@@ -100,7 +100,7 @@ private:
 	uint32_t defenseTicks;
 	int32_t changeTargetTicks;
 	std::string strDescription;
-	bool needThink;
+	bool walkActive;
 	//bool targetIsRecentAdded;
 	bool internalUpdateTargetList;
 	bool isActive;

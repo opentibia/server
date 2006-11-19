@@ -481,6 +481,7 @@ protected:
 	bool pzLocked;
 	uint32_t blockCount;
 	uint32_t skillPoint;
+	uint32_t attackTicks;
 	
 	chaseMode_t chaseMode;
 
@@ -570,6 +571,7 @@ protected:
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
 	virtual uint32_t getConditionSuppressions() const { return conditionSuppressions; }
 	virtual uint16_t getLookCorpse() const;
+	virtual uint32_t getAttackSpeed();
 
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 	

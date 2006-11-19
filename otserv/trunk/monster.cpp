@@ -59,7 +59,7 @@ Creature()
 	defenseTicks = 0;
 	changeTargetTicks = 0;
 	isActive = false;
-	needThink = false;
+	walkActive = false;
 	internalUpdateTargetList = false;
 	meleeBonusAttack = false;
 	spellBonusAttack = false;
@@ -246,23 +246,31 @@ void Monster::onCreatureLeave(const Creature* creature)
 
 void Monster::startThink()
 {
-	isActive = true;
+	if(!isActive){
+		isActive = true;
+		walkActive = false;
+	}	
 
 	if(isSummon()){
 		setAttackedCreature(getMaster()->getAttackedCreature());
 		setFollowCreature(getMaster()->getFollowCreature());
 	}
 
+	addEventThink();
+	addEventWalk();
+
+	/*
 	if(!eventCheck){
 		needThink = true;
 		eventCheck = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
 	}
+	*/
 
+	/*
 	if(!eventCheckAttacking){
 		eventCheckAttacking = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, &g_game, getID(), 500)));
 	}
-
-	addEventWalk();
+	*/
 }
 
 void Monster::stopThink()
@@ -272,6 +280,10 @@ void Monster::stopThink()
 		(*cit)->setAttackedCreature(NULL);
 	}
 
+	stopEventThink();
+	stopEventWalk();
+
+	/*
 	stopEventWalk();
 	eventWalk = 0;
 
@@ -280,6 +292,7 @@ void Monster::stopThink()
 
 	g_game.stopEvent(eventCheckAttacking);
 	eventCheckAttacking = 0;
+	*/
 }
 
 void Monster::searchTarget()
@@ -336,7 +349,7 @@ void Monster::onThink(uint32_t interval)
 		}
 	}
 
-	needThink = false;
+	walkActive = true;
 
 	if(!isActive && conditions.empty()){
 		stopThink();
@@ -363,14 +376,6 @@ void Monster::onThink(uint32_t interval)
 	*/
 
 	Creature::onThink(interval);
-
-	/*
-	if(!eventCheckAttacking){
-		eventCheckAttacking = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, &g_game, getID(), 500)));
-	}
-
-	addEventWalk();
-	*/
 	
 	onThinkYell(interval);
 	onDefending(interval);
@@ -404,6 +409,12 @@ void Monster::onThink(uint32_t interval)
 		}
 	}
 
+	/*
+	static uint64_t lastThink = GetTickCount();
+
+	std::cout << getName() << ", lastThink: " << (GetTickCount() - lastThink) << std::endl;
+	lastThink = GetTickCount();
+	*/
 }
 
 void Monster::onThinkYell(uint32_t interval)
@@ -431,7 +442,7 @@ void Monster::onWalk()
 
 bool Monster::getNextStep(Direction& dir)
 {
-	if(needThink){
+	if(!walkActive){
 		return false;
 	}
 
@@ -589,10 +600,15 @@ void Monster::doAttacking(uint32_t interval)
 	}
 
 	if(mType->combatMeleeMin != 0 || mType->combatMeleeMax != 0){
-		if(mType->combatMeleeSpeed < attackTicks || meleeBonusAttack){
+		if(mType->combatMeleeSpeed <= attackTicks || meleeBonusAttack){
 			
 			if(meleeBonusAttack || attackTicks % mType->combatMeleeSpeed < interval){
 				if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
+					static uint64_t lastMelee = GetTickCount();
+					
+					//std::cout << getName() << ", lastMelee: " << (GetTickCount() - lastMelee) << std::endl;
+					lastMelee = GetTickCount();
+
 					CombatParams params;
 					params.combatType = COMBAT_PHYSICALDAMAGE;
 					params.blockedByArmor = true;
@@ -627,7 +643,7 @@ void Monster::doAttacking(uint32_t interval)
 		}
 	}
 
-	attackedCreature->onAttacked();
+	//attackedCreature->onAttacked();
 
 	if(resetTicks){
 		attackTicks = 0;

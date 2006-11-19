@@ -65,7 +65,7 @@ Creature::Creature() :
 	followDistance = 1;
 
 	eventCheck = 0;
-	eventCheckAttacking = 0;
+	//eventCheckAttacking = 0;
 	attackedCreature = NULL;
 	lastHitCreature = 0;
 	internalDefense = true;
@@ -129,11 +129,25 @@ bool Creature::canSee(const Position& pos) const
 	return false;
 }
 
+void Creature::addEventThink()
+{
+	if(eventCheck == 0){
+		eventCheck = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
+		//onStartThink();
+	}
+}
+
+void Creature::stopEventThink()
+{
+	if(eventCheck != 0){
+		g_game.stopEvent(eventCheck);
+		eventCheck = 0;
+		//onStopThink();
+	}
+}
+
 void Creature::onThink(uint32_t interval)
 {
-	eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature,
-		&g_game, getID(), interval)));
-
 	if(internalUpdateFollow && followCreature){
 		internalUpdateFollow = false;
 		internalFollowCreature(followCreature);
@@ -146,6 +160,22 @@ void Creature::onThink(uint32_t interval)
 		internalDefense = true;
 		internalArmor = true;
 	}
+
+	if(attackedCreature){
+		if(g_game.canThrowObjectTo(getPosition(), attackedCreature->getPosition())){
+			doAttacking(interval);
+		}
+
+		attackedCreature->onAttacked();
+	}
+
+	if(eventCheck != 0){
+		eventCheck = 0;
+		addEventThink();
+	}
+
+	//eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature,
+	//	&g_game, getID(), interval)));
 }
 
 void Creature::onWalk()

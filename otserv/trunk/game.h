@@ -319,9 +319,8 @@ public:
 
 	//Events
 	void checkWalk(unsigned long creatureId);
-	//void checkAutoWalkPlayer(unsigned long creatureId);
 	void checkCreature(uint32_t creatureId, uint32_t interval);
-	void checkCreatureAttacking(uint32_t creatureId, uint32_t interval);
+	//void checkCreatureAttacking(uint32_t creatureId, uint32_t interval);
 	void checkSpawns(int t);
 	void checkLight(int t);
 	

@@ -178,7 +178,6 @@ public:
 	virtual void setAttackedCreature(Creature* creature);
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
-	virtual void doAttacking(uint32_t interval) {};
 
 	void setMaster(Creature* creature) {master = creature;}
 	Creature* getMaster() {return master;}
@@ -239,6 +238,8 @@ public:
 	virtual void setNormalCreatureLight();
 	void setCreatureLight(LightInfo& light) {internalLight = light;}
 	
+	void addEventThink();
+	void stopEventThink();
 	virtual void onThink(uint32_t interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);
@@ -284,7 +285,7 @@ protected:
 	Direction direction;
 
 	unsigned long eventCheck;
-	unsigned long eventCheckAttacking;
+	//unsigned long eventCheckAttacking;
 	
 	Creature* master;
 	std::list<Creature*> summons;
@@ -307,6 +308,8 @@ protected:
 	bool internalDefense;
 	bool internalArmor;
 	uint32_t blockTicks;
+
+	virtual void doAttacking(uint32_t interval) {};
 
 	LightInfo internalLight;
 	void validateWalkPath();

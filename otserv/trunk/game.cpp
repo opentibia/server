@@ -544,8 +544,9 @@ bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /
 			int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
 			creature->getParent()->postAddNotification(creature, newStackPos);
 
-			creature->eventCheck = addEvent(makeTask(500, boost::bind(&Game::checkCreature, this, creature->getID(), 500)));
-			creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
+			creature->addEventThink();
+			//creature->eventCheck = addEvent(makeTask(500, boost::bind(&Game::checkCreature, this, creature->getID(), 500)));
+			//creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
 		}
 	}
 
@@ -564,8 +565,10 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	//std::cout << "remove: " << creature << " " << creature->getID() << std::endl;
 
-	stopEvent(creature->eventCheck);
-	stopEvent(creature->eventCheckAttacking);
+	creature->stopEventThink();
+
+	//stopEvent(creature->eventCheck);
+	//stopEvent(creature->eventCheckAttacking);
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -1488,6 +1491,7 @@ void Game::getSpectators(SpectatorVec& list, const Position& centerPos, bool mul
 }
 
 //battle system
+/*
 void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreatureAttacking()");
@@ -1505,6 +1509,7 @@ void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 		creature->eventCheckAttacking = addEvent(makeTask(interval, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), interval)));
 	}
 }
+*/
 
 //Implementation of player invoked events
 bool Game::movePlayer(Player* player, Direction direction)

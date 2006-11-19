@@ -81,6 +81,7 @@ Creature()
 	pzLocked = false;
 	blockCount  = 0;
 	skillPoint = 0;
+	attackTicks = 0;
 
 	chaseMode = CHASEMODE_STANDSTILL;
 	//fightMode = FIGHTMODE_NONE;
@@ -2278,9 +2279,18 @@ void Player::setAttackedCreature(Creature* creature)
 	}
 }
 
+uint32_t Player::getAttackSpeed()
+{
+	return 2000;
+}
+
 void Player::doAttacking(uint32_t interval)
 {
-	if(attackedCreature){
+	attackTicks += interval;
+
+	if(getAttackSpeed() <= attackTicks){
+		attackTicks = 0;
+
 		Item* tool;
 		const Weapon* weapon;
 
@@ -2303,8 +2313,6 @@ void Player::doAttacking(uint32_t interval)
 				addSkillAdvance(SKILL_FIST, getSkillPoint());
 			}
 		}
-		
-		//onAttackedCreature(attackedCreature);
 	}
 }
 
