@@ -2847,7 +2847,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 								break;
 
 							case RACE_UNDEAD:
-								textColor = TEXTCOLOR_WHITE;
+								textColor = TEXTCOLOR_LIGHTGREY;
 								hitEffect = NM_ME_HIT_AREA;
 								break;
 								
