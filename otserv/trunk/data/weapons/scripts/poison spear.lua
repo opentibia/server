@@ -1,4 +1,5 @@
 local combat = createCombatObject()
+setCombatParam(combat, COMBAT_PARAM_BLOCKARMOR, 1)
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_POISONDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_SPEAR)
 setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, -0.2, -30, -0.5, 0)
