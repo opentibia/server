@@ -604,11 +604,6 @@ void Monster::doAttacking(uint32_t interval)
 			
 			if(meleeBonusAttack || attackTicks % mType->combatMeleeSpeed < interval){
 				if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
-					static uint64_t lastMelee = GetTickCount();
-					
-					//std::cout << getName() << ", lastMelee: " << (GetTickCount() - lastMelee) << std::endl;
-					lastMelee = GetTickCount();
-
 					CombatParams params;
 					params.combatType = COMBAT_PHYSICALDAMAGE;
 					params.blockedByArmor = true;
