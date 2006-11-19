@@ -744,9 +744,6 @@ bool InstantSpell::loadFunction(const std::string& functionName)
 	else if(strcasecmp(functionName.c_str(), "Levitate") == 0){
 		function = Levitate;
 	}
-	else if(strcasecmp(functionName.c_str(), "magicrope") == 0){
-		function = MagicRope;
-	}
 	else if(strcasecmp(functionName.c_str(), "illusion") == 0){
 		function = Illusion;
 	}
@@ -1305,27 +1302,6 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 	}
 
 	return (ret == RET_NOERROR);
-}
-
-bool InstantSpell::MagicRope(const InstantSpell* spell, Creature* creature, const std::string& param)
-{
-	Player* player = creature->getPlayer();
-	if(!player){
-		return false;
-	}
-
-	const Position& currentPos = creature->getPosition();
-
-	Tile* tmpTile = g_game.getTile(currentPos.x + 1, currentPos.y, currentPos.z - 1);
-	if(!tmpTile || !tmpTile->ground || tmpTile->hasProperty(BLOCKSOLID)){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
-	g_game.internalTeleport(creature, tmpTile->getPosition());
-	g_game.addMagicEffect(player->getPosition(), NM_ME_ENERGY_AREA);
-	return true;
 }
 
 bool InstantSpell::Illusion(const InstantSpell* spell, Creature* creature, const std::string& param)

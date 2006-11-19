@@ -255,6 +255,7 @@ protected:
 	static int luaDoRemoveItem(lua_State *L);
 	static int luaDoFeedPlayer(lua_State *L);
 	static int luaDoSendCancel(lua_State *L);
+	static int luaDoSendDefaultCancel(lua_State *L);
 	static int luaDoTeleportThing(lua_State *L);
 	static int luaDoTransformItem(lua_State *L);
 	static int luaDoSendMagicEffect(lua_State *L);

@@ -613,20 +613,23 @@ bool LuaScriptInterface::closeState()
 
 bool LuaScriptInterface::callFunction(uint32_t nParams, int32_t& result)
 {
-	bool ret;
+	//bool ret;
 	int size0 = lua_gettop(m_luaState);
 	if(lua_pcall(m_luaState, nParams, 1, 0) != 0){
 		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(m_luaState)));
-		ret =  false;
+		result = 0;
 	}
 	else{
 		result = (int32_t)LuaScriptInterface::popNumber(m_luaState);
-		ret =  true;
+		//ret =  true;
 	}
+
 	if((lua_gettop(m_luaState) + (int)nParams  + 1) != size0){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
-	return ret;
+
+	return (result == 1);
+	//return ret;
 }
 
 bool LuaScriptInterface::callFunction(uint32_t nParams)
@@ -805,6 +808,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doPlayerFeed", LuaScriptInterface::luaDoFeedPlayer);	
 	//doPlayerSendCancel(uid,text)
 	lua_register(m_luaState, "doPlayerSendCancel", LuaScriptInterface::luaDoSendCancel);
+	//doPlayerSendDefaultCancel(uid, ReturnValue)
+	lua_register(m_luaState, "doPlayerSendDefaultCancel", LuaScriptInterface::luaDoSendDefaultCancel);
 	//doTeleportThing(uid,newpos)
 	lua_register(m_luaState, "doTeleportThing", LuaScriptInterface::luaDoTeleportThing);
 	//doTransformItem(uid,toitemid)	
@@ -1250,6 +1255,26 @@ int LuaScriptInterface::luaDoSendCancel(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaDoSendDefaultCancel(lua_State *L)
+{	
+	//doPlayerSendDefaultCancel(uid, ReturnValue)
+	ReturnValue ret = (ReturnValue)popNumber(L);	
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	const Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->sendCancelMessage(ret);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
 
 int LuaScriptInterface::luaDoTeleportThing(lua_State *L)
 {
@@ -2776,7 +2801,7 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 		}
 	}
 
-	lua_pushnumber(L, LUA_NO_ERROR);
+	lua_pushnumber(L, LUA_TRUE);
 	return 1;
 }
 
