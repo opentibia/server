@@ -544,7 +544,7 @@ void Player::dropLoot(Container* corpse)
 	#ifdef __SKULLSYSTEM__
 			if(item && ((item->getContainer()) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
 	#else
-			if(item && ((item->getContainer()) || random_range(1, 100) <= 100)){
+			if(item && ((item->getContainer()) || random_range(1, 100) <= 10)){
 	#endif
 				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount());
 
