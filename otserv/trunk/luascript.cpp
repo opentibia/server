@@ -628,7 +628,7 @@ bool LuaScriptInterface::callFunction(uint32_t nParams, int32_t& result)
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 
-	return (result == 1);
+	return (result == LUA_NO_ERROR);
 	//return ret;
 }
 
@@ -2801,7 +2801,7 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 		}
 	}
 
-	lua_pushnumber(L, LUA_TRUE);
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
