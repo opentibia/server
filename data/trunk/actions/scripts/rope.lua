@@ -1,10 +1,14 @@
 function onUse(cid, item, frompos, item2, topos)
-	newpos = {x = topos.x, y = topos.y, z = topos.z}
-	if isInArray(ROPE_SPOT, item2.itemid) == 1 then
+
+	newpos = {x = topos.x, y = topos.y, z = topos.z, stackpos = 0}
+
+	grounditem = getThingfromPos(newpos)
+
+	if isInArray(ROPE_SPOT, grounditem.itemid) == 1 then
 		newpos.y = newpos.y + 1
 		newpos.z = newpos.z - 1
 		doTeleportThing(cid, newpos)
-	elseif isInArray(OPENED_HOLE, item2.itemid) == 1 or isInArray(OPENED_TRAP, item2.itemid) == 1 or isInArray(DOWN_LADDER, item2.itemid) == 1 then
+	elseif isInArray(OPENED_HOLE, grounditem.itemid) == 1 or isInArray(OPENED_TRAP, grounditem.itemid) == 1 or isInArray(DOWN_LADDER, grounditem.itemid) == 1 then
 		newpos.y = newpos.y + 1
 		downpos = {x = topos.x, y = topos.y, z = topos.z + 1, stackpos = 255}
 		downitem = getThingfromPos(downpos)
