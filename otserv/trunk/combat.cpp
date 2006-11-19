@@ -672,13 +672,9 @@ void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatPar
 	}
 }
 
-void Combat::postCombatEffects(Creature* caster, const Position& pos, bool success) const
+void Combat::postCombatEffects(Creature* caster, const Position& pos) const
 {
 	Combat::postCombatEffects(caster, pos, params);
-
-	if(!success){
-		g_game.addMagicEffect(pos, NM_ME_PUFF);
-	}
 }
 
 ValueCallback::ValueCallback(formulaType_t _type)

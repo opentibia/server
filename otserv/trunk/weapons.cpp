@@ -388,8 +388,11 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 		executeUseWeapon(player, var);
 	}
 	else{
-		int32_t damage = getWeaponDamage(player, item);
-		Combat::doCombatHealth(player, tile->getPosition(), NULL, damage, damage, params);
+		Combat::postCombatEffects(player, tile->getPosition(), params);
+		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
+
+		//int32_t damage = getWeaponDamage(player, item);
+		//Combat::doCombatHealth(player, tile->getPosition(), NULL, damage, damage, params);
 	}
 
 	onUsedWeapon(player, item, tile);

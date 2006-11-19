@@ -132,6 +132,7 @@ public:
 		const AreaCombat* area, std::list<Tile*>& list);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(Creature* attacker, Creature* target);
+	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
 
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;
@@ -144,7 +145,7 @@ public:
 	bool hasArea() const {return area != NULL;}
 	void setCondition(const Condition* _condition);
 	void setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb);
-	void postCombatEffects(Creature* caster, const Position& pos, bool success) const;
+	void postCombatEffects(Creature* caster, const Position& pos) const;
 
 protected:
 	static void doCombatDefault(Creature* caster, Creature* target, const CombatParams& params);
@@ -159,7 +160,6 @@ protected:
 	static bool CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 
 	static void combatTileEffects(Creature* caster, Tile* tile, const CombatParams& params);
-	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
 	void getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const;
 
 	//configureable

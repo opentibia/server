@@ -2775,7 +2775,8 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 				combat->doCombat(creature, var->pos);
 			}
 			else{
-				combat->postCombatEffects(creature, var->pos, false);
+				combat->postCombatEffects(creature, var->pos);
+				g_game.addMagicEffect(var->pos, NM_ME_PUFF);
 			}
 			break;
 		}
