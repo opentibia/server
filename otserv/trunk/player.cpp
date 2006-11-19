@@ -538,17 +538,23 @@ uint16_t Player::getLookCorpse() const
 
 void Player::dropLoot(Container* corpse)
 {
-	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
-		Item* item = inventory[i];		
-#ifdef __SKULLSYSTEM__
-		if(item && ((item->getContainer()) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
-#else
-		if(item && ((item->getContainer()) || random_range(1, 100) <= 10)){
-#endif
-			corpse->__internalAddThing(item);
-			sendRemoveInventoryItem((slots_t)i, item);
-			onRemoveInventoryItem((slots_t)i, item);
-			inventory[i] = NULL;
+	if(corpse){
+		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
+			Item* item = inventory[i];		
+	#ifdef __SKULLSYSTEM__
+			if(item && ((item->getContainer()) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
+	#else
+			if(item && ((item->getContainer()) || random_range(1, 100) <= 100)){
+	#endif
+				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount());
+
+				/*
+				corpse->__internalAddThing(item);
+				sendRemoveInventoryItem((slots_t)i, item);
+				onRemoveInventoryItem((slots_t)i, item);
+				inventory[i] = NULL;
+				*/
+			}
 		}
 	}
 }

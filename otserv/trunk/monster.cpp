@@ -781,8 +781,10 @@ void Monster::updateLookDirection()
 
 void Monster::dropLoot(Container* corpse)
 {
-	if(!getMaster()){
-		mType->createLoot(corpse);
+	if(corpse){
+		if(!getMaster()){
+			mType->createLoot(corpse);
+		}
 	}
 }
 

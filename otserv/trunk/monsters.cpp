@@ -445,7 +445,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t range = 0;
 
 						if(readXMLInteger(tmpNode, "speed", intValue)){
-							speed = intValue;
+							speed = std::max(1, intValue);
 						}
 
 						if(readXMLInteger(tmpNode, "chance", intValue)){
@@ -508,7 +508,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t range = 0;
 
 						if(readXMLInteger(tmpNode, "speed", intValue)){
-							speed = intValue;
+							speed = std::max(1, intValue);
 						}
 
 						if(readXMLInteger(tmpNode, "chance", intValue)){
@@ -532,6 +532,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							sb.chance = chance;
 							sb.minCombatValue = min;
 							sb.maxCombatValue = max;
+							sb.range = range;
 							sb.speed = speed;
 
 							Spell* spell;

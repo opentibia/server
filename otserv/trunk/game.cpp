@@ -2605,6 +2605,7 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 			Item* corpse = creature->getCorpse();
 			if(corpse){
 				internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
+				creature->dropLoot(corpse->getContainer());
 				startDecay(corpse);
 			}
 
