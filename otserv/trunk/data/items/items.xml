@@ -125,10 +125,6 @@
 		<attribute key="speed" value="40"/>
 	</item>
 
-	<item id="2195" name="boots of haste">
-		<attribute key="speed" value="40"/>
-	</item>
-
 	<item id="1487" name="fire">
 		<attribute key="duration" value="60"/>
 		<attribute key="field" value="fire">
@@ -151,7 +147,9 @@
 	</item>
 
 	<item id="1506" name="magic fire">
-		<attribute key="field" damageType="fire" initDamage="400"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="400"/>
+		</attribute>
 	</item>
 
 </items>
