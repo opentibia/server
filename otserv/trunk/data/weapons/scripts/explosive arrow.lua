@@ -8,5 +8,5 @@ local area = createCombatArea( { {1, 1, 1}, {1, 3, 1}, {1, 1, 1} } )
 setCombatArea(combat, area)
 
 function onUseWeapon(cid, var)
-	doCombat(cid, combat, var)
+	return doCombat(cid, combat, var)
 end
