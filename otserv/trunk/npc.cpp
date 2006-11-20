@@ -49,6 +49,7 @@ Creature()
 	if(!m_scriptInterface){
 		 m_scriptInterface = new NpcScriptInterface();
 	}
+	m_npcEventHandler = NULL;
 	loaded = true;
 	name = _name;
 

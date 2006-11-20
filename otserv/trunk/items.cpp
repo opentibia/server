@@ -112,51 +112,6 @@ ItemType::~ItemType()
 	delete condition;
 }
 
-bool ItemType::isGroundTile() const
-{
-	return group == ITEM_GROUP_GROUND;
-}
-
-bool ItemType::isContainer() const
-{
-	return (group == ITEM_GROUP_CONTAINER);
-}
-
-bool ItemType::isDoor() const
-{
-	return (group == ITEM_GROUP_DOOR);
-}
-
-bool ItemType::isTeleport() const
-{
-	return (group == ITEM_GROUP_TELEPORT);
-}
-
-bool ItemType::isMagicField() const
-{
-	return (group == ITEM_GROUP_MAGICFIELD);
-}
-
-bool ItemType::isKey() const
-{
-	return (group == ITEM_GROUP_KEY);
-}
-
-bool ItemType::isSplash() const
-{
-	return (group == ITEM_GROUP_SPLASH);
-}
-
-bool ItemType::isFluidContainer() const
-{
-	return (group == ITEM_GROUP_FLUID);
-}
-
-bool ItemType::isRune() const
-{
-	return (group == ITEM_GROUP_RUNE);
-}
-
 Items::Items() :
 items(8000)
 {
@@ -956,11 +911,6 @@ bool Items::loadFromXml(const std::string& datadir)
 	return true;
 }
 
-const ItemType& Items::operator[](int id)
-{
-	return getItemType(id);
-}
-
 ItemType& Items::getItemType(int id)
 {
 	ItemType* iType = items.getElement(id);
@@ -1018,25 +968,24 @@ Array<A>::~Array()
 template<typename A>
 A Array<A>::getElement(uint32_t id)
 {
-	if(id < 0 || id >= m_size){
-		return 0;
+	if(id >= 0 && id < m_size){
+		return m_data[id];
 	}
 	else{
-		return m_data[id];
+		return 0;
 	}
 }
 
 template<typename A>
 void Array<A>::addElement(A a, uint32_t pos)
 {
-	#define INCREMENT 5000
-	if(pos >= m_size){
-		m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
-		memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
-		m_size = pos + INCREMENT;
+	if(pos >= 0){
+		#define INCREMENT 5000
+		if(pos >= m_size){
+			m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
+			memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
+			m_size = pos + INCREMENT;
+		}
+		m_data[pos] = a;
 	}
-	if(pos < 0){
-		return;
-	}
-	m_data[pos] = a;
 }

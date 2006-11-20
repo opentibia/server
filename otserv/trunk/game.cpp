@@ -260,7 +260,7 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 unsigned long Game::addEvent(SchedulerTask* event)
 {
   bool do_signal = false;
-  OTSYS_THREAD_LOCK(eventLock, "addEvent()")
+  OTSYS_THREAD_LOCK(eventLock, "addEvent()");
 
 	if(event->getEventId() == 0) {
 		++eventIdCount;
@@ -279,7 +279,7 @@ unsigned long Game::addEvent(SchedulerTask* event)
 	if(isEmpty || *event < *eventList.top())
 		do_signal = true;
 
-  OTSYS_THREAD_UNLOCK(eventLock, "addEvent()")
+	OTSYS_THREAD_UNLOCK(eventLock, "addEvent()");
 
 	if (do_signal)
 		OTSYS_THREAD_SIGNAL_SEND(eventSignal);
@@ -304,11 +304,11 @@ bool Game::stopEvent(unsigned long eventid)
 		//it->second->setEventId(0); //invalidate the event
 		eventIdMap.erase(it);
 
-		OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()")
+		OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()");
 		return true;
 	}
 
-	OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()")
+	OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()");
 	return false;
 }
 

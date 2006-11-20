@@ -24,9 +24,30 @@
 #include "definitions.h"
 #include <string>
 #include "stdio.h"
-#include "definitions.h"
 
-typedef unsigned long NODE;
+
+struct NodeStruct;
+
+typedef NodeStruct* NODE;
+
+struct NodeStruct{
+	NodeStruct(){
+		start = 0;
+		propsSize = 0;
+		next = 0;
+		child = 0;
+		type = 0;
+	}
+	~NodeStruct(){
+		delete next;
+		delete child;
+	}
+	unsigned long start;
+	unsigned long propsSize;
+	unsigned long type;
+	NodeStruct* next;
+	NodeStruct* child;
+};
 
 #define NO_NODE 0
 
@@ -72,7 +93,10 @@ protected:
 		ESCAPE_CHAR = 0xFD,
 	};
 
+	bool parseNode(NODE node);
+
 	inline bool readByte(int &value);
+	inline bool readBytes(unsigned char* buffer, int size, long pos);
 	inline bool checks(const NODE node);
 	inline bool safeSeek(unsigned long pos);
 	inline bool safeTell(long &pos);
@@ -101,22 +125,24 @@ public:
 protected:
 	FILE* m_file;
 	FILELOADER_ERRORS m_lastError;
+	NODE m_root;
 	unsigned long m_buffer_size;
 	unsigned char* m_buffer;
 
 	bool m_use_cache;
 	struct _cache{
 		unsigned long loaded;
-		long base;
-		long size;
+		unsigned long base;
+		unsigned long size;
 		unsigned char* data;
 	};
 	#define CACHE_BLOCKS 3
 	unsigned long m_cache_size;
 	_cache m_cached_data[CACHE_BLOCKS];
-	long m_cache_index;
-	long m_cache_offset;
-	inline long getCacheBlock(unsigned long pos);
+	#define NO_VALID_CACHE 0xFFFFFFFF
+	unsigned long m_cache_index;
+	unsigned long m_cache_offset;
+	inline unsigned long getCacheBlock(unsigned long pos);
 	long loadCacheBlock(unsigned long pos);
 };
 
@@ -276,8 +302,5 @@ protected:
 	unsigned long buffer_size;
 	unsigned long size;
 };
-
-
-
 
 #endif

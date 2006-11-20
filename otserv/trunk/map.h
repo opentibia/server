@@ -31,6 +31,7 @@
 #include "item.h"
 #include "creature.h"
 #include "iomapserialize.h"
+#include "fileloader.h"
 
 #include "tools.h"
 #include "tile.h"
@@ -168,9 +169,14 @@ public:
 	MapError_t getLastError() {return lasterrortype;}
 	int getErrorCode() {return lasterrorcode;}
 
-	void setLastError(MapError_t errtype, unsigned long _code = 0)
+	void setLastError(MapError_t errtype, NODE _code = 0)
 	{
-		lasterrorcode = _code;
+		if(_code){
+			lasterrorcode = _code->start;
+		}
+		else{
+			lasterrorcode = 0;
+		}
 		lasterrortype = errtype;
 	}
 

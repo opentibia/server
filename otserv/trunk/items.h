@@ -133,15 +133,15 @@ public:
 
 	itemgroup_t group;
 
-	bool isGroundTile() const;
-	bool isContainer() const;
-	bool isDoor() const;
-	bool isTeleport() const;
-	bool isMagicField() const;
-	bool isKey() const;
-	bool isSplash() const;
-	bool isFluidContainer() const;
-	bool isRune() const;
+	bool isGroundTile() const {return (group == ITEM_GROUP_GROUND);}
+	bool isContainer() const {return (group == ITEM_GROUP_CONTAINER);}
+	bool isDoor() const {return (group == ITEM_GROUP_DOOR);}
+	bool isTeleport() const {return (group == ITEM_GROUP_TELEPORT);}
+	bool isMagicField() const {return (group == ITEM_GROUP_MAGICFIELD);}
+	bool isKey() const {return (group == ITEM_GROUP_KEY);}
+	bool isSplash() const {return (group == ITEM_GROUP_SPLASH);}
+	bool isFluidContainer() const {return (group == ITEM_GROUP_FLUID);}
+	bool isRune() const {return (group == ITEM_GROUP_RUNE);}
 
 	uint16_t id;
 	uint16_t clientId;
@@ -247,7 +247,7 @@ public:
 
 	int loadFromOtb(std::string);
 	
-	const ItemType& operator[](int id);
+	const ItemType& operator[](int id){return getItemType(id);}
 	ItemType& getItemType(int id);
 
 	int getItemIdByName(const std::string& name);
