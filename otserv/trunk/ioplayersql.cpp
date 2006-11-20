@@ -79,9 +79,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	player->setDirection((Direction)result.getDataInt("direction"));
 	player->experience = result.getDataLong("experience");
 	player->level = result.getDataInt("level");
-	player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
-	if(player->level_percent > 100)
-		player->level_percent = 100;
+	//player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
+	//if(player->level_percent > 100)
+	//	player->level_percent = 100;
 	player->capacity = result.getDataInt("cap");
 	player->maxDepotLimit = result.getDataInt("maxdepotitems");
 	player->lastLoginSaved = result.getDataInt("lastlogin");

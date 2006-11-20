@@ -158,9 +158,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			player->lastLoginSaved = 0;
 
+		/*
 		//level percent
-		player->level_percent = (unsigned char)(100*(player->experience - player->getExpForLv(player->level)) /
+		int32_t percent = (100*(player->experience - player->getExpForLv(player->level)) /
 			(1.*player->getExpForLv(player->level+1) - player->getExpForLv(player->level)));
+
+		player->level_percent = std::min(100, percent);
+		*/
 
 		p = root->children;
 

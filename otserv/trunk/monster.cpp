@@ -349,12 +349,12 @@ void Monster::onThink(uint32_t interval)
 		}
 	}
 
-	walkActive = true;
-
 	if(!isActive && conditions.empty()){
 		stopThink();
 		return;
 	}
+
+	walkActive = true;
 
 	/*
 	if(isSummon()){
@@ -374,8 +374,6 @@ void Monster::onThink(uint32_t interval)
 		}
 	}
 	*/
-
-	Creature::onThink(interval);
 	
 	onThinkYell(interval);
 	onDefending(interval);
@@ -409,6 +407,8 @@ void Monster::onThink(uint32_t interval)
 		}
 	}
 
+
+	Creature::onThink(interval);
 	/*
 	static uint64_t lastThink = GetTickCount();
 
