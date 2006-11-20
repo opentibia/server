@@ -479,7 +479,8 @@ protected:
 	uint32_t npings;
 
 	bool pzLocked;
-	uint32_t blockCount;
+	int32_t blockCount;
+	int32_t shieldBlockCount;
 	uint32_t skillPoint;
 	uint32_t attackTicks;
 	

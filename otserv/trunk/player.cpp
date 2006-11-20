@@ -79,7 +79,8 @@ Creature()
 	internal_ping = 0;
 
 	pzLocked = false;
-	blockCount  = 0;
+	blockCount = 0;
+	shieldBlockCount = 0;
 	skillPoint = 0;
 	attackTicks = 0;
 
@@ -1265,6 +1266,7 @@ void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 		case BLOCK_NONE:
 			skillPoint = 1;
 			blockCount = 0;
+			shieldBlockCount = 30;
 			break;
 
 		case BLOCK_DEFENSE:
@@ -1362,11 +1364,15 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 
 void Player::onDefenseBlock(bool blockedHit)
 {
-	if(blockedHit){
-		addSkillAdvance(SKILL_SHIELD, 2);
-	}
-	else{
-		addSkillAdvance(SKILL_SHIELD, 1);
+	if(shieldBlockCount > 0){
+		--shieldBlockCount;
+
+		if(blockedHit){
+			addSkillAdvance(SKILL_SHIELD, skillPoint * 2);
+		}
+		else{
+			addSkillAdvance(SKILL_SHIELD, skillPoint);
+		}
 	}
 }
 
