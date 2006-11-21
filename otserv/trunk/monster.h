@@ -100,10 +100,10 @@ private:
 	uint32_t defenseTicks;
 	int32_t changeTargetTicks;
 	std::string strDescription;
-	bool walkActive;
 	//bool targetIsRecentAdded;
 	bool internalUpdateTargetList;
 	bool isActive;
+	bool isWalkActive;
 	bool meleeBonusAttack;
 	bool spellBonusAttack;
 
@@ -129,6 +129,7 @@ private:
 
 	void updateLookDirection();
 	void updateTargetList();
+	void clearTargetList();
 
 	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 

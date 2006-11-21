@@ -254,8 +254,8 @@ Position Spells::getCasterPosition(Creature* creature, Direction dir)
 
 Spell::Spell()
 {
-	level = 0;
-	magLevel = 0;
+	level = -1;
+	magLevel = -1;
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
@@ -1569,7 +1569,7 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 
 	hasCharges = (charges > 0);
 
-	if(magLevel != 0){
+	if(magLevel != -1){
 		//Change magic level in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);
 		iType.runeMagLevel = magLevel;

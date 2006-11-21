@@ -298,10 +298,6 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Creature::onCreatureDisappear(const Creature* creature)
 {
-	if(creature->getMaster() == this){
-		removeSummon(creature);
-	}
-
 	if(attackedCreature == creature){
 		setAttackedCreature(NULL);
 		onAttackedCreatureDissapear();
@@ -397,6 +393,10 @@ void Creature::die()
 		if(Creature* attacker = g_game.getCreatureByID((*it).first)){
 			attacker->onAttackedCreatureKilled(this);
 		}
+	}
+
+	if(getMaster()){
+		getMaster()->removeSummon(this);
 	}
 }
 

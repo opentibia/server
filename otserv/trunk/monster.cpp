@@ -59,7 +59,7 @@ Creature()
 	defenseTicks = 0;
 	changeTargetTicks = 0;
 	isActive = false;
-	walkActive = false;
+	isWalkActive = false;
 	internalUpdateTargetList = false;
 	meleeBonusAttack = false;
 	spellBonusAttack = false;
@@ -85,7 +85,7 @@ Creature()
 
 Monster::~Monster()
 {
-	//
+	clearTargetList();
 }
 
 bool Monster::canSee(const Position& pos) const
@@ -176,14 +176,24 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 	}
 }
 
+void Monster::clearTargetList()
+{
+	for(TargetList::iterator it = targetList.begin(); it != targetList.end(); ++it){
+		(*it)->releaseThing2();
+	}
+
+	targetList.clear();
+}
+
 void Monster::updateTargetList()
 {
 	//std::cout << "updateTargetList" << std::endl;
 
 	//targetList.clear();
-
 	for(TargetList::iterator it = targetList.begin(); it != targetList.end();){
-		if(!canSee((*it)->getPosition())){
+		if((*it)->getHealth() <= 0 || !canSee((*it)->getPosition())){
+			//std::cout << "Remove (cannot see) creature: " << &(*it) << ", Position: "<< (*it)->getPosition() << std::endl;
+			(*it)->releaseThing2();
 			it = targetList.erase(it);
 		}
 		else
@@ -220,11 +230,12 @@ void Monster::onCreatureEnter(const Creature* creature)
 
 void Monster::onCreatureFound(const Creature* creature)
 {
-	if((creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer()))){
+	if(creature->getHealth() > 0 && (creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer()))){
 		if(std::find(targetList.begin(), targetList.end(), creature) == targetList.end()){
-			targetList.push_back(const_cast<Creature*>(creature));
-
-			//targetIsRecentAdded = true;
+			//std::cout << "Adding creature: " << &creature << ", Position: "<< creature->getPosition() << std::endl;
+			Creature* target = const_cast<Creature*>(creature);
+			target->useThing2();
+			targetList.push_back(target);
 			internalUpdateTargetList = true;
 			startThink();
 		}
@@ -233,23 +244,25 @@ void Monster::onCreatureFound(const Creature* creature)
 
 void Monster::onCreatureLeave(const Creature* creature)
 {
-	if(creature == this || getMaster() == creature){
-		//stopThink();
+	if(getMaster() == creature){
+		isWalkActive = false;
+	}
+
+	if(creature == this){
 		isActive = false;
 	}
 
 	TargetList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
 	if(it != targetList.end()){
+		(*it)->releaseThing2();
 		targetList.erase(it);
+		//std::cout << "Remove creature: " << &creature << ", Position: "<< creature->getPosition() << std::endl;
 	}
 }
 
 void Monster::startThink()
 {
-	if(!isActive){
-		isActive = true;
-		walkActive = false;
-	}	
+	isActive = true;
 
 	if(isSummon()){
 		setAttackedCreature(getMaster()->getAttackedCreature());
@@ -258,41 +271,21 @@ void Monster::startThink()
 
 	addEventThink();
 	addEventWalk();
-
-	/*
-	if(!eventCheck){
-		needThink = true;
-		eventCheck = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
-	}
-	*/
-
-	/*
-	if(!eventCheckAttacking){
-		eventCheckAttacking = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, &g_game, getID(), 500)));
-	}
-	*/
 }
 
 void Monster::stopThink()
 {
+	isWalkActive = false;
 	isActive = false;
+
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
 		(*cit)->setAttackedCreature(NULL);
 	}
 
+	clearTargetList();
+
 	stopEventThink();
 	stopEventWalk();
-
-	/*
-	stopEventWalk();
-	eventWalk = 0;
-
-	g_game.stopEvent(eventCheck);
-	eventCheck = 0;
-
-	g_game.stopEvent(eventCheckAttacking);
-	eventCheckAttacking = 0;
-	*/
 }
 
 void Monster::searchTarget()
@@ -312,18 +305,6 @@ void Monster::searchTarget()
 			}
 		}while(lastCreature != *targetList.begin());
 	}
-
-	/*
-	if(!targetList.empty()){
-		TargetList::iterator it = targetList.begin();
-		Creature* target = *it;
-
-		targetList.erase(it);
-		targetList.push_back(target);
-
-		selectTarget(target);
-	}
-	*/
 }
 
 bool Monster::selectTarget(Creature* creature)
@@ -354,7 +335,7 @@ void Monster::onThink(uint32_t interval)
 		return;
 	}
 
-	walkActive = true;
+	isWalkActive = true;
 
 	/*
 	if(isSummon()){
@@ -442,7 +423,7 @@ void Monster::onWalk()
 
 bool Monster::getNextStep(Direction& dir)
 {
-	if(!walkActive){
+	if(!isWalkActive){
 		return false;
 	}
 

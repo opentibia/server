@@ -465,7 +465,7 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 	}
 	else{
 		//update percent
-		int32_t newPercent = std::min((int32_t)100, (int32_t)(100*(skills[skill][SKILL_TRIES])/(1.*vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1))));
+		uint32_t newPercent = std::min((uint32_t)100, (100*skills[skill][SKILL_TRIES])/vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1));
 	 	if(skills[skill][SKILL_PERCENT] != newPercent){
 			skills[skill][SKILL_PERCENT] = newPercent;
 			client->sendSkills();
@@ -822,12 +822,13 @@ void Player::sendStats()
 {
 	//update level and magLevel percents
 	if(lastSentStats.experience != getExperience() || lastSentStats.level != level){
-		int32_t tmpVar = (100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));
-		level_percent = std::min((int32_t)100, tmpVar);
+		uint32_t currentExpLevel = getExpForLv(level);
+		uint32_t tmpVar = (100*(experience - currentExpLevel)) / std::max((int32_t)1, (int32_t)(getExpForLv(level + 1) - currentExpLevel));
+		level_percent = std::min((uint32_t)100, tmpVar);
 	}
 			
 	if(lastSentStats.manaSpent != manaSpent || lastSentStats.magLevel != magLevel){
-		int32_t tmpVar = (100*(manaSpent/(1.* vocation->getReqMana(magLevel + 1))));
+		int32_t tmpVar = (100*manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
 		maglevel_percent = std::min((int32_t)100, tmpVar);
 	}
 			
@@ -1258,8 +1259,9 @@ void Player::addExperience(uint32_t exp)
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
-		sendStats();
 	}
+
+	sendStats();
 }
 
 void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
@@ -2784,17 +2786,17 @@ void Player::setSex(playersex_t player_sex)
 
 void Player::setSkillsPercents()
 {
-	int32_t percent = 0;
+	uint32_t percent = 0;
 
-	percent = 100*(manaSpent/(1.*vocation->getReqMana(magLevel+1)));
-	maglevel_percent = std::min((int32_t)100, percent);
+	percent = (100*manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel+1)));
+	maglevel_percent = std::min((uint32_t)100, percent);
 
-	percent = (100*(getExperience() - getExpForLv(getLevel())) /
-		(1.*getExpForLv(getLevel()+1) - getExpForLv(getLevel())));
-	level_percent = std::min((int32_t)100, percent);
+	percent = (100*(getExperience() - getExpForLv(getLevel()))) /
+		std::max((int32_t)1, (int32_t)((getExpForLv(getLevel() + 1) - getExpForLv(getLevel()))));
+	level_percent = std::min((uint32_t)100, percent);
 
-	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){
-		percent = (100*(skills[i][SKILL_TRIES])/(1.*vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]+1)));
-		skills[i][SKILL_PERCENT] = std::min((int32_t)100, percent);
+	for(unsigned int i = SKILL_FIRST; i < SKILL_LAST; ++i){
+		percent = (100*skills[i][SKILL_TRIES]) / std::max((int32_t)1, (int32_t)(vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]+1)));
+		skills[i][SKILL_PERCENT] = std::min((uint32_t)100, percent);
 	}
 }
