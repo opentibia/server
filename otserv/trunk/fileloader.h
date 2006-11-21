@@ -39,14 +39,43 @@ struct NodeStruct{
 		type = 0;
 	}
 	~NodeStruct(){
-		delete next;
-		delete child;
+		//
 	}
 	unsigned long start;
 	unsigned long propsSize;
 	unsigned long type;
 	NodeStruct* next;
 	NodeStruct* child;
+
+	static void clearNet(NodeStruct* root){
+		if(root){
+			clearChild(root);
+		}
+	}
+
+private:
+	static void clearNext(NodeStruct* node){
+		NodeStruct* deleteNode = node;
+		NodeStruct* nextNode;
+		while(deleteNode){
+			if(deleteNode->child){
+				clearChild(deleteNode->child);
+			}
+			nextNode = deleteNode->next;
+			delete deleteNode;
+			deleteNode = nextNode;
+		}
+	}
+
+	static void clearChild(NodeStruct* node){
+		if(node->child){
+			clearChild(node->child);
+		}
+		if(node->next){
+			clearNext(node->next);
+		}
+		delete node;
+	}
 };
 
 #define NO_NODE 0
