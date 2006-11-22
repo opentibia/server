@@ -296,16 +296,16 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 	validateWalkPath();
 }
 
-void Creature::onCreatureDisappear(const Creature* creature)
+void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 {
 	if(attackedCreature == creature){
 		setAttackedCreature(NULL);
-		onAttackedCreatureDissapear();
+		onAttackedCreatureDissapear(isLogout);
 	}
 
 	if(followCreature == creature){
 		setFollowCreature(NULL);
-		onFollowCreatureDissapear();
+		onFollowCreatureDissapear(isLogout);
 	}
 }
 
@@ -313,7 +313,7 @@ void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, 
 {
 	validateWalkPath();
 
-	onCreatureDisappear(creature);
+	onCreatureDisappear(creature, isLogout);
 }
 
 void Creature::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
@@ -334,18 +334,11 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 				lastStepCost = 2;
 			}
 		}
-
-		/*
-		if(!teleport &&  (std::abs(newPos.x - oldPos.x) >=1 && std::abs(newPos.y - oldPos.y) >= 1) ){
-			//diagonal extra cost
-			lastStepCost = 2;
-		}
-		*/
 	}
 
 	if(followCreature == creature || (creature == this && followCreature)){
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
-			onCreatureDisappear(followCreature);
+			onCreatureDisappear(followCreature, false);
 		}
 		
 		validateWalkPath();
@@ -353,10 +346,10 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 
 	if(attackedCreature == creature || (creature == this && attackedCreature)){
 		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
-			onCreatureDisappear(attackedCreature);
+			onCreatureDisappear(attackedCreature, false);
 		}
 		else if(attackedCreature->isInPz() || isInPz()){
-			onCreatureDisappear(attackedCreature);
+			onCreatureDisappear(attackedCreature, false);
 		}
 	}
 }
@@ -365,11 +358,11 @@ void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 {
 	if(!visible && !canSeeInvisibility() && getMaster() != creature){
 		if(followCreature == creature){
-			onCreatureDisappear(followCreature);
+			onCreatureDisappear(followCreature, false);
 		}
 
 		if(attackedCreature == creature){
-			onCreatureDisappear(attackedCreature);
+			onCreatureDisappear(attackedCreature, false);
 		}
 	}
 }
@@ -470,6 +463,12 @@ void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 
 void Creature::setAttackedCreature(Creature* creature)
 {
+#ifdef __DEBUG__
+	if(creature && !canSee(creature->getPosition()){
+		std::cout << "Creature::setAttackedCreature - can not see creature" << std::endl;
+	}
+#endif
+
 	attackedCreature = creature;
 
 	if(attackedCreature){
@@ -544,6 +543,12 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 
 void Creature::setFollowCreature(const Creature* creature)
 {
+#ifdef __DEBUG__
+	if(creature && !canSee(creature->getPosition()){
+		std::cout << "Creature::setFollowCreature - can not see creature" << std::endl;
+	}
+#endif
+
 	if(followCreature != creature){
 		followCreature = creature;
 

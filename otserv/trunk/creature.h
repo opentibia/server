@@ -250,13 +250,12 @@ public:
 	virtual void onUpdateTile(const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
-	virtual void onCreatureDisappear(const Creature* creature);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
 		uint32_t oldStackPos, bool teleport);
 
-	virtual void onAttackedCreatureDissapear() {};
-	virtual void onFollowCreatureDissapear() {};
+	virtual void onAttackedCreatureDissapear(bool isLogout) {};
+	virtual void onFollowCreatureDissapear(bool isLogout) {};
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
@@ -309,6 +308,7 @@ protected:
 	bool internalArmor;
 	uint32_t blockTicks;
 
+	void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void doAttacking(uint32_t interval) {};
 
 	LightInfo internalLight;

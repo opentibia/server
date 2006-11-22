@@ -955,16 +955,22 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 	}
 }
 
-void Player::onAttackedCreatureDissapear()
+void Player::onAttackedCreatureDissapear(bool isLogout)
 {
 	sendCancelTarget();
-	sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+
+	if(!isLogout){
+		sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+	}
 }
 
-void Player::onFollowCreatureDissapear()
+void Player::onFollowCreatureDissapear(bool isLogout)
 {
 	sendCancelTarget();
-	sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+
+	if(!isLogout){
+		sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+	}
 }
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)

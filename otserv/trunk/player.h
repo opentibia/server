@@ -335,8 +335,8 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
 		uint32_t oldStackPos, bool teleport);
 
-	virtual void onAttackedCreatureDissapear();
-	virtual void onFollowCreatureDissapear();
+	virtual void onAttackedCreatureDissapear(bool isLogout);
+	virtual void onFollowCreatureDissapear(bool isLogout);
 
 	//virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
 	//virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
