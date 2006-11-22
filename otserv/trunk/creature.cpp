@@ -313,7 +313,7 @@ void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, 
 {
 	validateWalkPath();
 
-	onCreatureDisappear(creature, isLogout);
+	onCreatureDisappear(creature, true);
 }
 
 void Creature::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
