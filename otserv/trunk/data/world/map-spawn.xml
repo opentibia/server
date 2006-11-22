@@ -1201,4 +1201,16 @@
 <spawn centerx="286" centery="240" centerz="8" radius="5">
 <monster name="Fire Devil" x="-1" y="0" spawntime="60"/>
 </spawn>
+<spawn centerx="396" centery="392" centerz="5" radius="1">
+<monster name="Magicthrower" x="0" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="403" centery="392" centerz="5" radius="1">
+<monster name="Magicthrower" x="0" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="403" centery="396" centerz="5" radius="1">
+<monster name="Magicthrower" x="0" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="396" centery="396" centerz="5" radius="1">
+<monster name="Magicthrower" x="0" y="0" spawntime="60"/>
+</spawn>
 </spawns>
