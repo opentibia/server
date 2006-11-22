@@ -110,29 +110,29 @@ Creature()
 			if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
 
 				if(readXMLInteger(p, "type", intValue)){
-					currentOutfit.lookType = intValue;
 					defaultOutfit.lookType = intValue;
+
+					if(readXMLInteger(p, "head", intValue)){
+						defaultOutfit.lookHead = intValue;
+					}
+
+					if(readXMLInteger(p, "body", intValue)){
+						defaultOutfit.lookBody = intValue;
+					}
+
+					if(readXMLInteger(p, "legs", intValue)){
+						defaultOutfit.lookLegs = intValue;
+					}
+
+					if(readXMLInteger(p, "feet", intValue)){
+						defaultOutfit.lookFeet = intValue;
+					}
+				}
+				else if(readXMLInteger(p, "typeex", intValue)){
+					defaultOutfit.lookTypeEx = intValue;
 				}
 
-				if(readXMLInteger(p, "head", intValue)){
-					currentOutfit.lookHead = intValue;
-					defaultOutfit.lookHead = intValue;
-				}
-
-				if(readXMLInteger(p, "body", intValue)){
-					currentOutfit.lookBody = intValue;
-					defaultOutfit.lookBody = intValue;
-				}
-
-				if(readXMLInteger(p, "legs", intValue)){
-					currentOutfit.lookLegs = intValue;
-					defaultOutfit.lookLegs = intValue;
-				}
-				
-				if(readXMLInteger(p, "feet", intValue)){
-					currentOutfit.lookFeet = intValue;
-					defaultOutfit.lookFeet = intValue;
-				}
+				currentOutfit = defaultOutfit;
 			}
 
 			p = p->next;

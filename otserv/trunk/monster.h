@@ -57,7 +57,7 @@ public:
 	virtual int getArmor() const { return mType->armor; }
 	virtual int getDefense() const { return mType->defense; }
 	virtual bool isPushable() const { return mType->pushable; }
-	virtual bool isAttackable() const { return true;}
+	virtual bool isAttackable() const { return mType->isAttackable;}
 	virtual void doAttacking(uint32_t interval);
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);

@@ -30,6 +30,7 @@
 #include <libxml/parser.h> 
 
 extern ConfigManager g_config;
+extern Monsters g_monsters;
 extern Game g_game;
 
 SpawnManager::SpawnManager()
@@ -289,6 +290,11 @@ bool Spawn::addMonster(std::string name, Direction dir, int x, int y, int spawnt
 		return false;
 	}
 
+	if(g_monsters.getIdByName(name) == 0){
+		std::cout << "[Spawn::addMonster] Can not find " << name << std::endl;
+		return false;
+	}
+
 	struct spawninfo si;
 	si.name = name;
 	si.dir = dir;
@@ -311,7 +317,7 @@ Monster* Spawn::respawn(unsigned long spawnid, Position& pos, std::string& name,
 		monster->setDirection(dir);
 		monster->setMasterPos(centerPos);
 
-		if(g_game.placeCreature(pos, monster)) {
+		if(g_game.placeCreature(pos, monster, true, true)){
 			monster->useThing2();
 			spawnedmap.insert(spawned_pair(spawnid, monster));
 			spawnmap[spawnid].lastspawn = OTSYS_TIME();

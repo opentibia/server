@@ -43,6 +43,7 @@ void MonsterType::reset()
 	isSummonable = false;
 	isIllusionable = false;
 	isConvinceable = false;
+	isAttackable = true;
 	race = RACE_BLOOD;
 	armor = 0;
 	experience = 0;
@@ -57,13 +58,6 @@ void MonsterType::reset()
 	
 	health = 100;
 	health_max = 100;
-	outfit.lookHead = 10;
-	outfit.lookBody = 10;
-	outfit.lookLegs = 10;
-	outfit.lookFeet = 10;
-	outfit.lookType = 10;
-	lookcorpse = 0;
-	//lookmaster = 10;
 	damageImmunities = 0;
 	conditionImmunities = 0;
 	lightLevel = 0;
@@ -288,6 +282,10 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			mType->manaCost = intValue;
 		}
 
+		if(readXMLInteger(root, "isattackable", intValue)){
+			mType->isAttackable = (intValue != 0);
+		}
+
 		if(readXMLInteger(root, "illusionable", intValue)){
 			mType->isIllusionable = (intValue != 0);
 		}
@@ -372,51 +370,34 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 				if(readXMLInteger(p, "type", intValue)){
 					mType->outfit.lookType = intValue;
-					//mType->lookmaster = mType->looktype;
-				}
 
-				if(readXMLInteger(p, "head", intValue)){
-					mType->outfit.lookHead = intValue;
-				}
+					if(readXMLInteger(p, "head", intValue)){
+						mType->outfit.lookHead = intValue;
+					}
 
-				if(readXMLInteger(p, "body", intValue)){
-					mType->outfit.lookBody = intValue;
-				}
+					if(readXMLInteger(p, "body", intValue)){
+						mType->outfit.lookBody = intValue;
+					}
 
-				if(readXMLInteger(p, "legs", intValue)){
-					mType->outfit.lookLegs = intValue;
-				}
+					if(readXMLInteger(p, "legs", intValue)){
+						mType->outfit.lookLegs = intValue;
+					}
 
-				if(readXMLInteger(p, "feet", intValue)){
-					mType->outfit.lookFeet = intValue;
+					if(readXMLInteger(p, "feet", intValue)){
+						mType->outfit.lookFeet = intValue;
+					}
+					
+					if(readXMLInteger(p, "addons", intValue)){
+						mType->outfit.lookAddons = intValue;
+					}
 				}
-				
-				if(readXMLInteger(p, "addons", intValue)){
-					mType->outfit.lookAddons = intValue;
+				else if(readXMLInteger(p, "typeex", intValue)){
+					mType->outfit.lookTypeEx = intValue;
 				}
 
 				if(readXMLInteger(p, "corpse", intValue)){
 					mType->lookcorpse = intValue;
 				}
-
-				/*
-				if(readXMLInteger(p, "race", intValue)){
-					switch(intValue){
-						case 1:
-							mType->race = RACE_VENOM;
-							break;
-						case 2:
-							mType->race = RACE_BLOOD;
-							break;
-						case 3:
-							mType->race = RACE_UNDEAD;
-							break;
-						case 4:
-							mType->race = RACE_FIRE;
-							break;
-					}
-				}
-				*/
 
 				if(readXMLString(p, "race", strValue)){
 					if((strcasecmp(strValue.c_str(), "venom") == 0) || (atoi(strValue.c_str()) == 1)){
