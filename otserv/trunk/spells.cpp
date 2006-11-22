@@ -880,14 +880,8 @@ bool InstantSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 	lua_pushnumber(L, cid);
 	lua_pushnumber(L, variant);
 
-	bool isSuccess = true;
-
-	int32_t result;
-	if(m_scriptInterface->callFunction(2, result) == false){
-		isSuccess = false;
-	}
-	
-	return isSuccess;
+	int32_t result = m_scriptInterface->callFunction(2);
+	return (result == LUA_NO_ERROR);
 }
 
 House* InstantSpell::getHouseFromPos(Creature* creature)
@@ -1779,12 +1773,7 @@ bool RuneSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 	m_scriptInterface->pushFunction(m_scriptId);
 	lua_pushnumber(L, cid);
 	lua_pushnumber(L, variant);
-	
-	bool isSuccess = true;
 
-	int32_t result;
-	if(m_scriptInterface->callFunction(2, result) == false){
-		isSuccess = false;
-	}
-	return isSuccess;
+	int32_t result = m_scriptInterface->callFunction(2);
+	return (result == LUA_NO_ERROR);
 }

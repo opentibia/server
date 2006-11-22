@@ -45,6 +45,14 @@ class AreaCombat;
 class Combat;
 class Condition;
 
+enum LUA_RET_CODE{
+	LUA_NO_ERROR = 0,
+	LUA_ERROR = -1,
+	LUA_TRUE = 1,
+	LUA_FALSE = 0,
+	LUA_NULL = 0,
+};
+
 enum LuaVariantType_t{	
 	VARIANT_NONE = 0,
 	VARIANT_NUMBER,
@@ -228,8 +236,7 @@ public:
 
 	bool pushFunction(int32_t functionId);
 
-	bool callFunction(uint32_t nParams, int32_t& result);
-	bool callFunction(uint32_t nParams);
+	int32_t callFunction(uint32_t nParams);
 
 	//push/pop common structures
 	static void pushThing(lua_State *L, Thing* thing, uint32_t thingid);

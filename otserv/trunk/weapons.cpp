@@ -189,35 +189,6 @@ void Weapon::setCombatParam(const CombatParams& _params)
 	params = _params;
 }
 
-/*
-bool Weapon::init()
-{
-	//getCombatHandle()
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << "getCombatHandle";
-	env->setEventDesc(desc.str());
-	#endif
-	
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(Position(0, 0, 0));
-	
-	lua_State* L = m_scriptInterface->getLuaState();
-
-	m_scriptInterface->pushFunction(m_scriptId);
-
-	long result;
-	if(m_scriptInterface->callFunction(0, result)){
-		combat = env->getCombatObject(result);
-		return true;
-	}
-	
-	return false;
-}
-*/
-
 bool Weapon::configureEvent(xmlNodePtr p)
 {
 	int intValue;
@@ -489,14 +460,8 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 	lua_pushnumber(L, cid);
 	lua_pushnumber(L, variant);
 
-	bool isSuccess = true;
-
-	int32_t result;
-	if(m_scriptInterface->callFunction(2, result) == false){
-		isSuccess = false;
-	}
-	
-	return isSuccess;
+	int32_t result = m_scriptInterface->callFunction(2);
+	return (result == LUA_NO_ERROR);
 }
 
 

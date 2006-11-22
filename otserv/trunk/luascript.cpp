@@ -42,14 +42,6 @@ extern Game g_game;
 extern Monsters g_monsters;
 extern ConfigManager g_config;
 
-enum LUA_RET_CODE{
-	LUA_NO_ERROR = 0,
-	LUA_ERROR = -1,
-	LUA_TRUE = 1,
-	LUA_FALSE = 0,
-	LUA_NULL = 0,
-};
-
 enum{
 	EVENT_ID_LOADING = 1,
 	EVENT_ID_USER = 1000,
@@ -611,6 +603,7 @@ bool LuaScriptInterface::closeState()
 	return true;
 }
 
+/*
 bool LuaScriptInterface::callFunction(uint32_t nParams, int32_t& result)
 {
 	//bool ret;
@@ -636,6 +629,27 @@ bool LuaScriptInterface::callFunction(uint32_t nParams)
 {
 	int32_t a;
 	return callFunction(nParams, a);
+}
+*/
+
+int32_t LuaScriptInterface::callFunction(uint32_t nParams)
+{
+	int32_t result = LUA_NO_ERROR;
+
+	int size0 = lua_gettop(m_luaState);
+	if(lua_pcall(m_luaState, nParams, 1, 0) != 0){
+		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(m_luaState)));
+		result = LUA_ERROR;
+	}
+	else{
+		result = (int32_t)LuaScriptInterface::popNumber(m_luaState);
+	}
+
+	if((lua_gettop(m_luaState) + (int)nParams  + 1) != size0){
+		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+	}
+
+	return result;
 }
 
 void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, uint32_t thingid)

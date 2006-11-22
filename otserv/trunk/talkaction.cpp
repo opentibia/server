@@ -174,10 +174,6 @@ long TalkAction::executeSay(Creature* creature, const std::string& words, const 
 	lua_pushstring(L, words.c_str());
 	lua_pushstring(L, param.c_str());
 	
-	int32_t ret;
-	if(m_scriptInterface->callFunction(3, ret) == false){
-		ret = 0;
-	}
-	
-	return ret;
+	int32_t result = m_scriptInterface->callFunction(3);
+	return (result == LUA_TRUE);
 }
