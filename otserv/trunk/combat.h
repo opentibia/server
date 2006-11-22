@@ -133,6 +133,7 @@ public:
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(Creature* attacker, Creature* target);
 	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
+	static ConditionType_t CombatTypeToCondition(CombatType_t type);
 
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;

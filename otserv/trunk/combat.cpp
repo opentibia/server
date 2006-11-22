@@ -445,6 +445,20 @@ void Combat::postCombatEffects(Creature* caster, const Position& pos, const Comb
 	}
 }
 
+ConditionType_t Combat::CombatTypeToCondition(CombatType_t type)
+{
+	switch(type){
+		//case COMBAT_PHYSICALDAMAGE: break;
+		case COMBAT_ENERGYDAMAGE: return CONDITION_ENERGY; break;
+		case COMBAT_POISONDAMAGE: return CONDITION_ENERGY; break;
+		case COMBAT_FIREDAMAGE: return CONDITION_FIRE; break;
+		case COMBAT_HEALING: return CONDITION_REGENERATION; break;
+
+		default:
+			return CONDITION_NONE;
+	}
+}
+
 void Combat::CombatFunc(Creature* caster, const Position& pos,
 	const AreaCombat* area, const CombatParams& params, COMBATFUNC func, void* data)
 {
