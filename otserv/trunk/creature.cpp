@@ -558,6 +558,11 @@ void Creature::setFollowCreature(const Creature* creature)
 
 bool Creature::internalFollowCreature(const Creature* creature)
 {
+	if(getBaseSpeed() <= 0){
+		setFollowCreature(NULL);
+		return false;
+	}
+	
 	setFollowCreature(creature);
 
 	if(creature){

@@ -270,7 +270,10 @@ void Monster::startThink()
 	}
 
 	addEventThink();
-	addEventWalk();
+
+	if(getBaseSpeed() > 0){
+		addEventWalk();
+	}
 }
 
 void Monster::stopThink()
@@ -320,6 +323,7 @@ bool Monster::selectTarget(Creature* creature)
 
 	setAttackedCreature(creature);
 	internalFollowCreature(creature);
+
 	return true;
 }
 
