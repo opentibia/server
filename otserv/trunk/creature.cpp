@@ -558,6 +558,8 @@ void Creature::setFollowCreature(const Creature* creature)
 
 bool Creature::internalFollowCreature(const Creature* creature)
 {
+	setFollowCreature(creature);
+
 	if(creature){
 		listWalkDir.clear();
 		uint32_t maxDistance = getFollowDistance();
@@ -571,7 +573,7 @@ bool Creature::internalFollowCreature(const Creature* creature)
 		startAutoWalk(listWalkDir);
 	}
 	
-	setFollowCreature(creature);
+	//setFollowCreature(creature);
 	return true;
 }
 

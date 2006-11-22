@@ -318,8 +318,8 @@ bool Monster::selectTarget(Creature* creature)
 		return false;
 	}
 
-	internalFollowCreature(creature);
 	setAttackedCreature(creature);
+	internalFollowCreature(creature);
 	return true;
 }
 
@@ -382,7 +382,8 @@ void Monster::onThink(uint32_t interval)
 			//monster is a summon
 			if(attackedCreature){
 				if(followCreature != attackedCreature && attackedCreature != this){
-					internalFollowCreature(attackedCreature);
+					//internalFollowCreature(attackedCreature);
+					selectTarget(attackedCreature);
 				}
 			}
 			else if(getMaster()->getAttackedCreature()){
@@ -420,11 +421,12 @@ void Monster::onThinkYell(uint32_t interval)
 
 void Monster::onWalk()
 {
-	if(!isActive){
-		return;
+	if(isActive){
+		Creature::onWalk();
 	}
-
-	Creature::onWalk();
+	else{
+		eventWalk = 0;
+	}
 }
 
 bool Monster::getNextStep(Direction& dir)
