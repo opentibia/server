@@ -104,14 +104,14 @@ bool Monster::canSee(const Position& pos) const
 	*/
 }
 
-void Monster::onAttackedCreatureDissapear()
+void Monster::onAttackedCreatureDissapear(bool isLogout)
 {
 	internalUpdateTargetList = true;
 	spellBonusAttack = true;
 	meleeBonusAttack = true;
 }
 
-void Monster::onFollowCreatureDissapear()
+void Monster::onFollowCreatureDissapear(bool isLogout)
 {
 	internalUpdateTargetList = true;
 }
@@ -153,8 +153,6 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
-		//targetIsRecentAdded = true;
-		//updateTargetList();
 		internalUpdateTargetList = true;
 		startThink();
 	}
@@ -213,8 +211,6 @@ void Monster::onCreatureEnter(const Creature* creature)
 {
 	if(creature == this){
 		setFollowCreature(NULL);
-
-		//updateTargetList();
 		internalUpdateTargetList = true;
 		startThink();
 	}
@@ -265,8 +261,12 @@ void Monster::startThink()
 	isActive = true;
 
 	if(isSummon()){
+		selectTarget(getMaster()->getAttackedCreature());
+
+		/*
 		setAttackedCreature(getMaster()->getAttackedCreature());
 		setFollowCreature(getMaster()->getFollowCreature());
+		*/
 	}
 
 	addEventThink();
@@ -309,15 +309,18 @@ void Monster::searchTarget()
 
 bool Monster::selectTarget(Creature* creature)
 {
-	if(creature->isAttackable()){
-		if(creature->getPosition().z == getPosition().z && !creature->isInPz() && (canSeeInvisibility() || !creature->isInvisible())){
-			internalFollowCreature(creature);
-			setAttackedCreature(creature);
-			return true;
-		}
+	if(!creature || !creature->isAttackable() || creature->isInPz()){
+		return false;
 	}
 
-	return false;
+	const Position& creaturePos = creature->getPosition();
+	if(!creature->canSee(creaturePos) || creaturePos.z != getPosition().z){
+		return false;
+	}
+
+	internalFollowCreature(creature);
+	setAttackedCreature(creature);
+	return true;
 }
 
 void Monster::onThink(uint32_t interval)
@@ -381,6 +384,9 @@ void Monster::onThink(uint32_t interval)
 				if(followCreature != attackedCreature && attackedCreature != this){
 					internalFollowCreature(attackedCreature);
 				}
+			}
+			else if(getMaster()->getAttackedCreature()){
+				selectTarget(getMaster()->getAttackedCreature());
 			}
 			else if(getMaster() != followCreature){
 				internalFollowCreature(getMaster());
@@ -711,8 +717,10 @@ void Monster::updateLookDirection()
 	Direction newDir = getDirection();
 
 	if(attackedCreature){
-		int32_t dx = attackedCreature->getPosition().x - getPosition().x;
-		int32_t dy = attackedCreature->getPosition().y - getPosition().y;
+		const Position& pos = getPosition();
+		const Position& attackedCreaturePos = attackedCreature->getPosition();
+		int32_t dx = attackedCreaturePos.x - pos.x;
+		int32_t dy = attackedCreaturePos.y - pos.y;
 
 		if(std::abs(dx) > std::abs(dy)){
 			//look EAST/WEST

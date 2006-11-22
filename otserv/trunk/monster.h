@@ -67,8 +67,8 @@ public:
 
 	virtual void setNormalCreatureLight();
 
-	virtual void onAttackedCreatureDissapear();
-	virtual void onFollowCreatureDissapear();
+	virtual void onAttackedCreatureDissapear(bool isLogout);
+	virtual void onFollowCreatureDissapear(bool isLogout);
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
