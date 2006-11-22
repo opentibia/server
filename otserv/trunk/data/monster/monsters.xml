@@ -6,4 +6,5 @@
 <monster name="minotaur archer" file="minotaur archer.xml"/>
 <monster name="poison spider" file="poison spider.xml"/>
 <monster name="stalker" file="stalker.xml"/>
+<monster name="magicthrower" file="magicthrower.xml"/>
 </monsters>
