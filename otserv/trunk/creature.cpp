@@ -150,7 +150,8 @@ void Creature::onThink(uint32_t interval)
 {
 	if(internalUpdateFollow && followCreature){
 		internalUpdateFollow = false;
-		internalFollowCreature(followCreature);
+		setFollowCreature(followCreature);
+		//internalFollowCreature(followCreature);
 	}
 
 	blockTicks += interval;
@@ -461,27 +462,6 @@ void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 	changeMana(-manaLoss);
 }
 
-void Creature::setAttackedCreature(Creature* creature)
-{
-#ifdef __DEBUG__
-	if(creature && !canSee(creature->getPosition()){
-		std::cout << "Creature::setAttackedCreature - can not see creature" << std::endl;
-	}
-#endif
-
-	attackedCreature = creature;
-
-	if(attackedCreature){
-		onAttackedCreature(attackedCreature);
-		attackedCreature->onAttacked();
-	}
-
-	std::list<Creature*>::iterator cit;
-	for(cit = summons.begin(); cit != summons.end(); ++cit) {
-		(*cit)->setAttackedCreature(creature);
-	}
-}
-
 BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 	bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
@@ -541,13 +521,60 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 	return blockType;
 }
 
+bool Creature::setAttackedCreature(Creature* creature)
+{
+	if(creature && !canSee(creature->getPosition())){
+		attackedCreature = NULL;
+		return false;
+	}
+
+	attackedCreature = creature;
+
+	if(attackedCreature){
+		onAttackedCreature(attackedCreature);
+		attackedCreature->onAttacked();
+	}
+
+	std::list<Creature*>::iterator cit;
+	for(cit = summons.begin(); cit != summons.end(); ++cit) {
+		(*cit)->setAttackedCreature(creature);
+	}
+
+	return true;
+}
+
+bool Creature::setFollowCreature(Creature* creature)
+{
+	if(creature && !canSee(creature->getPosition())){
+		followCreature = NULL;
+		return false;
+	}
+
+	followCreature = creature;
+
+	if(creature){
+		listWalkDir.clear();
+		uint32_t maxDistance = getFollowDistance();
+		bool fullPath = getFullPathSearch();
+		bool reachable = getFollowReachable();
+		if(!g_game.getPathToEx(this, creature->getPosition(), 1, maxDistance, fullPath, reachable, listWalkDir)){
+			followCreature = NULL;
+			return false;
+		}
+
+		startAutoWalk(listWalkDir);
+	}
+
+	onFollowCreature(creature);
+	return true;
+}
+
+/*
 void Creature::setFollowCreature(const Creature* creature)
 {
-#ifdef __DEBUG__
-	if(creature && !canSee(creature->getPosition()){
+	if(creature && !canSee(creature->getPosition())){
 		std::cout << "Creature::setFollowCreature - can not see creature" << std::endl;
 	}
-#endif
 
 	if(followCreature != creature){
 		followCreature = creature;
@@ -559,6 +586,11 @@ void Creature::setFollowCreature(const Creature* creature)
 bool Creature::internalFollowCreature(const Creature* creature)
 {
 	if(getBaseSpeed() <= 0){
+		setFollowCreature(NULL);
+		return false;
+	}
+
+	if(creature && !canSee(creature->getPosition())){
 		setFollowCreature(NULL);
 		return false;
 	}
@@ -581,6 +613,7 @@ bool Creature::internalFollowCreature(const Creature* creature)
 	//setFollowCreature(creature);
 	return true;
 }
+*/
 
 double Creature::getDamageRatio(Creature* attacker) const
 {
@@ -680,6 +713,12 @@ void Creature::onKilledCreature(Creature* target)
 void Creature::onGainExperience(int32_t gainExperience)
 {
 	if(gainExperience > 0){
+
+		if(getMaster()){
+			gainExperience = gainExperience / 2;
+			getMaster()->onGainExperience(gainExperience);
+		}
+
 		std::stringstream strExp;
 		strExp << gainExperience;
 

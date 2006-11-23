@@ -202,7 +202,8 @@ public:
 	bool addVIP(uint32_t guid, std::string& name, bool isOnline, bool interal = false);
 
 	//follow functions
-	virtual bool internalFollowCreature(const Creature* creature);
+	//virtual bool internalFollowCreature(const Creature* creature);
+	virtual bool setFollowCreature(Creature* creature);
 	void setChaseMode(uint8_t mode);
 
 	//follow events
@@ -212,7 +213,7 @@ public:
 	virtual void onWalkAborted();
 
 	//combat functions
-	virtual void setAttackedCreature(Creature* creature);
+	virtual bool setAttackedCreature(Creature* creature);
 	bool isImmune(CombatType_t type) const;
 	bool isImmune(ConditionType_t type) const;
 	virtual bool isAttackable() const;

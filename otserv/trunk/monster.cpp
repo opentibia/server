@@ -262,11 +262,6 @@ void Monster::startThink()
 
 	if(isSummon()){
 		selectTarget(getMaster()->getAttackedCreature());
-
-		/*
-		setAttackedCreature(getMaster()->getAttackedCreature());
-		setFollowCreature(getMaster()->getFollowCreature());
-		*/
 	}
 
 	addEventThink();
@@ -322,7 +317,8 @@ bool Monster::selectTarget(Creature* creature)
 	}
 
 	setAttackedCreature(creature);
-	internalFollowCreature(creature);
+	setFollowCreature(creature);
+	//internalFollowCreature(creature);
 
 	return true;
 }
@@ -386,7 +382,6 @@ void Monster::onThink(uint32_t interval)
 			//monster is a summon
 			if(attackedCreature){
 				if(followCreature != attackedCreature && attackedCreature != this){
-					//internalFollowCreature(attackedCreature);
 					selectTarget(attackedCreature);
 				}
 			}
@@ -394,7 +389,8 @@ void Monster::onThink(uint32_t interval)
 				selectTarget(getMaster()->getAttackedCreature());
 			}
 			else if(getMaster() != followCreature){
-				internalFollowCreature(getMaster());
+				//internalFollowCreature(getMaster());
+				setFollowCreature(getMaster());
 			}
 		}
 	}

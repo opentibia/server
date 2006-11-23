@@ -164,8 +164,8 @@ public:
 
 	//follow functions
 	virtual const Creature* getFollowCreature() { return followCreature; };
-	virtual void setFollowCreature(const Creature* creature);
-	virtual bool internalFollowCreature(const Creature* creature);
+	virtual bool setFollowCreature(Creature* creature);
+	//virtual bool internalFollowCreature(const Creature* creature);
 	virtual uint32_t getFollowDistance() const {return followDistance;}
 	virtual bool getFullPathSearch() const {return !followCreature;}
 	virtual bool getFollowReachable() const {return true;}
@@ -175,7 +175,7 @@ public:
 
 	//combat functions
 	Creature* getAttackedCreature() { return attackedCreature; }
-	virtual void setAttackedCreature(Creature* creature);
+	virtual bool setAttackedCreature(Creature* creature);
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 
@@ -293,7 +293,7 @@ protected:
 	ConditionList conditions;
 
 	//follow variables
-	const Creature* followCreature;
+	Creature* followCreature;
 	unsigned long eventWalk;
 	std::list<Direction> listWalkDir;
 	bool internalUpdateFollow;

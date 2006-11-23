@@ -1015,6 +1015,10 @@ void Player::onCreatureMove(const Creature* creature, const Position& newPos, co
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
+		if(!followCreature || chaseMode != CHASEMODE_FOLLOW){
+			attackTicks = 0;
+		}
+
 		if(tradeState != TRADE_TRANSFER){
 			//check if we should close trade
 			if(tradeItem){
@@ -1194,9 +1198,11 @@ void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t da
 		ss << "You lose " << damage << " hitpoints";
 
 	if(attacker){
-		ss << " due to an attack by " << attacker->getNameDescription() << ".";
+		ss << " due to an attack by " << attacker->getNameDescription();
 		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
 	}
+
+	ss << ".";
 
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
@@ -2266,6 +2272,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
   }
 }
 
+/*
 bool Player::internalFollowCreature(const Creature* creature)
 {
 	bool result = Creature::internalFollowCreature(creature);
@@ -2281,20 +2288,40 @@ bool Player::internalFollowCreature(const Creature* creature)
 
 	return result;
 }
-
-void Player::setAttackedCreature(Creature* creature)
+*/
+bool Player::setFollowCreature(Creature* creature)
 {
-	Creature::setAttackedCreature(creature);
+	if(!Creature::setFollowCreature(creature)){
+		setFollowCreature(NULL);
+		setAttackedCreature(NULL);
+
+		sendCancelMessage(RET_THEREISNOWAY);
+		sendCancelTarget();
+		stopEventWalk();
+		return false;
+	}
+
+	return true;
+}
+
+bool Player::setAttackedCreature(Creature* creature)
+{
+	if(!Creature::setAttackedCreature(creature)){
+		return false;
+	}
 
 	if(chaseMode == CHASEMODE_FOLLOW && creature){
 		if(followCreature != creature){
 			//chase opponent
-			internalFollowCreature(creature);
+			//internalFollowCreature(creature);
+			setFollowCreature(creature);
 		}
 	}
 	else{
 		setFollowCreature(NULL);
 	}
+
+	return true;
 }
 
 uint32_t Player::getAttackSpeed()
@@ -2307,6 +2334,7 @@ void Player::doAttacking(uint32_t interval)
 	attackTicks += interval;
 
 	if(getAttackSpeed() <= attackTicks){
+		bool result = false;
 		attackTicks = 0;
 
 		Item* tool;
@@ -2314,7 +2342,7 @@ void Player::doAttacking(uint32_t interval)
 
 		if(getCombatItem(&tool, &weapon)){
 			if(weapon){
-				weapon->useWeapon(this, tool, attackedCreature);
+				result = weapon->useWeapon(this, tool, attackedCreature);
 			}
 		}
 		else{
@@ -2329,7 +2357,13 @@ void Player::doAttacking(uint32_t interval)
 				params.blockedByShield = true;
 				Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
 				addSkillAdvance(SKILL_FIST, getSkillPoint());
+				result = true;
 			}
+		}
+
+		if(!result){
+			//make next instant
+			attackTicks = getAttackSpeed();
 		}
 	}
 }
@@ -2381,7 +2415,8 @@ void Player::setChaseMode(uint8_t mode)
 		if(chaseMode == CHASEMODE_FOLLOW){
 			if(!followCreature && attackedCreature){
 				//chase opponent
-				internalFollowCreature(attackedCreature);
+				//internalFollowCreature(attackedCreature);
+				setFollowCreature(attackedCreature);
 			}
 		}
 		else if(attackedCreature){
