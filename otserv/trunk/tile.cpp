@@ -472,7 +472,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			
 			if(monster->canPushItems()){
 				for(CreatureVector::const_iterator cit = creatures.begin(); cit != creatures.end(); ++cit){
-					if( !(*cit)->getMonster() || !(*cit)->isPushable() ){
+					if( !(*cit)->getMonster() ||
+						!(*cit)->isPushable() ||
+						((*cit)->getMonster()->isSummon() && (*cit)->getMonster()->getMaster()->getPlayer()))
+					{
 						return RET_NOTPOSSIBLE;
 					}
 				}
