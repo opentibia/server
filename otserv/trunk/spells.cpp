@@ -1673,6 +1673,11 @@ bool RuneSpell::canExecuteAction(const Player* player, const Position& toPos)
 		return false;
 	}
 
+	if(toPos.x == 0xFFFF){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		return false;
+	}
+
 	/*
 	if(!playerSpellCheck(player)){
 		return false;
