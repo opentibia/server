@@ -62,7 +62,7 @@ Creature::Creature() :
 	followCreature = NULL;
 	eventWalk = 0;
 	internalUpdateFollow = false;
-	followDistance = 1;
+	//followDistance = 1;
 
 	eventCheck = 0;
 	//eventCheckAttacking = 0;
@@ -543,6 +543,18 @@ bool Creature::setAttackedCreature(Creature* creature)
 	return true;
 }
 
+void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
+{
+	fpp.fullPathSearch = false;
+	fpp.needReachable = true;
+	fpp.targetDistance = 1;
+
+	bool fullPathSearch = false;
+	if(followCreature != creature || !g_game.canThrowObjectTo(getPosition(), creature->getPosition())){
+		fpp.fullPathSearch = true;
+	}
+}
+
 bool Creature::setFollowCreature(Creature* creature)
 {
 	if(creature && !canSee(creature->getPosition())){
@@ -550,14 +562,15 @@ bool Creature::setFollowCreature(Creature* creature)
 		return false;
 	}
 
-	followCreature = creature;
-
 	if(creature){
+		FindPathParams fpp;
+		getPathSearchParams(creature, fpp);
+
 		listWalkDir.clear();
-		uint32_t maxDistance = getFollowDistance();
-		bool fullPath = getFullPathSearch();
-		bool reachable = getFollowReachable();
-		if(!g_game.getPathToEx(this, creature->getPosition(), 1, maxDistance, fullPath, reachable, listWalkDir)){
+		//uint32_t maxDistance = getFollowDistance();
+		//bool fullPathSearch = getFullPathSearch();
+		//bool reachable = getFollowReachable();
+		if(!g_game.getPathToEx(this, creature->getPosition(), 1, fpp.targetDistance, fpp.fullPathSearch, fpp.needReachable, listWalkDir)){
 			followCreature = NULL;
 			return false;
 		}
@@ -565,6 +578,7 @@ bool Creature::setFollowCreature(Creature* creature)
 		startAutoWalk(listWalkDir);
 	}
 
+	followCreature = creature;
 	onFollowCreature(creature);
 	return true;
 }

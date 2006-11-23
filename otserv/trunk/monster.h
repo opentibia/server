@@ -87,8 +87,8 @@ public:
 	bool canPushItems() const {return mType->canPushItems;}
 	bool isSummon() const { return getMaster() != NULL; }
 
-	virtual uint32_t getFollowDistance() const;
-	virtual bool getFollowReachable() const;
+	//virtual uint32_t getFollowDistance() const;
+	//virtual bool getFollowReachable() const;
 	virtual void getCombatValues(int32_t& min, int32_t& max);
 	
 	uint32_t getManaCost() const {return mType->manaCost;}
@@ -100,7 +100,6 @@ private:
 	uint32_t defenseTicks;
 	int32_t changeTargetTicks;
 	std::string strDescription;
-	//bool targetIsRecentAdded;
 	bool internalUpdateTargetList;
 	bool isActive;
 	bool isWalkActive;
@@ -139,6 +138,7 @@ private:
 	virtual uint32_t getDamageImmunities() const { return mType->damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return mType->conditionImmunities; }
 	virtual uint16_t getLookCorpse() const { return mType->lookcorpse; }
+	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 };
 
 #endif

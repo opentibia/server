@@ -50,28 +50,10 @@ enum slots_t {
 	SLOT_LAST = SLOT_DEPOT
 };
 
-enum fight_t {
-	FIGHT_MELEE,
-	FIGHT_DIST,
-	FIGHT_MAGICDIST
-};
-
-enum playerLooks
-{
-	PLAYER_MALE_1=0x80,
-	PLAYER_MALE_2=0x81,
-	PLAYER_MALE_3=0x82,
-	PLAYER_MALE_4=0x83,
-	PLAYER_MALE_5=0x84,
-	PLAYER_MALE_6=0x85,
-	PLAYER_MALE_7=0x86,
-	PLAYER_FEMALE_1=0x88,
-	PLAYER_FEMALE_2=0x89,
-	PLAYER_FEMALE_3=0x8A,
-	PLAYER_FEMALE_4=0x8B,
-	PLAYER_FEMALE_5=0x8C,
-	PLAYER_FEMALE_6=0x8D,
-	PLAYER_FEMALE_7=0x8E,
+struct FindPathParams{
+	bool fullPathSearch;
+	bool needReachable;
+	uint32_t targetDistance;
 };
 
 class Map;
@@ -166,9 +148,9 @@ public:
 	virtual const Creature* getFollowCreature() { return followCreature; };
 	virtual bool setFollowCreature(Creature* creature);
 	//virtual bool internalFollowCreature(const Creature* creature);
-	virtual uint32_t getFollowDistance() const {return followDistance;}
-	virtual bool getFullPathSearch() const {return !followCreature;}
-	virtual bool getFollowReachable() const {return true;}
+	//virtual bool getFullPathSearch() const {return !followCreature;}
+	//virtual uint32_t getFollowDistance() const {return followDistance;}
+	//virtual bool getFollowReachable() const {return true;}
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature) {};
@@ -297,7 +279,7 @@ protected:
 	unsigned long eventWalk;
 	std::list<Direction> listWalkDir;
 	bool internalUpdateFollow;
-	uint32_t followDistance;
+	//uint32_t followDistance;
 
 	//combat variables
 	Creature* attackedCreature;
@@ -318,6 +300,7 @@ protected:
 	bool getKillers(Creature** lastHitCreature, Creature** mostDamageCreature);
 	virtual void dropLoot(Container* corpse) {};
 	virtual uint16_t getLookCorpse() const { return 0; }
+	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;
 	friend class Map;

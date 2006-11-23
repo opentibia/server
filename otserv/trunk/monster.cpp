@@ -77,9 +77,9 @@ Creature()
 	minCombatValue = 0;
 	maxCombatValue = 0;
 
-	followDistance = mType->targetDistance;
+	//followDistance = mType->targetDistance;
 
-	strDescription = "a " + getName() + ".";
+	strDescription = mType->nameDescription;
 	toLowerCaseString(strDescription);
 }
 
@@ -846,12 +846,34 @@ bool Monster::convinceCreature(Creature* creature)
 	return false;
 }
 
+void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
+{
+	Creature::getPathSearchParams(creature, fpp);
+
+	fpp.targetDistance = mType->targetDistance;
+
+	if(isSummon()){
+		if(getMaster() == creature){
+			fpp.targetDistance = 2;
+		}
+	}
+	else{
+		if(getHealth() <= mType->runAwayHealth){
+			//Distance should be higher than visible viewport (defined in Map::maxViewportX/maxViewportY)
+			fpp.targetDistance = 10;
+			fpp.needReachable = false;
+		}
+	}
+}
+
+/*
 uint32_t Monster::getFollowDistance() const
 {
 	if(isSummon()){
 		//if(getMaster() == followCreature){
 		//if(!followCreature || getMaster() == followCreature){
-		if((!followCreature && !attackedCreature) || getMaster() == followCreature){
+		//if((!followCreature && !attackedCreature) || getMaster() == followCreature){
+		if(getMaster() == followCreature){
 			return 2;
 		}
 	}
@@ -873,3 +895,4 @@ bool Monster::getFollowReachable() const
 
 	return Creature::getFollowReachable();
 }
+*/
