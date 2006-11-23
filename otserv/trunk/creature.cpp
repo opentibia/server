@@ -523,9 +523,12 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 
 bool Creature::setAttackedCreature(Creature* creature)
 {
-	if(creature && !canSee(creature->getPosition())){
-		attackedCreature = NULL;
-		return false;
+	if(creature){
+		const Position& creaturePos = creature->getPosition();
+		if(creaturePos.z != getPosition().z || !canSee(creaturePos)){
+			attackedCreature = NULL;
+			return false;
+		}
 	}
 
 	attackedCreature = creature;
@@ -557,9 +560,12 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 
 bool Creature::setFollowCreature(Creature* creature)
 {
-	if(creature && !canSee(creature->getPosition())){
-		followCreature = NULL;
-		return false;
+	if(creature){
+		const Position& creaturePos = creature->getPosition();
+		if(creaturePos.z != getPosition().z || !canSee(creaturePos)){
+			followCreature = NULL;
+			return false;
+		}
 	}
 
 	if(creature){
