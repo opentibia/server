@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <spells>
-<rune name="Sudden Death" id="2268" charges="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="sd.lua"></rune>
+<rune name="Sudden Death" id="2268" charges="1" needtarget="1" lvl="10" maglv="0" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="sd.lua"></rune>
 <rune name="Heavy Magic Missile" id="2311" charges="5" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="hmm.lua"></rune>
 <rune name="Great Fireball" id="2269" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="gfb.lua"></rune>
 <rune name="Polymorph" id="2270" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="polymorph.lua"></rune>
@@ -61,4 +61,6 @@
 <rune name="bolt" id="20001" enabled="1" script="monsters/bolt.lua"></rune>
 <rune name="spider bite" id="20002" enabled="1" script="monsters/spider bite.lua"></rune>
 <rune name="imitate" id="20003" enabled="1" script="monsters/imitate.lua"></rune>
+<rune name="explosive arrow" id="20004" enabled="1" script="monsters/explosive arrow.lua"></rune>
+<rune name="poison spit" id="20005" enabled="1" script="monsters/poison spit.lua"></rune>
 </spells>

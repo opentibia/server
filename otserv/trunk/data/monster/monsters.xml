@@ -7,4 +7,6 @@
 <monster name="poison spider" file="poison spider.xml"/>
 <monster name="stalker" file="stalker.xml"/>
 <monster name="magicthrower" file="magicthrower.xml"/>
+<monster name="warlock" file="warlock.xml"/>
+<monster name="giant spider" file="giant spider.xml"/>
 </monsters>

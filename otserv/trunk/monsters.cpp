@@ -569,6 +569,9 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							else if(strcasecmp(strValue.c_str(), "drunk") == 0){
 								mType->conditionImmunities |= CONDITION_DRUNK;
 							}
+							else if(strcasecmp(strValue.c_str(), "invisible") == 0){
+								mType->conditionImmunities |= CONDITION_INVISIBLE;
+							}
 						}
 					}
 

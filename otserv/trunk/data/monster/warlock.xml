@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<monster name="Warlock" experience="6000" pushable="0" armor="40" defense="45" canpushitems="1" staticattack="30" speed="220">
+	<health now="4200" max="4200"/>
+	<look type="130" head="19" body="71" legs="128" feet="128" corpse="3128"/>
+	<combat targetdistance="5" runonhealth="2100"/>
+	<targetchange speed="2000" chance="5"/>
+
+<attacks>
+	<attack name="melee" speed="2000" min="-200" max="-550"/> 
+	<attack name="Fire Field" speed="4000" chance="0"/>
+	<attack name="Combustion" speed="2000" chance="50" min="-100" max="-350"/>
+	<attack name="Polymorph" speed="3000" chance="40"/>
+	<attack name="Explosive Arrow" speed="2000" chance="80" min="-80" max="-120"/>
+</attacks>
+
+<defenses>
+	<defense name="Invisible" speed="4000" chance="0"/>
+	<defense name="Ultimate Healing" speed="4000" chance="5" min="50" max="200"/>
+</defenses>
+
+<immunities>
+	<immunity name="poison"/>
+	<immunity name="energy"/>
+	<immunity name="paralyze"/>
+	<immunity name="fire"/>
+	<immunity name="drunk"/>
+	<immunity name="outfit"/>
+</immunities>
+
+<loot>
+ 	<item id="2148" countmax="100" chance1="100000" chancemax="0"/>
+ 	<item id="2600" chance="10000"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2148" countmax="50" chance1="80000" chancemax="0"/>
+ 	<item id="2411" chance="5000"/>
+	<item id="2792" countmax="5" chance1="6666" chancemax="0"/>
+	<item id="2793" countmax="2" chance1="6666" chancemax="0"/>
+ 	<item id="2656" chance="1333"/>
+ 	<item id="2466" chance="800"/>
+ 	<item id="2436" chance="1428"/>
+ 	<item id="2123" chance="1000"/>
+ 	</inside>
+ 	</item>
+</loot>
+
+</monster>
