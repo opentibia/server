@@ -44,6 +44,7 @@ void MonsterType::reset()
 	isIllusionable = false;
 	isConvinceable = false;
 	isAttackable = true;
+	isHostile = true;
 	race = RACE_BLOOD;
 	armor = 0;
 	experience = 0;
@@ -282,9 +283,13 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			mType->manaCost = intValue;
 		}
 
-		if(readXMLInteger(root, "isattackable", intValue)){
+		if(readXMLInteger(root, "attackable", intValue)){
 			mType->isAttackable = (intValue != 0);
 		}
+
+		if(readXMLInteger(root, "hostile", intValue)){
+			mType->isHostile = (intValue != 0);
+		}		
 
 		if(readXMLInteger(root, "illusionable", intValue)){
 			mType->isIllusionable = (intValue != 0);

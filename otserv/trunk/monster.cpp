@@ -316,9 +316,11 @@ bool Monster::selectTarget(Creature* creature)
 		return false;
 	}
 
-	setAttackedCreature(creature);
+	if(isHostile() || isSummon()){
+		setAttackedCreature(creature);
+	}
+
 	setFollowCreature(creature);
-	//internalFollowCreature(creature);
 
 	return true;
 }
