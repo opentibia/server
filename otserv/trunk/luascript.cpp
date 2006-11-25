@@ -1486,6 +1486,11 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 		return 1;
 	}
 
+	const ItemType& it = Item::items[itemId];
+	if(it.stackable && count > 100){
+		count = 100;
+	}
+
 	Item* newItem = Item::CreateItem(itemId, count);
 
 	if(!newItem){
@@ -1498,6 +1503,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 	ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
 
 	if(ret != RET_NOERROR){
+		delete newItem;
 		reportErrorFunc("Could not add item");
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
@@ -1714,7 +1720,7 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 	Position pos;
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
-	uint32_t type = popNumber(L);
+	uint32_t count = popNumber(L);
 	uint32_t itemId = (uint32_t)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
@@ -1726,7 +1732,12 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 		return 1;
 	}
 	
-	Item* newItem = Item::CreateItem(itemId, type);
+	const ItemType& it = Item::items[itemId];
+	if(it.stackable && count > 100){
+		count = 100;
+	}
+
+	Item* newItem = Item::CreateItem(itemId, count);
 	
 	ReturnValue ret = g_game.internalAddItem(tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	if(ret != RET_NOERROR){
@@ -3688,14 +3699,19 @@ int LuaScriptInterface::luaGetContainerItem(lua_State *L)
 int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 {
 	//doAddContainerItem(uid, itemid, count or subtype)
-	uint32_t type = popNumber(L);
-	uint16_t itemid = (uint16_t)popNumber(L);
+	uint32_t count = popNumber(L);
+	uint16_t itemId = (uint16_t)popNumber(L);
 	uint32_t uid = popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	Container* container = env->getContainerByUID(uid);
-	if(container){
-		Item* newItem = Item::CreateItem(itemid, type);
+		if(container){
+		const ItemType& it = Item::items[itemId];
+		if(it.stackable && count > 100){
+			count = 100;
+		}
+
+		Item* newItem = Item::CreateItem(itemId, count);
 
 		ReturnValue ret = g_game.internalAddItem(container, newItem);
 		if(ret != RET_NOERROR){

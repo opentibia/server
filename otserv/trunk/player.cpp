@@ -1015,9 +1015,11 @@ void Player::onCreatureMove(const Creature* creature, const Position& newPos, co
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
+		/*
 		if(!followCreature || chaseMode != CHASEMODE_FOLLOW){
 			attackTicks = 0;
 		}
+		*/
 
 		if(tradeState != TRADE_TRANSFER){
 			//check if we should close trade
