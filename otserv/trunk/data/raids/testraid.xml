@@ -1,0 +1,12 @@
+<raid>
+<announce delay="0" message="Hello guys!" />
+<singlespawn delay="5000" name="Demon" x="100" y="91" z="7" />
+<singlespawn delay="5500" name="Demon" x="100" y="92" z="7" />
+<singlespawn delay="6000" name="Demon" x="101" y="91" z="7" />
+
+<areaspawn delay="6500" fromx="90" fromy="81" fromz="7" tox="110" toy="101" toz="7">
+<monster name="poison spider" amount="5" />
+<monster name="minotaur archer" amount="5" />
+</areaspawn>
+
+</raid>
