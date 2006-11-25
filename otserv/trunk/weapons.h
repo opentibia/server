@@ -83,6 +83,8 @@ public:
 
 	uint16_t getID() const {return id;}
 
+	static bool useFist(Player* player, Creature* target);
+
 protected:
 	virtual std::string getScriptEventName();
 
