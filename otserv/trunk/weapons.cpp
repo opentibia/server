@@ -182,7 +182,7 @@ Weapon::~Weapon()
 {
 	//
 }
-	
+
 void Weapon::setCombatParam(const CombatParams& _params)
 {
 	m_scripted = false;
@@ -331,6 +331,29 @@ bool Weapon::useWeapon(Player* player, Item* item, Creature* target) const
 	}
 
 	return internalUseWeapon(player, item, target);
+}
+
+bool Weapon::useFist(Player* player, Creature* target)
+{
+	const Position& playerPos = player->getPosition();
+	const Position& targetPos = target->getPosition();
+
+	if(Position::areInRange<1,1>(playerPos, targetPos)){
+		int32_t damage = -(int32_t)(0.5 * player->getSkill(SKILL_FIST, SKILL_LEVEL))*rand()/RAND_MAX;
+		CombatParams params;
+		params.combatType = COMBAT_PHYSICALDAMAGE;
+		params.blockedByArmor = true;
+		params.blockedByShield = true;
+		Combat::doCombatHealth(player, target, damage, damage, params);
+
+		if(player->getAccessLevel() <= 0){
+			player->addSkillAdvance(SKILL_FIST, player->getSkillPoint());
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target) const

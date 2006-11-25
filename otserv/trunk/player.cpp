@@ -2348,19 +2348,7 @@ void Player::doAttacking(uint32_t interval)
 			}
 		}
 		else{
-			const Position& playerPos = getPosition();
-			const Position& targetPos = attackedCreature->getPosition();
-
-			if(Position::areInRange<1,1>(playerPos, targetPos)){
-				int32_t damage = -(int32_t)(0.5 * skills[SKILL_FIST][SKILL_LEVEL])*rand()/RAND_MAX;
-				CombatParams params;
-				params.combatType = COMBAT_PHYSICALDAMAGE;
-				params.blockedByArmor = true;
-				params.blockedByShield = true;
-				Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
-				addSkillAdvance(SKILL_FIST, getSkillPoint());
-				result = true;
-			}
+			result = Weapon::useFist(this, attackedCreature);
 		}
 
 		if(!result){
