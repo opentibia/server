@@ -43,6 +43,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "movement.h"
 #include "spells.h"
 #include "weapons.h"
+#include "raids.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -88,6 +89,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/bans",&Commands::bansManager},
 	{"/town",&Commands::teleportToTown},
 	{"/serverinfo",&Commands::serverInfo},
+	{"/raid",&Commands::forceRaid},
 };
 
 
@@ -1168,6 +1170,37 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 	}
 	if(str.str().size() > 0){
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+	}
+	return true;
+}
+
+bool Commands::forceRaid(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Raid *raid = Raids::getInstance()->getRaidByName(param);
+	if(!raid || !raid->isLoaded()) {
+		if(Player *player = creature->getPlayer()) {
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "No such raid exists.");
+		}
+	} else {
+		if(Raids::getInstance()->getRunning()) {
+			if(Player *player = creature->getPlayer()) {
+				player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Another raid is already being executed.");
+			}
+		} else {
+			Raids::getInstance()->setRunning(raid);
+			RaidEvent *event = raid->getNextRaidEvent();
+			if(event) {
+				if(Player *player = creature->getPlayer()) {
+					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
+				}
+				raid->setState(RAIDSTATE_EXECUTING);
+				g_game.addEvent(makeTask(event->getDelay(), boost::bind(&Raid::executeRaidEvent, raid, event)));
+			} else {
+				if(Player *player = creature->getPlayer()) {
+					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "The raid does not contain any data.");
+				}
+			}
+		}
 	}
 	return true;
 }

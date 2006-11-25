@@ -25,6 +25,7 @@
 #include "npc.h"
 #include "tools.h"
 #include "configmanager.h"
+#include "raids.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -254,7 +255,13 @@ bool SpawnManager::startup()
 	if(!spawns.empty()) {
 		g_game.addEvent(makeTask(20000, std::bind2nd(std::mem_fun(&Game::checkSpawns), 20000)));
 	}
-
+	
+	Raids *raids = Raids::getInstance();
+	raids->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY) + "raids/raids.xml");
+	if(raids->isLoaded()) {
+		raids->startup();
+	}
+	
 	return true;
 }
 
