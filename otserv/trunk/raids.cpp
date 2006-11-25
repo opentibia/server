@@ -36,17 +36,14 @@ Raids::Raids()
 {
 	loaded = false;
 	started = false;
+	fileName = "";
 	running = NULL;
 	lastRaidEnd = 0;
 }
 
 Raids::~Raids()
 {
-	RaidList::iterator it;
-	for(it = raidList.begin(); it != raidList.end(); ++it){
-		delete (*it);
-	}
-	raidList.clear();
+	clear();
 }
 
 Raids* Raids::getInstance()
@@ -62,6 +59,8 @@ bool Raids::loadFromXml(const std::string& fileName)
 	if(isLoaded()){
 		return true;
 	}
+	
+	this->fileName = fileName;
 	
 	xmlDocPtr doc = xmlParseFile(fileName.c_str());
 	
@@ -168,9 +167,33 @@ void Raids::startup()
 	
 	RaidList::iterator it;
 	for(it = raidList.begin(); it != raidList.end(); it++){
-		g_game.addEvent(makeTask((*it)->getInterval(), boost::bind(&Raid::checkRaid, (*it))));
+		uint32_t eventId = g_game.addEvent(makeTask((*it)->getInterval(), boost::bind(&Raid::checkRaid, (*it))));
+		(*it)->setRaidCheckEvent(eventId);
 	}
 	started = true;
+}
+
+void Raids::clear()
+{
+	RaidList::iterator it;
+	for(it = raidList.begin(); it != raidList.end(); ++it){
+		delete (*it);
+	}
+	raidList.clear();
+	
+	loaded = false;
+	started = false;
+	fileName = "";
+	running = NULL;
+	lastRaidEnd = 0;
+	
+}
+
+void Raids::reload()
+{
+	std::string file = fileName;
+	clear();
+	loadFromXml(file);
 }
 
 Raid* Raids::getRaidByName(const std::string& name)
@@ -185,7 +208,7 @@ Raid* Raids::getRaidByName(const std::string& name)
 	return NULL;
 }
 
-Raid::Raid(const std::string& _name, unsigned long _chance, unsigned long _interval, uint32_t _marginTime)
+Raid::Raid(const std::string& _name, uint32_t _chance, uint32_t _interval, uint32_t _marginTime)
 {
 	loaded = false;
 	name = _name;
@@ -194,10 +217,14 @@ Raid::Raid(const std::string& _name, unsigned long _chance, unsigned long _inter
 	nextEvent = 0;
 	state = RAIDSTATE_IDLE;
 	margin = _marginTime;
+	checkRaidEvent = 0;
+	nextEventEvent = 0;
 }
 
 Raid::~Raid()
 {
+	stopEvents();
+	
 	RaidEventVector::iterator it;
 	for(it = raidEvents.begin(); it != raidEvents.end(); it++) {
 		delete (*it);
@@ -467,26 +494,23 @@ void Raid::checkRaid()
 		if(!Raids::getInstance()->getRunning()){
 			if(OTSYS_TIME() >= Raids::getInstance()->getLastRaidEnd()+getMargin()){
 				if(chance >= random_range(0, 100)){
-					state = RAIDSTATE_STARTUP;
+#ifdef __DEBUG_RAID__
+					std::cout << "[Notice] Raids: Starting raid " << name << std::endl;
+#endif
+					
+					Raids::getInstance()->setRunning(this);
+					
+					RaidEvent* raidEvent = getNextRaidEvent();
+					if(raidEvent){
+							state = RAIDSTATE_EXECUTING;
+							nextEventEvent = g_game.addEvent(makeTask(raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, raidEvent)));
+					}
 				}
 			}
 		}
 	}
-  else if(state == RAIDSTATE_STARTUP){
-#ifdef __DEBUG_RAID__
-		std::cout << "[Notice] Raids: Starting raid " << name << std::endl;
-#endif
 
-		Raids::getInstance()->setRunning(this);
-		
-		RaidEvent* raidEvent = getNextRaidEvent();
-		if(raidEvent){
-			state = RAIDSTATE_EXECUTING;
-			g_game.addEvent(makeTask(raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, raidEvent)));
-		}
-	}
-
-	g_game.addEvent(makeTask(getInterval(), boost::bind(&Raid::checkRaid, this)));
+	checkRaidEvent = g_game.addEvent(makeTask(getInterval(), boost::bind(&Raid::checkRaid, this)));
 }
 
 void Raid::executeRaidEvent(RaidEvent* raidEvent)
@@ -495,7 +519,7 @@ void Raid::executeRaidEvent(RaidEvent* raidEvent)
 		nextEvent++;
 		RaidEvent* newRaidEvent = getNextRaidEvent();
 		if(newRaidEvent){
-			g_game.addEvent(makeTask(newRaidEvent->getDelay()-raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
+			nextEventEvent = g_game.addEvent(makeTask(newRaidEvent->getDelay()-raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
 		}
 		else{
 			resetRaid();
@@ -516,6 +540,18 @@ void Raid::resetRaid()
 	state = RAIDSTATE_IDLE;
 	Raids::getInstance()->setRunning(NULL);
 	Raids::getInstance()->setLastRaidEnd(OTSYS_TIME());
+}
+
+void Raid::stopEvents()
+{
+	if(checkRaidEvent != 0){
+		g_game.stopEvent(checkRaidEvent);
+		checkRaidEvent = 0;
+	}
+	if(nextEventEvent != 0){
+		g_game.stopEvent(nextEventEvent);
+		nextEventEvent = 0;
+	}
 }
 
 RaidEvent* Raid::getNextRaidEvent()

@@ -519,6 +519,10 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 		g_spells->reload();
 		g_monsters.reload();
 	}
+	else if(param == "raids"){
+		Raids::getInstance()->reload();
+		Raids::getInstance()->startup();
+	}
 	/*
 	else if(param == "weapons"){
 		g_weapons->reload();

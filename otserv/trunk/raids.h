@@ -28,7 +28,6 @@
 
 enum RaidState_t{
 	RAIDSTATE_IDLE = 0,
-	RAIDSTATE_STARTUP,
 	RAIDSTATE_EXECUTING
 };
 
@@ -48,14 +47,18 @@ typedef std::vector<RaidEvent*> RaidEventVector;
 typedef std::list<MonsterSpawn*> MonsterSpawnList;
 
 class Raids{
+private:
+	Raids();
 public:
 	static Raids* getInstance();
 	
-	Raids();
 	~Raids();
 	
 	bool loadFromXml(const std::string& fileName);
 	void startup();
+	
+	void clear();
+	void reload();
 	
 	bool isLoaded() { return loaded; }
 	bool isStarted() { return started; }
@@ -74,11 +77,12 @@ private:
 	bool loaded, started;
 	Raid* running;
 	uint64_t lastRaidEnd;
+	std::string fileName;
 };
 
 class Raid{
 public:
-	Raid(const std::string& _name, unsigned long _chance, unsigned long _interval, uint32_t _marginTime);
+	Raid(const std::string& _name, uint32_t _chance, uint32_t _interval, uint32_t _marginTime);
 	~Raid();
 	
 	bool loadFromXml(const std::string& fileName);
@@ -97,6 +101,9 @@ public:
 	uint64_t getMargin() { return margin; }
 	uint32_t getInterval() {return interval;}
 	
+	void stopEvents();
+	void setRaidCheckEvent(uint32_t eventId) { checkRaidEvent = eventId; }
+	
 private:
 	RaidEventVector raidEvents;
 	std::string name;
@@ -104,6 +111,7 @@ private:
 	uint32_t nextEvent;
 	uint64_t margin;
 	RaidState_t state;
+	uint32_t checkRaidEvent, nextEventEvent;
 	bool loaded;
 };
 
@@ -123,9 +131,9 @@ private:
 class AnnounceEvent : public RaidEvent{
 public:
 	AnnounceEvent(const std::string& _message, MessageClasses _messageType, uint32_t _delay);
-	~AnnounceEvent() {};
+	virtual ~AnnounceEvent() {};
 	
-	bool executeEvent();
+	virtual bool executeEvent();
 
 private:
 	std::string message;
@@ -135,9 +143,9 @@ private:
 class SingleSpawnEvent : public RaidEvent{
 public:
 	SingleSpawnEvent(const std::string& _monsterName, const Position& pos, uint32_t _delay);
-	~SingleSpawnEvent() {};
+	virtual ~SingleSpawnEvent() {};
 	
-	bool executeEvent();
+	virtual bool executeEvent();
 
 private:
 	std::string monsterName;
@@ -147,12 +155,12 @@ private:
 class AreaSpawnEvent : public RaidEvent{
 public:
 	AreaSpawnEvent(const Position& fromPos, const Position& toPos, uint32_t _delay);
-	~AreaSpawnEvent();
+	virtual ~AreaSpawnEvent();
 	
 	void addMonster(MonsterSpawn* monsterSpawn);
 	void addMonster(const std::string& monsterName, uint32_t amount);
 	
-	bool executeEvent();
+	virtual bool executeEvent();
 
 private:
 	MonsterSpawnList spawnList;
