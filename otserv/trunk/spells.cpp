@@ -1630,10 +1630,12 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		return false;
 	}
 
-	if(player->getSummonCount() >= 2){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
+	if(player->getAccessLevel() <= 0){
+		if(player->getSummonCount() >= 2){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
 	}
 
 	Thing* thing = g_game.internalGetThing(player, posTo, STACKPOS_LOOK);

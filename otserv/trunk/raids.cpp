@@ -177,8 +177,8 @@ Raid* Raids::getRaidByName(const std::string& name)
 {
 	RaidList::iterator it;
 	for(it = raidList.begin(); it != raidList.end(); it++){
-		if((*it)->getName() == name){
-		return (*it);
+		if(strcasecmp((*it)->getName().c_str(), name.c_str()) == 0){
+			return (*it);
 		}
 	}
 

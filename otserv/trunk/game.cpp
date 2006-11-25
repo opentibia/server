@@ -1617,7 +1617,8 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 		type = SPEAK_PRIVATE;
 	}
 
-	toPlayer->onCreatureSay(player, type, text);	
+	toPlayer->sendCreatureSay(player, type, text);
+	toPlayer->onCreatureSay(player, type, text);
 
 	std::stringstream ss;
 	ss << "Message sent to " << toPlayer->getName() << ".";

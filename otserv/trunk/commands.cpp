@@ -1176,31 +1176,33 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 
 bool Commands::forceRaid(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Raid *raid = Raids::getInstance()->getRaidByName(param);
-	if(!raid || !raid->isLoaded()) {
-		if(Player *player = creature->getPlayer()) {
-			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "No such raid exists.");
-		}
-	} else {
-		if(Raids::getInstance()->getRunning()) {
-			if(Player *player = creature->getPlayer()) {
-				player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Another raid is already being executed.");
-			}
-		} else {
-			Raids::getInstance()->setRunning(raid);
-			RaidEvent *event = raid->getNextRaidEvent();
-			if(event) {
-				if(Player *player = creature->getPlayer()) {
-					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
-				}
-				raid->setState(RAIDSTATE_EXECUTING);
-				g_game.addEvent(makeTask(event->getDelay(), boost::bind(&Raid::executeRaidEvent, raid, event)));
-			} else {
-				if(Player *player = creature->getPlayer()) {
-					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "The raid does not contain any data.");
-				}
-			}
-		}
+	Player* player = creature->getPlayer();
+	if(!player){
+		return false;
 	}
+
+	Raid* raid = Raids::getInstance()->getRaidByName(param);
+	if(!raid || !raid->isLoaded()){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "No such raid exists.");
+		return false;
+	}
+
+	if(Raids::getInstance()->getRunning()){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Another raid is already being executed.");
+		return false;
+	}
+
+	Raids::getInstance()->setRunning(raid);
+	RaidEvent* event = raid->getNextRaidEvent();
+
+	if(!event){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "The raid does not contain any data.");
+		return false;
+	}
+
+	raid->setState(RAIDSTATE_EXECUTING);
+	g_game.addEvent(makeTask(event->getDelay(), boost::bind(&Raid::executeRaidEvent, raid, event)));
+
+	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
 	return true;
 }

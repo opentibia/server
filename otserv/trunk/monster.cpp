@@ -819,8 +819,10 @@ bool Monster::challengeCreature(Creature* creature)
 
 bool Monster::convinceCreature(Creature* creature)
 {
-	if(!mType->isConvinceable){
-		return false;
+	if(creature->getPlayer() && creature->getPlayer()->getAccessLevel() <= 0){
+		if(!mType->isConvinceable){
+			return false;
+		}
 	}
 
 	if(isSummon()){

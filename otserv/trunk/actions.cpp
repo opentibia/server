@@ -336,8 +336,7 @@ bool Action::canExecuteAction(const Player* player, const Position& toPos)
 		}
 	}
 	else{
-		ret = Actions::canUseFar(player, toPos, blockWalls());
-		if(ret != RET_NOERROR){
+		if(Actions::canUseFar(player, toPos, blockWalls()) != RET_NOERROR){
 			player->sendCancelMessage(ret);
 			return false;
 		}
