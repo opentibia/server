@@ -52,6 +52,7 @@
 #include "ban.h"
 #include "rsa.h"
 #include "admin.h"
+#include "raids.h"
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
@@ -704,6 +705,9 @@ int main(int argc, char *argv[])
 	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE), g_config.getString(ConfigManager::MAP_KIND))){
 		return -1;
 	}
+
+	Raids::getInstance()->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY) + "raids/raids.xml");
+	Raids::getInstance()->startup();
 
 	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32
