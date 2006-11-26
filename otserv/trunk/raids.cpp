@@ -137,6 +137,7 @@ bool Raids::loadFromXml(const std::string& fileName)
 				bool ret = newRaid->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY) + "raids/" + file);
 				if(!ret){
 					std::cout << "[Error] Raids: failed to load raid " << name << std::endl;
+					delete newRaid;
 				}
 				else{
 					raidList.push_back(newRaid);
