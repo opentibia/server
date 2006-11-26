@@ -363,8 +363,8 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"targetchange") == 0){
 
-				if(readXMLInteger(p, "speed", intValue)){
-					mType->changeTargetSpeed = intValue;
+				if(readXMLInteger(p, "speed", intValue) || readXMLInteger(p, "interval", intValue)){
+					mType->changeTargetSpeed = std::max(1, intValue);
 				}
 
 				if(readXMLInteger(p, "chance", intValue)){
@@ -430,7 +430,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t speed = 1000;
 						int32_t range = 0;
 
-						if(readXMLInteger(tmpNode, "speed", intValue)){
+						if(readXMLInteger(tmpNode, "speed", intValue) || readXMLInteger(tmpNode, "interval", intValue)){
 							speed = std::max(1, intValue);
 						}
 
@@ -493,7 +493,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t speed = 1000;
 						int32_t range = 0;
 
-						if(readXMLInteger(tmpNode, "speed", intValue)){
+						if(readXMLInteger(tmpNode, "speed", intValue) || readXMLInteger(tmpNode, "interval", intValue)){
 							speed = std::max(1, intValue);
 						}
 
@@ -586,7 +586,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			else if(xmlStrcmp(p->name, (const xmlChar*)"voices") == 0){
 				xmlNodePtr tmpNode = p->children;
 				
-				if(readXMLInteger(p, "speed", intValue)){
+				if(readXMLInteger(p, "speed", intValue) || readXMLInteger(p, "interval", intValue)){
 					mType->yellSpeedTicks = intValue;
 				}
 
@@ -628,7 +628,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t chance = 100;
 						int32_t speed = 1000;
 
-						if(readXMLInteger(tmpNode, "speed", intValue)){
+						if(readXMLInteger(tmpNode, "speed", intValue) || readXMLInteger(tmpNode, "interval", intValue)){
 							speed = intValue;
 						}
 
