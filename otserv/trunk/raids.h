@@ -90,7 +90,7 @@ public:
 	void checkRaid();
 	void executeRaidEvent(RaidEvent* raidEvent);
 	void resetRaid();
-	//RaidEvent* getFirstRaidEvent();
+	
 	RaidEvent* getNextRaidEvent();
 	void setState(RaidState_t newState) { state = newState; }
 	std::string getName() const { return name; }

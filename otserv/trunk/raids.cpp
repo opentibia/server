@@ -492,8 +492,8 @@ void Raid::checkRaid()
 {
 	if(state == RAIDSTATE_IDLE){
 		if(!Raids::getInstance()->getRunning()){
-			if(OTSYS_TIME() >= Raids::getInstance()->getLastRaidEnd()+getMargin()){
-				if(chance >= random_range(0, 100)){
+			if((uint64_t)OTSYS_TIME() >= (Raids::getInstance()->getLastRaidEnd() + getMargin())){
+				if(chance >= (uint32_t)random_range(0, 100)){
 #ifdef __DEBUG_RAID__
 					std::cout << "[Notice] Raids: Starting raid " << name << std::endl;
 #endif
@@ -646,7 +646,7 @@ bool AreaSpawnEvent::executeEvent()
 	for(it = spawnList.begin(); it != spawnList.end(); it++) {
 		MonsterSpawn* spawn = (*it);
 
-		for(int i = 0; i < spawn->amount; i++){
+		for(unsigned int i = 0; i < spawn->amount; i++){
 			Monster* monster = Monster::createMonster(spawn->name);
 			if(!monster){
 				return false;
