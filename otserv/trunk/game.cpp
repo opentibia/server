@@ -314,11 +314,6 @@ bool Game::stopEvent(unsigned long eventid)
 
 /*****************************************************************************/
 
-uint32_t Game::getPlayersOnline() {return (uint32_t)Player::listPlayer.list.size();};
-uint32_t Game::getMonstersOnline() {return (uint32_t)Monster::listMonster.list.size();};
-uint32_t Game::getNpcsOnline() {return (uint32_t)Npc::listNpc.list.size();};
-uint32_t Game::getCreaturesOnline() {return (uint32_t)listCreature.list.size();};
-
 Cylinder* Game::internalGetCylinder(Player* player, const Position& pos)
 {
 	if(pos.x != 0xFFFF){

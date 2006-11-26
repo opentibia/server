@@ -171,29 +171,26 @@ bool Map::saveMap(const std::string& identifier)
 	return saved;
 }
 
-Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)
+Tile* Map::getTile(uint16_t x, uint16_t y, uint8_t z)
 {
-	if(_z < MAP_MAX_LAYERS){
-		// _x & 0x7F  is like _x % 128
-		//TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
-		//TileMap *tm = &tileMaps[_x & 0xFF][_y & 0xFF];
-		TileMap* tm = &tileMaps[_x & 0x7F][_y & 0x7F];
-
-		if(!tm)
+	if(z < MAP_MAX_LAYERS){
+		QTreeLeafNode* leaf = getLeaf(x, y);
+		if(leaf){
+			Floor* floor = leaf->getFloor(z);
+			if(floor){
+				return floor->tiles[x & FLOOR_MASK][y & FLOOR_MASK];
+			}
+			else{
+				return NULL;
+			}
+		}
+		else{
 			return NULL;
-	
-		// search in the stl map for the requested tile
-		//TileMap::iterator it = tm->find((_x << 16) | _y);
-		//TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
-		TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
-
-		// ... found
-		if(it != tm->end())
-			return it->second;
+		}
 	}
-	
-	// or not
-	return NULL;
+	else{
+		return NULL;
+	}
 }
 
 Tile* Map::getTile(const Position& pos)
@@ -201,12 +198,28 @@ Tile* Map::getTile(const Position& pos)
 	return getTile(pos.x, pos.y, pos.z);
 }
 
-void Map::setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile)
+void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 {
-	Tile* tile = getTile(_x, _y, _z);
+	QTreeLeafNode::newLeaf = false;
+	QTreeLeafNode* leaf = root.createLeaf(x, y, 16);
+	if(QTreeLeafNode::newLeaf){
+		//notify north ..
+		QTreeLeafNode* northLeaf = root.getLeaf(x, y - FLOOR_SIZE);
+		if(northLeaf){
+			northLeaf->m_leafS = leaf;
+		}
+		//.. and west leaf
+		QTreeLeafNode* westLeaf = root.getLeaf(x - FLOOR_SIZE, y);
+		if(westLeaf){
+			westLeaf->m_leafE = leaf;
+		}
+	}
 
-	if(!tile){
-		tileMaps[_x & 0x7F][_y & 0x7F][ (_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z] = newtile;
+	Floor* floor = leaf->createFloor(z);
+	uint32_t offsetX = x & FLOOR_MASK;
+	uint32_t offsetY = y & FLOOR_MASK;
+	if(!floor->tiles[offsetX][offsetY]){
+		floor->tiles[offsetX][offsetY] = newtile;
 	}
 	else{
 		std::cout << "Error: Map::setTile() already exists." << std::endl;
@@ -313,18 +326,16 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	CreatureVector::iterator cit;
 	Tile* tile;
 
-	for(int nz = minRangeZ; nz < maxRangeZ + 1; ++nz){
+	for(int32_t nz = minRangeZ; nz < maxRangeZ + 1; ++nz){
 		offsetZ = centerPos.z - nz;
-
-		for(int nx = minRangeX + offsetZ; nx <= maxRangeX + offsetZ; ++nx){
-			for(int ny = minRangeY + offsetZ; ny <= maxRangeY + offsetZ; ++ny){
+		
+		for(int32_t nx = minRangeX + offsetZ; nx <= maxRangeX + offsetZ; ++nx){
+			for(int32_t ny = minRangeY + offsetZ; ny <= maxRangeY + offsetZ; ++ny){
 				tile = getTile(nx + centerPos.x, ny + centerPos.y, nz);
 				if(tile){
 					for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
 						if(std::find(list.begin(), list.end(), *cit) == list.end()){
-							//if((*cit)->canSee(centerPos)){
-								list.push_back(*cit);
-							//}
+							list.push_back(*cit);
 						}
 					}
 				}
@@ -650,6 +661,8 @@ bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Dir
 	return !listDir.empty();
 }
 
+//*********** AStarNodes *************
+
 AStarNodes::AStarNodes()
 {
 	curNode = 0;
@@ -736,4 +749,97 @@ bool AStarNodes::isInList(long x, long y)
 		}
 	}
 	return false;
+}
+
+//*********** Floor constructor **************
+
+Floor::Floor()
+{
+	for(unsigned int i = 0; i < FLOOR_SIZE; ++i){
+		for(unsigned int j = 0; j < FLOOR_SIZE; ++j){
+			tiles[i][j] = 0;
+		}
+	}
+}
+
+//**************** QTreeNode **********************
+QTreeNode::QTreeNode()
+{
+	m_isLeaf = false;
+	m_child[0] = NULL;
+	m_child[1] = NULL;
+	m_child[2] = NULL;
+	m_child[3] = NULL;
+}
+
+QTreeNode::~QTreeNode()
+{
+	delete m_child[0];
+	delete m_child[1];
+	delete m_child[2];
+	delete m_child[3];
+}
+
+QTreeLeafNode* QTreeNode::getLeaf(uint32_t x, uint32_t y)
+{
+	if(!isLeaf()){
+		uint32_t index = ((x & 0x8000) >> 15) | ((y & 0x8000) >> 14);
+		if(m_child[index]){
+			return m_child[index]->getLeaf(x*2, y*2);
+		}
+		else{
+			return NULL;
+		}
+	}
+	else{
+		return static_cast<QTreeLeafNode*>(this);
+	}
+}
+
+QTreeLeafNode* QTreeNode::createLeaf(uint32_t x, uint32_t y, uint32_t level)
+{
+	if(!isLeaf()){
+		uint32_t index = ((x & 0x8000) >> 15) | ((y & 0x8000) >> 14);
+		if(!m_child[index]){
+			if(level != FLOOR_BITS){
+				m_child[index] = new QTreeNode();
+			}
+			else{
+				m_child[index] = new QTreeLeafNode();
+				QTreeLeafNode::newLeaf = true;
+			}
+		}
+		return m_child[index]->createLeaf(x*2, y*2, level - 1);
+	}
+	else{
+		return static_cast<QTreeLeafNode*>(this);
+	}
+}
+
+
+//************ LeafNode  ************************
+bool QTreeLeafNode::newLeaf = false;
+QTreeLeafNode::QTreeLeafNode()
+{
+	for(unsigned int i = 0; i < 16; ++i){
+		m_array[i] = NULL;
+	}
+	m_isLeaf = true;
+	m_leafS = NULL;
+	m_leafE = NULL;
+}
+
+QTreeLeafNode::~QTreeLeafNode()
+{
+	for(unsigned int i = 0; i < MAP_MAX_LAYERS; ++i){
+		delete m_array[i];
+	}
+}
+
+Floor* QTreeLeafNode::createFloor(uint32_t z)
+{
+	if(!m_array[z]){
+		m_array[z] = new Floor();
+	}
+	return m_array[z];
 }

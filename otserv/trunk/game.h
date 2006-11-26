@@ -31,6 +31,7 @@
 #include "item.h"
 #include "container.h"
 #include "player.h"
+#include "npc.h"
 #include "spawn.h"
 #include "templates.h"
 #include "scheduler.h"
@@ -166,10 +167,10 @@ public:
 		*/
 	bool removeCreature(Creature* creature, bool isLogout = true);
 
-	uint32_t getPlayersOnline();
-	uint32_t getMonstersOnline();
-	uint32_t getNpcsOnline();
-	uint32_t getCreaturesOnline();
+	uint32_t getPlayersOnline() {return (uint32_t)Player::listPlayer.list.size();}
+	uint32_t getMonstersOnline() {return (uint32_t)Monster::listMonster.list.size();}
+	uint32_t getNpcsOnline() {return (uint32_t)Npc::listNpc.list.size();}
+	uint32_t getCreaturesOnline() {return (uint32_t)listCreature.list.size();}
 
 	void getWorldLightInfo(LightInfo& lightInfo);
 
@@ -467,6 +468,6 @@ SchedulerTask* makeTask(int64_t ticks,
 	TCallList<ArgType>* t = new TCallList<ArgType>(f1, f2, call_list, interval);
 	t->setTicks(ticks);
 	return t;
-};
+}
 
 #endif

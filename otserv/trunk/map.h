@@ -89,6 +89,57 @@ public:
 typedef std::list<Creature*> SpectatorVec;
 typedef std::list<Player*> PlayerList;
 
+#define FLOOR_BITS 3
+#define FLOOR_SIZE (1 << FLOOR_BITS)
+#define FLOOR_MASK (FLOOR_SIZE - 1)
+
+struct Floor{
+	Floor();
+	Tile* tiles[FLOOR_SIZE][FLOOR_SIZE];
+};
+
+class QTreeLeafNode;
+
+class QTreeNode{
+public:
+	QTreeNode();
+	virtual ~QTreeNode();
+
+	bool isLeaf(){return m_isLeaf;}
+	QTreeLeafNode* getLeaf(uint32_t x, uint32_t y);
+	QTreeLeafNode* createLeaf(uint32_t x, uint32_t y, uint32_t level);
+	
+protected:
+	bool m_isLeaf;
+	QTreeNode* m_child[4];
+
+	friend class Map;
+};
+
+
+class QTreeLeafNode : public QTreeNode{
+public:
+	QTreeLeafNode();
+	virtual ~QTreeLeafNode();
+
+	Floor* createFloor(uint32_t z);
+	Floor* getFloor(uint32_t z){return m_array[z];}
+
+	QTreeLeafNode* stepSouth(){return m_leafS;}
+	QTreeLeafNode* stepEast(){return m_leafE;}
+
+protected:
+	static bool newLeaf;
+	QTreeLeafNode* m_leafS;
+	QTreeLeafNode* m_leafE;
+	Floor* m_array[MAP_MAX_LAYERS];
+
+	friend class Map;
+	friend class QTreeNode;
+};
+
+
+
 /**
   * Map class.
   * Holds all the actual map-data
@@ -122,8 +173,10 @@ public:
 	* Get a single tile.
 	* \returns A pointer to that tile.
 	*/
-	Tile* getTile(uint16_t _x, uint16_t _y, uint8_t _z);
+	Tile* getTile(uint16_t x, uint16_t y, uint8_t z);
 	Tile* getTile(const Position& pos);
+    
+    QTreeLeafNode* getLeaf(uint16_t x, uint16_t y){ return root.getLeaf(x, y);}
     
 	/**
 	* Set a single tile.
@@ -193,9 +246,7 @@ protected:
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0);
 
-
-	typedef std::map<unsigned long, Tile*> TileMap;
-	TileMap tileMaps[128][128];
+	QTreeNode root;
 
 	friend class Game;
 
