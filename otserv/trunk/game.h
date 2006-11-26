@@ -103,7 +103,6 @@ public:
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index);
-	const Position& internalGetPosition(Player* player, const Position& pos);
 
 	/**
 	  * Get a single tile of the map.

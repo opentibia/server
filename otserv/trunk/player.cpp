@@ -2550,15 +2550,6 @@ void Player::onAttacked()
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	//TODO: Share damage points with team (share exp)
-
-	/*
-	Soul regeneration
-	if(points > getLevel()){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOULREGENERATION, 3600 * 4, 0);
-		addCondition(condition);
-	}
-	*/
-
 	Creature::onAttackedCreatureDrainHealth(target, points);
 }
 
@@ -2590,6 +2581,17 @@ void Player::onGainExperience(int32_t gainExperience)
 	Creature::onGainExperience(gainExperience);
 
 	if(gainExperience > 0){
+		//soul regeneration
+		if(gainExperience >= getLevel()){
+			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
+			//1 soulpoint / 2 minutes for normal players
+			//1 soulpoint / 15 seconds for premium players
+
+			condition->setParam(CONDITIONPARAM_SOULGAIN, 1);
+			condition->setParam(CONDITIONPARAM_SOULTICKS, 15 * 1000);
+			addCondition(condition);
+		}
+
 		addExperience(gainExperience);
 	}
 }

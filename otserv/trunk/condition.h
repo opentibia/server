@@ -22,12 +22,16 @@
 #define __OTSERV_CONDITION_H__
 
 #include "definitions.h"
+#include "fileloader.h"
 #include "enums.h"
 
 #include <list>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 class Creature;
 class Player;
+class PropStream;
 
 enum ConditionType_t {
 	CONDITION_NONE					= 0,
@@ -44,12 +48,43 @@ enum ConditionType_t {
 	CONDITION_INFIGHT				= 1024,
 	CONDITION_DRUNK					= 2048,
 	CONDITION_EXHAUSTED			= 4096,
-	CONDITION_REGENERATION	= 8192
+	CONDITION_REGENERATION	= 8192,
+	CONDITION_SOUL          = 16384
 };
 
 enum EndCondition_t{
 	REASON_ENDTICKS,
 	REASON_ABORT,
+};
+
+enum ConditionAttr_t{
+	CONDITIONATTR_TYPE = 1,
+	CONDITIONATTR_ID = 2,
+	CONDITIONATTR_TICKS = 3,
+	CONDITIONATTR_HEALTHTICKS = 4,
+	CONDITIONATTR_HEALTHGAIN = 5,
+	CONDITIONATTR_MANATICKS = 6,
+	CONDITIONATTR_MANAGAIN = 7,
+	CONDITIONATTR_DELAYED = 8,
+	CONDITIONATTR_OWNER = 9,
+	CONDITIONATTR_INTERVALDATA = 10,
+	CONDITIONATTR_SPEEDDELTA = 11,
+	CONDITIONATTR_FORMULA_MINA = 12,
+	CONDITIONATTR_FORMULA_MINB = 13,
+	CONDITIONATTR_FORMULA_MAXA = 14,
+	CONDITIONATTR_FORMULA_MAXB = 15,
+	CONDITIONATTR_LIGHTCOLOR = 16,
+	CONDITIONATTR_LIGHTLEVEL = 17,
+	CONDITIONATTR_LIGHTTICKS = 18,
+	CONDITIONATTR_LIGHTINTERVAL = 19,
+	CONDITIONATTR_SOULTICKS = 20,
+	CONDITIONATTR_SOULGAIN = 21
+};
+
+struct IntervalInfo{
+	int32_t timeLeft;
+	int32_t value;
+	int32_t interval;
 };
 
 class Condition{
@@ -73,6 +108,14 @@ public:
 	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
+
+	//serialization
+	virtual xmlNodePtr serialize();
+	virtual bool unserialize(xmlNodePtr p);
+
+	bool unserialize(PropStream& propStream);
+	virtual bool serialize(PropWriteStream& propWriteStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
 	ConditionId_t id;
@@ -116,15 +159,46 @@ public:
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
+	//serialization
+	virtual xmlNodePtr serialize();
+	virtual bool unserialize(xmlNodePtr p);
+
+	virtual bool serialize(PropWriteStream& propWriteStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
+
 protected:
 	uint32_t internalHealthTicks;
 	uint32_t internalManaTicks;
 
 	uint32_t healthTicks;
 	uint32_t manaTicks;
-
 	uint32_t healthGain;
 	uint32_t manaGain;
+};
+
+class ConditionSoul : public ConditionGeneric
+{
+public:
+	ConditionSoul(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionSoul(){};
+	virtual void addCondition(Creature* creature, const Condition* addCondition);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+
+	virtual ConditionSoul* clone()  const { return new ConditionSoul(*this); }
+
+	virtual bool setParam(ConditionParam_t param, int32_t value);
+
+	//serialization
+	virtual xmlNodePtr serialize();
+	virtual bool unserialize(xmlNodePtr p);
+
+	virtual bool serialize(PropWriteStream& propWriteStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
+
+protected:
+	uint32_t internalSoulTicks;
+	uint32_t soulTicks;
+	uint32_t soulGain;
 };
 
 class ConditionInvisible: public ConditionGeneric
@@ -157,17 +231,19 @@ public:
 
 	void addDamage(uint32_t rounds, uint32_t time, int32_t value);
 
+	//serialization
+	virtual xmlNodePtr serialize();
+	virtual bool unserialize(xmlNodePtr p);
+
+	virtual bool serialize(PropWriteStream& propWriteStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
+
 protected:
 	bool delayed;
 	uint32_t owner;
 
-	struct DamageInfo{
-		int32_t timeLeft;
-		int32_t damage;
-		int32_t interval;
-	};
-
-	std::list<DamageInfo> damageList;
+	typedef std::list<IntervalInfo> DamageList;
+	DamageList damageList;
 
 	bool getNextDamage(int32_t& damage);
 	bool doDamage(Creature* creature, int32_t damage);
@@ -190,7 +266,14 @@ public:
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 	
 	void setFormulaVars(float _mina, float _minb, float _maxa, float _maxb);
-	
+
+	//serialization
+	virtual xmlNodePtr serialize();
+	virtual bool unserialize(xmlNodePtr p);
+
+	virtual bool serialize(PropWriteStream& propWriteStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
+
 protected:	
 	void getFormulaValues(int32_t var, int32_t& min, int32_t& max) const;
 	
@@ -219,6 +302,13 @@ public:
 
 	void addOutfit(Outfit_t outfit);
 
+	//serialization
+	virtual xmlNodePtr serialize();
+	virtual bool unserialize(xmlNodePtr p);
+
+	virtual bool serialize(PropWriteStream& propWriteStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
+
 protected:
 	std::vector<Outfit_t> outfits;
 
@@ -240,7 +330,14 @@ public:
 	virtual ConditionLight* clone()  const { return new ConditionLight(*this); }
 	
 	virtual bool setParam(ConditionParam_t param, int32_t value);
-	
+
+	//serialization
+	virtual xmlNodePtr serialize();
+	virtual bool unserialize(xmlNodePtr p);
+
+	virtual bool serialize(PropWriteStream& propWriteStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
+
 protected:
 	LightInfo lightInfo;
 	uint32_t internalLightTicks;

@@ -352,8 +352,6 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 
 			/*for move operations*/
 			if(index == STACKPOS_MOVE){
-				//thing = tile->getTopMoveableThing(); //tile->getTopDownItem();
-
 				Item* item = tile->getTopDownItem();
 				if(item && !item->isNotMoveable())
 					thing = item;
@@ -362,7 +360,6 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			}
 			/*use item*/
 			else if(index == STACKPOS_USE){
-				//thing = tile->getTopMoveableThing(); //tile->getTopDownItem();
 				thing = tile->getTopDownItem();
 			}
 			else{
@@ -408,32 +405,6 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 	}
 
 	return NULL;
-}
-
-const Position& Game::internalGetPosition(Player* player, const Position& pos)
-{
-	static const Position dummyPos(0,0,0);
-
-	if(pos.x == 0xFFFF){
-		//container
-		if(pos.y & 0x40){
-			uint8_t fromCid = pos.y & 0x0F;
-			//uint8_t slot = pos.z;
-			
-			Container* container = player->getContainer(fromCid);
-			if(!container)
-				return dummyPos;
-			
-			return container->getPosition();
-		}
-		//inventory
-		else{
-			return player->getPosition();
-		}
-	}
-	else{
-		return pos;
-	}
 }
 
 Tile* Game::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
