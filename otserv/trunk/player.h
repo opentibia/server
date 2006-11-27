@@ -219,7 +219,6 @@ public:
 	bool addVIP(uint32_t guid, std::string& name, bool isOnline, bool interal = false);
 
 	//follow functions
-	//virtual bool internalFollowCreature(const Creature* creature);
 	virtual bool setFollowCreature(Creature* creature);
 	void setChaseMode(uint8_t mode);
 
