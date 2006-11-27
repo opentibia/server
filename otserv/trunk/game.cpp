@@ -2245,7 +2245,6 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 	}
 
 	return player->setFollowCreature(followCreature);
-	//return player->internalFollowCreature(followCreature);
 }
 
 bool Game::playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode)

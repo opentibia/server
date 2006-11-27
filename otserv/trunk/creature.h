@@ -147,10 +147,6 @@ public:
 	//follow functions
 	virtual const Creature* getFollowCreature() { return followCreature; };
 	virtual bool setFollowCreature(Creature* creature);
-	//virtual bool internalFollowCreature(const Creature* creature);
-	//virtual bool getFullPathSearch() const {return !followCreature;}
-	//virtual uint32_t getFollowDistance() const {return followDistance;}
-	//virtual bool getFollowReachable() const {return true;}
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature) {};
@@ -215,7 +211,7 @@ public:
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onDefenseBlock(bool blockedHit) {};
 	virtual void onArmorBlock(bool blockedHit) {};
-	
+
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
 	void setCreatureLight(LightInfo& light) {internalLight = light;}
@@ -223,6 +219,7 @@ public:
 	void addEventThink();
 	void stopEventThink();
 	virtual void onThink(uint32_t interval);
+	virtual void onAttacking(uint32_t interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);
 

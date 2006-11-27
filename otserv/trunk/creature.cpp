@@ -151,7 +151,6 @@ void Creature::onThink(uint32_t interval)
 	if(internalUpdateFollow && followCreature){
 		internalUpdateFollow = false;
 		setFollowCreature(followCreature);
-		//internalFollowCreature(followCreature);
 	}
 
 	blockTicks += interval;
@@ -162,13 +161,7 @@ void Creature::onThink(uint32_t interval)
 		internalArmor = true;
 	}
 
-	if(attackedCreature){
-		attackedCreature->onAttacked();
-
-		if(g_game.canThrowObjectTo(getPosition(), attackedCreature->getPosition())){
-			doAttacking(interval);
-		}
-	}
+	onAttacking(interval);
 
 	if(eventCheck != 0){
 		eventCheck = 0;
@@ -177,6 +170,17 @@ void Creature::onThink(uint32_t interval)
 
 	//eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature,
 	//	&g_game, getID(), interval)));
+}
+
+void Creature::onAttacking(uint32_t interval)
+{
+	if(attackedCreature){
+		attackedCreature->onAttacked();
+
+		if(g_game.canThrowObjectTo(getPosition(), attackedCreature->getPosition())){
+			doAttacking(interval);
+		}
+	}
 }
 
 void Creature::onWalk()
@@ -587,52 +591,6 @@ bool Creature::setFollowCreature(Creature* creature)
 	onFollowCreature(creature);
 	return true;
 }
-
-/*
-void Creature::setFollowCreature(const Creature* creature)
-{
-	if(creature && !canSee(creature->getPosition())){
-		std::cout << "Creature::setFollowCreature - can not see creature" << std::endl;
-	}
-
-	if(followCreature != creature){
-		followCreature = creature;
-
-		onFollowCreature(creature);
-	}
-}
-
-bool Creature::internalFollowCreature(const Creature* creature)
-{
-	if(getBaseSpeed() <= 0){
-		setFollowCreature(NULL);
-		return false;
-	}
-
-	if(creature && !canSee(creature->getPosition())){
-		setFollowCreature(NULL);
-		return false;
-	}
-	
-	setFollowCreature(creature);
-
-	if(creature){
-		listWalkDir.clear();
-		uint32_t maxDistance = getFollowDistance();
-		bool fullPath = getFullPathSearch();
-		bool reachable = getFollowReachable();
-		if(!g_game.getPathToEx(this, creature->getPosition(), 1, maxDistance, fullPath, reachable, listWalkDir)){
-			setFollowCreature(NULL);
-			return false;
-		}
-
-		startAutoWalk(listWalkDir);
-	}
-	
-	//setFollowCreature(creature);
-	return true;
-}
-*/
 
 double Creature::getDamageRatio(Creature* attacker) const
 {

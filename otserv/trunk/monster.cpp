@@ -341,25 +341,6 @@ void Monster::onThink(uint32_t interval)
 	}
 
 	isWalkActive = true;
-
-	/*
-	if(isSummon()){
-		if(!isActive && conditions.empty()){
-			stopThink();
-		}
-		else{
-			Creature::onThink(interval);
-		}
-	}
-	else{
-		if((!isActive || targetList.empty()) && conditions.empty()){
-			stopThink();
-		}
-		else{
-			Creature::onThink(interval);
-		}
-	}
-	*/
 	
 	onThinkYell(interval);
 	onDefending(interval);
@@ -391,7 +372,6 @@ void Monster::onThink(uint32_t interval)
 				selectTarget(getMaster()->getAttackedCreature());
 			}
 			else if(getMaster() != followCreature){
-				//internalFollowCreature(getMaster());
 				setFollowCreature(getMaster());
 			}
 		}
@@ -399,12 +379,6 @@ void Monster::onThink(uint32_t interval)
 
 
 	Creature::onThink(interval);
-	/*
-	static uint64_t lastThink = GetTickCount();
-
-	std::cout << getName() << ", lastThink: " << (GetTickCount() - lastThink) << std::endl;
-	lastThink = GetTickCount();
-	*/
 }
 
 void Monster::onThinkYell(uint32_t interval)
@@ -606,23 +580,6 @@ void Monster::doAttacking(uint32_t interval)
 					meleeBonusAttack = true;
 				}
 			}
-
-			/*
-			if(attackTicks % mType->combatMeleeSpeed >= interval){
-				//already used this melee attack for this round
-			}
-			else if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
-				CombatParams params;
-				params.combatType = COMBAT_PHYSICALDAMAGE;
-				params.blockedByArmor = true;
-				params.blockedByShield = true;
-				Combat::doCombatHealth(this, attackedCreature, mType->combatMeleeMin, mType->combatMeleeMax, params);
-				meleeBonusAttack = false;
-			}
-			else{
-				meleeBonusAttack = true;
-			}
-			*/
 		}
 		else{
 			resetTicks = false;
