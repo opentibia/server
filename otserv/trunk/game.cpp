@@ -1100,31 +1100,35 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count)
 	Thing* thing = NULL;
 	Item* item = NULL;
 	
-	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex() && count > 0; ++i){
-		if(!(thing = cylinder->__getThing(i)))
-			continue;
-
-		if(!(item = thing->getItem()))
-			continue;
-
-		if(item->getID() == itemId){
-			if(item->isStackable()){
-				if(item->getItemCount() > count){
-					internalRemoveItem(item, count);
-					count = 0;
+	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex() && count > 0;){
+		
+		if((thing = cylinder->__getThing(i)) && (item = thing->getItem())){
+			if(item->getID() == itemId){
+				if(item->isStackable()){
+					if(item->getItemCount() > count){
+						internalRemoveItem(item, count);
+						count = 0;
+					}
+					else{
+						count -= item->getItemCount();
+						internalRemoveItem(item);
+					}
 				}
 				else{
-					count -= item->getItemCount();
+					--count;
 					internalRemoveItem(item);
 				}
 			}
 			else{
-				--count;
-				internalRemoveItem(item);
+				++i;
+
+				if(tmpContainer = item->getContainer()){
+					listContainer.push_back(tmpContainer);
+				}
 			}
 		}
-		else if(tmpContainer = item->getContainer()){
-			listContainer.push_back(tmpContainer);
+		else{
+			++i;
 		}
 	}
 	
@@ -1132,7 +1136,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count)
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 		
-		for(int i = 0; i < (int32_t)container->size() && count > 0; i++){
+		for(int i = 0; i < (int32_t)container->size() && count > 0;){
 			Item* item = container->getItem(i);
 			if(item->getID() == itemId){
 				if(item->isStackable()){
@@ -1150,8 +1154,12 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count)
 					internalRemoveItem(item);
 				}
 			}
-			else if(tmpContainer = item->getContainer()){
-				listContainer.push_back(tmpContainer);
+			else{
+				++i;
+
+				if(tmpContainer = item->getContainer()){
+					listContainer.push_back(tmpContainer);
+				}
 			}
 		}
 	}
