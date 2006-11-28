@@ -423,6 +423,8 @@ public:
 	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
 	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
+	uint64_t getLastAction() const {return lastAction;}
+
 	VIPListSet VIPList;
 
 	//items
@@ -495,6 +497,7 @@ protected:
 	bool SendBuffer;
 	uint32_t internal_ping;
 	uint32_t npings;
+	uint64_t lastAction;
 
 	bool pzLocked;
 	int32_t blockCount;

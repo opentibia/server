@@ -77,6 +77,7 @@ Creature()
 	SendBuffer = false;
 	npings = 0;
 	internal_ping = 0;
+	lastAction = 0;
 
 	pzLocked = false;
 	blockCount = 0;
@@ -1015,6 +1016,8 @@ void Player::onCreatureMove(const Creature* creature, const Position& newPos, co
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
+		lastAction = OTSYS_TIME();
+
 		if(tradeState != TRADE_TRANSFER){
 			//check if we should close trade
 			if(tradeItem){
@@ -2320,17 +2323,18 @@ void Player::doAttacking(uint32_t interval)
 {
 	if(getAttackSpeed() <= attackTicks){
 		bool result = false;
-		attackTicks = 0;
 
 		Item* tool;
 		const Weapon* weapon;
 
-		if(getCombatItem(&tool, &weapon)){
-			if(weapon){
+		if(getCombatItem(&tool, &weapon)){			
+			if(weapon && weapon->checkLastAction(this, interval)){
+				attackTicks = 0;
 				result = weapon->useWeapon(this, tool, attackedCreature);
 			}
 		}
 		else{
+			attackTicks = 0;
 			result = Weapon::useFist(this, attackedCreature);
 		}
 
