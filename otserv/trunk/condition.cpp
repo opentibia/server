@@ -742,26 +742,20 @@ bool ConditionDamage::unserialize(xmlNodePtr p)
 		if(xmlStrcmp(nodeList->name, (const xmlChar*)"valuelist") == 0){
 
 			IntervalInfo di;
+			di.interval = 0;
+			di.timeLeft = 0;
+			di.value = 0;
 
 			if(readXMLInteger(nodeList, "duration", intValue)){
 				di.timeLeft = intValue;
-			}
-			else{
-				di.timeLeft = 10;
 			}
 
 			if(readXMLInteger(nodeList, "value", intValue)){
 				di.value = intValue;
 			}
-			else{
-				di.value = 10;
-			}
 
 			if(readXMLInteger(nodeList, "interval", intValue)){
 				di.interval = intValue;
-			}
-			else{
-				di.interval = 10;
 			}
 
 			damageList.push_back(di);
