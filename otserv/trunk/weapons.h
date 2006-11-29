@@ -76,7 +76,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
 
-	virtual bool checkLastAction(Player* player, uint32_t interval) const {return true;}
+	virtual bool checkLastAction(Player* player, int32_t interval) const {return true;}
 	virtual bool playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 
@@ -141,7 +141,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
 
-	virtual bool checkLastAction(Player* player, uint32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
+	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
 	virtual bool playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 
@@ -161,7 +161,7 @@ public:
 	virtual ~WeaponWand() {};
 
 	virtual bool configureEvent(xmlNodePtr p);
-	virtual bool checkLastAction(Player* player, uint32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
+	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
 
 protected:
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;

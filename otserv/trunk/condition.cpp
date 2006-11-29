@@ -746,13 +746,22 @@ bool ConditionDamage::unserialize(xmlNodePtr p)
 			if(readXMLInteger(nodeList, "duration", intValue)){
 				di.timeLeft = intValue;
 			}
+			else{
+				di.timeLeft = 10;
+			}
 
 			if(readXMLInteger(nodeList, "value", intValue)){
 				di.value = intValue;
 			}
+			else{
+				di.value = 10;
+			}
 
 			if(readXMLInteger(nodeList, "interval", intValue)){
 				di.interval = intValue;
+			}
+			else{
+				di.interval = 10;
 			}
 
 			damageList.push_back(di);

@@ -174,7 +174,8 @@ bool Map::saveMap(const std::string& identifier)
 Tile* Map::getTile(uint16_t x, uint16_t y, uint8_t z)
 {
 	if(z < MAP_MAX_LAYERS){
-		QTreeLeafNode* leaf = getLeaf(x, y);
+		//QTreeLeafNode* leaf = getLeaf(x, y);
+		QTreeLeafNode* leaf = QTreeNode::getLeafStatic(&root, x, y);
 		if(leaf){
 			Floor* floor = leaf->getFloor(z);
 			if(floor){
@@ -201,17 +202,30 @@ Tile* Map::getTile(const Position& pos)
 void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 {
 	QTreeLeafNode::newLeaf = false;
-	QTreeLeafNode* leaf = root.createLeaf(x, y, 16);
+	QTreeLeafNode* leaf = root.createLeaf(x, y, 15);
 	if(QTreeLeafNode::newLeaf){
-		//notify north ..
+		//update north
 		QTreeLeafNode* northLeaf = root.getLeaf(x, y - FLOOR_SIZE);
 		if(northLeaf){
 			northLeaf->m_leafS = leaf;
 		}
-		//.. and west leaf
+
+		//update west leaf
 		QTreeLeafNode* westLeaf = root.getLeaf(x - FLOOR_SIZE, y);
 		if(westLeaf){
 			westLeaf->m_leafE = leaf;
+		}
+
+		//update south
+		QTreeLeafNode* southLeaf = root.getLeaf(x, y + FLOOR_SIZE);
+		if(southLeaf){
+			leaf->m_leafS = southLeaf;
+		}
+   
+		//update east
+		QTreeLeafNode* eastLeaf = root.getLeaf(x + FLOOR_SIZE, y);
+		if(eastLeaf){
+			leaf->m_leafE = eastLeaf;
 		}
 	}
 
@@ -796,6 +810,29 @@ QTreeLeafNode* QTreeNode::getLeaf(uint32_t x, uint32_t y)
 	}
 }
 
+QTreeLeafNode* QTreeNode::getLeafStatic(QTreeNode* root, uint32_t x, uint32_t y)
+{
+	QTreeNode* currentNode = root;
+	uint32_t currentX = x, currentY = y;
+	while(currentNode){
+		if(!currentNode->isLeaf()){
+			uint32_t index = ((currentX & 0x8000) >> 15) | ((currentY & 0x8000) >> 14);
+			if(currentNode->m_child[index]){
+				currentNode = currentNode->m_child[index];
+				currentX = currentX*2;
+				currentY = currentY*2;
+			}
+			else{
+				return NULL;
+			}
+		}
+		else{
+			return static_cast<QTreeLeafNode*>(currentNode);
+		}
+	}
+	return NULL;
+}
+
 QTreeLeafNode* QTreeNode::createLeaf(uint32_t x, uint32_t y, uint32_t level)
 {
 	if(!isLeaf()){
@@ -821,7 +858,7 @@ QTreeLeafNode* QTreeNode::createLeaf(uint32_t x, uint32_t y, uint32_t level)
 bool QTreeLeafNode::newLeaf = false;
 QTreeLeafNode::QTreeLeafNode()
 {
-	for(unsigned int i = 0; i < 16; ++i){
+	for(unsigned int i = 0; i < MAP_MAX_LAYERS; ++i){
 		m_array[i] = NULL;
 	}
 	m_isLeaf = true;
