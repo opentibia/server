@@ -490,7 +490,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				if(const Item* iitem = iithing->getItem()){
 					const ItemType& iiType = Item::items[iitem->getID()];
 
-					if(iiType.isMagicField()){
+					if(iiType.isMagicField() && !iiType.blockSolid){
 						const MagicField* field = iitem->getMagicField();
 						if(!monster->hasCondition(Combat::CombatTypeToCondition(field->getCombatType())) && !monster->isImmune(field->getCombatType())){
 							return RET_NOTPOSSIBLE;
