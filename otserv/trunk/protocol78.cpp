@@ -1974,7 +1974,7 @@ void Protocol78::AddCreature(NetworkMessage &msg,const Creature* creature, bool 
 		msg.AddString(creature->getName());
 	}
 
-	msg.AddByte(std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1)));
+	msg.AddByte((int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1)));
 	msg.AddByte((uint8_t)creature->getDirection());
 
 	if(!creature->isInvisible()){
@@ -2073,7 +2073,7 @@ void Protocol78::AddCreatureHealth(NetworkMessage& msg,const Creature* creature)
 {
 	msg.AddByte(0x8C);
 	msg.AddU32(creature->getID());
-	msg.AddByte(std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1)));
+	msg.AddByte((int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1)));
 }
 
 void Protocol78::AddCreatureInvisible(NetworkMessage& msg, const Creature* creature)
