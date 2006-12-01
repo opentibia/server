@@ -176,16 +176,6 @@ Vocation::~Vocation()
 	}
 }
 
-const std::string& Vocation::getVocName() const
-{
-	return name;
-}
-
-const std::string& Vocation::getVocDescription() const
-{
-	return description;
-}
-
 uint32_t Vocation::getReqSkillTries(int skill, int level)
 {
 	if(skill < SKILL_FIRST || skill > SKILL_LAST){

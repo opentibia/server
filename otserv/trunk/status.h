@@ -29,7 +29,11 @@
 class Status{
 public:
 	// procs
-	static Status* instance();
+	static Status* instance()
+	{
+		static Status status;
+		return &status;
+	}
 	
 	void addPlayer();
 	void removePlayer();
@@ -57,7 +61,6 @@ private:
 	std::string version;
 
 	Status();
-	static Status* _Status;
 };
 
 #endif

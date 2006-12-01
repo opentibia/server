@@ -24,6 +24,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include "enums.h"
 
 struct Outfit{
     uint32_t looktype;
@@ -40,7 +41,7 @@ public:
 
 	void addOutfit(const Outfit& outfit);
 	bool remOutfit(const Outfit& outfit);
-	const OutfitListType& getOutfits() const;
+	const OutfitListType& getOutfits() const {return m_list;}
 	bool isInList(uint32_t looktype, uint32_t addons) const;
 	
 private:
@@ -52,15 +53,30 @@ class Outfits
 public:
 	~Outfits();
 	
-	static Outfits* getInstance();
+	static Outfits* getInstance(){
+		static Outfits instance;
+		return &instance;
+	}
 	
 	bool loadFromXml(const std::string& datadir);
-	const OutfitListType& getOutfits(uint32_t type);
-	const OutfitList& getOutfitList(uint32_t type);
+	const OutfitListType& getOutfits(uint32_t type){
+		return getOutfitList(type).getOutfits();
+	}
+	
+	const OutfitList& getOutfitList(uint32_t type){
+		if(type < m_list.size()){
+			return *m_list[type];
+		}
+		else{
+			if(type == PLAYERSEX_FEMALE)
+				return m_female_list;
+			else
+				return m_male_list;
+		}
+	}
 	
 private:
 	Outfits();
-	static Outfits* _instance;
 	typedef std::vector<OutfitList*> OutfitsListVector;
 	OutfitsListVector m_list;
 	

@@ -50,7 +50,10 @@ class Raids{
 private:
 	Raids();
 public:
-	static Raids* getInstance();
+	static Raids* getInstance(){
+		static Raids instance;
+		return &instance;
+	}
 	
 	~Raids();
 	
@@ -73,7 +76,6 @@ public:
 	
 private:
 	RaidList raidList;
-	static Raids* _instance;
 	bool loaded, started;
 	Raid* running;
 	uint64_t lastRaidEnd;

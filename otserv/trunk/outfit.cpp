@@ -27,7 +27,6 @@
 #include "player.h"
 #include "tools.h"
 
-Outfits* Outfits::_instance = NULL;
 
 OutfitList::OutfitList()
 {
@@ -92,11 +91,6 @@ bool OutfitList::isInList(uint32_t looktype, uint32_t addons) const
 	return false;
 }
 
-const OutfitListType& OutfitList::getOutfits() const
-{
-	return m_list;
-}
-
 Outfits::Outfits()
 {
 	Outfit outfit;
@@ -122,34 +116,6 @@ Outfits::~Outfits()
 		delete *it;
 	}
 	m_list.clear();
-}
-	
-Outfits* Outfits::getInstance()
-{
-	if(!_instance){
-		_instance = new Outfits();
-	}
-	return _instance;
-}
-
-const OutfitListType& Outfits::getOutfits(uint32_t type)
-{
-	return getOutfitList(type).getOutfits();
-}
-
-const OutfitList& Outfits::getOutfitList(uint32_t type)
-{
-	if(type < m_list.size()){
-		return *m_list[type];
-	}
-	else{
-		if(type == PLAYERSEX_FEMALE){
-			return m_female_list;
-		}
-		else{
-			return m_male_list;
-		}
-	}
 }
 
 bool Outfits::loadFromXml(const std::string& datadir)

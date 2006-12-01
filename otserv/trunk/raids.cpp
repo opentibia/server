@@ -30,8 +30,6 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
-Raids* Raids::_instance = NULL;
-
 Raids::Raids()
 {
 	loaded = false;
@@ -44,14 +42,6 @@ Raids::Raids()
 Raids::~Raids()
 {
 	clear();
-}
-
-Raids* Raids::getInstance()
-{
-	if(_instance == NULL){
-		_instance = new Raids();
-	}
-	return _instance;
 }
 
 bool Raids::loadFromXml(const std::string& fileName)

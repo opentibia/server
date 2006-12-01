@@ -21,8 +21,6 @@
 #include "logger.h"
 #include <iostream>
 
-Logger* Logger::instance = NULL;
-
 /*
 void Logger::logMessage(std::string channel, eLogType type, int level,
 			std::string message, std::string func,
@@ -48,14 +46,6 @@ void Logger::logMessage(std::string channel, eLogType type, int level,
 	std::cout << "File: " << file << std::endl; 
 }
 */
-
-Logger* Logger::getInstance()
-{
-	if(!instance){
-		instance = new Logger();
-	}
-	return instance;
-}
 
 Logger::Logger()
 {
