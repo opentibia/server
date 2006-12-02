@@ -429,7 +429,7 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 	int32_t manaCost = getManaCost(player);
 
 	if(manaCost > 0){
-		player->changeMana(manaCost);
+		player->changeMana(-(int32_t)manaCost);
 		player->addManaSpent(manaCost);
 	}
 
