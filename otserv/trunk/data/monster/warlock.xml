@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
-<monster name="Warlock" experience="6000" pushable="0" armor="40" defense="45" canpushitems="1" staticattack="30" speed="220">
+<monster name="Warlock" experience="6000" pushable="0" canpushitems="1" staticattack="30" speed="220">
 	<health now="4200" max="4200"/>
 	<look type="130" head="19" body="71" legs="128" feet="128" corpse="3128"/>
+	<stats attackskill="70" attack="25" defenseskill="20" defense="30" armor="10"/>
 	<combat targetdistance="5" runonhealth="2100"/>
 	<targetchange speed="2000" chance="5"/>
 

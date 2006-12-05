@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
-<monster name="Poison Spider" experience="22" pushable="1" summonable="1" convinceable="1" manacost="200" illusionable="1" armor="15" defense="20" canpushitems="0" staticattack="50" speed="160">
+<monster name="Poison Spider" experience="22" pushable="1" summonable="1" convinceable="1" manacost="200" illusionable="1" canpushitems="0" staticattack="50" speed="160">
 	<health now="26" max="26"/>
 	<look type="36" head="20" body="30" legs="40" feet="50" corpse="2848"/>
+	<stats attackskill="10" attack="5" defenseskill="0" defense="0" armor="0"/>
 	<combat targetdistance="1" runonhealth="0"/>
 
 <attacks>
