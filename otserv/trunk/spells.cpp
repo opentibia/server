@@ -571,11 +571,9 @@ void Spell::postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) 
 		player->addManaSpent(manaCost);
 	}
 
-	/*
 	if(soulCost > 0){
 		player->changeSoul(-(int32_t)soulCost);
 	}
-	*/
 }
 
 

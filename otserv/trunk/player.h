@@ -228,8 +228,11 @@ public:
 	void addManaSpent(uint32_t amount);
 	void addSkillAdvance(skills_t skill, uint32_t count);
 
-	virtual int getArmor() const;
-	virtual int getDefense() const;
+	virtual int32_t getArmor() const;
+	virtual int32_t getDefense() const;
+	virtual int32_t getDefenseSkill() const;
+	virtual int32_t getAttackPower() const;
+	void setAttackPower(int32_t attackValue) {attackPower = attackValue;}
 
 	void addDefaultRegeneration(uint32_t addTicks);
 
@@ -417,7 +420,8 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	//combat help functions
-	bool getCombatItem(Item** tool, const Weapon** weapon);
+	//bool getCombatItem(Item** tool, const Weapon** weapon);
+	Item* getWeapon() const;
 
 	std::string getSkillName(int skillid);
 	void addExperience(uint32_t exp);
@@ -467,6 +471,7 @@ protected:
 	Vocation* vocation;
 	playersex_t sex;
 	int32_t soul, soulMax;
+	int32_t attackPower;
 
 	double inventoryWeight;
 	double capacity;

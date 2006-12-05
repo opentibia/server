@@ -160,6 +160,12 @@ bool Weapons::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
+int32_t Weapons::getAttackPower(int32_t attackValue, int32_t attackSkill)
+{
+	return attackValue * attackSkill + attackSkill;
+	//return attackValue * attackSkill + attackSkill * attackSkill;
+}
+
 Weapon::Weapon(LuaScriptInterface* _interface) :
 	Event(_interface)
 {
@@ -330,6 +336,8 @@ bool Weapon::useWeapon(Player* player, Item* item, Creature* target) const
 		return false;
 	}
 
+	onUseWeapon(player, item);
+
 	return internalUseWeapon(player, item, target);
 }
 
@@ -339,7 +347,12 @@ bool Weapon::useFist(Player* player, Creature* target)
 	const Position& targetPos = target->getPosition();
 
 	if(Position::areInRange<1,1>(playerPos, targetPos)){
-		int32_t damage = -(int32_t)(0.5 * player->getSkill(SKILL_FIST, SKILL_LEVEL))*rand()/RAND_MAX;
+		int32_t attackSkill = player->getSkill(SKILL_FIST, SKILL_LEVEL);
+		int32_t attackValue = 10;
+		int32_t attackPower = Weapons::getAttackPower(attackValue, attackSkill);
+		player->setAttackPower(attackPower);
+		int32_t damage = -(int32_t)(0.5 * attackSkill)*rand()/RAND_MAX;
+
 		CombatParams params;
 		params.combatType = COMBAT_PHYSICALDAMAGE;
 		params.blockedByArmor = true;
@@ -384,13 +397,25 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 	else{
 		Combat::postCombatEffects(player, tile->getPosition(), params);
 		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
-
-		//int32_t damage = getWeaponDamage(player, item);
-		//Combat::doCombatHealth(player, tile->getPosition(), NULL, damage, damage, params);
 	}
 
 	onUsedWeapon(player, item, tile);
 	return true;
+}
+
+void Weapon::onUseWeapon(Player* player, Item* item) const
+{
+	skills_t skill;
+	uint32_t skillpoint;
+	int32_t attackSkill = 10;
+	if(getSkillType(player, item, skill, skillpoint)){
+		attackSkill = player->getSkill(skill, SKILL_LEVEL);
+	}
+
+	int32_t attackValue = item->getAttack();
+	int32_t attackPower = Weapons::getAttackPower(attackValue, attackSkill);
+
+	player->setAttackPower(attackPower);
 }
 
 void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
@@ -429,17 +454,15 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 	int32_t manaCost = getManaCost(player);
 
 	if(manaCost > 0){
-		player->changeMana(-(int32_t)manaCost);
+		player->changeMana(-manaCost);
 		player->addManaSpent(manaCost);
 	}
 
-	/*
 	int32_t soulCost = soul;
 
 	if(soulCost > 0){
 		player->changeSoul(-soulCost);
 	}
-	*/
 }
 
 int32_t Weapon::getManaCost(const Player* player) const
@@ -581,9 +604,15 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item) con
 		}
 	}
 	
+	/*
 	int32_t attackValue = item->getAttack();
 	int32_t maxDamage = (skillLevel * (attackValue / 20) + attackValue);
 	return -(1 + (int32_t)(maxDamage * rand()/(RAND_MAX + 1.0)));
+	*/
+
+	int32_t attackValue = item->getAttack();
+	int32_t maxDamage = (skillLevel/20) * attackValue + attackValue;
+	return -random_range(0, maxDamage);
 }
 
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
@@ -659,6 +688,8 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		return false;
 	}
 
+	onUseWeapon(player, item);
+
 	Position destPos = target->getPosition();
 	Tile* destTile = target->getTile();
 
@@ -695,8 +726,11 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item) 
 {
 	int32_t skillLevel = player->getSkill(SKILL_DIST, SKILL_LEVEL);
 
-	int32_t maxDamage = (skillLevel * (ammuAttackValue / 20) + ammuAttackValue);
-	return -(1 + (int32_t)(maxDamage * rand()/(RAND_MAX + 1.0)));
+	int32_t maxDamage = (skillLevel * ammuAttackValue)/20 + ammuAttackValue;
+	return -random_range(0, maxDamage);
+
+	//int32_t maxDamage = (skillLevel * (ammuAttackValue / 20) + ammuAttackValue);
+	//return -(1 + (int32_t)(maxDamage * rand()/(RAND_MAX + 1.0)));
 }
 
 bool WeaponDistance::getSkillType(const Player* player, const Item* item,

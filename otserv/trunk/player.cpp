@@ -78,6 +78,7 @@ Creature()
 	npings = 0;
 	internal_ping = 0;
 	lastAction = 0;
+	attackPower = 0;
 
 	pzLocked = false;
 	blockCount = 0;
@@ -247,6 +248,59 @@ void Player::setConditionSuppressions(uint32_t conditions, bool remove)
 	}
 }
 
+Item* Player::getWeapon() const
+{
+	Item* item = NULL;
+
+	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+		item = getInventoryItem((slots_t)slot);
+		if(!item){
+			continue;
+		}
+
+		switch(item->getWeaponType()){
+			case WEAPON_SWORD:
+			case WEAPON_AXE:
+			case WEAPON_CLUB:
+			case WEAPON_WAND:
+			{
+				const Weapon* weapon = g_weapons->getWeapon(item);
+				if(weapon){
+					return item;
+				}
+
+				break;
+			}
+
+			case WEAPON_DIST:
+			{
+				if(item->getAmuType() != AMMO_NONE){
+					Item* ammuItem = getInventoryItem(SLOT_AMMO);
+
+					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
+						const Weapon* weapon = g_weapons->getWeapon(ammuItem);
+						if(weapon){
+							return ammuItem;
+						}
+					}
+				}
+				else{
+					const Weapon* weapon = g_weapons->getWeapon(item);
+					if(weapon){
+						return item;
+					}
+				}
+			}
+
+			default:
+				break;
+		}
+	}
+	
+	return NULL;
+}
+
+/*
 bool Player::getCombatItem(Item** tool, const Weapon** weapon)
 {
 	Item* item = NULL;
@@ -277,8 +331,6 @@ bool Player::getCombatItem(Item** tool, const Weapon** weapon)
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
 
 					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
-						//return ammuItem;
-
 						*weapon = g_weapons->getWeapon(ammuItem);
 						if(*weapon){
 							*tool = ammuItem;
@@ -287,8 +339,6 @@ bool Player::getCombatItem(Item** tool, const Weapon** weapon)
 					}
 				}
 				else{
-					//return item;
-
 					*weapon = g_weapons->getWeapon(item);
 					if(*weapon){
 						*tool = item;
@@ -300,58 +350,95 @@ bool Player::getCombatItem(Item** tool, const Weapon** weapon)
 			default:
 				break;
 		}
-
-		/*
-		const Weapon* weapon = g_weapons->getWeapon(item);
-		if(weapon){
-			return item;
-		}
-		*/
 	}
 	
 	return false;
 }
+*/
 
-int Player::getArmor() const
+int32_t Player::getArmor() const
 {
-	int armor = 0;
+	int32_t armor = 0;
 	
-	if(inventory[SLOT_HEAD])
-		armor += inventory[SLOT_HEAD]->getArmor();
-	if(inventory[SLOT_NECKLACE])
-		armor += inventory[SLOT_NECKLACE]->getArmor();
-	if(inventory[SLOT_ARMOR])
-		armor += inventory[SLOT_ARMOR]->getArmor();
-	if(inventory[SLOT_LEGS])
-		armor += inventory[SLOT_LEGS]->getArmor();
-	if(inventory[SLOT_FEET])
-		armor += inventory[SLOT_FEET]->getArmor();
-	if(inventory[SLOT_RING])
-		armor += inventory[SLOT_RING]->getArmor();
+	if(getInventoryItem(SLOT_HEAD))
+		armor += getInventoryItem(SLOT_HEAD)->getArmor();
+	if(getInventoryItem(SLOT_NECKLACE))
+		armor += getInventoryItem(SLOT_NECKLACE)->getArmor();
+	if(getInventoryItem(SLOT_ARMOR))
+		armor += getInventoryItem(SLOT_ARMOR)->getArmor();
+	if(getInventoryItem(SLOT_LEGS))
+		armor += getInventoryItem(SLOT_LEGS)->getArmor();
+	if(getInventoryItem(SLOT_FEET))
+		armor += getInventoryItem(SLOT_FEET)->getArmor();
+	if(getInventoryItem(SLOT_RING))
+		armor += getInventoryItem(SLOT_RING)->getArmor();
 	
 	return armor;
 }
 
-int Player::getDefense() const
+int32_t Player::getDefense() const
 {
 	int defense = 0;
-	
-	if(inventory[SLOT_LEFT]){		
-		if(inventory[SLOT_LEFT]->getWeaponType() == WEAPON_SHIELD)
-			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + inventory[SLOT_LEFT]->getDefense();
-		else
-			defense += inventory[SLOT_LEFT]->getDefense();
+	if(getInventoryItem(SLOT_LEFT) && getInventoryItem(SLOT_LEFT)->getWeaponType() == WEAPON_SHIELD){
+		if(getInventoryItem(SLOT_RIGHT)->getDefense() * 2 > defense){
+			defense = getInventoryItem(SLOT_LEFT)->getDefense() * 2;
+		}
+	}
+	else if(getInventoryItem(SLOT_RIGHT) && getInventoryItem(SLOT_RIGHT)->getWeaponType() == WEAPON_SHIELD){
+		if(getInventoryItem(SLOT_RIGHT)->getDefense() * 2 > defense){
+			defense = getInventoryItem(SLOT_RIGHT)->getDefense() * 2;
+		}
 	}
 
-	if(inventory[SLOT_RIGHT]){
-		if(inventory[SLOT_RIGHT]->getWeaponType() == WEAPON_SHIELD)
-			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + inventory[SLOT_RIGHT]->getDefense();
-		else
-			defense += inventory[SLOT_RIGHT]->getDefense();
+	if(defense != 0){
+		return defense;
 	}
-	
-	defense += random_range(0, skills[SKILL_SHIELD][SKILL_LEVEL]);
-	return random_range(defense/4, (defense*rand())/(RAND_MAX + 1));
+	else{
+		if(getInventoryItem(SLOT_HEAD))
+			defense += getInventoryItem(SLOT_HEAD)->getDefense();
+		if(getInventoryItem(SLOT_NECKLACE))
+			defense += getInventoryItem(SLOT_NECKLACE)->getDefense();
+		if(getInventoryItem(SLOT_ARMOR))
+			defense += getInventoryItem(SLOT_ARMOR)->getDefense();
+		if(getInventoryItem(SLOT_LEGS))
+			defense += getInventoryItem(SLOT_LEGS)->getDefense();
+		if(getInventoryItem(SLOT_FEET))
+			defense += getInventoryItem(SLOT_FEET)->getDefense();
+		if(getInventoryItem(SLOT_RING))
+			defense += getInventoryItem(SLOT_RING)->getDefense();
+		
+		return defense;
+	}
+}
+
+int32_t Player::getAttackPower() const
+{
+	return attackPower;
+
+	/*
+	Item* weapon = getWeapon();
+	if(weapon){
+		switch(weapon->getWeaponType()){
+			case WEAPON_AXE: return getSkill(SKILL_AXE, SKILL_LEVEL); break;
+			case WEAPON_SWORD: return getSkill(SKILL_SWORD, SKILL_LEVEL); break;
+			case WEAPON_CLUB: return getSkill(SKILL_CLUB, SKILL_LEVEL); break;
+			case WEAPON_AMMO: return getSkill(SKILL_DIST, SKILL_LEVEL); break;
+			case WEAPON_DIST: return getSkill(SKILL_DIST, SKILL_LEVEL); break;
+
+			default:
+				return 0;
+				break;
+		}
+	}
+	else{
+		return getSkill(SKILL_SWORD, SKILL_LEVEL);
+	}
+	*/
+}
+
+int32_t Player::getDefenseSkill() const
+{
+	return getSkill(SKILL_SHIELD, SKILL_LEVEL);
 }
 
 void Player::sendIcons() const
@@ -1384,11 +1471,26 @@ void Player::onDefenseBlock(bool blockedHit)
 	if(shieldBlockCount > 0){
 		--shieldBlockCount;
 
-		if(blockedHit){
-			addSkillAdvance(SKILL_SHIELD, 2);
+		bool hasShield = false;
+		Item* item;
+
+		item = getInventoryItem(SLOT_LEFT);
+		if(item && item->getWeaponType() == WEAPON_SHIELD){
+			hasShield = true;
 		}
-		else{
-			addSkillAdvance(SKILL_SHIELD, 1);
+		
+		item = getInventoryItem(SLOT_RIGHT);
+		if(item && item->getWeaponType() == WEAPON_SHIELD){
+			hasShield = true;
+		}
+
+		if(hasShield){
+			if(blockedHit){
+				addSkillAdvance(SKILL_SHIELD, 2);
+			}
+			else{
+				addSkillAdvance(SKILL_SHIELD, 1);
+			}
 		}
 	}
 }
@@ -2324,19 +2426,20 @@ void Player::doAttacking(uint32_t interval)
 	if(getAttackSpeed() <= attackTicks){
 		bool result = false;
 
-		Item* tool;
-		const Weapon* weapon;
+		Item* tool = getWeapon();
+		const Weapon* weapon = g_weapons->getWeapon(tool);
 
-		if(getCombatItem(&tool, &weapon)){			
-			if(weapon && weapon->checkLastAction(this, interval)){
-				attackTicks = 0;
-				result = weapon->useWeapon(this, tool, attackedCreature);
-			}
+		//if(weapon){
+		if(weapon && weapon->checkLastAction(this, 100)){
+			attackTicks = 0;
+			result = weapon->useWeapon(this, tool, attackedCreature);
 		}
 		else{
 			attackTicks = 0;
 			result = Weapon::useFist(this, attackedCreature);
 		}
+
+		setAttackPower(0);
 
 		if(!result){
 			//make next instant

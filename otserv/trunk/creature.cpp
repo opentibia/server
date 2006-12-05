@@ -148,6 +148,16 @@ void Creature::stopEventThink()
 
 void Creature::onThink(uint32_t interval)
 {
+	if(!canSeeInvisibility()){
+		if(followCreature && followCreature->isInvisible() && getMaster() != followCreature){
+			onCreatureDisappear(followCreature, false);
+		}
+
+		if(attackedCreature && attackedCreature->isInvisible()){
+			onCreatureDisappear(attackedCreature, false);
+		}
+	}
+
 	if(internalUpdateFollow && followCreature){
 		internalUpdateFollow = false;
 		setFollowCreature(followCreature);
@@ -361,6 +371,7 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 
 void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 {
+	/*
 	if(!visible && !canSeeInvisibility() && getMaster() != creature){
 		if(followCreature == creature){
 			onCreatureDisappear(followCreature, false);
@@ -370,6 +381,7 @@ void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 			onCreatureDisappear(attackedCreature, false);
 		}
 	}
+	*/
 }
 
 void Creature::die()
@@ -477,32 +489,56 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 	}
 
 	if(blockType == BLOCK_NONE && internalDefense && checkDefense){
-		int32_t defense = getDefense();
+		
+		if(attacker){
+			int32_t defenseSkill = getDefenseSkill();
+			int32_t defenseValue = getDefense();
+			int32_t defensePower = defenseValue * (defenseSkill / 2) + defenseSkill;
+			int32_t attackPower = attacker->getAttackPower();
+			float x = (attackPower - defensePower)/100.0;
+			float e = std::exp(-x);
+			float result = 910/(1 + e) + 50;
+			int32_t r = random_range(0, 1000);
 
-		int32_t attackValue = (rand() % 80) + (damage / 16);
-		if(attackValue < defense){
-			damage = 0;
-			blockType = BLOCK_DEFENSE;
-			internalDefense = false;
-			onDefenseBlock(true);
-		}
-		else{
-			onDefenseBlock(false);
+			/*
+			std::cout << "Block shield: "
+				<< "Attacker: " << (attacker ? attacker->getName() : "")
+				<< ", defensePower: " << defensePower
+				<< ", attackPower: " << attackPower
+				<< ", result: " << result
+				<< ", r: " << r
+				<< ", blocked: " << (result <= r ? "yes" : "no")
+				<< std::endl;
+			*/
+
+			if(result <= r){
+				damage = 0;
+				blockType = BLOCK_DEFENSE;
+				internalDefense = false;
+				onDefenseBlock(true);
+			}
+			else{
+				onDefenseBlock(false);
+			}
 		}
 	}
 	
 	if(blockType == BLOCK_NONE && internalArmor && checkArmor){
 		internalArmor = false;
-		int32_t armor = getArmor();
 
-		int32_t armor2 = armor*armor;
-		int32_t max = armor2/8 + 2*armor + 8;
-		int32_t min = -armor2/32 + (5*armor)/2;
-		if(min < 0){
-			min = 0;
-		}
-		min = random_range(min/2, min);
-		int32_t reduceDamage = random_range(min, max);
+		int32_t armor = getArmor();		
+		int32_t maxReduceDamage = (armor + 4) / 2;
+		int32_t reduceDamage = rand() % maxReduceDamage;
+
+		/*
+		std::cout << "Armor block: "
+			<< "Attacker: " << (attacker ? attacker->getName() : "")
+			<< ", maxReduceDamage: " << maxReduceDamage
+			<< ", reduceDamage: " << reduceDamage
+			<< ", damage: " << reduceDamage
+			<< ", blocked: " << (reduceDamage >= damage ? "yes" : "no")
+			<< std::endl;
+		*/
 
 		if(reduceDamage >= damage){
 			damage = 0;

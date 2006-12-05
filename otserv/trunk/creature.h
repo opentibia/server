@@ -164,8 +164,10 @@ public:
 	virtual void addSummon(Creature* creature);
 	virtual void removeSummon(const Creature* creature);
 
-	virtual int getArmor() const {return 0;}
-	virtual int getDefense() const {return 0;}
+	virtual int32_t getArmor() const {return 0;}
+	virtual int32_t getDefense() const {return 0;}
+	virtual int32_t getDefenseSkill() const {return 0;}
+	virtual int32_t getAttackPower() const {return 0;}
 
 	bool addCondition(Condition* condition);
 	void removeCondition(ConditionType_t type, ConditionId_t id);

@@ -54,6 +54,8 @@ public:
 	static int32_t weaponExhaustionTime;
 	static int32_t weaponInFightTime;
 
+	static int32_t getAttackPower(int32_t attackValue, int32_t attackSkill);
+
 protected:
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
@@ -93,6 +95,7 @@ protected:
 	bool internalUseWeapon(Player* player, Item* item, Creature* target) const;
 	bool internalUseWeapon(Player* player, Item* item, Tile* tile) const;
 
+	virtual void onUseWeapon(Player* player, Item* item) const;
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const = 0;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
@@ -141,6 +144,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
 
+	//virtual bool checkLastAction(Player* player, int32_t interval) const {return (OTSYS_TIME() - getLastAction() >= interval);}
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
 	virtual bool playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
