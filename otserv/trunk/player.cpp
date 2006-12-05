@@ -1403,7 +1403,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 	}
 	*/
 
-	int32_t absorbedDamage = 0;
+	bool absorbedDamage;
 
 	//reduce damage against inventory items
 	Item* item = NULL;
@@ -1416,37 +1416,62 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			continue;
 
 		const ItemType& it = Item::items[item->getID()];
+		absorbedDamage = false;
 
 		if(it.abilities.absorbPercentAll != 0){
-			absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentAll) / 100) * damage);
+			//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentAll) / 100) * damage);
+			if(it.abilities.absorbPercentAll > 0){
+				damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentAll) / 100));
+				absorbedDamage = true;
+			}
 		}
 
 		switch(combatType){
 			case COMBAT_PHYSICALDAMAGE:
-				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPhysical) / 100) * damage);
+				//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPhysical) / 100) * damage);
+				if(it.abilities.absorbPercentPhysical > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentPhysical) / 100));
+					absorbedDamage = true;
+				}
 				break;
 
 			case COMBAT_FIREDAMAGE:
-				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentFire) / 100) * damage);
+				//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentFire) / 100) * damage);
+				if(it.abilities.absorbPercentFire > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentFire) / 100));
+					absorbedDamage = true;
+				}
 				break;
 
 			case COMBAT_ENERGYDAMAGE:
-				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentEnergy) / 100) * damage);
+				//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentEnergy) / 100) * damage);
+				if(it.abilities.absorbPercentEnergy > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentEnergy) / 100));
+					absorbedDamage = true;
+				}
 				break;
 
 			case COMBAT_POISONDAMAGE:
-				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPoison) / 100) * damage);
+				//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPoison) / 100) * damage);
+				if(it.abilities.absorbPercentPoison > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentPoison) / 100));
+					absorbedDamage = true;
+				}
 				break;
 
 			case COMBAT_LIFEDRAIN:
-				absorbedDamage += (int32_t)(((double)it.abilities.absorbPercentLifeDrain) / 100) * damage;
+				//absorbedDamage += (int32_t)(((double)it.abilities.absorbPercentLifeDrain) / 100) * damage;
+				if(it.abilities.absorbPercentLifeDrain > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentLifeDrain) / 100));
+					absorbedDamage = true;
+				}
 				break;
 
 			default:
 				break;
 		}
 	
-		if(absorbedDamage != 0){
+		if(absorbedDamage){
 			int32_t charges = item->getItemCharge();
 
 			if(charges != 0){
@@ -1455,12 +1480,9 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		}
 	}
 
-	if(absorbedDamage > 0){
-		damage -= absorbedDamage;
-		if(damage <= 0){
-			damage = 0;
-			blockType = BLOCK_DEFENSE;
-		}
+	if(damage <= 0){
+		damage = 0;
+		blockType = BLOCK_DEFENSE;
 	}
 
 	return blockType;
