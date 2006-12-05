@@ -1,28 +1,82 @@
-----config.lua--------------
--- Config file for otserv
+-------- config.lua --------
+-- Config file for OTServ --
 ----------------------------
 
--- datadir
+-- data directory location
 datadir = "data/"
 
--- map
--- sets what map to load, if sql, determines the sql map
+-- map location
 map = "data/world/map.otbm"
+
+-- mapkind
+-- options: OTBM for binary map, XML for OTX map
+mapkind = "OTBM"
+
+-- map store location (for XML players only)
 mapstore = "data/world/map-mapstore.xml"
+
+-- house store location (for XML players only)
 housestore = "data/world/map-housestore.xml"
+
+-- bans storage (for XML players only)
+banIdentifier = "data/bans.xml"
+
+-- server name
+servername = "OTServ"
+
+-- server location
+location = "Germany"
+
+-- server ip (the ip that server listens on)
+ip = "127.0.0.1"
+
+-- server port (the port that server listens on)
+port = "7171"
+
+-- server url
+url = "http://otserv.org"
+
+-- server owner name
+ownername = "Tliff"
+
+-- server owner email
+owneremail = "otserv@tibia.de"
+
+-- world name
+worldname = "Otera"
+
+-- world type
+-- options: pvp, no-pvp, pvp-enforced
+worldtype = "pvp"
+
+-- exhausted time in ms (1000 = 1 second)
+exhausted = 1000
+
+-- how many ms to add if the player is already exhausted and tries to cast a spell (1000 = 1 second)
+exhaustedadd = 200
+
+-- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1 second)
+pzlocked = 6000
 
 -- house rent period
 -- options: daily, weekly, monthly
-houserentperiod = "monthly"
+houserentperiod = "weekly"
 
--- mapkind
--- options: OTBM for binary, XML for OTX maps, SQL for SQL map(Not supported by default)
-mapkind = "OTBM"
+-- rates (experience, skill, magic level and loot)
+rate_exp = 1
+rate_skill = 1
+rate_mag = 1
+rate_loot = 1
 
--- bans
-banIdentifier = "data/bans.xml"
+-- motd (the message box that you sometimes get before you choose characters)
+motd = "Welcome to OTServ 0.6.0!"
+motdnum = "1"
 
--- how many logins attempts until ip is temporary disabled (set to 0 to disable)
+-- login message
+loginmsg = "Welcome to OTServ. For help visit http://www.otfans.net"
+
+-- how many logins attempts until ip is temporary disabled 
+-- set to 0 to disable
 logintries = 5
 
 -- how long the retry timeout until a new login can be made (without disabling the ip)
@@ -31,88 +85,26 @@ retrytimeout = 5000
 -- how long the player need to wait until the ip is allowed again
 logintimeout = 15 * 60 * 1000
 
--- loginmsg
--- the message the player gets when he logs in
-loginmsg = "Welcome to OTServ. For help visit http://www.otfans.net"
-
--- port
--- the port otserv listens on
-port = "7171"
-
--- servername
--- name of our server
-servername = "otserv.org"
-
--- ownername
--- name of the owner of our server
-ownername = "Tliff"
-
--- owneremail
--- email of the owner of our server
-owneremail = "otserv@tibia.de"
-
--- url
--- the url for more server info
-url = "http://otserv.org"
-
--- location
--- the location of the server
-location = "Germany"
-
--- ip
--- the ip the server should redirect too
-ip = "127.0.0.1"
-
--- motd
--- The messagebox you sometimes get before you choose characters
-motd = "Welcome to OpenTibia 0.6.0"
-motdnum="1"
-
--- use md5 passwords for accounts, yes/no
-md5passwords = "no"
-
--- world type. options: pvp, no-pvp, pvp-enforced
-worldtype = "pvp"
-
--- max number of players allowed
-maxplayers = "1000"
-
--- exhausted time in ms (1000 = 1sec)
-exhausted = 1000
-
--- how many ms to add if the player is already exhausted and tries to cast a spell (1000 = 1sec)
-exhaustedadd = 200
-
--- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1sec)
-pzlocked = 5*60*1000
-
--- experience, skill and loot rate
-rate_exp = 1
-rate_skill = 1
-rate_mag = 1
-rate_loot = 1
-
--- allow multiple logins of the same char
+-- allow clones (multiple logins of the same char)
+-- options: 0 (no), 1 (yes)
 allowclones = 0
 
--- vocation names
-vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}
+-- max number of players allowed
+maxplayers = "900"
 
---- sql type mysql/sqlite only viable if both are present
-sql_type	=	"sqlite"
+-- md5 passwords for accounts
+-- options: yes, no
+md5passwords = "no"
 
---- SQLITE part
-sqlite_db	= "db.s3db"
+-- SQL type
+-- options: mysql, sqlite
+sql_type = "mysql"
 
---- SQL part
+--- MySQL part (ignore if you are using SQLite)
 sql_host = "localhost"
 sql_user = "root"
 sql_pass = ""
 sql_db   = "otserv"
 
---- SQL MAP part
-map_host = "localhost"
-map_user = "root"
-map_pass = ""
-map_db   = ""
-
+--- SQLite part (ignore if you are using MySQL)
+sqlite_db = "db.s3db"
