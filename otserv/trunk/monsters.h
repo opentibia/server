@@ -72,8 +72,15 @@ public:
 	std::string name;
 	std::string nameDescription;
 	int experience;
-	int armor;
+
+	//int attackSkill;
+	//int attackValue;
+	int attackPower;
+
+	int defenseSkill;
 	int defense;
+	int armor;
+
 	bool canPushItems;
 	unsigned long staticAttack;
 	int maxSummons;

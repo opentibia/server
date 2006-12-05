@@ -25,6 +25,7 @@
 #include "tools.h"
 #include "spells.h"
 #include "luascript.h"
+#include "weapons.h"
 #include "configmanager.h"
 
 #include <libxml/xmlmemory.h>
@@ -46,9 +47,14 @@ void MonsterType::reset()
 	isAttackable = true;
 	isHostile = true;
 	race = RACE_BLOOD;
-	armor = 0;
 	experience = 0;
+
+	attackPower = 0;
+
+	defenseSkill = 0;
 	defense = 0;
+	armor = 0;
+
 	canPushItems = false;
 	staticAttack = 1;
 	maxSummons = 0;
@@ -350,6 +356,32 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				}
 				else
 					monsterLoad = false;
+			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"stats") == 0){
+				int attackSkill = 0;
+				int attackValue = 0;
+
+				if(readXMLInteger(p, "attackskill", intValue)){
+					attackSkill = intValue;
+				}
+
+				if(readXMLInteger(p, "attack", intValue)){
+					attackValue = intValue;
+				}
+
+				mType->attackPower = Weapons::getAttackPower(attackValue, attackSkill);
+				
+				if(readXMLInteger(p, "defense", intValue)){
+					mType->defense = intValue;
+				}
+
+				if(readXMLInteger(p, "defenseskill", intValue)){
+					mType->defenseSkill = intValue;
+				}
+
+				if(readXMLInteger(p, "armor", intValue)){
+					mType->armor = intValue;
+				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"combat") == 0){
 
