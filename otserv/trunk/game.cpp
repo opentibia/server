@@ -2701,34 +2701,8 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
-		
-		/*
-		if(Combat::canDoCombat(attacker, target) != RET_NOERROR){
-			return false;
-		}
-
-		if(attacker == target){
-			return false;
-		}
-
-		if(getWorldType() == WORLD_TYPE_NO_PVP){
-			if(attacker && (attacker->getPlayer() && target->getPlayer())){
-				return false;
-			}
-
-			if(target->getMaster() && target->getMaster()->getPlayer()){
-				return false;
-			}
-		}
-		*/
 
 		int32_t damage = -healthChange;
-
-		/*
-		if(attacker && attacker->getPlayer() && target->getPlayer()){
-			damage = damage * 0.50;
-		}
-		*/
 
 		BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
@@ -2909,26 +2883,6 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
-		
-		/*
-		if(Combat::canDoCombat(attacker, target) != RET_NOERROR){
-			return false;
-		}
-
-		if(attacker == target){
-			return false;
-		}
-
-		if(getWorldType() == WORLD_TYPE_NO_PVP){
-			if(attacker && (attacker->getPlayer() && target->getPlayer())){
-				return false;
-			}
-
-			if(target->getMaster() && target->getMaster()->getPlayer()){
-				return false;
-			}
-		}
-		*/
 
 		if(target->isImmune(COMBAT_MANADRAIN)){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
@@ -2936,12 +2890,6 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 		}
 
 		int32_t manaLoss = std::min(target->getMana(), -manaChange);
-
-		/*
-		if(attacker && attacker->getPlayer() && target->getPlayer()){
-			manaLoss = manaLoss * 0.50;
-		}
-		*/
 
 		if(manaLoss > 0){
 			target->drainMana(attacker, manaLoss);
