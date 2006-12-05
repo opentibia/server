@@ -177,7 +177,7 @@ public:
 	Tile* getTile(uint16_t x, uint16_t y, uint8_t z);
 	Tile* getTile(const Position& pos);
     
-    QTreeLeafNode* getLeaf(uint16_t x, uint16_t y){ return root.getLeaf(x, y);}
+	QTreeLeafNode* getLeaf(uint16_t x, uint16_t y){ return root.getLeaf(x, y);}
     
 	/**
 	* Set a single tile.

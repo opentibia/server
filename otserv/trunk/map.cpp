@@ -300,7 +300,6 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	int32_t minRangeX /*= 0*/, int32_t maxRangeX /*= 0*/,
 	int32_t minRangeY /*= 0*/, int32_t maxRangeY /*= 0*/)
 {
-
 	minRangeX = (minRangeX == 0 ? -maxViewportX : -minRangeX);
 	maxRangeX = (maxRangeX == 0 ? maxViewportX : maxRangeX);
 	minRangeY = (minRangeY == 0 ? -maxViewportY : -minRangeY);
@@ -308,7 +307,6 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	
 	int32_t minRangeZ;
 	int32_t maxRangeZ;
-	int32_t offsetZ;
 
 	if(multifloor){
 		if(centerPos.z > 7){
@@ -340,22 +338,105 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	CreatureVector::iterator cit;
 	Tile* tile;
 
-	for(int32_t nz = minRangeZ; nz < maxRangeZ + 1; ++nz){
-		offsetZ = centerPos.z - nz;
-		
-		for(int32_t nx = minRangeX + offsetZ; nx <= maxRangeX + offsetZ; ++nx){
-			for(int32_t ny = minRangeY + offsetZ; ny <= maxRangeY + offsetZ; ++ny){
-				tile = getTile(nx + centerPos.x, ny + centerPos.y, nz);
-				if(tile){
-					for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
-						if(std::find(list.begin(), list.end(), *cit) == list.end()){
-							list.push_back(*cit);
+	int32_t maxoffset = centerPos.z - minRangeZ;
+	int32_t x1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX - maxoffset  )));
+	int32_t y1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY - maxoffset )));
+
+	int32_t x2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + maxoffset )));
+	int32_t y2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + maxoffset )));
+
+	int32_t startx1 = x1 - (x1 % FLOOR_SIZE);
+	int32_t starty1 = y1 - (y1 % FLOOR_SIZE);
+	int32_t endx2 = x2 - (x2 % FLOOR_SIZE);
+	int32_t endy2 = y2 - (y2 % FLOOR_SIZE);
+	
+	int32_t floorx1, floory1, floorx2, floory2;
+
+	QTreeLeafNode* startLeaf;
+	QTreeLeafNode* leafE;
+	QTreeLeafNode* leafS;
+	Floor* floor;
+	int32_t offsetZ;
+
+	startLeaf = getLeaf(startx1, starty1);
+	leafS = startLeaf;
+
+	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
+		leafE = leafS;
+		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){			
+			if(leafE){
+				for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
+
+					if(floor = leafE->getFloor(nz)){
+						//get current floor limits
+						offsetZ = centerPos.z - nz;
+
+						floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
+						floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
+						floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
+						floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
+
+						for(int ly = 0; ly < FLOOR_SIZE; ++ly){
+							for(int lx = 0; lx < FLOOR_SIZE; ++lx){
+								if((nx + lx >= floorx1 && nx + lx <= floorx2) && (ny + ly >= floory1 && ny + ly <= floory2)){
+									if(tile = floor->tiles[(nx + lx) & FLOOR_MASK][(ny + ly) & FLOOR_MASK]){
+										for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
+											if(std::find(list.begin(), list.end(), *cit) == list.end()){
+												list.push_back(*cit);
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}
+
+				leafE = leafE->stepEast();
+				//leafE = getLeaf(nx + FLOOR_SIZE, ny);
+			}
+			else{
+				leafE = getLeaf(nx + FLOOR_SIZE, ny);
+			}
+		}
+
+		if(leafS){
+			leafS = leafS->stepSouth();
+		}
+		else{
+			leafS = getLeaf(startx1, ny + FLOOR_SIZE);
+		}
+	}
+
+	/*
+	//int offsetZ;
+	for(int32_t nz = minRangeZ; nz < maxRangeZ + 1; ++nz){
+		offsetZ = centerPos.z - nz;
+
+		int32_t floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
+		int32_t floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
+		int32_t floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
+		int32_t floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
+
+		//std::cout << "x1: " << floorx1 << ", y1: " << floory1 << ", x2: " << floorx2 << ", xy: " << floory2 << ", z: " << nz << std::endl;
+			for(int32_t nx = minRangeX + offsetZ; nx <= maxRangeX + offsetZ; ++nx){
+				for(int32_t ny = minRangeY + offsetZ; ny <= maxRangeY + offsetZ; ++ny){
+
+				if((nx + centerPos.x >= floorx1 && nx + centerPos.x <= floorx2) && (ny + centerPos.y >= floory1 && ny + centerPos.y <= floory2)){
+					tile = getTile(nx + centerPos.x, ny + centerPos.y, nz);
+					if(tile){
+						for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
+							if(std::find(list.begin(), list.end(), *cit) == list.end()){
+								list.push_back(*cit);
+							}
+						}
+					}
+				}
+
 			}
 		}
 	}
+	*/
 }
 
 bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
