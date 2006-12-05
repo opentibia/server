@@ -54,8 +54,11 @@ public:
 
 	virtual RaceType_t getRace() const { return mType->race; }
 
-	virtual int getArmor() const { return mType->armor; }
-	virtual int getDefense() const { return mType->defense; }
+	virtual int32_t getArmor() const { return mType->armor; }
+	virtual int32_t getDefense() const { return mType->defense; }
+	virtual int32_t getDefenseSkill() const {return mType->defenseSkill;}
+	virtual int32_t getAttackPower() const {return mType->attackPower;}
+
 	virtual bool isPushable() const { return mType->pushable; }
 	virtual bool isAttackable() const { return mType->isAttackable;}
 	virtual void doAttacking(uint32_t interval);

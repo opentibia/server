@@ -616,7 +616,7 @@ void Monster::onDefending(uint32_t interval)
 		}
 	}
 
-	if((int32_t)summons.size() < mType->maxSummons){
+	if(!isSummon() && (int32_t)summons.size() < mType->maxSummons){
 		for(SummonList::iterator it = mType->summonList.begin(); it != mType->summonList.end(); ++it){
 			if(it->speed > defenseTicks){
 				resetTicks = false;
