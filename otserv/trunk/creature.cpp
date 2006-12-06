@@ -495,10 +495,18 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 			int32_t defenseValue = getDefense();
 			int32_t defensePower = defenseValue * (defenseSkill / 2) + defenseSkill;
 			int32_t attackPower = attacker->getAttackPower();
-			float x = (attackPower - defensePower)/100.0;
-			float e = std::exp(-x);
-			float result = 910/(1 + e) + 50;
-			int32_t r = random_range(0, 1000);
+			uint32_t result;
+			float x = (attackPower - defensePower)/100.0f;
+			if(x >= -7.0f && x <= 7.0f){
+				result = (uint32_t)(910.f/(1.f + std::exp(-x))) + 50;
+			}
+			else if(x > 7.0f){
+				result = 960;
+			}
+			else{
+				result = 50;
+			}
+			uint32_t r = random_range(0, 1000);
 
 			/*
 			std::cout << "Block shield: "

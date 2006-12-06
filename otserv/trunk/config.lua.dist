@@ -12,13 +12,13 @@ map = "data/world/map.otbm"
 -- options: OTBM for binary map, XML for OTX map
 mapkind = "OTBM"
 
--- map store location (for XML players only)
+-- map store location (for XML only)
 mapstore = "data/world/map-mapstore.xml"
 
--- house store location (for XML players only)
+-- house store location (for XML only)
 housestore = "data/world/map-housestore.xml"
 
--- bans storage (for XML players only)
+-- bans storage (for XML only)
 banIdentifier = "data/bans.xml"
 
 -- server name
@@ -43,7 +43,7 @@ ownername = "Tliff"
 owneremail = "otserv@tibia.de"
 
 -- world name
-worldname = "Otera"
+worldname = "OpenTibia"
 
 -- world type
 -- options: pvp, no-pvp, pvp-enforced
@@ -60,7 +60,7 @@ pzlocked = 6000
 
 -- house rent period
 -- options: daily, weekly, monthly
-houserentperiod = "weekly"
+houserentperiod = "monthly"
 
 -- rates (experience, skill, magic level and loot)
 rate_exp = 1
@@ -73,7 +73,7 @@ motd = "Welcome to OTServ 0.6.0!"
 motdnum = "1"
 
 -- login message
-loginmsg = "Welcome to OTServ. For help visit http://www.otfans.net"
+loginmsg = "Welcome to OTServ. For help visit http://otserv.org"
 
 -- how many logins attempts until ip is temporary disabled 
 -- set to 0 to disable
