@@ -380,7 +380,7 @@ int32_t Player::getDefense() const
 {
 	int defense = 0;
 	if(getInventoryItem(SLOT_LEFT) && getInventoryItem(SLOT_LEFT)->getWeaponType() == WEAPON_SHIELD){
-		if(getInventoryItem(SLOT_RIGHT)->getDefense() * 2 > defense){
+		if(getInventoryItem(SLOT_LEFT)->getDefense() * 2 > defense){
 			defense = getInventoryItem(SLOT_LEFT)->getDefense() * 2;
 		}
 	}
