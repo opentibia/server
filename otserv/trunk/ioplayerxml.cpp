@@ -120,7 +120,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			isLoaded = false;
 
-		if(readXMLInteger(root, "magLevel", intValue)){
+		if(readXMLInteger(root, "maglevel", intValue)){
 			player->magLevel = intValue;
 		}
 		else
