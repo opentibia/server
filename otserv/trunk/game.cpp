@@ -3005,8 +3005,10 @@ void Game::startDecay(Item* item)
 		uint32_t decayState = item->getDecaying();
 		//if(decayState == DECAYING_FALSE || decayState == DECAYING_PENDING){
 		if(decayState != DECAYING_TRUE){
-			if(decayState == DECAYING_FALSE && !item->hasDuration()){
-				item->setDefaultDuration();
+			if(decayState == DECAYING_FALSE){
+				if(!item->hasDuration() || item->getDuration() == 0){
+					item->setDefaultDuration();
+				}
 			}
 			else if(decayState == DECAYING_PENDING){
 				//no change duration because was set during loading time
@@ -3031,7 +3033,6 @@ void Game::internalDecayItem(Item* item)
 	if(it.decayTo != 0){
 		Item* newItem = transformItem(item, it.decayTo);
 		newItem->setDecaying(DECAYING_FALSE);
-		//newItem->setDuration(newItem->getDefaultDuration());
 		newItem->setDefaultDuration();
 		startDecay(newItem);
 	}
