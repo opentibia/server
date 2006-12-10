@@ -1319,6 +1319,7 @@ bool InstantSpell::Illusion(const InstantSpell* spell, Creature* creature, const
 ConjureSpell::ConjureSpell(LuaScriptInterface* _interface) :
 InstantSpell(_interface)
 {
+	isAggressive = false;
 	conjureId = 0;
 	conjureCount = 1;
 	conjureReagentId = 0;
@@ -1488,6 +1489,7 @@ bool ConjureSpell::ConjureFood(const ConjureSpell* spell, Creature* creature, co
 	bool result = internalConjureItem(player, foodType, 1);
 
 	if(result){
+		spell->postCastSpell(player);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
 	}
 

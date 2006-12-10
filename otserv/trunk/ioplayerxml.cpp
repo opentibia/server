@@ -126,6 +126,10 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			isLoaded = false;
 
+		if(readXMLInteger(root, "soul", intValue)){
+			player->soul = intValue;
+		}
+
 		if(readXMLInteger(root, "voc", intValue)){
 			player->setVocation(intValue);
 		}
@@ -487,77 +491,198 @@ bool IOPlayerXML::savePlayer(Player* player)
 
 	player->preSave();
 
-	sb << player->getName();  	       xmlSetProp(root, (const xmlChar*)"name", (const xmlChar*)sb.str().c_str());     sb.str("");
-	sb << player->getGUID();           xmlSetProp(root, (const xmlChar*)"id", (const xmlChar*)sb.str().c_str());	sb.str("");
-	sb << player->accountNumber;       xmlSetProp(root, (const xmlChar*)"account", (const xmlChar*)sb.str().c_str());	sb.str("");
-	sb << player->sex;                 xmlSetProp(root, (const xmlChar*)"sex", (const xmlChar*)sb.str().c_str());     	sb.str("");
+	sb << player->getName();
+	xmlSetProp(root, (const xmlChar*)"name", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->getGUID();
+	xmlSetProp(root, (const xmlChar*)"id", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->accountNumber;
+	xmlSetProp(root, (const xmlChar*)"account", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->sex;
+	xmlSetProp(root, (const xmlChar*)"sex", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << (int)player->getDirection();
+	xmlSetProp(root, (const xmlChar*)"lookdir", (const xmlChar*)sb.str().c_str());
+
+	/*
 	sb << player->getDirection();
 
-	if (sb.str() == "North"){sb.str(""); sb << "0";}
-	if (sb.str() == "East") {sb.str(""); sb << "1";}
-	if (sb.str() == "South"){sb.str(""); sb << "2";}
-	if (sb.str() == "West") {sb.str(""); sb << "3";}
+	if(sb.str() == "North"){
+		sb.str("");
+		sb << "0";
+	}
+	if(sb.str() == "East") {sb.str(""); sb << "1";}
+	if(sb.str() == "South"){sb.str(""); sb << "2";}
+	if(sb.str() == "West") {sb.str(""); sb << "3";}
 	xmlSetProp(root, (const xmlChar*)"lookdir", (const xmlChar*)sb.str().c_str());  sb.str("");
+	*/
 
-	sb << player->experience;         xmlSetProp(root, (const xmlChar*)"exp", (const xmlChar*)sb.str().c_str());       sb.str("");
-	sb << (int)player->getVocationId();      xmlSetProp(root, (const xmlChar*)"voc", (const xmlChar*)sb.str().c_str());       sb.str("");
-	sb << player->level;              xmlSetProp(root, (const xmlChar*)"level", (const xmlChar*)sb.str().c_str());     sb.str("");
-	sb << player->accessLevel;             xmlSetProp(root, (const xmlChar*)"access", (const xmlChar*)sb.str().c_str());	sb.str("");
-	sb << player->getCapacity();      xmlSetProp(root, (const xmlChar*)"cap", (const xmlChar*)sb.str().c_str());       sb.str("");
-	sb << player->magLevel;	          xmlSetProp(root, (const xmlChar*)"maglevel", (const xmlChar*)sb.str().c_str());  sb.str("");
-	sb << player->maxDepotLimit;	  xmlSetProp(root, (const xmlChar*)"maxdepotitems", (const xmlChar*)sb.str().c_str());  sb.str("");
-	sb << player->lastlogin;	        xmlSetProp(root, (const xmlChar*)"lastlogin", (const xmlChar*)sb.str().c_str());  sb.str("");
+	sb.str("");
+	sb << player->experience;
+	xmlSetProp(root, (const xmlChar*)"exp", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << (int)player->getVocationId();
+	xmlSetProp(root, (const xmlChar*)"voc", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->level;
+	xmlSetProp(root, (const xmlChar*)"level", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->accessLevel;
+	xmlSetProp(root, (const xmlChar*)"access", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->getCapacity();
+	xmlSetProp(root, (const xmlChar*)"cap", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->magLevel;
+	xmlSetProp(root, (const xmlChar*)"maglevel", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->soul;
+	xmlSetProp(root, (const xmlChar*)"soul", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->maxDepotLimit;
+	xmlSetProp(root, (const xmlChar*)"maxdepotitems", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->lastlogin;
+	xmlSetProp(root, (const xmlChar*)"lastlogin", (const xmlChar*)sb.str().c_str());
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"spawn");
-	sb << player->getLoginPosition().x;   xmlSetProp(pn, (const xmlChar*)"x", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->getLoginPosition().y;  	xmlSetProp(pn,  (const xmlChar*)"y", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->getLoginPosition().z; 	xmlSetProp(pn,  (const xmlChar*)"z", (const xmlChar*)sb.str().c_str());	       sb.str("");
+
+	sb.str("");
+	sb << player->getLoginPosition().x;
+	xmlSetProp(pn, (const xmlChar*)"x", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->getLoginPosition().y;
+	xmlSetProp(pn,  (const xmlChar*)"y", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->getLoginPosition().z;
+	xmlSetProp(pn,  (const xmlChar*)"z", (const xmlChar*)sb.str().c_str());
+
 	xmlAddChild(root, pn);
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"temple");
-	sb << player->masterPos.x;  xmlSetProp(pn, (const xmlChar*)"x", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->masterPos.y;  xmlSetProp(pn, (const xmlChar*)"y", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->masterPos.z; 	xmlSetProp(pn, (const xmlChar*)"z", (const xmlChar*)sb.str().c_str());	       sb.str("");
+
+	sb.str("");
+	sb << player->masterPos.x;
+	xmlSetProp(pn, (const xmlChar*)"x", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->masterPos.y;
+	xmlSetProp(pn, (const xmlChar*)"y", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->masterPos.z;
+	xmlSetProp(pn, (const xmlChar*)"z", (const xmlChar*)sb.str().c_str());
 	xmlAddChild(root, pn);
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"health");
-	sb << player->health;     xmlSetProp(pn, (const xmlChar*)"now", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->healthMax;  xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());        sb.str("");
-	//sb << player->food;  	    xmlSetProp(pn, (const xmlChar*)"food", (const xmlChar*)sb.str().c_str());       sb.str("");
+
+	sb.str("");
+	sb << player->health;
+	xmlSetProp(pn, (const xmlChar*)"now", (const xmlChar*)sb.str().c_str());
+	
+	sb.str("");
+	sb << player->healthMax;
+	xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());
 
 	xmlAddChild(root, pn);
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"mana");
-	sb << player->mana;      xmlSetProp(pn, (const xmlChar*)"now", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->manaMax;   xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->manaSpent; xmlSetProp(pn, (const xmlChar*)"spent", (const xmlChar*)sb.str().c_str());      sb.str("");
+
+	sb.str("");
+	sb << player->mana;
+	xmlSetProp(pn, (const xmlChar*)"now", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->manaMax;
+	xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->manaSpent;
+	xmlSetProp(pn, (const xmlChar*)"spent", (const xmlChar*)sb.str().c_str());
 	xmlAddChild(root, pn);
 
 	//upconversion of uchar(uint8_t) to get value not character into the stream
 	pn = xmlNewNode(NULL,(const xmlChar*)"look");
-	sb << (int16_t)player->defaultOutfit.lookType;    xmlSetProp(pn, (const xmlChar*)"type", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->defaultOutfit.lookHead;    xmlSetProp(pn, (const xmlChar*)"head", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->defaultOutfit.lookBody;    xmlSetProp(pn, (const xmlChar*)"body", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->defaultOutfit.lookLegs;    xmlSetProp(pn, (const xmlChar*)"legs", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->defaultOutfit.lookFeet;    xmlSetProp(pn, (const xmlChar*)"feet", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->defaultOutfit.lookAddons;  xmlSetProp(pn, (const xmlChar*)"addons", (const xmlChar*)sb.str().c_str());      sb.str("");
+
+	sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookType;
+	xmlSetProp(pn, (const xmlChar*)"type", (const xmlChar*)sb.str().c_str());
+	
+	sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookHead;
+	xmlSetProp(pn, (const xmlChar*)"head", (const xmlChar*)sb.str().c_str());
+	
+	sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookBody;
+	xmlSetProp(pn, (const xmlChar*)"body", (const xmlChar*)sb.str().c_str());
+	
+	sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookLegs;
+	xmlSetProp(pn, (const xmlChar*)"legs", (const xmlChar*)sb.str().c_str());
+	
+	sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookFeet;
+	xmlSetProp(pn, (const xmlChar*)"feet", (const xmlChar*)sb.str().c_str());
+	
+	sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookAddons;
+	xmlSetProp(pn, (const xmlChar*)"addons", (const xmlChar*)sb.str().c_str());
+
 	xmlAddChild(root, pn);
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"guild");
-	sb << player->guildName;  xmlSetProp(pn, (const xmlChar*)"name", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->guildRank;  xmlSetProp(pn, (const xmlChar*)"rank", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->guildNick;  xmlSetProp(pn, (const xmlChar*)"nick", (const xmlChar*)sb.str().c_str());       sb.str("");
-	sb << player->guildId;  	xmlSetProp(pn, (const xmlChar*)"id",   (const xmlChar*)sb.str().c_str());       sb.str("");
+
+	sb.str("");
+	sb << player->guildName;
+	xmlSetProp(pn, (const xmlChar*)"name", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->guildRank;
+	xmlSetProp(pn, (const xmlChar*)"rank", (const xmlChar*)sb.str().c_str());
+	
+	sb.str("");
+	sb << player->guildNick;
+	xmlSetProp(pn, (const xmlChar*)"nick", (const xmlChar*)sb.str().c_str());
+	
+	sb.str("");
+	sb << player->guildId;
+	xmlSetProp(pn, (const xmlChar*)"id",   (const xmlChar*)sb.str().c_str());
 
 	xmlAddChild(root, pn);
 
 	sn = xmlNewNode(NULL,(const xmlChar*)"skills");
 	for(int i = 0; i <= 6; i++){
 	  pn = xmlNewNode(NULL,(const xmlChar*)"skill");
-	  sb << i;                                  xmlSetProp(pn, (const xmlChar*)"skillid", (const xmlChar*)sb.str().c_str());      sb.str("");
-	  sb << player->skills[i][SKILL_LEVEL];     xmlSetProp(pn, (const xmlChar*)"level",   (const xmlChar*)sb.str().c_str());        sb.str("");
-	  sb << player->skills[i][SKILL_TRIES];     xmlSetProp(pn, (const xmlChar*)"tries",   (const xmlChar*)sb.str().c_str());        sb.str("");
-	  xmlAddChild(sn, pn);
+
+		sb.str("");
+	  sb << i;
+		xmlSetProp(pn, (const xmlChar*)"skillid", (const xmlChar*)sb.str().c_str());
+		
+		sb.str("");
+	  sb << player->skills[i][SKILL_LEVEL];
+		xmlSetProp(pn, (const xmlChar*)"level",   (const xmlChar*)sb.str().c_str());
+		
+		sb.str("");
+	  sb << player->skills[i][SKILL_TRIES];
+		xmlSetProp(pn, (const xmlChar*)"tries",   (const xmlChar*)sb.str().c_str());
+
+		xmlAddChild(sn, pn);
 	}
 
 	xmlAddChild(root, sn);
@@ -566,9 +691,10 @@ bool IOPlayerXML::savePlayer(Player* player)
 	for(int i = 1; i <= 10; i++){
 		if(player->inventory[i]){
 			pn = xmlNewNode(NULL,(const xmlChar*)"slot");
+
+			sb.str("");
 			sb << i;
 			xmlSetProp(pn, (const xmlChar*)"slotid", (const xmlChar*)sb.str().c_str());
-			sb.str("");
 
 			nn = player->inventory[i]->serialize();
 
@@ -583,9 +709,10 @@ bool IOPlayerXML::savePlayer(Player* player)
 
 	for(DepotMap::reverse_iterator it = player->depots.rbegin(); it !=player->depots.rend()  ;++it){
 		pn = xmlNewNode(NULL,(const xmlChar*)"depot");
+
+		sb.str("");
 		sb << it->first;
 		xmlSetProp(pn, (const xmlChar*)"depotid", (const xmlChar*)sb.str().c_str());
-		sb.str("");
 
 		nn = (it->second)->serialize();
 		xmlAddChild(pn, nn);
@@ -598,13 +725,13 @@ bool IOPlayerXML::savePlayer(Player* player)
 	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
 		pn = xmlNewNode(NULL,(const xmlChar*)"data");
+		sb.str("");
 		sb << cit->first;
 		xmlSetProp(pn, (const xmlChar*)"key", (const xmlChar*)sb.str().c_str());
-		sb.str("");
 
+		sb.str("");
 		sb << cit->second;
 		xmlSetProp(pn, (const xmlChar*)"value", (const xmlChar*)sb.str().c_str());
-		sb.str("");
 
 		xmlAddChild(sn, pn);
 	}
@@ -613,9 +740,11 @@ bool IOPlayerXML::savePlayer(Player* player)
 	sn = xmlNewNode(NULL,(const xmlChar*)"viplist");
 	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
 		pn = xmlNewNode(NULL,(const xmlChar*)"vip");
+
+		sb.str("");
 		sb << *it;
 		xmlSetProp(pn, (const xmlChar*)"playerguid", (const xmlChar*)sb.str().c_str());
-		sb.str("");
+
 		xmlAddChild(sn, pn);
 	}
 	xmlAddChild(root, sn);
