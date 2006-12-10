@@ -261,7 +261,7 @@ void Npc::doMove(Direction dir)
 	g_game.internalMoveCreature(this, dir);
 }
 
-void Npc::doLook(Direction dir)
+void Npc::doTurn(Direction dir)
 {
 	g_game.internalCreatureTurn(this, dir);
 }
@@ -378,7 +378,7 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "selfSay", NpcScriptInterface::luaActionSay);
 	lua_register(m_luaState, "selfMove", NpcScriptInterface::luaActionMove);
 	lua_register(m_luaState, "selfMoveTo", NpcScriptInterface::luaActionMoveTo);
-	lua_register(m_luaState, "selfLook", NpcScriptInterface::luaActionLook);
+	lua_register(m_luaState, "selfTurn", NpcScriptInterface::luaActionTurn);
 	lua_register(m_luaState, "selfGetPosition", NpcScriptInterface::luaSelfGetPos);
 	lua_register(m_luaState, "creatureGetName", NpcScriptInterface::luaCreatureGetName);
 	lua_register(m_luaState, "creatureGetName2", NpcScriptInterface::luaCreatureGetName2);
@@ -491,13 +491,13 @@ int NpcScriptInterface::luaActionMoveTo(lua_State* L)
 	return 0;
 }
 
-int NpcScriptInterface::luaActionLook(lua_State* L)
+int NpcScriptInterface::luaActionTurn(lua_State* L)
 {
 	Direction dir = (Direction)(int)popNumber(L);
 
 	Npc* mynpc = getNpc();
 	if(mynpc)
-		mynpc->doLook(dir);
+		mynpc->doTurn(dir);
 
 	return 0;
 }

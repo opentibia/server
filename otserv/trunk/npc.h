@@ -48,7 +48,7 @@ protected:
 	static int luaActionSay(lua_State *L);
 	static int luaActionMove(lua_State *L);
 	static int luaActionMoveTo(lua_State *L);
-	static int luaActionLook(lua_State *L);
+	static int luaActionTurn(lua_State *L);
 	static int luaCreatureGetName(lua_State *L);
 	static int luaCreatureGetName2(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
@@ -125,7 +125,7 @@ public:
 	
 	void doSay(std::string msg);
 	void doMove(Direction dir);
-	void doLook(Direction dir);
+	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
 	
