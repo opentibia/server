@@ -73,6 +73,9 @@ Creature()
 	baseSpeed = mType->base_speed;
 	internalLight.level = mType->lightLevel;
 	internalLight.color = mType->lightColor;
+
+	attackStrength = mType->attackStrength;
+	defenseStrength = mType->defenseStrength;
 	
 	minCombatValue = 0;
 	maxCombatValue = 0;
@@ -573,7 +576,8 @@ void Monster::doAttacking(uint32_t interval)
 					params.combatType = COMBAT_PHYSICALDAMAGE;
 					params.blockedByArmor = true;
 					params.blockedByShield = true;
-					Combat::doCombatHealth(this, attackedCreature, mType->combatMeleeMin, mType->combatMeleeMax, params);
+					int32_t damage = random_range(mType->combatMeleeMin, mType->combatMeleeMax) * (((float)attackStrength) / 100);
+					Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
 					meleeBonusAttack = false;
 				}
 				else{
@@ -826,34 +830,3 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 		}
 	}
 }
-
-/*
-uint32_t Monster::getFollowDistance() const
-{
-	if(isSummon()){
-		//if(getMaster() == followCreature){
-		//if(!followCreature || getMaster() == followCreature){
-		//if((!followCreature && !attackedCreature) || getMaster() == followCreature){
-		if(getMaster() == followCreature){
-			return 2;
-		}
-	}
-	else{
-		if(getHealth() <= mType->runAwayHealth){
-			//Distance should be higher than visible viewport (defined in Map::maxViewportX/maxViewportY)
-			return 10;
-		}
-	}
-
-	return Creature::getFollowDistance();
-}
-
-bool Monster::getFollowReachable() const
-{
-	if(getHealth() <= mType->runAwayHealth){
-		return false;
-	}
-
-	return Creature::getFollowReachable();
-}
-*/

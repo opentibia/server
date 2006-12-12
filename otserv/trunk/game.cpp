@@ -2255,13 +2255,13 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 	return player->setFollowCreature(followCreature);
 }
 
-bool Game::playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode)
+bool Game::playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_t chaseMode)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetFightModes");
 	if(player->isRemoved())
 		return false;
 
-	//player->setFightMode(fightMode);
+	player->setFightMode(fightMode);
 	player->setChaseMode(chaseMode);
 	return true;
 }

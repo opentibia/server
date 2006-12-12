@@ -73,11 +73,6 @@ public:
 	std::string nameDescription;
 	int experience;
 
-	//int attackSkill;
-	//int attackValue;
-	int attackPower;
-
-	int defenseSkill;
 	int defense;
 	int armor;
 
@@ -121,6 +116,9 @@ public:
 
 	int32_t changeTargetSpeed;
 	int32_t changeTargetChance;
+
+	int32_t attackStrength;
+	int32_t defenseStrength;
 
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);

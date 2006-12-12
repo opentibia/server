@@ -87,7 +87,10 @@ Creature()
 	attackTicks = 0;
 
 	chaseMode = CHASEMODE_STANDSTILL;
-	//fightMode = FIGHTMODE_NONE;
+
+	attackStrength = 100;
+	defenseStrength = 0;
+	fightMode = FIGHTMODE_ATTACK;
 
 	tradePartner = NULL;
 	tradeState = TRADE_NONE;
@@ -378,67 +381,48 @@ int32_t Player::getArmor() const
 
 int32_t Player::getDefense() const
 {
-	int defense = 0;
-	if(getInventoryItem(SLOT_LEFT) && getInventoryItem(SLOT_LEFT)->getWeaponType() == WEAPON_SHIELD){
-		if(getInventoryItem(SLOT_LEFT)->getDefense() * 2 > defense){
-			defense = getInventoryItem(SLOT_LEFT)->getDefense() * 2;
-		}
-	}
-	else if(getInventoryItem(SLOT_RIGHT) && getInventoryItem(SLOT_RIGHT)->getWeaponType() == WEAPON_SHIELD){
-		if(getInventoryItem(SLOT_RIGHT)->getDefense() * 2 > defense){
-			defense = getInventoryItem(SLOT_RIGHT)->getDefense() * 2;
-		}
-	}
+	int32_t baseDefense = 5;
+	int32_t defense = 0;
+	int32_t shieldSkill = getSkill(SKILL_SHIELD, SKILL_LEVEL);
 
-	if(defense != 0){
-		return defense;
+	if(getInventoryItem(SLOT_LEFT)){
+		if(getInventoryItem(SLOT_LEFT)->getDefense() > defense){
+			defense = getInventoryItem(SLOT_LEFT)->getDefense();
+		}
 	}
-	else{
-		if(getInventoryItem(SLOT_HEAD))
+	else if(getInventoryItem(SLOT_RIGHT)){
+		if(getInventoryItem(SLOT_RIGHT)->getDefense() > defense){
+			defense = getInventoryItem(SLOT_RIGHT)->getDefense();
+		}
+	}
+	
+	if(defense <= 0){
+		if(getInventoryItem(SLOT_HEAD)){
 			defense += getInventoryItem(SLOT_HEAD)->getDefense();
-		if(getInventoryItem(SLOT_NECKLACE))
+		}
+
+		if(getInventoryItem(SLOT_NECKLACE)){
 			defense += getInventoryItem(SLOT_NECKLACE)->getDefense();
-		if(getInventoryItem(SLOT_ARMOR))
+		}
+
+		if(getInventoryItem(SLOT_ARMOR)){
 			defense += getInventoryItem(SLOT_ARMOR)->getDefense();
-		if(getInventoryItem(SLOT_LEGS))
+		}
+
+		if(getInventoryItem(SLOT_LEGS)){
 			defense += getInventoryItem(SLOT_LEGS)->getDefense();
-		if(getInventoryItem(SLOT_FEET))
+		}
+
+		if(getInventoryItem(SLOT_FEET)){
 			defense += getInventoryItem(SLOT_FEET)->getDefense();
-		if(getInventoryItem(SLOT_RING))
+		}
+
+		if(getInventoryItem(SLOT_RING)){
 			defense += getInventoryItem(SLOT_RING)->getDefense();
-		
-		return defense;
-	}
-}
-
-int32_t Player::getAttackPower() const
-{
-	return attackPower;
-
-	/*
-	Item* weapon = getWeapon();
-	if(weapon){
-		switch(weapon->getWeaponType()){
-			case WEAPON_AXE: return getSkill(SKILL_AXE, SKILL_LEVEL); break;
-			case WEAPON_SWORD: return getSkill(SKILL_SWORD, SKILL_LEVEL); break;
-			case WEAPON_CLUB: return getSkill(SKILL_CLUB, SKILL_LEVEL); break;
-			case WEAPON_AMMO: return getSkill(SKILL_DIST, SKILL_LEVEL); break;
-			case WEAPON_DIST: return getSkill(SKILL_DIST, SKILL_LEVEL); break;
-
-			default:
-				return 0;
-				break;
 		}
 	}
-	else{
-		return getSkill(SKILL_SWORD, SKILL_LEVEL);
-	}
-	*/
-}
 
-int32_t Player::getDefenseSkill() const
-{
-	return getSkill(SKILL_SHIELD, SKILL_LEVEL);
+	return baseDefense + (defense * shieldSkill * 0.01);
 }
 
 void Player::sendIcons() const
@@ -1397,11 +1381,9 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 {
 	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
-	/*
-	if(blockType == BLOCK_DEFENSE){
-		addSkillAdvance(SKILL_SHIELD, 1);
+	if(blockType != BLOCK_NONE){
+		return blockType;
 	}
-	*/
 
 	bool absorbedDamage;
 
@@ -2461,7 +2443,7 @@ void Player::doAttacking(uint32_t interval)
 			result = Weapon::useFist(this, attackedCreature);
 		}
 
-		setAttackPower(0);
+		//setAttackPower(0);
 
 		if(!result){
 			//make next instant
@@ -2502,16 +2484,19 @@ void Player::onFollowCreature(const Creature* creature)
 	}
 }
 
-void Player::setChaseMode(uint8_t mode)
+void Player::setChaseMode(chaseMode_t mode)
 {
 	chaseMode_t prevChaseMode = chaseMode;
+	chaseMode = mode;
 
+	/*
 	if(mode == 1){
 		chaseMode = CHASEMODE_FOLLOW;
 	}
 	else{
 		chaseMode = CHASEMODE_STANDSTILL;
 	}
+	*/
 	
 	if(prevChaseMode != chaseMode){
 		if(chaseMode == CHASEMODE_FOLLOW){
@@ -2523,6 +2508,34 @@ void Player::setChaseMode(uint8_t mode)
 		else if(attackedCreature){
 			setFollowCreature(NULL);
 			stopEventWalk();
+		}
+	}
+}
+
+void Player::setFightMode(fightMode_t mode)
+{
+	fightMode = mode;
+
+	switch(fightMode){
+		case FIGHTMODE_ATTACK:
+		{
+			attackStrength = 100;
+			defenseStrength = 0;
+			break;
+		}
+
+		case FIGHTMODE_BALANCED:
+		{
+			attackStrength = 50;
+			defenseStrength = 50;
+			break;
+		}
+
+		case FIGHTMODE_DEFENSE:
+		{
+			attackStrength = 0;
+			defenseStrength = 100;
+			break;
 		}
 	}
 }

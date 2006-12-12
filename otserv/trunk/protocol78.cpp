@@ -1141,8 +1141,29 @@ void Protocol78::parseSay(NetworkMessage& msg)
 
 void Protocol78::parseFightModes(NetworkMessage& msg)
 {
-	uint8_t fightMode = msg.GetByte(); //1 - offensive, 2 - balanced, 3 - defensive
-	uint8_t chaseMode = msg.GetByte(); // 0 - stand while fightning, 1 - chase opponent
+	uint8_t rawFightMode = msg.GetByte(); //1 - offensive, 2 - balanced, 3 - defensive
+	uint8_t rawChaseMode = msg.GetByte(); // 0 - stand while fightning, 1 - chase opponent
+
+	chaseMode_t chaseMode = CHASEMODE_STANDSTILL;
+
+	if(rawChaseMode == 0){
+		chaseMode = CHASEMODE_STANDSTILL;
+	}
+	else if(rawChaseMode == 1){
+		chaseMode = CHASEMODE_FOLLOW;
+	}
+
+	fightMode_t fightMode = FIGHTMODE_ATTACK;
+
+	if(rawFightMode == 1){
+		fightMode = FIGHTMODE_ATTACK;
+	}
+	else if(rawFightMode == 2){
+		fightMode = FIGHTMODE_BALANCED;
+	}
+	else if(rawFightMode == 3){
+		fightMode = FIGHTMODE_DEFENSE;
+	}
 
 	game->playerSetFightModes(player, fightMode, chaseMode);
 }

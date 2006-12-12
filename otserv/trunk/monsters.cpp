@@ -49,9 +49,6 @@ void MonsterType::reset()
 	race = RACE_BLOOD;
 	experience = 0;
 
-	attackPower = 0;
-
-	defenseSkill = 0;
 	defense = 0;
 	armor = 0;
 
@@ -84,6 +81,9 @@ void MonsterType::reset()
 
 	changeTargetSpeed = 0;
 	changeTargetChance = 0;
+
+	attackStrength = 100;
+	defenseStrength = 0;
 }
 
 MonsterType::~MonsterType()
@@ -277,69 +277,31 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			toLowerCaseString(mType->nameDescription);
 		}
 
+		if(readXMLString(root, "race", strValue)){
+			if((strcasecmp(strValue.c_str(), "venom") == 0) || (atoi(strValue.c_str()) == 1)){
+				mType->race = RACE_VENOM;
+			}
+			else if((strcasecmp(strValue.c_str(), "blood") == 0) || (atoi(strValue.c_str()) == 2)){
+				mType->race = RACE_BLOOD;
+			}
+			else if((strcasecmp(strValue.c_str(), "undead") == 0) || (atoi(strValue.c_str()) == 3)){
+				mType->race = RACE_UNDEAD;
+			}
+			else if((strcasecmp(strValue.c_str(), "fire") == 0) || (atoi(strValue.c_str()) == 4)){
+				mType->race = RACE_FIRE;
+			}
+		}
+
 		if(readXMLInteger(root, "experience", intValue)){
 			mType->experience = intValue;
-		}
-
-		if(readXMLInteger(root, "summonable", intValue)){
-			mType->isSummonable = (intValue != 0);
-		}
-		
-		if(readXMLInteger(root, "manacost", intValue)){
-			mType->manaCost = intValue;
-		}
-
-		if(readXMLInteger(root, "attackable", intValue)){
-			mType->isAttackable = (intValue != 0);
-		}
-
-		if(readXMLInteger(root, "hostile", intValue)){
-			mType->isHostile = (intValue != 0);
-		}		
-
-		if(readXMLInteger(root, "illusionable", intValue)){
-			mType->isIllusionable = (intValue != 0);
-		}
-
-		if(readXMLInteger(root, "convinceable", intValue)){
-			mType->isConvinceable = (intValue != 0);
-		}
-
-		if(readXMLInteger(root, "pushable", intValue)){
-			mType->pushable = (intValue != 0);
 		}
 
 		if(readXMLInteger(root, "speed", intValue)){
 			mType->base_speed = intValue;
 		}
 
-		if(readXMLInteger(root, "defense", intValue)){
-			mType->defense = intValue;
-		}
-
-		if(readXMLInteger(root, "armor", intValue)){
-			mType->armor = intValue;
-		}
-
-		if(readXMLInteger(root, "canpushitems", intValue)){
-			mType->canPushItems = (intValue != 0);
-		}
-
-		if(readXMLInteger(root, "staticattack", intValue)){
-			if(intValue == 0)
-				mType->staticAttack = 1;
-			else if(intValue >= RAND_MAX)
-				mType->staticAttack = RAND_MAX;
-			else
-				mType->staticAttack = intValue;
-		}
-
-		if(readXMLInteger(root, "lightlevel", intValue)){
-			mType->lightLevel = intValue;
-		}
-
-		if(readXMLInteger(root, "lightcolor", intValue)){
-			mType->lightColor = intValue;
+		if(readXMLInteger(root, "manacost", intValue)){
+			mType->manaCost = intValue;
 		}
 
 		while(p){
@@ -357,40 +319,68 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				else
 					monsterLoad = false;
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*)"stats") == 0){
-				int attackSkill = 0;
-				int attackValue = 0;
+			else if(xmlStrcmp(p->name, (const xmlChar*)"flags") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"flag") == 0){
 
-				if(readXMLInteger(p, "attackskill", intValue)){
-					attackSkill = intValue;
-				}
+						if(readXMLInteger(tmpNode, "summonable", intValue)){
+							mType->isSummonable = (intValue != 0);
+						}
+						
+						if(readXMLInteger(tmpNode, "attackable", intValue)){
+							mType->isAttackable = (intValue != 0);
+						}
+						
+						if(readXMLInteger(tmpNode, "hostile", intValue)){
+							mType->isHostile = (intValue != 0);
+						}		
 
-				if(readXMLInteger(p, "attack", intValue)){
-					attackValue = intValue;
-				}
+						if(readXMLInteger(tmpNode, "illusionable", intValue)){
+							mType->isIllusionable = (intValue != 0);
+						}
+						
+						if(readXMLInteger(tmpNode, "convinceable", intValue)){
+							mType->isConvinceable = (intValue != 0);
+						}
 
-				mType->attackPower = Weapons::getAttackPower(attackValue, attackSkill);
-				
-				if(readXMLInteger(p, "defense", intValue)){
-					mType->defense = intValue;
-				}
+						if(readXMLInteger(tmpNode, "pushable", intValue)){
+							mType->pushable = (intValue != 0);
+						}
 
-				if(readXMLInteger(p, "defenseskill", intValue)){
-					mType->defenseSkill = intValue;
-				}
+						if(readXMLInteger(tmpNode, "canpushitems", intValue)){
+							mType->canPushItems = (intValue != 0);
+						}
 
-				if(readXMLInteger(p, "armor", intValue)){
-					mType->armor = intValue;
-				}
-			}
-			else if(xmlStrcmp(p->name, (const xmlChar*)"combat") == 0){
+						if(readXMLInteger(tmpNode, "staticattack", intValue)){
+							if(intValue == 0){
+								intValue = 1;
+							}
+							else if(intValue >= RAND_MAX){
+								intValue = RAND_MAX;
+							}
+							
+							mType->staticAttack = intValue;
+						}
 
-				if(readXMLInteger(p, "targetdistance", intValue)){
-					mType->targetDistance = std::max(1, intValue);
-				}
+						if(readXMLInteger(tmpNode, "lightlevel", intValue)){
+							mType->lightLevel = intValue;
+						}
 
-				if(readXMLInteger(p, "runonhealth", intValue)){
-					mType->runAwayHealth = intValue;
+						if(readXMLInteger(tmpNode, "lightcolor", intValue)){
+							mType->lightColor = intValue;
+						}
+
+						if(readXMLInteger(tmpNode, "targetdistance", intValue)){
+							mType->targetDistance = std::max(1, intValue);
+						}
+
+						if(readXMLInteger(tmpNode, "runonhealth", intValue)){
+							mType->runAwayHealth = intValue;
+						}
+					}
+
+					tmpNode = tmpNode->next;
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"targetchange") == 0){
@@ -401,6 +391,16 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 				if(readXMLInteger(p, "chance", intValue)){
 					mType->changeTargetChance = intValue;
+				}
+			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"strategy") == 0){
+
+				if(readXMLInteger(p, "attack", intValue)){
+					mType->attackStrength = intValue;
+				}
+
+				if(readXMLInteger(p, "defense", intValue)){
+					mType->defenseStrength = intValue;
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
@@ -436,6 +436,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					mType->lookcorpse = intValue;
 				}
 
+				/*
 				if(readXMLString(p, "race", strValue)){
 					if((strcasecmp(strValue.c_str(), "venom") == 0) || (atoi(strValue.c_str()) == 1)){
 						mType->race = RACE_VENOM;
@@ -450,6 +451,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						mType->race = RACE_FIRE;
 					}
 				}
+				*/
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){
 				xmlNodePtr tmpNode = p->children;
@@ -461,6 +463,8 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t chance = 100;
 						int32_t speed = 1000;
 						int32_t range = 0;
+						int32_t attack = 0;
+						int32_t skill = 0;
 
 						if(readXMLInteger(tmpNode, "speed", intValue) || readXMLInteger(tmpNode, "interval", intValue)){
 							speed = std::max(1, intValue);
@@ -476,6 +480,17 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 						if(readXMLInteger(tmpNode, "max", intValue)){
 							max = intValue;
+						}
+
+						if(readXMLInteger(tmpNode, "skill", intValue)){
+							skill = intValue;
+
+							if(readXMLInteger(tmpNode, "attack", intValue)){
+								attack = intValue;
+							}
+
+							min = 0;
+							max = -Weapons::getMaxWeaponDamage(skill, attack);
 						}
 
 						if(readXMLInteger(tmpNode, "range", intValue)){
@@ -502,7 +517,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 									mType->spellAttackList.push_back(sb);
 								}
 								else{
-									std::cout << "Warning: [Monsters::loadMonster] Spell \"" << strValue << "\" not found - " << file << std::endl;
+									std::cout << "Warning: [Monsters::loadMonster] Spell " << strValue << " not found - " << file << std::endl;
 								}
 							}
 						}
@@ -515,6 +530,14 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"defenses") == 0){
+				if(readXMLInteger(p, "defense", intValue)){
+					mType->defense = intValue;
+				}
+
+				if(readXMLInteger(p, "armor", intValue)){
+					mType->armor = intValue;
+				}
+
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"defense") == 0){
@@ -559,7 +582,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 								mType->spellDefenseList.push_back(sb);
 							}
 							else{
-								std::cout << "Warning: [Monsters::loadMonster] Spell not found - " << file << std::endl;
+								std::cout << "Warning: [Monsters::loadMonster] Spell " << strValue << " not found - " << file << std::endl;
 							}
 						}
 						else{

@@ -59,6 +59,9 @@ Creature::Creature() :
 	baseSpeed = 220;
 	varSpeed = 0;
 
+	attackStrength = 0;
+	defenseStrength = 0;
+
 	followCreature = NULL;
 	eventWalk = 0;
 	internalUpdateFollow = false;
@@ -489,73 +492,28 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 	}
 
 	if(blockType == BLOCK_NONE && internalDefense && checkDefense){
-		
-		if(attacker){
-			int32_t defenseSkill = getDefenseSkill();
-			int32_t defenseValue = getDefense();
-			int32_t defensePower = defenseValue * (defenseSkill / 2) + defenseSkill;
-			int32_t attackPower = attacker->getAttackPower();
-			uint32_t result;
-			float x = (attackPower - defensePower)/100.0f;
-			if(x >= -7.0f && x <= 7.0f){
-				result = (uint32_t)(910.f/(1.f + std::exp(-x))) + 50;
-			}
-			else if(x > 7.0f){
-				result = 960;
-			}
-			else{
-				result = 50;
-			}
-			uint32_t r = random_range(0, 1000);
+		int32_t defense = getDefense();
+		defense += (defense * (((float)(defenseStrength) / 100)));
 
-			/*
-			std::cout << "Block shield: "
-				<< "Attacker: " << (attacker ? attacker->getName() : "")
-				<< ", defensePower: " << defensePower
-				<< ", attackPower: " << attackPower
-				<< ", result: " << result
-				<< ", r: " << r
-				<< ", blocked: " << (result <= r ? "yes" : "no")
-				<< std::endl;
-			*/
-
-			if(result <= r){
-				damage = 0;
-				blockType = BLOCK_DEFENSE;
-				internalDefense = false;
-				onDefenseBlock(true);
-			}
-			else{
-				onDefenseBlock(false);
-			}
+		damage -= defense;
+		if(damage <= 0){
+			damage = 0;
+			blockType = BLOCK_DEFENSE;
+			internalDefense = false;
+			onDefenseBlock(true);
 		}
 	}
 	
 	if(blockType == BLOCK_NONE && internalArmor && checkArmor){
 		internalArmor = false;
 
-		int32_t armor = getArmor();		
-		int32_t maxReduceDamage = (armor + 4) / 2;
-		int32_t reduceDamage = rand() % maxReduceDamage;
+		int32_t armor = getArmor();
 
-		/*
-		std::cout << "Armor block: "
-			<< "Attacker: " << (attacker ? attacker->getName() : "")
-			<< ", maxReduceDamage: " << maxReduceDamage
-			<< ", reduceDamage: " << reduceDamage
-			<< ", damage: " << reduceDamage
-			<< ", blocked: " << (reduceDamage >= damage ? "yes" : "no")
-			<< std::endl;
-		*/
-
-		if(reduceDamage >= damage){
+		damage -= armor;
+		if(damage <= 0){
 			damage = 0;
 			blockType = BLOCK_ARMOR;
 			onArmorBlock(true);
-		}
-		else{
-			damage -= reduceDamage;
-			onArmorBlock(false);
 		}
 	}
 

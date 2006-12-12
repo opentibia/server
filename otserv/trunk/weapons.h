@@ -54,7 +54,7 @@ public:
 	static int32_t weaponExhaustionTime;
 	static int32_t weaponInFightTime;
 
-	static int32_t getAttackPower(int32_t attackValue, int32_t attackSkill);
+	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue);
 
 protected:
 	virtual void clear();
@@ -95,7 +95,7 @@ protected:
 	bool internalUseWeapon(Player* player, Item* item, Creature* target) const;
 	bool internalUseWeapon(Player* player, Item* item, Tile* tile) const;
 
-	virtual void onUseWeapon(Player* player, Item* item) const;
+	//virtual void onUseWeapon(Player* player, Item* item) const;
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const = 0;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};

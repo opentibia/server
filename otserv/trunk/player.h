@@ -69,6 +69,12 @@ enum chaseMode_t {
 	CHASEMODE_FOLLOW,
 };
 
+enum fightMode_t {
+	FIGHTMODE_ATTACK,
+	FIGHTMODE_BALANCED,
+	FIGHTMODE_DEFENSE
+};
+
 enum tradestate_t {
 	TRADE_NONE,
 	TRADE_INITIATED,
@@ -197,13 +203,15 @@ public:
 
 	//follow functions
 	virtual bool setFollowCreature(Creature* creature);
-	void setChaseMode(uint8_t mode);
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature);
 
 	//walk events
 	virtual void onWalkAborted();
+
+	void setChaseMode(chaseMode_t mode);
+	void setFightMode(fightMode_t mode);
 
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);
@@ -230,9 +238,6 @@ public:
 
 	virtual int32_t getArmor() const;
 	virtual int32_t getDefense() const;
-	virtual int32_t getDefenseSkill() const;
-	virtual int32_t getAttackPower() const;
-	void setAttackPower(int32_t attackValue) {attackPower = attackValue;}
 
 	void addDefaultRegeneration(uint32_t addTicks);
 
@@ -488,6 +493,7 @@ protected:
 	uint32_t attackTicks;
 	
 	chaseMode_t chaseMode;
+	fightMode_t fightMode;
 
 	//account variables
 	int accountNumber;

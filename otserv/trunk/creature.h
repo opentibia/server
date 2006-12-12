@@ -166,8 +166,6 @@ public:
 
 	virtual int32_t getArmor() const {return 0;}
 	virtual int32_t getDefense() const {return 0;}
-	virtual int32_t getDefenseSkill() const {return 0;}
-	virtual int32_t getAttackPower() const {return 0;}
 
 	bool addCondition(Condition* condition);
 	void removeCondition(ConditionType_t type, ConditionId_t id);
@@ -245,6 +243,8 @@ public:
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
 
 	virtual void getCombatValues(int32_t& min, int32_t& max) {};
+	int32_t getAttackStrength() const {return attackStrength;}
+	int32_t getDefenseStrength() const {return defenseStrength;}
 
 	uint32_t getSummonCount() const {return summons.size();}
 
@@ -252,6 +252,8 @@ protected:
 	
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
+	int32_t attackStrength;
+	int32_t defenseStrength;
 
 	Outfit_t currentOutfit;
 	Outfit_t defaultOutfit;
@@ -265,7 +267,6 @@ protected:
 	Direction direction;
 
 	unsigned long eventCheck;
-	//unsigned long eventCheckAttacking;
 	
 	Creature* master;
 	std::list<Creature*> summons;
@@ -278,7 +279,6 @@ protected:
 	unsigned long eventWalk;
 	std::list<Direction> listWalkDir;
 	bool internalUpdateFollow;
-	//uint32_t followDistance;
 
 	//combat variables
 	Creature* attackedCreature;

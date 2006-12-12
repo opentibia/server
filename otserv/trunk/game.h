@@ -283,7 +283,7 @@ public:
 	bool internalStartTrade(Player* player, Player* partner, Item* tradeItem);
 	bool playerSetAttackedCreature(Player* player, unsigned long creatureId);
 	bool playerFollowCreature(Player* player, unsigned long creatureId);
-	bool playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode);
+	bool playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_t chaseMode);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackpos);
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
 	bool playerTurn(Player* player, Direction dir);
