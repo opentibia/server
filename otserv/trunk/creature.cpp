@@ -493,9 +493,9 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 
 	if(blockType == BLOCK_NONE && internalDefense && checkDefense){
 		int32_t defense = getDefense();
-		defense += (defense * (((float)(defenseStrength) / 100)));
+		defense = defense + (defense * defenseStrength) / 100;
 
-		damage -= defense;
+		damage = damage - defense;
 		if(damage <= 0){
 			damage = 0;
 			blockType = BLOCK_DEFENSE;

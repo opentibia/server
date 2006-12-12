@@ -576,7 +576,7 @@ void Monster::doAttacking(uint32_t interval)
 					params.combatType = COMBAT_PHYSICALDAMAGE;
 					params.blockedByArmor = true;
 					params.blockedByShield = true;
-					int32_t damage = random_range(mType->combatMeleeMin, mType->combatMeleeMax) * (((float)attackStrength) / 100);
+					int32_t damage = (random_range(mType->combatMeleeMin, mType->combatMeleeMax) * attackStrength) / 100;
 					Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
 					meleeBonusAttack = false;
 				}

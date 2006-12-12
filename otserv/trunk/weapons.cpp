@@ -349,7 +349,7 @@ bool Weapon::useFist(Player* player, Creature* target)
 		int32_t attackValue = 7;
 
 		int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
-		int32_t damage = -random_range(0, maxDamage) * (((float)attackStrength) / 100);
+		int32_t damage = -(random_range(0, maxDamage) * attackStrength) / 100;
 
 		CombatParams params;
 		params.combatType = COMBAT_PHYSICALDAMAGE;
@@ -456,7 +456,7 @@ int32_t Weapon::getManaCost(const Player* player) const
 
 	if(manaPercent != 0){
 		int32_t maxMana = player->getMaxMana();
-		int32_t manaCost = (maxMana * manaPercent)/100;
+		int32_t manaCost = (maxMana * manaPercent) / 100;
 		return manaCost;
 	}
 
@@ -590,7 +590,7 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item) con
 	int32_t attackStrength = player->getAttackStrength();
 	int32_t attackValue = item->getAttack();
 	int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
-	return -(random_range(0, maxDamage) * (((float)attackStrength) / 100));
+	return -(random_range(0, maxDamage) * attackStrength) / 100;
 }
 
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
@@ -704,7 +704,7 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item) 
 
 	int32_t attackStrength = player->getAttackStrength();
 	int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, ammuAttackValue);
-	return -(random_range(0, maxDamage) * (((float)attackStrength) / 100));
+	return -(random_range(0, maxDamage) * attackStrength) / 100;
 }
 
 bool WeaponDistance::getSkillType(const Player* player, const Item* item,

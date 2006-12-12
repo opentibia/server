@@ -422,7 +422,7 @@ int32_t Player::getDefense() const
 		}
 	}
 
-	return baseDefense + (defense * shieldSkill * 0.01);
+	return baseDefense + (defense * shieldSkill) / 100;
 }
 
 void Player::sendIcons() const
