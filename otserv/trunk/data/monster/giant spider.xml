@@ -1,14 +1,21 @@
 <?xml version="1.0"?>
-<monster name="Giant Spider" experience="900" pushable="0" canpushitems="1" speed="240">
-	<health now="2300" max="2300"/>
-	<look type="38" corpse="2857"/>
-	<stats attackskill="200" attack="50" defenseskill="20" defense="40" armor="20"/>
-	<combat targetdistance="1" runonhealth="0"/>
+<monster name="Giant Spider" race="venom" experience="900" speed="240">
+<health now="2300" max="2300"/>
+<look type="38" corpse="2857"/>
+
+<flags>	
+	<flag pushable="0"/>
+	<flag canpushitems="1"/>
+	<flag targetdistance="1"/>
+</flags>
 
 <attacks>
-	<attack name="melee" min="-100" max="-450" speed="2000" chance="90"/>
+	<attack name="melee" speed="2000" chance="90" min="-100" max="-450"/>
 	<attack name="poison spit" speed="2000" chance="50"/>
 </attacks>
+
+<defense armor="30" defense="35">
+</defense>
 
 <immunities>
 	<immunity name="poison"/>

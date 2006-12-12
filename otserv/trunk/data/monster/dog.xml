@@ -1,13 +1,22 @@
 <?xml version="1.0"?>
-<monster name="Dog" experience="0" hostile="0" pushable="1" summonable="1" convinceable="1" manacost="200" illusionable="1" armor="0" defense="2" canpushitems="0" staticattack="50" speed="160">
-	<health now="20" max="20"/>
-	<look type="32" corpse="2839"/>
-	<stats attackskill="10" attack="5" defenseskill="0" defense="0" armor="0"/>
-	<combat targetdistance="1" runonhealth="0"/>
+<monster name="Dog" race="blood" experience="0" manacost="200" speed="160">	
+<health now="20" max="20"/>
+<look type="32" corpse="2839"/>
 
-<attacks>
-	<attack name="melee" speed="2000" min="0" max="-15"/> 
-</attacks>
+<flags>
+	<flag hostile="0"/>
+	<flag pushable="1"/>
+	<flag summonable="1"/>
+	<flag convinceable="1"/>
+	<flag illusionable="1"/>
+	<flag canpushitems="0"/>
+	<flag staticattack="50"/>
+	<flag targetdistance="1"/>
+	<flag runonhealth="0"/>
+</flags>
+
+<defense armor="0" defense="0">
+</defense>
 
 <voices>
 	<voice sentence="Wuff wuff!"/>

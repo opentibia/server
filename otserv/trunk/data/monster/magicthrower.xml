@@ -1,7 +1,12 @@
 <?xml version="1.0"?>
-<monster name="Magicthrower" pushable="0" attackable="0" speed="0">
-	<health now="150" max="150"/>
-	<look typeex="0"/>
+<monster name="Magicthrower" race="undead" speed="0">
+<health now="150" max="150"/>
+<look typeex="0"/>
+
+<flags>	
+	<flag pushable="0"/>
+	<flag attackable="0"/>
+</flags>
 
 <attacks>
 	<attack name="Fire Field" speed="1000" chance="100"/>

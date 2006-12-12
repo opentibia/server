@@ -1,20 +1,26 @@
 <?xml version="1.0"?>
-<monster name="Warlock" experience="6000" pushable="0" canpushitems="1" staticattack="30" speed="220">
-	<health now="4200" max="4200"/>
-	<look type="130" head="19" body="71" legs="128" feet="128" corpse="3128"/>
-	<stats attackskill="70" attack="25" defenseskill="20" defense="30" armor="10"/>
-	<combat targetdistance="5" runonhealth="2100"/>
-	<targetchange speed="2000" chance="5"/>
+<monster name="Warlock" race="blood" experience="6000" speed="220">
+<health now="4200" max="4200"/>
+<look type="130" head="19" body="71" legs="128" feet="128" corpse="3128"/>
+<targetchange speed="2000" chance="5"/>
+
+<flags>
+	<flag pushable="0"/>
+	<flag canpushitems="1"/>
+	<flag staticattack="30"/>
+	<flag targetdistance="5"/>
+	<flag runonhealth="2100"/>
+</flags>
 
 <attacks>
-	<attack name="melee" speed="2000" min="-200" max="-550"/> 
+	<attack name="melee" speed="2000" min="0" max="-150"/> 
 	<attack name="Fire Field" speed="4000" chance="0"/>
 	<attack name="Combustion" speed="2000" chance="50" min="-100" max="-350"/>
-	<attack name="Polymorph" speed="3000" chance="40"/>
+	<attack name="Polymorph" speed="2000" chance="40"/>
 	<attack name="Explosive Arrow" speed="2000" chance="80" min="-80" max="-120"/>
 </attacks>
 
-<defenses>
+<defenses armor="40" defense="45">
 	<defense name="Invisible" speed="4000" chance="0"/>
 	<defense name="Ultimate Healing" speed="4000" chance="5" min="50" max="200"/>
 </defenses>

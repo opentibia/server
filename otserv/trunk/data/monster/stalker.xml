@@ -1,11 +1,20 @@
 <?xml version="1.0"?>
-<monster name="Stalker" experience="150" pushable="1" summonable="1" convinceable="1" manacost="200" illusionable="1" canpushitems="0" staticattack="50" speed="160">
-	<health now="150" max="150"/>
-	<look type="128" head="95" body="116" legs="95" feet="114" corpse="3128"/>
-	<stats attackskill="70" attack="25" defenseskill="20" defense="30" armor="10"/>
+<monster name="Stalker" race="blood" experience="150" speed="160" manacost="200">
+<health now="15000" max="15000"/>
+<look type="128" head="95" body="116" legs="95" feet="114" corpse="3128"/>
+
+<flags>	
+	<flag pushable="1"/>
+	<flag summonable="1"/>
+	<flag convinceable="1"/>
+	<flag illusionable="1"/>
+	<flag canpushitems="0"/>
+	<flag staticattack="50"/>
+</flags>
 
 <attacks>
 	<attack name="melee" speed="2000" min="-50" max="-80"/> 
+	<attack name="bolt" speed="2000000" min="-50" max="-80"/> 
 	<attack name="imitate" speed="2000" range="50" chance="100"/>
 </attacks>
 

@@ -1,20 +1,28 @@
 <?xml version="1.0"?>
-<monster name="Demon" experience="6000" pushable="0" canpushitems="1" staticattack="40" speed="500">
-	<health now="8200" max="8200"/>
-	<look type="35" head="20" body="30" legs="40" feet="50" corpse="2916"/>
-	<stats attackskill="200" attack="50" defenseskill="80" defense="40" armor="60"/>
-	<combat targetdistance="1" runonhealth="0"/>
-	<targetchange speed="2000" chance="5"/>
+<monster name="Demon" race="fire" experience="6000" speed="220">
+<health now="8200" max="8200"/>
+<look type="35" corpse="2916"/>
+<targetchange speed="2000" chance="5"/>
+	
+<flags>
+	<flag targetdistance="1"/>
+	<flag runonhealth="0"/>
+	<flag pushable="0"/>
+	<flag canpushitems="1"/>
+	<flag staticattack="40"/>
+</flags>
 
 <attacks>
-	<attack name="melee" speed="2000" min="-200" max="-550"/> 
-	<attack name="Great Fireball" speed="10000" chance="0" min="-100" max="-350"/>
-	<attack name="Combustion" speed="20000" chance="10" min="-100" max="-350"/>
-	<attack name="Polymorph" speed="30000" chance="50"/>
-	<attack name="Energy Wave" speed="5000" chance="20"/>
+	<attack name="melee" speed="2000" skill="130" attack="75"/>
+	<attack name="Fire Field" speed="4000" chance="5"/>
+	<attack name="Great Fireball" speed="2000" chance="20" min="-100" max="-350"/>
+	<attack name="Ultimate Explosion" speed="2000" chance="10" min="-100" max="-350"/>
+	<attack name="Combustion" speed="2000" chance="50" min="-100" max="-350"/>
+	<attack name="Polymorph" speed="3000" chance="40"/>
+	<attack name="Energy Wave" speed="2000" chance="50"/>
 </attacks>
 
-<defenses>
+<defenses armor="40" defense="45">
 	<defense name="Invisible" speed="4000" chance="20"/>
 	<defense name="Ultimate Healing" speed="4000" chance="5" min="50" max="200"/>
 </defenses>
@@ -22,15 +30,16 @@
 <immunities>
 	<immunity name="poison"/>
 	<immunity name="energy"/>
-	<immunity name="fire"/>
 	<immunity name="paralyze"/>
+	<immunity name="fire"/>
+	<immunity name="invisible"/>
 	<immunity name="drunk"/>
 	<immunity name="outfit"/>
 </immunities>
 
-<summons maxSummons="2">
+<summons maxSummons="1">
 	<summon name="banshee" speed="2000" chance="50"/>
-	<summon name="minotaur archer" speed="2000" chance="50"/>
+	<summon name="minotaur archer" speed="1000" chance="100"/>
 	<summon name="fire elemental" speed="2000" chance="50"/>
 </summons>
 
