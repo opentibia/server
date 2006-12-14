@@ -672,7 +672,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"summons") == 0){
 
-				if(readXMLInteger(p, "maxSummons", intValue)){
+				if(readXMLInteger(p, "maxSummons", intValue) || readXMLInteger(p, "max", intValue)){
 					mType->maxSummons = std::min(intValue, 100);
 				}
 

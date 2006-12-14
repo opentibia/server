@@ -303,62 +303,6 @@ Item* Player::getWeapon() const
 	return NULL;
 }
 
-/*
-bool Player::getCombatItem(Item** tool, const Weapon** weapon)
-{
-	Item* item = NULL;
-
-	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
-		item = getInventoryItem((slots_t)slot);
-		if(!item){
-			continue;
-		}
-
-		switch(item->getWeaponType()){
-			case WEAPON_SWORD:
-			case WEAPON_AXE:
-			case WEAPON_CLUB:
-			case WEAPON_WAND:
-				//return item;
-
-				*weapon = g_weapons->getWeapon(item);
-				if(*weapon){
-					*tool = item;
-					return true;
-				}
-				break;
-
-			case WEAPON_DIST:
-			{
-				if(item->getAmuType() != AMMO_NONE){
-					Item* ammuItem = getInventoryItem(SLOT_AMMO);
-
-					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
-						*weapon = g_weapons->getWeapon(ammuItem);
-						if(*weapon){
-							*tool = ammuItem;
-							return true;
-						}
-					}
-				}
-				else{
-					*weapon = g_weapons->getWeapon(item);
-					if(*weapon){
-						*tool = item;
-						return true;
-					}
-				}
-			}
-
-			default:
-				break;
-		}
-	}
-	
-	return false;
-}
-*/
-
 int32_t Player::getArmor() const
 {
 	int32_t armor = 0;
@@ -390,7 +334,8 @@ int32_t Player::getDefense() const
 			defense = getInventoryItem(SLOT_LEFT)->getDefense();
 		}
 	}
-	else if(getInventoryItem(SLOT_RIGHT)){
+	
+	if(getInventoryItem(SLOT_RIGHT)){
 		if(getInventoryItem(SLOT_RIGHT)->getDefense() > defense){
 			defense = getInventoryItem(SLOT_RIGHT)->getDefense();
 		}
@@ -2533,8 +2478,8 @@ void Player::setFightMode(fightMode_t mode)
 
 		case FIGHTMODE_DEFENSE:
 		{
-			attackStrength = 0;
-			defenseStrength = 100;
+			attackStrength = 30;
+			defenseStrength = 70;
 			break;
 		}
 	}
