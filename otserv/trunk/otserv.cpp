@@ -84,6 +84,8 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 	}
 #endif
 
+#define CLIENT_VERSION_MIN 780
+#define CLIENT_VERSION_MAX 782
 
 typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
 IPList serverIPs;
@@ -200,7 +202,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.setEncryptionState(true);
 				msg.setEncryptionKey(k);
 
-				if(version >= 780 && version <= 782){
+				if(version >= CLIENT_VERSION_MIN && version <= CLIENT_VERSION_MAX){
 
 					int serverip = serverIPs[0].first;
 
@@ -297,7 +299,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.setEncryptionState(true);
 				msg.setEncryptionKey(k);
 
-				if(version < 780 || version > 782){
+				if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 					msg.AddByte(0x14);
 					msg.AddString("Only clients with protocol 7.8x allowed!");
 					msg.WriteToSocket(s);
