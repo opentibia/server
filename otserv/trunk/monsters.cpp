@@ -633,6 +633,56 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 								mType->conditionImmunities |= CONDITION_INVISIBLE;
 							}
 						}
+						else if(readXMLInteger(tmpNode, "physical", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_PHYSICALDAMAGE;
+								//mType->conditionImmunities |= CONDITION_PHYSICAL;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "energy", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_ENERGYDAMAGE;
+								mType->conditionImmunities |= CONDITION_ENERGY;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "fire", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_FIREDAMAGE;
+								mType->conditionImmunities |= CONDITION_FIRE;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "poison", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_POISONDAMAGE;
+								mType->conditionImmunities |= CONDITION_POISON;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "lifedrain", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_LIFEDRAIN;
+								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "paralyze", intValue)){
+							if(intValue != 0){
+								mType->conditionImmunities |= CONDITION_PARALYZE;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "outfit", intValue)){
+							if(intValue != 0){
+								mType->conditionImmunities |= CONDITION_OUTFIT;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "drunk", intValue)){
+							if(intValue != 0){
+								mType->conditionImmunities |= CONDITION_DRUNK;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "invisible", intValue)){
+							if(intValue != 0){
+								mType->conditionImmunities |= CONDITION_INVISIBLE;
+							}
+						}
 					}
 
 					tmpNode = tmpNode->next;
