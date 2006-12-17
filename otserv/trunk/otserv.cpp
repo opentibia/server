@@ -28,7 +28,7 @@
 
 #include "otsystem.h"
 #include "networkmessage.h"
-#include "protocol78.h"
+#include "protocol79.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -84,8 +84,8 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 	}
 #endif
 
-#define CLIENT_VERSION_MIN 780
-#define CLIENT_VERSION_MAX 782
+#define CLIENT_VERSION_MIN 790
+#define CLIENT_VERSION_MAX 790
 
 typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
 IPList serverIPs;
@@ -176,7 +176,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			if(version <= 760){
 				msg.Reset();
 				msg.AddByte(0x0A);
-				msg.AddString("Only clients with protocol 7.8x allowed!");
+				msg.AddString("Only clients with protocol 7.9 allowed!");
 				msg.WriteToSocket(s);
 			}
 			else if(msg.RSA_decrypt()){
@@ -260,15 +260,15 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						}
 					}
 				}
-				else{//version != 78x
+				else{//version != 790
 					msg.AddByte(0x0A);
-					msg.AddString("Only clients with protocol 7.8x allowed!");
+					msg.AddString("Only clients with protocol 7.9 allowed!");
 				}
 
 				msg.WriteToSocket(s);
 			}
 		}
-		// gameworld connection tibia 7.8x
+		// gameworld connection tibia 7.9x
 		else if (protId == 0x0A){
 			/*uint16_t  clientos =*/ msg.GetU16();
 			uint16_t version  = msg.GetU16();
@@ -301,7 +301,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 				if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 					msg.AddByte(0x14);
-					msg.AddString("Only clients with protocol 7.8x allowed!");
+					msg.AddString("Only clients with protocol 7.9 allowed!");
 					msg.WriteToSocket(s);
 				}
 				else if(g_bans.isIpDisabled(s)){
@@ -343,8 +343,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						}
 
 						if(s){
-							Protocol78* protocol;
-							protocol = new Protocol78(s);
+							Protocol79* protocol;
+							protocol = new Protocol79(s);
 							protocol->setKey(k);
 							player = new Player(name, protocol);
 							player->useThing2();

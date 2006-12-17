@@ -155,23 +155,17 @@ bool Outfits::loadFromXml(const std::string& datadir)
 						}
 						
 						Outfit outfit;
+						std::string outfitName;
+						readXMLString(p, "name", outfitName);
 						if(readXMLInteger(p, "looktype", intVal)){
 							outfit.looktype = intVal;
 						}
 						if(readXMLInteger(p, "addons", intVal)){
 							outfit.addons = intVal;
 						}
-						/*
-						if(readXMLString(p, "addons", str)){
-							uint32_t addons_field = 0;
-							for(int i = 0; (i < 2) && i < str.size(); ++i){ //allow 2 addons
-								if(str[i] == '1'){
-									addons_field = addons_field | ( 1 << i);
-								}
-							}
-							outfit.addons = addons_field;
-						}
-						*/
+						
+						outfitNamesMap[outfit.looktype] = outfitName;
+						
 						list->addOutfit(outfit);
 					}
 				}

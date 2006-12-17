@@ -46,7 +46,7 @@ extern Weapons* g_weapons;
 
 AutoList<Player> Player::listPlayer;
 
-Player::Player(const std::string& _name, Protocol78 *p) :
+Player::Player(const std::string& _name, Protocol79 *p) :
 Creature()
 {	
 	client = p;

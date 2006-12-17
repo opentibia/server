@@ -25,7 +25,7 @@
 #include "condition.h"
 #include "creature.h"
 #include "player.h"
-#include "const78.h"
+#include "const79.h"
 
 #include <sstream>
 

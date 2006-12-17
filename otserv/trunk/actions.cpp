@@ -20,7 +20,7 @@
 #include "otpch.h"
 
 #include "definitions.h"
-#include "const78.h"
+#include "const79.h"
 #include "player.h"
 #include "monster.h"
 #include "npc.h"

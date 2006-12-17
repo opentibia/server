@@ -75,10 +75,24 @@ public:
 		}
 	}
 	
+	const std::string& getOutfitName(uint32_t looktype) const{
+		std::map<uint32_t, std::string>::const_iterator it;
+		it = outfitNamesMap.find(looktype);
+		if(it != outfitNamesMap.end()){
+			return it->second;
+		}
+		else{
+			static const std::string d = "Outfit";
+			return d;
+		}
+	}
+	
 private:
 	Outfits();
 	typedef std::vector<OutfitList*> OutfitsListVector;
 	OutfitsListVector m_list;
+	
+	std::map<uint32_t, std::string> outfitNamesMap;
 	
 	OutfitList m_female_list;
 	OutfitList m_male_list;

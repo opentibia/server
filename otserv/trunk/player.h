@@ -29,7 +29,7 @@
 #include "outfit.h"
 #include "enums.h"
 #include "vocation.h"
-#include "protocol78.h"
+#include "protocol79.h"
 
 #include <vector>
 #include <ctime>
@@ -37,7 +37,7 @@
 
 class House;
 class Weapon;
-class Protocol78;
+class Protocol79;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -95,7 +95,7 @@ typedef std::set<uint32_t> VIPListSet;
 class Player : public Creature, public Cylinder
 {
 public:
-	Player(const std::string& name, Protocol78* p);
+	Player(const std::string& name, Protocol79* p);
 	virtual ~Player();
 	
 	virtual Player* getPlayer() {return this;};
@@ -461,7 +461,7 @@ protected:
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
 protected:
-	Protocol78* client;
+	Protocol79* client;
 
 	int32_t level;
 	int32_t magLevel;

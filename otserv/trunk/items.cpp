@@ -242,7 +242,7 @@ int Items::loadFromOtb(std::string file)
 		return ERROR_INVALID_FORMAT;
 	}
 	
-	if(Items::dwMinorVersion != CLIENT_VERSION_780){
+	if(Items::dwMinorVersion != CLIENT_VERSION_790){
 		std::cout << "Not supported items.otb client version." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}

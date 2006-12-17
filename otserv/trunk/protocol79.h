@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Implementation of tibia v7.8x protocol
+// Implementation of tibia v7.9x protocol
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_PROTOCOL78_H__
-#define __OTSERV_PROTOCOL78_H__
+#ifndef __OTSERV_PROTOCOL79_H__
+#define __OTSERV_PROTOCOL79_H__
 
 #include "definitions.h"
 #include <string>
@@ -42,11 +42,11 @@ class House;
 class Container;
 class Tile;
 
-class Protocol78
+class Protocol79
 {
 public:
-	Protocol78(SOCKET s);
-	~Protocol78();
+	Protocol79(SOCKET s);
+	~Protocol79();
 	
 	connectResult_t ConnectPlayer();
 	void ReceiveLoop();  

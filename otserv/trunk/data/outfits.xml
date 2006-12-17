@@ -18,7 +18,7 @@
 <outfit type="0" looktype="157" addons="3" />
 <outfit type="0" looktype="158" addons="3" />
 <!-- Male outfits -->
-<outfit type="1" looktype="128" addons="3" />
+<outfit type="1" looktype="128" addons="3" name="Citizen" />
 <outfit type="1" looktype="129" addons="3" />
 <outfit type="1" looktype="130" addons="3" />
 <outfit type="1" looktype="131" addons="3" />
