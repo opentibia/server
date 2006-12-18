@@ -269,7 +269,6 @@ private:
 	unsigned long listId;
 		
 	bool pendingLogout;
-	Game   *game;
 	Player* player;
 	SOCKET s;
 	

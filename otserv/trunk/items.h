@@ -264,7 +264,6 @@ public:
 
 protected:
 	Array<ItemType*> items;
-	ItemType dummyItemType; // use this for invalid ids
 	std::string m_datadir;
 };
 

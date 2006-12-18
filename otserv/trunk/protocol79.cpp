@@ -54,13 +54,11 @@ extern ConfigManager g_config;
 extern Actions actions;
 Chat g_chat;
 
-
 Protocol79::Protocol79(SOCKET s)
 {
 	OTSYS_THREAD_LOCKVARINIT(bufferLock);
 	
 	player = NULL;
-	game = NULL;
 	pendingLogout = false;
 
 	windowTextID = 0;
@@ -77,7 +75,6 @@ Protocol79::~Protocol79()
 		s = 0;
 	}
 	player = NULL;
-	game = NULL;
 }
 
 uint32_t Protocol79::getIP() const
@@ -99,7 +96,6 @@ uint32_t Protocol79::getIP() const
 void Protocol79::setPlayer(Player* p)
 {
 	player = p;
-	game   = &g_game;
 }
 
 void Protocol79::sleepTillMove()
@@ -134,11 +130,11 @@ connectResult_t Protocol79::ConnectPlayer()
 	}
 	else{
 		//last login position
-		if(game->placeCreature(player->getLoginPosition(), player)){
+		if(g_game.placeCreature(player->getLoginPosition(), player)){
 			return CONNECT_SUCCESS;
 		}
 		//temple
-		else if(game->placeCreature(player->getTemplePosition(), player, true)){
+		else if(g_game.placeCreature(player->getTemplePosition(), player, true)){
 			return CONNECT_SUCCESS;
 		}
 		else
@@ -166,17 +162,17 @@ void Protocol79::ReceiveLoop()
 		}
 		// logout by disconnect?  -> kick
 		if(pendingLogout == false){
-			game->playerSetAttackedCreature(player, 0);
+			g_game.playerSetAttackedCreature(player, 0);
 
 			while(player->hasCondition(CONDITION_INFIGHT) && !player->isRemoved() && s == 0){
 				OTSYS_SLEEP(250);
 			}
 
-			OTSYS_THREAD_LOCK(game->gameLock, "Protocol79::ReceiveLoop()");
+			OTSYS_THREAD_LOCK(g_game.gameLock, "Protocol79::ReceiveLoop()");
 
 			if(!player->isRemoved()){
 				if(s == 0){
-					game->removeCreature(player);
+					g_game.removeCreature(player);
 				}
 				else{
 					//set new key after reattaching
@@ -184,7 +180,7 @@ void Protocol79::ReceiveLoop()
 				}
 			}
 
-			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol79::ReceiveLoop()");
+			OTSYS_THREAD_UNLOCK(g_game.gameLock, "Protocol79::ReceiveLoop()");
 		}
 	}while(s != 0 && !player->isRemoved());
 }
@@ -403,7 +399,7 @@ void Protocol79::parsePacket(NetworkMessage &msg)
 		break;
 	}
 
-	game->flushSendBuffers();
+	g_game.flushSendBuffers();
 }
 
 void Protocol79::GetTileDescription(const Tile* tile, NetworkMessage &msg)
@@ -476,7 +472,7 @@ void Protocol79::GetFloorDescription(NetworkMessage& msg, int x, int y, int z, i
 
 	for(int nx = 0; nx < width; nx++){
 		for(int ny = 0; ny < height; ny++){
-			tile = game->getTile(x + nx + offset, y + ny + offset, z);
+			tile = g_game.getTile(x + nx + offset, y + ny + offset, z);
 			if(tile){
 				if(skip >= 0){
 					msg.AddByte(skip);
@@ -529,7 +525,7 @@ void Protocol79::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 		{
 			removedKnown = knownPlayers.front();
 
-			Creature *c = game->getCreatureByID(removedKnown);
+			Creature *c = g_game.getCreatureByID(removedKnown);
 			if ((!c) || (!canSee(c)))
 				break;
 
@@ -601,7 +597,7 @@ void Protocol79::logout()
 {
 	// we ask the game to remove us
 	if(!player->isRemoved()){
-		if(game->removeCreature(player))
+		if(g_game.removeCreature(player))
 			pendingLogout = true;
 	}
 	else{
@@ -623,7 +619,7 @@ void Protocol79::parseLogout(NetworkMessage& msg)
 
 void Protocol79::parseCreatePrivateChannel(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseCreatePrivateChannel()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseCreatePrivateChannel()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -646,7 +642,7 @@ void Protocol79::parseChannelInvite(NetworkMessage& msg)
 {
 	std::string name = msg.GetString();
 		
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseChannelInvite()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseChannelInvite()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -654,7 +650,7 @@ void Protocol79::parseChannelInvite(NetworkMessage& msg)
 	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
 
 	if(channel){
-		Player* invitePlayer = game->getPlayerByName(name);
+		Player* invitePlayer = g_game.getPlayerByName(name);
 		
 		if(invitePlayer){
 			channel->invitePlayer(player, invitePlayer);
@@ -666,7 +662,7 @@ void Protocol79::parseChannelExclude(NetworkMessage& msg)
 {
 	std::string name = msg.GetString();
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseChannelExclude()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseChannelExclude()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -674,7 +670,7 @@ void Protocol79::parseChannelExclude(NetworkMessage& msg)
 	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
 
 	if(channel){
-		Player* excludePlayer = game->getPlayerByName(name);
+		Player* excludePlayer = g_game.getPlayerByName(name);
 		
 		if(excludePlayer){
 			channel->excludePlayer(player, excludePlayer);
@@ -684,7 +680,7 @@ void Protocol79::parseChannelExclude(NetworkMessage& msg)
 
 void Protocol79::parseGetChannels(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseGetChannels()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseGetChannels()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -695,7 +691,7 @@ void Protocol79::parseGetChannels(NetworkMessage& msg)
 void Protocol79::parseOpenChannel(NetworkMessage& msg)
 {
 	unsigned short channelId = msg.GetU16();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseOpenChannel()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseOpenChannel()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -708,7 +704,7 @@ void Protocol79::parseOpenChannel(NetworkMessage& msg)
 void Protocol79::parseCloseChannel(NetworkMessage &msg)
 {
 	unsigned short channelId = msg.GetU16();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseCloseChannel()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseCloseChannel()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -721,12 +717,12 @@ void Protocol79::parseOpenPriv(NetworkMessage& msg)
 	std::string receiver;
 	receiver = msg.GetString();
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseOpenPriv()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseOpenPriv()");
 	if(player->isRemoved()){
 		return;
 	}
 
-	Player* playerPriv = game->getPlayerByName(receiver);
+	Player* playerPriv = g_game.getPlayerByName(receiver);
 	if(playerPriv){
 		sendOpenPriv(playerPriv->getName());
 	}
@@ -734,8 +730,8 @@ void Protocol79::parseOpenPriv(NetworkMessage& msg)
 
 void Protocol79::parseCancelMove(NetworkMessage& msg)
 {
-	game->playerSetAttackedCreature(player, 0);
-	game->playerFollowCreature(player, 0);
+	g_game.playerSetAttackedCreature(player, 0);
+	g_game.playerFollowCreature(player, 0);
 }
 
 void Protocol79::parseDebug(NetworkMessage& msg)
@@ -756,7 +752,7 @@ void Protocol79::parseDebug(NetworkMessage& msg)
 
 void Protocol79::parseRecievePing(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseReceivePing()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseReceivePing()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -796,40 +792,40 @@ void Protocol79::parseAutoWalk(NetworkMessage& msg)
 		path.push_back(dir);
 	}
 
-	game->playerAutoWalk(player, path);
+	g_game.playerAutoWalk(player, path);
 }
 
 void Protocol79::parseStopAutoWalk(NetworkMessage& msg)
 {
-	game->playerStopAutoWalk(player);
+	g_game.playerStopAutoWalk(player);
 }
 
 void Protocol79::parseMoveNorth(NetworkMessage& msg)
 {
 	sleepTillMove();
 
-	game->movePlayer(player, NORTH);
+	g_game.movePlayer(player, NORTH);
 }
 
 void Protocol79::parseMoveEast(NetworkMessage& msg)
 {
 	sleepTillMove();
 
-	game->movePlayer(player, EAST);
+	g_game.movePlayer(player, EAST);
 }
 
 void Protocol79::parseMoveSouth(NetworkMessage& msg)
 {
 	sleepTillMove();
 
-	game->movePlayer(player, SOUTH);
+	g_game.movePlayer(player, SOUTH);
 }
 
 void Protocol79::parseMoveWest(NetworkMessage& msg)
 {
 	sleepTillMove();
 
-	game->movePlayer(player, WEST);
+	g_game.movePlayer(player, WEST);
 }
 
 void Protocol79::parseMoveNorthEast(NetworkMessage& msg)
@@ -837,7 +833,7 @@ void Protocol79::parseMoveNorthEast(NetworkMessage& msg)
 	sleepTillMove();
 	sleepTillMove();
 
-	game->movePlayer(player, NORTHEAST);
+	g_game.movePlayer(player, NORTHEAST);
 }
 
 void Protocol79::parseMoveSouthEast(NetworkMessage& msg)
@@ -845,7 +841,7 @@ void Protocol79::parseMoveSouthEast(NetworkMessage& msg)
 	sleepTillMove();
 	sleepTillMove();
 
-	game->movePlayer(player, SOUTHEAST);
+	g_game.movePlayer(player, SOUTHEAST);
 }
 
 void Protocol79::parseMoveSouthWest(NetworkMessage& msg)
@@ -853,7 +849,7 @@ void Protocol79::parseMoveSouthWest(NetworkMessage& msg)
 	sleepTillMove();
 	sleepTillMove();
 
-	game->movePlayer(player, SOUTHWEST);
+	g_game.movePlayer(player, SOUTHWEST);
 }
 
 void Protocol79::parseMoveNorthWest(NetworkMessage& msg)
@@ -861,32 +857,32 @@ void Protocol79::parseMoveNorthWest(NetworkMessage& msg)
 	sleepTillMove();
 	sleepTillMove();
 
-	game->movePlayer(player, NORTHWEST);
+	g_game.movePlayer(player, NORTHWEST);
 }
 
 void Protocol79::parseTurnNorth(NetworkMessage& msg)
 {
-	game->playerTurn(player, NORTH);
+	g_game.playerTurn(player, NORTH);
 }
 
 void Protocol79::parseTurnEast(NetworkMessage& msg)
 {
-	game->playerTurn(player, EAST);
+	g_game.playerTurn(player, EAST);
 }
 
 void Protocol79::parseTurnSouth(NetworkMessage& msg)
 {
-	game->playerTurn(player, SOUTH);
+	g_game.playerTurn(player, SOUTH);
 }
 
 void Protocol79::parseTurnWest(NetworkMessage& msg)
 {
-	game->playerTurn(player, WEST);
+	g_game.playerTurn(player, WEST);
 }
 
 void Protocol79::parseRequestOutfit(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseRequestOutfit()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseRequestOutfit()");
 	msg.Reset();
 	
 	msg.AddByte(0xC8);
@@ -938,7 +934,7 @@ void Protocol79::parseSetOutfit(NetworkMessage& msg)
 		newOutfit.lookFeet = lookfeet;
 		newOutfit.lookAddons = lookaddons;
 
-		game->playerChangeOutfit(player, newOutfit);
+		g_game.playerChangeOutfit(player, newOutfit);
 	}
 }
 
@@ -953,7 +949,7 @@ void Protocol79::parseUseItem(NetworkMessage& msg)
 	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
 #endif
 */
-	game->playerUseItem(player, pos, stackpos, index, spriteId);
+	g_game.playerUseItem(player, pos, stackpos, index, spriteId);
 }
 
 void Protocol79::parseUseItemEx(NetworkMessage& msg)
@@ -965,7 +961,7 @@ void Protocol79::parseUseItemEx(NetworkMessage& msg)
 	uint16_t toSpriteId = msg.GetU16();
 	uint8_t toStackpos = msg.GetByte();
 
-	game->playerUseItemEx(player, fromPos, fromStackpos, fromSpriteId, toPos, toStackpos, toSpriteId);
+	g_game.playerUseItemEx(player, fromPos, fromStackpos, fromSpriteId, toPos, toStackpos, toSpriteId);
 }
 
 void Protocol79::parseBattleWindow(NetworkMessage &msg)
@@ -975,14 +971,14 @@ void Protocol79::parseBattleWindow(NetworkMessage &msg)
 	uint8_t fromStackPos = msg.GetByte();
 	uint32_t creatureId = msg.GetU32();
 
-	game->playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, spriteId);
+	g_game.playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, spriteId);
 }
 
 void Protocol79::parseCloseContainer(NetworkMessage& msg)
 {
 	unsigned char containerid = msg.GetByte();
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseCloseContainer()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseCloseContainer()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -994,7 +990,7 @@ void Protocol79::parseCloseContainer(NetworkMessage& msg)
 void Protocol79::parseUpArrowContainer(NetworkMessage& msg)
 {
 	uint32_t cid = msg.GetByte();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseUpArrowContainer()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseUpArrowContainer()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -1014,7 +1010,7 @@ void Protocol79::parseUpArrowContainer(NetworkMessage& msg)
 void Protocol79::parseUpdateContainer(NetworkMessage& msg)
 {
 	uint32_t cid = msg.GetByte();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseUpdateContainer()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseUpdateContainer()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -1046,7 +1042,7 @@ void Protocol79::parseThrow(NetworkMessage& msg)
 	if(toPos == fromPos)
 		return;
 
-	game->thingMove(player, fromPos, spriteId, fromStackpos, toPos, count);
+	g_game.thingMove(player, fromPos, spriteId, fromStackpos, toPos, count);
 }
 
 void Protocol79::parseLookAt(NetworkMessage& msg)
@@ -1061,7 +1057,7 @@ void Protocol79::parseLookAt(NetworkMessage& msg)
 #endif
 */
 
-	game->playerLookAt(player, pos, spriteId, stackpos);
+	g_game.playerLookAt(player, pos, spriteId, stackpos);
 }
 
 void Protocol79::parseSay(NetworkMessage& msg)
@@ -1079,31 +1075,31 @@ void Protocol79::parseSay(NetworkMessage& msg)
 		channelId = msg.GetU16();
 	std::string text = msg.GetString();
 
-	if(game->playerSaySpell(player, type, text)){
+	if(g_game.playerSaySpell(player, type, text)){
 		return;
 	}
 
 	switch(type){
 		case SPEAK_SAY:
-			game->playerSay(player, type, text);
+			g_game.playerSay(player, type, text);
 			break;
 		case SPEAK_WHISPER:
-			game->playerWhisper(player, text);
+			g_game.playerWhisper(player, text);
 			break;
 		case SPEAK_YELL:
-			game->playerYell(player, text);
+			g_game.playerYell(player, text);
 			break;
 		case SPEAK_PRIVATE:
 		case SPEAK_PRIVATE_RED:
-			game->playerSpeakTo(player, type, receiver, text);
+			g_game.playerSpeakTo(player, type, receiver, text);
 			break;
 		case SPEAK_CHANNEL_Y:
 		case SPEAK_CHANNEL_R1:
 		case SPEAK_CHANNEL_R2:
-			game->playerTalkToChannel(player, type, text, channelId);
+			g_game.playerTalkToChannel(player, type, text, channelId);
 			break;
 		case SPEAK_BROADCAST:
-			game->playerBroadcastMessage(player, text);
+			g_game.playerBroadcastMessage(player, text);
 			break;
 		default:
 			break;
@@ -1136,19 +1132,19 @@ void Protocol79::parseFightModes(NetworkMessage& msg)
 		fightMode = FIGHTMODE_DEFENSE;
 	}
 
-	game->playerSetFightModes(player, fightMode, chaseMode);
+	g_game.playerSetFightModes(player, fightMode, chaseMode);
 }
 
 void Protocol79::parseAttack(NetworkMessage& msg)
 {
 	unsigned long creatureid = msg.GetU32();
-	game->playerSetAttackedCreature(player, creatureid);
+	g_game.playerSetAttackedCreature(player, creatureid);
 }
 
 void Protocol79::parseFollow(NetworkMessage& msg)
 {
 	unsigned long creatureId = msg.GetU32();
-	game->playerFollowCreature(player, creatureId);
+	g_game.playerFollowCreature(player, creatureId);
 }
 
 void Protocol79::parseTextWindow(NetworkMessage& msg)
@@ -1159,7 +1155,7 @@ void Protocol79::parseTextWindow(NetworkMessage& msg)
 		return;
 
 	if(readItem && windowTextID == id){
-		game->playerWriteItem(player, readItem, new_text);
+		g_game.playerWriteItem(player, readItem, new_text);
 		readItem->releaseThing2();
 		readItem = NULL;
 	}
@@ -1171,7 +1167,7 @@ void Protocol79::parseHouseWindow(NetworkMessage &msg)
 	unsigned long id = msg.GetU32();
 	std::string new_list = msg.GetString();
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol79::parseHouseWindow()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseHouseWindow()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -1190,12 +1186,12 @@ void Protocol79::parseRequestTrade(NetworkMessage& msg)
 	uint8_t stackpos = msg.GetByte();
 	uint32_t playerId = msg.GetU32();
 
-	game->playerRequestTrade(player, pos, stackpos, playerId, spriteId);
+	g_game.playerRequestTrade(player, pos, stackpos, playerId, spriteId);
 }
 
 void Protocol79::parseAcceptTrade(NetworkMessage& msg)
 {
-	game->playerAcceptTrade(player);
+	g_game.playerAcceptTrade(player);
 }
 
 void Protocol79::parseLookInTrade(NetworkMessage& msg)
@@ -1203,12 +1199,12 @@ void Protocol79::parseLookInTrade(NetworkMessage& msg)
 	bool counterOffer = (msg.GetByte() == 0x01);
 	int index = msg.GetByte();
 
-	game->playerLookInTrade(player, counterOffer, index);
+	g_game.playerLookInTrade(player, counterOffer, index);
 }
 
 void Protocol79::parseCloseTrade()
 {
-	game->playerCloseTrade(player);
+	g_game.playerCloseTrade(player);
 }
 
 void Protocol79::parseAddVip(NetworkMessage& msg)
@@ -1217,7 +1213,7 @@ void Protocol79::parseAddVip(NetworkMessage& msg)
 	if(vip_name.size() > 32)
 		return;
 
-	game->playerRequestAddVip(player, vip_name);
+	g_game.playerRequestAddVip(player, vip_name);
 }
 
 void Protocol79::parseRemVip(NetworkMessage& msg)
@@ -1232,7 +1228,7 @@ void Protocol79::parseRotateItem(NetworkMessage& msg)
 	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 
-	game->playerRotateItem(player, pos, stackpos, spriteId);
+	g_game.playerRotateItem(player, pos, stackpos, spriteId);
 }
 
 // Send methods
@@ -1667,7 +1663,7 @@ void Protocol79::sendAddCreature(const Creature* creature, bool isLogin)
 
 			//gameworld light-settings
 			LightInfo lightInfo;
-			game->getWorldLightInfo(lightInfo);
+			g_game.getWorldLightInfo(lightInfo);
 			AddWorldLight(msg, lightInfo);
 
 			//player light level
@@ -1690,7 +1686,7 @@ void Protocol79::sendAddCreature(const Creature* creature, bool isLogin)
 				bool online;
 				std::string vip_name;
 				if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
-					online = (game->getPlayerByName(vip_name) != NULL);
+					online = (g_game.getPlayerByName(vip_name) != NULL);
 					sendVIP((*it), vip_name, online);
 				}
 			}
@@ -2151,7 +2147,7 @@ void Protocol79::UpdateTile(NetworkMessage& msg, const Position& pos)
 	msg.AddByte(0x69);
 	msg.AddPosition(pos);
 
-	Tile* tile = game->getTile(pos.x, pos.y, pos.z);
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(tile){
 		GetTileDescription(tile, msg);
 		msg.AddByte(0);
@@ -2320,7 +2316,7 @@ void Protocol79::flushOutputBuffer()
 
 void Protocol79::WriteBuffer(NetworkMessage& add)
 {
-	game->addPlayerBuffer(player);
+	g_game.addPlayerBuffer(player);
 
 	OTSYS_THREAD_LOCK(bufferLock, "Protocol79::WriteBuffer");
 

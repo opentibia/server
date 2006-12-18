@@ -921,6 +921,7 @@ ItemType& Items::getItemType(int id)
 		#ifdef __DEBUG__
 		std::cout << "WARNING! unknown itemtypeid " << id << ". using defaults." << std::endl;
 		#endif
+		static ItemType dummyItemType; // use this for invalid ids
 		return dummyItemType;
 	}
 }
