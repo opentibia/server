@@ -69,6 +69,7 @@ void MonsterType::reset()
 
 	combatMeleeMin = 0;
 	combatMeleeMax = 0;
+	combatMeleeSpeed = 2000;
 
 	manaCost = 0;
 	summonList.clear();
@@ -76,6 +77,7 @@ void MonsterType::reset()
 	spellAttackList.clear();
 	spellDefenseList.clear();
 
+	yellSpeedTicks = 0;
 	yellChance = 0;
 	voiceVector.clear();
 
@@ -127,19 +129,22 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 	if(Item::items[lootBlock.id].stackable == true){
 		uint32_t randvalue = Monsters::getLootRandom();
 		uint32_t n = 1;
-		if(randvalue < lootBlock.chance1){
-			if(randvalue < lootBlock.chancemax){
+		if(randvalue < lootBlock.chance){
+			/*if(randvalue < lootBlock.chancemax){
 				n = lootBlock.countmax;
 			}
 			else{
 				//if chancemax < randvalue < chance1
 				n = (unsigned char)(randvalue % lootBlock.countmax + 1);
-			}		
-			tmpItem = Item::CreateItem(lootBlock.id,n);
+			}
+			*/
+
+			n = (unsigned char)(randvalue % lootBlock.countmax + 1);
+			tmpItem = Item::CreateItem(lootBlock.id, n);
 		}
 	}
 	else{
-		if(Monsters::getLootRandom() < lootBlock.chance1){
+		if(Monsters::getLootRandom() < lootBlock.chance){
 			tmpItem = Item::CreateItem(lootBlock.id);
 		}
 	}
@@ -783,6 +788,31 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 		return false;
 	}
 	
+	if(readXMLInteger(node, "countmax", intValue)){
+		lootBlock.countmax = intValue;
+
+		if(lootBlock.countmax > 100){
+			lootBlock.countmax = 100;
+		}
+	}
+	else{
+		//std::cout << "missing countmax for loot id = "<< lootBlock.id << std::endl;
+		lootBlock.countmax = 1;
+	}
+
+	if(readXMLInteger(node, "chance", intValue) || readXMLInteger(node, "chance1", intValue)){
+		lootBlock.chance = intValue;
+
+		if(lootBlock.chance > CHANCE_MAX){
+			lootBlock.chance = CHANCE_MAX;
+		}
+	}
+	else{
+		//std::cout << "missing chance for loot id = "<< lootBlock.id << std::endl;
+		lootBlock.chance = CHANCE_MAX;
+	}
+
+	/*
 	if(Item::items[lootBlock.id].stackable == true){
 		if(readXMLInteger(node, "countmax", intValue)){
 			lootBlock.countmax = intValue;
@@ -838,6 +868,7 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 			lootBlock.chance1 = CHANCE_MAX;
 		}
 	}
+	*/
 
 	if(Item::items[lootBlock.id].isContainer()){
 		loadLootContainer(node, lootBlock);
