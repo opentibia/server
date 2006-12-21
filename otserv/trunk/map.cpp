@@ -363,7 +363,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 
 	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
 		leafE = leafS;
-		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){			
+		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
 			if(leafE){
 				for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
 

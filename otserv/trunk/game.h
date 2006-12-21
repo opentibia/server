@@ -107,9 +107,15 @@ public:
 
 	/**
 	  * Get a single tile of the map.
-	  * \returns A Pointer to the tile
+	  * \returns A pointer to the tile
 		*/
-	Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
+	Tile* getTile(uint32_t x, uint32_t y, uint32_t z);
+
+	/**
+	  * Get a leaf of the map.
+	  * \returns A pointer to a leaf
+		*/
+	QTreeLeafNode* getLeaf(uint32_t x, uint32_t y);
 
 	/**
 	  * Returns a creature based on the unique creature identifier
