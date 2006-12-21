@@ -44,7 +44,7 @@ IOMapSerializeSQL::~IOMapSerializeSQL()
 bool IOMapSerializeSQL::loadMap(Map* map, const std::string& identifier)
 {
 	Database* db = Database::instance();
-	DBQuery query(); //we need this to lock database
+	DBQuery query; //we need this to lock database
 	
 	if(!db->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
