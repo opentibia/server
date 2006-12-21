@@ -402,9 +402,14 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 	return NULL;
 }
 
-Tile* Game::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
+Tile* Game::getTile(uint32_t x, uint32_t y, uint32_t z)
 {
-	return map->getTile(_x, _y, _z);
+	return map->getTile(x, y, z);
+}
+
+QTreeLeafNode* Game::getLeaf(uint32_t x, uint32_t y)
+{
+	return map->getLeaf(x, y);
 }
 
 Creature* Game::getCreatureByID(unsigned long id)
@@ -2690,11 +2695,9 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 	if(healthChange > 0){
 		target->changeHealth(healthChange);
-		//addCreatureHealth(list, target);
 	}
 	else{
 		SpectatorVec list;
-		//getSpectators(Range(targetPos, true), list);
 		getSpectators(list, targetPos, true);
 
 		if(!target->isAttackable() || Combat::canDoCombat(attacker, target) != RET_NOERROR){
@@ -2719,7 +2722,6 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 			addMagicEffect(list, targetPos, NM_ME_BLOCKHIT);
 			return false;
 		}
-		//if(blockType == BLOCK_ARMOR || blockType == BLOCK_IMMUNITY){
 		else if(blockType == BLOCK_IMMUNITY){
 			uint8_t hitEffect = 0;
 
@@ -2883,13 +2885,14 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
+		
+		int32_t manaLoss = std::min(target->getMana(), -manaChange);
+		BlockType_t blockType = target->blockHit(attacker, COMBAT_MANADRAIN, manaLoss);
 
-		if(target->isImmune(COMBAT_MANADRAIN)){
+		if(blockType != BLOCK_NONE){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
-
-		int32_t manaLoss = std::min(target->getMana(), -manaChange);
 
 		if(manaLoss > 0){
 			target->drainMana(attacker, manaLoss);

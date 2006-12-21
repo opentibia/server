@@ -217,6 +217,7 @@ public:
 	virtual bool setAttackedCreature(Creature* creature);
 	bool isImmune(CombatType_t type) const;
 	bool isImmune(ConditionType_t type) const;
+	bool hasShield() const;
 	virtual bool isAttackable() const;
 	
 	virtual void changeHealth(int32_t healthChange);
@@ -255,8 +256,8 @@ public:
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
-	virtual void onDefenseBlock(bool blockedHit);
-	virtual void onArmorBlock(bool blockedHit);
+	//virtual void onDefenseBlock(bool blockedHit);
+	//virtual void onArmorBlock(bool blockedHit);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
@@ -487,7 +488,8 @@ protected:
 	int64_t lastAction;
 
 	bool pzLocked;
-	int32_t blockCount;
+	//int32_t blockCount;
+	int32_t bloodHitCount;
 	int32_t shieldBlockCount;
 	uint32_t skillPoint;
 	uint32_t attackTicks;

@@ -209,8 +209,8 @@ public:
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
-	virtual void onDefenseBlock(bool blockedHit) {};
-	virtual void onArmorBlock(bool blockedHit) {};
+	//virtual void onDefenseBlock(bool blockedHit) {};
+	//virtual void onArmorBlock(bool blockedHit) {};
 
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
@@ -285,9 +285,11 @@ protected:
 	typedef std::map<uint32_t, int32_t> DamageMap;
 	DamageMap damageMap;
 	uint32_t lastHitCreature;
-	bool internalDefense;
-	bool internalArmor;
+	uint32_t blockCount;
 	uint32_t blockTicks;
+
+	//bool internalDefense;
+	//bool internalArmor;
 
 	void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void doAttacking(uint32_t interval) {};

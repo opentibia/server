@@ -81,7 +81,8 @@ Creature()
 	attackPower = 0;
 
 	pzLocked = false;
-	blockCount = 0;
+	//blockCount = 0;
+	bloodHitCount = 0;
 	shieldBlockCount = 0;
 	skillPoint = 0;
 	attackTicks = 0;
@@ -1298,13 +1299,23 @@ void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 	switch(blockType){
 		case BLOCK_NONE:
 			skillPoint = 1;
-			blockCount = 0;
+			//blockCount = 0;
+			bloodHitCount = 30;
 			shieldBlockCount = 30;
 			break;
 
 		case BLOCK_DEFENSE:
 		case BLOCK_ARMOR:
 			//need to draw blood every 30 hits
+			if(bloodHitCount > 0){
+				skillPoint = 1;
+				--bloodHitCount;
+			}
+			else{
+				skillPoint = 0;
+			}
+
+			/*
 			if(blockCount < 30){
 				blockCount++;
 				skillPoint = 1;
@@ -1312,6 +1323,7 @@ void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 			else{
 				skillPoint = 0;
 			}
+			*/
 
 			break;
 
@@ -1321,12 +1333,40 @@ void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 	}
 }
 
+bool Player::hasShield() const
+{
+	bool result = false;
+	Item* item;
+
+	item = getInventoryItem(SLOT_LEFT);
+	if(item && item->getWeaponType() == WEAPON_SHIELD){
+		result = true;
+	}
+
+	item = getInventoryItem(SLOT_RIGHT);
+	if(item && item->getWeaponType() == WEAPON_SHIELD){
+		result = true;
+	}
+
+	return result;
+}
+
 BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
 	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
 	if(blockType != BLOCK_NONE){
+		if(blockType != BLOCK_IMMUNITY){
+			if(shieldBlockCount > 0){
+				--shieldBlockCount;
+				
+				if(hasShield()){
+					addSkillAdvance(SKILL_SHIELD, 1);
+				}
+			}
+		}
+
 		return blockType;
 	}
 
@@ -1346,7 +1386,6 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		absorbedDamage = false;
 
 		if(it.abilities.absorbPercentAll != 0){
-			//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentAll) / 100) * damage);
 			if(it.abilities.absorbPercentAll > 0){
 				damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentAll) / 100));
 				absorbedDamage = true;
@@ -1355,44 +1394,58 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 
 		switch(combatType){
 			case COMBAT_PHYSICALDAMAGE:
-				//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPhysical) / 100) * damage);
+			{
 				if(it.abilities.absorbPercentPhysical > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentPhysical) / 100));
 					absorbedDamage = true;
 				}
 				break;
+			}
 
 			case COMBAT_FIREDAMAGE:
-				//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentFire) / 100) * damage);
+			{
 				if(it.abilities.absorbPercentFire > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentFire) / 100));
 					absorbedDamage = true;
 				}
 				break;
+			}
 
 			case COMBAT_ENERGYDAMAGE:
-				//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentEnergy) / 100) * damage);
+			{
 				if(it.abilities.absorbPercentEnergy > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentEnergy) / 100));
 					absorbedDamage = true;
 				}
 				break;
+			}
 
 			case COMBAT_POISONDAMAGE:
-				//absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPoison) / 100) * damage);
+			{
 				if(it.abilities.absorbPercentPoison > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentPoison) / 100));
 					absorbedDamage = true;
 				}
 				break;
+			}
 
 			case COMBAT_LIFEDRAIN:
-				//absorbedDamage += (int32_t)(((double)it.abilities.absorbPercentLifeDrain) / 100) * damage;
+			{
 				if(it.abilities.absorbPercentLifeDrain > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentLifeDrain) / 100));
 					absorbedDamage = true;
 				}
 				break;
+			}
+
+			case COMBAT_MANADRAIN:
+			{
+				if(it.abilities.absorbPercentManaDrain > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentManaDrain) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
 
 			default:
 				break;
@@ -1415,6 +1468,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 	return blockType;
 }
 
+/*
 void Player::onDefenseBlock(bool blockedHit)
 {
 	if(shieldBlockCount > 0){
@@ -1434,12 +1488,7 @@ void Player::onDefenseBlock(bool blockedHit)
 		}
 
 		if(hasShield){
-			if(blockedHit){
-				addSkillAdvance(SKILL_SHIELD, 2);
-			}
-			else{
-				addSkillAdvance(SKILL_SHIELD, 1);
-			}
+			addSkillAdvance(SKILL_SHIELD, 1);
 		}
 	}
 }
@@ -1448,6 +1497,7 @@ void Player::onArmorBlock(bool blockedHit)
 {
 	//
 }
+*/
 
 uint32_t Player::getIP() const
 {

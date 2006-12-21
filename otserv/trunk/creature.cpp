@@ -65,14 +65,13 @@ Creature::Creature() :
 	followCreature = NULL;
 	eventWalk = 0;
 	internalUpdateFollow = false;
-	//followDistance = 1;
 
 	eventCheck = 0;
-	//eventCheckAttacking = 0;
 	attackedCreature = NULL;
 	lastHitCreature = 0;
-	internalDefense = true;
-	internalArmor = true;
+	//internalDefense = true;
+	//internalArmor = true;
+	blockCount = 0;
 	blockTicks = 0;
 }
 
@@ -168,10 +167,11 @@ void Creature::onThink(uint32_t interval)
 
 	blockTicks += interval;
 
-	if(blockTicks >= 1500){
+	if(blockTicks >= 1000){
+		blockCount = std::min((uint32_t)blockCount + 1, (uint32_t)2);
 		blockTicks = 0;
-		internalDefense = true;
-		internalArmor = true;
+		//internalDefense = true;
+		//internalArmor = true;
 	}
 
 	onAttacking(interval);
@@ -491,29 +491,34 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 		blockType = BLOCK_IMMUNITY;
 	}
 
-	if(blockType == BLOCK_NONE && internalDefense && checkDefense){
-		int32_t defense = getDefense();
-		defense = defense + (defense * defenseStrength) / 100;
+	if((checkDefense || checkArmor) && blockCount > 0){
+		--blockCount;
 
-		damage = damage - defense;
-		if(damage <= 0){
-			damage = 0;
-			blockType = BLOCK_DEFENSE;
-			internalDefense = false;
-			onDefenseBlock(true);
+		//if(blockType == BLOCK_NONE && internalDefense && checkDefense){
+		if(blockType == BLOCK_NONE && checkDefense){
+			int32_t defense = getDefense();
+			defense = defense + (defense * defenseStrength) / 100;
+
+			damage = damage - defense;
+			if(damage <= 0){
+				damage = 0;
+				blockType = BLOCK_DEFENSE;
+				//internalDefense = false;
+				//onDefenseBlock(true);
+			}
 		}
-	}
-	
-	if(blockType == BLOCK_NONE && internalArmor && checkArmor){
-		internalArmor = false;
+		
+		//if(blockType == BLOCK_NONE && internalArmor && checkArmor){
+		if(blockType == BLOCK_NONE && checkArmor){
+			int32_t armor = getArmor();
+			//internalArmor = false;
 
-		int32_t armor = getArmor();
-
-		damage -= armor;
-		if(damage <= 0){
-			damage = 0;
-			blockType = BLOCK_ARMOR;
-			onArmorBlock(true);
+			damage -= armor;
+			if(damage <= 0){
+				damage = 0;
+				blockType = BLOCK_ARMOR;
+				//onArmorBlock(true);
+			}
 		}
 	}
 
