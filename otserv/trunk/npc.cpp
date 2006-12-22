@@ -46,14 +46,16 @@ NpcScriptInterface* Npc::m_scriptInterface = NULL;
 Npc::Npc(const std::string& _name) :
 Creature()
 {
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	if(!m_scriptInterface){
-		 m_scriptInterface = new NpcScriptInterface();
+		m_scriptInterface = new NpcScriptInterface();
+		m_scriptInterface->loadNpcLib(std::string(datadir + "npc/scripts/lib/npc.lua"));
 	}
+	
 	m_npcEventHandler = NULL;
 	loaded = true;
 	name = _name;
 
-	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
 	std::string scriptname;
 
@@ -357,7 +359,7 @@ bool NpcScriptInterface::loadNpcLib(std::string file)
 		return true;
 		
 	if(loadFile(file) == -1){
-		std::cout << "Warning: [NpcScriptInterface::loadNpcLib] Can not load actions " << file << std::endl;
+		std::cout << "Warning: [NpcScriptInterface::loadNpcLib] Can not load " << file  << std::endl;
 		return false;
 	}
 		
@@ -556,11 +558,6 @@ NpcScript::NpcScript(std::string file, Npc* npc) :
 NpcEventsHandler(npc)
 {
 	m_scriptInterface = npc->getScriptInterface();
-	//load npc libs
-	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
-	if(m_scriptInterface->loadFile(std::string(datadir + "npc/scripts/lib/npc.lua")) == -1){
-		std::cout << "Warning: [NpcScript::NpcScript] Can not load npc/scripts/lib/npc.lua" << std::endl;
-	}
 	
 	if(m_scriptInterface->loadFile(file) == -1){
 		std::cout << "Warning: [NpcScript::NpcScript] Can not load script. " << file << std::endl;
