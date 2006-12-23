@@ -24,6 +24,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <map>
 #include "enums.h"
 
 struct Outfit{

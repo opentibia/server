@@ -1285,7 +1285,7 @@ void Player::addExperience(uint32_t exp)
 		g_game.addCreatureHealth(this);
 
 		std::stringstream levelMsg;
-		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
+		levelMsg << "You advanced from level " << prevLevel << " to level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 	}
 
