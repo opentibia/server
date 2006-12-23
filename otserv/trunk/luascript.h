@@ -355,6 +355,8 @@ protected:
 	static int luaIsMoveable(lua_State *L);
 	
 	static int luaGetPlayerByName(lua_State *L);
+	static int luaGetPlayerGUID(lua_State *L);
+	static int luaGetPlayerGUIDByName(lua_State *L);
 	
 	//container
 	static int luaGetContainerSize(lua_State *L);

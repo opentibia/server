@@ -898,7 +898,11 @@ void LuaScriptInterface::registerFunctions()
 
 	//getPlayerByName(name)
 	lua_register(m_luaState, "getPlayerByName", LuaScriptInterface::luaGetPlayerByName);
-	
+	//getPlayerGUID(cid)
+	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
+	//getPlayerGUIDByName(name)
+	lua_register(m_luaState, "getPlayerGUIDByName", LuaScriptInterface::luaGetPlayerGUIDByName);
+
 	//getContainerSize(uid)
 	lua_register(m_luaState, "getContainerSize", LuaScriptInterface::luaGetContainerSize);
 	//getContainerCap(uid)
@@ -3636,6 +3640,50 @@ int LuaScriptInterface::luaGetPlayerByName(lua_State *L)
 	
 }
 
+int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
+{
+	//getPlayerGUIDByName(name)
+	const char* name = popString(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Player* player = g_game.getPlayerByName(name);
+	uint32_t value = LUA_NULL;
+
+	if(player){
+		value = player->getGUID();
+	}
+	else{
+		player = new Player(name, NULL);
+		if(IOPlayer::instance()->loadPlayer(player, name)){
+			value = player->getGUID();
+		}
+
+		delete player;
+	}
+
+	lua_pushnumber(L, value);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerGUID(lua_State *L)
+{
+	//getPlayerGUID(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Player* player = env->getPlayerByUID(cid);
+	uint32_t value = LUA_NULL;
+
+	if(player){
+		value = player->getGUID();
+	}
+
+	lua_pushnumber(L, value);
+	return 1;	
+}
+
 int LuaScriptInterface::luaGetContainerSize(lua_State *L)
 {
 	//getContainerSize(uid)
@@ -3780,7 +3828,7 @@ int LuaScriptInterface::luaDoPlayerAddOutfit(lua_State *L)
 	//doPlayerAddOutfit(cid, looktype, addon)
 	int addon = (int)popNumber(L);
 	int looktype = (int)popNumber(L);
-	uint32_t cid = popNumber(L);	
+	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
