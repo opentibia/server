@@ -105,7 +105,7 @@ void MonsterType::createLoot(Container* corpse)
 		Item* tmpItem = createLootItem(*it);
 		if(tmpItem){
 			//check containers
-			if(Container* container = dynamic_cast<Container*>(tmpItem)){
+			if(Container* container = tmpItem->getContainer()){
 				createLootContainer(container, *it);
 				if(container->size() == 0){
 					delete container;
@@ -126,20 +126,10 @@ void MonsterType::createLoot(Container* corpse)
 Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 {
 	Item* tmpItem = NULL;
-	if(Item::items[lootBlock.id].stackable == true){
+	if(Item::items[lootBlock.id].stackable){
 		uint32_t randvalue = Monsters::getLootRandom();
-		uint32_t n = 1;
 		if(randvalue < lootBlock.chance){
-			/*if(randvalue < lootBlock.chancemax){
-				n = lootBlock.countmax;
-			}
-			else{
-				//if chancemax < randvalue < chance1
-				n = (unsigned char)(randvalue % lootBlock.countmax + 1);
-			}
-			*/
-
-			n = (unsigned char)(randvalue % lootBlock.countmax + 1);
+			uint32_t n = randvalue % lootBlock.countmax + 1;
 			tmpItem = Item::CreateItem(lootBlock.id, n);
 		}
 	}
@@ -153,21 +143,23 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 
 void MonsterType::createLootContainer(Container* parent, const LootBlock& lootblock)
 {
-	LootItems::const_iterator it;
-	for(it = lootblock.childLoot.begin(); it != lootblock.childLoot.end(); it++){
-		Item* tmpItem = createLootItem(*it);
-		if(tmpItem){
-			if(Container* container = dynamic_cast<Container*>(tmpItem)){
-				createLootContainer(container, *it);
-				if(container->size() == 0){
-					delete container;
+	if(parent->size() < parent->capacity()){
+		LootItems::const_iterator it;
+		for(it = lootblock.childLoot.begin(); it != lootblock.childLoot.end(); it++){
+			Item* tmpItem = createLootItem(*it);
+			if(tmpItem){
+				if(Container* container = dynamic_cast<Container*>(tmpItem)){
+					createLootContainer(container, *it);
+					if(container->size() == 0){
+						delete container;
+					}
+					else{
+						parent->__internalAddThing(dynamic_cast<Thing*>(container));
+					}
 				}
 				else{
-					parent->__internalAddThing(dynamic_cast<Thing*>(container));
+					parent->__internalAddThing(tmpItem);
 				}
-			}
-			else{
-				parent->__internalAddThing(tmpItem);
 			}
 		}
 	}
