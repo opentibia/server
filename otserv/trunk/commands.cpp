@@ -322,19 +322,7 @@ bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, cons
 bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::string& param)
 {	
 	Player* playerBan = game->getPlayerByName(param);
-	if(playerBan) {
-		/*
-		MagicEffectClass me;
-		
-		me.animationColor = 0xB4;
-		me.damageEffect = NM_ME_MAGIC_BLOOD;
-		me.maxDamage = (playerBan->health + playerBan->mana)*10;
-		me.minDamage = (playerBan->health + playerBan->mana)*10;
-		me.offensive = true;
-
-		game->creatureMakeMagic(NULL, playerBan->getPosition(), &me);
-		*/
-
+	if(playerBan){
 		Player* player = creature->getPlayer();
 		if(player && player->getAccessLevel() <= playerBan->getAccessLevel()){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot ban this player.");
