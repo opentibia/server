@@ -2465,7 +2465,7 @@ int32_t Player::getGainedExperience(Creature* attacker) const
 				int32_t c = getExperience();
 				
 				int32_t result = std::max((int32_t)0, (int32_t)std::floor( getDamageRatio(attacker) * ((double)(1 - (((double)a / b)))) * 0.05 * c ) );
-				return result;
+				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
 		}
 	}
 
