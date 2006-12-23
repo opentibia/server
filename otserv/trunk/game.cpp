@@ -2543,7 +2543,7 @@ void Game::checkWalk(unsigned long creatureId)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkWalk");
 
 	Creature* creature = getCreatureByID(creatureId);
-	if(creature){
+	if(creature && creature->getHealth() > 0){
 		creature->onWalk();
 		flushSendBuffers();
 	}
