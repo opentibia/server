@@ -3645,8 +3645,6 @@ int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
 	//getPlayerGUIDByName(name)
 	const char* name = popString(L);
 	
-	ScriptEnviroment* env = getScriptEnv();
-	
 	Player* player = g_game.getPlayerByName(name);
 	uint32_t value = LUA_NULL;
 
@@ -3654,12 +3652,11 @@ int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
 		value = player->getGUID();
 	}
 	else{
-		player = new Player(name, NULL);
-		if(IOPlayer::instance()->loadPlayer(player, name)){
-			value = player->getGUID();
+		unsigned long guid;
+		std::string strName(name);
+		if(IOPlayer::instance()->getGuidByName(guid, strName)){
+			value = guid;
 		}
-
-		delete player;
 	}
 
 	lua_pushnumber(L, value);
