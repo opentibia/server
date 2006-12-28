@@ -237,7 +237,7 @@ bool Monsters::reload()
 	return loadFromXml(datadir, true);
 }
 
-ConditionDamage* getDamageCondition(ConditionType_t conditionType, int32_t maxDamage, int32_t minDamage, int32_t startDamage)
+ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType, int32_t maxDamage, int32_t minDamage, int32_t startDamage)
 {
 	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, 0, 0));
 	condition->setParam(CONDITIONPARAM_MINVALUE, minDamage);
@@ -248,7 +248,7 @@ ConditionDamage* getDamageCondition(ConditionType_t conditionType, int32_t maxDa
 	return condition;
 }
 
-bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
+bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 {
 	sb.chance = 100;
 	sb.speed = 2000;

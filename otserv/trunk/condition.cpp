@@ -1037,7 +1037,7 @@ void ConditionDamage::generateDamageList(int32_t amount, int32_t start, std::lis
 
 	for(int32_t i = start; i > 0; --i){
 		int32_t n = start + 1 - i;
-		med = std::ceil((((float) n) / start) * amount);
+		med = (int32_t)std::ceil((((float) n) / start) * amount);
 
 		do{
 			sum += i;

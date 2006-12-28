@@ -146,6 +146,9 @@ public:
 	static uint32_t getLootRandom();
 	
 private:
+	ConditionDamage* getDamageCondition(ConditionType_t conditionType, int32_t maxDamage, int32_t minDamage, int32_t startDamage);
+	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb);
+
 	MonsterType* loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
 
 	bool loadLootContainer(xmlNodePtr, LootBlock&);
