@@ -1325,17 +1325,6 @@ void Protocol79::sendTextMessage(MessageClasses mclass, const std::string& messa
 	WriteBuffer(msg);
 }
 
-/*
-void Protocol79::sendTextMessage(MessageClasses mclass, const std::string& message,
-	const Position& pos, unsigned char type)
-{
-	NetworkMessage msg;
-	AddMagicEffect(msg,pos,type);
-	AddTextMessage(msg,mclass, message);
-	WriteBuffer(msg);
-}
-*/
-
 void Protocol79::sendClosePrivate(uint16_t channelId)
 {
 	NetworkMessage msg;
@@ -1906,6 +1895,13 @@ void Protocol79::sendVIP(unsigned long guid, const std::string& name, bool isOnl
 	msg.AddU32(guid);
 	msg.AddString(name);
 	msg.AddByte(isOnline == true ? 1 : 0);
+	WriteBuffer(msg);
+}
+
+void Protocol79::sendReLoginWindow()
+{
+	NetworkMessage msg;
+	msg.AddByte(0x28);
 	WriteBuffer(msg);
 }
 

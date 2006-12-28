@@ -219,6 +219,8 @@ public:
 	ConditionDamage(ConditionId_t _id, ConditionType_t _type);
 	virtual ~ConditionDamage(){};
 	
+	static void generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list);
+
 	virtual bool startCondition(Creature* creature);
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, EndCondition_t reason);
@@ -239,8 +241,14 @@ public:
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
+	int32_t maxDamage;
+	int32_t minDamage;
+	int32_t startDamage;
+
 	bool delayed;
 	uint32_t owner;
+
+	bool init();
 
 	typedef std::list<IntervalInfo> DamageList;
 	DamageList damageList;

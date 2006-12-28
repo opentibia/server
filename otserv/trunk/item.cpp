@@ -221,6 +221,48 @@ uint32_t Item::getDefaultDuration() const
 
 bool Item::unserialize(xmlNodePtr nodeItem)
 {
+	int intValue;
+	std::string strValue;
+
+	if(readXMLInteger(nodeItem, "id", intValue)){
+		id = intValue;
+	}
+	else{
+		return false;
+	}
+
+	if(readXMLInteger(nodeItem, "count", intValue)){
+		setItemCountOrSubtype(intValue);
+	}
+
+	if(readXMLString(nodeItem, "special_description", strValue)){
+		setSpecialDescription(strValue);
+	}
+
+	if(readXMLString(nodeItem, "text", strValue)){
+		setText(strValue);
+	}
+
+	if(readXMLInteger(nodeItem, "actionId", intValue)){
+		setActionId(intValue);
+	}
+			
+	if(readXMLInteger(nodeItem, "uniqueId", intValue)){
+		setUniqueId(intValue);
+	}
+
+	if(readXMLInteger(nodeItem, "duration", intValue)){
+		setDuration(intValue);
+	}
+
+	if(readXMLInteger(nodeItem, "decayState", intValue)){
+		ItemDecayState_t decayState = (ItemDecayState_t)intValue;
+		if(decayState != DECAYING_FALSE){
+			setDecaying(DECAYING_PENDING);
+		}
+	}
+
+	/*
 	char* nodeValue;
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "id");
 	if(nodeValue){
@@ -275,6 +317,7 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 
 		xmlFreeOTSERV(nodeValue);
 	}
+	*/
 	
 	return true;
 }

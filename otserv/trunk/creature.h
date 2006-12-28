@@ -282,7 +282,13 @@ protected:
 
 	//combat variables
 	Creature* attackedCreature;
-	typedef std::map<uint32_t, int32_t> DamageMap;
+
+	struct damageBlock_t{
+		int32_t total;
+		int64_t ticks;
+	};
+
+	typedef std::map<uint32_t, damageBlock_t> DamageMap;
 	DamageMap damageMap;
 	uint32_t lastHitCreature;
 	uint32_t blockCount;

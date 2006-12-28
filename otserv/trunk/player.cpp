@@ -841,13 +841,28 @@ void Player::sendStats()
 	//update level and magLevel percents
 	if(lastSentStats.experience != getExperience() || lastSentStats.level != level){
 		uint32_t currentExpLevel = getExpForLv(level);
-		uint32_t tmpVar = (100*(experience - currentExpLevel)) / std::max((int32_t)1, (int32_t)(getExpForLv(level + 1) - currentExpLevel));
-		level_percent = std::min((uint32_t)100, tmpVar);
+		int32_t percent = (100*(experience - currentExpLevel)) / std::max((int32_t)1, (int32_t)(getExpForLv(level + 1) - currentExpLevel));
+
+		if(percent < 0){
+			percent = 0;
+		}
+		else if(percent > 100){
+			percent = 100;
+		}
+
+		level_percent = percent;
 	}
 			
 	if(lastSentStats.manaSpent != manaSpent || lastSentStats.magLevel != magLevel){
-		int32_t tmpVar = (100*manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
-		maglevel_percent = std::min((int32_t)100, tmpVar);
+		int32_t percent = (100 * manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
+		if(percent < 0){
+			percent = 0;
+		}
+		else if(percent > 100){
+			percent = 100;
+		}
+
+		maglevel_percent = percent;
 	}
 			
 	//save current stats 
@@ -1177,22 +1192,6 @@ bool Player::NeedUpdateStats()
 void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
-
-	/*
-	if(!isInPz()){
-		if(food > 1000){
-			food -= interval;
-
-			gainManaTick();
-			gainHealthTick();
-		}
-	}
-
-	if(NeedUpdateStats()){
-		sendStats();
-	}
-	*/
-
 	sendPing();
 
 #ifdef __SKULLSYSTEM__
@@ -1215,7 +1214,7 @@ void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t da
 
 	if(attacker){
 		ss << " due to an attack by " << attacker->getNameDescription();
-		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
+		//sendCreatureSquare(attacker, SQ_COLOR_BLACK);
 	}
 
 	ss << ".";
@@ -1355,6 +1354,10 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
 	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+
+	if(attacker){
+		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
+	}
 
 	if(blockType != BLOCK_NONE){
 		if(blockType != BLOCK_IMMUNITY){
@@ -1509,7 +1512,6 @@ void Player::die()
 	Creature::die();
 
 	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
-
 	loginPosition = masterPos;
 
 	//Magic level loss
@@ -1580,6 +1582,8 @@ void Player::die()
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
 		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 	}
+
+	client->sendReLoginWindow();
 }
 
 Item* Player::getCorpse()
@@ -1619,6 +1623,18 @@ void Player::preSave()
 		health = healthMax;
 		mana = manaMax;
 	}
+}
+
+void Player::addExhaustionTicks()
+{
+	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, g_game.getExhaustionTicks(), 0);
+	addCondition(condition);
+}
+
+void Player::addInFightTicks()
+{
+	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, g_game.getInFightTicks(), 0);
+	addCondition(condition);
 }
 
 void Player::addDefaultRegeneration(uint32_t addTicks)
@@ -2584,6 +2600,7 @@ void Player::onEndCondition(ConditionType_t type)
 	sendIcons();
 
 	if(type == CONDITION_INFIGHT){
+		damageMap.clear();
 		pzLocked = false;
 
 #ifdef __SKULLSYSTEM__
@@ -2647,10 +2664,7 @@ void Player::onAttackedCreature(Creature* target)
 			}
 		}
 
-		if(Weapons::weaponInFightTime != 0){
-			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
-			addCondition(condition);
-		}
+		addInFightTicks();
 	}
 }
 
@@ -2659,10 +2673,7 @@ void Player::onAttacked()
 	Creature::onAttacked();
 
 	if(getAccessLevel() == 0){
-		if(Weapons::weaponInFightTime != 0){
-			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
-			addCondition(condition);
-		}
+		addInFightTicks();
 	}
 }
 
@@ -2683,10 +2694,12 @@ void Player::onKilledCreature(Creature* target)
 				addUnjustifiedDead(targetPlayer);
 			}
 #endif
-
-			pzLocked = true;
-			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
-			addCondition(condition);
+			
+			if(hasCondition(CONDITION_INFIGHT)){
+				pzLocked = true;
+				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
+				addCondition(condition);
+			}
 		}
 	}
 }
@@ -2940,15 +2953,38 @@ void Player::setSkillsPercents()
 {
 	uint32_t percent = 0;
 
-	percent = (100*manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel+1)));
-	maglevel_percent = std::min((uint32_t)100, percent);
+	percent = (100 * manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
+	if(percent < 0){
+		percent = 0;
+	}
+	else if(percent > 100){
+		percent = 100;
+	}
+
+	maglevel_percent = percent;
 
 	percent = (100*(getExperience() - getExpForLv(getLevel()))) /
 		std::max((int32_t)1, (int32_t)((getExpForLv(getLevel() + 1) - getExpForLv(getLevel()))));
-	level_percent = std::min((uint32_t)100, percent);
+
+	if(percent < 0){
+		percent = 0;
+	}
+	else if(percent > 100){
+		percent = 100;
+	}
+
+	level_percent = percent;
 
 	for(unsigned int i = SKILL_FIRST; i < SKILL_LAST; ++i){
 		percent = (100*skills[i][SKILL_TRIES]) / std::max((int32_t)1, (int32_t)(vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]+1)));
-		skills[i][SKILL_PERCENT] = std::min((uint32_t)100, percent);
+
+		if(percent < 0){
+			percent = 0;
+		}
+		else if(percent > 100){
+			percent = 100;
+		}
+
+		skills[i][SKILL_PERCENT] = percent;
 	}
 }

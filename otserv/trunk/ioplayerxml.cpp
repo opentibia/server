@@ -368,20 +368,31 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				xmlNodePtr slotNode = p->children;
 				while(slotNode){
 					if(xmlStrcmp(slotNode->name, (const xmlChar*)"slot") == 0){
-						int itemId = 0;
-						int slotId = 0;
+						int32_t itemId = 0;
+						int32_t slotId = 0;
 
 						if(readXMLInteger(slotNode, "slotid", intValue)){
 							slotId = intValue;
 						}
-						else
+						else{
 							isLoaded = false;
+						}
 
 						xmlNodePtr itemNode = slotNode->children;
 						while(itemNode){
-							if(readXMLInteger(itemNode, "id", intValue)){
-								itemId = intValue;
-								break;
+							if(xmlStrcmp(itemNode->name, (const xmlChar*)"item") == 0){
+								if(readXMLInteger(itemNode, "id", intValue)){
+									itemId = intValue;
+
+									Item* item = Item::CreateItem(itemId);
+									if(item){
+										item->unserialize(itemNode);
+										player->__internalAddThing(slotId, item);
+									}
+								}
+								else{
+									isLoaded = false;
+								}
 							}
 
 							itemNode = itemNode->next;
@@ -392,13 +403,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 						}
 						else
 							isLoaded = false;
-						*/
 
 						Item* item = Item::CreateItem(itemId);
 						if(item){
 							item->unserialize(slotNode->children);
 							player->__internalAddThing(slotId, item);
 						}
+						*/
 					}
 
 					slotNode = slotNode->next;
@@ -408,20 +419,36 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"depot") == 0){
-						int depotId = 0;
-						int itemId = 0;
+						int32_t depotId = 0;
+						int32_t itemId = 0;
 
 						if(readXMLInteger(tmpNode, "depotid", intValue)){
 							depotId = intValue;
 						}
-						else
+						else{
 							isLoaded = false;
+						}
 
 						xmlNodePtr itemNode = tmpNode->children;
 						while(itemNode){
-							if(readXMLInteger(itemNode, "id", intValue)){
-								itemId = intValue;
-								break;
+							if(xmlStrcmp(itemNode->name, (const xmlChar*)"item") == 0){
+								if(readXMLInteger(itemNode, "id", intValue)){
+									itemId = intValue;
+
+									if(itemId != 0){
+										Depot* myDepot = new Depot(itemId);
+										myDepot->useThing2();
+										myDepot->unserialize(itemNode);
+										myDepot->setDepotId(depotId);
+
+										player->addDepot(myDepot, depotId);
+									}
+
+									break;
+								}
+								else{
+									isLoaded = false;
+								}
 							}
 
 							itemNode = itemNode->next;
@@ -433,7 +460,6 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 						}
 						else
 							isLoaded = false;
-						*/
 
 						if(itemId != 0){
 							Depot* myDepot = new Depot(itemId);
@@ -442,6 +468,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 
 							player->addDepot(myDepot, depotId);
 						}
+						*/
 					}
 
 					tmpNode = tmpNode->next;

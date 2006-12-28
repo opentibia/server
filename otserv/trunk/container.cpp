@@ -54,7 +54,8 @@ bool Container::unserialize(xmlNodePtr nodeItem)
 			return true; //container is empty
 		}
 	  
-		char* nodeValue;
+		//char* nodeValue;
+		int intValue;
 
 		while(nodeContainer){
 			//load container items
@@ -62,13 +63,23 @@ bool Container::unserialize(xmlNodePtr nodeItem)
 				xmlNodePtr nodeContainerItem = nodeContainer->children;
 				while(nodeContainerItem){
 					if(xmlStrcmp(nodeContainerItem->name, (const xmlChar*)"item") == 0){
-						unsigned int id = 0;
+						int32_t id = 0;
+
+						if(readXMLInteger(nodeContainerItem, "id", intValue)){
+							id = intValue;
+						}
+						else{
+							return false;
+						}
+
+						/*
 						if(nodeValue = (char*)xmlGetProp(nodeContainerItem, (const xmlChar *) "id")){
 							id = atoi(nodeValue);
 							xmlFreeOTSERV(nodeValue);
 						}
 						else
 							return false;
+						*/
 
 						Item* item = Item::CreateItem(id);
 						if(!item){

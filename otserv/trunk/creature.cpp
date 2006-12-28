@@ -418,10 +418,13 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 	*_lastHitCreature = g_game.getCreatureByID(lastHitCreature);
 
 	int32_t mostDamage = 0;
+	damageBlock_t db;
 	for(DamageMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		if((*it).second > mostDamage){
+		db = it->second;
+
+		if((db.total > mostDamage && (OTSYS_TIME() - db.ticks <= g_game.getInFightTicks()))){
 			if(*_mostDamageCreature = g_game.getCreatureByID((*it).first)){
-				mostDamage = (*it).second;
+				mostDamage = db.total;
 			}
 		}
 	}
@@ -494,7 +497,6 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 	if((checkDefense || checkArmor) && blockCount > 0){
 		--blockCount;
 
-		//if(blockType == BLOCK_NONE && internalDefense && checkDefense){
 		if(blockType == BLOCK_NONE && checkDefense){
 			int32_t defense = getDefense();
 			defense = defense + (defense * defenseStrength) / 100;
@@ -503,21 +505,16 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 			if(damage <= 0){
 				damage = 0;
 				blockType = BLOCK_DEFENSE;
-				//internalDefense = false;
-				//onDefenseBlock(true);
 			}
 		}
 		
-		//if(blockType == BLOCK_NONE && internalArmor && checkArmor){
 		if(blockType == BLOCK_NONE && checkArmor){
 			int32_t armor = getArmor();
-			//internalArmor = false;
 
 			damage -= armor;
 			if(damage <= 0){
 				damage = 0;
 				blockType = BLOCK_ARMOR;
-				//onArmorBlock(true);
 			}
 		}
 	}
@@ -604,11 +601,14 @@ double Creature::getDamageRatio(Creature* attacker) const
 	int32_t totalDamage = 0;
 	int32_t attackerDamage = 0;
 
+	damageBlock_t db;
 	for(DamageMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		totalDamage += (*it).second;
+		db = it->second;
 
-		if((*it).first == attacker->getID()){
-			attackerDamage += (*it).second;
+		totalDamage += db.total;
+
+		if(it->first == attacker->getID()){
+			attackerDamage += db.total;
 		}
 	}
 
@@ -625,8 +625,21 @@ bool Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
 {
 	if(damagePoints > 0){
 		uint32_t attackerId = (attacker ? attacker->getID() : 0);
+		//damageMap[attackerId] += damagePoints;
 
-		damageMap[attackerId] += damagePoints;
+		DamageMap::iterator it = damageMap.find(attackerId);
+
+		if(it == damageMap.end()){
+			damageBlock_t db;
+			db.ticks = OTSYS_TIME();
+			db.total = damagePoints;
+			damageMap[attackerId] = db;
+		}
+		else{
+			it->second.total += damagePoints;
+			it->second.ticks = OTSYS_TIME();
+		}
+
 		lastHitCreature = attackerId;
 	}
 

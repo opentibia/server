@@ -656,6 +656,9 @@ Condition(_id, _type, 0)
 {
 	delayed = false;
 	owner = 0;
+	minDamage = 0;
+	maxDamage = 0;
+	startDamage = 0;
 }
 
 bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
@@ -675,6 +678,21 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 			delayed = (value != 0);
 			return true;
 			break;
+		}
+
+		case CONDITIONPARAM_MAXVALUE:
+		{
+			maxDamage = std::abs(value);
+		}
+
+		case CONDITIONPARAM_MINVALUE:
+		{
+			minDamage = std::abs(value);
+		}
+
+		case CONDITIONPARAM_STARTVALUE:
+		{
+			startDamage = std::abs(value);
 		}
 
 		default:
@@ -834,8 +852,43 @@ void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 	}
 }
 
+bool ConditionDamage::init()
+{
+	if(damageList.empty()){
+		int32_t amount = random_range(minDamage, maxDamage);
+		if(startDamage > maxDamage){
+			startDamage = maxDamage;
+		}
+		else if(startDamage == 0){
+			startDamage = std::max((int32_t)1, (int32_t)std::ceil(((float)amount / 20.0)));
+		}
+
+		std::list<int32_t> list;
+		ConditionDamage::generateDamageList(amount, startDamage, list);
+
+		for(std::list<int32_t>::iterator it = list.begin(); it != list.end(); ++it){
+			addDamage(1, 2000, -*it);
+		}
+	}
+
+	return (!damageList.empty());
+}
 bool ConditionDamage::startCondition(Creature* creature)
 {
+	if(!init()){
+		return false;
+	}
+
+	if(!delayed){
+		int32_t damage = 0;
+		if(getNextDamage(damage)){
+			return doDamage(creature, damage);
+		}
+	}
+
+	return true;
+
+	/*
 	if(delayed){
 		return true;
 	}
@@ -846,6 +899,7 @@ bool ConditionDamage::startCondition(Creature* creature)
 	}
 
 	return false;
+	*/
 }
 
 bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
@@ -936,12 +990,18 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 		const ConditionDamage& conditionDamage = static_cast<const ConditionDamage&>(*addCondition);
 
 		owner = conditionDamage.owner;
+		maxDamage = conditionDamage.maxDamage;
+		minDamage = conditionDamage.minDamage;
+		startDamage = conditionDamage.startDamage;
+
 		damageList.clear();
 		damageList = conditionDamage.damageList;
-
-		int32_t damage = 0;
-		if(getNextDamage(damage)){
-			doDamage(creature, damage);
+		
+		if(init()){
+			int32_t damage = 0;
+			if(getNextDamage(damage)){
+				doDamage(creature, damage);
+			}
 		}
 	}
 }
@@ -966,6 +1026,28 @@ uint32_t ConditionDamage::getIcons() const
 	}
 
 	return 0;
+}
+
+void ConditionDamage::generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list)
+{
+	amount = std::abs(amount);
+	int32_t sum = 0;
+	int32_t med = 0;
+	float x1, x2;
+
+	for(int32_t i = start; i > 0; --i){
+		int32_t n = start + 1 - i;
+		med = std::ceil((((float) n) / start) * amount);
+
+		do{
+			sum += i;
+			list.push_back(i);
+
+			x1 = std::fabs(1.0 - (((float)sum) + i) / med);
+			x2 = std::fabs(1.0 - (((float)sum) / med));
+
+		}while(x1 < x2);
+	}
 }
 
 ConditionSpeed::ConditionSpeed(ConditionId_t _id, ConditionType_t _type, int32_t _ticks, int32_t changeSpeed) :

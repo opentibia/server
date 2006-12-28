@@ -39,14 +39,9 @@ extern Monsters g_monsters;
 extern Vocations g_vocations;
 extern ConfigManager g_config;
 
-int32_t Spells::spellExhaustionTime = 0;
-int32_t Spells::spellInFightTime = 0;
-
 Spells::Spells():
 m_scriptInterface("Spell Interface")
 {
-	spellExhaustionTime = g_config.getNumber(ConfigManager::EXHAUSTED);
-	spellInFightTime = g_config.getNumber(ConfigManager::PZ_LOCKED);
 	m_scriptInterface.initState();
 }
 
@@ -579,13 +574,11 @@ void Spell::postCastSpell(Player* player) const
 	}
 
 	if(exhaustion){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, Spells::spellExhaustionTime, 0);
-		player->addCondition(condition);
+		player->addExhaustionTicks();
 	}
 	
-	if(isAggressive && Spells::spellInFightTime != 0){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, Spells::spellInFightTime, 0);
-		player->addCondition(condition);
+	if(isAggressive){
+		player->addInFightTicks();
 	}
 
 	int32_t manaCost = getManaCost(player);

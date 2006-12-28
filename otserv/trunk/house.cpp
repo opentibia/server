@@ -603,12 +603,19 @@ bool Door::unserialize(xmlNodePtr nodeItem)
 {
 	bool ret = Item::unserialize(nodeItem);
 
+	int intValue;
+	if(readXMLInteger(nodeItem, "doorId", intValue)){
+		setDoorId(doorId);
+	}
+
+	/*
 	char* nodeValue;
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "doorId");
 	if(nodeValue){
 		setDoorId(atoi(nodeValue));
 		xmlFreeOTSERV(nodeValue);
 	}
+	*/
 	
 	return ret;
 }

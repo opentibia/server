@@ -101,6 +101,8 @@ public:
   
 	void setWorldType(WorldType_t type);
 	WorldType_t getWorldType() const {return worldType;}
+	int32_t getInFightTicks() {return inFightTicks;}
+	int32_t getExhaustionTicks() {return exhaustionTicks;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index);
@@ -392,6 +394,8 @@ protected:
 	unsigned long eventIdCount;
 
 	uint32_t maxPlayers;
+	uint32_t inFightTicks;
+	uint32_t exhaustionTicks;
 
 	GameState_t gameState;
 	WorldType_t worldType;

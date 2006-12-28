@@ -166,8 +166,6 @@ private:
 	void sendCreatureInvisible(const Creature* creature);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
-	//void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
-	//	unsigned char type);
 	
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
@@ -178,6 +176,7 @@ private:
 	void sendVIPLogIn(unsigned long guid);
 	void sendVIPLogOut(unsigned long guid);
 	void sendVIP(unsigned long guid, const std::string& name, bool isOnline);
+	void sendReLoginWindow();
 	
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(const LightInfo& lightInfo);

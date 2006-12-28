@@ -136,6 +136,9 @@ int Game::loadMap(std::string filename, std::string filekind)
 	}
 
 	maxPlayers = g_config.getNumber(ConfigManager::MAX_PLAYERS);
+	inFightTicks = g_config.getNumber(ConfigManager::PZ_LOCKED);
+	exhaustionTicks = g_config.getNumber(ConfigManager::EXHAUSTED);
+
 	return map->loadMap(filename, filekind);
 }
 

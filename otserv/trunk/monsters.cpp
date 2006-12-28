@@ -237,26 +237,15 @@ bool Monsters::reload()
 	return loadFromXml(datadir, true);
 }
 
-void generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list)
+ConditionDamage* getDamageCondition(ConditionType_t conditionType, int32_t maxDamage, int32_t minDamage, int32_t startDamage)
 {
-	amount = std::abs(amount);
-	int32_t sum = 0;
-	int32_t med = 0;
-	float x1, x2;
+	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, 0, 0));
+	condition->setParam(CONDITIONPARAM_MINVALUE, minDamage);
+	condition->setParam(CONDITIONPARAM_MAXVALUE, maxDamage);
+	condition->setParam(CONDITIONPARAM_STARTVALUE, startDamage);
+	condition->setParam(CONDITIONPARAM_DELAYED, 1);
 
-	for(int32_t i = start; i > 0; --i){
-		int32_t n = start + 1 - i;
-		med = (((float) n) / start) * amount;
-
-		do{
-			sum += i;
-			list.push_back(-i);
-
-			x1 = std::fabs(1.0 - (((float)sum) + i) / med);
-			x2 = std::fabs(1.0 - (((float)sum) / med));
-
-		}while(x1 < x2);
-	}
+	return condition;
 }
 
 bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
@@ -293,6 +282,13 @@ bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 
 	if(readXMLInteger(node, "max", intValue)){
 		sb.maxCombatValue = intValue;
+
+		//normalize values
+		if(std::abs(sb.minCombatValue) > std::abs(sb.maxCombatValue)){
+			int32_t value = sb.maxCombatValue;
+			sb.maxCombatValue = sb.minCombatValue;
+			sb.minCombatValue = value;
+		}
 	}
 
 	if(sb.spell = g_spells->getSpellByName(name)){
@@ -343,6 +339,35 @@ bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 				sb.minCombatValue = 0;
 				sb.maxCombatValue = -Weapons::getMaxWeaponDamage(skill, attack);
 			}
+		}
+		
+		ConditionType_t conditionType = CONDITION_NONE;
+		int32_t minDamage = 0;
+		int32_t maxDamage = 0;
+		int32_t startDamage = 0;
+
+		if(readXMLInteger(node, "fire", intValue)){
+			conditionType = CONDITION_FIRE;
+
+			minDamage = intValue;
+			maxDamage = intValue;
+		}
+		else if(readXMLInteger(node, "poison", intValue)){
+			conditionType = CONDITION_POISON;
+
+			minDamage = intValue;
+			maxDamage = intValue;
+		}
+		else if(readXMLInteger(node, "energy", intValue)){
+			conditionType = CONDITION_ENERGY;
+
+			minDamage = intValue;
+			maxDamage = intValue;
+		}
+
+		if(conditionType != CONDITION_NONE){
+			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage);
+			combat->setCondition(condition);
 		}
 
 		sb.range = 1;
@@ -465,24 +490,19 @@ bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 			conditionType = CONDITION_ENERGY;
 		}
 
-		int32_t maxDamage = sb.maxCombatValue;
-		int32_t startDamage = maxDamage / 20;
+		int32_t minDamage = std::abs(sb.minCombatValue);
+		int32_t maxDamage = std::abs(sb.maxCombatValue);
+		int32_t startDamage = 0;
 
 		if(readXMLInteger(node, "start", intValue)){
-			if(intValue > 0 && intValue <= std::abs(maxDamage)){
+			intValue = std::abs(intValue);
+
+			if(intValue <= minDamage){
 				startDamage = intValue;
 			}
 		}
 
-		std::list<int32_t> list;
-		generateDamageList(maxDamage, startDamage, list);
-
-		ConditionDamage* condition = dynamic_cast<ConditionDamage*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, 0, 0));
-
-		for(std::list<int32_t>::iterator it = list.begin(); it != list.end(); ++it){
-			condition->addDamage(1, 2000, *it);
-		}
-
+		Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage);
 		combat->setCondition(condition);
 	}
 	else{

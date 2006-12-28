@@ -32,15 +32,9 @@ extern Game g_game;
 extern Vocations g_vocations;
 extern ConfigManager g_config;
 
-int32_t Weapons::weaponExhaustionTime = 0;
-int32_t Weapons::weaponInFightTime = 0;
-
 Weapons::Weapons():
 m_scriptInterface("Weapon Interface")
 {
-	weaponExhaustionTime = g_config.getNumber(ConfigManager::EXHAUSTED);
-	weaponInFightTime = g_config.getNumber(ConfigManager::PZ_LOCKED);
-
 	m_scriptInterface.initState();
 }
 
@@ -203,15 +197,15 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	 	id = intValue;
 	}
 	else{
-		std::cout << "Error: [Weapon::configureSpell] Weapon without id." << std::endl;
+		std::cout << "Error: [Weapon::configureEvent] Weapon without id." << std::endl;
 		return false;
 	}
 
-	if(readXMLInteger(p, "lvl", intValue)){
+	if(readXMLInteger(p, "lvl", intValue) || readXMLInteger(p, "level", intValue)){
 	 	level = intValue;
 	}
 
-	if(readXMLInteger(p, "maglv", intValue)){
+	if(readXMLInteger(p, "maglv", intValue) || readXMLInteger(p, "maglevel", intValue)){
 	 	magLevel = intValue;
 	}
 
@@ -429,9 +423,8 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		player->addSkillAdvance(skillType, skillPoint);
 	}
 
-	if(exhaustion && Weapons::weaponExhaustionTime != 0){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, Weapons::weaponExhaustionTime, 0);
-		player->addCondition(condition);
+	if(exhaustion){
+		player->addExhaustionTicks();
 	}
 
 	int32_t manaCost = getManaCost(player);

@@ -240,6 +240,8 @@ public:
 	virtual int32_t getArmor() const;
 	virtual int32_t getDefense() const;
 
+	void addExhaustionTicks();
+	void addInFightTicks();
 	void addDefaultRegeneration(uint32_t addTicks);
 
 	virtual void die();
@@ -256,8 +258,6 @@ public:
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
-	//virtual void onDefenseBlock(bool blockedHit);
-	//virtual void onArmorBlock(bool blockedHit);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
@@ -488,7 +488,6 @@ protected:
 	int64_t lastAction;
 
 	bool pzLocked;
-	//int32_t blockCount;
 	int32_t bloodHitCount;
 	int32_t shieldBlockCount;
 	uint32_t skillPoint;
