@@ -750,21 +750,20 @@ bool IOPlayerXML::savePlayer(Player* player)
 	xmlAddChild(root, sn);
 
 	//Save the character
-	if(xmlSaveFile(filename.c_str(), doc)){
-		#ifdef __DEBUG__
+	//if(xmlSaveFile(filename.c_str(), doc)){
+	bool result = xmlSaveFormatFileEnc(filename.c_str(), doc, "UTF-8", 1);
+#ifdef __DEBUG__
+	if(result){
 		std::cout << "\tSaved character succefully!\n";
-		#endif
-
-		xmlFreeDoc(doc);
-		xmlMutexUnlock(xmlmutex);
-		return true;
 	}
 	else{
 		std::cout << "\tCouldn't save character =(\n";
-		xmlFreeDoc(doc);
-		xmlMutexUnlock(xmlmutex);
-		return false;
 	}
+#endif
+
+	xmlFreeDoc(doc);
+	xmlMutexUnlock(xmlmutex);
+	return result;
 }
 
 bool IOPlayerXML::getGuidByName(unsigned long& guid, std::string& name)

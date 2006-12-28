@@ -691,7 +691,9 @@ void Creature::onAttackedCreatureKilled(Creature* target)
 
 void Creature::onKilledCreature(Creature* target)
 {
-	//
+	if(getMaster()){
+		getMaster()->onKilledCreature(target);
+	}
 }
 
 void Creature::onGainExperience(int32_t gainExperience)

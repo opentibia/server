@@ -74,8 +74,30 @@ typedef bool (InstantSpellFunction)(const InstantSpell* spell, Creature* creatur
 typedef bool (ConjureSpellFunction)(const ConjureSpell* spell, Creature* creature, const std::string& param);
 typedef bool (RuneSpellFunction)(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo);
 
-class Spell
-{
+class BaseSpell{
+public:
+	BaseSpell() {};
+	virtual ~BaseSpell(){};
+
+	virtual bool castSpell(Creature* creature) = 0;
+	virtual bool castSpell(Creature* creature, Creature* target) = 0;
+};
+
+class CombatSpell : public BaseSpell{
+public:
+	CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection);
+	virtual ~CombatSpell(){};
+
+	virtual bool castSpell(Creature* creature);
+	virtual bool castSpell(Creature* creature, Creature* target);
+
+private:
+	bool needDirection;
+	bool needTarget;
+	Combat* combat;
+};
+
+class Spell : public BaseSpell{
 public:
 	Spell();
 	virtual ~Spell(){};
@@ -84,8 +106,8 @@ public:
 	
 	const std::string& getName() const {return name;}
 
-	virtual bool castSpell(Creature* creature) = 0;
-	virtual bool castSpell(Creature* creature, Creature* target) = 0;
+	//virtual bool castSpell(Creature* creature) = 0;
+	//virtual bool castSpell(Creature* creature, Creature* target) = 0;
 
 	void postCastSpell(Player* player) const;
 	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;

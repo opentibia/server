@@ -1121,7 +1121,7 @@ void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem)
 
 void Player::onRemoveInventoryItem(slots_t slot, Item* item)
 {
-	setItemAbility(slot, false);
+	//setItemAbility(slot, false);
 
 	if(tradeState != TRADE_TRANSFER){
 		checkTradeState(item);
@@ -1285,7 +1285,7 @@ void Player::addExperience(uint32_t exp)
 		g_game.addCreatureHealth(this);
 
 		std::stringstream levelMsg;
-		levelMsg << "You advanced from level " << prevLevel << " to level " << newLevel << ".";
+		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 	}
 

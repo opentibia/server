@@ -106,7 +106,6 @@ private:
 	bool internalUpdateTargetList;
 	bool isActive;
 	bool isWalkActive;
-	bool meleeBonusAttack;
 	bool spellBonusAttack;
 
 	int32_t minCombatValue;

@@ -1547,7 +1547,10 @@ bool Game::playerYell(Player* player, std::string& text)
 		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED);
 
 		std::transform(text.begin(), text.end(), text.begin(), upchar);
+		
+		internalCreatureSay(player, SPEAK_YELL, text);
 
+		/*
 		SpectatorVec list;
 		SpectatorVec::iterator it;
 
@@ -1564,6 +1567,7 @@ bool Game::playerYell(Player* player, std::string& text)
 		for(it = list.begin(); it != list.end(); ++it) {
 			(*it)->onCreatureSay(player, SPEAK_YELL, text);
 		}
+		*/
 	}
 	else{
 		isExhausted = true;
@@ -2401,8 +2405,12 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	//getSpectators(Range(creature->getPosition()), list);
-	getSpectators(list, creature->getPosition());
+	if(type == SPEAK_YELL || type == SPEAK_MONSTER_YELL){
+		getSpectators(list, creature->getPosition(), true, 18, 18, 14, 14);
+	}
+	else{
+		getSpectators(list, creature->getPosition());
+	}
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -2413,25 +2421,6 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onCreatureSay(creature, type, text);
-	}
-
-	return true;
-}
-
-bool Game::internalMonsterYell(Monster* monster, const std::string& text) 
-{
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-
-	//map->getSpectators(Range(monster->getPosition(), 18, 18, 14, 14), list);
-	getSpectators(list, monster->getPosition(), false, 18, 18, 14, 14);
-
-	//players
-	Player* tmpPlayer = NULL;
-	for(it = list.begin(); it != list.end(); ++it) {
-		if(tmpPlayer = (*it)->getPlayer()){
-			tmpPlayer->sendCreatureSay(monster, SPEAK_MONSTER1, text);
-		}
 	}
 
 	return true;
@@ -2694,6 +2683,10 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 	const Position& targetPos = target->getPosition();
 
 	if(healthChange > 0){
+		if(target->getHealth() <= 0){
+			return false;
+		}
+		
 		target->changeHealth(healthChange);
 	}
 	else{

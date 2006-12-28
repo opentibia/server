@@ -2042,8 +2042,8 @@ void Protocol79::AddCreatureSpeak(NetworkMessage& msg,const Creature* creature, 
 		case SPEAK_SAY:
 		case SPEAK_WHISPER:
 		case SPEAK_YELL:
-		case SPEAK_MONSTER1:
-		case SPEAK_MONSTER2:
+		case SPEAK_MONSTER_SAY:
+		case SPEAK_MONSTER_YELL:
 			msg.AddPosition(creature->getPosition());
 			break;
 		case SPEAK_CHANNEL_Y:

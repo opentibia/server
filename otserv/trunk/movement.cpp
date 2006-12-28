@@ -447,13 +447,18 @@ long MoveEvent::RemoveItemField(Item* item, Item* tileItem, const Position& pos)
 
 long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 {
-	player->setItemAbility(slot, true);
+	if(player->isItemAbilityEnabled(slot)){
+		return 1;
+	}
 
 	const ItemType& it = Item::items[item->getID()];
 	
 	if(it.transformEquipTo != 0){
 		g_game.transformItem(item, it.transformEquipTo);
 		g_game.startDecay(item);
+	}
+	else{
+		player->setItemAbility(slot, true);
 	}
 
 	if(it.abilities.invisible){
@@ -507,6 +512,10 @@ long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 
 long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 {
+	if(!player->isItemAbilityEnabled(slot)){
+		return 1;
+	}
+
 	player->setItemAbility(slot, false);
 
 	const ItemType& it = Item::items[item->getID()];

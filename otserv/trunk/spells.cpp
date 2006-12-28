@@ -252,6 +252,46 @@ Position Spells::getCasterPosition(Creature* creature, Direction dir)
 	return pos;
 }
 
+
+CombatSpell::CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection)
+{
+	combat =_combat;
+	needTarget = _needTarget;
+	needDirection = _needDirection;
+}
+
+bool CombatSpell::castSpell(Creature* creature)
+{
+	Position pos;
+
+	if(needDirection){
+		pos = Spells::getCasterPosition(creature, creature->getDirection());
+	}
+	else{
+		pos = creature->getPosition();
+	}
+
+	combat->doCombat(creature, pos);
+	return true;
+}
+
+bool CombatSpell::castSpell(Creature* creature, Creature* target)
+{
+	if(combat->hasArea()){
+		if(needTarget){
+			combat->doCombat(creature, target->getPosition());
+		}
+		else{
+			return castSpell(creature);
+		}
+	}
+	else{
+		combat->doCombat(creature, target);
+	}
+
+	return true;
+}
+
 Spell::Spell()
 {
 	level = -1;
@@ -427,116 +467,109 @@ bool Spell::playerSpellCheck(const Player* player) const
 
 bool Spell::playerInstantSpellCheck(const Player* player, const Position& toPos)
 {
-	bool result = playerSpellCheck(player);
+	if(!playerSpellCheck(player)){
+		return false;
+	}
 
-	if(result){
-		ReturnValue ret = RET_NOERROR;
-
-		if(toPos.x != 0xFFFF){
-			const Position& playerPos = player->getPosition();
-			if(playerPos.z > toPos.z){
-				ret = RET_FIRSTGOUPSTAIRS;
-			}
-			else if(playerPos.z < toPos.z){
-				ret = RET_FIRSTGODOWNSTAIRS;
-			}
-			else{
-				Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
-
-				if(!tile){
-					ret = RET_NOTPOSSIBLE;
-				}
-
-				if(ret == RET_NOERROR){
-					ret = Combat::canDoCombat(player, tile, isAggressive);
-				}
-				
-				if(ret == RET_NOERROR){
-					if(blockingCreature && !tile->creatures.empty()){
-						ret = RET_NOTENOUGHROOM;
-					}
-					else if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
-						ret = RET_NOTENOUGHROOM;
-					}
-				}
-
-				/*
-				if(ret == RET_NOERROR && blockingSolid){
-					if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
-						ret = RET_NOTENOUGHROOM;
-					}
-				}
-				*/
-			}
-		}
-
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
+	if(toPos.x != 0xFFFF){
+		const Position& playerPos = player->getPosition();
+		if(playerPos.z > toPos.z){
+			player->sendCancelMessage(RET_FIRSTGOUPSTAIRS);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
+		else if(playerPos.z < toPos.z){
+			player->sendCancelMessage(RET_FIRSTGODOWNSTAIRS);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+		else{
+			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
+
+			if(!tile){
+				player->sendCancelMessage(RET_NOTPOSSIBLE);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+
+			ReturnValue ret;
+			if((ret = Combat::canDoCombat(player, tile, isAggressive)) != RET_NOERROR){
+				player->sendCancelMessage(ret);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+			
+			if(blockingCreature && !tile->creatures.empty()){
+				player->sendCancelMessage(RET_NOTENOUGHROOM);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+			
+			if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
+				player->sendCancelMessage(RET_NOTENOUGHROOM);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+		}
 	}
 
-	return result;
+	return true;
 }
 
 bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 {
-	bool result = playerSpellCheck(player);
+	if(!playerSpellCheck(player)){
+		return false;
+	}
 
-	if(result){
-		ReturnValue ret = RET_NOERROR;
-
-		if(toPos.x != 0xFFFF){
-			const Position& playerPos = player->getPosition();
-			if(playerPos.z > toPos.z){
-				ret = RET_FIRSTGOUPSTAIRS;
-			}
-			else if(playerPos.z < toPos.z){
-				ret = RET_FIRSTGODOWNSTAIRS;
-			}
-			else{
-				Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
-
-				if(!tile){
-					ret = RET_NOTPOSSIBLE;
-				}
-
-				if(ret == RET_NOERROR){
-					ret = Combat::canDoCombat(player, tile, isAggressive);
-				}
-
-				if(ret == RET_NOERROR){
-					if(blockingCreature && !tile->creatures.empty()){
-						ret = RET_NOTENOUGHROOM;
-					}
-					else if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
-						ret = RET_NOTENOUGHROOM;
-					}
-				}
-
-				/*
-				if(ret == RET_NOERROR && blocking){
-					if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
-						ret = RET_NOTENOUGHROOM;
-					}
-				}
-				*/
-				
-				if(ret == RET_NOERROR && needTarget && tile->creatures.empty()){
-					ret = RET_CANONLYUSETHISRUNEONCREATURES;
-				}
-			}
-		}
-
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
+	if(toPos.x != 0xFFFF){
+		const Position& playerPos = player->getPosition();
+		if(playerPos.z > toPos.z){
+			player->sendCancelMessage(RET_FIRSTGOUPSTAIRS);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
+		else if(playerPos.z < toPos.z){
+			player->sendCancelMessage(RET_FIRSTGODOWNSTAIRS);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+		else{
+			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
+
+			if(!tile){
+				player->sendCancelMessage(RET_NOTPOSSIBLE);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+
+			ReturnValue ret;
+			if((ret = Combat::canDoCombat(player, tile, isAggressive)) != RET_NOERROR){
+				player->sendCancelMessage(ret);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+
+			if(blockingCreature && !tile->creatures.empty()){
+				player->sendCancelMessage(RET_NOTENOUGHROOM);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+			else if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
+				player->sendCancelMessage(RET_NOTENOUGHROOM);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+			
+			if(needTarget && tile->creatures.empty()){
+				player->sendCancelMessage(RET_CANONLYUSETHISRUNEONCREATURES);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+		}
 	}
 
-	return result;
+	return true;
 }
 
 void Spell::postCastSpell(Player* player) const
@@ -767,7 +800,7 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 	}
 	else if(needTarget){
 		Player* target = g_game.getPlayerByName(param);
-		if(!target){
+		if(!target || target->getHealth() <= 0){
 			player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
@@ -1204,14 +1237,7 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 		return false;
 	}
 
-	uint32_t mId = g_monsters.getIdByName(param);
-	if(!mId){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
-	MonsterType* mType = g_monsters.getMonsterType(mId);
+	MonsterType* mType = g_monsters.getMonsterType(param);
 	if(!mType){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);

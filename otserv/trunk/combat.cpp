@@ -160,11 +160,13 @@ ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
 	}
 
 	if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-		if(target->getPlayer()){
-			return RET_YOUMAYNOTATTACKTHISPLAYER;
-		}
-		else if(target->getMaster() && target->getMaster()->getPlayer()){
-			return RET_YOUMAYNOTATTACKTHISPLAYER;
+		if(attacker && attacker->getPlayer()){
+			if(target->getPlayer()){
+				return RET_YOUMAYNOTATTACKTHISPLAYER;
+			}
+			else if(target->getMaster() && target->getMaster()->getPlayer()){
+				return RET_YOUMAYNOTATTACKTHISPLAYER;
+			}
 		}
 	}
 
@@ -1031,6 +1033,79 @@ void AreaCombat::setupArea(const std::list<uint32_t>& list, uint32_t rows)
 	MatrixArea* westArea = new MatrixArea(maxOutput, maxOutput);
 	copyArea(area, westArea, MATRIXOPERATION_ROTATE270);
 	areas[WEST] = westArea;
+}
+
+void AreaCombat::setupArea(int32_t length, int32_t spread)
+{
+	std::list<uint32_t> list;
+
+	uint32_t rows = length;
+	int32_t cols = 1;
+	
+	if(spread != 0){
+		cols = ((length - length % spread) / spread) * 2 + 1;
+	}
+
+	int32_t colSpread = cols;
+
+	for(int32_t y = 1; y <= rows; ++y){
+		int32_t mincol = cols - colSpread + 1;
+		int32_t maxcol = cols - (cols - colSpread);
+		for(int32_t x = 1; x <= cols; ++x){
+			if(y == rows && x == ((cols - cols % 2) / 2) + 1){
+				list.push_back(3);
+			}
+			else if(x >= mincol && x <= maxcol){
+				list.push_back(1);
+			}
+			else{
+				list.push_back(0);
+			}
+		}
+
+		if(spread > 0 && y % spread == 0){
+			--colSpread;
+		}
+	}
+
+	setupArea(list, rows);
+}
+
+void AreaCombat::setupArea(int32_t radius)
+{
+	int32_t area[13][13] = {
+		{0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 8, 8, 7, 8, 8, 0, 0, 0, 0},
+		{0, 0, 0, 8, 7, 6, 6, 6, 7, 8, 0, 0, 0},
+		{0, 0, 8, 7, 6, 5, 5, 5, 6, 7, 8, 0, 0},
+		{0, 8, 7, 6, 5, 4, 4, 4, 5, 6, 7, 8, 0},
+		{0, 8, 6, 5, 4, 3, 2, 3, 4, 5, 6, 8, 0},
+		{8, 7, 6, 5, 4, 2, 1, 2, 4, 5, 6, 7, 8},
+		{0, 8, 6, 5, 4, 3, 2, 3, 4, 5, 6, 8, 0},
+		{0, 8, 7, 6, 5, 4, 4, 4, 5, 6, 7, 8, 0},
+		{0, 0, 8, 7, 6, 5, 5, 5, 6, 7, 8, 0, 0},
+		{0, 0, 0, 8, 7, 6, 6, 6, 7, 8, 0, 0, 0},
+		{0, 0, 0, 0, 8, 8, 7, 8, 8, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0}
+	};
+
+	std::list<uint32_t> list;
+
+	for(int32_t y = 0; y < 13; ++y){
+		for(int32_t x = 0; x < 13; ++x){
+			if(area[y][x] == 1){
+				list.push_back(3);
+			}
+			else if(area[y][x] > 0 && area[y][x] <= radius){
+				list.push_back(1);
+			}
+			else{
+				list.push_back(0);
+			}
+		}
+	}
+
+	setupArea(list, 13);
 }
 
 void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)

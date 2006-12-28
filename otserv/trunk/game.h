@@ -260,8 +260,6 @@ public:
 	  */
 	bool internalCreatureSay(Creature* creature, SpeakClasses type, const std::string& text);
 
-	bool internalMonsterYell(Monster* monster, const std::string& text);
-
 	//Implementation of player invoked events
 	bool movePlayer(Player* player, Direction direction);
 	bool playerWhisper(Player* player, const std::string& text);

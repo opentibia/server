@@ -24,7 +24,9 @@
 #include <string>
 #include "creature.h"
 
-#define CHANCE_MAX  100000
+#define MAX_LOOTCHANCE 100000
+#define MAX_STATICWALK 100
+
 struct LootBlock{
 	unsigned short id;
 	unsigned short countmax;
@@ -47,21 +49,27 @@ struct summonBlock_t{
 	uint32_t speed;
 };
 
-class Spell;
+class BaseSpell;
 
 struct spellBlock_t{
-	Spell* spell;
+	BaseSpell* spell;
 	uint32_t chance;
 	uint32_t speed;
 	uint32_t range;
 	int32_t minCombatValue;
 	int32_t maxCombatValue;
+	bool combatSpell;
+};
+
+struct voiceBlock_t{
+	std::string text;
+	bool yellText;
 };
 
 typedef std::list<LootBlock> LootItems;
 typedef std::list<summonBlock_t> SummonList;
 typedef std::list<spellBlock_t> SpellList;
-typedef std::vector<std::string> VoiceVector;
+typedef std::vector<voiceBlock_t> VoiceVector;
 
 class MonsterType{
 public:
@@ -78,7 +86,7 @@ public:
 	int armor;
 
 	bool canPushItems;
-	unsigned long staticAttack;
+	unsigned long staticAttackChance;
 	int maxSummons;
 	int targetDistance;
 	int runAwayHealth;
@@ -107,10 +115,6 @@ public:
 	SpellList spellAttackList;
 	SpellList spellDefenseList;
 
-	int32_t combatMeleeMin;
-	int32_t combatMeleeMax;
-	uint32_t combatMeleeSpeed;
-
 	uint32_t yellChance;
 	uint32_t yellSpeedTicks;
 	VoiceVector voiceVector;
@@ -135,6 +139,7 @@ public:
 	bool isLoaded(){return loaded;}	
 	bool reload();
 	
+	MonsterType* getMonsterType(const std::string& name);
 	MonsterType* getMonsterType(unsigned long mid);
 	unsigned long getIdByName(const std::string& name);
 

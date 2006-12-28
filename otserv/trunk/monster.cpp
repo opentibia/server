@@ -61,7 +61,6 @@ Creature()
 	isActive = false;
 	isWalkActive = false;
 	internalUpdateTargetList = false;
-	meleeBonusAttack = false;
 	spellBonusAttack = false;
 	
 	mType = _mtype;
@@ -111,7 +110,6 @@ void Monster::onAttackedCreatureDissapear(bool isLogout)
 {
 	internalUpdateTargetList = true;
 	spellBonusAttack = true;
-	meleeBonusAttack = true;
 }
 
 void Monster::onFollowCreatureDissapear(bool isLogout)
@@ -393,7 +391,14 @@ void Monster::onThinkYell(uint32_t interval)
 
 		if(!mType->voiceVector.empty() && (mType->yellChance >= (uint32_t)random_range(0, 100))){
 			uint32_t index = random_range(0, mType->voiceVector.size() - 1);
-			g_game.internalMonsterYell(this, mType->voiceVector[index]);
+			const voiceBlock_t& vb = mType->voiceVector[index];
+
+			if(vb.yellText){
+				g_game.internalCreatureSay(this, SPEAK_MONSTER_YELL, vb.text);
+			}
+			else{
+				g_game.internalCreatureSay(this, SPEAK_MONSTER_SAY, vb.text);
+			}
 		}
 	}
 }
@@ -431,7 +436,8 @@ bool Monster::getNextStep(Direction& dir)
 
 	if(!result){
 		//target dancing
-		if(rand() % mType->staticAttack == 0){
+		//if(rand() % mType->staticAttack == 0){
+		if(mType->staticAttackChance < (uint32_t)random_range(1, 100)){
 			if(attackedCreature && attackedCreature == followCreature){
 				result = getRandomStep(getPosition(), attackedCreature->getPosition(), dir);
 			}
@@ -566,31 +572,6 @@ void Monster::doAttacking(uint32_t interval)
 			spellBonusAttack = false;
 		}
 	}
-
-	if(mType->combatMeleeMin != 0 || mType->combatMeleeMax != 0){
-		if(mType->combatMeleeSpeed <= attackTicks || meleeBonusAttack){
-			
-			if(meleeBonusAttack || attackTicks % mType->combatMeleeSpeed < interval){
-				if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
-					CombatParams params;
-					params.combatType = COMBAT_PHYSICALDAMAGE;
-					params.blockedByArmor = true;
-					params.blockedByShield = true;
-					int32_t damage = (random_range(mType->combatMeleeMin, mType->combatMeleeMax) * attackStrength) / 100;
-					Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
-					meleeBonusAttack = false;
-				}
-				else{
-					meleeBonusAttack = true;
-				}
-			}
-		}
-		else{
-			resetTicks = false;
-		}
-	}
-
-	//attackedCreature->onAttacked();
 
 	if(resetTicks){
 		attackTicks = 0;
