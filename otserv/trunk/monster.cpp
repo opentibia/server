@@ -308,7 +308,7 @@ void Monster::searchTarget()
 
 bool Monster::selectTarget(Creature* creature)
 {
-	if(!creature || !creature->isAttackable() || creature->isInPz()){
+	if(!creature || creature == this || !creature->isAttackable() || creature->isInPz()){
 		return false;
 	}
 

@@ -377,11 +377,22 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 						else
 							isLoaded = false;
 
+						xmlNodePtr itemNode = slotNode->children;
+						while(itemNode){
+							if(readXMLInteger(itemNode, "id", intValue)){
+								itemId = intValue;
+								break;
+							}
+
+							itemNode = itemNode->next;
+						}
+						/*
 						if(readXMLInteger(slotNode->children, "id", intValue)){
 							itemId = intValue;
 						}
 						else
 							isLoaded = false;
+						*/
 
 						Item* item = Item::CreateItem(itemId);
 						if(item){
@@ -406,17 +417,31 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 						else
 							isLoaded = false;
 
+						xmlNodePtr itemNode = tmpNode->children;
+						while(itemNode){
+							if(readXMLInteger(itemNode, "id", intValue)){
+								itemId = intValue;
+								break;
+							}
+
+							itemNode = itemNode->next;
+						}
+
+						/*
 						if(readXMLInteger(tmpNode->children, "id", intValue)){
 							itemId = intValue;
 						}
 						else
 							isLoaded = false;
+						*/
 
-						Depot* myDepot = new Depot(itemId);
-						myDepot->useThing2();
-						myDepot->unserialize(tmpNode->children);
+						if(itemId != 0){
+							Depot* myDepot = new Depot(itemId);
+							myDepot->useThing2();
+							myDepot->unserialize(tmpNode->children);
 
-						player->addDepot(myDepot, depotId);
+							player->addDepot(myDepot, depotId);
+						}
 					}
 
 					tmpNode = tmpNode->next;
