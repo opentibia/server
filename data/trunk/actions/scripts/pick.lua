@@ -1,5 +1,5 @@
 function onUse(cid, item, frompos, item2, topos)
-	if isInArray(MUD, item2.itemid) == 1 then
+	if isInArray(MUD, item2.itemid) == TRUE then
 		if item2.actionid == 100 then
 			doTransformItem(item2.uid, 383)
 			doDecayItem(item2.uid)

@@ -1,43 +1,37 @@
 function onUse(cid, item, frompos, item2, topos) 
+	doorpos = {x = frompos.x, y = frompos.y, z = frompos.z, stackpos = 253}
 	if isInArray(CLOSED_LEVEL_DOOR, item.itemid) == 1 then
-		if TEST_SERVER == "off" then
-			if getPlayerLevel(cid) >= item.actionid - 100 then
-				doTransformItem(item.uid, item.itemid + 1)
-				playerpos = getPlayerPosition(cid)
-				doorpos = {x = frompos.x, y = frompos.y, z = frompos.z, stackpos = 253}
-				if playerpos.y == doorpos.y + 1 and playerpos.x == doorpos.x then
-					doMoveCreature(cid, 0)
-				elseif playerpos.x == doorpos.x - 1 and playerpos.y == doorpos.y then
-					doMoveCreature(cid, 1)
-				elseif playerpos.y == doorpos.y - 1 and playerpos.x == doorpos.x then
-					doMoveCreature(cid, 2)
-				elseif playerpos.y == doorpos.y and playerpos.x == doorpos.x + 1 then
-					doMoveCreature(cid, 3)
-				elseif playerpos.x == doorpos.x + 1 and playerpos.y == doorpos.y - 1 then
-					doMoveCreature(cid, 4)
-				elseif playerpos.x == doorpos.x - 1 and playerpos.y == doorpos.y - 1 then
-					doMoveCreature(cid, 5)
-				elseif playerpos.x == doorpos.x + 1 and playerpos.y == doorpos.y + 1 then
-					doMoveCreature(cid, 6)
-				elseif playerpos.x == doorpos.x - 1 and playerpos.y == doorpos.y + 1 then
-					doMoveCreature(cid, 7)
-				end
-			else
-				if LEVEL_DOOR_MSG == "leveltopass" then
-					doPlayerSendTextMessage(cid, 22, "You need level "..(item.actionid - 100).." to pass this door.")
-				else
-					doPlayerSendTextMessage(cid, 22, "Only the worthy may pass.")
-				end
+		if TEST_SERVER == "ON" then
+			doPlayerSendTextMessage(cid, 22, "It is locked.")
+			return 1
+		end
+		if getPlayerLevel(cid) >= item.actionid - 100 then
+			doTransformItem(item.uid, item.itemid + 1)
+			if getPlayerPosition(cid).x == doorpos.x and getPlayerPosition(cid).y == doorpos.y + 1 then
+				doMoveCreature(cid, NORTH)
+			elseif getPlayerPosition(cid).x == doorpos.x - 1 and getPlayerPosition(cid).y == doorpos.y then
+				doMoveCreature(cid, EAST)
+			elseif getPlayerPosition(cid).x == doorpos.x and getPlayerPosition(cid).y == doorpos.y - 1 then
+				doMoveCreature(cid, SOUTH)
+			elseif getPlayerPosition(cid).x == doorpos.x + 1 and getPlayerPosition(cid).y == doorpos.y then
+				doMoveCreature(cid, WEST)
+			elseif getPlayerPosition(cid).x == doorpos.x + 1 and getPlayerPosition(cid).y == doorpos.y - 1 then
+				doMoveCreature(cid, SOUTHWEST)
+			elseif getPlayerPosition(cid).x == doorpos.x - 1 and getPlayerPosition(cid).y == doorpos.y - 1 then
+				doMoveCreature(cid, SOUTHEAST)
+			elseif getPlayerPosition(cid).x == doorpos.x + 1 and getPlayerPosition(cid).y == doorpos.y + 1 then
+				doMoveCreature(cid, NORTHWEST)
+			elseif getPlayerPosition(cid).x == doorpos.x - 1 and getPlayerPosition(cid).y == doorpos.y + 1 then
+				doMoveCreature(cid, NORTHEAST)
 			end
 		else
-			doPlayerSendTextMessage(cid, 22, "It is locked.")
+			doPlayerSendTextMessage(cid, 22, "You need level "..(item.actionid - 100).." to pass this door.")
 		end
 	elseif isInArray(OPENED_LEVEL_DOOR, item.itemid) == 1 then
-			if isInArray(VERTICAL_OPENED_LEVEL_DOOR, item.itemid) == 1 then
-					doMoveCreature(cid, 1)
-			else
-					doMoveCreature(cid, 2)
-			end			
+		if getThingfromPos(doorpos).itemid > 0 then
+			doPlayerSendCancel(cid, "Sorry, not possible.")
+			return 1
+		end
 	else
 		return 0
     end

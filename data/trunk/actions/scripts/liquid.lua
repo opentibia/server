@@ -1,24 +1,42 @@
+local drunk = createConditionObject(CONDITION_DRUNK)
+setConditionParam(drunk, CONDITION_PARAM_TICKS, 60000)
+
+local poison = createConditionObject(CONDITION_POISON)
+local rand = math.random(1, 10)
+addDamageCondition(poison, rand, 6000, -5)
+addDamageCondition(poison, rand, 6000, -4)
+addDamageCondition(poison, rand, 6000, -3)
+addDamageCondition(poison, rand, 6000, -2)
+addDamageCondition(poison, rand, 6000, -1)
+
+local fire = createConditionObject(CONDITION_FIRE)
+addDamageCondition(fire, 1, 6000, -20)
+addDamageCondition(fire, 7, 6000, -10)
+
 function onUse(cid, item, frompos, item2, topos)
-	if item2.itemid == 1 then
+	if item2.itemid == 1 and item2.uid == cid then
+		doChangeTypeItem(item.uid, 0)
 		if item.type == 0 then
 			doPlayerSendCancel(cid, "It is empty.")
+		elseif item.type == 3 or item.type == 15 then
+			doPlayerSay(cid, "Aaah...", 1)
+			doTargetCombatCondition(0, cid, drunk, CONST_ME_NONE)
+		elseif item.type == 4 or item.type == 11  or item.type == 28 then
+			doPlayerSay(cid, "Argh!", 1)
+			doTargetCombatCondition(0, cid, poison, CONST_ME_NONE)
+		elseif item.type == 7 then
+			doPlayerSay(cid, "Aaaah...", 1)
+			doPlayerAddMana(cid, math.random(80, 160))
+			doSendMagicEffect(topos, 12)
+		elseif item.type == 10 then
+			doPlayerSay(cid, "Aaaah...", 1)
+			doPlayerAddHealth(cid, math.random(40, 80))
+			doSendMagicEffect(topos, 12)			
+		elseif item.type == 26 then
+			doPlayerSay(cid, "Ouch!", 1)
+			doTargetCombatCondition(0, cid, fire, CONST_ME_NONE)
 		else
-			if isPlayer(cid) then
-				doChangeTypeItem(item.uid, 0)
-				-- TODO: add drunk system and poison system				
-				if item.type == 7 then
-					new_mana = math.random(80, 160)
-					doPlayerAddMana(cid, new_mana)
-					doSendMagicEffect(topos, 12)
-					doPlayerSay(cid, "Aaaah...", 1)
-				elseif item.type == 10 then
-					doPlayerAddHealth(cid, 60)
-					doSendMagicEffect(topos, 12)
-					doPlayerSay(cid, "Aaaah...", 1)
-				else
-					doPlayerSay(cid, "Gulp.", 1)
-				end
-			end
+			doPlayerSay(cid, "Gulp.", 1)
 		end
 	elseif item2.itemid == 1771 or isInArray(WATER, item2.itemid) == 1 and item.type == 0 then
 		doChangeTypeItem(item.uid, 1)

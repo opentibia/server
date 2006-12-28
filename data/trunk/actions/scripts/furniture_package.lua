@@ -3,7 +3,6 @@ function onUse(cid, item, frompos, item2, topos)
 		doSendMagicEffect(frompos, 3)
 		return 1
 	end
-	-- If furniture packages was updated in items.otb we need to update items IDs above too
 	if item.itemid == 3901 then
 		doTransformItem(item.uid, 1652)
 	elseif item.itemid == 3902 then

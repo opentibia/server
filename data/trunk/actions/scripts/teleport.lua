@@ -1,12 +1,12 @@
 function onUse(cid, item, frompos, item2, topos)
-	newpos = {x = frompos.x, y = frompos.y, z = frompos.z}
-	if item.itemid == 1386 or item.itemid == 3678 then
-		newpos.y = newpos.y + 1
-		newpos.z = newpos.z - 1
-		doTeleportThing(cid, newpos)
+	npos = {x = frompos.x, y = frompos.y, z = frompos.z}
+	if isInArray(LADDER, item.itemid) == 1 then
+		npos.y = npos.y + 1
+		npos.z = npos.z - 1
+		doTeleportThing(cid, npos)
 	else
-		newpos.z = newpos.z + 1
-		doTeleportThing(cid, newpos)
+		npos.z = npos.z + 1
+		doTeleportThing(cid, npos)
 	end
 	return 1
 end
