@@ -191,6 +191,9 @@ inline ShootType_t translateOTBShootType(ShootTypeOtb_t sf)
 	case OTB_SHOOT_POISONFIELD:
 		return SHOOT_POISONFIELD;
 		break;
+	case OTB_SHOOT_INFERNALBOLT:
+		return SHOOT_INFERNALBOLT;
+		break;
 	}
 
 	return SHOOT_NONE;

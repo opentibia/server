@@ -532,11 +532,13 @@ bool Item::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
 
 bool Item::serializeAttr(PropWriteStream& propWriteStream)
 {
+	/*
 	if(isStackable() || isSplash() || isFluidContainer()){
 		unsigned char _count = getItemCountOrSubtype();
 		propWriteStream.ADD_UCHAR(ATTR_COUNT);
 		propWriteStream.ADD_UCHAR(_count);
 	}
+	*/
 
 	if(isRune()){
 		unsigned char _count = getItemCharge();

@@ -71,6 +71,7 @@ enum MagicEffectClasses {
 #define NM_ANI_SNOWBALL          12
 #define NM_ANI_POWERBOLT         13
 #define NM_ANI_FLYPOISONFIELD    14
+#define NM_ANI_INFERNALBOLT      15
 
 //for internal use, dont send to client
 #define NM_ANI_NONE             255
@@ -211,7 +212,8 @@ enum ShootType_t {
 	SHOOT_SNOWBALL = NM_ANI_SNOWBALL,
 	SHOOT_POWERBOLT = NM_ANI_POWERBOLT,
 	SHOOT_SPEAR = NM_ANI_SPEAR,
-	SHOOT_POISONFIELD = NM_ANI_FLYPOISONFIELD
+	SHOOT_POISONFIELD = NM_ANI_FLYPOISONFIELD,
+	SHOOT_INFERNALBOLT = NM_ANI_INFERNALBOLT
 };
 
 enum Skulls_t{

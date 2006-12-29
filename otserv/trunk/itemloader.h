@@ -153,7 +153,8 @@ enum ShootTypeOtb_t {
 	OTB_SHOOT_SNOWBALL      = 12,
 	OTB_SHOOT_POWERBOLT     = 13,
 	OTB_SHOOT_SPEAR         = 14,
-	OTB_SHOOT_POISONFIELD   = 15
+	OTB_SHOOT_POISONFIELD   = 15,
+	OTB_SHOOT_INFERNALBOLT  = 16
 };
 
 //1-byte aligned structs
