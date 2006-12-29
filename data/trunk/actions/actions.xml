@@ -2,20 +2,11 @@
 
 <actions>
 	
-	-- Quests Chests
+	-- Quests Chests (only for example)
 	<action uniqueid="1000" script="quest_chest.lua" />
 	<action uniqueid="1001" script="quest_chest.lua" />
 	<action uniqueid="1002" script="quest_chest.lua" />
 	<action uniqueid="1003" script="quest_chest.lua" />
-	<action uniqueid="1004" script="quest_chest.lua" />
-	<action uniqueid="1005" script="quest_chest.lua" />
-	<action uniqueid="1006" script="quest_chest.lua" />
-	<action uniqueid="1007" script="quest_chest.lua" />
-	<action uniqueid="1008" script="quest_chest.lua" />
-	<action uniqueid="1009" script="quest_chest.lua" />
-	<action uniqueid="1010" script="quest_chest.lua" />
-	<action uniqueid="1011" script="quest_chest.lua" />
-	<action uniqueid="1012" script="quest_chest.lua" />
 	
 	-- Tools
 	<action itemid="2120" script="rope.lua" />

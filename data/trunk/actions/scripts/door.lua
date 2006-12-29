@@ -1,9 +1,9 @@
 function onUse(cid, item, frompos, item2, topos)
-	doorpos = {x = frompos.x, y = frompos.y, z = frompos.z, stackpos = 253}
+	doorPos = {x = frompos.x, y = frompos.y, z = frompos.z, stackpos = 253}
 	if isInArray(CLOSED_NORMAL_DOOR, item.itemid) == 1 then
 		doTransformItem(item.uid, item.itemid + 1)
 	elseif isInArray(OPENED_NORMAL_DOOR, item.itemid) == 1 then
-		if getThingfromPos(doorpos).itemid > 0 then
+		if getThingfromPos(doorPos).itemid > 0 then
 			doPlayerSendCancel(cid, "Sorry, not possible.")
 			return 1
 		end
@@ -15,7 +15,7 @@ function onUse(cid, item, frompos, item2, topos)
 			doTransformItem(item.uid, item.itemid + 1)
 		end
 	elseif isInArray(OPENED_LOCKED_DOOR, item.itemid) == 1 then
-		if getThingfromPos(doorpos).itemid > 0 then
+		if getThingfromPos(doorPos).itemid > 0 then
 			doPlayerSendCancel(cid, "Sorry, not possible.")
 			return 1
 		end

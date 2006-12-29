@@ -1,11 +1,23 @@
+== GLOBAL ==
+
+1. Update mapping instructions
+
 == ACTIONS ==
 
-1. Review name of variables
+1. Review name of variables [Done 29/12/2006]
+2. Update to protocol 7.8/7.9
+3. Add key system for quest chests
 
 == MOVEMENTS ==
 
-1. Review name of variables
+1. Review name of variables [Done 29/12/2006]
+2. Update to protocol 7.8/7.9
 
 == MONSTERS ==
 
 1. Update to revbattlesys
+
+== SPELLS ==
+
+1. Add missing runes and spells (check spells.xml)
+2. Add house spells

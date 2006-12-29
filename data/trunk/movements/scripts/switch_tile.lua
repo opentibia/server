@@ -1,15 +1,15 @@
 function onStepIn(cid, item, pos)
-	if isPlayer(cid) == 0 then
+	if isPlayer(cid) ~= TRUE then
 		return 1
 	end
 	if item.actionid == 100 then
 		doTransformSwitchTile(item)
 	elseif item.actionid > 100 then
-		depot_items = getPlayerDepotItems(cid, item.actionid - 100)
-		if depot_items == 1 then
-			doPlayerSendTextMessage(cid, 20, "Your depot contains 1 item.")
+		depotItems = getPlayerDepotItems(cid, item.actionid - 100)
+		if depotItems > 1 then
+			doPlayerSendTextMessage(cid, 20, "Your depot contains " .. depotItems .. " items.")
 		else
-			doPlayerSendTextMessage(cid, 20, "Your depot contains "..depot_items.." items.")
+			doPlayerSendTextMessage(cid, 20, "Your depot contains 1 item.")
 		end
 		doTransformSwitchTile(item)
 	end
