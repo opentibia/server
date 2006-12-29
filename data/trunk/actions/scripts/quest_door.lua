@@ -1,6 +1,6 @@
 function onUse(cid, item, frompos, item2, topos) 
 	doorPos = {x = frompos.x, y = frompos.y, z = frompos.z, stackpos = 253}
-	if isInArray(CLOSED_QUEST_DOOR, item.itemid) == 1 then
+	if isInArray(CLOSED_QUEST_DOOR, item.itemid) == TRUE then
 		if TEST_SERVER == "ON" then
 			doPlayerSendTextMessage(cid, 22, "It is locked.")
 			return 1
@@ -27,7 +27,7 @@ function onUse(cid, item, frompos, item2, topos)
 		else
 			doPlayerSendTextMessage(cid, 22, "The door seems to be sealed against unwanted intruders.")
 		end
-	elseif isInArray(OPENED_QUEST_DOOR, item.itemid) == 1 then
+	elseif isInArray(OPENED_QUEST_DOOR, item.itemid) == TRUE then
 		if getThingfromPos(doorPos).itemid > 0 then
 			doPlayerSendCancel(cid, "Sorry, not possible.")
 			return 1

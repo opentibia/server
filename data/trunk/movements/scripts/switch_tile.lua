@@ -5,9 +5,8 @@ function onStepIn(cid, item, pos)
 	if item.actionid == 100 then
 		doTransformSwitchTile(item)
 	elseif item.actionid > 100 then
-		depotItems = getPlayerDepotItems(cid, item.actionid - 100)
-		if depotItems > 1 then
-			doPlayerSendTextMessage(cid, 20, "Your depot contains " .. depotItems .. " items.")
+		if getPlayerDepotItems(cid, item.actionid - 100) > 1 then
+			doPlayerSendTextMessage(cid, 20, "Your depot contains " .. getPlayerDepotItems(cid, item.actionid - 100) .. " items.")
 		else
 			doPlayerSendTextMessage(cid, 20, "Your depot contains 1 item.")
 		end
@@ -22,7 +21,7 @@ function onStepOut(cid, item, pos)
 end
 
 function doTransformSwitchTile(item)
-	if isInArray(SWITCH_TILE_ON, item.itemid) == 1 then
+	if isInArray(SWITCH_TILE_ON, item.itemid) == TRUE then
 		if item.itemid == 425 then
 			doTransformItem(item.uid, item.itemid + 1)
 		else
