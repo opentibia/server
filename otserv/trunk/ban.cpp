@@ -310,7 +310,7 @@ bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
 	DBQuery query;
 	DBResult result;
 	
-	if(!db->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+	if(!db->connect()){
 		return false;
 	}
 
@@ -357,7 +357,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 	Database* db = Database::instance();
 	DBQuery query;
 	
-	if(!db->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+	if(!db->connect()){
 		return false;
 	}
 

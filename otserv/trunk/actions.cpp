@@ -347,39 +347,47 @@ bool Action::canExecuteAction(const Player* player, const Position& toPos)
 bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse)
 {
 	//onUse(cid, item1, position1, item2, position2)
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << player->getName() << " - " << item->getID() << " " << posFrom << "|" << posTo;
-	env->setEventDesc(desc.str());
-	#endif
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << player->getName() << " - " << item->getID() << " " << posFrom << "|" << posTo;
+		env->setEventDesc(desc.str());
+		#endif
 	
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(player->getPosition());
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(player->getPosition());
 	
-	long cid = env->addThing(player);
-	long itemid1 = env->addThing(item);
+		long cid = env->addThing(player);
+		long itemid1 = env->addThing(item);
 	
-	lua_State* L = m_scriptInterface->getLuaState();
+		lua_State* L = m_scriptInterface->getLuaState();
 	
-	m_scriptInterface->pushFunction(m_scriptId);
-	lua_pushnumber(L, cid);
-	LuaScriptInterface::pushThing(L, item, itemid1);
-	LuaScriptInterface::pushPosition(L, posFrom, posFrom.stackpos);
-	//std::cout << "posTo" <<  (Position)posTo << " stack" << (int)posTo.stackpos <<std::endl;
-	Thing* thing = g_game.internalGetThing(player, posTo, posTo.stackpos);
-	if(thing && (!extendedUse || thing != item)){
-		long thingId2 = env->addThing(thing);
-		LuaScriptInterface::pushThing(L, thing, thingId2);
-		LuaScriptInterface::pushPosition(L, posTo, posTo.stackpos);
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		LuaScriptInterface::pushThing(L, item, itemid1);
+		LuaScriptInterface::pushPosition(L, posFrom, posFrom.stackpos);
+		//std::cout << "posTo" <<  (Position)posTo << " stack" << (int)posTo.stackpos <<std::endl;
+		Thing* thing = g_game.internalGetThing(player, posTo, posTo.stackpos);
+		if(thing && (!extendedUse || thing != item)){
+			long thingId2 = env->addThing(thing);
+			LuaScriptInterface::pushThing(L, thing, thingId2);
+			LuaScriptInterface::pushPosition(L, posTo, posTo.stackpos);
+		}
+		else{
+			LuaScriptInterface::pushThing(L, NULL, 0);
+			Position posEx;
+			LuaScriptInterface::pushPosition(L, posEx, 0);
+		}
+	
+		int32_t result = m_scriptInterface->callFunction(5);
+		m_scriptInterface->releaseScriptEnv();
+		
+		return (result == LUA_TRUE);
 	}
 	else{
-		LuaScriptInterface::pushThing(L, NULL, 0);
-		Position posEx;
-		LuaScriptInterface::pushPosition(L, posEx, 0);
+		std::cout << "[Error] Call stack overflow. Action::executeUse" << std::endl;
+		return false;
 	}
-	
-	int32_t result = m_scriptInterface->callFunction(5);
-	return (result == LUA_TRUE);
 }

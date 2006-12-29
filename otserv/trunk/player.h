@@ -121,6 +121,8 @@ public:
 	void setGuildRank(const std::string& rank) {guildRank = rank;};
 	void setGuildNick(const std::string& nick) {guildNick = nick;};
 	
+	void setFlags(uint32_t flags){};
+	
 	bool isOnline() {return (client != NULL);};
 	uint32_t getIP() const;
 
@@ -154,6 +156,7 @@ public:
 	time_t getLastLoginSaved() const { return lastLoginSaved; };
 	const Position& getLoginPosition() { return loginPosition; };
 	const Position& getTemplePosition() { return masterPos; };
+	uint32_t getTown() { return town; };
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
@@ -412,6 +415,7 @@ public:
 	int64_t getLastAction() const {return lastAction;}
 
 	VIPListSet VIPList;
+	uint32_t maxVipLimit;
 
 	//items
 	ContainerVector containerVec;
@@ -548,11 +552,14 @@ protected:
 	std::string nameDescription;
 	uint32_t guid;
 	
+	uint32_t town;
+	
 	//guild variables
 	uint32_t guildId;
 	std::string guildName;
 	std::string guildRank;
 	std::string guildNick;
+	uint32_t guildLevel;
 	
 	StorageMap storageMap;
 	LightInfo itemsLight;

@@ -72,10 +72,6 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 			acc.password = strValue;
 		}
 
-		if(readXMLInteger(root, "type", intValue)){
-			acc.accType = intValue;
-		}
-
 		if(readXMLInteger(root, "premDays", intValue)){
 			acc.premDays = intValue;
 		}

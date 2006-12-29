@@ -22,7 +22,6 @@
 #define __OTSERV_DatabaseMySQL_H__
 
 #ifdef WIN32
-//#include <winsock2.h>
 #include <winsock.h>
 #endif
 
@@ -45,12 +44,9 @@ public:
 	*\returns
 	* 	TRUE if the connection is ok
 	* 	FALSE if the connection fails
-	*\param db_name The "name" of the DatabaseMySQL used
-	*\param db_host The "host" to connect to
-	*\param db_user The "username" used in the connection
-	*\param db_pass The "password" of the username used
 	*/
-	DATABASE_VIRTUAL bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass);
+	DATABASE_VIRTUAL bool connect();
+	
 
 	/** Disconnects from the connected DatabaseMySQL
 	*\returns
@@ -91,6 +87,8 @@ private:
 	bool m_initialized;
 	bool m_connected;
 	MYSQL m_handle;
+	
+	std::string m_host, m_user, m_pass, m_dbname;
 };
 
 

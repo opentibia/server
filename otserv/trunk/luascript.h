@@ -88,15 +88,16 @@ public:
 	~ScriptEnviroment();
 
 	void resetEnv();
-	void resetCallback();
+	void resetCallback() {m_callbackId = 0;}
 
-	void setScriptId(long scriptId, LuaScriptInterface* scriptInterface);
+	void setScriptId(long scriptId, LuaScriptInterface* scriptInterface)
+		{m_scriptId = scriptId; m_interface = scriptInterface;}
 	bool setCallbackId(long callbackId);
-	void setEventDesc(const std::string& desc);
+	void setEventDesc(const std::string& desc) {m_eventdesc = desc;}
 	
-	std::string getEventDesc();
-	long getScriptId();
-	LuaScriptInterface* getScriptInterface();
+	std::string getEventDesc() {return m_eventdesc;}
+	long getScriptId() {return m_scriptId;}
+	LuaScriptInterface* getScriptInterface() {return m_interface;}
 
 	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, long& callbackId);
 
@@ -108,8 +109,11 @@ public:
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
 
-	void setRealPos(const Position& realPos);
-	Position getRealPos();
+	void setRealPos(const Position& realPos) {m_realPos = realPos;}
+	Position getRealPos() {return m_realPos;}
+
+	void setNpc(Npc* npc) {m_curNpc = npc;}
+	Npc* getNpc() const {return m_curNpc;}
 
 	Thing* getThingByUID(uint32_t uid);
 	Item* getItemByUID(uint32_t uid);
@@ -167,7 +171,9 @@ private:
 	//condition map
 	uint32_t m_lastConditionId;
 	static ConditionMap m_conditionMap;
-	
+
+	//for npc scripts
+	Npc* m_curNpc;
 };
 
 class Position;
@@ -224,15 +230,36 @@ public:
 
 	long getEvent(const std::string& eventName);
 
-	static ScriptEnviroment* getScriptEnv();
+	static ScriptEnviroment* getScriptEnv(){
+		assert(m_scriptEnvIndex >= 0 && m_scriptEnvIndex < 16);
+		return &m_scriptEnv[m_scriptEnvIndex];
+	}
+	
+	static bool reserveScriptEnv(){
+		++m_scriptEnvIndex;
+		if(m_scriptEnvIndex < 15){
+			return true;
+		}
+		else{
+			--m_scriptEnvIndex;
+			return false;
+		}
+	}
+	
+	static void releaseScriptEnv(){
+		if(m_scriptEnvIndex >= 0){
+			m_scriptEnv[m_scriptEnvIndex].resetEnv();
+			--m_scriptEnvIndex;
+		}
+	}
 
 	static void reportError(const char* function, const std::string& error_desc);
 
-	std::string getInterfaceName();
-	long getLastLuaError();
+	std::string getInterfaceName() {return m_interfaceName;}
+	long getLastLuaError() {return m_lastLuaError;}
 	void dumpLuaStack();
 
-	lua_State* getLuaState();
+	lua_State* getLuaState() {return m_luaState;}
 
 	bool pushFunction(int32_t functionId);
 
@@ -416,7 +443,8 @@ protected:
 	long m_lastLuaError;
 private:
 
-	static ScriptEnviroment m_scriptEnv;
+	static ScriptEnviroment m_scriptEnv[16];
+	static int32_t m_scriptEnvIndex;
 
 	long m_runningEventId;
 	std::string m_loadingFile;

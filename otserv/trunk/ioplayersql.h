@@ -26,7 +26,19 @@
 #include "player.h"
 #include "database.h"
 
-/** Baseclass for all Player-Loaders */
+class PlayerGroup
+{
+public:
+	PlayerGroup(){};
+	~PlayerGroup(){};
+	
+	std::string m_name;
+	uint32_t m_flags;
+	uint32_t m_access;
+	uint32_t m_maxDepotItems;
+	uint32_t m_maxVip;
+};
+
 class IOPlayerSQL : protected IOPlayer{
 public:
 	/** Get a textual description of what source is used
@@ -50,8 +62,9 @@ public:
 	~IOPlayerSQL(){};
 
 protected:
-	std::string getItems(Item* i, int &startid, int startslot, int player, int parentid);
 	bool storeNameByGuid(Database &mysql, unsigned long guid);
+	
+	const PlayerGroup* getPlayerGroup(uint32_t groupid);
 
 	struct StringCompareCase{
 		bool operator()(const std::string& l, const std::string& r) const{
@@ -64,16 +77,17 @@ protected:
 		}
 	};
 
+	typedef std::map<int,std::pair<Item*,int> > ItemMap;
+
+	void loadItems(ItemMap& itemMap, DBResult& result);
+
 	typedef std::map<unsigned long, std::string> NameCacheMap;
 	typedef std::map<std::string, unsigned long, StringCompareCase> GuidCacheMap;
+	typedef std::map<uint32_t, PlayerGroup*> PlayerGroupMap;
 	
+	PlayerGroupMap playerGroupMap;
 	NameCacheMap nameCacheMap;
 	GuidCacheMap guidCacheMap;
-	
-	std::string m_host;
-	std::string m_user;
-	std::string m_pass;
-	std::string m_db;
 };
 
 #endif

@@ -26,9 +26,17 @@
 #include <mysql/errmsg.h>
 #endif
 
+#include "configmanager.h"
+extern ConfigManager g_config;
 
 DatabaseMySQL::DatabaseMySQL()
 {
+	//load connection parameters
+	m_host   = g_config.getString(ConfigManager::SQL_HOST);
+	m_user   = g_config.getString(ConfigManager::SQL_USER);
+	m_pass   = g_config.getString(ConfigManager::SQL_PASS);
+	m_dbname = g_config.getString(ConfigManager::SQL_DB);
+	
 	init();
 }
 
@@ -52,25 +60,25 @@ bool DatabaseMySQL::init()
 	return m_initialized;
 }
 
-bool DatabaseMySQL::connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass)
+bool DatabaseMySQL::connect()
 {
+	if(m_connected){
+		return true;
+	}
+	
 	if(!m_initialized && !init()){
 		return false;
 	}
 	
-	if(m_connected){
-		return true;
-	}
-
 	// Connect to the DatabaseMySQL host
-	if(!mysql_real_connect(&m_handle, db_host, db_user, db_pass, NULL, 0, NULL, 0))
+	if(!mysql_real_connect(&m_handle, m_host.c_str(), m_user.c_str(), m_pass.c_str(), NULL, 0, NULL, 0))
 	{
 		std::cout << "MYSQL ERROR mysql_real_connect: " << mysql_error(&m_handle)  << std::endl;
 		return false;
 	}
 
 	// Select the correct DatabaseMySQL
-	if(mysql_select_db(&m_handle, db_name))
+	if(mysql_select_db(&m_handle, m_dbname.c_str()))
 	{
 		std::cout << "MYSQL ERROR mysql_select_db"  << std::endl;
 		return false;

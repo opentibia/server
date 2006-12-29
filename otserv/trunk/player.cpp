@@ -64,6 +64,7 @@ Creature()
 	soul       = 0;
 	soulMax    = 100;
 	guildId    = 0;
+	guildLevel = 0;
 
 	level      = 1;
 	experience = 180;
@@ -125,8 +126,11 @@ Creature()
 	}
 
 	maxDepotLimit = 1000;
+	maxVipLimit = 50;
  	
  	vocation_id = (Vocation_t)0;
+ 	
+ 	town = 0;
 
 #ifdef __SKULLSYSTEM__
 	redSkullTicks = 0;
@@ -1711,7 +1715,7 @@ bool Player::addVIP(uint32_t _guid, std::string& name, bool isOnline, bool inter
 		return false;
 	}
 	
-	if(VIPList.size() > 50){
+	if(VIPList.size() > maxVipLimit){
 		if(!internal)
 			sendTextMessage(MSG_STATUS_SMALL, "You cannot add more buddies.");
 		return false;

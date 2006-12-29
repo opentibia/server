@@ -33,10 +33,7 @@ extern ConfigManager g_config;
 
 IOAccountSQL::IOAccountSQL()
 {
-	m_host = g_config.getString(ConfigManager::SQL_HOST);
-	m_user = g_config.getString(ConfigManager::SQL_USER);
-	m_pass = g_config.getString(ConfigManager::SQL_PASS);
-	m_db   = g_config.getString(ConfigManager::SQL_DB);
+	//
 }
 
 Account IOAccountSQL::loadAccount(unsigned long accno)
@@ -47,35 +44,20 @@ Account IOAccountSQL::loadAccount(unsigned long accno)
 	DBQuery query;
 	DBResult result;
 
-	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
-		return acc;
+	query << "SELECT id,password,premdays FROM accounts WHERE id='" << accno << "'";
+	if(mysql->connect() && mysql->storeQuery(query, result)){
+		acc.accnumber = result.getDataInt("id");
+		acc.password = result.getDataString("password");
+		acc.premDays = result.getDataInt("premdays");
+		query << "SELECT name FROM players where account_id='" << accno << "'";
+		if(mysql->storeQuery(query, result)){
+			for(uint32_t i = 0; i < result.getNumRows(); ++i){
+				std::string ss = result.getDataString("name", i);
+				acc.charList.push_back(ss.c_str());
+			}
+			acc.charList.sort();
+		}
 	}
-
-	query << "SELECT * FROM accounts WHERE accno='" << accno << "'";
-	if(!mysql->storeQuery(query, result))
-		return acc;
-
-	acc.accnumber = result.getDataInt("accno");
-	acc.password = result.getDataString("password");
-	acc.accType = result.getDataInt("type");
-	acc.premDays = result.getDataInt("premDays");
-
-	/*std::cout << "pass '" << acc.password
-		<< "'      acc '" << acc.accnumber
-        << "'     type '" << acc.accType
-        << "'      prem '" << acc.premDays
-        << "'" <<std::endl;*/
-
-	query << "SELECT name FROM players where account='" << accno << "'";
-	if(!mysql->storeQuery(query, result))
-		return acc;
-
-	for(uint32_t i = 0; i < result.getNumRows(); ++i){
-		std::string ss = result.getDataString("name", i);
-		acc.charList.push_back(ss.c_str());
-	}
-
-	acc.charList.sort();
 	return acc;
 }
 
@@ -86,26 +68,21 @@ bool IOAccountSQL::getPassword(unsigned long accno, const std::string &name, std
 	DBQuery query;
 	DBResult result;
 	
-	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
-		return false;
-	}
-
-	query << "SELECT password FROM accounts WHERE accno='" << accno << "'";
-	if(!mysql->storeQuery(query, result))
-		return false;
-
-	std::string acc_password = result.getDataString("password");
-
-	query << "SELECT name FROM players where account='" << accno << "'";
-	if(!mysql->storeQuery(query, result))
-		return false;
-
-	for(uint32_t i = 0; i < result.getNumRows(); ++i)
-	{
-		std::string ss = result.getDataString("name", i);
-		if(ss == name){
-			password = acc_password;
-			return true;
+	query << "SELECT password FROM accounts WHERE id='" << accno << "'";
+	if(mysql->connect() && mysql->storeQuery(query, result) && (result.getNumRows() == 1)){
+		std::string acc_password = result.getDataString("password");
+			
+		query << "SELECT name FROM players where account_id='" << accno << "'";
+		if(mysql->storeQuery(query, result)){
+				
+			for(uint32_t i = 0; i < result.getNumRows(); ++i){
+				std::string ss = result.getDataString("name", i);
+				if(ss == name){
+					password = acc_password;
+					return true;
+				}
+			}
+			
 		}
 	}
 	return false;

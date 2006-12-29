@@ -326,8 +326,6 @@ NpcScriptInterface* Npc::getScriptInterface()
 	return m_scriptInterface;	
 }
 
-Npc* NpcScriptInterface::m_curNpc = NULL;
-
 NpcScriptInterface::NpcScriptInterface() :
 LuaScriptInterface("Npc interface")
 {
@@ -364,16 +362,6 @@ bool NpcScriptInterface::loadNpcLib(std::string file)
 		
 	m_libLoaded = true;
 	return true;
-}
-
-Npc* NpcScriptInterface::getNpc()
-{
-	return m_curNpc;
-}
-
-void NpcScriptInterface::setNpc(Npc* npc)
-{
-	m_curNpc = npc;
 }
 
 void NpcScriptInterface::registerFunctions()
@@ -448,7 +436,8 @@ int NpcScriptInterface::luaCreatureGetPos(lua_State *L)
 
 int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 {
-	Npc* mynpc = getNpc();
+	ScriptEnviroment* env = getScriptEnv();
+	Npc* mynpc = env->getNpc();
 	if(mynpc){
 		Position pos = mynpc->getPosition();
 		lua_pushnumber(L, pos.x);
@@ -467,8 +456,8 @@ int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 int NpcScriptInterface::luaActionSay(lua_State* L)
 {
 	std::string msg(popString(L));
-
-	Npc* mynpc = getNpc();
+	ScriptEnviroment* env = getScriptEnv();
+	Npc* mynpc = env->getNpc();
 	if(mynpc)
 		mynpc->doSay(msg);
 	return 0;
@@ -477,8 +466,8 @@ int NpcScriptInterface::luaActionSay(lua_State* L)
 int NpcScriptInterface::luaActionMove(lua_State* L)
 {
 	Direction dir = (Direction)(int)popNumber(L);
-
-	Npc* mynpc = getNpc();
+	ScriptEnviroment* env = getScriptEnv();
+	Npc* mynpc = env->getNpc();
 	if(mynpc)
 		mynpc->doMove(dir);
 
@@ -491,7 +480,9 @@ int NpcScriptInterface::luaActionMoveTo(lua_State* L)
 	target.z = (int)popNumber(L);
 	target.y = (int)popNumber(L);
 	target.x = (int)popNumber(L);
-	Npc* mynpc = getNpc();
+	
+	ScriptEnviroment* env = getScriptEnv();
+	Npc* mynpc = env->getNpc();
 	if(mynpc)
 		mynpc->doMoveTo(target);
 	return 0;
@@ -500,8 +491,9 @@ int NpcScriptInterface::luaActionMoveTo(lua_State* L)
 int NpcScriptInterface::luaActionTurn(lua_State* L)
 {
 	Direction dir = (Direction)(int)popNumber(L);
-
-	Npc* mynpc = getNpc();
+	
+	ScriptEnviroment* env = getScriptEnv();
+	Npc* mynpc = env->getNpc();
 	if(mynpc)
 		mynpc->doTurn(dir);
 
@@ -511,9 +503,9 @@ int NpcScriptInterface::luaActionTurn(lua_State* L)
 int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 {
 	long uid = (long)popNumber(L);
-	Npc* mynpc = getNpc();
 	
 	ScriptEnviroment* env = getScriptEnv();
+	Npc* mynpc = env->getNpc();
 	
 	Thing* thing = env->getThingByUID(uid);
 	if(thing && mynpc){
@@ -581,26 +573,32 @@ void NpcScript::onCreatureAppear(const Creature* creature)
 	if(m_onCreatureAppear == -1){
 		return;	
 	}
+	//onCreatureAppear(creature)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "npc " << m_npc->getName();
+		env->setEventDesc(desc.str());
+		#endif
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << "npc " << m_npc->getName();
-	env->setEventDesc(desc.str());
-	#endif
+		lua_State* L = m_scriptInterface->getLuaState();
 	
-	lua_State* L = m_scriptInterface->getLuaState();
+		env->setScriptId(m_onCreatureAppear, m_scriptInterface);
+		env->setRealPos(m_npc->getPosition());
+		env->setNpc(m_npc);
 	
-	env->setScriptId(m_onCreatureAppear, m_scriptInterface);
-	env->setRealPos(m_npc->getPosition());
-	m_scriptInterface->setNpc(m_npc);
+		long cid = env->addThing(const_cast<Creature*>(creature));
 	
-	long cid = env->addThing(const_cast<Creature*>(creature));
-	
-	m_scriptInterface->pushFunction(m_onCreatureAppear);
-	lua_pushnumber(L, cid);	
-	m_scriptInterface->callFunction(1);
+		m_scriptInterface->pushFunction(m_onCreatureAppear);
+		lua_pushnumber(L, cid);	
+		m_scriptInterface->callFunction(1);
+		m_scriptInterface->releaseScriptEnv();
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. NpcScript::onCreatureAppear" << std::endl;
+	}
 }
 
 void NpcScript::onCreatureDisappear(const Creature* creature)
@@ -608,26 +606,32 @@ void NpcScript::onCreatureDisappear(const Creature* creature)
 	if(m_onCreatureDisappear == -1){
 		return;	
 	}
+	//onCreatureDisappear(id)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "npc " << m_npc->getName();
+		env->setEventDesc(desc.str());
+		#endif
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << "npc " << m_npc->getName();
-	env->setEventDesc(desc.str());
-	#endif
+		lua_State* L = m_scriptInterface->getLuaState();
 	
-	lua_State* L = m_scriptInterface->getLuaState();
+		env->setScriptId(m_onCreatureDisappear, m_scriptInterface);
+		env->setRealPos(m_npc->getPosition());
+		env->setNpc(m_npc);
 	
-	env->setScriptId(m_onCreatureDisappear, m_scriptInterface);
-	env->setRealPos(m_npc->getPosition());
-	m_scriptInterface->setNpc(m_npc);
+		long cid = env->addThing(const_cast<Creature*>(creature));
 	
-	long cid = env->addThing(const_cast<Creature*>(creature));
-	
-	m_scriptInterface->pushFunction(m_onCreatureDisappear);
-	lua_pushnumber(L, cid);	
-	m_scriptInterface->callFunction(1);
+		m_scriptInterface->pushFunction(m_onCreatureDisappear);
+		lua_pushnumber(L, cid);	
+		m_scriptInterface->callFunction(1);
+		m_scriptInterface->releaseScriptEnv();
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. NpcScript::onCreatureDisappear" << std::endl;
+	}
 }
 
 void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
@@ -635,27 +639,33 @@ void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const
 	if(m_onCreatureSay == -1){
 		return;	
 	}
+	//onCreatureSay(cid, type, msg)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "npc " << m_npc->getName();
+		env->setEventDesc(desc.str());
+		#endif
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << "npc " << m_npc->getName();
-	env->setEventDesc(desc.str());
-	#endif
+		env->setScriptId(m_onCreatureSay, m_scriptInterface);
+		env->setRealPos(m_npc->getPosition());
+		env->setNpc(m_npc);
 	
-	env->setScriptId(m_onCreatureSay, m_scriptInterface);
-	env->setRealPos(m_npc->getPosition());
-	m_scriptInterface->setNpc(m_npc);
+		long cid = env->addThing(const_cast<Creature*>(creature));
 	
-	long cid = env->addThing(const_cast<Creature*>(creature));
-	
-	lua_State* L = m_scriptInterface->getLuaState();
-	m_scriptInterface->pushFunction(m_onCreatureSay);
-	lua_pushnumber(L, cid);
-	lua_pushnumber(L, type);
-	lua_pushstring(L, text.c_str());
-	m_scriptInterface->callFunction(3);
+		lua_State* L = m_scriptInterface->getLuaState();
+		m_scriptInterface->pushFunction(m_onCreatureSay);
+		lua_pushnumber(L, cid);
+		lua_pushnumber(L, type);
+		lua_pushstring(L, text.c_str());
+		m_scriptInterface->callFunction(3);
+		m_scriptInterface->releaseScriptEnv();
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. NpcScript::onCreatureSay" << std::endl;
+	}
 }
 
 void NpcScript::onThink()
@@ -663,19 +673,25 @@ void NpcScript::onThink()
 	if(m_onThink == -1){
 		return;	
 	}
+	//onThink()
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "npc " << m_npc->getName();
+		env->setEventDesc(desc.str());
+		#endif
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << "npc " << m_npc->getName();
-	env->setEventDesc(desc.str());
-	#endif
+		env->setScriptId(m_onThink, m_scriptInterface);
+		env->setRealPos(m_npc->getPosition());
+		env->setNpc(m_npc);
 	
-	env->setScriptId(m_onThink, m_scriptInterface);
-	env->setRealPos(m_npc->getPosition());
-	m_scriptInterface->setNpc(m_npc);
-	
-	m_scriptInterface->pushFunction(m_onThink);
-	m_scriptInterface->callFunction(0);
+		m_scriptInterface->pushFunction(m_onThink);
+		m_scriptInterface->callFunction(0);
+		m_scriptInterface->releaseScriptEnv();
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. NpcScript::onThink" << std::endl;
+	}
 }

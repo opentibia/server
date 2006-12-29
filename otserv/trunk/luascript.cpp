@@ -85,28 +85,6 @@ void ScriptEnviroment::resetEnv()
 	m_realPos.z = 0;
 }
 
-void ScriptEnviroment::resetCallback()
-{
-	m_callbackId = 0;
-}
-
-void ScriptEnviroment::setRealPos(const Position& realPos)
-{
-	m_realPos = realPos;	
-}
-
-Position ScriptEnviroment::getRealPos()
-{
-	return m_realPos;
-}
-	
-void ScriptEnviroment::setScriptId(long scriptId, LuaScriptInterface* scriptInterface)
-{
-	resetEnv();
-	m_scriptId = scriptId;
-	m_interface = scriptInterface;
-}
-
 bool ScriptEnviroment::setCallbackId(long callbackId)
 {
 	if(m_callbackId == 0){
@@ -120,26 +98,6 @@ bool ScriptEnviroment::setCallbackId(long callbackId)
 		}
 		return false;
 	}
-}
-
-void ScriptEnviroment::setEventDesc(const std::string& desc)
-{
-	m_eventdesc = desc;
-}
-
-std::string ScriptEnviroment::getEventDesc()
-{
-	return m_eventdesc;
-}
-
-long ScriptEnviroment::getScriptId()
-{
-	return m_scriptId;
-}
-
-LuaScriptInterface* ScriptEnviroment::getScriptInterface()
-{
-	return m_interface;
 }
 
 void ScriptEnviroment::getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, long& callbackId)
@@ -418,7 +376,8 @@ std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code){
 	};
 }
 
-ScriptEnviroment LuaScriptInterface::m_scriptEnv;
+ScriptEnviroment LuaScriptInterface::m_scriptEnv[16];
+int32_t LuaScriptInterface::m_scriptEnvIndex = -1;
 
 LuaScriptInterface::LuaScriptInterface(std::string interfaceName)
 {
@@ -437,11 +396,6 @@ bool LuaScriptInterface::reInitState()
 	return initState();
 }
 
-long LuaScriptInterface::getLastLuaError()
-{
-	return m_lastLuaError;
-}
-
 void LuaScriptInterface::dumpLuaStack()
 {
 	int a = lua_gettop(m_luaState);
@@ -449,11 +403,6 @@ void LuaScriptInterface::dumpLuaStack()
 	for(int i = 1; i <= a ; ++i){
 		std::cout << lua_typename(m_luaState, lua_type(m_luaState,-i)) << " " << lua_topointer(m_luaState, -i) << std::endl;
 	}
-}
-
-lua_State* LuaScriptInterface::getLuaState()
-{
-	return m_luaState;
 }
 
 long LuaScriptInterface::loadFile(const std::string& file)
@@ -470,15 +419,18 @@ long LuaScriptInterface::loadFile(const std::string& file)
 	}
 	
 	m_loadingFile = file;
-	ScriptEnviroment* env = getScriptEnv();
+	this->reserveScriptEnv();
+	ScriptEnviroment* env = this->getScriptEnv();
 	env->setScriptId(EVENT_ID_LOADING, this);
 	
 	//execute it
 	ret = lua_pcall(m_luaState, 0, 0, 0);
 	if(ret != 0){
+		this->releaseScriptEnv();
 		return -1;
 	}
 	
+	this->releaseScriptEnv();
 	return 0;
 }
 
@@ -521,11 +473,6 @@ const std::string& LuaScriptInterface::getFileById(long scriptId)
 		return unk;
 	}
 }
-	
-ScriptEnviroment* LuaScriptInterface::getScriptEnv()
-{
-	return &m_scriptEnv;
-}
 
 void LuaScriptInterface::reportError(const char* function, const std::string& error_desc)
 {
@@ -548,11 +495,6 @@ void LuaScriptInterface::reportError(const char* function, const std::string& er
 	if(function)
 		std::cout << function << "(). ";
 	std::cout << error_desc << std::endl;
-}
-
-std::string LuaScriptInterface::getInterfaceName()
-{
-	return m_interfaceName;
 }
 
 bool LuaScriptInterface::pushFunction(int32_t functionId)
@@ -602,35 +544,6 @@ bool LuaScriptInterface::closeState()
 	lua_close(m_luaState);
 	return true;
 }
-
-/*
-bool LuaScriptInterface::callFunction(uint32_t nParams, int32_t& result)
-{
-	//bool ret;
-	int size0 = lua_gettop(m_luaState);
-	if(lua_pcall(m_luaState, nParams, 1, 0) != 0){
-		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(m_luaState)));
-		result = 0;
-	}
-	else{
-		result = (int32_t)LuaScriptInterface::popNumber(m_luaState);
-		//ret =  true;
-	}
-
-	if((lua_gettop(m_luaState) + (int)nParams  + 1) != size0){
-		LuaScriptInterface::reportError(NULL, "Stack size changed!");
-	}
-
-	return (result == LUA_NO_ERROR);
-	//return ret;
-}
-
-bool LuaScriptInterface::callFunction(uint32_t nParams)
-{
-	int32_t a;
-	return callFunction(nParams, a);
-}
-*/
 
 int32_t LuaScriptInterface::callFunction(uint32_t nParams)
 {
@@ -1884,8 +1797,6 @@ int LuaScriptInterface::luaGetTilePzInfo(lua_State *L)
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
 	
-	//ScriptEnviroment* env = getScriptEnv();
-	
 	Tile *tile = g_game.map->getTile(pos);
 	
 	if(tile){
@@ -1909,8 +1820,6 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 	Position pos;
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
-	
-	//ScriptEnviroment* env = getScriptEnv();
 	
 	Tile *tile = g_game.map->getTile(pos);
 	if(tile){

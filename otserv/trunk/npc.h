@@ -35,13 +35,9 @@ public:
 	NpcScriptInterface();
 	virtual ~NpcScriptInterface();
 
-	static void setNpc(Npc* npc);
-
 	bool loadNpcLib(std::string file);
 
 protected:
-	
-	static Npc* getNpc();
 	
 	virtual void registerFunctions();
 	
@@ -60,7 +56,6 @@ private:
 	virtual bool closeState();
 	
 	bool m_libLoaded;
-	static Npc* m_curNpc;
 };
 
 class NpcEventsHandler

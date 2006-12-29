@@ -26,24 +26,18 @@
 #include <string>
 
 
-
 class Account
 {
-	//superflous
-	friend class IOAccount;
 public:
   Account();
   ~Account();
 
   unsigned long accnumber;
-  int accType;     // ?
   int premDays;    // Premium days
 
-  std::string name;
   std::string password;
 
   std::list<std::string> charList;
-
 };
 
 #endif  // #ifndef __ACCOUNT_H__

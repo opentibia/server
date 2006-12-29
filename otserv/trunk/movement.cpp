@@ -569,29 +569,37 @@ long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 {
 	//onStepIn(cid, item, pos)
 	//onStepOut(cid, item, pos)
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << creature->getName() << " itemid: " << item->getID() << " - " << pos;
-	env->setEventDesc(desc.str());
-	#endif
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << creature->getName() << " itemid: " << item->getID() << " - " << pos;
+		env->setEventDesc(desc.str());
+		#endif
 	
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(pos);
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(pos);
 	
-	long cid = env->addThing((Thing*)creature);
-	long itemid = env->addThing(item);
+		long cid = env->addThing((Thing*)creature);
+		long itemid = env->addThing(item);
 	
-	lua_State* L = m_scriptInterface->getLuaState();
+		lua_State* L = m_scriptInterface->getLuaState();
 	
-	m_scriptInterface->pushFunction(m_scriptId);
-	lua_pushnumber(L, cid);
-	LuaScriptInterface::pushThing(L, item, itemid);
-	LuaScriptInterface::pushPosition(L, pos, 0);
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		LuaScriptInterface::pushThing(L, item, itemid);
+		LuaScriptInterface::pushPosition(L, pos, 0);
 	
-	int32_t result = m_scriptInterface->callFunction(3);
-	return (result == LUA_TRUE);
+		int32_t result = m_scriptInterface->callFunction(3);
+		m_scriptInterface->releaseScriptEnv();
+		
+		return (result == LUA_TRUE);
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. MoveEvent::executeStep" << std::endl;
+		return 0;
+	}
 }
 
 long MoveEvent::fireEquip(Player* player, Item* item, slots_t slot)
@@ -608,29 +616,37 @@ long MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
 {
 	//onEquip(cid, item, slot)
 	//onDeEquip(cid, item, slot)
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << player->getName() << " itemid:" << item->getID() << " slot:" << slot;
-	env->setEventDesc(desc.str());
-	#endif
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << player->getName() << " itemid:" << item->getID() << " slot:" << slot;
+		env->setEventDesc(desc.str());
+		#endif
 	
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(player->getPosition());
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(player->getPosition());
 	
-	long cid = env->addThing((Thing*)player);
-	long itemid = env->addThing(item);
+		long cid = env->addThing((Thing*)player);
+		long itemid = env->addThing(item);
 	
-	lua_State* L = m_scriptInterface->getLuaState();
+		lua_State* L = m_scriptInterface->getLuaState();
 	
-	m_scriptInterface->pushFunction(m_scriptId);
-	lua_pushnumber(L, cid);
-	LuaScriptInterface::pushThing(L, item, itemid);
-	lua_pushnumber(L, slot);
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		LuaScriptInterface::pushThing(L, item, itemid);
+		lua_pushnumber(L, slot);
 	
-	int32_t result = m_scriptInterface->callFunction(3);
-	return (result == LUA_TRUE);
+		int32_t result = m_scriptInterface->callFunction(3);
+		m_scriptInterface->releaseScriptEnv();
+		
+		return (result == LUA_TRUE);
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. MoveEvent::executeEquip" << std::endl;
+		return 0;
+	}
 }
 
 long MoveEvent::fireAddRemItem(Item* item, Item* tileItem, const Position& pos)
@@ -647,30 +663,38 @@ long MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position& po
 {
 	//onAddItem(moveitem, tileitem, pos)
 	//onRemoveItem(moveitem, tileitem, pos)
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	if(tileItem){
-		desc << "tileid: " << tileItem->getID();
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		if(tileItem){
+			desc << "tileid: " << tileItem->getID();
+		}
+		desc << " itemid: " << item->getID() << " - " << pos;
+		env->setEventDesc(desc.str());
+		#endif
+	
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(pos);
+	
+		long itemidMoved = env->addThing(item);
+		long itemidTile = env->addThing(tileItem);
+	
+		lua_State* L = m_scriptInterface->getLuaState();
+	
+		m_scriptInterface->pushFunction(m_scriptId);
+		LuaScriptInterface::pushThing(L, item, itemidMoved);
+		LuaScriptInterface::pushThing(L, tileItem, itemidTile);
+		LuaScriptInterface::pushPosition(L, pos, 0);
+	
+		int32_t result = m_scriptInterface->callFunction(3);
+		m_scriptInterface->releaseScriptEnv();
+		
+		return (result == LUA_TRUE);
 	}
-	desc << " itemid: " << item->getID() << " - " << pos;
-	env->setEventDesc(desc.str());
-	#endif
-	
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(pos);
-	
-	long itemidMoved = env->addThing(item);
-	long itemidTile = env->addThing(tileItem);
-	
-	lua_State* L = m_scriptInterface->getLuaState();
-	
-	m_scriptInterface->pushFunction(m_scriptId);
-	LuaScriptInterface::pushThing(L, item, itemidMoved);
-	LuaScriptInterface::pushThing(L, tileItem, itemidTile);
-	LuaScriptInterface::pushPosition(L, pos, 0);
-	
-	int32_t result = m_scriptInterface->callFunction(3);
-	return (result == LUA_TRUE);
+	else{
+		std::cout << "[Error] Call stack overflow. MoveEvent::executeAddRemItem" << std::endl;
+		return 0;
+	}
 }

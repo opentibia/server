@@ -882,30 +882,38 @@ bool InstantSpell::internalCastSpell(Creature* creature, const LuaVariant& var)
 bool InstantSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 {
 	//onCastSpell(cid, var)
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << "onCastSpell - " << creature->getName();
-	env->setEventDesc(desc.str());
-	#endif
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "onCastSpell - " << creature->getName();
+		env->setEventDesc(desc.str());
+		#endif
 	
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(creature->getPosition());
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(creature->getPosition());
 	
-	lua_State* L = m_scriptInterface->getLuaState();
+		lua_State* L = m_scriptInterface->getLuaState();
 
-	uint32_t cid = env->addThing(creature);
+		uint32_t cid = env->addThing(creature);
 
-	LuaVariant* pVar = new LuaVariant(var);
-	uint32_t variant = env->addVariant(pVar);
+		LuaVariant* pVar = new LuaVariant(var);
+		uint32_t variant = env->addVariant(pVar);
 
-	m_scriptInterface->pushFunction(m_scriptId);
-	lua_pushnumber(L, cid);
-	lua_pushnumber(L, variant);
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		lua_pushnumber(L, variant);
 
-	int32_t result = m_scriptInterface->callFunction(2);
-	return (result == LUA_NO_ERROR);
+		int32_t result = m_scriptInterface->callFunction(2);
+		m_scriptInterface->releaseScriptEnv();
+		
+		return (result == LUA_NO_ERROR);
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. InstantSpell::executeCastSpell" << std::endl;
+		return false;
+	}
 }
 
 House* InstantSpell::getHouseFromPos(Creature* creature)
@@ -1777,29 +1785,36 @@ bool RuneSpell::internalCastSpell(Creature* creature, const LuaVariant& var)
 bool RuneSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 {
 	//onCastSpell(cid, var)
-
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << "onCastSpell - " << creature->getName();
-	env->setEventDesc(desc.str());
-	#endif
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "onCastSpell - " << creature->getName();
+		env->setEventDesc(desc.str());
+		#endif
 		
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(creature->getPosition());
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(creature->getPosition());
 		
-	lua_State* L = m_scriptInterface->getLuaState();
+		lua_State* L = m_scriptInterface->getLuaState();
 		
-	uint32_t cid = env->addThing(creature);
+		uint32_t cid = env->addThing(creature);
 
-	LuaVariant* pVar = new LuaVariant(var);
-	uint32_t variant = env->addVariant(pVar);
+		LuaVariant* pVar = new LuaVariant(var);
+		uint32_t variant = env->addVariant(pVar);
 
-	m_scriptInterface->pushFunction(m_scriptId);
-	lua_pushnumber(L, cid);
-	lua_pushnumber(L, variant);
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		lua_pushnumber(L, variant);
 
-	int32_t result = m_scriptInterface->callFunction(2);
-	return (result == LUA_NO_ERROR);
+		int32_t result = m_scriptInterface->callFunction(2);
+		m_scriptInterface->releaseScriptEnv();
+		
+		return (result == LUA_NO_ERROR);
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. RuneSpell::executeCastSpell" << std::endl;
+		return false;
+	}
 }

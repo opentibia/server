@@ -154,26 +154,34 @@ std::string TalkAction::getScriptEventName()
 long TalkAction::executeSay(Creature* creature, const std::string& words, const std::string& param)
 {
 	//onSay(cid, words, param)
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	#ifdef __DEBUG_LUASCRIPTS__
-	std::stringstream desc;
-	desc << creature->getName() << " - " << words << " " << param;
-	env->setEventDesc(desc.str());
-	#endif
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << creature->getName() << " - " << words << " " << param;
+		env->setEventDesc(desc.str());
+		#endif
 	
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(creature->getPosition());
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(creature->getPosition());
 	
-	long cid = env->addThing((Thing*)creature);
+		long cid = env->addThing((Thing*)creature);
 	
-	lua_State* L = m_scriptInterface->getLuaState();
+		lua_State* L = m_scriptInterface->getLuaState();
 	
-	m_scriptInterface->pushFunction(m_scriptId);
-	lua_pushnumber(L, cid);
-	lua_pushstring(L, words.c_str());
-	lua_pushstring(L, param.c_str());
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		lua_pushstring(L, words.c_str());
+		lua_pushstring(L, param.c_str());
 	
-	int32_t result = m_scriptInterface->callFunction(3);
-	return (result == LUA_TRUE);
+		int32_t result = m_scriptInterface->callFunction(3);
+		m_scriptInterface->releaseScriptEnv();
+		
+		return (result == LUA_TRUE);
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. TalkAction::executeSay" << std::endl;
+		return 0;
+	}
 }

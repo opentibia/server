@@ -53,7 +53,7 @@ bool DatabaseSqLite::init()
 	return m_initialized;
 }
 
-bool DatabaseSqLite::connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass)
+bool DatabaseSqLite::connect()
 {
     //don't need to connect
 	m_connected = true;

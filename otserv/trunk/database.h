@@ -178,12 +178,8 @@ public:
 	*\returns
 	* 	TRUE if the connection is ok
 	* 	FALSE if the connection fails
-	*\param db_name The "name" of the database used
-	*\param db_host The "host" to connect to
-	*\param db_user The "username" used in the connection
-	*\param db_pass The "password" of the username used
 	*/
-	DATABASE_VIRTUAL bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass){return false;};
+	DATABASE_VIRTUAL bool connect(){return false;};
 
 	/** Disconnects from the connected database
 	*\returns

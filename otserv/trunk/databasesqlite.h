@@ -45,7 +45,7 @@ public:
 	*\param db_user The "username" used in the connection
 	*\param db_pass The "password" of the username used
 	*/
-	virtual bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass);
+	virtual bool connect();
 
 	/** Disconnects from the connected DatabaseSqLite
 	*\returns
