@@ -62,12 +62,6 @@ enum ItemDecayState_t{
 	DECAYING_FALSE = 0,
 	DECAYING_TRUE,
 	DECAYING_PENDING
-
-	/*
-	ITEM_NO_DECAYING = 0,
-	ITEM_DECAYING = 1,
-	ITEM_PENDING_START_DECAY = 2,
-	*/
 };
 
 /*from iomapotbm.h*/
@@ -221,9 +215,9 @@ public:
 	virtual std::string getDescription(int32_t lookDistance) const;
 	std::string getWeightDescription() const;
 
-	unsigned short getID() const {return id;}
-	unsigned short getClientID() const {return items[id].clientId;}
-	virtual void setID(unsigned short newid) {id = newid;}
+	uint16_t getID() const {return id;}
+	uint16_t getClientID() const {return items[id].clientId;}
+	void setID(uint16_t newid);
 
 	WeaponType_t getWeaponType() const {return items[id].weaponType;}
 	Ammo_t	getAmuType() const {return items[id].amuType;}

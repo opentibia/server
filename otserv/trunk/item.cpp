@@ -118,13 +118,7 @@ Item::Item(const unsigned short _type, unsigned short _count /*= 0*/) :
 		charges = _count;
 	}
 
-	/*
-	setItemCountOrSubtype(_count);
-
-	if(count == 0){
-		count = 1;
-	}
-	*/
+	setDefaultDuration();
 }
 
 Item::Item(const Item &i) :
@@ -136,12 +130,15 @@ Item::Item(const Item &i) :
 	charges = i.charges;
 	fluid = i.fluid;
 	
-	unsigned short v;
-	if(v = i.getActionId())
-		setActionId(v);
+	uint16_t _actionId;
+	if(_actionId = i.getActionId()){
+		setActionId(_actionId);
+	}
 	
-	if(v = i.getUniqueId())
-		setUniqueId(v);
+	uint16_t _uniqueId;
+	if(_uniqueId = i.getUniqueId()){
+		setUniqueId(_uniqueId);
+	}
 	
 	if(i.getSpecialDescription() != ""){
 		setSpecialDescription(i.getSpecialDescription());
@@ -150,12 +147,37 @@ Item::Item(const Item &i) :
 	if(i.getText() != ""){
 		setText(i.getText());
 	}
+
+	uint32_t _owner;
+	if(_owner = i.getOwner()){
+		setOwner(_owner);
+	}
+
+	uint32_t _duration;
+	if(_duration = i.getDuration()){
+		setDuration(_duration);
+	}
+
+	uint32_t _decayState;
+	if(_decayState = i.getDecaying()){
+		setDecaying((ItemDecayState_t)_decayState);
+	}
 }
 
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
 	//
+}
+
+void Item::setID(uint16_t newid)
+{
+	id = newid;
+
+	if(getDuration() <= 0){
+		setDecaying(DECAYING_FALSE);
+		setDefaultDuration();
+	}
 }
 
 unsigned char Item::getItemCountOrSubtype() const

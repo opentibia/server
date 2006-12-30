@@ -855,6 +855,8 @@ void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 bool ConditionDamage::init()
 {
 	if(damageList.empty()){
+		setTicks(0);
+
 		int32_t amount = random_range(minDamage, maxDamage);
 		if(startDamage > maxDamage){
 			startDamage = maxDamage;
@@ -983,27 +985,42 @@ void ConditionDamage::endCondition(Creature* creature, EndCondition_t reason)
 void ConditionDamage::addCondition(Creature* creature, const Condition* addCondition)
 {
 	if(addCondition->getType() == conditionType){
-		if(addCondition->getTicks() > ticks){
-			ticks = addCondition->getTicks();
-		}
-		
 		const ConditionDamage& conditionDamage = static_cast<const ConditionDamage&>(*addCondition);
 
-		owner = conditionDamage.owner;
-		maxDamage = conditionDamage.maxDamage;
-		minDamage = conditionDamage.minDamage;
-		startDamage = conditionDamage.startDamage;
+		if(conditionDamage.getTotalDamage() > getTotalDamage()){
+			ticks = addCondition->getTicks();
+			owner = conditionDamage.owner;
+			maxDamage = conditionDamage.maxDamage;
+			minDamage = conditionDamage.minDamage;
+			startDamage = conditionDamage.startDamage;
 
-		damageList.clear();
-		damageList = conditionDamage.damageList;
-		
-		if(init()){
-			int32_t damage = 0;
-			if(getNextDamage(damage)){
-				doDamage(creature, damage);
+			damageList.clear();
+			damageList = conditionDamage.damageList;
+			
+			if(init()){
+				int32_t damage = 0;
+				if(getNextDamage(damage)){
+					doDamage(creature, damage);
+				}
 			}
 		}
 	}
+}
+
+int32_t ConditionDamage::getTotalDamage() const
+{
+	int32_t result = 0;
+
+	if(!damageList.empty()){
+		for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); ++it){
+			result += it->value;
+		}
+	}
+	else{
+		result = maxDamage + (maxDamage - minDamage) / 2;
+	}
+
+	return std::abs(result);
 }
 
 uint32_t ConditionDamage::getIcons() const
@@ -1037,7 +1054,7 @@ void ConditionDamage::generateDamageList(int32_t amount, int32_t start, std::lis
 
 	for(int32_t i = start; i > 0; --i){
 		int32_t n = start + 1 - i;
-		med = (int32_t)std::ceil((((float) n) / start) * amount);
+		med = (n * amount) / start;
 
 		do{
 			sum += i;

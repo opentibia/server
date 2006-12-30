@@ -107,7 +107,7 @@ public:
 	void setDirection(Direction dir) { direction = dir;}
 
 	const Position& getMasterPos() const { return masterPos;}
-	void setMasterPos(const Position& pos) { masterPos = pos;}
+	void setMasterPos(const Position& pos, uint32_t radius = 1) { masterPos = pos;}
 
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return (getSleepTicks() <= 0);};
@@ -259,6 +259,7 @@ protected:
 	Outfit_t defaultOutfit;
 
 	Position masterPos;
+	uint32_t masterRadius;
 	uint64_t lastMove;
 	uint32_t lastStepCost;
 	uint32_t baseSpeed;

@@ -57,6 +57,7 @@ enum WorldType_t {
 };
 
 enum GameState_t {
+	GAME_STATE_STARTUP,
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
 	GAME_STATE_SHUTDOWN,
@@ -326,8 +327,6 @@ public:
 	//Events
 	void checkWalk(unsigned long creatureId);
 	void checkCreature(uint32_t creatureId, uint32_t interval);
-	//void checkCreatureAttacking(uint32_t creatureId, uint32_t interval);
-	void checkSpawns(int t);
 	void checkLight(int t);
 	
 	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target,

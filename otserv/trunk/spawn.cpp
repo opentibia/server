@@ -33,27 +33,26 @@ extern ConfigManager g_config;
 extern Monsters g_monsters;
 extern Game g_game;
 
-SpawnManager::SpawnManager()
+Spawns::Spawns()
 {
-	//
+	loaded = false;
+	started = false;
+	filename = "";
 }
 
-SpawnManager::~SpawnManager()
+Spawns::~Spawns()
 {
-	for(spawnsList::iterator it = spawns.begin(); it != spawns.end(); ++it)
-		delete *it;
-
-	spawns.clear();
+	clear();
 }
 
-bool SpawnManager::addSpawn(Spawn* spawn)
+bool Spawns::loadFromXml(const std::string& _filename)
 {
-	spawns.push_back(spawn);
-	return true;
-}
-
-bool SpawnManager::loadSpawnsXML(std::string filename)
-{
+	if(isLoaded()){
+		return true;
+	}
+	
+	filename = _filename;
+	
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
@@ -107,19 +106,21 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 				}
 
 				Spawn* spawn = new Spawn(centerPos, radius);
-				spawns.push_back(spawn);
-
-				std::string name;
-				int x, y, spawntime;
-				Direction dir = NORTH;
-				int rawdir = 0; //NORTH
+				spawnList.push_back(spawn);
 
 				xmlNodePtr tmpNode = spawnNode->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"monster") == 0){
 
+						spawnBlock_t sb;
+						sb.direction = NORTH;
+						sb.name = "";
+						sb.interval = 0;
+						sb.pos = centerPos;
+						sb.lastSpawn = 0;
+
 						if(readXMLString(tmpNode, "name", strValue)){
-							name = strValue;
+							sb.name = strValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
@@ -127,11 +128,16 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 						}
 
 						if(readXMLInteger(tmpNode, "direction", intValue)){
-							rawdir = intValue;
+							switch(intValue){
+								case 0: sb.direction = NORTH; break;
+								case 1: sb.direction = EAST; break;
+								case 2: sb.direction = SOUTH; break;
+								case 3: sb.direction = WEST; break;
+							}
 						}
 
 						if(readXMLInteger(tmpNode, "x", intValue)){
-							x = intValue;
+							sb.pos.x += intValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
@@ -139,35 +145,28 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 						}
 
 						if(readXMLInteger(tmpNode, "y", intValue)){
-							y = intValue;
+							sb.pos.y += intValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
 							continue;
 						}
 
-						if(readXMLInteger(tmpNode, "spawntime", intValue)){
-							spawntime = intValue;
+						if(readXMLInteger(tmpNode, "spawntime", intValue) || readXMLInteger(tmpNode, "interval", intValue)){
+							sb.interval = intValue * 1000;
 						}
 						else{
 							tmpNode = tmpNode->next;
 							continue;
 						}
 
-						switch(rawdir){
-							case 0: dir = NORTH; break;
-							case 1: dir = EAST; break;
-							case 2: dir = SOUTH; break;
-							case 3: dir = WEST; break;
-
-							default:
-								dir = NORTH;
-								break;
-						}
-
-						spawn->addMonster(name, dir, x, y, spawntime * 1000);
+						spawn->addMonster(sb);
 					}
 					else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"npc") == 0){
+
+						Direction direction = NORTH;
+						std::string name = "";
+						Position placePos = centerPos;
 
 						if(readXMLString(tmpNode, "name", strValue)){
 							name = strValue;
@@ -178,11 +177,16 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 						}
 						
 						if(readXMLInteger(tmpNode, "direction", intValue)){
-							rawdir = intValue;
+							switch(intValue){
+								case 0: direction = NORTH; break;
+								case 1: direction = EAST; break;
+								case 2: direction = SOUTH; break;
+								case 3: direction = WEST; break;
+							}
 						}
 
 						if(readXMLInteger(tmpNode, "x", intValue)){
-							x = intValue;
+							placePos.x += intValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
@@ -190,22 +194,11 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 						}
 
 						if(readXMLInteger(tmpNode, "y", intValue)){
-							y = intValue;
+							placePos.y += intValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
 							continue;
-						}
-
-						switch(rawdir){
-							case 0: dir = NORTH; break;
-							case 1: dir = EAST; break;
-							case 2: dir = SOUTH; break;
-							case 3: dir = WEST; break;
-
-							default:
-								dir = NORTH;
-								break;
 						}
 						
 						Npc* npc = new Npc(name);
@@ -216,11 +209,7 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 							continue;
 						}
 						
-						npc->setDirection(dir);
-
-						Position placePos = centerPos;
-						placePos.x += x;
-						placePos.y += y;
+						npc->setDirection(direction);
 
 						// Place the npc
 						if(!g_game.placeCreature(placePos, npc)){
@@ -239,159 +228,193 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 		}
 
 		xmlFreeDoc(doc);
+		loaded = true;
 		return true;
+	}
+	
+	return false;
+}
+
+void Spawns::startup()
+{	
+	if(!isLoaded() || isStarted())
+		return;
+	
+	uint32_t offset = 0;
+	for(SpawnList::iterator it = spawnList.begin(); it != spawnList.end(); ++it){
+		(*it)->startup();
+		uint32_t eventId = g_game.addEvent(makeTask((*it)->getInterval() + offset, boost::bind(&Spawn::checkSpawn, (*it))));
+		(*it)->setSpawnCheckEvent(eventId);
+
+		//std::cout << "starting spawn: " << (*it)->getInterval() + offset << std::endl;
+		offset += 1000;
+	}
+
+	started = true;
+}
+
+void Spawns::clear()
+{
+	for(SpawnList::iterator it= spawnList.begin(); it != spawnList.end(); ++it){
+		delete (*it);
+	}
+
+	spawnList.clear();
+	
+	loaded = false;
+	started = false;
+	filename = "";
+}
+
+void Spawns::reload()
+{
+	std::string file = filename;
+	clear();
+	loadFromXml(file);
+}
+
+Spawn::Spawn(const Position& _pos, int32_t _radius)
+{
+	centerPos = _pos;
+	radius = _radius;
+
+	interval = 20000;
+	checkSpawnEvent = 0;
+}
+
+Spawn::~Spawn()
+{
+	stopEvent();
+}
+
+bool Spawn::findPlayer(const Position& pos)
+{
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+
+	g_game.getSpectators(list, pos, true);
+
+	Player* tmpPlayer = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		if((tmpPlayer = (*it)->getPlayer()) && tmpPlayer->getAccessLevel() == 0){
+			return true;
+		}
 	}
 
 	return false;
 }
 
-bool SpawnManager::startup()
+bool Spawn::isInSpawnZone(const Position& pos)
 {
-	for(spawnsList::iterator it = spawns.begin(); it != spawns.end(); ++it) {
-		(*it)->startup();
-	}
-
-	if(!spawns.empty()) {
-		g_game.addEvent(makeTask(20000, std::bind2nd(std::mem_fun(&Game::checkSpawns), 20000)));
-	}
-	
-	return true;
-}
-
-void SpawnManager::checkSpawns(int t)
-{
-	for(spawnsList::iterator it = spawns.begin(); it != spawns.end(); ++it) {
-		(*it)->idle(t);
-	}
-}
-
-Spawn::Spawn(Position pos, int _radius)
-{
-	centerPos = pos;
-	radius = _radius;
-}
-
-bool Spawn::startup()
-{
-	for(SpawnMap::iterator sit = spawnmap.begin(); sit != spawnmap.end(); ++sit) {
-		respawn(sit->first, sit->second.pos, sit->second.name, sit->second.dir);
-	}
-
-	return true;
-}
-
-bool Spawn::addMonster(std::string name, Direction dir, int x, int y, int spawntime)
-{
-	Position tmpPos(centerPos.x + x, centerPos.y, centerPos.z);
-	if(!isInSpawnRange(tmpPos)) {
-// #ifdef __DEBUG__
-		std::cout << "Monster is outside the spawn-area!" << std::endl;
-// #endif
-		return false;
-	}
-
-	if(g_monsters.getIdByName(name) == 0){
-		std::cout << "[Spawn::addMonster] Can not find " << name << std::endl;
-		return false;
-	}
-
-	struct spawninfo si;
-	si.name = name;
-	si.dir = dir;
-	si.pos.x = centerPos.x + x;
-	si.pos.y = centerPos.y + y;
-	si.pos.z = centerPos.z;
-	si.spawntime = spawntime;
-	si.lastspawn = 0;
-
-	unsigned long spawnid = (int)spawnmap.size() + 1;
-	spawnmap[spawnid] = si;
-
-	return true;
-}
-
-Monster* Spawn::respawn(unsigned long spawnid, Position& pos, std::string& name, Direction dir)
-{
-	Monster* monster = Monster::createMonster(name);
-	if(monster){
-		monster->setDirection(dir);
-		monster->setMasterPos(centerPos);
-
-		if(g_game.placeCreature(pos, monster, true, true)){
-			monster->useThing2();
-			spawnedmap.insert(spawned_pair(spawnid, monster));
-			spawnmap[spawnid].lastspawn = OTSYS_TIME();
-			return monster;
-		}
-
-		//not loaded, or could not place it on the map
-		delete monster;
-		monster = NULL;
-	}
-	else{
-		std::cout << "[Spawn::respawn] Can not create monster " << name << std::endl;
-	}
-
-	return NULL;
-}
-
-bool Spawn::isInSpawnRange(const Position& p)
-{
-	if((p.x >= centerPos.x - radius) && (p.x <= centerPos.x + radius) &&
-      (p.y >= centerPos.y - radius) && (p.y <= centerPos.y + radius))
+	if((pos.x >= centerPos.x - radius) && (pos.x <= centerPos.x + radius) &&
+      (pos.y >= centerPos.y - radius) && (pos.y <= centerPos.y + radius))
     return true;
 
 	return false;
 }
 
-void Spawn::idle(int t)
+bool Spawn::spawnMonster(uint32_t spawnId, const std::string& name, const Position& pos, Direction dir)
 {
-	SpawnedMap::iterator it;
-	for(it = spawnedmap.begin(); it != spawnedmap.end();) {
-		if (it->second->isRemoved()) {
-			if(it->first != 0) {
-				spawnmap[it->first].lastspawn = OTSYS_TIME();
+	Monster* monster = Monster::createMonster(name);
+	if(!monster){
+		return false;
+	}
+
+	if(!g_game.placeCreature(pos, monster, true, true)){
+		delete monster;
+		return false;
+	}
+
+	monster->setDirection(dir);
+	monster->setMasterPos(centerPos, radius);
+	monster->useThing2();
+
+	spawnedMap.insert(spawned_pair(spawnId, monster));
+	spawnMap[spawnId].lastSpawn = OTSYS_TIME();
+	return true;
+}
+
+void Spawn::startup()
+{
+	for(SpawnMap::iterator it = spawnMap.begin(); it != spawnMap.end(); ++it) {
+		uint32_t spawnId = it->first;
+		spawnBlock_t& sb = it->second;
+
+		spawnMonster(spawnId, sb.name, sb.pos, sb.direction);
+	}
+}
+
+void Spawn::checkSpawn()
+{
+	//std::cout << "[Notice] Spawns: check spawn " << this << std::endl;
+
+	Monster* monster;
+	uint32_t spawnId;
+	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end();){
+		spawnId = it->first;
+		monster = it->second;
+
+		if(monster->isRemoved()) {
+			if(spawnId != 0) {
+				spawnMap[spawnId].lastSpawn = OTSYS_TIME();
 			}
 
-			it->second->releaseThing2();
-			spawnedmap.erase(it++);
+			monster->releaseThing2();
+			spawnedMap.erase(it++);
 		}
-		else if(!isInSpawnRange(it->second->getPosition()) && it->first != 0) {
-			spawnedmap.insert(spawned_pair(0, it->second));
-			spawnedmap.erase(it++);
+		else if(!isInSpawnZone(monster->getPosition()) && spawnId != 0) {
+			spawnedMap.insert(spawned_pair(0, monster));
+			spawnedMap.erase(it++);
+
+			//TODO: despawn the monster
 		}
-		else
+		else{
 			++it;
+		}
 	}
 	
-	for(SpawnMap::iterator sit = spawnmap.begin(); sit != spawnmap.end(); ++sit) {
+	for(SpawnMap::iterator it = spawnMap.begin(); it != spawnMap.end(); ++it) {
+		spawnId = it->first;
+		spawnBlock_t& sb = it->second;
 
-		if(spawnedmap.count(sit->first) == 0) {
-			if((OTSYS_TIME() - sit->second.lastspawn) >= sit->second.spawntime) {
+		if(spawnedMap.count(spawnId) == 0){
+			if((OTSYS_TIME() - sb.lastSpawn) >= sb.interval){
 
-				SpectatorVec list;
-				SpectatorVec::iterator it;
-
-				//g_game.getSpectators(Range(sit->second.pos, true), list);
-				g_game.getSpectators(list, sit->second.pos, true);
-
-				bool playerFound = false;
-				Player* player = NULL;
-
-				for(it = list.begin(); it != list.end(); ++it) {
-					if((player = (*it)->getPlayer()) && player->getAccessLevel() == 0){
-						playerFound = true;
-						break;
-					}
-				}
-				
-				if(playerFound){
-					sit->second.lastspawn = OTSYS_TIME();
+				if(findPlayer(sb.pos)){
+					sb.lastSpawn = OTSYS_TIME();
 					continue;
 				}
 
-				respawn(sit->first, sit->second.pos, sit->second.name, sit->second.dir);
+				//std::cout << "Spawn monster " << sb.name << std::endl;
+				spawnMonster(spawnId, sb.name, sb.pos, sb.direction);
 			}
 		}
+	}
+
+	checkSpawnEvent = g_game.addEvent(makeTask(getInterval(), boost::bind(&Spawn::checkSpawn, this)));
+}
+
+bool Spawn::addMonster(const spawnBlock_t& cb)
+{
+	if(g_monsters.getIdByName(cb.name) == 0){
+		std::cout << "[Spawn::addMonster] Can not find " << cb.name << std::endl;
+		return false;
+	}
+	
+	if(cb.interval > interval){
+		interval = cb.interval;
+	}
+
+	uint32_t spawnId = (int)spawnMap.size() + 1;
+	spawnMap[spawnId] = cb;
+
+	return true;
+}
+
+void Spawn::stopEvent()
+{
+	if(checkSpawnEvent != 0){
+		g_game.stopEvent(checkSpawnEvent);
+		checkSpawnEvent = 0;
 	}
 }

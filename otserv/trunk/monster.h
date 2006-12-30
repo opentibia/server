@@ -90,8 +90,6 @@ public:
 	bool isHostile() const { return mType->isHostile;}
 	virtual bool canSeeInvisibility() const { return isImmune(CONDITION_INVISIBLE);}
 
-	//virtual uint32_t getFollowDistance() const;
-	//virtual bool getFollowReachable() const;
 	virtual void getCombatValues(int32_t& min, int32_t& max);
 	
 	uint32_t getManaCost() const {return mType->manaCost;}
@@ -132,6 +130,7 @@ private:
 	void updateTargetList();
 	void clearTargetList();
 
+	bool isInSpawnZone(const Position& pos);
 	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }

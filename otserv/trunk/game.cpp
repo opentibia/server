@@ -1360,6 +1360,8 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 		return item;
 	}
 
+	//std::cout << "transformItem: " << item << ", current id: " << item->getID() << ", new id: " << newtype << ", name: " << item->getName() << std::endl;
+
 	if(item->getContainer()){
 		//container to container
 		if(Item::items[newtype].isContainer()){
@@ -3000,27 +3002,31 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 
 void Game::startDecay(Item* item)
 {
+	uint32_t decayState = item->getDecaying();
+	if(decayState == DECAYING_TRUE){
+		//already decaying
+		return;
+	}
+
 	if(item->canDecay()){
-		uint32_t decayState = item->getDecaying();
-		//if(decayState == DECAYING_FALSE || decayState == DECAYING_PENDING){
-		if(decayState != DECAYING_TRUE){
-			if(decayState == DECAYING_FALSE){
-				if(!item->hasDuration() || item->getDuration() == 0){
-					item->setDefaultDuration();
-				}
+		/*
+		if(decayState == DECAYING_FALSE){
+			if(!item->hasDuration() || item->getDuration() == 0){
+				item->setDefaultDuration();
 			}
-			else if(decayState == DECAYING_PENDING){
-				//no change duration because was set during loading time
-			}
-			
-			if(item->getDuration() > 0){
-				item->useThing2();
-				item->setDecaying(DECAYING_TRUE);
-				decayItems.push_back(item);
-			}
-			else{
-				internalDecayItem(item);
-			}
+		}
+		else if(decayState == DECAYING_PENDING){
+			//no change duration because was set during loading time
+		}
+		*/
+		
+		if(item->getDuration() > 0){
+			item->useThing2();
+			item->setDecaying(DECAYING_TRUE);
+			decayItems.push_back(item);
+		}
+		else{
+			internalDecayItem(item);
 		}
 	}
 }
@@ -3031,8 +3037,6 @@ void Game::internalDecayItem(Item* item)
 
 	if(it.decayTo != 0){
 		Item* newItem = transformItem(item, it.decayTo);
-		newItem->setDecaying(DECAYING_FALSE);
-		newItem->setDefaultDuration();
 		startDecay(newItem);
 	}
 	else{
@@ -3048,13 +3052,11 @@ void Game::checkDecay(int32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
-	//std::cout << "checkDecay" << std::endl;
 	Item* item = NULL;
 	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
 		item = *it;
-		//std::cout << "check Item " << item << std::endl;
-		//item->setDuration(item->getDuration() - interval);
 		item->decreaseDuration(interval);
+		//std::cout << "checkDecay: " << item << ", id:" << item->getID() << ", name: " << item->getName() << ", duration: " << item->getDuration() << std::endl;
 		
 		if(!item->canDecay()){
 			item->setDecaying(DECAYING_FALSE);
@@ -3074,14 +3076,6 @@ void Game::checkDecay(int32_t interval)
 	}
 
 	flushSendBuffers();
-}
-
-void Game::checkSpawns(int t)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkSpawns()");
-	
-	SpawnManager::getInstance().checkSpawns(t);
-	this->addEvent(makeTask(t, std::bind2nd(std::mem_fun(&Game::checkSpawns), t)));
 }
 
 void Game::checkLight(int t)

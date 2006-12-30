@@ -335,6 +335,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								player->client->setKey(k);
 								player->client->reinitializeProtocol(s);
 								player->client->sendAddCreature(player, false);
+								player->sendIcons();
 								player->lastip = player->getIP();
 								s = 0;
 							}
@@ -369,6 +370,11 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								#endif
 								msg.AddByte(0x14);
 								msg.AddString("You are already logged in.");
+								msg.WriteToSocket(s);
+							}
+							else if(g_game.getGameState() == GAME_STATE_STARTUP){
+								msg.AddByte(0x14);
+								msg.AddString("Gameworld is starting up. Please wait.");
 								msg.WriteToSocket(s);
 							}
 							else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
@@ -549,6 +555,7 @@ int main(int argc, char *argv[])
 
 //	LOG_MESSAGE("main", EVENT, 1, "Starting server");
 
+	g_game.setGameState(GAME_STATE_STARTUP);
 
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... ";
@@ -786,6 +793,7 @@ int main(int argc, char *argv[])
 	int listen_errors;
 	int accept_errors;
 	listen_errors = 0;
+	g_game.setGameState(GAME_STATE_NORMAL);
 	while(g_game.getGameState() != GAME_STATE_SHUTDOWN && listen_errors < 100){
 		sockaddr_in local_adress;
 		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct

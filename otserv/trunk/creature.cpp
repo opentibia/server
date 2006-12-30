@@ -59,6 +59,11 @@ Creature::Creature() :
 	baseSpeed = 220;
 	varSpeed = 0;
 
+	masterRadius = 0;
+	masterPos.x = 0;
+	masterPos.y = 0;
+	masterPos.z = 0;
+
 	attackStrength = 0;
 	defenseStrength = 0;
 
@@ -760,19 +765,17 @@ bool Creature::addCondition(Condition* condition)
 	if(prevCond){
 		prevCond->addCondition(this, condition);
 		delete condition;
-	}
-	else{
-		if(condition->startCondition(this)){
-			conditions.push_back(condition);
-			onAddCondition(condition->getType());
-		}
-		else{
-			delete condition;
-			return false;
-		}
+		return true;
 	}
 
-	return true;
+	if(condition->startCondition(this)){
+		conditions.push_back(condition);
+		onAddCondition(condition->getType());
+		return true;
+	}
+
+	delete condition;
+	return false;
 }
 
 void Creature::removeCondition(ConditionType_t type)

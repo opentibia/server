@@ -36,8 +36,8 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 bool IOMapXML::loadSpawns(Map* map)
 {
 	if(!map->spawnfile.empty()){
-		SpawnManager::getInstance().loadSpawnsXML(map->spawnfile);
-		SpawnManager::getInstance().startup();
+		Spawns::getInstance()->loadFromXml(map->spawnfile);
+		Spawns::getInstance()->startup();
 	}
 	
 	return true;

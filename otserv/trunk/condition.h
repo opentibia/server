@@ -249,6 +249,7 @@ protected:
 	uint32_t owner;
 
 	bool init();
+	int32_t getTotalDamage() const;
 
 	typedef std::list<IntervalInfo> DamageList;
 	DamageList damageList;

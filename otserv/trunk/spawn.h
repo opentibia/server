@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __SPAWN_H
-#define __SPAWN_H
+#ifndef __OTSERV_SPAWN_H__
+#define __OTSERV_SPAWN_H__
 
 #include "tile.h"
 #include "position.h"
@@ -30,32 +30,106 @@
 #include <vector>
 #include <map>
 
-class Game;
 class Spawn;
-typedef std::list<Spawn*> spawnsList;
+typedef std::list<Spawn*> SpawnList;
 
-class Spawn /*: public Event*/ {
-public:
-	Spawn(Position pos, int _radius);
-	void idle(int t);
-	bool addMonster(std::string name, Direction dir, int x, int y, int spawntime);
+class Spawns{
+private:
+	Spawns();
 
 public:
-	bool startup();
+	static Spawns* getInstance(){
+		static Spawns instance;
+		return &instance;
+	}
+	
+	~Spawns();
+	
+	bool loadFromXml(const std::string& _filename);
+	void startup();
+	
+	void clear();
+	void reload();
+	
+	bool isLoaded() { return loaded; }
+	bool isStarted() { return started; }
+	
+private:
+	SpawnList spawnList;
+	bool loaded, started;
+	std::string filename;
+};
 
-	/*
-	virtual void onCreatureEnter(const Creature* creature, const Position& pos);
-	virtual void onCreatureLeave(const Creature* creature, const Position& pos);
-	*/
+struct spawnBlock_t{
+	std::string name;
+	Direction direction;
+	Position pos;
+	int32_t interval;
+	int64_t lastSpawn;
+};
+
+class Spawn{
+public:
+	Spawn(const Position& _pos, int32_t _radius);
+	~Spawn();
+	
+	bool addMonster(const spawnBlock_t& sb);
+
+	uint32_t getInterval() {return interval;}
+	
+	void startup();
+
+	void stopEvent();
+	void setSpawnCheckEvent(uint32_t eventId) { checkSpawnEvent = eventId; }
+	
+	void checkSpawn();
 
 private:
+	Position centerPos;
+	int32_t radius;
+
+	//map of creatures in the spawn
+	typedef std::map<uint32_t, spawnBlock_t> SpawnMap;
+	SpawnMap spawnMap;
+
+	//map of the spawned creatures
+	typedef std::multimap<uint32_t, Monster*, std::less<uint32_t> > SpawnedMap;
+	typedef SpawnedMap::value_type spawned_pair;
+	SpawnedMap spawnedMap;
+
+	uint32_t interval;
+	uint32_t checkSpawnEvent;
+
+	bool findPlayer(const Position& pos);
+	bool isInSpawnZone(const Position& pos);
+	bool spawnMonster(uint32_t spawnId, const std::string& name, const Position& pos, Direction dir);
+};
+
+/*
+class Game;
+class Spawn;
+typedef std::list<Spawn*> SpawnList;
+
+class Spawn{
+public:
+	Spawn(Position pos, int32_t _radius);
+	//void idle(int t);
+	bool addMonster(std::string name, Direction dir, int32_t x, int32_t y, int32_t time);
+
+//public:
+//	bool startup();
+
+	void setSpawnCheckEvent(uint32_t eventId) { checkSpawnEvent = eventId; }
+
+private:
+	uint32_t checkSpawnEvent;
 	Position centerPos;
 	int radius;
 
 	bool isInSpawnRange(const Position& pos);
-	Monster* respawn(unsigned long spawnid, Position& pos, std::string& name, Direction dir);
+	Monster* respawn(uint32_t spawnid, Position& pos, std::string& name, Direction dir);
 
-	struct spawninfo {
+	struct spawnBlock_t{
 		Position pos;
 		std::string name;
 		Direction dir;
@@ -64,13 +138,13 @@ private:
 	};
 
 	//List of monsters in the spawn
-	typedef std::map<unsigned long, struct spawninfo> SpawnMap;
-	SpawnMap spawnmap;
+	typedef std::map<uint32_t, spawnBlock_t> SpawnMap;
+	SpawnMap spawnMap;
 
 	//For spawned monsters
-	typedef std::multimap<unsigned long, Monster*, std::less<unsigned long> > SpawnedMap;
+	typedef std::multimap<uint32_t, Monster*, std::less<uint32_t> > SpawnedMap;
 	typedef SpawnedMap::value_type spawned_pair;
-	SpawnedMap spawnedmap;
+	SpawnedMap spawnedMap;
 };
 
 class SpawnManager{
@@ -80,22 +154,19 @@ public:
 		return instance;
 	}
 
-	//static SpawnManager* instance();
-	//static bool initialize(Game* igame);
-
 	bool addSpawn(Spawn* spawn);
 	bool loadSpawnsXML(std::string filename);
 	bool startup();
 
-	void checkSpawns(int t);
+	//void checkSpawns(int t);
 
 protected:
 	SpawnManager();
 	~SpawnManager();
 
 	SpawnManager* _instance;
-	spawnsList spawns;
-	Game* game;
+	SpawnList spawnList;
 };
+*/
 
 #endif

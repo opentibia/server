@@ -140,35 +140,44 @@ void Monster::onUpdateTile(const Position& pos)
 void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	Creature::onCreatureAppear(creature, isLogin);
-	onCreatureEnter(creature);
+
+	if(g_game.getGameState() != GAME_STATE_STARTUP){
+		onCreatureEnter(creature);
+	}
 }
 
 void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
-	onCreatureLeave(creature);
+
+	if(g_game.getGameState() != GAME_STATE_STARTUP){
+		onCreatureLeave(creature);
+	}
 }
 
 void Monster::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
-	if(creature == this){
-		internalUpdateTargetList = true;
-		startThink();
-	}
-	else if(canSee(newPos) && !canSee(oldPos)){
-		onCreatureEnter(creature);
-	}
-	else if(!canSee(newPos) && canSee(oldPos)){
-		onCreatureLeave(creature);
-	}
-	else{
-		//creature walking around in visible range
-		if(!isSummon()){
-			if(!followCreature){
-				if(creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer())){
-					selectTarget(const_cast<Creature*>(creature));
+	if(g_game.getGameState() != GAME_STATE_STARTUP){
+
+		if(creature == this){
+			internalUpdateTargetList = true;
+			startThink();
+		}
+		else if(canSee(newPos) && !canSee(oldPos)){
+			onCreatureEnter(creature);
+		}
+		else if(!canSee(newPos) && canSee(oldPos)){
+			onCreatureLeave(creature);
+		}
+		else{
+			//creature walking around in visible range
+			if(!isSummon()){
+				if(!followCreature){
+					if(creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer())){
+						selectTarget(const_cast<Creature*>(creature));
+					}
 				}
 			}
 		}
@@ -477,6 +486,17 @@ bool Monster::getNextStep(Direction& dir)
 	return result;
 }
 
+bool Monster::isInSpawnZone(const Position& pos)
+{
+	if(masterRadius == 0){
+		//no restrictions
+		return true;
+	}
+
+	return ((pos.x >= masterPos.x - masterRadius) && (pos.x <= masterPos.x + masterRadius) &&
+      (pos.y >= masterPos.y - masterRadius) && (pos.y <= masterPos.y + masterRadius));
+}
+
 bool Monster::getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir)
 {
 	int32_t dirArr[4] = {0};
@@ -493,36 +513,52 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	//NORTH
 	tmpDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
-		tile = g_game.getTile(creaturePos.x, creaturePos.y - 1, creaturePos.z);
-		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
-			dirArr[dirSize++] = NORTH;
+		Position tmpPos = creaturePos;
+		tmpPos.y = tmpPos.y - 1;
+		if(isInSpawnZone(tmpPos)){
+			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
+			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				dirArr[dirSize++] = NORTH;
+			}
 		}
 	}
 
 	//SOUTH
 	tmpDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs((creaturePos.y + 1) - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
-		tile = g_game.getTile(creaturePos.x, creaturePos.y + 1, creaturePos.z);
-		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
-			dirArr[dirSize++] = SOUTH;
+		Position tmpPos = creaturePos;
+		tmpPos.y = tmpPos.y + 1;
+		if(isInSpawnZone(tmpPos)){
+			tile = g_game.getTile(tmpPos.x, tmpPos.y, creaturePos.z);
+			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				dirArr[dirSize++] = SOUTH;
+			}
 		}
 	}
 
 	//WEST
 	tmpDist = std::max(std::abs((creaturePos.x - 1) - centerPos.x), std::abs(creaturePos.y - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
-		tile = g_game.getTile(creaturePos.x - 1, creaturePos.y, creaturePos.z);
-		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
-			dirArr[dirSize++] = WEST;
+		Position tmpPos = creaturePos;
+		tmpPos.x = tmpPos.x - 1;
+		if(isInSpawnZone(tmpPos)){
+			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
+			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				dirArr[dirSize++] = WEST;
+			}
 		}
 	}
 
 	//EAST
 	tmpDist = std::max(std::abs((creaturePos.x + 1) - centerPos.x), std::abs(creaturePos.y - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
-		tile = g_game.getTile(creaturePos.x + 1, creaturePos.y, creaturePos.z);
-		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
-			dirArr[dirSize++] = EAST;
+		Position tmpPos = creaturePos;
+		tmpPos.x = tmpPos.x + 1;
+		if(isInSpawnZone(tmpPos)){
+			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
+			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				dirArr[dirSize++] = EAST;
+			}
 		}
 	}
 
