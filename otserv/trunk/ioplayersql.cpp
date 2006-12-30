@@ -509,7 +509,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	if(!mysql->executeQuery(query))
 		return false;
 
-	query_insert.setQuery("INSERT INTO player_storage (player_id , key , value ) VALUES ");
+	query_insert.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
 	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
 		streamitems << "(" << player->getGUID() <<","<< cit->first <<","<< cit->second<<")";
