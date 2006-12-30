@@ -80,6 +80,7 @@ struct LuaVariant{
 
 class LuaScriptInterface;
 class Game;
+class Npc;
 
 class ScriptEnviroment
 {
