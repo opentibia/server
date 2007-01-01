@@ -290,7 +290,7 @@ Item* Tile::getMoveableBlockingItem()
 {
 	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
 		const ItemType& iiType = Item::items[(*iit)->getID()];
-		if((iiType.blockPathFind || iiType.blockSolid) && iiType.moveable)
+		if((iiType.blockPathFind || iiType.blockSolid) && iiType.moveable && ((*iit)->getUniqueId() != 0))
 			return *iit;
 	}
 
@@ -492,12 +492,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 					if(iiType.isMagicField() && !iiType.blockSolid){
 						const MagicField* field = iitem->getMagicField();
-						if(!monster->hasCondition(Combat::CombatTypeToCondition(field->getCombatType())) && !monster->isImmune(field->getCombatType())){
+						if(!monster->hasCondition(Combat::CombatTypeToCondition(field->getCombatType())) &&
+							!monster->isImmune(field->getCombatType())){
 							return RET_NOTPOSSIBLE;
 						}
 					}
 					else if(iiType.blockSolid || (((flags & FLAG_PATHFINDING) == FLAG_PATHFINDING) && iiType.blockPathFind)){
-						if(!monster->canPushItems() || !iiType.moveable){
+						if(!monster->canPushItems() || !iiType.moveable || (iitem->getUniqueId() != 0)){
 							return RET_NOTPOSSIBLE;
 						}
 					}
@@ -539,7 +540,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					//check if this a creature that just is about to login/spawn
 					//those can be placed here if the blocking item is moveable
 					if(!creature->getParent()){
-						if(!iiType.moveable)
+						if(!iiType.moveable || iitem->getUniqueId() != 0)
 							return RET_NOTPOSSIBLE;
 					}
 					else

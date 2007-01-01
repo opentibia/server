@@ -17,8 +17,8 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-#ifndef __IOPLAYERSQL_H
-#define __IOPLAYERSQL_H
+#ifndef __OTSERV_IOPLAYERSQL_H__
+#define __OTSERV_IOPLAYERSQL_H__
 
 #include <string>
 
@@ -38,6 +38,9 @@ public:
 	uint32_t m_maxDepotItems;
 	uint32_t m_maxVip;
 };
+
+typedef std::pair<int32_t, Item*> itemBlock;
+typedef std::list<itemBlock> ItemBlockList;
 
 class IOPlayerSQL : protected IOPlayer{
 public:
@@ -80,6 +83,7 @@ protected:
 	typedef std::map<int,std::pair<Item*,int> > ItemMap;
 
 	void loadItems(ItemMap& itemMap, DBResult& result);
+	bool saveItems(Player* player, const ItemBlockList& itemList, DBSplitInsert& query_insert);
 
 	typedef std::map<unsigned long, std::string> NameCacheMap;
 	typedef std::map<std::string, unsigned long, StringCompareCase> GuidCacheMap;

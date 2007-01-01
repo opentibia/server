@@ -130,11 +130,11 @@ connectResult_t Protocol79::ConnectPlayer()
 	}
 	else{
 		//last login position
-		if(g_game.placeCreature(player->getLoginPosition(), player)){
+		if(g_game.placePlayer(player, player->getLoginPosition())){
 			return CONNECT_SUCCESS;
 		}
 		//temple
-		else if(g_game.placeCreature(player->getTemplePosition(), player, true)){
+		else if(g_game.placePlayer(player, player->getTemplePosition(), true)){
 			return CONNECT_SUCCESS;
 		}
 		else
@@ -1983,22 +1983,34 @@ void Protocol79::AddCreature(NetworkMessage &msg,const Creature* creature, bool 
 	msg.AddByte(0x00); // shield
 }
 
+int32_t checkConstrains(int32_t value, int32_t min, int32_t max)
+{
+	if(value > 0xFFFF){
+		value = 0xFFFF;
+	}
+	else if(value < 0){
+		value = 0;
+	}
+	
+	return value;
+}
 
 void Protocol79::AddPlayerStats(NetworkMessage& msg)
 {
 	msg.AddByte(0xA0);
-	msg.AddU16(player->getHealth());
-	msg.AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
-	msg.AddU16((unsigned short)std::floor(player->getFreeCapacity()));
-	msg.AddU32(player->getExperience());
-	msg.AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
-	msg.AddByte(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT));
-	msg.AddU16(player->getMana());
-	msg.AddU16(player->getPlayerInfo(PLAYERINFO_MAXMANA));
-	msg.AddByte(player->getMagicLevel());
-	msg.AddByte(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT));
-	msg.AddByte(player->getPlayerInfo(PLAYERINFO_SOUL));
-	msg.AddU16(1440); //stamina(minutes)
+
+	msg.AddU16(checkConstrains(player->getHealth(), 0, 0xFFFF));
+	msg.AddU16(checkConstrains(player->getPlayerInfo(PLAYERINFO_MAXHEALTH), 0, 0xFFFF));
+	msg.AddU16(checkConstrains(std::floor(player->getFreeCapacity()), 0, 0xFFFF));
+	msg.AddU32(checkConstrains(player->getExperience(), 0, 0xFFFFFFFF));
+	msg.AddU16(checkConstrains(player->getPlayerInfo(PLAYERINFO_LEVEL), 0, 0xFFFF));
+	msg.AddByte(checkConstrains(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT), 0, 100));
+	msg.AddU16(checkConstrains(player->getMana(), 0, 0xFFFF));
+	msg.AddU16(checkConstrains(player->getPlayerInfo(PLAYERINFO_MAXMANA), 0, 0xFFFF));
+	msg.AddByte(checkConstrains(player->getMagicLevel(), 0, 0xFF));
+	msg.AddByte(checkConstrains(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT), 0, 100));
+	msg.AddByte(checkConstrains(player->getPlayerInfo(PLAYERINFO_SOUL), 0, 0xFF));
+	msg.AddU16(checkConstrains(1440, 0, 0xFFFF)); //stamina(minutes)
 }
 
 void Protocol79::AddPlayerSkills(NetworkMessage& msg)

@@ -212,7 +212,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						npc->setDirection(direction);
 
 						// Place the npc
-						if(!g_game.placeCreature(placePos, npc)){
+						if(!g_game.placeCreature(npc, placePos)){
 							delete npc;
 
 							tmpNode = tmpNode->next;
@@ -320,7 +320,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, const std::string& name, const Positi
 		return false;
 	}
 
-	if(!g_game.placeCreature(pos, monster, true, true)){
+	if(!g_game.placeCreature(monster, pos, true)){
 		delete monster;
 		return false;
 	}

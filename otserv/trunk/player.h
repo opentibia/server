@@ -519,12 +519,16 @@ protected:
 	//extra skill modifiers
 	int32_t varSkills[SKILL_LAST + 1];
 	
+	ConditionList storedConditionList;
+
+	/*
 	//reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
 	static const int CapGain[5];
 	static const int ManaGain[5];
 	static const int HPGain[5];
 	static const int gainManaVector[5][2];
 	static const int gainHealthVector[5][2];
+	*/
 	
 	unsigned char level_percent;
 	unsigned char maglevel_percent;

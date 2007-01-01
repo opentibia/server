@@ -161,13 +161,20 @@ public:
 	bool stopEvent(unsigned long eventid);
 
 	/**
-	  * Place Creature on the map.
-	  * Adds the Creature to playersOnline and to the map
-	  * \param creature Creature to place on the map
-	  * \param isLogin Is true if the player is logging into the game
-	  * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
+	  * Place Player on the map.
+	  * \param player Player to place on the map
+	  * \param pos The position to place the player
+	  * \param forced If true, placing the player will not fail becase of obstacles (creatures/chests)
 	  */
-	bool placeCreature(const Position& pos, Creature* creature, bool isLogin = true, bool forceLogin = false);
+	bool placePlayer(Player* player, const Position& pos, bool forced = false);
+
+	/**
+	  * Place Creature on the map.
+	  * \param creature Creature to place on the map
+	  * \param pos The position to place the creature
+	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/chests)
+	  */
+	bool placeCreature(Creature* creature, const Position& pos, bool forced = false);
 
 	/**
 		* Remove Creature from the map.

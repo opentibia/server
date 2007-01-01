@@ -655,7 +655,7 @@ void Monster::onDefending(uint32_t interval)
 					const Position& summonPos = getPosition();
 					
 					addSummon(summon);
-					if(!g_game.placeCreature(summonPos, summon)){
+					if(!g_game.placeCreature(summon, summonPos)){
 						removeSummon(summon);
 					}
 				}

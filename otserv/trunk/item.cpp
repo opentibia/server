@@ -639,7 +639,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			break;
 
 		case BLOCKINGANDNOTMOVEABLE:
-			if(it.blockSolid && !it.moveable)
+			if(it.blockSolid && (!it.moveable || getUniqueId() != 0))
 				return true;
 			break;
 		

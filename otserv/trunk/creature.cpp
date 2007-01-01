@@ -92,7 +92,7 @@ Creature::~Creature()
 	summons.clear();
 
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		(*it)->endCondition(this, REASON_ABORT);
+		(*it)->endCondition(this, CONDITIONEND_CLEANUP);
 		delete *it;
 	}
 
@@ -785,7 +785,7 @@ void Creature::removeCondition(ConditionType_t type)
 			Condition* condition = *it;
 			it = conditions.erase(it);
 
-			condition->endCondition(this, REASON_ABORT);
+			condition->endCondition(this, CONDITIONEND_ABORT);
 			delete condition;
 
 			onEndCondition(type);
@@ -803,7 +803,7 @@ void Creature::removeCondition(ConditionType_t type, ConditionId_t id)
 			Condition* condition = *it;
 			it = conditions.erase(it);
 
-			condition->endCondition(this, REASON_ABORT);
+			condition->endCondition(this, CONDITIONEND_ABORT);
 			delete condition;
 
 			onEndCondition(type);
@@ -833,7 +833,7 @@ void Creature::removeCondition(Condition* condition)
 		Condition* condition = *it;
 		it = conditions.erase(it);
 
-		condition->endCondition(this, REASON_ABORT);
+		condition->endCondition(this, CONDITIONEND_ABORT);
 		onEndCondition(condition->getType());
 		delete condition;
 	}
@@ -862,7 +862,7 @@ void Creature::executeConditions(int32_t newticks)
 			Condition* condition = *it;
 			it = conditions.erase(it);
 
-			condition->endCondition(this, REASON_ENDTICKS);
+			condition->endCondition(this, CONDITIONEND_TICKS);
 			delete condition;
 
 			onEndCondition(type);

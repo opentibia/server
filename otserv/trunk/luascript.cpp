@@ -1862,7 +1862,7 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L){
 		return 1;
 	}
 	
-	if(!g_game.placeCreature((Position&)pos, monster)){
+	if(!g_game.placeCreature(monster, (Position&)pos)){
 		delete monster;
 		std::string error_str = (std::string)"Can not summon monster: " + name;
 		reportErrorFunc(error_str);

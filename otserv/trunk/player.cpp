@@ -989,6 +989,14 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 				g_moveEvents->onPlayerEquip(this, item, (slots_t)slot, true);
 			}
 		}
+
+		if(!storedConditionList.empty()){
+			for(ConditionList::const_iterator it = storedConditionList.begin(); it != storedConditionList.end(); ++it){
+				addCondition(*it);
+			}
+
+			storedConditionList.clear();
+		}
 	}
 }
 
@@ -1041,7 +1049,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		}
 
 #ifdef __DEBUG_PLAYERS__
-		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
+		std::cout << (uint32_t)g_game.getPlayersOnline() << " players online." << std::endl;
 #endif
 	}
 }
@@ -1587,7 +1595,21 @@ void Player::die()
 		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 	}
 
-	client->sendReLoginWindow();
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
+		if((*it)->isPersistent()){
+			Condition* condition = *it;
+			it = conditions.erase(it);
+
+			condition->endCondition(this, CONDITIONEND_DIE);
+			onEndCondition(condition->getType());
+			delete condition;
+		}
+		else{
+			++it;
+		}
+	}
+
+	//client->sendReLoginWindow();
 }
 
 Item* Player::getCorpse()

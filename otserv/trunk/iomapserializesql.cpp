@@ -141,14 +141,14 @@ bool IOMapSerializeSQL::saveTile(Database* db, uint32_t tileId, const Tile* tile
 		++runningID;
 
 		const char* attributes = NULL;
-		unsigned long attribSize = 0;
+		unsigned long attributesSize = 0;
 
 		PropWriteStream propWriteStream;
 		item->serializeAttr(propWriteStream);
-		attributes = propWriteStream.getStream(attribSize);
+		propWriteStream.getStream(&attributes, attributesSize);
 
 		streamitems << "(" << tileId << "," << runningID << "," << parentid << "," << item->getID() << ","
-			<< (int)item->getItemCountOrSubtype() << ",'" << Database::escapeString(attributes, attribSize) <<"')";
+			<< (int)item->getItemCountOrSubtype() << ",'" << Database::escapeString(attributes, attributesSize) <<"')";
 		
 		if(!query_insert.addRow(streamitems.str()))
 			return false;
@@ -185,14 +185,14 @@ bool IOMapSerializeSQL::saveTile(Database* db, uint32_t tileId, const Tile* tile
 			}
 
 			const char* attributes = NULL;
-			unsigned long attribSize = 0;
+			unsigned long attributesSize = 0;
 
 			PropWriteStream propWriteStream;
 			item->serializeAttr(propWriteStream);
-			attributes = propWriteStream.getStream(attribSize);
+			propWriteStream.getStream(&attributes, attributesSize);
 
 			streamitems << "(" << tileId << "," << runningID << "," << parentid << "," << item->getID() << ","
-				<< (int)item->getItemCountOrSubtype() << ",'" << Database::escapeString(attributes, attribSize) <<"')";
+				<< (int)item->getItemCountOrSubtype() << ",'" << Database::escapeString(attributes, attributesSize) <<"')";
 				
 			if(!query_insert.addRow(streamitems.str()))
 				return false;

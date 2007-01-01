@@ -748,27 +748,34 @@ bool InstantSpell::configureEvent(xmlNodePtr p)
 bool InstantSpell::loadFunction(const std::string& functionName)
 {
 	if(strcasecmp(functionName.c_str(), "editHouseGuest") == 0){
+		isAggressive = false;
 		function = HouseGuestList;
 	}
 	else if(strcasecmp(functionName.c_str(), "editHouseSubOwner") == 0){
+		isAggressive = false;
 		function = HouseSubOwnerList;
 	}
 	else if(strcasecmp(functionName.c_str(), "editHouseDoor") == 0){
+		isAggressive = false;
 		function = HouseDoorList;	
 	}
 	else if(strcasecmp(functionName.c_str(), "houseKick") == 0){
+		isAggressive = false;
 		function = HouseKick;
 	}
 	else if(strcasecmp(functionName.c_str(), "searchPlayer") == 0){
+		isAggressive = false;
 		function = SearchPlayer;
 	}
 	else if(strcasecmp(functionName.c_str(), "summonMonster") == 0){
 		function = SummonMonster;
 	}
 	else if(strcasecmp(functionName.c_str(), "Levitate") == 0){
+		isAggressive = false;
 		function = Levitate;
 	}
 	else if(strcasecmp(functionName.c_str(), "illusion") == 0){
+		isAggressive = false;
 		function = Illusion;
 	}
 	else{

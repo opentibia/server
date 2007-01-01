@@ -479,52 +479,55 @@ Player* Game::getPlayerByName(const std::string& s)
 	return NULL; //just in case the player doesnt exist
 }
 
-bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /*= true*/, bool forceLogin /*= false*/)
+bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= false*/)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placePlayer()");
+
+	if(player->getAccessLevel() == 0 && getPlayersOnline() >= maxPlayers){
+		return false;
+	}
+
+	return placeCreature(player, pos, forced);
+}
+
+bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placeCreature()");
 
-	bool isSuccess = false;
-	Player* player = creature->getPlayer();
-
-	if(!player || player->getAccessLevel() != 0 || getPlayersOnline() < maxPlayers){
-		isSuccess = map->placeCreature(pos, creature, forceLogin);		
-		if(isSuccess){
-			//std::cout << "placeCreature: " << creature << " " << creature->getID() << std::endl;
-
-			creature->useThing2();
-			creature->setID();
-			listCreature.addList(creature);
-			creature->addList();
-
-			SpectatorVec list;
-			SpectatorVec::iterator it;
-
-			//getSpectators(Range(creature->getPosition(), true), list);
-			getSpectators(list, creature->getPosition(), true);
-
-			//send to client
-			Player* tmpPlayer = NULL;
-			for(it = list.begin(); it != list.end(); ++it) {
-				if(tmpPlayer = (*it)->getPlayer()){
-					tmpPlayer->sendCreatureAppear(creature, isLogin);
-				}
-			}
-			
-			//event method
-			for(it = list.begin(); it != list.end(); ++it) {
-				(*it)->onCreatureAppear(creature, isLogin);
-			}
-
-			int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
-			creature->getParent()->postAddNotification(creature, newStackPos);
-
-			creature->addEventThink();
-			//creature->eventCheck = addEvent(makeTask(500, boost::bind(&Game::checkCreature, this, creature->getID(), 500)));
-			//creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
-		}
+	if(!map->placeCreature(pos, creature, forced)){
+		return false;
 	}
 
-	return isSuccess;
+	//std::cout << "placeCreature: " << creature << " " << creature->getID() << std::endl;
+
+	creature->useThing2();
+	creature->setID();
+	listCreature.addList(creature);
+	creature->addList();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+
+	getSpectators(list, creature->getPosition(), true);
+
+	//send to client
+	Player* tmpPlayer = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendCreatureAppear(creature, true);
+		}
+	}
+	
+	//event method
+	for(it = list.begin(); it != list.end(); ++it) {
+		(*it)->onCreatureAppear(creature, true);
+	}
+
+	int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
+	creature->getParent()->postAddNotification(creature, newStackPos);
+
+	creature->addEventThink();
+	return true;
 }
 
 bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
@@ -541,14 +544,10 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	creature->stopEventThink();
 
-	//stopEvent(creature->eventCheck);
-	//stopEvent(creature->eventCheckAttacking);
-
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
 	Cylinder* cylinder = creature->getTile();
-	//getSpectators(Range(cylinder->getPosition(), true), list);
 	getSpectators(list, cylinder->getPosition(), true);
 
 	int32_t index = cylinder->__getIndexOfThing(creature);

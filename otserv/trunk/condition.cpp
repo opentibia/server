@@ -93,7 +93,7 @@ xmlNodePtr Condition::serialize()
 bool Condition::unserialize(PropStream& propStream)
 {
 	unsigned char attr_type;
-	while(propStream.GET_UCHAR(attr_type)){
+	while(propStream.GET_UCHAR(attr_type) && attr_type != CONDITIONATTR_END){
 		if(!unserializeProp((ConditionAttr_t)attr_type, propStream)){
 			return false;
 			break;
@@ -138,6 +138,12 @@ bool Condition::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 			}
 
 			ticks = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONATTR_END:
+		{
 			return true;
 			break;
 		}
@@ -240,6 +246,50 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 	}
 }
 
+
+Condition* Condition::createCondition(PropStream& propStream)
+{
+	uint8_t attr;
+	
+	if(!propStream.GET_UCHAR(attr) || attr != CONDITIONATTR_TYPE){
+		return NULL;
+	}
+
+	uint32_t _type = 0;
+	if(!propStream.GET_ULONG(_type)){
+		return NULL;
+	}
+
+	if(!propStream.GET_UCHAR(attr) || attr != CONDITIONATTR_ID){
+		return NULL;
+	}
+
+	uint32_t _id = 0;
+	if(!propStream.GET_ULONG(_id)){
+		return NULL;
+	}
+
+	if(!propStream.GET_UCHAR(attr) || attr != CONDITIONATTR_TICKS){
+		return NULL;
+	}
+
+	uint32_t _ticks = 0;
+	if(!propStream.GET_ULONG(_ticks)){
+		return NULL;
+	}
+
+	return createCondition((ConditionId_t)_id, (ConditionType_t)_type, _ticks, 0);
+}
+
+bool Condition::isPersistent() const
+{
+	if(ticks != -1 && (id == CONDITIONID_DEFAULT || id == CONDITIONID_COMBAT)){
+		return true;
+	}
+
+	return false;
+}
+
 ConditionGeneric::ConditionGeneric(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
 Condition(_id, _type, _ticks)
 {
@@ -265,7 +315,7 @@ bool ConditionGeneric::executeCondition(Creature* creature, int32_t interval)
 	*/
 }
 
-void ConditionGeneric::endCondition(Creature* creature, EndCondition_t reason)
+void ConditionGeneric::endCondition(Creature* creature, ConditionEnd_t reason)
 {
 	//
 }
@@ -759,24 +809,24 @@ bool ConditionDamage::unserialize(xmlNodePtr p)
 	while(nodeList){
 		if(xmlStrcmp(nodeList->name, (const xmlChar*)"valuelist") == 0){
 
-			IntervalInfo di;
-			di.interval = 0;
-			di.timeLeft = 0;
-			di.value = 0;
+			IntervalInfo damageInfo;
+			damageInfo.interval = 0;
+			damageInfo.timeLeft = 0;
+			damageInfo.value = 0;
 
 			if(readXMLInteger(nodeList, "duration", intValue)){
-				di.timeLeft = intValue;
+				damageInfo.timeLeft = intValue;
 			}
 
 			if(readXMLInteger(nodeList, "value", intValue)){
-				di.value = intValue;
+				damageInfo.value = intValue;
 			}
 
 			if(readXMLInteger(nodeList, "interval", intValue)){
-				di.interval = intValue;
+				damageInfo.interval = intValue;
 			}
 
-			damageList.push_back(di);
+			damageList.push_back(damageInfo);
 		}
 
 		nodeList = nodeList->next;
@@ -806,12 +856,13 @@ bool ConditionDamage::unserializeProp(ConditionAttr_t attr, PropStream& propStre
 		return true;
 	}
 	else if(attr == CONDITIONATTR_INTERVALDATA){
-		IntervalInfo di;
-		if(!propStream.GET_VALUE(di)){
+		IntervalInfo damageInfo;
+		if(!propStream.GET_VALUE(damageInfo)){
 			return false;
 		}
 
-		damageList.push_back(di);
+		ticks += damageInfo.interval;
+		damageList.push_back(damageInfo);
 		return true;
 	}
 
@@ -842,12 +893,12 @@ void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 {
 	//rounds, time, damage
 	for(unsigned int i = 0; i < rounds; ++i){
-		IntervalInfo di;
-		di.interval = time;
-		di.timeLeft = time;
-		di.value = value;
+		IntervalInfo damageInfo;
+		damageInfo.interval = time;
+		damageInfo.timeLeft = time;
+		damageInfo.value = value;
 		
-		damageList.push_back(di);
+		damageList.push_back(damageInfo);
 		ticks += time;
 	}
 }
@@ -977,7 +1028,7 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 	return g_game.combatChangeHealth(combatType, attacker, creature, damage);
 }
 
-void ConditionDamage::endCondition(Creature* creature, EndCondition_t reason)
+void ConditionDamage::endCondition(Creature* creature, ConditionEnd_t reason)
 {
 	//
 }
@@ -1272,7 +1323,7 @@ bool ConditionSpeed::executeCondition(Creature* creature, int32_t interval)
 	return Condition::executeCondition(creature, interval);
 }
 
-void ConditionSpeed::endCondition(Creature* creature, EndCondition_t reason)
+void ConditionSpeed::endCondition(Creature* creature, ConditionEnd_t reason)
 {
 	g_game.changeSpeed(creature, -speedDelta);
 }
@@ -1329,7 +1380,7 @@ bool ConditionInvisible::startCondition(Creature* creature)
 	return true;
 }
 
-void ConditionInvisible::endCondition(Creature* creature, EndCondition_t reason)
+void ConditionInvisible::endCondition(Creature* creature, ConditionEnd_t reason)
 {
 	if(!creature->isInvisible()){
 		g_game.internalCreatureChangeVisible(creature, true);
@@ -1418,7 +1469,7 @@ void ConditionOutfit::changeOutfit(Creature* creature, int32_t index /*= -1*/)
 	}
 }
 
-void ConditionOutfit::endCondition(Creature* creature, EndCondition_t reason)
+void ConditionOutfit::endCondition(Creature* creature, ConditionEnd_t reason)
 {
 	g_game.internalCreatureChangeOutfit(creature, creature->getDefaultOutfit());
 }
@@ -1476,7 +1527,7 @@ bool ConditionLight::executeCondition(Creature* creature, int32_t interval)
 	return Condition::executeCondition(creature, interval);
 }
 
-void ConditionLight::endCondition(Creature* creature, EndCondition_t reason)
+void ConditionLight::endCondition(Creature* creature, ConditionEnd_t reason)
 {
 	creature->setNormalCreatureLight();
 	g_game.changeLight(creature);

@@ -33,6 +33,8 @@
 
 #include <list>
 
+typedef std::list<Condition*> ConditionList;
+
 enum slots_t {
 	SLOT_WHEREEVER = 0,
 	SLOT_FIRST = 1,
@@ -55,6 +57,7 @@ struct FindPathParams{
 	bool needReachable;
 	uint32_t targetDistance;
 };
+
 
 class Map;
 class Thing;
@@ -272,7 +275,6 @@ protected:
 	Creature* master;
 	std::list<Creature*> summons;
 	
-	typedef std::list<Condition*> ConditionList;
 	ConditionList conditions;
 
 	//follow variables

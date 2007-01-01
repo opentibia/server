@@ -52,9 +52,11 @@ enum ConditionType_t {
 	CONDITION_SOUL          = 16384
 };
 
-enum EndCondition_t{
-	REASON_ENDTICKS,
-	REASON_ABORT,
+enum ConditionEnd_t{
+	CONDITIONEND_CLEANUP,
+	CONDITIONEND_DIE,
+	CONDITIONEND_TICKS,
+	CONDITIONEND_ABORT
 };
 
 enum ConditionAttr_t{
@@ -78,7 +80,10 @@ enum ConditionAttr_t{
 	CONDITIONATTR_LIGHTTICKS = 18,
 	CONDITIONATTR_LIGHTINTERVAL = 19,
 	CONDITIONATTR_SOULTICKS = 20,
-	CONDITIONATTR_SOULGAIN = 21
+	CONDITIONATTR_SOULGAIN = 21,
+
+	//reserved for serialization
+	CONDITIONATTR_END      = 254
 };
 
 struct IntervalInfo{
@@ -94,7 +99,7 @@ public:
 	
 	virtual bool startCondition(Creature* creature) = 0;
 	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, EndCondition_t reason) = 0;
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason) = 0;
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
 	virtual uint32_t getIcons() const = 0;
 	virtual ConditionId_t getId() const {return id;}
@@ -106,6 +111,7 @@ public:
 	void setTicks(int32_t newTicks) { ticks = newTicks; }
 
 	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param);
+	static Condition* createCondition(PropStream& propStream);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
@@ -116,6 +122,8 @@ public:
 	bool unserialize(PropStream& propStream);
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
+
+	bool isPersistent() const;
 
 protected:
 	ConditionId_t id;
@@ -131,7 +139,7 @@ public:
 	
 	virtual bool startCondition(Creature* creature);
 	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint32_t getIcons() const;
 	
@@ -208,7 +216,7 @@ public:
 	virtual ~ConditionInvisible(){};
 
 	virtual bool startCondition(Creature* creature);
-	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 
 	virtual ConditionInvisible* clone()  const { return new ConditionInvisible(*this); }
 };
@@ -223,7 +231,7 @@ public:
 
 	virtual bool startCondition(Creature* creature);
 	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint32_t getIcons() const;
 
@@ -266,7 +274,7 @@ public:
 	
 	virtual bool startCondition(Creature* creature);
 	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint32_t getIcons() const;	
 
@@ -303,7 +311,7 @@ public:
 	
 	virtual bool startCondition(Creature* creature);
 	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint32_t getIcons() const;
 
@@ -332,7 +340,7 @@ public:
 	
 	virtual bool startCondition(Creature* creature);
 	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* addCondition);
 	virtual uint32_t getIcons() const;
 
