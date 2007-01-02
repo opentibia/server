@@ -77,6 +77,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	player->setDirection((Direction)result.getDataInt("direction"));
 	player->experience = result.getDataLong("experience");
 	player->level = result.getDataInt("level");
+	player->soul = result.getDataInt("soul");
 	player->capacity = result.getDataInt("cap");
 	player->lastLoginSaved = result.getDataInt("lastlogin");
 	player->setVocation(result.getDataInt("vocation"));
@@ -286,7 +287,6 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 bool IOPlayerSQL::saveItems(Player* player, const ItemBlockList& itemList, DBSplitInsert& query_insert)
 {
 	std::list<Container*> listContainer;
-	Container* tmpContainer = NULL;
 
 	typedef std::pair<Container*, int32_t> containerBlock;
 	std::list<containerBlock> stack;
@@ -304,12 +304,11 @@ bool IOPlayerSQL::saveItems(Player* player, const ItemBlockList& itemList, DBSpl
 		item = it->second;
 		++runningId;
 		
-		const char* attributes = NULL;
-		unsigned long attributesSize = 0;
+		uint32_t attributesSize;
 
 		PropWriteStream propWriteStream;
 		item->serializeAttr(propWriteStream);
-		propWriteStream.getStream(&attributes, attributesSize);
+		const char* attributes = propWriteStream.getStream(attributesSize);
 
 		ss << "(" << player->getGUID() << ","
 			<< pid << ","
@@ -343,12 +342,11 @@ bool IOPlayerSQL::saveItems(Player* player, const ItemBlockList& itemList, DBSpl
 				stack.push_back(containerBlock(container, runningId));
 			}
 			
-			const char* attributes = NULL;
-			unsigned long attributesSize = 0;
+			uint32_t attributesSize;
 
 			PropWriteStream propWriteStream;
 			item->serializeAttr(propWriteStream);
-			propWriteStream.getStream(&attributes, attributesSize);
+			const char* attributes = propWriteStream.getStream(attributesSize);
 
 			ss << "(" << player->getGUID() <<","
 				<< parentId << ","
@@ -409,9 +407,8 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		}
 	}
 
-	const char* conditions = NULL;
-	uint32_t conditionsSize = 0;
-	propWriteStream.getStream(&conditions, conditionsSize);
+	uint32_t conditionsSize;
+	const char* conditions = propWriteStream.getStream(conditionsSize);
 
 	//First, an UPDATE query to write the player itself
 	query << "UPDATE `players` SET ";
@@ -431,6 +428,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`mana` = " << player->mana << ", ";
 	query << "`manamax` = " << player->manaMax << ", ";
 	query << "`manaspent` = " << player->manaSpent << ", ";
+	query << "`soul` = " << player->soul << ", ";
 	query << "`town_id` = '" << player->town << "', ";
 	query << "`posx` = '" << player->getLoginPosition().x << "', ";
 	query << "`posy` = '" << player->getLoginPosition().y << "', ";

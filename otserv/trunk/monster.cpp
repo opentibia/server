@@ -493,8 +493,8 @@ bool Monster::isInSpawnZone(const Position& pos)
 		return true;
 	}
 
-	return ((pos.x >= masterPos.x - masterRadius) && (pos.x <= masterPos.x + masterRadius) &&
-      (pos.y >= masterPos.y - masterRadius) && (pos.y <= masterPos.y + masterRadius));
+	return ((pos.x >= masterPos.x - (int)masterRadius) && (pos.x <= masterPos.x + (int)masterRadius) &&
+      (pos.y >= masterPos.y - (int)masterRadius) && (pos.y <= masterPos.y + (int)masterRadius));
 }
 
 bool Monster::getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir)

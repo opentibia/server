@@ -1983,34 +1983,35 @@ void Protocol79::AddCreature(NetworkMessage &msg,const Creature* creature, bool 
 	msg.AddByte(0x00); // shield
 }
 
-int32_t checkConstrains(int32_t value, int32_t min, int32_t max)
+inline int32_t checkConstrains(int32_t value, int32_t min, int32_t max)
 {
-	if(value > 0xFFFF){
-		value = 0xFFFF;
+	if(value > max){
+		return max;
 	}
-	else if(value < 0){
-		value = 0;
+	else if(value < min){
+		return min;
 	}
-	
-	return value;
+	else{
+		return value;
+	}
 }
 
 void Protocol79::AddPlayerStats(NetworkMessage& msg)
 {
 	msg.AddByte(0xA0);
 
-	msg.AddU16(checkConstrains(player->getHealth(), 0, 0xFFFF));
-	msg.AddU16(checkConstrains(player->getPlayerInfo(PLAYERINFO_MAXHEALTH), 0, 0xFFFF));
-	msg.AddU16(checkConstrains(std::floor(player->getFreeCapacity()), 0, 0xFFFF));
-	msg.AddU32(checkConstrains(player->getExperience(), 0, 0xFFFFFFFF));
-	msg.AddU16(checkConstrains(player->getPlayerInfo(PLAYERINFO_LEVEL), 0, 0xFFFF));
+	msg.AddU16(player->getHealth());
+	msg.AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
+	msg.AddU16((int32_t)player->getFreeCapacity());
+	msg.AddU32(player->getExperience());
+	msg.AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
 	msg.AddByte(checkConstrains(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT), 0, 100));
-	msg.AddU16(checkConstrains(player->getMana(), 0, 0xFFFF));
-	msg.AddU16(checkConstrains(player->getPlayerInfo(PLAYERINFO_MAXMANA), 0, 0xFFFF));
-	msg.AddByte(checkConstrains(player->getMagicLevel(), 0, 0xFF));
+	msg.AddU16(player->getMana());
+	msg.AddU16(player->getPlayerInfo(PLAYERINFO_MAXMANA));
+	msg.AddByte(player->getMagicLevel());
 	msg.AddByte(checkConstrains(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT), 0, 100));
-	msg.AddByte(checkConstrains(player->getPlayerInfo(PLAYERINFO_SOUL), 0, 0xFF));
-	msg.AddU16(checkConstrains(1440, 0, 0xFFFF)); //stamina(minutes)
+	msg.AddByte(player->getPlayerInfo(PLAYERINFO_SOUL));
+	msg.AddU16(1440); //stamina(minutes)
 }
 
 void Protocol79::AddPlayerSkills(NetworkMessage& msg)

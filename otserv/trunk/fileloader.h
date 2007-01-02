@@ -272,9 +272,9 @@ public:
 	PropWriteStream(){buffer = (char*)malloc(32*sizeof(char)); buffer_size = 32; size = 0; memset(buffer, 0, 32*sizeof(char));}
 	~PropWriteStream(){free(buffer);};
 
-	void getStream(const char** data, unsigned long& _size) const{
+	const char* getStream(uint32_t& _size) const{
 		_size = size;
-		*data = buffer;
+		return buffer;
 	}
 	
 	//TODO: might need temp buffer and zero fill the memory chunk allocated by realloc
@@ -329,8 +329,8 @@ public:
 
 protected:
 	char* buffer;
-	unsigned long buffer_size;
-	unsigned long size;
+	uint32_t buffer_size;
+	uint32_t size;
 };
 
 #endif

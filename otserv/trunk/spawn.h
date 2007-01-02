@@ -64,7 +64,7 @@ struct spawnBlock_t{
 	std::string name;
 	Direction direction;
 	Position pos;
-	int32_t interval;
+	uint32_t interval;
 	int64_t lastSpawn;
 };
 
@@ -104,69 +104,5 @@ private:
 	bool isInSpawnZone(const Position& pos);
 	bool spawnMonster(uint32_t spawnId, const std::string& name, const Position& pos, Direction dir);
 };
-
-/*
-class Game;
-class Spawn;
-typedef std::list<Spawn*> SpawnList;
-
-class Spawn{
-public:
-	Spawn(Position pos, int32_t _radius);
-	//void idle(int t);
-	bool addMonster(std::string name, Direction dir, int32_t x, int32_t y, int32_t time);
-
-//public:
-//	bool startup();
-
-	void setSpawnCheckEvent(uint32_t eventId) { checkSpawnEvent = eventId; }
-
-private:
-	uint32_t checkSpawnEvent;
-	Position centerPos;
-	int radius;
-
-	bool isInSpawnRange(const Position& pos);
-	Monster* respawn(uint32_t spawnid, Position& pos, std::string& name, Direction dir);
-
-	struct spawnBlock_t{
-		Position pos;
-		std::string name;
-		Direction dir;
-		uint32_t spawntime;
-		uint64_t lastspawn;
-	};
-
-	//List of monsters in the spawn
-	typedef std::map<uint32_t, spawnBlock_t> SpawnMap;
-	SpawnMap spawnMap;
-
-	//For spawned monsters
-	typedef std::multimap<uint32_t, Monster*, std::less<uint32_t> > SpawnedMap;
-	typedef SpawnedMap::value_type spawned_pair;
-	SpawnedMap spawnedMap;
-};
-
-class SpawnManager{
-public:
-	static SpawnManager& getInstance(){
-		static SpawnManager instance;
-		return instance;
-	}
-
-	bool addSpawn(Spawn* spawn);
-	bool loadSpawnsXML(std::string filename);
-	bool startup();
-
-	//void checkSpawns(int t);
-
-protected:
-	SpawnManager();
-	~SpawnManager();
-
-	SpawnManager* _instance;
-	SpawnList spawnList;
-};
-*/
 
 #endif
