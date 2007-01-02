@@ -162,14 +162,6 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			player->lastLoginSaved = 0;
 
-		/*
-		//level percent
-		int32_t percent = (100*(player->experience - player->getExpForLv(player->level)) /
-			(1.*player->getExpForLv(player->level+1) - player->getExpForLv(player->level)));
-
-		player->level_percent = std::min(100, percent);
-		*/
-
 		p = root->children;
 
 		while(p){
@@ -509,6 +501,33 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				}
 			}
 
+			else if(xmlStrcmp(p->name, (const xmlChar*)"conditions") == 0){
+				int typeValue;
+				int idValue;
+				int ticksValue;
+
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"condition") == 0){
+						if(readXMLInteger(tmpNode, "id", idValue) &&
+							readXMLInteger(tmpNode, "type", typeValue) &&
+							readXMLInteger(tmpNode, "ticks", ticksValue))
+						{
+							Condition* condition = Condition::createCondition((ConditionId_t)idValue, (ConditionType_t)typeValue, ticksValue, 0);
+							if(condition){
+								if(condition->unserialize(tmpNode)){
+									player->storedConditionList.push_back(condition);
+								}
+								else{
+									delete condition;
+								}
+							}
+						}
+					}
+
+					tmpNode = tmpNode->next;
+				}
+			}
 			p = p->next;
 		}
 
@@ -799,6 +818,17 @@ bool IOPlayerXML::savePlayer(Player* player)
 
 		xmlAddChild(sn, pn);
 	}
+	xmlAddChild(root, sn);
+
+	sn = xmlNewNode(NULL,(const xmlChar*)"conditions");
+
+	for(ConditionList::const_iterator it = player->conditions.begin(); it != player->conditions.end(); ++it){
+		if((*it)->isPersistent()){
+			nn = (*it)->serialize();
+			xmlAddChild(sn, nn);
+		}
+	}
+
 	xmlAddChild(root, sn);
 
 	//Save the character

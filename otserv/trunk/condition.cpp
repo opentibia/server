@@ -57,15 +57,21 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 
 bool Condition::unserialize(xmlNodePtr p)
 {
+	/*
 	int intValue;
 
 	if(readXMLInteger(p, "id", intValue)){
 		id = (ConditionId_t)intValue;
 	}
 
+	if(readXMLInteger(p, "type", intValue)){
+		type = (ConditionId_t)intValue;
+	}
+
 	if(readXMLInteger(p, "ticks", intValue)){
 		ticks = intValue;
 	}
+	*/
 
 	return true;
 }
@@ -769,7 +775,7 @@ xmlNodePtr ConditionDamage::serialize()
 	xmlSetProp(nodeCondition, (const xmlChar*)"owner", (const xmlChar*)ss.str().c_str());
 
 	for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); ++it){
-		xmlNodePtr nodeValueListNode = xmlNewNode(NULL, (const xmlChar*)"valuelist");
+		xmlNodePtr nodeValueListNode = xmlNewNode(NULL, (const xmlChar*)"damage");
 		
 		ss.str("");
 		ss << (*it).timeLeft;
@@ -783,7 +789,7 @@ xmlNodePtr ConditionDamage::serialize()
 		ss << (*it).interval;
 		xmlSetProp(nodeValueListNode, (const xmlChar*)"interval", (const xmlChar*)ss.str().c_str());
 
-		xmlAddChild(nodeValueListNode, nodeCondition);
+		xmlAddChild(nodeCondition, nodeValueListNode);
 	}
 
 	return nodeCondition;
@@ -794,6 +800,8 @@ bool ConditionDamage::unserialize(xmlNodePtr p)
 	if(!Condition::unserialize(p)){
 		return false;
 	}
+
+	setTicks(0);
 
 	int intValue;
 
@@ -807,7 +815,7 @@ bool ConditionDamage::unserialize(xmlNodePtr p)
 
 	xmlNodePtr nodeList = p->children;
 	while(nodeList){
-		if(xmlStrcmp(nodeList->name, (const xmlChar*)"valuelist") == 0){
+		if(xmlStrcmp(nodeList->name, (const xmlChar*)"damage") == 0){
 
 			IntervalInfo damageInfo;
 			damageInfo.interval = 0;
@@ -826,6 +834,7 @@ bool ConditionDamage::unserialize(xmlNodePtr p)
 				damageInfo.interval = intValue;
 			}
 
+			setTicks(getTicks() + damageInfo.interval);
 			damageList.push_back(damageInfo);
 		}
 
@@ -861,7 +870,7 @@ bool ConditionDamage::unserializeProp(ConditionAttr_t attr, PropStream& propStre
 			return false;
 		}
 
-		ticks += damageInfo.interval;
+		setTicks(getTicks() + damageInfo.interval);
 		damageList.push_back(damageInfo);
 		return true;
 	}
