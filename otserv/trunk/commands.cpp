@@ -232,7 +232,7 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 	}
 
 	// Place the npc
-	if(game->placeCreature(creature->getPosition(), npc)){
+	if(game->placeCreature(npc, creature->getPosition())){
 		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
@@ -263,7 +263,7 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 	}
 
 	// Place the monster
-	if(game->placeCreature(creature->getPosition(), monster)){
+	if(game->placeCreature(monster, creature->getPosition())){
 		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
@@ -287,7 +287,7 @@ ReturnValue Commands::placeSummon(Creature* creature, const std::string& name)
 	
 	// Place the monster
 	creature->addSummon(monster);
-	if(!g_game.placeCreature(creature->getPosition(), monster)){
+	if(!g_game.placeCreature(monster, creature->getPosition())){
 		creature->removeSummon(monster);
 		return RET_NOTENOUGHROOM;
 	}

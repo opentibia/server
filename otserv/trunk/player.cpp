@@ -79,10 +79,8 @@ Creature()
 	npings = 0;
 	internal_ping = 0;
 	lastAction = 0;
-	attackPower = 0;
 
 	pzLocked = false;
-	//blockCount = 0;
 	bloodHitCount = 0;
 	shieldBlockCount = 0;
 	skillPoint = 0;
@@ -625,6 +623,16 @@ bool Player::canSee(const Position& pos) const
 {
 	return client->canSee(pos);
 }
+
+bool Player::canSeeCreature(const Creature* creature) const
+{
+	if(!canSeeInvisibility() && creature->isInvisible() && !creature->getPlayer()){
+		return false;
+	}
+
+	return true;
+}
+
 
 Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 {	
@@ -2470,7 +2478,6 @@ void Player::doAttacking(uint32_t interval)
 		Item* tool = getWeapon();
 		const Weapon* weapon = g_weapons->getWeapon(tool);
 
-		//if(weapon){
 		if(weapon && weapon->checkLastAction(this, 100)){
 			attackTicks = 0;
 			result = weapon->useWeapon(this, tool, attackedCreature);
@@ -2479,8 +2486,6 @@ void Player::doAttacking(uint32_t interval)
 			attackTicks = 0;
 			result = Weapon::useFist(this, attackedCreature);
 		}
-
-		//setAttackPower(0);
 
 		if(!result){
 			//make next instant

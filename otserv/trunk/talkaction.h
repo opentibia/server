@@ -32,6 +32,7 @@ enum TalkActionResult_t{
 	//TALKACTION_NOTFOUND,
 	TALKACTION_CONTINUE,
 	TALKACTION_BREAK,
+	TALKACTION_FAILED,
 };
 
 class TalkAction;

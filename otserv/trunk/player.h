@@ -190,6 +190,7 @@ public:
 	bool addDepot(Depot* depot, uint32_t depotId);
 	
 	virtual bool canSee(const Position& pos) const;
+	virtual bool canSeeCreature(const Creature* creature) const;
 	
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
 
@@ -481,7 +482,6 @@ protected:
 	Vocation* vocation;
 	playersex_t sex;
 	int32_t soul, soulMax;
-	int32_t attackPower;
 
 	double inventoryWeight;
 	double capacity;

@@ -136,6 +136,15 @@ bool Creature::canSee(const Position& pos) const
 	return false;
 }
 
+bool Creature::canSeeCreature(const Creature* creature) const
+{
+	if(!canSeeInvisibility() && creature->isInvisible()){
+		return false;
+	}
+
+	return true;
+}
+
 void Creature::addEventThink()
 {
 	if(eventCheck == 0){
@@ -155,14 +164,12 @@ void Creature::stopEventThink()
 
 void Creature::onThink(uint32_t interval)
 {
-	if(!canSeeInvisibility()){
-		if(followCreature && followCreature->isInvisible() && getMaster() != followCreature){
-			onCreatureDisappear(followCreature, false);
-		}
+	if(followCreature && getMaster() != followCreature && !canSeeCreature(followCreature)){
+		onCreatureDisappear(followCreature, false);
+	}
 
-		if(attackedCreature && attackedCreature->isInvisible()){
-			onCreatureDisappear(attackedCreature, false);
-		}
+	if(attackedCreature && getMaster() != attackedCreature && !canSeeCreature(attackedCreature)){
+		onCreatureDisappear(attackedCreature, false);
 	}
 
 	if(internalUpdateFollow && followCreature){
@@ -175,8 +182,6 @@ void Creature::onThink(uint32_t interval)
 	if(blockTicks >= 1000){
 		blockCount = std::min((uint32_t)blockCount + 1, (uint32_t)2);
 		blockTicks = 0;
-		//internalDefense = true;
-		//internalArmor = true;
 	}
 
 	onAttacking(interval);
@@ -185,14 +190,12 @@ void Creature::onThink(uint32_t interval)
 		eventCheck = 0;
 		addEventThink();
 	}
-
-	//eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature,
-	//	&g_game, getID(), interval)));
 }
 
 void Creature::onAttacking(uint32_t interval)
 {
 	if(attackedCreature){
+		onAttacked();
 		attackedCreature->onAttacked();
 
 		if(g_game.canThrowObjectTo(getPosition(), attackedCreature->getPosition())){

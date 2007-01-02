@@ -561,12 +561,10 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 					if(strValue == "poison"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_FLYPOISONFIELD);
 					}
+					if(strValue == "infernalbolt"){
+						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_INFERNALBOLT);
+					}
 				}
-				/*
-				if(readXMLInteger(attributeNode, "value", intValue)){
-					combat->setParam(COMBATPARAM_DISTANCEEFFECT, intValue);
-				}
-				*/
 			}
 			else if(strcasecmp(strValue.c_str(), "areaEffect") == 0){
 				if(readXMLString(attributeNode, "value", strValue)){

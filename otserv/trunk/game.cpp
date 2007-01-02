@@ -2346,12 +2346,19 @@ bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& 
 		}
 	}
 
-	if(g_talkactions->playerSaySpell(player, type, text) == TALKACTION_BREAK){
+	TalkActionResult_t result;
+
+	result = g_talkactions->playerSaySpell(player, type, text);
+	if(result == TALKACTION_BREAK){
 		return true;
 	}
 
-	if(g_spells->playerSaySpell(player, type, text)){
+	result = g_spells->playerSaySpell(player, type, text);
+	if(result == TALKACTION_BREAK){
 		return playerSay(player, SPEAK_SAY, text);
+	}
+	else if(result == TALKACTION_FAILED){
+		return true;
 	}
 
 	return false;

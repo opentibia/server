@@ -50,7 +50,7 @@ Spells::~Spells()
 	clear();
 }
 
-bool Spells::playerSaySpell(Player* player, SpeakClasses type, const std::string& words)
+TalkActionResult_t Spells::playerSaySpell(Player* player, SpeakClasses type, const std::string& words)
 {
 	std::string str_words;
 	std::string str_param;
@@ -72,12 +72,15 @@ bool Spells::playerSaySpell(Player* player, SpeakClasses type, const std::string
 		if(strcasecmp(it->first.c_str(), str_words.c_str()) == 0){
 			InstantSpell* instantSpell = it->second;
 			if(instantSpell->playerCastInstant(player, str_param)){
-				return true;
+				return TALKACTION_BREAK;
+			}
+			else{
+				return TALKACTION_FAILED;
 			}
 		}
 	}
 
-	return false;
+	return TALKACTION_CONTINUE;
 }
 
 void Spells::clear()
@@ -582,7 +585,7 @@ void Spell::postCastSpell(Player* player) const
 	}
 
 	int32_t manaCost = getManaCost(player);
-	int32_t soulCost = 0;
+	int32_t soulCost = getSoulCost(player);
 	postCastSpell(player, manaCost, soulCost);
 }
 

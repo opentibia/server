@@ -50,7 +50,7 @@ public:
 	InstantSpell* getInstantSpell(const std::string& words);
 	InstantSpell* getInstantSpellByName(const std::string& name);
 
-	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
+	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
 
 	static int32_t spellExhaustionTime;
 	static int32_t spellInFightTime;

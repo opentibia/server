@@ -99,6 +99,7 @@ public:
 	virtual void addList() = 0;
 
 	virtual bool canSee(const Position& pos) const;
+	virtual bool canSeeCreature(const Creature* creature) const;
 
 	unsigned long getExpForLv(const int& lv) const
 	{ 
