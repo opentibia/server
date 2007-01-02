@@ -290,7 +290,7 @@ Item* Tile::getMoveableBlockingItem()
 {
 	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
 		const ItemType& iiType = Item::items[(*iit)->getID()];
-		if((iiType.blockPathFind || iiType.blockSolid) && iiType.moveable && ((*iit)->getUniqueId() != 0))
+		if((iiType.blockPathFind || iiType.blockSolid) && iiType.moveable && ((*iit)->getUniqueId() == 0))
 			return *iit;
 	}
 
