@@ -33,7 +33,8 @@ enum RaidState_t{
 
 struct MonsterSpawn{
 	std::string name;
-	uint32_t amount;
+	uint32_t minAmount;
+	uint32_t maxAmount;
 };
 
 //How many times it will try to find a tile to add the monster to before giving up
@@ -57,7 +58,7 @@ public:
 	
 	~Raids();
 	
-	bool loadFromXml(const std::string& fileName);
+	bool loadFromXml(const std::string& _filename);
 	void startup();
 	
 	void clear();
@@ -79,7 +80,7 @@ private:
 	bool loaded, started;
 	Raid* running;
 	uint64_t lastRaidEnd;
-	std::string fileName;
+	std::string filename;
 };
 
 class Raid{
@@ -87,7 +88,7 @@ public:
 	Raid(const std::string& _name, uint32_t _chance, uint32_t _interval, uint32_t _marginTime);
 	~Raid();
 	
-	bool loadFromXml(const std::string& fileName);
+	bool loadFromXml(const std::string& _filename);
 	
 	void checkRaid();
 	void executeRaidEvent(RaidEvent* raidEvent);
@@ -160,7 +161,7 @@ public:
 	virtual ~AreaSpawnEvent();
 	
 	void addMonster(MonsterSpawn* monsterSpawn);
-	void addMonster(const std::string& monsterName, uint32_t amount);
+	void addMonster(const std::string& monsterName, uint32_t minAmount, uint32_t maxAmount);
 	
 	virtual bool executeEvent();
 
