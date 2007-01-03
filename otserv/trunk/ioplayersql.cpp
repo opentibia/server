@@ -139,6 +139,12 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	if(town){
 		player->masterPos = town->getTemplePosition();
 	}
+	//if posx == 0 AND posy == 0 AND posz == 0
+	// login position is temple position
+	Position loginPos = player->loginPosition;
+	if(loginPos.x == 0 && loginPos.y == 0 && loginPos.z == 0){
+		player->loginPosition = player->masterPos;
+	}
 
 	uint32_t rankid = result.getDataInt("rank_id");
 	if(rankid){
@@ -155,7 +161,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	}
 
 	//get password
-	query << "SELECT * FROM accounts WHERE id='" << accno << "'";
+	query << "SELECT password FROM accounts WHERE id='" << accno << "'";
 	if(!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 
@@ -163,7 +169,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 
 	// we need to find out our skills
 	// so we query the skill table
-	query << "SELECT * FROM player_skills WHERE player_id='" << player->getGUID() << "'";
+	query << "SELECT skillid,value,count FROM player_skills WHERE player_id='" << player->getGUID() << "'";
 	if(mysql->storeQuery(query, result)){
 		//now iterate over the skills
 		for(uint32_t i = 0; i < result.getNumRows(); ++i){
@@ -181,7 +187,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	//load inventory items
 	ItemMap itemMap;
 	
-	query << "SELECT * FROM player_items WHERE player_id='" << player->getGUID() << "'" << " ORDER BY sid DESC";
+	query << "SELECT pid,sid,itemtype,count,attributes FROM player_items WHERE player_id='" << player->getGUID() << "'" << " ORDER BY sid DESC";
 	if(mysql->storeQuery(query, result) && (result.getNumRows() > 0)){
 		loadItems(itemMap, result);
 
@@ -214,7 +220,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 
 	//load depot items
 	itemMap.clear();
-	query << "SELECT * FROM player_depotitems WHERE player_id='" << player->getGUID() << "'" << " ORDER BY sid DESC";
+	query << "SELECT pid,sid,itemtype,count,attributes FROM player_depotitems WHERE player_id='" << player->getGUID() << "'" << " ORDER BY sid DESC";
 	if(mysql->storeQuery(query, result) && (result.getNumRows() > 0)){
 		loadItems(itemMap, result);
 
@@ -254,7 +260,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	}
 	
 	//load storage map
-	query << "SELECT * FROM player_storage WHERE player_id='" << player->getGUID() << "'";
+	query << "SELECT `key`,`value` FROM player_storage WHERE player_id='" << player->getGUID() << "'";
 	if(mysql->storeQuery(query,result)){
 		for(uint32_t i=0; i < result.getNumRows(); ++i){
 			uint32_t key = result.getDataInt("key",i);

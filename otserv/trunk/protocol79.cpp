@@ -1859,6 +1859,27 @@ void Protocol79::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 	WriteBuffer(msg);
 }
 
+void Protocol79::sendTextWindow(uint32_t itemid, const std::string& text)
+{
+	NetworkMessage msg;
+	if(readItem){
+		readItem->releaseThing2();
+	}
+	windowTextID++;
+	msg.AddByte(0x96);
+	msg.AddU32(windowTextID);
+	msg.AddItemId(itemid);
+	
+	msg.AddU16(text.size());
+	msg.AddString(text);
+	readItem = NULL;
+	maxTextLength = 0;
+	
+	msg.AddString("");
+	msg.AddString("");
+	WriteBuffer(msg);
+}
+
 void Protocol79::sendHouseWindow(House* _house, unsigned long _listid, const std::string& text)
 {
 	NetworkMessage msg;

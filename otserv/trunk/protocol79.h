@@ -171,6 +171,7 @@ private:
 	void sendCloseTrade();
 	
 	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
+	void sendTextWindow(uint32_t itemid,const std::string& text);
 	void sendHouseWindow(House* house, unsigned long listid, const std::string& text);
 	
 	void sendVIPLogIn(unsigned long guid);

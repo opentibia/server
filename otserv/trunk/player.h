@@ -153,10 +153,11 @@ public:
 	int getPlayerInfo(playerinfo_t playerinfo) const;	
 	uint32_t getExperience() const {return experience;}
 
-	time_t getLastLoginSaved() const { return lastLoginSaved; };
-	const Position& getLoginPosition() { return loginPosition; };
-	const Position& getTemplePosition() { return masterPos; };
-	uint32_t getTown() { return town; };
+	time_t getLastLoginSaved() const {return lastLoginSaved;}
+	const Position& getLoginPosition() {return loginPosition;}
+	const Position& getTemplePosition() {return masterPos;}
+	uint32_t getTown() const {return town;}
+	void setTown(uint32_t _town) {town = _town;}
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
@@ -391,10 +392,10 @@ public:
 		{client->sendSkills();}
 	void sendTextMessage(MessageClasses mclass, const std::string& message) const
 		{client->sendTextMessage(mclass, message);}
-	/*void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos, unsigned char type) const
-		{client->sendTextMessage(mclass, message, pos, type);}*/
 	void sendTextWindow(Item* item,const uint16_t maxlen, const bool canWrite) const
 		{client->sendTextWindow(item,maxlen,canWrite);}
+	void sendTextWindow(uint32_t itemid, const std::string& text) const
+		{client->sendTextWindow(itemid,text);}
 	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId) const
 		{client->sendToChannel(creature, type, text, channelId);}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const

@@ -35,6 +35,7 @@
 #include "condition.h"
 #include "monsters.h"
 #include "baseevents.h"
+#include "town.h"
 #include "ioplayer.h"
 #include "configmanager.h"
 
@@ -682,6 +683,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerSkill", LuaScriptInterface::luaGetPlayerSkill);
 	//getPlayerMasterPos(cid)
 	lua_register(m_luaState, "getPlayerMasterPos", LuaScriptInterface::luaGetPlayerMasterPos);
+	//getPlayerTown(cid)
+	lua_register(m_luaState, "getPlayerTown", LuaScriptInterface::luaGetPlayerTown);
 	//getPlayerVocation(cid)
 	lua_register(m_luaState, "getPlayerVocation", LuaScriptInterface::luaGetPlayerVocation);
 	//getPlayerItemCount(cid,itemid)
@@ -773,6 +776,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doPlayerRemoveMoney", LuaScriptInterface::luaDoPlayerRemoveMoney);
 	//doShowTextWindow(cid,maxlen,canWrite)	
 	lua_register(m_luaState, "doShowTextWindow", LuaScriptInterface::luaDoShowTextWindow);	
+	//doShowTextDialog(cid,itemid,text)	
+	lua_register(m_luaState, "doShowTextDialog", LuaScriptInterface::luaDoShowTextDialog);	
 	//doDecayItem(uid)
 	lua_register(m_luaState, "doDecayItem", LuaScriptInterface::luaDoDecayItem);
 	//doCreateItem(itemid,type or count,position) .only working on ground. returns uid of the created item
@@ -783,6 +788,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doMoveCreature", LuaScriptInterface::luaDoMoveCreature);
 	//doPlayerSetMasterPos(cid,pos)
 	lua_register(m_luaState, "doPlayerSetMasterPos", LuaScriptInterface::luaDoPlayerSetMasterPos);
+	//doPlayerSetTown(cid,townid)
+	lua_register(m_luaState, "doPlayerSetTown", LuaScriptInterface::luaDoPlayerSetTown);
 	//doPlayerSetVocation(cid,voc)
 	lua_register(m_luaState, "doPlayerSetVocation", LuaScriptInterface::luaDoPlayerSetVocation);
 	//doPlayerRemoveItem(cid,itemid,count)
@@ -1028,6 +1035,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoSex:
 			value = player->getSex();
 			break;
+		case PlayerInfoTown:
+			value = player->getTown();
+			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -1096,8 +1106,12 @@ int LuaScriptInterface::luaGetPlayerGuildRank(lua_State *L){
 	
 int LuaScriptInterface::luaGetPlayerGuildNick(lua_State *L){
 	return internalGetPlayerInfo(L,PlayerInfoGuildNick);}
+
 int LuaScriptInterface::luaGetPlayerSex(lua_State *L){
 	return internalGetPlayerInfo(L,PlayerInfoSex);}
+
+int LuaScriptInterface::luaGetPlayerTown(lua_State *L){
+	return internalGetPlayerInfo(L,PlayerInfoTown);}
 //
 
 
@@ -1510,30 +1524,32 @@ int LuaScriptInterface::luaGetPlayerSkill(lua_State *L)
 int LuaScriptInterface::luaDoShowTextWindow(lua_State *L)
 {
 	//doShowTextWindow(uid,maxlen,canWrite)
-	//TODO
-	/*bool canWrite = */(popNumber(L) != 0);
-	/*unsigned short maxlen = (unsigned short)*/popNumber(L);
-	/*unsigned long uid = (unsigned long)*/popNumber(L);
-	/*
+	popNumber(L);
+	popNumber(L);
+	popNumber(L);
+	reportErrorFunc("Deprecated function.");
+	lua_pushnumber(L, LUA_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoShowTextDialog(lua_State *L)
+{
+	//doShowTextDialog(cid, itemid, text)
+	const char * text = popString(L);
+	uint32_t itemid = popNumber(L);
+	uint32_t cid = popNumber(L);
+	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Item* item = env->getItemByUID(uid);
-	if(item){
-		env->_player->sendTextWindow(item, maxlen, canWrite);
-		
-		lua_pushnumber(L, 0);
-		return 1;
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->sendTextWindow(itemid, text);
+		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
-#ifdef __DEBUG__
-		std::cout << "luadoShowTextWindow: Item not found" << std::endl;
-#endif
-
-		lua_pushnumber(L, -1);
-		return 1;
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
 	}
-	*/
-	lua_pushnumber(L, LUA_ERROR);
 	return 1;
 }
 
@@ -1907,14 +1923,33 @@ int LuaScriptInterface::luaDoPlayerSetMasterPos(lua_State *L)
 	Position pos;
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
+	popNumber(L);
+	
+	reportErrorFunc("Deprecated function. Use doPlayerSetTown");
+	lua_pushnumber(L, LUA_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSetTown(lua_State *L)
+{
+	//doPlayerSetTown(cid,towind)
+	uint32_t townid = popNumber(L);
 	uint32_t cid = popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		player->masterPos = pos;
-		lua_pushnumber(L, LUA_NO_ERROR);
+		Town* town = Towns::getInstance().getTown(townid);
+		if(town){
+			player->masterPos = town->getTemplePosition();
+			player->setTown(townid);
+			lua_pushnumber(L, LUA_NO_ERROR);
+		}
+		else{
+			reportErrorFunc("Not found townid");
+			lua_pushnumber(L, LUA_ERROR);
+		}
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));

@@ -197,6 +197,7 @@ enum PlayerInfo_t{
 	PlayerInfoGuildRank,
 	PlayerInfoGuildNick,
 	PlayerInfoSex,
+	PlayerInfoTown,
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -297,6 +298,7 @@ protected:
 	static int luaDoChangeTypeItem(lua_State *L);
 	static int luaDoSendAnimatedText(lua_State *L);
 	static int luaDoShowTextWindow(lua_State *L);
+	static int luaDoShowTextDialog(lua_State *L);
 	static int luaDoDecayItem(lua_State *L);
 	static int luaDoCreateItem(lua_State *L);
 	static int luaDoSummonCreature(lua_State *L);
@@ -311,6 +313,7 @@ protected:
 	static int luaDoPlayerSendTextMessage(lua_State *L);
 	static int luaDoPlayerRemoveMoney(lua_State *L);
 	static int luaDoPlayerSetMasterPos(lua_State *L);
+	static int luaDoPlayerSetTown(lua_State *L);
 	static int luaDoPlayerSetVocation(lua_State *L);
 	static int luaDoPlayerRemoveItem(lua_State *L);
 	static int luaDoPlayerAddSoul(lua_State *L);
@@ -349,6 +352,7 @@ protected:
 	static int luaGetPlayerSkill(lua_State *L);
 	static int luaGetPlayerVocation(lua_State *L);
 	static int luaGetPlayerMasterPos(lua_State *L);
+	static int luaGetPlayerTown(lua_State *L);
 	static int luaGetPlayerItemCount(lua_State *L);
 	static int luaGetPlayerSoul(lua_State *L);
 	static int luaGetPlayerFreeCap(lua_State *L);
