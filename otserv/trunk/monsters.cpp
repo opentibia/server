@@ -161,13 +161,13 @@ void MonsterType::createLootContainer(Container* parent, const LootBlock& lootbl
 		for(it = lootblock.childLoot.begin(); it != lootblock.childLoot.end(); it++){
 			Item* tmpItem = createLootItem(*it);
 			if(tmpItem){
-				if(Container* container = dynamic_cast<Container*>(tmpItem)){
+				if(Container* container = tmpItem->getContainer()){
 					createLootContainer(container, *it);
 					if(container->size() == 0){
 						delete container;
 					}
 					else{
-						parent->__internalAddThing(dynamic_cast<Thing*>(container));
+						parent->__internalAddThing(container);
 					}
 				}
 				else{
