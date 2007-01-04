@@ -186,8 +186,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 
 	//load inventory items
 	ItemMap itemMap;
-	
-	query << "SELECT pid,sid,itemtype,count,attributes FROM player_items WHERE player_id='" << player->getGUID() << "'";
+
+	query << "SELECT pid,sid,itemtype,count,attributes FROM player_items WHERE player_id='" << player->getGUID() <<"' ORDER BY sid DESC";
 	if(mysql->storeQuery(query, result) && (result.getNumRows() > 0)){
 		loadItems(itemMap, result);
 
@@ -221,7 +221,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	//load depot items
 	itemMap.clear();
 	
-	query << "SELECT pid,sid,itemtype,count,attributes FROM player_depotitems WHERE player_id='" << player->getGUID() << "'";
+	query << "SELECT pid,sid,itemtype,count,attributes FROM player_depotitems WHERE player_id='" << player->getGUID() << "' ORDER BY sid DESC";
 	if(mysql->storeQuery(query, result) && (result.getNumRows() > 0)){
 		loadItems(itemMap, result);
 

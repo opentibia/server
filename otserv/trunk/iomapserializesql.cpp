@@ -227,7 +227,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 	int tileId = result.getDataInt("id");
 
 	query.reset();
-	query << "SELECT * FROM tile_items WHERE tile_id='" << tileId <<"' ORDER BY sid ASC";
+	query << "SELECT * FROM tile_items WHERE tile_id='" << tileId <<"' ORDER BY sid DESC";
 	if(db.storeQuery(query, result) && (result.getNumRows() > 0)){
 		Item* item = NULL;
 
