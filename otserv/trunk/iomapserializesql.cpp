@@ -208,7 +208,7 @@ bool IOMapSerializeSQL::saveTile(Database* db, uint32_t tileId, const Tile* tile
 
 bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 {
-	typedef OTSERV_HASH_MAP<int,std::pair<Item*,int> > ItemMap;
+	typedef std::map<int,std::pair<Item*,int> > ItemMap;
 	ItemMap itemMap;
 
 	const Position& tilePos = tile->getPosition();
