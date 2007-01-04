@@ -338,10 +338,11 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	CreatureVector::iterator cit;
 	Tile* tile;
 
-	int32_t maxoffset = centerPos.z - minRangeZ;
-	int32_t x1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX - maxoffset  )));
-	int32_t y1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY - maxoffset )));
+	int32_t minoffset = centerPos.z - maxRangeZ;
+	int32_t x1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + minoffset  )));
+	int32_t y1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + minoffset )));
 
+	int32_t maxoffset = centerPos.z - minRangeZ;
 	int32_t x2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + maxoffset )));
 	int32_t y2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + maxoffset )));
 
