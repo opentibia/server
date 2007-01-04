@@ -269,10 +269,22 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 	}
 
 	if(readXMLInteger(node, "chance", intValue)){
+		if(intValue < 0 || intValue > 100){
+			intValue = 100;
+		}
+
 		sb.chance = intValue;
 	}
 
 	if(readXMLInteger(node, "range", intValue)){
+		if(intValue < 0 ){
+			intValue = 0;
+		}
+
+		if(intValue > Map::maxViewportX * 2){
+			intValue = Map::maxViewportX * 2;
+		}
+
 		sb.range = intValue;
 	}
 

@@ -227,7 +227,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 	int tileId = result.getDataInt("id");
 
 	query.reset();
-	query << "SELECT * FROM tile_items WHERE tile_id='" << tileId <<"' ORDER BY sid DESC";
+	query << "SELECT * FROM tile_items WHERE tile_id='" << tileId <<"' ORDER BY sid ASC";
 	if(db.storeQuery(query, result) && (result.getNumRows() > 0)){
 		Item* item = NULL;
 
@@ -296,20 +296,18 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 		}
 	}
 
-	ItemMap::iterator it;
-	for(int i = (int)itemMap.size(); i > 0; --i){
-		it = itemMap.find(i);
-		if(it == itemMap.end())
-			continue;
+	ItemMap::reverse_iterator it;
+	ItemMap::iterator it2;
 
-		if(int p = (*it).second.second){
-			ItemMap::iterator pit = itemMap.find(p); //parent container
-			if(pit == itemMap.end())
-				continue;
+	for(it = itemMap.rbegin(); it != itemMap.rend(); ++it){
+		Item* item = it->second.first;
+		int pid = it->second.second;
 
-			if(Container* container = (*pit).second.first->getContainer()){
-				container->__internalAddThing((*it).second.first);
-				g_game.startDecay((*it).second.first);
+		it2 = itemMap.find(pid);
+		if(it2 != itemMap.end()){
+			if(Container* container = it2->second.first->getContainer()){
+				container->__internalAddThing(item);
+				g_game.startDecay(item);
 			}
 		}
 	}
