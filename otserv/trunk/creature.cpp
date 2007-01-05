@@ -497,10 +497,12 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 {
 	BlockType_t blockType = BLOCK_NONE;
 
-	if(blockType == BLOCK_NONE && isImmune(combatType)){
+	if(isImmune(combatType)){
 		damage = 0;
 		blockType = BLOCK_IMMUNITY;
 	}
+
+	int32_t damageAbsorption = 0;
 
 	if((checkDefense || checkArmor) && blockCount > 0){
 		--blockCount;
@@ -509,7 +511,7 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 			int32_t defense = getDefense();
 			defense = defense + (defense * defenseStrength) / 100;
 
-			damage = damage - defense;
+			damage -= defense;
 			if(damage <= 0){
 				damage = 0;
 				blockType = BLOCK_DEFENSE;

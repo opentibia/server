@@ -31,6 +31,12 @@
 
 #include <libxml/parser.h>
 
+
+enum DistributionType_t{
+	DISTRO_NORMAL,
+	DISTRO_SQUARE
+};
+
 bool fileExists(const char* filename);
 void replaceString(std::string& str, const std::string sought, const std::string replacement);
 void trim_right(std::string& source, const std::string& t);
@@ -41,7 +47,7 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 
-int random_range(int lowest_number, int highest_number);
+int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_NORMAL);
 
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);

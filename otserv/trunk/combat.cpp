@@ -339,7 +339,11 @@ CallBack* Combat::getCallback(CallBackParam_t key)
 bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	Combat2Var* var = (Combat2Var*)data;
-	int32_t healthChange = random_range(var->minChange, var->maxChange);
+	int32_t healthChange = random_range(var->minChange, var->maxChange, DISTRO_SQUARE);
+
+	if(g_game.combatBlockHit(params.combatType, caster, target, healthChange, params.blockedByShield, params.blockedByArmor)){
+		return false;
+	}
 
 	if(healthChange < 0){
 		if(caster && caster->getPlayer() && target->getPlayer()){
@@ -347,7 +351,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 		}
 	}
 
-	bool result = g_game.combatChangeHealth(params.combatType, caster, target, healthChange, params.blockedByShield, params.blockedByArmor);
+	bool result = g_game.combatChangeHealth(params.combatType, caster, target, healthChange);
 
 	if(result){
 		CombatConditionFunc(caster, target, params, NULL);
@@ -360,7 +364,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 bool Combat::CombatManaFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	Combat2Var* var = (Combat2Var*)data;
-	int32_t manaChange = random_range(var->minChange, var->maxChange);
+	int32_t manaChange = random_range(var->minChange, var->maxChange, DISTRO_SQUARE);
 
 	if(manaChange < 0){
 		if(caster && caster->getPlayer() && target->getPlayer()){
@@ -389,6 +393,7 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
 			}
 
+			//TODO: infight condition until all aggressive conditions has ended
 			result = target->addCondition(conditionCopy);
 		}
 	}

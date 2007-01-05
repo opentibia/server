@@ -626,7 +626,7 @@ bool Player::canSee(const Position& pos) const
 
 bool Player::canSeeCreature(const Creature* creature) const
 {
-	if(!canSeeInvisibility() && creature->isInvisible() && !creature->getPlayer()){
+	if((getAccessLevel() == 0) && !canSeeInvisibility() && creature->isInvisible() && !creature->getPlayer()){
 		return false;
 	}
 

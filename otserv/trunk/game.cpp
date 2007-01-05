@@ -2688,8 +2688,91 @@ void Game::changeLight(const Creature* creature)
 	}
 }
 
-bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target,
-	int32_t healthChange, bool checkDefense /* = false */, bool checkArmor /* = false */)
+bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
+	int32_t& healthChange, bool checkDefense, bool checkArmor)
+{
+	if(healthChange > 0){
+		return false;
+	}
+
+	const Position& targetPos = target->getPosition();
+
+	SpectatorVec list;
+	getSpectators(list, targetPos, true);
+
+	if(!target->isAttackable() || Combat::canDoCombat(attacker, target) != RET_NOERROR){
+		addMagicEffect(list, targetPos, NM_ME_PUFF);
+		return true;
+	}
+
+	if(attacker && !attacker->canSeeCreature(target)){
+		//No effects for invisible creatures to avoid detection
+		healthChange = 0;
+		return true;
+	}
+
+	int32_t damage = -healthChange;
+	BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+
+	if(blockType == BLOCK_NONE){
+		return false;
+	}
+
+	healthChange = -damage;
+
+	if(blockType == BLOCK_DEFENSE){
+		addMagicEffect(list, targetPos, NM_ME_PUFF);
+		return true;
+	}
+	else if(blockType == BLOCK_ARMOR){
+		addMagicEffect(list, targetPos, NM_ME_BLOCKHIT);
+		return true;
+	}
+	else if(blockType == BLOCK_IMMUNITY){
+		uint8_t hitEffect = 0;
+
+		switch(combatType){
+			case COMBAT_UNDEFINEDDAMAGE:
+				break;
+
+			case COMBAT_ENERGYDAMAGE:
+			{
+				hitEffect = NM_ME_BLOCKHIT;
+				break;
+			}
+
+			case COMBAT_POISONDAMAGE:
+			{
+				hitEffect = NM_ME_POISON_RINGS;
+				break;
+			}
+
+			case COMBAT_FIREDAMAGE:
+			{
+				hitEffect = NM_ME_BLOCKHIT;
+				break;
+			}
+
+			case COMBAT_PHYSICALDAMAGE:
+			{
+				hitEffect = NM_ME_BLOCKHIT;
+				break;
+			}
+
+			default:
+				hitEffect = NM_ME_PUFF;
+				break;
+		}
+
+		addMagicEffect(list, targetPos, hitEffect);
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange)
 {
 	const Position& targetPos = target->getPosition();
 
@@ -2706,67 +2789,10 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 		if(!target->isAttackable() || Combat::canDoCombat(attacker, target) != RET_NOERROR){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
-			return false;
+			return true;
 		}
 
 		int32_t damage = -healthChange;
-
-		BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
-
-		if(blockType != BLOCK_NONE && target->isInvisible()){
-			//No effects for invisible creatures to avoid detection
-			return false;
-		}
-
-		if(blockType == BLOCK_DEFENSE){
-			addMagicEffect(list, targetPos, NM_ME_PUFF);
-			return false;
-		}
-		else if(blockType == BLOCK_ARMOR){
-			addMagicEffect(list, targetPos, NM_ME_BLOCKHIT);
-			return false;
-		}
-		else if(blockType == BLOCK_IMMUNITY){
-			uint8_t hitEffect = 0;
-
-			switch(combatType){
-				case COMBAT_UNDEFINEDDAMAGE:
-					break;
-
-				case COMBAT_ENERGYDAMAGE:
-				{
-					hitEffect = NM_ME_BLOCKHIT;
-					break;
-				}
-
-				case COMBAT_POISONDAMAGE:
-				{
-					hitEffect = NM_ME_POISON_RINGS;
-					break;
-				}
-
-				case COMBAT_FIREDAMAGE:
-				{
-					hitEffect = NM_ME_BLOCKHIT;
-					break;
-				}
-
-				case COMBAT_PHYSICALDAMAGE:
-				{
-					hitEffect = NM_ME_BLOCKHIT;
-					break;
-				}
-
-				default:
-					hitEffect = NM_ME_PUFF;
-					break;
-			}
-
-			addMagicEffect(list, targetPos, hitEffect);
-
-			return false;
-		}
-
 		if(damage != 0){
 			if(target->hasCondition(CONDITION_MANASHIELD)){
 				int32_t manaDamage = std::min(target->getMana(), damage);

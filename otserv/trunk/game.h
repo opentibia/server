@@ -336,8 +336,10 @@ public:
 	void checkCreature(uint32_t creatureId, uint32_t interval);
 	void checkLight(int t);
 	
-	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target,
-		int32_t healthChange, bool checkDefense = false, bool checkArmor = false);
+	bool combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
+		int32_t& healthChange, bool checkDefense, bool checkArmor);
+	
+	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange);
 	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
 
 	//animation help functions

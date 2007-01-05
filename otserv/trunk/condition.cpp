@@ -1034,6 +1034,11 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 	}
 
 	Creature* attacker = g_game.getCreatureByID(owner);
+
+	if(g_game.combatBlockHit(combatType, attacker, creature, damage, false, false)){
+		return false;
+	}
+
 	return g_game.combatChangeHealth(combatType, attacker, creature, damage);
 }
 
