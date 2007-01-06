@@ -25,7 +25,6 @@
 
 #include "networkmessage.h"
 
-#include "item.h"
 #include "container.h"
 #include "creature.h"
 #include "player.h"

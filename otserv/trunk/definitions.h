@@ -78,6 +78,7 @@
 	#include <hash_map>
 	#include <hash_set>
 	#include <limits>
+	#include <assert.h>
 	#define OTSERV_HASH_MAP stdext::hash_map
 	#define OTSERV_HASH_SET stdext::hash_set
 

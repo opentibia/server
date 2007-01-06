@@ -44,6 +44,7 @@ class Container;
 class AreaCombat;
 class Combat;
 class Condition;
+class Npc;
 
 enum LUA_RET_CODE{
 	LUA_NO_ERROR = 0,

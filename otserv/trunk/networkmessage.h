@@ -25,6 +25,7 @@
 #include "definitions.h"
 #include "otsystem.h"
 #include "const79.h"
+#include "item.h"
 
 class Creature;
 class Player;
@@ -132,15 +133,21 @@ public:
 	void setRSAInstance(RSA* rsa){m_RSA = rsa;}
 
 protected:
-	inline bool canAdd(int size){
-    	return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
-  	};
+	inline bool canAdd(int size)
+	{
+		bool result = (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
+		if(!result){
+			result = false;
+		}
+
+		return result;
+  };
   	
-  	void XTEA_encrypt();
-  	void XTEA_decrypt();
-  	
-  	int m_MsgSize;
-  	int m_ReadPos;
+	void XTEA_encrypt();
+	void XTEA_decrypt();
+
+	int m_MsgSize;
+	int m_ReadPos;
 
 	uint8_t m_MsgBuf[NETWORKMESSAGE_MAXSIZE];
 	
