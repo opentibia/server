@@ -453,7 +453,7 @@ bool ConditionRegeneration::unserializeProp(ConditionAttr_t attr, PropStream& pr
 		healthTicks = value;
 		return true;
 	}
-	else if(attr = CONDITIONATTR_HEALTHGAIN){
+	else if(attr == CONDITIONATTR_HEALTHGAIN){
 		uint32_t value = 0;
 		if(!propStream.GET_VALUE(value)){
 			return false;
