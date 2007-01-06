@@ -85,7 +85,7 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 #endif
 
 #define CLIENT_VERSION_MIN 790
-#define CLIENT_VERSION_MAX 790
+#define CLIENT_VERSION_MAX 791
 
 typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
 IPList serverIPs;

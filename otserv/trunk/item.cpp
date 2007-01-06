@@ -227,20 +227,6 @@ bool Item::hasSubType() const
 	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.runeMagLevel != -1);
 }
 
-void Item::setDefaultDuration()
-{
-	uint32_t duration = getDefaultDuration();
-
-	if(duration != 0){
-		setDuration(duration);
-	}
-}
-
-uint32_t Item::getDefaultDuration() const
-{
-	return items[id].decayTime * 1000;
-}
-
 bool Item::unserialize(xmlNodePtr nodeItem)
 {
 	int intValue;
@@ -848,19 +834,6 @@ void Item::getLight(LightInfo& lightInfo)
 }
 
 std::string ItemAttributes::emptyString("");
-
-ItemAttributes::ItemAttributes()
-{
-	m_attributes = 0;
-	m_firstAttr = NULL;
-}
-
-ItemAttributes::~ItemAttributes()
-{
-	if(m_firstAttr){
-		deleteAttrs(m_firstAttr);
-	}
-}
 
 const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
 {

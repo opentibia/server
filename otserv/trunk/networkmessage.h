@@ -36,38 +36,74 @@ class NetworkMessage
 {
 public:
 	// constructor/destructor
-	NetworkMessage();
-	~NetworkMessage();
+	NetworkMessage(){
+		m_encryptionEnabled = false;
+		m_keyset = false;
+		m_RSA = NULL;
+		Reset();
+	}
+	~NetworkMessage(){};
 
 	// resets the internal buffer to an empty message
-	void Reset();
+	void Reset(){
+		m_MsgSize = 0;
+		m_ReadPos = 4;
+	}
 
 	// socket functions
 	bool ReadFromSocket(SOCKET socket);
 	bool WriteToSocket(SOCKET socket);
 
 	// simply read functions for incoming message
-	uint8_t  GetByte();
-	uint16_t GetU16();
-	uint16_t GetSpriteId();
-	uint32_t GetU32();
+	uint8_t  GetByte(){return m_MsgBuf[m_ReadPos++];}
+	uint16_t GetU16(){
+		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
+		m_ReadPos += 2;
+		return v;
+	}
+	uint16_t GetSpriteId(){
+		return GetU16();
+	}
+	uint32_t GetU32(){
+		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+		m_ReadPos += 4;
+		return v;
+	}
 	std::string GetString();
 	std::string GetRaw();
 	Position GetPosition();
 
-	void setEncryptionState(bool state);
-	void setEncryptionKey(const uint32_t* key);
+	void setEncryptionState(bool state){m_encryptionEnabled = state;}
+	void setEncryptionKey(const uint32_t* key){
+		memcpy(m_key, key, 16);
+		m_keyset = true;
+	}
 
 	// skips count unknown/unused bytes in an incoming message
-	void SkipBytes(int count);
+	void SkipBytes(int count){m_ReadPos += count;}
 
 	// simply write functions for outgoing message
-	void AddByte(uint8_t  value);
-	void AddU16(uint16_t value);
-	void AddU32(uint32_t value);
+	void AddByte(uint8_t  value){
+		if(!canAdd(1))
+			return;
+		m_MsgBuf[m_ReadPos++] = value;
+		m_MsgSize++;
+	}
+	void AddU16(uint16_t value){
+		if(!canAdd(2))
+			return;
+		*(uint16_t*)(m_MsgBuf + m_ReadPos) = value;
+		m_ReadPos += 2; m_MsgSize += 2;
+	}
+	void AddU32(uint32_t value){
+		if(!canAdd(4))
+			return;
+		*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
+		m_ReadPos += 4; m_MsgSize += 4;
+	}
 	void AddBytes(const char* bytes, uint32_t size);
 
-	void AddString(const std::string &value);
+	void AddString(const std::string &value){AddString(value.c_str());}
 	void AddString(const char* value);
 
 
@@ -75,8 +111,14 @@ public:
 	void AddPosition(const Position &pos);
 	void AddItem(uint16_t id, uint8_t count);
 	void AddItem(const Item *item);
-	void AddItemId(const Item *item);
-	void AddItemId(uint16_t itemId);
+	void AddItemId(const Item *item){
+		const ItemType &it = Item::items[item->getID()];
+		AddU16(it.clientId);
+	}
+	void AddItemId(uint16_t itemId){
+		const ItemType &it = Item::items[itemId];
+		AddU16(it.clientId);
+	}
 	void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
   	int getMessageLength(){
@@ -87,7 +129,7 @@ public:
 
 	bool RSA_decrypt();
 
-	void setRSAInstance(RSA* rsa);
+	void setRSAInstance(RSA* rsa){m_RSA = rsa;}
 
 protected:
 	inline bool canAdd(int size){

@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "math.h"
 #include "tools.h"
 
 bool fileExists(const char* filename)

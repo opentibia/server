@@ -34,40 +34,11 @@
 #include "rsa.h"
 
 
-long fluidMap[] = {FLUID_EMPTY_1, FLUID_BLUE_1, FLUID_RED_1, FLUID_BROWN_1, 
+const uint32_t fluidMap[] = {FLUID_EMPTY_1, FLUID_BLUE_1, FLUID_RED_1, FLUID_BROWN_1, 
 	FLUID_GREEN_1, FLUID_YELLOW_1, FLUID_WHITE_1, FLUID_PURPLE_1};
 
-/******************************************************************************/
-
-NetworkMessage::NetworkMessage()
-{
-	m_encryptionEnabled = false;
-	m_keyset = false;
-	m_RSA = NULL;
-	Reset();
-}
-
-NetworkMessage::~NetworkMessage()
-{
-	//
-}
-
-void NetworkMessage::setRSAInstance(RSA* rsa)
-{
-	m_RSA = rsa;
-}
 
 /******************************************************************************/
-
-void NetworkMessage::Reset()
-{
-	m_MsgSize = 0;
-	m_ReadPos = 4;
-}
-
-
-/******************************************************************************/
-
 bool NetworkMessage::ReadFromSocket(SOCKET socket)
 {
 	// just read the size to avoid reading 2 messages at once
@@ -147,7 +118,7 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 	int start;
 	if(m_encryptionEnabled){
 		if(!m_keyset){
-			std::cout << "Failure: [NetworkMessage::ReadFromSocket]. Key not set" << std::endl;
+			std::cout << "Failure: [NetworkMessage::WriteToSocket]. Key not set" << std::endl;
 			return false;
 		}
 		start = 0;
@@ -191,34 +162,6 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 
 
 /******************************************************************************/
-
-
-uint8_t NetworkMessage::GetByte()
-{
-	return m_MsgBuf[m_ReadPos++];
-}
-
-
-uint16_t NetworkMessage::GetU16()
-{
-	uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
-	m_ReadPos += 2;
-	return v;
-}
-
-uint16_t NetworkMessage::GetSpriteId()
-{
-	unsigned short v = this->GetU16();
-	return v;
-}
-
-uint32_t NetworkMessage::GetU32()
-{
-	uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
-	m_ReadPos += 4;
-	return v;
-}
-
 std::string NetworkMessage::GetString()
 {
 	uint16_t stringlen = GetU16();
@@ -249,53 +192,7 @@ Position NetworkMessage::GetPosition()
 	pos.z = GetByte();
 	return pos;
 }
-
-
-void NetworkMessage::SkipBytes(int count)
-{
-	m_ReadPos += count;
-}
-
-
 /******************************************************************************/
-
-
-void NetworkMessage::AddByte(uint8_t value)
-{
-	if(!canAdd(1))
-		return;
-	m_MsgBuf[m_ReadPos++] = value;
-	m_MsgSize++;
-}
-
-
-void NetworkMessage::AddU16(uint16_t value)
-{
-	if(!canAdd(2))
-		return;
-	
-	*(uint16_t*)(m_MsgBuf + m_ReadPos) = value;
-	m_ReadPos += 2;
-	m_MsgSize += 2;
-}
-
-
-void NetworkMessage::AddU32(uint32_t value)
-{
-	if(!canAdd(4))
-		return;
-	
-	*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
-	m_ReadPos += 4;
-	m_MsgSize += 4;
-}
-
-
-void NetworkMessage::AddString(const std::string& value)
-{
-	AddString(value.c_str());
-}
-
 
 void NetworkMessage::AddString(const char* value)
 {
@@ -319,16 +216,12 @@ void NetworkMessage::AddBytes(const char* bytes, uint32_t size)
 	m_MsgSize += size;
 }
 
-/******************************************************************************/
-
-
 void NetworkMessage::AddPosition(const Position& pos)
 {
 	AddU16(pos.x);
 	AddU16(pos.y);
 	AddByte(pos.z);
 }
-
 
 void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 {
@@ -361,19 +254,6 @@ void NetworkMessage::AddItem(const Item* item)
 	}
 }
 
-void NetworkMessage::AddItemId(uint16_t itemId)
-{
-	const ItemType &it = Item::items[itemId];
-	AddU16(it.clientId);
-}
-
-void NetworkMessage::AddItemId(const Item* item)
-{
-	const ItemType &it = Item::items[item->getID()];
-
-	AddU16(it.clientId);
-}
-
 void NetworkMessage::JoinMessages(NetworkMessage &add)
 {
 	if(!canAdd(add.m_MsgSize))
@@ -383,18 +263,6 @@ void NetworkMessage::JoinMessages(NetworkMessage &add)
 	m_ReadPos += add.m_MsgSize;
   	m_MsgSize += add.m_MsgSize;
 }
-
-void NetworkMessage::setEncryptionState(bool state)
-{
-	m_encryptionEnabled = state;
-}
-
-void NetworkMessage::setEncryptionKey(const uint32_t* key)
-{
-	memcpy(m_key, key, 16);
-	m_keyset = true;
-}
-
 
 void NetworkMessage::XTEA_encrypt()
 {

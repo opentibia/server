@@ -95,8 +95,15 @@ enum AttrTypes_t{
 
 class ItemAttributes{
 public:
-	ItemAttributes();
-	virtual ~ItemAttributes();
+	ItemAttributes(){
+		m_attributes = 0;
+		m_firstAttr = NULL;
+	}
+	virtual ~ItemAttributes(){
+		if(m_firstAttr){
+			deleteAttrs(m_firstAttr);
+		}
+	}
 	
 	void setSpecialDescription(const std::string& desc) {setStrAttr(ATTR_ITEM_DESC, desc);}
 	const std::string& getSpecialDescription() const {return getStrAttr(ATTR_ITEM_DESC);}
@@ -273,8 +280,13 @@ public:
 	
 	void setUniqueId(unsigned short n);
 
-	void setDefaultDuration();
-	uint32_t getDefaultDuration() const;
+	void setDefaultDuration(){
+		uint32_t duration = getDefaultDuration();
+		if(duration != 0){
+			setDuration(duration);
+		}
+	}
+	uint32_t getDefaultDuration() const {return items[id].decayTime * 1000;}
 	bool canDecay();
 
 	virtual bool canRemove() const {return true;}
