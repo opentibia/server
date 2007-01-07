@@ -135,12 +135,7 @@ public:
 protected:
 	inline bool canAdd(int size)
 	{
-		bool result = (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
-		if(!result){
-			result = false;
-		}
-
-		return result;
+		return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
   };
   	
 	void XTEA_encrypt();

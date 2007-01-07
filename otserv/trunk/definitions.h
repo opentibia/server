@@ -108,6 +108,7 @@
 	#include <string.h>
 	#include <ext/hash_map>
 	#include <ext/hash_set>
+	#include <assert.h>
 
 	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 	#define OTSERV_HASH_SET __gnu_cxx::hash_set

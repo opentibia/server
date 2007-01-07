@@ -26,6 +26,7 @@
 #include "creature.h"
 #include "player.h"
 #include "const79.h"
+#include "tools.h"
 
 #include <sstream>
 

@@ -22,7 +22,9 @@
 #include "definitions.h"
 #include "weapons.h"
 #include "combat.h"
+#include "tools.h"
 #include "configmanager.h"
+
 #include <sstream>
 
 #include <libxml/xmlmemory.h>
