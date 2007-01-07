@@ -8,8 +8,7 @@
 		- Undead Legion;
 		- Enchant Staff;
 		- Destroy Field;
-		- Desintegrate;
-		- House spells.
+		- Desintegrate.
 		
 		Above we have all runes/spells like Tibia.
 	-->
@@ -284,6 +283,48 @@
 		<vocation name="Druid" />
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
+	</instant>
+	
+	-- House Spells
+	<instant name="Edit Sub-Owners" words="aleta som" lvl="0" mana="0" prem="1" aggressive="0" selftarget="1" needtarget="0" params="0" direction="0" blocking="0" exhaustion="1"  enabled="1" function="editHouseSubOwner">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Paladin" />
+		<vocation name="Knight" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+		<vocation name="Royal Paladin" />
+		<vocation name="Elite Knight" />
+	</instant>
+	<instant name="Edit Guest List" words="aleta sio" lvl="0" mana="0" prem="1" aggressive="0" selftarget="1" needtarget="0" params="0" direction="0" blocking="0" exhaustion="1" enabled="1" function="editHouseGuest">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Paladin" />
+		<vocation name="Knight" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+		<vocation name="Royal Paladin" />
+		<vocation name="Elite Knight" />
+	</instant>
+	<instant name="Edit Door Rights" words="aleta grav" lvl="0" mana="0" prem="1" aggressive="0" selftarget="1" needtarget="0" params="0" direction="0" blocking="0" exhaustion="1"  enabled="1" function="editHouseDoor">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Paladin" />
+		<vocation name="Knight" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+		<vocation name="Royal Paladin" />
+		<vocation name="Elite Knight" />
+	</instant>
+	<instant name="Kick Character" words="alana sio" lvl="0" mana="0" prem="1" aggressive="0" selftarget="1" needtarget="0" params="1" direction="0" blocking="0" exhaustion="1"  enabled="1" function="houseKick">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Paladin" />
+		<vocation name="Knight" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+		<vocation name="Royal Paladin" />
+		<vocation name="Elite Knight" />
 	</instant>
 	
 	<!-- MAKE RUNES -->

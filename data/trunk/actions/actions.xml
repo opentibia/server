@@ -106,6 +106,12 @@
 	<action itemid="2796" script="food.lua" />
 	<action itemid="5097" script="food.lua" />
 	<action itemid="6125" script="food.lua" />
+	<action itemid="6278" script="food.lua" />
+	<action itemid="6279" script="food.lua" />
+	<action itemid="6280" script="food.lua" />
+	<action itemid="6393" script="food.lua" />
+	<action itemid="6394" script="food.lua" />
+	<action itemid="6501" script="food.lua" />
 	
 	-- Teleport Items
 	<action itemid="430" script="teleport.lua" />

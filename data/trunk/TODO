@@ -5,8 +5,8 @@
 == ACTIONS ==
 
 1. Review name of variables [Done 29/12/2006]
-2. Update to protocol 7.8/7.9
-3. Add key system for quest chests
+2. Update to protocol 7.8/7.9 [In Progress]
+3. Rewrite quest quests
 4. Review NORMAL_CORPSE_STAGE_I and SWAMP_CORPSE_STAGE_I
 
 == MOVEMENTS ==
@@ -21,4 +21,8 @@
 == SPELLS ==
 
 1. Add missing runes and spells (check spells.xml)
-2. Add house spells
+2. Add house spells [Done 07/01/2007]
+
+== WEAPONS ==
+
+1. Change poison/burst arrow condition/formula
