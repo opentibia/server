@@ -313,7 +313,7 @@ public:
 	}
 
 	inline void ADD_STRING(const std::string& add){
-		unsigned short str_len = add.size();
+		uint16_t str_len = add.size();
 
 		ADD_USHORT(str_len);
 

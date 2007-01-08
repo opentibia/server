@@ -29,7 +29,6 @@
 
 class Creature;
 class Player;
-class Item;
 class Position;
 class RSA;
 
