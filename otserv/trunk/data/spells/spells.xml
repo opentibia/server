@@ -12,7 +12,7 @@
 <rune name="Magic Wall" id="2276" charges="1" blocktype="all" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="magic wall.lua"></rune>
 <rune name="Magic Prison" id="2277" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="magic prison.lua"></rune>
 <rune name="Fire Field" id="2278" charges="1" blocktype="solid" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="fire field.lua"></rune>
-<rune name="Invisible" id="2279" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="invisible.lua"></rune>
+<rune name="Stealth" id="2279" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="invisible.lua"></rune>
 <rune name="Drunk" id="2267" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="drunk.lua"></rune>
 <rune name="Chameleon" id="2291" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" function="chameleon"></rune>
 <rune name="Convince Creature" id="2292" charges="3" lvl="10" maglv="20" exhaustion="1" prem="0" enabled="1" allowfaruse="1" function="convince"></rune>
