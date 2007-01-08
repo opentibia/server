@@ -340,7 +340,7 @@ CallBack* Combat::getCallback(CallBackParam_t key)
 bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	Combat2Var* var = (Combat2Var*)data;
-	int32_t healthChange = random_range(var->minChange, var->maxChange, DISTRO_SQUARE);
+	int32_t healthChange = random_range(var->minChange, var->maxChange);
 
 	if(g_game.combatBlockHit(params.combatType, caster, target, healthChange, params.blockedByShield, params.blockedByArmor)){
 		return false;
@@ -365,7 +365,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 bool Combat::CombatManaFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	Combat2Var* var = (Combat2Var*)data;
-	int32_t manaChange = random_range(var->minChange, var->maxChange, DISTRO_SQUARE);
+	int32_t manaChange = random_range(var->minChange, var->maxChange);
 
 	if(manaChange < 0){
 		if(caster && caster->getPlayer() && target->getPlayer()){
