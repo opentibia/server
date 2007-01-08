@@ -2713,12 +2713,11 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 
 	int32_t damage = -healthChange;
 	BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+	healthChange = -damage;
 
 	if(blockType == BLOCK_NONE){
 		return false;
 	}
-
-	healthChange = -damage;
 
 	if(blockType == BLOCK_DEFENSE){
 		addMagicEffect(list, targetPos, NM_ME_PUFF);
@@ -3041,17 +3040,6 @@ void Game::startDecay(Item* item)
 	}
 
 	if(item->canDecay()){
-		/*
-		if(decayState == DECAYING_FALSE){
-			if(!item->hasDuration() || item->getDuration() == 0){
-				item->setDefaultDuration();
-			}
-		}
-		else if(decayState == DECAYING_PENDING){
-			//no change duration because was set during loading time
-		}
-		*/
-		
 		if(item->getDuration() > 0){
 			item->useThing2();
 			item->setDecaying(DECAYING_TRUE);
