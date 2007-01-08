@@ -47,9 +47,7 @@ public:
 	
 	bool loadFromXml(const std::string& _filename);
 	void startup();
-	
 	void clear();
-	void reload();
 	
 	bool isLoaded() { return loaded; }
 	bool isStarted() { return started; }
@@ -76,13 +74,10 @@ public:
 	bool addMonster(const spawnBlock_t& sb);
 
 	uint32_t getInterval() {return interval;}
-	
 	void startup();
 
+	void startSpawnCheck();
 	void stopEvent();
-	void setSpawnCheckEvent(uint32_t eventId) { checkSpawnEvent = eventId; }
-	
-	void checkSpawn();
 
 private:
 	Position centerPos;
@@ -103,6 +98,8 @@ private:
 	bool findPlayer(const Position& pos);
 	bool isInSpawnZone(const Position& pos);
 	bool spawnMonster(uint32_t spawnId, const std::string& name, const Position& pos, Direction dir);
+
+	void checkSpawn();
 };
 
 #endif

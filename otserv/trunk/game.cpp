@@ -2705,19 +2705,9 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 		return true;
 	}
 
-	if(attacker && !attacker->canSeeCreature(target)){
-		//No effects for invisible creatures to avoid detection
-		healthChange = 0;
-		return true;
-	}
-
 	int32_t damage = -healthChange;
 	BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 	healthChange = -damage;
-
-	if(blockType == BLOCK_NONE){
-		return false;
-	}
 
 	if(blockType == BLOCK_DEFENSE){
 		addMagicEffect(list, targetPos, NM_ME_PUFF);

@@ -28,6 +28,7 @@
 #include "game.h"
 #include "spells.h"
 #include "combat.h"
+#include "spawn.h"
 
 extern Game g_game;
 
@@ -64,6 +65,7 @@ Creature()
 	spellBonusAttack = false;
 	
 	mType = _mtype;
+	spawn = NULL;
 	defaultOutfit = mType->outfit;
 	currentOutfit = mType->outfit;
 
@@ -484,6 +486,15 @@ bool Monster::getNextStep(Direction& dir)
 	}
 
 	return result;
+}
+
+void Monster::die()
+{
+	Creature::die();
+
+	if(spawn){
+		spawn->startSpawnCheck();
+	}
 }
 
 bool Monster::isInSpawnZone(const Position& pos)

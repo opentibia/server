@@ -27,6 +27,7 @@
 
 class Creature;
 class Game;
+class Spawn;
 
 class Monster : public Creature
 {
@@ -94,6 +95,8 @@ public:
 	
 	uint32_t getManaCost() const {return mType->manaCost;}
 
+	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
+
 private:
 	int32_t thinkTicks;
 	uint32_t yellTicks;
@@ -112,6 +115,7 @@ private:
 	typedef std::list<Creature*> TargetList;
 	TargetList targetList;
 	MonsterType* mType;
+	Spawn* spawn;
 
 	void searchTarget();
 	bool selectTarget(Creature* creature);
@@ -133,6 +137,7 @@ private:
 	bool isInSpawnZone(const Position& pos);
 	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 
+	virtual void die();
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }
 	virtual void dropLoot(Container* corpse);

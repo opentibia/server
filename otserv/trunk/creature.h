@@ -111,7 +111,7 @@ public:
 	void setDirection(Direction dir) { direction = dir;}
 
 	const Position& getMasterPos() const { return masterPos;}
-	void setMasterPos(const Position& pos, uint32_t radius = 1) { masterPos = pos;}
+	void setMasterPos(const Position& pos, uint32_t radius = 1) { masterPos = pos; masterRadius = radius;}
 
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return (getSleepTicks() <= 0);};

@@ -55,7 +55,7 @@ void MonsterType::reset()
 	armor = 0;
 
 	canPushItems = false;
-	staticAttackChance = 75;
+	staticAttackChance = 95;
 	maxSummons = 0;
 	targetDistance = 1;
 	runAwayHealth = 0;
@@ -421,12 +421,9 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		if(readXMLInteger(node, "speedchange", intValue)){
 			speedChange = intValue;
 
-			if(speedChange < -10000){
-				speedChange = -10000;
-			}
-
-			if(speedChange > 10000){
-				speedChange = 10000;
+			if(speedChange < -1000){
+				//cant be slower than 100%
+				speedChange = -1000;
 			}
 		}
 
@@ -440,7 +437,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		}
 
 		ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, duration, 0));
-		condition->setFormulaVars(speedChange / 10000.0, 0, speedChange / 10000.0, 0);
+		condition->setFormulaVars(speedChange / 1000.0, 0, speedChange / 1000.0, 0);
 		combat->setCondition(condition);
 	}
 	else if(name == "outfit"){
@@ -793,7 +790,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 								intValue = 0;
 							}
 
-							if(intValue >= 100){
+							if(intValue > 100){
 								intValue = 100;
 							}
 							

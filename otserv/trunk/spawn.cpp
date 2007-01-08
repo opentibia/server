@@ -33,6 +33,8 @@ extern ConfigManager g_config;
 extern Monsters g_monsters;
 extern Game g_game;
 
+#define DEFAULTSPAWN_INTERVAL 60000
+
 Spawns::Spawns()
 {
 	loaded = false;
@@ -237,17 +239,11 @@ bool Spawns::loadFromXml(const std::string& _filename)
 
 void Spawns::startup()
 {	
-	if(!isLoaded() || isStarted())
+	if(!isLoaded() || isStarted() || spawnList.empty())
 		return;
-	
-	uint32_t offset = 0;
+
 	for(SpawnList::iterator it = spawnList.begin(); it != spawnList.end(); ++it){
 		(*it)->startup();
-		uint32_t eventId = g_game.addEvent(makeTask((*it)->getInterval() + offset, boost::bind(&Spawn::checkSpawn, (*it))));
-		(*it)->setSpawnCheckEvent(eventId);
-
-		//std::cout << "starting spawn: " << (*it)->getInterval() + offset << std::endl;
-		offset += 1000;
 	}
 
 	started = true;
@@ -260,17 +256,17 @@ void Spawns::clear()
 	}
 
 	spawnList.clear();
-	
+
 	loaded = false;
 	started = false;
 	filename = "";
 }
 
-void Spawns::reload()
+void Spawn::startSpawnCheck()
 {
-	std::string file = filename;
-	clear();
-	loadFromXml(file);
+	if(checkSpawnEvent == 0){
+		checkSpawnEvent = g_game.addEvent(makeTask(getInterval(), boost::bind(&Spawn::checkSpawn, this)));
+	}
 }
 
 Spawn::Spawn(const Position& _pos, int32_t _radius)
@@ -278,12 +274,25 @@ Spawn::Spawn(const Position& _pos, int32_t _radius)
 	centerPos = _pos;
 	radius = _radius;
 
-	interval = 20000;
+	interval = DEFAULTSPAWN_INTERVAL;
 	checkSpawnEvent = 0;
 }
 
 Spawn::~Spawn()
 {
+	Monster* monster;
+	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end(); ++it){
+		monster = it->second;
+
+		if(monster->isRemoved()){
+			monster->releaseThing2();
+		}
+		monster->setSpawn(NULL);
+	}
+
+	spawnedMap.clear();
+	spawnMap.clear();
+
 	stopEvent();
 }
 
@@ -326,6 +335,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, const std::string& name, const Positi
 	}
 
 	monster->setDirection(dir);
+	monster->setSpawn(this);
 	monster->setMasterPos(centerPos, radius);
 	monster->useThing2();
 
@@ -336,7 +346,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, const std::string& name, const Positi
 
 void Spawn::startup()
 {
-	for(SpawnMap::iterator it = spawnMap.begin(); it != spawnMap.end(); ++it) {
+	for(SpawnMap::iterator it = spawnMap.begin(); it != spawnMap.end(); ++it){
 		uint32_t spawnId = it->first;
 		spawnBlock_t& sb = it->second;
 
@@ -346,7 +356,11 @@ void Spawn::startup()
 
 void Spawn::checkSpawn()
 {
-	//std::cout << "[Notice] Spawns: check spawn " << this << std::endl;
+#ifdef __DEBUG_SPAWN__
+	std::cout << "[Notice] Spawn::checkSpawn " << this << std::endl;
+#endif
+
+	checkSpawnEvent = 0;
 
 	Monster* monster;
 	uint32_t spawnId;
@@ -378,20 +392,27 @@ void Spawn::checkSpawn()
 		spawnBlock_t& sb = it->second;
 
 		if(spawnedMap.count(spawnId) == 0){
-			if((OTSYS_TIME() - sb.lastSpawn) >= sb.interval){
+			if(OTSYS_TIME() >= sb.lastSpawn + sb.interval){
 
 				if(findPlayer(sb.pos)){
 					sb.lastSpawn = OTSYS_TIME();
 					continue;
 				}
 
-				//std::cout << "Spawn monster " << sb.name << std::endl;
 				spawnMonster(spawnId, sb.name, sb.pos, sb.direction);
+				break; //only spawn one monster each round
 			}
 		}
 	}
 
-	checkSpawnEvent = g_game.addEvent(makeTask(getInterval(), boost::bind(&Spawn::checkSpawn, this)));
+	if(spawnedMap.size() < spawnMap.size()){
+		checkSpawnEvent = g_game.addEvent(makeTask(getInterval(), boost::bind(&Spawn::checkSpawn, this)));
+	}
+#ifdef __DEBUG_SPAWN__
+	else{
+		std::cout << "[Notice] Spawn::checkSpawn stopped " << this << std::endl;
+	}
+#endif
 }
 
 bool Spawn::addMonster(const spawnBlock_t& cb)
@@ -401,7 +422,7 @@ bool Spawn::addMonster(const spawnBlock_t& cb)
 		return false;
 	}
 	
-	if(cb.interval > interval){
+	if(cb.interval < interval){
 		interval = cb.interval;
 	}
 
