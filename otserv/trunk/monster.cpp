@@ -95,17 +95,6 @@ Monster::~Monster()
 bool Monster::canSee(const Position& pos) const
 {
 	return Creature::canSee(pos);
-
-	/*
-	const Position& myPos = getPosition();
-
-	if(pos.z != myPos.z){
-		return false;
-	}
-
-	return (std::abs(myPos.x - pos.x) <= Map::maxViewportX &&
-					std::abs(myPos.y - pos.y) <= Map::maxViewportY);
-	*/
 }
 
 void Monster::onAttackedCreatureDissapear(bool isLogout)
@@ -154,6 +143,12 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 
 	if(g_game.getGameState() != GAME_STATE_STARTUP){
 		onCreatureLeave(creature);
+
+		if(creature == this){
+			if(spawn){
+				spawn->startSpawnCheck();
+			}
+		}
 	}
 }
 
@@ -363,6 +358,10 @@ void Monster::onThink(uint32_t interval)
 		internalUpdateTargetList = false;
 		thinkTicks = 2000;
 
+		if(despawn()){
+			g_game.removeCreature(this, true);
+		}
+
 		updateLookDirection();
 
 		if(!isSummon()){
@@ -491,21 +490,29 @@ bool Monster::getNextStep(Direction& dir)
 void Monster::die()
 {
 	Creature::die();
-
-	if(spawn){
-		spawn->startSpawnCheck();
-	}
 }
 
-bool Monster::isInSpawnZone(const Position& pos)
+bool Monster::despawn()
+{
+	if(spawn){
+		return spawn->isInDespawnZone(getPosition());
+	}
+
+	return false;
+}
+
+bool Monster::canWalkTo(const Position& toPos)
 {
 	if(masterRadius == 0){
 		//no restrictions
 		return true;
 	}
 
-	return ((pos.x >= masterPos.x - (int)masterRadius) && (pos.x <= masterPos.x + (int)masterRadius) &&
-      (pos.y >= masterPos.y - (int)masterRadius) && (pos.y <= masterPos.y + (int)masterRadius));
+	if(spawn && spawn->isInSpawnZone(getPosition())){
+		return Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos);
+	}
+
+	return true;
 }
 
 bool Monster::getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir)
@@ -526,7 +533,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	if(currentDist == 0 || tmpDist == currentDist){
 		Position tmpPos = creaturePos;
 		tmpPos.y = tmpPos.y - 1;
-		if(isInSpawnZone(tmpPos)){
+		if(canWalkTo(tmpPos)){
 			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
 			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 				dirArr[dirSize++] = NORTH;
@@ -539,7 +546,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	if(currentDist == 0 || tmpDist == currentDist){
 		Position tmpPos = creaturePos;
 		tmpPos.y = tmpPos.y + 1;
-		if(isInSpawnZone(tmpPos)){
+		if(canWalkTo(tmpPos)){
 			tile = g_game.getTile(tmpPos.x, tmpPos.y, creaturePos.z);
 			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 				dirArr[dirSize++] = SOUTH;
@@ -552,7 +559,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	if(currentDist == 0 || tmpDist == currentDist){
 		Position tmpPos = creaturePos;
 		tmpPos.x = tmpPos.x - 1;
-		if(isInSpawnZone(tmpPos)){
+		if(canWalkTo(tmpPos)){
 			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
 			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 				dirArr[dirSize++] = WEST;
@@ -565,7 +572,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	if(currentDist == 0 || tmpDist == currentDist){
 		Position tmpPos = creaturePos;
 		tmpPos.x = tmpPos.x + 1;
-		if(isInSpawnZone(tmpPos)){
+		if(canWalkTo(tmpPos)){
 			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
 			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 				dirArr[dirSize++] = EAST;

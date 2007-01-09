@@ -43,6 +43,8 @@ public:
 		return &instance;
 	}
 	
+	bool isInZone(const Position& centerPos, int32_t radius, const Position& pos);
+
 	~Spawns();
 	
 	bool loadFromXml(const std::string& _filename);
@@ -79,9 +81,14 @@ public:
 	void startSpawnCheck();
 	void stopEvent();
 
+	bool isInSpawnZone(const Position& pos);
+	bool isInDespawnZone(const Position& pos);
+
 private:
 	Position centerPos;
 	int32_t radius;
+	int32_t despawnRange;
+	int32_t despawnRadius;
 
 	//map of creatures in the spawn
 	typedef std::map<uint32_t, spawnBlock_t> SpawnMap;
@@ -96,9 +103,7 @@ private:
 	uint32_t checkSpawnEvent;
 
 	bool findPlayer(const Position& pos);
-	bool isInSpawnZone(const Position& pos);
 	bool spawnMonster(uint32_t spawnId, const std::string& name, const Position& pos, Direction dir);
-
 	void checkSpawn();
 };
 

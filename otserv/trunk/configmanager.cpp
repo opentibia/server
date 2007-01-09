@@ -88,6 +88,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[EXHAUSTED] = getGlobalNumber(L, "exhausted", 1500);
 	m_confInteger[EXHAUSTED_ADD] = getGlobalNumber(L, "exhaustedadd", 0);
 	m_confInteger[PZ_LOCKED] = getGlobalNumber(L, "pzlocked", 60 * 1000);
+	m_confInteger[DEFAULT_DESPAWNRANGE] = getGlobalNumber(L, "despawnrange", 2);
+	m_confInteger[DEFAULT_DESPAWNRADIUS] = getGlobalNumber(L, "despawnradius", 50);
 	m_confInteger[ALLOW_CLONES] = getGlobalNumber(L, "allowclones", 0);
 	m_confInteger[RATE_EXPERIENCE] = getGlobalNumber(L, "rate_exp", 1);
 	m_confInteger[RATE_SKILL] = getGlobalNumber(L, "rate_skill", 1);

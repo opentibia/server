@@ -313,6 +313,34 @@ bool Spell::configureSpell(xmlNodePtr p)
 	std::string strValue;
 	if(readXMLString(p, "name", strValue)){
 		name = strValue;
+
+		const char* reservedList[17] =
+		{
+			"melee",
+			"physical",
+			"poison",
+			"fire",
+			"energy",
+			"lifedrain",
+			"manadrain",
+			"healing",
+			"speed",
+			"outfit",
+			"invisible",
+			"firefield",
+			"poisonfield",
+			"energyfield",
+			"firecondition",
+			"poisoncondition",
+			"energycondition"
+		};
+	
+		for(int i = 0; i < 17; ++i){
+			if(strcasecmp(reservedList[i], name.c_str()) == 0){
+				std::cout << "Error: [Spell::configureSpell] Spell is using a reserved name: " << reservedList[i] << std::endl;
+				return false;
+			}
+		}
 	}
 	else{
 		std::cout << "Error: [Spell::configureSpell] Spell without name." << std::endl;

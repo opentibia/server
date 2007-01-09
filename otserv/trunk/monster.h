@@ -134,7 +134,8 @@ private:
 	void updateTargetList();
 	void clearTargetList();
 
-	bool isInSpawnZone(const Position& pos);
+	bool canWalkTo(const Position& pos);
+	bool despawn();
 	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 
 	virtual void die();
