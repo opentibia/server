@@ -643,12 +643,19 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 					else if(strValue == "purplenote"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_SOUND_PURPLE);
 					}
+					else if(strValue == "bluenote"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_SOUND_BLUE);
+					}
+					else if(strValue == "whitenote"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_SOUND_WHITE);
+					}
+					else if(strValue == "bubbles"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_BUBBLES);
+					}
+					else if(strValue == "bubblearea"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_CRAPS);
+					}
 				}
-				/*
-				if(readXMLInteger(attributeNode, "value", intValue)){
-					combat->setParam(COMBATPARAM_EFFECT, intValue);
-				}
-				*/
 			}
 		}
 
