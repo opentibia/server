@@ -36,19 +36,19 @@ AutoList<Monster>Monster::listMonster;
 
 extern Monsters g_monsters;
 
+Monster* Monster::createMonster(MonsterType* mType)
+{
+	return new Monster(mType);
+}
+
 Monster* Monster::createMonster(const std::string& name)
 {
-	unsigned long id = g_monsters.getIdByName(name);
-	if(!id){
+	MonsterType* mType = g_monsters.getMonsterType(name);
+	if(!mType){
 		return NULL;
 	}
 	
-	MonsterType* mtype = g_monsters.getMonsterType(id);
-	if(!mtype)
-		return NULL;
-	
-	Monster* new_monster = new Monster(mtype);
-	return new_monster;
+	return createMonster(mType);
 }
 
 Monster::Monster(MonsterType* _mtype) :
@@ -132,22 +132,18 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	Creature::onCreatureAppear(creature, isLogin);
 
-	if(g_game.getGameState() != GAME_STATE_STARTUP){
-		onCreatureEnter(creature);
-	}
+	onCreatureEnter(creature);
 }
 
 void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 
-	if(g_game.getGameState() != GAME_STATE_STARTUP){
-		onCreatureLeave(creature);
+	onCreatureLeave(creature);
 
-		if(creature == this){
-			if(spawn){
-				spawn->startSpawnCheck();
-			}
+	if(creature == this){
+		if(spawn){
+			spawn->startSpawnCheck();
 		}
 	}
 }
@@ -156,25 +152,22 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 {
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
-	if(g_game.getGameState() != GAME_STATE_STARTUP){
-
-		if(creature == this){
-			internalUpdateTargetList = true;
-			startThink();
-		}
-		else if(canSee(newPos) && !canSee(oldPos)){
-			onCreatureEnter(creature);
-		}
-		else if(!canSee(newPos) && canSee(oldPos)){
-			onCreatureLeave(creature);
-		}
-		else{
-			//creature walking around in visible range
-			if(!isSummon()){
-				if(!followCreature){
-					if(creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer())){
-						selectTarget(const_cast<Creature*>(creature));
-					}
+	if(creature == this){
+		internalUpdateTargetList = true;
+		startThink();
+	}
+	else if(canSee(newPos) && !canSee(oldPos)){
+		onCreatureEnter(creature);
+	}
+	else if(!canSee(newPos) && canSee(oldPos)){
+		onCreatureLeave(creature);
+	}
+	else{
+		//creature walking around in visible range
+		if(!isSummon()){
+			if(!followCreature){
+				if(creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer())){
+					selectTarget(const_cast<Creature*>(creature));
 				}
 			}
 		}

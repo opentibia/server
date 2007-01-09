@@ -36,6 +36,7 @@ private:
 	//const Monster& operator=(const Monster& rhs);
 
 public:
+	static Monster* createMonster(MonsterType* mType);
 	static Monster* createMonster(const std::string& name);
 	virtual ~Monster();
 

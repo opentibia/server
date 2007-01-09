@@ -87,6 +87,7 @@ public:
 		RATE_SKILL,
 		RATE_LOOT,
 		RATE_MAGIC,
+		RATE_SPAWN,
 		OTSERV_DB_ENABLED,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};

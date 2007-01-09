@@ -161,6 +161,14 @@ public:
 	bool stopEvent(unsigned long eventid);
 
 	/**
+	  * Place Creature on the map without sending out events to the surrounding.
+	  * \param creature Creature to place on the map
+	  * \param pos The position to place the creature
+	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/chests)
+	  */
+	bool internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/);
+
+	/**
 	  * Place Player on the map.
 	  * \param player Player to place on the map
 	  * \param pos The position to place the player

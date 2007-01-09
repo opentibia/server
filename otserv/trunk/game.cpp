@@ -490,20 +490,29 @@ bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= fals
 	return placeCreature(player, pos, forced);
 }
 
-bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
+bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placeCreature()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::internalPlaceCreature()");
 
 	if(!map->placeCreature(pos, creature, forced)){
 		return false;
 	}
 
-	//std::cout << "placeCreature: " << creature << " " << creature->getID() << std::endl;
+	//std::cout << "internalPlaceCreature: " << creature << " " << creature->getID() << std::endl;
 
 	creature->useThing2();
 	creature->setID();
 	listCreature.addList(creature);
 	creature->addList();
+
+	return true;
+}
+
+bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
+{
+	if(!internalPlaceCreature(creature, pos, forced)){
+		return false;
+	}
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;

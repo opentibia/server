@@ -61,7 +61,7 @@ private:
 };
 
 struct spawnBlock_t{
-	std::string name;
+	MonsterType* mType;
 	Direction direction;
 	Position pos;
 	uint32_t interval;
@@ -73,7 +73,7 @@ public:
 	Spawn(const Position& _pos, int32_t _radius);
 	~Spawn();
 	
-	bool addMonster(const spawnBlock_t& sb);
+	bool addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval);
 
 	uint32_t getInterval() {return interval;}
 	void startup();
@@ -103,7 +103,7 @@ private:
 	uint32_t checkSpawnEvent;
 
 	bool findPlayer(const Position& pos);
-	bool spawnMonster(uint32_t spawnId, const std::string& name, const Position& pos, Direction dir);
+	bool spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir);
 	void checkSpawn();
 };
 
