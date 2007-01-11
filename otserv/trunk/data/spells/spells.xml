@@ -58,15 +58,11 @@
 
 <conjure name="Conjure Bolt" words="exevo con mort" conjureId="2543" conjureCount="15" aggressive="0" maglv="6" mana="70" soul="0" prem="0" enabled="1" function="conjureItem"/>
 
-<rune name="bolt" id="20001" enabled="1" script="monsters/bolt.lua"></rune>
-<rune name="spider bite" id="20002" enabled="1" script="monsters/spider bite.lua"></rune>
-<rune name="imitate" id="20003" enabled="1" script="monsters/imitate.lua"></rune>
-<rune name="explosive arrow" id="20004" enabled="1" script="monsters/explosive arrow.lua"></rune>
-<rune name="poison spit" id="20005" enabled="1" script="monsters/poison spit.lua"></rune>
-
 <instant name="House Guest List" words="aleta sio" enabled="1" function="editHouseGuest"></instant>
 <instant name="House Subowner List" words="aleta som" enabled="1" function="editHouseSubOwner"></instant>
 <instant name="House Door List" words="aleta grav" enabled="1" function="editHouseDoor"></instant>
 <instant name="House Kick" words="alana sio" params="1" enabled="1" function="houseKick"></instant>
+
+<rune name="imitate" id="20001" enabled="1" script="monsters/imitate.lua"></rune>
 
 </spells>
