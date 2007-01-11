@@ -375,7 +375,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 
 	monster->setDirection(dir);
 	monster->setSpawn(this);
-	monster->setMasterPos(centerPos, radius);
+	monster->setMasterPos(pos, radius);
 	monster->useThing2();
 
 	spawnedMap.insert(spawned_pair(spawnId, monster));

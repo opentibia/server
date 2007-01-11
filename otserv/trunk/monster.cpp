@@ -63,6 +63,7 @@ Creature()
 	isWalkActive = false;
 	internalUpdateTargetList = false;
 	spellBonusAttack = false;
+	createLoot = true;
 	
 	mType = _mtype;
 	spawn = NULL;
@@ -460,19 +461,28 @@ bool Monster::getNextStep(Direction& dir)
 					objectRemoved = true;
 				}
 				else{
+					//Failed to remove an item, while result says success.. just silently ignore the failure.
 					break;
-				}
-			}
-
-			for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
-				if((*cit)->getMonster() && (*cit)->isPushable()){
-					(*cit)->changeHealth(-(*cit)->getHealth());
-					objectRemoved = true;
 				}
 			}
 
 			if(objectRemoved){
 				g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
+			}
+
+			objectRemoved = false;
+			for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
+				Monster* monster = (*cit)->getMonster();
+
+				if(monster && monster->isPushable()){
+					monster->changeHealth(-monster->getHealth());
+					monster->setCreateLoot(false);
+					objectRemoved = true;
+				}
+			}
+
+			if(objectRemoved){
+				g_game.addMagicEffect(tile->getPosition(), NM_ME_BLOCKHIT);
 			}
 		}
 	}
@@ -774,7 +784,7 @@ void Monster::updateLookDirection()
 
 void Monster::dropLoot(Container* corpse)
 {
-	if(corpse){
+	if(corpse && createLoot){
 		if(!getMaster()){
 			mType->createLoot(corpse);
 		}

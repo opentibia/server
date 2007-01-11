@@ -96,6 +96,7 @@ public:
 	
 	uint32_t getManaCost() const {return mType->manaCost;}
 
+	void setCreateLoot(bool _createLoot) {createLoot = _createLoot;}
 	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
 
 private:
@@ -105,6 +106,7 @@ private:
 	uint32_t defenseTicks;
 	int32_t changeTargetTicks;
 	std::string strDescription;
+	bool createLoot;
 	bool internalUpdateTargetList;
 	bool isActive;
 	bool isWalkActive;

@@ -3409,7 +3409,7 @@ int LuaScriptInterface::luaGetPlayerDepotItems(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		const Depot* depot = player->getDepot(depotid, false);
+		const Depot* depot = player->getDepot(depotid, true);
 		if(depot){
 			lua_pushnumber(L, depot->getItemHoldingCount());
 		}
