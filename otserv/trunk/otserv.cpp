@@ -84,8 +84,8 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 	}
 #endif
 
-#define CLIENT_VERSION_MIN 790
-#define CLIENT_VERSION_MAX 791
+#define CLIENT_VERSION_MIN 792
+#define CLIENT_VERSION_MAX 792
 
 typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
 IPList serverIPs;
@@ -260,7 +260,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						}
 					}
 				}
-				else{//version != 790
+				else{
 					msg.AddByte(0x0A);
 					msg.AddString("Only clients with protocol 7.9 allowed!");
 				}
