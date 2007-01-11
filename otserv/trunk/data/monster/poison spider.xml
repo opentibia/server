@@ -1,32 +1,43 @@
 <?xml version="1.0"?>
 <monster name="Poison Spider" race="venom" experience="22" speed="160" manacost="200">
-<health now="26" max="26"/>
-<look type="36" corpse="2848"/>
+  <health now="26" max="26"/>
+  <look type="36" head="0" body="0" legs="0" feet="0" corpse="2848"/>
+  <targetchange interval="2000" chance="0"/>
+  <strategy attack="100" defense="0"/>
 
-<flags>
-	<flag pushable="1"/>
-	<flag summonable="1"/>
-	<flag convinceable="1"/>
-	<flag illusionable="1"/>
-	<flag canpushitems="0"/>
-	<flag staticattack="50"/>
-	<flag targetdistance="1"/>
-	<flag runonhealth="0"/>
-</flags>
+  <flags>
+    <flag summonable="1"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="1"/>
+    <flag pushable="1"/>
+    <flag canpushitems="0"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="1"/>
+    <flag runonhealth="6"/>
+  </flags>
 
-<attacks>
-	<attack name="spider bite" speed="2000" range="1" chance="100" min="0" max="-20"/>
-</attacks>
+  <attacks>
+    <attack name="melee" interval="2000" skill="20" attack="10" poison="30"/>
+  </attacks>
 
+  <defenses armor="4" defense="10">
+  </defenses>
 
-<defenses armor="15" defense="20">
-</defenses>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
 
-<immunities>
-	<immunity name="poison"/>
-</immunities>
-
-<loot>
- 	<item id="2148" countmax="10" chance1="80000" chancemax="0"/>
-</loot>
+  <loot>
+    <item id="2148" countmax="10" chance="80000"/>
+  </loot>
 </monster>
