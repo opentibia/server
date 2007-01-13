@@ -91,7 +91,7 @@ public:
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void setID(){this->id = auto_id | this->idRange();}
-	void setRemoved();
+	void setRemoved(){isInternalRemoved = true;}
 
 	virtual uint32_t idRange() = 0;
 	uint32_t getID() const { return id; }
@@ -118,7 +118,15 @@ public:
 	virtual bool isRemoved() const {return isInternalRemoved;};
 	virtual bool canSeeInvisibility() const { return false;}
 		
-	int64_t getSleepTicks() const;
+	int64_t getSleepTicks() const{
+		int64_t delay;
+		int stepDuration = getStepDuration();
+		if(lastMove != 0)
+			delay = (((int64_t)(lastMove)) + ((int64_t)(stepDuration))) - ((int64_t)(OTSYS_TIME()));
+		else
+			delay = 0;
+		return delay;
+	}
 	int64_t getEventStepTicks() const;
 	int getStepDuration() const;
 

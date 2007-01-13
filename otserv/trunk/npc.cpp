@@ -215,12 +215,22 @@ void Npc::onUpdateTile(const Position& pos)
 void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	Creature::onCreatureAppear(creature, isLogin);
+	
+	//only players for script events
+	if(!creature->getPlayer())
+		return;
+	
 	m_npcEventHandler->onCreatureAppear(creature);
 }
 
 void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
+	
+	//only players for script events
+	if(!creature->getPlayer())
+		return;
+	
 	m_npcEventHandler->onCreatureDisappear(creature);
 }
 
@@ -239,7 +249,11 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 {
 	if(creature->getID() == this->getID())
 		return;
-
+	
+	//only players for script events
+	if(!creature->getPlayer())
+		return;
+		
 	m_npcEventHandler->onCreatureSay(creature, type, text);
 }
 

@@ -95,6 +95,12 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 	return false;
 }
 
+#define RAND_MAX24 16777216
+uint32_t rand24b()
+{
+	return (rand() << 12) ^ (rand()) & (0xFFFFFF);
+}
+
 int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_NORMAL*/)
 {
 	if(std::abs(lowest_number) > std::abs(highest_number)){
@@ -103,18 +109,16 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 		lowest_number = nTmp;
 	}
 
-	double range = highest_number - lowest_number + 1;
-	double r;
+	int range = highest_number - lowest_number;
 	
 	if(type == DISTRO_NORMAL){
-		r = rand()/(RAND_MAX + 1.0);
+		int r = rand24b() % range;
+		return lowest_number + r;
 	}
 	else{
-		r = 1.-sqrt((1.*rand())/RAND_MAX);
+		float r = 1.f -sqrt((1.f*rand24b())/RAND_MAX24);
+		return lowest_number + (int)((float)range * r);
 	}
-
-	return lowest_number + int(range * r);
-	//return lowest_number + int(range * rand()/(RAND_MAX + 1.0));
 }
 
 // dump a part of the memory to stderr.

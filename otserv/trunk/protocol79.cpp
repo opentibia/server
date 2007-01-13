@@ -100,7 +100,7 @@ void Protocol79::setPlayer(Player* p)
 
 void Protocol79::sleepTillMove()
 {
-	long long delay = player->getSleepTicks();
+	int64_t delay = player->getSleepTicks();
 	if(delay > 0 ){       
 #if __DEBUG__     
 		std::cout << "Delaying "<< player->getName() << " --- " << delay << std::endl;		

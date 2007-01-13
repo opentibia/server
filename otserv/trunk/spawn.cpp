@@ -398,7 +398,7 @@ void Spawn::checkSpawn()
 #ifdef __DEBUG_SPAWN__
 	std::cout << "[Notice] Spawn::checkSpawn " << this << std::endl;
 #endif
-
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Spawn::checkSpawn()");
 	checkSpawnEvent = 0;
 
 	Monster* monster;
@@ -443,7 +443,7 @@ void Spawn::checkSpawn()
 				spawnMonster(spawnId, sb.mType, sb.pos, sb.direction);
 
 				++spawnCount;
-				if(spawnCount >= g_config.getNumber(ConfigManager::RATE_SPAWN)){
+				if(spawnCount >= (uint32_t)g_config.getNumber(ConfigManager::RATE_SPAWN)){
 					break;
 				}
 			}

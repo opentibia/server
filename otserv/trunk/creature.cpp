@@ -103,11 +103,6 @@ Creature::~Creature()
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
 }
 
-void Creature::setRemoved()
-{
-	isInternalRemoved = true;
-}
-
 bool Creature::canSee(const Position& pos) const
 {
 	const Position& myPos = getPosition();
@@ -889,7 +884,7 @@ bool Creature::hasCondition(ConditionType_t type) const
 			return true;
 		}
 	}
-
+	
 	return false;
 }
 
@@ -937,18 +932,6 @@ int Creature::getStepDuration() const
 
 	return duration * lastStepCost;
 };
-
-int64_t Creature::getSleepTicks() const
-{
-	int64_t delay = 0;
-	int stepDuration = getStepDuration();
-	
-	if(lastMove != 0) {
-		delay = (((int64_t)(lastMove)) + ((int64_t)(stepDuration))) - ((int64_t)(OTSYS_TIME()));
-	}
-	
-	return delay;
-}
 
 int64_t Creature::getEventStepTicks() const
 {
