@@ -112,8 +112,14 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 	int range = highest_number - lowest_number;
 	
 	if(type == DISTRO_NORMAL){
+		bool negative = false;
+		if(range < 0){
+			range = std::abs(range);
+			negative = true;
+		}
+
 		int r = ((range != 0) ? rand24b() % range : 0);
-		return lowest_number + r;
+		return lowest_number + (!negative ? r : -r);
 	}
 	else{
 		float r = 1.f -sqrt((1.f*rand24b())/RAND_MAX24);
