@@ -1540,7 +1540,7 @@ bool ConjureSpell::ConjureFood(const ConjureSpell* spell, Creature* creature, co
 	}
 
 	uint32_t foodType = 0;
-	switch(rand() % 7){
+	switch(random_range(0, 7)){
 		case 0: foodType = ITEM_MEAT; break;
 		case 1: foodType = ITEM_HAM; break;
 		case 2: foodType = ITEM_GRAPE; break;

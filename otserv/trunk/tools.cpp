@@ -112,7 +112,7 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 	int range = highest_number - lowest_number;
 	
 	if(type == DISTRO_NORMAL){
-		int r = rand24b() % range;
+		int r = ((range != 0) ? rand24b() % range : 0);
 		return lowest_number + r;
 	}
 	else{

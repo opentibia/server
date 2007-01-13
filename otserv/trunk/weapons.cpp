@@ -672,7 +672,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 	Position destPos = target->getPosition();
 	Tile* destTile = target->getTile();
 
-	if(rand() % 100 < hitChance){
+	if(random_range(0, 100) < hitChance){
 		Weapon::internalUseWeapon(player, item, target);
 	}
 	else{
