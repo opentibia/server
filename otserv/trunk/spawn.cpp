@@ -74,7 +74,6 @@ bool Spawns::loadFromXml(const std::string& _filename)
 			if(xmlStrcmp(spawnNode->name, (const xmlChar*)"spawn") == 0){
 				Position centerPos;
 				int32_t radius = 0;
-				//int32_t despawnRadius = 0;
 
 				if(readXMLInteger(spawnNode, "centerx", intValue)){
 					centerPos.x = intValue;
@@ -107,12 +106,6 @@ bool Spawns::loadFromXml(const std::string& _filename)
 					xmlFreeDoc(doc);
 					return false;
 				}
-
-				/*
-				if(readXMLInteger(spawnNode, "despawnradius", intValue)){
-					despawnRadius = intValue;
-				}
-				*/
 
 				Spawn* spawn = new Spawn(centerPos, radius);
 				spawnList.push_back(spawn);
@@ -284,9 +277,6 @@ Spawn::Spawn(const Position& _pos, int32_t _radius)
 {
 	centerPos = _pos;
 	radius = _radius;
-	despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
-	despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
-
 	interval = DEFAULTSPAWN_INTERVAL;
 	checkSpawnEvent = 0;
 }
@@ -329,27 +319,6 @@ bool Spawn::findPlayer(const Position& pos)
 bool Spawn::isInSpawnZone(const Position& pos)
 {
 	return Spawns::getInstance()->isInZone(centerPos, radius, pos);
-}
-
-bool Spawn::isInDespawnZone(const Position& pos)
-{
-	if(despawnRadius == 0){
-		return false;
-	}
-
-	if(!Spawns::getInstance()->isInZone(centerPos, despawnRadius, pos)){
-		return true;
-	}
-
-	if(despawnRange == 0){
-		return false;
-	}
-
-	if(!((pos.z >= centerPos.z - despawnRange) && (pos.z <= centerPos.z + despawnRange)) ){
-		return true;
-	}
-
-	return false;
 }
 
 bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir)
@@ -419,8 +388,6 @@ void Spawn::checkSpawn()
 		else if(!isInSpawnZone(monster->getPosition()) && spawnId != 0) {
 			spawnedMap.insert(spawned_pair(0, monster));
 			spawnedMap.erase(it++);
-
-			//TODO: despawn the monster
 		}
 		else{
 			++it;

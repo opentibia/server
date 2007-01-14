@@ -82,7 +82,6 @@ public:
 	void stopEvent();
 
 	bool isInSpawnZone(const Position& pos);
-	bool isInDespawnZone(const Position& pos);
 
 private:
 	Position centerPos;

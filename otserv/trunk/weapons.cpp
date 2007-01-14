@@ -354,7 +354,9 @@ bool Weapon::useFist(Player* player, Creature* target)
 		Combat::doCombatHealth(player, target, damage, damage, params);
 
 		if(player->getAccessLevel() <= 0){
-			player->addSkillAdvance(SKILL_FIST, player->getSkillPoint());
+			if(player->getAddAttackSkill()){
+				player->addSkillAdvance(SKILL_FIST, 1);
+			}
 		}
 
 		return true;
@@ -530,7 +532,26 @@ void WeaponMelee::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 bool WeaponMelee::getSkillType(const Player* player, const Item* item,
 	skills_t& skill, uint32_t& skillpoint) const
 {
-	skillpoint = player->getSkillPoint();
+	skillpoint = 0;
+
+	if(player->getAddAttackSkill()){
+		switch(player->getLastAttackBlockType()){
+			case BLOCK_DEFENSE:
+			case BLOCK_ARMOR:
+			case BLOCK_NONE:
+			{
+				skillpoint = 1;
+				break;
+			}
+
+			default:
+			{
+				skillpoint = 0;
+				break;
+			}
+		}
+	}
+
 	WeaponType_t weaponType = item->getWeaponType();
 
 	switch(weaponType){
@@ -714,7 +735,29 @@ bool WeaponDistance::getSkillType(const Player* player, const Item* item,
 	skills_t& skill, uint32_t& skillpoint) const
 {
 	skill = SKILL_DIST;
-	skillpoint = player->getSkillPoint();
+	skillpoint = 0;
+
+	if(player->getAddAttackSkill()){
+		switch(player->getLastAttackBlockType()){
+			case BLOCK_NONE:
+			{
+				skillpoint = 2;
+				break;
+			}
+
+			case BLOCK_DEFENSE:
+			case BLOCK_ARMOR:
+			{
+				skillpoint = 1;
+				break;
+			}
+
+			default:
+				skillpoint = 0;
+				break;
+		}
+	}
+	
 	return true;
 }
 

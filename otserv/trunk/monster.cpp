@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 #include "monster.h"
 #include "monsters.h"
@@ -29,8 +30,10 @@
 #include "spells.h"
 #include "combat.h"
 #include "spawn.h"
+#include "configmanager.h"
 
 extern Game g_game;
+extern ConfigManager g_config;
 
 AutoList<Monster>Monster::listMonster;
 
@@ -417,6 +420,72 @@ void Monster::onWalk()
 	}
 }
 
+bool Monster::pushItem(Item* item, int32_t radius)
+{
+	const Position& centerPos = item->getPosition();
+
+	typedef std::pair<int32_t, int32_t> relPair;
+	std::vector<relPair> relList;
+	relList.push_back(relPair(-1, 0));
+	relList.push_back(relPair(-1, 0));
+	relList.push_back(relPair(0, 1));
+	relList.push_back(relPair(0, -1));
+	relList.push_back(relPair(1, 1));
+	relList.push_back(relPair(1, 0));
+	relList.push_back(relPair(-1, 0));
+	relList.push_back(relPair(-1, -1));
+
+	std::random_shuffle(relList.begin(), relList.end());
+
+	Position tryPos;
+	for(int32_t n = 1; n <= radius; ++n){
+		for(std::vector<relPair>::iterator it = relList.begin(); it != relList.end(); ++it){
+			int32_t dx = it->first * n;
+			int32_t dy = it->second * n;
+
+			tryPos = centerPos;
+			tryPos.x = tryPos.x + dx;
+			tryPos.y = tryPos.y + dy;
+
+			Tile* tile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
+			if(tile && g_game.canThrowObjectTo(centerPos, tryPos)){
+				if(g_game.internalMoveItem(item->getParent(), tile, INDEX_WHEREEVER, item, item->getItemCount()) == RET_NOERROR){
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+bool Monster::pushCreature(Creature* creature)
+{
+	Position monsterPos = creature->getPosition();
+
+	std::vector<Direction> dirList;
+	dirList.push_back(NORTH);
+	dirList.push_back(SOUTH);
+	dirList.push_back(WEST);
+	dirList.push_back(EAST);
+
+	std::random_shuffle(dirList.begin(), dirList.end());
+
+	for(std::vector<Direction>::iterator it = dirList.begin(); it != dirList.end(); ++it){
+		const Position& tryPos = Spells::getCasterPosition(creature, *it);
+		Tile* toTile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
+
+		if(toTile && !toTile->hasProperty(BLOCKPATHFIND)){
+			if(g_game.internalMoveCreature(creature, *it) == RET_NOERROR){
+				return true;
+				break;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool Monster::getNextStep(Direction& dir)
 {
 	if(!isWalkActive){
@@ -440,7 +509,6 @@ bool Monster::getNextStep(Direction& dir)
 
 	if(!result){
 		//target dancing
-		//if(rand() % mType->staticAttack == 0){
 		if(mType->staticAttackChance < (uint32_t)random_range(1, 100)){
 			if(attackedCreature && attackedCreature == followCreature){
 				result = getRandomStep(getPosition(), attackedCreature->getPosition(), dir);
@@ -455,14 +523,17 @@ bool Monster::getNextStep(Direction& dir)
 
 		if(tile){
 			bool objectRemoved = false;
-			while(Item* item = tile->getMoveableBlockingItem()){
-				//TODO. move items?
-				if(g_game.internalRemoveItem(item) == RET_NOERROR){
-					objectRemoved = true;
-				}
-				else{
-					//Failed to remove an item, while result says success.. just silently ignore the failure.
-					break;
+			//We can not use iterators here since we can push the item to another tile
+			//which will invalidate the iterator.
+			for(int i = 0; i < tile->downItems.size(); ++i){
+				Item* item = tile->downItems[i];
+				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND) 
+					|| item->hasProperty(BLOCKSOLID))){
+					if(!pushItem(item, 1)){
+						if(g_game.internalRemoveItem(item) == RET_NOERROR){
+							objectRemoved = true;
+						}
+					}
 				}
 			}
 
@@ -471,13 +542,17 @@ bool Monster::getNextStep(Direction& dir)
 			}
 
 			objectRemoved = false;
-			for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
-				Monster* monster = (*cit)->getMonster();
+			//We can not use iterators here since we can push a creature to another tile
+			//which will invalidate the iterator.
+			for(int i = 0; i < tile->creatures.size(); ++i){
+				Monster* monster = tile->creatures[i]->getMonster();
 
 				if(monster && monster->isPushable()){
-					monster->changeHealth(-monster->getHealth());
-					monster->setCreateLoot(false);
-					objectRemoved = true;
+					if(!pushCreature(monster)){
+						monster->changeHealth(-monster->getHealth());
+						monster->setCreateLoot(false);
+						objectRemoved = true;
+					}
 				}
 			}
 
@@ -498,7 +573,28 @@ void Monster::die()
 bool Monster::despawn()
 {
 	if(spawn){
-		return spawn->isInDespawnZone(getPosition());
+		const Position& pos = getPosition();
+
+		int32_t despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
+		int32_t despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
+
+		if(despawnRadius == 0){
+			return false;
+		}
+
+		if(!Spawns::getInstance()->isInZone(masterPos, despawnRadius, pos)){
+			return true;
+		}
+
+		if(despawnRange == 0){
+			return false;
+		}
+
+		if(!((pos.z >= masterPos.z - despawnRange) && (pos.z <= masterPos.z + despawnRange))){
+			return true;
+		}
+
+		return false;
 	}
 
 	return false;
@@ -662,6 +758,10 @@ void Monster::onDefending(uint32_t interval)
 		for(SummonList::iterator it = mType->summonList.begin(); it != mType->summonList.end(); ++it){
 			if(it->speed > defenseTicks){
 				resetTicks = false;
+				continue;
+			}
+
+			if((int32_t)summons.size() >= mType->maxSummons){
 				continue;
 			}
 

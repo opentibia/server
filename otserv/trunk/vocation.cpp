@@ -212,7 +212,7 @@ void Vocation::debugVocation()
 {
 	std::cout << "name: " << name << std::endl;
 	std::cout << "gain cap: " << gainCap << " hp: " << gainHP << " mana: " << gainMana << std::endl;
-	std::cout << "gain time: Healht(" << gainHealthTicks << " ticks, +" << gainHealthAmount << "). Mana(" << 
+	std::cout << "gain time: Health(" << gainHealthTicks << " ticks, +" << gainHealthAmount << "). Mana(" << 
 		gainManaTicks << " ticks, +" << gainManaAmount << ")" << std::endl;
 	std::cout << "mana multiplier: " << manaMultiplier << std::endl;
 	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){

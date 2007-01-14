@@ -139,6 +139,9 @@ private:
 
 	bool canWalkTo(const Position& pos);
 	bool despawn();
+	
+	bool pushItem(Item* item, int32_t radius);
+	bool pushCreature(Creature* creature);
 	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 
 	virtual void die();

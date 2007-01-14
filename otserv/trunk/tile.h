@@ -72,7 +72,6 @@ public:
 	Item* getTopTopItem();
 	Item* getTopDownItem();
 	bool isMoveableBlocking() const;
-	Item* getMoveableBlockingItem();
 	Thing* getTopThing();
 	
 	uint32_t getThingCount() const {return (uint32_t)(ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();}

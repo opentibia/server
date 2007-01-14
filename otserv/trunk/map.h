@@ -47,19 +47,16 @@ class Map;
 class IOMap;
 
 struct AStarNode{
-	/** Current position */
-	long x,y;
-	/** Parent of this node. Null if this is the rootnode */
+	uint32_t x, y;
 	AStarNode* parent;
-	/** Heuristics variable */
-	//float f, g, h;
-	int h;
-	/** Operator to sort so we can find the best node */
-	bool operator<(const AStarNode &node){return this->h < node.h;}
+	int32_t f, g, h;
 };
 
 #define MAX_NODES 512
 #define GET_NODE_INDEX(a) (a - &nodes[0])
+
+#define MAP_NORMALWALKCOST 10
+#define MAP_DIAGONALWALKCOST 25
 
 class AStarNodes{
 public:
@@ -69,9 +66,15 @@ public:
 	AStarNode* createOpenNode();
 	AStarNode* getBestNode();
 	void closeNode(AStarNode* node);
+	void openNode(AStarNode* node);
 	unsigned long countClosedNodes();
 	unsigned long countOpenNodes();
 	bool isInList(long x, long y);
+	AStarNode* getNodeInList(long x, long y);
+
+	int getMapWalkCost(const Creature* creature, AStarNode* node, const Tile* neighbourTile);
+	int getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal);
+
 private:
 	AStarNode nodes[MAX_NODES];
 	std::bitset<MAX_NODES> openNodes;

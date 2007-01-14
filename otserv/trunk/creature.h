@@ -91,7 +91,7 @@ public:
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void setID(){this->id = auto_id | this->idRange();}
-	void setRemoved(){isInternalRemoved = true;}
+	void setRemoved() {isInternalRemoved = true;}
 
 	virtual uint32_t idRange() = 0;
 	uint32_t getID() const { return id; }
@@ -127,6 +127,7 @@ public:
 			delay = 0;
 		return delay;
 	}
+
 	int64_t getEventStepTicks() const;
 	int getStepDuration() const;
 
@@ -221,8 +222,7 @@ public:
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
-	//virtual void onDefenseBlock(bool blockedHit) {};
-	//virtual void onArmorBlock(bool blockedHit) {};
+	virtual void onBlockHit(BlockType_t blockType);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
@@ -291,6 +291,7 @@ protected:
 	unsigned long eventWalk;
 	std::list<Direction> listWalkDir;
 	bool internalUpdateFollow;
+	bool internalValidatePath;
 
 	//combat variables
 	Creature* attackedCreature;

@@ -49,8 +49,11 @@ extern ConfigManager g_config;
 
 //client viewport: 8, 6
 //minimum viewport 9, 7
-int32_t Map::maxViewportX = 9; 
-int32_t Map::maxViewportY = 7;
+//int32_t Map::maxViewportX = 9;
+//int32_t Map::maxViewportY = 7;
+
+int32_t Map::maxViewportX = 10; 
+int32_t Map::maxViewportY = 10;
 
 Map::Map()
 {
@@ -533,7 +536,7 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 			}
 			lastrx = rx; lastry = ry; lastrz = rz;
 			
-			Tile *tile = getTile(rx, ry, rz);
+			Tile* tile = getTile(rx, ry, rz);
 			if(tile){
 				if(tile->hasProperty(BLOCKPROJECTILE))
 					return false;
@@ -572,7 +575,7 @@ bool Map::isPathValid(const Creature* creature, const std::list<Direction>& list
 		}
 
 		Tile* tile = getTile(pos);
-		if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
+		if(!tile || !tile->creatures.empty() ||  tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
 			return false;
 		}
 	}
@@ -586,7 +589,153 @@ bool Map::isPathValid(const Creature* creature, const std::list<Direction>& list
 
 bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir)
 {
-	if(creature->getPosition().z != toPosition.z){
+	Position startPos = creature->getPosition();
+
+	if(startPos.z != toPosition.z){
+		return false;
+	}
+
+	AStarNodes nodes;
+	AStarNode* startNode = nodes.createOpenNode();
+
+	startNode->x = startPos.x;
+	startNode->y = startPos.y;
+
+	startNode->g = 0; 
+	startNode->h = nodes.getEstimatedDistance(startPos.x, startPos.y, toPosition.x, toPosition.y);
+	startNode->f = startNode->g + startNode->h;
+	startNode->parent = NULL;
+
+	int32_t x, y;
+	int32_t z = startPos.z;
+
+	int32_t neighbourOrderList[8][2] =
+	{
+		{-1, 0},
+		{0, 1},
+		{1, 0},
+		{0, -1},
+
+		//diagonal
+		{-1, -1},
+		{1, -1},
+		{1, 1},
+		{-1, 1},
+	};
+
+	Tile* tile = NULL;
+	AStarNode* found = NULL;
+	
+	while(nodes.countClosedNodes() < 100){		
+		AStarNode* n = nodes.getBestNode();
+		if(!n){
+			listDir.clear();
+			return false; //no path found
+		}
+
+		if(n->x == toPosition.x && n->y == toPosition.y){
+			found = n;
+			break;
+		}
+		else{
+			for(int i = 0; i < 8; ++i){
+				x = n->x + neighbourOrderList[i][0];
+				y = n->y + neighbourOrderList[i][1];
+			
+				if((x == startPos.x && y == startPos.y)){
+					continue;
+				}
+
+				tile = getTile(x, y, z);
+
+				if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+					//The cost (g) for this neighbour
+					int32_t newg = n->g + nodes.getMapWalkCost(creature, n, tile);
+
+					//Check if the node is already in the closed/open list
+					//If it exists and the nodes already on them has a lower cost (g) then we can ignore this neighbour node
+
+					AStarNode* neighbourNode = nodes.getNodeInList(x, y);
+					if(neighbourNode){
+						if(neighbourNode->g <= newg){
+							//The node on the closed/open list is cheaper than this one
+							continue;
+						}
+
+						nodes.openNode(neighbourNode);
+					}
+					else{
+						//Does not exist in the open/closed list, create a new node
+						neighbourNode = nodes.createOpenNode();
+					}
+
+					//This node is the best node so far with this state
+					neighbourNode->x = x;
+					neighbourNode->y = y;
+					neighbourNode->parent = n;
+					neighbourNode->g = newg;
+					neighbourNode->h = nodes.getEstimatedDistance(neighbourNode->x, neighbourNode->y,
+						toPosition.x, toPosition.y);
+					neighbourNode->f = neighbourNode->g + neighbourNode->h;
+				}
+
+			}
+			
+			nodes.closeNode(n);
+		}
+	}
+
+	int32_t prevx = toPosition.x;
+	int32_t prevy = toPosition.y;
+	int32_t dx, dy;
+
+	while(found){
+		x = found->x;
+		y = found->y;
+
+		found = found->parent;
+
+		dx = x - prevx;
+		dy = y - prevy;
+
+		prevx = x;
+		prevy = y;
+
+		if(dx == -1 && dy == -1){
+			listDir.insert(listDir.begin(), SOUTHEAST);
+		}
+		else if(dx == 1 && dy == -1){
+			listDir.insert(listDir.begin(), SOUTHWEST);
+		}
+		else if(dx == -1 && dy == 1){
+			listDir.insert(listDir.begin(), NORTHEAST);
+		}
+		else if(dx == 1 && dy == 1){
+			listDir.insert(listDir.begin(), NORTHWEST);
+		}
+		else if(dx == -1){
+			listDir.insert(listDir.begin(), EAST);
+		}
+		else if(dx == 1){
+			listDir.insert(listDir.begin(), WEST);
+		}
+		else if(dy == -1){
+			listDir.insert(listDir.begin(), SOUTH);
+		}
+		else if(dy == 1){
+			listDir.insert(listDir.begin(), NORTH);
+		}
+	}
+
+	return !listDir.empty();
+}
+
+/*
+bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir)
+{
+	Position startPos = creature->getPosition();
+
+	if(startPos.z != toPosition.z){
 		return false;
 	}
 
@@ -594,26 +743,22 @@ bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Dir
 	AStarNodes nodes;
 	AStarNode* found = NULL;
 
-	Position startPos = creature->getPosition();
-
 	AStarNode* startNode = nodes.createOpenNode();
-	startNode->parent = NULL;
-	startNode->h = 0;
+
 	startNode->x = toPosition.x;
 	startNode->y = toPosition.y;
+	startNode->h = 0;
 
 	int32_t x, y;
 	int32_t dx, dy;
 	int32_t z = toPosition.z;
 
-	while(!found && nodes.countClosedNodes() < 100){		
+	while(nodes.countClosedNodes() < 100){		
 		AStarNode* current = nodes.getBestNode();
 		if(!current){
 			listDir.clear();
 			return false; //no path found
 		}
-
-		nodes.closeNode(current);
 
 		for(int dx = -1; dx <= 1; dx++){
 			for(int dy = -1; dy <= 1; dy++){
@@ -647,6 +792,8 @@ bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Dir
 				}
 			}
 		}
+
+		nodes.closeNode(current);
 	}
 
 	int32_t prevx = startPos.x;
@@ -756,6 +903,7 @@ bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Dir
 
 	return !listDir.empty();
 }
+*/
 
 //*********** AStarNodes *************
 
@@ -781,27 +929,23 @@ AStarNode* AStarNodes::getBestNode()
 	if(curNode == 0)
 		return NULL;
 
-	int best_node_h;
-	unsigned long best_node;
-	bool found;
-	
-	best_node_h = 100000;
-	best_node = 0;
-	found = false;
+	int best_node_f = 100000;
+	unsigned long best_node = 0;
+	bool found = false;
 
 	for(unsigned long i = 0; i < curNode; i++){
-		if(nodes[i].h < best_node_h && openNodes[i] == 1){
+		if(nodes[i].f < best_node_f && openNodes[i] == 1){
 			found = true;
-			best_node_h = nodes[i].h;
+			best_node_f = nodes[i].f;
 			best_node = i;
 		}
 	}
+
 	if(found){
 		return &nodes[best_node];
 	}
-	else{
-		return NULL;
-	}
+
+	return NULL;
 }
 
 void AStarNodes::closeNode(AStarNode* node)
@@ -813,6 +957,17 @@ void AStarNodes::closeNode(AStarNode* node)
 	}
 
 	openNodes[pos] = 0;
+}
+
+void AStarNodes::openNode(AStarNode* node)
+{
+	unsigned long pos = GET_NODE_INDEX(node);
+	if(pos < 0 || pos >= MAX_NODES){
+		std::cout << "AStarNodes. trying to open node out of range" << std::endl;
+		return;
+	}
+
+	openNodes[pos] = 1;
 }
 
 unsigned long AStarNodes::countClosedNodes()
@@ -845,6 +1000,52 @@ bool AStarNodes::isInList(long x, long y)
 		}
 	}
 	return false;
+}
+
+AStarNode* AStarNodes::getNodeInList(long x, long y)
+{
+	for(unsigned long i = 0; i < curNode; i++){
+		if(nodes[i].x == x && nodes[i].y == y){
+			return &nodes[i];
+		}
+	}
+
+	return NULL;
+}
+
+int AStarNodes::getMapWalkCost(const Creature* creature, AStarNode* node, const Tile* neighbourTile)
+{
+	int cost = 0;
+	if(std::abs((int)node->x - neighbourTile->getPosition().x) == std::abs((int)node->y - neighbourTile->getPosition().y)){
+		//diagonal movement extra cost
+		cost = MAP_DIAGONALWALKCOST;
+	}
+	else{
+		cost = MAP_NORMALWALKCOST;
+	}
+
+	/*
+	if(!neighbourTile->hasProperty(BLOCKPATHFIND)){
+		//extra cost for blockpath find flag
+		cost = cost + 20;
+	}
+	*/
+
+	if(!neighbourTile->creatures.empty()){
+		//destroy creature cost
+		cost = cost + MAP_NORMALWALKCOST * 10;
+	}
+
+	return cost;
+}
+
+int AStarNodes::getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal)
+{
+	int h_diagonal = std::min(std::abs(x - xGoal), std::abs(y - yGoal));
+	int h_straight = (std::abs(x - xGoal) + std::abs(y - yGoal));
+
+	return MAP_DIAGONALWALKCOST * h_diagonal + MAP_NORMALWALKCOST * (h_straight - 2 * h_diagonal);	
+	//return (std::abs(x - xGoal) + std::abs(y - yGoal)) * MAP_NORMALWALKCOST;
 }
 
 //*********** Floor constructor **************

@@ -83,7 +83,8 @@ Creature()
 	pzLocked = false;
 	bloodHitCount = 0;
 	shieldBlockCount = 0;
-	skillPoint = 0;
+	lastAttackBlockType = BLOCK_NONE;
+	addAttackSkillPoint = false;
 	attackTicks = 0;
 
 	chaseMode = CHASEMODE_STANDSTILL;
@@ -162,6 +163,15 @@ void Player::setVocation(uint32_t vocId)
 {
 	vocation_id = (Vocation_t)vocId;
 	vocation = g_vocations.getVocation(vocId);
+
+	//Update health/mana gain condition
+	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
+	if(condition){
+		condition->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
+		condition->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
+		condition->setParam(CONDITIONPARAM_MANAGAIN, vocation->getManaGainAmount());
+		condition->setParam(CONDITIONPARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
+	}
 }
 
 uint32_t Player::getVocationId() const
@@ -1311,44 +1321,53 @@ void Player::addExperience(uint32_t exp)
 	sendStats();
 }
 
+void Player::onBlockHit(BlockType_t blockType)
+{
+	if(shieldBlockCount > 0){
+		--shieldBlockCount;
+		
+		if(hasShield()){
+			addSkillAdvance(SKILL_SHIELD, 1);
+		}
+	}
+}
+
 void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 {
 	Creature::onAttackedCreatureBlockHit(target, blockType);
 
+	lastAttackBlockType = blockType;
+
 	switch(blockType){
 		case BLOCK_NONE:
-			skillPoint = 1;
-			//blockCount = 0;
+		{
+			addAttackSkillPoint = true;
 			bloodHitCount = 30;
 			shieldBlockCount = 30;
+			
 			break;
+		}
 
 		case BLOCK_DEFENSE:
 		case BLOCK_ARMOR:
+		{
 			//need to draw blood every 30 hits
 			if(bloodHitCount > 0){
-				skillPoint = 1;
+				addAttackSkillPoint = true;
 				--bloodHitCount;
 			}
 			else{
-				skillPoint = 0;
+				addAttackSkillPoint = false;
 			}
-
-			/*
-			if(blockCount < 30){
-				blockCount++;
-				skillPoint = 1;
-			}
-			else{
-				skillPoint = 0;
-			}
-			*/
 
 			break;
+		}
 
 		default:
-			skillPoint = 0;
+		{
+			addAttackSkillPoint = false;
 			break;
+		}
 	}
 }
 
@@ -1380,6 +1399,11 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 	}
 
 	if(blockType != BLOCK_NONE){
+		return blockType;
+	}
+
+	/*
+	if(blockType != BLOCK_NONE){
 		if(blockType != BLOCK_IMMUNITY){
 			if(shieldBlockCount > 0){
 				--shieldBlockCount;
@@ -1392,6 +1416,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 
 		return blockType;
 	}
+	*/
 
 	bool absorbedDamage;
 
@@ -1490,37 +1515,6 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 
 	return blockType;
 }
-
-/*
-void Player::onDefenseBlock(bool blockedHit)
-{
-	if(shieldBlockCount > 0){
-		--shieldBlockCount;
-
-		bool hasShield = false;
-		Item* item;
-
-		item = getInventoryItem(SLOT_LEFT);
-		if(item && item->getWeaponType() == WEAPON_SHIELD){
-			hasShield = true;
-		}
-		
-		item = getInventoryItem(SLOT_RIGHT);
-		if(item && item->getWeaponType() == WEAPON_SHIELD){
-			hasShield = true;
-		}
-
-		if(hasShield){
-			addSkillAdvance(SKILL_SHIELD, 1);
-		}
-	}
-}
-
-void Player::onArmorBlock(bool blockedHit)
-{
-	//
-}
-*/
 
 uint32_t Player::getIP() const
 {

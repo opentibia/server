@@ -599,6 +599,11 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 				return true;
 			break;
 
+		case MOVEABLE:
+			if(it.moveable && getUniqueId() == 0)
+				return true;
+			break;
+
 		case HASHEIGHT:
 			if(it.hasHeight)
 				return true;

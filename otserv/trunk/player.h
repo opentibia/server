@@ -235,7 +235,8 @@ public:
 	virtual void doAttacking(uint32_t interval);
 
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
-	uint32_t getSkillPoint() const {return skillPoint;}
+	bool getAddAttackSkill() const {return addAttackSkillPoint;}
+	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);	
@@ -263,6 +264,7 @@ public:
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
+	virtual void onBlockHit(BlockType_t blockType);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
@@ -495,7 +497,8 @@ protected:
 	bool pzLocked;
 	int32_t bloodHitCount;
 	int32_t shieldBlockCount;
-	uint32_t skillPoint;
+	BlockType_t lastAttackBlockType;
+	bool addAttackSkillPoint;
 	uint32_t attackTicks;
 	
 	chaseMode_t chaseMode;
@@ -521,15 +524,6 @@ protected:
 	int32_t varSkills[SKILL_LAST + 1];
 	
 	ConditionList storedConditionList;
-
-	/*
-	//reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
-	static const int CapGain[5];
-	static const int ManaGain[5];
-	static const int HPGain[5];
-	static const int gainManaVector[5][2];
-	static const int gainHealthVector[5][2];
-	*/
 	
 	unsigned char level_percent;
 	unsigned char maglevel_percent;

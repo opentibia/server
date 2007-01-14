@@ -31,15 +31,13 @@ struct LootBlock{
 	unsigned short id;
 	unsigned short countmax;
 	unsigned long chance;
-	//unsigned long chance1;
-	//unsigned long chancemax;
+
 	typedef std::list<LootBlock> LootItems;
 	LootItems childLoot;
 	LootBlock(){
 		id = 0;
 		countmax = 0;
 		chance = 0;
-		//chancemax = 0;
 	}
 };	
 

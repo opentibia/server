@@ -70,6 +70,7 @@ Creature::Creature() :
 	followCreature = NULL;
 	eventWalk = 0;
 	internalUpdateFollow = false;
+	internalValidatePath = false;
 
 	eventCheck = 0;
 	attackedCreature = NULL;
@@ -201,7 +202,12 @@ void Creature::onAttacking(uint32_t interval)
 
 void Creature::onWalk()
 {
-	if(getSleepTicks() <= 0){
+	if(internalValidatePath){
+		internalValidatePath = false;
+		validateWalkPath();
+	}
+
+	if(!internalUpdateFollow && getSleepTicks() <= 0){
 		Direction dir;
 		if(getNextStep(dir)){
 			ReturnValue ret = g_game.internalMoveCreature(this, dir);
@@ -242,7 +248,6 @@ void Creature::onWalk(Direction& dir)
 bool Creature::getNextStep(Direction& dir)
 {
 	if(!listWalkDir.empty()){
-		Position pos = getPosition();
 		dir = listWalkDir.front();
 		listWalkDir.pop_front();
 		onWalk(dir);
@@ -287,34 +292,40 @@ void Creature::validateWalkPath()
 {
 	if(!internalUpdateFollow && followCreature){
 		if(listWalkDir.empty() || !g_game.isPathValid(this, listWalkDir, followCreature->getPosition())){
-			internalUpdateFollow = true;
+			//internalUpdateFollow = true;
+			setFollowCreature(followCreature);
 		}
 	}
 }
 
 void Creature::onAddTileItem(const Position& pos, const Item* item)
 {
-	validateWalkPath();
+	//validateWalkPath();
+	internalValidatePath = true;
 }
 
 void Creature::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
 {
-	validateWalkPath();
+	internalValidatePath = true;
+	//validateWalkPath();
 }
 
 void Creature::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
-	validateWalkPath();
+	internalValidatePath = true;
+	//validateWalkPath();
 }
 
 void Creature::onUpdateTile(const Position& pos)
 {
-	validateWalkPath();
+	internalValidatePath = true;
+	//validateWalkPath();
 }
 
 void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	validateWalkPath();
+	internalValidatePath = true;
+	//validateWalkPath();
 }
 
 void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
@@ -332,7 +343,8 @@ void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 
 void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	validateWalkPath();
+	//validateWalkPath();
+	internalValidatePath = true;
 
 	onCreatureDisappear(creature, true);
 }
@@ -356,13 +368,17 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 			}
 		}
 	}
+	else{
+		internalValidatePath = true;
+	}
 
 	if(followCreature == creature || (creature == this && followCreature)){
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
 			onCreatureDisappear(followCreature, false);
 		}
 		
-		validateWalkPath();
+		//validateWalkPath();
+		//internalValidatePath = true;
 	}
 
 	if(attackedCreature == creature || (creature == this && attackedCreature)){
@@ -377,17 +393,7 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 
 void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 {
-	/*
-	if(!visible && !canSeeInvisibility() && getMaster() != creature){
-		if(followCreature == creature){
-			onCreatureDisappear(followCreature, false);
-		}
-
-		if(attackedCreature == creature){
-			onCreatureDisappear(attackedCreature, false);
-		}
-	}
-	*/
+	//
 }
 
 void Creature::die()
@@ -496,11 +502,14 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 		damage = 0;
 		blockType = BLOCK_IMMUNITY;
 	}
+	else if(checkDefense || checkArmor){
+		bool hasDefense = false;
+		if(blockCount > 0){
+			--blockCount;
+			hasDefense = true;
+		}
 
-	if((checkDefense || checkArmor) && blockCount > 0){
-		--blockCount;
-
-		if(blockType == BLOCK_NONE && checkDefense){
+		if(checkDefense && hasDefense){
 			int32_t maxDefense = getDefense();
 			maxDefense = maxDefense + (maxDefense * defenseStrength) / 100;
 			//int32_t defense = random_range(0, maxDefense);
@@ -509,10 +518,11 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 			if(damage <= 0){
 				damage = 0;
 				blockType = BLOCK_DEFENSE;
+				checkArmor = false;
 			}
 		}
-		
-		if(blockType == BLOCK_NONE && checkArmor){
+			
+		if(checkArmor){
 			int32_t maxArmor = getArmor();
 			//int32_t armor = random_range(0, maxArmor);
 
@@ -521,6 +531,10 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 				damage = 0;
 				blockType = BLOCK_ARMOR;
 			}
+		}
+
+		if(hasDefense && blockType != BLOCK_NONE){
+			onBlockHit(blockType);
 		}
 	}
 
@@ -731,6 +745,11 @@ void Creature::onGainExperience(int32_t gainExperience)
 }
 
 void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
+{
+	//
+}
+
+void Creature::onBlockHit(BlockType_t blockType)
 {
 	//
 }
