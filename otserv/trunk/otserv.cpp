@@ -176,7 +176,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			if(version <= 760){
 				msg.Reset();
 				msg.AddByte(0x0A);
-				msg.AddString("Only clients with protocol 7.9 allowed!");
+				msg.AddString("Only clients with protocol 7.92 allowed!");
 				msg.WriteToSocket(s);
 			}
 			else if(msg.RSA_decrypt()){
@@ -262,7 +262,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				}
 				else{
 					msg.AddByte(0x0A);
-					msg.AddString("Only clients with protocol 7.9 allowed!");
+					msg.AddString("Only clients with protocol 7.92 allowed!");
 				}
 
 				msg.WriteToSocket(s);
@@ -301,7 +301,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 				if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 					msg.AddByte(0x14);
-					msg.AddString("Only clients with protocol 7.9 allowed!");
+					msg.AddString("Only clients with protocol 7.92 allowed!");
 					msg.WriteToSocket(s);
 				}
 				else if(g_bans.isIpDisabled(s)){
@@ -787,7 +787,7 @@ int main(int argc, char *argv[])
 	Status* status = Status::instance();
 	status->playersmax = g_config.getNumber(ConfigManager::MAX_PLAYERS);
 
-	OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
+	//OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
 
 	// start the server listen...
 	int listen_errors;

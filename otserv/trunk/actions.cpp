@@ -281,14 +281,10 @@ bool Actions::useItemEx(Player* player, const Position& from_pos,
 				return true;
 			}
 		}
-
-		return ret;
 	}
-	else{
-		//not found
-		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-		return false;
-	}
+	//not found or the script returned false
+	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+	return false;
 }
 
 Action::Action(LuaScriptInterface* _interface) :

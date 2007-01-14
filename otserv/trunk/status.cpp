@@ -39,7 +39,7 @@ extern Game g_game;
 #define STATUS_SERVER_VERSION "0.6.0_CVS"
 //#define STATUS_SERVER_VERSION "0.6.0"
 #define STATUS_SERVER_NAME "otserv"
-#define STATUS_CLIENT_VERISON "7.9"
+#define STATUS_CLIENT_VERISON "7.92"
 
 Status::Status()
 {
@@ -217,7 +217,7 @@ bool Status::hasSlot()
 	return this->playersonline < this->playersmax;
 }
 
-
+/*
 OTSYS_THREAD_RETURN Status::SendInfoThread(void *p)
 {
 	SOCKET s;
@@ -315,3 +315,4 @@ OTSYS_THREAD_RETURN Status::SendInfoThread(void *p)
   return 0;
 #endif
 }
+*/

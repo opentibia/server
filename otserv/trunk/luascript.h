@@ -259,7 +259,7 @@ public:
 	static void reportError(const char* function, const std::string& error_desc);
 
 	std::string getInterfaceName() {return m_interfaceName;}
-	long getLastLuaError() {return m_lastLuaError;}
+	const std::string& getLastLuaError() const {return m_lastLuaError;}
 	void dumpLuaStack();
 
 	lua_State* getLuaState() {return m_luaState;}
@@ -446,7 +446,7 @@ protected:
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
 
 	lua_State* m_luaState;
-	long m_lastLuaError;
+	std::string m_lastLuaError;
 private:
 
 	static ScriptEnviroment m_scriptEnv[16];

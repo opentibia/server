@@ -144,6 +144,7 @@ bool Event::loadScript(const std::string& scriptFile)
 	
 	if(m_scriptInterface->loadFile(scriptFile) == -1){
 		std::cout << "Warning: [Event::loadScript] Can not load script. " << scriptFile << std::endl;
+		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
 		return false;
 	}
 	long id = m_scriptInterface->getEvent(getScriptEventName());

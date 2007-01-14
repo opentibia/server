@@ -103,7 +103,11 @@ uint32_t rand24b()
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_NORMAL*/)
 {
-	if(std::abs(lowest_number) > std::abs(highest_number)){
+	if(highest_number == lowest_number){
+		return lowest_number;
+	}
+	
+	if(lowest_number > highest_number){
 		int nTmp = highest_number;
 		highest_number = lowest_number;
 		lowest_number = nTmp;
@@ -112,14 +116,8 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 	int range = highest_number - lowest_number;
 	
 	if(type == DISTRO_NORMAL){
-		bool negative = false;
-		if(range < 0){
-			range = std::abs(range);
-			negative = true;
-		}
-
-		int r = ((range != 0) ? rand24b() % range : 0);
-		return lowest_number + (!negative ? r : -r);
+		int r = rand24b() % range;
+		return lowest_number + r;
 	}
 	else{
 		float r = 1.f -sqrt((1.f*rand24b())/RAND_MAX24);

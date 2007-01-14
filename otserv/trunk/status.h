@@ -45,8 +45,7 @@ public:
 	int getPlayersOnline(){return playersonline;}
 	int getMaxPlayersOnline(){return playersmax;}
 	
-	//
-	static OTSYS_THREAD_RETURN SendInfoThread(void *p);
+	//static OTSYS_THREAD_RETURN SendInfoThread(void *p);
 
 	uint64_t start;
 	int playersmax;

@@ -411,7 +411,7 @@ long LuaScriptInterface::loadFile(const std::string& file)
 	//loads file as a chunk at stack top
 	int ret = luaL_loadfile(m_luaState, file.c_str());
 	if(ret != 0){
-		m_lastLuaError = ret;
+		m_lastLuaError = popString(m_luaState);
 		return -1;
 	}
 	//check that it is loaded as a function

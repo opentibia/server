@@ -566,6 +566,7 @@ NpcEventsHandler(npc)
 	
 	if(m_scriptInterface->loadFile(file) == -1){
 		std::cout << "Warning: [NpcScript::NpcScript] Can not load script. " << file << std::endl;
+		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
 		m_loaded = false;
 		return;
 	}
