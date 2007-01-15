@@ -1255,7 +1255,7 @@ bool ConditionSpeed::unserializeProp(ConditionAttr_t attr, PropStream& propStrea
 		speedDelta = value;
 		return true;
 	}
-	else if(attr = CONDITIONATTR_FORMULA_MINA){
+	else if(attr == CONDITIONATTR_FORMULA_MINA){
 		float value = 0;
 		if(!propStream.GET_VALUE(value)){
 			return false;
@@ -1352,6 +1352,10 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 		const ConditionSpeed& conditionSpeed = static_cast<const ConditionSpeed&>(*addCondition);
 		int32_t oldSpeedDelta = speedDelta;
 		speedDelta = conditionSpeed.speedDelta;
+		mina = conditionSpeed.mina;
+		maxa = conditionSpeed.maxa;
+		minb = conditionSpeed.minb;
+		maxb = conditionSpeed.maxb;
 
 		if(speedDelta == 0){
 			int32_t min;
@@ -1360,7 +1364,10 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 			speedDelta = random_range(min, max);
 		}
 		
-		g_game.changeSpeed(creature, (speedDelta - oldSpeedDelta));
+		int32_t newSpeedChange = (speedDelta - oldSpeedDelta);
+		if(newSpeedChange != 0){
+			g_game.changeSpeed(creature, newSpeedChange);
+		}
 	}
 }
 
