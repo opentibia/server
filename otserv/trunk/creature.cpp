@@ -213,7 +213,8 @@ void Creature::onWalk()
 			ReturnValue ret = g_game.internalMoveCreature(this, dir);
 
 			if(ret != RET_NOERROR){
-				internalUpdateFollow = true;
+				internalValidatePath = true;
+				//internalUpdateFollow = true;
 			}
 		}
 	}
@@ -406,7 +407,9 @@ void Creature::die()
 			lastHitCreature->onKilledCreature(this);
 		}
 
-		if(mostDamageCreature && mostDamageCreature != lastHitCreature){
+		if(mostDamageCreature &&
+			mostDamageCreature != lastHitCreature &&
+			(!mostDamageCreature->getMaster() || mostDamageCreature->getMaster() != lastHitCreature)){
 			mostDamageCreature->onKilledCreature(this);
 		}
 	}
@@ -597,11 +600,11 @@ bool Creature::setFollowCreature(Creature* creature)
 	if(creature){
 		FindPathParams fpp;
 		getPathSearchParams(creature, fpp);
-
-		listWalkDir.clear();
-		//uint32_t maxDistance = getFollowDistance();
-		//bool fullPathSearch = getFullPathSearch();
-		//bool reachable = getFollowReachable();
+		
+		if(!listWalkDir.empty()){
+			listWalkDir.clear();
+			onWalkAborted(); //TESTING
+		}
 		if(!g_game.getPathToEx(this, creature->getPosition(), 1, fpp.targetDistance, fpp.fullPathSearch, fpp.needReachable, listWalkDir)){
 			followCreature = NULL;
 			return false;

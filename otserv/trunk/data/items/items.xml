@@ -1,4 +1,36 @@
 <items>
+	<item id="2041" name="candelabrum">
+		<attribute key="stopduration" value="1"/>
+	</item>
+
+	<item id="2044" name="lamp">
+		<attribute key="stopduration" value="1"/>
+	</item>
+
+	<item id="2047" name="candle">
+		<attribute key="stopduration" value="1"/>
+	</item>
+
+	<item id="2050" name="torch">
+		<attribute key="stopduration" value="1"/>
+	</item>
+
+	<item id="2052" name="torch">
+		<attribute key="stopduration" value="1"/>
+	</item>
+
+	<item id="2054" name="torch">
+		<attribute key="stopduration" value="1"/>
+	</item>
+
+	<item id="2062" name="small oil lamp">
+		<attribute key="stopduration" value="1"/>
+	</item>
+
+	<item id="2063" name="oil lamp">
+		<attribute key="stopduration" value="1"/>
+	</item>
+
 	<item id="1499" name="wild growth">
 		<attribute key="field" value="block"/>
 		<attribute key="duration" value="20"/>
@@ -14,36 +46,100 @@
 		<attribute key="duration" value="20"/>
 	</item>
 
+	<item id="2172" name="bronze amulet">
+		<attribute key="charges" value="150"/>
+		<attribute key="showcharges" value="1"/>
+		<attribute key="absorbPercentManaDrain" value="20"/>
+	</item>
+
 	<item id="2197" name="stone skin amulet">
 		<attribute key="charges" value="5"/>
 		<attribute key="showcharges" value="1"/>
 		<attribute key="absorbPercentPhysical" value="95"/>
 	</item>
 	
+	<item id="2164" name="might ring">
+		<attribute key="transformEquipTo" value="2318"/>
+		<attribute key="showcharges" value="1"/>
+		<attribute key="charges" value="5"/>
+	</item>
+
+	<item id="2318" name="might ring">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="transformDeEquipTo" value="2164"/>
+		<attribute key="showcharges" value="1"/>
+		<attribute key="charges" value="5"/>
+		<attribute key="absorbPercentAll" value="25"/>
+	</item>
+
 	<item id="2396" name="ice rapier">
 		<attribute key="charges" value="1"/>
 	</item>
 
 	<item id="2165" name="stealth ring">
 		<attribute key="transformEquipTo" value="2202"/>
-		<attribute key="canDecay" value="0"/>
+		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 
 	<item id="2202" name="stealth ring">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2165"/>
 		<attribute key="duration" value="600"/>
 		<attribute key="showduration" value="1"/>
 		<attribute key="invisible" value="1"/>
 	</item>
 	
+	<item id="2166" name="power ring">
+		<attribute key="transformEquipTo" value="2203"/>
+		<attribute key="stopduration" value="1"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2203" name="power ring">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="transformDeEquipTo" value="2166"/>
+		<attribute key="skillFist" value="5"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2208" name="axe ring">
+		<attribute key="transformEquipTo" value="2211"/>
+		<attribute key="stopduration" value="1"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2211" name="axe ring">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="transformDeEquipTo" value="2208"/>
+		<attribute key="skillAxe" value="5"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2209" name="club ring">
+		<attribute key="transformEquipTo" value="2212"/>
+		<attribute key="stopduration" value="1"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2212" name="club ring">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="transformDeEquipTo" value="2209"/>
+		<attribute key="skillClub" value="5"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
 	<item id="2169" name="time ring">
 		<attribute key="transformEquipTo" value="2206"/>
-		<attribute key="canDecay" value="0"/>
+		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 
 	<item id="2206" name="time ring">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2169"/>
 		<attribute key="duration" value="600"/>
 		<attribute key="showduration" value="1"/>
@@ -52,25 +148,26 @@
 
 	<item id="2167" name="energy ring">
 		<attribute key="transformEquipTo" value="2204"/>
-		<attribute key="canDecay" value="0"/>
+		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 
 	<item id="2204" name="energy ring">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2167"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="20"/>
 		<attribute key="showduration" value="1"/>
 		<attribute key="manashield" value="1"/>
 	</item>
 
-
 	<item id="2207" name="sword ring">
 		<attribute key="transformEquipTo" value="2210"/>
+		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
-		<attribute key="canDecay" value="0"/>
 	</item>
 
 	<item id="2210" name="sword ring">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2207"/>
 		<attribute key="skillSword" value="5"/>
 		<attribute key="duration" value="300"/>
@@ -79,11 +176,12 @@
 
 	<item id="2213" name="dwarfen ring">
 		<attribute key="transformEquipTo" value="2215"/>
+		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
-		<attribute key="canDecay" value="0"/>
 	</item>
 
 	<item id="2215" name="dwarfen ring">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2213"/>
 		<attribute key="suppressDrunk" value="1"/>
 		<attribute key="duration" value="300"/>
@@ -92,11 +190,12 @@
 
 	<item id="2168" name="life ring">
 		<attribute key="transformEquipTo" value="2205"/>
+		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
-		<attribute key="canDecay" value="0"/>
 	</item>
 
 	<item id="2205" name="life ring">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2168"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="healthGain" value="100"/>
@@ -106,18 +205,33 @@
 		<attribute key="showduration" value="1"/>
 	</item>
 
-	<item id="2162" name="magic lightwand">
+	<item id="2214" name="ring of healing">
+		<attribute key="transformEquipTo" value="2216"/>
+		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
-		<attribute key="canDecay" value="0"/>
+	</item>
+
+	<item id="2216" name="ring of healing">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="transformDeEquipTo" value="2214"/>
+		<attribute key="duration" value="500"/>
+		<attribute key="healthGain" value="50"/>
+		<attribute key="HealthTicks" value="1000"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2162" name="magic light wand">
+		<attribute key="stopduration" value="1"/>
+		<attribute key="showduration" value="1"/>
 	</item>
 
 	<item id="2163" name="magic lightwand">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="showduration" value="1"/>
-		<attribute key="canDecay" value="1"/>
 		<attribute key="duration" value="300"/>
 	</item>
 
-	<item id="1491" name="energy">
+	<item id="1491" name="energy field">
 		<attribute key="duration" value="60"/>
 	</item>
 
@@ -125,7 +239,7 @@
 		<attribute key="speed" value="40"/>
 	</item>
 
-	<item id="1487" name="fire">
+	<item id="1487" name="fire field">
 		<attribute key="duration" value="60"/>
 		<attribute key="field" value="fire">
 			<attribute key="damage" value="25"/>

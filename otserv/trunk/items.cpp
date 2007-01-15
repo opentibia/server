@@ -76,9 +76,10 @@ ItemType::ItemType()
 	attack        = 0;
 	defence       = 0;
 	armor         = 0;
-	decayTo       = 0;
+	decayTo       = -1;
 	decayTime     = 0;
-	canDecay      =	true;
+	stopTime      = false;
+
 	allowDistRead = false;
 
 	isVertical		= false;
@@ -302,7 +303,7 @@ int Items::loadFromOtb(std::string file)
 		iType->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 		iType->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 		iType->alwaysOnTop = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
-		iType->canDecay = !((flags & FLAG_CANNOTDECAY) == FLAG_CANNOTDECAY);
+		//iType->canDecay = !((flags & FLAG_CANNOTDECAY) == FLAG_CANNOTDECAY);
 		iType->isVertical = ((flags & FLAG_VERTICAL) == FLAG_VERTICAL);
 		iType->isHorizontal = ((flags & FLAG_HORIZONTAL) == FLAG_HORIZONTAL);
 		iType->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
@@ -500,8 +501,10 @@ int Items::loadFromOtb(std::string file)
 				if(!props.GET_STRUCT(db2))
 					return ERROR_INVALID_FORMAT;
 				
-				iType->decayTime = db2->decayTime;
-				iType->decayTo = db2->decayTo;
+				if(db2->decayTime > 0){
+					iType->decayTime = db2->decayTime;
+					iType->decayTo = db2->decayTo;
+				}
 				break;
 			}	
 			case ITEM_ATTR_WEAPON2:
@@ -636,9 +639,14 @@ bool Items::loadFromXml(const std::string& datadir)
 
 					while(itemAttributesNode){
 						if(readXMLString(itemAttributesNode, "key", strValue)){
-							if(strcasecmp(strValue.c_str(), "canDecay") == 0){
+							if(strcasecmp(strValue.c_str(), "stopduration") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.canDecay = (intValue != 0);
+									it.stopTime = (intValue != 0);
+								}
+							}
+							if(strcasecmp(strValue.c_str(), "decayTo") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.decayTo = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "transformEquipTo") == 0){
@@ -654,7 +662,6 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(strcasecmp(strValue.c_str(), "duration") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.decayTime = intValue;
-									it.canDecay = true;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "showduration") == 0){

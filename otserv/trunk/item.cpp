@@ -172,11 +172,20 @@ Item::~Item()
 
 void Item::setID(uint16_t newid)
 {
+	const ItemType& prevIt = Item::items[id];
 	id = newid;
 
-	if(getDuration() <= 0){
+	const ItemType& it = Item::items[newid];
+	uint32_t newDuration = it.decayTime * 1000;
+
+	if(newDuration == 0 && !it.stopTime && it.decayTo == -1){
+		removeAttribute(ATTR_ITEM_DECAYING);
+		removeAttribute(ATTR_ITEM_DURATION);
+	}
+
+	if(newDuration > 0 && (!prevIt.stopTime || !hasAttribute(ATTR_ITEM_DURATION)) ){
 		setDecaying(DECAYING_FALSE);
-		setDefaultDuration();
+		setDuration(newDuration);
 	}
 }
 
@@ -814,7 +823,9 @@ bool Item::canDecay()
 	if(isRemoved()){
 		return false;
 	}
-	return (items[id].canDecay && getDefaultDuration() > 0);
+	
+	return (items[id].decayTo != -1);
+	//return (items[id].canDecay && getDefaultDuration() > 0);
 }
 
 int Item::getWorth() const
@@ -884,6 +895,31 @@ bool ItemAttributes::hasAttribute(itemAttrTypes type) const
 	return false;
 }
 	
+void ItemAttributes::removeAttribute(itemAttrTypes type)
+{
+	if((type & m_attributes) == type){
+		Attribute* prevAttr = NULL;
+		Attribute* curAttr = m_firstAttr;
+		while(curAttr != NULL){
+			if(curAttr->type == type){
+				if(prevAttr){
+					prevAttr->next = curAttr->next;
+				}
+				else{
+					m_firstAttr = curAttr->next;
+				}
+
+				m_attributes = m_attributes & ~type;
+
+				delete curAttr;
+				break;
+			}
+
+			curAttr = curAttr->next;
+		}
+	}
+}
+
 uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
 {
 	if(!validateIntAttrType(type))
@@ -898,7 +934,7 @@ uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
 	}
 }
 
-void ItemAttributes::setIntAttr(itemAttrTypes type, uint32_t value)
+void ItemAttributes::setIntAttr(itemAttrTypes type, int32_t value)
 {
 	if(!validateIntAttrType(type))
 		return;
@@ -909,7 +945,7 @@ void ItemAttributes::setIntAttr(itemAttrTypes type, uint32_t value)
 	}
 }
 
-void ItemAttributes::increaseIntAttr(itemAttrTypes type, uint32_t value)
+void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
 {
 	if(!validateIntAttrType(type))
 		return;

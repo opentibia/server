@@ -157,15 +157,14 @@ public:
 	int            defence;
 	int            armor;
 	uint16_t       slot_position;
-	uint16_t       decayTo;
-	uint16_t       decayTime;
-	bool           canDecay;
 	bool           isVertical;
 	bool           isHorizontal;
 	bool           isHangable;
 	bool           allowDistRead;
-
-	uint16_t speed;
+	uint16_t       speed;
+	int32_t        decayTo;
+	uint32_t       decayTime;
+	bool           stopTime;
 
 	// other bools
 	int             magicfieldtype;
@@ -208,15 +207,6 @@ public:
 
 	Condition* condition;
 	CombatType_t combatType;
-
-	/*
-	//fields
-	int32_t initialDamage;
-
-	int32_t roundMin;
-	int32_t roundTime;
-	int32_t roundDamage;
-	*/
 };
 
 template<typename A>

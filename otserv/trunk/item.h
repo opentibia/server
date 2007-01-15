@@ -123,7 +123,6 @@ public:
 
 	void setDuration(int32_t time) {setIntAttr(ATTR_ITEM_DURATION, time);}
 	void decreaseDuration(int32_t time) {increaseIntAttr(ATTR_ITEM_DURATION, -time);}
-	bool hasDuration() {return hasAttribute(ATTR_ITEM_DURATION);}
 	int32_t getDuration() const {return getIntAttr(ATTR_ITEM_DURATION);}
 
 	void setDecaying(ItemDecayState_t decayState) {setIntAttr(ATTR_ITEM_DECAYING, decayState);}
@@ -142,6 +141,7 @@ protected:
 	};
 
 	bool hasAttribute(itemAttrTypes type) const;
+	void removeAttribute(itemAttrTypes type);
 
 private:
 	static std::string emptyString;
@@ -164,13 +164,13 @@ private:
 	void setStrAttr(itemAttrTypes type, const std::string& value);
 	
 	uint32_t getIntAttr(itemAttrTypes type) const;
-	void setIntAttr(itemAttrTypes type, uint32_t value);
-	void increaseIntAttr(itemAttrTypes type, uint32_t value);
+	void setIntAttr(itemAttrTypes type, int32_t value);
+	void increaseIntAttr(itemAttrTypes type, int32_t value);
 	
 	bool validateIntAttrType(itemAttrTypes type) const;
 	bool validateStrAttrType(itemAttrTypes type) const;
 	
-	void addAttr(Attribute* attr);
+	void addAttr(Attribute* attr);	
 	Attribute* getAttr(itemAttrTypes type) const;
 	Attribute* getAttr(itemAttrTypes type);
 	
