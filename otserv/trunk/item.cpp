@@ -263,7 +263,7 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 	if(readXMLInteger(nodeItem, "actionId", intValue)){
 		setActionId(intValue);
 	}
-			
+
 	if(readXMLInteger(nodeItem, "uniqueId", intValue)){
 		setUniqueId(intValue);
 	}
@@ -278,63 +278,6 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 			setDecaying(DECAYING_PENDING);
 		}
 	}
-
-	/*
-	char* nodeValue;
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "id");
-	if(nodeValue){
-		id = atoi(nodeValue);
-		xmlFreeOTSERV(nodeValue);
-	}
-	else
-		return false;
-
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "count");
-	if(nodeValue){
-		setItemCountOrSubtype(atoi(nodeValue));
-		xmlFreeOTSERV(nodeValue);
-	}
-
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "special_description");
-	if(nodeValue){
-		setSpecialDescription(nodeValue);
-		xmlFreeOTSERV(nodeValue);
-	}
-
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "text");
-	if(nodeValue){
-		setText(nodeValue);
-		xmlFreeOTSERV(nodeValue);
-	}
-
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "actionId");
-	if(nodeValue){
-		setActionId(atoi(nodeValue));
-		xmlFreeOTSERV(nodeValue);
-	}
-
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "uniqueId");
-	if(nodeValue){
-		setUniqueId(atoi(nodeValue));
-		xmlFreeOTSERV(nodeValue);
-	}
-
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "duration");
-	if(nodeValue){
-		setDuration(atoi(nodeValue));
-		xmlFreeOTSERV(nodeValue);
-	}
-
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "decayState");
-	if(nodeValue){
-		ItemDecayState_t decayState = (ItemDecayState_t)atoi(nodeValue);
-		if(decayState != DECAYING_FALSE){
-			setDecaying(DECAYING_PENDING);
-		}
-
-		xmlFreeOTSERV(nodeValue);
-	}
-	*/
 	
 	return true;
 }
@@ -926,6 +869,7 @@ void ItemAttributes::removeAttribute(itemAttrTypes type)
 				delete curAttr;
 				return;
 			}
+
 			//advance in the linked list
 			prevAttr = curAttr;
 			curAttr = curAttr->next;

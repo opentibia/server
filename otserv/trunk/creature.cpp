@@ -447,15 +447,6 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 Item* Creature::getCorpse()
 {
 	Item* corpse = Item::CreateItem(getLookCorpse());
-
-	/*
-	if(corpse){
-		if(Container* corpseContainer = corpse->getContainer()){
-			dropLoot(corpseContainer);
-		}
-	}
-	*/
-
 	return corpse;
 }
 

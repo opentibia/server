@@ -59,16 +59,8 @@
 	</item>
 	
 	<item id="2164" name="might ring">
-		<attribute key="transformEquipTo" value="2318"/>
+		<attribute key="charges" value="20"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="charges" value="5"/>
-	</item>
-
-	<item id="2318" name="might ring">
-		<attribute key="decayTo" value="0"/>
-		<attribute key="transformDeEquipTo" value="2164"/>
-		<attribute key="showcharges" value="1"/>
-		<attribute key="charges" value="5"/>
 		<attribute key="absorbPercentAll" value="25"/>
 	</item>
 

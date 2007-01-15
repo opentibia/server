@@ -148,10 +148,27 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 	}
 	else{
 		if(Monsters::getLootRandom() < lootBlock.chance){
-			tmpItem = Item::CreateItem(lootBlock.id);
+			tmpItem = Item::CreateItem(lootBlock.id, 0);
 		}
 	}
-	return tmpItem;
+	
+	if(tmpItem){
+		if(lootBlock.subType != -1){
+			tmpItem->setItemCountOrSubtype(lootBlock.subType);
+		}
+
+		if(lootBlock.actionId != -1){
+			tmpItem->setActionId(lootBlock.actionId);
+		}
+
+		if(lootBlock.text != ""){
+			tmpItem->setText(lootBlock.text);
+		}
+
+		return tmpItem;
+	}
+
+	return NULL;
 }
 
 void MonsterType::createLootContainer(Container* parent, const LootBlock& lootblock)
@@ -1106,6 +1123,8 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 {
 	int intValue;
+	std::string strValue;
+
 	if(readXMLInteger(node, "id", intValue)){
 		lootBlock.id = intValue;
 	}
@@ -1141,7 +1160,20 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 	if(Item::items[lootBlock.id].isContainer()){
 		loadLootContainer(node, lootBlock);
 	}
-	
+
+	//optional
+	if(readXMLInteger(node, "subtype", intValue)){
+		lootBlock.subType = intValue;
+	}
+
+	if(readXMLInteger(node, "actionId", intValue)){
+		lootBlock.actionId = intValue;
+	}
+
+	if(readXMLString(node, "text", strValue)){
+		lootBlock.text = strValue;
+	}
+
 	return true;
 }
 

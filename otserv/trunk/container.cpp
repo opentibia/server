@@ -72,15 +72,6 @@ bool Container::unserialize(xmlNodePtr nodeItem)
 							return false;
 						}
 
-						/*
-						if(nodeValue = (char*)xmlGetProp(nodeContainerItem, (const xmlChar *) "id")){
-							id = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
-						}
-						else
-							return false;
-						*/
-
 						Item* item = Item::CreateItem(id);
 						if(!item){
 							return false;

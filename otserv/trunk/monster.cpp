@@ -525,16 +525,19 @@ bool Monster::getNextStep(Direction& dir)
 			bool objectRemoved = false;
 			//We can not use iterators here since we can push the item to another tile
 			//which will invalidate the iterator.
-			for(unsigned int i = 0; i < tile->downItems.size(); ++i){
+			for(int i = 0; i < tile->downItems.size();){
 				Item* item = tile->downItems[i];
 				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND) 
 					|| item->hasProperty(BLOCKSOLID))){
 					if(!pushItem(item, 1)){
 						if(g_game.internalRemoveItem(item) == RET_NOERROR){
 							objectRemoved = true;
+							continue;
 						}
 					}
 				}
+
+				++i;
 			}
 
 			if(objectRemoved){
@@ -544,7 +547,7 @@ bool Monster::getNextStep(Direction& dir)
 			objectRemoved = false;
 			//We can not use iterators here since we can push a creature to another tile
 			//which will invalidate the iterator.
-			for(unsigned int i = 0; i < tile->creatures.size(); ++i){
+			for(int i = 0; i < tile->creatures.size();){
 				Monster* monster = tile->creatures[i]->getMonster();
 
 				if(monster && monster->isPushable()){
@@ -552,8 +555,11 @@ bool Monster::getNextStep(Direction& dir)
 						monster->changeHealth(-monster->getHealth());
 						monster->setCreateLoot(false);
 						objectRemoved = true;
+						continue;
 					}
 				}
+				
+				++i;
 			}
 
 			if(objectRemoved){

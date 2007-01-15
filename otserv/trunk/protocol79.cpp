@@ -1543,23 +1543,29 @@ void Protocol79::sendPing()
 
 void Protocol79::sendDistanceShoot(const Position& from, const Position& to, unsigned char type)
 {
-	NetworkMessage msg;
-	AddDistanceShoot(msg,from, to,type);
-	WriteBuffer(msg);
+	if(canSee(from) || canSee(to)){
+		NetworkMessage msg;
+		AddDistanceShoot(msg,from, to,type);
+		WriteBuffer(msg);
+	}
 }
 
 void Protocol79::sendMagicEffect(const Position& pos, unsigned char type)
 {
-	NetworkMessage msg;
-	AddMagicEffect(msg, pos, type);
-	WriteBuffer(msg);
+	if(canSee(pos)){
+		NetworkMessage msg;
+		AddMagicEffect(msg, pos, type);
+		WriteBuffer(msg);
+	}
 }
 
 void Protocol79::sendAnimatedText(const Position& pos, unsigned char color, std::string text)
 {
-	NetworkMessage msg;
-	AddAnimatedText(msg, pos, color, text);
-	WriteBuffer(msg);
+	if(canSee(pos)){
+		NetworkMessage msg;
+		AddAnimatedText(msg, pos, color, text);
+		WriteBuffer(msg);
+	}
 }
 
 void Protocol79::sendCreatureHealth(const Creature* creature)

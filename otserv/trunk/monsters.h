@@ -32,12 +32,21 @@ struct LootBlock{
 	unsigned short countmax;
 	unsigned long chance;
 
+	//optional
+	int subType;
+	int actionId;
+	std::string text;
+
 	typedef std::list<LootBlock> LootItems;
 	LootItems childLoot;
 	LootBlock(){
 		id = 0;
 		countmax = 0;
 		chance = 0;
+
+		subType = -1;
+		actionId = -1;
+		text = "";
 	}
 };	
 
