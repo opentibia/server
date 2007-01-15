@@ -47,7 +47,7 @@ class Map;
 class IOMap;
 
 struct AStarNode{
-	uint32_t x, y;
+	int32_t x, y;
 	AStarNode* parent;
 	int32_t f, g, h;
 };

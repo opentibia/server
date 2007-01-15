@@ -855,8 +855,9 @@ const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
 {
 	if(!validateStrAttrType(type))
 		return emptyString;
-		
-	Attribute* attr = getAttr(type);
+	
+	//this will *NOT* create the attribute if it does not exist
+	Attribute* attr = getAttrConst(type);
 	if(attr){
 		return *(std::string*)attr->value;
 	}
@@ -873,11 +874,14 @@ void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
 	if(value.length() == 0)
 		return;
 	
+	//this will create the attribute if it does not exist
 	Attribute* attr = getAttr(type);
 	if(attr){
+		//if has a previous value delete it
 		if(attr->value){
 			delete (std::string*)attr->value;
 		}
+		//create the new value as string
 		attr->value = (void*)new std::string(value);
 	}
 }
@@ -887,7 +891,7 @@ bool ItemAttributes::hasAttribute(itemAttrTypes type) const
 	if(!validateIntAttrType(type))
 		return false;
 
-	Attribute* attr = getAttr(type);
+	Attribute* attr = getAttrConst(type);
 	if(attr){
 		return true;
 	}
@@ -897,24 +901,33 @@ bool ItemAttributes::hasAttribute(itemAttrTypes type) const
 	
 void ItemAttributes::removeAttribute(itemAttrTypes type)
 {
-	if((type & m_attributes) == type){
+	//check if we have it
+	if((type & m_attributes) != 0){
+		//go trough the linked list until find it
 		Attribute* prevAttr = NULL;
 		Attribute* curAttr = m_firstAttr;
 		while(curAttr != NULL){
 			if(curAttr->type == type){
+				//found so remove it from the linked list
 				if(prevAttr){
 					prevAttr->next = curAttr->next;
 				}
 				else{
 					m_firstAttr = curAttr->next;
 				}
-
+				//remove it from flags
 				m_attributes = m_attributes & ~type;
-
+				
+				//delete string if it is string type
+				if(validateStrAttrType(type)){
+					delete (std::string*)curAttr->value;
+				}
+				//finally delete the attribute and return
 				delete curAttr;
-				break;
+				return;
 			}
-
+			//advance in the linked list
+			prevAttr = curAttr;
 			curAttr = curAttr->next;
 		}
 	}
@@ -925,7 +938,7 @@ uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
 	if(!validateIntAttrType(type))
 		return 0;
 		
-	Attribute* attr = getAttr(type);
+	Attribute* attr = getAttrConst(type);
 	if(attr){
 		return (uint32_t)(long)attr->value;
 	}
@@ -958,6 +971,7 @@ void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
 	
 inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 {
+	//list of numeric type attributes
 	switch(type){
 	case ATTR_ITEM_ACTIONID:
 	case ATTR_ITEM_UNIQUEID:
@@ -976,6 +990,7 @@ inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 
 inline bool ItemAttributes::validateStrAttrType(itemAttrTypes type) const
 {
+	//list of text type attributes
 	switch(type){
 	case ATTR_ITEM_DESC:
 		return true;
@@ -992,32 +1007,41 @@ inline bool ItemAttributes::validateStrAttrType(itemAttrTypes type) const
 
 void ItemAttributes::addAttr(Attribute* attr)
 {
+	//add an attribute to the linked list
 	if(m_firstAttr){
+		//is not the first, so look for the end of the list
 		Attribute* curAttr = m_firstAttr;
 		while(curAttr->next){
 			curAttr = curAttr->next;
 		}
+		//and add it at the end
 		curAttr->next = attr;
 	}
 	else{
+		//is the first
 		m_firstAttr = attr;
 	}
+	//add it to flags
 	m_attributes = m_attributes | attr->type;
 }
 
-ItemAttributes::Attribute* ItemAttributes::getAttr(itemAttrTypes type) const
+ItemAttributes::Attribute* ItemAttributes::getAttrConst(itemAttrTypes type) const
 {
+	//check flags
 	if((type & m_attributes) == 0){
 		return NULL;
 	}
-	
+	//it is here, so search it in the linked list
 	Attribute* curAttr = m_firstAttr;
 	while(curAttr){
 		if(curAttr->type == type){
+			//found
 			return curAttr;
 		}
 		curAttr = curAttr->next;
 	}
+	//not found?
+	std::cout << "Warning: [ItemAttributes::getAttrConst] (type & m_attributes) != 0 but attribute not found" << std::endl;
 	return NULL;
 }
 
@@ -1025,11 +1049,13 @@ ItemAttributes::Attribute* ItemAttributes::getAttr(itemAttrTypes type)
 {
 	Attribute* curAttr;
 	if((type & m_attributes) == 0){
+		//if that type was not present add it
 		curAttr = new Attribute(type);
 		addAttr(curAttr);
 		return curAttr;
 	}
 	else{
+		//was present, search and return it
 		curAttr = m_firstAttr;
 		while(curAttr){
 			if(curAttr->type == type){
@@ -1046,15 +1072,15 @@ ItemAttributes::Attribute* ItemAttributes::getAttr(itemAttrTypes type)
 
 void ItemAttributes::deleteAttrs(Attribute* attr)
 {
+	//deletes all attributes recursively
 	if(attr){
-		if(validateIntAttrType(attr->type)){
-			//
-		}
-		else if(validateStrAttrType(attr->type)){
+		//if is string type, delete the allocated string
+		if(validateStrAttrType(attr->type)){
 			delete (std::string*)attr->value;
 		}
 		Attribute* next_attr = attr->next;
 		attr->next = NULL;
+		//delete next while it was not NULL
 		if(next_attr){
 			deleteAttrs(next_attr);
 		}

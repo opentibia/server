@@ -171,7 +171,7 @@ private:
 	bool validateStrAttrType(itemAttrTypes type) const;
 	
 	void addAttr(Attribute* attr);	
-	Attribute* getAttr(itemAttrTypes type) const;
+	Attribute* getAttrConst(itemAttrTypes type) const;
 	Attribute* getAttr(itemAttrTypes type);
 	
 	void deleteAttrs(Attribute* attr);

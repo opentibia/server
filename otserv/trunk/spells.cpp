@@ -1096,7 +1096,7 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 	};
 
 	Player* playerExiva = g_game.getPlayerByName(param);
-	if(playerExiva){
+	if(playerExiva && playerExiva->getAccessLevel() <= player->getAccessLevel()){
 		const Position lookPos = player->getPosition();
 		const Position searchPos = playerExiva->getPosition();
 		

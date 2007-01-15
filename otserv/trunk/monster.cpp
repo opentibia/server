@@ -525,7 +525,7 @@ bool Monster::getNextStep(Direction& dir)
 			bool objectRemoved = false;
 			//We can not use iterators here since we can push the item to another tile
 			//which will invalidate the iterator.
-			for(int i = 0; i < tile->downItems.size(); ++i){
+			for(unsigned int i = 0; i < tile->downItems.size(); ++i){
 				Item* item = tile->downItems[i];
 				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND) 
 					|| item->hasProperty(BLOCKSOLID))){
@@ -544,7 +544,7 @@ bool Monster::getNextStep(Direction& dir)
 			objectRemoved = false;
 			//We can not use iterators here since we can push a creature to another tile
 			//which will invalidate the iterator.
-			for(int i = 0; i < tile->creatures.size(); ++i){
+			for(unsigned int i = 0; i < tile->creatures.size(); ++i){
 				Monster* monster = tile->creatures[i]->getMonster();
 
 				if(monster && monster->isPushable()){

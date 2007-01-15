@@ -174,7 +174,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		//now iterate over the skills
 		for(uint32_t i = 0; i < result.getNumRows(); ++i){
 			int skillid = result.getDataInt("skillid",i);
-			if(skillid > 0 && skillid <= SKILL_LAST){
+			if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST){
 				player->skills[skillid][SKILL_LEVEL] = result.getDataInt("value",i);
 				player->skills[skillid][SKILL_TRIES] = result.getDataInt("count",i);
 			}
