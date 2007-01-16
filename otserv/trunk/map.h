@@ -194,7 +194,7 @@ public:
   * \param creature Creature to place on the map
   * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	*/
-	bool placeCreature(const Position& pos, Creature* creature, bool forceLogin = false);
+	bool placeCreature(const Position& centerPos, Creature* creature, bool forceLogin = false);
 	
 	/**
 	* Remove a creature from the map.

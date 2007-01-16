@@ -623,19 +623,81 @@ bool Monster::canWalkTo(const Position& toPos)
 	return true;
 }
 
-bool Monster::getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir)
+bool Monster::canWalkTo(const Position& creaturePos, const Position& centerPos, Direction dir, uint32_t curDist)
 {
-	int32_t dirArr[4] = {0};
-	int32_t dirSize = 0;
+	int32_t dx = 0;
+	int32_t dy = 0;
+
+	switch(dir){
+		case NORTH:
+			dy = -1;
+		break;
+
+		case SOUTH:
+			dy = 1;
+		break;
+
+		case WEST:
+			dx = -1;
+		break;
+
+		case EAST:
+			dx = 1;
+		break;
+	}
+
 	Tile* tile;
 
-	uint32_t tmpDist;
-	uint32_t currentDist;
+	//check so that the new distance is the same as before unless curDist is 0
+	uint32_t tmpDist = std::max(std::abs((creaturePos.x + dx) - centerPos.x), std::abs((creaturePos.y + dy) - centerPos.y));
+	if(curDist == 0 || tmpDist == curDist){
+		Position tmpPos = creaturePos;
+		tmpPos.x = tmpPos.x + dx;
+		tmpPos.y = tmpPos.y + dy;
+		if(canWalkTo(tmpPos)){
+			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
+			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool Monster::getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir)
+{
+	Tile* tile;
 	
-	currentDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs(creaturePos.y - centerPos.y));
+	uint32_t curDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs(creaturePos.y - centerPos.y));
 
-	//check so that the new distance is the same as before (unless dx and dy is 0)
+	std::vector<Direction> dirList;
 
+	if(canWalkTo(creaturePos, centerPos, NORTH, curDist)){
+		dirList.push_back(NORTH);
+	}
+
+	if(canWalkTo(creaturePos, centerPos, SOUTH, curDist)){
+		dirList.push_back(SOUTH);
+	}
+
+	if(canWalkTo(creaturePos, centerPos, EAST, curDist)){
+		dirList.push_back(EAST);
+	}
+
+	if(canWalkTo(creaturePos, centerPos, WEST, curDist)){
+		dirList.push_back(WEST);
+	}
+
+	if(!dirList.empty()){
+		std::random_shuffle(dirList.begin(), dirList.end());
+		dir = dirList[random_range(0, dirList.size() - 1)];
+		return true;
+	}
+
+	return false;
+
+	/*
 	//NORTH
 	tmpDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
@@ -695,6 +757,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	}
 
 	return false;
+	*/
 }
 
 void Monster::doAttacking(uint32_t interval)

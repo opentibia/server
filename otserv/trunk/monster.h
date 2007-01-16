@@ -138,6 +138,7 @@ private:
 	void clearTargetList();
 
 	bool canWalkTo(const Position& pos);
+	bool canWalkTo(const Position& creaturePos, const Position& centerPos, Direction dir, uint32_t curDist);
 	bool despawn();
 	
 	bool pushItem(Item* item, int32_t radius);

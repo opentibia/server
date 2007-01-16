@@ -243,9 +243,9 @@ void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 	}
 }
 
-bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin /*=false*/)
+bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forceLogin /*=false*/)
 {
-	Tile* tile = getTile(pos.x, pos.y, pos.z);
+	Tile* tile = getTile(centerPos);
 
 	bool foundTile = false;
 	bool placeInPZ = false;
@@ -259,9 +259,31 @@ bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin
 		}
 	}
 
-	for(int cx = pos.x - 1; cx <= pos.x + 1 && !foundTile; cx++){
-		for(int cy = pos.y - 1; cy <= pos.y + 1 && !foundTile; cy++){
-			tile = getTile(cx, cy, pos.z);
+	typedef std::pair<int32_t, int32_t> relPair;
+	std::vector<relPair> relList;
+	relList.push_back(relPair(-1, 0));
+	relList.push_back(relPair(-1, 0));
+	relList.push_back(relPair(0, 1));
+	relList.push_back(relPair(0, -1));
+	relList.push_back(relPair(1, 1));
+	relList.push_back(relPair(1, 0));
+	relList.push_back(relPair(-1, 0));
+	relList.push_back(relPair(-1, -1));
+
+	std::random_shuffle(relList.begin(), relList.end());
+	uint32_t radius = 1;
+
+	Position tryPos;
+	for(int32_t n = 1; n <= radius && !foundTile; ++n){
+		for(std::vector<relPair>::iterator it = relList.begin(); it != relList.end() && !foundTile; ++it){
+			int32_t dx = it->first * n;
+			int32_t dy = it->second * n;
+
+			tryPos = centerPos;
+			tryPos.x = tryPos.x + dx;
+			tryPos.y = tryPos.y + dy;
+
+			tile = getTile(tryPos);
 			if(!tile || (placeInPZ && !tile->isPz()))
 				continue;
 
