@@ -86,7 +86,7 @@ Item* Item::CreateItem(PropStream& propStream)
 	}
 
 	const ItemType& iType = Item::items[_id];
-	unsigned char _count = 1;
+	unsigned char _count = 0;
 
 	if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
 		if(!propStream.GET_UCHAR(_count)){

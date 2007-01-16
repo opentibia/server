@@ -529,11 +529,12 @@ bool Monster::getNextStep(Direction& dir)
 				Item* item = tile->downItems[i];
 				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND) 
 					|| item->hasProperty(BLOCKSOLID))){
-					if(!pushItem(item, 1)){
-						if(g_game.internalRemoveItem(item) == RET_NOERROR){
-							objectRemoved = true;
-							continue;
-						}
+					if(pushItem(item, 1)){
+						continue;
+					}
+					else if(g_game.internalRemoveItem(item) == RET_NOERROR){
+						objectRemoved = true;
+						continue;
 					}
 				}
 
@@ -551,11 +552,13 @@ bool Monster::getNextStep(Direction& dir)
 				Monster* monster = tile->creatures[i]->getMonster();
 
 				if(monster && monster->isPushable()){
-					if(!pushCreature(monster)){
+					if(pushCreature(monster)){
+						continue;
+					}
+					else{
 						monster->changeHealth(-monster->getHealth());
 						monster->setCreateLoot(false);
 						objectRemoved = true;
-						continue;
 					}
 				}
 				

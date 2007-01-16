@@ -282,7 +282,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 	}
 
 	if(groundId != 0){
-		Item* ground = Item::CreateItem(groundId);
+		Item* ground = Item::CreateItem(groundId, 0);
 		tile->__internalAddThing(ground);
 	}
 
@@ -308,7 +308,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 			const ItemType& iType = Item::items[id];
 			if(!map->defaultMapLoaded || iType.moveable){
 				//create a new item
-				item = Item::CreateItem(id);
+				item = Item::CreateItem(id, 0);
 
 				if(!item){
 					map->setLastError(LOADMAPERROR_FAILEDTOCREATEITEM);

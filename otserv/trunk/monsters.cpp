@@ -429,7 +429,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 	}
 	else if(name == "speed"){
 		int32_t speedChange = 0;
-		int32_t duration = 1000;
+		int32_t duration = 10000;
 
 		if(readXMLInteger(node, "duration", intValue)){
 			duration = intValue;
@@ -458,7 +458,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		combat->setCondition(condition);
 	}
 	else if(name == "outfit"){
-		int32_t duration = 1000;
+		int32_t duration = 10000;
 
 		if(readXMLInteger(node, "duration", intValue)){
 			duration = intValue;
@@ -484,7 +484,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		}
 	}
 	else if(name == "invisible"){
-		int32_t duration = 1000;
+		int32_t duration = 10000;
 
 		if(readXMLInteger(node, "duration", intValue)){
 			duration = intValue;
@@ -492,6 +492,16 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 
 		Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
 		combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
+		combat->setCondition(condition);
+	}
+	else if(name == "drunk"){
+		int32_t duration = 10000;
+
+		if(readXMLInteger(node, "duration", intValue)){
+			duration = intValue;
+		}
+
+		Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, 0);
 		combat->setCondition(condition);
 	}
 	else if(name == "firefield"){
