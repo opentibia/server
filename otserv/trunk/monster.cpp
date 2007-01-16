@@ -525,7 +525,7 @@ bool Monster::getNextStep(Direction& dir)
 			bool objectRemoved = false;
 			//We can not use iterators here since we can push the item to another tile
 			//which will invalidate the iterator.
-			for(int i = 0; i < tile->downItems.size();){
+			for(unsigned int i = 0; i < tile->downItems.size();){
 				Item* item = tile->downItems[i];
 				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND) 
 					|| item->hasProperty(BLOCKSOLID))){
@@ -548,7 +548,7 @@ bool Monster::getNextStep(Direction& dir)
 			objectRemoved = false;
 			//We can not use iterators here since we can push a creature to another tile
 			//which will invalidate the iterator.
-			for(int i = 0; i < tile->creatures.size();){
+			for(unsigned int i = 0; i < tile->creatures.size();){
 				Monster* monster = tile->creatures[i]->getMonster();
 
 				if(monster && monster->isPushable()){
@@ -644,6 +644,8 @@ bool Monster::canWalkTo(const Position& creaturePos, const Position& centerPos, 
 		case EAST:
 			dx = 1;
 		break;
+		default:
+			break;
 	}
 
 	Tile* tile;
@@ -666,9 +668,7 @@ bool Monster::canWalkTo(const Position& creaturePos, const Position& centerPos, 
 }
 
 bool Monster::getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir)
-{
-	Tile* tile;
-	
+{	
 	uint32_t curDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs(creaturePos.y - centerPos.y));
 
 	std::vector<Direction> dirList;

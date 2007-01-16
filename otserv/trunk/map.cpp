@@ -274,7 +274,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 	uint32_t radius = 1;
 
 	Position tryPos;
-	for(int32_t n = 1; n <= radius && !foundTile; ++n){
+	for(uint32_t n = 1; n <= radius && !foundTile; ++n){
 		for(std::vector<relPair>::iterator it = relList.begin(); it != relList.end() && !foundTile; ++it){
 			int32_t dx = it->first * n;
 			int32_t dy = it->second * n;

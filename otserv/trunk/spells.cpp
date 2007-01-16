@@ -314,7 +314,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 	if(readXMLString(p, "name", strValue)){
 		name = strValue;
 
-		const char* reservedList[18] =
+		const char* reservedList[] =
 		{
 			"melee",
 			"physical",
@@ -336,7 +336,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 			"energycondition"
 		};
 	
-		for(int i = 0; i < 18; ++i){
+		for(unsigned int i = 0; i < sizeof(reservedList)/sizeof(const char*); ++i){
 			if(strcasecmp(reservedList[i], name.c_str()) == 0){
 				std::cout << "Error: [Spell::configureSpell] Spell is using a reserved name: " << reservedList[i] << std::endl;
 				return false;

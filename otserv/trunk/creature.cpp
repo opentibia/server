@@ -37,7 +37,7 @@
 #include <vector>
 
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
-unsigned long AutoID::count = 1000;
+uint32_t AutoID::count = 1000;
 AutoID::list_type AutoID::list;
 
 extern Game g_game;

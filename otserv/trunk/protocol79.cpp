@@ -420,7 +420,7 @@ void Protocol79::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 		CreatureVector::const_iterator itc;
 		for(itc = tile->creatures.begin(); ((itc != tile->creatures.end()) && (count < 10)); ++itc){
 			bool known;
-			unsigned long removedKnown;
+			uint32_t removedKnown;
 			checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
 			AddCreature(msg,*itc, known, removedKnown);
 			count++;
@@ -494,10 +494,10 @@ void Protocol79::GetFloorDescription(NetworkMessage& msg, int x, int y, int z, i
 	}
 }
 
-void Protocol79::checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown)
+void Protocol79::checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &removedKnown)
 {
 	// loop through the known player and check if the given player is in
-	std::list<unsigned long>::iterator i;
+	std::list<uint32_t>::iterator i;
 	for(i = knownPlayers.begin(); i != knownPlayers.end(); ++i)
 	{
 		if((*i) == id)
@@ -690,7 +690,7 @@ void Protocol79::parseGetChannels(NetworkMessage& msg)
 
 void Protocol79::parseOpenChannel(NetworkMessage& msg)
 {
-	unsigned short channelId = msg.GetU16();
+	uint16_t channelId = msg.GetU16();
 	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseOpenChannel()");
 	if(player->isRemoved()){
 		return;
@@ -703,7 +703,7 @@ void Protocol79::parseOpenChannel(NetworkMessage& msg)
 
 void Protocol79::parseCloseChannel(NetworkMessage &msg)
 {
-	unsigned short channelId = msg.GetU16();
+	uint16_t channelId = msg.GetU16();
 	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseCloseChannel()");
 	if(player->isRemoved()){
 		return;
@@ -904,7 +904,7 @@ void Protocol79::parseRequestOutfit(NetworkMessage& msg)
 		msg.AddByte(count_outfits);
 	}
 	
-	unsigned long counter = 0;
+	uint32_t counter = 0;
 	OutfitListType::const_iterator it;
 	for(it = player_outfits.begin(); it != player_outfits.end() && (counter < 15); ++it, ++counter){
 		msg.AddU16((*it)->looktype);
@@ -1137,19 +1137,19 @@ void Protocol79::parseFightModes(NetworkMessage& msg)
 
 void Protocol79::parseAttack(NetworkMessage& msg)
 {
-	unsigned long creatureid = msg.GetU32();
+	uint32_t creatureid = msg.GetU32();
 	g_game.playerSetAttackedCreature(player, creatureid);
 }
 
 void Protocol79::parseFollow(NetworkMessage& msg)
 {
-	unsigned long creatureId = msg.GetU32();
+	uint32_t creatureId = msg.GetU32();
 	g_game.playerFollowCreature(player, creatureId);
 }
 
 void Protocol79::parseTextWindow(NetworkMessage& msg)
 {
-	unsigned long id = msg.GetU32();
+	uint32_t id = msg.GetU32();
 	std::string new_text = msg.GetString();
 	if(new_text.length() > maxTextLength)
 		return;
@@ -1163,8 +1163,8 @@ void Protocol79::parseTextWindow(NetworkMessage& msg)
 
 void Protocol79::parseHouseWindow(NetworkMessage &msg)
 {
-	unsigned char _listid = msg.GetByte();
-	unsigned long id = msg.GetU32();
+	uint8_t _listid = msg.GetByte();
+	uint32_t id = msg.GetU32();
 	std::string new_list = msg.GetString();
 
 	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseHouseWindow()");
@@ -1218,7 +1218,7 @@ void Protocol79::parseAddVip(NetworkMessage& msg)
 
 void Protocol79::parseRemVip(NetworkMessage& msg)
 {
-	unsigned long id = msg.GetU32();
+	uint32_t id = msg.GetU32();
 	player->removeVIP(id);
 }
 
@@ -1886,7 +1886,7 @@ void Protocol79::sendTextWindow(uint32_t itemid, const std::string& text)
 	WriteBuffer(msg);
 }
 
-void Protocol79::sendHouseWindow(House* _house, unsigned long _listid, const std::string& text)
+void Protocol79::sendHouseWindow(House* _house, uint32_t _listid, const std::string& text)
 {
 	NetworkMessage msg;
 	windowTextID++;
@@ -1899,7 +1899,7 @@ void Protocol79::sendHouseWindow(House* _house, unsigned long _listid, const std
 	WriteBuffer(msg);
 }
 
-void Protocol79::sendVIPLogIn(unsigned long guid)
+void Protocol79::sendVIPLogIn(uint32_t guid)
 {
 	NetworkMessage msg;
 	msg.AddByte(0xD3);
@@ -1907,7 +1907,7 @@ void Protocol79::sendVIPLogIn(unsigned long guid)
 	WriteBuffer(msg);
 }
 
-void Protocol79::sendVIPLogOut(unsigned long guid)
+void Protocol79::sendVIPLogOut(uint32_t guid)
 {
 	NetworkMessage msg;
 	msg.AddByte(0xD4);
@@ -1915,7 +1915,7 @@ void Protocol79::sendVIPLogOut(unsigned long guid)
 	WriteBuffer(msg);
 }
 
-void Protocol79::sendVIP(unsigned long guid, const std::string& name, bool isOnline)
+void Protocol79::sendVIP(uint32_t guid, const std::string& name, bool isOnline)
 {
 	NetworkMessage msg;
 	msg.AddByte(0xD2);
@@ -2154,7 +2154,7 @@ void Protocol79::AddTileCreature(NetworkMessage& msg, const Position& pos, const
 	msg.AddPosition(pos);
 
 	bool known;
-	unsigned long removedKnown;
+	uint32_t removedKnown;
 	checkCreatureAsKnown(creature->getID(), known, removedKnown);
 	AddCreature(msg, creature, known, removedKnown);
 }

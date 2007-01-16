@@ -61,10 +61,10 @@ public:
 	
 private:
 	NetworkMessage OutputBuffer;
-	std::list<unsigned long> knownPlayers;
+	std::list<uint32_t> knownPlayers;
 	uint32_t m_key[4];
 
-	void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);
+	void checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &removedKnown);
 	
 	bool canSee(int x, int y, int z) const;
 	bool canSee(const Creature*) const;
@@ -172,11 +172,11 @@ private:
 	
 	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
 	void sendTextWindow(uint32_t itemid,const std::string& text);
-	void sendHouseWindow(House* house, unsigned long listid, const std::string& text);
+	void sendHouseWindow(House* house, uint32_t listid, const std::string& text);
 	
-	void sendVIPLogIn(unsigned long guid);
-	void sendVIPLogOut(unsigned long guid);
-	void sendVIP(unsigned long guid, const std::string& name, bool isOnline);
+	void sendVIPLogIn(uint32_t guid);
+	void sendVIPLogOut(uint32_t guid);
+	void sendVIP(uint32_t guid, const std::string& name, bool isOnline);
 	void sendReLoginWindow();
 	
 	void sendCreatureLight(const Creature* creature);
