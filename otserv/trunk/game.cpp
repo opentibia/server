@@ -891,10 +891,14 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 				toCylinder->__removeThing(toItem, toItem->getItemCount());
 				fromCylinder->__addThing(toItem);
 
-				toCylinder->postRemoveNotification(toItem, oldToItemIndex, true);
+				if(oldToItemIndex != -1){
+					toCylinder->postRemoveNotification(toItem, oldToItemIndex, true);
+				}
 
 				int32_t newToItemIndex = fromCylinder->__getIndexOfThing(toItem);
-				fromCylinder->postAddNotification(toItem, newToItemIndex);
+				if(newToItemIndex != -1){
+					fromCylinder->postAddNotification(toItem, newToItemIndex);
+				}
 
 				ret = toCylinder->__queryAdd(index, item, count, flags);
 				toItem = NULL;
@@ -960,14 +964,21 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 		toCylinder->__addThing(index, moveItem);
 	}
 
-	fromCylinder->postRemoveNotification(item, itemIndex, isCompleteRemoval);
+	if(itemIndex != -1){
+		fromCylinder->postRemoveNotification(item, itemIndex, isCompleteRemoval);
+	}
+
 	if(moveItem){
 		int32_t moveItemIndex = toCylinder->__getIndexOfThing(moveItem);
-		toCylinder->postAddNotification(moveItem, moveItemIndex);
+		if(moveItemIndex != -1){
+			toCylinder->postAddNotification(moveItem, moveItemIndex);
+		}
 	}
 	else{
 		itemIndex = toCylinder->__getIndexOfThing(item);
-		toCylinder->postAddNotification(item, itemIndex);
+		if(itemIndex != -1){
+			toCylinder->postAddNotification(item, itemIndex);
+		}
 	}
 
 	//we could not move all, inform the player
@@ -1036,11 +1047,16 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 			toCylinder->__addThing(index, moveItem);
 
 			int32_t moveItemIndex = toCylinder->__getIndexOfThing(moveItem);
-			toCylinder->postAddNotification(moveItem, moveItemIndex);
+			if(moveItemIndex != -1){
+				toCylinder->postAddNotification(moveItem, moveItemIndex);
+			}
 		}
 		else{
 			int32_t itemIndex = toCylinder->__getIndexOfThing(item);
-			toCylinder->postAddNotification(item, itemIndex);
+
+			if(itemIndex != -1){
+				toCylinder->postAddNotification(item, itemIndex);
+			}
 		}
 	}
 
