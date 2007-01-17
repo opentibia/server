@@ -767,15 +767,23 @@ void Tile::__addThing(int32_t index, Thing* thing)
 		else{
 			if(item->isMagicField()){
 				//remove old field item if exists
+				MagicField* oldField = NULL;
 				ItemVector::iterator iit;
 				for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-					if((*iit)->isMagicField()){
-						Item* oldField = *iit;
-						__removeThing(oldField, 1);
+					if(oldField = (*iit)->getMagicField()){
+						if(oldField->isReplaceable()){
+							__removeThing(oldField, 1);
 
-						oldField->setParent(NULL);
-						g_game.FreeThing(oldField);
-						break;
+							oldField->setParent(NULL);
+							g_game.FreeThing(oldField);
+							break;
+						}
+						else{
+							//This magic field cannot be replaced.
+							item->setParent(NULL);
+							g_game.FreeThing(item);
+							return;
+						}
 					}
 				}
 			}

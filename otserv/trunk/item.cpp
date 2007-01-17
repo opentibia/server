@@ -196,8 +196,8 @@ unsigned char Item::getItemCountOrSubtype() const
 	if(it.isFluidContainer() || it.isSplash()){
 		return fluid;
 	}
-	//else if(items[id].runeMagLevel != -1)
-	else if(charges != 0){
+	//else if(charges != 0){
+	else if(it.charges != 0){
 		return charges;
 	}
 	else{

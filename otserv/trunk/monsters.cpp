@@ -505,13 +505,13 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		combat->setCondition(condition);
 	}
 	else if(name == "firefield"){
-		combat->setParam(COMBATPARAM_CREATEITEM, 1487);
+		combat->setParam(COMBATPARAM_CREATEITEM, 1492);
 	}
 	else if(name == "poisonfield"){
-		combat->setParam(COMBATPARAM_CREATEITEM, 1490);
+		combat->setParam(COMBATPARAM_CREATEITEM, 1496);
 	}
 	else if(name == "energyfield"){
-		combat->setParam(COMBATPARAM_CREATEITEM, 1491);
+		combat->setParam(COMBATPARAM_CREATEITEM, 1495);
 	}
 	else if(name == "firecondition" || name == "poisoncondition" || name == "energycondition"){
 		ConditionType_t conditionType;
@@ -555,49 +555,49 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 					if(strValue == "spear"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_SPEAR);
 					}
-					if(strValue == "bolt"){
+					else if(strValue == "bolt"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_BOLT);
 					}
-					if(strValue == "arrow"){
+					else if(strValue == "arrow"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_ARROW);
 					}
-					if(strValue == "fire"){
+					else if(strValue == "fire"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_FIRE);
 					}
-					if(strValue == "energy"){
+					else if(strValue == "energy"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_ENERGY);
 					}
-					if(strValue == "poisonarrow"){
+					else if(strValue == "poisonarrow"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_POISONARROW);
 					}
-					if(strValue == "burstarrow"){
+					else if(strValue == "burstarrow"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_BURSTARROW);
 					}
-					if(strValue == "throwingstar"){
+					else if(strValue == "throwingstar"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_THROWINGSTAR);
 					}
-					if(strValue == "throwingknife"){
+					else if(strValue == "throwingknife"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_THROWINGKNIFE);
 					}
-					if(strValue == "smallstone"){
+					else if(strValue == "smallstone"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_SMALLSTONE);
 					}
-					if(strValue == "suddendeath"){
+					else if(strValue == "suddendeath"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_SUDDENDEATH);
 					}
-					if(strValue == "largerock"){
+					else if(strValue == "largerock"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_LARGEROCK);
 					}
-					if(strValue == "snowball"){
+					else if(strValue == "snowball"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_SNOWBALL);
 					}
-					if(strValue == "powerbolt"){
+					else if(strValue == "powerbolt"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_POWERBOLT);
 					}
-					if(strValue == "poison"){
+					else if(strValue == "poison"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_FLYPOISONFIELD);
 					}
-					if(strValue == "infernalbolt"){
+					else if(strValue == "infernalbolt"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_INFERNALBOLT);
 					}
 				}

@@ -1102,11 +1102,74 @@ ReturnValue Game::internalPlayerAddItem(Player* player, Item* item)
 	return RET_NOERROR;
 }
 
-bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count)
+Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType /*= -1*/)
 {
-	if(cylinder == NULL || ((int32_t)cylinder->__getItemTypeCount(itemId) < count)){
+	if(cylinder == NULL){
 		return false;
 	}
+
+	std::list<Container*> listContainer;
+	Container* tmpContainer = NULL;
+	Thing* thing = NULL;
+	Item* item = NULL;
+	
+	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex();){
+		
+		if((thing = cylinder->__getThing(i)) && (item = thing->getItem())){
+			if(item->getID() == itemId){
+				if(item->isStackable() && (subType == -1 || item->getItemCount() >= subType)){
+					return item;
+				}
+				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
+					return item;
+				}
+			}
+			else{
+				++i;
+
+				if(tmpContainer = item->getContainer()){
+					listContainer.push_back(tmpContainer);
+				}
+			}
+		}
+		else{
+			++i;
+		}
+	}
+	
+	while(listContainer.size() > 0){
+		Container* container = listContainer.front();
+		listContainer.pop_front();
+		
+		for(int i = 0; i < (int32_t)container->size();){
+			Item* item = container->getItem(i);
+			if(item->getID() == itemId){
+				if(item->isStackable() && (subType == -1 || item->getItemCount() >= subType)){
+					return item;
+				}
+				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
+					return item;
+				}
+			}
+			else{
+				++i;
+
+				if(tmpContainer = item->getContainer()){
+					listContainer.push_back(tmpContainer);
+				}
+			}
+		}
+	}
+
+	return NULL;
+}
+
+bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, int32_t subType /*= -1*/)
+{
+	if(cylinder == NULL || ((int32_t)cylinder->__getItemTypeCount(itemId) < count) ){
+		return false;
+	}
+
 	if(count <= 0){
 		return true;
 	}
@@ -1130,7 +1193,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count)
 						internalRemoveItem(item);
 					}
 				}
-				else{
+				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
 					--count;
 					internalRemoveItem(item);
 				}
@@ -1165,7 +1228,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count)
 						internalRemoveItem(item);
 					}
 				}
-				else{
+				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
 					--count;
 					internalRemoveItem(item);
 				}
@@ -1778,10 +1841,19 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 
-	Thing* thing = internalGetThing(player, fromPos, STACKPOS_USE);
+	Thing* thing = NULL;
+
+	if(fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0){
+		//client wants us to find an item in the inventory
+	}
+	else{
+		thing = internalGetThing(player, fromPos, STACKPOS_USE);
+	}
+
 	if(!thing){
 		return false;
 	}
+
 	Item* item = thing->getItem();
 	if(!item){
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
@@ -3032,17 +3104,17 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 
 void Game::startDecay(Item* item)
 {
-	uint32_t decayState = item->getDecaying();
-	if(decayState == DECAYING_TRUE){
-		//already decaying
-		return;
-	}
-
 	if(item->canDecay()){
+		uint32_t decayState = item->getDecaying();
+		if(decayState == DECAYING_TRUE){
+			//already decaying
+			return;
+		}
+
 		if(item->getDuration() > 0){
 			item->useThing2();
 			item->setDecaying(DECAYING_TRUE);
-			decayItems.push_back(item);
+			toDecayItems.push_back(item);
 		}
 		else{
 			internalDecayItem(item);
@@ -3070,7 +3142,7 @@ void Game::internalDecayItem(Item* item)
 void Game::checkDecay(int32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
-	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
+
 	Item* item = NULL;
 	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
 		item = *it;
@@ -3094,6 +3166,7 @@ void Game::checkDecay(int32_t interval)
 		}
 	}
 
+	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 	flushSendBuffers();
 }
 
@@ -3201,8 +3274,12 @@ void Game::flushSendBuffers()
 	}
 
 	ToReleaseThings.clear();
-		
-	return;
+
+	for(DecayList::iterator it = toDecayItems.begin(); it != toDecayItems.end(); ++it){
+		decayItems.push_back(*it);
+	}
+
+	toDecayItems.clear();		
 }
 
 void Game::addPlayerBuffer(Player* p)
@@ -3219,8 +3296,6 @@ void Game::addPlayerBuffer(Player* p)
 		BufferedPlayers.push_back(p);
 		p->SendBuffer = true;
 	}
-	
-	return;
 }
 
 void Game::FreeThing(Thing* thing)
@@ -3228,6 +3303,4 @@ void Game::FreeThing(Thing* thing)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::FreeThing()");
 	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);
-	
-	return;
 }

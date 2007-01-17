@@ -223,13 +223,25 @@ public:
 	ReturnValue internalPlayerAddItem(Player* player, Item* item);
 
 	/**
+	  * Find an item of a certain type
+	  * \param cylinder to search the item
+	  * \param spriteId is the item sprite to remove
+	  * \param subType is the extra type an item can have such as charges/fluidtype, default is -1
+		* meaning it's not used
+	  * \returns A pointer to the item to an item and NULL if not found
+	  */
+	Item* findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType = -1);
+
+	/**
 	  * Remove item(s) of a certain type
 	  * \param cylinder to remove the item(s) from
-	  * \param spriteId is the item sprite to remove
+	  * \param itemId is the item to remove
 	  * \param count is the amount to remove
+	  * \param subType is the extra type an item can have such as charges/fluidtype, default is -1
+		* meaning it's not used
 	  * \returns true if the removal was successful
 	  */
-	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count);
+	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, int32_t subType = -1);
 
 	/**
 	  * Get the amount of money in a a cylinder
@@ -393,8 +405,9 @@ protected:
 	void checkDecay(int32_t interval);
 	void internalDecayItem(Item* item);
 
-	typedef std::vector<Item*> DecayList;
+	typedef std::list<Item*> DecayList;
 	DecayList decayItems;
+	DecayList toDecayItems;
 	
 	static const int LIGHT_LEVEL_DAY = 250;
 	static const int LIGHT_LEVEL_NIGHT = 40;

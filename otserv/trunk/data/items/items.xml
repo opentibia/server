@@ -31,21 +31,6 @@
 		<attribute key="stopduration" value="1"/>
 	</item>
 
-	<item id="1499" name="wild growth">
-		<attribute key="field" value="block"/>
-		<attribute key="duration" value="20"/>
-	</item>
-
-	<item id="1497" name="magic wall">
-		<attribute key="field" value="block"/>
-		<attribute key="duration" value="20"/>
-	</item>
-
-	<item id="1498" name="magic wall">
-		<attribute key="field" value="block"/>
-		<attribute key="duration" value="20"/>
-	</item>
-
 	<item id="2172" name="bronze amulet">
 		<attribute key="charges" value="150"/>
 		<attribute key="showcharges" value="1"/>
@@ -232,7 +217,8 @@
 	</item>
 
 	<item id="1487" name="fire field">
-		<attribute key="duration" value="60"/>
+		<attribute key="decayTo" value="-1"/>
+		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
 			<attribute key="damage" value="25"/>
 			<attribute key="ticks" value="2000"/>
@@ -252,10 +238,260 @@
 		</attribute>
 	</item>
 
-	<item id="1506" name="magic fire">
+	<item id="1488" name="fire field">
+		<attribute key="decayTo" value="-1"/>
+		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="400"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
 		</attribute>
+	</item>
+
+	<item id="1489" name="fire field">
+		<attribute key="decayTo" value="-1"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire"/>
+	</item>
+
+	<item id="1490" name="poison field">
+		<attribute key="decayTo" value="-1"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="poison">
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+		</attribute>
+	</item>
+
+	<item id="1491" name="energy field">
+		<attribute key="decayTo" value="-1"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="energy">
+			<attribute key="damage" value="25"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="20"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="20"/>
+		</attribute>
+	</item>
+
+	<item id="1492" name="fire field">
+		<attribute key="decayTo" value="1493"/>
+		<attribute key="duration" value="120"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="25"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+		</attribute>
+	</item>
+
+	<item id="1493" name="fire field">
+		<attribute key="decayTo" value="1494"/>
+		<attribute key="duration" value="120"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+		</attribute>
+	</item>
+
+	<item id="1494" name="fire field">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="20"/>
+		<attribute key="field" value="fire"/>
+	</item>
+
+	<item id="1495" name="energy field">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="120"/>
+		<attribute key="field" value="energy">
+			<attribute key="damage" value="25"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="20"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="20"/>
+		</attribute>
+	</item>
+
+	<item id="1496" name="poison field">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="120"/>
+		<attribute key="field" value="poison">
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+		</attribute>
+	</item>
+
+	<item id="1497" name="magic wall">
+		<attribute key="decayTo" value="-1"/>
+		<attribute key="field" value="block"/>
+	</item>
+
+	<item id="1498" name="magic wall">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="field" value="block"/>
+		<attribute key="duration" value="20"/>
+	</item>
+
+	<item id="1499" name="wild growth">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="field" value="block"/>
+		<attribute key="duration" value="20"/>
+	</item>
+
+	<item id="1500" name="fire field">
+		<attribute key="decayTo" value="1500"/>
+		<attribute key="duration" value="5"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="25"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+		</attribute>
+	</item>
+
+	<item id="1501" name="fire field">
+		<attribute key="decayTo" value="1502"/>
+		<attribute key="duration" value="5"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+		</attribute>
+	</item>
+
+	<item id="1502" name="fire field">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="5"/>
+		<attribute key="field" value="fire"/>
+	</item>
+
+	<item id="1503" name="poison field">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="field" value="poison">
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="5"/>
+		</attribute>
+	</item>
+
+	<item id="1504" name="energy field">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="field" value="energy">
+			<attribute key="damage" value="25"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="20"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="20"/>
+		</attribute>
+	</item>
+
+	<item id="1505" name="smoke">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="20"/>
+		<attribute key="field" value="smoke"/>
+	</item>
+
+	<item id="1506" name="searing fire">
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+	</item>
+
+	<item id="1507" name="searing fire">
+		<attribute key="decayTo" value="1508"/>
+		<attribute key="duration" value="10"/>
+	</item>
+
+	<item id="1508" name="searing fire">
+		<attribute key="decayTo" value="1506"/>
+		<attribute key="duration" value="5"/>
 	</item>
 
 </items>

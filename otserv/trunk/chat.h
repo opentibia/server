@@ -18,14 +18,15 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __CHAT_H
-#define __CHAT_H
+#ifndef __OTSERV_CHAT_H__
+#define __OTSERV_CHAT_H__
 
 #include <map>
 #include <list>
 #include <string>
 
 #include "const79.h"
+#include "definitions.h"
 
 class Player;
 
@@ -113,6 +114,5 @@ private:
 	
 	ChatChannel* dummyPrivate;
 };
-
 
 #endif

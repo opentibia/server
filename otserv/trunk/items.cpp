@@ -99,13 +99,7 @@ ItemType::ItemType()
 	condition = NULL;
 	combatType = COMBAT_NONE;
 
-	/*
-	//fields
-	initialDamage = 0;
-	roundMin = 0;
-	roundTime = 0;
-	roundDamage = 0;
-	*/
+	replaceable = true;
 }
 
 ItemType::~ItemType()
@@ -400,37 +394,31 @@ int Items::loadFromOtb(std::string file)
 					return ERROR_INVALID_FORMAT;
 				
 				switch(otb_slot){
-				case OTB_SLOT_DEFAULT:
-				case OTB_SLOT_WEAPON:
-				case OTB_SLOT_HAND:
-					//default	
-					break;
-				case OTB_SLOT_HEAD:
-					iType->slot_position = SLOTP_HEAD;
-					break;
-				case OTB_SLOT_BODY:
-					iType->slot_position = SLOTP_ARMOR;
-					break;
-				case OTB_SLOT_LEGS:
-					iType->slot_position = SLOTP_LEGS;
-					break;
-				case OTB_SLOT_BACKPACK:
-					iType->slot_position = SLOTP_BACKPACK;
-					break;
-				case OTB_SLOT_2HAND:
-					iType->slot_position  = SLOTP_TWO_HAND;
-					break;
-				case OTB_SLOT_FEET:
-					iType->slot_position = SLOTP_FEET;
-					break;
-				case OTB_SLOT_AMULET:
-					iType->slot_position = SLOTP_NECKLACE;
-					break;
-				case OTB_SLOT_RING:
-					iType->slot_position = SLOTP_RING;
-					break;
+					case OTB_SLOT_HEAD:
+						iType->slot_position |= SLOTP_HEAD;
+						break;
+					case OTB_SLOT_BODY:
+						iType->slot_position |= SLOTP_ARMOR;
+						break;
+					case OTB_SLOT_LEGS:
+						iType->slot_position |= SLOTP_LEGS;
+						break;
+					case OTB_SLOT_BACKPACK:
+						iType->slot_position |= SLOTP_BACKPACK;
+						break;
+					case OTB_SLOT_2HAND:
+						iType->slot_position |= SLOTP_TWO_HAND;
+						break;
+					case OTB_SLOT_FEET:
+						iType->slot_position |= SLOTP_FEET;
+						break;
+					case OTB_SLOT_AMULET:
+						iType->slot_position |= SLOTP_NECKLACE;
+						break;
+					case OTB_SLOT_RING:
+						iType->slot_position |= SLOTP_RING;
+						break;
 					}
-				iType->slot_position = iType->slot_position | SLOTP_LEFT | SLOTP_RIGHT | SLOTP_AMMO;
 				break;
 			}	
 			case ITEM_ATTR_MAXITEMS:
@@ -639,12 +627,192 @@ bool Items::loadFromXml(const std::string& datadir)
 
 					while(itemAttributesNode){
 						if(readXMLString(itemAttributesNode, "key", strValue)){
-							if(strcasecmp(strValue.c_str(), "stopduration") == 0){
+							if(strcasecmp(strValue.c_str(), "name") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									it.name = strValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "description") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									it.description = strValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "weight") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.weight = intValue / 100;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "armor") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.armor = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "defense") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.defence = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "attack") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.attack = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "rotateTo") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.rotateTo = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "containerSize") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.maxItems = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "textMaxLen") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.maxTextLen = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "textReadOnlyId") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.readOnlyId = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "weaponType") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(strcasecmp(strValue.c_str(), "sword") == 0){
+										it.weaponType = WEAPON_SWORD;
+									}
+									else if(strcasecmp(strValue.c_str(), "club") == 0){
+										it.weaponType = WEAPON_CLUB;
+									}
+									else if(strcasecmp(strValue.c_str(), "axe") == 0){
+										it.weaponType = WEAPON_AXE;
+									}
+									else if(strcasecmp(strValue.c_str(), "shield") == 0){
+										it.weaponType = WEAPON_SHIELD;
+									}
+									else if(strcasecmp(strValue.c_str(), "distance") == 0){
+										it.weaponType = WEAPON_DIST;
+									}
+									else if(strcasecmp(strValue.c_str(), "wand") == 0){
+										it.weaponType = WEAPON_WAND;
+									}
+									else if(strcasecmp(strValue.c_str(), "ammo") == 0){
+										it.weaponType = WEAPON_AMMO;
+									}
+									else{
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown weaponType " << strValue  << std::endl;
+									}
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "slotType") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(strcasecmp(strValue.c_str(), "head") == 0){
+										it.slot_position |= SLOTP_HEAD;
+									}
+									else if(strcasecmp(strValue.c_str(), "head") == 0){
+										it.slot_position |= SLOTP_HEAD;
+									}
+									else if(strcasecmp(strValue.c_str(), "body") == 0){
+										it.slot_position |= OTB_SLOT_BODY;
+									}
+									else if(strcasecmp(strValue.c_str(), "legs") == 0){
+										it.slot_position |= OTB_SLOT_LEGS;
+									}
+									else if(strcasecmp(strValue.c_str(), "backpack") == 0){
+										it.slot_position |= OTB_SLOT_BACKPACK;
+									}
+									else if(strcasecmp(strValue.c_str(), "two-handed") == 0){
+										it.slot_position |= OTB_SLOT_2HAND;
+									}
+									else if(strcasecmp(strValue.c_str(), "feet") == 0){
+										it.slot_position |= OTB_SLOT_FEET;
+									}
+									else if(strcasecmp(strValue.c_str(), "necklace") == 0){
+										it.slot_position |= OTB_SLOT_AMULET;
+									}
+									else if(strcasecmp(strValue.c_str(), "ring") == 0){
+										it.slot_position |= OTB_SLOT_RING;
+									}
+									else{
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown slotType " << strValue  << std::endl;
+									}
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "ammoType") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(strcasecmp(strValue.c_str(), "arrow") == 0){
+										it.amuType = AMMO_ARROW;
+									}
+									else if(strcasecmp(strValue.c_str(), "bolt") == 0){
+										it.amuType = AMMO_BOLT;
+									}
+									else{
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown ammoType " << strValue  << std::endl;
+									}
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "shootType") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(strcasecmp(strValue.c_str(), "spear") == 0){
+										it.shootType = SHOOT_SPEAR;
+									}
+									else if(strcasecmp(strValue.c_str(), "bolt") == 0){
+										it.shootType = SHOOT_BOLT;
+									}
+									else if(strcasecmp(strValue.c_str(), "arrow") == 0){
+										it.shootType = SHOOT_ARROW;
+									}
+									else if(strcasecmp(strValue.c_str(), "fire") == 0){
+										it.shootType = SHOOT_FIRE;
+									}
+									else if(strcasecmp(strValue.c_str(), "energy") == 0){
+										it.shootType = SHOOT_ENERGY;
+									}
+									else if(strcasecmp(strValue.c_str(), "poisonarrow") == 0){
+										it.shootType = SHOOT_POISONARROW;
+									}
+									else if(strcasecmp(strValue.c_str(), "burstarrow") == 0){
+										it.shootType = SHOOT_BURSTARROW;
+									}
+									else if(strcasecmp(strValue.c_str(), "throwingstar") == 0){
+										it.shootType = SHOOT_THROWINGSTAR;
+									}
+									else if(strcasecmp(strValue.c_str(), "throwingknife") == 0){
+										it.shootType = SHOOT_THROWINGKNIFE;
+									}
+									else if(strcasecmp(strValue.c_str(), "smallstone") == 0){
+										it.shootType = SHOOT_SMALLSTONE;
+									}
+									else if(strcasecmp(strValue.c_str(), "suddendeath") == 0){
+										it.shootType = SHOOT_SUDDENDEATH;
+									}
+									else if(strcasecmp(strValue.c_str(), "largerock") == 0){
+										it.shootType = SHOOT_LARGEROCK;
+									}
+									else if(strcasecmp(strValue.c_str(), "snowball") == 0){
+										it.shootType = SHOOT_SNOWBALL;
+									}
+									else if(strcasecmp(strValue.c_str(), "powerbolt") == 0){
+										it.shootType = SHOOT_POWERBOLT;
+									}
+									else if(strcasecmp(strValue.c_str(), "poison") == 0){
+										it.shootType = SHOOT_POISONFIELD;
+									}
+									else if(strcasecmp(strValue.c_str(), "infernalbolt") == 0){
+										it.shootType = SHOOT_INFERNALBOLT;
+									}
+									else{
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown shootType " << strValue  << std::endl;
+									}
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "stopduration") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.stopTime = (intValue != 0);
 								}
 							}
-							if(strcasecmp(strValue.c_str(), "decayTo") == 0){
+							else if(strcasecmp(strValue.c_str(), "decayTo") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.decayTo = intValue;
 								}
@@ -871,36 +1039,11 @@ bool Items::loadFromXml(const std::string& datadir)
 										}
 									}
 								}
-
-								/*
-								if(readXMLString(itemAttributesNode, "damageType", strValue)){
-									if(strcasecmp(strValue.c_str(), "fire") == 0){
-										it.combatType = COMBAT_FIREDAMAGE;
-									}
-									else if(strcasecmp(strValue.c_str(), "energy") == 0){
-										it.combatType = COMBAT_ENERGYDAMAGE;
-									}
-									else if(strcasecmp(strValue.c_str(), "poison") == 0){
-										it.combatType = COMBAT_POISONDAMAGE;
-									}
+							}
+							else if(strcasecmp(strValue.c_str(), "replaceable") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.replaceable = (intValue != 0);
 								}
-
-								if(readXMLInteger(itemAttributesNode, "initDamage", intValue)){
-									it.initialDamage = -intValue;
-								}
-
-								if(readXMLInteger(itemAttributesNode, "roundMin", intValue)){
-									it.roundMin = intValue;
-								}
-
-								if(readXMLInteger(itemAttributesNode, "roundTime", intValue)){
-									it.roundTime = intValue;
-								}
-
-								if(readXMLInteger(itemAttributesNode, "roundDamage", intValue)){
-									it.roundDamage = -intValue;
-								}
-								*/
 							}
 						}
 

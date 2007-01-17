@@ -739,21 +739,25 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 		case CONDITIONPARAM_MAXVALUE:
 		{
 			maxDamage = std::abs(value);
+			break;
 		}
 
 		case CONDITIONPARAM_MINVALUE:
 		{
 			minDamage = std::abs(value);
+			break;
 		}
 
 		case CONDITIONPARAM_STARTVALUE:
 		{
 			startDamage = std::abs(value);
+			break;
 		}
 
 		default:
 		{
 			return false;
+			break;
 		}
 	}
 
