@@ -138,9 +138,10 @@ public:
 	bool isDoor() const {return (group == ITEM_GROUP_DOOR);}
 	bool isTeleport() const {return (group == ITEM_GROUP_TELEPORT);}
 	bool isMagicField() const {return (group == ITEM_GROUP_MAGICFIELD);}
-	bool isKey() const {return (group == ITEM_GROUP_KEY);}
 	bool isSplash() const {return (group == ITEM_GROUP_SPLASH);}
 	bool isFluidContainer() const {return (group == ITEM_GROUP_FLUID);}
+
+	bool isKey() const {return (group == ITEM_GROUP_KEY);}
 	bool isRune() const {return (group == ITEM_GROUP_RUNE);}
 
 	uint16_t id;
@@ -243,9 +244,9 @@ public:
 
 	int getItemIdByName(const std::string& name);
 	
-	static long dwMajorVersion;
-	static long dwMinorVersion;
-	static long dwBuildNumber;
+	static uint32_t dwMajorVersion;
+	static uint32_t dwMinorVersion;
+	static uint32_t dwBuildNumber;
 
 	bool loadFromXml(const std::string& datadir);
 	

@@ -242,7 +242,7 @@ public:
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 	bool isBlocking() const {return items[id].blockSolid;}
 	bool isStackable() const {return items[id].stackable;}
-	bool isRune() const {return (items[id].group == ITEM_GROUP_RUNE);}
+	bool isRune() const {return items[id].isRune();}
 	bool isFluidContainer() const {return (items[id].isFluidContainer());}
 	bool isAlwaysOnTop() const {return items[id].alwaysOnTop;}
 	bool isGroundTile() const {return items[id].isGroundTile();}

@@ -193,7 +193,7 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 		}
 		
 		//find a free private channel slot
-		for(uint32_t i = 100; i < 10000; ++i){
+		for(uint16_t i = 100; i < 10000; ++i){
 			if(m_privateChannels.find(i) == m_privateChannels.end()){
 				PrivateChatChannel* newChannel = new PrivateChatChannel(i, player->getName() + "'s Channel");
 				if(!newChannel)

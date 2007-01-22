@@ -29,9 +29,9 @@
 #include <iostream>
 #include <string>
 
-long Items::dwMajorVersion = 0;
-long Items::dwMinorVersion = 0;
-long Items::dwBuildNumber = 0;
+uint32_t Items::dwMajorVersion = 0;
+uint32_t Items::dwMinorVersion = 0;
+uint32_t Items::dwBuildNumber = 0;
 
 extern Spells* g_spells;
 
@@ -135,68 +135,9 @@ bool Items::reload()
 	return false;
 }
 
-inline ShootType_t translateOTBShootType(ShootTypeOtb_t sf)
-{
-	switch(sf){
-	case OTB_SHOOT_NONE:
-		return SHOOT_NONE;
-		break;
-	case OTB_SHOOT_BOLT:
-		return SHOOT_BOLT;
-		break;
-	case OTB_SHOOT_ARROW:
-		return SHOOT_ARROW;
-		break;
-	case OTB_SHOOT_FIRE:
-		return SHOOT_FIRE;
-		break;
-	case OTB_SHOOT_ENERGY:
-		return SHOOT_ENERGY;
-		break;
-	case OTB_SHOOT_POISONARROW:
-		return SHOOT_POISONARROW;
-		break;
-	case OTB_SHOOT_BURSTARROW:
-		return SHOOT_BURSTARROW;
-		break;
-	case OTB_SHOOT_THROWINGSTAR:
-		return SHOOT_THROWINGSTAR;
-		break;
-	case OTB_SHOOT_THROWINGKNIFE:
-		return SHOOT_THROWINGKNIFE;
-		break;
-	case OTB_SHOOT_SMALLSTONE:
-		return SHOOT_SMALLSTONE;
-		break;
-	case OTB_SHOOT_SUDDENDEATH:
-		return SHOOT_SUDDENDEATH;
-		break;
-	case OTB_SHOOT_LARGEROCK:
-		return SHOOT_LARGEROCK;
-		break;
-	case OTB_SHOOT_SNOWBALL:
-		return SHOOT_SNOWBALL;
-		break;
-	case OTB_SHOOT_POWERBOLT:
-		return SHOOT_POWERBOLT;
-		break;
-	case OTB_SHOOT_SPEAR:
-		return SHOOT_SPEAR;
-		break;
-	case OTB_SHOOT_POISONFIELD:
-		return SHOOT_POISONFIELD;
-		break;
-	case OTB_SHOOT_INFERNALBOLT:
-		return SHOOT_INFERNALBOLT;
-		break;
-	}
-
-	return SHOOT_NONE;
-}
-
 int Items::loadFromOtb(std::string file)
 {
-	ItemLoader f;
+	FileLoader f;
 	if(!f.openFile(file.c_str(), false, true)){
 		return f.getError();
 	}
@@ -235,12 +176,15 @@ int Items::loadFromOtb(std::string file)
 		}
 	}
 	
-	if(Items::dwMajorVersion != 1){
+	if(Items::dwMajorVersion != 2){
 		std::cout << "Not supported items.otb version." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
 	
-	if(Items::dwMinorVersion != CLIENT_VERSION_792){
+	if(Items::dwMajorVersion == 0xFFFFFFFF){
+		std::cout << "[Warning] Items::loadFromOtb items.otb using generic client version." << std::endl;
+	}
+	else if(Items::dwMinorVersion != CLIENT_VERSION_792){
 		std::cout << "Not supported items.otb client version." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -261,14 +205,8 @@ int Items::loadFromOtb(std::string file)
 		case ITEM_GROUP_NONE:
 		case ITEM_GROUP_GROUND:
 		case ITEM_GROUP_CONTAINER:
-		case ITEM_GROUP_WEAPON:
-		case ITEM_GROUP_AMMUNITION:
-		case ITEM_GROUP_ARMOR:
-		case ITEM_GROUP_RUNE:
 		case ITEM_GROUP_TELEPORT:
 		case ITEM_GROUP_MAGICFIELD:
-		case ITEM_GROUP_WRITEABLE:
-		case ITEM_GROUP_KEY:
 		case ITEM_GROUP_SPLASH:
 		case ITEM_GROUP_FLUID:
 		case ITEM_GROUP_DOOR:
@@ -297,20 +235,15 @@ int Items::loadFromOtb(std::string file)
 		iType->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 		iType->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 		iType->alwaysOnTop = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
-		//iType->canDecay = !((flags & FLAG_CANNOTDECAY) == FLAG_CANNOTDECAY);
 		iType->isVertical = ((flags & FLAG_VERTICAL) == FLAG_VERTICAL);
 		iType->isHorizontal = ((flags & FLAG_HORIZONTAL) == FLAG_HORIZONTAL);
 		iType->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 		iType->allowDistRead = ((flags & FLAG_ALLOWDISTREAD) == FLAG_ALLOWDISTREAD);
-
-		if(type == ITEM_GROUP_WRITEABLE) {
-			iType->RWInfo |= CAN_BE_WRITTEN;
-		}
+		iType->rotable = ((flags & FLAG_ROTABLE) == FLAG_ROTABLE);
 
 		if((flags & FLAG_READABLE) == FLAG_READABLE)
 			iType->RWInfo |= CAN_BE_READ;
 
-		iType->rotable = ((flags & FLAG_ROTABLE) == FLAG_ROTABLE);
 		
 		attribute_t attrib;
 		datasize_t datalen = 0;
@@ -330,8 +263,8 @@ int Items::loadFromOtb(std::string file)
 				if(!props.GET_USHORT(serverid))
 					return ERROR_INVALID_FORMAT;
 				
-				if(serverid > 20000 && serverid < 20100)
-					serverid = serverid - 20000;
+				if(serverid > 20000)
+					return ERROR_INVALID_FORMAT;
 						
 				iType->id = serverid;
 				break;
@@ -347,29 +280,7 @@ int Items::loadFromOtb(std::string file)
 				
 				iType->clientId = clientid;
 				break;
-			}		
-			case ITEM_ATTR_NAME:
-			{
-				uint8_t name[128];
-				if(datalen >= sizeof(name))
-					return ERROR_INVALID_FORMAT;
-
-				if(!props.GET_NSTRING(datalen, iType->name))
-					return ERROR_INVALID_FORMAT;
-				
-				break;
-			}	
-			case ITEM_ATTR_DESCR:
-			{
-				uint8_t descr[128];
-				if(datalen >= sizeof(descr))
-					return ERROR_INVALID_FORMAT;
-	
-				if(!props.GET_NSTRING(datalen, iType->description))
-					return ERROR_INVALID_FORMAT;
-
-				break;
-			}	
+			}
 			case ITEM_ATTR_SPEED:
 			{
 				if(datalen != sizeof(uint16_t))
@@ -382,180 +293,7 @@ int Items::loadFromOtb(std::string file)
 				iType->speed = speed;
 
 				break;
-			}					
-			case ITEM_ATTR_SLOT:
-			{
-				if(datalen != sizeof(uint16_t))
-					return ERROR_INVALID_FORMAT;
-				
-				uint16_t otb_slot;
-				
-				if(!props.GET_USHORT(otb_slot))
-					return ERROR_INVALID_FORMAT;
-				
-				switch(otb_slot){
-					case OTB_SLOT_HEAD:
-						iType->slot_position |= SLOTP_HEAD;
-						break;
-					case OTB_SLOT_BODY:
-						iType->slot_position |= SLOTP_ARMOR;
-						break;
-					case OTB_SLOT_LEGS:
-						iType->slot_position |= SLOTP_LEGS;
-						break;
-					case OTB_SLOT_BACKPACK:
-						iType->slot_position |= SLOTP_BACKPACK;
-						break;
-					case OTB_SLOT_2HAND:
-						iType->slot_position |= SLOTP_TWO_HAND;
-						break;
-					case OTB_SLOT_FEET:
-						iType->slot_position |= SLOTP_FEET;
-						break;
-					case OTB_SLOT_AMULET:
-						iType->slot_position |= SLOTP_NECKLACE;
-						break;
-					case OTB_SLOT_RING:
-						iType->slot_position |= SLOTP_RING;
-						break;
-					}
-				break;
-			}	
-			case ITEM_ATTR_MAXITEMS:
-			{
-				if(datalen != sizeof(uint16_t))
-					return ERROR_INVALID_FORMAT;
-				
-				uint16_t maxItems;
-				if(!props.GET_USHORT(maxItems))
-					return ERROR_INVALID_FORMAT;
-
-				iType->maxItems = maxItems;
-
-				break;
-			}		
-			case ITEM_ATTR_WEIGHT:
-			{
-				if(datalen != sizeof(double))
-					return ERROR_INVALID_FORMAT;
-
-				if(!props.GET_VALUE(iType->weight))
-					return ERROR_INVALID_FORMAT;
-
-				break;
 			}
-			case ITEM_ATTR_MAGLEVEL:
-			{
-				if(datalen != sizeof(uint16_t))
-					return ERROR_INVALID_FORMAT;
-					
-				uint16_t maglev;
-				if(!props.GET_USHORT(maglev))
-					return ERROR_INVALID_FORMAT;
-				
-				iType->runeMagLevel = maglev;
-				break;
-			}
-			case ITEM_ATTR_MAGFIELDTYPE:
-			{
-				if(datalen != sizeof(uint8_t))
-					return ERROR_INVALID_FORMAT;
-				
-				unsigned char fieldtype;
-				if(!props.GET_UCHAR(fieldtype))
-					return ERROR_INVALID_FORMAT;
-
-				iType->magicfieldtype = fieldtype;
-				break;
-			}	
-			case ITEM_ATTR_ROTATETO:
-			{
-				if(datalen != sizeof(uint16_t))
-					return ERROR_INVALID_FORMAT;
-				
-				uint16_t rotate;
-				if(!props.GET_USHORT(rotate))
-					return ERROR_INVALID_FORMAT;
-				
-				iType->rotateTo = rotate;
-				break;
-			}	
-			case ITEM_ATTR_DECAY2:
-			{
-				if(datalen != sizeof(decayBlock2))
-					return ERROR_INVALID_FORMAT;
-
-				decayBlock2* db2;
-				if(!props.GET_STRUCT(db2))
-					return ERROR_INVALID_FORMAT;
-				
-				if(db2->decayTime > 0){
-					iType->decayTime = db2->decayTime;
-					iType->decayTo = db2->decayTo;
-				}
-				break;
-			}	
-			case ITEM_ATTR_WEAPON2:
-			{
-				if(datalen != sizeof(weaponBlock2))
-					return ERROR_INVALID_FORMAT;
-
-				weaponBlock2* wb2;
-				if(!props.GET_STRUCT(wb2))
-					return ERROR_INVALID_FORMAT;
-				
-				iType->weaponType = (WeaponType_t)wb2->weaponType;
-				iType->shootType = translateOTBShootType((ShootTypeOtb_t)wb2->shootType);
-				iType->amuType = (Ammo_t)wb2->amuType;
-				iType->attack = wb2->attack;
-				iType->defence = wb2->defence;
-				break;
-			}
-			case ITEM_ATTR_AMU2:
-			{
-				if(datalen != sizeof(amuBlock2))
-					return ERROR_INVALID_FORMAT;
-
-				amuBlock2* ab2;
-				if(!props.GET_STRUCT(ab2))
-					return ERROR_INVALID_FORMAT;
-					
-				iType->weaponType = WEAPON_AMMO;
-				iType->shootType = translateOTBShootType((ShootTypeOtb_t)ab2->shootType);
-				iType->amuType = (Ammo_t)ab2->amuType;
-				iType->attack = ab2->attack;
-				break;
-			}
-			case ITEM_ATTR_ARMOR2:
-			{
-				if(datalen != sizeof(armorBlock2))
-					return ERROR_INVALID_FORMAT;
-
-				armorBlock2* ab2;
-				if(!props.GET_STRUCT(ab2))
-					return ERROR_INVALID_FORMAT;
-				
-				iType->armor = ab2->armor;
-				iType->weight = ab2->weight;
-				//ignore this value
-				//iType->slot_position = (slots_t)ab2.slot_position;
-
-				break;
-			}
-			case ITEM_ATTR_WRITEABLE3:
-			{
-				if(datalen != sizeof(writeableBlock3))
-					return ERROR_INVALID_FORMAT;
-
-				writeableBlock3* wb3;
-				if(!props.GET_STRUCT(wb3))
-					return ERROR_INVALID_FORMAT;
-					
-				iType->readOnlyId = wb3->readOnlyId;
-				iType->maxTextLen = wb3->maxTextLen;
-
-				break;
-			}	
 			case ITEM_ATTR_LIGHT2:
 			{
 				if(datalen != sizeof(lightBlock2))
@@ -621,13 +359,41 @@ bool Items::loadFromXml(const std::string& datadir)
 				if(readXMLInteger(itemNode, "id", intValue)){
 					id = intValue;
 
+					if(id > 20000 && id < 20100){
+						id = id - 20000;
+
+						ItemType* iType = new ItemType();
+						iType->id = id;
+						items.addElement(iType, iType->id);
+					}
+
 					ItemType& it = Item::items.getItemType(id);
+
+					if(readXMLString(itemNode, "name", strValue)){
+						it.name = strValue;
+					}
 
 					xmlNodePtr itemAttributesNode = itemNode->children;
 
 					while(itemAttributesNode){
 						if(readXMLString(itemAttributesNode, "key", strValue)){
-							if(strcasecmp(strValue.c_str(), "name") == 0){
+							if(strcasecmp(strValue.c_str(), "type") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(strcasecmp(strValue.c_str(), "key") == 0){
+										it.group = ITEM_GROUP_KEY;
+									}
+									else if(strcasecmp(strValue.c_str(), "rune") == 0){
+										it.group = ITEM_GROUP_RUNE;
+									}
+									else if(strcasecmp(strValue.c_str(), "magicfield") == 0){
+										it.group = ITEM_GROUP_MAGICFIELD;
+									}
+									else{
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown type " << strValue  << std::endl;
+									}
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "name") == 0){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.name = strValue;
 								}
@@ -667,12 +433,12 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.maxItems = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "textMaxLen") == 0){
+							else if(strcasecmp(strValue.c_str(), "maxTextLen") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.maxTextLen = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "textReadOnlyId") == 0){
+							else if(strcasecmp(strValue.c_str(), "readOnceItemId") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.readOnlyId = intValue;
 								}
@@ -697,7 +463,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(strcasecmp(strValue.c_str(), "wand") == 0){
 										it.weaponType = WEAPON_WAND;
 									}
-									else if(strcasecmp(strValue.c_str(), "ammo") == 0){
+									else if(strcasecmp(strValue.c_str(), "ammunition") == 0){
 										it.weaponType = WEAPON_AMMO;
 									}
 									else{
@@ -710,29 +476,26 @@ bool Items::loadFromXml(const std::string& datadir)
 									if(strcasecmp(strValue.c_str(), "head") == 0){
 										it.slot_position |= SLOTP_HEAD;
 									}
-									else if(strcasecmp(strValue.c_str(), "head") == 0){
-										it.slot_position |= SLOTP_HEAD;
-									}
 									else if(strcasecmp(strValue.c_str(), "body") == 0){
-										it.slot_position |= OTB_SLOT_BODY;
+										it.slot_position |= SLOTP_ARMOR;
 									}
 									else if(strcasecmp(strValue.c_str(), "legs") == 0){
-										it.slot_position |= OTB_SLOT_LEGS;
-									}
-									else if(strcasecmp(strValue.c_str(), "backpack") == 0){
-										it.slot_position |= OTB_SLOT_BACKPACK;
-									}
-									else if(strcasecmp(strValue.c_str(), "two-handed") == 0){
-										it.slot_position |= OTB_SLOT_2HAND;
+										it.slot_position |= SLOTP_LEGS;
 									}
 									else if(strcasecmp(strValue.c_str(), "feet") == 0){
-										it.slot_position |= OTB_SLOT_FEET;
+										it.slot_position |= SLOTP_FEET;
+									}
+									else if(strcasecmp(strValue.c_str(), "backpack") == 0){
+										it.slot_position |= SLOTP_BACKPACK;
+									}
+									else if(strcasecmp(strValue.c_str(), "two-handed") == 0){
+										it.slot_position |= SLOTP_TWO_HAND;
 									}
 									else if(strcasecmp(strValue.c_str(), "necklace") == 0){
-										it.slot_position |= OTB_SLOT_AMULET;
+										it.slot_position |= SLOTP_NECKLACE;
 									}
 									else if(strcasecmp(strValue.c_str(), "ring") == 0){
-										it.slot_position |= OTB_SLOT_RING;
+										it.slot_position |= SLOTP_RING;
 									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown slotType " << strValue  << std::endl;
