@@ -5263,227 +5263,171 @@
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2261" name="adito grav">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2262" name="adevo mas vis">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2263" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2264" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2265" name="adura gran">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2266" name="adana pox">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2267" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2268" name="adori vita vis">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2269" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2270" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2271" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2272" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2273" name="adura vita">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2274" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2275" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2276" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2277" name="adevo grav vis">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2278" name="adana ani">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2279" name="adevo mas grav vis">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2280" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2281" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2282" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2283" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2284" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2285" name="adevo grav pox">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2286" name="adevo mas pox">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2287" name="adori">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2288" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2289" name="adevo mas grav pox">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2290" name="adeta sio">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2291" name="adevo ina">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2292" name="adevo res pox">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2293" name="adevo grav tera">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2294" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2295" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2296" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2297" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2298" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2299" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2300" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2301" name="adevo grav flam">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2302" name="adori flam">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2303" name="adevo mas grav flam">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2304" name="adori gran flam">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2305" name="adevo mas flam">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2306" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2307" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2308" name="adevo res flam">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2309" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2310" name="adito tera">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="5000000"/>
 </item>
 <item id="2311" name="adori gran">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2312" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2313" name="adevo mas hur">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2314" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2315" name="rune">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2316" name="adana mort">
-	<attribute key="type" value="rune"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2317" name="dead human">
@@ -6781,15 +6725,19 @@
 	<attribute key="rotateTo" value="2585"/>
 </item>
 <item id="2589" name="locker">
+	<attribute key="type" value="depot"/>
 	<attribute key="containerSize" value="30"/>
 </item>
 <item id="2590" name="locker">
+	<attribute key="type" value="depot"/>
 	<attribute key="containerSize" value="30"/>
 </item>
 <item id="2591" name="locker">
+	<attribute key="type" value="depot"/>
 	<attribute key="containerSize" value="30"/>
 </item>
 <item id="2592" name="locker">
+	<attribute key="type" value="depot"/>
 	<attribute key="containerSize" value="30"/>
 </item>
 <item id="2593" name="mailbox">
@@ -7608,6 +7556,8 @@
 	<attribute key="duration" value="60"/>
 </item>
 <item id="2852" name="bear skeleton">
+	<attribute key="decayTo" value="0"/>
+	<attribute key="duration" value="60"/>
 </item>
 <item id="2853" name="dead ghoul">
 	<attribute key="weight" value="60200"/>
@@ -7789,6 +7739,8 @@
 	<attribute key="duration" value="60"/>
 </item>
 <item id="2892" name="lion skeleton">
+	<attribute key="decayTo" value="0"/>
+	<attribute key="duration" value="180"/>
 </item>
 <item id="2893" name="dead polar bear">
 	<attribute key="containerSize" value="8"/>
@@ -7804,6 +7756,8 @@
 	<attribute key="duration" value="60"/>
 </item>
 <item id="2896" name="bear skeleton">
+	<attribute key="decayTo" value="0"/>
+	<attribute key="duration" value="180"/>
 </item>
 <item id="2897" name="dead scorpion">
 	<attribute key="weight" value="1000"/>

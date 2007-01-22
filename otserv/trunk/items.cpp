@@ -382,11 +382,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									if(strcasecmp(strValue.c_str(), "key") == 0){
 										it.group = ITEM_GROUP_KEY;
 									}
-									else if(strcasecmp(strValue.c_str(), "rune") == 0){
-										it.group = ITEM_GROUP_RUNE;
-									}
 									else if(strcasecmp(strValue.c_str(), "magicfield") == 0){
 										it.group = ITEM_GROUP_MAGICFIELD;
+									}
+									else if(strcasecmp(strValue.c_str(), "depot") == 0){
+										//it.group = ITEM_GROUP_DEPOT;
 									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown type " << strValue  << std::endl;
