@@ -205,6 +205,7 @@ int Items::loadFromOtb(std::string file)
 		case ITEM_GROUP_NONE:
 		case ITEM_GROUP_GROUND:
 		case ITEM_GROUP_CONTAINER:
+		case ITEM_GROUP_RUNE:
 		case ITEM_GROUP_TELEPORT:
 		case ITEM_GROUP_MAGICFIELD:
 		case ITEM_GROUP_SPLASH:

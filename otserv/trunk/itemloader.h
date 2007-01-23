@@ -209,13 +209,4 @@ struct writeableBlock3{
 
 #pragma pack()
 /////////OTB specific//////////////
-
-class ItemLoader : public FileLoader {
-public:
-	ItemLoader();
-	virtual ~ItemLoader();
-	int setFlags(flags_t flags);
-	int setProps(attribute_t attr, void* data, datasize_t size);
-};
-
 #endif
