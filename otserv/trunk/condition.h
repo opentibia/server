@@ -49,7 +49,8 @@ enum ConditionType_t {
 	CONDITION_DRUNK					= 2048,
 	CONDITION_EXHAUSTED			= 4096,
 	CONDITION_REGENERATION	= 8192,
-	CONDITION_SOUL          = 16384
+	CONDITION_SOUL          = 16384,
+	CONDITION_DROWN         = 32768
 };
 
 enum ConditionEnd_t{

@@ -38,7 +38,8 @@ enum CombatType_t {
 	COMBAT_UNDEFINEDDAMAGE	= 16,
 	COMBAT_LIFEDRAIN				= 32,
 	COMBAT_MANADRAIN				= 64,
-	COMBAT_HEALING					= 128
+	COMBAT_HEALING					= 128,
+	COMBAT_DROWNDAMAGE      = 256
 };
 
 enum CombatParam_t{

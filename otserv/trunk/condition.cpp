@@ -188,6 +188,7 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_POISON:
 		case CONDITION_FIRE:
 		case CONDITION_ENERGY:
+		case CONDITION_DROWN:
 		{
 			return new ConditionDamage(_id, _type);
 			break;
@@ -1029,6 +1030,10 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 			combatType = COMBAT_ENERGYDAMAGE;
 			break;
 
+		case CONDITION_DROWN:
+			combatType = COMBAT_DROWNDAMAGE;
+			break;
+
 		case CONDITION_POISON:
 			combatType = COMBAT_POISONDAMAGE;
 			break;
@@ -1101,6 +1106,10 @@ uint32_t ConditionDamage::getIcons() const
 
 		case CONDITION_ENERGY:
 			return ICON_ENERGY;
+			break;
+
+		case CONDITION_DROWN:
+			return ICON_DROWNING;
 			break;
 
 		case CONDITION_POISON:

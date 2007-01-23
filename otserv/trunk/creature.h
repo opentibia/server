@@ -181,6 +181,7 @@ public:
 	virtual int32_t getDefense() const {return 0;}
 
 	bool addCondition(Condition* condition);
+	bool addCombatCondition(Condition* condition);
 	void removeCondition(ConditionType_t type, ConditionId_t id);
 	void removeCondition(ConditionType_t type);
 	void removeCondition(Condition* condition);
@@ -212,6 +213,7 @@ public:
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);
+	virtual void onAddCombatCondition(ConditionType_t type);
 	virtual void onEndCondition(ConditionType_t type);
 	virtual void onTickCondition(ConditionType_t type, bool& bRemove);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);

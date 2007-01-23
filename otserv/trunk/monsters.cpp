@@ -513,8 +513,11 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 	else if(name == "energyfield"){
 		combat->setParam(COMBATPARAM_CREATEITEM, 1495);
 	}
-	else if(name == "firecondition" || name == "poisoncondition" || name == "energycondition"){
-		ConditionType_t conditionType;
+	else if(name == "firecondition" ||
+			name == "poisoncondition" ||
+			name == "energycondition" ||
+			name == "drowncondition"){
+		ConditionType_t conditionType = CONDITION_NONE;
 
 		if(name == "firecondition"){
 			conditionType = CONDITION_FIRE;
@@ -522,8 +525,11 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		else if(name == "poisoncondition"){
 			conditionType = CONDITION_POISON;
 		}
-		else{
+		else if(name == "energycondition"){
 			conditionType = CONDITION_ENERGY;
+		}
+		else if(name == "drowncondition"){
+			conditionType = CONDITION_DROWN;
 		}
 
 		int32_t minDamage = std::abs(sb.minCombatValue);
@@ -963,6 +969,10 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 								mType->damageImmunities |= COMBAT_POISONDAMAGE;
 								mType->conditionImmunities |= CONDITION_POISON;
 							}
+							else if(strcasecmp(strValue.c_str(), "drown") == 0){
+								mType->damageImmunities |= COMBAT_DROWNDAMAGE;
+								mType->conditionImmunities |= CONDITION_DROWN;
+							}
 							else if(strcasecmp(strValue.c_str(), "lifedrain") == 0){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
@@ -980,6 +990,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 								mType->conditionImmunities |= CONDITION_INVISIBLE;
 							}
 						}
+						//old immunities code
 						else if(readXMLInteger(tmpNode, "physical", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities |= COMBAT_PHYSICALDAMAGE;

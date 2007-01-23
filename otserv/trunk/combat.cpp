@@ -395,7 +395,7 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 			}
 
 			//TODO: infight condition until all aggressive conditions has ended
-			result = target->addCondition(conditionCopy);
+			result = target->addCombatCondition(conditionCopy);
 		}
 	}
 
@@ -461,6 +461,7 @@ ConditionType_t Combat::CombatTypeToCondition(CombatType_t type)
 		case COMBAT_POISONDAMAGE: return CONDITION_POISON; break;
 		case COMBAT_FIREDAMAGE: return CONDITION_FIRE; break;
 		case COMBAT_HEALING: return CONDITION_REGENERATION; break;
+		case COMBAT_DROWNDAMAGE: return CONDITION_DROWN; break;
 
 		default:
 			return CONDITION_NONE;
@@ -1193,7 +1194,7 @@ void MagicField::onStepInField(Creature* creature)
 				conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);
 			}
 
-			creature->addCondition(conditionCopy);
+			creature->addCombatCondition(conditionCopy);
 		}
 	}
 }

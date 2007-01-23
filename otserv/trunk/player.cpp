@@ -2618,10 +2618,25 @@ void Player::onAddCondition(ConditionType_t type)
 	sendIcons();
 }
 
+void Player::onAddCombatCondition(ConditionType_t type)
+{
+	if(type == CONDITION_POISON){
+		sendTextMessage(MSG_STATUS_DEFAULT, "You are poisoned.");
+	}
+	else if(type == CONDITION_DROWN){
+		sendTextMessage(MSG_STATUS_DEFAULT, "You are drowning.");
+	}
+	else if(type == CONDITION_PARALYZE){
+		sendTextMessage(MSG_STATUS_DEFAULT, "You are paralyzed.");
+	}
+	else if(type == CONDITION_DRUNK){
+		sendTextMessage(MSG_STATUS_DEFAULT, "You are drunk.");
+	}
+}
+
 void Player::onEndCondition(ConditionType_t type)
 {
 	Creature::onEndCondition(type);
-
 	sendIcons();
 
 	if(type == CONDITION_INFIGHT){

@@ -256,6 +256,7 @@ public:
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);
+	virtual void onAddCombatCondition(ConditionType_t type);
 	virtual void onEndCondition(ConditionType_t type);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onAttackedCreature(Creature* target);

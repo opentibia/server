@@ -669,6 +669,11 @@ void Creature::onAddCondition(ConditionType_t type)
 	}
 }
 
+void Creature::onAddCombatCondition(ConditionType_t type)
+{
+	//
+}
+
 void Creature::onEndCondition(ConditionType_t type)
 {
 	//
@@ -681,6 +686,7 @@ void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
 			case CONDITION_FIRE: bRemove = (field->getCombatType() != COMBAT_FIREDAMAGE); break;
 			case CONDITION_ENERGY: bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE); break;
 			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_POISONDAMAGE); break;
+			case CONDITION_DROWN: bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE); break;
 			default: 
 				break;
 		}
@@ -789,6 +795,12 @@ bool Creature::addCondition(Condition* condition)
 
 	delete condition;
 	return false;
+}
+
+bool Creature::addCombatCondition(Condition* condition)
+{
+	onAddCombatCondition(condition->getType());
+	return addCondition(condition);
 }
 
 void Creature::removeCondition(ConditionType_t type)

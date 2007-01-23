@@ -202,19 +202,19 @@ int Items::loadFromOtb(std::string file)
 		iType->group = (itemgroup_t)type;
 
 		switch(type){
-		case ITEM_GROUP_NONE:
-		case ITEM_GROUP_GROUND:
-		case ITEM_GROUP_CONTAINER:
-		case ITEM_GROUP_RUNE:
-		case ITEM_GROUP_TELEPORT:
-		case ITEM_GROUP_MAGICFIELD:
-		case ITEM_GROUP_SPLASH:
-		case ITEM_GROUP_FLUID:
-		case ITEM_GROUP_DOOR:
-			break;
-		default:
-			return ERROR_INVALID_FORMAT;
-			break;
+			case ITEM_GROUP_NONE:
+			case ITEM_GROUP_GROUND:
+			case ITEM_GROUP_CONTAINER:
+			case ITEM_GROUP_TELEPORT:
+			case ITEM_GROUP_MAGICFIELD:
+			case ITEM_GROUP_RUNE:
+			case ITEM_GROUP_SPLASH:
+			case ITEM_GROUP_FLUID:
+			case ITEM_GROUP_DOOR:
+				break;
+			default:
+				return ERROR_INVALID_FORMAT;
+				break;
 		}
 
 		//read 4 byte flags
