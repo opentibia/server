@@ -150,7 +150,7 @@ public:
 	std::string    name;
 	std::string    description;
 	unsigned short maxItems;
-	double         weight;
+	float          weight;
 	WeaponType_t   weaponType;
 	Ammo_t         amuType;
 	ShootType_t    shootType;

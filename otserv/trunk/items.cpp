@@ -205,9 +205,9 @@ int Items::loadFromOtb(std::string file)
 			case ITEM_GROUP_NONE:
 			case ITEM_GROUP_GROUND:
 			case ITEM_GROUP_CONTAINER:
+			case ITEM_GROUP_RUNE:
 			case ITEM_GROUP_TELEPORT:
 			case ITEM_GROUP_MAGICFIELD:
-			case ITEM_GROUP_RUNE:
 			case ITEM_GROUP_SPLASH:
 			case ITEM_GROUP_FLUID:
 			case ITEM_GROUP_DOOR:
@@ -406,7 +406,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(strcasecmp(strValue.c_str(), "weight") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.weight = intValue / 100;
+									it.weight = intValue / 100.f;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "armor") == 0){
