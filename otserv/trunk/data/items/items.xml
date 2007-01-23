@@ -569,8 +569,6 @@
 <item id="382" name="stone wall">
 </item>
 <item id="383" name="hole">
-	<attribute key="decayTo" value="1335"/>
-	<attribute key="duration" value="60"/>
 </item>
 <item id="384" name="dirt">
 </item>
@@ -2988,7 +2986,7 @@
 </item>
 <item id="1500" name="fire field">
 	<attribute key="type" value="magicfield"/>
-	<attribute key="decayTo" value="1500"/>
+	<attribute key="decayTo" value="1501"/>
 	<attribute key="duration" value="10"/>
 	<attribute key="field" value="fire">
 		<attribute key="damage" value="25"/>
@@ -3068,8 +3066,7 @@
 </item>
 <item id="1505" name="smoke">
 	<attribute key="type" value="magicfield"/>
-	<attribute key="decayTo" value="0"/>
-	<attribute key="duration" value="20"/>
+	<attribute key="replaceable" value="0"/>
 	<attribute key="field" value="smoke"/>
 </item>
 <item id="1506" name="searing fire">
