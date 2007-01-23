@@ -1165,7 +1165,7 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 
 MagicField::MagicField(uint16_t _type) : Item(_type)
 {
-	//
+	createTime = OTSYS_TIME();
 }
 
 MagicField::~MagicField()
@@ -1191,7 +1191,9 @@ void MagicField::onStepInField(Creature* creature)
 			Condition* conditionCopy = it.condition->clone();
 			uint32_t owner = getOwner();
 			if(owner != 0){
-				conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);
+				if((OTSYS_TIME() - createTime <= 5000) || creature->hasBeenAttacked(owner)){
+					conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);
+				}
 			}
 
 			creature->addCombatCondition(conditionCopy);

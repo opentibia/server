@@ -716,6 +716,7 @@ Condition(_id, _type, 0)
 	minDamage = 0;
 	maxDamage = 0;
 	startDamage = 0;
+	tickInterval = 2000;
 }
 
 bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
@@ -752,6 +753,12 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 		case CONDITIONPARAM_STARTVALUE:
 		{
 			startDamage = std::abs(value);
+			break;
+		}
+
+		case CONDITIONPARAM_TICKINTERVAL:
+		{
+			tickInterval = std::abs(value);
 			break;
 		}
 
@@ -923,18 +930,21 @@ bool ConditionDamage::init()
 		setTicks(0);
 
 		int32_t amount = random_range(minDamage, maxDamage);
-		if(startDamage > maxDamage){
-			startDamage = maxDamage;
-		}
-		else if(startDamage == 0){
-			startDamage = std::max((int32_t)1, (int32_t)std::ceil(((float)amount / 20.0)));
-		}
 
-		std::list<int32_t> list;
-		ConditionDamage::generateDamageList(amount, startDamage, list);
+		if(amount != 0){
+			if(startDamage > maxDamage){
+				startDamage = maxDamage;
+			}
+			else if(startDamage == 0){
+				startDamage = std::max((int32_t)1, (int32_t)std::ceil(((float)amount / 20.0)));
+			}
 
-		for(std::list<int32_t>::iterator it = list.begin(); it != list.end(); ++it){
-			addDamage(1, 2000, -*it);
+			std::list<int32_t> list;
+			ConditionDamage::generateDamageList(amount, startDamage, list);
+
+			for(std::list<int32_t>::iterator it = list.begin(); it != list.end(); ++it){
+				addDamage(1, tickInterval, -*it);
+			}
 		}
 	}
 
@@ -1067,6 +1077,7 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 			maxDamage = conditionDamage.maxDamage;
 			minDamage = conditionDamage.minDamage;
 			startDamage = conditionDamage.startDamage;
+			tickInterval = conditionDamage.tickInterval;
 
 			damageList.clear();
 			damageList = conditionDamage.damageList;

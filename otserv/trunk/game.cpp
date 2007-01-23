@@ -2957,8 +2957,8 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 					case COMBAT_DROWNDAMAGE:
 					{
-						textColor = TEXTCOLOR_BLUE;
-						hitEffect = NM_ME_BUBBLES;
+						textColor = TEXTCOLOR_LIGHTBLUE;
+						hitEffect = NM_ME_LOSE_ENERGY;
 						break;
 					}
 

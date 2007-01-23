@@ -210,6 +210,7 @@ public:
 	virtual Item* getCorpse();
 	virtual int32_t getGainedExperience(Creature* attacker) const;
 	virtual bool addDamagePoints(Creature* attacker, int32_t damagePoints);
+	bool hasBeenAttacked(uint32_t attackerId);
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);

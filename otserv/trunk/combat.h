@@ -314,6 +314,9 @@ public:
 	bool isReplaceable() const {return Item::items[getID()].replaceable;}
 	CombatType_t getCombatType() const;
 	void onStepInField(Creature* creature);
+
+private:
+	uint64_t createTime;
 };
 
 #endif

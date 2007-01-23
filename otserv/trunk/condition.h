@@ -253,6 +253,7 @@ protected:
 	int32_t maxDamage;
 	int32_t minDamage;
 	int32_t startDamage;
+	int32_t tickInterval;
 
 	bool delayed;
 	uint32_t owner;

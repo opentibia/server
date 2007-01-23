@@ -782,6 +782,9 @@ bool Items::loadFromXml(const std::string& datadir)
 										it.combatType = combatType;
 										it.condition = conditionDamage;
 										uint32_t ticks = 0;
+										int32_t damage = 0;
+										int32_t start = 0;
+										int32_t count = 1;
 
 										xmlNodePtr fieldAttributesNode = itemAttributesNode->children;
 										while(fieldAttributesNode){
@@ -792,9 +795,46 @@ bool Items::loadFromXml(const std::string& datadir)
 													}
 												}
 
+												if(strcasecmp(strValue.c_str(), "count") == 0){
+													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
+														if(intValue > 0){
+															count = intValue;
+														}
+														else{
+															count = 1;
+														}
+													}
+												}
+
+												if(strcasecmp(strValue.c_str(), "start") == 0){
+													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
+														if(intValue > 0){
+															start = intValue;
+														}
+														else{
+															start = 0;
+														}
+													}
+												}
+
 												if(strcasecmp(strValue.c_str(), "damage") == 0){
 													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
-														conditionDamage->addDamage(1, ticks, -intValue);
+
+														damage = -intValue;
+
+														if(start > 0){
+															std::list<int32_t> damageList;
+															ConditionDamage::generateDamageList(damage, start, damageList);
+
+															for(std::list<int32_t>::iterator it = damageList.begin(); it != damageList.end(); ++it){
+																conditionDamage->addDamage(1, ticks, -*it);
+															}
+
+															start = 0;
+														}
+														else{
+															conditionDamage->addDamage(count, ticks, damage);
+														}
 													}
 												}
 											}

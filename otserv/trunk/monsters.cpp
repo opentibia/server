@@ -254,9 +254,11 @@ bool Monsters::reload()
 	return loadFromXml(datadir, true);
 }
 
-ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType, int32_t maxDamage, int32_t minDamage, int32_t startDamage)
+ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType,
+	int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval)
 {
 	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, 0, 0));
+	condition->setParam(CONDITIONPARAM_TICKINTERVAL, tickInterval);
 	condition->setParam(CONDITIONPARAM_MINVALUE, minDamage);
 	condition->setParam(CONDITIONPARAM_MAXVALUE, maxDamage);
 	condition->setParam(CONDITIONPARAM_STARTVALUE, startDamage);
@@ -374,28 +376,36 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		int32_t minDamage = 0;
 		int32_t maxDamage = 0;
 		int32_t startDamage = 0;
+		uint32_t tickInterval = 2000;
 
 		if(readXMLInteger(node, "fire", intValue)){
 			conditionType = CONDITION_FIRE;
 
 			minDamage = intValue;
 			maxDamage = intValue;
+			tickInterval = 10000;
 		}
 		else if(readXMLInteger(node, "poison", intValue)){
 			conditionType = CONDITION_POISON;
 
 			minDamage = intValue;
 			maxDamage = intValue;
+			tickInterval = 5000;
 		}
 		else if(readXMLInteger(node, "energy", intValue)){
 			conditionType = CONDITION_ENERGY;
 
 			minDamage = intValue;
 			maxDamage = intValue;
+			tickInterval = 10000;
+		}
+
+		if(readXMLInteger(node, "tick", intValue) && intValue > 0){
+			tickInterval = intValue;
 		}
 
 		if(conditionType != CONDITION_NONE){
-			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage);
+			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
 			combat->setCondition(condition);
 		}
 
@@ -518,18 +528,27 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 			name == "energycondition" ||
 			name == "drowncondition"){
 		ConditionType_t conditionType = CONDITION_NONE;
+		uint32_t tickInterval = 2000;
 
 		if(name == "firecondition"){
 			conditionType = CONDITION_FIRE;
+			tickInterval = 10000;
 		}
 		else if(name == "poisoncondition"){
 			conditionType = CONDITION_POISON;
+			tickInterval = 5000;
 		}
 		else if(name == "energycondition"){
 			conditionType = CONDITION_ENERGY;
+			tickInterval = 10000;
 		}
 		else if(name == "drowncondition"){
 			conditionType = CONDITION_DROWN;
+			tickInterval = 5000;
+		}
+
+		if(readXMLInteger(node, "tick", intValue) && intValue > 0){
+			tickInterval = intValue;
 		}
 
 		int32_t minDamage = std::abs(sb.minCombatValue);
@@ -544,7 +563,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 			}
 		}
 
-		Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage);
+		Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
 		combat->setCondition(condition);
 	}
 	else{
