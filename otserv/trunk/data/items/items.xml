@@ -4077,7 +4077,7 @@
 <item id="1975" name="book">
 	<attribute key="weight" value="1300"/>
 </item>
-<item id="1976" name="book">
+<item id="1976" name="gemmed book">
 	<attribute key="weight" value="1300"/>
 </item>
 <item id="1977" name="book">
@@ -4713,6 +4713,9 @@
 <item id="2161" name="strange talisman">
 	<attribute key="weight" value="290"/>
 	<attribute key="slotType" value="necklace"/>
+	<attribute key="charges" value="200"/>
+	<attribute key="showcharges" value="1"/>
+	<attribute key="absorbPercentEnergy" value="10"/>
 </item>
 <item id="2162" name="magic lightwand">
 	<attribute key="weight" value="1500"/>
@@ -4770,6 +4773,9 @@
 <item id="2170" name="silver amulet">
 	<attribute key="weight" value="500"/>
 	<attribute key="slotType" value="necklace"/>
+	<attribute key="charges" value="200"/>
+	<attribute key="showcharges" value="1"/>
+	<attribute key="absorbPercentPoison" value="10"/>
 </item>
 <item id="2171" name="platinum amulet">
 	<attribute key="description" value="It is an amulet of protection."/>
@@ -4890,18 +4896,33 @@
 <item id="2198" name="elven amulet">
 	<attribute key="weight" value="270"/>
 	<attribute key="slotType" value="necklace"/>
+	<attribute key="charges" value="50"/>
+	<attribute key="showcharges" value="1"/>
+	<attribute key="absorbPercentPhysical" value="10"/>
+	<attribute key="absorbPercentEnergy" value="10"/>
+	<attribute key="absorbPercentFire" value="10"/>
+	<attribute key="absorbPercentPoison" value="10"/>
 </item>
 <item id="2199" name="garlic necklace">
 	<attribute key="weight" value="380"/>
 	<attribute key="slotType" value="necklace"/>
+	<attribute key="charges" value="150"/>
+	<attribute key="showcharges" value="1"/>
+	<attribute key="absorbPercentLifeDrain" value="20"/>
 </item>
 <item id="2200" name="protection amulet">
 	<attribute key="weight" value="550"/>
 	<attribute key="slotType" value="necklace"/>
+	<attribute key="charges" value="250"/>
+	<attribute key="showcharges" value="1"/>
+	<attribute key="absorbPercentPhysical" value="10"/>
 </item>
 <item id="2201" name="dragon necklace">
 	<attribute key="weight" value="630"/>
 	<attribute key="slotType" value="necklace"/>
+	<attribute key="charges" value="200"/>
+	<attribute key="showcharges" value="1"/>
+	<attribute key="absorbPercentFire" value="10"/>
 </item>
 <item id="2202" name="stealth ring">
 	<attribute key="weight" value="100"/>
@@ -4935,11 +4956,11 @@
 	<attribute key="slotType" value="ring"/>
 	<attribute key="decayTo" value="0"/>
 	<attribute key="transformDeEquipTo" value="2168"/>
-	<attribute key="duration" value="500"/>
-	<attribute key="healthGain" value="100"/>
-	<attribute key="HealthTicks" value="1000"/>
-	<attribute key="manaGain" value="50"/>
-	<attribute key="manaTicks" value="1000"/>
+	<attribute key="duration" value="1200"/>
+	<attribute key="healthGain" value="1"/>
+	<attribute key="healthTicks" value="3000"/>
+	<attribute key="manaGain" value="4"/>
+	<attribute key="manaTicks" value="3000"/>
 	<attribute key="showduration" value="1"/>
 </item>
 <item id="2206" name="time ring">
@@ -5026,9 +5047,11 @@
 	<attribute key="weight" value="100"/>
 	<attribute key="decayTo" value="0"/>
 	<attribute key="transformDeEquipTo" value="2214"/>
-	<attribute key="duration" value="500"/>
-	<attribute key="healthGain" value="50"/>
-	<attribute key="HealthTicks" value="1000"/>
+	<attribute key="duration" value="480"/>
+	<attribute key="healthGain" value="1"/>
+	<attribute key="healthTicks" value="1000"/>
+	<attribute key="manaGain" value="4"/>
+	<attribute key="manaTicks" value="1000"/>
 	<attribute key="showduration" value="1"/>
 </item>
 <item id="2217" name="book">
@@ -5162,6 +5185,8 @@
 </item>
 <item id="2261" name="adito grav">
 	<attribute key="weight" value="120"/>
+	<attribute key="charges" value="3"/>
+	<attribute key="showcharges" value="1"/>
 </item>
 <item id="2262" name="adevo mas vis">
 	<attribute key="weight" value="120"/>
@@ -5997,10 +6022,10 @@
 	<attribute key="attack" value="38"/>
 	<attribute key="weaponType" value="sword"/>
 </item>
-<item id="2452" name="uknown mace">
+<item id="2452" name="unknown mace">
 	<attribute key="weight" value="100"/>
-	<attribute key="defense" value="10"/>
-	<attribute key="attack" value="14"/>
+	<attribute key="defense" value="15"/>
+	<attribute key="attack" value="50"/>
 	<attribute key="weaponType" value="club"/>
 </item>
 <item id="2453" name="sprite wand">
@@ -16411,17 +16436,17 @@
 	<attribute key="decayTo" value="6328"/>
 	<attribute key="duration" value="10"/>
 </item>
-<item id="6332" name="daed hellhound">
+<item id="6332" name="dead hellhound">
 	<attribute key="containerSize" value="8"/>
 	<attribute key="decayTo" value="6333"/>
 	<attribute key="duration" value="10"/>
 </item>
-<item id="6333" name="daed hellhound">
+<item id="6333" name="dead hellhound">
 	<attribute key="containerSize" value="8"/>
 	<attribute key="decayTo" value="6334"/>
 	<attribute key="duration" value="180"/>
 </item>
-<item id="6334" name="daed hellhound">
+<item id="6334" name="dead hellhound">
 	<attribute key="containerSize" value="8"/>
 	<attribute key="decayTo" value="6335"/>
 	<attribute key="duration" value="180"/>
