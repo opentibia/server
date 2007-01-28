@@ -617,7 +617,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 			if(items[id].runeMagLevel != -1){
 				s << "a spell rune for level " << it.runeMagLevel << "." << std::endl;
 
-				s << "It's an \"" << it.description << "\" spell (";
+				s << "It's an \"" << it.runeSpellName << "\" spell (";
 				if(getItemCharge())
 					s << (int)getItemCharge();
 				else

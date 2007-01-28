@@ -168,7 +168,6 @@ public:
 	uint32_t       decayTime;
 	bool           stopTime;
 
-	// other bools
 	int             magicfieldtype;
 	int             RWInfo;
 	unsigned short  readOnlyId;
@@ -178,10 +177,12 @@ public:
 	bool            moveable;
 	bool            alwaysOnTop;
 	int             alwaysOnTopOrder;
-	int             runeMagLevel;
 	bool            pickupable;
 	bool            rotable;
 	int				      rotateTo;
+
+	int             runeMagLevel;
+	std::string     runeSpellName;
 
 	int lightLevel;
 	int lightColor;

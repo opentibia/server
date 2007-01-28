@@ -61,6 +61,7 @@ ItemType::ItemType()
 	blockProjectile = false;
 	blockPathFind = false;
 		
+	std::string runeSpellName;
 	runeMagLevel    = -1;
 	magicfieldtype = -1;
 	
@@ -404,6 +405,11 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(strcasecmp(strValue.c_str(), "description") == 0){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.description = strValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "runeSpellName") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									it.runeSpellName = strValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "weight") == 0){
