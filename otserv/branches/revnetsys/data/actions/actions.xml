@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+
+<actions>
+
+-- Tools
+<action itemid="2580" script="fishing.lua" allowfaruse="1" />
+<action itemid="2120" script="rope.lua"	 />
+<action itemid="2554" script="shovel.lua"  />
+
+-- Others
+<action itemid="2785" script="blueberry_bush.lua"   />
+
+
+-- Teleports
+<action itemid="430" script="teleport.lua"  />
+<action itemid="1386" script="teleport.lua" />
+<action itemid="3678" script="teleport.lua" />
+<action itemid="3135" script="teleport.lua" />
+<action itemid="3678" script="teleport.lua" />
+
+-- Foods
+<action itemid="2328" script="food.lua" />
+<action itemid="2362" script="food.lua" />
+<action itemid="2363" script="food.lua" />
+<action itemid="2666" script="food.lua" />
+
+-- Fluids
+<action itemid="1775" script="fluids.lua" />
+<action itemid="2562" script="fluids.lua" />
+<action itemid="2006" script="fluids.lua" />
+<action itemid="2034" script="fluids.lua" />
+<action itemid="2574" script="fluids.lua" />
+<action itemid="2575" script="fluids.lua" />
+<action itemid="2576" script="fluids.lua" />
+<action itemid="2577" script="fluids.lua" />
+<action itemid="2005" script="fluids.lua" />
+
+
+-- Decayto Items
+<action itemid="2047" script="decayto.lua" />
+<action itemid="2048" script="decayto.lua" />
+<action itemid="2044" script="decayto.lua" />
+<action itemid="2045" script="decayto.lua" />
+<action itemid="2057" script="decayto.lua" />
+<action itemid="2042" script="decayto.lua" />
+
+
+-- Keys
+<action itemid="2086" script="key.lua"	/>
+<action itemid="2087" script="key.lua"	/>
+<action itemid="2088" script="key.lua"	/>
+<action itemid="2089" script="key.lua"	/>
+<action itemid="2090" script="key.lua"	/>
+<action itemid="2091" script="key.lua"	/>
+<action itemid="2092" script="key.lua"	/>
+
+--Doors
+<action itemid="1539" script="door_open1.lua" /> --free fence door--
+<action itemid="1540" script="door_close1e.lua" /> --free fence door--
+<action itemid="1541" script="door_open1.lua" /> --free fence door--
+<action itemid="1542" script="door_close1n.lua" /> --free fence door--
+
+<action itemid="1634" script="door_open1.lua" /> --table closed--
+<action itemid="1635" script="door_close1.lua" /> --table open--
+
+<action itemid="1636" script="door_open1.lua" /> --table closed--
+<action itemid="1637" script="door_close1.lua" /> --table open--
+
+<action itemid="1638" script="door_open1.lua" /> --table closed--
+<action itemid="1639" script="door_close1.lua" /> --table open--
+
+<action itemid="1640" script="door_open1.lua" /> --table closed--
+<action itemid="1641" script="door_close1.lua" /> --table open--
+
+---------------
+
+<action itemid="1209" script="door_open2.lua" /> --free normal door--
+<action itemid="1211" script="door_close2e.lua" /> --free normal door--
+<action itemid="1212" script="door_open2.lua" /> --free normal door--
+<action itemid="1214" script="door_close2n.lua" /> --free normal door--
+
+<action itemid="1219" script="door_open1.lua" />
+<action itemid="1220" script="door_close1e.lua" />
+<action itemid="1221" script="door_open1.lua" />
+<action itemid="1222" script="door_close1n.lua" />
+
+<action itemid="1223" script="door_open1.lua" />
+<action itemid="1224" script="door_close1e.lua" />
+<action itemid="1225" script="door_open1.lua" />
+<action itemid="1226" script="door_close1n.lua" />
+
+<action itemid="1227" script="door_open1.lua" />
+<action itemid="1228" script="door_close1e.lua" />
+<action itemid="1229" script="door_open1.lua" />
+<action itemid="1230" script="door_close1n.lua" />
+
+<action itemid="1231" script="door_open2.lua" /> --free egipcian door--
+<action itemid="1233" script="door_close2e.lua" /> --free egipcian door--
+<action itemid="1234" script="door_open2.lua" /> --free egipcian door--
+<action itemid="1236" script="door_close2n.lua" /> --free egipcian door--
+
+<action itemid="1237" script="door_open1.lua" /> --free egipcian door--
+<action itemid="1238" script="door_close1e.lua" /> --free egipcian door--
+<action itemid="1239" script="door_open1.lua" /> --free egipcian door--
+<action itemid="1240" script="door_close1n.lua" /> --free egipcian door--
+
+<action itemid="1241" script="door_open1.lua" />
+<action itemid="1242" script="door_close1e.lua" />
+<action itemid="1243" script="door_open1.lua" />
+<action itemid="1244" script="door_close1n.lua" />
+
+<action itemid="1245" script="door_open1.lua" />
+<action itemid="1246" script="door_close1e.lua" />
+<action itemid="1247" script="door_open1.lua" />
+<action itemid="1248" script="door_close1n.lua" />
+
+<action itemid="1249" script="door_open2.lua" /> --free egipcian door--
+<action itemid="1251" script="door_close2e.lua" /> --free egipcian door--
+<action itemid="1252" script="door_open2.lua" /> --free egipcian door--
+<action itemid="1254" script="door_close2n.lua" /> --free egipcian door--
+
+<action itemid="1255" script="door_open1.lua" />
+<action itemid="1256" script="door_close1e.lua" />
+<action itemid="1257" script="door_open1.lua" />
+<action itemid="1258" script="door_close1n.lua" />
+
+<action itemid="1259" script="door_open1.lua" />
+<action itemid="1260" script="door_close1e.lua" />
+<action itemid="1261" script="door_open1.lua" />
+<action itemid="1262" script="door_close1n.lua" />
+
+
+-- Music
+<action itemid="2070" script="music.lua" />
+<action itemid="2372" script="music.lua" />
+
+
+
+-- Objects
+<action itemid="1479" script="trans_inc.lua" />
+<action itemid="1480" script="trans_dec.lua" />
+
+<action itemid="1945" script="trans_inc.lua" /> 
+<action itemid="1946" script="trans_dec.lua" /> 
+
+<action itemid="2037" script="trans_inc.lua" />
+<action itemid="2038" script="trans_dec.lua" />
+
+<action itemid="2039" script="trans_inc.lua" />
+<action itemid="2040" script="trans_dec.lua" />
+
+<action itemid="2058" script="trans_inc.lua" />
+<action itemid="2059" script="trans_dec.lua" />
+
+<action itemid="2060" script="trans_inc.lua" />
+<action itemid="2061" script="trans_dec.lua" />
+
+
+</actions>
