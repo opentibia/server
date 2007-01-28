@@ -27,6 +27,7 @@
 #include "const79.h"
 #include "enums.h"
 #include "itemloader.h"
+#include <map>
 
 #define SLOTP_WHEREEVER 0xFFFFFFFF
 #define SLOTP_HEAD 1
@@ -239,10 +240,11 @@ public:
 
 	int loadFromOtb(std::string);
 	
-	const ItemType& operator[](int id){return getItemType(id);}
-	ItemType& getItemType(int id);
+	const ItemType& operator[](int32_t id){return getItemType(id);}
+	ItemType& getItemType(int32_t id);
+	ItemType& getItemIdByClientId(int32_t spriteId);
 
-	int getItemIdByName(const std::string& name);
+	int32_t getItemIdByName(const std::string& name);
 	
 	static uint32_t dwMajorVersion;
 	static uint32_t dwMinorVersion;
@@ -255,6 +257,9 @@ public:
 	uint32_t size() {return items.size();}
 
 protected:
+	typedef std::map<int32_t, int32_t> ReverseItemMap;
+	ReverseItemMap reverseItemMap;
+
 	Array<ItemType*> items;
 	std::string m_datadir;
 };

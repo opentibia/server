@@ -5188,169 +5188,195 @@
 	<attribute key="charges" value="3"/>
 	<attribute key="showcharges" value="1"/>
 </item>
-<item id="2262" name="adevo mas vis">
+<item id="2262" name="spell rune">
+	<attribute key="description" value="adevo mas vis"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2263" name="rune">
+<item id="2263" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2264" name="rune">
+<item id="2264" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2265" name="adura gran">
+<item id="2265" name="spell rune">
+	<attribute key="description" value="adura gran"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2266" name="adana pox">
+<item id="2266" name="spell rune">
+	<attribute key="description" value="adana pox"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2267" name="rune">
+<item id="2267" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2268" name="adori vita vis">
+<item id="2268" name="spell rune">
+	<attribute key="description" value="adori vita vis"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2269" name="rune">
+<item id="2269" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2270" name="rune">
+<item id="2270" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2271" name="rune">
+<item id="2271" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2272" name="rune">
+<item id="2272" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2273" name="adura vita">
+<item id="2273" name="spell rune">
+	<attribute key="description" value="adura vita"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2274" name="rune">
+<item id="2274" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2275" name="rune">
+<item id="2275" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2276" name="rune">
+<item id="2276" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2277" name="adevo grav vis">
+<item id="2277" name="spell rune">
+	<attribute key="description" value="adevo grav vis"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2278" name="adana ani">
+<item id="2278" name="spell rune">
+	<attribute key="description" value="adana ani"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2279" name="adevo mas grav vis">
+<item id="2279" name="spell rune">
+	<attribute key="description" value="adevo mas grav vis"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2280" name="rune">
+<item id="2280" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2281" name="rune">
+<item id="2281" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2282" name="rune">
+<item id="2282" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2283" name="rune">
+<item id="2283" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2284" name="rune">
+<item id="2284" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2285" name="adevo grav pox">
+<item id="2285" name="spell rune">
+	<attribute key="description" value="adevo grav pox"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2286" name="adevo mas pox">
+<item id="2286" name="spell rune">
+	<attribute key="description" value="adevo mas pox"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2287" name="adori">
+<item id="2287" name="spell rune">
+	<attribute key="description" value="adori"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2288" name="rune">
+<item id="2288" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2289" name="adevo mas grav pox">
+<item id="2289" name="spell rune">
+	<attribute key="description" value="adevo mas grav pox"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2290" name="adeta sio">
+<item id="2290" name="spell rune">
+	<attribute key="description" value="adeta sio"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2291" name="adevo ina">
+<item id="2291" name="spell rune">
+	<attribute key="description" value="adevo ina"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2292" name="adevo res pox">
+<item id="2292" name="spell rune">
+	<attribute key="description" value="adevo res pox"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2293" name="adevo grav tera">
+<item id="2293" name="spell rune">
+	<attribute key="description" value="adevo grav tera"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2294" name="rune">
+<item id="2294" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2295" name="rune">
+<item id="2295" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2296" name="rune">
+<item id="2296" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2297" name="rune">
+<item id="2297" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2298" name="rune">
+<item id="2298" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2299" name="rune">
+<item id="2299" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2300" name="rune">
+<item id="2300" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2301" name="adevo grav flam">
+<item id="2301" name="spell rune">
+	<attribute key="description" value="adevo grav flam"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2302" name="adori flam">
+<item id="2302" name="spell rune">
+	<attribute key="description" value="adori flam"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2303" name="adevo mas grav flam">
+<item id="2303" name="spell rune">
+	<attribute key="description" value="adevo mas grav flam"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2304" name="adori gran flam">
+<item id="2304" name="spell rune">
+	<attribute key="description" value="adori gran flam"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2305" name="adevo mas flam">
+<item id="2305" name="spell rune">
+	<attribute key="description" value="adevo mas flam"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2306" name="rune">
+<item id="2306" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2307" name="rune">
+<item id="2307" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2308" name="adevo res flam">
+<item id="2308" name="spell rune">
+	<attribute key="description" value="adevo res flam"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2309" name="rune">
+<item id="2309" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2310" name="adito tera">
-	<attribute key="weight" value="5000000"/>
-</item>
-<item id="2311" name="adori gran">
+<item id="2310" name="spell rune">
+	<attribute key="description" value="adito tera"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2312" name="rune">
+<item id="2311" name="spell rune">
+	<attribute key="description" value="adori gran"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2313" name="adevo mas hur">
+<item id="2312" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2314" name="rune">
+<item id="2313" name="spell rune">
+	<attribute key="description" value="adevo mas hur"/>
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2315" name="rune">
+<item id="2314" name="spell rune">
 	<attribute key="weight" value="120"/>
 </item>
-<item id="2316" name="adana mort">
+<item id="2315" name="spell rune">
+	<attribute key="weight" value="120"/>
+</item>
+<item id="2316" name="spell rune">
+	<attribute key="description" value="adana mort"/>
 	<attribute key="weight" value="120"/>
 </item>
 <item id="2317" name="dead human">

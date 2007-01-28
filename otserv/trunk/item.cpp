@@ -605,7 +605,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 	std::stringstream s;
 	const ItemType& it = items[id];
 
-	if (it.name.length()) {
+	if(it.name.length()) {
 		if(isStackable() && count > 1){
 			s << (int)count << " " << it.name << "s.";
 
@@ -614,11 +614,10 @@ std::string Item::getDescription(int32_t lookDistance) const
 			}
 		}
 		else{
-			if(items[id].runeMagLevel != -1)
-			{
+			if(items[id].runeMagLevel != -1){
 				s << "a spell rune for level " << it.runeMagLevel << "." << std::endl;
 
-				s << "It's an \"" << it.name << "\" spell (";
+				s << "It's an \"" << it.description << "\" spell (";
 				if(getItemCharge())
 					s << (int)getItemCharge();
 				else

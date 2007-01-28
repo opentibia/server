@@ -48,6 +48,7 @@ Creature::Creature() :
 {
 	direction  = NORTH;
 	master = NULL;
+	summon = false;
 
 	health     = 1000;
 	healthMax  = 1000;
@@ -125,8 +126,8 @@ bool Creature::canSee(const Position& pos) const
 
 	int offsetz = myPos.z - pos.z;
 
-	if ((pos.x >= myPos.x - 8 + offsetz) && (pos.x <= myPos.x + 9 + offsetz) &&
-		(pos.y >= myPos.y - 6 + offsetz) && (pos.y <= myPos.y + 7 + offsetz))
+	if ((pos.x >= myPos.x - Map::maxViewportX + offsetz) && (pos.x <= myPos.x + Map::maxViewportX + offsetz) &&
+		(pos.y >= myPos.y - Map::maxViewportY + offsetz) && (pos.y <= myPos.y + Map::maxViewportY + offsetz))
 		return true;
 
 	return false;
@@ -767,6 +768,7 @@ void Creature::onBlockHit(BlockType_t blockType)
 void Creature::addSummon(Creature* creature)
 {
 	//std::cout << "addSummon: " << this << " summon=" << creature << std::endl;
+	creature->setSummon(true);
 	creature->setMaster(this);
 	creature->useThing2();
 	summons.push_back(creature);
@@ -776,7 +778,8 @@ void Creature::removeSummon(const Creature* creature)
 {
 	//std::cout << "removeSummon: " << this << " summon=" << creature << std::endl;
 	std::list<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
-	if(cit != summons.end()) {
+	if(cit != summons.end()){
+		(*cit)->setSummon(false);
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();
 		summons.erase(cit);
@@ -809,8 +812,11 @@ bool Creature::addCondition(Condition* condition)
 
 bool Creature::addCombatCondition(Condition* condition)
 {
+	if(!addCondition(condition)){
+		return false;
+	}
+
 	onAddCombatCondition(condition->getType());
-	return addCondition(condition);
 }
 
 void Creature::removeCondition(ConditionType_t type)

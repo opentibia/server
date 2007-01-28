@@ -33,6 +33,7 @@
 #include "tasks.h"
 #include "tools.h"
 #include "spells.h"
+#include "configmanager.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -44,6 +45,7 @@
 
 extern Game g_game;
 extern Spells* g_spells;
+extern ConfigManager g_config;
 
 Actions::Actions() :
 m_scriptInterface("Action Interface")
@@ -164,7 +166,7 @@ ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, 
 	return RET_NOERROR;
 }
 
-Action *Actions::getAction(const Item* item)
+Action* Actions::getAction(const Item* item)
 {
 	if(item->getUniqueId() != 0){
 		ActionUseMap::iterator it = uniqueItemMap.find(item->getUniqueId());
@@ -194,6 +196,10 @@ Action *Actions::getAction(const Item* item)
 
 bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* item)
 {	
+	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
+		return false;
+	}
+	
 	//check if it is a house door
 	if(Door* door = item->getDoor()){
 		if(door->canUse(player) == false){
@@ -210,6 +216,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 		int32_t stack = item->getParent()->__getIndexOfThing(item);
 		PositionEx posEx(pos, stack);
 		if(action->executeUse(player, item, posEx, posEx, false)){
+			player->setLastAction(OTSYS_TIME());
 			return true;
 		}
 	}
@@ -224,6 +231,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 		else{
 			player->sendTextWindow(item, 0, false);
 		}
+
 		return true;
 	}
 	
@@ -236,6 +244,57 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 	//we dont know what to do with this item
 	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 	return false;	
+}
+
+bool Actions::useItemEx(Player* player, const Position& fromPos,
+	const Position& toPos, const unsigned char toStackPos, Item* item)
+{
+	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
+		return false;
+	}
+
+	Action* action = getAction(item);
+	
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPos);
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			return false;
+		}
+
+		int32_t fromStackPos = item->getParent()->__getIndexOfThing(item);
+		PositionEx fromPosEx(fromPos, fromStackPos);
+		PositionEx toPosEx(toPos, toStackPos);
+		if(action->executeUse(player, item, fromPosEx, toPosEx, true)){
+			player->setLastAction(OTSYS_TIME());
+			return true;
+		}
+	}
+
+	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+	return false;
+}
+
+bool Actions::useItemEx(Player* player, Item* item, Creature* creature)
+{
+	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
+		return false;
+	}
+
+	Action* action = getAction(item);
+	
+	if(action){
+		PositionEx fromPosEx(item->getPosition(), item->getParent()->__getIndexOfThing(item));
+		PositionEx toPosEx(creature->getPosition(), creature->getParent()->__getIndexOfThing(creature));
+
+		if(action->executeUse(player, item, fromPosEx, toPosEx, true)){
+			player->setLastAction(OTSYS_TIME());
+			return true;
+		}
+	}
+
+	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+	return false;
 }
 
 bool Actions::openContainer(Player* player, Container* container, const unsigned char index)
@@ -264,27 +323,6 @@ bool Actions::openContainer(Player* player, Container* container, const unsigned
 	}
 
 	return true;
-}
-
-bool Actions::useItemEx(Player* player, const Position& from_pos,
-	const Position& to_pos, const unsigned char to_stack, Item* item)
-{
-	Action* action = getAction(item);
-	
-	if(action){
-		bool ret = action->canExecuteAction(player, to_pos);
-		if(ret){
-			int32_t from_stack = item->getParent()->__getIndexOfThing(item);
-			PositionEx posFromEx(from_pos, from_stack);
-			PositionEx posToEx(to_pos, to_stack);
-			if(action->executeUse(player, item, posFromEx, posToEx, true)){
-				return true;
-			}
-		}
-	}
-	//not found or the script returned false
-	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-	return false;
 }
 
 Action::Action(LuaScriptInterface* _interface) :
@@ -321,26 +359,26 @@ std::string Action::getScriptEventName()
 	return "onUse";
 }
 
-bool Action::canExecuteAction(const Player* player, const Position& toPos)
+ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos)
 {
 	ReturnValue ret = RET_NOERROR;
 
 	if(allowFarUse() == false){
 		if((ret = Actions::canUse(player, toPos)) != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
+			return ret;
 		}
 	}
 	else{
 		if(Actions::canUseFar(player, toPos, blockWalls()) != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
+			return ret;
 		}
 	}
-	return true;
+
+	return RET_NOERROR;
 }
 
-bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse)
+bool Action::executeUse(Player* player, Item* item,
+	const PositionEx& fromPos, const PositionEx& toPos, bool extendedUse)
 {
 	//onUse(cid, item1, position1, item2, position2)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -348,7 +386,7 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 	
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
-		desc << player->getName() << " - " << item->getID() << " " << posFrom << "|" << posTo;
+		desc << player->getName() << " - " << item->getID() << " " << fromPos << "|" << toPos;
 		env->setEventDesc(desc.str());
 		#endif
 	
@@ -363,13 +401,13 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 		LuaScriptInterface::pushThing(L, item, itemid1);
-		LuaScriptInterface::pushPosition(L, posFrom, posFrom.stackpos);
+		LuaScriptInterface::pushPosition(L, fromPos, fromPos.stackpos);
 		//std::cout << "posTo" <<  (Position)posTo << " stack" << (int)posTo.stackpos <<std::endl;
-		Thing* thing = g_game.internalGetThing(player, posTo, posTo.stackpos);
+		Thing* thing = g_game.internalGetThing(player, toPos, toPos.stackpos);
 		if(thing && (!extendedUse || thing != item)){
 			long thingId2 = env->addThing(thing);
 			LuaScriptInterface::pushThing(L, thing, thingId2);
-			LuaScriptInterface::pushPosition(L, posTo, posTo.stackpos);
+			LuaScriptInterface::pushPosition(L, toPos, toPos.stackpos);
 		}
 		else{
 			LuaScriptInterface::pushThing(L, NULL, 0);

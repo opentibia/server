@@ -230,7 +230,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 	
-	virtual bool canExecuteAction(const Player* player, const Position& toPos);
+	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
 
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse);
 	

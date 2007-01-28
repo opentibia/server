@@ -225,7 +225,7 @@ public:
 	/**
 	  * Find an item of a certain type
 	  * \param cylinder to search the item
-	  * \param spriteId is the item sprite to remove
+	  * \param itemId is the item to remove
 	  * \param subType is the extra type an item can have such as charges/fluidtype, default is -1
 		* meaning it's not used
 	  * \returns A pointer to the item to an item and NULL if not found
@@ -302,10 +302,10 @@ public:
 	bool playerStopAutoWalk(Player* player);
 	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
 		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId);
-	bool internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId);
 	bool playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t spriteId);
 	bool playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
 		uint32_t creatureId, uint16_t spriteId);
+	bool playerUseHotkey(Player* player, int32_t spriteId, int32_t subType, uint32_t creatureId);
 	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t spriteId);
 	bool playerWriteItem(Player* player, Item* item, const std::string& text);
 

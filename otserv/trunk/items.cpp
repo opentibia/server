@@ -328,6 +328,8 @@ int Items::loadFromOtb(std::string file)
 			}
 		}
 
+		reverseItemMap[iType->clientId] = iType->id;
+
 		// store the found item	 
 		items.addElement(iType, iType->id);		
 		node = f.getNextNode(node, type);
@@ -868,7 +870,7 @@ bool Items::loadFromXml(const std::string& datadir)
 	return true;
 }
 
-ItemType& Items::getItemType(int id)
+ItemType& Items::getItemType(int32_t id)
 {
 	ItemType* iType = items.getElement(id);
 	if(iType){
@@ -883,18 +885,29 @@ ItemType& Items::getItemType(int id)
 	}
 }
 
+ItemType& Items::getItemIdByClientId(int32_t spriteId)
+{
+	uint32_t i = 100;
+	ItemType* iType;
+	do{
+		iType = items.getElement(i);
+		if(iType && iType->clientId == spriteId){
+			return *iType;
+		}
+		i++;
+	}while(iType);
 
-int Items::getItemIdByName(const std::string& name)
+#ifdef __DEBUG__
+	std::cout << "WARNING! unknown sprite id " << spriteId << ". using defaults." << std::endl;
+	#endif
+	static ItemType dummyItemType; // use this for invalid ids
+	return dummyItemType;
+}
+
+int32_t Items::getItemIdByName(const std::string& name)
 {
 	if(!name.empty()){
-		/*
-		for(ItemMap::iterator it = items.begin(); it != items.end(); ++it){
-			if(strcasecmp(name.c_str(), it->second->name.c_str()) == 0){
-				return it->first;
-			}
-		}
-		*/
-		long i = 100;
+		uint32_t i = 100;
 		ItemType* iType;
 		do{
 			iType = items.getElement(i);

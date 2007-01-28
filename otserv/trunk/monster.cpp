@@ -577,6 +577,15 @@ bool Monster::getNextStep(Direction& dir)
 void Monster::die()
 {
 	Creature::die();
+
+	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
+		(*cit)->changeHealth(-(*cit)->getHealth());
+		(*cit)->setAttackedCreature(NULL);
+		(*cit)->setMaster(NULL);
+		(*cit)->releaseThing2();
+	}
+
+	summons.clear();
 }
 
 bool Monster::despawn()
@@ -957,7 +966,7 @@ void Monster::updateLookDirection()
 void Monster::dropLoot(Container* corpse)
 {
 	if(corpse && createLoot){
-		if(!getMaster()){
+		if(!isSummon()){
 			mType->createLoot(corpse);
 		}
 	}

@@ -40,8 +40,9 @@ public:
 
 
 	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item);
-	bool useItemEx(Player* player, const Position& from_pos,
-		const Position& to_pos, const unsigned char to_stack, Item* item);
+	bool useItemEx(Player* player, Item* item, Creature* creature);
+	bool useItemEx(Player* player, const Position& fromPos,
+		const Position& toPos, const unsigned char toStackPos, Item* item);
 
 	bool openContainer(Player* player,Container* container, const unsigned char index);
 
@@ -60,7 +61,7 @@ protected:
 	ActionUseMap uniqueItemMap;
 	ActionUseMap actionItemMap;
 
-	Action *getAction(const Item* item);
+	Action* getAction(const Item* item);
 	void clearMap(ActionUseMap& map);
 
 	LuaScriptInterface m_scriptInterface;
@@ -84,7 +85,7 @@ public:
 	void setAllowFarUse(bool v){allowfaruse = v;};
 	void setBlockWalls(bool v){blockwalls = v;};
 
-	virtual bool canExecuteAction(const Player* player, const Position& toPos);
+	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
 
 protected:
 	virtual std::string getScriptEventName();

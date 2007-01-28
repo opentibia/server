@@ -1735,24 +1735,23 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 	return true;
 }
 
-bool RuneSpell::canExecuteAction(const Player* player, const Position& toPos)
+ReturnValue RuneSpell::canExecuteAction(const Player* player, const Position& toPos)
 {
-	if(!Action::canExecuteAction(player, toPos)){
-		return false;
+	ReturnValue ret = Action::canExecuteAction(player, toPos);
+	if(ret != RET_NOERROR){
+		return ret;
 	}
 
 	if(toPos.x == 0xFFFF){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		return false;
+		if(needTarget){
+			return RET_CANONLYUSETHISRUNEONCREATURES;
+		}
+		else if(!selfTarget){
+			return RET_NOTENOUGHROOM;
+		}
 	}
 
-	/*
-	if(!playerSpellCheck(player)){
-		return false;
-	}
-	*/
-
-	return true;
+	return RET_NOERROR;
 }
 
 bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse)

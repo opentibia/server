@@ -88,6 +88,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[EXHAUSTED] = getGlobalNumber(L, "exhausted", 1500);
 	m_confInteger[EXHAUSTED_ADD] = getGlobalNumber(L, "exhaustedadd", 0);
 	m_confInteger[PZ_LOCKED] = getGlobalNumber(L, "pzlocked", 60 * 1000);
+	m_confInteger[MIN_ACTIONTIME] = getGlobalNumber(L, "minactioninterval", 200);
 	m_confInteger[DEFAULT_DESPAWNRANGE] = getGlobalNumber(L, "despawnrange", 2);
 	m_confInteger[DEFAULT_DESPAWNRADIUS] = getGlobalNumber(L, "despawnradius", 50);
 	m_confInteger[ALLOW_CLONES] = getGlobalNumber(L, "allowclones", 0);
@@ -96,6 +97,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATE_LOOT] = getGlobalNumber(L, "rate_loot", 1);
 	m_confInteger[RATE_MAGIC] = getGlobalNumber(L, "rate_mag", 1);
 	m_confInteger[RATE_SPAWN] = getGlobalNumber(L, "rate_spawn", 1);
+	m_confInteger[HOTKEYS] = getGlobalNumber(L, "enablehotkeys", 0);
 	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
 	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
 

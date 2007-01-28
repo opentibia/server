@@ -88,7 +88,6 @@ public:
 	virtual bool getNextStep(Direction& dir);
 
 	bool canPushItems() const {return mType->canPushItems;}
-	bool isSummon() const { return getMaster() != NULL; }
 	bool isHostile() const { return mType->isHostile;}
 	virtual bool canSeeInvisibility() const { return isImmune(CONDITION_INVISIBLE);}
 

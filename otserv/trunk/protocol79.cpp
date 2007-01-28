@@ -944,12 +944,19 @@ void Protocol79::parseUseItem(NetworkMessage& msg)
 	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 	uint8_t index = msg.GetByte();
+
 /*
 #ifdef __DEBUG__
 	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
 #endif
 */
-	g_game.playerUseItem(player, pos, stackpos, index, spriteId);
+
+	if(pos.x == 0xFFFF && pos.y == 0 && pos.z == 0){
+		g_game.playerUseHotkey(player, spriteId, -1, 0);
+	}
+	else{
+		g_game.playerUseItem(player, pos, stackpos, index, spriteId);
+	}
 }
 
 void Protocol79::parseUseItemEx(NetworkMessage& msg)
@@ -971,7 +978,29 @@ void Protocol79::parseBattleWindow(NetworkMessage &msg)
 	uint8_t fromStackPos = msg.GetByte();
 	uint32_t creatureId = msg.GetU32();
 
-	g_game.playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, spriteId);
+	if(fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0){
+		const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+		int32_t subType = -1;
+		if(it.id != 0){
+			if(it.isFluidContainer()){
+				switch(fromStackPos){
+					case 0: subType = FLUID_EMPTY_1; break;
+					case 1: subType = FLUID_WATER; break;
+					case 2: subType = FLUID_MANAFLUID; break;
+					case 3: subType = FLUID_BEER; break;
+					case 5: subType = FLUID_BLOOD; break;
+					case 6: subType = FLUID_SLIME; break;
+					case 8: subType = FLUID_LEMONADE; break;
+					case 9: subType = FLUID_MILK; break;
+				}
+			}
+		}
+
+		g_game.playerUseHotkey(player, spriteId, subType, creatureId);
+	}
+	else{
+		g_game.playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, spriteId);
+	}
 }
 
 void Protocol79::parseCloseContainer(NetworkMessage& msg)

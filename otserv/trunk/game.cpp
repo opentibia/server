@@ -937,6 +937,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 
 	//remove the item
 	int32_t itemIndex = fromCylinder->__getIndexOfThing(item);
+	Item* updateItem = NULL;
 	fromCylinder->__removeThing(item, m);
 	bool isCompleteRemoval = item->isRemoved();
 
@@ -945,6 +946,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 		if(toItem && toItem->getID() == item->getID()){
 			n = std::min((uint32_t)100 - toItem->getItemCount(), m);
 			toCylinder->__updateThing(toItem, toItem->getItemCount() + n);
+			updateItem = toItem;
 		}
 		
 		if(m - n > 0){
@@ -974,10 +976,11 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 			toCylinder->postAddNotification(moveItem, moveItemIndex);
 		}
 	}
-	else{
-		itemIndex = toCylinder->__getIndexOfThing(item);
-		if(itemIndex != -1){
-			toCylinder->postAddNotification(item, itemIndex);
+	
+	if(updateItem){
+		int32_t updateItemIndex = toCylinder->__getIndexOfThing(updateItem);
+		if(updateItemIndex != -1){
+			toCylinder->postAddNotification(updateItem, updateItemIndex);
 		}
 	}
 
@@ -1139,6 +1142,9 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
 					return item;
 				}
+				else{
+					++i;
+				}
 			}
 			else{
 				++i;
@@ -1165,6 +1171,9 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 				}
 				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
 					return item;
+				}
+				else{
+					++i;
 				}
 			}
 			else{
@@ -1783,13 +1792,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 		return false;
 	}
 
-	return internalUseItemEx(player, fromPos, item, toPos, toStackPos, toSpriteId);
-}
-
-bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
-{
-	g_actions->useItemEx(player, fromPos, toPos, toStackPos, item);
-	return true;
+	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item);
 }
 
 bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t spriteId)
@@ -1815,6 +1818,7 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, 
 	}
 
 	Thing* thing = internalGetThing(player, pos, stackpos);
+
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
@@ -1857,14 +1861,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 
-	Thing* thing = NULL;
-
-	if(fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0){
-		//client wants us to find an item in the inventory
-	}
-	else{
-		thing = internalGetThing(player, fromPos, STACKPOS_USE);
-	}
+	Thing* thing = internalGetThing(player, fromPos, STACKPOS_USE);
 
 	if(!thing){
 		return false;
@@ -1876,7 +1873,76 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 	
-	return internalUseItemEx(player, fromPos, item, creature->getPosition(), 0, 0);
+	return g_actions->useItemEx(player, fromPos, creature->getPosition(), 0, item);
+}
+
+bool Game::playerUseHotkey(Player* player, int32_t spriteId, int32_t subType, uint32_t creatureId)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItemExHotkey");
+	if(player->isRemoved())
+		return false;
+
+	if(g_config.getNumber(ConfigManager::HOTKEYS) == 0){
+		return false;
+	}
+
+	Creature* creature = NULL;
+	if(creatureId != 0){
+		creature = getCreatureByID(creatureId);
+		if(!creature){	
+			return false;
+		}
+
+		if(!Position::areInRange<7,5,0>(creature->getPosition(), player->getPosition())){
+			return false;
+		}
+	}
+
+	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+	if(it.id == 0){
+		return false;
+	}
+
+	uint32_t itemCount = player->__getItemTypeCount(it.id);
+	if(itemCount <= 0){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		return false;
+	}
+
+	Item* item = findItemOfType(player, it.id, subType);
+
+	if(!item){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		return false;
+	}
+
+	bool result = false;
+
+	if(creature){
+		if((player != creature) || it.isFluidContainer() || it.isRune()){
+			result = g_actions->useItemEx(player, item, creature);
+		}
+		else{
+			result = g_actions->useItemEx(player, player->getPosition(), player->getPosition(), 0, item);
+		}
+	}
+	else{
+		result = g_actions->useItem(player, player->getPosition(), 0, item);
+	}
+
+	if(result){
+		std::stringstream ss;
+		if(itemCount == 1){
+			ss << "Using the last " << it.name << "...";
+		}
+		else{
+			ss << "Using one of " << itemCount << " " << it.name << "s..."; 
+		}
+		
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	}
+
+	return result;
 }
 
 bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t spriteId)

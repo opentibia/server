@@ -417,6 +417,7 @@ public:
 	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
 	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
+	void setLastAction(uint64_t time) {lastAction = time;}
 	int64_t getLastAction() const {return lastAction;}
 
 	VIPListSet VIPList;

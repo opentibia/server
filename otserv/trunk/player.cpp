@@ -572,20 +572,13 @@ void Player::dropLoot(Container* corpse)
 {
 	if(corpse){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
-			Item* item = inventory[i];		
+			Item* item = inventory[i];
 	#ifdef __SKULLSYSTEM__
 			if(item && ((item->getContainer()) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
 	#else
 			if(item && ((item->getContainer()) || random_range(1, 100) <= 10)){
 	#endif
 				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount());
-
-				/*
-				corpse->__internalAddThing(item);
-				sendRemoveInventoryItem((slots_t)i, item);
-				onRemoveInventoryItem((slots_t)i, item);
-				inventory[i] = NULL;
-				*/
 			}
 		}
 	}
@@ -1078,8 +1071,6 @@ void Player::onCreatureMove(const Creature* creature, const Position& newPos, co
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
-		lastAction = OTSYS_TIME();
-
 		if(tradeState != TRADE_TRANSFER){
 			//check if we should close trade
 			if(tradeItem){
