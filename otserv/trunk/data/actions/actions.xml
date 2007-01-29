@@ -156,4 +156,6 @@
 <action itemid="2061" script="trans_dec.lua" />
 
 
+<action itemid="6576" script="fireworks.lua" />
+
 </actions>
