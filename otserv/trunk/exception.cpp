@@ -285,7 +285,7 @@ EXCEPTION_DISPOSITION
 				if(functions->first > stack_val && functions != functionMap.begin()) {
 					functions--;
 					*outdriver  << (unsigned long)esp << "  " << 
-					functions->second <<"("  << stack_val <<")" << std::endl;
+					functions->second <<"("  << functions->first <<")" << std::endl;
 					break;
 				}
 			}
@@ -464,7 +464,7 @@ void ExceptionHandler::dumpStack()
 				if(functions->first > stack_val && functions != functionMap.begin()) {
 					functions--;
 					output << (unsigned long)esp << "  " << 
-					functions->second <<"("  << stack_val <<")" << std::endl;
+					functions->second <<"("  << functions->first <<")" << std::endl;
 					break;
 				}
 			}

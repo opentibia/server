@@ -444,6 +444,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(strcasecmp(strValue.c_str(), "maxTextLen") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.maxTextLen = intValue;
+									it.RWInfo |= CAN_BE_WRITTEN;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "readOnceItemId") == 0){

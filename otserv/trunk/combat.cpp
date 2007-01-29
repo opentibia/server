@@ -174,16 +174,6 @@ ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
 	return RET_NOERROR;
 }
 
-void Combat::setArea(const AreaCombat* _area)
-{
-	area = new AreaCombat(*_area);
-}
-
-void Combat::setCondition(const Condition* _condition)
-{
-	params.condition = _condition->clone();
-}
-
 void Combat::setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb)
 {
 	formulaType = _type;
@@ -453,21 +443,6 @@ void Combat::postCombatEffects(Creature* caster, const Position& pos, const Comb
 	}
 }
 
-ConditionType_t Combat::CombatTypeToCondition(CombatType_t type)
-{
-	switch(type){
-		//case COMBAT_PHYSICALDAMAGE: break;
-		case COMBAT_ENERGYDAMAGE: return CONDITION_ENERGY; break;
-		case COMBAT_POISONDAMAGE: return CONDITION_POISON; break;
-		case COMBAT_FIREDAMAGE: return CONDITION_FIRE; break;
-		case COMBAT_HEALING: return CONDITION_REGENERATION; break;
-		case COMBAT_DROWNDAMAGE: return CONDITION_DROWN; break;
-
-		default:
-			return CONDITION_NONE;
-	}
-}
-
 void Combat::CombatFunc(Creature* caster, const Position& pos,
 	const AreaCombat* area, const CombatParams& params, COMBATFUNC func, void* data)
 {
@@ -695,15 +670,7 @@ void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatPar
 	}
 }
 
-void Combat::postCombatEffects(Creature* caster, const Position& pos) const
-{
-	Combat::postCombatEffects(caster, pos, params);
-}
-
-ValueCallback::ValueCallback(formulaType_t _type)
-{
-	type = _type;
-}
+//**********************************************************
 
 void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) const
 {
@@ -766,6 +733,8 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) 
 	}
 }
 
+//**********************************************************
+
 void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
 {
 	//"onTileCombat"(cid, pos)
@@ -803,6 +772,8 @@ void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
 		return;
 	}
 }
+
+//**********************************************************
 
 void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const
 {
@@ -844,15 +815,7 @@ void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const
 	}
 }
 
-AreaCombat::AreaCombat()
-{
-	hasExtArea = false;
-}
-
-AreaCombat::~AreaCombat() 
-{
-	clear();
-}
+//**********************************************************
 
 void AreaCombat::clear()
 {
@@ -1163,21 +1126,7 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 	areas[SOUTHEAST] = seArea;
 }
 
-MagicField::MagicField(uint16_t _type) : Item(_type)
-{
-	createTime = OTSYS_TIME();
-}
-
-MagicField::~MagicField()
-{
-	//
-}
-
-CombatType_t MagicField::getCombatType() const
-{
-	const ItemType& it = items[getID()];
-	return it.combatType;
-}
+//**********************************************************
 
 void MagicField::onStepInField(Creature* creature)
 {

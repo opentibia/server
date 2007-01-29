@@ -817,6 +817,7 @@ bool Creature::addCombatCondition(Condition* condition)
 	}
 
 	onAddCombatCondition(condition->getType());
+	return true;
 }
 
 void Creature::removeCondition(ConditionType_t type)
