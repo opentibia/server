@@ -43,11 +43,6 @@
 #define	SLOTP_DEPOT 1024
 #define	SLOTP_TWO_HAND 2048
 
-enum eRWInfo{
-	CAN_BE_READ = 1,
-	CAN_BE_WRITTEN = 2
-};
-
 struct Abilities{
 	Abilities()
 	{
@@ -168,9 +163,11 @@ public:
 	uint32_t       decayTime;
 	bool           stopTime;
 
-	int             RWInfo;
-	unsigned short  readOnlyId;
+	bool            canReadText;
+	bool            canWriteText;
 	unsigned short  maxTextLen;
+	unsigned short  writeOnceItemId;
+
 	bool            stackable;
 	bool            useable;
 	bool            moveable;

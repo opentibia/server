@@ -1562,8 +1562,15 @@ int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)
 	
 	const Item* item = env->getItemByUID(uid);
 	if(item){
-		int maxlen;
-		lua_pushnumber(L, (item->getRWInfo(maxlen)));
+		uint32_t rwflags = 0;
+		if(item->isReadable())
+			rwflags |= 1;
+
+		if(item->canWriteText()){
+			rwflags |= 2;
+		}
+
+		lua_pushnumber(L, rwflags);
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));

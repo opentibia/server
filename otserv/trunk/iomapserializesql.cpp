@@ -133,7 +133,7 @@ bool IOMapSerializeSQL::saveTile(Database* db, uint32_t tileId, const Tile* tile
 		if(!(!item->isNotMoveable() ||
 			item->getDoor() ||
 			(item->getContainer() && item->getContainer()->size() != 0)||
-			(item->getRWInfo(n) & CAN_BE_WRITTEN)
+			(item->canWriteText())
 			/*item->getBed()*/))
 			continue;
 

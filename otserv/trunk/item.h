@@ -235,7 +235,11 @@ public:
 	int getArmor() const {return items[id].armor;}
 	int getDefense() const {return items[id].defence;}
 	int getSlotPosition() const {return items[id].slot_position;}
-	int getRWInfo(int& maxlen) const;
+
+	bool isReadable() const {return items[id].canReadText;}
+	bool canWriteText() const {return items[id].canWriteText;}
+	int32_t getMaxWriteLength() const {return items[id].maxTextLen;}
+
 	int getWorth() const;
 	void getLight(LightInfo& lightInfo);
 

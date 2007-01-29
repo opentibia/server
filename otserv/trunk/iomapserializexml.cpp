@@ -239,7 +239,7 @@ bool IOMapSerializeXML::saveTile(xmlNodePtr nodeMap, const Tile* tile)
 		if(!(!item->isNotMoveable() ||
 			item->getDoor() ||
 			item->getContainer() ||
-			(item->getRWInfo(n) & CAN_BE_WRITTEN)
+			item->canWriteText()
 			/*item->getBed()*/))
 			continue;
 

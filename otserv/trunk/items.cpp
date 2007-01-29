@@ -37,19 +37,16 @@ extern Spells* g_spells;
 
 ItemType::ItemType()
 {
-	group           = ITEM_GROUP_NONE;
-
-	RWInfo          = 0;
-	readOnlyId      = 0;
-	stackable       = false;
-	useable	        = false;
-	moveable        = true;
-	alwaysOnTop     = false;
+	group            = ITEM_GROUP_NONE;
+	stackable        = false;
+	useable	         = false;
+	moveable         = true;
+	alwaysOnTop      = false;
 	alwaysOnTopOrder = 0;
-	pickupable      = false;
-	rotable         = false;
-	rotateTo		= 0;
-	hasHeight       = false;
+	pickupable       = false;
+	rotable          = false;
+	rotateTo		     = 0;
+	hasHeight        = false;
 
 	floorChangeDown = true;
 	floorChangeNorth = false;
@@ -88,6 +85,11 @@ ItemType::ItemType()
 
 	lightLevel    = 0;
 	lightColor    = 0;
+
+	maxTextLen = 0;
+	canReadText = false;
+	canWriteText = false;
+	writeOnceItemId  = 0;
 
 	transformEquipTo   = 0;
 	transformDeEquipTo = 0;
@@ -242,8 +244,9 @@ int Items::loadFromOtb(std::string file)
 		iType->allowDistRead = ((flags & FLAG_ALLOWDISTREAD) == FLAG_ALLOWDISTREAD);
 		iType->rotable = ((flags & FLAG_ROTABLE) == FLAG_ROTABLE);
 
-		if((flags & FLAG_READABLE) == FLAG_READABLE)
-			iType->RWInfo |= CAN_BE_READ;
+		if((flags & FLAG_READABLE) == FLAG_READABLE){
+			iType->canReadText = true;
+		}
 
 		
 		attribute_t attrib;
@@ -441,15 +444,27 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.maxItems = intValue;
 								}
 							}
+							/*
+							else if(strcasecmp(strValue.c_str(), "readable") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.canReadText = true;
+								}
+							}
+							*/
+							else if(strcasecmp(strValue.c_str(), "writeable") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.canWriteText = true;
+									it.canReadText = true;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "maxTextLen") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.maxTextLen = intValue;
-									it.RWInfo |= CAN_BE_WRITTEN;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "readOnceItemId") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.readOnlyId = intValue;
+									it.writeOnceItemId = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "weaponType") == 0){

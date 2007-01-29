@@ -3693,6 +3693,7 @@
 <item id="1810" name="blackboard">
 </item>
 <item id="1811" name="blackboard">
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="1024"/>
 </item>
 <item id="1812" name="tapestry">
@@ -3708,6 +3709,7 @@
 <item id="1817" name="mirrow">
 </item>
 <item id="1818" name="blackboard">
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="1024"/>
 </item>
 <item id="1819" name="banner">
@@ -3983,16 +3985,19 @@
 </item>
 <item id="1947" name="blank paper">
 	<attribute key="weight" value="100"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 	<attribute key="readOnceItemId" value="1954"/>
 </item>
 <item id="1948" name="parchment">
 	<attribute key="weight" value="200"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 	<attribute key="readOnceItemId" value="1967"/>
 </item>
 <item id="1949" name="scroll">
 	<attribute key="weight" value="50"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="256"/>
 </item>
 <item id="1950" name="book">
@@ -4000,11 +4005,13 @@
 </item>
 <item id="1951" name="parchment">
 	<attribute key="weight" value="200"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 	<attribute key="readOnceItemId" value="1953"/>
 </item>
 <item id="1952" name="document">
 	<attribute key="weight" value="150"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 	<attribute key="readOnceItemId" value="1968"/>
 </item>
@@ -6705,6 +6712,7 @@
 </item>
 <item id="2597" name="letter">
 	<attribute key="weight" value="50"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 </item>
 <item id="2598" name="stamped letter">
@@ -6712,6 +6720,7 @@
 </item>
 <item id="2599" name="label">
 	<attribute key="weight" value="10"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="64"/>
 </item>
 <item id="2600" name="inkwell">
@@ -12624,6 +12633,7 @@
 </item>
 <item id="4842" name="parchment">
 	<attribute key="weight" value="100"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 </item>
 <item id="4843" name="giant apes hair">
@@ -12662,15 +12672,18 @@
 </item>
 <item id="4853" name="blank paper">
 	<attribute key="weight" value="100"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 	<attribute key="readOnceItemId" value="4854"/>
 </item>
 <item id="4854" name="paper">
 	<attribute key="weight" value="100"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 </item>
 <item id="4855" name="book">
 	<attribute key="weight" value="1600"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="1024"/>
 </item>
 <item id="4856" name="ice pick">
@@ -12679,6 +12692,7 @@
 </item>
 <item id="4857" name="parchment">
 	<attribute key="weight" value="100"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 </item>
 <item id="4858" name="funeral urn">
@@ -16671,10 +16685,12 @@
 </item>
 <item id="6387" name="">
 	<attribute key="weight" value="0"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 </item>
 <item id="6388" name="christmas card">
 	<attribute key="weight" value="100"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="0"/>
 </item>
 <item id="6389" name="">
@@ -17039,6 +17055,7 @@
 </item>
 <item id="6538" name="">
 	<attribute key="weight" value="0"/>
+	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
 </item>
 <item id="6539" name="">

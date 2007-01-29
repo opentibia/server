@@ -221,12 +221,9 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 		}
 	}
 	
-	//can we read it?
-	int maxlen;
-	int RWInfo = item->getRWInfo(maxlen);
-	if(RWInfo & CAN_BE_READ){
-		if(RWInfo & CAN_BE_WRITTEN){
-			player->sendTextWindow(item, maxlen, true);
+	if(item->isReadable()){
+		if(item->canWriteText()){
+			player->sendTextWindow(item, item->getMaxWriteLength(), true);
 		}
 		else{
 			player->sendTextWindow(item, 0, false);

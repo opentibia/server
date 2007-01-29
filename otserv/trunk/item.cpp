@@ -743,13 +743,6 @@ void Item::setUniqueId(unsigned short n)
 	ScriptEnviroment::addUniqueThing(this);
 }
 
-int Item::getRWInfo(int& maxlen) const
-{
-	const ItemType& it = items[id];
-	maxlen = it.maxTextLen;
-	return it.RWInfo;
-}
-
 bool Item::canDecay()
 {
 	if(isRemoved()){

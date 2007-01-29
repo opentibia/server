@@ -1963,7 +1963,7 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 
 	item->setText(text);
 	
-	uint16_t newtype = Item::items[item->getID()].readOnlyId;
+	uint16_t newtype = Item::items[item->getID()].writeOnceItemId;
 	if(newtype != 0){
 		transformItem(item, newtype);
 	}
