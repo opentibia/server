@@ -62,8 +62,7 @@ ItemType::ItemType()
 	blockPathFind = false;
 		
 	std::string runeSpellName;
-	runeMagLevel    = -1;
-	magicfieldtype = -1;
+	runeMagLevel    = 0;
 	
 	speed		      = 0;
 	id            = 0;

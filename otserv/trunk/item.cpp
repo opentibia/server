@@ -218,22 +218,12 @@ void Item::setItemCountOrSubtype(unsigned char n)
 	else{
 		count = n;
 	}
-
-	/*
-	if(isFluidContainer() || isSplash())
-		fluid = n;
-	else if(items[id].runeMagLevel != -1)
-		chargecount = n;
-	else{
-		count = n;
-	}
-	*/
 }
 
 bool Item::hasSubType() const
 {
 	const ItemType& it = items[id];
-	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.runeMagLevel != -1);
+	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.isRune());
 }
 
 bool Item::unserialize(xmlNodePtr nodeItem)
@@ -614,8 +604,8 @@ std::string Item::getDescription(int32_t lookDistance) const
 			}
 		}
 		else{
-			if(items[id].runeMagLevel != -1){
-				s << "a spell rune for level " << it.runeMagLevel << "." << std::endl;
+			if(it.isRune()){
+				s << "a " << it.name << " for level " << it.runeMagLevel << "." << std::endl;
 
 				s << "It's an \"" << it.runeSpellName << "\" spell (";
 				if(getItemCharge())

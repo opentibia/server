@@ -1620,8 +1620,7 @@ int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
 			}
 		}
 		else if(stackpos == 254){
-			//TODO
-			//thing = tile->getFieldItem();
+			thing = tile->getFieldItem();
 		}
 		else if(stackpos == 253){
 			thing = tile->getTopCreature();
@@ -3505,7 +3504,7 @@ int LuaScriptInterface::luaDoMoveCreature(lua_State *L)
 	
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
-		ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)direction);
+		ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)direction, true);
 		lua_pushnumber(L, ret);
 	}
 	else{

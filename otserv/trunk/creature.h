@@ -172,6 +172,8 @@ public:
 
 	void setMaster(Creature* creature) {master = creature;}
 	Creature* getMaster() {return master;}
+	bool hasMaster() const {return master != NULL;}
+
 	void setSummon(bool _summon) { summon = _summon;}
 	bool isSummon() const {return summon;}
 	const Creature* getMaster() const {return master;}

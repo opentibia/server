@@ -168,7 +168,7 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 	}
 	else{
 		//creature walking around in visible range
-		if(!isSummon()){
+		if(!hasMaster()){
 			if(!followCreature){
 				if(creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer())){
 					selectTarget(const_cast<Creature*>(creature));
@@ -262,16 +262,18 @@ void Monster::onCreatureLeave(const Creature* creature)
 
 void Monster::startThink()
 {
-	isActive = true;
+	if(getHealth() > 0){
+		isActive = true;
 
-	if(isSummon()){
-		selectTarget(getMaster()->getAttackedCreature());
-	}
+		if(hasMaster()){
+			selectTarget(getMaster()->getAttackedCreature());
+		}
 
-	addEventThink();
+		addEventThink();
 
-	if(getBaseSpeed() > 0){
-		addEventWalk();
+		if(getBaseSpeed() > 0){
+			addEventWalk();
+		}
 	}
 }
 
@@ -320,7 +322,7 @@ bool Monster::selectTarget(Creature* creature)
 		return false;
 	}
 
-	if(isHostile() || isSummon()){
+	if(isHostile() || hasMaster()){
 		setAttackedCreature(creature);
 	}
 
@@ -361,7 +363,7 @@ void Monster::onThink(uint32_t interval)
 
 		updateLookDirection();
 
-		if(!isSummon()){
+		if(!hasMaster()){
 			if(!followCreature){
 				searchTarget();
 			}
@@ -494,7 +496,7 @@ bool Monster::getNextStep(Direction& dir)
 
 	bool result = false;
 
-	if(isSummon()){
+	if(hasMaster()){
 		result = Creature::getNextStep(dir);
 	}
 	else{
@@ -771,7 +773,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 
 void Monster::doAttacking(uint32_t interval)
 {
-	if(isSummon()){
+	if(hasMaster()){
 		if(attackedCreature == this){
 			return;
 		}
@@ -835,7 +837,7 @@ void Monster::onDefending(uint32_t interval)
 		}
 	}
 
-	if(!isSummon() && (int32_t)summons.size() < mType->maxSummons){
+	if(!hasMaster() && (int32_t)summons.size() < mType->maxSummons){
 		for(SummonList::iterator it = mType->summonList.begin(); it != mType->summonList.end(); ++it){
 			if(it->speed > defenseTicks){
 				resetTicks = false;
@@ -989,7 +991,7 @@ void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t d
 
 bool Monster::challengeCreature(Creature* creature)
 {
-	if(isSummon()){
+	if(hasMaster()){
 		return false;
 	}
 	else{
@@ -1005,7 +1007,7 @@ bool Monster::convinceCreature(Creature* creature)
 		}
 	}
 
-	if(isSummon()){
+	if(hasMaster()){
 		if(getMaster()->getPlayer()){
 			return false;
 		}
@@ -1036,7 +1038,7 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 
 	fpp.targetDistance = mType->targetDistance;
 
-	if(isSummon()){
+	if(hasMaster()){
 		if(getMaster() == creature){
 			fpp.targetDistance = 2;
 		}

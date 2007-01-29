@@ -434,6 +434,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	Thing* iithing = NULL;
 
 	if(const Creature* creature = thing->getCreature()){
+		if((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT){
+			return RET_NOERROR;
+		}
+
 		if((flags & FLAG_PATHFINDING) == FLAG_PATHFINDING){
 			if(floorChange() || getTeleportItem()){
 				return RET_NOTPOSSIBLE;

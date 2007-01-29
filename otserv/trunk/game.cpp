@@ -690,7 +690,7 @@ void Game::moveCreature(uint32_t playerID, const Position& playerPos, uint32_t m
 	}
 }
 
-ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction)
+ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, bool force /*= false*/)
 {
 	Cylinder* fromTile = creature->getTile();
 	Cylinder* toTile = NULL;
@@ -764,7 +764,12 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction)
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
 	if(toTile != NULL){
-		ret = internalMoveCreature(creature, fromTile, toTile);
+		uint32_t flags = 0;
+		if(force){
+			flags = FLAG_NOLIMIT;
+		}
+
+		ret = internalMoveCreature(creature, fromTile, toTile, flags);
 	}
 
 	if(ret != RET_NOERROR){
@@ -777,10 +782,9 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction)
 	return ret;
 }
 
-ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder)
+ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags /*= 0*/)
 {
 	//check if we can move the creature to the destination
-	uint32_t flags = 0;
 	ReturnValue ret = toCylinder->__queryAdd(0, creature, 1, flags);
 	if(ret != RET_NOERROR){
 		return ret;
@@ -1570,27 +1574,6 @@ void Game::getSpectators(SpectatorVec& list, const Position& centerPos, bool mul
 	map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
 }
 
-//battle system
-/*
-void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreatureAttacking()");
-
-	Creature* creature = getCreatureByID(creatureId);
-	if(creature && creature->getHealth() > 0){
-		Creature* attackedCreature = creature->getAttackedCreature();
-
-		if(attackedCreature){
-			if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition())){
-				creature->doAttacking(interval);
-			}
-		}
-
-		creature->eventCheckAttacking = addEvent(makeTask(interval, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), interval)));
-	}
-}
-*/
-
 //Implementation of player invoked events
 bool Game::movePlayer(Player* player, Direction direction)
 {
@@ -1646,29 +1629,8 @@ bool Game::playerYell(Player* player, std::string& text)
 
 	if(!player->hasCondition(CONDITION_EXHAUSTED)){
 		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED);
-
 		std::transform(text.begin(), text.end(), text.begin(), upchar);
-		
 		internalCreatureSay(player, SPEAK_YELL, text);
-
-		/*
-		SpectatorVec list;
-		SpectatorVec::iterator it;
-
-		//getSpectators(Range(player->getPosition(), 18, 18, 14, 14), list);
-		getSpectators(list, player->getPosition(), false, 18, 18, 14, 14);
-
-		Player* tmpPlayer = NULL;
-		for(it = list.begin(); it != list.end(); ++it){
-			if(tmpPlayer = (*it)->getPlayer()){
-				tmpPlayer->sendCreatureSay(player, SPEAK_YELL, text);
-			}
-		}
-
-		for(it = list.begin(); it != list.end(); ++it) {
-			(*it)->onCreatureSay(player, SPEAK_YELL, text);
-		}
-		*/
 	}
 	else{
 		isExhausted = true;

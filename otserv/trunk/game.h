@@ -182,7 +182,7 @@ public:
 	  * \param pos The position to place the creature
 	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	  */
-	bool placeCreature(Creature* creature, const Position& pos, bool forced = false);
+	bool placeCreature(Creature* creature, const Position& pos, bool force = false);
 
 	/**
 		* Remove Creature from the map.
@@ -207,8 +207,8 @@ public:
 
 	void moveCreature(uint32_t playerID, const Position& playerPos, uint32_t movingCreatureID, const Position& toPos);
 
-	ReturnValue internalMoveCreature(Creature* creature, Direction direction);
-	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);
+	ReturnValue internalMoveCreature(Creature* creature, Direction direction, bool force = false);
+	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);
 
 	void moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count, uint16_t spriteId);

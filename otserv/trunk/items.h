@@ -168,7 +168,6 @@ public:
 	uint32_t       decayTime;
 	bool           stopTime;
 
-	int             magicfieldtype;
 	int             RWInfo;
 	unsigned short  readOnlyId;
 	unsigned short  maxTextLen;
