@@ -366,7 +366,7 @@ ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos
 		}
 	}
 	else{
-		if(Actions::canUseFar(player, toPos, blockWalls()) != RET_NOERROR){
+		if((ret = Actions::canUseFar(player, toPos, blockWalls())) != RET_NOERROR){
 			return ret;
 		}
 	}
