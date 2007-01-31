@@ -51,6 +51,7 @@ public:
 
 protected:
 	ReturnValue internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item);
+	void showUseHotkeyMessage(Player* player, Item* item, uint32_t itemCount);
 
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
