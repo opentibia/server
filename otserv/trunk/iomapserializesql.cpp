@@ -119,7 +119,6 @@ bool IOMapSerializeSQL::saveTile(Database* db, uint32_t tileId, const Tile* tile
 	int parentid = 0;
 	std::stringstream streamitems;
 	std::string itemsstring;
-	int n = 0;
 
 	DBSplitInsert query_insert(db);
 	query_insert.setQuery("INSERT INTO `tile_items` (`tile_id`, `sid` , `pid` , `itemtype` , `count`, `attributes` ) VALUES ");

@@ -228,7 +228,6 @@ bool IOMapSerializeXML::saveTile(xmlNodePtr nodeMap, const Tile* tile)
 {
 	Item* item;
 	xmlNodePtr nodeTile = NULL;
-	int n = 0;
 
 	for(int i = tile->getThingCount() - 1; i >= 0; --i){
 		item = tile->__getThing(i)->getItem();

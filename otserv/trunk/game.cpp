@@ -404,7 +404,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 
 			int32_t subType = -1;
 			if(it.isFluidContainer()){
-				uint32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+				int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
 				if(index < maxFluidType){
 					subType = reverseFluidMap[index];
 				}

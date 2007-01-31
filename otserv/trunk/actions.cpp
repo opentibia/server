@@ -243,27 +243,35 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 		return false;
 	}
 	
-	uint32_t itemCount = item->getParent()->__getItemTypeCount(item->getID(), item->getSubType(), false);
-	ReturnValue ret = internalUseItem(player, pos, index, item);
-	if(ret != RET_NOERROR){
+	ReturnValue ret;
+	if(isHotkey){
+		uint32_t itemCount = item->getParent()->__getItemTypeCount(item->getID(), item->getSubType(), false);
+	
+		ret = internalUseItem(player, pos, index, item);
+		
+		if(ret == RET_NOERROR){
+			std::stringstream ss;
+			if(itemCount == 1){
+				ss << "Using the last " << item->getName() << "...";
+			}
+			else{
+				ss << "Using one of " << itemCount << " " << item->getName() << "s..."; 
+			}
+			player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+		}
+	}
+	else{
+		ret = internalUseItem(player, pos, index, item);
+	}
+	
+	if(ret == RET_NOERROR){
+		player->setLastAction(OTSYS_TIME());
+		return true;
+	}
+	else{
 		player->sendCancelMessage(ret);
 		return false;
 	}
-
-	if(isHotkey){
-		std::stringstream ss;
-		if(itemCount == 1){
-			ss << "Using the last " << item->getName() << "...";
-		}
-		else{
-			ss << "Using one of " << itemCount << " " << item->getName() << "s..."; 
-		}
-		
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
-	}
-
-	player->setLastAction(OTSYS_TIME());
-	return true;
 }
 
 bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
