@@ -627,7 +627,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 	else
 		fromIndex = fromStackPos;
 
-	Thing* thing = internalGetThing(player, fromPos, fromIndex, 0, STACKPOS_MOVE);
+	Thing* thing = internalGetThing(player, fromPos, fromIndex, spriteId, STACKPOS_MOVE);
 
 	Cylinder* toCylinder = internalGetCylinder(player, toPos);
 	uint8_t toIndex = 0;

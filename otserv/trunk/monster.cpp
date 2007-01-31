@@ -256,12 +256,20 @@ void Monster::onCreatureLeave(const Creature* creature)
 	if(it != targetList.end()){
 		(*it)->releaseThing2();
 		targetList.erase(it);
+		
+		isActive = !targetList.empty();
 		//std::cout << "Remove creature: " << &creature << ", Position: "<< creature->getPosition() << std::endl;
 	}
 }
 
 void Monster::startThink()
 {
+	/*
+	if(!isActive){
+		std::cout << "Monster::startThink() - Address: " << this << ", Name: " << getName() << std::endl;
+	}
+	*/
+
 	isActive = true;
 
 	if(hasMaster()){
@@ -277,6 +285,8 @@ void Monster::startThink()
 
 void Monster::stopThink()
 {
+	//std::cout << "Monster::stopThink() - Address: " << this << ", Name: " << getName() << std::endl;
+
 	isWalkActive = false;
 	isActive = false;
 
@@ -332,6 +342,8 @@ bool Monster::selectTarget(Creature* creature)
 
 void Monster::onThink(uint32_t interval)
 {
+	//std::cout << "Monster::onThink() - Address: " << this << ", Name: " << getName() << std::endl;
+
 	if(internalUpdateTargetList){
 		updateTargetList();
 
