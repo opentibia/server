@@ -1655,7 +1655,8 @@ bool RuneSpell::loadFunction(const std::string& functionName)
 	return true;
 }
 
-bool RuneSpell::Illusion(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo)
+bool RuneSpell::Illusion(const RuneSpell* spell, Creature* creature, Item* item,
+	const Position& posFrom, const Position& posTo)
 {
 	Player* player = creature->getPlayer();
 	if(!player){

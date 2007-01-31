@@ -944,6 +944,7 @@ void Protocol79::parseUseItem(NetworkMessage& msg)
 	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 	uint8_t index = msg.GetByte();
+	bool isHotkey = (pos.x == 0xFFFF && pos.y == 0 && pos.z == 0);
 
 /*
 #ifdef __DEBUG__
@@ -951,24 +952,20 @@ void Protocol79::parseUseItem(NetworkMessage& msg)
 #endif
 */
 
-	if(pos.x == 0xFFFF && pos.y == 0 && pos.z == 0){
-		g_game.playerUseHotkey(player, spriteId, -1, 0);
-	}
-	else{
-		g_game.playerUseItem(player, pos, stackpos, index, spriteId);
-	}
+	g_game.playerUseItem(player, pos, stackpos, index, spriteId, isHotkey);
 }
 
 void Protocol79::parseUseItemEx(NetworkMessage& msg)
 {
 	Position fromPos = msg.GetPosition();
 	uint16_t fromSpriteId = msg.GetSpriteId();
-	uint8_t fromStackpos = msg.GetByte();
+	uint8_t fromStackPos = msg.GetByte();
 	Position toPos = msg.GetPosition();
 	uint16_t toSpriteId = msg.GetU16();
-	uint8_t toStackpos = msg.GetByte();
+	uint8_t toStackPos = msg.GetByte();
+	bool isHotkey = (fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0);
 
-	g_game.playerUseItemEx(player, fromPos, fromStackpos, fromSpriteId, toPos, toStackpos, toSpriteId);
+	g_game.playerUseItemEx(player, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey);
 }
 
 void Protocol79::parseBattleWindow(NetworkMessage &msg)
@@ -977,30 +974,9 @@ void Protocol79::parseBattleWindow(NetworkMessage &msg)
 	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t fromStackPos = msg.GetByte();
 	uint32_t creatureId = msg.GetU32();
+	bool isHotkey = (fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0);
 
-	if(fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0){
-		const ItemType& it = Item::items.getItemIdByClientId(spriteId);
-		int32_t subType = -1;
-		if(it.id != 0){
-			if(it.isFluidContainer()){
-				switch(fromStackPos){
-					case 0: subType = FLUID_EMPTY_1; break;
-					case 1: subType = FLUID_WATER; break;
-					case 2: subType = FLUID_MANAFLUID; break;
-					case 3: subType = FLUID_BEER; break;
-					case 5: subType = FLUID_BLOOD; break;
-					case 6: subType = FLUID_SLIME; break;
-					case 8: subType = FLUID_LEMONADE; break;
-					case 9: subType = FLUID_MILK; break;
-				}
-			}
-		}
-
-		g_game.playerUseHotkey(player, spriteId, subType, creatureId);
-	}
-	else{
-		g_game.playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, spriteId);
-	}
+	g_game.playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, spriteId, isHotkey);
 }
 
 void Protocol79::parseCloseContainer(NetworkMessage& msg)

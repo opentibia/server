@@ -36,7 +36,7 @@ int32_t Cylinder::__getLastIndex() const
 	return -1;
 }
 
-uint32_t Cylinder::__getItemTypeCount(uint16_t itemId) const
+uint32_t Cylinder::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
 {
 	return 0;
 }

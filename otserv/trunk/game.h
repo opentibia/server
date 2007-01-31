@@ -46,9 +46,12 @@ class Task;
 class lessSchedTask;
 class SchedulerTask;
 
-#define STACKPOS_MOVE -1
-#define STACKPOS_LOOK -2
-#define STACKPOS_USE -3
+enum stackPosType_t{
+	STACKPOS_NORMAL,
+	STACKPOS_MOVE,
+	STACKPOS_LOOK,
+	STACKPOS_USE,
+};
 
 enum WorldType_t {
 	WORLD_TYPE_NO_PVP,
@@ -106,7 +109,8 @@ public:
 	int32_t getExhaustionTicks() {return exhaustionTicks;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
-	Thing* internalGetThing(Player* player, const Position& pos, int32_t index);
+	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
+		uint32_t spriteId = 0, stackPosType_t type = STACKPOS_NORMAL);
 
 	/**
 	  * Get a single tile of the map.
@@ -202,10 +206,11 @@ public:
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0);
 
-	void thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackpos,
+	void thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
 		const Position& toPos, uint8_t count);
 
-	void moveCreature(uint32_t playerID, const Position& playerPos, uint32_t movingCreatureID, const Position& toPos);
+	void moveCreature(uint32_t playerId, const Position& playerPos,
+		uint32_t movingCreatureId, const Position& toPos);
 
 	ReturnValue internalMoveCreature(Creature* creature, Direction direction, bool force = false);
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);
@@ -301,15 +306,15 @@ public:
 	bool playerAutoWalk(Player* player, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(Player* player);
 	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
-		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId);
-	bool playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t spriteId);
+		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey);
+	bool playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
+		uint8_t index, uint16_t spriteId, bool isHotkey);
 	bool playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
-		uint32_t creatureId, uint16_t spriteId);
-	bool playerUseHotkey(Player* player, int32_t spriteId, int32_t subType, uint32_t creatureId);
-	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t spriteId);
+		uint32_t creatureId, uint16_t spriteId, bool isHotkey);
+	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId);
 	bool playerWriteItem(Player* player, Item* item, const std::string& text);
 
-	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackpos,
+	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackPos,
 		uint32_t playerId, uint16_t spriteId);
 	bool playerAcceptTrade(Player* player);
 	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
@@ -318,7 +323,7 @@ public:
 	bool playerSetAttackedCreature(Player* player, unsigned long creatureId);
 	bool playerFollowCreature(Player* player, unsigned long creatureId);
 	bool playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_t chaseMode);
-	bool playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackpos);
+	bool playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackPos);
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
 	bool playerTurn(Player* player, Direction dir);
 	bool playerSay(Player* player, SpeakClasses type, const std::string& text);

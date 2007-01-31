@@ -21,6 +21,8 @@
 #ifndef __OTSERV_CONST79_H__
 #define __OTSERV_CONST79_H__
 
+#include "definitions.h"
+
 #define NETWORKMESSAGE_MAXSIZE 16768
 
 enum MagicEffectClasses {
@@ -153,6 +155,30 @@ enum e_fluids {
 	FLUID_LIFEFLUID = FLUID_RED,
 	FLUID_OIL = FLUID_BROWN,
 	FLUID_WINE = FLUID_PURPLE,
+};
+
+const uint32_t reverseFluidMap[] = {
+	FLUID_EMPTY_1,
+	FLUID_WATER,
+	FLUID_MANAFLUID,
+	FLUID_BEER, 
+	FLUID_EMPTY_1,
+	FLUID_BLOOD,
+	FLUID_SLIME,
+	FLUID_EMPTY_1,
+	FLUID_LEMONADE,
+	FLUID_MILK
+};
+
+const uint32_t fluidMap[] = {
+	FLUID_EMPTY_1,
+	FLUID_BLUE_1,
+	FLUID_RED_1,
+	FLUID_BROWN_1, 
+	FLUID_GREEN_1,
+	FLUID_YELLOW_1,
+	FLUID_WHITE_1,
+	FLUID_PURPLE_1
 };
 
 enum SquareColor_t {

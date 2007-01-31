@@ -335,21 +335,22 @@ Cylinder* Game::internalGetCylinder(Player* player, const Position& pos)
 	}
 }
 
-Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index)
+Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index,
+	uint32_t spriteId /*= 0*/, stackPosType_t type /*= STACKPOS_NORMAL*/)
 {
 	if(pos.x != 0xFFFF){
 		Tile* tile = getTile(pos.x, pos.y, pos.z);
 
 		if(tile){
 			/*look at*/
-			if(index == STACKPOS_LOOK){
+			if(type == STACKPOS_LOOK){
 				return tile->getTopThing();
 			}
 
 			Thing* thing = NULL;
 
 			/*for move operations*/
-			if(index == STACKPOS_MOVE){
+			if(type == STACKPOS_MOVE){
 				Item* item = tile->getTopDownItem();
 				if(item && !item->isNotMoveable())
 					thing = item;
@@ -357,7 +358,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 					thing = tile->getTopCreature();
 			}
 			/*use item*/
-			else if(index == STACKPOS_USE){
+			else if(type == STACKPOS_USE){
 				thing = tile->getTopDownItem();
 			}
 			else{
@@ -394,6 +395,22 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 				return NULL;
 			
 			return parentcontainer->getItem(slot);
+		}
+		else if(pos.y == 0 && pos.z == 0){
+			const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+			if(it.id == 0){
+				return NULL;
+			}
+
+			int32_t subType = -1;
+			if(it.isFluidContainer()){
+				uint32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+				if(index < maxFluidType){
+					subType = reverseFluidMap[index];
+				}
+			}
+
+			return findItemOfType(player, it.id, subType);
 		}
 		//inventory
 		else{
@@ -589,7 +606,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	return true;
 }
 
-void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackpos,
+void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
 	const Position& toPos, uint8_t count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
@@ -608,9 +625,9 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 		}
 	}
 	else
-		fromIndex = fromStackpos;
+		fromIndex = fromStackPos;
 
-	Thing* thing = internalGetThing(player, fromPos, STACKPOS_MOVE /*fromIndex*/);
+	Thing* thing = internalGetThing(player, fromPos, fromIndex, 0, STACKPOS_MOVE);
 
 	Cylinder* toCylinder = internalGetCylinder(player, toPos);
 	uint8_t toIndex = 0;
@@ -638,12 +655,13 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 	}
 }
 
-void Game::moveCreature(uint32_t playerID, const Position& playerPos, uint32_t movingCreatureID, const Position& toPos)
+void Game::moveCreature(uint32_t playerId, const Position& playerPos,
+	uint32_t movingCreatureId, const Position& toPos)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
 
-	Player* player = getPlayerByID(playerID);
-	Creature* movingCreature = getCreatureByID(movingCreatureID);
+	Player* player = getPlayerByID(playerId);
+	Creature* movingCreature = getCreatureByID(movingCreatureId);
 	
 	if(!player || player->isRemoved() || !movingCreature || movingCreature->isRemoved())
 		return;
@@ -1139,16 +1157,8 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex();){
 		
 		if((thing = cylinder->__getThing(i)) && (item = thing->getItem())){
-			if(item->getID() == itemId){
-				if(item->isStackable() && (subType == -1 || item->getItemCount() >= subType)){
-					return item;
-				}
-				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
-					return item;
-				}
-				else{
-					++i;
-				}
+			if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
+				return item;
 			}
 			else{
 				++i;
@@ -1169,16 +1179,8 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 		
 		for(int i = 0; i < (int32_t)container->size();){
 			Item* item = container->getItem(i);
-			if(item->getID() == itemId){
-				if(item->isStackable() && (subType == -1 || item->getItemCount() >= subType)){
-					return item;
-				}
-				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
-					return item;
-				}
-				else{
-					++i;
-				}
+			if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
+				return item;
 			}
 			else{
 				++i;
@@ -1195,7 +1197,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 
 bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, int32_t subType /*= -1*/)
 {
-	if(cylinder == NULL || ((int32_t)cylinder->__getItemTypeCount(itemId) < count) ){
+	if(cylinder == NULL || ((int32_t)cylinder->__getItemTypeCount(itemId, subType) < count) ){
 		return false;
 	}
 
@@ -1222,7 +1224,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 						internalRemoveItem(item);
 					}
 				}
-				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
+				else if(subType == -1 || subType == item->getSubType()){
 					--count;
 					internalRemoveItem(item);
 				}
@@ -1257,7 +1259,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 						internalRemoveItem(item);
 					}
 				}
-				else if(subType == -1 || item->getItemCountOrSubtype() == subType){
+				else if(subType == -1 || subType == item->getSubType()){
 					--count;
 					internalRemoveItem(item);
 				}
@@ -1730,11 +1732,15 @@ bool Game::playerStopAutoWalk(Player* player)
 }
 
 bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
-	const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
+	const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItemEx()");
 	if(player->isRemoved())
 		return false;
+
+	if(isHotkey && g_config.getNumber(ConfigManager::HOTKEYS) == 0){
+		return false;
+	}
 
 	ReturnValue ret = RET_NOERROR;
 	if((ret = Actions::canUse(player, fromPos)) != RET_NOERROR){
@@ -1742,7 +1748,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 		return false;
 	}
 	
-	Thing* thing = internalGetThing(player, fromPos, fromStackPos);
+	Thing* thing = internalGetThing(player, fromPos, fromStackPos, fromSpriteId);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
@@ -1754,14 +1760,19 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 		return false;
 	}
 
-	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item);
+	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item, isHotkey);
 }
 
-bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t spriteId)
+bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
+	uint8_t index, uint16_t spriteId, bool isHotkey)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItem()");
 	if(player->isRemoved())
 		return false;
+
+	if(isHotkey && g_config.getNumber(ConfigManager::HOTKEYS) == 0){
+		return false;
+	}
 
 	ReturnValue ret = RET_NOERROR;
 	if((ret = Actions::canUse(player, pos)) != RET_NOERROR){
@@ -1779,7 +1790,7 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, 
 		*/
 	}
 
-	Thing* thing = internalGetThing(player, pos, stackpos);
+	Thing* thing = internalGetThing(player, pos, stackPos, spriteId);
 
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -1792,12 +1803,12 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, 
 		return false;
 	}
 
-	g_actions->useItem(player, pos, index, item);
+	g_actions->useItem(player, pos, index, item, isHotkey);
 	return true;
 }
 
 bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
-	uint32_t creatureId, uint16_t spriteId)
+	uint32_t creatureId, uint16_t spriteId, bool isHotkey)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseBattleWindow");
 	if(player->isRemoved())
@@ -1812,10 +1823,13 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 	
-	if(creature->getPlayer()){
-		player->sendCancelMessage(RET_DIRECTPLAYERSHOOT);
-		return false;
+	if(g_config.getNumber(ConfigManager::HOTKEYS) == 0){
+		if(creature->getPlayer() || isHotkey){
+			player->sendCancelMessage(RET_DIRECTPLAYERSHOOT);
+			return false;
+		}
 	}
+	
 
 	ReturnValue ret = RET_NOERROR;
 	if((ret = Actions::canUse(player, fromPos)) != RET_NOERROR){
@@ -1823,9 +1837,10 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 
-	Thing* thing = internalGetThing(player, fromPos, STACKPOS_USE);
+	Thing* thing = internalGetThing(player, fromPos, fromStackPos, spriteId, STACKPOS_USE);
 
 	if(!thing){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
@@ -1835,10 +1850,12 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 	
-	return g_actions->useItemEx(player, fromPos, creature->getPosition(), 0, item);
+	//bool result = g_actions->useItemEx(player, fromPos, creature->getPosition(), 0, item, isHotkey);
+	return g_actions->useItemEx(player, item, creature, isHotkey);
 }
 
-bool Game::playerUseHotkey(Player* player, int32_t spriteId, int32_t subType, uint32_t creatureId)
+/*
+bool Game::playerUseBattleWindowHotkey(Player* player, int32_t spriteId, int32_t subType, uint32_t creatureId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItemExHotkey");
 	if(player->isRemoved())
@@ -1865,7 +1882,7 @@ bool Game::playerUseHotkey(Player* player, int32_t spriteId, int32_t subType, ui
 		return false;
 	}
 
-	uint32_t itemCount = player->__getItemTypeCount(it.id);
+	uint32_t itemCount = player->__getItemTypeCount(it.id, subType, false);
 	if(itemCount <= 0){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
@@ -1906,14 +1923,15 @@ bool Game::playerUseHotkey(Player* player, int32_t spriteId, int32_t subType, ui
 
 	return result;
 }
+*/
 
-bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t spriteId)
+bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRotateItem()");
 	if(player->isRemoved())
 		return false;
 	
-	Thing* thing = internalGetThing(player, pos, stackpos);
+	Thing* thing = internalGetThing(player, pos, stackPos);
 	if(!thing){
 		return false;
 	}
@@ -1972,7 +1990,7 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 	return true;
 }
 
-bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stackpos,
+bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stackPos,
 	uint32_t playerId, uint16_t spriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestTrade()");
@@ -1992,7 +2010,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		return false;
 	}
 
-	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, STACKPOS_USE /*stackpos*/));
+	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, stackPos, spriteId, STACKPOS_USE));
 	if(!tradeItem || tradeItem->getClientID() != spriteId || !tradeItem->isPickupable()) {
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
@@ -2291,13 +2309,13 @@ bool Game::playerCloseTrade(Player* player)
 	return true;
 }
 
-bool Game::playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackpos)
+bool Game::playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackPos)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerLookAt()");
 	if(player->isRemoved())
 		return false;
 	
-	Thing* thing = internalGetThing(player, pos, STACKPOS_LOOK /*stackpos*/);
+	Thing* thing = internalGetThing(player, pos, stackPos, spriteId, STACKPOS_LOOK);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;

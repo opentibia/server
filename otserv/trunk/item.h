@@ -270,12 +270,13 @@ public:
 	const std::string& getName() const {return items[id].name;}
 
 	// get the number of items
-	unsigned short getItemCount() const {return count;}
+	uint8_t getItemCount() const {return count;}
 	void setItemCount(uint8_t n) {count = n;}
 
 	unsigned char getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
 	bool hasSubType() const;
+	uint8_t getSubType() const;
 
 	unsigned char getItemCharge() const {return charges;};
 	void setItemCharge(unsigned char n) {charges = n;};

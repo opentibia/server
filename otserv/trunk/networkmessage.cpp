@@ -32,11 +32,6 @@
 #include "position.h"
 #include "rsa.h"
 
-
-const uint32_t fluidMap[] = {FLUID_EMPTY_1, FLUID_BLUE_1, FLUID_RED_1, FLUID_BROWN_1, 
-	FLUID_GREEN_1, FLUID_YELLOW_1, FLUID_WHITE_1, FLUID_PURPLE_1};
-
-
 /******************************************************************************/
 bool NetworkMessage::ReadFromSocket(SOCKET socket)
 {

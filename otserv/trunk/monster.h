@@ -64,6 +64,7 @@ public:
 	virtual void doAttacking(uint32_t interval);
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
+	virtual void changeHealth(int32_t healthChange);
 
 	virtual bool challengeCreature(Creature* creature);
 	virtual bool convinceCreature(Creature* creature);

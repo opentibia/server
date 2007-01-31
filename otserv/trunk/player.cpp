@@ -2253,7 +2253,7 @@ int32_t Player::__getLastIndex() const
 	return SLOT_LAST;
 }
 
-uint32_t Player::__getItemTypeCount(uint16_t itemId) const
+uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
 {
 	uint32_t count = 0;
 
@@ -2264,12 +2264,18 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId) const
 
 	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
 		if(item = inventory[i]){
-			if(item->getID() == itemId){
-				if(item->isStackable()){
+			if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
+
+				if(itemCount){
 					count+= item->getItemCount();
 				}
 				else{
-					++count;
+					if(item->isRune()){
+						count+= item->getItemCharge();
+					}
+					else{
+						count+= item->getItemCount();
+					}
 				}
 			}
 
@@ -2283,7 +2289,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId) const
 		const Container* container = listContainer.front();
 		listContainer.pop_front();
 		
-		count+= container->__getItemTypeCount(itemId);
+		count+= container->__getItemTypeCount(itemId, subType, itemCount);
 
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
 			if(tmpContainer = (*cit)->getContainer()){

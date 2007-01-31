@@ -262,18 +262,16 @@ void Monster::onCreatureLeave(const Creature* creature)
 
 void Monster::startThink()
 {
-	if(getHealth() > 0){
-		isActive = true;
+	isActive = true;
 
-		if(hasMaster()){
-			selectTarget(getMaster()->getAttackedCreature());
-		}
+	if(hasMaster()){
+		selectTarget(getMaster()->getAttackedCreature());
+	}
 
-		addEventThink();
+	addEventThink();
 
-		if(getBaseSpeed() > 0){
-			addEventWalk();
-		}
+	if(getBaseSpeed() > 0){
+		addEventWalk();
 	}
 }
 
@@ -284,6 +282,7 @@ void Monster::stopThink()
 
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
 		(*cit)->setAttackedCreature(NULL);
+		(*cit)->onAttackedCreatureDissapear(false);
 	}
 
 	clearTargetList();
@@ -987,6 +986,12 @@ void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t d
 	if(isInvisible()){
 		removeCondition(CONDITION_INVISIBLE);
 	}
+}
+
+void Monster::changeHealth(int32_t healthChange)
+{
+	startThink();
+	Creature::changeHealth(healthChange);
 }
 
 bool Monster::challengeCreature(Creature* creature)

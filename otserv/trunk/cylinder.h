@@ -172,9 +172,11 @@ public:
 	/**
 	  * Get the amount of items of a certain type
 	  * \param itemId is the item type to the get the count of
+	  * \param subType is the extra type an item can have such as charges/fluidtype, -1 means not used
+	  * \param itemCount if set to true it will only count items and not other subtypes like charges
 	  * \param returns the amount of items of the asked item type
 	  */
-	virtual uint32_t __getItemTypeCount(uint16_t itemId) const;
+	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
 
 	/**
 	  * Adds an object to the cylinder without sending to the client(s)

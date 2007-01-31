@@ -39,10 +39,10 @@ public:
 	virtual ~Actions();
 
 
-	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item);
-	bool useItemEx(Player* player, Item* item, Creature* creature);
-	bool useItemEx(Player* player, const Position& fromPos,
-		const Position& toPos, const unsigned char toStackPos, Item* item);
+	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey);
+	bool useItemEx(Player* player, Item* item, Creature* creature, bool isHotkey);
+	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
+		const unsigned char toStackPos, Item* item, bool isHotkey);
 
 	bool openContainer(Player* player,Container* container, const unsigned char index);
 
@@ -50,6 +50,8 @@ public:
 	static ReturnValue canUseFar(const Creature* creature ,const Position& toPos, const bool blockWalls);
 
 protected:
+	ReturnValue internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item);
+
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
 	virtual std::string getScriptBaseName();

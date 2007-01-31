@@ -668,17 +668,25 @@ int32_t Container::__getLastIndex() const
 	return size();
 }
 
-uint32_t Container::__getItemTypeCount(uint16_t itemId) const
+uint32_t Container::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
 {
 	uint32_t count = 0;
+	Item* item = NULL;
 
-	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
-		if((*cit)->getID() == itemId){
-			if((*cit)->isStackable()){
-				count+= (*cit)->getItemCount();
+	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
+		item = (*it);
+		if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
+
+			if(itemCount){
+				count+= item->getItemCount();
 			}
 			else{
-				++count;
+				if(item->isRune()){
+					count+= item->getItemCharge();
+				}
+				else{
+					count+= item->getItemCount();
+				}
 			}
 		}
 	}

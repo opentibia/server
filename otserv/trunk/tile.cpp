@@ -1023,7 +1023,7 @@ int32_t Tile::__getLastIndex() const
 	return getThingCount();
 }
 
-uint32_t Tile::__getItemTypeCount(uint16_t itemId) const
+uint32_t Tile::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
 {
 	uint32_t count = 0;
 	Thing* thing = NULL;
@@ -1031,12 +1031,18 @@ uint32_t Tile::__getItemTypeCount(uint16_t itemId) const
 		thing = __getThing(i);
 
 		if(const Item* item = thing->getItem()){
-			if(item->getID() == itemId){
-				if(item->isStackable()){
+			if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
+
+				if(itemCount){
 					count+= item->getItemCount();
 				}
 				else{
-					++count;
+					if(item->isRune()){
+						count+= item->getItemCharge();
+					}
+					else{
+						count+= item->getItemCount();
+					}
 				}
 			}
 		}

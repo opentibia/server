@@ -194,17 +194,12 @@ Action* Actions::getAction(const Item* item)
 	return NULL;
 }
 
-bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* item)
+ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item)
 {	
-	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
-		return false;
-	}
-	
 	//check if it is a house door
 	if(Door* door = item->getDoor()){
-		if(door->canUse(player) == false){
-			player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-			return false;
+		if(!door->canUse(player)){
+			return RET_CANNOTUSETHISOBJECT;
 		}
 	}
 	
@@ -216,8 +211,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 		int32_t stack = item->getParent()->__getIndexOfThing(item);
 		PositionEx posEx(pos, stack);
 		if(action->executeUse(player, item, posEx, posEx, false)){
-			player->setLastAction(OTSYS_TIME());
-			return true;
+			return RET_NOERROR;
 		}
 	}
 	
@@ -229,22 +223,51 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 			player->sendTextWindow(item, 0, false);
 		}
 
-		return true;
+		return RET_NOERROR;
 	}
 	
 	//if it is a container try to open it
 	if(Container* container = item->getContainer()){
-		if(openContainer(player, container, index))
-			return true;
+		if(openContainer(player, container, index)){
+			return RET_NOERROR;
+		}
 	}
     
 	//we dont know what to do with this item
-	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-	return false;	
+	return RET_CANNOTUSETHISOBJECT;
 }
 
-bool Actions::useItemEx(Player* player, const Position& fromPos,
-	const Position& toPos, const unsigned char toStackPos, Item* item)
+bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey)
+{	
+	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
+		return false;
+	}
+	
+	uint32_t itemCount = item->getParent()->__getItemTypeCount(item->getID(), item->getSubType(), false);
+	ReturnValue ret = internalUseItem(player, pos, index, item);
+	if(ret != RET_NOERROR){
+		player->sendCancelMessage(ret);
+		return false;
+	}
+
+	if(isHotkey){
+		std::stringstream ss;
+		if(itemCount == 1){
+			ss << "Using the last " << item->getName() << "...";
+		}
+		else{
+			ss << "Using one of " << itemCount << " " << item->getName() << "s..."; 
+		}
+		
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	}
+
+	player->setLastAction(OTSYS_TIME());
+	return true;
+}
+
+bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
+	const unsigned char toStackPos, Item* item, bool isHotkey)
 {
 	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
 		return false;
@@ -252,27 +275,44 @@ bool Actions::useItemEx(Player* player, const Position& fromPos,
 
 	Action* action = getAction(item);
 	
-	if(action){
-		ReturnValue ret = action->canExecuteAction(player, toPos);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-
-		int32_t fromStackPos = item->getParent()->__getIndexOfThing(item);
-		PositionEx fromPosEx(fromPos, fromStackPos);
-		PositionEx toPosEx(toPos, toStackPos);
-		if(action->executeUse(player, item, fromPosEx, toPosEx, true)){
-			player->setLastAction(OTSYS_TIME());
-			return true;
-		}
+	if(!action){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
 	}
 
-	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-	return false;
+	ReturnValue ret = action->canExecuteAction(player, toPos);
+	if(ret != RET_NOERROR){
+		player->sendCancelMessage(ret);
+		return false;
+	}
+
+	uint32_t itemCount = item->getParent()->__getItemTypeCount(item->getID(), item->getSubType(), false);
+	int32_t fromStackPos = item->getParent()->__getIndexOfThing(item);
+	PositionEx fromPosEx(fromPos, fromStackPos);
+	PositionEx toPosEx(toPos, toStackPos);
+
+	if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+
+	if(isHotkey){
+		std::stringstream ss;
+		if(itemCount == 1){
+			ss << "Using the last " << item->getName() << "...";
+		}
+		else{
+			ss << "Using one of " << itemCount << " " << item->getName() << "s..."; 
+		}
+		
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	}
+
+	player->setLastAction(OTSYS_TIME());
+	return true;
 }
 
-bool Actions::useItemEx(Player* player, Item* item, Creature* creature)
+bool Actions::useItemEx(Player* player, Item* item, Creature* creature, bool isHotkey)
 {
 	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
 		return false;
@@ -280,18 +320,34 @@ bool Actions::useItemEx(Player* player, Item* item, Creature* creature)
 
 	Action* action = getAction(item);
 	
-	if(action){
-		PositionEx fromPosEx(item->getPosition(), item->getParent()->__getIndexOfThing(item));
-		PositionEx toPosEx(creature->getPosition(), creature->getParent()->__getIndexOfThing(creature));
-
-		if(action->executeUse(player, item, fromPosEx, toPosEx, true)){
-			player->setLastAction(OTSYS_TIME());
-			return true;
-		}
+	if(!action){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
 	}
 
-	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-	return false;
+	uint32_t itemCount = item->getParent()->__getItemTypeCount(item->getID(), item->getSubType(), false);
+	PositionEx fromPosEx(item->getPosition(), item->getParent()->__getIndexOfThing(item));
+	PositionEx toPosEx(creature->getPosition(), creature->getParent()->__getIndexOfThing(creature));
+
+	if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+
+	if(isHotkey){
+		std::stringstream ss;
+		if(itemCount == 1){
+			ss << "Using the last " << item->getName() << "...";
+		}
+		else{
+			ss << "Using one of " << itemCount << " " << item->getName() << "s..."; 
+		}
+		
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	}
+
+	player->setLastAction(OTSYS_TIME());
+	return true;
 }
 
 bool Actions::openContainer(Player* player, Container* container, const unsigned char index)
@@ -360,13 +416,15 @@ ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos
 {
 	ReturnValue ret = RET_NOERROR;
 
-	if(allowFarUse() == false){
-		if((ret = Actions::canUse(player, toPos)) != RET_NOERROR){
+	if(!allowFarUse()){
+		ret = Actions::canUse(player, toPos);
+		if(ret != RET_NOERROR){
 			return ret;
 		}
 	}
 	else{
-		if((ret = Actions::canUseFar(player, toPos, blockWalls())) != RET_NOERROR){
+		ret = Actions::canUseFar(player, toPos, blockWalls());
+		if(ret != RET_NOERROR){
 			return ret;
 		}
 	}

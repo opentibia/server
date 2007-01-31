@@ -196,7 +196,6 @@ unsigned char Item::getItemCountOrSubtype() const
 	if(it.isFluidContainer() || it.isSplash()){
 		return fluid;
 	}
-	//else if(charges != 0){
 	else if(it.charges != 0){
 		return charges;
 	}
@@ -224,6 +223,20 @@ bool Item::hasSubType() const
 {
 	const ItemType& it = items[id];
 	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.isRune());
+}
+
+uint8_t Item::getSubType() const
+{
+	const ItemType& it = items[getID()];
+
+	if(it.isFluidContainer() || it.isSplash()){
+		return fluid;
+	}
+	else if(it.charges != 0){
+		return charges;
+	}
+
+	return 0;
 }
 
 bool Item::unserialize(xmlNodePtr nodeItem)
