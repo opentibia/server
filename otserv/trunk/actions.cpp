@@ -332,6 +332,12 @@ bool Actions::useItemEx(Player* player, Item* item, Creature* creature, bool isH
 		return false;
 	}
 
+	ReturnValue ret = action->canExecuteAction(player, creature->getPosition());
+	if(ret != RET_NOERROR){
+		player->sendCancelMessage(ret);
+		return false;
+	}
+
 	PositionEx fromPosEx(item->getPosition(), item->getParent()->__getIndexOfThing(item));
 	PositionEx toPosEx(creature->getPosition(), creature->getParent()->__getIndexOfThing(creature));
 
