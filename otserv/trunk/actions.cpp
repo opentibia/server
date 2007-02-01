@@ -249,7 +249,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 			subType = item->getSubType();
 		}
 
-		uint32_t itemCount = item->getTopParent()->__getItemTypeCount(item->getID(), subType, false);
+		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
 		ReturnValue ret = internalUseItem(player, pos, index, item);
 		if(ret != RET_NOERROR){
 			player->sendCancelMessage(ret);
@@ -300,54 +300,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 			subType = item->getSubType();
 		}
 
-		uint32_t itemCount = item->getTopParent()->__getItemTypeCount(item->getID(), subType, false);
-		if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
-			player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-			return false;
-		}
-
-		showUseHotkeyMessage(player, item, itemCount);
-	}
-	else{
-		if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
-			player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-			return false;
-		}
-	}
-
-	player->setLastAction(OTSYS_TIME());
-	return true;
-}
-
-bool Actions::useItemEx(Player* player, Item* item, Creature* creature, bool isHotkey)
-{
-	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
-		return false;
-	}
-
-	Action* action = getAction(item);
-	
-	if(!action){
-		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-		return false;
-	}
-
-	ReturnValue ret = action->canExecuteAction(player, creature->getPosition());
-	if(ret != RET_NOERROR){
-		player->sendCancelMessage(ret);
-		return false;
-	}
-
-	PositionEx fromPosEx(item->getPosition(), item->getParent()->__getIndexOfThing(item));
-	PositionEx toPosEx(creature->getPosition(), creature->getParent()->__getIndexOfThing(creature));
-
-	if(isHotkey){
-		int32_t subType = -1;
-		if(item->hasSubType() && !item->isRune()){
-			subType = item->getSubType();
-		}
-
-		uint32_t itemCount = item->getTopParent()->__getItemTypeCount(item->getID(), subType, false);
+		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
 		if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
 			player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 			return false;

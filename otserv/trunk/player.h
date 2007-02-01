@@ -598,6 +598,7 @@ protected:
 	friend class LuaScriptInterface;
 	friend class Commands;
 	friend class Map;
+	friend class Actions;
 	friend class IOPlayerXML;
 	friend class IOPlayerSQL;
 };

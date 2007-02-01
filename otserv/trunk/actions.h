@@ -38,9 +38,7 @@ public:
 	Actions();
 	virtual ~Actions();
 
-
 	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey);
-	bool useItemEx(Player* player, Item* item, Creature* creature, bool isHotkey);
 	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 		const unsigned char toStackPos, Item* item, bool isHotkey);
 

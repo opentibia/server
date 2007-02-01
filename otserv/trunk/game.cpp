@@ -1830,13 +1830,6 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		}
 	}
 	
-
-	ReturnValue ret = RET_NOERROR;
-	if((ret = Actions::canUse(player, fromPos)) != RET_NOERROR){
-		player->sendCancelMessage(ret);
-		return false;
-	}
-
 	Thing* thing = internalGetThing(player, fromPos, fromStackPos, spriteId, STACKPOS_USE);
 
 	if(!thing){
@@ -1850,80 +1843,8 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 	
-	//bool result = g_actions->useItemEx(player, fromPos, creature->getPosition(), 0, item, isHotkey);
-	return g_actions->useItemEx(player, item, creature, isHotkey);
+	return g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), item, isHotkey);
 }
-
-/*
-bool Game::playerUseBattleWindowHotkey(Player* player, int32_t spriteId, int32_t subType, uint32_t creatureId)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItemExHotkey");
-	if(player->isRemoved())
-		return false;
-
-	if(g_config.getNumber(ConfigManager::HOTKEYS) == 0){
-		return false;
-	}
-
-	Creature* creature = NULL;
-	if(creatureId != 0){
-		creature = getCreatureByID(creatureId);
-		if(!creature){	
-			return false;
-		}
-
-		if(!Position::areInRange<7,5,0>(creature->getPosition(), player->getPosition())){
-			return false;
-		}
-	}
-
-	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
-	if(it.id == 0){
-		return false;
-	}
-
-	uint32_t itemCount = player->__getItemTypeCount(it.id, subType, false);
-	if(itemCount <= 0){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		return false;
-	}
-
-	Item* item = findItemOfType(player, it.id, subType);
-
-	if(!item){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		return false;
-	}
-
-	bool result = false;
-
-	if(creature){
-		if((player != creature) || it.isFluidContainer() || it.isRune()){
-			result = g_actions->useItemEx(player, item, creature);
-		}
-		else{
-			result = g_actions->useItemEx(player, player->getPosition(), player->getPosition(), 0, item);
-		}
-	}
-	else{
-		result = g_actions->useItem(player, player->getPosition(), 0, item);
-	}
-
-	if(result){
-		std::stringstream ss;
-		if(itemCount == 1){
-			ss << "Using the last " << it.name << "...";
-		}
-		else{
-			ss << "Using one of " << itemCount << " " << it.name << "s..."; 
-		}
-		
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
-	}
-
-	return result;
-}
-*/
 
 bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId)
 {
