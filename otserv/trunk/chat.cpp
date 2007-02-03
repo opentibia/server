@@ -285,7 +285,7 @@ bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& t
 		return false;
 	
 	//0x07 is the channelId of Help channel
-	if(channelId == 0x07 && type = SPEAK_CHANNEL_Y && player->hasFlag(PlayerFlag_TalkOrangeHelpChannel)){
+	if(channelId == 0x07 && type == SPEAK_CHANNEL_Y && player->hasFlag(PlayerFlag_TalkOrangeHelpChannel)){
 		type = SPEAK_CHANNEL_O;
 	}
 	
