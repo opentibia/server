@@ -2434,6 +2434,11 @@ bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	return map->canThrowObjectTo(fromPos, toPos);
 }
 
+bool Game::isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor)
+{
+	return map->isViewClear(fromPos, toPos, sameFloor);
+}
+
 bool Game::getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir)
 {
 	return map->getPathTo(creature, toPosition, listDir);
@@ -2516,7 +2521,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 
 	uint32_t currentDist = std::max(std::abs(creaturePos.x - targetPos.x), std::abs(creaturePos.y - targetPos.y));
 	if(currentDist == maxDist){
-		if(!targetMustBeReachable || map->canThrowObjectTo(creaturePos, targetPos)){
+		if(!targetMustBeReachable || map->isViewClear(creaturePos, targetPos, true)){
 			return true;
 		}
 	}
@@ -2553,7 +2558,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 
 					if(tmpWalkDist <= minWalkDist || tmpPos == creaturePos || minWalkDist == -1){
 
-						if(targetMustBeReachable && !canThrowObjectTo(tmpPos, targetPos)){
+						if(targetMustBeReachable && !isViewClear(tmpPos, targetPos, true)){
 							continue;
 						}
 						

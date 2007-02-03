@@ -195,7 +195,7 @@ void Creature::onAttacking(uint32_t interval)
 		onAttacked();
 		attackedCreature->onAttacked();
 
-		if(g_game.canThrowObjectTo(getPosition(), attackedCreature->getPosition())){
+		if(g_game.isViewClear(getPosition(), attackedCreature->getPosition(), true)){
 			doAttacking(interval);
 		}
 	}
@@ -584,7 +584,7 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 	fpp.needReachable = true;
 	fpp.targetDistance = 1;
 
-	if(followCreature != creature || !g_game.canThrowObjectTo(getPosition(), creature->getPosition())){
+	if(followCreature != creature || !g_game.isViewClear(getPosition(), creature->getPosition(), true)){
 		fpp.fullPathSearch = true;
 	}
 }

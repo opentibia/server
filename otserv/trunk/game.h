@@ -335,6 +335,7 @@ public:
 	void FreeThing(Thing* thing);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
+	bool isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor);
 	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
 

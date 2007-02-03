@@ -163,6 +163,8 @@ public:
 	//scripting
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
+	bool getHasParam() const { return hasParam;}
+
 protected:	
 	virtual std::string getScriptEventName();
 	

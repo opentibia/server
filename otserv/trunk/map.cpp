@@ -467,28 +467,44 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 
 bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 {
-	Position start = fromPos;
-	Position end = toPos;
-	
 	//z checks
 	//underground 8->15
 	//ground level and above 7->0
-	if((start.z >= 8 && end.z < 8) || (end.z >= 8 && start.z < 8))
+	if((fromPos.z >= 8 && toPos.z < 8) || (toPos.z >= 8 && fromPos.z < 8)){
 		return false;
+	}
 	
-	if(start.z - end.z > 2)
+	if(fromPos.z - fromPos.z > 2){
 		return false;
+	}
 	
 	int deltax, deltay, deltaz;
-	deltax = abs(start.x - end.x);
-	deltay = abs(start.y - end.y);
-	deltaz = abs(start.z - end.z);
+	deltax = std::abs(fromPos.x - toPos.x);
+	deltay = std::abs(fromPos.y - toPos.y);
+	deltaz = std::abs(fromPos.z - toPos.z);
     
 	//distance checks
 	if(deltax - deltaz > 8 || deltay - deltaz > 6){
 		return false;
 	}
-    
+
+	return isViewClear(fromPos, toPos, false);
+}
+
+bool Map::isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck)
+{
+	if(floorCheck && fromPos.z != toPos.z){
+		return false;
+	}
+
+	Position start = fromPos;
+	Position end = toPos;
+
+	int deltax, deltay, deltaz;
+	deltax = abs(start.x - end.x);
+	deltay = abs(start.y - end.y);
+	deltaz = abs(start.z - end.z);
+
 	int max = deltax, dir = 0;
 	if(deltay > max){
 		max = deltay; 

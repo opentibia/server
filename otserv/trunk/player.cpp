@@ -727,7 +727,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		break;
 
 	case RET_NOTENOUGHCAPACITY:
-		sendCancel("This object is to heavy.");
+		sendCancel("This object is too heavy.");
 		break;
 		
 	case RET_CONTAINERNOTENOUGHROOM:
@@ -1481,6 +1481,15 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			{
 				if(it.abilities.absorbPercentManaDrain > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentManaDrain) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_DROWNDAMAGE:
+			{
+				if(it.abilities.absorbPercentDrown > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDrown) / 100));
 					absorbedDamage = true;
 				}
 				break;

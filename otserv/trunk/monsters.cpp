@@ -635,6 +635,9 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 					else if(strValue == "bluebubble"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_LOSE_ENERGY);
 					}
+					else if(strValue == "greenbubble"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_POISON_RINGS);
+					}
 					else if(strValue == "poff"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_PUFF);
 					}

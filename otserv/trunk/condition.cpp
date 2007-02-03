@@ -982,7 +982,7 @@ bool ConditionDamage::startCondition(Creature* creature)
 bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 {
 	if(!damageList.empty()){
-		IntervalInfo& damageInfo = damageList.front();		
+		IntervalInfo& damageInfo = damageList.front();
 
 		bool bRemove = true;
 		creature->onTickCondition(getType(), bRemove);
@@ -1078,14 +1078,29 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 			minDamage = conditionDamage.minDamage;
 			startDamage = conditionDamage.startDamage;
 			tickInterval = conditionDamage.tickInterval;
+			int32_t nextTimeLeft = tickInterval;
 
-			damageList.clear();
+			if(!damageList.empty()){
+				//save previous timeLeft
+				IntervalInfo& damageInfo = damageList.front();
+				nextTimeLeft = damageInfo.timeLeft;
+				damageList.clear();
+			}
+
 			damageList = conditionDamage.damageList;
 			
 			if(init()){
-				int32_t damage = 0;
-				if(getNextDamage(damage)){
-					doDamage(creature, damage);
+				if(!damageList.empty()){
+					//restore last timeLeft
+					IntervalInfo& damageInfo = damageList.front();
+					damageInfo.timeLeft = nextTimeLeft;
+				}
+
+				if(!delayed){
+					int32_t damage = 0;
+					if(getNextDamage(damage)){
+						doDamage(creature, damage);
+					}
 				}
 			}
 		}

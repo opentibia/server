@@ -736,6 +736,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentManaDrain = intValue;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentDrown") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentDrown = intValue;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentPhysical") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentPhysical = intValue;
@@ -746,7 +751,6 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.conditionSuppressions |= CONDITION_DRUNK;
 								}
 							}
-							/*
 							else if(strcasecmp(strValue.c_str(), "suppressEnergy") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_ENERGY;
@@ -767,7 +771,12 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.conditionSuppressions |= CONDITION_LIFEDRAIN;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressManaDrain") == 0){
+							else if(strcasecmp(strValue.c_str(), "suppressDrown") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.conditionSuppressions |= CONDITION_DROWN;
+								}
+							}
+							/*else if(strcasecmp(strValue.c_str(), "suppressManaDrain") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_MANADRAIN;
 								}
@@ -776,8 +785,7 @@ bool Items::loadFromXml(const std::string& datadir)
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_PHYSICAL;
 								}
-							}
-							*/
+							}*/
 							else if(strcasecmp(strValue.c_str(), "field") == 0){
 								it.group = ITEM_GROUP_MAGICFIELD;
 								CombatType_t combatType = COMBAT_NONE;

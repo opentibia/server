@@ -53,6 +53,7 @@ struct Abilities{
 		absorbPercentPoison = 0;
 		absorbPercentLifeDrain = 0;
 		absorbPercentManaDrain = 0;
+		absorbPercentDrown = 0;
 
 		/*
 		absorbAll = 0;
@@ -98,6 +99,7 @@ struct Abilities{
 	uint8_t absorbPercentPoison;
 	uint8_t absorbPercentLifeDrain;
 	uint8_t absorbPercentManaDrain;
+	uint8_t absorbPercentDrown;
 
 	//extra skill modifiers
 	int32_t skills[SKILL_LAST + 1];

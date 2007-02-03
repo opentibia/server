@@ -52,30 +52,53 @@ Spells::~Spells()
 
 TalkActionResult_t Spells::playerSaySpell(Player* player, SpeakClasses type, const std::string& words)
 {
-	std::string str_words;
-	std::string str_param;
-	size_t loc = words.find( '"', 0 );
-	if(loc != std::string::npos && loc >= 0){
-		str_words = std::string(words, 0, loc);
-		str_param = std::string(words, (loc+1), words.size()-loc-1);
-	}
-	else{
-		str_words = words;
-		str_param = std::string(""); 
-	}
-	
+	std::string str_words = words;
+
+	//strip trailing spaces
 	trim_left(str_words, " ");
 	trim_right(str_words, " ");
 
-	InstantsMap::iterator it;
-	for(it = instants.begin(); it != instants.end(); ++it){
-		if(strcasecmp(it->first.c_str(), str_words.c_str()) == 0){
-			InstantSpell* instantSpell = it->second;
-			if(instantSpell->playerCastInstant(player, str_param)){
-				return TALKACTION_BREAK;
+	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
+		InstantSpell* instantSpell = it->second;
+		size_t spellLen = instantSpell->getWords().length();
+		if(strncasecmp(instantSpell->getWords().c_str(), str_words.c_str(), spellLen) == 0){
+
+			if(instantSpell->getHasParam()){
+				size_t paramLen = str_words.length() - spellLen;
+				std::string paramText = str_words.substr(spellLen, paramLen);
+				if(paramText.empty() || paramText[0] != ' '){
+					continue;
+				}
+
+				size_t loc1 = paramText.find('"', 0);
+				size_t loc2 = std::string::npos;
+				if(loc1 != std::string::npos){
+					loc2 = paramText.find('"', loc1 + 1);
+				}
+
+				if(loc2 == std::string::npos){
+					loc2 = paramText.length();
+				}
+				
+				std::string param = paramText.substr(loc1 + 1, loc2 - loc1 - 1);
+
+				trim_left(param, " ");
+				trim_right(param, " ");
+
+				if(instantSpell->playerCastInstant(player, param)){
+					return TALKACTION_BREAK;
+				}
+				else{
+					return TALKACTION_FAILED;
+				}
 			}
-			else{
-				return TALKACTION_FAILED;
+			else if(spellLen == words.length()){
+				if(instantSpell->playerCastInstant(player, "")){
+					return TALKACTION_BREAK;
+				}
+				else{
+					return TALKACTION_FAILED;
+				}
 			}
 		}
 	}
@@ -838,7 +861,9 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 			return false;
 		}
 
-		if(!g_game.canThrowObjectTo(player->getPosition(), target->getPosition())){
+		const Position& fromPos = player->getPosition();
+		const Position& toPos = target->getPosition();
+		if(!g_game.canThrowObjectTo(fromPos, toPos) || fromPos.z != toPos.z){
 			player->sendCancelMessage(RET_PLAYERISNOTREACHABLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;

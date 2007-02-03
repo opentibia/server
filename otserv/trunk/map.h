@@ -211,6 +211,15 @@ public:
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
 
 	/**
+	* Checks if view is clear from fromPos to toPos
+	*	\param fromPos from Source point
+	*	\param toPos Destination point
+	*	\param floorCheck if true then view is not clear if fromPos.z is not the same as toPos.z
+	*	\returns The result if there is no obstacles
+	*/
+	bool isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck);
+
+	/**
 	* Get the path to a specific position on the map.
 	* \param creature The creature that wants a route
 	* \param start The start position of the path
