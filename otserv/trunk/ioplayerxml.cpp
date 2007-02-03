@@ -850,11 +850,11 @@ bool IOPlayerXML::savePlayer(Player* player)
 
 bool IOPlayerXML::getGuidByName(unsigned long& guid, std::string& name)
 {
-	unsigned long a;
+	bool a;
 	return getGuidByNameEx(guid, a, name);
 }
 
-bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, unsigned long& alvl, std::string& name)
+bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, bool& specialVip, std::string& name)
 {
 	//load players.xml to get guid
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
@@ -907,7 +907,7 @@ bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, unsigned long& alvl, std:
 	toLowerCaseString(playerfile);
 
 	doc = xmlParseFile(playerfile.c_str());
-
+	specialVip = false;
 	if(doc){
 		int intValue;
 		std::string strValue;
@@ -926,7 +926,9 @@ bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, unsigned long& alvl, std:
 			isSuccess = false;
 
 		if(readXMLInteger(root, "access", intValue)){
-			alvl = intValue;
+			if(intValue > 0){
+				specialVip = true;
+			}
 		}
 		else
 			isSuccess = false;

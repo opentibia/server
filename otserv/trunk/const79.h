@@ -97,7 +97,7 @@ enum SpeakClasses {
 	SPEAK_CHANNEL_Y     = 0x05,	//yellow
 	SPEAK_CHANNEL_R1    = 0x0A,	//red - #c text -- gamemaster command
 	SPEAK_CHANNEL_R2    = 0x0E,	//red - #d text -- counsellor command(?)
-	SPEAK_CHANNEL_O     = 0x0C,	//orange		
+	SPEAK_CHANNEL_O     = 0x0C,	//orange
 	SPEAK_MONSTER_SAY   = 0x10,
 	SPEAK_MONSTER_YELL  = 0x11,
 };
@@ -296,6 +296,38 @@ enum item_t {
 	ITEM_MAILBOX3         = 3981,
 	
 	ITEM_DOCUMENT_RO      = 1968, //read-only
+};
+
+enum PlayerFlags{
+	PlayerFlag_CannotUseCombat = 0,
+	PlayerFlag_CannotAttackPlayer,
+	PlayerFlag_CannotAttackMonster,
+	PlayerFlag_IgnoredByMonsters,
+	PlayerFlag_CannotBeAttacked,
+	PlayerFlag_CanConvinceAll,
+	PlayerFlag_CanSummonAll,
+	PlayerFlag_CanSenseInvisibility,
+	PlayerFlag_NotGainInFight,
+	PlayerFlag_HasInfiniteMana,
+	PlayerFlag_HasInfiniteSoul,
+	PlayerFlag_CannotUseSpells,
+	PlayerFlag_CannotPickupItem,
+	PlayerFlag_CanAlwaysLogin,
+	PlayerFlag_CanBroadcast,
+	PlayerFlag_CanEditHouses,
+	PlayerFlag_CannotBeBanned,
+	PlayerFlag_CannotBePushed,
+	PlayerFlag_HasInfinateCapacity,
+	PlayerFlag_CanPushAllCreatures,
+	PlayerFlag_CanTalkRedPrivate,
+	PlayerFlag_CanTalkRedChannel,
+	PlayerFlag_TalkOrangeHelpChannel,
+	PlayerFlag_NotGainExperience,
+	PlayerFlag_NotGainMana,
+	PlayerFlag_NotGainHealth,
+	PlayerFlag_SetMaxSpeed,
+	PlayerFlag_SpecialVIP,
+	PlayerFlag_NotGenerateLoot,
 };
 
 //Reserved player storage key ranges

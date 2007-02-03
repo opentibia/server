@@ -426,7 +426,7 @@ bool AdminProtocol::adminCommandCloseServer()
 	g_game.setGameState(GAME_STATE_CLOSED);
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end()){
-		if((*it).second->getAccessLevel() == 0){
+		if(!(*it).second->hasFlag(PlayerFlag_CanAlwaysLogin)){
 			(*it).second->kickPlayer();
 			it = Player::listPlayer.list.begin();
 		}

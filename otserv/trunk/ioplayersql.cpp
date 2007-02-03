@@ -644,7 +644,7 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string& name)
 }
 
 
-bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std::string& name)
+bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, bool &specialVip, std::string& name)
 {
 	Database* mysql = Database::instance();
 	DBQuery query;
@@ -662,10 +662,10 @@ bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std:
 	guid = result.getDataInt("id");
 	const PlayerGroup* group = getPlayerGroup(result.getDataInt("group_id"));
 	if(group){
-		alvl = group->m_access;
+		specialVip = (group->m_flags & PlayerFlag_SpecialVIP) != 0;
 	}
 	else{
-		alvl = 0;
+		specialVip = false;
 	}
 	return true;
 }

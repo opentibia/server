@@ -125,7 +125,7 @@ connectResult_t Protocol79::ConnectPlayer()
 {
 	Waitlist* wait = Waitlist::instance();
 
-	if(player->getAccessLevel() == 0 && !wait->clientLogin(player->getAccount(), player->getIP())){
+	if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && !wait->clientLogin(player->getAccount(), player->getIP())){
 		return CONNECT_TOMANYPLAYERS;
 	}
 	else{

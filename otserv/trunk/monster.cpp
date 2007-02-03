@@ -1018,7 +1018,8 @@ bool Monster::challengeCreature(Creature* creature)
 
 bool Monster::convinceCreature(Creature* creature)
 {
-	if(creature->getPlayer() && creature->getPlayer()->getAccessLevel() <= 0){
+	Player* player = creature->getPlayer();
+	if(player && !player->hasFlag(PlayerFlag_CanConvinceAll)){
 		if(!mType->isConvinceable){
 			return false;
 		}

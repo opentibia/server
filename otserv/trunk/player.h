@@ -98,11 +98,11 @@ public:
 	Player(const std::string& name, Protocol79* p);
 	virtual ~Player();
 	
-	virtual Player* getPlayer() {return this;};
-	virtual const Player* getPlayer() const {return this;};
+	virtual Player* getPlayer() {return this;}
+	virtual const Player* getPlayer() const {return this;}
 
-	virtual const std::string& getName() const {return name;};
-	virtual const std::string& getNameDescription() const {return name;};
+	virtual const std::string& getName() const {return name;}
+	virtual const std::string& getNameDescription() const {return name;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void setGUID(uint32_t _guid) {guid = _guid;};
@@ -113,17 +113,18 @@ public:
 	void addList();
 	void kickPlayer() {client->logout();}
 	
-	uint32_t getGuildId() const {return guildId;};
-	const std::string& getGuildName() const {return guildName;};
-	const std::string& getGuildRank() const {return guildRank;};
-	const std::string& getGuildNick() const {return guildNick;};
+	uint32_t getGuildId() const {return guildId;}
+	const std::string& getGuildName() const {return guildName;}
+	const std::string& getGuildRank() const {return guildRank;}
+	const std::string& getGuildNick() const {return guildNick;}
 	
-	void setGuildRank(const std::string& rank) {guildRank = rank;};
-	void setGuildNick(const std::string& nick) {guildNick = nick;};
+	void setGuildRank(const std::string& rank) {guildRank = rank;}
+	void setGuildNick(const std::string& nick) {guildNick = nick;}
 	
-	void setFlags(uint32_t flags){};
+	void setFlags(uint64_t flags){ groupFlags = flags;}
+	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & (1 << value)));}
 	
-	bool isOnline() {return (client != NULL);};
+	bool isOnline() {return (client != NULL);}
 	uint32_t getIP() const;
 
 	void addContainer(uint32_t containerid, Container* container);
@@ -163,7 +164,7 @@ public:
 	virtual int getThrowRange() const {return 1;};
 
 	double getCapacity() const {
-		if(getAccessLevel() == 0) {
+		if(!hasFlag(PlayerFlag_HasInfinateCapacity)){
 			return capacity;
 		}
 		else
@@ -487,6 +488,7 @@ protected:
 	Vocation* vocation;
 	playersex_t sex;
 	int32_t soul, soulMax;
+	uint64_t groupFlags;
 
 	double inventoryWeight;
 	double capacity;
@@ -576,7 +578,7 @@ protected:
 	
 	void updateItemsLight(bool internal = false);
 	void updateBaseSpeed(){ 
-		if(getAccessLevel() == 0){
+		if(!hasFlag(PlayerFlag_SetMaxSpeed)){
 			baseSpeed = 220 + (2* (level - 1));
 		}
 		else{

@@ -283,7 +283,12 @@ bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& t
 	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel)
 		return false;
-		
+	
+	//0x07 is the channelId of Help channel
+	if(channelId == 0x07 && type = SPEAK_CHANNEL_Y && player->hasFlag(PlayerFlag_TalkOrangeHelpChannel)){
+		type = SPEAK_CHANNEL_O;
+	}
+	
 	if(channel->talk(player, type, text, channelId))
 		return true;
 	else

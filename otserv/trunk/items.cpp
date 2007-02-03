@@ -462,7 +462,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.maxTextLen = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "readOnceItemId") == 0){
+							else if(strcasecmp(strValue.c_str(), "writeOnceItemId") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.writeOnceItemId = intValue;
 								}

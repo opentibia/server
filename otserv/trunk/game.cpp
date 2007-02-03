@@ -500,7 +500,7 @@ bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= fals
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placePlayer()");
 
-	if(player->getAccessLevel() == 0 && getPlayersOnline() >= maxPlayers){
+	if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && getPlayersOnline() >= maxPlayers){
 		return false;
 	}
 
@@ -679,7 +679,7 @@ void Game::moveCreature(uint32_t playerId, const Position& playerPos,
 	if(!toTile){
 		ret = RET_NOTPOSSIBLE;
 	}
-	else if(!movingCreature->isPushable() && player->getAccessLevel() == 0){
+	else if(!movingCreature->isPushable() && !player->hasFlag(PlayerFlag_CanPushAllCreatures)){
 		ret = RET_NOTMOVEABLE;
 	}
 	else{
@@ -1661,7 +1661,7 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 		return false;
 	}
 
-	if(player->getAccessLevel() == 0){
+	if(type == SPEAK_PRIVATE_RED && !player->hasFlag(PlayerFlag_CanTalkRedPrivate)){
 		type = SPEAK_PRIVATE;
 	}
 
@@ -1680,7 +1680,7 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 	if(player->isRemoved())
 		return false;
 	
-	if(player->getAccessLevel() == 0){
+	if((type == SPEAK_CHANNEL_R1 || type == SPEAK_CHANNEL_R2) && !player->hasFlag(PlayerFlag_CanTalkRedChannel)){
 		type = SPEAK_CHANNEL_Y;
 	}
 	
@@ -1691,7 +1691,7 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 bool Game::playerBroadcastMessage(Player* player, const std::string& text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerBroadcastMessage()");
-	if(player->isRemoved() || player->getAccessLevel() == 0)
+	if(player->isRemoved() || !player->hasFlag(PlayerFlag_CanBroadcast))
 		return false;
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
@@ -2352,13 +2352,13 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 	std::string real_name;
 	real_name = vip_name;
 	unsigned long guid;
-	unsigned long access_lvl;
+	bool specialVip;
 	
-	if(!IOPlayer::instance()->getGuidByNameEx(guid, access_lvl, real_name)){
+	if(!IOPlayer::instance()->getGuidByNameEx(guid, specialVip, real_name)){
 		player->sendTextMessage(MSG_STATUS_SMALL, "A player with that name does not exist.");
 		return false;
 	}
-	if(access_lvl > (unsigned long)player->getAccessLevel()){
+	if(specialVip && !player->hasFlag(PlayerFlag_SpecialVIP)){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You can not add this player.");
 		return false;
 	}

@@ -113,7 +113,7 @@ void House::setHouseOwner(uint32_t guid)
 
 AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
 {
-	if(player->getAccessLevel() > 2)
+	if(player->hasFlag(PlayerFlag_CanEditHouses))
 		return HOUSE_OWNER;
 	
 	if(player->getGUID() == houseOwner)
@@ -135,7 +135,7 @@ bool House::kickPlayer(Player* player, const std::string& name)
 		HouseTile* houseTile = dynamic_cast<HouseTile*>(kickingPlayer->getTile());
 		
 		if(houseTile && houseTile->getHouse() == this){
-			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && player->getAccessLevel() >= kickingPlayer->getAccessLevel()){
+			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && !kickingPlayer->hasFlag(PlayerFlag_CanEditHouses)){
 				if(g_game.internalTeleport(kickingPlayer, getEntryPosition()) == RET_NOERROR){
 					g_game.addMagicEffect(getEntryPosition(), NM_ME_ENERGY_AREA);
 				}

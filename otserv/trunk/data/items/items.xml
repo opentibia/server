@@ -3987,13 +3987,13 @@
 	<attribute key="weight" value="100"/>
 	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
-	<attribute key="readOnceItemId" value="1954"/>
+	<attribute key="writeOnceItemId" value="1954"/>
 </item>
 <item id="1948" name="parchment">
 	<attribute key="weight" value="200"/>
 	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
-	<attribute key="readOnceItemId" value="1967"/>
+	<attribute key="writeOnceItemId" value="1967"/>
 </item>
 <item id="1949" name="scroll">
 	<attribute key="weight" value="50"/>
@@ -4007,13 +4007,13 @@
 	<attribute key="weight" value="200"/>
 	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
-	<attribute key="readOnceItemId" value="1953"/>
+	<attribute key="writeOnceItemId" value="1953"/>
 </item>
 <item id="1952" name="document">
 	<attribute key="weight" value="150"/>
 	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
-	<attribute key="readOnceItemId" value="1968"/>
+	<attribute key="writeOnceItemId" value="1968"/>
 </item>
 <item id="1953" name="parchment">
 	<attribute key="weight" value="200"/>
@@ -12674,7 +12674,7 @@
 	<attribute key="weight" value="100"/>
 	<attribute key="writeable" value="1"/>
 	<attribute key="maxTextLen" value="512"/>
-	<attribute key="readOnceItemId" value="4854"/>
+	<attribute key="writeOnceItemId" value="4854"/>
 </item>
 <item id="4854" name="paper">
 	<attribute key="weight" value="100"/>

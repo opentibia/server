@@ -33,7 +33,7 @@ public:
 	~PlayerGroup(){};
 	
 	std::string m_name;
-	uint32_t m_flags;
+	uint64_t m_flags;
 	uint32_t m_access;
 	uint32_t m_maxDepotItems;
 	uint32_t m_maxVip;
@@ -56,7 +56,7 @@ public:
 	virtual bool savePlayer(Player* player);
 	
 	virtual bool getGuidByName(unsigned long& guid, std::string& name);
-	virtual bool getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std::string& name);
+	virtual bool getGuidByNameEx(unsigned long &guid, bool& specialVip, std::string& name);
 	virtual bool getNameByGuid(unsigned long guid, std::string& name);
 	virtual bool getGuildIdByName(unsigned long& guildId, const std::string& guildName);
 	virtual bool playerExists(std::string name);

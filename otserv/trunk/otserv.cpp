@@ -354,12 +354,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 							connectResult_t connectRes = CONNECT_INTERNALERROR;
 
-							if(g_bans.isPlayerBanished(name) && player->getAccessLevel() == 0){
+							if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
 								msg.AddByte(0x14);
 								msg.AddString("Your character is banished!");
 								msg.WriteToSocket(s);
 							}
-							else if(g_bans.isAccountBanished(accnumber) && player->getAccessLevel() == 0){
+							else if(g_bans.isAccountBanished(accnumber) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
 								msg.AddByte(0x14);
 								msg.AddString("Your account is banished!");
 								msg.WriteToSocket(s);
@@ -380,7 +380,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
 								//nothing to do
 							}
-							else if(g_game.getGameState() == GAME_STATE_CLOSED && player->getAccessLevel() == 0){
+							else if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
 								msg.AddByte(0x14);
 								msg.AddString("Server temporarly closed.");
 								msg.WriteToSocket(s);

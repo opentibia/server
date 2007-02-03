@@ -183,7 +183,7 @@ bool Player::isPushable() const
 {
 	bool ret = Creature::isPushable();
 
-	if(getAccessLevel() != 0){
+	if(hasFlag(PlayerFlag_CannotBePushed)){
 		return false;
 	}
 
@@ -401,7 +401,7 @@ void Player::updateInventoryWeigth()
 {
 	inventoryWeight = 0.00;
 	
-	if(getAccessLevel() == 0){
+	if(!hasFlag(PlayerFlag_HasInfinateCapacity)){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = getInventoryItem((slots_t)i);
 			if(item){
@@ -629,7 +629,7 @@ bool Player::canSee(const Position& pos) const
 
 bool Player::canSeeCreature(const Creature* creature) const
 {
-	if((getAccessLevel() == 0) && !canSeeInvisibility() && creature->isInvisible() && !creature->getPlayer()){
+	if(creature->isInvisible() && !creature->getPlayer() && !hasFlag(PlayerFlag_CanSenseInvisibility) && !canSeeInvisibility()){
 		return false;
 	}
 
@@ -1262,7 +1262,7 @@ void Player::drainMana(Creature* attacker, int32_t manaLoss)
 
 void Player::addManaSpent(uint32_t amount)
 {
-	if(amount != 0 && getAccessLevel() == 0){
+	if(amount != 0 && !hasFlag(PlayerFlag_NotGainMana)){
 		manaSpent += amount * g_config.getNumber(ConfigManager::RATE_MAGIC);
 		int reqMana = vocation->getReqMana(magLevel + 1);
 
@@ -1777,7 +1777,7 @@ void Player::autoCloseContainers(const Container* container)
 
 bool Player::hasCapacity(const Item* item, uint32_t count) const
 {
-	if(getAccessLevel() == 0 && item->getTopParent() != this){
+	if(!hasFlag(PlayerFlag_HasInfinateCapacity) && item->getTopParent() != this){
 		double itemWeight = 0;
 
 		if(item->isStackable()){

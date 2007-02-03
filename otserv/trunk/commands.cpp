@@ -619,7 +619,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end())
 	{
-		if((*it).second->getAccessLevel() == 0){
+		if(!(*it).second->hasFlag(PlayerFlag_CanAlwaysLogin)){
 			(*it).second->kickPlayer();
 			it = Player::listPlayer.list.begin();
 		}
