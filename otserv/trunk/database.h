@@ -88,14 +88,14 @@ public:
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	int getDataInt(const std::string &s, unsigned int nrow=0);
+	uint32_t getDataInt(const std::string &s, unsigned int nrow=0);
 
 	/** Get the Long value of a field in database
 	*\returns The Long value of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	long getDataLong(const std::string &s, unsigned int nrow=0);
+	uint64_t getDataLong(const std::string &s, unsigned int nrow=0);
 
 	/** Get the String of a field in database
 	*\returns The String of the selected field and row

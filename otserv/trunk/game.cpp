@@ -1680,7 +1680,10 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 	if(player->isRemoved())
 		return false;
 	
-	if((type == SPEAK_CHANNEL_R1 || type == SPEAK_CHANNEL_R2) && !player->hasFlag(PlayerFlag_CanTalkRedChannel)){
+	if(type == SPEAK_CHANNEL_R1 && !player->hasFlag(PlayerFlag_CanTalkRedChannel)){
+		type = SPEAK_CHANNEL_Y;
+	}
+	else if(type == SPEAK_CHANNEL_R2 && !player->hasFlag(PlayerFlag_CanTalkRedChannelAnonymous)){
 		type = SPEAK_CHANNEL_Y;
 	}
 	

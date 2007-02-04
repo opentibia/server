@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL COMMENT 'group name',
-    `flags` INT NOT NULL DEFAULT 0,
+    `flags` BIGINT UNSIGNED NOT NULL DEFAULT 0,
     `access` INT NOT NULL,
     `maxdepotitems` INT NOT NULL,
     `maxviplist` INT NOT NULL,

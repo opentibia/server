@@ -163,9 +163,9 @@ Chat::Chat()
 	if(newChannel)
 		m_normalChannels[0x06] = newChannel;
 				
-	newChannel = new ChatChannel(0x07, "Help");
+	newChannel = new ChatChannel(0x08, "Help");
 	if(newChannel)
-		m_normalChannels[0x07] = newChannel;
+		m_normalChannels[0x08] = newChannel;
 		
 	newChannel = new PrivateChatChannel(0xFFFF, "Private Chat Channel");
 	if(newChannel)
@@ -284,8 +284,8 @@ bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& t
 	if(!channel)
 		return false;
 	
-	//0x07 is the channelId of Help channel
-	if(channelId == 0x07 && type == SPEAK_CHANNEL_Y && player->hasFlag(PlayerFlag_TalkOrangeHelpChannel)){
+	//0x08 is the channelId of Help channel
+	if(channelId == 0x08 && type == SPEAK_CHANNEL_Y && player->hasFlag(PlayerFlag_TalkOrangeHelpChannel)){
 		type = SPEAK_CHANNEL_O;
 	}
 	

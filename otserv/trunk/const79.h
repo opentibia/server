@@ -95,8 +95,8 @@ enum SpeakClasses {
 	//SPEAK_CHANNEL??   = 0x07,
 	//SPEAK_CHANNEL??   = 0x08,	
 	SPEAK_CHANNEL_Y     = 0x05,	//yellow
-	SPEAK_CHANNEL_R1    = 0x0A,	//red - #c text -- gamemaster command
-	SPEAK_CHANNEL_R2    = 0x0E,	//red - #d text -- counsellor command(?)
+	SPEAK_CHANNEL_R1    = 0x0A,	//red - #c text
+	SPEAK_CHANNEL_R2    = 0x0E,	//red anonymous - #d text
 	SPEAK_CHANNEL_O     = 0x0C,	//orange
 	SPEAK_MONSTER_SAY   = 0x10,
 	SPEAK_MONSTER_YELL  = 0x11,
@@ -328,6 +328,7 @@ enum PlayerFlags{
 	PlayerFlag_SetMaxSpeed,
 	PlayerFlag_SpecialVIP,
 	PlayerFlag_NotGenerateLoot,
+	PlayerFlag_CanTalkRedChannelAnonymous,
 };
 
 //Reserved player storage key ranges

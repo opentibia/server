@@ -722,7 +722,7 @@ const PlayerGroup* IOPlayerSQL::getPlayerGroup(uint32_t groupid)
 			PlayerGroup* group = new PlayerGroup;
 			
 			group->m_name = result.getDataString("name");
-			group->m_flags = result.getDataInt("flags");
+			group->m_flags = result.getDataLong("flags");
 			group->m_access = result.getDataInt("access");
 			group->m_maxDepotItems = result.getDataInt("maxdepotitems");
 			group->m_maxVip = result.getDataInt("maxviplist");

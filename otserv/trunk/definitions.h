@@ -67,7 +67,8 @@
 	#include <ext/hash_set>
 	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 	#define OTSERV_HASH_SET __gnu_cxx::hash_set
-
+	#define ATOI64 atoll
+	
 #else
 	typedef unsigned long long uint64_t;
 
@@ -99,6 +100,8 @@
 	typedef unsigned short uint16_t;
 	typedef signed short int16_t;
 	typedef unsigned char uint8_t;
+	
+	#define ATOI64 _atoi64
 
 	#pragma warning(disable:4786) // msvc too long debug names in stl
 	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
@@ -117,8 +120,9 @@
 
 	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 	#define OTSERV_HASH_SET __gnu_cxx::hash_set
-	typedef int64_t int64_t;
-
+	
+	#define ATOI64 atoll
+	
 #endif
 
 #endif

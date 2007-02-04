@@ -2070,7 +2070,15 @@ void Protocol79::AddCreatureSpeak(NetworkMessage& msg,const Creature* creature, 
 {
 	msg.AddByte(0xAA);
 	msg.AddU32(0);
-	msg.AddString(creature->getName());
+	//Do not add name for anonymous channel talk
+	if(type != SPEAK_CHANNEL_R2){
+		msg.AddString(creature->getName());
+	}
+	else{
+		msg.AddString("");
+	}
+	
+	//Add level only for players
 	if(const Player* player = creature->getPlayer()){
 		msg.AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
 	}
