@@ -431,6 +431,39 @@ void Creature::die()
 	if(getMaster()){
 		getMaster()->removeSummon(this);
 	}
+
+	Item* splash = NULL;
+	switch(getRace()){
+		case RACE_VENOM:
+			splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_GREEN);
+			break;
+
+		case RACE_BLOOD:
+			splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
+			break;
+
+		case RACE_UNDEAD:
+			break;
+			
+		case RACE_FIRE:
+			break;
+
+		default:
+			break;
+	}
+
+	Tile* tile = getTile();
+	if(splash){
+		g_game.internalAddItem(tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		g_game.startDecay(splash);
+	}
+
+	Item* corpse = getCorpse();
+	if(corpse){
+		g_game.internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		dropLoot(corpse->getContainer());
+		g_game.startDecay(corpse);
+	}
 }
 
 bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCreature)

@@ -2637,39 +2637,6 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 		else{
 			creature->die();
 			removeCreature(creature, false);
-
-			Item* splash = NULL;
-			switch(creature->getRace()){
-				case RACE_VENOM:
-					splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_GREEN);
-					break;
-
-				case RACE_BLOOD:
-					splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
-					break;
-
-				case RACE_UNDEAD:
-					break;
-					
-				case RACE_FIRE:
-					break;
-
-				default:
-					break;
-			}
-
-			Tile* tile = creature->getTile();
-			if(splash){
-				internalAddItem(tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
-				startDecay(splash);
-			}
-
-			Item* corpse = creature->getCorpse();
-			if(corpse){
-				internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
-				creature->dropLoot(corpse->getContainer());
-				startDecay(corpse);
-			}
 		}
 
 		flushSendBuffers();
