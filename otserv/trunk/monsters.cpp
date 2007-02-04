@@ -710,6 +710,18 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 					else if(strValue == "bubblearea"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_CRAPS);
 					}
+					else if(strValue == "giftwraps"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_GIFT_WRAPS);
+					}
+					else if(strValue == "fireworkyellow"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_FIREWORK_YELLOW);
+					}
+					else if(strValue == "fireworkred"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_FIREWORK_RED);
+					}
+					else if(strValue == "fireworkblue"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_FIREWORK_BLUE);
+					}
 				}
 			}
 		}
