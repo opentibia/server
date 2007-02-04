@@ -453,65 +453,68 @@ bool Spell::configureSpell(xmlNodePtr p)
 
 bool Spell::playerSpellCheck(const Player* player) const
 {
-	if(player->getAccessLevel() > 0){
-		return true;
-	}
-	
-	if(!enabled){
+	if(player->hasFlag(PlayerFlag_CannotUseSpells)){
 		return false;
 	}
-	
-	if(isAggressive){
-		if(player->getAccessLevel() == 0 && player->getTile()->isPz()){
-			player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
+
+	if(!player->hasFlag(PlayerFlag_IgnoreSpellCheck)){
+		if(!enabled){
 			return false;
 		}
-	}
+		
+		if(isAggressive){
+			if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone) && player->getTile()->isPz()){
+				player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
+				return false;
+			}
+		}
 
-	if(player->hasCondition(CONDITION_EXHAUSTED)){
-		player->sendCancelMessage(RET_YOUAREEXHAUSTED);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
-	if(player->getLevel() < level){
-		player->sendCancelMessage(RET_NOTENOUGHLEVEL);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
-	if(player->getMagicLevel() < magLevel){
-		player->sendCancelMessage(RET_NOTENOUGHMAGICLEVEL);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
-	if(player->getMana() < getManaCost(player)){
-		player->sendCancelMessage(RET_NOTENOUGHMANA);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
-	if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){		
-		player->sendCancelMessage(RET_NOTENOUGHSOUL);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
-	if(!vocSpellMap.empty()){
-		if(vocSpellMap.find(player->getVocationId()) == vocSpellMap.end()){
-			player->sendCancel("Your vocation cannot use this spell.");
+		if(player->hasCondition(CONDITION_EXHAUSTED)){
+			player->sendCancelMessage(RET_YOUAREEXHAUSTED);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
+
+		if(player->getLevel() < level){
+			player->sendCancelMessage(RET_NOTENOUGHLEVEL);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+
+		if(player->getMagicLevel() < magLevel){
+			player->sendCancelMessage(RET_NOTENOUGHMAGICLEVEL);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+
+		if(player->getMana() < getManaCost(player)){
+			player->sendCancelMessage(RET_NOTENOUGHMANA);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+
+		if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){		
+			player->sendCancelMessage(RET_NOTENOUGHSOUL);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+
+		if(!vocSpellMap.empty()){
+			if(vocSpellMap.find(player->getVocationId()) == vocSpellMap.end()){
+				player->sendCancel("Your vocation cannot use this spell.");
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+		}
+
+		//TODO: check if the player knows the spell
+		/*
+		if(premium && !player->getPremium()){
+			return false;
+		}
+		*/
 	}
 
-	//TODO: check if the player knows the spell
-	/*
-	if(premium && !player->getPremium()){
-		return false;
-	}
-	*/
 	return true;
 }
 
@@ -624,16 +627,16 @@ bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 
 void Spell::postCastSpell(Player* player) const
 {
-	if(player->getAccessLevel() > 0){
-		return;
-	}
-
-	if(exhaustion){
-		player->addExhaustionTicks();
+	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
+		if(exhaustion){
+			player->addExhaustionTicks();
+		}
 	}
 	
-	if(isAggressive){
-		player->addInFightTicks();
+	if(!player->hasFlag(PlayerFlag_NotGainInFight)){
+		if(isAggressive){
+			player->addInFightTicks();
+		}
 	}
 
 	int32_t manaCost = getManaCost(player);
@@ -643,17 +646,17 @@ void Spell::postCastSpell(Player* player) const
 
 void Spell::postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const
 {
-	if(player->getAccessLevel() > 0){
-		return;
+	if(!player->hasFlag(PlayerFlag_HasInfiniteMana)){
+		if(manaCost > 0){
+			player->addManaSpent(manaCost);
+			player->changeMana(-(int32_t)manaCost);
+		}
 	}
 
-	if(manaCost > 0){
-		player->addManaSpent(manaCost);
-		player->changeMana(-(int32_t)manaCost);
-	}
-
-	if(soulCost > 0){
-		player->changeSoul(-(int32_t)soulCost);
+	if(!player->hasFlag(PlayerFlag_HasInfiniteSoul)){
+		if(soulCost > 0){
+			player->changeSoul(-(int32_t)soulCost);
+		}
 	}
 }
 
@@ -710,22 +713,12 @@ ReturnValue Spell::CreateIllusion(Creature* creature, const std::string& name, i
 		return RET_CREATUREDOESNOTEXIST;
 	}
 
-	if(creature->getPlayer() && creature->getPlayer()->getAccessLevel() == 0){
+	Player* player = creature->getPlayer();
+	if(player && !player->hasFlag(PlayerFlag_CanIllusionAll)){
 		if(!mType->isIllusionable){
 			return RET_NOTPOSSIBLE;
 		}
 	}
-
-	/*
-	ConditionOutfit* outfitCondition = new ConditionOutfit(CONDITIONID_COMBAT, CONDITION_OUTFIT, time);
-
-	if(!outfitCondition){
-		return RET_NOTPOSSIBLE;
-	}
-
-	outfitCondition->addOutfit(mType->outfit);
-	creature->addCondition(outfitCondition);
-	*/
 
 	return CreateIllusion(creature, mType->outfit, time);
 }
@@ -736,21 +729,6 @@ ReturnValue Spell::CreateIllusion(Creature* creature, uint32_t itemId, int32_t t
 	if(it.id == 0){
 		return RET_NOTPOSSIBLE;
 	}
-
-	/*
-	ConditionOutfit* outfitCondition = new ConditionOutfit(CONDITIONID_COMBAT, CONDITION_OUTFIT, time);
-
-	if(!outfitCondition){
-		return RET_NOTPOSSIBLE;
-	}
-
-	Outfit_t outfit;
-	outfit.lookTypeEx = itemId;
-	outfitCondition->addOutfit(outfit);
-	creature->addCondition(outfitCondition);
-
-	return RET_NOERROR;
-	*/
 
 	Outfit_t outfit;
 	outfit.lookTypeEx = itemId;
@@ -1309,23 +1287,25 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 		return false;
 	}
 
-	if(player->getAccessLevel() == 0 && !mType->isSummonable){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
 	int32_t manaCost = mType->manaCost;
-	if(player->getMana() < manaCost){
-		player->sendCancelMessage(RET_NOTENOUGHMANA);
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
+	if(!player->hasFlag(PlayerFlag_CanSummonAll)){
+		if(!mType->isSummonable){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
 
-	if(player->getSummonCount() >= 2){
-		player->sendCancel("You cannot summon more creatures.");
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
+		if(player->getMana() < manaCost){
+			player->sendCancelMessage(RET_NOTENOUGHMANA);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+
+		if(player->getSummonCount() >= 2){
+			player->sendCancel("You cannot summon more creatures.");
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
 	}
 
 	ReturnValue ret = Commands::placeSummon(creature, param);
@@ -1722,7 +1702,7 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		return false;
 	}
 
-	if(player->getAccessLevel() <= 0){
+	if(!player->hasFlag(PlayerFlag_CanConvinceAll)){
 		if(player->getSummonCount() >= 2){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
@@ -1763,6 +1743,10 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 
 ReturnValue RuneSpell::canExecuteAction(const Player* player, const Position& toPos)
 {
+	if(player->hasFlag(PlayerFlag_CannotUseSpells)){
+		return RET_CANNOTUSETHISOBJECT;
+	}
+
 	ReturnValue ret = Action::canExecuteAction(player, toPos);
 	if(ret != RET_NOERROR){
 		return ret;

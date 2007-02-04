@@ -324,7 +324,7 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 	Player* playerBan = game->getPlayerByName(param);
 	if(playerBan){
 		Player* player = creature->getPlayer();
-		if(player && player->getAccessLevel() <= playerBan->getAccessLevel()){
+		if(player && player->hasFlag(PlayerFlag_CannotBeBanned)){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot ban this player.");
 			return true;
 		}

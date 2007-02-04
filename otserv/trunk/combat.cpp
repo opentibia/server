@@ -103,7 +103,6 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 
 ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive)
 {
-	//if(tile->hasProperty(BLOCKPROJECTILE) || tile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
 	if(tile->hasProperty(BLOCKPROJECTILE)){
 		return RET_NOTENOUGHROOM;
 	}
@@ -130,7 +129,7 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 		}
 
 		if(const Player* player = caster->getPlayer()){
-			if(player->getAccessLevel() > 0){
+			if(player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 				return RET_NOERROR;
 			}
 		}
@@ -145,28 +144,30 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 
 ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
 {
-	/*
-	if(attacker == target){
-		return RET_YOUMAYNOTATTACKTHISPLAYER;
-	}
-	*/
+	if(attacker && attacker->getPlayer()){
+		Player* attackerPlayer = attacker->getPlayer();
 
-	if(attacker && attacker->getPlayer() && target->getPlayer()){
-		if(attacker->getPlayer()->getAccessLevel() > target->getPlayer()->getAccessLevel()){
-			return RET_NOERROR;
-		}
-		else if(attacker->getPlayer()->getAccessLevel() < target->getPlayer()->getAccessLevel()){
-			return RET_YOUMAYNOTATTACKTHISPLAYER;
-		}
-	}
+		if(target->getPlayer()){
+			if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
+				return RET_YOUMAYNOTATTACKTHISPLAYER;
+			}
 
-	if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-		if(attacker && attacker->getPlayer()){
+			if(target->getPlayer()->hasFlag(PlayerFlag_CannotBeAttacked)){
+				return RET_YOUMAYNOTATTACKTHISPLAYER;
+			}
+		}
+		else if(target->getMonster()){
+			if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackMonster)){
+				return RET_YOUMAYNOTATTACKTHISCREATURE;
+			}
+		}
+
+		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
 			if(target->getPlayer()){
 				return RET_YOUMAYNOTATTACKTHISPLAYER;
 			}
 			else if(target->getMaster() && target->getMaster()->getPlayer()){
-				return RET_YOUMAYNOTATTACKTHISPLAYER;
+				return RET_YOUMAYNOTATTACKTHISCREATURE;
 			}
 		}
 	}

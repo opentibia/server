@@ -292,33 +292,32 @@ bool Weapon::playerWeaponCheck(Player* player, Creature* target) const
 		return false;
 	}
 
-	if(player->getAccessLevel() > 0){
-		return true;
-	}
+	if(!player->hasFlag(PlayerFlag_IgnoreWeaponCheck)){
 	
-	if(!enabled){
-		return false;
-	}
-
-	if(player->getLevel() < level){
-		return false;
-	}
-
-	if(player->getMagicLevel() < magLevel){
-		return false;
-	}
-
-	if(player->getMana() < getManaCost(player)){
-		return false;
-	}
-
-	if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){
-		return false;
-	}
-
-	if(!vocWeaponMap.empty()){
-		if(vocWeaponMap.find(player->getVocationId()) == vocWeaponMap.end()){
+		if(!enabled){
 			return false;
+		}
+
+		if(player->getLevel() < level){
+			return false;
+		}
+
+		if(player->getMagicLevel() < magLevel){
+			return false;
+		}
+
+		if(player->getMana() < getManaCost(player)){
+			return false;
+		}
+
+		if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){
+			return false;
+		}
+
+		if(!vocWeaponMap.empty()){
+			if(vocWeaponMap.find(player->getVocationId()) == vocWeaponMap.end()){
+				return false;
+			}
 		}
 	}
 
@@ -353,7 +352,7 @@ bool Weapon::useFist(Player* player, Creature* target)
 		params.blockedByShield = true;
 		Combat::doCombatHealth(player, target, damage, damage, params);
 
-		if(player->getAccessLevel() <= 0){
+		if(!player->hasFlag(PlayerFlag_NotGainSkill)){
 			if(player->getAddAttackSkill()){
 				player->addSkillAdvance(SKILL_FIST, 1);
 			}
@@ -417,31 +416,35 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		g_game.transformItem(item, item->getID(), newCharge);
 	}
 
-	if(player->getAccessLevel() > 0){
-		return;
+	if(!player->hasFlag(PlayerFlag_NotGainSkill)){
+		skills_t skillType;
+		uint32_t skillPoint = 0;
+		if(getSkillType(player, item, skillType, skillPoint)){
+			player->addSkillAdvance(skillType, skillPoint);
+		}
 	}
 
-	skills_t skillType;
-	uint32_t skillPoint = 0;
-	if(getSkillType(player, item, skillType, skillPoint)){
-		player->addSkillAdvance(skillType, skillPoint);
+	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
+		if(exhaustion){
+			player->addExhaustionTicks();
+		}
 	}
 
-	if(exhaustion){
-		player->addExhaustionTicks();
+	if(!player->hasFlag(PlayerFlag_HasInfiniteMana)){
+		int32_t manaCost = getManaCost(player);
+
+		if(manaCost > 0){
+			player->addManaSpent(manaCost);
+			player->changeMana(-manaCost);
+		}
 	}
 
-	int32_t manaCost = getManaCost(player);
+	if(!player->hasFlag(PlayerFlag_HasInfiniteSoul)){
+		int32_t soulCost = soul;
 
-	if(manaCost > 0){
-		player->addManaSpent(manaCost);
-		player->changeMana(-manaCost);
-	}
-
-	int32_t soulCost = soul;
-
-	if(soulCost > 0){
-		player->changeSoul(-soulCost);
+		if(soulCost > 0){
+			player->changeSoul(-soulCost);
+		}
 	}
 }
 

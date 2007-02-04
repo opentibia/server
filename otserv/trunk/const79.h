@@ -302,14 +302,15 @@ enum PlayerFlags{
 	PlayerFlag_CannotUseCombat = 0,
 	PlayerFlag_CannotAttackPlayer,
 	PlayerFlag_CannotAttackMonster,
-	PlayerFlag_IgnoredByMonsters,
 	PlayerFlag_CannotBeAttacked,
 	PlayerFlag_CanConvinceAll,
 	PlayerFlag_CanSummonAll,
+	PlayerFlag_CanIllusionAll,
 	PlayerFlag_CanSenseInvisibility,
 	PlayerFlag_NotGainInFight,
 	PlayerFlag_HasInfiniteMana,
 	PlayerFlag_HasInfiniteSoul,
+	PlayerFlag_HasNoExhaustion,
 	PlayerFlag_CannotUseSpells,
 	PlayerFlag_CannotPickupItem,
 	PlayerFlag_CanAlwaysLogin,
@@ -325,10 +326,14 @@ enum PlayerFlags{
 	PlayerFlag_NotGainExperience,
 	PlayerFlag_NotGainMana,
 	PlayerFlag_NotGainHealth,
+	PlayerFlag_NotGainSkill,
 	PlayerFlag_SetMaxSpeed,
 	PlayerFlag_SpecialVIP,
 	PlayerFlag_NotGenerateLoot,
 	PlayerFlag_CanTalkRedChannelAnonymous,
+	PlayerFlag_IgnoreProtectionZone,
+	PlayerFlag_IgnoreSpellCheck,
+	PlayerFlag_IgnoreWeaponCheck
 };
 
 //Reserved player storage key ranges

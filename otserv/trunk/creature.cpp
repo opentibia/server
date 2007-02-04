@@ -343,6 +343,11 @@ void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 	}
 }
 
+void Creature::onAttackedCreatureEnterProtectionZone(const Creature* creature)
+{
+	onCreatureDisappear(creature, false);
+}
+
 void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	//validateWalkPath();
@@ -388,7 +393,8 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 			onCreatureDisappear(attackedCreature, false);
 		}
 		else if(attackedCreature->isInPz() || isInPz()){
-			onCreatureDisappear(attackedCreature, false);
+			//onCreatureDisappear(attackedCreature, false);
+			onAttackedCreatureEnterProtectionZone(attackedCreature);
 		}
 	}
 }

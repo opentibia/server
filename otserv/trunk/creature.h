@@ -230,6 +230,7 @@ public:
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
+	virtual void onAttackedCreatureEnterProtectionZone(const Creature* creature);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
@@ -314,9 +315,6 @@ protected:
 	uint32_t lastHitCreature;
 	uint32_t blockCount;
 	uint32_t blockTicks;
-
-	//bool internalDefense;
-	//bool internalArmor;
 
 	void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void doAttacking(uint32_t interval) {};

@@ -122,7 +122,7 @@ public:
 	void setGuildNick(const std::string& nick) {guildNick = nick;}
 	
 	void setFlags(uint64_t flags){ groupFlags = flags;}
-	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & (1 << value)));}
+	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 	
 	bool isOnline() {return (client != NULL);}
 	uint32_t getIP() const;
@@ -267,6 +267,7 @@ public:
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
+	virtual void onAttackedCreatureEnterProtectionZone(const Creature* creature);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 

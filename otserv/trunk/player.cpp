@@ -570,7 +570,7 @@ uint16_t Player::getLookCorpse() const
 
 void Player::dropLoot(Container* corpse)
 {
-	if(corpse){
+	if(corpse && !hasFlag(PlayerFlag_NotGenerateLoot)){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
 	#ifdef __SKULLSYSTEM__
@@ -835,6 +835,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You may not attack this player.");
 		break;
 
+	case RET_YOUMAYNOTATTACKTHISCREATURE:
+		sendCancel("You may not attack this creature.");
+		break;
+
 	case RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE:
 		sendCancel("You may not attack a person in a protection zone.");
 		break;
@@ -1026,6 +1030,13 @@ void Player::onFollowCreatureDissapear(bool isLogout)
 
 	if(!isLogout){
 		sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+	}
+}
+
+void Player::onAttackedCreatureEnterProtectionZone(const Creature* creature)
+{
+	if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+		Creature::onAttackedCreatureEnterProtectionZone(creature);
 	}
 }
 
@@ -1786,6 +1797,10 @@ void Player::autoCloseContainers(const Container* container)
 
 bool Player::hasCapacity(const Item* item, uint32_t count) const
 {
+	if(hasFlag(PlayerFlag_CannotPickupItem)){
+		return false;
+	}
+
 	if(!hasFlag(PlayerFlag_HasInfinateCapacity) && item->getTopParent() != this){
 		double itemWeight = 0;
 
@@ -2687,7 +2702,7 @@ void Player::onAttackedCreature(Creature* target)
 {
 	Creature::onAttackedCreature(target);
 
-	if(getAccessLevel() == 0){
+	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
 				pzLocked = true;
@@ -2718,7 +2733,7 @@ void Player::onAttacked()
 {
 	Creature::onAttacked();
 
-	if(getAccessLevel() == 0){
+	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		addInFightTicks();
 	}
 }
@@ -2733,7 +2748,7 @@ void Player::onKilledCreature(Creature* target)
 {
 	Creature::onKilledCreature(target);
 
-	if(getAccessLevel() == 0){
+	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(Player* targetPlayer = target->getPlayer()){
 #ifdef __SKULLSYSTEM__
 			if(!targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
@@ -2752,7 +2767,7 @@ void Player::onKilledCreature(Creature* target)
 
 void Player::onGainExperience(int32_t gainExperience)
 {
-	if(getAccessLevel() > 0){
+	if(hasFlag(PlayerFlag_NotGainExperience)){
 		gainExperience = 0;
 	}
 
@@ -2774,19 +2789,9 @@ void Player::onGainExperience(int32_t gainExperience)
 	}
 }
 
-/*
-void Player::onTargetCreatureDisappear()
-{
-	Creature::onTargetCreatureDisappear();
-
-	sendCancelTarget();
-	sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-}
-*/
-
 bool Player::isImmune(CombatType_t type) const
 {
-	if(getAccessLevel() != 0){
+	if(hasFlag(PlayerFlag_CannotBeAttacked)){
 		return true;
 	}
 
@@ -2795,7 +2800,7 @@ bool Player::isImmune(CombatType_t type) const
 
 bool Player::isImmune(ConditionType_t type) const
 {
-	if(getAccessLevel() != 0){
+	if(hasFlag(PlayerFlag_CannotBeAttacked)){
 		return true;
 	}
 
@@ -2804,7 +2809,7 @@ bool Player::isImmune(ConditionType_t type) const
 
 bool Player::isAttackable() const
 {
-	if(getAccessLevel() != 0){
+	if(hasFlag(PlayerFlag_CannotBeAttacked)){
 		return false;
 	}
 
@@ -2838,8 +2843,9 @@ void Player::changeSoul(int32_t soulChange)
 #ifdef __SKULLSYSTEM__
 Skulls_t Player::getSkull() const
 {
-	if(getAccessLevel() != 0)
+	if(hasFlag(PlayerFlag_NotGainInFight)){
 		return SKULL_NONE;
+	}
 		
 	return skull;
 }
@@ -2863,36 +2869,31 @@ Skulls_t Player::getSkullClient(const Player* player) const
 
 bool Player::hasAttacked(const Player* attacked) const
 {
-	if(getAccessLevel() != 0)
+	if(hasFlag(PlayerFlag_NotGainInFight) || !attacked){
 		return false;
-
-	if(!attacked)
-		return false;
+	}
 	
 	AttackedSet::const_iterator it;
-	uint32_t attacked_id = attacked->getID();
-	it = attackedSet.find(attacked_id);
+	uint32_t attackedId = attacked->getID();
+	it = attackedSet.find(attackedId);
 	if(it != attackedSet.end()){
 		return true;
 	}
-	else{
-		return false;
-	}
+
+	return false;
 }
 
 void Player::addAttacked(const Player* attacked)
 {
-	if(getAccessLevel() != 0)
+	if(hasFlag(PlayerFlag_NotGainInFight) || !attacked || attacked == this){
 		return;
-	
-	if(!attacked || attacked == this)
-		return;
+	}
 
 	AttackedSet::iterator it;
-	uint32_t attacked_id = attacked->getID();
-	it = attackedSet.find(attacked_id);
+	uint32_t attackedId = attacked->getID();
+	it = attackedSet.find(attackedId);
 	if(it == attackedSet.end()){
-		attackedSet.insert(attacked_id);
+		attackedSet.insert(attackedId);
 	}
 }
 
@@ -2903,8 +2904,9 @@ void Player::clearAttacked()
 
 void Player::addUnjustifiedDead(const Player* attacked)
 {
-	if(getAccessLevel() != 0 || attacked == this)
+	if(hasFlag(PlayerFlag_NotGainInFight) || attacked == this){
 		return;
+	}
 		
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";

@@ -2288,23 +2288,25 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 	}
 
 	ReturnValue ret = RET_NOERROR;
-	if(player->getAccessLevel() == 0){
-		if(attackCreature == player){
+	if(player->isInPz() && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
+		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
+	}
+	else if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone) && attackCreature->isInPz()){
+		ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
+	}
+	else if(attackCreature == player){
+		ret = RET_YOUMAYNOTATTACKTHISPLAYER;
+	}
+	else if(player->hasFlag(PlayerFlag_CannotUseCombat) || !attackCreature->isAttackable()){
+		if(attackCreature->getPlayer()){
 			ret = RET_YOUMAYNOTATTACKTHISPLAYER;
 		}
-		else if(player->isInPz()){
-			ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
+		else{
+			ret = RET_YOUMAYNOTATTACKTHISCREATURE;
 		}
-		else if(attackCreature->isInPz()){
-			ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
-		}
-		else if(!attackCreature->isAttackable()){
-			ret = RET_YOUMAYNOTATTACKTHISPLAYER;
-		}
-
-		if(ret == RET_NOERROR){
-			ret = Combat::canDoCombat(player, attackCreature);
-		}
+	}
+	else{
+		ret = Combat::canDoCombat(player, attackCreature);
 	}
 
 	if(ret == RET_NOERROR){
