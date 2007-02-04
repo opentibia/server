@@ -159,7 +159,7 @@ void DBResult::clear()
 	m_numFields = 0;
 }
 
-uint32_t DBResult::getDataInt(const std::string &s, unsigned int nrow)
+int32_t DBResult::getDataInt(const std::string &s, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -178,7 +178,7 @@ uint32_t DBResult::getDataInt(const std::string &s, unsigned int nrow)
 	return 0; // Failed
 }
 
-uint64_t DBResult::getDataLong(const std::string &s, unsigned int nrow)
+int64_t DBResult::getDataLong(const std::string &s, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())

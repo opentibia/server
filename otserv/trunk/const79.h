@@ -307,6 +307,7 @@ enum PlayerFlags{
 	PlayerFlag_CanSummonAll,
 	PlayerFlag_CanIllusionAll,
 	PlayerFlag_CanSenseInvisibility,
+	PlayerFlag_IgnoredByMonsters,
 	PlayerFlag_NotGainInFight,
 	PlayerFlag_HasInfiniteMana,
 	PlayerFlag_HasInfiniteSoul,

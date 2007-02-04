@@ -14635,6 +14635,7 @@
 <item id="5741" name="skull helmet">
 	<attribute key="weight" value="4200"/>
 	<attribute key="armor" value="9"/>
+	<attribute key="slotType" value="head"/>
 </item>
 <item id="5742" name="">
 </item>
