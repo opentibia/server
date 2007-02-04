@@ -713,13 +713,13 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 					else if(strValue == "giftwraps"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_GIFT_WRAPS);
 					}
-					else if(strValue == "fireworkyellow"){
+					else if(strValue == "yellowfirework"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_FIREWORK_YELLOW);
 					}
-					else if(strValue == "fireworkred"){
+					else if(strValue == "redfirework"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_FIREWORK_RED);
 					}
-					else if(strValue == "fireworkblue"){
+					else if(strValue == "bluefirework"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_FIREWORK_BLUE);
 					}
 				}

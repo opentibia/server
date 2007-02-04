@@ -267,9 +267,9 @@ public:
 	int32_t getDefenseStrength() const {return defenseStrength;}
 
 	uint32_t getSummonCount() const {return summons.size();}
+	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
 
 protected:
-	
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
 	int32_t attackStrength;
@@ -284,6 +284,7 @@ protected:
 	uint32_t lastStepCost;
 	uint32_t baseSpeed;
 	int32_t varSpeed;
+	bool lootDrop;
 
 	Direction direction;
 

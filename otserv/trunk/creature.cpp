@@ -49,6 +49,7 @@ Creature::Creature() :
 	direction  = NORTH;
 	master = NULL;
 	summon = false;
+	lootDrop = true;
 
 	health     = 1000;
 	healthMax  = 1000;

@@ -2635,6 +2635,9 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 			creature->executeConditions(interval);
 		}
 		else{
+			creature->die();
+			removeCreature(creature, false);
+
 			Item* splash = NULL;
 			switch(creature->getRace()){
 				case RACE_VENOM:
@@ -2667,9 +2670,6 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 				creature->dropLoot(corpse->getContainer());
 				startDecay(corpse);
 			}
-
-			creature->die();
-			removeCreature(creature, false);
 		}
 
 		flushSendBuffers();

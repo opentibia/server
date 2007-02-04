@@ -126,6 +126,7 @@ Creature()
 
 	maxDepotLimit = 1000;
 	maxVipLimit = 50;
+	groupFlags = 0;
  	
  	vocation_id = (Vocation_t)0;
  	
@@ -570,7 +571,7 @@ uint16_t Player::getLookCorpse() const
 
 void Player::dropLoot(Container* corpse)
 {
-	if(corpse && !hasFlag(PlayerFlag_NotGenerateLoot)){
+	if(corpse && lootDrop){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
 	#ifdef __SKULLSYSTEM__
@@ -2746,6 +2747,10 @@ void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 
 void Player::onKilledCreature(Creature* target)
 {
+	if(hasFlag(PlayerFlag_NotGenerateLoot)){
+		target->setDropLoot(false);
+	}
+
 	Creature::onKilledCreature(target);
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){

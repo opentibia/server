@@ -66,7 +66,6 @@ Creature()
 	isWalkActive = false;
 	internalUpdateTargetList = false;
 	spellBonusAttack = false;
-	createLoot = true;
 	
 	mType = _mtype;
 	spawn = NULL;
@@ -570,7 +569,7 @@ bool Monster::getNextStep(Direction& dir)
 					}
 					else{
 						monster->changeHealth(-monster->getHealth());
-						monster->setCreateLoot(false);
+						monster->setDropLoot(false);
 						objectRemoved = true;
 					}
 				}
@@ -978,7 +977,7 @@ void Monster::updateLookDirection()
 
 void Monster::dropLoot(Container* corpse)
 {
-	if(corpse && createLoot){
+	if(corpse && lootDrop){
 		if(!isSummon()){
 			mType->createLoot(corpse);
 		}

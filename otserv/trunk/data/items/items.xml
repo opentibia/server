@@ -4954,7 +4954,7 @@
 	<attribute key="slotType" value="ring"/>
 	<attribute key="decayTo" value="0"/>
 	<attribute key="transformDeEquipTo" value="2167"/>
-	<attribute key="duration" value="20"/>
+	<attribute key="duration" value="1200"/>
 	<attribute key="showduration" value="1"/>
 	<attribute key="manashield" value="1"/>
 </item>
