@@ -47,7 +47,7 @@ public:
 	RuneSpell* getRuneSpell(uint32_t id);
 	RuneSpell* getRuneSpellByName(const std::string& name);
 	
-	InstantSpell* getInstantSpell(const std::string& words);
+	InstantSpell* getInstantSpell(const std::string words);
 	InstantSpell* getInstantSpellByName(const std::string& name);
 
 	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
@@ -58,6 +58,7 @@ public:
 	static Position getCasterPosition(Creature* creature, Direction dir);
 	
 protected:
+
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
 	virtual std::string getScriptBaseName();

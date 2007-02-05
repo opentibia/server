@@ -789,6 +789,8 @@ void Monster::doAttacking(uint32_t interval)
 		}
 	}
 
+	updateLookDirection();
+
 	bool resetTicks = true;
 	attackTicks += interval;
 

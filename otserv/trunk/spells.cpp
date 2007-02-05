@@ -58,52 +58,42 @@ TalkActionResult_t Spells::playerSaySpell(Player* player, SpeakClasses type, con
 	trim_left(str_words, " ");
 	trim_right(str_words, " ");
 
-	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
-		InstantSpell* instantSpell = it->second;
+	InstantSpell* instantSpell = getInstantSpell(str_words);
+	if(!instantSpell){
+		return TALKACTION_CONTINUE;
+	}
+
+	std::string param = "";
+
+	if(instantSpell->getHasParam()){
 		size_t spellLen = instantSpell->getWords().length();
-		if(strncasecmp(instantSpell->getWords().c_str(), str_words.c_str(), spellLen) == 0){
+		size_t paramLen = str_words.length() - spellLen;
+		std::string paramText = str_words.substr(spellLen, paramLen);
 
-			if(instantSpell->getHasParam()){
-				size_t paramLen = str_words.length() - spellLen;
-				std::string paramText = str_words.substr(spellLen, paramLen);
-				if(paramText.empty() || paramText[0] != ' '){
-					continue;
-				}
-
-				size_t loc1 = paramText.find('"', 0);
-				size_t loc2 = std::string::npos;
-				if(loc1 != std::string::npos){
-					loc2 = paramText.find('"', loc1 + 1);
-				}
-
-				if(loc2 == std::string::npos){
-					loc2 = paramText.length();
-				}
-				
-				std::string param = paramText.substr(loc1 + 1, loc2 - loc1 - 1);
-
-				trim_left(param, " ");
-				trim_right(param, " ");
-
-				if(instantSpell->playerCastInstant(player, param)){
-					return TALKACTION_BREAK;
-				}
-				else{
-					return TALKACTION_FAILED;
-				}
+		if(!paramText.empty() && paramText[0] == ' '){
+			size_t loc1 = paramText.find('"', 0);
+			size_t loc2 = std::string::npos;
+			if(loc1 != std::string::npos){
+				loc2 = paramText.find('"', loc1 + 1);
 			}
-			else if(spellLen == words.length()){
-				if(instantSpell->playerCastInstant(player, "")){
-					return TALKACTION_BREAK;
-				}
-				else{
-					return TALKACTION_FAILED;
-				}
+
+			if(loc2 == std::string::npos){
+				loc2 = paramText.length();
 			}
+			
+			param = paramText.substr(loc1 + 1, loc2 - loc1 - 1);
+
+			trim_left(param, " ");
+			trim_right(param, " ");
 		}
 	}
 
-	return TALKACTION_CONTINUE;
+	if(instantSpell->playerCastInstant(player, param)){
+		return TALKACTION_BREAK;
+	}
+	else{
+		return TALKACTION_FAILED;
+	}
 }
 
 void Spells::clear()
@@ -202,16 +192,22 @@ RuneSpell* Spells::getRuneSpellByName(const std::string& name)
 
 	return NULL;
 }
-	
-InstantSpell* Spells::getInstantSpell(const std::string& words)
+
+InstantSpell* Spells::getInstantSpell(const std::string words)
 {
+	InstantSpell* result = NULL;
 	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
-		if(strcasecmp(it->second->getWords().c_str(), words.c_str()) == 0){
-			return it->second;
+		InstantSpell* instantSpell = it->second;
+		size_t spellLen = instantSpell->getWords().length();
+
+		if(strncasecmp(instantSpell->getWords().c_str(), words.c_str(), spellLen) == 0){
+			if(!result || spellLen > result->getWords().length()){
+				result = instantSpell;
+			}
 		}
 	}
 
-	return NULL;
+	return result;
 }
 
 InstantSpell* Spells::getInstantSpellByName(const std::string& name)
