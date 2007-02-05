@@ -428,10 +428,6 @@ void Creature::die()
 		}
 	}
 
-	if(getMaster()){
-		getMaster()->removeSummon(this);
-	}
-
 	Item* splash = NULL;
 	switch(getRace()){
 		case RACE_VENOM:
@@ -463,6 +459,10 @@ void Creature::die()
 		g_game.internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		dropLoot(corpse->getContainer());
 		g_game.startDecay(corpse);
+	}
+
+	if(getMaster()){
+		getMaster()->removeSummon(this);
 	}
 }
 
