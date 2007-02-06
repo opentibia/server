@@ -1,0 +1,116 @@
+-------- config.lua --------
+-- Config file for OTServ --
+----------------------------
+
+-- data directory location
+datadir = "data/"
+
+-- map location
+map = "data/world/map.otbm"
+
+-- mapkind
+-- options: OTBM for binary map, XML for OTX map
+mapkind = "OTBM"
+
+-- map store location (for XML only)
+mapstore = "data/world/map-mapstore.xml"
+
+-- house store location (for XML only)
+housestore = "data/world/map-housestore.xml"
+
+-- bans storage (for XML only)
+banIdentifier = "data/bans.xml"
+
+-- server name
+servername = "OTServ"
+
+-- server location
+location = "Germany"
+
+-- server ip (the ip that server listens on)
+ip = "127.0.0.1"
+
+-- server port (the port that server listens on)
+port = "7171"
+
+-- server url
+url = "http://otserv.org"
+
+-- server owner name
+ownername = "Tliff"
+
+-- server owner email
+owneremail = "otserv@tibia.de"
+
+-- world name
+worldname = "OpenTibia"
+
+-- world type
+-- options: pvp, no-pvp, pvp-enforced
+worldtype = "pvp"
+
+-- exhausted time in ms (1000 = 1 second)
+exhausted = 1000
+
+-- how many ms to add if the player is already exhausted and tries to cast a spell (1000 = 1 second)
+exhaustedadd = 200
+
+-- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1 second)
+pzlocked = 6000
+
+-- set to 0 = disabled (default), 1 = enabled
+enablehotkeys = 0
+
+-- minimum amount of time between 2 actions (1000 = 1 second)
+minactioninterval = 200
+
+-- house rent period
+-- options: daily, weekly, monthly
+houserentperiod = "monthly"
+
+-- rates (experience, skill, magic level and loot)
+rate_exp = 1
+rate_skill = 1
+rate_mag = 1
+rate_loot = 1
+
+-- motd (the message box that you sometimes get before you choose characters)
+motd = "Welcome to OTServ 0.6.0!"
+motdnum = "1"
+
+-- login message
+loginmsg = "Welcome to OTServ. For help visit http://otserv.org"
+
+-- how many logins attempts until ip is temporary disabled 
+-- set to 0 to disable
+logintries = 5
+
+-- how long the retry timeout until a new login can be made (without disabling the ip)
+retrytimeout = 5000
+
+-- how long the player need to wait until the ip is allowed again
+logintimeout = 60 * 1000
+
+-- allow clones (multiple logins of the same char)
+-- options: 0 (no), 1 (yes)
+allowclones = 0
+
+-- max number of players allowed
+maxplayers = "900"
+
+-- md5 passwords for accounts
+-- options: yes, no
+md5passwords = "no"
+
+-- SQL type
+-- options: mysql, sqlite
+sql_type = "mysql"
+
+--- MySQL part (ignore if you are using SQLite)
+sql_host = "localhost"
+sql_user = "root"
+sql_pass = ""
+sql_db   = "otserv"
+
+--- SQLite part (ignore if you are using MySQL)
+sqlite_db = "db.s3db"

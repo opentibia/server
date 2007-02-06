@@ -1,0 +1,3 @@
+<raids>
+<raid name="Testraid" file="testraid.xml" chance="50" interval="10" margin="0" /><!-- Each 10 minutes there is a 50% chance that the raid is executed... -->
+</raids>
