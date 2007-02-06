@@ -2,9 +2,6 @@
 
 <movements>
 	
-	-- Underwate System
-	<movevent event="StepIn" itemid="5405" script="underwater_system.lua" />
-	
 	-- Fields and Walls
 	<movevent event="AddItem" tileitem="0" itemid="1487" function="onAddField" />
 	<movevent event="AddItem" tileitem="0" itemid="1490" function="onAddField" />
