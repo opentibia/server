@@ -1,7 +1,7 @@
 function onUse(cid, item, frompos, item2, topos)
-	if delay(cid) == 0 then
-		return 1
-	end
+	--if delay(cid) == 0 then
+		--return 1
+	--end
 	if isInArray(WATER_WITH_FISH, item2.itemid) == TRUE then
 		formula = getPlayerSkill(cid, 6) / 200 + 0.85 * math.random()
 		if formula > 0.70 then
@@ -25,9 +25,9 @@ function onUse(cid, item, frompos, item2, topos)
 	return 1
 end
 
-function delay(cid) 	 
-	if os.difftime(os.time(), getPlayerStorageValue(cid, 100)) >= 1 then 	 
-		setPlayerStorageValue(cid, 100, os.time())
-		return 1
-	end
-end
+--function delay(cid) 	 
+	--if os.difftime(os.time(), getPlayerStorageValue(cid, 100)) >= 1 then 	 
+		--setPlayerStorageValue(cid, 100, os.time())
+		--return 1
+	--end
+--end

@@ -127,13 +127,14 @@ function onUse(cid, item, frompos, item2, topos)
 		sound = "Mmmm."
 		food = 180
 	elseif item.itemid == 6280 then
-		sound = "". getPlayerName(cid) . " blew out the candle."
+		sound = "Blewing out the candle."
 		doTransformItem(item.uid, item.itemid - 1)
+		doSendMagicEffect(frompos, 2)
 	elseif item.itemid == 6393 then -- valentine's cake
 		sound = "Mmmm."
 		food = 0
 	elseif item.itemid == 6394 then -- cream cake
-		sound = ""
+		sound = "Mmmm."
 		food = 0
 	elseif item.itemid == 6501 then -- cream cake
 		sound = "Mmmm."
@@ -145,7 +146,7 @@ function onUse(cid, item, frompos, item2, topos)
 		doPlayerSendCancel(cid, "You are full.")
 		return 1
 	end
-	doSendAnimatedText(getPlayerPosition(cid), sound, TEXTCOLOR_ORANGE)
+	doPlayerSay(cid, sound, 1)
 	if item.itemid ~= 6280 then
 		doPlayerFeed(cid, food)
 		doRemoveItem(item.uid, 1)

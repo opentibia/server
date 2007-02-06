@@ -240,6 +240,10 @@
 	<action itemid="5122" script="level_door.lua" />
 	<action itemid="5130" script="level_door.lua" />
 	<action itemid="5131" script="level_door.lua" />
+	<action itemid="6263" script="level_door.lua" />
+	<action itemid="6264" script="level_door.lua" />
+	<action itemid="6265" script="level_door.lua" />
+	<action itemid="6266" script="level_door.lua" />
 	
 	-- Quest Doors
 	<action itemid="1223" script="quest_door.lua" />

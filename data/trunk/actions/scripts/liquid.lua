@@ -19,24 +19,21 @@ function onUse(cid, item, frompos, item2, topos)
 		if item.type == 0 then
 			doPlayerSendCancel(cid, "It is empty.")
 		elseif item.type == 3 or item.type == 15 then
-			doSendAnimatedText(getPlayerPosition(cid), "Aaah...", TEXTCOLOR_ORANGE)
+			doPlayerSay(cid, "Aaah...", 1)
 			doTargetCombatCondition(0, cid, drunk, CONST_ME_NONE)
 		elseif item.type == 4 or item.type == 11  or item.type == 28 then
-			doSendAnimatedText(getPlayerPosition(cid), "Argh!", TEXTCOLOR_ORANGE)
+			doPlayerSay(cid, "Argh!", 1)
 			doTargetCombatCondition(0, cid, poison, CONST_ME_NONE)
 		elseif item.type == 7 then
-			doSendAnimatedText(getPlayerPosition(cid), "Aaaah...", TEXTCOLOR_ORANGE)
+			doPlayerSay(cid, "Aaaah...", 1)
 			doPlayerAddMana(cid, math.random(80, 160))
 			doSendMagicEffect(topos, 12)
 		elseif item.type == 10 then
-			doSendAnimatedText(getPlayerPosition(cid), "Aaaah...", TEXTCOLOR_ORANGE)
+			doPlayerSay(cid, "Aaaah...", 1)
 			doPlayerAddHealth(cid, math.random(40, 80))
-			doSendMagicEffect(topos, 12)			
-		elseif item.type == 26 then
-			doSendAnimatedText(getPlayerPosition(cid), "Ouch!", TEXTCOLOR_ORANGE)
-			doTargetCombatCondition(0, cid, fire, CONST_ME_NONE)
+			doSendMagicEffect(topos, 12)
 		else
-			doSendAnimatedText(getPlayerPosition(cid), "Gulp.", TEXTCOLOR_ORANGE)
+			doPlayerSay(cid, "Gulp.", 1)
 		end
 	elseif item2.itemid == 1771 or isInArray(WATER, item2.itemid) == TRUE and item.type == 0 then
 		doChangeTypeItem(item.uid, 1)
@@ -48,8 +45,6 @@ function onUse(cid, item, frompos, item2, topos)
 		doChangeTypeItem(item.uid, 15)
 	elseif isInArray(MUD, item2.itemid) == TRUE and item.type == 0 then
 		doChangeTypeItem(item.uid, 19)
-	elseif isInArray(LAVA, item2.itemid) == TRUE and item.type == 0 then
-		doChangeTypeItem(item.uid, 26)
 	elseif isInArray(SWAMP, item2.itemid) == TRUE or isInArray(SWAMP_CORPSE_STAGE_I, item2.itemid) == TRUE and item.type == 0 then
 		doChangeTypeItem(item.uid, 28)
 	elseif isInArray(LIQUID_CONTAINER, item2.itemid) == TRUE and item.type ~= 0 then
