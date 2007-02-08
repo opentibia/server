@@ -36,7 +36,7 @@
 extern ConfigManager g_config;
 extern Game g_game;
 
-#define STATUS_SERVER_VERSION "0.6.0_CVS"
+#define STATUS_SERVER_VERSION "0.6.0_SVN"
 //#define STATUS_SERVER_VERSION "0.6.0"
 #define STATUS_SERVER_NAME "otserv"
 #define STATUS_CLIENT_VERISON "7.92"
