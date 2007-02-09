@@ -234,9 +234,10 @@ public:
 	virtual bool loadFunction(const std::string& functionName);
 	
 	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
+	virtual bool hasOwnErrorHandler() {return true;}
 
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse);
-	
+
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);
 

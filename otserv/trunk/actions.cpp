@@ -310,7 +310,10 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	}
 	else{
 		if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
-			player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+			if(!action->hasOwnErrorHandler()){
+				player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+			}
+
 			return false;
 		}
 	}

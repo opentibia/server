@@ -87,6 +87,7 @@ public:
 	void setBlockWalls(bool v){blockwalls = v;};
 
 	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
+	virtual bool hasOwnErrorHandler() {return false;}
 
 protected:
 	virtual std::string getScriptEventName();
