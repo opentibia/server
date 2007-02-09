@@ -146,11 +146,11 @@ CREATE TABLE `house_lists` (
 
 CREATE TABLE `bans` (
     `type` INT NOT NULL COMMENT 'this field defines if its ip, account, player, or any else ban',
-    `ip` INT UNSIGNED NOT NULL,
-    `mask` INT UNSIGNED NOT NULL DEFAULT 4294967295 COMMENT 'used for ip ban',
-    `player` INT UNSIGNED NOT NULL COMMENT 'id of player to ban',
-    `account` INT UNSIGNED NOT NULL,
-    `time` INT UNSIGNED NOT NULL
+    `ip` INT UNSIGNED NOT NULL DEFAULT 0,
+    `mask` INT UNSIGNED NOT NULL DEFAULT 4294967295,
+    `player` INT UNSIGNED NOT NULL DEFAULT 0,
+    `account` INT UNSIGNED NOT NULL DEFAULT 0,
+    `time` INT UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tiles` (
