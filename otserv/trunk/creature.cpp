@@ -409,16 +409,21 @@ void Creature::die()
 {
 	Creature* lastHitCreature = NULL;
 	Creature* mostDamageCreature = NULL;
+	Creature* mostDamageCreatureMaster = NULL;
+	Creature* lastHitCreatureMaster = NULL;
 
 	if(getKillers(&lastHitCreature, &mostDamageCreature)){
 		if(lastHitCreature){
 			lastHitCreature->onKilledCreature(this);
+			lastHitCreatureMaster = lastHitCreature->getMaster();
 		}
 
-		if(mostDamageCreature &&
-			mostDamageCreature != lastHitCreature &&
-			(!mostDamageCreature->getMaster() || mostDamageCreature->getMaster() != lastHitCreature)){
-			mostDamageCreature->onKilledCreature(this);
+		if(mostDamageCreature){
+			mostDamageCreatureMaster = mostDamageCreature->getMaster();
+			if(mostDamageCreature != lastHitCreature && mostDamageCreature != lastHitCreatureMaster &&
+				mostDamageCreatureMaster != lastHitCreature && mostDamageCreatureMaster != lastHitCreatureMaster){
+				mostDamageCreature->onKilledCreature(this);
+			}
 		}
 	}
 
