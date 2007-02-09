@@ -334,7 +334,8 @@ enum PlayerFlags{
 	PlayerFlag_CanTalkRedChannelAnonymous,
 	PlayerFlag_IgnoreProtectionZone,
 	PlayerFlag_IgnoreSpellCheck,
-	PlayerFlag_IgnoreWeaponCheck
+	PlayerFlag_IgnoreWeaponCheck,
+	PlayerFlag_CannotBeMuted
 };
 
 //Reserved player storage key ranges

@@ -88,6 +88,7 @@ typedef std::vector<containervector_pair> ContainerVector;
 typedef std::map<uint32_t, Depot*> DepotMap;
 typedef std::map<uint32_t, int32_t> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
+typedef std::map<uint32_t, uint32_t> MuteCountMap;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -97,9 +98,12 @@ class Player : public Creature, public Cylinder
 public:
 	Player(const std::string& name, Protocol79* p);
 	virtual ~Player();
-	
+
 	virtual Player* getPlayer() {return this;}
 	virtual const Player* getPlayer() const {return this;}
+
+	static MuteCountMap muteCountMap;
+	static uint32_t maxMessageBuffer;
 
 	virtual const std::string& getName() const {return name;}
 	virtual const std::string& getNameDescription() const {return name;}
@@ -162,6 +166,9 @@ public:
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
+	bool isMuted(uint32_t& muteTime);
+	void addMessageBuffer();
+	void removeMessageBuffer();
 
 	double getCapacity() const {
 		if(!hasFlag(PlayerFlag_HasInfinateCapacity)){
@@ -351,8 +358,8 @@ public:
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
 
-	//virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
 	//virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	//virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
 	//virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 
 	//container
@@ -490,6 +497,8 @@ protected:
 	playersex_t sex;
 	int32_t soul, soulMax;
 	uint64_t groupFlags;
+	uint32_t MessageBufferTicks;
+	int32_t MessageBufferCount;
 
 	double inventoryWeight;
 	double capacity;

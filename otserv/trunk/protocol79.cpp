@@ -1069,7 +1069,7 @@ void Protocol79::parseSay(NetworkMessage& msg)
 {
 	SpeakClasses type = (SpeakClasses)msg.GetByte();
 
-	std::string receiver;
+	std::string receiver = "";
 	unsigned short channelId = 0;
 	if(type == SPEAK_PRIVATE ||
 		type == SPEAK_PRIVATE_RED)
@@ -1080,35 +1080,7 @@ void Protocol79::parseSay(NetworkMessage& msg)
 		channelId = msg.GetU16();
 	std::string text = msg.GetString();
 
-	if(g_game.playerSaySpell(player, type, text)){
-		return;
-	}
-
-	switch(type){
-		case SPEAK_SAY:
-			g_game.playerSay(player, type, text);
-			break;
-		case SPEAK_WHISPER:
-			g_game.playerWhisper(player, text);
-			break;
-		case SPEAK_YELL:
-			g_game.playerYell(player, text);
-			break;
-		case SPEAK_PRIVATE:
-		case SPEAK_PRIVATE_RED:
-			g_game.playerSpeakTo(player, type, receiver, text);
-			break;
-		case SPEAK_CHANNEL_Y:
-		case SPEAK_CHANNEL_R1:
-		case SPEAK_CHANNEL_R2:
-			g_game.playerTalkToChannel(player, type, text, channelId);
-			break;
-		case SPEAK_BROADCAST:
-			g_game.playerBroadcastMessage(player, text);
-			break;
-		default:
-			break;
-	}
+	g_game.playerSay(player, channelId, type, receiver, text);
 }
 
 void Protocol79::parseFightModes(NetworkMessage& msg)

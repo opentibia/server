@@ -45,6 +45,8 @@ extern MoveEvents* g_moveEvents;
 extern Weapons* g_weapons;
 
 AutoList<Player> Player::listPlayer;
+MuteCountMap Player::muteCountMap;
+uint32_t Player::maxMessageBuffer;
 
 Player::Player(const std::string& _name, Protocol79 *p) :
 Creature()
@@ -79,6 +81,8 @@ Creature()
 	npings = 0;
 	internal_ping = 0;
 	lastAction = 0;
+	MessageBufferTicks = 0;
+	MessageBufferCount = 0;
 
 	pzLocked = false;
 	bloodHitCount = 0;
@@ -1227,9 +1231,55 @@ void Player::onThink(uint32_t interval)
 	Creature::onThink(interval);
 	sendPing();
 
+	MessageBufferTicks += interval;
+
+	if(MessageBufferTicks >= 1500){
+		MessageBufferTicks = 0;
+		addMessageBuffer();
+	}
+
 #ifdef __SKULLSYSTEM__
 	checkRedSkullTicks(interval);
 #endif
+}
+
+bool Player::isMuted(uint32_t& muteTime)
+{
+	Condition* condition = getCondition(CONDITION_MUTED, CONDITIONID_DEFAULT);
+	if(condition){
+		muteTime = std::max((uint32_t)1, (uint32_t)condition->getTicks() / 1000);
+		return true;
+	}
+
+	muteTime = 0;
+	return false;
+}
+
+void Player::addMessageBuffer()
+{
+	if(MessageBufferCount > 0){
+		MessageBufferCount -= 1;
+	}
+}
+
+void Player::removeMessageBuffer()
+{
+	if(MessageBufferCount <= maxMessageBuffer + 1){
+		MessageBufferCount += 1;
+
+		if(MessageBufferCount > maxMessageBuffer){
+			uint32_t muteCount = 1;
+			MuteCountMap::iterator it = muteCountMap.find(getGUID());
+			if(it != muteCountMap.end()){
+				muteCount = it->second;
+			}
+
+			uint32_t muteTime = 5 * muteCount * muteCount;
+			muteCountMap[getGUID()] = muteCount + 1;
+			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime * 1000, 0);
+			addCondition(condition);
+		}
+	}
 }
 
 void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)

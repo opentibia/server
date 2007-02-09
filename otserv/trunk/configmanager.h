@@ -90,6 +90,7 @@ public:
 		RATE_MAGIC,
 		RATE_SPAWN,
 		HOTKEYS,
+		MAX_MESSAGEBUFFER,
 		OTSERV_DB_ENABLED,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};

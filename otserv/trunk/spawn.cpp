@@ -73,7 +73,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 		while(spawnNode){
 			if(xmlStrcmp(spawnNode->name, (const xmlChar*)"spawn") == 0){
 				Position centerPos;
-				int32_t radius = 0;
+				int32_t radius = -1;
 
 				if(readXMLInteger(spawnNode, "centerx", intValue)){
 					centerPos.x = intValue;
@@ -210,6 +210,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						}
 						
 						npc->setDirection(direction);
+						npc->setMasterPos(placePos, radius);
 
 						// Place the npc
 						if(!g_game.placeCreature(npc, placePos)){

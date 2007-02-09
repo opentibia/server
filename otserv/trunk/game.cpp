@@ -138,6 +138,7 @@ int Game::loadMap(std::string filename, std::string filekind)
 	maxPlayers = g_config.getNumber(ConfigManager::MAX_PLAYERS);
 	inFightTicks = g_config.getNumber(ConfigManager::PZ_LOCKED);
 	exhaustionTicks = g_config.getNumber(ConfigManager::EXHAUSTED);
+	Player::maxMessageBuffer = g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER);
 
 	return map->loadMap(filename, filekind);
 }
@@ -1620,7 +1621,7 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	return true;
 }
 
-bool Game::playerYell(Player* player, std::string& text)
+bool Game::playerYell(Player* player, const std::string& text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerYell()");
 	if(player->isRemoved())
@@ -1628,11 +1629,11 @@ bool Game::playerYell(Player* player, std::string& text)
 
 	int32_t addExhaustion = 0;
 	bool isExhausted = false;
-
 	if(!player->hasCondition(CONDITION_EXHAUSTED)){
 		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED);
-		std::transform(text.begin(), text.end(), text.begin(), upchar);
-		internalCreatureSay(player, SPEAK_YELL, text);
+		std::string yellText = text;
+		std::transform(yellText.begin(), yellText.end(), yellText.begin(), upchar);
+		internalCreatureSay(player, SPEAK_YELL, yellText);
 	}
 	else{
 		isExhausted = true;
@@ -2381,13 +2382,60 @@ bool Game::playerTurn(Player* player, Direction dir)
 	return internalCreatureTurn(player, dir);
 }
 
-bool Game::playerSay(Player* player, SpeakClasses type, const std::string& text)
+bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
+	const std::string& receiver, const std::string& text)
+{
+	uint32_t muteTime;
+	if(player->isMuted(muteTime)){
+		std::stringstream ss;
+		ss << "You are muted. " << muteTime << " seconds left.";
+		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
+		return false;
+	}
+	
+	if(playerSaySpell(player, type, text)){
+		return true;
+	}
+
+	player->removeMessageBuffer();
+
+	switch(type){
+		case SPEAK_SAY:
+			return playerSayDefault(player, text);
+			break;
+		case SPEAK_WHISPER:
+			return playerWhisper(player, text);
+			break;
+		case SPEAK_YELL:
+			return playerYell(player, text);
+			break;
+		case SPEAK_PRIVATE:
+		case SPEAK_PRIVATE_RED:
+			return playerSpeakTo(player, type, receiver, text);
+			break;
+		case SPEAK_CHANNEL_Y:
+		case SPEAK_CHANNEL_R1:
+		case SPEAK_CHANNEL_R2:
+			return playerTalkToChannel(player, type, text, channelId);
+			break;
+		case SPEAK_BROADCAST:
+			return playerBroadcastMessage(player, text);
+			break;
+
+		default:
+			break;
+	}
+
+	return false;
+}
+
+bool Game::playerSayDefault(Player* player, const std::string& text)
 {	
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSay()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSayDefault()");
 	if(player->isRemoved())
 		return false;
 
-	return internalCreatureSay(player, type, text);
+	return internalCreatureSay(player, SPEAK_SAY, text);
 }
 
 bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
@@ -2424,7 +2472,7 @@ bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& 
 
 	result = g_spells->playerSaySpell(player, type, text);
 	if(result == TALKACTION_BREAK){
-		return playerSay(player, SPEAK_SAY, text);
+		return internalCreatureSay(player, SPEAK_SAY, text);
 	}
 	else if(result == TALKACTION_FAILED){
 		return true;

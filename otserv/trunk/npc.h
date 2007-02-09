@@ -144,8 +144,13 @@ protected:
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	virtual bool isAttackable() const { return false; };
+	virtual bool getNextStep(Direction& dir);
 	
+	bool canWalkTo(const Position& fromPos, Direction dir);
+	bool getRandomStep(Direction& dir);
+
 	std::string name;
+	bool autoWalk;
 	
 	NpcEventsHandler* m_npcEventHandler;
 	bool loaded;

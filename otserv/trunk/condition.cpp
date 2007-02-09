@@ -57,22 +57,6 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 
 bool Condition::unserialize(xmlNodePtr p)
 {
-	/*
-	int intValue;
-
-	if(readXMLInteger(p, "id", intValue)){
-		id = (ConditionId_t)intValue;
-	}
-
-	if(readXMLInteger(p, "type", intValue)){
-		type = (ConditionId_t)intValue;
-	}
-
-	if(readXMLInteger(p, "ticks", intValue)){
-		ticks = intValue;
-	}
-	*/
-
 	return true;
 }
 
@@ -240,6 +224,7 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
+		case CONDITION_MUTED:
 		{
 			return new ConditionGeneric(_id, _type,_ticks);
 			break;

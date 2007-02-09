@@ -632,7 +632,7 @@ bool Monster::despawn()
 
 bool Monster::canWalkTo(const Position& toPos)
 {
-	if(masterRadius == 0){
+	if(masterRadius == -1){
 		//no restrictions
 		return true;
 	}
@@ -717,68 +717,6 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	}
 
 	return false;
-
-	/*
-	//NORTH
-	tmpDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
-	if(currentDist == 0 || tmpDist == currentDist){
-		Position tmpPos = creaturePos;
-		tmpPos.y = tmpPos.y - 1;
-		if(canWalkTo(tmpPos)){
-			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
-			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
-				dirArr[dirSize++] = NORTH;
-			}
-		}
-	}
-
-	//SOUTH
-	tmpDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs((creaturePos.y + 1) - centerPos.y));
-	if(currentDist == 0 || tmpDist == currentDist){
-		Position tmpPos = creaturePos;
-		tmpPos.y = tmpPos.y + 1;
-		if(canWalkTo(tmpPos)){
-			tile = g_game.getTile(tmpPos.x, tmpPos.y, creaturePos.z);
-			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
-				dirArr[dirSize++] = SOUTH;
-			}
-		}
-	}
-
-	//WEST
-	tmpDist = std::max(std::abs((creaturePos.x - 1) - centerPos.x), std::abs(creaturePos.y - centerPos.y));
-	if(currentDist == 0 || tmpDist == currentDist){
-		Position tmpPos = creaturePos;
-		tmpPos.x = tmpPos.x - 1;
-		if(canWalkTo(tmpPos)){
-			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
-			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
-				dirArr[dirSize++] = WEST;
-			}
-		}
-	}
-
-	//EAST
-	tmpDist = std::max(std::abs((creaturePos.x + 1) - centerPos.x), std::abs(creaturePos.y - centerPos.y));
-	if(currentDist == 0 || tmpDist == currentDist){
-		Position tmpPos = creaturePos;
-		tmpPos.x = tmpPos.x + 1;
-		if(canWalkTo(tmpPos)){
-			tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
-			if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
-				dirArr[dirSize++] = EAST;
-			}
-		}
-	}
-
-	if(dirSize > 0){
-		uint32_t index = random_range(0, dirSize - 1);
-		dir = (Direction)dirArr[index];
-		return true;
-	}
-
-	return false;
-	*/
 }
 
 void Monster::doAttacking(uint32_t interval)

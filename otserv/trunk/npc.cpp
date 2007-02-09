@@ -55,6 +55,7 @@ Creature()
 	m_npcEventHandler = NULL;
 	loaded = true;
 	name = _name;
+	autoWalk = false;
 
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
 	std::string scriptname;
@@ -86,12 +87,16 @@ Creature()
 		}
 		else
 			name = "";
-		
+
 		if(readXMLInteger(root, "speed", intValue)){
 			baseSpeed = intValue;
 		}
 		else
 			baseSpeed = 220;
+
+		if(readXMLInteger(root, "autowalk", intValue)){
+			autoWalk = intValue != 0;
+		}
 
 		while(p){
 			if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
@@ -172,17 +177,6 @@ Npc::~Npc()
 bool Npc::canSee(const Position& pos) const
 {
 	return Creature::canSee(pos);
-
-	/*
-	const Position& myPos = getPosition();
-
-	if(pos.z != myPos.z){
-		return false;
-	}
-
-	return (std::abs(myPos.x - pos.x) <= Map::maxViewportX &&
-					std::abs(myPos.y - pos.y) <= Map::maxViewportY);
-	*/
 }
 
 std::string Npc::getDescription(int32_t lookDistance) const
@@ -215,12 +209,15 @@ void Npc::onUpdateTile(const Position& pos)
 void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	Creature::onCreatureAppear(creature, isLogin);
+
+	if(creature == this && autoWalk){
+		addEventWalk();
+	}
 	
 	//only players for script events
-	if(!creature->getPlayer())
-		return;
-	
-	m_npcEventHandler->onCreatureAppear(creature);
+	if(creature->getPlayer()){
+		m_npcEventHandler->onCreatureAppear(creature);
+	}
 }
 
 void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
@@ -228,10 +225,9 @@ void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool 
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 	
 	//only players for script events
-	if(!creature->getPlayer())
-		return;
-	
-	m_npcEventHandler->onCreatureDisappear(creature);
+	if(creature->getPlayer()){
+		m_npcEventHandler->onCreatureDisappear(creature);
+	}
 }
 
 void Npc::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
@@ -251,10 +247,9 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 		return;
 	
 	//only players for script events
-	if(!creature->getPlayer())
-		return;
-		
-	m_npcEventHandler->onCreatureSay(creature, type, text);
+	if(creature->getPlayer()){
+		m_npcEventHandler->onCreatureSay(creature, type, text);
+	}
 }
 
 void Npc::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
@@ -286,6 +281,82 @@ void Npc::doTurn(Direction dir)
 	g_game.internalCreatureTurn(this, dir);
 }
 
+bool Npc::getNextStep(Direction& dir)
+{
+	if(Creature::getNextStep(dir)){
+		return true;
+	}
+
+	if(autoWalk){
+		return getRandomStep(dir);
+	}
+
+	return false;
+}
+
+bool Npc::canWalkTo(const Position& fromPos, Direction dir)
+{
+	if(masterRadius == -1){
+		//no restrictions
+		return true;
+	}
+
+	Position toPos = fromPos;
+
+	switch(dir){
+		case NORTH:
+			toPos.y -= 1;
+		break;
+
+		case SOUTH:
+			toPos.y += 1;
+		break;
+
+		case WEST:
+			toPos.x -= 1;
+		break;
+
+		case EAST:
+			toPos.x += 1;
+		break;
+
+		default:
+			break;
+	}
+
+	return Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos);
+}
+
+bool Npc::getRandomStep(Direction& dir)
+{
+	std::vector<Direction> dirList;
+	const Position& creaturePos = getPosition();
+
+	if(canWalkTo(creaturePos, NORTH)){
+		dirList.push_back(NORTH);
+	}
+
+	if(canWalkTo(creaturePos, SOUTH)){
+		dirList.push_back(SOUTH);
+	}
+
+	if(canWalkTo(creaturePos, EAST)){
+		dirList.push_back(EAST);
+	}
+
+	if(canWalkTo(creaturePos, WEST)){
+		dirList.push_back(WEST);
+	}
+
+	if(!dirList.empty()){
+		std::random_shuffle(dirList.begin(), dirList.end());
+		dir = dirList[random_range(0, dirList.size() - 1)];
+		return true;
+	}
+
+	return false;
+}
+
 void Npc::doMoveTo(Position target)
 {
 	std::list<Direction> listDir;
@@ -294,45 +365,6 @@ void Npc::doMoveTo(Position target)
 	}
 
 	startAutoWalk(listDir);
-	
-	/*
-	if(route.size() == 0 || route.back() != target || route.front() != getPosition()){
-		route = g_game.map->getPathTo(this, getPosition(), target);
-	}
-
-	if(route.size() == 0){
-		//still no route, means there is none
-		return;
-	}
-	else
-		route.pop_front();
-
-	Position nextStep = route.front();
-	route.pop_front();
-	int dx = nextStep.x - getPosition().x;
-	int dy = nextStep.y - getPosition().y;
-
-	Direction dir;
-
-	if(dx == -1 && dy == -1)
-		dir = NORTHWEST;
-	else if(dx == 1 && dy == -1)
-		dir = NORTHEAST;
-	else if(dx == -1 && dy == 1)
-		dir = SOUTHWEST;
-	else if(dx == 1 && dy == 1)
-		dir = SOUTHEAST;
-	else if(dx == -1)
-		dir = WEST;
-	else if(dx == 1)
-		dir = EAST;
-	else if(dy == -1)
-		dir = NORTH;
-	else
-		dir = SOUTH;
-
-	g_game.internalMoveCreature(this, dir);
-	*/
 }
 
 NpcScriptInterface* Npc::getScriptInterface()

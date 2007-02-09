@@ -279,7 +279,7 @@ protected:
 	Outfit_t defaultOutfit;
 
 	Position masterPos;
-	uint32_t masterRadius;
+	int32_t masterRadius;
 	uint64_t lastMove;
 	uint32_t lastStepCost;
 	uint32_t baseSpeed;

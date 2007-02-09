@@ -298,7 +298,7 @@ public:
 	//Implementation of player invoked events
 	bool movePlayer(Player* player, Direction direction);
 	bool playerWhisper(Player* player, const std::string& text);
-	bool playerYell(Player* player, std::string& text);
+	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerBroadcastMessage(Player* player, const std::string& text);
 	bool anonymousBroadcastMessage(const std::string& text);
@@ -326,7 +326,9 @@ public:
 	bool playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackPos);
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
 	bool playerTurn(Player* player, Direction dir);
-	bool playerSay(Player* player, SpeakClasses type, const std::string& text);
+	bool playerSay(Player* player, uint16_t channelId, SpeakClasses type,
+		const std::string& receiver, const std::string& text);
+	bool playerSayDefault(Player* player, const std::string& text);
 	bool playerChangeOutfit(Player* player, Outfit_t outfit);
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
 
