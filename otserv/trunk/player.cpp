@@ -1297,7 +1297,6 @@ void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t da
 
 	if(attacker){
 		ss << " due to an attack by " << attacker->getNameDescription();
-		//sendCreatureSquare(attacker, SQ_COLOR_BLACK);
 	}
 
 	ss << ".";
@@ -1689,9 +1688,9 @@ Item* Player::getCorpse()
 
 		if(getKillers(&lastHitCreature, &mostDamageCreature) && lastHitCreature){
 			ss << " " << (getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by "
-				<< lastHitCreature->getNameDescription();
+				<< lastHitCreature->getNameDescription() << ".";
 		}
-
+		
 		corpse->setSpecialDescription(ss.str());
 	}
 
