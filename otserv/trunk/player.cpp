@@ -1245,6 +1245,10 @@ void Player::onThink(uint32_t interval)
 
 bool Player::isMuted(uint32_t& muteTime)
 {
+	if(hasFlag(PlayerFlag_CannotBeMuted)){
+		return false;
+	}
+
 	Condition* condition = getCondition(CONDITION_MUTED, CONDITIONID_DEFAULT);
 	if(condition){
 		muteTime = std::max((uint32_t)1, (uint32_t)condition->getTicks() / 1000);
@@ -1257,14 +1261,14 @@ bool Player::isMuted(uint32_t& muteTime)
 
 void Player::addMessageBuffer()
 {
-	if(MessageBufferCount > 0){
+	if(!hasFlag(PlayerFlag_CannotBeMuted) && MessageBufferCount > 0){
 		MessageBufferCount -= 1;
 	}
 }
 
 void Player::removeMessageBuffer()
 {
-	if(MessageBufferCount <= maxMessageBuffer + 1){
+	if(!hasFlag(PlayerFlag_CannotBeMuted) && MessageBufferCount <= maxMessageBuffer + 1){
 		MessageBufferCount += 1;
 
 		if(MessageBufferCount > maxMessageBuffer){
@@ -1278,6 +1282,10 @@ void Player::removeMessageBuffer()
 			muteCountMap[getGUID()] = muteCount + 1;
 			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime * 1000, 0);
 			addCondition(condition);
+
+			std::stringstream ss;
+			ss << "You are muted for " << muteTime << " seconds.";
+			sendTextMessage(MSG_STATUS_SMALL, ss.str());
 		}
 	}
 }

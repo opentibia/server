@@ -209,8 +209,7 @@ public:
 	void thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
 		const Position& toPos, uint8_t count);
 
-	void moveCreature(uint32_t playerId, const Position& playerPos,
-		uint32_t movingCreatureId, const Position& toPos);
+	void moveCreature(uint32_t playerId, uint32_t movingCreatureId, const Position& toPos);
 
 	ReturnValue internalMoveCreature(Creature* creature, Direction direction, bool force = false);
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);

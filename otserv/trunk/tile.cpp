@@ -466,7 +466,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 			else if(!creatures.empty()){
-				return RET_NOTPOSSIBLE;
+				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 
 			for(uint32_t i = 0; i < getThingCount(); ++i){
@@ -487,14 +487,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 							return RET_NOTPOSSIBLE;
 						}
 					}
-
-					/*
-					if(iiType.blockSolid){
-						if(!monster->canPushItems() || !iiType.moveable){
-							return RET_NOTPOSSIBLE;
-						}
-					}
-					*/
 				}
 			}
 
@@ -502,7 +494,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 		else if(const Player* player = creature->getPlayer()){
 			if(!creatures.empty()){
-				return RET_NOTPOSSIBLE;
+				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 
 			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->isPzLocked()){
@@ -511,7 +503,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 		else{
 			if(!creatures.empty()){
-				return RET_NOTPOSSIBLE;
+				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 		}
 

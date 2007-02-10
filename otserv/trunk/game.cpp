@@ -644,8 +644,8 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 
 	if(thing && toCylinder){
 		if(Creature* movingCreature = thing->getCreature()){
-			addEvent(makeTask(1000, boost::bind(&Game::moveCreature, this, player->getID(),
-				player->getPosition(), movingCreature->getID(), toCylinder->getPosition())));
+			addEvent(makeTask(2000, boost::bind(&Game::moveCreature, this, player->getID(),
+				movingCreature->getID(), toCylinder->getPosition())));
 		}
 		else if(Item* movingItem = thing->getItem()){
 			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, spriteId);
@@ -656,8 +656,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 	}
 }
 
-void Game::moveCreature(uint32_t playerId, const Position& playerPos,
-	uint32_t movingCreatureId, const Position& toPos)
+void Game::moveCreature(uint32_t playerId, uint32_t movingCreatureId, const Position& toPos)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
 
@@ -665,9 +664,6 @@ void Game::moveCreature(uint32_t playerId, const Position& playerPos,
 	Creature* movingCreature = getCreatureByID(movingCreatureId);
 	
 	if(!player || player->isRemoved() || !movingCreature || movingCreature->isRemoved())
-		return;
-
-	if(player->getPosition() != playerPos)
 		return;
 	
 	if(!Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition()))
@@ -2388,7 +2384,7 @@ bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
 	uint32_t muteTime;
 	if(player->isMuted(muteTime)){
 		std::stringstream ss;
-		ss << "You are muted. " << muteTime << " seconds left.";
+		ss << "You are still muted for " << muteTime << " seconds.";
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 		return false;
 	}
