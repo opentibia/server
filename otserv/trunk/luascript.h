@@ -439,6 +439,8 @@ protected:
 	static int luaSetMonsterOutfit(lua_State *L);
 	static int luaSetItemOutfit(lua_State *L);
 
+	static int luaSetNpcFocus(lua_State *L);
+
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);
 	//

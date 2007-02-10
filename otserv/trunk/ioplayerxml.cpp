@@ -148,6 +148,10 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			isLoaded = false;
 
+		if(readXMLInteger(root, "groupflags", intValue)){
+			player->groupFlags = intValue;
+		}
+
 		if(readXMLInteger(root, "maxdepotitems", intValue)){
 			player->maxDepotLimit = intValue;
 		}

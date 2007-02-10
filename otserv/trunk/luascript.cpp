@@ -938,6 +938,9 @@ void LuaScriptInterface::registerFunctions()
 	//getCreatureOutfit(cid)
 	lua_register(m_luaState, "getCreatureOutfit", LuaScriptInterface::luaGetCreatureOutfit);
 
+	//doNpcSetCreatureFocus(cid)
+	lua_register(m_luaState, "doNpcSetCreatureFocus", LuaScriptInterface::luaSetNpcFocus);
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 	//isInArray(array, value)
@@ -3374,6 +3377,26 @@ int LuaScriptInterface::luaSetItemOutfit(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaSetNpcFocus(lua_State *L)
+{
+	//doNpcSetCreatureFocus(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Npc* npc = env->getNpc();
+	if(!npc){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Creature* creature = env->getCreatureByUID(cid);
+	npc->setCreatureFocus(creature);
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 

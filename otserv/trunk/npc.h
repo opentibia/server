@@ -123,7 +123,9 @@ public:
 	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
-	
+
+	void setCreatureFocus(Creature* creature);
+
 	NpcScriptInterface* getScriptInterface();
 	
 protected:
@@ -151,6 +153,7 @@ protected:
 
 	std::string name;
 	bool autoWalk;
+	uint32_t focusCreature;
 	
 	NpcEventsHandler* m_npcEventHandler;
 	bool loaded;

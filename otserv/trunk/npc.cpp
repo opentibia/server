@@ -24,6 +24,7 @@
 #include "game.h"
 #include "tools.h"
 #include "configmanager.h"
+#include "position.h"
 
 #include <algorithm>
 #include <functional>
@@ -56,6 +57,7 @@ Creature()
 	loaded = true;
 	name = _name;
 	autoWalk = false;
+	focusCreature = 0;
 
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
 	std::string scriptname;
@@ -287,7 +289,7 @@ bool Npc::getNextStep(Direction& dir)
 		return true;
 	}
 
-	if(autoWalk){
+	if(autoWalk && focusCreature == 0){
 		return getRandomStep(dir);
 	}
 
@@ -365,6 +367,50 @@ void Npc::doMoveTo(Position target)
 	}
 
 	startAutoWalk(listDir);
+}
+
+void Npc::setCreatureFocus(Creature* creature)
+{
+	if(creature){
+		focusCreature = creature->getID();
+
+		const Position& creaturePos = creature->getPosition();
+		const Position& myPos = getPosition();
+		int32_t dx = myPos.x - creaturePos.x;
+		int32_t dy = myPos.y - creaturePos.y;
+
+		Direction dir = SOUTH;
+		float tan = 0;
+
+		if(dx != 0){
+			tan = dy/dx;
+		}
+		else{
+			tan = 10;
+		}
+
+		if(std::abs(tan) < 1){
+			if(dx > 0){
+				dir = WEST;
+			}
+			else{
+				dir = EAST;
+			}
+		}
+		else{
+			if(dy > 0){
+				dir = NORTH;
+			}
+			else{
+				dir = SOUTH;
+			}
+		}
+
+		g_game.internalCreatureTurn(this, dir);
+	}
+	else{
+		focusCreature = 0;
+	}
 }
 
 NpcScriptInterface* Npc::getScriptInterface()
