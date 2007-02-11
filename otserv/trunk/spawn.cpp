@@ -453,6 +453,17 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 	return true;
 }
 
+void Spawn::removeMonster(Monster* monster)
+{
+	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end(); ++it){
+		if(it->second == monster){
+			monster->releaseThing2();
+			spawnedMap.erase(it);
+			break;
+		}
+	}
+}
+
 void Spawn::stopEvent()
 {
 	if(checkSpawnEvent != 0){

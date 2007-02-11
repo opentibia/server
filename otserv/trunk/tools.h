@@ -45,6 +45,7 @@ void trim_left(std::string& source, const std::string& t);
 void toLowerCaseString(std::string& source);
 
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
+bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 

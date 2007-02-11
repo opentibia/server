@@ -207,7 +207,21 @@ InstantSpell* Spells::getInstantSpell(const std::string words)
 		}
 	}
 
-	return result;
+	if(result){
+		if(words.length() > result->getWords().length() && !result->getHasParam()){
+			size_t spellLen = result->getWords().length();
+			size_t paramLen = words.length() - spellLen;
+			std::string paramText = words.substr(spellLen, paramLen);
+
+			if(paramText[0] != ' '){
+				return NULL;
+			}
+		}
+
+		return result;
+	}
+
+	return NULL;
 }
 
 InstantSpell* Spells::getInstantSpellByName(const std::string& name)
@@ -1706,7 +1720,7 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		}
 	}
 
-	Thing* thing = g_game.internalGetThing(player, posTo, STACKPOS_LOOK);
+	Thing* thing = g_game.internalGetThing(player, posTo, 0, 0, STACKPOS_LOOK);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);

@@ -74,6 +74,7 @@ public:
 	~Spawn();
 	
 	bool addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval);
+	void removeMonster(Monster* monster);
 
 	uint32_t getInterval() {return interval;}
 	void startup();

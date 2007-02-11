@@ -289,6 +289,7 @@ void Monster::stopThink()
 	isWalkActive = false;
 	isActive = false;
 
+	setAttackedCreature(NULL);
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
 		(*cit)->setAttackedCreature(NULL);
 		(*cit)->onAttackedCreatureDissapear(false);
@@ -590,6 +591,7 @@ void Monster::die()
 {
 	Creature::die();
 
+	setAttackedCreature(NULL);
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
 		(*cit)->changeHealth(-(*cit)->getHealth());
 		(*cit)->setAttackedCreature(NULL);
@@ -975,6 +977,13 @@ bool Monster::convinceCreature(Creature* creature)
 
 			setFollowCreature(NULL);
 			setAttackedCreature(NULL);
+
+			if(spawn){
+				spawn->removeMonster(this);
+				spawn = NULL;
+				masterRadius = -1;
+			}
+
 			return true;
 		}
 	}
@@ -982,6 +991,12 @@ bool Monster::convinceCreature(Creature* creature)
 		creature->addSummon(this);
 		setFollowCreature(NULL);
 		setAttackedCreature(NULL);
+
+		if(spawn){
+			spawn->removeMonster(this);
+			spawn = NULL;
+			masterRadius = -1;
+		}
 
 		return true;
 	}

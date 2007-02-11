@@ -142,15 +142,16 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			isLoaded = false;
 
+		uint64_t int64Value;
+		if(readXMLInteger64(root, "groupflags", int64Value)){
+			player->groupFlags = int64Value;
+		}
+
 		if(readXMLInteger(root, "cap", intValue)){
 			player->capacity = intValue;
 		}
 		else
 			isLoaded = false;
-
-		if(readXMLInteger(root, "groupflags", intValue)){
-			player->groupFlags = intValue;
-		}
 
 		if(readXMLInteger(root, "maxdepotitems", intValue)){
 			player->maxDepotLimit = intValue;
@@ -613,6 +614,10 @@ bool IOPlayerXML::savePlayer(Player* player)
 	sb.str("");
 	sb << player->accessLevel;
 	xmlSetProp(root, (const xmlChar*)"access", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->groupFlags;
+	xmlSetProp(root, (const xmlChar*)"groupflags", (const xmlChar*)sb.str().c_str());
 
 	sb.str("");
 	sb << player->getCapacity();
