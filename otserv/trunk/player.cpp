@@ -46,7 +46,7 @@ extern Weapons* g_weapons;
 
 AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
-uint32_t Player::maxMessageBuffer;
+int32_t Player::maxMessageBuffer;
 
 Player::Player(const std::string& _name, Protocol79 *p) :
 Creature()

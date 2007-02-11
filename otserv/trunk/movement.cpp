@@ -581,8 +581,8 @@ long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 		env->setScriptId(m_scriptId, m_scriptInterface);
 		env->setRealPos(pos);
 	
-		long cid = env->addThing((Thing*)creature);
-		long itemid = env->addThing(item);
+		uint32_t cid = env->addThing(creature);
+		uint32_t itemid = env->addThing(item);
 	
 		lua_State* L = m_scriptInterface->getLuaState();
 	
@@ -628,8 +628,8 @@ long MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
 		env->setScriptId(m_scriptId, m_scriptInterface);
 		env->setRealPos(player->getPosition());
 	
-		long cid = env->addThing((Thing*)player);
-		long itemid = env->addThing(item);
+		uint32_t cid = env->addThing(player);
+		uint32_t itemid = env->addThing(item);
 	
 		lua_State* L = m_scriptInterface->getLuaState();
 	

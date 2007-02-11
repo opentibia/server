@@ -937,6 +937,19 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doSetCreatureOutfit", LuaScriptInterface::luaSetCreatureOutfit);
 	//getCreatureOutfit(cid)
 	lua_register(m_luaState, "getCreatureOutfit", LuaScriptInterface::luaGetCreatureOutfit);
+	//getCreaturePosition(cid)
+	lua_register(m_luaState, "getCreaturePosition", LuaScriptInterface::luaGetCreaturePosition);
+
+	//isItemStackable(itemid)
+	lua_register(m_luaState, "isItemStackable", LuaScriptInterface::luaIsItemStackable);
+	//isItemRune(itemid)
+	lua_register(m_luaState, "isItemRune", LuaScriptInterface::luaIsItemRune);
+	//isItemDoor(itemid)
+	lua_register(m_luaState, "isItemDoor", LuaScriptInterface::luaIsItemDoor);
+	//isItemContainer(itemid)
+	lua_register(m_luaState, "isItemContainer", LuaScriptInterface::luaIsItemContainer);
+	//isItemFluidContainer(itemid)
+	lua_register(m_luaState, "isItemFluidContainer", LuaScriptInterface::luaIsItemFluidContainer);
 
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -3833,3 +3846,91 @@ int LuaScriptInterface::luaDoSetCreatureLight(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetCreaturePosition(lua_State *L)
+{
+	//getCreaturePosition(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		Position pos = creature->getPosition();
+		pushPosition(L, pos, 0);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsItemStackable(lua_State *L)
+{
+	//isItemStackable(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	if(it.stackable){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsItemRune(lua_State *L)
+{
+	//isItemRune(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	if(it.isRune()){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsItemDoor(lua_State *L)
+{
+	//isItemDoor(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	if(it.isDoor()){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsItemContainer(lua_State *L)
+{
+	//isItemContainer(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	if(it.isContainer()){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsItemFluidContainer(lua_State *L)
+{
+	//isItemFluidContainer(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	if(it.isFluidContainer()){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}

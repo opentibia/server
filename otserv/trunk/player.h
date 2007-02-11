@@ -103,7 +103,7 @@ public:
 	virtual const Player* getPlayer() const {return this;}
 
 	static MuteCountMap muteCountMap;
-	static uint32_t maxMessageBuffer;
+	static int32_t maxMessageBuffer;
 
 	virtual const std::string& getName() const {return name;}
 	virtual const std::string& getNameDescription() const {return name;}

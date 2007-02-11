@@ -438,6 +438,13 @@ protected:
 	static int luaGetCreatureOutfit(lua_State *L);
 	static int luaSetMonsterOutfit(lua_State *L);
 	static int luaSetItemOutfit(lua_State *L);
+	static int luaGetCreaturePosition(lua_State *L);
+
+	static int luaIsItemStackable(lua_State *L);
+	static int luaIsItemRune(lua_State *L);
+	static int luaIsItemDoor(lua_State *L);
+	static int luaIsItemContainer(lua_State *L);
+	static int luaIsItemFluidContainer(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);

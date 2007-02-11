@@ -433,8 +433,8 @@ bool Action::executeUse(Player* player, Item* item,
 		env->setScriptId(m_scriptId, m_scriptInterface);
 		env->setRealPos(player->getPosition());
 	
-		long cid = env->addThing(player);
-		long itemid1 = env->addThing(item);
+		uint32_t cid = env->addThing(player);
+		uint32_t itemid1 = env->addThing(item);
 	
 		lua_State* L = m_scriptInterface->getLuaState();
 	

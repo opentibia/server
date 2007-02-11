@@ -177,7 +177,7 @@ public:
 	int             alwaysOnTopOrder;
 	bool            pickupable;
 	bool            rotable;
-	int				      rotateTo;
+	int             rotateTo;
 
 	int             runeMagLevel;
 	std::string     runeSpellName;

@@ -51,6 +51,7 @@ protected:
 	static int luaSelfGetPos(lua_State *L);
 	static int luagetDistanceTo(lua_State *L);
 	static int luaSetNpcFocus(lua_State *L);
+	static int luaGetNpcCid(lua_State *L);
 	
 private:
 	virtual bool initState();

@@ -23,13 +23,13 @@
 
 #include "definitions.h"
 
-#define NETWORKMESSAGE_MAXSIZE 16768
+#define NETWORKMESSAGE_MAXSIZE 15360
 
 enum MagicEffectClasses {
 	NM_ME_DRAW_BLOOD  	   = 0x00,
-	NM_ME_LOSE_ENERGY	     = 0x01,
-	NM_ME_PUFF			       = 0x02,
-	NM_ME_BLOCKHIT		     = 0x03,
+	NM_ME_LOSE_ENERGY	   = 0x01,
+	NM_ME_PUFF			   = 0x02,
+	NM_ME_BLOCKHIT		   = 0x03,
 	NM_ME_EXPLOSION_AREA   = 0x04,
 	NM_ME_EXPLOSION_DAMAGE = 0x05,
 	NM_ME_FIRE_AREA        = 0x06,
