@@ -146,7 +146,9 @@ protected:
 	virtual void onThink(uint32_t interval);
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
-	virtual bool isAttackable() const { return false; };
+	bool isImmune(CombatType_t type) const {return true;}
+	bool isImmune(ConditionType_t type) const {return true;}
+	virtual bool isAttackable() const { return false; }
 	virtual bool getNextStep(Direction& dir);
 	
 	bool canWalkTo(const Position& fromPos, Direction dir);
