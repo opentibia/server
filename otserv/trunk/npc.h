@@ -44,11 +44,13 @@ protected:
 	static int luaActionSay(lua_State *L);
 	static int luaActionMove(lua_State *L);
 	static int luaActionMoveTo(lua_State *L);
+	static int luaActionTurn(lua_State* L);
 	static int luaCreatureGetName(lua_State *L);
 	static int luaCreatureGetName2(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
 	static int luaSelfGetPos(lua_State *L);
 	static int luagetDistanceTo(lua_State *L);
+	static int luaSetNpcFocus(lua_State *L);
 	
 private:
 	virtual bool initState();
@@ -104,7 +106,7 @@ public:
 	virtual Npc* getNpc() {return this;};
 	virtual const Npc* getNpc() const {return this;};
 
-	virtual bool isPushable() const { return true;};
+	virtual bool isPushable() const { return false;};
 	
 	virtual uint32_t idRange(){ return 0x30000000;}
 	static AutoList<Npc> listNpc;
@@ -119,6 +121,7 @@ public:
 	
 	void doSay(std::string msg);
 	void doMove(Direction dir);
+	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
 

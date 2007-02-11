@@ -278,6 +278,11 @@ void Npc::doMove(Direction dir)
 	g_game.internalMoveCreature(this, dir);
 }
 
+void Npc::doTurn(Direction dir)
+{
+	g_game.internalCreatureTurn(this, dir);
+}
+
 bool Npc::getNextStep(Direction& dir)
 {
 	if(Creature::getNextStep(dir)){
@@ -459,11 +464,13 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "selfSay", NpcScriptInterface::luaActionSay);
 	lua_register(m_luaState, "selfMove", NpcScriptInterface::luaActionMove);
 	lua_register(m_luaState, "selfMoveTo", NpcScriptInterface::luaActionMoveTo);
+	lua_register(m_luaState, "selfTurn", NpcScriptInterface::luaActionTurn);
 	lua_register(m_luaState, "selfGetPosition", NpcScriptInterface::luaSelfGetPos);
 	lua_register(m_luaState, "creatureGetName", NpcScriptInterface::luaCreatureGetName);
 	lua_register(m_luaState, "creatureGetName2", NpcScriptInterface::luaCreatureGetName2);
 	lua_register(m_luaState, "creatureGetPosition", NpcScriptInterface::luaCreatureGetPos);
 	lua_register(m_luaState, "getDistanceTo", NpcScriptInterface::luagetDistanceTo);
+	lua_register(m_luaState, "doNpcSetCreatureFocus", NpcScriptInterface::luaSetNpcFocus);
 }
 
 
@@ -574,6 +581,18 @@ int NpcScriptInterface::luaActionMoveTo(lua_State* L)
 	return 0;
 }
 
+int NpcScriptInterface::luaActionTurn(lua_State* L)
+{
+	Direction dir = (Direction)(int)popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	Npc* mynpc = env->getNpc();
+	if(mynpc)
+		mynpc->doTurn(dir);
+
+	return 0;
+}
+
 int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 {
 	long uid = (long)popNumber(L);
@@ -599,6 +618,26 @@ int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 		return 1;
 	}
 	
+	return 1;
+}
+
+int NpcScriptInterface::luaSetNpcFocus(lua_State *L)
+{
+	//doNpcSetCreatureFocus(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Npc* mynpc = env->getNpc();
+	if(!mynpc){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Creature* creature = env->getCreatureByUID(cid);
+	mynpc->setCreatureFocus(creature);
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
