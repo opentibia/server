@@ -624,12 +624,7 @@ int NpcScriptInterface::luaSetNpcFocus(lua_State *L)
 	Npc* mynpc = env->getNpc();
 	if(mynpc){
 		Creature* creature = env->getCreatureByUID(cid);
-		if(creature){
-			mynpc->setCreatureFocus(creature);
-		}
-		else{
-			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		}
+		mynpc->setCreatureFocus(creature);
 	}
 	return 0;
 }
