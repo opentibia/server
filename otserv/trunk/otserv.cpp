@@ -64,12 +64,9 @@
 	#include <fcntl.h>
 	#include <arpa/inet.h>
 	#include <signal.h>
-	#include <errno.h>
 
 	#define SOCKET_ERROR -1
 	#define ERROR_EINTR EINTR
-
-	extern int errno;
 #endif
 
 #ifdef __DEBUG_CRITICALSECTION__
@@ -865,7 +862,7 @@ int main(int argc, char *argv[])
 					continue;
 				}
 				else{
-					std::cout << "WARNING: select() function returned an error." << std::endl;;
+					SOCKET_PERROR("select");
 					break;
 				}
 			}
@@ -886,7 +883,7 @@ int main(int argc, char *argv[])
 			}
 			else{
 				accept_errors++;
-				std::cout << "WARNING: Not a valid socket from accept() function." << std::endl;;
+				SOCKET_PERROR("accept");
 			}
 		}
 

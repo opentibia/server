@@ -29,7 +29,7 @@ otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
 	luascript.h map.h monster.h networkmessage.h npc.h otsystem.h player.h \
 	position.h protocol79.h scheduler.h spells.h stamp-h status.h \
 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
-	actions.h actions.cpp scheduler.cpp commands.cpp commands.h depot.cpp depot.h \
+	actions.h actions.cpp commands.cpp commands.h depot.cpp depot.h \
 	md5.cpp md5.h fileloader.cpp fileloader.h chat.cpp chat.h logger.cpp logger.h \
 	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp teleport.cpp teleport.h \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \

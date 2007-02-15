@@ -120,6 +120,32 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
 
 typedef int socklen_t;
 
+#define PERROR(a) \
+{ \
+	LPVOID lpMsg; \
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | \
+		FORMAT_MESSAGE_FROM_SYSTEM | \
+		FORMAT_MESSAGE_IGNORE_INSERTS, NULL, \
+		GetLastError(), \
+		MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), \
+		(LPTSTR) &lpMsg, 0, NULL);  \
+		fprintf(stderr,"%s:(%d)%s\n",a,GetLastError(),lpMsg); \
+		LocalFree(lpMsg); \
+}
+
+#define SOCKET_PERROR(a) \
+{ \
+	LPVOID lpMsg; \
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | \
+		FORMAT_MESSAGE_FROM_SYSTEM | \
+		FORMAT_MESSAGE_IGNORE_INSERTS, NULL, \
+		WSAGetLastError(), \
+		MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), \
+		(LPTSTR) &lpMsg, 0, NULL);  \
+		fprintf(stderr,"%s:(%d)%s\n",a,WSAGetLastError(),lpMsg); \
+		LocalFree(lpMsg); \
+}
+
 #else  // #if defined WIN32 || defined __WINDOWS__
 
 #include <pthread.h>
@@ -200,6 +226,8 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
 #define closesocket close
 #endif
 
+#define PERROR(a) perror(a)
+#define SOCKET_PERROR(a) perror(a)
 
 #endif // #if defined WIN32 || defined __WINDOWS__
 
