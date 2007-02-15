@@ -30,7 +30,7 @@
 struct LootBlock{
 	unsigned short id;
 	unsigned short countmax;
-	unsigned long chance;
+	uint32_t chance;
 
 	//optional
 	int subType;
@@ -93,7 +93,7 @@ public:
 	int armor;
 
 	bool canPushItems;
-	unsigned long staticAttackChance;
+	uint32_t staticAttackChance;
 	int maxSummons;
 	int targetDistance;
 	int runAwayHealth;
@@ -147,8 +147,8 @@ public:
 	bool reload();
 	
 	MonsterType* getMonsterType(const std::string& name);
-	MonsterType* getMonsterType(unsigned long mid);
-	unsigned long getIdByName(const std::string& name);
+	MonsterType* getMonsterType(uint32_t mid);
+	uint32_t getIdByName(const std::string& name);
 
 	static uint32_t getLootRandom();
 	
@@ -162,10 +162,10 @@ private:
 	bool loadLootContainer(xmlNodePtr, LootBlock&);
 	bool loadLootItem(xmlNodePtr, LootBlock&);
 
-	typedef std::map<std::string, unsigned long> MonsterNameMap;
+	typedef std::map<std::string, uint32_t> MonsterNameMap;
 	MonsterNameMap monsterNames;
 	
-	typedef std::map<unsigned long, MonsterType*> MonsterMap;
+	typedef std::map<uint32_t, MonsterType*> MonsterMap;
 	MonsterMap monsters;
 	
 	bool loaded;

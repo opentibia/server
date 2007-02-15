@@ -61,7 +61,7 @@ void RSA::setKey(char* p, char* q, char* d)
 	m_keySet = true;
 }
 
-bool RSA::decrypt(char* msg, long size)
+bool RSA::decrypt(char* msg, int32_t size)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
 	
@@ -130,7 +130,7 @@ void RSA::setKey(char* p, char* q, char* d)
 	mpz_clear(qm1);
 }
 
-bool RSA::decrypt(char* msg, long size)
+bool RSA::decrypt(char* msg, int32_t size)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
 	
@@ -171,10 +171,10 @@ bool RSA::decrypt(char* msg, long size)
 	return true;
 }
 
-long RSA::getKeySize()
+int32_t RSA::getKeySize()
 {
 	size_t count = (mpz_sizeinbase(m_mod, 2) + 7)/8;
-	long a = count/128;
+	int32_t a = count/128;
 	return a*128;
 }
 

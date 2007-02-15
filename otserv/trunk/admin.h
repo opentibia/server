@@ -159,8 +159,8 @@ public:
 protected:
 	bool m_enabled;
 	bool m_onlyLocalHost;
-	long m_maxConnections;
-	long m_currrentConnections;
+	int32_t m_maxConnections;
+	int32_t m_currrentConnections;
 	
 	std::string m_password;
 	
@@ -176,15 +176,15 @@ public:
 	~AdminConnection();
 	
 	std::string getIPString();
-	long getStartTime();
+	int32_t getStartTime();
 	
-	long getLastCommandTime();
+	int32_t getLastCommandTime();
 	void setLastCommandTime();
 	
 protected:
 	std::string m_ip;
-	long m_startTime;
-	long m_lastCommand;
+	int32_t m_startTime;
+	int32_t m_lastCommand;
 };
 
 class AdminProtocol{
@@ -196,17 +196,17 @@ public:
 	
 protected:
 	
-	long parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffer);
+	int32_t parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffer);
 
 	bool adminCommandCloseServer();
 	bool adminCommandPayHouses();
 	
 	AdminConnection* m_connection;
 	
-	long m_loginTries;
+	int32_t m_loginTries;
 	
 	SOCKET m_socket;
-	long m_state;
+	int32_t m_state;
 	
 };
 

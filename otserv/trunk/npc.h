@@ -92,10 +92,10 @@ public:
 private:
 	NpcScriptInterface* m_scriptInterface;
 	
-	long m_onCreatureAppear;
-	long m_onCreatureDisappear;
-	long m_onCreatureSay;
-	long m_onThink;
+	int32_t m_onCreatureAppear;
+	int32_t m_onCreatureDisappear;
+	int32_t m_onCreatureSay;
+	int32_t m_onThink;
 };
 
 class Npc : public Creature

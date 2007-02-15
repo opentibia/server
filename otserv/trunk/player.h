@@ -288,7 +288,7 @@ public:
 	void setSkull(Skulls_t newSkull) {skull = newSkull;}
 	void sendCreatureSkull(const Creature* creature, Skulls_t skull) const
 		{client->sendCreatureSkull(creature, skull);}
-	void checkRedSkullTicks(long ticks);
+	void checkRedSkullTicks(int32_t ticks);
 #endif	
 	const OutfitListType& getPlayerOutfits();
 	bool canWear(uint32_t _looktype, uint32_t _addons);

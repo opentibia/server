@@ -1114,9 +1114,9 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 		const Position lookPos = player->getPosition();
 		const Position searchPos = playerExiva->getPosition();
 		
-		long dx = lookPos.x - searchPos.x;
-		long dy = lookPos.y - searchPos.y;
-		long dz = lookPos.z - searchPos.z;
+		int32_t dx = lookPos.x - searchPos.x;
+		int32_t dy = lookPos.y - searchPos.y;
+		int32_t dz = lookPos.z - searchPos.z;
 		
 		distance_t distance;
 		direction_t direction;
@@ -1136,7 +1136,7 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 			distance = DISTANCE_BESIDE;
 		}
 		else{
-			long distance2 = dx*dx + dy*dy;
+			int32_t distance2 = dx*dx + dy*dy;
 			if(distance2 < 625){
 				distance = DISTANCE_CLOSE_1;
 			}

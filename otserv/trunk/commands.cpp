@@ -330,7 +330,7 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 		}
 
 		playerBan->sendTextMessage(MSG_STATUS_CONSOLE_RED, "You have been banned.");
-		unsigned long ip = playerBan->lastip;
+		uint32_t ip = playerBan->lastip;
 		if(ip > 0) {
 			g_bans.addIpBan(ip, 0xFFFFFFFF, 0);
 		}
@@ -595,7 +595,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 			return true;
 		}
 		unsigned char ip[4];
-		*(unsigned long*)&ip = paramPlayer->lastip;
+		*(uint32_t*)&ip = paramPlayer->lastip;
 		info << "name:   " << paramPlayer->getName() << std::endl <<
 		        "access: " << paramPlayer->getAccessLevel() << std::endl <<
 		        "level:  " << paramPlayer->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
@@ -754,7 +754,7 @@ bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const s
 			if(houseTile){
 				
 				std::string real_name = param;
-				unsigned long guid;
+				uint32_t guid;
 				if(param == "none"){
 					houseTile->getHouse()->setHouseOwner(0);
 				}
@@ -836,7 +836,7 @@ bool Commands::getHouse(Creature* creature, const std::string& cmd, const std::s
 		return false;
 	
 	std::string real_name = param;
-	unsigned long guid;
+	uint32_t guid;
 	if(IOPlayer::instance()->getGuidByName(guid, real_name)){
 		House* house = Houses::getInstance().getHouseByPlayerId(guid);
 		std::stringstream str;
@@ -871,7 +871,7 @@ bool Commands::serverInfo(Creature* creature, const std::string& cmd, const std:
 	return true;
 }
 
-void showTime(std::stringstream& str, unsigned long time)
+void showTime(std::stringstream& str, uint32_t time)
 {
 	if(time == 0xFFFFFFFF){
 		str << "permanent";
@@ -892,7 +892,7 @@ void showTime(std::stringstream& str, unsigned long time)
 	}
 }
 
-unsigned long parseTime(const std::string& time)
+uint32_t parseTime(const std::string& time)
 {
 	if(time == ""){
 		return 0;
@@ -907,8 +907,8 @@ unsigned long parseTime(const std::string& time)
 		if(timeit == timetoken.end()){
 			return 0;
 		}
-		unsigned long number = atoi(timeit->c_str());
-		unsigned long multiplier = 0;
+		uint32_t number = atoi(timeit->c_str());
+		uint32_t multiplier = 0;
 		++timeit;
 		if(timeit == timetoken.end()){
 			return 0;
@@ -984,7 +984,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 		param1 = parseParams(cmdit, cmdtokens.end());
 		param2 = parseParams(cmdit, cmdtokens.end());
 		param3 = parseParams(cmdit, cmdtokens.end());
-		long time = 0;
+		int32_t time = 0;
 		switch(type){
 		case 'i':
 		{
@@ -995,7 +995,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 		case 'p':
 		{
 			std::string playername = param1;
-			unsigned long guid;
+			uint32_t guid;
 			if(!IOPlayer::instance()->getGuidByName(guid, playername)){
 				str << "Player not found.";
 				break;
@@ -1008,7 +1008,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 		
 		case 'a':
 		{
-			long account = atoi(param1.c_str());
+			int32_t account = atoi(param1.c_str());
 			time = parseTime(param2);
 			if(account != 0){
 				g_bans.addAccountBan(account, time);
@@ -1028,7 +1028,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 				break;
 			}
 			time = parseTime(param2);
-			long account = playerBan->getAccount();
+			int32_t account = playerBan->getAccount();
 			if(account){
 				g_bans.addAccountBan(account, time);
 				str << "Account banished.";
@@ -1059,7 +1059,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
 			return true;
 		}
-		unsigned long number = atoi(cmdit->c_str());
+		uint32_t number = atoi(cmdit->c_str());
 		bool ret = false;
 		bool typeFound = true;
 		switch(type){
@@ -1096,15 +1096,15 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			IpBanList::const_iterator it;
 			unsigned char ip[4];
 			unsigned char mask[4];
-			unsigned long n = 0;
+			uint32_t n = 0;
 			for(it = ipBanList.begin(); it != ipBanList.end(); ++it){
 				n++;
 				if(it->time != 0 && it->time < currentTime){
 					str << "*";
 				}
 				str << n << " : ";
-				*(unsigned long*)&ip = it->ip;
-				*(unsigned long*)&mask = it->mask;
+				*(uint32_t*)&ip = it->ip;
+				*(uint32_t*)&mask = it->mask;
 				str << ipText(ip) << " " << ipText(mask) << " ";
 				showTime(str, it->time);
 				str << std::endl;
@@ -1119,7 +1119,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			str << "Player bans: " << std::endl;
 			const PlayerBanList playerBanList = g_bans.getPlayerBans();
 			PlayerBanList::const_iterator it;
-			unsigned long n = 0;
+			uint32_t n = 0;
 			for(it = playerBanList.begin(); it != playerBanList.end(); ++it){
 				n++;
 				if(it->time != 0 && it->time < currentTime){
@@ -1143,7 +1143,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			str << "Account bans: " << std::endl;
 			const AccountBanList accountBanList = g_bans.getAccountBans();
 			AccountBanList::const_iterator it;
-			unsigned long n = 0;
+			uint32_t n = 0;
 			for(it = accountBanList.begin(); it != accountBanList.end(); ++it){
 				n++;
 				if(it->time != 0 && it->time < currentTime){

@@ -889,7 +889,7 @@ void Protocol79::parseRequestOutfit(NetworkMessage& msg)
 	AddCreatureOutfit(msg, player, player->getDefaultOutfit());
 	
 	const OutfitListType& player_outfits = player->getPlayerOutfits();
-	long count_outfits = player_outfits.size();
+	size_t count_outfits = player_outfits.size();
 	
 	//client outfits limit is 15
 	if(count_outfits > 15){

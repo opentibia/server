@@ -261,12 +261,12 @@ private:
 	void RemoveInventoryItem(NetworkMessage& msg, slots_t slot);
 
 	OTSYS_THREAD_LOCKVAR bufferLock;
-	unsigned long windowTextID;
+	uint32_t windowTextID;
 	Item* readItem;
-	unsigned long maxTextLength;
+	uint32_t maxTextLength;
 	
 	House* house;
-	unsigned long listId;
+	uint32_t listId;
 		
 	bool pendingLogout;
 	Player* player;

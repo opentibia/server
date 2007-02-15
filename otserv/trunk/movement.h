@@ -56,19 +56,19 @@ public:
 	MoveEvents();
 	virtual ~MoveEvents();
 	
-	long onCreatureMove(Creature* creature, Tile* tile, bool isIn);
-	long onPlayerEquip(Player* player, Item* item, slots_t slot, bool isEquip);
-	long onItemMove(Item* item, Tile* tile, bool isAdd);
+	uint32_t onCreatureMove(Creature* creature, Tile* tile, bool isIn);
+	uint32_t onPlayerEquip(Player* player, Item* item, slots_t slot, bool isEquip);
+	uint32_t onItemMove(Item* item, Tile* tile, bool isAdd);
 	
 protected:
-	typedef std::map<long , MoveEventList> MoveListMap;
+	typedef std::map<int32_t , MoveEventList> MoveListMap;
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
 	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	
-	void addEvent(MoveEvent* event, long id, MoveListMap& map);
+	void addEvent(MoveEvent* event, int32_t id, MoveListMap& map);
 	
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
 	
@@ -79,9 +79,9 @@ protected:
 	LuaScriptInterface m_scriptInterface;
 };
 
-typedef long (StepFunction)(Creature* creature, Item* item, const Position& pos);
-typedef long (MoveFunction)(Item* item, Item* tileItem, const Position& pos);
-typedef long (EquipFunction)(Player* player, Item* item, slots_t slot);
+typedef uint32_t (StepFunction)(Creature* creature, Item* item, const Position& pos);
+typedef uint32_t (MoveFunction)(Item* item, Item* tileItem, const Position& pos);
+typedef uint32_t (EquipFunction)(Player* player, Item* item, slots_t slot);
 
 class MoveEvent : public Event
 {
@@ -95,16 +95,16 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 
-	long fireStepEvent(Creature* creature, Item* item, const Position& pos);
-	long fireAddRemItem(Item* item, Item* tileItem, const Position& pos);
-	long fireEquip(Player* player, Item* item, slots_t slot);
+	uint32_t fireStepEvent(Creature* creature, Item* item, const Position& pos);
+	uint32_t fireAddRemItem(Item* item, Item* tileItem, const Position& pos);
+	uint32_t fireEquip(Player* player, Item* item, slots_t slot);
 
 	slots_t getSlot() const {return slot;}
 
 	//scripting
-	long executeStep(Creature* creature, Item* item, const Position& pos);
-	long executeEquip(Player* player, Item* item, slots_t slot);
-	long executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
+	uint32_t executeStep(Creature* creature, Item* item, const Position& pos);
+	uint32_t executeEquip(Player* player, Item* item, slots_t slot);
+	uint32_t executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	//
 	
 protected:

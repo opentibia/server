@@ -50,12 +50,12 @@ public:
 
 	virtual void operator()(Game* arg) = 0;
 
-	virtual void setEventId(unsigned long id)
+	virtual void setEventId(uint32_t id)
 	{
 		_eventid = id;
 	}
 
-	inline unsigned long getEventId() const
+	inline uint32_t getEventId() const
 	{
 		return _eventid;
 	}
@@ -71,7 +71,7 @@ public:
 	}
 
 protected:
-	unsigned long _eventid;
+	uint32_t _eventid;
 	int64_t _cycle;
 };
 
@@ -97,8 +97,13 @@ protected:
 	boost::function1<void, Game*> _f;
 };
 
-SchedulerTask* makeTask(boost::function1<void, Game*> f);
-SchedulerTask* makeTask(int64_t ticks, boost::function1<void, Game*> f);
+inline SchedulerTask* makeTask(boost::function1<void, Game*> f) {return new TSchedulerTask(f);}
+inline SchedulerTask* makeTask(int64_t ticks, boost::function1<void, Game*> f){
+	SchedulerTask* ret = new TSchedulerTask(f);
+	//ret->setEventId(0);
+	ret->setTicks(ticks);
+	return ret;
+}
 
 class lessSchedTask : public std::binary_function<SchedulerTask*, SchedulerTask*, bool>{
 public:

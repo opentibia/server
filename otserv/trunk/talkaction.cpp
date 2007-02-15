@@ -109,7 +109,7 @@ TalkActionResult_t TalkActions::playerSaySpell(Player* player, SpeakClasses type
 	for(it = wordsMap.begin(); it != wordsMap.end(); ++it){
 		if(it->first == str_words){
 			TalkAction* talkAction = it->second;
-			long ret =  talkAction->executeSay(player, str_words, str_param);
+			uint32_t ret =  talkAction->executeSay(player, str_words, str_param);
 			if(ret == 1){
 				return TALKACTION_CONTINUE;
 			}
@@ -151,7 +151,7 @@ std::string TalkAction::getScriptEventName()
 	return "onSay";
 }
 
-long TalkAction::executeSay(Creature* creature, const std::string& words, const std::string& param)
+uint32_t TalkAction::executeSay(Creature* creature, const std::string& words, const std::string& param)
 {
 	//onSay(cid, words, param)
 	if(m_scriptInterface->reserveScriptEnv()){

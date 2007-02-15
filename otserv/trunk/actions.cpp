@@ -445,7 +445,7 @@ bool Action::executeUse(Player* player, Item* item,
 		//std::cout << "posTo" <<  (Position)posTo << " stack" << (int)posTo.stackpos <<std::endl;
 		Thing* thing = g_game.internalGetThing(player, toPos, toPos.stackpos);
 		if(thing && (!extendedUse || thing != item)){
-			long thingId2 = env->addThing(thing);
+			uint32_t thingId2 = env->addThing(thing);
 			LuaScriptInterface::pushThing(L, thing, thingId2);
 			LuaScriptInterface::pushPosition(L, toPos, toPos.stackpos);
 		}

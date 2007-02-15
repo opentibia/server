@@ -211,7 +211,7 @@ bool Monsters::loadFromXml(const std::string& _datadir,bool reloading /*= false*
 	if(doc){
 		loaded = true;
 		xmlNodePtr root, p;
-		unsigned long id = 0;
+		uint32_t id = 0;
 		root = xmlDocGetRootElement(doc);
 
 		if(xmlStrcmp(root->name,(const xmlChar*)"monsters") != 0){
@@ -741,7 +741,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 	bool new_mType = true;
 	
 	if(reloading){
-		unsigned long id = getIdByName(monster_name);
+		uint32_t id = getIdByName(monster_name);
 		if(id != 0){
 			mType = getMonsterType(id);
 			if(mType != NULL){
@@ -1274,7 +1274,7 @@ MonsterType* Monsters::getMonsterType(const std::string& name)
 	return getMonsterType(mId);
 }
 
-MonsterType* Monsters::getMonsterType(unsigned long mid)
+MonsterType* Monsters::getMonsterType(uint32_t mid)
 {
 	MonsterMap::iterator it = monsters.find(mid);
 	if(it != monsters.end()){
@@ -1285,7 +1285,7 @@ MonsterType* Monsters::getMonsterType(unsigned long mid)
 	}
 }
 
-unsigned long Monsters::getIdByName(const std::string& name)
+uint32_t Monsters::getIdByName(const std::string& name)
 {
 	std::string lower_name = name;
 	std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(), tolower);

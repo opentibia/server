@@ -154,7 +154,7 @@ bool Map::saveMap(const std::string& identifier)
 
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
 	bool saved = false;
-	for(long tries = 0;tries < 3;tries++){
+	for(uint32_t tries = 0; tries < 3; tries++){
 		if(IOMapSerialize->saveMap(this, storeIdentifier)){
 			saved = true;
 			break;
@@ -165,7 +165,7 @@ bool Map::saveMap(const std::string& identifier)
 		return false;
 	
 	saved = false;
-	for(long tries = 0;tries < 3;tries++){
+	for(uint32_t tries = 0; tries < 3; tries++){
 		if(IOMapSerialize->saveHouseInfo(this, houseStoreIdentifier)){
 			saved = true;
 			break;
@@ -956,7 +956,7 @@ AStarNode* AStarNodes::createOpenNode()
 	if(curNode >= MAX_NODES)
 		return NULL;
 	
-	unsigned long ret_node = curNode;
+	uint32_t ret_node = curNode;
 	curNode++;
 	openNodes[ret_node] = 1;
 	return &nodes[ret_node];
@@ -968,10 +968,10 @@ AStarNode* AStarNodes::getBestNode()
 		return NULL;
 
 	int best_node_f = 100000;
-	unsigned long best_node = 0;
+	uint32_t best_node = 0;
 	bool found = false;
 
-	for(unsigned long i = 0; i < curNode; i++){
+	for(uint32_t i = 0; i < curNode; i++){
 		if(nodes[i].f < best_node_f && openNodes[i] == 1){
 			found = true;
 			best_node_f = nodes[i].f;
@@ -988,7 +988,7 @@ AStarNode* AStarNodes::getBestNode()
 
 void AStarNodes::closeNode(AStarNode* node)
 {
-	unsigned long pos = GET_NODE_INDEX(node);
+	uint32_t pos = GET_NODE_INDEX(node);
 	if(pos < 0 || pos >= MAX_NODES){
 		std::cout << "AStarNodes. trying to close node out of range" << std::endl;
 		return;
@@ -999,7 +999,7 @@ void AStarNodes::closeNode(AStarNode* node)
 
 void AStarNodes::openNode(AStarNode* node)
 {
-	unsigned long pos = GET_NODE_INDEX(node);
+	uint32_t pos = GET_NODE_INDEX(node);
 	if(pos < 0 || pos >= MAX_NODES){
 		std::cout << "AStarNodes. trying to open node out of range" << std::endl;
 		return;
@@ -1008,10 +1008,10 @@ void AStarNodes::openNode(AStarNode* node)
 	openNodes[pos] = 1;
 }
 
-unsigned long AStarNodes::countClosedNodes()
+uint32_t AStarNodes::countClosedNodes()
 {
-	unsigned long counter = 0;
-	for(unsigned long i = 0; i < curNode; i++){
+	uint32_t counter = 0;
+	for(uint32_t i = 0; i < curNode; i++){
 		if(openNodes[i] == 0){
 			counter++;
 		}
@@ -1019,10 +1019,10 @@ unsigned long AStarNodes::countClosedNodes()
 	return counter;
 }
 
-unsigned long AStarNodes::countOpenNodes()
+uint32_t AStarNodes::countOpenNodes()
 {
-	unsigned long counter = 0;
-	for(unsigned long i = 0; i < curNode; i++){
+	uint32_t counter = 0;
+	for(uint32_t i = 0; i < curNode; i++){
 		if(openNodes[i] == 1){
 			counter++;
 		}
@@ -1030,9 +1030,9 @@ unsigned long AStarNodes::countOpenNodes()
 	return counter;
 }
 
-bool AStarNodes::isInList(long x, long y)
+bool AStarNodes::isInList(int32_t x, int32_t y)
 {
-	for(unsigned long i = 0; i < curNode; i++){
+	for(uint32_t i = 0; i < curNode; i++){
 		if(nodes[i].x == x && nodes[i].y == y){
 			return true;
 		}
@@ -1040,9 +1040,9 @@ bool AStarNodes::isInList(long x, long y)
 	return false;
 }
 
-AStarNode* AStarNodes::getNodeInList(long x, long y)
+AStarNode* AStarNodes::getNodeInList(int32_t x, int32_t y)
 {
-	for(unsigned long i = 0; i < curNode; i++){
+	for(uint32_t i = 0; i < curNode; i++){
 		if(nodes[i].x == x && nodes[i].y == y){
 			return &nodes[i];
 		}

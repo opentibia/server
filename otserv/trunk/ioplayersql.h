@@ -55,17 +55,17 @@ public:
 	*/
 	virtual bool savePlayer(Player* player);
 	
-	virtual bool getGuidByName(unsigned long& guid, std::string& name);
-	virtual bool getGuidByNameEx(unsigned long &guid, bool& specialVip, std::string& name);
-	virtual bool getNameByGuid(unsigned long guid, std::string& name);
-	virtual bool getGuildIdByName(unsigned long& guildId, const std::string& guildName);
+	virtual bool getGuidByName(uint32_t& guid, std::string& name);
+	virtual bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
+	virtual bool getNameByGuid(uint32_t guid, std::string& name);
+	virtual bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 	virtual bool playerExists(std::string name);
 
 	IOPlayerSQL();
 	~IOPlayerSQL(){};
 
 protected:
-	bool storeNameByGuid(Database &mysql, unsigned long guid);
+	bool storeNameByGuid(Database &mysql, uint32_t guid);
 	
 	const PlayerGroup* getPlayerGroup(uint32_t groupid);
 
@@ -85,8 +85,8 @@ protected:
 	void loadItems(ItemMap& itemMap, DBResult& result);
 	bool saveItems(Player* player, const ItemBlockList& itemList, DBSplitInsert& query_insert);
 
-	typedef std::map<unsigned long, std::string> NameCacheMap;
-	typedef std::map<std::string, unsigned long, StringCompareCase> GuidCacheMap;
+	typedef std::map<uint32_t, std::string> NameCacheMap;
+	typedef std::map<std::string, uint32_t, StringCompareCase> GuidCacheMap;
 	typedef std::map<uint32_t, PlayerGroup*> PlayerGroupMap;
 	
 	PlayerGroupMap playerGroupMap;

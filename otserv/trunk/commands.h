@@ -88,7 +88,7 @@ typedef  bool (Commands::*CommandFunc)(Creature*,const std::string&,const std::s
 
 struct Command{
 	CommandFunc f;
-	long accesslevel;
+	int32_t accesslevel;
 	bool loaded;
 };
 

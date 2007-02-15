@@ -50,10 +50,10 @@ public:
 	
 	//virtual bool loadDepot(Player* player, unsigned long depotId);
 	
-	virtual bool getGuidByName(unsigned long& guid, std::string& name);
-	virtual bool getGuidByNameEx(unsigned long& guid, bool& specialVip, std::string& name);
-	virtual bool getNameByGuid(unsigned long guid, std::string& name);
-	virtual bool getGuildIdByName(unsigned long& guildId, const std::string& guildName);
+	virtual bool getGuidByName(uint32_t& guid, std::string& name);
+	virtual bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
+	virtual bool getNameByGuid(uint32_t guid, std::string& name);
+	virtual bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 	virtual bool playerExists(std::string name);
 
 protected:

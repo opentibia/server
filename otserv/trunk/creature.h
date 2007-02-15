@@ -101,7 +101,7 @@ public:
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
 
-	unsigned long getExpForLv(const int& lv) const
+	uint32_t getExpForLv(const int& lv) const
 	{ 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
 	}
@@ -288,7 +288,7 @@ protected:
 
 	Direction direction;
 
-	unsigned long eventCheck;
+	uint32_t eventCheck;
 	
 	Creature* master;
 	bool summon;
@@ -298,7 +298,7 @@ protected:
 
 	//follow variables
 	Creature* followCreature;
-	unsigned long eventWalk;
+	uint32_t eventWalk;
 	std::list<Direction> listWalkDir;
 	bool internalUpdateFollow;
 	bool internalValidatePath;

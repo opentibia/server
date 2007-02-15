@@ -126,7 +126,7 @@ bool Mailbox::sendItem(Item* item)
 		return false;            
 	}
 	
-	unsigned long guid;
+	uint32_t guid;
 	if(!IOPlayer::instance()->getGuidByName(guid, reciever)){
 		return false;
 	}

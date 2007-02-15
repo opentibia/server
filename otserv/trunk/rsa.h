@@ -32,9 +32,9 @@ public:
 	~RSA();
 	void setKey(char* p, char* q, char* d);
 	bool setKey(const std::string& file);
-	bool decrypt(char* msg,long size);
+	bool decrypt(char* msg, int32_t size);
 	
-	long getKeySize();
+	int32_t getKeySize();
 	void getPublicKey(char* buffer);
 	
 protected:

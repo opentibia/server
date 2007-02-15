@@ -75,7 +75,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	}
 
 	player->setDirection((Direction)result.getDataInt("direction"));
-	player->experience = result.getDataLong("experience");
+	player->experience = result.getDataInt("experience");
 	player->level = result.getDataInt("level");
 	player->soul = result.getDataInt("soul");
 	player->capacity = result.getDataInt("cap");
@@ -105,7 +105,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	player->currentOutfit = player->defaultOutfit;
 
 	#ifdef __SKULLSYSTEM__
-	long redSkullSeconds = result.getDataInt("redskulltime") - std::time(NULL);
+	int32_t redSkullSeconds = result.getDataInt("redskulltime") - std::time(NULL);
 	if(redSkullSeconds > 0){
 		//ensure that we round up the number of ticks
 		player->redSkullTicks = (redSkullSeconds + 2)*1000;
@@ -447,13 +447,13 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`conditions` = '" << Database::escapeString(conditions, conditionsSize) << "' ";
 
 #ifdef __SKULLSYSTEM__
-	long redSkullTime = 0;
+	int32_t redSkullTime = 0;
 	if(player->redSkullTicks > 0){
 		redSkullTime = std::time(NULL) + player->redSkullTicks/1000;
 	}
 
 	query << ", `redskulltime` = " << redSkullTime << ", ";
-	long redSkull = 0;
+	int32_t redSkull = 0;
 	if(player->skull == SKULL_RED){
 		redSkull = 1;
 	}
@@ -571,7 +571,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	return trans.success();
 }
 
-bool IOPlayerSQL::storeNameByGuid(Database &mysql, unsigned long guid)
+bool IOPlayerSQL::storeNameByGuid(Database &mysql, uint32_t guid)
 {
 	DBQuery query;
 	DBResult result;
@@ -589,7 +589,7 @@ bool IOPlayerSQL::storeNameByGuid(Database &mysql, unsigned long guid)
 	return true;
 }
 
-bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string& name)
+bool IOPlayerSQL::getNameByGuid(uint32_t guid, std::string& name)
 {
 	NameCacheMap::iterator it = nameCacheMap.find(guid);
 	if(it != nameCacheMap.end()){
@@ -615,7 +615,7 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string& name)
 	return true;
 }
 
-bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string& name)
+bool IOPlayerSQL::getGuidByName(uint32_t &guid, std::string& name)
 {
 	GuidCacheMap::iterator it = guidCacheMap.find(name);
 	if(it != guidCacheMap.end()){
@@ -644,7 +644,7 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string& name)
 }
 
 
-bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, bool &specialVip, std::string& name)
+bool IOPlayerSQL::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string& name)
 {
 	Database* mysql = Database::instance();
 	DBQuery query;
@@ -670,7 +670,7 @@ bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, bool &specialVip, std::st
 	return true;
 }
 
-bool IOPlayerSQL::getGuildIdByName(unsigned long &guildId, const std::string& guildName)
+bool IOPlayerSQL::getGuildIdByName(uint32_t &guildId, const std::string& guildName)
 {
 	Database* mysql = Database::instance();
 	DBQuery query;

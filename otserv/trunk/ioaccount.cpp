@@ -44,12 +44,12 @@ IOAccount* IOAccount::instance(){
 	return _instance;
 }
 
-Account IOAccount::loadAccount(unsigned long accno){
+Account IOAccount::loadAccount(uint32_t accno){
 	Account acc;
 	return acc;
 }
 
-bool IOAccount::getPassword(unsigned long accno, const std::string& name, std::string& password)
+bool IOAccount::getPassword(uint32_t accno, const std::string& name, std::string& password)
 {
 	return false;
 }

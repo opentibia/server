@@ -41,7 +41,7 @@ private:
 	bool saveTile(xmlNodePtr nodeTile, const Tile* tile);
 	bool loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile);
 
-	void saveAccessList(xmlNodePtr nodeHouseAccessList, unsigned long listId, const std::string& listText);
+	void saveAccessList(xmlNodePtr nodeHouseAccessList, uint32_t listId, const std::string& listText);
 };
 
 #endif

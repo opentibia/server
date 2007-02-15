@@ -25,10 +25,10 @@
 #include <list>
 
 struct IpBanStruct{
-	unsigned long ip;
-	unsigned long mask;
-	unsigned long time;
-	IpBanStruct(unsigned long _ip, unsigned long _mask, unsigned long _time){
+	uint32_t ip;
+	uint32_t mask;
+	uint32_t time;
+	IpBanStruct(uint32_t _ip, uint32_t _mask, uint32_t _time){
 		ip = _ip;
 		mask = _mask;
 		time = _time;
@@ -45,9 +45,9 @@ struct ConnectBlock{
 };
 
 struct idBan{
-	unsigned long id;
-	unsigned long time;
-	idBan(unsigned long _id, unsigned long _time){
+	uint32_t id;
+	uint32_t time;
+	idBan(uint32_t _id, uint32_t _time){
 		id = _id;
 		time = _time;
 	}
@@ -58,8 +58,8 @@ typedef idBan AccountBanStruct;
 typedef std::list< IpBanStruct > IpBanList;
 typedef std::list< PlayerBanStruct > PlayerBanList;
 typedef std::list< AccountBanStruct > AccountBanList;
-typedef std::map<unsigned long, LoginBlock > IpLoginMap;
-typedef std::map<unsigned long, ConnectBlock > IpConnectMap;
+typedef std::map<uint32_t, LoginBlock > IpLoginMap;
+typedef std::map<uint32_t, ConnectBlock > IpConnectMap;
 
 enum BanType_t{
   BAN_IPADDRESS = 1,
@@ -75,19 +75,19 @@ public:
 
 	bool isIpBanished(SOCKET s);
 	bool isPlayerBanished(const std::string& name);
-	bool isAccountBanished(const unsigned long account);
+	bool isAccountBanished(uint32_t account);
 	bool isIpDisabled(SOCKET s);
 	bool acceptConnection(SOCKET s);
 
-	void addIpBan(unsigned long ip, unsigned long mask, unsigned long time);
-	void addPlayerBan(unsigned long playerId, unsigned long time);
-	void addAccountBan(unsigned long account, unsigned long time);
+	void addIpBan(uint32_t ip, uint32_t mask, uint32_t time);
+	void addPlayerBan(uint32_t playerId, uint32_t time);
+	void addAccountBan(uint32_t account, uint32_t time);
 	void addConnectionAttempt(SOCKET s);
 	void addLoginAttempt(SOCKET s, bool isSuccess);
 
-	bool removeIpBan(unsigned long n);
-	bool removePlayerBan(unsigned long n);
-	bool removeAccountBan(unsigned long n);
+	bool removeIpBan(uint32_t n);
+	bool removePlayerBan(uint32_t n);
+	bool removeAccountBan(uint32_t n);
 
 	bool loadBans(const std::string& identifier);
 	bool saveBans(const std::string& identifier);
@@ -104,9 +104,9 @@ protected:
 	IpLoginMap ipLoginMap;
 	IpConnectMap ipConnectMap;
 
-	unsigned long loginTimeout;
-	unsigned long maxLoginTries;
-	unsigned long retryTimeout;
+	uint32_t loginTimeout;
+	uint32_t maxLoginTries;
+	uint32_t retryTimeout;
 
 	OTSYS_THREAD_LOCKVAR banLock;
 

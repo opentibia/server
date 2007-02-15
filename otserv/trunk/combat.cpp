@@ -874,9 +874,9 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 	return true;
 }
 
-long round(float v)
+int32_t round(float v)
 {
-	long t = (long)std::floor(v);
+	int32_t t = (int32_t)std::floor(v);
 	if((v - t) > 0.5){
 		return t + 1;
 	}
@@ -952,15 +952,15 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 		float c = std::sin(angleRad);
 		float d = std::cos(angleRad);
 		
-		for(long x = 0; x < (long)input->getCols(); ++x){
-			for(long y = 0; y < (long)input->getRows(); ++y){
+		for(int32_t x = 0; x < (int32_t)input->getCols(); ++x){
+			for(int32_t y = 0; y < (int32_t)input->getRows(); ++y){
 				//calculate new coordinates using rotation center
-				long newX = x - centerX;
-				long newY = y - centerY;
+				int32_t newX = x - centerX;
+				int32_t newY = y - centerY;
 
 				//perform rotation
-				long rotatedX = round(newX * a + newY * b);
-				long rotatedY = round(newX * c + newY * d);
+				int32_t rotatedX = round(newX * a + newY * b);
+				int32_t rotatedY = round(newX * c + newY * d);
 
 				//write in the output matrix using rotated coordinates
 				(*output)[rotatedY + rotateCenterY][rotatedX + rotateCenterX] = (*input)[y][x];

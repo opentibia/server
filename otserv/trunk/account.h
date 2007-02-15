@@ -32,7 +32,7 @@ public:
   Account();
   ~Account();
 
-  unsigned long accnumber;
+  uint32_t accnumber;
   int premDays;    // Premium days
 
   std::string password;

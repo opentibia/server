@@ -57,7 +57,7 @@ AdminConnection::~AdminConnection()
 	//
 }
 
-long AdminConnection::getLastCommandTime()
+int32_t AdminConnection::getLastCommandTime()
 {
 	return m_lastCommand;
 }
@@ -72,7 +72,7 @@ std::string AdminConnection::getIPString()
 	return m_ip;
 }
 
-long AdminConnection::getStartTime()
+int32_t AdminConnection::getStartTime()
 {
 	return m_startTime;
 }
@@ -161,7 +161,7 @@ void AdminProtocol::receiveLoop()
 	}
 }
 
-long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffer)
+int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffer)
 {
 	if(msg.getMessageLength() <= 0)
 		return NO_PACKET;

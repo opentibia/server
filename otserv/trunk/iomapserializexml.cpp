@@ -498,7 +498,7 @@ bool IOMapSerializeXML::saveHouseInfo(Map* map, const std::string& identifier)
 	return true;
 }
 
-void IOMapSerializeXML::saveAccessList(xmlNodePtr nodeHouse, unsigned long listId, const std::string& listText)
+void IOMapSerializeXML::saveAccessList(xmlNodePtr nodeHouse, uint32_t listId, const std::string& listText)
 {
 	std::stringstream ss;
 		

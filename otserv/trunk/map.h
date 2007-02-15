@@ -67,10 +67,10 @@ public:
 	AStarNode* getBestNode();
 	void closeNode(AStarNode* node);
 	void openNode(AStarNode* node);
-	unsigned long countClosedNodes();
-	unsigned long countOpenNodes();
-	bool isInList(long x, long y);
-	AStarNode* getNodeInList(long x, long y);
+	uint32_t countClosedNodes();
+	uint32_t countOpenNodes();
+	bool isInList(int32_t x, int32_t y);
+	AStarNode* getNodeInList(int32_t x, int32_t y);
 
 	int getMapWalkCost(const Creature* creature, AStarNode* node, const Tile* neighbourTile);
 	int getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal);
@@ -78,7 +78,7 @@ public:
 private:
 	AStarNode nodes[MAX_NODES];
 	std::bitset<MAX_NODES> openNodes;
-	unsigned long curNode;
+	uint32_t curNode;
 };
 
 template<class T> class lessPointer : public std::binary_function<T*, T*, bool>

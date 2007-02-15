@@ -39,19 +39,6 @@ Thing::~Thing()
 	//std::cout << "thing destructor " << this << std::endl;
 }
 
-void Thing::useThing2()
-{
-	++useCount;
-}
-
-void Thing::releaseThing2()
-{
-	--useCount;
-
-	if(useCount <= 0)
-		delete this;
-}
-
 Cylinder* Thing::getTopParent()
 {
 	//tile

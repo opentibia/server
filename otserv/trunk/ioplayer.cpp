@@ -57,17 +57,17 @@ bool IOPlayer::savePlayer(Player* player)
 	return false;
 }
 
-bool IOPlayer::getGuidByNameEx(unsigned long& guid, bool& alvl, std::string& name)
+bool IOPlayer::getGuidByNameEx(uint32_t& guid, bool& alvl, std::string& name)
 {
 	return false;
 }
 
-bool IOPlayer::getGuidByName(unsigned long& guid, std::string& name)
+bool IOPlayer::getGuidByName(uint32_t& guid, std::string& name)
 {
 	return false;
 }
 
-bool IOPlayer::getNameByGuid(unsigned long guid, std::string& name)
+bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)
 {
 	return false;
 }
@@ -77,7 +77,7 @@ bool IOPlayer::playerExists(std::string name)
 	return false;
 }
 
-bool IOPlayer::getGuildIdByName(unsigned long &guid, const std::string& name)
+bool IOPlayer::getGuildIdByName(uint32_t &guid, const std::string& name)
 {
 	return false;
 }

@@ -2979,7 +2979,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 }
 
-void Player::checkRedSkullTicks(long ticks)
+void Player::checkRedSkullTicks(int32_t ticks)
 {
 	if(redSkullTicks - ticks > 0)
 		redSkullTicks = redSkullTicks - ticks;
@@ -3005,7 +3005,7 @@ bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 
 void Player::genReservedStorageRange()
 {
-	unsigned long base_key;
+	uint32_t base_key;
 	//generate outfits range
 	base_key = PSTRG_OUTFITS_RANGE_START + 1;
 	
@@ -3017,7 +3017,7 @@ void Player::genReservedStorageRange()
 		uint32_t looktype = (*it)->looktype;
 		uint32_t addons = (*it)->addons;
 		if(!global_outfits.isInList(looktype, addons)){
-			long value = (looktype << 16) | (addons & 0xFF);
+			int32_t value = (looktype << 16) | (addons & 0xFF);
 			storageMap[base_key] = value;
 			base_key++;
 			if(base_key > PSTRG_OUTFITS_RANGE_START + PSTRG_OUTFITS_RANGE_SIZE){

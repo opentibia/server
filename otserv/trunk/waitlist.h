@@ -26,12 +26,12 @@
 
 struct Wait{
 	int acc;
-	unsigned long ip;
+	uint32_t ip;
 	
 	 int64_t timeout;
 	int slot;
 		
-	Wait(int account, unsigned long ipnum, int place){
+	Wait(int account, uint32_t ipnum, int place){
 		acc = account;
 		ip = ipnum;
 		timeout = OTSYS_TIME();
@@ -50,16 +50,16 @@ public:
 	
 	static Waitlist* instance();
 	
-	void createMessage(NetworkMessage& msg, int acc, unsigned long ip);
-	bool clientLogin(int acc, unsigned long ip);
+	void createMessage(NetworkMessage& msg, int acc, uint32_t ip);
+	bool clientLogin(int acc, uint32_t ip);
 	
 	OTSYS_THREAD_LOCKVAR waitListLock;   
 protected:
 	Waitinglist waitList;
 	
-	WaitinglistIterator findClient(int acc, unsigned long ip);
-	void addClient(int acc, unsigned long ip);
-	int getClientSlot(int acc, unsigned long ip);
+	WaitinglistIterator findClient(int acc, uint32_t ip);
+	void addClient(int acc, uint32_t ip);
+	int getClientSlot(int acc, uint32_t ip);
 	
 	void cleanUpList();
 	int getTime(int slot){return 20;}

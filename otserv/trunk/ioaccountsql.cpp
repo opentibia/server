@@ -36,7 +36,7 @@ IOAccountSQL::IOAccountSQL()
 	//
 }
 
-Account IOAccountSQL::loadAccount(unsigned long accno)
+Account IOAccountSQL::loadAccount(uint32_t accno)
 {
 	Account acc;
 
@@ -62,7 +62,7 @@ Account IOAccountSQL::loadAccount(unsigned long accno)
 }
 
 
-bool IOAccountSQL::getPassword(unsigned long accno, const std::string &name, std::string &password)
+bool IOAccountSQL::getPassword(uint32_t accno, const std::string &name, std::string &password)
 {
 	Database* mysql = Database::instance();
 	DBQuery query;

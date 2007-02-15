@@ -66,7 +66,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		int intValue;
 		std::string strValue;
 
-		int account = 0;
+		uint32_t account = 0;
 		if(readXMLInteger(root, "account", intValue)){
 			account = intValue;
 		}
@@ -82,13 +82,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		xmlMutexLock(xmlmutex);
 
 		player->password = a.password;
-		if(a.accnumber == 0 || a.accnumber != (unsigned long)account){
+		if(a.accnumber == 0 || a.accnumber != account){
 		  xmlFreeDoc(doc);
 		  xmlMutexUnlock(xmlmutex);
 		  return false;
 		}
 
-		unsigned long _guid = 0;
+		uint32_t _guid = 0;
 		std::string _name = player->getName();
 		if(getGuidByName(_guid, _name)){
 			player->setGUID(_guid);
@@ -475,8 +475,8 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"data") == 0){
-						unsigned long key = 0;
-						long value = 0;
+						uint32_t key = 0;
+						int32_t value = 0;
 
 						if(readXMLInteger(tmpNode, "key", intValue)){
 							key = intValue;
@@ -857,13 +857,13 @@ bool IOPlayerXML::savePlayer(Player* player)
 	return result;
 }
 
-bool IOPlayerXML::getGuidByName(unsigned long& guid, std::string& name)
+bool IOPlayerXML::getGuidByName(uint32_t& guid, std::string& name)
 {
 	bool a;
 	return getGuidByNameEx(guid, a, name);
 }
 
-bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, bool& specialVip, std::string& name)
+bool IOPlayerXML::getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name)
 {
 	//load players.xml to get guid
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
@@ -948,7 +948,7 @@ bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, bool& specialVip, std::st
 	return isSuccess;
 }
 
-bool IOPlayerXML::getNameByGuid(unsigned long guid, std::string& name)
+bool IOPlayerXML::getNameByGuid(uint32_t guid, std::string& name)
 {
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	std::string filename = datadir + "players/" + "players.xml";
@@ -975,7 +975,7 @@ bool IOPlayerXML::getNameByGuid(unsigned long guid, std::string& name)
 			if(xmlStrcmp(playerNode->name,(const xmlChar*)"player") == 0){
 				if(readXMLInteger(playerNode, "guid", intValue)){
 
-					if((unsigned long)intValue == guid){
+					if((uint32_t)intValue == guid){
 
 						if(readXMLString(playerNode, "name", strValue)){
 
@@ -996,7 +996,7 @@ bool IOPlayerXML::getNameByGuid(unsigned long guid, std::string& name)
 	return isSuccess;
 }
 
-bool IOPlayerXML::getGuildIdByName(unsigned long& guildId, const std::string& guildName)
+bool IOPlayerXML::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 {
 	return false;
 }

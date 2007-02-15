@@ -601,7 +601,7 @@ int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 			lua_pushnumber(L, -1);
 		}
 		else{
-			long dist = std::max(std::abs(npc_pos.x - thing_pos.x), std::abs(npc_pos.y - thing_pos.y));
+			int32_t dist = std::max(std::abs(npc_pos.x - thing_pos.x), std::abs(npc_pos.y - thing_pos.y));
 			lua_pushnumber(L, dist);
 		}	
 	}

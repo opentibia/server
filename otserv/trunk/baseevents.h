@@ -61,7 +61,7 @@ public:
 protected:
 	virtual std::string getScriptEventName() = 0;
 	
-	long m_scriptId;
+	int32_t m_scriptId;
 	LuaScriptInterface* m_scriptInterface;
 	
 	bool m_scripted;
@@ -76,7 +76,7 @@ public:
 	bool loadCallBack(LuaScriptInterface* _interface, std::string name);
 	
 protected:
-	long m_scriptId;
+	int32_t m_scriptId;
 	LuaScriptInterface* m_scriptInterface;
 	
 	bool m_loaded;

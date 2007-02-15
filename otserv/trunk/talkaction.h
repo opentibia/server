@@ -69,7 +69,7 @@ public:
 	std::string getWords() const {return m_words;};
 	
 	//scripting
-	long executeSay(Creature* creature, const std::string& words, const std::string& param);
+	uint32_t executeSay(Creature* creature, const std::string& words, const std::string& param);
 	//
 	
 protected:

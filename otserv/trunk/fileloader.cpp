@@ -525,7 +525,7 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 		return -1;
 	}
 
-	unsigned long size = fread(m_cached_data[loading_cache].data, 1, m_cache_size, m_file);
+	size_t size = fread(m_cached_data[loading_cache].data, 1, m_cache_size, m_file);
 	m_cached_data[loading_cache].size = size;
 
 	if(size < (pos - m_cached_data[loading_cache].base)){

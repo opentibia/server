@@ -129,14 +129,14 @@ public:
 	  * \param id is the unique creature id to get a creature pointer to
 	  * \returns A Creature pointer to the creature
 	  */
-	Creature* getCreatureByID(unsigned long id);
+	Creature* getCreatureByID(uint32_t id);
 
 	/**
 	  * Returns a player based on the unique creature identifier
 	  * \param id is the unique player id to get a player pointer to
 	  * \returns A Pointer to the player
 	  */
-	Player* getPlayerByID(unsigned long id);
+	Player* getPlayerByID(uint32_t id);
 
 	/**
 	  * Returns a creature based on a string name identifier
@@ -156,13 +156,13 @@ public:
 	  * Starts an event.
 	  * \returns A unique identifier for the event
 	  */
-	unsigned long addEvent(SchedulerTask*);
+	uint32_t addEvent(SchedulerTask*);
 
 	/**
 	  * Stop an event.
 	  * \param eventid unique identifier to an event
 	  */
-	bool stopEvent(unsigned long eventid);
+	bool stopEvent(uint32_t eventid);
 
 	/**
 	  * Place Creature on the map without sending out events to the surrounding.
@@ -319,8 +319,8 @@ public:
 	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(Player* player);
 	bool internalStartTrade(Player* player, Player* partner, Item* tradeItem);
-	bool playerSetAttackedCreature(Player* player, unsigned long creatureId);
-	bool playerFollowCreature(Player* player, unsigned long creatureId);
+	bool playerSetAttackedCreature(Player* player, uint32_t creatureId);
+	bool playerFollowCreature(Player* player, uint32_t creatureId);
 	bool playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_t chaseMode);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackPos);
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
@@ -359,7 +359,7 @@ public:
 	OTSYS_THREAD_LOCKVAR gameLock;   
 
 	//Events
-	void checkWalk(unsigned long creatureId);
+	void checkWalk(uint32_t creatureId);
 	void checkCreature(uint32_t creatureId, uint32_t interval);
 	void checkLight(int t);
 	
@@ -388,7 +388,7 @@ protected:
 	std::vector<Thing*> ToReleaseThings;
 
 	//list of items that are in trading state, mapped to the player
-	std::map<Item*, unsigned long> tradeItems;
+	std::map<Item*, uint32_t> tradeItems;
 	
 	AutoList<Creature> listCreature;
 
@@ -426,8 +426,8 @@ protected:
 	int light_hour_delta;
 	
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
-	std::map<unsigned long, SchedulerTask*> eventIdMap;
-	unsigned long eventIdCount;
+	std::map<uint32_t, SchedulerTask*> eventIdMap;
+	uint32_t eventIdCount;
 
 	uint32_t maxPlayers;
 	uint32_t inFightTicks;

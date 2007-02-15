@@ -483,7 +483,7 @@ bool AccessList::parseList(const std::string& _list)
 
 bool AccessList::addPlayer(std::string& name)
 {
-	unsigned long guid;
+	uint32_t guid;
 	std::string dbName = name;
 	if(IOPlayer::instance()->getGuidByName(guid, dbName)){
 		if(playerList.find(guid) == playerList.end()){
@@ -496,7 +496,7 @@ bool AccessList::addPlayer(std::string& name)
 
 bool AccessList::addGuild(const std::string& guildName, const std::string& rank)
 {
-	unsigned long guildId;
+	uint32_t guildId;
 	if(IOPlayer::instance()->getGuildIdByName(guildId, guildName)){
 		if(guildId != 0 && guildList.find(guildId) == guildList.end()){
 			guildList.insert(guildId);

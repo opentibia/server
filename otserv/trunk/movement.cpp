@@ -143,7 +143,7 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	return success;
 }
 	
-void MoveEvents::addEvent(MoveEvent* event, long id, MoveListMap& map)
+void MoveEvents::addEvent(MoveEvent* event, int32_t id, MoveListMap& map)
 {
 	MoveListMap::iterator it = map.find(id);
 	if(it == map.end()){
@@ -181,7 +181,7 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
 	return NULL;
 }
 
-long MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
+uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 {
 	MoveEvent_t eventType;
 	if(isIn){
@@ -191,10 +191,10 @@ long MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 		eventType = MOVE_EVENT_STEP_OUT;
 	}
 	
-	long ret = 1;
-	long j = tile->__getLastIndex();
+	uint32_t ret = 1;
+	int32_t j = tile->__getLastIndex();
 	Item* tileItem = NULL;
-	for(long i = tile->__getFirstIndex(); i < j; ++i){
+	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
 		if(thing && (tileItem = thing->getItem())){
 			MoveEvent* event = getEvent(tileItem, eventType);
@@ -206,7 +206,7 @@ long MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 	return ret;
 }
 
-long MoveEvents::onPlayerEquip(Player* player, Item* item, slots_t slot, bool isEquip)
+uint32_t MoveEvents::onPlayerEquip(Player* player, Item* item, slots_t slot, bool isEquip)
 {
 	MoveEvent_t eventType;
 	if(isEquip){
@@ -223,7 +223,7 @@ long MoveEvents::onPlayerEquip(Player* player, Item* item, slots_t slot, bool is
 	return 1;
 }
 
-long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
+uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 {
 	MoveEvent_t eventType1;
 	MoveEvent_t eventType2;
@@ -236,15 +236,15 @@ long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		eventType2 = MOVE_EVENT_REMOVE_ITEM_ITEMTILE;
 	}
 	
-	long ret = 1;
+	uint32_t ret = 1;
 	MoveEvent* event = getEvent(item, eventType1);
 	if(event){
 		ret = ret & event->fireAddRemItem(item, NULL, tile->getPosition());
 	}
 	
-	long j = tile->__getLastIndex();
+	int32_t j = tile->__getLastIndex();
 	Item* tileItem = NULL;
-	for(long i = tile->__getFirstIndex(); i < j; ++i){
+	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
 		if(thing && (tileItem = thing->getItem()) && (tileItem != item)){
 			MoveEvent* event = getEvent(tileItem, eventType2);
@@ -409,7 +409,7 @@ void MoveEvent::setEventType(MoveEvent_t type)
 	m_eventType = type;
 }
 
-long MoveEvent::StepInField(Creature* creature, Item* item, const Position& pos)
+uint32_t MoveEvent::StepInField(Creature* creature, Item* item, const Position& pos)
 {
 	MagicField* field = item->getMagicField();
 
@@ -421,12 +421,12 @@ long MoveEvent::StepInField(Creature* creature, Item* item, const Position& pos)
 	return LUA_ERROR_ITEM_NOT_FOUND;
 }
 
-long MoveEvent::StepOutField(Creature* creature, Item* item, const Position& pos)
+uint32_t MoveEvent::StepOutField(Creature* creature, Item* item, const Position& pos)
 {
 	return 1;
 }
 
-long MoveEvent::AddItemField(Item* item, Item* tileItem, const Position& pos)
+uint32_t MoveEvent::AddItemField(Item* item, Item* tileItem, const Position& pos)
 {
 	if(MagicField* field = item->getMagicField()){
 		Tile* tile = item->getTile();
@@ -440,12 +440,12 @@ long MoveEvent::AddItemField(Item* item, Item* tileItem, const Position& pos)
 	return LUA_ERROR_ITEM_NOT_FOUND;
 }
 
-long MoveEvent::RemoveItemField(Item* item, Item* tileItem, const Position& pos)
+uint32_t MoveEvent::RemoveItemField(Item* item, Item* tileItem, const Position& pos)
 {
 	return 1;
 }
 
-long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
+uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 {
 	if(player->isItemAbilityEnabled(slot)){
 		return 1;
@@ -510,7 +510,7 @@ long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 	return 1;
 }
 
-long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
+uint32_t MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 {
 	if(!player->isItemAbilityEnabled(slot)){
 		return 1;
@@ -555,7 +555,7 @@ long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 	return 1;
 }
 
-long MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& pos)
+uint32_t MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& pos)
 {
 	if(m_scripted){
 		return executeStep(creature, item, pos);
@@ -565,7 +565,7 @@ long MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& po
 	}
 }
 
-long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
+uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 {
 	//onStepIn(cid, item, pos)
 	//onStepOut(cid, item, pos)
@@ -602,7 +602,7 @@ long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 	}
 }
 
-long MoveEvent::fireEquip(Player* player, Item* item, slots_t slot)
+uint32_t MoveEvent::fireEquip(Player* player, Item* item, slots_t slot)
 {
 	if(m_scripted){
 		return executeEquip(player, item, slot);
@@ -612,7 +612,7 @@ long MoveEvent::fireEquip(Player* player, Item* item, slots_t slot)
 	}
 }
 
-long MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
+uint32_t MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
 {
 	//onEquip(cid, item, slot)
 	//onDeEquip(cid, item, slot)
@@ -649,7 +649,7 @@ long MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
 	}
 }
 
-long MoveEvent::fireAddRemItem(Item* item, Item* tileItem, const Position& pos)
+uint32_t MoveEvent::fireAddRemItem(Item* item, Item* tileItem, const Position& pos)
 {
 	if(m_scripted){
 		return executeAddRemItem(item, tileItem, pos);
@@ -659,7 +659,7 @@ long MoveEvent::fireAddRemItem(Item* item, Item* tileItem, const Position& pos)
 	}
 }
 
-long MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position& pos)
+uint32_t MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position& pos)
 {
 	//onAddItem(moveitem, tileitem, pos)
 	//onRemoveItem(moveitem, tileitem, pos)
@@ -678,8 +678,8 @@ long MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position& po
 		env->setScriptId(m_scriptId, m_scriptInterface);
 		env->setRealPos(pos);
 	
-		long itemidMoved = env->addThing(item);
-		long itemidTile = env->addThing(tileItem);
+		uint32_t itemidMoved = env->addThing(item);
+		uint32_t itemidTile = env->addThing(tileItem);
 	
 		lua_State* L = m_scriptInterface->getLuaState();
 	

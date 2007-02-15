@@ -86,7 +86,7 @@ void ScriptEnviroment::resetEnv()
 	m_realPos.z = 0;
 }
 
-bool ScriptEnviroment::setCallbackId(long callbackId)
+bool ScriptEnviroment::setCallbackId(int32_t callbackId)
 {
 	if(m_callbackId == 0){
 		m_callbackId = callbackId;
@@ -101,7 +101,7 @@ bool ScriptEnviroment::setCallbackId(long callbackId)
 	}
 }
 
-void ScriptEnviroment::getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, long& callbackId)
+void ScriptEnviroment::getEventInfo(int32_t& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, int32_t& callbackId)
 {
 	scriptId = m_scriptId;
 	desc = m_eventdesc;
@@ -113,7 +113,7 @@ void ScriptEnviroment::addUniqueThing(Thing* thing)
 {
 	Item* item = thing->getItem();
 	if(item && item->getUniqueId() != 0 ){
-		long uid = item->getUniqueId();
+		int32_t uid = item->getUniqueId();
 		
 		Thing* tmp = m_globalMap[uid];
 		if(!tmp){
@@ -149,7 +149,7 @@ uint32_t ScriptEnviroment::addThing(Thing* thing)
 			}
 		
 			++m_lastUID;
-			if(m_lastUID < 70000)
+			if(m_lastUID > 0xFFFFFF)
 				m_lastUID = 70000;
 		
 			while(m_localMap[m_lastUID]){
@@ -406,7 +406,7 @@ void LuaScriptInterface::dumpLuaStack()
 	}
 }
 
-long LuaScriptInterface::loadFile(const std::string& file)
+int32_t LuaScriptInterface::loadFile(const std::string& file)
 {
 	//loads file as a chunk at stack top
 	int ret = luaL_loadfile(m_luaState, file.c_str());
@@ -435,7 +435,7 @@ long LuaScriptInterface::loadFile(const std::string& file)
 	return 0;
 }
 
-long LuaScriptInterface::getEvent(const std::string& eventName)
+int32_t LuaScriptInterface::getEvent(const std::string& eventName)
 {
 	//get our events table
 	lua_getfield(m_luaState, LUA_REGISTRYINDEX, "EVENTS");
@@ -463,7 +463,7 @@ long LuaScriptInterface::getEvent(const std::string& eventName)
 	return m_runningEventId - 1;
 }
 
-const std::string& LuaScriptInterface::getFileById(long scriptId)
+const std::string& LuaScriptInterface::getFileById(int32_t scriptId)
 {
 	static std::string unk = "(Unknown scriptfile)";
 	ScriptsCache::iterator it = m_cacheFiles.find(scriptId);
@@ -478,8 +478,8 @@ const std::string& LuaScriptInterface::getFileById(long scriptId)
 void LuaScriptInterface::reportError(const char* function, const std::string& error_desc)
 {
 	ScriptEnviroment* env = getScriptEnv();
-	long fileId;
-	long callbackId;
+	int32_t fileId;
+	int32_t callbackId;
 	std::string event_desc;
 	LuaScriptInterface* scriptInterface;
 	env->getEventInfo(fileId, event_desc, scriptInterface, callbackId);
@@ -673,9 +673,9 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerLevel", LuaScriptInterface::luaGetPlayerLevel);
 	//getPlayerMagLevel(uid)
 	lua_register(m_luaState, "getPlayerMagLevel", LuaScriptInterface::luaGetPlayerMagLevel);
-	//getPlayerName(uid)	
+	//getPlayerName(uid)
 	lua_register(m_luaState, "getPlayerName", LuaScriptInterface::luaGetPlayerName);
-	//getPlayerAccess(uid)	
+	//getPlayerAccess(uid)
 	lua_register(m_luaState, "getPlayerAccess", LuaScriptInterface::luaGetPlayerAccess);
 	//getPlayerPosition(uid)
 	lua_register(m_luaState, "getPlayerPosition", LuaScriptInterface::luaGetPlayerPosition);
@@ -742,13 +742,13 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doPlayerSendDefaultCancel", LuaScriptInterface::luaDoSendDefaultCancel);
 	//doTeleportThing(uid,newpos)
 	lua_register(m_luaState, "doTeleportThing", LuaScriptInterface::luaDoTeleportThing);
-	//doTransformItem(uid,toitemid)	
+	//doTransformItem(uid,toitemid)
 	lua_register(m_luaState, "doTransformItem", LuaScriptInterface::luaDoTransformItem);
 	//doPlayerSay(uid,text,type)
 	lua_register(m_luaState, "doPlayerSay", LuaScriptInterface::luaDoPlayerSay);
 	//doSendMagicEffect(position,type)
 	lua_register(m_luaState, "doSendMagicEffect", LuaScriptInterface::luaDoSendMagicEffect);
-	//doChangeTypeItem(uid,new_type)	
+	//doChangeTypeItem(uid,new_type)
 	lua_register(m_luaState, "doChangeTypeItem", LuaScriptInterface::luaDoChangeTypeItem);
 	//doSetItemActionId(uid,actionid)
 	lua_register(m_luaState, "doSetItemActionId", LuaScriptInterface::luaDoSetItemActionId);
@@ -3487,7 +3487,7 @@ int LuaScriptInterface::luaGetGuildId(lua_State *L)
 	//getGuildId(guild_name)
 	const char* name = popString(L);
 		
-	unsigned long guildId;
+	uint32_t guildId;
 	if(IOPlayer::instance()->getGuildIdByName(guildId, std::string(name))){
 		lua_pushnumber(L, guildId);
 	}
@@ -3615,7 +3615,7 @@ int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
 		value = player->getGUID();
 	}
 	else{
-		unsigned long guid;
+		uint32_t guid;
 		std::string strName(name);
 		if(IOPlayer::instance()->getGuidByName(guid, strName)){
 			value = guid;

@@ -240,7 +240,7 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 		}
 
 		if(task) {
-			std::map<unsigned long, SchedulerTask*>::iterator it = _this->eventIdMap.find(task->getEventId());
+			std::map<uint32_t, SchedulerTask*>::iterator it = _this->eventIdMap.find(task->getEventId());
 			if(it != _this->eventIdMap.end()) {
 				_this->eventIdMap.erase(it);
 				runtask = true;
@@ -261,10 +261,10 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 
 }
 
-unsigned long Game::addEvent(SchedulerTask* event)
+uint32_t Game::addEvent(SchedulerTask* event)
 {
-  bool do_signal = false;
-  OTSYS_THREAD_LOCK(eventLock, "addEvent()");
+	bool do_signal = false;
+	OTSYS_THREAD_LOCK(eventLock, "addEvent()");
 
 	if(event->getEventId() == 0) {
 		++eventIdCount;
@@ -291,14 +291,14 @@ unsigned long Game::addEvent(SchedulerTask* event)
 	return event->getEventId();
 }
 
-bool Game::stopEvent(unsigned long eventid)
+bool Game::stopEvent(uint32_t eventid)
 {
 	if(eventid == 0)
 		return false;
 
 	OTSYS_THREAD_LOCK(eventLock, "stopEvent()")
 
-	std::map<unsigned long, SchedulerTask*>::iterator it = eventIdMap.find(eventid);
+	std::map<uint32_t, SchedulerTask*>::iterator it = eventIdMap.find(eventid);
 	if(it != eventIdMap.end()) {
 
 #ifdef __DEBUG__EVENTSCHEDULER__
@@ -433,7 +433,7 @@ QTreeLeafNode* Game::getLeaf(uint32_t x, uint32_t y)
 	return map->getLeaf(x, y);
 }
 
-Creature* Game::getCreatureByID(unsigned long id)
+Creature* Game::getCreatureByID(uint32_t id)
 {
 	if(id == 0)
 		return NULL;
@@ -447,7 +447,7 @@ Creature* Game::getCreatureByID(unsigned long id)
 	return NULL; //just in case the player doesnt exist
 }
 
-Player* Game::getPlayerByID(unsigned long id)
+Player* Game::getPlayerByID(uint32_t id)
 {
 	if(id == 0)
 		return NULL;
@@ -1949,7 +1949,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		return false;
 	}
 
-	std::map<Item*, unsigned long>::const_iterator it;
+	std::map<Item*, uint32_t>::const_iterator it;
 	const Container* container = NULL;
 	for(it = tradeItems.begin(); it != tradeItems.end(); it++) {
 		if(tradeItem == it->first || 
@@ -2026,7 +2026,7 @@ bool Game::playerAcceptTrade(Player* player)
 		player->setTradeState(TRADE_TRANSFER);
 		tradePartner->setTradeState(TRADE_TRANSFER);
 
-		std::map<Item*, unsigned long>::iterator it;
+		std::map<Item*, uint32_t>::iterator it;
 
 		it = tradeItems.find(tradeItem1);
 		if(it != tradeItems.end()) {
@@ -2192,7 +2192,7 @@ bool Game::playerCloseTrade(Player* player)
 
 	std::vector<Item*>::iterator it;
 	if(player->getTradeItem()){
-		std::map<Item*, unsigned long>::iterator it = tradeItems.find(player->getTradeItem());
+		std::map<Item*, uint32_t>::iterator it = tradeItems.find(player->getTradeItem());
 		if(it != tradeItems.end()) {
 			FreeThing(it->first);
 			tradeItems.erase(it);
@@ -2210,7 +2210,7 @@ bool Game::playerCloseTrade(Player* player)
 
 	if(tradePartner){
 		if(tradePartner->getTradeItem()){
-			std::map<Item*, unsigned long>::iterator it = tradeItems.find(tradePartner->getTradeItem());
+			std::map<Item*, uint32_t>::iterator it = tradeItems.find(tradePartner->getTradeItem());
 			if(it != tradeItems.end()) {
 				FreeThing(it->first);
 				tradeItems.erase(it);
@@ -2266,7 +2266,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t spriteId, 
 	return true;
 }
 
-bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
+bool Game::playerSetAttackedCreature(Player* player, uint32_t creatureId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetAttackedCreature()");
 	if(player->isRemoved())
@@ -2318,7 +2318,7 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 	}
 }
 
-bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
+bool Game::playerFollowCreature(Player* player, uint32_t creatureId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerFollowCreature");
 	if(player->isRemoved())
@@ -2353,7 +2353,7 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 
 	std::string real_name;
 	real_name = vip_name;
-	unsigned long guid;
+	uint32_t guid;
 	bool specialVip;
 	
 	if(!IOPlayer::instance()->getGuidByNameEx(guid, specialVip, real_name)){
@@ -2656,7 +2656,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 	return false;
 }
 
-void Game::checkWalk(unsigned long creatureId)
+void Game::checkWalk(uint32_t creatureId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkWalk");
 

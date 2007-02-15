@@ -45,7 +45,7 @@ Waitlist* Waitlist::instance(){
 	return _Wait;
 }
 
-WaitinglistIterator Waitlist::findClient(int acc, unsigned long ip)
+WaitinglistIterator Waitlist::findClient(int acc, uint32_t ip)
 {
 	int slot = 1;
 	WaitinglistIterator it;
@@ -64,7 +64,7 @@ WaitinglistIterator Waitlist::findClient(int acc, unsigned long ip)
 	return waitList.end();
 }
 
-void Waitlist::addClient(int acc, unsigned long ip)
+void Waitlist::addClient(int acc, uint32_t ip)
 {
 	WaitinglistIterator it = findClient(acc, ip);
 	
@@ -74,7 +74,7 @@ void Waitlist::addClient(int acc, unsigned long ip)
 	}
 }
 
-int Waitlist::getClientSlot(int acc, unsigned long ip)
+int Waitlist::getClientSlot(int acc, uint32_t ip)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::getClientSlot()");
 	
@@ -91,7 +91,7 @@ int Waitlist::getClientSlot(int acc, unsigned long ip)
 	}
 }
 
-bool Waitlist::clientLogin(int acc, unsigned long ip)
+bool Waitlist::clientLogin(int acc, uint32_t ip)
 {		
 	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::clientLogin()");
 
@@ -124,7 +124,7 @@ bool Waitlist::clientLogin(int acc, unsigned long ip)
 	return false;
 }
 
-void Waitlist::createMessage(NetworkMessage& msg, int acc, unsigned long ip)
+void Waitlist::createMessage(NetworkMessage& msg, int acc, uint32_t ip)
 {
 	int slot = getClientSlot(acc, ip);
 	std::stringstream tmp;

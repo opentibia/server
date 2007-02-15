@@ -92,16 +92,16 @@ public:
 	void resetEnv();
 	void resetCallback() {m_callbackId = 0;}
 
-	void setScriptId(long scriptId, LuaScriptInterface* scriptInterface)
+	void setScriptId(int32_t scriptId, LuaScriptInterface* scriptInterface)
 		{m_scriptId = scriptId; m_interface = scriptInterface;}
-	bool setCallbackId(long callbackId);
+	bool setCallbackId(int32_t callbackId);
 	void setEventDesc(const std::string& desc) {m_eventdesc = desc;}
 	
 	std::string getEventDesc() {return m_eventdesc;}
-	long getScriptId() {return m_scriptId;}
+	int32_t getScriptId() {return m_scriptId;}
 	LuaScriptInterface* getScriptInterface() {return m_interface;}
 
-	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, long& callbackId);
+	void getEventInfo(int32_t& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, int32_t& callbackId);
 
 	static void addUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
@@ -135,16 +135,16 @@ public:
 	Condition* getConditionObject(uint32_t conditionId);
 
 private:
-	typedef std::map<long, Thing*> ThingMap;
+	typedef std::map<int32_t, Thing*> ThingMap;
 	typedef std::vector<const LuaVariant*> VariantVector;
-	typedef std::map<unsigned long,long> StorageMap;
+	typedef std::map<uint32_t, int32_t> StorageMap;
 	typedef std::map<uint32_t, AreaCombat*> AreaMap;
 	typedef std::map<uint32_t, Combat*> CombatMap;
 	typedef std::map<uint32_t, Condition*> ConditionMap;
 
 	//script file id
-	long m_scriptId;
-	long m_callbackId;
+	int32_t m_scriptId;
+	int32_t m_callbackId;
 	LuaScriptInterface* m_interface;
 	//script event desc
 	std::string m_eventdesc;
@@ -156,7 +156,7 @@ private:
 	Position m_realPos;
 	
 	//item/creature map
-	long m_lastUID;
+	int32_t m_lastUID;
 	ThingMap m_localMap;
 	
 	//variant vector
@@ -228,10 +228,10 @@ public:
 	virtual bool initState();
 	bool reInitState();
 
-	long loadFile(const std::string& file);
-	const std::string& getFileById(long scriptId);
+	int32_t loadFile(const std::string& file);
+	const std::string& getFileById(int32_t scriptId);
 
-	long getEvent(const std::string& eventName);
+	int32_t getEvent(const std::string& eventName);
 
 	static ScriptEnviroment* getScriptEnv(){
 		assert(m_scriptEnvIndex >= 0 && m_scriptEnvIndex < 16);
@@ -459,11 +459,11 @@ private:
 	static ScriptEnviroment m_scriptEnv[16];
 	static int32_t m_scriptEnvIndex;
 
-	long m_runningEventId;
+	int32_t m_runningEventId;
 	std::string m_loadingFile;
 
 	//script file cache
-	typedef std::map<long , std::string> ScriptsCache;
+	typedef std::map<int32_t , std::string> ScriptsCache;
 	ScriptsCache m_cacheFiles;
 
 
