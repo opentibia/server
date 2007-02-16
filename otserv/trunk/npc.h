@@ -52,6 +52,8 @@ protected:
 	static int luagetDistanceTo(lua_State *L);
 	static int luaSetNpcFocus(lua_State *L);
 	static int luaGetNpcCid(lua_State *L);
+	static int luaGetNpcName(lua_State *L);
+	static int luaGetNpcParameter(lua_State *L);
 	
 private:
 	virtual bool initState();
@@ -155,6 +157,9 @@ protected:
 	bool canWalkTo(const Position& fromPos, Direction dir);
 	bool getRandomStep(Direction& dir);
 
+	typedef std::map<std::string, std::string> ParametersMap;
+	ParametersMap m_parameters;
+
 	std::string name;
 	bool autoWalk;
 	uint32_t focusCreature;
@@ -163,6 +168,8 @@ protected:
 	bool loaded;
 	
 	static NpcScriptInterface* m_scriptInterface;
+	
+	friend class NpcScriptInterface;
 };
 
 #endif

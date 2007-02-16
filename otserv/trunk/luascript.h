@@ -99,9 +99,13 @@ public:
 	
 	std::string getEventDesc() {return m_eventdesc;}
 	int32_t getScriptId() {return m_scriptId;}
+	int32_t getCallbackId() {return m_callbackId;}
 	LuaScriptInterface* getScriptInterface() {return m_interface;}
+	
+	void setTimerEvent() {m_timerEvent = true;}
+	void resetTimerEvent() {m_timerEvent = false;}
 
-	void getEventInfo(int32_t& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, int32_t& callbackId);
+	void getEventInfo(int32_t& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, int32_t& callbackId, bool& timerEvent);
 
 	static void addUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
@@ -145,6 +149,7 @@ private:
 	//script file id
 	int32_t m_scriptId;
 	int32_t m_callbackId;
+	bool m_timerEvent;
 	LuaScriptInterface* m_interface;
 	//script event desc
 	std::string m_eventdesc;
@@ -228,7 +233,7 @@ public:
 	virtual bool initState();
 	bool reInitState();
 
-	int32_t loadFile(const std::string& file);
+	int32_t loadFile(const std::string& file, Npc* npc = NULL);
 	const std::string& getFileById(int32_t scriptId);
 
 	int32_t getEvent(const std::string& eventName);
@@ -384,12 +389,14 @@ protected:
 
 	//type validation
 	static int luaIsPlayer(lua_State *L);
+	static int luaIsCreature(lua_State *L);
 	static int luaIsContainer(lua_State *L);
 	static int luaIsMoveable(lua_State *L);
 	
 	static int luaGetPlayerByName(lua_State *L);
 	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerGUIDByName(lua_State *L);
+	static int luaRegisterCreature(lua_State *L);
 	
 	//container
 	static int luaGetContainerSize(lua_State *L);
@@ -439,6 +446,7 @@ protected:
 	static int luaSetMonsterOutfit(lua_State *L);
 	static int luaSetItemOutfit(lua_State *L);
 	static int luaGetCreaturePosition(lua_State *L);
+	static int luaGetCreatureName(lua_State *L);
 
 	static int luaIsItemStackable(lua_State *L);
 	static int luaIsItemRune(lua_State *L);
@@ -448,6 +456,7 @@ protected:
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);
+	static int luaAddEvent(lua_State *L);
 	//
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
@@ -466,6 +475,17 @@ private:
 	typedef std::map<int32_t , std::string> ScriptsCache;
 	ScriptsCache m_cacheFiles;
 
+	//events information
+	struct LuaTimerEventDesc{
+		int32_t scriptId;
+		int function;
+		int parameter;
+	};
+	uint32_t m_lastEventTimerId;
+	typedef std::map<uint32_t , LuaTimerEventDesc > LuaTimerEvents;
+	LuaTimerEvents m_timerEvents;
+	
+	void executeTimerEvent(uint32_t eventIndex);
 
 	std::string m_interfaceName;
 };

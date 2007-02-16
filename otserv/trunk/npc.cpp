@@ -65,7 +65,7 @@ Creature()
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
-		xmlNodePtr root, p;
+		xmlNodePtr root, p, q;
 		root = xmlDocGetRootElement(doc);
 
 		if(xmlStrcmp(root->name,(const xmlChar*)"npc") != 0){
@@ -115,8 +115,7 @@ Creature()
 				else
 					healthMax = 100;
 			}
-
-			if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
 
 				if(readXMLInteger(p, "type", intValue)){
 					defaultOutfit.lookType = intValue;
@@ -147,7 +146,24 @@ Creature()
 
 				currentOutfit = defaultOutfit;
 			}
-
+			else if(xmlStrcmp(p->name, (const xmlChar*)"parameters") == 0){
+					
+				for(q = p->children; q != NULL; q = q->next){
+					if(xmlStrcmp(q->name, (const xmlChar*)"parameter") == 0){
+						std::string paramKey;
+						std::string paramValue;
+						if(!readXMLString(q, "key", paramKey)){
+							continue;
+						}
+						if(!readXMLString(q, "value", paramValue)){
+							continue;
+						}
+						m_parameters[paramKey] = paramValue;
+					}
+				}
+				
+			}
+			
 			p = p->next;
 		}
 
@@ -472,14 +488,16 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getDistanceTo", NpcScriptInterface::luagetDistanceTo);
 	lua_register(m_luaState, "doNpcSetCreatureFocus", NpcScriptInterface::luaSetNpcFocus);
 	lua_register(m_luaState, "getNpcCid", NpcScriptInterface::luaGetNpcCid);
+	lua_register(m_luaState, "getNpcName", NpcScriptInterface::luaGetNpcName);
+	lua_register(m_luaState, "getNpcParameter", NpcScriptInterface::luaGetNpcParameter);
 }
 
 
 int NpcScriptInterface::luaCreatureGetName2(lua_State *L)
 {
 	//creatureGetName2(name) - returns creature id
-	reportErrorFunc("Deprecated function.");
 	popString(L);
+	reportErrorFunc("Deprecated function.");
 	lua_pushnumber(L, 0);
 	return 1;
 }
@@ -487,18 +505,9 @@ int NpcScriptInterface::luaCreatureGetName2(lua_State *L)
 int NpcScriptInterface::luaCreatureGetName(lua_State *L)
 {
 	//creatureGetName(cid)
-	uint32_t uid = popNumber(L);
-	ScriptEnviroment* env = getScriptEnv();
-	Creature* creature = env->getCreatureByUID(uid);
-	
-	if(creature){
-		lua_pushstring(L, creature->getName().c_str());
-	}
-	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushstring(L, "");
-	}
-	
+	popNumber(L);
+	reportErrorFunc("Deprecated function. Use getCreatureName");
+	lua_pushstring(L, "");
 	return 1;
 }
 
@@ -646,6 +655,45 @@ int NpcScriptInterface::luaGetNpcCid(lua_State* L)
 	return 1;
 }
 
+int NpcScriptInterface::luaGetNpcName(lua_State* L)
+{
+	//getNpcName()
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Npc* mynpc = env->getNpc();
+	if(mynpc){
+		lua_pushstring(L, mynpc->getName().c_str());
+	}
+	else{
+		lua_pushstring(L, "");
+	}
+	
+	return 1;
+}
+
+int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
+{
+	//getNpcParameter(paramKey)
+	std::string paramKey = popString(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Npc* mynpc = env->getNpc();
+	if(mynpc){
+		Npc::ParametersMap::iterator it = mynpc->m_parameters.find(paramKey);
+		if(it != mynpc->m_parameters.end()){
+			lua_pushstring(L, it->second.c_str());
+		}
+		else{
+			lua_pushnumber(L, 0);
+		}
+	}
+	else{
+		lua_pushnumber(L, 0);
+	}
+	
+	return 1;
+}
 
 NpcEventsHandler::NpcEventsHandler(Npc* npc)
 {
@@ -669,7 +717,7 @@ NpcEventsHandler(npc)
 {
 	m_scriptInterface = npc->getScriptInterface();
 	
-	if(m_scriptInterface->loadFile(file) == -1){
+	if(m_scriptInterface->loadFile(file, npc) == -1){
 		std::cout << "Warning: [NpcScript::NpcScript] Can not load script. " << file << std::endl;
 		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
 		m_loaded = false;

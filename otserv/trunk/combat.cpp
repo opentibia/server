@@ -721,7 +721,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) 
 			min = LuaScriptInterface::popNumber(L);
 		}
 
-		if((lua_gettop(L) + 3 /*nParams*/  + 1) != size0){
+		if((lua_gettop(L) + parameters /*nParams*/  + 1) != size0){
 			LuaScriptInterface::reportError(NULL, "Stack size changed!");
 		}
 
@@ -756,14 +756,7 @@ void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
 		lua_pushnumber(L, cid);
 		m_scriptInterface->pushPosition(L, tile->getPosition(), 0);
 
-		int size0 = lua_gettop(L);
-		if(lua_pcall(L, 2, 0 /*nReturnValues*/, 0) != 0){
-			LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
-		}
-
-		if((lua_gettop(L) + 2 /*nParams*/  + 1) != size0){
-			LuaScriptInterface::reportError(NULL, "Stack size changed!");
-		}
+		m_scriptInterface->callFunction(2);
 
 		env->resetCallback();
 		m_scriptInterface->releaseScriptEnv();

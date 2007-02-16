@@ -72,6 +72,7 @@ void ScriptEnviroment::resetEnv()
 {
 	m_scriptId = 0;
 	m_callbackId = 0;
+	m_timerEvent = false;
 	m_interface = NULL;
 	m_localMap.clear();
 
@@ -101,12 +102,13 @@ bool ScriptEnviroment::setCallbackId(int32_t callbackId)
 	}
 }
 
-void ScriptEnviroment::getEventInfo(int32_t& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, int32_t& callbackId)
+void ScriptEnviroment::getEventInfo(int32_t& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, int32_t& callbackId, bool& timerEvent)
 {
 	scriptId = m_scriptId;
 	desc = m_eventdesc;
 	scriptInterface = m_interface;
 	callbackId = m_callbackId;
+	timerEvent = m_timerEvent;
 }
 
 void ScriptEnviroment::addUniqueThing(Thing* thing)
@@ -384,6 +386,7 @@ LuaScriptInterface::LuaScriptInterface(std::string interfaceName)
 {
 	m_luaState = NULL;
 	m_interfaceName = interfaceName;
+	m_lastEventTimerId = 1000;
 }
 
 LuaScriptInterface::~LuaScriptInterface()
@@ -406,7 +409,7 @@ void LuaScriptInterface::dumpLuaStack()
 	}
 }
 
-int32_t LuaScriptInterface::loadFile(const std::string& file)
+int32_t LuaScriptInterface::loadFile(const std::string& file, Npc* npc /* = NULL*/)
 {
 	//loads file as a chunk at stack top
 	int ret = luaL_loadfile(m_luaState, file.c_str());
@@ -423,6 +426,7 @@ int32_t LuaScriptInterface::loadFile(const std::string& file)
 	this->reserveScriptEnv();
 	ScriptEnviroment* env = this->getScriptEnv();
 	env->setScriptId(EVENT_ID_LOADING, this);
+	env->setNpc(npc);
 	
 	//execute it
 	ret = lua_pcall(m_luaState, 0, 0, 0);
@@ -478,19 +482,23 @@ const std::string& LuaScriptInterface::getFileById(int32_t scriptId)
 void LuaScriptInterface::reportError(const char* function, const std::string& error_desc)
 {
 	ScriptEnviroment* env = getScriptEnv();
-	int32_t fileId;
+	int32_t scriptId;
 	int32_t callbackId;
+	bool timerEvent;
 	std::string event_desc;
 	LuaScriptInterface* scriptInterface;
-	env->getEventInfo(fileId, event_desc, scriptInterface, callbackId);
+	env->getEventInfo(scriptId, event_desc, scriptInterface, callbackId, timerEvent);
 	
 	std::cout << std::endl << "Lua Script Error: ";
 	if(scriptInterface){
 		std::cout << "[" << scriptInterface->getInterfaceName() << "] " << std::endl;
+		if(timerEvent){
+			std::cout << "in a timer event called from: " << std::endl;
+		}
 		if(callbackId){
 			std::cout << "in callback: " << scriptInterface->getFileById(callbackId) << std::endl;
 		}
-		std::cout << scriptInterface->getFileById(fileId) << std::endl;
+		std::cout << scriptInterface->getFileById(scriptId) << std::endl;
 	}
 	std::cout << event_desc << std::endl;
 	if(function)
@@ -542,8 +550,46 @@ bool LuaScriptInterface::initState()
 bool LuaScriptInterface::closeState()
 {
 	m_cacheFiles.clear();
+	
+	LuaTimerEvents::iterator it;
+	for(it = m_timerEvents.begin(); it != m_timerEvents.end(); ++it){
+		luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+		luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.function);
+	}
+	m_timerEvents.clear();
+	
 	lua_close(m_luaState);
 	return true;
+}
+
+void LuaScriptInterface::executeTimerEvent(uint32_t eventIndex)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "LuaScriptInterface::executeTimerEvent()");
+	LuaTimerEvents::iterator it = m_timerEvents.find(eventIndex);
+	if(it != m_timerEvents.end()){
+		//push function
+		lua_rawgeti(m_luaState, LUA_REGISTRYINDEX, it->second.function);
+		
+		//push parameters
+		lua_rawgeti(m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+		
+		//call the function
+		if(reserveScriptEnv()){
+			ScriptEnviroment* env = getScriptEnv();
+			env->setTimerEvent();
+			env->setScriptId(it->second.scriptId, this);
+			callFunction(1);
+			releaseScriptEnv();
+		}
+		else{
+			std::cout << "[Error] Call stack overflow. LuaScriptInterface::executeTimerEvent" << std::endl;
+		}
+		
+		//free resources
+		luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+		luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.function);
+		m_timerEvents.erase(it);
+	}	
 }
 
 int32_t LuaScriptInterface::callFunction(uint32_t nParams)
@@ -811,6 +857,8 @@ void LuaScriptInterface::registerFunctions()
 	
 	//isPlayer(cid)
 	lua_register(m_luaState, "isPlayer", LuaScriptInterface::luaIsPlayer);
+	//isCreature(cid)
+	lua_register(m_luaState, "isCreature", LuaScriptInterface::luaIsCreature);
 	//isContainer(uid)
 	lua_register(m_luaState, "isContainer", LuaScriptInterface::luaIsContainer);
 	//isMoveable(uid)
@@ -822,6 +870,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
 	//getPlayerGUIDByName(name)
 	lua_register(m_luaState, "getPlayerGUIDByName", LuaScriptInterface::luaGetPlayerGUIDByName);
+	//registerCreature(cid)
+	lua_register(m_luaState, "registerCreature", LuaScriptInterface::luaRegisterCreature);
 
 	//getContainerSize(uid)
 	lua_register(m_luaState, "getContainerSize", LuaScriptInterface::luaGetContainerSize);
@@ -939,6 +989,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getCreatureOutfit", LuaScriptInterface::luaGetCreatureOutfit);
 	//getCreaturePosition(cid)
 	lua_register(m_luaState, "getCreaturePosition", LuaScriptInterface::luaGetCreaturePosition);
+	//getCreatureName(cid)
+	lua_register(m_luaState, "getCreatureName", LuaScriptInterface::luaGetCreatureName);
 
 	//isItemStackable(itemid)
 	lua_register(m_luaState, "isItemStackable", LuaScriptInterface::luaIsItemStackable);
@@ -955,6 +1007,9 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 	//isInArray(array, value)
 	lua_register(m_luaState, "isInArray", LuaScriptInterface::luaIsInArray);
+	
+	//addEvent(callback, delay, parameter)
+	lua_register(m_luaState, "addEvent", LuaScriptInterface::luaAddEvent);
 	
 }
 
@@ -3550,6 +3605,22 @@ int LuaScriptInterface::luaIsPlayer(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaIsCreature(lua_State *L)
+{
+	//isCreature(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	if(env->getCreatureByUID(cid)){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}
+
 int LuaScriptInterface::luaIsContainer(lua_State *L)
 {
 	//isContainer(uid)
@@ -3642,6 +3713,26 @@ int LuaScriptInterface::luaGetPlayerGUID(lua_State *L)
 
 	lua_pushnumber(L, value);
 	return 1;	
+}
+
+int LuaScriptInterface::luaRegisterCreature(lua_State *L)
+{
+	//registerCreature(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* creature = g_game.getCreatureByID(cid);
+	uint32_t newcid;
+	if(creature){
+		newcid = env->addThing(creature);
+	}
+	else{
+		newcid = 0;
+	}
+
+	lua_pushnumber(L, newcid);
+	return 1;
 }
 
 int LuaScriptInterface::luaGetContainerSize(lua_State *L)
@@ -3865,6 +3956,24 @@ int LuaScriptInterface::luaGetCreaturePosition(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetCreatureName(lua_State *L)
+{
+	//getCreatureName(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		lua_pushstring(L, creature->getName().c_str());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
 int LuaScriptInterface::luaIsItemStackable(lua_State *L)
 {
 	//isItemStackable(itemid)
@@ -3932,5 +4041,48 @@ int LuaScriptInterface::luaIsItemFluidContainer(lua_State *L)
 	else{
 		lua_pushnumber(L, LUA_FALSE);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaAddEvent(lua_State *L)
+{
+	//addEvent(callback, delay, parameter)	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	if(env->getCallbackId() != 0){
+		reportError(__FUNCTION__, "This function cannot be used in combat callbacks.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+	
+	LuaScriptInterface* script_interface = env->getScriptInterface();
+	if(!script_interface){
+		reportError(__FUNCTION__, "No valid script interface!");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+	
+	if(lua_isfunction(L, -3) == 0){
+		reportError(__FUNCTION__, "callback parameter should be a function.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	LuaTimerEventDesc eventDesc;
+	eventDesc.parameter = luaL_ref(L, LUA_REGISTRYINDEX);
+	uint32_t delay = popNumber(L);
+	if(delay < 100){
+		delay = 100;
+	}
+	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
+	
+	eventDesc.scriptId = env->getScriptId();
+	
+	script_interface->m_lastEventTimerId++;
+	script_interface->m_timerEvents[script_interface->m_lastEventTimerId] = eventDesc;
+	
+	g_game.addEvent(makeTask(delay, boost::bind(&LuaScriptInterface::executeTimerEvent, script_interface, script_interface->m_lastEventTimerId)));
+	
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
