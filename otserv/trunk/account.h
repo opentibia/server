@@ -19,12 +19,13 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __ACCOUNT_H__
-#define __ACCOUNT_H__
+#ifndef __OTSERV_ACCOUNT_H__
+#define __OTSERV_ACCOUNT_H__
 
 #include <list>
 #include <string>
 
+#include "definitions.h"
 
 class Account
 {

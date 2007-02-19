@@ -162,6 +162,7 @@ protected:
 
 	std::string name;
 	bool autoWalk;
+	bool floorChange;
 	uint32_t focusCreature;
 	
 	NpcEventsHandler* m_npcEventHandler;

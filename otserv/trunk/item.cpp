@@ -222,7 +222,7 @@ void Item::setItemCountOrSubtype(unsigned char n)
 bool Item::hasSubType() const
 {
 	const ItemType& it = items[id];
-	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.isRune());
+	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.charges != 0);
 }
 
 uint8_t Item::getSubType() const
@@ -595,7 +595,8 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 	return false;
 }
 
-double Item::getWeight() const {
+double Item::getWeight() const
+{
 	if(isStackable()){
 		return items[id].weight * std::max(1, (int)count);
 	}

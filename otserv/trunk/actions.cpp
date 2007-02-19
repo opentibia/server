@@ -245,7 +245,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 	
 	if(isHotkey){
 		int32_t subType = -1;
-		if(item->hasSubType() && !item->isRune()){
+		if(item->hasSubType() && !item->hasCharges()){
 			subType = item->getSubType();
 		}
 
@@ -296,7 +296,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 
 	if(isHotkey){
 		int32_t subType = -1;
-		if(item->hasSubType() && !item->isRune()){
+		if(item->hasSubType() && !item->hasCharges()){
 			subType = item->getSubType();
 		}
 

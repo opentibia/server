@@ -57,6 +57,7 @@ Creature()
 	loaded = true;
 	name = _name;
 	autoWalk = false;
+	floorChange = false;
 	focusCreature = 0;
 
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
@@ -99,6 +100,10 @@ Creature()
 		if(readXMLInteger(root, "autowalk", intValue)){
 			autoWalk = intValue != 0;
 		}
+
+		if(readXMLInteger(root, "floorchange", intValue)){
+			floorChange = intValue != 0;
+		}		
 
 		while(p){
 			if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
@@ -342,7 +347,21 @@ bool Npc::canWalkTo(const Position& fromPos, Direction dir)
 			break;
 	}
 
-	return Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos);
+	bool result = Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos);
+	if(!result){
+		return false;
+	}
+
+	Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
+	if(!tile || tile->__queryAdd(0, this, 1, 0) != RET_NOERROR){
+		return false;
+	}
+
+	if(!floorChange && (tile->floorChange() || tile->getTeleportItem())){
+		return false;
+	}
+
+	return true;
 }
 
 bool Npc::getRandomStep(Direction& dir)
