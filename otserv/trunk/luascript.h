@@ -204,6 +204,7 @@ enum PlayerInfo_t{
 	PlayerInfoGuildNick,
 	PlayerInfoSex,
 	PlayerInfoTown,
+	PlayerInfoGUID
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -344,7 +345,14 @@ protected:
 	static int luaGetTileHouseInfo(lua_State *L);
 	//houses
 	static int luaGetHouseOwner(lua_State *L);
+	static int luaGetHouseName(lua_State *L);
+	static int luaGetHouseEntry(lua_State *L);
+	static int luaGetHouseRent(lua_State *L);
+	static int luaGetHouseTown(lua_State *L);
+	static int luaGetHouseAccessList(lua_State *L);
+	static int luaGetHouseByPlayerGUID(lua_State *L);
 	static int luaSetHouseOwner(lua_State *L);
+	static int luaSetHouseAccessList(lua_State *L);
 
 	//get player info functions
 	static int luaGetPlayerFood(lua_State *L);
@@ -370,6 +378,8 @@ protected:
 	static int luaGetPlayerGuildRank(lua_State *L);
 	static int luaGetPlayerGuildNick(lua_State *L);
 	static int luaGetPlayerSex(lua_State *L);
+	static int luaGetPlayerGUID(lua_State *L);
+	static int luaGetPlayerFlagValue(lua_State *L);
 
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
@@ -394,7 +404,6 @@ protected:
 	static int luaIsMoveable(lua_State *L);
 	
 	static int luaGetPlayerByName(lua_State *L);
-	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerGUIDByName(lua_State *L);
 	static int luaRegisterCreature(lua_State *L);
 	
@@ -453,10 +462,12 @@ protected:
 	static int luaIsItemDoor(lua_State *L);
 	static int luaIsItemContainer(lua_State *L);
 	static int luaIsItemFluidContainer(lua_State *L);
+	static int luaGetItemName(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);
 	static int luaAddEvent(lua_State *L);
+	static int luaStopEvent(lua_State *L);
 	//
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);

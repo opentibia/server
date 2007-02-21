@@ -517,7 +517,7 @@ int NpcScriptInterface::luaCreatureGetName2(lua_State *L)
 	//creatureGetName2(name) - returns creature id
 	popString(L);
 	reportErrorFunc("Deprecated function.");
-	lua_pushnumber(L, 0);
+	lua_pushnil(L);
 	return 1;
 }
 
@@ -597,6 +597,7 @@ int NpcScriptInterface::luaActionMoveTo(lua_State* L)
 	Npc* mynpc = env->getNpc();
 	if(mynpc)
 		mynpc->doMoveTo(target);
+	
 	return 0;
 }
 
@@ -636,7 +637,6 @@ int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
 		lua_pushnil(L);
-		return 1;
 	}
 	
 	return 1;
@@ -668,7 +668,7 @@ int NpcScriptInterface::luaGetNpcCid(lua_State* L)
 		lua_pushnumber(L, cid);
 	}
 	else{
-		lua_pushnumber(L, 0);
+		lua_pushnil(L);
 	}
 	
 	return 1;
@@ -704,11 +704,11 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 			lua_pushstring(L, it->second.c_str());
 		}
 		else{
-			lua_pushnumber(L, 0);
+			lua_pushnil(L);
 		}
 	}
 	else{
-		lua_pushnumber(L, 0);
+		lua_pushnil(L);
 	}
 	
 	return 1;

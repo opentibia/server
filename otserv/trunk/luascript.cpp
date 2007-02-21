@@ -431,6 +431,7 @@ int32_t LuaScriptInterface::loadFile(const std::string& file, Npc* npc /* = NULL
 	//execute it
 	ret = lua_pcall(m_luaState, 0, 0, 0);
 	if(ret != 0){
+		reportError(NULL, std::string(popString(m_luaState)));
 		this->releaseScriptEnv();
 		return -1;
 	}
@@ -470,12 +471,17 @@ int32_t LuaScriptInterface::getEvent(const std::string& eventName)
 const std::string& LuaScriptInterface::getFileById(int32_t scriptId)
 {
 	static std::string unk = "(Unknown scriptfile)";
-	ScriptsCache::iterator it = m_cacheFiles.find(scriptId);
-	if(it != m_cacheFiles.end()){
-		return it->second;
+	if(scriptId != EVENT_ID_LOADING){
+		ScriptsCache::iterator it = m_cacheFiles.find(scriptId);
+		if(it != m_cacheFiles.end()){
+			return it->second;
+		}
+		else{
+			return unk;
+		}
 	}
 	else{
-		return unk;
+		return m_loadingFile;
 	}
 }
 
@@ -753,6 +759,12 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerGuildRank", LuaScriptInterface::luaGetPlayerGuildRank);
 	//getPlayerGuildNick(cid)
 	lua_register(m_luaState, "getPlayerGuildNick", LuaScriptInterface::luaGetPlayerGuildNick);
+	//getPlayerSex(cid)
+	lua_register(m_luaState, "getPlayerSex", LuaScriptInterface::luaGetPlayerSex);
+	//getPlayerGUID(cid)
+	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
+	//getPlayerFlagValue(cid, flag)
+	lua_register(m_luaState, "getPlayerFlagValue", LuaScriptInterface::luaGetPlayerFlagValue);
 	
 	//getPlayerStorageValue(uid,valueid)
 	lua_register(m_luaState, "getPlayerStorageValue", LuaScriptInterface::luaGetPlayerStorageValue);
@@ -866,8 +878,6 @@ void LuaScriptInterface::registerFunctions()
 
 	//getPlayerByName(name)
 	lua_register(m_luaState, "getPlayerByName", LuaScriptInterface::luaGetPlayerByName);
-	//getPlayerGUID(cid)
-	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
 	//getPlayerGUIDByName(name)
 	lua_register(m_luaState, "getPlayerGUIDByName", LuaScriptInterface::luaGetPlayerGUIDByName);
 	//registerCreature(cid)
@@ -884,7 +894,21 @@ void LuaScriptInterface::registerFunctions()
 	
 	//getHouseOwner(houseid)
 	lua_register(m_luaState, "getHouseOwner", LuaScriptInterface::luaGetHouseOwner);
-	//setHouseOwner(houseid, owner)
+	//getHouseName(houseid)
+	lua_register(m_luaState, "getHouseName", LuaScriptInterface::luaGetHouseName);
+	//getHouseEntry(houseid)
+	lua_register(m_luaState, "getHouseEntry", LuaScriptInterface::luaGetHouseEntry);
+	//getHouseRent(houseid)
+	lua_register(m_luaState, "getHouseRent", LuaScriptInterface::luaGetHouseRent);
+	//getHouseTown(houseid)
+	lua_register(m_luaState, "getHouseTown", LuaScriptInterface::luaGetHouseTown);
+	//getHouseAccessList(houseod, listid)
+	lua_register(m_luaState, "getHouseAccessList", LuaScriptInterface::luaGetHouseAccessList);
+	//getHouseByPlayerGUID(playerGUID)
+	lua_register(m_luaState, "getHouseByPlayerGUID", LuaScriptInterface::luaGetHouseByPlayerGUID);
+	//setHouseAccessList(houseid, listid, listtext)
+	lua_register(m_luaState, "setHouseAccessList", LuaScriptInterface::luaSetHouseAccessList);
+	//setHouseOwner(houseid, ownerGUID)
 	lua_register(m_luaState, "setHouseOwner", LuaScriptInterface::luaSetHouseOwner);
 	
 	//getWorldType()
@@ -899,8 +923,6 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
 	//getGuildId(guild_name)
 	lua_register(m_luaState, "getGuildId", LuaScriptInterface::luaGetGuildId);
-	//getPlayerSex(cid)
-	lua_register(m_luaState, "getPlayerSex", LuaScriptInterface::luaGetPlayerSex);
 	
 	//createCombatArea( {area}, {extArea} )
 	lua_register(m_luaState, "createCombatArea", LuaScriptInterface::luaCreateCombatArea);
@@ -1002,6 +1024,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "isItemContainer", LuaScriptInterface::luaIsItemContainer);
 	//isItemFluidContainer(itemid)
 	lua_register(m_luaState, "isItemFluidContainer", LuaScriptInterface::luaIsItemFluidContainer);
+	//getItemName(itemid)
+	lua_register(m_luaState, "getItemName", LuaScriptInterface::luaGetItemName);
 
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -1010,6 +1034,8 @@ void LuaScriptInterface::registerFunctions()
 	
 	//addEvent(callback, delay, parameter)
 	lua_register(m_luaState, "addEvent", LuaScriptInterface::luaAddEvent);
+	//stopEvent(eventid)
+	lua_register(m_luaState, "stopEvent", LuaScriptInterface::luaStopEvent);
 	
 }
 
@@ -1106,6 +1132,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoTown:
 			value = player->getTown();
 			break;
+		case PlayerInfoGUID:
+			value = player->getGUID();
+			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -1128,60 +1157,87 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 }
 //getPlayer[Info](uid)
 int LuaScriptInterface::luaGetPlayerFood(lua_State *L){	
-	return internalGetPlayerInfo(L,PlayerInfoFood);}
+	return internalGetPlayerInfo(L, PlayerInfoFood);}
 	
 int LuaScriptInterface::luaGetPlayerAccess(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoAccess);}
+	return internalGetPlayerInfo(L, PlayerInfoAccess);}
 	
 int LuaScriptInterface::luaGetPlayerLevel(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoLevel);}
+	return internalGetPlayerInfo(L, PlayerInfoLevel);}
 	
 int LuaScriptInterface::luaGetPlayerMagLevel(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoMagLevel);}
+	return internalGetPlayerInfo(L, PlayerInfoMagLevel);}
 	
 int LuaScriptInterface::luaGetPlayerMana(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoMana);}
+	return internalGetPlayerInfo(L, PlayerInfoMana);}
 
 int LuaScriptInterface::luaGetPlayerHealth(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoHealth);}
+	return internalGetPlayerInfo(L, PlayerInfoHealth);}
 	
 int LuaScriptInterface::luaGetPlayerName(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoName);}
+	return internalGetPlayerInfo(L, PlayerInfoName);}
 	
 int LuaScriptInterface::luaGetPlayerPosition(lua_State *L){	
-	return internalGetPlayerInfo(L,PlayerInfoPosition);}
+	return internalGetPlayerInfo(L, PlayerInfoPosition);}
 	
 int LuaScriptInterface::luaGetPlayerVocation(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoVocation);}
+	return internalGetPlayerInfo(L, PlayerInfoVocation);}
 
 int LuaScriptInterface::luaGetPlayerMasterPos(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoMasterPos);}
+	return internalGetPlayerInfo(L, PlayerInfoMasterPos);}
 
 int LuaScriptInterface::luaGetPlayerSoul(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoSoul);}
+	return internalGetPlayerInfo(L, PlayerInfoSoul);}
 
 int LuaScriptInterface::luaGetPlayerFreeCap(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoFreeCap);}
+	return internalGetPlayerInfo(L, PlayerInfoFreeCap);}
 	
 int LuaScriptInterface::luaGetPlayerGuildId(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoGuildId);}
+	return internalGetPlayerInfo(L, PlayerInfoGuildId);}
 	
 int LuaScriptInterface::luaGetPlayerGuildName(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoGuildName);}
+	return internalGetPlayerInfo(L, PlayerInfoGuildName);}
 	
 int LuaScriptInterface::luaGetPlayerGuildRank(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoGuildRank);}
+	return internalGetPlayerInfo(L, PlayerInfoGuildRank);}
 	
 int LuaScriptInterface::luaGetPlayerGuildNick(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoGuildNick);}
+	return internalGetPlayerInfo(L, PlayerInfoGuildNick);}
 
 int LuaScriptInterface::luaGetPlayerSex(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoSex);}
+	return internalGetPlayerInfo(L, PlayerInfoSex);}
 
 int LuaScriptInterface::luaGetPlayerTown(lua_State *L){
-	return internalGetPlayerInfo(L,PlayerInfoTown);}
+	return internalGetPlayerInfo(L, PlayerInfoTown);}
+	
+int LuaScriptInterface::luaGetPlayerGUID(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoGUID);}
 //
 
+int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
+{
+	//getPlayerFlagValue(cid, flag)
+	uint32_t flagindex = popNumber(L);
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(flagindex < PlayerFlag_LastFlag){
+			lua_pushnumber(L, player->hasFlag((PlayerFlags)flagindex) ? 1 : 0);
+		}
+		else{
+			reportErrorFunc("No valid flag index.");
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
 
 int LuaScriptInterface::luaDoRemoveItem(lua_State *L)
 {	
@@ -2064,15 +2120,14 @@ int LuaScriptInterface::luaDebugPrint(lua_State *L)
 int LuaScriptInterface::luaDoPlayerAddSoul(lua_State *L)
 {
 	//doPlayerAddSoul(cid,soul)
-	/*int addsoul = */popNumber(L);
+	int32_t addsoul = popNumber(L);
 	uint32_t cid = popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		//TODO: add soul;
-		player->sendStats();
+		player->changeSoul(addsoul);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -2119,7 +2174,129 @@ int LuaScriptInterface::luaGetHouseOwner(lua_State *L)
 	}
 	return 1;
 }
+
+int LuaScriptInterface::luaGetHouseName(lua_State *L)
+{
+	//getHouseName(houseid)
+	uint32_t houseid = popNumber(L);
 	
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		lua_pushstring(L, house->getName().c_str());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetHouseEntry(lua_State *L)
+{
+	//getHouseEntry(houseid)
+	uint32_t houseid = popNumber(L);
+	
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		pushPosition(L, house->getEntryPosition(), 0);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetHouseRent(lua_State *L)
+{
+	//getHouseRent(houseid)
+	uint32_t houseid = popNumber(L);
+	
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		lua_pushnumber(L, house->getRent());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetHouseTown(lua_State *L)
+{
+	//getHouseTown(houseid)
+	uint32_t houseid = popNumber(L);
+	
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		lua_pushnumber(L, house->getTownId());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetHouseAccessList(lua_State *L)
+{
+	//getHouseAccessList(houseid, listid)
+	uint32_t listid = popNumber(L);
+	uint32_t houseid = popNumber(L);
+	
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		std::string list;
+		if(house->getAccessList(listid, list)){
+			lua_pushstring(L, list.c_str());
+		}
+		else{
+			reportErrorFunc("No valid listid.");
+			lua_pushnil(L);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int  LuaScriptInterface::luaGetHouseByPlayerGUID(lua_State *L)
+{
+	//getHouseByPlayerGUID(playerGUID)
+	uint32_t guid = popNumber(L);
+	
+	House* house = Houses::getInstance().getHouseByPlayerId(guid);
+	if(house){
+		lua_pushnumber(L, house->getHouseId());
+	}
+	else{
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaSetHouseAccessList(lua_State *L)
+{
+	//setHouseAccessList(houseid, listid, listtext)
+	std::string list = popString(L);
+	uint32_t listid = popNumber(L);
+	uint32_t houseid = popNumber(L);
+	
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		house->setAccessList(listid, list);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
 int LuaScriptInterface::luaSetHouseOwner(lua_State *L)
 {
 	//setHouseOwner(houseid, owner)
@@ -3697,24 +3874,6 @@ int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaGetPlayerGUID(lua_State *L)
-{
-	//getPlayerGUID(cid)
-	uint32_t cid = popNumber(L);
-	
-	ScriptEnviroment* env = getScriptEnv();
-	
-	Player* player = env->getPlayerByUID(cid);
-	uint32_t value = LUA_NULL;
-
-	if(player){
-		value = player->getGUID();
-	}
-
-	lua_pushnumber(L, value);
-	return 1;	
-}
-
 int LuaScriptInterface::luaRegisterCreature(lua_State *L)
 {
 	//registerCreature(cid)
@@ -4044,6 +4203,15 @@ int LuaScriptInterface::luaIsItemFluidContainer(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetItemName(lua_State *L)
+{
+	//getItemName(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	lua_pushstring(L, it.name.c_str());
+	return 1;
+}
+
 int LuaScriptInterface::luaAddEvent(lua_State *L)
 {
 	//addEvent(callback, delay, parameter)	
@@ -4083,6 +4251,33 @@ int LuaScriptInterface::luaAddEvent(lua_State *L)
 	
 	g_game.addEvent(makeTask(delay, boost::bind(&LuaScriptInterface::executeTimerEvent, script_interface, script_interface->m_lastEventTimerId)));
 	
-	lua_pushnumber(L, LUA_NO_ERROR);
+	lua_pushnumber(L, script_interface->m_lastEventTimerId);
+	return 1;
+}
+
+int LuaScriptInterface::luaStopEvent(lua_State *L)
+{
+	//stopEvent(eventid)
+	uint32_t eventId = popNumber(L);
+	ScriptEnviroment* env = getScriptEnv();
+	
+	LuaScriptInterface* script_interface = env->getScriptInterface();
+	if(!script_interface){
+		reportError(__FUNCTION__, "No valid script interface!");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	LuaTimerEvents::iterator it = script_interface->m_timerEvents.find(eventId);
+	if(it != script_interface->m_timerEvents.end()){
+		luaL_unref(script_interface->m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+		luaL_unref(script_interface->m_luaState, LUA_REGISTRYINDEX, it->second.function);
+		script_interface->m_timerEvents.erase(it);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	
 	return 1;
 }

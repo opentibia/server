@@ -335,7 +335,9 @@ enum PlayerFlags{
 	PlayerFlag_IgnoreProtectionZone,
 	PlayerFlag_IgnoreSpellCheck,
 	PlayerFlag_IgnoreWeaponCheck,
-	PlayerFlag_CannotBeMuted
+	PlayerFlag_CannotBeMuted,
+	//add new flags here
+	PlayerFlag_LastFlag
 };
 
 //Reserved player storage key ranges

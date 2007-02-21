@@ -775,19 +775,9 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 {
 	Player* player = creature->getPlayer();
 	if(player){
-		if(!player->getTile()->hasFlag(TILESTATE_HOUSE)){
-			player->sendCancel("You are not in a house");	
-			return false;
-		}
-		
-		HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-		if(!houseTile){
-			return false;
-		}
-		
-		House* house = houseTile->getHouse();
-		if(!(house && house->getHouseOwner() == player->getGUID())){
-			player->sendCancel("You are not owner of this house.");
+		House* house = Houses::getInstance().getHouseByPlayerId(player->getGUID());
+		if(!house){
+			player->sendCancel("You do not own any house.");
 			return false;
 		}
 		
