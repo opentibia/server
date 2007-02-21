@@ -2335,19 +2335,20 @@ void Protocol79::flushOutputBuffer()
 	return;
 }
 
-void Protocol79::WriteBuffer(NetworkMessage& add)
+void Protocol79::WriteBuffer(NetworkMessage& addMsg)
 {
-	g_game.addPlayerBuffer(player);
+	if(!addMsg.empty()){
+		g_game.addPlayerBuffer(player);
 
-	OTSYS_THREAD_LOCK(bufferLock, "Protocol79::WriteBuffer");
+		OTSYS_THREAD_LOCK(bufferLock, "Protocol79::WriteBuffer");
 
-	if(OutputBuffer.getMessageLength() + add.getMessageLength() >= NETWORKMESSAGE_MAXSIZE - 16){
-		this->flushOutputBuffer();
+		if(OutputBuffer.getMessageLength() + addMsg.getMessageLength() >= NETWORKMESSAGE_MAXSIZE - 16){
+			flushOutputBuffer();
+		}
+
+		OutputBuffer.JoinMessages(addMsg);
+		OTSYS_THREAD_UNLOCK(bufferLock, "Protocol79::WriteBuffer");
 	}
-
-	OutputBuffer.JoinMessages(add);
-	OTSYS_THREAD_UNLOCK(bufferLock, "Protocol79::WriteBuffer");
-	return;
 }
 
 void Protocol79::setKey(const uint32_t* key)

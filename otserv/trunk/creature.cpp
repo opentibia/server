@@ -48,8 +48,8 @@ Creature::Creature() :
 {
 	direction  = NORTH;
 	master = NULL;
-	summon = false;
 	lootDrop = true;
+	summon = false;
 
 	health     = 1000;
 	healthMax  = 1000;
@@ -814,6 +814,7 @@ void Creature::addSummon(Creature* creature)
 {
 	//std::cout << "addSummon: " << this << " summon=" << creature << std::endl;
 	creature->setSummon(true);
+	creature->setDropLoot(false);
 	creature->setMaster(this);
 	creature->useThing2();
 	summons.push_back(creature);
@@ -825,6 +826,7 @@ void Creature::removeSummon(const Creature* creature)
 	std::list<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
 	if(cit != summons.end()){
 		(*cit)->setSummon(false);
+		(*cit)->setDropLoot(false);
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();
 		summons.erase(cit);

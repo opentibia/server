@@ -290,8 +290,9 @@ void Monster::stopThink()
 	isActive = false;
 
 	setAttackedCreature(NULL);
+
+	//make sure the targetList is updated by forcing a onAttackedCreatureDissapear event
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
-		(*cit)->setAttackedCreature(NULL);
 		(*cit)->onAttackedCreatureDissapear(false);
 	}
 
@@ -535,33 +536,33 @@ bool Monster::getNextStep(Direction& dir)
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 
 		if(tile){
-			bool objectRemoved = false;
+			int32_t removeCount = 0;
+			int32_t moveCount = 0;
 			//We can not use iterators here since we can push the item to another tile
 			//which will invalidate the iterator.
-			for(unsigned int i = 0; i < tile->downItems.size();){
+			//start from the end to minimize the amount of traffic
+			int32_t downItemSize = tile->downItems.size();
+			for(int32_t i = downItemSize - 1; i >= 0; --i){
 				Item* item = tile->downItems[i];
 				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND) 
 					|| item->hasProperty(BLOCKSOLID))){
-					if(pushItem(item, 1)){
-						continue;
-					}
-					else if(g_game.internalRemoveItem(item) == RET_NOERROR){
-						objectRemoved = true;
-						continue;
-					}
+						if(moveCount < 100 && pushItem(item, 1)){
+							moveCount++;
+						}
+						else if(g_game.internalRemoveItem(item) == RET_NOERROR){
+							++removeCount;
+						}
 				}
-
-				++i;
 			}
 
-			if(objectRemoved){
+			if(removeCount > 0){
 				g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 			}
 
-			objectRemoved = false;
+			removeCount = 0;
 			//We can not use iterators here since we can push a creature to another tile
 			//which will invalidate the iterator.
-			for(unsigned int i = 0; i < tile->creatures.size();){
+			for(int32_t i = 0; i < tile->creatures.size();){
 				Monster* monster = tile->creatures[i]->getMonster();
 
 				if(monster && monster->isPushable()){
@@ -571,14 +572,15 @@ bool Monster::getNextStep(Direction& dir)
 					else{
 						monster->changeHealth(-monster->getHealth());
 						monster->setDropLoot(false);
-						objectRemoved = true;
+						//objectRemoved = true;
+						removeCount++;
 					}
 				}
 				
 				++i;
 			}
 
-			if(objectRemoved){
+			if(removeCount > 0){
 				g_game.addMagicEffect(tile->getPosition(), NM_ME_BLOCKHIT);
 			}
 		}
@@ -594,7 +596,6 @@ void Monster::die()
 	setAttackedCreature(NULL);
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
 		(*cit)->changeHealth(-(*cit)->getHealth());
-		(*cit)->setAttackedCreature(NULL);
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();
 	}
@@ -920,9 +921,7 @@ void Monster::updateLookDirection()
 void Monster::dropLoot(Container* corpse)
 {
 	if(corpse && lootDrop){
-		if(!isSummon()){
-			mType->createLoot(corpse);
-		}
+		mType->createLoot(corpse);
 	}
 }
 
@@ -978,6 +977,15 @@ bool Monster::convinceCreature(Creature* creature)
 			setFollowCreature(NULL);
 			setAttackedCreature(NULL);
 
+			//destroy summons
+			for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
+				(*cit)->changeHealth(-(*cit)->getHealth());
+				(*cit)->setMaster(NULL);
+				(*cit)->releaseThing2();
+			}
+
+			summons.clear();
+
 			if(spawn){
 				spawn->removeMonster(this);
 				spawn = NULL;
@@ -991,6 +999,14 @@ bool Monster::convinceCreature(Creature* creature)
 		creature->addSummon(this);
 		setFollowCreature(NULL);
 		setAttackedCreature(NULL);
+
+		for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
+			(*cit)->changeHealth(-(*cit)->getHealth());
+			(*cit)->setMaster(NULL);
+			(*cit)->releaseThing2();
+		}
+		
+		summons.clear();
 
 		if(spawn){
 			spawn->removeMonster(this);
