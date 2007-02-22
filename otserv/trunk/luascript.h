@@ -468,6 +468,8 @@ protected:
 	static int luaIsInArray(lua_State *L);
 	static int luaAddEvent(lua_State *L);
 	static int luaStopEvent(lua_State *L);
+
+	static int luaGetDataDirectory(lua_State *L);
 	//
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);

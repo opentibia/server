@@ -124,16 +124,31 @@
 				RelativePath="..\actions.cpp">
 			</File>
 			<File
+				RelativePath="..\admin.cpp">
+			</File>
+			<File
 				RelativePath="..\allocator.cpp">
 			</File>
 			<File
 				RelativePath="..\ban.cpp">
 			</File>
 			<File
+				RelativePath="..\baseevents.cpp">
+			</File>
+			<File
 				RelativePath="..\chat.cpp">
 			</File>
 			<File
+				RelativePath="..\combat.cpp">
+			</File>
+			<File
 				RelativePath="..\commands.cpp">
+			</File>
+			<File
+				RelativePath="..\condition.cpp">
+			</File>
+			<File
+				RelativePath="..\configmanager.cpp">
 			</File>
 			<File
 				RelativePath="..\container.cpp">
@@ -148,7 +163,16 @@
 				RelativePath="..\database.cpp">
 			</File>
 			<File
+				RelativePath="..\databasemysql.cpp">
+			</File>
+			<File
+				RelativePath="..\databasesqlite.cpp">
+			</File>
+			<File
 				RelativePath="..\depot.cpp">
+			</File>
+			<File
+				RelativePath="..\exception.cpp">
 			</File>
 			<File
 				RelativePath="..\fileloader.cpp">
@@ -166,10 +190,10 @@
 				RelativePath="..\ioaccount.cpp">
 			</File>
 			<File
-				RelativePath="..\ioaccountxml.cpp">
+				RelativePath="..\ioaccountsql.cpp">
 			</File>
 			<File
-				RelativePath="..\iomapbin.cpp">
+				RelativePath="..\ioaccountxml.cpp">
 			</File>
 			<File
 				RelativePath="..\iomapotbm.cpp">
@@ -178,10 +202,10 @@
 				RelativePath="..\iomapserialize.cpp">
 			</File>
 			<File
-				RelativePath="..\iomapserializexml.cpp">
+				RelativePath="..\iomapserializesql.cpp">
 			</File>
 			<File
-				RelativePath="..\iomapsql.cpp">
+				RelativePath="..\iomapserializexml.cpp">
 			</File>
 			<File
 				RelativePath="..\iomapxml.cpp">
@@ -190,13 +214,13 @@
 				RelativePath="..\ioplayer.cpp">
 			</File>
 			<File
+				RelativePath="..\ioplayersql.cpp">
+			</File>
+			<File
 				RelativePath="..\ioplayerxml.cpp">
 			</File>
 			<File
 				RelativePath="..\item.cpp">
-			</File>
-			<File
-				RelativePath="..\itemloader.cpp">
 			</File>
 			<File
 				RelativePath="..\items.cpp">
@@ -206,9 +230,6 @@
 			</File>
 			<File
 				RelativePath="..\luascript.cpp">
-			</File>
-			<File
-				RelativePath="..\magic.cpp">
 			</File>
 			<File
 				RelativePath="..\mailbox.cpp">
@@ -226,6 +247,9 @@
 				RelativePath="..\monsters.cpp">
 			</File>
 			<File
+				RelativePath="..\movement.cpp">
+			</File>
+			<File
 				RelativePath="..\networkmessage.cpp">
 			</File>
 			<File
@@ -235,19 +259,28 @@
 				RelativePath="..\otserv.cpp">
 			</File>
 			<File
+				RelativePath="..\outfit.cpp">
+			</File>
+			<File
 				RelativePath="..\player.cpp">
 			</File>
 			<File
 				RelativePath="..\position.cpp">
 			</File>
 			<File
-				RelativePath="..\protocol.cpp">
+				RelativePath="..\protocol78.cpp">
 			</File>
 			<File
-				RelativePath="..\protocol76.cpp">
+				RelativePath="..\protocol79.cpp">
 			</File>
 			<File
-				RelativePath="..\scheduler.cpp">
+				RelativePath="..\raids.cpp">
+			</File>
+			<File
+				RelativePath="..\rsa.cpp">
+			</File>
+			<File
+				RelativePath="..\scriptmanager.cpp">
 			</File>
 			<File
 				RelativePath="..\spawn.cpp">
@@ -257,6 +290,9 @@
 			</File>
 			<File
 				RelativePath="..\status.cpp">
+			</File>
+			<File
+				RelativePath="..\talkaction.cpp">
 			</File>
 			<File
 				RelativePath="..\teleport.cpp">
@@ -274,7 +310,13 @@
 				RelativePath="..\trashholder.cpp">
 			</File>
 			<File
+				RelativePath="..\vocation.cpp">
+			</File>
+			<File
 				RelativePath="..\waitlist.cpp">
+			</File>
+			<File
+				RelativePath="..\weapons.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -288,16 +330,34 @@
 				RelativePath="..\actions.h">
 			</File>
 			<File
+				RelativePath="..\admin.h">
+			</File>
+			<File
 				RelativePath="..\allocator.h">
 			</File>
 			<File
 				RelativePath="..\ban.h">
 			</File>
 			<File
+				RelativePath="..\baseevents.h">
+			</File>
+			<File
+				RelativePath="..\chat.h">
+			</File>
+			<File
+				RelativePath="..\combat.h">
+			</File>
+			<File
 				RelativePath="..\commands.h">
 			</File>
 			<File
-				RelativePath="..\const76.h">
+				RelativePath="..\condition.h">
+			</File>
+			<File
+				RelativePath="..\configmanager.h">
+			</File>
+			<File
+				RelativePath="..\const79.h">
 			</File>
 			<File
 				RelativePath="..\container.h">
@@ -312,10 +372,22 @@
 				RelativePath="..\database.h">
 			</File>
 			<File
+				RelativePath="..\databasemysql.h">
+			</File>
+			<File
+				RelativePath="..\databasesqlite.h">
+			</File>
+			<File
 				RelativePath="..\definitions.h">
 			</File>
 			<File
 				RelativePath="..\depot.h">
+			</File>
+			<File
+				RelativePath="..\enums.h">
+			</File>
+			<File
+				RelativePath="..\exception.h">
 			</File>
 			<File
 				RelativePath="..\fileloader.h">
@@ -342,19 +414,16 @@
 				RelativePath="..\iomap.h">
 			</File>
 			<File
-				RelativePath="..\iomapbin.h">
-			</File>
-			<File
 				RelativePath="..\iomapotbm.h">
 			</File>
 			<File
 				RelativePath="..\iomapserialize.h">
 			</File>
 			<File
-				RelativePath="..\iomapserializexml.h">
+				RelativePath="..\iomapserializesql.h">
 			</File>
 			<File
-				RelativePath="..\iomapsql.h">
+				RelativePath="..\iomapserializexml.h">
 			</File>
 			<File
 				RelativePath="..\iomapxml.h">
@@ -378,10 +447,10 @@
 				RelativePath="..\items.h">
 			</File>
 			<File
-				RelativePath="..\luascript.h">
+				RelativePath="..\logger.h">
 			</File>
 			<File
-				RelativePath="..\magic.h">
+				RelativePath="..\luascript.h">
 			</File>
 			<File
 				RelativePath="..\mailbox.h">
@@ -399,13 +468,22 @@
 				RelativePath="..\monsters.h">
 			</File>
 			<File
+				RelativePath="..\movement.h">
+			</File>
+			<File
 				RelativePath="..\networkmessage.h">
 			</File>
 			<File
 				RelativePath="..\npc.h">
 			</File>
 			<File
+				RelativePath="..\otpch.h">
+			</File>
+			<File
 				RelativePath="..\otsystem.h">
+			</File>
+			<File
+				RelativePath="..\outfit.h">
 			</File>
 			<File
 				RelativePath="..\player.h">
@@ -414,16 +492,22 @@
 				RelativePath="..\position.h">
 			</File>
 			<File
-				RelativePath="..\protocol.h">
+				RelativePath="..\protocol78.h">
 			</File>
 			<File
-				RelativePath="..\protocol76.h">
+				RelativePath="..\protocol79.h">
 			</File>
 			<File
-				RelativePath=".\resource.h">
+				RelativePath="..\raids.h">
+			</File>
+			<File
+				RelativePath="..\rsa.h">
 			</File>
 			<File
 				RelativePath="..\scheduler.h">
+			</File>
+			<File
+				RelativePath="..\scriptmanager.h">
 			</File>
 			<File
 				RelativePath="..\spawn.h">
@@ -433,6 +517,9 @@
 			</File>
 			<File
 				RelativePath="..\status.h">
+			</File>
+			<File
+				RelativePath="..\talkaction.h">
 			</File>
 			<File
 				RelativePath="..\tasks.h">
@@ -459,7 +546,13 @@
 				RelativePath="..\trashholder.h">
 			</File>
 			<File
+				RelativePath="..\vocation.h">
+			</File>
+			<File
 				RelativePath="..\waitlist.h">
+			</File>
+			<File
+				RelativePath="..\weapons.h">
 			</File>
 		</Filter>
 		<Filter

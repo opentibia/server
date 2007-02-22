@@ -1036,7 +1036,9 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "addEvent", LuaScriptInterface::luaAddEvent);
 	//stopEvent(eventid)
 	lua_register(m_luaState, "stopEvent", LuaScriptInterface::luaStopEvent);
-	
+
+	//getDataDir()
+	lua_register(m_luaState, "getDataDir", LuaScriptInterface::luaGetDataDirectory);
 }
 
 
@@ -4281,3 +4283,12 @@ int LuaScriptInterface::luaStopEvent(lua_State *L)
 	
 	return 1;
 }
+
+int LuaScriptInterface::luaGetDataDirectory(lua_State *L)
+{
+	//getDataDir()
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
+	lua_pushstring(L, datadir.c_str());
+	return 1;
+}
+

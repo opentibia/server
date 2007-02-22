@@ -56,7 +56,7 @@ Creature()
 	m_npcEventHandler = NULL;
 	loaded = true;
 	name = _name;
-	autoWalk = false;
+	autoWalkChance = 0;
 	floorChange = false;
 	focusCreature = 0;
 
@@ -95,10 +95,18 @@ Creature()
 			baseSpeed = intValue;
 		}
 		else
-			baseSpeed = 220;
+			baseSpeed = 110;
 
 		if(readXMLInteger(root, "autowalk", intValue)){
-			autoWalk = intValue != 0;
+			if(intValue > 100){
+				intValue = 100;
+			}
+
+			if(intValue < 0){
+				intValue = 0;
+			}
+
+			autoWalkChance = intValue;
 		}
 
 		if(readXMLInteger(root, "floorchange", intValue)){
@@ -233,7 +241,7 @@ void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	Creature::onCreatureAppear(creature, isLogin);
 
-	if(creature == this && autoWalk){
+	if(creature == this && autoWalkChance > 0){
 		addEventWalk();
 	}
 	
@@ -310,7 +318,7 @@ bool Npc::getNextStep(Direction& dir)
 		return true;
 	}
 
-	if(autoWalk && focusCreature == 0){
+	if(autoWalkChance > 0 && autoWalkChance >= random_range(1, 100) && focusCreature == 0){
 		return getRandomStep(dir);
 	}
 

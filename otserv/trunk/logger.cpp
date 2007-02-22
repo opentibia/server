@@ -75,6 +75,7 @@ void Logger::logMessage(char* channel, eLogType type, int level, std::string mes
 	if(channel){
 		fprintf(m_file, " [%s] ", channel);
 	}
+
 	//write message type
 	char* type_str;
 	switch(type){

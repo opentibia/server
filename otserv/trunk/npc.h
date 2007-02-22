@@ -161,7 +161,7 @@ protected:
 	ParametersMap m_parameters;
 
 	std::string name;
-	bool autoWalk;
+	int32_t autoWalkChance;
 	bool floorChange;
 	uint32_t focusCreature;
 	

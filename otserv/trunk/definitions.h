@@ -81,6 +81,8 @@
 	#include <hash_set>
 	#include <limits>
 	#include <assert.h>
+	#include <time.h>
+
 	#define OTSERV_HASH_MAP stdext::hash_map
 	#define OTSERV_HASH_SET stdext::hash_set
 

@@ -19,8 +19,10 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __LOGGER_H
-#define __LOGGER_H
+#ifndef __OTSERV_LOGGER_H__
+#define __OTSERV_LOGGER_H__
+
+#include "definitions.h"
 
 #ifdef __GNUC__
 #define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
