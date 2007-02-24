@@ -254,7 +254,7 @@ public:
 	virtual int32_t getArmor() const;
 	virtual int32_t getDefense() const;
 
-	void addExhaustionTicks();
+	void addExhaustionTicks(uint32_t ticks);
 	void addInFightTicks();
 	void addDefaultRegeneration(uint32_t addTicks);
 

@@ -138,6 +138,7 @@ int Game::loadMap(std::string filename, std::string filekind)
 	maxPlayers = g_config.getNumber(ConfigManager::MAX_PLAYERS);
 	inFightTicks = g_config.getNumber(ConfigManager::PZ_LOCKED);
 	exhaustionTicks = g_config.getNumber(ConfigManager::EXHAUSTED);
+	fightExhaustionTicks = g_config.getNumber(ConfigManager::FIGHTEXHAUSTED);	
 	Player::maxMessageBuffer = g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER);
 
 	return map->loadMap(filename, filekind);
@@ -2458,10 +2459,10 @@ bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string
 
 	//First, check if this was a command
 	for(uint32_t i = 0; i < commandTags.size(); i++){
-		const CommandTagPair& cmdTag = commandTags[i];
-		if(player->getAccessLevel() >= cmdTag.second && cmdTag.first == text.substr(0,1)){
-			commands.exeCommand(player, text);
-			return true;
+		if(commandTags[i] == text.substr(0,1)){
+			if(commands.exeCommand(player, text) || player->getAccessLevel() > 0){
+				return true;
+			}
 		}
 	}
 
@@ -3256,18 +3257,18 @@ void Game::getWorldLightInfo(LightInfo& lightInfo)
 	lightInfo.color = 0xD7;
 }
 
-void Game::addCommandTag(std::string tag, uint32_t accessLevel)
+void Game::addCommandTag(std::string tag)
 {
 	bool found = false;
 	for(uint32_t i=0; i< commandTags.size() ;i++){
-		if(commandTags[i].first == tag){
+		if(commandTags[i] == tag){
 			found = true;
 			break;
 		}
 	}
 
 	if(!found){
-		commandTags.push_back(CommandTagPair(tag, accessLevel));
+		commandTags.push_back(tag);
 	}
 }
 

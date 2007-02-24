@@ -546,7 +546,7 @@ bool Monster::getNextStep(Direction& dir)
 				Item* item = tile->downItems[i];
 				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND) 
 					|| item->hasProperty(BLOCKSOLID))){
-						if(moveCount < 100 && pushItem(item, 1)){
+						if(moveCount < 20 && pushItem(item, 1)){
 							moveCount++;
 						}
 						else if(g_game.internalRemoveItem(item) == RET_NOERROR){

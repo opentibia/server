@@ -1261,17 +1261,17 @@ bool Player::isMuted(uint32_t& muteTime)
 
 void Player::addMessageBuffer()
 {
-	if(!hasFlag(PlayerFlag_CannotBeMuted) && MessageBufferCount > 0){
+	if(!hasFlag(PlayerFlag_CannotBeMuted) && MessageBufferCount > 0 && Player::maxMessageBuffer != 0){
 		MessageBufferCount -= 1;
 	}
 }
 
 void Player::removeMessageBuffer()
 {
-	if(!hasFlag(PlayerFlag_CannotBeMuted) && MessageBufferCount <= maxMessageBuffer + 1){
+	if(!hasFlag(PlayerFlag_CannotBeMuted) && MessageBufferCount <= Player::maxMessageBuffer + 1 && Player::maxMessageBuffer != 0){
 		MessageBufferCount += 1;
 
-		if(MessageBufferCount > maxMessageBuffer){
+		if(MessageBufferCount > Player::maxMessageBuffer){
 			uint32_t muteCount = 1;
 			MuteCountMap::iterator it = muteCountMap.find(getGUID());
 			if(it != muteCountMap.end()){
@@ -1722,9 +1722,9 @@ void Player::preSave()
 	}
 }
 
-void Player::addExhaustionTicks()
+void Player::addExhaustionTicks(uint32_t ticks)
 {
-	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, g_game.getExhaustionTicks(), 0);
+	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, ticks, 0);
 	addCondition(condition);
 }
 

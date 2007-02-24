@@ -167,7 +167,7 @@ bool Commands::loadXml(const std::string& _datadir)
 			std::cout << "Warning: Missing access level for command " << it->first << std::endl;
 		}
 		//register command tag in game
-		game->addCommandTag(it->first.substr(0,1), it->second->accesslevel);
+		game->addCommandTag(it->first.substr(0,1));
 	}
 	
 	
@@ -210,7 +210,10 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 	Player* player = creature->getPlayer();
 	//check access for this command
 	if(player && player->getAccessLevel() < it->second->accesslevel){
-		player->sendTextMessage(MSG_STATUS_SMALL, "You can not execute this command.");
+		if(player->getAccessLevel() > 0){
+			player->sendTextMessage(MSG_STATUS_SMALL, "You can not execute this command.");
+		}
+
 		return false;
 	}
 

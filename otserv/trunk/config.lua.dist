@@ -49,8 +49,11 @@ worldname = "OpenTibia"
 -- options: pvp, no-pvp, pvp-enforced
 worldtype = "pvp"
 
--- exhausted time in ms (1000 = 1 second)
+-- exhausted time in ms (1000 = 1 second) for none-aggressive spells/weapons
 exhausted = 1000
+
+-- exhausted time in ms (1000 = 1 second) for aggressive spells/weapons
+fightexhausted = 2000
 
 -- how many ms to add if the player is already exhausted and tries to cast a spell (1000 = 1 second)
 exhaustedadd = 200
@@ -61,10 +64,10 @@ pzlocked = 6000
 -- set to 0 = disabled (default), 1 = enabled
 enablehotkeys = 0
 
--- minimum amount of time between 2 actions ('Use') (1000 = 1 second)
+-- minimum amount of time between actions ('Use') (1000 = 1 second)
 minactioninterval = 200
 
--- minimum amount of time between 2 extended actions ('Use with') (1000 = 1 second)
+-- minimum amount of time between extended actions ('Use with...') (1000 = 1 second)
 minactionexinterval = 1000
 
 -- house rent period
@@ -76,6 +79,9 @@ rate_exp = 1
 rate_skill = 1
 rate_mag = 1
 rate_loot = 1
+
+-- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
+maxmessagebuffer = 0
 
 -- motd (the message box that you sometimes get before you choose characters)
 motd = "Welcome to OTServ 0.6.0!"

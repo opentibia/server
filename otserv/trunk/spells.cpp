@@ -639,7 +639,7 @@ void Spell::postCastSpell(Player* player) const
 {
 	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
 		if(exhaustion){
-			player->addExhaustionTicks();
+			player->addExhaustionTicks(isAggressive ? g_game.getFightExhaustionTicks() : g_game.getExhaustionTicks());
 		}
 	}
 	

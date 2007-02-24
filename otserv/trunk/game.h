@@ -107,6 +107,7 @@ public:
 	WorldType_t getWorldType() const {return worldType;}
 	int32_t getInFightTicks() {return inFightTicks;}
 	int32_t getExhaustionTicks() {return exhaustionTicks;}
+	int32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
@@ -433,15 +434,15 @@ protected:
 	uint32_t maxPlayers;
 	uint32_t inFightTicks;
 	uint32_t exhaustionTicks;
+	uint32_t fightExhaustionTicks;
 
 	GameState_t gameState;
 	WorldType_t worldType;
 
 	Map* map;
 	
-	typedef std::pair<std::string, uint32_t> CommandTagPair;
-	std::vector<CommandTagPair> commandTags;
-	void addCommandTag(std::string tag, uint32_t accessLevel);
+	std::vector<std::string> commandTags;
+	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
 	friend class Commands;

@@ -85,8 +85,9 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confString[MOTD] = getGlobalString(L, "motd");
 	m_confInteger[MOTD_NUM] = getGlobalNumber(L, "motdnum");
 	m_confInteger[MAX_PLAYERS] = getGlobalNumber(L, "maxplayers");
-	m_confInteger[EXHAUSTED] = getGlobalNumber(L, "exhausted", 1500);
+	m_confInteger[EXHAUSTED] = getGlobalNumber(L, "exhausted", 1000);
 	m_confInteger[EXHAUSTED_ADD] = getGlobalNumber(L, "exhaustedadd", 0);
+	m_confInteger[FIGHTEXHAUSTED] = getGlobalNumber(L, "fightexhausted", 2000);
 	m_confInteger[PZ_LOCKED] = getGlobalNumber(L, "pzlocked", 60 * 1000);
 	m_confInteger[MIN_ACTIONTIME] = getGlobalNumber(L, "minactioninterval", 200);
 	m_confInteger[MIN_ACTIONEXTIME] = getGlobalNumber(L, "minactionexinterval", 1000);

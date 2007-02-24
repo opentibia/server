@@ -426,7 +426,7 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 
 	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
 		if(exhaustion){
-			player->addExhaustionTicks();
+			player->addExhaustionTicks(g_game.getFightExhaustionTicks());
 		}
 	}
 
