@@ -273,7 +273,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 	const unsigned char toStackPos, Item* item, bool isHotkey)
 {
-	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
+	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME)){
 		return false;
 	}
 

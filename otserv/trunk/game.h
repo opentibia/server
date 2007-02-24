@@ -329,6 +329,7 @@ public:
 		const std::string& receiver, const std::string& text);
 	bool playerSayDefault(Player* player, const std::string& text);
 	bool playerChangeOutfit(Player* player, Outfit_t outfit);
+	bool playerSayCommand(Player* player, SpeakClasses type, const std::string& text);
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
 
 	void flushSendBuffers();
@@ -438,8 +439,9 @@ protected:
 
 	Map* map;
 	
-	std::vector<std::string> commandTags;
-	void addCommandTag(std::string tag);
+	typedef std::pair<std::string, uint32_t> CommandTagPair;
+	std::vector<CommandTagPair> commandTags;
+	void addCommandTag(std::string tag, uint32_t accessLevel);
 	void resetCommandTag();
 
 	friend class Commands;

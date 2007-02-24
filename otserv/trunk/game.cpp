@@ -2389,6 +2389,10 @@ bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
 		return false;
 	}
 	
+	if(playerSayCommand(player, type, text)){
+		return true;
+	}
+
 	if(playerSaySpell(player, type, text)){
 		return true;
 	}
@@ -2446,18 +2450,29 @@ bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
 	return true;
 }
 
-bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
+bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSaySpell()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSayCommand()");
 	if(player->isRemoved())
 		return false;
 
 	//First, check if this was a command
 	for(uint32_t i = 0; i < commandTags.size(); i++){
-		if(commandTags[i] == text.substr(0,1)){
-			return commands.exeCommand(player, text);
+		const CommandTagPair& cmdTag = commandTags[i];
+		if(player->getAccessLevel() >= cmdTag.second && cmdTag.first == text.substr(0,1)){
+			commands.exeCommand(player, text);
+			return true;
 		}
 	}
+
+	return false;
+}
+
+bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSaySpell()");
+	if(player->isRemoved())
+		return false;
 
 	TalkActionResult_t result;
 
@@ -3241,18 +3256,18 @@ void Game::getWorldLightInfo(LightInfo& lightInfo)
 	lightInfo.color = 0xD7;
 }
 
-void Game::addCommandTag(std::string tag)
+void Game::addCommandTag(std::string tag, uint32_t accessLevel)
 {
 	bool found = false;
 	for(uint32_t i=0; i< commandTags.size() ;i++){
-		if(commandTags[i] == tag){
+		if(commandTags[i].first == tag){
 			found = true;
 			break;
 		}
 	}
 
 	if(!found){
-		commandTags.push_back(tag);
+		commandTags.push_back(CommandTagPair(tag, accessLevel));
 	}
 }
 

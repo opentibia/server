@@ -123,7 +123,7 @@ bool Commands::loadXml(const std::string& _datadir)
 			xmlFreeDoc(doc);
 			return false;
 		}
-	
+
 		std::string strCmd;
 
 		p = root->children;
@@ -167,7 +167,7 @@ bool Commands::loadXml(const std::string& _datadir)
 			std::cout << "Warning: Missing access level for command " << it->first << std::endl;
 		}
 		//register command tag in game
-		game->addCommandTag(it->first.substr(0,1));
+		game->addCommandTag(it->first.substr(0,1), it->second->accesslevel);
 	}
 	
 	
@@ -192,7 +192,7 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 	std::string str_param;
 	
 	std::string::size_type loc = cmd.find( ' ', 0 );
-	if( loc != std::string::npos && loc >= 0){
+	if(loc != std::string::npos && loc >= 0){
 		str_command = std::string(cmd, 0, loc);
 		str_param = std::string(cmd, (loc+1), cmd.size()-loc-1);
 	}

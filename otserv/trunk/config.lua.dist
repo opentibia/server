@@ -61,8 +61,11 @@ pzlocked = 6000
 -- set to 0 = disabled (default), 1 = enabled
 enablehotkeys = 0
 
--- minimum amount of time between 2 actions (1000 = 1 second)
+-- minimum amount of time between 2 actions ('Use') (1000 = 1 second)
 minactioninterval = 200
+
+-- minimum amount of time between 2 extended actions ('Use with') (1000 = 1 second)
+minactionexinterval = 1000
 
 -- house rent period
 -- options: daily, weekly, monthly
