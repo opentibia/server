@@ -537,6 +537,7 @@ bool LuaScriptInterface::initState()
 	luaopen_os(m_luaState);
 	luaopen_string(m_luaState);
 	luaopen_math(m_luaState);
+	//luaL_openlibs(m_luaState);
 	
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	

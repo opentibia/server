@@ -562,7 +562,7 @@ bool Monster::getNextStep(Direction& dir)
 			removeCount = 0;
 			//We can not use iterators here since we can push a creature to another tile
 			//which will invalidate the iterator.
-			for(int32_t i = 0; i < tile->creatures.size();){
+			for(uint32_t i = 0; i < tile->creatures.size();){
 				Monster* monster = tile->creatures[i]->getMonster();
 
 				if(monster && monster->isPushable()){
