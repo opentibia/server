@@ -18,99 +18,77 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_SCHEDULER_H__
 #define __OTSERV_SCHEDULER_H__
 
 #include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <functional>
+#include <vector>
+#include <queue>
+#include <set>
+
 #include "otsystem.h"
+#include "tasks.h"
 
-class Game;
-
-class SchedulerTask {
+class SchedulerTask : public Task{
 public:
-	SchedulerTask() {
-		_eventid = 0;
-		_cycle = 0;
-  }
-
-	virtual ~SchedulerTask()
-	{
-		//
+	~SchedulerTask() {}
+		
+	static SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f){
+		return new SchedulerTask(delay, f);
 	}
-
-	// definition to make sure lower cycles end up front
-	// in the priority_queue used in the scheduler
-	inline bool operator<(const SchedulerTask& other) const
+	
+	void setEventId(uint32_t eventid) {m_eventid = eventid;}
+	uint32_t getEventId() const {return m_eventid;}
+	
+	uint64_t getCycle() const {return m_cycle;}
+	
+	bool operator<(const SchedulerTask& other) const
 	{
 		return getCycle() > other.getCycle();
 	}
-
-	virtual void operator()(Game* arg) = 0;
-
-	virtual void setEventId(uint32_t id)
-	{
-		_eventid = id;
-	}
-
-	inline uint32_t getEventId() const
-	{
-		return _eventid;
-	}
-
-	virtual void setTicks(const int64_t ticks)
-	{
-		_cycle = OTSYS_TIME() + ticks;
-	}
-
-	inline int64_t getCycle() const
-	{
-		return _cycle;
-	}
-
+	
 protected:
-	uint32_t _eventid;
-	int64_t _cycle;
+	
+	SchedulerTask(uint32_t delay, boost::function<void (void)> f) : Task(f) {
+		m_cycle = OTSYS_TIME() + delay;
+		m_eventid = 0;
+	}
+	
+	uint64_t m_cycle;
+	uint32_t m_eventid;
 };
 
-class TSchedulerTask : public SchedulerTask{
-public:
-	TSchedulerTask(boost::function1<void, Game*> f) :
-		_f(f)
-	{
-		//
-	}
-
-	virtual ~TSchedulerTask()
-	{
-		//
-	}
-
-	virtual void operator()(Game* arg)
-	{
-		_f(arg);
-	}
-
-protected:
-	boost::function1<void, Game*> _f;
-};
-
-inline SchedulerTask* makeTask(boost::function1<void, Game*> f) {return new TSchedulerTask(f);}
-inline SchedulerTask* makeTask(int64_t ticks, boost::function1<void, Game*> f){
-	SchedulerTask* ret = new TSchedulerTask(f);
-	//ret->setEventId(0);
-	ret->setTicks(ticks);
-	return ret;
-}
-
-class lessSchedTask : public std::binary_function<SchedulerTask*, SchedulerTask*, bool>{
+class lessSchedTask : public std::binary_function<SchedulerTask*&, SchedulerTask*&, bool>{
 public:
 	bool operator()(SchedulerTask*& t1, SchedulerTask*& t2)
 	{
-		return *t1 < *t2;
+		return (*t1) < (*t2);
 	}
+};
+
+class Scheduler{
+public:
+	~Scheduler() {}
+	
+	static Scheduler& getScheduler() {return c_scheduler;}
+	
+	uint32_t addEvent(SchedulerTask* event);
+	bool stopEvent(uint32_t eventId);
+	
+	static OTSYS_THREAD_RETURN schedulerThread(void *p);
+	
+protected:
+	Scheduler();
+
+	static Scheduler c_scheduler;
+
+	OTSYS_THREAD_LOCKVAR m_eventLock;
+	OTSYS_THREAD_SIGNALVAR m_eventSignal;
+
+	uint32_t m_lastEventId;
+	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > m_eventList;
+	typedef std::set<uint32_t> EventIdSet;
+	EventIdSet m_eventIds;
 };
 
 #endif

@@ -19,77 +19,52 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_TASKS_H__
 #define __OTSERV_TASKS_H__
 
 #include <boost/function.hpp>
-#include <functional>
-
-#include "player.h"
-#include "game.h"
-#include "position.h"
-
-//class MovePlayer : public std::binary_function<Game*, Direction, int>{
-class MovePlayerTask : public boost::function<bool(Game*, Direction)>{
-public:
-	MovePlayerTask(Player* player, Game* game, Direction dir) :
-		//boost::function2<bool, Game*, Direction>(game, dir),
-		_player(player)
-	{
-		_player->useThing2();
-	}
-
-	virtual ~MovePlayerTask()
-	{
-		_player->releaseThing2();
-	}
-
-	//virtual bool operator()(Game* game, Direction dir)
-	result_type operator()(const first_argument_type& game, const second_argument_type& dir) const
-	{
-		OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "MovePlayerTask");
-
-		if(_player->isRemoved()){
-			return false;
-		}
-
-#ifdef __DEBUG__
-		std::cout << "MovePlayerTask: " << dir << std::endl;
-#endif
-
-		//_player->lastMove = OTSYS_TIME();
-		ReturnValue ret = game->internalMoveCreature(_player, dir);
-
-		game->flushSendBuffers();
-
-		return (ret == RET_NOERROR);
-	}
-
-private:
-	Player* _player;
-};
+#include "otsystem.h"
 
 class Task{
 public:
-	Task(boost::function1<bool, Game*> f) :
-		_f(f)
-	{
-		//
+	~Task() {}
+	
+	void operator()(){
+		m_f();
 	}
-
-	virtual ~Task()
-	{
-		//
+	
+	static Task* createTask(boost::function<void (void)> f){
+		return new Task(f);
 	}
-
-	virtual void operator()(Game* arg)
-	{
-		_f(arg);
-	}
-
+	
 protected:
-	boost::function1<bool, Game*> _f;
+	
+	Task(boost::function<void (void)> f){
+		m_f = f;
+	}
+	
+	boost::function<void (void)> m_f;
 };
 
+class Dispatcher{
+public:
+	~Dispatcher() {}
+	
+	static Dispatcher& getDispatcher() {return c_dispatcher;}
+	
+	void addTask(Task* task);
+	
+	static OTSYS_THREAD_RETURN dispatcherThread(void *p);
+	
+protected:
+	Dispatcher();
+	
+	
+	OTSYS_THREAD_LOCKVAR m_taskLock;
+	OTSYS_THREAD_SIGNALVAR m_taskSignal;
+	
+	std::list<Task*> m_taskList;
+	static Dispatcher c_dispatcher;
+	
+};
 #endif
