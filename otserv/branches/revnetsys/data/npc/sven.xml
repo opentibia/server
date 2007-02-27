@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-
-<npc name="Sven" script="data/npc/scripts/sven.lua" access="1">
-	<health now="100" max="100"/>
-	<look type="35" head="20" body="30" legs="40" feet="50" corpse="2131"/>
-</npc>
