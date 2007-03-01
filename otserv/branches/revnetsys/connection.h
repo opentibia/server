@@ -24,27 +24,27 @@
 #include "definitions.h"
 #include "networkmessage.h"
 
-#include <asio.hpp>
+#include <boost/asio.hpp>
 
 class Protocol;
 
 class Connection{
 public:
-	Connection(asio::io_service& io_service) : socket(io_service) { };
+	Connection(boost::asio::io_service& io_service) : socket(io_service) { };
 	~Connection() {}
 
-	const asio::ip::tcp::socket& getHandle() const { return socket;}
+	const boost::asio::ip::tcp::socket& getHandle() const { return socket;}
 
 	void closeConnection();
 	void acceptConnection();
 	void send(char* data, uint32_t size);
 	
-	void parseHeader(const asio::error& error);
-	void parsePacket(const asio::error& error);
+	void parseHeader(const boost::asio::error& error);
+	void parsePacket(const boost::asio::error& error);
 
 private:
 	NetworkMessage msg;
-	asio::ip::tcp::socket socket;
+	boost::asio::ip::tcp::socket socket;
 	Protocol* protocol;
 };
 

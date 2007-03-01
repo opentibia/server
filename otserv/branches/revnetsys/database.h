@@ -25,8 +25,7 @@
 #include "otsystem.h"
 
 #ifdef WIN32
-//#include <winsock2.h>
-#include <winsock.h>
+#include <winsock2.h>
 #endif
 
 #ifdef __MYSQL_ALT_INCLUDE__

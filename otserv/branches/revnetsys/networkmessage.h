@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __NETWORK_MESSAGE_H__
-#define __NETWORK_MESSAGE_H__
+#ifndef __OTSERV_NETWORK_MESSAGE_H__
+#define __OTSERV_NETWORK_MESSAGE_H__
 
 
 #include "definitions.h"
@@ -35,6 +35,9 @@ class RSA;
 class NetworkMessage
 {
 public:
+  enum { header_length = 2 };
+  enum { max_body_length = NETWORKMESSAGE_MAXSIZE };
+
 	// constructor/destructor
 	NetworkMessage(){
 		m_encryptionEnabled = false;
@@ -121,11 +124,17 @@ public:
 	}
 	void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
-  	int getMessageLength(){
+  int getMessageLength(){
 		return m_MsgSize;
 	}
 	
+	bool decodeHeader();
+
+	char* getBuffer() {return (char*)&m_MsgBuf[0];}
+	char* getBodyBuffer() {return (char*)&m_MsgBuf[header_length];}
+
 	bool empty() const { return m_MsgSize == 0;}
+
 	void JoinMessages(NetworkMessage &add);
 
 	bool RSA_decrypt();

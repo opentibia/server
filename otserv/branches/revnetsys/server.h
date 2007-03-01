@@ -25,13 +25,13 @@
 #include "connection.h"
 
 #include <boost/bind.hpp>
-#include <asio.hpp>
+#include <boost/asio.hpp>
 
 class server
 {
 public:
-  server(asio::io_service& io_service, uint16_t port)
-		: acceptor(io_service, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
+  server(boost::asio::io_service& io_service, uint16_t port)
+		: acceptor(io_service, boost::asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
   {
     accept();
   }
@@ -55,7 +55,7 @@ private:
     }
   }
 
-	asio::ip::tcp::acceptor acceptor;
+	boost::asio::ip::tcp::acceptor acceptor;
 };
 
 #endif

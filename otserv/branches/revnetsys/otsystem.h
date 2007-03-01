@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSYSTEM_H__
-#define __OTSYSTEM_H__
+#ifndef __OTSERV_OTTHREAD_H__
+#define __OTSERV_OTTHREAD_H__
 
 #include "definitions.h"
 #include "logger.h"
@@ -32,13 +32,12 @@
 #ifdef __WIN_LOW_FRAG_HEAP__
 #define _WIN32_WINNT 0x0501
 #endif
-#include <windows.h>
+#include <winsock2.h>
 #include <process.h>    /* _beginthread, _endthread */
 #include <stddef.h>
 #include <stdlib.h>
 #include <conio.h>
 #include <sys/timeb.h>
-#include <winsock.h>
 
 #define OTSYS_CREATE_THREAD(a, b) _beginthread(a, 0, b)
 

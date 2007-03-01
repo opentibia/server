@@ -32,6 +32,12 @@
 #include "position.h"
 #include "rsa.h"
 
+bool NetworkMessage::decodeHeader()
+{
+	int datasize = m_MsgBuf[0] | m_MsgBuf[1] << 8;
+	return true;
+}
+
 /******************************************************************************/
 bool NetworkMessage::ReadFromSocket(SOCKET socket)
 {

@@ -30,25 +30,25 @@ void Connection::closeConnection()
 
 void Connection::acceptConnection()
 {
-	asio::async_read(socket,
-		asio::buffer(msg.getBuffer(), NetworkMessage::header_length),
-		boost::bind(&Connection::parseHeader, this, asio::placeholders::error));
+	boost::asio::async_read(socket,
+		boost::asio::buffer(msg.getBuffer(), NetworkMessage::header_length),
+		boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
 }
 
-void Connection::parseHeader(const asio::error& error)
+void Connection::parseHeader(const boost::asio::error& error)
 {
   if(!error && msg.decodeHeader()){
-    asio::async_read(socket, asio::buffer(msg.getBodyBuffer(), msg.getMessageLength()),
-        boost::bind(&Connection::parsePacket, this, asio::placeholders::error));
+    boost::asio::async_read(socket, boost::asio::buffer(msg.getBodyBuffer(), msg.getMessageLength()),
+        boost::bind(&Connection::parsePacket, this, boost::asio::placeholders::error));
   }
 }
 
-void Connection::parsePacket(const asio::error& error)
+void Connection::parsePacket(const boost::asio::error& error)
 {
 	if(!error){
-    asio::async_read(socket,
-        asio::buffer(msg.getBuffer(), NetworkMessage::header_length),
-        boost::bind(&Connection::parseHeader, this, asio::placeholders::error));
+    boost::asio::async_read(socket,
+        boost::asio::buffer(msg.getBuffer(), NetworkMessage::header_length),
+        boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
 	}
 }
 

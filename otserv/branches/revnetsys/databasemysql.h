@@ -18,11 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_DatabaseMySQL_H__
-#define __OTSERV_DatabaseMySQL_H__
+#ifndef __OTSERV_DATABASEMYSQL_H__
+#define __OTSERV_DATABASEMYSQL_H__
 
 #ifdef WIN32
-#include <winsock.h>
+#include <winsock2.h>
 #endif
 
 #ifdef __MYSQL_ALT_INCLUDE__
