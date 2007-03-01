@@ -157,7 +157,7 @@ void Raids::startup()
 	setLastRaidEnd(OTSYS_TIME());
 	
 	for(RaidList::iterator it = raidList.begin(); it != raidList.end(); ++it){
-		uint32_t eventId = g_game.addEvent(makeTask((*it)->getInterval(), boost::bind(&Raid::checkRaid, (*it))));
+		uint32_t eventId = Scheduler::getScheduler().addEvent(createSchedulerTask((*it)->getInterval(), boost::bind(&Raid::checkRaid, (*it))));
 		(*it)->setRaidCheckEvent(eventId);
 	}
 	started = true;
@@ -572,14 +572,14 @@ void Raid::checkRaid()
 					RaidEvent* raidEvent = getNextRaidEvent();
 					if(raidEvent){
 							state = RAIDSTATE_EXECUTING;
-							nextEventEvent = g_game.addEvent(makeTask(raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, raidEvent)));
+							nextEventEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, raidEvent)));
 					}
 				}
 			}
 		}
 	}
 
-	checkRaidEvent = g_game.addEvent(makeTask(getInterval(), boost::bind(&Raid::checkRaid, this)));
+	checkRaidEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(getInterval(), boost::bind(&Raid::checkRaid, this)));
 }
 
 void Raid::executeRaidEvent(RaidEvent* raidEvent)
@@ -588,7 +588,7 @@ void Raid::executeRaidEvent(RaidEvent* raidEvent)
 		nextEvent++;
 		RaidEvent* newRaidEvent = getNextRaidEvent();
 		if(newRaidEvent){
-			nextEventEvent = g_game.addEvent(makeTask(newRaidEvent->getDelay()-raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
+			nextEventEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(newRaidEvent->getDelay()-raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
 		}
 		else{
 			resetRaid();
@@ -614,11 +614,11 @@ void Raid::resetRaid()
 void Raid::stopEvents()
 {
 	if(checkRaidEvent != 0){
-		g_game.stopEvent(checkRaidEvent);
+		Scheduler::getScheduler().stopEvent(checkRaidEvent);
 		checkRaidEvent = 0;
 	}
 	if(nextEventEvent != 0){
-		g_game.stopEvent(nextEventEvent);
+		Scheduler::getScheduler().stopEvent(nextEventEvent);
 		nextEventEvent = 0;
 	}
 }

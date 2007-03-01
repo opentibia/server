@@ -37,14 +37,10 @@
 #include "scheduler.h"
 
 class Creature;
-class Player;
 class Monster;
 class Npc;
 class CombatInfo;
 class Commands;
-class Task;
-class lessSchedTask;
-class SchedulerTask;
 
 enum stackPosType_t{
 	STACKPOS_NORMAL,
@@ -152,18 +148,6 @@ public:
 	  * \returns A Pointer to the player
 	  */
 	Player* getPlayerByName(const std::string& s);
-
-	/**
-	  * Starts an event.
-	  * \returns A unique identifier for the event
-	  */
-	uint32_t addEvent(SchedulerTask*);
-
-	/**
-	  * Stop an event.
-	  * \param eventid unique identifier to an event
-	  */
-	bool stopEvent(uint32_t eventid);
 
 	/**
 	  * Place Creature on the map without sending out events to the surrounding.
@@ -384,6 +368,15 @@ public:
 	uint8_t effect);
 
 	void startDecay(Item* item);
+	
+	Map* getMap() { return map;}
+	const Map* getMap() const { return map;}
+
+	int getLightHour() {return light_hour;}
+	int getLightLevel() {return lightlevel;}
+
+	void addCommandTag(std::string tag);
+	void resetCommandTag();
 
 protected:
 	std::vector<Player*> BufferedPlayers;
@@ -393,11 +386,6 @@ protected:
 	std::map<Item*, uint32_t> tradeItems;
 	
 	AutoList<Creature> listCreature;
-
-	OTSYS_THREAD_LOCKVAR eventLock;
-	OTSYS_THREAD_SIGNALVAR eventSignal;
-
-	static OTSYS_THREAD_RETURN eventThread(void *p);
 
 #ifdef __DEBUG_CRITICALSECTION__
 	static OTSYS_THREAD_RETURN monitorThread(void *p);
@@ -427,10 +415,6 @@ protected:
 	int light_hour;
 	int light_hour_delta;
 	
-	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
-	std::map<uint32_t, SchedulerTask*> eventIdMap;
-	uint32_t eventIdCount;
-
 	uint32_t maxPlayers;
 	uint32_t inFightTicks;
 	uint32_t exhaustionTicks;
@@ -442,79 +426,6 @@ protected:
 	Map* map;
 	
 	std::vector<std::string> commandTags;
-	void addCommandTag(std::string tag);
-	void resetCommandTag();
-
-	friend class Commands;
-	friend class Monster;
-	friend class Npc;
-	friend class GameState;
-	friend class Spawn;
-	friend class SpawnManager;
-	friend class LuaScriptInterface;
-	friend class Actions;
-	friend class AdminProtocol;
-	friend class Combat;
-	friend class AreaCombat;
-	friend class Action;
 };
-
-template<class ArgType>
-class TCallList : public SchedulerTask{
-public:
-	TCallList(
-		boost::function<bool(Game*, ArgType)> f1,
-		Task* f2,
-		std::list<ArgType>& call_list,
-		int64_t interval) :
-			_f1(f1), _f2(f2), _list(call_list), _interval(interval)
-	{
-		//
-	}
-	
-	virtual void operator()(Game* arg)
-	{
-		if(_eventid != 0){
-			bool ret = _f1(arg, _list.front());
-			_list.pop_front();
-
-			if(ret){
-				if(_list.empty()){
-					//callback function
-					if(_f2){
-						(_f2)(arg);
-						delete _f2;
-					}
-				}
-				else{
-					//fire next task
-					SchedulerTask* newTask = new TCallList(_f1, _f2, _list, _interval);
-					newTask->setTicks(_interval);
-					newTask->setEventId(this->getEventId());
-					arg->addEvent(newTask);
-				}
-			}
-		}
-	}
-
-private:
-	boost::function<bool(Game*, ArgType)> _f1;
-	Task* _f2;
-
-	std::list<ArgType> _list;
-	int64_t _interval;
-};
-
-template<class ArgType>
-SchedulerTask* makeTask(int64_t ticks,
-	boost::function<bool(Game*, ArgType)>* f1,
-	std::list<ArgType>& call_list,
-	int64_t interval,
-	Task* f2)
-{
-	TCallList<ArgType>* t = new TCallList<ArgType>(f1, f2, call_list, interval);
-	t->setTicks(ticks);
-	return t;
-}
 
 #endif

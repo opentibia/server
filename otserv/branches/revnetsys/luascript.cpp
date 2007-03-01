@@ -1740,7 +1740,7 @@ int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Tile* tile = g_game.map->getTile(pos);	
+	Tile* tile = g_game.getMap()->getTile(pos);	
 	Thing *thing = NULL;
 	
 	if(tile){
@@ -1791,7 +1791,7 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Tile* tile = g_game.map->getTile(pos);
+	Tile* tile = g_game.getMap()->getTile(pos);
 	if(!tile){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -1946,7 +1946,7 @@ int LuaScriptInterface::luaGetTilePzInfo(lua_State *L)
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
 	
-	Tile *tile = g_game.map->getTile(pos);
+	Tile *tile = g_game.getMap()->getTile(pos);
 	
 	if(tile){
 		if(tile->isPz()){
@@ -1970,7 +1970,7 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
 	
-	Tile *tile = g_game.map->getTile(pos);
+	Tile *tile = g_game.getMap()->getTile(pos);
 	if(tile){
 		if(HouseTile* houseTile = dynamic_cast<HouseTile*>(tile)){
 			House* house = houseTile->getHouse();
@@ -2342,7 +2342,7 @@ int LuaScriptInterface::luaGetWorldType(lua_State *L)
 int LuaScriptInterface::luaGetWorldTime(lua_State *L)
 {
 	//getWorldTime()
-	uint32_t time = g_game.light_hour;
+	uint32_t time = g_game.getLightHour();
 	lua_pushnumber(L, time);
 	return 1;
 }
@@ -2350,7 +2350,7 @@ int LuaScriptInterface::luaGetWorldTime(lua_State *L)
 int LuaScriptInterface::luaGetWorldLight(lua_State *L)
 {
 	//getWorldLight()
-	uint32_t level = g_game.lightlevel;
+	uint32_t level = g_game.getLightLevel();
 	lua_pushnumber(L, level);
 	lua_pushnumber(L, 0xD7);//color
 	return 2;
@@ -4252,7 +4252,7 @@ int LuaScriptInterface::luaAddEvent(lua_State *L)
 	script_interface->m_lastEventTimerId++;
 	script_interface->m_timerEvents[script_interface->m_lastEventTimerId] = eventDesc;
 	
-	g_game.addEvent(makeTask(delay, boost::bind(&LuaScriptInterface::executeTimerEvent, script_interface, script_interface->m_lastEventTimerId)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(delay, boost::bind(&LuaScriptInterface::executeTimerEvent, script_interface, script_interface->m_lastEventTimerId)));
 	
 	lua_pushnumber(L, script_interface->m_lastEventTimerId);
 	return 1;

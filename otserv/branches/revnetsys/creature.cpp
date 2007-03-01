@@ -146,7 +146,7 @@ bool Creature::canSeeCreature(const Creature* creature) const
 void Creature::addEventThink()
 {
 	if(eventCheck == 0){
-		eventCheck = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
+		eventCheck = Scheduler::getScheduler().addEvent(createSchedulerTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
 		//onStartThink();
 	}
 }
@@ -154,7 +154,7 @@ void Creature::addEventThink()
 void Creature::stopEventThink()
 {
 	if(eventCheck != 0){
-		g_game.stopEvent(eventCheck);
+		Scheduler::getScheduler().stopEvent(eventCheck);
 		eventCheck = 0;
 		//onStopThink();
 	}
@@ -274,14 +274,14 @@ void Creature::addEventWalk()
 		//std::cout << "addEventWalk()" << std::endl;
 
 		int64_t ticks = getEventStepTicks();
-		eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkWalk), getID())));
+		eventWalk = Scheduler::getScheduler().addEvent(createSchedulerTask(ticks, boost::bind(&Game::checkWalk, &g_game, getID())));
 	}
 }
 
 void Creature::stopEventWalk()
 {
 	if(eventWalk != 0){
-		g_game.stopEvent(eventWalk);
+		Scheduler::getScheduler().stopEvent(eventWalk);
 		eventWalk = 0;
 
 		if(!listWalkDir.empty()){

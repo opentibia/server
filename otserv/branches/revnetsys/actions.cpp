@@ -159,7 +159,7 @@ ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, 
 	}
 	
 	if(blockWalls && canUse(creature, toPos) == RET_TOOFARAWAY && 
-		!g_game.map->canThrowObjectTo(creaturePos, toPos)){
+		!g_game.getMap()->canThrowObjectTo(creaturePos, toPos)){
 			return RET_CANNOTTHROW;
 	}
 

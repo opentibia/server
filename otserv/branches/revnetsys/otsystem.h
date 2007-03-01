@@ -19,12 +19,11 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTTHREAD_H__
-#define __OTTHREAD_H__
+#ifndef __OTSYSTEM_H__
+#define __OTSYSTEM_H__
 
 #include "definitions.h"
 #include "logger.h"
-
 
 #include <list>
 #include <algorithm>
@@ -120,6 +119,32 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
 
 typedef int socklen_t;
 
+inline void PERROR(const char*a)
+{
+	LPVOID lpMsg;
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+		FORMAT_MESSAGE_FROM_SYSTEM | 
+		FORMAT_MESSAGE_IGNORE_INSERTS, NULL, 
+		GetLastError(), 
+		MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), 
+		(LPTSTR) &lpMsg, 0, NULL);  
+		fprintf(stderr,"%s:(%d)%s\n",a,GetLastError(),lpMsg); 
+		LocalFree(lpMsg); 
+};
+
+inline void SOCKET_PERROR(const char* a)
+{ 
+	LPVOID lpMsg; 
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+		FORMAT_MESSAGE_FROM_SYSTEM | 
+		FORMAT_MESSAGE_IGNORE_INSERTS, NULL, 
+		WSAGetLastError(), 
+		MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), 
+		(LPTSTR) &lpMsg, 0, NULL);  
+		fprintf(stderr,"%s:(%d)%s\n",a,WSAGetLastError(),lpMsg); 
+		LocalFree(lpMsg); 
+};
+
 #else  // #if defined WIN32 || defined __WINDOWS__
 
 #include <pthread.h>
@@ -202,6 +227,8 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
 #define closesocket close
 #endif
 
+#define PERROR(a) perror(a)
+#define SOCKET_PERROR(a) perror(a)
 
 #endif // #if defined WIN32 || defined __WINDOWS__
 
@@ -282,4 +309,4 @@ public:
 
 #endif //__DEBUG_CRITICALSECTION__
 
-#endif // #ifndef __OTTHREAD_H__
+#endif // #ifndef __OTSYSTEM_H__

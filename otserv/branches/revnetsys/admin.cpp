@@ -439,7 +439,7 @@ bool AdminProtocol::adminCommandCloseServer()
 		return false;
 	}
 	
-	if(!g_game.map->saveMap("")){
+	if(!g_game.getMap()->saveMap("")){
 		return false;
 	}
 	

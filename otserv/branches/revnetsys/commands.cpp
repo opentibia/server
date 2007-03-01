@@ -642,7 +642,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		Houses::getInstance().payHouses();
 	}
 	
-	if(!game->map->saveMap("")){
+	if(!game->getMap()->saveMap("")){
 		if(player)
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving map.");
 	}
@@ -1186,7 +1186,7 @@ bool Commands::forceRaid(Creature* creature, const std::string& cmd, const std::
 	}
 
 	raid->setState(RAIDSTATE_EXECUTING);
-	g_game.addEvent(makeTask(event->getDelay(), boost::bind(&Raid::executeRaidEvent, raid, event)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(event->getDelay(), boost::bind(&Raid::executeRaidEvent, raid, event)));
 
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
 	return true;

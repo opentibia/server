@@ -3,6 +3,7 @@
 #endif
 #define __OTSERV_OTCP_H__
 
+#undef __USE_OTPCH__
 
 #ifdef __USE_OTPCH__
 

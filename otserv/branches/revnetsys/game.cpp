@@ -67,30 +67,22 @@ extern Spells* g_spells;
 
 Game::Game()
 {
-	eventIdCount = 1000;
-
 	gameState = GAME_STATE_NORMAL;
 	map = NULL;
 	worldType = WORLD_TYPE_PVP;
 
 	OTSYS_THREAD_LOCKVARINIT(gameLock);
-	OTSYS_THREAD_LOCKVARINIT(eventLock);
 	OTSYS_THREAD_LOCKVARINIT(AutoID::autoIDLock);
 
 #if defined __EXCEPTION_TRACER__
 	OTSYS_THREAD_LOCKVARINIT(maploadlock);
 #endif
 
-	OTSYS_THREAD_SIGNALVARINIT(eventSignal);
-	BufferedPlayers.clear();
-
-	OTSYS_CREATE_THREAD(eventThread, this);
-
 #ifdef __DEBUG_CRITICALSECTION__
 	OTSYS_CREATE_THREAD(monitorThread, this);
 #endif
 
-	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 
 	int daycycle = 3600;
 	//(1440 minutes/day)/(3600 seconds/day)*10 seconds event interval
@@ -102,7 +94,7 @@ Game::Game()
 	lightlevel = LIGHT_LEVEL_DAY;
 	light_state = LIGHT_STATE_DAY;
 
-	addEvent(makeTask(10000, boost::bind(&Game::checkLight, this, 10000)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(10000, boost::bind(&Game::checkLight, this, 10000)));
 }
 
 Game::~Game()
@@ -197,125 +189,6 @@ OTSYS_THREAD_RETURN Game::monitorThread(void *p)
 	}
 }
 #endif
-
-OTSYS_THREAD_RETURN Game::eventThread(void *p)
-{
-#if defined __EXCEPTION_TRACER__
-	ExceptionHandler eventExceptionHandler;
-	eventExceptionHandler.InstallHandler();
-#endif
-
-  Game* _this = (Game*)p;
-
-  // basically what we do is, look at the first scheduled item,
-  // and then sleep until it's due (or if there is none, sleep until we get an event)
-  // of course this means we need to get a notification if there are new events added
-  while (true)
-  {
-#ifdef __DEBUG__EVENTSCHEDULER__
-    std::cout << "schedulercycle start..." << std::endl;
-#endif
-
-    SchedulerTask* task = NULL;
-		bool runtask = false;
-
-    // check if there are events waiting...
-    OTSYS_THREAD_LOCK(_this->eventLock, "eventThread()")
-
-		int ret;
-    if (_this->eventList.size() == 0) {
-      // unlock mutex and wait for signal
-      ret = OTSYS_THREAD_WAITSIGNAL(_this->eventSignal, _this->eventLock);
-    } else {
-      // unlock mutex and wait for signal or timeout
-      ret = OTSYS_THREAD_WAITSIGNAL_TIMED(_this->eventSignal, _this->eventLock, _this->eventList.top()->getCycle());
-    }
-    // the mutex is locked again now...
-    if (ret == OTSYS_THREAD_TIMEOUT) {
-      // ok we had a timeout, so there has to be an event we have to execute...
-#ifdef __DEBUG__EVENTSCHEDULER__
-      std::cout << "event found at " << OTSYS_TIME() << " which is to be scheduled at: " << _this->eventList.top()->getCycle() << std::endl;
-#endif
-      task = _this->eventList.top();
-      _this->eventList.pop();
-		}
-
-		if(task) {
-			std::map<uint32_t, SchedulerTask*>::iterator it = _this->eventIdMap.find(task->getEventId());
-			if(it != _this->eventIdMap.end()) {
-				_this->eventIdMap.erase(it);
-				runtask = true;
-			}
-		}
-
-		OTSYS_THREAD_UNLOCK(_this->eventLock, "eventThread()");
-    if (task) {
-			if(runtask) {
-				(*task)(_this);
-			}
-			delete task;
-    }
-  }
-#if defined __EXCEPTION_TRACER__
-	eventExceptionHandler.RemoveHandler();
-#endif
-
-}
-
-uint32_t Game::addEvent(SchedulerTask* event)
-{
-	bool do_signal = false;
-	OTSYS_THREAD_LOCK(eventLock, "addEvent()");
-
-	if(event->getEventId() == 0) {
-		++eventIdCount;
-		event->setEventId(eventIdCount);
-	}
-
-#ifdef __DEBUG__EVENTSCHEDULER__
-		std::cout << "addEvent - " << event->getEventId() << std::endl;
-#endif
-
-	eventIdMap[event->getEventId()] = event;
-
-	bool isEmpty = eventList.empty();
-	eventList.push(event);
-
-	if(isEmpty || *event < *eventList.top())
-		do_signal = true;
-
-	OTSYS_THREAD_UNLOCK(eventLock, "addEvent()");
-
-	if (do_signal)
-		OTSYS_THREAD_SIGNAL_SEND(eventSignal);
-
-	return event->getEventId();
-}
-
-bool Game::stopEvent(uint32_t eventid)
-{
-	if(eventid == 0)
-		return false;
-
-	OTSYS_THREAD_LOCK(eventLock, "stopEvent()")
-
-	std::map<uint32_t, SchedulerTask*>::iterator it = eventIdMap.find(eventid);
-	if(it != eventIdMap.end()) {
-
-#ifdef __DEBUG__EVENTSCHEDULER__
-		std::cout << "stopEvent - eventid: " << eventid << "/" << it->second->getEventId() << std::endl;
-#endif
-
-		//it->second->setEventId(0); //invalidate the event
-		eventIdMap.erase(it);
-
-		OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()");
-		return true;
-	}
-
-	OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()");
-	return false;
-}
 
 /*****************************************************************************/
 
@@ -645,7 +518,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 
 	if(thing && toCylinder){
 		if(Creature* movingCreature = thing->getCreature()){
-			addEvent(makeTask(2000, boost::bind(&Game::moveCreature, this, player->getID(),
+			Scheduler::getScheduler().addEvent(createSchedulerTask(2000, boost::bind(&Game::moveCreature, this, player->getID(),
 				movingCreature->getID(), toCylinder->getPosition())));
 		}
 		else if(Item* movingItem = thing->getItem()){
@@ -3193,7 +3066,7 @@ void Game::checkDecay(int32_t interval)
 		}
 	}
 
-	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 	flushSendBuffers();
 }
 
@@ -3201,7 +3074,7 @@ void Game::checkLight(int t)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkLight()");
 	
-	addEvent(makeTask(10000, boost::bind(&Game::checkLight, this, 10000)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(10000, boost::bind(&Game::checkLight, this, 10000)));
 	
 	light_hour = light_hour + light_hour_delta;
 	if(light_hour > 1440)

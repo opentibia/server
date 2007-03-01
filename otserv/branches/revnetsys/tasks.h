@@ -32,11 +32,7 @@ public:
 	void operator()(){
 		m_f();
 	}
-	
-	static Task* createTask(boost::function<void (void)> f){
-		return new Task(f);
-	}
-	
+		
 protected:
 	
 	Task(boost::function<void (void)> f){
@@ -44,7 +40,13 @@ protected:
 	}
 	
 	boost::function<void (void)> m_f;
+	
+	friend Task* createTask(boost::function<void (void)>);
 };
+
+inline Task* createTask(boost::function<void (void)> f){
+	return new Task(f);
+}
 
 class Dispatcher{
 public:
@@ -67,4 +69,6 @@ protected:
 	static Dispatcher c_dispatcher;
 	
 };
+
+
 #endif

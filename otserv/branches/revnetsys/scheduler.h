@@ -22,6 +22,7 @@
 #define __OTSERV_SCHEDULER_H__
 
 #include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <vector>
 #include <queue>
 #include <set>
@@ -33,10 +34,6 @@ class SchedulerTask : public Task{
 public:
 	~SchedulerTask() {}
 		
-	static SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f){
-		return new SchedulerTask(delay, f);
-	}
-	
 	void setEventId(uint32_t eventid) {m_eventid = eventid;}
 	uint32_t getEventId() const {return m_eventid;}
 	
@@ -56,7 +53,13 @@ protected:
 	
 	uint64_t m_cycle;
 	uint32_t m_eventid;
+	
+	friend SchedulerTask* createSchedulerTask(uint32_t, boost::function<void (void)>);
 };
+
+inline SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f){
+	return new SchedulerTask(delay, f);
+}
 
 class lessSchedTask : public std::binary_function<SchedulerTask*&, SchedulerTask*&, bool>{
 public:
@@ -90,5 +93,6 @@ protected:
 	typedef std::set<uint32_t> EventIdSet;
 	EventIdSet m_eventIds;
 };
+
 
 #endif
