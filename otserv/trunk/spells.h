@@ -116,6 +116,8 @@ public:
 	int32_t getManaCost(const Player* player) const;
 	int32_t getSoulCost(const Player* player) const;
 
+	virtual bool isInstant() const = 0;
+
 	static ReturnValue CreateIllusion(Creature* creature, const Outfit_t outfit, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, const std::string& name, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, uint32_t itemId, int32_t time);
@@ -164,6 +166,7 @@ public:
 	//scripting
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
+	virtual bool isInstant() const { return true;}
 	bool getHasParam() const { return hasParam;}
 
 protected:	
@@ -244,8 +247,9 @@ public:
 	//scripting
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 	
+	virtual bool isInstant() const { return false;}
 	uint32_t getRuneItemId(){return runeId;};
-	
+
 protected:
 	virtual std::string getScriptEventName();
 	

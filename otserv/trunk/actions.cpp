@@ -302,7 +302,10 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
 		if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
-			player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+			if(!action->hasOwnErrorHandler()){
+				player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+			}
+
 			return false;
 		}
 

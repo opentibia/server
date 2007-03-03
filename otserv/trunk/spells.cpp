@@ -481,7 +481,11 @@ bool Spell::playerSpellCheck(const Player* player) const
 
 		if(player->hasCondition(CONDITION_EXHAUSTED)){
 			player->sendCancelMessage(RET_YOUAREEXHAUSTED);
-			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+	
+			if(isInstant()){
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			}
+
 			return false;
 		}
 
