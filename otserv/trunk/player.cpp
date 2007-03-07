@@ -2893,7 +2893,7 @@ void Player::changeMana(int32_t manaChange)
 void Player::changeSoul(int32_t soulChange)
 {
 	if(soulChange > 0){
-		soul += std::min(soulChange, soulMax - soulChange);
+		soul += std::min(soulChange, soulMax - soul);
 	}
 	else{
 		soul = std::max((int32_t)0, soul + soulChange);
