@@ -483,12 +483,9 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 	
 		uint32_t cid = env->addThing(player);
 
-		LuaVariant* pVar = new LuaVariant(var);
-		uint32_t variant = env->addVariant(pVar);
-
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
-		lua_pushnumber(L, variant);
+		m_scriptInterface->pushVariant(L, var);
 
 		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();

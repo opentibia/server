@@ -76,12 +76,6 @@ void ScriptEnviroment::resetEnv()
 	m_interface = NULL;
 	m_localMap.clear();
 
-	for(VariantVector::iterator it = m_variants.begin(); it != m_variants.end(); ++it){
-		delete *it;
-	}
-	
-	m_variants.clear();
-
 	m_realPos.x = 0;
 	m_realPos.y = 0;
 	m_realPos.z = 0;
@@ -166,17 +160,6 @@ uint32_t ScriptEnviroment::addThing(Thing* thing)
 	else{
 		return 0;
 	}
-}
-
-uint32_t ScriptEnviroment::addVariant(const LuaVariant* variant)
-{
-	m_variants.push_back(variant);
-	return m_variants.size() - 1;
-}
-
-const LuaVariant* ScriptEnviroment::getVariant(uint32_t index)
-{
-	return m_variants[index];
 }
 	
 Thing* ScriptEnviroment::getThingByUID(uint32_t uid)
@@ -619,6 +602,25 @@ int32_t LuaScriptInterface::callFunction(uint32_t nParams)
 	return result;
 }
 
+void LuaScriptInterface::pushVariant(lua_State *L, const LuaVariant& var)
+{
+	lua_newtable(L);
+	setField(L, "type", var.type);
+
+	switch(var.type){
+		case VARIANT_NUMBER: setField(L, "number", var.number); break;
+		case VARIANT_STRING: setField(L, "string", var.text); break;
+		case VARIANT_TARGETPOSITION:
+		case VARIANT_POSITION:
+		{
+				lua_pushstring(L, "pos");
+				pushPosition(L, var.pos);
+				lua_settable(L, -3);
+				break;
+		}
+	}
+}
+
 void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, uint32_t thingid)
 {
 	lua_newtable(L);
@@ -659,6 +661,15 @@ void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, uint32_t thingid)
 	}
 }
 
+void LuaScriptInterface::pushPosition(lua_State *L, const PositionEx& position)
+{
+	lua_newtable(L);
+	setField(L, "z", position.z);
+	setField(L, "y", position.y);
+	setField(L, "x", position.x);
+	setField(L, "stackpos", position.stackpos);
+}
+
 void LuaScriptInterface::pushPosition(lua_State *L, const Position& position, uint32_t stackpos)
 {
 	lua_newtable(L);
@@ -666,6 +677,46 @@ void LuaScriptInterface::pushPosition(lua_State *L, const Position& position, ui
 	setField(L, "y", position.y);
 	setField(L, "x", position.x);
 	setField(L, "stackpos", stackpos);
+}
+
+LuaVariant LuaScriptInterface::popVariant(lua_State *L)
+{
+	uint32_t type = getField(L, "type");
+
+	LuaVariant var;
+	var.type = (LuaVariantType_t)type;
+
+	switch(type){
+		case VARIANT_NUMBER: var.number = getField(L, "number"); break;
+		case VARIANT_STRING: var.text = getField(L, "string"); break;
+		case VARIANT_POSITION:
+		case VARIANT_TARGETPOSITION:
+		{
+			lua_pushstring(L, "pos");
+			lua_gettable(L, -2);
+			popPosition(L, var.pos);
+			lua_pop(L, 1); //table
+			break;
+		}
+
+		default:
+		{
+			var.type = VARIANT_NONE;
+			break;
+		}
+	}
+
+	return var;
+}
+
+void LuaScriptInterface::popPosition(lua_State *L, PositionEx& position)
+{
+	position.z = getField(L, "z");
+	position.y = getField(L, "y");
+	position.x = getField(L, "x");
+	position.stackpos = getField(L, "stackpos");
+
+	lua_pop(L, 1); //table
 }
 
 void LuaScriptInterface::popPosition(lua_State *L, Position& position, uint32_t& stackpos)
@@ -705,13 +756,20 @@ int32_t LuaScriptInterface::getField(lua_State *L, const char *key)
 	return result;
 }
 
-void LuaScriptInterface::setField(lua_State *L, const char *index, uint32_t val)
+void LuaScriptInterface::setField(lua_State *L, const char* index, uint32_t val)
 {
 	lua_pushstring(L, index);
 	lua_pushnumber(L, (double)val);
 	lua_settable(L, -3);
 }
 	
+void LuaScriptInterface::setField(lua_State *L, const char* index, const std::string& val)
+{
+	lua_pushstring(L, index);
+	lua_pushstring(L, val.c_str());
+	lua_settable(L, -3);
+}
+
 void LuaScriptInterface::registerFunctions()
 {
 	//lua_register(L, "name", C_function);
@@ -994,10 +1052,26 @@ void LuaScriptInterface::registerFunctions()
 	//doConvinceCreature(cid, target)
 	lua_register(m_luaState, "doConvinceCreature", LuaScriptInterface::luaDoConvinceCreature);
 
+	//numberToVariant(number)
+	lua_register(m_luaState, "numberToVariant", LuaScriptInterface::luaNumberToVariant);
+
+	//stringToVariant(string)
+	lua_register(m_luaState, "stringToVariant", LuaScriptInterface::luaStringToVariant);
+
+	//positionToVariant(pos)
+	lua_register(m_luaState, "positionToVariant", LuaScriptInterface::luaPositionToVariant);
+
+	//targetPositionToVariant(pos)
+	lua_register(m_luaState, "targetPositionToVariant", LuaScriptInterface::luaTargetPositionToVariant);
+
 	//variantToNumber(var)
 	lua_register(m_luaState, "variantToNumber", LuaScriptInterface::luaVariantToNumber);
+
 	//variantToString(var)
 	lua_register(m_luaState, "variantToString", LuaScriptInterface::luaVariantToString);
+
+	//variantToPosition(var)
+	lua_register(m_luaState, "variantToPosition", LuaScriptInterface::luaVariantToPosition);
 
 	//doChangeSpeed(cid, delta)
 	lua_register(m_luaState, "doChangeSpeed", LuaScriptInterface::luaDoChangeSpeed);
@@ -2937,12 +3011,10 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 	//doCombat(cid, combat, param)
 
 	ScriptEnviroment* env = getScriptEnv();
-
-	uint32_t variant = (uint32_t)popNumber(L);
+	
+	LuaVariant var = popVariant(L);
 	uint32_t combatId = (uint32_t)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
-
-	const LuaVariant* var = env->getVariant(variant);
 	
 	Creature* creature = NULL;
 	
@@ -2964,16 +3036,16 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 		return 1;
 	}
 
-	if(!var){
+	if(var.type == VARIANT_NONE){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_VARIANT_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
 
-	switch(var->type){
+	switch(var.type){
 		case VARIANT_NUMBER:
 		{
-			Creature* target = g_game.getCreatureByID(var->number);
+			Creature* target = g_game.getCreatureByID(var.number);
 
 			if(!target){
 				lua_pushnumber(L, LUA_ERROR);
@@ -2992,25 +3064,25 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 
 		case VARIANT_POSITION:
 		{
-			combat->doCombat(creature, var->pos);
+			combat->doCombat(creature, var.pos);
 			break;
 		}
 
 		case VARIANT_TARGETPOSITION:
 		{
 			if(combat->hasArea()){
-				combat->doCombat(creature, var->pos);
+				combat->doCombat(creature, var.pos);
 			}
 			else{
-				combat->postCombatEffects(creature, var->pos);
-				g_game.addMagicEffect(var->pos, NM_ME_PUFF);
+				combat->postCombatEffects(creature, var.pos);
+				g_game.addMagicEffect(var.pos, NM_ME_PUFF);
 			}
 			break;
 		}
 
 		case VARIANT_STRING:
 		{
-			Player* target = g_game.getPlayerByName(var->text);
+			Player* target = g_game.getPlayerByName(var.text);
 			if(!target){
 				lua_pushnumber(L, LUA_ERROR);
 				return 1;
@@ -3442,19 +3514,62 @@ int LuaScriptInterface::luaDoConvinceCreature(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaNumberToVariant(lua_State *L)
+{
+	//numberToVariant(number)
+
+	LuaVariant var;
+	var.type = VARIANT_NUMBER;
+	var.number = popNumber(L);
+
+	LuaScriptInterface::pushVariant(L, var);
+	return 1;
+}
+
+int LuaScriptInterface::luaStringToVariant(lua_State *L)
+{
+	//stringToVariant(string)
+	LuaVariant var;
+	var.type = VARIANT_STRING;
+	var.text = popString(L);
+
+	LuaScriptInterface::pushVariant(L, var);
+	return 1;
+}
+
+int LuaScriptInterface::luaPositionToVariant(lua_State *L)
+{
+	//positionToVariant(pos)
+
+	LuaVariant var;
+	var.type = VARIANT_POSITION;
+	popPosition(L, var.pos);
+
+	LuaScriptInterface::pushVariant(L, var);
+	return 1;
+}
+
+int LuaScriptInterface::luaTargetPositionToVariant(lua_State *L)
+{
+	//targetPositionToVariant(pos)
+
+	LuaVariant var;
+	var.type = VARIANT_TARGETPOSITION;
+	popPosition(L, var.pos);
+
+	LuaScriptInterface::pushVariant(L, var);
+	return 1;
+}
+
 int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 {
 	//variantToNumber(var)
 
-	ScriptEnviroment* env = getScriptEnv();
-
-	uint32_t variant = popNumber(L);
-	const LuaVariant* var = env->getVariant(variant);
+	LuaVariant var = popVariant(L);
 
 	uint32_t number = 0;
-
-	if(var && var->type == VARIANT_NUMBER){
-		number = var->number;
+	if(var.type == VARIANT_NUMBER){
+		number = var.number;
 	}
 
 	lua_pushnumber(L, number);
@@ -3465,18 +3580,29 @@ int LuaScriptInterface::luaVariantToString(lua_State *L)
 {
 	//variantToString(var)
 
-	ScriptEnviroment* env = getScriptEnv();
-
-	uint32_t variant = popNumber(L);
-	const LuaVariant* var = env->getVariant(variant);
+	LuaVariant var = popVariant(L);
 
 	std::string text = "";
-
-	if(var && var->type == VARIANT_STRING){
-		text = var->text;
+	if(var.type == VARIANT_STRING){
+		text = var.text;
 	}
 
 	lua_pushstring(L, text.c_str());
+	return 1;
+}
+
+int LuaScriptInterface::luaVariantToPosition(lua_State *L)
+{
+	//luaVariantToPosition(var)
+
+	LuaVariant var = popVariant(L);
+
+	PositionEx pos(0, 0, 0, 0);
+	if(var.type == VARIANT_POSITION || var.type == VARIANT_TARGETPOSITION){
+		pos = var.pos;
+	}
+
+	pushPosition(L, pos, pos.stackpos);
 	return 1;
 }
 

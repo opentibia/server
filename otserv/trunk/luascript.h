@@ -70,12 +70,13 @@ struct LuaVariant{
 		pos.x = 0;
 		pos.y = 0;
 		pos.z = 0;
+		pos.stackpos = 0;
 		number = 0;
 	}
 
 	LuaVariantType_t type;
 	std::string text;
-	Position pos;
+	PositionEx pos;
 	uint32_t number;
 };
 
@@ -109,8 +110,6 @@ public:
 
 	static void addUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
-	uint32_t addVariant(const LuaVariant* variant);
-	const LuaVariant* getVariant(uint32_t index);
 	
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
@@ -163,9 +162,6 @@ private:
 	//item/creature map
 	int32_t m_lastUID;
 	ThingMap m_localMap;
-	
-	//variant vector
-	VariantVector m_variants;
 	
 	//area map
 	uint32_t m_lastAreaId;
@@ -276,15 +272,20 @@ public:
 
 	//push/pop common structures
 	static void pushThing(lua_State *L, Thing* thing, uint32_t thingid);
+	static void pushVariant(lua_State *L, const LuaVariant& var);
+	static void pushPosition(lua_State *L, const PositionEx& position);
 	static void pushPosition(lua_State *L, const Position& position, uint32_t stackpos);
-
+		
+	static LuaVariant popVariant(lua_State *L);
+	static void popPosition(lua_State *L, PositionEx& position);
 	static void popPosition(lua_State *L, Position& position, uint32_t& stackpos);
 	static uint32_t popNumber(lua_State *L);
 	static double popFloatNumber(lua_State *L);
 	static const char* popString(lua_State *L);
 
 	static int32_t getField(lua_State *L, const char *key);
-	static void setField(lua_State *L, const char *index, uint32_t val);
+	static void setField(lua_State *L, const char* index, uint32_t val);
+	static void setField(lua_State *L, const char* index, const std::string& val);
 
 protected:
 	virtual bool closeState();
@@ -445,8 +446,14 @@ protected:
 	static int luaDoChallengeCreature(lua_State *L);
 	static int luaDoConvinceCreature(lua_State *L);
 
+	static int luaNumberToVariant(lua_State *L);
+	static int luaStringToVariant(lua_State *L);
+	static int luaPositionToVariant(lua_State *L);
+	static int luaTargetPositionToVariant(lua_State *L);
+
 	static int luaVariantToNumber(lua_State *L);
 	static int luaVariantToString(lua_State *L);
+	static int luaVariantToPosition(lua_State *L);
 
 	static int luaDoChangeSpeed(lua_State *L);
 
@@ -503,4 +510,4 @@ private:
 	std::string m_interfaceName;
 };
 
-#endif  // #ifndef __LUASCRIPT_H__
+#endif
