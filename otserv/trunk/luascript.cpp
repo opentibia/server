@@ -687,15 +687,24 @@ LuaVariant LuaScriptInterface::popVariant(lua_State *L)
 	var.type = (LuaVariantType_t)type;
 
 	switch(type){
-		case VARIANT_NUMBER: var.number = getField(L, "number"); break;
-		case VARIANT_STRING: var.text = getField(L, "string"); break;
+		case VARIANT_NUMBER:
+		{
+			var.number = getField(L, "number");
+			break;
+		}
+
+		case VARIANT_STRING:
+		{
+			var.text = getField(L, "string");
+			break;
+		}
+
 		case VARIANT_POSITION:
 		case VARIANT_TARGETPOSITION:
 		{
 			lua_pushstring(L, "pos");
 			lua_gettable(L, -2);
 			popPosition(L, var.pos);
-			lua_pop(L, 1); //table
 			break;
 		}
 
@@ -705,7 +714,9 @@ LuaVariant LuaScriptInterface::popVariant(lua_State *L)
 			break;
 		}
 	}
-
+	
+	lua_pop(L, 1); //table
+	
 	return var;
 }
 
