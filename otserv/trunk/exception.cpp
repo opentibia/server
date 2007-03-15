@@ -48,12 +48,12 @@ OTSYS_THREAD_LOCKVAR maploadlock;
 
 #if defined WIN32 || defined __WINDOWS__
 EXCEPTION_DISPOSITION
- __cdecl _SEHHandler(
-     struct _EXCEPTION_RECORD *ExceptionRecord,
-     void * EstablisherFrame,
-     struct _CONTEXT *ContextRecord,
-     void * DispatcherContext
-     );
+__cdecl _SEHHandler(
+	struct _EXCEPTION_RECORD *ExceptionRecord,
+	void * EstablisherFrame,
+	struct _CONTEXT *ContextRecord,
+	void * DispatcherContext
+);
 void printPointer(std::ostream* output,unsigned long p);
 #endif
 
@@ -120,12 +120,12 @@ bool ExceptionHandler::RemoveHandler(){
 
 #if defined WIN32 || defined __WINDOWS__
 EXCEPTION_DISPOSITION
- __cdecl _SEHHandler(
-     struct _EXCEPTION_RECORD *ExceptionRecord,
-     void * EstablisherFrame,
-     struct _CONTEXT *ContextRecord,
-     void * DispatcherContext
-     ){
+__cdecl _SEHHandler(
+	struct _EXCEPTION_RECORD *ExceptionRecord,
+	void * EstablisherFrame,
+	struct _CONTEXT *ContextRecord,
+	void * DispatcherContext
+	){
 	//
 	unsigned long *esp;
 	unsigned long *next_ret;
@@ -315,39 +315,40 @@ bool ExceptionHandler::LoadMap(){
 	if(maploaded == true){
 		return false;
 	}
+	functionMap.clear();
 	installed = false;
 	//load map file if exists
-    char line[1024];
+	char line[1024];
 	FILE* input = fopen("otserv.map", "r");
 	min_off = 0xFFFFFF;
 	max_off = 0;
 	long n = 0;
-    if(!input){
+	if(!input){
 		std::cout << "Failed loading symbols. otserv.map not found. " << std::endl;
 		std::cout << "Go to http://otfans.net/showthread.php?t=4718 for more info." << std::endl;
 		system("pause");
 		exit(1);
-        return false;
+		return false;
 	}
 	
-    //read until found .text           0x00401000
-    while(fgets(line, 1024, input)){
+	//read until found .text           0x00401000
+	while(fgets(line, 1024, input)){
 		if(memcmp(line,".text",5) == 0)
 			break;
 	}
-    
+
 	if(feof(input)){
 		return false;
 	}
 	
 	char tofind[] = "0x";
-    char lib[] = ".a(";
-    while(fgets(line, 1024, input)){
+	char lib[] = ".a(";
+	while(fgets(line, 1024, input)){
 		char* pos = strstr(line, lib);
-        if(pos)
-        	break;	//not load libs
+		if(pos)
+			break; //not load libs
 		pos = strstr(line, tofind);
-        if(pos){
+		if(pos){
 			//read hex offset
 			char hexnumber[12];
 			strncpy(hexnumber, pos, 10);
@@ -376,8 +377,8 @@ bool ExceptionHandler::LoadMap(){
 				n++;
 			}
 		}
-    }
-    // close file
+	}
+	// close file
 	fclose(input);
 	//std::cout << "Loaded " << n << " stack symbols" <<std::endl;
 	maploaded = true;

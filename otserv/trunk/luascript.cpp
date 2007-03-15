@@ -618,7 +618,9 @@ void LuaScriptInterface::pushVariant(lua_State *L, const LuaVariant& var)
 				lua_settable(L, -3);
 				break;
 		}
-	}
+		case VARIANT_NONE:
+			break;
+ 	}
 }
 
 void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, uint32_t thingid)
@@ -831,6 +833,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerGuildNick", LuaScriptInterface::luaGetPlayerGuildNick);
 	//getPlayerSex(cid)
 	lua_register(m_luaState, "getPlayerSex", LuaScriptInterface::luaGetPlayerSex);
+	//getPlayerLookDir(cid)
+	lua_register(m_luaState, "getPlayerLookDir", LuaScriptInterface::luaGetPlayerLookDir);
 	//getPlayerGUID(cid)
 	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
 	//getPlayerFlagValue(cid, flag)
@@ -1217,6 +1221,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoSex:
 			value = player->getSex();
 			break;
+		case PlayerInfoLookDirection:
+			value = player->getDirection();
+			break;
 		case PlayerInfoTown:
 			value = player->getTown();
 			break;
@@ -1294,6 +1301,9 @@ int LuaScriptInterface::luaGetPlayerGuildNick(lua_State *L){
 
 int LuaScriptInterface::luaGetPlayerSex(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoSex);}
+
+int LuaScriptInterface::luaGetPlayerLookDir(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoLookDirection);}
 
 int LuaScriptInterface::luaGetPlayerTown(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoTown);}

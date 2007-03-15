@@ -406,7 +406,7 @@ void Player::updateInventoryWeigth()
 {
 	inventoryWeight = 0.00;
 	
-	if(!hasFlag(PlayerFlag_HasInfinateCapacity)){
+	if(!hasFlag(PlayerFlag_HasInfiniteCapacity)){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = getInventoryItem((slots_t)i);
 			if(item){
@@ -1859,7 +1859,7 @@ bool Player::hasCapacity(const Item* item, uint32_t count) const
 		return false;
 	}
 
-	if(!hasFlag(PlayerFlag_HasInfinateCapacity) && item->getTopParent() != this){
+	if(!hasFlag(PlayerFlag_HasInfiniteCapacity) && item->getTopParent() != this){
 		double itemWeight = 0;
 
 		if(item->isStackable()){

@@ -319,7 +319,7 @@ enum PlayerFlags{
 	PlayerFlag_CanEditHouses,
 	PlayerFlag_CannotBeBanned,
 	PlayerFlag_CannotBePushed,
-	PlayerFlag_HasInfinateCapacity,
+	PlayerFlag_HasInfiniteCapacity,
 	PlayerFlag_CanPushAllCreatures,
 	PlayerFlag_CanTalkRedPrivate,
 	PlayerFlag_CanTalkRedChannel,

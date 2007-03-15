@@ -171,7 +171,7 @@ public:
 	void removeMessageBuffer();
 
 	double getCapacity() const {
-		if(!hasFlag(PlayerFlag_HasInfinateCapacity)){
+		if(!hasFlag(PlayerFlag_HasInfiniteCapacity)){
 			return capacity;
 		}
 		else

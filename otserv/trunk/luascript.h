@@ -199,6 +199,7 @@ enum PlayerInfo_t{
 	PlayerInfoGuildRank,
 	PlayerInfoGuildNick,
 	PlayerInfoSex,
+	PlayerInfoLookDirection,
 	PlayerInfoTown,
 	PlayerInfoGUID
 };
@@ -379,6 +380,7 @@ protected:
 	static int luaGetPlayerGuildRank(lua_State *L);
 	static int luaGetPlayerGuildNick(lua_State *L);
 	static int luaGetPlayerSex(lua_State *L);
+	static int luaGetPlayerLookDir(lua_State *L);
 	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerFlagValue(lua_State *L);
 
