@@ -4368,12 +4368,6 @@ int LuaScriptInterface::luaAddEvent(lua_State *L)
 	//addEvent(callback, delay, parameter)	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	if(env->getCallbackId() != 0){
-		reportError(__FUNCTION__, "This function cannot be used in combat callbacks.");
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-	
 	LuaScriptInterface* script_interface = env->getScriptInterface();
 	if(!script_interface){
 		reportError(__FUNCTION__, "No valid script interface!");
