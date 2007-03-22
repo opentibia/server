@@ -680,7 +680,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) 
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		lua_State* L = m_scriptInterface->getLuaState();
 	
-		if(!env->setCallbackId(m_scriptId))
+		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
 			return;
 		
 		uint32_t cid = env->addThing(player);
@@ -743,7 +743,7 @@ void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		lua_State* L = m_scriptInterface->getLuaState();
 	
-		if(!env->setCallbackId(m_scriptId))
+		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
 			return;
 		
 		uint32_t cid = 0;
@@ -776,7 +776,7 @@ void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		lua_State* L = m_scriptInterface->getLuaState();
 	
-		if(!env->setCallbackId(m_scriptId))
+		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
 			return;
 		
 		uint32_t cid = 0;

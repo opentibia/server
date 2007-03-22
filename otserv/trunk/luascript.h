@@ -95,7 +95,7 @@ public:
 
 	void setScriptId(int32_t scriptId, LuaScriptInterface* scriptInterface)
 		{m_scriptId = scriptId; m_interface = scriptInterface;}
-	bool setCallbackId(int32_t callbackId);
+	bool setCallbackId(int32_t callbackId, LuaScriptInterface* scriptInterface);
 	void setEventDesc(const std::string& desc) {m_eventdesc = desc;}
 	
 	std::string getEventDesc() {return m_eventdesc;}

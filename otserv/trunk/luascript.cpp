@@ -81,10 +81,11 @@ void ScriptEnviroment::resetEnv()
 	m_realPos.z = 0;
 }
 
-bool ScriptEnviroment::setCallbackId(int32_t callbackId)
+bool ScriptEnviroment::setCallbackId(int32_t callbackId, LuaScriptInterface* scriptInterface)
 {
 	if(m_callbackId == 0){
 		m_callbackId = callbackId;
+		m_interface = scriptInterface;
 		return true;
 	}
 	else{
