@@ -939,7 +939,10 @@ std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end)
 				tmp += " " + *it;
 				++it;
 			}
-			tmp.erase(tmp.length() - 1);
+
+			if(tmp.length() > 0 && tmp[tmp.length() - 1] == '"'){
+				tmp.erase(tmp.length() - 1);
+			}
 		}
 		return tmp;
 	}
