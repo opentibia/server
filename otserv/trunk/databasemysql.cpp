@@ -111,9 +111,10 @@ bool DatabaseMySQL::executeQuery(DBQuery &q)
 	const char* querytext = s.c_str();
 	int querylength = s.length(); //strlen(querytext);
 	// Execute the query
-	if(int error = mysql_real_query(&m_handle, querytext, querylength))
+	if(mysql_real_query(&m_handle, querytext, querylength) != 0)
 	{
 		std::cout << "MYSQL ERROR mysql_real_query: " << q.str() << " " << mysql_error(&m_handle)  << std::endl;
+		int error = mysql_errno(&m_handle);
 		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
 			m_connected = false;
 		}
