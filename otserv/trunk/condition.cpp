@@ -696,7 +696,8 @@ bool ConditionSoul::setParam(ConditionParam_t param, int32_t value)
 ConditionDamage::ConditionDamage(ConditionId_t _id, ConditionType_t _type) :
 Condition(_id, _type, 0)
 {
-	delayed = false;
+ 	delayed = false;
+	forceUpdate = false;
 	owner = 0;
 	minDamage = 0;
 	maxDamage = 0;
@@ -715,6 +716,13 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 			return true;
 			break;
 		}
+
+		case CONDITIONPARAM_FORCEUPDATE:
+		{
+			forceUpdate = (value != 0);
+			return true;
+			break;
+		}		
 
 		case CONDITIONPARAM_DELAYED:
 		{
@@ -1056,7 +1064,7 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 	if(addCondition->getType() == conditionType){
 		const ConditionDamage& conditionDamage = static_cast<const ConditionDamage&>(*addCondition);
 
-		if(conditionDamage.getTotalDamage() > getTotalDamage()){
+		if(conditionDamage.doForceUpdate() || conditionDamage.getTotalDamage() > getTotalDamage()){
 			ticks = addCondition->getTicks();
 			owner = conditionDamage.owner;
 			maxDamage = conditionDamage.maxDamage;

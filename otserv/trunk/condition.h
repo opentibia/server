@@ -242,6 +242,7 @@ public:
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	void addDamage(uint32_t rounds, uint32_t time, int32_t value);
+	bool doForceUpdate() const { return forceUpdate;}
 
 	//serialization
 	virtual xmlNodePtr serialize();
@@ -256,6 +257,7 @@ protected:
 	int32_t startDamage;
 	int32_t tickInterval;
 
+	bool forceUpdate;
 	bool delayed;
 	uint32_t owner;
 

@@ -812,6 +812,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									if(combatType != COMBAT_NONE){
 										it.combatType = combatType;
 										it.condition = conditionDamage;
+										it.condition->setParam(CONDITIONPARAM_FORCEUPDATE, true);
 										uint32_t ticks = 0;
 										int32_t damage = 0;
 										int32_t start = 0;
