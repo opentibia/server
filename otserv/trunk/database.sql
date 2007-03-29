@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS `player_items`;
 DROP TABLE IF EXISTS `player_skills`;
 DROP TABLE IF EXISTS `player_storage`;
 DROP TABLE IF EXISTS `player_viplist`;
+DROP TABLE IF EXISTS `player_spells`;
 DROP TABLE IF EXISTS `guild_ranks`;
 DROP TABLE IF EXISTS `guilds`;
 DROP TABLE IF EXISTS `players`;
@@ -101,6 +102,12 @@ CREATE TABLE `guild_ranks` (
 CREATE TABLE `player_viplist` (
     `player_id` INT NOT NULL COMMENT 'id of player whose viplist entry it is',
     `vip_id` INT NOT NULL COMMENT 'id of target player of viplist entry',
+    KEY (`player_id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `player_spells` (
+    `player_id` INT NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
     KEY (`player_id`)
 ) ENGINE = InnoDB;
 

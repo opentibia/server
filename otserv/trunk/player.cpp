@@ -3098,3 +3098,28 @@ void Player::setSkillsPercents()
 		skills[i][SKILL_PERCENT] = percent;
 	}
 }
+
+void Player::learnInstantSpell(const std::string& name)
+{
+	if(!hasLearnedInstantSpell(name)){
+		learnedInstantSpellList.push_back(name);
+	}
+}
+
+bool Player::hasLearnedInstantSpell(const std::string& name) const
+{
+	if(hasFlag(PlayerFlag_CannotUseSpells)){
+		return false;
+	}
+
+	if(hasFlag(PlayerFlag_IgnoreSpellCheck)){
+		return true;
+	}
+
+	LearnedInstantSpellList::const_iterator it = std::find(learnedInstantSpellList.begin(), learnedInstantSpellList.end(), name);
+	if(it != learnedInstantSpellList.end()){
+		return true;
+	}
+
+	return false;
+}

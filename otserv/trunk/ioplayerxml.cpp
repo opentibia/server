@@ -505,7 +505,18 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 					tmpNode = tmpNode->next;
 				}
 			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"knownspells") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"spell") == 0){
+						if(readXMLString(tmpNode, "name", strValue)){
+							player->learnedInstantSpellList.push_back(strValue);
+						}
+					}
 
+					tmpNode = tmpNode->next;
+				}
+			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"conditions") == 0){
 				int typeValue;
 				int idValue;
@@ -824,6 +835,19 @@ bool IOPlayerXML::savePlayer(Player* player)
 		sb.str("");
 		sb << *it;
 		xmlSetProp(pn, (const xmlChar*)"playerguid", (const xmlChar*)sb.str().c_str());
+
+		xmlAddChild(sn, pn);
+	}
+	xmlAddChild(root, sn);
+
+	sn = xmlNewNode(NULL,(const xmlChar*)"knownspells");
+	for(LearnedInstantSpellList::const_iterator it = player->learnedInstantSpellList.begin();
+			it != player->learnedInstantSpellList.end(); it++){
+		pn = xmlNewNode(NULL,(const xmlChar*)"spell");
+
+		sb.str("");
+		sb << *it;
+		xmlSetProp(pn, (const xmlChar*)"name", (const xmlChar*)sb.str().c_str());
 
 		xmlAddChild(sn, pn);
 	}

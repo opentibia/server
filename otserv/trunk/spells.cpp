@@ -230,7 +230,7 @@ uint32_t Spells::getInstantSpellCount(const Player* player)
 	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
 		InstantSpell* instantSpell = it->second;
 		
-		if(instantSpell->canUse(player)){
+		if(instantSpell->canCast(player)){
 			++count;
 		}
 	}
@@ -244,7 +244,7 @@ InstantSpell* Spells::getInstantSpellByIndex(const Player* player, uint32_t inde
 	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
 		InstantSpell* instantSpell = it->second;
 		
-		if(instantSpell->canUse(player)){
+		if(instantSpell->canCast(player)){
 			if(count == index){
 				return instantSpell;
 			}
@@ -370,6 +370,7 @@ Spell::Spell()
 	premium = false;
 	enabled = true;
 	isAggressive = true;
+	learnable = false;
 }
 	
 bool Spell::configureSpell(xmlNodePtr p)
@@ -451,6 +452,10 @@ bool Spell::configureSpell(xmlNodePtr p)
 
 	if(readXMLInteger(p, "selftarget", intValue)){
 		selfTarget = (intValue == 1);
+	}
+
+	if(readXMLInteger(p, "needlearn", intValue)){
+		learnable = (intValue == 1);
 	}
 
 	if(readXMLInteger(p, "blocking", intValue)){
@@ -545,20 +550,22 @@ bool Spell::playerSpellCheck(const Player* player) const
 			return false;
 		}
 
-		if(!vocSpellMap.empty()){
-			if(vocSpellMap.find(player->getVocationId()) == vocSpellMap.end()){
-				player->sendCancel("Your vocation cannot use this spell.");
+		if(isInstant() && isLearnable()){
+			if(!player->hasLearnedInstantSpell(getName())){
+				player->sendCancel("You need to learn this spell first.");
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
 		}
-
-		//TODO: check if the player knows the spell
-		/*
-		if(premium && !player->getPremium()){
-			return false;
+		else{
+			if(!vocSpellMap.empty()){
+				if(vocSpellMap.find(player->getVocationId()) == vocSpellMap.end()){
+					player->sendCancel("Your vocation cannot use this spell.");
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+			}
 		}
-		*/
 	}
 
 	return true;
@@ -1430,20 +1437,22 @@ bool InstantSpell::Illusion(const InstantSpell* spell, Creature* creature, const
 	return (ret == RET_NOERROR);
 }
 
-bool InstantSpell::canUse(const Player* player)
+bool InstantSpell::canCast(const Player* player) const
 {
-	//TODO: Only return spells that the player has learned
-
-	if(player->getLevel() < level || player->getMagicLevel() < magLevel){
-		return false;
+	if(isLearnable()){
+		if(player->hasLearnedInstantSpell(getName())){
+			return true;
+		}
 	}
-
-	if(vocSpellMap.empty() || vocSpellMap.find(player->getVocationId()) != vocSpellMap.end()){
-		return true;
+	else{
+		if(vocSpellMap.empty() || vocSpellMap.find(player->getVocationId()) != vocSpellMap.end()){
+			return true;
+		}
 	}
 
 	return false;
 }
+
 
 ConjureSpell::ConjureSpell(LuaScriptInterface* _interface) :
 InstantSpell(_interface)

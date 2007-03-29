@@ -158,4 +158,9 @@
 <action itemid="6120" script="spellbook.lua" />
 <action itemid="6576" script="fireworks.lua" />
 
+
+
+-- Quests
+<action actionid="6666" script="spellscroll.lua"/>
+
 </actions>

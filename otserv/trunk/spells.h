@@ -122,7 +122,7 @@ public:
 	int32_t getMagicLevel() const { return magLevel;}
 
 	virtual bool isInstant() const = 0;
-	virtual bool canUse(const Player* player) {return true;}
+	bool isLearnable() const { return learnable;}
 
 	static ReturnValue CreateIllusion(Creature* creature, const Outfit_t outfit, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, const std::string& name, int32_t time);
@@ -133,6 +133,7 @@ protected:
 	bool playerInstantSpellCheck(const Player* player, const Position& toPos);
 	bool playerRuneSpellCheck(const Player* player, const Position& toPos);
 	
+	bool learnable;
 	bool enabled;
 	bool premium;
 	int32_t level;
@@ -173,8 +174,8 @@ public:
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
 	virtual bool isInstant() const { return true;}
-	virtual bool canUse(const Player* player);
 	bool getHasParam() const { return hasParam;}
+	bool canCast(const Player* player) const;
 
 protected:	
 	virtual std::string getScriptEventName();

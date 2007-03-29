@@ -184,6 +184,17 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		query.reset();
 	}
 
+	query << "SELECT player_id,name FROM player_spells WHERE player_id='" << player->getGUID() << "'";
+	if(mysql->storeQuery(query, result)){
+		for(uint32_t i = 0; i < result.getNumRows(); ++i){
+			std::string spellName = result.getDataString("name",i);
+			player->learnedInstantSpellList.push_back(spellName);
+		}
+	}
+	else{
+		query.reset();
+	}
+
 	//load inventory items
 	ItemMap itemMap;
 
@@ -471,7 +482,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	if(!mysql->executeQuery(query))
 		return false;
 
-	// Saving Skills
+	//skills
 	for(int i = 0; i <= 6; i++){
 		query << "UPDATE player_skills SET value = " << player->skills[i][SKILL_LEVEL] <<", count = "<< player->skills[i][SKILL_TRIES] << " WHERE player_id = " << player->getGUID() << " AND  skillid = " << i;
 
@@ -479,14 +490,37 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			return false;
 	}
 
-	//now item saving
+	//learned spells
+	query << "DELETE FROM player_spells WHERE player_id='"<< player->getGUID() << "'";
+
+	if(!mysql->executeQuery(query)){
+		return false;
+	}
+
+	std::stringstream ss;
+	DBSplitInsert query_insert(mysql);
+	query_insert.setQuery("INSERT INTO `player_spells` (`player_id` , `name` ) VALUES ");
+	for(LearnedInstantSpellList::const_iterator it = player->learnedInstantSpellList.begin();
+			it != player->learnedInstantSpellList.end(); ++it){
+		ss << "(" << player->getGUID() <<",'"<< Database::escapeString(*it)<<"')";
+		
+		if(!query_insert.addRow(ss.str()))
+			return false;
+		
+		ss.str("");
+	}
+
+	if(!query_insert.executeQuery()){
+		return false;
+	}
+
+	//item saving
 	query << "DELETE FROM player_items WHERE player_id='"<< player->getGUID() << "'";
 
 	if(!mysql->executeQuery(query)){
 		return false;
 	}
 
-	DBSplitInsert query_insert(mysql);
 	query_insert.setQuery("INSERT INTO `player_items` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES ");
 	
 	ItemBlockList itemList;
@@ -527,7 +561,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		return false;
 	}
 
-	std::stringstream ss;
+	ss.str("");
 	query_insert.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
 	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){

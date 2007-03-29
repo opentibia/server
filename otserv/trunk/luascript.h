@@ -385,6 +385,8 @@ protected:
 	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerFlagValue(lua_State *L);
 
+	static int luaPlayerLearnInstantSpell(lua_State *L);
+	static int luaGetPlayerLearnedInstantSpell(lua_State *L);
 	static int luaGetPlayerInstantSpellInfo(lua_State *L);
 	static int luaGetPlayerInstantSpellCount(lua_State *L);
 

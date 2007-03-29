@@ -89,6 +89,7 @@ typedef std::map<uint32_t, Depot*> DepotMap;
 typedef std::map<uint32_t, int32_t> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
+typedef std::list<std::string> LearnedInstantSpellList;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -429,6 +430,9 @@ public:
 	void setLastAction(uint64_t time) {lastAction = time;}
 	int64_t getLastAction() const {return lastAction;}
 
+	void learnInstantSpell(const std::string& name);
+	bool hasLearnedInstantSpell(const std::string& name) const;
+
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;
 
@@ -529,13 +533,14 @@ protected:
 	//inventory variables
 	Item* inventory[11];
 	bool inventoryAbilities[11];
-	//Abilities ExtraAbilities;
 	
 	//player advances variables
 	uint32_t skills[SKILL_LAST + 1][3];
 
 	//extra skill modifiers
 	int32_t varSkills[SKILL_LAST + 1];
+
+	LearnedInstantSpellList learnedInstantSpellList;
 	
 	ConditionList storedConditionList;
 	
