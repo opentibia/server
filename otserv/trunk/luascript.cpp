@@ -42,6 +42,7 @@
 extern Game g_game;
 extern Monsters g_monsters;
 extern ConfigManager g_config;
+extern Spells* g_spells;
 
 enum{
 	EVENT_ID_LOADING = 1,
@@ -356,6 +357,9 @@ std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code){
 		return "Variant not found";
 	case LUA_ERROR_VARIANT_UNKNOWN:
 		return "Unknown variant type";
+		break;
+	case LUA_ERROR_SPELL_NOT_FOUND:
+		return "Spell not found";
 		break;
 	default:
 		return "Wrong error code!";
@@ -840,7 +844,12 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
 	//getPlayerFlagValue(cid, flag)
 	lua_register(m_luaState, "getPlayerFlagValue", LuaScriptInterface::luaGetPlayerFlagValue);
-	
+
+	//getPlayerInstantSpellCount(cid)
+	lua_register(m_luaState, "getPlayerInstantSpellCount", LuaScriptInterface::luaGetPlayerInstantSpellCount);
+	//getPlayerInstantSpellInfo(cid, index)
+	lua_register(m_luaState, "getPlayerInstantSpellInfo", LuaScriptInterface::luaGetPlayerInstantSpellInfo);
+
 	//getPlayerStorageValue(uid,valueid)
 	lua_register(m_luaState, "getPlayerStorageValue", LuaScriptInterface::luaGetPlayerStorageValue);
 	//setPlayerStorageValue(uid,valueid, newvalue)
@@ -1335,6 +1344,55 @@ int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerInstantSpellCount(lua_State *L)
+{
+	//getPlayerInstantSpellCount(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		lua_pushnumber(L, g_spells->getInstantSpellCount(player));
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerInstantSpellInfo(lua_State *L)
+{
+	//getPlayerInstantSpellInfo(cid, index)
+	uint32_t index = popNumber(L);
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	InstantSpell* spell = g_spells->getInstantSpellByIndex(player, index);
+	if(!spell){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_SPELL_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	lua_newtable(L);
+	setField(L, "name", spell->getName());
+	setField(L, "words", spell->getWords());
+	setField(L, "level", spell->getLevel());
+	setField(L, "mlevel", spell->getMagicLevel());
+	setField(L, "mana", spell->getManaCost(player));
 	return 1;
 }
 

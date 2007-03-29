@@ -224,6 +224,38 @@ InstantSpell* Spells::getInstantSpell(const std::string words)
 	return NULL;
 }
 
+uint32_t Spells::getInstantSpellCount(const Player* player)
+{
+	uint32_t count = 0;
+	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
+		InstantSpell* instantSpell = it->second;
+		
+		if(instantSpell->canUse(player)){
+			++count;
+		}
+	}
+
+	return count;
+}
+
+InstantSpell* Spells::getInstantSpellByIndex(const Player* player, uint32_t index)
+{
+	uint32_t count = 0;
+	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
+		InstantSpell* instantSpell = it->second;
+		
+		if(instantSpell->canUse(player)){
+			if(count == index){
+				return instantSpell;
+			}
+
+			++count;
+		}
+	}
+
+	return NULL;
+}
+
 InstantSpell* Spells::getInstantSpellByName(const std::string& name)
 {
 	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
@@ -325,8 +357,8 @@ bool CombatSpell::castSpell(Creature* creature, Creature* target)
 
 Spell::Spell()
 {
-	level = -1;
-	magLevel = -1;
+	level = 0;
+	magLevel = 0;
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
@@ -1396,6 +1428,21 @@ bool InstantSpell::Illusion(const InstantSpell* spell, Creature* creature, const
 	}
 
 	return (ret == RET_NOERROR);
+}
+
+bool InstantSpell::canUse(const Player* player)
+{
+	//TODO: Only return spells that the player has learned
+
+	if(player->getLevel() < level || player->getMagicLevel() < magLevel){
+		return false;
+	}
+
+	if(vocSpellMap.empty() || vocSpellMap.find(player->getVocationId()) != vocSpellMap.end()){
+		return true;
+	}
+
+	return false;
 }
 
 ConjureSpell::ConjureSpell(LuaScriptInterface* _interface) :

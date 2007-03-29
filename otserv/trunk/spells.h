@@ -50,6 +50,9 @@ public:
 	InstantSpell* getInstantSpell(const std::string words);
 	InstantSpell* getInstantSpellByName(const std::string& name);
 
+	uint32_t getInstantSpellCount(const Player* player);
+	InstantSpell* getInstantSpellByIndex(const Player* player, uint32_t index);
+
 	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
 
 	static int32_t spellExhaustionTime;
@@ -115,8 +118,11 @@ public:
 
 	int32_t getManaCost(const Player* player) const;
 	int32_t getSoulCost(const Player* player) const;
+	int32_t getLevel() const { return level;}
+	int32_t getMagicLevel() const { return magLevel;}
 
 	virtual bool isInstant() const = 0;
+	virtual bool canUse(const Player* player) {return true;}
 
 	static ReturnValue CreateIllusion(Creature* creature, const Outfit_t outfit, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, const std::string& name, int32_t time);
@@ -167,6 +173,7 @@ public:
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
 	virtual bool isInstant() const { return true;}
+	virtual bool canUse(const Player* player);
 	bool getHasParam() const { return hasParam;}
 
 protected:	

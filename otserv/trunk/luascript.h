@@ -218,7 +218,8 @@ enum ErrorCode_t{
 	LUA_ERROR_AREA_NOT_FOUND,
 	LUA_ERROR_CONTAINER_NOT_FOUND,
 	LUA_ERROR_VARIANT_NOT_FOUND,
-	LUA_ERROR_VARIANT_UNKNOWN
+	LUA_ERROR_VARIANT_UNKNOWN,
+	LUA_ERROR_SPELL_NOT_FOUND
 };
 
 
@@ -383,6 +384,9 @@ protected:
 	static int luaGetPlayerLookDir(lua_State *L);
 	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerFlagValue(lua_State *L);
+
+	static int luaGetPlayerInstantSpellInfo(lua_State *L);
+	static int luaGetPlayerInstantSpellCount(lua_State *L);
 
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
