@@ -3116,9 +3116,11 @@ bool Player::hasLearnedInstantSpell(const std::string& name) const
 		return true;
 	}
 
-	LearnedInstantSpellList::const_iterator it = std::find(learnedInstantSpellList.begin(), learnedInstantSpellList.end(), name);
-	if(it != learnedInstantSpellList.end()){
-		return true;
+	for(LearnedInstantSpellList::const_iterator it = learnedInstantSpellList.begin();
+			it != learnedInstantSpellList.end(); ++it){
+		if(strcasecmp((*it).c_str(), name.c_str()) == 0){
+			return true;
+		}
 	}
 
 	return false;

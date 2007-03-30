@@ -1457,6 +1457,7 @@ int LuaScriptInterface::luaGetPlayerInstantSpellInfo(lua_State *L)
 	setField(L, "level", spell->getLevel());
 	setField(L, "mlevel", spell->getMagicLevel());
 	setField(L, "mana", spell->getManaCost(player));
+	setField(L, "manapercent", spell->getManaPercent());
 	return 1;
 }
 

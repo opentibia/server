@@ -22,8 +22,8 @@
 <vocation name="Druid"/>
 </instant>
 <instant name="Levitate" words="exani hur" params="1" soul="0" exhaustion="1" prem="0" enabled="1" function="Levitate"></instant>
-<instant name="Summon Creature" words="utevo res" aggressive="1" params="1" soul="0" exhaustion="1" prem="0" enabled="1" function="summonMonster"></instant>
-<instant name="Find Person" words="exiva" aggressive="0" params="1" mana="100" soul="0" exhaustion="1" prem="0" enabled="1" function="searchPlayer"></instant>
+<instant name="Summon Creature" words="utevo res" aggressive="1" params="1" lvl="10" soul="0" exhaustion="1" prem="0" enabled="1" function="summonMonster"></instant>
+<instant name="Find Person" words="exiva" aggressive="0" params="1" lvl="10" mana="100" soul="0" exhaustion="1" prem="0" enabled="1" function="searchPlayer"></instant>
 <instant name="Heal Friend" words="exura sio" aggressive="0" params="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="healfriend.lua">
 <vocation name="Druid"/>
 </instant>
@@ -49,16 +49,16 @@
 <instant name="Magic Rope" words="exani tera" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" script="magic rope.lua"></instant>
 <instant name="Create Illusion" words="utevo res ina" params="1" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" function="Illusion"></instant>
 
-<conjure name="Ultimate Healing Rune" words="adura vita" reagentId="2260" conjureId="2273" aggressive="0" maglv="20" mana="150" soul="10" prem="0" enabled="1" function="conjureRune">
+<conjure name="Ultimate Healing Rune" words="adura vita" reagentId="2260" conjureId="2273" aggressive="0" lvl="24" maglv="20" mana="150" soul="10" prem="0" enabled="1" function="conjureRune">
 </conjure>
 
-<conjure name="Heavy Magic Missile" words="adori gran" reagentId="2260" conjureId="2311" conjureCount="5" aggressive="0" maglv="20" mana="200" soul="10" prem="0" enabled="1" function="conjureRune">
+<conjure name="Heavy Magic Missile" words="adori gran" reagentId="2260" conjureId="2311" conjureCount="5" aggressive="0" lvl="24" maglv="20" mana="200" soul="10" prem="0" enabled="1" function="conjureRune">
 </conjure>
 
-<conjure name="Create Food" words="exevo pan" maglv="20" mana="200" soul="10" prem="0" enabled="1" function="conjureFood">
+<conjure name="Create Food" words="exevo pan" lvl="10" maglv="20" mana="200" soul="10" prem="0" enabled="1" function="conjureFood">
 </conjure>
 
-<conjure name="Conjure Bolt" words="exevo con mort" conjureId="2543" conjureCount="15" aggressive="0" maglv="6" mana="70" soul="0" prem="0" enabled="1" function="conjureItem"/>
+<conjure name="Conjure Bolt" words="exevo con mort" conjureId="2543" conjureCount="15" aggressive="0" lvl="25" maglv="6" mana="70" soul="0" prem="0" enabled="1" function="conjureItem"/>
 
 <instant name="House Guest List" words="aleta sio" enabled="1" function="editHouseGuest"></instant>
 <instant name="House Subowner List" words="aleta som" enabled="1" function="editHouseSubOwner"></instant>
