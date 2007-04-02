@@ -1743,7 +1743,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 		return false;
 	}
 
-	ReturnValue ret = RET_NOERROR;
+	ReturnValue ret;
 	if((ret = Actions::canUse(player, fromPos)) != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
@@ -1775,7 +1775,7 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
 		return false;
 	}
 
-	ReturnValue ret = RET_NOERROR;
+	ReturnValue ret;
 	if((ret = Actions::canUse(player, pos)) != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
@@ -1792,7 +1792,6 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
 	}
 
 	Thing* thing = internalGetThing(player, pos, stackPos, spriteId);
-
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
@@ -1831,15 +1830,20 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		}
 	}
 	
+	ReturnValue ret;
+	if((ret = Actions::canUse(player, fromPos)) != RET_NOERROR){
+		player->sendCancelMessage(ret);
+		return false;
+	}
+	
 	Thing* thing = internalGetThing(player, fromPos, fromStackPos, spriteId, STACKPOS_USE);
-
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
 	Item* item = thing->getItem();
-	if(!item){
+	if(!item || item->getClientID() != spriteId){
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
@@ -1852,14 +1856,14 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPo
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRotateItem()");
 	if(player->isRemoved())
 		return false;
-	
+
 	Thing* thing = internalGetThing(player, pos, stackPos);
 	if(!thing){
 		return false;
 	}
+	
 	Item* item = thing->getItem();
-
-	if(item == NULL || spriteId != item->getClientID() || !item->isRoteable()){
+	if(!item || item->getClientID() != spriteId || !item->isRoteable()){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
