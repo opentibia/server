@@ -78,8 +78,7 @@ CREATE TABLE `players` (
     `town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
     PRIMARY KEY (`id`),
     KEY (`name`),
-    KEY (`account_id`),
-    FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`)
+    FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guilds` (
@@ -96,26 +95,27 @@ CREATE TABLE `guild_ranks` (
     `name` VARCHAR(255) NOT NULL COMMENT 'rank name',
     `level` INT NOT NULL COMMENT 'rank level - leader, vice, member, maybe something else',
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`guild_id`) REFERENCES `guilds`(`id`)
+    FOREIGN KEY (`guild_id`) REFERENCES `guilds`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_viplist` (
     `player_id` INT NOT NULL COMMENT 'id of player whose viplist entry it is',
     `vip_id` INT NOT NULL COMMENT 'id of target player of viplist entry',
-    KEY (`player_id`)
+    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`vip_id`) REFERENCES `players`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_spells` (
     `player_id` INT NOT NULL,
     `name` VARCHAR(255) NOT NULL,
-    KEY (`player_id`)
+    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_storage` (
     `player_id` INT NOT NULL,
     `key` INT NOT NULL,
     `value` INT NOT NULL,
-    KEY (`player_id`)
+    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_skills` (
@@ -123,7 +123,7 @@ CREATE TABLE `player_skills` (
     `skillid` INT UNSIGNED NOT NULL,
     `value` INT UNSIGNED NOT NULL DEFAULT 0,
     `count` INT UNSIGNED NOT NULL DEFAULT 0,
-    KEY (`player_id`)
+    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_items` (
@@ -133,7 +133,7 @@ CREATE TABLE `player_items` (
     `itemtype` INT NOT NULL,
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB COMMENT 'replaces unique_id, action_id, text, special_desc',
-    KEY (`player_id`)
+    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `houses` (
@@ -148,7 +148,7 @@ CREATE TABLE `house_lists` (
     `house_id` INT NOT NULL,
     `listid` INT NOT NULL,
     `list` TEXT NOT NULL,
-    KEY (`house_id`)
+    FOREIGN KEY (`house_id`) REFERENCES `houses`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `bans` (
@@ -175,7 +175,7 @@ CREATE TABLE `tile_items` (
     `itemtype` INT NOT NULL,
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB,
-    KEY (`tile_id`)
+    FOREIGN KEY (`tile_id`) REFERENCES `tiles`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_depotitems` (
@@ -186,7 +186,8 @@ CREATE TABLE `player_depotitems` (
     `itemtype` INT NOT NULL,
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB,
-    KEY (`player_id`,`depotid`)
+    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE,
+    KEY (`player_id`, `depotid`)
 ) ENGINE = InnoDB;
 
 DELIMITER |
@@ -196,7 +197,6 @@ BEFORE DELETE
 ON `accounts`
 FOR EACH ROW
 BEGIN
-    DELETE FROM `players` WHERE `account_id` = OLD.`id`;
     DELETE FROM `bans` WHERE `type` = 3 AND `account` = OLD.`id`;
 END|
 
@@ -206,7 +206,6 @@ ON `guilds`
 FOR EACH ROW
 BEGIN
     UPDATE `players` SET `rank_id` = 0 WHERE `rank_id` IN (SELECT `id` FROM `guild_ranks` WHERE `guild_id` = OLD.`id`);
-    DELETE FROM `guild_ranks` WHERE `guild_id` = OLD.`id`;
 END|
 
 CREATE TRIGGER `ondelete_players`
@@ -214,10 +213,6 @@ BEFORE DELETE
 ON `players`
 FOR EACH ROW
 BEGIN
-    DELETE FROM `player_viplist` WHERE `player_id` = OLD.`id` OR `vip_id` = OLD.`id`;
-    DELETE FROM `player_storage` WHERE `player_id` = OLD.`id`;
-    DELETE FROM `player_skills` WHERE `player_id` = OLD.`id`;
-    DELETE FROM `player_items` WHERE `player_id` = OLD.`id`;
     DELETE FROM `bans` WHERE `type` = 2 AND `player` = OLD.`id`;
     UPDATE `houses` SET `owner` = 0 WHERE `owner` = OLD.`id`;
 END|
