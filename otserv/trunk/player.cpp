@@ -2513,6 +2513,7 @@ bool Player::setFollowCreature(Creature* creature)
 bool Player::setAttackedCreature(Creature* creature)
 {
 	if(!Creature::setAttackedCreature(creature)){
+		sendCancelTarget();
 		return false;
 	}
 
