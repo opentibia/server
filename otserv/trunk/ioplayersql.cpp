@@ -696,7 +696,7 @@ bool IOPlayerSQL::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string&
 	guid = result.getDataInt("id");
 	const PlayerGroup* group = getPlayerGroup(result.getDataInt("group_id"));
 	if(group){
-		specialVip = (group->m_flags & PlayerFlag_SpecialVIP) != 0;
+		specialVip = (0 != (group->m_flags & ((uint64_t)1 << PlayerFlag_SpecialVIP)));
 	}
 	else{
 		specialVip = false;

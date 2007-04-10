@@ -399,7 +399,7 @@ public:
 	void sendIcons() const; 
 	void sendMagicEffect(const Position& pos, unsigned char type) const
 		{client->sendMagicEffect(pos,type);}
-	void sendPing();
+	void sendPing(uint32_t interval);
 	void sendStats();
 	void sendSkills() const
 		{client->sendSkills();}

@@ -903,10 +903,10 @@ void Player::sendStats()
 	client->sendStats();
 }
 
-void Player::sendPing()
+void Player::sendPing(uint32_t interval)
 {
-	internal_ping++;
-	if(internal_ping >= 5){ //1 ping each 5 seconds
+	internal_ping = internal_ping + interval;
+	if(internal_ping >= 5000){ //1 ping each 5 seconds
 		internal_ping = 0;
 		npings++;
 		client->sendPing();
@@ -1229,7 +1229,7 @@ bool Player::NeedUpdateStats()
 void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
-	sendPing();
+	sendPing(interval);
 
 	MessageBufferTicks += interval;
 
@@ -1261,7 +1261,7 @@ bool Player::isMuted(uint32_t& muteTime)
 
 void Player::addMessageBuffer()
 {
-	if(!hasFlag(PlayerFlag_CannotBeMuted) && MessageBufferCount > 0 && Player::maxMessageBuffer != 0){
+	if(MessageBufferCount > 0 && Player::maxMessageBuffer != 0 && !hasFlag(PlayerFlag_CannotBeMuted)){
 		MessageBufferCount -= 1;
 	}
 }
