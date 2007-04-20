@@ -280,9 +280,6 @@ bool Raid::loadFromXml(const std::string& _filename)
 					else if(strcasecmp(strValue.c_str(), "default") == 0){
 						type = MSG_EVENT_DEFAULT;
 					}
-					else if(strcasecmp(strValue.c_str(), "default") == 0){
-						type = MSG_EVENT_DEFAULT;
-					}
 					else if(strcasecmp(strValue.c_str(), "description") == 0){
 						type = MSG_INFO_DESCR;
 					}

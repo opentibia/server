@@ -856,7 +856,7 @@ bool InstantSpell::loadFunction(const std::string& functionName)
 	else if(strcasecmp(functionName.c_str(), "summonMonster") == 0){
 		function = SummonMonster;
 	}
-	else if(strcasecmp(functionName.c_str(), "Levitate") == 0){
+	else if(strcasecmp(functionName.c_str(), "levitate") == 0){
 		isAggressive = false;
 		function = Levitate;
 	}
@@ -1785,7 +1785,7 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 	}
 
 	Creature* convinceCreature = thing->getCreature();
-	if(!convinceCreature || !convinceCreature->convinceCreature(creature)){
+	if(!convinceCreature){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
@@ -1803,6 +1803,12 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		return false;
 	}
 
+	if(!convinceCreature->convinceCreature(creature)){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+	
 	spell->postCastSpell(player, manaCost, spell->getSoulCost(player));
 	g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
 	return true;
