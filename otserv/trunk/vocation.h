@@ -43,6 +43,9 @@ public:
 	uint32_t getHealthGainTicks() const {return gainHealthTicks;};
 	uint32_t getHealthGainAmount() const {return gainHealthAmount;};
 	
+	uint32_t getSoulMax() const {return maxSoul;};
+	uint32_t getSoulGainTicks() const {return gainSoulTicks;};
+	
 	void debugVocation();
 	
 protected:
@@ -60,6 +63,9 @@ protected:
 	uint32_t gainCap;
 	uint32_t gainMana;
 	uint32_t gainHP;
+	
+	uint32_t maxSoul;
+	uint32_t gainSoulTicks;
 	
 	static uint32_t skillBase[SKILL_LAST + 1];
 	float skillMultipliers[SKILL_LAST + 1];

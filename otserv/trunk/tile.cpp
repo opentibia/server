@@ -471,10 +471,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 			for(uint32_t i = 0; i < getThingCount(); ++i){
 				iithing = __getThing(i);
-
 				if(const Item* iitem = iithing->getItem()){
 					const ItemType& iiType = Item::items[iitem->getID()];
-
 					if(iiType.isMagicField() && !iiType.blockSolid){
 						const MagicField* field = iitem->getMagicField();
 						if(!monster->hasCondition(Combat::CombatTypeToCondition(field->getCombatType())) &&
@@ -509,10 +507,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
-
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
-
 				if(iiType.blockSolid){
 					//check if this a creature that just is about to login/spawn
 					//those can be placed here if the blocking item is moveable
@@ -543,21 +539,35 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 
-		if(ground == NULL)
+		if(ground == NULL && !item->isHangable())
 			return RET_NOTPOSSIBLE;
 
 		if(!creatures.empty() && item->isBlocking())
 			return RET_NOTENOUGHROOM;
 
+		bool canHang = false;
+		bool hasHangable = false;
 		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
-
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
-
+				if(item->isHangable() && iiType.isHangable){
+					hasHangable = true;
+				}
 				if(iiType.blockSolid){
+					if(item->isHangable() && iiType.blockProjectile && (iiType.isHorizontal || iiType.isVertical)){
+						canHang = true;
+						if(iiType.isHorizontal && !(flags & FLAG_FROMSOUTH)){
+							return RET_NOTPOSSIBLE;
+						}
+						else if(iiType.isVertical && !(flags & FLAG_FROMEAST)){
+							return RET_NOTPOSSIBLE;
+						}
+						else{
+							continue;
+						}
+					}
 					if(item->isPickupable()){
-
 						//TODO: query script interface
 						if(iitem->getID() == ITEM_DUSTBIN)
 							continue;
@@ -569,6 +579,9 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 						return RET_NOTENOUGHROOM;
 				}
 			}
+		}
+		if(item->isHangable() && canHang && hasHangable){
+			return RET_NOTENOUGHROOM;
 		}
 	}
 

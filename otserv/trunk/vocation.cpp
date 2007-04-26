@@ -81,6 +81,12 @@ bool Vocations::loadFromXml(const std::string& datadir)
 					if(readXMLInteger(p, "gainmanaamount", intVal)){
 						voc->gainManaAmount = intVal;
 					}
+					if(readXMLInteger(p, "maxsoul", intVal)){
+						voc->maxSoul = intVal;
+					}
+					if(readXMLInteger(p, "gainsoulticks", intVal)){
+						voc->gainSoulTicks = intVal;
+					}
 					if(readXMLFloat(p, "manamultiplier", floatVal)){
 						voc->manaMultiplier = floatVal;
 					}
@@ -158,6 +164,8 @@ Vocation::Vocation()
 	gainCap = 5;
 	gainMana = 5;
 	gainHP = 5;
+	maxSoul = 100;
+	gainSoulTicks = 120;
 	manaMultiplier = 4.0;
 	skillMultipliers[0] = 1.5f;
 	skillMultipliers[1] = 2.0f;

@@ -123,11 +123,11 @@ class Condition;
 
 class ItemType {
 private:
-	ItemType(const ItemType& it){};
 
 public:
 	ItemType();
 	~ItemType();
+	ItemType(const ItemType& it){};
 
 	itemgroup_t group;
 

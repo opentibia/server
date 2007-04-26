@@ -177,6 +177,10 @@ void Player::setVocation(uint32_t vocId)
 		condition->setParam(CONDITIONPARAM_MANAGAIN, vocation->getManaGainAmount());
 		condition->setParam(CONDITIONPARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
 	}
+	
+	//Se the player's max soul according to their vocation
+	const uint32_t vocMaxSoul = vocation->getSoulMax();
+	soulMax = vocMaxSoul;
 }
 
 uint32_t Player::getVocationId() const
@@ -2840,11 +2844,10 @@ void Player::onGainExperience(int32_t gainExperience)
 		//soul regeneration
 		if(gainExperience >= getLevel()){
 			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
-			//1 soulpoint / 2 minutes for normal players
-			//1 soulpoint / 15 seconds for premium players
-
+			//Soul regeneration rate is defined by the vocation
+			uint32_t vocSoulTicks = vocation->getSoulGainTicks();
 			condition->setParam(CONDITIONPARAM_SOULGAIN, 1);
-			condition->setParam(CONDITIONPARAM_SOULTICKS, 15 * 1000);
+			condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
 			addCondition(condition);
 		}
 
