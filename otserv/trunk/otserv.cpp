@@ -156,7 +156,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 	playerExceptionHandler.InstallHandler();
 #endif
 
-	srand((unsigned)time(NULL));
+	srand(time(NULL));
 
 	SOCKET s = *(SOCKET*)dat;
 
@@ -474,20 +474,18 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 #if defined WIN32 || defined WINDOWS
 #else
-  return 0;
+	return 0;
 #endif
 }
 
 
 
 void ErrorMessage(const char* message) {
-  std::cout << std::endl << std::endl << "Error: " << message;
+	std::cout << std::endl << std::endl << "Error: " << message;
 
-  std::string s;
-  std::cin >> s;
+	std::string s;
+	std::cin >> s;
 }
-
-
 
 int main(int argc, char *argv[])
 {
@@ -500,21 +498,12 @@ int main(int argc, char *argv[])
 	mainExceptionHandler.InstallHandler();
 #endif
 
-#ifdef __WIN_LOW_FRAG_HEAP__
-	ULONG  HeapFragValue = 2;
-
-	if(HeapSetInformation(GetProcessHeap(),HeapCompatibilityInformation,&HeapFragValue,sizeof(HeapFragValue))){
-		std::cout << "Heap Success" << std::endl;
-	}
-	else{
-		std::cout << "Heap Error" << std::endl;
-	}
-#endif
 	std::cout << ":: OTServ Development-Version 0.6.0 - SVN Preview" << std::endl;
 	std::cout << ":: ==============================================" << std::endl;
 	//std::cout << ":: OTServ Version 0.6.0" << std::endl;
 	//std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
+	
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ || defined __DEBUG_LUASCRIPTS__
 	
 	std::cout << ":: Debugging:";
@@ -534,17 +523,17 @@ int main(int argc, char *argv[])
 #endif
 
 #if !defined(WIN32) && !defined(__ROOT_PERMISSION__)
-	if( getuid() == 0 || geteuid() == 0 )
-	{
+	if( getuid() == 0 || geteuid() == 0 ){
 		std::cout << std::endl << "OTServ executed as root user, please login with a normal user." << std::endl;
 		return 1;
 	}
 #endif
 
-	// ignore sigpipe...
+
 #if defined __WINDOWS__ || defined WIN32
-		//nothing yet
+	//nothing yet
 #else
+	// ignore sigpipe...
 	struct sigaction sigh;
 	sigh.sa_handler = SIG_IGN;
 	sigaction(SIGPIPE, &sigh, NULL);
@@ -774,9 +763,24 @@ int main(int argc, char *argv[])
 	else
 		ip = g_config.getString(ConfigManager::IP);
 
-	std::cout << ip << std::endl << "::" << std::endl;
+	uint32_t resolvedIp = inet_addr(ip.c_str());
+	if(resolvedIp == INADDR_NONE){
+		struct hostent* he = gethostbyname(ip.c_str());
+		if(he != 0){
+			resolvedIp = *(uint32_t*)he->h_addr;
+		}
+		else{
+			std::string error_msg = "Can't resolve: " + ip;
+			ErrorMessage(error_msg.c_str());
+			return -1;
+		}
+	}
+	
+	char resolvedIpstr[32];
+	formatIP(resolvedIp, resolvedIpstr);
+	std::cout << resolvedIpstr << std::endl << "::" << std::endl;
 
-	IpNetMask.first  = inet_addr(ip.c_str());
+	IpNetMask.first  = resolvedIp;
 	IpNetMask.second = 0;
 	serverIPs.push_back(IpNetMask);
 	std::cout << ":: Starting Server... ";
