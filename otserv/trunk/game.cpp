@@ -865,37 +865,28 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	else if(!map->canThrowObjectTo(fromPos, toPos)){
 		ret = RET_CANNOTTHROW;
 	}
-
-	Tile* fromTile = getTile(fromPos.x, fromPos.y, fromPos.z);
-	for(uint32_t i = 0; i < fromTile->getThingCount(); ++i){
-		Thing* iithing = fromCylinder->__getThing(i);
-		if(const Item* iitem = iithing->getItem()){
-			const ItemType& iiType = Item::items[iitem->getID()];
-			if(item->isHangable()){
-				if(iiType.isVertical && fromPos.x > toPos.x){
-					ret = RET_CANNOTTHROW;
-				}
-				if(iiType.isHorizontal && fromPos.y > toPos.y){
-					ret = RET_CANNOTTHROW;
-				}
+	//check that the player has access to dest tile
+	Tile* tile =  getTile(toPos.x, toPos.y, toPos.z);
+	if(tile){
+		if(tile->hasProperty(ISVERTICAL)){
+			if(playerPos.x + 1 == toPos.x){
+				ret = RET_CANNOTTHROW;
+			}
+		}
+		else if(tile->hasProperty(ISHORIZONTAL)){
+			if(playerPos.y + 1 == toPos.y){
+				ret = RET_CANNOTTHROW;
 			}
 		}
 	}
-
+	
+	uint32_t flags = 0;
+	if(!Position::areInRange<1,1,0>(playerPos, toPos)){
+		flags = FLAG_FROMFARPOSITION;
+	}
+	
 	if(ret == RET_NOERROR){
-		int flags = 0;
-		if(!Position::areInRange<1,1,0>(playerPos, toPos)){
-			ret = RET_TOOFARAWAY;
-		}
-        if(playerPos.x >= toPos.x){
-            flags |= FLAG_FROMEAST;
-		}
-        if(playerPos.y >= toPos.y){
-            flags |= FLAG_FROMSOUTH;
-		}
-		if(ret == RET_NOERROR){
-        	ret = internalMoveItem(fromCylinder, toCylinder, index, item, count, flags);
-		}
+		ret = internalMoveItem(fromCylinder, toCylinder, index, item, count, flags);
 	}
 
 	if(ret != RET_NOERROR){

@@ -178,9 +178,8 @@ void Player::setVocation(uint32_t vocId)
 		condition->setParam(CONDITIONPARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
 	}
 	
-	//Se the player's max soul according to their vocation
-	const uint32_t vocMaxSoul = vocation->getSoulMax();
-	soulMax = vocMaxSoul;
+	//Set the player's max soul according to their vocation
+	soulMax = vocation->getSoulMax();
 }
 
 uint32_t Player::getVocationId() const

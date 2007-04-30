@@ -539,35 +539,31 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 
-		if(ground == NULL && !item->isHangable())
+		bool itemIsHangable = item->isHangable();
+		
+		if(ground == NULL && !itemIsHangable)
 			return RET_NOTPOSSIBLE;
 
 		if(!creatures.empty() && item->isBlocking())
 			return RET_NOTENOUGHROOM;
 
-		bool canHang = false;
 		bool hasHangable = false;
+		bool supportsHangableItems = false;
 		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
-				if(item->isHangable() && iiType.isHangable){
+				
+				//Is not posible 2 hangables in the same tile
+				if(iiType.isHangable && itemIsHangable){
 					hasHangable = true;
 				}
+				
 				if(iiType.blockSolid){
-					if(item->isHangable() && iiType.blockProjectile && (iiType.isHorizontal || iiType.isVertical)){
-						canHang = true;
-						if(iiType.isHorizontal && !(flags & FLAG_FROMSOUTH)){
-							return RET_NOTPOSSIBLE;
-						}
-						else if(iiType.isVertical && !(flags & FLAG_FROMEAST)){
-							return RET_NOTPOSSIBLE;
-						}
-						else{
-							continue;
-						}
+					if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
+						supportsHangableItems = true;
 					}
-					if(item->isPickupable()){
+					else if(item->isPickupable()){
 						//TODO: query script interface
 						if(iitem->getID() == ITEM_DUSTBIN)
 							continue;
@@ -575,13 +571,20 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 						if(!iiType.hasHeight || iiType.pickupable)
 							return RET_NOTENOUGHROOM;
 					}
-					else
+					else{
 						return RET_NOTENOUGHROOM;
+					}
 				}
 			}
 		}
-		if(item->isHangable() && canHang && hasHangable){
-			return RET_NOTENOUGHROOM;
+		
+		if(itemIsHangable && supportsHangableItems){
+			if((flags & FLAG_FROMFARPOSITION) == FLAG_FROMFARPOSITION){
+				return RET_TOOFARAWAY;
+			}
+			if(hasHangable){
+				return RET_NOTENOUGHROOM;
+			}
 		}
 	}
 
