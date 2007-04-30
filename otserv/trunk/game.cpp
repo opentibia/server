@@ -866,7 +866,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 		ret = RET_CANNOTTHROW;
 	}
 	//check that the player has access to dest tile
-	Tile* tile =  getTile(toPos.x, toPos.y, toPos.z);
+	Tile* tile = getTile(toPos.x, toPos.y, toPos.z);
 	if(tile){
 		if(tile->hasProperty(ISVERTICAL)){
 			if(playerPos.x + 1 == toPos.x){
@@ -879,7 +879,21 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 			}
 		}
 	}
-	
+	//check if the hangable item can be thrown to the dest tile
+	Tile* fromTile = getTile(fromPos.x, fromPos.y, fromPos.z);
+	if(fromTile){
+		if(fromTile->hasProperty(ISVERTICAL)){
+			if(fromPos.x > toPos.x){
+				ret = RET_CANNOTTHROW;
+			}
+		}
+		if(fromTile->hasProperty(ISHORIZONTAL)){
+			if(fromPos.y > toPos.y){
+				ret = RET_CANNOTTHROW;
+			}
+		}
+	}
+
 	uint32_t flags = 0;
 	if(!Position::areInRange<1,1,0>(playerPos, toPos)){
 		flags = FLAG_FROMFARPOSITION;
