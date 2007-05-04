@@ -26,6 +26,9 @@
 #include "const79.h"
 #include "position.h"
 
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
 enum RaidState_t{
 	RAIDSTATE_IDLE = 0,
 	RAIDSTATE_EXECUTING
@@ -75,22 +78,26 @@ public:
 	uint64_t getLastRaidEnd() { return lastRaidEnd; }
 	void setLastRaidEnd(uint64_t newLastRaidEnd) { lastRaidEnd = newLastRaidEnd; }
 	
+	void checkRaids();
+	
 private:
 	RaidList raidList;
 	bool loaded, started;
 	Raid* running;
 	uint64_t lastRaidEnd;
+	uint32_t checkRaidsEvent;
 	std::string filename;
 };
 
 class Raid{
 public:
-	Raid(const std::string& _name, uint32_t _chance, uint32_t _interval, uint32_t _marginTime);
+	Raid(const std::string& _name, uint32_t _interval, uint32_t _marginTime);
 	~Raid();
 	
 	bool loadFromXml(const std::string& _filename);
 	
-	void checkRaid();
+	void startRaid();
+	
 	void executeRaidEvent(RaidEvent* raidEvent);
 	void resetRaid();
 	
@@ -105,60 +112,72 @@ public:
 	uint32_t getInterval() {return interval;}
 	
 	void stopEvents();
-	void setRaidCheckEvent(uint32_t eventId) { checkRaidEvent = eventId; }
 	
 private:
 	RaidEventVector raidEvents;
 	std::string name;
-	uint32_t interval, chance;
+	uint32_t interval;
 	uint32_t nextEvent;
 	uint64_t margin;
 	RaidState_t state;
-	uint32_t checkRaidEvent, nextEventEvent;
+	uint32_t nextEventEvent;
 	bool loaded;
 };
 
 class RaidEvent{
 public:
-	RaidEvent(uint32_t _delay);
+	RaidEvent() {};
 	virtual ~RaidEvent() {};
 	
-	virtual bool executeEvent() {return false;};
-	uint32_t getDelay() const { return delay;}
-	void setDelay(uint32_t newDelay) { delay = newDelay; }
+	virtual bool configureRaidEvent(xmlNodePtr eventNode);
+	
+	virtual bool executeEvent() {return false;}
+	uint32_t getDelay() const {return m_delay;}
+	void setDelay(uint32_t newDelay) {m_delay = newDelay;}
+	
+	static bool compareEvents(const RaidEvent* lhs, const RaidEvent* rhs)
+	{
+		return lhs->getDelay() < rhs->getDelay();
+	}
 	
 private:
-	uint32_t delay;
+	uint32_t m_delay;
 };
 
 class AnnounceEvent : public RaidEvent{
 public:
-	AnnounceEvent(const std::string& _message, MessageClasses _messageType, uint32_t _delay);
+	AnnounceEvent() {};
 	virtual ~AnnounceEvent() {};
+	
+	virtual bool configureRaidEvent(xmlNodePtr eventNode);
 	
 	virtual bool executeEvent();
 
 private:
-	std::string message;
-	MessageClasses messageType;
+	std::string m_message;
+	MessageClasses m_messageType;
 };
 
 class SingleSpawnEvent : public RaidEvent{
 public:
-	SingleSpawnEvent(const std::string& _monsterName, const Position& pos, uint32_t _delay);
+	SingleSpawnEvent() {};
 	virtual ~SingleSpawnEvent() {};
+	
+	virtual bool configureRaidEvent(xmlNodePtr eventNode);
 	
 	virtual bool executeEvent();
 
 private:
-	std::string monsterName;
-	Position position;
+	std::string m_monsterName;
+	Position m_position;
 };
 
 class AreaSpawnEvent : public RaidEvent{
 public:
-	AreaSpawnEvent(const Position& fromPos, const Position& toPos, uint32_t _delay);
+	AreaSpawnEvent() {};
 	virtual ~AreaSpawnEvent();
+	
+	virtual bool configureRaidEvent(xmlNodePtr eventNode);
 	
 	void addMonster(MonsterSpawn* monsterSpawn);
 	void addMonster(const std::string& monsterName, uint32_t minAmount, uint32_t maxAmount);
@@ -166,8 +185,8 @@ public:
 	virtual bool executeEvent();
 
 private:
-	MonsterSpawnList spawnList;
-	Position fromPos, toPos;
+	MonsterSpawnList m_spawnList;
+	Position m_fromPos, m_toPos;
 };
 
 /*

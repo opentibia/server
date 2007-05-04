@@ -504,7 +504,8 @@ int main(int argc, char *argv[])
 	//std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 	
-#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ || defined __DEBUG_LUASCRIPTS__
+#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ \
+	|| defined __DEBUG_LUASCRIPTS__ || __DEBUG_RAID__
 	
 	std::cout << ":: Debugging:";
 	#ifdef __DEBUG__MOVESYS__
@@ -518,7 +519,10 @@ int main(int argc, char *argv[])
 	#endif
 	#ifdef __DEBUG_LUASCRIPTS__
 	std::cout << " LUA-SCRIPTS";
-	 #endif
+	#endif
+	#ifdef __DEBUG_RAID__
+	std::cout << " RAIDS";
+	#endif
 	std::cout << std::endl;
 #endif
 
