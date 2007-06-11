@@ -309,7 +309,7 @@ bool Spawn::findPlayer(const Position& pos)
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if((tmpPlayer = (*it)->getPlayer()) && !tmpPlayer->hasFlag(PlayerFlag_CannotBeAttacked)){
+		if((tmpPlayer = (*it)->getPlayer()) && !tmpPlayer->hasFlag(PlayerFlag_IgnoredByMonsters)){
 			return true;
 		}
 	}
