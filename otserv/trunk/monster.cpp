@@ -155,13 +155,9 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 {
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
-	const Player* player = creature->getPlayer();
-
 	if(creature == this){
-		if(player && !player->hasFlag(PlayerFlag_IgnoredByMonsters)){
-			internalUpdateTargetList = true;
-			startThink();
-		}
+		internalUpdateTargetList = true;
+		startThink();
 	}
 	else if(canSee(newPos) && !canSee(oldPos)){
 		onCreatureEnter(creature);
@@ -173,8 +169,7 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 		//creature walking around in visible range
 		if(!hasMaster()){
 			if(!followCreature){
-				if((player && !player->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
-				(creature->getMaster() && creature->getMaster()->getPlayer())){
+				if(creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer())){
 					selectTarget(const_cast<Creature*>(creature));
 				}
 			}
@@ -234,9 +229,10 @@ void Monster::onCreatureEnter(const Creature* creature)
 
 void Monster::onCreatureFound(const Creature* creature)
 {
-	if(creature->getHealth() > 0 &&
-	((creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
-	 (creature->getMaster() && creature->getMaster()->getPlayer()))){
+	const Player* player = creature->getPlayer();
+	const Creature* master = creature->getMaster();
+	if(creature->getHealth() > 0 && ((player && (!player->hasFlag(PlayerFlag_IgnoredByMonsters) ||
+	player == getMaster())) || (master && master->getPlayer()))){
 		if(std::find(targetList.begin(), targetList.end(), creature) == targetList.end()){
 			//std::cout << "Adding creature: " << &creature << ", Position: "<< creature->getPosition() << std::endl;
 			Creature* target = const_cast<Creature*>(creature);
@@ -336,11 +332,6 @@ bool Monster::selectTarget(Creature* creature)
 
 	const Position& creaturePos = creature->getPosition();
 	if(!creature->canSee(creaturePos) || creaturePos.z != getPosition().z){
-		return false;
-	}
-
-	Player* player = creature->getPlayer();
-	if(player && player->hasFlag(PlayerFlag_IgnoredByMonsters)){
 		return false;
 	}
 

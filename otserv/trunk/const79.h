@@ -299,43 +299,44 @@ enum item_t {
 };
 
 enum PlayerFlags{
-	PlayerFlag_CannotUseCombat = 0,
-	PlayerFlag_CannotAttackPlayer,
-	PlayerFlag_CannotAttackMonster,
-	PlayerFlag_CannotBeAttacked,
-	PlayerFlag_CanConvinceAll,
-	PlayerFlag_CanSummonAll,
-	PlayerFlag_CanIllusionAll,
-	PlayerFlag_CanSenseInvisibility,
-	PlayerFlag_IgnoredByMonsters,
-	PlayerFlag_NotGainInFight,
-	PlayerFlag_HasInfiniteMana,
-	PlayerFlag_HasInfiniteSoul,
-	PlayerFlag_HasNoExhaustion,
-	PlayerFlag_CannotUseSpells,
-	PlayerFlag_CannotPickupItem,
-	PlayerFlag_CanAlwaysLogin,
-	PlayerFlag_CanBroadcast,
-	PlayerFlag_CanEditHouses,
-	PlayerFlag_CannotBeBanned,
-	PlayerFlag_CannotBePushed,
-	PlayerFlag_HasInfiniteCapacity,
-	PlayerFlag_CanPushAllCreatures,
-	PlayerFlag_CanTalkRedPrivate,
-	PlayerFlag_CanTalkRedChannel,
-	PlayerFlag_TalkOrangeHelpChannel,
-	PlayerFlag_NotGainExperience,
-	PlayerFlag_NotGainMana,
-	PlayerFlag_NotGainHealth,
-	PlayerFlag_NotGainSkill,
-	PlayerFlag_SetMaxSpeed,
-	PlayerFlag_SpecialVIP,
-	PlayerFlag_NotGenerateLoot,
-	PlayerFlag_CanTalkRedChannelAnonymous,
-	PlayerFlag_IgnoreProtectionZone,
-	PlayerFlag_IgnoreSpellCheck,
-	PlayerFlag_IgnoreWeaponCheck,
-	PlayerFlag_CannotBeMuted,
+	//Add the flag's numbers to get the groupFlags number you need
+	PlayerFlag_CannotUseCombat = 0,			//2^0 = 1
+	PlayerFlag_CannotAttackPlayer,			//2^1 = 2
+	PlayerFlag_CannotAttackMonster,			//2^2 = 4
+	PlayerFlag_CannotBeAttacked,			//2^3 = 8
+	PlayerFlag_CanConvinceAll,				//2^4 = 16
+	PlayerFlag_CanSummonAll,				//2^5 = 32
+	PlayerFlag_CanIllusionAll,				//2^6 = 64
+	PlayerFlag_CanSenseInvisibility,		//2^7 = 128
+	PlayerFlag_IgnoredByMonsters,			//2^8 = 256
+	PlayerFlag_NotGainInFight,				//2^9 = 512
+	PlayerFlag_HasInfiniteMana,				//2^10 = 1024
+	PlayerFlag_HasInfiniteSoul,				//2^11 = 2048
+	PlayerFlag_HasNoExhaustion,				//2^12 = 4096
+	PlayerFlag_CannotUseSpells,				//2^13 = 8192
+	PlayerFlag_CannotPickupItem,			//2^14 = 16384
+	PlayerFlag_CanAlwaysLogin,				//2^15 = 32768
+	PlayerFlag_CanBroadcast,				//2^16 = 65536
+	PlayerFlag_CanEditHouses,				//2^17 = 131072
+	PlayerFlag_CannotBeBanned,				//2^18 = 262144
+	PlayerFlag_CannotBePushed,				//2^19 = 524288
+	PlayerFlag_HasInfiniteCapacity,			//2^20 = 1048576
+	PlayerFlag_CanPushAllCreatures,			//2^21 = 2097152
+	PlayerFlag_CanTalkRedPrivate,			//2^22 = 4194304
+	PlayerFlag_CanTalkRedChannel,			//2^23 = 8388608
+	PlayerFlag_TalkOrangeHelpChannel,		//2^24 = 16777216
+	PlayerFlag_NotGainExperience,			//2^25 = 33554432
+	PlayerFlag_NotGainMana,					//2^26 = 67108864
+	PlayerFlag_NotGainHealth,				//2^27 = 134217728
+	PlayerFlag_NotGainSkill,				//2^28 = 268435456
+	PlayerFlag_SetMaxSpeed,					//2^29 = 536870912
+	PlayerFlag_SpecialVIP,					//2^30 = 1073741824
+	PlayerFlag_NotGenerateLoot,				//2^31 = 2147483648
+	PlayerFlag_CanTalkRedChannelAnonymous,  //2^32 = 4294967296
+	PlayerFlag_IgnoreProtectionZone,        //2^33 = 8589934592
+	PlayerFlag_IgnoreSpellCheck,            //2^34 = 17179869184
+	PlayerFlag_IgnoreWeaponCheck,           //2^35 = 34359738368
+	PlayerFlag_CannotBeMuted,               //2^36 = 68719476736
 	//add new flags here
 	PlayerFlag_LastFlag
 };
