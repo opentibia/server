@@ -1,0 +1,229 @@
+// !$*UTF8*$!
+{
+	F69A41150C1E943500798B45 /* exception.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {704, 6692}}";
+			sepNavSelRange = "{12020, 32}";
+			sepNavVisRect = "{{0, 5434}, {459, 186}}";
+		};
+	};
+	F69A411A0C1E943500798B45 /* databasesqlite.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {614, 2254}}";
+			sepNavSelRange = "{2606, 19}";
+			sepNavVisRect = "{{0, 1296}, {459, 186}}";
+		};
+	};
+	F69A411C0C1E943500798B45 /* databasemysql.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {728, 2996}}";
+			sepNavSelRange = "{3875, 16}";
+			sepNavVisRect = "{{0, 1675}, {711, 429}}";
+			sepNavWindowFrame = "{{199, 47}, {750, 558}}";
+		};
+	};
+	F69A411D0C1E943500798B45 /* database.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {632, 3920}}";
+			sepNavSelRange = "{3702, 15}";
+			sepNavVisRect = "{{0, 1751}, {459, 186}}";
+			sepNavWindowFrame = "{{15, 215}, {750, 558}}";
+		};
+	};
+	F69A41690C1E9A2E00798B45 /* otserv-xml */ = {
+		activeExec = 0;
+		executables = (
+			F69A416B0C1E9A2E00798B45 /* otserv-xml */,
+		);
+	};
+	F69A416B0C1E9A2E00798B45 /* otserv-xml */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "otserv-xml";
+		sourceDirectories = (
+		);
+	};
+	F69A42E10C1EAC8300798B45 /* otserv-mysql */ = {
+		activeExec = 0;
+		executables = (
+			F69A43760C1EAC8300798B45 /* otserv-mysql */,
+		);
+	};
+	F69A43760C1EAC8300798B45 /* otserv-mysql */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "otserv-mysql";
+		sourceDirectories = (
+		);
+	};
+	F69A43930C1EAED100798B45 /* otserv-sqlite */ = {
+		activeExec = 0;
+		executables = (
+			F69A44280C1EAED100798B45 /* otserv-sqlite */,
+		);
+	};
+	F69A44280C1EAED100798B45 /* otserv-sqlite */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "otserv-sqlite";
+		sourceDirectories = (
+		);
+	};
+	F69AE4DC0C1E804900C5F7A1 /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = F69A43760C1EAC8300798B45 /* otserv-mysql */;
+		activeTarget = F69A42E10C1EAC8300798B45 /* otserv-mysql */;
+		addToTargets = (
+		);
+		codeSenseManager = F69AE4E10C1E804900C5F7A1 /* Code sense */;
+		executables = (
+			F69A43760C1EAC8300798B45 /* otserv-mysql */,
+			F69A416B0C1E9A2E00798B45 /* otserv-xml */,
+			F69A44280C1EAED100798B45 /* otserv-sqlite */,
+		);
+		ignoreBreakpointsInProjectsDict = {
+		};
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXErrorsWarningsDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXErrorsWarningsDataSource_LocationID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					925,
+					45.2085,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXErrorsWarningsDataSource_TypeID,
+					PBXErrorsWarningsDataSource_MessageID,
+					PBXErrorsWarningsDataSource_LocationID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					22,
+					300,
+					365,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXExecutablesDataSource_ActiveFlagID,
+					PBXExecutablesDataSource_NameID,
+					PBXExecutablesDataSource_CommentsID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					243,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					200,
+					297,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 203330509;
+			PBXWorkspaceStateSaveDate = 203330509;
+		};
+		sourceControlManager = F69AE4E00C1E804900C5F7A1 /* Source Control */;
+		userBuildSettings = {
+			OBJROOT = "$(SYMROOT)";
+			SYMROOT = ../../otserv_build;
+		};
+	};
+	F69AE4E00C1E804900C5F7A1 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+		scmType = "";
+	};
+	F69AE4E10C1E804900C5F7A1 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+}
