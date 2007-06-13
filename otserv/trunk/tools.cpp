@@ -156,72 +156,9 @@ void hexdump(unsigned char *_data, int _len) {
 
 // Upcase a char.
 char upchar(char c) {
-  if (c >= 'a' && c <= 'z')
-      return c - 'a' + 'A';
-  else if (c == 'à')
-      return 'À';
-  else if (c == 'á')
-      return 'Á';
-  else if (c == 'â')
-      return 'Â';
-  else if (c == 'ã')
-      return 'Ã';
-  else if (c == 'ä')
-      return 'Ä';
-  else if (c == 'å')
-      return 'Å';
-  else if (c == 'æ')
-      return 'Æ';
-  else if (c == 'ç')
-      return 'Ç';
-  else if (c == 'è')
-      return 'È';
-  else if (c == 'é')
-      return 'É';
-  else if (c == 'ê')
-      return 'Ê';
-  else if (c == 'ë')
-      return 'Ë';
-  else if (c == 'ì')
-      return 'Ì';
-  else if (c == 'í')
-      return 'Í';
-  else if (c == 'î')
-      return 'Î';
-  else if (c == 'ï')
-      return 'Ï';
-  else if (c == 'ğ')
-      return 'Ğ';
-  else if (c == 'ñ')
-      return 'Ñ';
-  else if (c == 'ò')
-      return 'Ò';
-  else if (c == 'ó')
-      return 'Ó';
-  else if (c == 'ô')
-      return 'Ô';
-  else if (c == 'õ')
-      return 'Õ';
-  else if (c == 'ö')
-      return 'Ö';
-  else if (c == 'ø')
-      return 'Ø';
-  else if (c == 'ù')
-      return 'Ù';
-  else if (c == 'ú')
-      return 'Ú';
-  else if (c == 'û')
-      return 'Û';
-  else if (c == 'ü')
-      return 'Ü';
-  else if (c == 'ı')
-      return 'İ';
-  else if (c == 'ş')
-      return 'Ş';
-  else if (c == 'ÿ')
-      return 'ß';
-  else
-      return c;
+	if((c >= 97 && c <= 122) || (c <= -1 && c >= -32)){
+		return c-32;
+	}
 }
 
 std::string urlEncode(const std::string& str)
