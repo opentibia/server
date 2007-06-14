@@ -128,11 +128,11 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 	int range = highest_number - lowest_number;
 	
 	if(type == DISTRO_NORMAL){
-		int r = rand24b() % range;
-		return lowest_number + r + 1;
+		int r = rand24b() % (range + 1);
+		return lowest_number + r;
 	}
 	else{
-		float r = 1.f -sqrt((1.f*rand24b())/RAND_MAX24);
+		float r = 1.f - sqrt((1.f*rand24b())/RAND_MAX24);
 		return lowest_number + (int)((float)range * r);
 	}
 }
