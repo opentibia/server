@@ -155,10 +155,12 @@ void hexdump(unsigned char *_data, int _len) {
 }
 
 // Upcase a char.
-char upchar(char c) {
+char upchar(char c)
+{
 	if((c >= 97 && c <= 122) || (c <= -1 && c >= -32)){
 		return c-32;
 	}
+	return c;
 }
 
 std::string urlEncode(const std::string& str)
