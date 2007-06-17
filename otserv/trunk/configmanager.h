@@ -94,6 +94,7 @@ public:
 		HOTKEYS,
 		MAX_MESSAGEBUFFER,
 		OTSERV_DB_ENABLED,
+		SAVE_CLIENT_DEBUG_ASSERTIONS,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

@@ -136,7 +136,9 @@ private:
 	void parseOpenChannel(NetworkMessage& msg);
 	void parseOpenPriv(NetworkMessage& msg);
 	void parseCloseChannel(NetworkMessage& msg);
-
+	
+	void parseDebugAssert(NetworkMessage& msg);
+	
 	void parseDebug(NetworkMessage& msg);
 
 	//Send functions
@@ -267,7 +269,9 @@ private:
 	
 	House* house;
 	uint32_t listId;
-		
+	
+	bool debugAssertSent;
+	
 	bool pendingLogout;
 	Player* player;
 	SOCKET s;

@@ -61,6 +61,8 @@ Protocol79::Protocol79(SOCKET s)
 	player = NULL;
 	pendingLogout = false;
 
+	debugAssertSent = false;
+
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
@@ -114,6 +116,7 @@ void Protocol79::reinitializeProtocol(SOCKET _s)
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
+	debugAssertSent = false;
 	OutputBuffer.Reset();
 	knownPlayers.clear();
 	if(s)
@@ -389,6 +392,10 @@ void Protocol79::parsePacket(NetworkMessage &msg)
 
 	case 0xDD:
 		parseRemVip(msg);
+		break;
+
+	case 0xE8:
+		parseDebugAssert(msg);
 		break;
 
 	default:
@@ -1206,6 +1213,34 @@ void Protocol79::parseRotateItem(NetworkMessage& msg)
 	uint8_t stackpos = msg.GetByte();
 
 	g_game.playerRotateItem(player, pos, stackpos, spriteId);
+}
+
+void Protocol79::parseDebugAssert(NetworkMessage& msg)
+{
+	if(g_config.getNumber(ConfigManager::SAVE_CLIENT_DEBUG_ASSERTIONS) == 0){
+		return;
+	}
+	
+	//only accept 1 report each time
+	if(debugAssertSent){
+		return;
+	}
+	debugAssertSent = true;
+	
+	std::string assertLine = msg.GetString();
+	std::string date = msg.GetString();
+	std::string description = msg.GetString();
+	std::string comment = msg.GetString();
+	
+	//write it to assertions file
+	FILE* f = fopen("client_assertions.txt", "a");
+	char bufferDate[32], bufferIp[32];
+	time_t tmp = time(NULL);
+	formatIP(getIP(), bufferIp);
+	formatDate(tmp, bufferDate);
+	fprintf(f, "----- %s - %s (%s) -----\n", bufferDate, player->getName().c_str(), bufferIp);
+	fprintf(f, "%s\n%s\n%s\n%s\n", assertLine.c_str(), date.c_str(), description.c_str(), comment.c_str());
+	fclose(f);
 }
 
 // Send methods

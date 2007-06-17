@@ -874,15 +874,9 @@ void showTime(std::stringstream& str, uint32_t time)
 		str << "shutdown";
 	}
 	else{
-		time_t tmp = time;
-		const tm* tms = localtime(&tmp);
-		if(tms){
-			str << tms->tm_hour << ":" << tms->tm_min << ":" << tms->tm_sec << "  " << 
-				tms->tm_mday << "/" << tms->tm_mon + 1 << "/" << tms->tm_year + 1900;
-		}
-		else{
-			str << "UNIX Time : " <<  time;
-		}
+		char buffer[32];
+		formatDate((time_t)time, buffer);
+		str << buffer;
 	}
 }
 

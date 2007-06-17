@@ -107,6 +107,10 @@ allowclones = 0
 -- max number of players allowed
 maxplayers = "900"
 
+-- save client debug assertion reports
+-- options: 0 (no), 1 (yes)
+saveclientdebug = 0
+
 -- md5 passwords for accounts
 -- options: yes, no
 md5passwords = "no"

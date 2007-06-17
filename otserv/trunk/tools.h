@@ -60,5 +60,6 @@ std::string urlEncode(const std::string& str);
 uint32_t getIPSocket(SOCKET s);
 //buffer should be at least 17 bytes
 void formatIP(uint32_t ip, char* buffer);
+void formatDate(time_t time, char* buffer);
 
 #endif

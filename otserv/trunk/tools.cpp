@@ -209,3 +209,16 @@ void formatIP(uint32_t ip, char* buffer)
 {
 	sprintf(buffer, "%d.%d.%d.%d", ip & 0xFF, (ip >> 8) & 0xFF, (ip >> 16) & 0xFF, (ip >> 24));
 }
+
+//buffer should have at least 21 bytes
+void formatDate(time_t time, char* buffer)
+{
+	const tm* tms = localtime(&time);
+	if(tms){
+		sprintf(buffer, "%02d/%02d/%04d  %02d:%02d:%02d", tms->tm_mday, tms->tm_mon + 1, tms->tm_year + 1900,
+			tms->tm_hour, tms->tm_min, tms->tm_sec);
+	}
+	else{
+		sprintf(buffer, "UNIX Time : %d", (int)time);
+	}
+}

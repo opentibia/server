@@ -20,7 +20,7 @@
 
 #include "logger.h"
 #include <iostream>
-
+#include "tools.h"
 /*
 void Logger::logMessage(std::string channel, eLogType type, int level,
 			std::string message, std::string func,
@@ -65,12 +65,10 @@ void Logger::logMessage(char* channel, eLogType type, int level, std::string mes
 	// if should be save decide where and how
 	
 	//write timestamp of the event
+	char buffer[32];
 	time_t tmp = time(NULL);
-	const tm* tms = localtime(&tmp);
-	if(tms){
-		fprintf(m_file, "%02d/%02d/%04d  %02d:%02d:%02d", tms->tm_mday, tms->tm_mon + 1, tms->tm_year + 1900,
-			tms->tm_hour, tms->tm_min, tms->tm_sec);
-	}
+	formatDate(tmp, buffer);
+	fprintf(m_file, "%s", buffer);
 	//write channel generating the message
 	if(channel){
 		fprintf(m_file, " [%s] ", channel);
