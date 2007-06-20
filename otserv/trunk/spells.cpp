@@ -1387,21 +1387,22 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 	if(strcasecmp(param.c_str(), "up") == 0){
 		if(currentPos.z != 8){
 			Tile* tmpTile = g_game.getTile(currentPos.x, currentPos.y, currentPos.z - 1);
-			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
+			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE))){
 				tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z - 1);
 				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)){
-					ret = g_game.internalMoveCreature(player, player->getTile(), tmpTile);
+					ret = g_game.internalMoveCreature(player, player->getTile(), tmpTile, FLAG_NOLIMIT);
 				}
 			}
 		}
 	}
 	else if(strcasecmp(param.c_str(), "down") == 0){
-		Tile* tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z);
-		if(currentPos.z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID)))){
-			tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z + 1);
-
-			if(tmpTile){
-				ret = g_game.internalMoveCreature(player, player->getTile(), tmpTile);
+		if(currentPos.z != 7){
+			Tile* tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z);
+			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE))){
+				tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z + 1);
+				if(tmpTile){
+					ret = g_game.internalMoveCreature(player, player->getTile(), tmpTile, FLAG_NOLIMIT);
+				}
 			}
 		}
 	}

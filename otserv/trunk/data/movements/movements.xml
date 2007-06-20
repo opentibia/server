@@ -58,7 +58,14 @@
 <movevent event="StepIn" itemid="1505" function="onStepInField" />
 <movevent event="AddItem" tileitem="0" itemid="1505" function="onAddField" />
 
-<movevent event="StepIn" itemid="1506" script="searingfire.lua" />
+<movevent event="StepIn" itemid="1506" function="onStepInField" />
+<movevent event="AddItem" tileitem="0" itemid="1506" function="onAddField" />
+
+<movevent event="StepIn" itemid="1507" function="onStepInField" />
+<movevent event="AddItem" tileitem="0" itemid="1507" function="onAddField" />
+
+<movevent event="StepIn" itemid="1508" function="onStepInField" />
+<movevent event="AddItem" tileitem="0" itemid="1508" function="onAddField" />
 
 <movevent event="Equip" itemid="2197" slot="necklace" function="onEquipItem" />
 <movevent event="DeEquip" itemid="2197" slot="necklace" function="onDeEquipItem" />
@@ -108,5 +115,13 @@
 
 <movevent event="Equip" itemid="2195" slot="feet" function="onEquipItem" />
 <movevent event="DeEquip" itemid="2195" slot="feet" function="onDeEquipItem" />
+
+<movevent event="Equip" itemid="6132" slot="feet" function="onEquipItem" />
+<movevent event="Equip" itemid="2640" slot="feet" function="onEquipItem" />
+<movevent event="DeEquip" itemid="2640" slot="feet" function="onDeEquipItem" />
+
+<movevent event="Equip" itemid="6300" slot="ring" function="onEquipItem" />
+<movevent event="Equip" itemid="6301" slot="ring" function="onEquipItem" />
+<movevent event="DeEquip" itemid="6301" slot="ring" function="onDeEquipItem" />
 
 </movements>
