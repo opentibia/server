@@ -15187,10 +15187,12 @@
 <item id="5926" name="backpack">
 	<attribute key="weight" value="1800"/>
 	<attribute key="containerSize" value="20"/>
+	<attribute key="slotType" value="backpack"/>
 </item>
 <item id="5927" name="bag">
 	<attribute key="weight" value="800"/>
 	<attribute key="containerSize" value="8"/>
+	<attribute key="slotType" value="backpack"/>
 </item>
 <item id="5928" name="empty goldfish bowl">
 	<attribute key="weight" value="3200"/>
