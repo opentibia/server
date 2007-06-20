@@ -5639,8 +5639,9 @@
 	<attribute key="weight" value="1500"/>
 </item>
 <item id="2365" name="backpack of holding">
-	<attribute key="weight" value="1600"/>
+	<attribute key="weight" value="1500"/>
 	<attribute key="containerSize" value="24"/>
+	<attribute key="slotType" value="backpack"/>
 </item>
 <item id="2366" name="roc feather">
 	<attribute key="weight" value="100"/>
@@ -14442,7 +14443,7 @@
 	<attribute key="decayTo" value="5630"/>
 	<attribute key="duration" value="180"/>
 </item>
-<item id="5630" name="dead thornback tortois">
+<item id="5630" name="dead thornback tortoise">
 	<attribute key="weight" value="6000"/>
 	<attribute key="decayTo" value="0"/>
 	<attribute key="duration" value="60"/>
@@ -15275,10 +15276,12 @@
 <item id="5949" name="backpack">
 	<attribute key="weight" value="1800"/>
 	<attribute key="containerSize" value="20"/>
+	<attribute key="slotType" value="backpack"/>
 </item>
 <item id="5950" name="bag">
 	<attribute key="weight" value="800"/>
 	<attribute key="containerSize" value="8"/>
+	<attribute key="slotType" value="backpack"/>
 </item>
 <item id="5951" name="">
 	<attribute key="weight" value="0"/>
@@ -16813,7 +16816,7 @@
 </item>
 <item id="6390" name="fountain">
 </item>
-<item id="6391" name="nightamre shield">
+<item id="6391" name="nightmare shield">
 	<attribute key="description" value="It was crafted by the ancient order of the nightmare knights."/>
 	<attribute key="weight" value="3200"/>
 	<attribute key="defense" value="36"/>
