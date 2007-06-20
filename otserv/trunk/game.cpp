@@ -205,6 +205,8 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 	eventExceptionHandler.InstallHandler();
 #endif
 
+	srand(time(NULL));
+
   Game* _this = (Game*)p;
 
   // basically what we do is, look at the first scheduled item,
