@@ -38,6 +38,7 @@
 #include "town.h"
 #include "ioplayer.h"
 #include "configmanager.h"
+#include "teleport.h"
 
 extern Game g_game;
 extern Monsters g_monsters;
@@ -928,6 +929,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doDecayItem", LuaScriptInterface::luaDoDecayItem);
 	//doCreateItem(itemid,type or count,position) .only working on ground. returns uid of the created item
 	lua_register(m_luaState, "doCreateItem", LuaScriptInterface::luaDoCreateItem);
+	//doCreateTeleport(teleportID,positionToGo,createPosition)
+	lua_register(m_luaState, "doCreateTeleport", LuaScriptInterface::luaDoCreateTeleport);
 	//doSummonCreature(name, position)
 	lua_register(m_luaState, "doSummonCreature", LuaScriptInterface::luaDoSummonCreature);
 	//doMoveCreature(cid, direction)
@@ -2032,6 +2035,57 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 		return 1;
 	}
 	
+	if(newItem->getParent()){
+		uint32_t uid = env->addThing(newItem);
+		lua_pushnumber(L, uid);
+	}
+	else{
+		//stackable item stacked with existing object, newItem will be released
+		lua_pushnumber(L, LUA_NULL);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoCreateTeleport(lua_State *L)
+{
+	//doCreateTeleport(teleportID,positionToGo,createPosition)
+	Position createPos;
+	uint32_t createStackpos;
+	popPosition(L, createPos, createStackpos);
+	Position toPos;
+	uint32_t toStackpos;
+	popPosition(L, toPos, toStackpos);
+	uint32_t itemId = (uint32_t)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Tile* tile = g_game.map->getTile(createPos);
+	if(!tile){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Item* newItem = Item::CreateItem(itemId);
+	Teleport* newTp = newItem->getTeleport();
+
+	if(!newTp){
+		delete newItem;
+		reportErrorFunc("Wrong teleport id");
+        lua_pushnumber(L, LUA_ERROR);
+        return 1;
+	}
+
+	newTp->setDestPos(toPos);
+
+	ReturnValue ret = g_game.internalAddItem(tile, newTp, INDEX_WHEREEVER, FLAG_NOLIMIT);
+	if(ret != RET_NOERROR){
+		delete newItem;
+		reportErrorFunc("Can not add Item");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
 	if(newItem->getParent()){
 		uint32_t uid = env->addThing(newItem);
 		lua_pushnumber(L, uid);
