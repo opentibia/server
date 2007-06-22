@@ -205,7 +205,7 @@ BEFORE DELETE
 ON `guilds`
 FOR EACH ROW
 BEGIN
-    UPDATE `players` SET `rank_id` = 0 WHERE `rank_id` IN (SELECT `id` FROM `guild_ranks` WHERE `guild_id` = OLD.`id`);
+    UPDATE `players` SET `guildnick` = '', `rank_id` = 0 WHERE `rank_id` IN (SELECT `id` FROM `guild_ranks` WHERE `guild_id` = OLD.`id`);
 END|
 
 CREATE TRIGGER `ondelete_players`
