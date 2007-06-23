@@ -235,10 +235,6 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		enabled = (intValue == 1);
 	}
 
-	if(readXMLInteger(p, "range", intValue)){
-		range = intValue;
-	}
-
 	if(readXMLString(p, "ammo", strValue)){
 		if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"move") == 0){
 			ammoAction = AMMOACTION_MOVE;
@@ -266,6 +262,8 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		vocationNode = vocationNode->next;
 	}
 
+    range = Item::items[id].shootRange;
+
 	return true;
 }
 
@@ -288,7 +286,23 @@ bool Weapon::playerWeaponCheck(Player* player, Creature* target) const
 		return false;
 	}
 
-	if( std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y)) > range){
+	uint32_t trueRange = range;
+	const ItemType& it = Item::items[getID()];
+	Item* trueWeapon;
+	if(it.weaponType == WEAPON_AMMO){
+		for(int s = SLOT_RIGHT; s <= SLOT_LEFT; ++s){
+			trueWeapon = player->getInventoryItem((slots_t)s);
+			if(trueWeapon){
+				break;
+			}
+		}
+	}
+
+	if(trueWeapon && trueWeapon->getWeaponType() == WEAPON_DIST && trueWeapon->getAmuType() != AMMO_NONE){
+        trueRange = Item::items[trueWeapon->getID()].shootRange;
+	}
+
+	if(std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y)) > trueRange){
 		return false;
 	}
 
@@ -650,25 +664,23 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	id = it.id;
 	ammuAttackValue = it.attack;
 	params.distanceEffect = it.shootType;
+	range = it.shootRange;
 
 	switch(it.amuType){
 		case AMMO_ARROW:
 		{
 			hitChance = 80;
-			range = 5;
 			break;
 		}
 
 		case AMMO_BOLT:
 		{
 			hitChance = 90;
-			range = 6;
 			break;
 		}
 
 		default:
 			hitChance = 50;
-			range = 4;
 			break;
 	}
 

@@ -97,6 +97,7 @@ ItemType::ItemType()
 	showCharges   = false;
 	charges       = 0;
 	breakChance   = 0;
+	shootRange    = 1;
 
 	condition = NULL;
 	combatType = COMBAT_NONE;
@@ -592,6 +593,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown shootType " << strValue  << std::endl;
 									}
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "range") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.shootRange = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "stopduration") == 0){

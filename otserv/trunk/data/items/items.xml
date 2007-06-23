@@ -2438,6 +2438,7 @@
 	<attribute key="attack" value="20"/>
 	<attribute key="weaponType" value="distance"/>
 	<attribute key="shootType" value="smallstone"/>
+	<attribute key="range" value="5"/>
 </item>
 <item id="1295" name="stone">
 	<attribute key="weight" value="3000"/>
@@ -4600,6 +4601,7 @@
 	<attribute key="weight" value="80"/>
 	<attribute key="weaponType" value="distance"/>
 	<attribute key="shootType" value="snowball"/>
+	<attribute key="range" value="5"/>
 </item>
 <item id="2112" name="teddy bear">
 	<attribute key="weight" value="700"/>
@@ -4874,16 +4876,19 @@
 	<attribute key="description" value="it emits clouds of poisonous swamp gas."/>
 	<attribute key="weight" value="2650"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="2"/>
 </item>
 <item id="2182" name="snakebite rod">
 	<attribute key="description" value="it seems to twitch and quiver as if trying to escape your grip."/>
 	<attribute key="weight" value="4300"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="3"/>
 </item>
 <item id="2183" name="tempest rod">
 	<attribute key="description" value="it grants you the power of striking your foes with furious thunderstorms."/>
 	<attribute key="weight" value="2100"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="1"/>
 </item>
 <item id="2184" name="crystal wand">
 	<attribute key="weight" value="2800"/>
@@ -4892,36 +4897,43 @@
 	<attribute key="description" value="it erupts powerful bursts of magma upon everything in your path."/>
 	<attribute key="weight" value="2900"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="3"/>
 </item>
 <item id="2186" name="moonlight rod">
 	<attribute key="description" value="shimmering rays of moonlight radiate from its tip"/>
 	<attribute key="weight" value="1950"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="2"/>
 </item>
 <item id="2187" name="wand of Inferno">
 	<attribute key="description" value="it unleashes the very fires of hell."/>
 	<attribute key="weight" value="3050"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="2"/>
 </item>
 <item id="2188" name="wand of plague">
 	<attribute key="description" value="infectious goo covers its tip"/>
 	<attribute key="weight" value="2300"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="2"/>
 </item>
 <item id="2189" name="wand of cosmic energy">
 	<attribute key="description" value="the energy of a radiant star is trapped inside its globe."/>
 	<attribute key="weight" value="2300"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="1"/>
 </item>
 <item id="2190" name="wand of vortex">
 	<attribute key="description" value="surges of energy rush through the tip of this wand."/>
 	<attribute key="weight" value="2300"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="3"/>
 </item>
 <item id="2191" name="wand of dragonbreath">
 	<attribute key="description" value="legends say that this wand holds the soul of a young dragon."/>
 	<attribute key="weight" value="2300"/>
 	<attribute key="weaponType" value="wand"/>
+	<attribute key="range" value="3"/>
 </item>
 <item id="2192" name="crystal ball">
 	<attribute key="weight" value="3400"/>
@@ -5762,6 +5774,7 @@
 	<attribute key="attack" value="30"/>
 	<attribute key="weaponType" value="distance"/>
 	<attribute key="shootType" value="spear"/>
+	<attribute key="range" value="5"/>
 </item>
 <item id="2390" name="magic longsword">
 	<attribute key="weight" value="4300"/>
@@ -5828,6 +5841,7 @@
 	<attribute key="attack" value="25"/>
 	<attribute key="weaponType" value="distance"/>
 	<attribute key="shootType" value="throwingstar"/>
+	<attribute key="range" value="5"/>
 </item>
 <item id="2400" name="magic sword">
 	<attribute key="description" value="It is the Sword of Valor."/>
@@ -5899,6 +5913,7 @@
 	<attribute key="attack" value="30"/>
 	<attribute key="weaponType" value="distance"/>
 	<attribute key="shootType" value="throwingknife"/>
+	<attribute key="range" value="5"/>
 </item>
 <item id="2411" name="poison dagger">
 	<attribute key="weight" value="880"/>
@@ -6191,12 +6206,14 @@
 	<attribute key="weaponType" value="distance"/>
 	<attribute key="slotType" value="two-handed"/>
 	<attribute key="ammoType" value="bolt"/>
+	<attribute key="range" value="5"/>
 </item>
 <item id="2456" name="bow">
 	<attribute key="weight" value="3100"/>
 	<attribute key="weaponType" value="distance"/>
 	<attribute key="slotType" value="two-handed"/>
 	<attribute key="ammoType" value="arrow"/>
+	<attribute key="range" value="5"/>
 </item>
 <item id="2457" name="steel helmet">
 	<attribute key="weight" value="4600"/>
@@ -6938,7 +6955,7 @@
 <item id="2639" name="tic-tac-toe token">
 	<attribute key="weight" value="500"/>
 </item>
-<item id="2640" name="soft boots">
+<item id="2640" name="pair of soft boots">
 	<attribute key="weight" value="800"/>
 	<attribute key="slotType" value="feet"/>
 	<attribute key="decayTo" value="6530"/>
@@ -14854,10 +14871,12 @@
 	<attribute key="weight" value="0"/>
 </item>
 <item id="5803" name="arbalest">
+	<attribute key="description" value="It is a bit heavy due to the iron mounting, but very precise."/>
 	<attribute key="weight" value="9500"/>
 	<attribute key="weaponType" value="distance"/>
 	<attribute key="slotType" value="two-handed"/>
 	<attribute key="ammoType" value="bolt"/>
+	<attribute key="range" value="6"/>
 </item>
 <item id="5804" name="nose ring">
 	<attribute key="weight" value="50"/>
@@ -16075,7 +16094,7 @@
 	<attribute key="defense" value="26"/>
 	<attribute key="weaponType" value="shield"/>
 </item>
-<item id="6132" name="soft boots">
+<item id="6132" name="pair of soft boots">
 	<attribute key="weight" value="800"/>
 	<attribute key="slotType" value="feet"/>
 	<attribute key="transformEquipTo" value="2640"/>
