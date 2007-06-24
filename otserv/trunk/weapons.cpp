@@ -234,6 +234,10 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	if(readXMLInteger(p, "enabled", intValue)){
 		enabled = (intValue == 1);
 	}
+	
+	if(readXMLInteger(p, "range", intValue)){
+		std::cout << "Warning: range is not longer used in weapons.xml." << std::endl;
+	}
 
 	if(readXMLString(p, "ammo", strValue)){
 		if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"move") == 0){
@@ -286,20 +290,13 @@ bool Weapon::playerWeaponCheck(Player* player, Creature* target) const
 		return false;
 	}
 
-	uint32_t trueRange = range;
+	int32_t trueRange;
 	const ItemType& it = Item::items[getID()];
-	Item* trueWeapon;
 	if(it.weaponType == WEAPON_AMMO){
-		for(int s = SLOT_RIGHT; s <= SLOT_LEFT; ++s){
-			trueWeapon = player->getInventoryItem((slots_t)s);
-			if(trueWeapon){
-				break;
-			}
-		}
+		trueRange = player->getShootRange();
 	}
-
-	if(trueWeapon && trueWeapon->getWeaponType() == WEAPON_DIST && trueWeapon->getAmuType() != AMMO_NONE){
-        trueRange = Item::items[trueWeapon->getID()].shootRange;
+	else{
+		trueRange = range;
 	}
 
 	if(std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y)) > trueRange){

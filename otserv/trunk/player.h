@@ -242,6 +242,7 @@ public:
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
+	int32_t getShootRange() const {return shootRange;}
 
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
@@ -450,7 +451,7 @@ protected:
 
 	//combat help functions
 	//bool getCombatItem(Item** tool, const Weapon** weapon);
-	Item* getWeapon() const;
+	Item* getWeapon();
 
 	std::string getSkillName(int skillid);
 	void addExperience(uint32_t exp);
@@ -518,6 +519,7 @@ protected:
 	BlockType_t lastAttackBlockType;
 	bool addAttackSkillPoint;
 	uint32_t attackTicks;
+	int32_t shootRange;
 	
 	chaseMode_t chaseMode;
 	fightMode_t fightMode;

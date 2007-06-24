@@ -229,6 +229,7 @@ public:
 
 	WeaponType_t getWeaponType() const {return items[id].weaponType;}
 	Ammo_t	getAmuType() const {return items[id].amuType;}
+	int32_t	getShootRange() const {return items[id].shootRange;}
 
 	virtual double getWeight() const;
 	int getAttack() const {return items[id].attack;}

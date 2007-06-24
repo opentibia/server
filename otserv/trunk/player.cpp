@@ -90,6 +90,7 @@ Creature()
 	lastAttackBlockType = BLOCK_NONE;
 	addAttackSkillPoint = false;
 	attackTicks = 0;
+	shootRange = 1;
 
 	chaseMode = CHASEMODE_STANDSTILL;
 
@@ -272,10 +273,10 @@ void Player::setConditionSuppressions(uint32_t conditions, bool remove)
 	}
 }
 
-Item* Player::getWeapon() const
+Item* Player::getWeapon()
 {
-	Item* item = NULL;
-
+	Item* item;
+	
 	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
 		item = getInventoryItem((slots_t)slot);
 		if(!item){
@@ -304,6 +305,7 @@ Item* Player::getWeapon() const
 					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
 						const Weapon* weapon = g_weapons->getWeapon(ammuItem);
 						if(weapon){
+							shootRange = item->getShootRange();
 							return ammuItem;
 						}
 					}
