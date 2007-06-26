@@ -27,7 +27,7 @@
 #include "templates.h"
 #include "position.h"
 #include "condition.h"
-#include "const79.h"
+#include "const80.h"
 #include "tile.h"
 #include "enums.h"
 

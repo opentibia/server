@@ -48,7 +48,7 @@ AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
 int32_t Player::maxMessageBuffer;
 
-Player::Player(const std::string& _name, Protocol79 *p) :
+Player::Player(const std::string& _name, Protocol80 *p) :
 Creature()
 {	
 	client = p;

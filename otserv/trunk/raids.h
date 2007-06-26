@@ -23,7 +23,7 @@
 #include <list>
 
 #include "definitions.h"
-#include "const79.h"
+#include "const80.h"
 #include "position.h"
 
 #include <libxml/xmlmemory.h>

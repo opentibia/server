@@ -39,7 +39,7 @@ extern Game g_game;
 #define STATUS_SERVER_VERSION "0.6.0_SVN"
 //#define STATUS_SERVER_VERSION "0.6.0"
 #define STATUS_SERVER_NAME "otserv"
-#define STATUS_CLIENT_VERISON "7.92"
+#define STATUS_CLIENT_VERISON "8.0"
 
 Status::Status()
 {

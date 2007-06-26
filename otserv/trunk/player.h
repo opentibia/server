@@ -29,7 +29,7 @@
 #include "outfit.h"
 #include "enums.h"
 #include "vocation.h"
-#include "protocol79.h"
+#include "protocol80.h"
 
 #include <vector>
 #include <ctime>
@@ -37,7 +37,7 @@
 
 class House;
 class Weapon;
-class Protocol79;
+class Protocol80;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -97,7 +97,7 @@ typedef std::list<std::string> LearnedInstantSpellList;
 class Player : public Creature, public Cylinder
 {
 public:
-	Player(const std::string& name, Protocol79* p);
+	Player(const std::string& name, Protocol80* p);
 	virtual ~Player();
 
 	virtual Player* getPlayer() {return this;}
@@ -486,7 +486,7 @@ protected:
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
 protected:
-	Protocol79* client;
+	Protocol80* client;
 
 	int32_t level;
 	int32_t magLevel;

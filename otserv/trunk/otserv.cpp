@@ -28,7 +28,7 @@
 
 #include "otsystem.h"
 #include "networkmessage.h"
-#include "protocol79.h"
+#include "protocol80.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -81,8 +81,8 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 	}
 #endif
 
-#define CLIENT_VERSION_MIN 792
-#define CLIENT_VERSION_MAX 792
+#define CLIENT_VERSION_MIN 800
+#define CLIENT_VERSION_MAX 800
 
 typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
 IPList serverIPs;
@@ -173,7 +173,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			if(version <= 760){
 				msg.Reset();
 				msg.AddByte(0x0A);
-				msg.AddString("Only clients with protocol 7.92 allowed!");
+				msg.AddString("Only clients with protocol 8.0 allowed!");
 				msg.WriteToSocket(s);
 			}
 			else if(msg.RSA_decrypt()){
@@ -259,13 +259,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				}
 				else{
 					msg.AddByte(0x0A);
-					msg.AddString("Only clients with protocol 7.92 allowed!");
+					msg.AddString("Only clients with protocol 8.0 allowed!");
 				}
 
 				msg.WriteToSocket(s);
 			}
 		}
-		// gameworld connection tibia 7.9x
+		// gameworld connection tibia 8.0
 		else if (protId == 0x0A){
 			/*uint16_t  clientos =*/ msg.GetU16();
 			uint16_t version  = msg.GetU16();
@@ -298,7 +298,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 				if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 					msg.AddByte(0x14);
-					msg.AddString("Only clients with protocol 7.92 allowed!");
+					msg.AddString("Only clients with protocol 8.0 allowed!");
 					msg.WriteToSocket(s);
 				}
 				else if(g_bans.isIpDisabled(s)){
@@ -341,8 +341,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						}
 
 						if(s){
-							Protocol79* protocol;
-							protocol = new Protocol79(s);
+							Protocol80* protocol;
+							protocol = new Protocol80(s);
 							protocol->setKey(k);
 							player = new Player(name, protocol);
 							player->useThing2();
