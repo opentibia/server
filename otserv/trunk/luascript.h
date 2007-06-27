@@ -472,6 +472,9 @@ protected:
 	static int luaSetItemOutfit(lua_State *L);
 	static int luaGetCreaturePosition(lua_State *L);
 	static int luaGetCreatureName(lua_State *L);
+	static int luaGetCreatureSpeed(lua_State *L);
+	static int luaGetCreatureBaseSpeed(lua_State *L);
+	static int luaGetCreatureTarget(lua_State *L);
 
 	static int luaIsItemStackable(lua_State *L);
 	static int luaIsItemRune(lua_State *L);

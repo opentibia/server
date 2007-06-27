@@ -971,7 +971,7 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerByName", LuaScriptInterface::luaGetPlayerByName);
 	//getPlayerGUIDByName(name)
 	lua_register(m_luaState, "getPlayerGUIDByName", LuaScriptInterface::luaGetPlayerGUIDByName);
-	//registerCreature(cid)
+	//registerCreature(id)
 	lua_register(m_luaState, "registerCreature", LuaScriptInterface::luaRegisterCreature);
 
 	//getContainerSize(uid)
@@ -1120,6 +1120,12 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getCreaturePosition", LuaScriptInterface::luaGetCreaturePosition);
 	//getCreatureName(cid)
 	lua_register(m_luaState, "getCreatureName", LuaScriptInterface::luaGetCreatureName);
+	//getCreatureSpeed(cid)
+	lua_register(m_luaState, "getCreatureSpeed", LuaScriptInterface::luaGetCreatureSpeed);
+	//getCreatureBaseSpeed(cid)
+	lua_register(m_luaState, "getCreatureBaseSpeed", LuaScriptInterface::luaGetCreatureBaseSpeed);
+	//getCreatureTarget(cid)
+	lua_register(m_luaState, "getCreatureTarget", LuaScriptInterface::luaGetCreatureTarget);
 
 	//isItemStackable(itemid)
 	lua_register(m_luaState, "isItemStackable", LuaScriptInterface::luaIsItemStackable);
@@ -4204,12 +4210,12 @@ int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
 
 int LuaScriptInterface::luaRegisterCreature(lua_State *L)
 {
-	//registerCreature(cid)
-	uint32_t cid = popNumber(L);
+	//registerCreature(id)
+	uint32_t id = popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Creature* creature = g_game.getCreatureByID(cid);
+	Creature* creature = g_game.getCreatureByID(id);
 	uint32_t newcid;
 	if(creature){
 		newcid = env->addThing(creature);
@@ -4612,3 +4618,63 @@ int LuaScriptInterface::luaGetDataDirectory(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetCreatureSpeed(lua_State *L)
+{
+	//getCreatureSpeed(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		lua_pushnumber(L, creature->getSpeed());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureBaseSpeed(lua_State *L)
+{
+	//getCreatureBaseSpeed(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		lua_pushnumber(L, creature->getBaseSpeed());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureTarget(lua_State *L)
+{
+	//getCreatureTarget(cid)
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		Creature* target = creature->getAttackedCreature();
+		if(target){
+			uint32_t targetCid = env->addThing(target);
+			lua_pushnumber(L, targetCid);
+		}
+		else{
+			lua_pushnumber(L, 0);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;		
+}

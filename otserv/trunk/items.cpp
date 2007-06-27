@@ -590,6 +590,42 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(strcasecmp(strValue.c_str(), "infernalbolt") == 0){
 										it.shootType = SHOOT_INFERNALBOLT;
 									}
+									else if(strcasecmp(strValue.c_str(), "huntingspear") == 0){
+										it.shootType = SHOOT_HUNTINGSPEAR;
+									}
+									else if(strcasecmp(strValue.c_str(), "enchantedspear") == 0){
+										it.shootType = SHOOT_ENCHANTEDSPEAR;
+									}
+									else if(strcasecmp(strValue.c_str(), "redassassinstar") == 0){
+										it.shootType = SHOOT_REDASSASSINSTAR;
+									}
+									else if(strcasecmp(strValue.c_str(), "greenassassinstar") == 0){
+										it.shootType = SHOOT_GREENASSASSINSTAR;
+									}
+									else if(strcasecmp(strValue.c_str(), "royalspear") == 0){
+										it.shootType = SHOOT_ROYALSPEAR;
+									}
+									else if(strcasecmp(strValue.c_str(), "sniperarrow") == 0){
+										it.shootType = SHOOT_SNIPERARROW;
+									}
+									else if(strcasecmp(strValue.c_str(), "onyxarrow") == 0){
+										it.shootType = SHOOT_ONYXARROW;
+									}
+									else if(strcasecmp(strValue.c_str(), "piercingbolt") == 0){
+										it.shootType = SHOOT_PIERCINGBOLT;
+									}
+									else if(strcasecmp(strValue.c_str(), "whirlwindsword") == 0){
+										it.shootType = SHOOT_WHIRLWINDSWORD;
+									}
+									else if(strcasecmp(strValue.c_str(), "whirlwindaxe") == 0){
+										it.shootType = SHOOT_WHIRLWINDAXE;
+									}
+									else if(strcasecmp(strValue.c_str(), "whirlwindmace") == 0){
+										it.shootType = SHOOT_WHIRLWINDMACE;
+									}
+									else if(strcasecmp(strValue.c_str(), "etherealspear") == 0){
+										it.shootType = SHOOT_ETHEREALSPEAR;
+									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown shootType " << strValue  << std::endl;
 									}
