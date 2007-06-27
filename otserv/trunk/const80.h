@@ -95,6 +95,7 @@ enum MagicEffectClasses {
 #define NM_ANI_ETHEREALSPEAR	 27
 	
 //for internal use, dont send to client
+#define NM_ANI_WEAPONTYPE       254
 #define NM_ANI_NONE             255
 
 enum SpeakClasses {

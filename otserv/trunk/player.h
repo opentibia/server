@@ -248,6 +248,10 @@ public:
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
+	Item* getWeapon();
+	virtual WeaponType_t getWeaponType();
+	int32_t getWeaponSkill(const Item* item) const;
+
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);	
 	void addManaSpent(uint32_t amount);
@@ -448,10 +452,6 @@ public:
 protected:
 	void checkTradeState(const Item* item);
 	bool hasCapacity(const Item* item, uint32_t count) const;
-
-	//combat help functions
-	//bool getCombatItem(Item** tool, const Weapon** weapon);
-	Item* getWeapon();
 
 	std::string getSkillName(int skillid);
 	void addExperience(uint32_t exp);

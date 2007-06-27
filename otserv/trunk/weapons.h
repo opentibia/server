@@ -87,6 +87,7 @@ public:
 	uint16_t getID() const {return id;}
 
 	static bool useFist(Player* player, Creature* target);
+	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const = 0;
 
 protected:
 	virtual std::string getScriptEventName();
@@ -95,9 +96,7 @@ protected:
 	bool internalUseWeapon(Player* player, Item* item, Creature* target) const;
 	bool internalUseWeapon(Player* player, Item* item, Tile* tile) const;
 
-	//virtual void onUseWeapon(Player* player, Item* item) const;
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
-	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const = 0;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
 
 	int32_t getManaCost(const Player* player) const;
@@ -128,10 +127,10 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
+	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const;
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
-	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
 };
 
@@ -144,14 +143,13 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
 
-	//virtual bool checkLastAction(Player* player, int32_t interval) const {return (OTSYS_TIME() - getLastAction() >= interval);}
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
 	virtual bool playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
+	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const;
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
-	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
 
 	int32_t hitChance;
@@ -166,9 +164,9 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
+	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const;
 
 protected:
-	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
 
 	int32_t minChange;

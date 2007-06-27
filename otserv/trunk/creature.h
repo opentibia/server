@@ -262,6 +262,7 @@ public:
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
 
+	virtual WeaponType_t getWeaponType() {return WEAPON_NONE;}
 	virtual void getCombatValues(int32_t& min, int32_t& max) {};
 	int32_t getAttackStrength() const {return attackStrength;}
 	int32_t getDefenseStrength() const {return defenseStrength;}

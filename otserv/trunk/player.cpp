@@ -326,6 +326,52 @@ Item* Player::getWeapon()
 	return NULL;
 }
 
+WeaponType_t Player::getWeaponType()
+{
+	Item* item = getWeapon();
+	if(!item){
+		return WEAPON_NONE;
+	}
+
+	return item->getWeaponType();
+}
+
+int32_t Player::getWeaponSkill(const Item* item) const
+{
+	if(!item){
+		return 0;
+	}
+
+	WeaponType_t weaponType = item->getWeaponType();
+	int32_t attackSkill = 0;
+
+	switch(weaponType){
+		case WEAPON_SWORD:
+			attackSkill = getSkill(SKILL_SWORD, SKILL_LEVEL);
+			break;
+
+		case WEAPON_CLUB:
+		{
+			attackSkill = getSkill(SKILL_CLUB, SKILL_LEVEL);
+			break;
+		}
+
+		case WEAPON_AXE:
+		{
+			attackSkill = getSkill(SKILL_AXE, SKILL_LEVEL);
+			break;
+		}
+
+		case WEAPON_DIST:
+		{
+			attackSkill = getSkill(SKILL_AXE, SKILL_LEVEL);
+			break;
+		}
+	}
+
+	return attackSkill;
+}
+
 int32_t Player::getArmor() const
 {
 	int32_t armor = 0;
@@ -837,6 +883,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("Player is not reachable.");
 		break;
 
+	case RET_CREATUREISNOTREACHABLE:
+		sendCancel("Creature is not reachable.");
+		break;
+
 	case RET_ACTIONNOTPERMITTEDINPROTECTIONZONE:
 		sendCancel("This action is not permitted in a protection zone.");
 		break;
@@ -857,6 +907,9 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You may not attack a person while you are in a protection zone.");
 		break;
 	
+	case RET_YOUCANONLYUSEITONCREATURES:
+		sendCancel("You can only use it on creatures.");
+		break;
 
 	case RET_NOTPOSSIBLE:
 	default:

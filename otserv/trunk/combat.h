@@ -274,6 +274,9 @@ public:
 		}
 	}
 
+	static void addDistanceEffect(Creature* caster, const Position& fromPos, const Position& toPos,
+	uint8_t effect);
+
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;
 

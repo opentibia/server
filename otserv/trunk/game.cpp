@@ -3095,7 +3095,6 @@ void Game::addAnimatedText(const Position& pos, uint8_t textColor,
 	const std::string& text)
 {
 	SpectatorVec list;
-	//getSpectators(Range(pos, true), list);
 	getSpectators(list, pos, true);
 
 	addAnimatedText(list, pos, textColor, text);
@@ -3135,8 +3134,6 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 	uint8_t effect)
 {
 	SpectatorVec list;
-	//getSpectators(Range(fromPos, true), list);
-	//getSpectators(Range(toPos, true), list);
 
 	getSpectators(list, fromPos, true);
 	getSpectators(list, toPos, true);

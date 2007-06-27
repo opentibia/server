@@ -131,9 +131,9 @@ public:
 	static ReturnValue CreateIllusion(Creature* creature, uint32_t itemId, int32_t time);
 
 protected:
-	bool playerSpellCheck(const Player* player) const;
-	bool playerInstantSpellCheck(const Player* player, const Position& toPos);
-	bool playerRuneSpellCheck(const Player* player, const Position& toPos);
+	bool playerSpellCheck(Player* player) const;
+	bool playerInstantSpellCheck(Player* player, const Position& toPos);
+	bool playerRuneSpellCheck(Player* player, const Position& toPos);
 	
 	bool learnable;
 	bool enabled;
@@ -146,6 +146,7 @@ protected:
 	int32_t soul;
 	bool exhaustion;
 	bool needTarget;
+	bool needWeapon;
 	bool selfTarget;
 	bool blockingSolid;
 	bool blockingCreature;

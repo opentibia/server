@@ -594,38 +594,18 @@ bool WeaponMelee::getSkillType(const Player* player, const Item* item,
 	}
 }
 
-int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item) const
+int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item, bool maxDamage /*= false*/) const
 {
-	WeaponType_t weaponType = item->getWeaponType();
-
-	int32_t attackSkill = 0;
-
-	switch(weaponType){
-		case WEAPON_SWORD:
-			attackSkill = player->getSkill(SKILL_SWORD, SKILL_LEVEL);
-			break;
-
-		case WEAPON_CLUB:
-		{
-			attackSkill = player->getSkill(SKILL_CLUB, SKILL_LEVEL);
-			break;
-		}
-
-		case WEAPON_AXE:
-		{
-			attackSkill = player->getSkill(SKILL_AXE, SKILL_LEVEL);
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
-
+	int32_t attackSkill = player->getWeaponSkill(item);
 	int32_t attackStrength = player->getAttackStrength();
 	int32_t attackValue = item->getAttack();
-	int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
-	return -(random_range(0, maxDamage) * attackStrength) / 100;
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
+	
+	if(maxDamage){
+		return -maxValue;
+	}
+
+	return -(random_range(0, maxValue) * attackStrength) / 100;
 }
 
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
@@ -731,12 +711,17 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 	Weapon::onUsedWeapon(player, item, destTile);
 }
 
-int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item) const
+int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t attackSkill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
 
 	int32_t attackStrength = player->getAttackStrength();
-	int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, ammuAttackValue);
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, ammuAttackValue);
+
+	if(maxDamage){
+		return -maxValue;
+	}
+
 	return -(random_range(0, maxDamage) * attackStrength) / 100;
 }
 
@@ -796,7 +781,11 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 	return true;
 }
 
-int32_t WeaponWand::getWeaponDamage(const Player* player, const Item* item) const
+int32_t WeaponWand::getWeaponDamage(const Player* player, const Item* item, bool maxDamage /*= false*/) const
 {
+	if(maxDamage){
+		return -maxChange;
+	}
+
 	return random_range(-minChange, -maxChange);
 }

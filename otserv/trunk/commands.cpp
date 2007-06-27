@@ -380,13 +380,17 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 	std::string tmp = param;
 	
 	std::string::size_type pos = tmp.find(' ', 0);
-	if(pos == std::string::npos)
-		return false;
-	
-	int type = atoi(tmp.substr(0, pos).c_str());
-	tmp.erase(0, pos+1);
-	int count = std::max(1, std::min(atoi(tmp.c_str()), 100));
+	if(pos == std::string::npos){
+		pos = tmp.size();
+	}
 				
+	int type = atoi(tmp.substr(0, pos).c_str());
+	int count = 100;
+	if(pos < tmp.size()){
+		tmp.erase(0, pos+1);
+		count = std::max(1, std::min(atoi(tmp.c_str()), 100));
+	}
+
 	Item* newItem = Item::CreateItem(type, count);
 	if(!newItem)
 		return false;

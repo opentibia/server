@@ -364,6 +364,7 @@ Spell::Spell()
 	soul = 0;
 	exhaustion = false;
 	needTarget = false;
+	needWeapon = false;
 	selfTarget = false;
 	blockingSolid = false;
 	blockingCreature = false;
@@ -450,6 +451,10 @@ bool Spell::configureSpell(xmlNodePtr p)
 		needTarget = (intValue == 1);
 	}
 
+	if(readXMLInteger(p, "needweapon", intValue)){
+		needWeapon = (intValue == 1);
+	}
+
 	if(readXMLInteger(p, "selftarget", intValue)){
 		selfTarget = (intValue == 1);
 	}
@@ -498,7 +503,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 	return true;
 }
 
-bool Spell::playerSpellCheck(const Player* player) const
+bool Spell::playerSpellCheck(Player* player) const
 {
 	if(player->hasFlag(PlayerFlag_CannotUseSpells)){
 		return false;
@@ -566,12 +571,27 @@ bool Spell::playerSpellCheck(const Player* player) const
 				}
 			}
 		}
+
+		if(needWeapon){
+			switch(player->getWeaponType()){
+				case WEAPON_SWORD:
+				case WEAPON_CLUB:
+				case WEAPON_AXE: break;
+
+				default:
+				{
+					player->sendCancel("You need to equip a weapon to use this spell.");
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+			}
+		}
 	}
 
 	return true;
 }
 
-bool Spell::playerInstantSpellCheck(const Player* player, const Position& toPos)
+bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 {
 	if(!playerSpellCheck(player)){
 		return false;
@@ -622,7 +642,7 @@ bool Spell::playerInstantSpellCheck(const Player* player, const Position& toPos)
 	return true;
 }
 
-bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
+bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 {
 	if(!playerSpellCheck(player)){
 		return false;
@@ -885,17 +905,31 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 		var.number = player->getID();
 	}
 	else if(needTarget){
-		Player* target = g_game.getPlayerByName(param);
-		if(!target || target->getHealth() <= 0){
-			player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
-			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-			return false;
+		Creature* target = NULL;
+
+		if(hasParam){
+			target = g_game.getPlayerByName(param);
+
+			if(!target || target->getHealth() <= 0){
+				player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+		}
+		else{
+			target = player->getAttackedCreature();
+
+			if(!target || target->getHealth() <= 0){
+				player->sendCancelMessage(RET_YOUCANONLYUSEITONCREATURES);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
 		}
 
 		const Position& fromPos = player->getPosition();
 		const Position& toPos = target->getPosition();
 		if(!g_game.canThrowObjectTo(fromPos, toPos) || fromPos.z != toPos.z){
-			player->sendCancelMessage(RET_PLAYERISNOTREACHABLE);
+			player->sendCancelMessage(RET_CREATUREISNOTREACHABLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}

@@ -27,10 +27,12 @@
 #include "player.h"
 #include "const80.h"
 #include "tools.h"
+#include "weapons.h"
 
 #include <sstream>
 
 extern Game g_game;
+extern Weapons* g_weapons;
 
 Combat::Combat()
 {
@@ -69,9 +71,26 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 		else{
 			switch(formulaType){
 				case FORMULA_LEVELMAGIC:
+				{
 					max = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * mina + minb);
 					min = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * maxa + maxb);
 					break;
+				}
+
+				case FORMULA_SKILL:
+				{
+					Item* tool = player->getWeapon();
+					const Weapon* weapon = g_weapons->getWeapon(tool);
+					
+					min = minb;
+					max = maxb;
+
+					if(weapon){
+						max = weapon->getWeaponDamage(player, tool, true) * maxa + maxb;
+					}
+
+					break;
+				}
 
 				default:
 					min = 0;
@@ -440,9 +459,30 @@ void Combat::combatTileEffects(Creature* caster, Tile* tile, const CombatParams&
 void Combat::postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params)
 {
 	if(caster && params.distanceEffect != NM_ME_NONE){
-		g_game.addDistanceEffect(caster->getPosition(), pos, params.distanceEffect);
+		addDistanceEffect(caster, caster->getPosition(), pos, params.distanceEffect);
 	}
 }
+
+void Combat::addDistanceEffect(Creature* caster, const Position& fromPos, const Position& toPos,
+	uint8_t effect)
+{
+	uint8_t distanceEffect = effect;
+
+	if(distanceEffect == NM_ANI_WEAPONTYPE){
+		switch(caster->getWeaponType()){
+			case WEAPON_AXE: distanceEffect = NM_ANI_WHIRLWINDAXE; break;
+			case WEAPON_SWORD: distanceEffect = NM_ANI_WHIRLWINDSWORD; break;
+			case WEAPON_CLUB: distanceEffect = NM_ANI_WHIRLWINDMACE; break;
+
+			default: distanceEffect = NM_ME_NONE; break;
+		}
+	}
+
+	if(caster && distanceEffect != NM_ME_NONE){
+		g_game.addDistanceEffect(fromPos, toPos, distanceEffect);
+	}
+}
+
 
 void Combat::CombatFunc(Creature* caster, const Position& pos,
 	const AreaCombat* area, const CombatParams& params, COMBATFUNC func, void* data)
@@ -537,7 +577,6 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 void Combat::doCombatHealth(Creature* caster, Creature* target,
 	int32_t minChange, int32_t maxChange, const CombatParams& params)
 {
-	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		Combat2Var var;
 		var.minChange = minChange;
@@ -549,7 +588,7 @@ void Combat::doCombatHealth(Creature* caster, Creature* target,
 		}
 
 		if(caster && params.distanceEffect != NM_ME_NONE){
-			g_game.addDistanceEffect(caster->getPosition(), target->getPosition(), params.distanceEffect);
+			addDistanceEffect(caster, caster->getPosition(), target->getPosition(), params.distanceEffect);
 		}
 	}
 }
@@ -567,7 +606,6 @@ void Combat::doCombatHealth(Creature* caster, const Position& pos,
 void Combat::doCombatMana(Creature* caster, Creature* target,
 	int32_t minChange, int32_t maxChange, const CombatParams& params)
 {
-	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		Combat2Var var;
 		var.minChange = minChange;
@@ -583,7 +621,7 @@ void Combat::doCombatMana(Creature* caster, Creature* target,
 		}
 
 		if(caster && params.distanceEffect != NM_ME_NONE){
-			g_game.addDistanceEffect(caster->getPosition(), target->getPosition(), params.distanceEffect);
+			addDistanceEffect(caster, caster->getPosition(), target->getPosition(), params.distanceEffect);
 		}
 	}
 }
@@ -606,7 +644,6 @@ void Combat::doCombatCondition(Creature* caster, const Position& pos, const Area
 
 void Combat::doCombatCondition(Creature* caster, Creature* target, const CombatParams& params)
 {
-	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		CombatConditionFunc(caster, target, params, NULL);	
 
@@ -619,7 +656,7 @@ void Combat::doCombatCondition(Creature* caster, Creature* target, const CombatP
 		}
 
 		if(caster && params.distanceEffect != NM_ME_NONE){
-			g_game.addDistanceEffect(caster->getPosition(), target->getPosition(), params.distanceEffect);
+			addDistanceEffect(caster, caster->getPosition(), target->getPosition(), params.distanceEffect);
 		}
 	}
 }
@@ -632,7 +669,6 @@ void Combat::doCombatDispel(Creature* caster, const Position& pos, const AreaCom
 
 void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatParams& params)
 {
-	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		CombatDispelFunc(caster, target, params, NULL);	
 
@@ -645,14 +681,13 @@ void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatPara
 		}
 
 		if(caster && params.distanceEffect != NM_ME_NONE){
-			g_game.addDistanceEffect(caster->getPosition(), target->getPosition(), params.distanceEffect);
+			addDistanceEffect(caster, caster->getPosition(), target->getPosition(), params.distanceEffect);
 		}
 	}
 }
 
 void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatParams& params)
 {
-	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target, isAggressive) == RET_NOERROR)){
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		CombatNullFunc(caster, target, params, NULL);
 		combatTileEffects(caster, target->getTile(), params);
@@ -666,7 +701,7 @@ void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatPar
 		}
 
 		if(caster && params.distanceEffect != NM_ME_NONE){
-			g_game.addDistanceEffect(caster->getPosition(), target->getPosition(), params.distanceEffect);
+			addDistanceEffect(caster, caster->getPosition(), target->getPosition(), params.distanceEffect);
 		}
 	}
 }
@@ -692,19 +727,27 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) 
 
 		switch(type){
 			case FORMULA_LEVELMAGIC:
+			{
 				//"onGetPlayerMinMaxValues"(cid, level, maglevel)
 				lua_pushnumber(L, player->getLevel());
 				lua_pushnumber(L, player->getMagicLevel());
 				parameters += 2;
 				break;
+			}
 
-			/*
 			case FORMULA_SKILL:
-				lua_pushnumber(L, player->getSkill(x, SKILL_LEVEL));
-				lua_pushnumber(L, (int32_t)minb);
-				parameters += 2;
+			{
+				Item* item = player->getWeapon();
+				int32_t attackSkill = player->getWeaponSkill(item);
+				int32_t attackValue = item->getAttack();
+				int32_t attackStrength = player->getAttackStrength();
+
+				lua_pushnumber(L, attackSkill);
+				lua_pushnumber(L, attackValue);
+				lua_pushnumber(L, attackStrength);
+				parameters += 3;
 				break;
-			*/
+			}
 
 			default:
 				std::cout << "ValueCallback::getMinMaxValues - unknown callback type" << std::endl;
