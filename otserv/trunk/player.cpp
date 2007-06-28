@@ -343,7 +343,7 @@ int32_t Player::getWeaponSkill(const Item* item) const
 	}
 
 	WeaponType_t weaponType = item->getWeaponType();
-	int32_t attackSkill = 0;
+	int32_t attackSkill;
 
 	switch(weaponType){
 		case WEAPON_SWORD:
@@ -367,8 +367,12 @@ int32_t Player::getWeaponSkill(const Item* item) const
 			attackSkill = getSkill(SKILL_AXE, SKILL_LEVEL);
 			break;
 		}
+		default:
+		{
+			attackSkill = 0;
+			break;
+		}	
 	}
-
 	return attackSkill;
 }
 

@@ -541,6 +541,10 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 	int color = atoi(param.c_str());
 	Player* player = creature->getPlayer();
 	if(player) {
+		//Outfit_t ot = player->getCurrentOutfit();
+		//ot.lookType = color;
+		//game->internalCreatureChangeOutfit(player, ot);
+		
 		player->sendMagicEffect(player->getPosition(), color);
 		/*
 		LightInfo lightInfo;

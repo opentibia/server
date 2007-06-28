@@ -82,11 +82,13 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 					Item* tool = player->getWeapon();
 					const Weapon* weapon = g_weapons->getWeapon(tool);
 					
-					min = minb;
-					max = maxb;
-
+					min = (int32_t)minb;
+					
 					if(weapon){
-						max = weapon->getWeaponDamage(player, tool, true) * maxa + maxb;
+						max = (int32_t)(weapon->getWeaponDamage(player, tool, true) * maxa + maxb);
+					}
+					else{
+						max = (int32_t)maxb;
 					}
 
 					break;

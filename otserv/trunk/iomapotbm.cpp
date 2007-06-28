@@ -98,6 +98,14 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		return false;
 	}
 
+	// Prevent load maps saved with items.otb previous to
+	// version 800, because of the change to stackable of 
+	// itemid 3965
+	if(root_header->minorVersionItems < CLIENT_VERSION_800){
+		map->setLastError(LOADMAPERROR_OUTDATEDHEADER, root);
+		return false;
+	}
+
 	if(root_header->minorVersionItems > (unsigned long)Items::dwMinorVersion){
 		std::cout << "Warning: [OTBM loader] This map needs an updated items OTB file." <<std::endl;
 	}
