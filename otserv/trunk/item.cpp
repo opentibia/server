@@ -32,12 +32,14 @@
 
 #include "actions.h"
 #include "combat.h"
+#include "weapons.h"
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
 extern Game g_game;
+extern Weapons* g_weapons;
 
 Items Item::items;
 
@@ -629,13 +631,61 @@ std::string Item::getDescription(int32_t lookDistance) const
 
 				s << "x).";
 			}
-			else if(isWeapon() && (getAttack() || getDefense()))
+			else if(isWeapon())
 			{
-				if(getAttack()){
-					s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ").";
+				s << "a " << it.name;
+				if(getAttack() || getDefense()){
+					if(getAttack()){
+						if(getExtraDef()){
+							s << " (Atk:" << getAttack() << " Def:" << getDefense() << " " << std::showpos << getExtraDef() << ")";
+						}
+						else{
+                            s << " (Atk:" << getAttack() << " Def:" << getDefense() << ")";
+						}
+					}
+					else{
+						if(getExtraDef()){
+							s << " (Def:" << getDefense() << " " << std::showpos << getExtraDef() << ")";
+						}
+						else{
+                            s << " (Def:" << getDefense() << ")";
+						}
+					}
 				}
-				else{
-					s << "a " << it.name << " (Def:" << (int)getDefense() << ").";
+				s << ".";
+
+				const Weapon* weapon = g_weapons->getWeapon(this);
+				if(weapon && weapon->getWieldInfo()){
+					const uint32_t wieldInfo = weapon->getWieldInfo();
+					s << std::endl << "It can only be wielded ";
+					if(wieldInfo & WIELDINFO_UNPROPERLY){
+						s << "properly ";
+					}
+					s << "by ";
+					if(wieldInfo & WIELDINFO_VOCREQ){
+						s << weapon->getVocationString();
+					}
+					else{
+						s << "players";
+					}
+					if(wieldInfo & WIELDINFO_LEVEL){
+						s << " of level " << weapon->getReqLevel() << " or higher";
+					}
+					if(wieldInfo & WIELDINFO_MAGLV){
+						if(wieldInfo & WIELDINFO_LEVEL){
+							s << " and";
+						}
+						else{
+							s << " of";
+						}
+						s << " magic level " << weapon->getReqMagLv() << " or higher";
+					}
+					/* No Premium system yet.
+					if(wieldInfo & WIELDINFO_PREMIUM){
+						s << " with a premium account";
+					}
+					*/
+					s << ".";
 				}
 			}
 			else if(getArmor()){

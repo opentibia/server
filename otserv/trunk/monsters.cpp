@@ -625,6 +625,42 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 					else if(strValue == "infernalbolt"){
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_INFERNALBOLT);
 					}
+					else if(strValue == "huntingspear"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_HUNTINGSPEAR);
+					}
+					else if(strValue == "enchantedspear"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_ENCHANTEDSPEAR);
+					}
+					else if(strValue == "assassinstar"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_REDASSASSINSTAR);
+					}
+					else if(strValue == "greenstar"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_GREENASSASSINSTAR);
+					}
+					else if(strValue == "royalspear"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_ROYALSPEAR);
+					}
+					else if(strValue == "sniperarrow"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_SNIPERARROW);
+					}
+					else if(strValue == "onyxarrow"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_ONYXARROW);
+					}
+					else if(strValue == "piercingbolt"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_PIERCINGBOLT);
+					}
+					else if(strValue == "whirlwindsword"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_WHIRLWINDSWORD);
+					}
+					else if(strValue == "whirlwindaxe"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_WHIRLWINDAXE);
+					}
+					else if(strValue == "whirlwindclub"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_WHIRLWINDMACE);
+					}
+					else if(strValue == "etherealspear"){
+                        combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_ETHEREALSPEAR);
+					}
 				}
 			}
 			else if(strcasecmp(strValue.c_str(), "areaEffect") == 0){
@@ -721,6 +757,18 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 					}
 					else if(strValue == "bluefirework"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_FIREWORK_BLUE);
+					}
+					else if(strValue == "stars"){
+                        combat->setParam(COMBATPARAM_EFFECT, NM_ME_STUN);
+					}
+					else if(strValue == "sleep"){
+                        combat->setParam(COMBATPARAM_EFFECT, NM_ME_SLEEP);
+					}
+					else if(strValue == "watermonster"){
+                        combat->setParam(COMBATPARAM_EFFECT, NM_ME_WATERCREATURE);
+					}
+					else if(strValue == "greybubble"){
+                        combat->setParam(COMBATPARAM_EFFECT, NM_ME_GROUNDSHAKER);
 					}
 				}
 			}

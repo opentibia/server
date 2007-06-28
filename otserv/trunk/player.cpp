@@ -400,11 +400,15 @@ int32_t Player::getDefense() const
 {
 	int32_t baseDefense = 5;
 	int32_t defense = 0;
+	int32_t extraDef = 0;
 	int32_t shieldSkill = getSkill(SKILL_SHIELD, SKILL_LEVEL);
 
 	if(getInventoryItem(SLOT_LEFT)){
 		if(getInventoryItem(SLOT_LEFT)->getDefense() > defense){
 			defense = getInventoryItem(SLOT_LEFT)->getDefense();
+		}
+		if(getInventoryItem(SLOT_LEFT)->getExtraDef() > extraDef){
+			defense = getInventoryItem(SLOT_LEFT)->getExtraDef();
 		}
 	}
 	
@@ -412,7 +416,12 @@ int32_t Player::getDefense() const
 		if(getInventoryItem(SLOT_RIGHT)->getDefense() > defense){
 			defense = getInventoryItem(SLOT_RIGHT)->getDefense();
 		}
+		if(getInventoryItem(SLOT_RIGHT)->getExtraDef() > extraDef){
+			defense = getInventoryItem(SLOT_RIGHT)->getExtraDef();
+		}
 	}
+
+	defense += extraDef;
 	
 	if(defense <= 0){
 		if(getInventoryItem(SLOT_HEAD)){

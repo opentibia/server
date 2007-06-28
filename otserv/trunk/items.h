@@ -155,6 +155,7 @@ public:
 	ShootType_t    shootType;
 	int            attack;
 	int            defence;
+	int            extraDef;
 	int            armor;
 	uint16_t       slot_position;
 	bool           isVertical;

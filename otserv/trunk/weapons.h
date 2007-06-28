@@ -42,6 +42,14 @@ enum AmmoAction_t{
 	AMMOACTION_MOVE
 };
 
+enum WieldInfo_t{
+	WIELDINFO_LEVEL = 1,
+	WIELDINFO_MAGLV = 2,
+	WIELDINFO_UNPROPERLY = 4,
+	WIELDINFO_VOCREQ = 8,
+	WIELDINFO_PREMIUM = 16
+};
+
 class Weapons : public BaseEvents
 {
 public:
@@ -76,10 +84,11 @@ public:
 	virtual ~Weapon();
 
 	virtual bool configureEvent(xmlNodePtr p);
+	virtual bool loadFunction(const std::string& functionName);
 	virtual bool configureWeapon(const ItemType& it);
 
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return true;}
-	virtual bool playerWeaponCheck(Player* player, Creature* target) const;
+	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 
 	void setCombatParam(const CombatParams& _params);
@@ -88,6 +97,13 @@ public:
 
 	static bool useFist(Player* player, Creature* target);
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const = 0;
+
+	const int32_t getReqLevel() const {return level;}
+	const int32_t getReqMagLv() const {return magLevel;}
+	const bool isWieldedUnproperly() const {return wieldUnproperly;}
+	const bool isPremium() const {return premium;}
+	const uint32_t getWieldInfo() const {return wieldInfo;}
+	const std::string& getVocationString() const {return vocationString;}
 
 protected:
 	virtual std::string getScriptEventName();
@@ -105,6 +121,7 @@ protected:
 	bool enabled;
 	bool premium;
 	bool exhaustion;
+	bool wieldUnproperly;
 	int32_t level;
 	int32_t magLevel;
 	int32_t mana;
@@ -113,6 +130,8 @@ protected:
 	int32_t range;
 	AmmoAction_t ammoAction;
 	CombatParams params;
+	uint32_t wieldInfo;
+	std::string vocationString;
 
 private:
 	typedef std::map<int32_t, bool> VocWeaponMap;
@@ -144,7 +163,7 @@ public:
 	virtual bool configureWeapon(const ItemType& it);
 
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
-	virtual bool playerWeaponCheck(Player* player, Creature* target) const;
+	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const;
 

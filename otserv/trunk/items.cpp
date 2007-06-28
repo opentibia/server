@@ -72,6 +72,7 @@ ItemType::ItemType()
 	shootType     = SHOOT_NONE;
 	attack        = 0;
 	defence       = 0;
+	extraDef      = 0;
 	armor         = 0;
 	decayTo       = -1;
 	decayTime     = 0;
@@ -428,6 +429,11 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(strcasecmp(strValue.c_str(), "defense") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.defence = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "extradef") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.extraDef = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "attack") == 0){

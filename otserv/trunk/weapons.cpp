@@ -174,9 +174,12 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	exhaustion = false;
 	premium = false;
 	enabled = true;
+	wieldUnproperly = false;
 	exhaustion = 0;
 	range = 1;
 	ammoAction = AMMOACTION_NONE;
+	wieldInfo = 0;
+	vocationString = "";
 }
 
 Weapon::~Weapon()
@@ -194,6 +197,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 {
 	int intValue;
 	std::string strValue;
+	uint32_t _wieldInfo = 0;
 
 	if(readXMLInteger(p, "id", intValue)){
 	 	id = intValue;
@@ -234,7 +238,11 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	if(readXMLInteger(p, "enabled", intValue)){
 		enabled = (intValue == 1);
 	}
-	
+
+	if(readXMLInteger(p, "unproperly", intValue)){
+		wieldUnproperly = (intValue == 1);
+	}
+
 	if(readXMLInteger(p, "range", intValue)){
 		std::cout << "Warning: range is not longer used in weapons.xml." << std::endl;
 	}
@@ -251,6 +259,8 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		}
 	}
 
+	typedef std::list<std::string> STRING_LIST;
+	STRING_LIST vocStringList;
 	xmlNodePtr vocationNode = p->children;
 	while(vocationNode){
 		if(xmlStrcmp(vocationNode->name,(const xmlChar*)"vocation") == 0){
@@ -259,6 +269,12 @@ bool Weapon::configureEvent(xmlNodePtr p)
 
 				if(vocationId != -1){
 					vocWeaponMap[vocationId] = true;
+					intValue = 1;
+					readXMLInteger(vocationNode, "showInDescription", intValue);
+					if(intValue != 0){
+						toLowerCaseString(strValue);
+						vocStringList.push_back(strValue);
+					}
 				}
 			}
 		}
@@ -268,7 +284,49 @@ bool Weapon::configureEvent(xmlNodePtr p)
 
     range = Item::items[id].shootRange;
 
+	//Set few information for the lookDescription
+	if(!vocStringList.empty()){
+		for(STRING_LIST::iterator it = vocStringList.begin(); it != vocStringList.end(); ++it){
+			if(*it != vocStringList.front()){
+				if(*it != vocStringList.back()){
+					vocationString += ", ";
+				}
+				else{
+					vocationString += " and ";
+				}
+			}
+			vocationString += *it;
+			vocationString += "s";
+		}
+	}
+
+	if(getReqLevel() > 0){
+		wieldInfo |= WIELDINFO_LEVEL;
+	}
+	if(getReqMagLv() > 0){
+		wieldInfo |= WIELDINFO_MAGLV;
+	}
+	if(isWieldedUnproperly()){
+		wieldInfo |= WIELDINFO_UNPROPERLY;
+	}
+	if(!getVocationString().empty()){
+		wieldInfo |= WIELDINFO_VOCREQ;
+	}
+	if(isPremium()){
+		wieldInfo |= WIELDINFO_PREMIUM;
+	}
+
 	return true;
+}
+
+bool Weapon::loadFunction(const std::string& functionName)
+{
+	if(functionName == "internalLoadWeapon"){
+		if(configureWeapon(Item::items[getID()])){
+			return true;
+		}
+	}
+	return false;
 }
 
 bool Weapon::configureWeapon(const ItemType& it)
@@ -281,13 +339,13 @@ std::string Weapon::getScriptEventName()
 	return "onUseWeapon";
 }
 
-bool Weapon::playerWeaponCheck(Player* player, Creature* target) const
+int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 {
 	const Position& playerPos = player->getPosition();
 	const Position& targetPos = target->getPosition();
 
 	if(playerPos.z != targetPos.z){
-		return false;
+		return 0;
 	}
 
 	int32_t trueRange;
@@ -300,44 +358,46 @@ bool Weapon::playerWeaponCheck(Player* player, Creature* target) const
 	}
 
 	if(std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y)) > trueRange){
-		return false;
+		return 0;
 	}
 
 	if(!player->hasFlag(PlayerFlag_IgnoreWeaponCheck)){
 	
 		if(!enabled){
-			return false;
-		}
-
-		if(player->getLevel() < level){
-			return false;
-		}
-
-		if(player->getMagicLevel() < magLevel){
-			return false;
+			return 0;
 		}
 
 		if(player->getMana() < getManaCost(player)){
-			return false;
+			return 0;
 		}
 
 		if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){
-			return false;
+			return 0;
 		}
 
-		if(!vocWeaponMap.empty()){
-			if(vocWeaponMap.find(player->getVocationId()) == vocWeaponMap.end()){
-				return false;
+		if(isWieldedUnproperly()){
+			if(player->getLevel() < getReqLevel()){
+				return 50;
+			}
+
+			if(player->getMagicLevel() < getReqMagLv()){
+				return 50;
+			}
+
+			if(!vocWeaponMap.empty()){
+				if(vocWeaponMap.find(player->getVocationId()) == vocWeaponMap.end()){
+					return 50;
+				}
 			}
 		}
 	}
 
-	return true;
+	return 100;
 }
 
 bool Weapon::useWeapon(Player* player, Item* item, Creature* target) const
 {
-	if(!playerWeaponCheck(player, target)){
+	if(playerWeaponCheck(player, target) == 0){
 		return false;
 	}
 
@@ -384,7 +444,8 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target) con
 		executeUseWeapon(player, var);
 	}
 	else{
-		int32_t damage = getWeaponDamage(player, item);
+		double percentDmg = (double)playerWeaponCheck(player, target)/100;
+		int32_t damage = int32_t(getWeaponDamage(player, item) * percentDmg);
 		Combat::doCombatHealth(player, target, damage, damage, params);
 	}
 
@@ -508,7 +569,6 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 		return false;
 	}
 }
-
 
 WeaponMelee::WeaponMelee(LuaScriptInterface* _interface) :
 	Weapon(_interface)
@@ -664,18 +724,14 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	return true;
 }
 
-bool WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
+int32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
 {
-	if(!Weapon::playerWeaponCheck(player, target)){
-		return false;
-	}
-
-	return true;
+	return Weapon::playerWeaponCheck(player, target);
 }
 
 bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) const
 {
-	if(!playerWeaponCheck(player, target)){
+	if(playerWeaponCheck(player, target) == 0){
 		return false;
 	}
 

@@ -235,6 +235,7 @@ public:
 	int getAttack() const {return items[id].attack;}
 	int getArmor() const {return items[id].armor;}
 	int getDefense() const {return items[id].defence;}
+	int getExtraDef() const {return items[id].extraDef;}
 	int getSlotPosition() const {return items[id].slot_position;}
 
 	bool isReadable() const {return items[id].canReadText;}
