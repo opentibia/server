@@ -722,7 +722,7 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item, 
 		return -maxValue;
 	}
 
-	return -(random_range(0, maxDamage) * attackStrength) / 100;
+	return -(random_range(0, maxValue) * attackStrength) / 100;
 }
 
 bool WeaponDistance::getSkillType(const Player* player, const Item* item,
