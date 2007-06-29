@@ -735,7 +735,7 @@
 	</item>
 	<item id="459" name="stair">
 	</item>
-	<item id="460" name="nothing">
+	<item id="460" name="">
 	</item>
 	<item id="461" name="closed trapdoor">
 	</item>
@@ -2872,6 +2872,7 @@
 	</item>
 	<item id="1487" name="fire field">
 		<attribute key="type" value="magicfield"/>
+		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
 			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
@@ -2881,6 +2882,7 @@
 	</item>
 	<item id="1488" name="fire field">
 		<attribute key="type" value="magicfield"/>
+		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
@@ -2889,10 +2891,12 @@
 	</item>
 	<item id="1489" name="fire field">
 		<attribute key="type" value="magicfield"/>
+		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire"/>
 	</item>
 	<item id="1490" name="poison field">
 		<attribute key="type" value="magicfield"/>
+		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="poison">
 			<attribute key="ticks" value="5000"/>
 			<attribute key="start" value="5"/>
@@ -2901,6 +2905,7 @@
 	</item>
 	<item id="1491" name="energy field">
 		<attribute key="type" value="magicfield"/>
+		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="energy">
 			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
@@ -4322,7 +4327,7 @@
 	</item>
 	<item id="2018" name="pool">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2019" name="pool">
 		<attribute key="decayTo" value="2020"/>
@@ -5041,7 +5046,7 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2167"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 		<attribute key="showduration" value="1"/>
 		<attribute key="manashield" value="1"/>
 	</item>
@@ -5050,7 +5055,7 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2168"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 		<attribute key="healthGain" value="1"/>
 		<attribute key="healthTicks" value="3000"/>
 		<attribute key="manaGain" value="4"/>
@@ -5093,7 +5098,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2207"/>
 		<attribute key="skillSword" value="4"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2211" name="axe ring">
@@ -5102,7 +5107,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2208"/>
 		<attribute key="skillAxe" value="4"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2212" name="club ring">
@@ -5111,7 +5116,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2209"/>
 		<attribute key="skillClub" value="4"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2213" name="dwarven ring">
@@ -7475,36 +7480,36 @@
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2810"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2807" name="dead spider">
 		<attribute key="weight" value="4600"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2822"/>
-		<attribute key="duration" value="1200"/>	
+		<attribute key="duration" value="600"/>	
 	</item>
 	<item id="2808" name="dead cyclops">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2911"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2809" name="slain skeleton">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2922"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2810" name="dead troll">
 		<attribute key="weight" value="50000"/>
 		<attribute key="containerSize" value="10"/>	
 		<attribute key="decayTo" value="2811"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2811" name="dead troll">
 		<attribute key="weight" value="30000"/>
 		<attribute key="containerSize" value="10"/>	
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2812" name="dead troll">
 		<attribute key="weight" value="10000"/>
@@ -7513,18 +7518,18 @@
 		<attribute key="weight" value="6300"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2814"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2814" name="dead rat">
 		<attribute key="weight" value="4400"/>
 		<attribute key="containerSize" value="5"/>	
 		<attribute key="decayTo" value="2815"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2815" name="dead rat">
 		<attribute key="weight" value="3000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2816" name="dead rat">
 		<attribute key="weight" value="2000"/>
@@ -7532,22 +7537,22 @@
 	<item id="2817" name="dead snake">
 		<attribute key="weight" value="1200"/>
 		<attribute key="decayTo" value="2818"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2818" name="dead snake">
 		<attribute key="weight" value="840"/>
 		<attribute key="decayTo" value="2819"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2819" name="dead snake">
 		<attribute key="weight" value="620"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2820" name="dead orc">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2821"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2821" name="dead orc">
 		<attribute key="decayTo" value="2966"/>
@@ -7556,38 +7561,38 @@
 	<item id="2822" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2823"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2823" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2824" name="dead rotworm">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2825"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2825" name="dead rotworm">
 		<attribute key="decayTo" value="2964"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2826" name="dead wolf">
 		<attribute key="weight" value="26000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2827"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2827" name="dead wolf">
 		<attribute key="weight" value="20000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2828"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2828" name="dead wolf">
 		<attribute key="weight" value="8000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2829" name="dead wolf">
 		<attribute key="weight" value="4000"/>
@@ -7596,19 +7601,19 @@
 		<attribute key="weight" value="130000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2831"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2831" name="dead minotaur">
 		<attribute key="weight" value="105000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2832"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2832" name="dead minotaur">
 		<attribute key="weight" value="85000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2833" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
@@ -7620,19 +7625,19 @@
 		<attribute key="weight" value="68000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2836"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2836" name="dead deer">
 		<attribute key="weight" value="68000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2837"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2837" name="dead deer">
 		<attribute key="weight" value="5000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2838" name="dead deer">
 		<attribute key="weight" value="5000"/>
@@ -7641,7 +7646,7 @@
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2840"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2840" name="dead dog">
 		<attribute key="weight" value="21000"/>
@@ -7652,7 +7657,7 @@
 	<item id="2841" name="dead dog">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2842" name="dead dog">
 		<attribute key="weight" value="700"/>
@@ -7661,12 +7666,12 @@
 		<attribute key="weight" value="40000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2975"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2844" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3104"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2845" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
@@ -7680,24 +7685,24 @@
 		<attribute key="weight" value="9000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2885"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2849" name="dead bear">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2850"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2850" name="dead bear">
 		<attribute key="decayTo" value="2851"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2851" name="dead bear">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2852" name="dead bear">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2853" name="slain ghoul">
 		<attribute key="weight" value="60200"/>
@@ -7715,61 +7720,61 @@
 	<item id="2857" name="dead giant spider">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2858"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2858" name="dead giant spider">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2859"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2859" name="dead giant spider">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2860" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2861"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2861" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="decayTo" value="2966"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2862" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2863"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2863" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="decayTo" value="2966"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2864" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2865"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2865" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="decayTo" value="2966"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2866" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2867"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2867" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2878"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2868" name="dead minotaur">
 		<attribute key="weight" value="67520"/>
@@ -7785,13 +7790,13 @@
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2872"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2872" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2878"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2873" name="dead minotaur">
 		<attribute key="weight" value="67520"/>
@@ -7807,19 +7812,19 @@
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2877"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2877" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2878"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2878" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2879" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
@@ -7830,148 +7835,148 @@
 	<item id="2881" name="dead dragon lord">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2882"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2882" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2883"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2883" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2884" name="dead dragon">
 	</item>
 	<item id="2885" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2944"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2886" name="dead fire devil">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2887"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2887" name="dead fire devil">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="2888"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2888" name="dead fire devil">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2889" name="dead lion">
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2890"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2890" name="dead lion">
 		<attribute key="decayTo" value="2891"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2891" name="dead lion">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2892" name="dead lion">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2893" name="dead bear">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2894"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2894" name="dead bear">
 		<attribute key="decayTo" value="2895"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2895" name="dead bear">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2896" name="dead bear">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2897" name="dead scorpion">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2898"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2898" name="dead scorpion">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2965"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2899" name="dead wasp">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2900"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2900" name="dead wasp">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2901"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2901" name="dead wasp">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2902" name="dead bug">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2903"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2903" name="dead bug">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2904"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2904" name="dead bug">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2905" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2906"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2906" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2907"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2907" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2908" name="dead beholder">
 		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="2909"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2909" name="dead beholder">
 		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="2910"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2910" name="dead beholder">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2911" name="dead cyclops">
 	</item>
@@ -7981,75 +7986,75 @@
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2977"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2914" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2915"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2915" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2907"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2916" name="slain demon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2917"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2917" name="slain demon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2918"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2918" name="slain demon">
 		<attribute key="decayTo" value="2919"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2919" name="slain demon">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2920" name="dead orc">
 		<attribute key="weight" value="90000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2921"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2921" name="dead orc">
 		<attribute key="weight" value="90000"/>
 		<attribute key="decayTo" value="2966"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2922" name="slain skeleton">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="2923"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2923" name="slain skeleton">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2924" name="dead wolf">
 		<attribute key="weight" value="8000"/>
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2925"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2925" name="dead wolf">
 		<attribute key="weight" value="8000"/>
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2926"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2926" name="dead wolf">
 		<attribute key="weight" value="8000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2927" name="dead wolf">
 		<attribute key="weight" value="4000"/>
@@ -8058,81 +8063,81 @@
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2929"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2929" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2930"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2930" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2931" name="dead behemoth">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2932"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2932" name="dead behemoth">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2933"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2933" name="dead behemoth">
 		<attribute key="decayTo" value="2934"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2934" name="dead behemoth">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2935" name="dead pig">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2936"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2936" name="dead pig">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2937"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2937" name="dead pig">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2938" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2939"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2939" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="decayTo" value="2966"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2940" name="dead goblin">
 		<attribute key="weight" value="4000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2941"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2941" name="dead goblin">
 		<attribute key="weight" value="4000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2942"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2942" name="dead goblin">
 		<attribute key="weight" value="4000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2943" name="dead goblin">
 		<attribute key="weight" value="4000"/>
@@ -8140,24 +8145,24 @@
 	<item id="2944" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2945" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2946"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2946" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2947"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2947" name="dead elf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2948" name="dead elf">
 		<attribute key="weight" value="50000"/>
@@ -8166,52 +8171,52 @@
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2950"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2950" name="slain mummy">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2951"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2951" name="slain mummy">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2952" name="dead stone golem">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2953"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2953" name="dead stone golem">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2954"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2954" name="dead stone golem">
 		<attribute key="decayTo" value="2955"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2955" name="dead stone golem">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2956" name="slain vampire">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2957"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2957" name="slain vampire">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2958"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2958" name="slain vampire">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2959" name="slain vampire">
 		<attribute key="weight" value="60000"/>
@@ -8220,18 +8225,18 @@
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2961"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2961" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2962"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2962" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2963" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
@@ -8239,153 +8244,153 @@
 	<item id="2964" name="dead rotworm">
 		<attribute key="weight" value="10000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2965" name="dead scorpion">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2966" name="dead orc">
 		<attribute key="weight" value="10000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2967" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2968"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2968" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2966"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2969" name="dead wolf">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2970"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2970" name="dead wolf">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2971"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2971" name="dead wolf">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2972" name="dead orc and wolf">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2973"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2973" name="dead orc and wolf">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2974"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2974" name="dead orc and wolf">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2975" name="slain skeleton">
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2976"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2976" name="slain skeleton">
 		<attribute key="weight" value="10000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2977" name="remains of ghost">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2978"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2978" name="remains of ghost">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2979" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2980"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2980" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2947"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2981" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2982"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2982" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2947"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2983" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2984"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2984" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2962"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2985" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2986"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2986" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2962"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2987" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2988"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2988" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2962"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2989" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2990"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2990" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2991"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2991" name="dead djinn">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2992" name="dead rabbit">
 		<attribute key="weight" value="1000"/>
@@ -8401,324 +8406,324 @@
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2996"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2996" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="2997"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2997" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2998" name="slain banshee">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2999"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2999" name="slain banshee">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3000"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3000" name="slain banshee">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3001" name="dead djinn">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="3002"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3002" name="dead djinn">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2991"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3003" name="dead djinn">
 	</item>
 	<item id="3004" name="dead ancient scarab">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3005"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3005" name="dead ancient scarab">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3006"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3006" name="dead ancient scarab">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3007" name="dead cobra">
 		<attribute key="weight" value="6000"/>
 		<attribute key="decayTo" value="3008"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3008" name="dead cobra">
 		<attribute key="weight" value="6000"/>
 		<attribute key="decayTo" value="3009"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3009" name="dead cobra">
 		<attribute key="weight" value="6000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3010" name="dead larva">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="3011"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3011" name="dead larva">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3012"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3012" name="dead larva">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3013" name="dead scarab">
 		<attribute key="weight" value="2000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3014"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3014" name="dead scarab">
 		<attribute key="weight" value="2000"/>
 		<attribute key="decayTo" value="3015"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3015" name="dead scarab">
 		<attribute key="weight" value="2000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3016" name="slain pharaoh">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3017"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3017" name="slain pharaoh">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3018"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3018" name="slain pharaoh">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3019" name="dead hyaena">
 		<attribute key="weight" value="8000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="3020"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3020" name="dead hyaena">
 		<attribute key="weight" value="8000"/>
 		<attribute key="decayTo" value="3021"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3021" name="dead hyaena">
 		<attribute key="weight" value="8000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3022" name="dead gargoyle">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3023"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3023" name="dead gargoyle">
 		<attribute key="decayTo" value="3024"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3024" name="dead gargoyle">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3025" name="slain lich">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3026"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3026" name="slain lich">
 		<attribute key="decayTo" value="3027"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3027" name="slain lich">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3028" name="slain crypt shambler">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3029"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3029" name="slain crypt shambler">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="3030"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3030" name="slain crypt shambler">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3031" name="slain bonebeast">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3032"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3032" name="slain bonebeast">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3033"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3033" name="slain bonebeast">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3034" name="slain pharaoh">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3035"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3035" name="slain pharaoh">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3036"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3036" name="slain pharaoh">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3037" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3038"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3038" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3039"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3039" name="dead djinn">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3040" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3041"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3041" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3042"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3042" name="dead djinn">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3043" name="dead badger">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3044"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3044" name="dead badger">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3045"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3045" name="dead badger">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3046" name="dead skunk">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3047"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3047" name="dead skunk">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3048"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3048" name="dead skunk">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3049" name="dead gazer">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="3050"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3050" name="dead gazer">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3051"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3051" name="dead gazer">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3052" name="dead beholder">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3053"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3053" name="dead beholder">
 		<attribute key="decayTo" value="3054"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3054" name="dead beholder">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3055" name="dead yeti">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3056"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3056" name="dead yeti">
 		<attribute key="decayTo" value="3057"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3057" name="dead yeti">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3058" name="dead human">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3059"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3059" name="dead human">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3060"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3060" name="dead human">
 		<attribute key="weight" value="50000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3061" name="dead human">
 		<attribute key="weight" value="60000"/>
@@ -8732,34 +8737,34 @@
 	<item id="3064" name="dead human">
 		<attribute key="weight" value="50000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3065" name="dead human">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3066"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3066" name="dead human">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3064"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3067" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3068" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2822"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3069" name="dead cyclop">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3117"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3070" name="dead troll">
 		<attribute key="weight" value="25040"/>
@@ -8774,7 +8779,7 @@
 		<attribute key="weight" value="6800"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3074" name="dead rat">
 		<attribute key="weight" value="6800"/>
@@ -8798,7 +8803,7 @@
 		<attribute key="weight" value="16740"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3081" name="dead orc">
 		<attribute key="weight" value="60040"/>
@@ -8812,7 +8817,7 @@
 	<item id="3084" name="dead rotworm">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3085" name="dead rotworm">
 	</item>
@@ -8820,7 +8825,7 @@
 		<attribute key="weight" value="11950"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3087" name="dead wolf">
 		<attribute key="weight" value="11500"/>
@@ -8836,7 +8841,7 @@
 		<attribute key="weight" value="67520"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3091" name="dead minotaur">
 		<attribute key="weight" value="67520"/>
@@ -8856,7 +8861,7 @@
 		<attribute key="weight" value="68000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3096" name="dead deer">
 		<attribute key="weight" value="60000"/>
@@ -8873,7 +8878,7 @@
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3100" name="dead dog">
 		<attribute key="weight" value="1000"/>
@@ -8889,22 +8894,22 @@
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3104" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3105"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3105" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3106"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3106" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3107" name="dead dragon">
 	</item>
@@ -8912,12 +8917,12 @@
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3109" name="dead bear">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3110" name="dead bear">
 	</item>
@@ -8929,17 +8934,17 @@
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="3114"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3114" name="slain ghoul">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="3115"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3115" name="slain ghoul">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3116" name="slain ghoul">
 		<attribute key="weight" value="60200"/>
@@ -8950,23 +8955,23 @@
 	</item>
 	<item id="3118" name="dead cyclop">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3119" name="dead rabbit">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3120"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3120" name="dead rabbit">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3121"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3121" name="dead rabbit">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3122" name="dead dragon">
 	</item>
@@ -8988,7 +8993,7 @@
 	<item id="3129" name="dead human">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="3130"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="3130" name="dead human">
 		<attribute key="weight" value="120000"/>
@@ -9013,7 +9018,7 @@
 	<item id="3134" name="dead human">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3135" name="ladder">
 	</item>
@@ -11449,275 +11454,275 @@
 		<attribute key="weight" value="500"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="4254"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4254" name="dead crab">
 		<attribute key="weight" value="400"/>
 		<attribute key="decayTo" value="4255"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4255" name="dead crab">
 		<attribute key="weight" value="300"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4256" name="dead lizard">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4257"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4257" name="dead lizard">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4258"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4258" name="dead lizard">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4259" name="dead lizard">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4260"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4260" name="dead lizard">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4261"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4261" name="dead lizard">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4262" name="dead lizard">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4263"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4263" name="dead lizard">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4264"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4264" name="dead lizard">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4265" name="dead chicken">
 		<attribute key="weight" value="500"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4266"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4266" name="dead chicken">
 		<attribute key="weight" value="400"/>
 		<attribute key="decayTo" value="4267"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4267" name="dead chicken">
 		<attribute key="weight" value="300"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4268" name="dead ape">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4269"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4269" name="dead ape">
 		<attribute key="decayTo" value="4270"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4270" name="dead ape">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4271" name="dead ape">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4272"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4272" name="dead ape">
 		<attribute key="decayTo" value="4273"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4273" name="dead ape">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4274" name="dead ape">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4275"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4275" name="dead ape">
 		<attribute key="decayTo" value="4276"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4276" name="dead ape">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4277" name="dead crocodile">
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="4278"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4278" name="dead crocodile">
 		<attribute key="decayTo" value="4279"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4279" name="dead crocodile">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4280" name="dead carniphila">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4281"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4281" name="dead carniphila">
 		<attribute key="decayTo" value="4282"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4282" name="dead carniphila">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4283" name="dead hydra">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4284"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4284" name="dead hydra">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4285"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4285" name="dead hydra">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4286" name="dead panda">
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="4287"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4287" name="dead panda">
 		<attribute key="decayTo" value="4288"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4288" name="dead panda">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4289" name="dead centipede">
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="4290"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4290" name="dead centipede">
 		<attribute key="decayTo" value="4291"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4291" name="dead centipede">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4292" name="dead tiger">
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="4293"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4293" name="dead tiger">
 		<attribute key="decayTo" value="4294"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4294" name="dead tiger">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4295" name="dead elephant">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4296"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4296" name="dead elephant">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4297"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4297" name="dead elephant">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4298" name="dead bat">
 		<attribute key="weight" value="500"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="4299"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4299" name="dead bat">
 		<attribute key="weight" value="400"/>
 		<attribute key="decayTo" value="4300"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4300" name="dead bat">
 		<attribute key="weight" value="300"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4301" name="dead flamingo">
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="4302"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4302" name="dead flamingo">
 		<attribute key="decayTo" value="4303"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4303" name="dead flamingo">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4304" name="dead dworc">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4305"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4305" name="dead dworc">
 		<attribute key="decayTo" value="4306"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4306" name="dead dworc">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4307" name="dead dworc">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4308"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4308" name="dead dworc">
 		<attribute key="decayTo" value="4309"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4309" name="dead dworc">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4310" name="dead dworc">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4311"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4311" name="dead dworc">
 		<attribute key="decayTo" value="4312"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4312" name="dead dworc">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4313" name="dead butterfly">
 		<attribute key="weight" value="10"/>
@@ -11726,67 +11731,67 @@
 		<attribute key="weight" value="2000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="4315"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4315" name="dead parrot">
 		<attribute key="weight" value="1500"/>
 		<attribute key="decayTo" value="4316"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4316" name="dead parrot">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4317" name="dead terror bird">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4318"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4318" name="dead terror bird">
 		<attribute key="decayTo" value="4319"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4319" name="dead terror bird">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4320" name="dead tarantula">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4321"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4321" name="dead tarantula">
 		<attribute key="decayTo" value="4322"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4322" name="dead tarantula">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4323" name="dead serpent spawn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4324"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4324" name="dead serpent spawn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4325"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4325" name="dead serpent spawn">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4326" name="dead spit nettle">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="4327"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="4327" name="dead spit nettle">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4328" name="">
 	</item>
@@ -12354,7 +12359,7 @@
 	</item>
 	<item id="4610" name="shallow water">
 		<attribute key="decayTo" value="4608"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="4611" name="shallow water">
 	</item>
@@ -14298,97 +14303,97 @@
 	<item id="5522" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5537"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5523" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5533"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5524" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5531"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5525" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5529"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5526" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5535"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5527" name="dead enlightened of the cult">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5528"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5528" name="dead enlightened of the cult">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5529" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5530"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5530" name="dead quara">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5531" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5532"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5532" name="dead quara">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5533" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5534"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5534" name="dead quara">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5535" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5536"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5536" name="dead quara">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5537" name="dead quara">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5538"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5538" name="dead quara">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5539" name="rum cask">
 	</item>
 	<item id="5540" name="dead carrion worm">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5541"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5541" name="dead carrion worm">
 		<attribute key="decayTo" value="5542"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5542" name="dead carrion worm">
 		<attribute key="weight" value="4000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5543" name="ladder">
 	</item>
@@ -14439,23 +14444,23 @@
 		<attribute key="weight" value="40000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5566" name="slain pirate ghost">
 		<attribute key="weight" value="20000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5567"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5567" name="slain pirate ghost">
 		<attribute key="weight" value="20000"/>
 		<attribute key="decayTo" value="5568"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5568" name="slain pirate ghost">
 		<attribute key="weight" value="20000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5569" name="blue carpet">
 	</item>
@@ -14574,31 +14579,31 @@
 		<attribute key="weight" value="1500"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5626"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5626" name="dead tortoise">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="5627"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5627" name="dead tortoise">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5628" name="dead thornback tortoise">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5629"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5629" name="dead thornback tortoise">
 		<attribute key="decayTo" value="5630"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5630" name="dead thornback tortoise">
 		<attribute key="weight" value="6000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5631" name="dirt wall">
 	</item>
@@ -14673,16 +14678,16 @@
 	<item id="5666" name="dead mammoth">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5667"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5667" name="dead mammoth">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5668"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5668" name="dead mammoth">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5669" name="voodoo skull">
 		<attribute key="weight" value="1000"/>
@@ -14728,16 +14733,16 @@
 	<item id="5688" name="dead blood crab">
 		<attribute key="containerSize" value="7"/>
 		<attribute key="decayTo" value="5689"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5689" name="dead blood crab ">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5690"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5690" name="dead blood crab ">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5691" name="trapdoor">
 	</item>
@@ -14817,7 +14822,7 @@
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="5728"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5728" name="dead seagull">
 		<attribute key="weight" value="800"/>
@@ -14910,7 +14915,7 @@
 	<item id="5765" name="dead toad">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5766"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5766" name="dead toad">
 		<attribute key="containerSize" value="10"/>
@@ -15359,22 +15364,22 @@
 	<item id="5931" name="ferumbras' remains">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5932"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5932" name="ferumbras' remains">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="5933"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5933" name="ferumbras' remains">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5934" name="dead frog">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="5935"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="5935" name="dead frog">
 		<attribute key="weight" value="800"/>
@@ -16563,9 +16568,9 @@
 	</item>
 	<item id="6286" name="some cracks">
 	</item>
-	<item id="6287" name="nothing">
+	<item id="6287" name="">
 	</item>
-	<item id="6288" name="nothing">
+	<item id="6288" name="">
 	</item>
 	<item id="6289" name="burning wall">
 	</item>
@@ -16613,16 +16618,16 @@
 	<item id="6303" name="dead wyvern">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6304"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6304" name="dead wyvern">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6305"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6305" name="dead wyvern">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6306" name="slain undead dragon">
 		<attribute key="containerSize" value="10"/>
@@ -16632,21 +16637,21 @@
 	<item id="6307" name="slain undead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6308"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6308" name="slain undead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6309"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6309" name="slain undead dragon">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6310" name="slain lost soul">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6319"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6311" name="slain lost soul">
 		<attribute key="containerSize" value="10"/>
@@ -16661,16 +16666,16 @@
 	<item id="6313" name="slain hand of cursed fate">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6314"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6314" name="slain hand of cursed fate">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6315"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6315" name="slain hand of cursed fate">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6316" name="slain betrayed wraith">
 		<attribute key="containerSize" value="10"/>
@@ -16680,16 +16685,16 @@
 	<item id="6317" name="slain betrayed wraith">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6318"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6318" name="slain betrayed wraith">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6319" name="slain lost soul">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6320" name="slain destroyer">
 		<attribute key="containerSize" value="10"/>
@@ -16699,16 +16704,16 @@
 	<item id="6321" name="slain destroyer">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6322"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6322" name="slain destroyer">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6323"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6323" name="slain destroyer">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6324" name="slain hellfire fighter">
 		<attribute key="containerSize" value="10"/>
@@ -16718,30 +16723,30 @@
 	<item id="6325" name="slain hellfire fighter">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6326"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6326" name="slain hellfire fighter">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6327"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6327" name="slain hellfire fighter">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6328" name="slain dark torturer">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6329"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6329" name="slain dark torturer">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6330"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6330" name="slain dark torturer">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6331" name="slain dark torturer">
 		<attribute key="containerSize" value="10"/>
@@ -16756,16 +16761,16 @@
 	<item id="6333" name="dead hellhound">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6334"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6334" name="dead hellhound">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6335"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6335" name="dead hellhound">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6336" name="dead juggernaut">
 		<attribute key="containerSize" value="10"/>
@@ -16775,16 +16780,16 @@
 	<item id="6337" name="dead juggernaut">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6338"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6338" name="dead juggernaut">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6339"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6339" name="dead juggernaut">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6340" name="slain nightmare">
 		<attribute key="containerSize" value="10"/>
@@ -16794,16 +16799,16 @@
 	<item id="6341" name="slain nightmare">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6342"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6342" name="slain nightmare">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6343"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6343" name="slain nightmare">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6344" name="slain phantasm">
 		<attribute key="containerSize" value="10"/>
@@ -16814,18 +16819,18 @@
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6346"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6346" name="slain phantasm">
 		<attribute key="weight" value="8000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6347"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6347" name="slain phantasm">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6348" name="slain spectre">
 		<attribute key="containerSize" value="10"/>
@@ -16836,18 +16841,18 @@
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6350"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6350" name="slain spectre">
 		<attribute key="weight" value="8000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6351"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6351" name="slain spectre">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6352" name="">
 	</item>
@@ -16862,7 +16867,7 @@
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6356" name="oven">
 		<attribute key="rotateTo" value="6358"/>
@@ -16896,15 +16901,15 @@
 	<item id="6365" name="slain diabolic imp">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6366"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6366" name="slain diabolic imp">
 		<attribute key="decayTo" value="6367"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6367" name="slain diabolic imp">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6368" name="bookcase">
 		<attribute key="rotateTo" value="6369"/>
@@ -17188,7 +17193,7 @@
 	</item>
 	<item id="6493" name="bat decoration">
 	</item>
-	<item id="6494" name="nothing">
+	<item id="6494" name="">
 	</item>
 	<item id="6495" name="firefly">
 	</item>
@@ -17198,7 +17203,7 @@
 		<attribute key="description" value="It contains presents which were stolen from Santa. Bring them back to Ruprecht on Vega."/>
 		<attribute key="weight" value="8000"/>
 	</item>
-	<item id="6498" name="nothing">
+	<item id="6498" name="">
 	</item>
 	<item id="6499" name="diplom">
 		<attribute key="weight" value="1000"/>
@@ -17266,15 +17271,15 @@
 	<item id="6520" name="plaguesmith remains">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="6521"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6521" name="plaguesmith remains">
 		<attribute key="decayTo" value="6522"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6522" name="plaguesmith remains">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6523" name="gingerbread recipe">
 		<attribute key="decoration" value="Use it to learn how to make Gingerbreadman in the christmas bakery."/>
@@ -17390,9 +17395,9 @@
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
-	<item id="6554" name="nothing">
+	<item id="6554" name="">
 	</item>
-	<item id="6555" name="nothing">
+	<item id="6555" name="">
 	</item>
 	<item id="6556" name="tic-tac-toe token">
 		<attribute key="weight" value="500"/>
@@ -17404,7 +17409,7 @@
 		<attribute key="description" value="Shake it to create a potion."/>
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="6559" name="nothing">
+	<item id="6559" name="">
 	</item>
 	<item id="6560" name="dead human">
 		<attribute key="containerSize" value="10"/>
@@ -18059,7 +18064,7 @@
 	</item>
 	<item id="6867" name="wooden wall">
 	</item>
-	<item id="6868" name="nothing">
+	<item id="6868" name="">
 	</item>
 	<item id="6869" name="ice">
 	</item>
@@ -18199,7 +18204,7 @@
 	</item>
 	<item id="6937" name="ice">
 	</item>
-	<item id="6938" name="nothing">
+	<item id="6938" name="">
 	</item>
 	<item id="6939" name="snow">
 	</item>
@@ -18693,9 +18698,9 @@
 	</item>
 	<item id="7180" name="bone wall">
 	</item>
-	<item id="7181" name="nothing">
+	<item id="7181" name="">
 	</item>
-	<item id="7182" name="nothing">
+	<item id="7182" name="">
 	</item>
 	<item id="7183" name="baby seal doll">
 		<attribute key="weight" value="850"/>
@@ -18868,11 +18873,11 @@
 	<item id="7257" name="dead braindeath">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7258"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7258" name="dead braindeath">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7259" name="case">
 		<attribute key="containerSize" value="8"/>
@@ -18880,7 +18885,7 @@
 	<item id="7260" name="dead braindeath">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7257"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7261" name="plant">
 	</item>
@@ -18933,23 +18938,23 @@
 	<item id="7283" name="dead frost dragon">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7284"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7284" name="dead frost dragon">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7285"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7285" name="dead frost dragon">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7286" name="waterskin">
 		<attribute key="weight" value="800"/>
 	</item>
-	<item id="7287" name="nothing">
+	<item id="7287" name="">
 	</item>
-	<item id="7288" name="nothing">
+	<item id="7288" name="">
 	</item>
 	<item id="7289" name="frost charm">
 		<attribute key="weight" value="1900"/>
@@ -19015,7 +19020,7 @@
 	</item>
 	<item id="7312" name="frozen human">
 	</item>
-	<item id="7313" name="nothing">
+	<item id="7313" name="">
 	</item>
 	<item id="7314" name="red dragon scale">
 		<attribute key="weight" value="90"/>
@@ -19031,16 +19036,16 @@
 	<item id="7317" name="dead husky">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7318"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7318" name="dead husky">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7319"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7319" name="dead husky">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7320" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
@@ -19050,16 +19055,16 @@
 	<item id="7321" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7322"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7322" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7323"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7323" name="dead chakoya">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7324" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
@@ -19069,12 +19074,12 @@
 	<item id="7325" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7326"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7326" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7323"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7327" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
@@ -19084,12 +19089,12 @@
 	<item id="7328" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7329"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7329" name="dead chakoya">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7323"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7330" name="dead frost giant">
 		<attribute key="containerSize" value="8"/>
@@ -19099,17 +19104,17 @@
 	<item id="7331" name="dead frost giant">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7332"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7332" name="dead frost giant">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7333"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7333" name="dead frost giant">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7334" name="dead penguin">
 		<attribute key="containerSize" value="8"/>
@@ -19119,16 +19124,16 @@
 	<item id="7335" name="dead penguin">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7336"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7336" name="dead penguin">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7337"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7337" name="dead penguin">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7338" name="dead silver rabbit">
 		<attribute key="containerSize" value="8"/>
@@ -19138,16 +19143,16 @@
 	<item id="7339" name="dead silver rabbit">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7340"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7340" name="dead silver rabbit">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7341"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7341" name="dead silver rabbit">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7342" name="backpack">
 		<attribute key="weight" value="1800"/>
@@ -19165,16 +19170,16 @@
 	<item id="7345" name="dead crystal spider">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7346"/>
-		<attribute key="duration" value="1800"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7346" name="dead crystal spider">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7347"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7347" name="dead crystal spider">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="1200"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7348" name="old cobbled pavement">
 	</item>
@@ -19232,18 +19237,21 @@
 		<attribute key="attack" value="65"/>
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="greenassassinstar"/>
+		<attribute key="range" value="5"/>
 	</item>
 	<item id="7367" name="enchanted spear">
 		<attribute key="weight" value="2000"/>
 		<attribute key="attack" value="38"/>
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="enchantedspear"/>
+		<attribute key="range" value="5"/>
 	</item>
 	<item id="7368" name="assassin star">
 		<attribute key="weight" value="200"/>
 		<attribute key="attack" value="65"/>
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="redassassinstar"/>
+		<attribute key="range" value="5"/>
 	</item>
 	<item id="7369" name="golden trophy">
 		<attribute key="weight" value="3500"/>
