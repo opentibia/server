@@ -5046,7 +5046,7 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2167"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="showduration" value="1"/>
 		<attribute key="manashield" value="1"/>
 	</item>
@@ -5055,7 +5055,7 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2168"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="healthGain" value="1"/>
 		<attribute key="healthTicks" value="3000"/>
 		<attribute key="manaGain" value="4"/>
@@ -5098,7 +5098,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2207"/>
 		<attribute key="skillSword" value="4"/>
-		<attribute key="duration" value="900"/>
+		<attribute key="duration" value="800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2211" name="axe ring">
@@ -5107,7 +5107,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2208"/>
 		<attribute key="skillAxe" value="4"/>
-		<attribute key="duration" value="900"/>
+		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2212" name="club ring">
@@ -5116,7 +5116,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2209"/>
 		<attribute key="skillClub" value="4"/>
-		<attribute key="duration" value="900"/>
+		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2213" name="dwarven ring">
@@ -12359,7 +12359,7 @@
 	</item>
 	<item id="4610" name="shallow water">
 		<attribute key="decayTo" value="4608"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="1200"/>
 	</item>
 	<item id="4611" name="shallow water">
 	</item>
