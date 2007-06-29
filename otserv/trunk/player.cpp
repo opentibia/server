@@ -408,7 +408,7 @@ int32_t Player::getDefense() const
 			defense = getInventoryItem(SLOT_LEFT)->getDefense();
 		}
 		if(getInventoryItem(SLOT_LEFT)->getExtraDef() > extraDef){
-			defense = getInventoryItem(SLOT_LEFT)->getExtraDef();
+			extraDef = getInventoryItem(SLOT_LEFT)->getExtraDef();
 		}
 	}
 	
@@ -417,7 +417,7 @@ int32_t Player::getDefense() const
 			defense = getInventoryItem(SLOT_RIGHT)->getDefense();
 		}
 		if(getInventoryItem(SLOT_RIGHT)->getExtraDef() > extraDef){
-			defense = getInventoryItem(SLOT_RIGHT)->getExtraDef();
+			extraDef = getInventoryItem(SLOT_RIGHT)->getExtraDef();
 		}
 	}
 
