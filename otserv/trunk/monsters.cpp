@@ -267,7 +267,7 @@ ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType,
 	return condition;
 }
 
-bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
+bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description)
 {
 	sb.chance = 100;
 	sb.speed = 2000;
@@ -566,8 +566,11 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
 		combat->setCondition(condition);
 	}
+	else if(name == "strength") {
+		//
+	}
 	else{
-		std::cout << "Error: [Monsters::deserializeSpell] Unknown spell name: " << name << std::endl;
+		std::cout << "Error: [Monsters::deserializeSpell] - " << description <<  " - Unknown spell name: " << name << std::endl;
 		delete combat;
 		return false;
 	}
@@ -663,7 +666,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 						combat->setParam(COMBATPARAM_DISTANCEEFFECT, NM_ANI_ETHEREALSPEAR);
 					}
 					else{
-						std::cout << "Warning: [Monsters::deserializeSpell] Unknown shootEffect: " << strValue << std::endl;
+						std::cout << "Warning: [Monsters::deserializeSpell] - "  << description << " - Unknown shootEffect: " << strValue << std::endl;
 					}
 				}
 			}
@@ -775,7 +778,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_GROUNDSHAKER);
 					}
 					else{
-						std::cout << "Warning: [Monsters::deserializeSpell] Unknown areaEffect: " << strValue << std::endl;
+						std::cout << "Warning: [Monsters::deserializeSpell] - "  << description << " - Unknown areaEffect: " << strValue << std::endl;
 					}
 				}
 			}
@@ -1005,7 +1008,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
 
 						spellBlock_t sb;
-						if(deserializeSpell(tmpNode, sb)){
+						if(deserializeSpell(tmpNode, sb, monster_name)){
 							mType->spellAttackList.push_back(sb);
 						}
 					}
@@ -1027,7 +1030,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"defense") == 0){
 						
 						spellBlock_t sb;
-						if(deserializeSpell(tmpNode, sb)){
+						if(deserializeSpell(tmpNode, sb, monster_name)){
 							mType->spellDefenseList.push_back(sb);
 						}
 					}
