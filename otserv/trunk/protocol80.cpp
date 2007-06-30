@@ -1079,13 +1079,15 @@ void Protocol80::parseSay(NetworkMessage& msg)
 
 	std::string receiver = "";
 	unsigned short channelId = 0;
-	if(type == SPEAK_PRIVATE ||
-		type == SPEAK_PRIVATE_RED)
+	
+	if(type == SPEAK_PRIVATE || type == SPEAK_PRIVATE_RED){
 		receiver = msg.GetString();
-	if(type == SPEAK_CHANNEL_Y ||
-		type == SPEAK_CHANNEL_R1 ||
-		type == SPEAK_CHANNEL_R2)
+	}
+	else if(type == SPEAK_CHANNEL_Y || type == SPEAK_CHANNEL_R1 ||
+		type == SPEAK_CHANNEL_R2){
 		channelId = msg.GetU16();
+	}
+	
 	std::string text = msg.GetString();
 
 	g_game.playerSay(player, channelId, type, receiver, text);

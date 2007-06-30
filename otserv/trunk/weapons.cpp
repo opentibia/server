@@ -197,7 +197,6 @@ bool Weapon::configureEvent(xmlNodePtr p)
 {
 	int intValue;
 	std::string strValue;
-	uint32_t _wieldInfo = 0;
 
 	if(readXMLInteger(p, "id", intValue)){
 	 	id = intValue;

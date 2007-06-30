@@ -602,11 +602,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(strcasecmp(strValue.c_str(), "enchantedspear") == 0){
 										it.shootType = SHOOT_ENCHANTEDSPEAR;
 									}
-									else if(strcasecmp(strValue.c_str(), "redassassinstar") == 0){
-										it.shootType = SHOOT_REDASSASSINSTAR;
+									else if(strcasecmp(strValue.c_str(), "redstar") == 0){
+										it.shootType = SHOOT_REDSTAR;
 									}
-									else if(strcasecmp(strValue.c_str(), "greenassassinstar") == 0){
-										it.shootType = SHOOT_GREENASSASSINSTAR;
+									else if(strcasecmp(strValue.c_str(), "greenstar") == 0){
+										it.shootType = SHOOT_GREENSTAR;
 									}
 									else if(strcasecmp(strValue.c_str(), "royalspear") == 0){
 										it.shootType = SHOOT_ROYALSPEAR;
@@ -626,8 +626,8 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(strcasecmp(strValue.c_str(), "whirlwindaxe") == 0){
 										it.shootType = SHOOT_WHIRLWINDAXE;
 									}
-									else if(strcasecmp(strValue.c_str(), "whirlwindmace") == 0){
-										it.shootType = SHOOT_WHIRLWINDMACE;
+									else if(strcasecmp(strValue.c_str(), "whirlwindclub") == 0){
+										it.shootType = SHOOT_WHIRLWINDCLUB;
 									}
 									else if(strcasecmp(strValue.c_str(), "etherealspear") == 0){
 										it.shootType = SHOOT_ETHEREALSPEAR;

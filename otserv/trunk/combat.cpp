@@ -474,7 +474,7 @@ void Combat::addDistanceEffect(Creature* caster, const Position& fromPos, const 
 		switch(caster->getWeaponType()){
 			case WEAPON_AXE: distanceEffect = NM_ANI_WHIRLWINDAXE; break;
 			case WEAPON_SWORD: distanceEffect = NM_ANI_WHIRLWINDSWORD; break;
-			case WEAPON_CLUB: distanceEffect = NM_ANI_WHIRLWINDMACE; break;
+			case WEAPON_CLUB: distanceEffect = NM_ANI_WHIRLWINDCLUB; break;
 
 			default: distanceEffect = NM_ME_NONE; break;
 		}
