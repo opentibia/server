@@ -34,24 +34,25 @@ class Player;
 class PropStream;
 
 enum ConditionType_t {
-	CONDITION_NONE					= 0,
-	CONDITION_POISON				= 1,
-	CONDITION_FIRE					= 2,
-	CONDITION_ENERGY				= 4,
-	CONDITION_LIFEDRAIN			= 8,
-	CONDITION_HASTE					= 16,
-	CONDITION_PARALYZE			= 32,
-	CONDITION_OUTFIT				= 64,
-	CONDITION_INVISIBLE			= 128,
-	CONDITION_LIGHT					= 256,
-	CONDITION_MANASHIELD		= 512,
-	CONDITION_INFIGHT				= 1024,
-	CONDITION_DRUNK					= 2048,
-	CONDITION_EXHAUSTED			= 4096,
-	CONDITION_REGENERATION	= 8192,
+	CONDITION_NONE          = 0,
+	CONDITION_POISON        = 1,
+	CONDITION_FIRE          = 2,
+	CONDITION_ENERGY        = 4,
+	CONDITION_LIFEDRAIN     = 8,
+	CONDITION_HASTE         = 16,
+	CONDITION_PARALYZE		= 32,
+	CONDITION_OUTFIT        = 64,
+	CONDITION_INVISIBLE     = 128,
+	CONDITION_LIGHT         = 256,
+	CONDITION_MANASHIELD    = 512,
+	CONDITION_INFIGHT       = 1024,
+	CONDITION_DRUNK         = 2048,
+	CONDITION_EXHAUSTED     = 4096,
+	CONDITION_REGENERATION  = 8192,
 	CONDITION_SOUL          = 16384,
 	CONDITION_DROWN         = 32768,
-	CONDITION_MUTED         = 65536
+	CONDITION_MUTED         = 65536,
+	CONDITION_ATTRIBUTES    = 131072
 };
 
 enum ConditionEnd_t{
@@ -83,6 +84,8 @@ enum ConditionAttr_t{
 	CONDITIONATTR_LIGHTINTERVAL = 19,
 	CONDITIONATTR_SOULTICKS = 20,
 	CONDITIONATTR_SOULGAIN = 21,
+	CONDITIONATTR_SKILLS = 22,
+	CONDITIONATTR_STATS = 23,
 
 	//reserved for serialization
 	CONDITIONATTR_END      = 254
@@ -155,6 +158,40 @@ public:
 	virtual ~ConditionManaShield(){};
 
 	virtual ConditionManaShield* clone()  const { return new ConditionManaShield(*this); }
+};
+
+class ConditionAttributes : public ConditionGeneric
+{
+public:
+	ConditionAttributes(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionAttributes(){};
+
+	virtual bool startCondition(Creature* creature);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
+	virtual void addCondition(Creature* creature, const Condition* condition);
+
+	virtual ConditionAttributes* clone()  const { return new ConditionAttributes(*this); }
+
+	virtual bool setParam(ConditionParam_t param, int32_t value);
+
+	//serialization
+	virtual xmlNodePtr serialize();
+	virtual bool unserialize(xmlNodePtr p);
+
+	virtual bool serialize(PropWriteStream& propWriteStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
+
+protected:
+	int32_t skills[SKILL_LAST + 1];
+	int32_t stats[STAT_LAST + 1];
+	int32_t statsPercent[STAT_LAST + 1];
+	int32_t currentSkill;
+	int32_t currentStat;
+	
+	void updatePercentStats(Player* player);
+	void updateSkills(Player* player);
+	void updateStats(Player* player);
 };
 
 class ConditionRegeneration : public ConditionGeneric

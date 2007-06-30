@@ -137,10 +137,10 @@ public:
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
 	int getBaseSpeed() {return baseSpeed;}
 
-	int32_t getHealth() const {return health;}
-	int32_t getMaxHealth() const {return healthMax;}
-	int32_t getMana() const {return mana;}
-	int32_t getMaxMana() const {return manaMax;}
+	virtual int32_t getHealth() const {return health;}
+	virtual int32_t getMaxHealth() const {return healthMax;}
+	virtual int32_t getMana() const {return mana;}
+	virtual int32_t getMaxMana() const {return manaMax;}
 
 	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}

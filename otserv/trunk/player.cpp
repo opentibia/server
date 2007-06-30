@@ -129,6 +129,10 @@ Creature()
 		varSkills[i] = 0;
 	}
 
+	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
+		varStats[i] = 0;
+	}
+
 	maxDepotLimit = 1000;
 	maxVipLimit = 50;
 	groupFlags = 0;
@@ -485,14 +489,14 @@ int Player::getPlayerInfo(playerinfo_t playerinfo) const
 	switch(playerinfo) {
 		case PLAYERINFO_LEVEL: return level; break;
 		case PLAYERINFO_LEVELPERCENT: return level_percent; break;
-		case PLAYERINFO_MAGICLEVEL: return magLevel; break;
+		case PLAYERINFO_MAGICLEVEL: return magLevel + varStats[STAT_MAGICPOINTS]; break;
 		case PLAYERINFO_MAGICLEVELPERCENT: return maglevel_percent; break;
 		case PLAYERINFO_HEALTH: return health; break;
-		case PLAYERINFO_MAXHEALTH: return healthMax; break;
+		case PLAYERINFO_MAXHEALTH: return healthMax + varStats[STAT_MAXHITPOINTS]; break;
 		case PLAYERINFO_MANA: return mana; break;
-		case PLAYERINFO_MAXMANA: return manaMax; break;
+		case PLAYERINFO_MAXMANA: return manaMax + varStats[STAT_MAXMANAPOINTS]; break;
 		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
-		case PLAYERINFO_SOUL: return soul; break;
+		case PLAYERINFO_SOUL: return soul + varStats[STAT_SOULPOINTS]; break;
 		default:
 			return 0; break;
 	}
@@ -571,6 +575,33 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 	 	}
 	}
 }
+
+void Player::setVarStats(stats_t stat, int32_t modifier)
+{
+	varStats[stat] += modifier;
+
+	switch(stat){
+		case STAT_MAXHITPOINTS:
+		{
+			if(getHealth() > getMaxHealth()){
+				changeHealth(getMaxHealth() - getHealth());
+			}
+
+			g_game.addCreatureHealth(this);
+			break;
+		}
+
+		case STAT_MAXMANAPOINTS:
+		{
+			if(getMana() > getMaxMana()){
+				changeMana(getMaxMana() - getMana());
+			}
+
+			sendStats();
+			break;
+		}
+	}
+};
 
 Container* Player::getContainer(uint32_t cid)
 {
@@ -967,7 +998,7 @@ void Player::sendStats()
 	lastSentStats.experience = getExperience();
 	lastSentStats.level = getLevel();
 	lastSentStats.mana = getMana();
-	lastSentStats.manaMax = getPlayerInfo(PLAYERINFO_MAXMANA);
+	lastSentStats.manaMax = getMaxMana();
 	lastSentStats.magLevel = getMagicLevel();
 	lastSentStats.manaSpent = manaSpent;
 	
@@ -1282,14 +1313,14 @@ void Player::checkTradeState(const Item* item)
 bool Player::NeedUpdateStats()
 {
 	if(lastSentStats.health != getHealth() ||
-		 lastSentStats.healthMax != healthMax ||
+		 lastSentStats.healthMax != getMaxHealth() ||
 		 (int)lastSentStats.freeCapacity != (int)getFreeCapacity() ||
 		 lastSentStats.experience != getExperience() ||
 		 lastSentStats.level != getLevel() ||
 		 lastSentStats.mana != getMana() ||
-		 lastSentStats.manaMax != manaMax ||
+		 lastSentStats.manaMax != getMaxMana() ||
 		 lastSentStats.manaSpent != manaSpent ||
-		 lastSentStats.magLevel != magLevel){
+		 lastSentStats.magLevel != getMagicLevel()){
 		return true;
 	}
 	else{

@@ -187,6 +187,9 @@ public:
 			return 0.00;
 	}
 	
+	virtual int32_t getMaxHealth() const {return healthMax + varStats[STAT_MAXHITPOINTS];}
+	virtual int32_t getMaxMana() const {return manaMax + varStats[STAT_MAXMANAPOINTS];}
+
 	Item* getInventoryItem(slots_t slot) const;
 
 	bool isItemAbilityEnabled(slots_t slot) const {return inventoryAbilities[slot];}
@@ -194,6 +197,9 @@ public:
 
 	int32_t getVarSkill(skills_t skill) const {return varSkills[skill];}
 	void setVarSkill(skills_t skill, int32_t modifier) {varSkills[skill] += modifier;}
+	
+	int32_t getVarStats(stats_t stat) const {return varStats[stat];}
+	void setVarStats(stats_t stat, int32_t modifier);
 	void setConditionSuppressions(uint32_t conditions, bool remove);
 
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
@@ -541,6 +547,9 @@ protected:
 
 	//extra skill modifiers
 	int32_t varSkills[SKILL_LAST + 1];
+
+	//extra stat modifiers
+	int32_t varStats[STAT_LAST + 1];
 
 	LearnedInstantSpellList learnedInstantSpellList;
 	

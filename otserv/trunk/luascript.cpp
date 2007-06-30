@@ -1126,6 +1126,10 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getCreatureBaseSpeed", LuaScriptInterface::luaGetCreatureBaseSpeed);
 	//getCreatureTarget(cid)
 	lua_register(m_luaState, "getCreatureTarget", LuaScriptInterface::luaGetCreatureTarget);
+	//getCreatureHealth(cid)
+	lua_register(m_luaState, "getCreatureHealth", LuaScriptInterface::luaGetCreatureHealth);
+	//getCreatureMaxHealth(cid)
+	lua_register(m_luaState, "getCreatureMaxHealth", LuaScriptInterface::luaGetCreatureMaxHealth);
 
 	//isItemStackable(itemid)
 	lua_register(m_luaState, "isItemStackable", LuaScriptInterface::luaIsItemStackable);
@@ -4676,5 +4680,43 @@ int LuaScriptInterface::luaGetCreatureTarget(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
-	return 1;		
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureHealth(lua_State *L)
+{
+	//getCreatureHealth(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		lua_pushnumber(L, creature->getHealth());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureMaxHealth(lua_State *L)
+{
+	//getCreatureMaxHealth(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		lua_pushnumber(L, creature->getMaxHealth());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
 }

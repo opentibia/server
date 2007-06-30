@@ -475,6 +475,8 @@ protected:
 	static int luaGetCreatureSpeed(lua_State *L);
 	static int luaGetCreatureBaseSpeed(lua_State *L);
 	static int luaGetCreatureTarget(lua_State *L);
+	static int luaGetCreatureHealth(lua_State *L);
+	static int luaGetCreatureMaxHealth(lua_State *L);
 
 	static int luaIsItemStackable(lua_State *L);
 	static int luaIsItemRune(lua_State *L);

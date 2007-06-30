@@ -509,7 +509,7 @@ Item* Creature::getCorpse()
 void Creature::changeHealth(int32_t healthChange)
 {
 	if(healthChange > 0){
-		health += std::min(healthChange, healthMax - health);
+		health += std::min(healthChange, getMaxHealth() - health);
 	}
 	else{
 		health = std::max((int32_t)0, health + healthChange);
@@ -521,7 +521,7 @@ void Creature::changeHealth(int32_t healthChange)
 void Creature::changeMana(int32_t manaChange)
 {
 	if(manaChange > 0){
-		mana += std::min(manaChange, manaMax - mana);
+		mana += std::min(manaChange, getMaxMana() - mana);
 	}
 	else{
 		mana = std::max((int32_t)0, mana + manaChange);

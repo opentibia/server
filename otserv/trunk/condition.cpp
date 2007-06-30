@@ -221,6 +221,12 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 			break;
 		}
 
+		case CONDITION_ATTRIBUTES:
+		{
+			return new ConditionAttributes(_id, _type,_ticks);
+			break;
+		}
+
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
@@ -346,6 +352,376 @@ uint32_t ConditionGeneric::getIcons() const
 	return 0;
 }
 
+ConditionAttributes::ConditionAttributes(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
+	ConditionGeneric(_id, _type, _ticks)
+{
+	currentSkill = 0;
+	currentStat = 0;
+	memset(skills, 0, sizeof(skills));
+	memset(stats, 0, sizeof(stats));
+	memset(statsPercent, 0, sizeof(statsPercent));	
+}
+
+void ConditionAttributes::addCondition(Creature* creature, const Condition* addCondition)
+{
+	if(addCondition->getType() == conditionType){
+		if(addCondition->getTicks() > ticks){
+			ticks = addCondition->getTicks();
+		}
+		
+		const ConditionAttributes& conditionAttrs = static_cast<const ConditionAttributes&>(*addCondition);
+
+		if(Player* player = creature->getPlayer()){
+			for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+				player->setVarSkill((skills_t)i, -skills[i]);
+			}
+
+			for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
+				player->setVarStats((stats_t)i, -stats[i]);
+			}
+		}
+		
+		memcpy(skills, conditionAttrs.skills, sizeof(skills));
+		memcpy(stats, conditionAttrs.stats, sizeof(stats));
+		memcpy(statsPercent, conditionAttrs.statsPercent, sizeof(statsPercent));
+
+		if(Player* player = creature->getPlayer()){
+			updateSkills(player);
+
+			updatePercentStats(player);
+			updateStats(player);
+		}
+	}
+}
+
+xmlNodePtr ConditionAttributes::serialize()
+{
+	xmlNodePtr nodeCondition = Condition::serialize();
+
+	std::stringstream ss;
+	std::stringstream ss2;
+
+	std::string str = "skill";
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		ss.str("");
+		ss << skills[i];
+		ss2.str("");
+		ss2 << str << i;
+		xmlSetProp(nodeCondition, (const xmlChar*)ss2.str().c_str(), (const xmlChar*)ss.str().c_str());
+	}
+
+	str = "stat";
+	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
+		ss.str("");
+		ss << stats[i];
+		ss2.str("");
+		ss2 << str << i;
+		xmlSetProp(nodeCondition, (const xmlChar*)ss2.str().c_str(), (const xmlChar*)ss.str().c_str());
+	}
+
+	return nodeCondition;
+}
+
+bool ConditionAttributes::unserialize(xmlNodePtr p)
+{
+	if(!Condition::unserialize(p)){
+		return false;
+	}
+
+	std::string str = "skill";
+	std::stringstream ss;
+	int intValue;
+
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		ss.str("");
+		ss << str << i;
+		if(readXMLInteger(p, ss.str().c_str(), intValue)){
+			skills[i] = intValue;
+		}
+	}
+
+	str = "stat";
+	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
+		ss.str("");
+		ss << str << i;
+		if(readXMLInteger(p, ss.str().c_str(), intValue)){
+			stats[i] = intValue;
+		}
+	}
+
+	return true;
+}
+
+bool ConditionAttributes::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
+{
+	if(attr == CONDITIONATTR_SKILLS){
+		int32_t value = 0;
+		if(!propStream.GET_VALUE(value)){
+			return false;
+		}
+
+		skills[currentSkill] = value;
+		++currentSkill;
+		return true;
+	}
+	else if(attr == CONDITIONATTR_STATS){
+		int32_t value = 0;
+		if(!propStream.GET_VALUE(value)){
+			return false;
+		}
+
+		stats[currentStat] = value;
+		++currentStat;
+
+		return true;
+	}
+
+	return Condition::unserializeProp(attr, propStream);
+}
+
+bool ConditionAttributes::serialize(PropWriteStream& propWriteStream)
+{
+	if(!Condition::serialize(propWriteStream)){
+		return false;
+	}
+
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		propWriteStream.ADD_UCHAR(CONDITIONATTR_SKILLS);
+		propWriteStream.ADD_VALUE(skills[i]);
+	}
+
+	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
+		propWriteStream.ADD_UCHAR(CONDITIONATTR_STATS);
+		propWriteStream.ADD_VALUE(stats[i]);
+	}
+
+	return true;
+}
+
+
+bool ConditionAttributes::startCondition(Creature* creature)
+{
+	if(Player* player = creature->getPlayer()){
+		updateSkills(player);
+		updatePercentStats(player);
+		updateStats(player);
+	}
+
+	return true;
+}
+
+void ConditionAttributes::updatePercentStats(Player* player)
+{
+	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
+		if(statsPercent[i] == 0){
+			continue;
+		}
+
+		switch(i){
+			case STAT_MAXHITPOINTS:
+				stats[i] = player->getMaxHealth() * ((statsPercent[i] - 100) / 100.0);
+			break;
+
+			case STAT_MAXMANAPOINTS:
+				stats[i] = player->getMaxMana() * ((statsPercent[i] - 100) / 100.0);
+			break;
+
+			case STAT_SOULPOINTS:
+				stats[i] = player->getPlayerInfo(PLAYERINFO_SOUL) * ((statsPercent[i] - 100) / 100.0);
+			break;
+
+			case STAT_MAGICPOINTS:
+				stats[i] = player->getMagicLevel() * ((statsPercent[i] - 100) / 100.0);
+			break;
+		}
+	}
+}
+
+void ConditionAttributes::updateSkills(Player* player)
+{
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		player->setVarSkill((skills_t)i, skills[i]);
+	}
+
+	player->sendSkills();
+}
+
+void ConditionAttributes::updateStats(Player* player)
+{
+	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
+		player->setVarStats((stats_t)i, stats[i]);
+	}
+
+	player->sendStats();
+}
+
+bool ConditionAttributes::executeCondition(Creature* creature, int32_t interval)
+{
+	return ConditionGeneric::executeCondition(creature, interval);
+}
+
+void ConditionAttributes::endCondition(Creature* creature, ConditionEnd_t reason)
+{
+	if(Player* player = creature->getPlayer()){
+		for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+			player->setVarSkill((skills_t)i, -skills[i]);
+		}
+
+		player->sendSkills();
+	}
+
+	if(Player* player = creature->getPlayer()){
+		for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
+			player->setVarStats((stats_t)i, -stats[i]);
+		}
+
+		player->sendStats();
+	}
+}
+
+bool ConditionAttributes::setParam(ConditionParam_t param, int32_t value)
+{
+	bool ret = ConditionGeneric::setParam(param, value);
+
+	switch(param){
+		case CONDITIONPARAM_SKILL_MELEE:
+		{
+			skills[SKILL_CLUB] = value;
+			skills[SKILL_AXE] = value;
+			skills[SKILL_SWORD] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_SKILL_FIST:
+		{
+			skills[SKILL_FIST] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_SKILL_CLUB:
+		{
+			skills[SKILL_CLUB] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_SKILL_SWORD:
+		{
+			skills[SKILL_SWORD] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_SKILL_AXE:
+		{
+			skills[SKILL_AXE] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_SKILL_DISTANCE:
+		{
+			skills[SKILL_DIST] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_SKILL_SHIELD:
+		{
+			skills[SKILL_SHIELD] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_SKILL_FISHING:
+		{
+			skills[SKILL_FISH] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_STAT_MAXHITPOINTS:
+		{
+			stats[STAT_MAXHITPOINTS] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_STAT_MAXMANAPOINTS:
+		{
+			stats[STAT_MAXMANAPOINTS] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_STAT_SOULPOINTS:
+		{
+			stats[STAT_SOULPOINTS] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_STAT_MAGICPOINTS:
+		{
+			stats[STAT_MAGICPOINTS] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_STAT_MAXHITPOINTSPERCENT:
+		{
+			if(value < 0){
+				value = 0;
+			}
+
+			statsPercent[STAT_MAXHITPOINTS] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_STAT_MAXMANAPOINTSPERCENT:
+		{
+			if(value < 0){
+				value = 0;
+			}
+
+			statsPercent[STAT_MAXMANAPOINTS] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_STAT_SOULPOINTSPERCENT:
+		{
+			if(value < 0){
+				value = 0;
+			}
+
+			statsPercent[STAT_SOULPOINTS] = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_STAT_MAGICPOINTSPERCENT:
+		{
+			if(value < 0){
+				value = 0;
+			}
+
+			statsPercent[STAT_MAGICPOINTS] = value;
+			return true;
+			break;
+		}
+
+		default:
+		{
+			return false;
+		}
+	}
+
+	return ret;
+}
 
 ConditionRegeneration::ConditionRegeneration(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
 	ConditionGeneric(_id, _type, _ticks)

@@ -762,15 +762,15 @@ bool IOPlayerXML::savePlayer(Player* player)
 	  pn = xmlNewNode(NULL,(const xmlChar*)"skill");
 
 		sb.str("");
-	  sb << i;
+		sb << i;
 		xmlSetProp(pn, (const xmlChar*)"skillid", (const xmlChar*)sb.str().c_str());
 		
 		sb.str("");
-	  sb << player->skills[i][SKILL_LEVEL];
+		sb << player->skills[i][SKILL_LEVEL];
 		xmlSetProp(pn, (const xmlChar*)"level",   (const xmlChar*)sb.str().c_str());
 		
 		sb.str("");
-	  sb << player->skills[i][SKILL_TRIES];
+		sb << player->skills[i][SKILL_TRIES];
 		xmlSetProp(pn, (const xmlChar*)"tries",   (const xmlChar*)sb.str().c_str());
 
 		xmlAddChild(sn, pn);
