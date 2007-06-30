@@ -5098,7 +5098,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2207"/>
 		<attribute key="skillSword" value="4"/>
-		<attribute key="duration" value="800"/>
+		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2211" name="axe ring">
@@ -10530,7 +10530,7 @@
 	</item>
 	<item id="3870" name="cloth wall">
 	</item>
-	<item id="3871" name="logs">
+	<item id="3871" name="pile of chopped wood">
 	</item>
 	<item id="3872" name="tree stump">
 	</item>
@@ -10889,13 +10889,13 @@
 	<item id="3976" name="worm">
 		<attribute key="weight" value="20"/>
 	</item>
-	<item id="3977" name="fishing stand">
+	<item id="3977" name="crane">
 	</item>
-	<item id="3978" name="fishing stand">
+	<item id="3978" name="crane">
 	</item>
-	<item id="3979" name="fishing stand">
+	<item id="3979" name="crane">
 	</item>
-	<item id="3980" name="fishing stand">
+	<item id="3980" name="crane">
 	</item>
 	<item id="3981" name="mailbox">
 	</item>
@@ -13142,7 +13142,7 @@
 	</item>
 	<item id="4972" name="ventilation grille">
 	</item>
-	<item id="4973" name="wooden">
+	<item id="4973" name="bollard">
 	</item>
 	<item id="4974" name="ship">
 	</item>
@@ -13779,9 +13779,9 @@
 	</item>
 	<item id="5275" name="wooden wall">
 	</item>
-	<item id="5276" name="window">
+	<item id="5276" name="wooden wall window">
 	</item>
-	<item id="5277" name="window">
+	<item id="5277" name="wooden wall window">
 	</item>
 	<item id="5278" name="closed door">
 	</item>
@@ -14395,7 +14395,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="5543" name="ladder">
+	<item id="5543" name="rope-ladder">
 	</item>
 	<item id="5544" name="cart">
 	</item>
@@ -17742,45 +17742,45 @@
 	</item>
 	<item id="6706" name="ice">
 	</item>
-	<item id="6707" name="ice stone">
+	<item id="6707" name="ice">
 	</item>
-	<item id="6708" name="ice stone">
+	<item id="6708" name="ice">
 	</item>
-	<item id="6709" name="ice stone">
+	<item id="6709" name="ice">
 	</item>
-	<item id="6710" name="ice stone">
+	<item id="6710" name="ice">
 	</item>
-	<item id="6711" name="ice stone">
+	<item id="6711" name="ice">
 	</item>
-	<item id="6712" name="ice stone">
+	<item id="6712" name="ice">
 	</item>
-	<item id="6713" name="ice stone">
+	<item id="6713" name="ice">
 	</item>
-	<item id="6714" name="ice stone">
+	<item id="6714" name="ice">
 	</item>
-	<item id="6715" name="ice stone">
+	<item id="6715" name="ice">
 	</item>
-	<item id="6716" name="ice stone">
+	<item id="6716" name="ice">
 	</item>
-	<item id="6717" name="ice stone">
+	<item id="6717" name="ice">
 	</item>
-	<item id="6718" name="ice stone">
+	<item id="6718" name="ice">
 	</item>
-	<item id="6719" name="ice mountain">
+	<item id="6719" name="icy mountain">
 	</item>
-	<item id="6720" name="ice mountain">
+	<item id="6720" name="icy mountain">
 	</item>
-	<item id="6721" name="ice mountain">
+	<item id="6721" name="icy mountain">
 	</item>
-	<item id="6722" name="ice mountain">
+	<item id="6722" name="icy mountain">
 	</item>
-	<item id="6723" name="ice mountain">
+	<item id="6723" name="icy mountain">
 	</item>
-	<item id="6724" name="ice mountain">
+	<item id="6724" name="icy mountain">
 	</item>
-	<item id="6725" name="ice mountain">
+	<item id="6725" name="icy mountain">
 	</item>
-	<item id="6726" name="ice mountain">
+	<item id="6726" name="icy mountain">
 	</item>
 	<item id="6727" name="ice wall">
 	</item>
@@ -17806,27 +17806,27 @@
 	</item>
 	<item id="6738" name="ice wall">
 	</item>
-	<item id="6739" name="frozen brick wall">
+	<item id="6739" name="frozen wall">
 	</item>
-	<item id="6740" name="frozen brick wall">
+	<item id="6740" name="frozen wall">
 	</item>
-	<item id="6741" name="frozen brick wall">
+	<item id="6741" name="frozen wall">
 	</item>
-	<item id="6742" name="frozen brick wall">
+	<item id="6742" name="frozen wall">
 	</item>
-	<item id="6743" name="frozen brick wall">
+	<item id="6743" name="frozen wall">
 	</item>
-	<item id="6744" name="frozen brick wall">
+	<item id="6744" name="frozen wall">
 	</item>
-	<item id="6745" name="frozen brick wall">
+	<item id="6745" name="frozen wall">
 	</item>
-	<item id="6746" name="frozen brick wall">
+	<item id="6746" name="frozen wall">
 	</item>
-	<item id="6747" name="frozen brick wall">
+	<item id="6747" name="frozen wall">
 	</item>
-	<item id="6748" name="frozen brick wall">
+	<item id="6748" name="frozen wall">
 	</item>
-	<item id="6749" name="frozen brick wall">
+	<item id="6749" name="frozen wall">
 	</item>
 	<item id="6750" name="igloo">
 	</item>
@@ -17878,7 +17878,7 @@
 	</item>
 	<item id="6774" name="fur wall">
 	</item>
-	<item id="6775" name="fur wall">
+	<item id="6775" name="fur pillar">
 	</item>
 	<item id="6776" name="fur wall">
 	</item>
@@ -17904,13 +17904,13 @@
 	</item>
 	<item id="6787" name="fur wall">
 	</item>	
-	<item id="6788" name="fur window">
+	<item id="6788" name="fur wall window">
 	</item>
-	<item id="6789" name="fur window">
+	<item id="6789" name="fur wall window">
 	</item>
-	<item id="6790" name="fur window">
+	<item id="6790" name="fur wall window">
 	</item>
-	<item id="6791" name="fur window">
+	<item id="6791" name="fur wall window">
 	</item>
 	<item id="6792" name="fur archway">
 	</item>
@@ -17936,41 +17936,41 @@
 	</item>
 	<item id="6803" name="fur archway">
 	</item>
-	<item id="6804" name="fur roof">
+	<item id="6804" name="fur">
 	</item>
-	<item id="6805" name="fur roof">
+	<item id="6805" name="fur">
 	</item>
-	<item id="6806" name="fur roof">
+	<item id="6806" name="fur">
 	</item>
-	<item id="6807" name="fur roof">
+	<item id="6807" name="fur">
 	</item>
-	<item id="6808" name="fur roof">
+	<item id="6808" name="fur">
 	</item>
-	<item id="6809" name="fur roof">
+	<item id="6809" name="fur">
 	</item>
-	<item id="6810" name="fur roof">
+	<item id="6810" name="fur">
 	</item>
-	<item id="6811" name="fur roof">
+	<item id="6811" name="fur">
 	</item>
-	<item id="6812" name="fur roof">
+	<item id="6812" name="fur">
 	</item>
-	<item id="6813" name="fur roof">
+	<item id="6813" name="fur">
 	</item>
-	<item id="6814" name="fur roof">
+	<item id="6814" name="fur">
 	</item>
-	<item id="6815" name="fur roof">
+	<item id="6815" name="fur">
 	</item>
-	<item id="6816" name="fur roof">
+	<item id="6816" name="fur">
 	</item>
-	<item id="6817" name="fur roof">
+	<item id="6817" name="fur">
 	</item>
-	<item id="6818" name="fur roof">
+	<item id="6818" name="fur">
 	</item>
-	<item id="6819" name="fur roof">
+	<item id="6819" name="fur">
 	</item>
-	<item id="6820" name="fur roof">
+	<item id="6820" name="fur">
 	</item>
-	<item id="6821" name="fur roof">
+	<item id="6821" name="fur">
 	</item>
 	<item id="6822" name="snow">
 	</item>
@@ -18010,7 +18010,7 @@
 	</item>
 	<item id="6840" name="wooden wall">
 	</item>
-	<item id="6841" name="wooden wall">
+	<item id="6841" name="wooden pillar">
 	</item>
 	<item id="6842" name="wooden wall">
 	</item>
@@ -18028,41 +18028,41 @@
 	</item>
 	<item id="6849" name="wooden wall">
 	</item>
-	<item id="6850" name="wooden wall">
+	<item id="6850" name="ornamented wall">
 	</item>
-	<item id="6851" name="wooden wall">
+	<item id="6851" name="stone base">
 	</item>
-	<item id="6852" name="wooden wall">
+	<item id="6852" name="stone base">
 	</item>
-	<item id="6853" name="wooden wall">
+	<item id="6853" name="ornamented wall">
 	</item>
-	<item id="6854" name="wooden wall">
+	<item id="6854" name="stone base">
 	</item>
-	<item id="6855" name="wooden wall">
+	<item id="6855" name="stone base">
 	</item>
-	<item id="6856" name="wooden wall">
+	<item id="6856" name="stone base">
 	</item>
-	<item id="6857" name="wooden wall">
+	<item id="6857" name="ornamented wall">
 	</item>
-	<item id="6858" name="wooden wall">
+	<item id="6858" name="stone base">
 	</item>
-	<item id="6859" name="wooden wall">
+	<item id="6859" name="stone base">
 	</item>
-	<item id="6860" name="wooden wall">
+	<item id="6860" name="ornamented wall">
 	</item>
-	<item id="6861" name="wooden wall">
+	<item id="6861" name="stone base">
 	</item>
-	<item id="6862" name="wooden wall">
+	<item id="6862" name="stone base">
 	</item>
-	<item id="6863" name="wooden wall">
+	<item id="6863" name="stone base">
 	</item>
-	<item id="6864" name="wooden wall">
+	<item id="6864" name="stone base">
 	</item>
-	<item id="6865" name="wooden wall">
+	<item id="6865" name="stone base">
 	</item>
-	<item id="6866" name="wooden wall">
+	<item id="6866" name="stone base">
 	</item>
-	<item id="6867" name="wooden wall">
+	<item id="6867" name="stone base">
 	</item>
 	<item id="6868" name="">
 	</item>
@@ -18100,15 +18100,15 @@
 	</item>
 	<item id="6885" name="archway">
 	</item>
-	<item id="6886" name="wooden pilar">
+	<item id="6886" name="strut">
 	</item>
-	<item id="6887" name="wooden pilar">
+	<item id="6887" name="strut">
 	</item>
-	<item id="6888" name="wooden pilar">
+	<item id="6888" name="strut">
 	</item>
-	<item id="6889" name="horns">
+	<item id="6889" name="tusks">
 	</item>
-	<item id="6890" name="horns">
+	<item id="6890" name="tusks">
 	</item>
 	<item id="6891" name="closed door">
 	</item>
@@ -18260,7 +18260,7 @@
 	</item>
 	<item id="6965" name="ice railing">
 	</item>
-	<item id="6966" name="ice">
+	<item id="6966" name="icicles">
 	</item>
 	<item id="6967" name="ice floor">
 	</item>
@@ -18268,33 +18268,33 @@
 	</item>
 	<item id="6969" name="wooden railing">
 	</item>
-	<item id="6970" name="horns">
+	<item id="6970" name="mammoth skull">
 	</item>
-	<item id="6971" name="horns">
+	<item id="6971" name="mammoth skull">
 	</item>
 	<item id="6972" name="bones">
 	</item>
 	<item id="6973" name="bones">
 	</item>
-	<item id="6974" name="horns">
+	<item id="6974" name="mammoth skull">
 	</item>
-	<item id="6975" name="horns">
+	<item id="6975" name="mammoth skull">
 	</item>
-	<item id="6976" name="horns">
+	<item id="6976" name="mammoth skull">
 	</item>
-	<item id="6977" name="horns">
+	<item id="6977" name="mammoth skull">
 	</item>
-	<item id="6978" name="boar skin">
+	<item id="6978" name=" mammoth fur">
 	</item>
-	<item id="6979" name="boar skin">
+	<item id="6979" name="mammoth fur">
 	</item>
 	<item id="6980" name="sliver">
 	</item>
-	<item id="6981" name="fence">
+	<item id="6981" name="rope">
 	</item>
-	<item id="6982" name="fence">
+	<item id="6982" name="rope">
 	</item>
-	<item id="6983" name="fence">
+	<item id="6983" name="rope">
 	</item>
 	<item id="6984" name="fish">
 	</item>
@@ -18302,71 +18302,71 @@
 	</item>
 	<item id="6986" name="fence">
 	</item>
-	<item id="6987" name="dragon head">
+	<item id="6987" name="wooden dragon">
 	</item>
-	<item id="6988" name="dragon head">
+	<item id="6988" name="wooden dragon">
 	</item>
-	<item id="6989" name="dragon head">
+	<item id="6989" name="wooden bull">
 	</item>
-	<item id="6990" name="minotaur head">
+	<item id="6990" name="wooden bull">
 	</item>
-	<item id="6991" name="minotaur head">
+	<item id="6991" name="wooden yeti">
 	</item>
-	<item id="6992" name="minotaur head">
+	<item id="6992" name="wooden yeti">
 	</item>
-	<item id="6993" name="wooden roof">
+	<item id="6993" name="wooden decoration">
 	</item>
-	<item id="6994" name="wooden roof">
+	<item id="6994" name="wooden decoration">
 	</item>
-	<item id="6995" name="wooden roof">
+	<item id="6995" name="wooden decoration">
 	</item>
-	<item id="6996" name="wooden roof">
+	<item id="6996" name="wooden decoration">
 	</item>
-	<item id="6997" name="wooden roof">
+	<item id="6997" name="wooden decoration">
 	</item>
-	<item id="6998" name="wooden roof">
+	<item id="6998" name="wooden decoration">
 	</item>
-	<item id="6999" name="snow stone">
+	<item id="6999" name="snowy stone">
 	</item>
-	<item id="7000" name="snow stone">
+	<item id="7000" name="snowy stone">
 	</item>
-	<item id="7001" name="snow stones">
+	<item id="7001" name="snowy stone">
 	</item>
-	<item id="7002" name="snow stone">
+	<item id="7002" name="snowy stone">
 	</item>
-	<item id="7003" name="snow stone">
+	<item id="7003" name="snowy stone">
 	</item>
-	<item id="7004" name="snow stone">
+	<item id="7004" name="snowy stone">
 	</item>
-	<item id="7005" name="snow stone">
+	<item id="7005" name="snowy stone">
 	</item>
-	<item id="7006" name="snow stone">
+	<item id="7006" name="snowy stone">
 	</item>
-	<item id="7007" name="snow stone">
+	<item id="7007" name="snowy stone">
 	</item>
-	<item id="7008" name="snow stone">
+	<item id="7008" name="snowy stone">
 	</item>
-	<item id="7009" name="snow stone">
+	<item id="7009" name="snowy stone">
 	</item>
-	<item id="7010" name="snow stone">
+	<item id="7010" name="snowy stone">
 	</item>
-	<item id="7011" name="snow stone">
+	<item id="7011" name="snowy stone">
 	</item>
-	<item id="7012" name="snow stone">
+	<item id="7012" name="snowy stone">
 	</item>
-	<item id="7013" name="snow stone">
+	<item id="7013" name="snowy stone">
 	</item>
-	<item id="7014" name="snow stone">
+	<item id="7014" name="snowy stone">
 	</item>
-	<item id="7015" name="snow stone">
+	<item id="7015" name="snowy stone">
 	</item>
-	<item id="7016" name="snow stone">
+	<item id="7016" name="snowy stone">
 	</item>
-	<item id="7017" name="snow stone">
+	<item id="7017" name="snowy stone">
 	</item>
-	<item id="7018" name="snow stone">
+	<item id="7018" name="snowy stone">
 	</item>
-	<item id="7019" name="snow stone">
+	<item id="7019" name="snowy stone">
 	</item>
 	<item id="7020" name="snow tree">
 	</item>
@@ -18378,21 +18378,21 @@
 	</item>
 	<item id="7024" name="tree">
 	</item>
-	<item id="7025" name="wooden window">
+	<item id="7025" name="nordic wall window">
 	</item>
-	<item id="7026" name="wooden window">
+	<item id="7026" name="nordic wall window">
 	</item>
-	<item id="7027" name="wooden window">
+	<item id="7027" name="nordic wall window">
 	</item>
-	<item id="7028" name="wooden window">
+	<item id="7028" name="nordic wall window">
 	</item>
-	<item id="7029" name="ice window">
+	<item id="7029" name="ice wall window">
 	</item>
-	<item id="7030" name="ice window">
+	<item id="7030" name="ice wall window">
 	</item>
-	<item id="7031" name="ice window">
+	<item id="7031" name="ice wall window">
 	</item>
-	<item id="7032" name="ice window">
+	<item id="7032" name="ice wall window">
 	</item>
 	<item id="7033" name="closed door">
 	</item>
@@ -18444,9 +18444,9 @@
 	</item>
 	<item id="7057" name="open door">
 	</item>
-	<item id="7058" name="skulls">
+	<item id="7058" name="skull pillar">
 	</item>
-	<item id="7059" name="skulls">
+	<item id="7059" name="glowing skull pillar">
 	</item>
 	<item id="7060" name="ice archway">
 	</item>
@@ -18678,11 +18678,11 @@
 	</item>
 	<item id="7170" name="frozen trough">
 	</item>
-	<item id="7171" name="happy snowman">
+	<item id="7171" name="snowman">
 	</item>
-	<item id="7172" name="evil snowman">
+	<item id="7172" name="snowman">
 	</item>
-	<item id="7173" name="mad snowman">
+	<item id="7173" name="snowman">
 	</item>
 	<item id="7174" name="lying bear">
 	</item>
@@ -18765,64 +18765,64 @@
 	</item>
 	<item id="7212" name="raft">
 	</item>
-	<item id="7213" name="scull">
+	<item id="7213" name="ship rudder">
 	</item>
-	<item id="7214" name="scull">
+	<item id="7214" name="ship rudder">
 	</item>
-	<item id="7215" name="scull">
+	<item id="7215" name="ship rudder">
 	</item>
-	<item id="7216" name="scull">
+	<item id="7216" name="ship rudder">
 	</item>
-	<item id="7217" name="scull">
+	<item id="7217" name="ship rudder">
 	</item>
-	<item id="7218" name="scull">
+	<item id="7218" name="ship rudder">
 	</item>
-	<item id="7219" name="scull">
+	<item id="7219" name="ship rudder">
 	</item>
-	<item id="7220" name="scull">
+	<item id="7220" name="ship rudder">
 	</item>
-	<item id="7221" name="scull">
+	<item id="7221" name="ship rudder">
 	</item>
-	<item id="7222" name="scull">
+	<item id="7222" name="ship rudder">
 	</item>
-	<item id="7223" name="scull">
+	<item id="7223" name="ship rudder">
 	</item>
-	<item id="7224" name="scull">
+	<item id="7224" name="ship rudder">
 	</item>
-	<item id="7225" name="scull">
+	<item id="7225" name="ship rudder">
 	</item>
-	<item id="7226" name="scull">
+	<item id="7226" name="ship rudder">
 	</item>
-	<item id="7227" name="scull">
+	<item id="7227" name="ship rudder">
 	</item>
-	<item id="7228" name="dragon ship head">
+	<item id="7228" name="figurehead">
 	</item>
-	<item id="7229" name="dragon ship head">
+	<item id="7229" name="figurehead">
 	</item>
-	<item id="7230" name="dragon ship head">
+	<item id="7230" name="figurehead">
 	</item>
-	<item id="7231" name="dragon ship head">
+	<item id="7231" name="figurehead">
 	</item>
-	<item id="7232" name="pins">
+	<item id="7232" name="spikes">
 	</item>
-	<item id="7233" name="pins">
+	<item id="7233" name="spikes">
 	</item>
-	<item id="7234" name="decorative shield">
+	<item id="7234" name="shield">
 	</item>
-	<item id="7235" name="decorative shield">
+	<item id="7235" name="shield">
 	</item>
 	<item id="7236" name="air-hole">
 		<attribute key="description" value="You can see a moving fish there."/>
 	</item>
 	<item id="7237" name="air-hole">
 	</item>
-	<item id="7238" name="decorative shield">
+	<item id="7238" name="shield">
 	</item>
-	<item id="7239" name="decorative shield">
+	<item id="7239" name="shield">
 	</item>
-	<item id="7240" name="decorative shield">
+	<item id="7240" name="shield">
 	</item>
-	<item id="7241" name="decorative shield">
+	<item id="7241" name="shield">
 	</item>
 	<item id="7242" name="life crystal">
 		<attribute key="weight" value="250"/>
@@ -18893,13 +18893,13 @@
 	</item>
 	<item id="7263" name="roof">
 	</item>
-	<item id="7264" name="sledge">
+	<item id="7264" name="sled">
 	</item>
-	<item id="7265" name="sledge">
+	<item id="7265" name="sled">
 	</item>
-	<item id="7266" name="sledge">
+	<item id="7266" name="sled">
 	</item>
-	<item id="7267" name="sledge">
+	<item id="7267" name="sled">
 	</item>
 	<item id="7268" name="husky">
 	</item>
@@ -19558,10 +19558,10 @@
 		<attribute key="description" value="Drinking this is said to increase your magical skills for a while, but to decrease your defense."/>
 		//It raises magic level by 5? and decreases shielding by 10.
 	</item>
-	<item id="7441" name="ice">
+	<item id="7441" name="ice cube">
 		<attribute key="weight" value="1000"/>
 	</item>
-	<item id="7442" name="unfinished sculpture">
+	<item id="7442" name="ice cube">
 		<attribute key="weight" value="9000"/>
 	</item>
 	<item id="7443" name="bullseye potion">
@@ -19569,20 +19569,20 @@
 		<attribute key="description" value="Drinking this is said to increase your distance skill for a while, but to decrease your defense."/>
 		//It raises distance fighting by 5 and decreases shielding by 10.
 	</item>
-	<item id="7444" name="unfinished sculpture">
+	<item id="7444" name="ice cube">
 		<attribute key="weight" value="8000"/>
 	</item>
-	<item id="7445" name="unfinished sculpture">
+	<item id="7445" name="ice cube">
 		<attribute key="description" value="It seems to be an elephant sculpture."/>
 		<attribute key="weight" value="7000"/>
 	</item>
-	<item id="7446" name="elephant sculpture">
+	<item id="7446" name="small ice statue">
 		<attribute key="weight" value="6500"/>
 	</item>
-	<item id="7447" name="ice sculpture">
+	<item id="7447" name="small ice statue">
 		<attribute key="weight" value="5900"/>
 	</item>
-	<item id="7448" name="">
+	<item id="7448" name="small ice statue">
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7449" name="crystal sword">
