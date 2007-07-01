@@ -600,6 +600,10 @@ void Player::setVarStats(stats_t stat, int32_t modifier)
 			sendStats();
 			break;
 		}
+		default:
+		{
+			break;
+		}
 	}
 };
 

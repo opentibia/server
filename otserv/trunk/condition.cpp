@@ -519,20 +519,20 @@ void ConditionAttributes::updatePercentStats(Player* player)
 
 		switch(i){
 			case STAT_MAXHITPOINTS:
-				stats[i] = player->getMaxHealth() * ((statsPercent[i] - 100) / 100.0);
-			break;
+				stats[i] = (int32_t)(player->getMaxHealth() * ((statsPercent[i] - 100) / 100.f));
+				break;
 
 			case STAT_MAXMANAPOINTS:
-				stats[i] = player->getMaxMana() * ((statsPercent[i] - 100) / 100.0);
-			break;
+				stats[i] = (int32_t)(player->getMaxMana() * ((statsPercent[i] - 100) / 100.f));
+				break;
 
 			case STAT_SOULPOINTS:
-				stats[i] = player->getPlayerInfo(PLAYERINFO_SOUL) * ((statsPercent[i] - 100) / 100.0);
-			break;
+				stats[i] = (int32_t)(player->getPlayerInfo(PLAYERINFO_SOUL) * ((statsPercent[i] - 100) / 100.f));
+				break;
 
 			case STAT_MAGICPOINTS:
-				stats[i] = player->getMagicLevel() * ((statsPercent[i] - 100) / 100.0);
-			break;
+				stats[i] = (int32_t)(player->getMagicLevel() * ((statsPercent[i] - 100) / 100.f));
+				break;
 		}
 	}
 }
