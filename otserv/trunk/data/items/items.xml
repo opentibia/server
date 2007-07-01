@@ -5854,7 +5854,8 @@
 	<item id="2396" name="ice rapier">
 		<attribute key="description" value="A deadly but fragile weapon."/>
 		<attribute key="weight" value="1500"/>
-		<attribute key="attack" value="100"/>
+		<attribute key="attack" value="60"/>
+		<attribute key="defense" value="1"/>
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="charges" value="1"/>
 	</item>
@@ -15229,7 +15230,7 @@
 		<attribute key="description" value="It is said to make your feet fly."/>
 		<attribute key="weight" value="1000"/>
 	</item>
-	<item id="5892" name="chunk of crude iron">
+	<item id="5892" name="huge chunk of crude iron">
 		<attribute key="weight" value="5000"/>
 	</item>
 	<item id="5893" name="perfect behemoth fang">
@@ -16154,7 +16155,7 @@
 		<attribute key="weight" value="170"/>
 		<attribute key="containerSize" value="1"/>
 	</item>
-	<item id="6105" name="raymon striker's lucky pillow">
+	<item id="6105" name="raymond striker's lucky pillow">
 		<attribute key="weight" value="1700"/>
 	</item>
 	<item id="6106" name="green flask">
@@ -18284,7 +18285,7 @@
 	</item>
 	<item id="6977" name="mammoth skull">
 	</item>
-	<item id="6978" name=" mammoth fur">
+	<item id="6978" name="mammoth fur">
 	</item>
 	<item id="6979" name="mammoth fur">
 	</item>
@@ -18511,13 +18512,19 @@
 	<item id="7090" name="frozen mud">
 	</item>
 	<item id="7091" name="dead frost dragon">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7092"/>
+		<attribute key="duration" value="10"/>
 	</item>
 	<item id="7092" name="dead frost dragon">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7093"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7093" name="dead frost dragon">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7094" name="dead frost dragon">
 	</item>
@@ -19236,7 +19243,7 @@
 		<attribute key="weight" value="200"/>
 		<attribute key="attack" value="65"/>
 		<attribute key="weaponType" value="distance"/>
-		<attribute key="shootType" value="greenassassinstar"/>
+		<attribute key="shootType" value="greenstar"/>
 		<attribute key="range" value="5"/>
 	</item>
 	<item id="7367" name="enchanted spear">
@@ -19250,7 +19257,7 @@
 		<attribute key="weight" value="200"/>
 		<attribute key="attack" value="65"/>
 		<attribute key="weaponType" value="distance"/>
-		<attribute key="shootType" value="redassassinstar"/>
+		<attribute key="shootType" value="redstar"/>
 		<attribute key="range" value="5"/>
 	</item>
 	<item id="7369" name="golden trophy">
@@ -19286,7 +19293,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="royalspear"/>
 	</item>
-	<item id="7379" name="brutetamers staff">
+	<item id="7379" name="brutetamer's staff">
 		<attribute key="weight" value="3800"/>
 		<attribute key="defense" value="15"/>
 		<attribute key="attack" value="35"/>
@@ -19295,7 +19302,7 @@
 		<attribute key="description" value="Barbarian women are said to use it for conjuring beasts."/>
 	</item>
 	<item id="7380" name="headchopper">
-		<attribute key="weight" value="3500"/> <!-- ? -->
+		<attribute key="weight" value="4500"/> <!-- ? -->
 		<attribute key="defense" value="20"/>
 		<attribute key="attack" value="42"/>
 		<attribute key="slotType" value="two-handed"/>
@@ -19319,7 +19326,7 @@
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7384" name="mystical blade">
-		<attribute key="weight" value="4700"/> <!-- ? -->
+		<attribute key="weight" value="3500"/>
 		<attribute key="defense" value="25"/>
 		<attribute key="attack" value="44"/>
 		<attribute key="weaponType" value="sword"/>
@@ -19341,12 +19348,12 @@
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7389" name="heroic axe">
-		<attribute key="weight" value="4500"/> <!-- ? -->
+		<attribute key="weight" value="6100"/> <!-- ? -->
 		<attribute key="defense" value="24"/>
 		<attribute key="attack" value="44"/>
 		<attribute key="weaponType" value="axe"/>
 	</item>
-	<item id="7390" name="the justice seeker">
+	<item id="7390" name="justice seeker">
 		<attribute key="weight" value="5000"/>
 		<attribute key="defense" value="24"/>
 		<attribute key="attack" value="47"/>
@@ -19480,8 +19487,12 @@
 	<item id="7424" name="">
 		<attribute key="weight" value="0"/>
 	</item>
-	<item id="7425" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7425" name="Taurus Mace">
+		<attribute key="weight" value="5100"/>
+		<attribute key="defense" value="18"/>
+		<attribute key="attack" value="30"/>
+		<attribute key="weaponType" value="club"/>
+		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="7426" name="amber staff">
 		<attribute key="weight" value="3500"/>
@@ -19545,7 +19556,7 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="description" value="A beautiful gem is embedded in this weapon."/>
 	</item>
-	<item id="7438" name="">
+	<item id="7438" name="Golden Bow">
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7439" name="berserk potion">
