@@ -18523,10 +18523,12 @@
 	</item>
 	<item id="7093" name="dead frost dragon">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="7094"/>
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7094" name="dead frost dragon">
+		<atrribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7095" name="wooden railing">
 	</item>
@@ -19302,7 +19304,7 @@
 		<attribute key="description" value="Barbarian women are said to use it for conjuring beasts."/>
 	</item>
 	<item id="7380" name="headchopper">
-		<attribute key="weight" value="4500"/> <!-- ? -->
+		<attribute key="weight" value="4500"/>
 		<attribute key="defense" value="20"/>
 		<attribute key="attack" value="42"/>
 		<attribute key="slotType" value="two-handed"/>
@@ -19348,7 +19350,7 @@
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7389" name="heroic axe">
-		<attribute key="weight" value="6100"/> <!-- ? -->
+		<attribute key="weight" value="6100"/>
 		<attribute key="defense" value="24"/>
 		<attribute key="attack" value="44"/>
 		<attribute key="weaponType" value="axe"/>
