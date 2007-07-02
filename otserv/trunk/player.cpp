@@ -400,33 +400,51 @@ int32_t Player::getArmor() const
 	return armor;
 }
 
+Item* Player::getShield() const
+{
+	Item* item;
+
+	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+		item = getInventoryItem((slots_t)slot);
+		if(!item){
+			continue;
+		}
+
+		if(item->getWeaponType() == WEAPON_SHIELD){
+			return item;
+		}
+	}
+
+	return NULL;
+}
+
 int32_t Player::getDefense() const
 {
 	int32_t baseDefense = 5;
 	int32_t defense = 0;
 	int32_t extraDef = 0;
 	int32_t shieldSkill = getSkill(SKILL_SHIELD, SKILL_LEVEL);
+	const Item* weapon = getWeapon();
+	const Item* shield = getShield();
 
-	if(getInventoryItem(SLOT_LEFT)){
-		if(getInventoryItem(SLOT_LEFT)->getDefense() > defense){
-			defense = getInventoryItem(SLOT_LEFT)->getDefense();
+	if(weapon || shield){
+		if(weapon->getDefense() > defense){
+			defense = weapon->getDefense();
 		}
-		if(getInventoryItem(SLOT_LEFT)->getExtraDef() > extraDef){
-			extraDef = getInventoryItem(SLOT_LEFT)->getExtraDef();
+		if(shield->getDefense() > defense){
+			defense = shield->getDefense();
+		}
+		if(weapon->getExtraDef() > extraDef){
+			extraDef = weapon->getExtraDef();
+		}
+		if(shield->getExtraDef() > extraDef){
+			extraDef = shield->getExtraDef();
+		}
+		if(shield){
+			defense += extraDef;
 		}
 	}
-	
-	if(getInventoryItem(SLOT_RIGHT)){
-		if(getInventoryItem(SLOT_RIGHT)->getDefense() > defense){
-			defense = getInventoryItem(SLOT_RIGHT)->getDefense();
-		}
-		if(getInventoryItem(SLOT_RIGHT)->getExtraDef() > extraDef){
-			extraDef = getInventoryItem(SLOT_RIGHT)->getExtraDef();
-		}
-	}
 
-	defense += extraDef;
-	
 	if(defense <= 0){
 		if(getInventoryItem(SLOT_HEAD)){
 			defense += getInventoryItem(SLOT_HEAD)->getDefense();
