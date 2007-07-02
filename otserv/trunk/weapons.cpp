@@ -338,7 +338,7 @@ std::string Weapon::getScriptEventName()
 	return "onUseWeapon";
 }
 
-int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
+uint32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 {
 	const Position& playerPos = player->getPosition();
 	const Position& targetPos = target->getPosition();
@@ -375,19 +375,21 @@ int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 		}
 
 		if(isWieldedUnproperly()){
+			uint32_t damageModifier = 100;
 			if(player->getLevel() < getReqLevel()){
-				return 50;
+				damageModifier = damageModifier/2;
 			}
 
 			if(player->getMagicLevel() < getReqMagLv()){
-				return 50;
+				damageModifier = damageModifier/2;
 			}
 
 			if(!vocWeaponMap.empty()){
 				if(vocWeaponMap.find(player->getVocationId()) == vocWeaponMap.end()){
-					return 50;
+					damageModifier = damageModifier/2;
 				}
 			}
+			return damageModifier;
 		}
 	}
 
@@ -396,11 +398,13 @@ int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 
 bool Weapon::useWeapon(Player* player, Item* item, Creature* target) const
 {
-	if(playerWeaponCheck(player, target) == 0){
+	uint32_t damageModifier = playerWeaponCheck(player, target);
+	if(damageModifier == 0){
 		return false;
 	}
-
-	return internalUseWeapon(player, item, target);
+	else{
+		return internalUseWeapon(player, item, target, damageModifier);
+	}
 }
 
 bool Weapon::useFist(Player* player, Creature* target)
@@ -434,7 +438,7 @@ bool Weapon::useFist(Player* player, Creature* target)
 	return false;
 }
 
-bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target) const
+bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, uint32_t damageModifier) const
 {
 	if(m_scripted){
 		LuaVariant var;
@@ -443,8 +447,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target) con
 		executeUseWeapon(player, var);
 	}
 	else{
-		double percentDmg = (double)playerWeaponCheck(player, target)/100;
-		int32_t damage = int32_t(getWeaponDamage(player, item) * percentDmg);
+		int32_t damage = (getWeaponDamage(player, item) * damageModifier) / 100;
 		Combat::doCombatHealth(player, target, damage, damage, params);
 	}
 
@@ -723,14 +726,17 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	return true;
 }
 
-int32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
+/*
+uint32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
 {
 	return Weapon::playerWeaponCheck(player, target);
 }
+*/
 
 bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) const
 {
-	if(playerWeaponCheck(player, target) == 0){
+	uint32_t damageModifier = playerWeaponCheck(player, target);
+	if(damageModifier == 0){
 		return false;
 	}
 
@@ -738,7 +744,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 	Tile* destTile = target->getTile();
 
 	if(random_range(0, 100) < hitChance){
-		Weapon::internalUseWeapon(player, item, target);
+		Weapon::internalUseWeapon(player, item, target, damageModifier);
 	}
 	else{
 		//miss target

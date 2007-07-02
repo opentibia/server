@@ -118,6 +118,22 @@ bool ExceptionHandler::RemoveHandler(){
 	return true;
 }
 
+char* getFunctionName(unsigned long addr, unsigned long& start)
+{
+	FunctionMap::iterator functions;
+	if(addr >= min_off && addr <= max_off){
+		for(functions = functionMap.begin(); functions != functionMap.end(); ++functions) {
+			if(functions->first > addr && functions != functionMap.begin()){
+				functions--;
+				start = functions->first;
+				return functions->second;
+				break;
+			}
+		}
+	}
+	return NULL;
+}
+
 #if defined WIN32 || defined __WINDOWS__
 EXCEPTION_DISPOSITION
 __cdecl _SEHHandler(
@@ -218,16 +234,10 @@ __cdecl _SEHHandler(
 	*outdriver << "Exception: " << (unsigned long)ExceptionRecord->ExceptionCode << 
 		" at eip = " << (unsigned long)ExceptionRecord->ExceptionAddress;
 	FunctionMap::iterator functions;
-	if((unsigned long)(ExceptionRecord->ExceptionAddress) >= min_off &&
-		(unsigned long)(ExceptionRecord->ExceptionAddress) <= max_off){
-		for(functions = functionMap.begin(); functions != functionMap.end(); ++functions) {
-			if(functions->first > (unsigned long)(ExceptionRecord->ExceptionAddress) && 
-					functions != functionMap.begin()) {
-				functions--;
-				*outdriver << "(" <<functions->second << ")" ;
-				break;
-			}
-		}
+	unsigned long functionAddr;
+	char* functionName = getFunctionName((unsigned long)ExceptionRecord->ExceptionAddress, functionAddr);
+	if(functionName){
+		*outdriver << "(" << functionName << ")";
 	}
 	*outdriver << std::endl ;
 	
@@ -280,15 +290,10 @@ __cdecl _SEHHandler(
 		if(stack_val >= min_off && stack_val <= max_off){
 			foundRetAddress++;
 			//
-			FunctionMap::iterator functions;
-			for(functions = functionMap.begin(); functions != functionMap.end(); ++functions) {
-				if(functions->first > stack_val && functions != functionMap.begin()) {
-					functions--;
-					*outdriver  << (unsigned long)esp << "  " << 
-					functions->second <<"("  << functions->first <<")" << std::endl;
-					break;
-				}
-			}
+			unsigned long functionAddr;
+			char* functionName = getFunctionName(stack_val, functionAddr);
+			output << (unsigned long)esp << "  " << functionName << "(" << 
+				functionAddr << ")" << std::endl;
 		}
 		esp++;
 	}
@@ -459,16 +464,10 @@ void ExceptionHandler::dumpStack()
 		}
 		if(stack_val >= min_off && stack_val <= max_off){
 			foundRetAddress++;
-			//
-			FunctionMap::iterator functions;
-			for(functions = functionMap.begin(); functions != functionMap.end(); ++functions) {
-				if(functions->first > stack_val && functions != functionMap.begin()) {
-					functions--;
-					output << (unsigned long)esp << "  " << 
-					functions->second <<"("  << functions->first <<")" << std::endl;
-					break;
-				}
-			}
+			unsigned long functionAddr;
+			char* functionName = getFunctionName(stack_val, functionAddr);
+			output << (unsigned long)esp << "  " << functionName << "(" << 
+				functionAddr << ")" << std::endl;
 		}
 		esp++;
 	}

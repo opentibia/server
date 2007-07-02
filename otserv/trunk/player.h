@@ -255,10 +255,9 @@ public:
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
 	Item* getWeapon();
-	Item* getWeapon() const {return getWeapon();}
 	virtual WeaponType_t getWeaponType();
 	int32_t getWeaponSkill(const Item* item) const;
-	Item* getShield() const;
+	void getShieldandWeapon(const Item* &shield, const Item* &weapon) const;
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);	

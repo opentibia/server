@@ -634,23 +634,21 @@ std::string Item::getDescription(int32_t lookDistance) const
 			else if(isWeapon())
 			{
 				s << "a " << it.name;
-				if(getAttack() || getDefense()){
-					if(getAttack()){
-						if(getExtraDef()){
-							s << " (Atk:" << getAttack() << " Def:" << getDefense() << " " << std::showpos << getExtraDef() << ")";
-						}
-						else{
-                            s << " (Atk:" << getAttack() << " Def:" << getDefense() << ")";
-						}
+				if(getAttack()){
+					if(getExtraDef()){
+						s << " (Atk:" << getAttack() << " Def:" << getDefense() << " " << std::showpos << getExtraDef() << ")" << std::noshowpos;
 					}
 					else{
-						if(getExtraDef()){
-							s << " (Def:" << getDefense() << " " << std::showpos << getExtraDef() << ")";
-						}
-						else{
-                            s << " (Def:" << getDefense() << ")";
-						}
+						s << " (Atk:" << getAttack() << " Def:" << getDefense() << ")";
 					}
+				}
+				else if(getDefense()){
+					/*if(getExtraDef()){
+						s << " (Def:" << getDefense() << " " << std::showpos << getExtraDef() << ")";
+					}
+					else{*/
+						s << " (Def:" << getDefense() << ")";
+					//}
 				}
 				s << ".";
 

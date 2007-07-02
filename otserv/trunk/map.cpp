@@ -86,8 +86,8 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 		return false;
 	}
 
-	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
-
+	std::cout << ":: Loading map from: " << identifier << " " << loader->getSourceDescription() << std::endl;
+	
 	bool loadMapSuccess = loader->loadMap(this, identifier);
 	defaultMapLoaded = true;
 

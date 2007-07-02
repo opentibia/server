@@ -88,7 +88,7 @@ public:
 	virtual bool configureWeapon(const ItemType& it);
 
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return true;}
-	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
+	virtual uint32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 
 	void setCombatParam(const CombatParams& _params);
@@ -109,7 +109,7 @@ protected:
 	virtual std::string getScriptEventName();
 
 	bool executeUseWeapon(Player* player, const LuaVariant& var) const;
-	bool internalUseWeapon(Player* player, Item* item, Creature* target) const;
+	bool internalUseWeapon(Player* player, Item* item, Creature* target, uint32_t damageModifier) const;
 	bool internalUseWeapon(Player* player, Item* item, Tile* tile) const;
 
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
@@ -163,7 +163,7 @@ public:
 	virtual bool configureWeapon(const ItemType& it);
 
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
-	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
+	//virtual uint32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const;
 

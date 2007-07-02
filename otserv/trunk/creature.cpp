@@ -562,7 +562,6 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 		if(checkDefense && hasDefense){
 			int32_t maxDefense = getDefense();
 			maxDefense = maxDefense + (maxDefense * defenseStrength) / 100;
-			//int32_t defense = random_range(0, maxDefense);
 
 			damage -= maxDefense;
 			if(damage <= 0){
@@ -574,7 +573,6 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 			
 		if(checkArmor){
 			int32_t maxArmor = getArmor();
-			//int32_t armor = random_range(0, maxArmor);
 
 			damage -= maxArmor;
 			if(damage <= 0){
