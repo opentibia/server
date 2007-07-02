@@ -7243,9 +7243,9 @@
 	<item id="2696" name="cheese">
 		<attribute key="weight" value="400"/>
 	</item>
-	<item id="2697" name="dead tree">
+	<item id="2697" name="snowy dead tree">
 	</item>
-	<item id="2698" name="pine">
+	<item id="2698" name="snowy fir tree">
 	</item>
 	<item id="2699" name="magic tree">
 	</item>
@@ -8781,7 +8781,7 @@
 		<attribute key="decayTo" value="2822"/>
 		<attribute key="duration" value="900"/>
 	</item>
-	<item id="3069" name="dead cyclop">
+	<item id="3069" name="dead cyclops">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3117"/>
 		<attribute key="duration" value="600"/>
@@ -8969,11 +8969,11 @@
 	<item id="3116" name="slain ghoul">
 		<attribute key="weight" value="60200"/>
 	</item>
-	<item id="3117" name="dead cyclop">
+	<item id="3117" name="dead cyclops">
 		<attribute key="decayTo" value="3118"/>
 		<attribute key="duration" value="20"/>
 	</item>
-	<item id="3118" name="dead cyclop">
+	<item id="3118" name="dead cyclops">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -9782,59 +9782,59 @@
 	</item>
 	<item id="3505" name="grass archway">
 	</item>
-	<item id="3506" name="hanging decoration">
+	<item id="3506" name="liane">
 	</item>
-	<item id="3507" name="hanging decoration">
+	<item id="3507" name="liane">
 	</item>
-	<item id="3508" name="wooden wall">
+	<item id="3508" name="palisade">
 	</item>
-	<item id="3509" name="wooden wall">
+	<item id="3509" name="palisade">
 	</item>
-	<item id="3510" name="wooden wall">
+	<item id="3510" name="palisade">
 	</item>
-	<item id="3511" name="wooden wall">
+	<item id="3511" name="palisade">
 	</item>
-	<item id="3512" name="wooden wall">
+	<item id="3512" name="palisade">
 	</item>
-	<item id="3513" name="wooden wall">
+	<item id="3513" name="palisade">
 	</item>
-	<item id="3514" name="wooden wall">
+	<item id="3514" name="palisade">
 	</item>
-	<item id="3515" name="wooden wall">
+	<item id="3515" name="palisade">
 	</item>
-	<item id="3516" name="wooden wall">
+	<item id="3516" name="palisade">
 	</item>
-	<item id="3517" name="wooden wall">
+	<item id="3517" name="palisade">
 	</item>
-	<item id="3518" name="wooden wall">
+	<item id="3518" name="palisade">
 	</item>
-	<item id="3519" name="wooden wall">
+	<item id="3519" name="palisade">
 	</item>
-	<item id="3520" name="wooden wall">
+	<item id="3520" name="palisade">
 	</item>
-	<item id="3521" name="wooden wall">
+	<item id="3521" name="palisade">
 	</item>
-	<item id="3522" name="wooden wall">
+	<item id="3522" name="palisade">
 	</item>
-	<item id="3523" name="wooden wall">
+	<item id="3523" name="palisade">
 	</item>
-	<item id="3524" name="wooden wall">
+	<item id="3524" name="palisade">
 	</item>
-	<item id="3525" name="wooden wall">
+	<item id="3525" name="palisade">
 	</item>
-	<item id="3526" name="wooden wall">
+	<item id="3526" name="palisade">
 	</item>
-	<item id="3527" name="wooden wall">
+	<item id="3527" name="palisade">
 	</item>
-	<item id="3528" name="wooden wall">
+	<item id="3528" name="palisade">
 	</item>
-	<item id="3529" name="wooden wall">
+	<item id="3529" name="palisade">
 	</item>
-	<item id="3530" name="wooden wall">
+	<item id="3530" name="palisade">
 	</item>
-	<item id="3531" name="wooden wall">
+	<item id="3531" name="palisade">
 	</item>
-	<item id="3532" name="wooden wall">
+	<item id="3532" name="palisade">
 	</item>
 	<item id="3533" name="stone wall">
 	</item>
@@ -10552,9 +10552,9 @@
 	</item>
 	<item id="3871" name="pile of chopped wood">
 	</item>
-	<item id="3872" name="tree stump">
+	<item id="3872" name="block of wood">
 	</item>
-	<item id="3873" name="logs">
+	<item id="3873" name="some pieces of wood">
 	</item>
 	<item id="3874" name="fishing net">
 	</item>
@@ -13265,9 +13265,9 @@
 	</item>
 	<item id="5019" name="skulls">
 	</item>
-	<item id="5020" name="skull">
+	<item id="5020" name="burning skull">
 	</item>
-	<item id="5021" name="skull">
+	<item id="5021" name="burning skull">
 	</item>
 	<item id="5022" name="orichalcum pearl">
 		<attribute key="weight" value="30"/>
@@ -14699,12 +14699,12 @@
 	<item id="5665" name="water source">
 	</item>
 	<item id="5666" name="dead mammoth">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="5667"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="5667" name="dead mammoth">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="5668"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -15150,17 +15150,17 @@
 	</item>
 	<item id="5853" name="weapon rack">
 	</item>
-	<item id="5854" name="weapon rack">
+	<item id="5854" name="lance">
 	</item>
-	<item id="5855" name="weapon rack">
+	<item id="5855" name="lance">
 	</item>
 	<item id="5856" name="weapon rack">
 	</item>
 	<item id="5857" name="weapon rack">
 	</item>
-	<item id="5858" name="weapon rack">
+	<item id="5858" name="scimitar">
 	</item>
-	<item id="5859" name="weapon rack">
+	<item id="5859" name="scimitar">
 	</item>
 	<item id="5860" name="armour rack">
 	</item>
@@ -15502,7 +15502,7 @@
 		<attribute key="decayTo" value="3068"/>
 		<attribute key="duration" value="10"/>
 	</item>
-	<item id="5962" name="dead cyclop">
+	<item id="5962" name="dead cyclops">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3069"/>
 		<attribute key="duration" value="10"/>
@@ -16059,7 +16059,7 @@
 		<attribute key="duration" value="10"/>
 	</item>
 	<item id="6074" name="dead mammoth">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="5666"/>
 		<attribute key="duration" value="10"/>
 	</item>
@@ -17047,7 +17047,7 @@
 	</item>
 	<item id="6412" name="bone archway">
 	</item>
-	<item id="6413" name="bone wall">
+	<item id="6413" name="bone pillar">
 	</item>
 	<item id="6414" name="bone window">
 	</item>
@@ -17937,9 +17937,9 @@
 	</item>
 	<item id="6792" name="fur archway">
 	</item>
-	<item id="6793" name="flag">
+	<item id="6793" name="barbarian banner">
 	</item>
-	<item id="6794" name="flag">
+	<item id="6794" name="barbarian banner">
 	</item>
 	<item id="6795" name="closed door">
 	</item>
@@ -18295,9 +18295,9 @@
 	</item>
 	<item id="6971" name="mammoth skull">
 	</item>
-	<item id="6972" name="bones">
+	<item id="6972" name="bone totem">
 	</item>
-	<item id="6973" name="bones">
+	<item id="6973" name="mammoth totem">
 	</item>
 	<item id="6974" name="mammoth skull">
 	</item>
@@ -18391,13 +18391,13 @@
 	</item>
 	<item id="7019" name="snowy stone">
 	</item>
-	<item id="7020" name="snow tree">
+	<item id="7020" name="snowy dead tree">
 	</item>
-	<item id="7021" name="snow tree">
+	<item id="7021" name="snowy dead tree">
 	</item>
-	<item id="7022" name="snow tree">
+	<item id="7022" name="snowy dead tree">
 	</item>
-	<item id="7023" name="snow tree">
+	<item id="7023" name="snowy pine tree">
 	</item>
 	<item id="7024" name="tree">
 	</item>
@@ -18842,10 +18842,10 @@
 	</item>
 	<item id="7235" name="shield">
 	</item>
-	<item id="7236" name="air-hole">
+	<item id="7236" name="ice hole">
 		<attribute key="description" value="You can see a moving fish there."/>
 	</item>
-	<item id="7237" name="air-hole">
+	<item id="7237" name="ice hole">
 	</item>
 	<item id="7238" name="shield">
 	</item>
@@ -19598,6 +19598,10 @@
 	</item>
 	<item id="7438" name="golden bow">
 		<attribute key="weight" value="0"/>
+		<attribute key="slotType" value="two-handed"/>	
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="arrow"/>
+		<attribute key="range" value="5"/>
 	</item>
 	<item id="7439" name="berserk potion">
 		<attribute key="weight" value="200"/>
