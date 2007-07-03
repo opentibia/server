@@ -616,7 +616,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 			s << (int)count << " " << it.name << "s.";
 
 			if(lookDistance <= 1) {
-				s << std::endl << "They weight " << std::fixed << std::setprecision(2) << ((double) count * it.weight) << " oz.";
+				s << std::endl << "They weigh " << std::fixed << std::setprecision(2) << ((double) count * it.weight) << " oz.";
 			}
 		}
 		else{

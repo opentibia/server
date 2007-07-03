@@ -338,7 +338,7 @@ std::string Weapon::getScriptEventName()
 	return "onUseWeapon";
 }
 
-uint32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
+int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 {
 	const Position& playerPos = player->getPosition();
 	const Position& targetPos = target->getPosition();
@@ -375,7 +375,7 @@ uint32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 		}
 
 		if(isWieldedUnproperly()){
-			uint32_t damageModifier = 100;
+			int32_t damageModifier = 100;
 			if(player->getLevel() < getReqLevel()){
 				damageModifier = damageModifier/2;
 			}
@@ -398,7 +398,7 @@ uint32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 
 bool Weapon::useWeapon(Player* player, Item* item, Creature* target) const
 {
-	uint32_t damageModifier = playerWeaponCheck(player, target);
+	int32_t damageModifier = playerWeaponCheck(player, target);
 	if(damageModifier == 0){
 		return false;
 	}
@@ -438,7 +438,7 @@ bool Weapon::useFist(Player* player, Creature* target)
 	return false;
 }
 
-bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, uint32_t damageModifier) const
+bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int32_t damageModifier) const
 {
 	if(m_scripted){
 		LuaVariant var;
@@ -735,7 +735,7 @@ uint32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) con
 
 bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) const
 {
-	uint32_t damageModifier = playerWeaponCheck(player, target);
+	int32_t damageModifier = playerWeaponCheck(player, target);
 	if(damageModifier == 0){
 		return false;
 	}

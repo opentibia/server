@@ -605,17 +605,8 @@ bool Door::unserialize(xmlNodePtr nodeItem)
 
 	int intValue;
 	if(readXMLInteger(nodeItem, "doorId", intValue)){
-		setDoorId(doorId);
+		setDoorId(intValue);
 	}
-
-	/*
-	char* nodeValue;
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "doorId");
-	if(nodeValue){
-		setDoorId(atoi(nodeValue));
-		xmlFreeOTSERV(nodeValue);
-	}
-	*/
 	
 	return ret;
 }

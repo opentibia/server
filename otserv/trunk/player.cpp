@@ -368,7 +368,7 @@ int32_t Player::getWeaponSkill(const Item* item) const
 
 		case WEAPON_DIST:
 		{
-			attackSkill = getSkill(SKILL_AXE, SKILL_LEVEL);
+			attackSkill = getSkill(SKILL_DIST, SKILL_LEVEL);
 			break;
 		}
 		default:
@@ -400,7 +400,7 @@ int32_t Player::getArmor() const
 	return armor;
 }
 
-void Player::getShieldandWeapon(const Item* &shield, const Item* &weapon) const
+void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
 {
 	Item* item;
 
@@ -430,7 +430,7 @@ int32_t Player::getDefense() const
 	int32_t defenseSkill = 0;
 	const Item* weapon;
 	const Item* shield;
-	getShieldandWeapon(shield, weapon);
+	getShieldAndWeapon(shield, weapon);
 
 	if(weapon){
 		defense = weapon->getDefense();
