@@ -265,8 +265,8 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>8</integer>
-									<integer>6</integer>
+									<integer>10</integer>
+									<integer>7</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
@@ -305,7 +305,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>MyNewFile14.java</string>
+								<string>player.h</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -313,7 +313,20 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>MyNewFile14.java</string>
+										<string>player.h</string>
+										<key>_historyCapacity</key>
+										<integer>0</integer>
+										<key>bookmark</key>
+										<string>F6BB43660C3ADDA600C9180A</string>
+										<key>history</key>
+										<array>
+											<string>F6F5BAB40C38D87900B77664</string>
+											<string>F6F5BACD0C38DA2300B77664</string>
+										</array>
+										<key>prevStack</key>
+										<array>
+											<string>F6F5BAB60C38D87900B77664</string>
+										</array>
 									</dict>
 									<key>SplitCount</key>
 									<string>1</string>
@@ -324,14 +337,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {801, 0}}</string>
+								<string>{{0, 0}, {801, 425}}</string>
 								<key>RubberWindowFrame</key>
 								<string>150 124 1009 653 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>0pt</string>
+							<string>425pt</string>
 						</dict>
 						<dict>
 							<key>ContentConfiguration</key>
@@ -344,14 +357,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 5}, {801, 607}}</string>
+								<string>{{0, 430}, {801, 182}}</string>
 								<key>RubberWindowFrame</key>
 								<string>150 124 1009 653 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
 							<key>Proportion</key>
-							<string>607pt</string>
+							<string>182pt</string>
 						</dict>
 					</array>
 					<key>Proportion</key>
@@ -370,9 +383,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>F69A42070C1E9B2400798B45</string>
+				<string>F6BB43600C3ADCAF00C9180A</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>F69A42080C1E9B2400798B45</string>
+				<string>F6BB43610C3ADCAF00C9180A</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -506,7 +519,6 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>1C0AD2B3069F1EA900FABCE6</string>
 		<string>F69A415D0C1E95F100798B45</string>
 		<string>/Users/iooo/Projects/otserv/src/mac/otserv.xcodeproj</string>
 	</array>
@@ -532,7 +544,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CD0528F0623707200166675</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>exception.cpp</string>
+								<string></string>
 								<key>StatusBarVisibility</key>
 								<true/>
 							</dict>
@@ -549,8 +561,6 @@
 							<string>218pt</string>
 						</dict>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -590,7 +600,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>F69A415D0C1E95F100798B45</string>
-				<string>F69A415E0C1E95F100798B45</string>
+				<string>F6BB43670C3ADDA700C9180A</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>

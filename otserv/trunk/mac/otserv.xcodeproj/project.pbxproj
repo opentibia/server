@@ -50,7 +50,6 @@
 		F69A41D40C1E9A5400798B45 /* outfit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E70C1E943500798B45 /* outfit.cpp */; };
 		F69A41D60C1E9A5400798B45 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E50C1E943500798B45 /* player.cpp */; };
 		F69A41D80C1E9A5400798B45 /* position.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E30C1E943500798B45 /* position.cpp */; };
-		F69A41DA0C1E9A5400798B45 /* protocol79.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E10C1E943500798B45 /* protocol79.cpp */; };
 		F69A41DC0C1E9A5400798B45 /* raids.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DF0C1E943500798B45 /* raids.cpp */; };
 		F69A41DE0C1E9A5400798B45 /* rsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DD0C1E943500798B45 /* rsa.cpp */; };
 		F69A41E10C1E9A5400798B45 /* scriptmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DA0C1E943500798B45 /* scriptmanager.cpp */; };
@@ -114,7 +113,6 @@
 		F69A43470C1EAC8300798B45 /* outfit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E70C1E943500798B45 /* outfit.cpp */; };
 		F69A43490C1EAC8300798B45 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E50C1E943500798B45 /* player.cpp */; };
 		F69A434B0C1EAC8300798B45 /* position.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E30C1E943500798B45 /* position.cpp */; };
-		F69A434D0C1EAC8300798B45 /* protocol79.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E10C1E943500798B45 /* protocol79.cpp */; };
 		F69A434F0C1EAC8300798B45 /* raids.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DF0C1E943500798B45 /* raids.cpp */; };
 		F69A43510C1EAC8300798B45 /* rsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DD0C1E943500798B45 /* rsa.cpp */; };
 		F69A43540C1EAC8300798B45 /* scriptmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DA0C1E943500798B45 /* scriptmanager.cpp */; };
@@ -178,7 +176,6 @@
 		F69A43F90C1EAED100798B45 /* outfit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E70C1E943500798B45 /* outfit.cpp */; };
 		F69A43FB0C1EAED100798B45 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E50C1E943500798B45 /* player.cpp */; };
 		F69A43FD0C1EAED100798B45 /* position.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E30C1E943500798B45 /* position.cpp */; };
-		F69A43FF0C1EAED100798B45 /* protocol79.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E10C1E943500798B45 /* protocol79.cpp */; };
 		F69A44010C1EAED100798B45 /* raids.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DF0C1E943500798B45 /* raids.cpp */; };
 		F69A44030C1EAED100798B45 /* rsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DD0C1E943500798B45 /* rsa.cpp */; };
 		F69A44060C1EAED100798B45 /* scriptmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DA0C1E943500798B45 /* scriptmanager.cpp */; };
@@ -194,9 +191,13 @@
 		F69A441D0C1EAED100798B45 /* vocation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C30C1E943500798B45 /* vocation.cpp */; };
 		F69A441F0C1EAED100798B45 /* waitlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C10C1E943500798B45 /* waitlist.cpp */; };
 		F69A44210C1EAED100798B45 /* weapons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40BF0C1E943500798B45 /* weapons.cpp */; };
+		F6F5BAC60C38D93300B77664 /* protocol80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F5BAC40C38D93300B77664 /* protocol80.cpp */; };
+		F6F5BAC70C38D93300B77664 /* protocol80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F5BAC40C38D93300B77664 /* protocol80.cpp */; };
+		F6F5BAC80C38D93300B77664 /* protocol80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F5BAC40C38D93300B77664 /* protocol80.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F62DEBA80C233B4C004E3974 /* config.lua */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = config.lua; path = ../../../../.otserv/config.lua; sourceTree = SOURCE_ROOT; };
 		F69A40BE0C1E943500798B45 /* weapons.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = weapons.h; path = ../weapons.h; sourceTree = SOURCE_ROOT; };
 		F69A40BF0C1E943500798B45 /* weapons.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = weapons.cpp; path = ../weapons.cpp; sourceTree = SOURCE_ROOT; };
 		F69A40C00C1E943500798B45 /* waitlist.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = waitlist.h; path = ../waitlist.h; sourceTree = SOURCE_ROOT; };
@@ -231,8 +232,6 @@
 		F69A40DD0C1E943500798B45 /* rsa.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rsa.cpp; path = ../rsa.cpp; sourceTree = SOURCE_ROOT; };
 		F69A40DE0C1E943500798B45 /* raids.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = raids.h; path = ../raids.h; sourceTree = SOURCE_ROOT; };
 		F69A40DF0C1E943500798B45 /* raids.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = raids.cpp; path = ../raids.cpp; sourceTree = SOURCE_ROOT; };
-		F69A40E00C1E943500798B45 /* protocol79.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = protocol79.h; path = ../protocol79.h; sourceTree = SOURCE_ROOT; };
-		F69A40E10C1E943500798B45 /* protocol79.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = protocol79.cpp; path = ../protocol79.cpp; sourceTree = SOURCE_ROOT; };
 		F69A40E20C1E943500798B45 /* position.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = position.h; path = ../position.h; sourceTree = SOURCE_ROOT; };
 		F69A40E30C1E943500798B45 /* position.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = position.cpp; path = ../position.cpp; sourceTree = SOURCE_ROOT; };
 		F69A40E40C1E943500798B45 /* player.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = player.h; path = ../player.h; sourceTree = SOURCE_ROOT; };
@@ -300,7 +299,6 @@
 		F69A41220C1E943500798B45 /* ioaccountxml.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ioaccountxml.h; path = ../ioaccountxml.h; sourceTree = SOURCE_ROOT; };
 		F69A41230C1E943500798B45 /* container.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = container.h; path = ../container.h; sourceTree = SOURCE_ROOT; };
 		F69A41240C1E943500798B45 /* container.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = container.cpp; path = ../container.cpp; sourceTree = SOURCE_ROOT; };
-		F69A41250C1E943500798B45 /* const79.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = const79.h; path = ../const79.h; sourceTree = SOURCE_ROOT; };
 		F69A41260C1E943500798B45 /* configmanager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = configmanager.h; path = ../configmanager.h; sourceTree = SOURCE_ROOT; };
 		F69A41270C1E943500798B45 /* configmanager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = configmanager.cpp; path = ../configmanager.cpp; sourceTree = SOURCE_ROOT; };
 		F69A41280C1E943500798B45 /* condition.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = condition.h; path = ../condition.h; sourceTree = SOURCE_ROOT; };
@@ -342,6 +340,9 @@
 		F69A416A0C1E9A2E00798B45 /* otserv-xml */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "otserv-xml"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F69A43750C1EAC8300798B45 /* otserv-mysql */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "otserv-mysql"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F69A44270C1EAED100798B45 /* otserv-sqlite */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "otserv-sqlite"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F6F5BAC30C38D92200B77664 /* const80.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = const80.h; path = ../const80.h; sourceTree = SOURCE_ROOT; };
+		F6F5BAC40C38D93300B77664 /* protocol80.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = protocol80.cpp; path = ../protocol80.cpp; sourceTree = SOURCE_ROOT; };
+		F6F5BAC50C38D93300B77664 /* protocol80.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = protocol80.h; path = ../protocol80.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -369,9 +370,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F62DEBA70C233B16004E3974 /* Other files */ = {
+			isa = PBXGroup;
+			children = (
+				F62DEBA80C233B4C004E3974 /* config.lua */,
+			);
+			name = "Other files";
+			sourceTree = "<group>";
+		};
 		F69A414C0C1E944200798B45 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				F6F5BAC40C38D93300B77664 /* protocol80.cpp */,
+				F6F5BAC50C38D93300B77664 /* protocol80.h */,
+				F6F5BAC30C38D92200B77664 /* const80.h */,
 				F69A41400C1E943500798B45 /* movement.h */,
 				F69A41410C1E943500798B45 /* itemloader.h */,
 				F69A41420C1E943500798B45 /* map.cpp */,
@@ -411,7 +423,6 @@
 				F69A41220C1E943500798B45 /* ioaccountxml.h */,
 				F69A41230C1E943500798B45 /* container.h */,
 				F69A41240C1E943500798B45 /* container.cpp */,
-				F69A41250C1E943500798B45 /* const79.h */,
 				F69A41260C1E943500798B45 /* configmanager.h */,
 				F69A41270C1E943500798B45 /* configmanager.cpp */,
 				F69A41280C1E943500798B45 /* condition.h */,
@@ -512,8 +523,6 @@
 				F69A40DD0C1E943500798B45 /* rsa.cpp */,
 				F69A40DE0C1E943500798B45 /* raids.h */,
 				F69A40DF0C1E943500798B45 /* raids.cpp */,
-				F69A40E00C1E943500798B45 /* protocol79.h */,
-				F69A40E10C1E943500798B45 /* protocol79.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -531,6 +540,7 @@
 		F69AE4DA0C1E804900C5F7A1 = {
 			isa = PBXGroup;
 			children = (
+				F62DEBA70C233B16004E3974 /* Other files */,
 				F69A414C0C1E944200798B45 /* Source */,
 				F69A41530C1E951400798B45 /* Products */,
 			);
@@ -598,8 +608,8 @@
 			productRefGroup = F69A41530C1E951400798B45 /* Products */;
 			projectDirPath = "";
 			targets = (
-				F69A42E10C1EAC8300798B45 /* otserv-mysql */,
 				F69A41690C1E9A2E00798B45 /* otserv-xml */,
+				F69A42E10C1EAC8300798B45 /* otserv-mysql */,
 				F69A43930C1EAED100798B45 /* otserv-sqlite */,
 			);
 		};
@@ -653,7 +663,6 @@
 				F69A41D40C1E9A5400798B45 /* outfit.cpp in Sources */,
 				F69A41D60C1E9A5400798B45 /* player.cpp in Sources */,
 				F69A41D80C1E9A5400798B45 /* position.cpp in Sources */,
-				F69A41DA0C1E9A5400798B45 /* protocol79.cpp in Sources */,
 				F69A41DC0C1E9A5400798B45 /* raids.cpp in Sources */,
 				F69A41DE0C1E9A5400798B45 /* rsa.cpp in Sources */,
 				F69A41E10C1E9A5400798B45 /* scriptmanager.cpp in Sources */,
@@ -669,6 +678,7 @@
 				F69A41F80C1E9A5400798B45 /* vocation.cpp in Sources */,
 				F69A41FA0C1E9A5400798B45 /* waitlist.cpp in Sources */,
 				F69A41FC0C1E9A5400798B45 /* weapons.cpp in Sources */,
+				F6F5BAC60C38D93300B77664 /* protocol80.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -724,7 +734,6 @@
 				F69A43470C1EAC8300798B45 /* outfit.cpp in Sources */,
 				F69A43490C1EAC8300798B45 /* player.cpp in Sources */,
 				F69A434B0C1EAC8300798B45 /* position.cpp in Sources */,
-				F69A434D0C1EAC8300798B45 /* protocol79.cpp in Sources */,
 				F69A434F0C1EAC8300798B45 /* raids.cpp in Sources */,
 				F69A43510C1EAC8300798B45 /* rsa.cpp in Sources */,
 				F69A43540C1EAC8300798B45 /* scriptmanager.cpp in Sources */,
@@ -740,6 +749,7 @@
 				F69A436B0C1EAC8300798B45 /* vocation.cpp in Sources */,
 				F69A436D0C1EAC8300798B45 /* waitlist.cpp in Sources */,
 				F69A436F0C1EAC8300798B45 /* weapons.cpp in Sources */,
+				F6F5BAC70C38D93300B77664 /* protocol80.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -795,7 +805,6 @@
 				F69A43F90C1EAED100798B45 /* outfit.cpp in Sources */,
 				F69A43FB0C1EAED100798B45 /* player.cpp in Sources */,
 				F69A43FD0C1EAED100798B45 /* position.cpp in Sources */,
-				F69A43FF0C1EAED100798B45 /* protocol79.cpp in Sources */,
 				F69A44010C1EAED100798B45 /* raids.cpp in Sources */,
 				F69A44030C1EAED100798B45 /* rsa.cpp in Sources */,
 				F69A44060C1EAED100798B45 /* scriptmanager.cpp in Sources */,
@@ -811,6 +820,7 @@
 				F69A441D0C1EAED100798B45 /* vocation.cpp in Sources */,
 				F69A441F0C1EAED100798B45 /* waitlist.cpp in Sources */,
 				F69A44210C1EAED100798B45 /* weapons.cpp in Sources */,
+				F6F5BAC80C38D93300B77664 /* protocol80.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
