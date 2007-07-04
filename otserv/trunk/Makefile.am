@@ -22,12 +22,12 @@ otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
 	account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
 	item.cpp items.cpp luascript.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp \
-	otserv.cpp player.cpp position.cpp protocol79.cpp spells.cpp \
-	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const79.h \
+	otserv.cpp player.cpp position.cpp protocol80.cpp spells.cpp \
+	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const80.h \
 	container.h creature.h definitions.h game.h ioaccount.h ioaccountxml.h \
 	iomap.h iomapxml.h ioplayer.h ioplayerxml.h item.h items.h \
 	luascript.h map.h monster.h networkmessage.h npc.h otsystem.h player.h \
-	position.h protocol79.h scheduler.h spells.h stamp-h status.h \
+	position.h protocol80.h scheduler.h spells.h stamp-h status.h \
 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
 	actions.h actions.cpp commands.cpp commands.h depot.cpp depot.h \
 	md5.cpp md5.h fileloader.cpp fileloader.h chat.cpp chat.h logger.cpp logger.h \
