@@ -428,8 +428,8 @@ int32_t Player::getDefense() const
 	int32_t defense = 0;
 	int32_t extraDef = 0;
 	int32_t defenseSkill = 0;
-	const Item* weapon;
-	const Item* shield;
+	const Item* weapon = NULL;
+	const Item* shield = NULL;
 	getShieldAndWeapon(shield, weapon);
 
 	if(weapon){
