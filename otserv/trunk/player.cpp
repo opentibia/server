@@ -403,7 +403,8 @@ int32_t Player::getArmor() const
 void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
 {
 	Item* item;
-
+	shield = NULL;
+	weapon = NULL;
 	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
 		item = getInventoryItem((slots_t)slot);
 		if(item){
@@ -428,8 +429,8 @@ int32_t Player::getDefense() const
 	int32_t defense = 0;
 	int32_t extraDef = 0;
 	int32_t defenseSkill = 0;
-	const Item* weapon = NULL;
-	const Item* shield = NULL;
+	const Item* weapon;
+	const Item* shield;
 	getShieldAndWeapon(shield, weapon);
 
 	if(weapon){
