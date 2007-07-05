@@ -1403,10 +1403,16 @@ void Protocol80::sendContainer(uint32_t cid, const Container* container, bool ha
 	msg.AddString(container->getName());
 	msg.AddByte(container->capacity());
 	msg.AddByte(hasParent ? 0x01 : 0x00);
-	msg.AddByte(container->size());
+	if(container->size() > 255){
+		msg.AddByte(255);
+	}
+	else{
+		msg.AddByte(container->size());
+	}
 
 	ItemList::const_iterator cit;
-	for(cit = container->getItems(); cit != container->getEnd(); ++cit){
+	uint32_t i = 0;
+	for(cit = container->getItems(); cit != container->getEnd() && i < 255; ++cit, ++i){
 		msg.AddItem(*cit);
 	}
 
