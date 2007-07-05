@@ -174,7 +174,7 @@ CREATE TABLE `tile_items` (
     `pid` INT NOT NULL DEFAULT 0,
     `itemtype` INT NOT NULL,
     `count` INT NOT NULL DEFAULT 0,
-    `attributes` BLOB,
+    `attributes` BLOB NOT NULL,
     FOREIGN KEY (`tile_id`) REFERENCES `tiles`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
@@ -185,7 +185,7 @@ CREATE TABLE `player_depotitems` (
     `pid` INT NOT NULL DEFAULT 0,
     `itemtype` INT NOT NULL,
     `count` INT NOT NULL DEFAULT 0,
-    `attributes` BLOB,
+    `attributes` BLOB NOT NULL,
     FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE,
     KEY (`player_id`, `depotid`)
 ) ENGINE = InnoDB;
