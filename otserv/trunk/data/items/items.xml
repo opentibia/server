@@ -4905,19 +4905,19 @@
 	<item id="2180" name="orb of nature">
 	</item>
 	<item id="2181" name="quagmire rod">
-		<attribute key="description" value="it emits clouds of poisonous swamp gas."/>
+		<attribute key="description" value="It emits clouds of poisonous swamp gas."/>
 		<attribute key="weight" value="2650"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="2"/>
 	</item>
 	<item id="2182" name="snakebite rod">
-		<attribute key="description" value="it seems to twitch and quiver as if trying to escape your grip."/>
+		<attribute key="description" value="It seems to twitch and quiver as if trying to escape your grip."/>
 		<attribute key="weight" value="4300"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2183" name="tempest rod">
-		<attribute key="description" value="it grants you the power of striking your foes with furious thunderstorms."/>
+		<attribute key="description" value="It grants you the power of striking your foes with furious thunderstorms."/>
 		<attribute key="weight" value="2100"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="1"/>
@@ -4926,43 +4926,43 @@
 		<attribute key="weight" value="2800"/>
 	</item>
 	<item id="2185" name="volcanic rod">
-		<attribute key="description" value="it erupts powerful bursts of magma upon everything in your path."/>
+		<attribute key="description" value="It erupts powerful bursts of magma upon everything in your path."/>
 		<attribute key="weight" value="2900"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2186" name="moonlight rod">
-		<attribute key="description" value="shimmering rays of moonlight radiate from its tip"/>
+		<attribute key="description" value="Shimmering rays of moonlight radiate from its tip"/>
 		<attribute key="weight" value="1950"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="2"/>
 	</item>
 	<item id="2187" name="wand of inferno">
-		<attribute key="description" value="it unleashes the very fires of hell."/>
+		<attribute key="description" value="It unleashes the very fires of hell."/>
 		<attribute key="weight" value="3050"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="2"/>
 	</item>
 	<item id="2188" name="wand of plague">
-		<attribute key="description" value="infectious goo covers its tip"/>
+		<attribute key="description" value="Infectious goo covers its tip"/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="2"/>
 	</item>
 	<item id="2189" name="wand of cosmic energy">
-		<attribute key="description" value="the energy of a radiant star is trapped inside its globe."/>
+		<attribute key="description" value="The energy of a radiant star is trapped inside its globe."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="1"/>
 	</item>
 	<item id="2190" name="wand of vortex">
-		<attribute key="description" value="surges of energy rush through the tip of this wand."/>
+		<attribute key="description" value="Surges of energy rush through the tip of this wand."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2191" name="wand of dragonbreath">
-		<attribute key="description" value="legends say that this wand holds the soul of a young dragon."/>
+		<attribute key="description" value="Legends say that this wand holds the soul of a young dragon."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
 		<attribute key="range" value="3"/>
@@ -19188,10 +19188,12 @@
 	<item id="7342" name="backpack">
 		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="20"/>
+		<attribute key="slotType" value="backpack"/>
 	</item>
 	<item id="7343" name="bag">
 		<attribute key="weight" value="800"/>
 		<attribute key="containerSize" value="8"/>
+		<attribute key="slotType" value="backpack"/>
 	</item>
 	<item id="7344" name="dead crystal spider">
 		<attribute key="containerSize" value="8"/>
