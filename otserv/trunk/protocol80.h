@@ -175,6 +175,7 @@ private:
 	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
 	void sendTextWindow(uint32_t itemid,const std::string& text);
 	void sendHouseWindow(House* house, uint32_t listid, const std::string& text);
+	void sendOutfitWindow(const Player* player);
 	
 	void sendVIPLogIn(uint32_t guid);
 	void sendVIPLogOut(uint32_t guid);

@@ -890,38 +890,11 @@ void Protocol80::parseTurnWest(NetworkMessage& msg)
 void Protocol80::parseRequestOutfit(NetworkMessage& msg)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol80::parseRequestOutfit()");
-	msg.Reset();
-	
-	msg.AddByte(0xC8);
-	AddCreatureOutfit(msg, player, player->getDefaultOutfit());
-	
-	const OutfitListType& player_outfits = player->getPlayerOutfits();
-	size_t count_outfits = player_outfits.size();
-	
-	#define MAX_NUMBER_OF_OUTFITS 25
-	//client 8.0 outfits limit is 25
-	if(count_outfits > MAX_NUMBER_OF_OUTFITS){
-		msg.AddByte(MAX_NUMBER_OF_OUTFITS);
-	}
-	//if there is not any available outfit
-	// return. Client need at least 1 outfit!
-	else if(count_outfits == 0){
+	if(player->isRemoved()){
 		return;
 	}
-	else{
-		msg.AddByte(count_outfits);
-	}
-	
-	uint32_t counter = 0;
-	OutfitListType::const_iterator it;
-	for(it = player_outfits.begin(); it != player_outfits.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
-		msg.AddU16((*it)->looktype);
-		msg.AddString(Outfits::getInstance()->getOutfitName((*it)->looktype));
-		msg.AddByte((*it)->addons);
-	}
-		
-	WriteBuffer(msg);
 
+	sendOutfitWindow(player);
 }
 
 void Protocol80::parseSetOutfit(NetworkMessage& msg)
@@ -1690,11 +1663,19 @@ void Protocol80::sendAddCreature(const Creature* creature, bool isLogin)
 				AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
 			}
 
-			tempstring = "Your last visit was on ";
-			time_t lastlogin = player->getLastLoginSaved();
-			tempstring += ctime(&lastlogin);
-			tempstring.erase(tempstring.length() -1);
-			tempstring += ".";
+			if(player->getLastLoginSaved() != 0){
+				tempstring = "Your last visit was on ";
+				time_t lastlogin = player->getLastLoginSaved();
+				tempstring += ctime(&lastlogin);
+				tempstring.erase(tempstring.length() -1);
+				tempstring += ".";
+			}
+			else{
+				tempstring = "Welcome to ";
+				tempstring += g_config.getString(ConfigManager::SERVER_NAME);
+				tempstring += ". Please choose an outfit.";
+				sendOutfitWindow(player);
+			}
 			AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
 			WriteBuffer(msg);
 
@@ -1858,7 +1839,7 @@ void Protocol80::sendRemoveContainerItem(uint8_t cid, uint8_t slot)
 	WriteBuffer(msg);
 }
 
-void Protocol80::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite)
+void Protocol80::sendTextWindow(Item* item, const unsigned short maxlen, const bool canWrite)
 {
 	NetworkMessage msg;
 	if(readItem){
@@ -1881,8 +1862,23 @@ void Protocol80::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 		readItem = NULL;
 		maxTextLength = 0;
 	}
-	msg.AddString("unknown");
-	msg.AddString("unknown");
+
+	if(item->getWriter().length()){
+		msg.AddString(item->getWriter());
+	}
+	else{
+		msg.AddString("");
+	}
+
+	time_t writtenDate = item->getWrittenDate();
+	if(writtenDate > 0){
+		char date[16];
+		formatDate2(writtenDate, date);
+		msg.AddString(std::string(date));
+	}
+	else{
+		msg.AddString("");
+	}
 	WriteBuffer(msg);
 }
 
@@ -1917,6 +1913,40 @@ void Protocol80::sendHouseWindow(House* _house, uint32_t _listid, const std::str
 	msg.AddByte(0);
 	msg.AddU32(windowTextID);
 	msg.AddString(text);
+	WriteBuffer(msg);
+}
+
+void Protocol80::sendOutfitWindow(const Player* p)
+{
+	NetworkMessage msg;
+	msg.AddByte(0xC8);
+	AddCreatureOutfit(msg, player, player->getDefaultOutfit());
+	Player* player = const_cast<Player*>(p);
+
+	const OutfitListType& player_outfits = player->getPlayerOutfits();
+	size_t count_outfits = player_outfits.size();
+
+    #define MAX_NUMBER_OF_OUTFITS 25
+    //client 8.0 outfits limit is 25
+	if(count_outfits > MAX_NUMBER_OF_OUTFITS){
+		msg.AddByte(MAX_NUMBER_OF_OUTFITS);
+	}
+	//if there is not any available outfit
+	// return. Client need at least 1 outfit!
+	else if(count_outfits == 0){
+		return;
+	}
+	else{
+		msg.AddByte(count_outfits);
+	}
+
+	uint32_t counter = 0;
+	OutfitListType::const_iterator it;
+	for(it = player_outfits.begin(); it != player_outfits.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
+		msg.AddU16((*it)->looktype);
+		msg.AddString(Outfits::getInstance()->getOutfitName((*it)->looktype));
+		msg.AddByte((*it)->addons);
+	}
 	WriteBuffer(msg);
 }
 

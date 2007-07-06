@@ -147,9 +147,12 @@ public:
 	uint16_t clientId;
 
 	std::string    name;
+	std::string    article;
+	std::string    pluralName;
 	std::string    description;
 	unsigned short maxItems;
 	float          weight;
+	bool           showCount;
 	WeaponType_t   weaponType;
 	Ammo_t         amuType;
 	ShootType_t    shootType;

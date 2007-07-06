@@ -317,6 +317,7 @@ public:
 	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackPos,
 		uint32_t playerId, uint16_t spriteId);
 	bool playerAcceptTrade(Player* player);
+	std::string getTradeErrorDescription(ReturnValue& ret, Item* item);
 	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(Player* player);
 	bool internalStartTrade(Player* player, Player* partner, Item* tradeItem);

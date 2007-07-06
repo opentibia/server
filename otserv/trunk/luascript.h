@@ -187,7 +187,9 @@ enum PlayerInfo_t{
 	PlayerInfoLevel,
 	PlayerInfoMagLevel,
 	PlayerInfoMana,
+	PlayerInfoManaMax,
 	PlayerInfoHealth,
+	PlayerInfoHealthMax,
 	PlayerInfoName,
 	PlayerInfoPosition,
 	PlayerInfoVocation,
@@ -364,7 +366,9 @@ protected:
 	static int luaGetPlayerLevel(lua_State *L);
 	static int luaGetPlayerMagLevel(lua_State *L);
 	static int luaGetPlayerMana(lua_State *L);
+	static int luaGetPlayerManaMax(lua_State *L);
 	static int luaGetPlayerHealth(lua_State *L);
+	static int luaGetPlayerHealthMax(lua_State *L);
 	static int luaGetPlayerName(lua_State *L);
 	static int luaGetPlayerPosition(lua_State *L);
 	static int luaGetPlayerSkill(lua_State *L);

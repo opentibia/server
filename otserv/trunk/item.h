@@ -92,6 +92,8 @@ enum AttrTypes_t{
 	ATTR_COUNT = 15,
 	ATTR_DURATION = 16,
 	ATTR_DECAYING_STATE = 17,
+	ATTR_WRITTENDATE = 18,
+	ATTR_WRITTENBY = 19,
 };
 
 class ItemAttributes{
@@ -111,6 +113,12 @@ public:
 	
 	void setText(const std::string& text) {setStrAttr(ATTR_ITEM_TEXT, text);}
 	const std::string& getText() const {return getStrAttr(ATTR_ITEM_TEXT);}
+
+	void setWrittenDate(time_t n) {setIntAttr(ATTR_ITEM_WRITTENDATE, (uint32_t)n);}
+	time_t getWrittenDate() const {return (time_t)getIntAttr(ATTR_ITEM_WRITTENDATE);}
+
+	void setWriter(std::string _writer) {setStrAttr(ATTR_ITEM_WRITTENBY, _writer);}
+	std::string getWriter() const {return getStrAttr(ATTR_ITEM_WRITTENBY);}
 	
 	void setActionId(unsigned short n) {if(n < 100) n = 100; setIntAttr(ATTR_ITEM_ACTIONID, n);}
 	uint16_t getActionId() const {return getIntAttr(ATTR_ITEM_ACTIONID);}
@@ -134,6 +142,8 @@ protected:
 		ATTR_ITEM_UNIQUEID = 2,
 		ATTR_ITEM_DESC = 4,
 		ATTR_ITEM_TEXT = 8,
+		ATTR_ITEM_WRITTENDATE = 16,
+		ATTR_ITEM_WRITTENBY = 32,
 
 		ATTR_ITEM_OWNER = 65536,
 		ATTR_ITEM_DURATION = 131072,
@@ -256,7 +266,7 @@ public:
 	bool isMagicField() const {return items[id].isMagicField();}
 	bool isNotMoveable() const {return !items[id].moveable;}
 	bool isPickupable() const {return items[id].pickupable;}
-	bool isWeapon() const {return (items[id].weaponType != WEAPON_NONE && items[id].weaponType != WEAPON_AMMO);}
+	bool isWeapon() const {return (items[id].weaponType != WEAPON_NONE);}
 	bool isUseable() const {return items[id].useable;}
 	bool isHangable() const {return items[id].isHangable;}
 	bool isRoteable() const {const ItemType& it = items[id]; return it.rotable && it.rotateTo;}

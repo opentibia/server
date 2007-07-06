@@ -150,6 +150,14 @@ Item::Item(const Item &i) :
 		setText(i.getText());
 	}
 
+	if(i.getWrittenDate() != 0){
+		setWrittenDate(i.getWrittenDate());
+	}
+
+	if(i.getWriter() != ""){
+		setWriter(i.getWriter());
+	}
+
 	uint32_t _owner;
 	if(_owner = i.getOwner()){
 		setOwner(_owner);
@@ -265,6 +273,14 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 		setText(strValue);
 	}
 
+	if(readXMLInteger(nodeItem, "written_date", intValue)){
+		setWrittenDate(intValue);
+	}
+
+	if(readXMLString(nodeItem, "writer", strValue)){
+		setWriter(strValue);
+	}
+
 	if(readXMLInteger(nodeItem, "actionId", intValue)){
 		setActionId(intValue);
 	}
@@ -313,6 +329,18 @@ xmlNodePtr Item::serialize()
 		ss.str("");
 		ss << getText();
 		xmlSetProp(nodeItem, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
+	}
+
+	if(getWrittenDate() != 0){
+		ss.str("");
+		ss << getWrittenDate();
+		xmlSetProp(nodeItem, (const xmlChar*)"written_date", (const xmlChar*)ss.str().c_str());
+	}
+
+	if(getWriter() != ""){
+		ss.str("");
+		ss << getWriter();
+		xmlSetProp(nodeItem, (const xmlChar*)"writer", (const xmlChar*)ss.str().c_str());
 	}
 
 	if(!isNotMoveable() /*moveable*/){
@@ -384,6 +412,28 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			}
 
 			setText(_text);
+			break;
+		}
+
+		case ATTR_WRITTENDATE:
+		{
+			uint32_t _writtenDate;
+			if(!propStream.GET_ULONG(_writtenDate)){
+				return false;
+			}
+
+			setWrittenDate(_writtenDate);
+			break;
+		}
+		
+		case ATTR_WRITTENBY:
+		{
+			std::string _writer;
+			if(!propStream.GET_STRING(_writer)){
+				return false;
+			}
+
+			setWriter(_writer);
 			break;
 		}
 
@@ -525,6 +575,18 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 		propWriteStream.ADD_STRING(_text);
 	}
 
+	const time_t& _writtenDate = getWrittenDate();
+	if(_writtenDate > 0){
+		propWriteStream.ADD_UCHAR(ATTR_WRITTENDATE);
+		propWriteStream.ADD_ULONG(_writtenDate);
+	}
+
+	const std::string& _writer = getWriter();
+	if(_writer.length() > 0){
+		propWriteStream.ADD_UCHAR(ATTR_WRITTENBY);
+		propWriteStream.ADD_STRING(_writer);
+	}
+
 	const std::string& _specialDesc = getSpecialDescription();
 	if(_specialDesc.length() > 0){
 		propWriteStream.ADD_UCHAR(ATTR_DESC);
@@ -611,175 +673,185 @@ std::string Item::getDescription(int32_t lookDistance) const
 	std::stringstream s;
 	const ItemType& it = items[id];
 
-	if(it.name.length()) {
-		if(isStackable() && count > 1){
-			s << (int)count << " " << it.name << "s.";
+	if(it.name.length()){
+		if(isStackable() && getItemCount() > 1){
+			if(it.showCount){
+				s << (int)getItemCount() << " ";
+			}
 
-			if(lookDistance <= 1) {
-				s << std::endl << "They weigh " << std::fixed << std::setprecision(2) << ((double) count * it.weight) << " oz.";
+			if(it.pluralName.length()){
+				s << it.pluralName << "";
+			}
+			else{
+				s << it.name << "s";
 			}
 		}
 		else{
-			if(it.isRune()){
-				s << "a " << it.name << " for level " << it.runeMagLevel << "." << std::endl;
-
-				s << "It's an \"" << it.runeSpellName << "\" spell (";
-				if(getItemCharge())
-					s << (int)getItemCharge();
-				else
-					s << "1";
-
-				s << "x).";
+			if(it.article.length()){
+				s << it.article << " ";
 			}
-			else if(isWeapon())
-			{
-				s << "a " << it.name;
-				if(getAttack()){
-					if(getExtraDef()){
-						s << " (Atk:" << getAttack() << " Def:" << getDefense() << " " << std::showpos << getExtraDef() << ")" << std::noshowpos;
-					}
-					else{
-						s << " (Atk:" << getAttack() << " Def:" << getDefense() << ")";
-					}
-				}
-				else if(getDefense()){
-					/*if(getExtraDef()){
-						s << " (Def:" << getDefense() << " " << std::showpos << getExtraDef() << ")";
-					}
-					else{*/
-						s << " (Def:" << getDefense() << ")";
-					//}
-				}
-				s << ".";
-
-				const Weapon* weapon = g_weapons->getWeapon(this);
-				if(weapon && weapon->getWieldInfo()){
-					const uint32_t wieldInfo = weapon->getWieldInfo();
-					s << std::endl << "It can only be wielded ";
-					if(wieldInfo & WIELDINFO_UNPROPERLY){
-						s << "properly ";
-					}
-					s << "by ";
-					if(wieldInfo & WIELDINFO_VOCREQ){
-						s << weapon->getVocationString();
-					}
-					else{
-						s << "players";
-					}
-					if(wieldInfo & WIELDINFO_LEVEL){
-						s << " of level " << weapon->getReqLevel() << " or higher";
-					}
-					if(wieldInfo & WIELDINFO_MAGLV){
-						if(wieldInfo & WIELDINFO_LEVEL){
-							s << " and";
-						}
-						else{
-							s << " of";
-						}
-						s << " magic level " << weapon->getReqMagLv() << " or higher";
-					}
-					/* No Premium system yet.
-					if(wieldInfo & WIELDINFO_PREMIUM){
-						s << " with a premium account";
-					}
-					*/
-					s << ".";
-				}
-			}
-			else if(getArmor()){
-				s << "a " << it.name << " (Arm:" << (int)getArmor() << ").";
-			}
-			else if(isFluidContainer()){
-				s << "a " << it.name;
-				if(fluid == 0){
-					s << ". It is empty.";
-				}
-				else{
-					s << " of " << items[fluid].name << ".";
-				}
-			}
-			else if(isSplash()){
-				s << "a " << it.name << " of ";
-				if(fluid == 0){
-					s << items[1].name << ".";
-				}
-				else{
-					s << items[fluid].name << ".";
-				}
-			}
-			else if(it.isKey()){
-				s << "a " << it.name << " (Key:" << getActionId() << ").";
-			}
-			else if(it.isGroundTile()){
-				s << it.name << ".";
-			}
-			else if(it.isContainer()){
-				s << "a " << it.name << " (Vol:" << getContainer()->capacity() << ").";
-			}
-			else if(it.allowDistRead){
-				s << it.name << "." << std::endl;
-
-				if(lookDistance <= 4){
-					if(getText() != ""){
-						s << "You read: " << getText();
-					}
-					else
-						s << "Nothing is written on it.";
-				}
-				else
-					s << "You are too far away to read it.";
-			}
-			else{
-				s << "a " << it.name;
-
-				if(it.showCharges){
-					uint32_t charges = getItemCharge();
-
-					if(charges > 1){
-						s << " that has " << charges << " charges left";
-					}
-					else{
-						s << " that has " << charges << " charge left";
-					}
-				}
-				if(it.showDuration){
-					uint32_t duration = getDuration() / 1000;
-					if(duration > 0){
-						s << " that has energy for ";
-
-						if(duration >= 120){
-							s << duration / 60 << " minutes left";
-						}
-						else if(duration > 60){
-							s << duration / 60 << " minute left";
-						}
-						else{
-							s << " less than a minute left";
-						}
-					}
-					else{
-						s << std::endl << " that is brand-new";
-					}
-				}
-
-				s << ".";
-			}
-
-			if(lookDistance <= 1){
-				double weight = getWeight();
-				if(weight > 0)
-					s << std::endl << "It weighs " << std::fixed << std::setprecision(2) << weight << " oz.";
-			}
-
-			if(getSpecialDescription() != "")
-				s << std::endl << getSpecialDescription().c_str();
-			else if(lookDistance <= 1 && it.description.length()){
-				s << std::endl << it.description;
-			}
+			s << it.name;
 		}
 	}
-	else
-		s << "an item of type " << id <<".";
+	else{
+		s << "an item of type " << getID();
+	}
+
+	if(it.isRune()){
+		s << " for magic level " << (int)it.runeMagLevel << "." << std::endl;
+		s << "It's an \"" << it.runeSpellName << "\" spell(";
+		if(getItemCharge()){
+			s << getItemCharge();
+		}
+		else{
+			s << "1";
+		}
+		s << "x).";
+	}
+	else if(isWeapon())
+	{
+		if(getWeaponType() != WEAPON_AMMO){ // Arrows and Bolts doesn't show atk
+			if(getAttack()){
+				if(getExtraDef()){
+					s << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << " " << std::showpos << (int)getExtraDef() << ")" << std::noshowpos;
+				}
+				else{
+					s << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")";
+				}
+			}
+			else if(getDefense()){
+				s << std::endl << " (Def:" << (int)getDefense() << ")";
+			}
+		}
+		s << ".";
+
+		const Weapon* weapon = g_weapons->getWeapon(this);
+		if(weapon && weapon->getWieldInfo()){
+			const uint32_t wieldInfo = weapon->getWieldInfo();
+			s << std::endl << "It can only be wielded properly by ";
+			if(wieldInfo & WIELDINFO_VOCREQ){
+				s << weapon->getVocationString();
+			}
+			else{
+				s << "players";
+			}
+			if(wieldInfo & WIELDINFO_LEVEL){
+				s << " of level " << (int)weapon->getReqLevel() << " or higher";
+			}
+			if(wieldInfo & WIELDINFO_MAGLV){
+				if(wieldInfo & WIELDINFO_LEVEL){
+					s << " and";
+				}
+				else{
+					s << " of";
+				}
+				s << " magic level " << (int)weapon->getReqMagLv() << " or higher";
+			}
+			/* No Premium system yet.
+			if(wieldInfo & WIELDINFO_PREMIUM){
+				s << " with a premium account";
+			}
+			*/
+			s << ".";
+		}
+	}
+	else if(getArmor()){
+		s << " (Arm:" << (int)getArmor() << ").";
+	}
+	else if(isFluidContainer()){
+		if(fluid == 0){
+			s << ". It is empty.";
+		}
+		else{
+			s << " of " << items[fluid].name << ".";
+		}
+	}
+	else if(isSplash()){
+		s << " of ";
+		if(fluid == 0){
+			s << items[1].name << ".";
+		}
+		else{
+			s << items[fluid].name << ".";
+		}
+	}
+	else if(it.isKey()){
+		s << " (Key:" << (int)getActionId() << ").";
+	}
+	else if(it.isContainer()){
+		s << " (Vol:" << (int)getContainer()->capacity() << ").";
+	}
+	else if(it.allowDistRead){
+		s << "." << std::endl;
+
+		if(getText() != ""){
+			if(lookDistance <= 4){
+				if(getWriter().length()){
+					s << getWriter() << " wrote";
+
+					time_t wDate = getWrittenDate();
+					if(wDate > 0){
+						char date[16];
+						formatDate2(wDate, date);
+						s << " on " << date;
+					}
+					s << ": ";
+				}
+				else{
+					s << "You read: ";
+				}
+				s << getText();
+			}
+			else{
+				s << "You are too far away to read it.";
+			}
+		}
+		else{
+			s << "Nothing is written on it.";
+		}
+	}
+	else if(it.showCharges){
+		uint32_t charges = getItemCharge();
+		if(charges > 1){
+			s << " that has " << (int)charges << " charges left.";
+		}
+		else{
+			s << " that has 1 charge left.";
+		}
+	}
+	else if(it.showDuration){
+		uint32_t duration = getDuration() / 1000;
+		if(duration > 0){
+			s << " that has energy for ";
+
+			if(duration >= 120){
+				s << duration / 60 << " minutes left.";
+			}
+			else if(duration > 60){
+				s << "1 minute left.";
+			}
+			else{
+				s << " less than a minute left.";
+			}
+		}
+		else{
+			s << " that is brand-new.";
+		}
+	}
+	else{
+		s << ".";
+	}
+
+	if(lookDistance <= 1){
+		s << std::endl << getWeightDescription();
+	}
+
+	if(getSpecialDescription() != ""){
+		s << std::endl << getSpecialDescription().c_str();
+	}
+	else if(it.description.length() && lookDistance <= 1){
+		s << std::endl << it.description;
+	}
 
 	return s.str();
 }
@@ -790,7 +862,12 @@ std::string Item::getWeightDescription() const
 
 	std::stringstream ss;
 	if(weight > 0){
-		ss << " It weighs " << std::fixed << std::setprecision(2) << weight << " oz.";
+		if(isStackable() && count > 1){
+			ss << "They weigh " << std::fixed << std::setprecision(2) << weight << " oz.";
+		}
+		else{
+			ss << "It weighs " << std::fixed << std::setprecision(2) << weight << " oz.";
+		}
 	}
 
 	return ss.str();
@@ -858,8 +935,8 @@ void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
 	if(!validateStrAttrType(type))
 		return;
 	
-	if(value.length() == 0)
-		return;
+	//if(value.length() == 0)
+	//	return;
 	
 	//this will create the attribute if it does not exist
 	Attribute* attr = getAttr(type);
@@ -963,7 +1040,7 @@ inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 	switch(type){
 	case ATTR_ITEM_ACTIONID:
 	case ATTR_ITEM_UNIQUEID:
-	case ATTR_ITEM_OWNER:
+	case ATTR_ITEM_WRITTENDATE:
 	case ATTR_ITEM_DURATION:
 	case ATTR_ITEM_DECAYING:
 		return true;
@@ -981,9 +1058,8 @@ inline bool ItemAttributes::validateStrAttrType(itemAttrTypes type) const
 	//list of text type attributes
 	switch(type){
 	case ATTR_ITEM_DESC:
-		return true;
-		break;
 	case ATTR_ITEM_TEXT:
+	case ATTR_ITEM_WRITTENBY:
 		return true;
 		break;
 	default:

@@ -45,9 +45,8 @@ enum AmmoAction_t{
 enum WieldInfo_t{
 	WIELDINFO_LEVEL = 1,
 	WIELDINFO_MAGLV = 2,
-	WIELDINFO_UNPROPERLY = 4,
-	WIELDINFO_VOCREQ = 8,
-	WIELDINFO_PREMIUM = 16
+	WIELDINFO_VOCREQ = 4,
+	WIELDINFO_PREMIUM = 8
 };
 
 class Weapons : public BaseEvents

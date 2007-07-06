@@ -305,9 +305,6 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	if(getReqMagLv() > 0){
 		wieldInfo |= WIELDINFO_MAGLV;
 	}
-	if(isWieldedUnproperly()){
-		wieldInfo |= WIELDINFO_UNPROPERLY;
-	}
 	if(!getVocationString().empty()){
 		wieldInfo |= WIELDINFO_VOCREQ;
 	}
@@ -374,6 +371,12 @@ int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 			return 0;
 		}
 
+		if(!vocWeaponMap.empty()){
+			if(vocWeaponMap.find(player->getVocationId()) == vocWeaponMap.end()){
+				return 0;
+			}
+		}
+
 		if(isWieldedUnproperly()){
 			int32_t damageModifier = 100;
 			if(player->getLevel() < getReqLevel()){
@@ -382,12 +385,6 @@ int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 
 			if(player->getMagicLevel() < getReqMagLv()){
 				damageModifier = damageModifier/2;
-			}
-
-			if(!vocWeaponMap.empty()){
-				if(vocWeaponMap.find(player->getVocationId()) == vocWeaponMap.end()){
-					damageModifier = damageModifier/2;
-				}
 			}
 			return damageModifier;
 		}

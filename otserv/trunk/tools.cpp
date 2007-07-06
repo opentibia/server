@@ -222,3 +222,16 @@ void formatDate(time_t time, char* buffer)
 		sprintf(buffer, "UNIX Time : %d", (int)time);
 	}
 }
+
+//buffer should have at least 16 bytes
+void formatDate2(time_t time, char* buffer)
+{
+	const tm* tms = localtime(&time);
+	if(tms){
+		strftime(buffer, 12, "%d %b %Y", tms);
+	}
+	else{
+		sprintf(buffer, "UNIX Time : %d", (int)time);
+	}
+}
+

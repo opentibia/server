@@ -37,6 +37,7 @@ extern Spells* g_spells;
 
 ItemType::ItemType()
 {
+	article          = "";
 	group            = ITEM_GROUP_NONE;
 	stackable        = false;
 	useable	         = false;
@@ -66,6 +67,7 @@ ItemType::ItemType()
 	clientId      = 0;
 	maxItems      = 8;  // maximum size if this is a container
 	weight        = 0;  // weight of the item, e.g. throwing distance depends on it
+	showCount     = true;
 	weaponType    = WEAPON_NONE;
 	slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
 	amuType       = AMMO_NONE;
@@ -381,6 +383,14 @@ bool Items::loadFromXml(const std::string& datadir)
 						it.name = strValue;
 					}
 
+					if(readXMLString(itemNode, "article", strValue)){
+						it.article = strValue;
+					}
+					
+					if(readXMLString(itemNode, "plural", strValue)){
+						it.pluralName = strValue;
+					}
+
 					xmlNodePtr itemAttributesNode = itemNode->children;
 
 					while(itemAttributesNode){
@@ -406,6 +416,16 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.name = strValue;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "article") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									it.article = strValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "plural") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									it.pluralName = strValue;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "description") == 0){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.description = strValue;
@@ -419,6 +439,11 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(strcasecmp(strValue.c_str(), "weight") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.weight = intValue / 100.f;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "showcount") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.showCount = (intValue != 0);
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "armor") == 0){
@@ -460,8 +485,8 @@ bool Items::loadFromXml(const std::string& datadir)
 							*/
 							else if(strcasecmp(strValue.c_str(), "writeable") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.canWriteText = true;
-									it.canReadText = true;
+									it.canWriteText = (intValue != 0);
+									it.canReadText = (intValue != 0);
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "maxTextLen") == 0){
@@ -669,7 +694,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(strcasecmp(strValue.c_str(), "showduration") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.showDuration = true;
+									it.showDuration = (intValue != 0);
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "charges") == 0){
@@ -679,11 +704,13 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(strcasecmp(strValue.c_str(), "showcharges") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.showCharges = true;
+									it.showCharges = (intValue != 0);
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "invisible") == 0){
-								it.abilities.invisible = true;
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.invisible = (intValue != 0);
+								}
 							}
 							else if(strcasecmp(strValue.c_str(), "speed") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
@@ -716,7 +743,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(strcasecmp(strValue.c_str(), "manaShield") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.manaShield = true;
+									it.abilities.manaShield = (intValue != 0);
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "skillSword") == 0){

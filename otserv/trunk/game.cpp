@@ -808,6 +808,14 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 		return ret;
 	}
 
+	//check if the creature is a player and if it is pzlocked and tries to move to a pZone
+	Player* player = creature->getPlayer();
+	if(player){
+		if(player->isPzLocked() && toCylinder->getTile()->hasFlag(TILESTATE_PROTECTIONZONE)){
+			return RET_PLAYERISPZLOCKED;
+		}
+	}
+
 	fromCylinder->getTile()->moveCreature(creature, toCylinder);
 
 	int32_t index = 0;
@@ -1940,14 +1948,24 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 		return false;
 	}
 
+	std::string oldText = item->getText();
 	item->setText(text);
-	
+	if(!text.empty()){
+		if(oldText != text){
+			item->setWriter(player->getName());
+			item->setWrittenDate(std::time(NULL));
+		}
+	}
+	else{
+		item->setWriter("");
+		item->setWrittenDate(0);
+	}
+
 	uint16_t newtype = Item::items[item->getID()].writeOnceItemId;
 	if(newtype != 0){
 		transformItem(item, newtype);
 	}
-	
-	//TODO: set last written by
+
 	return true;
 }
 
@@ -2104,30 +2122,12 @@ bool Game::playerAcceptTrade(Player* player)
 		}
 
 		if(!isSuccess){
-			std::stringstream ss;
-			if(ret1 == RET_NOTENOUGHCAPACITY){
-				ss << "You do not have enough capacity to carry this object." << std::endl << tradeItem1->getWeightDescription();
-			}
-			else if(ret1 == RET_NOTENOUGHROOM || ret2 == RET_CONTAINERNOTENOUGHROOM){
-				ss << "You do not have enough room to carry this object.";
-			}
-			else
-				ss << "Trade could not be completed.";
-
-			tradePartner->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+			std::string errorDescription = getTradeErrorDescription(ret1, tradeItem1);
+			tradePartner->sendTextMessage(MSG_INFO_DESCR, errorDescription);
 			tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
 
-			ss.str("");
-			if(ret2 == RET_NOTENOUGHCAPACITY){
-				ss << "You do not have enough capacity to carry this object." << std::endl << tradeItem2->getWeightDescription();
-			}
-			else if(ret2 == RET_NOTENOUGHROOM || ret2 == RET_CONTAINERNOTENOUGHROOM){
-				ss << "You do not have enough room to carry this object.";
-			}
-			else
-				ss << "Trade could not be completed.";
-
-			player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+			errorDescription = getTradeErrorDescription(ret2, tradeItem2);
+			player->sendTextMessage(MSG_INFO_DESCR, errorDescription);
 			player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
 		}
 
@@ -2145,6 +2145,34 @@ bool Game::playerAcceptTrade(Player* player)
 	}
 
 	return false;
+}
+
+std::string Game::getTradeErrorDescription(ReturnValue& ret, Item* item)
+{
+	std::stringstream ss;
+	if(ret == RET_NOTENOUGHCAPACITY){
+		ss << "You do not have enough capacity to carry";
+		if(item->isStackable() && item->getItemCount() > 1){
+			ss << " these objects.";
+		}
+		else{
+            ss << " this object." ;
+		}
+		ss << std::endl << " " << item->getWeightDescription();
+	}
+	else if(ret == RET_NOTENOUGHROOM || ret == RET_CONTAINERNOTENOUGHROOM){
+        ss << "You do not have enough room to carry";
+        if(item->isStackable() && item->getItemCount() > 1){
+			ss << " these objects.";
+		}
+		else{
+			ss << " this object.";
+		}
+	}
+	else{
+		ss << "Trade could not be completed.";
+	}
+	return ss.str().c_str();
 }
 
 bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
