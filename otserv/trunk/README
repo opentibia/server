@@ -93,6 +93,17 @@ MySQL Server
 				Should be all correct for you anyway ;).
 			13. Start the server and login.
 				
+
+SQLite compilation
+	As an alternative for MySQL, there is SQLite database available. SQLite is an embedable library that works
+	directly on file and doesn't require any server application. It means that you can use SQL advantages without installing anything, just compiling OTServ proper way.
+
+		Instructions to compile OTServ:
+			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
+			2. Compile your OTServ against SQLite:
+				a) On Windows use -D__USE_SQLITE__ -lsqlite3
+				b) On POSIX systems use ./configure --enable-sqlite
+
 Problems?
 	The server is now stable nowadays, but if you do find bugs you can report them at the 
 	CVS Bug Report board on OTFans Forums (http://otfans.net/forumdisplay.php?f=52). If your 
@@ -112,6 +123,7 @@ Credits?
 	Jiddo - Scripting
 	the fike - Developer (advisory/optimization)
 	Vitor - Developer (advisory/optimization)
+	Wrzasq - Database design
 
 	Yorick - Fansite , Forum administrator
 	Pekay - README Documentation, Forum administrator

@@ -3,12 +3,6 @@
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
-/* Define to 1 if you have the <boost/bind.hpp> header file. */
-#undef HAVE_BOOST_BIND_HPP
-
-/* Define to 1 if you have the <boost/config.hpp> header file. */
-#undef HAVE_BOOST_CONFIG_HPP
-
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
 
@@ -17,6 +11,9 @@
 
 /* Define to 1 if you have the `gethostbyname' function. */
 #undef HAVE_GETHOSTBYNAME
+
+/* Define to 1 if you have the <gmp.h> header file. */
+#undef HAVE_GMP_H
 
 /* Define to 1 if you have the `inet_ntoa' function. */
 #undef HAVE_INET_NTOA
@@ -27,14 +24,20 @@
 /* Define to 1 if you have the `mysqlclient' library (-lmysqlclient). */
 #undef HAVE_LIBMYSQLCLIENT
 
+/* Define to 1 if you have the `sqlite3' library (-lsqlite3). */
+#undef HAVE_LIBSQLITE3
+
+/* Define to 1 if you have the <lua.h> header file. */
+#undef HAVE_LUA_H
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
 
-/* Define to 1 if you have the <mysql.h> header file. */
-#undef HAVE_MYSQL_H
+/* Define to 1 if you have the <mysql/mysql.h> header file. */
+#undef HAVE_MYSQL_MYSQL_H
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #undef HAVE_NETDB_H
@@ -47,6 +50,9 @@
 
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
+
+/* Define to 1 if you have the <sqlite3.h> header file. */
+#undef HAVE_SQLITE3_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -108,5 +114,5 @@
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

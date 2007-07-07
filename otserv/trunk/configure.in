@@ -76,14 +76,17 @@ AC_SUBST(LUA_LIBS)
 AC_SUBST(LUA_CFLAGS)
 
 # check for boost
-AC_CHECK_HEADERS([boost/config.hpp boost/bind.hpp],[],[AC_MSG_ERROR("boost headers are missing.")])
 AC_CHECK_LIB(boost_thread-gcc-mt, main, [BOOST_LIBS="-lboost_thread-gcc-mt"], [
-	AC_CHECK_LIB(boost_thread, main, [BOOST_LIBS="-lboost_thread"], [
-		AC_MSG_ERROR("Linking against boost libraries failed.")])
+	AC_CHECK_LIB(boost_thread-mt, main, [BOOST_LIBS="-lboost_thread-mt"], [
+		AC_CHECK_LIB(boost_thread, main, [BOOST_LIBS="-lboost_thread"], [
+			AC_MSG_ERROR("Linking against boost libraries failed.")])
+	])
 ])
 AC_CHECK_LIB(boost_regex-gcc-mt, main, [BOOST_LIBS="$BOOST_LIBS -lboost_regex-gcc-mt"], [
-	AC_CHECK_LIB(boost_regex, main, [BOOST_LIBS="$BOOST_LIBS -lboost_regex"], [
-		AC_MSG_ERROR("Linking against boost libraries failed.")])
+	AC_CHECK_LIB(boost_regex-mt, main, [BOOST_LIBS="$BOOST_LIBS -lboost_regex-mt"], [
+		AC_CHECK_LIB(boost_regex, main, [BOOST_LIBS="$BOOST_LIBS -lboost_regex"], [
+			AC_MSG_ERROR("Linking against boost libraries failed.")])
+	])
 ])
 AC_SUBST(BOOST_LIBS)
 
