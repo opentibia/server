@@ -332,7 +332,7 @@ void Actions::showUseHotkeyMessage(Player* player, Item* item, uint32_t itemCoun
 		ss << "Using the last " << item->getName() << "...";
 	}
 	else{
-		ss << "Using one of " << itemCount << " " << item->getName() << "s..."; 
+		ss << "Using one of " << itemCount << " " << item->getPluralName() << "..."; 
 	}
 	
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());

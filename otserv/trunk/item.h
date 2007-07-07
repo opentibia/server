@@ -284,6 +284,7 @@ public:
 	bool floorChangeWest() const {return items[id].floorChangeWest;}
 
 	const std::string& getName() const {return items[id].name;}
+	const std::string& getPluralName() const {return items[id].pluralName;}
 
 	// get the number of items
 	uint8_t getItemCount() const {return count;}
@@ -317,6 +318,10 @@ public:
 	virtual void __startDecaying();
 
 protected:
+	// If weight description is needed from outside of item class
+	// use the other getWeightDescription
+	std::string getWeightDescription(double weight) const;
+	
 	unsigned short id;  // the same id as in ItemType
 	unsigned char count; // number of stacked items
 	unsigned char charges; //number of charges on the item

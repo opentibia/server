@@ -680,12 +680,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 				s << (int)getItemCount() << " ";
 			}
 
-			if(it.pluralName.length()){
-				s << it.pluralName << "";
-			}
-			else{
-				s << it.name << "s";
-			}
+			s << it.pluralName;
 		}
 		else{
 			if(it.article.length()){
@@ -702,7 +697,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 		s << " for magic level " << (int)it.runeMagLevel << "." << std::endl;
 		s << "It's an \"" << it.runeSpellName << "\" spell(";
 		if(getItemCharge()){
-			s << getItemCharge();
+			s << (int)getItemCharge();
 		}
 		else{
 			s << "1";
@@ -843,8 +838,11 @@ std::string Item::getDescription(int32_t lookDistance) const
 		s << ".";
 	}
 
-	if(lookDistance <= 1){
-		s << std::endl << getWeightDescription();
+	if(lookDistance <= 1 ){
+		double weight = getWeight();
+		if(weight > 0){
+			s << std::endl << getWeightDescription(weight);
+		}
 	}
 
 	if(getSpecialDescription() != ""){
@@ -860,17 +858,23 @@ std::string Item::getDescription(int32_t lookDistance) const
 std::string Item::getWeightDescription() const
 {
 	double weight = getWeight();
-
-	std::stringstream ss;
 	if(weight > 0){
-		if(isStackable() && count > 1){
-			ss << "They weigh " << std::fixed << std::setprecision(2) << weight << " oz.";
-		}
-		else{
-			ss << "It weighs " << std::fixed << std::setprecision(2) << weight << " oz.";
-		}
+		return getWeightDescription(weight);
 	}
+	else{
+		return "";
+	}
+}
 
+std::string Item::getWeightDescription(double weight) const
+{
+	std::stringstream ss;
+	if(isStackable() && count > 1){
+		ss << "They weigh " << std::fixed << std::setprecision(2) << weight << " oz.";
+	}
+	else{
+		ss << "It weighs " << std::fixed << std::setprecision(2) << weight << " oz.";
+	}
 	return ss.str();
 }
 

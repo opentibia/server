@@ -960,6 +960,11 @@ bool Items::loadFromXml(const std::string& datadir)
 
 						itemAttributesNode = itemAttributesNode->next;
 					}
+					// if no plural is specified we will build the default
+					// plural adding "s" at the end
+					if(it.pluralName.size() == 0 && it.name.size() != 0){
+						it.pluralName = it.name + "s";
+					}
 				}
 				else{
 					std::cout << "Warning: [Spells::loadFromXml] - No itemid found" << std::endl;
