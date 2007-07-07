@@ -1863,8 +1863,9 @@ void Protocol80::sendTextWindow(Item* item, const unsigned short maxlen, const b
 		maxTextLength = 0;
 	}
 
-	if(item->getWriter().length()){
-		msg.AddString(item->getWriter());
+	const std::string& writer = item->getWriter();
+	if(writer.size()){
+		msg.AddString(writer);
 	}
 	else{
 		msg.AddString("");
@@ -1874,7 +1875,7 @@ void Protocol80::sendTextWindow(Item* item, const unsigned short maxlen, const b
 	if(writtenDate > 0){
 		char date[16];
 		formatDate2(writtenDate, date);
-		msg.AddString(std::string(date));
+		msg.AddString(date);
 	}
 	else{
 		msg.AddString("");
@@ -1926,8 +1927,8 @@ void Protocol80::sendOutfitWindow(const Player* p)
 	const OutfitListType& player_outfits = player->getPlayerOutfits();
 	size_t count_outfits = player_outfits.size();
 
-    #define MAX_NUMBER_OF_OUTFITS 25
-    //client 8.0 outfits limit is 25
+	#define MAX_NUMBER_OF_OUTFITS 25
+	//client 8.0 outfits limit is 25
 	if(count_outfits > MAX_NUMBER_OF_OUTFITS){
 		msg.AddByte(MAX_NUMBER_OF_OUTFITS);
 	}

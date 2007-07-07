@@ -237,7 +237,7 @@ __cdecl _SEHHandler(
 	unsigned long functionAddr;
 	char* functionName = getFunctionName((unsigned long)ExceptionRecord->ExceptionAddress, functionAddr);
 	if(functionName){
-		*outdriver << "(" << functionName << ")";
+		*outdriver << "(" << functionName << " - " << functionAddr <<")";
 	}
 	*outdriver << std::endl ;
 	

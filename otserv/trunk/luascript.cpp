@@ -797,12 +797,12 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerFood", LuaScriptInterface::luaGetPlayerFood);
 	//getPlayerHealth(uid)	
 	lua_register(m_luaState, "getPlayerHealth", LuaScriptInterface::luaGetPlayerHealth);
-	//getPlayerHealthMax(uid)
-	lua_register(m_luaState, "getPlayerHealthMax", LuaScriptInterface::luaGetPlayerHealthMax);
+	//getPlayerMaxHealth(uid)
+	lua_register(m_luaState, "getPlayerMaxHealth", LuaScriptInterface::luaGetPlayerMaxHealth);
 	//getPlayerMana(uid)
 	lua_register(m_luaState, "getPlayerMana", LuaScriptInterface::luaGetPlayerMana);
-	//getPlayerManaMax(uid)
-	lua_register(m_luaState, "getPlayerManaMax", LuaScriptInterface::luaGetPlayerManaMax);
+	//getPlayerMaxMana(uid)
+	lua_register(m_luaState, "getPlayerMaxMana", LuaScriptInterface::luaGetPlayerMaxMana);
 	//getPlayerLevel(uid)
 	lua_register(m_luaState, "getPlayerLevel", LuaScriptInterface::luaGetPlayerLevel);
 	//getPlayerMagLevel(uid)
@@ -1187,13 +1187,13 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoMana:
 			value = player->getMana();
 			break;
-		case PlayerInfoManaMax:
+		case PlayerInfoMaxMana:
 			value = player->getMaxMana();
 			break;
 		case PlayerInfoHealth:
 			value = player->getHealth();
 			break;
-        case PlayerInfoHealthMax:
+		case PlayerInfoMaxHealth:
 			value = player->getMaxHealth();
 			break;
 		case PlayerInfoName:
@@ -1303,14 +1303,14 @@ int LuaScriptInterface::luaGetPlayerMagLevel(lua_State *L){
 int LuaScriptInterface::luaGetPlayerMana(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoMana);}
 
-int LuaScriptInterface::luaGetPlayerManaMax(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoManaMax);}
+int LuaScriptInterface::luaGetPlayerMaxMana(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoMaxMana);}
 
 int LuaScriptInterface::luaGetPlayerHealth(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoHealth);}
 
-int LuaScriptInterface::luaGetPlayerHealthMax(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoHealthMax);}
+int LuaScriptInterface::luaGetPlayerMaxHealth(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoMaxHealth);}
 
 int LuaScriptInterface::luaGetPlayerName(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoName);}

@@ -150,8 +150,9 @@ Item::Item(const Item &i) :
 		setText(i.getText());
 	}
 
-	if(i.getWrittenDate() != 0){
-		setWrittenDate(i.getWrittenDate());
+	uint32_t _writtenDate;
+	if(_writtenDate = i.getWrittenDate()){
+		setWrittenDate(_writtenDate);
 	}
 
 	if(i.getWriter() != ""){
@@ -575,7 +576,7 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 		propWriteStream.ADD_STRING(_text);
 	}
 
-	const time_t& _writtenDate = getWrittenDate();
+	const time_t _writtenDate = getWrittenDate();
 	if(_writtenDate > 0){
 		propWriteStream.ADD_UCHAR(ATTR_WRITTENDATE);
 		propWriteStream.ADD_ULONG(_writtenDate);
@@ -935,8 +936,8 @@ void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
 	if(!validateStrAttrType(type))
 		return;
 	
-	//if(value.length() == 0)
-	//	return;
+	if(value.length() == 0)
+		return;
 	
 	//this will create the attribute if it does not exist
 	Attribute* attr = getAttr(type);
@@ -1040,9 +1041,10 @@ inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 	switch(type){
 	case ATTR_ITEM_ACTIONID:
 	case ATTR_ITEM_UNIQUEID:
-	case ATTR_ITEM_WRITTENDATE:
+	case ATTR_ITEM_OWNER:
 	case ATTR_ITEM_DURATION:
 	case ATTR_ITEM_DECAYING:
+	case ATTR_ITEM_WRITTENDATE:
 		return true;
 		break;
 

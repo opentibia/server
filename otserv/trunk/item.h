@@ -109,16 +109,20 @@ public:
 	}
 	
 	void setSpecialDescription(const std::string& desc) {setStrAttr(ATTR_ITEM_DESC, desc);}
+	void resetSpecialDescription() {removeAttribute(ATTR_ITEM_DESC);}
 	const std::string& getSpecialDescription() const {return getStrAttr(ATTR_ITEM_DESC);}
 	
 	void setText(const std::string& text) {setStrAttr(ATTR_ITEM_TEXT, text);}
+	void resetText() {removeAttribute(ATTR_ITEM_TEXT);}
 	const std::string& getText() const {return getStrAttr(ATTR_ITEM_TEXT);}
 
 	void setWrittenDate(time_t n) {setIntAttr(ATTR_ITEM_WRITTENDATE, (uint32_t)n);}
+	void resetWrittenDate() {removeAttribute(ATTR_ITEM_WRITTENDATE);}
 	time_t getWrittenDate() const {return (time_t)getIntAttr(ATTR_ITEM_WRITTENDATE);}
 
 	void setWriter(std::string _writer) {setStrAttr(ATTR_ITEM_WRITTENBY, _writer);}
-	std::string getWriter() const {return getStrAttr(ATTR_ITEM_WRITTENBY);}
+	void resetWriter() {removeAttribute(ATTR_ITEM_WRITTENBY);}	
+	const std::string& getWriter() const {return getStrAttr(ATTR_ITEM_WRITTENBY);}
 	
 	void setActionId(unsigned short n) {if(n < 100) n = 100; setIntAttr(ATTR_ITEM_ACTIONID, n);}
 	uint16_t getActionId() const {return getIntAttr(ATTR_ITEM_ACTIONID);}

@@ -1948,17 +1948,17 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 		return false;
 	}
 
-	std::string oldText = item->getText();
-	item->setText(text);
 	if(!text.empty()){
-		if(oldText != text){
+		if(item->getText() != text){
+			item->setText(text);
 			item->setWriter(player->getName());
 			item->setWrittenDate(std::time(NULL));
 		}
 	}
 	else{
-		item->setWriter("");
-		item->setWrittenDate(0);
+		item->resetText();
+		item->resetWriter();
+		item->resetWrittenDate();
 	}
 
 	uint16_t newtype = Item::items[item->getID()].writeOnceItemId;
@@ -2147,7 +2147,7 @@ bool Game::playerAcceptTrade(Player* player)
 	return false;
 }
 
-std::string Game::getTradeErrorDescription(ReturnValue& ret, Item* item)
+std::string Game::getTradeErrorDescription(ReturnValue ret, Item* item)
 {
 	std::stringstream ss;
 	if(ret == RET_NOTENOUGHCAPACITY){
@@ -2156,13 +2156,13 @@ std::string Game::getTradeErrorDescription(ReturnValue& ret, Item* item)
 			ss << " these objects.";
 		}
 		else{
-            ss << " this object." ;
+			ss << " this object." ;
 		}
 		ss << std::endl << " " << item->getWeightDescription();
 	}
 	else if(ret == RET_NOTENOUGHROOM || ret == RET_CONTAINERNOTENOUGHROOM){
-        ss << "You do not have enough room to carry";
-        if(item->isStackable() && item->getItemCount() > 1){
+		ss << "You do not have enough room to carry";
+		if(item->isStackable() && item->getItemCount() > 1){
 			ss << " these objects.";
 		}
 		else{

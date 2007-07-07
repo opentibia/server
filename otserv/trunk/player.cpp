@@ -2038,7 +2038,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 						ret = RET_BOTHHANDSNEEDTOBEFREE;
 					}
 					else
-					ret = RET_NOERROR;
+						ret = RET_NOERROR;
 				}
 				else{
 					//check if we already carry a double-handed item
