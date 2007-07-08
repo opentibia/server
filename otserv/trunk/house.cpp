@@ -841,7 +841,7 @@ bool Houses::payHouses()
 
 				if(!IOPlayer::instance()->loadPlayer(player, name)){
 		#ifdef __DEBUG__
-					std::cout << "Failure: [House::transferToDepot], can not load player: " << name << std::endl;
+					std::cout << "Failure: [Houses::payHouses], can not load player: " << name << std::endl;
 		#endif
 					delete player;
 					continue;
@@ -849,6 +849,10 @@ bool Houses::payHouses()
 			}
 
 			Depot* depot = player->getDepot(town->getTownID(), true);
+			// savePlayerHere is an ungly hack
+			// to avoid saving 2 times a not online player
+			// when items are transferred to his depot
+			bool savePlayerHere = true;
 			if(depot){
 				//get money from depot
 				if(g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
@@ -874,6 +878,11 @@ bool Houses::payHouses()
 				else{
 					if(house->getPayRentWarnings() >= 7){
 						house->setHouseOwner(0);
+						// setHouseOwner will load the player,
+						// transfer house items to his depot and then
+						// will save it, so here should not be saved
+						// again
+						savePlayerHere = false;
 					}
 					else{
 						int daysLeft = 7 - house->getPayRentWarnings();
@@ -914,7 +923,9 @@ bool Houses::payHouses()
 			}
 
 			if(!player->isOnline()){
-				IOPlayer::instance()->savePlayer(player);
+				if(savePlayerHere){
+					IOPlayer::instance()->savePlayer(player);
+				}
 				delete player;
 			}
 		}

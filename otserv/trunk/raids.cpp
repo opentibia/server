@@ -168,7 +168,10 @@ void Raids::checkRaids()
 			if(now >= (getLastRaidEnd() + (*it)->getMargin())){
 				if(MAX_RAND_RANGE*CHECK_RAIDS_INTERVAL/(*it)->getInterval() >= (uint32_t)random_range(0, MAX_RAND_RANGE)){
 #ifdef __DEBUG_RAID__
-					std::cout << "[Notice] Raids: Starting raid " << (*it)->getName() << std::endl;
+					char buffer[32];
+					time_t tmp = time(NULL);
+					formatDate(tmp, buffer);
+					std::cout << buffer << " [Notice] Raids: Starting raid " << (*it)->getName() << std::endl;
 #endif
 					setRunning(*it);
 					(*it)->startRaid();
