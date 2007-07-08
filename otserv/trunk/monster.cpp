@@ -592,9 +592,9 @@ bool Monster::getNextStep(Direction& dir)
 	return result;
 }
 
-void Monster::die()
+void Monster::onDie()
 {
-	Creature::die();
+	Creature::onDie();
 
 	setAttackedCreature(NULL);
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){

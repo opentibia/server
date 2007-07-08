@@ -271,7 +271,7 @@ public:
 	void addInFightTicks();
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual void die();
+	virtual void onDie();
 	virtual Item* getCorpse();
 	virtual int32_t getGainedExperience(Creature* attacker) const;
 

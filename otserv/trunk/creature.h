@@ -210,7 +210,7 @@ public:
 	virtual bool challengeCreature(Creature* creature) {return false;};
 	virtual bool convinceCreature(Creature* creature) {return false;};
 
-	virtual void die();
+	virtual void onDie();
 	virtual Item* getCorpse();
 	virtual int32_t getGainedExperience(Creature* attacker) const;
 	virtual bool addDamagePoints(Creature* attacker, int32_t damagePoints);

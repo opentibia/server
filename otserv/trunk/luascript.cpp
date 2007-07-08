@@ -1016,6 +1016,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getWorldCreatures", LuaScriptInterface::luaGetWorldCreatures);
 	//getWorldUpTime()
 	lua_register(m_luaState, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
+	//broadcastMessage(message)
+	lua_register(m_luaState, "broadcastMessage", LuaScriptInterface::luaBroadcastMessage);
 	//getGuildId(guild_name)
 	lua_register(m_luaState, "getGuildId", LuaScriptInterface::luaGetGuildId);
 	
@@ -2694,6 +2696,15 @@ int LuaScriptInterface::luaGetWorldUpTime(lua_State *L)
 	}
 
 	lua_pushnumber(L, uptime);
+	return 1;
+}
+
+int LuaScriptInterface::luaBroadcastMessage(lua_State *L)
+{
+	//broadcastMessage(message)
+	std::string message = popString(L);
+	g_game.anonymousBroadcastMessage(message);
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 

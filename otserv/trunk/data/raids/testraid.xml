@@ -9,4 +9,6 @@
 <monster name="Demon" minamount="1" maxamount="10"/>
 </areaspawn>
 
+<script delay="10000" script="raidevent.lua" />
+
 </raid>

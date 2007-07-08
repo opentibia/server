@@ -143,7 +143,7 @@ private:
 	bool pushCreature(Creature* creature);
 	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 
-	virtual void die();
+	virtual void onDie();
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }
 	virtual void dropLoot(Container* corpse);

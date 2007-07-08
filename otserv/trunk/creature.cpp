@@ -405,7 +405,7 @@ void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 	//
 }
 
-void Creature::die()
+void Creature::onDie()
 {
 	Creature* lastHitCreature = NULL;
 	Creature* mostDamageCreature = NULL;

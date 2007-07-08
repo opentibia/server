@@ -1687,9 +1687,9 @@ uint32_t Player::getIP() const
 	return client->getIP();
 }
 
-void Player::die()
+void Player::onDie()
 {
-	Creature::die();
+	Creature::onDie();
 
 	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
 	loginPosition = masterPos;

@@ -2762,7 +2762,7 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 			creature->executeConditions(interval);
 		}
 		else{
-			creature->die();
+			creature->onDie();
 			removeCreature(creature, false);
 		}
 

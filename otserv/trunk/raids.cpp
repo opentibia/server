@@ -276,6 +276,9 @@ bool Raid::loadFromXml(const std::string& _filename)
 			else if(xmlStrcmp(eventNode->name, (const xmlChar*)"areaspawn") == 0){
 				event = new AreaSpawnEvent();
 			}
+			else if(xmlStrcmp(eventNode->name, (const xmlChar*)"script") == 0){
+				event = new ScriptEvent();
+			}
 			else{
 				eventNode = eventNode->next;
 				continue;
@@ -285,7 +288,7 @@ bool Raid::loadFromXml(const std::string& _filename)
 				raidEvents.push_back(event);
 			}
 			else{
-				std::cout << "Raids: Error in file(" << _filename <<") eventNode: " << eventNode->name << std::cout;
+				std::cout << "Raids: Error in file(" << _filename <<") eventNode: " << eventNode->name << std::endl;
 				delete event;
 			}
 			eventNode = eventNode->next;
@@ -690,4 +693,72 @@ bool AreaSpawnEvent::executeEvent()
 		}
 	}
 	return true;
+}
+
+
+LuaScriptInterface ScriptEvent::m_scriptInterface("Raid Interface");
+
+ScriptEvent::ScriptEvent() :
+Event(&m_scriptInterface)
+{
+	m_scriptInterface.initState();
+}
+
+void ScriptEvent::reInitScriptInterface()
+{
+	m_scriptInterface.reInitState();
+}
+
+
+bool ScriptEvent::configureRaidEvent(xmlNodePtr eventNode)
+{
+	if(!RaidEvent::configureRaidEvent(eventNode)){
+		return false;
+	}
+	
+	std::string str;
+	if(readXMLString(eventNode, "script", str)){
+		std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
+		if(!loadScript(datadir + "raids/scripts/" + str)){
+			std::cout << "Error: [ScriptEvent::configureRaidEvent] Can not load raid script." << std::endl;
+			return false;
+		}
+	}
+	else{
+		std::cout << "Error: [ScriptEvent::configureRaidEvent] No script file found for raid" << std::endl;
+		return false;
+	}
+	return true;
+}
+
+std::string ScriptEvent::getScriptEventName()
+{
+	return "onRaid";
+}
+
+bool ScriptEvent::executeEvent()
+{
+	//onRaid()
+	if(m_scriptInterface.reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface.getScriptEnv();
+	
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "Raid event" << std::endl;
+		env->setEventDesc(desc.str());
+		#endif
+	
+		env->setScriptId(m_scriptId, &m_scriptInterface);
+		
+		m_scriptInterface.pushFunction(m_scriptId);
+	
+		int32_t result = m_scriptInterface.callFunction(0);
+		m_scriptInterface.releaseScriptEnv();
+		
+		return (result == LUA_TRUE);
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. ScriptEvent::executeEvent" << std::endl;
+		return 0;
+	}
 }

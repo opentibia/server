@@ -25,16 +25,17 @@
 #include "definitions.h"
 #include "const80.h"
 #include "position.h"
+#include "baseevents.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-enum RaidState_t{
+enum RaidState_t {
 	RAIDSTATE_IDLE = 0,
 	RAIDSTATE_EXECUTING
 };
 
-struct MonsterSpawn{
+struct MonsterSpawn {
 	std::string name;
 	uint32_t minAmount;
 	uint32_t maxAmount;
@@ -50,7 +51,8 @@ typedef std::list<Raid*> RaidList;
 typedef std::vector<RaidEvent*> RaidEventVector;
 typedef std::list<MonsterSpawn*> MonsterSpawnList;
 
-class Raids{
+class Raids
+{
 private:
 	Raids();
 public:
@@ -89,7 +91,8 @@ private:
 	std::string filename;
 };
 
-class Raid{
+class Raid
+{
 public:
 	Raid(const std::string& _name, uint32_t _interval, uint32_t _marginTime);
 	~Raid();
@@ -124,7 +127,8 @@ private:
 	bool loaded;
 };
 
-class RaidEvent{
+class RaidEvent
+{
 public:
 	RaidEvent() {};
 	virtual ~RaidEvent() {};
@@ -144,7 +148,8 @@ private:
 	uint32_t m_delay;
 };
 
-class AnnounceEvent : public RaidEvent{
+class AnnounceEvent : public RaidEvent
+{
 public:
 	AnnounceEvent() {};
 	virtual ~AnnounceEvent() {};
@@ -158,7 +163,8 @@ private:
 	MessageClasses m_messageType;
 };
 
-class SingleSpawnEvent : public RaidEvent{
+class SingleSpawnEvent : public RaidEvent
+{
 public:
 	SingleSpawnEvent() {};
 	virtual ~SingleSpawnEvent() {};
@@ -189,17 +195,24 @@ private:
 	Position m_fromPos, m_toPos;
 };
 
-/*
-//Not yet implemented...
-class CustomEvent : public RaidEvent{
+
+class ScriptEvent : public RaidEvent, public Event
+{
 public:
-	CustomEvent(const std::string& _scriptFile, uint32_t _delay);
-	~CustomEvent();
+	ScriptEvent();
+	~ScriptEvent() {};
+
+	virtual bool configureRaidEvent(xmlNodePtr eventNode);
+	virtual bool configureEvent(xmlNodePtr p) {return false;}
 	
 	bool executeEvent();
 
-private:
-	std::string scriptFile;
-}*/
+	static void reInitScriptInterface();
+
+protected:
+	virtual std::string getScriptEventName();
+	
+	static LuaScriptInterface m_scriptInterface;
+};
 
 #endif
