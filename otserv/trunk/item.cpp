@@ -892,9 +892,12 @@ bool Item::canDecay()
 	if(isRemoved()){
 		return false;
 	}
-	
+
+	if(getUniqueId() != 0 || getActionId() != 0){
+		return false;
+	}
+
 	return (items[id].decayTo != -1);
-	//return (items[id].canDecay && getDefaultDuration() > 0);
 }
 
 int Item::getWorth() const
