@@ -937,6 +937,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doCreateTeleport", LuaScriptInterface::luaDoCreateTeleport);
 	//doSummonCreature(name, position)
 	lua_register(m_luaState, "doSummonCreature", LuaScriptInterface::luaDoSummonCreature);
+	//doRemoveCreature(cid)
+	lua_register(m_luaState, "doRemoveCreature", LuaScriptInterface::luaDoRemoveCreature);
 	//doMoveCreature(cid, direction)
 	lua_register(m_luaState, "doMoveCreature", LuaScriptInterface::luaDoMoveCreature);
 	//doPlayerSetMasterPos(cid,pos)
@@ -2326,6 +2328,31 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L){
 	return 1;	
 }
 
+int LuaScriptInterface::luaDoRemoveCreature(lua_State *L)
+{
+	//doRemoveCreature(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+    Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		//Players will get kicked without restrictions
+		if(creature->getPlayer()){
+			creature->getPlayer()->kickPlayer();
+		}
+		//Monsters/NPCs will get removed
+		else{
+			g_game.removeCreature(creature);
+		}
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
 
 int LuaScriptInterface::luaDoPlayerRemoveMoney(lua_State *L)
 {

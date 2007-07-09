@@ -315,6 +315,7 @@ protected:
 	static int luaDoCreateItem(lua_State *L);
 	static int luaDoCreateTeleport(lua_State *L);
 	static int luaDoSummonCreature(lua_State *L);
+	static int luaDoRemoveCreature(lua_State *L);
 	static int luaDoMoveCreature(lua_State *L);
 
 	static int luaDoPlayerSay(lua_State *L);
