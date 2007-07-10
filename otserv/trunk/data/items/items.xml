@@ -4753,7 +4753,7 @@
 	<item id="2145" article="a" name="small diamond" plural="small diamonds">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="2146" article="a" name="small sapphire" plural="small sapphire">
+	<item id="2146" article="a" name="small sapphire" plural="small sapphires">
 		<attribute key="weight" value="10"/>
 	</item>
 	<item id="2147" article="a" name="small ruby" plural="small rubies">
@@ -4765,7 +4765,7 @@
 	<item id="2149" article="a" name="small emerald" plural="small emeralds">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="2150" article="a" name="small amethyst" plural="small amethyst">
+	<item id="2150" article="a" name="small amethyst" plural="small amethysts">
 		<attribute key="weight" value="10"/>
 	</item>
 	<item id="2151" article="a" name="talon" plural="talons">
@@ -5177,7 +5177,7 @@
 	<item id="2224" name="rubbish">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="2225" name="pieces of iron" plural="pieces of iron">
+	<item id="2225" article="a" name="piece of iron" plural="pieces of iron">
 		<attribute key="weight" value="10"/>
 	</item>
 	<item id="2226" article="a" name="fishbone">
@@ -7161,7 +7161,7 @@
 		<attribute key="weight" value="320"/>
 		<attribute key="showcount" value="0"/>
 	</item>
-	<item id="2669" article="a" name="fish" plural="fish">
+	<item id="2669" article="a" name="northern pike" plural="northern pikes">
 		<attribute key="weight" value="120"/>
 	</item>
 	<item id="2670" name="shrimp" plural="shrimp">
@@ -17239,7 +17239,7 @@
 		<attribute key="weight" value="1000"/>
 	</item>
 	<item id="6500" article="a" name="demonic essence" plural="demonic essences">
-		<attribue key="decoration" value="Someone might be interested in trading this"/>
+		<attribue key="description" value="Someone might be interested in trading this."/>
 		<attribute key="weight" value="100"/>
 	</item>
 	<item id="6501" article="a" name="gingerbread man">
@@ -17363,7 +17363,7 @@
 	<item id="6535" name="plasmother remains">
 		<attribute key="weight" value="3000"/>
 	</item>
-	<item id="6536" article="a" name="sapphire">
+	<item id="6536" article="a" name="countess sorrow's frozen tear">
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="6537" name="mr punish's handcuffs">
@@ -17374,7 +17374,7 @@
 		<attribute key="writeable" value="1"/>
 		<attribute key="maxTextLen" value="512"/>
 	</item>
-	<item id="6539" article="a" name="handmaidens protector">
+	<item id="6539" article="a" name="handmaiden's protector">
 		<attribute key="weight" value="3500"/>
 	</item>
 	<item id="6540" article="a" name="">
@@ -18968,22 +18968,22 @@
 	<item id="7281" article="a" name="life crystal">
 		<attribute key="weight" value="250"/>
 	</item>
-	<item id="7282" article="a" name="dead frost dragon">
+	<item id="7282" article="a" name="dead ice golem">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7283"/>
 		<attribute key="duration" value="10"/>
 	</item>
-	<item id="7283" article="a" name="dead frost dragon">
+	<item id="7283" article="a" name="dead ice golem">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7284"/>
 		<attribute key="duration" value="900"/>
 	</item>
-	<item id="7284" article="a" name="dead frost dragon">
+	<item id="7284" article="a" name="dead ice golem">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="7285"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="7285" article="a" name="dead frost dragon">
+	<item id="7285" article="a" name="dead ice golem">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -18996,7 +18996,6 @@
 	</item>
 	<item id="7289" article="a" name="frost charm">
 		<attribute key="weight" value="1900"/>
-		<attribute key="description" value="It is a shattered part of the Frostheart Spire."/>
 	</item>
 	<item id="7290" article="a" name="shard">
 		<attribute key="weight" value="1900"/>
@@ -19140,32 +19139,32 @@
 		<attribute key="duration" value="10"/>
 	</item>
 	<item id="7331" article="a" name="dead frost giant">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="7332"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7332" article="a" name="dead frost giant">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="7333"/>
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7333" article="a" name="dead frost giant">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7334" article="a" name="dead penguin">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="7335"/>
 		<attribute key="duration" value="10"/>
 	</item>
 	<item id="7335" article="a" name="dead penguin">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="7336"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7336" article="a" name="dead penguin">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="7337"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -19174,17 +19173,17 @@
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7338" article="a" name="dead silver rabbit">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="7339"/>
 		<attribute key="duration" value="10"/>
 	</item>
 	<item id="7339" article="a" name="dead silver rabbit">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="7340"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7340" article="a" name="dead silver rabbit">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="7341"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -19203,17 +19202,17 @@
 		<attribute key="slotType" value="backpack"/>
 	</item>
 	<item id="7344" article="a" name="dead crystal spider">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="7345"/>
 		<attribute key="duration" value="10"/>
 	</item>
 	<item id="7345" article="a" name="dead crystal spider">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="7346"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7346" article="a" name="dead crystal spider">
-		<attribute key="containerSize" value="8"/>
+		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="7347"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -19347,7 +19346,7 @@
 		<attribute key="defense" value="10"/>
 		<attribute key="attack" value="30"/>
 		<attribute key="weaponType" value="club"/>
-		<attribute key="description" value="Made from a mammoths legbones, it is one of the favoured weapons among barbarians."/>
+		<attribute key="description" value="Made from a mammoth's legbones, it is one of the favoured weapons among barbarians."/>
 	</item>
 	<item id="7382" article="a" name="demonrage sword">
 		<attribute key="weight" value="15000"/>
