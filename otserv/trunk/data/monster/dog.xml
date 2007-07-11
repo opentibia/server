@@ -16,8 +16,8 @@
     <flag runonhealth="8"/>
   </flags>
 
-  <defense armor="0" defense="0">
-  </defense>
+  <defenses armor="0" defense="0">
+  </defenses>
 
   <voices>
     <voice sentence="Wuff wuff!"/>

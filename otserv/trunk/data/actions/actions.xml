@@ -159,6 +159,8 @@
 <action itemid="6576" script="fireworks.lua" />
 <action itemid="4852" script="rage trinket.lua"/>
 
+-- Example creature event
+<action itemid="2392" script="setevent.lua" allowfaruse="1" />
 
 -- Quests
 <action actionid="6666" script="spellscroll.lua"/>

@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -48,7 +48,7 @@ struct LootBlock{
 		actionId = -1;
 		text = "";
 	}
-};	
+};
 
 struct summonBlock_t{
 	std::string name;
@@ -77,14 +77,15 @@ typedef std::list<LootBlock> LootItems;
 typedef std::list<summonBlock_t> SummonList;
 typedef std::list<spellBlock_t> SpellList;
 typedef std::vector<voiceBlock_t> VoiceVector;
+typedef std::list<std::string> MonsterScriptList;
 
 class MonsterType{
 public:
 	MonsterType();
 	~MonsterType();
-	
+
 	void reset();
-	
+
 	std::string name;
 	std::string nameDescription;
 	int experience;
@@ -101,7 +102,7 @@ public:
 	int base_speed;
 	int health;
 	int health_max;
-	
+
 	Outfit_t outfit;
 	int32_t lookcorpse;
 	int conditionImmunities;
@@ -112,10 +113,10 @@ public:
 	bool isConvinceable;
 	bool isAttackable;
 	bool isHostile;
-	
+
 	int lightLevel;
 	int lightColor;
-		
+
 	uint32_t manaCost;
 	SummonList summonList;
 	LootItems lootItems;
@@ -132,6 +133,8 @@ public:
 	int32_t attackStrength;
 	int32_t defenseStrength;
 
+	MonsterScriptList scriptList;
+
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
 	Item* createLootItem(const LootBlock& lootblock);
@@ -141,17 +144,17 @@ class Monsters{
 public:
 	Monsters();
 	~Monsters();
-	
+
 	bool loadFromXml(const std::string& _datadir, bool reloading = false);
-	bool isLoaded(){return loaded;}	
+	bool isLoaded(){return loaded;}
 	bool reload();
-	
+
 	MonsterType* getMonsterType(const std::string& name);
 	MonsterType* getMonsterType(uint32_t mid);
 	uint32_t getIdByName(const std::string& name);
 
 	static uint32_t getLootRandom();
-	
+
 private:
 	ConditionDamage* getDamageCondition(ConditionType_t conditionType,
 		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
@@ -164,13 +167,13 @@ private:
 
 	typedef std::map<std::string, uint32_t> MonsterNameMap;
 	MonsterNameMap monsterNames;
-	
+
 	typedef std::map<uint32_t, MonsterType*> MonsterMap;
 	MonsterMap monsters;
-	
+
 	bool loaded;
 	std::string datadir;
-		
+
 };
 
 #endif

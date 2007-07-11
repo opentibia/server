@@ -54,7 +54,7 @@ enum LUA_RET_CODE{
 	LUA_NULL = 0,
 };
 
-enum LuaVariantType_t{	
+enum LuaVariantType_t{
 	VARIANT_NONE = 0,
 	VARIANT_NUMBER,
 	VARIANT_POSITION,
@@ -97,12 +97,12 @@ public:
 		{m_scriptId = scriptId; m_interface = scriptInterface;}
 	bool setCallbackId(int32_t callbackId, LuaScriptInterface* scriptInterface);
 	void setEventDesc(const std::string& desc) {m_eventdesc = desc;}
-	
+
 	std::string getEventDesc() {return m_eventdesc;}
 	int32_t getScriptId() {return m_scriptId;}
 	int32_t getCallbackId() {return m_callbackId;}
 	LuaScriptInterface* getScriptInterface() {return m_interface;}
-	
+
 	void setTimerEvent() {m_timerEvent = true;}
 	void resetTimerEvent() {m_timerEvent = false;}
 
@@ -110,7 +110,7 @@ public:
 
 	static void addUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
-	
+
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
 
@@ -156,13 +156,13 @@ private:
 	static StorageMap m_globalStorageMap;
 	//unique id map
 	static ThingMap m_globalMap;
-	
+
 	Position m_realPos;
-	
+
 	//item/creature map
 	int32_t m_lastUID;
 	ThingMap m_localMap;
-	
+
 	//area map
 	uint32_t m_lastAreaId;
 	static AreaMap m_areaMap;
@@ -243,7 +243,7 @@ public:
 		assert(m_scriptEnvIndex >= 0 && m_scriptEnvIndex < 16);
 		return &m_scriptEnv[m_scriptEnvIndex];
 	}
-	
+
 	static bool reserveScriptEnv(){
 		++m_scriptEnvIndex;
 		if(m_scriptEnvIndex < 15){
@@ -254,7 +254,7 @@ public:
 			return false;
 		}
 	}
-	
+
 	static void releaseScriptEnv(){
 		if(m_scriptEnvIndex >= 0){
 			m_scriptEnv[m_scriptEnvIndex].resetEnv();
@@ -279,7 +279,7 @@ public:
 	static void pushVariant(lua_State *L, const LuaVariant& var);
 	static void pushPosition(lua_State *L, const PositionEx& position);
 	static void pushPosition(lua_State *L, const Position& position, uint32_t stackpos);
-		
+
 	static LuaVariant popVariant(lua_State *L);
 	static void popPosition(lua_State *L, PositionEx& position);
 	static void popPosition(lua_State *L, Position& position, uint32_t& stackpos);
@@ -398,10 +398,10 @@ protected:
 
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
-	
+
 	static int luaGetGlobalStorageValue(lua_State *L);
 	static int luaSetGlobalStorageValue(lua_State *L);
-	
+
 	static int luaDoPlayerAddOutfit(lua_State *L);
 	static int luaDoPlayerRemOutfit(lua_State *L);
 
@@ -418,11 +418,11 @@ protected:
 	static int luaIsCreature(lua_State *L);
 	static int luaIsContainer(lua_State *L);
 	static int luaIsMoveable(lua_State *L);
-	
+
 	static int luaGetPlayerByName(lua_State *L);
 	static int luaGetPlayerGUIDByName(lua_State *L);
-	static int luaRegisterCreature(lua_State *L);
-	
+	static int luaRegisterCreatureEvent(lua_State *L);
+
 	//container
 	static int luaGetContainerSize(lua_State *L);
 	static int luaGetContainerCap(lua_State *L);
@@ -524,7 +524,7 @@ private:
 	uint32_t m_lastEventTimerId;
 	typedef std::map<uint32_t , LuaTimerEventDesc > LuaTimerEvents;
 	LuaTimerEvents m_timerEvents;
-	
+
 	void executeTimerEvent(uint32_t eventIndex);
 
 	std::string m_interfaceName;

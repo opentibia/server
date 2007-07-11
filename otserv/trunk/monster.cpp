@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -50,7 +50,7 @@ Monster* Monster::createMonster(const std::string& name)
 	if(!mType){
 		return NULL;
 	}
-	
+
 	return createMonster(mType);
 }
 
@@ -66,7 +66,7 @@ Creature()
 	isWalkActive = false;
 	internalUpdateTargetList = false;
 	spellBonusAttack = false;
-	
+
 	mType = _mtype;
 	spawn = NULL;
 	defaultOutfit = mType->outfit;
@@ -80,7 +80,7 @@ Creature()
 
 	attackStrength = mType->attackStrength;
 	defenseStrength = mType->defenseStrength;
-	
+
 	minCombatValue = 0;
 	maxCombatValue = 0;
 
@@ -88,6 +88,14 @@ Creature()
 
 	strDescription = mType->nameDescription;
 	toLowerCaseString(strDescription);
+
+	// register creature events
+	MonsterScriptList::iterator it;
+	for(it = mType->scriptList.begin(); it != mType->scriptList.end(); ++it){
+		if(!registerCreatureEvent(*it)){
+			std::cout << "Warning: [Monster::Monster]. Unknown event name - " << *it << std::endl;
+		}
+	}
 }
 
 Monster::~Monster()
@@ -258,7 +266,7 @@ void Monster::onCreatureLeave(const Creature* creature)
 	if(it != targetList.end()){
 		(*it)->releaseThing2();
 		targetList.erase(it);
-		
+
 		isActive = !targetList.empty();
 		//std::cout << "Remove creature: " << &creature << ", Position: "<< creature->getPosition() << std::endl;
 	}
@@ -362,7 +370,7 @@ void Monster::onThink(uint32_t interval)
 	}
 
 	isWalkActive = true;
-	
+
 	onThinkYell(interval);
 	onDefending(interval);
 
@@ -532,7 +540,7 @@ bool Monster::getNextStep(Direction& dir)
 			}
 		}
 	}
-	
+
 	//destroy blocking items
 	if(result && canPushItems()){
 		const Position& pos = Spells::getCasterPosition(this, dir);
@@ -547,7 +555,7 @@ bool Monster::getNextStep(Direction& dir)
 			int32_t downItemSize = tile->downItems.size();
 			for(int32_t i = downItemSize - 1; i >= 0; --i){
 				Item* item = tile->downItems[i];
-				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND) 
+				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND)
 					|| item->hasProperty(BLOCKSOLID))){
 						if(moveCount < 20 && pushItem(item, 1)){
 							moveCount++;
@@ -579,7 +587,7 @@ bool Monster::getNextStep(Direction& dir)
 						removeCount++;
 					}
 				}
-				
+
 				++i;
 			}
 
@@ -695,7 +703,7 @@ bool Monster::canWalkTo(const Position& creaturePos, const Position& centerPos, 
 }
 
 bool Monster::getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir)
-{	
+{
 	uint32_t curDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs(creaturePos.y - centerPos.y));
 
 	std::vector<Direction> dirList;
@@ -813,7 +821,7 @@ void Monster::onDefending(uint32_t interval)
 				Monster* summon = Monster::createMonster(it->name);
 				if(summon){
 					const Position& summonPos = getPosition();
-					
+
 					addSummon(summon);
 					if(!g_game.placeCreature(summon, summonPos)){
 						removeSummon(summon);
@@ -832,7 +840,7 @@ void Monster::onThinkChangeTarget(uint32_t interval)
 {
 	if(mType->changeTargetSpeed > 0){
 		changeTargetTicks += interval;
-	
+
 		if(mType->changeTargetSpeed >= changeTargetTicks){
 			changeTargetTicks = 0;
 
@@ -1008,7 +1016,7 @@ bool Monster::convinceCreature(Creature* creature)
 			(*cit)->setMaster(NULL);
 			(*cit)->releaseThing2();
 		}
-		
+
 		summons.clear();
 
 		if(spawn){

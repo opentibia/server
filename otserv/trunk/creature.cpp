@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -42,6 +42,7 @@ AutoID::list_type AutoID::list;
 
 extern Game g_game;
 extern ConfigManager g_config;
+extern CreatureEvents* g_creatureEvents;
 
 Creature::Creature() :
   isInternalRemoved(false)
@@ -55,7 +56,7 @@ Creature::Creature() :
 	healthMax  = 1000;
 	mana = 0;
 	manaMax = 0;
-	
+
 	lastMove = 0;
 	lastStepCost = 1;
 	baseSpeed = 220;
@@ -81,6 +82,8 @@ Creature::Creature() :
 	//internalArmor = true;
 	blockCount = 0;
 	blockTicks = 0;
+
+	scriptEventsBitField = 0;
 }
 
 Creature::~Creature()
@@ -362,7 +365,7 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 {
 	if(creature == this){
 		lastMove = OTSYS_TIME();
-		
+
 		lastStepCost = 1;
 
 		if(!teleport){
@@ -384,7 +387,7 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
 			onCreatureDisappear(followCreature, false);
 		}
-		
+
 		//validateWalkPath();
 		//internalValidatePath = true;
 	}
@@ -445,7 +448,7 @@ void Creature::onDie()
 
 		case RACE_UNDEAD:
 			break;
-			
+
 		case RACE_FIRE:
 			break;
 
@@ -468,6 +471,12 @@ void Creature::onDie()
 
 	if(getMaster()){
 		getMaster()->removeSummon(this);
+	}
+
+	//scripting event - onDie
+	CreatureEvent* event = getCreatureEvent(CREATURE_EVENT_DIE);
+	if(event){
+		event->executeOnDie(this, corpse);
 	}
 }
 
@@ -570,7 +579,7 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 				checkArmor = false;
 			}
 		}
-			
+
 		if(checkArmor){
 			int32_t maxArmor = getArmor();
 
@@ -645,7 +654,7 @@ bool Creature::setFollowCreature(Creature* creature)
 	if(creature){
 		FindPathParams fpp;
 		getPathSearchParams(creature, fpp);
-		
+
 		if(!listWalkDir.empty()){
 			listWalkDir.clear();
 			onWalkAborted(); //TESTING
@@ -741,7 +750,7 @@ void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
 			case CONDITION_ENERGY: bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE); break;
 			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_POISONDAMAGE); break;
 			case CONDITION_DROWN: bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE); break;
-			default: 
+			default:
 				break;
 		}
 	}
@@ -971,7 +980,7 @@ bool Creature::hasCondition(ConditionType_t type) const
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -1040,4 +1049,54 @@ void Creature::setNormalCreatureLight()
 {
 	internalLight.level = 0;
 	internalLight.color = 0;
+}
+
+bool Creature::registerCreatureEvent(const std::string& name)
+{
+	CreatureEvent* event = g_creatureEvents->getEventByName(name);
+	if(event){
+		CreatureEventType_t type = event->getEventType();
+		if(!hasEventRegistered(type)){
+			// not was added, so set the bit in the bitfield
+			scriptEventsBitField = scriptEventsBitField | ((uint32_t)1 << type);
+		}
+		else{
+			//had a previous event handler for this type
+			// and have to be removed
+			CreatureEventList::iterator it = findEvent(type);
+			eventsList.erase(it);
+		}
+		eventsList.push_back(event);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+std::list<CreatureEvent*>::iterator Creature::findEvent(CreatureEventType_t type)
+{
+	CreatureEventList::iterator it;
+	for(it = eventsList.begin(); it != eventsList.end(); ++it){
+		if((*it)->getEventType() == type){
+			return it;
+		}
+	}
+	return eventsList.end();
+}
+
+CreatureEvent* Creature::getCreatureEvent(CreatureEventType_t type)
+{
+	if(hasEventRegistered(type)){
+		CreatureEventList::iterator it = findEvent(type);
+		if(it != eventsList.end()){
+			return *it;
+		}
+		else{
+			return NULL;
+		}
+	}
+	else{
+		return NULL;
+	}
 }

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,6 +30,7 @@
 #include "const80.h"
 #include "tile.h"
 #include "enums.h"
+#include "creatureevent.h"
 
 #include <list>
 
@@ -68,7 +69,7 @@ class Npc;
 class Item;
 
 //////////////////////////////////////////////////////////////////////
-// Defines the Base class for all creatures and base functions which 
+// Defines the Base class for all creatures and base functions which
 // every creature has
 
 class Creature : public AutoID, virtual public Thing
@@ -76,7 +77,7 @@ class Creature : public AutoID, virtual public Thing
 public:
 	Creature();
 	virtual ~Creature();
-	
+
 	virtual Creature* getCreature() {return this;};
 	virtual const Creature* getCreature()const {return this;};
 	virtual Player* getPlayer() {return NULL;};
@@ -102,7 +103,7 @@ public:
 	virtual bool canSeeCreature(const Creature* creature) const;
 
 	uint32_t getExpForLv(const int& lv) const
-	{ 
+	{
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
 	}
 
@@ -117,7 +118,7 @@ public:
 	virtual bool isPushable() const {return (getSleepTicks() <= 0);};
 	virtual bool isRemoved() const {return isInternalRemoved;};
 	virtual bool canSeeInvisibility() const { return false;}
-		
+
 	int64_t getSleepTicks() const{
 		int64_t delay;
 		int stepDuration = getStepDuration();
@@ -133,7 +134,7 @@ public:
 
 	uint32_t getSpeed() const {int32_t n = baseSpeed + varSpeed; return std::max(n, (int32_t)1);}
 	void setSpeed(int32_t varSpeedDelta){ varSpeed = varSpeedDelta; }
-	
+
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
 	int getBaseSpeed() {return baseSpeed;}
 
@@ -177,7 +178,7 @@ public:
 
 	void setSummon(bool _summon) { summon = _summon;}
 	bool isSummon() const {return summon;}
-	
+
 	virtual void addSummon(Creature* creature);
 	virtual void removeSummon(const Creature* creature);
 
@@ -235,7 +236,7 @@ public:
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
 	void setCreatureLight(LightInfo& light) {internalLight = light;}
-	
+
 	void addEventThink();
 	void stopEventThink();
 	virtual void onThink(uint32_t interval);
@@ -258,7 +259,7 @@ public:
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
-	
+
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
 
@@ -269,6 +270,9 @@ public:
 
 	uint32_t getSummonCount() const {return summons.size();}
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
+
+	//creature script events
+	bool registerCreatureEvent(const std::string& name);
 
 protected:
 	int32_t health, healthMax;
@@ -290,12 +294,22 @@ protected:
 	Direction direction;
 
 	uint32_t eventCheck;
-	
+
 	Creature* master;
 	bool summon;
 	std::list<Creature*> summons;
-	
+
 	ConditionList conditions;
+
+	//creature script events
+	uint32_t scriptEventsBitField;
+	bool hasEventRegistered(CreatureEventType_t event){
+		return (0 != (scriptEventsBitField & ((uint32_t)1 << event)));
+	}
+	typedef std::list<CreatureEvent*> CreatureEventList;
+	CreatureEventList eventsList;
+	CreatureEventList::iterator findEvent(CreatureEventType_t type);
+	CreatureEvent* getCreatureEvent(CreatureEventType_t type);
 
 	//follow variables
 	Creature* followCreature;
@@ -334,7 +348,7 @@ protected:
 	friend class Map;
 	friend class Commands;
 	friend class LuaScriptInterface;
-	
+
 	uint32_t id;
 	bool isInternalRemoved;
 };

@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,19 +24,21 @@
 #include "configmanager.h"
 
 #include <libxml/xmlmemory.h>
-#include <libxml/parser.h> 
+#include <libxml/parser.h>
 
 #include "actions.h"
 #include "talkaction.h"
 #include "spells.h"
 #include "movement.h"
 #include "weapons.h"
+#include "creatureevent.h"
 
 Actions* g_actions = NULL;
 TalkActions* g_talkactions = NULL;
 Spells* g_spells = NULL;
 MoveEvents* g_moveEvents = NULL;
 Weapons* g_weapons = NULL;
+CreatureEvents* g_creatureEvents = NULL;
 
 extern ConfigManager g_config;
 extern void ErrorMessage(const char* message) ;
@@ -65,9 +67,9 @@ ScriptingManager* ScriptingManager::getInstance()
 bool ScriptingManager::loadScriptSystems()
 {
 	std::cout << ":: Loading Script Systems" << std::endl;
-	
+
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
-	
+
 	//load weapons data
 	std::cout << ":: Loading Weapons ...";
 	g_weapons = new Weapons();
@@ -79,7 +81,7 @@ bool ScriptingManager::loadScriptSystems()
 	g_weapons->loadDefaults();
 	std::cout << "[done]" << std::endl;
 
-	//load spells data	
+	//load spells data
 	g_spells = new Spells();
 	std::cout << ":: Loading Spells ...";
 	if(!g_spells->loadFromXml(datadir)){
@@ -87,7 +89,7 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	/*
 	std::cout << ":: Loading Fields ...";
 	Items::loadFieldsFromXml(datadir);
@@ -102,7 +104,7 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	//load talkactions data
 	g_talkactions = new TalkActions();
 	std::cout << ":: Loading Talkactions ...";
@@ -111,7 +113,7 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	//load moveEvents
 	g_moveEvents = new MoveEvents();
 	std::cout << ":: Loading MoveEvents ...";
@@ -120,6 +122,15 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
+	//load creature events
+	g_creatureEvents = new CreatureEvents();
+	std::cout << ":: Loading CreatureEvents ...";
+	if(!g_creatureEvents->loadFromXml(datadir)){
+		ErrorMessage("Unable to load CreatureEvents!");
+		return false;
+	}
+	std::cout << "[done]" << std::endl;
+
 	return true;
 }

@@ -26,6 +26,10 @@
   <defenses armor="15" defense="20">
   </defenses>
 
+  <script>
+    <event name="MINO_DIE" />
+  </script>
+  
   <loot>
     <item id="2148" countmax="28" chance="100000"/>
     <item id="2543" countmax="18" chance="70000"/>
