@@ -1,5 +1,5 @@
 ============================================
-========== OpenTibia Server 0.5.0 ==========
+========== OpenTibia Server 0.6.0 ==========
 ============================================
 ===== www.otserv.org	www.otfans.net =====
 ============================================
@@ -10,8 +10,8 @@ What is this?
 	based on the CIPSoft's Tibia.
 
 How does it work?
-	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7 and then 7.71.
-	OTServ is now played using Tibia 7.8 or 7.81.
+	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 7.8 and then 7.81.
+	OTServ is now played using Tibia 8.0.
 
 	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here 
 	http://web.telia.com/~u49016513/tibialoaderV143.zip or http://otfans.net/showthread.php?t=20767.
@@ -147,13 +147,20 @@ Credits?
 	And special thanks to all otfans.net moderators.
 
 Help?
-	We always need help. Post on the forums:
+	We always need help. Post on the forum:
 	OTFans - http://otfans.net
 		English community, the official site of OpenTibia.
-	OTFans Pl - http://otfans.pl
-		Polish community, the official fansite in Poland.
-	OTPlanet - http://otplanet.com
-		Brazilian community, the official fansite in Brazil.
+
+	Want account maker for your server? Find one here:
+	OTServ-AAC - http://www.otserv-aac.info
+		Website that promotes "good" AAC scripts.
+
+	Need to promote your server? Put it on servers list:
+	OTServList - http://www.otservlist.org
+		Official OTServ list, you dont need any other ;).
+
+	Note that only websites mentioned in this document are treated as official support of OTServ.
+	No other websites are officialy affiliated with OTServ.
 
 Anything else?
 	Yes! There are utilities available as a seperate package soon at the sourceforge site
