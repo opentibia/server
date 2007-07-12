@@ -686,19 +686,16 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 					else if(strValue == "bluebubble"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_LOSE_ENERGY);
 					}
-					else if(strValue == "greenbubble"){
-						combat->setParam(COMBATPARAM_EFFECT, NM_ME_POISON_RINGS);
-					}
 					else if(strValue == "poff"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_PUFF);
 					}
 					else if(strValue == "yellowspark"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_BLOCKHIT);
 					}
-					else if(strValue == "explosion"){
+					else if(strValue == "explosionarea"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_EXPLOSION_AREA);
 					}
-					else if(strValue == "explosionarea"){
+					else if(strValue == "explosion"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_EXPLOSION_DAMAGE);
 					}
 					else if(strValue == "firearea"){
@@ -706,6 +703,9 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 					}
 					else if(strValue == "yellowbubble"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_YELLOW_RINGS);
+					}
+					else if(strValue == "greenbubble"){
+						combat->setParam(COMBATPARAM_EFFECT, NM_ME_POISON_RINGS);
 					}
 					else if(strValue == "blackspark"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_HIT_AREA);
@@ -725,7 +725,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 					else if(strValue == "greenshimmer"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_MAGIC_POISON);
 					}
-					else if(strValue == "yellowspark"){
+					else if(strValue == "fire"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_HITBY_FIRE);
 					}
 					else if(strValue == "greenspark"){
@@ -758,7 +758,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 					else if(strValue == "bubbles"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_BUBBLES);
 					}
-					else if(strValue == "bubblearea"){
+					else if(strValue == "dice"){
 						combat->setParam(COMBATPARAM_EFFECT, NM_ME_CRAPS);
 					}
 					else if(strValue == "giftwraps"){
