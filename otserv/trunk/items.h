@@ -43,6 +43,14 @@
 #define	SLOTP_DEPOT 1024
 #define	SLOTP_TWO_HAND 2048
 
+enum ItemTypes_t {
+	ITEM_TYPE_NONE = 0,
+	ITEM_TYPE_DEPOT,
+	ITEM_TYPE_MAILBOX,
+	ITEM_TYPE_TRASHHOLDER,
+	ITEM_TYPE_LAST
+};
+
 struct Abilities{
 	Abilities()
 	{
@@ -131,6 +139,7 @@ public:
 	~ItemType();
 
 	itemgroup_t group;
+	ItemTypes_t type;
 
 	bool isGroundTile() const {return (group == ITEM_GROUP_GROUND);}
 	bool isContainer() const {return (group == ITEM_GROUP_CONTAINER);}
@@ -142,6 +151,9 @@ public:
 
 	bool isKey() const {return (group == ITEM_GROUP_KEY);}
 	bool isRune() const {return (group == ITEM_GROUP_RUNE);}
+	bool isDepot() const {return (type == ITEM_TYPE_DEPOT);}
+	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
+	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
 
 	uint16_t id;
 	uint16_t clientId;
@@ -156,6 +168,7 @@ public:
 	WeaponType_t   weaponType;
 	Ammo_t         amuType;
 	ShootType_t    shootType;
+	MagicEffectClasses magicEffect;
 	int            attack;
 	int            defence;
 	int            extraDef;

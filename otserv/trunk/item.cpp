@@ -50,7 +50,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 	const ItemType& it = Item::items[_type];
 	
 	if(it.id != 0){
-		if(_type == ITEM_LOCKER1 || _type == ITEM_LOCKER2 || _type == ITEM_LOCKER3 || _type == ITEM_LOCKER4){
+		if(it.isDepot()){
 			newItem = new Depot(_type);
 		}
 		else if(it.isContainer()){
@@ -65,10 +65,10 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		else if(it.isDoor()){
 			newItem = new Door(_type);
 		}
-		else if(_type == ITEM_DUSTBIN){
-			newItem = new TrashHolder(_type /*, NM_ME_PUFF*/);
+		else if(it.isTrashHolder()){
+			newItem = new TrashHolder(_type, it.magicEffect);
 		}
-		else if(_type == ITEM_MAILBOX1 || _type == ITEM_MAILBOX2 || _type == ITEM_MAILBOX3){
+		else if(it.isMailbox()){
 			newItem = new Mailbox(_type);
 		}
 		else{

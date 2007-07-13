@@ -524,11 +524,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	}
 	else if(const Item* item = thing->getItem()){
 		//If its a new (summoned item) always accept it, or FLAG_NOLIMIT is set
-		/*
-		if(thing->getParent() == NULL || ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT) ){
-			return RET_NOERROR;
-		}
-		*/
 #ifdef __DEBUG__
 		if(thing->getParent() == NULL){
 			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
@@ -541,11 +536,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 		bool itemIsHangable = item->isHangable();
 		
-		if(ground == NULL && !itemIsHangable)
+		if(ground == NULL && !itemIsHangable){
 			return RET_NOTPOSSIBLE;
+		}
 
-		if(!creatures.empty() && item->isBlocking())
+		if(!creatures.empty() && item->isBlocking()){
 			return RET_NOTENOUGHROOM;
+		}
 
 		bool hasHangable = false;
 		bool supportsHangableItems = false;
@@ -565,11 +562,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					}
 					else if(item->isPickupable()){
 						//TODO: query script interface
-						if(iitem->getID() == ITEM_DUSTBIN)
+						if(iitem->getTrashHolder()){
 							continue;
+						}
 
-						if(!iiType.hasHeight || iiType.pickupable)
+						if(!iiType.hasHeight || iiType.pickupable){
 							return RET_NOTENOUGHROOM;
+						}
 					}
 					else{
 						return RET_NOTENOUGHROOM;

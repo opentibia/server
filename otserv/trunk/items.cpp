@@ -39,6 +39,7 @@ ItemType::ItemType()
 {
 	article          = "";
 	group            = ITEM_GROUP_NONE;
+	type             = ITEM_TYPE_NONE;
 	stackable        = false;
 	useable	         = false;
 	moveable         = true;
@@ -72,6 +73,7 @@ ItemType::ItemType()
 	slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
 	amuType       = AMMO_NONE;
 	shootType     = SHOOT_NONE;
+	magicEffect   = NM_ME_NONE;
 	attack        = 0;
 	defence       = 0;
 	extraDef      = 0;
@@ -404,7 +406,13 @@ bool Items::loadFromXml(const std::string& datadir)
 										it.group = ITEM_GROUP_MAGICFIELD;
 									}
 									else if(strcasecmp(strValue.c_str(), "depot") == 0){
-										//it.group = ITEM_GROUP_DEPOT;
+										it.type = ITEM_TYPE_DEPOT;
+									}
+									else if(strcasecmp(strValue.c_str(), "mailbox") == 0){
+										it.type = ITEM_TYPE_MAILBOX;
+									}
+									else if(strcasecmp(strValue.c_str(), "trashholder") == 0){
+										it.type = ITEM_TYPE_TRASHHOLDER;
 									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown type " << strValue  << std::endl;
@@ -659,6 +667,118 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown shootType " << strValue  << std::endl;
+									}
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "effect") == 0){
+                                if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(strcasecmp(strValue.c_str(), "blood") == 0){
+										it.magicEffect = NM_ME_DRAW_BLOOD;
+									}
+									else if(strcasecmp(strValue.c_str(), "loseenergy") == 0){
+										it.magicEffect = NM_ME_LOSE_ENERGY;
+									}
+									else if(strcasecmp(strValue.c_str(), "poff") == 0){
+										it.magicEffect = NM_ME_PUFF;
+									}
+									else if(strcasecmp(strValue.c_str(), "blockhit") == 0){
+										it.magicEffect = NM_ME_BLOCKHIT;
+									}
+									else if(strcasecmp(strValue.c_str(), "explosionarea") == 0){
+										it.magicEffect = NM_ME_EXPLOSION_AREA;
+									}
+									else if(strcasecmp(strValue.c_str(), "explosion") == 0){
+										it.magicEffect = NM_ME_EXPLOSION_DAMAGE;
+									}
+									else if(strcasecmp(strValue.c_str(), "firearea") == 0){
+										it.magicEffect = NM_ME_FIRE_AREA;
+									}
+									else if(strcasecmp(strValue.c_str(), "yellowrings") == 0){
+										it.magicEffect = NM_ME_YELLOW_RINGS;
+									}
+									else if(strcasecmp(strValue.c_str(), "greenrings") == 0){
+										it.magicEffect = NM_ME_POISON_RINGS;
+									}
+									else if(strcasecmp(strValue.c_str(), "greysparks") == 0){
+										it.magicEffect = NM_ME_HIT_AREA;
+									}
+									else if(strcasecmp(strValue.c_str(), "energyarea") == 0){
+										it.magicEffect = NM_ME_ENERGY_AREA;
+									}
+									else if(strcasecmp(strValue.c_str(), "energy") == 0){
+										it.magicEffect = NM_ME_ENERGY_DAMAGE;
+									}
+									else if(strcasecmp(strValue.c_str(), "magicblue") == 0){
+										it.magicEffect = NM_ME_MAGIC_ENERGY;
+									}
+									else if(strcasecmp(strValue.c_str(), "magicred") == 0){
+										it.magicEffect = NM_ME_MAGIC_BLOOD;
+									}
+									else if(strcasecmp(strValue.c_str(), "magicgreen") == 0){
+										it.magicEffect = NM_ME_MAGIC_POISON;
+									}
+									else if(strcasecmp(strValue.c_str(), "fire") == 0){
+										it.magicEffect = NM_ME_HITBY_FIRE;
+									}
+									else if(strcasecmp(strValue.c_str(), "poison") == 0){
+										it.magicEffect = NM_ME_POISON;
+									}
+									else if(strcasecmp(strValue.c_str(), "mortarea") == 0){
+										it.magicEffect = NM_ME_MORT_AREA;
+									}
+									else if(strcasecmp(strValue.c_str(), "greensound") == 0){
+										it.magicEffect = NM_ME_SOUND_GREEN;
+									}
+									else if(strcasecmp(strValue.c_str(), "redsound") == 0){
+										it.magicEffect = NM_ME_SOUND_RED;
+									}
+									else if(strcasecmp(strValue.c_str(), "greenpoff") == 0){
+										it.magicEffect = NM_ME_POISON_AREA;
+									}
+									else if(strcasecmp(strValue.c_str(), "yellowsound") == 0){
+										it.magicEffect = NM_ME_SOUND_YELLOW;
+									}
+									else if(strcasecmp(strValue.c_str(), "purplesound") == 0){
+										it.magicEffect = NM_ME_SOUND_PURPLE;
+									}
+									else if(strcasecmp(strValue.c_str(), "whitesound") == 0){
+										it.magicEffect = NM_ME_SOUND_WHITE;
+									}
+									else if(strcasecmp(strValue.c_str(), "bluesound") == 0){
+										it.magicEffect = NM_ME_SOUND_BLUE;
+									}
+									else if(strcasecmp(strValue.c_str(), "bubbles") == 0){
+										it.magicEffect = NM_ME_BUBBLES;
+									}
+									else if(strcasecmp(strValue.c_str(), "dice") == 0){
+										it.magicEffect = NM_ME_CRAPS;
+									}
+									else if(strcasecmp(strValue.c_str(), "giftwraps") == 0){
+										it.magicEffect = NM_ME_GIFT_WRAPS;
+									}
+									else if(strcasecmp(strValue.c_str(), "yellowfireworks") == 0){
+										it.magicEffect = NM_ME_FIREWORK_YELLOW;
+									}
+									else if(strcasecmp(strValue.c_str(), "redfireworks") == 0){
+										it.magicEffect = NM_ME_FIREWORK_RED;
+									}
+									else if(strcasecmp(strValue.c_str(), "bluefireworks") == 0){
+										it.magicEffect = NM_ME_FIREWORK_BLUE;
+									}
+									else if(strcasecmp(strValue.c_str(), "stun") == 0){
+										it.magicEffect = NM_ME_STUN;
+									}
+									else if(strcasecmp(strValue.c_str(), "sleep") == 0){
+										it.magicEffect = NM_ME_SLEEP;
+									}
+                                    else if(strcasecmp(strValue.c_str(), "watercreature") == 0){
+										it.magicEffect = NM_ME_WATERCREATURE;
+									}
+									else if(strcasecmp(strValue.c_str(), "groundshaker") == 0){
+										it.magicEffect = NM_ME_GROUNDSHAKER;
+									}
+									else if(strcasecmp(strValue.c_str(), "none") == 0){
+										it.magicEffect = NM_ME_NONE;
 									}
 								}
 							}
