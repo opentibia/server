@@ -116,45 +116,45 @@
 	<melee id="2421" level="85" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Thunder Hammer
 	
 -- Rods
-	<wand id="2182" level="7" mana="2" enabled="1" exhaustion="1" script="snakebite_rod.lua">
+	<wand id="2182" level="7" mana="2" enabled="1" script="snakebite_rod.lua">
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
 	</wand>
-	<wand id="2186" level="13" mana="3" enabled="1" exhaustion="1" script="moonlight_rod.lua">
+	<wand id="2186" level="13" mana="3" enabled="1" script="moonlight_rod.lua">
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
 	</wand> 
-	<wand id="2185" level="19" mana="5" enabled="1" exhaustion="1" script="volcanic_rod.lua">
+	<wand id="2185" level="19" mana="5" enabled="1" script="volcanic_rod.lua">
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
 	</wand>
-	<wand id="2181" level="26" mana="8" enabled="1" exhaustion="1" script="quagmire_rod.lua">
+	<wand id="2181" level="26" mana="8" enabled="1" script="quagmire_rod.lua">
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
 	</wand>
-	<wand id="2183" level="33" mana="13" enabled="1" exhaustion="1" script="tempest_rod.lua">
+	<wand id="2183" level="33" mana="13" enabled="1" script="tempest_rod.lua">
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
 	</wand>
 
 -- Wands
-	<wand id="2190" level="7" mana="2" enabled="1" exhaustion="1" script="wand_of_vortex.lua">
+	<wand id="2190" level="7" mana="2" enabled="1" script="wand_of_vortex.lua">
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
-	<wand id="2191" level="13" mana="3" enabled="1" exhaustion="1" script="wand_of_dragonbreath.lua">
+	<wand id="2191" level="13" mana="3" enabled="1" script="wand_of_dragonbreath.lua">
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
-	<wand id="2188" level="19" mana="5" enabled="1" exhaustion="1" script="wand_of_plague.lua">
+	<wand id="2188" level="19" mana="5" enabled="1" script="wand_of_plague.lua">
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
-	<wand id="2189" level="26" mana="8" enabled="1" exhaustion="1" script="wand_of_cosmic_energy.lua">
+	<wand id="2189" level="26" mana="8" enabled="1" script="wand_of_cosmic_energy.lua">
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
-	<wand id="2187" level="33" mana="13" enabled="1" exhaustion="1" script="wand_of_inferno.lua">
+	<wand id="2187" level="33" mana="13" enabled="1" script="wand_of_inferno.lua">
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
@@ -162,6 +162,7 @@
 -- Ammunition
 	<distance id="2545" enabled="1" hitchance="80" ammo="removecount" script="poison_arrow.lua"/>
 	<distance id="2546" enabled="1" hitchance="80" ammo="removecount" script="explosive_arrow.lua"/>
+	<distance id="7366" enabled="1" hitchance="80" ammo="move" script="viper_star.lua"/>
 	<distance id="3965" level="20" enabled="1" ammo="move" function="internalLoadWeapon"/> --Hunting Spear
 	<distance id="7378" level="25" enabled="1" ammo="move" function="internalLoadWeapon"/> --Royal Spear
 	<distance id="7367" level="42" enabled="1" ammo="move" function="internalLoadWeapon"/> --Enchanted Spear
