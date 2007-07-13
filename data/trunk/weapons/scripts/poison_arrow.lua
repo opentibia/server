@@ -6,7 +6,7 @@ setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, -0.1, -30, -0.2, 0)
 
 local condition = createConditionObject(CONDITION_POISON)
 setConditionParam(condition, CONDITION_PARAM_DELAYED, 1)
-addDamageCondition(condition, 10, 2000, -10)
+addDamageCondition(condition, 10, 2000, -1)
 setCombatCondition(combat, condition)
 
 function onUseWeapon(cid, var)
