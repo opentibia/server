@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -62,54 +62,57 @@ enum MagicEffectClasses {
 	NM_ME_WATERCREATURE    = 0x21, //33
 	NM_ME_GROUNDSHAKER     = 0x22, //34
 	//for internal use, dont send to client
-	NM_ME_NONE             = 0xFF
+	NM_ME_NONE             = 0xFF,
+	NM_ME_UNK              = 0xFFFF,
 };
 
-#define NM_ANI_SPEAR             0
-#define NM_ANI_BOLT              1
-#define NM_ANI_ARROW             2
-#define NM_ANI_FIRE              3
-#define NM_ANI_ENERGY            4
-#define NM_ANI_POISONARROW       5
-#define NM_ANI_BURSTARROW        6
-#define NM_ANI_THROWINGSTAR      7
-#define NM_ANI_THROWINGKNIFE     8
-#define NM_ANI_SMALLSTONE        9
-#define NM_ANI_SUDDENDEATH       10
-#define NM_ANI_LARGEROCK         11
-#define NM_ANI_SNOWBALL          12
-#define NM_ANI_POWERBOLT         13
-#define NM_ANI_FLYPOISONFIELD    14
-#define NM_ANI_INFERNALBOLT      15
-#define NM_ANI_HUNTINGSPEAR		 16
-#define NM_ANI_ENCHANTEDSPEAR    17
-#define NM_ANI_REDSTAR 	 18
-#define NM_ANI_GREENSTAR 19
-#define NM_ANI_ROYALSPEAR 		 20
-#define NM_ANI_SNIPERARROW 		 21
-#define NM_ANI_ONYXARROW 		 22
-#define NM_ANI_PIERCINGBOLT		 23
-#define NM_ANI_WHIRLWINDSWORD 	 24
-#define NM_ANI_WHIRLWINDAXE		 25
-#define NM_ANI_WHIRLWINDCLUB	 26
-#define NM_ANI_ETHEREALSPEAR	 27
-	
-//for internal use, dont send to client
-#define NM_ANI_WEAPONTYPE       254
-#define NM_ANI_NONE             255
+enum ShootType_t {
+	NM_SHOOT_SPEAR			= 0,
+	NM_SHOOT_BOLT           = 1,
+	NM_SHOOT_ARROW          = 2,
+	NM_SHOOT_FIRE			= 3,
+	NM_SHOOT_ENERGY         = 4,
+	NM_SHOOT_POISONARROW    = 5,
+	NM_SHOOT_BURSTARROW     = 6,
+	NM_SHOOT_THROWINGSTAR   = 7,
+	NM_SHOOT_THROWINGKNIFE  = 8,
+	NM_SHOOT_SMALLSTONE     = 9,
+	NM_SHOOT_SUDDENDEATH    = 10,
+	NM_SHOOT_LARGEROCK      = 11,
+	NM_SHOOT_SNOWBALL       = 12,
+	NM_SHOOT_POWERBOLT      = 13,
+	NM_SHOOT_POISONFIELD    = 14,
+	NM_SHOOT_INFERNALBOLT   = 15,
+	NM_SHOOT_HUNTINGSPEAR	= 16,
+	NM_SHOOT_ENCHANTEDSPEAR = 17,
+	NM_SHOOT_REDSTAR 	 	= 18,
+	NM_SHOOT_GREENSTAR 		= 19,
+	NM_SHOOT_ROYALSPEAR 	= 20,
+	NM_SHOOT_SNIPERARROW 	= 21,
+	NM_SHOOT_ONYXARROW 		= 22,
+	NM_SHOOT_PIERCINGBOLT	= 23,
+	NM_SHOOT_WHIRLWINDSWORD = 24,
+	NM_SHOOT_WHIRLWINDAXE	= 25,
+	NM_SHOOT_WHIRLWINDCLUB	= 26,
+	NM_SHOOT_ETHEREALSPEAR	= 27,
+	//for internal use, dont send to client
+	NM_SHOOT_WEAPONTYPE		= 254,
+	NM_SHOOT_NONE			= 255,
+	NM_SHOOT_UNK			= 0xFFFF
+};
 
 enum SpeakClasses {
 	SPEAK_SAY           = 0x01,
 	SPEAK_WHISPER       = 0x02,
 	SPEAK_YELL          = 0x03,
 	//SPEAK_            = 0x0D,
-	SPEAK_BROADCAST     = 0x09,		
+	SPEAK_BROADCAST     = 0x09,
 	SPEAK_PRIVATE       = 0x04,
 	SPEAK_PRIVATE_RED   = 0x0B,	//@name@text
 	//SPEAK_            = 0x0F,
 	//SPEAK_CHANNEL??   = 0x06,
 	//SPEAK_CHANNEL??   = 0x07,
-	//SPEAK_CHANNEL??   = 0x08,	
+	//SPEAK_CHANNEL??   = 0x08,
 	SPEAK_CHANNEL_Y     = 0x05,	//yellow
 	SPEAK_CHANNEL_R1    = 0x0A,	//red - #c text
 	SPEAK_CHANNEL_R2    = 0x0E,	//red anonymous - #d text
@@ -160,7 +163,7 @@ enum FluidClasses {
 	FLUID_BLUE_2 = 0x10,
 };
 
-enum e_fluids {	
+enum e_fluids {
 	FLUID_WATER	= FLUID_BLUE,
 	FLUID_BLOOD	= FLUID_RED,
 	FLUID_BEER = FLUID_BROWN,
@@ -177,7 +180,7 @@ const uint32_t reverseFluidMap[] = {
 	FLUID_EMPTY_1,
 	FLUID_WATER,
 	FLUID_MANAFLUID,
-	FLUID_BEER, 
+	FLUID_BEER,
 	FLUID_EMPTY_1,
 	FLUID_BLOOD,
 	FLUID_SLIME,
@@ -190,7 +193,7 @@ const uint32_t fluidMap[] = {
 	FLUID_EMPTY_1,
 	FLUID_BLUE_1,
 	FLUID_RED_1,
-	FLUID_BROWN_1, 
+	FLUID_BROWN_1,
 	FLUID_GREEN_1,
 	FLUID_YELLOW_1,
 	FLUID_WHITE_1,
@@ -215,12 +218,12 @@ enum TextColor_t {
 
 enum Icons_t{
 	ICON_POISON = 1,
-	ICON_BURN = 2, 
-	ICON_ENERGY =  4, 
-	ICON_DRUNK = 8, 
-	ICON_MANASHIELD = 16, 
-	ICON_PARALYZE = 32, 
-	ICON_HASTE = 64, 
+	ICON_BURN = 2,
+	ICON_ENERGY =  4,
+	ICON_DRUNK = 8,
+	ICON_MANASHIELD = 16,
+	ICON_PARALYZE = 32,
+	ICON_HASTE = 64,
 	ICON_SWORDS = 128,
 	ICON_DROWNING = 256
 };
@@ -242,38 +245,6 @@ enum Ammo_t {
 	AMMO_ARROW = 2
 };
 
-enum ShootType_t {
-	SHOOT_NONE = 0,
-	SHOOT_BOLT = NM_ANI_BOLT,
-	SHOOT_ARROW = NM_ANI_ARROW, 
-	SHOOT_FIRE = NM_ANI_FIRE,
-	SHOOT_ENERGY = NM_ANI_ENERGY,
-	SHOOT_POISONARROW = NM_ANI_POISONARROW,
-	SHOOT_BURSTARROW = NM_ANI_BURSTARROW,
-	SHOOT_THROWINGSTAR = NM_ANI_THROWINGSTAR,
-	SHOOT_THROWINGKNIFE = NM_ANI_THROWINGKNIFE,
-	SHOOT_SMALLSTONE = NM_ANI_SMALLSTONE,
-	SHOOT_SUDDENDEATH = NM_ANI_SUDDENDEATH,
-	SHOOT_LARGEROCK = NM_ANI_LARGEROCK,
-	SHOOT_SNOWBALL = NM_ANI_SNOWBALL,
-	SHOOT_POWERBOLT = NM_ANI_POWERBOLT,
-	SHOOT_SPEAR = NM_ANI_SPEAR,
-	SHOOT_POISONFIELD = NM_ANI_FLYPOISONFIELD,
-	SHOOT_INFERNALBOLT = NM_ANI_INFERNALBOLT,
-	SHOOT_HUNTINGSPEAR = NM_ANI_HUNTINGSPEAR,
-	SHOOT_ENCHANTEDSPEAR = NM_ANI_ENCHANTEDSPEAR,
-	SHOOT_REDSTAR = NM_ANI_REDSTAR,
-	SHOOT_GREENSTAR = NM_ANI_GREENSTAR,
-	SHOOT_ROYALSPEAR = NM_ANI_ROYALSPEAR,
-	SHOOT_SNIPERARROW = NM_ANI_SNIPERARROW,
-	SHOOT_ONYXARROW = NM_ANI_ONYXARROW,
-	SHOOT_PIERCINGBOLT = NM_ANI_PIERCINGBOLT,
-	SHOOT_WHIRLWINDSWORD = NM_ANI_WHIRLWINDSWORD,
-	SHOOT_WHIRLWINDAXE = NM_ANI_WHIRLWINDAXE,
-	SHOOT_WHIRLWINDCLUB = NM_ANI_WHIRLWINDCLUB,
-	SHOOT_ETHEREALSPEAR= NM_ANI_ETHEREALSPEAR
-};
-
 enum Skulls_t{
 	SKULL_NONE = 0,
 	SKULL_YELLOW = 1,
@@ -283,18 +254,16 @@ enum Skulls_t{
 };
 
 enum item_t {
-	ITEM_FISHING_ROD      = 2580,
-	ITEM_SHOVEL           = 2554,
-	ITEM_ROPE             = 2120,
-	ITEM_MACHETE          = 2420,
-	ITEM_SCYTHE           = 2550,
 	ITEM_COINS_GOLD       = 2148,
 	ITEM_COINS_PLATINUM   = 2152,
 	ITEM_COINS_CRYSTAL    = 2160,
+
 	ITEM_DEPOT            = 2594,
-	ITEM_RUNE_BLANK       = 2260,
+	ITEM_LOCKER1          = 2589,
+
 	ITEM_MALE_CORPSE      = 3058,
 	ITEM_FEMALE_CORPSE    = 3065,
+
 	ITEM_MEAT             = 2666,
 	ITEM_HAM              = 2671,
 	ITEM_GRAPE            = 2681,
@@ -303,26 +272,15 @@ enum item_t {
 	ITEM_ROLL             = 2690,
 	ITEM_CHEESE           = 2696,
 
-	ITEM_BOLT             = 2543,
-	ITEM_ARROW            = 2544,
-
 	ITEM_FULLSPLASH       = 2016,
 	ITEM_SMALLSPLASH      = 2019,
-	ITEM_LOCKER1          = 2589,
-	ITEM_LOCKER2          = 2590,
-	ITEM_LOCKER3          = 2591,
-	ITEM_LOCKER4          = 2592,
-	ITEM_DUSTBIN          = 1777,
-	
+
 	ITEM_PARCEL           = 2595,
 	ITEM_PARCEL_STAMPED   = 2596,
 	ITEM_LETTER           = 2597,
 	ITEM_LETTER_STAMPED   = 2598,
 	ITEM_LABEL            = 2599,
-	ITEM_MAILBOX1         = 2334,
-	ITEM_MAILBOX2         = 2593,
-	ITEM_MAILBOX3         = 3981,
-	
+
 	ITEM_DOCUMENT_RO      = 1968, //read-only
 };
 
@@ -376,7 +334,7 @@ enum PlayerFlags{
 //[1000 - 1500]
 #define PSTRG_OUTFITS_RANGE_START   (PSTRG_RESERVED_RANGE_START + 1000)
 #define PSTRG_OUTFITS_RANGE_SIZE    500
-	
+
 #define IS_IN_KEYRANGE(key, range) (key >= PSTRG_##range##_START && ((key - PSTRG_##range##_START) < PSTRG_##range##_SIZE))
 
 #endif

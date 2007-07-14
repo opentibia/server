@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -93,9 +93,9 @@ enum itemattrib_t {
 	ITEM_ATTR_ARMOR2,
 	ITEM_ATTR_WRITEABLE2,
 	ITEM_ATTR_LIGHT2,
-	
+
 	ITEM_ATTR_TOPORDER,
-	
+
 	ITEM_ATTR_WRITEABLE3,
 
 	ITEM_ATTR_LAST
@@ -103,8 +103,8 @@ enum itemattrib_t {
 
 enum itemflags_t {
 	FLAG_BLOCK_SOLID = 1,
-	FLAG_BLOCK_PROJECTILE = 2, 
-	FLAG_BLOCK_PATHFIND = 4, 
+	FLAG_BLOCK_PROJECTILE = 2,
+	FLAG_BLOCK_PATHFIND = 4,
 	FLAG_HAS_HEIGHT = 8,
 	FLAG_USEABLE = 16,
 	FLAG_PICKUPABLE = 32,
@@ -124,7 +124,7 @@ enum itemflags_t {
 	FLAG_CANNOTDECAY = 524288,
 	FLAG_ALLOWDISTREAD = 1048576,
 };
-
+/*
 enum slotsOTB_t{
 	OTB_SLOT_DEFAULT,
 	OTB_SLOT_HEAD,
@@ -158,7 +158,7 @@ enum ShootTypeOtb_t {
 	OTB_SHOOT_POISONFIELD   = 15,
 	OTB_SHOOT_INFERNALBOLT  = 16
 };
-
+*/
 //1-byte aligned structs
 #pragma pack(1)
 
@@ -168,7 +168,7 @@ struct VERSIONINFO{
 	uint32_t dwBuildNumber;
 	uint8_t CSDVersion[128];
 };
-
+/*
 struct decayBlock2{
 	uint16_t decayTo;
 	uint16_t decayTime;
@@ -197,17 +197,17 @@ struct armorBlock2{
 struct writeableBlock2{
 	uint16_t readOnlyId;
 };
-
+*/
 struct lightBlock2{
 	uint16_t lightLevel;
 	uint16_t lightColor;
 };
-
+/*
 struct writeableBlock3{
 	uint16_t readOnlyId;
 	uint16_t maxTextLen;
 };
-
+*/
 #pragma pack()
 /////////OTB specific//////////////
 #endif

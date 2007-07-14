@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,6 +23,7 @@
 
 #include "definitions.h"
 #include "otsystem.h"
+#include "const80.h"
 
 #include <string>
 #include <algorithm>
@@ -64,5 +65,8 @@ void formatIP(uint32_t ip, char* buffer);
 void formatDate(time_t time, char* buffer);
 //buffer should have at least 16 bytes
 void formatDate2(time_t time, char* buffer);
+
+MagicEffectClasses getMagicEffect(const std::string& strValue);
+ShootType_t getShootType(const std::string& strValue);
 
 #endif

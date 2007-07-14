@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -59,10 +59,10 @@ ItemType::ItemType()
 	blockSolid = false;
 	blockProjectile = false;
 	blockPathFind = false;
-		
+
 	std::string runeSpellName;
 	runeMagLevel    = 0;
-	
+
 	speed		      = 0;
 	id            = 0;
 	clientId      = 0;
@@ -72,7 +72,7 @@ ItemType::ItemType()
 	weaponType    = WEAPON_NONE;
 	slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
 	amuType       = AMMO_NONE;
-	shootType     = SHOOT_NONE;
+	shootType     = (ShootType_t)0;
 	magicEffect   = NM_ME_NONE;
 	attack        = 0;
 	defence       = 0;
@@ -149,10 +149,10 @@ int Items::loadFromOtb(std::string file)
 	if(!f.openFile(file.c_str(), false, true)){
 		return f.getError();
 	}
-	
+
 	unsigned long type;
 	NODE node = f.getChildNode(NO_NODE, type);
-	
+
 	PropStream props;
 	if(f.getProps(node,props)){
 		//4 byte flags
@@ -183,12 +183,12 @@ int Items::loadFromOtb(std::string file)
 			Items::dwBuildNumber = vi->dwBuildNumber;	//revision
 		}
 	}
-	
+
 	if(Items::dwMajorVersion != 2){
 		std::cout << "Not supported items.otb version." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
-	
+
 	if(Items::dwMajorVersion == 0xFFFFFFFF){
 		std::cout << "[Warning] Items::loadFromOtb items.otb using generic client version." << std::endl;
 	}
@@ -196,7 +196,7 @@ int Items::loadFromOtb(std::string file)
 		std::cout << "Not supported items.otb client version." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
-	
+
 	node = f.getChildNode(node, type);
 
 	while(node != NO_NODE){
@@ -204,7 +204,7 @@ int Items::loadFromOtb(std::string file)
 		if(!f.getProps(node,props)){
 			return f.getError();
 		}
-			
+
 		flags_t flags;
 		ItemType* iType = new ItemType();
 		iType->group = (itemgroup_t)type;
@@ -254,7 +254,7 @@ int Items::loadFromOtb(std::string file)
 			iType->canReadText = true;
 		}
 
-		
+
 		attribute_t attrib;
 		datasize_t datalen = 0;
 		while(props.GET_VALUE(attrib)){
@@ -268,14 +268,14 @@ int Items::loadFromOtb(std::string file)
 			{
 				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
-				
-				uint16_t serverid;				
+
+				uint16_t serverid;
 				if(!props.GET_USHORT(serverid))
 					return ERROR_INVALID_FORMAT;
-				
+
 				if(serverid > 20000)
 					return ERROR_INVALID_FORMAT;
-						
+
 				iType->id = serverid;
 				break;
 			}
@@ -287,7 +287,7 @@ int Items::loadFromOtb(std::string file)
 				uint16_t clientid;
 				if(!props.GET_USHORT(clientid))
 					return ERROR_INVALID_FORMAT;
-				
+
 				iType->clientId = clientid;
 				break;
 			}
@@ -295,11 +295,11 @@ int Items::loadFromOtb(std::string file)
 			{
 				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
-				
+
 				uint16_t speed;
 				if(!props.GET_USHORT(speed))
 					return ERROR_INVALID_FORMAT;
-				
+
 				iType->speed = speed;
 
 				break;
@@ -312,7 +312,7 @@ int Items::loadFromOtb(std::string file)
 				lightBlock2* lb2;
 				if(!props.GET_STRUCT(lb2))
 					return ERROR_INVALID_FORMAT;
-			
+
 				iType->lightLevel = lb2->lightLevel;
 				iType->lightColor = lb2->lightColor;
 				break;
@@ -321,11 +321,11 @@ int Items::loadFromOtb(std::string file)
 			{
 				if(datalen != sizeof(uint8_t))
 					return ERROR_INVALID_FORMAT;
-				
+
 				uint8_t v;
 				if(!props.GET_UCHAR(v))
 					return ERROR_INVALID_FORMAT;
-					
+
 				iType->alwaysOnTopOrder = v;
 				break;
 			}
@@ -339,11 +339,11 @@ int Items::loadFromOtb(std::string file)
 
 		reverseItemMap[iType->clientId] = iType->id;
 
-		// store the found item	 
-		items.addElement(iType, iType->id);		
+		// store the found item
+		items.addElement(iType, iType->id);
 		node = f.getNextNode(node, type);
 	}
-	
+
 	return ERROR_NONE;
 }
 
@@ -359,7 +359,7 @@ bool Items::loadFromXml(const std::string& datadir)
 
 	if(doc){
 		xmlNodePtr root = xmlDocGetRootElement(doc);
-		
+
 		if(xmlStrcmp(root->name,(const xmlChar*)"items") != 0){
 			xmlFreeDoc(doc);
 			return false;
@@ -388,7 +388,7 @@ bool Items::loadFromXml(const std::string& datadir)
 					if(readXMLString(itemNode, "article", strValue)){
 						it.article = strValue;
 					}
-					
+
 					if(readXMLString(itemNode, "plural", strValue)){
 						it.pluralName = strValue;
 					}
@@ -581,89 +581,9 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(strcasecmp(strValue.c_str(), "shootType") == 0){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(strcasecmp(strValue.c_str(), "spear") == 0){
-										it.shootType = SHOOT_SPEAR;
-									}
-									else if(strcasecmp(strValue.c_str(), "bolt") == 0){
-										it.shootType = SHOOT_BOLT;
-									}
-									else if(strcasecmp(strValue.c_str(), "arrow") == 0){
-										it.shootType = SHOOT_ARROW;
-									}
-									else if(strcasecmp(strValue.c_str(), "fire") == 0){
-										it.shootType = SHOOT_FIRE;
-									}
-									else if(strcasecmp(strValue.c_str(), "energy") == 0){
-										it.shootType = SHOOT_ENERGY;
-									}
-									else if(strcasecmp(strValue.c_str(), "poisonarrow") == 0){
-										it.shootType = SHOOT_POISONARROW;
-									}
-									else if(strcasecmp(strValue.c_str(), "burstarrow") == 0){
-										it.shootType = SHOOT_BURSTARROW;
-									}
-									else if(strcasecmp(strValue.c_str(), "throwingstar") == 0){
-										it.shootType = SHOOT_THROWINGSTAR;
-									}
-									else if(strcasecmp(strValue.c_str(), "throwingknife") == 0){
-										it.shootType = SHOOT_THROWINGKNIFE;
-									}
-									else if(strcasecmp(strValue.c_str(), "smallstone") == 0){
-										it.shootType = SHOOT_SMALLSTONE;
-									}
-									else if(strcasecmp(strValue.c_str(), "suddendeath") == 0){
-										it.shootType = SHOOT_SUDDENDEATH;
-									}
-									else if(strcasecmp(strValue.c_str(), "largerock") == 0){
-										it.shootType = SHOOT_LARGEROCK;
-									}
-									else if(strcasecmp(strValue.c_str(), "snowball") == 0){
-										it.shootType = SHOOT_SNOWBALL;
-									}
-									else if(strcasecmp(strValue.c_str(), "powerbolt") == 0){
-										it.shootType = SHOOT_POWERBOLT;
-									}
-									else if(strcasecmp(strValue.c_str(), "poison") == 0){
-										it.shootType = SHOOT_POISONFIELD;
-									}
-									else if(strcasecmp(strValue.c_str(), "infernalbolt") == 0){
-										it.shootType = SHOOT_INFERNALBOLT;
-									}
-									else if(strcasecmp(strValue.c_str(), "huntingspear") == 0){
-										it.shootType = SHOOT_HUNTINGSPEAR;
-									}
-									else if(strcasecmp(strValue.c_str(), "enchantedspear") == 0){
-										it.shootType = SHOOT_ENCHANTEDSPEAR;
-									}
-									else if(strcasecmp(strValue.c_str(), "redstar") == 0){
-										it.shootType = SHOOT_REDSTAR;
-									}
-									else if(strcasecmp(strValue.c_str(), "greenstar") == 0){
-										it.shootType = SHOOT_GREENSTAR;
-									}
-									else if(strcasecmp(strValue.c_str(), "royalspear") == 0){
-										it.shootType = SHOOT_ROYALSPEAR;
-									}
-									else if(strcasecmp(strValue.c_str(), "sniperarrow") == 0){
-										it.shootType = SHOOT_SNIPERARROW;
-									}
-									else if(strcasecmp(strValue.c_str(), "onyxarrow") == 0){
-										it.shootType = SHOOT_ONYXARROW;
-									}
-									else if(strcasecmp(strValue.c_str(), "piercingbolt") == 0){
-										it.shootType = SHOOT_PIERCINGBOLT;
-									}
-									else if(strcasecmp(strValue.c_str(), "whirlwindsword") == 0){
-										it.shootType = SHOOT_WHIRLWINDSWORD;
-									}
-									else if(strcasecmp(strValue.c_str(), "whirlwindaxe") == 0){
-										it.shootType = SHOOT_WHIRLWINDAXE;
-									}
-									else if(strcasecmp(strValue.c_str(), "whirlwindclub") == 0){
-										it.shootType = SHOOT_WHIRLWINDCLUB;
-									}
-									else if(strcasecmp(strValue.c_str(), "etherealspear") == 0){
-										it.shootType = SHOOT_ETHEREALSPEAR;
+									ShootType_t shoot = getShootType(strValue);
+									if(shoot != NM_SHOOT_UNK){
+										it.shootType = shoot;
 									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown shootType " << strValue  << std::endl;
@@ -671,114 +591,13 @@ bool Items::loadFromXml(const std::string& datadir)
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "effect") == 0){
-                                if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(strcasecmp(strValue.c_str(), "blood") == 0){
-										it.magicEffect = NM_ME_DRAW_BLOOD;
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									MagicEffectClasses effect = getMagicEffect(strValue);
+									if(effect != NM_ME_UNK){
+										it.magicEffect = effect;
 									}
-									else if(strcasecmp(strValue.c_str(), "loseenergy") == 0){
-										it.magicEffect = NM_ME_LOSE_ENERGY;
-									}
-									else if(strcasecmp(strValue.c_str(), "poff") == 0){
-										it.magicEffect = NM_ME_PUFF;
-									}
-									else if(strcasecmp(strValue.c_str(), "blockhit") == 0){
-										it.magicEffect = NM_ME_BLOCKHIT;
-									}
-									else if(strcasecmp(strValue.c_str(), "explosionarea") == 0){
-										it.magicEffect = NM_ME_EXPLOSION_AREA;
-									}
-									else if(strcasecmp(strValue.c_str(), "explosion") == 0){
-										it.magicEffect = NM_ME_EXPLOSION_DAMAGE;
-									}
-									else if(strcasecmp(strValue.c_str(), "firearea") == 0){
-										it.magicEffect = NM_ME_FIRE_AREA;
-									}
-									else if(strcasecmp(strValue.c_str(), "yellowrings") == 0){
-										it.magicEffect = NM_ME_YELLOW_RINGS;
-									}
-									else if(strcasecmp(strValue.c_str(), "greenrings") == 0){
-										it.magicEffect = NM_ME_POISON_RINGS;
-									}
-									else if(strcasecmp(strValue.c_str(), "greysparks") == 0){
-										it.magicEffect = NM_ME_HIT_AREA;
-									}
-									else if(strcasecmp(strValue.c_str(), "energyarea") == 0){
-										it.magicEffect = NM_ME_ENERGY_AREA;
-									}
-									else if(strcasecmp(strValue.c_str(), "energy") == 0){
-										it.magicEffect = NM_ME_ENERGY_DAMAGE;
-									}
-									else if(strcasecmp(strValue.c_str(), "magicblue") == 0){
-										it.magicEffect = NM_ME_MAGIC_ENERGY;
-									}
-									else if(strcasecmp(strValue.c_str(), "magicred") == 0){
-										it.magicEffect = NM_ME_MAGIC_BLOOD;
-									}
-									else if(strcasecmp(strValue.c_str(), "magicgreen") == 0){
-										it.magicEffect = NM_ME_MAGIC_POISON;
-									}
-									else if(strcasecmp(strValue.c_str(), "fire") == 0){
-										it.magicEffect = NM_ME_HITBY_FIRE;
-									}
-									else if(strcasecmp(strValue.c_str(), "poison") == 0){
-										it.magicEffect = NM_ME_POISON;
-									}
-									else if(strcasecmp(strValue.c_str(), "mortarea") == 0){
-										it.magicEffect = NM_ME_MORT_AREA;
-									}
-									else if(strcasecmp(strValue.c_str(), "greensound") == 0){
-										it.magicEffect = NM_ME_SOUND_GREEN;
-									}
-									else if(strcasecmp(strValue.c_str(), "redsound") == 0){
-										it.magicEffect = NM_ME_SOUND_RED;
-									}
-									else if(strcasecmp(strValue.c_str(), "greenpoff") == 0){
-										it.magicEffect = NM_ME_POISON_AREA;
-									}
-									else if(strcasecmp(strValue.c_str(), "yellowsound") == 0){
-										it.magicEffect = NM_ME_SOUND_YELLOW;
-									}
-									else if(strcasecmp(strValue.c_str(), "purplesound") == 0){
-										it.magicEffect = NM_ME_SOUND_PURPLE;
-									}
-									else if(strcasecmp(strValue.c_str(), "whitesound") == 0){
-										it.magicEffect = NM_ME_SOUND_WHITE;
-									}
-									else if(strcasecmp(strValue.c_str(), "bluesound") == 0){
-										it.magicEffect = NM_ME_SOUND_BLUE;
-									}
-									else if(strcasecmp(strValue.c_str(), "bubbles") == 0){
-										it.magicEffect = NM_ME_BUBBLES;
-									}
-									else if(strcasecmp(strValue.c_str(), "dice") == 0){
-										it.magicEffect = NM_ME_CRAPS;
-									}
-									else if(strcasecmp(strValue.c_str(), "giftwraps") == 0){
-										it.magicEffect = NM_ME_GIFT_WRAPS;
-									}
-									else if(strcasecmp(strValue.c_str(), "yellowfireworks") == 0){
-										it.magicEffect = NM_ME_FIREWORK_YELLOW;
-									}
-									else if(strcasecmp(strValue.c_str(), "redfireworks") == 0){
-										it.magicEffect = NM_ME_FIREWORK_RED;
-									}
-									else if(strcasecmp(strValue.c_str(), "bluefireworks") == 0){
-										it.magicEffect = NM_ME_FIREWORK_BLUE;
-									}
-									else if(strcasecmp(strValue.c_str(), "stun") == 0){
-										it.magicEffect = NM_ME_STUN;
-									}
-									else if(strcasecmp(strValue.c_str(), "sleep") == 0){
-										it.magicEffect = NM_ME_SLEEP;
-									}
-                                    else if(strcasecmp(strValue.c_str(), "watercreature") == 0){
-										it.magicEffect = NM_ME_WATERCREATURE;
-									}
-									else if(strcasecmp(strValue.c_str(), "groundshaker") == 0){
-										it.magicEffect = NM_ME_GROUNDSHAKER;
-									}
-									else if(strcasecmp(strValue.c_str(), "none") == 0){
-										it.magicEffect = NM_ME_NONE;
+									else{
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown effect " << strValue  << std::endl;
 									}
 								}
 							}
@@ -1003,6 +822,9 @@ bool Items::loadFromXml(const std::string& datadir)
 									//	damageCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_PHYSICAL);
 									//	combatType = COMBAT_PHYSICALDAMAGE;
 									//}
+									else{
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown field value " << strValue  << std::endl;
+									}
 
 									if(combatType != COMBAT_NONE){
 										it.combatType = combatType;
@@ -1152,7 +974,7 @@ int32_t Items::getItemIdByName(const std::string& name)
 	return -1;
 }
 
-template<typename A> 
+template<typename A>
 Array<A>::Array(uint32_t n)
 {
 	m_data = (A*)malloc(sizeof(A)*n);
@@ -1160,7 +982,7 @@ Array<A>::Array(uint32_t n)
 	m_size = n;
 }
 
-template<typename A> 
+template<typename A>
 Array<A>::~Array()
 {
 	free(m_data);

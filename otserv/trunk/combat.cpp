@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -81,9 +81,9 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 				{
 					Item* tool = player->getWeapon();
 					const Weapon* weapon = g_weapons->getWeapon(tool);
-					
+
 					min = (int32_t)minb;
-					
+
 					if(weapon){
 						max = (int32_t)(weapon->getWeaponDamage(player, tool, true) * maxa + maxb);
 					}
@@ -263,7 +263,7 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 			return true;
 			break;
 		}
-		
+
 		case COMBATPARAM_DISPEL:
 		{
 			params.dispelType = (ConditionType_t)value;
@@ -470,11 +470,11 @@ void Combat::addDistanceEffect(Creature* caster, const Position& fromPos, const 
 {
 	uint8_t distanceEffect = effect;
 
-	if(distanceEffect == NM_ANI_WEAPONTYPE){
+	if(distanceEffect == NM_SHOOT_WEAPONTYPE){
 		switch(caster->getWeaponType()){
-			case WEAPON_AXE: distanceEffect = NM_ANI_WHIRLWINDAXE; break;
-			case WEAPON_SWORD: distanceEffect = NM_ANI_WHIRLWINDSWORD; break;
-			case WEAPON_CLUB: distanceEffect = NM_ANI_WHIRLWINDCLUB; break;
+			case WEAPON_AXE: distanceEffect = NM_SHOOT_WHIRLWINDAXE; break;
+			case WEAPON_SWORD: distanceEffect = NM_SHOOT_WHIRLWINDSWORD; break;
+			case WEAPON_CLUB: distanceEffect = NM_SHOOT_WHIRLWINDCLUB; break;
 
 			default: distanceEffect = NM_ME_NONE; break;
 		}
@@ -500,7 +500,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 
 	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
 		bool bContinue = true;
-		
+
 		if(canDoCombat(caster, *it, params.isAggressive) == RET_NOERROR){
 			for(CreatureVector::iterator cit = (*it)->creatures.begin(); bContinue && cit != (*it)->creatures.end(); ++cit){
 				if(params.targetCasterOrTopMost){
@@ -516,7 +516,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 						continue;
 					}
 				}
-				
+
 				//if((caster != *cit || !params.isAggressive) && (Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
 				if(!params.isAggressive || (caster != *cit && Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
 					func(caster, *cit, params, data);
@@ -647,7 +647,7 @@ void Combat::doCombatCondition(Creature* caster, const Position& pos, const Area
 void Combat::doCombatCondition(Creature* caster, Creature* target, const CombatParams& params)
 {
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
-		CombatConditionFunc(caster, target, params, NULL);	
+		CombatConditionFunc(caster, target, params, NULL);
 
 		if(params.targetCallback){
 			params.targetCallback->onTargetCombat(caster, target);
@@ -672,7 +672,7 @@ void Combat::doCombatDispel(Creature* caster, const Position& pos, const AreaCom
 void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatParams& params)
 {
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
-		CombatDispelFunc(caster, target, params, NULL);	
+		CombatDispelFunc(caster, target, params, NULL);
 
 		if(params.targetCallback){
 			params.targetCallback->onTargetCombat(caster, target);
@@ -716,10 +716,10 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) 
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		lua_State* L = m_scriptInterface->getLuaState();
-	
+
 		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
 			return;
-		
+
 		uint32_t cid = env->addThing(player);
 
 		m_scriptInterface->pushFunction(m_scriptId);
@@ -787,12 +787,12 @@ void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		lua_State* L = m_scriptInterface->getLuaState();
-	
+
 		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
 			return;
-		
+
 		uint32_t cid = 0;
-	
+
 		if(creature){
 			cid = env->addThing(creature);
 		}
@@ -820,12 +820,12 @@ void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		lua_State* L = m_scriptInterface->getLuaState();
-	
+
 		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
 			return;
-		
+
 		uint32_t cid = 0;
-	
+
 		if(creature){
 			cid = env->addThing(creature);
 		}
@@ -891,7 +891,7 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 
 	for(size_t y = 0; y < rows; ++y){
 		for(size_t x = 0; x < cols; ++x){
-			
+
 			if(area->getValue(y, x) != 0){
 				if(g_game.map->isViewClear(targetPos, tmpPos, true)){
 					tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
@@ -944,7 +944,7 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 				(*output)[y][rx++] = (*input)[y][x];
 			}
 		}
-		
+
 		output->setCenter(centerY, (input->getRows() - 1) - centerX);
 	}
 	else if(op == MATRIXOPERATION_FLIP){
@@ -989,7 +989,7 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 		float b = -std::sin(angleRad);
 		float c = std::sin(angleRad);
 		float d = std::cos(angleRad);
-		
+
 		for(int32_t x = 0; x < (int32_t)input->getCols(); ++x){
 			for(int32_t y = 0; y < (int32_t)input->getRows(); ++y){
 				//calculate new coordinates using rotation center
@@ -1021,7 +1021,7 @@ MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, uint32_t row
 		if(*it == 1 || *it == 3){
 			area->setValue(y, x, true);
 		}
-		
+
 		if(*it == 2 || *it == 3){
 			area->setCenter(y, x);
 		}
@@ -1068,7 +1068,7 @@ void AreaCombat::setupArea(int32_t length, int32_t spread)
 
 	uint32_t rows = length;
 	int32_t cols = 1;
-	
+
 	if(spread != 0){
 		cols = ((length - length % spread) / spread) * 2 + 1;
 	}

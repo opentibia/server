@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -118,7 +118,7 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 	if(highest_number == lowest_number){
 		return lowest_number;
 	}
-	
+
 	if(lowest_number > highest_number){
 		int nTmp = highest_number;
 		highest_number = lowest_number;
@@ -126,7 +126,7 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 	}
 
 	int range = highest_number - lowest_number;
-	
+
 	if(type == DISTRO_NORMAL){
 		int r = rand24b() % (range + 1);
 		return lowest_number + r;
@@ -145,11 +145,11 @@ void hexdump(unsigned char *_data, int _len) {
 			fprintf(stderr, "%02x ", _data[i]);
 		for(; i < 16; i++)
 			fprintf(stderr, "   ");
-		
+
 		fprintf(stderr, " ");
 		for(i = 0; i < 16 && i < _len; i++)
 			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
-		
+
 		fprintf(stderr, "\n");
 	}
 }
@@ -235,3 +235,101 @@ void formatDate2(time_t time, char* buffer)
 	}
 }
 
+struct MagicEffectNames{
+	char* name;
+	MagicEffectClasses effect;
+};
+
+struct ShootTypeNames{
+	char* name;
+	ShootType_t shoot;
+};
+
+MagicEffectNames magicEffectNames[] = {
+	{"redspark", NM_ME_DRAW_BLOOD},
+	{"bluebubble", NM_ME_LOSE_ENERGY},
+	{"poff", NM_ME_PUFF},
+	{"yellowspark", NM_ME_BLOCKHIT},
+	{"explosionarea", NM_ME_EXPLOSION_AREA},
+	{"explosion", NM_ME_EXPLOSION_DAMAGE},
+	{"firearea", NM_ME_FIRE_AREA},
+	{"yellowbubble", NM_ME_YELLOW_RINGS},
+	{"greenbubble", NM_ME_POISON_RINGS},
+	{"blackspark", NM_ME_HIT_AREA},
+	{"energyarea", NM_ME_ENERGY_AREA},
+	{"energy", NM_ME_ENERGY_DAMAGE},
+	{"blueshimmer", NM_ME_MAGIC_ENERGY},
+	{"redshimmer", NM_ME_MAGIC_BLOOD},
+	{"greenshimmer", NM_ME_MAGIC_POISON},
+	{"fire", NM_ME_HITBY_FIRE},
+	{"greenspark", NM_ME_POISON},
+	{"mortarea", NM_ME_MORT_AREA},
+	{"greennote", NM_ME_SOUND_GREEN},
+	{"rednote", NM_ME_SOUND_RED},
+	{"poison", NM_ME_POISON_AREA},
+	{"yellownote", NM_ME_SOUND_YELLOW},
+	{"purplenote", NM_ME_SOUND_PURPLE},
+	{"bluenote", NM_ME_SOUND_BLUE},
+	{"whitenote", NM_ME_SOUND_WHITE},
+	{"bubbles", NM_ME_BUBBLES},
+	{"dice", NM_ME_CRAPS},
+	{"giftwraps", NM_ME_GIFT_WRAPS},
+	{"yellowfirework", NM_ME_FIREWORK_YELLOW},
+	{"redfirework", NM_ME_FIREWORK_RED},
+	{"bluefirework", NM_ME_FIREWORK_BLUE},
+	{"stun", NM_ME_STUN},
+	{"sleep", NM_ME_SLEEP},
+	{"watercreature", NM_ME_WATERCREATURE},
+	{"groundshaker", NM_ME_GROUNDSHAKER}
+};
+
+ShootTypeNames shootTypeNames[] = {
+	{"spear", NM_SHOOT_SPEAR},
+	{"bolt", NM_SHOOT_BOLT},
+	{"arrow", NM_SHOOT_ARROW},
+	{"fire", NM_SHOOT_FIRE},
+	{"energy", NM_SHOOT_ENERGY},
+	{"poisonarrow", NM_SHOOT_POISONARROW},
+	{"burstarrow", NM_SHOOT_BURSTARROW},
+	{"throwingstar", NM_SHOOT_THROWINGSTAR},
+	{"throwingknife", NM_SHOOT_THROWINGKNIFE},
+	{"smallstone", NM_SHOOT_SMALLSTONE},
+	{"suddendeath", NM_SHOOT_SUDDENDEATH},
+	{"largerock", NM_SHOOT_LARGEROCK},
+	{"snowball", NM_SHOOT_SNOWBALL},
+	{"powerbolt", NM_SHOOT_POWERBOLT},
+	{"poison", NM_SHOOT_POISONFIELD},
+	{"infernalbolt", NM_SHOOT_INFERNALBOLT},
+	{"huntingspear", NM_SHOOT_HUNTINGSPEAR},
+	{"enchantedspear", NM_SHOOT_ENCHANTEDSPEAR},
+	{"redstar", NM_SHOOT_REDSTAR},
+	{"greenstar", NM_SHOOT_GREENSTAR},
+	{"royalspear", NM_SHOOT_ROYALSPEAR},
+	{"sniperarrow", NM_SHOOT_SNIPERARROW},
+	{"onyxarrow", NM_SHOOT_ONYXARROW},
+	{"piercingbolt", NM_SHOOT_PIERCINGBOLT},
+	{"whirlwindsword", NM_SHOOT_WHIRLWINDSWORD},
+	{"whirlwindaxe", NM_SHOOT_WHIRLWINDAXE},
+	{"whirlwindclub", NM_SHOOT_WHIRLWINDCLUB},
+	{"etherealspear", NM_SHOOT_ETHEREALSPEAR}
+};
+
+MagicEffectClasses getMagicEffect(const std::string& strValue)
+{
+	for(uint32_t i = 0; i < sizeof(magicEffectNames)/sizeof(MagicEffectNames); ++i){
+		if(strValue == magicEffectNames[i].name){
+			return magicEffectNames[i].effect;
+		}
+	}
+	return NM_ME_UNK;
+}
+
+ShootType_t getShootType(const std::string& strValue)
+{
+	for(uint32_t i = 0; i < sizeof(shootTypeNames)/sizeof(ShootTypeNames); ++i){
+		if(strValue == shootTypeNames[i].name){
+			return shootTypeNames[i].shoot;
+		}
+	}
+	return NM_SHOOT_UNK;
+}
