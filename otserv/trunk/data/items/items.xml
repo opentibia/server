@@ -781,13 +781,13 @@
 	</item>
 	<item id="480" article="a" name="hole">
 	</item>
-	<item id="481" article="a" name="lose stone pile">
+	<item id="481" article="a" name="loose stone pile">
 	</item>
 	<item id="482" article="a" name="hole">
 		<attribute key="decayTo" value="481"/>
 		<attribute key="duration" value="300"/>
 	</item>
-	<item id="483" article="a" name="lose ice pile">
+	<item id="483" article="a" name="loose ice pile">
 	</item>
 	<item id="484" article="a" name="hole">
 		<attribute key="decayTo" value="483"/>
