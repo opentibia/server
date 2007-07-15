@@ -781,13 +781,13 @@
 	</item>
 	<item id="480" article="a" name="hole">
 	</item>
-	<item id="481" article="a" name="loose stone pile">
+	<item id="481" article="a" name="lose stone pile">
 	</item>
 	<item id="482" article="a" name="hole">
 		<attribute key="decayTo" value="481"/>
 		<attribute key="duration" value="300"/>
 	</item>
-	<item id="483" article="a" name="loose ice pile">
+	<item id="483" article="a" name="lose ice pile">
 	</item>
 	<item id="484" article="a" name="hole">
 		<attribute key="decayTo" value="483"/>
@@ -808,17 +808,17 @@
 	<item id="490" name="water">
 		<attribute key="description" value="You see the silvery movement of fish."/>
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="491" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="492" name="water">
 		<attribute key="decayTo" value="490"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="493" name="water">
 	</item>
@@ -1048,19 +1048,19 @@
 	</item>
 	<item id="602" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="603" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="604" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="605" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="606" name="water">
 	</item>
@@ -1088,51 +1088,51 @@
 	</item>
 	<item id="618" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="619" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="620" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="621" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="622" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="623" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="624" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="625" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="626" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="627" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="628" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="629" name="water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="630" name="water">
 	</item>
@@ -3015,19 +3015,16 @@
 	</item>
 	<item id="1497" article="a" name="magic wall">
 		<attribute key="type" value="magicfield"/>
-		<attribute key="field" value="block"/>
 	</item>
 	<item id="1498" article="a" name="magic wall">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="20"/>
-		<attribute key="field" value="block"/>
 	</item>
 	<item id="1499" article="a" name="rush wood">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="45"/>
-		<attribute key="field" value="block"/>
 	</item>
 	<item id="1500" article="a" name="fire field">
 		<attribute key="type" value="magicfield"/>
@@ -3079,7 +3076,6 @@
 	<item id="1505" name="smoke">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
-		<attribute key="field" value="smoke"/>
 	</item>
 	<item id="1506" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
@@ -3104,7 +3100,6 @@
 		<attribute key="decayTo" value="1506"/>
 		<attribute key="duration" value="5"/>
 		<attribute key="replaceable" value="0"/>
-		<attribute key="field" value="smoke"/>
 	</item>
 	<item id="1509" name="lava">
 	</item>
@@ -12443,11 +12438,11 @@
 	</item>
 	<item id="4608" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4609" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4610" name="shallow water">
 		<attribute key="decayTo" value="4608"/>
@@ -12455,63 +12450,63 @@
 	</item>
 	<item id="4611" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4612" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4613" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4614" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4615" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4616" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4617" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4618" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4619" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4620" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4621" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4622" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4623" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4624" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4625" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4626" name="">
 	</item>
@@ -12591,15 +12586,15 @@
 	</item>
 	<item id="4664" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4665" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4666" name="shallow water">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="loseEnergy"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4667" name="dirt">
 	</item>
@@ -12651,91 +12646,91 @@
 	</item>
 	<item id="4691" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4692" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4693" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4694" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4695" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4696" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4697" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4698" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4699" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4700" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4701" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4702" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4703" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4704" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4705" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4706" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4707" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4708" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4709" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4710" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4711" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4712" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4713" name="swamp">
 	</item>
@@ -12811,31 +12806,31 @@
 	</item>
 	<item id="4749" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4750" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4751" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4752" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4753" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4754" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4755" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4756" name="grass">
 	</item>
@@ -12843,7 +12838,7 @@
 	</item>
 	<item id="4758" name="swamp">
 		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenRings"/>
+		<attribute key="effect" value="greenbubble"/>
 	</item>
 	<item id="4759" name="rocks">
 	</item>
