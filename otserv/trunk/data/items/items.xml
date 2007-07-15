@@ -5778,7 +5778,7 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="2377" article="a" name="two-handed sword">
+	<item id="2377" article="a" name="two handed sword">
 		<attribute key="weight" value="7000"/>
 		<attribute key="defense" value="25"/>
 		<attribute key="attack" value="30"/>
@@ -17574,7 +17574,7 @@
 	<item id="6553" article="a" name="ruthless axe">
 		<attribute key="weight" value="5800"/>
 		<attribute key="defense" value="15"/>
-		<attribute key="attack" value="49"/>
+		<attribute key="attack" value="50"/>
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
@@ -19525,8 +19525,12 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="7386" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7386" article="a" name="mercenary sword">
+		<attribute key="weight" value="6800"/>
+		<attribute key="defense" value="27"/>
+		<attribute key="attack" value="43"/>
+		<attribute key="weaponType" value="sword"/>
+		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="7387" article="a" name="diamond sceptre">
 		<attribute key="weight" value="1500"/>
@@ -19606,7 +19610,7 @@
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7406" article="a" name="blacksteel sword">
-		<attribute key="weight" value="5600"/> <!-- ? -->
+		<attribute key="weight" value="5900"/>
 		<attribute key="defense" value="22"/>
 		<attribute key="attack" value="42"/>
 		<attribute key="weaponType" value="sword"/>
@@ -19739,7 +19743,7 @@
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7434" article="a" name="royal axe">
-		<attribute key="weight" value="5500"/> <!-- ? -->
+		<attribute key="weight" value="9200"/>
 		<attribute key="defense" value="25"/>
 		<attribute key="attack" value="47"/>
 		<attribute key="weaponType" value="axe"/>
@@ -19847,8 +19851,10 @@
 	<item id="7458" name="">
 		<attribute key="weight" value="0"/>
 	</item>
-	<item id="7459" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7459" name="earmuffs">
+		<attribute key="weight" value="500"/>
+		<attribute key="armor" value="0"/>
+		<attribute key="slotType" value="head"/>
 	</item>
 	<item id="7460" name="">
 		<attribute key="weight" value="0"/>
