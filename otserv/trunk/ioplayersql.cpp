@@ -130,6 +130,10 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		}
 	}
 
+	player->lossPercent[LOSS_EXPERIENCE] = result.getDataInt("loss_experience");
+	player->lossPercent[LOSS_MANASPENT] = result.getDataInt("loss_mana");
+	player->lossPercent[LOSS_SKILLTRIES] = result.getDataInt("loss_skills");
+
 	player->loginPosition.x = result.getDataInt("posx");
 	player->loginPosition.y = result.getDataInt("posy");
 	player->loginPosition.z = result.getDataInt("posz");
@@ -455,7 +459,10 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`sex` = " << player->sex << ", ";
 	query << "`lastlogin` = " << player->lastlogin << ", ";
 	query << "`lastip` = " << player->lastip << ", ";
-	query << "`conditions` = '" << Database::escapeString(conditions, conditionsSize) << "' ";
+	query << "`conditions` = '" << Database::escapeString(conditions, conditionsSize) << "', ";
+	query << "`loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE) << ", ";
+	query << "`loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT) << ", ";
+	query << "`loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES) << " ";
 
 #ifdef __SKULLSYSTEM__
 	int32_t redSkullTime = 0;

@@ -849,6 +849,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
 	//getPlayerFlagValue(cid, flag)
 	lua_register(m_luaState, "getPlayerFlagValue", LuaScriptInterface::luaGetPlayerFlagValue);
+	//getPlayerLossPercent(cid, lossType)
+	lua_register(m_luaState, "getPlayerLossPercent", LuaScriptInterface::luaGetPlayerLossPercent);
 
 	//playerLearnInstantSpell(cid, name)
 	lua_register(m_luaState, "playerLearnInstantSpell", LuaScriptInterface::luaPlayerLearnInstantSpell);
@@ -963,6 +965,9 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doPlayerRemOutfit", LuaScriptInterface::luaDoPlayerRemOutfit);
 	//doSetCreatureLight(cid, lightLevel, lightColor, time)
 	lua_register(m_luaState, "doSetCreatureLight", LuaScriptInterface::luaDoSetCreatureLight);
+	//doPlayerSetLossPercent(cid, lossType, newPercent)
+	lua_register(m_luaState, "doPlayerSetLossPercent", LuaScriptInterface::luaDoPlayerSetLossPercent);
+
 
 	//isPlayer(cid)
 	lua_register(m_luaState, "isPlayer", LuaScriptInterface::luaIsPlayer);
@@ -1881,12 +1886,71 @@ int LuaScriptInterface::luaGetPlayerSkill(lua_State *L)
 
 	const Player* player = env->getPlayerByUID(cid);
 	if(player){
-		if(skillid <= 6){
+		if(skillid <= SKILL_LAST){
 			uint32_t value = player->skills[skillid][SKILL_LEVEL];
 			lua_pushnumber(L, value);
 		}
 		else{
 			reportErrorFunc("No valid skillId");
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerLossPercent(lua_State *L)
+{
+	//getPlayerLossPercent(cid, lossType)
+	uint8_t lossType = (uint8_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	const Player* player = env->getPlayerByUID(cid);
+	if(player){
+	    if(lossType <= LOSS_LAST){
+			uint32_t value = player->getLossPercent((lossTypes_t)lossType);
+			lua_pushnumber(L, value);
+		}
+		else{
+			reportErrorFunc("No valid lossType");
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSetLossPercent(lua_State *L)
+{
+	//DoPlayerSetLossPercent(cid, lossType, newPercent)
+	uint32_t newPercent = popNumber(L);
+	uint8_t lossType = (uint8_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(lossType <= LOSS_LAST){
+			if(newPercent <= 100){
+				player->setLossPercent((lossTypes_t)lossType, newPercent);
+				lua_pushnumber(L, LUA_NO_ERROR);
+			}
+			else{
+                reportErrorFunc("lossPercent value higher than 100");
+                lua_pushnumber(L, LUA_ERROR);
+			}
+		}
+		else{
+			reportErrorFunc("No valid lossType");
 			lua_pushnumber(L, LUA_ERROR);
 		}
 	}

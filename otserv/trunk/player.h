@@ -202,6 +202,13 @@ public:
 	void setVarStats(stats_t stat, int32_t modifier);
 	void setConditionSuppressions(uint32_t conditions, bool remove);
 
+	uint32_t getLossPercent(lossTypes_t lossType) const {return lossPercent[lossType];}
+	void setLossPercent(lossTypes_t lossType, uint32_t newPercent)
+	{
+		if(newPercent <= 100)
+			lossPercent[lossType] = newPercent;
+	}
+
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
 	
@@ -552,6 +559,9 @@ protected:
 	//extra stat modifiers
 	int32_t varStats[STAT_LAST + 1];
 
+	//loss percent variables
+	uint32_t lossPercent[LOSS_LAST + 1];
+
 	LearnedInstantSpellList learnedInstantSpellList;
 	
 	ConditionList storedConditionList;
@@ -613,7 +623,7 @@ protected:
 		};
 	}
 
-	virtual int32_t getLostExperience() const { return (int32_t)std::floor(((double)experience * 0.1));}	
+	virtual int32_t getLostExperience() const { return (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100));}
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }

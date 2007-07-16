@@ -336,6 +336,7 @@ protected:
 	static int luaDoPlayerSetGuildRank(lua_State *L);
 	static int luaDoPlayerSetGuildNick(lua_State *L);
 	static int luaDoSetCreatureLight(lua_State *L);
+	static int luaDoPlayerSetLossPercent(lua_State *L);
 
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
@@ -390,6 +391,7 @@ protected:
 	static int luaGetPlayerLookDir(lua_State *L);
 	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerFlagValue(lua_State *L);
+	static int luaGetPlayerLossPercent(lua_State *L);
 
 	static int luaPlayerLearnInstantSpell(lua_State *L);
 	static int luaGetPlayerLearnedInstantSpell(lua_State *L);

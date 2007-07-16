@@ -167,6 +167,18 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			player->lastLoginSaved = 0;
 
+		if(readXMLInteger(root, "loss_experience", intValue)){
+			player->lossPercent[LOSS_EXPERIENCE] = intValue;
+		}
+
+		if(readXMLInteger(root, "loss_mana", intValue)){
+            player->lossPercent[LOSS_MANASPENT] = intValue;
+		}
+
+		if(readXMLInteger(root, "loss_skills", intValue)){
+            player->lossPercent[LOSS_SKILLTRIES] = intValue;
+		}
+
 		p = root->children;
 
 		while(p){
@@ -649,6 +661,18 @@ bool IOPlayerXML::savePlayer(Player* player)
 	sb.str("");
 	sb << player->lastlogin;
 	xmlSetProp(root, (const xmlChar*)"lastlogin", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->lossPercent[LOSS_EXPERIENCE];
+	xmlSetProp(root, (const xmlChar*)"loss_experience", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->lossPercent[LOSS_MANASPENT];
+	xmlSetProp(root, (const xmlChar*)"loss_mana", (const xmlChar*)sb.str().c_str());
+
+	sb.str("");
+	sb << player->lossPercent[LOSS_SKILLTRIES];
+	xmlSetProp(root, (const xmlChar*)"loss_skills", (const xmlChar*)sb.str().c_str());
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"spawn");
 

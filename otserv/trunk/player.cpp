@@ -135,6 +135,10 @@ Creature()
 		varStats[i] = 0;
 	}
 
+	for(int32_t i = LOSS_FIRST; i <= LOSS_LAST; ++i){
+		lossPercent[i] = 10;
+	}
+
 	maxDepotLimit = 1000;
 	maxVipLimit = 50;
 	groupFlags = 0;
@@ -1714,7 +1718,7 @@ void Player::onDie()
 
 	sumMana += manaSpent;
 
-	lostMana = (int32_t)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
+	lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
 
 	while(lostMana > manaSpent){
 		lostMana -= manaSpent;
@@ -1737,7 +1741,7 @@ void Player::onDie()
 		}
 
 		sumSkillTries += skills[i][SKILL_TRIES];
-		lostSkillTries = (uint32_t)(sumSkillTries * 0.1);           //player loses 10% of his skill tries
+		lostSkillTries = (uint32_t)std::ceil(sumSkillTries * ((double)lossPercent[LOSS_SKILLTRIES]/100));
 
 		while(lostSkillTries > skills[i][SKILL_TRIES]){
 			lostSkillTries -= skills[i][SKILL_TRIES];
