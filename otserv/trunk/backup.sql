@@ -1,15 +1,15 @@
 CREATE TABLE "accounts" (
     "id" INTEGER  PRIMARY KEY NOT NULL,
     "password" VARCHAR(255) NOT NULL,
-    "email" VARCHAR(255) DEFAULT '' NOT NULL,
-    "blocked" BOOLEAN DEFAULT FALSE NOT NULL,
-    "premdays" INTEGER DEFAULT 0 NOT NULL
+    "email" VARCHAR(255) NOT NULL DEFAULT '',
+    "blocked" BOOLEAN NOT NULL DEFAULT FALSE,
+    "premdays" INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "groups" (
     "id" INTEGER PRIMARY KEY,
     "name" VARCHAR(255) NOT NULL,
-    "flags" INTEGER DEFAULT 0 NOT NULL,
+    "flags" INTEGER NOT NULL DEFAULT 0,
     "access" INTEGER NOT NULL,
     "maxdepotitems" INTEGER NOT NULL,
     "maxviplist" INTEGER NOT NULL
@@ -20,37 +20,40 @@ CREATE TABLE "players" (
     "name" VARCHAR(255) NOT NULL,
     "account_id" INTEGER NOT NULL,
     "group_id" INTEGER NOT NULL,
-    "sex" INTEGER DEFAULT 0 NOT NULL,
-    "vocation" INTEGER DEFAULT 0 NOT NULL,
-    "experience" INTEGER DEFAULT 0 NOT NULL,
-    "level" INTEGER DEFAULT 1 NOT NULL,
-    "maglevel" INTEGER DEFAULT 0 NOT NULL,
-    "health" INTEGER DEFAULT 100 NOT NULL,
-    "healthmax" INTEGER DEFAULT 100 NOT NULL,
-    "mana" INTEGER DEFAULT 100 NOT NULL,
-    "manamax" INTEGER DEFAULT 100 NOT NULL,
-    "manaspent" INTEGER DEFAULT 0 NOT NULL,
-    "soul" INTEGER DEFAULT 0 NOT NULL,
-    "direction" INTEGER DEFAULT 0 NOT NULL,
-    "lookbody" INTEGER DEFAULT 136 NOT NULL,
-    "lookfeet" INTEGER DEFAULT 10 NOT NULL,
-    "lookhead" INTEGER DEFAULT 10 NOT NULL,
-    "looklegs" INTEGER DEFAULT 10 NOT NULL,
-    "looktype" INTEGER DEFAULT 10 NOT NULL,
-    "lookaddons" INTEGER DEFAULT 0 NOT NULL,
-    "posx" INTEGER DEFAULT 0 NOT NULL,
-    "posy" INTEGER DEFAULT 0 NOT NULL,
-    "posz" INTEGER DEFAULT 0 NOT NULL,
-    "cap" INTEGER DEFAULT 0 NOT NULL,
-    "lastlogin" INTEGER DEFAULT 0 NOT NULL,
-    "lastip" INTEGER DEFAULT 0 NOT NULL,
-    "save" BOOLEAN DEFAULT TRUE NOT NULL,
+    "sex" INTEGER NOT NULL DEFAULT 0,
+    "vocation" INTEGER NOT NULL DEFAULT 0,
+    "experience" INTEGER NOT NULL DEFAULT 0,
+    "level" INTEGER NOT NULL DEFAULT 1,
+    "maglevel" INTEGER NOT NULL DEFAULT 0,
+    "health" INTEGER NOT NULL DEFAULT 100,
+    "healthmax" INTEGER NOT NULL DEFAULT 100,
+    "mana" INTEGER NOT NULL DEFAULT 100,
+    "manamax" INTEGER NOT NULL DEFAULT 100,
+    "manaspent" INTEGER NOT NULL DEFAULT 0,
+    "soul" INTEGER NOT NULL DEFAULT 0,
+    "direction" INTEGER NOT NULL DEFAULT 0,
+    "lookbody" INTEGER NOT NULL DEFAULT 10,
+    "lookfeet" INTEGER NOT NULL DEFAULT 10,
+    "lookhead" INTEGER NOT NULL DEFAULT 10,
+    "looklegs" INTEGER NOT NULL DEFAULT 10,
+    "looktype" INTEGER NOT NULL DEFAULT 136,
+    "lookaddons" INTEGER NOT NULL DEFAULT 0,
+    "posx" INTEGER NOT NULL DEFAULT 0,
+    "posy" INTEGER NOT NULL DEFAULT 0,
+    "posz" INTEGER NOT NULL DEFAULT 0,
+    "cap" INTEGER NOT NULL DEFAULT 0,
+    "lastlogin" INTEGER NOT NULL DEFAULT 0,
+    "lastip" INTEGER NOT NULL DEFAULT 0,
+    "save" BOOLEAN NOT NULL DEFAULT TRUE,
     "conditions" BLOB NOT NULL,
-    "redskulltime" INTEGER DEFAULT 0 NOT NULL,
-    "redskull" BOOLEAN DEFAULT FALSE NOT NULL,
-    "guildnick" VARCHAR(255) DEFAULT '' NOT NULL,
+    "redskulltime" INTEGER NOT NULL DEFAULT 0,
+    "redskull" BOOLEAN NOT NULL DEFAULT FALSE,
+    "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
     "rank_id" INTEGER NOT NULL,
     "town_id" INTEGER NOT NULL,
+    "loss_experience" INTEGER NOT NULL DEFAULT 10,
+    "loss_mana" INTEGER NOT NULL DEFAULT 10,
+    "loss_skills" INTEGER NOT NULL DEFAULT 10,
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
 );
@@ -74,7 +77,7 @@ CREATE TABLE "guild_ranks" (
 CREATE TABLE "houses" (
     "id" INTEGER PRIMARY KEY,
     "owner" INTEGER NOT NULL,
-    "paid" INTEGER DEFAULT 0 NOT NULL,
+    "paid" INTEGER NOT NULL DEFAULT 0,
     "warnings" TEXT NOT NULL
 );
 
@@ -87,11 +90,11 @@ CREATE TABLE "house_lists" (
 
 CREATE TABLE "player_depotitems" (
     "player_id" INTEGER NOT NULL,
-    "depotid" INTEGER DEFAULT 0 NOT NULL,
+    "depotid" INTEGER NOT NULL DEFAULT 0,
     "sid" INTEGER NOT NULL,
-    "pid" INTEGER DEFAULT 0 NOT NULL,
+    "pid" INTEGER NOT NULL DEFAULT 0,
     "itemtype" INTEGER NOT NULL,
-    "count" INTEGER DEFAULT 0 NOT NULL,
+    "count" INTEGER NOT NULL DEFAULT 0,
     "attributes" BLOB NOT NULL,
     FOREIGN KEY ("player_id") REFERENCES "players" ("id")
 );
@@ -99,8 +102,8 @@ CREATE TABLE "player_depotitems" (
 CREATE TABLE "player_skills" (
     "player_id" INTEGER NOT NULL,
     "skillid" INTEGER NOT NULL,
-    "value" INTEGER DEFAULT 0 NOT NULL,
-    "count" INTEGER DEFAULT 0 NOT NULL,
+    "value" INTEGER NOT NULL DEFAULT 0,
+    "count" INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY ("player_id") REFERENCES "players" ("id")
 );
 
@@ -128,9 +131,9 @@ CREATE TABLE "tiles" (
 CREATE TABLE "tile_items" (
     "tile_id" INTEGER NOT NULL,
     "sid" INTEGER NOT NULL,
-    "pid" INTEGER DEFAULT 0 NOT NULL,
+    "pid" INTEGER NOT NULL DEFAULT 0,
     "itemtype" INTEGER NOT NULL,
-    "count" INTEGER DEFAULT 0 NOT NULL,
+    "count" INTEGER NOT NULL DEFAULT 0,
     "attributes" BLOB NOT NULL,
     FOREIGN KEY ("tile_id") REFERENCES "tiles" ("id")
 );
@@ -152,12 +155,12 @@ CREATE TABLE "player_spells" (
 );
 
 CREATE TABLE "bans" (
-    "type" INTEGER DEFAULT 0 NOT NULL,
-    "ip" INTEGER DEFAULT 0 NOT NULL,
-    "mask" INTEGER DEFAULT 4294967295 NOT NULL,
-    "player" INTEGER DEFAULT 0 NOT NULL,
-    "account" INTEGER DEFAULT 0 NOT NULL,
-    "time" INTEGER DEFAULT 0 NOT NULL
+    "type" INTEGER NOT NULL DEFAULT 0,
+    "ip" INTEGER NOT NULL DEFAULT 0,
+    "mask" INTEGER NOT NULL DEFAULT 4294967295,
+    "player" INTEGER NOT NULL DEFAULT 0,
+    "account" INTEGER NOT NULL DEFAULT 0,
+    "time" INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TRIGGER "oncreate_guilds"
