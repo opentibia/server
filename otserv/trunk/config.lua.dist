@@ -74,11 +74,19 @@ minactionexinterval = 1000
 -- options: daily, weekly, monthly
 houserentperiod = "monthly"
 
--- rates (experience, skill, magic level and loot)
+-- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
 rate_skill = 1
 rate_mag = 1
 rate_loot = 1
+rate_spawn = 1
+
+-- despawn configs
+-- how many floors can a monster go from his spawn before despawning
+despawnrange = 2
+
+-- how many square metters can a monster be far from his spawn before despawning
+despawnradius = 50
 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
 maxmessagebuffer = 0
