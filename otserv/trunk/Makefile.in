@@ -79,7 +79,7 @@ am__otserv_SOURCES_DIST = ioplayersql.cpp ioplayersql.h \
 	raids.h movement.cpp movement.h combat.cpp combat.h \
 	condition.cpp condition.h weapons.cpp weapons.h talkaction.cpp \
 	talkaction.h vocation.cpp vocation.h scriptmanager.cpp \
-	scriptmanager.h
+	scriptmanager.h creatureevent.cpp creatureevent.h
 @USE_SQL_TRUE@am__objects_1 = ioplayersql.$(OBJEXT) \
 @USE_SQL_TRUE@	ioaccountsql.$(OBJEXT) database.$(OBJEXT) \
 @USE_SQL_TRUE@	iomapserializesql.$(OBJEXT)
@@ -105,7 +105,7 @@ am_otserv_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	admin.$(OBJEXT) baseevents.$(OBJEXT) raids.$(OBJEXT) \
 	movement.$(OBJEXT) combat.$(OBJEXT) condition.$(OBJEXT) \
 	weapons.$(OBJEXT) talkaction.$(OBJEXT) vocation.$(OBJEXT) \
-	scriptmanager.$(OBJEXT)
+	scriptmanager.$(OBJEXT) creatureevent.$(OBJEXT)
 otserv_OBJECTS = $(am_otserv_OBJECTS)
 am__DEPENDENCIES_1 =
 otserv_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -282,7 +282,8 @@ otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
 	admin.cpp admin.h baseevents.cpp baseevents.h \
 	raids.cpp raids.h movement.cpp movement.h combat.cpp combat.h \
 	condition.cpp condition.h weapons.cpp weapons.h talkaction.cpp talkaction.h \
-	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h
+	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h creatureevent.cpp \
+	creatureevent.h
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -364,6 +365,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/configmanager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/container.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/creature.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/creatureevent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cylinder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/database.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/databasemysql.Po@am__quote@

@@ -39,6 +39,7 @@ otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
 	admin.cpp admin.h baseevents.cpp baseevents.h \
 	raids.cpp raids.h movement.cpp movement.h combat.cpp combat.h \
 	condition.cpp condition.h weapons.cpp weapons.h talkaction.cpp talkaction.h \
-	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h
+	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h creatureevent.cpp \
+	creatureevent.h
 
 
