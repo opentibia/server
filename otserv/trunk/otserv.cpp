@@ -552,18 +552,27 @@ int main(int argc, char *argv[])
 	srand(time(NULL));
 	std::cout << "[done]" << std::endl;
 
+#if defined __LUA_NAME_ALTER__
+	const char* configname = "otserv.lua";
+#else
+	const char* configname = "config.lua";
+#endif
+
 	// read global config
-	std::cout << ":: Loading lua script config.lua... ";
+	std::cout << ":: Loading lua script " << configname << "... ";
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
 	std::string configpath;
 	configpath = getenv("HOME");
-	configpath += "/.otserv/config.lua";
+	configpath += "/.otserv/";
+	configpath += configname;
 	if (!g_config.loadFile(configpath))
 #else
-	if (!g_config.loadFile("config.lua"))
+	if (!g_config.loadFile(configname))
 #endif
 	{
-		ErrorMessage("Unable to load config.lua!");
+		char errorMessage[26];
+		sprintf(errorMessage, "Unable to load %s!", configname);
+		ErrorMessage(errorMessage);
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
