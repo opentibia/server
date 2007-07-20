@@ -104,6 +104,23 @@ SQLite compilation
 				a) On Windows use -D__USE_SQLITE__ -lsqlite3
 				b) On POSIX systems use ./configure --enable-sqlite
 
+KDE KDevelop compilation
+	A graphical environment to program and compile otserv without any knowledge about the linux shell, it by 
+	default will run the configuration without any flag, with that I mean that will be compiled with XML and 
+	this can be easily changed opening the project and going to:
+		1. Project -> Project Options
+		2. Configure Options -> Configure arguents:
+			By default debuging enabled, and it will say:
+				--enable-debug=full
+				If you don't like or want it, you can delete it.
+		3. After (or replacing) --enable-debug=full you will write:
+			3.1 for MySQL:
+				--enable-mysql
+			3.2 for SQLite:
+				--enable-sqlite
+
+If you find any problem using kdevelop file, please go to http://otserv.org/index.php?title=Compiling_with_KDevelop
+
 Problems?
 	The server is now stable nowadays, but if you do find bugs you can report them at the 
 	CVS Bug Report board on OTFans Forums (http://otfans.net/forumdisplay.php?f=52). If your 
@@ -124,6 +141,7 @@ Credits?
 	the fike - Developer (advisory/optimization)
 	Vitor - Developer (advisory/optimization)
 	Wrzasq - Database design
+	Arkold Thos - Developer?, Linux porter
 
 	Yorick - Fansite , Forum administrator
 	Pekay - README Documentation, Forum administrator
