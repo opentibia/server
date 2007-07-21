@@ -17,6 +17,13 @@ AM_INIT_AUTOMAKE(otserv, 0.2)
 AC_ARG_WITH(debug, [  --with-debug      enable debuging],DEBUG=-DDEBUG)
 AC_SUBST(DEBUG)
 
+# check if we want to use otserv.lua instead config.lua
+AC_ARG_WITH(otconfig, [  --use-otconfig      use otserv.lua configuration], [
+	AM_CONDITIONAL(USE_OTCONFIG, true)
+	OTCONFIG_FLAGS=-D__LUA_NAME_ALTER__
+	AC_SUBST(OTCONFIG_FLAGS)
+])
+
 AM_CONDITIONAL(USE_SQL, false)
 AM_CONDITIONAL(USE_MYSQL, false)
 AM_CONDITIONAL(USE_SQLITE, false)
