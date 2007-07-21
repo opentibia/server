@@ -545,16 +545,19 @@ bool LuaScriptInterface::initState()
 
 bool LuaScriptInterface::closeState()
 {
-	m_cacheFiles.clear();
+	if(m_luaState){
+		m_cacheFiles.clear();
 
-	LuaTimerEvents::iterator it;
-	for(it = m_timerEvents.begin(); it != m_timerEvents.end(); ++it){
-		luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
-		luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.function);
+		LuaTimerEvents::iterator it;
+		for(it = m_timerEvents.begin(); it != m_timerEvents.end(); ++it){
+			luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+			luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.function);
+		}
+		m_timerEvents.clear();
+
+		lua_close(m_luaState);
 	}
-	m_timerEvents.clear();
 
-	lua_close(m_luaState);
 	return true;
 }
 

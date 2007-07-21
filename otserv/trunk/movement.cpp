@@ -357,6 +357,9 @@ bool MoveEvent::configureEvent(xmlNodePtr p)
 				else if(strcasecmp(str.c_str(), "ring") == 0){
 					slot = SLOT_RING;
 				}
+				else{
+					std::cout << "Warning: [MoveEvent::configureMoveEvent] " << "Unknown slot type " << str << std::endl;
+				}
 			}
 		}
 	}

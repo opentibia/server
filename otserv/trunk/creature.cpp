@@ -474,9 +474,9 @@ void Creature::onDie()
 	}
 
 	//scripting event - onDie
-	CreatureEvent* event = getCreatureEvent(CREATURE_EVENT_DIE);
-	if(event){
-		event->executeOnDie(this, corpse);
+	CreatureEvent* eventDie = getCreatureEvent(CREATURE_EVENT_DIE);
+	if(eventDie){
+		eventDie->executeOnDie(this, corpse);
 	}
 }
 
