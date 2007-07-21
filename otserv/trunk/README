@@ -118,12 +118,17 @@ KDE KDevelop compilation
 				--enable-mysql
 			3.2 for SQLite:
 				--enable-sqlite
-
-Different LUA configuration file
-	Default configuration file for OTServ is config.lua. In some cases you might need to use another name for it as config.lua might be ambiguous. In order to make your OTServ using otserv.lua file instead of config.lua compile it with:
-		-D__LUA_NAME_ALTER__
+		4. Extra
+			4.1 Different LUA configuration file
+				--with-otconfig
 
 If you find any problem using kdevelop file, please go to http://otserv.org/index.php?title=Compiling_with_KDevelop
+
+Different LUA configuration file
+	Default configuration file for OTServ is config.lua. In some cases you might need to use another name for 
+	it as config.lua might be ambiguous. In order to make your OTServ using otserv.lua file instead of config.lua 
+	compile it with:
+		-D__LUA_NAME_ALTER__
 
 Problems?
 	The server is now stable nowadays, but if you do find bugs you can report them at the 
