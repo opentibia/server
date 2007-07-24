@@ -1106,26 +1106,9 @@ bool InstantSpell::HouseDoorList(const InstantSpell* spell, Creature* creature, 
 		return false;
 	
 	Player* player = creature->getPlayer();
-	Position pos = player->getPosition();
-
-	switch(player->getDirection()){
-	case NORTH:
-		pos.y -= 1;
-		break;
-	case SOUTH:
-		pos.y += 1;
-		break;
-	case WEST:
-		pos.x -= 1;
-		break;
-	case EAST:
-		pos.x += 1;
-		break;
-	default:
-		break;
-	}
-
+	Position pos = Spells::getCasterPosition(player, player->getDirection());
 	Door* door = house->getDoorByPosition(pos);
+
 	if(door && house->canEditAccessList(door->getDoorId(), player)){
 		player->sendHouseWindow(house, door->getDoorId());
 		return true;
@@ -1424,7 +1407,7 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 			Tile* tmpTile = g_game.getTile(currentPos.x, currentPos.y, currentPos.z - 1);
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE))){
 				tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z - 1);
-				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
+				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE) && !tmpTile->hasProperty(BLOCKPATHFIND)){
 					ret = g_game.internalMoveCreature(player, player->getTile(), tmpTile, FLAG_NOLIMIT);
 				}
 			}
@@ -1435,7 +1418,7 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 			Tile* tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z);
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
 				tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z + 1);
-				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
+				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE) && !tmpTile->hasProperty(BLOCKPATHFIND)){
 					ret = g_game.internalMoveCreature(player, player->getTile(), tmpTile, FLAG_NOLIMIT);
 				}
 			}

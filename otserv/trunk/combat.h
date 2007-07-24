@@ -261,18 +261,6 @@ public:
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(Creature* attacker, Creature* target);
 	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
-	static ConditionType_t CombatTypeToCondition(CombatType_t type){
-		switch(type){
-		//case COMBAT_PHYSICALDAMAGE: break;
-		case COMBAT_ENERGYDAMAGE: return CONDITION_ENERGY; break;
-		case COMBAT_POISONDAMAGE: return CONDITION_POISON; break;
-		case COMBAT_FIREDAMAGE: return CONDITION_FIRE; break;
-		case COMBAT_HEALING: return CONDITION_REGENERATION; break;
-		case COMBAT_DROWNDAMAGE: return CONDITION_DROWN; break;
-		default:
-			return CONDITION_NONE;
-		}
-	}
 
 	static void addDistanceEffect(Creature* caster, const Position& fromPos, const Position& toPos,
 	uint8_t effect);
