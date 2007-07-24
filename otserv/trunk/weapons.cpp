@@ -377,17 +377,16 @@ int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 			}
 		}
 
-		if(isWieldedUnproperly()){
-			int32_t damageModifier = 100;
-			if(player->getLevel() < getReqLevel()){
-				damageModifier = damageModifier/2;
-			}
-
-			if(player->getMagicLevel() < getReqMagLv()){
-				damageModifier = damageModifier/2;
-			}
-			return damageModifier;
+		int32_t damageModifier = 100;
+		if(player->getLevel() < getReqLevel()){
+			damageModifier = (isWieldedUnproperly()? damageModifier/2 : 0);
 		}
+
+		if(player->getMagicLevel() < getReqMagLv()){
+			damageModifier = (isWieldedUnproperly()? damageModifier/2 : 0);
+		}
+		return damageModifier;
+
 	}
 
 	return 100;
