@@ -180,7 +180,7 @@ public:
 	}
 	
 	double getFreeCapacity() const {
-		if(accessLevel == 0) {
+		if(!hasFlag(PlayerFlag_HasInfiniteCapacity)) {
 			return std::max(0.00, capacity - inventoryWeight);
 		}
 		else
