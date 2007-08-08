@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -47,43 +47,43 @@ class Protocol80
 public:
 	Protocol80(SOCKET s);
 	~Protocol80();
-	
+
 	connectResult_t ConnectPlayer();
-	void ReceiveLoop();  
+	void ReceiveLoop();
 	void WriteBuffer(NetworkMessage &add);
 	void reinitializeProtocol(SOCKET s);
-	
+
 	void setKey(const uint32_t* key);
-		
+
 	void setPlayer(Player* p);
 	uint32_t getIP() const;
 	void sleepTillMove();
-	
+
 private:
 	NetworkMessage OutputBuffer;
 	std::list<uint32_t> knownPlayers;
 	uint32_t m_key[4];
 
 	void checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &removedKnown);
-	
+
 	bool canSee(int x, int y, int z) const;
 	bool canSee(const Creature*) const;
 	bool canSee(const Position& pos) const;
 	void logout();
-	
+
 	void flushOutputBuffer();
 	void WriteMsg(NetworkMessage& msg);
 
 	// we have all the parse methods
 	void parsePacket(NetworkMessage& msg);
-	
+
 	//Parse methods
-	void parseLogout(NetworkMessage& msg);	
+	void parseLogout(NetworkMessage& msg);
 	void parseCancelMove(NetworkMessage& msg);
 
 	void parseRecievePing(NetworkMessage& msg);
 	void parseAutoWalk(NetworkMessage& msg);
-	void parseStopAutoWalk(NetworkMessage& msg);	
+	void parseStopAutoWalk(NetworkMessage& msg);
 	void parseMoveNorth(NetworkMessage& msg);
 	void parseMoveEast(NetworkMessage& msg);
 	void parseMoveSouth(NetworkMessage& msg);
@@ -92,12 +92,12 @@ private:
 	void parseMoveSouthEast(NetworkMessage& msg);
 	void parseMoveSouthWest(NetworkMessage& msg);
 	void parseMoveNorthWest(NetworkMessage& msg);
-	
+
 	void parseTurnNorth(NetworkMessage& msg);
 	void parseTurnEast(NetworkMessage& msg);
 	void parseTurnSouth(NetworkMessage& msg);
 	void parseTurnWest(NetworkMessage& msg);
-	
+
 	void parseRequestOutfit(NetworkMessage& msg);
 	void parseSetOutfit(NetworkMessage& msg);
 	void parseSay(NetworkMessage& msg);
@@ -105,7 +105,7 @@ private:
 	void parseFightModes(NetworkMessage& msg);
 	void parseAttack(NetworkMessage& msg);
 	void parseFollow(NetworkMessage& msg);
-	
+
 	void parseThrow(NetworkMessage& msg);
 	void parseUseItemEx(NetworkMessage& msg);
 	void parseBattleWindow(NetworkMessage& msg);
@@ -115,19 +115,19 @@ private:
 	void parseUpdateContainer(NetworkMessage& msg);
 	void parseTextWindow(NetworkMessage& msg);
 	void parseHouseWindow(NetworkMessage& msg);
-	
+
 	//trade methods
 	void parseRequestTrade(NetworkMessage& msg);
 	void parseLookInTrade(NetworkMessage& msg);
 	void parseAcceptTrade(NetworkMessage& msg);
 	void parseCloseTrade();
-	
+
 	//VIP methods
 	void parseAddVip(NetworkMessage& msg);
 	void parseRemVip(NetworkMessage& msg);
 
 	void parseRotateItem(NetworkMessage& msg);
-		
+
 	//Channel tabs
 	void parseCreatePrivateChannel(NetworkMessage& msg);
 	void parseChannelInvite(NetworkMessage& msg);
@@ -136,9 +136,9 @@ private:
 	void parseOpenChannel(NetworkMessage& msg);
 	void parseOpenPriv(NetworkMessage& msg);
 	void parseCloseChannel(NetworkMessage& msg);
-	
+
 	void parseDebugAssert(NetworkMessage& msg);
-	
+
 	void parseDebug(NetworkMessage& msg);
 
 	//Send functions
@@ -147,7 +147,7 @@ private:
 	void sendChannel(uint16_t channelId, const std::string& channelName);
 	void sendOpenPriv(const std::string& receiver);
 	void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
-	
+
 	void sendIcons(int icons);
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
@@ -158,7 +158,7 @@ private:
 	void sendPing();
 	void sendCreatureTurn(const Creature* creature, unsigned char stackpos);
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
-	
+
 	void sendCancel(const std::string& message);
 	void sendCancelWalk();
 	void sendChangeSpeed(const Creature* creature, uint32_t speed);
@@ -168,27 +168,27 @@ private:
 	void sendCreatureInvisible(const Creature* creature);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
-	
+
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
-	
+
 	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
 	void sendTextWindow(uint32_t itemid,const std::string& text);
 	void sendHouseWindow(House* house, uint32_t listid, const std::string& text);
 	void sendOutfitWindow(const Player* player);
-	
+
 	void sendVIPLogIn(uint32_t guid);
 	void sendVIPLogOut(uint32_t guid);
 	void sendVIP(uint32_t guid, const std::string& name, bool isOnline);
 	void sendReLoginWindow();
-	
+
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(const LightInfo& lightInfo);
-	
+
 	void sendCreatureSkull(const Creature* creature, Skulls_t skull);
 	void sendCreatureShield(const Creature* creature);
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
-	
+
 	//tiles
 	void sendAddTileItem(const Position& pos, const Item* item);
 	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
@@ -215,13 +215,13 @@ private:
 
 	//Help functions
 
-	// translate a tile to clientreadable format
+	// translate a tile to client readable format
 	void GetTileDescription(const Tile* tile, NetworkMessage &msg);
-	
-	// translate a floor to clientreadable format
+
+	// translate a floor to client readable format
 	void GetFloorDescription(NetworkMessage& msg, int x, int y, int z, int width, int height, int offset, int& skip);
 
-	// translate a map area to clientreadable format
+	// translate a map area to client readable format
 	void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
 		unsigned short width, unsigned short height,
 		NetworkMessage &msg);
@@ -236,7 +236,7 @@ private:
 	void AddCreatureSpeak(NetworkMessage &msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
 	void AddCreatureHealth(NetworkMessage &msg,const Creature* creature);
 	void AddCreatureOutfit(NetworkMessage &msg, const Creature* creature, const Outfit_t& outfit);
-	void AddCreatureInvisible(NetworkMessage &msg, const Creature* creature);	
+	void AddCreatureInvisible(NetworkMessage &msg, const Creature* creature);
 	void AddPlayerSkills(NetworkMessage &msg);
 	void AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo);
 	void AddCreatureLight(NetworkMessage &msg, const Creature* creature);
@@ -257,7 +257,7 @@ private:
 	void AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item* item);
 	void UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item);
 	void RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot);
-	
+
 	//inventory
 	void AddInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
 	void UpdateInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
@@ -267,16 +267,16 @@ private:
 	uint32_t windowTextID;
 	Item* readItem;
 	uint32_t maxTextLength;
-	
+
 	House* house;
 	uint32_t listId;
-	
+
 	bool debugAssertSent;
-	
+
 	bool pendingLogout;
 	Player* player;
 	SOCKET s;
-	
+
 	friend class Player;
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };

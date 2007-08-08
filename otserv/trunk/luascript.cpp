@@ -521,7 +521,12 @@ bool LuaScriptInterface::initState()
 	if(!m_luaState){
 		return false;
 	}
-	luaL_openlibs(m_luaState);
+	luaopen_base(m_luaState);
+	luaopen_table(m_luaState);
+	luaopen_os(m_luaState);
+	luaopen_string(m_luaState);
+	luaopen_math(m_luaState);
+	//luaL_openlibs(m_luaState);
 
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 
@@ -1928,7 +1933,7 @@ int LuaScriptInterface::luaGetPlayerLossPercent(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerSetLossPercent(lua_State *L)
 {
-	//DoPlayerSetLossPercent(cid, lossType, newPercent)
+	//doPlayerSetLossPercent(cid, lossType, newPercent)
 	uint32_t newPercent = popNumber(L);
 	uint8_t lossType = (uint8_t)popNumber(L);
 	uint32_t cid = popNumber(L);
@@ -1943,8 +1948,8 @@ int LuaScriptInterface::luaDoPlayerSetLossPercent(lua_State *L)
 				lua_pushnumber(L, LUA_NO_ERROR);
 			}
 			else{
-                reportErrorFunc("lossPercent value higher than 100");
-                lua_pushnumber(L, LUA_ERROR);
+				reportErrorFunc("lossPercent value higher than 100");
+				lua_pushnumber(L, LUA_ERROR);
 			}
 		}
 		else{
