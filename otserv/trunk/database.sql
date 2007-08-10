@@ -81,7 +81,8 @@ CREATE TABLE `players` (
     `loss_skills` INT NOT NULL DEFAULT 10,
     PRIMARY KEY (`id`),
     KEY (`name`),
-    FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`) ON DELETE CASCADE
+    FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`group_id`) REFERENCES `groups`(`id`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guilds` (
