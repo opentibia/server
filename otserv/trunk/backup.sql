@@ -90,7 +90,6 @@ CREATE TABLE "house_lists" (
 
 CREATE TABLE "player_depotitems" (
     "player_id" INTEGER NOT NULL,
-    "depotid" INTEGER NOT NULL DEFAULT 0,
     "sid" INTEGER NOT NULL,
     "pid" INTEGER NOT NULL DEFAULT 0,
     "itemtype" INTEGER NOT NULL,

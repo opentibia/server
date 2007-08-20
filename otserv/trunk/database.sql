@@ -184,7 +184,6 @@ CREATE TABLE `tile_items` (
 
 CREATE TABLE `player_depotitems` (
     `player_id` INT NOT NULL,
-    `depotid` INT NOT NULL DEFAULT 0,
     `sid` INT NOT NULL COMMENT 'any given range eg 0-100 will be reserved for depot lockers and all > 100 will be then normal items inside depots',
     `pid` INT NOT NULL DEFAULT 0,
     `itemtype` INT NOT NULL,
