@@ -189,8 +189,7 @@ CREATE TABLE `player_depotitems` (
     `itemtype` INT NOT NULL,
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB NOT NULL,
-    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE,
-    KEY (`player_id`, `depotid`)
+    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 DELIMITER |
