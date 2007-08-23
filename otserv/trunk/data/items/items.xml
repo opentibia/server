@@ -4686,8 +4686,8 @@
 	<item id="2112" article="a" name="teddy bear">
 		<attribute key="weight" value="700"/>
 	</item>
-	<item id="2113" article="a" name="ship model">
-		<attribute key="weight" value="300"/>
+	<item id="2113" article="a" name="model ship">
+		<attribute key="weight" value="1300"/>
 	</item>
 	<item id="2114" article="a" name="piggy bank">
 		<attribute key="weight" value="150"/>
@@ -5605,8 +5605,9 @@
 	<item id="2331" article="a" name="present">
 		<attribute key="weight" value="600"/>
 	</item>
-	<item id="2332" article="a" name="horn">
-		<attribute key="weight" value="80"/>
+	<item id="2332" article="a" name="post horn">
+		<attribute key="description" value="It's property of the Postmaster's Guild and only rewarded to loyal members."/>
+		<attribute key="weight" value="1500"/>
 	</item>
 	<item id="2333" article="a" name="stamped letter">
 		<attribute key="weight" value="50"/>
@@ -5754,8 +5755,7 @@
 	<item id="2370" article="a" name="lute">
 		<attribute key="weight" value="3400"/>
 	</item>
-	<item id="2371" article="a" name="post horn">
-		<attribute key="description" value="It's property of the Postmaster's Guild and only rewarded to loyal members."/>
+	<item id="2371" article="a" name="horn of sundering">
 		<attribute key="weight" value="1500"/>
 	</item>
 	<item id="2372" article="a" name="lyre">
@@ -10855,7 +10855,7 @@
 	<item id="3951" article="a" name="drum">
 		<attribute key="weight" value="4500"/>
 	</item>
-	<item id="3952" article="a" name="horn">
+	<item id="3952" article="a" name="didgeridoo">
 		<attribute key="weight" value="2600"/>
 	</item>
 	<item id="3953" article="a" name="drum">
@@ -10870,8 +10870,8 @@
 	<item id="3956" article="an" name="elephant tusk" plural="elephant tusks">
 		<attribute key="weight" value="1500"/>
 	</item>
-	<item id="3957" article="a" name="horn">
-		<attribute key="weight" value="250"/>
+	<item id="3957" article="a" name="war horn">
+		<attribute key="weight" value="150"/>
 	</item>
 	<item id="3958" article="a" name="garbage">
 	</item>
@@ -13408,7 +13408,7 @@
 	</item>
 	<item id="5012" article="a" name="light wall">
 	</item>
-	<item id="5013" article="a" name="ligh wall">
+	<item id="5013" article="a" name="light wall">
 	</item>
 	<item id="5014" article="an" name="exotic butterfly">
 		<attribute key="weight" value="100"/>
@@ -14326,9 +14326,9 @@
 	</item>
 	<item id="5453" article="a" name="damaged ship cabin">
 	</item>
-	<item id="5454" article="a" name="damaged ship railling">
+	<item id="5454" article="a" name="damaged ship railing">
 	</item>
-	<item id="5455" article="a" name="damaged ship railling">
+	<item id="5455" article="a" name="damaged ship railing">
 	</item>
 	<item id="5456" article="a" name="damaged ship">
 	</item>
@@ -15143,11 +15143,11 @@
 	</item>
 	<item id="5784" article="an" name="arrow">
 	</item>
-	<item id="5785" name="">
-		<attribute key="weight" value="0"/>
+	<item id="5785" article="a" name="medal of honour">
+		<attribute key="weight" value="100"/>
 	</item>
-	<item id="5786" article="a" name="whistle">
-		<attribute key="weight" value="200"/>
+	<item id="5786" article="a" name="wooden whistle">
+		<attribute key="weight" value="100"/>
 	</item>
 	<item id="5787" article="a" name="target">
 	</item>
@@ -15181,8 +15181,8 @@
 	<item id="5798" article="an" name="abacus">
 		<attribute key="weight" value="2000"/>
 	</item>
-	<item id="5799" name="">
-		<attribute key="weight" value="0"/>
+	<item id="5799" article="a" name="golden figurine">
+		<attribute key="weight" value="1500"/>
 	</item>
 	<item id="5800" name="">
 	</item>
@@ -17600,7 +17600,7 @@
 		<attribute key="duration" value="180"/>
 	</item>
 	<item id="6561" article="a" name="ceremonial ankh">
-		<attribute key="weight" value="1200"/>
+		<attribute key="weight" value="500"/>
 	</item>
 	<item id="6562" article="a" name="roof">
 	</item>
@@ -19539,8 +19539,12 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="description" value="The beautiful jewel on the top of this sceptre is sharp enough to cut through glass."/>
 	</item>
-	<item id="7388" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7388" article="a" name="vile axe">
+		<attribute key="weight" value="5200"/>
+		<attribute key="defense" value="19"/>
+		<attribute key="attack" value="43"/>
+		<attribute key="weaponType" value="axe"/>
+		<attribute key="extradef" value="3"/>
 	</item>
 	<item id="7389" article="a" name="heroic axe">
 		<attribute key="weight" value="6100"/>
@@ -19549,7 +19553,7 @@
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="7390" article="a" name="justice seeker">
+	<item id="7390" article="the" name="justice seeker">
 		<attribute key="weight" value="5000"/>
 		<attribute key="defense" value="24"/>
 		<attribute key="attack" value="47"/>
@@ -19603,8 +19607,12 @@
 	<item id="7403" name="">
 		<attribute key="weight" value="0"/>
 	</item>
-	<item id="7404" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7404" article="an" name="assassin dagger">
+		<attribute key="weight" value="1700"/>
+		<attribute key="defense" value="12"/>
+		<attribute key="attack" value="40"/>
+		<attribute key="weaponType" value="sword"/>
+		<attribute key="extradef" value="-2"/>
 	</item>
 	<item id="7405" name="">
 		<attribute key="weight" value="0"/>
@@ -19639,8 +19647,12 @@
 	<item id="7411" name="">
 		<attribute key="weight" value="0"/>
 	</item>
-	<item id="7412" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7412" article="a" name="butcher's axe">
+		<attribute key="weight" value="2000"/> <!-- ? -->
+		<attribute key="defense" value="24"/>
+		<attribute key="attack" value="41"/>
+		<attribute key="weaponType" value="axe"/>
+		<attribute key="extradef" value="-2"/>
 	</item>
 	<item id="7413" article="a" name="titan axe">
 		<attribute key="weight" value="8100"/>
@@ -19649,8 +19661,12 @@
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
-	<item id="7414" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7414" article="a" name="bloody edge">
+		<attribute key="weight" value="5200"/>
+		<attribute key="defense" value="21"/>
+		<attribute key="attack" value="43"/>
+		<attribute key="weaponType" value="sword"/>
+		<attribute key="extradef" value="-3"/>
 	</item>
 	<item id="7415" article="a" name="cranial basher">
 		<attribute key="weight" value="7800"/>
@@ -19687,9 +19703,13 @@
 	<item id="7423" name="">
 		<attribute key="weight" value="0"/>
 	</item>
-	<item id="7424" name="">
-		<attribute key="weight" value="0"/>
-	</item>
+	<item id="7424" article="a" name="lunar staff">
+		<attribute key="weight" value="3800"/>
+		<attribute key="defense" value="25"/>
+		<attribute key="attack" value="40"/>
+		<attribute key="weaponType" value="club"/>
+		<attribute key="slotType" value="two-handed"/>
+	</item>	
 	<item id="7425" article="a" name="taurus mace">
 		<attribute key="weight" value="5100"/>
 		<attribute key="defense" value="18"/>
@@ -19816,10 +19836,10 @@
 	<item id="7450" name="">
 		<attribute key="weight" value="0"/>
 	</item>
-	<item id="7451" article="a" name="lunar staff">
-		<attribute key="weight" value="3800"/>
-		<attribute key="defense" value="25"/>
-		<attribute key="attack" value="40"/>
+	<item id="7451" article="a" name="shadow sceptre">
+		<attribute key="weight" value="3800"/> <!-- ? -->
+		<attribute key="defense" value="17"/>
+		<attribute key="attack" value="39"/>
 		<attribute key="weaponType" value="club"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
