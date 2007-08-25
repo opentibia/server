@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -51,30 +51,30 @@ bool Raids::loadFromXml(const std::string& _filename)
 	if(isLoaded()){
 		return true;
 	}
-	
+
 	filename = _filename;
-	
+
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	
+
 	if(doc){
 		xmlNodePtr root, raidNode;
 		root = xmlDocGetRootElement(doc);
-		
+
 		if(xmlStrcmp(root->name,(const xmlChar*)"raids") != 0){
 			std::cout << "[Error] Raids: Wrong root node." << std::endl;
 			xmlFreeDoc(doc);
 			return false;
 		}
-		
+
 		int intValue;
 		std::string strValue;
-		
+
 		raidNode = root->children;
 		while(raidNode){
 			if(xmlStrcmp(raidNode->name, (const xmlChar*)"raid") == 0){
 				std::string name, file;
 				uint32_t interval, margin;
-				
+
 				if(readXMLString(raidNode, "name", strValue)){
 					name = strValue;
 				}
@@ -83,7 +83,7 @@ bool Raids::loadFromXml(const std::string& _filename)
 					raidNode = raidNode->next;
 					continue;
 				}
-				
+
 				if(readXMLString(raidNode, "file", strValue)){
 					file = strValue;
 				}
@@ -93,8 +93,8 @@ bool Raids::loadFromXml(const std::string& _filename)
 					file = ss.str();
 					std::cout << "[Warning] Raids: file tag missing for raid " << name << ". Using default: " << file << std::endl;
 				}
-				
-				//interval2 is the average interval between 
+
+				//interval2 is the average interval between
 				// 2 executions of the raid in minutes
 				if(readXMLInteger(raidNode, "interval2", intValue)){
 					interval = intValue * 60; //transform  to seconds
@@ -104,7 +104,7 @@ bool Raids::loadFromXml(const std::string& _filename)
 					raidNode = raidNode->next;
 					continue;
 				}
-				
+
 				if(readXMLInteger(raidNode, "margin", intValue)){
 					margin = intValue * 60 * 1000; //transform to milliseconds
 				}
@@ -112,13 +112,13 @@ bool Raids::loadFromXml(const std::string& _filename)
 					std::cout << "[Warning] Raids: margin tag missing for raid " << name << std::endl;
 					margin = 0;
 				}
-				
+
 				Raid* newRaid = new Raid(name, interval, margin);
 				if(!newRaid){
 					xmlFreeDoc(doc);
 					return false;
 				}
-				
+
 				bool ret = newRaid->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY) + "raids/" + file);
 				if(!ret){
 					std::cout << "[Error] Raids: failed to load raid " << name << std::endl;
@@ -131,15 +131,15 @@ bool Raids::loadFromXml(const std::string& _filename)
 
 			raidNode = raidNode->next;
 		}
-				
+
 		xmlFreeDoc(doc);
-		
+
 	}
 	else{
 		std::cout << "[Error] Raids: Could not load " << filename << std::endl;
 		return false;
 	}
-	
+
 	loaded = true;
 	return true;
 }
@@ -148,20 +148,22 @@ bool Raids::loadFromXml(const std::string& _filename)
 #define CHECK_RAIDS_INTERVAL 60
 
 void Raids::startup()
-{	
+{
 	if(!isLoaded() || isStarted())
 		return;
-	
+
 	setLastRaidEnd(OTSYS_TIME());
-	
+
 	checkRaidsEvent = g_game.addEvent(makeTask(CHECK_RAIDS_INTERVAL*1000, boost::bind(&Raids::checkRaids, this)));
-	
+
 	started = true;
 }
 
 
 void Raids::checkRaids()
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Raids::checkRaids()");
+
 	if(!getRunning()){
 		uint64_t now = OTSYS_TIME();
 		for(RaidList::iterator it = raidList.begin(); it != raidList.end(); ++it){
@@ -178,7 +180,7 @@ void Raids::checkRaids()
 					break;
 				}
 			}
-				
+
 		}
 	}
 
@@ -189,13 +191,13 @@ void Raids::clear()
 {
 	g_game.stopEvent(checkRaidsEvent);
 	checkRaidsEvent = 0;
-	
+
 	RaidList::iterator it;
 	for(it = raidList.begin(); it != raidList.end(); ++it){
 		delete (*it);
 	}
 	raidList.clear();
-	
+
 	loaded = false;
 	started = false;
 	filename = "";
@@ -236,7 +238,7 @@ Raid::Raid(const std::string& _name, uint32_t _interval, uint32_t _marginTime)
 Raid::~Raid()
 {
 	stopEvents();
-	
+
 	RaidEventVector::iterator it;
 	for(it = raidEvents.begin(); it != raidEvents.end(); it++) {
 		delete (*it);
@@ -245,25 +247,25 @@ Raid::~Raid()
 }
 
 bool Raid::loadFromXml(const std::string& _filename)
-{	
+{
 	if(isLoaded()){
 		return true;
 	}
-	
+
 	xmlDocPtr doc = xmlParseFile(_filename.c_str());
-	
+
 	if(doc){
 		xmlNodePtr root, eventNode;
 		root = xmlDocGetRootElement(doc);
-		
+
 		if(xmlStrcmp(root->name,(const xmlChar*)"raid") != 0){
 			std::cout << "[Error] Raids: Wrong root node." << std::endl;
 			xmlFreeDoc(doc);
 			return false;
 		}
-		
+
 		std::string strValue;
-		
+
 		eventNode = root->children;
 		while(eventNode){
 			RaidEvent* event;
@@ -283,7 +285,7 @@ bool Raid::loadFromXml(const std::string& _filename)
 				eventNode = eventNode->next;
 				continue;
 			}
-			
+
 			if(event->configureRaidEvent(eventNode)){
 				raidEvents.push_back(event);
 			}
@@ -293,17 +295,17 @@ bool Raid::loadFromXml(const std::string& _filename)
 			}
 			eventNode = eventNode->next;
 		}
-		
+
 		//sort by delay time
 		std::sort(raidEvents.begin(), raidEvents.end(), RaidEvent::compareEvents);
-		
-		xmlFreeDoc(doc);	
+
+		xmlFreeDoc(doc);
 	}
 	else{
 		std::cout << "[Error] Raid: Could not load " << _filename << "!" << std::endl;
 		return false;
 	}
-	
+
 	loaded = true;
 	return true;
 }
@@ -319,6 +321,8 @@ void Raid::startRaid()
 
 void Raid::executeRaidEvent(RaidEvent* raidEvent)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Raid::executeRaidEvent");
+
 	if(raidEvent->executeEvent()){
 		nextEvent++;
 		RaidEvent* newRaidEvent = getNextRaidEvent();
@@ -387,7 +391,7 @@ bool AnnounceEvent::configureRaidEvent(xmlNodePtr eventNode)
 	}
 
 	std::string strValue;
-		
+
 	if(readXMLString(eventNode, "message", strValue)){
 		m_message = strValue;
 	}
@@ -395,7 +399,7 @@ bool AnnounceEvent::configureRaidEvent(xmlNodePtr eventNode)
 		std::cout << "[Error] Raid: message tag missing for announce event." << std::endl;
 		return false;
 	}
-		
+
 	if(readXMLString(eventNode, "type", strValue)){
 		if(strcasecmp(strValue.c_str(), "warning") == 0){
 			m_messageType = MSG_STATUS_WARNING;
@@ -443,10 +447,10 @@ bool SingleSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 	if(!RaidEvent::configureRaidEvent(eventNode)){
 		return false;
 	}
-	
+
 	std::string strValue;
 	int intValue;
-			
+
 	if(readXMLString(eventNode, "name", strValue)){
 		m_monsterName = strValue;
 	}
@@ -454,7 +458,7 @@ bool SingleSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 		std::cout << "[Error] Raid: name tag missing for singlespawn event." << std::endl;
 		return false;
 	}
-				
+
 	if(readXMLInteger(eventNode, "x", intValue)){
 		m_position.x = intValue;
 	}
@@ -462,7 +466,7 @@ bool SingleSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 		std::cout << "[Error] Raid: x tag missing for singlespawn event." << std::endl;
 		return false;
 	}
-	
+
 	if(readXMLInteger(eventNode, "y", intValue)){
 		m_position.y = intValue;
 	}
@@ -470,7 +474,7 @@ bool SingleSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 		std::cout << "[Error] Raid: y tag missing for singlespawn event." << std::endl;
 		return false;
 	}
-	
+
 	if(readXMLInteger(eventNode, "z", intValue)){
 		m_position.z = intValue;
 	}
@@ -507,7 +511,7 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 
 	std::string strValue;
 	int intValue;
-	
+
 	if(readXMLInteger(eventNode, "radius", intValue)){
 		int32_t radius = intValue;
 		Position centerPos;
@@ -519,7 +523,7 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 			std::cout << "[Error] Raid: centerx tag missing for areaspawn event." << std::endl;
 			return false;
 		}
-				
+
 		if(readXMLInteger(eventNode, "centery", intValue)){
 			centerPos.y = intValue;
 		}
@@ -527,7 +531,7 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 			std::cout << "[Error] Raid: centery tag missing for areaspawn event." << std::endl;
 			return false;
 		}
-		
+
 		if(readXMLInteger(eventNode, "centerz", intValue)){
 			centerPos.z = intValue;
 		}
@@ -552,7 +556,7 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 			std::cout << "[Error] Raid: fromx tag missing for areaspawn event." << std::endl;
 			return false;
 		}
-		
+
 		if(readXMLInteger(eventNode, "fromy", intValue)){
 			m_fromPos.y = intValue;
 		}
@@ -568,7 +572,7 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 			std::cout << "[Error] Raid: fromz tag missing for areaspawn event." << std::endl;
 			return false;
 		}
-					
+
 		if(readXMLInteger(eventNode, "tox", intValue)){
 			m_toPos.x = intValue;
 		}
@@ -593,14 +597,14 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 			return false;
 		}
 	}
-	
+
 	xmlNodePtr monsterNode = eventNode->children;
 	while(monsterNode){
 		if(xmlStrcmp(monsterNode->name, (const xmlChar*)"monster") == 0){
 			std::string name;
 			int32_t minAmount = 0;
 			int32_t maxAmount = 0;
-						
+
 			if(readXMLString(monsterNode, "name", strValue)){
 				name = strValue;
 			}
@@ -608,7 +612,7 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 				std::cout << "[Error] Raid: name tag missing for monster node." << std::endl;
 				return false;
 			}
-					
+
 			if(readXMLInteger(monsterNode, "minamount", intValue)){
 				minAmount = intValue;
 			}
@@ -627,7 +631,7 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 					return false;
 				}
 			}
-				
+
 			addMonster(name, minAmount, maxAmount);
 		}
 		monsterNode = monsterNode->next;
@@ -679,7 +683,7 @@ bool AreaSpawnEvent::executeEvent()
 				pos.x = random_range(m_fromPos.x, m_toPos.x);
 				pos.y = random_range(m_fromPos.y, m_toPos.y);
 				pos.z = random_range(m_fromPos.z, m_toPos.z);
-				
+
 				if(g_game.placeCreature(monster, pos)){
 					success = true;
 					break;
@@ -715,7 +719,7 @@ bool ScriptEvent::configureRaidEvent(xmlNodePtr eventNode)
 	if(!RaidEvent::configureRaidEvent(eventNode)){
 		return false;
 	}
-	
+
 	std::string str;
 	if(readXMLString(eventNode, "script", str)){
 		std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
@@ -741,20 +745,20 @@ bool ScriptEvent::executeEvent()
 	//onRaid()
 	if(m_scriptInterface.reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface.getScriptEnv();
-	
+
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
 		desc << "Raid event" << std::endl;
 		env->setEventDesc(desc.str());
 		#endif
-	
+
 		env->setScriptId(m_scriptId, &m_scriptInterface);
-		
+
 		m_scriptInterface.pushFunction(m_scriptId);
-	
+
 		int32_t result = m_scriptInterface.callFunction(0);
 		m_scriptInterface.releaseScriptEnv();
-		
+
 		return (result == LUA_TRUE);
 	}
 	else{

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -133,7 +133,7 @@ class ItemType {
 private:
 	//It is private because calling it can cause unexpected results
 	ItemType(const ItemType& it){};
-	
+
 public:
 	ItemType();
 	~ItemType();
@@ -235,10 +235,11 @@ class Array{
 public:
 	Array(uint32_t n);
 	~Array();
-	
+
 	A getElement(uint32_t id);
+	const A getElement(uint32_t id) const;
 	void addElement(A a, uint32_t pos);
-	
+
 	uint32_t size() {return m_size;}
 
 private:
@@ -252,26 +253,27 @@ class Items{
 public:
 	Items();
 	~Items();
-	
+
 	bool reload();
 	void clear();
 
 	int loadFromOtb(std::string);
-	
-	const ItemType& operator[](int32_t id){return getItemType(id);}
+
+	const ItemType& operator[](int32_t id) const {return getItemType(id);}
+	const ItemType& getItemType(int32_t id) const;
 	ItemType& getItemType(int32_t id);
-	ItemType& getItemIdByClientId(int32_t spriteId);
+	const ItemType& getItemIdByClientId(int32_t spriteId) const;
 
 	int32_t getItemIdByName(const std::string& name);
-	
+
 	static uint32_t dwMajorVersion;
 	static uint32_t dwMinorVersion;
 	static uint32_t dwBuildNumber;
 
 	bool loadFromXml(const std::string& datadir);
-	
+
 	void addItemType(ItemType* iType);
-	
+
 	uint32_t size() {return items.size();}
 
 protected:

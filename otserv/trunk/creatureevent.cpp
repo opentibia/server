@@ -47,6 +47,8 @@ void CreatureEvents::clear()
 	//clear global events
 	m_logInEvent->clearEvent();
 	m_logOutEvent->clearEvent();
+	delete m_logInEvent; m_logInEvent = NULL;
+	delete m_logOutEvent; m_logOutEvent = NULL;
 	//clear creature events
 	CreatureEventList::iterator it;
 	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){

@@ -48,7 +48,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 	Item* newItem = NULL;
 
 	const ItemType& it = Item::items[_type];
-	
+
 	if(it.id != 0){
 		if(it.isDepot()){
 			newItem = new Depot(_type);
@@ -131,21 +131,21 @@ Item::Item(const Item &i) :
 	count = i.count;
 	charges = i.charges;
 	fluid = i.fluid;
-	
+
 	uint16_t _actionId;
 	if(_actionId = i.getActionId()){
 		setActionId(_actionId);
 	}
-	
+
 	uint16_t _uniqueId;
 	if(_uniqueId = i.getUniqueId()){
 		setUniqueId(_uniqueId);
 	}
-	
+
 	if(i.getSpecialDescription() != ""){
 		setSpecialDescription(i.getSpecialDescription());
 	}
-	
+
 	if(i.getText() != ""){
 		setText(i.getText());
 	}
@@ -300,7 +300,7 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 			setDecaying(DECAYING_PENDING);
 		}
 	}
-	
+
 	return true;
 }
 
@@ -351,7 +351,7 @@ xmlNodePtr Item::serialize()
 			xmlSetProp(nodeItem, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
 		}
 	}
-	
+
 	uint32_t duration = getDuration();
 	if(duration != 0){
 		ss.str("");
@@ -426,7 +426,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			setWrittenDate(_writtenDate);
 			break;
 		}
-		
+
 		case ATTR_WRITTENBY:
 		{
 			std::string _writer;
@@ -469,7 +469,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			setDuration(duration);
 			break;
 		}
-		
+
 		case ATTR_DECAYING_STATE:
 		{
 			uint8_t state = 0;
@@ -638,7 +638,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.blockPathFind)
 				return true;
 			break;
-		
+
 		case ISVERTICAL:
 			if(it.isVertical)
 				return true;
@@ -653,7 +653,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.blockSolid && (!it.moveable || getUniqueId() != 0))
 				return true;
 			break;
-		
+
 		default:
 			return false;
 	}
@@ -743,11 +743,9 @@ std::string Item::getDescription(int32_t lookDistance) const
 				}
 				s << " magic level " << (int)weapon->getReqMagLv() << " or higher";
 			}
-			/* No Premium system yet.
 			if(wieldInfo & WIELDINFO_PREMIUM){
-				s << " with a premium account";
+				s << " with a premium player";
 			}
-			*/
 			s << ".";
 		}
 	}
@@ -882,7 +880,7 @@ void Item::setUniqueId(unsigned short n)
 {
 	if(getUniqueId() != 0)
 		return;
-	
+
 	ItemAttributes::setUniqueId(n);
 	ScriptEnviroment::addUniqueThing(this);
 }
@@ -927,7 +925,7 @@ const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
 {
 	if(!validateStrAttrType(type))
 		return emptyString;
-	
+
 	//this will *NOT* create the attribute if it does not exist
 	Attribute* attr = getAttrConst(type);
 	if(attr){
@@ -942,10 +940,10 @@ void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
 {
 	if(!validateStrAttrType(type))
 		return;
-	
+
 	if(value.length() == 0)
 		return;
-	
+
 	//this will create the attribute if it does not exist
 	Attribute* attr = getAttr(type);
 	if(attr){
@@ -970,7 +968,7 @@ bool ItemAttributes::hasAttribute(itemAttrTypes type) const
 
 	return false;
 }
-	
+
 void ItemAttributes::removeAttribute(itemAttrTypes type)
 {
 	//check if we have it
@@ -989,7 +987,7 @@ void ItemAttributes::removeAttribute(itemAttrTypes type)
 				}
 				//remove it from flags
 				m_attributes = m_attributes & ~type;
-				
+
 				//delete string if it is string type
 				if(validateStrAttrType(type)){
 					delete (std::string*)curAttr->value;
@@ -1010,7 +1008,7 @@ uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
 {
 	if(!validateIntAttrType(type))
 		return 0;
-		
+
 	Attribute* attr = getAttrConst(type);
 	if(attr){
 		return (uint32_t)(long)attr->value;
@@ -1024,7 +1022,7 @@ void ItemAttributes::setIntAttr(itemAttrTypes type, int32_t value)
 {
 	if(!validateIntAttrType(type))
 		return;
-	
+
 	Attribute* attr = getAttr(type);
 	if(attr){
 		attr->value = (void*)value;
@@ -1035,13 +1033,13 @@ void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
 {
 	if(!validateIntAttrType(type))
 		return;
-	
+
 	Attribute* attr = getAttr(type);
 	if(attr){
 		attr->value = (void*)((long)attr->value + value);
 	}
 }
-	
+
 inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 {
 	//list of numeric type attributes

@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,7 +52,7 @@ const Weapon* Weapons::getWeapon(const Item* item) const
 	}
 
 	WeaponMap::const_iterator it = weapons.find(item->getID());
-	
+
 	if(it != weapons.end()){
 		return it->second;
 	}
@@ -68,16 +68,16 @@ void Weapons::clear()
 	}
 
 	weapons.clear();
-}	
+}
 
 LuaScriptInterface& Weapons::getScriptInterface()
 {
-	return m_scriptInterface;	
+	return m_scriptInterface;
 }
 
 std::string Weapons::getScriptBaseName()
 {
-	return "weapons";	
+	return "weapons";
 }
 
 bool Weapons::loadDefaults()
@@ -145,14 +145,14 @@ bool Weapons::registerEvent(Event* event, xmlNodePtr p)
 {
 	Weapon* weapon = dynamic_cast<Weapon*>(event);
 	//weapon->init();
-	
+
 	if(weapon){
 		weapons[weapon->getID()] = weapon;
 	}
 	else{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -277,7 +277,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 				}
 			}
 		}
-		
+
 		vocationNode = vocationNode->next;
 	}
 
@@ -358,8 +358,12 @@ int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 	}
 
 	if(!player->hasFlag(PlayerFlag_IgnoreWeaponCheck)){
-	
+
 		if(!enabled){
+			return 0;
+		}
+
+		if(isPremium() && !player->isPremium()){
 			return 0;
 		}
 
@@ -545,12 +549,12 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 		desc << "onUseWeapon - " << player->getName();
 		env->setEventDesc(desc.str());
 		#endif
-	
+
 		env->setScriptId(m_scriptId, m_scriptInterface);
 		env->setRealPos(player->getPosition());
-	
+
 		lua_State* L = m_scriptInterface->getLuaState();
-	
+
 		uint32_t cid = env->addThing(player);
 
 		m_scriptInterface->pushFunction(m_scriptId);
@@ -559,7 +563,7 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 
 		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
-		
+
 		return (result == LUA_NO_ERROR);
 	}
 	else{
@@ -586,7 +590,7 @@ bool WeaponMelee::configureEvent(xmlNodePtr p)
 bool WeaponMelee::configureWeapon(const ItemType& it)
 {
 	m_scripted = false;
-	
+
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
@@ -658,7 +662,7 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item, boo
 	int32_t attackStrength = player->getAttackStrength();
 	int32_t attackValue = item->getAttack();
 	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
-	
+
 	if(maxDamage){
 		return -maxValue;
 	}
@@ -684,7 +688,7 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 	if(readXMLInteger(p, "hitchance", intValue)){
 		hitChance = intValue;
 	}
-	
+
 	return true;
 }
 
@@ -748,7 +752,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		int dy = random_range(-1, 1);
 
 		destTile = g_game.getTile(destPos.x + dx, destPos.y + dy, destPos.z);
-		
+
 		if(destTile && !destTile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
 			destPos.x += dx;
 			destPos.y += dy;
@@ -808,7 +812,7 @@ bool WeaponDistance::getSkillType(const Player* player, const Item* item,
 				break;
 		}
 	}
-	
+
 	return true;
 }
 

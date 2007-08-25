@@ -170,8 +170,10 @@ int32_t DBResult::getDataInt(const std::string &s, unsigned int nrow)
 			if(it2->second->row[it->second] == NULL)
 				return 0;
 			else {
-			    if(std::string("TRUE").compare(it2->second->row[it->second]) == 0) //SqLite returns a string
-                    return 1;
+				#ifdef __USE_SQLITE__
+				if(std::string("TRUE").compare(it2->second->row[it->second]) == 0) //SqLite returns a string
+					return 1;
+				#endif
 				return atoi(it2->second->row[it->second]);
 			}
 		}

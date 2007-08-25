@@ -142,6 +142,7 @@ Creature()
 	maxDepotLimit = 1000;
 	maxVipLimit = 50;
 	groupFlags = 0;
+	premiumDays = 0;
 
  	vocation_id = (Vocation_t)0;
 

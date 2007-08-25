@@ -854,6 +854,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerFlagValue", LuaScriptInterface::luaGetPlayerFlagValue);
 	//getPlayerLossPercent(cid, lossType)
 	lua_register(m_luaState, "getPlayerLossPercent", LuaScriptInterface::luaGetPlayerLossPercent);
+	//getPlayerPremiumDays(cid)
+	lua_register(m_luaState, "getPlayerPremiumDays", LuaScriptInterface::luaGetPlayerPremiumDays);
 
 	//playerLearnInstantSpell(cid, name)
 	lua_register(m_luaState, "playerLearnInstantSpell", LuaScriptInterface::luaPlayerLearnInstantSpell);
@@ -868,6 +870,9 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerStorageValue", LuaScriptInterface::luaGetPlayerStorageValue);
 	//setPlayerStorageValue(uid,valueid, newvalue)
 	lua_register(m_luaState, "setPlayerStorageValue", LuaScriptInterface::luaSetPlayerStorageValue);
+
+	//isPremium(cid)
+	lua_register(m_luaState, "isPremium", LuaScriptInterface::luaIsPremium);
 
 	//getGlobalStorageValue(valueid)
 	lua_register(m_luaState, "getGlobalStorageValue", LuaScriptInterface::luaGetGlobalStorageValue);
@@ -1279,6 +1284,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoGUID:
 			value = player->getGUID();
 			break;
+		case PlayerInfoPremiumDays:
+			value = player->getPremiumDays();
+			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -1365,6 +1373,9 @@ int LuaScriptInterface::luaGetPlayerTown(lua_State *L){
 
 int LuaScriptInterface::luaGetPlayerGUID(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoGUID);}
+
+int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoPremiumDays);}
 //
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
@@ -4841,4 +4852,27 @@ int LuaScriptInterface::luaGetCreatureMaxHealth(lua_State *L)
 	}
 
 	return 1;
+}
+
+int LuaScriptInterface::luaIsPremium(lua_State *L)
+{
+	//isPremium(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(player->isPremium()){
+			lua_pushnumber(L, LUA_TRUE);
+		}
+		else{
+			lua_pushnumber(L, LUA_FALSE);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+
 }

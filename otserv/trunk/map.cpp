@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -41,6 +41,7 @@
 #include "items.h"
 #include "map.h"
 #include "tile.h"
+#include "combat.h"
 
 #include "player.h"
 #include "configmanager.h"
@@ -52,7 +53,7 @@ extern ConfigManager g_config;
 //int32_t Map::maxViewportX = 9;
 //int32_t Map::maxViewportY = 7;
 
-int32_t Map::maxViewportX = 10; 
+int32_t Map::maxViewportX = 10;
 int32_t Map::maxViewportY = 10;
 
 Map::Map()
@@ -87,7 +88,7 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	}
 
 	std::cout << ":: Loading map from: " << identifier << " " << loader->getSourceDescription() << std::endl;
-	
+
 	bool loadMapSuccess = loader->loadMap(this, identifier);
 	defaultMapLoaded = true;
 
@@ -117,7 +118,7 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 		case LOADMAPERROR_UNKNOWNNODETYPE:
 			std::cout << "FATAL: Unknown stream node found. Code: " << getErrorCode() << std::endl;
 			break;
-		
+
 		default:
 			std::cout << "FATAL: Unknown error!" << std::endl;
 			break;
@@ -126,7 +127,7 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 		std::cin.get();
 		return false;
 	}
-	
+
 	if(!loader->loadSpawns(this)){
 		std::cout << "WARNING: could not load spawn data." << std::endl;
 	}
@@ -136,7 +137,7 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	}
 
 	delete loader;
-	
+
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
 	IOMapSerialize->loadHouseInfo(this, houseStoreIdentifier);
 	IOMapSerialize->loadMap(this, mapStoreIdentifier);
@@ -160,10 +161,10 @@ bool Map::saveMap(const std::string& identifier)
 			break;
 		}
 	}
-	
+
 	if(!saved)
 		return false;
-	
+
 	saved = false;
 	for(uint32_t tries = 0; tries < 3; tries++){
 		if(IOMapSerialize->saveHouseInfo(this, houseStoreIdentifier)){
@@ -198,7 +199,7 @@ Tile* Map::getTile(uint16_t x, uint16_t y, uint8_t z)
 }
 
 Tile* Map::getTile(const Position& pos)
-{ 
+{
 	return getTile(pos.x, pos.y, pos.z);
 }
 
@@ -224,7 +225,7 @@ void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 		if(southLeaf){
 			leaf->m_leafS = southLeaf;
 		}
-   
+
 		//update east
 		QTreeLeafNode* eastLeaf = root.getLeaf(x + FLOOR_SIZE, y);
 		if(eastLeaf){
@@ -251,7 +252,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 	bool placeInPZ = false;
 
 	if(tile){
-		placeInPZ = tile->isPz();		
+		placeInPZ = tile->isPz();
 
 		ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
 		if(forceLogin || ret == RET_NOERROR || ret == RET_PLAYERISNOTINVITED){
@@ -261,14 +262,14 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 
 	typedef std::pair<int32_t, int32_t> relPair;
 	std::vector<relPair> relList;
-	relList.push_back(relPair(-1, 0));
-	relList.push_back(relPair(-1, 0));
-	relList.push_back(relPair(0, 1));
-	relList.push_back(relPair(0, -1));
-	relList.push_back(relPair(1, 1));
-	relList.push_back(relPair(1, 0));
-	relList.push_back(relPair(-1, 0));
 	relList.push_back(relPair(-1, -1));
+	relList.push_back(relPair(-1, 0));
+	relList.push_back(relPair(-1, 1));
+	relList.push_back(relPair(0, -1));
+	relList.push_back(relPair(0, 1));
+	relList.push_back(relPair(1, -1));
+	relList.push_back(relPair(1, 0));
+	relList.push_back(relPair(1, 1));
 
 	std::random_shuffle(relList.begin(), relList.end());
 	uint32_t radius = 1;
@@ -329,7 +330,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	maxRangeX = (maxRangeX == 0 ? maxViewportX : maxRangeX);
 	minRangeY = (minRangeY == 0 ? -maxViewportY : -minRangeY);
 	maxRangeY = (maxRangeY == 0 ? maxViewportY : maxRangeY);
-	
+
 	int32_t minRangeZ;
 	int32_t maxRangeZ;
 
@@ -375,7 +376,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	int32_t starty1 = y1 - (y1 % FLOOR_SIZE);
 	int32_t endx2 = x2 - (x2 % FLOOR_SIZE);
 	int32_t endy2 = y2 - (y2 % FLOOR_SIZE);
-	
+
 	int32_t floorx1, floory1, floorx2, floory2;
 
 	QTreeLeafNode* startLeaf;
@@ -473,16 +474,16 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	if((fromPos.z >= 8 && toPos.z < 8) || (toPos.z >= 8 && fromPos.z < 8)){
 		return false;
 	}
-	
+
 	if(fromPos.z - fromPos.z > 2){
 		return false;
 	}
-	
+
 	int deltax, deltay, deltaz;
 	deltax = std::abs(fromPos.x - toPos.x);
 	deltay = std::abs(fromPos.y - toPos.y);
 	deltaz = std::abs(fromPos.z - toPos.z);
-    
+
 	//distance checks
 	if(deltax - deltaz > 8 || deltay - deltaz > 6){
 		return false;
@@ -507,21 +508,21 @@ bool Map::isViewClear(const Position& fromPos, const Position& toPos, bool floor
 
 	int max = deltax, dir = 0;
 	if(deltay > max){
-		max = deltay; 
+		max = deltay;
 		dir = 1;
 	}
 	if(deltaz > max){
-		max = deltaz; 
+		max = deltaz;
 		dir = 2;
 	}
-	
+
 	switch(dir){
 	case 0:
 		//x -> x
 		//y -> y
 		//z -> z
 		break;
-	case 1:	
+	case 1:
 		//x -> y
 		//y -> x
 		//z -> z
@@ -542,15 +543,15 @@ bool Map::isViewClear(const Position& fromPos, const Position& toPos, bool floor
 	int stepx = ((start.x < end.x) ? 1 : -1);
 	int stepy = ((start.y < end.y) ? 1 : -1);
 	int stepz = ((start.z < end.z) ? 1 : -1);
-	
+
 	int x, y, z;
 	int errory = 0, errorz = 0;
 	x = start.x;
 	y = start.y;
 	z = start.z;
-	
+
 	int lastrx = x, lastry = y, lastrz = z;
-	
+
 	for( ; x != end.x + stepx; x += stepx){
 		int rx, ry, rz;
 		switch(dir){
@@ -565,7 +566,7 @@ bool Map::isViewClear(const Position& fromPos, const Position& toPos, bool floor
 			break;
 		}
 
-		if(!(toPos.x == rx && toPos.y == ry && toPos.z == rz) && 
+		if(!(toPos.x == rx && toPos.y == ry && toPos.z == rz) &&
 		  !(fromPos.x == rx && fromPos.y == ry && fromPos.z == rz)){
 			if(lastrz != rz){
 				if(getTile(lastrx, lastry, std::min(lastrz, rz))){
@@ -573,7 +574,7 @@ bool Map::isViewClear(const Position& fromPos, const Position& toPos, bool floor
 				}
 			}
 			lastrx = rx; lastry = ry; lastrz = rz;
-			
+
 			Tile* tile = getTile(rx, ry, rz);
 			if(tile){
 				if(tile->hasProperty(BLOCKPROJECTILE))
@@ -639,7 +640,7 @@ bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Dir
 	startNode->x = startPos.x;
 	startNode->y = startPos.y;
 
-	startNode->g = 0; 
+	startNode->g = 0;
 	startNode->h = nodes.getEstimatedDistance(startPos.x, startPos.y, toPosition.x, toPosition.y);
 	startNode->f = startNode->g + startNode->h;
 	startNode->parent = NULL;
@@ -663,8 +664,8 @@ bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Dir
 
 	Tile* tile = NULL;
 	AStarNode* found = NULL;
-	
-	while(nodes.countClosedNodes() < 100){		
+
+	while(nodes.countClosedNodes() < 100){
 		AStarNode* n = nodes.getBestNode();
 		if(!n){
 			listDir.clear();
@@ -679,7 +680,7 @@ bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Dir
 			for(int i = 0; i < 8; ++i){
 				x = n->x + neighbourOrderList[i][0];
 				y = n->y + neighbourOrderList[i][1];
-			
+
 				if((x == startPos.x && y == startPos.y)){
 					continue;
 				}
@@ -718,7 +719,7 @@ bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Dir
 				}
 
 			}
-			
+
 			nodes.closeNode(n);
 		}
 	}
@@ -780,7 +781,7 @@ AStarNode* AStarNodes::createOpenNode()
 {
 	if(curNode >= MAX_NODES)
 		return NULL;
-	
+
 	uint32_t ret_node = curNode;
 	curNode++;
 	openNodes[ret_node] = 1;
@@ -899,6 +900,12 @@ int AStarNodes::getMapWalkCost(const Creature* creature, AStarNode* node, const 
 		cost = cost + MAP_NORMALWALKCOST * 10;
 	}
 
+	if(const MagicField* field = neighbourTile->getFieldItem()){
+		if(!creature->isImmune(field->getCombatType())){
+			cost = cost + MAP_NORMALWALKCOST * 20;
+		}
+	}
+
 	return cost;
 }
 
@@ -907,7 +914,7 @@ int AStarNodes::getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_
 	int h_diagonal = std::min(std::abs(x - xGoal), std::abs(y - yGoal));
 	int h_straight = (std::abs(x - xGoal) + std::abs(y - yGoal));
 
-	return MAP_DIAGONALWALKCOST * h_diagonal + MAP_NORMALWALKCOST * (h_straight - 2 * h_diagonal);	
+	return MAP_DIAGONALWALKCOST * h_diagonal + MAP_NORMALWALKCOST * (h_straight - 2 * h_diagonal);
 	//return (std::abs(x - xGoal) + std::abs(y - yGoal)) * MAP_NORMALWALKCOST;
 }
 

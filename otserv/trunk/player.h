@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -117,18 +117,21 @@ public:
 	void removeList();
 	void addList();
 	void kickPlayer() {client->logout();}
-	
+
 	uint32_t getGuildId() const {return guildId;}
 	const std::string& getGuildName() const {return guildName;}
 	const std::string& getGuildRank() const {return guildRank;}
 	const std::string& getGuildNick() const {return guildNick;}
-	
+
 	void setGuildRank(const std::string& rank) {guildRank = rank;}
 	void setGuildNick(const std::string& nick) {guildNick = nick;}
-	
+
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
-	
+
+	int getPremiumDays() const {return premiumDays;}
+	bool isPremium() {return (premiumDays > 0);}
+
 	bool isOnline() {return (client != NULL);}
 	uint32_t getIP() const;
 
@@ -136,14 +139,14 @@ public:
 	void closeContainer(uint32_t containerid);
 	int32_t getContainerID(const Container* container) const;
 	Container* getContainer(uint32_t cid);
-	
+
 	void addStorageValue(const uint32_t key, const int32_t value);
 	bool getStorageValue(const uint32_t key, int32_t& value) const;
 	void genReservedStorageRange();
-	
+
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
-	
+
 	int32_t getAccount() const {return accountNumber;}
 	int32_t getLevel() const {return level;}
 	int32_t getMagicLevel() const {return magLevel;}
@@ -154,9 +157,9 @@ public:
 
 	void setSkillsPercents();
 
-	playersex_t getSex() const {return sex;}	
+	playersex_t getSex() const {return sex;}
 	void setSex(playersex_t);
-	int getPlayerInfo(playerinfo_t playerinfo) const;	
+	int getPlayerInfo(playerinfo_t playerinfo) const;
 	uint32_t getExperience() const {return experience;}
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
@@ -178,7 +181,7 @@ public:
 		else
 			return 0.00;
 	}
-	
+
 	double getFreeCapacity() const {
 		if(!hasFlag(PlayerFlag_HasInfiniteCapacity)) {
 			return std::max(0.00, capacity - inventoryWeight);
@@ -186,7 +189,7 @@ public:
 		else
 			return 0.00;
 	}
-	
+
 	virtual int32_t getMaxHealth() const {return healthMax + varStats[STAT_MAXHITPOINTS];}
 	virtual int32_t getMaxMana() const {return manaMax + varStats[STAT_MAXMANAPOINTS];}
 
@@ -197,7 +200,7 @@ public:
 
 	int32_t getVarSkill(skills_t skill) const {return varSkills[skill];}
 	void setVarSkill(skills_t skill, int32_t modifier) {varSkills[skill] += modifier;}
-	
+
 	int32_t getVarStats(stats_t stat) const {return varStats[stat];}
 	void setVarStats(stats_t stat, int32_t modifier);
 	void setConditionSuppressions(uint32_t conditions, bool remove);
@@ -211,17 +214,17 @@ public:
 
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
-	
+
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
-	
+
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
 
 	//safe-trade functions
 	void setTradeState(tradestate_t state) {tradeState = state;};
 	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
-	
+
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
 	void notifyLogOut(Player* player);
@@ -246,7 +249,7 @@ public:
 	bool isImmune(ConditionType_t type) const;
 	bool hasShield() const;
 	virtual bool isAttackable() const;
-	
+
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 	void changeSoul(int32_t soulChange);
@@ -267,7 +270,7 @@ public:
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);	
+	virtual void drainMana(Creature* attacker, int32_t manaLoss);
 	void addManaSpent(uint32_t amount);
 	void addSkillAdvance(skills_t skill, uint32_t count);
 
@@ -309,12 +312,12 @@ public:
 	void sendCreatureSkull(const Creature* creature, Skulls_t skull) const
 		{client->sendCreatureSkull(creature, skull);}
 	void checkRedSkullTicks(int32_t ticks);
-#endif	
+#endif
 	const OutfitListType& getPlayerOutfits();
 	bool canWear(uint32_t _looktype, uint32_t _addons);
 	void addOutfit(uint32_t _looktype, uint32_t _addons);
 	bool remOutfit(uint32_t _looktype, uint32_t _addons);
-	
+
 	//tile
 	//send methods
 	void sendAddTileItem(const Position& pos, const Item* item)
@@ -369,7 +372,7 @@ public:
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void onUpdateTile(const Position& pos);
-	
+
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
@@ -386,7 +389,7 @@ public:
 	void onAddContainerItem(const Container* container, const Item* item);
 	void onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem);
 	void onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
-	
+
 	void onCloseContainer(const Container* container);
 	void onSendContainer(const Container* container);
 	void autoCloseContainers(const Container* container);
@@ -406,7 +409,7 @@ public:
 		{client->sendCancelTarget();}
 	void sendCancelWalk() const
 		{client->sendCancelWalk();}
-	void sendChangeSpeed(const Creature* creature, uint32_t newSpeed) const 
+	void sendChangeSpeed(const Creature* creature, uint32_t newSpeed) const
 		{client->sendChangeSpeed(creature, newSpeed);}
 	void sendCreatureHealth(const Creature* creature) const
 		{client->sendCreatureHealth(creature);}
@@ -415,7 +418,7 @@ public:
 	void sendHouseWindow(House* _house, uint32_t _listid) const;
 	void sendClosePrivate(uint16_t channelId) const
 		{client->sendClosePrivate(channelId);}
-	void sendIcons() const; 
+	void sendIcons() const;
 	void sendMagicEffect(const Position& pos, unsigned char type) const
 		{client->sendMagicEffect(pos,type);}
 	void sendPing(uint32_t interval);
@@ -432,11 +435,11 @@ public:
 		{client->sendToChannel(creature, type, text, channelId);}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{client->sendTradeItemRequest(player, item, ack);}
-	void sendTradeClose() const 
+	void sendTradeClose() const
 		{client->sendCloseTrade();}
 	void sendWorldLight(LightInfo& lightInfo)
 		{client->sendWorldLight(lightInfo);}
-	
+
 	void receivePing() {if(npings > 0) npings--;}
 	void flushMsg() {client->flushOutputBuffer();}
 
@@ -459,7 +462,7 @@ public:
 	ContainerVector containerVec;
 	void preSave();
 
-	//depots	
+	//depots
 	DepotMap depots;
 	uint32_t maxDepotLimit;
 
@@ -516,12 +519,13 @@ protected:
 	playersex_t sex;
 	int32_t soul, soulMax;
 	uint64_t groupFlags;
+	int32_t premiumDays;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 
 	double inventoryWeight;
 	double capacity;
-	
+
 	bool SendBuffer;
 	uint32_t internal_ping;
 	uint32_t npings;
@@ -534,7 +538,7 @@ protected:
 	bool addAttackSkillPoint;
 	uint32_t attackTicks;
 	int32_t shootRange;
-	
+
 	chaseMode_t chaseMode;
 	fightMode_t fightMode;
 
@@ -545,11 +549,11 @@ protected:
 	time_t lastLoginSaved;
 	Position loginPosition;
 	uint32_t lastip;
-	
+
 	//inventory variables
 	Item* inventory[11];
 	bool inventoryAbilities[11];
-	
+
 	//player advances variables
 	uint32_t skills[SKILL_LAST + 1][3];
 
@@ -563,9 +567,9 @@ protected:
 	uint32_t lossPercent[LOSS_LAST + 1];
 
 	LearnedInstantSpellList learnedInstantSpellList;
-	
+
 	ConditionList storedConditionList;
-	
+
 	unsigned char level_percent;
 	unsigned char maglevel_percent;
 
@@ -585,36 +589,36 @@ protected:
 		int32_t manaSpent;
 		int32_t magLevel;
 	};
-	
+
 	SentStats lastSentStats;
 
-	std::string name;	
+	std::string name;
 	std::string nameDescription;
 	uint32_t guid;
-	
+
 	uint32_t town;
-	
+
 	//guild variables
 	uint32_t guildId;
 	std::string guildName;
 	std::string guildRank;
 	std::string guildNick;
 	uint32_t guildLevel;
-	
+
 	StorageMap storageMap;
 	LightInfo itemsLight;
-	
+
 	OutfitList m_playerOutfits;
-	
+
 #ifdef __SKULLSYSTEM__
 	int64_t redSkullTicks;
 	Skulls_t skull;
 	typedef std::set<uint32_t> AttackedSet;
 	AttackedSet attackedSet;
 #endif
-	
+
 	void updateItemsLight(bool internal = false);
-	void updateBaseSpeed(){ 
+	void updateBaseSpeed(){
 		if(!hasFlag(PlayerFlag_SetMaxSpeed)){
 			baseSpeed = 220 + (2* (level - 1));
 		}
@@ -632,7 +636,7 @@ protected:
 	virtual uint32_t getAttackSpeed();
 
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
-	
+
 	friend class Game;
 	friend class LuaScriptInterface;
 	friend class Commands;

@@ -45,6 +45,7 @@ CREATE TABLE `players` (
     `name` VARCHAR(255) NOT NULL,
     `account_id` INT NOT NULL,
     `group_id` INT NOT NULL COMMENT 'users group',
+    `premdays` INT NOT NULL,
     `sex` INT UNSIGNED NOT NULL DEFAULT 0,
     `vocation` INT UNSIGNED NOT NULL DEFAULT 0,
     `experience` INT UNSIGNED NOT NULL DEFAULT 0,

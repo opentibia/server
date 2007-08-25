@@ -937,7 +937,22 @@ ItemType& Items::getItemType(int32_t id)
 	}
 }
 
-ItemType& Items::getItemIdByClientId(int32_t spriteId)
+const ItemType& Items::getItemType(int32_t id) const
+{
+	ItemType* iType = items.getElement(id);
+	if(iType){
+		return *iType;
+	}
+	else{
+		#ifdef __DEBUG__
+		std::cout << "WARNING! unknown itemtypeid " << id << ". using defaults." << std::endl;
+		#endif
+		static ItemType dummyItemType; // use this for invalid ids
+		return dummyItemType;
+	}
+}
+
+const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
 {
 	uint32_t i = 100;
 	ItemType* iType;
@@ -949,7 +964,7 @@ ItemType& Items::getItemIdByClientId(int32_t spriteId)
 		i++;
 	}while(iType);
 
-#ifdef __DEBUG__
+	#ifdef __DEBUG__
 	std::cout << "WARNING! unknown sprite id " << spriteId << ". using defaults." << std::endl;
 	#endif
 	static ItemType dummyItemType; // use this for invalid ids
@@ -990,6 +1005,17 @@ Array<A>::~Array()
 
 template<typename A>
 A Array<A>::getElement(uint32_t id)
+{
+	if(id >= 0 && id < m_size){
+		return m_data[id];
+	}
+	else{
+		return 0;
+	}
+}
+
+template<typename A>
+const A Array<A>::getElement(uint32_t id) const
 {
 	if(id >= 0 && id < m_size){
 		return m_data[id];

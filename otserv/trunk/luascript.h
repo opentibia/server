@@ -203,7 +203,8 @@ enum PlayerInfo_t{
 	PlayerInfoSex,
 	PlayerInfoLookDirection,
 	PlayerInfoTown,
-	PlayerInfoGUID
+	PlayerInfoGUID,
+	PlayerInfoPremiumDays
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -392,11 +393,14 @@ protected:
 	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerFlagValue(lua_State *L);
 	static int luaGetPlayerLossPercent(lua_State *L);
+	static int luaGetPlayerPremiumDays(lua_State *L);
 
 	static int luaPlayerLearnInstantSpell(lua_State *L);
 	static int luaGetPlayerLearnedInstantSpell(lua_State *L);
 	static int luaGetPlayerInstantSpellInfo(lua_State *L);
 	static int luaGetPlayerInstantSpellCount(lua_State *L);
+
+	static int luaIsPremium(lua_State *L);
 
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
