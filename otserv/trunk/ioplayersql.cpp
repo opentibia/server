@@ -52,7 +52,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT * FROM players WHERE name='" << Database::escapeString(name) << "'";
+	query << "SELECT `id`,`name`,`account_id`,`group_id`,`premend`,`sex`,`vocation`,`experience`,`level`,`maglevel`,`health`,`healthmax`,`mana`,`manamax`,`manaspent`,`soul`,`direction`,`lookbody`,`lookfeet`,`lookhead`,`looklegs`,`looktype`,`lookaddons`,`posx`,`posy`,`posz`,`cap`,`lastlogin`,`lastip`,`save`,`conditions`,`redskulltime`,`redskull`,`guildnick`,`rank_id`,`town_id`,`loss_experience`,`loss_mana`,`loss_skills` FROM players WHERE name='" << Database::escapeString(name) << "'";
 	if(!mysql->connect() ||!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 

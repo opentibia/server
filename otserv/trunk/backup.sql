@@ -2,8 +2,7 @@ CREATE TABLE "accounts" (
     "id" INTEGER PRIMARY KEY NOT NULL,
     "password" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255) NOT NULL DEFAULT '',
-    "blocked" BOOLEAN NOT NULL DEFAULT FALSE,
-    "premdays" INTEGER NOT NULL DEFAULT 0
+    "blocked" BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE "groups" (
@@ -20,7 +19,7 @@ CREATE TABLE "players" (
     "name" VARCHAR(255) NOT NULL,
     "account_id" INTEGER NOT NULL,
     "group_id" INTEGER NOT NULL,
-    "premdays" INTEGER NOT NULL DEFAULT 0,
+    "premend" INTEGER NOT NULL DEFAULT 0,
     "sex" INTEGER NOT NULL DEFAULT 0,
     "vocation" INTEGER NOT NULL DEFAULT 0,
     "experience" INTEGER NOT NULL DEFAULT 0,
@@ -91,6 +90,7 @@ CREATE TABLE "house_lists" (
 
 CREATE TABLE "player_depotitems" (
     "player_id" INTEGER NOT NULL,
+    "depot_id" INTEGER NOT NULL,
     "sid" INTEGER NOT NULL,
     "pid" INTEGER NOT NULL DEFAULT 0,
     "itemtype" INTEGER NOT NULL,

@@ -36,7 +36,6 @@ CREATE TABLE `accounts` (
     `password` VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL for MD5*/,
     `email` VARCHAR(255) NOT NULL DEFAULT '',
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
-    `premdays` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
@@ -45,7 +44,7 @@ CREATE TABLE `players` (
     `name` VARCHAR(255) NOT NULL,
     `account_id` INT NOT NULL,
     `group_id` INT NOT NULL COMMENT 'users group',
-    `premdays` INT NOT NULL DEFAULT 0,
+    `premend` INT UNSIGNED NOT NULL DEFAULT 0,
     `sex` INT UNSIGNED NOT NULL DEFAULT 0,
     `vocation` INT UNSIGNED NOT NULL DEFAULT 0,
     `experience` INT UNSIGNED NOT NULL DEFAULT 0,
@@ -185,12 +184,15 @@ CREATE TABLE `tile_items` (
 
 CREATE TABLE `player_depotitems` (
     `player_id` INT NOT NULL,
+    `depot_id` INT NOT NULL,
     `sid` INT NOT NULL COMMENT 'any given range eg 0-100 will be reserved for depot lockers and all > 100 will be then normal items inside depots',
     `pid` INT NOT NULL DEFAULT 0,
     `itemtype` INT NOT NULL,
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB NOT NULL,
-    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE
+    FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE,
+    KEY (`player_id`, `depot_id`),
+    UNIQUE KEY (`player_id`, `sid`)
 ) ENGINE = InnoDB;
 
 DELIMITER |
