@@ -52,7 +52,14 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT `id`,`name`,`account_id`,`group_id`,`premend`,`sex`,`vocation`,`experience`,`level`,`maglevel`,`health`,`healthmax`,`mana`,`manamax`,`manaspent`,`soul`,`direction`,`lookbody`,`lookfeet`,`lookhead`,`looklegs`,`looktype`,`lookaddons`,`posx`,`posy`,`posz`,`cap`,`lastlogin`,`lastip`,`save`,`conditions`,`redskulltime`,`redskull`,`guildnick`,`rank_id`,`town_id`,`loss_experience`,`loss_mana`,`loss_skills` FROM players WHERE name='" << Database::escapeString(name) << "'";
+	query << "SELECT `id`,`name`,`account_id`,`group_id`,`premend`,`sex`,"
+	  "`vocation`,`experience`,`level`,`maglevel`,`health`,`healthmax`,`mana`,"
+	  "`manamax`,`manaspent`,`soul`,`direction`,`lookbody`,`lookfeet`,`lookhead`,"
+	  "`looklegs`,`looktype`,`lookaddons`,`posx`,`posy`,`posz`,`cap`,`lastlogin`,"
+	  "`lastip`,`save`,`conditions`,`redskulltime`,`redskull`,`guildnick`,"
+	  "`rank_id`,`town_id`,`loss_experience`,`loss_mana`,`loss_skills`"
+	  "FROM players WHERE name='" << Database::escapeString(name) << "'";
+
 	if(!mysql->connect() ||!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 
@@ -74,7 +81,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		player->setFlags(group->m_flags);
 	}
 
+	#ifdef __USE_SQL_PREMDAYS__
 	player->premiumDays = result.getDataInt("premdays");
+	#endif
 
 	player->setDirection((Direction)result.getDataInt("direction"));
 	player->experience = result.getDataInt("experience");
@@ -165,6 +174,23 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		}
 
 	}
+
+	#ifndef __USE_SQL_PREMDAYS__
+	time_t premEnd = result.getDataInt("premend");
+	time_t timeNow = time(NULL);
+	if(premEnd != 0 && premEnd < timeNow){
+		//TODO: remove every premium property of the player
+		// outfit, vocation, temple, ...
+
+		//update table
+		DBQuery query2;
+		query2 << "UPDATE players SET premend = 0 WHERE name='" << Database::escapeString(name) << "'";
+		mysql->executeQuery(query2);
+	}
+	else{
+		player->premiumDays = (premEnd - timeNow)/(3600*24);
+	}
+	#endif
 
 	//get password
 	query << "SELECT password FROM accounts WHERE id='" << accno << "'";

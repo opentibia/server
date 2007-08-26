@@ -249,7 +249,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								msg.AddU16(g_config.getNumber(ConfigManager::PORT));
 							}
 
-							msg.AddU16(account.premDays);
+							msg.AddU16(0);
 						}
 						else{
 							msg.AddByte(0x0A);
@@ -269,7 +269,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		else if (protId == 0x0A){
 			/*uint16_t  clientos =*/ msg.GetU16();
 			uint16_t version  = msg.GetU16();
-			
+
 			msg.setRSAInstance(g_otservRSA);
 			if(msg.RSA_decrypt()){
 				uint32_t k[4];
@@ -503,10 +503,10 @@ int main(int argc, char *argv[])
 	//std::cout << ":: OTServ Version 0.6.0" << std::endl;
 	//std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
-	
+
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ \
 	|| defined __DEBUG_LUASCRIPTS__ || __DEBUG_RAID__
-	
+
 	std::cout << ":: Debugging:";
 	#ifdef __DEBUG__MOVESYS__
 	std::cout << " MOVESYS";
@@ -630,7 +630,7 @@ int main(int argc, char *argv[])
 		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
-	
+
 	if(!Item::items.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << "items/items.xml" << "!";
@@ -638,7 +638,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	//load scripts
 	if(ScriptingManager::getInstance()->loadScriptSystems() == false){
 		return -1;
@@ -655,7 +655,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	// load outfits data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "outfits.xml";
@@ -681,7 +681,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
@@ -768,6 +768,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	std::cout << ":: Local port:            " << g_config.getNumber(ConfigManager::PORT) << std::endl;
+
 	std::cout << ":: Global IP address:     ";
 	std::string ip;
 
@@ -788,7 +790,7 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 	}
-	
+
 	char resolvedIpstr[32];
 	formatIP(resolvedIp, resolvedIpstr);
 	std::cout << resolvedIpstr << std::endl << "::" << std::endl;

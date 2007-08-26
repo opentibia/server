@@ -44,11 +44,10 @@ Account IOAccountSQL::loadAccount(uint32_t accno)
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT id,password,premdays FROM accounts WHERE id='" << accno << "'";
+	query << "SELECT id,password FROM accounts WHERE id='" << accno << "'";
 	if(mysql->connect() && mysql->storeQuery(query, result)){
 		acc.accnumber = result.getDataInt("id");
 		acc.password = result.getDataString("password");
-		acc.premDays = result.getDataInt("premdays");
 		query << "SELECT name FROM players WHERE account_id='" << accno << "'";
 		if(mysql->storeQuery(query, result)){
 			for(uint32_t i = 0; i < result.getNumRows(); ++i){
@@ -67,14 +66,14 @@ bool IOAccountSQL::getPassword(uint32_t accno, const std::string &name, std::str
 	Database* mysql = Database::instance();
 	DBQuery query;
 	DBResult result;
-	
+
 	query << "SELECT password FROM accounts WHERE id='" << accno << "'";
 	if(mysql->connect() && mysql->storeQuery(query, result) && (result.getNumRows() == 1)){
 		std::string acc_password = result.getDataString("password");
-			
+
 		query << "SELECT name FROM players WHERE account_id='" << accno << "'";
 		if(mysql->storeQuery(query, result)){
-				
+
 			for(uint32_t i = 0; i < result.getNumRows(); ++i){
 				std::string ss = result.getDataString("name", i);
 				if(ss == name){
@@ -82,7 +81,7 @@ bool IOAccountSQL::getPassword(uint32_t accno, const std::string &name, std::str
 					return true;
 				}
 			}
-			
+
 		}
 	}
 	return false;

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -58,7 +58,7 @@ Account IOAccountXML::loadAccount(uint32_t accno)
 		root = xmlDocGetRootElement(doc);
 
 		if(xmlStrcmp(root->name,(const xmlChar*)"account") != 0){
-			xmlFreeDoc(doc);			
+			xmlFreeDoc(doc);
 			xmlMutexUnlock(xmlmutex);
 			return acc;
 		}
@@ -66,14 +66,9 @@ Account IOAccountXML::loadAccount(uint32_t accno)
 		p = root->children;
 
 		std::string strValue;
-		int intValue;
 
 		if(readXMLString(root, "pass", strValue)){
 			acc.password = strValue;
-		}
-
-		if(readXMLInteger(root, "premDays", intValue)){
-			acc.premDays = intValue;
 		}
 
 		// now load in characters.
@@ -92,13 +87,13 @@ Account IOAccountXML::loadAccount(uint32_t accno)
 			}
 			p = p->next;
 		}
-		
+
 		xmlFreeDoc(doc);
 
 		// Organize the char list.
 		acc.charList.sort();
 		acc.accnumber = accno;
-	}	
+	}
 
 	xmlMutexUnlock(xmlmutex);
 	return acc;
@@ -107,12 +102,12 @@ Account IOAccountXML::loadAccount(uint32_t accno)
 bool IOAccountXML::getPassword(uint32_t accno, const std::string& name, std::string& password)
 {
 	std::string acc_password;
-	
+
 	std::stringstream accsstr;
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	accsstr << datadir + "accounts/" << accno << ".xml";
 	std::string filename = accsstr.str();
-	
+
 	xmlMutexLock(xmlmutex);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
@@ -121,13 +116,13 @@ bool IOAccountXML::getPassword(uint32_t accno, const std::string& name, std::str
 		root = xmlDocGetRootElement(doc);
 
 		if(xmlStrcmp(root->name,(const xmlChar*)"account") != 0){
-			xmlFreeDoc(doc);			
+			xmlFreeDoc(doc);
 			xmlMutexUnlock(xmlmutex);
 			return false;
 		}
 
 		p = root->children;
-		
+
 		std::string strValue;
 		if(readXMLString(root, "pass", strValue)){
 			acc_password = strValue;
@@ -153,7 +148,7 @@ bool IOAccountXML::getPassword(uint32_t accno, const std::string& name, std::str
 			}
 			p = p->next;
 		}
-		
+
 		xmlFreeDoc(doc);
 	}
 
