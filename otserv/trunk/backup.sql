@@ -1,5 +1,5 @@
 CREATE TABLE "accounts" (
-    "id" INTEGER  PRIMARY KEY NOT NULL,
+    "id" INTEGER PRIMARY KEY NOT NULL,
     "password" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255) NOT NULL DEFAULT '',
     "blocked" BOOLEAN NOT NULL DEFAULT FALSE,
@@ -16,10 +16,11 @@ CREATE TABLE "groups" (
 );
 
 CREATE TABLE "players" (
-    "id" INTEGER  PRIMARY KEY NOT NULL,
+    "id" INTEGER PRIMARY KEY NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "account_id" INTEGER NOT NULL,
     "group_id" INTEGER NOT NULL,
+    "premdays" INTEGER NOT NULL DEFAULT 0,
     "sex" INTEGER NOT NULL DEFAULT 0,
     "vocation" INTEGER NOT NULL DEFAULT 0,
     "experience" INTEGER NOT NULL DEFAULT 0,
