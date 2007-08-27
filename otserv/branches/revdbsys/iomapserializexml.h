@@ -1,0 +1,47 @@
+//////////////////////////////////////////////////////////////////////
+// OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+// SQL map serialization
+//////////////////////////////////////////////////////////////////////
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
+
+
+#ifndef __IOMAPSERIALIZEXML_H__
+#define __IOMAPSERIALIZEXML_H__
+
+#include "iomapserialize.h"
+#include "map.h"
+
+#include <string>
+
+class IOMapSerializeXML : public IOMapSerialize{
+public:
+	IOMapSerializeXML();
+	virtual ~IOMapSerializeXML();
+
+	virtual bool loadMap(Map* map, const std::string& identifier);
+	virtual bool saveMap(Map* map, const std::string& identifier);
+	virtual bool loadHouseInfo(Map* map, const std::string& identifier);
+	virtual bool saveHouseInfo(Map* map, const std::string& identifier);
+
+private:
+	bool saveTile(xmlNodePtr nodeTile, const Tile* tile);
+	bool loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile);
+
+	void saveAccessList(xmlNodePtr nodeHouseAccessList, uint32_t listId, const std::string& listText);
+};
+
+#endif
