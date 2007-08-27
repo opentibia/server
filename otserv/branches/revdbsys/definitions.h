@@ -45,8 +45,11 @@
     #define __SPLIT_QUERIES__
 #endif
 
-#if defined __USE_MYSQL__ || __USE_SQLITE__
-	#define USE_SQL_ENGINE
+/** FIXME: DELME - will be deleted after dropping precompiler conditions */
+#define USE_SQL_ENGINE
+
+#if !defined(__USE_MYSQL__) && !defined(__USE_SQLITE__)
+    #define __USE_SQLITE__
 #endif
 
 #if defined(__USE_MYSQL__) && !defined(__USE_SQLITE__)

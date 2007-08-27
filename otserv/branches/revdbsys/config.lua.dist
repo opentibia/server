@@ -127,11 +127,11 @@ md5passwords = "no"
 -- options: mysql, sqlite
 sql_type = "mysql"
 
---- MySQL part (ignore if you are using SQLite)
+--- SQL connection part
+sql_db   = "db.s3db"
+--- sql_db = "otserv" //use this one for MySQL
+
+-- there settings are for MySQL only, SQLite doesn't need then
 sql_host = "localhost"
 sql_user = "root"
 sql_pass = ""
-sql_db   = "otserv"
-
---- SQLite part (ignore if you are using MySQL)
-sqlite_db = "db.s3db"

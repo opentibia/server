@@ -42,7 +42,7 @@ bool DatabaseSqLite::init()
 	m_connected = false;
 
 	// Initialize mysql
-	if(sqlite3_open(g_config.getString(ConfigManager::SQLITE_DB).c_str(), &m_handle) != SQLITE_OK){
+	if(sqlite3_open(g_config.getString(ConfigManager::SQL_DB).c_str(), &m_handle) != SQLITE_OK){
 		//throw DBError("sqlite_init", DB_ERROR_INIT);
 		std::cout << "SQLITE ERROR sqlite_init" << std::endl;
 		sqlite3_close(m_handle);

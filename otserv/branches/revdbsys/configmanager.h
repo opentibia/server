@@ -60,7 +60,7 @@ public:
 		SQL_USER,
 		SQL_PASS,
 		SQL_DB,
-		SQLITE_DB,
+		SQLITE_DB,/* deprecated */
 		SQL_TYPE,
 		MAP_HOST,
 		MAP_USER,
