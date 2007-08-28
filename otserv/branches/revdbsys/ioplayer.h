@@ -18,23 +18,38 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __IOPLAYER_H
 #define __IOPLAYER_H
 
 #include <string>
 
 #include "player.h"
+#include "database.h"
 
-/** Baseclass for all Player-Loaders */
+class PlayerGroup
+{
+public:
+	PlayerGroup(){};
+	~PlayerGroup(){};
+	
+	std::string m_name;
+	uint64_t m_flags;
+	uint32_t m_access;
+	uint32_t m_maxDepotItems;
+	uint32_t m_maxVip;
+};
+
+typedef std::pair<int32_t, Item*> itemBlock;
+typedef std::list<itemBlock> ItemBlockList;
+
+/** Class responsible for loading players from database. */
 class IOPlayer {
 public:
 	static IOPlayer* instance();
 
 	/** Get a textual description of what source is used
-	  * \returns Name of the source*/
-	virtual char* getSourceDescription(){return "Player source: NULL";};
-
+	* \returns Name of the source*/
+	virtual char* getSourceDescription(){return "Player source: SQL";};
 	/** Load a player
 	  * \param player Player structure to load to
 	  * \param name Name of the player
@@ -56,9 +71,38 @@ public:
 	virtual bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 	virtual bool playerExists(std::string name);
 
+	IOPlayer();
+	~IOPlayer(){};
+
 protected:
-	IOPlayer(){};
-	virtual ~IOPlayer(){};
+	bool storeNameByGuid(Database &mysql, uint32_t guid);
+	
+	const PlayerGroup* getPlayerGroup(uint32_t groupid);
+
+	struct StringCompareCase{
+		bool operator()(const std::string& l, const std::string& r) const{
+			if(strcasecmp(l.c_str(), r.c_str()) < 0){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+	};
+
+	typedef std::map<int,std::pair<Item*,int> > ItemMap;
+
+	void loadItems(ItemMap& itemMap, DBResult& result);
+	bool saveItems(Player* player, const ItemBlockList& itemList, DBSplitInsert& query_insert);
+
+	typedef std::map<uint32_t, std::string> NameCacheMap;
+	typedef std::map<std::string, uint32_t, StringCompareCase> GuidCacheMap;
+	typedef std::map<uint32_t, PlayerGroup*> PlayerGroupMap;
+	
+	PlayerGroupMap playerGroupMap;
+	NameCacheMap nameCacheMap;
+	GuidCacheMap guidCacheMap;
+
 	static IOPlayer* _instance;
 };
 

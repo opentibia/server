@@ -435,7 +435,7 @@ bool AdminProtocol::adminCommandCloseServer()
 		}
 	}
 	
-	if(!g_bans.saveBans(g_config.getString(ConfigManager::BAN_FILE))){
+	if(!g_bans.saveBans()){
 		return false;
 	}
 	

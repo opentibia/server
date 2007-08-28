@@ -646,7 +646,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 
 	Player* player = creature->getPlayer();
 
-	if(!g_bans.saveBans(g_config.getString(ConfigManager::BAN_FILE))){
+	if(!g_bans.saveBans()){
 		if(player)
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving bans.");
 	}

@@ -56,7 +56,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[HOUSE_STORE_FILE] = getGlobalString(L, "housestore");
 		m_confString[HOUSE_RENT_PERIOD] = getGlobalString(L, "houserentperiod", "monthly");
 		m_confString[MAP_KIND] = getGlobalString(L, "mapkind");
-		m_confString[BAN_FILE] = getGlobalString(L, "banIdentifier");
 		m_confString[MD5_PASS] = getGlobalString(L, "md5passwords");
 		m_confString[WORLD_TYPE] = getGlobalString(L, "worldtype");
 		m_confString[SQL_HOST] = getGlobalString(L, "sql_host");

@@ -50,18 +50,17 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am__otserv_SOURCES_DIST = ioplayersql.cpp ioplayersql.h \
-	ioaccountsql.cpp ioaccountsql.h database.cpp database.h \
-	iomapserializesql.cpp iomapserializesql.h databasemysql.cpp \
+am__otserv_SOURCES_DIST = database.cpp database.h \
+	databasemysql.cpp \
 	databasemysql.h databasesqlite.cpp databasesqlite.h \
 	account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
-	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
+	iomapxml.cpp ioplayer.cpp \
 	item.cpp items.cpp luascript.cpp map.cpp monster.cpp \
 	networkmessage.cpp npc.cpp otserv.cpp player.cpp position.cpp \
 	protocol80.cpp spells.cpp status.cpp thing.cpp tile.cpp \
 	tools.cpp account.h bootstrap.sh config.h const80.h \
 	container.h creature.h definitions.h game.h ioaccount.h \
-	ioaccountxml.h iomap.h iomapxml.h ioplayer.h ioplayerxml.h \
+	iomap.h iomapxml.h ioplayer.h \
 	item.h items.h luascript.h map.h monster.h networkmessage.h \
 	npc.h otsystem.h player.h position.h protocol80.h scheduler.h \
 	spells.h stamp-h status.h tasks.h templates.h texcept.h \
@@ -72,7 +71,7 @@ am__otserv_SOURCES_DIST = ioplayersql.cpp ioplayersql.h \
 	teleport.cpp teleport.h trashholder.cpp trashholder.h \
 	mailbox.cpp mailbox.h waitlist.cpp waitlist.h house.cpp \
 	house.h housetile.cpp housetile.h iomapserialize.cpp \
-	iomapserialize.h iomapserializexml.cpp iomapserializexml.h \
+	iomapserialize.h \
 	cylinder.cpp cylinder.h ban.cpp ban.h rsa.cpp rsa.h \
 	configmanager.cpp configmanager.h outfit.cpp outfit.h otpch.h \
 	admin.cpp admin.h baseevents.cpp baseevents.h raids.cpp \
@@ -80,15 +79,13 @@ am__otserv_SOURCES_DIST = ioplayersql.cpp ioplayersql.h \
 	condition.cpp condition.h weapons.cpp weapons.h talkaction.cpp \
 	talkaction.h vocation.cpp vocation.h scriptmanager.cpp \
 	scriptmanager.h creatureevent.cpp creatureevent.h
-@USE_SQL_TRUE@am__objects_1 = ioplayersql.$(OBJEXT) \
-@USE_SQL_TRUE@	ioaccountsql.$(OBJEXT) database.$(OBJEXT) \
-@USE_SQL_TRUE@	iomapserializesql.$(OBJEXT)
 @USE_MYSQL_TRUE@am__objects_2 = databasemysql.$(OBJEXT)
 @USE_SQLITE_TRUE@am__objects_3 = databasesqlite.$(OBJEXT)
-am_otserv_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3) \
+am_otserv_OBJECTS = $(am__objects_2) $(am__objects_3) \
+	database.$(OBJEXT) \
 	account.$(OBJEXT) container.$(OBJEXT) creature.$(OBJEXT) \
-	game.$(OBJEXT) ioaccount.$(OBJEXT) ioaccountxml.$(OBJEXT) \
-	iomapxml.$(OBJEXT) ioplayer.$(OBJEXT) ioplayerxml.$(OBJEXT) \
+	game.$(OBJEXT) ioaccount.$(OBJEXT) \
+	iomapxml.$(OBJEXT) ioplayer.$(OBJEXT) \
 	item.$(OBJEXT) items.$(OBJEXT) luascript.$(OBJEXT) \
 	map.$(OBJEXT) monster.$(OBJEXT) networkmessage.$(OBJEXT) \
 	npc.$(OBJEXT) otserv.$(OBJEXT) player.$(OBJEXT) \
@@ -100,7 +97,7 @@ am_otserv_OBJECTS = $(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	iomapotbm.$(OBJEXT) monsters.$(OBJEXT) teleport.$(OBJEXT) \
 	trashholder.$(OBJEXT) mailbox.$(OBJEXT) waitlist.$(OBJEXT) \
 	house.$(OBJEXT) housetile.$(OBJEXT) iomapserialize.$(OBJEXT) \
-	iomapserializexml.$(OBJEXT) cylinder.$(OBJEXT) ban.$(OBJEXT) \
+	cylinder.$(OBJEXT) ban.$(OBJEXT) \
 	rsa.$(OBJEXT) configmanager.$(OBJEXT) outfit.$(OBJEXT) \
 	admin.$(OBJEXT) baseevents.$(OBJEXT) raids.$(OBJEXT) \
 	movement.$(OBJEXT) combat.$(OBJEXT) condition.$(OBJEXT) \
@@ -258,17 +255,16 @@ AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(MYSQL_FLAGS) $(LUA_CFLAGS) \
 otserv_LDADD = $(XML_LIBS) $(LUA_LIBS) $(BOOST_LIBS) $(GMP_LIBS) -ldl
 @USE_MYSQL_TRUE@MAYBE_MYSQL = databasemysql.cpp databasemysql.h
 @USE_SQLITE_TRUE@MAYBE_SQLITE = databasesqlite.cpp databasesqlite.h
-@USE_SQL_TRUE@MAYBE_SQL = ioplayersql.cpp ioplayersql.h ioaccountsql.cpp ioaccountsql.h \
-@USE_SQL_TRUE@	database.cpp database.h iomapserializesql.cpp iomapserializesql.h
 
-otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
+otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
+	database.cpp database.h \
 	account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
-	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
+	iomapxml.cpp ioplayer.cpp \
 	item.cpp items.cpp luascript.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp \
 	otserv.cpp player.cpp position.cpp protocol80.cpp spells.cpp \
 	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const80.h \
-	container.h creature.h definitions.h game.h ioaccount.h ioaccountxml.h \
-	iomap.h iomapxml.h ioplayer.h ioplayerxml.h item.h items.h \
+	container.h creature.h definitions.h game.h ioaccount.h \
+	iomap.h iomapxml.h ioplayer.h item.h items.h \
 	luascript.h map.h monster.h networkmessage.h npc.h otsystem.h player.h \
 	position.h protocol80.h scheduler.h spells.h stamp-h status.h \
 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
@@ -277,7 +273,7 @@ otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
 	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp teleport.cpp teleport.h \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
 	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
-	iomapserializexml.cpp iomapserializexml.h cylinder.cpp cylinder.h ban.cpp ban.h \
+	cylinder.cpp cylinder.h ban.cpp ban.h \
 	rsa.cpp rsa.h configmanager.cpp configmanager.h outfit.cpp outfit.h otpch.h \
 	admin.cpp admin.h baseevents.cpp baseevents.h \
 	raids.cpp raids.h movement.cpp movement.h combat.cpp combat.h \
@@ -376,16 +372,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/house.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/housetile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioaccount.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioaccountsql.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioaccountxml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iomapotbm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iomapserialize.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iomapserializesql.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iomapserializexml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iomapxml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioplayer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioplayersql.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioplayerxml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/items.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logger.Po@am__quote@

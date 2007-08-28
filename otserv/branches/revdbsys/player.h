@@ -642,8 +642,7 @@ protected:
 	friend class Commands;
 	friend class Map;
 	friend class Actions;
-	friend class IOPlayerXML;
-	friend class IOPlayerSQL;
+	friend class IOPlayer;
 };
 
 #endif

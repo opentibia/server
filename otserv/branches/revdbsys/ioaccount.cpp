@@ -22,21 +22,22 @@
 #include "definitions.h"
 #include "ioaccount.h"
 
-#if defined USE_SQL_ENGINE
-#include "ioaccountsql.h"
-#else
-#include "ioaccountxml.h"
-#endif
+#include <algorithm>
+#include <functional>
+#include <sstream>
+
+#include "database.h"
+#include <iostream>
+
+#include "configmanager.h"
+
+extern ConfigManager g_config;
 
 IOAccount* IOAccount::_instance = NULL;
 
 IOAccount* IOAccount::instance(){
 	if(!_instance){
-#if defined USE_SQL_ENGINE
-		_instance = (IOAccount*)new IOAccountSQL;
-#else
-		_instance = (IOAccount*)new IOAccountXML;
-#endif
+		_instance = new IOAccount;
 	}
 	#ifdef __DEBUG__
 	printf("%s \n", _instance->getSourceDescription());
@@ -44,12 +45,58 @@ IOAccount* IOAccount::instance(){
 	return _instance;
 }
 
-Account IOAccount::loadAccount(uint32_t accno){
+IOAccount::IOAccount()
+{
+	//
+}
+
+Account IOAccount::loadAccount(uint32_t accno)
+{
 	Account acc;
+
+	Database* mysql = Database::instance();
+	DBQuery query;
+	DBResult result;
+
+	query << "SELECT id,password FROM accounts WHERE id='" << accno << "'";
+	if(mysql->connect() && mysql->storeQuery(query, result)){
+		acc.accnumber = result.getDataInt("id");
+		acc.password = result.getDataString("password");
+		query << "SELECT name FROM players WHERE account_id='" << accno << "'";
+		if(mysql->storeQuery(query, result)){
+			for(uint32_t i = 0; i < result.getNumRows(); ++i){
+				std::string ss = result.getDataString("name", i);
+				acc.charList.push_back(ss.c_str());
+			}
+			acc.charList.sort();
+		}
+	}
 	return acc;
 }
 
-bool IOAccount::getPassword(uint32_t accno, const std::string& name, std::string& password)
+
+bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string &password)
 {
+	Database* mysql = Database::instance();
+	DBQuery query;
+	DBResult result;
+
+	query << "SELECT password FROM accounts WHERE id='" << accno << "'";
+	if(mysql->connect() && mysql->storeQuery(query, result) && (result.getNumRows() == 1)){
+		std::string acc_password = result.getDataString("password");
+
+		query << "SELECT name FROM players WHERE account_id='" << accno << "'";
+		if(mysql->storeQuery(query, result)){
+
+			for(uint32_t i = 0; i < result.getNumRows(); ++i){
+				std::string ss = result.getDataString("name", i);
+				if(ss == name){
+					password = acc_password;
+					return true;
+				}
+			}
+
+		}
+	}
 	return false;
 }

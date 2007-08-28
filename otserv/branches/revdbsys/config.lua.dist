@@ -18,9 +18,6 @@ mapstore = "data/world/map-mapstore.xml"
 -- house store location (for XML only)
 housestore = "data/world/map-housestore.xml"
 
--- bans storage (for XML only)
-banIdentifier = "data/bans.xml"
-
 -- server name
 servername = "OTServ"
 
@@ -92,7 +89,7 @@ despawnradius = 50
 maxmessagebuffer = 0
 
 -- motd (the message box that you sometimes get before you choose characters)
-motd = "Welcome to OTServ 0.6.0!"
+motd = "Welcome to OTServ revdbsys!"
 motdnum = "1"
 
 -- login message
@@ -125,7 +122,7 @@ md5passwords = "no"
 
 -- SQL type
 -- options: mysql, sqlite
-sql_type = "mysql"
+sql_type = "sqlite"
 
 --- SQL connection part
 sql_db   = "db.s3db"

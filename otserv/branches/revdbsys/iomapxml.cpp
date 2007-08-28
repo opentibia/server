@@ -22,14 +22,14 @@
 #include "iomapxml.h"
 #include "definitions.h"
 
-#include "iomapserializexml.h"
+#include "iomapserialize.h"
 #include "map.h"
 #include "house.h"
 #include "spawn.h"
 
 bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 {
-	IOMapSerializeXML xmlMap;
+	IOMapSerialize xmlMap;
 	return xmlMap.loadMap(map, identifier);
 }
 

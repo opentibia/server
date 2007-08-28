@@ -266,11 +266,7 @@ protected:
 	friend class IOMapOTBM;
 	friend class IOMapXML;
 	friend class IOMap;
-	friend class IOMapSerializeXML;
-
-#if defined USE_SQL_ENGINE
-	friend class IOMapSerializeSQL;
-#endif
+	friend class IOMapSerialize;
 };
 
 #endif

@@ -22,8 +22,6 @@
 #ifndef __OTSERV_IOMAPSERIALIZE_H__
 #define __OTSERV_IOMAPSERIALIZE_H__
 
-#include <string>
-
 enum MapError_t{
 	LOADMAPERROR_NONE,
 	LOADMAPERROR_CANNOTOPENFILE,
@@ -38,43 +36,57 @@ enum MapError_t{
 
 class Map;
 
+#include "iomapserialize.h"
+#include "database.h"
+#include "map.h"
+
+#include <string>
+
 class IOMapSerialize{
 public:
 	static IOMapSerialize* getInstance();
+
+	IOMapSerialize();
+	virtual ~IOMapSerialize();
 
 	/** Load the map from a file/database
 	  * \param map pointer to the Map class
 	  * \param identifier is the mapfile/database to open
 	  * \returns Returns true if the map was loaded successfully
 	*/
-	virtual bool loadMap(Map* map, const std::string& identifier) = 0;
+	virtual bool loadMap(Map* map, const std::string& identifier);
 
 	/** Save the map to a file/database
 	  * \param map pointer to the Map class
 	  * \param identifier is the mapfile/database to open
 	  * \returns Returns true if the map was saved successfully
 	*/
-	virtual bool saveMap(Map* map, const std::string& identifier) = 0;
+	virtual bool saveMap(Map* map, const std::string& identifier);
 
 	/** Load the house access list to a file/database
 	  * \param map pointer to the Map class
 	  * \param identifier is the house access file/database to open
 	  * \returns Returns true if the house access list was opened successfully
 	*/
-	virtual bool loadHouseInfo(Map* map, const std::string& identifier) = 0;
+	virtual bool loadHouseInfo(Map* map, const std::string& identifier);
 
 	/** Save the house access list to a file/database
 	  * \param map pointer to the Map class
 	  * \param identifier is the house access file/database to open
 	  * \returns Returns true if the house access list was saved successfully
 	*/
-	virtual bool saveHouseInfo(Map* map, const std::string& identifier) = 0;
+	virtual bool saveHouseInfo(Map* map, const std::string& identifier);
 
 protected:
-	static IOMapSerialize* _instance;
+	std::string m_host;
+	std::string m_user;
+	std::string m_pass;
+	std::string m_db;
 
-	IOMapSerialize(){};
-	virtual ~IOMapSerialize(){};
+	bool saveTile(Database* db, uint32_t tileId, const Tile* tile);
+	bool loadTile(Database& db, Tile* tile);
+
+	static IOMapSerialize* _instance;
 };
 
 #endif

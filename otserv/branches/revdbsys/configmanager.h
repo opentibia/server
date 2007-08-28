@@ -44,7 +44,7 @@ public:
 		HOUSE_STORE_FILE,
 		HOUSE_RENT_PERIOD,
 		MAP_KIND,
-		BAN_FILE,
+		BAN_FILE,/* deprecated */
 		LOGIN_MSG,
 		SERVER_NAME,
 		WORLD_NAME,
