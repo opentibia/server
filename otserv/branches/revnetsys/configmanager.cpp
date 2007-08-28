@@ -103,7 +103,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);	
 	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
 	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
-
+	m_confInteger[USE_MD5_PASS] = 0;
 	/*
 	for(int i=0; i<4; ++i){
 		m_confVocationString[i] = getGlobalStringField(L, "vocations", i+1, "unknown");

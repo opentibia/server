@@ -47,7 +47,6 @@
 #include "account.h"
 
 #include "tools.h"
-#include "md5.h"
 #include "waitlist.h"
 #include "ban.h"
 #include "rsa.h"
@@ -84,7 +83,6 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 #define CLIENT_VERSION_MIN 792
 #define CLIENT_VERSION_MAX 792
 
-typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
 IPList serverIPs;
 
 ConfigManager g_config;
@@ -103,51 +101,6 @@ extern AdminProtocolConfig* adminConfig;
 #include "exception.h"
 #endif
 #include "networkmessage.h"
-
-enum passwordType_t{
-	PASSWORD_TYPE_PLAIN,
-	PASSWORD_TYPE_MD5,
-};
-
-passwordType_t passwordType;
-
-bool passwordTest(std::string &plain, std::string &hash)
-{
-	if(passwordType == PASSWORD_TYPE_MD5){
-		MD5_CTX m_md5;
-		std::stringstream hexStream;
-		std::string plainHash;
-
-		MD5Init(&m_md5, 0);
-		MD5Update(&m_md5, (const unsigned char*)plain.c_str(), plain.length());
-		MD5Final(&m_md5);
-
-		hexStream.flags(std::ios::hex);
-		for(int i=0;i<16;i++){
-			hexStream << std::setw(2) << std::setfill('0') << (unsigned long)m_md5.digest[i];
-		}
-
-		plainHash = hexStream.str();
-		std::transform(plainHash.begin(), plainHash.end(), plainHash.begin(), upchar);
-		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
-		if(plainHash == hash){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-	else{
-		if(plain == hash){
-			return true;
-		}
-		else{
-			return false;
-		}
-
-	}
-
-}
 
 OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 {
@@ -701,7 +654,7 @@ int main(int argc, char *argv[])
 	#endif
 
 	if(g_config.getString(ConfigManager::MD5_PASS) == "yes"){
-		passwordType = PASSWORD_TYPE_MD5;
+		g_config.setNumber(passwordType = PASSWORD_TYPE_MD5;
 		std::cout << ":: Use MD5 passwords" << std::endl;
 	}
 	else{

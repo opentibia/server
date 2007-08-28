@@ -18,51 +18,21 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_CONNECTION_H__
-#define __OTSERV_CONNECTION_H__
+#ifndef __OTSERV_PROTOCOL_LOGIN_H__
+#define __OTSERV_PROTOCOL_LOGIN_H__
 
-#include "definitions.h"
-#include <boost/asio.hpp>
+#include "protocol.h"
 
-#include "networkmessage.h"
-
-
-using namespace boost;
-using namespace boost::asio::ip;
-
-class Protocol;
+class NetworkMessage;
 class OutputMessage;
 
-class Connection
+class ProtocolLogin : public Protocol
 {
 public:
-	Connection(asio::io_service& io_service) : m_socket(io_service)
-	{ 
-		m_protocol = NULL;
-		m_pendingWrite = 0;
-	}
-	
-	~Connection() {}
+	ProtocolLogin(Connection* connection) : Protocol(connection) {}
+	virtual ~ProtocolLogin() {}
 
-	const tcp::socket& getHandle() const { return m_socket; }
-
-	void closeConnection();
-	void acceptConnection();
-	
-	void send(OutputMessage* msg);
-	
-	void parseHeader(const asio::error& error);
-	void parsePacket(const asio::error& error);
-
-	void onWriteOperation(const asio::error& error);
-	
-private:
-	NetworkMessage m_msg;
-	tcp::socket m_socket;
-	
-	int32_t m_pendingWrite;
-	
-	Protocol* m_protocol;
+	virtual void parsePacket(NetworkMessage& msg);
 };
 
 #endif

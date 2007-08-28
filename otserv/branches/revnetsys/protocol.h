@@ -24,15 +24,42 @@
 #include "definitions.h"
 
 class NetworkMessage;
+class OutputMessage;
+class Connection;
+class RSA;
 
 class Protocol
 {
 public:
-	Protocol() {}
+	Protocol(Connection* connection)
+	{ 
+		m_connection = connection;
+		m_encryptionEnabled = false;
+		m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
+	}
+	
 	virtual ~Protocol() {}
 
 	virtual void parsePacket(NetworkMessage& msg) = 0;
-	virtual void sendPacket(NetworkMessage& msg) = 0;
+	
+	//Called from connection to know if the protocol instance
+	// can be released
+	virtual bool canBeReleased() { return true; }
+	
+	virtual void onSendMessage(OutputMessage* msg);
+	
+	Connection* getConnection() { return m_connection;}
+	void setConnection(Connection* connection) { m_connection = connection; }
+	
+protected:
+	
+	void XTEA_encrypt(OutputMessage& msg);
+	bool XTEA_decrypt(NetworkMessage& msg);
+	bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
+	
+	Connection* m_connection;
+	bool m_encryptionEnabled;
+	uint32_t m_key[4];
 };
 
 #endif

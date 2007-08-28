@@ -53,6 +53,11 @@
 	#define USE_MYSQL_ONLY
 #endif
 
+enum passwordType_t{
+	PASSWORD_TYPE_PLAIN = 0,
+	PASSWORD_TYPE_MD5 = 1,
+};
+
 #if defined __WINDOWS__ || defined WIN32
 
 #ifndef __FUNCTION__
@@ -61,6 +66,12 @@
 
 #define OTSYS_THREAD_RETURN  void
 #define EWOULDBLOCK WSAEWOULDBLOCK
+
+//Windows 2000	0x0500
+//Windows Xp	0x0501
+//Windows 2003	0x0502
+//Windows Vista	0x0600
+#define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
 	#include <ext/hash_map>
@@ -72,8 +83,6 @@
 	
 #else
 	typedef unsigned long long uint64_t;
-
-	#define _WIN32_WINNT 0x0500
 
 	#ifndef NOMINMAX
 		#define NOMINMAX

@@ -26,7 +26,10 @@
 #include "logger.h"
 
 #include <list>
+#include <vector>
 #include <algorithm>
+
+typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
 
 #if defined WIN32 || defined __WINDOWS__
 #ifdef __WIN_LOW_FRAG_HEAP__

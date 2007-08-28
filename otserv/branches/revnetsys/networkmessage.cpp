@@ -32,13 +32,13 @@
 #include "position.h"
 #include "rsa.h"
 
-bool NetworkMessage::decodeHeader()
+int32_t NetworkMessage::decodeHeader()
 {
-	int datasize = m_MsgBuf[0] | m_MsgBuf[1] << 8;
-	return true;
+	return (int32_t)(m_MsgBuf[0] | m_MsgBuf[1] << 8);
 }
 
 /******************************************************************************/
+/*
 bool NetworkMessage::ReadFromSocket(SOCKET socket)
 {
 	// just read the size to avoid reading 2 messages at once
@@ -159,7 +159,7 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 
 	return ret;
 }
-
+*/
 
 /******************************************************************************/
 std::string NetworkMessage::GetString()
@@ -216,6 +216,15 @@ void NetworkMessage::AddBytes(const char* bytes, uint32_t size)
 	m_MsgSize += size;
 }
 
+void NetworkMessage::AddPaddingBytes(uint32_t n)
+{
+	if(!canAdd(n))
+		return;
+		
+	memset((void*)&m_MsgBuf[m_ReadPos], 0, n);
+	m_MsgSize = m_MsgSize + n;
+}
+
 void NetworkMessage::AddPosition(const Position& pos)
 {
 	AddU16(pos.x);
@@ -263,7 +272,7 @@ void NetworkMessage::JoinMessages(NetworkMessage &add)
 	m_ReadPos += add.m_MsgSize;
   	m_MsgSize += add.m_MsgSize;
 }
-
+/*
 void NetworkMessage::XTEA_encrypt()
 {
 	uint32_t k[4];
@@ -342,3 +351,4 @@ bool NetworkMessage::RSA_decrypt()
 	
 	return true;
 }
+*/

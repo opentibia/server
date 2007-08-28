@@ -32,6 +32,7 @@ Scheduler::Scheduler()
 
 OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
 {
+	srand(time(NULL));
 	while(true){
 		SchedulerTask* event = NULL;
 		bool runEvent = false;
@@ -91,7 +92,6 @@ uint32_t Scheduler::addEvent(SchedulerTask* event)
 	// insert the eventid in the list of active events
 	m_eventIds.insert(event->getEventId());
 	
-	bool isEmpty = m_eventList.empty();
 	bool do_signal;
 	
 	// add the event to the queue
@@ -99,7 +99,7 @@ uint32_t Scheduler::addEvent(SchedulerTask* event)
 	
 	// if the list was empty or this event is the top in the list
 	// we have to signal it
-	if(isEmpty || event == m_eventList.top())
+	if(event == m_eventList.top())
 		do_signal = true;
 	else
 		do_signal = false;

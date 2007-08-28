@@ -27,35 +27,37 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
+using boost;
+using boost::asio::ip;
+
 class server
 {
 public:
-  server(boost::asio::io_service& io_service, uint16_t port)
-		: acceptor(io_service, boost::asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
-  {
-    accept();
-  }
+	server(asio::io_service& io_service, uint16_t port)
+		: acceptor(io_service, tcp::endpoint(tcp::v4(), port))
+	{
+		accept();
+	}
 
 private:
-  void accept()
-  {
+	void accept()
+	{
 		Connection* connection = new Connection(acceptor.io_service());
 
-		/*
-    acceptor.async_accept(connection->getHandle(),
-        boost::bind(&server::onAccept, this, connection, asio::placeholders::error));
-		*/
-  }
+		acceptor.async_accept(connection->getHandle(),
+			boost::bind(&server::onAccept, this, connection, 
+			asio::placeholders::error));
+	}
 
-  void onAccept(Connection* connection, const asio::error& error)
-  {
-    if(!error){
-      connection->acceptConnection();
-      accept();
-    }
-  }
+	void onAccept(Connection* connection, const asio::error& error)
+	{
+		if(!error){
+			connection->acceptConnection();
+			accept();
+		}
+	}
 
-	boost::asio::ip::tcp::acceptor acceptor;
+	tcp::acceptor acceptor;
 };
 
 #endif

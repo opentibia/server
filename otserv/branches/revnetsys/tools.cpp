@@ -17,10 +17,21 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-#include "otpch.h"
+
+#include "definitions.h"
+#include "boost/asio.hpp"
 
 #include "math.h"
 #include "tools.h"
+#include "configmanager.h"
+#include "md5.h"
+#include <sstream>
+#include <iomanip>
+
+extern ConfigManager g_config;
+
+using namespace boost::asio::ip;
+using namespace boost;
 
 bool fileExists(const char* filename)
 {
@@ -249,8 +260,15 @@ std::string urlEncode(const char* str)
 	return out;
 }
 
-uint32_t getIPSocket(SOCKET s)
+uint32_t getIPSocket(const tcp::socket& s)
 {
+	asio::error error;
+	const tcp::endpoint endpoint = s.remote_endpoint(asio::assign_error(error));
+	if(!error){
+		return endpoint.address().to_v4().to_ulong();
+	}
+	
+	/*
 	sockaddr_in sain;
 	socklen_t salen = sizeof(sockaddr_in);
 
@@ -261,8 +279,44 @@ uint32_t getIPSocket(SOCKET s)
 		return sain.sin_addr.s_addr;
 #endif
 	}
-
+*/
 	return 0;
+}
+
+bool passwordTest(const std::string &plain, std::string &hash)
+{
+	if(g_config.getNumber(ConfigManager::USE_MD5_PASS) == PASSWORD_TYPE_MD5){
+		MD5_CTX m_md5;
+		std::stringstream hexStream;
+		std::string plainHash;
+
+		MD5Init(&m_md5, 0);
+		MD5Update(&m_md5, (const unsigned char*)plain.c_str(), plain.length());
+		MD5Final(&m_md5);
+
+		hexStream.flags(std::ios::hex);
+		for(uint32_t i = 0; i < 16; ++i){
+			hexStream << std::setw(2) << std::setfill('0') << (uint32_t)m_md5.digest[i];
+		}
+
+		plainHash = hexStream.str();
+		std::transform(plainHash.begin(), plainHash.end(), plainHash.begin(), upchar);
+		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
+		if(plainHash == hash){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	else{
+		if(plain == hash){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 }
 
 //buffer should have at least 17 bytes

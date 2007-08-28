@@ -20,40 +20,111 @@
 
 #include "connection.h"
 #include "protocol.h"
+#include "protocollogin.h"
+#include "outputmessage.h"
 
 #include <boost/bind.hpp>
 
 void Connection::closeConnection()
 {
-	//
+	//TODO. Decide from which thread should be closed the connection
+	// using a timer and a pool of connections(like OutputMessage)?
 }
 
 void Connection::acceptConnection()
 {
-	boost::asio::async_read(socket,
-		boost::asio::buffer(msg.getBuffer(), NetworkMessage::header_length),
-		boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
+	// Read size of te first packet
+	asio::async_read(m_socket,
+		asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
+		boost::bind(&Connection::parseHeader, this, asio::placeholders::error));
 }
 
-void Connection::parseHeader(const boost::asio::error& error)
+void Connection::parseHeader(const asio::error& error)
 {
-  if(!error && msg.decodeHeader()){
-    boost::asio::async_read(socket, boost::asio::buffer(msg.getBodyBuffer(), msg.getMessageLength()),
-        boost::bind(&Connection::parsePacket, this, boost::asio::placeholders::error));
-  }
-}
-
-void Connection::parsePacket(const boost::asio::error& error)
-{
-	if(!error){
-    boost::asio::async_read(socket,
-        boost::asio::buffer(msg.getBuffer(), NetworkMessage::header_length),
-        boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
+	int32_t size = m_msg.decodeHeader();
+	if(!error && size > 0 && size < NETWORKMESSAGE_MAXSIZE - 16){
+		// Read packet content
+		asio::async_read(m_socket, asio::buffer(m_msg.getBodyBuffer(), size),
+			boost::bind(&Connection::parsePacket, this, asio::placeholders::error));
+	}
+	else{
+		switch(error){
+		case asio::error::operation_aborted;
+		
+			break;
+		default:
+			//TODO: error?
+			break;
+		}
 	}
 }
 
-void Connection::send(char* data, uint32_t size)
+void Connection::parsePacket(const asio::error& error)
 {
-	//
+	if(!error){
+		// Protocol selection
+		if(!m_protocol){
+			// Protocol depends on the first byte of the packet
+			uint8_t protocolId = m_msg.GetByte();
+			switch(protocolId){
+			case 0x01: // Login server protocol
+				m_protocol = new ProtocolLogin(this);
+				break;
+			case 0x0A: // World server protocol
+				//m_protocol = new protocol79(this);
+				break;
+			case 0xFE: // Admin protocol
+				break;
+			case 0xFF: // Status protocol
+				//m_protocol = new protocolStatus(this);
+				break;
+			default:
+				// No valid protocol
+				// TODO: close connection
+				break;
+			}
+		}
+		
+		// Send the packet to the current protocol
+		m_protocol->parsePacket(m_msg);
+		
+		// Wait to the next packet
+    	asio::async_read(m_socket,
+			asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
+			boost::bind(&Connection::parseHeader, this, asio::placeholders::error));
+	}
+	else{
+		switch(error){
+		case asio::error::operation_aborted;
+			break;
+		default:
+			//TODO: error?
+			break;
+		}
+	}
 }
 
+void Connection::send(OutputMessage* msg)
+{
+	asio::async_write(m_socket,
+		asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
+		boost::bind(&OutputMessagePool::writeHandler, msg, asio::placeholders::error));
+	
+	m_pendingWrite++;
+}
+
+void Connection::onWriteOperation(const asio::error& error)
+{
+	if(!error){
+		if(m_pendingWrite != 0){
+			m_pendingWrite--;
+		}
+		else{
+			// Error. Pending operations counter is 0, but we are getting a
+			// notification!!
+		}
+	}
+	else{
+		//TODO. write operation error
+	}
+}

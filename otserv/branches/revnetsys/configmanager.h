@@ -60,13 +60,13 @@ public:
 		SQL_USER,
 		SQL_PASS,
 		SQL_DB,
-		SQLITE_DB,
 		SQL_TYPE,
 		MAP_HOST,
 		MAP_USER,
 		MAP_PASS,
 		MAP_DB,
 		OTSERV_DB_HOST,
+		USE_MD5_PASS,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 
