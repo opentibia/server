@@ -11,7 +11,7 @@ AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(otserv, 0.2)
+AM_INIT_AUTOMAKE(otserv, 0.6)
 
 # check if we want debuging
 AC_ARG_WITH(debug, [  --with-debug      enable debuging],DEBUG=-DDEBUG)

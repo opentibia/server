@@ -214,10 +214,9 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 
 	DBQuery query;
 	query.reset();
-	query << "SELECT tiles.id FROM tiles WHERE x='" << tilePos.x
-		<< "' AND y='" << tilePos.y
-		<< "' AND z='" << tilePos.z
-		<< "'";
+	query << "SELECT tiles.id FROM tiles WHERE x=" << tilePos.x
+		<< " AND y=" << tilePos.y
+		<< " AND z=" << tilePos.z;
 
 	DBResult result;
 	if(!db.storeQuery(query, result) || result.getNumRows() != 1)
@@ -226,7 +225,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 	int tileId = result.getDataInt("id");
 
 	query.reset();
-	query << "SELECT * FROM tile_items WHERE tile_id='" << tileId <<"' ORDER BY sid DESC";
+	query << "SELECT * FROM tile_items WHERE tile_id=" << tileId <<" ORDER BY sid DESC";
 	if(db.storeQuery(query, result) && (result.getNumRows() > 0)){
 		Item* item = NULL;
 
