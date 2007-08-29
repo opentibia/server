@@ -29,7 +29,7 @@
 
 bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 {
-	return IOMapSerialize::getInstance().loadMap(map, identifier);
+	return IOMapSerialize::getInstance()->loadMap(map, identifier);
 }
 
 bool IOMapXML::loadSpawns(Map* map)
