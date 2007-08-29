@@ -26,17 +26,13 @@
 
 #include "networkmessage.h"
 
-
-using namespace boost;
-using namespace boost::asio::ip;
-
 class Protocol;
 class OutputMessage;
 
 class Connection
 {
 public:
-	Connection(asio::io_service& io_service) : m_socket(io_service)
+	Connection(boost::asio::io_service& io_service) : m_socket(io_service)
 	{ 
 		m_protocol = NULL;
 		m_pendingWrite = 0;
@@ -44,21 +40,21 @@ public:
 	
 	~Connection() {}
 
-	const tcp::socket& getHandle() const { return m_socket; }
+	const boost::asio::ip::tcp::socket& getHandle() const { return m_socket; }
 
 	void closeConnection();
 	void acceptConnection();
 	
 	void send(OutputMessage* msg);
 	
-	void parseHeader(const asio::error& error);
-	void parsePacket(const asio::error& error);
+	void parseHeader(const boost::asio::error& error);
+	void parsePacket(const boost::asio::error& error);
 
-	void onWriteOperation(const asio::error& error);
+	void onWriteOperation(const boost::asio::error& error);
 	
 private:
 	NetworkMessage m_msg;
-	tcp::socket m_socket;
+	boost::asio::ip::tcp::socket m_socket;
 	
 	int32_t m_pendingWrite;
 	

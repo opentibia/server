@@ -61,8 +61,7 @@ std::string urlEncode(const std::string& str);
 
 bool passwordTest(const std::string &plain, std::string &hash);
 
-using namespace boost::asio::ip;
-uint32_t getIPSocket(const tcp::socket& s);
+uint32_t getIPSocket(const boost::asio::ip::tcp::socket& s);
 
 //buffer should be at least 17 bytes
 void formatIP(uint32_t ip, char* buffer);

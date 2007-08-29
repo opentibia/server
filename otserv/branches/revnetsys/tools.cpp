@@ -30,9 +30,6 @@
 
 extern ConfigManager g_config;
 
-using namespace boost::asio::ip;
-using namespace boost;
-
 bool fileExists(const char* filename)
 {
 	FILE* f = fopen(filename, "rb");
@@ -260,10 +257,10 @@ std::string urlEncode(const char* str)
 	return out;
 }
 
-uint32_t getIPSocket(const tcp::socket& s)
+uint32_t getIPSocket(const boost::asio::ip::tcp::socket& s)
 {
-	asio::error error;
-	const tcp::endpoint endpoint = s.remote_endpoint(asio::assign_error(error));
+	boost::asio::error error;
+	const boost::asio::ip::tcp::endpoint endpoint = s.remote_endpoint(boost::asio::assign_error(error));
 	if(!error){
 		return endpoint.address().to_v4().to_ulong();
 	}

@@ -21,7 +21,8 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
-#include "definitions.h"
+//#include "definitions.h"
+//#include <boost/asio.hpp>
 
 class NetworkMessage;
 class OutputMessage;

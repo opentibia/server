@@ -30,10 +30,6 @@
 #include "protocol.h"
 #include "connection.h"
 
-using namespace boost;
-
-
-
 #define OUTPUT_POOL_SIZE 100
 
 class OutputMessage : public NetworkMessage
@@ -155,7 +151,7 @@ public:
 
 protected:
 	
-	static void writeHandler(OutputMessage* msg, const asio::error& error)
+	static void writeHandler(OutputMessage* msg, const boost::asio::error& error)
 	{
 		OTSYS_THREAD_LOCK_CLASS lockClass(getInstance()->m_outputPoolLock);
 		Connection* connection = msg->getProtocol()->getConnection();

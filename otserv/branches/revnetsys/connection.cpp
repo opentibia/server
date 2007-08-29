@@ -34,32 +34,30 @@ void Connection::closeConnection()
 void Connection::acceptConnection()
 {
 	// Read size of te first packet
-	asio::async_read(m_socket,
-		asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
-		boost::bind(&Connection::parseHeader, this, asio::placeholders::error));
+	boost::asio::async_read(m_socket,
+		boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
+		boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
 }
 
-void Connection::parseHeader(const asio::error& error)
+void Connection::parseHeader(const boost::asio::error& error)
 {
 	int32_t size = m_msg.decodeHeader();
 	if(!error && size > 0 && size < NETWORKMESSAGE_MAXSIZE - 16){
 		// Read packet content
-		asio::async_read(m_socket, asio::buffer(m_msg.getBodyBuffer(), size),
-			boost::bind(&Connection::parsePacket, this, asio::placeholders::error));
+		boost::asio::async_read(m_socket, boost::asio::buffer(m_msg.getBodyBuffer(), size),
+			boost::bind(&Connection::parsePacket, this, boost::asio::placeholders::error));
 	}
 	else{
-		switch(error){
-		case asio::error::operation_aborted;
-		
-			break;
-		default:
+		if(error == boost::asio::error::operation_aborted){
+			//
+		}
+		else{
 			//TODO: error?
-			break;
 		}
 	}
 }
 
-void Connection::parsePacket(const asio::error& error)
+void Connection::parsePacket(const boost::asio::error& error)
 {
 	if(!error){
 		// Protocol selection
@@ -89,31 +87,30 @@ void Connection::parsePacket(const asio::error& error)
 		m_protocol->parsePacket(m_msg);
 		
 		// Wait to the next packet
-    	asio::async_read(m_socket,
-			asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
-			boost::bind(&Connection::parseHeader, this, asio::placeholders::error));
+    	boost::asio::async_read(m_socket,
+			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
+			boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
 	}
 	else{
-		switch(error){
-		case asio::error::operation_aborted;
-			break;
-		default:
+		if(error == boost::asio::error::operation_aborted){
+			//
+		}
+		else{
 			//TODO: error?
-			break;
 		}
 	}
 }
 
 void Connection::send(OutputMessage* msg)
 {
-	asio::async_write(m_socket,
-		asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
-		boost::bind(&OutputMessagePool::writeHandler, msg, asio::placeholders::error));
+	boost::asio::async_write(m_socket,
+		boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
+		boost::bind(&OutputMessagePool::writeHandler, msg, boost::asio::placeholders::error));
 	
 	m_pendingWrite++;
 }
 
-void Connection::onWriteOperation(const asio::error& error)
+void Connection::onWriteOperation(const boost::asio::error& error)
 {
 	if(!error){
 		if(m_pendingWrite != 0){
