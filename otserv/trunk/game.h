@@ -154,6 +154,13 @@ public:
 	Player* getPlayerByName(const std::string& s);
 
 	/**
+	  * Returns a player based on an account number identifier
+	  * \param acc is the account identifier
+	  * \returns A Pointer to the player
+	  */
+	Player* getPlayerByAccount(const uint32_t& acc);
+
+	/**
 	  * Starts an event.
 	  * \returns A unique identifier for the event
 	  */

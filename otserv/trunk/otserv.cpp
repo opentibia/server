@@ -363,11 +363,21 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 									msg.WriteToSocket(s);
 								}
 								else if(playerexist && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
+									//TODO: replace player when logging in from another computer
 									#ifdef __DEBUG_PLAYERS__
 									std::cout << "reject player..." << std::endl;
 									#endif
 									msg.AddByte(0x14);
 									msg.AddString("You are already logged in.");
+									msg.WriteToSocket(s);
+								}
+								else if(g_game.getPlayerByAccount(player->getAccount()) && !player->hasFlag(PlayerFlag_CanAlwaysLogin)
+										&& !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
+									#ifdef __DEBUG_PLAYERS__
+									std::cout << "reject player..." << std::endl;
+									#endif
+									msg.AddByte(0x14);
+									msg.AddString("You may only login with one character per account."); //?
 									msg.WriteToSocket(s);
 								}
 								else if(g_game.getGameState() == GAME_STATE_STARTUP){
@@ -481,8 +491,6 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 	return 0;
 #endif
 }
-
-
 
 void ErrorMessage(const char* message) {
 	std::cout << std::endl << std::endl << "Error: " << message;

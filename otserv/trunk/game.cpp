@@ -500,6 +500,21 @@ Player* Game::getPlayerByName(const std::string& s)
 	return NULL; //just in case the player doesnt exist
 }
 
+Player* Game::getPlayerByAccount(const uint32_t& acc)
+{
+    OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getPlayerByAccount()");
+
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(!it->second->isRemoved()){
+			if(it->second->getAccount() == acc){
+				return it->second;
+			}
+		}
+	}
+
+	return NULL;
+}
+
 bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= false*/)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placePlayer()");
