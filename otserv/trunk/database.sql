@@ -34,6 +34,7 @@ CREATE TABLE `groups` (
 CREATE TABLE `accounts` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `password` VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL for MD5*/,
+    `group_id` INT NOT NULL COMMENT 'accounts group',
     `email` VARCHAR(255) NOT NULL DEFAULT '',
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`id`)

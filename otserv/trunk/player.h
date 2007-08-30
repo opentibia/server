@@ -130,7 +130,7 @@ public:
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
 	int getPremiumDays() const {return premiumDays;}
-	bool isPremium() {return (premiumDays > 0);}
+	bool isPremium() {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
 
 	bool isOnline() {return (client != NULL);}
 	uint32_t getIP() const;

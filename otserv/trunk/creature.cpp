@@ -246,7 +246,7 @@ void Creature::onWalk(Direction& dir)
 					break;
 			}
 
-			g_game.internalCreatureSay(this, SPEAK_SAY, "Hicks!");
+			g_game.internalCreatureSay(this, SPEAK_MONSTER_SAY, "Hicks!");
 		}
 	}
 }
@@ -789,6 +789,12 @@ void Creature::onKilledCreature(Creature* target)
 	if(getMaster()){
 		getMaster()->onKilledCreature(target);
 	}
+
+	//scripting event - onKill
+	CreatureEvent* eventKill = getCreatureEvent(CREATURE_EVENT_KILL);
+	if(eventKill){
+		eventKill->executeOnKill(this, target);
+	}
 }
 
 void Creature::onGainExperience(int32_t gainExperience)
@@ -1069,9 +1075,7 @@ bool Creature::registerCreatureEvent(const std::string& name)
 		eventsList.push_back(event);
 		return true;
 	}
-	else{
-		return false;
-	}
+	return false;
 }
 
 std::list<CreatureEvent*>::iterator Creature::findEvent(CreatureEventType_t type)
@@ -1092,11 +1096,6 @@ CreatureEvent* Creature::getCreatureEvent(CreatureEventType_t type)
 		if(it != eventsList.end()){
 			return *it;
 		}
-		else{
-			return NULL;
-		}
 	}
-	else{
-		return NULL;
-	}
+	return NULL;
 }

@@ -1,6 +1,7 @@
 CREATE TABLE "accounts" (
     "id" INTEGER PRIMARY KEY NOT NULL,
     "password" VARCHAR(255) NOT NULL,
+	"group_id" INTEGER NOT NULL,
     "email" VARCHAR(255) NOT NULL DEFAULT '',
     "blocked" BOOLEAN NOT NULL DEFAULT FALSE
 );

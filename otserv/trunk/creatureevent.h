@@ -28,7 +28,8 @@ enum CreatureEventType_t{
 	CREATURE_EVENT_NONE,
 	CREATURE_EVENT_LOGIN,
 	CREATURE_EVENT_LOGOUT,
-	CREATURE_EVENT_DIE
+	CREATURE_EVENT_DIE,
+	CREATURE_EVENT_KILL
 };
 
 class CreatureEvent;
@@ -83,6 +84,7 @@ public:
 	uint32_t executeOnLogin(Player* player);
 	uint32_t executeOnLogout(Player* player);
 	uint32_t executeOnDie(Creature* creature, Item* corpse);
+	uint32_t executeOnKill(Creature* creature, Creature* target);
 	//
 
 protected:

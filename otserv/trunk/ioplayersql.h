@@ -68,6 +68,7 @@ protected:
 	bool storeNameByGuid(Database &mysql, uint32_t guid);
 	
 	const PlayerGroup* getPlayerGroup(uint32_t groupid);
+	const PlayerGroup* getPlayerGroupByAccount(uint32_t accno);
 
 	struct StringCompareCase{
 		bool operator()(const std::string& l, const std::string& r) const{

@@ -73,8 +73,21 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	player->accountNumber = accno;
 	player->setSex((playersex_t)result.getDataInt("sex"));
 
+	const PlayerGroup* accGroup = getPlayerGroupByAccount(accno);
 	const PlayerGroup* group = getPlayerGroup(result.getDataInt("group_id"));
-	if(group){
+	if(accGroup && group){
+		player->accessLevel = std::max(accGroup->m_access, group->m_access);
+		player->maxDepotLimit = std::max(accGroup->m_maxDepotItems, group->m_maxDepotItems);
+		player->maxVipLimit = std::max(accGroup->m_maxVip, group->m_maxVip);
+		player->setFlags(accGroup->m_flags | group->m_flags);
+	}
+	else if(accGroup){
+		player->accessLevel = accGroup->m_access;
+		player->maxDepotLimit = accGroup->m_maxDepotItems;
+		player->maxVipLimit = accGroup->m_maxVip;
+		player->setFlags(accGroup->m_flags);
+	}
+	else if(group){
 		player->accessLevel = group->m_access;
 		player->maxDepotLimit = group->m_maxDepotItems;
 		player->maxVipLimit = group->m_maxVip;
@@ -723,19 +736,23 @@ bool IOPlayerSQL::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string&
 		return false;
 	}
 
-	query << "SELECT name,id,group_id FROM players WHERE name='" << Database::escapeString(name) << "'";
+	query << "SELECT name,id,group_id,account_id FROM players WHERE name='" << Database::escapeString(name) << "'";
 	if(!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 
 	name = result.getDataString("name");
 	guid = result.getDataInt("id");
+	const PlayerGroup* accGroup = getPlayerGroupByAccount(result.getDataInt("account_id"));
 	const PlayerGroup* group = getPlayerGroup(result.getDataInt("group_id"));
+	uint64_t flags = 0;
 	if(group){
-		specialVip = (0 != (group->m_flags & ((uint64_t)1 << PlayerFlag_SpecialVIP)));
+		flags |= group->m_flags;
 	}
-	else{
-		specialVip = false;
+	if(accGroup){
+		flags |= accGroup->m_flags;
 	}
+
+	specialVip = (0 != (flags & ((uint64_t)1 << PlayerFlag_SpecialVIP)));
 	return true;
 }
 
@@ -799,6 +816,19 @@ const PlayerGroup* IOPlayerSQL::getPlayerGroup(uint32_t groupid)
 			playerGroupMap[groupid] = group;
 			return group;
 		}
+	}
+	return NULL;
+}
+
+const PlayerGroup* IOPlayerSQL::getPlayerGroupByAccount(uint32_t accno)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult result;
+
+	query << "SELECT group_id FROM accounts WHERE id='" << accno << "'";
+	if(db->connect() && db->storeQuery(query, result)){
+		return getPlayerGroup(result.getDataInt("group_id"));
 	}
 	return NULL;
 }

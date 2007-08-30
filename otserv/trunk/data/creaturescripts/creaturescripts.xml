@@ -8,4 +8,6 @@
 <event type="die" name="MINO_DIE" script="die1.lua" />
 <event type="die" name="DIE_BROADCAST" script="die2.lua" />
 
+<event type="kill" name="KILL_MESSAGES" script="kill.lua" />
+
 </creaturescripts>
