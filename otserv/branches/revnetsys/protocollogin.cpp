@@ -26,6 +26,7 @@
 #include "tools.h"
 #include "ioaccount.h"
 #include "ban.h"
+#include <iomanip>
 
 #define CLIENT_VERSION_MIN 792
 #define CLIENT_VERSION_MAX 792
@@ -35,14 +36,19 @@ extern ConfigManager g_config;
 extern IPList serverIPs;
 extern Ban g_bans;
 
+void ProtocolLogin::deleteProtocolTask()
+{
+	std::cout << "Deleting ProtocolLogin" << std::endl;
+	delete this;
+}
+
 void ProtocolLogin::parsePacket(NetworkMessage& msg)
 {
 	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 	msg.SkipBytes(12);
 	
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this); 
-	
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
 	if(version <= 760){
 		output->AddByte(0x0A);
 		output->AddString("Only clients with protocol 7.92 allowed!");
@@ -54,22 +60,23 @@ void ProtocolLogin::parsePacket(NetworkMessage& msg)
 		m_key[2] = msg.GetU32();
 		m_key[3] = msg.GetU32();
 
-		/*
-		std::cout.flags(std::ios::hex);
-		std::cout << std::setw(2) << std::setfill('0') << k[0] << " " <<
-		std::setw(2) << std::setfill('0') << k[1] << " " <<
-		std::setw(2) << std::setfill('0') << k[2] << " " <<
-		std::setw(2) << std::setfill('0') << k[3] << std::endl;
-		std::cout.flags(std::ios::dec);
-		*/
+		/*std::cout.flags(std::ios::hex);
+		std::cout << std::setw(2) << std::setfill('0') << m_key[0] << " " <<
+		std::setw(2) << std::setfill('0') << m_key[1] << " " <<
+		std::setw(2) << std::setfill('0') << m_key[2] << " " <<
+		std::setw(2) << std::setfill('0') << m_key[3] << std::endl;
+		std::cout.flags(std::ios::dec);*/
 		
 		uint32_t accnumber = msg.GetU32();
 		std::string password = msg.GetString();
-
+		
 		if(version >= CLIENT_VERSION_MIN && version <= CLIENT_VERSION_MAX){
 
 			uint32_t serverip = serverIPs[0].first;
-			uint32_t clientip = getIPSocket(m_connection->getHandle());
+			uint32_t clientip = m_connection->getIP();
+			char buffer[32];
+			formatIP(clientip, buffer);
+			std::cout << "Connection from " << buffer << std::endl;
 
 			for(uint32_t i = 0; i < serverIPs.size(); i++){
 				if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
@@ -126,9 +133,7 @@ void ProtocolLogin::parsePacket(NetworkMessage& msg)
 			output->AddByte(0x0A);
 			output->AddString("Only clients with protocol 7.92 allowed!");
 		}
-		
-		OutputMessagePool::getInstance()->send(output); 
+		OutputMessagePool::getInstance()->send(output);
 	}
-	
 	m_connection->closeConnection();
 }

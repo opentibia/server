@@ -24,6 +24,8 @@
 #include "definitions.h"
 #include <boost/asio.hpp>
 
+#include "otsystem.h"
+
 #include "networkmessage.h"
 
 class Protocol;
@@ -32,31 +34,55 @@ class OutputMessage;
 class Connection
 {
 public:
+	enum {
+		CLOSE_STATE_NONE = 0,
+		CLOSE_STATE_REQUESTED = 1,
+		CLOSE_STATE_CLOSING = 2,
+	};
+	
 	Connection(boost::asio::io_service& io_service) : m_socket(io_service)
 	{ 
 		m_protocol = NULL;
 		m_pendingWrite = 0;
+		m_pendingRead = 0;
+		m_CloseState = CLOSE_STATE_NONE;
+		m_socketClosed = false;
+		OTSYS_THREAD_LOCKVARINIT(m_connectionLock);
 	}
 	
-	~Connection() {}
+	~Connection()
+	{
+		OTSYS_THREAD_LOCKVARRELEASE(m_connectionLock);
+	}
 
-	const boost::asio::ip::tcp::socket& getHandle() const { return m_socket; }
+	boost::asio::ip::tcp::socket& getHandle() { return m_socket; }
 
 	void closeConnection();
 	void acceptConnection();
 	
 	void send(OutputMessage* msg);
 	
+	uint32_t getIP();
+	
+private:
 	void parseHeader(const boost::asio::error& error);
 	void parsePacket(const boost::asio::error& error);
 
+	friend class OutputMessagePool;
 	void onWriteOperation(const boost::asio::error& error);
 	
-private:
+	void closeConnectionTask();
+	void closingConnection();
+	
 	NetworkMessage m_msg;
 	boost::asio::ip::tcp::socket m_socket;
+	bool m_socketClosed;
 	
 	int32_t m_pendingWrite;
+	int32_t m_pendingRead;
+	uint32_t m_CloseState;
+	
+	OTSYS_THREAD_LOCKVAR m_connectionLock;
 	
 	Protocol* m_protocol;
 };

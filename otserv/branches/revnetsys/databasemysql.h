@@ -21,9 +21,7 @@
 #ifndef __OTSERV_DATABASEMYSQL_H__
 #define __OTSERV_DATABASEMYSQL_H__
 
-#ifdef WIN32
-#include <winsock2.h>
-#endif
+#include "otsystem.h"
 
 #ifdef __MYSQL_ALT_INCLUDE__
 #include <mysql.h>
@@ -32,7 +30,6 @@
 #endif
 #include <sstream>
 #include "database.h"
-
 
 class DatabaseMySQL : public _Database
 {

@@ -19,7 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-
+/*
 #include "admin.h"
 #include "game.h"
 #include "networkmessage.h"
@@ -698,3 +698,4 @@ static void addLogLine(AdminConnection* conn, eLogType type, int level, std::str
 	LOG_MESSAGE("OTADMIN", type, level, logMsg);
 }
 
+*/

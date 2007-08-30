@@ -21,9 +21,6 @@
 #ifndef __OTSERV_TOOLS_H__
 #define __OTSERV_TOOLS_H__
 
-#include "definitions.h"
-#include "boost/asio.hpp"
-
 #include "otsystem.h"
 
 #include <string>
@@ -60,8 +57,6 @@ std::string urlEncode(const char* str);
 std::string urlEncode(const std::string& str);
 
 bool passwordTest(const std::string &plain, std::string &hash);
-
-uint32_t getIPSocket(const boost::asio::ip::tcp::socket& s);
 
 //buffer should be at least 17 bytes
 void formatIP(uint32_t ip, char* buffer);

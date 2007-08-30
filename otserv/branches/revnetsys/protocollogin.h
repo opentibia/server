@@ -33,6 +33,10 @@ public:
 	virtual ~ProtocolLogin() {}
 
 	virtual void parsePacket(NetworkMessage& msg);
+	
+protected:
+	
+	virtual void deleteProtocolTask();
 };
 
 #endif

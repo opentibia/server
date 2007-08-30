@@ -35,7 +35,7 @@
 #include "iomapotbm.h"
 #include "iomapserialize.h"
 
-#include "otsystem.h"
+//#include "otsystem.h"
 #include <stdio.h>
 
 #include "items.h"

@@ -25,7 +25,9 @@
 
 void Protocol::onSendMessage(OutputMessage* msg)
 {
+	std::cout << "Protocol::onSendMessage" << std::endl;
 	if(m_encryptionEnabled){
+		std::cout << "Protocol::onSendMessage - encrypt" << std::endl;
 		XTEA_encrypt(*msg);
 	}
 }
@@ -35,16 +37,20 @@ void Protocol::XTEA_encrypt(OutputMessage& msg)
 	uint32_t k[4];
 	k[0] = m_key[0]; k[1] = m_key[1]; k[2] = m_key[2]; k[3] = m_key[3];
 	
+	int32_t messageLength = msg.getMessageLength();
+	//adding the size of unencrypted header
+	messageLength = messageLength + 2;
+	msg.setMessageLength(messageLength);
+	
 	//add bytes until reach 8 multiple
 	uint32_t n;
-	if(((msg.getMessageLength() + 2) % 8) != 0){
-		n = 8 - ((msg.getMessageLength() + 2) % 8);
+	if((messageLength % 8) != 0){
+		n = 8 - (messageLength % 8);
 		msg.AddPaddingBytes(n);
 	}
 	
 	int read_pos = 0;
 	uint32_t* buffer = (uint32_t*)msg.getBodyBuffer();
-	int32_t messageLength = msg.getMessageLength();
 	while(read_pos < messageLength/4){
 		uint32_t v0 = buffer[read_pos], v1 = buffer[read_pos + 1];
 		uint32_t delta = 0x61C88647;
@@ -58,7 +64,6 @@ void Protocol::XTEA_encrypt(OutputMessage& msg)
 		buffer[read_pos] = v0; buffer[read_pos + 1] = v1;
 		read_pos = read_pos + 2;
 	}
-	
 	msg.addCryptoHeader();
 }
 

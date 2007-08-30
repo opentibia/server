@@ -21,7 +21,7 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
-//#include "definitions.h"
+#include "definitions.h"
 //#include <boost/asio.hpp>
 
 class NetworkMessage;
@@ -43,10 +43,6 @@ public:
 
 	virtual void parsePacket(NetworkMessage& msg) = 0;
 	
-	//Called from connection to know if the protocol instance
-	// can be released
-	virtual bool canBeReleased() { return true; }
-	
 	virtual void onSendMessage(OutputMessage* msg);
 	
 	Connection* getConnection() { return m_connection;}
@@ -57,6 +53,9 @@ protected:
 	void XTEA_encrypt(OutputMessage& msg);
 	bool XTEA_decrypt(NetworkMessage& msg);
 	bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
+	
+	virtual void deleteProtocolTask() = 0;
+	friend class Connection;
 	
 	Connection* m_connection;
 	bool m_encryptionEnabled;

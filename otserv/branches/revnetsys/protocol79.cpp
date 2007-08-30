@@ -114,7 +114,7 @@ void Protocol79::reinitializeProtocol(SOCKET _s)
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
-	OutputBuffer.Reset();
+	//OutputBuffer.Reset();
 	knownPlayers.clear();
 	if(s)
 		closesocket(s);
@@ -148,13 +148,13 @@ connectResult_t Protocol79::ConnectPlayer()
 void Protocol79::ReceiveLoop()
 {
 	NetworkMessage msg;
-	msg.setEncryptionState(true);
-	msg.setEncryptionKey(m_key);
+	//msg.setEncryptionState(true);
+	//msg.setEncryptionKey(m_key);
 
 	do{
-		while(pendingLogout == false && msg.ReadFromSocket(s)){
+		/*while(pendingLogout == false && msg.ReadFromSocket(s)){
 			parsePacket(msg);
-		}
+		}*/
 
 		if(s){
 			closesocket(s);
@@ -176,7 +176,7 @@ void Protocol79::ReceiveLoop()
 				}
 				else{
 					//set new key after reattaching
-					msg.setEncryptionKey(m_key);
+					//msg.setEncryptionKey(m_key);
 				}
 			}
 
@@ -883,7 +883,7 @@ void Protocol79::parseTurnWest(NetworkMessage& msg)
 void Protocol79::parseRequestOutfit(NetworkMessage& msg)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Protocol79::parseRequestOutfit()");
-	msg.Reset();
+	//msg.Reset();
 	
 	msg.AddByte(0xC8);
 	AddCreatureOutfit(msg, player, player->getDefaultOutfit());
@@ -2329,14 +2329,15 @@ void Protocol79::flushOutputBuffer()
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock, "Protocol79::flushOutputBuffer()");
 	//force writetosocket
-	OutputBuffer.WriteToSocket(s);
-	OutputBuffer.Reset();
+	//OutputBuffer.WriteToSocket(s);
+	//OutputBuffer.Reset();
 
 	return;
 }
 
 void Protocol79::WriteBuffer(NetworkMessage& addMsg)
 {
+	/*
 	if(!addMsg.empty()){
 		g_game.addPlayerBuffer(player);
 
@@ -2348,12 +2349,12 @@ void Protocol79::WriteBuffer(NetworkMessage& addMsg)
 
 		OutputBuffer.JoinMessages(addMsg);
 		OTSYS_THREAD_UNLOCK(bufferLock, "Protocol79::WriteBuffer");
-	}
+	}*/
 }
 
 void Protocol79::setKey(const uint32_t* key)
 {
 	memcpy(m_key, key, 16);
-	OutputBuffer.setEncryptionState(true);
-	OutputBuffer.setEncryptionKey(key);
+	//OutputBuffer.setEncryptionState(true);
+	//OutputBuffer.setEncryptionKey(key);
 }

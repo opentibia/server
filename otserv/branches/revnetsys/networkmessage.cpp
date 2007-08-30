@@ -221,7 +221,7 @@ void NetworkMessage::AddPaddingBytes(uint32_t n)
 	if(!canAdd(n))
 		return;
 		
-	memset((void*)&m_MsgBuf[m_ReadPos], 0, n);
+	memset((void*)&m_MsgBuf[m_ReadPos], 0x33, n);
 	m_MsgSize = m_MsgSize + n;
 }
 

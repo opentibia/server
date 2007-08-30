@@ -147,6 +147,7 @@ std::string Status::getStatusString()
 
 void Status::getInfo(NetworkMessage &nm)
 {
+	/*
 	// the client selects which information may be 
 	// sent back, so we'll save some bandwidth and 
 	// make many
@@ -158,7 +159,7 @@ void Status::getInfo(NetworkMessage &nm)
 	bool bplayersinfo = nm.GetByte() == 1;
 	bool bmapinfo     = nm.GetByte() == 1;
   
-	nm.Reset();   
+	nm.Reset();
 	uint64_t running = (OTSYS_TIME() - this->start) / 1000;
 	// since we haven't all the things on the right place like map's 
 	// creator/info and other things, i'll put the info chunked into
@@ -207,6 +208,7 @@ void Status::getInfo(NetworkMessage &nm)
     	nm.AddU16(mh);
   	}
 
+	*/
 	return;   
   	// just one thing, I'm good with monospaced text, right?
   	// if you haven't undertood the joke, look at the top ^^

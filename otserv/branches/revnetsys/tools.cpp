@@ -257,32 +257,9 @@ std::string urlEncode(const char* str)
 	return out;
 }
 
-uint32_t getIPSocket(const boost::asio::ip::tcp::socket& s)
-{
-	boost::asio::error error;
-	const boost::asio::ip::tcp::endpoint endpoint = s.remote_endpoint(boost::asio::assign_error(error));
-	if(!error){
-		return endpoint.address().to_v4().to_ulong();
-	}
-	
-	/*
-	sockaddr_in sain;
-	socklen_t salen = sizeof(sockaddr_in);
-
-	if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
-#if defined WIN32 || defined __WINDOWS__
-		return sain.sin_addr.S_un.S_addr;
-#else
-		return sain.sin_addr.s_addr;
-#endif
-	}
-*/
-	return 0;
-}
-
 bool passwordTest(const std::string &plain, std::string &hash)
 {
-	if(g_config.getNumber(ConfigManager::USE_MD5_PASS) == PASSWORD_TYPE_MD5){
+	if(g_config.getNumber(ConfigManager::PASSWORD_TYPE) == PASSWORD_TYPE_MD5){
 		MD5_CTX m_md5;
 		std::stringstream hexStream;
 		std::string plainHash;

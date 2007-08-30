@@ -22,7 +22,8 @@
 #ifndef __OTSERV_OTTHREAD_H__
 #define __OTSERV_OTTHREAD_H__
 
-#include "definitions.h"
+//#include "definitions.h"
+//#include "boost/asio.hpp"
 #include "logger.h"
 
 #include <list>

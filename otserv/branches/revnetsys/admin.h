@@ -75,7 +75,7 @@
 //  error
 //		message(string)
 //
-
+/*
 #include "otsystem.h"
 #include "player.h"
 #include "logger.h"
@@ -209,5 +209,5 @@ protected:
 	int32_t m_state;
 	
 };
-
+*/
 #endif

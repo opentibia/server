@@ -21,7 +21,7 @@
 
 #include "creature.h"
 #include "game.h"
-#include "otsystem.h"
+//#include "otsystem.h"
 #include "player.h"
 #include "npc.h"
 #include "monster.h"

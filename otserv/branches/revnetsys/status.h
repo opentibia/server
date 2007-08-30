@@ -22,7 +22,7 @@
 #define __OTSERV_STATUS_H
 
 #include <string>
-#include "otsystem.h"
+//#include "otsystem.h"
 #include "definitions.h"
 #include "networkmessage.h"
 

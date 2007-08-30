@@ -27,17 +27,19 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
-using boost;
-using boost::asio::ip;
-
-class server
+class Server
 {
 public:
-	server(asio::io_service& io_service, uint16_t port)
-		: acceptor(io_service, tcp::endpoint(tcp::v4(), port))
+	Server(boost::asio::io_service& io_service, uint32_t serverip, uint16_t port)
+		: acceptor(io_service, 
+		 boost::asio::ip::tcp::endpoint(
+		 	boost::asio::ip::address(boost::asio::ip::address_v4(serverip)), 
+			port))
 	{
 		accept();
 	}
+	
+	~Server() { }
 
 private:
 	void accept()
@@ -45,11 +47,11 @@ private:
 		Connection* connection = new Connection(acceptor.io_service());
 
 		acceptor.async_accept(connection->getHandle(),
-			boost::bind(&server::onAccept, this, connection, 
-			asio::placeholders::error));
+			boost::bind(&Server::onAccept, this, connection, 
+			boost::asio::placeholders::error));
 	}
 
-	void onAccept(Connection* connection, const asio::error& error)
+	void onAccept(Connection* connection, const boost::asio::error& error)
 	{
 		if(!error){
 			connection->acceptConnection();
@@ -57,7 +59,7 @@ private:
 		}
 	}
 
-	tcp::acceptor acceptor;
+	boost::asio::ip::tcp::acceptor acceptor;
 };
 
 #endif

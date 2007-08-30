@@ -67,7 +67,6 @@ protected:
 	
 	std::list<Task*> m_taskList;
 	static Dispatcher c_dispatcher;
-	
 };
 
 

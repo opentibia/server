@@ -20,6 +20,8 @@
 #include "otpch.h"
 
 #include "definitions.h"
+#include <boost/asio.hpp>
+#include "server.h"
 
 #include <string>
 #include <iostream>
@@ -27,15 +29,16 @@
 #include <sstream>
 
 #include "otsystem.h"
-#include "networkmessage.h"
-#include "protocol79.h"
+//#include "networkmessage.h"
+//#include "protocol79.h"
+#include "server.h"
 
 #include <stdlib.h>
 #include <time.h>
 #include "game.h"
 
-#include "ioaccount.h"
-#include "ioplayer.h"
+//#include "ioaccount.h"
+//#include "ioplayer.h"
 
 #include "status.h"
 #include "monsters.h"
@@ -44,10 +47,10 @@
 #include "vocation.h"
 #include "scriptmanager.h"
 #include "configmanager.h"
-#include "account.h"
+//#include "account.h"
 
 #include "tools.h"
-#include "waitlist.h"
+//#include "waitlist.h"
 #include "ban.h"
 #include "rsa.h"
 #include "admin.h"
@@ -56,7 +59,7 @@
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
 #endif
-
+/*
 #ifdef WIN32
 	#define ERROR_EINTR WSAEINTR
 #else
@@ -67,7 +70,7 @@
 	#define SOCKET_ERROR -1
 	#define ERROR_EINTR EINTR
 #endif
-
+*/
 #ifdef __DEBUG_CRITICALSECTION__
 OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 #endif
@@ -80,8 +83,10 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 	}
 #endif
 
+/*
 #define CLIENT_VERSION_MIN 792
 #define CLIENT_VERSION_MAX 792
+*/
 
 IPList serverIPs;
 
@@ -95,13 +100,13 @@ Vocations g_vocations;
 
 RSA* g_otservRSA = NULL;
 
-extern AdminProtocolConfig* adminConfig;
+//extern AdminProtocolConfig* adminConfig;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
 #endif
 #include "networkmessage.h"
-
+/*
 OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 {
 #if defined __EXCEPTION_TRACER__
@@ -119,7 +124,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 		// login server connection
 		if(protId == 0x01){
-			/*uint16_t clientos =*/ msg.GetU16();
+			/uint16_t clientos// = msg.GetU16();
 			uint16_t version  = msg.GetU16();
 			msg.SkipBytes(12);
 			msg.setRSAInstance(g_otservRSA);
@@ -136,14 +141,14 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				k[2] = msg.GetU32();
 				k[3] = msg.GetU32();
 
-				/*
+				/
 				std::cout.flags(std::ios::hex);
 				std::cout << std::setw(2) << std::setfill('0') << k[0] << " " <<
 					 std::setw(2) << std::setfill('0') << k[1] << " " <<
 					 std::setw(2) << std::setfill('0') << k[2] << " " <<
 					 std::setw(2) << std::setfill('0') << k[3] << std::endl;
 				std::cout.flags(std::ios::dec);
-				*/
+				//
 
 				unsigned int accnumber = msg.GetU32();
 				std::string  password  = msg.GetString();
@@ -220,7 +225,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		}
 		// gameworld connection tibia 7.9x
 		else if (protId == 0x0A){
-			/*uint16_t  clientos =*/ msg.GetU16();
+			/uint16_t  clientos =// msg.GetU16();
 			uint16_t version  = msg.GetU16();
 			
 			msg.setRSAInstance(g_otservRSA);
@@ -231,16 +236,16 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				k[2] = msg.GetU32();
 				k[3] = msg.GetU32();
 
-				/*
+				/
 				std::cout.flags(std::ios::hex);
 				std::cout << std::setw(2) << std::setfill('0') << k[0] << " " <<
 					 std::setw(2) << std::setfill('0') << k[1] << " " <<
 					 std::setw(2) << std::setfill('0') << k[2] << " " <<
 					 std::setw(2) << std::setfill('0') << k[3] << std::endl;
 				std::cout.flags(std::ios::dec);
-				*/
+				//
 
-				/*unsigned char  unknown =*/ msg.GetByte();
+				/unsigned char  unknown =// msg.GetByte();
 				unsigned long accnumber = msg.GetU32();
 				std::string name     = msg.GetString();
 				std::string password = msg.GetString();
@@ -430,8 +435,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
   return 0;
 #endif
 }
-
-
+*/
 
 void ErrorMessage(const char* message) {
   std::cout << std::endl << std::endl << "Error: " << message;
@@ -439,8 +443,6 @@ void ErrorMessage(const char* message) {
   std::string s;
   std::cin >> s;
 }
-
-
 
 int main(int argc, char *argv[])
 {
@@ -468,8 +470,7 @@ int main(int argc, char *argv[])
 	//std::cout << ":: OTServ Version 0.6.0" << std::endl;
 	//std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
-#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ || defined __DEBUG_LUASCRIPTS__
-	
+#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ || defined __DEBUG_LUASCRIPTS__ || defined __DEBUG_NET__	
 	std::cout << ":: Debugging:";
 	#ifdef __DEBUG__MOVESYS__
 	std::cout << " MOVESYS";
@@ -482,7 +483,10 @@ int main(int argc, char *argv[])
 	#endif
 	#ifdef __DEBUG_LUASCRIPTS__
 	std::cout << " LUA-SCRIPTS";
-	 #endif
+	#endif
+	#ifdef __DEBUG_NET__
+	std::cout << " NET-ASIO";
+	#endif
 	std::cout << std::endl;
 #endif
 
@@ -619,7 +623,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-
+	/*
 	//load admin protocol configuration
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "admin.xml";
@@ -632,7 +636,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+	*/
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
@@ -654,11 +658,8 @@ int main(int argc, char *argv[])
 	#endif
 
 	if(g_config.getString(ConfigManager::MD5_PASS) == "yes"){
-		g_config.setNumber(passwordType = PASSWORD_TYPE_MD5;
+		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_MD5);
 		std::cout << ":: Use MD5 passwords" << std::endl;
-	}
-	else{
-		passwordType = PASSWORD_TYPE_PLAIN;
 	}
 
 	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE), g_config.getString(ConfigManager::MAP_KIND))){
@@ -667,7 +668,7 @@ int main(int argc, char *argv[])
 
 	Raids::getInstance()->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY) + "raids/raids.xml");
 	Raids::getInstance()->startup();
-
+/*
 	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32
 	WORD wVersionRequested;
@@ -685,7 +686,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 #endif
-
+*/
 
 	std::pair<uint32_t, uint32_t> IpNetMask;
 	IpNetMask.first  = inet_addr("127.0.0.1");
@@ -738,12 +739,18 @@ int main(int argc, char *argv[])
 	status->playersmax = g_config.getNumber(ConfigManager::MAX_PLAYERS);
 
 	//OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
-
+	
+	g_game.setGameState(GAME_STATE_NORMAL);
+	
+	boost::asio::io_service io_service;
+	Server server(io_service, INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
+	io_service.run();
+	
+/*
 	// start the server listen...
 	int listen_errors;
 	int accept_errors;
 	listen_errors = 0;
-	g_game.setGameState(GAME_STATE_NORMAL);
 	while(g_game.getGameState() != GAME_STATE_SHUTDOWN && listen_errors < 100){
 		sockaddr_in local_adress;
 		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct
@@ -847,11 +854,11 @@ int main(int argc, char *argv[])
 	if(listen_errors >= 100){
 		std::cout << "ERROR: Server shutted down because there where 100 listen errors." << std::endl;
 	}
-
+	
 #ifdef WIN32
 	WSACleanup();
 #endif
-
+*/
 #if defined __EXCEPTION_TRACER__
 	mainExceptionHandler.RemoveHandler();
 #endif
