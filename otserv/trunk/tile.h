@@ -8,7 +8,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -38,7 +38,13 @@ typedef std::vector<Creature*> CreatureVector;
 enum tileflags_t{
 	TILESTATE_NONE = 0,
 	TILESTATE_PROTECTIONZONE = 1,
-	TILESTATE_HOUSE = 2
+	TILESTATE_HOUSE = 2,
+	TILESTATE_FLOORCHANGE = 4,
+	TILESTATE_FLOORCHANGE_DOWN = 8,
+	TILESTATE_FLOORCHANGE_NORTH = 16,
+	TILESTATE_FLOORCHANGE_SOUTH = 32,
+	TILESTATE_FLOORCHANGE_EAST = 64,
+	TILESTATE_FLOORCHANGE_WEST = 128
 };
 
 class Tile : public Cylinder
@@ -51,7 +57,7 @@ public:
 		tilePos.y = y;
 		tilePos.z = z;
 
-		flags = 0;
+		m_flags = 0;
 		ground = NULL;
 	}
 
@@ -67,25 +73,40 @@ public:
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
 	Mailbox* getMailbox() const;
-    
+
 	Creature* getTopCreature();
 	Item* getTopTopItem();
 	Item* getTopDownItem();
 	bool isMoveableBlocking() const;
 	Thing* getTopThing();
-	
+
 	uint32_t getThingCount() const {return (uint32_t)(ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();}
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 
-	bool hasFlag(tileflags_t flag) const {return ((flags & (uint32_t)flag) == (uint32_t)flag);}
-	void setFlag(tileflags_t flag) {flags |= flag;}
+	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}
+	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
+	void resetFlag(tileflags_t flag) {m_flags &= ~(uint32_t)flag;}
 	bool isPz() const {return hasFlag(TILESTATE_PROTECTIONZONE);}
 	void setPz() {setFlag(TILESTATE_PROTECTIONZONE);}
-  
-	bool floorChange() const;
-	bool floorChangeDown() const;
-	bool floorChange(Direction direction) const;
+
+	bool floorChange() const {return hasFlag(TILESTATE_FLOORCHANGE);}
+	bool floorChangeDown() const {return hasFlag(TILESTATE_FLOORCHANGE_DOWN);}
+	bool floorChange(Direction direction) const
+	{
+		switch(direction){
+		case NORTH:
+			return hasFlag(TILESTATE_FLOORCHANGE_NORTH);
+		case SOUTH:
+			return hasFlag(TILESTATE_FLOORCHANGE_SOUTH);
+		case EAST:
+			return hasFlag(TILESTATE_FLOORCHANGE_EAST);
+		case WEST:
+			return hasFlag(TILESTATE_FLOORCHANGE_WEST);
+		default:
+			return false;
+		}
+	}
 	bool hasHeight(uint32_t n) const;
 	uint32_t getHeight() const;
 
@@ -132,9 +153,11 @@ private:
 	void onRemoveTileItem(uint32_t index, Item* item);
 	void onUpdateTile();
 
+	void updateTileFlags(Item* item, bool removing);
+
 protected:
 	Position tilePos;
-	uint32_t flags;
+	uint16_t m_flags;
 };
 
 #endif

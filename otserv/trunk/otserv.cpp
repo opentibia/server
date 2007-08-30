@@ -347,84 +347,88 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							player = new Player(name, protocol);
 							player->useThing2();
 							player->setID();
-							IOPlayer::instance()->loadPlayer(player, name);
 
-							connectResult_t connectRes = CONNECT_INTERNALERROR;
+							if(IOPlayer::instance()->loadPlayer(player, name)){
 
-							if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-								msg.AddByte(0x14);
-								msg.AddString("Your character is banished!");
-								msg.WriteToSocket(s);
-							}
-							else if(g_bans.isAccountBanished(accnumber) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-								msg.AddByte(0x14);
-								msg.AddString("Your account is banished!");
-								msg.WriteToSocket(s);
-							}
-							else if(playerexist && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
-								#ifdef __DEBUG_PLAYERS__
-								std::cout << "reject player..." << std::endl;
-								#endif
-								msg.AddByte(0x14);
-								msg.AddString("You are already logged in.");
-								msg.WriteToSocket(s);
-							}
-							else if(g_game.getGameState() == GAME_STATE_STARTUP){
-								msg.AddByte(0x14);
-								msg.AddString("Gameworld is starting up. Please wait.");
-								msg.WriteToSocket(s);
-							}
-							else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
-								//nothing to do
-							}
-							else if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
-								msg.AddByte(0x14);
-								msg.AddString("Server temporarly closed.");
-								msg.WriteToSocket(s);
-							}
-							else if((connectRes = protocol->ConnectPlayer()) != CONNECT_SUCCESS){
-								#ifdef __DEBUG_PLAYERS__
-								std::cout << "reject player..." << std::endl;
-								#endif
-								switch(connectRes){
-									case CONNECT_TOMANYPLAYERS:
-									{
-										Waitlist* wait = Waitlist::instance();
-										wait->createMessage(msg, accnumber, player->getIP());
+								connectResult_t connectRes = CONNECT_INTERNALERROR;
+
+								if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
+									msg.AddByte(0x14);
+									msg.AddString("Your character is banished!");
+									msg.WriteToSocket(s);
+								}
+								else if(g_bans.isAccountBanished(accnumber) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
+									msg.AddByte(0x14);
+									msg.AddString("Your account is banished!");
+									msg.WriteToSocket(s);
+								}
+								else if(playerexist && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
+									#ifdef __DEBUG_PLAYERS__
+									std::cout << "reject player..." << std::endl;
+									#endif
+									msg.AddByte(0x14);
+									msg.AddString("You are already logged in.");
+									msg.WriteToSocket(s);
+								}
+								else if(g_game.getGameState() == GAME_STATE_STARTUP){
+									msg.AddByte(0x14);
+									msg.AddString("Gameworld is starting up. Please wait.");
+									msg.WriteToSocket(s);
+								}
+								else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+									//nothing to do
+								}
+								else if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+									msg.AddByte(0x14);
+									msg.AddString("Server temporarly closed.");
+									msg.WriteToSocket(s);
+								}
+								else if((connectRes = protocol->ConnectPlayer()) != CONNECT_SUCCESS){
+									#ifdef __DEBUG_PLAYERS__
+									std::cout << "reject player..." << std::endl;
+									#endif
+									switch(connectRes){
+										case CONNECT_TOMANYPLAYERS:
+										{
+											Waitlist* wait = Waitlist::instance();
+											wait->createMessage(msg, accnumber, player->getIP());
+										}
+										break;
+										case CONNECT_MASTERPOSERROR:
+
+											msg.AddByte(0x14);
+											msg.AddString("Temple position is wrong. Contact the administrator.");
+										break;
+
+										default:
+											msg.AddByte(0x14);
+											msg.AddString("Internal error.");
+										break;
 									}
-									break;
-									case CONNECT_MASTERPOSERROR:
 
-										msg.AddByte(0x14);
-										msg.AddString("Temple position is wrong. Contact the administrator.");
-									break;
+									msg.WriteToSocket(s);
+								}
+								else{
+									Status* stat = Status::instance();
+									stat->addPlayer();
+									player->lastlogin = time(NULL);
+									player->lastip = player->getIP();
+									s = 0;            // protocol/player will close socket
 
-									default:
-										msg.AddByte(0x14);
-										msg.AddString("Internal error.");
-									break;
+									OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
+									isLocked = false;
+									protocol->ReceiveLoop();
+									stat->removePlayer();
 								}
 
-								msg.WriteToSocket(s);
+								if(player){
+									g_game.FreeThing(player);
+								}
 							}
 							else{
-								Status* stat = Status::instance();
-								stat->addPlayer();
-								player->lastlogin = time(NULL);
-								player->lastip = player->getIP();
-								s = 0;            // protocol/player will close socket
-
-								OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
-								isLocked = false;
-								protocol->ReceiveLoop();
-								stat->removePlayer();
-							}
-
-							if(player){
-								g_game.FreeThing(player);
+								delete player;
 							}
 						}
-
 						if(isLocked){
 							OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 						}

@@ -124,7 +124,7 @@ Item::Item(const unsigned short _type, unsigned short _count /*= 0*/) :
 }
 
 Item::Item(const Item &i) :
-	ItemAttributes()
+	Thing(), ItemAttributes()
 {
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;

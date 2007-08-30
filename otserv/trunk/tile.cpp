@@ -8,7 +8,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -63,7 +63,7 @@ bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 
 	return false;
 }
-
+/*
 bool Tile::floorChange() const
 {
 	ItemVector::const_iterator iit;
@@ -74,10 +74,10 @@ bool Tile::floorChange() const
 		const ItemType& iiType = Item::items[(*iit)->getID()];
 
 		if (iiType.floorChangeNorth || iiType.floorChangeSouth || iiType.floorChangeEast || iiType.floorChangeWest)
-			return true;      
+			return true;
 	}
 
-	for (iit = downItems.begin(); iit != downItems.end(); ++iit){ 
+	for (iit = downItems.begin(); iit != downItems.end(); ++iit){
 		const ItemType& iiType = Item::items[(*iit)->getID()];
 
 		if (iiType.floorChangeNorth || iiType.floorChangeSouth || iiType.floorChangeEast || iiType.floorChangeWest)
@@ -107,10 +107,10 @@ bool Tile::floorChangeDown() const
 }
 
 bool Tile::floorChange(Direction direction) const
-{  
+{
 	ItemVector::const_iterator iit;
 	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-		if(direction == NORTH){  
+		if(direction == NORTH){
 			if((*iit)->floorChangeNorth())
 				return true;
 		}
@@ -129,7 +129,7 @@ bool Tile::floorChange(Direction direction) const
 	}
 
 	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-		if(direction == NORTH){  
+		if(direction == NORTH){
 			if((*iit)->floorChangeNorth())
 				return true;
 		}
@@ -149,7 +149,7 @@ bool Tile::floorChange(Direction direction) const
 
 	return false;
 }
-
+*/
 bool Tile::hasHeight(uint32_t n) const
 {
 	uint32_t height = 0;
@@ -302,7 +302,7 @@ void Tile::onAddTileItem(Item* item)
 			player->sendAddTileItem(cylinderMapPos, item);
 		}
 	}
-	
+
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onAddTileItem(cylinderMapPos, item);
@@ -454,7 +454,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(floorChange() || getTeleportItem()){
 				return RET_NOTPOSSIBLE;
 			}
-			
+
 			if(monster->canPushItems()){
 				for(CreatureVector::const_iterator cit = creatures.begin(); cit != creatures.end(); ++cit){
 					if( !(*cit)->getMonster() ||
@@ -534,7 +534,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 
 		bool itemIsHangable = item->isHangable();
-		
+
 		if(ground == NULL && !itemIsHangable){
 			return RET_NOTPOSSIBLE;
 		}
@@ -549,12 +549,12 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			iithing = __getThing(i);
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
-				
+
 				//Is not posible 2 hangables in the same tile
 				if(iiType.isHangable && itemIsHangable){
 					hasHangable = true;
 				}
-				
+
 				if(iiType.blockSolid){
 					if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
 						supportsHangableItems = true;
@@ -575,7 +575,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 		}
-		
+
 		if(itemIsHangable && supportsHangableItems){
 			if((flags & FLAG_FROMFARPOSITION) == FLAG_FROMFARPOSITION){
 				return RET_TOOFARAWAY;
@@ -723,7 +723,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 #endif
 			return /*RET_NOTPOSSIBLE*/;
 		}
-		
+
 		item->setParent(this);
 
 		if(item->isGroundTile()){
@@ -731,7 +731,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				onAddTileItem(item);
 			}
 			else{
-				int32_t index = __getIndexOfThing(ground);				
+				int32_t index = __getIndexOfThing(ground);
 				onUpdateTileItem(index, ground, item);
 
 				ground->setParent(NULL);
@@ -935,7 +935,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		}
 
 		if(item == ground){
-			
+
 			onRemoveTileItem(index, item);
 
 			ground->setParent(NULL);
@@ -959,14 +959,14 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		else{
 			for (iit = downItems.begin(); iit != downItems.end(); ++iit){
 				if(*iit == item){
-					if(item->isStackable() && count != item->getItemCount()){							
+					if(item->isStackable() && count != item->getItemCount()){
 						int newCount = std::max(0, (int)(item->getItemCount() - count));
 						item->setItemCount(newCount);
 
 						onUpdateTileItem(index, item, item);
 					}
 					else {
-						
+
 						onRemoveTileItem(index, item);
 
 						(*iit)->setParent(NULL);
@@ -1122,6 +1122,12 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 			mailbox->__addThing(thing);
 		}
 	}
+
+	//update floor change flags
+	Item* item = thing->getItem();
+	if(item){
+		updateTileFlags(item, false);
+	}
 }
 
 void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
@@ -1143,7 +1149,7 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 			player->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
 		}
 	}
-	
+
 	//calling movement scripts
 	Creature* creature = thing->getCreature();
 	if(creature){
@@ -1155,7 +1161,12 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 			g_moveEvents->onItemMove(item, this, false);
 		}
 	}
-	
+
+	//update floor change flags
+	Item* item = thing->getItem();
+	if(item){
+		updateTileFlags(item, true);
+	}
 }
 
 void Tile::__internalAddThing(Thing* thing)
@@ -1199,6 +1210,60 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 		}
 		else{
 			downItems.insert(downItems.begin(), item);
+		}
+
+		//update floor change flags
+		updateTileFlags(item, false);
+	}
+}
+
+void Tile::updateTileFlags(Item* item, bool removing)
+{
+	if(!removing){
+		//!removing is adding an item to the tile
+		if(!hasFlag(TILESTATE_FLOORCHANGE)){
+			if(item->floorChangeDown()){
+				setFlag(TILESTATE_FLOORCHANGE);
+				setFlag(TILESTATE_FLOORCHANGE_DOWN);
+			}
+			if(item->floorChangeNorth()){
+				setFlag(TILESTATE_FLOORCHANGE);
+				setFlag(TILESTATE_FLOORCHANGE_NORTH);
+			}
+			if(item->floorChangeSouth()){
+				setFlag(TILESTATE_FLOORCHANGE);
+				setFlag(TILESTATE_FLOORCHANGE_SOUTH);
+			}
+			if(item->floorChangeEast()){
+				setFlag(TILESTATE_FLOORCHANGE);
+				setFlag(TILESTATE_FLOORCHANGE_EAST);
+			}
+			if(item->floorChangeWest()){
+				setFlag(TILESTATE_FLOORCHANGE);
+				setFlag(TILESTATE_FLOORCHANGE_WEST);
+			}
+		}
+	}
+	else{
+		if(item->floorChangeDown()){
+			resetFlag(TILESTATE_FLOORCHANGE);
+			resetFlag(TILESTATE_FLOORCHANGE_DOWN);
+		}
+		if(item->floorChangeNorth()){
+			resetFlag(TILESTATE_FLOORCHANGE);
+			resetFlag(TILESTATE_FLOORCHANGE_NORTH);
+		}
+		if(item->floorChangeSouth()){
+			resetFlag(TILESTATE_FLOORCHANGE);
+			resetFlag(TILESTATE_FLOORCHANGE_SOUTH);
+		}
+		if(item->floorChangeEast()){
+			resetFlag(TILESTATE_FLOORCHANGE);
+			resetFlag(TILESTATE_FLOORCHANGE_EAST);
+		}
+		if(item->floorChangeWest()){
+			resetFlag(TILESTATE_FLOORCHANGE);
+			resetFlag(TILESTATE_FLOORCHANGE_WEST);
 		}
 	}
 }

@@ -52,7 +52,13 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT `id`,`name`,`account_id`,`group_id`,`premend`,`sex`,"
+	#ifdef __USE_SQL_PREMDAYS__
+	#define PREMIUM_FIELD "premdays"
+	#else
+	#define PREMIUM_FIELD "premend"
+	#endif
+
+	query << "SELECT `id`,`name`,`account_id`,`group_id`,`" << PREMIUM_FIELD << "`,`sex`,"
 	  "`vocation`,`experience`,`level`,`maglevel`,`health`,`healthmax`,`mana`,"
 	  "`manamax`,`manaspent`,`soul`,`direction`,`lookbody`,`lookfeet`,`lookhead`,"
 	  "`looklegs`,`looktype`,`lookaddons`,`posx`,`posy`,`posz`,`cap`,`lastlogin`,"
@@ -826,8 +832,8 @@ const PlayerGroup* IOPlayerSQL::getPlayerGroupByAccount(uint32_t accno)
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT group_id FROM accounts WHERE id='" << accno << "'";
-	if(db->connect() && db->storeQuery(query, result)){
+	query << "SELECT group_id FROM accounts WHERE id=" << accno;
+	if(db->connect() && db->storeQuery(query, result) && result.getNumRows() == 1){
 		return getPlayerGroup(result.getDataInt("group_id"));
 	}
 	return NULL;

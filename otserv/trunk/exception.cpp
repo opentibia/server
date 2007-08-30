@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,7 +23,7 @@
 #include <string>
 #include <iomanip>
 #include <ctime>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <map>
 
 #include "otsystem.h"
@@ -151,7 +151,7 @@ __cdecl _SEHHandler(
 	unsigned long nparameters = 0;
 	unsigned long file,foundRetAddress = 0;
 	_MEMORY_BASIC_INFORMATION mbi;
-	
+
 	std::ostream *outdriver;
 	std::cout << "Error: generating report file..." <<std::endl;
 	std::ofstream output("report.txt",std::ios_base::app);
@@ -163,20 +163,20 @@ __cdecl _SEHHandler(
 		file = true;
 		outdriver = &output;
 	}
-	
+
 	time_t rawtime;
 	time(&rawtime);
 	*outdriver << "*****************************************************" << std::endl;
 	*outdriver << "Error report - " << std::ctime(&rawtime) << std::endl;
 	*outdriver << "Compiler info - " << COMPILER_STRING << std::endl;
 	*outdriver << "Compilation Date - " << COMPILATION_DATE << std::endl << std::endl;
-	
+
 	//system and process info
 	//- global memory information
 	MEMORYSTATUS mstate;
 	GlobalMemoryStatus(&mstate);
 	*outdriver << "Memory load: " << mstate.dwMemoryLoad << std::endl <<
-		"Total phys: " << mstate.dwTotalPhys/1024 << " K available phys: " << 
+		"Total phys: " << mstate.dwTotalPhys/1024 << " K available phys: " <<
 		mstate.dwAvailPhys/1024 << " K" << std::endl;
 	//-process info
 	FILETIME FTcreation,FTexit,FTkernel,FTuser;
@@ -184,9 +184,9 @@ __cdecl _SEHHandler(
 	GetProcessTimes(GetCurrentProcess(),&FTcreation,&FTexit,&FTkernel,&FTuser);
 	// creation time
 	FileTimeToSystemTime(&FTcreation,&systemtime);
-	*outdriver << "Start time: " << systemtime.wDay << "-" << 
+	*outdriver << "Start time: " << systemtime.wDay << "-" <<
 		systemtime.wMonth << "-" << systemtime.wYear << "  " <<
-		systemtime.wHour << ":" << systemtime.wMinute << ":" << 
+		systemtime.wHour << ":" << systemtime.wMinute << ":" <<
 		systemtime.wSecond << std::endl;
 	// kernel time
 	unsigned long miliseconds;
@@ -207,8 +207,8 @@ __cdecl _SEHHandler(
 	*outdriver << ":" << miliseconds/1000;
 	miliseconds = miliseconds - (miliseconds/1000)*1000;
 	*outdriver << "." << miliseconds << std::endl;
-	
-	
+
+
 	// n threads
 	PROCESSENTRY32 uProcess;
 	HANDLE lSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
@@ -227,11 +227,11 @@ __cdecl _SEHHandler(
 		}
 		CloseHandle (lSnapShot);
 	}
-	
+
 	*outdriver << std::endl;
 	//exception header type and eip
 	outdriver->flags(std::ios::hex | std::ios::showbase);
-	*outdriver << "Exception: " << (unsigned long)ExceptionRecord->ExceptionCode << 
+	*outdriver << "Exception: " << (unsigned long)ExceptionRecord->ExceptionCode <<
 		" at eip = " << (unsigned long)ExceptionRecord->ExceptionAddress;
 	FunctionMap::iterator functions;
 	unsigned long functionAddr;
@@ -240,7 +240,7 @@ __cdecl _SEHHandler(
 		*outdriver << "(" << functionName << " - " << functionAddr <<")";
 	}
 	*outdriver << std::endl ;
-	
+
 	//registers
 	*outdriver << "eax = ";printPointer(outdriver,ContextRecord->Eax);*outdriver << std::endl;
 	*outdriver << "ebx = ";printPointer(outdriver,ContextRecord->Ebx);*outdriver << std::endl;
@@ -252,16 +252,16 @@ __cdecl _SEHHandler(
 	*outdriver << "esp = ";printPointer(outdriver,ContextRecord->Esp);*outdriver << std::endl;
 	*outdriver << "efl = " << ContextRecord->EFlags << std::endl;
 	*outdriver << std::endl;
-	
+
 	//stack dump
 	esp = (unsigned long *)(ContextRecord->Esp);
 	VirtualQuery(esp, &mbi, sizeof(mbi));
 	stacklimit = (unsigned long*)((unsigned long)(mbi.BaseAddress) + mbi.RegionSize);
-	
+
 	*outdriver << "---Stack Trace---" << std::endl;
 	*outdriver << "From: " << (unsigned long)esp <<
 		" to: " << (unsigned long)stacklimit << std::endl;
-	
+
 	stackstart = esp;
 	next_ret = (unsigned long*)(ContextRecord->Ebp);
 	unsigned long frame_param_counter;
@@ -270,7 +270,7 @@ __cdecl _SEHHandler(
 		stack_val = *esp;
 		if(foundRetAddress)
 			nparameters++;
-		
+
 		if(esp - stackstart < 20 || nparameters < 10 || std::abs(esp - next_ret) < 10 || frame_param_counter < 8){
 			*outdriver  << (unsigned long)esp << " | ";
 			printPointer(outdriver,stack_val);
@@ -292,7 +292,7 @@ __cdecl _SEHHandler(
 			//
 			unsigned long functionAddr;
 			char* functionName = getFunctionName(stack_val, functionAddr);
-			output << (unsigned long)esp << "  " << functionName << "(" << 
+			output << (unsigned long)esp << "  " << functionName << "(" <<
 				functionAddr << ")" << std::endl;
 		}
 		esp++;
@@ -335,7 +335,7 @@ bool ExceptionHandler::LoadMap(){
 		exit(1);
 		return false;
 	}
-	
+
 	//read until found .text           0x00401000
 	while(fgets(line, 1024, input)){
 		if(memcmp(line,".text",5) == 0)
@@ -345,7 +345,7 @@ bool ExceptionHandler::LoadMap(){
 	if(feof(input)){
 		return false;
 	}
-	
+
 	char tofind[] = "0x";
 	char lib[] = ".a(";
 	while(fgets(line, 1024, input)){
@@ -370,7 +370,7 @@ bool ExceptionHandler::LoadMap(){
 				}
 				if(*pos2 == 0 || (*pos2 == '0' && *(pos2+1) == 'x'))
 					continue;
-				
+
 				char* name = new char[strlen(pos2)+1];
 				strcpy(name, pos2);
 				name[strlen(pos2) - 1] = 0;
@@ -400,7 +400,7 @@ void ExceptionHandler::dumpStack()
 	#ifndef __GNUC__
 	return;
 	#endif
-	
+
 	unsigned long *esp;
 	unsigned long *next_ret;
 	unsigned long stack_val;
@@ -409,9 +409,9 @@ void ExceptionHandler::dumpStack()
 	unsigned long nparameters = 0;
 	unsigned long foundRetAddress = 0;
 	_MEMORY_BASIC_INFORMATION mbi;
-	
+
 	std::cout << "Error: generating report file..." << std::endl;
-	std::ofstream output("report.txt",std::ios_base::app);	
+	std::ofstream output("report.txt",std::ios_base::app);
 	output.flags(std::ios::hex | std::ios::showbase);
 	time_t rawtime;
 	time(&rawtime);
@@ -425,14 +425,14 @@ void ExceptionHandler::dumpStack()
 	#else
 	//
 	#endif
-	
+
 	VirtualQuery(esp, &mbi, sizeof(mbi));
 	stacklimit = (unsigned long*)((unsigned long)(mbi.BaseAddress) + mbi.RegionSize);
-	
+
 	output << "---Stack Trace---" << std::endl;
 	output << "From: " << (unsigned long)esp <<
 		" to: " << (unsigned long)stacklimit << std::endl;
-	
+
 	stackstart = esp;
 	#ifdef __GNUC__
 	__asm__ ("movl %%ebp, %0;":"=r"(next_ret)::);
@@ -445,7 +445,7 @@ void ExceptionHandler::dumpStack()
 		stack_val = *esp;
 		if(foundRetAddress)
 			nparameters++;
-		
+
 		if(esp - stackstart < 20 || nparameters < 10 || std::abs(esp - next_ret) < 10 || frame_param_counter < 8){
 			output  << (unsigned long)esp << " | ";
 			printPointer(&output, stack_val);
@@ -466,7 +466,7 @@ void ExceptionHandler::dumpStack()
 			foundRetAddress++;
 			unsigned long functionAddr;
 			char* functionName = getFunctionName(stack_val, functionAddr);
-			output << (unsigned long)esp << "  " << functionName << "(" << 
+			output << (unsigned long)esp << "  " << functionName << "(" <<
 				functionAddr << ")" << std::endl;
 		}
 		esp++;

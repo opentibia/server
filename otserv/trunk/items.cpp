@@ -1006,7 +1006,7 @@ Array<A>::~Array()
 template<typename A>
 A Array<A>::getElement(uint32_t id)
 {
-	if(id >= 0 && id < m_size){
+	if(id < m_size){
 		return m_data[id];
 	}
 	else{
@@ -1017,7 +1017,7 @@ A Array<A>::getElement(uint32_t id)
 template<typename A>
 const A Array<A>::getElement(uint32_t id) const
 {
-	if(id >= 0 && id < m_size){
+	if(id < m_size){
 		return m_data[id];
 	}
 	else{
@@ -1028,13 +1028,11 @@ const A Array<A>::getElement(uint32_t id) const
 template<typename A>
 void Array<A>::addElement(A a, uint32_t pos)
 {
-	if(pos >= 0){
-		#define INCREMENT 5000
-		if(pos >= m_size){
-			m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
-			memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
-			m_size = pos + INCREMENT;
-		}
-		m_data[pos] = a;
+	#define INCREMENT 5000
+	if(pos >= m_size){
+		m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
+		memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
+		m_size = pos + INCREMENT;
 	}
+	m_data[pos] = a;
 }
