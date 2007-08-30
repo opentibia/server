@@ -1,11 +1,3 @@
-CREATE TABLE "accounts" (
-    "id" INTEGER PRIMARY KEY NOT NULL,
-    "password" VARCHAR(255) NOT NULL,
-	"group_id" INTEGER NOT NULL,
-    "email" VARCHAR(255) NOT NULL DEFAULT '',
-    "blocked" BOOLEAN NOT NULL DEFAULT FALSE
-);
-
 CREATE TABLE "groups" (
     "id" INTEGER PRIMARY KEY,
     "name" VARCHAR(255) NOT NULL,
@@ -13,6 +5,15 @@ CREATE TABLE "groups" (
     "access" INTEGER NOT NULL,
     "maxdepotitems" INTEGER NOT NULL,
     "maxviplist" INTEGER NOT NULL
+);
+
+CREATE TABLE "accounts" (
+    "id" INTEGER PRIMARY KEY NOT NULL,
+    "password" VARCHAR(255) NOT NULL,
+    "group_id" INTEGER NOT NULL,
+    "email" VARCHAR(255) NOT NULL DEFAULT '',
+    "blocked" BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
 );
 
 CREATE TABLE "players" (
@@ -245,6 +246,26 @@ BEGIN
         OR (SELECT "id" FROM "accounts" WHERE "id" = NEW."account_id") IS NULL;
 
     SELECT RAISE(ROLLBACK, 'UPDATE on table "players" violates foreign: "group_id"')
+    WHERE NEW."group_id" IS NULL
+        OR (SELECT "id" FROM "groups" WHERE "id" = NEW."group_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_accounts"
+BEFORE INSERT
+ON "accounts"
+FOR EACH ROW
+BEGIN
+    SELECT RAISE(ROLLBACK, 'INSERT on table "accounts" violates foreign: "group_id"')
+    WHERE NEW."group_id" IS NULL
+        OR (SELECT "id" FROM "groups" WHERE "id" = NEW."group_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_accounts"
+BEFORE UPDATE
+ON "accounts"
+FOR EACH ROW
+BEGIN
+    SELECT RAISE(ROLLBACK, 'UPDATE on table "accounts" violates foreign: "group_id"')
     WHERE NEW."group_id" IS NULL
         OR (SELECT "id" FROM "groups" WHERE "id" = NEW."group_id") IS NULL;
 END;

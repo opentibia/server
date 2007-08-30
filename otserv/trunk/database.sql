@@ -37,7 +37,8 @@ CREATE TABLE `accounts` (
     `group_id` INT NOT NULL COMMENT 'accounts group',
     `email` VARCHAR(255) NOT NULL DEFAULT '',
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `players` (
