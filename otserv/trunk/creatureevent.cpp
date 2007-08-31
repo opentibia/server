@@ -45,10 +45,16 @@ CreatureEvents::~CreatureEvents()
 void CreatureEvents::clear()
 {
 	//clear global events
-	m_logInEvent->clearEvent();
-	m_logOutEvent->clearEvent();
-	delete m_logInEvent; m_logInEvent = NULL;
-	delete m_logOutEvent; m_logOutEvent = NULL;
+	if(m_logInEvent){
+		m_logInEvent->clearEvent();
+		delete m_logInEvent;
+		m_logInEvent = NULL;
+	}
+	if(m_logOutEvent){
+		m_logOutEvent->clearEvent();
+		delete m_logOutEvent;
+		m_logOutEvent = NULL;
+	}
 	//clear creature events
 	CreatureEventList::iterator it;
 	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
@@ -362,19 +368,19 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target)
 		uint32_t cid = env->addThing(creature);
 		uint32_t targetId = env->addThing(target);
 
-        lua_State* L = m_scriptInterface->getLuaState();
+		lua_State* L = m_scriptInterface->getLuaState();
 
-        m_scriptInterface->pushFunction(m_scriptId);
-        lua_pushnumber(L, cid);
-        lua_pushnumber(L, targetId);
-        
-        int32_t result = m_scriptInterface->callFunction(2);
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		lua_pushnumber(L, targetId);
+
+		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
 		return (result == LUA_TRUE);
 	}
 	else{
-        std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnKill" << std::endl;
+		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnKill" << std::endl;
 		return 0;
 	}
 }
