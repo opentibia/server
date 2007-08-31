@@ -58,7 +58,7 @@ Combat::~Combat()
 	delete area;
 }
 
-void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const
+void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min, int32_t& max) const
 {
 	if(!creature){
 		return;
@@ -85,7 +85,7 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 					min = (int32_t)minb;
 
 					if(weapon){
-						max = (int32_t)(weapon->getWeaponDamage(player, tool, true) * maxa + maxb);
+						max = (int32_t)(weapon->getWeaponDamage(player, target, tool, true) * maxa + maxb);
 					}
 					else{
 						max = (int32_t)maxb;
@@ -541,7 +541,7 @@ void Combat::doCombat(Creature* caster, Creature* target) const
 	if(params.combatType != COMBAT_NONE){
 		int32_t minChange = 0;
 		int32_t maxChange = 0;
-		getMinMaxValues(caster, minChange, maxChange);
+		getMinMaxValues(caster, target, minChange, maxChange);
 
 		if(params.combatType != COMBAT_MANADRAIN){
 			doCombatHealth(caster, target, minChange, maxChange, params);
@@ -562,7 +562,7 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 	if(params.combatType != COMBAT_NONE){
 		int32_t minChange = 0;
 		int32_t maxChange = 0;
-		getMinMaxValues(caster, minChange, maxChange);
+		getMinMaxValues(caster, NULL, minChange, maxChange);
 
 		if(params.combatType != COMBAT_MANADRAIN){
 			doCombatHealth(caster, pos, area, minChange, maxChange, params);

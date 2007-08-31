@@ -95,7 +95,7 @@ public:
 	uint16_t getID() const {return id;}
 
 	static bool useFist(Player* player, Creature* target);
-	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const = 0;
+	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const = 0;
 
 	const int32_t getReqLevel() const {return level;}
 	const int32_t getReqMagLv() const {return magLevel;}
@@ -145,7 +145,7 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
-	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const;
+	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
@@ -164,7 +164,7 @@ public:
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
 	//virtual uint32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
-	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const;
+	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
@@ -182,7 +182,7 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
-	virtual int32_t getWeaponDamage(const Player* player, const Item* item, bool maxDamage = false) const;
+	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 
 protected:
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};

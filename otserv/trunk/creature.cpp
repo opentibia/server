@@ -273,8 +273,8 @@ bool Creature::startAutoWalk(std::list<Direction>& listDir)
 
 void Creature::addEventWalk()
 {
-	if(eventWalk == 0){
-		//std::cout << "addEventWalk()" << std::endl;
+	if(eventWalk == 0 && getBaseSpeed() > 0){
+		//std::cout << "addEventWalk() - " << getName() << std::endl;
 
 		int64_t ticks = getEventStepTicks();
 		eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkWalk), getID())));

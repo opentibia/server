@@ -291,7 +291,7 @@ protected:
 	static bool CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 
 	static void combatTileEffects(Creature* caster, Tile* tile, const CombatParams& params);
-	void getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const;
+	void getMinMaxValues(Creature* creature, Creature* target, int32_t& min, int32_t& max) const;
 
 	//configureable
 	CombatParams params;

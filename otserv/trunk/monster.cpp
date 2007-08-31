@@ -287,10 +287,7 @@ void Monster::startThink()
 	}
 
 	addEventThink();
-
-	if(getBaseSpeed() > 0){
-		addEventWalk();
-	}
+	addEventWalk();
 }
 
 void Monster::stopThink()

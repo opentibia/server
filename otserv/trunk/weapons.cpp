@@ -447,7 +447,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 		executeUseWeapon(player, var);
 	}
 	else{
-		int32_t damage = (getWeaponDamage(player, item) * damageModifier) / 100;
+		int32_t damage = (getWeaponDamage(player, target, item) * damageModifier) / 100;
 		Combat::doCombatHealth(player, target, damage, damage, params);
 	}
 
@@ -656,7 +656,7 @@ bool WeaponMelee::getSkillType(const Player* player, const Item* item,
 	}
 }
 
-int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item, bool maxDamage /*= false*/) const
+int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t attackSkill = player->getWeaponSkill(item);
 	int32_t attackStrength = player->getAttackStrength();
@@ -772,7 +772,7 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 	Weapon::onUsedWeapon(player, item, destTile);
 }
 
-int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item, bool maxDamage /*= false*/) const
+int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t attackSkill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
 
@@ -842,7 +842,7 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 	return true;
 }
 
-int32_t WeaponWand::getWeaponDamage(const Player* player, const Item* item, bool maxDamage /*= false*/) const
+int32_t WeaponWand::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	if(maxDamage){
 		return -maxChange;

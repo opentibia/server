@@ -59,7 +59,7 @@ public:
 	virtual int32_t getArmor() const { return mType->armor; }
 	virtual int32_t getDefense() const { return mType->defense; }
 
-	virtual bool isPushable() const { return mType->pushable; }
+	virtual bool isPushable() const { return mType->pushable && (baseSpeed > 0); }
 	virtual bool isAttackable() const { return mType->isAttackable;}
 	virtual void doAttacking(uint32_t interval);
 
