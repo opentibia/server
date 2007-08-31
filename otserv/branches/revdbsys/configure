@@ -2307,9 +2307,9 @@ fi
 
 
 #check if we want postgresql
-# Check whether --enable-mysql was given.
-if test "${enable_mysql+set}" = set; then
-  enableval=$enable_mysql;
+# Check whether --enable-pgsql was given.
+if test "${enable_pgsql+set}" = set; then
+  enableval=$enable_pgsql;
 
 
 if true; then
@@ -6480,8 +6480,8 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 _ACEOF
  MYSQL_LIBS=-lmysqlclient
 else
-  { { echo "$as_me:$LINENO: error: \"mysql-client missing.\"" >&5
-echo "$as_me: error: \"mysql-client missing.\"" >&2;}
+  { { echo "$as_me:$LINENO: error: \"mysql headers missing.\"" >&5
+echo "$as_me: error: \"mysql headers missing.\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -6698,8 +6698,8 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 _ACEOF
  PGSQL_LIBS=-lpg
 else
-  { { echo "$as_me:$LINENO: error: \"postgresql-client missing.\"" >&5
-echo "$as_me: error: \"postgresql-client missing.\"" >&2;}
+  { { echo "$as_me:$LINENO: error: \"postgresql headers missing.\"" >&5
+echo "$as_me: error: \"postgresql headers missing.\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -6918,8 +6918,8 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 _ACEOF
  ODBC_LIBS=-lodbc
 else
-  { { echo "$as_me:$LINENO: error: \"unixodbc missing.\"" >&5
-echo "$as_me: error: \"unixodbc missing.\"" >&2;}
+  { { echo "$as_me:$LINENO: error: \"unixodbc headers missing.\"" >&5
+echo "$as_me: error: \"unixodbc headers missing.\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -7136,8 +7136,8 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 _ACEOF
  SQLITE_LIBS=-lsqlite3
 else
-  { { echo "$as_me:$LINENO: error: \"sqlite3 missing.\"" >&5
-echo "$as_me: error: \"sqlite3 missing.\"" >&2;}
+  { { echo "$as_me:$LINENO: error: \"sqlite3 headers missing.\"" >&5
+echo "$as_me: error: \"sqlite3 headers missing.\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -7215,7 +7215,7 @@ fi
 
 fi
 
-#AC_CHECK_HEADERS([mysql++.h],[MYSQLPP_LIBS=-lmysqlpp],[AC_MSG_ERROR("mysql++ missing.")])
+#AC_CHECK_HEADERS([mysql++.h],[MYSQLPP_LIBS=-lmysqlpp],[AC_MSG_ERROR("mysql++ headers missing.")])
 #AC_CHECK_LIB(mysqlpp, mysqlpp)
 #AC_SUBST(MYSQLPP_LIBS)
 
