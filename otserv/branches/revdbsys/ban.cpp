@@ -289,10 +289,6 @@ IOBan* IOBan::getInstance()
 
 IOBan::IOBan()
 {
-	m_host = g_config.getString(ConfigManager::SQL_HOST);
-	m_user = g_config.getString(ConfigManager::SQL_USER);
-	m_pass = g_config.getString(ConfigManager::SQL_PASS);
-	m_db   = g_config.getString(ConfigManager::SQL_DB);
 }
 
 bool IOBan::loadBans(Ban& banclass)
@@ -352,8 +348,7 @@ bool IOBan::saveBans(const Ban& banclass)
 		return false;
 	}
 
-	DBTransaction trans(db);
-	if(!trans.start())
+    if( !db->beginTransaction() )
 		return false;
 
 	query << "DELETE FROM bans;";
@@ -428,5 +423,5 @@ bool IOBan::saveBans(const Ban& banclass)
 			return false;
 	}
 
-	return trans.success();
+	return db->commit();
 }

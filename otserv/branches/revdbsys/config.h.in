@@ -24,6 +24,9 @@
 /* Define to 1 if you have the `mysqlclient' library (-lmysqlclient). */
 #undef HAVE_LIBMYSQLCLIENT
 
+/* Define to 1 if you have the `odbc' library (-lodbc). */
+#undef HAVE_LIBODBC
+
 /* Define to 1 if you have the `sqlite3' library (-lsqlite3). */
 #undef HAVE_LIBSQLITE3
 
@@ -51,8 +54,17 @@
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
 
+/* Define to 1 if you have the <sqlext.h> header file. */
+#undef HAVE_SQLEXT_H
+
 /* Define to 1 if you have the <sqlite3.h> header file. */
 #undef HAVE_SQLITE3_H
+
+/* Define to 1 if you have the <sqltypes.h> header file. */
+#undef HAVE_SQLTYPES_H
+
+/* Define to 1 if you have the <sql.h> header file. */
+#undef HAVE_SQL_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H

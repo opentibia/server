@@ -78,11 +78,6 @@ public:
 	virtual bool saveHouseInfo(Map* map, const std::string& identifier);
 
 protected:
-	std::string m_host;
-	std::string m_user;
-	std::string m_pass;
-	std::string m_db;
-
 	bool saveTile(Database* db, uint32_t tileId, const Tile* tile);
 	bool loadTile(Database& db, Tile* tile);
 

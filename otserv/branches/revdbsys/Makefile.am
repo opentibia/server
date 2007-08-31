@@ -4,7 +4,7 @@ noinst_PROGRAMS = otserv
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(MYSQL_FLAGS) $(LUA_CFLAGS) \
 	$(SQLITE_FLAGS) $(PROFILER_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror \
-	$(OTCONFIG_FLAGS)
+	$(OTCONFIG_FLAGS) $(ODBC_FLAGS)
 
 otserv_LDADD = $(XML_LIBS) $(LUA_LIBS) $(BOOST_LIBS) $(GMP_LIBS) -ldl
 
@@ -14,11 +14,13 @@ endif
 if USE_SQLITE
 MAYBE_SQLITE = databasesqlite.cpp databasesqlite.h
 endif
+if USE_ODBC
+MAYBE_ODBC = databaseodbc.cpp databaseodbc.h
+endif
 
-otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
-	database.cpp database.h \
+otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) \
+	database.cpp database.h iomapxml.cpp ioplayer.cpp \
 	account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
-	iomapxml.cpp ioplayer.cpp \
 	item.cpp items.cpp luascript.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp \
 	otserv.cpp player.cpp position.cpp protocol80.cpp spells.cpp \
 	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const80.h \
@@ -32,10 +34,9 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
 	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp teleport.cpp teleport.h \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
 	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
-	cylinder.cpp cylinder.h ban.cpp ban.h \
+	cylinder.cpp cylinder.h ban.cpp ban.h creatureevent.h \
 	rsa.cpp rsa.h configmanager.cpp configmanager.h outfit.cpp outfit.h otpch.h \
 	admin.cpp admin.h baseevents.cpp baseevents.h \
 	raids.cpp raids.h movement.cpp movement.h combat.cpp combat.h \
 	condition.cpp condition.h weapons.cpp weapons.h talkaction.cpp talkaction.h \
-	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h creatureevent.cpp \
-	creatureevent.h
+	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h creatureevent.cpp

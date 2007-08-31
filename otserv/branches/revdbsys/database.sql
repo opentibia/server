@@ -1,3 +1,4 @@
+DROP TRIGGER IF EXISTS `onupdate_players`;
 DROP TRIGGER IF EXISTS `oncreate_players`;
 DROP TRIGGER IF EXISTS `oncreate_guilds`;
 DROP TRIGGER IF EXISTS `ondelete_players`;
@@ -244,6 +245,20 @@ BEGIN
     INSERT INTO `player_skills` (`player_id`, `skillid`, `value`) VALUES (NEW.`id`, 4, 10);
     INSERT INTO `player_skills` (`player_id`, `skillid`, `value`) VALUES (NEW.`id`, 5, 10);
     INSERT INTO `player_skills` (`player_id`, `skillid`, `value`) VALUES (NEW.`id`, 6, 10);
+END|
+
+CREATE TRIGGER `onupdate_players`
+AFTER UPDATE
+ON `players`
+FOR EACH ROW
+BEGIN
+    IF OLD.`lastlogin` < NEW.`lastlogin` THEN
+        DELETE FROM `player_spells` WHERE `player_id` = OLD.`id`;
+        DELETE FROM `player_items` WHERE `player_id` = OLD.`id`;
+        DELETE FROM `player_depotitems` WHERE `player_id` = OLD.`id`;
+        DELETE FROM `player_storage` WHERE `player_id` = OLD.`id`;
+        DELETE FROM `player_viplist` WHERE `player_id` = OLD.`id`;
+    END IF;
 END|
 
 DELIMITER ;

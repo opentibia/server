@@ -29,8 +29,11 @@
 #ifdef __USE_SQLITE__
 #include "databasesqlite.h"
 #endif
+#ifdef __USE_ODBC__
+#include "databaseodbc.h"
+#endif
 
-#if defined __USE_MYSQL__ && defined __USE_SQLITE__
+#if defined MULTI_SQL_DRIVERS
 #include "configmanager.h"
 extern ConfigManager g_config;
 #endif
@@ -86,7 +89,7 @@ void DBResult::addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fiel
 	m_numRows++;
 }
 #endif
-#ifdef __USE_SQLITE__
+#if defined(__USE_SQLITE__) || defined(__USE_ODBC__)
 void DBResult::addRow(char **results, unsigned int num_fields)
 {
 	RowData* rd = new RowData;
@@ -114,28 +117,6 @@ void DBResult::addRow(char **results, unsigned int num_fields)
 	m_numRows++;
 }
 #endif
-/*
-void DBResult::clearRows()
-{
-	std::map<unsigned int, char **>::iterator it;
-	for(it = m_listRows.begin(); it != m_listRows.end();)
-	{
-		for(unsigned int i=0; i < m_lastNumFields; ++i)
-			delete[] it->second[i];
-
-		delete[] it->second;
-		m_listRows.erase(it++);
-	}
-	m_numRows = 0;
-}
-
-void DBResult::clearFieldNames()
-{
-	m_listNames.clear();
-	m_lastNumFields = m_numFields;
-	m_numFields = 0;
-}
-*/
 
 void DBResult::clear()
 {
@@ -250,17 +231,28 @@ Database* _Database::_instance = NULL;
 
 Database* _Database::instance(){
 	if(!_instance){
-#if defined __USE_MYSQL__ && defined __USE_SQLITE__
+#if defined MULTI_SQL_DRIVERS
+#ifdef __USE_MYSQL__
         if(g_config.getString(ConfigManager::SQL_TYPE) == "mysql"){
             _instance = new DatabaseMySQL;
 		}
-        else{
+#endif
+#ifdef __USE_ODBC__
+        if(g_config.getString(ConfigManager::SQL_TYPE) == "odbc"){
+            _instance = new DatabaseODBC;
+		}
+#endif
+#ifdef __USE_ODBC__
+        if(g_config.getString(ConfigManager::SQL_TYPE) == "sqlite"){
             _instance = new DatabaseSqLite;
 		}
+#endif
 #elif defined __USE_MYSQL__
 		_instance = new DatabaseMySQL;
 #elif defined __USE_SQLITE__
 		_instance = new DatabaseSqLite;
+#elif defined __USE_ODBC__
+		_instance = new DatabaseODBC;
 #endif
 		OTSYS_THREAD_LOCKVARINIT(DBQuery::database_lock);
 	}
@@ -356,50 +348,6 @@ std::string _Database::escapeString(const char* s, unsigned long size)
 
 }
 #endif
-
-DBTransaction::DBTransaction(Database* database)
-{
-	m_database = database;
-	m_state = STATE_NO_START;
-}
-
-DBTransaction::~DBTransaction()
-{
-	if(m_state == STATE_START){
-		if(!m_database->rollback()){
-			//TODO: What to do here?
-		}
-	}
-}
-
-bool DBTransaction::start()
-{
-	DBQuery query;
-	#ifndef __USE_SQLITE__
-	query << "START TRANSACTION;";
-	#else
-	query << "BEGIN;";
-	#endif
-	if(m_database->executeQuery(query)){
-		m_state = STATE_START;
-		return true;
-	}
-	else{
-		return false;
-	}
-}
-
-bool DBTransaction::success()
-{
-	if(m_state == STATE_START){
-		m_state = STEATE_COMMIT;
-		return m_database->commit();
-	}
-	else{
-		return false;
-	}
-}
-
 
 DBSplitInsert::DBSplitInsert(Database* database)
 {

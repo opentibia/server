@@ -72,6 +72,7 @@ public:
 	*/
 	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res);
 
+        DATABASE_VIRTUAL bool beginTransaction();
 	DATABASE_VIRTUAL bool rollback();
 	DATABASE_VIRTUAL bool commit();
 

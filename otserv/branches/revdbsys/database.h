@@ -116,11 +116,6 @@ public:
 	*/
 	unsigned int getNumRows(){ return m_numRows; };
 
-	/** Get the number of fields
-	*\returns The number of fields
-	*/
-	unsigned int getNumFields(){ return m_numFields; };
-
 private:
     //friend class Database;
 	#ifdef __USE_MYSQL__
@@ -129,11 +124,14 @@ private:
 	#endif
 	#ifdef __USE_SQLITE__
 	friend class DatabaseSqLite;
+	#endif
+	#if defined(__USE_SQLITE__) || defined(__USE_ODBC__)
 	void addRow(char **results, unsigned int num_fields);
 	#endif
+	#ifdef __USE_ODBC__
+	friend class DatabaseODBC;
+	#endif
 	void clear();
-	//void clearRows();
-	//void clearFieldNames();
 	void setFieldName(const std::string &s, unsigned int n){
 		m_listNames[s] = n;
 		m_numFields++;
@@ -172,7 +170,7 @@ public:
 	*	be sure that you define a DBQuery object
 	*	under it to lock database instance usage
 	*/
-    static Database* instance();
+	static Database* instance();
 
 	/** Connect to a mysql database
 	*\returns
@@ -210,6 +208,7 @@ public:
 	* 	TRUE
 	* 	FALSE
 	*/
+	DATABASE_VIRTUAL bool beginTransaction(){return false;}
 	DATABASE_VIRTUAL bool rollback(){return false;};
 	DATABASE_VIRTUAL bool commit(){return false;};
 
@@ -234,25 +233,6 @@ protected:
 #ifdef USE_MYSQL_ONLY
 #include "databasemysql.h"
 #endif
-
-class DBTransaction
-{
-public:
-	DBTransaction(Database* database);
-	~DBTransaction();
-
-	bool start();
-	bool success();
-
-private:
-	enum TransactionStates_t{
-		STATE_NO_START,
-		STATE_START,
-		STEATE_COMMIT,
-	};
-	TransactionStates_t m_state;
-	Database* m_database;
-};
 
 class DBSplitInsert
 {

@@ -41,7 +41,7 @@
 	#endif
 #endif
 
-#if !defined(__USE_MYSQL__) && !defined(__USE_SQLITE__)
+#if !defined(__USE_MYSQL__) && !defined(__USE_SQLITE__) && !defined(__USE_ODBC__)
     #define __USE_SQLITE__
 #endif
 
@@ -49,8 +49,12 @@
     #define __SPLIT_QUERIES__
 #endif
 
-#if defined(__USE_MYSQL__) && !defined(__USE_SQLITE__)
+#if defined(__USE_MYSQL__) && !defined(__USE_SQLITE__) && !defined(__USE_ODBC__)
 	#define USE_MYSQL_ONLY
+#endif
+
+#if (defined __USE_MYSQL__ && defined __USE_SQLITE__) || (defined __USE_MYSQL__ && defined __USE_ODBC__) || (defined __USE_ODBC__ && defined __USE_SQLITE__)
+    #define MULTI_SQL_DRIVERS
 #endif
 
 #if defined __WINDOWS__ || defined WIN32

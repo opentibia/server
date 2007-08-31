@@ -43,10 +43,6 @@ IOMapSerialize* IOMapSerialize::getInstance()
 
 IOMapSerialize::IOMapSerialize()
 {
-	m_host = g_config.getString(ConfigManager::SQL_HOST);
-	m_user = g_config.getString(ConfigManager::SQL_USER);
-	m_pass = g_config.getString(ConfigManager::SQL_PASS);
-	m_db   = g_config.getString(ConfigManager::SQL_DB);
 }
 
 IOMapSerialize::~IOMapSerialize()
@@ -84,10 +80,10 @@ bool IOMapSerialize::saveMap(Map* map, const std::string& identifier)
 	}
 
 	//Start the transaction
-	DBTransaction trans(db);
-	if(!trans.start()){
-		return false;
-	}
+	if( !db->beginTransaction() )
+    {
+        return false;
+    }
 
 	//clear old tile data
 	query.reset();
@@ -115,7 +111,7 @@ bool IOMapSerialize::saveMap(Map* map, const std::string& identifier)
 	}
 
 	//End the transaction
-	return trans.success();
+	return db->commit();
 }
 
 bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
@@ -227,10 +223,9 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 
 	DBQuery query;
 	query.reset();
-	query << "SELECT tiles.id FROM tiles WHERE x='" << tilePos.x
-		<< "' AND y='" << tilePos.y
-		<< "' AND z='" << tilePos.z
-		<< "'";
+	query << "SELECT id FROM tiles WHERE x=" << tilePos.x
+		<< " AND y=" << tilePos.y
+		<< " AND z=" << tilePos.z;
 
 	DBResult result;
 	if(!db.storeQuery(query, result) || result.getNumRows() != 1)
@@ -239,7 +234,7 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 	int tileId = result.getDataInt("id");
 
 	query.reset();
-	query << "SELECT * FROM tile_items WHERE tile_id='" << tileId <<"' ORDER BY sid DESC";
+	query << "SELECT * FROM tile_items WHERE tile_id=" << tileId <<" ORDER BY sid DESC";
 	if(db.storeQuery(query, result) && (result.getNumRows() > 0)){
 		Item* item = NULL;
 
@@ -384,10 +379,8 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 		return false;
 	}
 
-	DBTransaction trans(db);
-	if(!trans.start()){
-		return false;
-	}
+    if( !db->beginTransaction() )
+        return false;
 
 	query << "DELETE FROM houses;";
 	if(!db->executeQuery(query))
@@ -461,5 +454,5 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 		}
 	}
 
-	return trans.success();
+	return db->commit();
 }

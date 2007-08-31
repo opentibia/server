@@ -26,7 +26,7 @@ extern ConfigManager g_config;
 
 DatabaseSqLite::DatabaseSqLite()
 {
-	init();
+    //
 }
 
 DatabaseSqLite::~DatabaseSqLite()
@@ -36,10 +36,9 @@ DatabaseSqLite::~DatabaseSqLite()
 
 bool DatabaseSqLite::m_fieldnames = false;
 
-bool DatabaseSqLite::init()
+bool DatabaseSqLite::connect()
 {
 	m_initialized = false;
-	m_connected = false;
 
 	// Initialize mysql
 	if(sqlite3_open(g_config.getString(ConfigManager::SQL_DB).c_str(), &m_handle) != SQLITE_OK){
@@ -51,13 +50,6 @@ bool DatabaseSqLite::init()
 		m_initialized = true;
 
 	return m_initialized;
-}
-
-bool DatabaseSqLite::connect()
-{
-    //don't need to connect
-	m_connected = true;
-	return true;
 }
 
 bool DatabaseSqLite::disconnect()
@@ -73,10 +65,15 @@ bool DatabaseSqLite::disconnect()
 
 bool DatabaseSqLite::executeQuery(DBQuery &q)
 {
-	if(!m_initialized || !m_connected)
+	if(!m_initialized)
 		return false;
 
 	std::string s = q.str();
+
+	#ifdef __SQL_QUERY_DEBUG__
+	std::cout << s << std::endl;
+	#endif
+
 	const char* querytext = s.c_str();
 	// Execute the query
 	if(sqlite3_exec(m_handle, querytext, 0, 0, &zErrMsg) != SQLITE_OK)
@@ -94,14 +91,14 @@ bool DatabaseSqLite::executeQuery(DBQuery &q)
 
 bool DatabaseSqLite::storeQuery(DBQuery &q, DBResult &dbres)
 {
-	if(!m_initialized || !m_connected)
+	if(!m_initialized)
 		return false;
 
 	std::string s = q.str();
 	const char* querytext = s.c_str();
 
 	q.reset();
-    dbres.clear();
+	dbres.clear();
 	// Execute the query
 	if(sqlite3_exec(m_handle, querytext, DatabaseSqLite::callback, &dbres, &zErrMsg) != SQLITE_OK)
 	{
@@ -119,30 +116,28 @@ bool DatabaseSqLite::storeQuery(DBQuery &q, DBResult &dbres)
 		return false;
 }
 
+bool DatabaseSqLite::beginTransaction()
+{
+	DBQuery query;
+	query << "BEGIN;";
+
+	return executeQuery(query);
+}
+
 bool DatabaseSqLite::rollback()
 {
-    DBQuery query;
+	DBQuery query;
 	query << "ROLLBACK;";
 
-	if(executeQuery(query)){
-		return true;
-	}
-	else{
-		return false;
-	}
+	return executeQuery(query);
 }
 
 bool DatabaseSqLite::commit()
 {
-    DBQuery query;
+	DBQuery query;
 	query << "COMMIT;";
 
-	if(executeQuery(query)){
-		return true;
-	}
-	else{
-		return false;
-	}
+	return executeQuery(query);
 }
 
 int DatabaseSqLite::callback(void *db, int num_fields, char **results, char **columnNames){

@@ -124,10 +124,6 @@ protected:
 	IOBan();
 	virtual ~IOBan(){};
 	static IOBan* _instance;
-	std::string m_host;
-	std::string m_user;
-	std::string m_pass;
-	std::string m_db;
 };
 
 #endif

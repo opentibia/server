@@ -54,16 +54,16 @@ Account IOAccount::loadAccount(uint32_t accno)
 {
 	Account acc;
 
-	Database* mysql = Database::instance();
+	Database* db = Database::instance();
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT id,password FROM accounts WHERE id='" << accno << "'";
-	if(mysql->connect() && mysql->storeQuery(query, result)){
+	query << "SELECT id,password FROM accounts WHERE id=" << accno;
+	if(db->connect() && db->storeQuery(query, result)){
 		acc.accnumber = result.getDataInt("id");
 		acc.password = result.getDataString("password");
-		query << "SELECT name FROM players WHERE account_id='" << accno << "'";
-		if(mysql->storeQuery(query, result)){
+		query << "SELECT name FROM players WHERE account_id=" << accno;
+		if(db->storeQuery(query, result)){
 			for(uint32_t i = 0; i < result.getNumRows(); ++i){
 				std::string ss = result.getDataString("name", i);
 				acc.charList.push_back(ss.c_str());
@@ -77,16 +77,16 @@ Account IOAccount::loadAccount(uint32_t accno)
 
 bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string &password)
 {
-	Database* mysql = Database::instance();
+	Database* db = Database::instance();
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT password FROM accounts WHERE id='" << accno << "'";
-	if(mysql->connect() && mysql->storeQuery(query, result) && (result.getNumRows() == 1)){
+	query << "SELECT password FROM accounts WHERE id=" << accno;
+	if(db->connect() && db->storeQuery(query, result) && (result.getNumRows() == 1)){
 		std::string acc_password = result.getDataString("password");
 
-		query << "SELECT name FROM players WHERE account_id='" << accno << "'";
-		if(mysql->storeQuery(query, result)){
+		query << "SELECT name FROM players WHERE account_id=" << accno;
+		if(db->storeQuery(query, result)){
 
 			for(uint32_t i = 0; i < result.getNumRows(); ++i){
 				std::string ss = result.getDataString("name", i);

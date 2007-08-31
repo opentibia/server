@@ -121,12 +121,13 @@ saveclientdebug = 0
 md5passwords = "no"
 
 -- SQL type
--- options: mysql, sqlite
+-- options: mysql, sqlite, odbc
 sql_type = "sqlite"
 
 --- SQL connection part
 sql_db   = "db.s3db"
 --- sql_db = "otserv" //use this one for MySQL
+--- sql_db = "Your Source" // use this for ODBC
 
 -- there settings are for MySQL only, SQLite doesn't need then
 sql_host = "localhost"

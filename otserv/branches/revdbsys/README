@@ -109,12 +109,24 @@ MySQL Server
 				a) On Windows use -D__USE_MYSQL__ -lmysqlclient
 				b) On POSIX systems use ./configure --enable-mysql
 
-SQLite and MySQL at once compilation
+ODBC data sources
+	OTServ contains also ODBC database driver. It allows to connect throught unified ODBC connection mechanism
+	to any ODBC data source. It was first developed under Windows, but there are currently ODBC implementations
+	on various platforms (search for UnixODBC).
+
+	Note: under non-Windows OSes you will need to download UnixODBC. You most likely have it in your Linux
+	ditro repositories as unixodbc and unixodbc-dev packages.
+
+		Instructions to compile OTServ with ODBC driver:
+				a) On Windows use -D__USE_ODBC__ -lodbc
+				b) On POSIX systems use ./configure --enable-odbc
+
+SQLite with other drivers
 	By default any alternative driver like MySQL disables SQLite support. However sometimes you might want
 	to compile more then one driver into your server (then you choose which one you want to use in your
 	config.lua file).
 
-		Instructions to compile OTServ with MySQL and SQLite:
+		Instructions to compile OTServ with SQLite and other drivers:
 			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
 			2. Compile your OTServ against SQLite:
 				a) On Windows use -D__USE_SQLITE__ -lsqlite3 -D__USE_MYSQL__ -lmysqlclient
@@ -138,10 +150,10 @@ KDE KDevelop compilation
 				--enable-debug=full
 				If you don't like or want it, you can delete it.
 		3. After (or replacing) --enable-debug=full you will write:
-			3.1 for MySQL:
+			a) for MySQL:
 				--enable-mysql
-			3.2 for SQLite with MySQL:
-				--enable-mysql --enable-sqlite
+			b) for ODBC:
+				--enable-odbc
 		4. Extra
 			4.1 Different LUA configuration file
 				--with-otconfig
@@ -169,6 +181,7 @@ Credits?
 	Vitor - Developer (advisory/optimization)
 	Wrzasq - Developer (database design, revdbsys, pot)
 	Arkold Thos - Developer?, Linux porter
+	bruno - ODBC driver
 
 	Yorick - Fansite , Forum administrator
 	Pekay - README Documentation, Forum administrator
