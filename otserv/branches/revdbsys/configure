@@ -678,12 +678,15 @@ USE_OTCONFIG_TRUE
 USE_OTCONFIG_FALSE
 USE_MYSQL_TRUE
 USE_MYSQL_FALSE
+USE_PGSQL_TRUE
+USE_PGSQL_FALSE
 USE_ODBC_TRUE
 USE_ODBC_FALSE
 USE_SQLITE_TRUE
 USE_SQLITE_FALSE
 OTCONFIG_FLAGS
 MYSQL_FLAGS
+PGSQL_FLAGS
 ODBC_FLAGS
 SQLITE_FLAGS
 PROFILER_FLAGS
@@ -709,6 +712,7 @@ LUA_LIBS
 BOOST_LIBS
 GMP_LIBS
 MYSQL_LIBS
+PGSQL_LIBS
 ODBC_LIBS
 SQLITE_LIBS
 LIBOBJS
@@ -1308,6 +1312,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-mysql          enable MySQL support
+  --enable-pgsql          enable PostgreSQL support
   --enable-odbc           enable ODBC support
   --enable-sqlite         enable SQLite support (default))
   --enable-profiler       enable profiler support
@@ -2226,6 +2231,15 @@ fi
 
 
 if false; then
+  USE_PGSQL_TRUE=
+  USE_PGSQL_FALSE='#'
+else
+  USE_PGSQL_TRUE='#'
+  USE_PGSQL_FALSE=
+fi
+
+
+if false; then
   USE_ODBC_TRUE=
   USE_ODBC_FALSE='#'
 else
@@ -2286,6 +2300,35 @@ else
   USE_SQLITE_FALSE=
 fi
     MYSQL_FLAGS=-D__USE_MYSQL__
+    SQLITE_FLAGS=
+
+
+fi
+
+
+#check if we want postgresql
+# Check whether --enable-mysql was given.
+if test "${enable_mysql+set}" = set; then
+  enableval=$enable_mysql;
+
+
+if true; then
+  USE_PGSQL_TRUE=
+  USE_PGSQL_FALSE='#'
+else
+  USE_PGSQL_TRUE='#'
+  USE_PGSQL_FALSE=
+fi
+
+
+if false; then
+  USE_SQLITE_TRUE=
+  USE_SQLITE_FALSE='#'
+else
+  USE_SQLITE_TRUE='#'
+  USE_SQLITE_FALSE=
+fi
+    PGSQL_FLAGS=-D__USE_PGSQL__
     SQLITE_FLAGS=
 
 
@@ -6516,6 +6559,224 @@ fi
 
 fi
 
+# check for postgresql if it is enabled
+if test -n "$PGSQL_FLAGS"; then
+
+for ac_header in postgres/libpq-fe.h
+do
+as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  { echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+ac_res=`eval echo '${'$as_ac_Header'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+else
+  # Is the header compilable?
+{ echo "$as_me:$LINENO: checking $ac_header usability" >&5
+echo $ECHO_N "checking $ac_header usability... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <$ac_header>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ echo "$as_me:$LINENO: checking $ac_header presence" >&5
+echo $ECHO_N "checking $ac_header presence... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <$ac_header>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_cxx_preproc_warn_flag$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
+echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: $ac_header:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: $ac_header: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
+
+    ;;
+esac
+{ echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  eval "$as_ac_Header=\$ac_header_preproc"
+fi
+ac_res=`eval echo '${'$as_ac_Header'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+
+fi
+if test `eval echo '${'$as_ac_Header'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+ PGSQL_LIBS=-lpg
+else
+  { { echo "$as_me:$LINENO: error: \"postgresql-client missing.\"" >&5
+echo "$as_me: error: \"postgresql-client missing.\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+done
+
+
+{ echo "$as_me:$LINENO: checking for main in -lpq" >&5
+echo $ECHO_N "checking for main in -lpq... $ECHO_C" >&6; }
+if test "${ac_cv_lib_pq_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpq  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_pq_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_pq_main=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_pq_main" >&5
+echo "${ECHO_T}$ac_cv_lib_pq_main" >&6; }
+if test $ac_cv_lib_pq_main = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBPQ 1
+_ACEOF
+
+  LIBS="-lpq $LIBS"
+
+else
+  { { echo "$as_me:$LINENO: error: \"Linking against libpq failed.\"" >&5
+echo "$as_me: error: \"Linking against libpq failed.\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+fi
+
 # check for odbc if it is enabled
 if test -n "$ODBC_FLAGS"; then
 
@@ -7652,12 +7913,15 @@ USE_OTCONFIG_TRUE!$USE_OTCONFIG_TRUE$ac_delim
 USE_OTCONFIG_FALSE!$USE_OTCONFIG_FALSE$ac_delim
 USE_MYSQL_TRUE!$USE_MYSQL_TRUE$ac_delim
 USE_MYSQL_FALSE!$USE_MYSQL_FALSE$ac_delim
+USE_PGSQL_TRUE!$USE_PGSQL_TRUE$ac_delim
+USE_PGSQL_FALSE!$USE_PGSQL_FALSE$ac_delim
 USE_ODBC_TRUE!$USE_ODBC_TRUE$ac_delim
 USE_ODBC_FALSE!$USE_ODBC_FALSE$ac_delim
 USE_SQLITE_TRUE!$USE_SQLITE_TRUE$ac_delim
 USE_SQLITE_FALSE!$USE_SQLITE_FALSE$ac_delim
 OTCONFIG_FLAGS!$OTCONFIG_FLAGS$ac_delim
 MYSQL_FLAGS!$MYSQL_FLAGS$ac_delim
+PGSQL_FLAGS!$PGSQL_FLAGS$ac_delim
 ODBC_FLAGS!$ODBC_FLAGS$ac_delim
 SQLITE_FLAGS!$SQLITE_FLAGS$ac_delim
 PROFILER_FLAGS!$PROFILER_FLAGS$ac_delim
@@ -7681,9 +7945,6 @@ PKG_CONFIG!$PKG_CONFIG$ac_delim
 LUA_CFLAGS!$LUA_CFLAGS$ac_delim
 LUA_LIBS!$LUA_LIBS$ac_delim
 BOOST_LIBS!$BOOST_LIBS$ac_delim
-GMP_LIBS!$GMP_LIBS$ac_delim
-MYSQL_LIBS!$MYSQL_LIBS$ac_delim
-ODBC_LIBS!$ODBC_LIBS$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -7725,12 +7986,16 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+GMP_LIBS!$GMP_LIBS$ac_delim
+MYSQL_LIBS!$MYSQL_LIBS$ac_delim
+PGSQL_LIBS!$PGSQL_LIBS$ac_delim
+ODBC_LIBS!$ODBC_LIBS$ac_delim
 SQLITE_LIBS!$SQLITE_LIBS$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 3; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 7; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

@@ -125,11 +125,14 @@ private:
 	#ifdef __USE_SQLITE__
 	friend class DatabaseSqLite;
 	#endif
-	#if defined(__USE_SQLITE__) || defined(__USE_ODBC__)
+	#if defined(__USE_SQLITE__) || defined(__USE_ODBC__) || defined(__USE_PGSQL)
 	void addRow(char **results, unsigned int num_fields);
 	#endif
 	#ifdef __USE_ODBC__
 	friend class DatabaseODBC;
+	#endif
+	#ifdef __USE_PGSQL__
+	friend class DatabasePgSQL;
 	#endif
 	void clear();
 	void setFieldName(const std::string &s, unsigned int n){

@@ -109,6 +109,14 @@ MySQL Server
 				a) On Windows use -D__USE_MYSQL__ -lmysqlclient
 				b) On POSIX systems use ./configure --enable-mysql
 
+PostgreSQL Server
+	PostgreSQL is, after MySQL, probably most popular open-source database system. It provides huge possibilities and
+	better performance.
+
+		Instructions to compile OTServ with PostgreSQL driver:
+				a) On Windows use -D__USE_PGSQL__ -lpg
+				b) On POSIX systems use ./configure --enable-pgsql
+
 ODBC data sources
 	OTServ contains also ODBC database driver. It allows to connect throught unified ODBC connection mechanism
 	to any ODBC data source. It was first developed under Windows, but there are currently ODBC implementations

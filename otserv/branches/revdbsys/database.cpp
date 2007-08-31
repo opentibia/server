@@ -32,6 +32,9 @@
 #ifdef __USE_ODBC__
 #include "databaseodbc.h"
 #endif
+#ifdef __USE_PGSQL__
+#include "databasepgsql.h"
+#endif
 
 #if defined MULTI_SQL_DRIVERS
 #include "configmanager.h"
@@ -89,7 +92,7 @@ void DBResult::addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fiel
 	m_numRows++;
 }
 #endif
-#if defined(__USE_SQLITE__) || defined(__USE_ODBC__)
+#if defined(__USE_SQLITE__) || defined(__USE_ODBC__) || defined(__USE_PGSQL__)
 void DBResult::addRow(char **results, unsigned int num_fields)
 {
 	RowData* rd = new RowData;
@@ -247,12 +250,19 @@ Database* _Database::instance(){
             _instance = new DatabaseSqLite;
 		}
 #endif
+#ifdef __USE_PGSQL__
+        if(g_config.getString(ConfigManager::SQL_TYPE) == "pgsql"){
+            _instance = new DatabaseSqLite;
+		}
+#endif
 #elif defined __USE_MYSQL__
 		_instance = new DatabaseMySQL;
 #elif defined __USE_SQLITE__
 		_instance = new DatabaseSqLite;
 #elif defined __USE_ODBC__
 		_instance = new DatabaseODBC;
+#elif defined __USE_PGSQL__
+		_instance = new DatabasePgSQL;
 #endif
 		OTSYS_THREAD_LOCKVARINIT(DBQuery::database_lock);
 	}

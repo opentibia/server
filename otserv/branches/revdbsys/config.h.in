@@ -27,6 +27,9 @@
 /* Define to 1 if you have the `odbc' library (-lodbc). */
 #undef HAVE_LIBODBC
 
+/* Define to 1 if you have the `pq' library (-lpq). */
+#undef HAVE_LIBPQ
+
 /* Define to 1 if you have the `sqlite3' library (-lsqlite3). */
 #undef HAVE_LIBSQLITE3
 
@@ -47,6 +50,9 @@
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the <postgres/libpq-fe.h> header file. */
+#undef HAVE_POSTGRES_LIBPQ_FE_H
 
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT

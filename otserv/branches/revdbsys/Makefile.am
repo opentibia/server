@@ -4,7 +4,7 @@ noinst_PROGRAMS = otserv
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(MYSQL_FLAGS) $(LUA_CFLAGS) \
 	$(SQLITE_FLAGS) $(PROFILER_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror \
-	$(OTCONFIG_FLAGS) $(ODBC_FLAGS)
+	$(OTCONFIG_FLAGS) $(ODBC_FLAGS) $(PGSQL_FLAGS)
 
 otserv_LDADD = $(XML_LIBS) $(LUA_LIBS) $(BOOST_LIBS) $(GMP_LIBS) -ldl
 
@@ -17,8 +17,11 @@ endif
 if USE_ODBC
 MAYBE_ODBC = databaseodbc.cpp databaseodbc.h
 endif
+if USE_PGSQL
+MAYBE_PGSQL = databasepgsql.cpp databasepgsql.h
+endif
 
-otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) \
+otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	database.cpp database.h iomapxml.cpp ioplayer.cpp \
 	account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	item.cpp items.cpp luascript.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp \
