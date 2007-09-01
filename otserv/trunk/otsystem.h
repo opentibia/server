@@ -107,7 +107,7 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
   
   DWORD tout = 0;
   if (tout64 > 0)
-    tout = (DWORD)(tout64);
+	tout = (DWORD)(tout64);
 
   //LeaveCriticalSection(&lock);
 	OTSYS_THREAD_UNLOCK(lock, "OTSYS_THREAD_WAITSIGNAL_TIMED");
@@ -255,7 +255,7 @@ public:
 		if(s == NULL)
 			return;
 
-    logBlock lb;
+	logBlock lb;
 		lb.mutexaddr = (unsigned long)(a);
 		lb.lock = lock;
 		lb.str = s;

@@ -175,36 +175,36 @@ void Status::getInfo(NetworkMessage &nm)
   	}
   
 	if(bserverinfo1){
-    	nm.AddByte(0x11); // server info - owner info
+		nm.AddByte(0x11); // server info - owner info
 		nm.AddString(g_config.getString(ConfigManager::OWNER_NAME).c_str());
 		nm.AddString(g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
   	}
   
 	if(bserverinfo2){
-    	nm.AddByte(0x12); // server info - misc
+		nm.AddByte(0x12); // server info - misc
 		nm.AddString(g_config.getString(ConfigManager::MOTD).c_str());
 		nm.AddString(g_config.getString(ConfigManager::LOCATION).c_str());
 		nm.AddString(g_config.getString(ConfigManager::URL).c_str());
-    	nm.AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
-    	nm.AddU32((uint32_t)(running));       // since servers can be online for months ;)
-    	nm.AddString(STATUS_SERVER_VERSION);
+		nm.AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
+		nm.AddU32((uint32_t)(running));       // since servers can be online for months ;)
+		nm.AddString(STATUS_SERVER_VERSION);
   	}
 
 	if(bplayersinfo){
-    	nm.AddByte(0x20); // players info
-    	nm.AddU32(this->playersonline);
-	    nm.AddU32(this->playersmax);
-	    nm.AddU32(this->playerspeak);
+		nm.AddByte(0x20); // players info
+		nm.AddU32(this->playersonline);
+		nm.AddU32(this->playersmax);
+		nm.AddU32(this->playerspeak);
   	} 
   
   	if(bmapinfo){
-    	nm.AddByte(0x30); // map info
-    	nm.AddString(this->mapname.c_str());
-    	nm.AddString(this->mapauthor.c_str());
-    	int mw, mh;
-    	g_game.getMapDimensions(mw, mh);  
-    	nm.AddU16(mw);
-    	nm.AddU16(mh);
+		nm.AddByte(0x30); // map info
+		nm.AddString(this->mapname.c_str());
+		nm.AddString(this->mapauthor.c_str());
+		int mw, mh;
+		g_game.getMapDimensions(mw, mh);
+		nm.AddU16(mw);
+		nm.AddU16(mh);
   	}
 
 	return;   
@@ -216,103 +216,3 @@ bool Status::hasSlot()
 {
 	return this->playersonline < this->playersmax;
 }
-
-/*
-OTSYS_THREAD_RETURN Status::SendInfoThread(void *p)
-{
-	SOCKET s;
-	std::string post_message;
-	while(g_game.getGameState() != GAME_STATE_SHUTDOWN){
-		OTSYS_SLEEP(8*60*1000); //wait 8 minutes
-		
-		if(g_config.getNumber(ConfigManager::OTSERV_DB_ENABLED) == 0)
-			continue;
-		
-		std::string host = g_config.getString(ConfigManager::OTSERV_DB_HOST);
-		
-		uint32_t host_ip = inet_addr(host.c_str()); //is it a numeric ip?
-		if(host_ip == INADDR_NONE){
-			hostent* he = gethostbyname(host.c_str()); //if not use dns
-			if(he != NULL){
-				host_ip = *(uint32_t*)(he->h_addr_list[0]);
-			}
-			else{
-				std::cout << "[Status::SendInfoThread] Can not resolve host ip \"" << host << "\"" << std::endl;
-				continue;
-        	}
-    	}
-    	
-    	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if(s == INVALID_SOCKET){
-			std::cout << "[Status::SendInfoThread] Can not create socket." << std::endl;
-			continue;
-		}
-    	
-    	sockaddr_in host_addr;
-    	host_addr.sin_family = AF_INET;
-		host_addr.sin_addr.s_addr = host_ip;
-		host_addr.sin_port = htons(80);
-		
-		if(connect(s, (const sockaddr*)&host_addr, sizeof(host_addr)) == SOCKET_ERROR){
-			std::cout << "[Status::SendInfoThread] Can not connect to " << host << std::endl;
-			closesocket(s);
-			continue;
-		}
-
-		Status* status_instance = Status::instance();
-		
-		std::stringstream status;
-		uint64_t running = (OTSYS_TIME() - status_instance->start)/1000;
-		status << "uptime=" << running << "&"
-			"ip=" << urlEncode(g_config.getString(ConfigManager::IP)) << "&"
-			"servername=" << urlEncode(g_config.getString(ConfigManager::SERVER_NAME)) << "&"
-			"port=" << g_config.getNumber(ConfigManager::PORT) << "&"
-			"location=" << urlEncode(g_config.getString(ConfigManager::LOCATION)) << "&"
-			"url=" << urlEncode(g_config.getString(ConfigManager::URL)) << "&"
-			"server=" << urlEncode(STATUS_SERVER_NAME) << "&"
-			"version=" << urlEncode(STATUS_SERVER_VERSION) << "&"
-			"client=" << urlEncode(STATUS_CLIENT_VERISON) << "&"
-			"ownername=" << urlEncode(g_config.getString(ConfigManager::OWNER_NAME)) << "&"
-			"owneremail=" << urlEncode(g_config.getString(ConfigManager::OWNER_EMAIL)) << "&"
-			"playersonline=" << status_instance->playersonline << "&"
-			"playersmax=" << status_instance->playersmax << "&"
-			"playerspeak=" << status_instance->playerspeak << "&"
-			"monsterstotal=" << g_game.getMonstersOnline() << "&"
-			"mapname=" << urlEncode(status_instance->mapname) << "&"
-			"mapauthor=" << urlEncode(status_instance->mapauthor) << "&"
-			"width=" << "&"
-			"heigh=" << "&"
-			"motd=" << urlEncode(g_config.getString(ConfigManager::MOTD));
-		
-		
-		char size[16] = {'0'};
-		sprintf(size, "%d", (int)status.str().size());
-		std::string status_length = std::string(size);
-		post_message = "POST /otservdb.php HTTP/1.1\r\n"
-						"Host: " + host +"\r\n"
-						"User-Agent: otserv("STATUS_SERVER_NAME"/"STATUS_SERVER_VERSION")\r\n"
-						"Connection: close\r\n"
-						"Cache-Control: no-cache\r\n"
-						"Content-Type: application/x-www-form-urlencoded\r\n"
-						"Content-Length: " + status_length + "\r\n"
-						"\r\n" +
-						status.str();
-		
-		if(send(s, post_message.c_str(), post_message.size(), 0) == SOCKET_ERROR){
-			std::cout << "[Status::SendInfoThread] Error while sending status to " << host << std::endl;
-			closesocket(s);
-			continue;
-		}
-		status.clear();
-		
-		//TODO: read server response?
-		
-		closesocket(s);
-	}
-#if defined WIN32 || defined WINDOWS
-	//
-#else
-  return 0;
-#endif
-}
-*/

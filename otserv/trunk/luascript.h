@@ -321,6 +321,7 @@ protected:
 
 	static int luaDoPlayerSay(lua_State *L);
 	static int luaDoPlayerAddSkillTry(lua_State *L);
+	static int luaDoPlayerAddManaSpent(lua_State *L);
 	static int luaDoPlayerAddHealth(lua_State *L);
 	static int luaDoPlayerAddMana(lua_State *L);
 	static int luaDoPlayerSoul(lua_State *L);

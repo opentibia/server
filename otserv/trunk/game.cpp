@@ -207,57 +207,57 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 
 	srand(time(NULL));
 
-  Game* _this = (Game*)p;
+	Game* _this = (Game*)p;
 
-  // basically what we do is, look at the first scheduled item,
-  // and then sleep until it's due (or if there is none, sleep until we get an event)
-  // of course this means we need to get a notification if there are new events added
-  while (true)
-  {
-#ifdef __DEBUG__EVENTSCHEDULER__
-    std::cout << "schedulercycle start..." << std::endl;
-#endif
+	// basically what we do is, look at the first scheduled item,
+	// and then sleep until it's due (or if there is none, sleep until we get an event)
+	// of course this means we need to get a notification if there are new events added
+	while(true){
+	#ifdef __DEBUG__EVENTSCHEDULER__
+		std::cout << "schedulercycle start..." << std::endl;
+	#endif
 
-    SchedulerTask* task = NULL;
+		SchedulerTask* task = NULL;
 		bool runtask = false;
 
-    // check if there are events waiting...
-    OTSYS_THREAD_LOCK(_this->eventLock, "eventThread()")
+		// check if there are events waiting...
+		OTSYS_THREAD_LOCK(_this->eventLock, "eventThread()")
 
 		int ret;
-    if (_this->eventList.size() == 0) {
-      // unlock mutex and wait for signal
-      ret = OTSYS_THREAD_WAITSIGNAL(_this->eventSignal, _this->eventLock);
-    } else {
-      // unlock mutex and wait for signal or timeout
-      ret = OTSYS_THREAD_WAITSIGNAL_TIMED(_this->eventSignal, _this->eventLock, _this->eventList.top()->getCycle());
-    }
-    // the mutex is locked again now...
-    if (ret == OTSYS_THREAD_TIMEOUT) {
-      // ok we had a timeout, so there has to be an event we have to execute...
-#ifdef __DEBUG__EVENTSCHEDULER__
-      std::cout << "event found at " << OTSYS_TIME() << " which is to be scheduled at: " << _this->eventList.top()->getCycle() << std::endl;
-#endif
-      task = _this->eventList.top();
-      _this->eventList.pop();
+		if(_this->eventList.size() == 0){
+			// unlock mutex and wait for signal
+			ret = OTSYS_THREAD_WAITSIGNAL(_this->eventSignal, _this->eventLock);
+		}
+		else{
+			// unlock mutex and wait for signal or timeout
+			ret = OTSYS_THREAD_WAITSIGNAL_TIMED(_this->eventSignal, _this->eventLock, _this->eventList.top()->getCycle());
+		}
+		// the mutex is locked again now...
+		if(ret == OTSYS_THREAD_TIMEOUT){
+			// ok we had a timeout, so there has to be an event we have to execute...
+	#ifdef __DEBUG__EVENTSCHEDULER__
+			std::cout << "event found at " << OTSYS_TIME() << " which is to be scheduled at: " << _this->eventList.top()->getCycle() << std::endl;
+	#endif
+			task = _this->eventList.top();
+			_this->eventList.pop();
 		}
 
-		if(task) {
+		if(task){
 			std::map<uint32_t, SchedulerTask*>::iterator it = _this->eventIdMap.find(task->getEventId());
-			if(it != _this->eventIdMap.end()) {
+			if(it != _this->eventIdMap.end()){
 				_this->eventIdMap.erase(it);
 				runtask = true;
 			}
 		}
 
 		OTSYS_THREAD_UNLOCK(_this->eventLock, "eventThread()");
-    if (task) {
-			if(runtask) {
+		if(task){
+			if(runtask){
 				(*task)(_this);
 			}
 			delete task;
-    }
-  }
+		}
+	}
 #if defined __EXCEPTION_TRACER__
 	eventExceptionHandler.RemoveHandler();
 #endif
@@ -500,9 +500,9 @@ Player* Game::getPlayerByName(const std::string& s)
 	return NULL; //just in case the player doesnt exist
 }
 
-Player* Game::getPlayerByAccount(const uint32_t& acc)
+Player* Game::getPlayerByAccount(uint32_t acc)
 {
-    OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getPlayerByAccount()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getPlayerByAccount()");
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		if(!it->second->isRemoved()){

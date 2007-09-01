@@ -28,8 +28,8 @@
 #include "enums.h"
 
 struct Outfit{
-    uint32_t looktype;
-    uint32_t addons;
+	uint32_t looktype;
+	uint32_t addons;
 };
 
 typedef std::list<Outfit*> OutfitListType;

@@ -170,18 +170,18 @@ Action* Actions::getAction(const Item* item)
 {
 	if(item->getUniqueId() != 0){
 		ActionUseMap::iterator it = uniqueItemMap.find(item->getUniqueId());
-    	if (it != uniqueItemMap.end()){
+		if(it != uniqueItemMap.end()){
 			return it->second;
 		}
 	}
 	if(item->getActionId() != 0){
 		ActionUseMap::iterator it = actionItemMap.find(item->getActionId());
-    	if (it != actionItemMap.end()){
-	    	return it->second;
+		if (it != actionItemMap.end()){
+			return it->second;
 		}
 	}
 	ActionUseMap::iterator it = useItemMap.find(item->getID());
-    if (it != useItemMap.end()){
+	if(it != useItemMap.end()){
 	   	return it->second;
 	}
 
@@ -232,7 +232,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 			return RET_NOERROR;
 		}
 	}
-    
+
 	//we dont know what to do with this item
 	return RET_CANNOTUSETHISOBJECT;
 }

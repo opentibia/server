@@ -281,7 +281,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		vocationNode = vocationNode->next;
 	}
 
-    range = Item::items[id].shootRange;
+	range = Item::items[id].shootRange;
 
 	//Set few information for the lookDescription
 	if(!vocStringList.empty()){

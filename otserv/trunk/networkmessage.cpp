@@ -143,7 +143,7 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 				break;
 			}
 		}
-    	sendBytes += b;
+		sendBytes += b;
 	}while(sendBytes < m_MsgSize+2);
 
 #if defined WIN32 || defined __WINDOWS__
@@ -240,7 +240,7 @@ void NetworkMessage::AddItem(const Item* item)
 	AddU16(it.clientId);
 
 	if(it.stackable || it.isRune()){
-    	AddByte(item->getItemCountOrSubtype());
+		AddByte(item->getItemCountOrSubtype());
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
 		uint32_t fluidIndex = item->getItemCountOrSubtype() % 8;

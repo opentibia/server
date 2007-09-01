@@ -158,7 +158,7 @@ public:
 	  * \param acc is the account identifier
 	  * \returns A Pointer to the player
 	  */
-	Player* getPlayerByAccount(const uint32_t& acc);
+	Player* getPlayerByAccount(uint32_t acc);
 
 	/**
 	  * Starts an event.

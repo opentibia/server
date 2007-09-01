@@ -921,6 +921,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doSendAnimatedText", LuaScriptInterface::luaDoSendAnimatedText);
 	//doPlayerAddSkillTry(cid,skillid,n)
 	lua_register(m_luaState, "doPlayerAddSkillTry", LuaScriptInterface::luaDoPlayerAddSkillTry);
+	//doPlayerAddManaSpent(cid,mana)
+	lua_register(m_luaState, "doPlayerAddManaSpent", LuaScriptInterface::luaDoPlayerAddManaSpent);
 	//doPlayerAddHealth(cid,health)
 	lua_register(m_luaState, "doPlayerAddHealth", LuaScriptInterface::luaDoPlayerAddHealth);
 	//doCreatureAddHealth(cid,health)
@@ -1750,6 +1752,26 @@ int LuaScriptInterface::luaDoPlayerAddSkillTry(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaDoPlayerAddManaSpent(lua_State *L)
+{
+	//doPlayerAddManaSpent(cid,mana)
+	uint32_t mana = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->addManaSpent(mana);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
 int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 {
 	//doPlayerAddHealth(uid,health)
@@ -1926,7 +1948,7 @@ int LuaScriptInterface::luaGetPlayerLossPercent(lua_State *L)
 
 	const Player* player = env->getPlayerByUID(cid);
 	if(player){
-	    if(lossType <= LOSS_LAST){
+		if(lossType <= LOSS_LAST){
 			uint32_t value = player->getLossPercent((lossTypes_t)lossType);
 			lua_pushnumber(L, value);
 		}
@@ -2177,8 +2199,8 @@ int LuaScriptInterface::luaDoCreateTeleport(lua_State *L)
 	if(!newTp){
 		delete newItem;
 		reportErrorFunc("Wrong teleport id");
-        lua_pushnumber(L, LUA_ERROR);
-        return 1;
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
 
 	newTp->setDestPos(toPos);

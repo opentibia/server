@@ -529,9 +529,9 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << " WHERE `id` = "<< player->getGUID()
 	#ifndef __USE_SQLITE__
 	<<" LIMIT 1";
-    #else
-    ;
-    #endif
+	#else
+	;
+	#endif
 
 	if(!mysql->executeQuery(query))
 		return false;

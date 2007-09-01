@@ -115,6 +115,9 @@ allowclones = 0
 -- max number of players allowed
 maxplayers = "900"
 
+-- only one player per acc - 1 to yes, 0 to no
+checkAccounts = 1
+
 -- save client debug assertion reports
 -- options: 0 (no), 1 (yes)
 saveclientdebug = 0

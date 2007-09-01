@@ -102,15 +102,10 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[HOTKEYS] = getGlobalNumber(L, "enablehotkeys", 0);
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);
 	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalNumber(L, "saveclientdebug", 0);
+	m_confInteger[CHECK_ACCOUNTS] = getGlobalNumber(L, "checkAccounts", 1);
 	
 	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
 	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
-	
-	/*
-	for(int i=0; i<4; ++i){
-		m_confVocationString[i] = getGlobalStringField(L, "vocations", i+1, "unknown");
-	}
-	*/
 
 	m_isLoaded = true;
 

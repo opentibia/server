@@ -162,19 +162,19 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
 	MoveListMap::iterator it;
 	if(item->getUniqueId() != 0){
 		it = m_uniqueIdMap.find(item->getUniqueId());
-    	if(it != m_uniqueIdMap.end()){
+		if(it != m_uniqueIdMap.end()){
 			return it->second.event[eventType];
 		}
 	}
 	if(item->getActionId() != 0){
 		it = m_actionIdMap.find(item->getActionId());
-    	if(it != m_actionIdMap.end()){
-	    	return it->second.event[eventType];
+		if(it != m_actionIdMap.end()){
+			return it->second.event[eventType];
 		}
 	}
 	
 	it = m_itemIdMap.find(item->getID());
-    if(it != m_itemIdMap.end()){
+	if(it != m_itemIdMap.end()){
 	   	return it->second.event[eventType];
 	}
 	
@@ -510,6 +510,33 @@ uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 	}
 	player->sendSkills();
 
+	//stat modifiers
+	uint32_t trueStat;
+	for(int32_t s = STAT_FIRST; s <= STAT_LAST; ++s){
+		if(!it.abilities.stats[s] && !it.abilities.statsPercent[s]){
+			continue;
+		}
+		player->setVarStats((stats_t)s, it.abilities.stats[s]);
+
+		switch(s){
+			case STAT_MAXHITPOINTS:
+				trueStat = (int32_t)(player->getMaxHealth() * ((it.abilities.statsPercent[s] - 100) / 100.f));
+				break;
+			case STAT_MAXMANAPOINTS:
+                trueStat = (int32_t)(player->getMaxMana() * ((it.abilities.statsPercent[s] - 100) / 100.f));
+				break;
+			case STAT_SOULPOINTS:
+                trueStat = (int32_t)(player->getPlayerInfo(PLAYERINFO_SOUL) * ((it.abilities.statsPercent[s] - 100) / 100.f));
+				break;
+			case STAT_MAGICPOINTS:
+                trueStat = (int32_t)(player->getMagicLevel() * ((it.abilities.statsPercent[s] - 100) / 100.f));
+				break;
+		}
+
+		player->setVarStats((stats_t)s, trueStat);
+	}
+	player->sendStats();
+
 	return 1;
 }
 
@@ -554,6 +581,33 @@ uint32_t MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 		player->setVarSkill((skills_t)i, -it.abilities.skills[i]);
 	}
 	player->sendSkills();
+
+	//stat modifiers
+	uint32_t trueStat;
+	for(int32_t s = STAT_FIRST; s <= STAT_LAST; ++s){
+		if(!it.abilities.stats[s] && !it.abilities.statsPercent[s]){
+			continue;
+		}
+		player->setVarStats((stats_t)s, it.abilities.stats[s]);
+
+		switch(s){
+			case STAT_MAXHITPOINTS:
+				trueStat = (int32_t)(player->getMaxHealth() * ((it.abilities.statsPercent[s] - 100) / 100.f));
+				break;
+			case STAT_MAXMANAPOINTS:
+                trueStat = (int32_t)(player->getMaxMana() * ((it.abilities.statsPercent[s] - 100) / 100.f));
+				break;
+			case STAT_SOULPOINTS:
+                trueStat = (int32_t)(player->getPlayerInfo(PLAYERINFO_SOUL) * ((it.abilities.statsPercent[s] - 100) / 100.f));
+				break;
+			case STAT_MAGICPOINTS:
+                trueStat = (int32_t)(player->getMagicLevel() * ((it.abilities.statsPercent[s] - 100) / 100.f));
+				break;
+		}
+
+		player->setVarStats((stats_t)s, -trueStat);
+	}
+	player->sendStats();
 
 	return 1;
 }

@@ -372,12 +372,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 									msg.WriteToSocket(s);
 								}
 								else if(g_game.getPlayerByAccount(player->getAccount()) && !player->hasFlag(PlayerFlag_CanAlwaysLogin)
-										&& !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
+										&& g_config.getNumber(ConfigManager::CHECK_ACCOUNTS)){
 									#ifdef __DEBUG_PLAYERS__
 									std::cout << "reject player..." << std::endl;
 									#endif
 									msg.AddByte(0x14);
-									msg.AddString("You may only login with one character per account."); //?
+									msg.AddString("You may only login with one character per account.");
 									msg.WriteToSocket(s);
 								}
 								else if(g_game.getGameState() == GAME_STATE_STARTUP){
@@ -423,7 +423,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 									stat->addPlayer();
 									player->lastlogin = time(NULL);
 									player->lastip = player->getIP();
-									s = 0;            // protocol/player will close socket
+									s = 0;			// protocol/player will close socket
 
 									OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 									isLocked = false;

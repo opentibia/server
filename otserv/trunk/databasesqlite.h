@@ -71,7 +71,7 @@ public:
 	*/
 	virtual bool storeQuery(DBQuery &q, DBResult &res);
 
-    virtual bool rollback();
+	virtual bool rollback();
 	virtual bool commit();
 
 private:
@@ -82,7 +82,7 @@ private:
 	* 	FALSE if the DatabaseSqLite was not successfully initialized
 	*/
 	bool init();
-    static int callback(void *db, int argc, char **argv, char **azColName);
+	static int callback(void *db, int argc, char **argv, char **azColName);
 
 	bool m_initialized;
 	bool m_connected;

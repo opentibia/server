@@ -95,6 +95,7 @@ public:
 		MAX_MESSAGEBUFFER,
 		OTSERV_DB_ENABLED,
 		SAVE_CLIENT_DEBUG_ASSERTIONS,
+		CHECK_ACCOUNTS,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
@@ -103,7 +104,6 @@ public:
 	bool reload();
 	std::string getString(int _what) { return m_confString[_what]; };
 	int getNumber(int _what);
-	//std::string getVocationString(int _vocation) { return m_confVocationString[_vocation-1]; };
 
 	bool setNumber(int _what, int _value);
 
@@ -115,7 +115,6 @@ private:
 	bool m_isLoaded;
 	std::string m_confString[LAST_STRING_CONFIG];
 	int m_confInteger[LAST_INTEGER_CONFIG];
-	std::string m_confVocationString[4];
 };
 
 

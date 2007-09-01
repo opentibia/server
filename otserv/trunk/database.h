@@ -122,7 +122,7 @@ public:
 	unsigned int getNumFields(){ return m_numFields; };
 
 private:
-    //friend class Database;
+	//friend class Database;
 	#ifdef __USE_MYSQL__
 	friend class DatabaseMySQL;
 	void addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fields);
@@ -172,7 +172,7 @@ public:
 	*	be sure that you define a DBQuery object
 	*	under it to lock database instance usage
 	*/
-    static Database* instance();
+	static Database* instance();
 
 	/** Connect to a mysql database
 	*\returns

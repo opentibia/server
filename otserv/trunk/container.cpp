@@ -40,7 +40,7 @@ Container::~Container()
 		(*cit)->setParent(NULL);
 		(*cit)->releaseThing2();
 	}
-    
+
 	itemlist.clear();
 }
 

@@ -34,7 +34,7 @@ using namespace std;
 
 Mailbox::Mailbox(uint16_t _type) : Item(_type)
 {
-    //
+	//
 }
 
 Mailbox::~Mailbox()
@@ -117,13 +117,13 @@ bool Mailbox::sendItem(Item* item)
 {
 	std::string reciever = std::string("");
 	uint32_t dp = 0;
-     
+
 	if(!getReceiver(item, reciever, dp)){
 		return false;
 	}
-     
+
 	if(reciever == "" || dp == 0){ /**No need to continue if its still empty**/
-		return false;            
+		return false;
 	}
 	
 	uint32_t guid;
@@ -133,7 +133,7 @@ bool Mailbox::sendItem(Item* item)
 	
 	if(Player* player = g_game.getPlayerByName(reciever)){ 
 		Depot* depot = player->getDepot(dp, true);
-              
+
 		if(depot){
 			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER, item, item->getItemCount(), FLAG_NOLIMIT) == RET_NOERROR){
 				g_game.transformItem(item, item->getID() + 1); /**Change it to stamped!**/	
@@ -184,13 +184,13 @@ bool Mailbox::getReceiver(Item* item, std::string& name, uint32_t& dp)
 	if(!item){
 		return false;
 	}
-     
+
 	if(item->getID() == ITEM_PARCEL){ /**We need to get the text from the label incase its a parcel**/
 		Container* parcel = item->getContainer();
-          
+
 		for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); cit++){
 			if((*cit)->getID() == ITEM_LABEL){
-				item = (*cit);           
+				item = (*cit);
 				
 				if(item->getText() != ""){
 					break;	
@@ -199,27 +199,27 @@ bool Mailbox::getReceiver(Item* item, std::string& name, uint32_t& dp)
 		}
 	}
 	else if(item->getID() != ITEM_LETTER){/**The item is somehow not a parcel or letter**/
-		std::cout << "Mailbox::getReciver error, trying to get reciecer from unkown item! ID:: " << item->getID() << "." << std::endl;    
+		std::cout << "Mailbox::getReciver error, trying to get reciecer from unkown item! ID:: " << item->getID() << "." << std::endl;
 		return false;
 	}
-     
+
 	if(!item || item->getText() == "") /**No label/letter found or its empty.**/
 		return false;
-        
-	std::string temp;     
+
+	std::string temp;
 	std::istringstream iss(item->getText(), istringstream::in);
 	int i = 0;
 	std::string line[2];
-          
+
 	while(getline(iss, temp, '\n')){
 		line[i] = temp;
-                 
+
 		if(i == 1){ /**Just read the two first lines.**/
 			break;
 		}
 		i++;
 	}
-          
+
 	name = line[0];
 
 	Town* town = Towns::getInstance().getTown(line[1]);

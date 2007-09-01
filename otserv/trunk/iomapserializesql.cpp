@@ -137,16 +137,16 @@ bool IOMapSerializeSQL::saveTile(Database* db, uint32_t tileId, const Tile* tile
 			continue;
 
 		if(!storedTile){
-            DBQuery tileListQuery;
-            const Position& tilePos = tile->getPosition();
-            tileListQuery << "INSERT INTO `tiles` (`id`, `x` , `y` , `z` ) VALUES";
-            tileListQuery << "(" << tileId << "," << tilePos.x << "," << tilePos.y << "," << tilePos.z << ")";
+			DBQuery tileListQuery;
+			const Position& tilePos = tile->getPosition();
+			tileListQuery << "INSERT INTO `tiles` (`id`, `x` , `y` , `z` ) VALUES";
+			tileListQuery << "(" << tileId << "," << tilePos.x << "," << tilePos.y << "," << tilePos.z << ")";
 
-            if(!db->executeQuery(tileListQuery))
-                return false;
+			if(!db->executeQuery(tileListQuery))
+			return false;
 
-            storedTile = true;
-        }
+			storedTile = true;
+		}
 		++runningID;
 
 		uint32_t attributesSize;
@@ -384,7 +384,7 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 	if(!db->executeQuery(query))
 		return false;
 
-    std::stringstream housestream;
+	std::stringstream housestream;
 
 	DBSplitInsert query_insert(db);
 	query_insert.setQuery("INSERT INTO `houses` (`id` , `owner` , `paid`, `warnings`) VALUES ");

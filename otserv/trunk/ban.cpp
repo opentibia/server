@@ -388,7 +388,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 			if(!query_insert.addRow(bans.str()))
 				return false;
 
-            bans.str("");
+			bans.str("");
 		}
 	}
 	if(executeQuery){
@@ -408,7 +408,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 			if(!query_insert.addRow(bans.str()))
 				return false;
 			
-            bans.str("");        
+			bans.str("");
 		}
 	}
 	if(executeQuery){
@@ -428,7 +428,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 			if(!query_insert.addRow(bans.str()))
 				return false;
 			
-            bans.str("");
+			bans.str("");
 		}
 	}
 	

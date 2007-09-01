@@ -75,6 +75,9 @@ struct Abilities{
 
 		memset(skills, 0, sizeof(skills));
 
+		memset(stats, 0 , sizeof(stats));
+		memset(statsPercent, 0, sizeof(statsPercent));
+
 		speed = 0;
 		manaShield = false;
 		invisible = false;
@@ -111,6 +114,10 @@ struct Abilities{
 
 	//extra skill modifiers
 	int32_t skills[SKILL_LAST + 1];
+
+	//stats modifiers
+	int32_t stats[STAT_LAST + 1];
+	int32_t statsPercent[STAT_LAST + 1];
 
 	int32_t speed;
 	bool manaShield;

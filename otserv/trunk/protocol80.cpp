@@ -103,8 +103,8 @@ void Protocol80::setPlayer(Player* p)
 void Protocol80::sleepTillMove()
 {
 	int64_t delay = player->getSleepTicks();
-	if(delay > 0 ){       
-#if __DEBUG__     
+	if(delay > 0 ){
+#if __DEBUG__
 		std::cout << "Delaying "<< player->getName() << " --- " << delay << std::endl;		
 #endif	
 		OTSYS_SLEEP((uint32_t)delay);
@@ -128,7 +128,7 @@ connectResult_t Protocol80::ConnectPlayer()
 {
 	Waitlist* wait = Waitlist::instance();
 
-	if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && !wait->clientLogin(player->getAccount(), player->getIP())){
+	if(!player->isPremium() && !player->hasFlag(PlayerFlag_CanAlwaysLogin) && !wait->clientLogin(player->getAccount(), player->getIP())){
 		return CONNECT_TOMANYPLAYERS;
 	}
 	else{
@@ -361,7 +361,7 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 	case 0xAB:
 		parseChannelInvite(msg);
 		break;
-        
+
 	case 0xAC:
 		parseChannelExclude(msg);
 		break;

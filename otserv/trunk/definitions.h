@@ -42,7 +42,7 @@
 #endif
 
 #ifdef __USE_SQLITE__
-    #define __SPLIT_QUERIES__
+	#define __SPLIT_QUERIES__
 #endif
 
 #if defined __USE_MYSQL__ || __USE_SQLITE__

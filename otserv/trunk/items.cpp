@@ -720,6 +720,46 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.skills[SKILL_FIST] = intValue;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "maxHitPoints") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.stats[STAT_MAXHITPOINTS] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "maxHitPointsPercent") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.statsPercent[STAT_MAXHITPOINTS] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "maxManaPoints") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.stats[STAT_MAXMANAPOINTS] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "maxManaPointsPercent") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.statsPercent[STAT_MAXMANAPOINTS] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "soulPoints") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.stats[STAT_SOULPOINTS] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "soulPointsPercent") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.statsPercent[STAT_SOULPOINTS] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "magicPoints") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.stats[STAT_MAGICPOINTS] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "magicPointsPercent") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.statsPercent[STAT_MAGICPOINTS] = intValue;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentAll") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentAll = intValue;

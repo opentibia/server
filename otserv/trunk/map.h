@@ -154,7 +154,7 @@ class Map
 public:
 	Map();
 	~Map();
-    
+
 	static int32_t maxViewportX;
 	static int32_t maxViewportY;
 
@@ -179,9 +179,9 @@ public:
 	*/
 	Tile* getTile(uint16_t x, uint16_t y, uint8_t z);
 	Tile* getTile(const Position& pos);
-    
+
 	QTreeLeafNode* getLeaf(uint16_t x, uint16_t y){ return root.getLeaf(x, y);}
-    
+
 	/**
 	* Set a single tile.
 	* \param a tile to set for the

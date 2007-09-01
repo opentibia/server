@@ -295,7 +295,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 		  
 	nodeItem = nodeTile->children;
 	while(nodeItem){
-		if(xmlStrcmp(nodeItem->name,(const xmlChar*) "item") == 0){          
+		if(xmlStrcmp(nodeItem->name,(const xmlChar*) "item") == 0){
 			unsigned int id = 0;
 			item = NULL;
 

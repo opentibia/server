@@ -105,7 +105,7 @@ void DBResult::addRow(char **results, unsigned int num_fields)
 		unsigned long colLen = strlen(results[i]);
 		rd->row[i] = new char[colLen+1];
 		rd->length[i] = new unsigned long;
-        /*std::cout <<"'"<< colLen <<"' : '" << results[i] <<"'\n";*/
+		/*std::cout <<"'"<< colLen <<"' : '" << results[i] <<"'\n";*/
 		memcpy(rd->row[i], results[i], colLen+1);
 		*(rd->length[i]) = colLen;
 	}
@@ -251,11 +251,11 @@ Database* _Database::_instance = NULL;
 Database* _Database::instance(){
 	if(!_instance){
 #if defined __USE_MYSQL__ && defined __USE_SQLITE__
-        if(g_config.getString(ConfigManager::SQL_TYPE) == "mysql"){
-            _instance = new DatabaseMySQL;
+		if(g_config.getString(ConfigManager::SQL_TYPE) == "mysql"){
+			_instance = new DatabaseMySQL;
 		}
-        else{
-            _instance = new DatabaseSqLite;
+		else{
+			_instance = new DatabaseSqLite;
 		}
 #elif defined __USE_MYSQL__
 		_instance = new DatabaseMySQL;
@@ -320,7 +320,7 @@ void escape_string(std::string & s)
 
 std::string _Database::escapeString(const std::string &s)
 {
-    #ifdef __USE_MYSQL__
+	#ifdef __USE_MYSQL__
 	return escapeString(s.c_str(), s.size());
 	#else
 	std::string r = std::string(s);

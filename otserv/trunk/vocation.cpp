@@ -207,9 +207,9 @@ uint32_t Vocation::getReqMana(int magLevel)
 	}
 	uint32_t reqMana = (unsigned int)(400*pow(manaMultiplier, magLevel-1));
 	if (reqMana % 20 < 10)
-    	reqMana = reqMana - (reqMana % 20);
+		reqMana = reqMana - (reqMana % 20);
 	else
-    	reqMana = reqMana - (reqMana % 20) + 20;
+		reqMana = reqMana - (reqMana % 20) + 20;
 
 	cacheMana[magLevel] = reqMana;
 

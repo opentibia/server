@@ -564,23 +564,24 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 
 bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const std::string& param)
 {
-    std::string tmp = param;
-    Player* player = creature->getPlayer();
+	std::string tmp = param;
+	Player* player = creature->getPlayer();
 
-    if(!player)
-        return false;
+	if(!player){
+		return false;
+	}
 
-    Town* town = Towns::getInstance().getTown(tmp);
-    if(town){
-        if(game->internalTeleport(creature, town->getTemplePosition()) == RET_NOERROR) {
-            game->addMagicEffect(town->getTemplePosition(), NM_ME_ENERGY_AREA);
-            return true;
-        }
-    }
+	Town* town = Towns::getInstance().getTown(tmp);
+	if(town){
+		if(game->internalTeleport(creature, town->getTemplePosition()) == RET_NOERROR) {
+			game->addMagicEffect(town->getTemplePosition(), NM_ME_ENERGY_AREA);
+			return true;
+		}
+	}
 
-    player->sendCancel("Could not find the town.");
+	player->sendCancel("Could not find the town.");
 
-    return false;
+	return false;
 }
 
 bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std::string& param)
@@ -613,11 +614,11 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 		unsigned char ip[4];
 		*(uint32_t*)&ip = paramPlayer->lastip;
 		info << "name:   " << paramPlayer->getName() << std::endl <<
-		        "access: " << paramPlayer->getAccessLevel() << std::endl <<
-		        "level:  " << paramPlayer->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
-		        "maglvl: " << paramPlayer->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
-		        "speed:  " <<  paramPlayer->getSpeed() <<std::endl <<
-		        "position " << paramPlayer->getPosition() << std::endl <<
+				"access: " << paramPlayer->getAccessLevel() << std::endl <<
+				"level:  " << paramPlayer->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
+				"maglvl: " << paramPlayer->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
+				"speed:  " <<  paramPlayer->getSpeed() <<std::endl <<
+				"position " << paramPlayer->getPosition() << std::endl <<
 				"ip: " << ipText(ip);
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, info.str().c_str());
 	}
