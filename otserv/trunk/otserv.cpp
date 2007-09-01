@@ -371,8 +371,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 									msg.AddString("You are already logged in.");
 									msg.WriteToSocket(s);
 								}
-								else if(g_game.getPlayerByAccount(player->getAccount()) && !player->hasFlag(PlayerFlag_CanAlwaysLogin)
-										&& g_config.getNumber(ConfigManager::CHECK_ACCOUNTS)){
+								else if(g_config.getNumber(ConfigManager::CHECK_ACCOUNTS) &&
+										!player->hasFlag(PlayerFlag_CanAlwaysLogin) &&
+										g_game.getPlayerByAccount(player->getAccount())){
 									#ifdef __DEBUG_PLAYERS__
 									std::cout << "reject player..." << std::endl;
 									#endif
@@ -642,10 +643,14 @@ int main(int argc, char *argv[])
 		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
+	std::cout << "[done]" << std::endl;
 
+	filename.str("");
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.xml";
+	std::cout << ":: Loading " << filename.str() << "... ";
 	if(!Item::items.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
-		errormsg << "Unable to load " << "items/items.xml" << "!";
+		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}

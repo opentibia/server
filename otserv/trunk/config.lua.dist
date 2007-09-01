@@ -112,11 +112,12 @@ logintimeout = 60 * 1000
 -- options: 0 (no), 1 (yes)
 allowclones = 0
 
+-- only one player online per account
+-- options: 0 (no), 1 (yes)
+checkaccounts = 0
+
 -- max number of players allowed
 maxplayers = "900"
-
--- only one player per acc - 1 to yes, 0 to no
-checkAccounts = 1
 
 -- save client debug assertion reports
 -- options: 0 (no), 1 (yes)

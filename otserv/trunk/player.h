@@ -147,7 +147,7 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
-	int32_t getAccount() const {return accountNumber;}
+	uint32_t getAccount() const {return accountNumber;}
 	int32_t getLevel() const {return level;}
 	int32_t getMagicLevel() const {return magLevel;}
 	int32_t getAccessLevel() const {return accessLevel;}
@@ -543,7 +543,7 @@ protected:
 	fightMode_t fightMode;
 
 	//account variables
-	int accountNumber;
+	uint32_t accountNumber;
 	std::string password;
 	time_t lastlogin;
 	time_t lastLoginSaved;
