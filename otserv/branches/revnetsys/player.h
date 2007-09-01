@@ -516,7 +516,7 @@ protected:
 	double inventoryWeight;
 	double capacity;
 	
-	bool SendBuffer;
+	//bool SendBuffer;
 	uint32_t internal_ping;
 	uint32_t npings;
 	int64_t lastAction;

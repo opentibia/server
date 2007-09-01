@@ -55,7 +55,8 @@ extern ConfigManager g_config;
 extern Actions actions;
 Chat g_chat;
 
-Protocol79::Protocol79(SOCKET s)
+Protocol79::Protocol79(Connection* connection) :
+	Protocol(connection)
 {
 	OTSYS_THREAD_LOCKVARINIT(bufferLock);
 	
@@ -66,6 +67,7 @@ Protocol79::Protocol79(SOCKET s)
 	readItem = NULL;
 	maxTextLength = 0;
 	this->s = s;
+	m_outputBuffer = NULL;
 }
 
 Protocol79::~Protocol79()
@@ -869,7 +871,7 @@ void Protocol79::parseTurnSouth(NetworkMessage& msg)
 void Protocol79::parseTurnWest(NetworkMessage& msg)
 {
 	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind<bool>(&Game::playerTurn, &g_game, player, WEST)));
+		createTask(boost::bind(&Game::playerTurn, &g_game, player, WEST)));
 }
 
 void Protocol79::parseRequestOutfit(NetworkMessage& msg)

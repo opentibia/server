@@ -24,12 +24,14 @@
 #include "definitions.h"
 //#include <boost/asio.hpp>
 
+#include <boost/utility.hpp>
+
 class NetworkMessage;
 class OutputMessage;
 class Connection;
 class RSA;
 
-class Protocol
+class Protocol : boost::noncopyable
 {
 public:
 	Protocol(Connection* connection)

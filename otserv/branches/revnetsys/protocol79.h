@@ -24,7 +24,8 @@
 
 #include "definitions.h"
 #include <string>
-#include "networkmessage.h"
+#include "protocol.h"
+#include "outputmessage.h"
 #include "enums.h"
 #include "creature.h"
 
@@ -41,11 +42,12 @@ class Game;
 class House;
 class Container;
 class Tile;
+class Connection;
 
-class Protocol79
+class Protocol79 : public Protocol
 {
 public:
-	Protocol79(SOCKET s);
+	Protocol79(Connection* connection);
 	~Protocol79();
 	
 	connectResult_t ConnectPlayer();
@@ -60,9 +62,31 @@ public:
 	//void sleepTillMove();
 	
 private:
-	NetworkMessage OutputBuffer;
+	OutputMessage* m_outputBuffer;
 	std::list<uint32_t> knownPlayers;
 	uint32_t m_key[4];
+
+	NetworkMessage* getOutputBuffer()
+	{
+		if(m_outputBuffer){
+			return m_outputBuffer;
+		}
+		else if(m_connection){
+			m_outputBuffer = OutputMessagePool::getInstance()->getOutputMessage(this);
+			return m_outputBuffer;
+		}
+		else{
+			return NULL;
+		}
+	}
+	
+	void sendOutputBuffer()
+	{
+		if(m_outputBuffer){
+			OutputMessagePool::getInstance()->send(m_outputBuffer);
+			m_outputBuffer = NULL;
+		}
+	}
 
 	void checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &removedKnown);
 	

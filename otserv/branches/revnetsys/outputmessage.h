@@ -32,7 +32,7 @@
 
 #define OUTPUT_POOL_SIZE 100
 
-class OutputMessage : public NetworkMessage
+class OutputMessage : public NetworkMessage, boost::noncopyable
 {
 private:
 	OutputMessage() {
@@ -179,13 +179,12 @@ protected:
 	
 	static void writeHandler(OutputMessage* msg, const boost::asio::error& error)
 	{
-		OTSYS_THREAD_LOCK_CLASS lockClass(getInstance()->m_outputPoolLock);
 		std::cout << "Write handler" << std::endl;
 		Connection* connection = msg->getConnection();
 		connection->onWriteOperation(error);
-		msg->setState(OutputMessage::STATE_FREE);
 		msg->setProtocol(NULL);
 		msg->setConnection(NULL);
+		msg->setState(OutputMessage::STATE_FREE);
 	}
 	
 	friend class Connection;

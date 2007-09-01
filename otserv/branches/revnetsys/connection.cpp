@@ -31,10 +31,10 @@ void Connection::closeConnection()
 {
 	std::cout << "Connection::closeConnection" << std::endl;
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
-	if(m_CloseState != CLOSE_STATE_NONE)
+	if(m_closeState != CLOSE_STATE_NONE)
 		return;
 	
-	m_CloseState = CLOSE_STATE_REQUESTED;
+	m_closeState = CLOSE_STATE_REQUESTED;
 	/*
 	Dispatcher::getDispatcher().addTask(
 		createTask(boost::bind(&Connection::closeConnectionTask, this)));
@@ -47,12 +47,12 @@ void Connection::closeConnectionTask()
 {
 	std::cout << "Connection::closeConnectionTask" << std::endl;
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
-	if(m_CloseState != CLOSE_STATE_REQUESTED){
-		std::cout << "Error: [Connection::closeConnectionTask] m_CloseState = " << m_CloseState << std::endl;
+	if(m_closeState != CLOSE_STATE_REQUESTED){
+		std::cout << "Error: [Connection::closeConnectionTask] m_closeState = " << m_closeState << std::endl;
 		return;
 	}
 	
-	m_CloseState = CLOSE_STATE_CLOSING;
+	m_closeState = CLOSE_STATE_CLOSING;
 	
 	if(m_protocol){
 		Dispatcher::getDispatcher().addTask(
@@ -77,7 +77,7 @@ void Connection::parseHeader(const boost::asio::error& error)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	m_pendingRead--;
-	if(m_CloseState == CLOSE_STATE_CLOSING){
+	if(m_closeState == CLOSE_STATE_CLOSING){
 		closingConnection();
 		return;
 	}
@@ -104,7 +104,7 @@ void Connection::parsePacket(const boost::asio::error& error)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	m_pendingRead--;
-	if(m_CloseState == CLOSE_STATE_CLOSING){
+	if(m_closeState == CLOSE_STATE_CLOSING){
 		closingConnection();
 		return;
 	}
@@ -156,7 +156,7 @@ void Connection::send(OutputMessage* msg)
 {
 	std::cout << "Connection::send init" << std::endl;
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
-	if(m_CloseState == CLOSE_STATE_CLOSING)
+	if(m_closeState == CLOSE_STATE_CLOSING)
 		return;
 	
 	std::cout << "Connection::send " << msg->getMessageLength() << std::endl;
@@ -213,7 +213,7 @@ void Connection::onWriteOperation(const boost::asio::error& error)
 		//TODO. write operation error occurred
 	}
 	
-	if(m_CloseState == CLOSE_STATE_CLOSING){
+	if(m_closeState == CLOSE_STATE_CLOSING){
 		closingConnection();
 		return;
 	}

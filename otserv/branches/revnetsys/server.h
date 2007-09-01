@@ -26,8 +26,9 @@
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
+#include <boost/utility.hpp>
 
-class Server
+class Server : boost::noncopyable
 {
 public:
 	Server(boost::asio::io_service& io_service, uint32_t serverip, uint16_t port)

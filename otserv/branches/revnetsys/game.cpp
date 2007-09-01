@@ -3302,19 +3302,22 @@ void Game::resetCommandTag()
 
 void Game::flushSendBuffers()
 {	
+	/*
 	for(std::vector<Player*>::iterator it = BufferedPlayers.begin(); it != BufferedPlayers.end(); ++it) {
 		(*it)->flushMsg();
 		(*it)->SendBuffer = false;
 		(*it)->releaseThing2();
 
-		/*
+		
 		#ifdef __DEBUG__
 				std::cout << "flushSendBuffers() - releaseThing()" << std::endl;
 		#endif
-		*/
+		
 	}
 
 	BufferedPlayers.clear();
+	*/
+	OutputMessagePool::getInstance()->sendAll();
 	
 	//free memory
 	for(std::vector<Thing*>::iterator it = ToReleaseThings.begin(); it != ToReleaseThings.end(); ++it){
@@ -3329,20 +3332,20 @@ void Game::flushSendBuffers()
 
 	toDecayItems.clear();		
 }
-
+/*
 void Game::addPlayerBuffer(Player* p)
 {		
-/*
 #ifdef __DEBUG__
 	std::cout << "addPlayerBuffer() - useThing()" << std::endl;
 #endif
-*/
+
 	if(p->SendBuffer == false){
 		p->useThing2();
 		BufferedPlayers.push_back(p);
 		p->SendBuffer = true;
 	}
 }
+*/
 
 void Game::FreeThing(Thing* thing)
 {	

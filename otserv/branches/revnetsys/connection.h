@@ -24,6 +24,8 @@
 #include "definitions.h"
 #include <boost/asio.hpp>
 
+#include <boost/utility.hpp>
+
 #include "otsystem.h"
 
 #include "networkmessage.h"
@@ -31,7 +33,7 @@
 class Protocol;
 class OutputMessage;
 
-class Connection
+class Connection : boost::noncopyable
 {
 public:
 	enum {
@@ -45,7 +47,7 @@ public:
 		m_protocol = NULL;
 		m_pendingWrite = 0;
 		m_pendingRead = 0;
-		m_CloseState = CLOSE_STATE_NONE;
+		m_closeState = CLOSE_STATE_NONE;
 		m_socketClosed = false;
 		OTSYS_THREAD_LOCKVARINIT(m_connectionLock);
 	}
@@ -76,11 +78,11 @@ private:
 	
 	NetworkMessage m_msg;
 	boost::asio::ip::tcp::socket m_socket;
-	bool m_socketClosed;
+	bool m_socketClosed; //TODO. remove in next asio release
 	
 	int32_t m_pendingWrite;
 	int32_t m_pendingRead;
-	uint32_t m_CloseState;
+	uint32_t m_closeState;
 	
 	OTSYS_THREAD_LOCKVAR m_connectionLock;
 	

@@ -389,7 +389,7 @@ public:
 	void resetCommandTag();
 
 protected:
-	std::vector<Player*> BufferedPlayers;
+	//std::vector<Player*> BufferedPlayers;
 	std::vector<Thing*> ToReleaseThings;
 
 	//list of items that are in trading state, mapped to the player
