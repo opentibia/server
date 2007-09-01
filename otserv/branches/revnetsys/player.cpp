@@ -931,6 +931,10 @@ void Player::sendHouseWindow(House* _house, uint32_t _listid) const
 	}
 }
 
+void Player::sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName)
+{
+	client->sendCreatePrivateChannel(channelId, channelName);
+}
 
 //container
 void Player::sendAddContainerItem(const Container* container, const Item* item)
@@ -958,6 +962,11 @@ void Player::sendRemoveContainerItem(const Container* container, uint8_t slot, c
 			client->sendRemoveContainerItem(cl->first, slot);
 		}
 	}
+}
+
+void Player::sendContainer(uint32_t cid, const Container* container, bool hasParent)
+{
+	client->sendContainer(cid, container, hasParent);
 }
 
 void Player::onAddTileItem(const Position& pos, const Item* item)

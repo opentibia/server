@@ -287,6 +287,14 @@ public:
 	bool playerBroadcastMessage(Player* player, const std::string& text);
 	bool anonymousBroadcastMessage(const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+	bool playerCreatePrivateChannel(Player* player);
+	bool playerChannelInvite(Player* player, const std::string& name);
+	bool playerChannelExclude(Player* player, const std::string& name);
+	bool playerRequestChannels(Player* player);
+	bool playerOpenChannel(Player* player, uint16_t channelId);
+	bool playerCloseChannel(Player* player, uint16_t channelId);
+	bool playerOpenPrivateChannel(Player* player, const std::string& receiver);
+	bool playerReceivePing(Player* player);
 	bool playerAutoWalk(Player* player, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(Player* player);
 	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
@@ -295,9 +303,12 @@ public:
 		uint8_t index, uint16_t spriteId, bool isHotkey);
 	bool playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
 		uint32_t creatureId, uint16_t spriteId, bool isHotkey);
+	bool playerCloseContainer(Player* player, uint8_t cid);
+	bool playerMoveUpContainer(Player* player, uint8_t cid);
+	bool playerUpdateContainer(Player* player, uint8_t cid);
 	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId);
 	bool playerWriteItem(Player* player, Item* item, const std::string& text);
-
+	bool Game::playerRequestHouseWindow(Player* player, uint8_t listId, uint32_t id, const std::string& text);
 	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackPos,
 		uint32_t playerId, uint16_t spriteId);
 	bool playerAcceptTrade(Player* player);
@@ -308,8 +319,10 @@ public:
 	bool playerFollowCreature(Player* player, uint32_t creatureId);
 	bool playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_t chaseMode);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackPos);
-	bool playerRequestAddVip(Player* player, const std::string& vip_name);
+	bool playerRequestAddVip(Player* player, const std::string& name);
+	bool playerRequestRemoveVip(Player* player, uint32_t guid);
 	bool playerTurn(Player* player, Direction dir);
+	bool Game::playerRequestOutfit(Player* player);
 	bool playerSay(Player* player, uint16_t channelId, SpeakClasses type,
 		const std::string& receiver, const std::string& text);
 	bool playerSayDefault(Player* player, const std::string& text);

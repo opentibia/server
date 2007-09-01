@@ -131,8 +131,8 @@ public:
 	bool isOnline() {return (client != NULL);}
 	uint32_t getIP() const;
 
-	void addContainer(uint32_t containerid, Container* container);
-	void closeContainer(uint32_t containerid);
+	void addContainer(uint32_t cid, Container* container);
+	void closeContainer(uint32_t cid);
 	int32_t getContainerID(const Container* container) const;
 	Container* getContainer(uint32_t cid);
 	
@@ -335,6 +335,7 @@ public:
 	void sendAddContainerItem(const Container* container, const Item* item);
 	void sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem);
 	void sendRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
+	void sendContainer(uint32_t cid, const Container* container, bool hasParent);
 
 	//inventory
 	void sendAddInventoryItem(slots_t slot, const Item* item)
@@ -393,6 +394,8 @@ public:
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
 		{client->sendDistanceShoot(from, to,type);}
 	void sendHouseWindow(House* _house, uint32_t _listid) const;
+	void sendRequestOutfit() const;
+	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName);
 	void sendClosePrivate(uint16_t channelId) const
 		{client->sendClosePrivate(channelId);}
 	void sendIcons() const; 
@@ -416,7 +419,17 @@ public:
 		{client->sendCloseTrade();}
 	void sendWorldLight(LightInfo& lightInfo)
 		{client->sendWorldLight(lightInfo);}
-	
+	void sendChannelsDialog()
+		{client->sendChannelsDialog();}
+	void sendOpenPrivateChannel(const std::string& receiver)
+		{client->sendOpenPrivateChannel(receiver);}
+	void sendRequestOutfit()
+		{client->sendRequestOutfit();}
+	void sendCloseContainer(uint32_t cid)
+		{client->sendCloseContainer(cid);}
+	void sendChannel(uint16_t channelId, const std::string& channelName)
+		{client->sendChannel(channelId, channelName);}
+
 	void receivePing() {if(npings > 0) npings--;}
 	void flushMsg() {client->flushOutputBuffer();}
 

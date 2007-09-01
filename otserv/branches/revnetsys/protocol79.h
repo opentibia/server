@@ -124,7 +124,7 @@ private:
 	
 	//VIP methods
 	void parseAddVip(NetworkMessage& msg);
-	void parseRemVip(NetworkMessage& msg);
+	void parseRemoveVip(NetworkMessage& msg);
 
 	void parseRotateItem(NetworkMessage& msg);
 		
@@ -141,9 +141,11 @@ private:
 
 	//Send functions
 	void sendClosePrivate(uint16_t channelId);
+	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName);
+
 	void sendChannelsDialog();
 	void sendChannel(uint16_t channelId, const std::string& channelName);
-	void sendOpenPriv(const std::string& receiver);
+	void sendOpenPrivateChannel(const std::string& receiver);
 	void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
 	
 	void sendIcons(int icons);
@@ -163,6 +165,7 @@ private:
 	void sendCancelTarget();
 	void sendCreatureVisible(const Creature* creature, bool visible);
 	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
+	void sendRequestOutfit();
 	void sendCreatureInvisible(const Creature* creature);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);

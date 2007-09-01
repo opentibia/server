@@ -1562,6 +1562,134 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 	return true;
 }
 
+bool Game::playerCreatePrivateChannel(Player* player)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCreatePrivateChannel()");
+	if(player->isRemoved())
+		return false;
+
+	ChatChannel* channel = g_chat.createChannel(player, 0xFFFF);
+	
+	if(!channel){
+		return false;
+	}
+	
+	if(!channel->addUser(player)){
+		return false;
+	}
+	
+	player->sendCreatePrivateChannel(channel->getId(), channel->getName());
+	return true;
+}
+
+bool Game::playerChannelInvite(Player* player, const std::string& name)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerChannelInvite()");
+	if(player->isRemoved())
+		return false;
+
+	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
+
+	if(!channel){
+		return false;
+	}
+
+	Player* invitePlayer = getPlayerByName(name);
+	
+	if(!invitePlayer){
+		return false;
+	}
+
+	channel->invitePlayer(player, invitePlayer);
+	return true;
+}
+
+bool Game::playerChannelExclude(Player* player, const std::string& name)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerChannelExclude()");
+	if(player->isRemoved())
+		return false;
+
+	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
+
+	if(!channel){
+		return false;
+	}
+
+	Player* excludePlayer = getPlayerByName(name);
+	
+	if(!excludePlayer){
+		return false;
+	}
+
+	channel->excludePlayer(player, excludePlayer);
+	return true;
+}
+
+bool Game::playerRequestChannels(Player* player)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestChannels()");
+	if(player->isRemoved())
+		return false;
+
+	player->sendChannelsDialog();
+	return true;
+}
+
+bool Game::playerOpenChannel(Player* player, uint16_t channelId)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerOpenChannel()");
+	if(player->isRemoved())
+		return false;
+
+	if(!g_chat.addUserToChannel(player, channelId)){
+		return false;
+	}
+
+	ChatChannel* channel = g_chat.getChannel(player, channelId);
+	if(!channel){
+		return false;
+	}
+
+	player->sendChannel(channel->getId(), channel->getName());
+	return true;
+}
+
+bool Game::playerCloseChannel(Player* player, uint16_t channelId)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseChannel()");
+	if(player->isRemoved())
+		return false;
+
+	g_chat.removeUserFromChannel(player, channelId);
+	return true;
+}
+
+bool Game::playerOpenPrivateChannel(Player* player, const std::string& receiver)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerOpenPrivateChannel()");
+	if(player->isRemoved())
+		return false;
+
+	Player* playerPriv = getPlayerByName(receiver);
+	if(!playerPriv){
+		return false;
+	}
+
+	player->sendOpenPrivateChannel(playerPriv->getName());
+	return true;
+}
+
+bool Game::playerReceivePing(Player* player)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerReceivePing()");
+	if(player->isRemoved())
+		return false;
+
+	player->receivePing();
+	return true;
+}
+
 bool Game::playerBroadcastMessage(Player* player, const std::string& text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerBroadcastMessage()");
@@ -1589,9 +1717,10 @@ bool Game::anonymousBroadcastMessage(const std::string& text)
 bool Game::playerAutoWalk(Player* player, std::list<Direction>& listDir)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerAutoWalk()");
-	if(player->isRemoved())
+	if(player->isRemoved()){
 		return false;
-
+	}
+	
 	return player->startAutoWalk(listDir);
 }
 
@@ -1720,6 +1849,57 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 	return g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), item, isHotkey);
 }
 
+bool Game::playerCloseContainer(Player* player, uint8_t cid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseContainer()");
+	if(player->isRemoved())
+		return false;
+
+	player->closeContainer(cid);
+	player->sendCloseContainer(cid);
+	return true;
+}
+
+bool Game::playerMoveUpContainer(Player* player, uint8_t cid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerMoveUpContainer()");
+	if(player->isRemoved())
+		return false;
+
+	Container* container = player->getContainer(cid);
+	if(!container){
+		return false;
+	}
+
+	Container* parentContainer = dynamic_cast<Container*>(container->getParent());
+	if(!parentContainer){
+		return false;
+	}
+
+	bool hasParent = (dynamic_cast<const Container*>(parentContainer->getParent()) != NULL);
+	player->addContainer(cid, parentContainer);
+	player->sendContainer(cid, parentContainer, hasParent);
+
+	return true;
+}
+
+bool Game::playerUpdateContainer(Player* player, uint8_t cid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUpdateContainer()");
+	if(player->isRemoved())
+		return false;
+
+	Container* container = player->getContainer(cid);
+	if(!container){
+		return false;
+	}
+
+	bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
+	player->sendContainer(cid, container, hasParent);
+
+	return true;
+}
+
 bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRotateItem()");
@@ -1782,6 +1962,23 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 	}
 	
 	//TODO: set last written by
+	return true;
+}
+
+bool Game::playerRequestHouseWindow(Player* player, uint8_t listId, uint32_t id, const std::string& text)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestHouseWindow()");	
+	if(player->isRemoved())
+		return false;
+
+	/*
+	if(player->client->house && player->client->windowTextID == id && listId == 0){
+		player->client->house->setAccessList(listId, new_list);
+		player->client->house = NULL;
+		player->client->listId = 0;
+	}
+	*/
+
 	return true;
 }
 
@@ -2221,7 +2418,7 @@ bool Game::playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_
 
 bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::requestAddVip");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestAddVip");
 	if(player->isRemoved())
 		return false;
 
@@ -2243,6 +2440,16 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 	return player->addVIP(guid, real_name, online);
 }
 
+bool Game::playerRequestRemoveVip(Player* player, uint32_t guid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestRemoveVip");
+	if(player->isRemoved())
+		return false;
+
+	player->removeVIP(guid);
+	return true;
+}
+
 bool Game::playerTurn(Player* player, Direction dir)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerTurn()");
@@ -2250,6 +2457,16 @@ bool Game::playerTurn(Player* player, Direction dir)
 		return false;
 
 	return internalCreatureTurn(player, dir);
+}
+
+bool Game::playerRequestOutfit(Player* player)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::parseRequestOutfit()");
+	if(player->isRemoved())
+		return false;
+
+	player->sendRequestOutfit();
+	return true;
 }
 
 bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
