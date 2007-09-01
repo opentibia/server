@@ -52,7 +52,7 @@ public:
 	
 	connectResult_t ConnectPlayer();
 	void ReceiveLoop();  
-	void WriteBuffer(NetworkMessage &add);
+	void WriteBuffer(NetworkMessage* add);
 	void reinitializeProtocol(SOCKET s);
 	
 	void setKey(const uint32_t* key);
@@ -240,52 +240,52 @@ private:
 	//Help functions
 
 	// translate a tile to clientreadable format
-	void GetTileDescription(const Tile* tile, NetworkMessage &msg);
+	void GetTileDescription(const Tile* tile, NetworkMessage* msg);
 	
 	// translate a floor to clientreadable format
-	void GetFloorDescription(NetworkMessage& msg, int x, int y, int z, int width, int height, int offset, int& skip);
+	void GetFloorDescription(NetworkMessage* msg, int x, int y, int z,
+		int width, int height, int offset, int& skip);
 
 	// translate a map area to clientreadable format
 	void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
-		unsigned short width, unsigned short height,
-		NetworkMessage &msg);
+		unsigned short width, unsigned short height, NetworkMessage* msg);
 
-	void AddMapDescription(NetworkMessage& msg, const Position& pos);
-	void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const std::string& message);
-	void AddAnimatedText(NetworkMessage &msg,const Position& pos, unsigned char color, const std::string& text);
-	void AddMagicEffect(NetworkMessage &msg,const Position& pos, unsigned char type);
-	void AddDistanceShoot(NetworkMessage &msg,const Position& from, const Position& to, unsigned char type);
-	void AddCreature(NetworkMessage &msg,const Creature* creature, bool known, unsigned int remove);
-	void AddPlayerStats(NetworkMessage &msg);
-	void AddCreatureSpeak(NetworkMessage &msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
-	void AddCreatureHealth(NetworkMessage &msg,const Creature* creature);
-	void AddCreatureOutfit(NetworkMessage &msg, const Creature* creature, const Outfit_t& outfit);
-	void AddCreatureInvisible(NetworkMessage &msg, const Creature* creature);	
-	void AddPlayerSkills(NetworkMessage &msg);
-	void AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo);
-	void AddCreatureLight(NetworkMessage &msg, const Creature* creature);
+	void AddMapDescription(NetworkMessage* msg, const Position& pos);
+	void AddTextMessage(NetworkMessage* msg,MessageClasses mclass, const std::string& message);
+	void AddAnimatedText(NetworkMessage* msg,const Position& pos, unsigned char color, const std::string& text);
+	void AddMagicEffect(NetworkMessage* msg,const Position& pos, unsigned char type);
+	void AddDistanceShoot(NetworkMessage* msg,const Position& from, const Position& to, unsigned char type);
+	void AddCreature(NetworkMessage* msg,const Creature* creature, bool known, unsigned int remove);
+	void AddPlayerStats(NetworkMessage* msg);
+	void AddCreatureSpeak(NetworkMessage* msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
+	void AddCreatureHealth(NetworkMessage* msg,const Creature* creature);
+	void AddCreatureOutfit(NetworkMessage* msg, const Creature* creature, const Outfit_t& outfit);
+	void AddCreatureInvisible(NetworkMessage* msg, const Creature* creature);	
+	void AddPlayerSkills(NetworkMessage* msg);
+	void AddWorldLight(NetworkMessage* msg, const LightInfo& lightInfo);
+	void AddCreatureLight(NetworkMessage* msg, const Creature* creature);
 
 	//tiles
-	void AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item);
-	void AddTileCreature(NetworkMessage& msg, const Position& pos, const Creature* creature);
-	void UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item);
-	void RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos);
-	void UpdateTile(NetworkMessage& msg, const Position& pos);
+	void AddTileItem(NetworkMessage* msg, const Position& pos, const Item* item);
+	void AddTileCreature(NetworkMessage* msg, const Position& pos, const Creature* creature);
+	void UpdateTileItem(NetworkMessage* msg, const Position& pos, uint32_t stackpos, const Item* item);
+	void RemoveTileItem(NetworkMessage* msg, const Position& pos, uint32_t stackpos);
+	void UpdateTile(NetworkMessage* msg, const Position& pos);
 
-	void MoveUpCreature(NetworkMessage& msg, const Creature* creature,
+	void MoveUpCreature(NetworkMessage* msg, const Creature* creature,
 		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
-	void MoveDownCreature(NetworkMessage& msg, const Creature* creature,
+	void MoveDownCreature(NetworkMessage* msg, const Creature* creature,
 		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
 
 	//container
-	void AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item* item);
-	void UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item);
-	void RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot);
+	void AddContainerItem(NetworkMessage* msg, uint8_t cid, const Item* item);
+	void UpdateContainerItem(NetworkMessage* msg, uint8_t cid, uint8_t slot, const Item* item);
+	void RemoveContainerItem(NetworkMessage* msg, uint8_t cid, uint8_t slot);
 	
 	//inventory
-	void AddInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
-	void UpdateInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
-	void RemoveInventoryItem(NetworkMessage& msg, slots_t slot);
+	void AddInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
+	void UpdateInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
+	void RemoveInventoryItem(NetworkMessage* msg, slots_t slot);
 
 	OTSYS_THREAD_LOCKVAR bufferLock;
 	uint32_t windowTextID;
