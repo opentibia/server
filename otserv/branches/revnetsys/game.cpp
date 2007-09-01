@@ -71,7 +71,6 @@ Game::Game()
 	map = NULL;
 	worldType = WORLD_TYPE_PVP;
 
-	OTSYS_THREAD_LOCKVARINIT(gameLock);
 	OTSYS_THREAD_LOCKVARINIT(AutoID::autoIDLock);
 
 #if defined __EXCEPTION_TRACER__
@@ -111,13 +110,11 @@ void Game::setWorldType(WorldType_t type)
 
 GameState_t Game::getGameState()
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getGameState()");
 	return gameState;
 }
 
 void Game::setGameState(GameState_t newstate)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::setGameState()");
 	gameState = newstate;
 }
 
@@ -337,8 +334,6 @@ Player* Game::getPlayerByID(uint32_t id)
 
 Creature* Game::getCreatureByName(const std::string& s)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getCreatureByName()");
-
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 	for(AutoList<Creature>::listiterator it = listCreature.list.begin(); it != listCreature.list.end(); ++it){
@@ -355,8 +350,6 @@ Creature* Game::getCreatureByName(const std::string& s)
 
 Player* Game::getPlayerByName(const std::string& s)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getPlayerByName()");
-
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
@@ -373,8 +366,6 @@ Player* Game::getPlayerByName(const std::string& s)
 
 bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= false*/)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placePlayer()");
-
 	if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && getPlayersOnline() >= maxPlayers){
 		return false;
 	}
@@ -384,8 +375,6 @@ bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= fals
 
 bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::internalPlaceCreature()");
-
 	if(!map->placeCreature(pos, creature, forced)){
 		return false;
 	}
@@ -433,7 +422,6 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 
 bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::removeCreature()");
 	if(creature->isRemoved())
 		return false;
 
@@ -484,7 +472,6 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
 	const Position& toPos, uint8_t count)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
 	if(player->isRemoved())
 		return;
 
@@ -532,8 +519,6 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 
 void Game::moveCreature(uint32_t playerId, uint32_t movingCreatureId, const Position& toPos)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
-
 	Player* player = getPlayerByID(playerId);
 	Creature* movingCreature = getCreatureByID(movingCreatureId);
 	
@@ -703,7 +688,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 	Item* item, uint32_t count, uint16_t spriteId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::moveItem()");
 	if(player->isRemoved())
 		return;
 
@@ -1450,7 +1434,6 @@ void Game::getSpectators(SpectatorVec& list, const Position& centerPos, bool mul
 //Implementation of player invoked events
 bool Game::movePlayer(Player* player, Direction direction)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::movePlayer()");
 	if(player->isRemoved())
 		return false;
 
@@ -1461,7 +1444,6 @@ bool Game::movePlayer(Player* player, Direction direction)
 
 bool Game::playerWhisper(Player* player, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerWhisper()");
 	if(player->isRemoved())
 		return false;
 
@@ -1493,7 +1475,6 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 
 bool Game::playerYell(Player* player, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerYell()");
 	if(player->isRemoved())
 		return false;
 
@@ -1522,7 +1503,6 @@ bool Game::playerYell(Player* player, const std::string& text)
 bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver,
 	const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSpeakTo");
 	if(player->isRemoved())
 		return false;
 	
@@ -1547,7 +1527,6 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 
 bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerTalkToChannel");
 	if(player->isRemoved())
 		return false;
 	
@@ -1564,7 +1543,6 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 
 bool Game::playerCreatePrivateChannel(Player* player)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCreatePrivateChannel()");
 	if(player->isRemoved())
 		return false;
 
@@ -1584,7 +1562,6 @@ bool Game::playerCreatePrivateChannel(Player* player)
 
 bool Game::playerChannelInvite(Player* player, const std::string& name)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerChannelInvite()");
 	if(player->isRemoved())
 		return false;
 
@@ -1606,7 +1583,6 @@ bool Game::playerChannelInvite(Player* player, const std::string& name)
 
 bool Game::playerChannelExclude(Player* player, const std::string& name)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerChannelExclude()");
 	if(player->isRemoved())
 		return false;
 
@@ -1628,7 +1604,6 @@ bool Game::playerChannelExclude(Player* player, const std::string& name)
 
 bool Game::playerRequestChannels(Player* player)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestChannels()");
 	if(player->isRemoved())
 		return false;
 
@@ -1638,7 +1613,6 @@ bool Game::playerRequestChannels(Player* player)
 
 bool Game::playerOpenChannel(Player* player, uint16_t channelId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerOpenChannel()");
 	if(player->isRemoved())
 		return false;
 
@@ -1657,7 +1631,6 @@ bool Game::playerOpenChannel(Player* player, uint16_t channelId)
 
 bool Game::playerCloseChannel(Player* player, uint16_t channelId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseChannel()");
 	if(player->isRemoved())
 		return false;
 
@@ -1667,7 +1640,6 @@ bool Game::playerCloseChannel(Player* player, uint16_t channelId)
 
 bool Game::playerOpenPrivateChannel(Player* player, const std::string& receiver)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerOpenPrivateChannel()");
 	if(player->isRemoved())
 		return false;
 
@@ -1682,7 +1654,6 @@ bool Game::playerOpenPrivateChannel(Player* player, const std::string& receiver)
 
 bool Game::playerReceivePing(Player* player)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerReceivePing()");
 	if(player->isRemoved())
 		return false;
 
@@ -1692,7 +1663,6 @@ bool Game::playerReceivePing(Player* player)
 
 bool Game::playerBroadcastMessage(Player* player, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerBroadcastMessage()");
 	if(player->isRemoved() || !player->hasFlag(PlayerFlag_CanBroadcast))
 		return false;
 
@@ -1705,8 +1675,6 @@ bool Game::playerBroadcastMessage(Player* player, const std::string& text)
 
 bool Game::anonymousBroadcastMessage(const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::anonymousBroadcastMessage()");
-
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		(*it).second->sendTextMessage(MSG_STATUS_WARNING, text.c_str());
 	}
@@ -1716,7 +1684,6 @@ bool Game::anonymousBroadcastMessage(const std::string& text)
 
 bool Game::playerAutoWalk(Player* player, std::list<Direction>& listDir)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerAutoWalk()");
 	if(player->isRemoved()){
 		return false;
 	}
@@ -1726,7 +1693,6 @@ bool Game::playerAutoWalk(Player* player, std::list<Direction>& listDir)
 
 bool Game::playerStopAutoWalk(Player* player)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerStopAutoWalk()");
 	if(player->isRemoved())
 		return false;
 
@@ -1737,7 +1703,6 @@ bool Game::playerStopAutoWalk(Player* player)
 bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
 	const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItemEx()");
 	if(player->isRemoved())
 		return false;
 
@@ -1769,7 +1734,6 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
 	uint8_t index, uint16_t spriteId, bool isHotkey)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItem()");
 	if(player->isRemoved())
 		return false;
 
@@ -1813,7 +1777,6 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
 bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
 	uint32_t creatureId, uint16_t spriteId, bool isHotkey)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseBattleWindow");
 	if(player->isRemoved())
 		return false;
 
@@ -1851,7 +1814,6 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 
 bool Game::playerCloseContainer(Player* player, uint8_t cid)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseContainer()");
 	if(player->isRemoved())
 		return false;
 
@@ -1862,7 +1824,6 @@ bool Game::playerCloseContainer(Player* player, uint8_t cid)
 
 bool Game::playerMoveUpContainer(Player* player, uint8_t cid)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerMoveUpContainer()");
 	if(player->isRemoved())
 		return false;
 
@@ -1885,7 +1846,6 @@ bool Game::playerMoveUpContainer(Player* player, uint8_t cid)
 
 bool Game::playerUpdateContainer(Player* player, uint8_t cid)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUpdateContainer()");
 	if(player->isRemoved())
 		return false;
 
@@ -1902,7 +1862,6 @@ bool Game::playerUpdateContainer(Player* player, uint8_t cid)
 
 bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRotateItem()");
 	if(player->isRemoved())
 		return false;
 	
@@ -1932,7 +1891,6 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPo
 
 bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerWriteItem()");	
 	if(player->isRemoved())
 		return false;
 
@@ -1967,7 +1925,6 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 
 bool Game::playerRequestHouseWindow(Player* player, uint8_t listId, uint32_t id, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestHouseWindow()");	
 	if(player->isRemoved())
 		return false;
 
@@ -1985,7 +1942,6 @@ bool Game::playerRequestHouseWindow(Player* player, uint8_t listId, uint32_t id,
 bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stackPos,
 	uint32_t playerId, uint16_t spriteId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestTrade()");
 	if(player->isRemoved())
 		return false;
 
@@ -2079,7 +2035,6 @@ bool Game::internalStartTrade(Player* player, Player* tradePartner, Item* tradeI
 
 bool Game::playerAcceptTrade(Player* player)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerAcceptTrade()");
 	if(player->isRemoved())
 		return false;
 
@@ -2180,7 +2135,6 @@ bool Game::playerAcceptTrade(Player* player)
 
 bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerLookInTrade()");
 	if(player->isRemoved())
 		return false;
 
@@ -2248,7 +2202,6 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 
 bool Game::playerCloseTrade(Player* player)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseTrade()");
 	if(player->isRemoved())
 		return false;
 
@@ -2303,7 +2256,6 @@ bool Game::playerCloseTrade(Player* player)
 
 bool Game::playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackPos)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerLookAt()");
 	if(player->isRemoved())
 		return false;
 	
@@ -2339,7 +2291,6 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t spriteId, 
 
 bool Game::playerSetAttackedCreature(Player* player, uint32_t creatureId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetAttackedCreature()");
 	if(player->isRemoved())
 		return false;
 
@@ -2391,7 +2342,6 @@ bool Game::playerSetAttackedCreature(Player* player, uint32_t creatureId)
 
 bool Game::playerFollowCreature(Player* player, uint32_t creatureId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerFollowCreature");
 	if(player->isRemoved())
 		return false;
 
@@ -2407,7 +2357,6 @@ bool Game::playerFollowCreature(Player* player, uint32_t creatureId)
 
 bool Game::playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_t chaseMode)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetFightModes");
 	if(player->isRemoved())
 		return false;
 
@@ -2418,7 +2367,6 @@ bool Game::playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_
 
 bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestAddVip");
 	if(player->isRemoved())
 		return false;
 
@@ -2442,7 +2390,6 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 
 bool Game::playerRequestRemoveVip(Player* player, uint32_t guid)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestRemoveVip");
 	if(player->isRemoved())
 		return false;
 
@@ -2452,7 +2399,6 @@ bool Game::playerRequestRemoveVip(Player* player, uint32_t guid)
 
 bool Game::playerTurn(Player* player, Direction dir)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerTurn()");
 	if(player->isRemoved())
 		return false;
 
@@ -2461,7 +2407,6 @@ bool Game::playerTurn(Player* player, Direction dir)
 
 bool Game::playerRequestOutfit(Player* player)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::parseRequestOutfit()");
 	if(player->isRemoved())
 		return false;
 
@@ -2522,7 +2467,6 @@ bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
 
 bool Game::playerSayDefault(Player* player, const std::string& text)
 {	
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSayDefault()");
 	if(player->isRemoved())
 		return false;
 
@@ -2531,7 +2475,6 @@ bool Game::playerSayDefault(Player* player, const std::string& text)
 
 bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerChangeOutfit()");
 	if(player->isRemoved())
 		return false;
 
@@ -2543,7 +2486,6 @@ bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
 
 bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSayCommand()");
 	if(player->isRemoved())
 		return false;
 
@@ -2561,7 +2503,6 @@ bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string
 
 bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSaySpell()");
 	if(player->isRemoved())
 		return false;
 
@@ -2764,8 +2705,6 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 
 void Game::checkWalk(uint32_t creatureId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkWalk");
-
 	Creature* creature = getCreatureByID(creatureId);
 	if(creature && creature->getHealth() > 0){
 		creature->onWalk();
@@ -2775,8 +2714,6 @@ void Game::checkWalk(uint32_t creatureId)
 
 void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreature()");
-
 	Creature* creature = getCreatureByID(creatureId);
 
 	if(creature){
@@ -3258,8 +3195,6 @@ void Game::internalDecayItem(Item* item)
 
 void Game::checkDecay(int32_t interval)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
-
 	Item* item = NULL;
 	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
 		item = *it;
@@ -3289,8 +3224,6 @@ void Game::checkDecay(int32_t interval)
 
 void Game::checkLight(int t)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkLight()");
-	
 	Scheduler::getScheduler().addEvent(createSchedulerTask(10000, boost::bind(&Game::checkLight, this, 10000)));
 	
 	light_hour = light_hour + light_hour_delta;
@@ -3369,8 +3302,6 @@ void Game::resetCommandTag()
 
 void Game::flushSendBuffers()
 {	
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::flushSendBuffers()");
-
 	for(std::vector<Player*>::iterator it = BufferedPlayers.begin(); it != BufferedPlayers.end(); ++it) {
 		(*it)->flushMsg();
 		(*it)->SendBuffer = false;
@@ -3401,8 +3332,6 @@ void Game::flushSendBuffers()
 
 void Game::addPlayerBuffer(Player* p)
 {		
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::addPlayerBuffer()");
-
 /*
 #ifdef __DEBUG__
 	std::cout << "addPlayerBuffer() - useThing()" << std::endl;
@@ -3417,7 +3346,6 @@ void Game::addPlayerBuffer(Player* p)
 
 void Game::FreeThing(Thing* thing)
 {	
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::FreeThing()");
 	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);
 }

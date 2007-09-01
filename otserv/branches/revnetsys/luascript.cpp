@@ -571,7 +571,6 @@ bool LuaScriptInterface::closeState()
 
 void LuaScriptInterface::executeTimerEvent(uint32_t eventIndex)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "LuaScriptInterface::executeTimerEvent()");
 	LuaTimerEvents::iterator it = m_timerEvents.find(eventIndex);
 	if(it != m_timerEvents.end()){
 		//push function

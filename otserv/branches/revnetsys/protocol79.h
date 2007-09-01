@@ -57,7 +57,7 @@ public:
 		
 	void setPlayer(Player* p);
 	uint32_t getIP() const;
-	void sleepTillMove();
+	//void sleepTillMove();
 	
 private:
 	NetworkMessage OutputBuffer;

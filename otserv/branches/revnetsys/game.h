@@ -354,9 +354,6 @@ public:
 	GameState_t getGameState();
 	void setGameState(GameState_t newstate);
 
-	//Lock variable for Game class
-	OTSYS_THREAD_LOCKVAR gameLock;   
-
 	//Events
 	void checkWalk(uint32_t creatureId);
 	void checkCreature(uint32_t creatureId, uint32_t interval);

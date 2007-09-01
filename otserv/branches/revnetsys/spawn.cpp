@@ -368,7 +368,7 @@ void Spawn::checkSpawn()
 #ifdef __DEBUG_SPAWN__
 	std::cout << "[Notice] Spawn::checkSpawn " << this << std::endl;
 #endif
-	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Spawn::checkSpawn()");
+	//OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Spawn::checkSpawn()");
 	checkSpawnEvent = 0;
 
 	Monster* monster;

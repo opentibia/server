@@ -1000,8 +1000,6 @@ std::string Creature::getDescription(int32_t lookDistance) const
 
 int Creature::getStepDuration() const
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Creature::getStepDuration()");
-
 	int32_t duration = 0;
 
 	if(isRemoved()){
