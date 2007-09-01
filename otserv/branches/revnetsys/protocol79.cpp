@@ -633,6 +633,14 @@ void Protocol79::parseChannelInvite(NetworkMessage& msg)
 		createTask(boost::bind(&Game::playerChannelInvite, &g_game, player, name)));
 }
 
+void Protocol79::parseChannelExclude(NetworkMessage& msg)
+{
+	std::string name = msg.GetString();
+
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(&Game::playerChannelExclude, &g_game, player, name)));
+}
+
 void Protocol79::parseGetChannels(NetworkMessage& msg)
 {
 	Dispatcher::getDispatcher().addTask(
