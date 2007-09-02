@@ -41,34 +41,87 @@
 #include <sql.h>
 #include <sqlext.h>
 
-#define RETURN_SUCCESS(ret) ((ret == SQL_SUCCESS) || (ret == SQL_SUCCESS_WITH_INFO))
-
 /**
 	@author bruno <brfwolf@thormenta.com>
 */
 class DatabaseODBC : public _Database
 {
-	public:
-		DatabaseODBC();
-		~DatabaseODBC();
+public:
+	DatabaseODBC();
+	DATABASE_VIRTUAL ~DatabaseODBC();
 
-		virtual bool connect();
-		virtual bool disconnect();
-		virtual bool executeQuery(DBQuery& q);
-		virtual bool storeQuery(DBQuery& q, DBResult& res);
-		virtual bool beginTransaction();
-		virtual bool rollback();
-		virtual bool commit();
+	DATABASE_VIRTUAL bool beginTransaction();
+	DATABASE_VIRTUAL bool rollback();
+	DATABASE_VIRTUAL bool commit();
 
-	protected:
-		void displayError(SQLHSTMT hStmt);
-		SQLCHAR* prepareQuery(DBQuery& query);
+	DATABASE_VIRTUAL DBStatement* prepareStatement(const std::string &query);
 
-		SQLHENV hEnv;
-		SQLHDBC hDbc;
-		bool hConnected;
+	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
 
-		uint8_t *szDSN, *szUser, *szPass;
+	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
+
+	DATABASE_VIRTUAL void freeStatement(DBStatement *stmt);
+	DATABASE_VIRTUAL void freeResult(DBResult *res);
+
+protected:
+	std::string _parse(const std::string &s);
+
+	SQLHDBC m_handle;
+	SQLHENV m_env;
+
+	bool m_connected;
+};
+
+class ODBCStatement : public _DBStatement
+{
+	friend class DatabaseODBC;
+	friend class _Database;
+
+public:
+	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value);
+	DATABASE_VIRTUAL void setLong(int32_t param, int64_t value);
+	DATABASE_VIRTUAL void setString(int32_t param, const std::string &value);
+	DATABASE_VIRTUAL void bindStream(int32_t param, const char* value, unsigned long size);
+
+	DATABASE_VIRTUAL bool execute();
+
+protected:
+	ODBCStatement(SQLHSTMT stmt);
+	DATABASE_VIRTUAL ~ODBCStatement();
+
+	uint16_t m_params;
+	uint16_t* m_types;
+	uint32_t* m_lengths;
+
+	typedef std::map<int32_t, void*> binds_t;
+	binds_t m_binds;
+
+	SQLHSTMT m_handle;
+};
+
+class ODBCResult : public _DBResult
+{
+	friend class DatabaseODBC;
+	friend class ODBCStatement;
+	friend class _Database;
+
+public:
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s);
+	DATABASE_VIRTUAL std::string getDataString(const std::string &s);
+	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size);
+
+	DATABASE_VIRTUAL bool next();
+
+protected:
+	ODBCResult(SQLHSTMT stmt);
+	DATABASE_VIRTUAL ~ODBCResult();
+
+	typedef std::map<const std::string, uint32_t> listNames_t;
+	listNames_t m_listNames;
+
+	SQLHSTMT m_handle;
 };
 
 #endif

@@ -24,239 +24,237 @@
 #include "definitions.h"
 #include "otsystem.h"
 
-#ifdef WIN32
-//#include <winsock2.h>
-#include <winsock.h>
-#endif
-
-#ifdef __MYSQL_ALT_INCLUDE__
-#include <mysql.h>
-#elif defined __USE_MYSQL__
-#include <mysql/mysql.h>
-#endif
 #include <sstream>
 #include <map>
 
-enum db_error_t {
-	DB_ERROR_UNKNOWN = 100,
-	DB_ERROR_INIT,
-	DB_ERROR_CONNECT,
-	DB_ERROR_SELECT,
-	DB_ERROR_QUERY,
-	DB_ERROR_STORE,
-	DB_ERROR_DATA_NOT_FOUND,
-	DB_ERROR_BUFFER_EXCEEDED,
-};
-
-struct RowData{
-	char** row;
-	unsigned long** length;
-};
-
-class DBQuery : public std::stringstream
-{
-public:
-	DBQuery();
-	~DBQuery();
-
-	/** Reset the actual query */
-	void reset(){ this->str("");};
-
-	/** Get the text of the query
-	*\returns The text of the actual query
-	*/
-	const char *getText(){ return this->str().c_str(); };
-
-	/** Get size of the query text
-	*\returns The size of the query text
-	*/
-	int getSize(){ return (int)this->str().length(); };
-
-protected:
-	static OTSYS_THREAD_LOCKVAR database_lock;
-	friend class _Database;
-};
-
-class DBResult
-{
-public:
-	DBResult();
-	~DBResult();
-
-	/** Get the Integer value of a field in database
-	*\returns The Integer value of the selected field and row
-	*\param s The name of the field
-	*\param nrow The number of the row
-	*/
-	int32_t getDataInt(const std::string &s, unsigned int nrow=0);
-
-	/** Get the Long value of a field in database
-	*\returns The Long value of the selected field and row
-	*\param s The name of the field
-	*\param nrow The number of the row
-	*/
-	int64_t getDataLong(const std::string &s, unsigned int nrow=0);
-
-	/** Get the String of a field in database
-	*\returns The String of the selected field and row
-	*\param s The name of the field
-	*\param nrow The number of the row
-	*/
-	std::string getDataString(const std::string &s, unsigned int nrow=0);
-
-	/** Get the blob of a field in database
-	*\returns a PropStream that is initiated with the blob data field, if not exist it returns NULL.
-	*\param s The name of the field
-	*\param nrow The number of the row
-	*/
-	const char* getDataBlob(const std::string &s, unsigned long& size, unsigned int nrow=0);
-
-	/** Get the number of rows
-	*\returns The number of rows
-	*/
-	unsigned int getNumRows(){ return m_numRows; };
-
-private:
-    //friend class Database;
-	#ifdef __USE_MYSQL__
-	friend class DatabaseMySQL;
-	void addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fields);
-	#endif
-	#ifdef __USE_SQLITE__
-	friend class DatabaseSqLite;
-	#endif
-	#if defined(__USE_SQLITE__) || defined(__USE_ODBC__) || defined(__USE_PGSQL)
-	void addRow(char **results, unsigned int num_fields);
-	#endif
-	#ifdef __USE_ODBC__
-	friend class DatabaseODBC;
-	#endif
-	#ifdef __USE_PGSQL__
-	friend class DatabasePgSQL;
-	#endif
-	void clear();
-	void setFieldName(const std::string &s, unsigned int n){
-		m_listNames[s] = n;
-		m_numFields++;
-	};
-
-	unsigned int m_numFields;
-	//unsigned int m_lastNumFields;
-	unsigned int m_numRows;
-	typedef std::map<const std::string, unsigned int> listNames_type;
-	listNames_type m_listNames;
-	//typedef std::map<unsigned int, char **> RowDataMap;
-	typedef std::map<unsigned int, RowData* > RowDataMap;
-	RowDataMap m_listRows;
-};
-
-#ifdef USE_MYSQL_ONLY
-#define DATABASE_VIRTUAL
-#define DATABASE_CLASS DatabaseMySQL
-class DatabaseMySQL;
-#else
+#ifdef MULTI_SQL_DRIVERS
 #define DATABASE_VIRTUAL virtual
 #define DATABASE_CLASS _Database
+#define DBSTMT_CLASS _DBStatement
+#define DBRES_CLASS _DBResult
 class _Database;
+class _DBStatement;
+class _DBResult;
+#else
+#define DATABASE_VIRTUAL
+
+#if defined(__USE_MYSQL__)
+#define DATABASE_CLASS DatabaseMySQL
+#define DBSTMT_CLASS MySQLStatement
+#define DBRES_CLASS MySQLResult
+class DatabaseMySQL;
+class MySQLStatement;
+class MySQLResult;
+
+#elif defined(__USE_SQLITE__)
+#define DATABASE_CLASS DatabaseSQLite
+#define DBSTMT_CLASS SQLiteStatement
+#define DBRES_CLASS SQLiteResult
+class DatabaseSQLite;
+class SQLiteStatement;
+class SQLiteResult;
+
+#elif defined(__USE_ODBC__)
+#define DATABASE_CLASS DatabaseODBC
+#define DBSTMT_CLASS ODBCStatement
+#define DBRES_CLASS ODBCResult
+class DatabaseODBC;
+class ODBCStatement;
+class ODBCResult;
+
+#elif defined(__USE_PGSQL__)
+#define DATABASE_CLASS DatabasePgSQL
+#define DBSTMT_CLASS PgSQLStatement
+#define DBRES_CLASS PgSQLResult
+class DatabasePgSQL;
+class PgSQLStatement;
+class PgSQLResult;
+
+#endif
 #endif
 
 typedef DATABASE_CLASS Database;
+typedef DBSTMT_CLASS DBStatement;
+typedef DBRES_CLASS DBResult;
 
+/**
+ * Generic database connection handler. All drivers must extend it.
+ * 
+ * @author wrzasq <wrzasq@gmail.com>
+ */
 class _Database
 {
 public:
-	/** Get Database instance
-	*\returns
-	* 	Database instance
-	*\note
-	*	When you get database instance
-	*	be sure that you define a DBQuery object
-	*	under it to lock database instance usage
-	*/
+	// thread-safety for database queries
+	static OTSYS_THREAD_LOCKVAR lock;
+
+/**
+ * Singleton implementation.
+ * 
+ * Retruns instance of database handler. Don't create database (or drivers) instances in your code - instead of it use Database::instance(). This method stores static instance of connection class internaly to make sure exacly one instance of connection is created for entire system.
+ * 
+ * @return database connection handler singletor
+ */
 	static Database* instance();
 
-	/** Connect to a mysql database
-	*\returns
-	* 	TRUE if the connection is ok
-	* 	FALSE if the connection fails
-	*/
-	DATABASE_VIRTUAL bool connect(){return false;};
+/**
+ * Transaction related methods.
+ * 
+ * Methods for starting, commiting and rolling back transaction. Each of the returns boolean value.
+ * 
+ * @return true on success, false on error
+ * @note
+ *	If your database system doesn't support transactions you should return true - it's not feature test, code should work without transaction, just will lack integrity.
+ */
+	DATABASE_VIRTUAL bool beginTransaction() { return false; }
+	DATABASE_VIRTUAL bool rollback() { return false; };
+	DATABASE_VIRTUAL bool commit() { return false; };
 
-	/** Disconnects from the connected database
-	*\returns
-	* 	TRUE if the database was disconnected
-	* 	FALSE if the database was not disconnected or no database selected
-	*/
-	DATABASE_VIRTUAL bool disconnect(){return false;};
+/**
+ * Generates prepared statement.
+ * 
+ * Prepared statements are queries templates compiled by database server for further execution with given list of attributes.
+ * 
+ * @param std::string query pattern
+ * @return preated statement instance
+ */
+	DATABASE_VIRTUAL DBStatement* prepareStatement(const std::string &query) { return NULL; }
 
-	/** Execute a query which don't get any information of the database (for ex.: INSERT, UPDATE, etc)
-	*\returns
-	* 	TRUE if the query is ok
-	* 	FALSE if the query fails
-	*\ref q The query object
-	*/
-	DATABASE_VIRTUAL bool executeQuery(DBQuery &q ){return false;};
+/**
+ * Executes command.
+ * 
+ * Executes query which doesn't generates results (eg. INSERT, UPDATE, DELETE...).
+ * 
+ * @param std::string query command
+ * @return true on success, false on error
+ */
+	DATABASE_VIRTUAL bool executeQuery(const std::string &query) { return false; }
+/**
+ * Queries database.
+ * 
+ * Executes query which generates results (mostly SELECT).
+ * 
+ * @param std::string query
+ * @return results object (null on error)
+ */
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query) { return NULL; }
 
-	/** Store a query which get information of the database (for ex.: SELECT)
-	*\returns
-	* 	TRUE if the query is ok
-	* 	FALSE if the query fails
-	*\ref q The query object
-	*\ref res The DBResult object where to insert the results of the query
-	*/
-	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res){return false;};
+/**
+ * Escapes string for query.
+ * 
+ * Prepares string to fit SQL queries including quoting it.
+ * 
+ * @param std::string string to be escaped
+ * @return quoted string
+ */
+	DATABASE_VIRTUAL std::string escapeString(const std::string &s) { return "''"; }
 
-	/** Transaciont related functions
-	*\returns
-	* 	TRUE
-	* 	FALSE
-	*/
-	DATABASE_VIRTUAL bool beginTransaction(){return false;}
-	DATABASE_VIRTUAL bool rollback(){return false;};
-	DATABASE_VIRTUAL bool commit(){return false;};
-
-	/** Escape the special characters in a string for no problems with the query
-	*\returns The string modified
-	*\param s The source string
-	*/
-	static std::string escapeString(const std::string &s);
-
-	/** Escape the special characters in a string for no problems with the query
-	*\returns The string modified
-	*\param s The source string
-	*/
-	static std::string escapeString(const char* s, unsigned long size);
+/**
+ * Resource freeing.
+ * 
+ * @param DBResult*|DBStatement resource to be freed
+ */
+	DATABASE_VIRTUAL void freeStatement(DBStatement *stmt) {};
+	DATABASE_VIRTUAL void freeResult(DBResult *res) {};
 
 protected:
-	_Database(){};
-	DATABASE_VIRTUAL ~_Database(){};
+	_Database() {};
+	DATABASE_VIRTUAL ~_Database() {};
+
+private:
 	static Database* _instance;
 };
 
-#ifdef USE_MYSQL_ONLY
-#include "databasemysql.h"
-#endif
-
-class DBSplitInsert
+/**
+ * Prepared statent class.
+ * 
+ * @author wrzasq <wrzasq@gmail.com>
+ */
+class _DBStatement
 {
+	// unused at the moment
+	//friend class Database;
+
 public:
-	DBSplitInsert(Database* database);
-	~DBSplitInsert();
+/**
+ * Binds parameter value to of given index.
+ * 
+ * @param int parameter index
+ */
+	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value) {}
+	DATABASE_VIRTUAL void setLong(int32_t param, int64_t value) {}
+	DATABASE_VIRTUAL void setString(int32_t param, const std::string &value) {}
+	DATABASE_VIRTUAL void bindStream(int32_t param, const char* value, unsigned long size) {}
 
-	bool addRow(const std::string& row);
+/**
+ * Executes statement.
+ * 
+ * Runs query with currently associated parameters.
+ * 
+ * @return true on success, false on error
+ */
+	DATABASE_VIRTUAL bool execute() { return false; }
 
-	void setQuery(const std::string& query);
-
-	bool executeQuery();
-
-	void clear();
-private:
-
-	bool internalExecuteQuery();
-
-	Database* m_database;
-	std::string m_query;
-	std::string m_buffer;
+protected:
+	_DBStatement() {};
+	DATABASE_VIRTUAL ~_DBStatement() {};
 };
+
+/**
+ * Query results.
+ * 
+ * @author <wrzasq@gmail.com>
+ */
+class _DBResult
+{
+	// unused at the moment
+	//friend class Database;
+	//friend class DBStatement;
+
+public:
+	/**Get the Integer value of a field in database
+	*\returns The Integer value of the selected field and row
+	*\param s The name of the field
+	*/
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s) { return 0; };
+	/** Get the Long value of a field in database
+	*\returns The Long value of the selected field and row
+	*\param s The name of the field
+	*/
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s) { return 0; };
+	/** Get the String of a field in database
+	*\returns The String of the selected field and row
+	*\param s The name of the field
+	*/
+	DATABASE_VIRTUAL std::string getDataString(const std::string &s) { return "''"; };
+	/** Get the blob of a field in database
+	*\returns a PropStream that is initiated with the blob data field, if not exist it returns NULL.
+	*\param s The name of the field
+	*/
+	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size) { return NULL; };
+
+/**
+ * Moves to next result in set.
+ * 
+ * @return true if moved, false if there are no more results.
+ */
+	DATABASE_VIRTUAL bool next() {};
+
+protected:
+	_DBResult() {};
+	DATABASE_VIRTUAL ~_DBResult() {};
+};
+
+#ifndef MULTI_SQL_DRIVERS
+#if defined(__USE_MYSQL__)
+#include "databasemysql.h"
+#elif defined(__USE_SQLITE__)
+#include "databasesqlite.h"
+#elif defined(__USE_ODBC__)
+#include "databaseodbc.h"
+#elif defined(__USE_PGSQL__)
+#include "databasepgsql.h"
+#endif
+#endif
 
 #endif

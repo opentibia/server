@@ -51,8 +51,8 @@
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
 
-/* Define to 1 if you have the <postgres/libpq-fe.h> header file. */
-#undef HAVE_POSTGRES_LIBPQ_FE_H
+/* Define to 1 if you have the <postgresql/libpq-fe.h> header file. */
+#undef HAVE_POSTGRESQL_LIBPQ_FE_H
 
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT

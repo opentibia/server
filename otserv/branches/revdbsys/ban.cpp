@@ -294,133 +294,103 @@ IOBan::IOBan()
 bool IOBan::loadBans(Ban& banclass)
 {
 	Database* db = Database::instance();
-	DBQuery query;
-	DBResult result;
+	DBResult* result;
 	
-	if(!db->connect()){
-		return false;
-	}
-
-	query << "SELECT * FROM bans";
-	if(!db->storeQuery(query, result))
+	if(!(result = db->storeQuery("SELECT * FROM `bans`")))
 		return true;
 
 	uint32_t currentTime = std::time(NULL);
-	for(uint32_t i=0; i < result.getNumRows(); ++i){
-		int banType = result.getDataInt("type", i);
-		int time = result.getDataInt("time", i);
-		if(time > (int)currentTime){
+	while(result->next()) {
+		int banType = result->getDataInt("type");
+		int time = result->getDataInt("time");
+		if(time > (int)currentTime) {
 			switch(banType){
 				case BAN_IPADDRESS:
 				{
-					int ip = result.getDataInt("ip", i);
-					int mask = result.getDataInt("mask", i);
+					int ip = result->getDataInt("ip");
+					int mask = result->getDataInt("mask");
 					banclass.addIpBan(ip, mask, time);
 					break;
 				}
 
 				case BAN_PLAYER:
 				{
-					int player = result.getDataInt("player", i);
+					int player = result->getDataInt("player");
 					banclass.addPlayerBan(player, time);
 					break;
 				}
 
 				case BAN_ACCOUNT:
 				{
-					int account = result.getDataInt("account", i);
+					int account = result->getDataInt("account");
 					banclass.addAccountBan(account, time);
 					break;
 				}
 			}
 		}
 	}
-
+	db->freeResult(result);
 	return true;
 }
 
 bool IOBan::saveBans(const Ban& banclass)
 {
 	Database* db = Database::instance();
-	DBQuery query;
 	
-	if(!db->connect()){
+	if( !db->beginTransaction() )
+		return false;
+
+	if(!db->executeQuery("DELETE FROM `bans`")){
+		db->rollback();
 		return false;
 	}
-
-    if( !db->beginTransaction() )
-		return false;
-
-	query << "DELETE FROM bans;";
-	if(!db->executeQuery(query))
-		return false;
 
 	uint32_t currentTime = std::time(NULL);
 	//save ip bans
-	bool executeQuery = false;
 
-	std::stringstream bans;
-
-	DBSplitInsert query_insert(db);
-	
-	query_insert.setQuery("INSERT INTO `bans` (`type` , `ip` , `mask`, `time`) VALUES ");
+	DBStatement* stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `ip`, `mask`, `time`) VALUES (1, ?, ?, ?)");
 	
 	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it){
 		if(it->time > currentTime){
-			executeQuery = true;
-			bans << "(1," << it->ip << "," << it->mask <<
-				"," << it->time << ")";
+			stmt->setInt(1, it->ip);
+			stmt->setInt(2, it->mask);
+			stmt->setInt(3, it->time);
 
-			if(!query_insert.addRow(bans.str()))
+			if(!stmt->execute()){
+				db->rollback();
 				return false;
-
-            bans.str("");
+			}
 		}
-	}
-	if(executeQuery){
-		if(!query_insert.executeQuery())
-			return false;
 	}
 
 	//save player bans
-	executeQuery = false;
-	query_insert.setQuery("INSERT INTO `bans` (`type` , `player` , `time`) VALUES ");
+	stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `player`, `time`) VALUES (2, ?, ?)");
 	
 	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it){
 		if(it->time > currentTime){
-			executeQuery = true;
-			bans  << "(2," << it->id << "," << it->time << ")";
-			
-			if(!query_insert.addRow(bans.str()))
+			stmt->setInt(1, it->id);
+			stmt->setInt(2, it->time);
+
+			if(!stmt->execute()){
+				db->rollback();
 				return false;
-			
-            bans.str("");        
+			}
 		}
-	}
-	if(executeQuery){
-		if(!query_insert.executeQuery())
-			return false;
 	}
 
 	//save account bans
-	executeQuery = false;
-	query_insert.setQuery("INSERT INTO `bans` (`type` , `account` , `time`) VALUES ");
+	stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `account`, `time`) VALUES (3, ?, ?)");
 	
 	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it){
 		if(it->time > currentTime){
-			executeQuery = true;
-			bans << "(3," << it->id << "," << it->time << ")";
-			
-			if(!query_insert.addRow(bans.str()))
+			stmt->setInt(1, it->id);
+			stmt->setInt(2, it->time);
+
+			if(!stmt->execute()){
+				db->rollback();
 				return false;
-			
-            bans.str("");
+			}
 		}
-	}
-	
-	if(executeQuery){
-		if(!query_insert.executeQuery())
-			return false;
 	}
 
 	return db->commit();

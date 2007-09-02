@@ -21,10 +21,6 @@
 #ifndef __OTSERV_DatabaseMySQL_H__
 #define __OTSERV_DatabaseMySQL_H__
 
-#ifdef WIN32
-#include <winsock.h>
-#endif
-
 #ifdef __MYSQL_ALT_INCLUDE__
 #include <mysql.h>
 #else
@@ -33,64 +29,77 @@
 #include <sstream>
 #include "database.h"
 
-
 class DatabaseMySQL : public _Database
 {
 public:
 	DatabaseMySQL();
 	DATABASE_VIRTUAL ~DatabaseMySQL();
 
-	/** Connect to a mysql DatabaseMySQL
-	*\returns
-	* 	TRUE if the connection is ok
-	* 	FALSE if the connection fails
-	*/
-	DATABASE_VIRTUAL bool connect();
-	
-
-	/** Disconnects from the connected DatabaseMySQL
-	*\returns
-	* 	TRUE if the DatabaseMySQL was disconnected
-	* 	FALSE if the DatabaseMySQL was not disconnected or no DatabaseMySQL selected
-	*/
-	DATABASE_VIRTUAL bool disconnect();
-
-	/** Execute a query which don't get any information of the DatabaseMySQL (for ex.: INSERT, UPDATE, etc)
-	*\returns
-	* 	TRUE if the query is ok
-	* 	FALSE if the query fails
-	*\ref q The query object
-	*/
-	DATABASE_VIRTUAL bool executeQuery(DBQuery &q);
-
-	/** Store a query which get information of the DatabaseMySQL (for ex.: SELECT)
-	*\returns
-	* 	TRUE if the query is ok
-	* 	FALSE if the query fails
-	*\ref q The query object
-	*\ref res The DBResult object where to insert the results of the query
-	*/
-	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res);
-
-        DATABASE_VIRTUAL bool beginTransaction();
+	DATABASE_VIRTUAL bool beginTransaction();
 	DATABASE_VIRTUAL bool rollback();
 	DATABASE_VIRTUAL bool commit();
 
-private:
+	DATABASE_VIRTUAL DBStatement* prepareStatement(const std::string &query);
 
-	/** initialize the DatabaseMySQL
-	*\returns
-	* 	TRUE if the DatabaseMySQL was successfully initialized
-	* 	FALSE if the DatabaseMySQL was not successfully initialized
-	*/
-	bool init();
+	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
 
-	bool m_initialized;
-	bool m_connected;
+	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
+
+	DATABASE_VIRTUAL void freeStatement(DBStatement *stmt);
+	DATABASE_VIRTUAL void freeResult(DBResult *res);
+
+protected:
 	MYSQL m_handle;
-	
-	std::string m_host, m_user, m_pass, m_dbname;
+
+	bool m_connected;
 };
 
+class MySQLStatement : public _DBStatement
+{
+	friend class DatabaseMySQL;
+	friend class _Database;
+
+public:
+	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value);
+	DATABASE_VIRTUAL void setLong(int32_t param, int64_t value);
+	DATABASE_VIRTUAL void setString(int32_t param, const std::string &value);
+	DATABASE_VIRTUAL void bindStream(int32_t param, const char* value, unsigned long size);
+
+	DATABASE_VIRTUAL bool execute();
+
+protected:
+	MySQLStatement(MYSQL_STMT* stmt);
+	DATABASE_VIRTUAL ~MySQLStatement();
+
+	MYSQL_STMT* m_handle;
+	MYSQL_BIND* m_bind;
+	uint32_t m_count;
+};
+
+class MySQLResult : public _DBResult
+{
+	friend class DatabaseMySQL;
+	friend class MySQLStatement;
+	friend class _Database;
+
+public:
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s);
+	DATABASE_VIRTUAL std::string getDataString(const std::string &s);
+	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size);
+
+	DATABASE_VIRTUAL bool next();
+
+protected:
+	MySQLResult(MYSQL_RES* res);
+	DATABASE_VIRTUAL ~MySQLResult();
+
+	typedef std::map<const std::string, uint32_t> listNames_t;
+	listNames_t m_listNames;
+
+	MYSQL_RES* m_handle;
+	MYSQL_ROW m_row;
+};
 
 #endif

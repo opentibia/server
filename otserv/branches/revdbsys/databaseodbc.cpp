@@ -30,250 +30,486 @@
 
 #include <iostream>
 
-#include "tools.h"
 #include "databaseodbc.h"
 #include "configmanager.h"
 
-#ifndef SQL_OK
-#define SQL_OK(a) (a == SQL_SUCCESS || a == SQL_SUCCESS_WITH_INFO)
-#endif
+#define RETURN_SUCCESS(ret) (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 
 extern ConfigManager g_config;
 
+/** DatabaseODBC definitions */
+
 DatabaseODBC::DatabaseODBC()
 {
-	hConnected = false;
+	m_connected = false;
 
-	hEnv = NULL;
-	hDbc = NULL;
+	char* dns = new char[SQL_MAX_DSN_LENGTH];
+	char* user = new char[32];
+	char* pass = new char[32];
 
-	szDSN  = new uint8_t[SQL_MAX_DSN_LENGTH];
-	szPass = new uint8_t[32];
-	szUser = new uint8_t[32];
+	strcpy((char*)dns, g_config.getString(ConfigManager::SQL_DB).c_str());
+	strcpy((char*)user, g_config.getString(ConfigManager::SQL_USER).c_str());
+	strcpy((char*)pass, g_config.getString(ConfigManager::SQL_PASS).c_str());
 
-	strcpy((char*)szDSN,  g_config.getString(ConfigManager::SQL_DB).c_str());
-	strcpy((char*)szPass, g_config.getString(ConfigManager::SQL_PASS).c_str());
-	strcpy((char*)szUser, g_config.getString(ConfigManager::SQL_USER).c_str());
-
-	SQLRETURN ret = SQLAllocEnv(&hEnv);
+	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &m_env);
 	if (!RETURN_SUCCESS(ret))
 	{
-		std::cout << "Failed to allocate SQLHENV." << std::endl;
-		displayError(NULL);
-		hEnv = NULL;
+		std::cout << "Failed to allocate ODBC SQLHENV enviroment handle." << std::endl;
+		m_env = NULL;
 		return;
 	}
 
-	ret = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER*)SQL_OV_ODBC3, 0);
+	ret = SQLSetEnvAttr(m_env, SQL_ATTR_ODBC_VERSION, (SQLPOINTER*)SQL_OV_ODBC3, 0);
 	if (!RETURN_SUCCESS(ret))
 	{
-		std::cout << "Failed to set SQLHENV attribute SQL_ATTR_ODBC_VERSION = SQL_OV_ODBC3." << std::endl;
-		displayError(NULL);
-		SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
-		hEnv = NULL;
+		std::cout << "SQLSetEnvAttr(SQL_ATTR_ODBC_VERSION): Failed to switch to ODBC 3 version." << std::endl;
+		SQLFreeHandle(SQL_HANDLE_ENV, m_env);
+		m_env = NULL;
 	}
-}
 
+	if (m_env == NULL)
+	{
+		std::cout << "ODBC SQLHENV enviroment not initialized." << std::endl;
+		return;
+	}
+
+	ret = SQLAllocHandle(SQL_HANDLE_DBC, m_env, &m_handle);
+	if (!RETURN_SUCCESS(ret))
+	{
+		std::cout << "Failed to allocate ODBC SQLHDBC connection handle." << std::endl;
+		m_handle = NULL;
+		return;
+	}
+
+	ret = SQLSetConnectAttr(m_handle, SQL_ATTR_CONNECTION_TIMEOUT, (SQLPOINTER*)5, 0);
+	if (!RETURN_SUCCESS(ret))
+	{
+		std::cout << "SQLSetConnectAttr(SQL_ATTR_CONNECTION_TIMEOUT): Failed to set connection timeout." << std::endl;
+		SQLFreeHandle(SQL_HANDLE_DBC, m_handle);
+		m_handle = NULL;
+		return;
+	}
+
+	ret = SQLConnect(m_handle, (SQLCHAR*)dns, SQL_NTS, (SQLCHAR*)user, SQL_NTS, (SQLCHAR*)pass, SQL_NTS);
+	if (!RETURN_SUCCESS(ret)) 
+	{
+		std::cout << "Failed to connect to ODBC via DSN: " << dns << " (user " << user << ")" << std::endl;
+		SQLFreeHandle(SQL_HANDLE_DBC, m_handle);
+		m_handle = NULL;
+		return;
+	}
+
+	m_connected = true;
+}
 
 DatabaseODBC::~DatabaseODBC()
 {
-	disconnect();
-	SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
-}
-
-
-bool DatabaseODBC::connect()
-{
-	if (hConnected == true)
-		return true;
-
-	if (hEnv == NULL)
-	{
-		std::cout << "SQLHENV not initialized." << std::endl;
-		return false;
+	if(m_connected) {
+		SQLDisconnect(m_handle);
+		SQLFreeHandle(SQL_HANDLE_DBC, m_handle);
+		m_handle = NULL;
+		m_connected = false;
 	}
 
-	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_DBC, hEnv, &hDbc);
-	if (!RETURN_SUCCESS(ret))
-	{
-		std::cout << "Failed to allocate SQLHDBC." << std::endl;
-		hDbc = NULL;
-		return false;
-	}
-
-	ret = SQLSetConnectAttr(hDbc, SQL_ATTR_CONNECTION_TIMEOUT, (SQLPOINTER*)5, 0);
-	if (!RETURN_SUCCESS(ret))
-	{
-		std::cout << "Failed to set SQLHDBC attribute SQL_ATTR_CONNECTION_TIMEOUT = 5." << std::endl;
-		displayError(NULL);
-		SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
-		hDbc = NULL;
-		return false;
-	}
-
-	ret = SQLConnect(hDbc, (SQLCHAR*)szDSN, SQL_NTS, (SQLCHAR*)szUser, SQL_NTS, (SQLCHAR*)szPass, SQL_NTS);
-	if (!RETURN_SUCCESS(ret)) 
-	{
-		std::cout << "Failed to connect to ODBC via DSN: " << szDSN << " (user " << szUser << "; pwd " << szPass << ")" << std::endl;
-		displayError(NULL);
-		SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
-		hDbc = NULL;
-		return false;
-	}
-
-	hConnected = true;
-	return true;
-}
-
-bool DatabaseODBC::disconnect()
-{
-	if(hConnected) {
-		SQLDisconnect(hDbc);
-		SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
-		hDbc = NULL;
-		hConnected = false;
-	}
-	return true;
-}
-
-void DatabaseODBC::displayError(SQLHSTMT hStmt)
-{
-	SQLCHAR sqlState[6];
-	SQLINTEGER errorCode;
-	SQLCHAR errorMsg[512];
-	SQLSMALLINT errorMsgSize;
-	SQLError(hEnv, hDbc, hStmt, sqlState, &errorCode, errorMsg, 512, &errorMsgSize);
-	std::cout << "SQL Error #" << errorCode << ": " << errorMsg << std::endl << "Statement: " << sqlState << std::endl;
-}
-
-SQLCHAR* DatabaseODBC::prepareQuery(DBQuery& query)
-{
-	std::string tmp( query.str() );
-	replaceString(tmp, "`", "\"");
-
-	#ifdef __SQL_QUERY_DEBUG__
-	std::cout << tmp << std::endl;
-	#endif
-
-	SQLCHAR *szQueryStr = new SQLCHAR[tmp.length()];
-	strcpy((char*)szQueryStr, tmp.c_str());
-	query.reset();
-
-	return szQueryStr;
-}
-
-bool DatabaseODBC::executeQuery(DBQuery& q)
-{
-	if (!hConnected)
-		return false;
-
-	SQLHSTMT hStmt;
-	
-	SQLRETURN ret = SQLAllocStmt(hDbc, &hStmt);
-	if (!RETURN_SUCCESS(ret))
-	{
-		std::cout << "Failed to allocate SQLHSTMT." << std::endl;
-		displayError(hStmt);
-		return false;
-	}
-
-	SQLCHAR *szQueryStr = prepareQuery(q);
-
-	ret = SQLExecDirect(hStmt, (SQLCHAR*)szQueryStr, SQL_NTS);
-
-	if (!RETURN_SUCCESS(ret))
-	{
-		std::cout << "Failed to execute query: \"" << szQueryStr << "\"." << std::endl;
-		displayError(hStmt);
-		return false;
-	}
-
-	return true;
-}
-
-bool DatabaseODBC::storeQuery(DBQuery& q, DBResult& res)
-{
-	if (!hConnected)
-		return false;
-
-	SQLHSTMT hStmt;
-	
-	SQLRETURN ret = SQLAllocStmt(hDbc, &hStmt);
-	if (!RETURN_SUCCESS(ret))
-	{
-		std::cout << "Failed to allocate SQLHSTMT." << std::endl;
-		displayError(hStmt);
-		return false;
-	}
-
-	SQLCHAR *szQueryStr = prepareQuery(q);
-
-	ret = SQLExecDirect(hStmt, (SQLCHAR*)szQueryStr, SQL_NTS);
-	if (!RETURN_SUCCESS(ret))
-	{
-		std::cout << "Failed to execute query: \"" << szQueryStr << "\"." << std::endl;
-		displayError(hStmt);
-		SQLFreeStmt (hStmt, SQL_DROP); 
-		return false;
-	}
-
-	SQLSMALLINT numCols;
-	ret = SQLNumResultCols(hStmt, &numCols);
-	if (!RETURN_SUCCESS(ret))
-	{
-		std::cout << "Failed to retrieve columns count for query \"" << szQueryStr << "\"." << std::endl;
-		displayError(hStmt);
-		SQLFreeStmt (hStmt, SQL_DROP); 
-		return false;
-	}
-
-	res.clear();
-
-	SQLCHAR **resultrow = new SQLCHAR*[numCols];
-	bool *described = new bool[numCols];
-	for (int i = 0; i < numCols; i++)
-		described[i] = false;
-
-	while (true)
-	{
-		ret = SQLFetch(hStmt);
-		if (!RETURN_SUCCESS(ret))
-			break;
-		for (SQLUSMALLINT k = 1; k <= (SQLUSMALLINT)numCols; k++)
-		{
-			if (!described[k-1])
-			{
-				SQLCHAR columnName[129];
-				SQLDescribeCol(hStmt, k, (SQLCHAR*)columnName, 129, NULL, NULL, NULL, NULL, NULL);
-				std::string name((char*)columnName);
-				res.setFieldName(name, (unsigned int)k-1);
-				described[k-1] = true;
-			}
-
-			resultrow[k-1] = (SQLCHAR*)malloc(512);
-			SQLLEN strlenorind;
-			ret = SQLGetData(hStmt, k, SQL_C_CHAR, resultrow[k-1], 512, &strlenorind);
-			if (!RETURN_SUCCESS(ret))
-				break;
-		}
-		res.addRow((char**)resultrow, numCols);
-	}
-
-	SQLFreeStmt (hStmt, SQL_DROP); 
-	return true;
+	SQLFreeHandle(SQL_HANDLE_ENV, m_env);
 }
 
 bool DatabaseODBC::beginTransaction()
 {
 	return true;
-}
-
-bool DatabaseODBC::commit()
-{
-	return RETURN_SUCCESS( SQLTransact(hEnv, hDbc, SQL_COMMIT) );
+	// return executeQuery("BEGIN");
 }
 
 bool DatabaseODBC::rollback()
 {
-	return RETURN_SUCCESS( SQLTransact(hEnv, hDbc, SQL_ROLLBACK) );
+	return true;
+	// SQL_RETURN ret = SQLTransact(m_env, m_handle, SQL_ROLLBACK);
+	// return RETURN_SUCCESS(ret);
+}
+
+bool DatabaseODBC::commit()
+{
+	return true;
+	// SQL_RETURN ret = SQLTransact(m_env, m_handle, SQL_COMMIT);
+	// return RETURN_SUCCESS(ret);
+}
+
+DBStatement* DatabaseODBC::prepareStatement(const std::string &query)
+{
+	if(!m_connected)
+		return NULL;
+
+	#ifdef __SQL_QUERY_DEBUG__
+	std::cout << "ODBC PREPARED STATEMENT: " << query << std::endl;
+	#endif
+
+	std::string buff = _parse(query);
+
+	OTSYS_THREAD_LOCK(Database::lock, NULL);
+
+	SQLHSTMT stmt;
+	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_STMT, m_handle, &stmt);
+	if (!RETURN_SUCCESS(ret))
+	{
+		std::cout << "Failed to allocate ODBC SQLHSTMT statement." << std::endl;
+		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+		return false;
+	}
+
+	ret = SQLPrepare(stmt, (SQLCHAR*)buff.c_str(), buff.length() );
+	if (!RETURN_SUCCESS(ret)) 
+	{
+		std::cout << "SQLPrepare(): Failed to prepare statement: " << query << std::endl;
+		SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+		return false;
+	}
+
+	DBStatement* statement = new ODBCStatement(stmt);
+	return statement;
+}
+
+bool DatabaseODBC::executeQuery(const std::string &query)
+{
+	if (!m_connected)
+		return false;
+
+	#ifdef __SQL_QUERY_DEBUG__
+	std::cout << "ODBC QUERY: " << query << std::endl;
+	#endif
+
+	std::string buff = _parse(query);
+
+	OTSYS_THREAD_LOCK(Database::lock, NULL);
+
+	SQLHSTMT stmt;
+
+	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_STMT, m_handle, &stmt);
+	if (!RETURN_SUCCESS(ret))
+	{
+		std::cout << "Failed to allocate ODBC SQLHSTMT statement." << std::endl;
+		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+		return false;
+	}
+
+	ret = SQLExecDirect(stmt, (SQLCHAR*)buff.c_str(), buff.length() );
+
+	if (!RETURN_SUCCESS(ret))
+	{
+		std::cout << "SQLExecDirect(): " << query << ": ODBC ERROR: " << std::endl;
+		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+		return false;
+	}
+
+	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+	return true;
+}
+
+DBResult* DatabaseODBC::storeQuery(const std::string &query)
+{
+	if (!m_connected)
+		return NULL;
+
+	#ifdef __SQL_QUERY_DEBUG__
+	std::cout << "ODBC QUERY: " << query << std::endl;
+	#endif
+
+	std::string buff = _parse(query);
+
+	OTSYS_THREAD_LOCK(Database::lock, NULL);
+
+	SQLHSTMT stmt;
+
+	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_STMT, m_handle, &stmt);
+	if (!RETURN_SUCCESS(ret))
+	{
+		std::cout << "Failed to allocate ODBC SQLHSTMT statement." << std::endl;
+		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+		return NULL;
+	}
+
+	char* temp = new char[buff.length()];
+	strcpy((char*)temp, buff.c_str());
+	ret = SQLExecDirect(stmt, (SQLCHAR*)temp, buff.length() );
+	delete[] temp;
+
+	if (!RETURN_SUCCESS(ret))
+	{
+		std::cout << "SQLExecDirect(): " << query << ": ODBC ERROR: " << std::endl;
+		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+		return NULL;
+	}
+
+	DBResult* results = new ODBCResult(stmt);
+	return results;
+}
+
+std::string DatabaseODBC::escapeString(const std::string &s)
+{
+	std::string buff = std::string(s);
+
+	int32_t pos = 0;
+	while( buff.find('\'', pos) != std::string::npos) {
+		pos = buff.find('\'', pos);
+		buff.insert(pos, "'");
+		pos += 2;
+	}
+
+	buff = "'" + buff + "'";
+	return buff;
+}
+
+std::string DatabaseODBC::_parse(const std::string &s)
+{
+	std::string query = "";
+
+	query.reserve(s.size());
+	bool inString = false;
+	uint8_t ch;
+	for(int a = 0; a < s.length(); a++){
+		ch = s[a];
+
+		if(ch == '\'') {
+			if(inString && s[a + 1] != '\'')
+				inString = false;
+			else
+				inString = true;
+		}
+
+		if(ch == '`' && !inString)
+			ch = '"';
+
+		query += ch;
+	}
+
+	return query;
+}
+
+void DatabaseODBC::freeStatement(DBStatement* stmt)
+{
+/** FIXME: causes segfault when trying to allocate new statement handle */
+	//delete (ODBCStatement*)stmt;
+}
+
+void DatabaseODBC::freeResult(DBResult* res)
+{
+	//delete (ODBCResult*)res;
+}
+
+/** ODBCStatement definitions */
+
+void ODBCStatement::setInt(int32_t param, int32_t value)
+{
+	int32_t* buff = new int32_t;
+	*buff = value;
+	m_binds[param - 1] = buff;
+	m_types[param - 1] = SQL_C_SLONG;
+
+	SQLRETURN stat = SQLBindParameter(m_handle, param, SQL_PARAM_INPUT, SQL_C_SLONG, SQL_INTEGER, 0, 0, m_binds[param - 1], 0, NULL);
+
+	if( !RETURN_SUCCESS(stat) ) {
+		std::cout << "ODBCStatement::setInt(): ODBC ERROR." << std::endl;
+	}
+}
+
+void ODBCStatement::setLong(int32_t param, int64_t value)
+{
+	int64_t* buff = new int64_t;
+	*buff = value;
+	m_binds[param - 1] = buff;
+	m_types[param - 1] = SQL_C_SBIGINT;
+
+	SQLRETURN stat = SQLBindParameter(m_handle, param, SQL_PARAM_INPUT, SQL_C_SBIGINT, SQL_INTEGER, 0, 0, m_binds[param - 1], 0, NULL);
+
+	if( !RETURN_SUCCESS(stat) ) {
+		std::cout << "ODBCStatement::setLong(): ODBC ERROR." << std::endl;
+	}
+}
+
+void ODBCStatement::setString(int32_t param, const std::string &value)
+{
+	char* buff = new char[value.length()];
+	strcpy(buff, value.c_str());
+	m_binds[param - 1] = buff;
+	m_types[param - 1] = SQL_C_CHAR;
+
+	SQLRETURN stat = SQLBindParameter(m_handle, param, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 0, 0, buff, value.length(), NULL);
+
+	if( !RETURN_SUCCESS(stat) ) {
+		std::cout << "ODBCStatement::setString(): ODBC ERROR." << std::endl;
+	}
+}
+
+void ODBCStatement::bindStream(int32_t param, const char* value, unsigned long size)
+{
+	m_lengths[param - 1] = size;
+
+	char* buff = new char[size];
+	strcpy(buff, value);
+	m_binds[param - 1] = buff;
+	m_types[param - 1] = SQL_C_BINARY;
+
+	SQLRETURN stat = SQLBindParameter(m_handle, param, SQL_PARAM_INPUT, SQL_C_BINARY, SQL_BINARY, size, 0, buff, size, (SQLLEN*)m_lengths[param - 1]);
+
+	if( !RETURN_SUCCESS(stat) ) {
+		std::cout << "ODBCStatement::bindStream(): ODBC ERROR." << std::endl;
+	}
+}
+
+bool ODBCStatement::execute()
+{
+	SQLRETURN stat = SQLExecute(m_handle);
+
+	for( int32_t i = 0; i < m_params; i++)
+		if(m_binds[i])
+			switch(m_types[i]) {
+				case SQL_C_SLONG:
+					delete (int32_t*)m_binds[i];
+					break;
+
+				case SQL_C_SBIGINT:
+					delete (int64_t*)m_binds[i];
+					break;
+
+				case SQL_C_CHAR:
+				case SQL_C_BINARY:
+					delete[] (char*)m_binds[i];
+					break;
+			}
+
+	return RETURN_SUCCESS(stat);
+}
+
+ODBCStatement::ODBCStatement(SQLHSTMT stmt)
+{
+	m_handle = stmt;
+	SQLNumParams(m_handle, (SQLSMALLINT*)&m_params);
+	m_types = new uint16_t[m_params];
+	m_lengths = new uint32_t[m_params];
+}
+
+ODBCStatement::~ODBCStatement()
+{
+	for( int32_t i = 0; i < m_params; i++)
+		if(m_binds[i])
+			switch(m_types[i]) {
+				case SQL_C_SLONG:
+					delete (int32_t*)m_binds[i];
+					break;
+
+				case SQL_C_SBIGINT:
+					delete (int64_t*)m_binds[i];
+					break;
+
+				case SQL_C_BINARY:
+				case SQL_C_CHAR:
+					delete[] (char*)m_binds[i];
+					break;
+			}
+
+	delete[] m_types;
+	delete[] m_lengths;
+	SQLFreeHandle(SQL_HANDLE_STMT, m_handle);
+	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+}
+
+/** ODBCResult definitions */
+
+int32_t ODBCResult::getDataInt(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() )
+	{
+		int32_t value;
+		SQLRETURN ret = SQLGetData(m_handle, it->second, SQL_C_SLONG, &value, 0, NULL);
+		if( RETURN_SUCCESS(ret) ) {
+			return value;
+		} else {
+			std::cout << "Error during getDataInt(" << s << ")." << std::endl;
+		}
+	}
+
+	std::cout << "Error during getDataInt(" << s << ")." << std::endl;
+	return 0; // Failed
+}
+
+int64_t ODBCResult::getDataLong(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() )
+	{
+		int64_t value;
+		SQLRETURN ret = SQLGetData(m_handle, it->second, SQL_C_SBIGINT, &value, 0, NULL);
+		if( RETURN_SUCCESS(ret) ) {
+			return value;
+		} else {
+			std::cout << "Error during getDataLong(" << s << ")." << std::endl;
+		}
+	}
+
+	std::cout << "Error during getDataLong(" << s << ")." << std::endl;
+	return 0; // Failed
+}
+
+std::string ODBCResult::getDataString(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() )
+	{
+		char* value = new char[1024];
+		SQLRETURN ret = SQLGetData(m_handle, it->second, SQL_C_CHAR, value, 1024, NULL);
+		if( RETURN_SUCCESS(ret) ) {
+			std::string buff = std::string(value);
+			return buff;
+		} else {
+			std::cout << "Error during getDataString(" << s << ")." << std::endl;
+		}
+	}
+
+	std::cout << "Error during getDataString(" << s << ")." << std::endl;
+	return std::string(""); // Failed
+}
+
+const char* ODBCResult::getDataStream(const std::string &s, unsigned long &size)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() )
+	{
+		char* value = new char[1024];
+		SQLRETURN ret = SQLGetData(m_handle, it->second, SQL_C_BINARY, value, 1024, (SQLLEN*)&size);
+		if( RETURN_SUCCESS(ret) ) {
+			return value;
+		} else {
+			std::cout << "Error during getDataStream(" << s << ")." << std::endl;
+		}
+	}
+
+	std::cout << "Error during getDataStream(" << s << ")." << std::endl;
+	return 0; // Failed
+}
+
+bool ODBCResult::next()
+{
+	SQLRETURN ret = SQLFetch(m_handle);
+	return RETURN_SUCCESS(ret);
+}
+
+ODBCResult::ODBCResult(SQLHSTMT stmt)
+{
+	m_handle = stmt;
+
+	int16_t numCols;
+	SQLNumResultCols(m_handle, &numCols);
+
+	for(int32_t i = 1; i <= numCols; i++) {
+		char* name = new char[129];
+		SQLDescribeCol(m_handle, i, (SQLCHAR*)name, 129, NULL, NULL, NULL, NULL, NULL);
+		m_listNames[name] = i;
+	}
+}
+
+ODBCResult::~ODBCResult()
+{
+	SQLFreeHandle(SQL_HANDLE_STMT, m_handle);
+	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 }

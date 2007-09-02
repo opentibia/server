@@ -6562,7 +6562,7 @@ fi
 # check for postgresql if it is enabled
 if test -n "$PGSQL_FLAGS"; then
 
-for ac_header in postgres/libpq-fe.h
+for ac_header in postgresql/libpq-fe.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
