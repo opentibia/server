@@ -6302,7 +6302,7 @@
 	<item id="2454" article="a" name="war axe">
 		<attribute key="weight" value="6150"/>
 		<attribute key="defense" value="10"/>
-		<attribute key="attack" value="20"/>
+		<attribute key="attack" value="48"/>
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
@@ -17158,7 +17158,7 @@
 	</item>
 	<item id="6391" article="a" name="nightmare shield">
 		<attribute key="weight" value="3200"/>
-		<attribute key="defense" value="36"/>
+		<attribute key="defense" value="37"/>
 		<attribute key="description" value="It was crafted by the ancient order of the nightmare knights."/>
 		<attribute key="weaponType" value="shield"/>
 	</item>
@@ -19405,21 +19405,21 @@
 	</item>
 	<item id="7363" article="a" name="piercing bolt" plural="piercing bolts">
 		<attribute key="weight" value="80"/>
-		<attribute key="attack" value="35"/>
+		<attribute key="attack" value="33"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="piercingbolt"/>
 	</item>
 	<item id="7364" article="a" name="sniper arrow" plural="sniper arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="55"/>
+		<attribute key="attack" value="26"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="sniperarrow"/>
 	</item>
 	<item id="7365" article="an" name="onyx arrow" plural="onyx arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="45"/>
+		<attribute key="attack" value="38"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="onyxarrow"/>
