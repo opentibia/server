@@ -1760,12 +1760,12 @@ bool Game::playerBroadcastMessage(Player* player, const std::string& text)
 	return true;
 }
 
-bool Game::anonymousBroadcastMessage(const std::string& text)
+bool Game::anonymousBroadcastMessage(MessageClasses type, const std::string& text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::anonymousBroadcastMessage()");
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		(*it).second->sendTextMessage(MSG_STATUS_WARNING, text.c_str());
+		(*it).second->sendTextMessage(type, text.c_str());
 	}
 
 	return true;

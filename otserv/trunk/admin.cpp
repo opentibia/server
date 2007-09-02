@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -110,24 +110,24 @@ void AdminProtocol::receiveLoop()
 	if(!adminConfig->isEnabled()){
 		return;
 	}
-	
+
 	m_state = NO_CONNECTED;
 	//is allowed this ip?
 	if(!adminConfig->allowIP(m_socket)){
 		addLogLine(m_connection, LOGTYPE_EVENT, 1, "ip not allowed");
 		return;
 	}
-	
+
 	//max connections limit
 	if(!adminConfig->addConnection()){
 		addLogLine(m_connection, LOGTYPE_EVENT, 1, "can not add new connection");
 		return;
 	}
-	
+
 	addLogLine(m_connection, LOGTYPE_EVENT, 1, "start message loop");
 	//read loop
 	NetworkMessage msg;
-	
+
 	//send hello
 	msg.AddByte(AP_MSG_HELLO);
 	msg.AddU32(1); //version
@@ -135,11 +135,11 @@ void AdminProtocol::receiveLoop()
 	msg.AddU16(adminConfig->getProtocolPolicy()); //security policy
 	msg.AddU32(adminConfig->getProtocolOptions()); //protocol options(encryption, ...)
 	msg.WriteToSocket(m_socket);
-	
+
 	m_connection->setLastCommandTime();
 	msg.Reset();
 	m_state = ENCRYPTION_NO_SET;
-	
+
 	NetworkMessage outputBuffer;
 	//TODO. read from socket with timeout
 	while(msg.ReadFromSocket(m_socket)){
@@ -151,9 +151,9 @@ void AdminProtocol::receiveLoop()
 		}
 	}
 	addLogLine(m_connection, LOGTYPE_EVENT, 1, "end message loop");
-	
+
 	adminConfig->removeConnection();
-	
+
 	//close socket
 	if(m_socket){
 		closesocket(m_socket);
@@ -165,11 +165,11 @@ int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBu
 {
 	if(msg.getMessageLength() <= 0)
 		return NO_PACKET;
-	
+
 	uint8_t recvbyte = msg.GetByte();
-	
+
 	outputBuffer.Reset();
-	
+
 	switch(m_state){
 	case ENCRYPTION_NO_SET:
 	{
@@ -178,7 +178,7 @@ int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBu
 				addLogLine(m_connection, LOGTYPE_WARNING, 1, "encryption timeout");
 				return END_LOOP;
 			}
-		
+
 			if(recvbyte != AP_MSG_ENCRYPTION && recvbyte != AP_MSG_KEY_EXCHANGE){
 				outputBuffer.AddByte(AP_MSG_ERROR);
 				outputBuffer.AddString("encryption needed");
@@ -231,7 +231,7 @@ int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBu
 		addLogLine(m_connection, LOGTYPE_ERROR, 1, "no valid connection state!!!");
 		return END_LOOP;
 	}
-	
+
 	m_connection->setLastCommandTime();
 	switch(recvbyte){
 	case AP_MSG_LOGIN:
@@ -270,7 +270,7 @@ int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBu
 					addLogLine(m_connection, LOGTYPE_WARNING, 1, "no valid server key type");
 					break;
 				}
-				
+
 				msg.setRSAInstance(rsa);
 				if(msg.RSA_decrypt()){
 					m_state = NO_LOGGED_IN;
@@ -279,14 +279,14 @@ int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBu
 					k[1] = msg.GetU32();
 					k[2] = msg.GetU32();
 					k[3] = msg.GetU32();
-					
+
 					msg.Reset();
 					//use for in/out the new key we have
 					msg.setEncryptionState(true);
 					msg.setEncryptionKey(k);
 					outputBuffer.setEncryptionState(true);
 					outputBuffer.setEncryptionKey(k);
-					
+
 					outputBuffer.AddByte(AP_MSG_ENCRYPTION_OK);
 					addLogLine(m_connection, LOGTYPE_EVENT, 1, "encryption ok");
 				}
@@ -324,7 +324,7 @@ int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBu
 					addLogLine(m_connection, LOGTYPE_WARNING, 1, "no valid server key type");
 					break;
 				}
-				
+
 				outputBuffer.AddByte(AP_MSG_KEY_EXCHANGE_OK);
 				outputBuffer.AddByte(ENCRYPTION_RSA1024XTEA);
 				char RSAPublicKey[128];
@@ -358,7 +358,7 @@ int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBu
 		{
 			std::string message = msg.GetString();
 			addLogLine(m_connection, LOGTYPE_EVENT, 1, "broadcast: " + message);
-			g_game.anonymousBroadcastMessage(message);
+			g_game.anonymousBroadcastMessage(MSG_STATUS_WARNING, message);
 			outputBuffer.AddByte(AP_MSG_COMMAND_OK);
 			break;
 		}
@@ -415,7 +415,7 @@ int32_t AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBu
 		addLogLine(m_connection, LOGTYPE_WARNING, 1, "not known command byte");
 		break;
 	};
-	
+
 	outputBuffer.WriteToSocket(m_socket);
 	return CONTINUE_LOOP;
 }
@@ -434,15 +434,15 @@ bool AdminProtocol::adminCommandCloseServer()
 			++it;
 		}
 	}
-	
+
 	if(!g_bans.saveBans(g_config.getString(ConfigManager::BAN_FILE))){
 		return false;
 	}
-	
+
 	if(!g_game.map->saveMap("")){
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -472,9 +472,9 @@ AdminProtocolConfig::~AdminProtocolConfig()
 }
 
 bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
-{	
+{
 	std::string filename = directory + "admin.xml";
-	
+
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	if(!doc){
 		return false;
@@ -482,12 +482,12 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 
 	xmlNodePtr root, p, q;
 	root = xmlDocGetRootElement(doc);
-	
+
 	if(!xmlStrEqual(root->name,(const xmlChar*)"otadmin")){
 		xmlFreeDoc(doc);
 		return false;
 	}
-		
+
 	int enabled;
 	if(readXMLInteger(root, "enabled", enabled)){
 		if(enabled){
@@ -497,7 +497,7 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 			m_enabled = false;
 		}
 	}
-		
+
 	int value;
 	p = root->children;
 	while(p){

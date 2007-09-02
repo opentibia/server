@@ -1035,6 +1035,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
 	//broadcastMessage(message)
 	lua_register(m_luaState, "broadcastMessage", LuaScriptInterface::luaBroadcastMessage);
+	//broadcastMessageEx(message, messageClass)
+	lua_register(m_luaState, "broadcastMessageEx", LuaScriptInterface::luaBroadcastMessageEx);
 	//getGuildId(guild_name)
 	lua_register(m_luaState, "getGuildId", LuaScriptInterface::luaGetGuildId);
 
@@ -2830,8 +2832,25 @@ int LuaScriptInterface::luaBroadcastMessage(lua_State *L)
 {
 	//broadcastMessage(message)
 	std::string message = popString(L);
-	g_game.anonymousBroadcastMessage(message);
+	g_game.anonymousBroadcastMessage(MSG_STATUS_WARNING, message);
 	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaBroadcastMessageEx(lua_State *L)
+{
+	//broadcastMessageEx(message, messageClass)
+	std::string message = popString(L);
+	uint32_t type = popNumber(L);
+
+	if(type >= 0x12 && type <= 0x19){
+		g_game.anonymousBroadcastMessage((MessageClasses)type, message);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc("Not valid messageClass.");
+		lua_pushnumber(L, LUA_ERROR);
+	}
 	return 1;
 }
 

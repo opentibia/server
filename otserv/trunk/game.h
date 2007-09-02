@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -83,7 +83,7 @@ class Game
 public:
   Game();
 	~Game();
-	
+
 	/**
 	  * Load a map.
 	  * \param filename Mapfile to load
@@ -91,18 +91,18 @@ public:
 	  * \returns Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
 	  */
 	int loadMap(std::string filename, std::string filekind);
-	
+
 	/**
 	  * Get the map size - info purpose only
 	  * \param a the referenced witdh var
 	  * \param b the referenced height var
 	  */
 	void getMapDimensions(int& a, int& b) {
-		a = map->mapwidth;  
-		b = map->mapheight;  
+		a = map->mapwidth;
+		b = map->mapheight;
 		return;
 	}
-  
+
 	void setWorldType(WorldType_t type);
 	WorldType_t getWorldType() const {return worldType;}
 	int32_t getInFightTicks() {return inFightTicks;}
@@ -224,7 +224,7 @@ public:
 
 	void moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count, uint16_t spriteId);
-	
+
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count, uint32_t flags = 0);
 
@@ -308,7 +308,7 @@ public:
 	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerBroadcastMessage(Player* player, const std::string& text);
-	bool anonymousBroadcastMessage(const std::string& text);
+	bool anonymousBroadcastMessage(MessageClasses type, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 	bool playerAutoWalk(Player* player, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(Player* player);
@@ -361,21 +361,21 @@ public:
 #ifdef __SKULLSYSTEM__
 	void changeSkull(Player* player, Skulls_t newSkull);
 #endif
-	
+
 	GameState_t getGameState();
 	void setGameState(GameState_t newstate);
 
 	//Lock variable for Game class
-	OTSYS_THREAD_LOCKVAR gameLock;   
+	OTSYS_THREAD_LOCKVAR gameLock;
 
 	//Events
 	void checkWalk(uint32_t creatureId);
 	void checkCreature(uint32_t creatureId, uint32_t interval);
 	void checkLight(int t);
-	
+
 	bool combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
 		int32_t& healthChange, bool checkDefense, bool checkArmor);
-	
+
 	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange);
 	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
 
@@ -399,7 +399,7 @@ protected:
 
 	//list of items that are in trading state, mapped to the player
 	std::map<Item*, uint32_t> tradeItems;
-	
+
 	AutoList<Creature> listCreature;
 
 	OTSYS_THREAD_LOCKVAR eventLock;
@@ -417,7 +417,7 @@ protected:
 		int      type;
 		void*    data;
 	};
-	
+
 	#define DECAY_INTERVAL  10000
 	void checkDecay(int32_t interval);
 	void internalDecayItem(Item* item);
@@ -425,7 +425,7 @@ protected:
 	typedef std::list<Item*> DecayList;
 	DecayList decayItems;
 	DecayList toDecayItems;
-	
+
 	static const int LIGHT_LEVEL_DAY = 250;
 	static const int LIGHT_LEVEL_NIGHT = 40;
 	static const int SUNSET = 1305;
@@ -434,7 +434,7 @@ protected:
 	LightState_t light_state;
 	int light_hour;
 	int light_hour_delta;
-	
+
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
 	std::map<uint32_t, SchedulerTask*> eventIdMap;
 	uint32_t eventIdCount;
@@ -448,7 +448,7 @@ protected:
 	WorldType_t worldType;
 
 	Map* map;
-	
+
 	std::vector<std::string> commandTags;
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
@@ -479,7 +479,7 @@ public:
 	{
 		//
 	}
-	
+
 	virtual void operator()(Game* arg)
 	{
 		if(_eventid != 0){
