@@ -36,9 +36,7 @@ class OutputMessage : public NetworkMessage, boost::noncopyable
 {
 private:
 	OutputMessage() {
-		m_protocol = NULL;
-		m_connection = NULL;
-		m_state = STATE_FREE;
+		freeMessage();
 		m_outputBufferStart = 2;
 	}
 	
@@ -59,6 +57,12 @@ public:
 		STATE_ALLOCATED,
 		STATE_WAITING
 	};
+	
+	void freeMessage(){
+		setProtocol(NULL);
+		setConnection(NULL);
+		setState(OutputMessage::STATE_FREE);
+	}
 	
 protected:
 	
@@ -182,9 +186,7 @@ protected:
 		std::cout << "Write handler" << std::endl;
 		Connection* connection = msg->getConnection();
 		connection->onWriteOperation(error);
-		msg->setProtocol(NULL);
-		msg->setConnection(NULL);
-		msg->setState(OutputMessage::STATE_FREE);
+		msg->freeMessage();
 	}
 	
 	friend class Connection;

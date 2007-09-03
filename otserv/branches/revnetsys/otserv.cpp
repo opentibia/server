@@ -744,6 +744,7 @@ int main(int argc, char *argv[])
 	
 	boost::asio::io_service io_service;
 	Server server(io_service, INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
+	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
 	io_service.run();
 	
 /*

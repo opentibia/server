@@ -159,13 +159,25 @@ void Connection::send(OutputMessage* msg)
 	if(m_closeState == CLOSE_STATE_CLOSING)
 		return;
 	
-	std::cout << "Connection::send " << msg->getMessageLength() << std::endl;
+	if(m_pendingWrite == 0){
+		std::cout << "Connection::send " << msg->getMessageLength() << std::endl;
+		internalSend(msg);
+	}
+	else{
+		std::cout << "Connection:: Adding to queue " << msg->getMessageLength() << std::endl;
+		m_outputQueue.push_back(msg);
+	}
+}
+
+void Connection::internalSend(OutputMessage* msg)
+{
 	boost::asio::async_write(m_socket,
 		boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
 		boost::bind(&OutputMessagePool::writeHandler, msg, boost::asio::placeholders::error));
-	
+		
 	m_pendingWrite++;
 }
+
 
 uint32_t Connection::getIP()
 {
@@ -178,18 +190,6 @@ uint32_t Connection::getIP()
 	else{
 		return 0;
 	}
-	/*
-	sockaddr_in sain;
-	socklen_t salen = sizeof(sockaddr_in);
-
-	if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
-#if defined WIN32 || defined __WINDOWS__
-		return sain.sin_addr.S_un.S_addr;
-#else
-		return sain.sin_addr.s_addr;
-#endif
-	}
-*/
 }
 
 
@@ -201,6 +201,12 @@ void Connection::onWriteOperation(const boost::asio::error& error)
 	if(!error){
 		if(m_pendingWrite > 0){
 			m_pendingWrite--;
+			if(m_outputQueue.size() != 0){
+				OutputMessage* msg = m_outputQueue.front();
+				m_outputQueue.pop_front();
+				std::cout << "Connection::onWriteOperation send " << msg->getMessageLength() << std::endl;
+				internalSend(msg);
+			}
 		}
 		else{
 			std::cout << "onWriteOperation. Error 1" << std::endl;

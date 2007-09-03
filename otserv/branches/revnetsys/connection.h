@@ -76,11 +76,14 @@ private:
 	void closeConnectionTask();
 	void closingConnection();
 	
+	void internalSend(OutputMessage* msg);
+	
 	NetworkMessage m_msg;
 	boost::asio::ip::tcp::socket m_socket;
 	bool m_socketClosed; //TODO. remove in next asio release
 	
 	int32_t m_pendingWrite;
+	std::list <OutputMessage*> m_outputQueue;
 	int32_t m_pendingRead;
 	uint32_t m_closeState;
 	

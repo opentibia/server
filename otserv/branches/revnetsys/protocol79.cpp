@@ -788,7 +788,7 @@ void Protocol79::parseMoveSouth(NetworkMessage& msg)
 
 void Protocol79::parseMoveWest(NetworkMessage& msg)
 {
-	int64_t delay = player->getSleepTicks() * 1.5;
+	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
 	if(delay > 0 ){       
 		Scheduler::getScheduler().addEvent(
 			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, WEST)));
@@ -801,7 +801,7 @@ void Protocol79::parseMoveWest(NetworkMessage& msg)
 
 void Protocol79::parseMoveNorthEast(NetworkMessage& msg)
 {
-	int64_t delay = player->getSleepTicks() * 1.5;
+	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
 	if(delay > 0 ){       
 		Scheduler::getScheduler().addEvent(
 			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, NORTHEAST)));
@@ -814,7 +814,7 @@ void Protocol79::parseMoveNorthEast(NetworkMessage& msg)
 
 void Protocol79::parseMoveSouthEast(NetworkMessage& msg)
 {
-	int64_t delay = player->getSleepTicks() * 1.5;
+	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
 	if(delay > 0 ){       
 		Scheduler::getScheduler().addEvent(
 			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, SOUTHEAST)));
@@ -827,7 +827,7 @@ void Protocol79::parseMoveSouthEast(NetworkMessage& msg)
 
 void Protocol79::parseMoveSouthWest(NetworkMessage& msg)
 {
-	int64_t delay = player->getSleepTicks() * 1.5;
+	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
 	if(delay > 0 ){       
 		Scheduler::getScheduler().addEvent(
 			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, SOUTHWEST)));
@@ -840,7 +840,7 @@ void Protocol79::parseMoveSouthWest(NetworkMessage& msg)
 
 void Protocol79::parseMoveNorthWest(NetworkMessage& msg)
 {
-	int64_t delay = player->getSleepTicks() * 1.5;
+	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
 	if(delay > 0 ){       
 		Scheduler::getScheduler().addEvent(
 			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, NORTHWEST)));
