@@ -112,6 +112,7 @@ protected:
 	bool internalUseWeapon(Player* player, Item* item, Tile* tile) const;
 
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
+	virtual void onUsedAmmo(Player* player, Item* item, Tile* destTile) const;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
 
 	int32_t getManaCost(const Player* player) const;
@@ -149,6 +150,7 @@ public:
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
+	virtual void onUsedAmmo(Player* player, Item* item, Tile* destTile) const;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
 };
 
@@ -168,9 +170,11 @@ public:
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
+	virtual void onUsedAmmo(Player* player, Item* item, Tile* destTile) const;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
 
 	int32_t hitChance;
+	int32_t breakChance;
 	int32_t ammuAttackValue;
 };
 

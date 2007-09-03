@@ -327,6 +327,7 @@ bool Weapon::loadFunction(const std::string& functionName)
 
 bool Weapon::configureWeapon(const ItemType& it)
 {
+	id = it.id;
 	return true;
 }
 
@@ -451,6 +452,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 		Combat::doCombatHealth(player, target, damage, damage, params);
 	}
 
+	onUsedAmmo(player, item, target->getTile());
 	onUsedWeapon(player, item, target->getTile());
 	return true;
 }
@@ -468,28 +470,13 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 	}
 
+	onUsedAmmo(player, item, tile);
 	onUsedWeapon(player, item, tile);
 	return true;
 }
 
 void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 {
-	if(ammoAction == AMMOACTION_REMOVECOUNT){
-		int32_t newCount = std::max(0, item->getItemCount() - 1);
-		g_game.transformItem(item, item->getID(), newCount);
-	}
-	else if(ammoAction == AMMOACTION_REMOVECHARGE){
-		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
-		g_game.transformItem(item, item->getID(), newCharge);
-	}
-	else if(ammoAction == AMMOACTION_MOVE){
-		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, FLAG_NOLIMIT);
-	}
-	else if(item->hasCharges()){
-		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
-		g_game.transformItem(item, item->getID(), newCharge);
-	}
-
 	if(!player->hasFlag(PlayerFlag_NotGainSkill)){
 		skills_t skillType;
 		uint32_t skillPoint = 0;
@@ -519,6 +506,25 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		if(soulCost > 0){
 			player->changeSoul(-soulCost);
 		}
+	}
+}
+
+void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
+{
+	if(ammoAction == AMMOACTION_REMOVECOUNT){
+		int32_t newCount = std::max(0, item->getItemCount() - 1);
+		g_game.transformItem(item, item->getID(), newCount);
+	}
+	else if(ammoAction == AMMOACTION_REMOVECHARGE){
+		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		g_game.transformItem(item, item->getID(), newCharge);
+	}
+	else if(ammoAction == AMMOACTION_MOVE){
+		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, FLAG_NOLIMIT);
+	}
+	else if(item->hasCharges()){
+		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		g_game.transformItem(item, item->getID(), newCharge);
 	}
 }
 
@@ -575,7 +581,9 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 WeaponMelee::WeaponMelee(LuaScriptInterface* _interface) :
 	Weapon(_interface)
 {
-	//
+	params.blockedByArmor = true;
+	params.blockedByShield = true;
+	params.combatType = COMBAT_PHYSICALDAMAGE;
 }
 
 bool WeaponMelee::configureEvent(xmlNodePtr p)
@@ -590,16 +598,17 @@ bool WeaponMelee::configureEvent(xmlNodePtr p)
 bool WeaponMelee::configureWeapon(const ItemType& it)
 {
 	m_scripted = false;
-
-	params.blockedByArmor = true;
-	params.blockedByShield = true;
-	params.combatType = COMBAT_PHYSICALDAMAGE;
-	return true;
+	return Weapon::configureWeapon(it);
 }
 
 void WeaponMelee::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 {
 	Weapon::onUsedWeapon(player, item, destTile);
+}
+
+void WeaponMelee::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
+{
+	Weapon::onUsedAmmo(player, item, destTile);
 }
 
 bool WeaponMelee::getSkillType(const Player* player, const Item* item,
@@ -673,8 +682,12 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* targe
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
 	Weapon(_interface)
 {
-	hitChance = 50;
-	ammuAttackValue = 20;
+	hitChance = 0;
+	breakChance = 0;
+	ammuAttackValue = 0;
+	ammoAction = AMMOACTION_REMOVECOUNT;
+	params.blockedByArmor = true;
+	params.combatType = COMBAT_PHYSICALDAMAGE;
 }
 
 bool WeaponDistance::configureEvent(xmlNodePtr p)
@@ -683,10 +696,31 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 		return false;
 	}
 
-	int intValue;
+	const ItemType& it = Item::items[id];
+	hitChance = it.hitChance;
+	breakChance = it.breakChance;
 
-	if(readXMLInteger(p, "hitchance", intValue)){
+	int intValue;
+	if(readXMLInteger(p, "hitChance", intValue)){
+		if(intValue < 0){
+			intValue = 0;
+		}
+		else if(intValue > 100){
+			intValue = 100;
+		}
+
 		hitChance = intValue;
+	}
+
+	if(readXMLInteger(p, "breakChance", intValue)){
+		if(intValue < 0){
+			intValue = 0;
+		}
+		else if(intValue > 100){
+			intValue = 100;
+		}
+
+		breakChance = intValue;
 	}
 
 	return true;
@@ -696,42 +730,40 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 {
 	m_scripted = false;
 
-	ammoAction = AMMOACTION_REMOVECOUNT;
-	params.blockedByArmor = true;
-	params.combatType = COMBAT_PHYSICALDAMAGE;
-
-	id = it.id;
 	ammuAttackValue = it.attack;
 	params.distanceEffect = it.shootType;
 	range = it.shootRange;
 
+	if(hitChance == 0){
+		hitChance = it.hitChance;
+	}
+
+	if(breakChance == 0){
+		breakChance = it.breakChance;
+	}
+
 	switch(it.amuType){
 		case AMMO_ARROW:
 		{
-			hitChance = 80;
+			hitChance = (hitChance > 0 ? hitChance : 80);
+			breakChance = (breakChance > 0 ? breakChance : 7);
 			break;
 		}
 
 		case AMMO_BOLT:
 		{
-			hitChance = 90;
+			hitChance = (hitChance > 0 ? hitChance : 90);
+			breakChance = (breakChance > 0 ? breakChance : 7);
 			break;
 		}
 
 		default:
-			hitChance = 50;
+			hitChance = (hitChance > 0 ? hitChance : 50);
 			break;
 	}
 
-	return true;
+	return Weapon::configureWeapon(it);
 }
-
-/*
-uint32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
-{
-	return Weapon::playerWeaponCheck(player, target);
-}
-*/
 
 bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) const
 {
@@ -770,6 +802,17 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 {
 	Weapon::onUsedWeapon(player, item, destTile);
+}
+
+void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
+{
+	if(ammoAction == AMMOACTION_MOVE && breakChance > 0 && random_range(0, 100) < breakChance){
+		int32_t newCount = std::max(0, item->getItemCount() - 1);
+		g_game.transformItem(item, item->getID(), newCount);
+	}
+	else{
+		Weapon::onUsedAmmo(player, item, destTile);
+	}
 }
 
 int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const

@@ -228,6 +228,7 @@ public:
 	bool showCharges;
 	uint32_t charges;
 	uint32_t breakChance;
+	uint32_t hitChance;
 	uint32_t shootRange;
 
 	Abilities abilities;

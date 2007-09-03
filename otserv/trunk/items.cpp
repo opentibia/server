@@ -101,6 +101,7 @@ ItemType::ItemType()
 	showDuration  = false;
 	showCharges   = false;
 	charges       = 0;
+	hitChance     = 0; 
 	breakChance   = 0;
 	shootRange    = 1;
 
@@ -644,6 +645,30 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(strcasecmp(strValue.c_str(), "showcharges") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.showCharges = (intValue != 0);
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "breakChance") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									if(intValue < 0){
+										intValue = 0;
+									}
+									else if(intValue > 100){
+										intValue = 100;
+									}
+
+									it.breakChance = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "hitChance") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									if(intValue < 0){
+										intValue = 0;
+									}
+									else if(intValue > 100){
+										intValue = 100;
+									}
+
+									it.hitChance = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "invisible") == 0){
