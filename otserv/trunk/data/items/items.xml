@@ -2501,7 +2501,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="smallstone"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="10"/>
+		<attribute key="breakChance" value="7"/>
 	</item>
 	<item id="1295" article="a" name="stone">
 		<attribute key="weight" value="3000"/>
@@ -5864,7 +5864,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="spear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="10"/>
+		<attribute key="breakChance" value="10"/> <!-- ? -->
 	</item>
 	<item id="2390" article="a" name="magic longsword">
 		<attribute key="description" value="It is the magic Cyclopmania Sword."/>
@@ -6011,7 +6011,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="throwingknife"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="10"/>
+		<attribute key="breakChance" value="7"/>
 	</item>
 	<item id="2411" article="a" name="poison dagger">
 		<attribute key="weight" value="880"/>
@@ -19442,6 +19442,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="enchantedspear"/>
 		<attribute key="range" value="5"/>
+		<attribute key="breakChance" value="7"/> <!-- ? -->
 	</item>
 	<item id="7368" article="an" name="assassin star" plural="assassin stars">
 		<attribute key="weight" value="200"/>
@@ -19449,6 +19450,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="redstar"/>
 		<attribute key="range" value="5"/>
+		<attribute key="breakChance" value="100"/>
 	</item>
 	<item id="7369" article="a" name="golden trophy">
 		<attribute key="weight" value="3500"/>
@@ -19483,6 +19485,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="royalspear"/>
 		<attribute key="range" value="5"/>
+		<attribute key="breakChance" value="10"/> <!-- ? -->
 	</item>
 	<item id="7379" name="brutetamer's staff">
 		<attribute key="weight" value="3800"/>
