@@ -236,12 +236,12 @@ void formatDate2(time_t time, char* buffer)
 }
 
 struct MagicEffectNames{
-	char* name;
+	const char* name;
 	MagicEffectClasses effect;
 };
 
 struct ShootTypeNames{
-	char* name;
+	const char* name;
 	ShootType_t shoot;
 };
 

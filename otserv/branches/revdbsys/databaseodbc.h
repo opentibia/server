@@ -27,8 +27,8 @@
 // Author: bruno <brfwolf@thormenta.com>, (C) 2007
 //
 //
-#ifndef __OTSERV_DatabaseODBC_H__
-#define __OTSERV_DatabaseODBC_H__
+#ifndef __DATABASE_ODBC_H__
+#define __DATABASE_ODBC_H__
 
 #include "database.h"
 
@@ -76,7 +76,6 @@ protected:
 class ODBCStatement : public _DBStatement
 {
 	friend class DatabaseODBC;
-	friend class _Database;
 
 public:
 	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value);
@@ -103,8 +102,6 @@ protected:
 class ODBCResult : public _DBResult
 {
 	friend class DatabaseODBC;
-	friend class ODBCStatement;
-	friend class _Database;
 
 public:
 	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);

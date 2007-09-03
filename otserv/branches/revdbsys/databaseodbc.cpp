@@ -31,10 +31,10 @@
 #include <iostream>
 
 #include "databaseodbc.h"
-#include "configmanager.h"
 
 #define RETURN_SUCCESS(ret) (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 
+#include "configmanager.h"
 extern ConfigManager g_config;
 
 /** DatabaseODBC definitions */
@@ -259,13 +259,12 @@ std::string DatabaseODBC::_parse(const std::string &s)
 
 void DatabaseODBC::freeStatement(DBStatement* stmt)
 {
-/** FIXME: causes segfault when trying to allocate new statement handle */
-	//delete (ODBCStatement*)stmt;
+	delete (ODBCStatement*)stmt;
 }
 
 void DatabaseODBC::freeResult(DBResult* res)
 {
-	//delete (ODBCResult*)res;
+	delete (ODBCResult*)res;
 }
 
 /** ODBCStatement definitions */

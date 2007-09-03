@@ -35,7 +35,7 @@ public:
 	/** Get a textual description of what source is used
 	* \returns Name of the source
 	*/
-	virtual char* getSourceDescription() = 0;
+	virtual const char* getSourceDescription() = 0;
 
 	/** Load the map from a file/database
 	  * \param map pointer to the Map class

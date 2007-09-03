@@ -31,11 +31,8 @@
 class IOAccount {
   public:
 	static IOAccount* instance();
-	/** Get a textual description of what source is used
-	  * \returns Name of the source*/
-	virtual char* getSourceDescription(){return "Account source: SQL";};
+
 	virtual Account loadAccount(uint32_t accno);
-	
 	virtual bool getPassword(uint32_t accno, const std::string& name, std::string& password);
 
 	IOAccount();

@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_DATABASE_H__
-#define __OTSERV_DATABASE_H__
+#ifndef __DATABASE_H__
+#define __DATABASE_H__
 
 #include "definitions.h"
 #include "otsystem.h"
@@ -150,7 +150,7 @@ public:
 /**
  * Resource freeing.
  * 
- * @param DBResult*|DBStatement resource to be freed
+ * @param DBResult*|DBStatement* resource to be freed
  */
 	DATABASE_VIRTUAL void freeStatement(DBStatement *stmt) {};
 	DATABASE_VIRTUAL void freeResult(DBResult *res) {};
@@ -165,6 +165,69 @@ private:
 
 /**
  * Prepared statent class.
+ * 
+ * This class stores pre-compiled query which can be evaluated many times. However there are some limitations:
+ * 
+ * - Only commands that doesn't return any results can be evaluated this way (like INSERT, UDPATE, not SELECT).
+ * - Only one prepared statement can exist at one time - at all this limitation affects only PostgreSQL driver.
+ * - Note that on some database engines if statement was prepared during transaction, after transaction is closed (rolled back, or sometimes even after commiting) prepared statements are dropped.
+ * 
+ * There are two important rules that you must follow during work with prepared statements ALWAYS:
+ * 
+ * - You must bind ALL parameters before any execution.
+ * - You must bind parameters again after EACH execute() call.
+ * 
+ * Common usage of this class is:
+ * 
+ * <code>
+ * Database* db = Database::getInstance();
+ * DBStatement* stmt;
+ * 
+ * if(stmt = db->prepareStatement("INSERT INTO `player_items` (`player_id`, `sid`, `attributes`) VALUES (?, ?, ?)")) {
+ *	unsigned long size;
+ *	const char* attributes;
+ *	
+ *	attributes = item1->getAttributes(&size);
+ *	stmt->setInt(1, player1->getGUID() );
+ *	stmt->setInt(2, runningID++);
+ *	stmt->bindStream(3, attributes, size);
+ *	// execute() performs statement with given parameters
+ *	if(!stmt->execute()) {
+ *		std::cout << "Error during INSERT query." << std::endl;
+ *		db->freeStatement(stmt);
+ *		return;
+ *	}
+ * 
+ *	attributes = item2->getAttributes(&size);
+ *	stmt->setInt(1, player2->getGUID() );
+ *	stmt->setInt(2, runningID++);
+ *	stmt->bindStream(3, attributes, size);
+ *	// execute() performs statement with given parameters
+ *	if(!stmt->execute()) {
+ *		std::cout << "Error during INSERT query." << std::endl;
+ *		db->freeStatement(stmt);
+ *		return;
+ *	}
+ * 
+ *	attributes = item3->getAttributes(&size);
+ *	stmt->setInt(1, player3->getGUID() );
+ *	stmt->setInt(2, runningID++);
+ *	stmt->bindStream(3, attributes, size);
+ *	// execute() performs statement with given parameters
+ *	if(!stmt->execute()) {
+ *		std::cout << "Error during INSERT query." << std::endl;
+ *		db->freeStatement(stmt);
+ *		return;
+ *	}
+ * 
+ *	// more evaluations
+ * 
+ *	// remember about this
+ *	db->freeStatement(stmt);
+ * } else {
+ *	std::cout << "Error during preparing statement." << std::endl;
+ * }
+ * </code>
  * 
  * @author wrzasq <wrzasq@gmail.com>
  */
@@ -200,6 +263,28 @@ protected:
 
 /**
  * Query results.
+ * 
+ * This class handles results of queries like SELECT, or SHOW. It handles only currently used row and retrives next continously to reduce used resources. Common usage of this class is:
+ * 
+ * <code>
+ * Database* db = Database::getInstance();
+ * DBResult* result;
+ * 
+ * if(result = db->storeQuery("SELECT `id`, `name`, `conditions` FROM `players`")) {
+ *	unsigned long size;
+ *	const char* conditions;
+ *	// next() will return false when there are no more records
+ *	while(result->next()) {
+ *		conditions = db->getDataStream("conditions", &size);
+ *		std::cout << "Player " << result->getDataString("name") << " with ID " << player->getDataInt("id") << " has " << size << " bytes in conditions stream." << std::endl;
+ *	}
+ * 
+ *	// remember about this
+ *	db->freeResult(result);
+ * } else {
+ *	std::cout << "Error during SELECT query." << std::endl;
+ * }
+ * </code>
  * 
  * @author <wrzasq@gmail.com>
  */

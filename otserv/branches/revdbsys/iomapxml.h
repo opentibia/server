@@ -32,7 +32,7 @@ public:
 	IOMapXML(){};
 	~IOMapXML(){};
 
-	virtual char* getSourceDescription(){ return "OTX"; };
+	virtual const char* getSourceDescription(){ return "OTX"; };
 	virtual bool loadMap(Map* map, const std::string& identifier);
 	virtual bool loadSpawns(Map* map);
 	virtual bool loadHouses(Map* map);

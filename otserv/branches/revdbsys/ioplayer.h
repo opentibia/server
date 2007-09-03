@@ -47,9 +47,6 @@ class IOPlayer {
 public:
 	static IOPlayer* instance();
 
-	/** Get a textual description of what source is used
-	* \returns Name of the source*/
-	virtual char* getSourceDescription(){return "Player source: SQL";};
 	/** Load a player
 	  * \param player Player structure to load to
 	  * \param name Name of the player

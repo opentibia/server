@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_DatabaseSqLite_H__
-#define __OTSERV_DatabaseSqLite_H__
+#ifndef __DATABASE_SQLITE_H__
+#define __DATABASE_SQLITE_H__
 
 #include <sqlite3.h>
 #include <sstream>
@@ -56,7 +56,6 @@ protected:
 class SQLiteStatement : public _DBStatement
 {
 	friend class DatabaseSQLite;
-	friend class _Database;
 
 public:
 	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value);
@@ -76,8 +75,6 @@ protected:
 class SQLiteResult : public _DBResult
 {
 	friend class DatabaseSQLite;
-	friend class SQLiteStatement;
-	friend class _Database;
 
 public:
 	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);

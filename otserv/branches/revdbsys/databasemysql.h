@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_DatabaseMySQL_H__
-#define __OTSERV_DatabaseMySQL_H__
+#ifndef __DATABASE_MYSQL_H__
+#define __DATABASE_MYSQL_H__
 
 #ifdef __MYSQL_ALT_INCLUDE__
 #include <mysql.h>
@@ -58,7 +58,6 @@ protected:
 class MySQLStatement : public _DBStatement
 {
 	friend class DatabaseMySQL;
-	friend class _Database;
 
 public:
 	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value);
@@ -80,8 +79,6 @@ protected:
 class MySQLResult : public _DBResult
 {
 	friend class DatabaseMySQL;
-	friend class MySQLStatement;
-	friend class _Database;
 
 public:
 	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);

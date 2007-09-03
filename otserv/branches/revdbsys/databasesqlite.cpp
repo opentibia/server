@@ -20,10 +20,10 @@
 
 #include <iostream>
 #include "databasesqlite.h"
-#include "configmanager.h"
 
 #define FAILED(_code) _code != SQLITE_OK
 
+#include "configmanager.h"
 extern ConfigManager g_config;
 
 /** DatabaseSQLite definitions */

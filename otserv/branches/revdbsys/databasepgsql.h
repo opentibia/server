@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_DatabasePgPgSQL_H__
-#define __OTSERV_DatabasePgPgSQL_H__
+#ifndef __DATABASE_PGSQL_H__
+#define __DATABASE_PGSQL_H__
 
 #include "database.h"
 
@@ -56,7 +56,6 @@ protected:
 class PgSQLStatement : public _DBStatement
 {
 	friend class DatabasePgSQL;
-	friend class _Database;
 
 public:
 	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value);
@@ -80,8 +79,6 @@ protected:
 class PgSQLResult : public _DBResult
 {
 	friend class DatabasePgSQL;
-	friend class PgSQLStatement;
-	friend class _Database;
 
 public:
 	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);

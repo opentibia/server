@@ -21,8 +21,8 @@
 #include <iostream>
 
 #include "databasepgsql.h"
-#include "configmanager.h"
 
+#include "configmanager.h"
 extern ConfigManager g_config;
 
 /** DatabasePgSQL definitions */
