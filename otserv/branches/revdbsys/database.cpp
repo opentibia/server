@@ -40,7 +40,7 @@
 extern ConfigManager g_config;
 #endif
 
-OTSYS_THREAD_LOCKVAR _Database::lock;
+OTSYS_THREAD_LOCKVAR DBQuery::database_lock;
 
 Database* _Database::_instance = NULL;
 
@@ -48,29 +48,35 @@ Database* _Database::instance(){
 	if(!_instance){
 #if defined MULTI_SQL_DRIVERS
 #ifdef __USE_MYSQL__
-        if(g_config.getString(ConfigManager::SQL_TYPE) == "mysql"){
-            _instance = new DatabaseMySQL;
-		}
+		if(g_config.getString(ConfigManager::SQL_TYPE) == "mysql")
+			_instance = new DatabaseMySQL;
 #endif
 #ifdef __USE_ODBC__
-        if(g_config.getString(ConfigManager::SQL_TYPE) == "odbc"){
-            _instance = new DatabaseODBC;
-		}
+		if(g_config.getString(ConfigManager::SQL_TYPE) == "odbc")
+			_instance = new DatabaseODBC;
 #endif
 #ifdef __USE_ODBC__
-        if(g_config.getString(ConfigManager::SQL_TYPE) == "sqlite"){
-            _instance = new DatabaseSQLite;
-		}
+		if(g_config.getString(ConfigManager::SQL_TYPE) == "sqlite")
+			_instance = new DatabaseSQLite;
 #endif
 #ifdef __USE_PGSQL__
-        if(g_config.getString(ConfigManager::SQL_TYPE) == "pgsql"){
-            _instance = new DatabasePgSQL;
-		}
+		if(g_config.getString(ConfigManager::SQL_TYPE) == "pgsql")
+			_instance = new DatabasePgSQL;
 #endif
 #else
 		_instance = new Database;
 #endif
-		OTSYS_THREAD_LOCKVARINIT(Database::lock);
+		OTSYS_THREAD_LOCKVARINIT(DBQuery::database_lock);
 	}
 	return _instance;
+}
+
+DBQuery::DBQuery()
+{
+	OTSYS_THREAD_LOCK(database_lock, NULL);
+}
+
+DBQuery::~DBQuery()
+{
+	OTSYS_THREAD_UNLOCK(database_lock, NULL);
 }

@@ -31,14 +31,12 @@ DatabasePgSQL::DatabasePgSQL()
 {
 	// load connection parameters
 	std::string dns = "host='" + g_config.getString(ConfigManager::SQL_HOST) + "' dbname='" + g_config.getString(ConfigManager::SQL_DB) + "' user='" + g_config.getString(ConfigManager::SQL_USER) + "' password='" + g_config.getString(ConfigManager::SQL_PASS) + "'";
-	m_connected = false;
 
 	m_handle = PQconnectdb(dns.c_str());
 	m_connected = PQstatus(m_handle) == CONNECTION_OK;
 
-	if (!m_connected) {
+	if(!m_connected)
 		std::cout << "Failed to connected to PostgreSQL database: " << PQerrorMessage(m_handle) << std::endl;
-	}
 }
 
 DatabasePgSQL::~DatabasePgSQL()
@@ -70,17 +68,14 @@ DBStatement* DatabasePgSQL::prepareStatement(const std::string &query)
 	std::cout << "PGSQL PREPARED STATEMENT: " << query << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK(Database::lock, NULL);
-
 	// we dont need special parameters info
-	PGresult* stmt = PQprepare(m_handle, "", DatabasePgSQL::_parse(query).c_str(), 0, NULL);
+	PGresult* stmt = PQprepare(m_handle, "", _parse(query).c_str(), 0, NULL);
 	ExecStatusType stat = PQresultStatus(stmt);
 	PQclear(stmt);
 
 	// checks if statement is ok
 	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK) {
 		std::cout << "PQprepare(): PgSQL error: " << PQerrorMessage(m_handle);
-		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 		return NULL;
 	}
 
@@ -98,23 +93,18 @@ bool DatabasePgSQL::executeQuery(const std::string &query)
 	std::cout << "PGSQL QUERY: " << query << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK(Database::lock, NULL);
-
 	// executes query
-	PGresult* res = PQexec(m_handle, DatabasePgSQL::_parse(query).c_str() );
+	PGresult* res = PQexec(m_handle, _parse(query).c_str() );
 	ExecStatusType stat = PQresultStatus(res);
 
-	if (stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK)
-	{
+	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK) {
 		std::cout << "PQexec(): " << query << ": " << PQresultErrorMessage(res) << std::endl;
 		PQclear(res);
-		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 		return false;
 	}
 
 	// everything went fine
 	PQclear(res);
-	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 	return true;
 }
 
@@ -127,17 +117,13 @@ DBResult* DatabasePgSQL::storeQuery(const std::string &query)
 	std::cout << "PGSQL QUERY: " << query << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK(Database::lock, NULL);
-
 	// executes query
-	PGresult* res = PQexec(m_handle, DatabasePgSQL::_parse(query).c_str() );
+	PGresult* res = PQexec(m_handle, _parse(query).c_str() );
 	ExecStatusType stat = PQresultStatus(res);
 
-	if (stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK)
-	{
+	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK) {
 		std::cout << "PQexec(): " << query << ": " << PQresultErrorMessage(res) << std::endl;
 		PQclear(res);
-		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 		return false;
 	}
 
@@ -148,8 +134,8 @@ DBResult* DatabasePgSQL::storeQuery(const std::string &query)
 
 std::string DatabasePgSQL::escapeString(const std::string &s)
 {
+	// remember to escape even empty string!
 	if(!s.size())
-		// remember to escape even empty string!
 		return std::string("''");
 
 	// the worst case is 2n + 1
@@ -171,7 +157,7 @@ std::string DatabasePgSQL::_parse(const std::string &s)
 	bool inString = false;
 	uint8_t ch;
 	uint8_t param = 0;
-	for(int a = 0; a < s.length(); a++){
+	for(int a = 0; a < s.length(); a++) {
 		ch = s[a];
 
 		if(ch == '\'') {
@@ -213,14 +199,12 @@ void PgSQLStatement::setInt(int32_t param, int32_t value)
 {
 	m_binds[param - 1] = new char[11];
 	m_lengths[param - 1] = sprintf(m_binds[param - 1], "%d", value);
-	m_alloc[param - 1] = true;
 }
 
 void PgSQLStatement::setLong(int32_t param, int64_t value)
 {
 	m_binds[param - 1] = new char[21];
 	m_lengths[param - 1] = sprintf(m_binds[param - 1], "%d", value);
-	m_alloc[param - 1] = true;
 }
 
 void PgSQLStatement::setString(int32_t param, const std::string &value)
@@ -228,7 +212,6 @@ void PgSQLStatement::setString(int32_t param, const std::string &value)
 	m_lengths[param - 1] = value.length();
 	m_binds[param - 1] = new char[value.length()];
 	strcpy(m_binds[param - 1], value.c_str() );
-	m_alloc[param - 1] = true;
 }
 
 void PgSQLStatement::bindStream(int32_t param, const char* value, unsigned long size)
@@ -236,7 +219,6 @@ void PgSQLStatement::bindStream(int32_t param, const char* value, unsigned long 
 	m_lengths[param - 1] = size;
 	m_binds[param - 1] = new char[size];
 	memcpy(m_binds[param - 1], value, size);
-	m_alloc[param - 1] = true;
 }
 
 bool PgSQLStatement::execute()
@@ -252,7 +234,7 @@ bool PgSQLStatement::execute()
 
 	// frees allocated binds
 	for( int32_t i = 0; i < m_params; i++)
-		if ( m_alloc[i] ) { delete[] m_binds[i]; m_alloc[i] = false; }
+		delete[] m_binds[i];
 
 	PQclear(res);
 	return true;
@@ -268,19 +250,16 @@ PgSQLStatement::PgSQLStatement(PGconn* conn)
 
 	m_binds = new char*[m_params];
 	m_lengths = new int32_t[m_params];
-	m_alloc = new bool[m_params];
 }
 
 PgSQLStatement::~PgSQLStatement()
 {
 	// frees allocated binds
 	for( int32_t i = 0; i < m_params; i++)
-		if ( m_alloc[i] ) { delete[] m_binds[i]; m_alloc[i] = false; }
+		delete[] m_binds[i];
 
 	delete[] m_lengths;
 	delete[] m_binds;
-	delete[] m_alloc;
-	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 }
 
 /** PgSQLResult definitions */
@@ -302,10 +281,10 @@ std::string PgSQLResult::getDataString(const std::string &s)
 
 const char* PgSQLResult::getDataStream(const std::string &s, unsigned long &size)
 {
-	std::string buff = PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) );
-	char* temp = new char[buff.size()];
-	size = buff.size();
-	strcpy(temp, buff.c_str() );
+	std::string buf = PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) );
+	char* temp = new char[buf.size()];
+	size = buf.size();
+	strcpy(temp, buf.c_str() );
 	return temp;
 }
 
@@ -328,5 +307,4 @@ PgSQLResult::PgSQLResult(PGresult* results)
 PgSQLResult::~PgSQLResult()
 {
 	PQclear(m_handle);
-	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 }

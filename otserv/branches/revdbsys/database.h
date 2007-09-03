@@ -25,7 +25,6 @@
 #include "otsystem.h"
 
 #include <sstream>
-#include <map>
 
 #ifdef MULTI_SQL_DRIVERS
 #define DATABASE_VIRTUAL virtual
@@ -77,6 +76,8 @@ typedef DATABASE_CLASS Database;
 typedef DBSTMT_CLASS DBStatement;
 typedef DBRES_CLASS DBResult;
 
+class DBQuery;
+
 /**
  * Generic database connection handler. All drivers must extend it.
  * 
@@ -85,9 +86,6 @@ typedef DBRES_CLASS DBResult;
 class _Database
 {
 public:
-	// thread-safety for database queries
-	static OTSYS_THREAD_LOCKVAR lock;
-
 /**
  * Singleton implementation.
  * 
@@ -243,6 +241,23 @@ public:
 protected:
 	_DBResult() {};
 	DATABASE_VIRTUAL ~_DBResult() {};
+};
+
+/**
+ * Thread locking hack.
+ * 
+ * By using this class for your queries you lock and unlock database for threads.
+ */
+class DBQuery : public std::stringstream
+{
+	friend class _Database;
+
+public:
+	DBQuery();
+	~DBQuery();
+
+protected:
+	static OTSYS_THREAD_LOCKVAR database_lock;
 };
 
 #ifndef MULTI_SQL_DRIVERS

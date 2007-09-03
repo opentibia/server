@@ -73,7 +73,6 @@ protected:
 	int32_t m_params;
 	char** m_binds;
 	int32_t* m_lengths;
-	bool* m_alloc;
 
 	PGconn* m_handle;
 };

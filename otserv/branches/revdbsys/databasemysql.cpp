@@ -46,7 +46,7 @@ DatabaseMySQL::DatabaseMySQL()
 	mysql_options(&m_handle, MYSQL_OPT_RECONNECT, &reconnect);
 
 	// connects to database
-	if ( !mysql_real_connect(&m_handle, g_config.getString(ConfigManager::SQL_HOST).c_str(), g_config.getString(ConfigManager::SQL_USER).c_str(), g_config.getString(ConfigManager::SQL_PASS).c_str(), g_config.getString(ConfigManager::SQL_DB).c_str(), 0, NULL, 0) ) {
+	if( !mysql_real_connect(&m_handle, g_config.getString(ConfigManager::SQL_HOST).c_str(), g_config.getString(ConfigManager::SQL_USER).c_str(), g_config.getString(ConfigManager::SQL_PASS).c_str(), g_config.getString(ConfigManager::SQL_DB).c_str(), 0, NULL, 0) ) {
 		std::cout << "Failed to connect to database. MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		return;
 	}
@@ -72,6 +72,7 @@ bool DatabaseMySQL::rollback()
 	#ifdef __SQL_QUERY_DEBUG__
 	std::cout << "ROLLBACK" << std::endl;
 	#endif
+
 	if( mysql_rollback(&m_handle) != 0) {
 		std::cout << "mysql_rollback(): MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		return false;
@@ -105,20 +106,16 @@ DBStatement* DatabaseMySQL::prepareStatement(const std::string &query)
 	std::cout << "MYSQL PREPARED STATEMENT: " << query << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK(Database::lock, NULL);
-
 	// allocates new preapred statement
 	MYSQL_STMT* stmt = mysql_stmt_init(&m_handle);
 
-	if (!stmt) {
+	if(!stmt) {
 		std::cout << "mysql_stmt_init(): MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
-		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 		return NULL;
 	// prepares statement
 	} else if( mysql_stmt_prepare(stmt, query.c_str(), query.length() ) != 0) {
 		std::cout << "mysql_stmt_prepare(): MYSQL ERROR: " << mysql_stmt_error(stmt) << std::endl;
 		mysql_stmt_close(stmt);
-		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 		return NULL;
 	}
 
@@ -136,26 +133,25 @@ bool DatabaseMySQL::executeQuery(const std::string &query)
 	#endif
 
 	bool state = true;
-	OTSYS_THREAD_LOCK(Database::lock, NULL);
 
 	// executes the query
-	if ( mysql_real_query(&m_handle, query.c_str(), query.length() ) != 0)
-	{
+	if( mysql_real_query(&m_handle, query.c_str(), query.length() ) != 0) {
 		std::cout << "mysql_real_query(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
-		if (error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR) {
+
+		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR)
 			m_connected = false;
-		}
+
 		state = false;
 	}
 
 	// we should call that every time as someone would call executeQuery('SELECT...')
 	// as it is described in MySQL manual: "it doesn't hurt" :P
 	MYSQL_RES* m_res = mysql_store_result(&m_handle);
+
 	if(m_res)
 		mysql_free_result(m_res);
 
-	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 	return state;
 }
 
@@ -169,16 +165,16 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 	#endif
 
 	bool state = true;
-	OTSYS_THREAD_LOCK(Database::lock, NULL);
 
 	// executes the query
-	if ( mysql_real_query(&m_handle, query.c_str(), query.length() ) != 0)
+	if( mysql_real_query(&m_handle, query.c_str(), query.length() ) != 0)
 	{
 		std::cout << "mysql_real_query(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
-		if (error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR) {
+
+		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR)
 			m_connected = false;
-		}
+
 		state = false;
 	}
 
@@ -190,10 +186,10 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 	if(!m_res) {
 		std::cout << "mysql_store_result(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
-		if (error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR) {
+
+		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR)
 			m_connected = false;
-		}
-		OTSYS_THREAD_UNLOCK(Database::lock, NULL);
+
 		return NULL;
 	}
 
@@ -204,8 +200,8 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 
 std::string DatabaseMySQL::escapeString(const std::string &s)
 {
+	// remember about quoiting even an empty string!
 	if(!s.size())
-		// remember about quoiting even an empty string!
 		return std::string("''");
 
 	// the worst case is 2n + 1
@@ -234,7 +230,7 @@ void DatabaseMySQL::freeResult(DBResult* res)
 
 void MySQLStatement::setInt(int32_t param, int32_t value)
 {
-	if (param > m_count) {
+	if(param > m_count) {
 		std::cout << "DBStatement::setInt(): parameter out of range." << std::cout;
 		return;
 	}
@@ -249,7 +245,7 @@ void MySQLStatement::setInt(int32_t param, int32_t value)
 
 void MySQLStatement::setLong(int32_t param, int64_t value)
 {
-	if (param > m_count) {
+	if(param > m_count) {
 		std::cout << "DBStatement::setLong(): parameter out of range." << std::cout;
 		return;
 	}
@@ -263,7 +259,7 @@ void MySQLStatement::setLong(int32_t param, int64_t value)
 
 void MySQLStatement::setString(int32_t param, const std::string &value)
 {
-	if (param > m_count) {
+	if(param > m_count) {
 		std::cout << "DBStatement::setString(): parameter out of range." << std::cout;
 		return;
 	}
@@ -278,7 +274,7 @@ void MySQLStatement::setString(int32_t param, const std::string &value)
 
 void MySQLStatement::bindStream(int32_t param, const char* value, unsigned long size)
 {
-	if (param > m_count) {
+	if(param > m_count) {
 		std::cout << "DBStatement::bindStream(): parameter out of range." << std::cout;
 		return;
 	}
@@ -294,14 +290,14 @@ void MySQLStatement::bindStream(int32_t param, const char* value, unsigned long 
 bool MySQLStatement::execute()
 {
 	// binds parameters
-	if ( mysql_stmt_bind_param(m_handle, m_bind) != 0)
+	if( mysql_stmt_bind_param(m_handle, m_bind) != 0)
 	{
 		std::cout << "mysql_stmt_bind_param(): MYSQL ERROR: " << mysql_stmt_error(m_handle) << std::endl;
 		return false;
 	}
 
 	// executes query
-	if ( mysql_stmt_execute(m_handle) != 0)
+	if( mysql_stmt_execute(m_handle) != 0)
 	{
 		std::cout << "mysql_stmt_execute(): MYSQL ERROR: " << mysql_stmt_error(m_handle) << std::endl;
 		return false;
@@ -343,8 +339,6 @@ MySQLStatement::~MySQLStatement()
 	// frees statements info
 	delete[] m_bind;
 	mysql_stmt_close(m_handle);
-
-	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 }
 
 /** MySQLResult definitions */
@@ -352,8 +346,7 @@ MySQLStatement::~MySQLStatement()
 int32_t MySQLResult::getDataInt(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() )
-	{
+	if(it != m_listNames.end() ) {
 		if(m_row[it->second] == NULL)
 			return 0;
 		else
@@ -367,8 +360,7 @@ int32_t MySQLResult::getDataInt(const std::string &s)
 int64_t MySQLResult::getDataLong(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() )
-	{
+	if(it != m_listNames.end() ) {
 		if(m_row[it->second] == NULL)
 			return 0;
 		else
@@ -382,8 +374,7 @@ int64_t MySQLResult::getDataLong(const std::string &s)
 std::string MySQLResult::getDataString(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() )
-	{
+	if(it != m_listNames.end() ) {
 		if(m_row[it->second] == NULL)
 			return std::string("");
 		else
@@ -397,8 +388,7 @@ std::string MySQLResult::getDataString(const std::string &s)
 const char* MySQLResult::getDataStream(const std::string &s, unsigned long &size)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() )
-	{
+	if(it != m_listNames.end() ) {
 		if(m_row[it->second] == NULL) {
 			size = 0;
 			return NULL;
@@ -435,5 +425,4 @@ MySQLResult::MySQLResult(MYSQL_RES* res)
 MySQLResult::~MySQLResult()
 {
 	mysql_free_result(m_handle);
-	OTSYS_THREAD_UNLOCK(Database::lock, NULL);
 }

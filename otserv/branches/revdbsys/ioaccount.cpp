@@ -35,13 +35,11 @@ extern ConfigManager g_config;
 
 IOAccount* IOAccount::_instance = NULL;
 
-IOAccount* IOAccount::instance(){
-	if(!_instance){
+IOAccount* IOAccount::instance()
+{
+	if(!_instance)
 		_instance = new IOAccount;
-	}
-	#ifdef __DEBUG__
-	printf("%s \n", _instance->getSourceDescription());
-	#endif
+
 	return _instance;
 }
 
@@ -55,25 +53,27 @@ Account IOAccount::loadAccount(uint32_t accno)
 	Account acc;
 
 	Database* db = Database::instance();
-	std::stringstream query;
+	DBQuery query;
 	DBResult* result;
 
 	query << "SELECT `id`, `password` FROM `accounts` WHERE `id` = " << accno;
-	result = db->storeQuery(query.str());
-	if(result != NULL && result->next())
-	{
-		acc.accnumber = result->getDataInt("id");
-		acc.password = result->getDataString("password");
+	if(result = db->storeQuery(query.str())) {
+		if(result->next()) {
+			acc.accnumber = result->getDataInt("id");
+			acc.password = result->getDataString("password");
+			db->freeResult(result);
 
-		query.str("");
-		query << "SELECT `name` FROM `players` WHERE `account_id` = " << accno;
-		if(result = db->storeQuery(query.str())){
-			while(result->next()) {
-				std::string ss = result->getDataString("name");
-				acc.charList.push_back(ss.c_str());
+			query.str("SELECT `name` FROM `players` WHERE `account_id` = ");
+			query << accno;
+			if(result = db->storeQuery(query.str())) {
+				while(result->next()) {
+					std::string ss = result->getDataString("name");
+					acc.charList.push_back(ss.c_str());
+				}
+				acc.charList.sort();
 			}
-			acc.charList.sort();
 		}
+
 		db->freeResult(result);
 	}
 
@@ -83,23 +83,27 @@ Account IOAccount::loadAccount(uint32_t accno)
 bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string &password)
 {
 	Database* db = Database::instance();
-	std::stringstream query;
+	DBQuery query;
 	DBResult* result;
 
 	query << "SELECT `password` FROM `accounts` WHERE `id` = " << accno;
-	result = db->storeQuery(query.str());
-	if(result != NULL && result->next()) {
-		std::string acc_password = result->getDataString("password");
-
-		db->freeResult(result);
-
-		query.str("");
-		query << "SELECT `name` FROM `players` WHERE `account_id` = " << accno << " AND `name` = " << db->escapeString(name);
-		result = db->storeQuery(query.str());
-		if(result != NULL && result->next()) {
-			password = acc_password;
-			return true;
+	if(result = db->storeQuery(query.str())) {
+		if(result->next()) {
+			std::string acc_password = result->getDataString("password");
+	
+			db->freeResult(result);
+	
+			query.str("SELECT `name` FROM `players` WHERE `account_id` = ");
+			query << accno << " AND `name` = " << db->escapeString(name);
+			if(result = db->storeQuery(query.str())) {
+				if(result->next()) {
+					password = acc_password;
+					db->freeResult(result);
+					return true;
+				}
+			}
 		}
+
 		db->freeResult(result);
 	}
 

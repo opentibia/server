@@ -49,12 +49,12 @@ bool Ban::isIpBanished(SOCKET s)
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	uint32_t clientip = getIPSocket(s);
 	if(clientip != 0){
-		for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
-			if((it->ip & it->mask) == (clientip & it->mask)){
+		for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it) {
+			if((it->ip & it->mask) == (clientip & it->mask)) {
 				uint32_t currentTime = std::time(NULL);
-				if(it->time == 0 || currentTime < it->time){
+
+				if(it->time == 0 || currentTime < it->time)
 					return true;
-				}
 			}
 		}
 	}
@@ -65,9 +65,8 @@ bool Ban::isIpBanished(SOCKET s)
 bool Ban::isIpDisabled(SOCKET s)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	if(maxLoginTries == 0){
+	if(maxLoginTries == 0)
 		return false;
-	}
 
 	uint32_t clientip = getIPSocket(s);
 	if(clientip != 0){
@@ -75,9 +74,8 @@ bool Ban::isIpDisabled(SOCKET s)
 		IpLoginMap::const_iterator it = ipLoginMap.find(clientip);
 		if(it != ipLoginMap.end()){
 			if( (it->second.numberOfLogins >= maxLoginTries) &&
-				(currentTime < it->second.lastLoginTime + loginTimeout) ){
+				(currentTime < it->second.lastLoginTime + loginTimeout) )
 				return true;
-			}
 		}
 	}
 
@@ -89,14 +87,13 @@ bool Ban::acceptConnection(SOCKET s)
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	uint32_t clientip = getIPSocket(s);
 
-	if(clientip == 0){
+	if(clientip == 0)
 		return false;
-	}
 
 	uint64_t currentTime = OTSYS_TIME();
 
 	IpConnectMap::iterator it = ipConnectMap.find(clientip);
-	if(it == ipConnectMap.end()){
+	if(it == ipConnectMap.end()) {
 		ConnectBlock cb;
 		cb.lastConnection = currentTime;
 
@@ -104,9 +101,8 @@ bool Ban::acceptConnection(SOCKET s)
 		return true;
 	}
 
-	if(currentTime - it->second.lastConnection < 1000){
+	if(currentTime - it->second.lastConnection < 1000)
 		return false;
-	}
 
 	it->second.lastConnection = currentTime;
 	return true;
@@ -116,7 +112,7 @@ void Ban::addLoginAttempt(SOCKET s, bool isSuccess)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	uint32_t clientip = getIPSocket(s);
-	if(clientip != 0){
+	if(clientip != 0) {
 		uint32_t currentTime = std::time(NULL);
 
 		IpLoginMap::iterator it = ipLoginMap.find(clientip);
@@ -129,13 +125,11 @@ void Ban::addLoginAttempt(SOCKET s, bool isSuccess)
 			it = ipLoginMap.find(clientip);
 		}
 
-		if(it->second.numberOfLogins >= maxLoginTries){
+		if(it->second.numberOfLogins >= maxLoginTries)
 			it->second.numberOfLogins = 0;
-		}
 
-		if(!isSuccess || (currentTime < it->second.lastLoginTime + retryTimeout) ){
+		if(!isSuccess || (currentTime < it->second.lastLoginTime + retryTimeout) )
 			++it->second.numberOfLogins;
-		}
 		else
 			it->second.numberOfLogins = 0;
 
@@ -148,15 +142,14 @@ bool Ban::isPlayerBanished(const std::string& name)
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	uint32_t playerId;
 	std::string playerName = name;
-	if(!IOPlayer::instance()->getGuidByName(playerId, playerName)){
+	if(!IOPlayer::instance()->getGuidByName(playerId, playerName))
 		return false;
-	}
+
 	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it){
-   		if(it->id  == playerId){
+		if(it->id  == playerId){
 			uint32_t currentTime = std::time(NULL);
-			if(it->time == 0 || currentTime < it->time){
+			if(it->time == 0 || currentTime < it->time)
 				return true;
-			}
 		}
 	}
 	return false;
@@ -166,25 +159,23 @@ bool Ban::isAccountBanished(uint32_t account)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	uint32_t currentTime = std::time(NULL);
-	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it){
-   		if(it->id  == account){
-			if(it->time == 0 || currentTime < it->time){
+	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it)
+   		if(it->id  == account)
+			if(it->time == 0 || currentTime < it->time)
 				return true;
-			}
-		}
-	}
+
 	return false;
 }
 
 void Ban::addIpBan(uint32_t ip, uint32_t mask, uint32_t time)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
-		if(it->ip == ip && it->mask == mask){
+	for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it)
+		if(it->ip == ip && it->mask == mask) {
 			it->time = time;
 			return;
 		}
-	}
+
 	IpBanStruct ipBanStruct(ip, mask, time);
 	ipBanList.push_back(ipBanStruct);
 }
@@ -192,12 +183,12 @@ void Ban::addIpBan(uint32_t ip, uint32_t mask, uint32_t time)
 void Ban::addPlayerBan(uint32_t playerId, uint32_t time)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it){
-		if(it->id == playerId){
+	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it)
+		if(it->id == playerId) {
 			it->time = time;
 			return;
 		}
-	}
+
 	PlayerBanStruct playerBanStruct(playerId, time);
 	playerBanList.push_back(playerBanStruct);
 }
@@ -205,12 +196,12 @@ void Ban::addPlayerBan(uint32_t playerId, uint32_t time)
 void Ban::addAccountBan(uint32_t account, uint32_t time)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it){
-		if(it->id == account){
+	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it)
+		if(it->id == account) {
 			it->time = time;
 			return;
 		}
-	}
+
 	AccountBanStruct accountBanStruct(account, time);
 	accountBanList.push_back(accountBanStruct);
 }
@@ -218,9 +209,9 @@ void Ban::addAccountBan(uint32_t account, uint32_t time)
 bool Ban::removeIpBan(uint32_t n)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
+	for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it) {
 		--n;
-		if(n == 0){
+		if(n == 0) {
 			ipBanList.erase(it);
 			return true;
 		}
@@ -231,9 +222,9 @@ bool Ban::removeIpBan(uint32_t n)
 bool Ban::removePlayerBan(uint32_t n)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it){
+	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it) {
 		--n;
-		if(n == 0){
+		if(n == 0) {
 			playerBanList.erase(it);
 			return true;
 		}
@@ -244,9 +235,9 @@ bool Ban::removePlayerBan(uint32_t n)
 bool Ban::removeAccountBan(uint32_t n)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it){
+	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it) {
 		--n;
-		if(n == 0){
+		if(n == 0) {
 			accountBanList.erase(it);
 			return true;
 		}
@@ -281,9 +272,9 @@ bool Ban::saveBans()
 
 IOBan* IOBan::getInstance()
 {
-	if(!_instance){
+	if(!_instance)
 		_instance = new IOBan();
-	}
+
 	return _instance;
 }
 
@@ -295,9 +286,10 @@ bool IOBan::loadBans(Ban& banclass)
 {
 	Database* db = Database::instance();
 	DBResult* result;
-	
+	DBQuery query;
+
 	if(!(result = db->storeQuery("SELECT * FROM `bans`")))
-		return true;
+		return false;
 
 	uint32_t currentTime = std::time(NULL);
 	while(result->next()) {
@@ -336,6 +328,7 @@ bool IOBan::loadBans(Ban& banclass)
 bool IOBan::saveBans(const Ban& banclass)
 {
 	Database* db = Database::instance();
+	DBQuery query;
 	
 	if( !db->beginTransaction() )
 		return false;
@@ -350,48 +343,54 @@ bool IOBan::saveBans(const Ban& banclass)
 
 	DBStatement* stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `ip`, `mask`, `time`) VALUES (1, ?, ?, ?)");
 	
-	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it){
-		if(it->time > currentTime){
+	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it) {
+		if(it->time > currentTime) {
 			stmt->setInt(1, it->ip);
 			stmt->setInt(2, it->mask);
 			stmt->setInt(3, it->time);
 
-			if(!stmt->execute()){
+			if(!stmt->execute()) {
+				db->freeStatement(stmt);
 				db->rollback();
 				return false;
 			}
 		}
 	}
+	db->freeStatement(stmt);
 
 	//save player bans
 	stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `player`, `time`) VALUES (2, ?, ?)");
 	
-	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it){
-		if(it->time > currentTime){
+	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it) {
+		if(it->time > currentTime) {
 			stmt->setInt(1, it->id);
 			stmt->setInt(2, it->time);
 
-			if(!stmt->execute()){
+			if(!stmt->execute()) {
+				db->freeStatement(stmt);
 				db->rollback();
 				return false;
 			}
 		}
 	}
+	db->freeStatement(stmt);
 
 	//save account bans
 	stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `account`, `time`) VALUES (3, ?, ?)");
 	
-	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it){
-		if(it->time > currentTime){
+	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it) {
+		if(it->time > currentTime) {
 			stmt->setInt(1, it->id);
 			stmt->setInt(2, it->time);
 
-			if(!stmt->execute()){
+			if(!stmt->execute()) {
+				db->freeStatement(stmt);
 				db->rollback();
 				return false;
 			}
 		}
 	}
 
+	db->freeStatement(stmt);
 	return db->commit();
 }
