@@ -203,6 +203,8 @@ public:
 
 	int32_t getVarStats(stats_t stat) const {return varStats[stat];}
 	void setVarStats(stats_t stat, int32_t modifier);
+	int32_t getDefaultStats(stats_t stat);
+
 	void setConditionSuppressions(uint32_t conditions, bool remove);
 
 	uint32_t getLossPercent(lossTypes_t lossType) const {return lossPercent[lossType];}

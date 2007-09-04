@@ -603,7 +603,34 @@ void Player::setVarStats(stats_t stat, int32_t modifier)
 			break;
 		}
 	}
-};
+}
+
+int32_t Player::getDefaultStats(stats_t stat)
+{
+	switch(stat){
+		case STAT_MAXHITPOINTS:
+		{
+			return getMaxHealth() - getVarStats(STAT_MAXHITPOINTS);
+			break;
+		}
+
+		case STAT_MAXMANAPOINTS:
+			return getMaxMana() - getVarStats(STAT_MAXMANAPOINTS);
+			break;
+
+		case STAT_SOULPOINTS:
+			return getPlayerInfo(PLAYERINFO_SOUL) - getVarStats(STAT_SOULPOINTS);
+			break;
+
+		case STAT_MAGICPOINTS:
+			return getMagicLevel() - getVarStats(STAT_MAGICPOINTS);
+			break;
+
+		default:
+			return 0;
+			break;
+	}
+}
 
 Container* Player::getContainer(uint32_t cid)
 {

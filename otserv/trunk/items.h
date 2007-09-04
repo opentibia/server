@@ -93,16 +93,6 @@ struct Abilities{
 	};
 
 	//damage abilities modifiers
-	/*
-	uint8_t absorbAll;
-	uint8_t absorbPhysical;
-	uint8_t absorbFire;
-	uint8_t absorbEnergy;
-	uint8_t absorbPoison;
-	uint8_t absorbLifeDrain;
-	uint8_t absorbManaDrain;
-	*/
-
 	uint8_t absorbPercentAll;
 	uint8_t absorbPercentPhysical;
 	uint8_t absorbPercentFire;
