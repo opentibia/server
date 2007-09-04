@@ -44,6 +44,15 @@ DatabasePgSQL::~DatabasePgSQL()
 	PQfinish(m_handle);
 }
 
+int DatabasePgSQL::getParam(DBParam_t param)
+{
+	switch(param) {
+		case DBPARAM_MULTIINSERT:
+			return true;
+			break;
+	}
+}
+
 bool DatabasePgSQL::beginTransaction()
 {
 	return executeQuery("BEGIN");
@@ -57,31 +66,6 @@ bool DatabasePgSQL::rollback()
 bool DatabasePgSQL::commit()
 {
 	return executeQuery("COMMIT");
-}
-
-DBStatement* DatabasePgSQL::prepareStatement(const std::string &query)
-{
-	if(!m_connected)
-		return NULL;
-
-	#ifdef __SQL_QUERY_DEBUG__
-	std::cout << "PGSQL PREPARED STATEMENT: " << query << std::endl;
-	#endif
-
-	// we dont need special parameters info
-	PGresult* stmt = PQprepare(m_handle, "", _parse(query).c_str(), 0, NULL);
-	ExecStatusType stat = PQresultStatus(stmt);
-	PQclear(stmt);
-
-	// checks if statement is ok
-	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK) {
-		std::cout << "PQprepare(): PgSQL error: " << PQerrorMessage(m_handle);
-		return NULL;
-	}
-
-	// prepared statement wrapper
-	DBStatement* statement = new PgSQLStatement(m_handle);
-	return statement;
 }
 
 bool DatabasePgSQL::executeQuery(const std::string &query)
@@ -134,19 +118,35 @@ DBResult* DatabasePgSQL::storeQuery(const std::string &query)
 
 std::string DatabasePgSQL::escapeString(const std::string &s)
 {
-	// remember to escape even empty string!
+	// remember to quote even empty string!
 	if(!s.size())
 		return std::string("''");
 
 	// the worst case is 2n + 1
+	int32_t error;
 	char* output = new char[ s.length() * 2 + 1];
 
 	// quotes escaped string and frees temporary buffer
-	PQescapeStringConn(m_handle, output, s.c_str(), s.length(), NULL);
+	PQescapeStringConn(m_handle, output, s.c_str(), s.length(), &error);
 	std::string r = std::string("'");
 	r += output;
 	r += "'";
 	delete[] output;
+	return r;
+}
+
+std::string DatabasePgSQL::escapeBlob(const char* s, uint32_t length)
+{
+	// remember to quote even empty stream!
+	if(!s)
+		return std::string("''");
+
+	// quotes escaped string and frees temporary buffer
+	char* output = (char*)PQescapeByteaConn(m_handle, (unsigned char*)s, length, NULL);
+	std::string r = std::string("'");
+	r += output;
+	r += "'";
+	PQfreemem(output);
 	return r;
 }
 
@@ -170,96 +170,15 @@ std::string DatabasePgSQL::_parse(const std::string &s)
 		if(ch == '`' && !inString)
 			ch = '"';
 
-		// why PostgreSQL must use different notation of parameters in prepared statements >;(
-		if(ch == '?' && !inString) {
-			param++;
-			query += '$';
-			ch = 48 + param;
-		}
-
 		query += ch;
 	}
 
 	return query;
 }
 
-void DatabasePgSQL::freeStatement(DBStatement* stmt)
-{
-	delete (PgSQLStatement*)stmt;
-}
-
 void DatabasePgSQL::freeResult(DBResult* res)
 {
 	delete (PgSQLResult*)res;
-}
-
-/** PgSQLStatement definitions */
-
-void PgSQLStatement::setInt(int32_t param, int32_t value)
-{
-	m_binds[param - 1] = new char[11];
-	m_lengths[param - 1] = sprintf(m_binds[param - 1], "%d", value);
-}
-
-void PgSQLStatement::setLong(int32_t param, int64_t value)
-{
-	m_binds[param - 1] = new char[21];
-	m_lengths[param - 1] = sprintf(m_binds[param - 1], "%d", value);
-}
-
-void PgSQLStatement::setString(int32_t param, const std::string &value)
-{
-	m_lengths[param - 1] = value.length();
-	m_binds[param - 1] = new char[value.length()];
-	strcpy(m_binds[param - 1], value.c_str() );
-}
-
-void PgSQLStatement::bindStream(int32_t param, const char* value, unsigned long size)
-{
-	m_lengths[param - 1] = size;
-	m_binds[param - 1] = new char[size];
-	memcpy(m_binds[param - 1], value, size);
-}
-
-bool PgSQLStatement::execute()
-{
-	PGresult* res = PQexecPrepared(m_handle, "", m_params, m_binds, m_lengths, NULL, 0);
-	ExecStatusType stat = PQresultStatus(res);
-
-	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK) {
-		std::cout << "DBStatement::execute(): PGSQL ERROR: " << PQresultErrorMessage(res) << std::endl;
-		PQclear(res);
-		return false;
-	}
-
-	// frees allocated binds
-	for( int32_t i = 0; i < m_params; i++)
-		delete[] m_binds[i];
-
-	PQclear(res);
-	return true;
-}
-
-PgSQLStatement::PgSQLStatement(PGconn* conn)
-{
-	m_handle = conn;
-
-	PGresult* res = PQdescribePrepared(m_handle, NULL);
-	m_params = PQnparams(res);
-	PQclear(res);
-
-	m_binds = new char*[m_params];
-	m_lengths = new int32_t[m_params];
-}
-
-PgSQLStatement::~PgSQLStatement()
-{
-	// frees allocated binds
-	for( int32_t i = 0; i < m_params; i++)
-		delete[] m_binds[i];
-
-	delete[] m_lengths;
-	delete[] m_binds;
 }
 
 /** PgSQLResult definitions */

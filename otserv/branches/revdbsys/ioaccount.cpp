@@ -63,8 +63,8 @@ Account IOAccount::loadAccount(uint32_t accno)
 			acc.password = result->getDataString("password");
 			db->freeResult(result);
 
-			query.str("SELECT `name` FROM `players` WHERE `account_id` = ");
-			query << accno;
+			query.str("");
+			query << "SELECT `name` FROM `players` WHERE `account_id` = " << accno;
 			if(result = db->storeQuery(query.str())) {
 				while(result->next()) {
 					std::string ss = result->getDataString("name");
@@ -86,22 +86,12 @@ bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `password` FROM `accounts` WHERE `id` = " << accno;
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`id` = " << accno << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` " << db->escapeString(name);
 	if(result = db->storeQuery(query.str())) {
 		if(result->next()) {
-			std::string acc_password = result->getDataString("password");
-	
+			password = result->getDataString("password");
 			db->freeResult(result);
-	
-			query.str("SELECT `name` FROM `players` WHERE `account_id` = ");
-			query << accno << " AND `name` = " << db->escapeString(name);
-			if(result = db->storeQuery(query.str())) {
-				if(result->next()) {
-					password = acc_password;
-					db->freeResult(result);
-					return true;
-				}
-			}
+			return true;
 		}
 
 		db->freeResult(result);

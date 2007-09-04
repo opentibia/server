@@ -29,54 +29,47 @@
 #ifdef MULTI_SQL_DRIVERS
 #define DATABASE_VIRTUAL virtual
 #define DATABASE_CLASS _Database
-#define DBSTMT_CLASS _DBStatement
 #define DBRES_CLASS _DBResult
 class _Database;
-class _DBStatement;
 class _DBResult;
 #else
 #define DATABASE_VIRTUAL
 
 #if defined(__USE_MYSQL__)
 #define DATABASE_CLASS DatabaseMySQL
-#define DBSTMT_CLASS MySQLStatement
 #define DBRES_CLASS MySQLResult
 class DatabaseMySQL;
-class MySQLStatement;
 class MySQLResult;
 
 #elif defined(__USE_SQLITE__)
 #define DATABASE_CLASS DatabaseSQLite
-#define DBSTMT_CLASS SQLiteStatement
 #define DBRES_CLASS SQLiteResult
 class DatabaseSQLite;
-class SQLiteStatement;
 class SQLiteResult;
 
 #elif defined(__USE_ODBC__)
 #define DATABASE_CLASS DatabaseODBC
-#define DBSTMT_CLASS ODBCStatement
 #define DBRES_CLASS ODBCResult
 class DatabaseODBC;
-class ODBCStatement;
 class ODBCResult;
 
 #elif defined(__USE_PGSQL__)
 #define DATABASE_CLASS DatabasePgSQL
-#define DBSTMT_CLASS PgSQLStatement
 #define DBRES_CLASS PgSQLResult
 class DatabasePgSQL;
-class PgSQLStatement;
 class PgSQLResult;
 
 #endif
 #endif
 
 typedef DATABASE_CLASS Database;
-typedef DBSTMT_CLASS DBStatement;
 typedef DBRES_CLASS DBResult;
 
 class DBQuery;
+
+enum DBParam_t {
+	DBPARAM_MULTIINSERT = 1
+};
 
 /**
  * Generic database connection handler. All drivers must extend it.
@@ -96,6 +89,16 @@ public:
 	static Database* instance();
 
 /**
+ * Database information.
+ * 
+ * Returns currently used database attribute.
+ * 
+ * @param DBParam_t parameter to get
+ * @return suitable for given parameter
+ */
+	DATABASE_VIRTUAL int getParam(DBParam_t param) { return 0; }
+
+/**
  * Transaction related methods.
  * 
  * Methods for starting, commiting and rolling back transaction. Each of the returns boolean value.
@@ -104,19 +107,9 @@ public:
  * @note
  *	If your database system doesn't support transactions you should return true - it's not feature test, code should work without transaction, just will lack integrity.
  */
-	DATABASE_VIRTUAL bool beginTransaction() { return false; }
-	DATABASE_VIRTUAL bool rollback() { return false; };
-	DATABASE_VIRTUAL bool commit() { return false; };
-
-/**
- * Generates prepared statement.
- * 
- * Prepared statements are queries templates compiled by database server for further execution with given list of attributes.
- * 
- * @param std::string query pattern
- * @return preated statement instance
- */
-	DATABASE_VIRTUAL DBStatement* prepareStatement(const std::string &query) { return NULL; }
+	DATABASE_VIRTUAL bool beginTransaction() { return 0; }
+	DATABASE_VIRTUAL bool rollback() { return 0; }
+	DATABASE_VIRTUAL bool commit() { return 0; }
 
 /**
  * Executes command.
@@ -126,7 +119,7 @@ public:
  * @param std::string query command
  * @return true on success, false on error
  */
-	DATABASE_VIRTUAL bool executeQuery(const std::string &query) { return false; }
+	DATABASE_VIRTUAL bool executeQuery(const std::string &query) { return 0; }
 /**
  * Queries database.
  * 
@@ -135,7 +128,7 @@ public:
  * @param std::string query
  * @return results object (null on error)
  */
-	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query) { return NULL; }
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query) { return 0; }
 
 /**
  * Escapes string for query.
@@ -146,13 +139,22 @@ public:
  * @return quoted string
  */
 	DATABASE_VIRTUAL std::string escapeString(const std::string &s) { return "''"; }
+/**
+ * Escapes binary stream for query.
+ * 
+ * Prepares binary stream to fit SQL queries.
+ * 
+ * @param char* binary stream
+ * @param long stream length
+ * @return quoted string
+ */
+	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length) { return "''"; };
 
 /**
  * Resource freeing.
  * 
- * @param DBResult*|DBStatement* resource to be freed
+ * @param DBResult* resource to be freed
  */
-	DATABASE_VIRTUAL void freeStatement(DBStatement *stmt) {};
 	DATABASE_VIRTUAL void freeResult(DBResult *res) {};
 
 protected:
@@ -161,104 +163,6 @@ protected:
 
 private:
 	static Database* _instance;
-};
-
-/**
- * Prepared statent class.
- * 
- * This class stores pre-compiled query which can be evaluated many times. However there are some limitations:
- * 
- * - Only commands that doesn't return any results can be evaluated this way (like INSERT, UDPATE, not SELECT).
- * - Only one prepared statement can exist at one time - at all this limitation affects only PostgreSQL driver.
- * - Note that on some database engines if statement was prepared during transaction, after transaction is closed (rolled back, or sometimes even after commiting) prepared statements are dropped.
- * 
- * There are two important rules that you must follow during work with prepared statements ALWAYS:
- * 
- * - You must bind ALL parameters before any execution.
- * - You must bind parameters again after EACH execute() call.
- * 
- * Common usage of this class is:
- * 
- * <code>
- * Database* db = Database::getInstance();
- * DBStatement* stmt;
- * 
- * if(stmt = db->prepareStatement("INSERT INTO `player_items` (`player_id`, `sid`, `attributes`) VALUES (?, ?, ?)")) {
- *	unsigned long size;
- *	const char* attributes;
- *	
- *	attributes = item1->getAttributes(&size);
- *	stmt->setInt(1, player1->getGUID() );
- *	stmt->setInt(2, runningID++);
- *	stmt->bindStream(3, attributes, size);
- *	// execute() performs statement with given parameters
- *	if(!stmt->execute()) {
- *		std::cout << "Error during INSERT query." << std::endl;
- *		db->freeStatement(stmt);
- *		return;
- *	}
- * 
- *	attributes = item2->getAttributes(&size);
- *	stmt->setInt(1, player2->getGUID() );
- *	stmt->setInt(2, runningID++);
- *	stmt->bindStream(3, attributes, size);
- *	// execute() performs statement with given parameters
- *	if(!stmt->execute()) {
- *		std::cout << "Error during INSERT query." << std::endl;
- *		db->freeStatement(stmt);
- *		return;
- *	}
- * 
- *	attributes = item3->getAttributes(&size);
- *	stmt->setInt(1, player3->getGUID() );
- *	stmt->setInt(2, runningID++);
- *	stmt->bindStream(3, attributes, size);
- *	// execute() performs statement with given parameters
- *	if(!stmt->execute()) {
- *		std::cout << "Error during INSERT query." << std::endl;
- *		db->freeStatement(stmt);
- *		return;
- *	}
- * 
- *	// more evaluations
- * 
- *	// remember about this
- *	db->freeStatement(stmt);
- * } else {
- *	std::cout << "Error during preparing statement." << std::endl;
- * }
- * </code>
- * 
- * @author wrzasq <wrzasq@gmail.com>
- */
-class _DBStatement
-{
-	// unused at the moment
-	//friend class Database;
-
-public:
-/**
- * Binds parameter value to of given index.
- * 
- * @param int parameter index
- */
-	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value) {}
-	DATABASE_VIRTUAL void setLong(int32_t param, int64_t value) {}
-	DATABASE_VIRTUAL void setString(int32_t param, const std::string &value) {}
-	DATABASE_VIRTUAL void bindStream(int32_t param, const char* value, unsigned long size) {}
-
-/**
- * Executes statement.
- * 
- * Runs query with currently associated parameters.
- * 
- * @return true on success, false on error
- */
-	DATABASE_VIRTUAL bool execute() { return false; }
-
-protected:
-	_DBStatement() {};
-	DATABASE_VIRTUAL ~_DBStatement() {};
 };
 
 /**
@@ -292,29 +196,28 @@ class _DBResult
 {
 	// unused at the moment
 	//friend class Database;
-	//friend class DBStatement;
 
 public:
 	/**Get the Integer value of a field in database
 	*\returns The Integer value of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s) { return 0; };
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s) { return 0; }
 	/** Get the Long value of a field in database
 	*\returns The Long value of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s) { return 0; };
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s) { return 0; }
 	/** Get the String of a field in database
 	*\returns The String of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL std::string getDataString(const std::string &s) { return "''"; };
+	DATABASE_VIRTUAL std::string getDataString(const std::string &s) { return "''"; }
 	/** Get the blob of a field in database
 	*\returns a PropStream that is initiated with the blob data field, if not exist it returns NULL.
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size) { return NULL; };
+	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size) { return 0; }
 
 /**
  * Moves to next result in set.
@@ -343,6 +246,50 @@ public:
 
 protected:
 	static OTSYS_THREAD_LOCKVAR database_lock;
+};
+
+/**
+ * INSERT statement.
+ * 
+ * Gives possibility to optimize multiple INSERTs on databases that support multiline INSERTs.
+ */
+class DBInsert
+{
+public:
+/**
+ * Associates with given database handler.
+ * 
+ * @param Database* database wrapper
+ */
+	DBInsert(Database* db);
+	~DBInsert() {};
+
+/**
+ * Sets query prototype.
+ * 
+ * @param std::string& INSERT query
+ */
+	void setQuery(const std::string& query);
+
+/**
+ * Adds new row to INSERT statement.
+ * 
+ * On databases that doesn't support multiline INSERTs it simply execute INSERT for each row.
+ * 
+ * @param std::string& row data
+ */
+	bool addRow(const std::string& row);
+
+/**
+ * Executes current buffer.
+ */
+	bool execute();
+
+protected:
+	Database* m_db;
+	bool m_multiLine;
+	std::string m_query;
+	std::string m_buf;
 };
 
 #ifndef MULTI_SQL_DRIVERS

@@ -175,6 +175,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	if(premEnd != 0 && premEnd < timeNow) {
 		//TODO: remove every premium property of the player
 		// outfit, vocation, temple, ...
+		// can it be done as database trigger?
 
 		//update table
 		query << "UPDATE `players` SET `premend` = 0 WHERE `id` = " << player->getGUID();
@@ -214,11 +215,12 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	}
 
 	player->password = result->getDataString("password");
+	db->freeResult(result);
 
 	// we need to find out our skills
 	// so we query the skill table
-	query.str("SELECT `skillid`, `value`, `count` FROM `player_skills` WHERE `player_id` = ");
-	query << player->getGUID();
+	query.str("");
+	query << "SELECT `skillid`, `value`, `count` FROM `player_skills` WHERE `player_id` = " << player->getGUID();
 	if(result = db->storeQuery(query.str())) {
 		//now iterate over the skills
 		while(result->next()) {
@@ -232,8 +234,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 		db->freeResult(result);
 	}
 
-	query.str("SELECT `name` FROM `player_spells` WHERE `player_id` = ");
-	query << player->getGUID();
+	query.str("");
+	query << "SELECT `name` FROM `player_spells` WHERE `player_id` = " << player->getGUID();
 	if(result = db->storeQuery(query.str())) {
 		while(result->next()) {
 			std::string spellName = result->getDataString("name");
@@ -246,8 +248,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	//load inventory items
 	ItemMap itemMap;
 
-	query.str("SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_items` WHERE `player_id` = ");
-	query << player->getGUID() << " ORDER BY `sid` DESC";
+	query.str("");
+	query << "SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_items` WHERE `player_id` = " << player->getGUID() << " ORDER BY `sid` DESC";
 	if(result = db->storeQuery(query.str()) ) {
 		loadItems(itemMap, result);
 
@@ -277,8 +279,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	//load depot items
 	itemMap.clear();
 
-	query.str("SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_depotitems` WHERE `player_id` = ");
-	query << player->getGUID() << " ORDER BY `sid` DESC";
+	query.str("");
+	query << "SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_depotitems` WHERE `player_id` = " << player->getGUID() << " ORDER BY `sid` DESC";
 	if(result = db->storeQuery(query.str()) ) {
 		loadItems(itemMap, result);
 
@@ -310,8 +312,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	}
 
 	//load storage map
-	query.str("SELECT `key`, `value` FROM `player_storage` WHERE `player_id` = ");
-	query << player->getGUID();
+	query.str("");
+	query << "SELECT `key`, `value` FROM `player_storage` WHERE `player_id` = " << player->getGUID();
 	if(result = db->storeQuery(query.str())) {
 		while(result->next()) {
 			uint32_t key = result->getDataInt("key");
@@ -322,8 +324,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	}
 
 	//load vip
-	query.str("SELECT `vip_id` FROM `player_viplist` WHERE `player_id` = ");
-	query << player->getGUID();
+	query.str("");
+	query << "SELECT `vip_id` FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
 	if(result = db->storeQuery(query.str())) {
 		while(result->next()) {
 			uint32_t vip_id = result->getDataInt("vip_id");
@@ -337,9 +339,10 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	return true;
 }
 
-bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBStatement* query_insert)
+bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert& query_insert)
 {
 	std::list<Container*> listContainer;
+	std::stringstream stream;
 
 	typedef std::pair<Container*, int32_t> containerBlock;
 	std::list<containerBlock> stack;
@@ -347,6 +350,7 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBStatem
 	int32_t parentId = 0;
 	int32_t runningId = 100;
 
+	Database* db = Database::instance();
 	Item* item;
 	int32_t pid;
 
@@ -361,13 +365,10 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBStatem
 		item->serializeAttr(propWriteStream);
 		const char* attributes = propWriteStream.getStream(attributesSize);
 
-		query_insert->setInt(1, pid);
-		query_insert->setInt(2, runningId);
-		query_insert->setInt(3, (int32_t)item->getID() );
-		query_insert->setInt(4, (int32_t)item->getItemCountOrSubtype() );
-		query_insert->bindStream(5, attributes, attributesSize);
+		stream.str("");
+		stream << player->getGUID() << ", " << pid << ", " << runningId << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
 
-		if(!query_insert->execute()){
+		if(!query_insert.addRow(stream.str())){
 			return false;
 		}
 
@@ -396,13 +397,10 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBStatem
 			item->serializeAttr(propWriteStream);
 			const char* attributes = propWriteStream.getStream(attributesSize);
 
-			query_insert->setInt(1, parentId);
-			query_insert->setInt(2, runningId);
-			query_insert->setInt(3, (int32_t)item->getID() );
-			query_insert->setInt(4, (int32_t)item->getItemCountOrSubtype() );
-			query_insert->bindStream(5, attributes, attributesSize);
+			stream.str("");
+			stream << player->getGUID() << ", " << parentId << ", " << runningId << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
 
-			if(!query_insert->execute()){
+			if(!query_insert.addRow(stream.str())){
 				return false;
 			}
 		}
@@ -454,8 +452,8 @@ bool IOPlayer::savePlayer(Player* player)
 	const char* conditions = propWriteStream.getStream(conditionsSize);
 
 	//First, an UPDATE query to write the player itself
-	query.str("UPDATE `players` SET `level` = ");
-	query << player->level
+	query.str("");
+	query << "UPDATE `players` SET `level` = " << player->level
 	<< ", `vocation` = " << (int)player->getVocationId()
 	<< ", `health` = " << player->health
 	<< ", `healthmax` = " << player->healthMax
@@ -510,47 +508,37 @@ bool IOPlayer::savePlayer(Player* player)
 		return false;
 	}
 
-	DBStatement* stmt;
-
-	query.str("UPDATE `player_skills` SET `value` = ?, `count` = ? WHERE `player_id` = ");
-	query << player->getGUID() << " AND `skillid` = ?";
-
-	if(!(stmt = db->prepareStatement(query.str())))
-		return false;
-
 	//skills
 	for(int i = 0; i <= 6; i++){
-		stmt->setInt(1, player->skills[i][SKILL_LEVEL]);
-		stmt->setInt(2, player->skills[i][SKILL_TRIES]);
-		stmt->setInt(3, i);
+		query.str("");
+		query << "UPDATE `player_skills` SET `value` = " << player->skills[i][SKILL_LEVEL] << ", `count` = " << player->skills[i][SKILL_TRIES] << " WHERE `player_id` = " << player->getGUID() << " AND `skillid` = " << i;
 
-		if(!stmt->execute()) {
-			db->freeStatement(stmt);
+		if(!db->executeQuery(query.str())) {
 			db->rollback();
 			return false;
 		}
 	}
 
-	db->freeStatement(stmt);
+	DBInsert stmt(db);
 
 	//learned spells
-	query.str("INSERT INTO `player_spells` (`player_id`, `name`) VALUES (");
-	query << player->getGUID() << ", ?)";
-	if(!(stmt = db->prepareStatement(query.str())))
-		return false;
+	stmt.setQuery("INSERT INTO `player_spells` (`player_id`, `name`) VALUES ");
 
 	for(LearnedInstantSpellList::const_iterator it = player->learnedInstantSpellList.begin();
 			it != player->learnedInstantSpellList.end(); ++it){
-		stmt->setString(1, db->escapeString(*it) );
+		query.str("");
+		query << player->getGUID() << ", " << db->escapeString(*it);
 
-		if(!stmt->execute()) {
-			db->freeStatement(stmt);
+		if(!stmt.addRow(query.str())) {
 			db->rollback();
 			return false;
 		}
 	}
 
-	db->freeStatement(stmt);
+	if(!stmt.execute()) {
+		db->rollback();
+		return false;
+	}
 
 	ItemBlockList itemList;
 
@@ -561,77 +549,60 @@ bool IOPlayer::savePlayer(Player* player)
 	}
 
 	//item saving
-	query.str("INSERT INTO `player_items` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES (");
-	query << player->getGUID() << ", ?, ?, ?, ?, ?)";
+	stmt.setQuery("INSERT INTO `player_items` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES ");
 
-	if(!(stmt = db->prepareStatement(query.str())))
-		return false;
-
-	if(!saveItems(player, itemList, stmt)) {
-		db->freeStatement(stmt);
+	if(!(saveItems(player, itemList, stmt) && stmt.execute())) {
 		db->rollback();
 		return false;
 	}
-
-	db->freeStatement(stmt);
 
 	itemList.clear();
 	for(DepotMap::iterator it = player->depots.begin(); it != player->depots.end(); ++it)
 		itemList.push_back(itemBlock(it->first, it->second));
 
 	//save depot items
-	query.str("INSERT INTO `player_depotitems` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES (");
-	query << player->getGUID() << ", ?, ?, ?, ?, ?)";
+	stmt.setQuery("INSERT INTO `player_depotitems` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES ");
 
-	if(!(stmt = db->prepareStatement(query.str())))
-		return false;
-
-	if(!saveItems(player, itemList, stmt)) {
-		db->freeStatement(stmt);
+	if(!(saveItems(player, itemList, stmt) && stmt.execute())) {
 		db->rollback();
 		return false;
 	}
 
-	db->freeStatement(stmt);
-
-	query.str("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES (");
-	query << player->getGUID() << ", ?, ?)";
-
-	if(!(stmt = db->prepareStatement(query.str())))
-		return false;
+	stmt.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
 
 	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++) {
-		stmt->setInt(1, cit->first);
-		stmt->setInt(2, cit->second);
+		query.str("");
+		query << player->getGUID() << ", " << cit->first << ", " << cit->second;
 
-		if(!stmt->execute()) {
-			db->freeStatement(stmt);
+		if(!stmt.addRow(query.str())) {
 			db->rollback();
 			return false;
 		}
 	}
 
-	db->freeStatement(stmt);
+	if(!stmt.execute()) {
+		db->rollback();
+		return false;
+	}
 
 	//save vip list
-	query.str("INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES (");
-	query << player->getGUID() << ", ?)";
-
-	if(!(stmt = db->prepareStatement(query.str())))
-		return false;
+	stmt.setQuery("INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES ");
 
 	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++) {
-		stmt->setInt(1, *it );
+		query.str("");
+		query << player->getGUID() << ", " << *it;
 
-		if(!stmt->execute()) {
-			db->freeStatement(stmt);
+		if(!stmt.addRow(query.str())) {
 			db->rollback();
 			return false;
 		}
 	}
 
-	db->freeStatement(stmt);
+	if(!stmt.execute()) {
+		db->rollback();
+		return false;
+	}
 
 	//End the transaction
 	return db->commit();

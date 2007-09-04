@@ -46,6 +46,15 @@ DatabaseSQLite::~DatabaseSQLite()
 	sqlite3_close(m_handle);
 }
 
+int DatabaseSQLite::getParam(DBParam_t param)
+{
+	switch(param) {
+		case DBPARAM_MULTIINSERT:
+			return false;
+			break;
+	}
+}
+
 bool DatabaseSQLite::beginTransaction()
 {
 	return executeQuery("BEGIN");
@@ -85,27 +94,6 @@ std::string DatabaseSQLite::_parse(const std::string &s)
 	}
 
 	return query;
-}
-
-DBStatement* DatabaseSQLite::prepareStatement(const std::string &query)
-{
-	if(!m_connected)
-		return NULL;
-
-	#ifdef __SQL_QUERY_DEBUG__
-	std::cout << "SQLITE PREPARED STATEMENT: " << query << std::endl;
-	#endif
-
-	std::string buf = _parse(query);
-	sqlite3_stmt* stmt;
-	// prepares statement
-	if( FAILED( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) ) ) {
-		std::cout << "sqlite3_prepare_v2(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
-		return NULL;
-	}
-
-	DBStatement* statement = new SQLiteStatement(stmt);
-	return statement;
 }
 
 bool DatabaseSQLite::executeQuery(const std::string &query)
@@ -176,68 +164,44 @@ std::string DatabaseSQLite::escapeString(const std::string &s)
 	return r;
 }
 
-void DatabaseSQLite::freeStatement(DBStatement* stmt)
+std::string DatabaseSQLite::escapeBlob(const char* s, uint32_t length)
 {
-	delete (SQLiteStatement*)stmt;
+	std::string buf = "'";
+
+	for(int32_t i = 0; i < length; i++) {
+		switch(s[i]) {
+			case '\'':
+				buf += "\'\'";
+				break;
+
+			case '\0':
+				buf += "\\0";
+				break;
+
+			case '\\':
+				buf += "\\\\";
+				break;
+
+			case '\r':
+				buf += "\\r";
+				break;
+
+			case '\n':
+				buf += "\\n";
+				break;
+
+			default:
+				buf += s[i];
+		}
+	}
+
+	buf += "'";
+	return buf;
 }
 
 void DatabaseSQLite::freeResult(DBResult* res)
 {
 	delete (SQLiteResult*)res;
-}
-
-/** SQLiteStatement definitions */
-
-void SQLiteStatement::setInt(int32_t param, int32_t value)
-{
-	if( FAILED( sqlite3_bind_int(m_handle, param, value) ) )
-		std::cout << "DBStatement::setInt(): SQLITE ERROR." << std::endl;
-}
-
-void SQLiteStatement::setLong(int32_t param, int64_t value)
-{
-	if( FAILED( sqlite3_bind_int64(m_handle, param, value) ) )
-		std::cout << "DBStatement::setLong(): SQLITE ERROR." << std::endl;
-}
-
-void SQLiteStatement::setString(int32_t param, const std::string &value)
-{
-	if( FAILED( sqlite3_bind_text(m_handle, param, value.c_str(), value.size(), SQLITE_STATIC) ) )
-		std::cout << "DBStatement::setString(): SQLITE ERROR." << std::endl;
-}
-
-void SQLiteStatement::bindStream(int32_t param, const char* value, unsigned long size)
-{
-	if( FAILED( sqlite3_bind_blob(m_handle, param, value, size, SQLITE_STATIC) ) )
-		std::cout << "DBStatement::bindStream(): SQLITE ERROR." << std::endl;
-}
-
-bool SQLiteStatement::execute()
-{
-	// executes the query
-	int ret = sqlite3_step(m_handle);
-	if( FAILED(ret) && ret != SQLITE_DONE && ret != SQLITE_ROW) {
-		std::cout << "sqlite3_step(): SQLITE ERROR." << std::endl;
-
-		return false;
-	} else {
-		// resets query for next use
-		sqlite3_reset(m_handle);
-		// resets bindings
-		sqlite3_clear_bindings(m_handle);
-
-		return true;
-	}
-}
-
-SQLiteStatement::SQLiteStatement(sqlite3_stmt* stmt)
-{
-	m_handle = stmt;
-}
-
-SQLiteStatement::~SQLiteStatement()
-{
-	sqlite3_finalize(m_handle);
 }
 
 /** SQLiteResult definitions */

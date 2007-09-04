@@ -108,6 +108,15 @@ DatabaseODBC::~DatabaseODBC()
 	SQLFreeHandle(SQL_HANDLE_ENV, m_env);
 }
 
+int DatabaseODBC::getParam(DBParam_t param)
+{
+	switch(param) {
+		case DBPARAM_MULTIINSERT:
+			return false;
+			break;
+	}
+}
+
 bool DatabaseODBC::beginTransaction()
 {
 	return true;
@@ -126,35 +135,6 @@ bool DatabaseODBC::commit()
 	return true;
 	// SQL_RETURN ret = SQLTransact(m_env, m_handle, SQL_COMMIT);
 	// return RETURN_SUCCESS(ret);
-}
-
-DBStatement* DatabaseODBC::prepareStatement(const std::string &query)
-{
-	if(!m_connected)
-		return NULL;
-
-	#ifdef __SQL_QUERY_DEBUG__
-	std::cout << "ODBC PREPARED STATEMENT: " << query << std::endl;
-	#endif
-
-	std::string buf = _parse(query);
-
-	SQLHSTMT stmt;
-	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_STMT, m_handle, &stmt);
-	if(!RETURN_SUCCESS(ret)) {
-		std::cout << "Failed to allocate ODBC SQLHSTMT statement." << std::endl;
-		return false;
-	}
-
-	ret = SQLPrepare(stmt, (SQLCHAR*)buf.c_str(), buf.length() );
-	if(!RETURN_SUCCESS(ret)) {
-		std::cout << "SQLPrepare(): Failed to prepare statement: " << query << std::endl;
-		SQLFreeHandle(SQL_HANDLE_STMT, stmt);
-		return false;
-	}
-
-	DBStatement* statement = new ODBCStatement(stmt);
-	return statement;
 }
 
 bool DatabaseODBC::executeQuery(const std::string &query)
@@ -179,7 +159,7 @@ bool DatabaseODBC::executeQuery(const std::string &query)
 	ret = SQLExecDirect(stmt, (SQLCHAR*)buf.c_str(), buf.length() );
 
 	if(!RETURN_SUCCESS(ret)) {
-		std::cout << "SQLExecDirect(): " << query << ": ODBC ERROR: " << std::endl;
+		std::cout << "SQLExecDirect(): " << query << ": ODBC ERROR." << std::endl;
 		return false;
 	}
 
@@ -208,7 +188,7 @@ DBResult* DatabaseODBC::storeQuery(const std::string &query)
 	ret = SQLExecDirect(stmt, (SQLCHAR*)buf.c_str(), buf.length() );
 
 	if(!RETURN_SUCCESS(ret)) {
-		std::cout << "SQLExecDirect(): " << query << ": ODBC ERROR: " << std::endl;
+		std::cout << "SQLExecDirect(): " << query << ": ODBC ERROR." << std::endl;
 		return NULL;
 	}
 
@@ -218,17 +198,42 @@ DBResult* DatabaseODBC::storeQuery(const std::string &query)
 
 std::string DatabaseODBC::escapeString(const std::string &s)
 {
-	std::string buff = std::string(s);
+	return escapeBlob( s.c_str(), s.length() );
+}
 
-	int32_t pos = 0;
-	while( buff.find('\'', pos) != std::string::npos) {
-		pos = buff.find('\'', pos);
-		buff.insert(pos, "'");
-		pos += 2;
+std::string DatabaseODBC::escapeBlob(const char* s, uint32_t length)
+{
+	std::string buf = "'";
+
+	for(int32_t i = 0; i < length; i++) {
+		switch(s[i]) {
+			case '\'':
+				buf += "\'\'";
+				break;
+
+			case '\0':
+				buf += "\\0";
+				break;
+
+			case '\\':
+				buf += "\\\\";
+				break;
+
+			case '\r':
+				buf += "\\r";
+				break;
+
+			case '\n':
+				buf += "\\n";
+				break;
+
+			default:
+				buf += s[i];
+		}
 	}
 
-	buff = "'" + buff + "'";
-	return buff;
+	buf += "'";
+	return buf;
 }
 
 std::string DatabaseODBC::_parse(const std::string &s)
@@ -257,126 +262,9 @@ std::string DatabaseODBC::_parse(const std::string &s)
 	return query;
 }
 
-void DatabaseODBC::freeStatement(DBStatement* stmt)
-{
-	delete (ODBCStatement*)stmt;
-}
-
 void DatabaseODBC::freeResult(DBResult* res)
 {
 	delete (ODBCResult*)res;
-}
-
-/** ODBCStatement definitions */
-
-void ODBCStatement::setInt(int32_t param, int32_t value)
-{
-	int32_t* buff = new int32_t;
-	*buff = value;
-	m_binds[param - 1] = buff;
-	m_types[param - 1] = SQL_C_SLONG;
-
-	SQLRETURN stat = SQLBindParameter(m_handle, param, SQL_PARAM_INPUT, SQL_C_SLONG, SQL_INTEGER, 0, 0, m_binds[param - 1], 0, NULL);
-
-	if( !RETURN_SUCCESS(stat) )
-		std::cout << "ODBCStatement::setInt(): ODBC ERROR." << std::endl;
-}
-
-void ODBCStatement::setLong(int32_t param, int64_t value)
-{
-	int64_t* buff = new int64_t;
-	*buff = value;
-	m_binds[param - 1] = buff;
-	m_types[param - 1] = SQL_C_SBIGINT;
-
-	SQLRETURN stat = SQLBindParameter(m_handle, param, SQL_PARAM_INPUT, SQL_C_SBIGINT, SQL_INTEGER, 0, 0, m_binds[param - 1], 0, NULL);
-
-	if( !RETURN_SUCCESS(stat) )
-		std::cout << "ODBCStatement::setLong(): ODBC ERROR." << std::endl;
-}
-
-void ODBCStatement::setString(int32_t param, const std::string &value)
-{
-	char* buff = new char[value.length()];
-	strcpy(buff, value.c_str());
-	m_binds[param - 1] = buff;
-	m_types[param - 1] = SQL_C_CHAR;
-
-	SQLRETURN stat = SQLBindParameter(m_handle, param, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 0, 0, buff, value.length(), NULL);
-
-	if( !RETURN_SUCCESS(stat) )
-		std::cout << "ODBCStatement::setString(): ODBC ERROR." << std::endl;
-}
-
-void ODBCStatement::bindStream(int32_t param, const char* value, unsigned long size)
-{
-	m_lengths[param - 1] = size;
-
-	char* buff = new char[size];
-	strcpy(buff, value);
-	m_binds[param - 1] = buff;
-	m_types[param - 1] = SQL_C_BINARY;
-
-	SQLRETURN stat = SQLBindParameter(m_handle, param, SQL_PARAM_INPUT, SQL_C_BINARY, SQL_BINARY, size, 0, buff, size, (SQLLEN*)m_lengths[param - 1]);
-
-	if( !RETURN_SUCCESS(stat) )
-		std::cout << "ODBCStatement::bindStream(): ODBC ERROR." << std::endl;
-}
-
-bool ODBCStatement::execute()
-{
-	SQLRETURN stat = SQLExecute(m_handle);
-
-	for( int32_t i = 0; i < m_params; i++)
-		if(m_binds[i])
-			switch(m_types[i]) {
-				case SQL_C_SLONG:
-					delete (int32_t*)m_binds[i];
-					break;
-
-				case SQL_C_SBIGINT:
-					delete (int64_t*)m_binds[i];
-					break;
-
-				case SQL_C_CHAR:
-				case SQL_C_BINARY:
-					delete[] (char*)m_binds[i];
-					break;
-			}
-
-	return RETURN_SUCCESS(stat);
-}
-
-ODBCStatement::ODBCStatement(SQLHSTMT stmt)
-{
-	m_handle = stmt;
-	SQLNumParams(m_handle, (SQLSMALLINT*)&m_params);
-	m_types = new uint16_t[m_params];
-	m_lengths = new uint32_t[m_params];
-}
-
-ODBCStatement::~ODBCStatement()
-{
-	for( int32_t i = 0; i < m_params; i++)
-		if(m_binds[i])
-			switch(m_types[i]) {
-				case SQL_C_SLONG:
-					delete (int32_t*)m_binds[i];
-					break;
-
-				case SQL_C_SBIGINT:
-					delete (int64_t*)m_binds[i];
-					break;
-
-				case SQL_C_BINARY:
-				case SQL_C_CHAR:
-					delete[] (char*)m_binds[i];
-					break;
-			}
-
-	delete[] m_types;
-	delete[] m_lengths;
-	SQLFreeHandle(SQL_HANDLE_STMT, m_handle);
 }
 
 /** ODBCResult definitions */

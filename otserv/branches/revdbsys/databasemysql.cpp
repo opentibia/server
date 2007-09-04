@@ -59,6 +59,15 @@ DatabaseMySQL::~DatabaseMySQL()
 	mysql_close(&m_handle);
 }
 
+int DatabaseMySQL::getParam(DBParam_t param)
+{
+	switch(param) {
+		case DBPARAM_MULTIINSERT:
+			return true;
+			break;
+	}
+}
+
 bool DatabaseMySQL::beginTransaction()
 {
 	return executeQuery("BEGIN");
@@ -95,32 +104,6 @@ bool DatabaseMySQL::commit()
 	}
 
 	return true;
-}
-
-DBStatement* DatabaseMySQL::prepareStatement(const std::string &query)
-{
-	if(!m_connected)
-		return NULL;
-
-	#ifdef __SQL_QUERY_DEBUG__
-	std::cout << "MYSQL PREPARED STATEMENT: " << query << std::endl;
-	#endif
-
-	// allocates new preapred statement
-	MYSQL_STMT* stmt = mysql_stmt_init(&m_handle);
-
-	if(!stmt) {
-		std::cout << "mysql_stmt_init(): MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
-		return NULL;
-	// prepares statement
-	} else if( mysql_stmt_prepare(stmt, query.c_str(), query.length() ) != 0) {
-		std::cout << "mysql_stmt_prepare(): MYSQL ERROR: " << mysql_stmt_error(stmt) << std::endl;
-		mysql_stmt_close(stmt);
-		return NULL;
-	}
-
-	DBStatement* statement = new MySQLStatement(stmt);
-	return statement;
 }
 
 bool DatabaseMySQL::executeQuery(const std::string &query)
@@ -200,15 +183,20 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 
 std::string DatabaseMySQL::escapeString(const std::string &s)
 {
+	return escapeBlob( s.c_str(), s.length() );
+}
+
+std::string DatabaseMySQL::escapeBlob(const char* s, uint32_t length)
+{
 	// remember about quoiting even an empty string!
-	if(!s.size())
+	if(!s)
 		return std::string("''");
 
 	// the worst case is 2n + 1
-	char* output = new char[ s.length() * 2 + 1];
+	char* output = new char[length * 2 + 1];
 
 	// quotes escaped string and frees temporary buffer
-	mysql_escape_string(output, s.c_str(), s.length() );
+	mysql_real_escape_string(&m_handle, output, s, length);
 	std::string r = "'";
 	r += output;
 	r += "'";
@@ -216,129 +204,9 @@ std::string DatabaseMySQL::escapeString(const std::string &s)
 	return r;
 }
 
-void DatabaseMySQL::freeStatement(DBStatement* stmt)
-{
-	delete (MySQLStatement*)stmt;
-}
-
 void DatabaseMySQL::freeResult(DBResult* res)
 {
 	delete (MySQLResult*)res;
-}
-
-/** MySQLStatement definitions */
-
-void MySQLStatement::setInt(int32_t param, int32_t value)
-{
-	if(param > m_count) {
-		std::cout << "DBStatement::setInt(): parameter out of range." << std::cout;
-		return;
-	}
-
-	// parameter info
-	m_bind[param - 1].buffer_type = MYSQL_TYPE_LONG;
-//	m_bind[param].buffer = (char*)&value;
-	int32_t* buff = new int32_t;
-	*buff = value;
-	m_bind[param - 1].buffer = buff;
-}
-
-void MySQLStatement::setLong(int32_t param, int64_t value)
-{
-	if(param > m_count) {
-		std::cout << "DBStatement::setLong(): parameter out of range." << std::cout;
-		return;
-	}
-
-	m_bind[param - 1].buffer_type = MYSQL_TYPE_LONGLONG;
-//	m_bind[param].buffer = (char*)&value;
-	int64_t* buff = new int64_t;
-	*buff = value;
-	m_bind[param - 1].buffer = buff;
-}
-
-void MySQLStatement::setString(int32_t param, const std::string &value)
-{
-	if(param > m_count) {
-		std::cout << "DBStatement::setString(): parameter out of range." << std::cout;
-		return;
-	}
-
-	m_bind[param - 1].buffer_type = MYSQL_TYPE_STRING;
-	m_bind[param - 1].buffer_length = value.size();
-	m_bind[param - 1].buffer = new char[ value.length() ];
-	strcpy((char*)m_bind[param - 1].buffer, value.c_str() );
-
-	m_bind[param - 1].length = &m_bind[param - 1].buffer_length;
-}
-
-void MySQLStatement::bindStream(int32_t param, const char* value, unsigned long size)
-{
-	if(param > m_count) {
-		std::cout << "DBStatement::bindStream(): parameter out of range." << std::cout;
-		return;
-	}
-
-	m_bind[param - 1].buffer_type = MYSQL_TYPE_BLOB;
-	m_bind[param - 1].buffer_length = size;
-	m_bind[param - 1].buffer = new char[size];
-	memcpy(m_bind[param - 1].buffer, value, size);
-
-	m_bind[param - 1].length = &m_bind[param - 1].buffer_length;
-}
-
-bool MySQLStatement::execute()
-{
-	// binds parameters
-	if( mysql_stmt_bind_param(m_handle, m_bind) != 0)
-	{
-		std::cout << "mysql_stmt_bind_param(): MYSQL ERROR: " << mysql_stmt_error(m_handle) << std::endl;
-		return false;
-	}
-
-	// executes query
-	if( mysql_stmt_execute(m_handle) != 0)
-	{
-		std::cout << "mysql_stmt_execute(): MYSQL ERROR: " << mysql_stmt_error(m_handle) << std::endl;
-		return false;
-	}
-
-	// deletes params
-	for( int16_t i = 0; i < m_count; i++)
-		switch( m_bind[i].buffer_type ) {
-			case MYSQL_TYPE_LONG:
-				delete (int32_t*)m_bind[i].buffer;
-				break;
-
-			case MYSQL_TYPE_LONGLONG:
-				delete (int64_t*)m_bind[i].buffer;
-				break;
-
-			case MYSQL_TYPE_STRING:
-			case MYSQL_TYPE_BLOB:
-				delete[] (char*)m_bind[i].buffer;
-				break;
-		}
-
-	// resets parameters
-	memset(m_bind, 0, sizeof(*m_bind) * m_count);
-	return true;
-}
-
-MySQLStatement::MySQLStatement(MYSQL_STMT* stmt)
-{
-	// statement info initialization
-	m_handle = stmt;
-	m_count = mysql_stmt_param_count(m_handle);
-	m_bind = new MYSQL_BIND[m_count];
-	memset(m_bind, 0, sizeof(*m_bind) * m_count);
-}
-
-MySQLStatement::~MySQLStatement()
-{
-	// frees statements info
-	delete[] m_bind;
-	mysql_stmt_close(m_handle);
 }
 
 /** MySQLResult definitions */

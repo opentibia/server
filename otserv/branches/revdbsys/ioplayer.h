@@ -90,7 +90,7 @@ protected:
 	typedef std::map<int,std::pair<Item*,int> > ItemMap;
 
 	void loadItems(ItemMap& itemMap, DBResult* result);
-	bool saveItems(Player* player, const ItemBlockList& itemList, DBStatement* query_insert);
+	bool saveItems(Player* player, const ItemBlockList& itemList, DBInsert& query_insert);
 
 	typedef std::map<uint32_t, std::string> NameCacheMap;
 	typedef std::map<std::string, uint32_t, StringCompareCase> GuidCacheMap;

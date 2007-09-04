@@ -80,3 +80,54 @@ DBQuery::~DBQuery()
 {
 	OTSYS_THREAD_UNLOCK(database_lock, NULL);
 }
+
+DBInsert::DBInsert(Database* db)
+{
+	m_db = db;
+
+	// checks if current database engine supports multiline INSERTs
+	m_multiLine = m_db->getParam(DBPARAM_MULTIINSERT);
+}
+
+void DBInsert::setQuery(const std::string& query)
+{
+	m_query = query;
+	m_buf = "";
+}
+
+bool DBInsert::addRow(const std::string& row)
+{
+	if(m_multiLine) {
+		int32_t size = m_buf.length();
+
+		// adds new row to buffer
+		if(size == 0) {
+			m_buf = "(" + row + ")";
+		} else if(size > 8192) {
+			if(!execute())
+				return false;
+
+			m_buf = "(" + row + ")";
+		} else {
+			m_buf += ",(" + row + ")";
+		}
+
+		return true;
+	} else {
+		// executes INSERT for current row
+		return m_db->executeQuery(m_query + "(" + row + ")" );
+	}
+}
+
+bool DBInsert::execute()
+{
+	if(m_multiLine) {
+		// executes buffer
+		bool res = m_db->executeQuery(m_query + m_buf);
+		m_buf = "";
+		return res;
+	} else {
+		// INSERTs were executed on-fly
+		return true;
+	}
+}

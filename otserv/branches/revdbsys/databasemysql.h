@@ -35,45 +35,24 @@ public:
 	DatabaseMySQL();
 	DATABASE_VIRTUAL ~DatabaseMySQL();
 
+	DATABASE_VIRTUAL int getParam(DBParam_t param);
+
 	DATABASE_VIRTUAL bool beginTransaction();
 	DATABASE_VIRTUAL bool rollback();
 	DATABASE_VIRTUAL bool commit();
-
-	DATABASE_VIRTUAL DBStatement* prepareStatement(const std::string &query);
 
 	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
 	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
 
 	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
+	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length);
 
-	DATABASE_VIRTUAL void freeStatement(DBStatement *stmt);
 	DATABASE_VIRTUAL void freeResult(DBResult *res);
 
 protected:
 	MYSQL m_handle;
 
 	bool m_connected;
-};
-
-class MySQLStatement : public _DBStatement
-{
-	friend class DatabaseMySQL;
-
-public:
-	DATABASE_VIRTUAL void setInt(int32_t param, int32_t value);
-	DATABASE_VIRTUAL void setLong(int32_t param, int64_t value);
-	DATABASE_VIRTUAL void setString(int32_t param, const std::string &value);
-	DATABASE_VIRTUAL void bindStream(int32_t param, const char* value, unsigned long size);
-
-	DATABASE_VIRTUAL bool execute();
-
-protected:
-	MySQLStatement(MYSQL_STMT* stmt);
-	DATABASE_VIRTUAL ~MySQLStatement();
-
-	MYSQL_STMT* m_handle;
-	MYSQL_BIND* m_bind;
-	uint32_t m_count;
 };
 
 class MySQLResult : public _DBResult
