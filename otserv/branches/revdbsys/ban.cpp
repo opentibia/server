@@ -341,56 +341,65 @@ bool IOBan::saveBans(const Ban& banclass)
 	uint32_t currentTime = std::time(NULL);
 	//save ip bans
 
-	DBStatement* stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `ip`, `mask`, `time`) VALUES (1, ?, ?, ?)");
+	DBInsert stmt(db);
+	stmt.setQuery("INSERT INTO `bans` (`type`, `ip`, `mask`, `time`) VALUES ");
 	
 	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it) {
 		if(it->time > currentTime) {
-			stmt->setInt(1, it->ip);
-			stmt->setInt(2, it->mask);
-			stmt->setInt(3, it->time);
+			query.str("");
+			query << 1 << ", " << it->ip << ", " << it->mask << ", " << it->time;
 
-			if(!stmt->execute()) {
-				db->freeStatement(stmt);
+			if(!stmt.addRow(query.str())) {
 				db->rollback();
 				return false;
 			}
 		}
 	}
-	db->freeStatement(stmt);
+
+	if(!stmt.execute()) {
+		db->rollback();
+		return false;
+	}
 
 	//save player bans
-	stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `player`, `time`) VALUES (2, ?, ?)");
+	stmt.setQuery("INSERT INTO `bans` (`type`, `player`, `time`) VALUES ");
 	
 	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it) {
 		if(it->time > currentTime) {
-			stmt->setInt(1, it->id);
-			stmt->setInt(2, it->time);
+			query.str("");
+			query << 2 << ", " << it->id << ", " << it->time;
 
-			if(!stmt->execute()) {
-				db->freeStatement(stmt);
+			if(!stmt.addRow(query.str())) {
 				db->rollback();
 				return false;
 			}
 		}
 	}
-	db->freeStatement(stmt);
+
+	if(!stmt.execute()) {
+		db->rollback();
+		return false;
+	}
 
 	//save account bans
-	stmt = db->prepareStatement("INSERT INTO `bans` (`type`, `account`, `time`) VALUES (3, ?, ?)");
+	stmt.setQuery("INSERT INTO `bans` (`type`, `account`, `time`) VALUES ");
 	
 	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it) {
 		if(it->time > currentTime) {
-			stmt->setInt(1, it->id);
-			stmt->setInt(2, it->time);
+			query.str("");
+			query << 3 << ", " << it->id << ", " << it->time;
 
-			if(!stmt->execute()) {
-				db->freeStatement(stmt);
+			if(!stmt.addRow(query.str())) {
 				db->rollback();
 				return false;
 			}
 		}
 	}
 
-	db->freeStatement(stmt);
+	if(!stmt.execute()) {
+		db->rollback();
+		return false;
+	}
+
 	return db->commit();
 }
