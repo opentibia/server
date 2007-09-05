@@ -346,10 +346,9 @@ bool IOBan::saveBans(const Ban& banclass)
 	
 	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it) {
 		if(it->time > currentTime) {
-			query.str("");
 			query << 1 << ", " << it->ip << ", " << it->mask << ", " << it->time;
 
-			if(!stmt.addRow(query.str())) {
+			if(!stmt.addRow(query)) {
 				db->rollback();
 				return false;
 			}
@@ -366,10 +365,9 @@ bool IOBan::saveBans(const Ban& banclass)
 	
 	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it) {
 		if(it->time > currentTime) {
-			query.str("");
 			query << 2 << ", " << it->id << ", " << it->time;
 
-			if(!stmt.addRow(query.str())) {
+			if(!stmt.addRow(query)) {
 				db->rollback();
 				return false;
 			}
@@ -386,10 +384,9 @@ bool IOBan::saveBans(const Ban& banclass)
 	
 	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it) {
 		if(it->time > currentTime) {
-			query.str("");
 			query << 3 << ", " << it->id << ", " << it->time;
 
-			if(!stmt.addRow(query.str())) {
+			if(!stmt.addRow(query)) {
 				db->rollback();
 				return false;
 			}

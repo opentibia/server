@@ -71,6 +71,13 @@ Database* _Database::instance(){
 	return _instance;
 }
 
+bool _Database::addRow(const std::stringstream& row)
+{
+	bool ret = addRow(row.str());
+	row.str("");
+	return ret;
+}
+
 DBQuery::DBQuery()
 {
 	OTSYS_THREAD_LOCK(database_lock, NULL);

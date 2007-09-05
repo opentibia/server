@@ -279,6 +279,10 @@ public:
  * @param std::string& row data
  */
 	bool addRow(const std::string& row);
+/**
+ * Allows to use addRow() with stringstream as parameter.
+ */
+	bool addRow(const std::stringstream& row);
 
 /**
  * Executes current buffer.

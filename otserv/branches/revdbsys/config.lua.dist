@@ -131,5 +131,7 @@ sql_db   = "db.s3db"
 
 -- there settings are not used by SQLite
 sql_host = "localhost"
+sql_port = 3306
+--- sql_port = 5432 // use this for PgSQL
 sql_user = "root"
 sql_pass = ""

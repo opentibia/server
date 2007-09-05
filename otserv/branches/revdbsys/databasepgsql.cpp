@@ -30,9 +30,10 @@ extern ConfigManager g_config;
 DatabasePgSQL::DatabasePgSQL()
 {
 	// load connection parameters
-	std::string dns = "host='" + g_config.getString(ConfigManager::SQL_HOST) + "' dbname='" + g_config.getString(ConfigManager::SQL_DB) + "' user='" + g_config.getString(ConfigManager::SQL_USER) + "' password='" + g_config.getString(ConfigManager::SQL_PASS) + "'";
+	std::stringstream dns;
+	dns << "host='" << g_config.getString(ConfigManager::SQL_HOST) << "' dbname='" << g_config.getString(ConfigManager::SQL_DB) << "' user='" << g_config.getString(ConfigManager::SQL_USER) << "' password='" << g_config.getString(ConfigManager::SQL_PASS) << "' port='" << g_config.getNumber(ConfigManager::SQL_PORT) << "'";
 
-	m_handle = PQconnectdb(dns.c_str());
+	m_handle = PQconnectdb(dns.str().c_str());
 	m_connected = PQstatus(m_handle) == CONNECTION_OK;
 
 	if(!m_connected)

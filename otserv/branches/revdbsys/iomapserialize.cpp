@@ -138,6 +138,7 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 				return false;
 
 			storedTile = true;
+			query.str("");
 		}
 		++runningID;
 
@@ -147,10 +148,9 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 		item->serializeAttr(propWriteStream);
 		const char* attributes = propWriteStream.getStream(attributesSize);
 
-		query.str("");
 		query << tileId << ", " << runningID << ", " << parentid << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
 
-		if(!stmt.addRow(query.str()))
+		if(!stmt.addRow(query))
 			return false;
 
 		if(item->getContainer())
@@ -175,10 +175,9 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 			item->serializeAttr(propWriteStream);
 			const char* attributes = propWriteStream.getStream(attributesSize);
 
-			query.str("");
 			query << tileId << ", " << runningID << ", " << parentid << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
 
-			if(!stmt.addRow(query.str()))
+			if(!stmt.addRow(query))
 				return false;
 		}
 	}
@@ -371,10 +370,9 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		House* house = it->second;
 
-		query.str("");
 		query << house->getHouseId() << ", " << house->getHouseOwner() << ", " << house->getPaidUntil() << ", " << house->getPayRentWarnings();
 
-		if(!stmt.addRow(query.str())) {
+		if(!stmt.addRow(query)) {
 			db->rollback();
 			return false;
 		}
@@ -393,19 +391,17 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 
 		std::string listText;
 		if(house->getAccessList(GUEST_LIST, listText) && listText != ""){
-			query.str("");
 			query << house->getHouseId() << ", " << GUEST_LIST << ", " << listText;
 
-			if(!stmt.addRow(query.str())) {
+			if(!stmt.addRow(query)) {
 				db->rollback();
 				return false;
 			}
 		}
 		if(house->getAccessList(SUBOWNER_LIST, listText) && listText != ""){
-			query.str("");
 			query << house->getHouseId() << ", " << SUBOWNER_LIST << ", " << listText;
 
-			if(!stmt.addRow(query.str())) {
+			if(!stmt.addRow(query)) {
 				db->rollback();
 				return false;
 			}
@@ -414,10 +410,9 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 		for(HouseDoorList::iterator it = house->getHouseDoorBegin(); it != house->getHouseDoorEnd(); ++it){
 			const Door* door = *it;
 			if(door->getAccessList(listText) && listText != ""){
-				query.str("");
 				query << house->getHouseId() << ", " << door->getDoorId() << ", " << listText;
 
-				if(!stmt.addRow(query.str())) {
+				if(!stmt.addRow(query)) {
 					db->rollback();
 					return false;
 				}

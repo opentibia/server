@@ -95,6 +95,7 @@ public:
 		MAX_MESSAGEBUFFER,
 		OTSERV_DB_ENABLED,
 		SAVE_CLIENT_DEBUG_ASSERTIONS,
+		SQL_PORT,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

@@ -182,7 +182,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 		db->executeQuery(query.str());
 		query.str("");
 	} else {
-		player->premiumDays = (premEnd - timeNow)/(3600*24);
+		player->premiumDays = (premEnd - timeNow)/86400;
 	}
 	#endif
 
@@ -365,10 +365,9 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 		item->serializeAttr(propWriteStream);
 		const char* attributes = propWriteStream.getStream(attributesSize);
 
-		stream.str("");
 		stream << player->getGUID() << ", " << pid << ", " << runningId << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
 
-		if(!query_insert.addRow(stream.str())){
+		if(!query_insert.addRow(stream)){
 			return false;
 		}
 
@@ -397,12 +396,10 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 			item->serializeAttr(propWriteStream);
 			const char* attributes = propWriteStream.getStream(attributesSize);
 
-			stream.str("");
 			stream << player->getGUID() << ", " << parentId << ", " << runningId << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
 
-			if(!query_insert.addRow(stream.str())){
+			if(!query_insert.addRow(stream))
 				return false;
-			}
 		}
 	}
 
@@ -526,10 +523,9 @@ bool IOPlayer::savePlayer(Player* player)
 
 	for(LearnedInstantSpellList::const_iterator it = player->learnedInstantSpellList.begin();
 			it != player->learnedInstantSpellList.end(); ++it){
-		query.str("");
 		query << player->getGUID() << ", " << db->escapeString(*it);
 
-		if(!stmt.addRow(query.str())) {
+		if(!stmt.addRow(query)) {
 			db->rollback();
 			return false;
 		}
@@ -572,10 +568,9 @@ bool IOPlayer::savePlayer(Player* player)
 
 	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++) {
-		query.str("");
 		query << player->getGUID() << ", " << cit->first << ", " << cit->second;
 
-		if(!stmt.addRow(query.str())) {
+		if(!stmt.addRow(query)) {
 			db->rollback();
 			return false;
 		}
@@ -590,10 +585,9 @@ bool IOPlayer::savePlayer(Player* player)
 	stmt.setQuery("INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES ");
 
 	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++) {
-		query.str("");
 		query << player->getGUID() << ", " << *it;
 
-		if(!stmt.addRow(query.str())) {
+		if(!stmt.addRow(query)) {
 			db->rollback();
 			return false;
 		}
