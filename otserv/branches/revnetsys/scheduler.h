@@ -73,7 +73,11 @@ class Scheduler{
 public:
 	~Scheduler() {}
 	
-	static Scheduler& getScheduler() {return c_scheduler;}
+	static Scheduler& getScheduler()
+	{
+		static Scheduler scheduler;
+		return scheduler;
+	}
 	
 	uint32_t addEvent(SchedulerTask* event);
 	bool stopEvent(uint32_t eventId);
@@ -82,8 +86,6 @@ public:
 	
 protected:
 	Scheduler();
-
-	static Scheduler c_scheduler;
 
 	OTSYS_THREAD_LOCKVAR m_eventLock;
 	OTSYS_THREAD_SIGNALVAR m_eventSignal;

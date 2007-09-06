@@ -52,7 +52,11 @@ class Dispatcher{
 public:
 	~Dispatcher() {}
 	
-	static Dispatcher& getDispatcher() {return c_dispatcher;}
+	static Dispatcher& getDispatcher()
+	{
+		static Dispatcher dispatcher;
+		return dispatcher;
+	}
 	
 	void addTask(Task* task);
 	
@@ -61,12 +65,10 @@ public:
 protected:
 	Dispatcher();
 	
-	
 	OTSYS_THREAD_LOCKVAR m_taskLock;
 	OTSYS_THREAD_SIGNALVAR m_taskSignal;
 	
 	std::list<Task*> m_taskList;
-	static Dispatcher c_dispatcher;
 };
 
 

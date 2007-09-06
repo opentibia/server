@@ -20,8 +20,6 @@
 
 #include "tasks.h"
 
-Dispatcher Dispatcher::c_dispatcher;
-
 Dispatcher::Dispatcher()
 {
 	OTSYS_THREAD_LOCKVARINIT(m_taskLock);

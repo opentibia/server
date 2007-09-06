@@ -20,8 +20,6 @@
 
 #include "scheduler.h"
 
-Scheduler Scheduler::c_scheduler;
-
 Scheduler::Scheduler()
 {
 	OTSYS_THREAD_LOCKVARINIT(m_eventLock);
