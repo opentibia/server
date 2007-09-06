@@ -80,7 +80,7 @@ private:
 			return NULL;
 		}
 	}
-	
+	/*
 	void sendOutputBuffer()
 	{
 		if(m_outputBuffer){
@@ -88,7 +88,10 @@ private:
 			m_outputBuffer = NULL;
 		}
 	}
-
+	*/
+	
+	void sendLoginErrorMessage(uint8_t error, const char* message);
+	
 	//virtual void loginTask(const std::string& name, Connection* connection);
 	virtual void deleteProtocolTask();
 

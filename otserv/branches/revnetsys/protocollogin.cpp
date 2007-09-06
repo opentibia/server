@@ -123,7 +123,7 @@ void ProtocolLogin::parsePacket(NetworkMessage& msg)
 						output->AddU16(g_config.getNumber(ConfigManager::PORT));
 					}
 
-					output->AddU16(account.premDays);
+					output->AddU16(0);
 				}
 				else{
 					output->AddByte(0x0A);

@@ -147,7 +147,7 @@ void Protocol79::deleteProtocolTask()
 			g_game.removeCreature(player, false);
 		}
 
-#ifdef __DEBUG__
+#ifdef __DEBUG_NET__
 		std::cout << "Deleting Protocol79 - Protocol:" << this << ", Player: " << player << std::endl;
 #endif
 	}
@@ -226,6 +226,8 @@ bool Protocol79::connectPlayer(const std::string& name)
 {
 	player = g_game.getPlayerByName(name);
 	if(player && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
+		sendLoginErrorMessage(0x14, "Not implemented yet");
+		/*
 		//reattach player?
 		if(!player->isRemoved()){
 			player->lastlogin = time(NULL);
@@ -234,6 +236,7 @@ bool Protocol79::connectPlayer(const std::string& name)
 			player->sendIcons();
 			player->lastip = player->getIP();
 		}
+		*/
 	}
 	else{
 		player = new Player(name, this);
@@ -241,43 +244,24 @@ bool Protocol79::connectPlayer(const std::string& name)
 		player->setID();
 		IOPlayer::instance()->loadPlayer(player, name);
 
-		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 
 		if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-			output->AddByte(0x14);
-			output->AddString("Your character is banished!");
-			OutputMessagePool::getInstance()->send(output);
+			sendLoginErrorMessage(0x14, "Your character is banished!");
 			return false;
 		}
 		else if(g_bans.isAccountBanished(player->getAccount()) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-			output->AddByte(0x14);
-			output->AddString("Your account is banished!");
-			OutputMessagePool::getInstance()->send(output);
+			sendLoginErrorMessage(0x14, "Your account is banished!");
 			return false;
 		}
 		/*else if(playerexist && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
 			#ifdef __DEBUG_PLAYERS__
 			std::cout << "reject player..." << std::endl;
 			#endif
-			output->AddByte(0x14);
-			output->AddString("You are already logged in.");
-			OutputMessagePool::getInstance()->send(output);
+			sendLoginErrorMessage(0x14, "You are already logged in.");
 			return false;
 		}*/
-		else if(g_game.getGameState() == GAME_STATE_STARTUP){
-			output->AddByte(0x14);
-			output->AddString("Gameworld is starting up. Please wait.");
-			OutputMessagePool::getInstance()->send(output);
-			return false;
-		}
-		else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
-			//nothing to do
-			return false;
-		}
 		else if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
-			output->AddByte(0x14);
-			output->AddString("Server temporarly closed.");
-			OutputMessagePool::getInstance()->send(output);
+			sendLoginErrorMessage(0x14, "Server temporarly closed.");
 			return false;
 		}
 
@@ -291,10 +275,12 @@ bool Protocol79::connectPlayer(const std::string& name)
 			ss << "Too many players online.\n" << "You are at place "
 				<< currentSlot << " on the waiting list.";
 			
+			OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 			output->AddByte(0x16);
 			output->AddString(ss.str());
 			output->AddByte(retryTime);
 			OutputMessagePool::getInstance()->send(output);
+			m_connection->closeConnection();
 			return false;
 		}
 		else{
@@ -302,9 +288,7 @@ bool Protocol79::connectPlayer(const std::string& name)
 			if(!g_game.placePlayer(player, player->getLoginPosition())){
 				//resort to temple position
 				if(!g_game.placePlayer(player, player->getTemplePosition(), true)){
-					output->AddByte(0x14);
-					output->AddString("Temple position is wrong. Contact the administrator.");
-					OutputMessagePool::getInstance()->send(output);
+					sendLoginErrorMessage(0x14, "Temple position is wrong. Contact the administrator.");
 					return false;
 				}
 			}
@@ -333,13 +317,8 @@ void Protocol79::parsePacket(NetworkMessage& msg)
 	uint16_t clientos = msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-
 	if(version <= 760){
-		output->AddByte(0x0A);
-		output->AddString("Only clients with protocol 7.92 allowed!");
-		OutputMessagePool::getInstance()->send(output);
-		m_connection->closeConnection();
+		sendLoginErrorMessage(0x0A, "Only clients with protocol 7.92 allowed!");
 	}
 	else if(RSA_decrypt(g_otservRSA, msg)){
 		m_encryptionEnabled = true;
@@ -354,22 +333,21 @@ void Protocol79::parsePacket(NetworkMessage& msg)
 		std::string password = msg.GetString();
 
 		if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
-			output->AddByte(0x14);
-			output->AddString("Only clients with protocol 7.92 allowed!");
-			OutputMessagePool::getInstance()->send(output);
-			m_connection->closeConnection();
+			sendLoginErrorMessage(0x14, "Only clients with protocol 7.92 allowed!");
 		}
 		else if(g_bans.isIpDisabled(getIP())){
-			output->AddByte(0x14);
-			output->AddString("To many connections attempts from this IP. Try again later.");
-			OutputMessagePool::getInstance()->send(output);
-			m_connection->closeConnection();
+			sendLoginErrorMessage(0x14, "Too many connections attempts from this IP. Try again later.");
 		}
 		else if(g_bans.isIpBanished(getIP())){
-			output->AddByte(0x14);
-			output->AddString("Your IP is banished!");
-			OutputMessagePool::getInstance()->send(output);
+			sendLoginErrorMessage(0x14, "Your IP is banished!");
+		}
+		else if(g_game.getGameState() == GAME_STATE_STARTUP){
+			sendLoginErrorMessage(0x14, "Gameworld is starting up. Please wait.");
+		}
+		else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+			//nothing to do, just close the connection
 			m_connection->closeConnection();
+			return;
 		}
 		else{
 			std::string acc_pass;
@@ -381,8 +359,20 @@ void Protocol79::parsePacket(NetworkMessage& msg)
 			if(isSuccess){
 				connectPlayer(name);
 			}
+			else{
+				m_connection->closeConnection();
+			}
 		}
 	}
+}
+
+void Protocol79::sendLoginErrorMessage(uint8_t error, const char* message)
+{
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	output->AddByte(error);
+	output->AddString(message);
+	OutputMessagePool::getInstance()->send(output);
+	m_connection->closeConnection();
 }
 
 /*
