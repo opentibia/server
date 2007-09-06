@@ -213,7 +213,7 @@ InstantSpell* Spells::getInstantSpell(const std::string words)
 			size_t paramLen = words.length() - spellLen;
 			std::string paramText = words.substr(spellLen, paramLen);
 
-			if(paramText[0] != ' '){
+			if(paramText.length() >= 2 && paramText.substr(0, 2) != " \""){
 				return NULL;
 			}
 		}
