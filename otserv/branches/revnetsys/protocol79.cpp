@@ -241,7 +241,7 @@ bool Protocol79::connectPlayer(const std::string& name)
 		player->setID();
 		IOPlayer::instance()->loadPlayer(player, name);
 
-		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
+		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 
 		if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
 			output->AddByte(0x14);
@@ -333,7 +333,7 @@ void Protocol79::parsePacket(NetworkMessage& msg)
 	uint16_t clientos = msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 
 	if(version <= 760){
 		output->AddByte(0x0A);

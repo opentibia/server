@@ -35,10 +35,7 @@
 class OutputMessage : public NetworkMessage, boost::noncopyable
 {
 private:
-	OutputMessage() {
-		freeMessage();
-		m_outputBufferStart = 2;
-	}
+	OutputMessage();
 	
 public:
 	~OutputMessage() {}
@@ -46,7 +43,8 @@ public:
 	char* getOutputBuffer() { return (char*)&m_MsgBuf[m_outputBufferStart];}
 	void setBufferStart(uint32_t start) {m_outputBufferStart = start;}
 	
-	void addCryptoHeader(){
+	void addCryptoHeader()
+	{
 		*(uint16_t*)(m_MsgBuf) = m_MsgSize;
 		m_MsgSize = m_MsgSize + 2;
 		m_outputBufferStart = 0;
@@ -55,16 +53,30 @@ public:
 	enum OutputMessageState{
 		STATE_FREE,
 		STATE_ALLOCATED,
+		STATE_ALLOCATED_NO_AUTOSEND,
 		STATE_WAITING
 	};
 	
-	void freeMessage(){
+	void releaseMessage()
+	{
+		if(m_state == STATE_ALLOCATED_NO_AUTOSEND){
+			freeMessage();
+		}
+		else{
+			#ifdef __DEBUG_NET__
+			std::cout << "Warning: [OutputMessage::freeMessage] m_state != STATE_ALLOCATED_NO_AUTOSEND" << std::endl;
+			#endif
+		}
+	}
+	
+protected:
+	
+	void freeMessage()
+	{
 		setProtocol(NULL);
 		setConnection(NULL);
 		setState(OutputMessage::STATE_FREE);
 	}
-	
-protected:
 	
 	friend class OutputMessagePool;
 	
@@ -88,24 +100,10 @@ protected:
 class OutputMessagePool
 {
 private:
-	OutputMessagePool()
-	{
-		OTSYS_THREAD_LOCKVARINIT(m_outputPoolLock);
-		for(uint32_t i = 0; i < OUTPUT_POOL_SIZE; ++i){
-			m_outputMessages.push_back(new OutputMessage);
-		}
-	}
+	OutputMessagePool();
 
 public:
-	~OutputMessagePool()
-	{
-		OutputMessageVector::iterator it;
-		for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
-			delete *it;
-		}
-		m_outputMessages.clear();
-		OTSYS_THREAD_LOCKVARRELEASE(m_outputPoolLock);
-	}
+	~OutputMessagePool();
 	
 	static OutputMessagePool* getInstance()
 	{
@@ -113,81 +111,13 @@ public:
 		return &instance;
 	}
 	
-	void send(OutputMessage* msg)
-	{
-		OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
-		if(msg->getState() == OutputMessage::STATE_ALLOCATED){
-			std::cout << "Sending message" << std::endl;
-			msg->writeMessageLength();
-			Protocol* protocol = msg->getProtocol();
-			protocol->onSendMessage(msg);
-			#ifdef __DEBUG_NET__
-			if(protocol->getConnection() == NULL){
-				std::cout << "Error: [OutputMessagePool::send] NULL connection." << std::endl;
-			}
-			#endif
-			msg->getConnection()->send(msg);
-			msg->setState(OutputMessage::STATE_WAITING);
-		}
-	}
+	void send(OutputMessage* msg);
+	void sendAll();
+	OutputMessage* getOutputMessage(Protocol* protocol, bool autosend = true);
 	
-	void sendAll()
-	{
-		OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
-		OutputMessageVector::iterator it;
-		for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
-			if((*it)->getState() == OutputMessage::STATE_ALLOCATED){
-				(*it)->writeMessageLength();
-				Protocol* protocol = (*it)->getProtocol();
-				#ifdef __DEBUG_NET__
-				if(protocol->getConnection() == NULL){
-					std::cout << "Error: [OutputMessagePool::sendAll] NULL connection." << std::endl;
-				}
-				#endif
-				protocol->onSendMessage(*it);
-				(*it)->getConnection()->send(*it);
-				(*it)->setState(OutputMessage::STATE_WAITING);
-			}
-		}
-	}
-	
-	OutputMessage* getOutputMessage(Protocol* protocol)
-	{
-		#ifdef __DEBUG_NET__
-		if(protocol->getConnection() == NULL){
-			std::cout << "Error: [OutputMessagePool::getOutputMessage] NULL connection." << std::endl;
-		}
-		#endif
-		
-		OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
-		OutputMessageVector::iterator it;
-		for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
-			if((*it)->getState() == OutputMessage::STATE_FREE){
-				(*it)->Reset();
-				(*it)->setState(OutputMessage::STATE_ALLOCATED);
-				(*it)->setProtocol(protocol);
-				(*it)->setConnection(protocol->getConnection());
-				return *it;
-			}
-		}
-
-		OutputMessage* outputmessage = new OutputMessage;
-		outputmessage->setState(OutputMessage::STATE_ALLOCATED);
-		outputmessage->setProtocol(protocol);
-		outputmessage->setConnection(protocol->getConnection());
-		m_outputMessages.push_back(outputmessage);
-		return outputmessage;
-	}
-
 protected:
 	
-	static void writeHandler(OutputMessage* msg, const boost::asio::error& error)
-	{
-		std::cout << "Write handler" << std::endl;
-		Connection* connection = msg->getConnection();
-		connection->onWriteOperation(error);
-		msg->freeMessage();
-	}
+	static void writeHandler(OutputMessage* msg, const boost::asio::error& error);
 	
 	friend class Connection;
 

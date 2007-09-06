@@ -48,12 +48,14 @@ void ProtocolLogin::parsePacket(NetworkMessage& msg)
 	uint16_t version  = msg.GetU16();
 	msg.SkipBytes(12);
 	
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
 	if(version <= 760){
+		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		output->AddByte(0x0A);
 		output->AddString("Only clients with protocol 7.92 allowed!");
+		OutputMessagePool::getInstance()->send(output);
 	}
 	else if(RSA_decrypt(g_otservRSA, msg)){
+		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		m_encryptionEnabled = true;
 		m_key[0] = msg.GetU32();
 		m_key[1] = msg.GetU32();

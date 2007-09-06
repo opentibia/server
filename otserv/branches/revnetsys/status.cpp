@@ -56,7 +56,7 @@ void ProtocolStatus::parsePacket(NetworkMessage& msg)
 	case 0xFF:
 	{
 		if(msg.GetRaw() == "info"){
-			OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
+			OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 			Status* status = Status::instance();
 			std::string str = status->getStatusString();
 			output->AddBytes(str.c_str(), str.size());
@@ -84,7 +84,7 @@ void ProtocolStatus::parsePacket(NetworkMessage& msg)
 			requestedInfo |= REQUEST_MAP_INFO;
 		}
 		
-		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
+		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		Status* status = Status::instance();
 		status->getInfo(requestedInfo, output);
 		OutputMessagePool::getInstance()->send(output);
