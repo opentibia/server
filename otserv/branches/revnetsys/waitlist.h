@@ -50,19 +50,19 @@ public:
 	
 	static Waitlist* instance();
 	
-	void createMessage(NetworkMessage& msg, int acc, uint32_t ip);
-	bool clientLogin(int acc, uint32_t ip);
-	
+	bool clientLogin(const Player* player);
+	int getClientSlot(const Player* player);
+	int getTime(int slot){return 20;}
+
 	OTSYS_THREAD_LOCKVAR waitListLock;   
+
 protected:
 	Waitinglist waitList;
 	
-	WaitinglistIterator findClient(int acc, uint32_t ip);
-	void addClient(int acc, uint32_t ip);
-	int getClientSlot(int acc, uint32_t ip);
+	WaitinglistIterator findClient(const Player* player);
+	void addClient(const Player* player);
 	
-	void cleanUpList();
-	int getTime(int slot){return 20;}
+	void cleanUpList();	
 private:
 	static Waitlist* _Wait;	
 };

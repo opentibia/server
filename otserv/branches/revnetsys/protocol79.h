@@ -50,21 +50,22 @@ public:
 	Protocol79(Connection* connection);
 	~Protocol79();
 	
-	connectResult_t ConnectPlayer();
+	//connectResult_t ConnectPlayer();
+	bool connectPlayer(const std::string& name);
+
 	void ReceiveLoop();  
 	void WriteBuffer(NetworkMessage* add);
-	void reinitializeProtocol(SOCKET s);
+	void reinitializeProtocol();
 	
 	void setKey(const uint32_t* key);
 		
 	void setPlayer(Player* p);
 	uint32_t getIP() const;
-	//void sleepTillMove();
-	
+
 private:
 	OutputMessage* m_outputBuffer;
 	std::list<uint32_t> knownPlayers;
-	uint32_t m_key[4];
+	//uint32_t m_key[4];
 
 	NetworkMessage* getOutputBuffer()
 	{
@@ -87,6 +88,9 @@ private:
 			m_outputBuffer = NULL;
 		}
 	}
+
+	//virtual void loginTask(const std::string& name, Connection* connection);
+	virtual void deleteProtocolTask();
 
 	void checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &removedKnown);
 	
@@ -297,7 +301,7 @@ private:
 		
 	bool pendingLogout;
 	Player* player;
-	SOCKET s;
+	//SOCKET s;
 	
 	friend class Player;
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);

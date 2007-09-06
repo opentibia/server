@@ -20,6 +20,7 @@
 
 #include "connection.h"
 #include "protocol.h"
+#include "protocol79.h"
 #include "protocollogin.h"
 #include "outputmessage.h"
 #include "tasks.h"
@@ -119,7 +120,7 @@ void Connection::parsePacket(const boost::asio::error& error)
 				m_protocol = new ProtocolLogin(this);
 				break;
 			case 0x0A: // World server protocol
-				//m_protocol = new protocol79(this);
+				m_protocol = new Protocol79(this);
 				break;
 			case 0xFE: // Admin protocol
 				break;

@@ -19,41 +19,42 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <time.h>
-#include <list>
-
-#include "networkmessage.h"
 #include "protocol79.h"
-
+#include "definitions.h"
+#include "networkmessage.h"
 #include "items.h"
-
 #include "tile.h"
 #include "creature.h"
 #include "player.h"
 #include "status.h"
 #include "chat.h"
-
-#include <stdio.h>
-
 #include "configmanager.h"
-
 #include "otsystem.h"
 #include "actions.h"
 #include "game.h"
 #include "ioplayer.h"
 #include "house.h"
 #include "waitlist.h"
+#include "ban.h"
+#include "ioaccount.h"
+
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <time.h>
+#include <list>
 
 #include <boost/function.hpp>
 
 extern Game g_game;
 extern ConfigManager g_config;
 extern Actions actions;
+extern RSA* g_otservRSA;
+extern Ban g_bans;
 Chat g_chat;
+
+#define CLIENT_VERSION_MIN 792
+#define CLIENT_VERSION_MAX 792
 
 Protocol79::Protocol79(Connection* connection) :
 	Protocol(connection)
@@ -66,22 +67,27 @@ Protocol79::Protocol79(Connection* connection) :
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
-	this->s = s;
+	//this->s = s;
 	m_outputBuffer = NULL;
 }
 
 Protocol79::~Protocol79()
 {
 	OTSYS_THREAD_LOCKVARRELEASE(bufferLock);
+
+	/*
 	if(s){
 		closesocket(s);
 		s = 0;
 	}
+	*/
+
 	player = NULL;
 }
 
 uint32_t Protocol79::getIP() const
 {
+	/*
 	sockaddr_in sain;
 	socklen_t salen = sizeof(sockaddr_in);
 	if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
@@ -92,6 +98,7 @@ uint32_t Protocol79::getIP() const
 		return sain.sin_addr.s_addr;
 #endif
 	}
+	*/
 	
 	return 0;
 }
@@ -101,31 +108,52 @@ void Protocol79::setPlayer(Player* p)
 	player = p;
 }
 
-/*
-void Protocol79::sleepTillMove()
-{
-	int64_t delay = player->getSleepTicks();
-	if(delay > 0 ){       
-#if __DEBUG__     
-		std::cout << "Delaying "<< player->getName() << " --- " << delay << std::endl;		
-#endif	
-		OTSYS_SLEEP((uint32_t)delay);
-	}
-}
-*/
-
-void Protocol79::reinitializeProtocol(SOCKET _s)
+void Protocol79::reinitializeProtocol()
 {
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
 	//OutputBuffer.Reset();
 	knownPlayers.clear();
-	if(s)
+
+	/*
+	if(s){
 		closesocket(s);
+	}
+
 	s = _s;
+	*/
 }
 
+/*
+void Protocol79::loginTask(const std::string& name, Connection* connection)
+{
+	searchPlayer
+	if player is online then
+		assign this Protocol to the player 
+		send messages to the client
+	else
+		load player
+		etc
+	endif
+}
+*/
+
+void Protocol79::deleteProtocolTask()
+{
+	if(player){
+		player->client = NULL;
+		if(player->isOnline() && !player->hasCondition(CONDITION_INFIGHT)){
+			g_game.removeCreature(player, false);
+		}
+
+#ifdef __DEBUG__
+		std::cout << "Deleting Protocol79 - Protocol:" << this << ", Player: " << player << std::endl;
+#endif
+	}
+}
+
+/*
 connectResult_t Protocol79::ConnectPlayer()
 {
 	Waitlist* wait = Waitlist::instance();
@@ -148,23 +176,25 @@ connectResult_t Protocol79::ConnectPlayer()
 
 	return CONNECT_INTERNALERROR;
 }
-
+*/
 
 void Protocol79::ReceiveLoop()
 {
+	/*
 	//NetworkMessage msg;
 	//msg.setEncryptionState(true);
 	//msg.setEncryptionKey(m_key);
 
 	do{
-		/*while(pendingLogout == false && msg.ReadFromSocket(s)){
-			parsePacket(msg);
-		}*/
+		//while(pendingLogout == false && msg.ReadFromSocket(s)){
+		//	parsePacket(msg);
+		//}
 
 		if(s){
 			closesocket(s);
 			s = 0;
 		}
+
 		// logout by disconnect?  -> kick
 		if(pendingLogout == false){
 			g_game.playerSetAttackedCreature(player, 0);
@@ -175,6 +205,7 @@ void Protocol79::ReceiveLoop()
 
 			//OTSYS_THREAD_LOCK(g_game.gameLock, "Protocol79::ReceiveLoop()");
 
+			/*
 			if(!player->isRemoved()){
 				if(s == 0){
 					g_game.removeCreature(player);
@@ -188,9 +219,173 @@ void Protocol79::ReceiveLoop()
 			//OTSYS_THREAD_UNLOCK(g_game.gameLock, "Protocol79::ReceiveLoop()");
 		}
 	}while(s != 0 && !player->isRemoved());
+	*/
 }
 
+bool Protocol79::connectPlayer(const std::string& name)
+{
+	player = g_game.getPlayerByName(name);
+	if(player && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
+		//reattach player?
+		if(!player->isRemoved()){
+			player->lastlogin = time(NULL);
+			player->client->reinitializeProtocol();
+			player->client->sendAddCreature(player, false);
+			player->sendIcons();
+			player->lastip = player->getIP();
+		}
+	}
+	else{
+		player = new Player(name, this);
+		player->useThing2();
+		player->setID();
+		IOPlayer::instance()->loadPlayer(player, name);
 
+		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
+
+		if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
+			output->AddByte(0x14);
+			output->AddString("Your character is banished!");
+			OutputMessagePool::getInstance()->send(output);
+			return false;
+		}
+		else if(g_bans.isAccountBanished(player->getAccount()) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
+			output->AddByte(0x14);
+			output->AddString("Your account is banished!");
+			OutputMessagePool::getInstance()->send(output);
+			return false;
+		}
+		/*else if(playerexist && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
+			#ifdef __DEBUG_PLAYERS__
+			std::cout << "reject player..." << std::endl;
+			#endif
+			output->AddByte(0x14);
+			output->AddString("You are already logged in.");
+			OutputMessagePool::getInstance()->send(output);
+			return false;
+		}*/
+		else if(g_game.getGameState() == GAME_STATE_STARTUP){
+			output->AddByte(0x14);
+			output->AddString("Gameworld is starting up. Please wait.");
+			OutputMessagePool::getInstance()->send(output);
+			return false;
+		}
+		else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+			//nothing to do
+			return false;
+		}
+		else if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+			output->AddByte(0x14);
+			output->AddString("Server temporarly closed.");
+			OutputMessagePool::getInstance()->send(output);
+			return false;
+		}
+
+		if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) &&
+			!Waitlist::instance()->clientLogin(player)){
+
+			int32_t currentSlot = Waitlist::instance()->getClientSlot(player);
+			int32_t retryTime = Waitlist::instance()->getTime(currentSlot);
+			std::stringstream ss;
+			
+			ss << "Too many players online.\n" << "You are at place "
+				<< currentSlot << " on the waiting list.";
+			
+			output->AddByte(0x16);
+			output->AddString(ss.str());
+			output->AddByte(retryTime);
+			OutputMessagePool::getInstance()->send(output);
+			return false;
+		}
+		else{
+			//last login position
+			if(!g_game.placePlayer(player, player->getLoginPosition())){
+				//resort to temple position
+				if(!g_game.placePlayer(player, player->getTemplePosition(), true)){
+					output->AddByte(0x14);
+					output->AddString("Temple position is wrong. Contact the administrator.");
+					OutputMessagePool::getInstance()->send(output);
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+
+	/*
+		Status* stat = Status::instance();
+		stat->addPlayer();
+		player->lastlogin = time(NULL);
+		player->lastip = player->getIP();
+		s = 0;            // protocol/player will close socket
+
+		OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
+		isLocked = false;
+		protocol->ReceiveLoop();
+		stat->removePlayer();
+	}
+	*/
+}
+
+void Protocol79::parsePacket(NetworkMessage& msg)
+{
+	uint16_t clientos = msg.GetU16();
+	uint16_t version  = msg.GetU16();
+
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
+
+	if(version <= 760){
+		output->AddByte(0x0A);
+		output->AddString("Only clients with protocol 7.92 allowed!");
+		OutputMessagePool::getInstance()->send(output);
+		m_connection->closeConnection();
+	}
+	else if(RSA_decrypt(g_otservRSA, msg)){
+		m_encryptionEnabled = true;
+		m_key[0] = msg.GetU32();
+		m_key[1] = msg.GetU32();
+		m_key[2] = msg.GetU32();
+		m_key[3] = msg.GetU32();
+
+		unsigned char unknown = msg.GetByte();
+		unsigned long accnumber = msg.GetU32();
+		std::string name = msg.GetString();
+		std::string password = msg.GetString();
+
+		if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
+			output->AddByte(0x14);
+			output->AddString("Only clients with protocol 7.92 allowed!");
+			OutputMessagePool::getInstance()->send(output);
+			m_connection->closeConnection();
+		}
+		else if(g_bans.isIpDisabled(getIP())){
+			output->AddByte(0x14);
+			output->AddString("To many connections attempts from this IP. Try again later.");
+			OutputMessagePool::getInstance()->send(output);
+			m_connection->closeConnection();
+		}
+		else if(g_bans.isIpBanished(getIP())){
+			output->AddByte(0x14);
+			output->AddString("Your IP is banished!");
+			OutputMessagePool::getInstance()->send(output);
+			m_connection->closeConnection();
+		}
+		else{
+			std::string acc_pass;
+			bool isSuccess = IOAccount::instance()->getPassword(accnumber, name, acc_pass) &&
+				passwordTest(password,acc_pass);
+
+			g_bans.addLoginAttempt(getIP(), isSuccess);
+
+			if(isSuccess){
+				connectPlayer(name);
+			}
+		}
+	}
+}
+
+/*
 void Protocol79::parsePacket(NetworkMessage &msg)
 {
 	if(msg.getMessageLength() <= 0)
@@ -406,6 +601,7 @@ void Protocol79::parsePacket(NetworkMessage &msg)
 
 	g_game.flushSendBuffers();
 }
+*/
 
 void Protocol79::GetTileDescription(const Tile* tile, NetworkMessage* msg)
 {

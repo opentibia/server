@@ -626,6 +626,7 @@ protected:
 	friend class Actions;
 	friend class IOPlayerXML;
 	friend class IOPlayerSQL;
+	friend class Protocol79;
 };
 
 #endif
