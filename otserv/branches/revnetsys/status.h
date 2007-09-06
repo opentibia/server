@@ -26,6 +26,21 @@
 #include "definitions.h"
 #include "networkmessage.h"
 
+#include "protocol.h"
+
+class ProtocolStatus : public Protocol 
+{
+public:
+	ProtocolStatus(Connection* connection) : Protocol(connection) {}
+	virtual ~ProtocolStatus() {}
+
+	virtual void parsePacket(NetworkMessage& msg);
+	
+protected:
+	
+	virtual void deleteProtocolTask();		
+};
+
 class Status{
 public:
 	// procs
@@ -40,7 +55,7 @@ public:
 	bool hasSlot();
 	
 	std::string getStatusString();
-	void getInfo(NetworkMessage &nm);
+	void getInfo(uint32_t requestedInfo, OutputMessage* output);
 
 	int getPlayersOnline(){return playersonline;}
 	int getMaxPlayersOnline(){return playersmax;}

@@ -41,6 +41,67 @@ extern Game g_game;
 #define STATUS_SERVER_NAME "otserv"
 #define STATUS_CLIENT_VERISON "7.92"
 
+enum RequestedInfo_t{
+	REQUEST_BASIC_SERVER_INFO = 1,
+	REQUEST_OWNER_SERVER_INFO = 2,
+	REQUEST_MISC_SERVER_INFO = 4,
+	REQUEST_PLAYERS_INFO = 8,
+	REQUEST_MAP_INFO = 16
+};
+
+void ProtocolStatus::parsePacket(NetworkMessage& msg)
+{
+	switch(msg.GetByte()){
+	//XML info protocol
+	case 0xFF:
+	{
+		if(msg.GetRaw() == "info"){
+			OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
+			Status* status = Status::instance();
+			std::string str = status->getStatusString();
+			output->AddBytes(str.c_str(), str.size());
+			OutputMessagePool::getInstance()->send(output);
+		}
+		break;
+	}
+	//Another ServerInfo protocol
+	case 0x01:
+	{	
+		uint32_t requestedInfo = 0;
+		if(msg.GetByte() == 1){
+			requestedInfo |= REQUEST_BASIC_SERVER_INFO;
+		}
+		if(msg.GetByte() == 1){
+			requestedInfo |= REQUEST_OWNER_SERVER_INFO;
+		}
+		if(msg.GetByte() == 1){
+			requestedInfo |= REQUEST_MISC_SERVER_INFO;
+		}
+		if(msg.GetByte() == 1){
+			requestedInfo |= REQUEST_PLAYERS_INFO;
+		}
+		if(msg.GetByte() == 1){
+			requestedInfo |= REQUEST_MAP_INFO;
+		}
+		
+		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this);
+		Status* status = Status::instance();
+		status->getInfo(requestedInfo, output);
+		OutputMessagePool::getInstance()->send(output);
+		break;
+	}
+	default:
+		break;
+	}
+	m_connection->closeConnection();
+}
+
+void ProtocolStatus::deleteProtocolTask()
+{
+	std::cout << "Deleting ProtocolStatus" << std::endl;
+	delete this;
+}
+
 Status::Status()
 {
 	this->playersonline = 0;
@@ -145,73 +206,61 @@ std::string Status::getStatusString()
 	return xml;
 }
 
-void Status::getInfo(NetworkMessage &nm)
+void Status::getInfo(uint32_t requestedInfo, OutputMessage* output)
 {
-	/*
 	// the client selects which information may be 
 	// sent back, so we'll save some bandwidth and 
 	// make many
 	std::stringstream ss;
-	
-	bool bserverinfo0 = nm.GetByte() == 1;
-	bool bserverinfo1 = nm.GetByte() == 1;
-	bool bserverinfo2 = nm.GetByte() == 1;
-	bool bplayersinfo = nm.GetByte() == 1;
-	bool bmapinfo     = nm.GetByte() == 1;
-  
-	nm.Reset();
 	uint64_t running = (OTSYS_TIME() - this->start) / 1000;
 	// since we haven't all the things on the right place like map's 
 	// creator/info and other things, i'll put the info chunked into
 	// operators, so the httpd server will only receive the existing
 	// properties of the server, such serverinfo, playersinfo and so
-  
-	if(bserverinfo0){
-		nm.AddByte(0x10); // server info
-		nm.AddString(g_config.getString(ConfigManager::SERVER_NAME).c_str());
-		nm.AddString(g_config.getString(ConfigManager::IP).c_str());  
+
+	if(requestedInfo & REQUEST_BASIC_SERVER_INFO){
+		output->AddByte(0x10); // server info
+		output->AddString(g_config.getString(ConfigManager::SERVER_NAME).c_str());
+		output->AddString(g_config.getString(ConfigManager::IP).c_str());  
 		ss << g_config.getNumber(ConfigManager::PORT);
-		nm.AddString(ss.str().c_str());
+		output->AddString(ss.str().c_str());
 		ss.str(""); 
   	}
-  
-	if(bserverinfo1){
-    	nm.AddByte(0x11); // server info - owner info
-		nm.AddString(g_config.getString(ConfigManager::OWNER_NAME).c_str());
-		nm.AddString(g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
-  	}
-  
-	if(bserverinfo2){
-    	nm.AddByte(0x12); // server info - misc
-		nm.AddString(g_config.getString(ConfigManager::MOTD).c_str());
-		nm.AddString(g_config.getString(ConfigManager::LOCATION).c_str());
-		nm.AddString(g_config.getString(ConfigManager::URL).c_str());
-    	nm.AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
-    	nm.AddU32((uint32_t)(running));       // since servers can be online for months ;)
-    	nm.AddString(STATUS_SERVER_VERSION);
+
+	if(requestedInfo & REQUEST_OWNER_SERVER_INFO){
+    	output->AddByte(0x11); // server info - owner info
+		output->AddString(g_config.getString(ConfigManager::OWNER_NAME).c_str());
+		output->AddString(g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
   	}
 
-	if(bplayersinfo){
-    	nm.AddByte(0x20); // players info
-    	nm.AddU32(this->playersonline);
-	    nm.AddU32(this->playersmax);
-	    nm.AddU32(this->playerspeak);
+	if(requestedInfo & REQUEST_MISC_SERVER_INFO){
+    	output->AddByte(0x12); // server info - misc
+		output->AddString(g_config.getString(ConfigManager::MOTD).c_str());
+		output->AddString(g_config.getString(ConfigManager::LOCATION).c_str());
+		output->AddString(g_config.getString(ConfigManager::URL).c_str());
+    	output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
+    	output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
+    	output->AddString(STATUS_SERVER_VERSION);
+  	}
+
+	if(requestedInfo & REQUEST_PLAYERS_INFO){
+    	output->AddByte(0x20); // players info
+    	output->AddU32(this->playersonline);
+	    output->AddU32(this->playersmax);
+	    output->AddU32(this->playerspeak);
   	} 
-  
-  	if(bmapinfo){
-    	nm.AddByte(0x30); // map info
-    	nm.AddString(this->mapname.c_str());
-    	nm.AddString(this->mapauthor.c_str());
+
+  	if(requestedInfo & REQUEST_MAP_INFO){
+    	output->AddByte(0x30); // map info
+    	output->AddString(this->mapname.c_str());
+    	output->AddString(this->mapauthor.c_str());
     	int mw, mh;
     	g_game.getMapDimensions(mw, mh);  
-    	nm.AddU16(mw);
-    	nm.AddU16(mh);
+    	output->AddU16(mw);
+    	output->AddU16(mh);
   	}
 
-	*/
-	return;   
-  	// just one thing, I'm good with monospaced text, right?
-  	// if you haven't undertood the joke, look at the top ^^
+	return;
 }
 
 bool Status::hasSlot()

@@ -20,9 +20,10 @@
 
 #include "connection.h"
 #include "protocol.h"
+#include "outputmessage.h"
 #include "protocol79.h"
 #include "protocollogin.h"
-#include "outputmessage.h"
+#include "status.h"
 #include "tasks.h"
 #include "scheduler.h"
 
@@ -125,7 +126,7 @@ void Connection::parsePacket(const boost::asio::error& error)
 			case 0xFE: // Admin protocol
 				break;
 			case 0xFF: // Status protocol
-				//m_protocol = new protocolStatus(this);
+				m_protocol = new ProtocolStatus(this);
 				break;
 			default:
 				// No valid protocol
