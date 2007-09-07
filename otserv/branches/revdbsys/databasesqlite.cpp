@@ -158,7 +158,7 @@ std::string DatabaseSQLite::escapeString(const std::string &s)
 	char* output = new char[ s.length() * 2 + 3];
 
 	// quotes escaped string and frees temporary buffer
-	sqlite3_snprintf( s.length() * 2 + 1, output, "'%q'", s.c_str() );
+	sqlite3_snprintf( s.length() * 2 + 1, output, "%Q", s.c_str() );
 	std::string r(output);
 	delete[] output;
 	return r;
@@ -166,34 +166,16 @@ std::string DatabaseSQLite::escapeString(const std::string &s)
 
 std::string DatabaseSQLite::escapeBlob(const char* s, uint32_t length)
 {
-	std::string buf = "'";
+	std::string buf = "x'";
+
+	char* hex = new char[2];
 
 	for(int32_t i = 0; i < length; i++) {
-		switch(s[i]) {
-			case '\'':
-				buf += "\'\'";
-				break;
-
-			case '\0':
-				buf += "\\0";
-				break;
-
-			case '\\':
-				buf += "\\\\";
-				break;
-
-			case '\r':
-				buf += "\\r";
-				break;
-
-			case '\n':
-				buf += "\\n";
-				break;
-
-			default:
-				buf += s[i];
-		}
+		sprintf(hex, "%02x", s[i]);
+		buf += hex;
 	}
+
+	delete[] hex;
 
 	buf += "'";
 	return buf;
