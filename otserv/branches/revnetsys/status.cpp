@@ -25,6 +25,7 @@
 #include "configmanager.h"
 #include <sstream>
 #include "game.h"
+#include "connection.h"
 #include "networkmessage.h"
 #include "tools.h"
 

@@ -22,13 +22,15 @@
 #define __OTSERV_OUTPUT_MESSAGE_H__
 
 #include "definitions.h"
-#include <boost/asio.hpp>
+#include <boost/system/system_error.hpp>
+#include <boost/utility.hpp>
 
 #include "networkmessage.h"
 #include "otsystem.h"
 #include <list>
-#include "protocol.h"
-#include "connection.h"
+
+class Protocol;
+class Connection;
 
 #define OUTPUT_POOL_SIZE 100
 
@@ -73,26 +75,26 @@ protected:
 	
 	void freeMessage()
 	{
-		setProtocol(NULL);
 		setConnection(NULL);
 		setState(OutputMessage::STATE_FREE);
+		m_frame = 0;
 	}
 	
 	friend class OutputMessagePool;
-	
-	void setProtocol(Protocol* protocol){ m_protocol = protocol;}
-	Protocol* getProtocol() { return m_protocol;}
-	
+		
 	void setConnection(Connection* connection){ m_connection = connection;}
 	Connection* getConnection() { return m_connection;}
 	
 	void setState(OutputMessageState state) { m_state = state;}
 	OutputMessageState getState() const { return m_state;}
 	
-	Protocol* m_protocol;
+	void setFrame(uint32_t frame) { m_frame = frame;}
+	uint32_t getFrame() const { return m_frame;}
+	
 	Connection* m_connection;
 	
 	uint32_t m_outputBufferStart;
+	uint32_t m_frame;
 	
 	OutputMessageState m_state;
 };
@@ -114,10 +116,13 @@ public:
 	void send(OutputMessage* msg);
 	void sendAll();
 	OutputMessage* getOutputMessage(Protocol* protocol, bool autosend = true);
+	void startExecutionFrame();
 	
 protected:
+
+	void configureOutputMessage(OutputMessage* msg, Protocol* protocol, bool autosend);
 	
-	static void writeHandler(OutputMessage* msg, const boost::asio::error& error);
+	static void writeHandler(OutputMessage* msg, const boost::system::error_code& error);
 	
 	friend class Connection;
 
@@ -125,6 +130,7 @@ protected:
 	
 	OutputMessageVector m_outputMessages;
 	OTSYS_THREAD_LOCKVAR m_outputPoolLock;
+	uint32_t m_frame;
 };
 
 #endif

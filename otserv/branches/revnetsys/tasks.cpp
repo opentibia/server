@@ -17,8 +17,14 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#include "otpch.h"
 
 #include "tasks.h"
+#include "outputmessage.h"
+
+#if defined __EXCEPTION_TRACER__
+#include "exception.h"
+#endif
 
 Dispatcher::Dispatcher()
 {
@@ -29,6 +35,10 @@ Dispatcher::Dispatcher()
 
 OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void *p)
 {
+	#if defined __EXCEPTION_TRACER__
+	ExceptionHandler dispatcherExceptionHandler;
+	dispatcherExceptionHandler.InstallHandler();
+	#endif
 	while(true){
     	Task* task = NULL;
 
@@ -52,10 +62,14 @@ OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void *p)
 		
 		// finally execute the task...
 		if(task){
+			OutputMessagePool::getInstance()->startExecutionFrame();
 			(*task)();
 			delete task;
     	}
 	}
+	#if defined __EXCEPTION_TRACER__
+	dispatcherExceptionHandler.RemoveHandler();
+	#endif
 }
 
 void Dispatcher::addTask(Task* task)

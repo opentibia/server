@@ -17,50 +17,28 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#include "otpch.h"
 
-#ifndef __OTSERV_PROTOCOL_H__
-#define __OTSERV_PROTOCOL_H__
+#include "server.h"
+#include "connection.h"
 
-#include "definitions.h"
-#include <boost/utility.hpp>
-
-class NetworkMessage;
-class OutputMessage;
-class Connection;
-class RSA;
-
-class Protocol : boost::noncopyable
+void Server::accept()
 {
-public:
-	Protocol(Connection* connection)
-	{ 
-		m_connection = connection;
-		m_encryptionEnabled = false;
-		m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
+	Connection* connection = new Connection(acceptor.io_service());
+
+	acceptor.async_accept(connection->getHandle(),
+		boost::bind(&Server::onAccept, this, connection, 
+		boost::asio::placeholders::error));
+}
+
+void Server::onAccept(Connection* connection, const boost::system::error_code& error)
+{
+	if(!error){
+		connection->acceptConnection();
+		std::cout << "accept - OK" << std::endl;
+		accept();
 	}
-	
-	virtual ~Protocol() {}
-
-	virtual void parsePacket(NetworkMessage& msg) = 0;
-	
-	void onSendMessage(OutputMessage* msg);
-	void onRecvMessage(NetworkMessage& msg);
-	
-	Connection* getConnection() { return m_connection;}
-	void setConnection(Connection* connection) { m_connection = connection; }
-	
-protected:
-	
-	void XTEA_encrypt(OutputMessage& msg);
-	bool XTEA_decrypt(NetworkMessage& msg);
-	bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
-	
-	virtual void deleteProtocolTask(){ delete this; }
-	friend class Connection;
-	
-	Connection* m_connection;
-	bool m_encryptionEnabled;
-	uint32_t m_key[4];
-};
-
-#endif
+	else{
+		std::cout << "Error while accepting:" << error.value() << " desc: " << error.message() << std::endl;
+	}
+}

@@ -220,7 +220,7 @@ void NetworkMessage::AddPaddingBytes(uint32_t n)
 {
 	if(!canAdd(n))
 		return;
-		
+	
 	memset((void*)&m_MsgBuf[m_ReadPos], 0x33, n);
 	m_MsgSize = m_MsgSize + n;
 }
@@ -245,7 +245,6 @@ void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 		uint32_t fluidIndex = count % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
-	
 }
 
 void NetworkMessage::AddItem(const Item* item)
@@ -255,14 +254,14 @@ void NetworkMessage::AddItem(const Item* item)
 	AddU16(it.clientId);
 
 	if(it.stackable || it.isRune()){
-    	AddByte(item->getItemCountOrSubtype());
+		AddByte(item->getItemCountOrSubtype());
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
 		uint32_t fluidIndex = item->getItemCountOrSubtype() % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
 }
-
+/*
 void NetworkMessage::JoinMessages(NetworkMessage &add)
 {
 	if(!canAdd(add.m_MsgSize))
@@ -272,7 +271,7 @@ void NetworkMessage::JoinMessages(NetworkMessage &add)
 	m_ReadPos += add.m_MsgSize;
   	m_MsgSize += add.m_MsgSize;
 }
-/*
+
 void NetworkMessage::XTEA_encrypt()
 {
 	uint32_t k[4];

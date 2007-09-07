@@ -17,6 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#include "otpch.h"
 
 #include "connection.h"
 #include "protocol.h"
@@ -29,6 +30,14 @@
 
 #include <boost/bind.hpp>
 
+#ifdef __DEBUG_NET__
+#define PRINT_ASIO_ERROR(desc) \
+	std::cout << "Error: [" << __FUNCTION__ << "] " << desc << " - Error: " <<  \
+		error.value() << " Desc: " << error.message() << std::endl;
+#else
+#define PRINT_ASIO_ERROR(desc)
+#endif
+
 void Connection::closeConnection()
 {
 	std::cout << "Connection::closeConnection" << std::endl;
@@ -37,10 +46,7 @@ void Connection::closeConnection()
 		return;
 	
 	m_closeState = CLOSE_STATE_REQUESTED;
-	/*
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Connection::closeConnectionTask, this)));
-	*/
+	
 	Scheduler::getScheduler().addEvent(
 		createSchedulerTask(1000, boost::bind(&Connection::closeConnectionTask, this)));
 }
@@ -75,7 +81,7 @@ void Connection::acceptConnection()
 	m_pendingRead++;
 }
 
-void Connection::parseHeader(const boost::asio::error& error)
+void Connection::parseHeader(const boost::system::error_code& error)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	m_pendingRead--;
@@ -97,12 +103,13 @@ void Connection::parseHeader(const boost::asio::error& error)
 			//
 		}
 		else{
-			//TODO: error?
+			PRINT_ASIO_ERROR("Reading header");
+			closeConnection();
 		}
 	}
 }
 
-void Connection::parsePacket(const boost::asio::error& error)
+void Connection::parsePacket(const boost::system::error_code& error)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	m_pendingRead--;
@@ -136,7 +143,7 @@ void Connection::parsePacket(const boost::asio::error& error)
 		}
 		
 		// Send the packet to the current protocol
-		m_protocol->parsePacket(m_msg);
+		m_protocol->onRecvMessage(m_msg);
 		
 		// Wait to the next packet
 		boost::asio::async_read(m_socket,
@@ -149,7 +156,8 @@ void Connection::parsePacket(const boost::asio::error& error)
 			//
 		}
 		else{
-			//TODO: error?
+			PRINT_ASIO_ERROR("Reading packet");
+			closeConnection();
 		}
 	}
 }
@@ -161,12 +169,16 @@ void Connection::send(OutputMessage* msg)
 	if(m_closeState == CLOSE_STATE_CLOSING)
 		return;
 	
+	if(m_protocol){
+		m_protocol->onSendMessage(msg);
+	}
+	
 	if(m_pendingWrite == 0){
 		std::cout << "Connection::send " << msg->getMessageLength() << std::endl;
 		internalSend(msg);
 	}
 	else{
-		std::cout << "Connection:: Adding to queue " << msg->getMessageLength() << std::endl;
+		std::cout << "Connection::send Adding to queue " << msg->getMessageLength() << std::endl;
 		m_outputQueue.push_back(msg);
 	}
 }
@@ -184,18 +196,19 @@ void Connection::internalSend(OutputMessage* msg)
 uint32_t Connection::getIP()
 {
 	//Ip is expressed in network byte order
-	boost::asio::error error;
-	const boost::asio::ip::tcp::endpoint endpoint = m_socket.remote_endpoint(boost::asio::assign_error(error));
+	boost::system::error_code error;
+	const boost::asio::ip::tcp::endpoint endpoint = m_socket.remote_endpoint(error);
 	if(!error){
 		return htonl(endpoint.address().to_v4().to_ulong());
 	}
 	else{
+		PRINT_ASIO_ERROR("Getting remote ip");
 		return 0;
 	}
 }
 
 
-void Connection::onWriteOperation(const boost::asio::error& error)
+void Connection::onWriteOperation(const boost::system::error_code& error)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	std::cout << "onWriteOperation" << std::endl;
@@ -217,8 +230,8 @@ void Connection::onWriteOperation(const boost::asio::error& error)
 		}
 	}
 	else{
-		std::cout << "onWriteOperation. Error 2" << std::endl;
-		//TODO. write operation error occurred
+		PRINT_ASIO_ERROR("Writting");
+		closeConnection();
 	}
 	
 	if(m_closeState == CLOSE_STATE_CLOSING){
@@ -233,12 +246,15 @@ void Connection::closingConnection()
 	if(m_pendingWrite == 0){
 		if(!m_socketClosed){
 			std::cout << "Closing socket" << std::endl;
-			boost::asio::error error;
-			m_socket.close(boost::asio::assign_error(error));
+			boost::system::error_code error;
+			m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			if(error){
+				PRINT_ASIO_ERROR("Shutdown");
+			}
+			m_socket.close(error);
 			m_socketClosed = true;
 			if(error){
-				std::cout << "Closing socket - error" << std::endl;
-				//
+				PRINT_ASIO_ERROR("Close");
 			}
 		}
 		if(m_pendingRead == 0){

@@ -65,7 +65,9 @@ enum passwordType_t{
 #endif
 
 #define OTSYS_THREAD_RETURN  void
+#ifndef EWOULDBLOCK
 #define EWOULDBLOCK WSAEWOULDBLOCK
+#endif
 
 //Windows 2000	0x0500
 //Windows Xp	0x0501

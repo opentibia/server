@@ -22,11 +22,12 @@
 #define __OTSERV_SERVER_H__
 
 #include "definitions.h"
-#include "connection.h"
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/utility.hpp>
+
+class Connection;
 
 class Server : boost::noncopyable
 {
@@ -43,23 +44,9 @@ public:
 	~Server() { }
 
 private:
-	void accept()
-	{
-		Connection* connection = new Connection(acceptor.io_service());
-
-		acceptor.async_accept(connection->getHandle(),
-			boost::bind(&Server::onAccept, this, connection, 
-			boost::asio::placeholders::error));
-	}
-
-	void onAccept(Connection* connection, const boost::asio::error& error)
-	{
-		if(!error){
-			connection->acceptConnection();
-			accept();
-		}
-	}
-
+	void accept();
+	void onAccept(Connection* connection, const boost::system::error_code& error);
+	
 	boost::asio::ip::tcp::acceptor acceptor;
 };
 

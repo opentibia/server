@@ -17,8 +17,13 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#include "otpch.h"
 
 #include "scheduler.h"
+
+#if defined __EXCEPTION_TRACER__
+#include "exception.h"
+#endif
 
 Scheduler::Scheduler()
 {
@@ -30,6 +35,10 @@ Scheduler::Scheduler()
 
 OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
 {
+	#if defined __EXCEPTION_TRACER__
+	ExceptionHandler schedulerExceptionHandler;
+	schedulerExceptionHandler.InstallHandler();
+	#endif
 	srand(time(NULL));
 	while(true){
 		SchedulerTask* event = NULL;
@@ -76,6 +85,9 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
 			}
 		}
 	}
+	#if defined __EXCEPTION_TRACER__
+	schedulerExceptionHandler.RemoveHandler();
+	#endif
 }
 
 uint32_t Scheduler::addEvent(SchedulerTask* event)

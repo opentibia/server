@@ -67,11 +67,11 @@ public:
 	uint32_t getIP();
 	
 private:
-	void parseHeader(const boost::asio::error& error);
-	void parsePacket(const boost::asio::error& error);
+	void parseHeader(const boost::system::error_code& error);
+	void parsePacket(const boost::system::error_code& error);
 
 	friend class OutputMessagePool;
-	void onWriteOperation(const boost::asio::error& error);
+	void onWriteOperation(const boost::system::error_code& error);
 	
 	void closeConnectionTask();
 	void closingConnection();

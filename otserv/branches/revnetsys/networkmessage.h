@@ -143,7 +143,7 @@ public:
 
 	//bool empty() const { return m_MsgSize == 0;}
 
-	void JoinMessages(NetworkMessage &add);
+	//void JoinMessages(NetworkMessage &add);
 /*
 	bool RSA_decrypt();
 
