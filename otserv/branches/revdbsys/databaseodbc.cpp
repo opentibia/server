@@ -24,7 +24,7 @@
 // Description: Frontend for ODBC connections
 //
 //
-// Author: bruno <brfwolf@thormenta.com>, (C) 2007
+// Author: Bruno R Ferreira <brf_coldf@yahoo.com.br>, (C) 2007
 //
 //
 

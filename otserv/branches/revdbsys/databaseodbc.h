@@ -24,7 +24,7 @@
 // Description: Frontend for ODBC connections
 //
 //
-// Author: bruno <brfwolf@thormenta.com>, (C) 2007
+// Author: Bruno R Ferreira <brf_coldf@yahoo.com.br>, (C) 2007
 //
 //
 #ifndef __DATABASE_ODBC_H__
@@ -42,7 +42,7 @@
 #include <sqlext.h>
 
 /**
-	@author bruno <brfwolf@thormenta.com>
+	@author Bruno R Ferreira <brf_coldf@yahoo.com.br>
 */
 class DatabaseODBC : public _Database
 {
