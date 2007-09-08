@@ -53,7 +53,7 @@ public:
 	//connectResult_t ConnectPlayer();
 	bool connectPlayer(const std::string& name);
 
-	void ReceiveLoop();  
+	//void ReceiveLoop();  
 	void WriteBuffer(NetworkMessage* add);
 	void reinitializeProtocol();
 	
@@ -115,19 +115,9 @@ private:
 	void parseRecievePing(NetworkMessage& msg);
 	void parseAutoWalk(NetworkMessage& msg);
 	void parseStopAutoWalk(NetworkMessage& msg);	
-	void parseMoveNorth(NetworkMessage& msg);
-	void parseMoveEast(NetworkMessage& msg);
-	void parseMoveSouth(NetworkMessage& msg);
-	void parseMoveWest(NetworkMessage& msg);
-	void parseMoveNorthEast(NetworkMessage& msg);
-	void parseMoveSouthEast(NetworkMessage& msg);
-	void parseMoveSouthWest(NetworkMessage& msg);
-	void parseMoveNorthWest(NetworkMessage& msg);
+	void parseMove(NetworkMessage& msg, Direction dir);
 	
-	void parseTurnNorth(NetworkMessage& msg);
-	void parseTurnEast(NetworkMessage& msg);
-	void parseTurnSouth(NetworkMessage& msg);
-	void parseTurnWest(NetworkMessage& msg);
+	void parseTurn(NetworkMessage& msg, Direction dir);
 	
 	void parseRequestOutfit(NetworkMessage& msg);
 	void parseSetOutfit(NetworkMessage& msg);
@@ -302,12 +292,10 @@ private:
 	House* house;
 	uint32_t listId;
 		
+	friend class Player;
+	
 	bool pendingLogout;
 	Player* player;
-	//SOCKET s;
-	
-	friend class Player;
-	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };
 
 #endif

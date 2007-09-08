@@ -1923,7 +1923,7 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 	return true;
 }
 
-bool Game::playerRequestHouseWindow(Player* player, uint8_t listId, uint32_t id, const std::string& text)
+bool Game::playerUpdateHouseWindow(Player* player, uint8_t listId, uint32_t id, const std::string& text)
 {
 	if(player->isRemoved())
 		return false;

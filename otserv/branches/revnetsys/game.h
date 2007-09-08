@@ -77,7 +77,7 @@ enum LightState_t {
 class Game
 {
 public:
-  Game();
+	Game();
 	~Game();
 	
 	/**
@@ -308,7 +308,7 @@ public:
 	bool playerUpdateContainer(Player* player, uint8_t cid);
 	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId);
 	bool playerWriteItem(Player* player, Item* item, const std::string& text);
-	bool Game::playerRequestHouseWindow(Player* player, uint8_t listId, uint32_t id, const std::string& text);
+	bool playerUpdateHouseWindow(Player* player, uint8_t listId, uint32_t id, const std::string& text);
 	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackPos,
 		uint32_t playerId, uint16_t spriteId);
 	bool playerAcceptTrade(Player* player);
@@ -322,7 +322,7 @@ public:
 	bool playerRequestAddVip(Player* player, const std::string& name);
 	bool playerRequestRemoveVip(Player* player, uint32_t guid);
 	bool playerTurn(Player* player, Direction dir);
-	bool Game::playerRequestOutfit(Player* player);
+	bool playerRequestOutfit(Player* player);
 	bool playerSay(Player* player, uint16_t channelId, SpeakClasses type,
 		const std::string& receiver, const std::string& text);
 	bool playerSayDefault(Player* player, const std::string& text);

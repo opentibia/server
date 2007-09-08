@@ -40,13 +40,13 @@ OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void *p)
 	dispatcherExceptionHandler.InstallHandler();
 	#endif
 	while(true){
-    	Task* task = NULL;
+		Task* task = NULL;
 
 		// check if there are tasks waiting
-    	OTSYS_THREAD_LOCK(getDispatcher().m_taskLock, "")	
-    	
-    	size_t listSize = getDispatcher().m_taskList.size();
-    	
+		OTSYS_THREAD_LOCK(getDispatcher().m_taskLock, "")	
+		
+		size_t listSize = getDispatcher().m_taskList.size();
+		
 		if(listSize == 0){
 			//if the list is empty wait for signal
 			OTSYS_THREAD_WAITSIGNAL(getDispatcher().m_taskSignal, getDispatcher().m_taskLock);
@@ -65,7 +65,8 @@ OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void *p)
 			OutputMessagePool::getInstance()->startExecutionFrame();
 			(*task)();
 			delete task;
-    	}
+			OutputMessagePool::getInstance()->sendAll();
+		}
 	}
 	#if defined __EXCEPTION_TRACER__
 	dispatcherExceptionHandler.RemoveHandler();

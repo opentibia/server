@@ -37,6 +37,7 @@
 #include "waitlist.h"
 #include "ban.h"
 #include "ioaccount.h"
+#include "connection.h"
 
 #include <string>
 #include <iostream>
@@ -55,6 +56,75 @@ Chat g_chat;
 
 #define CLIENT_VERSION_MIN 792
 #define CLIENT_VERSION_MAX 792
+
+// Helping templates to add dispatcher tasks
+template<class T1, class f1, class r>
+void addGameTask(r (Game::*f)(f1), T1 p1)
+{
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(f, &g_game, p1)));
+}
+
+template<class T1, class T2, class f1, class f2, class r>
+void addGameTask(r (Game::*f)(f1, f2), T1 p1, T2 p2)
+{
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(f, &g_game, p1, p2)));
+}
+
+template<class T1, class T2, class T3,
+class f1, class f2, class f3,
+class r>
+void addGameTask(r (Game::*f)(f1, f2, f3), T1 p1, T2 p2, T3 p3)
+{
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(f, &g_game, p1, p2, p3)));
+}
+
+template<class T1, class T2, class T3, class T4,
+class f1, class f2, class f3, class f4,
+class r>
+void addGameTask(r (Game::*f)(f1, f2, f3, f4), T1 p1, T2 p2, T3 p3, T4 p4)
+{
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(f, &g_game, p1, p2, p3, p4)));
+}
+
+template<class T1, class T2, class T3, class T4, class T5,
+class f1, class f2, class f3, class f4, class f5,
+class r>
+void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5)
+{
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5)));
+}
+
+template<class T1, class T2, class T3, class T4, class T5, class T6,
+class f1, class f2, class f3, class f4, class f5, class f6,
+class r>
+void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6)
+{
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6)));
+}
+
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7,
+class f1, class f2, class f3, class f4, class f5, class f6, class f7,
+class r>
+void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7)
+{
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6, p7)));
+}
+
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8,
+class f1, class f2, class f3, class f4, class f5, class f6, class f7, class f8,
+class r>
+void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8)
+{
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6, p7, p8)));
+}
 
 Protocol79::Protocol79(Connection* connection) :
 	Protocol(connection)
@@ -177,10 +247,9 @@ connectResult_t Protocol79::ConnectPlayer()
 	return CONNECT_INTERNALERROR;
 }
 */
-
+/*
 void Protocol79::ReceiveLoop()
 {
-	/*
 	//NetworkMessage msg;
 	//msg.setEncryptionState(true);
 	//msg.setEncryptionKey(m_key);
@@ -205,7 +274,7 @@ void Protocol79::ReceiveLoop()
 
 			//OTSYS_THREAD_LOCK(g_game.gameLock, "Protocol79::ReceiveLoop()");
 
-			/*
+			//
 			if(!player->isRemoved()){
 				if(s == 0){
 					g_game.removeCreature(player);
@@ -219,8 +288,8 @@ void Protocol79::ReceiveLoop()
 			//OTSYS_THREAD_UNLOCK(g_game.gameLock, "Protocol79::ReceiveLoop()");
 		}
 	}while(s != 0 && !player->isRemoved());
-	*/
 }
+*/
 
 bool Protocol79::connectPlayer(const std::string& name)
 {
@@ -284,6 +353,7 @@ bool Protocol79::connectPlayer(const std::string& name)
 			return false;
 		}
 		else{
+			/*TODO-revnetsys
 			//last login position
 			if(!g_game.placePlayer(player, player->getLoginPosition())){
 				//resort to temple position
@@ -292,6 +362,7 @@ bool Protocol79::connectPlayer(const std::string& name)
 					return false;
 				}
 			}
+			*/
 		}
 	}
 
@@ -314,7 +385,7 @@ bool Protocol79::connectPlayer(const std::string& name)
 
 void Protocol79::parsePacket(NetworkMessage& msg)
 {
-	uint16_t clientos = msg.GetU16();
+	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
 	if(version <= 760){
@@ -327,10 +398,10 @@ void Protocol79::parsePacket(NetworkMessage& msg)
 		m_key[2] = msg.GetU32();
 		m_key[3] = msg.GetU32();
 
-		unsigned char unknown = msg.GetByte();
+		/*unsigned char unknown =*/ msg.GetByte();
 		unsigned long accnumber = msg.GetU32();
-		std::string name = msg.GetString();
-		std::string password = msg.GetString();
+		const std::string name = msg.GetString();
+		const std::string password = msg.GetString();
 
 		if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 			sendLoginErrorMessage(0x14, "Only clients with protocol 7.92 allowed!");
@@ -376,7 +447,7 @@ void Protocol79::sendLoginErrorMessage(uint8_t error, const char* message)
 }
 
 /*
-void Protocol79::parsePacket(NetworkMessage &msg)
+void parsePacket(NetworkMessage &msg)
 {
 	if(msg.getMessageLength() <= 0)
 		return;
@@ -402,19 +473,19 @@ void Protocol79::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0x65: // move north
-		parseMoveNorth(msg);
+		parseMove(msg, NORTH);
 		break;
 
 	case 0x66: // move east
-		parseMoveEast(msg);
+		parseMove(msg, EAST);
 		break;
 
 	case 0x67: // move south
-		parseMoveSouth(msg);
+		parseMove(msg, SOUTH);
 		break;
 
 	case 0x68: // move west
-		parseMoveWest(msg);
+		parseMove(msg, WEST);
 		break;
 
 	case 0x69: // stop-autowalk
@@ -422,35 +493,35 @@ void Protocol79::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0x6A:
-		parseMoveNorthEast(msg);
+		parseMove(msg, NORTHEAST);
 		break;
 
 	case 0x6B:
-		parseMoveSouthEast(msg);
+		parseMove(msg, SOUTHEAST);
 		break;
 
 	case 0x6C:
-		parseMoveSouthWest(msg);
+		parseMove(msg, SOUTHWEST);
 		break;
 
 	case 0x6D:
-		parseMoveNorthWest(msg);
+		parseMove(msg, NORTHWEST);
 		break;
 
 	case 0x6F: // turn north
-		parseTurnNorth(msg);
+		parseTurn(msg, NORTH);
 		break;
 
 	case 0x70: // turn east
-		parseTurnEast(msg);
+		parseTurn(msg, EAST);
 		break;
 
 	case 0x71: // turn south
-		parseTurnSouth(msg);
+		parseTurn(msg, SOUTH);
 		break;
 
 	case 0x72: // turn west
-		parseTurnWest(msg);
+		parseTurn(msg, WEST);
 		break;
 
 	case 0x78: // throw item
@@ -800,73 +871,66 @@ void Protocol79::logout()
 // Parse methods
 void Protocol79::parseLogout(NetworkMessage& msg)
 {
+	/*TODO-revnetsys
 	if(player->hasCondition(CONDITION_INFIGHT) && !player->isRemoved()){
 		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
 	}
 	else{
 		logout();
 	}
+	*/
 }
 
 void Protocol79::parseCreatePrivateChannel(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerCreatePrivateChannel, &g_game, player)));
+	addGameTask(&Game::playerCreatePrivateChannel, player);
 }
 
 void Protocol79::parseChannelInvite(NetworkMessage& msg)
 {
-	std::string name = msg.GetString();
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerChannelInvite, &g_game, player, name)));
+	const std::string name = msg.GetString();
+	
+	addGameTask(&Game::playerChannelInvite, player, name);
 }
 
 void Protocol79::parseChannelExclude(NetworkMessage& msg)
 {
-	std::string name = msg.GetString();
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerChannelExclude, &g_game, player, name)));
+	const std::string name = msg.GetString();
+	
+	addGameTask(&Game::playerChannelExclude, player, name);
 }
 
 void Protocol79::parseGetChannels(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerRequestChannels, &g_game, player)));
+	addGameTask(&Game::playerRequestChannels, player);
 }
 
 void Protocol79::parseOpenChannel(NetworkMessage& msg)
 {
 	uint16_t channelId = msg.GetU16();
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerOpenChannel, &g_game, player, channelId)));
+	
+	addGameTask(&Game::playerOpenChannel, player, channelId);
 }
 
 void Protocol79::parseCloseChannel(NetworkMessage &msg)
 {
 	uint16_t channelId = msg.GetU16();
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerCloseChannel, &g_game, player, channelId)));
+	
+	addGameTask(&Game::playerCloseChannel, player, channelId);
 }
 
 void Protocol79::parseOpenPriv(NetworkMessage& msg)
 {
-	std::string receiver = msg.GetString();
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerOpenPrivateChannel, &g_game, player, receiver)));
+	const std::string receiver = msg.GetString();
+	
+	addGameTask(&Game::playerOpenPrivateChannel, player, receiver);
 }
 
 void Protocol79::parseCancelMove(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerSetAttackedCreature, &g_game, player, 0)));
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerFollowCreature, &g_game, player, 0)));
+	addGameTask(&Game::playerSetAttackedCreature, player, 0);
+	
+	addGameTask(&Game::playerFollowCreature, player, 0);
 }
 
 void Protocol79::parseDebug(NetworkMessage& msg)
@@ -887,8 +951,7 @@ void Protocol79::parseDebug(NetworkMessage& msg)
 
 void Protocol79::parseRecievePing(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerReceivePing, &g_game, player)));
+	addGameTask(&Game::playerReceivePing, player);
 }
 
 void Protocol79::parseAutoWalk(NetworkMessage& msg)
@@ -923,148 +986,44 @@ void Protocol79::parseAutoWalk(NetworkMessage& msg)
 		path.push_back(dir);
 	}
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerAutoWalk, &g_game, player, path)));
+	addGameTask(&Game::playerAutoWalk, player, path);
 }
 
 void Protocol79::parseStopAutoWalk(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerTurn, &g_game, player, NORTH)));
+	addGameTask(&Game::playerStopAutoWalk, player);
 }
 
-void Protocol79::parseMoveNorth(NetworkMessage& msg)
+void Protocol79::parseMove(NetworkMessage& msg, Direction dir)
 {
-	int64_t delay = player->getSleepTicks();
-	if(delay > 0 ){       
+	/*TODO-revnetsys
+	float multiplier;
+	switch(dir){
+	case NORTH: case SOUTH: case EAST: case WEST:
+		multiplier = 1.f;
+		break;
+	default:
+		multiplier = 1.5f;
+		break;
+	}
+	int64_t delay = player->getSleepTicks()*multiplier;
+	if(delay > 0 ){
 		Scheduler::getScheduler().addEvent(
 			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, NORTH)));
 	}
-	else{
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerTurn, &g_game, player, NORTH)));
+	else*/{
+		addGameTask(&Game::movePlayer, player, dir);
 	}
 }
 
-void Protocol79::parseMoveEast(NetworkMessage& msg)
+void Protocol79::parseTurn(NetworkMessage& msg, Direction dir)
 {
-	int64_t delay = player->getSleepTicks();
-	if(delay > 0 ){       
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, EAST)));
-	}
-	else{
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerTurn, &g_game, player, EAST)));
-	}
-}
-
-void Protocol79::parseMoveSouth(NetworkMessage& msg)
-{
-	int64_t delay = player->getSleepTicks();
-	if(delay > 0 ){       
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, SOUTH)));
-	}
-	else{
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerTurn, &g_game, player, SOUTH)));
-	}
-}
-
-void Protocol79::parseMoveWest(NetworkMessage& msg)
-{
-	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
-	if(delay > 0 ){       
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, WEST)));
-	}
-	else{
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerTurn, &g_game, player, WEST)));
-	}
-}
-
-void Protocol79::parseMoveNorthEast(NetworkMessage& msg)
-{
-	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
-	if(delay > 0 ){       
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, NORTHEAST)));
-	}
-	else{
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerTurn, &g_game, player, NORTHEAST)));
-	}
-}
-
-void Protocol79::parseMoveSouthEast(NetworkMessage& msg)
-{
-	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
-	if(delay > 0 ){       
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, SOUTHEAST)));
-	}
-	else{
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerTurn, &g_game, player, SOUTHEAST)));
-	}
-}
-
-void Protocol79::parseMoveSouthWest(NetworkMessage& msg)
-{
-	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
-	if(delay > 0 ){       
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, SOUTHWEST)));
-	}
-	else{
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerTurn, &g_game, player, SOUTHWEST)));
-	}
-}
-
-void Protocol79::parseMoveNorthWest(NetworkMessage& msg)
-{
-	int64_t delay = (int64_t)(player->getSleepTicks() * 1.5);
-	if(delay > 0 ){       
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, NORTHWEST)));
-	}
-	else{
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerTurn, &g_game, player, NORTHWEST)));
-	}
-}
-
-void Protocol79::parseTurnNorth(NetworkMessage& msg)
-{
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerTurn, &g_game, player, NORTH)));
-}
-
-void Protocol79::parseTurnEast(NetworkMessage& msg)
-{
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerTurn, &g_game, player, EAST)));
-}
-
-void Protocol79::parseTurnSouth(NetworkMessage& msg)
-{
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerTurn, &g_game, player, SOUTH)));
-}
-
-void Protocol79::parseTurnWest(NetworkMessage& msg)
-{
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerTurn, &g_game, player, WEST)));
+	addGameTask(&Game::playerTurn, player, dir);
 }
 
 void Protocol79::parseRequestOutfit(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerRequestOutfit, &g_game, player)));
+	addGameTask(&Game::playerRequestOutfit, player);
 }
 
 void Protocol79::parseSetOutfit(NetworkMessage& msg)
@@ -1085,8 +1044,7 @@ void Protocol79::parseSetOutfit(NetworkMessage& msg)
 		newOutfit.lookFeet = lookfeet;
 		newOutfit.lookAddons = lookaddons;
 
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerChangeOutfit, &g_game, player, newOutfit)));
+		addGameTask(&Game::playerChangeOutfit, player, newOutfit);
 	}
 }
 
@@ -1104,8 +1062,7 @@ void Protocol79::parseUseItem(NetworkMessage& msg)
 #endif
 */
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerUseItem, &g_game, player, pos, stackpos, index, spriteId, isHotkey)));
+	addGameTask(&Game::playerUseItem, player, pos, stackpos, index, spriteId, isHotkey);
 }
 
 void Protocol79::parseUseItemEx(NetworkMessage& msg)
@@ -1118,8 +1075,7 @@ void Protocol79::parseUseItemEx(NetworkMessage& msg)
 	uint8_t toStackPos = msg.GetByte();
 	bool isHotkey = (fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0);
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerUseItemEx, &g_game, player, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey)));
+	addGameTask(&Game::playerUseItemEx, player, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey);
 }
 
 void Protocol79::parseBattleWindow(NetworkMessage &msg)
@@ -1130,32 +1086,28 @@ void Protocol79::parseBattleWindow(NetworkMessage &msg)
 	uint32_t creatureId = msg.GetU32();
 	bool isHotkey = (fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0);
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerUseBattleWindow, &g_game, player, fromPos, fromStackPos, creatureId, spriteId, isHotkey)));
+	addGameTask(&Game::playerUseBattleWindow, player, fromPos, fromStackPos, creatureId, spriteId, isHotkey);
 }
 
 void Protocol79::parseCloseContainer(NetworkMessage& msg)
 {
 	unsigned char cid = msg.GetByte();
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerCloseContainer, &g_game, player, cid)));
+	addGameTask(&Game::playerCloseContainer, player, cid);
 }
 
 void Protocol79::parseUpArrowContainer(NetworkMessage& msg)
 {
 	unsigned char cid = msg.GetByte();
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerMoveUpContainer, &g_game, player, cid)));
+	addGameTask(&Game::playerMoveUpContainer, player, cid);
 }
 
 void Protocol79::parseUpdateContainer(NetworkMessage& msg)
 {
 	unsigned char cid = msg.GetByte();
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerUpdateContainer, &g_game, player, cid)));
+	addGameTask(&Game::playerUpdateContainer, player, cid);
 }
 
 void Protocol79::parseThrow(NetworkMessage& msg)
@@ -1175,8 +1127,7 @@ void Protocol79::parseThrow(NetworkMessage& msg)
 	*/
 
 	if(toPos != fromPos){
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::thingMove, &g_game, player, fromPos, spriteId, fromStackpos, toPos, count)));
+		addGameTask(&Game::thingMove, player, fromPos, spriteId, fromStackpos, toPos, count);
 	}
 }
 
@@ -1192,8 +1143,7 @@ void Protocol79::parseLookAt(NetworkMessage& msg)
 #endif
 */
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerLookAt, &g_game, player, pos, spriteId, stackpos)));
+	addGameTask(&Game::playerLookAt, player, pos, spriteId, stackpos);
 }
 
 void Protocol79::parseSay(NetworkMessage& msg)
@@ -1204,15 +1154,14 @@ void Protocol79::parseSay(NetworkMessage& msg)
 	unsigned short channelId = 0;
 	if(type == SPEAK_PRIVATE ||
 		type == SPEAK_PRIVATE_RED)
-		receiver = msg.GetString();
+		const std::string receiver = msg.GetString();
 	if(type == SPEAK_CHANNEL_Y ||
 		type == SPEAK_CHANNEL_R1 ||
 		type == SPEAK_CHANNEL_R2)
 		channelId = msg.GetU16();
-	std::string text = msg.GetString();
+	const std::string text = msg.GetString();
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerSay, &g_game, player, channelId, type, receiver, text)));
+	addGameTask(&Game::playerSay, player, channelId, type, receiver, text);
 }
 
 void Protocol79::parseFightModes(NetworkMessage& msg)
@@ -1241,36 +1190,32 @@ void Protocol79::parseFightModes(NetworkMessage& msg)
 		fightMode = FIGHTMODE_DEFENSE;
 	}
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerSetFightModes, &g_game, player, fightMode, chaseMode)));
+	addGameTask(&Game::playerSetFightModes, player, fightMode, chaseMode);
 }
 
 void Protocol79::parseAttack(NetworkMessage& msg)
 {
 	uint32_t creatureId = msg.GetU32();
 	
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerSetAttackedCreature, &g_game, player, creatureId)));
+	addGameTask(&Game::playerSetAttackedCreature, player, creatureId);
 }
 
 void Protocol79::parseFollow(NetworkMessage& msg)
 {
 	uint32_t creatureId = msg.GetU32();
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerFollowCreature, &g_game, player, creatureId)));
+	addGameTask(&Game::playerFollowCreature, player, creatureId);
 }
 
 void Protocol79::parseTextWindow(NetworkMessage& msg)
 {
 	uint32_t id = msg.GetU32();
-	std::string newText = msg.GetString();
+	const std::string newText = msg.GetString();
 	if(newText.length() > maxTextLength)
 		return;
 
 	if(readItem && windowTextID == id){
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Game::playerWriteItem, &g_game, player, readItem, newText)));
+		addGameTask(&Game::playerWriteItem, player, readItem, newText);
 
 		readItem->releaseThing2();
 		readItem = NULL;
@@ -1281,10 +1226,9 @@ void Protocol79::parseHouseWindow(NetworkMessage &msg)
 {
 	uint8_t listId = msg.GetByte();
 	uint32_t id = msg.GetU32();
-	std::string text = msg.GetString();
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerRequestHouseWindow, &g_game, player, listId, id, text)));
+	const std::string text = msg.GetString();
+	
+	addGameTask(&Game::playerUpdateHouseWindow, player, listId, id, text);
 }
 
 void Protocol79::parseRequestTrade(NetworkMessage& msg)
@@ -1294,14 +1238,12 @@ void Protocol79::parseRequestTrade(NetworkMessage& msg)
 	uint8_t stackpos = msg.GetByte();
 	uint32_t playerId = msg.GetU32();
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerRequestTrade, &g_game, player, pos, stackpos, playerId, spriteId)));
+	addGameTask(&Game::playerRequestTrade, player, pos, stackpos, playerId, spriteId);
 }
 
 void Protocol79::parseAcceptTrade(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerAcceptTrade, &g_game, player)));
+	addGameTask(&Game::playerAcceptTrade, player);
 }
 
 void Protocol79::parseLookInTrade(NetworkMessage& msg)
@@ -1309,32 +1251,28 @@ void Protocol79::parseLookInTrade(NetworkMessage& msg)
 	bool counterOffer = (msg.GetByte() == 0x01);
 	int index = msg.GetByte();
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerLookInTrade, &g_game, player, counterOffer, index)));
+	addGameTask(&Game::playerLookInTrade, player, counterOffer, index);
 }
 
 void Protocol79::parseCloseTrade()
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerCloseTrade, &g_game, player)));
+	addGameTask(&Game::playerCloseTrade, player);
 }
 
 void Protocol79::parseAddVip(NetworkMessage& msg)
 {
-	std::string name = msg.GetString();
+	const std::string name = msg.GetString();
 	if(name.size() > 32)
 		return;
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerRequestAddVip, &g_game, player, name)));
+	addGameTask(&Game::playerRequestAddVip, player, name);
 }
 
 void Protocol79::parseRemoveVip(NetworkMessage& msg)
 {
 	uint32_t guid = msg.GetU32();
 	
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerRequestRemoveVip, &g_game, player, guid)));
+	addGameTask(&Game::playerRequestRemoveVip, player, guid);
 }
 
 void Protocol79::parseRotateItem(NetworkMessage& msg)
@@ -1343,8 +1281,7 @@ void Protocol79::parseRotateItem(NetworkMessage& msg)
 	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::playerRotateItem, &g_game, player, pos, stackpos, spriteId)));
+	addGameTask(&Game::playerRotateItem, player, pos, stackpos, spriteId);
 }
 
 // Send methods
