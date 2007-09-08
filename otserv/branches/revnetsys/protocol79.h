@@ -50,10 +50,9 @@ public:
 	Protocol79(Connection* connection);
 	~Protocol79();
 	
-	//connectResult_t ConnectPlayer();
-	bool connectPlayer(const std::string& name);
+	bool login(const std::string& name);
+	bool logout();
 
-	//void ReceiveLoop();  
 	void WriteBuffer(NetworkMessage* add);
 	void reinitializeProtocol();
 	
@@ -65,7 +64,6 @@ public:
 private:
 	OutputMessage* m_outputBuffer;
 	std::list<uint32_t> knownPlayers;
-	//uint32_t m_key[4];
 
 	NetworkMessage* getOutputBuffer()
 	{
@@ -90,7 +88,7 @@ private:
 	}
 	*/
 	
-	void sendLoginErrorMessage(uint8_t error, const char* message);
+	void sendLoginErrorMessage(uint8_t error, const std::string& message);
 	
 	//virtual void loginTask(const std::string& name, Connection* connection);
 	virtual void deleteProtocolTask();
@@ -100,7 +98,6 @@ private:
 	bool canSee(int x, int y, int z) const;
 	bool canSee(const Creature*) const;
 	bool canSee(const Position& pos) const;
-	void logout();
 	
 	void flushOutputBuffer();
 	void WriteMsg(NetworkMessage& msg);
@@ -169,7 +166,6 @@ private:
 	void sendChannel(uint16_t channelId, const std::string& channelName);
 	void sendOpenPrivateChannel(const std::string& receiver);
 	void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
-	
 	void sendIcons(int icons);
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
@@ -294,8 +290,6 @@ private:
 	uint32_t listId;
 		
 	friend class Player;
-	
-	bool pendingLogout;
 	Player* player;
 };
 
