@@ -165,16 +165,14 @@ void Connection::parsePacket(const boost::system::error_code& error)
 	}
 }
 
-void Connection::send(OutputMessage* msg)
+bool Connection::send(OutputMessage* msg)
 {
 	std::cout << "Connection::send init" << std::endl;
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	if(m_closeState == CLOSE_STATE_CLOSING)
-		return;
+		return false;
 	
-	if(m_protocol){
-		m_protocol->onSendMessage(msg);
-	}
+	msg->getProtocol()->onSendMessage(msg);
 	
 	if(m_pendingWrite == 0){
 		std::cout << "Connection::send " << msg->getMessageLength() << std::endl;
@@ -184,6 +182,7 @@ void Connection::send(OutputMessage* msg)
 		std::cout << "Connection::send Adding to queue " << msg->getMessageLength() << std::endl;
 		m_outputQueue.push_back(msg);
 	}
+	return true;
 }
 
 void Connection::internalSend(OutputMessage* msg)
@@ -196,7 +195,7 @@ void Connection::internalSend(OutputMessage* msg)
 }
 
 
-uint32_t Connection::getIP()
+uint32_t Connection::getIP() const
 {
 	//Ip is expressed in network byte order
 	boost::system::error_code error;

@@ -431,7 +431,6 @@ public:
 		{client->sendChannel(channelId, channelName);}
 
 	void receivePing() {if(npings > 0) npings--;}
-	void flushMsg() {client->flushOutputBuffer();}
 
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t interval);
@@ -516,7 +515,6 @@ protected:
 	double inventoryWeight;
 	double capacity;
 	
-	//bool SendBuffer;
 	uint32_t internal_ping;
 	uint32_t npings;
 	int64_t lastAction;

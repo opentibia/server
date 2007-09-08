@@ -94,7 +94,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	default:
 		break;
 	}
-	m_connection->closeConnection();
+	getConnection()->closeConnection();
 }
 
 void ProtocolStatus::deleteProtocolTask()

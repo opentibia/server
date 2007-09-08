@@ -62,9 +62,9 @@ public:
 	void closeConnection();
 	void acceptConnection();
 	
-	void send(OutputMessage* msg);
+	bool send(OutputMessage* msg);
 	
-	uint32_t getIP();
+	uint32_t getIP() const;
 	
 private:
 	void parseHeader(const boost::system::error_code& error);

@@ -58,11 +58,13 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 	}
 	else if(RSA_decrypt(g_otservRSA, msg)){
 		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-		m_encryptionEnabled = true;
-		m_key[0] = msg.GetU32();
-		m_key[1] = msg.GetU32();
-		m_key[2] = msg.GetU32();
-		m_key[3] = msg.GetU32();
+		uint32_t key[4];
+		key[0] = msg.GetU32();
+		key[1] = msg.GetU32();
+		key[2] = msg.GetU32();
+		key[3] = msg.GetU32();
+		enableXTEAEncryption();
+		setXTEAKey(key);
 
 		/*std::cout.flags(std::ios::hex);
 		std::cout << std::setw(2) << std::setfill('0') << m_key[0] << " " <<
@@ -77,7 +79,7 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 		if(version >= CLIENT_VERSION_MIN && version <= CLIENT_VERSION_MAX){
 
 			uint32_t serverip = serverIPs[0].first;
-			uint32_t clientip = m_connection->getIP();
+			uint32_t clientip = getConnection()->getIP();
 			char buffer[32];
 			formatIP(clientip, buffer);
 			std::cout << "Connection from " << buffer << std::endl;
@@ -139,5 +141,5 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 		}
 		OutputMessagePool::getInstance()->send(output);
 	}
-	m_connection->closeConnection();
+	getConnection()->closeConnection();
 }

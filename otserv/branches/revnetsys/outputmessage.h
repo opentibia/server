@@ -71,19 +71,23 @@ public:
 		}
 	}
 	
+	Protocol* getProtocol() { return m_protocol;}
+	Connection* getConnection() { return m_connection;}
+	
 protected:
 	
 	void freeMessage()
 	{
 		setConnection(NULL);
+		setProtocol(NULL);
 		setState(OutputMessage::STATE_FREE);
 		m_frame = 0;
 	}
 	
 	friend class OutputMessagePool;
-		
+	
+	void setProtocol(Protocol* protocol){ m_protocol = protocol;}
 	void setConnection(Connection* connection){ m_connection = connection;}
-	Connection* getConnection() { return m_connection;}
 	
 	void setState(OutputMessageState state) { m_state = state;}
 	OutputMessageState getState() const { return m_state;}
@@ -91,6 +95,7 @@ protected:
 	void setFrame(uint32_t frame) { m_frame = frame;}
 	uint32_t getFrame() const { return m_frame;}
 	
+	Protocol* m_protocol;
 	Connection* m_connection;
 	
 	uint32_t m_outputBufferStart;
@@ -122,6 +127,8 @@ protected:
 
 	void configureOutputMessage(OutputMessage* msg, Protocol* protocol, bool autosend);
 	
+	void internalReleaseMessage(OutputMessage* msg);
+	
 	static void writeHandler(OutputMessage* msg, const boost::system::error_code& error);
 	
 	friend class Connection;
@@ -129,6 +136,7 @@ protected:
 	typedef std::list<OutputMessage*> OutputMessageVector;
 	
 	OutputMessageVector m_outputMessages;
+	OutputMessageVector m_autoSendOutputMessages;
 	OTSYS_THREAD_LOCKVAR m_outputPoolLock;
 	uint32_t m_frame;
 };

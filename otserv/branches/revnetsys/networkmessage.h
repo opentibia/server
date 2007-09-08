@@ -40,10 +40,6 @@ public:
 
 	// constructor/destructor
 	NetworkMessage(){
-		/*m_encryptionEnabled = false;
-		m_keyset = false;
-		m_RSA = NULL;
-		*/
 		Reset();
 	}
 	~NetworkMessage(){};
@@ -55,10 +51,6 @@ protected:
 		m_ReadPos = 4;
 	}
 public:
-	// socket functions
-	//bool ReadFromSocket(SOCKET socket);
-	//bool WriteToSocket(SOCKET socket);
-
 	// simply read functions for incoming message
 	uint8_t  GetByte(){return m_MsgBuf[m_ReadPos++];}
 	uint16_t GetU16(){
@@ -77,13 +69,7 @@ public:
 	std::string GetString();
 	std::string GetRaw();
 	Position GetPosition();
-/*
-	void setEncryptionState(bool state){m_encryptionEnabled = state;}
-	void setEncryptionKey(const uint32_t* key){
-		memcpy(m_key, key, 16);
-		m_keyset = true;
-	}
-*/
+
 	// skips count unknown/unused bytes in an incoming message
 	void SkipBytes(int count){m_ReadPos += count;}
 
@@ -141,35 +127,18 @@ public:
 	char* getBuffer() { return (char*)&m_MsgBuf[0]; }
 	char* getBodyBuffer() { m_ReadPos = 2; return (char*)&m_MsgBuf[header_length]; }
 
-	//bool empty() const { return m_MsgSize == 0;}
 
 	//void JoinMessages(NetworkMessage &add);
-/*
-	bool RSA_decrypt();
-
-	void setRSAInstance(RSA* rsa){m_RSA = rsa;}
-*/
 protected:
 	inline bool canAdd(int size)
 	{
 		return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
   	};
   	
-	//void XTEA_encrypt();
-	//void XTEA_decrypt();
-
 	int32_t m_MsgSize;
 	int32_t m_ReadPos;
 
 	uint8_t m_MsgBuf[NETWORKMESSAGE_MAXSIZE];
-	
-	/*
-	bool m_encryptionEnabled;
-	bool m_keyset;
-	uint32_t m_key[4];
-	
-	RSA* m_RSA;
-	*/
 };
 
 

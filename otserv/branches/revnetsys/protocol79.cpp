@@ -129,25 +129,21 @@ void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1, T2 p2, T3 
 Protocol79::Protocol79(Connection* connection) :
 	Protocol(connection)
 {
-	OTSYS_THREAD_LOCKVARINIT(bufferLock);
-	
 	player = NULL;
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
-	m_outputBuffer = NULL;
 }
 
 Protocol79::~Protocol79()
 {
-	OTSYS_THREAD_LOCKVARRELEASE(bufferLock);
 	player = NULL;
 }
 
 uint32_t Protocol79::getIP() const
 {
-	if(m_connection){
-		return m_connection->getIP();
+	if(getConnection()){
+		return getConnection()->getIP();
 	}
 
 	return 0;
@@ -163,7 +159,6 @@ void Protocol79::reinitializeProtocol()
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
-	//OutputBuffer.Reset();
 	knownPlayers.clear();
 }
 
@@ -285,7 +280,7 @@ bool Protocol79::login(const std::string& name)
 				output->AddString(ss.str());
 				output->AddByte(retryTime);
 				OutputMessagePool::getInstance()->send(output);
-				m_connection->closeConnection();
+				getConnection()->closeConnection();
 			}
 
 			if(g_game.placePlayer(player, player->getLoginPosition())){
@@ -348,21 +343,23 @@ bool Protocol79::logout()
 
 void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 {
-	uint16_t clientos = msg.GetU16();
+	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
 	if(version <= 760){
 		sendLoginErrorMessage(0x0A, "Only clients with protocol 7.92 allowed!");
 	}
 	else if(RSA_decrypt(g_otservRSA, msg)){
-		m_encryptionEnabled = true;
-		m_key[0] = msg.GetU32();
-		m_key[1] = msg.GetU32();
-		m_key[2] = msg.GetU32();
-		m_key[3] = msg.GetU32();
+		uint32_t key[4];
+		key[0] = msg.GetU32();
+		key[1] = msg.GetU32();
+		key[2] = msg.GetU32();
+		key[3] = msg.GetU32();
+		enableXTEAEncryption();
+		setXTEAKey(key);
 
-		unsigned char isSetGM = msg.GetByte();
-		unsigned long accnumber = msg.GetU32();
+		/*uint8_t isSetGM =*/ msg.GetByte();
+		uint32_t accnumber = msg.GetU32();
 		const std::string name = msg.GetString();
 		const std::string password = msg.GetString();
 
@@ -380,7 +377,7 @@ void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 		}
 		else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
 			//nothing to do, just close the connection
-			m_connection->closeConnection();
+			getConnection()->closeConnection();
 			return;
 		}
 		else{
@@ -395,24 +392,24 @@ void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 			}
 			else{
 				g_bans.addLoginAttempt(getIP(), false);
-				m_connection->closeConnection();
+				getConnection()->closeConnection();
 			}
 		}
 	}
 }
 
-void Protocol79::sendLoginErrorMessage(uint8_t error, const std::string& message)
+void Protocol79::sendLoginErrorMessage(uint8_t error, const char* message)
 {
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	output->AddByte(error);
 	output->AddString(message);
 	OutputMessagePool::getInstance()->send(output);
-	m_connection->closeConnection();
+	getConnection()->closeConnection();
 }
 
 void Protocol79::parsePacket(NetworkMessage &msg)
 {
-	if(msg.getMessageLength() <= 0)
+	if(msg.getMessageLength() <= 0 || !player)
 		return;
 
 	uint8_t recvbyte = msg.GetByte();
@@ -816,7 +813,7 @@ bool Protocol79::canSee(int x, int y, int z) const
 	return false;
 }
 
-// Parse methods
+//********************** Parse methods *******************************
 void Protocol79::parseLogout(NetworkMessage& msg)
 {
 	Dispatcher::getDispatcher().addTask(
@@ -1224,14 +1221,13 @@ void Protocol79::parseRotateItem(NetworkMessage& msg)
 	addGameTask(&Game::playerRotateItem, player, pos, stackpos, spriteId);
 }
 
-// Send methods
+//********************** Send methods  *******************************
 void Protocol79::sendOpenPrivateChannel(const std::string& receiver)
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		msg->AddByte(0xAD);
 		msg->AddString(receiver);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1243,7 +1239,6 @@ void Protocol79::sendCreatureOutfit(const Creature* creature, const Outfit_t& ou
 			msg->AddByte(0x8E);
 			msg->AddU32(creature->getID());
 			AddCreatureOutfit(msg, creature, outfit);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1268,8 +1263,6 @@ void Protocol79::sendRequestOutfit()
 				msg->AddString(Outfits::getInstance()->getOutfitName((*it)->looktype));
 				msg->AddByte((*it)->addons);
 			}
-				
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1282,7 +1275,6 @@ void Protocol79::sendCreatureInvisible(const Creature* creature)
 			msg->AddByte(0x8E);
 			msg->AddU32(creature->getID());
 			AddCreatureInvisible(msg, creature);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1293,7 +1285,6 @@ void Protocol79::sendCreatureLight(const Creature* creature)
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			AddCreatureLight(msg, creature);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1303,7 +1294,6 @@ void Protocol79::sendWorldLight(const LightInfo& lightInfo)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddWorldLight(msg, lightInfo);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1315,7 +1305,6 @@ void Protocol79::sendCreatureSkull(const Creature* creature, Skulls_t skull)
 			msg->AddByte(0x90);
 			msg->AddU32(creature->getID());
 			msg->AddByte(skull);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1328,7 +1317,6 @@ void Protocol79::sendCreatureShield(const Creature* creature)
 			msg->AddByte(0x91);
 			msg->AddU32(creature->getID());
 			msg->AddByte(0);	//no shield
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1341,7 +1329,6 @@ void Protocol79::sendCreatureSquare(const Creature* creature, SquareColor_t colo
 			msg->AddByte(0x86);
 			msg->AddU32(creature->getID());
 			msg->AddByte((uint8_t)color);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1351,7 +1338,6 @@ void Protocol79::sendStats()
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddPlayerStats(msg);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1360,7 +1346,6 @@ void Protocol79::sendTextMessage(MessageClasses mclass, const std::string& messa
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddTextMessage(msg, mclass, message);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1369,8 +1354,7 @@ void Protocol79::sendClosePrivate(uint16_t channelId)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		msg->AddByte(0xB3);
-		msg->AddU16(channelId);		
-		WriteBuffer(msg);
+		msg->AddU16(channelId);
 	}
 }
 
@@ -1381,7 +1365,6 @@ void Protocol79::sendCreatePrivateChannel(uint16_t channelId, const std::string&
 		msg->AddByte(0xB2);
 		msg->AddU16(channelId);
 		msg->AddString(channelName);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1403,8 +1386,6 @@ void Protocol79::sendChannelsDialog()
 			msg->AddU16(channel->getId());
 			msg->AddString(channel->getName());
 		}
-
-		WriteBuffer(msg);
 	}
 }
 
@@ -1415,7 +1396,6 @@ void Protocol79::sendChannel(uint16_t channelId, const std::string& channelName)
 		msg->AddByte(0xAC);
 		msg->AddU16(channelId);
 		msg->AddString(channelName);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1425,7 +1405,6 @@ void Protocol79::sendIcons(int icons)
 	if(msg){
 		msg->AddByte(0xA2);
 		msg->AddU16(icons);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1445,8 +1424,6 @@ void Protocol79::sendContainer(uint32_t cid, const Container* container, bool ha
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
 			msg->AddItem(*cit);
 		}
-
-		WriteBuffer(msg);
 	}
 }
 
@@ -1497,8 +1474,6 @@ void Protocol79::sendTradeItemRequest(const Player* player, const Item* item, bo
 			msg->AddByte(1);
 			msg->AddItem(item);
 		}
-
-		WriteBuffer(msg);
 	}
 }
 
@@ -1507,7 +1482,6 @@ void Protocol79::sendCloseTrade()
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		msg->AddByte(0x7F);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1517,7 +1491,6 @@ void Protocol79::sendCloseContainer(uint32_t cid)
 	if(msg){
 		msg->AddByte(0x6F);
 		msg->AddByte(cid);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1532,7 +1505,6 @@ void Protocol79::sendCreatureTurn(const Creature* creature, unsigned char stackP
 			msg->AddU16(0x63); /*99*/
 			msg->AddU32(creature->getID());
 			msg->AddByte(creature->getDirection());
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1542,7 +1514,6 @@ void Protocol79::sendCreatureSay(const Creature* creature, SpeakClasses type, co
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddCreatureSpeak(msg, creature, type, text, 0);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1551,7 +1522,6 @@ void Protocol79::sendToChannel(const Creature * creature, SpeakClasses type, con
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddCreatureSpeak(msg, creature, type, text, channelId);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1560,7 +1530,6 @@ void Protocol79::sendCancel(const std::string& message)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddTextMessage(msg, MSG_STATUS_SMALL, message);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1569,7 +1538,6 @@ void Protocol79::sendCancelTarget()
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		msg->AddByte(0xa3);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1580,7 +1548,6 @@ void Protocol79::sendChangeSpeed(const Creature* creature, uint32_t speed)
 		msg->AddByte(0x8F);
 		msg->AddU32(creature->getID());
 		msg->AddU16(speed);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1590,7 +1557,6 @@ void Protocol79::sendCancelWalk()
 	if(msg){
 		msg->AddByte(0xB5);
 		msg->AddByte(player->getDirection());
-		WriteBuffer(msg);
 	}
 }
 
@@ -1599,7 +1565,6 @@ void Protocol79::sendSkills()
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddPlayerSkills(msg);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1608,7 +1573,6 @@ void Protocol79::sendPing()
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		msg->AddByte(0x1E);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1618,7 +1582,6 @@ void Protocol79::sendDistanceShoot(const Position& from, const Position& to, uns
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			AddDistanceShoot(msg, from, to, type);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1629,7 +1592,6 @@ void Protocol79::sendMagicEffect(const Position& pos, unsigned char type)
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			AddMagicEffect(msg, pos, type);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1640,7 +1602,6 @@ void Protocol79::sendAnimatedText(const Position& pos, unsigned char color, std:
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			AddAnimatedText(msg, pos, color, text);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1650,7 +1611,6 @@ void Protocol79::sendCreatureHealth(const Creature* creature)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddCreatureHealth(msg, creature);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1661,7 +1621,6 @@ void Protocol79::sendAddTileItem(const Position& pos, const Item* item)
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			AddTileItem(msg, pos, item);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1672,7 +1631,6 @@ void Protocol79::sendUpdateTileItem(const Position& pos, uint32_t stackpos, cons
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			UpdateTileItem(msg, pos, stackpos, item);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1683,7 +1641,6 @@ void Protocol79::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			RemoveTileItem(msg, pos, stackpos);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1694,7 +1651,6 @@ void Protocol79::UpdateTile(const Position& pos)
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			UpdateTile(msg, pos);
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1760,7 +1716,6 @@ void Protocol79::sendAddCreature(const Creature* creature, bool isLogin)
 				tempstring.erase(tempstring.length() -1);
 				tempstring += ".";
 				AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
-				WriteBuffer(msg);
 
 				for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
 					bool online;
@@ -1770,9 +1725,6 @@ void Protocol79::sendAddCreature(const Creature* creature, bool isLogin)
 						sendVIP((*it), vip_name, online);
 					}
 				}
-
-				//force flush
-				flushOutputBuffer();
 			}
 			else{
 				AddTileCreature(msg, creature->getPosition(), creature);
@@ -1780,8 +1732,6 @@ void Protocol79::sendAddCreature(const Creature* creature, bool isLogin)
 				if(isLogin){
 					AddMagicEffect(msg, creature->getPosition(), NM_ME_ENERGY_AREA);
 				}
-
-				WriteBuffer(msg);
 			}
 		}
 	}
@@ -1797,8 +1747,6 @@ void Protocol79::sendRemoveCreature(const Creature* creature, const Position& po
 			if(isLogout){
 				AddMagicEffect(msg, pos, NM_ME_PUFF);
 			}
-
-			WriteBuffer(msg);
 		}
 	}
 }
@@ -1853,8 +1801,6 @@ void Protocol79::sendMoveCreature(const Creature* creature, const Position& newP
 					GetMapDescription(newPos.x - 8, newPos.y - 6, newPos.z, 1, 14, msg);
 				}
 			}
-
-			WriteBuffer(msg);
 		}
 	}
 	else if(canSee(oldPos) && canSee(creature->getPosition())){
@@ -1870,7 +1816,6 @@ void Protocol79::sendMoveCreature(const Creature* creature, const Position& newP
 					msg->AddPosition(oldPos);
 					msg->AddByte(oldStackPos);
 					msg->AddPosition(creature->getPosition());
-					WriteBuffer(msg);
 				}
 			}
 		}
@@ -1889,7 +1834,6 @@ void Protocol79::sendAddInventoryItem(slots_t slot, const Item* item)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddInventoryItem(msg, slot, item);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1898,7 +1842,6 @@ void Protocol79::sendUpdateInventoryItem(slots_t slot, const Item* item)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		UpdateInventoryItem(msg, slot, item);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1907,7 +1850,6 @@ void Protocol79::sendRemoveInventoryItem(slots_t slot)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		RemoveInventoryItem(msg, slot);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1917,7 +1859,6 @@ void Protocol79::sendAddContainerItem(uint8_t cid, const Item* item)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		AddContainerItem(msg, cid, item);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1926,7 +1867,6 @@ void Protocol79::sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* 
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		UpdateContainerItem(msg, cid, slot, item);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1935,7 +1875,6 @@ void Protocol79::sendRemoveContainerItem(uint8_t cid, uint8_t slot)
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		RemoveContainerItem(msg, cid, slot);
-		WriteBuffer(msg);
 	}
 }
 
@@ -1967,7 +1906,6 @@ void Protocol79::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 
 		msg->AddString("unknown");
 		msg->AddString("unknown");
-		WriteBuffer(msg);
 	}
 }
 
@@ -1991,7 +1929,6 @@ void Protocol79::sendTextWindow(uint32_t itemid, const std::string& text)
 		
 		msg->AddString("");
 		msg->AddString("");
-		WriteBuffer(msg);
 	}
 }
 
@@ -2006,7 +1943,6 @@ void Protocol79::sendHouseWindow(House* _house, uint32_t _listid, const std::str
 		msg->AddByte(0);
 		msg->AddU32(windowTextID);
 		msg->AddString(text);
-		WriteBuffer(msg);
 	}
 }
 
@@ -2016,7 +1952,6 @@ void Protocol79::sendVIPLogIn(uint32_t guid)
 	if(msg){
 		msg->AddByte(0xD3);
 		msg->AddU32(guid);
-		WriteBuffer(msg);
 	}
 }
 
@@ -2026,7 +1961,6 @@ void Protocol79::sendVIPLogOut(uint32_t guid)
 	if(msg){
 		msg->AddByte(0xD4);
 		msg->AddU32(guid);
-		WriteBuffer(msg);
 	}
 }
 
@@ -2038,7 +1972,6 @@ void Protocol79::sendVIP(uint32_t guid, const std::string& name, bool isOnline)
 		msg->AddU32(guid);
 		msg->AddString(name);
 		msg->AddByte(isOnline == true ? 1 : 0);
-		WriteBuffer(msg);
 	}
 }
 
@@ -2047,7 +1980,6 @@ void Protocol79::sendReLoginWindow()
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		msg->AddByte(0x28);
-		WriteBuffer(msg);
 	}
 }
 
@@ -2461,40 +2393,4 @@ void Protocol79::RemoveContainerItem(NetworkMessage* msg, uint8_t cid, uint8_t s
 	msg->AddByte(0x72);
 	msg->AddByte(cid);
 	msg->AddByte(slot);
-}
-
-//////////////////////////
-
-void Protocol79::flushOutputBuffer()
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock, "Protocol79::flushOutputBuffer()");
-	//force writetosocket
-	//OutputBuffer.WriteToSocket(s);
-	//OutputBuffer.Reset();
-
-	return;
-}
-
-void Protocol79::WriteBuffer(NetworkMessage* addMsg)
-{
-	/*
-	if(!addMsg.empty()){
-		g_game.addPlayerBuffer(player);
-
-		OTSYS_THREAD_LOCK(bufferLock, "Protocol79::WriteBuffer");
-
-		if(OutputBuffer.getMessageLength() + addMsg.getMessageLength() >= NETWORKMESSAGE_MAXSIZE - 16){
-			flushOutputBuffer();
-		}
-
-		OutputBuffer.JoinMessages(addMsg);
-		OTSYS_THREAD_UNLOCK(bufferLock, "Protocol79::WriteBuffer");
-	}*/
-}
-
-void Protocol79::setKey(const uint32_t* key)
-{
-	memcpy(m_key, key, 16);
-	//OutputBuffer.setEncryptionState(true);
-	//OutputBuffer.setEncryptionKey(key);
 }

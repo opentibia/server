@@ -30,6 +30,9 @@ void Protocol::onSendMessage(OutputMessage* msg)
 		std::cout << "Protocol::onSendMessage - encrypt" << std::endl;
 		XTEA_encrypt(*msg);
 	}
+	if(msg == m_outputBuffer){
+		m_outputBuffer = NULL;
+	}
 }
 
 void Protocol::onRecvMessage(NetworkMessage& msg)

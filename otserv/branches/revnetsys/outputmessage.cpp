@@ -83,28 +83,38 @@ void OutputMessagePool::sendAll()
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
-	for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
-		if((*it)->getState() == OutputMessage::STATE_ALLOCATED){
-			std::cout << "Sending message - ALL" << std::endl;
-			if((*it)->getFrame() != m_frame){
-				#ifdef __DEBUG_NET__
-				std::cout << "Error: [OutputMessagePool::send] Trying to send message out of frame." << (*it)->getFrame() << " Current: " << m_frame << std::endl;
-				#endif
-				(*it)->freeMessage();
-				return;		
-			}
-			(*it)->writeMessageLength();
-			if((*it)->getConnection()){
-				(*it)->getConnection()->send(*it);
+	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ++it){
+		std::cout << "Sending message - ALL" << std::endl;
+		if((*it)->getFrame() != m_frame){
+			#ifdef __DEBUG_NET__
+			std::cout << "Error: [OutputMessagePool::send] Trying to send message out of frame." << (*it)->getFrame() << " Current: " << m_frame << std::endl;
+			#endif
+			internalReleaseMessage(*it);
+			return;
+		}
+		(*it)->writeMessageLength();
+		if((*it)->getConnection()){
+			if((*it)->getConnection()->send(*it)){
+				(*it)->setState(OutputMessage::STATE_WAITING);
 			}
 			else{
-				#ifdef __DEBUG_NET__
-				std::cout << "Error: [OutputMessagePool::send] NULL connection." << std::endl;
-				#endif
+				internalReleaseMessage(*it);
 			}
-			(*it)->setState(OutputMessage::STATE_WAITING);
+		}
+		else{
+			#ifdef __DEBUG_NET__
+			std::cout << "Error: [OutputMessagePool::send] NULL connection." << std::endl;
+			#endif
 		}
 	}
+	m_autoSendOutputMessages.clear();
+}
+
+void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
+{
+	//Simulate that the message is sent and then liberate it
+	msg->getProtocol()->onSendMessage(msg);
+	msg->freeMessage();
 }
 
 OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool autosend /*= true*/)
@@ -114,7 +124,7 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 		std::cout << "Warning: [OutputMessagePool::getOutputMessage] NULL connection." << std::endl;
 	}
 	#endif
-		
+	std::cout << "request output message - auto = " << autosend << std::endl;
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
 	for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
@@ -125,8 +135,8 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 	}
 
 	OutputMessage* outputmessage = new OutputMessage;
-	configureOutputMessage(outputmessage, protocol, autosend);
 	m_outputMessages.push_back(outputmessage);
+	configureOutputMessage(outputmessage, protocol, autosend);
 	return outputmessage;
 }
 
@@ -135,10 +145,12 @@ void OutputMessagePool::configureOutputMessage(OutputMessage* msg, Protocol* pro
 	msg->Reset();
 	if(autosend){
 		msg->setState(OutputMessage::STATE_ALLOCATED);
+		m_autoSendOutputMessages.push_back(msg);
 	}
 	else{
 		msg->setState(OutputMessage::STATE_ALLOCATED_NO_AUTOSEND);
 	}
+	msg->setProtocol(protocol);
 	msg->setConnection(protocol->getConnection());
 	msg->setFrame(m_frame);
 }

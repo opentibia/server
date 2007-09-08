@@ -53,42 +53,15 @@ public:
 	bool login(const std::string& name);
 	bool logout();
 
-	void WriteBuffer(NetworkMessage* add);
 	void reinitializeProtocol();
-	
-	void setKey(const uint32_t* key);
 		
 	void setPlayer(Player* p);
 	uint32_t getIP() const;
 
 private:
-	OutputMessage* m_outputBuffer;
 	std::list<uint32_t> knownPlayers;
-
-	NetworkMessage* getOutputBuffer()
-	{
-		if(m_outputBuffer){
-			return m_outputBuffer;
-		}
-		else if(m_connection){
-			m_outputBuffer = OutputMessagePool::getInstance()->getOutputMessage(this);
-			return m_outputBuffer;
-		}
-		else{
-			return NULL;
-		}
-	}
-	/*
-	void sendOutputBuffer()
-	{
-		if(m_outputBuffer){
-			OutputMessagePool::getInstance()->send(m_outputBuffer);
-			m_outputBuffer = NULL;
-		}
-	}
-	*/
 	
-	void sendLoginErrorMessage(uint8_t error, const std::string& message);
+	void sendLoginErrorMessage(uint8_t error, const char* message);
 	
 	//virtual void loginTask(const std::string& name, Connection* connection);
 	virtual void deleteProtocolTask();
@@ -98,9 +71,6 @@ private:
 	bool canSee(int x, int y, int z) const;
 	bool canSee(const Creature*) const;
 	bool canSee(const Position& pos) const;
-	
-	void flushOutputBuffer();
-	void WriteMsg(NetworkMessage& msg);
 
 	// we have all the parse methods
 	virtual void parsePacket(NetworkMessage& msg);
@@ -281,7 +251,6 @@ private:
 	void UpdateInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void RemoveInventoryItem(NetworkMessage* msg, slots_t slot);
 
-	OTSYS_THREAD_LOCKVAR bufferLock;
 	uint32_t windowTextID;
 	Item* readItem;
 	uint32_t maxTextLength;
