@@ -30,17 +30,12 @@
 
 #include <boost/bind.hpp>
 
-#ifdef __DEBUG_NET__
-#define PRINT_ASIO_ERROR(desc) \
-	std::cout << "Error: [" << __FUNCTION__ << "] " << desc << " - Error: " <<  \
-		error.value() << " Desc: " << error.message() << std::endl;
-#else
-#define PRINT_ASIO_ERROR(desc)
-#endif
-
 void Connection::closeConnection()
 {
+	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::closeConnection" << std::endl;
+	#endif
+	
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	if(m_closeState != CLOSE_STATE_NONE)
 		return;
@@ -53,7 +48,10 @@ void Connection::closeConnection()
 
 void Connection::closeConnectionTask()
 {
+	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::closeConnectionTask" << std::endl;
+	#endif
+	
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	if(m_closeState != CLOSE_STATE_REQUESTED){
 		std::cout << "Error: [Connection::closeConnectionTask] m_closeState = " << m_closeState << std::endl;
@@ -167,7 +165,10 @@ void Connection::parsePacket(const boost::system::error_code& error)
 
 bool Connection::send(OutputMessage* msg)
 {
+	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::send init" << std::endl;
+	#endif
+	
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	if(m_closeState == CLOSE_STATE_CLOSING)
 		return false;
@@ -175,11 +176,15 @@ bool Connection::send(OutputMessage* msg)
 	msg->getProtocol()->onSendMessage(msg);
 	
 	if(m_pendingWrite == 0){
+		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Connection::send " << msg->getMessageLength() << std::endl;
+		#endif
 		internalSend(msg);
 	}
 	else{
+		//#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Connection::send Adding to queue " << msg->getMessageLength() << std::endl;
+		//#endif
 		m_outputQueue.push_back(msg);
 	}
 	return true;
@@ -212,21 +217,25 @@ uint32_t Connection::getIP() const
 
 void Connection::onWriteOperation(const boost::system::error_code& error)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
+	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "onWriteOperation" << std::endl;
+	#endif
 	
+	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	if(!error){
 		if(m_pendingWrite > 0){
 			m_pendingWrite--;
 			if(m_outputQueue.size() != 0){
 				OutputMessage* msg = m_outputQueue.front();
 				m_outputQueue.pop_front();
-				std::cout << "Connection::onWriteOperation send " << msg->getMessageLength() << std::endl;
 				internalSend(msg);
+				#ifdef __DEBUG_NET_DETAIL__
+				std::cout << "Connection::onWriteOperation send " << msg->getMessageLength() << std::endl;
+				#endif
 			}
 		}
 		else{
-			std::cout << "onWriteOperation. Error 1" << std::endl;
+			std::cout << "Error: [Connection::onWriteOperation] Getting unexpected notification!" << std::endl;
 			// Error. Pending operations counter is 0, but we are getting a
 			// notification!!
 		}
@@ -244,10 +253,16 @@ void Connection::onWriteOperation(const boost::system::error_code& error)
 
 void Connection::closingConnection()
 {
+	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::closingConnection" << std::endl;
+	#endif
+	
 	if(m_pendingWrite == 0){
 		if(!m_socketClosed){
+			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Closing socket" << std::endl;
+			#endif
+			
 			boost::system::error_code error;
 			m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 			if(error){
@@ -260,7 +275,9 @@ void Connection::closingConnection()
 			}
 		}
 		if(m_pendingRead == 0){
+			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Deleting Connection" << std::endl;
+			#endif
 			delete this;
 		}
 	}

@@ -33,6 +33,14 @@
 class Protocol;
 class OutputMessage;
 
+#ifdef __DEBUG_NET__
+#define PRINT_ASIO_ERROR(desc) \
+	std::cout << "Error: [" << __FUNCTION__ << "] " << desc << " - Error: " <<  \
+		error.value() << " Desc: " << error.message() << std::endl;
+#else
+#define PRINT_ASIO_ERROR(desc)
+#endif
+
 class Connection : boost::noncopyable
 {
 public:

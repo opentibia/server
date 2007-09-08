@@ -38,11 +38,13 @@ extern ConfigManager g_config;
 extern IPList serverIPs;
 extern Ban g_bans;
 
+#ifdef __DEBUG_NET_DETAIL__
 void ProtocolLogin::deleteProtocolTask()
 {
 	std::cout << "Deleting ProtocolLogin" << std::endl;
 	delete this;
 }
+#endif
 
 void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 {
@@ -80,10 +82,6 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 
 			uint32_t serverip = serverIPs[0].first;
 			uint32_t clientip = getConnection()->getIP();
-			char buffer[32];
-			formatIP(clientip, buffer);
-			std::cout << "Connection from " << buffer << std::endl;
-
 			for(uint32_t i = 0; i < serverIPs.size(); i++){
 				if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
 					serverip = serverIPs[i].first;

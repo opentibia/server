@@ -60,7 +60,10 @@ void OutputMessagePool::send(OutputMessage* msg)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	if(msg->getState() == OutputMessage::STATE_ALLOCATED_NO_AUTOSEND){
+		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Sending message - SINGLE" << std::endl;
+		#endif
+		
 		msg->writeMessageLength();
 		if(msg->getConnection()){
 			msg->getConnection()->send(msg);
@@ -84,7 +87,10 @@ void OutputMessagePool::sendAll()
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
 	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ++it){
+		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Sending message - ALL" << std::endl;
+		#endif
+		
 		if((*it)->getFrame() != m_frame){
 			#ifdef __DEBUG_NET__
 			std::cout << "Error: [OutputMessagePool::send] Trying to send message out of frame." << (*it)->getFrame() << " Current: " << m_frame << std::endl;
@@ -124,7 +130,10 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 		std::cout << "Warning: [OutputMessagePool::getOutputMessage] NULL connection." << std::endl;
 	}
 	#endif
+	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "request output message - auto = " << autosend << std::endl;
+	#endif
+	
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
 	for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
@@ -157,7 +166,10 @@ void OutputMessagePool::configureOutputMessage(OutputMessage* msg, Protocol* pro
 
 void OutputMessagePool::writeHandler(OutputMessage* msg, const boost::system::error_code& error)
 {
+	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Write handler" << std::endl;
+	#endif
+	
 	Connection* connection = msg->getConnection();
 	connection->onWriteOperation(error);
 	msg->freeMessage();

@@ -184,9 +184,9 @@ void Protocol79::deleteProtocolTask()
 			g_game.removeCreature(player, false);
 		}
 
-#ifdef __DEBUG_NET__
+		#ifdef __DEBUG_NET__
 		std::cout << "Deleting Protocol79 - Protocol:" << this << ", Player: " << player << std::endl;
-#endif
+		#endif
 	}
 }
 

@@ -35,10 +35,12 @@ void Server::onAccept(Connection* connection, const boost::system::error_code& e
 {
 	if(!error){
 		connection->acceptConnection();
+		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "accept - OK" << std::endl;
+		#endif
 		accept();
 	}
 	else{
-		std::cout << "Error while accepting:" << error.value() << " desc: " << error.message() << std::endl;
+		PRINT_ASIO_ERROR("Accepting");
 	}
 }

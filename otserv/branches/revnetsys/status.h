@@ -37,8 +37,9 @@ public:
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 protected:
-	
+	#ifdef __DEBUG_NET_DETAIL__
 	virtual void deleteProtocolTask();		
+	#endif
 };
 
 class Status{
