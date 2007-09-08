@@ -137,21 +137,12 @@ Protocol79::Protocol79(Connection* connection) :
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
-	//this->s = s;
 	m_outputBuffer = NULL;
 }
 
 Protocol79::~Protocol79()
 {
 	OTSYS_THREAD_LOCKVARRELEASE(bufferLock);
-
-	/*
-	if(s){
-		closesocket(s);
-		s = 0;
-	}
-	*/
-
 	player = NULL;
 }
 
@@ -185,14 +176,6 @@ void Protocol79::reinitializeProtocol()
 	maxTextLength = 0;
 	//OutputBuffer.Reset();
 	knownPlayers.clear();
-
-	/*
-	if(s){
-		closesocket(s);
-	}
-
-	s = _s;
-	*/
 }
 
 /*
@@ -223,30 +206,6 @@ void Protocol79::deleteProtocolTask()
 	}
 }
 
-/*
-connectResult_t Protocol79::ConnectPlayer()
-{
-	Waitlist* wait = Waitlist::instance();
-
-	if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && !wait->clientLogin(player->getAccount(), player->getIP())){
-		return CONNECT_TOMANYPLAYERS;
-	}
-	else{
-		//last login position
-		if(g_game.placePlayer(player, player->getLoginPosition())){
-			return CONNECT_SUCCESS;
-		}
-		//temple
-		else if(g_game.placePlayer(player, player->getTemplePosition(), true)){
-			return CONNECT_SUCCESS;
-		}
-		else
-			return CONNECT_MASTERPOSERROR;
-	}
-
-	return CONNECT_INTERNALERROR;
-}
-*/
 /*
 void Protocol79::ReceiveLoop()
 {
@@ -293,6 +252,7 @@ void Protocol79::ReceiveLoop()
 
 bool Protocol79::connectPlayer(const std::string& name)
 {
+	//TODO-revnetsys, cant call g_game here
 	player = g_game.getPlayerByName(name);
 	if(player && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
 		sendLoginErrorMessage(0x14, "Not implemented yet");
@@ -312,7 +272,6 @@ bool Protocol79::connectPlayer(const std::string& name)
 		player->useThing2();
 		player->setID();
 		IOPlayer::instance()->loadPlayer(player, name);
-
 
 		if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
 			sendLoginErrorMessage(0x14, "Your character is banished!");
@@ -369,23 +328,21 @@ bool Protocol79::connectPlayer(const std::string& name)
 	return true;
 
 	/*
-		Status* stat = Status::instance();
-		stat->addPlayer();
-		player->lastlogin = time(NULL);
-		player->lastip = player->getIP();
-		s = 0;            // protocol/player will close socket
+	Status* stat = Status::instance();
+	stat->addPlayer();
+	player->lastlogin = time(NULL);
+	player->lastip = player->getIP();
 
-		OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
-		isLocked = false;
-		protocol->ReceiveLoop();
-		stat->removePlayer();
-	}
+	OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
+	isLocked = false;
+	protocol->ReceiveLoop();
+	stat->removePlayer();
 	*/
 }
 
 void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 {
-	/*uint16_t clientos =*/ msg.GetU16();
+	uint16_t clientos = msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
 	if(version <= 760){
@@ -398,7 +355,7 @@ void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 		m_key[2] = msg.GetU32();
 		m_key[3] = msg.GetU32();
 
-		/*unsigned char unknown =*/ msg.GetByte();
+		unsigned char isSetGM = msg.GetByte();
 		unsigned long accnumber = msg.GetU32();
 		const std::string name = msg.GetString();
 		const std::string password = msg.GetString();
@@ -1031,17 +988,15 @@ void Protocol79::parseSetOutfit(NetworkMessage& msg)
 	int lookfeet = msg.GetByte();
 	int lookaddons = msg.GetByte();
 	
-	if(player->canWear(looktype, lookaddons)){
-		Outfit_t newOutfit;
-		newOutfit.lookType = looktype;
-		newOutfit.lookHead = lookhead;
-		newOutfit.lookBody = lookbody;
-		newOutfit.lookLegs = looklegs;
-		newOutfit.lookFeet = lookfeet;
-		newOutfit.lookAddons = lookaddons;
+	Outfit_t newOutfit;
+	newOutfit.lookType = looktype;
+	newOutfit.lookHead = lookhead;
+	newOutfit.lookBody = lookbody;
+	newOutfit.lookLegs = looklegs;
+	newOutfit.lookFeet = lookfeet;
+	newOutfit.lookAddons = lookaddons;
 
-		addGameTask(&Game::playerChangeOutfit, player, newOutfit);
-	}
+	addGameTask(&Game::playerChangeOutfit, player, newOutfit);
 }
 
 void Protocol79::parseUseItem(NetworkMessage& msg)
