@@ -32,7 +32,7 @@ public:
 	ProtocolLogin(Connection* connection) : Protocol(connection) {}
 	virtual ~ProtocolLogin() {}
 
-	virtual void parsePacket(NetworkMessage& msg);
+	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 protected:
 	

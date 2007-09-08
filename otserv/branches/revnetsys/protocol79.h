@@ -106,7 +106,8 @@ private:
 	void WriteMsg(NetworkMessage& msg);
 
 	// we have all the parse methods
-	void parsePacket(NetworkMessage& msg);
+	virtual void parsePacket(NetworkMessage& msg);
+	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 	//Parse methods
 	void parseLogout(NetworkMessage& msg);	

@@ -138,12 +138,15 @@ void Connection::parsePacket(const boost::system::error_code& error)
 			default:
 				// No valid protocol
 				closeConnection();
+				return;
 				break;
 			}
+			m_protocol->onRecvFirstMessage(m_msg);
 		}
-		
-		// Send the packet to the current protocol
-		m_protocol->onRecvMessage(m_msg);
+		else{
+			// Send the packet to the current protocol
+			m_protocol->onRecvMessage(m_msg);
+		}
 		
 		// Wait to the next packet
 		boost::asio::async_read(m_socket,

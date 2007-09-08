@@ -34,7 +34,7 @@ public:
 	ProtocolStatus(Connection* connection) : Protocol(connection) {}
 	virtual ~ProtocolStatus() {}
 
-	virtual void parsePacket(NetworkMessage& msg);
+	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 protected:
 	

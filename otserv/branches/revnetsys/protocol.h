@@ -41,10 +41,11 @@ public:
 	
 	virtual ~Protocol() {}
 
-	virtual void parsePacket(NetworkMessage& msg) = 0;
+	virtual void parsePacket(NetworkMessage& msg){};
 	
 	void onSendMessage(OutputMessage* msg);
 	void onRecvMessage(NetworkMessage& msg);
+	virtual void onRecvFirstMessage(NetworkMessage& msg) = 0;
 	
 	Connection* getConnection() { return m_connection;}
 	void setConnection(Connection* connection) { m_connection = connection; }

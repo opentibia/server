@@ -383,7 +383,7 @@ bool Protocol79::connectPlayer(const std::string& name)
 	*/
 }
 
-void Protocol79::parsePacket(NetworkMessage& msg)
+void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 {
 	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
@@ -446,8 +446,7 @@ void Protocol79::sendLoginErrorMessage(uint8_t error, const char* message)
 	m_connection->closeConnection();
 }
 
-/*
-void parsePacket(NetworkMessage &msg)
+void Protocol79::parsePacket(NetworkMessage &msg)
 {
 	if(msg.getMessageLength() <= 0)
 		return;
@@ -659,10 +658,7 @@ void parsePacket(NetworkMessage &msg)
 #endif
 		break;
 	}
-
-	g_game.flushSendBuffers();
 }
-*/
 
 void Protocol79::GetTileDescription(const Tile* tile, NetworkMessage* msg)
 {

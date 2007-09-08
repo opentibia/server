@@ -50,7 +50,7 @@ enum RequestedInfo_t{
 	REQUEST_MAP_INFO = 16
 };
 
-void ProtocolStatus::parsePacket(NetworkMessage& msg)
+void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 {
 	switch(msg.GetByte()){
 	//XML info protocol

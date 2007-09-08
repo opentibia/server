@@ -44,7 +44,7 @@ void ProtocolLogin::deleteProtocolTask()
 	delete this;
 }
 
-void ProtocolLogin::parsePacket(NetworkMessage& msg)
+void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 {
 	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
