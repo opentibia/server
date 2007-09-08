@@ -208,7 +208,7 @@ inline int64_t OTSYS_TIME()
 }
 
 inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock){
-	return pthread_cond_wait(signal, lock);
+	return pthread_cond_wait(&signal, &lock);
 }
 
 inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, int64_t cycle){
