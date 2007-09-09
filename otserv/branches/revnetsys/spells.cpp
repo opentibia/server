@@ -988,11 +988,14 @@ House* InstantSpell::getHouseFromPos(Creature* creature)
 bool InstantSpell::HouseGuestList(const InstantSpell* spell, Creature* creature, const std::string& param)
 {
 	House* house = getHouseFromPos(creature);
-	if(!house)
+	if(!house){
 		return false;
+	}
+
 	Player* player = creature->getPlayer();
 	
 	if(house->canEditAccessList(GUEST_LIST, player)){
+		player->setEditHouse(house, GUEST_LIST);
 		player->sendHouseWindow(house, GUEST_LIST);
 		return true;
 	}
@@ -1013,6 +1016,7 @@ bool InstantSpell::HouseSubOwnerList(const InstantSpell* spell, Creature* creatu
 	Player* player = creature->getPlayer();
 	
 	if(house->canEditAccessList(SUBOWNER_LIST, player)){
+		player->setEditHouse(house, SUBOWNER_LIST);
 		player->sendHouseWindow(house, SUBOWNER_LIST);
 		return true;
 	}
@@ -1052,6 +1056,7 @@ bool InstantSpell::HouseDoorList(const InstantSpell* spell, Creature* creature, 
 
 	Door* door = house->getDoorByPosition(pos);
 	if(door && house->canEditAccessList(door->getDoorId(), player)){
+		player->setEditHouse(house, door->getDoorId());
 		player->sendHouseWindow(house, door->getDoorId());
 		return true;
 	}

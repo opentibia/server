@@ -217,9 +217,11 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 	
 	if(item->isReadable()){
 		if(item->canWriteText()){
+			player->setWriteItem(item, item->getMaxWriteLength());
 			player->sendTextWindow(item, item->getMaxWriteLength(), true);
 		}
 		else{
+			player->setWriteItem(NULL);
 			player->sendTextWindow(item, 0, false);
 		}
 

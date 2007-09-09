@@ -136,6 +136,13 @@ Creature()
  	
  	town = 0;
 
+	windowTextId = 0;
+	writeItem = NULL;
+	maxWriteLen = 0;
+
+	editHouse = NULL;
+	editListId = 0;
+
 #ifdef __SKULLSYSTEM__
 	redSkullTicks = 0;
 	skull = SKULL_NONE;
@@ -162,6 +169,9 @@ Player::~Player()
 	if(client){
 		delete client;
 	}
+
+	setWriteItem(NULL);
+	setEditHouse(NULL);
 }
 
 void Player::setVocation(uint32_t vocId)
@@ -936,12 +946,51 @@ void Player::sendPing()
 	}
 }
 
-void Player::sendHouseWindow(House* _house, uint32_t _listid) const
+Item* Player::getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen)
+{
+	_windowTextId = windowTextId;
+	_maxWriteLen = maxWriteLen;
+	return writeItem;
+}
+
+void Player::setWriteItem(Item* item, uint16_t _maxWriteLen /*= 0*/)
+{
+	windowTextId++;
+	if(writeItem){
+		writeItem->releaseThing2();
+	}
+
+	if(item){
+		writeItem = item;
+		maxWriteLen = _maxWriteLen;
+		writeItem->useThing2();
+	}
+	else{
+		writeItem = NULL;
+		maxWriteLen = 0;
+	}
+}
+
+House* Player::getEditHouse(uint32_t& _windowTextId, uint32_t& _listId)
+{
+	_windowTextId = windowTextId;
+	_listId = editListId;
+	return editHouse;
+}
+
+void Player::setEditHouse(House* house, uint32_t listId /*= 0*/)
+{
+	windowTextId++;
+	editHouse = house;
+	editListId = listId;
+}
+
+void Player::sendHouseWindow(House* house, uint32_t listId) const
 {
 	if(client){
 		std::string text;
-		if(_house->getAccessList(_listid, text)){
-			client->sendHouseWindow(_house, _listid, text);
+		if(house->getAccessList(listId, text)){
+			client->sendHouseWindow(windowTextId, house, listId, text);
 		}
 	}
 }
@@ -1009,7 +1058,7 @@ void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item
 
 	if(tradeState != TRADE_TRANSFER){
 		if(tradeItem && oldItem == tradeItem){
-			g_game.playerCloseTrade(this);
+			g_game.internalCloseTrade(this);
 		}
 	}
 }
@@ -1022,7 +1071,7 @@ void Player::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item
 		if(tradeItem){
 			const Container* container = item->getContainer();
 			if(container && container->isHoldingItem(tradeItem)){
-				g_game.playerCloseTrade(this);
+				g_game.internalCloseTrade(this);
 			}
 		}
 	}
@@ -1094,7 +1143,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		}
 
 		if(tradePartner){
-			g_game.playerCloseTrade(this);
+			g_game.internalCloseTrade(this);
 		}
 
 		g_chat.removeUserFromAllChannels(this);
@@ -1125,13 +1174,13 @@ void Player::onCreatureMove(const Creature* creature, const Position& newPos, co
 			//check if we should close trade
 			if(tradeItem){
 				if(!Position::areInRange<1,1,0>(tradeItem->getPosition(), getPosition())){
-					g_game.playerCloseTrade(this);
+					g_game.internalCloseTrade(this);
 				}
 			}
 
 			if(tradePartner){
 				if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), getPosition())){
-					g_game.playerCloseTrade(this);
+					g_game.internalCloseTrade(this);
 				}
 			}
 		}
@@ -1162,7 +1211,7 @@ void Player::onRemoveContainerItem(const Container* container, uint8_t slot, con
 		
 		if(tradeItem){
 			if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
-				g_game.playerCloseTrade(this);
+				g_game.internalCloseTrade(this);
 			}
 		}
 	}
@@ -1219,7 +1268,7 @@ void Player::onRemoveInventoryItem(slots_t slot, Item* item)
 		if(tradeItem){
 			const Container* container = item->getContainer();
 			if(container && container->isHoldingItem(tradeItem)){
-				g_game.playerCloseTrade(this);
+				g_game.internalCloseTrade(this);
 			}
 		}
 	}
@@ -1229,14 +1278,14 @@ void Player::checkTradeState(const Item* item)
 {
 	if(tradeItem && tradeState != TRADE_TRANSFER){
 		if(tradeItem == item){
-			g_game.playerCloseTrade(this);
+			g_game.internalCloseTrade(this);
 		}
 		else{
 			const Container* container = dynamic_cast<const Container*>(item->getParent());
 
 			while(container != NULL){
 				if(container == tradeItem){
-					g_game.playerCloseTrade(this);
+					g_game.internalCloseTrade(this);
 					break;
 				}
 

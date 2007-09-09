@@ -318,7 +318,7 @@ bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, cons
 	if(!player)
 		return false;
 
-	game->playerBroadcastMessage(player, param);
+	game->internalBroadcastMessage(player, param);
 	return true;
 }
 

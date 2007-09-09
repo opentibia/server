@@ -394,8 +394,8 @@ public:
 	void sendCreatureHealth(const Creature* creature) const
 		{if(client) client->sendCreatureHealth(creature);}
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
-		{if(client) client->sendDistanceShoot(from, to,type);}
-	void sendHouseWindow(House* _house, uint32_t _listid) const;
+		{if(client) client->sendDistanceShoot(from, to, type);}
+	void sendHouseWindow(House* house, uint32_t listId) const;
 	void sendRequestOutfit() const;
 	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName);
 	void sendClosePrivate(uint16_t channelId) const
@@ -409,10 +409,10 @@ public:
 		{if(client) client->sendSkills();}
 	void sendTextMessage(MessageClasses mclass, const std::string& message) const
 		{if(client) client->sendTextMessage(mclass, message);}
-	void sendTextWindow(Item* item,const uint16_t maxlen, const bool canWrite) const
-		{if(client) client->sendTextWindow(item,maxlen,canWrite);}
-	void sendTextWindow(uint32_t itemid, const std::string& text) const
-		{if(client) client->sendTextWindow(itemid,text);}
+	void sendTextWindow(Item* item, uint16_t maxlen, bool canWrite) const
+		{if(client) client->sendTextWindow(windowTextId, item, maxlen, canWrite);}
+	void sendTextWindow(uint32_t itemId, const std::string& text) const
+		{if(client) client->sendTextWindow(windowTextId, itemId, text);}
 	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId) const
 		{if(client) client->sendToChannel(creature, type, text, channelId);}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
@@ -441,6 +441,13 @@ public:
 	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	void setLastAction(uint64_t time) {lastAction = time;}
+
+	Item* getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen);
+	void setWriteItem(Item* item, uint16_t _maxWriteLen = 0);
+
+	House* getEditHouse(uint32_t& _windowTextId, uint32_t& _listId);
+	void setEditHouse(House* house, uint32_t listId = 0);
+
 	int64_t getLastAction() const {return lastAction;}
 
 	VIPListSet VIPList;
@@ -591,6 +598,13 @@ protected:
 	LightInfo itemsLight;
 	
 	OutfitList m_playerOutfits;
+
+	//read/write storage data
+	uint32_t windowTextId;
+	Item* writeItem;
+	uint16_t maxWriteLen;
+	House* editHouse;
+	uint32_t editListId;
 	
 #ifdef __SKULLSYSTEM__
 	int64_t redSkullTicks;

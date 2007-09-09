@@ -52,6 +52,7 @@ public:
 	
 	bool login(const std::string& name);
 	bool logout();
+	void move(Direction dir);
 
 	void reinitializeProtocol();
 		
@@ -161,9 +162,9 @@ private:
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	
-	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
-	void sendTextWindow(uint32_t itemid,const std::string& text);
-	void sendHouseWindow(House* house, uint32_t listid, const std::string& text);
+	void sendTextWindow(uint32_t windowTextId, Item* item, uint16_t maxlen, bool canWrite);
+	void sendTextWindow(uint32_t windowTextId, uint32_t itemId, const std::string& text);
+	void sendHouseWindow(uint32_t windowTextId, House* house, uint32_t listId, const std::string& text);
 	
 	void sendVIPLogIn(uint32_t guid);
 	void sendVIPLogOut(uint32_t guid);
@@ -251,12 +252,14 @@ private:
 	void UpdateInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void RemoveInventoryItem(NetworkMessage* msg, slots_t slot);
 
+	/*
 	uint32_t windowTextID;
 	Item* readItem;
 	uint32_t maxTextLength;
 	
 	House* house;
 	uint32_t listId;
+	*/
 		
 	friend class Player;
 	Player* player;

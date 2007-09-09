@@ -1662,14 +1662,15 @@ int LuaScriptInterface::luaDoShowTextDialog(lua_State *L)
 {
 	//doShowTextDialog(cid, itemid, text)
 	const char * text = popString(L);
-	uint32_t itemid = popNumber(L);
+	uint32_t itemId = popNumber(L);
 	uint32_t cid = popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		player->sendTextWindow(itemid, text);
+		player->setWriteItem(NULL, 0);
+		player->sendTextWindow(itemId, text);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
