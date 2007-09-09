@@ -399,7 +399,9 @@ void Player::sendIcons() const
 		}
 	}
 
-	client->sendIcons(icons);
+	if(client){
+		client->sendIcons(icons);
+	}
 }
 
 void Player::updateInventoryWeigth()
@@ -495,15 +497,19 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 		skills[skill][SKILL_PERCENT] = 0;				 
 		std::stringstream advMsg;
 		advMsg << "You advanced in " << getSkillName(skill) << ".";
-		client->sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
-		client->sendSkills();
+		if(client){
+			client->sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
+			client->sendSkills();
+		}
 	}
 	else{
 		//update percent
 		uint32_t newPercent = std::min((uint32_t)100, (100*skills[skill][SKILL_TRIES])/vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1));
 	 	if(skills[skill][SKILL_PERCENT] != newPercent){
 			skills[skill][SKILL_PERCENT] = newPercent;
-			client->sendSkills();
+			if(client){
+				client->sendSkills();
+			}
 	 	}
 	}
 }
@@ -629,7 +635,11 @@ bool Player::getStorageValue(const uint32_t key, int32_t& value) const
 
 bool Player::canSee(const Position& pos) const
 {
-	return client->canSee(pos);
+	if(client){
+		return client->canSee(pos);
+	}
+
+	return false;
 }
 
 bool Player::canSeeCreature(const Creature* creature) const
@@ -900,7 +910,9 @@ void Player::sendStats()
 	lastSentStats.magLevel = getMagicLevel();
 	lastSentStats.manaSpent = manaSpent;
 	
-	client->sendStats();
+	if(client){
+		client->sendStats();
+	}
 }
 
 void Player::sendPing()
@@ -909,64 +921,77 @@ void Player::sendPing()
 	if(internal_ping >= 5){ //1 ping each 5 seconds
 		internal_ping = 0;
 		npings++;
-		client->sendPing();
+		if(client){
+			client->sendPing();
+		}
 	}
-	if(npings >= 6){
-		//std::cout << "logout" << std::endl;
-		if(hasCondition(CONDITION_INFIGHT) && health > 0){
-			//logout?
-			//client->logout();
+
+	if( (!hasCondition(CONDITION_INFIGHT) && npings >= 12) || npings >= 120){
+		if(client){
+			client->logout();
 		}
 		else{
-			//client->logout();			
+			g_game.removeCreature(this, true);
 		}
 	}
 }
 
 void Player::sendHouseWindow(House* _house, uint32_t _listid) const
 {
-	std::string text;
-	if(_house->getAccessList(_listid, text)){
-		client->sendHouseWindow(_house, _listid, text);
+	if(client){
+		std::string text;
+		if(_house->getAccessList(_listid, text)){
+			client->sendHouseWindow(_house, _listid, text);
+		}
 	}
 }
 
 void Player::sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName)
 {
-	client->sendCreatePrivateChannel(channelId, channelName);
+	if(client){
+		client->sendCreatePrivateChannel(channelId, channelName);
+	}
 }
 
 //container
 void Player::sendAddContainerItem(const Container* container, const Item* item)
 {
-  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
-		if(cl->second == container){
-			client->sendAddContainerItem(cl->first, item);
+	if(client){
+		for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+			if(cl->second == container){
+				client->sendAddContainerItem(cl->first, item);
+			}
 		}
 	}
 }
 
 void Player::sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem)
 {
-  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
-		if(cl->second == container){
-			client->sendUpdateContainerItem(cl->first, slot, newItem);
+	if(client){
+		for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+			if(cl->second == container){
+				client->sendUpdateContainerItem(cl->first, slot, newItem);
+			}
 		}
 	}
 }
 
 void Player::sendRemoveContainerItem(const Container* container, uint8_t slot, const Item* item)
 {
-  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
-		if(cl->second == container){
-			client->sendRemoveContainerItem(cl->first, slot);
+	if(client){
+		for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+			if(cl->second == container){
+				client->sendRemoveContainerItem(cl->first, slot);
+			}
 		}
 	}
 }
 
 void Player::sendContainer(uint32_t cid, const Container* container, bool hasParent)
 {
-	client->sendContainer(cid, container, hasParent);
+	if(client){
+		client->sendContainer(cid, container, hasParent);
+	}
 }
 
 void Player::onAddTileItem(const Position& pos, const Item* item)
@@ -1145,20 +1170,24 @@ void Player::onRemoveContainerItem(const Container* container, uint8_t slot, con
 
 void Player::onCloseContainer(const Container* container)
 {
-  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
-		if(cl->second == container){
-			client->sendCloseContainer(cl->first);
+	if(client){
+		for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+			if(cl->second == container){
+				client->sendCloseContainer(cl->first);
+			}
 		}
 	}
 }
 
 void Player::onSendContainer(const Container* container)
 {
-	bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
+	if(client){
+		bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
 
-	for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
-		if(cl->second == container){
-			client->sendContainer(cl->first, container, hasParent);
+		for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+			if(cl->second == container){
+				client->sendContainer(cl->first, container, hasParent);
+			}
 		}
 	}
 }
@@ -1596,7 +1625,11 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 
 uint32_t Player::getIP() const
 {
-	return client->getIP();
+	if(client){
+		return client->getIP();
+	}
+
+	return 0;
 }
 
 void Player::die()
@@ -1672,7 +1705,9 @@ void Player::die()
 	if(newLevel != level){
 		std::stringstream lvMsg;
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
+		if(client){
+			client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
+		}
 	}
 
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
@@ -1689,7 +1724,11 @@ void Player::die()
 		}
 	}
 
-	//client->sendReLoginWindow();
+	/*
+	if(client){
+		client->sendReLoginWindow();
+	}
+	*/
 }
 
 Item* Player::getCorpse()
@@ -1783,19 +1822,23 @@ void Player::addList()
 
 void Player::notifyLogIn(Player* login_player)
 {
-	VIPListSet::iterator it = VIPList.find(login_player->getGUID());
-	if(it != VIPList.end()){
-		client->sendVIPLogIn(login_player->getGUID());
-		sendTextMessage(MSG_STATUS_SMALL, (login_player->getName() + " has logged in."));
+	if(client){
+		VIPListSet::iterator it = VIPList.find(login_player->getGUID());
+		if(it != VIPList.end()){
+			client->sendVIPLogIn(login_player->getGUID());
+			sendTextMessage(MSG_STATUS_SMALL, (login_player->getName() + " has logged in."));
+		}
 	}
 }
 
 void Player::notifyLogOut(Player* logout_player)
 {
-	VIPListSet::iterator it = VIPList.find(logout_player->getGUID());
-	if(it != VIPList.end()){
-		client->sendVIPLogOut(logout_player->getGUID());
-		sendTextMessage(MSG_STATUS_SMALL, (logout_player->getName() + " has logged out."));
+	if(client){
+		VIPListSet::iterator it = VIPList.find(logout_player->getGUID());
+		if(it != VIPList.end()){
+			client->sendVIPLogOut(logout_player->getGUID());
+			sendTextMessage(MSG_STATUS_SMALL, (logout_player->getName() + " has logged out."));
+		}
 	}
 }
 
@@ -1832,8 +1875,9 @@ bool Player::addVIP(uint32_t _guid, std::string& name, bool isOnline, bool inter
 	
 	VIPList.insert(_guid);
 	
-	if(!internal)
+	if(client && !internal){
 		client->sendVIP(_guid, name, isOnline);
+	}
 	
 	return true;
 }
@@ -1858,7 +1902,9 @@ void Player::autoCloseContainers(const Container* container)
 	
 	for(CloseList::iterator it = closeList.begin(); it != closeList.end(); ++it){
 		closeContainer(*it);
-		client->sendCloseContainer(*it);
+		if(client){
+			client->sendCloseContainer(*it);
+		}
 	}						
 }
 
@@ -2410,7 +2456,9 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		updateItemsLight();
 		updateInventoryWeigth();
-		client->sendStats();
+		if(client){
+			client->sendStats();
+		}
 	}
 
 	if(const Item* item = thing->getItem()){
@@ -2445,7 +2493,9 @@ void Player::postRemoveNotification(Thing* thing, int32_t index, bool isComplete
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		updateItemsLight();
 		updateInventoryWeigth();
-		client->sendStats();
+		if(client){
+			client->sendStats();
+		}
 	}
 
 	if(const Item* item = thing->getItem()){
@@ -2981,7 +3031,9 @@ void Player::addUnjustifiedDead(const Player* attacked)
 		
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
-	client->sendTextMessage(MSG_STATUS_WARNING, Msg.str());
+	if(client){
+		client->sendTextMessage(MSG_STATUS_WARNING, Msg.str());
+	}
 	redSkullTicks = redSkullTicks + 12 * 3600 * 1000;
 	if(redSkullTicks >= 3*24*3600*1000){
 		g_game.changeSkull(this, SKULL_RED);

@@ -318,15 +318,9 @@ bool Protocol79::login(const std::string& name)
 bool Protocol79::logout()
 {
 	//dispatcher thread
-	if(player->isRemoved())
-		return false;
-
-	if(player->hasCondition(CONDITION_INFIGHT)){
-		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
-		return false;
-	}
-
-	return g_game.removeCreature(player);
+	bool result = g_game.removeCreature(player);
+	getConnection()->closeConnection();
+	return result;
 }
 
 /*
@@ -816,8 +810,13 @@ bool Protocol79::canSee(int x, int y, int z) const
 //********************** Parse methods *******************************
 void Protocol79::parseLogout(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Protocol79::logout, this)));
+	if(!player->hasCondition(CONDITION_INFIGHT)){
+		Dispatcher::getDispatcher().addTask(
+			createTask(boost::bind(&Protocol79::logout, this)));
+	}
+	else{
+		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
+	}
 }
 
 void Protocol79::parseCreatePrivateChannel(NetworkMessage& msg)
@@ -935,22 +934,26 @@ void Protocol79::parseStopAutoWalk(NetworkMessage& msg)
 
 void Protocol79::parseMove(NetworkMessage& msg, Direction dir)
 {
-	/*TODO-revnetsys
 	float multiplier;
 	switch(dir){
-	case NORTH: case SOUTH: case EAST: case WEST:
-		multiplier = 1.f;
-		break;
-	default:
-		multiplier = 1.5f;
-		break;
+		case NORTHWEST:
+		case NORTHEAST:
+		case SOUTHWEST:
+		case SOUTHEAST:
+			multiplier = 1.5f;
+			break;
+
+		default:
+			multiplier = 1.0f;
+			break;
 	}
+
 	int64_t delay = player->getSleepTicks()*multiplier;
 	if(delay > 0 ){
 		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerTurn, &g_game, player, NORTH)));
+			createSchedulerTask(delay, boost::bind(&Game::movePlayer, &g_game, player, dir)));
 	}
-	else*/{
+	else{
 		addGameTask(&Game::movePlayer, player, dir);
 	}
 }
