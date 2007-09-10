@@ -77,7 +77,7 @@ protected:
 	bool XTEA_decrypt(NetworkMessage& msg);
 	bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
 	
-	virtual void deleteProtocolTask(){ delete this; }
+	virtual void deleteProtocolTask();
 	friend class Connection;
 	
 private:

@@ -101,7 +101,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 void ProtocolStatus::deleteProtocolTask()
 {
 	std::cout << "Deleting ProtocolStatus" << std::endl;
-	delete this;
+	Protocol::deleteProtocolTask();
 }
 #endif
 

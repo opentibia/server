@@ -165,7 +165,7 @@ Player::~Player()
 		it->second->releaseThing2();
 	}
 
-	//std::cout << "Player destructor " << this->getID() << std::endl;
+	std::cout << "Player destructor " << this << std::endl;
 	if(client){
 		delete client;
 	}
@@ -936,12 +936,12 @@ void Player::sendPing()
 		}
 	}
 
-	if( (!hasCondition(CONDITION_INFIGHT) && npings >= 12) || npings >= 120){
-		if(client){
-			client->logout();
-		}
-		else{
+	if(!hasCondition(CONDITION_INFIGHT)){
+		if(!client){
 			g_game.removeCreature(this, true);
+		}
+		else if(npings > 24){
+			client->logout();
 		}
 	}
 }

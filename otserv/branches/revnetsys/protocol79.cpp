@@ -130,12 +130,6 @@ Protocol79::Protocol79(Connection* connection) :
 	Protocol(connection)
 {
 	player = NULL;
-
-	/*
-	windowTextID = 0;
-	readItem = NULL;
-	maxTextLength = 0;
-	*/
 }
 
 Protocol79::~Protocol79()
@@ -157,88 +151,23 @@ void Protocol79::setPlayer(Player* p)
 	player = p;
 }
 
-void Protocol79::reinitializeProtocol()
-{
-	/*
-	windowTextID = 0;
-	readItem = NULL;
-	maxTextLength = 0;
-	*/
-
-	knownPlayers.clear();
-}
-
-/*
-void Protocol79::loginTask(const std::string& name, Connection* connection)
-{
-	searchPlayer
-	if player is online then
-		assign this Protocol to the player 
-		send messages to the client
-	else
-		load player
-		etc
-	endif
-}
-*/
-
 void Protocol79::deleteProtocolTask()
 {
+	//dispatcher thread
 	if(player){
+		#ifdef __DEBUG_NET__
+		std::cout << "Deleting Protocol79 - Protocol:" << this << ", Player: " << player << std::endl;
+		#endif
+		
 		player->client = NULL;
 		if(player->isOnline() && !player->hasCondition(CONDITION_INFIGHT)){
 			g_game.removeCreature(player, false);
 		}
-
-		#ifdef __DEBUG_NET__
-		std::cout << "Deleting Protocol79 - Protocol:" << this << ", Player: " << player << std::endl;
-		#endif
+		g_game.FreeThing(player);
+		player = NULL;
 	}
+	Protocol::deleteProtocolTask();
 }
-
-/*
-void Protocol79::ReceiveLoop()
-{
-	//NetworkMessage msg;
-	//msg.setEncryptionState(true);
-	//msg.setEncryptionKey(m_key);
-
-	do{
-		//while(pendingLogout == false && msg.ReadFromSocket(s)){
-		//	parsePacket(msg);
-		//}
-
-		if(s){
-			closesocket(s);
-			s = 0;
-		}
-
-		// logout by disconnect?  -> kick
-		if(pendingLogout == false){
-			g_game.playerSetAttackedCreature(player, 0);
-
-			while(player->hasCondition(CONDITION_INFIGHT) && !player->isRemoved() && s == 0){
-				OTSYS_SLEEP(250);
-			}
-
-			//OTSYS_THREAD_LOCK(g_game.gameLock, "Protocol79::ReceiveLoop()");
-
-			//
-			if(!player->isRemoved()){
-				if(s == 0){
-					g_game.removeCreature(player);
-				}
-				else{
-					//set new key after reattaching
-					//msg.setEncryptionKey(m_key);
-				}
-			}
-
-			//OTSYS_THREAD_UNLOCK(g_game.gameLock, "Protocol79::ReceiveLoop()");
-		}
-	}while(s != 0 && !player->isRemoved());
-}
-*/
 
 bool Protocol79::login(const std::string& name)
 {
@@ -261,12 +190,6 @@ bool Protocol79::login(const std::string& name)
 		else if(g_bans.isAccountBanished(player->getAccount()) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
 			sendLoginErrorMessage(0x14, "Your account is banished!");
 		}
-		/*else if(playerexist && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
-			#ifdef __DEBUG_PLAYERS__
-			std::cout << "reject player..." << std::endl;
-			#endif
-			sendLoginErrorMessage(0x14, "You are already logged in.");
-		}*/
 		else if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
 			sendLoginErrorMessage(0x14, "Server temporarly closed.");
 		}
@@ -305,17 +228,22 @@ bool Protocol79::login(const std::string& name)
 	}
 	else if(g_config.getNumber(ConfigManager::ALLOW_CLONES)){
 		sendLoginErrorMessage(0x14, "Not implemented yet");
-
-		/*
-		//reattach player?
-		if(!player->isRemoved()){
-			player->lastlogin = time(NULL);
-			player->client->reinitializeProtocol();
-			player->client->sendAddCreature(player, false);
-			player->sendIcons();
-			player->lastip = player->getIP();
+	}
+	else{
+		if(_player->isOnline()){
+			sendLoginErrorMessage(0x14, "You are already logged in.");
+			return false;
 		}
-		*/
+		else if(!_player->isRemoved()){
+			this->player = _player;
+			_player->useThing2();
+			_player->lastlogin = time(NULL);
+			_player->client = this;
+			_player->client->sendAddCreature(player, false);
+			_player->sendIcons();
+			_player->lastip = player->getIP();
+			return true;
+		}
 	}
 
 	return false;
@@ -346,7 +274,7 @@ void Protocol79::move(Direction dir)
 			break;
 	}
 
-	int64_t delay = player->getSleepTicks()*multiplier;
+	int64_t delay = (int64_t)(player->getSleepTicks()*multiplier);
 	if(delay > 0 ){
 		Scheduler::getScheduler().addEvent(
 			createSchedulerTask(delay, boost::bind(&Game::playerMove, &g_game, player->getID(), dir)));
@@ -356,21 +284,9 @@ void Protocol79::move(Direction dir)
 	}
 }
 
-/*
-	Status* stat = Status::instance();
-	stat->addPlayer();
-	player->lastlogin = time(NULL);
-	player->lastip = player->getIP();
-
-	OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
-	isLocked = false;
-	protocol->ReceiveLoop();
-	stat->removePlayer();
-*/
-
 void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 {
-	uint16_t clientos = msg.GetU16();
+	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
 	if(version <= 760){
@@ -1166,18 +1082,6 @@ void Protocol79::parseTextWindow(NetworkMessage& msg)
 	const std::string newText = msg.GetString();
 
 	addGameTask(&Game::playerWriteItem, player->getID(), windowTextId, newText);
-
-	/*
-	if(newText.length() > maxTextLength)
-		return;
-
-	if(readItem && windowTextID == id){
-		addGameTask(&Game::playerWriteItem, player->getID(), readItem, newText);
-
-		readItem->releaseThing2();
-		readItem = NULL;
-	}
-	*/
 }
 
 void Protocol79::parseHouseWindow(NetworkMessage &msg)
@@ -1903,35 +1807,16 @@ void Protocol79::sendTextWindow(uint32_t windowTextId, Item* item, uint16_t maxl
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
-		/*
-		if(readItem){
-			readItem->releaseThing2();
-		}
-
-		windowTextID++;
-		*/
-
 		msg->AddByte(0x96);
 		msg->AddU32(windowTextId);
 		msg->AddItemId(item);
 		if(canWrite){
 			msg->AddU16(maxlen);
 			msg->AddString(item->getText());
-
-			/*
-			item->useThing2();
-			readItem = item;
-			maxTextLength = maxlen;
-			*/
 		}
 		else{
 			msg->AddU16(item->getText().size());
 			msg->AddString(item->getText());
-			
-			/*
-			readItem = NULL;
-			maxTextLength = 0;
-			*/
 		}
 
 		msg->AddString("unknown");
@@ -1943,25 +1828,12 @@ void Protocol79::sendTextWindow(uint32_t windowTextId, uint32_t itemId, const st
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
-		/*
-		if(readItem){
-			readItem->releaseThing2();
-		}
-
-		windowTextID++;
-		*/
-
 		msg->AddByte(0x96);
 		msg->AddU32(windowTextId);
 		msg->AddItemId(itemId);
 		
 		msg->AddU16(text.size());
 		msg->AddString(text);
-
-		/*
-		readItem = NULL;
-		maxTextLength = 0;
-		*/
 		
 		msg->AddString("");
 		msg->AddString("");
@@ -1973,12 +1845,6 @@ void Protocol79::sendHouseWindow(uint32_t windowTextId, House* _house,
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
-		/*
-		windowTextID++;
-		house = _house;
-		listId = _listid;
-		*/
-
 		msg->AddByte(0x97);
 		msg->AddByte(0);
 		msg->AddU32(windowTextId);

@@ -38,11 +38,11 @@ extern ConfigManager g_config;
 extern IPList serverIPs;
 extern Ban g_bans;
 
-#ifdef __DEBUG_NET_DETAIL__
+#ifdef __DEBUG_NET__
 void ProtocolLogin::deleteProtocolTask()
 {
 	std::cout << "Deleting ProtocolLogin" << std::endl;
-	delete this;
+	Protocol::deleteProtocolTask();
 }
 #endif
 

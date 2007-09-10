@@ -58,6 +58,8 @@ public:
 		m_closeState = CLOSE_STATE_NONE;
 		m_socketClosed = false;
 		OTSYS_THREAD_LOCKVARINIT(m_connectionLock);
+		m_writeError = false;
+		m_readError = false;
 	}
 	
 	~Connection()
@@ -77,9 +79,11 @@ public:
 private:
 	void parseHeader(const boost::system::error_code& error);
 	void parsePacket(const boost::system::error_code& error);
-
-	friend class OutputMessagePool;
-	void onWriteOperation(const boost::system::error_code& error);
+	
+	void onWriteOperation(OutputMessage* msg, const boost::system::error_code& error);
+	
+	void handleReadError(const boost::system::error_code& error);
+	void handleWriteError(const boost::system::error_code& error);
 	
 	void closeConnectionTask();
 	void closingConnection();
@@ -88,7 +92,10 @@ private:
 	
 	NetworkMessage m_msg;
 	boost::asio::ip::tcp::socket m_socket;
-	bool m_socketClosed; //TODO. remove in next asio release
+	bool m_socketClosed;
+	
+	bool m_writeError;
+	bool m_readError;
 	
 	int32_t m_pendingWrite;
 	std::list <OutputMessage*> m_outputQueue;

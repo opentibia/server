@@ -53,8 +53,6 @@ public:
 	bool login(const std::string& name);
 	bool logout();
 	void move(Direction dir);
-
-	void reinitializeProtocol();
 		
 	void setPlayer(Player* p);
 	uint32_t getIP() const;
@@ -64,7 +62,6 @@ private:
 	
 	void sendLoginErrorMessage(uint8_t error, const char* message);
 	
-	//virtual void loginTask(const std::string& name, Connection* connection);
 	virtual void deleteProtocolTask();
 
 	void checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &removedKnown);
@@ -251,15 +248,6 @@ private:
 	void AddInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void UpdateInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void RemoveInventoryItem(NetworkMessage* msg, slots_t slot);
-
-	/*
-	uint32_t windowTextID;
-	Item* readItem;
-	uint32_t maxTextLength;
-	
-	House* house;
-	uint32_t listId;
-	*/
 		
 	friend class Player;
 	Player* player;

@@ -21,10 +21,6 @@
 #ifndef __OTSERV_OUTPUT_MESSAGE_H__
 #define __OTSERV_OUTPUT_MESSAGE_H__
 
-#include "definitions.h"
-#include <boost/system/system_error.hpp>
-#include <boost/utility.hpp>
-
 #include "networkmessage.h"
 #include "otsystem.h"
 #include <list>
@@ -59,6 +55,7 @@ public:
 		STATE_WAITING
 	};
 	
+	/*
 	void releaseMessage()
 	{
 		if(m_state == STATE_ALLOCATED_NO_AUTOSEND){
@@ -70,6 +67,7 @@ public:
 			#endif
 		}
 	}
+	*/
 	
 	Protocol* getProtocol() { return m_protocol;}
 	Connection* getConnection() { return m_connection;}
@@ -92,14 +90,14 @@ protected:
 	void setState(OutputMessageState state) { m_state = state;}
 	OutputMessageState getState() const { return m_state;}
 	
-	void setFrame(uint32_t frame) { m_frame = frame;}
-	uint32_t getFrame() const { return m_frame;}
+	void setFrame(uint64_t frame) { m_frame = frame;}
+	uint64_t getFrame() const { return m_frame;}
 	
 	Protocol* m_protocol;
 	Connection* m_connection;
 	
 	uint32_t m_outputBufferStart;
-	uint32_t m_frame;
+	uint64_t m_frame;
 	
 	OutputMessageState m_state;
 };
@@ -123,22 +121,20 @@ public:
 	OutputMessage* getOutputMessage(Protocol* protocol, bool autosend = true);
 	void startExecutionFrame();
 	
+	void releaseMessage(OutputMessage* msg, bool sent = false);
+	
 protected:
 
 	void configureOutputMessage(OutputMessage* msg, Protocol* protocol, bool autosend);
 	
 	void internalReleaseMessage(OutputMessage* msg);
-	
-	static void writeHandler(OutputMessage* msg, const boost::system::error_code& error);
-	
-	friend class Connection;
 
 	typedef std::list<OutputMessage*> OutputMessageVector;
 	
 	OutputMessageVector m_outputMessages;
 	OutputMessageVector m_autoSendOutputMessages;
 	OTSYS_THREAD_LOCKVAR m_outputPoolLock;
-	uint32_t m_frame;
+	uint64_t m_frameTime;
 };
 
 #endif

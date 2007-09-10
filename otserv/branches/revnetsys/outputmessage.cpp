@@ -37,13 +37,13 @@ OutputMessagePool::OutputMessagePool()
 	for(uint32_t i = 0; i < OUTPUT_POOL_SIZE; ++i){
 		m_outputMessages.push_back(new OutputMessage);
 	}
-	m_frame = 1;
+	m_frameTime = OTSYS_TIME();
 }
 
 void OutputMessagePool::startExecutionFrame()
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
-	m_frame++;
+	m_frameTime = OTSYS_TIME();
 }
 
 OutputMessagePool::~OutputMessagePool()
@@ -86,34 +86,35 @@ void OutputMessagePool::sendAll()
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
-	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ++it){
-		#ifdef __DEBUG_NET_DETAIL__
-		std::cout << "Sending message - ALL" << std::endl;
-		#endif
-		
-		if((*it)->getFrame() != m_frame){
-			#ifdef __DEBUG_NET__
-			std::cout << "Error: [OutputMessagePool::send] Trying to send message out of frame." << (*it)->getFrame() << " Current: " << m_frame << std::endl;
+	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
+		//It will send only messages bigger then 1 kb or wiht a lifetime greater than 50 ms
+		if((*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 50)){
+			
+			#ifdef __DEBUG_NET_DETAIL__
+			std::cout << "Sending message - ALL" << std::endl;
 			#endif
-			internalReleaseMessage(*it);
-			return;
-		}
-		(*it)->writeMessageLength();
-		if((*it)->getConnection()){
-			if((*it)->getConnection()->send(*it)){
-				(*it)->setState(OutputMessage::STATE_WAITING);
+			
+			(*it)->writeMessageLength();
+			if((*it)->getConnection()){
+				if((*it)->getConnection()->send(*it)){
+					(*it)->setState(OutputMessage::STATE_WAITING);
+				}
+				else{
+					internalReleaseMessage(*it);
+				}
 			}
 			else{
-				internalReleaseMessage(*it);
+				#ifdef __DEBUG_NET__
+				std::cout << "Error: [OutputMessagePool::send] NULL connection." << std::endl;
+				#endif
 			}
+			
+			m_autoSendOutputMessages.erase(it++);
 		}
 		else{
-			#ifdef __DEBUG_NET__
-			std::cout << "Error: [OutputMessagePool::send] NULL connection." << std::endl;
-			#endif
+			++it;
 		}
 	}
-	m_autoSendOutputMessages.clear();
 }
 
 void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
@@ -121,6 +122,40 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 	//Simulate that the message is sent and then liberate it
 	msg->getProtocol()->onSendMessage(msg);
 	msg->freeMessage();
+}
+
+void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
+	switch(msg->getState()){
+	case OutputMessage::STATE_ALLOCATED:
+	{
+		OutputMessageVector::iterator it = 
+			std::find(m_autoSendOutputMessages.begin(), m_autoSendOutputMessages.end(), msg);
+		if(it != m_autoSendOutputMessages.end()){
+			m_autoSendOutputMessages.erase(it);
+		}
+		msg->freeMessage();
+		break;
+	}
+	case OutputMessage::STATE_ALLOCATED_NO_AUTOSEND:
+		msg->freeMessage();
+		break;
+	case OutputMessage::STATE_WAITING:
+		if(!sent){
+			std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_WAITING OutputMessage." << std::endl;
+		}
+		else{
+			msg->freeMessage();
+		}
+		break;
+	case OutputMessage::STATE_FREE:
+		std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_FREE OutputMessage." << std::endl;
+		break;
+	default:
+		std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_?(" << msg->getState() <<") OutputMessage." << std::endl;
+		break;
+	}
 }
 
 OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool autosend /*= true*/)
@@ -161,16 +196,5 @@ void OutputMessagePool::configureOutputMessage(OutputMessage* msg, Protocol* pro
 	}
 	msg->setProtocol(protocol);
 	msg->setConnection(protocol->getConnection());
-	msg->setFrame(m_frame);
-}
-
-void OutputMessagePool::writeHandler(OutputMessage* msg, const boost::system::error_code& error)
-{
-	#ifdef __DEBUG_NET_DETAIL__
-	std::cout << "Write handler" << std::endl;
-	#endif
-	
-	Connection* connection = msg->getConnection();
-	connection->onWriteOperation(error);
-	msg->freeMessage();
+	msg->setFrame(m_frameTime);
 }
