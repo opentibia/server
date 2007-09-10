@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -129,9 +129,9 @@ enum skills_t {
 enum stats_t {
 	STAT_FIRST = 0,
 	STAT_MAXHITPOINTS = STAT_FIRST,
-	STAT_MAXMANAPOINTS = 1,
-	STAT_SOULPOINTS = 2,
-	STAT_MAGICPOINTS = 3,
+	STAT_MAXMANAPOINTS,
+	STAT_SOULPOINTS,
+	STAT_MAGICPOINTS,
 	STAT_LAST = STAT_MAGICPOINTS
 };
 
@@ -193,7 +193,7 @@ struct Outfit_t{
 		lookBody   = 0;
 		lookLegs   = 0;
 		lookFeet   = 0;
-		lookType   = 0;	
+		lookType   = 0;
 		lookTypeEx = 0;
 		lookAddons = 0;
 	}
