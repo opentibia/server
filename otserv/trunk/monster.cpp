@@ -448,14 +448,14 @@ bool Monster::pushItem(Item* item, int32_t radius)
 
 	typedef std::pair<int32_t, int32_t> relPair;
 	std::vector<relPair> relList;
-	relList.push_back(relPair(-1, 0));
-	relList.push_back(relPair(-1, 0));
-	relList.push_back(relPair(0, 1));
-	relList.push_back(relPair(0, -1));
-	relList.push_back(relPair(1, 1));
-	relList.push_back(relPair(1, 0));
-	relList.push_back(relPair(-1, 0));
 	relList.push_back(relPair(-1, -1));
+	relList.push_back(relPair(-1, 0));
+	relList.push_back(relPair(-1, 1));
+	relList.push_back(relPair(0, -1));
+	relList.push_back(relPair(0, 1));
+	relList.push_back(relPair(1, -1));
+	relList.push_back(relPair(1, 0));
+	relList.push_back(relPair(1, 1));
 
 	std::random_shuffle(relList.begin(), relList.end());
 
