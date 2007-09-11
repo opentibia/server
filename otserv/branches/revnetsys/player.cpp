@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -50,7 +50,7 @@ int32_t Player::maxMessageBuffer;
 
 Player::Player(const std::string& _name, Protocol79 *p) :
 Creature()
-{	
+{
 	client = p;
 
 	if(client){
@@ -131,10 +131,11 @@ Creature()
 	maxDepotLimit = 1000;
 	maxVipLimit = 50;
 	groupFlags = 0;
- 	
+
  	vocation_id = (Vocation_t)0;
- 	
+
  	town = 0;
+ 	lastip = 0;
 
 	windowTextId = 0;
 	writeItem = NULL;
@@ -147,7 +148,7 @@ Creature()
 	redSkullTicks = 0;
 	skull = SKULL_NONE;
 #endif
-} 
+}
 
 Player::~Player()
 {
@@ -209,7 +210,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 {
 	std::stringstream s;
 	std::string str;
-	
+
 	if(lookDistance == -1){
 		s << "yourself.";
 
@@ -218,20 +219,20 @@ std::string Player::getDescription(int32_t lookDistance) const
 		else
 			s << " You have no vocation.";
 	}
-	else {	
+	else {
 		s << name << " (Level " << level <<").";
-	
+
 		if(sex == PLAYERSEX_FEMALE)
 			s << " She";
 		else
-			s << " He";	
-			
+			s << " He";
+
 		if(getVocationId() != VOCATION_NONE)
 			s << " is "<< vocation->getVocDescription() << ".";
 		else
 			s << " has no vocation.";
 	}
-	
+
 	if(guildId)
 	{
 		if(lookDistance == -1)
@@ -243,20 +244,20 @@ std::string Player::getDescription(int32_t lookDistance) const
 			else
 				s << " He is ";
 		}
-		
+
 		if(guildRank.length())
 			s << guildRank;
 		else
 			s << "a member";
-		
+
 		s << " of the " << guildName;
-		
+
 		if(guildNick.length())
 			s << " (" << guildNick << ")";
-		
+
 		s << ".";
 	}
-	
+
 	str = s.str();
 	return str;
 }
@@ -327,14 +328,14 @@ Item* Player::getWeapon() const
 				break;
 		}
 	}
-	
+
 	return NULL;
 }
 
 int32_t Player::getArmor() const
 {
 	int32_t armor = 0;
-	
+
 	if(getInventoryItem(SLOT_HEAD))
 		armor += getInventoryItem(SLOT_HEAD)->getArmor();
 	if(getInventoryItem(SLOT_NECKLACE))
@@ -347,7 +348,7 @@ int32_t Player::getArmor() const
 		armor += getInventoryItem(SLOT_FEET)->getArmor();
 	if(getInventoryItem(SLOT_RING))
 		armor += getInventoryItem(SLOT_RING)->getArmor();
-	
+
 	return armor;
 }
 
@@ -362,13 +363,13 @@ int32_t Player::getDefense() const
 			defense = getInventoryItem(SLOT_LEFT)->getDefense();
 		}
 	}
-	
+
 	if(getInventoryItem(SLOT_RIGHT)){
 		if(getInventoryItem(SLOT_RIGHT)->getDefense() > defense){
 			defense = getInventoryItem(SLOT_RIGHT)->getDefense();
 		}
 	}
-	
+
 	if(defense <= 0){
 		if(getInventoryItem(SLOT_HEAD)){
 			defense += getInventoryItem(SLOT_HEAD)->getDefense();
@@ -417,7 +418,7 @@ void Player::sendIcons() const
 void Player::updateInventoryWeigth()
 {
 	inventoryWeight = 0.00;
-	
+
 	if(!hasFlag(PlayerFlag_HasInfinateCapacity)){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = getInventoryItem((slots_t)i);
@@ -464,7 +465,7 @@ std::string Player::getSkillName(int skillid)
 	std::string skillname;
 	switch(skillid){
 	case SKILL_FIST:
-		skillname = "fist fighting"; 
+		skillname = "fist fighting";
 		break;
 	case SKILL_CLUB:
 		skillname = "club fighting";
@@ -504,7 +505,7 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 	if(skills[skill][SKILL_TRIES] >= vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1)){
 	 	skills[skill][SKILL_LEVEL]++;
 	 	skills[skill][SKILL_TRIES] = 0;
-		skills[skill][SKILL_PERCENT] = 0;				 
+		skills[skill][SKILL_PERCENT] = 0;
 		std::stringstream advMsg;
 		advMsg << "You advanced in " << getSkillName(skill) << ".";
 		if(client){
@@ -558,7 +559,7 @@ void Player::addContainer(uint32_t cid, Container* container)
 			return;
 		}
 	}
-	
+
 	//id doesnt exist, create it
 	containervector_pair cv;
 	cv.first = cid;
@@ -663,9 +664,9 @@ bool Player::canSeeCreature(const Creature* creature) const
 
 
 Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
-{	
+{
 	DepotMap::iterator it = depots.find(depotId);
-	if(it != depots.end()){	
+	if(it != depots.end()){
 		return it->second;
 	}
 
@@ -698,7 +699,7 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 	if(depot2){
 		return false;
 	}
-	
+
 	depots[depotId] = depot;
 	depot->setMaxDepotLimit(maxDepotLimit);
 	return true;
@@ -754,7 +755,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_NOTENOUGHCAPACITY:
 		sendCancel("This object is too heavy.");
 		break;
-		
+
 	case RET_CONTAINERNOTENOUGHROOM:
 		sendCancel("You cannot put more objects in this container.");
 		break;
@@ -775,7 +776,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_THEREISNOWAY:
 		sendCancel("There is no way.");
 		break;
-		
+
 	case RET_THISISIMPOSSIBLE:
 		sendCancel("This is impossible.");
 		break;
@@ -807,7 +808,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_NOTREQUIREDLEVELTOUSERUNE:
 		sendCancel("You do not have the required magic level to use this rune.");
 		break;
-		
+
 	case RET_YOUAREALREADYTRADING:
 		sendCancel("You are already trading.");
 		break;
@@ -847,7 +848,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_CANONLYUSETHISRUNEONCREATURES:
 		sendCancel("You can only use this rune on creatures.");
 		break;
-	
+
 	case RET_PLAYERISNOTREACHABLE:
 		sendCancel("Player is not reachable.");
 		break;
@@ -855,7 +856,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_ACTIONNOTPERMITTEDINPROTECTIONZONE:
 		sendCancel("This action is not permitted in a protection zone.");
 		break;
-	
+
 	case RET_YOUMAYNOTATTACKTHISPLAYER:
 		sendCancel("You may not attack this player.");
 		break;
@@ -867,11 +868,11 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE:
 		sendCancel("You may not attack a person in a protection zone.");
 		break;
-	
+
 	case RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE:
 		sendCancel("You may not attack a person while you are in a protection zone.");
 		break;
-	
+
 
 	case RET_NOTPOSSIBLE:
 	default:
@@ -896,7 +897,7 @@ void Player::sendStats()
 
 		level_percent = percent;
 	}
-			
+
 	if(lastSentStats.manaSpent != manaSpent || lastSentStats.magLevel != magLevel){
 		int32_t percent = (100 * manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
 		if(percent < 0){
@@ -908,8 +909,8 @@ void Player::sendStats()
 
 		maglevel_percent = percent;
 	}
-			
-	//save current stats 
+
+	//save current stats
 	lastSentStats.health = getHealth();
 	lastSentStats.healthMax = getMaxHealth();
 	lastSentStats.freeCapacity = getFreeCapacity();
@@ -919,7 +920,7 @@ void Player::sendStats()
 	lastSentStats.manaMax = getPlayerInfo(PLAYERINFO_MAXMANA);
 	lastSentStats.magLevel = getMagicLevel();
 	lastSentStats.manaSpent = manaSpent;
-	
+
 	if(client){
 		client->sendStats();
 	}
@@ -1133,7 +1134,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 
 	if(creature == this){
-		
+
 		if(isLogout){
 			loginPosition = getPosition();
 		}
@@ -1208,7 +1209,7 @@ void Player::onRemoveContainerItem(const Container* container, uint8_t slot, con
 {
 	if(tradeState != TRADE_TRANSFER){
 		checkTradeState(item);
-		
+
 		if(tradeItem){
 			if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
 				g_game.internalCloseTrade(this);
@@ -1402,7 +1403,7 @@ void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t da
 void Player::drainMana(Creature* attacker, int32_t manaLoss)
 {
 	Creature::drainMana(attacker, manaLoss);
-	
+
 	sendStats();
 
 	std::stringstream ss;
@@ -1425,7 +1426,7 @@ void Player::addManaSpent(uint32_t amount)
 		if(manaSpent >= reqMana){
 			manaSpent -= reqMana;
 			magLevel++;
-			
+
 			std::stringstream MaglvMsg;
 			MaglvMsg << "You advanced to magic level " << magLevel << ".";
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
@@ -1450,7 +1451,7 @@ void Player::addExperience(uint32_t exp)
 	}
 
 	if(prevLevel != newLevel){
-		//int32_t oldSpeed = getBaseSpeed();		
+		//int32_t oldSpeed = getBaseSpeed();
 		level = newLevel;
 		updateBaseSpeed();
 
@@ -1472,7 +1473,7 @@ void Player::onBlockHit(BlockType_t blockType)
 {
 	if(shieldBlockCount > 0){
 		--shieldBlockCount;
-		
+
 		if(hasShield()){
 			addSkillAdvance(SKILL_SHIELD, 1);
 		}
@@ -1491,7 +1492,7 @@ void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 			addAttackSkillPoint = true;
 			bloodHitCount = 30;
 			shieldBlockCount = 30;
-			
+
 			break;
 		}
 
@@ -1554,7 +1555,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		if(blockType != BLOCK_IMMUNITY){
 			if(shieldBlockCount > 0){
 				--shieldBlockCount;
-				
+
 				if(hasShield()){
 					addSkillAdvance(SKILL_SHIELD, 1);
 				}
@@ -1654,7 +1655,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			default:
 				break;
 		}
-	
+
 		if(absorbedDamage){
 			int32_t charges = item->getItemCharge();
 
@@ -1691,7 +1692,7 @@ void Player::die()
 	//Magic level loss
 	uint32_t sumMana = 0;
 	int32_t lostMana = 0;
-	
+
 	//sum up all the mana
 	for(int32_t i = 1; i <= magLevel; ++i){
 		sumMana += vocation->getReqMana(i);
@@ -1700,7 +1701,7 @@ void Player::die()
 	sumMana += manaSpent;
 
 	lostMana = (int32_t)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
-    
+
 	while(lostMana > manaSpent){
 		lostMana -= manaSpent;
 		manaSpent = vocation->getReqMana(magLevel);
@@ -1739,7 +1740,7 @@ void Player::die()
 		}
 
 		skills[i][SKILL_TRIES] -= lostSkillTries;
-	}               
+	}
 	//
 
 	//Level loss
@@ -1795,7 +1796,7 @@ Item* Player::getCorpse()
 			ss << " " << (getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by "
 				<< lastHitCreature->getNameDescription() << ".";
 		}
-		
+
 		corpse->setSpecialDescription(ss.str());
 	}
 
@@ -1806,7 +1807,7 @@ void Player::preSave()
 {
 	if(health <= 0){
 		experience -= getLostExperience();
-				
+
 		while(level > 1 && experience < getExpForLv(level)){
 			--level;
 			healthMax = std::max((int32_t)0, (healthMax - (int32_t)vocation->getHPGain()));
@@ -1852,11 +1853,11 @@ void Player::addDefaultRegeneration(uint32_t addTicks)
 void Player::removeList()
 {
 	listPlayer.removeList(getID());
-	
+
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it)
 	{
 		(*it).second->notifyLogOut(this);
-	}	
+	}
 }
 
 void Player::addList()
@@ -1864,8 +1865,8 @@ void Player::addList()
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it)
 	{
 		(*it).second->notifyLogIn(this);
-	}	
-	
+	}
+
 	listPlayer.addList(this);
 }
 
@@ -1908,26 +1909,26 @@ bool Player::addVIP(uint32_t _guid, std::string& name, bool isOnline, bool inter
 			sendTextMessage(MSG_STATUS_SMALL, "You cannot add yourself.");
 		return false;
 	}
-	
+
 	if(VIPList.size() > maxVipLimit){
 		if(!internal)
 			sendTextMessage(MSG_STATUS_SMALL, "You cannot add more buddies.");
 		return false;
 	}
-	
+
 	VIPListSet::iterator it = VIPList.find(_guid);
 	if(it != VIPList.end()){
 		if(!internal)
 			sendTextMessage(MSG_STATUS_SMALL, "This player is already in your list.");
 		return false;
 	}
-	
+
 	VIPList.insert(_guid);
-	
+
 	if(client && !internal){
 		client->sendVIP(_guid, name, isOnline);
 	}
-	
+
 	return true;
 }
 
@@ -1936,7 +1937,7 @@ void Player::autoCloseContainers(const Container* container)
 {
 	typedef std::vector<uint32_t> CloseList;
 	CloseList closeList;
-	
+
 	for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
 		Container* tmpcontainer = it->second;
 		while(tmpcontainer != NULL){
@@ -1944,17 +1945,17 @@ void Player::autoCloseContainers(const Container* container)
 				closeList.push_back(it->first);
 				break;
 			}
-			
+
 			tmpcontainer = dynamic_cast<Container*>(tmpcontainer->getParent());
 		}
 	}
-	
+
 	for(CloseList::iterator it = closeList.begin(); it != closeList.end(); ++it){
 		closeContainer(*it);
 		if(client){
 			client->sendCloseContainer(*it);
 		}
-	}						
+	}
 }
 
 bool Player::hasCapacity(const Item* item, uint32_t count) const
@@ -2000,9 +2001,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 	if(!item->isPickupable()){
 		return RET_CANNOTPICKUP;
 	}
-	
+
 	ReturnValue ret = RET_NOERROR;
-	
+
 	if((item->getSlotPosition() & SLOTP_HEAD) ||
 		(item->getSlotPosition() & SLOTP_NECKLACE) ||
 		(item->getSlotPosition() & SLOTP_BACKPACK) ||
@@ -2188,7 +2189,7 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 	if(index == -1){
 		return RET_NOTPOSSIBLE;
 	}
-	
+
 	const Item* item = thing->getItem();
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
@@ -2336,7 +2337,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
-	
+
 	Item* oldItem = getInventoryItem((slots_t)index);
 	if(!oldItem){
 #ifdef __DEBUG__MOVESYS__
@@ -2357,7 +2358,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 
 	//send to client
 	sendUpdateInventoryItem((slots_t)index, oldItem, item);
-	
+
 	//event methods
 	onUpdateInventoryItem((slots_t)index, oldItem, item);
 
@@ -2410,7 +2411,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 	else{
 		//send change to client
 		sendRemoveInventoryItem((slots_t)index, item);
-	
+
 		//event methods
 		onRemoveInventoryItem((slots_t)index, item);
 
@@ -2470,11 +2471,11 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 			}
 		}
 	}
-	
+
 	while(listContainer.size() > 0){
 		const Container* container = listContainer.front();
 		listContainer.pop_front();
-		
+
 		count+= container->__getItemTypeCount(itemId, subType, itemCount);
 
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
@@ -2579,7 +2580,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 #endif
 		return;
 	}
-		
+
 	//index == 0 means we should equip this item at the most appropiate slot
 	if(index == 0){
 #ifdef __DEBUG__MOVESYS__
@@ -2691,7 +2692,7 @@ int32_t Player::getGainedExperience(Creature* attacker) const
 				int32_t a = (int32_t)std::floor(attackerPlayer->getLevel() * 0.9);
 				int32_t b = getLevel();
 				int32_t c = getExperience();
-				
+
 				int32_t result = std::max((int32_t)0, (int32_t)std::floor( getDamageRatio(attacker) * ((double)(1 - (((double)a / b)))) * 0.05 * c ) );
 				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
 		}
@@ -2720,7 +2721,7 @@ void Player::setChaseMode(chaseMode_t mode)
 		chaseMode = CHASEMODE_STANDSTILL;
 	}
 	*/
-	
+
 	if(prevChaseMode != chaseMode){
 		if(chaseMode == CHASEMODE_FOLLOW){
 			if(!followCreature && attackedCreature){
@@ -2843,7 +2844,7 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 {
 	//Creature::onCombatRemoveCondition(attacker, condition);
 	bool remove = true;
-	
+
 	if(condition->getId() != 0){
 		remove = false;
 
@@ -2925,7 +2926,7 @@ void Player::onKilledCreature(Creature* target)
 				addUnjustifiedDead(targetPlayer);
 			}
 #endif
-			
+
 			if(hasCondition(CONDITION_INFIGHT)){
 				pzLocked = true;
 				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
@@ -3016,7 +3017,7 @@ Skulls_t Player::getSkull() const
 	if(hasFlag(PlayerFlag_NotGainInFight)){
 		return SKULL_NONE;
 	}
-		
+
 	return skull;
 }
 
@@ -3042,7 +3043,7 @@ bool Player::hasAttacked(const Player* attacked) const
 	if(hasFlag(PlayerFlag_NotGainInFight) || !attacked){
 		return false;
 	}
-	
+
 	AttackedSet::const_iterator it;
 	uint32_t attackedId = attacked->getID();
 	it = attackedSet.find(attackedId);
@@ -3077,7 +3078,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	if(hasFlag(PlayerFlag_NotGainInFight) || attacked == this){
 		return;
 	}
-		
+
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	if(client){
@@ -3093,7 +3094,7 @@ void Player::checkRedSkullTicks(int32_t ticks)
 {
 	if(redSkullTicks - ticks > 0)
 		redSkullTicks = redSkullTicks - ticks;
-	
+
 	if(redSkullTicks < 1000 && !hasCondition(CONDITION_INFIGHT) && skull != SKULL_NONE){
 		g_game.changeSkull(this, SKULL_NONE);
 	}
@@ -3101,7 +3102,7 @@ void Player::checkRedSkullTicks(int32_t ticks)
 #endif
 
 const OutfitListType& Player::getPlayerOutfits()
-{	
+{
 	return m_playerOutfits.getOutfits();
 }
 
@@ -3109,7 +3110,7 @@ bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 {
 	if(m_playerOutfits.isInList(_looktype, _addons)){
 		return true;
-	}	
+	}
 	return false;
 }
 
@@ -3118,9 +3119,9 @@ void Player::genReservedStorageRange()
 	uint32_t base_key;
 	//generate outfits range
 	base_key = PSTRG_OUTFITS_RANGE_START + 1;
-	
+
 	const OutfitList& global_outfits = Outfits::getInstance()->getOutfitList(sex);
-	
+
 	const OutfitListType& outfits = m_playerOutfits.getOutfits();
 	OutfitListType::const_iterator it;
 	for(it = outfits.begin(); it != outfits.end(); ++it){

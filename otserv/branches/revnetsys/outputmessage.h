@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,6 +25,8 @@
 #include "otsystem.h"
 #include <list>
 
+#include <boost/utility.hpp>
+
 class Protocol;
 class Connection;
 
@@ -34,27 +36,27 @@ class OutputMessage : public NetworkMessage, boost::noncopyable
 {
 private:
 	OutputMessage();
-	
+
 public:
 	~OutputMessage() {}
-	
+
 	char* getOutputBuffer() { return (char*)&m_MsgBuf[m_outputBufferStart];}
 	void setBufferStart(uint32_t start) {m_outputBufferStart = start;}
-	
+
 	void addCryptoHeader()
 	{
 		*(uint16_t*)(m_MsgBuf) = m_MsgSize;
 		m_MsgSize = m_MsgSize + 2;
 		m_outputBufferStart = 0;
 	}
-	
+
 	enum OutputMessageState{
 		STATE_FREE,
 		STATE_ALLOCATED,
 		STATE_ALLOCATED_NO_AUTOSEND,
 		STATE_WAITING
 	};
-	
+
 	/*
 	void releaseMessage()
 	{
@@ -68,12 +70,12 @@ public:
 		}
 	}
 	*/
-	
+
 	Protocol* getProtocol() { return m_protocol;}
 	Connection* getConnection() { return m_connection;}
-	
+
 protected:
-	
+
 	void freeMessage()
 	{
 		setConnection(NULL);
@@ -81,24 +83,24 @@ protected:
 		setState(OutputMessage::STATE_FREE);
 		m_frame = 0;
 	}
-	
+
 	friend class OutputMessagePool;
-	
+
 	void setProtocol(Protocol* protocol){ m_protocol = protocol;}
 	void setConnection(Connection* connection){ m_connection = connection;}
-	
+
 	void setState(OutputMessageState state) { m_state = state;}
 	OutputMessageState getState() const { return m_state;}
-	
+
 	void setFrame(uint64_t frame) { m_frame = frame;}
 	uint64_t getFrame() const { return m_frame;}
-	
+
 	Protocol* m_protocol;
 	Connection* m_connection;
-	
+
 	uint32_t m_outputBufferStart;
 	uint64_t m_frame;
-	
+
 	OutputMessageState m_state;
 };
 
@@ -109,28 +111,28 @@ private:
 
 public:
 	~OutputMessagePool();
-	
+
 	static OutputMessagePool* getInstance()
 	{
 		static OutputMessagePool instance;
 		return &instance;
 	}
-	
+
 	void send(OutputMessage* msg);
 	void sendAll();
 	OutputMessage* getOutputMessage(Protocol* protocol, bool autosend = true);
 	void startExecutionFrame();
-	
+
 	void releaseMessage(OutputMessage* msg, bool sent = false);
-	
+
 protected:
 
 	void configureOutputMessage(OutputMessage* msg, Protocol* protocol, bool autosend);
-	
+
 	void internalReleaseMessage(OutputMessage* msg);
 
 	typedef std::list<OutputMessage*> OutputMessageVector;
-	
+
 	OutputMessageVector m_outputMessages;
 	OutputMessageVector m_autoSendOutputMessages;
 	OTSYS_THREAD_LOCKVAR m_outputPoolLock;

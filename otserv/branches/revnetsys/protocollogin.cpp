@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,9 +30,6 @@
 #include "ban.h"
 #include <iomanip>
 
-#define CLIENT_VERSION_MIN 792
-#define CLIENT_VERSION_MAX 792
-
 extern RSA* g_otservRSA;
 extern ConfigManager g_config;
 extern IPList serverIPs;
@@ -51,7 +48,7 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 	msg.SkipBytes(12);
-	
+
 	if(version <= 760){
 		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		output->AddByte(0x0A);
@@ -74,10 +71,10 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 		std::setw(2) << std::setfill('0') << m_key[2] << " " <<
 		std::setw(2) << std::setfill('0') << m_key[3] << std::endl;
 		std::cout.flags(std::ios::dec);*/
-		
+
 		uint32_t accnumber = msg.GetU32();
 		std::string password = msg.GetString();
-		
+
 		if(version >= CLIENT_VERSION_MIN && version <= CLIENT_VERSION_MAX){
 
 			uint32_t serverip = serverIPs[0].first;
@@ -102,7 +99,7 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 
 				bool isSuccess = accnumber != 0 && account.accnumber == accnumber &&
 					passwordTest(password, account.password);
-				
+
 				g_bans.addLoginAttempt(clientip, isSuccess);
 
 				if(isSuccess){

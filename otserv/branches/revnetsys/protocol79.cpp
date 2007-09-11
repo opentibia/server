@@ -54,9 +54,6 @@ extern RSA* g_otservRSA;
 extern Ban g_bans;
 Chat g_chat;
 
-#define CLIENT_VERSION_MIN 792
-#define CLIENT_VERSION_MAX 792
-
 // Helping templates to add dispatcher tasks
 template<class T1, class f1, class r>
 void addGameTask(r (Game::*f)(f1), T1 p1)
@@ -158,7 +155,7 @@ void Protocol79::deleteProtocolTask()
 		#ifdef __DEBUG_NET__
 		std::cout << "Deleting Protocol79 - Protocol:" << this << ", Player: " << player << std::endl;
 		#endif
-		
+
 		player->client = NULL;
 		if(player->isOnline() && !player->hasCondition(CONDITION_INFIGHT)){
 			g_game.removeCreature(player, false);
@@ -200,10 +197,10 @@ bool Protocol79::login(const std::string& name)
 				int32_t currentSlot = Waitlist::instance()->getClientSlot(player);
 				int32_t retryTime = Waitlist::instance()->getTime(currentSlot);
 				std::stringstream ss;
-				
+
 				ss << "Too many players online.\n" << "You are at place "
 					<< currentSlot << " on the waiting list.";
-				
+
 				OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 				output->AddByte(0x16);
 				output->AddString(ss.str());
@@ -211,16 +208,20 @@ bool Protocol79::login(const std::string& name)
 				OutputMessagePool::getInstance()->send(output);
 				getConnection()->closeConnection();
 			}
-
-			if(g_game.placePlayer(player, player->getLoginPosition())){
-				return true;
-			}
-
-			if(g_game.placePlayer(player, player->getTemplePosition(), true)){
-				return true;
-			}
 			else{
-				sendLoginErrorMessage(0x14, "Temple position is wrong. Contact the administrator.");
+
+				player->lastip = player->getIP();
+
+				if(g_game.placePlayer(player, player->getLoginPosition())){
+					return true;
+				}
+
+				if(g_game.placePlayer(player, player->getTemplePosition(), true)){
+					return true;
+				}
+				else{
+					sendLoginErrorMessage(0x14, "Temple position is wrong. Contact the administrator.");
+				}
 			}
 		}
 
@@ -324,7 +325,7 @@ void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 			return;
 		}
 		else{
-			std::string acc_pass;			
+			std::string acc_pass;
 			if(IOAccount::instance()->getPassword(accnumber, name, acc_pass) &&
 				passwordTest(password,acc_pass)){
 
@@ -518,11 +519,11 @@ void Protocol79::parsePacket(NetworkMessage &msg)
 	case 0xAA:
 		parseCreatePrivateChannel(msg);
 		break;
-		
+
 	case 0xAB:
 		parseChannelInvite(msg);
 		break;
-        
+
 	case 0xAC:
 		parseChannelExclude(msg);
 		break;
@@ -776,14 +777,14 @@ void Protocol79::parseCreatePrivateChannel(NetworkMessage& msg)
 void Protocol79::parseChannelInvite(NetworkMessage& msg)
 {
 	const std::string name = msg.GetString();
-	
+
 	addGameTask(&Game::playerChannelInvite, player->getID(), name);
 }
 
 void Protocol79::parseChannelExclude(NetworkMessage& msg)
 {
 	const std::string name = msg.GetString();
-	
+
 	addGameTask(&Game::playerChannelExclude, player->getID(), name);
 }
 
@@ -795,27 +796,27 @@ void Protocol79::parseGetChannels(NetworkMessage& msg)
 void Protocol79::parseOpenChannel(NetworkMessage& msg)
 {
 	uint16_t channelId = msg.GetU16();
-	
+
 	addGameTask(&Game::playerOpenChannel, player->getID(), channelId);
 }
 
 void Protocol79::parseCloseChannel(NetworkMessage &msg)
 {
 	uint16_t channelId = msg.GetU16();
-	
+
 	addGameTask(&Game::playerCloseChannel, player->getID(), channelId);
 }
 
 void Protocol79::parseOpenPriv(NetworkMessage& msg)
 {
 	const std::string receiver = msg.GetString();
-	
+
 	addGameTask(&Game::playerOpenPrivateChannel, player->getID(), receiver);
 }
 
 void Protocol79::parseCancelMove(NetworkMessage& msg)
 {
-	addGameTask(&Game::playerSetAttackedCreature, player->getID(), 0);	
+	addGameTask(&Game::playerSetAttackedCreature, player->getID(), 0);
 	addGameTask(&Game::playerFollowCreature, player->getID(), 0);
 }
 
@@ -904,7 +905,7 @@ void Protocol79::parseSetOutfit(NetworkMessage& msg)
 	int looklegs = msg.GetByte();
 	int lookfeet = msg.GetByte();
 	int lookaddons = msg.GetByte();
-	
+
 	Outfit_t newOutfit;
 	newOutfit.lookType = looktype;
 	newOutfit.lookHead = lookhead;
@@ -1065,7 +1066,7 @@ void Protocol79::parseFightModes(NetworkMessage& msg)
 void Protocol79::parseAttack(NetworkMessage& msg)
 {
 	uint32_t creatureId = msg.GetU32();
-	
+
 	addGameTask(&Game::playerSetAttackedCreature, player->getID(), creatureId);
 }
 
@@ -1089,7 +1090,7 @@ void Protocol79::parseHouseWindow(NetworkMessage &msg)
 	uint8_t doorId = msg.GetByte();
 	uint32_t id = msg.GetU32();
 	const std::string text = msg.GetString();
-	
+
 	addGameTask(&Game::playerUpdateHouseWindow, player->getID(), doorId, id, text);
 }
 
@@ -1133,7 +1134,7 @@ void Protocol79::parseAddVip(NetworkMessage& msg)
 void Protocol79::parseRemoveVip(NetworkMessage& msg)
 {
 	uint32_t guid = msg.GetU32();
-	
+
 	addGameTask(&Game::playerRequestRemoveVip, player->getID(), guid);
 }
 
@@ -1174,13 +1175,13 @@ void Protocol79::sendRequestOutfit()
 	if(msg){
 		msg->AddByte(0xC8);
 		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
-		
+
 		const OutfitListType& player_outfits = player->getPlayerOutfits();
 		size_t count_outfits = player_outfits.size();
-		
+
 		if(count_outfits > 0){
 			msg->AddByte(std::min((uint8_t)count_outfits, (uint8_t)15)); //client outfits limit is 15
-		
+
 			uint32_t counter = 0;
 			OutfitListType::const_iterator it;
 			for(it = player_outfits.begin(); it != player_outfits.end() && (counter < 15); ++it, ++counter){
@@ -1831,10 +1832,10 @@ void Protocol79::sendTextWindow(uint32_t windowTextId, uint32_t itemId, const st
 		msg->AddByte(0x96);
 		msg->AddU32(windowTextId);
 		msg->AddItemId(itemId);
-		
+
 		msg->AddU16(text.size());
 		msg->AddString(text);
-		
+
 		msg->AddString("");
 		msg->AddString("");
 	}
@@ -2028,7 +2029,7 @@ void Protocol79::AddCreatureSpeak(NetworkMessage* msg, const Creature* creature,
 	else{
 		msg->AddString("");
 	}
-	
+
 	//Add level only for players
 	if(const Player* player = creature->getPlayer()){
 		msg->AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));

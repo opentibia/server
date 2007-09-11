@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -49,9 +49,9 @@ public:
 		CLOSE_STATE_REQUESTED = 1,
 		CLOSE_STATE_CLOSING = 2,
 	};
-	
+
 	Connection(boost::asio::io_service& io_service) : m_socket(io_service)
-	{ 
+	{
 		m_protocol = NULL;
 		m_pendingWrite = 0;
 		m_pendingRead = 0;
@@ -61,7 +61,7 @@ public:
 		m_writeError = false;
 		m_readError = false;
 	}
-	
+
 	~Connection()
 	{
 		OTSYS_THREAD_LOCKVARRELEASE(m_connectionLock);
@@ -71,39 +71,40 @@ public:
 
 	void closeConnection();
 	void acceptConnection();
-	
+
 	bool send(OutputMessage* msg);
-	
+
 	uint32_t getIP() const;
-	
+
 private:
 	void parseHeader(const boost::system::error_code& error);
 	void parsePacket(const boost::system::error_code& error);
-	
+
 	void onWriteOperation(OutputMessage* msg, const boost::system::error_code& error);
-	
+
 	void handleReadError(const boost::system::error_code& error);
 	void handleWriteError(const boost::system::error_code& error);
-	
+
 	void closeConnectionTask();
-	void closingConnection();
-	
+	bool closingConnection();
+	void deleteConnectionTask();
+
 	void internalSend(OutputMessage* msg);
-	
+
 	NetworkMessage m_msg;
 	boost::asio::ip::tcp::socket m_socket;
 	bool m_socketClosed;
-	
+
 	bool m_writeError;
 	bool m_readError;
-	
+
 	int32_t m_pendingWrite;
 	std::list <OutputMessage*> m_outputQueue;
 	int32_t m_pendingRead;
 	uint32_t m_closeState;
-	
+
 	OTSYS_THREAD_LOCKVAR m_connectionLock;
-	
+
 	Protocol* m_protocol;
 };
 

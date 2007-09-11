@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-#include "otpch.h"
+//#include "otpch.h"
 
 #include "connection.h"
 #include "protocol.h"
@@ -32,42 +32,47 @@
 
 void Connection::closeConnection()
 {
+	//any thread
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::closeConnection" << std::endl;
 	#endif
-	
+
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
 	if(m_closeState != CLOSE_STATE_NONE)
 		return;
-	
+
 	m_closeState = CLOSE_STATE_REQUESTED;
-	
+
 	Scheduler::getScheduler().addEvent(
 		createSchedulerTask(1000, boost::bind(&Connection::closeConnectionTask, this)));
 }
 
 void Connection::closeConnectionTask()
 {
+	//dispatcher thread
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::closeConnectionTask" << std::endl;
 	#endif
-	
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
+
+	OTSYS_THREAD_LOCK(m_connectionLock, "");
 	if(m_closeState != CLOSE_STATE_REQUESTED){
 		std::cout << "Error: [Connection::closeConnectionTask] m_closeState = " << m_closeState << std::endl;
+		OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 		return;
 	}
-	
+
 	m_closeState = CLOSE_STATE_CLOSING;
-	
+
 	if(m_protocol){
 		Dispatcher::getDispatcher().addTask(
 			createTask(boost::bind(&Protocol::deleteProtocolTask, m_protocol)));
 		m_protocol->setConnection(NULL);
 		m_protocol = NULL;
 	}
-	
-	closingConnection();
+
+	if(!closingConnection()){
+		OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+	}
 }
 
 void Connection::acceptConnection()
@@ -81,13 +86,15 @@ void Connection::acceptConnection()
 
 void Connection::parseHeader(const boost::system::error_code& error)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
+	OTSYS_THREAD_LOCK(m_connectionLock, "");
 	m_pendingRead--;
 	if(m_closeState == CLOSE_STATE_CLOSING){
-		closingConnection();
+		if(!closingConnection()){
+			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+		}
 		return;
 	}
-	
+
 	int32_t size = m_msg.decodeHeader();
 	if(!error && size > 0 && size < NETWORKMESSAGE_MAXSIZE - 16){
 		// Read packet content
@@ -99,17 +106,20 @@ void Connection::parseHeader(const boost::system::error_code& error)
 	else{
 		handleReadError(error);
 	}
+	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 }
 
 void Connection::parsePacket(const boost::system::error_code& error)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
+	OTSYS_THREAD_LOCK(m_connectionLock, "");
 	m_pendingRead--;
 	if(m_closeState == CLOSE_STATE_CLOSING){
-		closingConnection();
+		if(!closingConnection()){
+			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+		}
 		return;
 	}
-	
+
 	if(!error){
 		// Protocol selection
 		if(!m_protocol){
@@ -130,6 +140,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 			default:
 				// No valid protocol
 				closeConnection();
+				OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 				return;
 				break;
 			}
@@ -139,7 +150,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 			// Send the packet to the current protocol
 			m_protocol->onRecvMessage(m_msg);
 		}
-		
+
 		// Wait to the next packet
 		boost::asio::async_read(m_socket,
 			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
@@ -149,6 +160,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 	else{
 		handleReadError(error);
 	}
+	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 }
 
 void Connection::handleReadError(const boost::system::error_code& error)
@@ -178,13 +190,15 @@ bool Connection::send(OutputMessage* msg)
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::send init" << std::endl;
 	#endif
-	
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
-	if(m_closeState == CLOSE_STATE_CLOSING || m_writeError)
+
+	OTSYS_THREAD_LOCK(m_connectionLock, "");
+	if(m_closeState == CLOSE_STATE_CLOSING || m_writeError){
+		OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 		return false;
-	
+	}
+
 	msg->getProtocol()->onSendMessage(msg);
-	
+
 	if(m_pendingWrite == 0){
 		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Connection::send " << msg->getMessageLength() << std::endl;
@@ -197,6 +211,7 @@ bool Connection::send(OutputMessage* msg)
 		//#endif
 		m_outputQueue.push_back(msg);
 	}
+	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 	return true;
 }
 
@@ -205,7 +220,7 @@ void Connection::internalSend(OutputMessage* msg)
 	boost::asio::async_write(m_socket,
 		boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
 		boost::bind(&Connection::onWriteOperation, this, msg, boost::asio::placeholders::error));
-		
+
 	m_pendingWrite++;
 }
 
@@ -228,10 +243,11 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "onWriteOperation" << std::endl;
 	#endif
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
-	
+
+	OTSYS_THREAD_LOCK(m_connectionLock, "");
+
 	OutputMessagePool::getInstance()->releaseMessage(msg, true);
-	
+
 	if(!error){
 		if(m_pendingWrite > 0){
 			m_pendingWrite--;
@@ -253,11 +269,15 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 	else{
 		handleWriteError(error);
 	}
-	
+
 	if(m_closeState == CLOSE_STATE_CLOSING){
-		closingConnection();
+		if(!closingConnection()){
+			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+		}
 		return;
 	}
+
+	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 }
 
 void Connection::handleWriteError(const boost::system::error_code& error)
@@ -282,22 +302,28 @@ void Connection::handleWriteError(const boost::system::error_code& error)
 	m_writeError = true;
 }
 
-void Connection::closingConnection()
+bool Connection::closingConnection()
 {
+	//any thread
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::closingConnection" << std::endl;
 	#endif
-	
+
 	if(m_pendingWrite == 0 || m_writeError == true){
 		if(!m_socketClosed){
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Closing socket" << std::endl;
 			#endif
-			
+
 			boost::system::error_code error;
 			m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 			if(error){
-				PRINT_ASIO_ERROR("Shutdown");
+				if(error == boost::asio::error::not_connected){
+					//Transport endpoint is not connected.
+				}
+				else{
+					PRINT_ASIO_ERROR("Shutdown");
+				}
 			}
 			m_socket.close(error);
 			m_socketClosed = true;
@@ -309,14 +335,26 @@ void Connection::closingConnection()
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Deleting Connection" << std::endl;
 			#endif
-			
+
 			if(m_outputQueue.size() != 0){
 				OutputMessage* msg = m_outputQueue.front();
 				m_outputQueue.pop_front();
 				internalSend(msg);
 			}
-			
-			delete this;
+
+			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Connection::deleteConnectionTask, this)));
+
+			return true;
 		}
 	}
+	return false;
+}
+
+void Connection::deleteConnectionTask()
+{
+	//dispather thread
+	delete this;
 }

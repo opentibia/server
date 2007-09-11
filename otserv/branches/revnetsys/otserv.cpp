@@ -227,7 +227,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		else if (protId == 0x0A){
 			/uint16_t  clientos =// msg.GetU16();
 			uint16_t version  = msg.GetU16();
-			
+
 			msg.setRSAInstance(g_otservRSA);
 			if(msg.RSA_decrypt()){
 				uint32_t k[4];
@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
 	//std::cout << ":: OTServ Version 0.6.0" << std::endl;
 	//std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
-#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ || defined __DEBUG_LUASCRIPTS__ || defined __DEBUG_NET__	
+#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ || defined __DEBUG_LUASCRIPTS__ || defined __DEBUG_NET__
 	std::cout << ":: Debugging:";
 	#ifdef __DEBUG__MOVESYS__
 	std::cout << " MOVESYS";
@@ -504,6 +504,8 @@ int main(int argc, char *argv[])
 #else
 	struct sigaction sigh;
 	sigh.sa_handler = SIG_IGN;
+	sigh.sa_flags = 0;
+	sigemptyset(&sigh.sa_mask);
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 
@@ -585,7 +587,7 @@ int main(int argc, char *argv[])
 		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
-	
+
 	if(!Item::items.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << "items/items.xml" << "!";
@@ -593,7 +595,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	//load scripts
 	if(ScriptingManager::getInstance()->loadScriptSystems() == false){
 		return -1;
@@ -610,7 +612,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	// load outfits data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "outfits.xml";
@@ -739,14 +741,14 @@ int main(int argc, char *argv[])
 	status->playersmax = g_config.getNumber(ConfigManager::MAX_PLAYERS);
 
 	//OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
-	
+
 	g_game.setGameState(GAME_STATE_NORMAL);
-	
+
 	boost::asio::io_service io_service;
 	Server server(io_service, INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
 	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
 	io_service.run();
-	
+
 /*
 	// start the server listen...
 	int listen_errors;
@@ -855,7 +857,7 @@ int main(int argc, char *argv[])
 	if(listen_errors >= 100){
 		std::cout << "ERROR: Server shutted down because there where 100 listen errors." << std::endl;
 	}
-	
+
 #ifdef WIN32
 	WSACleanup();
 #endif
