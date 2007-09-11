@@ -494,6 +494,9 @@ bool Spell::configureSpell(xmlNodePtr p)
 				if(vocationId != -1){
 					vocSpellMap[vocationId] = true;
 				}
+				else{
+					std::cout << "Warning: [Spell::configureSpell] Wrong vocation name: " << strValue << std::endl;
+				}
 			}
 		}
 
