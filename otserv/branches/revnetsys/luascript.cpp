@@ -65,7 +65,17 @@ ScriptEnviroment::ScriptEnviroment()
 
 ScriptEnviroment::~ScriptEnviroment()
 {
-	//
+	for(CombatMap::iterator it = m_combatMap.begin(); it != m_combatMap.end(); ++it){
+		delete it->second;
+	}
+	
+	m_combatMap.clear();
+
+	for(AreaMap::iterator it = m_areaMap.begin(); it != m_areaMap.end(); ++it){
+		delete it->second;
+	}
+	
+	m_areaMap.clear();
 }
 
 void ScriptEnviroment::resetEnv()

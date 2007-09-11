@@ -1985,8 +1985,8 @@ bool Game::playerUpdateHouseWindow(uint32_t playerId, uint8_t listId, uint32_t w
 	uint32_t internalListId;
 	House* house = player->getEditHouse(internalWindowTextId, internalListId);
 
-	if(house && internalWindowTextId == windowTextId && internalListId == 0){
-		house->setAccessList(listId, text);
+	if(house && internalWindowTextId == windowTextId && listId == 0){
+		house->setAccessList(internalListId, text);
 		player->setEditHouse(NULL);
 	}
 

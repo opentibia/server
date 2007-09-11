@@ -859,11 +859,13 @@ bool Creature::addCondition(Condition* condition)
 
 bool Creature::addCombatCondition(Condition* condition)
 {
+	//Caution: condition variable could be deleted after the call to addCondition
+	ConditionType_t type = condition->getType();
 	if(!addCondition(condition)){
 		return false;
 	}
 
-	onAddCombatCondition(condition->getType());
+	onAddCombatCondition(type);
 	return true;
 }
 
