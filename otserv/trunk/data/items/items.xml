@@ -15412,6 +15412,7 @@
 	</item>
 	<item id="5890" article="a" name="chicken feather" plural="chicken feathers">
 		<attribute key="weight" value="10"/>
+		<attribute key="description" value="Some thousands of these would probably make an extremely comfortable pillow."/>
 	</item>
 	<item id="5891" article="an" name="enchanted chicken wing" plural="enchanted chicken wings">
 		<attribute key="description" value="It is said to make your feet fly."/>
@@ -15453,6 +15454,7 @@
 	</item>
 	<item id="5902" article="a" name="honeycomb" plural="honeycombs">
 		<attribute key="weight" value="80"/>
+		<attribute key="description" value="Some people swear that honey makes excellent glue."/>
 	</item>
 	<item id="5903" name="ferumbras' hat">
 		<attribute key="description" value="It is the proof that Ferumbras has fallen. For now. The Edron Academy should be interested in this."/>
