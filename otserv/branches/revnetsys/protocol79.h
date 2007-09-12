@@ -73,6 +73,7 @@ private:
 	// we have all the parse methods
 	virtual void parsePacket(NetworkMessage& msg);
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
+	bool parseFirstPacket(NetworkMessage& msg);
 	
 	//Parse methods
 	void parseLogout(NetworkMessage& msg);	

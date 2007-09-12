@@ -35,6 +35,8 @@ public:
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 protected:
+	bool parseFirstPacket(NetworkMessage& msg);
+
 	#ifdef __DEBUG_NET__
 	virtual void deleteProtocolTask();
 	#endif

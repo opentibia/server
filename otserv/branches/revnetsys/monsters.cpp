@@ -104,7 +104,7 @@ void MonsterType::reset()
 
 MonsterType::~MonsterType()
 {
-	//
+	reset();
 }
 
 uint32_t Monsters::getLootRandom()

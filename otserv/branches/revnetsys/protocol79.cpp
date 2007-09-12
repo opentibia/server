@@ -163,6 +163,7 @@ void Protocol79::deleteProtocolTask()
 		g_game.FreeThing(player);
 		player = NULL;
 	}
+
 	Protocol::deleteProtocolTask();
 }
 
@@ -170,72 +171,75 @@ bool Protocol79::login(const std::string& name)
 {
 	//dispatcher thread
 	Player* _player = g_game.getPlayerByName(name);
-	if(!_player){
+	if(!_player || g_config.getNumber(ConfigManager::ALLOW_CLONES)){
 		player = new Player(name, this);
 		player->useThing2();
 		player->setID();
 
 		if(!IOPlayer::instance()->loadPlayer(player, name)){
-	#ifdef __DEBUG__
+#ifdef __DEBUG__
 			std::cout << "Protocol79::login - loadPlayer failed - " << name << std::endl;
-	#endif
+#endif
+			sendLoginErrorMessage(0x14, "Your character could not be loaded.");
+			getConnection()->closeConnection();
+			return false;
 		}
 
 		if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
 			sendLoginErrorMessage(0x14, "Your character is banished!");
+			getConnection()->closeConnection();
+			return false;
 		}
-		else if(g_bans.isAccountBanished(player->getAccount()) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
+		
+		if(g_bans.isAccountBanished(player->getAccount()) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
 			sendLoginErrorMessage(0x14, "Your account is banished!");
+			getConnection()->closeConnection();
+			return false;
 		}
-		else if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+		
+		if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
 			sendLoginErrorMessage(0x14, "Server temporarly closed.");
+			getConnection()->closeConnection();
+			return false;
 		}
-		else{
-			if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) &&
-				!Waitlist::instance()->clientLogin(player)){
 
-				int32_t currentSlot = Waitlist::instance()->getClientSlot(player);
-				int32_t retryTime = Waitlist::instance()->getTime(currentSlot);
-				std::stringstream ss;
+		if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && !Waitlist::instance()->clientLogin(player)){
 
-				ss << "Too many players online.\n" << "You are at place "
-					<< currentSlot << " on the waiting list.";
+			int32_t currentSlot = Waitlist::instance()->getClientSlot(player);
+			int32_t retryTime = Waitlist::instance()->getTime(currentSlot);
+			std::stringstream ss;
 
-				OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-				output->AddByte(0x16);
-				output->AddString(ss.str());
-				output->AddByte(retryTime);
-				OutputMessagePool::getInstance()->send(output);
+			ss << "Too many players online.\n" << "You are at place "
+				<< currentSlot << " on the waiting list.";
+
+			OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+			output->AddByte(0x16);
+			output->AddString(ss.str());
+			output->AddByte(retryTime);
+			OutputMessagePool::getInstance()->send(output);
+			getConnection()->closeConnection();
+			return false;
+		}
+
+		player->lastip = player->getIP();
+		if(!g_game.placePlayer(player, player->getLoginPosition())){
+			if(!g_game.placePlayer(player, player->getTemplePosition(), true)){
+				sendLoginErrorMessage(0x14, "Temple position is wrong. Contact the administrator.");
 				getConnection()->closeConnection();
-			}
-			else{
-
-				player->lastip = player->getIP();
-
-				if(g_game.placePlayer(player, player->getLoginPosition())){
-					return true;
-				}
-
-				if(g_game.placePlayer(player, player->getTemplePosition(), true)){
-					return true;
-				}
-				else{
-					sendLoginErrorMessage(0x14, "Temple position is wrong. Contact the administrator.");
-				}
+				return false;
 			}
 		}
 
-		delete player;
-	}
-	else if(g_config.getNumber(ConfigManager::ALLOW_CLONES)){
-		sendLoginErrorMessage(0x14, "Not implemented yet");
+		return true;
 	}
 	else{
 		if(_player->isOnline()){
 			sendLoginErrorMessage(0x14, "You are already logged in.");
+			getConnection()->closeConnection();
 			return false;
 		}
-		else if(!_player->isRemoved()){
+		
+		if(!_player->isRemoved()){
 			this->player = _player;
 			_player->useThing2();
 			_player->lastlogin = time(NULL);
@@ -281,65 +285,80 @@ void Protocol79::move(Direction dir)
 			createSchedulerTask(delay, boost::bind(&Game::playerMove, &g_game, player->getID(), dir)));
 	}
 	else{
-		addGameTask(&Game::playerMove, player->getID(), dir);
+		g_game.playerMove(player->getID(), dir);
 	}
+}
+
+bool Protocol79::parseFirstPacket(NetworkMessage& msg)
+{
+	uint16_t clientos = msg.GetU16();
+	uint16_t version  = msg.GetU16();
+
+	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
+		sendLoginErrorMessage(0x0A, STRING_CLIENT_VERSION);
+		getConnection()->closeConnection();
+		return false;
+	}
+
+	if(!RSA_decrypt(g_otservRSA, msg)){
+		sendLoginErrorMessage(0x0A, "RSA decryption failed.");
+		getConnection()->closeConnection();
+		return false;
+	}
+
+	uint32_t key[4];
+	key[0] = msg.GetU32();
+	key[1] = msg.GetU32();
+	key[2] = msg.GetU32();
+	key[3] = msg.GetU32();
+	enableXTEAEncryption();
+	setXTEAKey(key);
+
+	uint8_t isSetGM = msg.GetByte();
+	uint32_t accnumber = msg.GetU32();
+	const std::string name = msg.GetString();
+	const std::string password = msg.GetString();
+	
+	if(g_bans.isIpDisabled(getIP())){
+		sendLoginErrorMessage(0x14, "Too many connections attempts from this IP. Try again later.");
+		getConnection()->closeConnection();
+		return false;
+	}
+	
+	if(g_bans.isIpBanished(getIP())){
+		sendLoginErrorMessage(0x14, "Your IP is banished!");
+		getConnection()->closeConnection();
+		return false;
+	}
+	
+	if(g_game.getGameState() == GAME_STATE_STARTUP){
+		sendLoginErrorMessage(0x14, "Gameworld is starting up. Please wait.");
+		getConnection()->closeConnection();
+		return false;
+	}
+	
+	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+		getConnection()->closeConnection();
+		return false;
+	}
+
+	std::string acc_pass;
+	if(!(IOAccount::instance()->getPassword(accnumber, name, acc_pass) && passwordTest(password,acc_pass))){
+		g_bans.addLoginAttempt(getIP(), false);
+		getConnection()->closeConnection();
+		return false;
+	}
+
+	g_bans.addLoginAttempt(getIP(), true);
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(&Protocol79::login, this, name)));
+
+	return true;
 }
 
 void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 {
-	/*uint16_t clientos =*/ msg.GetU16();
-	uint16_t version  = msg.GetU16();
-
-	if(version <= 760){
-		sendLoginErrorMessage(0x0A, "Only clients with protocol 7.92 allowed!");
-	}
-	else if(RSA_decrypt(g_otservRSA, msg)){
-		uint32_t key[4];
-		key[0] = msg.GetU32();
-		key[1] = msg.GetU32();
-		key[2] = msg.GetU32();
-		key[3] = msg.GetU32();
-		enableXTEAEncryption();
-		setXTEAKey(key);
-
-		/*uint8_t isSetGM =*/ msg.GetByte();
-		uint32_t accnumber = msg.GetU32();
-		const std::string name = msg.GetString();
-		const std::string password = msg.GetString();
-
-		if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
-			sendLoginErrorMessage(0x14, "Only clients with protocol 7.92 allowed!");
-		}
-		else if(g_bans.isIpDisabled(getIP())){
-			sendLoginErrorMessage(0x14, "Too many connections attempts from this IP. Try again later.");
-		}
-		else if(g_bans.isIpBanished(getIP())){
-			sendLoginErrorMessage(0x14, "Your IP is banished!");
-		}
-		else if(g_game.getGameState() == GAME_STATE_STARTUP){
-			sendLoginErrorMessage(0x14, "Gameworld is starting up. Please wait.");
-		}
-		else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
-			//nothing to do, just close the connection
-			getConnection()->closeConnection();
-			return;
-		}
-		else{
-			std::string acc_pass;
-			if(IOAccount::instance()->getPassword(accnumber, name, acc_pass) &&
-				passwordTest(password,acc_pass)){
-
-				g_bans.addLoginAttempt(getIP(), true);
-
-				Dispatcher::getDispatcher().addTask(
-					createTask(boost::bind(&Protocol79::login, this, name)));
-			}
-			else{
-				g_bans.addLoginAttempt(getIP(), false);
-				getConnection()->closeConnection();
-			}
-		}
-	}
+	parseFirstPacket(msg);
 }
 
 void Protocol79::sendLoginErrorMessage(uint8_t error, const char* message)
@@ -348,7 +367,6 @@ void Protocol79::sendLoginErrorMessage(uint8_t error, const char* message)
 	output->AddByte(error);
 	output->AddString(message);
 	OutputMessagePool::getInstance()->send(output);
-	getConnection()->closeConnection();
 }
 
 void Protocol79::parsePacket(NetworkMessage &msg)
@@ -1630,18 +1648,20 @@ void Protocol79::sendAddCreature(const Creature* creature, bool isLogin)
 
 				//player light level
 				AddCreatureLight(msg, creature);
+				
+				if(isLogin){
+					std::string tempstring = g_config.getString(ConfigManager::LOGIN_MSG);
+					if(tempstring.size() > 0){
+						AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
+					}
 
-				std::string tempstring = g_config.getString(ConfigManager::LOGIN_MSG);
-				if(tempstring.size() > 0){
+					tempstring = "Your last visit was on ";
+					time_t lastlogin = player->getLastLoginSaved();
+					tempstring += ctime(&lastlogin);
+					tempstring.erase(tempstring.length() -1);
+					tempstring += ".";
 					AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
 				}
-
-				tempstring = "Your last visit was on ";
-				time_t lastlogin = player->getLastLoginSaved();
-				tempstring += ctime(&lastlogin);
-				tempstring.erase(tempstring.length() -1);
-				tempstring += ".";
-				AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
 
 				for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
 					bool online;
