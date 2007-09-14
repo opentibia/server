@@ -40,7 +40,7 @@ public:
 
 	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey);
 	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
-		const unsigned char toStackPos, Item* item, bool isHotkey);
+		uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
 
 	bool openContainer(Player* player,Container* container, const unsigned char index);
 
@@ -48,7 +48,8 @@ public:
 	static ReturnValue canUseFar(const Creature* creature ,const Position& toPos, const bool blockWalls);
 
 protected:
-	ReturnValue internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item);
+	ReturnValue internalUseItem(Player* player, const Position& pos,
+		uint8_t index, Item* item, uint32_t creatureId);
 	void showUseHotkeyMessage(Player* player, Item* item, uint32_t itemCount);
 
 	virtual void clear();
@@ -77,7 +78,8 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 
 	//scripting
-	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse);
+	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom,
+		const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
 	//
 
 	bool allowFarUse() const {return allowfaruse;};

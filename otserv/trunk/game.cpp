@@ -1790,8 +1790,9 @@ bool Game::playerStopAutoWalk(Player* player)
 	return true;
 }
 
-bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
-	const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey)
+bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos,
+	uint16_t fromSpriteId, const Position& toPos, uint8_t toStackPos,
+	uint16_t toSpriteId, bool isHotkey)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItemEx()");
 	if(player->isRemoved())
@@ -1906,7 +1907,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 
-	return g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), item, isHotkey);
+	return g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), item, isHotkey, creatureId);
 }
 
 bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId)

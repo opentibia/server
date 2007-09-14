@@ -512,7 +512,8 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 					else if(*cit == (*it)->getTopCreature()){
 						bContinue = false;
 					}
-					else{
+
+					if(bContinue){
 						continue;
 					}
 				}

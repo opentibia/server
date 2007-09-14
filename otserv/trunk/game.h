@@ -312,8 +312,9 @@ public:
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 	bool playerAutoWalk(Player* player, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(Player* player);
-	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
-		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey);
+	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos,
+		uint16_t fromSpriteId, const Position& toPos, uint8_t toStackPos,
+		uint16_t toSpriteId, bool isHotkey);
 	bool playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
 		uint8_t index, uint16_t spriteId, bool isHotkey);
 	bool playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,

@@ -194,7 +194,8 @@ Action* Actions::getAction(const Item* item)
 	return NULL;
 }
 
-ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item)
+ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
+	uint8_t index, Item* item, uint32_t creatureId)
 {	
 	//check if it is a house door
 	if(Door* door = item->getDoor()){
@@ -210,7 +211,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 	if(action){
 		int32_t stack = item->getParent()->__getIndexOfThing(item);
 		PositionEx posEx(pos, stack);
-		if(action->executeUse(player, item, posEx, posEx, false)){
+		if(action->executeUse(player, item, posEx, posEx, false, creatureId)){
 			return RET_NOERROR;
 		}
 	}
@@ -237,7 +238,8 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 	return RET_CANNOTUSETHISOBJECT;
 }
 
-bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey)
+bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
+	Item* item, bool isHotkey)
 {	
 	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
 		return false;
@@ -250,7 +252,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 		}
 
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		ReturnValue ret = internalUseItem(player, pos, index, item);
+		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
 		if(ret != RET_NOERROR){
 			player->sendCancelMessage(ret);
 			return false;
@@ -259,7 +261,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 		showUseHotkeyMessage(player, item, itemCount);
 	}
 	else{
-		ReturnValue ret = internalUseItem(player, pos, index, item);
+		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
 		if(ret != RET_NOERROR){
 			player->sendCancelMessage(ret);
 			return false;
@@ -271,7 +273,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 }
 
 bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
-	const unsigned char toStackPos, Item* item, bool isHotkey)
+	uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId /* = 0*/)
 {
 	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME)){
 		return false;
@@ -301,7 +303,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		}
 
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
+		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
 			if(!action->hasOwnErrorHandler()){
 				player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 			}
@@ -312,7 +314,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		showUseHotkeyMessage(player, item, itemCount);
 	}
 	else{
-		if(!action->executeUse(player, item, fromPosEx, toPosEx, true)){
+		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
 			if(!action->hasOwnErrorHandler()){
 				player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 			}
@@ -420,8 +422,8 @@ ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos
 	return RET_NOERROR;
 }
 
-bool Action::executeUse(Player* player, Item* item,
-	const PositionEx& fromPos, const PositionEx& toPos, bool extendedUse)
+bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
+	const PositionEx& toPos, bool extendedUse, uint32_t creatureId)
 {
 	//onUse(cid, item1, position1, item2, position2)
 	if(m_scriptInterface->reserveScriptEnv()){

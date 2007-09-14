@@ -1862,7 +1862,8 @@ ReturnValue RuneSpell::canExecuteAction(const Player* player, const Position& to
 	return RET_NOERROR;
 }
 
-bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse)
+bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom,
+	const PositionEx& posTo, bool extendedUse, uint32_t creatureId)
 {
 	if(!playerRuneSpellCheck(player, posTo)){
 		return false;
@@ -1872,8 +1873,15 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 
 	if(m_scripted){
 		LuaVariant var;
-		var.type = VARIANT_POSITION;
-		var.pos = posTo;
+
+		if(creatureId != 0){
+			var.type = VARIANT_NUMBER;
+			var.number = creatureId;
+		}
+		else{
+			var.type = VARIANT_POSITION;
+			var.pos = posTo;
+		}
 
 		result = internalCastSpell(player, var);
 	}
