@@ -149,7 +149,7 @@ public:
 
 	uint32_t getAccount() const {return accountNumber;}
 	int32_t getLevel() const {return level;}
-	int32_t getMagicLevel() const {return magLevel;}
+	int32_t getMagicLevel() const {return magLevel + varStats[STAT_MAGICPOINTS];}
 	int32_t getAccessLevel() const {return accessLevel;}
 
 	void setVocation(uint32_t vocId);

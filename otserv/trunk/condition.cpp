@@ -1831,7 +1831,37 @@ xmlNodePtr ConditionOutfit::serialize()
 {
 	xmlNodePtr nodeCondition = Condition::serialize();
 
-	//serialize outfit
+	std::stringstream ss;
+
+	for(std::vector<Outfit_t>::const_iterator it = outfits.begin(); it != outfits.end(); ++it){
+		xmlNodePtr nodeValueListNode = xmlNewNode(NULL, (const xmlChar*)"outfit");
+		
+		ss.str("");
+		ss << (*it).lookType;
+		xmlSetProp(nodeValueListNode, (const xmlChar*)"looktype", (const xmlChar*)ss.str().c_str());
+
+		ss.str("");
+		ss << (*it).lookHead;
+		xmlSetProp(nodeValueListNode, (const xmlChar*)"lookhead", (const xmlChar*)ss.str().c_str());
+
+		ss.str("");
+		ss << (*it).lookBody;
+		xmlSetProp(nodeValueListNode, (const xmlChar*)"lookbody", (const xmlChar*)ss.str().c_str());
+
+		ss.str("");
+		ss << (*it).lookLegs;
+		xmlSetProp(nodeValueListNode, (const xmlChar*)"looklegs", (const xmlChar*)ss.str().c_str());
+
+		ss.str("");
+		ss << (*it).lookFeet;
+		xmlSetProp(nodeValueListNode, (const xmlChar*)"lookfeet", (const xmlChar*)ss.str().c_str());
+
+		ss.str("");
+		ss << (*it).lookAddons;
+		xmlSetProp(nodeValueListNode, (const xmlChar*)"lookaddons", (const xmlChar*)ss.str().c_str());
+
+		xmlAddChild(nodeCondition, nodeValueListNode);
+	}
 
 	return nodeCondition;
 }
@@ -1842,24 +1872,57 @@ bool ConditionOutfit::unserialize(xmlNodePtr p)
 		return false;
 	}
 
-	//unserialize outfit
+	xmlNodePtr nodeList = p->children;
+	while(nodeList){
+		if(xmlStrcmp(nodeList->name, (const xmlChar*)"outfit") == 0){
+
+			Outfit_t outfit;
+			int intValue;
+
+			if(readXMLInteger(nodeList, "looktype", intValue)){
+				outfit.lookType = intValue;
+			}
+
+			if(readXMLInteger(nodeList, "lookhead", intValue)){
+				outfit.lookHead = intValue;
+			}
+
+			if(readXMLInteger(nodeList, "lookbody", intValue)){
+				outfit.lookBody = intValue;
+			}
+
+			if(readXMLInteger(nodeList, "looklegs", intValue)){
+				outfit.lookLegs = intValue;
+			}
+
+			if(readXMLInteger(nodeList, "lookfeet", intValue)){
+				outfit.lookFeet = intValue;
+			}
+
+			if(readXMLInteger(nodeList, "lookaddons", intValue)){
+				outfit.lookAddons = intValue;
+			}
+
+			outfits.push_back(outfit);
+		}
+
+		nodeList = nodeList->next;
+	}
 
 	return true;
 }
 
 bool ConditionOutfit::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 {
-	/*
 	if(attr == CONDITIONATTR_OUTFIT){
-		int32_t value = 0;
-		if(!propStream.GET_VALUE(value)){
+		Outfit_t outfit;
+		if(!propStream.GET_VALUE(outfit)){
 			return false;
 		}
 
-		outfit = value;
+		outfits.push_back(outfit);
 		return true;
 	}
-	*/
 
 	return Condition::unserializeProp(attr, propStream);
 }
@@ -1869,8 +1932,11 @@ bool ConditionOutfit::serialize(PropWriteStream& propWriteStream)
 	if(!Condition::serialize(propWriteStream)){
 		return false;
 	}
-
-	//TODO: serialize outfits
+	
+	for(std::vector<Outfit_t>::const_iterator it = outfits.begin(); it != outfits.end(); ++it){
+		propWriteStream.ADD_UCHAR(CONDITIONATTR_OUTFIT);
+		propWriteStream.ADD_VALUE(*it);
+	}
 
 	return true;
 }
