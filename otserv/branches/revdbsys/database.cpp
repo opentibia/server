@@ -71,13 +71,6 @@ Database* _Database::instance(){
 	return _instance;
 }
 
-bool _Database::addRow(const std::stringstream& row)
-{
-	bool ret = addRow(row.str());
-	row.str("");
-	return ret;
-}
-
 DBQuery::DBQuery()
 {
 	OTSYS_THREAD_LOCK(database_lock, NULL);
@@ -124,6 +117,13 @@ bool DBInsert::addRow(const std::string& row)
 		// executes INSERT for current row
 		return m_db->executeQuery(m_query + "(" + row + ")" );
 	}
+}
+
+bool DBInsert::addRow(std::stringstream& row)
+{
+	bool ret = addRow(row.str());
+	row.str("");
+	return ret;
 }
 
 bool DBInsert::execute()

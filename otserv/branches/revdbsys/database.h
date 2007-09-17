@@ -282,7 +282,7 @@ public:
 /**
  * Allows to use addRow() with stringstream as parameter.
  */
-	bool addRow(const std::stringstream& row);
+	bool addRow(std::stringstream& row);
 
 /**
  * Executes current buffer.
