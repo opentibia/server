@@ -35,6 +35,8 @@ public:
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 protected:
+	void disconnectClient(uint8_t error, const char* message);
+	
 	bool parseFirstPacket(NetworkMessage& msg);
 
 	#ifdef __DEBUG_NET__

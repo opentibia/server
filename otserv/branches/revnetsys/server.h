@@ -32,8 +32,9 @@ class Connection;
 class Server : boost::noncopyable
 {
 public:
-	Server(boost::asio::io_service& io_service, uint32_t serverip, uint16_t port)
-		: acceptor(io_service, 
+	Server(uint32_t serverip, uint16_t port)
+		: m_io_service(),
+			m_acceptor(m_io_service, 
 		 boost::asio::ip::tcp::endpoint(
 		 	boost::asio::ip::address(boost::asio::ip::address_v4(serverip)), 
 			port))
@@ -43,11 +44,17 @@ public:
 	
 	~Server() { }
 
+	void run() { m_io_service.run(); }
+
+	void stop();
+
 private:
 	void accept();
 	void onAccept(Connection* connection, const boost::system::error_code& error);
+	void onStopServer();
 	
-	boost::asio::ip::tcp::acceptor acceptor;
+	boost::asio::io_service m_io_service;
+	boost::asio::ip::tcp::acceptor m_acceptor;
 };
 
 #endif

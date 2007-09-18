@@ -29,11 +29,13 @@
 #include "ioaccount.h"
 #include "ban.h"
 #include <iomanip>
+#include "game.h"
 
 extern RSA* g_otservRSA;
 extern ConfigManager g_config;
 extern IPList serverIPs;
 extern Ban g_bans;
+extern Game g_game;
 
 #ifdef __DEBUG_NET__
 void ProtocolLogin::deleteProtocolTask()
@@ -43,31 +45,37 @@ void ProtocolLogin::deleteProtocolTask()
 }
 #endif
 
-bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
+void ProtocolLogin::disconnectClient(uint8_t error, const char* message)
 {
-	uint16_t clientos = msg.GetU16();
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	output->AddByte(error);
+	output->AddString(message);
+	OutputMessagePool::getInstance()->send(output);
+	getConnection()->closeConnection();
+}
+
+bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
+{	
+	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+		getConnection()->closeConnection();
+		return false;
+	}
+
+	uint32_t clientip = getConnection()->getIP();
+
+	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 	msg.SkipBytes(12);
 	
-	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
-		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-		output->AddByte(0x0A);
-		output->AddString(STRING_CLIENT_VERSION);
-		OutputMessagePool::getInstance()->send(output);
-		getConnection()->closeConnection();
-		return false;
+	if(version <= 760){
+		disconnectClient(0x0A, STRING_CLIENT_VERSION);
 	}
 
 	if(!RSA_decrypt(g_otservRSA, msg)){
-		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-		output->AddByte(0x0A);
-		output->AddString("RSA decryption failed.");
-		OutputMessagePool::getInstance()->send(output);
 		getConnection()->closeConnection();
 		return false;
 	}
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	uint32_t key[4];
 	key[0] = msg.GetU32();
 	key[1] = msg.GetU32();
@@ -76,63 +84,59 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(key);
 
-	/*
-	std::cout.flags(std::ios::hex);
-	std::cout << std::setw(2) << std::setfill('0') << m_key[0] << " " <<
-	std::setw(2) << std::setfill('0') << m_key[1] << " " <<
-	std::setw(2) << std::setfill('0') << m_key[2] << " " <<
-	std::setw(2) << std::setfill('0') << m_key[3] << std::endl;
-	std::cout.flags(std::ios::dec);
-	*/
-
 	uint32_t accnumber = msg.GetU32();
 	std::string password = msg.GetString();
+
+	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
+		disconnectClient(0x0A, STRING_CLIENT_VERSION);
+		return false;
+	}
+
+	if(g_game.getGameState() == GAME_STATE_STARTUP){
+		disconnectClient(0x14, "Gameworld is starting up. Please wait.");
+		return false;
+	}
+
+	if(g_bans.isIpDisabled(clientip)){
+		disconnectClient(0x0A, "Too many connections attempts from this IP. Try again later.");
+		return false;
+	}
+	
+	if(g_bans.isIpBanished(clientip)){
+		disconnectClient(0x0A, "Your IP is banished!");
+		return false;
+	}
+
 	uint32_t serverip = serverIPs[0].first;
-	uint32_t clientip = getConnection()->getIP();
 	for(uint32_t i = 0; i < serverIPs.size(); i++){
 		if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
 			serverip = serverIPs[i].first;
 			break;
 		}
 	}
-
-	if(g_bans.isIpDisabled(clientip)){
-		output->AddByte(0x0A);
-		output->AddString("To many connections attempts from this IP. Try again later.");
-		OutputMessagePool::getInstance()->send(output);
-		getConnection()->closeConnection();
-		return false;
-	}
 	
-	if(g_bans.isIpBanished(clientip)){
-		output->AddByte(0x0A);
-		output->AddString("Your IP is banished!");
-		OutputMessagePool::getInstance()->send(output);
-		getConnection()->closeConnection();
-		return false;
-	}
-
 	Account account = IOAccount::instance()->loadAccount(accnumber);
 	if(!(accnumber != 0 && account.accnumber == accnumber &&
 			passwordTest(password, account.password))){
 
 		g_bans.addLoginAttempt(clientip, false);
-		output->AddByte(0x0A);
-		output->AddString("Please enter a valid account number and password.");
-		OutputMessagePool::getInstance()->send(output);
-		getConnection()->closeConnection();
+		disconnectClient(0x0A, "Please enter a valid account number and password.");
 		return false;
 	}
 
 	g_bans.addLoginAttempt(clientip, true);
-	output->AddByte(0x14);
+		
+	
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	//Add MOTD
 	std::stringstream motd;
+	output->AddByte(0x14);
 	motd << g_config.getNumber(ConfigManager::MOTD_NUM) << "\n";
 	motd << g_config.getString(ConfigManager::MOTD);
 	output->AddString(motd.str());
+	//Add char list
 	output->AddByte(0x64);
 	output->AddByte((uint8_t)account.charList.size());
-
 	std::list<std::string>::iterator it;
 	for(it = account.charList.begin(); it != account.charList.end(); it++){
 		output->AddString((*it));
@@ -140,8 +144,9 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		output->AddU32(serverip);
 		output->AddU16(g_config.getNumber(ConfigManager::PORT));
 	}
-
-	output->AddU16(account.premDays);
+	//Add premium days
+	output->AddU16(0);
+	
 	OutputMessagePool::getInstance()->send(output);
 	getConnection()->closeConnection();
 

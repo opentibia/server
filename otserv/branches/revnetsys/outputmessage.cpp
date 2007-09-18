@@ -26,7 +26,6 @@
 OutputMessage::OutputMessage()
 {
 	freeMessage();
-	m_outputBufferStart = 2;
 }
 
 //*********** OutputMessagePool ****************
@@ -58,22 +57,29 @@ OutputMessagePool::~OutputMessagePool()
 
 void OutputMessagePool::send(OutputMessage* msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
-	if(msg->getState() == OutputMessage::STATE_ALLOCATED_NO_AUTOSEND){
+	OTSYS_THREAD_LOCK(m_outputPoolLock, "");
+	OutputMessage::OutputMessageState state = msg->getState();
+	OTSYS_THREAD_UNLOCK(m_outputPoolLock, "");
+	
+	if(state == OutputMessage::STATE_ALLOCATED_NO_AUTOSEND){
 		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Sending message - SINGLE" << std::endl;
 		#endif
 		
 		msg->writeMessageLength();
 		if(msg->getConnection()){
-			msg->getConnection()->send(msg);
+			if(msg->getConnection()->send(msg)){
+				msg->setState(OutputMessage::STATE_WAITING);
+			}
+			else{
+				internalReleaseMessage(msg);
+			}
 		}
 		else{
 			#ifdef __DEBUG_NET__
 			std::cout << "Error: [OutputMessagePool::send] NULL connection." << std::endl;
 			#endif
 		}
-		msg->setState(OutputMessage::STATE_WAITING);
 	}
 	else{
 		#ifdef __DEBUG_NET__

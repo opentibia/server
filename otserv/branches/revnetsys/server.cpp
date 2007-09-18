@@ -24,9 +24,10 @@
 
 void Server::accept()
 {
-	Connection* connection = new Connection(acceptor.io_service());
+	//Connection* connection = new Connection(m_io_service);
+	Connection* connection = ConnectionManager::getInstance()->createConnection(m_io_service);
 
-	acceptor.async_accept(connection->getHandle(),
+	m_acceptor.async_accept(connection->getHandle(),
 		boost::bind(&Server::onAccept, this, connection, 
 		boost::asio::placeholders::error));
 }
@@ -43,4 +44,15 @@ void Server::onAccept(Connection* connection, const boost::system::error_code& e
 	else{
 		PRINT_ASIO_ERROR("Accepting");
 	}
+}
+
+void Server::stop()
+{
+	m_io_service.post(boost::bind(&Server::onStopServer, this));
+}
+
+void Server::onStopServer()
+{
+	m_acceptor.close();
+	ConnectionManager::getInstance()->closeAll();
 }

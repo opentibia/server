@@ -56,6 +56,8 @@ public:
 	const Connection* getConnection() const { return m_connection;}
 	void setConnection(Connection* connection) { m_connection = connection; }
 
+	uint32_t getIP() const;
+
 protected:
 	//Use this function for autosend messages only
 	OutputMessage* getOutputBuffer()

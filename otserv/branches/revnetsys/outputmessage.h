@@ -57,20 +57,6 @@ public:
 		STATE_WAITING
 	};
 
-	/*
-	void releaseMessage()
-	{
-		if(m_state == STATE_ALLOCATED_NO_AUTOSEND){
-			freeMessage();
-		}
-		else{
-			#ifdef __DEBUG_NET__
-			std::cout << "Warning: [OutputMessage::freeMessage] m_state != STATE_ALLOCATED_NO_AUTOSEND" << std::endl;
-			#endif
-		}
-	}
-	*/
-
 	Protocol* getProtocol() { return m_protocol;}
 	Connection* getConnection() { return m_connection;}
 
@@ -80,8 +66,10 @@ protected:
 	{
 		setConnection(NULL);
 		setProtocol(NULL);
-		setState(OutputMessage::STATE_FREE);
 		m_frame = 0;
+		m_outputBufferStart = 2;
+		//setState have to be the last one
+		setState(OutputMessage::STATE_FREE);
 	}
 
 	friend class OutputMessagePool;

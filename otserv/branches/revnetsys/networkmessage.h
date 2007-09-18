@@ -120,6 +120,8 @@ public:
 	void writeMessageLength(){
 		m_MsgBuf[2] = (unsigned char)(m_MsgSize);
 		m_MsgBuf[3] = (unsigned char)(m_MsgSize >> 8);
+		//added header size to the message size
+		m_MsgSize = m_MsgSize + 2;
 	}
 		
 	int32_t decodeHeader();

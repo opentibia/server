@@ -115,7 +115,7 @@ public:
 	static AutoList<Player> listPlayer;
 	void removeList();
 	void addList();
-	void kickPlayer() {if(client) client->logout();}
+	void kickPlayer();
 	
 	uint32_t getGuildId() const {return guildId;}
 	const std::string& getGuildName() const {return guildName;}

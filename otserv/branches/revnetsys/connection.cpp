@@ -17,18 +17,69 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-//#include "otpch.h"
+#include "otpch.h"
 
 #include "connection.h"
 #include "protocol.h"
 #include "outputmessage.h"
 #include "protocol79.h"
 #include "protocollogin.h"
+#include "admin.h"
 #include "status.h"
 #include "tasks.h"
 #include "scheduler.h"
 
 #include <boost/bind.hpp>
+
+
+Connection* ConnectionManager::createConnection(boost::asio::io_service& io_service)
+{
+	#ifdef __DEBUG_NET_DETAIL__
+	std::cout << "Create new Connection" << std::endl;
+	#endif
+	
+	OTSYS_THREAD_LOCK_CLASS(m_connectionManagerLock, "");
+	Connection* connection = new Connection(io_service);
+	m_connections.push_back(connection);
+	return connection;
+}
+
+void ConnectionManager::releaseConnection(Connection* connection)
+{
+	#ifdef __DEBUG_NET_DETAIL__
+	std::cout << "Releasing connection" << std::endl;
+	#endif
+	
+	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionManagerLock);
+	std::list<Connection*>::iterator it = 
+		std::find(m_connections.begin(), m_connections.end(), connection);
+	
+	if(it != m_connections.end()){
+		m_connections.erase(it);
+	}
+	else{
+		std::cout << "Error: [ConnectionManager::releaseConnection] Connection not found" << std::endl;
+	}
+}
+
+void ConnectionManager::closeAll()
+{
+	#ifdef __DEBUG_NET_DETAIL__
+	std::cout << "Closing all connections" << std::endl;
+	#endif
+	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionManagerLock);
+	std::list<Connection*>::iterator it = m_connections.begin();
+	while(it != m_connections.end()){
+		boost::system::error_code error;
+		(*it)->m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+		(*it)->m_socket.close(error);
+		++it;
+	}
+	m_connections.clear();
+}
+
+
+//*****************
 
 void Connection::closeConnection()
 {
@@ -133,6 +184,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 				m_protocol = new Protocol79(this);
 				break;
 			case 0xFE: // Admin protocol
+				m_protocol = new ProtocolAdmin(this);
 				break;
 			case 0xFF: // Status protocol
 				m_protocol = new ProtocolStatus(this);
@@ -165,6 +217,9 @@ void Connection::parsePacket(const boost::system::error_code& error)
 
 void Connection::handleReadError(const boost::system::error_code& error)
 {
+	#ifdef __DEBUG_NET_DETAIL__
+	PRINT_ASIO_ERROR("Reading - detail");
+	#endif
 	if(error == boost::asio::error::operation_aborted){
 		//Operation aborted because connection will be closed
 		//Do NOT call closeConnection() from here
@@ -244,9 +299,9 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 	std::cout << "onWriteOperation" << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK(m_connectionLock, "");
-
 	OutputMessagePool::getInstance()->releaseMessage(msg, true);
+	
+	OTSYS_THREAD_LOCK(m_connectionLock, "");
 
 	if(!error){
 		if(m_pendingWrite > 0){
@@ -282,6 +337,9 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 
 void Connection::handleWriteError(const boost::system::error_code& error)
 {
+	#ifdef __DEBUG_NET_DETAIL__
+	PRINT_ASIO_ERROR("Writing - detail");
+	#endif
 	if(error == boost::asio::error::operation_aborted){
 		//Operation aborted because connection will be closed
 		//Do NOT call closeConnection() from here

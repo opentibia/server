@@ -1870,6 +1870,16 @@ void Player::addList()
 	listPlayer.addList(this);
 }
 
+void Player::kickPlayer()
+{
+	if(client){
+		client->logout();
+	}
+	else{
+		g_game.removeCreature(this);
+	}
+}
+
 void Player::notifyLogIn(Player* login_player)
 {
 	if(client){

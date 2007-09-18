@@ -52,6 +52,7 @@
 #include "talkaction.h"
 #include "spells.h"
 #include "configmanager.h"
+#include "server.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -59,6 +60,7 @@ extern OTSYS_THREAD_LOCKVAR maploadlock;
 #endif
 
 extern ConfigManager g_config;
+extern Server* g_server;
 extern Actions* g_actions;
 extern Commands commands;
 extern Chat g_chat;
@@ -115,7 +117,12 @@ GameState_t Game::getGameState()
 
 void Game::setGameState(GameState_t newstate)
 {
-	gameState = newstate;
+	if(gameState != GAME_STATE_SHUTDOWN){
+		gameState = newstate;
+		if(newstate == GAME_STATE_SHUTDOWN && g_server){
+			g_server->stop();
+		}
+	}
 }
 
 int Game::loadMap(std::string filename, std::string filekind)

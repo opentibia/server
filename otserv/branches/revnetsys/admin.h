@@ -75,7 +75,7 @@
 //  error
 //		message(string)
 //
-/*
+
 #include "otsystem.h"
 #include "player.h"
 #include "logger.h"
@@ -150,7 +150,7 @@ public:
 	uint16_t getProtocolPolicy();
 	uint32_t getProtocolOptions();
 	
-	bool allowIP(SOCKET s);
+	bool allowIP(uint32_t ip);
 	
 	bool passwordMatch(std::string& password);
 	
@@ -170,44 +170,40 @@ protected:
 	RSA* m_key_RSA1024XTEA;
 };
 
-class AdminConnection{
-public:
-	AdminConnection(SOCKET s);
-	~AdminConnection();
-	
-	std::string getIPString();
-	int32_t getStartTime();
-	
-	int32_t getLastCommandTime();
-	void setLastCommandTime();
-	
-protected:
-	std::string m_ip;
-	int32_t m_startTime;
-	int32_t m_lastCommand;
-};
 
-class AdminProtocol{
+class ProtocolAdmin : public Protocol
+{
 public:
-	AdminProtocol(SOCKET s);
-	~AdminProtocol();
+	ProtocolAdmin(Connection* connection);
+	virtual ~ProtocolAdmin() {};
 	
-	void receiveLoop();
+	virtual void parsePacket(NetworkMessage& msg);
+	
+	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 protected:
 	
-	int32_t parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffer);
-
-	bool adminCommandCloseServer();
-	bool adminCommandPayHouses();
+	virtual void deleteProtocolTask();
 	
-	AdminConnection* m_connection;
+	void adminCommandCloseServer();
+	void adminCommandPayHouses();
+	
+	enum ConnectionState_t{
+		NO_CONNECTED,
+		ENCRYPTION_NO_SET,
+		ENCRYPTION_OK,
+		NO_LOGGED_IN,
+		LOGGED_IN,
+	};
+	
+	
+	
+private:
 	
 	int32_t m_loginTries;
-	
-	SOCKET m_socket;
-	int32_t m_state;
-	
+	ConnectionState_t m_state;
+	uint32_t m_lastCommand;
+	uint32_t m_startTime;
 };
-*/
+
 #endif

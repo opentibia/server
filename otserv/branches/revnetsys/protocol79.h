@@ -55,12 +55,11 @@ public:
 	void move(Direction dir);
 		
 	void setPlayer(Player* p);
-	uint32_t getIP() const;
 
 private:
 	std::list<uint32_t> knownPlayers;
 	
-	void sendLoginErrorMessage(uint8_t error, const char* message);
+	void disconnectClient(uint8_t error, const char* message);
 	
 	virtual void deleteProtocolTask();
 

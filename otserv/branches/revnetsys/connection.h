@@ -41,6 +41,34 @@ class OutputMessage;
 #define PRINT_ASIO_ERROR(desc)
 #endif
 
+class ConnectionManager
+{
+public:
+	~ConnectionManager()
+	{
+		OTSYS_THREAD_LOCKVARRELEASE(m_connectionManagerLock);
+	}
+	
+	static ConnectionManager* getInstance(){
+		static ConnectionManager instance;
+		return &instance;
+	}
+	
+	Connection* createConnection(boost::asio::io_service& io_service);
+	void releaseConnection(Connection* connection);
+	void closeAll();
+	
+protected:
+	
+	ConnectionManager()
+	{
+		OTSYS_THREAD_LOCKVARINIT(m_connectionManagerLock);
+	}
+	
+	std::list<Connection*> m_connections;
+	OTSYS_THREAD_LOCKVAR m_connectionManagerLock;
+};
+
 class Connection : boost::noncopyable
 {
 public:
@@ -49,7 +77,8 @@ public:
 		CLOSE_STATE_REQUESTED = 1,
 		CLOSE_STATE_CLOSING = 2,
 	};
-
+	
+private:
 	Connection(boost::asio::io_service& io_service) : m_socket(io_service)
 	{
 		m_protocol = NULL;
@@ -61,9 +90,12 @@ public:
 		m_writeError = false;
 		m_readError = false;
 	}
-
+	friend class ConnectionManager;
+	
+public:
 	~Connection()
 	{
+		ConnectionManager::getInstance()->releaseConnection(this);
 		OTSYS_THREAD_LOCKVARRELEASE(m_connectionLock);
 	}
 

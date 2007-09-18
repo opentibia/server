@@ -134,15 +134,6 @@ Protocol79::~Protocol79()
 	player = NULL;
 }
 
-uint32_t Protocol79::getIP() const
-{
-	if(getConnection()){
-		return getConnection()->getIP();
-	}
-
-	return 0;
-}
-
 void Protocol79::setPlayer(Player* p)
 {
 	player = p;
@@ -180,26 +171,22 @@ bool Protocol79::login(const std::string& name)
 #ifdef __DEBUG__
 			std::cout << "Protocol79::login - loadPlayer failed - " << name << std::endl;
 #endif
-			sendLoginErrorMessage(0x14, "Your character could not be loaded.");
-			getConnection()->closeConnection();
+			disconnectClient(0x14, "Your character could not be loaded.");
 			return false;
 		}
 
 		if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-			sendLoginErrorMessage(0x14, "Your character is banished!");
-			getConnection()->closeConnection();
+			disconnectClient(0x14, "Your character is banished!");
 			return false;
 		}
 		
 		if(g_bans.isAccountBanished(player->getAccount()) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-			sendLoginErrorMessage(0x14, "Your account is banished!");
-			getConnection()->closeConnection();
+			disconnectClient(0x14, "Your account is banished!");
 			return false;
 		}
 		
 		if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
-			sendLoginErrorMessage(0x14, "Server temporarly closed.");
-			getConnection()->closeConnection();
+			disconnectClient(0x14, "Server temporarly closed.");
 			return false;
 		}
 
@@ -224,8 +211,7 @@ bool Protocol79::login(const std::string& name)
 		player->lastip = player->getIP();
 		if(!g_game.placePlayer(player, player->getLoginPosition())){
 			if(!g_game.placePlayer(player, player->getTemplePosition(), true)){
-				sendLoginErrorMessage(0x14, "Temple position is wrong. Contact the administrator.");
-				getConnection()->closeConnection();
+				disconnectClient(0x14, "Temple position is wrong. Contact the administrator.");
 				return false;
 			}
 		}
@@ -234,8 +220,7 @@ bool Protocol79::login(const std::string& name)
 	}
 	else{
 		if(_player->isOnline()){
-			sendLoginErrorMessage(0x14, "You are already logged in.");
-			getConnection()->closeConnection();
+			disconnectClient(0x14, "You are already logged in.");
 			return false;
 		}
 		
@@ -258,7 +243,9 @@ bool Protocol79::logout()
 {
 	//dispatcher thread
 	bool result = g_game.removeCreature(player);
-	getConnection()->closeConnection();
+	if(Connection* connection = getConnection()){
+		connection->closeConnection();
+	}
 	return result;
 }
 
@@ -291,17 +278,15 @@ void Protocol79::move(Direction dir)
 
 bool Protocol79::parseFirstPacket(NetworkMessage& msg)
 {
-	uint16_t clientos = msg.GetU16();
-	uint16_t version  = msg.GetU16();
-
-	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
-		sendLoginErrorMessage(0x0A, STRING_CLIENT_VERSION);
+	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
 		getConnection()->closeConnection();
 		return false;
 	}
 
+	/*uint16_t clientos =*/ msg.GetU16();
+	uint16_t version  = msg.GetU16();
+
 	if(!RSA_decrypt(g_otservRSA, msg)){
-		sendLoginErrorMessage(0x0A, "RSA decryption failed.");
 		getConnection()->closeConnection();
 		return false;
 	}
@@ -314,31 +299,28 @@ bool Protocol79::parseFirstPacket(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(key);
 
-	uint8_t isSetGM = msg.GetByte();
+	/*uint8_t isSetGM =*/ msg.GetByte();
 	uint32_t accnumber = msg.GetU32();
 	const std::string name = msg.GetString();
 	const std::string password = msg.GetString();
 	
-	if(g_bans.isIpDisabled(getIP())){
-		sendLoginErrorMessage(0x14, "Too many connections attempts from this IP. Try again later.");
-		getConnection()->closeConnection();
-		return false;
-	}
-	
-	if(g_bans.isIpBanished(getIP())){
-		sendLoginErrorMessage(0x14, "Your IP is banished!");
-		getConnection()->closeConnection();
+	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
+		disconnectClient(0x0A, STRING_CLIENT_VERSION);
 		return false;
 	}
 	
 	if(g_game.getGameState() == GAME_STATE_STARTUP){
-		sendLoginErrorMessage(0x14, "Gameworld is starting up. Please wait.");
-		getConnection()->closeConnection();
+		disconnectClient(0x14, "Gameworld is starting up. Please wait.");
 		return false;
 	}
 	
-	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
-		getConnection()->closeConnection();
+	if(g_bans.isIpDisabled(getIP())){
+		disconnectClient(0x14, "Too many connections attempts from this IP. Try again later.");
+		return false;
+	}
+	
+	if(g_bans.isIpBanished(getIP())){
+		disconnectClient(0x14, "Your IP is banished!");
 		return false;
 	}
 
@@ -361,12 +343,13 @@ void Protocol79::onRecvFirstMessage(NetworkMessage& msg)
 	parseFirstPacket(msg);
 }
 
-void Protocol79::sendLoginErrorMessage(uint8_t error, const char* message)
+void Protocol79::disconnectClient(uint8_t error, const char* message)
 {
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	output->AddByte(error);
 	output->AddString(message);
 	OutputMessagePool::getInstance()->send(output);
+	getConnection()->closeConnection();
 }
 
 void Protocol79::parsePacket(NetworkMessage &msg)

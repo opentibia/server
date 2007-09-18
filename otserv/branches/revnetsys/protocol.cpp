@@ -21,6 +21,7 @@
 
 #include "definitions.h"
 #include "protocol.h"
+#include "connection.h"
 #include "outputmessage.h"
 #include "rsa.h"
 
@@ -60,6 +61,7 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 
 void Protocol::deleteProtocolTask()
 {
+	//dispather thread
 	if(m_outputBuffer){
 		OutputMessagePool::getInstance()->releaseMessage(m_outputBuffer);
 	}
@@ -72,9 +74,6 @@ void Protocol::XTEA_encrypt(OutputMessage& msg)
 	k[0] = m_key[0]; k[1] = m_key[1]; k[2] = m_key[2]; k[3] = m_key[3];
 
 	int32_t messageLength = msg.getMessageLength();
-	//adding the size of unencrypted header
-	messageLength = messageLength + 2;
-	msg.setMessageLength(messageLength);
 
 	//add bytes until reach 8 multiple
 	uint32_t n;
@@ -158,4 +157,13 @@ bool Protocol::RSA_decrypt(RSA* rsa, NetworkMessage& msg)
 	}
 
 	return true;
+}
+
+uint32_t Protocol::getIP() const
+{
+	if(getConnection()){
+		return getConnection()->getIP();
+	}
+
+	return 0;
 }

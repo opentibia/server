@@ -29,16 +29,12 @@
 #include <sstream>
 
 #include "otsystem.h"
-//#include "networkmessage.h"
-//#include "protocol79.h"
 #include "server.h"
 
 #include <stdlib.h>
 #include <time.h>
 #include "game.h"
 
-//#include "ioaccount.h"
-//#include "ioplayer.h"
 
 #include "status.h"
 #include "monsters.h"
@@ -47,10 +43,8 @@
 #include "vocation.h"
 #include "scriptmanager.h"
 #include "configmanager.h"
-//#include "account.h"
 
 #include "tools.h"
-//#include "waitlist.h"
 #include "ban.h"
 #include "rsa.h"
 #include "admin.h"
@@ -59,18 +53,7 @@
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
 #endif
-/*
-#ifdef WIN32
-	#define ERROR_EINTR WSAEINTR
-#else
-	#include <fcntl.h>
-	#include <arpa/inet.h>
-	#include <signal.h>
 
-	#define SOCKET_ERROR -1
-	#define ERROR_EINTR EINTR
-#endif
-*/
 #ifdef __DEBUG_CRITICALSECTION__
 OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 #endif
@@ -83,11 +66,6 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 	}
 #endif
 
-/*
-#define CLIENT_VERSION_MIN 792
-#define CLIENT_VERSION_MAX 792
-*/
-
 IPList serverIPs;
 
 ConfigManager g_config;
@@ -99,343 +77,14 @@ Ban g_bans;
 Vocations g_vocations;
 
 RSA* g_otservRSA = NULL;
+Server* g_server = NULL;
 
-//extern AdminProtocolConfig* adminConfig;
+extern AdminProtocolConfig* g_adminConfig;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
 #endif
 #include "networkmessage.h"
-/*
-OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
-{
-#if defined __EXCEPTION_TRACER__
-	ExceptionHandler playerExceptionHandler;
-	playerExceptionHandler.InstallHandler();
-#endif
-
-	srand((unsigned)time(NULL));
-
-	SOCKET s = *(SOCKET*)dat;
-
-	NetworkMessage msg;
-	if(msg.ReadFromSocket(s)){
-		unsigned char protId = msg.GetByte();
-
-		// login server connection
-		if(protId == 0x01){
-			/uint16_t clientos// = msg.GetU16();
-			uint16_t version  = msg.GetU16();
-			msg.SkipBytes(12);
-			msg.setRSAInstance(g_otservRSA);
-			if(version <= 760){
-				msg.Reset();
-				msg.AddByte(0x0A);
-				msg.AddString("Only clients with protocol 7.92 allowed!");
-				msg.WriteToSocket(s);
-			}
-			else if(msg.RSA_decrypt()){
-				uint32_t k[4];
-				k[0] = msg.GetU32();
-				k[1] = msg.GetU32();
-				k[2] = msg.GetU32();
-				k[3] = msg.GetU32();
-
-				/
-				std::cout.flags(std::ios::hex);
-				std::cout << std::setw(2) << std::setfill('0') << k[0] << " " <<
-					 std::setw(2) << std::setfill('0') << k[1] << " " <<
-					 std::setw(2) << std::setfill('0') << k[2] << " " <<
-					 std::setw(2) << std::setfill('0') << k[3] << std::endl;
-				std::cout.flags(std::ios::dec);
-				//
-
-				unsigned int accnumber = msg.GetU32();
-				std::string  password  = msg.GetString();
-
-				msg.Reset();
-				msg.setEncryptionState(true);
-				msg.setEncryptionKey(k);
-
-				if(version >= CLIENT_VERSION_MIN && version <= CLIENT_VERSION_MAX){
-
-					int serverip = serverIPs[0].first;
-
-					sockaddr_in sain;
-					socklen_t salen = sizeof(sockaddr_in);
-					if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
-						uint32_t clientip = *(uint32_t*)&sain.sin_addr;
-						for(unsigned int i = 0; i < serverIPs.size(); i++)
-							if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
-								serverip = serverIPs[i].first;
-								break;
-							}
-					}
-
-					if(g_bans.isIpDisabled(s)){
-						msg.AddByte(0x0A);
-						msg.AddString("To many connections attempts from this IP. Try again later.");
-					}
-					else if(g_bans.isIpBanished(s)){
-						msg.AddByte(0x0A);
-						msg.AddString("Your IP is banished!");
-					}
-					else{
-						Account account = IOAccount::instance()->loadAccount(accnumber);
-
-						bool isSuccess = accnumber != 0 && account.accnumber == accnumber &&
-							passwordTest(password, account.password);
-						g_bans.addLoginAttempt(s, isSuccess);
-
-						if(isSuccess){
-							// seems to be a successful load
-							msg.AddByte(0x14);
-							std::stringstream motd;
-							motd << g_config.getNumber(ConfigManager::MOTD_NUM);
-							motd << "\n";
-							motd << g_config.getString(ConfigManager::MOTD);
-							msg.AddString(motd.str());
-
-							msg.AddByte(0x64);
-							msg.AddByte((uint8_t)account.charList.size());
-
-							std::list<std::string>::iterator it;
-							for(it = account.charList.begin(); it != account.charList.end(); it++){
-								msg.AddString((*it));
-								msg.AddString(g_config.getString(ConfigManager::WORLD_NAME));
-								msg.AddU32(serverip);
-								msg.AddU16(g_config.getNumber(ConfigManager::PORT));
-							}
-
-							msg.AddU16(account.premDays);
-						}
-						else{
-							msg.AddByte(0x0A);
-							msg.AddString("Please enter a valid account number and password.");
-						}
-					}
-				}
-				else{
-					msg.AddByte(0x0A);
-					msg.AddString("Only clients with protocol 7.92 allowed!");
-				}
-
-				msg.WriteToSocket(s);
-			}
-		}
-		// gameworld connection tibia 7.9x
-		else if (protId == 0x0A){
-			/uint16_t  clientos =// msg.GetU16();
-			uint16_t version  = msg.GetU16();
-
-			msg.setRSAInstance(g_otservRSA);
-			if(msg.RSA_decrypt()){
-				uint32_t k[4];
-				k[0] = msg.GetU32();
-				k[1] = msg.GetU32();
-				k[2] = msg.GetU32();
-				k[3] = msg.GetU32();
-
-				/
-				std::cout.flags(std::ios::hex);
-				std::cout << std::setw(2) << std::setfill('0') << k[0] << " " <<
-					 std::setw(2) << std::setfill('0') << k[1] << " " <<
-					 std::setw(2) << std::setfill('0') << k[2] << " " <<
-					 std::setw(2) << std::setfill('0') << k[3] << std::endl;
-				std::cout.flags(std::ios::dec);
-				//
-
-				/unsigned char  unknown =// msg.GetByte();
-				unsigned long accnumber = msg.GetU32();
-				std::string name     = msg.GetString();
-				std::string password = msg.GetString();
-
-				msg.Reset();
-				msg.setEncryptionState(true);
-				msg.setEncryptionKey(k);
-
-				if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
-					msg.AddByte(0x14);
-					msg.AddString("Only clients with protocol 7.92 allowed!");
-					msg.WriteToSocket(s);
-				}
-				else if(g_bans.isIpDisabled(s)){
-					msg.AddByte(0x14);
-					msg.AddString("To many connections attempts from this IP. Try again later.");
-					msg.WriteToSocket(s);
-				}
-				else if(g_bans.isIpBanished(s)){
-					msg.AddByte(0x14);
-					msg.AddString("Your IP is banished!");
-					msg.WriteToSocket(s);
-				}
-				else{
-					OTSYS_SLEEP(1000);
-					std::string acc_pass;
-
-					bool isSuccess = IOAccount::instance()->getPassword(accnumber, name, acc_pass) &&
-						passwordTest(password,acc_pass);
-
-					g_bans.addLoginAttempt(s, isSuccess);
-
-					if(isSuccess){
-						bool isLocked = true;
-						OTSYS_THREAD_LOCK(g_game.gameLock, "ConnectionHandler()")
-						Player* player = g_game.getPlayerByName(name);
-						bool playerexist = (player != NULL);
-						if(player){
-							//reattach player?
-							if(player->client->s == 0 && !player->isRemoved() && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
-								player->lastlogin = time(NULL);
-								player->client->setKey(k);
-								player->client->reinitializeProtocol(s);
-								player->client->sendAddCreature(player, false);
-								player->sendIcons();
-								player->lastip = player->getIP();
-								s = 0;
-							}
-							//guess not...
-							player = NULL;
-						}
-
-						if(s){
-							Protocol79* protocol;
-							protocol = new Protocol79(s);
-							protocol->setKey(k);
-							player = new Player(name, protocol);
-							player->useThing2();
-							player->setID();
-							IOPlayer::instance()->loadPlayer(player, name);
-
-							connectResult_t connectRes = CONNECT_INTERNALERROR;
-
-							if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-								msg.AddByte(0x14);
-								msg.AddString("Your character is banished!");
-								msg.WriteToSocket(s);
-							}
-							else if(g_bans.isAccountBanished(accnumber) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-								msg.AddByte(0x14);
-								msg.AddString("Your account is banished!");
-								msg.WriteToSocket(s);
-							}
-							else if(playerexist && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
-								#ifdef __DEBUG_PLAYERS__
-								std::cout << "reject player..." << std::endl;
-								#endif
-								msg.AddByte(0x14);
-								msg.AddString("You are already logged in.");
-								msg.WriteToSocket(s);
-							}
-							else if(g_game.getGameState() == GAME_STATE_STARTUP){
-								msg.AddByte(0x14);
-								msg.AddString("Gameworld is starting up. Please wait.");
-								msg.WriteToSocket(s);
-							}
-							else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
-								//nothing to do
-							}
-							else if(g_game.getGameState() == GAME_STATE_CLOSED && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
-								msg.AddByte(0x14);
-								msg.AddString("Server temporarly closed.");
-								msg.WriteToSocket(s);
-							}
-							else if((connectRes = protocol->ConnectPlayer()) != CONNECT_SUCCESS){
-								#ifdef __DEBUG_PLAYERS__
-								std::cout << "reject player..." << std::endl;
-								#endif
-								switch(connectRes){
-									case CONNECT_TOMANYPLAYERS:
-									{
-										Waitlist* wait = Waitlist::instance();
-										wait->createMessage(msg, accnumber, player->getIP());
-									}
-									break;
-									case CONNECT_MASTERPOSERROR:
-
-										msg.AddByte(0x14);
-										msg.AddString("Temple position is wrong. Contact the administrator.");
-									break;
-
-									default:
-										msg.AddByte(0x14);
-										msg.AddString("Internal error.");
-									break;
-								}
-
-								msg.WriteToSocket(s);
-							}
-							else{
-								Status* stat = Status::instance();
-								stat->addPlayer();
-								player->lastlogin = time(NULL);
-								player->lastip = player->getIP();
-								s = 0;            // protocol/player will close socket
-
-								OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
-								isLocked = false;
-								protocol->ReceiveLoop();
-								stat->removePlayer();
-							}
-
-							if(player){
-								g_game.FreeThing(player);
-							}
-						}
-
-						if(isLocked){
-							OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
-						}
-					}
-				}
-			}
-		}
-		//Admin protocol
-		else if(protId == 0xFE){
-			AdminProtocol* adminProtocol = new AdminProtocol(s);
-			adminProtocol->receiveLoop();
-			delete adminProtocol;
-		}
-		// Since Cip made 02xx as Tibia protocol,
-		// Lets make FFxx as "our great info protocol" ;P
-		else if(protId == 0xFF) {
-			unsigned char subprot = msg.GetByte();
-			if(subprot == 0xFF){
-				if(msg.GetRaw() == "info"){
-					Status* status = Status::instance();
-
-					#ifdef __DEBUG__
-					uint64_t running = (OTSYS_TIME() - status->start)/1000;
-					std::cout << ":: Uptime: " << running << std::endl;
-					#endif
-					std::string str = status->getStatusString();
-					send(s, str.c_str(), (int)str.size(), 0);
-				}
-			}
-			// Another ServerInfo protocol
-			// Starting from 01, so the above could be 00 ;)
-			else if(subprot == 0x01){
-				// This one doesn't need to read nothing, so we could save time and bandwidth
-				// Can be called thgough a program that understand the NetMsg protocol
-				Status* status = Status::instance();
-				status->getInfo(msg);
-				msg.WriteToSocket(s);
-			}
-		}
-	}
-	if(s)
-		closesocket(s);
-#if defined __EXCEPTION_TRACER__
-	playerExceptionHandler.RemoveHandler();
-#endif
-
-
-#if defined WIN32 || defined WINDOWS
-#else
-  return 0;
-#endif
-}
-*/
 
 void ErrorMessage(const char* message) {
   std::cout << std::endl << std::endl << "Error: " << message;
@@ -625,20 +274,19 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	/*
+	
 	//load admin protocol configuration
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "admin.xml";
-	adminConfig = new AdminProtocolConfig();
+	g_adminConfig = new AdminProtocolConfig();
 	std::cout << ":: Loading admin protocol config... ";
-	if(!adminConfig->loadXMLConfig(g_config.getString(ConfigManager::DATA_DIRECTORY))){
+	if(!g_adminConfig->loadXMLConfig(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	*/
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
@@ -744,124 +392,11 @@ int main(int argc, char *argv[])
 
 	g_game.setGameState(GAME_STATE_NORMAL);
 
-	boost::asio::io_service io_service;
-	Server server(io_service, INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
+	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
 	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-	io_service.run();
+	g_server = &server;
+	server.run();
 
-/*
-	// start the server listen...
-	int listen_errors;
-	int accept_errors;
-	listen_errors = 0;
-	while(g_game.getGameState() != GAME_STATE_SHUTDOWN && listen_errors < 100){
-		sockaddr_in local_adress;
-		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct
-
-		local_adress.sin_family      = AF_INET;
-		local_adress.sin_port        = htons(g_config.getNumber(ConfigManager::PORT));
-		local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
-
-		// first we create a new socket
-		SOCKET listen_socket = socket(AF_INET, SOCK_STREAM, 0);
-
-		if(listen_socket <= 0){
-#ifdef WIN32
-			WSACleanup();
-#endif
-			ErrorMessage("Unable to create server socket (1)!");
-			return -1;
-  		} // if (listen_socket <= 0)
-
-#ifndef WIN32
-		int yes = 1;
-		// lose the pesky "Address already in use" error message
-		if(setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1){
-			ErrorMessage("Unable to set socket options!");
-			return -1;
-		}
-#endif
-
-		// bind socket on port
-		if(bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0){
-#ifdef WIN32
-			WSACleanup();
-#endif
-			ErrorMessage("Unable to create server socket (2)!");
-			return -1;
-  		} // if (bind(...))
-
-		// now we start listen on the new socket
-		if(listen(listen_socket, 10) == SOCKET_ERROR){
-#ifdef WIN32
-			WSACleanup();
-#endif
-			ErrorMessage("Listen on server socket not possible!");
-			return -1;
-		} // if (listen(*listen_socket, 10) == -1)
-
-
-		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-		accept_errors = 0;
-		while(g_game.getGameState() != GAME_STATE_SHUTDOWN && accept_errors < 100){
-			fd_set listen_set;
-			timeval tv;
-			FD_ZERO(&listen_set);
-			FD_SET(listen_socket, &listen_set);
-			tv.tv_sec = 2;
-			tv.tv_usec = 0;
-
-			int ret = select(listen_socket + 1, &listen_set, NULL, NULL, &tv);
-
-			if(ret == SOCKET_ERROR)
-			{
-				int errnum;
-#ifdef WIN32
-				errnum = WSAGetLastError();
-#else
-				errnum = errno;
-#endif
-				if(errnum == ERROR_EINTR){
-					continue;
-				}
-				else{
-					SOCKET_PERROR("select");
-					break;
-				}
-			}
-			else if(ret == 0){
-				continue;
-			}
-
-			SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
-			OTSYS_SLEEP(100);
-
-			if(s > 0){
-				if(g_bans.acceptConnection(s)){
-					OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
-				}
-				else{
-					closesocket(s);
-				}
-			}
-			else{
-				accept_errors++;
-				SOCKET_PERROR("accept");
-			}
-		}
-
-		closesocket(listen_socket);
-		listen_errors++;
-	}
-
-	if(listen_errors >= 100){
-		std::cout << "ERROR: Server shutted down because there where 100 listen errors." << std::endl;
-	}
-
-#ifdef WIN32
-	WSACleanup();
-#endif
-*/
 #if defined __EXCEPTION_TRACER__
 	mainExceptionHandler.RemoveHandler();
 #endif
