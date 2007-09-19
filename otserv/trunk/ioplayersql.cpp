@@ -205,6 +205,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		DBQuery query2;
 		query2 << "UPDATE players SET premend = 0 WHERE name='" << Database::escapeString(name) << "'";
 		mysql->executeQuery(query2);
+		player->premiumDays = 0;
 	}
 	else{
 		player->premiumDays = (premEnd - timeNow)/(3600*24);
