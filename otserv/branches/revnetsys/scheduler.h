@@ -30,6 +30,8 @@
 #include "otsystem.h"
 #include "tasks.h"
 
+class Player;
+
 class SchedulerTask : public Task{
 public:
 	~SchedulerTask() {}
@@ -57,7 +59,29 @@ protected:
 	friend SchedulerTask* createSchedulerTask(uint32_t, boost::function<void (void)>);
 };
 
-inline SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f){
+class SchedulerPlayerTask : public SchedulerTask
+{
+public:
+	void setPlayer(const Player* player);
+
+protected:
+	SchedulerPlayerTask(uint32_t delay, boost::function<void (void)> f);
+	~SchedulerPlayerTask();
+
+	uint32_t playerId;
+	friend SchedulerPlayerTask* createPlayerSchedulerTask(Player* player, uint32_t, boost::function<void (void)>);
+};
+
+inline SchedulerPlayerTask* createPlayerSchedulerTask(Player* player, uint32_t delay, 
+	boost::function<void (void)> f)
+{
+	SchedulerPlayerTask* task = new SchedulerPlayerTask(delay, f);
+	task->setPlayer(player);
+	return task;
+}
+
+inline SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f)
+{
 	return new SchedulerTask(delay, f);
 }
 

@@ -55,72 +55,212 @@ extern Ban g_bans;
 Chat g_chat;
 
 // Helping templates to add dispatcher tasks
-template<class T1, class f1, class r>
-void addGameTask(r (Game::*f)(f1), T1 p1)
+template<class f1, class r>
+bool addGameTask(r (Game::*f)(f1), Player* player, bool setAction, uint32_t delay)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(f, &g_game, p1)));
+	if(setAction){
+		if(player->getHasAction()){
+			return false;
+		}
+
+		player->setHasAction(true);
+	}
+
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createPlayerSchedulerTask(player, delay, boost::bind(f, &g_game, player->getID())));
+	}
+	else{
+		Dispatcher::getDispatcher().addTask(
+			createPlayerTask(player, boost::bind(f, &g_game, player->getID())));
+	}
+
+	return true;
 }
 
-template<class T1, class T2, class f1, class f2, class r>
-void addGameTask(r (Game::*f)(f1, f2), T1 p1, T2 p2)
+template<class T2, class f1, class f2, class r>
+bool addGameTask(r (Game::*f)(f1, f2), Player* player, T2 p2, bool setAction, uint32_t delay)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(f, &g_game, p1, p2)));
+	if(setAction){
+		if(player->getHasAction()){
+			return false;
+		}
+
+		player->setHasAction(true);
+	}
+
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createPlayerSchedulerTask(player, delay, boost::bind(f, &g_game, player->getID(), p2)));
+	}
+	else{
+		Dispatcher::getDispatcher().addTask(
+			createPlayerTask(player, boost::bind(f, &g_game, player->getID(), p2)));
+	}
+
+	return true;
 }
 
-template<class T1, class T2, class T3,
+template<class T2, class T3,
 class f1, class f2, class f3,
 class r>
-void addGameTask(r (Game::*f)(f1, f2, f3), T1 p1, T2 p2, T3 p3)
+bool addGameTask(r (Game::*f)(f1, f2, f3), Player* player, T2 p2, T3 p3,
+	bool setAction, uint32_t delay)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(f, &g_game, p1, p2, p3)));
+	if(setAction){
+		if(player->getHasAction()){
+			return false;
+		}
+
+		player->setHasAction(true);
+	}
+
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createPlayerSchedulerTask(player, delay, boost::bind(f, &g_game, player->getID(), p2, p3)));
+	}
+	else{
+		Dispatcher::getDispatcher().addTask(
+			createPlayerTask(player, boost::bind(f, &g_game, player->getID(), p2, p3)));
+	}
+
+	return true;
 }
 
-template<class T1, class T2, class T3, class T4,
+template<class T2, class T3, class T4,
 class f1, class f2, class f3, class f4,
 class r>
-void addGameTask(r (Game::*f)(f1, f2, f3, f4), T1 p1, T2 p2, T3 p3, T4 p4)
+bool addGameTask(r (Game::*f)(f1, f2, f3, f4), Player* player, T2 p2, T3 p3, T4 p4,
+	bool setAction, uint32_t delay)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(f, &g_game, p1, p2, p3, p4)));
+	if(setAction){
+		if(player->getHasAction()){
+			return false;
+		}
+
+		player->setHasAction(true);
+	}
+
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createPlayerSchedulerTask(player, delay, boost::bind(f, &g_game, player->getID(), p2, p3, p4)));
+	}
+	else{
+		Dispatcher::getDispatcher().addTask(
+			createPlayerTask(player, boost::bind(f, &g_game, player->getID(), p2, p3, p4)));
+	}
+
+	return true;
 }
 
-template<class T1, class T2, class T3, class T4, class T5,
+template<class T2, class T3, class T4, class T5,
 class f1, class f2, class f3, class f4, class f5,
 class r>
-void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5)
+bool addGameTask(r (Game::*f)(f1, f2, f3, f4, f5), Player* player, T2 p2, T3 p3, T4 p4, T5 p5,
+	bool setAction, uint32_t delay)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5)));
+	if(setAction){
+		if(player->getHasAction()){
+			return false;
+		}
+
+		player->setHasAction(true);
+	}
+
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createPlayerSchedulerTask(player, delay, boost::bind(f, &g_game,
+			player->getID(), p2, p3, p4, p5)));
+	}
+	else{
+		Dispatcher::getDispatcher().addTask(
+			createPlayerTask(player, boost::bind(f, &g_game, player->getID(), p2, p3, p4, p5)));
+	}
+
+	return true;
 }
 
-template<class T1, class T2, class T3, class T4, class T5, class T6,
+template<class T2, class T3, class T4, class T5, class T6,
 class f1, class f2, class f3, class f4, class f5, class f6,
 class r>
-void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6)
+bool addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6), Player* player, T2 p2, T3 p3, T4 p4,
+	T5 p5, T6 p6, bool setAction, uint32_t delay)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6)));
+	if(setAction){
+		if(player->getHasAction()){
+			return false;
+		}
+
+		player->setHasAction(true);
+	}
+
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createPlayerSchedulerTask(player, delay, boost::bind(f, &g_game,
+			player->getID(), p2, p3, p4, p5, p6)));
+	}
+	else{
+		Dispatcher::getDispatcher().addTask(
+			createPlayerTask(player, boost::bind(f, &g_game, player->getID(), p2, p3, p4, p5, p6)));
+	}
+
+	return true;
 }
 
-template<class T1, class T2, class T3, class T4, class T5, class T6, class T7,
+template<class T2, class T3, class T4, class T5, class T6, class T7,
 class f1, class f2, class f3, class f4, class f5, class f6, class f7,
 class r>
-void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7)
+bool addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7), Player* player,
+	T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, bool setAction, uint32_t delay)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6, p7)));
+	if(setAction){
+		if(player->getHasAction()){
+			return false;
+		}
+
+		player->setHasAction(true);
+	}
+
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createPlayerSchedulerTask(player, delay, boost::bind(f, &g_game,
+			player->getID(), p2, p3, p4, p5, p6, p7)));
+	}
+	else{
+		Dispatcher::getDispatcher().addTask(
+			createPlayerTask(player, boost::bind(f, &g_game, player->getID(),
+			p2, p3, p4, p5, p6, p7)));
+	}
+
+	return true;
 }
 
-template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8,
+template<class T2, class T3, class T4, class T5, class T6, class T7, class T8,
 class f1, class f2, class f3, class f4, class f5, class f6, class f7, class f8,
 class r>
-void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8)
+bool addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), Player* player,
+	T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, bool setAction, uint32_t delay)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6, p7, p8)));
+	if(setAction){
+		if(player->getHasAction()){
+			return false;
+		}
+
+		player->setHasAction(true);
+	}
+
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createPlayerSchedulerTask(player, delay, boost::bind(f, &g_game,
+			player->getID(), p2, p3, p4, p5, p6, p7, p8)));
+	}
+	else{
+		Dispatcher::getDispatcher().addTask(
+			createPlayerTask(player, boost::bind(f, &g_game, player->getID(),
+			p2, p3, p4, p5, p6, p7, p8)));
+	}
+
+	return true;
 }
 
 Protocol79::Protocol79(Connection* connection) :
@@ -268,8 +408,9 @@ void Protocol79::move(Direction dir)
 
 	int64_t delay = (int64_t)(player->getSleepTicks()*multiplier);
 	if(delay > 0 ){
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(delay, boost::bind(&Game::playerMove, &g_game, player->getID(), dir)));
+		addGameTask(&Game::playerMove, player, dir, true, delay);
+		//Scheduler::getScheduler().addEvent(
+		//	createSchedulerTask(delay, boost::bind(&Game::playerMove, &g_game, player->getID(), dir)));
 	}
 	else{
 		g_game.playerMove(player->getID(), dir);
@@ -358,9 +499,9 @@ void Protocol79::parsePacket(NetworkMessage &msg)
 		return;
 
 	uint8_t recvbyte = msg.GetByte();
+
 	//a dead player can not performs actions
 	if((player->isRemoved() || player->getHealth() <= 0) && recvbyte != 0x14){
-		OTSYS_SLEEP(10);
 		return;
 	}
 
@@ -772,53 +913,53 @@ void Protocol79::parseLogout(NetworkMessage& msg)
 
 void Protocol79::parseCreatePrivateChannel(NetworkMessage& msg)
 {
-	addGameTask(&Game::playerCreatePrivateChannel, player->getID());
+	addGameTask(&Game::playerCreatePrivateChannel, player, true, 0);
 }
 
 void Protocol79::parseChannelInvite(NetworkMessage& msg)
 {
 	const std::string name = msg.GetString();
 
-	addGameTask(&Game::playerChannelInvite, player->getID(), name);
+	addGameTask(&Game::playerChannelInvite, player, name, true, 0);
 }
 
 void Protocol79::parseChannelExclude(NetworkMessage& msg)
 {
 	const std::string name = msg.GetString();
 
-	addGameTask(&Game::playerChannelExclude, player->getID(), name);
+	addGameTask(&Game::playerChannelExclude, player, name, true, 0);
 }
 
 void Protocol79::parseGetChannels(NetworkMessage& msg)
 {
-	addGameTask(&Game::playerRequestChannels, player->getID());
+	addGameTask(&Game::playerRequestChannels, player, true, 0);
 }
 
 void Protocol79::parseOpenChannel(NetworkMessage& msg)
 {
 	uint16_t channelId = msg.GetU16();
 
-	addGameTask(&Game::playerOpenChannel, player->getID(), channelId);
+	addGameTask(&Game::playerOpenChannel, player, channelId, true, 0);
 }
 
 void Protocol79::parseCloseChannel(NetworkMessage &msg)
 {
 	uint16_t channelId = msg.GetU16();
 
-	addGameTask(&Game::playerCloseChannel, player->getID(), channelId);
+	addGameTask(&Game::playerCloseChannel, player, channelId, true, 0);
 }
 
 void Protocol79::parseOpenPriv(NetworkMessage& msg)
 {
 	const std::string receiver = msg.GetString();
 
-	addGameTask(&Game::playerOpenPrivateChannel, player->getID(), receiver);
+	addGameTask(&Game::playerOpenPrivateChannel, player, receiver, true, 0);
 }
 
 void Protocol79::parseCancelMove(NetworkMessage& msg)
 {
-	addGameTask(&Game::playerSetAttackedCreature, player->getID(), 0);
-	addGameTask(&Game::playerFollowCreature, player->getID(), 0);
+	addGameTask(&Game::playerSetAttackedCreature, player, 0, true, 0);
+	addGameTask(&Game::playerFollowCreature, player, 0, true, 0);
 }
 
 void Protocol79::parseDebug(NetworkMessage& msg)
@@ -839,7 +980,7 @@ void Protocol79::parseDebug(NetworkMessage& msg)
 
 void Protocol79::parseRecievePing(NetworkMessage& msg)
 {
-	addGameTask(&Game::playerReceivePing, player->getID());
+	addGameTask(&Game::playerReceivePing, player, false, 0);
 }
 
 void Protocol79::parseAutoWalk(NetworkMessage& msg)
@@ -874,28 +1015,28 @@ void Protocol79::parseAutoWalk(NetworkMessage& msg)
 		path.push_back(dir);
 	}
 
-	addGameTask(&Game::playerAutoWalk, player->getID(), path);
+	addGameTask(&Game::playerAutoWalk, player, path, true, 0);
 }
 
 void Protocol79::parseStopAutoWalk(NetworkMessage& msg)
 {
-	addGameTask(&Game::playerStopAutoWalk, player->getID());
+	addGameTask(&Game::playerStopAutoWalk, player, true, 0);
 }
 
 void Protocol79::parseMove(NetworkMessage& msg, Direction dir)
 {
 	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Protocol79::move, this, dir)));
+		createPlayerTask(player, boost::bind(&Protocol79::move, this, dir)));
 }
 
 void Protocol79::parseTurn(NetworkMessage& msg, Direction dir)
 {
-	addGameTask(&Game::playerTurn, player->getID(), dir);
+	addGameTask(&Game::playerTurn, player, dir, true, 0);
 }
 
 void Protocol79::parseRequestOutfit(NetworkMessage& msg)
 {
-	addGameTask(&Game::playerRequestOutfit, player->getID());
+	addGameTask(&Game::playerRequestOutfit, player, true, 0);
 }
 
 void Protocol79::parseSetOutfit(NetworkMessage& msg)
@@ -915,7 +1056,7 @@ void Protocol79::parseSetOutfit(NetworkMessage& msg)
 	newOutfit.lookFeet = lookfeet;
 	newOutfit.lookAddons = lookaddons;
 
-	addGameTask(&Game::playerChangeOutfit, player->getID(), newOutfit);
+	addGameTask(&Game::playerChangeOutfit, player, newOutfit, true, 0);
 }
 
 void Protocol79::parseUseItem(NetworkMessage& msg)
@@ -932,7 +1073,8 @@ void Protocol79::parseUseItem(NetworkMessage& msg)
 #endif
 */
 
-	addGameTask(&Game::playerUseItem, player->getID(), pos, stackpos, index, spriteId, isHotkey);
+	addGameTask(&Game::playerUseItem, player, pos, stackpos,
+		index, spriteId, isHotkey, true, 0);
 }
 
 void Protocol79::parseUseItemEx(NetworkMessage& msg)
@@ -945,7 +1087,8 @@ void Protocol79::parseUseItemEx(NetworkMessage& msg)
 	uint8_t toStackPos = msg.GetByte();
 	bool isHotkey = (fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0);
 
-	addGameTask(&Game::playerUseItemEx, player->getID(), fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey);
+	addGameTask(&Game::playerUseItemEx, player, fromPos, fromStackPos,
+		fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey, true, 0);
 }
 
 void Protocol79::parseBattleWindow(NetworkMessage &msg)
@@ -956,28 +1099,29 @@ void Protocol79::parseBattleWindow(NetworkMessage &msg)
 	uint32_t creatureId = msg.GetU32();
 	bool isHotkey = (fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0);
 
-	addGameTask(&Game::playerUseBattleWindow, player->getID(), fromPos, fromStackPos, creatureId, spriteId, isHotkey);
+	addGameTask(&Game::playerUseBattleWindow, player, fromPos, fromStackPos,
+		creatureId, spriteId, isHotkey, true, 0);
 }
 
 void Protocol79::parseCloseContainer(NetworkMessage& msg)
 {
 	unsigned char cid = msg.GetByte();
 
-	addGameTask(&Game::playerCloseContainer, player->getID(), cid);
+	addGameTask(&Game::playerCloseContainer, player, cid, true, 0);
 }
 
 void Protocol79::parseUpArrowContainer(NetworkMessage& msg)
 {
 	unsigned char cid = msg.GetByte();
 
-	addGameTask(&Game::playerMoveUpContainer, player->getID(), cid);
+	addGameTask(&Game::playerMoveUpContainer, player, cid, true, 0);
 }
 
 void Protocol79::parseUpdateContainer(NetworkMessage& msg)
 {
 	unsigned char cid = msg.GetByte();
 
-	addGameTask(&Game::playerUpdateContainer, player->getID(), cid);
+	addGameTask(&Game::playerUpdateContainer, player, cid, true, 0);
 }
 
 void Protocol79::parseThrow(NetworkMessage& msg)
@@ -997,8 +1141,8 @@ void Protocol79::parseThrow(NetworkMessage& msg)
 	*/
 
 	if(toPos != fromPos){
-		addGameTask(&Game::playerMoveThing, player->getID(), fromPos, spriteId,
-			fromStackpos, toPos, count);
+		addGameTask(&Game::playerMoveThing, player, fromPos, spriteId,
+			fromStackpos, toPos, count, true, 0);
 	}
 }
 
@@ -1014,7 +1158,7 @@ void Protocol79::parseLookAt(NetworkMessage& msg)
 #endif
 */
 
-	addGameTask(&Game::playerLookAt, player->getID(), pos, spriteId, stackpos);
+	addGameTask(&Game::playerLookAt, player, pos, spriteId, stackpos, true, 0);
 }
 
 void Protocol79::parseSay(NetworkMessage& msg)
@@ -1032,7 +1176,7 @@ void Protocol79::parseSay(NetworkMessage& msg)
 		channelId = msg.GetU16();
 	const std::string text = msg.GetString();
 
-	addGameTask(&Game::playerSay, player->getID(), channelId, type, receiver, text);
+	addGameTask(&Game::playerSay, player, channelId, type, receiver, text, true, 0);
 }
 
 void Protocol79::parseFightModes(NetworkMessage& msg)
@@ -1061,21 +1205,21 @@ void Protocol79::parseFightModes(NetworkMessage& msg)
 		fightMode = FIGHTMODE_DEFENSE;
 	}
 
-	addGameTask(&Game::playerSetFightModes, player->getID(), fightMode, chaseMode);
+	addGameTask(&Game::playerSetFightModes, player, fightMode, chaseMode, true, 0);
 }
 
 void Protocol79::parseAttack(NetworkMessage& msg)
 {
 	uint32_t creatureId = msg.GetU32();
 
-	addGameTask(&Game::playerSetAttackedCreature, player->getID(), creatureId);
+	addGameTask(&Game::playerSetAttackedCreature, player, creatureId, true, 0);
 }
 
 void Protocol79::parseFollow(NetworkMessage& msg)
 {
 	uint32_t creatureId = msg.GetU32();
 
-	addGameTask(&Game::playerFollowCreature, player->getID(), creatureId);
+	addGameTask(&Game::playerFollowCreature, player, creatureId, true, 0);
 }
 
 void Protocol79::parseTextWindow(NetworkMessage& msg)
@@ -1083,7 +1227,7 @@ void Protocol79::parseTextWindow(NetworkMessage& msg)
 	uint32_t windowTextId = msg.GetU32();
 	const std::string newText = msg.GetString();
 
-	addGameTask(&Game::playerWriteItem, player->getID(), windowTextId, newText);
+	addGameTask(&Game::playerWriteItem, player, windowTextId, newText, true, 0);
 }
 
 void Protocol79::parseHouseWindow(NetworkMessage &msg)
@@ -1092,7 +1236,7 @@ void Protocol79::parseHouseWindow(NetworkMessage &msg)
 	uint32_t id = msg.GetU32();
 	const std::string text = msg.GetString();
 
-	addGameTask(&Game::playerUpdateHouseWindow, player->getID(), doorId, id, text);
+	addGameTask(&Game::playerUpdateHouseWindow, player, doorId, id, text, true, 0);
 }
 
 void Protocol79::parseRequestTrade(NetworkMessage& msg)
@@ -1102,12 +1246,12 @@ void Protocol79::parseRequestTrade(NetworkMessage& msg)
 	uint8_t stackpos = msg.GetByte();
 	uint32_t playerId = msg.GetU32();
 
-	addGameTask(&Game::playerRequestTrade, player->getID(), pos, stackpos, playerId, spriteId);
+	addGameTask(&Game::playerRequestTrade, player, pos, stackpos, playerId, spriteId, true, 0);
 }
 
 void Protocol79::parseAcceptTrade(NetworkMessage& msg)
 {
-	addGameTask(&Game::playerAcceptTrade, player->getID());
+	addGameTask(&Game::playerAcceptTrade, player, true, 0);
 }
 
 void Protocol79::parseLookInTrade(NetworkMessage& msg)
@@ -1115,12 +1259,12 @@ void Protocol79::parseLookInTrade(NetworkMessage& msg)
 	bool counterOffer = (msg.GetByte() == 0x01);
 	int index = msg.GetByte();
 
-	addGameTask(&Game::playerLookInTrade, player->getID(), counterOffer, index);
+	addGameTask(&Game::playerLookInTrade, player, counterOffer, index, true, 0);
 }
 
 void Protocol79::parseCloseTrade()
 {
-	addGameTask(&Game::playerCloseTrade, player->getID());
+	addGameTask(&Game::playerCloseTrade, player, true, 0);
 }
 
 void Protocol79::parseAddVip(NetworkMessage& msg)
@@ -1129,14 +1273,14 @@ void Protocol79::parseAddVip(NetworkMessage& msg)
 	if(name.size() > 32)
 		return;
 
-	addGameTask(&Game::playerRequestAddVip, player->getID(), name);
+	addGameTask(&Game::playerRequestAddVip, player, name, true, 0);
 }
 
 void Protocol79::parseRemoveVip(NetworkMessage& msg)
 {
 	uint32_t guid = msg.GetU32();
 
-	addGameTask(&Game::playerRequestRemoveVip, player->getID(), guid);
+	addGameTask(&Game::playerRequestRemoveVip, player, guid, true, 0);
 }
 
 void Protocol79::parseRotateItem(NetworkMessage& msg)
@@ -1145,7 +1289,7 @@ void Protocol79::parseRotateItem(NetworkMessage& msg)
 	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 
-	addGameTask(&Game::playerRotateItem, player->getID(), pos, stackpos, spriteId);
+	addGameTask(&Game::playerRotateItem, player, pos, stackpos, spriteId, true, 0);
 }
 
 //********************** Send methods  *******************************

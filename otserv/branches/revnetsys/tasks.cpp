@@ -21,6 +21,10 @@
 
 #include "tasks.h"
 #include "outputmessage.h"
+#include "player.h"
+#include "game.h"
+
+extern Game g_game;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -89,4 +93,27 @@ void Dispatcher::addTask(Task* task)
 	if(isEmpty)
 		OTSYS_THREAD_SIGNAL_SEND(m_taskSignal);
 
+}
+
+PlayerTask::PlayerTask(boost::function<void (void)> f) : Task(f)
+{
+	playerId = 0;
+}
+
+PlayerTask::~PlayerTask()
+{
+	Player* player = g_game.getPlayerByID(playerId);
+	if(player){
+		player->setHasAction(false);
+	}
+}
+
+void PlayerTask::setPlayer(const Player* player)
+{
+	if(player){
+		playerId = player->getID();
+	}
+	else{
+		playerId = 0;
+	}
 }

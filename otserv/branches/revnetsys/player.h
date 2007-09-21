@@ -449,6 +449,8 @@ public:
 	void setEditHouse(House* house, uint32_t listId = 0);
 
 	int64_t getLastAction() const {return lastAction;}
+	bool getHasAction() {return hasAction;}
+	void setHasAction(bool b) {hasAction = b;}
 
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;
@@ -527,6 +529,7 @@ protected:
 	uint32_t internal_ping;
 	uint32_t npings;
 	int64_t lastAction;
+	bool hasAction;
 
 	bool pzLocked;
 	int32_t bloodHitCount;

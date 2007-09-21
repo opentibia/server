@@ -20,6 +20,10 @@
 #include "otpch.h"
 
 #include "scheduler.h"
+#include "player.h"
+#include "game.h"
+
+extern Game g_game;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -141,5 +145,29 @@ bool Scheduler::stopEvent(uint32_t eventid)
 		// this eventid is not valid
 		OTSYS_THREAD_UNLOCK(m_eventLock, "stopEvent()");
 		return false;
+	}
+}
+
+SchedulerPlayerTask::SchedulerPlayerTask(uint32_t delay, boost::function<void (void)> f) :
+	SchedulerTask(delay, f)
+{
+	playerId = 0;
+}
+
+SchedulerPlayerTask::~SchedulerPlayerTask()
+{
+	Player* player = g_game.getPlayerByID(playerId);
+	if(player){
+		player->setHasAction(false);
+	}
+}
+
+void SchedulerPlayerTask::setPlayer(const Player* player)
+{
+	if(player){
+		playerId = player->getID();
+	}
+	else{
+		playerId = 0;
 	}
 }
