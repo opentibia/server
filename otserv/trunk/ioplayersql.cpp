@@ -197,18 +197,20 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	#ifndef __USE_SQL_PREMDAYS__
 	time_t premEnd = result.getDataInt("premend");
 	time_t timeNow = time(NULL);
-	if(premEnd != 0 && premEnd < timeNow){
-		//TODO: remove every premium property of the player
-		// outfit, vocation, temple, ...
+	if(premEnd > 0){
+		if(premEnd < timeNow){
+			//TODO: remove every premium property of the player
+			// outfit, vocation, temple, ...
 
-		//update table
-		DBQuery query2;
-		query2 << "UPDATE players SET premend = 0 WHERE name='" << Database::escapeString(name) << "'";
-		mysql->executeQuery(query2);
-		player->premiumDays = 0;
-	}
-	else{
-		player->premiumDays = (premEnd - timeNow)/(3600*24);
+			//update table
+			DBQuery query2;
+			query2 << "UPDATE players SET premend = 0 WHERE name='" << Database::escapeString(name) << "'";
+			mysql->executeQuery(query2);
+			player->premiumDays = 0;
+		}
+		else{
+			player->premiumDays = (premEnd - timeNow)/(3600*24);
+		}
 	}
 	#endif
 
