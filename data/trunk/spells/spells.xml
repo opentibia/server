@@ -208,7 +208,7 @@
 		<vocation name="Paladin" />
 		<vocation name="Royal Paladin" />
 	</conjure>
-	<conjure name="Conjure Piercing Bolt" words="exevo con hur" lvl="33" mana="180" soul="3" prem="1" conjureId="7363" conjureCount="5" function="conjureItem">
+	<conjure name="Conjure Piercing Bolt" words="exevo con grav" lvl="33" mana="180" soul="3" prem="1" conjureId="7363" conjureCount="5" function="conjureItem">
 		<vocation name="Paladin" />
 		<vocation name="Royal Paladin" />
 	</conjure>
