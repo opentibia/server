@@ -143,8 +143,9 @@ std::string DatabasePgSQL::escapeBlob(const char* s, uint32_t length)
 		return std::string("''");
 
 	// quotes escaped string and frees temporary buffer
-	char* output = (char*)PQescapeByteaConn(m_handle, (unsigned char*)s, length, NULL);
-	std::string r = std::string("'");
+	size_t len;
+	char* output = (char*)PQescapeByteaConn(m_handle, (unsigned char*)s, length, &len);
+	std::string r = std::string("E'");
 	r += output;
 	r += "'";
 	PQfreemem(output);
@@ -202,10 +203,11 @@ std::string PgSQLResult::getDataString(const std::string &s)
 const char* PgSQLResult::getDataStream(const std::string &s, unsigned long &size)
 {
 	std::string buf = PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) );
-	char* temp = new char[buf.size()];
-	size = buf.size();
-	strcpy(temp, buf.c_str() );
-	return temp;
+	unsigned char* temp = PQunescapeBytea( (const unsigned char*)buf.c_str(), &size);
+	char* value = new char[buf.size()];
+	strcpy(value, (char*)temp);
+	PQfreemem(temp);
+	return value;
 }
 
 bool PgSQLResult::next()
