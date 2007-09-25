@@ -76,7 +76,7 @@
 		<vocation name="Sorcerer" />
 		<vocation name="Master Sorcerer" />
 	</instant>
-	<instant name="Groundshaker" words="exori mas" lvl="33" mana="160" prem="1" script="attack/groundshaker.lua">
+	<instant name="Groundshaker" words="exori mas" lvl="33" mana="160" prem="1" needweapon="1" script="attack/groundshaker.lua">
 		<vocation name="Knight" />
 		<vocation name="Elite Knight" />
 	</instant>
@@ -102,9 +102,9 @@
 	</instant>
 	
 	-- Healing Spells
-	<instant name="Antidote" words="exana pox" lvl="10" mana="30" aggressive="0" selftarget="1" script="antidote.lua"/>
-	<instant name="Light Healing" words="exura" lvl="9" mana="25" aggressive="0" selftarget="1" script="light_healing.lua"/>
-	<instant name="Intense Healing" words="exura gran" lvl="11" mana="40" aggressive="0" selftarget="1" script="intense_healing.lua">
+	<instant name="Light Healing" words="exura" lvl="9" mana="25" aggressive="0" selftarget="1" script="healing/light_healing.lua"/>
+	<instant name="Antidote" words="exana pox" lvl="10" mana="30" aggressive="0" selftarget="1" script="healing/antidote.lua"/>
+	<instant name="Intense Healing" words="exura gran" lvl="11" mana="40" aggressive="0" selftarget="1" script="healing/intense_healing.lua">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Paladin" />
@@ -112,7 +112,11 @@
 		<vocation name="Elder Druid" />
 		<vocation name="Royal Paladin" />
 	</instant>
-	<instant name="Ultimate Healing" words="exura vita" lvl="20" mana="160" aggressive="0" selftarget="1" script="ultimate_healing.lua">
+	<instant name="Heal Friend" words="exura sio" lvl="18" mana="70" prem="1" aggressive="0" needtarget="1" params="1" script="healing/heal_friend.lua">
+		<vocation name="Druid" />
+		<vocation name="Elder Druid" />
+	</instant>
+	<instant name="Ultimate Healing" words="exura vita" lvl="20" mana="160" aggressive="0" selftarget="1" script="healing/ultimate_healing.lua">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Paladin" />
@@ -120,65 +124,61 @@
 		<vocation name="Elder Druid" />
 		<vocation name="Royal Paladin" />
 	</instant>
-	<instant name="Heal Friend" words="exura sio" lvl="18" mana="70" prem="1" aggressive="0" needtarget="1" params="1" script="ultimate_healing.lua">
-		<vocation name="Druid" />
-		<vocation name="Elder Druid" />
-	</instant>
-	<instant name="Mass Healing" words="exura gran mas res" lvl="36" mana="150" prem="1" aggressive="0" script="mass_healing.lua">
+	<instant name="Mass Healing" words="exura gran mas res" lvl="36" mana="150" prem="1" aggressive="0" script="healing/mass_healing.lua">
 		<vocation name="Druid" />
 		<vocation name="Elder Druid" />
 	</instant>
 	
 	-- Support Spells
+	<instant name="Light" words="utevo lux" lvl="8" mana="20" aggressive="0" selftarget="1" script="support/light.lua"/>
 	<instant name="Find Person" words="exiva" lvl="8" mana="20" aggressive="0" params="1" function="searchPlayer"/>
+	<instant name="Magic Rope" words="exani tera" lvl="9" mana="20" prem="1" aggressive="0" selftarget="1" script="support/magic_rope.lua"/>
+	<instant name="Levitate" words="exani hur" lvl="12" mana="50" prem="1" aggressive="0" params="1" function="Levitate"/>
+	<instant name="Great Light" words="utevo gran lux" lvl="13" mana="60" aggressive="0" selftarget="1" script="support/great_light.lua"/>
+	<instant name="Magic Shield" words="utamo vita" lvl="14" mana="50" aggressive="0" selftarget="1" script="support/magic_shield.lua">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Paladin" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+		<vocation name="Royal Paladin" />
+	</instant>
+	<instant name="Haste" words="utani hur" lvl="14" mana="60" prem="1" aggressive="0" selftarget="1" script="support/haste.lua"/>
+	<instant name="Challenge" words="exeta res" lvl="20" mana="30" prem="1" aggressive="0" script="support/challenge.lua">
+		<vocation name="Elite Knight" />
+	</instant>
+	<instant name="Strong Haste" words="utani gran hur" lvl="20" mana="100" prem="1" aggressive="0" selftarget="1" script="support/strong_haste.lua">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+	</instant>
 	<instant name="Create Illusion" words="utevo res ina" lvl="23" mana="100" aggressive="0" params="1" function="Illusion">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
 	</instant>
-	<instant name="Light" words="utevo lux" lvl="8" mana="20" aggressive="0" selftarget="1" script="light.lua"/>
-	<instant name="Great Light" words="utevo gran lux" lvl="13" mana="60" aggressive="0" selftarget="1" script="great_light.lua"/>
-	<instant name="Ultimate Light" words="utevo vis lux" lvl="26" mana="140" prem="1" aggressive="0" selftarget="1" script="ultimate_light.lua">
+	<instant name="Ultimate Light" words="utevo vis lux" lvl="26" mana="140" prem="1" aggressive="0" selftarget="1" script="support/ultimate_light.lua">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
 	</instant>
-	<instant name="Magic Rope" words="exani tera" lvl="9" mana="20" prem="1" aggressive="0" selftarget="1" script="magic_rope.lua"/>
-	<instant name="Levitate" words="exani hur" lvl="12" mana="50" prem="1" aggressive="0" params="1" function="Levitate"/>
-	<instant name="Haste" words="utani hur" lvl="14" mana="60" prem="1" aggressive="0" selftarget="1" script="haste.lua"/>
-	<instant name="Strong Haste" words="utani gran hur" lvl="20" mana="100" prem="1" aggressive="0" selftarget="1" script="strong_haste.lua">
+	<instant name="Cancel Invisibility" words="exana ina" lvl="26" mana="200" prem="1" aggressive="0" selftarget="1" script="support/cancel_invisibility.lua">
 		<vocation name="Sorcerer" />
-		<vocation name="Druid" />
 		<vocation name="Master Sorcerer" />
+	</instant>
+	<instant name="Wild Growth" words="exevo grav vita" lvl="27" mana="220" prem="1" direction="1" blocking="1" script="support/wild_growth.lua">
 		<vocation name="Elder Druid" />
 	</instant>
-	<instant name="Wild Growth" words="exevo grav vita" lvl="27" mana="220" prem="1" aggressive="0" direction="1" blocking="1" script="wild_growth.lua">
-		<vocation name="Elder Druid" />
-	</instant>
-	<instant name="Invisible" words="utana vid" lvl="35" mana="440" aggressive="0" selftarget="1" script="invisible.lua">
+	<instant name="Invisible" words="utana vid" lvl="35" mana="440" aggressive="0" selftarget="1" script="support/invisible.lua">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Paladin" />
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
 		<vocation name="Royal Paladin" />
-	</instant>
-	<instant name="Cancel Invisibility" words="exana ina" lvl="26" mana="200" prem="1" aggressive="0" selftarget="1" script="cancel_invisibility.lua">
-		<vocation name="Sorcerer" />
-		<vocation name="Master Sorcerer" />
-	</instant>
-	<instant name="Magic Shield" words="utamo vita" lvl="14" mana="50" aggressive="0" selftarget="1" script="magic_shield.lua">
-		<vocation name="Sorcerer" />
-		<vocation name="Druid" />
-		<vocation name="Paladin" />
-		<vocation name="Master Sorcerer" />
-		<vocation name="Elder Druid" />
-		<vocation name="Royal Paladin" />
-	</instant>
-	<instant name="Challenge" words="exeta res" lvl="20" mana="30" prem="1" aggressive="0" script="challenge.lua">
-		<vocation name="Elite Knight" />
 	</instant>
 	
 	-- Supply Spells

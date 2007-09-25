@@ -11,9 +11,8 @@ function onCastSpell(cid, var)
 		doTeleportThing(cid, newpos)
 		doSendMagicEffect(pos, CONST_ME_ENERGYAREA)
 		return LUA_NO_ERROR
-	else
-		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
-		doSendMagicEffect(pos, CONST_ME_POFF)
-		return LUA_ERROR
-	end	
+	end
+	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
+	doSendMagicEffect(pos, CONST_ME_POFF)
+	return LUA_ERROR
 end
