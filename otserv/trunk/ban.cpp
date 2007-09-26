@@ -476,7 +476,7 @@ bool IOBanXML::loadBans(const std::string& identifier, Ban& banclass)
 
 							if(readXMLInteger(banNode, "ip", ip)){
 
-								readXMLInteger(banNode, "mask", ip);
+								readXMLInteger(banNode, "mask", mask);
 								banclass.addIpBan(ip, mask, time);
 							}
 
