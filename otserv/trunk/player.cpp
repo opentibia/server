@@ -78,6 +78,7 @@ Creature()
 	magLevel   = 20;
 	accessLevel = 0;
 	lastlogin  = 0;
+	lastip = 0;
 	lastLoginSaved = 0;
 	SendBuffer = false;
 	npings = 0;

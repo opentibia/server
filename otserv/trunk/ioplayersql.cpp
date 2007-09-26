@@ -507,8 +507,12 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`posz` = '" << player->getLoginPosition().z << "', ";
 	query << "`cap` = " << player->getCapacity() << ", ";
 	query << "`sex` = " << player->sex << ", ";
-	query << "`lastlogin` = " << player->lastlogin << ", ";
-	query << "`lastip` = " << player->lastip << ", ";
+	if(player->lastlogin != 0){
+		query << "`lastlogin` = " << player->lastlogin << ", ";
+	}
+	if(player->lastip != 0){
+		query << "`lastip` = " << player->lastip << ", ";
+	}
 	query << "`conditions` = '" << Database::escapeString(conditions, conditionsSize) << "', ";
 	query << "`loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE) << ", ";
 	query << "`loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT) << ", ";
