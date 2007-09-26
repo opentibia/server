@@ -290,15 +290,15 @@ public:
 	uint8_t getItemCount() const {return count;}
 	void setItemCount(uint8_t n) {count = n;}
 
-	unsigned char getItemCountOrSubtype() const;
+	uint8_t getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
 	bool hasSubType() const;
 	uint8_t getSubType() const;
 
-	unsigned char getItemCharge() const {return charges;};
+	uint8_t getItemCharge() const {return charges;};
 	void setItemCharge(unsigned char n) {charges = n;};
 
-	unsigned char getFluidType() const {return fluid;};
+	uint8_t getFluidType() const {return fluid;};
 	void setFluidType(unsigned char n) {fluid = n;};
 	
 	void setUniqueId(unsigned short n);

@@ -1565,10 +1565,11 @@ bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint3
 {
 	bool result = false;
 	if(reagentId != 0){
-		Item* item;
-
-		item = player->getInventoryItem(slot);
+		Item* item = player->getInventoryItem(slot);
 		if(item && item->getID() == reagentId){
+			if(item->isStackable() && item->getItemCount() != 1){ //TODO? reagentCount
+			    return false;
+			}
 
 			Item* newItem = g_game.transformItem(item, conjureId, conjureCount);
 			g_game.startDecay(newItem);

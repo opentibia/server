@@ -58,7 +58,7 @@ AREA_BEAM7 = {
 }
 
 --Diagonal Beams
-AREAGIAGONAL_BEAM5 = {
+AREADIAGONAL_BEAM5 = {
 {1, 0, 0, 0, 0},
 {0, 1, 0, 0, 0},
 {0, 0, 1, 0, 0},

@@ -10918,7 +10918,7 @@
 		<attribute key="weight" value="2200"/>
 		<attribute key="attack" value="32"/>
 		<attribute key="weaponType" value="distance"/>
-		<attribute key="shootType" value="royalspear"/>
+		<attribute key="shootType" value="huntingspear"/>
 		<attribute key="range" value="5"/>
 	</item>
 	<item id="3966" article="a" name="banana staff">

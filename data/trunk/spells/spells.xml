@@ -4,35 +4,35 @@
 	<!-- PLAYER RUNES -->
 	
 	-- Attack Runes
-	<rune name="Poison Field" id="2285" charges="3" maglv="0" mana="0" blocktype="solid" script="poison_field.lua"/>
-	<rune name="Poison Bomb" id="2286" charges="2" maglv="4" mana="0" blocktype="solid" script="poison_bomb.lua"/>
-	<rune name="Poison Wall" id="2289" charges="4" maglv="5" mana="0" blocktype="solid" script="poison_wall.lua"/>
-	<rune name="Envenom" id="2292" charges="1" maglv="4" mana="0" needtarget="1" blocktype="solid" script="envenom.lua"/>
-	<rune name="Fire Field" id="2301" charges="3" maglv="1" mana="0" blocktype="solid" script="fire_field.lua"/>
-	<rune name="Firebomb" id="2305" charges="2" maglv="5" mana="0" blocktype="solid" script="firebomb.lua"/>
-	<rune name="Fire Wall" id="2303" charges="4" maglv="6" mana="0" blocktype="solid" script="fire_wall.lua"/>
-	<rune name="Soulfire" id="2308" charges="2" maglv="7" mana="0" needtarget="1" blocktype="solid" script="soulfire.lua"/>
-	<rune name="Fireball" id="2302" charges="2" maglv="2" mana="0" blocktype="solid" script="fireball.lua"/>
-	<rune name="Great Fireball" id="2304" charges="2" maglv="4" mana="0" blocktype="solid" script="great_fireball.lua"/>
-	<rune name="Energy Field" id="2277" charges="3" maglv="3" mana="0" blocktype="solid" script="energy_field.lua"/>
-	<rune name="Energybomb" id="2262" charges="2" maglv="10" mana="0" blocktype="solid" script="energybomb.lua"/>
-	<rune name="Energy Wall" id="2279" charges="4" maglv="9" mana="0" blocktype="solid" script="energy_wall.lua"/>
-	<rune name="Light Magic Missile" id="2287" charges="5" maglv="0" mana="0" needtarget="1" blocktype="solid" script="light_magic_missile.lua"/>
-	<rune name="Heavy Magic Missile" id="2311" charges="5" maglv="4" mana="0" needtarget="1" blocktype="solid" script="heavy_magic_missile.lua"/>
-	<rune name="Explosion" id="2313" charges="3" maglv="6" mana="0" blocktype="solid" script="explosion.lua"/>
-	<rune name="Sudden Death" id="2268" charges="1" maglv="15" mana="0" needtarget="1" blocktype="solid" script="sudden_death.lua"/>
+	<rune name="Poison Field" id="2285" charges="3" blocktype="solid" script="poison_field.lua"/>
+	<rune name="Poison Bomb" id="2286" charges="2" maglv="4" blocktype="solid" script="poison_bomb.lua"/>
+	<rune name="Poison Wall" id="2289" charges="4" maglv="5" blocktype="solid" script="poison_wall.lua"/>
+	<rune name="Envenom" id="2292" charges="1" maglv="4" needtarget="1" blocktype="solid" script="envenom.lua"/>
+	<rune name="Fire Field" id="2301" charges="3" maglv="1" blocktype="solid" script="fire_field.lua"/>
+	<rune name="Firebomb" id="2305" charges="2" maglv="5" blocktype="solid" script="firebomb.lua"/>
+	<rune name="Fire Wall" id="2303" charges="4" maglv="6" blocktype="solid" script="fire_wall.lua"/>
+	<rune name="Soulfire" id="2308" charges="2" maglv="7" needtarget="1" blocktype="solid" script="soulfire.lua"/>
+	<rune name="Fireball" id="2302" charges="2" maglv="2" blocktype="solid" script="fireball.lua"/>
+	<rune name="Great Fireball" id="2304" charges="2" maglv="4" blocktype="solid" script="great_fireball.lua"/>
+	<rune name="Energy Field" id="2277" charges="3" maglv="3" blocktype="solid" script="energy_field.lua"/>
+	<rune name="Energybomb" id="2262" charges="2" maglv="10" blocktype="solid" script="energybomb.lua"/>
+	<rune name="Energy Wall" id="2279" charges="4" maglv="9" blocktype="solid" script="energy_wall.lua"/>
+	<rune name="Light Magic Missile" id="2287" charges="5" needtarget="1" blocktype="solid" script="light_magic_missile.lua"/>
+	<rune name="Heavy Magic Missile" id="2311" charges="5" maglv="4" needtarget="1" blocktype="solid" script="heavy_magic_missile.lua"/>
+	<rune name="Explosion" id="2313" charges="3" maglv="6" blocktype="solid" script="explosion.lua"/>
+	<rune name="Sudden Death" id="2268" charges="1" maglv="15" needtarget="1" blocktype="solid" script="sudden_death.lua"/>
 	
 	-- Healing Runes
-	<rune name="Antidote Rune" id="2266" charges="1" maglv="0" mana="0" aggressive="0" needtarget="1" blocktype="solid" script="antidote.lua"/>
-	<rune name="Intense Healing Rune" id="2265" charges="1" maglv="1" mana="0" aggressive="0" needtarget="1" blocktype="solid" script="intense_healing.lua"/>
-	<rune name="Ultimate Healing Rune" id="2273" charges="1" maglv="4" mana="0" aggressive="0" needtarget="1" blocktype="solid" script="ultimate_healing.lua"/>
+	<rune name="Antidote Rune" id="2266" charges="1" aggressive="0" needtarget="1" blocktype="solid" script="healing/antidote_rune.lua"/>
+	<rune name="Intense Healing Rune" id="2265" charges="1" maglv="1" aggressive="0" needtarget="1" blocktype="solid" script="healing/intense_healing_rune.lua"/>
+	<rune name="Ultimate Healing Rune" id="2273" charges="1" maglv="4" aggressive="0" needtarget="1" blocktype="solid" script="healing/ultimate_healing_rune.lua"/>
 	
 	-- Summon Runes
 	<rune name="Convince Creature" id="2290" charges="1" maglv="5" aggressive="0" needtarget="1" blocktype="solid" function="convince"/>
 	
 	-- Support Runes
-	<rune name="Chameleon" id="2291" charges="1" maglv="4" mana="0" aggressive="0" selftarget="1" blocktype="solid" function="chameleon"/>
-	<rune name="Magic Wall" id="2293" charges="3" maglv="9" mana="0" aggressive="0" blocktype="all" script="magic_wall.lua"/>
+	<rune name="Chameleon" id="2291" charges="1" maglv="4" aggressive="0" selftarget="1" blocktype="solid" function="chameleon"/>
+	<rune name="Magic Wall" id="2293" charges="3" maglv="9" aggressive="0" blocktype="all" script="magic_wall.lua"/>
 	<rune name="Paralyze" id="2278" charges="1" maglv="18" mana="1400" needtarget="1" blocktype="solid" script="paralyze.lua"/>
 	
 	<!-- PLAYER SPELLS -->
@@ -56,7 +56,7 @@
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
 	</instant>
-	<instant name="Whirlwind Throw" words="exori hur" lvl="15" mana="40" prem="1" needtarget="1" needweapon="1" script="attack/whirldwind_throw.lua">
+	<instant name="Whirlwind Throw" words="exori hur" lvl="15" mana="40" prem="1" needtarget="1" needweapon="1" script="attack/whirlwind_throw.lua">
 		<vocation name="Knight" />
 		<vocation name="Elite Knight" />
 	</instant>
@@ -212,12 +212,19 @@
 		<vocation name="Paladin" />
 		<vocation name="Royal Paladin" />
 	</conjure>
+	<conjure name="Enchant Staff" words="exeta vis" lvl="41" mana="80" prem="1" conjureId="2433" reagentId="2401" function="conjureItem">
+		<vocation name="Master Sorcerer" />
+	</conjure>
+	<conjure name="Enchant Spear" words="exeta con" lvl="45" mana="350" soul="3" prem="1" conjureId="7367" reagentId="2389" function="conjureItem">
+		<vocation name="Paladin" />
+		<vocation name="Royal Paladin" />
+	</conjure>
 	<conjure name="Power Bolt" words="exevo con vis" lvl="59" mana="800" soul="4" prem="1" conjureId="2547" conjureCount="10" function="conjureItem">
 		<vocation name="Royal Paladin" />
 	</conjure>
 	
 	-- Summon Spells
-	<instant name="Summon Creature" words="utevo res" lvl="25" mana="0" prem="1" aggressive="0" params="1" function="summonMonster">
+	<instant name="Summon Creature" words="utevo res" lvl="25" prem="1" aggressive="0" params="1" function="summonMonster">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Master Sorcerer" />
@@ -225,10 +232,10 @@
 	</instant>
 	
 	-- House Spells
-	<instant name="Edit Sub-Owners" words="aleta som" lvl="0" mana="0" prem="1" aggressive="0" selftarget="1"  function="editHouseSubOwner"/>
-	<instant name="Edit Guest List" words="aleta sio" lvl="0" mana="0" prem="1" aggressive="0" selftarget="1" function="editHouseGuest"/>
-	<instant name="Edit Door Rights" words="aleta grav" lvl="0" mana="0" prem="1" aggressive="0" selftarget="1"  function="editHouseDoor"/>
-	<instant name="Kick Character" words="alana sio" lvl="0" mana="0" prem="1" aggressive="0" selftarget="1" params="1"  function="houseKick"/>
+	<instant name="Edit Sub-Owners" words="aleta som" lvl="0" prem="1" aggressive="0" selftarget="1"  function="editHouseSubOwner"/>
+	<instant name="Edit Guest List" words="aleta sio" lvl="0" prem="1" aggressive="0" selftarget="1" function="editHouseGuest"/>
+	<instant name="Edit Door Rights" words="aleta grav" lvl="0" prem="1" aggressive="0" selftarget="1"  function="editHouseDoor"/>
+	<instant name="Kick Character" words="alana sio" lvl="0" prem="1" aggressive="0" selftarget="1" params="1"  function="houseKick"/>
 	
 	<!-- MAKE RUNES -->
 	

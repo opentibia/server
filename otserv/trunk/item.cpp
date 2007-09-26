@@ -200,7 +200,7 @@ void Item::setID(uint16_t newid)
 	}
 }
 
-unsigned char Item::getItemCountOrSubtype() const
+uint8_t Item::getItemCountOrSubtype() const
 {
 	const ItemType& it = items[getID()];
 
