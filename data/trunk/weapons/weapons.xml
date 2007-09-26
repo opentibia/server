@@ -34,6 +34,7 @@
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
+	<melee id="7416" level="55" enabled="1" unproperly="1" function="internalLoadWeapon"/>  --Bloody Edge
 	<melee id="7384" level="60" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Mystic Blade
 	<melee id="7382" level="60" enabled="1" unproperly="1" function="internalLoadWeapon">	--Demonrage Sword
 		<vocation name="Knight"/>
@@ -71,6 +72,7 @@
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
+	<melee id="7412" level="45" enabled="1" unproperly="1" function="internalLoadWeapon"/>  --Butcher's Axe
 	<melee id="2447" level="50" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Twin Axe
 	<melee id="2427" level="55" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Guardian Halberd
 	<melee id="7389" level="60" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Heroic Axe
@@ -105,14 +107,20 @@
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
 	<melee id="2445" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Crystal Mace
+	<melee id="7451" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Shadow Sceptre
 	<melee id="7392" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Orcish Maul
 	<melee id="7426" level="40" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Amber Staff
 	<melee id="7427" level="45" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Chaos Mace
 	<melee id="2391" level="50" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--War Hammer
 	<melee id="7415" level="60" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Cranial Basher
+	<melee id="7414" level="60" enabled="1" unproperly="1" function="internalLoadWeapon">
+		<vocation name="Knight"/>
+		<vocation name="Elite Knight" showInDescription="0"/>
+	</melee>
 	<melee id="2444" level="65" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Hammer of Wrath
 	<melee id="7429" level="75" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Blessed Sceptre
 	<melee id="2453" level="75" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Arcane Staff
+	<melee id="7431" level="80" enabled="1" unporperly="1" function="internalLoadWeapon"/>  --Demonbone
 	<melee id="2421" level="85" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Thunder Hammer
 	
 -- Rods

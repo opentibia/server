@@ -15602,8 +15602,8 @@
 		<attribute key="description" value="Many mighty priests of Tibia have blessed this stake."/>
 		<attribute key="weight" value="500"/>
 	</item>
-	<item id="5943" name="">
-		<attribute key="weight" value="0"/>
+	<item id="5943" article="the" name="Morgaroth's heart">
+		<attribute key="weight" value="3500"/>
 	</item>
 	<item id="5944" article="a" name="soul orb" plural="soul orbs">
 		<attribute key="description" value="This strange object seems to be made of half spirit, half metal. It is unknown by most smiths."/>
@@ -19671,12 +19671,12 @@
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
-	<item id="7414" article="a" name="bloody edge">
-		<attribute key="weight" value="5200"/>
+	<item id="7414" article="a" name="abyss hammer">
+		<attribute key="weight" value="5500"/>
 		<attribute key="defense" value="21"/>
-		<attribute key="attack" value="43"/>
-		<attribute key="weaponType" value="sword"/>
-		<attribute key="extradef" value="-3"/>
+		<attribute key="attack" value="47"/>
+		<attribute key="weaponType" value="club"/>
+		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="7415" article="a" name="cranial basher">
 		<attribute key="weight" value="7800"/>
@@ -19685,8 +19685,12 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="extradef" value="-2"/>
 	</item>
-	<item id="7416" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7416" article="a" name="bloody edge">
+		<attribute key="weight" value="5200"/>
+		<attribute key="defense" value="21"/>
+		<attribute key="attack" value="43"/>
+		<attribute key="weaponType" value="sword"/>
+		<attribute key="extradef" value="-3"/>
 	</item>
 	<item id="7417" name="">
 		<attribute key="weight" value="0"/>
@@ -19759,8 +19763,12 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="description" value="Small flames are dancing around this strange weapon."/>
 	</item>
-	<item id="7431" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7431" article="a" name="demonbone">
+		<attribute key="weight" value="18000"/>
+		<attribute key="defense" value="38"/>
+		<attribute key="extradef" value="-2"/>
+		<attribute key="attack" value="48"/>
+		<attribute key="weaponType" value="club"/>
 	</item>
 	<item id="7432" article="a" name="furry club">
 		<attribute key="weight" value="4200"/>
@@ -19802,12 +19810,10 @@
 	<item id="7439" article="a" name="berserk potion">
 		<attribute key="weight" value="200"/>
 		<attribute key="description" value="Drinking this is said to increase your fighting skills for a while, but to decrease your defense."/>
-		//It raises fist, sword, axe, club by 5? and decreases shielding by 10.
 	</item>
 	<item id="7440" article="a" name="mastermind potion">
 		<attribute key="weight" value="200"/>
 		<attribute key="description" value="Drinking this is said to increase your magical skills for a while, but to decrease your defense."/>
-		//It raises magic level by 5? and decreases shielding by 10.
 	</item>
 	<item id="7441" article="an" name="ice cube">
 		<attribute key="weight" value="1000"/>
@@ -19818,7 +19824,6 @@
 	<item id="7443" article="a" name="bullseye potion">
 		<attribute key="weight" value="200"/>
 		<attribute key="description" value="Drinking this is said to increase your distance skill for a while, but to decrease your defense."/>
-		//It raises distance fighting by 5 and decreases shielding by 10.
 	</item>
 	<item id="7444" article="an" name="ice cube">
 		<attribute key="weight" value="8000"/>
@@ -19847,11 +19852,10 @@
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7451" article="a" name="shadow sceptre">
-		<attribute key="weight" value="3800"/> <!-- ? -->
+		<attribute key="weight" value="4100"/>
 		<attribute key="defense" value="17"/>
 		<attribute key="attack" value="39"/>
 		<attribute key="weaponType" value="club"/>
-		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="7452" article="a" name="spiked squelcher">
 		<attribute key="weight" value="6800"/>
