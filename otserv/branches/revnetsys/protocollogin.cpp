@@ -93,7 +93,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	if(g_game.getGameState() == GAME_STATE_STARTUP){
-		disconnectClient(0x14, "Gameworld is starting up. Please wait.");
+		disconnectClient(0x0A, "Gameworld is starting up. Please wait.");
 		return false;
 	}
 

@@ -81,7 +81,6 @@ Creature()
 	npings = 0;
 	internal_ping = 0;
 	lastAction = 0;
-	hasAction = false;
 	MessageBufferTicks = 0;
 	MessageBufferCount = 0;
 

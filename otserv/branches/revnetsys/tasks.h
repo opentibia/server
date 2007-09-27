@@ -25,11 +25,9 @@
 #include <boost/function.hpp>
 #include "otsystem.h"
 
-class Player;
-
 class Task{
 public:
-	virtual ~Task() {}
+	~Task() {}
 	
 	void operator()(){
 		m_f();
@@ -46,28 +44,8 @@ protected:
 	friend Task* createTask(boost::function<void (void)>);
 };
 
-class PlayerTask : public Task{
-public:
-	void setPlayer(const Player* player);
-
-protected:
-	PlayerTask(boost::function<void (void)> f);
-	~PlayerTask();
-
-	uint32_t playerId;
-	friend PlayerTask* createPlayerTask(Player* player, boost::function<void (void)>);
-};
-
-inline Task* createTask(boost::function<void (void)> f)
-{
+inline Task* createTask(boost::function<void (void)> f){
 	return new Task(f);
-}
-
-inline PlayerTask* createPlayerTask(Player* player, boost::function<void (void)> f)
-{
-	PlayerTask* task = new PlayerTask(f);
-	task->setPlayer(player);
-	return task;
 }
 
 class Dispatcher{
