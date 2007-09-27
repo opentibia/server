@@ -86,7 +86,7 @@ bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`id` = " << accno << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` " << db->escapeString(name);
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`id` = " << accno << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
 	if(result = db->storeQuery(query.str())) {
 		if(result->next()) {
 			password = result->getDataString("password");
