@@ -521,12 +521,17 @@ bool LuaScriptInterface::initState()
 	if(!m_luaState){
 		return false;
 	}
+#ifndef __USE_LUALIBRARIES__
+	//Here you load only the "safe" libraries
 	luaopen_base(m_luaState);
 	luaopen_table(m_luaState);
 	luaopen_os(m_luaState);
 	luaopen_string(m_luaState);
 	luaopen_math(m_luaState);
-	//luaL_openlibs(m_luaState);
+#else
+	//And here you load both "safe" and "unsafe" libraries
+	luaL_openlibs(m_luaState);
+#endif
 
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 
@@ -949,6 +954,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doCreateTeleport", LuaScriptInterface::luaDoCreateTeleport);
 	//doSummonCreature(name, position)
 	lua_register(m_luaState, "doSummonCreature", LuaScriptInterface::luaDoSummonCreature);
+	//doPlayerSummonCreature(cid, name, position)
+	lua_register(m_luaState, "doPlayerSummonCreature", LuaScriptInterface::luaDoPlayerSummonCreature);
 	//doRemoveCreature(cid)
 	lua_register(m_luaState, "doRemoveCreature", LuaScriptInterface::luaDoRemoveCreature);
 	//doMoveCreature(cid, direction)
@@ -1166,6 +1173,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "isItemContainer", LuaScriptInterface::luaIsItemContainer);
 	//isItemFluidContainer(itemid)
 	lua_register(m_luaState, "isItemFluidContainer", LuaScriptInterface::luaIsItemFluidContainer);
+	//isItemMoveable(itemid)
+	lua_register(m_luaState, "isItemMoveable",LuaScriptInterface::luaIsItemMoveable);
 	//getItemName(itemid)
 	lua_register(m_luaState, "getItemName", LuaScriptInterface::luaGetItemName);
 
@@ -2429,6 +2438,45 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 	uint32_t cid = env->addThing((Thing*)monster);
 
 	lua_pushnumber(L, cid);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
+{
+    Position pos;
+	uint32_t stackpos;
+	popPosition(L, pos, stackpos);
+	const char *name = popString(L);
+	uint32_t cid = popNumber(L);
+
+    ScriptEnviroment* env = getScriptEnv();
+    Player* player = env->getPlayerByUID(cid);
+	if(player){
+        Monster* monster = Monster::createMonster(name);
+		if(!monster){
+			std::string error_str = (std::string)"Monster name(" + name + (std::string)") not found";
+			reportErrorFunc(error_str);
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+
+		player->addSummon(monster);
+		if(!g_game.placeCreature(monster, (Position&)pos)){
+			player->removeSummon(monster);
+			delete monster;
+			std::string error_str = (std::string)"Can not summon monster: " + name;
+			reportErrorFunc(error_str);
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+
+        uint32_t uid = env->addThing(monster);
+		lua_pushnumber(L, uid);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
 	return 1;
 }
 
@@ -4707,6 +4755,19 @@ int LuaScriptInterface::luaIsItemFluidContainer(lua_State *L)
 	uint32_t itemid = popNumber(L);
 	const ItemType& it = Item::items[itemid];
 	if(it.isFluidContainer()){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsItemMoveable(lua_State *L)
+{
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	if(it.moveable){
 		lua_pushnumber(L, LUA_TRUE);
 	}
 	else{

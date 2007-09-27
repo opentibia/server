@@ -316,6 +316,7 @@ protected:
 	static int luaDoCreateItem(lua_State *L);
 	static int luaDoCreateTeleport(lua_State *L);
 	static int luaDoSummonCreature(lua_State *L);
+	static int luaDoPlayerSummonCreature(lua_State *L);
 	static int luaDoRemoveCreature(lua_State *L);
 	static int luaDoMoveCreature(lua_State *L);
 
@@ -497,6 +498,7 @@ protected:
 	static int luaIsItemDoor(lua_State *L);
 	static int luaIsItemContainer(lua_State *L);
 	static int luaIsItemFluidContainer(lua_State *L);
+	static int luaIsItemMoveable(lua_State *L);
 	static int luaGetItemName(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
