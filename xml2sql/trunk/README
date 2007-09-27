@@ -1,0 +1,72 @@
+XML2SQL - XML to SQL converter.
+----------
+Copyright (C) 2007 OTServ Team
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Credits:
+	Wrzasq <wrzasq@gmail.com> - coding.
+
+
+----------
+1. Using
+----------
+
+
+This program reads your XML database content and generates SQL queries that represents same data. To use it you will need boost library (boost_filesystem).
+
+It imports accounts, players and bans.
+
+For boost library go to http://www.boost.org/.
+
+
+----------
+2. Running
+----------
+
+
+By default program will try to import database from ./data/ subdirectory in current path. You can run this program on another directory by calling it:
+
+$ xml2sql ./foo/
+
+or by using infinitive path:
+
+$ xml2sql /home/wrzasq/otserv/data/
+
+XML2SQL uses two outputs - standard (stdout) for SQL queries and diagnostic (stderr) for operation status information. It is easy to figure out that to save SQL code in file which you will later be able to execute in database you should call XML2SQL this way:
+
+$ xml2sql > database.sql
+
+This will save SQL export in database.sql file and will keep informing you about conversion process status on standard screen output.
+
+So for example if you have your XML database in non-standard directory you should use:
+
+$ xml2sql /path/to/your/directory/ > database.sql
+
+XML2SQL generates code compatible with MySQL. If you want to import it's output into SQLite, or PostgreSQL database you will have to modify SQL queries.
+
+
+----------
+3. Known problems
+----------
+
+
+- Generated SQL code is compatible with MySQL. It needs to be converted if you want to use it in SQLite, or PostgreSQL.
+
+- Users has always temple of first town as it is not possible to find out which city they are bound to based on it's coordinates.
+
+- For guilds owner is set as a first found member and guild ranks has all the same access level - those informations are not stored in XML and it's impossible to gues them.
+
+- Some binary data are not yet encoded (properly, or at all).

@@ -129,9 +129,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	if(redSkullSeconds > 0){
 		//ensure that we round up the number of ticks
 		player->redSkullTicks = (redSkullSeconds + 2)*1000;
-		if(player->redSkullTicks > 0) {
-			player->skull = SKULL_RED;
-		}
+		player->skull = SKULL_RED;
 	}
 	#endif
 
