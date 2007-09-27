@@ -49,7 +49,6 @@ CREATE TABLE "players" (
     "save" BOOLEAN NOT NULL DEFAULT TRUE,
     "conditions" BYTEA NOT NULL,
     "redskulltime" BIGINT NOT NULL DEFAULT 0,
-    "redskull" BOOLEAN NOT NULL DEFAULT FALSE,
     "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
     "loss_experience" INT NOT NULL DEFAULT 10,
     "loss_mana" INT NOT NULL DEFAULT 10,

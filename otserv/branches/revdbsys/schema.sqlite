@@ -47,7 +47,6 @@ CREATE TABLE "players" (
     "save" BOOLEAN NOT NULL DEFAULT TRUE,
     "conditions" BLOB NOT NULL,
     "redskulltime" INTEGER NOT NULL DEFAULT 0,
-    "redskull" BOOLEAN NOT NULL DEFAULT FALSE,
     "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
     "loss_experience" INTEGER NOT NULL DEFAULT 10,
     "loss_mana" INTEGER NOT NULL DEFAULT 10,
@@ -254,7 +253,7 @@ BEFORE DELETE
 ON "groups"
 FOR EACH ROW
 BEGIN
-    SELECT RAISE(ROLLBACK, 'DELETE on table "guilds" violates foreign: "group_id" from table "players"')
+    SELECT RAISE(ROLLBACK, 'DELETE on table "groups" violates foreign: "group_id" from table "players"')
     WHERE (SELECT "id" FROM "players" WHERE "group_id" = OLD."id") IS NOT NULL;
 END;
 

@@ -49,7 +49,6 @@ CREATE TABLE `players` (
     `save` TINYINT(1) NOT NULL DEFAULT TRUE,
     `conditions` BLOB NOT NULL COMMENT 'drunk, poisoned etc (maybe also food and redskull)',
     `redskulltime` INT UNSIGNED NOT NULL DEFAULT 0,
-    `redskull` TINYINT(1) NOT NULL DEFAULT FALSE,
     `guildnick` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'additional nick in guild - mostly for web interfaces i think',
     `loss_experience` INT NOT NULL DEFAULT 10,
     `loss_mana` INT NOT NULL DEFAULT 10,

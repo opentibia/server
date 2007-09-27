@@ -140,6 +140,9 @@ SQLite with other drivers
 				a) On Windows use -D__USE_SQLITE__ -lsqlite3 -D__USE_MYSQL__ -lmysqlclient
 				b) On POSIX systems use ./configure --enable-mysql --enable-sqlite
 
+What about old XML files?
+	If you have your old database in XML format and want to switch to SQL database, there is XML2SQL project in our SVN tree.
+
 Different LUA configuration file
 	Default configuration file for OTServ is config.lua. In some cases you might need to use another name for 
 	it as config.lua might be ambiguous. OTServ can use otserv.lua file instead of config.lua file.

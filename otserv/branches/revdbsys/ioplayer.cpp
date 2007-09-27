@@ -66,7 +66,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	  "`vocation`,`experience`,`level`,`maglevel`,`health`,`healthmax`,`mana`,"
 	  "`manamax`,`manaspent`,`soul`,`direction`,`lookbody`,`lookfeet`,`lookhead`,"
 	  "`looklegs`,`looktype`,`lookaddons`,`posx`,`posy`,`posz`,`cap`,`lastlogin`,"
-	  "`lastip`,`save`,`conditions`,`redskulltime`,`redskull`,`guildnick`,"
+	  "`lastip`,`save`,`conditions`,`redskulltime`,`guildnick`,"
 	  "`rank_id`,`town_id`,`loss_experience`,`loss_mana`,`loss_skills`"
 	  "FROM `players` WHERE `name` = " + db->escapeString(name) )));
 		return false;
@@ -129,7 +129,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	if(redSkullSeconds > 0){
 		//ensure that we round up the number of ticks
 		player->redSkullTicks = (redSkullSeconds + 2)*1000;
-		if(result->getDataInt("redskull") == 1){
+		if(player->redSkullTicks > 0) {
 			player->skull = SKULL_RED;
 		}
 	}
@@ -487,12 +487,6 @@ bool IOPlayer::savePlayer(Player* player)
 	}
 
 	query << ", `redskulltime` = " << redSkullTime;
-	int32_t redSkull = 0;
-	if(player->skull == SKULL_RED){
-		redSkull = 1;
-	}
-
-	query << ", `redskull` = " << redSkull;
 #endif
 
 	query << " WHERE `id` = " << player->getGUID() << " LIMIT 1";
