@@ -463,7 +463,7 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `looklegs` = " << (int)player->defaultOutfit.lookLegs
 	<< ", `looktype` = " << (int)player->defaultOutfit.lookType
 	<< ", `lookaddons` = " << (int)player->defaultOutfit.lookAddons
-	<< ", `magLevel` = " << player->magLevel
+	<< ", `maglevel` = " << player->magLevel
 	<< ", `mana` = " << player->mana
 	<< ", `manamax` = " << player->manaMax
 	<< ", `manaspent` = " << player->manaSpent
@@ -490,7 +490,7 @@ bool IOPlayer::savePlayer(Player* player)
 	query << ", `redskulltime` = " << redSkullTime;
 #endif
 
-	query << " WHERE `id` = " << player->getGUID() << " LIMIT 1";
+	query << " WHERE `id` = " << player->getGUID();
 
 	if( !db->beginTransaction() )
 		return false;

@@ -12,7 +12,7 @@ CREATE TABLE "accounts" (
     "id" BIGSERIAL,
     "password" VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL for MD5*/,
     "email" VARCHAR(255) NOT NULL DEFAULT '',
-    "blocked" BOOLEAN NOT NULL DEFAULT FALSE,
+    "blocked" SMALLINT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id")
 );
 
@@ -46,7 +46,7 @@ CREATE TABLE "players" (
     "cap" INT NOT NULL DEFAULT 0,
     "lastlogin" BIGINT NOT NULL DEFAULT 0,
     "lastip" BIGINT NOT NULL DEFAULT 0,
-    "save" BOOLEAN NOT NULL DEFAULT TRUE,
+    "save" SMALLINT NOT NULL DEFAULT 0,
     "conditions" BYTEA NOT NULL,
     "redskulltime" BIGINT NOT NULL DEFAULT 0,
     "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
