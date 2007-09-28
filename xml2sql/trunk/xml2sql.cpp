@@ -67,18 +67,6 @@ bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 	return false;
 }
 
-bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
-{
-	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
-	if(nodeValue){
-		value = atof(nodeValue);
-		xmlFreeOTSERV(nodeValue);
-		return true;
-	}
-
-	return false;
-}
-
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
@@ -96,8 +84,8 @@ std::string sqlQuote(std::string& s)
 	std::string buf = "'";
 	uint32_t length = s.length();
 
-	for(int32_t i = 0; i < length; i++) {
-		switch(s[i]) {
+	for(int32_t i = 0; i < length; i++){
+		switch(s[i]){
 			case '\'':
 				buf += "\'\'";
 				break;
@@ -133,22 +121,23 @@ void putSlot(xmlNodePtr items, int slotId, int pid = 0)
 	int count, id, itemType;
 	xmlNodePtr node;
 
-	if(slotId == -1) {
+	if(slotId == -1){
 		sid = 10;
 		return;
 	}
 
-	while(items) {
-		if( !xmlStrcmp(items->name, (const xmlChar*)"item") ) {
+	while(items){
+		if( !xmlStrcmp(items->name, (const xmlChar*)"item") ){
 			readXMLInteger(items, "id", itemType);
 
-			if( !readXMLInteger(items, "count", count) ) {
+			if( !readXMLInteger(items, "count", count) ){
 				count = 0;
 			}
 
-			if(pid) {
+			if(pid){
 				id = ++sid;
-			} else {
+			}
+			else{
 				id = slotId;
 			}
 
@@ -156,7 +145,7 @@ void putSlot(xmlNodePtr items, int slotId, int pid = 0)
 
 			node = items->children;
 
-			if(node && !xmlStrcmp(node->name, (const xmlChar*)"inside") ) {
+			if(node && !xmlStrcmp(node->name, (const xmlChar*)"inside") ){
 				putSlot(node->children, slotId, id);
 			}
 		}
@@ -171,22 +160,23 @@ void putDepot(xmlNodePtr items, int depotId, int pid = 0)
 	int count, id, itemType;
 	xmlNodePtr node;
 
-	if(depotId == -1) {
+	if(depotId == -1){
 		sid = 100;
 		return;
 	}
 
-	while(items) {
-		if( !xmlStrcmp(items->name, (const xmlChar*)"item") ) {
+	while(items){
+		if( !xmlStrcmp(items->name, (const xmlChar*)"item") ){
 			readXMLInteger(items, "id", itemType);
 
-			if( !readXMLInteger(items, "count", count) ) {
+			if( !readXMLInteger(items, "count", count) ){
 				count = 0;
 			}
 
-			if(pid) {
+			if(pid){
 				id = ++sid;
-			} else {
+			}
+			else{
 				id = depotId;
 			}
 
@@ -194,7 +184,7 @@ void putDepot(xmlNodePtr items, int depotId, int pid = 0)
 
 			node = items->children;
 
-			if(node && !xmlStrcmp(node->name, (const xmlChar*)"inside") ) {
+			if(node && !xmlStrcmp(node->name, (const xmlChar*)"inside") ){
 				putDepot(node->children, depotId, id);
 			}
 		}
@@ -215,11 +205,11 @@ int main(int argc, char** argv)
 	time_t now = time(NULL);
 	std::map<uint32_t, int> premium;
 
-	if(argc > 1) {
+	if(argc > 1){
 		path = argv[1];
 	}
 
-	if( !boost::filesystem::exists(path) ) {
+	if( !boost::filesystem::exists(path) ){
 		std::cerr << path << " XML source directory does not exists." << std::endl;
 		return 1;
 	}
@@ -228,7 +218,7 @@ int main(int argc, char** argv)
 
 	dir_name.str("");
 	dir_name << path << DIR_SEPARATOR << "accounts" << DIR_SEPARATOR;
-	if( boost::filesystem::exists( dir_name.str() ) ) {
+	if( boost::filesystem::exists( dir_name.str() ) ){
 		std::cout << "INSERT INTO `groups` (`name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) VALUES ('XML import group', 0, 0, 1000, 50);" << std::endl;
 		std::cout << "SET @DEFAULT_GROUP_ID := LAST_INSERT_ID();" << std::endl;
 
@@ -239,18 +229,18 @@ int main(int argc, char** argv)
 		boost::filesystem::path accounts_path( boost::filesystem::initial_path<boost::filesystem::path>() );
 		accounts_path = boost::filesystem::system_complete( boost::filesystem::path( dir_name.str(), boost::filesystem::native) );
 
-		for( boost::filesystem::directory_iterator accounts_dir(accounts_path); accounts_dir != dir_end; accounts_dir++) {
+		for( boost::filesystem::directory_iterator accounts_dir(accounts_path); accounts_dir != dir_end; accounts_dir++){
 			leaf = accounts_dir->path().leaf();
 
-			if( boost::filesystem::is_regular( accounts_dir->status() ) && leaf.substr( leaf.length() - 4) == ".xml") {
+			if( boost::filesystem::is_regular( accounts_dir->status() ) && leaf.substr( leaf.length() - 4) == ".xml"){
 				std::cerr << "Reading " << leaf << " account file...";
 
 				xml = xmlParseFile( ( dir_name.str() + leaf).c_str() );
 
-				if(xml) {
+				if(xml){
 					root = xmlDocGetRootElement(xml);
 
-					if( xmlStrcmp(root->name, (const xmlChar*)"account") ) {
+					if( xmlStrcmp(root->name, (const xmlChar*)"account") ){
 						xmlFreeDoc(xml);
 						std::cerr << " failed." << std::endl;
 						continue;
@@ -258,13 +248,14 @@ int main(int argc, char** argv)
 
 					id = atoi( leaf.substr(0, leaf.length() - 4).c_str() );
 
-					if( !readXMLString(root, "pass", password) ) {
+					if( !readXMLString(root, "pass", password) ){
 						password = "";
 					}
 
-					if( !readXMLInteger(root, "premDays", premDays) ) {
+					if( !readXMLInteger(root, "premDays", premDays) ){
 						premium[id] = 0;
-					} else {
+					}
+					else{
 						premium[id] = now + premDays * 86400;
 					}
 
@@ -272,7 +263,8 @@ int main(int argc, char** argv)
 
 					std::cerr << " done." << std::endl;
 					xmlFreeDoc(xml);
-				} else {
+				}
+				else{
 					std::cerr << " failed." << std::endl;
 				}
 			}
@@ -281,7 +273,7 @@ int main(int argc, char** argv)
 
 	dir_name.str("");
 	dir_name << path << DIR_SEPARATOR << "players" << DIR_SEPARATOR;
-	if( boost::filesystem::exists( dir_name.str() ) ) {
+	if( boost::filesystem::exists( dir_name.str() ) ){
 		std::string playerName, groupName, spellName, guildName, guildNick, guildRank;
 		int playerAccount, playerSex, playerVocation, playerExperience, playerLevel, playerMagLevel, vipId;
 		int groupAccess, groupMaxDepotItems;
@@ -296,18 +288,18 @@ int main(int argc, char** argv)
 		boost::filesystem::path players_path( boost::filesystem::initial_path<boost::filesystem::path>() );
 		players_path = boost::filesystem::system_complete( boost::filesystem::path( dir_name.str(), boost::filesystem::native) );
 
-		for( boost::filesystem::directory_iterator players_dir(players_path); players_dir != dir_end; players_dir++) {
+		for( boost::filesystem::directory_iterator players_dir(players_path); players_dir != dir_end; players_dir++){
 			leaf = players_dir->path().leaf();
 
-			if( boost::filesystem::is_regular( players_dir->status() ) && leaf.substr( leaf.length() - 4) == ".xml" && leaf != "players.xml") {
+			if( boost::filesystem::is_regular( players_dir->status() ) && leaf.substr( leaf.length() - 4) == ".xml" && leaf != "players.xml"){
 				std::cerr << "Reading " << leaf << " player file...";
 
 				xml = xmlParseFile( ( dir_name.str() + leaf).c_str() );
 
-				if(xml) {
+				if(xml){
 					root = xmlDocGetRootElement(xml);
 
-					if( xmlStrcmp(root->name, (const xmlChar*)"player") ) {
+					if( xmlStrcmp(root->name, (const xmlChar*)"player") ){
 						xmlFreeDoc(xml);
 						std::cerr << " failed." << std::endl;
 						continue;
@@ -341,73 +333,76 @@ int main(int argc, char** argv)
 
 					node = root->children;
 
-					while(node) {
-						if( !xmlStrcmp(node->name, (const xmlChar*)"mana") ) {
+					while(node){
+						if( !xmlStrcmp(node->name, (const xmlChar*)"mana") ){
 							xmlMana = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"health") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"health") ){
 							xmlHealth = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"look") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"look") ){
 							xmlLook = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"spawn") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"spawn") ){
 							xmlSpawn = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"guild") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"guild") ){
 							xmlGuild = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"skills") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"skills") ){
 							xmlSkills = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"inventory") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"inventory") ){
 							xmlInventory = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"depots") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"depots") ){
 							xmlDepots = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"storage") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"storage") ){
 							xmlStorage = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"viplist") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"viplist") ){
 							xmlVipList = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"knownspells") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"knownspells") ){
 							xmlKownSpells = node;
 						}
-						else if( !xmlStrcmp(node->name, (const xmlChar*)"conditions") ) {
+						else if( !xmlStrcmp(node->name, (const xmlChar*)"conditions") ){
 							xmlConditions = node;
 						}
 
 						node = node->next;
 					}
 
-					if(xmlHealth) {
+					if(xmlHealth){
 						readXMLInteger(xmlHealth, "now", playerHealth);
 						readXMLInteger(xmlHealth, "max", playerHealthMax);
-					} else {
+					}
+					else{
 						playerHealth = 100;
 						playerHealthMax = 100;
 					}
 
-					if(xmlMana) {
+					if(xmlMana){
 						readXMLInteger(xmlMana, "now", playerMana);
 						readXMLInteger(xmlMana, "max", playerManaMax);
 						readXMLInteger(xmlMana, "spent", playerManaSpent);
-					} else {
+					}
+					else{
 						playerMana = 100;
 						playerManaMax = 100;
 						playerManaSpent = 0;
 					}
 
-					if(xmlLook) {
+					if(xmlLook){
 						readXMLInteger(xmlLook, "head", playerLookHead);
 						readXMLInteger(xmlLook, "body", playerLookBody);
 						readXMLInteger(xmlLook, "legs", playerLookLegs);
 						readXMLInteger(xmlLook, "feet", playerLookFeet);
 						readXMLInteger(xmlLook, "type", playerLookType);
 						readXMLInteger(xmlLook, "addons", playerLookAddons);
-					} else {
+					}
+					else{
 						playerLookHead = 10;
 						playerLookBody = 10;
 						playerLookLegs = 10;
@@ -416,11 +411,12 @@ int main(int argc, char** argv)
 						playerLookAddons = 0;
 					}
 
-					if(xmlSpawn) {
+					if(xmlSpawn){
 						readXMLInteger(xmlSpawn, "x", playerPosX);
 						readXMLInteger(xmlSpawn, "y", playerPosY);
 						readXMLInteger(xmlSpawn, "z", playerPosZ);
-					} else {
+					}
+					else{
 						playerPosX = 0;
 						playerPosY = 0;
 						playerPosZ = 0;
@@ -429,11 +425,11 @@ int main(int argc, char** argv)
 					std::cout << "INSERT INTO `players` (`name`, `account_id`, `group_id`, `premend`, `sex`, `vocation`, `town_id`, `experience`, `level`, `maglevel`, `cap`, `soul`, `direction`, `lastlogin`, `loss_experience`, `loss_mana`, `loss_skills`, `health`, `healthmax`, `mana`, `manamax`, `manaspent`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, `posz`, `conditions`) VALUES (" << sqlQuote(playerName) << ", " << playerAccount << ", @GROUP_ID, " << premium[playerAccount] << ", " << playerSex << ", " << playerVocation << ", 1, " << playerExperience << ", " << playerLevel << ", " << playerMagLevel << ", " << playerCap << ", " << playerSoul << ", " << playerDirection << ", " << playerLastLogin << ", " << playerLossExperience << ", " << playerLossMana << ", " << playerLossSkills << ", " << playerHealth << ", " << playerHealthMax << ", " << playerMana << ", " << playerManaMax << ", " << playerManaSpent << ", " << playerLookBody << ", " << playerLookFeet << ", " << playerLookHead << ", " << playerLookLegs << ", " << playerLookType << ", " << playerLookAddons << ", " << playerPosX << ", " << playerPosY << ", " << playerPosZ << ", '');" << std::endl;
 					std::cout << "SET @PLAYER_ID := LAST_INSERT_ID();" << std::endl;
 
-					if(xmlSkills) {
+					if(xmlSkills){
 						node = xmlSkills->children;
 
-						while(node) {
-							if( !xmlStrcmp(node->name, (const xmlChar*)"skill") ) {
+						while(node){
+							if( !xmlStrcmp(node->name, (const xmlChar*)"skill") ){
 								readXMLInteger(node, "skillid", skillId);
 								readXMLInteger(node, "level", skillValue);
 								readXMLInteger(node, "tries", skillCount);
@@ -445,11 +441,11 @@ int main(int argc, char** argv)
 						}
 					}
 
-					if(xmlStorage) {
+					if(xmlStorage){
 						node = xmlStorage->children;
 
-						while(node) {
-							if( !xmlStrcmp(node->name, (const xmlChar*)"data") ) {
+						while(node){
+							if( !xmlStrcmp(node->name, (const xmlChar*)"data") ){
 								readXMLInteger(node, "key", storageKey);
 								readXMLInteger(node, "value", storageValue);
 
@@ -460,11 +456,11 @@ int main(int argc, char** argv)
 						}
 					}
 
-					if(xmlKownSpells) {
+					if(xmlKownSpells){
 						node = xmlKownSpells->children;
 
-						while(node) {
-							if( !xmlStrcmp(node->name, (const xmlChar*)"spell") ) {
+						while(node){
+							if( !xmlStrcmp(node->name, (const xmlChar*)"spell") ){
 								readXMLString(node, "name", spellName);
 
 								std::cout << "INSERT INTO `player_spells` (`player_id`, `name`) VALUES (@PLAYER_ID, " << sqlQuote(spellName) << ");" << std::endl;
@@ -474,11 +470,11 @@ int main(int argc, char** argv)
 						}
 					}
 
-					if(xmlVipList) {
+					if(xmlVipList){
 						node = xmlVipList->children;
 
-						while(node) {
-							if( !xmlStrcmp(node->name, (const xmlChar*)"vip") ) {
+						while(node){
+							if( !xmlStrcmp(node->name, (const xmlChar*)"vip") ){
 								readXMLInteger(node, "playerguid", vipId);
 
 								std::cout << "INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES (@PLAYER_ID, " << vipId << ");" << std::endl;
@@ -488,12 +484,12 @@ int main(int argc, char** argv)
 						}
 					}
 
-					if(xmlInventory) {
+					if(xmlInventory){
 						node = xmlInventory->children;
 						putSlot(NULL, -1);
 
-						while(node) {
-							if( !xmlStrcmp(node->name, (const xmlChar*)"slot") ) {
+						while(node){
+							if( !xmlStrcmp(node->name, (const xmlChar*)"slot") ){
 								readXMLInteger(node, "slotid", slotId);
 
 								putSlot(node->children, slotId);
@@ -503,12 +499,12 @@ int main(int argc, char** argv)
 						}
 					}
 
-					if(xmlDepots) {
+					if(xmlDepots){
 						node = xmlDepots->children;
 						putDepot(NULL, -1);
 
-						while(node) {
-							if( !xmlStrcmp(node->name, (const xmlChar*)"depot") ) {
+						while(node){
+							if( !xmlStrcmp(node->name, (const xmlChar*)"depot") ){
 								readXMLInteger(node, "depotid", depotId);
 
 								putDepot(node->children, depotId);
@@ -518,7 +514,7 @@ int main(int argc, char** argv)
 						}
 					}
 
-					if(xmlGuild) {
+					if(xmlGuild){
 						readXMLString(xmlGuild, "name", guildName);
 						readXMLString(xmlGuild, "rank", guildRank);
 						readXMLString(xmlGuild, "nick", guildNick);
@@ -532,7 +528,8 @@ int main(int argc, char** argv)
 
 					std::cerr << " done." << std::endl;
 					xmlFreeDoc(xml);
-				} else {
+				}
+				else{
 					std::cerr << " failed." << std::endl;
 				}
 			}
@@ -541,7 +538,7 @@ int main(int argc, char** argv)
 
 	dir_name.str("");
 	dir_name << path << DIR_SEPARATOR << "bans.xml";
-	if( boost::filesystem::exists( dir_name.str() ) ) {
+	if( boost::filesystem::exists( dir_name.str() ) ){
 		int banTime;
 		int banType;
 		int banTarget;
@@ -551,20 +548,21 @@ int main(int argc, char** argv)
 
 		xml = xmlParseFile( dir_name.str().c_str() );
 
-		if(xml) {
+		if(xml){
 			root = xmlDocGetRootElement(xml);
 
-			if( xmlStrcmp(root->name, (const xmlChar*)"bans") ) {
+			if( xmlStrcmp(root->name, (const xmlChar*)"bans") ){
 				xmlFreeDoc(xml);
 				std::cerr << " failed." << std::endl;
-			} else {
+			}
+			else{
 				node = root->children;
-				while(node) {
-					if( !xmlStrcmp(node->name, (const xmlChar*)"ban") ) {
-						if( readXMLInteger(node, "type", banType) ) {
+				while(node){
+					if( !xmlStrcmp(node->name, (const xmlChar*)"ban") ){
+						if( readXMLInteger(node, "type", banType) ){
 							readXMLInteger(node, "time", banTime);
 
-							switch(banType) {
+							switch(banType){
 								case 1:
 									readXMLInteger(node, "ip", banTarget);
 									readXMLInteger(node, "mask", banMask);
@@ -589,10 +587,12 @@ int main(int argc, char** argv)
 
 				std::cerr << " done." << std::endl;
 			}
-		} else {
+		}
+		else{
 			std::cerr << " failed." << std::endl;
 		}
-	} else {
+	}
+	else{
 		std::cerr << "No bans.xml file." << std::endl;
 	}
 

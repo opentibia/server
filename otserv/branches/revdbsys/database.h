@@ -67,7 +67,7 @@ typedef DBRES_CLASS DBResult;
 
 class DBQuery;
 
-enum DBParam_t {
+enum DBParam_t{
 	DBPARAM_MULTIINSERT = 1
 };
 
@@ -174,18 +174,19 @@ private:
  * Database* db = Database::getInstance();
  * DBResult* result;
  * 
- * if(result = db->storeQuery("SELECT `id`, `name`, `conditions` FROM `players`")) {
+ * if(result = db->storeQuery("SELECT `id`, `name`, `conditions` FROM `players`")){
  *	unsigned long size;
  *	const char* conditions;
  *	// next() will return false when there are no more records
- *	while(result->next()) {
+ *	while(result->next()){
  *		conditions = db->getDataStream("conditions", &size);
  *		std::cout << "Player " << result->getDataString("name") << " with ID " << player->getDataInt("id") << " has " << size << " bytes in conditions stream." << std::endl;
  *	}
  * 
  *	// remember about this
  *	db->freeResult(result);
- * } else {
+ * }
+ * else{
  *	std::cout << "Error during SELECT query." << std::endl;
  * }
  * </code>

@@ -28,7 +28,8 @@
 #include "definitions.h"
 
 /** Baseclass for all Player-Loaders */
-class IOAccount {
+class IOAccount
+{
   public:
 	static IOAccount* instance();
 

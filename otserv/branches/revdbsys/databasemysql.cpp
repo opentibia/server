@@ -36,7 +36,7 @@ DatabaseMySQL::DatabaseMySQL()
 	m_connected = false;
 
 	// connection handle initialization
-	if( !mysql_init(&m_handle) ) {
+	if( !mysql_init(&m_handle) ){
 		std::cout << "Failed to initialize MySQL connection handle." << std::endl;
 		return;
 	}
@@ -46,7 +46,7 @@ DatabaseMySQL::DatabaseMySQL()
 	mysql_options(&m_handle, MYSQL_OPT_RECONNECT, &reconnect);
 
 	// connects to database
-	if( !mysql_real_connect(&m_handle, g_config.getString(ConfigManager::SQL_HOST).c_str(), g_config.getString(ConfigManager::SQL_USER).c_str(), g_config.getString(ConfigManager::SQL_PASS).c_str(), g_config.getString(ConfigManager::SQL_DB).c_str(), g_config.getNumber(ConfigManager::SQL_PORT), NULL, 0) ) {
+	if( !mysql_real_connect(&m_handle, g_config.getString(ConfigManager::SQL_HOST).c_str(), g_config.getString(ConfigManager::SQL_USER).c_str(), g_config.getString(ConfigManager::SQL_PASS).c_str(), g_config.getString(ConfigManager::SQL_DB).c_str(), g_config.getNumber(ConfigManager::SQL_PORT), NULL, 0) ){
 		std::cout << "Failed to connect to database. MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		return;
 	}
@@ -61,7 +61,7 @@ DatabaseMySQL::~DatabaseMySQL()
 
 int DatabaseMySQL::getParam(DBParam_t param)
 {
-	switch(param) {
+	switch(param){
 		case DBPARAM_MULTIINSERT:
 			return true;
 			break;
@@ -82,7 +82,7 @@ bool DatabaseMySQL::rollback()
 	std::cout << "ROLLBACK" << std::endl;
 	#endif
 
-	if( mysql_rollback(&m_handle) != 0) {
+	if( mysql_rollback(&m_handle) != 0){
 		std::cout << "mysql_rollback(): MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		return false;
 	}
@@ -98,7 +98,7 @@ bool DatabaseMySQL::commit()
 	#ifdef __SQL_QUERY_DEBUG__
 	std::cout << "COMMIT" << std::endl;
 	#endif
-	if( mysql_commit(&m_handle) != 0) {
+	if( mysql_commit(&m_handle) != 0){
 		std::cout << "mysql_commit(): MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		return false;
 	}
@@ -118,7 +118,7 @@ bool DatabaseMySQL::executeQuery(const std::string &query)
 	bool state = true;
 
 	// executes the query
-	if( mysql_real_query(&m_handle, query.c_str(), query.length() ) != 0) {
+	if( mysql_real_query(&m_handle, query.c_str(), query.length() ) != 0){
 		std::cout << "mysql_real_query(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
 
@@ -166,7 +166,7 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 	MYSQL_RES* m_res = mysql_store_result(&m_handle);
 
 	// error occured
-	if(!m_res) {
+	if(!m_res){
 		std::cout << "mysql_store_result(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
 
@@ -214,7 +214,7 @@ void DatabaseMySQL::freeResult(DBResult* res)
 int32_t MySQLResult::getDataInt(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() ) {
+	if(it != m_listNames.end() ){
 		if(m_row[it->second] == NULL)
 			return 0;
 		else
@@ -228,7 +228,7 @@ int32_t MySQLResult::getDataInt(const std::string &s)
 int64_t MySQLResult::getDataLong(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() ) {
+	if(it != m_listNames.end() ){
 		if(m_row[it->second] == NULL)
 			return 0;
 		else
@@ -242,7 +242,7 @@ int64_t MySQLResult::getDataLong(const std::string &s)
 std::string MySQLResult::getDataString(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() ) {
+	if(it != m_listNames.end() ){
 		if(m_row[it->second] == NULL)
 			return std::string("");
 		else
@@ -256,11 +256,12 @@ std::string MySQLResult::getDataString(const std::string &s)
 const char* MySQLResult::getDataStream(const std::string &s, unsigned long &size)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() ) {
-		if(m_row[it->second] == NULL) {
+	if(it != m_listNames.end() ){
+		if(m_row[it->second] == NULL){
 			size = 0;
 			return NULL;
-		} else {
+		}
+		else{
 			size = mysql_fetch_lengths(m_handle)[it->second];
 			return m_row[it->second];
 		}
@@ -284,7 +285,7 @@ MySQLResult::MySQLResult(MYSQL_RES* res)
 
 	MYSQL_FIELD* field;
 	int32_t i = 0;
-	while( field = mysql_fetch_field(m_handle) ) {
+	while( field = mysql_fetch_field(m_handle) ){
 		m_listNames[field->name] = i;
 		i++;
 	}

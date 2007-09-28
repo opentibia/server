@@ -36,7 +36,8 @@ DatabaseSQLite::DatabaseSQLite()
 	if( FAILED( sqlite3_open(g_config.getString(ConfigManager::SQL_DB).c_str(), &m_handle) ) ){
 		std::cout << "Failed to initialize SQLite connection." << std::endl;
 		sqlite3_close(m_handle);
-	} else {
+	}
+	else{
 		m_connected = true;
 	}
 }
@@ -48,7 +49,7 @@ DatabaseSQLite::~DatabaseSQLite()
 
 int DatabaseSQLite::getParam(DBParam_t param)
 {
-	switch(param) {
+	switch(param){
 		case DBPARAM_MULTIINSERT:
 			return false;
 			break;
@@ -77,10 +78,10 @@ std::string DatabaseSQLite::_parse(const std::string &s)
 	query.reserve(s.size());
 	bool inString = false;
 	uint8_t ch;
-	for(int a = 0; a < s.length(); a++) {
+	for(int a = 0; a < s.length(); a++){
 		ch = s[a];
 
-		if(ch == '\'') {
+		if(ch == '\''){
 			if(inString && s[a + 1] != '\'')
 				inString = false;
 			else
@@ -108,14 +109,14 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 	std::string buf = _parse(query);
 	sqlite3_stmt* stmt;
 	// prepares statement
-	if( FAILED( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) ) ) {
+	if( FAILED( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) ) ){
 		std::cout << "sqlite3_prepare_v2(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return false;
 	}
 
 	// executes it once
 	int ret = sqlite3_step(stmt);
-	if( FAILED(ret) && ret != SQLITE_DONE && ret != SQLITE_ROW) {
+	if( FAILED(ret) && ret != SQLITE_DONE && ret != SQLITE_ROW){
 		std::cout << "sqlite3_step(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return false;
 	}
@@ -139,7 +140,7 @@ DBResult* DatabaseSQLite::storeQuery(const std::string &query)
 	std::string buf = _parse(query);
 	sqlite3_stmt* stmt;
 	// prepares statement
-	if( FAILED( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) ) ) {
+	if( FAILED( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) ) ){
 		std::cout << "sqlite3_prepare_v2(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return NULL;
 	}
@@ -170,7 +171,7 @@ std::string DatabaseSQLite::escapeBlob(const char* s, uint32_t length)
 
 	char* hex = new char[2];
 
-	for(int32_t i = 0; i < length; i++) {
+	for(int32_t i = 0; i < length; i++){
 		sprintf(hex, "%02x", s[i]);
 		buf += hex;
 	}
@@ -211,7 +212,7 @@ int64_t SQLiteResult::getDataLong(const std::string &s)
 std::string SQLiteResult::getDataString(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() ) {
+	if(it != m_listNames.end() ){
 		std::string value = (const char*)sqlite3_column_text(m_handle, it->second);
 		return value;
 	}
@@ -223,7 +224,7 @@ std::string SQLiteResult::getDataString(const std::string &s)
 const char* SQLiteResult::getDataStream(const std::string &s, unsigned long &size)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() ) {
+	if(it != m_listNames.end() ){
 		const char* value = (const char*)sqlite3_column_blob(m_handle, it->second);
 		size = sqlite3_column_bytes(m_handle, it->second);
 		return value;

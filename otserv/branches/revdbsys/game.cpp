@@ -228,7 +228,8 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
     if (_this->eventList.size() == 0) {
       // unlock mutex and wait for signal
       ret = OTSYS_THREAD_WAITSIGNAL(_this->eventSignal, _this->eventLock);
-    } else {
+    }
+    else {
       // unlock mutex and wait for signal or timeout
       ret = OTSYS_THREAD_WAITSIGNAL_TIMED(_this->eventSignal, _this->eventLock, _this->eventList.top()->getCycle());
     }

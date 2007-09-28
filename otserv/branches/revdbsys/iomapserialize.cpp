@@ -53,7 +53,7 @@ bool IOMapSerialize::loadMap(Map* map, const std::string& identifier)
 {
 	Database* db = Database::instance();
 
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it) {
+	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		//load tile
 		House* house = it->second;
 		for(HouseTileList::iterator it = house->getHouseTileBegin(); it != house->getHouseTileEnd(); ++it)
@@ -86,7 +86,7 @@ bool IOMapSerialize::saveMap(Map* map, const std::string& identifier)
 		House* house = it->second;
 		for(HouseTileList::iterator it = house->getHouseTileBegin(); it != house->getHouseTileEnd(); ++it){
 			++tileId;
-			if( !saveTile(db, tileId, *it) ) {
+			if( !saveTile(db, tileId, *it) ){
 				db->rollback();
 				return false;
 			}
@@ -157,13 +157,13 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 			containerStackList.push_back(ContainerStackList_Pair(item->getContainer(), runningID));
 	}
 
-	while(containerStackList.size() > 0) {
+	while(containerStackList.size() > 0){
 		ContainerStackList_Pair csPair = containerStackList.front();
 		container = csPair.first;
 		parentid = csPair.second;
 		containerStackList.pop_front();
 
-		for(ItemList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+		for(ItemList::const_iterator it = container->getItems(); it != container->getEnd(); ++it){
 			item = (*it);
 			++runningID;
 			if(item->getContainer())
@@ -205,7 +205,7 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 	if(!result)
 		return false;
 
-	if(!result->next()) {
+	if(!result->next()){
 		db.freeResult(result);
 		return false;
 	}
@@ -217,10 +217,10 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 	query << "SELECT * FROM `tile_items` WHERE `tile_id` = "
 	<< tileId
 	<< " ORDER BY `sid` DESC";
-	if(result = db.storeQuery(query.str())) {
+	if(result = db.storeQuery(query.str())){
 		Item* item = NULL;
 
-		while(result->next()) {
+		while(result->next()){
 			int sid = result->getDataInt("sid");
 			int pid = result->getDataInt("pid");
 			int type = result->getDataInt("itemtype");
@@ -315,10 +315,10 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 	if(result = db->storeQuery("SELECT * FROM `houses`"))
 		return false;
 
-	while(result->next()) {
+	while(result->next()){
 		int houseid = result->getDataInt("id");
 		House* house = Houses::getInstance().getHouse(houseid);
-		if(house) {
+		if(house){
 			int ownerid = result->getDataInt("owner");
 			int paid = result->getDataInt("paid");
 			int payRentWarnings = result->getDataInt("warnings");
@@ -333,10 +333,10 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		House* house = it->second;
-		if(house->getHouseOwner() != 0 && house->getHouseId() != 0) {
+		if(house->getHouseOwner() != 0 && house->getHouseId() != 0){
 			query << "SELECT `listid`, `list` FROM `house_lists` WHERE `house_id` = " << house->getHouseId();
-			if(result = db->storeQuery(query.str())) {
-				while(result->next()) {
+			if(result = db->storeQuery(query.str())){
+				while(result->next()){
 					int listid = result->getDataInt("listid");
 					std::string list = result->getDataString("list");
 					house->setAccessList(listid, list);
@@ -358,7 +358,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 	if( !db->beginTransaction() )
 		return false;
 
-	if(!db->executeQuery("DELETE FROM `houses`")) {
+	if(!db->executeQuery("DELETE FROM `houses`")){
 		db->rollback();
 		return false;
 	}
@@ -372,13 +372,13 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 
 		query << house->getHouseId() << ", " << house->getHouseOwner() << ", " << house->getPaidUntil() << ", " << house->getPayRentWarnings();
 
-		if(!stmt.addRow(query)) {
+		if(!stmt.addRow(query)){
 			db->rollback();
 			return false;
 		}
 	}
 
-	if(!stmt.execute()) {
+	if(!stmt.execute()){
 		db->rollback();
 		return false;
 	}
@@ -393,7 +393,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 		if(house->getAccessList(GUEST_LIST, listText) && listText != ""){
 			query << house->getHouseId() << ", " << GUEST_LIST << ", " << listText;
 
-			if(!stmt.addRow(query)) {
+			if(!stmt.addRow(query)){
 				db->rollback();
 				return false;
 			}
@@ -401,7 +401,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 		if(house->getAccessList(SUBOWNER_LIST, listText) && listText != ""){
 			query << house->getHouseId() << ", " << SUBOWNER_LIST << ", " << listText;
 
-			if(!stmt.addRow(query)) {
+			if(!stmt.addRow(query)){
 				db->rollback();
 				return false;
 			}
@@ -412,7 +412,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 			if(door->getAccessList(listText) && listText != ""){
 				query << house->getHouseId() << ", " << door->getDoorId() << ", " << listText;
 
-				if(!stmt.addRow(query)) {
+				if(!stmt.addRow(query)){
 					db->rollback();
 					return false;
 				}
@@ -420,7 +420,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
 		}
 	}
 
-	if(!stmt.execute()) {
+	if(!stmt.execute()){
 		db->rollback();
 		return false;
 	}

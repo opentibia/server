@@ -47,7 +47,7 @@ DatabasePgSQL::~DatabasePgSQL()
 
 int DatabasePgSQL::getParam(DBParam_t param)
 {
-	switch(param) {
+	switch(param){
 		case DBPARAM_MULTIINSERT:
 			return true;
 			break;
@@ -82,7 +82,7 @@ bool DatabasePgSQL::executeQuery(const std::string &query)
 	PGresult* res = PQexec(m_handle, _parse(query).c_str() );
 	ExecStatusType stat = PQresultStatus(res);
 
-	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK) {
+	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK){
 		std::cout << "PQexec(): " << query << ": " << PQresultErrorMessage(res) << std::endl;
 		PQclear(res);
 		return false;
@@ -106,7 +106,7 @@ DBResult* DatabasePgSQL::storeQuery(const std::string &query)
 	PGresult* res = PQexec(m_handle, _parse(query).c_str() );
 	ExecStatusType stat = PQresultStatus(res);
 
-	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK) {
+	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK){
 		std::cout << "PQexec(): " << query << ": " << PQresultErrorMessage(res) << std::endl;
 		PQclear(res);
 		return false;
@@ -159,10 +159,10 @@ std::string DatabasePgSQL::_parse(const std::string &s)
 	bool inString = false;
 	uint8_t ch;
 	uint8_t param = 0;
-	for(int a = 0; a < s.length(); a++) {
+	for(int a = 0; a < s.length(); a++){
 		ch = s[a];
 
-		if(ch == '\'') {
+		if(ch == '\''){
 			if(inString && s[a + 1] != '\'')
 				inString = false;
 			else

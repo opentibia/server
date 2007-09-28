@@ -69,9 +69,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	  "`lastip`,`save`,`conditions`,`redskulltime`,`guildnick`,"
 	  "`rank_id`,`town_id`,`loss_experience`,`loss_mana`,`loss_skills`"
 	  "FROM `players` WHERE `name` = " + db->escapeString(name) )));
-		return false;
 
-	if(!result->next()) {
+	if(!result->next()){
 		db->freeResult(result);
 		return false;
 	}
@@ -170,7 +169,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	#ifndef __USE_SQL_PREMDAYS__
 	time_t premEnd = result->getDataInt("premend");
 	time_t timeNow = time(NULL);
-	if(premEnd != 0 && premEnd < timeNow) {
+	if(premEnd != 0 && premEnd < timeNow){
 		//TODO: remove every premium property of the player
 		// outfit, vocation, temple, ...
 		// can it be done as database trigger?
@@ -179,7 +178,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 		query << "UPDATE `players` SET `premend` = 0 WHERE `id` = " << player->getGUID();
 		db->executeQuery(query.str());
 		query.str("");
-	} else {
+	}
+	else{
 		player->premiumDays = (premEnd - timeNow)/86400;
 	}
 	#endif
@@ -187,10 +187,10 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	player->guildNick = result->getDataString("guildnick");
 	db->freeResult(result);
 
-	if(rankid) {
+	if(rankid){
 		query << "SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, `guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` FROM `guild_ranks`, `guilds` WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds.id`";
-		if(result = db->storeQuery(query.str())) {
-			if(result->next()) {
+		if(result = db->storeQuery(query.str())){
+			if(result->next()){
 				player->guildName = result->getDataString("guildname");
 				player->guildLevel = result->getDataInt("level");
 				player->guildId = result->getDataInt("guildid");
@@ -207,7 +207,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	if(!(result = db->storeQuery(query.str())))
 		return false;
 
-	if(!result->next()) {
+	if(!result->next()){
 		db->freeResult(result);
 		return false;
 	}
@@ -219,11 +219,11 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	// so we query the skill table
 	query.str("");
 	query << "SELECT `skillid`, `value`, `count` FROM `player_skills` WHERE `player_id` = " << player->getGUID();
-	if(result = db->storeQuery(query.str())) {
+	if(result = db->storeQuery(query.str())){
 		//now iterate over the skills
-		while(result->next()) {
+		while(result->next()){
 			int skillid = result->getDataInt("skillid");
-			if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST) {
+			if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST){
 				player->skills[skillid][SKILL_LEVEL] = result->getDataInt("value");
 				player->skills[skillid][SKILL_TRIES] = result->getDataInt("count");
 			}
@@ -234,8 +234,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 
 	query.str("");
 	query << "SELECT `name` FROM `player_spells` WHERE `player_id` = " << player->getGUID();
-	if(result = db->storeQuery(query.str())) {
-		while(result->next()) {
+	if(result = db->storeQuery(query.str())){
+		while(result->next()){
 			std::string spellName = result->getDataString("name");
 			player->learnedInstantSpellList.push_back(spellName);
 		}
@@ -248,18 +248,19 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 
 	query.str("");
 	query << "SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_items` WHERE `player_id` = " << player->getGUID() << " ORDER BY `sid` DESC";
-	if(result = db->storeQuery(query.str()) ) {
+	if(result = db->storeQuery(query.str()) ){
 		loadItems(itemMap, result);
 
 		ItemMap::reverse_iterator it;
 		ItemMap::iterator it2;
 
-		for(it = itemMap.rbegin(); it != itemMap.rend(); ++it) {
+		for(it = itemMap.rbegin(); it != itemMap.rend(); ++it){
 			Item* item = it->second.first;
 			int pid = it->second.second;
 			if(pid >= 1 && pid <= 10){
 				player->__internalAddThing(pid, item);
-			} else {
+			}
+			else{
 				it2 = itemMap.find(pid);
 				if(it2 != itemMap.end())
 					if(Container* container = it2->second.first->getContainer())
@@ -279,26 +280,28 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 
 	query.str("");
 	query << "SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_depotitems` WHERE `player_id` = " << player->getGUID() << " ORDER BY `sid` DESC";
-	if(result = db->storeQuery(query.str()) ) {
+	if(result = db->storeQuery(query.str()) ){
 		loadItems(itemMap, result);
 
 		ItemMap::reverse_iterator it;
 		ItemMap::iterator it2;
 
-		for(it = itemMap.rbegin(); it != itemMap.rend(); ++it) {
+		for(it = itemMap.rbegin(); it != itemMap.rend(); ++it){
 			Item* item = it->second.first;
 			int pid = it->second.second;
 			if(pid >= 0 && pid < 100){
-				if(Container* c = item->getContainer()) {
+				if(Container* c = item->getContainer()){
 					if(Depot* depot = c->getDepot())
 						player->addDepot(depot, pid);
 					else
 						std::cout << "Error loading depot "<< pid << " for player " << player->getGUID() << std::endl;
-				} else {
+				}
+				else{
 					std::cout << "Error loading depot "<< pid << " for player " <<
 						player->getGUID() << std::endl;
 				}
-			} else {
+			}
+			else{
 				it2 = itemMap.find(pid);
 				if(it2 != itemMap.end())
 					if(Container* container = it2->second.first->getContainer())
@@ -312,8 +315,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	//load storage map
 	query.str("");
 	query << "SELECT `key`, `value` FROM `player_storage` WHERE `player_id` = " << player->getGUID();
-	if(result = db->storeQuery(query.str())) {
-		while(result->next()) {
+	if(result = db->storeQuery(query.str())){
+		while(result->next()){
 			uint32_t key = result->getDataInt("key");
 			int32_t value = result->getDataInt("value");
 			player->addStorageValue(key,value);
@@ -324,8 +327,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	//load vip
 	query.str("");
 	query << "SELECT `vip_id` FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
-	if(result = db->storeQuery(query.str())) {
-		while(result->next()) {
+	if(result = db->storeQuery(query.str())){
+		while(result->next()){
 			uint32_t vip_id = result->getDataInt("vip_id");
 			std::string dummy_str;
 			if(storeNameByGuid(*db, vip_id))
@@ -418,13 +421,13 @@ bool IOPlayer::savePlayer(Player* player)
 	if(!(result = db->storeQuery(query.str())))
 		return false;
 
-	if(!result->next()) {
+	if(!result->next()){
 		db->freeResult(result);
 		return false;
 	}
 
 	// If save var is not 1 don't save the player info
-	if(result->getDataInt("save") != 1) {
+	if(result->getDataInt("save") != 1){
 		db->freeResult(result);
 		return true;
 	}
@@ -465,10 +468,10 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `manamax` = " << player->manaMax
 	<< ", `manaspent` = " << player->manaSpent
 	<< ", `soul` = " << player->soul
-	<< ", `town_id` = '" << player->town
-	<< ", `posx` = '" << player->getLoginPosition().x
-	<< ", `posy` = '" << player->getLoginPosition().y
-	<< ", `posz` = '" << player->getLoginPosition().z
+	<< ", `town_id` = " << player->town
+	<< ", `posx` = " << player->getLoginPosition().x
+	<< ", `posy` = " << player->getLoginPosition().y
+	<< ", `posz` = " << player->getLoginPosition().z
 	<< ", `cap` = " << player->getCapacity()
 	<< ", `sex` = " << player->sex
 	<< ", `lastlogin` = " << player->lastlogin
@@ -492,7 +495,7 @@ bool IOPlayer::savePlayer(Player* player)
 	if( !db->beginTransaction() )
 		return false;
 
-	if(!db->executeQuery(query.str())) {
+	if(!db->executeQuery(query.str())){
 		db->rollback();
 		return false;
 	}
@@ -502,7 +505,7 @@ bool IOPlayer::savePlayer(Player* player)
 		query.str("");
 		query << "UPDATE `player_skills` SET `value` = " << player->skills[i][SKILL_LEVEL] << ", `count` = " << player->skills[i][SKILL_TRIES] << " WHERE `player_id` = " << player->getGUID() << " AND `skillid` = " << i;
 
-		if(!db->executeQuery(query.str())) {
+		if(!db->executeQuery(query.str())){
 			db->rollback();
 			return false;
 		}
@@ -517,13 +520,13 @@ bool IOPlayer::savePlayer(Player* player)
 			it != player->learnedInstantSpellList.end(); ++it){
 		query << player->getGUID() << ", " << db->escapeString(*it);
 
-		if(!stmt.addRow(query)) {
+		if(!stmt.addRow(query)){
 			db->rollback();
 			return false;
 		}
 	}
 
-	if(!stmt.execute()) {
+	if(!stmt.execute()){
 		db->rollback();
 		return false;
 	}
@@ -539,7 +542,7 @@ bool IOPlayer::savePlayer(Player* player)
 	//item saving
 	stmt.setQuery("INSERT INTO `player_items` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES ");
 
-	if(!(saveItems(player, itemList, stmt) && stmt.execute())) {
+	if(!(saveItems(player, itemList, stmt) && stmt.execute())){
 		db->rollback();
 		return false;
 	}
@@ -551,7 +554,7 @@ bool IOPlayer::savePlayer(Player* player)
 	//save depot items
 	stmt.setQuery("INSERT INTO `player_depotitems` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES ");
 
-	if(!(saveItems(player, itemList, stmt) && stmt.execute())) {
+	if(!(saveItems(player, itemList, stmt) && stmt.execute())){
 		db->rollback();
 		return false;
 	}
@@ -559,16 +562,16 @@ bool IOPlayer::savePlayer(Player* player)
 	stmt.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
 
 	player->genReservedStorageRange();
-	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++) {
+	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
 		query << player->getGUID() << ", " << cit->first << ", " << cit->second;
 
-		if(!stmt.addRow(query)) {
+		if(!stmt.addRow(query)){
 			db->rollback();
 			return false;
 		}
 	}
 
-	if(!stmt.execute()) {
+	if(!stmt.execute()){
 		db->rollback();
 		return false;
 	}
@@ -576,16 +579,16 @@ bool IOPlayer::savePlayer(Player* player)
 	//save vip list
 	stmt.setQuery("INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES ");
 
-	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++) {
+	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
 		query << player->getGUID() << ", " << *it;
 
-		if(!stmt.addRow(query)) {
+		if(!stmt.addRow(query)){
 			db->rollback();
 			return false;
 		}
 	}
 
-	if(!stmt.execute()) {
+	if(!stmt.execute()){
 		db->rollback();
 		return false;
 	}
@@ -608,7 +611,7 @@ bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
 	if(!(result = db.storeQuery(query.str())))
 		return false;
 
-	if(!result->next()) {
+	if(!result->next()){
 		db.freeResult(result);
 		return false;
 	}
@@ -621,7 +624,7 @@ bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
 bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)
 {
 	NameCacheMap::iterator it = nameCacheMap.find(guid);
-	if(it != nameCacheMap.end()) {
+	if(it != nameCacheMap.end()){
 		name = it->second;
 		return true;
 	}
@@ -635,7 +638,7 @@ bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)
 	if(!(result = db->storeQuery(query.str())))
 		return false;
 
-	if(!result->next()) {
+	if(!result->next()){
 		db->freeResult(result);
 		return false;
 	}
@@ -649,7 +652,7 @@ bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)
 bool IOPlayer::getGuidByName(uint32_t &guid, std::string& name)
 {
 	GuidCacheMap::iterator it = guidCacheMap.find(name);
-	if(it != guidCacheMap.end()) {
+	if(it != guidCacheMap.end()){
 		name = it->first;
 		guid = it->second;
 		return true;
@@ -662,7 +665,7 @@ bool IOPlayer::getGuidByName(uint32_t &guid, std::string& name)
 	if(!(result = db->storeQuery("SELECT `name`, `id` FROM `players` WHERE `name` = " + db->escapeString(name))))
 		return false;
 
-	if(!result->next()) {
+	if(!result->next()){
 		db->freeResult(result);
 		return false;
 	}
@@ -685,7 +688,7 @@ bool IOPlayer::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string& na
 	if(!(result = db->storeQuery("SELECT `name`, `id`, `group_id` FROM `players` WHERE `name`= " + db->escapeString(name))))
 		return false;
 
-	if(!result->next()) {
+	if(!result->next()){
 		db->freeResult(result);
 		return false;
 	}
@@ -712,7 +715,7 @@ bool IOPlayer::getGuildIdByName(uint32_t &guildId, const std::string& guildName)
 	if(!(result = db->storeQuery("SELECT `id` FROM `guilds` WHERE `name` = " + db->escapeString(guildName))))
 		return false;
 
-	if(result->next()) {
+	if(result->next()){
 		guildId = result->getDataInt("id");
 		db->freeResult(result);
 		return true;
@@ -731,7 +734,7 @@ bool IOPlayer::playerExists(std::string name)
 	if(!(result = db->storeQuery("SELECT `id` FROM `players` WHERE `name`= " + db->escapeString(name))))
 		return false;
 
-	if(result->next()) {
+	if(result->next()){
 		db->freeResult(result);
 		return true;
 	}
@@ -746,15 +749,16 @@ const PlayerGroup* IOPlayer::getPlayerGroup(uint32_t groupid)
 
 	if(it != playerGroupMap.end()){
 		return it->second;
-	} else {
+	}
+	else{
 		Database* db = Database::instance();
 		DBQuery query;
 		DBResult* result;
 
 		query << "SELECT * FROM `groups` WHERE `id`= " << groupid;
 
-		if(result = db->storeQuery(query.str())) {
-			if(result->next()) {
+		if(result = db->storeQuery(query.str())){
+			if(result->next()){
 				PlayerGroup* group = new PlayerGroup;
 
 				group->m_name = result->getDataString("name");
@@ -776,7 +780,7 @@ const PlayerGroup* IOPlayer::getPlayerGroup(uint32_t groupid)
 
 void IOPlayer::loadItems(ItemMap& itemMap, DBResult* result)
 {
-	while(result->next()) {
+	while(result->next()){
 		int sid = result->getDataInt("sid");
 		int pid = result->getDataInt("pid");
 		int type = result->getDataInt("itemtype");
