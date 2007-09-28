@@ -55,7 +55,7 @@ Database* _Database::instance(){
 		if(g_config.getString(ConfigManager::SQL_TYPE) == "odbc")
 			_instance = new DatabaseODBC;
 #endif
-#ifdef __USE_ODBC__
+#ifdef __USE_SQLITE__
 		if(g_config.getString(ConfigManager::SQL_TYPE) == "sqlite")
 			_instance = new DatabaseSQLite;
 #endif

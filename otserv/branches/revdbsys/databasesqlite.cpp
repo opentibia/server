@@ -21,8 +21,6 @@
 #include <iostream>
 #include "databasesqlite.h"
 
-#define FAILED(_code) _code != SQLITE_OK
-
 #include "configmanager.h"
 extern ConfigManager g_config;
 
@@ -33,7 +31,7 @@ DatabaseSQLite::DatabaseSQLite()
 	m_connected = false;
 
 	// Initialize sqlite
-	if( FAILED( sqlite3_open(g_config.getString(ConfigManager::SQL_DB).c_str(), &m_handle) ) ){
+	if( sqlite3_open(g_config.getString(ConfigManager::SQL_DB).c_str(), &m_handle) != SQLITE_OK){
 		std::cout << "Failed to initialize SQLite connection." << std::endl;
 		sqlite3_close(m_handle);
 	}
@@ -109,14 +107,15 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 	std::string buf = _parse(query);
 	sqlite3_stmt* stmt;
 	// prepares statement
-	if( FAILED( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) ) ){
-		std::cout << "sqlite3_prepare_v2(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
+	if( sqlite3_prepare(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
+//	if( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
+		std::cout << "sqlite3_prepare(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return false;
 	}
 
 	// executes it once
 	int ret = sqlite3_step(stmt);
-	if( FAILED(ret) && ret != SQLITE_DONE && ret != SQLITE_ROW){
+	if(ret != SQLITE_OK && ret != SQLITE_DONE && ret != SQLITE_ROW){
 		std::cout << "sqlite3_step(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return false;
 	}
@@ -140,8 +139,9 @@ DBResult* DatabaseSQLite::storeQuery(const std::string &query)
 	std::string buf = _parse(query);
 	sqlite3_stmt* stmt;
 	// prepares statement
-	if( FAILED( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) ) ){
-		std::cout << "sqlite3_prepare_v2(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
+	if( sqlite3_prepare(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
+//	if( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
+		std::cout << "sqlite3_prepare(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return NULL;
 	}
 
