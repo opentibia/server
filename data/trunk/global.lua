@@ -275,3 +275,14 @@ RETURNVALUE_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE = 44
 RETURNVALUE_YOUMAYNOTATTACKTHISCREATURE = 45
 RETURNVALUE_YOUCANONLYUSEITONCREATURES = 46
 RETURNVALUE_CREATUREISNOTREACHABLE = 47
+
+function getDistanceBetween(pos1, pos2)
+	local xDif = math.abs(pos1.x - pos2.x)
+	local yDif = math.abs(pos1.y - pos2.y)
+
+	local posDif = math.max(xDif, yDif)
+	if(pos1.z ~= pos2.z) then
+		posDif = posDif + 9 + 6
+	end
+	return posDif
+end

@@ -111,7 +111,7 @@ AREA_SQUARE1X1 = {
 -- Spells-only arrays
 
 --This HUGE array contains all corpses of the game, until protocol 8.0
--- It is used on animated dead rune and on undead legion. No unmoveable corpses are there.
+-- It is used on animate dead rune and on undead legion spell. No unmoveable corpses are there.
 CORPSES = {
 2806,2807,2808,2809,2810,2811,2812,2813,2814,2815,2816,2817,2818,2819,2820,2821,2822,2823,
 2824,2825,2826,2827,2828,2829,2830,2831,2832,2833,2834,2835,2836,2837,2838,2839,2840,2841,
@@ -143,3 +143,6 @@ CORPSES = {
 7284,7285,7317,7318,7319,7321,7322,7323,7325,7326,7328,7329,7331,7332,7333,7335,7336,7337,
 7339,7340,7341,7345,7346,7347} --And we have a total of 510 corpses.
 -- This array was made based on the materials.xml of the map editor, and wrote using LUA I/O functions. No way a human would do this ;)
+
+-- This array contains all destroyable field items
+FIELDS = {1487,1488,1489,1490,1491,1492,1493,1494,1495,1496,1500,1501,1502,1503,1504}

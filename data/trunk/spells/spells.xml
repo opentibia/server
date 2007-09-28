@@ -4,37 +4,39 @@
 	<!-- PLAYER RUNES -->
 	
 	-- Attack Runes
-	<rune name="Poison Field" id="2285" charges="3" blocktype="solid" script="poison_field.lua"/>
-	<rune name="Poison Bomb" id="2286" charges="2" maglv="4" blocktype="solid" script="poison_bomb.lua"/>
-	<rune name="Poison Wall" id="2289" charges="4" maglv="5" blocktype="solid" script="poison_wall.lua"/>
-	<rune name="Envenom" id="2292" charges="1" maglv="4" needtarget="1" blocktype="solid" script="envenom.lua"/>
-	<rune name="Fire Field" id="2301" charges="3" maglv="1" blocktype="solid" script="fire_field.lua"/>
-	<rune name="Firebomb" id="2305" charges="2" maglv="5" blocktype="solid" script="firebomb.lua"/>
-	<rune name="Fire Wall" id="2303" charges="4" maglv="6" blocktype="solid" script="fire_wall.lua"/>
-	<rune name="Soulfire" id="2308" charges="2" maglv="7" needtarget="1" blocktype="solid" script="soulfire.lua"/>
-	<rune name="Fireball" id="2302" charges="2" maglv="2" blocktype="solid" script="fireball.lua"/>
-	<rune name="Great Fireball" id="2304" charges="2" maglv="4" blocktype="solid" script="great_fireball.lua"/>
-	<rune name="Energy Field" id="2277" charges="3" maglv="3" blocktype="solid" script="energy_field.lua"/>
-	<rune name="Energybomb" id="2262" charges="2" maglv="10" blocktype="solid" script="energybomb.lua"/>
-	<rune name="Energy Wall" id="2279" charges="4" maglv="9" blocktype="solid" script="energy_wall.lua"/>
-	<rune name="Light Magic Missile" id="2287" charges="5" needtarget="1" blocktype="solid" script="light_magic_missile.lua"/>
-	<rune name="Heavy Magic Missile" id="2311" charges="5" maglv="4" needtarget="1" blocktype="solid" script="heavy_magic_missile.lua"/>
-	<rune name="Explosion" id="2313" charges="3" maglv="6" blocktype="solid" script="explosion.lua"/>
-	<rune name="Sudden Death" id="2268" charges="1" maglv="15" needtarget="1" blocktype="solid" script="sudden_death.lua"/>
+	<rune name="Poison Field" id="2285" allowfaruse="1" charges="3" blocktype="solid" script="poison_field.lua"/>
+	<rune name="Poison Bomb" id="2286" allowfaruse="1" charges="2" maglv="4" blocktype="solid" script="poison_bomb.lua"/>
+	<rune name="Poison Wall" id="2289" allowfaruse="1" charges="4" maglv="5" blocktype="solid" script="poison_wall.lua"/>
+	<rune name="Envenom" id="2292" allowfaruse="1" charges="1" maglv="4" needtarget="1" blocktype="solid" script="envenom.lua"/>
+	<rune name="Fire Field" id="2301" allowfaruse="1" charges="3" maglv="1" blocktype="solid" script="fire_field.lua"/>
+	<rune name="Firebomb" id="2305" allowfaruse="1" charges="2" maglv="5" blocktype="solid" script="firebomb.lua"/>
+	<rune name="Fire Wall" id="2303" allowfaruse="1" charges="4" maglv="6" blocktype="solid" script="fire_wall.lua"/>
+	<rune name="Soulfire" id="2308" allowfaruse="1" charges="2" maglv="7" needtarget="1" blocktype="solid" script="soulfire.lua"/>
+	<rune name="Fireball" id="2302" allowfaruse="1" charges="2" maglv="2" blocktype="solid" script="fireball.lua"/>
+	<rune name="Great Fireball" id="2304" allowfaruse="1" charges="2" maglv="4" blocktype="solid" script="great_fireball.lua"/>
+	<rune name="Energy Field" id="2277" allowfaruse="1" charges="3" maglv="3" blocktype="solid" script="energy_field.lua"/>
+	<rune name="Energybomb" id="2262" allowfaruse="1" charges="2" maglv="10" blocktype="solid" script="energybomb.lua"/>
+	<rune name="Energy Wall" id="2279" allowfaruse="1" charges="4" maglv="9" blocktype="solid" script="energy_wall.lua"/>
+	<rune name="Light Magic Missile" allowfaruse="1" id="2287" charges="5" needtarget="1" blocktype="solid" script="light_magic_missile.lua"/>
+	<rune name="Heavy Magic Missile" allowfaruse="1" id="2311" charges="5" maglv="4" needtarget="1" blocktype="solid" script="heavy_magic_missile.lua"/>
+	<rune name="Explosion" id="2313" allowfaruse="1" charges="3" maglv="6" blocktype="solid" script="explosion.lua"/>
+	<rune name="Sudden Death" id="2268" allowfaruse="1" charges="1" maglv="15" needtarget="1" blocktype="solid" script="sudden_death.lua"/>
 	
 	-- Healing Runes
-	<rune name="Antidote Rune" id="2266" charges="1" aggressive="0" needtarget="1" blocktype="solid" script="healing/antidote_rune.lua"/>
-	<rune name="Intense Healing Rune" id="2265" charges="1" maglv="1" aggressive="0" needtarget="1" blocktype="solid" script="healing/intense_healing_rune.lua"/>
-	<rune name="Ultimate Healing Rune" id="2273" charges="1" maglv="4" aggressive="0" needtarget="1" blocktype="solid" script="healing/ultimate_healing_rune.lua"/>
+	<rune name="Antidote Rune" id="2266" allowfaruse="1" charges="1" aggressive="0" needtarget="1" blocktype="solid" script="healing/antidote_rune.lua"/>
+	<rune name="Intense Healing Rune" id="2265" allowfaruse="1" charges="1" maglv="1" aggressive="0" needtarget="1" blocktype="solid" script="healing/intense_healing_rune.lua"/>
+	<rune name="Ultimate Healing Rune" id="2273" allowfaruse="1" charges="1" maglv="4" aggressive="0" needtarget="1" blocktype="solid" script="healing/ultimate_healing_rune.lua"/>
 	
 	-- Summon Runes
-	<rune name="Convince Creature" id="2290" charges="1" maglv="5" needtarget="1" blocktype="solid" function="convince"/>
-	<rune name="Animate Dead" id="2316" charges="1" maglv="4" blocktype="solid" script="summon/animate_dead_rune.lua"/>
+	<rune name="Convince Creature" id="2290" allowfaruse="1" charges="1" maglv="5" needtarget="1" blocktype="solid" function="convince"/>
+	<rune name="Animate Dead" id="2316" allowfaruse="1" charges="1" maglv="4" blocktype="solid" script="summon/animate_dead_rune.lua"/>
 	
 	-- Support Runes
-	<rune name="Chameleon" id="2291" charges="1" maglv="4" aggressive="0" selftarget="1" blocktype="solid" function="chameleon"/>
-	<rune name="Magic Wall" id="2293" charges="3" maglv="9" aggressive="0" blocktype="all" script="magic_wall.lua"/>
-	<rune name="Paralyze" id="2278" charges="1" maglv="18" mana="1400" needtarget="1" blocktype="solid" script="paralyze.lua"/>
+	<rune name="Desintegrate" id="2310" allowfaruse="1" charges="3" maglv="4" script="support/desintegrate_rune.lua"/>
+	<rune name="Destroy Field" id="2261" allowfaruse="1" charges="3" maglv="3" aggressive="0" script="support/destroy_field_rune.lua"/>
+	<rune name="Chameleon" id="2291" allowfaruse="1" charges="1" maglv="4" aggressive="0" selftarget="1" blocktype="solid" function="chameleon"/>
+	<rune name="Magic Wall" id="2293" allowfaruse="1" charges="3" maglv="9" aggressive="0" blocktype="all" script="support/magic_wall_rune.lua"/>
+	<rune name="Paralyze" id="2278" allowfaruse="1" charges="1" maglv="18" mana="1400" needtarget="1" blocktype="solid" script="support/paralyze_rune.lua"/>
 	
 	<!-- PLAYER SPELLS -->
 	
@@ -173,7 +175,7 @@
 	<instant name="Wild Growth" words="exevo grav vita" lvl="27" mana="220" prem="1" direction="1" blocking="1" script="support/wild_growth.lua">
 		<vocation name="Elder Druid" />
 	</instant>
-	<instant name="Invisible" words="utana vid" lvl="35" mana="440" aggressive="0" selftarget="1" script="support/invisible.lua">
+	<instant name="Invisibility" words="utana vid" lvl="35" mana="440" aggressive="0" selftarget="1" script="support/invisible.lua">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Paladin" />

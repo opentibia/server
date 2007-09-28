@@ -1,6 +1,4 @@
-local combat = createCombatObject()
-
-function onTargetCorpse(cid, pos)
+function doTargetCorpse(cid, pos)
 	local getPos = pos
 	getPos.stackpos = 255
 	corpse = getThingfromPos(getPos)
@@ -8,13 +6,21 @@ function onTargetCorpse(cid, pos)
 		doRemoveItem(corpse.uid, 1)
 		doPlayerSummonCreature(cid, "Skeleton", pos)
 		doSendMagicEffect(pos, CONST_ME_MAGIC_BLUE)
-	else
-		doSendMagicEffect(getPlayerPosition(cid), CONST_ME_POFF)
-		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
+		return LUA_NO_ERROR
 	end
+
+	doSendMagicEffect(getPlayerPosition(cid), CONST_ME_POFF)
+	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
+	return LUA_ERROR
 end
-setCombatCallback(combat, CALLBACK_PARAM_TARGETTILE, "onTargetCorpse")
 
 function onCastSpell(cid, var)
-	return doCombat(cid, combat, var)
+	local pos = variantToPosition(var)
+	if(pos.x ~= 0 and pos.y ~= 0 and pos.z ~= 0 and pos.stackpos ~= 0) then
+		return doTargetCorpse(cid, pos)
+	end
+
+	doSendMagicEffect(getPlayerPosition(cid), CONST_ME_POFF)
+	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
+	return LUA_ERROR
 end
