@@ -2,7 +2,7 @@ local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_POISONDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_GREEN_RINGS)
 
-local area = createCombatArea(AREA_ULTIMATE_CIRCLE)
+local area = createCombatArea(AREA_CROSS5X5)
 setCombatArea(combat, area)
 
 local condition = createConditionObject(CONDITION_POISON)

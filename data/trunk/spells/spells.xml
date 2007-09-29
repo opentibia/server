@@ -4,23 +4,23 @@
 	<!-- PLAYER RUNES -->
 	
 	-- Attack Runes
-	<rune name="Poison Field" id="2285" allowfaruse="1" charges="3" blocktype="solid" script="poison_field.lua"/>
-	<rune name="Poison Bomb" id="2286" allowfaruse="1" charges="2" maglv="4" blocktype="solid" script="poison_bomb.lua"/>
-	<rune name="Poison Wall" id="2289" allowfaruse="1" charges="4" maglv="5" blocktype="solid" script="poison_wall.lua"/>
-	<rune name="Envenom" id="2292" allowfaruse="1" charges="1" maglv="4" needtarget="1" blocktype="solid" script="envenom.lua"/>
-	<rune name="Fire Field" id="2301" allowfaruse="1" charges="3" maglv="1" blocktype="solid" script="fire_field.lua"/>
-	<rune name="Firebomb" id="2305" allowfaruse="1" charges="2" maglv="5" blocktype="solid" script="firebomb.lua"/>
-	<rune name="Fire Wall" id="2303" allowfaruse="1" charges="4" maglv="6" blocktype="solid" script="fire_wall.lua"/>
-	<rune name="Soulfire" id="2308" allowfaruse="1" charges="2" maglv="7" needtarget="1" blocktype="solid" script="soulfire.lua"/>
-	<rune name="Fireball" id="2302" allowfaruse="1" charges="2" maglv="2" blocktype="solid" script="fireball.lua"/>
-	<rune name="Great Fireball" id="2304" allowfaruse="1" charges="2" maglv="4" blocktype="solid" script="great_fireball.lua"/>
-	<rune name="Energy Field" id="2277" allowfaruse="1" charges="3" maglv="3" blocktype="solid" script="energy_field.lua"/>
-	<rune name="Energybomb" id="2262" allowfaruse="1" charges="2" maglv="10" blocktype="solid" script="energybomb.lua"/>
-	<rune name="Energy Wall" id="2279" allowfaruse="1" charges="4" maglv="9" blocktype="solid" script="energy_wall.lua"/>
-	<rune name="Light Magic Missile" allowfaruse="1" id="2287" charges="5" needtarget="1" blocktype="solid" script="light_magic_missile.lua"/>
-	<rune name="Heavy Magic Missile" allowfaruse="1" id="2311" charges="5" maglv="4" needtarget="1" blocktype="solid" script="heavy_magic_missile.lua"/>
-	<rune name="Explosion" id="2313" allowfaruse="1" charges="3" maglv="6" blocktype="solid" script="explosion.lua"/>
-	<rune name="Sudden Death" id="2268" allowfaruse="1" charges="1" maglv="15" needtarget="1" blocktype="solid" script="sudden_death.lua"/>
+	<rune name="Poison Field" id="2285" allowfaruse="1" charges="3" blocktype="solid" script="attack/poison_field.lua"/>
+	<rune name="Poison Bomb" id="2286" allowfaruse="1" charges="2" maglv="4" blocktype="solid" script="attack/poison_bomb.lua"/>
+	<rune name="Poison Wall" id="2289" allowfaruse="1" charges="4" maglv="5" blocktype="solid" script="attack/poison_wall.lua"/>
+	<rune name="Envenom" id="2292" allowfaruse="1" charges="1" maglv="4" needtarget="1" blocktype="solid" script="attack/envenom.lua"/>
+	<rune name="Fire Field" id="2301" allowfaruse="1" charges="3" maglv="1" blocktype="solid" script="attack/fire_field.lua"/>
+	<rune name="Firebomb" id="2305" allowfaruse="1" charges="2" maglv="5" blocktype="solid" script="attack/firebomb.lua"/>
+	<rune name="Fire Wall" id="2303" allowfaruse="1" charges="4" maglv="6" blocktype="solid" script="attack/fire_wall.lua"/>
+	<rune name="Soulfire" id="2308" allowfaruse="1" charges="2" maglv="7" needtarget="1" blocktype="solid" script="attack/soulfire.lua"/>
+	<rune name="Fireball" id="2302" allowfaruse="1" charges="2" maglv="2" blocktype="solid" script="attack/fireball.lua"/>
+	<rune name="Great Fireball" id="2304" allowfaruse="1" charges="2" maglv="4" blocktype="solid" script="attack/great_fireball.lua"/>
+	<rune name="Energy Field" id="2277" allowfaruse="1" charges="3" maglv="3" blocktype="solid" script="attack/energy_field.lua"/>
+	<rune name="Energybomb" id="2262" allowfaruse="1" charges="2" maglv="10" blocktype="solid" script="attack/energybomb.lua"/>
+	<rune name="Energy Wall" id="2279" allowfaruse="1" charges="4" maglv="9" blocktype="solid" script="eattack/nergy_wall.lua"/>
+	<rune name="Light Magic Missile" allowfaruse="1" id="2287" charges="5" needtarget="1" blocktype="solid" script="attack/light_magic_missile.lua"/>
+	<rune name="Heavy Magic Missile" allowfaruse="1" id="2311" charges="5" maglv="4" needtarget="1" blocktype="solid" script="attack/heavy_magic_missile.lua"/>
+	<rune name="Explosion" id="2313" allowfaruse="1" charges="3" maglv="6" blocktype="solid" script="attack/explosion.lua"/>
+	<rune name="Sudden Death" id="2268" allowfaruse="1" charges="1" maglv="15" needtarget="1" blocktype="solid" script="attack/sudden_death.lua"/>
 	
 	-- Healing Runes
 	<rune name="Antidote Rune" id="2266" allowfaruse="1" charges="1" aggressive="0" needtarget="1" blocktype="solid" script="healing/antidote_rune.lua"/>
@@ -253,39 +253,15 @@
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
 	</conjure>
-	<conjure name="Poison Bomb" words="adevo mas pox" lvl="25" mana="520" soul="2" prem="1" reagentId="2260" conjureId="2286" conjureCount="2" function="conjureRune">
-		<vocation name="Druid" />
-		<vocation name="Elder Druid" />
-	</conjure>
-	<conjure name="Poison Wall" words="adevo mas grav pox" lvl="29" mana="640" soul="3" reagentId="2260" conjureId="2289" conjureCount="4" function="conjureRune">
+	<conjure name="Light Magic Missile" words="adori" lvl="15" mana="120" soul="1" reagentId="2260" conjureId="2287" conjureCount="5" function="conjureRune">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
+		<vocation name="Paladin" />
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
-	</conjure>
-	<conjure name="Envenom" words="adevo res pox" lvl="21" mana="400" soul="2" prem="1" reagentId="2260" conjureId="2292" conjureCount="1" function="conjureRune">
-		<vocation name="Druid" />
-		<vocation name="Elder Druid" />
+		<vocation name="Royal Paladin" />
 	</conjure>
 	<conjure name="Fire Field" words="adevo grav flam" lvl="15" mana="240" soul="1" reagentId="2260" conjureId="2301" conjureCount="3" function="conjureRune">
-		<vocation name="Sorcerer" />
-		<vocation name="Druid" />
-		<vocation name="Master Sorcerer" />
-		<vocation name="Elder Druid" />
-	</conjure>
-	<conjure name="Firebomb" words="adevo mas flam" lvl="27" mana="600" soul="4" reagentId="2260" conjureId="2305" conjureCount="2" function="conjureRune">
-		<vocation name="Sorcerer" />
-		<vocation name="Druid" />
-		<vocation name="Master Sorcerer" />
-		<vocation name="Elder Druid" />
-	</conjure>
-	<conjure name="Fire Wall" words="adevo mas flam" lvl="33" mana="780" soul="4" reagentId="2260" conjureId="2303" conjureCount="4" function="conjureRune">
-		<vocation name="Sorcerer" />
-		<vocation name="Druid" />
-		<vocation name="Master Sorcerer" />
-		<vocation name="Elder Druid" />
-	</conjure>
-	<conjure name="Soulfire" words="adevo mas grav flam" lvl="27" mana="600" soul="3" prem="1" reagentId="2260" conjureId="2308" conjureCount="2" function="conjureRune">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Master Sorcerer" />
@@ -299,35 +275,21 @@
 		<vocation name="Elder Druid" />
 		<vocation name="Royal Paladin" />
 	</conjure>
+	<conjure name="Energy Field" words="adevo grav vis" lvl="18" mana="320" soul="2" reagentId="2260" conjureId="2277" conjureCount="3" function="conjureRune">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+	</conjure>
+	<conjure name="Envenom" words="adevo res pox" lvl="21" mana="400" soul="2" prem="1" reagentId="2260" conjureId="2292" conjureCount="1" function="conjureRune">
+		<vocation name="Druid" />
+		<vocation name="Elder Druid" />
+	</conjure>
 	<conjure name="Great Fireball" words="adori gran flam" lvl="23" mana="480" soul="3" reagentId="2260" conjureId="2304" conjureCount="2" function="conjureRune">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
-	</conjure>
-	<conjure name="Energy Field" words="adori grav vis" lvl="18" mana="320" soul="2" reagentId="2260" conjureId="2277" conjureCount="3" function="conjureRune">
-		<vocation name="Sorcerer" />
-		<vocation name="Druid" />
-		<vocation name="Master Sorcerer" />
-		<vocation name="Elder Druid" />
-	</conjure>
-	<conjure name="Energybomb" words="adori mas vis" lvl="37" mana="880" soul="5" prem="1" reagentId="2260" conjureId="2262" conjureCount="2" function="conjureRune">
-		<vocation name="Sorcerer" />
-		<vocation name="Master Sorcerer" />
-	</conjure>
-	<conjure name="Energy Wall" words="adori mas grav vis" lvl="41" mana="1000" soul="5" reagentId="2260" conjureId="2279" conjureCount="4" function="conjureRune">
-		<vocation name="Sorcerer" />
-		<vocation name="Druid" />
-		<vocation name="Master Sorcerer" />
-		<vocation name="Elder Druid" />
-	</conjure>
-	<conjure name="Light Magic Missile" words="adori" lvl="15" mana="120" soul="1" reagentId="2260" conjureId="2287" conjureCount="5" function="conjureRune">
-		<vocation name="Sorcerer" />
-		<vocation name="Druid" />
-		<vocation name="Paladin" />
-		<vocation name="Master Sorcerer" />
-		<vocation name="Elder Druid" />
-		<vocation name="Royal Paladin" />
 	</conjure>
 	<conjure name="Heavy Magic Missile" words="adori gran" lvl="25" mana="280" soul="2" reagentId="2260" conjureId="2311" conjureCount="5" function="conjureRune">
 		<vocation name="Sorcerer" />
@@ -337,7 +299,45 @@
 		<vocation name="Elder Druid" />
 		<vocation name="Royal Paladin" />
 	</conjure>
+	<conjure name="Poison Bomb" words="adevo mas pox" lvl="25" mana="520" soul="2" prem="1" reagentId="2260" conjureId="2286" conjureCount="2" function="conjureRune">
+		<vocation name="Druid" />
+		<vocation name="Elder Druid" />
+	</conjure>
+	<conjure name="Firebomb" words="adevo mas flam" lvl="27" mana="600" soul="4" reagentId="2260" conjureId="2305" conjureCount="2" function="conjureRune">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+	</conjure>
+	<conjure name="Soulfire" words="adevo res flam" lvl="27" mana="600" soul="3" prem="1" reagentId="2260" conjureId="2308" conjureCount="2" function="conjureRune">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+	</conjure>
+	<conjure name="Poison Wall" words="adevo mas grav pox" lvl="29" mana="640" soul="3" reagentId="2260" conjureId="2289" conjureCount="4" function="conjureRune">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+	</conjure>
 	<conjure name="Explosion" words="adevo mas hur" lvl="31" mana="720" soul="4" reagentId="2260" conjureId="2313" conjureCount="3" function="conjureRune">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+	</conjure>
+	<conjure name="Fire Wall" words="adevo mas grav flam" lvl="33" mana="780" soul="4" reagentId="2260" conjureId="2303" conjureCount="4" function="conjureRune">
+		<vocation name="Sorcerer" />
+		<vocation name="Druid" />
+		<vocation name="Master Sorcerer" />
+		<vocation name="Elder Druid" />
+	</conjure>
+	<conjure name="Energybomb" words="adevo mas vis" lvl="37" mana="880" soul="5" prem="1" reagentId="2260" conjureId="2262" conjureCount="2" function="conjureRune">
+		<vocation name="Sorcerer" />
+		<vocation name="Master Sorcerer" />
+	</conjure>
+	<conjure name="Energy Wall" words="adevo mas grav vis" lvl="41" mana="1000" soul="5" reagentId="2260" conjureId="2279" conjureCount="4" function="conjureRune">
 		<vocation name="Sorcerer" />
 		<vocation name="Druid" />
 		<vocation name="Master Sorcerer" />
@@ -399,7 +399,7 @@
 		<vocation name="Sorcerer" />
 		<vocation name="Master Sorcerer" />
 	</conjure>
-	<conjure name="Paralyze" words="adevo grav tera" lvl="54" mana="1400" soul="3" prem="1" reagentId="2260" conjureId="2278" conjureCount="1" function="conjureRune">
+	<conjure name="Paralyze" words="adana ani" lvl="54" mana="1400" soul="3" prem="1" reagentId="2260" conjureId="2278" conjureCount="1" function="conjureRune">
 		<vocation name="Druid" />
 		<vocation name="Elder Druid" />
 	</conjure>
