@@ -16,7 +16,7 @@
 	<rune name="Great Fireball" id="2304" allowfaruse="1" charges="2" maglv="4" blocktype="solid" script="attack/great_fireball.lua"/>
 	<rune name="Energy Field" id="2277" allowfaruse="1" charges="3" maglv="3" blocktype="solid" script="attack/energy_field.lua"/>
 	<rune name="Energybomb" id="2262" allowfaruse="1" charges="2" maglv="10" blocktype="solid" script="attack/energybomb.lua"/>
-	<rune name="Energy Wall" id="2279" allowfaruse="1" charges="4" maglv="9" blocktype="solid" script="eattack/nergy_wall.lua"/>
+	<rune name="Energy Wall" id="2279" allowfaruse="1" charges="4" maglv="9" blocktype="solid" script="attack/energy_wall.lua"/>
 	<rune name="Light Magic Missile" allowfaruse="1" id="2287" charges="5" needtarget="1" blocktype="solid" script="attack/light_magic_missile.lua"/>
 	<rune name="Heavy Magic Missile" allowfaruse="1" id="2311" charges="5" maglv="4" needtarget="1" blocktype="solid" script="attack/heavy_magic_missile.lua"/>
 	<rune name="Explosion" id="2313" allowfaruse="1" charges="3" maglv="6" blocktype="solid" script="attack/explosion.lua"/>
