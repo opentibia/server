@@ -1010,6 +1010,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getContainerItem", LuaScriptInterface::luaGetContainerItem);
 	//doAddContainerItem(uid, itemid, count or subtype)
 	lua_register(m_luaState, "doAddContainerItem", LuaScriptInterface::luaDoAddContainerItem);
+	//getDepotId(uid)
+	lua_register(m_luaState, "getDepotId", LuaScriptInterface::luaGetDepotId);
 
 	//getHouseOwner(houseid)
 	lua_register(m_luaState, "getHouseOwner", LuaScriptInterface::luaGetHouseOwner);
@@ -4555,6 +4557,31 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
+}
+
+int LuaScriptInterface::luaGetDepotId(lua_State *L)
+{
+	//getDepotId(uid)
+	uint32_t uid = popNumber(L);
+
+    ScriptEnviroment* env = getScriptEnv();
+	Container* container = env->getContainerByUID(uid);
+	if(container){
+		Depot* depot = container->getDepot();
+		if(depot){
+			lua_pushnumber(L, depot->getDepotId());
+		}
+		else{
+			reportErrorFunc("Depot not found.");
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
+        reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
 }
 
 int LuaScriptInterface::luaIsInArray(lua_State *L)

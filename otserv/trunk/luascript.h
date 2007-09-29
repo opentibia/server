@@ -437,6 +437,7 @@ protected:
 	static int luaGetContainerCap(lua_State *L);
 	static int luaGetContainerItem(lua_State *L);
 	static int luaDoAddContainerItem(lua_State *L);
+	static int luaGetDepotId(lua_State *L);
 
 	//
 	static int luaCreateCombatObject(lua_State *L);
