@@ -586,26 +586,28 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	xmlNodePtr attributeNode = node->children;
 
 	while(attributeNode){
-		if(readXMLString(attributeNode, "key", strValue)){
-			if(strcasecmp(strValue.c_str(), "shootEffect") == 0){
-				if(readXMLString(attributeNode, "value", strValue)){
-					ShootType_t shoot = getShootType(strValue);
-					if(shoot != NM_SHOOT_UNK){
-						combat->setParam(COMBATPARAM_DISTANCEEFFECT, shoot);
-					}
-					else{
-						std::cout << "Warning: [Monsters::deserializeSpell] - "  << description << " - Unknown shootEffect: " << strValue << std::endl;
+        if(xmlStrcmp(attributeNode->name, (const xmlChar*)"attribute") == 0){
+			if(readXMLString(attributeNode, "key", strValue)){
+				if(strcasecmp(strValue.c_str(), "shootEffect") == 0){
+					if(readXMLString(attributeNode, "value", strValue)){
+						ShootType_t shoot = getShootType(strValue);
+						if(shoot != NM_SHOOT_UNK){
+							combat->setParam(COMBATPARAM_DISTANCEEFFECT, shoot);
+						}
+						else{
+							std::cout << "Warning: [Monsters::deserializeSpell] - "  << description << " - Unknown shootEffect: " << strValue << std::endl;
+						}
 					}
 				}
-			}
-			else if(strcasecmp(strValue.c_str(), "areaEffect") == 0){
-				if(readXMLString(attributeNode, "value", strValue)){
-					MagicEffectClasses effect = getMagicEffect(strValue);
-					if(effect != NM_ME_UNK){
-						combat->setParam(COMBATPARAM_EFFECT, effect);
-					}
-					else{
-						std::cout << "Warning: [Monsters::deserializeSpell] - "  << description << " - Unknown areaEffect: " << strValue << std::endl;
+				else if(strcasecmp(strValue.c_str(), "areaEffect") == 0){
+					if(readXMLString(attributeNode, "value", strValue)){
+						MagicEffectClasses effect = getMagicEffect(strValue);
+						if(effect != NM_ME_UNK){
+							combat->setParam(COMBATPARAM_EFFECT, effect);
+						}
+						else{
+							std::cout << "Warning: [Monsters::deserializeSpell] - "  << description << " - Unknown areaEffect: " << strValue << std::endl;
+						}
 					}
 				}
 			}

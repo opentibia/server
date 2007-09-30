@@ -15,5 +15,13 @@ end
 
 function onStepOut(cid, item, pos)
 	doTransformItem(item.uid, item.itemid - 1)
-	return 1
+	return TRUE
+end
+
+function onRemoveItem(item, tile, pos)
+	if(getDistanceBetween(getThingPos(item.uid), pos) > 0) then
+		doTransformItem(item.uid, item.itemid - 1)
+		doSendMagicEffect(getThingPos(item.uid), CONST_ME_POFF)
+	end
+	return TRUE
 end

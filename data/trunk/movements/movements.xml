@@ -206,5 +206,6 @@
 	<movevent event="StepIn" itemid="1512" script="trap.lua" />
 	<movevent event="StepOut" itemid="1513" script="trap.lua" />
 	<movevent event="StepIn" itemid="2579" script="trap.lua" />
-	
+	<movevent event="RemoveItem" itemid="2579" script="trap.lua" />
+
 </movements>
