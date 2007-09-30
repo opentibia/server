@@ -320,6 +320,10 @@ void Protocol79::move(Direction dir)
 		
 			m_nextSchedulerTask = now + delay;
 		}
+		else{
+			Scheduler::getScheduler().addEvent(
+				createSchedulerTask(delay + ADD_TASK_INTERVAL, boost::bind(&Protocol79::move, this, dir)));
+		}
 	}
 	else{
 		g_game.playerMove(player->getID(), dir);
