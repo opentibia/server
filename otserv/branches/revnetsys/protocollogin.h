@@ -39,7 +39,7 @@ protected:
 	
 	bool parseFirstPacket(NetworkMessage& msg);
 
-	#ifdef __DEBUG_NET__
+	#ifdef __DEBUG_NET_DETAIL__
 	virtual void deleteProtocolTask();
 	#endif
 };

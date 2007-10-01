@@ -32,6 +32,7 @@
 
 class Protocol;
 class OutputMessage;
+class Connection;
 
 #ifdef __DEBUG_NET__
 #define PRINT_ASIO_ERROR(desc) \

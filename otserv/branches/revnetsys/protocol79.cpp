@@ -187,7 +187,7 @@ void Protocol79::deleteProtocolTask()
 {
 	//dispatcher thread
 	if(player){
-		#ifdef __DEBUG_NET__
+		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Deleting Protocol79 - Protocol:" << this << ", Player: " << player << std::endl;
 		#endif
 
