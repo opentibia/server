@@ -77,7 +77,7 @@ void Protocol79::addGameTask(r (Game::*f)(f1), T1 p1)
 		++m_rejectCount;
 
 		int64_t interval = now - m_lastTaskCheck;
-		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+		if(interval >= ADD_TASK_INTERVAL && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol79::logout, this)));
 		}
@@ -103,7 +103,7 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2), T1 p1, T2 p2)
 		++m_rejectCount;
 
 		int64_t interval = now - m_lastTaskCheck;
-		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+		if(interval >= ADD_TASK_INTERVAL && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol79::logout, this)));
 		}
@@ -131,7 +131,7 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3), T1 p1, T2 p2, T3 p3)
 		++m_rejectCount;
 
 		int64_t interval = now - m_lastTaskCheck;
-		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+		if(interval >= ADD_TASK_INTERVAL && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol79::logout, this)));
 		}
@@ -159,7 +159,7 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4), T1 p1, T2 p2, T3 p3, 
 		++m_rejectCount;
 
 		int64_t interval = now - m_lastTaskCheck;
-		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+		if(interval >= ADD_TASK_INTERVAL && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol79::logout, this)));
 		}
@@ -187,7 +187,7 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5), T1 p1, T2 p2, T3 
 		++m_rejectCount;
 
 		int64_t interval = now - m_lastTaskCheck;
-		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+		if(interval >= ADD_TASK_INTERVAL && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol79::logout, this)));
 		}
@@ -215,7 +215,7 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6), T1 p1, T2 p2,
 		++m_rejectCount;
 
 		int64_t interval = now - m_lastTaskCheck;
-		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+		if(interval >= ADD_TASK_INTERVAL && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol79::logout, this)));
 		}
@@ -243,7 +243,7 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7), T1 p1, T2
 		++m_rejectCount;
 
 		int64_t interval = now - m_lastTaskCheck;
-		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+		if(interval >= ADD_TASK_INTERVAL && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol79::logout, this)));
 		}
@@ -271,7 +271,7 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1
 		++m_rejectCount;
 
 		int64_t interval = now - m_lastTaskCheck;
-		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+		if(interval >= ADD_TASK_INTERVAL && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol79::logout, this)));
 		}
