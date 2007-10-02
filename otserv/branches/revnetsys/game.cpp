@@ -2360,6 +2360,12 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 	return true;
 }
 
+bool Game::playerCancelAttackAndFollow(uint32_t playerId)
+{
+	return playerSetAttackedCreature(playerId, 0) &&
+			playerFollowCreature(playerId, 0);
+}
+
 bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 {
 	Player* player = getPlayerByID(playerId);
@@ -2369,6 +2375,7 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	if(player->getAttackedCreature() && creatureId == 0){
 		player->setAttackedCreature(NULL);
 		player->sendCancelTarget();
+		return true;
 	}
 
 	Creature* attackCreature = getCreatureByID(creatureId);

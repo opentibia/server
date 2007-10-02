@@ -319,6 +319,7 @@ public:
 	bool playerCloseTrade(uint32_t playerId);
 	bool playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerFollowCreature(uint32_t playerId, uint32_t creatureId);
+	bool playerCancelAttackAndFollow(uint32_t playerId);
 	bool playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMode_t chaseMode);
 	bool playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteId, uint8_t stackPos);
 	bool playerRequestAddVip(uint32_t playerId, const std::string& name);

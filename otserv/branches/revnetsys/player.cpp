@@ -166,7 +166,7 @@ Player::~Player()
 		it->second->releaseThing2();
 	}
 
-	std::cout << "Player destructor " << this << std::endl;
+	//std::cout << "Player destructor " << this << std::endl;
 	if(client){
 		delete client;
 	}
@@ -926,10 +926,10 @@ void Player::sendStats()
 	}
 }
 
-void Player::sendPing()
+void Player::sendPing(uint32_t interval)
 {
-	internal_ping++;
-	if(internal_ping >= 5){ //1 ping each 5 seconds
+	internal_ping += interval;
+	if(internal_ping >= 5000){ //1 ping each 5 seconds
 		internal_ping = 0;
 		npings++;
 		if(client){
@@ -1317,7 +1317,7 @@ bool Player::NeedUpdateStats()
 void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
-	sendPing();
+	sendPing(interval);
 
 	MessageBufferTicks += interval;
 

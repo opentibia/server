@@ -284,10 +284,17 @@ private:
 	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8);
 	
 	Player* player;
+	
+	int64_t m_now;
 	int64_t m_nextTask;
 	int64_t m_nextSchedulerTask;
+	int64_t m_nextPing;
+	
 	int64_t m_lastTaskCheck;
-	int64_t m_rejectCount;
+	int32_t m_messageCount;
+	int32_t m_rejectCount;
+	
+	bool m_loggingOut;
 };
 
 #endif
