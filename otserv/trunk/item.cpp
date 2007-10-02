@@ -352,8 +352,8 @@ xmlNodePtr Item::serialize()
 		}
 	}
 
-	uint32_t duration = getDuration();
-	if(duration != 0){
+	if(hasAttribute(ATTR_ITEM_DURATION)){
+		uint32_t duration = getDuration();
 		ss.str("");
 		ss << duration;
 		xmlSetProp(nodeItem, (const xmlChar*)"duration", (const xmlChar*)ss.str().c_str());
@@ -594,8 +594,8 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 		propWriteStream.ADD_STRING(_specialDesc);
 	}
 
-	uint32_t duration = getDuration();
-	if(duration != 0){
+	if(hasAttribute(ATTR_ITEM_DURATION)){
+		uint32_t duration = getDuration();
 		propWriteStream.ADD_UCHAR(ATTR_DURATION);
 		propWriteStream.ADD_ULONG(duration);
 	}
@@ -814,8 +814,8 @@ std::string Item::getDescription(int32_t lookDistance) const
 		}
 	}
 	else if(it.showDuration){
-		uint32_t duration = getDuration() / 1000;
-		if(duration > 0){
+		if(hasAttribute(ATTR_ITEM_DURATION)){
+			uint32_t duration = getDuration() / 1000;
 			s << " that has energy for ";
 
 			if(duration >= 120){
