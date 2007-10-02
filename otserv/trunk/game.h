@@ -291,11 +291,6 @@ public:
 		const Position& toPos, uint8_t count);
 	bool playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId, const Position& toPos);
 	bool playerMove(uint32_t playerId, Direction direction);
-	bool playerWhisper(uint32_t playerId, const std::string& text);
-	bool playerYell(uint32_t playerId, const std::string& text);
-	bool playerBroadcastMessage(uint32_t playerId, const std::string& text);
-	bool playerSpeakTo(uint32_t playerId, SpeakClasses type, const std::string& receiver, const std::string& text);
-	bool playerTalkToChannel(uint32_t playerId, SpeakClasses type, const std::string& text, unsigned short channelId);
 	bool playerCreatePrivateChannel(uint32_t playerId);
 	bool playerChannelInvite(uint32_t playerId, const std::string& name);
 	bool playerChannelExclude(uint32_t playerId, const std::string& name);
@@ -334,10 +329,7 @@ public:
 	bool playerRequestOutfit(uint32_t playerId);
 	bool playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		const std::string& receiver, const std::string& text);
-	bool playerSayDefault(uint32_t playerId, const std::string& text);
 	bool playerChangeOutfit(uint32_t playerId, Outfit_t outfit);
-	bool playerSayCommand(uint32_t playerId, SpeakClasses type, const std::string& text);
-	bool playerSaySpell(uint32_t playerId, SpeakClasses type, const std::string& text);
 
 	void flushSendBuffers();
 	void FreeThing(Thing* thing);
@@ -399,6 +391,14 @@ public:
 	void resetCommandTag();
 
 protected:
+
+	bool playerSayCommand(Player* player, SpeakClasses type, const std::string& text);
+	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
+	bool playerWhisper(Player* player, const std::string& text);
+	bool playerYell(Player* player, const std::string& text);
+	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
+	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+
 	std::vector<Thing*> ToReleaseThings;
 
 	//list of items that are in trading state, mapped to the player

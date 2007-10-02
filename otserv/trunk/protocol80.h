@@ -99,6 +99,7 @@ private:
 	void parseUseItem(NetworkMessage& msg);
 	void parseCloseContainer(NetworkMessage& msg);
 	void parseUpArrowContainer(NetworkMessage& msg);
+	//void parseUpdateTile(NetworkMessage& msg);
 	void parseUpdateContainer(NetworkMessage& msg);
 	void parseTextWindow(NetworkMessage& msg);
 	void parseHouseWindow(NetworkMessage& msg);

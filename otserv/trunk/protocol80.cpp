@@ -632,8 +632,8 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 		parseCancelMove(msg);
 		break;
 
-	case 0xC9: //client sends its position, unknown usage
-		msg.GetPosition();
+	case 0xC9: //client request to resend the tile
+		//parseUpdateTile(msg);
 		break;
 
 	case 0xCA: //client request to resend the container (happens when you store more than container maxsize)
@@ -1126,15 +1126,22 @@ void Protocol80::parseSay(NetworkMessage& msg)
 {
 	SpeakClasses type = (SpeakClasses)msg.GetByte();
 
-	std::string receiver = "";
-	unsigned short channelId = 0;
-	if(type == SPEAK_PRIVATE ||
-		type == SPEAK_PRIVATE_RED)
-		const std::string receiver = msg.GetString();
-	if(type == SPEAK_CHANNEL_Y ||
-		type == SPEAK_CHANNEL_R1 ||
-		type == SPEAK_CHANNEL_R2)
+	std::string receiver;
+	uint16_t channelId = 0;
+	switch(type){
+	case SPEAK_PRIVATE:
+	case SPEAK_PRIVATE_RED:
+		receiver = msg.GetString();
+		break;
+	case SPEAK_CHANNEL_Y:
+	case SPEAK_CHANNEL_R1:
+	case SPEAK_CHANNEL_R2:
 		channelId = msg.GetU16();
+		break;
+	default:
+		break;
+	}
+
 	const std::string text = msg.GetString();
 
 	addGameTask(&Game::playerSay, player->getID(), channelId, type, receiver, text);

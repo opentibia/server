@@ -1053,7 +1053,7 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
 	//broadcastMessage(message)
 	lua_register(m_luaState, "broadcastMessage", LuaScriptInterface::luaBroadcastMessage);
-	//broadcastMessageEx(message, messageClass)
+	//broadcastMessageEx(messageClass, message)
 	lua_register(m_luaState, "broadcastMessageEx", LuaScriptInterface::luaBroadcastMessageEx);
 	//getGuildId(guild_name)
 	lua_register(m_luaState, "getGuildId", LuaScriptInterface::luaGetGuildId);
@@ -2426,7 +2426,7 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 	Position pos;
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
-	const char *name = popString(L);
+	const char* name = popString(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 
@@ -2455,10 +2455,11 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
 {
+	//doPlayerSummonCreature(cid, name, position)
 	Position pos;
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
-	const char *name = popString(L);
+	const char* name = popString(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2899,7 +2900,7 @@ int LuaScriptInterface::luaBroadcastMessage(lua_State *L)
 
 int LuaScriptInterface::luaBroadcastMessageEx(lua_State *L)
 {
-	//broadcastMessageEx(message, messageClass)
+	//broadcastMessageEx(messageClass, message)
 	std::string message = popString(L);
 	uint32_t type = popNumber(L);
 

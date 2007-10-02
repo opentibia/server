@@ -1525,75 +1525,6 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 	return (internalMoveCreature(player, direction) == RET_NOERROR);
 }
 
-bool Game::playerWhisper(uint32_t playerId, const std::string& text)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-
-	//getSpectators(Range(player->getPosition()), list);
-	getSpectators(list, player->getPosition());
-
-	Player* tmpPlayer = NULL;
-	for(it = list.begin(); it != list.end(); ++it){
-		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendCreatureSay(player, SPEAK_WHISPER, text);
-		}
-	}
-
-	//event method
-	for(it = list.begin(); it != list.end(); ++it) {
-		if(!Position::areInRange<1,1,0>(player->getPosition(), (*it)->getPosition())){
-			(*it)->onCreatureSay(player, SPEAK_WHISPER, std::string("pspsps"));
-		}
-		else{
-			(*it)->onCreatureSay(player, SPEAK_WHISPER, text);
-		}
-	}
-
-	return true;
-}
-
-bool Game::playerYell(uint32_t playerId, const std::string& text)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	int32_t addExhaustion = 0;
-	bool isExhausted = false;
-	if(!player->hasCondition(CONDITION_EXHAUSTED)){
-		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED);
-		std::string yellText = text;
-		std::transform(yellText.begin(), yellText.end(), yellText.begin(), upchar);
-		internalCreatureSay(player, SPEAK_YELL, yellText);
-	}
-	else{
-		isExhausted = true;
-		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED_ADD);
-		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.");
-	}
-
-	if(addExhaustion > 0){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, addExhaustion, 0);
-		player->addCondition(condition);
-	}
-
-	return !isExhausted;
-}
-
-bool Game::playerBroadcastMessage(uint32_t playerId, const std::string& text)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	return internalBroadcastMessage(player, text);
-}
-
 bool Game::internalBroadcastMessage(Player* player, const std::string& text)
 {
 	if(!player->hasFlag(PlayerFlag_CanBroadcast))
@@ -1603,49 +1534,6 @@ bool Game::internalBroadcastMessage(Player* player, const std::string& text)
 		(*it).second->sendCreatureSay(player, SPEAK_BROADCAST, text);
 	}
 
-	return true;
-}
-
-bool Game::playerSpeakTo(uint32_t playerId, SpeakClasses type, const std::string& receiver,
-	const std::string& text)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	Player* toPlayer = getPlayerByName(receiver);
-	if(!toPlayer) {
-		player->sendTextMessage(MSG_STATUS_SMALL, "A player with this name is not online.");
-		return false;
-	}
-
-	if(type == SPEAK_PRIVATE_RED && !player->hasFlag(PlayerFlag_CanTalkRedPrivate)){
-		type = SPEAK_PRIVATE;
-	}
-
-	toPlayer->sendCreatureSay(player, type, text);
-	toPlayer->onCreatureSay(player, type, text);
-
-	std::stringstream ss;
-	ss << "Message sent to " << toPlayer->getName() << ".";
-	player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
-	return true;
-}
-
-bool Game::playerTalkToChannel(uint32_t playerId, SpeakClasses type, const std::string& text, unsigned short channelId)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	if(type == SPEAK_CHANNEL_R1 && !player->hasFlag(PlayerFlag_CanTalkRedChannel)){
-		type = SPEAK_CHANNEL_Y;
-	}
-	else if(type == SPEAK_CHANNEL_R2 && !player->hasFlag(PlayerFlag_CanTalkRedChannelAnonymous)){
-		type = SPEAK_CHANNEL_Y;
-	}
-
-	g_chat.talkToChannel(player, type, text, channelId);
 	return true;
 }
 
@@ -2576,70 +2464,6 @@ bool Game::playerRequestOutfit(uint32_t playerId)
 	return true;
 }
 
-bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
-	const std::string& receiver, const std::string& text)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	uint32_t muteTime;
-	if(player->isMuted(muteTime)){
-		std::stringstream ss;
-		ss << "You are still muted for " << muteTime << " seconds.";
-		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
-		return false;
-	}
-
-	if(playerSayCommand(playerId, type, text)){
-		return true;
-	}
-
-	if(playerSaySpell(playerId, type, text)){
-		return true;
-	}
-
-	player->removeMessageBuffer();
-
-	switch(type){
-		case SPEAK_SAY:
-			return playerSayDefault(playerId, text);
-			break;
-		case SPEAK_WHISPER:
-			return playerWhisper(playerId, text);
-			break;
-		case SPEAK_YELL:
-			return playerYell(playerId, text);
-			break;
-		case SPEAK_PRIVATE:
-		case SPEAK_PRIVATE_RED:
-			return playerSpeakTo(playerId, type, receiver, text);
-			break;
-		case SPEAK_CHANNEL_Y:
-		case SPEAK_CHANNEL_R1:
-		case SPEAK_CHANNEL_R2:
-			return playerTalkToChannel(playerId, type, text, channelId);
-			break;
-		case SPEAK_BROADCAST:
-			return playerBroadcastMessage(playerId, text);
-			break;
-
-		default:
-			break;
-	}
-
-	return false;
-}
-
-bool Game::playerSayDefault(uint32_t playerId, const std::string& text)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	return internalCreatureSay(player, SPEAK_SAY, text);
-}
-
 bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 {
 	Player* player = getPlayerByID(playerId);
@@ -2659,12 +2483,63 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 	return true;
 }
 
-bool Game::playerSayCommand(uint32_t playerId, SpeakClasses type, const std::string& text)
+bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
+	const std::string& receiver, const std::string& text)
 {
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
 		return false;
 
+	uint32_t muteTime;
+	if(player->isMuted(muteTime)){
+		std::stringstream ss;
+		ss << "You are still muted for " << muteTime << " seconds.";
+		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
+		return false;
+	}
+
+	if(playerSayCommand(player, type, text)){
+		return true;
+	}
+
+	if(playerSaySpell(player, type, text)){
+		return true;
+	}
+
+	player->removeMessageBuffer();
+
+	switch(type){
+		case SPEAK_SAY:
+			return internalCreatureSay(player, SPEAK_SAY, text);
+			break;
+		case SPEAK_WHISPER:
+			return playerWhisper(player, text);
+			break;
+		case SPEAK_YELL:
+			return playerYell(player, text);
+			break;
+		case SPEAK_PRIVATE:
+		case SPEAK_PRIVATE_RED:
+			return playerSpeakTo(player, type, receiver, text);
+			break;
+		case SPEAK_CHANNEL_Y:
+		case SPEAK_CHANNEL_R1:
+		case SPEAK_CHANNEL_R2:
+			return playerTalkToChannel(player, type, text, channelId);
+			break;
+		case SPEAK_BROADCAST:
+			return internalBroadcastMessage(player, text);
+			break;
+
+		default:
+			break;
+	}
+
+	return false;
+}
+
+bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string& text)
+{
 	//First, check if this was a command
 	for(uint32_t i = 0; i < commandTags.size(); i++){
 		if(commandTags[i] == text.substr(0,1)){
@@ -2677,14 +2552,9 @@ bool Game::playerSayCommand(uint32_t playerId, SpeakClasses type, const std::str
 	return false;
 }
 
-bool Game::playerSaySpell(uint32_t playerId, SpeakClasses type, const std::string& text)
+bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
 {
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
 	TalkActionResult_t result;
-
 	result = g_talkactions->playerSaySpell(player, type, text);
 	if(result == TALKACTION_BREAK){
 		return true;
@@ -2699,6 +2569,92 @@ bool Game::playerSaySpell(uint32_t playerId, SpeakClasses type, const std::strin
 	}
 
 	return false;
+}
+
+bool Game::playerWhisper(Player* player, const std::string& text)
+{
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+
+	getSpectators(list, player->getPosition());
+
+	Player* tmpPlayer = NULL;
+	for(it = list.begin(); it != list.end(); ++it){
+		if((tmpPlayer = (*it)->getPlayer())){
+			if(!Position::areInRange<1,1,0>(player->getPosition(), (*it)->getPosition())){
+				tmpPlayer->sendCreatureSay(player, SPEAK_WHISPER, "pspsps");
+			}
+			else{
+				tmpPlayer->sendCreatureSay(player, SPEAK_WHISPER, text);
+			}
+		}
+	}
+
+	//event method
+	for(it = list.begin(); it != list.end(); ++it) {
+		(*it)->onCreatureSay(player, SPEAK_WHISPER, text);
+	}
+
+	return true;
+}
+
+bool Game::playerYell(Player* player, const std::string& text)
+{
+	int32_t addExhaustion = 0;
+	bool isExhausted = false;
+	if(!player->hasCondition(CONDITION_EXHAUSTED)){
+		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED);
+		std::string yellText = text;
+		std::transform(yellText.begin(), yellText.end(), yellText.begin(), upchar);
+		internalCreatureSay(player, SPEAK_YELL, yellText);
+	}
+	else{
+		isExhausted = true;
+		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED_ADD);
+		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.");
+	}
+
+	if(addExhaustion > 0){
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, addExhaustion, 0);
+		player->addCondition(condition);
+	}
+
+	return !isExhausted;
+}
+
+bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver,
+	const std::string& text)
+{
+	Player* toPlayer = getPlayerByName(receiver);
+	if(!toPlayer) {
+		player->sendTextMessage(MSG_STATUS_SMALL, "A player with this name is not online.");
+		return false;
+	}
+
+	if(type == SPEAK_PRIVATE_RED && !player->hasFlag(PlayerFlag_CanTalkRedPrivate)){
+		type = SPEAK_PRIVATE;
+	}
+
+	toPlayer->sendCreatureSay(player, type, text);
+	toPlayer->onCreatureSay(player, type, text);
+
+	std::stringstream ss;
+	ss << "Message sent to " << toPlayer->getName() << ".";
+	player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
+	return true;
+}
+
+bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId)
+{
+	if(type == SPEAK_CHANNEL_R1 && !player->hasFlag(PlayerFlag_CanTalkRedChannel)){
+		type = SPEAK_CHANNEL_Y;
+	}
+	else if(type == SPEAK_CHANNEL_R2 && !player->hasFlag(PlayerFlag_CanTalkRedChannelAnonymous)){
+		type = SPEAK_CHANNEL_Y;
+	}
+
+	g_chat.talkToChannel(player, type, text, channelId);
+	return true;
 }
 
 //--

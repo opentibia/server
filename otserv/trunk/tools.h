@@ -61,7 +61,7 @@ bool passwordTest(const std::string &plain, std::string &hash);
 
 //buffer should be at least 17 bytes
 void formatIP(uint32_t ip, char* buffer);
-//buffer should have at least 21 bytes
+//buffer should have at least 21 bytes. dd/mm/yyyy  hh:mm:ss
 void formatDate(time_t time, char* buffer);
 //buffer should have at least 16 bytes
 void formatDate2(time_t time, char* buffer);
