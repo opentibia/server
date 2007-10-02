@@ -286,6 +286,8 @@ private:
 	Player* player;
 	int64_t m_nextTask;
 	int64_t m_nextSchedulerTask;
+	int64_t m_lastTaskCheck;
+	int64_t m_rejectCount;
 };
 
 #endif

@@ -55,6 +55,7 @@ extern Ban g_bans;
 Chat g_chat;
 
 #define ADD_TASK_INTERVAL 30
+#define CHECK_TASK_INTERVAL 5000
 
 // Helping templates to add dispatcher tasks
 template<class T1, class f1, class r>
@@ -67,6 +68,20 @@ void Protocol79::addGameTask(r (Game::*f)(f1), T1 p1)
 	
 		m_nextTask = now + ADD_TASK_INTERVAL;
 	}
+	else{
+		if(m_lastTaskCheck == 0 || (now - m_lastTaskCheck) > CHECK_TASK_INTERVAL){
+			m_lastTaskCheck = now;
+			m_rejectCount = 0;
+		}
+
+		++m_rejectCount;
+
+		int64_t interval = now - m_lastTaskCheck;
+		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Protocol79::logout, this)));
+		}
+	}
 }
 
 template<class T1, class T2, class f1, class f2, class r>
@@ -78,6 +93,20 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2), T1 p1, T2 p2)
 			createTask(boost::bind(f, &g_game, p1, p2)));
 	
 		m_nextTask = now + ADD_TASK_INTERVAL;
+	}
+	else{
+		if(m_lastTaskCheck == 0 || (now - m_lastTaskCheck) > CHECK_TASK_INTERVAL){
+			m_lastTaskCheck = now;
+			m_rejectCount = 0;
+		}
+
+		++m_rejectCount;
+
+		int64_t interval = now - m_lastTaskCheck;
+		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Protocol79::logout, this)));
+		}
 	}
 }
 
@@ -93,6 +122,20 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3), T1 p1, T2 p2, T3 p3)
 	
 		m_nextTask = now + ADD_TASK_INTERVAL;
 	}
+	else{
+		if(m_lastTaskCheck == 0 || (now - m_lastTaskCheck) > CHECK_TASK_INTERVAL){
+			m_lastTaskCheck = now;
+			m_rejectCount = 0;
+		}
+
+		++m_rejectCount;
+
+		int64_t interval = now - m_lastTaskCheck;
+		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Protocol79::logout, this)));
+		}
+	}
 }
 
 template<class T1, class T2, class T3, class T4,
@@ -106,6 +149,20 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4), T1 p1, T2 p2, T3 p3, 
 			createTask(boost::bind(f, &g_game, p1, p2, p3, p4)));
 	
 		m_nextTask = now + ADD_TASK_INTERVAL;
+	}
+	else{
+		if(m_lastTaskCheck == 0 || (now - m_lastTaskCheck) > CHECK_TASK_INTERVAL){
+			m_lastTaskCheck = now;
+			m_rejectCount = 0;
+		}
+
+		++m_rejectCount;
+
+		int64_t interval = now - m_lastTaskCheck;
+		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Protocol79::logout, this)));
+		}
 	}
 }
 
@@ -121,6 +178,20 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5), T1 p1, T2 p2, T3 
 	
 		m_nextTask = now + ADD_TASK_INTERVAL;
 	}
+	else{
+		if(m_lastTaskCheck == 0 || (now - m_lastTaskCheck) > CHECK_TASK_INTERVAL){
+			m_lastTaskCheck = now;
+			m_rejectCount = 0;
+		}
+
+		++m_rejectCount;
+
+		int64_t interval = now - m_lastTaskCheck;
+		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Protocol79::logout, this)));
+		}
+	}
 }
 
 template<class T1, class T2, class T3, class T4, class T5, class T6,
@@ -134,6 +205,20 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6), T1 p1, T2 p2,
 			createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6)));
 	
 		m_nextTask = now + ADD_TASK_INTERVAL;
+	}
+	else{
+		if(m_lastTaskCheck == 0 || (now - m_lastTaskCheck) > CHECK_TASK_INTERVAL){
+			m_lastTaskCheck = now;
+			m_rejectCount = 0;
+		}
+
+		++m_rejectCount;
+
+		int64_t interval = now - m_lastTaskCheck;
+		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Protocol79::logout, this)));
+		}
 	}
 }
 
@@ -149,6 +234,20 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7), T1 p1, T2
 	
 		m_nextTask = now + ADD_TASK_INTERVAL;
 	}
+	else{
+		if(m_lastTaskCheck == 0 || (now - m_lastTaskCheck) > CHECK_TASK_INTERVAL){
+			m_lastTaskCheck = now;
+			m_rejectCount = 0;
+		}
+
+		++m_rejectCount;
+
+		int64_t interval = now - m_lastTaskCheck;
+		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Protocol79::logout, this)));
+		}
+	}
 }
 
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8,
@@ -163,6 +262,20 @@ void Protocol79::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1
 	
 		m_nextTask = now + ADD_TASK_INTERVAL;
 	}
+	else{
+		if(m_lastTaskCheck == 0 || (now - m_lastTaskCheck) > CHECK_TASK_INTERVAL){
+			m_lastTaskCheck = now;
+			m_rejectCount = 0;
+		}
+
+		++m_rejectCount;
+
+		int64_t interval = now - m_lastTaskCheck;
+		if(interval > 0 && ((((float)m_rejectCount) / interval) > (((float)1) / ADD_TASK_INTERVAL * 2) ){
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Protocol79::logout, this)));
+		}
+	}
 }
 
 Protocol79::Protocol79(Connection* connection) :
@@ -171,6 +284,8 @@ Protocol79::Protocol79(Connection* connection) :
 	player = NULL;
 	m_nextTask = 0;
 	m_nextSchedulerTask = 0;
+	m_lastTaskCheck = 0;
+	m_rejectCount = 0;
 }
 
 Protocol79::~Protocol79()
@@ -414,7 +529,6 @@ void Protocol79::parsePacket(NetworkMessage &msg)
 	uint8_t recvbyte = msg.GetByte();
 	//a dead player can not performs actions
 	if((player->isRemoved() || player->getHealth() <= 0) && recvbyte != 0x14){
-		OTSYS_SLEEP(10);
 		return;
 	}
 
