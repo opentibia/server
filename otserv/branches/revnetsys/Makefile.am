@@ -1,11 +1,8 @@
-AUTOMAKE_OPTIONS = foreign
 
 noinst_PROGRAMS = otserv
 
-AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(MYSQL_FLAGS) \
-	$(SQLITE_FLAGS) $(PROFILER_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror
-
-otserv_LDADD = $(XML_LIBS) $(LUA_LIBS) $(BOOST_LIBS) $(GMP_LIBS) -ldl
+AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(MYSQL_FLAGS) $(LUA_CFLAGS) $(DEBUG_FLAGS)\
+	$(SQLITE_FLAGS) $(PROFILER_FLAGS) $(OPTIONAL_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Wall
 
 if USE_MYSQL
 MAYBE_MYSQL = databasemysql.cpp databasemysql.h
@@ -39,6 +36,7 @@ otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
 	admin.cpp admin.h baseevents.cpp baseevents.h \
 	raids.cpp raids.h movement.cpp movement.h combat.cpp combat.h \
 	condition.cpp condition.h weapons.cpp weapons.h talkaction.cpp talkaction.h \
-	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h
+	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h server.cpp connection.cpp \
+	outputmessage.cpp tasks.cpp scheduler.cpp protocollogin.cpp protocol.cpp
 
 

@@ -162,7 +162,7 @@ bool DatabaseMySQL::storeQuery(DBQuery &q, DBResult &dbres)
 
 	// Adding the rows to a list
 	//dbres.clearRows();
-	while(row = mysql_fetch_row(r))
+	while((row = mysql_fetch_row(r)))
 	{
 		//get column sizes
 		unsigned long* lengths = mysql_fetch_lengths(r);

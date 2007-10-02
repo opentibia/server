@@ -298,7 +298,7 @@ void Tile::onAddTileItem(Item* item)
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendAddTileItem(cylinderMapPos, item);
 		}
 	}
@@ -321,7 +321,7 @@ void Tile::onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem)
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
 		}
 	}
@@ -344,7 +344,7 @@ void Tile::onRemoveTileItem(uint32_t index, Item* item)
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendRemoveTileItem(cylinderMapPos, index, item);
 		}
 	}
@@ -367,7 +367,7 @@ void Tile::onUpdateTile()
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendUpdateTile(cylinderMapPos);
 		}
 	}
@@ -414,7 +414,7 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
 		}
 	}
@@ -766,7 +766,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				MagicField* oldField = NULL;
 				ItemVector::iterator iit;
 				for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-					if(oldField = (*iit)->getMagicField()){
+					if((oldField = (*iit)->getMagicField())){
 						if(oldField->isReplaceable()){
 							__removeThing(oldField, 1);
 

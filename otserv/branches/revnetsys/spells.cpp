@@ -161,11 +161,11 @@ Spell* Spells::getSpellByName(const std::string& name)
 {
 	Spell* spell;
 
-	if(spell = getRuneSpellByName(name)){
+	if((spell = getRuneSpellByName(name))){
 		return spell;
 	}
 
-	if(spell = getInstantSpellByName(name)){
+	if((spell = getInstantSpellByName(name))){
 		return spell;
 	}
 

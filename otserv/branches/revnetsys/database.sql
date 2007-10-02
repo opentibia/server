@@ -1,8 +1,4 @@
-DROP TRIGGER IF EXISTS `oncreate_players`;
-DROP TRIGGER IF EXISTS `oncreate_guilds`;
-DROP TRIGGER IF EXISTS `ondelete_players`;
-DROP TRIGGER IF EXISTS `ondelete_guilds`;
-DROP TRIGGER IF EXISTS `ondelete_accounts`;
+
 
 DROP TABLE IF EXISTS `player_depotitems`;
 DROP TABLE IF EXISTS `tile_items`;
@@ -28,7 +24,7 @@ CREATE TABLE `groups` (
     `maxdepotitems` INT NOT NULL,
     `maxviplist` INT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `accounts` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -37,7 +33,7 @@ CREATE TABLE `accounts` (
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
     `premdays` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `players` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -79,7 +75,7 @@ CREATE TABLE `players` (
     KEY (`name`),
     KEY (`account_id`),
     FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `guilds` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -87,7 +83,7 @@ CREATE TABLE `guilds` (
     `ownerid` INT NOT NULL,
     `creationdata` INT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `guild_ranks` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -96,20 +92,20 @@ CREATE TABLE `guild_ranks` (
     `level` INT NOT NULL COMMENT 'rank level - leader, vice, member, maybe something else',
     PRIMARY KEY (`id`),
     FOREIGN KEY (`guild_id`) REFERENCES `guilds`(`id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `player_viplist` (
     `player_id` INT NOT NULL COMMENT 'id of player whose viplist entry it is',
     `vip_id` INT NOT NULL COMMENT 'id of target player of viplist entry',
     KEY (`player_id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `player_storage` (
     `player_id` INT NOT NULL,
     `key` INT NOT NULL,
     `value` INT NOT NULL,
     KEY (`player_id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `player_skills` (
     `player_id` INT NOT NULL,
@@ -117,7 +113,7 @@ CREATE TABLE `player_skills` (
     `value` INT UNSIGNED NOT NULL DEFAULT 0,
     `count` INT UNSIGNED NOT NULL DEFAULT 0,
     KEY (`player_id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `player_items` (
     `player_id` INT NOT NULL,
@@ -127,7 +123,7 @@ CREATE TABLE `player_items` (
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB COMMENT 'replaces unique_id, action_id, text, special_desc',
     KEY (`player_id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `houses` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -135,14 +131,14 @@ CREATE TABLE `houses` (
     `paid` INT UNSIGNED NOT NULL DEFAULT 0,
     `warnings` TEXT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `house_lists` (
     `house_id` INT NOT NULL,
     `listid` INT NOT NULL,
     `list` TEXT NOT NULL,
     KEY (`house_id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `bans` (
     `type` INT NOT NULL COMMENT 'this field defines if its ip, account, player, or any else ban',
@@ -151,7 +147,7 @@ CREATE TABLE `bans` (
     `player` INT UNSIGNED NOT NULL DEFAULT 0,
     `account` INT UNSIGNED NOT NULL DEFAULT 0,
     `time` INT UNSIGNED NOT NULL DEFAULT 0
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `tiles` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -159,7 +155,7 @@ CREATE TABLE `tiles` (
     `y` INT NOT NULL,
     `z` INT NOT NULL,
     PRIMARY KEY(`id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `tile_items` (
     `tile_id` INT NOT NULL,
@@ -169,7 +165,7 @@ CREATE TABLE `tile_items` (
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB,
     KEY (`tile_id`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 CREATE TABLE `player_depotitems` (
     `player_id` INT NOT NULL,
@@ -180,7 +176,7 @@ CREATE TABLE `player_depotitems` (
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB,
     KEY (`player_id`,`depotid`)
-) ENGINE = InnoDB;
+) ENGINE = MyISAM;
 
 DELIMITER |
 

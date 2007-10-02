@@ -1088,7 +1088,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 	if(isLogin && creature == this){
 		Item* item;
 		for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
-			if(item = getInventoryItem((slots_t)slot)){
+			if((item = getInventoryItem((slots_t)slot))){
 				item->__startDecaying();
 				g_moveEvents->onPlayerEquip(this, item, (slots_t)slot, true);
 			}
@@ -2460,7 +2460,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 	Item* item = NULL;
 
 	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
-		if(item = inventory[i]){
+		if((item = inventory[i])){
 			if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
 
 				if(itemCount){
@@ -2476,7 +2476,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 				}
 			}
 
-			if(tmpContainer = item->getContainer()){
+			if((tmpContainer = item->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 		}
@@ -2489,7 +2489,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 		count+= container->__getItemTypeCount(itemId, subType, itemCount);
 
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
-			if(tmpContainer = (*cit)->getContainer()){
+			if((tmpContainer = (*cit)->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 		}

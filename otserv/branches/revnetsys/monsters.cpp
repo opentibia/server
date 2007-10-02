@@ -322,7 +322,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb)
 		}
 	}
 
-	if(sb.spell = g_spells->getSpellByName(name)){
+	if((sb.spell = g_spells->getSpellByName(name))){
 		return true;
 	}
 

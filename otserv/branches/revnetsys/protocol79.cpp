@@ -1436,7 +1436,7 @@ void Protocol79::sendTradeItemRequest(const Player* player, const Item* item, bo
 				listContainer.pop_front();
 
 				for(it = container->getItems(); it != container->getEnd(); ++it){
-					if(tmpContainer = (*it)->getContainer()){
+					if((tmpContainer = (*it)->getContainer())){
 						listContainer.push_back(tmpContainer);
 					}
 

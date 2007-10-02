@@ -234,7 +234,7 @@ bool House::transferToDepot()
 			if(item->isPickupable()){
 				moveItemList.push_back(item);
 			}
-			else if(tmpContainer = item->getContainer()){
+			else if((tmpContainer = item->getContainer())){
 				for(ItemList::const_iterator it = tmpContainer->getItems(); it != tmpContainer->getEnd(); ++it){
 					moveItemList.push_back(*it);
 				}

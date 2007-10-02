@@ -452,7 +452,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendCreatureDisappear(creature, index, isLogout);
 		}
 	}
@@ -1037,7 +1037,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 			else{
 				++i;
 
-				if(tmpContainer = item->getContainer()){
+				if((tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1059,7 +1059,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 			else{
 				++i;
 
-				if(tmpContainer = item->getContainer()){
+				if((tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1106,7 +1106,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 			else{
 				++i;
 
-				if(tmpContainer = item->getContainer()){
+				if((tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1141,7 +1141,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 			else{
 				++i;
 
-				if(tmpContainer = item->getContainer()){
+				if((tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1173,7 +1173,7 @@ uint32_t Game::getMoney(Cylinder* cylinder)
 		if(!(item = thing->getItem()))
 			continue;
 
-		if(tmpContainer = item->getContainer()){
+		if((tmpContainer = item->getContainer())){
 			listContainer.push_back(tmpContainer);
 		}
 		else{
@@ -1190,7 +1190,7 @@ uint32_t Game::getMoney(Cylinder* cylinder)
 		for(it = container->getItems(); it != container->getEnd(); ++it){
 			Item* item = *it;
 
-			if(tmpContainer = item->getContainer()){
+			if((tmpContainer = item->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 			else if(item->getWorth() != 0){
@@ -1229,7 +1229,7 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 		if(!(item = thing->getItem()))
 			continue;
 
-		if(tmpContainer = item->getContainer()){
+		if((tmpContainer = item->getContainer())){
 			listContainer.push_back(tmpContainer);
 		}
 		else{
@@ -1247,7 +1247,7 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 		for(int i = 0; i < (int32_t)container->size() && money > 0; i++){
 			Item* item = container->getItem(i);
 
-			if(tmpContainer = item->getContainer()){
+			if((tmpContainer = item->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 			else if(item->getWorth() != 0){
@@ -1485,7 +1485,7 @@ bool Game::playerWhisper(uint32_t playerId, const std::string& text)
 	
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(tmpPlayer = (*it)->getPlayer()){
+		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->sendCreatureSay(player, SPEAK_WHISPER, text);
 		}
 	}
@@ -2242,7 +2242,7 @@ bool Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int ind
 		listContainer.pop_front();
 
 		for(it = container->getItems(); it != container->getEnd(); ++it){
-			if(tmpContainer = (*it)->getContainer()){
+			if((tmpContainer = (*it)->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 
@@ -2648,7 +2648,7 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 		//send to client
 		Player* tmpPlayer = NULL;
 		for(it = list.begin(); it != list.end(); ++it) {
-			if(tmpPlayer = (*it)->getPlayer()){
+			if((tmpPlayer = (*it)->getPlayer())){
 				tmpPlayer->sendCreatureTurn(creature, stackpos);
 			}
 		}
@@ -2678,7 +2678,7 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(tmpPlayer = (*it)->getPlayer()){
+		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->sendCreatureSay(creature, type, text);
 		}
 	}
@@ -2833,7 +2833,7 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendChangeSpeed(creature, creature->getSpeed());
 		}
 	}
@@ -2853,7 +2853,7 @@ void Game::internalCreatureChangeOutfit(Creature* creature, const Outfit_t& outf
 		//send to client
 		Player* tmpPlayer = NULL;
 		for(it = list.begin(); it != list.end(); ++it) {
-			if(tmpPlayer = (*it)->getPlayer()){
+			if((tmpPlayer = (*it)->getPlayer())){
 				tmpPlayer->sendCreatureChangeOutfit(creature, outfit);
 			}
 		}
@@ -2876,7 +2876,7 @@ void Game::internalCreatureChangeVisible(Creature* creature, bool visible)
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(tmpPlayer = (*it)->getPlayer()){
+		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->sendCreatureChangeVisible(creature, visible);
 		}
 	}
@@ -2898,7 +2898,7 @@ void Game::changeLight(const Creature* creature)
 
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendCreatureLight(creature);
 		}
 	}
@@ -3161,7 +3161,7 @@ void Game::addCreatureHealth(const SpectatorVec& list, const Creature* target)
 {
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendCreatureHealth(target);
 		}
 	}
@@ -3182,7 +3182,7 @@ void Game::addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_
 {
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendAnimatedText(pos, textColor, text);
 		}
 	}
@@ -3201,7 +3201,7 @@ void Game::addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t
 {
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendMagicEffect(pos, effect);
 		}
 	}
@@ -3219,7 +3219,7 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendDistanceShoot(fromPos, toPos, effect);
 		}
 	}
@@ -3237,7 +3237,7 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 
 	Player* spectator;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(spectator = (*it)->getPlayer()){
+		if((spectator = (*it)->getPlayer())){
 			spectator->sendCreatureSkull(player, newSkull);
 		}
 	}

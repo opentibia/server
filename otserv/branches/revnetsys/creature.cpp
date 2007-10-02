@@ -481,7 +481,7 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 		db = it->second;
 
 		if((db.total > mostDamage && (OTSYS_TIME() - db.ticks <= g_game.getInFightTicks()))){
-			if(*_mostDamageCreature = g_game.getCreatureByID((*it).first)){
+			if((*_mostDamageCreature = g_game.getCreatureByID((*it).first))){
 				mostDamage = db.total;
 			}
 		}
