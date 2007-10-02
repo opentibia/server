@@ -21,7 +21,6 @@
 #ifndef __OTSERV_TOOLS_H__
 #define __OTSERV_TOOLS_H__
 
-#include "definitions.h"
 #include "otsystem.h"
 #include "const80.h"
 
@@ -58,7 +57,8 @@ char upchar(char c);
 std::string urlEncode(const char* str);
 std::string urlEncode(const std::string& str);
 
-uint32_t getIPSocket(SOCKET s);
+bool passwordTest(const std::string &plain, std::string &hash);
+
 //buffer should be at least 17 bytes
 void formatIP(uint32_t ip, char* buffer);
 //buffer should have at least 21 bytes

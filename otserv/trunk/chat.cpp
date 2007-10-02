@@ -316,7 +316,7 @@ ChannelList Chat::getChannelList(Player* player)
 		ChatChannel *channel = getChannel(player, 0x00);
 		if(channel)
 			list.push_back(channel);
-		else if(channel = createChannel(player, 0x00))
+		else if((channel = createChannel(player, 0x00)))
 			list.push_back(channel);
 	}
 				

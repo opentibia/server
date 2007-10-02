@@ -73,17 +73,17 @@ public:
 	~Ban(){};
 	void init();
 
-	bool isIpBanished(SOCKET s);
+	bool isIpBanished(uint32_t clientip);
 	bool isPlayerBanished(const std::string& name);
 	bool isAccountBanished(uint32_t account);
-	bool isIpDisabled(SOCKET s);
-	bool acceptConnection(SOCKET s);
+	bool isIpDisabled(uint32_t clientip);
+	bool acceptConnection(uint32_t clientip);
 
 	void addIpBan(uint32_t ip, uint32_t mask, uint32_t time);
 	void addPlayerBan(uint32_t playerId, uint32_t time);
 	void addAccountBan(uint32_t account, uint32_t time);
-	void addConnectionAttempt(SOCKET s);
-	void addLoginAttempt(SOCKET s, bool isSuccess);
+	void addConnectionAttempt(uint32_t clientup);
+	void addLoginAttempt(uint32_t clientip, bool isSuccess);
 
 	bool removeIpBan(uint32_t n);
 	bool removePlayerBan(uint32_t n);

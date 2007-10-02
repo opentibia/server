@@ -159,7 +159,7 @@ ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, 
 	}
 	
 	if(blockWalls && canUse(creature, toPos) == RET_TOOFARAWAY && 
-		!g_game.map->canThrowObjectTo(creaturePos, toPos)){
+		!g_game.getMap()->canThrowObjectTo(creaturePos, toPos)){
 			return RET_CANNOTTHROW;
 	}
 
@@ -218,9 +218,11 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 	
 	if(item->isReadable()){
 		if(item->canWriteText()){
+			player->setWriteItem(item, item->getMaxWriteLength());
 			player->sendTextWindow(item, item->getMaxWriteLength(), true);
 		}
 		else{
+			player->setWriteItem(NULL);
 			player->sendTextWindow(item, 0, false);
 		}
 

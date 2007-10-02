@@ -20,6 +20,7 @@
 #include "otpch.h"
 
 #include "definitions.h"
+
 #include "ban.h"
 #include "ioplayer.h"
 #include "configmanager.h"
@@ -46,10 +47,9 @@ void Ban::init()
 	loginTimeout = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TIMEOUT) / 1000;
 }
 
-bool Ban::isIpBanished(SOCKET s)
+bool Ban::isIpBanished(uint32_t clientip)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	uint32_t clientip = getIPSocket(s);
 	if(clientip != 0){
 		for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
 			if((it->ip & it->mask) == (clientip & it->mask)){
@@ -64,14 +64,13 @@ bool Ban::isIpBanished(SOCKET s)
 	return false;
 }
 
-bool Ban::isIpDisabled(SOCKET s)
+bool Ban::isIpDisabled(uint32_t clientip)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	if(maxLoginTries == 0){
 		return false;
 	}
 
-	uint32_t clientip = getIPSocket(s);
 	if(clientip != 0){
 		uint32_t currentTime = std::time(NULL);
 		IpLoginMap::const_iterator it = ipLoginMap.find(clientip);
@@ -86,10 +85,9 @@ bool Ban::isIpDisabled(SOCKET s)
 	return false;
 }
 
-bool Ban::acceptConnection(SOCKET s)
+bool Ban::acceptConnection(uint32_t clientip)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	uint32_t clientip = getIPSocket(s);
 
 	if(clientip == 0){
 		return false;
@@ -114,10 +112,9 @@ bool Ban::acceptConnection(SOCKET s)
 	return true;
 }
 
-void Ban::addLoginAttempt(SOCKET s, bool isSuccess)
+void Ban::addLoginAttempt(uint32_t clientip, bool isSuccess)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	uint32_t clientip = getIPSocket(s);
 	if(clientip != 0){
 		uint32_t currentTime = std::time(NULL);
 

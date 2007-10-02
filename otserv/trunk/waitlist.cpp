@@ -45,12 +45,12 @@ Waitlist* Waitlist::instance(){
 	return _Wait;
 }
 
-WaitinglistIterator Waitlist::findClient(int acc, uint32_t ip)
+WaitinglistIterator Waitlist::findClient(const Player* player)
 {
 	int slot = 1;
 	WaitinglistIterator it;
 	for(it = waitList.begin(); it != waitList.end();) {
-		if((*it)->acc == acc && (*it)->ip == ip){
+		if((*it)->acc == player->getAccount() && (*it)->ip == player->getIP()){
 			(*it)->slot = slot; //update slot
 			(*it)->timeout = OTSYS_TIME(); //update timeout
 			return it;
@@ -64,21 +64,21 @@ WaitinglistIterator Waitlist::findClient(int acc, uint32_t ip)
 	return waitList.end();
 }
 
-void Waitlist::addClient(int acc, uint32_t ip)
+void Waitlist::addClient(const Player* player)
 {
-	WaitinglistIterator it = findClient(acc, ip);
+	WaitinglistIterator it = findClient(player);
 	
 	if(it == waitList.end()){
-		Wait* wait = new Wait(acc, ip, waitList.size()+1);
+		Wait* wait = new Wait(player->getAccount(), player->getIP(), waitList.size()+1);
 		waitList.push_back(wait);
 	}
 }
 
-int Waitlist::getClientSlot(int acc, uint32_t ip)
+int Waitlist::getClientSlot(const Player* player)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::getClientSlot()");
 	
-	WaitinglistIterator it = findClient(acc, ip);
+	WaitinglistIterator it = findClient(player);
 	if(it != waitList.end()){
 		return (*it)->slot;
 	}
@@ -91,14 +91,14 @@ int Waitlist::getClientSlot(int acc, uint32_t ip)
 	}
 }
 
-bool Waitlist::clientLogin(int acc, uint32_t ip)
+bool Waitlist::clientLogin(const Player* player)
 {		
 	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::clientLogin()");
 
 	Status* stat = Status::instance();	
 	
 	if(!stat->hasSlot()){
-		addClient(acc, ip);
+		addClient(player);
 		return false;
 	}
 	else{
@@ -108,7 +108,7 @@ bool Waitlist::clientLogin(int acc, uint32_t ip)
 		then its not this clients turn to sign in...
 		But if its 47 online, let it sign in!
 		**/
-		WaitinglistIterator it = findClient(acc, ip);
+		WaitinglistIterator it = findClient(player);
 		
 		if(it != waitList.end()){
 			if(((*it)->slot + stat->getPlayersOnline()) <= stat->getMaxPlayersOnline()){ 
@@ -122,22 +122,6 @@ bool Waitlist::clientLogin(int acc, uint32_t ip)
 	}
 	
 	return false;
-}
-
-void Waitlist::createMessage(NetworkMessage& msg, int acc, uint32_t ip)
-{
-	int slot = getClientSlot(acc, ip);
-	std::stringstream tmp;
-	
-	tmp << "Too many players online.\n";
-	tmp << "You are at place " << slot;
-	tmp << " on the waiting list.";
-	
-	msg.AddByte(0x16);
-	msg.AddString(tmp.str());
-	msg.AddByte(getTime(slot)); //number of seconds before retry
-	
-	tmp.str("");
 }
 
 void Waitlist::cleanUpList()

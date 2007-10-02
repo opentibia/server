@@ -168,7 +168,7 @@ double Container::getWeight() const
 		listContainer.pop_front();
 
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit) {
-			if(tmpContainer = (*cit)->getContainer()){
+			if((tmpContainer = (*cit)->getContainer())){
 				listContainer.push_back(tmpContainer);
 				weight += items[tmpContainer->getID()].weight;
 			}
@@ -235,7 +235,7 @@ bool Container::isHoldingItem(const Item* item) const
 				return true;
 			}
 
-			if(tmpContainer = (*cit)->getContainer()){
+			if((tmpContainer = (*cit)->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 		}
@@ -256,14 +256,14 @@ void Container::onAddContainerItem(Item* item)
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendAddContainerItem(this, item);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->onAddContainerItem(this, item);
 		}
 	}
@@ -281,14 +281,14 @@ void Container::onUpdateContainerItem(uint32_t index, Item* oldItem, Item* newIt
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendUpdateContainerItem(this, index, oldItem, newItem);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->onUpdateContainerItem(this, index, oldItem, newItem);
 		}
 	}
@@ -306,14 +306,14 @@ void Container::onRemoveContainerItem(uint32_t index, Item* item)
 	//send change to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendRemoveContainerItem(this, index, item);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->onRemoveContainerItem(this, index, item);
 		}
 	}

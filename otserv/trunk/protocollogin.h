@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Special Tasks which require more arguments than possible
-// with STL functions...
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,57 +18,30 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_TASKS_H__
-#define __OTSERV_TASKS_H__
+#ifndef __OTSERV_PROTOCOL_LOGIN_H__
+#define __OTSERV_PROTOCOL_LOGIN_H__
 
-#include <boost/function.hpp>
-#include "otsystem.h"
+#include "protocol.h"
 
-class Task{
+class NetworkMessage;
+class OutputMessage;
+
+class ProtocolLogin : public Protocol
+{
 public:
-	~Task() {}
-	
-	void operator()(){
-		m_f();
-	}
-		
-protected:
-	
-	Task(boost::function<void (void)> f){
-		m_f = f;
-	}
-	
-	boost::function<void (void)> m_f;
-	
-	friend Task* createTask(boost::function<void (void)>);
-};
+	ProtocolLogin(Connection* connection) : Protocol(connection) {}
+	virtual ~ProtocolLogin() {}
 
-inline Task* createTask(boost::function<void (void)> f){
-	return new Task(f);
-}
-
-class Dispatcher{
-public:
-	~Dispatcher() {}
-	
-	static Dispatcher& getDispatcher()
-	{
-		static Dispatcher dispatcher;
-		return dispatcher;
-	}
-	
-	void addTask(Task* task);
-	
-	static OTSYS_THREAD_RETURN dispatcherThread(void *p);
+	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 protected:
-	Dispatcher();
+	void disconnectClient(uint8_t error, const char* message);
 	
-	OTSYS_THREAD_LOCKVAR m_taskLock;
-	OTSYS_THREAD_SIGNALVAR m_taskSignal;
-	
-	std::list<Task*> m_taskList;
-};
+	bool parseFirstPacket(NetworkMessage& msg);
 
+	#ifdef __DEBUG_NET_DETAIL__
+	virtual void deleteProtocolTask();
+	#endif
+};
 
 #endif

@@ -37,7 +37,8 @@ public:
 	~ConfigManager();
 
 	enum string_config_t {
-		CONFIG_FILE = 0,
+		DUMMY_STR = 0,
+		CONFIG_FILE,
 		DATA_DIRECTORY,
 		MAP_FILE,
 		MAP_STORE_FILE,
@@ -60,7 +61,6 @@ public:
 		SQL_USER,
 		SQL_PASS,
 		SQL_DB,
-		SQLITE_DB,
 		SQL_TYPE,
 		MAP_HOST,
 		MAP_USER,
@@ -96,16 +96,17 @@ public:
 		OTSERV_DB_ENABLED,
 		SAVE_CLIENT_DEBUG_ASSERTIONS,
 		CHECK_ACCOUNTS,
+		PASSWORD_TYPE,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
 
 	bool loadFile(const std::string& _filename);
 	bool reload();
-	std::string getString(int _what) { return m_confString[_what]; };
-	int getNumber(int _what);
 
-	bool setNumber(int _what, int _value);
+	const std::string& getString(uint32_t _what);
+	int getNumber(uint32_t _what);
+	bool setNumber(uint32_t _what, int _value);
 
 private:
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");

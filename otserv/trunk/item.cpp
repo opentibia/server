@@ -133,12 +133,12 @@ Item::Item(const Item &i) :
 	fluid = i.fluid;
 
 	uint16_t _actionId;
-	if(_actionId = i.getActionId()){
+	if((_actionId = i.getActionId())){
 		setActionId(_actionId);
 	}
 
 	uint16_t _uniqueId;
-	if(_uniqueId = i.getUniqueId()){
+	if((_uniqueId = i.getUniqueId())){
 		setUniqueId(_uniqueId);
 	}
 
@@ -160,17 +160,17 @@ Item::Item(const Item &i) :
 	}
 
 	uint32_t _owner;
-	if(_owner = i.getOwner()){
+	if((_owner = i.getOwner())){
 		setOwner(_owner);
 	}
 
 	uint32_t _duration;
-	if(_duration = i.getDuration()){
+	if((_duration = i.getDuration())){
 		setDuration(_duration);
 	}
 
 	uint32_t _decayState;
-	if(_decayState = i.getDecaying()){
+	if((_decayState = i.getDecaying())){
 		setDecaying((ItemDecayState_t)_decayState);
 	}
 }

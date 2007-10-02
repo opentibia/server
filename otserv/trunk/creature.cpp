@@ -21,7 +21,6 @@
 
 #include "creature.h"
 #include "game.h"
-#include "otsystem.h"
 #include "player.h"
 #include "npc.h"
 #include "monster.h"
@@ -149,7 +148,7 @@ bool Creature::canSeeCreature(const Creature* creature) const
 void Creature::addEventThink()
 {
 	if(eventCheck == 0){
-		eventCheck = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
+		eventCheck = Scheduler::getScheduler().addEvent(createSchedulerTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
 		//onStartThink();
 	}
 }
@@ -157,7 +156,7 @@ void Creature::addEventThink()
 void Creature::stopEventThink()
 {
 	if(eventCheck != 0){
-		g_game.stopEvent(eventCheck);
+		Scheduler::getScheduler().stopEvent(eventCheck);
 		eventCheck = 0;
 		//onStopThink();
 	}
@@ -277,14 +276,14 @@ void Creature::addEventWalk()
 		//std::cout << "addEventWalk() - " << getName() << std::endl;
 
 		int64_t ticks = getEventStepTicks();
-		eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkWalk), getID())));
+		eventWalk = Scheduler::getScheduler().addEvent(createSchedulerTask(ticks, boost::bind(&Game::checkWalk, &g_game, getID())));
 	}
 }
 
 void Creature::stopEventWalk()
 {
 	if(eventWalk != 0){
-		g_game.stopEvent(eventWalk);
+		Scheduler::getScheduler().stopEvent(eventWalk);
 		eventWalk = 0;
 
 		if(!listWalkDir.empty()){
@@ -490,7 +489,7 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 		db = it->second;
 
 		if((db.total > mostDamage && (OTSYS_TIME() - db.ticks <= g_game.getInFightTicks()))){
-			if(*_mostDamageCreature = g_game.getCreatureByID((*it).first)){
+			if((*_mostDamageCreature = g_game.getCreatureByID((*it).first))){
 				mostDamage = db.total;
 			}
 		}
@@ -872,11 +871,13 @@ bool Creature::addCondition(Condition* condition)
 
 bool Creature::addCombatCondition(Condition* condition)
 {
+	//Caution: condition variable could be deleted after the call to addCondition
+	ConditionType_t type = condition->getType();
 	if(!addCondition(condition)){
 		return false;
 	}
 
-	onAddCombatCondition(condition->getType());
+	onAddCombatCondition(type);
 	return true;
 }
 
@@ -1013,8 +1014,6 @@ std::string Creature::getDescription(int32_t lookDistance) const
 
 int Creature::getStepDuration() const
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Creature::getStepDuration()");
-
 	int32_t duration = 0;
 
 	if(isRemoved()){

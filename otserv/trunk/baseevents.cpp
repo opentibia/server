@@ -68,7 +68,7 @@ bool BaseEvents::loadFromXml(const std::string& datadir)
 		while(p){
 			if(p->name){
 				std::string nodeName = (const char*)p->name;
-				if(event = getEvent(nodeName)){
+				if((event = getEvent(nodeName))){
 					if(event->configureEvent(p)){
 						bool success = true;
 						std::string scriptfile;

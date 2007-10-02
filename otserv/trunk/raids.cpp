@@ -154,7 +154,7 @@ void Raids::startup()
 
 	setLastRaidEnd(OTSYS_TIME());
 
-	checkRaidsEvent = g_game.addEvent(makeTask(CHECK_RAIDS_INTERVAL*1000, boost::bind(&Raids::checkRaids, this)));
+	checkRaidsEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(CHECK_RAIDS_INTERVAL*1000, boost::bind(&Raids::checkRaids, this)));
 
 	started = true;
 }
@@ -162,8 +162,6 @@ void Raids::startup()
 
 void Raids::checkRaids()
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Raids::checkRaids()");
-
 	if(!getRunning()){
 		uint64_t now = OTSYS_TIME();
 		for(RaidList::iterator it = raidList.begin(); it != raidList.end(); ++it){
@@ -184,12 +182,12 @@ void Raids::checkRaids()
 		}
 	}
 
-	checkRaidsEvent = g_game.addEvent(makeTask(CHECK_RAIDS_INTERVAL*1000, boost::bind(&Raids::checkRaids, this)));
+	checkRaidsEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(CHECK_RAIDS_INTERVAL*1000, boost::bind(&Raids::checkRaids, this)));
 }
 
 void Raids::clear()
 {
-	g_game.stopEvent(checkRaidsEvent);
+	Scheduler::getScheduler().stopEvent(checkRaidsEvent);
 	checkRaidsEvent = 0;
 
 	RaidList::iterator it;
@@ -315,19 +313,17 @@ void Raid::startRaid()
 	RaidEvent* raidEvent = getNextRaidEvent();
 	if(raidEvent){
 		state = RAIDSTATE_EXECUTING;
-		nextEventEvent = g_game.addEvent(makeTask(raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, raidEvent)));
+		nextEventEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, raidEvent)));
 	}
 }
 
 void Raid::executeRaidEvent(RaidEvent* raidEvent)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Raid::executeRaidEvent");
-
 	if(raidEvent->executeEvent()){
 		nextEvent++;
 		RaidEvent* newRaidEvent = getNextRaidEvent();
 		if(newRaidEvent){
-			nextEventEvent = g_game.addEvent(makeTask(newRaidEvent->getDelay()-raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
+			nextEventEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(newRaidEvent->getDelay()-raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
 		}
 		else{
 			resetRaid();
@@ -353,7 +349,7 @@ void Raid::resetRaid()
 void Raid::stopEvents()
 {
 	if(nextEventEvent != 0){
-		g_game.stopEvent(nextEventEvent);
+		Scheduler::getScheduler().stopEvent(nextEventEvent);
 		nextEventEvent = 0;
 	}
 }

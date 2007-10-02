@@ -147,10 +147,11 @@ void DBResult::clear()
 				delete[] it->second->row[i];
 
 			if(it->second->length[i] != NULL)
-				delete[] it->second->length[i];
+				delete it->second->length[i];
 		}
-
-		delete[] it->second;
+		delete[] it->second->row;
+		delete[] it->second->length;
+		delete it->second;
 		m_listRows.erase(it++);
 	}
 

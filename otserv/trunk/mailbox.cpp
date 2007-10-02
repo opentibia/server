@@ -28,9 +28,7 @@
 
 #include <sstream>
 
-
 extern Game g_game;
-using namespace std;
 
 Mailbox::Mailbox(uint16_t _type) : Item(_type)
 {
@@ -207,7 +205,7 @@ bool Mailbox::getReceiver(Item* item, std::string& name, uint32_t& dp)
 		return false;
 
 	std::string temp;
-	std::istringstream iss(item->getText(), istringstream::in);
+	std::istringstream iss(item->getText(), std::istringstream::in);
 	int i = 0;
 	std::string line[2];
 

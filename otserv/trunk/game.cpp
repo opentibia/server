@@ -52,6 +52,7 @@
 #include "talkaction.h"
 #include "spells.h"
 #include "configmanager.h"
+#include "server.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -59,6 +60,7 @@ extern OTSYS_THREAD_LOCKVAR maploadlock;
 #endif
 
 extern ConfigManager g_config;
+extern Server* g_server;
 extern Actions* g_actions;
 extern Commands commands;
 extern Chat g_chat;
@@ -67,30 +69,21 @@ extern Spells* g_spells;
 
 Game::Game()
 {
-	eventIdCount = 1000;
-
 	gameState = GAME_STATE_NORMAL;
 	map = NULL;
 	worldType = WORLD_TYPE_PVP;
 
-	OTSYS_THREAD_LOCKVARINIT(gameLock);
-	OTSYS_THREAD_LOCKVARINIT(eventLock);
 	OTSYS_THREAD_LOCKVARINIT(AutoID::autoIDLock);
 
 #if defined __EXCEPTION_TRACER__
 	OTSYS_THREAD_LOCKVARINIT(maploadlock);
 #endif
 
-	OTSYS_THREAD_SIGNALVARINIT(eventSignal);
-	BufferedPlayers.clear();
-
-	OTSYS_CREATE_THREAD(eventThread, this);
-
 #ifdef __DEBUG_CRITICALSECTION__
 	OTSYS_CREATE_THREAD(monitorThread, this);
 #endif
 
-	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 
 	int daycycle = 3600;
 	//(1440 minutes/day)/(3600 seconds/day)*10 seconds event interval
@@ -102,7 +95,7 @@ Game::Game()
 	lightlevel = LIGHT_LEVEL_DAY;
 	light_state = LIGHT_STATE_DAY;
 
-	addEvent(makeTask(10000, boost::bind(&Game::checkLight, this, 10000)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(10000, boost::bind(&Game::checkLight, this, 10000)));
 }
 
 Game::~Game()
@@ -119,14 +112,17 @@ void Game::setWorldType(WorldType_t type)
 
 GameState_t Game::getGameState()
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getGameState()");
 	return gameState;
 }
 
 void Game::setGameState(GameState_t newstate)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::setGameState()");
+	if(gameState != GAME_STATE_SHUTDOWN){
 	gameState = newstate;
+		if(newstate == GAME_STATE_SHUTDOWN && g_server){
+			g_server->stop();
+}
+	}
 }
 
 int Game::loadMap(std::string filename, std::string filekind)
@@ -197,127 +193,6 @@ OTSYS_THREAD_RETURN Game::monitorThread(void *p)
 	}
 }
 #endif
-
-OTSYS_THREAD_RETURN Game::eventThread(void *p)
-{
-#if defined __EXCEPTION_TRACER__
-	ExceptionHandler eventExceptionHandler;
-	eventExceptionHandler.InstallHandler();
-#endif
-
-	srand(time(NULL));
-
-	Game* _this = (Game*)p;
-
-	// basically what we do is, look at the first scheduled item,
-	// and then sleep until it's due (or if there is none, sleep until we get an event)
-	// of course this means we need to get a notification if there are new events added
-	while(true){
-	#ifdef __DEBUG__EVENTSCHEDULER__
-		std::cout << "schedulercycle start..." << std::endl;
-	#endif
-
-		SchedulerTask* task = NULL;
-		bool runtask = false;
-
-		// check if there are events waiting...
-		OTSYS_THREAD_LOCK(_this->eventLock, "eventThread()")
-
-		int ret;
-		if(_this->eventList.size() == 0){
-			// unlock mutex and wait for signal
-			ret = OTSYS_THREAD_WAITSIGNAL(_this->eventSignal, _this->eventLock);
-		}
-		else{
-			// unlock mutex and wait for signal or timeout
-			ret = OTSYS_THREAD_WAITSIGNAL_TIMED(_this->eventSignal, _this->eventLock, _this->eventList.top()->getCycle());
-		}
-		// the mutex is locked again now...
-		if(ret == OTSYS_THREAD_TIMEOUT){
-			// ok we had a timeout, so there has to be an event we have to execute...
-	#ifdef __DEBUG__EVENTSCHEDULER__
-			std::cout << "event found at " << OTSYS_TIME() << " which is to be scheduled at: " << _this->eventList.top()->getCycle() << std::endl;
-	#endif
-			task = _this->eventList.top();
-			_this->eventList.pop();
-		}
-
-		if(task){
-			std::map<uint32_t, SchedulerTask*>::iterator it = _this->eventIdMap.find(task->getEventId());
-			if(it != _this->eventIdMap.end()){
-				_this->eventIdMap.erase(it);
-				runtask = true;
-			}
-		}
-
-		OTSYS_THREAD_UNLOCK(_this->eventLock, "eventThread()");
-		if(task){
-			if(runtask){
-				(*task)(_this);
-			}
-			delete task;
-		}
-	}
-#if defined __EXCEPTION_TRACER__
-	eventExceptionHandler.RemoveHandler();
-#endif
-
-}
-
-uint32_t Game::addEvent(SchedulerTask* event)
-{
-	bool do_signal = false;
-	OTSYS_THREAD_LOCK(eventLock, "addEvent()");
-
-	if(event->getEventId() == 0) {
-		++eventIdCount;
-		event->setEventId(eventIdCount);
-	}
-
-#ifdef __DEBUG__EVENTSCHEDULER__
-		std::cout << "addEvent - " << event->getEventId() << std::endl;
-#endif
-
-	eventIdMap[event->getEventId()] = event;
-
-	bool isEmpty = eventList.empty();
-	eventList.push(event);
-
-	if(isEmpty || *event < *eventList.top())
-		do_signal = true;
-
-	OTSYS_THREAD_UNLOCK(eventLock, "addEvent()");
-
-	if (do_signal)
-		OTSYS_THREAD_SIGNAL_SEND(eventSignal);
-
-	return event->getEventId();
-}
-
-bool Game::stopEvent(uint32_t eventid)
-{
-	if(eventid == 0)
-		return false;
-
-	OTSYS_THREAD_LOCK(eventLock, "stopEvent()")
-
-	std::map<uint32_t, SchedulerTask*>::iterator it = eventIdMap.find(eventid);
-	if(it != eventIdMap.end()) {
-
-#ifdef __DEBUG__EVENTSCHEDULER__
-		std::cout << "stopEvent - eventid: " << eventid << "/" << it->second->getEventId() << std::endl;
-#endif
-
-		//it->second->setEventId(0); //invalidate the event
-		eventIdMap.erase(it);
-
-		OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()");
-		return true;
-	}
-
-	OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()");
-	return false;
-}
 
 /*****************************************************************************/
 
@@ -466,8 +341,6 @@ Player* Game::getPlayerByID(uint32_t id)
 
 Creature* Game::getCreatureByName(const std::string& s)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getCreatureByName()");
-
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 	for(AutoList<Creature>::listiterator it = listCreature.list.begin(); it != listCreature.list.end(); ++it){
@@ -484,8 +357,6 @@ Creature* Game::getCreatureByName(const std::string& s)
 
 Player* Game::getPlayerByName(const std::string& s)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getPlayerByName()");
-
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
@@ -502,8 +373,6 @@ Player* Game::getPlayerByName(const std::string& s)
 
 Player* Game::getPlayerByAccount(uint32_t acc)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getPlayerByAccount()");
-
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		if(!it->second->isRemoved()){
 			if(it->second->getAccount() == acc){
@@ -517,8 +386,6 @@ Player* Game::getPlayerByAccount(uint32_t acc)
 
 bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= false*/)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placePlayer()");
-
 	if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && getPlayersOnline() >= maxPlayers){
 		return false;
 	}
@@ -528,8 +395,6 @@ bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= fals
 
 bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::internalPlaceCreature()");
-
 	if(!map->placeCreature(pos, creature, forced)){
 		return false;
 	}
@@ -577,7 +442,6 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 
 bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::removeCreature()");
 	if(creature->isRemoved())
 		return false;
 
@@ -601,7 +465,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendCreatureDisappear(creature, index, isLogout);
 		}
 	}
@@ -625,12 +489,12 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	return true;
 }
 
-void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
-	const Position& toPos, uint8_t count)
+bool Game::playerMoveThing(uint32_t playerId, const Position& fromPos,
+	uint16_t spriteId, uint8_t fromStackPos, const Position& toPos, uint8_t count)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
-	if(player->isRemoved())
-		return;
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
 
 	Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
 	uint8_t fromIndex = 0;
@@ -662,30 +526,37 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 
 	if(thing && toCylinder){
 		if(Creature* movingCreature = thing->getCreature()){
-			addEvent(makeTask(2000, boost::bind(&Game::moveCreature, this, player->getID(),
+			Scheduler::getScheduler().addEvent(createSchedulerTask(2000,
+				boost::bind(&Game::playerMoveCreature, this, player->getID(),
 				movingCreature->getID(), toCylinder->getPosition())));
 		}
 		else if(Item* movingItem = thing->getItem()){
-			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, spriteId);
+			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count,
+				spriteId);
 		}
+
+		return true;
 	}
 	else{
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 	}
+
+	return false;
 }
 
-void Game::moveCreature(uint32_t playerId, uint32_t movingCreatureId, const Position& toPos)
+bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId, const Position& toPos)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
-
 	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
 	Creature* movingCreature = getCreatureByID(movingCreatureId);
 
-	if(!player || player->isRemoved() || !movingCreature || movingCreature->isRemoved())
-		return;
+	if(!movingCreature || movingCreature->isRemoved())
+		return false;
 
 	if(!Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition()))
-		return;
+		return false;
 
 	ReturnValue ret = RET_NOERROR;
 	Tile* toTile = map->getTile(toPos);
@@ -721,6 +592,8 @@ void Game::moveCreature(uint32_t playerId, uint32_t movingCreatureId, const Posi
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 	}
+
+	return true;
 }
 
 ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, bool force /*= false*/)
@@ -855,7 +728,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 	Item* item, uint32_t count, uint16_t spriteId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::moveItem()");
 	if(player->isRemoved())
 		return;
 
@@ -1219,7 +1091,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 			else{
 				++i;
 
-				if(tmpContainer = item->getContainer()){
+				if((tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1241,7 +1113,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 			else{
 				++i;
 
-				if(tmpContainer = item->getContainer()){
+				if((tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1288,7 +1160,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 			else{
 				++i;
 
-				if(tmpContainer = item->getContainer()){
+				if((tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1323,7 +1195,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 			else{
 				++i;
 
-				if(tmpContainer = item->getContainer()){
+				if((tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1355,7 +1227,7 @@ uint32_t Game::getMoney(Cylinder* cylinder)
 		if(!(item = thing->getItem()))
 			continue;
 
-		if(tmpContainer = item->getContainer()){
+		if((tmpContainer = item->getContainer())){
 			listContainer.push_back(tmpContainer);
 		}
 		else{
@@ -1372,7 +1244,7 @@ uint32_t Game::getMoney(Cylinder* cylinder)
 		for(it = container->getItems(); it != container->getEnd(); ++it){
 			Item* item = *it;
 
-			if(tmpContainer = item->getContainer()){
+			if((tmpContainer = item->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 			else if(item->getWorth() != 0){
@@ -1411,7 +1283,7 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 		if(!(item = thing->getItem()))
 			continue;
 
-		if(tmpContainer = item->getContainer()){
+		if((tmpContainer = item->getContainer())){
 			listContainer.push_back(tmpContainer);
 		}
 		else{
@@ -1429,7 +1301,7 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 		for(int i = 0; i < (int32_t)container->size() && money > 0; i++){
 			Item* item = container->getItem(i);
 
-			if(tmpContainer = item->getContainer()){
+			if((tmpContainer = item->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 			else if(item->getWorth() != 0){
@@ -1632,11 +1504,20 @@ void Game::getSpectators(SpectatorVec& list, const Position& centerPos, bool mul
 	map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
 }
 
-//Implementation of player invoked events
-bool Game::movePlayer(Player* player, Direction direction)
+bool Game::anonymousBroadcastMessage(MessageClasses type, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::movePlayer()");
-	if(player->isRemoved())
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		(*it).second->sendTextMessage(type, text.c_str());
+	}
+
+	return true;
+}
+
+//Implementation of player invoked events
+bool Game::playerMove(uint32_t playerId, Direction direction)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	player->setFollowCreature(NULL);
@@ -1644,10 +1525,10 @@ bool Game::movePlayer(Player* player, Direction direction)
 	return (internalMoveCreature(player, direction) == RET_NOERROR);
 }
 
-bool Game::playerWhisper(Player* player, const std::string& text)
+bool Game::playerWhisper(uint32_t playerId, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerWhisper()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	SpectatorVec list;
@@ -1658,7 +1539,7 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(tmpPlayer = (*it)->getPlayer()){
+		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->sendCreatureSay(player, SPEAK_WHISPER, text);
 		}
 	}
@@ -1676,10 +1557,10 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	return true;
 }
 
-bool Game::playerYell(Player* player, const std::string& text)
+bool Game::playerYell(uint32_t playerId, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerYell()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	int32_t addExhaustion = 0;
@@ -1704,11 +1585,32 @@ bool Game::playerYell(Player* player, const std::string& text)
 	return !isExhausted;
 }
 
-bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver,
+bool Game::playerBroadcastMessage(uint32_t playerId, const std::string& text)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	return internalBroadcastMessage(player, text);
+}
+
+bool Game::internalBroadcastMessage(Player* player, const std::string& text)
+{
+	if(!player->hasFlag(PlayerFlag_CanBroadcast))
+		return false;
+
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		(*it).second->sendCreatureSay(player, SPEAK_BROADCAST, text);
+	}
+
+	return true;
+}
+
+bool Game::playerSpeakTo(uint32_t playerId, SpeakClasses type, const std::string& receiver,
 	const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSpeakTo");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	Player* toPlayer = getPlayerByName(receiver);
@@ -1730,10 +1632,10 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 	return true;
 }
 
-bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId)
+bool Game::playerTalkToChannel(uint32_t playerId, SpeakClasses type, const std::string& text, unsigned short channelId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerTalkToChannel");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	if(type == SPEAK_CHANNEL_R1 && !player->hasFlag(PlayerFlag_CanTalkRedChannel)){
@@ -1747,55 +1649,158 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 	return true;
 }
 
-bool Game::playerBroadcastMessage(Player* player, const std::string& text)
+bool Game::playerCreatePrivateChannel(uint32_t playerId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerBroadcastMessage()");
-	if(player->isRemoved() || !player->hasFlag(PlayerFlag_CanBroadcast))
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
-	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		(*it).second->sendCreatureSay(player, SPEAK_BROADCAST, text);
+	ChatChannel* channel = g_chat.createChannel(player, 0xFFFF);
+
+	if(!channel){
+		return false;
 	}
 
+	if(!channel->addUser(player)){
+		return false;
+	}
+
+	player->sendCreatePrivateChannel(channel->getId(), channel->getName());
 	return true;
 }
 
-bool Game::anonymousBroadcastMessage(MessageClasses type, const std::string& text)
+bool Game::playerChannelInvite(uint32_t playerId, const std::string& name)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::anonymousBroadcastMessage()");
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
 
-	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		(*it).second->sendTextMessage(type, text.c_str());
+	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
+
+	if(!channel){
+		return false;
 	}
 
+	Player* invitePlayer = getPlayerByName(name);
+
+	if(!invitePlayer){
+		return false;
+	}
+
+	channel->invitePlayer(player, invitePlayer);
 	return true;
 }
 
-bool Game::playerAutoWalk(Player* player, std::list<Direction>& listDir)
+bool Game::playerChannelExclude(uint32_t playerId, const std::string& name)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerAutoWalk()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
+
+	if(!channel){
+		return false;
+	}
+
+	Player* excludePlayer = getPlayerByName(name);
+
+	if(!excludePlayer){
+		return false;
+	}
+
+	channel->excludePlayer(player, excludePlayer);
+	return true;
+}
+
+bool Game::playerRequestChannels(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	player->sendChannelsDialog();
+	return true;
+}
+
+bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	if(!g_chat.addUserToChannel(player, channelId)){
+		return false;
+	}
+
+	ChatChannel* channel = g_chat.getChannel(player, channelId);
+	if(!channel){
+		return false;
+	}
+
+	player->sendChannel(channel->getId(), channel->getName());
+	return true;
+}
+
+bool Game::playerCloseChannel(uint32_t playerId, uint16_t channelId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	g_chat.removeUserFromChannel(player, channelId);
+	return true;
+}
+
+bool Game::playerOpenPrivateChannel(uint32_t playerId, const std::string& receiver)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	Player* playerPriv = getPlayerByName(receiver);
+	if(!playerPriv){
+		return false;
+	}
+
+	player->sendOpenPrivateChannel(playerPriv->getName());
+	return true;
+}
+
+bool Game::playerReceivePing(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	player->receivePing();
+	return true;
+}
+
+bool Game::playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	return player->startAutoWalk(listDir);
 }
 
-bool Game::playerStopAutoWalk(Player* player)
+bool Game::playerStopAutoWalk(uint32_t playerId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerStopAutoWalk()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	player->stopEventWalk();
 	return true;
 }
 
-bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos,
-	uint16_t fromSpriteId, const Position& toPos, uint8_t toStackPos,
-	uint16_t toSpriteId, bool isHotkey)
+bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
+	const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItemEx()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	if(isHotkey && g_config.getNumber(ConfigManager::HOTKEYS) == 0){
@@ -1823,11 +1828,11 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item, isHotkey);
 }
 
-bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
+bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPos,
 	uint8_t index, uint16_t spriteId, bool isHotkey)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItem()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	if(isHotkey && g_config.getNumber(ConfigManager::HOTKEYS) == 0){
@@ -1866,11 +1871,11 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackPos,
 	return true;
 }
 
-bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
+bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos,
 	uint32_t creatureId, uint16_t spriteId, bool isHotkey)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseBattleWindow");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	Creature* creature = getCreatureByID(creatureId);
@@ -1910,10 +1915,61 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 	return g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), item, isHotkey, creatureId);
 }
 
-bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPos, const uint16_t spriteId)
+bool Game::playerCloseContainer(uint32_t playerId, uint8_t cid)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRotateItem()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	player->closeContainer(cid);
+	player->sendCloseContainer(cid);
+	return true;
+}
+
+bool Game::playerMoveUpContainer(uint32_t playerId, uint8_t cid)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	Container* container = player->getContainer(cid);
+	if(!container){
+		return false;
+	}
+
+	Container* parentContainer = dynamic_cast<Container*>(container->getParent());
+	if(!parentContainer){
+		return false;
+	}
+
+	bool hasParent = (dynamic_cast<const Container*>(parentContainer->getParent()) != NULL);
+	player->addContainer(cid, parentContainer);
+	player->sendContainer(cid, parentContainer, hasParent);
+
+	return true;
+}
+
+bool Game::playerUpdateContainer(uint32_t playerId, uint8_t cid)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	Container* container = player->getContainer(cid);
+	if(!container){
+		return false;
+	}
+
+	bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
+	player->sendContainer(cid, container, hasParent);
+
+	return true;
+}
+
+bool Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stackPos, const uint16_t spriteId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	Thing* thing = internalGetThing(player, pos, stackPos);
@@ -1940,59 +1996,85 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackPo
 	return true;
 }
 
-bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
+bool Game::playerWriteItem(uint32_t playerId, uint32_t windowTextId, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerWriteItem()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
-	if(item->isRemoved()){
+	uint16_t maxTextLength = 0;
+	uint32_t internalWindowTextId = 0;
+	Item* writeItem = player->getWriteItem(internalWindowTextId, maxTextLength);
+
+	if(text.length() > maxTextLength || windowTextId != internalWindowTextId){
+		return false;
+	}
+
+	if(!writeItem || writeItem->isRemoved()){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
-	Cylinder* topParent = item->getTopParent();
-
+	Cylinder* topParent = writeItem->getTopParent();
 	Player* owner = dynamic_cast<Player*>(topParent);
 	if(owner && owner != player){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
-	if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
+	if(!Position::areInRange<1,1,0>(writeItem->getPosition(), player->getPosition())){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
 	if(!text.empty()){
-		if(item->getText() != text){
-			item->setText(text);
-			item->setWriter(player->getName());
-			item->setWrittenDate(std::time(NULL));
+		if(writeItem->getText() != text){
+			writeItem->setText(text);
+			writeItem->setWriter(player->getName());
+			writeItem->setWrittenDate(std::time(NULL));
 		}
 	}
 	else{
-		item->resetText();
-		item->resetWriter();
-		item->resetWrittenDate();
+		writeItem->resetText();
+		writeItem->resetWriter();
+		writeItem->resetWrittenDate();
 	}
 
-	uint16_t newtype = Item::items[item->getID()].writeOnceItemId;
-	if(newtype != 0){
-		transformItem(item, newtype);
+	uint16_t newType = Item::items[writeItem->getID()].writeOnceItemId;
+	if(newType != 0){
+		transformItem(writeItem, newType);
+	}
+
+	player->setWriteItem(NULL);
+	return true;
+}
+
+bool Game::playerUpdateHouseWindow(uint32_t playerId, uint8_t listId, uint32_t windowTextId, const std::string& text)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	uint32_t internalWindowTextId;
+	uint32_t internalListId;
+	House* house = player->getEditHouse(internalWindowTextId, internalListId);
+
+	if(house && internalWindowTextId == windowTextId && listId == 0){
+		house->setAccessList(internalListId, text);
+		player->setEditHouse(NULL);
 	}
 
 	return true;
 }
 
-bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stackPos,
-	uint32_t playerId, uint16_t spriteId)
+bool Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t stackPos,
+	uint32_t tradePlayerId, uint16_t spriteId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestTrade()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
-	Player* tradePartner = getPlayerByID(playerId);
+	Player* tradePartner = getPlayerByID(tradePlayerId);
 	if(!tradePartner || tradePartner == player) {
 		player->sendTextMessage(MSG_INFO_DESCR, "Sorry, not possible.");
 		return false;
@@ -2080,10 +2162,10 @@ bool Game::internalStartTrade(Player* player, Player* tradePartner, Item* tradeI
 
 }
 
-bool Game::playerAcceptTrade(Player* player)
+bool Game::playerAcceptTrade(uint32_t playerId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerAcceptTrade()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	if(!(player->getTradeState() == TRADE_ACKNOWLEDGE || player->getTradeState() == TRADE_INITIATED)){
@@ -2191,10 +2273,10 @@ std::string Game::getTradeErrorDescription(ReturnValue ret, Item* item)
 	return ss.str().c_str();
 }
 
-bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
+bool Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int index)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerLookInTrade()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	Player* tradePartner = player->tradePartner;
@@ -2237,7 +2319,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 		listContainer.pop_front();
 
 		for(it = container->getItems(); it != container->getEnd(); ++it){
-			if(tmpContainer = (*it)->getContainer()){
+			if((tmpContainer = (*it)->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 
@@ -2259,12 +2341,17 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	return foundItem;
 }
 
-bool Game::playerCloseTrade(Player* player)
+bool Game::playerCloseTrade(uint32_t playerId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseTrade()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
+	return internalCloseTrade(player);
+}
+
+bool Game::internalCloseTrade(Player* player)
+{
 	Player* tradePartner = player->tradePartner;
 	if((tradePartner && tradePartner->getTradeState() == TRADE_TRANSFER) ||
 		  player->getTradeState() == TRADE_TRANSFER){
@@ -2314,10 +2401,10 @@ bool Game::playerCloseTrade(Player* player)
 	return true;
 }
 
-bool Game::playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackPos)
+bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteId, uint8_t stackPos)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerLookAt()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	Thing* thing = internalGetThing(player, pos, stackPos, spriteId, STACKPOS_LOOK);
@@ -2350,15 +2437,22 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t spriteId, 
 	return true;
 }
 
-bool Game::playerSetAttackedCreature(Player* player, uint32_t creatureId)
+bool Game::playerCancelAttackAndFollow(uint32_t playerId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetAttackedCreature()");
-	if(player->isRemoved())
+	return playerSetAttackedCreature(playerId, 0) &&
+			playerFollowCreature(playerId, 0);
+}
+
+bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	if(player->getAttackedCreature() && creatureId == 0){
 		player->setAttackedCreature(NULL);
 		player->sendCancelTarget();
+		return true;
 	}
 
 	Creature* attackCreature = getCreatureByID(creatureId);
@@ -2402,10 +2496,10 @@ bool Game::playerSetAttackedCreature(Player* player, uint32_t creatureId)
 	}
 }
 
-bool Game::playerFollowCreature(Player* player, uint32_t creatureId)
+bool Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerFollowCreature");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	player->setAttackedCreature(NULL);
@@ -2418,10 +2512,10 @@ bool Game::playerFollowCreature(Player* player, uint32_t creatureId)
 	return player->setFollowCreature(followCreature);
 }
 
-bool Game::playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_t chaseMode)
+bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMode_t chaseMode)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetFightModes");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	player->setFightMode(fightMode);
@@ -2429,10 +2523,10 @@ bool Game::playerSetFightModes(Player* player, fightMode_t fightMode, chaseMode_
 	return true;
 }
 
-bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
+bool Game::playerRequestAddVip(uint32_t playerId, const std::string& vip_name)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::requestAddVip");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	std::string real_name;
@@ -2453,18 +2547,42 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 	return player->addVIP(guid, real_name, online);
 }
 
-bool Game::playerTurn(Player* player, Direction dir)
+bool Game::playerRequestRemoveVip(uint32_t playerId, uint32_t guid)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerTurn()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	player->removeVIP(guid);
+	return true;
+}
+
+bool Game::playerTurn(uint32_t playerId, Direction dir)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	return internalCreatureTurn(player, dir);
 }
 
-bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
+bool Game::playerRequestOutfit(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	player->sendOutfitWindow();
+	return true;
+}
+
+bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	const std::string& receiver, const std::string& text)
 {
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
 	uint32_t muteTime;
 	if(player->isMuted(muteTime)){
 		std::stringstream ss;
@@ -2473,11 +2591,11 @@ bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
 		return false;
 	}
 
-	if(playerSayCommand(player, type, text)){
+	if(playerSayCommand(playerId, type, text)){
 		return true;
 	}
 
-	if(playerSaySpell(player, type, text)){
+	if(playerSaySpell(playerId, type, text)){
 		return true;
 	}
 
@@ -2485,25 +2603,25 @@ bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
 
 	switch(type){
 		case SPEAK_SAY:
-			return playerSayDefault(player, text);
+			return playerSayDefault(playerId, text);
 			break;
 		case SPEAK_WHISPER:
-			return playerWhisper(player, text);
+			return playerWhisper(playerId, text);
 			break;
 		case SPEAK_YELL:
-			return playerYell(player, text);
+			return playerYell(playerId, text);
 			break;
 		case SPEAK_PRIVATE:
 		case SPEAK_PRIVATE_RED:
-			return playerSpeakTo(player, type, receiver, text);
+			return playerSpeakTo(playerId, type, receiver, text);
 			break;
 		case SPEAK_CHANNEL_Y:
 		case SPEAK_CHANNEL_R1:
 		case SPEAK_CHANNEL_R2:
-			return playerTalkToChannel(player, type, text, channelId);
+			return playerTalkToChannel(playerId, type, text, channelId);
 			break;
 		case SPEAK_BROADCAST:
-			return playerBroadcastMessage(player, text);
+			return playerBroadcastMessage(playerId, text);
 			break;
 
 		default:
@@ -2513,21 +2631,22 @@ bool Game::playerSay(Player* player, uint16_t channelId, SpeakClasses type,
 	return false;
 }
 
-bool Game::playerSayDefault(Player* player, const std::string& text)
+bool Game::playerSayDefault(uint32_t playerId, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSayDefault()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	return internalCreatureSay(player, SPEAK_SAY, text);
 }
 
-bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
+bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerChangeOutfit()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
+	if(player->canWear(outfit.lookType, outfit.lookAddons)){
 	player->defaultOutfit = outfit;
 
 	if(player->hasCondition(CONDITION_OUTFIT)){
@@ -2535,14 +2654,15 @@ bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
 	}
 
 	internalCreatureChangeOutfit(player, outfit);
+	}
 
 	return true;
 }
 
-bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string& text)
+bool Game::playerSayCommand(uint32_t playerId, SpeakClasses type, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSayCommand()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	//First, check if this was a command
@@ -2557,10 +2677,10 @@ bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string
 	return false;
 }
 
-bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
+bool Game::playerSaySpell(uint32_t playerId, SpeakClasses type, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSaySpell()");
-	if(player->isRemoved())
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
 		return false;
 
 	TalkActionResult_t result;
@@ -2617,7 +2737,7 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 		//send to client
 		Player* tmpPlayer = NULL;
 		for(it = list.begin(); it != list.end(); ++it) {
-			if(tmpPlayer = (*it)->getPlayer()){
+			if((tmpPlayer = (*it)->getPlayer())){
 				tmpPlayer->sendCreatureTurn(creature, stackpos);
 			}
 		}
@@ -2647,7 +2767,7 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(tmpPlayer = (*it)->getPlayer()){
+		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->sendCreatureSay(creature, type, text);
 		}
 	}
@@ -2762,8 +2882,6 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 
 void Game::checkWalk(uint32_t creatureId)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkWalk");
-
 	Creature* creature = getCreatureByID(creatureId);
 	if(creature && creature->getHealth() > 0){
 		creature->onWalk();
@@ -2773,8 +2891,6 @@ void Game::checkWalk(uint32_t creatureId)
 
 void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreature()");
-
 	Creature* creature = getCreatureByID(creatureId);
 
 	if(creature){
@@ -2806,7 +2922,7 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendChangeSpeed(creature, creature->getSpeed());
 		}
 	}
@@ -2826,7 +2942,7 @@ void Game::internalCreatureChangeOutfit(Creature* creature, const Outfit_t& outf
 		//send to client
 		Player* tmpPlayer = NULL;
 		for(it = list.begin(); it != list.end(); ++it) {
-			if(tmpPlayer = (*it)->getPlayer()){
+			if((tmpPlayer = (*it)->getPlayer())){
 				tmpPlayer->sendCreatureChangeOutfit(creature, outfit);
 			}
 		}
@@ -2849,7 +2965,7 @@ void Game::internalCreatureChangeVisible(Creature* creature, bool visible)
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(tmpPlayer = (*it)->getPlayer()){
+		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->sendCreatureChangeVisible(creature, visible);
 		}
 	}
@@ -2871,7 +2987,7 @@ void Game::changeLight(const Creature* creature)
 
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendCreatureLight(creature);
 		}
 	}
@@ -3134,7 +3250,7 @@ void Game::addCreatureHealth(const SpectatorVec& list, const Creature* target)
 {
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendCreatureHealth(target);
 		}
 	}
@@ -3154,7 +3270,7 @@ void Game::addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_
 {
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendAnimatedText(pos, textColor, text);
 		}
 	}
@@ -3173,7 +3289,7 @@ void Game::addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t
 {
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendMagicEffect(pos, effect);
 		}
 	}
@@ -3189,7 +3305,7 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
+		if((player = (*it)->getPlayer())){
 			player->sendDistanceShoot(fromPos, toPos, effect);
 		}
 	}
@@ -3207,7 +3323,7 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 
 	Player* spectator;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(spectator = (*it)->getPlayer()){
+		if((spectator = (*it)->getPlayer())){
 			spectator->sendCreatureSkull(player, newSkull);
 		}
 	}
@@ -3253,8 +3369,6 @@ void Game::internalDecayItem(Item* item)
 
 void Game::checkDecay(int32_t interval)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
-
 	Item* item = NULL;
 	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
 		item = *it;
@@ -3278,15 +3392,13 @@ void Game::checkDecay(int32_t interval)
 		}
 	}
 
-	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 	flushSendBuffers();
 }
 
 void Game::checkLight(int t)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkLight()");
-
-	addEvent(makeTask(10000, boost::bind(&Game::checkLight, this, 10000)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(10000, boost::bind(&Game::checkLight, this, 10000)));
 
 	light_hour = light_hour + light_hour_delta;
 	if(light_hour > 1440)
@@ -3364,21 +3476,7 @@ void Game::resetCommandTag()
 
 void Game::flushSendBuffers()
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::flushSendBuffers()");
-
-	for(std::vector<Player*>::iterator it = BufferedPlayers.begin(); it != BufferedPlayers.end(); ++it) {
-		(*it)->flushMsg();
-		(*it)->SendBuffer = false;
-		(*it)->releaseThing2();
-
-		/*
-		#ifdef __DEBUG__
-				std::cout << "flushSendBuffers() - releaseThing()" << std::endl;
-		#endif
-		*/
-	}
-
-	BufferedPlayers.clear();
+	OutputMessagePool::getInstance()->sendAll();
 
 	//free memory
 	for(std::vector<Thing*>::iterator it = ToReleaseThings.begin(); it != ToReleaseThings.end(); ++it){
@@ -3394,25 +3492,8 @@ void Game::flushSendBuffers()
 	toDecayItems.clear();
 }
 
-void Game::addPlayerBuffer(Player* p)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::addPlayerBuffer()");
-
-/*
-#ifdef __DEBUG__
-	std::cout << "addPlayerBuffer() - useThing()" << std::endl;
-#endif
-*/
-	if(p->SendBuffer == false){
-		p->useThing2();
-		BufferedPlayers.push_back(p);
-		p->SendBuffer = true;
-	}
-}
-
 void Game::FreeThing(Thing* thing)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::FreeThing()");
 	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);
 }

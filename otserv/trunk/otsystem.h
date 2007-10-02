@@ -19,27 +19,27 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTTHREAD_H__
-#define __OTTHREAD_H__
+#ifndef __OTSERV_OTTHREAD_H__
+#define __OTSERV_OTTHREAD_H__
 
-#include "definitions.h"
 #include "logger.h"
 
-
 #include <list>
+#include <vector>
 #include <algorithm>
+
+typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
 
 #if defined WIN32 || defined __WINDOWS__
 #ifdef __WIN_LOW_FRAG_HEAP__
 #define _WIN32_WINNT 0x0501
 #endif
-#include <windows.h>
+#include <winsock2.h>
 #include <process.h>    /* _beginthread, _endthread */
 #include <stddef.h>
 #include <stdlib.h>
 #include <conio.h>
 #include <sys/timeb.h>
-#include <winsock.h>
 
 #define OTSYS_CREATE_THREAD(a, b) _beginthread(a, 0, b)
 
@@ -107,7 +107,7 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
   
   DWORD tout = 0;
   if (tout64 > 0)
-	tout = (DWORD)(tout64);
+		tout = (DWORD)(tout64);
 
   //LeaveCriticalSection(&lock);
 	OTSYS_THREAD_UNLOCK(lock, "OTSYS_THREAD_WAITSIGNAL_TIMED");
@@ -207,7 +207,9 @@ inline int64_t OTSYS_TIME()
   return ((int64_t)t.millitm) + ((int64_t)t.time) * 1000;
 }
 
-#define OTSYS_THREAD_WAITSIGNAL(a,b) pthread_cond_wait(&a, &b)
+inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock){
+	return pthread_cond_wait(&signal, &lock);
+}
 
 inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, int64_t cycle) {
 		  timespec tv;
@@ -308,4 +310,4 @@ public:
 
 #endif //__DEBUG_CRITICALSECTION__
 
-#endif // #ifndef __OTTHREAD_H__
+#endif // #ifndef __OTSYSTEM_H__

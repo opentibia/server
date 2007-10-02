@@ -61,24 +61,24 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 		return false;
 	}
 
-	if(nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "width")){
+	if((nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "width"))){
 		map->mapwidth = atoi(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
 
-	if(nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "height")){
+	if((nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "height"))){
 		map->mapheight = atoi(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
 	
-	if(nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "spawnfile")){
+	if((nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "spawnfile"))){
 		map->spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
 		map->spawnfile += nodeValue;
 
 		xmlFreeOTSERV(nodeValue);
 	}
 
-	if(nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "housefile")){
+	if((nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "housefile"))){
 		map->housefile = identifier.substr(0, identifier.rfind('/') + 1);
 		map->housefile += nodeValue;
 
@@ -93,7 +93,7 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 		if(xmlStrcmp(nodeChild->name, (const xmlChar*)"tile") == 0){
 
 			Position posTile;
-			if(nodeValue = (char*)xmlGetProp(nodeChild, (const xmlChar *) "x")){
+			if((nodeValue = (char*)xmlGetProp(nodeChild, (const xmlChar *) "x"))){
 				posTile.x = atoi(nodeValue);
 				xmlFreeOTSERV(nodeValue);
 			}
@@ -102,7 +102,7 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 				return false;
 			}
 
-			if(nodeValue = (char*)xmlGetProp(nodeChild, (const xmlChar *) "y")){
+			if((nodeValue = (char*)xmlGetProp(nodeChild, (const xmlChar *) "y"))){
 				posTile.y = atoi(nodeValue);
 				xmlFreeOTSERV(nodeValue);
 			}
@@ -111,7 +111,7 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 				return false;
 			}
 
-			if(nodeValue = (char*)xmlGetProp(nodeChild, (const xmlChar *) "z")){
+			if((nodeValue = (char*)xmlGetProp(nodeChild, (const xmlChar *) "z"))){
 				posTile.z = atoi(nodeValue);
 				xmlFreeOTSERV(nodeValue);
 			}
@@ -123,7 +123,7 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 			tile = map->getTile(posTile);
 			if(!tile){
 				int32_t houseid = 0;
-				if(nodeValue = (char*)xmlGetProp(nodeChild, (const xmlChar *) "houseid")){
+				if((nodeValue = (char*)xmlGetProp(nodeChild, (const xmlChar *) "houseid"))){
 					houseid = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
@@ -155,7 +155,7 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 				Position templePos;
 				uint32_t townid = 0;
 
-				if(nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "townid")){
+				if((nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "townid"))){
 					townid = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
@@ -170,22 +170,22 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 					Towns::getInstance().addTown(townid, town);
 				}
 
-				if(nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "name")){
+				if((nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "name"))){
 					town->setName(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
 
-				if(nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "templex")){
+				if((nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "templex"))){
 					templePos.x = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
 
-				if(nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "templey")){
+				if((nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "templey"))){
 					templePos.y = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
 
-				if(nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "templez")){
+				if((nodeValue = (char*)xmlGetProp(nodeTown, (const xmlChar *) "templez"))){
 					templePos.z = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
@@ -275,7 +275,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 	Item* item = NULL;
 
 	unsigned int groundId = 0;
-	if(nodeValue = (char*)xmlGetProp(nodeTile, (const xmlChar *) "ground")){
+	if((nodeValue = (char*)xmlGetProp(nodeTile, (const xmlChar *) "ground"))){
 		groundId = atoi(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
@@ -285,7 +285,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 		tile->__internalAddThing(ground);
 	}
 
-	if(nodeValue = (char*)xmlGetProp(nodeTile, (const xmlChar *) "pz")){ 
+	if((nodeValue = (char*)xmlGetProp(nodeTile, (const xmlChar *) "pz"))){ 
 		if(strcmp(nodeValue, "1") == 0){
 			tile->setFlag(TILESTATE_PROTECTIONZONE);
 		}
@@ -299,7 +299,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 			unsigned int id = 0;
 			item = NULL;
 
-			if(nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "id")){
+			if((nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "id"))){
 				id = atoi(nodeValue);
 				xmlFreeOTSERV(nodeValue);
 			}

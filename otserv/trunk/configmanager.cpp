@@ -19,8 +19,9 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "definitions.h"
 #include "configmanager.h"
-
+#include <iostream>
 
 ConfigManager::ConfigManager()
 {
@@ -63,7 +64,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[SQL_USER] = getGlobalString(L, "sql_user");
 		m_confString[SQL_PASS] = getGlobalString(L, "sql_pass");
 		m_confString[SQL_DB] = getGlobalString(L, "sql_db");
-		m_confString[SQLITE_DB] = getGlobalString(L, "sqlite_db");
+		//m_confString[SQLITE_DB] = getGlobalString(L, "sqlite_db");
 		m_confString[SQL_TYPE] = getGlobalString(L, "sql_type");
 		m_confString[MAP_HOST] = getGlobalString(L, "map_host");
 		m_confString[MAP_USER] = getGlobalString(L, "map_user");
@@ -106,7 +107,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 
 	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
 	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
-
+	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_isLoaded = true;
 
 	lua_close(L);
@@ -121,17 +122,28 @@ bool ConfigManager::reload()
 	return loadFile(m_confString[CONFIG_FILE]);
 }
 
-int ConfigManager::getNumber(int _what)
+const std::string& ConfigManager::getString(uint32_t _what)
+{ 
+	if(m_isLoaded && _what < LAST_STRING_CONFIG)
+		return m_confString[_what];
+	else
+	{
+		std::cout << "Warning: [ConfigManager::getString] " << _what << std::endl;
+		return m_confString[DUMMY_STR];
+	}
+}
+
+int ConfigManager::getNumber(uint32_t _what)
 {
 	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
 		return m_confInteger[_what];
 	else
 	{
-		fprintf(stderr, "WARNING: ConfigManager::getNumber()\n");
+		std::cout << "Warning: [ConfigManager::getNumber] " << _what << std::endl;
 		return 0;
 	}
 }
-bool ConfigManager::setNumber(int _what, int _value)
+bool ConfigManager::setNumber(uint32_t _what, int _value)
 {
 	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
 	{
@@ -140,7 +152,7 @@ bool ConfigManager::setNumber(int _what, int _value)
 	}
 	else
 	{
-		fprintf(stderr, "WARNING: ConfigManager::setNumber()\n");
+		std::cout << "Warning: [ConfigManager::setNumber] " << _what << std::endl;
 		return false;
 	}
 }

@@ -35,7 +35,6 @@
 #include "iomapotbm.h"
 #include "iomapserialize.h"
 
-#include "otsystem.h"
 #include <stdio.h>
 
 #include "items.h"
@@ -394,7 +393,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 			if(leafE){
 				for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
 
-					if(floor = leafE->getFloor(nz)){
+					if((floor = leafE->getFloor(nz))){
 						//get current floor limits
 						offsetZ = centerPos.z - nz;
 
@@ -406,7 +405,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 						for(int ly = 0; ly < FLOOR_SIZE; ++ly){
 							for(int lx = 0; lx < FLOOR_SIZE; ++lx){
 								if((nx + lx >= floorx1 && nx + lx <= floorx2) && (ny + ly >= floory1 && ny + ly <= floory2)){
-									if(tile = floor->tiles[(nx + lx) & FLOOR_MASK][(ny + ly) & FLOOR_MASK]){
+									if((tile = floor->tiles[(nx + lx) & FLOOR_MASK][(ny + ly) & FLOOR_MASK])){
 										for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
 											if(std::find(list.begin(), list.end(), *cit) == list.end()){
 												list.push_back(*cit);

@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Special Tasks which require more arguments than possible
-// with STL functions...
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,57 +18,43 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_TASKS_H__
-#define __OTSERV_TASKS_H__
+#ifndef __OTSERV_SERVER_H__
+#define __OTSERV_SERVER_H__
 
-#include <boost/function.hpp>
-#include "otsystem.h"
+#include "definitions.h"
 
-class Task{
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+#include <boost/utility.hpp>
+
+class Connection;
+
+class Server : boost::noncopyable
+{
 public:
-	~Task() {}
-	
-	void operator()(){
-		m_f();
-	}
-		
-protected:
-	
-	Task(boost::function<void (void)> f){
-		m_f = f;
-	}
-	
-	boost::function<void (void)> m_f;
-	
-	friend Task* createTask(boost::function<void (void)>);
-};
-
-inline Task* createTask(boost::function<void (void)> f){
-	return new Task(f);
-}
-
-class Dispatcher{
-public:
-	~Dispatcher() {}
-	
-	static Dispatcher& getDispatcher()
+	Server(uint32_t serverip, uint16_t port)
+		: m_io_service(),
+			m_acceptor(m_io_service, 
+		 boost::asio::ip::tcp::endpoint(
+		 	boost::asio::ip::address(boost::asio::ip::address_v4(serverip)), 
+			port))
 	{
-		static Dispatcher dispatcher;
-		return dispatcher;
+		accept();
 	}
 	
-	void addTask(Task* task);
-	
-	static OTSYS_THREAD_RETURN dispatcherThread(void *p);
-	
-protected:
-	Dispatcher();
-	
-	OTSYS_THREAD_LOCKVAR m_taskLock;
-	OTSYS_THREAD_SIGNALVAR m_taskSignal;
-	
-	std::list<Task*> m_taskList;
-};
+	~Server() { }
 
+	void run() { m_io_service.run(); }
+
+	void stop();
+
+private:
+	void accept();
+	void onAccept(Connection* connection, const boost::system::error_code& error);
+	void onStopServer();
+	
+	boost::asio::io_service m_io_service;
+	boost::asio::ip::tcp::acceptor m_acceptor;
+};
 
 #endif

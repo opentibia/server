@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Special Tasks which require more arguments than possible
-// with STL functions...
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,58 +17,42 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#include "otpch.h"
 
-#ifndef __OTSERV_TASKS_H__
-#define __OTSERV_TASKS_H__
+#include "server.h"
+#include "connection.h"
 
-#include <boost/function.hpp>
-#include "otsystem.h"
+void Server::accept()
+{
+	//Connection* connection = new Connection(m_io_service);
+	Connection* connection = ConnectionManager::getInstance()->createConnection(m_io_service);
 
-class Task{
-public:
-	~Task() {}
-	
-	void operator()(){
-		m_f();
-	}
-		
-protected:
-	
-	Task(boost::function<void (void)> f){
-		m_f = f;
-	}
-	
-	boost::function<void (void)> m_f;
-	
-	friend Task* createTask(boost::function<void (void)>);
-};
-
-inline Task* createTask(boost::function<void (void)> f){
-	return new Task(f);
+	m_acceptor.async_accept(connection->getHandle(),
+		boost::bind(&Server::onAccept, this, connection, 
+		boost::asio::placeholders::error));
 }
 
-class Dispatcher{
-public:
-	~Dispatcher() {}
-	
-	static Dispatcher& getDispatcher()
-	{
-		static Dispatcher dispatcher;
-		return dispatcher;
+void Server::onAccept(Connection* connection, const boost::system::error_code& error)
+{
+	if(!error){
+		connection->acceptConnection();
+		#ifdef __DEBUG_NET_DETAIL__
+		std::cout << "accept - OK" << std::endl;
+		#endif
+		accept();
 	}
-	
-	void addTask(Task* task);
-	
-	static OTSYS_THREAD_RETURN dispatcherThread(void *p);
-	
-protected:
-	Dispatcher();
-	
-	OTSYS_THREAD_LOCKVAR m_taskLock;
-	OTSYS_THREAD_SIGNALVAR m_taskSignal;
-	
-	std::list<Task*> m_taskList;
-};
+	else{
+		PRINT_ASIO_ERROR("Accepting");
+	}
+}
 
+void Server::stop()
+{
+	m_io_service.post(boost::bind(&Server::onStopServer, this));
+}
 
-#endif
+void Server::onStopServer()
+{
+	m_acceptor.close();
+	ConnectionManager::getInstance()->closeAll();
+}

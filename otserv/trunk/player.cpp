@@ -80,7 +80,7 @@ Creature()
 	lastlogin  = 0;
 	lastip = 0;
 	lastLoginSaved = 0;
-	SendBuffer = false;
+	//SendBuffer = false;
 	npings = 0;
 	internal_ping = 0;
 	lastAction = 0;
@@ -148,6 +148,14 @@ Creature()
  	vocation_id = (Vocation_t)0;
 
  	town = 0;
+ 	lastip = 0;
+
+	windowTextId = 0;
+	writeItem = NULL;
+	maxWriteLen = 0;
+
+	editHouse = NULL;
+	editListId = 0;
 
 #ifdef __SKULLSYSTEM__
 	redSkullTicks = 0;
@@ -171,10 +179,13 @@ Player::~Player()
 		it->second->releaseThing2();
 	}
 
-	//std::cout << "Player destructor " << this->getID() << std::endl;
+	//std::cout << "Player destructor " << this << std::endl;
 	if(client){
 		delete client;
 	}
+
+	setWriteItem(NULL);
+	setEditHouse(NULL);
 }
 
 void Player::setVocation(uint32_t vocId)
@@ -466,7 +477,9 @@ void Player::sendIcons() const
 		}
 	}
 
+	if(client){
 	client->sendIcons(icons);
+}
 }
 
 void Player::updateInventoryWeigth()
@@ -562,17 +575,21 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 		skills[skill][SKILL_PERCENT] = 0;
 		std::stringstream advMsg;
 		advMsg << "You advanced in " << getSkillName(skill) << ".";
+		if(client){
 		client->sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
 		client->sendSkills();
+	}
 	}
 	else{
 		//update percent
 		uint32_t newPercent = std::min((uint32_t)100, (100*skills[skill][SKILL_TRIES])/vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1));
 	 	if(skills[skill][SKILL_PERCENT] != newPercent){
 			skills[skill][SKILL_PERCENT] = newPercent;
+			if(client){
 			client->sendSkills();
 	 	}
 	}
+}
 }
 
 void Player::setVarStats(stats_t stat, int32_t modifier)
@@ -754,7 +771,11 @@ bool Player::getStorageValue(const uint32_t key, int32_t& value) const
 
 bool Player::canSee(const Position& pos) const
 {
+	if(client){
 	return client->canSee(pos);
+}
+
+	return false;
 }
 
 bool Player::canSeeCreature(const Creature* creature) const
@@ -1032,63 +1053,126 @@ void Player::sendStats()
 	lastSentStats.magLevel = getMagicLevel();
 	lastSentStats.manaSpent = manaSpent;
 
+	if(client){
 	client->sendStats();
+}
 }
 
 void Player::sendPing(uint32_t interval)
 {
-	internal_ping = internal_ping + interval;
+	internal_ping += interval;
 	if(internal_ping >= 5000){ //1 ping each 5 seconds
 		internal_ping = 0;
 		npings++;
+		if(client){
 		client->sendPing();
 	}
-	if(npings >= 6){
-		//std::cout << "logout" << std::endl;
-		if(hasCondition(CONDITION_INFIGHT) && health > 0){
-			//logout?
-			//client->logout();
 		}
-		else{
-			//client->logout();
+
+	if(!hasCondition(CONDITION_INFIGHT)){
+		if(!client){
+			g_game.removeCreature(this, true);
+		}
+		else if(npings > 24){
+			client->logout();
 		}
 	}
 }
 
-void Player::sendHouseWindow(House* _house, uint32_t _listid) const
+Item* Player::getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen)
 {
-	std::string text;
-	if(_house->getAccessList(_listid, text)){
-		client->sendHouseWindow(_house, _listid, text);
-	}
+	_windowTextId = windowTextId;
+	_maxWriteLen = maxWriteLen;
+	return writeItem;
 }
 
+void Player::setWriteItem(Item* item, uint16_t _maxWriteLen /*= 0*/)
+{
+	windowTextId++;
+	if(writeItem){
+		writeItem->releaseThing2();
+	}
+
+	if(item){
+		writeItem = item;
+		maxWriteLen = _maxWriteLen;
+		writeItem->useThing2();
+	}
+		else{
+		writeItem = NULL;
+		maxWriteLen = 0;
+		}
+	}
+
+House* Player::getEditHouse(uint32_t& _windowTextId, uint32_t& _listId)
+{
+	_windowTextId = windowTextId;
+	_listId = editListId;
+	return editHouse;
+}
+
+void Player::setEditHouse(House* house, uint32_t listId /*= 0*/)
+{
+	windowTextId++;
+	editHouse = house;
+	editListId = listId;
+}
+
+void Player::sendHouseWindow(House* house, uint32_t listId) const
+{
+	if(client){
+	std::string text;
+		if(house->getAccessList(listId, text)){
+			client->sendHouseWindow(windowTextId, house, listId, text);
+	}
+}
+}
+
+void Player::sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName)
+{
+	if(client){
+		client->sendCreatePrivateChannel(channelId, channelName);
+	}
+}
 
 //container
 void Player::sendAddContainerItem(const Container* container, const Item* item)
 {
+	if(client){
   for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
 		if(cl->second == container){
 			client->sendAddContainerItem(cl->first, item);
 		}
 	}
 }
+}
 
 void Player::sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem)
 {
+	if(client){
   for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
 		if(cl->second == container){
 			client->sendUpdateContainerItem(cl->first, slot, newItem);
 		}
 	}
 }
+}
 
 void Player::sendRemoveContainerItem(const Container* container, uint8_t slot, const Item* item)
 {
+	if(client){
   for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
 		if(cl->second == container){
 			client->sendRemoveContainerItem(cl->first, slot);
 		}
+	}
+}
+}
+
+void Player::sendContainer(uint32_t cid, const Container* container, bool hasParent)
+{
+	if(client){
+		client->sendContainer(cid, container, hasParent);
 	}
 }
 
@@ -1107,7 +1191,7 @@ void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item
 
 	if(tradeState != TRADE_TRANSFER){
 		if(tradeItem && oldItem == tradeItem){
-			g_game.playerCloseTrade(this);
+			g_game.internalCloseTrade(this);
 		}
 	}
 }
@@ -1120,7 +1204,7 @@ void Player::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item
 		if(tradeItem){
 			const Container* container = item->getContainer();
 			if(container && container->isHoldingItem(tradeItem)){
-				g_game.playerCloseTrade(this);
+				g_game.internalCloseTrade(this);
 			}
 		}
 	}
@@ -1136,7 +1220,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 	if(isLogin && creature == this){
 		Item* item;
 		for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
-			if(item = getInventoryItem((slots_t)slot)){
+			if((item = getInventoryItem((slots_t)slot))){
 				item->__startDecaying();
 				g_moveEvents->onPlayerEquip(this, item, (slots_t)slot, true);
 			}
@@ -1195,7 +1279,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		}
 
 		if(tradePartner){
-			g_game.playerCloseTrade(this);
+			g_game.internalCloseTrade(this);
 		}
 
 		g_chat.removeUserFromAllChannels(this);
@@ -1230,13 +1314,13 @@ void Player::onCreatureMove(const Creature* creature, const Position& newPos, co
 			//check if we should close trade
 			if(tradeItem){
 				if(!Position::areInRange<1,1,0>(tradeItem->getPosition(), getPosition())){
-					g_game.playerCloseTrade(this);
+					g_game.internalCloseTrade(this);
 				}
 			}
 
 			if(tradePartner){
 				if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), getPosition())){
-					g_game.playerCloseTrade(this);
+					g_game.internalCloseTrade(this);
 				}
 			}
 		}
@@ -1267,7 +1351,7 @@ void Player::onRemoveContainerItem(const Container* container, uint8_t slot, con
 
 		if(tradeItem){
 			if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
-				g_game.playerCloseTrade(this);
+				g_game.internalCloseTrade(this);
 			}
 		}
 	}
@@ -1275,15 +1359,18 @@ void Player::onRemoveContainerItem(const Container* container, uint8_t slot, con
 
 void Player::onCloseContainer(const Container* container)
 {
+	if(client){
   for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
 		if(cl->second == container){
 			client->sendCloseContainer(cl->first);
 		}
 	}
 }
+}
 
 void Player::onSendContainer(const Container* container)
 {
+	if(client){
 	bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
 
 	for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
@@ -1291,6 +1378,7 @@ void Player::onSendContainer(const Container* container)
 			client->sendContainer(cl->first, container, hasParent);
 		}
 	}
+}
 }
 
 //inventory
@@ -1320,7 +1408,7 @@ void Player::onRemoveInventoryItem(slots_t slot, Item* item)
 		if(tradeItem){
 			const Container* container = item->getContainer();
 			if(container && container->isHoldingItem(tradeItem)){
-				g_game.playerCloseTrade(this);
+				g_game.internalCloseTrade(this);
 			}
 		}
 	}
@@ -1330,14 +1418,14 @@ void Player::checkTradeState(const Item* item)
 {
 	if(tradeItem && tradeState != TRADE_TRANSFER){
 		if(tradeItem == item){
-			g_game.playerCloseTrade(this);
+			g_game.internalCloseTrade(this);
 		}
 		else{
 			const Container* container = dynamic_cast<const Container*>(item->getParent());
 
 			while(container != NULL){
 				if(container == tradeItem){
-					g_game.playerCloseTrade(this);
+					g_game.internalCloseTrade(this);
 					break;
 				}
 
@@ -1726,7 +1814,10 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 
 uint32_t Player::getIP() const
 {
-	return client->getIP();
+	if(client){
+		return client->getIP();
+	}
+	return 0;
 }
 
 void Player::onDie()
@@ -1802,7 +1893,9 @@ void Player::onDie()
 	if(newLevel != level){
 		std::stringstream lvMsg;
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
+		if(client){
 		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
+	}
 	}
 
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
@@ -1819,7 +1912,11 @@ void Player::onDie()
 		}
 	}
 
-	//client->sendReLoginWindow();
+	/*
+	if(client){
+		client->sendReLoginWindow();
+}
+	*/
 }
 
 Item* Player::getCorpse()
@@ -1911,22 +2008,36 @@ void Player::addList()
 	listPlayer.addList(this);
 }
 
+void Player::kickPlayer()
+{
+	if(client){
+		client->logout();
+	}
+	else{
+		g_game.removeCreature(this);
+	}
+}
+
 void Player::notifyLogIn(Player* login_player)
 {
+	if(client){
 	VIPListSet::iterator it = VIPList.find(login_player->getGUID());
 	if(it != VIPList.end()){
 		client->sendVIPLogIn(login_player->getGUID());
 		sendTextMessage(MSG_STATUS_SMALL, (login_player->getName() + " has logged in."));
 	}
 }
+}
 
 void Player::notifyLogOut(Player* logout_player)
 {
+	if(client){
 	VIPListSet::iterator it = VIPList.find(logout_player->getGUID());
 	if(it != VIPList.end()){
 		client->sendVIPLogOut(logout_player->getGUID());
 		sendTextMessage(MSG_STATUS_SMALL, (logout_player->getName() + " has logged out."));
 	}
+}
 }
 
 bool Player::removeVIP(uint32_t _guid)
@@ -1962,8 +2073,9 @@ bool Player::addVIP(uint32_t _guid, std::string& name, bool isOnline, bool inter
 
 	VIPList.insert(_guid);
 
-	if(!internal)
+	if(client && !internal){
 		client->sendVIP(_guid, name, isOnline);
+	}
 
 	return true;
 }
@@ -1988,8 +2100,10 @@ void Player::autoCloseContainers(const Container* container)
 
 	for(CloseList::iterator it = closeList.begin(); it != closeList.end(); ++it){
 		closeContainer(*it);
+		if(client){
 		client->sendCloseContainer(*it);
-	}
+		}
+}
 }
 
 bool Player::hasCapacity(const Item* item, uint32_t count) const
@@ -2484,7 +2598,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 	Item* item = NULL;
 
 	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
-		if(item = inventory[i]){
+		if((item = inventory[i])){
 			if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
 
 				if(itemCount){
@@ -2500,7 +2614,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 				}
 			}
 
-			if(tmpContainer = item->getContainer()){
+			if((tmpContainer = item->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 		}
@@ -2513,7 +2627,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 		count+= container->__getItemTypeCount(itemId, subType, itemCount);
 
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
-			if(tmpContainer = (*cit)->getContainer()){
+			if((tmpContainer = (*cit)->getContainer())){
 				listContainer.push_back(tmpContainer);
 			}
 		}
@@ -2540,7 +2654,9 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		updateItemsLight();
 		updateInventoryWeigth();
+		if(client){
 		client->sendStats();
+	}
 	}
 
 	if(const Item* item = thing->getItem()){
@@ -2575,7 +2691,9 @@ void Player::postRemoveNotification(Thing* thing, int32_t index, bool isComplete
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		updateItemsLight();
 		updateInventoryWeigth();
+		if(client){
 		client->sendStats();
+	}
 	}
 
 	if(const Item* item = thing->getItem()){
@@ -3111,7 +3229,9 @@ void Player::addUnjustifiedDead(const Player* attacked)
 
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
+	if(client){
 	client->sendTextMessage(MSG_STATUS_WARNING, Msg.str());
+	}
 	redSkullTicks = redSkullTicks + 12 * 3600 * 1000;
 	if(redSkullTicks >= 3*24*3600*1000){
 		g_game.changeSkull(this, SKULL_RED);

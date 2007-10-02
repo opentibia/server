@@ -104,7 +104,7 @@ void MonsterType::reset()
 
 MonsterType::~MonsterType()
 {
-	//
+	reset();
 }
 
 uint32_t Monsters::getLootRandom()
@@ -330,7 +330,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 		}
 	}
 
-	if(sb.spell = g_spells->getSpellByName(name)){
+	if((sb.spell = g_spells->getSpellByName(name))){
 		return true;
 	}
 

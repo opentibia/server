@@ -28,13 +28,11 @@
 #include "tools.h"
 #include "definitions.h"
 
-#include <boost/tokenizer.hpp>
 #include <iostream>
 #include <iomanip>
 
 extern ConfigManager g_config;
 
-typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 #ifndef __GNUC__
 #pragma warning( disable : 4005)
@@ -151,7 +149,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	propStream.init(conditions, conditionsSize);
 
 	Condition* condition;
-	while(condition = Condition::createCondition(propStream)){
+	while((condition = Condition::createCondition(propStream))){
 		if(condition->unserialize(propStream)){
 			player->storedConditionList.push_back(condition);
 		}
@@ -588,7 +586,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 
 	Item* item;
 	for(int32_t slotId = 1; slotId <= 10; ++slotId){
-		if(item = player->inventory[slotId]){
+		if((item = player->inventory[slotId])){
 			itemList.push_back(itemBlock(slotId, item));
 		}
 	}
