@@ -54,7 +54,7 @@ extern RSA* g_otservRSA;
 extern Ban g_bans;
 Chat g_chat;
 
-#define ADD_TASK_INTERVAL 35
+#define ADD_TASK_INTERVAL 40
 #define CHECK_TASK_INTERVAL 5000
 
 // Helping templates to add dispatcher tasks
@@ -450,7 +450,8 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 	}
 	else{
 		m_messageCount++;
-		if(m_rejectCount > m_messageCount/2 || (interval > ADD_TASK_INTERVAL*15 && interval/m_messageCount < ADD_TASK_INTERVAL*2)){
+		//std::cout << interval/m_messageCount << " " << m_rejectCount << "/" << m_messageCount << std::endl;
+		if(/*m_rejectCount > m_messageCount/2 || */(interval > ADD_TASK_INTERVAL*15 && interval/m_messageCount < 25)){
 			m_loggingOut = true;
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Protocol80::logout, this)));

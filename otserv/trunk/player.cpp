@@ -3230,7 +3230,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	if(client){
-	client->sendTextMessage(MSG_STATUS_WARNING, Msg.str());
+		client->sendTextMessage(MSG_STATUS_WARNING, Msg.str());
 	}
 	redSkullTicks = redSkullTicks + 12 * 3600 * 1000;
 	if(redSkullTicks >= 3*24*3600*1000){
