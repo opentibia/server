@@ -134,7 +134,6 @@ ReturnValue Depot::__queryMaxCount(int32_t index, const Thing* thing, uint32_t c
 void Depot::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(getParent() != NULL){
-		//getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
 		getParent()->postAddNotification(thing, index, LINK_PARENT);
 	}
 }
@@ -142,7 +141,6 @@ void Depot::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link
 void Depot::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(getParent() != NULL){
-		//getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 		getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
 	}
 }

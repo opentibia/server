@@ -77,10 +77,8 @@ Creature()
 	conditionSuppressions = 0;
 	magLevel   = 20;
 	accessLevel = 0;
-	lastlogin  = 0;
 	lastip = 0;
 	lastLoginSaved = 0;
-	//SendBuffer = false;
 	npings = 0;
 	internal_ping = 0;
 	lastAction = 0;

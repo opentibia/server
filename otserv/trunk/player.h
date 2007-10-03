@@ -567,7 +567,6 @@ protected:
 	//account variables
 	uint32_t accountNumber;
 	std::string password;
-	time_t lastlogin;
 	time_t lastLoginSaved;
 	Position loginPosition;
 	uint32_t lastip;

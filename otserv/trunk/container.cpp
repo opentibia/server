@@ -250,7 +250,6 @@ void Container::onAddContainerItem(Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
 	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
 
 	//send to client
@@ -275,7 +274,6 @@ void Container::onUpdateContainerItem(uint32_t index, Item* oldItem, Item* newIt
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
 	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
 
 	//send to client
@@ -300,7 +298,6 @@ void Container::onRemoveContainerItem(uint32_t index, Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
 	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
 
 	//send change to client
@@ -715,17 +712,14 @@ void Container::postAddNotification(Thing* thing, int32_t index, cylinderlink_t 
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		//topParent->postAddNotification(thing, index, true /*hasOwnership*/);
 		topParent->postAddNotification(thing, index, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			//topParent->getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
 			topParent->getParent()->postAddNotification(thing, index, LINK_NEAR);
 		}
 		else{
-			//topParent->postAddNotification(thing, index, false /*hasOwnership*/);
 			topParent->postAddNotification(thing, index, LINK_PARENT);
 		}
 	}
@@ -736,17 +730,14 @@ void Container::postRemoveNotification(Thing* thing, int32_t index, bool isCompl
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		//topParent->postRemoveNotification(thing, index, isCompleteRemoval, true /*hadOwnership*/);
 		topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			//topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 			topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
 		}
 		else{
-			//topParent->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 			topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
 		}
 	}

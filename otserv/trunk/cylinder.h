@@ -132,7 +132,6 @@ public:
 	  * \param index is the objects new index value
 	  * \param link holds the relation the object has to the cylinder
 	  */
-	//virtual void postAddNotification(Thing* thing, int32_t index, bool hasOwnership = true) = 0;
 	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER) = 0;
 
 	/**
@@ -142,7 +141,6 @@ public:
 	  * \param isCompleteRemoval indicates if the item was completely removed or just partially (stackables)
 	  * \param link holds the relation the object has to the cylinder
 	  */
-	//virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership = true) = 0;
 	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER) = 0;
 
 	/**

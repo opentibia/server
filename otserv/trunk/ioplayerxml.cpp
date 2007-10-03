@@ -659,7 +659,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 	xmlSetProp(root, (const xmlChar*)"maxdepotitems", (const xmlChar*)sb.str().c_str());
 
 	sb.str("");
-	sb << player->lastlogin;
+	sb << player->lastLoginSaved;
 	xmlSetProp(root, (const xmlChar*)"lastlogin", (const xmlChar*)sb.str().c_str());
 
 	sb.str("");

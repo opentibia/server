@@ -292,14 +292,13 @@ void Tile::onAddTileItem(Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, true), list);
 	g_game.getSpectators(list, cylinderMapPos, true);
 
 	//send to client
-	Player* player = NULL;
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			player->sendAddTileItem(cylinderMapPos, item);
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendAddTileItem(cylinderMapPos, item);
 		}
 	}
 
@@ -315,14 +314,13 @@ void Tile::onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, true), list);
 	g_game.getSpectators(list, cylinderMapPos, true);
 
 	//send to client
-	Player* player = NULL;
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			player->sendUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
 		}
 	}
 
@@ -338,14 +336,13 @@ void Tile::onRemoveTileItem(uint32_t index, Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, true), list);
 	g_game.getSpectators(list, cylinderMapPos, true);
 
 	//send to client
-	Player* player = NULL;
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			player->sendRemoveTileItem(cylinderMapPos, index, item);
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendRemoveTileItem(cylinderMapPos, index, item);
 		}
 	}
 
@@ -361,14 +358,13 @@ void Tile::onUpdateTile()
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, true), list);
 	g_game.getSpectators(list, cylinderMapPos, true);
 
 	//send to client
-	Player* player = NULL;
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			player->sendUpdateTile(cylinderMapPos);
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendUpdateTile(cylinderMapPos);
 		}
 	}
 
@@ -405,17 +401,14 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(fromPos, true), list);
-	//g_game.getSpectators(Range(toPos, true), list);
-
 	g_game.getSpectators(list, fromPos, true);
 	g_game.getSpectators(list, toPos, true);
 
 	//send to client
-	Player* player = NULL;
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if((player = (*it)->getPlayer())){
-			player->sendCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
 		}
 	}
 
@@ -1089,13 +1082,12 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, true), list);
 	g_game.getSpectators(list, cylinderMapPos, true);
 
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(Player* player = (*it)->getPlayer()){
-			//player->postAddNotification(thing, index, false);
-			player->postAddNotification(thing, index, LINK_NEAR);
+		if(tmpPlayer = (*it)->getPlayer()){
+			tmpPlayer->postAddNotification(thing, index, LINK_NEAR);
 		}
 	}
 
@@ -1136,17 +1128,16 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	//g_game.getSpectators(Range(cylinderMapPos, true), list);
 	g_game.getSpectators(list, cylinderMapPos, true);
 
 	if(/*isCompleteRemoval &&*/ getThingCount() > 8){
 		onUpdateTile();
 	}
 
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(Player* player = (*it)->getPlayer()){
-			//player->postRemoveNotification(thing, index, isCompleteRemoval, false);
-			player->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
+		if(tmpPlayer = (*it)->getPlayer()){
+			tmpPlayer->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
 		}
 	}
 

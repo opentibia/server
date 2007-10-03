@@ -417,7 +417,6 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-
 	getSpectators(list, creature->getPosition(), true);
 
 	//send to client
@@ -453,10 +452,10 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	creature->stopEventThink();
 
+	Cylinder* cylinder = creature->getTile();
+
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-
-	Cylinder* cylinder = creature->getTile();
 	getSpectators(list, cylinder->getPosition(), true);
 
 	int32_t index = cylinder->__getIndexOfThing(creature);
@@ -2471,13 +2470,13 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 		return false;
 
 	if(player->canWear(outfit.lookType, outfit.lookAddons)){
-	player->defaultOutfit = outfit;
+		player->defaultOutfit = outfit;
 
-	if(player->hasCondition(CONDITION_OUTFIT)){
-		return false;
-	}
+		if(player->hasCondition(CONDITION_OUTFIT)){
+			return false;
+		}
 
-	internalCreatureChangeOutfit(player, outfit);
+		internalCreatureChangeOutfit(player, outfit);
 	}
 
 	return true;
@@ -2575,9 +2574,9 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 {
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-
 	getSpectators(list, player->getPosition());
 
+	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
@@ -2687,7 +2686,6 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 
 		SpectatorVec list;
 		SpectatorVec::iterator it;
-		//map->getSpectators(Range(creature->getPosition(), true), list);
 		getSpectators(list, creature->getPosition(), true);
 
 		//send to client
@@ -2721,6 +2719,7 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 		getSpectators(list, creature->getPosition());
 	}
 
+	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
@@ -2728,6 +2727,7 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 		}
 	}
 
+	//event method
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onCreatureSay(creature, type, text);
 	}
@@ -2872,14 +2872,13 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-
-	//getSpectators(Range(creature->getPosition(), true), list);
 	getSpectators(list, creature->getPosition(), true);
 
-	Player* player;
+	//send to client
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			player->sendChangeSpeed(creature, creature->getSpeed());
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendChangeSpeed(creature, creature->getSpeed());
 		}
 	}
 }
@@ -2891,8 +2890,6 @@ void Game::internalCreatureChangeOutfit(Creature* creature, const Outfit_t& outf
 	if(!creature->isInvisible()){
 		SpectatorVec list;
 		SpectatorVec::iterator it;
-
-		//getSpectators(Range(creature->getPosition(), true), list);
 		getSpectators(list, creature->getPosition(), true);
 
 		//send to client
@@ -2914,8 +2911,6 @@ void Game::internalCreatureChangeVisible(Creature* creature, bool visible)
 {
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-
-	//getSpectators(Range(creature->getPosition(), true), list);
 	getSpectators(list, creature->getPosition(), true);
 
 	//send to client
@@ -2936,15 +2931,13 @@ void Game::internalCreatureChangeVisible(Creature* creature, bool visible)
 void Game::changeLight(const Creature* creature)
 {
 	SpectatorVec list;
-	SpectatorVec::iterator it;
-
-	//getSpectators(Range(creature->getPosition(), true), list);
 	getSpectators(list, creature->getPosition(), true);
 
-	Player* player;
-	for(it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			player->sendCreatureLight(creature);
+	//send to client
+	Player* tmpPlayer = NULL;
+	for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendCreatureLight(creature);
 		}
 	}
 }
@@ -3196,7 +3189,6 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 void Game::addCreatureHealth(const Creature* target)
 {
 	SpectatorVec list;
-	//getSpectators(Range(target->getPosition(), true), list);
 	getSpectators(list, target->getPosition(), true);
 
 	addCreatureHealth(list, target);
@@ -3235,7 +3227,6 @@ void Game::addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_
 void Game::addMagicEffect(const Position& pos, uint8_t effect)
 {
 	SpectatorVec list;
-	//getSpectators(Range(pos, true), list);
 	getSpectators(list, pos, true);
 
 	addMagicEffect(list, pos, effect);
@@ -3255,14 +3246,14 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 	uint8_t effect)
 {
 	SpectatorVec list;
-
 	getSpectators(list, fromPos, true);
 	getSpectators(list, toPos, true);
 
-	Player* player = NULL;
+	//send to client
+	Player* tmpPlayer = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			player->sendDistanceShoot(fromPos, toPos, effect);
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendDistanceShoot(fromPos, toPos, effect);
 		}
 	}
 }
@@ -3270,17 +3261,16 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 #ifdef __SKULLSYSTEM__
 void Game::changeSkull(Player* player, Skulls_t newSkull)
 {
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-
 	player->setSkull(newSkull);
-	//getSpectators(Range(player->getPosition(), true), list);
+
+	SpectatorVec list;
 	getSpectators(list, player->getPosition(), true);
 
-	Player* spectator;
-	for(it = list.begin(); it != list.end(); ++it){
-		if((spectator = (*it)->getPlayer())){
-			spectator->sendCreatureSkull(player, newSkull);
+	//send to client
+	Player* tmpPlayer = NULL;
+	for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendCreatureSkull(player, newSkull);
 		}
 	}
 }

@@ -505,8 +505,8 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`posz` = '" << player->getLoginPosition().z << "', ";
 	query << "`cap` = " << player->getCapacity() << ", ";
 	query << "`sex` = " << player->sex << ", ";
-	if(player->lastlogin != 0){
-		query << "`lastlogin` = " << player->lastlogin << ", ";
+	if(player->lastLoginSaved != 0){
+		query << "`lastlogin` = " << player->lastLoginSaved << ", ";
 	}
 	if(player->lastip != 0){
 		query << "`lastip` = " << player->lastip << ", ";

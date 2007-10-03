@@ -282,7 +282,6 @@ bool Protocol80::login(const std::string& name)
 			return false;
 		}
 
-		player->lastip = player->getIP();
 		if(!g_game.placePlayer(player, player->getLoginPosition())){
 			if(!g_game.placePlayer(player, player->getTemplePosition(), true)){
 				disconnectClient(0x14, "Temple position is wrong. Contact the administrator.");
@@ -290,6 +289,8 @@ bool Protocol80::login(const std::string& name)
 			}
 		}
 
+		player->lastip = player->getIP();
+		player->lastLoginSaved = time(NULL);
 		return true;
 	}
 	else{
@@ -301,10 +302,10 @@ bool Protocol80::login(const std::string& name)
 		if(!_player->isRemoved()){
 			this->player = _player;
 			_player->useThing2();
-			_player->lastlogin = time(NULL);
 			_player->client = this;
 			_player->client->sendAddCreature(player, false);
 			_player->sendIcons();
+			_player->lastLoginSaved = time(NULL);
 			_player->lastip = player->getIP();
 			return true;
 		}
@@ -1735,8 +1736,8 @@ void Protocol80::sendAddCreature(const Creature* creature, bool isLogin)
 
 					if(player->getLastLoginSaved() != 0){
 						tempstring = "Your last visit was on ";
-						time_t lastlogin = player->getLastLoginSaved();
-						tempstring += ctime(&lastlogin);
+						time_t lastLogin = player->getLastLoginSaved();
+						tempstring += ctime(&lastLogin);
 						tempstring.erase(tempstring.length() -1);
 						tempstring += ".";
 						AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
