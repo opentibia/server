@@ -49,6 +49,7 @@ CREATE TABLE "players" (
     "save" SMALLINT NOT NULL DEFAULT 0,
     "conditions" BYTEA NOT NULL,
     "redskulltime" BIGINT NOT NULL DEFAULT 0,
+    "redskull" SMALLINT NOT NULL DEFAULT 0,
     "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
     "loss_experience" INT NOT NULL DEFAULT 10,
     "loss_mana" INT NOT NULL DEFAULT 10,
