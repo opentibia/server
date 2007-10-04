@@ -187,6 +187,7 @@ public:
 	
 	HouseTileList::iterator getHouseTileBegin() {return houseTiles.begin();}
 	HouseTileList::iterator getHouseTileEnd() {return houseTiles.end();}
+	uint32_t getHouseTileSize() {return houseTiles.size();}
 
 	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
 	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}

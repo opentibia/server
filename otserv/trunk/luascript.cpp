@@ -1032,10 +1032,12 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getHouseRent", LuaScriptInterface::luaGetHouseRent);
 	//getHouseTown(houseid)
 	lua_register(m_luaState, "getHouseTown", LuaScriptInterface::luaGetHouseTown);
-	//getHouseAccessList(houseod, listid)
+	//getHouseAccessList(houseid, listid)
 	lua_register(m_luaState, "getHouseAccessList", LuaScriptInterface::luaGetHouseAccessList);
 	//getHouseByPlayerGUID(playerGUID)
 	lua_register(m_luaState, "getHouseByPlayerGUID", LuaScriptInterface::luaGetHouseByPlayerGUID);
+	//getHouseTilesSize(houseid)
+	lua_register(m_luaState, "getHouseTilesSize", LuaScriptInterface::luaGetHouseTilesSize);
 	//setHouseAccessList(houseid, listid, listtext)
 	lua_register(m_luaState, "setHouseAccessList", LuaScriptInterface::luaSetHouseAccessList);
 	//setHouseOwner(houseid, ownerGUID)
@@ -2758,7 +2760,7 @@ int LuaScriptInterface::luaGetHouseAccessList(lua_State *L)
 	return 1;
 }
 
-int  LuaScriptInterface::luaGetHouseByPlayerGUID(lua_State *L)
+int LuaScriptInterface::luaGetHouseByPlayerGUID(lua_State *L)
 {
 	//getHouseByPlayerGUID(playerGUID)
 	uint32_t guid = popNumber(L);
@@ -2769,6 +2771,22 @@ int  LuaScriptInterface::luaGetHouseByPlayerGUID(lua_State *L)
 	}
 	else{
 		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetHouseTilesSize(lua_State *L)
+{
+	//getHouseTilesSize(houseid)
+	uint32_t houseid = popNumber(L);
+
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		lua_pushnumber(L, house->getHouseTileSize());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
 	}
 	return 1;
 }

@@ -354,6 +354,7 @@ protected:
 	//get tile info
 	static int luaGetTilePzInfo(lua_State *L);
 	static int luaGetTileHouseInfo(lua_State *L);
+
 	//houses
 	static int luaGetHouseOwner(lua_State *L);
 	static int luaGetHouseName(lua_State *L);
@@ -362,6 +363,7 @@ protected:
 	static int luaGetHouseTown(lua_State *L);
 	static int luaGetHouseAccessList(lua_State *L);
 	static int luaGetHouseByPlayerGUID(lua_State *L);
+	static int luaGetHouseTilesSize(lua_State *L);
 	static int luaSetHouseOwner(lua_State *L);
 	static int luaSetHouseAccessList(lua_State *L);
 

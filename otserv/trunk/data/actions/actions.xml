@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 
 <actions>
+-- Example of house commands
+<action itemid="2176" script="house_tiles.lua"/>
 
 -- Tools
 <action itemid="2580" script="fishing.lua" allowfaruse="1" />
@@ -129,12 +131,9 @@
 <action itemid="1261" script="door_open1.lua" />
 <action itemid="1262" script="door_close1n.lua" />
 
-
 -- Music
 <action itemid="2070" script="music.lua" />
 <action itemid="2372" script="music.lua" />
-
-
 
 -- Objects
 <action itemid="1479" script="trans_inc.lua" />

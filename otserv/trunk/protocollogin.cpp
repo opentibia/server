@@ -87,6 +87,11 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	uint32_t accnumber = msg.GetU32();
 	std::string password = msg.GetString();
 
+	if(!accnumber){
+		disconnectClient(0x0A, "You must enter your account number.");
+		return false;
+	}
+
 	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
 		return false;
