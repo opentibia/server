@@ -264,8 +264,13 @@ bool Protocol80::login(const std::string& name)
 			return false;
 		}
 
-		if(!player->isPremium() && !player->hasFlag(PlayerFlag_CanAlwaysLogin) && !Waitlist::instance()->clientLogin(player)){
+		if(g_config.getNumber(ConfigManager::CHECK_ACCOUNTS) && !player->hasFlag(PlayerFlag_CanAlwaysLogin)
+			&& g_game.getPlayerByAccount(player->getAccount())){
+			disconnectClient(0x14, "You may only login with one character per account.");
+			return false;
+		}
 
+		if(!player->isPremium() && !player->hasFlag(PlayerFlag_CanAlwaysLogin) && !Waitlist::instance()->clientLogin(player)){
 			int32_t currentSlot = Waitlist::instance()->getClientSlot(player);
 			int32_t retryTime = Waitlist::instance()->getTime(currentSlot);
 			std::stringstream ss;
@@ -411,7 +416,7 @@ bool Protocol80::parseFirstPacket(NetworkMessage& msg)
 	std::string acc_pass;
 	if(!(IOAccount::instance()->getPassword(accnumber, name, acc_pass) && passwordTest(password,acc_pass))){
 		g_bans.addLoginAttempt(getIP(), false);
-		getConnection()->closeConnection();
+		disconnectClient(0x0A, "Please enter a valid account number and password.");
 		return false;
 	}
 
@@ -658,6 +663,10 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 		parseRemoveVip(msg);
 		break;
 
+	case 0xE8:
+		//parseDebugAssert(msg);
+		break;
+
 	default:
 #ifdef __DEBUG__
 		printf("unknown packet header: %x \n", recvbyte);
@@ -698,8 +707,8 @@ void Protocol80::GetTileDescription(const Tile* tile, NetworkMessage* msg)
 	}
 }
 
-void Protocol80::GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
-	unsigned short width, unsigned short height, NetworkMessage* msg)
+void Protocol80::GetMapDescription(uint16_t x, uint16_t y, unsigned char z,
+	uint16_t width, uint16_t height, NetworkMessage* msg)
 {
 	int skip = -1;
 	int startz, endz, zstep = 0;
@@ -955,7 +964,7 @@ void Protocol80::parseAutoWalk(NetworkMessage& msg)
 	std::list<Direction> path;
 	size_t numdirs = msg.GetByte();
 	for (size_t i = 0; i < numdirs; ++i) {
-		unsigned char rawdir = msg.GetByte();
+		uint8_t rawdir = msg.GetByte();
 		Direction dir = SOUTH;
 
 		switch(rawdir) {
@@ -1068,21 +1077,21 @@ void Protocol80::parseBattleWindow(NetworkMessage &msg)
 
 void Protocol80::parseCloseContainer(NetworkMessage& msg)
 {
-	unsigned char cid = msg.GetByte();
+	uint8_t cid = msg.GetByte();
 
 	addGameTask(&Game::playerCloseContainer, player->getID(), cid);
 }
 
 void Protocol80::parseUpArrowContainer(NetworkMessage& msg)
 {
-	unsigned char cid = msg.GetByte();
+	uint8_t cid = msg.GetByte();
 
 	addGameTask(&Game::playerMoveUpContainer, player->getID(), cid);
 }
 
 void Protocol80::parseUpdateContainer(NetworkMessage& msg)
 {
-	unsigned char cid = msg.GetByte();
+	uint8_t cid = msg.GetByte();
 
 	addGameTask(&Game::playerUpdateContainer, player->getID(), cid);
 }
@@ -1517,7 +1526,7 @@ void Protocol80::sendCloseContainer(uint32_t cid)
 	}
 }
 
-void Protocol80::sendCreatureTurn(const Creature* creature, unsigned char stackPos)
+void Protocol80::sendCreatureTurn(const Creature* creature, uint8_t stackPos)
 {
 	if(canSee(creature)){
 		NetworkMessage* msg = getOutputBuffer();
@@ -1540,7 +1549,7 @@ void Protocol80::sendCreatureSay(const Creature* creature, SpeakClasses type, co
 	}
 }
 
-void Protocol80::sendToChannel(const Creature * creature, SpeakClasses type, const std::string& text, unsigned short channelId)
+void Protocol80::sendToChannel(const Creature * creature, SpeakClasses type, const std::string& text, uint16_t channelId)
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
@@ -1599,7 +1608,7 @@ void Protocol80::sendPing()
 	}
 }
 
-void Protocol80::sendDistanceShoot(const Position& from, const Position& to, unsigned char type)
+void Protocol80::sendDistanceShoot(const Position& from, const Position& to, uint8_t type)
 {
 	if(canSee(from) || canSee(to)){
 		NetworkMessage* msg = getOutputBuffer();
@@ -1609,7 +1618,7 @@ void Protocol80::sendDistanceShoot(const Position& from, const Position& to, uns
 	}
 }
 
-void Protocol80::sendMagicEffect(const Position& pos, unsigned char type)
+void Protocol80::sendMagicEffect(const Position& pos, uint8_t type)
 {
 	if(canSee(pos)){
 		NetworkMessage* msg = getOutputBuffer();
@@ -1619,7 +1628,7 @@ void Protocol80::sendMagicEffect(const Position& pos, unsigned char type)
 	}
 }
 
-void Protocol80::sendAnimatedText(const Position& pos, unsigned char color, std::string text)
+void Protocol80::sendAnimatedText(const Position& pos, uint8_t color, std::string text)
 {
 	if(canSee(pos)){
 		NetworkMessage* msg = getOutputBuffer();
@@ -2061,7 +2070,7 @@ void Protocol80::AddTextMessage(NetworkMessage* msg, MessageClasses mclass, cons
 }
 
 void Protocol80::AddAnimatedText(NetworkMessage* msg, const Position& pos,
-	unsigned char color, const std::string& text)
+	uint8_t color, const std::string& text)
 {
 	msg->AddByte(0x84);
 	msg->AddPosition(pos);
@@ -2069,7 +2078,7 @@ void Protocol80::AddAnimatedText(NetworkMessage* msg, const Position& pos,
 	msg->AddString(text);
 }
 
-void Protocol80::AddMagicEffect(NetworkMessage* msg,const Position& pos, unsigned char type)
+void Protocol80::AddMagicEffect(NetworkMessage* msg,const Position& pos, uint8_t type)
 {
 	msg->AddByte(0x83);
 	msg->AddPosition(pos);
@@ -2077,7 +2086,7 @@ void Protocol80::AddMagicEffect(NetworkMessage* msg,const Position& pos, unsigne
 }
 
 void Protocol80::AddDistanceShoot(NetworkMessage* msg, const Position& from, const Position& to,
-	unsigned char type)
+	uint8_t type)
 {
 	msg->AddByte(0x85);
 	msg->AddPosition(from);
@@ -2085,7 +2094,7 @@ void Protocol80::AddDistanceShoot(NetworkMessage* msg, const Position& from, con
 	msg->AddByte(type + 1);
 }
 
-void Protocol80::AddCreature(NetworkMessage* msg,const Creature* creature, bool known, unsigned int remove)
+void Protocol80::AddCreature(NetworkMessage* msg,const Creature* creature, bool known, uint32_t remove)
 {
 	if(known){
 		msg->AddU16(0x62);
@@ -2172,7 +2181,7 @@ void Protocol80::AddPlayerSkills(NetworkMessage* msg)
 }
 
 void Protocol80::AddCreatureSpeak(NetworkMessage* msg, const Creature* creature,
-	SpeakClasses  type, std::string text, unsigned short channelId)
+	SpeakClasses type, std::string text, uint16_t channelId)
 {
 	msg->AddByte(0xAA);
 	msg->AddU32(0);

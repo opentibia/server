@@ -218,18 +218,11 @@ bool passwordTest(const std::string &plain, std::string &hash)
 		if(plainHash == hash){
 			return true;
 		}
-		else{
-			return false;
-		}
 	}
-	else{
-		if(plain == hash){
-			return true;
-		}
-		else{
-			return false;
-		}
+	else if(plain == hash){
+		return true;
 	}
+	return false;
 }
 
 //buffer should have at least 17 bytes

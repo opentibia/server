@@ -611,7 +611,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You can not get info about this player.");
 			return true;
 		}
-		unsigned char ip[4];
+		uint8_t ip[4];
 		*(uint32_t*)&ip = paramPlayer->lastip;
 		info << "name:   " << paramPlayer->getName() << std::endl <<
 				"access: " << paramPlayer->getAccessLevel() << std::endl <<
@@ -968,7 +968,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 	tokenizer::iterator cmdit = cmdtokens.begin();
 
 	if(cmdit != cmdtokens.end() && *cmdit == "add"){
-		unsigned char type;
+		uint8_t type;
 		++cmdit;
 		if(cmdit == cmdtokens.end()){
 			str << "Parse error.";
@@ -1049,7 +1049,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 		}
 	}
 	else if(cmdit != cmdtokens.end() && *cmdit == "rem"){
-		unsigned char type;
+		uint8_t type;
 		++cmdit;
 		if(cmdit == cmdtokens.end()){
 			str << "Parse error.";
@@ -1098,8 +1098,8 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			str << "IP bans: " << std::endl;
 			const IpBanList ipBanList = g_bans.getIpBans();
 			IpBanList::const_iterator it;
-			unsigned char ip[4];
-			unsigned char mask[4];
+			uint8_t ip[4];
+			uint8_t mask[4];
 			uint32_t n = 0;
 			for(it = ipBanList.begin(); it != ipBanList.end(); ++it){
 				n++;

@@ -1573,7 +1573,7 @@ bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint3
 		Item* item = player->getInventoryItem(slot);
 		if(item && item->getID() == reagentId){
 			if(item->isStackable() && item->getItemCount() != 1){ //TODO? reagentCount
-			    return false;
+				return false;
 			}
 
 			Item* newItem = g_game.transformItem(item, conjureId, conjureCount);

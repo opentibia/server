@@ -342,7 +342,7 @@ void Actions::showUseHotkeyMessage(Player* player, Item* item, uint32_t itemCoun
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 }
 
-bool Actions::openContainer(Player* player, Container* container, const unsigned char index)
+bool Actions::openContainer(Player* player, Container* container, const uint8_t index)
 {
 	Container* openContainer = NULL;
 

@@ -228,40 +228,40 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output)
 		ss << g_config.getNumber(ConfigManager::PORT);
 		output->AddString(ss.str().c_str());
 		ss.str(""); 
-  	}
+	}
   
 	if(requestedInfo & REQUEST_OWNER_SERVER_INFO){
-    	output->AddByte(0x11); // server info - owner info
+		output->AddByte(0x11); // server info - owner info
 		output->AddString(g_config.getString(ConfigManager::OWNER_NAME).c_str());
 		output->AddString(g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
-  	}
-  
+	}
+
 	if(requestedInfo & REQUEST_MISC_SERVER_INFO){
-    	output->AddByte(0x12); // server info - misc
+		output->AddByte(0x12); // server info - misc
 		output->AddString(g_config.getString(ConfigManager::MOTD).c_str());
 		output->AddString(g_config.getString(ConfigManager::LOCATION).c_str());
 		output->AddString(g_config.getString(ConfigManager::URL).c_str());
-    	output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
-    	output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
-    	output->AddString(STATUS_SERVER_VERSION);
-  	}
+		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
+		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
+		output->AddString(STATUS_SERVER_VERSION);
+	}
 
 	if(requestedInfo & REQUEST_PLAYERS_INFO){
-    	output->AddByte(0x20); // players info
-    	output->AddU32(this->playersonline);
-	    output->AddU32(this->playersmax);
-	    output->AddU32(this->playerspeak);
-  	} 
-  
-  	if(requestedInfo & REQUEST_MAP_INFO){
-    	output->AddByte(0x30); // map info
-    	output->AddString(this->mapname.c_str());
-    	output->AddString(this->mapauthor.c_str());
+		output->AddByte(0x20); // players info
+		output->AddU32(this->playersonline);
+		output->AddU32(this->playersmax);
+		output->AddU32(this->playerspeak);
+	}
+
+	if(requestedInfo & REQUEST_MAP_INFO){
+		output->AddByte(0x30); // map info
+		output->AddString(this->mapname.c_str());
+		output->AddString(this->mapauthor.c_str());
 		int mw, mh;
 		g_game.getMapDimensions(mw, mh);
-    	output->AddU16(mw);
-    	output->AddU16(mh);
-  	}
+		output->AddU16(mw);
+		output->AddU16(mh);
+	}
 
 	return;   
 }

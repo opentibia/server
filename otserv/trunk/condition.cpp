@@ -82,7 +82,7 @@ xmlNodePtr Condition::serialize()
 
 bool Condition::unserialize(PropStream& propStream)
 {
-	unsigned char attr_type;
+	uint8_t attr_type;
 	while(propStream.GET_UCHAR(attr_type) && attr_type != CONDITIONATTR_END){
 		if(!unserializeProp((ConditionAttr_t)attr_type, propStream)){
 			return false;

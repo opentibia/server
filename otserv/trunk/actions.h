@@ -42,7 +42,7 @@ public:
 	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 		uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
 
-	bool openContainer(Player* player,Container* container, const unsigned char index);
+	bool openContainer(Player* player,Container* container, const uint8_t index);
 
 	static ReturnValue canUse(const Creature* creature, const Position& pos);
 	static ReturnValue canUseFar(const Creature* creature ,const Position& toPos, const bool blockWalls);
