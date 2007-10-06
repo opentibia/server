@@ -7,6 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F62774050CB841CC00FC37DB /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774010CB841CC00FC37DB /* connection.cpp */; };
+		F62774060CB841CC00FC37DB /* creatureevent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774020CB841CC00FC37DB /* creatureevent.cpp */; };
+		F62774070CB841CC00FC37DB /* outputmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774030CB841CC00FC37DB /* outputmessage.cpp */; };
+		F62774080CB841CC00FC37DB /* protocollogin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774040CB841CC00FC37DB /* protocollogin.cpp */; };
+		F62774090CB841CC00FC37DB /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774010CB841CC00FC37DB /* connection.cpp */; };
+		F627740A0CB841CC00FC37DB /* creatureevent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774020CB841CC00FC37DB /* creatureevent.cpp */; };
+		F627740B0CB841CC00FC37DB /* outputmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774030CB841CC00FC37DB /* outputmessage.cpp */; };
+		F627740C0CB841CC00FC37DB /* protocollogin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774040CB841CC00FC37DB /* protocollogin.cpp */; };
+		F627740D0CB841CC00FC37DB /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774010CB841CC00FC37DB /* connection.cpp */; };
+		F627740E0CB841CC00FC37DB /* creatureevent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774020CB841CC00FC37DB /* creatureevent.cpp */; };
+		F627740F0CB841CC00FC37DB /* outputmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774030CB841CC00FC37DB /* outputmessage.cpp */; };
+		F62774100CB841CC00FC37DB /* protocollogin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774040CB841CC00FC37DB /* protocollogin.cpp */; };
+		F627741A0CB8424400FC37DB /* protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774130CB8424400FC37DB /* protocol.cpp */; };
+		F627741B0CB8424400FC37DB /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774160CB8424400FC37DB /* scheduler.cpp */; };
+		F627741C0CB8424400FC37DB /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774170CB8424400FC37DB /* server.cpp */; };
+		F627741D0CB8424400FC37DB /* tasks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774190CB8424400FC37DB /* tasks.cpp */; };
+		F627741E0CB8424400FC37DB /* protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774130CB8424400FC37DB /* protocol.cpp */; };
+		F627741F0CB8424400FC37DB /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774160CB8424400FC37DB /* scheduler.cpp */; };
+		F62774200CB8424400FC37DB /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774170CB8424400FC37DB /* server.cpp */; };
+		F62774210CB8424400FC37DB /* tasks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774190CB8424400FC37DB /* tasks.cpp */; };
+		F62774220CB8424400FC37DB /* protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774130CB8424400FC37DB /* protocol.cpp */; };
+		F62774230CB8424400FC37DB /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774160CB8424400FC37DB /* scheduler.cpp */; };
+		F62774240CB8424400FC37DB /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774170CB8424400FC37DB /* server.cpp */; };
+		F62774250CB8424400FC37DB /* tasks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774190CB8424400FC37DB /* tasks.cpp */; };
 		F69A41700C1E9A5400798B45 /* account.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413C0C1E943500798B45 /* account.cpp */; };
 		F69A41720C1E9A5400798B45 /* actions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413E0C1E943500798B45 /* actions.cpp */; };
 		F69A41740C1E9A5400798B45 /* admin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413A0C1E943500798B45 /* admin.cpp */; };
@@ -197,6 +221,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F62774010CB841CC00FC37DB /* connection.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = connection.cpp; path = ../connection.cpp; sourceTree = SOURCE_ROOT; };
+		F62774020CB841CC00FC37DB /* creatureevent.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = creatureevent.cpp; path = ../creatureevent.cpp; sourceTree = SOURCE_ROOT; };
+		F62774030CB841CC00FC37DB /* outputmessage.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = outputmessage.cpp; path = ../outputmessage.cpp; sourceTree = SOURCE_ROOT; };
+		F62774040CB841CC00FC37DB /* protocollogin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = protocollogin.cpp; path = ../protocollogin.cpp; sourceTree = SOURCE_ROOT; };
+		F62774110CB8424400FC37DB /* creatureevent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = creatureevent.h; path = ../creatureevent.h; sourceTree = SOURCE_ROOT; };
+		F62774120CB8424400FC37DB /* outputmessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = outputmessage.h; path = ../outputmessage.h; sourceTree = SOURCE_ROOT; };
+		F62774130CB8424400FC37DB /* protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = protocol.cpp; path = ../protocol.cpp; sourceTree = SOURCE_ROOT; };
+		F62774140CB8424400FC37DB /* protocol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = protocol.h; path = ../protocol.h; sourceTree = SOURCE_ROOT; };
+		F62774150CB8424400FC37DB /* protocollogin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = protocollogin.h; path = ../protocollogin.h; sourceTree = SOURCE_ROOT; };
+		F62774160CB8424400FC37DB /* scheduler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = scheduler.cpp; path = ../scheduler.cpp; sourceTree = SOURCE_ROOT; };
+		F62774170CB8424400FC37DB /* server.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = server.cpp; path = ../server.cpp; sourceTree = SOURCE_ROOT; };
+		F62774180CB8424400FC37DB /* server.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = server.h; path = ../server.h; sourceTree = SOURCE_ROOT; };
+		F62774190CB8424400FC37DB /* tasks.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = tasks.cpp; path = ../tasks.cpp; sourceTree = SOURCE_ROOT; };
 		F62DEBA80C233B4C004E3974 /* config.lua */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = config.lua; path = ../../../../.otserv/config.lua; sourceTree = SOURCE_ROOT; };
 		F69A40BE0C1E943500798B45 /* weapons.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = weapons.h; path = ../weapons.h; sourceTree = SOURCE_ROOT; };
 		F69A40BF0C1E943500798B45 /* weapons.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = weapons.cpp; path = ../weapons.cpp; sourceTree = SOURCE_ROOT; };
@@ -381,6 +418,19 @@
 		F69A414C0C1E944200798B45 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				F62774110CB8424400FC37DB /* creatureevent.h */,
+				F62774120CB8424400FC37DB /* outputmessage.h */,
+				F62774130CB8424400FC37DB /* protocol.cpp */,
+				F62774140CB8424400FC37DB /* protocol.h */,
+				F62774150CB8424400FC37DB /* protocollogin.h */,
+				F62774160CB8424400FC37DB /* scheduler.cpp */,
+				F62774170CB8424400FC37DB /* server.cpp */,
+				F62774180CB8424400FC37DB /* server.h */,
+				F62774190CB8424400FC37DB /* tasks.cpp */,
+				F62774010CB841CC00FC37DB /* connection.cpp */,
+				F62774020CB841CC00FC37DB /* creatureevent.cpp */,
+				F62774030CB841CC00FC37DB /* outputmessage.cpp */,
+				F62774040CB841CC00FC37DB /* protocollogin.cpp */,
 				F6F5BAC40C38D93300B77664 /* protocol80.cpp */,
 				F6F5BAC50C38D93300B77664 /* protocol80.h */,
 				F6F5BAC30C38D92200B77664 /* const80.h */,
@@ -620,6 +670,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F62774070CB841CC00FC37DB /* outputmessage.cpp in Sources */,
 				F69A41700C1E9A5400798B45 /* account.cpp in Sources */,
 				F69A41720C1E9A5400798B45 /* actions.cpp in Sources */,
 				F69A41740C1E9A5400798B45 /* admin.cpp in Sources */,
@@ -679,6 +730,13 @@
 				F69A41FA0C1E9A5400798B45 /* waitlist.cpp in Sources */,
 				F69A41FC0C1E9A5400798B45 /* weapons.cpp in Sources */,
 				F6F5BAC60C38D93300B77664 /* protocol80.cpp in Sources */,
+				F62774050CB841CC00FC37DB /* connection.cpp in Sources */,
+				F62774060CB841CC00FC37DB /* creatureevent.cpp in Sources */,
+				F62774080CB841CC00FC37DB /* protocollogin.cpp in Sources */,
+				F627741A0CB8424400FC37DB /* protocol.cpp in Sources */,
+				F627741B0CB8424400FC37DB /* scheduler.cpp in Sources */,
+				F627741C0CB8424400FC37DB /* server.cpp in Sources */,
+				F627741D0CB8424400FC37DB /* tasks.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -686,6 +744,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F627740B0CB841CC00FC37DB /* outputmessage.cpp in Sources */,
 				F69A42E30C1EAC8300798B45 /* account.cpp in Sources */,
 				F69A42E50C1EAC8300798B45 /* actions.cpp in Sources */,
 				F69A42E70C1EAC8300798B45 /* admin.cpp in Sources */,
@@ -750,6 +809,13 @@
 				F69A436D0C1EAC8300798B45 /* waitlist.cpp in Sources */,
 				F69A436F0C1EAC8300798B45 /* weapons.cpp in Sources */,
 				F6F5BAC70C38D93300B77664 /* protocol80.cpp in Sources */,
+				F62774090CB841CC00FC37DB /* connection.cpp in Sources */,
+				F627740A0CB841CC00FC37DB /* creatureevent.cpp in Sources */,
+				F627740C0CB841CC00FC37DB /* protocollogin.cpp in Sources */,
+				F627741E0CB8424400FC37DB /* protocol.cpp in Sources */,
+				F627741F0CB8424400FC37DB /* scheduler.cpp in Sources */,
+				F62774200CB8424400FC37DB /* server.cpp in Sources */,
+				F62774210CB8424400FC37DB /* tasks.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -757,6 +823,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F627740F0CB841CC00FC37DB /* outputmessage.cpp in Sources */,
 				F69A43950C1EAED100798B45 /* account.cpp in Sources */,
 				F69A43970C1EAED100798B45 /* actions.cpp in Sources */,
 				F69A43990C1EAED100798B45 /* admin.cpp in Sources */,
@@ -821,6 +888,13 @@
 				F69A441F0C1EAED100798B45 /* waitlist.cpp in Sources */,
 				F69A44210C1EAED100798B45 /* weapons.cpp in Sources */,
 				F6F5BAC80C38D93300B77664 /* protocol80.cpp in Sources */,
+				F627740D0CB841CC00FC37DB /* connection.cpp in Sources */,
+				F627740E0CB841CC00FC37DB /* creatureevent.cpp in Sources */,
+				F62774100CB841CC00FC37DB /* protocollogin.cpp in Sources */,
+				F62774220CB8424400FC37DB /* protocol.cpp in Sources */,
+				F62774230CB8424400FC37DB /* scheduler.cpp in Sources */,
+				F62774240CB8424400FC37DB /* server.cpp in Sources */,
+				F62774250CB8424400FC37DB /* tasks.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -837,17 +911,19 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					/sw/include/libxml2,
+					/opt/local/include,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
 				);
 				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = /sw/lib;
+				LIBRARY_SEARCH_PATHS = /opt/local/lib;
 				OTHER_LDFLAGS = (
 					"-lxml2",
 					"-lgmp",
 					"-llua",
-					"-lboost_thread",
-					"-lboost_regex",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "otserv-xml";
@@ -863,17 +939,19 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					/sw/include/libxml2,
+					/opt/local/include,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
 				);
 				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = /sw/lib;
+				LIBRARY_SEARCH_PATHS = /opt/local/lib;
 				OTHER_LDFLAGS = (
 					"-lxml2",
 					"-lgmp",
 					"-llua",
-					"-lboost_thread",
-					"-lboost_regex",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "otserv-xml";
@@ -892,17 +970,23 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = __USE_MYSQL__;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					/sw/include/libxml2,
+					/opt/local/include,
+					/opt/local/include/mysql5,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
 				);
 				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = /sw/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					/opt/local/lib/mysql5/mysql,
+				);
 				OTHER_LDFLAGS = (
 					"-lxml2",
 					"-lgmp",
 					"-llua",
-					"-lboost_thread",
-					"-lboost_regex",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
 					"-lmysqlclient",
 				);
 				PREBINDING = NO;
@@ -920,17 +1004,23 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PREPROCESSOR_DEFINITIONS = __USE_MYSQL__;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					/sw/include/libxml2,
+					/opt/local/include,
+					/opt/local/include/mysql5,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
 				);
 				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = /sw/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					/opt/local/lib/mysql5/mysql,
+				);
 				OTHER_LDFLAGS = (
 					"-lxml2",
 					"-lgmp",
 					"-llua",
-					"-lboost_thread",
-					"-lboost_regex",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
 					"-lmysqlclient",
 				);
 				PREBINDING = NO;
@@ -950,17 +1040,19 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = __USE_SQLITE__;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					/sw/include/libxml2,
+					/opt/local/include,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
 				);
 				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = /sw/lib;
+				LIBRARY_SEARCH_PATHS = /opt/local/lib;
 				OTHER_LDFLAGS = (
 					"-lxml2",
 					"-lgmp",
 					"-llua",
-					"-lboost_thread",
-					"-lboost_regex",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
 					"-lsqlite3",
 				);
 				PREBINDING = NO;
@@ -978,17 +1070,19 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PREPROCESSOR_DEFINITIONS = __USE_SQLITE__;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					/sw/include/libxml2,
+					/opt/local/include,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
 				);
 				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = /sw/lib;
+				LIBRARY_SEARCH_PATHS = /opt/local/lib;
 				OTHER_LDFLAGS = (
 					"-lxml2",
 					"-lgmp",
 					"-llua",
-					"-lboost_thread",
-					"-lboost_regex",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
 					"-lsqlite3",
 				);
 				PREBINDING = NO;
