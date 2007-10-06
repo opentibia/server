@@ -219,8 +219,10 @@ bool passwordTest(const std::string &plain, std::string &hash)
 			return true;
 		}
 	}
-	else if(plain == hash){
-		return true;
+	else{
+		if(plain == hash){
+			return true;
+		}
 	}
 	return false;
 }

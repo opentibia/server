@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,14 +22,58 @@
 #include "server.h"
 #include "connection.h"
 
+Server::Server(uint32_t serverip, uint16_t port)
+: m_io_service()
+{
+	m_acceptor = NULL;
+	m_listenErrors = 0;
+	m_serverIp = serverip;
+	m_serverPort = port;
+	openListenSocket();
+	accept();
+}
+
+Server::~Server()
+{
+	closeListenSocekt();
+}
+
 void Server::accept()
 {
-	//Connection* connection = new Connection(m_io_service);
+	if(!m_acceptor){
+		#ifdef __DEBUG_NET__
+		std::cout << "Error: [Server::accept] NULL m_acceptor." << std::endl;
+		#endif
+		return;
+	}
 	Connection* connection = ConnectionManager::getInstance()->createConnection(m_io_service);
 
-	m_acceptor.async_accept(connection->getHandle(),
-		boost::bind(&Server::onAccept, this, connection, 
+	m_acceptor->async_accept(connection->getHandle(),
+		boost::bind(&Server::onAccept, this, connection,
 		boost::asio::placeholders::error));
+}
+
+void Server::closeListenSocekt()
+{
+	if(m_acceptor){
+		if(m_acceptor->is_open()){
+			boost::system::error_code error;
+			m_acceptor->close(error);
+			if(error){
+				PRINT_ASIO_ERROR("Closing listen socket");
+			}
+		}
+		delete m_acceptor;
+		m_acceptor = NULL;
+	}
+}
+
+void Server::openListenSocket()
+{
+	m_acceptor = new boost::asio::ip::tcp::acceptor(m_io_service,
+					boost::asio::ip::tcp::endpoint(
+	 				boost::asio::ip::address(boost::asio::ip::address_v4(m_serverIp)),
+					m_serverPort));
 }
 
 void Server::onAccept(Connection* connection, const boost::system::error_code& error)
@@ -42,7 +86,22 @@ void Server::onAccept(Connection* connection, const boost::system::error_code& e
 		accept();
 	}
 	else{
-		PRINT_ASIO_ERROR("Accepting");
+		if(error != boost::asio::error::operation_aborted){
+			m_listenErrors++;
+			PRINT_ASIO_ERROR("Accepting");
+			closeListenSocekt();
+			if(m_listenErrors < 100){
+				openListenSocket();
+			}
+			else{
+				std::cout << "Error: [Server::onAccept] More than 100 listen errors." << std::endl;
+			}
+		}
+		else{
+			#ifdef __DEBUG_NET__
+			std::cout << "Error: [Server::onAccept] Operation aborted." << std::endl;
+			#endif
+		}
 	}
 }
 
@@ -53,6 +112,6 @@ void Server::stop()
 
 void Server::onStopServer()
 {
-	m_acceptor.close();
+	closeListenSocekt();
 	ConnectionManager::getInstance()->closeAll();
 }

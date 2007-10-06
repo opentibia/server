@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,17 +32,8 @@ class Connection;
 class Server : boost::noncopyable
 {
 public:
-	Server(uint32_t serverip, uint16_t port)
-		: m_io_service(),
-			m_acceptor(m_io_service, 
-		 boost::asio::ip::tcp::endpoint(
-		 	boost::asio::ip::address(boost::asio::ip::address_v4(serverip)), 
-			port))
-	{
-		accept();
-	}
-	
-	~Server() { }
+	Server(uint32_t serverip, uint16_t port);
+	~Server();
 
 	void run() { m_io_service.run(); }
 
@@ -52,9 +43,17 @@ private:
 	void accept();
 	void onAccept(Connection* connection, const boost::system::error_code& error);
 	void onStopServer();
-	
+
+	void openListenSocket();
+	void closeListenSocekt();
+
 	boost::asio::io_service m_io_service;
-	boost::asio::ip::tcp::acceptor m_acceptor;
+	boost::asio::ip::tcp::acceptor* m_acceptor;
+
+	uint32_t m_listenErrors;
+
+	uint32_t m_serverIp;
+	uint16_t m_serverPort;
 };
 
 #endif

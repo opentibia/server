@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -60,12 +60,12 @@ void OutputMessagePool::send(OutputMessage* msg)
 	OTSYS_THREAD_LOCK(m_outputPoolLock, "");
 	OutputMessage::OutputMessageState state = msg->getState();
 	OTSYS_THREAD_UNLOCK(m_outputPoolLock, "");
-	
+
 	if(state == OutputMessage::STATE_ALLOCATED_NO_AUTOSEND){
 		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Sending message - SINGLE" << std::endl;
 		#endif
-		
+
 		msg->writeMessageLength();
 		if(msg->getConnection()){
 			if(msg->getConnection()->send(msg)){
@@ -95,11 +95,11 @@ void OutputMessagePool::sendAll()
 	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
 		//It will send only messages bigger then 1 kb or wiht a lifetime greater than 50 ms
 		if((*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 50)){
-			
+
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Sending message - ALL" << std::endl;
 			#endif
-			
+
 			(*it)->writeMessageLength();
 			if((*it)->getConnection()){
 				if((*it)->getConnection()->send(*it)){
@@ -114,7 +114,7 @@ void OutputMessagePool::sendAll()
 				std::cout << "Error: [OutputMessagePool::send] NULL connection." << std::endl;
 				#endif
 			}
-			
+
 			m_autoSendOutputMessages.erase(it++);
 		}
 		else{
@@ -136,7 +136,7 @@ void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/
 	switch(msg->getState()){
 	case OutputMessage::STATE_ALLOCATED:
 	{
-		OutputMessageVector::iterator it = 
+		OutputMessageVector::iterator it =
 			std::find(m_autoSendOutputMessages.begin(), m_autoSendOutputMessages.end(), msg);
 		if(it != m_autoSendOutputMessages.end()){
 			m_autoSendOutputMessages.erase(it);
@@ -174,7 +174,7 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "request output message - auto = " << autosend << std::endl;
 	#endif
-	
+
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
 	for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){

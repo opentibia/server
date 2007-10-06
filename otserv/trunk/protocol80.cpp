@@ -200,7 +200,7 @@ Protocol80::Protocol80(Connection* connection) :
 	m_lastTaskCheck = 0;
 	m_messageCount = 0;
 	m_rejectCount = 0;
-	m_loggingOut = false;
+	m_debugAssertSent = false;
 }
 
 Protocol80::~Protocol80()
@@ -322,11 +322,17 @@ bool Protocol80::login(const std::string& name)
 bool Protocol80::logout()
 {
 	//dispatcher thread
-	bool result = g_game.removeCreature(player);
-	if(Connection* connection = getConnection()){
-		connection->closeConnection();
+	if(!player->hasCondition(CONDITION_INFIGHT)){
+		bool result = g_game.removeCreature(player);
+		if(Connection* connection = getConnection()){
+			connection->closeConnection();
+		}
+		return result;
 	}
-	return result;
+	else{
+		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
+		return false;
+	}
 }
 
 void Protocol80::move(Direction dir)
@@ -416,7 +422,7 @@ bool Protocol80::parseFirstPacket(NetworkMessage& msg)
 	std::string acc_pass;
 	if(!(IOAccount::instance()->getPassword(accnumber, name, acc_pass) && passwordTest(password,acc_pass))){
 		g_bans.addLoginAttempt(getIP(), false);
-		disconnectClient(0x0A, "Please enter a valid account number and password.");
+		getConnection()->closeConnection();
 		return false;
 	}
 
@@ -443,7 +449,7 @@ void Protocol80::disconnectClient(uint8_t error, const char* message)
 
 void Protocol80::parsePacket(NetworkMessage &msg)
 {
-	if(msg.getMessageLength() <= 0 || !player || m_loggingOut)
+	if(msg.getMessageLength() <= 0 || !player)
 		return;
 
 	m_now = OTSYS_TIME();
@@ -457,10 +463,8 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 	else{
 		m_messageCount++;
 		//std::cout << interval/m_messageCount << " " << m_rejectCount << "/" << m_messageCount << std::endl;
-		if(/*m_rejectCount > m_messageCount/2 || */(interval > ADD_TASK_INTERVAL*15 && interval/m_messageCount < 25)){
-			m_loggingOut = true;
-			Dispatcher::getDispatcher().addTask(
-				createTask(boost::bind(&Protocol80::logout, this)));
+		if(/*m_rejectCount > m_messageCount/2 ||*/ (interval > ADD_TASK_INTERVAL*15 && interval/m_messageCount < 25)){
+			getConnection()->closeConnection();
 		}
 	}
 
@@ -640,7 +644,7 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0xC9: //client request to resend the tile
-		//parseUpdateTile(msg);
+		parseUpdateTile(msg);
 		break;
 
 	case 0xCA: //client request to resend the container (happens when you store more than container maxsize)
@@ -664,7 +668,7 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0xE8:
-		//parseDebugAssert(msg);
+		parseDebugAssert(msg);
 		break;
 
 	default:
@@ -871,14 +875,8 @@ bool Protocol80::canSee(int x, int y, int z) const
 //********************** Parse methods *******************************
 void Protocol80::parseLogout(NetworkMessage& msg)
 {
-	if(!player->hasCondition(CONDITION_INFIGHT)){
-		m_loggingOut = true;
-		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Protocol80::logout, this)));
-	}
-	else{
-		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
-	}
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(&Protocol80::logout, this)));
 }
 
 void Protocol80::parseCreatePrivateChannel(NetworkMessage& msg)
@@ -928,8 +926,6 @@ void Protocol80::parseOpenPriv(NetworkMessage& msg)
 
 void Protocol80::parseCancelMove(NetworkMessage& msg)
 {
-	//addGameTask(&Game::playerSetAttackedCreature, player->getID(), 0);
-	//addGameTask(&Game::playerFollowCreature, player->getID(), 0);
 	addGameTask(&Game::playerCancelAttackAndFollow, player->getID());
 }
 
@@ -1087,6 +1083,12 @@ void Protocol80::parseUpArrowContainer(NetworkMessage& msg)
 	uint8_t cid = msg.GetByte();
 
 	addGameTask(&Game::playerMoveUpContainer, player->getID(), cid);
+}
+
+void Protocol80::parseUpdateTile(NetworkMessage& msg)
+{
+	Position pos = msg.GetPosition();
+	//TODO
 }
 
 void Protocol80::parseUpdateContainer(NetworkMessage& msg)
@@ -1269,6 +1271,34 @@ void Protocol80::parseRotateItem(NetworkMessage& msg)
 	uint8_t stackpos = msg.GetByte();
 
 	addGameTask(&Game::playerRotateItem, player->getID(), pos, stackpos, spriteId);
+}
+
+void Protocol80::parseDebugAssert(NetworkMessage& msg)
+{
+	if(g_config.getNumber(ConfigManager::SAVE_CLIENT_DEBUG_ASSERTIONS) == 0){
+		return;
+	}
+
+	//only accept 1 report each time
+	if(m_debugAssertSent){
+		return;
+	}
+	m_debugAssertSent = true;
+
+	std::string assertLine = msg.GetString();
+	std::string date = msg.GetString();
+	std::string description = msg.GetString();
+	std::string comment = msg.GetString();
+
+	//write it in the assertions file
+	FILE* f = fopen("client_assertions.txt", "a");
+	char bufferDate[32], bufferIp[32];
+	time_t tmp = time(NULL);
+	formatIP(getIP(), bufferIp);
+	formatDate(tmp, bufferDate);
+	fprintf(f, "----- %s - %s (%s) -----\n", bufferDate, player->getName().c_str(), bufferIp);
+	fprintf(f, "%s\n%s\n%s\n%s\n", assertLine.c_str(), date.c_str(), description.c_str(), comment.c_str());
+	fclose(f);
 }
 
 //********************** Send methods  *******************************

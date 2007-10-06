@@ -394,12 +394,6 @@ bool Connection::closingConnection()
 			std::cout << "Deleting Connection" << std::endl;
 			#endif
 
-			if(m_outputQueue.size() != 0){
-				OutputMessage* msg = m_outputQueue.front();
-				m_outputQueue.pop_front();
-				internalSend(msg);
-			}
-
 			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 
 			Dispatcher::getDispatcher().addTask(
