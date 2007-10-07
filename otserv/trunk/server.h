@@ -43,6 +43,8 @@ private:
 	void onAccept(Connection* connection, const boost::system::error_code& error);
 	void onStopServer();
 
+	void accept();
+
 	void openListenSocket();
 	void closeListenSocekt();
 
