@@ -1072,7 +1072,7 @@ void Player::sendPing(uint32_t interval)
 			g_game.removeCreature(this, true);
 		}
 		else if(npings > 24){
-			client->logout();
+			client->logout(true);
 		}
 	}
 }
@@ -2009,7 +2009,7 @@ void Player::addList()
 void Player::kickPlayer()
 {
 	if(client){
-		client->logout();
+		client->logout(true);
 	}
 	else{
 		g_game.removeCreature(this);

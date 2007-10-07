@@ -319,10 +319,10 @@ bool Protocol80::login(const std::string& name)
 	return false;
 }
 
-bool Protocol80::logout()
+bool Protocol80::logout(bool forced)
 {
 	//dispatcher thread
-	if(!player->hasCondition(CONDITION_INFIGHT)){
+	if(forced || !player->hasCondition(CONDITION_INFIGHT)){
 		bool result = g_game.removeCreature(player);
 		if(Connection* connection = getConnection()){
 			connection->closeConnection();
@@ -876,7 +876,7 @@ bool Protocol80::canSee(int x, int y, int z) const
 void Protocol80::parseLogout(NetworkMessage& msg)
 {
 	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Protocol80::logout, this)));
+		createTask(boost::bind(&Protocol80::logout, this, false)));
 }
 
 void Protocol80::parseCreatePrivateChannel(NetworkMessage& msg)
@@ -1829,7 +1829,7 @@ void Protocol80::sendMoveCreature(const Creature* creature, const Position& newP
 	if(creature == player){
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
-			if(teleport){
+			if(teleport || oldStackPos >= 10){
 				RemoveTileItem(msg, oldPos, oldStackPos);
 				AddMapDescription(msg, player->getPosition());
 			}
@@ -1838,12 +1838,10 @@ void Protocol80::sendMoveCreature(const Creature* creature, const Position& newP
 					RemoveTileItem(msg, oldPos, oldStackPos);
 				}
 				else{
-					if(oldStackPos < 10){
-						msg->AddByte(0x6D);
-						msg->AddPosition(oldPos);
-						msg->AddByte(oldStackPos);
-						msg->AddPosition(creature->getPosition());
-					}
+					msg->AddByte(0x6D);
+					msg->AddPosition(oldPos);
+					msg->AddByte(oldStackPos);
+					msg->AddPosition(creature->getPosition());
 				}
 
 				//floor change down
@@ -1876,19 +1874,17 @@ void Protocol80::sendMoveCreature(const Creature* creature, const Position& newP
 		}
 	}
 	else if(canSee(oldPos) && canSee(creature->getPosition())){
-		if(teleport || (oldPos.z == 7 && newPos.z >= 8)){
+		if(teleport || (oldPos.z == 7 && newPos.z >= 8) || oldStackPos >= 10){
 			sendRemoveCreature(creature, oldPos, oldStackPos, false);
 			sendAddCreature(creature, false);
 		}
 		else{
-			if(oldStackPos < 10){
-				NetworkMessage* msg = getOutputBuffer();
-				if(msg){
-					msg->AddByte(0x6D);
-					msg->AddPosition(oldPos);
-					msg->AddByte(oldStackPos);
-					msg->AddPosition(creature->getPosition());
-				}
+			NetworkMessage* msg = getOutputBuffer();
+			if(msg){
+				msg->AddByte(0x6D);
+				msg->AddPosition(oldPos);
+				msg->AddByte(oldStackPos);
+				msg->AddPosition(creature->getPosition());
 			}
 		}
 	}

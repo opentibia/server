@@ -51,7 +51,7 @@ public:
 	virtual ~Protocol80();
 
 	bool login(const std::string& name);
-	bool logout();
+	bool logout(bool forced);
 	void move(Direction dir);
 
 	void setPlayer(Player* p);
@@ -219,8 +219,8 @@ private:
 	void AddTextMessage(NetworkMessage* msg,MessageClasses mclass, const std::string& message);
 	void AddAnimatedText(NetworkMessage* msg,const Position& pos, unsigned char color, const std::string& text);
 	void AddMagicEffect(NetworkMessage* msg,const Position& pos, unsigned char type);
-	void AddDistanceShoot(NetworkMessage* msg,const Position& from, const Position& to, unsigned char type);
-	void AddCreature(NetworkMessage* msg,const Creature* creature, bool known, unsigned int remove);
+	void AddDistanceShoot(NetworkMessage* msg,const Position& from, const Position& to, uint8_t type);
+	void AddCreature(NetworkMessage* msg,const Creature* creature, bool known, uint32_t remove);
 	void AddPlayerStats(NetworkMessage* msg);
 	void AddCreatureSpeak(NetworkMessage* msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
 	void AddCreatureHealth(NetworkMessage* msg,const Creature* creature);
