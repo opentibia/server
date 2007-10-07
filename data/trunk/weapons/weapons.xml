@@ -24,17 +24,18 @@
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
+	<melee id="7404" level="40" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Assassin Dagger
 	<melee id="7386" level="40" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Mercenary Sword
 	<melee id="2446" level="45" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Pharaoh Sword
 	<melee id="7402" level="45" enabled="1" unproperly="1" function="internalLoadWeapon">	--Dragon Slayer
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
+	<melee id="7416" level="55" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Bloody Edge
 	<melee id="2393" level="55" enabled="1" unproperly="1" function="internalLoadWeapon">	--Giant Sword
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
-	<melee id="7416" level="55" enabled="1" unproperly="1" function="internalLoadWeapon"/>  --Bloody Edge
 	<melee id="7384" level="60" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Mystic Blade
 	<melee id="7382" level="60" enabled="1" unproperly="1" function="internalLoadWeapon">	--Demonrage Sword
 		<vocation name="Knight"/>
@@ -45,12 +46,16 @@
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
+	<melee id="7405" level="80" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Shenlong Sword
 	<melee id="2400" level="80" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Magic Sword
 	<melee id="2408" level="110" enabled="1" unproperly="1" function="internalLoadWeapon">	--Warlord Sword
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
-	<melee id="2390" level="140" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Magic Longsword
+	<melee id="2390" level="140" enabled="1" unproperly="1" function="internalLoadWeapon">	--Magic Longsword
+		<vocation name="Knight"/>
+		<vocation name="Elite Knight" showInDescription="0"/>
+	</melee>
 
 -- Axes
 	<melee id="2429" level="20" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Barbarian Axe
@@ -72,8 +77,9 @@
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
-	<melee id="7412" level="45" enabled="1" unproperly="1" function="internalLoadWeapon"/>  --Butcher's Axe
+	<melee id="7412" level="45" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Butcher's Axe
 	<melee id="2447" level="50" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Twin Axe
+	<melee id="7388" level="55" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Vile Axe
 	<melee id="2427" level="55" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Guardian Halberd
 	<melee id="7389" level="60" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Heroic Axe
 	<melee id="2414" level="60" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Dragon Lance
@@ -92,8 +98,8 @@
 	
 -- Clubs	
 	<melee id="2423" level="20" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Clerical Mace
-	<melee id="7425" level="20" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Taurus Mace
 	<melee id="7381" level="20" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Mammoth Whopper
+	<melee id="7425" level="20" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Taurus Mace
 	<melee id="7432" level="20" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Furry Club
 	<melee id="2434" level="25" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Dragon Hammer
 	<melee id="7387" level="25" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Diamond Sceptre
@@ -108,20 +114,28 @@
 	</melee>
 	<melee id="2445" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Crystal Mace
 	<melee id="7451" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Shadow Sceptre
+	<melee id="3961" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Lich Staff
+	<melee id="2424" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Silver Mace
 	<melee id="7392" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Orcish Maul
 	<melee id="7426" level="40" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Amber Staff
 	<melee id="7427" level="45" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Chaos Mace
-	<melee id="2391" level="50" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--War Hammer
+	<melee id="2391" level="50" enabled="1" unproperly="1" function="internalLoadWeapon">	--War Hammer
+		<vocation name="Knight"/>
+		<vocation name="Elite Knight" showInDescription="0"/>
+	</melee>
+	<melee id="7410" level="55" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Queen's Sceptre
 	<melee id="7415" level="60" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Cranial Basher
-	<melee id="7414" level="60" enabled="1" unproperly="1" function="internalLoadWeapon">
+	<melee id="7414" level="60" enabled="1" unproperly="1" function="internalLoadWeapon">	--Abyss Hammer
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
 	<melee id="2444" level="65" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Hammer of Wrath
 	<melee id="7429" level="75" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Blessed Sceptre
 	<melee id="2453" level="75" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Arcane Staff
-	<melee id="7431" level="80" enabled="1" unporperly="1" function="internalLoadWeapon"/>  --Demonbone
+	<melee id="2437" level="80" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Golden Mace
+	<melee id="7431" level="80" enabled="1" unporperly="1" function="internalLoadWeapon"/>	--Demonbone
 	<melee id="2421" level="85" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Thunder Hammer
+	<melee id="2452" level="85" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Heavy Mace
 	
 -- Rods
 	<wand id="2182" level="7" mana="2" enabled="1" script="snakebite_rod.lua">
@@ -171,14 +185,14 @@
 	<distance id="2545" enabled="1" hitchance="80" ammo="removecount" script="poison_arrow.lua"/>
 	<distance id="2546" enabled="1" hitchance="80" ammo="removecount" script="explosive_arrow.lua"/>
 	<distance id="7366" enabled="1" hitchance="80" ammo="move" script="viper_star.lua"/>
-	<distance id="3965" level="20" enabled="1" ammo="move" function="internalLoadWeapon"/> --Hunting Spear
-	<distance id="7378" level="25" enabled="1" ammo="move" function="internalLoadWeapon"/> --Royal Spear
-	<distance id="7367" level="42" enabled="1" ammo="move" function="internalLoadWeapon"/> --Enchanted Spear
-	<distance id="7368" level="80" enabled="1" ammo="removecount" function="internalLoadWeapon"/> --Assassion Star
-	<distance id="7364" level="20" enabled="1" ammo="removecount" function="internalLoadWeapon"/> --Sniper Arrow
-	<distance id="7365" level="40" enabled="1" ammo="removecount" function="internalLoadWeapon"/> --Onyx Arrow
-	<distance id="7363" level="30" enabled="1" ammo="removecount" function="internalLoadWeapon"/> -- Piercing Bolt
-	<distance id="2547" level="55" enabled="1" ammo="removecount" function="internalLoadWeapon"/> -- Power Bolt
-	<distance id="6529" level="70" enabled="1" ammo="removecount" function="internalLoadWeapon"/> -- Infernal Bolt
+	<distance id="3965" level="20" enabled="1" ammo="move" function="internalLoadWeapon"/>			--Hunting Spear
+	<distance id="7378" level="25" enabled="1" ammo="move" function="internalLoadWeapon"/>			--Royal Spear
+	<distance id="7367" level="42" enabled="1" ammo="move" function="internalLoadWeapon"/>			--Enchanted Spear
+	<distance id="7368" level="80" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	--Assassion Star
+	<distance id="7364" level="20" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	--Sniper Arrow
+	<distance id="7365" level="40" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	--Onyx Arrow
+	<distance id="7363" level="30" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	-- Piercing Bolt
+	<distance id="2547" level="55" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	-- Power Bolt
+	<distance id="6529" level="70" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	-- Infernal Bolt
 
 </weapons>

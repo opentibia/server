@@ -6197,7 +6197,7 @@
 	<item id="2437" article="a" name="golden mace">
 		<attribute key="weight" value="5000"/>
 		<attribute key="defense" value="24"/>
-		<attribute key="attack" value="45"/>
+		<attribute key="attack" value="47"/>
 		<attribute key="weaponType" value="club"/>
 	</item>
 	<item id="2438" article="an" name="epee">
@@ -10889,7 +10889,7 @@
 		<attribute key="slotType" value="backpack"/>
 	</item>
 	<item id="3961" article="a" name="lich staff">
-		<attribute key="weight" value="5000"/>
+		<attribute key="weight" value="8000"/>
 		<attribute key="defense" value="30"/>
 		<attribute key="attack" value="40"/>
 		<attribute key="weaponType" value="club"/>
@@ -19412,21 +19412,21 @@
 	</item>
 	<item id="7363" article="a" name="piercing bolt" plural="piercing bolts">
 		<attribute key="weight" value="80"/>
-		<attribute key="attack" value="33"/>
+		<attribute key="attack" value="35"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="piercingbolt"/>
 	</item>
 	<item id="7364" article="a" name="sniper arrow" plural="sniper arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="26"/>
+		<attribute key="attack" value="30"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="sniperarrow"/>
 	</item>
 	<item id="7365" article="an" name="onyx arrow" plural="onyx arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="38"/>
+		<attribute key="attack" value="35"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="onyxarrow"/>
@@ -19624,8 +19624,12 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="-2"/>
 	</item>
-	<item id="7405" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7405" article="a" name="shenlong sword">
+		<attribute key="weight" value="8000"/>
+		<attribute key="defense" value="31"/>
+		<attribute key="attack" value="48"/>
+		<attribute key="weaponType" value="sword"/>
+		<attribute key="extradef" value="-2"/>
 	</item>
 	<item id="7406" article="a" name="blacksteel sword">
 		<attribute key="weight" value="5900"/>
@@ -19651,8 +19655,11 @@
 	<item id="7409" name="">
 		<attribute key="weight" value="0"/>
 	</item>
-	<item id="7410" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7410" article="a" name="queen's sceptre">
+		<attribute key="weight" value="2300"/>
+		<attribute key="defense" value="19"/>
+		<attribute key="attack" value="43"/>
+		<attribute key="weaponType" value="club"/>
 	</item>
 	<item id="7411" name="">
 		<attribute key="weight" value="0"/>

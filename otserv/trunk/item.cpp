@@ -725,15 +725,21 @@ std::string Item::getDescription(int32_t lookDistance) const
 		if(weapon && weapon->getWieldInfo()){
 			const uint32_t wieldInfo = weapon->getWieldInfo();
 			s << std::endl << "It can only be wielded properly by ";
+			if(wieldInfo & WIELDINFO_PREMIUM){
+				s << "premium ";
+			}
+
 			if(wieldInfo & WIELDINFO_VOCREQ){
 				s << weapon->getVocationString();
 			}
 			else{
 				s << "players";
 			}
+
 			if(wieldInfo & WIELDINFO_LEVEL){
 				s << " of level " << (int)weapon->getReqLevel() << " or higher";
 			}
+
 			if(wieldInfo & WIELDINFO_MAGLV){
 				if(wieldInfo & WIELDINFO_LEVEL){
 					s << " and";
@@ -742,9 +748,6 @@ std::string Item::getDescription(int32_t lookDistance) const
 					s << " of";
 				}
 				s << " magic level " << (int)weapon->getReqMagLv() << " or higher";
-			}
-			if(wieldInfo & WIELDINFO_PREMIUM){
-				s << " with a premium player";
 			}
 			s << ".";
 		}
