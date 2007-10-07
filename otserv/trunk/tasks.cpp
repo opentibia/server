@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,27 +39,28 @@ OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void *p)
 	ExceptionHandler dispatcherExceptionHandler;
 	dispatcherExceptionHandler.InstallHandler();
 	#endif
+	srand((unsigned int)OTSYS_TIME());
 	while(true){
 		Task* task = NULL;
 
 		// check if there are tasks waiting
-		OTSYS_THREAD_LOCK(getDispatcher().m_taskLock, "")	
-		
+		OTSYS_THREAD_LOCK(getDispatcher().m_taskLock, "")
+
 		size_t listSize = getDispatcher().m_taskList.size();
-		
+
 		if(listSize == 0){
 			//if the list is empty wait for signal
 			OTSYS_THREAD_WAITSIGNAL(getDispatcher().m_taskSignal, getDispatcher().m_taskLock);
 		}
-		
+
 		if(listSize != 0 || getDispatcher().m_taskList.size() != 0){
 			// take the first task
 			task = getDispatcher().m_taskList.front();
 			getDispatcher().m_taskList.pop_front();
 		}
-		
+
 		OTSYS_THREAD_UNLOCK(getDispatcher().m_taskLock, "");
-		
+
 		// finally execute the task...
 		if(task){
 			OutputMessagePool::getInstance()->startExecutionFrame();
@@ -76,15 +77,15 @@ OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void *p)
 void Dispatcher::addTask(Task* task)
 {
 	OTSYS_THREAD_LOCK(m_taskLock, "");
-	
+
 	// check if the list was empty
 	bool isEmpty = m_taskList.empty();
-	
+
 	// add the task to the list
 	m_taskList.push_back(task);
-	
+
 	OTSYS_THREAD_UNLOCK(m_taskLock, "");
-	
+
 	// send a signal if the list was empty
 	if(isEmpty)
 		OTSYS_THREAD_SIGNAL_SEND(m_taskSignal);

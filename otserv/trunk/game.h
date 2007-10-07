@@ -310,6 +310,7 @@ public:
 	bool playerCloseContainer(uint32_t playerId, uint8_t cid);
 	bool playerMoveUpContainer(uint32_t playerId, uint8_t cid);
 	bool playerUpdateContainer(uint32_t playerId, uint8_t cid);
+	bool playerUpdateTile(uint32_t playerId, const Position& pos);
 	bool playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stackPos, const uint16_t spriteId);
 	bool playerWriteItem(uint32_t playerId, uint32_t windowTextId, const std::string& text);
 	bool playerUpdateHouseWindow(uint32_t playerId, uint8_t listId, uint32_t windowTextId, const std::string& text);

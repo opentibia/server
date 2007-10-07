@@ -770,8 +770,8 @@ bool Player::getStorageValue(const uint32_t key, int32_t& value) const
 bool Player::canSee(const Position& pos) const
 {
 	if(client){
-	return client->canSee(pos);
-}
+		return client->canSee(pos);
+	}
 
 	return false;
 }

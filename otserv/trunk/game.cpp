@@ -1836,6 +1836,19 @@ bool Game::playerMoveUpContainer(uint32_t playerId, uint8_t cid)
 	return true;
 }
 
+bool Game::playerUpdateTile(uint32_t playerId, const Position& pos)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	if(player->canSee(pos)){
+		player->sendUpdateTile(pos);
+		return true;
+	}
+	return false;
+}
+
 bool Game::playerUpdateContainer(uint32_t playerId, uint8_t cid)
 {
 	Player* player = getPlayerByID(playerId);

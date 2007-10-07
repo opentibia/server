@@ -329,7 +329,7 @@ public:
 	void sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 		{if(client) client->sendRemoveTileItem(pos, stackpos);}
 	void sendUpdateTile(const Position& pos)
-		{if(client) client->UpdateTile(pos);}
+		{if(client) client->sendUpdateTile(pos);}
 
 	void sendCreatureAppear(const Creature* creature, bool isLogin)
 		{if(client) client->sendAddCreature(creature, isLogin);}

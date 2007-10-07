@@ -182,7 +182,7 @@ private:
 	void sendAddTileItem(const Position& pos, const Item* item);
 	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
-	void UpdateTile(const Position& pos);
+	void sendUpdateTile(const Position& pos);
 
 	void sendAddCreature(const Creature* creature, bool isLogin);
 	void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
@@ -235,7 +235,6 @@ private:
 	void AddTileCreature(NetworkMessage* msg, const Position& pos, const Creature* creature);
 	void UpdateTileItem(NetworkMessage* msg, const Position& pos, uint32_t stackpos, const Item* item);
 	void RemoveTileItem(NetworkMessage* msg, const Position& pos, uint32_t stackpos);
-	void UpdateTile(NetworkMessage* msg, const Position& pos);
 
 	void MoveUpCreature(NetworkMessage* msg, const Creature* creature,
 		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);

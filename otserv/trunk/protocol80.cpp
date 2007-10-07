@@ -1088,7 +1088,8 @@ void Protocol80::parseUpArrowContainer(NetworkMessage& msg)
 void Protocol80::parseUpdateTile(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
-	//TODO
+
+	//addGameTask(&Game::playerUpdateTile, player->getID(), pos);
 }
 
 void Protocol80::parseUpdateContainer(NetworkMessage& msg)
@@ -1707,12 +1708,24 @@ void Protocol80::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 	}
 }
 
-void Protocol80::UpdateTile(const Position& pos)
+void Protocol80::sendUpdateTile(const Position& pos)
 {
 	if(canSee(pos)){
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
-			UpdateTile(msg, pos);
+			msg->AddByte(0x69);
+			msg->AddPosition(pos);
+
+			Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+			if(tile){
+				GetTileDescription(tile, msg);
+				msg->AddByte(0);
+				msg->AddByte(0xFF);
+			}
+			else{
+				msg->AddByte(0x01);
+				msg->AddByte(0xFF);
+			}
 		}
 	}
 }
@@ -1838,11 +1851,11 @@ void Protocol80::sendMoveCreature(const Creature* creature, const Position& newP
 					RemoveTileItem(msg, oldPos, oldStackPos);
 				}
 				else{
-					msg->AddByte(0x6D);
-					msg->AddPosition(oldPos);
-					msg->AddByte(oldStackPos);
-					msg->AddPosition(creature->getPosition());
-				}
+						msg->AddByte(0x6D);
+						msg->AddPosition(oldPos);
+						msg->AddByte(oldStackPos);
+						msg->AddPosition(creature->getPosition());
+					}
 
 				//floor change down
 				if(newPos.z > oldPos.z){
@@ -1879,15 +1892,15 @@ void Protocol80::sendMoveCreature(const Creature* creature, const Position& newP
 			sendAddCreature(creature, false);
 		}
 		else{
-			NetworkMessage* msg = getOutputBuffer();
-			if(msg){
-				msg->AddByte(0x6D);
-				msg->AddPosition(oldPos);
-				msg->AddByte(oldStackPos);
-				msg->AddPosition(creature->getPosition());
+				NetworkMessage* msg = getOutputBuffer();
+				if(msg){
+					msg->AddByte(0x6D);
+					msg->AddPosition(oldPos);
+					msg->AddByte(oldStackPos);
+					msg->AddPosition(creature->getPosition());
+				}
 			}
 		}
-	}
 	else if(canSee(oldPos)){
 		sendRemoveCreature(creature, oldPos, oldStackPos, false);
 	}
@@ -2330,23 +2343,6 @@ void Protocol80::RemoveTileItem(NetworkMessage* msg, const Position& pos, uint32
 		msg->AddByte(0x6C);
 		msg->AddPosition(pos);
 		msg->AddByte(stackpos);
-	}
-}
-
-void Protocol80::UpdateTile(NetworkMessage* msg, const Position& pos)
-{
-	msg->AddByte(0x69);
-	msg->AddPosition(pos);
-
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-	if(tile){
-		GetTileDescription(tile, msg);
-		msg->AddByte(0);
-		msg->AddByte(0xFF);
-	}
-	else{
-		msg->AddByte(0x01);
-		msg->AddByte(0xFF);
 	}
 }
 

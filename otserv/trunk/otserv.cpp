@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... ";
-	srand(time(NULL));
+	srand((unsigned int)OTSYS_TIME());
 	std::cout << "[done]" << std::endl;
 
 #if defined __LUA_NAME_ALTER__

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,12 +39,12 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
 	ExceptionHandler schedulerExceptionHandler;
 	schedulerExceptionHandler.InstallHandler();
 	#endif
-	srand(time(NULL));
+	srand((unsigned int)OTSYS_TIME());
 	while(true){
 		SchedulerTask* event = NULL;
 		bool runEvent = false;
 		int ret;
-		
+
 		// check if there are events waiting...
 		OTSYS_THREAD_LOCK(getScheduler().m_eventLock, "eventThread()")
 
@@ -56,7 +56,7 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
 			// unlock mutex and wait for signal or timeout
 			ret = OTSYS_THREAD_WAITSIGNAL_TIMED(getScheduler().m_eventSignal, getScheduler().m_eventLock, getScheduler().m_eventList.top()->getCycle());
 		}
-		
+
 		// the mutex is locked again now...
 		if(ret == OTSYS_THREAD_TIMEOUT){
 			// ok we had a timeout, so there has to be an event we have to execute...
@@ -72,7 +72,7 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
 			}
 		}
 		OTSYS_THREAD_UNLOCK(getScheduler().m_eventLock, "eventThread()");
-		
+
 		// add task to dispatcher
 		if(event){
 			// if it was not stopped
@@ -101,21 +101,21 @@ uint32_t Scheduler::addEvent(SchedulerTask* event)
 	}
 	// insert the eventid in the list of active events
 	m_eventIds.insert(event->getEventId());
-	
+
 	bool do_signal;
-	
+
 	// add the event to the queue
 	m_eventList.push(event);
-	
+
 	// if the list was empty or this event is the top in the list
 	// we have to signal it
 	if(event == m_eventList.top())
 		do_signal = true;
 	else
 		do_signal = false;
-	
+
 	OTSYS_THREAD_UNLOCK(m_eventLock, "");
-	
+
 	if(do_signal)
 		OTSYS_THREAD_SIGNAL_SEND(m_eventSignal);
 
