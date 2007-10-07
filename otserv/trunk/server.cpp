@@ -30,27 +30,11 @@ Server::Server(uint32_t serverip, uint16_t port)
 	m_serverIp = serverip;
 	m_serverPort = port;
 	openListenSocket();
-	accept();
 }
 
 Server::~Server()
 {
 	closeListenSocekt();
-}
-
-void Server::accept()
-{
-	if(!m_acceptor){
-		#ifdef __DEBUG_NET__
-		std::cout << "Error: [Server::accept] NULL m_acceptor." << std::endl;
-		#endif
-		return;
-	}
-	Connection* connection = ConnectionManager::getInstance()->createConnection(m_io_service);
-
-	m_acceptor->async_accept(connection->getHandle(),
-		boost::bind(&Server::onAccept, this, connection,
-		boost::asio::placeholders::error));
 }
 
 void Server::closeListenSocekt()
@@ -74,6 +58,12 @@ void Server::openListenSocket()
 					boost::asio::ip::tcp::endpoint(
 	 				boost::asio::ip::address(boost::asio::ip::address_v4(m_serverIp)),
 					m_serverPort));
+
+	Connection* connection = ConnectionManager::getInstance()->createConnection(m_io_service);
+
+	m_acceptor->async_accept(connection->getHandle(),
+		boost::bind(&Server::onAccept, this, connection,
+		boost::asio::placeholders::error));
 }
 
 void Server::onAccept(Connection* connection, const boost::system::error_code& error)

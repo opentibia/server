@@ -305,13 +305,13 @@ bool Protocol80::login(const std::string& name)
 		}
 
 		if(!_player->isRemoved()){
-			this->player = _player;
-			_player->useThing2();
-			_player->client = this;
-			_player->client->sendAddCreature(player, false);
-			_player->sendIcons();
-			_player->lastLoginSaved = time(NULL);
-			_player->lastip = player->getIP();
+			player = _player;
+			player->useThing2();
+			player->client = this;
+			player->client->sendAddCreature(player, false);
+			player->sendIcons();
+			player->lastLoginSaved = time(NULL);
+			player->lastip = player->getIP();
 			return true;
 		}
 	}
@@ -322,6 +322,9 @@ bool Protocol80::login(const std::string& name)
 bool Protocol80::logout(bool forced)
 {
 	//dispatcher thread
+	if(!player)
+		return false;
+
 	if(forced || !player->hasCondition(CONDITION_INFIGHT)){
 		bool result = g_game.removeCreature(player);
 		if(Connection* connection = getConnection()){
@@ -338,6 +341,10 @@ bool Protocol80::logout(bool forced)
 void Protocol80::move(Direction dir)
 {
 	//dispatcher thread
+	if(!player || player->isRemoved()){
+		return;
+	}
+
 	float multiplier;
 	switch(dir){
 		case NORTHWEST:

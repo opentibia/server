@@ -178,9 +178,6 @@ Player::~Player()
 	}
 
 	//std::cout << "Player destructor " << this << std::endl;
-	if(client){
-		delete client;
-	}
 
 	setWriteItem(NULL);
 	setEditHouse(NULL);

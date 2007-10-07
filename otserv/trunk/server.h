@@ -40,7 +40,6 @@ public:
 	void stop();
 
 private:
-	void accept();
 	void onAccept(Connection* connection, const boost::system::error_code& error);
 	void onStopServer();
 
