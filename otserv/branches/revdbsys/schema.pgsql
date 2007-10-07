@@ -162,7 +162,7 @@ CREATE TABLE "tile_items" (
 
 CREATE TABLE "player_depotitems" (
     "player_id" INT NOT NULL,
-    "depot_id" INT NOT NULL,
+    "depot_id" INT NOT NULL DEFAULT 0,
     "sid" INT NOT NULL,
     "pid" INT NOT NULL DEFAULT 0,
     "itemtype" INT NOT NULL,
