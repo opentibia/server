@@ -1,8 +1,10 @@
+ITEM_BIRD_CAGE	=	2095
+
 function onUse(cid, item, frompos, item2, topos)
-	if item.itemid == 2095 then
-		doSendMagicEffect(frompos, 21)
+	if (item.itemid == ITEM_BIRD_CAGE) then
+		doSendMagicEffect(frompos, CONST_ME_SOUND_YELLOW)
 	else
-		doSendMagicEffect(frompos, 18)
+		doSendMagicEffect(frompos, CONST_ME_SOUND_BLUE)
 	end
-    return 1
+    return TRUE
 end

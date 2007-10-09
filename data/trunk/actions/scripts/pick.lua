@@ -1,20 +1,14 @@
+local TUMB_ENTRANCE		 	= 	100
+local MUD_HOLE				= 	383
+
 function onUse(cid, item, frompos, item2, topos)
-	if isInArray(MUD, item2.itemid) == TRUE then
-		if item2.actionid == 100 then
-			doTransformItem(item2.uid, 383)
+	if (isInArray(MUD, item2.itemid) == TRUE) then
+		if (item2.actionid == TUMB_ENTRANCE) then
+			doTransformItem(item2.uid, MUD_HOLE)
 			doDecayItem(item2.uid)
-		else
-			return 0
+			return TRUE
 		end
-	elseif item2.itemid == 231 then
-		if item2.actionid == 100 then
-			doTransformItem(item2.uid, 489)
-			doDecayItem(item2.uid)
-		else
-			return 0
-		end
-	else
-		return 0
 	end
-	return 1
+
+	return FALSE
 end

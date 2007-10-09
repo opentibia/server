@@ -14380,8 +14380,6 @@
 	<item id="5470" article="a" name="distillery">
 	</item>
 	<item id="5471" article="a" name="sugar cane">
-		<attribute key="decayTo" value="5463"/>
-		<attribute key="duration" value="240"/>
 	</item>
 	<item id="5472" article="a" name="chain ball">
 	</item>

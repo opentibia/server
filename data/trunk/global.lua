@@ -7,6 +7,8 @@ FALSE = 0
 LUA_ERROR = -1
 LUA_NO_ERROR = 0
 
+CONTAINER_POSITION = 65535
+
 NORTH = 0
 EAST = 1
 SOUTH = 2
@@ -281,8 +283,36 @@ function getDistanceBetween(pos1, pos2)
 	local yDif = math.abs(pos1.y - pos2.y)
 
 	local posDif = math.max(xDif, yDif)
-	if(pos1.z ~= pos2.z) then
-		posDif = posDif + 9 + 6
+	if (pos1.z ~= pos2.z) then
+		posDif = (posDif + 9 + 6)
 	end
 	return posDif
+end
+
+function doPlayerAddMoney(cid, amount)
+	local crystals = math.floor(amount/10000)
+	amount = amount - crystals*10000
+	local platinum = math.floor(amount/100)
+	amount = amount - platinum*100
+	local gold = amount
+	local ret = 0
+	if (crystals > 0) then
+		ret = doPlayerGiveItem(cid, ITEM_CRYSTAL_COIN, crystals)
+		if(ret ~= LUA_NO_ERROR) then
+			return LUA_ERROR
+		end
+	end
+	if (platinum > 0) then
+		ret = doPlayerGiveItem(cid, ITEM_PLATINUM_COIN, platinum)
+		if (ret ~= LUA_NO_ERROR) then
+			return LUA_ERROR
+		end
+	end
+	if (gold > 0) then
+		ret = doPlayerGiveItem(cid, ITEM_GOLD_COIN, gold)
+		if (ret ~= LUA_NO_ERROR) then
+			return LUA_ERROR
+		end
+	end
+	return LUA_NO_ERROR
 end

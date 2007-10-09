@@ -5,7 +5,7 @@ function onUse(cid, item, frompos, item2, topos)
 	elseif isInArray(OPENED_NORMAL_DOOR, item.itemid) == TRUE then
 		if getThingfromPos(doorPos).itemid > 0 then
 			doPlayerSendCancel(cid, "Sorry, not possible.")
-			return 1
+			return TRUE
 		end
 		doTransformItem(item.uid, item.itemid - 1)
 	elseif isInArray(CLOSED_LOCKED_DOOR, item.itemid) == TRUE then
@@ -17,11 +17,11 @@ function onUse(cid, item, frompos, item2, topos)
 	elseif isInArray(OPENED_LOCKED_DOOR, item.itemid) == TRUE then
 		if getThingfromPos(doorPos).itemid > 0 then
 			doPlayerSendCancel(cid, "Sorry, not possible.")
-			return 1
+			return TRUE
 		end
 		doTransformItem(item.uid, item.itemid - 1)
 	else
-		return 0
+		return FALSE
 	end
-	return 1
+	return TRUE
 end

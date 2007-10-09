@@ -1,9 +1,11 @@
+local ITEM_MILL = 1381
+local ITEM_FLOUR = 2692
+
 function onUse(cid, item, frompos, item2, topos)
-	if item2.itemid == 1381 then
-		doPlayerAddItem(cid, 2692, 1)
+	if (item2.itemid == ITEM_MILL) then
 		doRemoveItem(item.uid, 1)
-	else 
-		return 0
+		doPlayerAddItem(cid, 2692, 1)
+		return TRUE
 	end
-	return 1
+	return FALSE
 end
