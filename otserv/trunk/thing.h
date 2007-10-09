@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -81,17 +81,19 @@ class Item;
 class Creature;
 
 class Thing {
-public:
+protected:
 	Thing();
+
+public:
 	virtual ~Thing();
 
 	void useThing2() {++useCount;}
 	void releaseThing2() {
-		--useCount; 
+		--useCount;
 		if(useCount <= 0)
 			delete this;
 	}
-	
+
 	virtual std::string getDescription(int32_t lookDistance) const = 0;
 
 	Cylinder* getParent() {return parent;};

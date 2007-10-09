@@ -720,7 +720,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 			break;
 	}
 
-	//creature->lastMove = OTSYS_TIME();
 	return RET_NOERROR;
 }
 
@@ -1519,9 +1518,32 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 	if(!player || player->isRemoved())
 		return false;
 
-	player->setFollowCreature(NULL);
-	player->onWalk(direction);
-	return (internalMoveCreature(player, direction) == RET_NOERROR);
+	float multiplier;
+	switch(direction){
+		case NORTHWEST:
+		case NORTHEAST:
+		case SOUTHWEST:
+		case SOUTHEAST:
+			multiplier = 1.5f;
+			break;
+
+		default:
+			multiplier = 1.0f;
+			break;
+	}
+
+	float delay = player->getSleepTicks()*multiplier;
+	if(delay > 0){
+		Scheduler::getScheduler().addEvent(
+			createSchedulerTask((int64_t)delay, boost::bind(&Game::playerMove, this, playerId, direction)));
+
+		return true;
+	}
+	else{
+		player->setFollowCreature(NULL);
+		player->onWalk(direction);
+		return (internalMoveCreature(player, direction) == RET_NOERROR);
+	}
 }
 
 bool Game::internalBroadcastMessage(Player* player, const std::string& text)

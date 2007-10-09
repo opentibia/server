@@ -74,8 +74,9 @@ class Item;
 
 class Creature : public AutoID, virtual public Thing
 {
-public:
+protected:
 	Creature();
+public:
 	virtual ~Creature();
 
 	virtual Creature* getCreature() {return this;};

@@ -52,7 +52,6 @@ public:
 
 	bool login(const std::string& name);
 	bool logout(bool forced);
-	void move(Direction dir);
 
 	void setPlayer(Player* p);
 
@@ -289,7 +288,6 @@ private:
 
 	int64_t m_now;
 	int64_t m_nextTask;
-	int64_t m_nextSchedulerTask;
 	int64_t m_nextPing;
 
 	int64_t m_lastTaskCheck;

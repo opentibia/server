@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -94,11 +94,11 @@ public:
 		static PoolManager instance;
 		return instance;
 	}
-	
+
 	void* allocate(size_t size) {
 		Pools::iterator it;
 		OTSYS_THREAD_LOCK(poolLock, NULL);
-		
+
 		for(it = pools.begin(); it != pools.end(); ++it) {
 			if(it->first >= size + sizeof(poolTag)) {
 				//poolTag* tag = reinterpret_cast<poolTag*>(it->second->ordered_malloc());
@@ -112,7 +112,7 @@ public:
 				return tag + 1;
 			}
 		}
-		
+
 		poolTag* tag = reinterpret_cast<poolTag*>(std::malloc(size + sizeof(poolTag)));
 		#ifdef __OTSERV_ALLOCATOR_STATS__
 		poolsStats[0]->allocations++;
@@ -122,16 +122,16 @@ public:
 		OTSYS_THREAD_UNLOCK(poolLock, NULL);
 		return tag + 1;
 	}
-	
+
 	void deallocate(void* deletable) {
 		if(deletable == NULL)
 			return;
-		
+
 		poolTag* const tag = reinterpret_cast<poolTag*>(deletable) - 1U;
 		OTSYS_THREAD_LOCK(poolLock, NULL);
 		if(tag->poolbytes) {
 			Pools::iterator it;
-			
+
 			it = pools.find(tag->poolbytes);
 			//it->second->ordered_free(tag);
 			it->second->free(tag);
@@ -147,7 +147,7 @@ public:
 		}
 		OTSYS_THREAD_UNLOCK(poolLock, NULL);
 	}
-	
+
 	/*
 	void releaseMemory(){
 		Pools::iterator it;
@@ -156,7 +156,7 @@ public:
 		}
 	}
 	*/
-	
+
 	#ifdef __OTSERV_ALLOCATOR_STATS__
 	void dumpStats(){
 		time_t rawtime;
@@ -165,11 +165,11 @@ public:
 		output << "Otserv Allocator Stats: " << std::ctime(&rawtime);
 		PoolsStats::iterator it;
 		for(it = poolsStats.begin(); it != poolsStats.end(); ++it) {
-			output << (int)(it->first) << " alloc: " << (int)(it->second->allocations) << 
-				" dealloc: " << (int)(it->second->deallocations) << 
+			output << (int)(it->first) << " alloc: " << (int)(it->second->allocations) <<
+				" dealloc: " << (int)(it->second->deallocations) <<
 				" unused: " << (int)(it->second->unused);
 			if(it->second->allocations != 0 && it->first != 0){
-				output << " avg: " << (int)((it->first) - (it->second->unused)/(it->second->allocations)) << 
+				output << " avg: " << (int)((it->first) - (it->second->unused)/(it->second->allocations)) <<
 				" %unused: " << (int)((it->second->unused)*100/(it->second->allocations)/(it->first));
 			}
 			output << " N: " << ((int)(it->second->allocations) - (int)(it->second->deallocations)) <<
@@ -194,10 +194,10 @@ public:
 		}
 		#endif
 	}
-	
+
 private:
 	void addPool(size_t size, size_t next_size) {
-		pools[size] = new(0) boost::pool<boost::default_user_allocator_malloc_free>(size, next_size); 
+		pools[size] = new(0) boost::pool<boost::default_user_allocator_malloc_free>(size, next_size);
 		#ifdef __OTSERV_ALLOCATOR_STATS__
 		t_PoolStats * tmp = new(0) t_PoolStats;
 		tmp->unused = 0;
@@ -206,19 +206,17 @@ private:
 		poolsStats[size] = tmp;
 		#endif
 	}
-	
+
 	PoolManager() {
 		OTSYS_THREAD_LOCKVARINIT(poolLock);
 		addPool(32, 32768);
 		addPool(48, 32768);
 		addPool(96, 16384);
-		addPool(256, 1024);
-		addPool(384, 256);
-		addPool(800, 256);
-		addPool(1152, 128);
-		addPool(2176, 64);
-		addPool(8448, 64);
-		addPool(18432, 64);
+		addPool(128, 1024);
+		addPool(384, 2048);
+		addPool(1024, 128);
+		addPool(8192, 128);
+		addPool(16384, 128);
 		#ifdef __OTSERV_ALLOCATOR_STATS__
 		t_PoolStats * tmp = new(0) t_PoolStats;
 		tmp->unused = 0;
@@ -227,13 +225,13 @@ private:
 		poolsStats[0] = tmp;
 		#endif
 	}
-	
+
 	PoolManager(const PoolManager&);
 	const PoolManager& operator=(const PoolManager&);
-	
-	typedef std::map<size_t, boost::pool<boost::default_user_allocator_malloc_free >*, std::less<size_t >, 
+
+	typedef std::map<size_t, boost::pool<boost::default_user_allocator_malloc_free >*, std::less<size_t >,
 		dummyallocator<std::pair<const size_t, boost::pool<boost::default_user_allocator_malloc_free>* > > > Pools;
-	
+
 	Pools pools;
 	#ifdef __OTSERV_ALLOCATOR_STATS__
 	struct t_PoolStats{
@@ -241,7 +239,7 @@ private:
 		int deallocations;
 		int unused;
 	};
-	typedef std::map<size_t, t_PoolStats*, std::less<size_t >, 
+	typedef std::map<size_t, t_PoolStats*, std::less<size_t >,
 		dummyallocator<std::pair<const size_t, t_PoolStats* > > > PoolsStats;
 	PoolsStats poolsStats;
 	#endif

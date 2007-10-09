@@ -54,8 +54,13 @@ extern RSA* g_otservRSA;
 extern Ban g_bans;
 Chat g_chat;
 
+
+#ifdef __SERVER_PROTECTION__
 #define ADD_TASK_INTERVAL 40
 #define CHECK_TASK_INTERVAL 5000
+#else
+#define ADD_TASK_INTERVAL -1
+#endif
 
 // Helping templates to add dispatcher tasks
 template<class T1, class f1, class r>
@@ -195,7 +200,6 @@ Protocol80::Protocol80(Connection* connection) :
 {
 	player = NULL;
 	m_nextTask = 0;
-	m_nextSchedulerTask = 0;
 	m_nextPing = 0;
 	m_lastTaskCheck = 0;
 	m_messageCount = 0;
@@ -338,46 +342,6 @@ bool Protocol80::logout(bool forced)
 	}
 }
 
-void Protocol80::move(Direction dir)
-{
-	//dispatcher thread
-	if(!player || player->isRemoved()){
-		return;
-	}
-
-	float multiplier;
-	switch(dir){
-		case NORTHWEST:
-		case NORTHEAST:
-		case SOUTHWEST:
-		case SOUTHEAST:
-			multiplier = 1.5f;
-			break;
-
-		default:
-			multiplier = 1.0f;
-			break;
-	}
-
-	int64_t delay = (int64_t)(player->getSleepTicks()*multiplier);
-	if(delay > 0){
-		if(m_now > m_nextSchedulerTask){
-
-			Scheduler::getScheduler().addEvent(
-				createSchedulerTask(delay, boost::bind(&Game::playerMove, &g_game, player->getID(), dir)));
-
-			m_nextSchedulerTask = m_now + delay;
-		}
-		else{
-			Scheduler::getScheduler().addEvent(
-				createSchedulerTask(delay + ADD_TASK_INTERVAL, boost::bind(&Protocol80::move, this, dir)));
-		}
-	}
-	else{
-		g_game.playerMove(player->getID(), dir);
-	}
-}
-
 bool Protocol80::parseFirstPacket(NetworkMessage& msg)
 {
 	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
@@ -460,6 +424,8 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 		return;
 
 	m_now = OTSYS_TIME();
+
+	#ifdef __SERVER_PROTECTION__
 	int64_t interval = m_now - m_lastTaskCheck;
 	if(interval > CHECK_TASK_INTERVAL){
 		interval = 0;
@@ -470,10 +436,11 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 	else{
 		m_messageCount++;
 		//std::cout << interval/m_messageCount << " " << m_rejectCount << "/" << m_messageCount << std::endl;
-		if(/*m_rejectCount > m_messageCount/2 ||*/ (interval > ADD_TASK_INTERVAL*15 && interval/m_messageCount < 25)){
+		if(/*m_rejectCount > m_messageCount/2 ||*/ (interval > 800 && interval/m_messageCount < 25)){
 			getConnection()->closeConnection();
 		}
 	}
+	#endif
 
 	uint8_t recvbyte = msg.GetByte();
 	//a dead player can not performs actions
@@ -1003,8 +970,7 @@ void Protocol80::parseStopAutoWalk(NetworkMessage& msg)
 
 void Protocol80::parseMove(NetworkMessage& msg, Direction dir)
 {
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Protocol80::move, this, dir)));
+	addGameTask(&Game::playerMove, player->getID(), dir);
 }
 
 void Protocol80::parseTurn(NetworkMessage& msg, Direction dir)
