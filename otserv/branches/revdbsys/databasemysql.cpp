@@ -19,6 +19,11 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+
+#if defined __WINDOWS__ || defined WIN32
+#include <winsock.h>
+#endif
+
 #include "databasemysql.h"
 #ifdef __MYSQL_ALT_INCLUDE__
 #include "errmsg.h"
