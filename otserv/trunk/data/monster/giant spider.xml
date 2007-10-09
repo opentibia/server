@@ -58,7 +58,7 @@
     </item>
   </loot>
 
-  <summons max="2">
+  <summons maxSummons="2">
     <summon name="poison spider" interval="1000" chance="10" max="2"/>
   </summons>
 

@@ -687,6 +687,9 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 			else if((strcasecmp(strValue.c_str(), "fire") == 0) || (atoi(strValue.c_str()) == 4)){
 				mType->race = RACE_FIRE;
 			}
+			else{
+				SHOW_XML_WARNING("Unknown race type " << strValue);
+			}
 		}
 
 		if(readXMLInteger(root, "experience", intValue)){
@@ -713,7 +716,7 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 					mType->health = intValue;
 				}
 				else{
-					SHOW_XML_ERROR("Missing health now");
+					SHOW_XML_ERROR("Missing health.now");
 					monsterLoad = false;
 				}
 
@@ -721,7 +724,7 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 					mType->health_max = intValue;
 				}
 				else{
-					SHOW_XML_ERROR("Missing health max");
+					SHOW_XML_ERROR("Missing health.max");
 					monsterLoad = false;
 				}
 			}
@@ -800,9 +803,15 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 				if(readXMLInteger(p, "speed", intValue) || readXMLInteger(p, "interval", intValue)){
 					mType->changeTargetSpeed = std::max(1, intValue);
 				}
+				else{
+					SHOW_XML_WARNING("Missing targetchange.speed");
+				}
 
 				if(readXMLInteger(p, "chance", intValue)){
 					mType->changeTargetChance = intValue;
+				}
+				else{
+					SHOW_XML_WARNING("Missing targetchange.chance");
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"strategy") == 0){
@@ -1005,9 +1014,15 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 				if(readXMLInteger(p, "speed", intValue) || readXMLInteger(p, "interval", intValue)){
 					mType->yellSpeedTicks = intValue;
 				}
+				else{
+					SHOW_XML_WARNING("Missing voices.speed");
+				}
 
 				if(readXMLInteger(p, "chance", intValue)){
 					mType->yellChance = intValue;
+				}
+				else{
+					SHOW_XML_WARNING("Missing voices.chance");
 				}
 
 				while(tmpNode){
@@ -1021,7 +1036,7 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 							vb.text = strValue;
 						}
 						else{
-							SHOW_XML_WARNING("Missing voice sentence");
+							SHOW_XML_WARNING("Missing voice.sentence");
 						}
 
 						if(readXMLInteger(tmpNode, "yell", intValue)){
@@ -1055,8 +1070,11 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"summons") == 0){
 
-				if(readXMLInteger(p, "maxSummons", intValue) || readXMLInteger(p, "max", intValue)){
+				if(readXMLInteger(p, "maxSummons", intValue)){
 					mType->maxSummons = std::min(intValue, 100);
+				}
+				else{
+					SHOW_XML_WARNING("Missing summons.maxSummons");
 				}
 
 				xmlNodePtr tmpNode = p->children;
@@ -1083,7 +1101,7 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 							mType->summonList.push_back(sb);
 						}
 						else{
-							SHOW_XML_WARNING("Missing summon name");
+							SHOW_XML_WARNING("Missing summon.name");
 						}
 					}
 

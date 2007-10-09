@@ -19,7 +19,7 @@
   <defenses armor="0" defense="0">
   </defenses>
 
-  <voices>
+  <voices speed="1000" chance="10">
     <voice sentence="Wuff wuff!"/>
   </voices>
 

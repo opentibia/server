@@ -51,7 +51,7 @@
     <immunity invisible="1"/>
   </immunities>
 
-  <summons max="1">
+  <summons maxSummons="1">
     <summon name="warlock" speed="1000" chance="10"/>
   </summons>
 
