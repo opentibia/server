@@ -41,7 +41,14 @@ public:
 	~OutputMessage() {}
 
 	char* getOutputBuffer() { return (char*)&m_MsgBuf[m_outputBufferStart];}
-	void setBufferStart(uint32_t start) {m_outputBufferStart = start;}
+
+	void writeMessageLength()
+	{
+		*(uint16_t*)(m_MsgBuf + 2) = m_MsgSize;
+		//added header size to the message size
+		m_MsgSize = m_MsgSize + 2;
+		m_outputBufferStart = 2;
+	}
 
 	void addCryptoHeader()
 	{
@@ -67,7 +74,7 @@ protected:
 		setConnection(NULL);
 		setProtocol(NULL);
 		m_frame = 0;
-		m_outputBufferStart = 2;
+		m_outputBufferStart = 4;
 		//setState have to be the last one
 		setState(OutputMessage::STATE_FREE);
 	}

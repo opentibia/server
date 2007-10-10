@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <sstream>
 #include "creatureevent.h"
 #include "tools.h"
 #include "player.h"

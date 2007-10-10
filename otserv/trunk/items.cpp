@@ -963,6 +963,9 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.replaceable = (intValue != 0);
 								}
 							}
+							else{
+								std::cout << "Warning: [Items::loadFromXml] Unknown key value " << strValue  << std::endl;
+							}
 						}
 
 						itemAttributesNode = itemAttributesNode->next;

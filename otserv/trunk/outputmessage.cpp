@@ -66,7 +66,6 @@ void OutputMessagePool::send(OutputMessage* msg)
 		std::cout << "Sending message - SINGLE" << std::endl;
 		#endif
 
-		msg->writeMessageLength();
 		if(msg->getConnection()){
 			if(msg->getConnection()->send(msg)){
 				msg->setState(OutputMessage::STATE_WAITING);
@@ -93,14 +92,19 @@ void OutputMessagePool::sendAll()
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
 	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
-		//It will send only messages bigger then 1 kb or wiht a lifetime greater than 50 ms
-		if((*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 50)){
+		#ifdef __NO_PLAYER_SENDBUFFER__
+		//use this define only for debugging
+		bool v = 1;
+		#else
+		//It will send only messages bigger then 1 kb or with a lifetime greater than 50 ms
+		bool v = (*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 50);
+		#endif
+		if(v){
 
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Sending message - ALL" << std::endl;
 			#endif
 
-			(*it)->writeMessageLength();
 			if((*it)->getConnection()){
 				if((*it)->getConnection()->send(*it)){
 					(*it)->setState(OutputMessage::STATE_WAITING);

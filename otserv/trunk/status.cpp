@@ -61,6 +61,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 			Status* status = Status::instance();
 			std::string str = status->getStatusString();
 			output->AddBytes(str.c_str(), str.size());
+			setRawMessages(true); // we dont want the size header, nor encryption
 			OutputMessagePool::getInstance()->send(output);
 		}
 		break;
@@ -177,11 +178,13 @@ std::string Status::getStatusString()
 	ss.str("");
 	xmlAddChild(root, p);
 	
+	/*
 	p=xmlNewNode(NULL,(const xmlChar*)"monsters");
 	ss << g_game.getMonstersOnline();
 	xmlSetProp(p, (const xmlChar*) "total", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlAddChild(root, p);
+	*/
 
 	p=xmlNewNode(NULL,(const xmlChar*)"map");
 	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)this->mapname.c_str());

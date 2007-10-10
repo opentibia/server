@@ -40,6 +40,7 @@ public:
 	{
 		m_connection = connection;
 		m_encryptionEnabled = false;
+		m_rawMessages = false;
 		m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
 		m_outputBuffer = NULL;
 	}
@@ -84,6 +85,8 @@ protected:
 	bool XTEA_decrypt(NetworkMessage& msg);
 	bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
 
+	void setRawMessages(bool value) { m_rawMessages = value; }
+
 	virtual void deleteProtocolTask();
 	friend class Connection;
 
@@ -92,6 +95,7 @@ private:
 	OutputMessage* m_outputBuffer;
 	Connection* m_connection;
 	bool m_encryptionEnabled;
+	bool m_rawMessages;
 	uint32_t m_key[4];
 };
 

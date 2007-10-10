@@ -151,7 +151,7 @@ Item::Item(const Item &i) :
 	}
 
 	uint32_t _writtenDate;
-	if(_writtenDate = i.getWrittenDate()){
+	if((_writtenDate = i.getWrittenDate())){
 		setWrittenDate(_writtenDate);
 	}
 

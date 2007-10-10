@@ -31,13 +31,18 @@ void Protocol::onSendMessage(OutputMessage* msg)
 	std::cout << "Protocol::onSendMessage" << std::endl;
 	#endif
 
-	if(m_encryptionEnabled){
-		#ifdef __DEBUG_NET_DETAIL__
-		std::cout << "Protocol::onSendMessage - encrypt" << std::endl;
-		#endif
+	if(!m_rawMessages){
+		msg->writeMessageLength();
+		
+		if(m_encryptionEnabled){
+			#ifdef __DEBUG_NET_DETAIL__
+			std::cout << "Protocol::onSendMessage - encrypt" << std::endl;
+			#endif
 
-		XTEA_encrypt(*msg);
+			XTEA_encrypt(*msg);
+		}
 	}
+	
 	if(msg == m_outputBuffer){
 		m_outputBuffer = NULL;
 	}

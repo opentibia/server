@@ -1086,7 +1086,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(tmpPlayer = (*it)->getPlayer()){
+		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->postAddNotification(thing, index, LINK_NEAR);
 		}
 	}
@@ -1136,7 +1136,7 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(tmpPlayer = (*it)->getPlayer()){
+		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
 		}
 	}
