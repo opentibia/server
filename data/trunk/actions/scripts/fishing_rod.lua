@@ -1,10 +1,4 @@
 function onUse(cid, item, frompos, item2, topos)
-	--[[
-	if (delay(cid) == 0) then
-		return TRUE
-	end
-	]]--
-	
 	local ITEM_WORM 		= 3976
 	local ITEM_FISH 		= 2667
 	local ITEM_BIG_FISH 	= 2669
@@ -36,12 +30,3 @@ function onUse(cid, item, frompos, item2, topos)
 	
 	return TRUE
 end
-
---[[
-function delay(cid) 	 
-	if (os.difftime(os.time(), getPlayerStorageValue(cid, 100)) >= 1) then 	 
-		setPlayerStorageValue(cid, 100, os.time())
-		return FALSE
-	end
-end
-]]--

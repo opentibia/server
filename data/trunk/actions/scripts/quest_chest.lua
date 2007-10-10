@@ -21,6 +21,11 @@ function onUse(cid, item, frompos, item2, topos)
 end
 
 function questChest(cid, storage, bag, vitems, rname, rid, rcount, prize)
+	--[[
+		TODO: 
+		- Rewrite questChest()
+		- Add key system
+	--]]
 	if getPlayerAccess(cid) > PLAYER_ACCESS or TEST_SERVER == "ON" then
 		doPlayerSendTextMessage(cid, 22, ""..prize.." is empty.")
 		return 1
