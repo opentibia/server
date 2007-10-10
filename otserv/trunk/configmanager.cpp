@@ -34,7 +34,7 @@ ConfigManager::~ConfigManager()
 }
 
 bool ConfigManager::loadFile(const std::string& _filename)
-{
+{	
 	lua_State* L = lua_open();
 
 	if(!L) return false;
@@ -51,20 +51,35 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[CONFIG_FILE] = _filename;
 		m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
 		m_confInteger[PORT] = getGlobalNumber(L, "port");
+		
+#if defined __CONFIG_V2__
+		unsigned int pos = _filename.rfind("/");
+		std::string configPath = "";
+		if(pos != std::string::npos)
+			configPath = _filename.substr(0, pos+1);
+		
+		m_confString[DATA_DIRECTORY] = configPath + getGlobalString(L, "datadir", "data/");
+		m_confString[MAP_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "map");
+		m_confString[MAP_STORE_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "mapstore");
+		m_confString[HOUSE_STORE_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "housestore");
+		m_confString[BAN_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "banIdentifier");
+		m_confString[SQLITE_DB] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "sqlite_db");
+#else
 		m_confString[DATA_DIRECTORY] = getGlobalString(L, "datadir");
 		m_confString[MAP_FILE] = getGlobalString(L, "map");
 		m_confString[MAP_STORE_FILE] = getGlobalString(L, "mapstore");
 		m_confString[HOUSE_STORE_FILE] = getGlobalString(L, "housestore");
+		m_confString[BAN_FILE] = getGlobalString(L, "banIdentifier");
+		m_confString[SQLITE_DB] = getGlobalString(L, "sqlite_db");
+#endif
 		m_confString[HOUSE_RENT_PERIOD] = getGlobalString(L, "houserentperiod", "monthly");
 		m_confString[MAP_KIND] = getGlobalString(L, "mapkind");
-		m_confString[BAN_FILE] = getGlobalString(L, "banIdentifier");
 		m_confString[MD5_PASS] = getGlobalString(L, "md5passwords");
 		m_confString[WORLD_TYPE] = getGlobalString(L, "worldtype");
 		m_confString[SQL_HOST] = getGlobalString(L, "sql_host");
 		m_confString[SQL_USER] = getGlobalString(L, "sql_user");
 		m_confString[SQL_PASS] = getGlobalString(L, "sql_pass");
 		m_confString[SQL_DB] = getGlobalString(L, "sql_db");
-		m_confString[SQLITE_DB] = getGlobalString(L, "sqlite_db");
 		m_confString[SQL_TYPE] = getGlobalString(L, "sql_type");
 		m_confString[MAP_HOST] = getGlobalString(L, "map_host");
 		m_confString[MAP_USER] = getGlobalString(L, "map_user");

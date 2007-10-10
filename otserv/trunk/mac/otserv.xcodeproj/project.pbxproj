@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F62774050CB841CC00FC37DB /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774010CB841CC00FC37DB /* connection.cpp */; };
-		F62774060CB841CC00FC37DB /* creatureevent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774020CB841CC00FC37DB /* creatureevent.cpp */; };
-		F62774070CB841CC00FC37DB /* outputmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774030CB841CC00FC37DB /* outputmessage.cpp */; };
-		F62774080CB841CC00FC37DB /* protocollogin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774040CB841CC00FC37DB /* protocollogin.cpp */; };
 		F62774090CB841CC00FC37DB /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774010CB841CC00FC37DB /* connection.cpp */; };
 		F627740A0CB841CC00FC37DB /* creatureevent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774020CB841CC00FC37DB /* creatureevent.cpp */; };
 		F627740B0CB841CC00FC37DB /* outputmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774030CB841CC00FC37DB /* outputmessage.cpp */; };
@@ -19,10 +15,6 @@
 		F627740E0CB841CC00FC37DB /* creatureevent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774020CB841CC00FC37DB /* creatureevent.cpp */; };
 		F627740F0CB841CC00FC37DB /* outputmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774030CB841CC00FC37DB /* outputmessage.cpp */; };
 		F62774100CB841CC00FC37DB /* protocollogin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774040CB841CC00FC37DB /* protocollogin.cpp */; };
-		F627741A0CB8424400FC37DB /* protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774130CB8424400FC37DB /* protocol.cpp */; };
-		F627741B0CB8424400FC37DB /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774160CB8424400FC37DB /* scheduler.cpp */; };
-		F627741C0CB8424400FC37DB /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774170CB8424400FC37DB /* server.cpp */; };
-		F627741D0CB8424400FC37DB /* tasks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774190CB8424400FC37DB /* tasks.cpp */; };
 		F627741E0CB8424400FC37DB /* protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774130CB8424400FC37DB /* protocol.cpp */; };
 		F627741F0CB8424400FC37DB /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774160CB8424400FC37DB /* scheduler.cpp */; };
 		F62774200CB8424400FC37DB /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774170CB8424400FC37DB /* server.cpp */; };
@@ -31,64 +23,6 @@
 		F62774230CB8424400FC37DB /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774160CB8424400FC37DB /* scheduler.cpp */; };
 		F62774240CB8424400FC37DB /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774170CB8424400FC37DB /* server.cpp */; };
 		F62774250CB8424400FC37DB /* tasks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774190CB8424400FC37DB /* tasks.cpp */; };
-		F69A41700C1E9A5400798B45 /* account.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413C0C1E943500798B45 /* account.cpp */; };
-		F69A41720C1E9A5400798B45 /* actions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413E0C1E943500798B45 /* actions.cpp */; };
-		F69A41740C1E9A5400798B45 /* admin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413A0C1E943500798B45 /* admin.cpp */; };
-		F69A41760C1E9A5400798B45 /* allocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41380C1E943500798B45 /* allocator.cpp */; };
-		F69A41780C1E9A5400798B45 /* ban.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41340C1E943500798B45 /* ban.cpp */; };
-		F69A417A0C1E9A5400798B45 /* baseevents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41320C1E943500798B45 /* baseevents.cpp */; };
-		F69A417C0C1E9A5400798B45 /* chat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41300C1E943500798B45 /* chat.cpp */; };
-		F69A417E0C1E9A5400798B45 /* combat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A412D0C1E943500798B45 /* combat.cpp */; };
-		F69A41800C1E9A5400798B45 /* commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A412B0C1E943500798B45 /* commands.cpp */; };
-		F69A41820C1E9A5400798B45 /* condition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41290C1E943500798B45 /* condition.cpp */; };
-		F69A41840C1E9A5400798B45 /* configmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41270C1E943500798B45 /* configmanager.cpp */; };
-		F69A41870C1E9A5400798B45 /* container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41240C1E943500798B45 /* container.cpp */; };
-		F69A41890C1E9A5400798B45 /* creature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41210C1E943500798B45 /* creature.cpp */; };
-		F69A418B0C1E9A5400798B45 /* cylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41200C1E943500798B45 /* cylinder.cpp */; };
-		F69A41940C1E9A5400798B45 /* depot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41170C1E943500798B45 /* depot.cpp */; };
-		F69A41990C1E9A5400798B45 /* fileloader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41130C1E943500798B45 /* fileloader.cpp */; };
-		F69A419B0C1E9A5400798B45 /* game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41110C1E943500798B45 /* game.cpp */; };
-		F69A419D0C1E9A5400798B45 /* house.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A410B0C1E943500798B45 /* house.cpp */; };
-		F69A419F0C1E9A5400798B45 /* housetile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41090C1E943500798B45 /* housetile.cpp */; };
-		F69A41A10C1E9A5400798B45 /* ioaccount.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41490C1E943500798B45 /* ioaccount.cpp */; };
-		F69A41A50C1E9A5400798B45 /* ioaccountxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A410C0C1E943500798B45 /* ioaccountxml.cpp */; };
-		F69A41A80C1E9A5400798B45 /* iomapotbm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41060C1E943500798B45 /* iomapotbm.cpp */; };
-		F69A41AA0C1E9A5400798B45 /* iomapserialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41040C1E943500798B45 /* iomapserialize.cpp */; };
-		F69A41AE0C1E9A5400798B45 /* iomapserializexml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41000C1E943500798B45 /* iomapserializexml.cpp */; };
-		F69A41B00C1E9A5400798B45 /* iomapxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FE0C1E943500798B45 /* iomapxml.cpp */; };
-		F69A41B20C1E9A5400798B45 /* ioplayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FC0C1E943500798B45 /* ioplayer.cpp */; };
-		F69A41B60C1E9A5400798B45 /* ioplayerxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F90C1E943500798B45 /* ioplayerxml.cpp */; };
-		F69A41B80C1E9A5400798B45 /* item.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F70C1E943500798B45 /* item.cpp */; };
-		F69A41BB0C1E9A5400798B45 /* items.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F60C1E943500798B45 /* items.cpp */; };
-		F69A41BD0C1E9A5400798B45 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F50C1E943500798B45 /* logger.cpp */; };
-		F69A41BF0C1E9A5400798B45 /* luascript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41460C1E943500798B45 /* luascript.cpp */; };
-		F69A41C10C1E9A5400798B45 /* mailbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F10C1E943500798B45 /* mailbox.cpp */; };
-		F69A41C30C1E9A5400798B45 /* map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41420C1E943500798B45 /* map.cpp */; };
-		F69A41C50C1E9A5400798B45 /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EF0C1E943500798B45 /* md5.cpp */; };
-		F69A41C70C1E9A5400798B45 /* monster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41360C1E943500798B45 /* monster.cpp */; };
-		F69A41C90C1E9A5400798B45 /* monsters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EC0C1E943500798B45 /* monsters.cpp */; };
-		F69A41CB0C1E9A5400798B45 /* movement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EB0C1E943500798B45 /* movement.cpp */; };
-		F69A41CD0C1E9A5400798B45 /* networkmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413F0C1E943500798B45 /* networkmessage.cpp */; };
-		F69A41CF0C1E9A5400798B45 /* npc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EA0C1E943500798B45 /* npc.cpp */; };
-		F69A41D20C1E9A5400798B45 /* otserv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E80C1E943500798B45 /* otserv.cpp */; };
-		F69A41D40C1E9A5400798B45 /* outfit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E70C1E943500798B45 /* outfit.cpp */; };
-		F69A41D60C1E9A5400798B45 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E50C1E943500798B45 /* player.cpp */; };
-		F69A41D80C1E9A5400798B45 /* position.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E30C1E943500798B45 /* position.cpp */; };
-		F69A41DC0C1E9A5400798B45 /* raids.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DF0C1E943500798B45 /* raids.cpp */; };
-		F69A41DE0C1E9A5400798B45 /* rsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DD0C1E943500798B45 /* rsa.cpp */; };
-		F69A41E10C1E9A5400798B45 /* scriptmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DA0C1E943500798B45 /* scriptmanager.cpp */; };
-		F69A41E30C1E9A5400798B45 /* spawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D80C1E943500798B45 /* spawn.cpp */; };
-		F69A41E50C1E9A5400798B45 /* spells.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D60C1E943500798B45 /* spells.cpp */; };
-		F69A41E70C1E9A5400798B45 /* status.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D40C1E943500798B45 /* status.cpp */; };
-		F69A41E90C1E9A5400798B45 /* talkaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D20C1E943500798B45 /* talkaction.cpp */; };
-		F69A41EC0C1E9A5400798B45 /* teleport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CF0C1E943500798B45 /* teleport.cpp */; };
-		F69A41EF0C1E9A5400798B45 /* thing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CC0C1E943500798B45 /* thing.cpp */; };
-		F69A41F10C1E9A5400798B45 /* tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CA0C1E943500798B45 /* tile.cpp */; };
-		F69A41F30C1E9A5400798B45 /* tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C80C1E943500798B45 /* tools.cpp */; };
-		F69A41F60C1E9A5400798B45 /* trashholder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C50C1E943500798B45 /* trashholder.cpp */; };
-		F69A41F80C1E9A5400798B45 /* vocation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C30C1E943500798B45 /* vocation.cpp */; };
-		F69A41FA0C1E9A5400798B45 /* waitlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C10C1E943500798B45 /* waitlist.cpp */; };
-		F69A41FC0C1E9A5400798B45 /* weapons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40BF0C1E943500798B45 /* weapons.cpp */; };
 		F69A42E30C1EAC8300798B45 /* account.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413C0C1E943500798B45 /* account.cpp */; };
 		F69A42E50C1EAC8300798B45 /* actions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413E0C1E943500798B45 /* actions.cpp */; };
 		F69A42E70C1EAC8300798B45 /* admin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413A0C1E943500798B45 /* admin.cpp */; };
@@ -215,7 +149,6 @@
 		F69A441D0C1EAED100798B45 /* vocation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C30C1E943500798B45 /* vocation.cpp */; };
 		F69A441F0C1EAED100798B45 /* waitlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C10C1E943500798B45 /* waitlist.cpp */; };
 		F69A44210C1EAED100798B45 /* weapons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40BF0C1E943500798B45 /* weapons.cpp */; };
-		F6F5BAC60C38D93300B77664 /* protocol80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F5BAC40C38D93300B77664 /* protocol80.cpp */; };
 		F6F5BAC70C38D93300B77664 /* protocol80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F5BAC40C38D93300B77664 /* protocol80.cpp */; };
 		F6F5BAC80C38D93300B77664 /* protocol80.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F5BAC40C38D93300B77664 /* protocol80.cpp */; };
 /* End PBXBuildFile section */
@@ -374,7 +307,6 @@
 		F69A41490C1E943500798B45 /* ioaccount.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ioaccount.cpp; path = ../ioaccount.cpp; sourceTree = SOURCE_ROOT; };
 		F69A414A0C1E943500798B45 /* npc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = npc.h; path = ../npc.h; sourceTree = SOURCE_ROOT; };
 		F69A414B0C1E943500798B45 /* depot.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = depot.h; path = ../depot.h; sourceTree = SOURCE_ROOT; };
-		F69A416A0C1E9A2E00798B45 /* otserv-xml */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "otserv-xml"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F69A43750C1EAC8300798B45 /* otserv-mysql */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "otserv-mysql"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F69A44270C1EAED100798B45 /* otserv-sqlite */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "otserv-sqlite"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6F5BAC30C38D92200B77664 /* const80.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = const80.h; path = ../const80.h; sourceTree = SOURCE_ROOT; };
@@ -383,13 +315,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		F69A41680C1E9A2E00798B45 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F69A43710C1EAC8300798B45 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -580,9 +505,8 @@
 		F69A41530C1E951400798B45 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F69A416A0C1E9A2E00798B45 /* otserv-xml */,
-				F69A43750C1EAC8300798B45 /* otserv-mysql */,
 				F69A44270C1EAED100798B45 /* otserv-sqlite */,
+				F69A43750C1EAC8300798B45 /* otserv-mysql */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -599,22 +523,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F69A41690C1E9A2E00798B45 /* otserv-xml */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F69A416D0C1E9A4C00798B45 /* Build configuration list for PBXNativeTarget "otserv-xml" */;
-			buildPhases = (
-				F69A41670C1E9A2E00798B45 /* Sources */,
-				F69A41680C1E9A2E00798B45 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "otserv-xml";
-			productName = otserv;
-			productReference = F69A416A0C1E9A2E00798B45 /* otserv-xml */;
-			productType = "com.apple.product-type.tool";
-		};
 		F69A42E10C1EAC8300798B45 /* otserv-mysql */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F69A43720C1EAC8300798B45 /* Build configuration list for PBXNativeTarget "otserv-mysql" */;
@@ -658,88 +566,13 @@
 			productRefGroup = F69A41530C1E951400798B45 /* Products */;
 			projectDirPath = "";
 			targets = (
-				F69A41690C1E9A2E00798B45 /* otserv-xml */,
-				F69A42E10C1EAC8300798B45 /* otserv-mysql */,
 				F69A43930C1EAED100798B45 /* otserv-sqlite */,
+				F69A42E10C1EAC8300798B45 /* otserv-mysql */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		F69A41670C1E9A2E00798B45 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F62774070CB841CC00FC37DB /* outputmessage.cpp in Sources */,
-				F69A41700C1E9A5400798B45 /* account.cpp in Sources */,
-				F69A41720C1E9A5400798B45 /* actions.cpp in Sources */,
-				F69A41740C1E9A5400798B45 /* admin.cpp in Sources */,
-				F69A41760C1E9A5400798B45 /* allocator.cpp in Sources */,
-				F69A41780C1E9A5400798B45 /* ban.cpp in Sources */,
-				F69A417A0C1E9A5400798B45 /* baseevents.cpp in Sources */,
-				F69A417C0C1E9A5400798B45 /* chat.cpp in Sources */,
-				F69A417E0C1E9A5400798B45 /* combat.cpp in Sources */,
-				F69A41800C1E9A5400798B45 /* commands.cpp in Sources */,
-				F69A41820C1E9A5400798B45 /* condition.cpp in Sources */,
-				F69A41840C1E9A5400798B45 /* configmanager.cpp in Sources */,
-				F69A41870C1E9A5400798B45 /* container.cpp in Sources */,
-				F69A41890C1E9A5400798B45 /* creature.cpp in Sources */,
-				F69A418B0C1E9A5400798B45 /* cylinder.cpp in Sources */,
-				F69A41940C1E9A5400798B45 /* depot.cpp in Sources */,
-				F69A41990C1E9A5400798B45 /* fileloader.cpp in Sources */,
-				F69A419B0C1E9A5400798B45 /* game.cpp in Sources */,
-				F69A419D0C1E9A5400798B45 /* house.cpp in Sources */,
-				F69A419F0C1E9A5400798B45 /* housetile.cpp in Sources */,
-				F69A41A10C1E9A5400798B45 /* ioaccount.cpp in Sources */,
-				F69A41A50C1E9A5400798B45 /* ioaccountxml.cpp in Sources */,
-				F69A41A80C1E9A5400798B45 /* iomapotbm.cpp in Sources */,
-				F69A41AA0C1E9A5400798B45 /* iomapserialize.cpp in Sources */,
-				F69A41AE0C1E9A5400798B45 /* iomapserializexml.cpp in Sources */,
-				F69A41B00C1E9A5400798B45 /* iomapxml.cpp in Sources */,
-				F69A41B20C1E9A5400798B45 /* ioplayer.cpp in Sources */,
-				F69A41B60C1E9A5400798B45 /* ioplayerxml.cpp in Sources */,
-				F69A41B80C1E9A5400798B45 /* item.cpp in Sources */,
-				F69A41BB0C1E9A5400798B45 /* items.cpp in Sources */,
-				F69A41BD0C1E9A5400798B45 /* logger.cpp in Sources */,
-				F69A41BF0C1E9A5400798B45 /* luascript.cpp in Sources */,
-				F69A41C10C1E9A5400798B45 /* mailbox.cpp in Sources */,
-				F69A41C30C1E9A5400798B45 /* map.cpp in Sources */,
-				F69A41C50C1E9A5400798B45 /* md5.cpp in Sources */,
-				F69A41C70C1E9A5400798B45 /* monster.cpp in Sources */,
-				F69A41C90C1E9A5400798B45 /* monsters.cpp in Sources */,
-				F69A41CB0C1E9A5400798B45 /* movement.cpp in Sources */,
-				F69A41CD0C1E9A5400798B45 /* networkmessage.cpp in Sources */,
-				F69A41CF0C1E9A5400798B45 /* npc.cpp in Sources */,
-				F69A41D20C1E9A5400798B45 /* otserv.cpp in Sources */,
-				F69A41D40C1E9A5400798B45 /* outfit.cpp in Sources */,
-				F69A41D60C1E9A5400798B45 /* player.cpp in Sources */,
-				F69A41D80C1E9A5400798B45 /* position.cpp in Sources */,
-				F69A41DC0C1E9A5400798B45 /* raids.cpp in Sources */,
-				F69A41DE0C1E9A5400798B45 /* rsa.cpp in Sources */,
-				F69A41E10C1E9A5400798B45 /* scriptmanager.cpp in Sources */,
-				F69A41E30C1E9A5400798B45 /* spawn.cpp in Sources */,
-				F69A41E50C1E9A5400798B45 /* spells.cpp in Sources */,
-				F69A41E70C1E9A5400798B45 /* status.cpp in Sources */,
-				F69A41E90C1E9A5400798B45 /* talkaction.cpp in Sources */,
-				F69A41EC0C1E9A5400798B45 /* teleport.cpp in Sources */,
-				F69A41EF0C1E9A5400798B45 /* thing.cpp in Sources */,
-				F69A41F10C1E9A5400798B45 /* tile.cpp in Sources */,
-				F69A41F30C1E9A5400798B45 /* tools.cpp in Sources */,
-				F69A41F60C1E9A5400798B45 /* trashholder.cpp in Sources */,
-				F69A41F80C1E9A5400798B45 /* vocation.cpp in Sources */,
-				F69A41FA0C1E9A5400798B45 /* waitlist.cpp in Sources */,
-				F69A41FC0C1E9A5400798B45 /* weapons.cpp in Sources */,
-				F6F5BAC60C38D93300B77664 /* protocol80.cpp in Sources */,
-				F62774050CB841CC00FC37DB /* connection.cpp in Sources */,
-				F62774060CB841CC00FC37DB /* creatureevent.cpp in Sources */,
-				F62774080CB841CC00FC37DB /* protocollogin.cpp in Sources */,
-				F627741A0CB8424400FC37DB /* protocol.cpp in Sources */,
-				F627741B0CB8424400FC37DB /* scheduler.cpp in Sources */,
-				F627741C0CB8424400FC37DB /* server.cpp in Sources */,
-				F627741D0CB8424400FC37DB /* tasks.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F69A42E20C1EAC8300798B45 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -901,64 +734,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		F69A416E0C1E9A4C00798B45 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = (
-					/opt/local/include,
-					/opt/local/include/libxml2,
-					/opt/local/include/boost_asio,
-				);
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = /opt/local/lib;
-				OTHER_LDFLAGS = (
-					"-lxml2",
-					"-lgmp",
-					"-llua",
-					"-lboost_thread-mt",
-					"-lboost_regex-mt",
-					"-lboost_system",
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = "otserv-xml";
-				ZERO_LINK = NO;
-			};
-			name = Debug;
-		};
-		F69A416F0C1E9A4C00798B45 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = (
-					/opt/local/include,
-					/opt/local/include/libxml2,
-					/opt/local/include/boost_asio,
-				);
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = /opt/local/lib;
-				OTHER_LDFLAGS = (
-					"-lxml2",
-					"-lgmp",
-					"-llua",
-					"-lboost_thread-mt",
-					"-lboost_regex-mt",
-					"-lboost_system",
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = "otserv-xml";
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		F69A43730C1EAC8300798B45 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -968,7 +743,10 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = __USE_MYSQL__;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__USE_MYSQL__,
+					__CONFIG_V2__,
+				);
 				HEADER_SEARCH_PATHS = (
 					/opt/local/include,
 					/opt/local/include/mysql5,
@@ -1002,7 +780,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				GCC_PREPROCESSOR_DEFINITIONS = __USE_MYSQL__;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__USE_MYSQL__,
+					__CONFIG_V2__,
+				);
 				HEADER_SEARCH_PATHS = (
 					/opt/local/include,
 					/opt/local/include/mysql5,
@@ -1038,7 +819,10 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = __USE_SQLITE__;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__USE_SQLITE__,
+					__CONFIG_V2__,
+				);
 				HEADER_SEARCH_PATHS = (
 					/opt/local/include,
 					/opt/local/include/libxml2,
@@ -1068,7 +852,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				GCC_PREPROCESSOR_DEFINITIONS = __USE_SQLITE__;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__USE_SQLITE__,
+					__CONFIG_V2__,
+				);
 				HEADER_SEARCH_PATHS = (
 					/opt/local/include,
 					/opt/local/include/libxml2,
@@ -1108,15 +895,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F69A416D0C1E9A4C00798B45 /* Build configuration list for PBXNativeTarget "otserv-xml" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F69A416E0C1E9A4C00798B45 /* Debug */,
-				F69A416F0C1E9A4C00798B45 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		F69A43720C1EAC8300798B45 /* Build configuration list for PBXNativeTarget "otserv-mysql" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
