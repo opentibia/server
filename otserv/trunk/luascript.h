@@ -400,9 +400,12 @@ protected:
 	static int luaGetPlayerPremiumDays(lua_State *L);
 
 	static int luaPlayerLearnInstantSpell(lua_State *L);
+	static int luaCanPlayerLearnInstantSpell(lua_State *L);
 	static int luaGetPlayerLearnedInstantSpell(lua_State *L);
 	static int luaGetPlayerInstantSpellInfo(lua_State *L);
 	static int luaGetPlayerInstantSpellCount(lua_State *L);
+	static int luaGetInstantSpellInfoByName(lua_State *L);
+	static int luaGetInstantSpellWords(lua_State *L);
 
 	static int luaIsPremium(lua_State *L);
 
