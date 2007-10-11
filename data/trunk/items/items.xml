@@ -17470,7 +17470,7 @@
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6523" article="a" name="gingerbread recipe">
-		<attribute key="decoration" value="Use it to learn how to make Gingerbreadman in the christmas bakery."/>
+		<attribute key="description" value="Use it to learn how to make Gingerbreadman in the christmas bakery."/>
 		<attribute key="weight" value="200"/>
 	</item>
 	<item id="6524" article="a" name="skeleton decoration">
