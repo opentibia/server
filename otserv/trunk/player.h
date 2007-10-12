@@ -362,7 +362,8 @@ public:
 	void sendAddContainerItem(const Container* container, const Item* item);
 	void sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem);
 	void sendRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
-	void sendContainer(uint32_t cid, const Container* container, bool hasParent);
+	void sendContainer(uint32_t cid, const Container* container, bool hasParent)
+		{if(client) client->sendContainer(cid, container, hasParent); }
 
 	//inventory
 	void sendAddInventoryItem(slots_t slot, const Item* item)
@@ -422,7 +423,8 @@ public:
 		{if(client) client->sendDistanceShoot(from, to, type);}
 	void sendHouseWindow(House* house, uint32_t listId) const;
 	void sendOutfitWindow() const;
-	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName);
+	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName)
+		{if(client) client->sendCreatePrivateChannel(channelId, channelName);}
 	void sendClosePrivate(uint16_t channelId) const
 		{if(client) client->sendClosePrivate(channelId);}
 	void sendIcons() const;
