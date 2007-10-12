@@ -58,8 +58,8 @@ int32_t Map::maxViewportY = 10;
 Map::Map()
 {
 	defaultMapLoaded = false;
-	mapwidth = 0;
-	mapheight = 0;
+	mapWidth = 0;
+	mapHeight = 0;
 
 	mapStoreIdentifier = g_config.getString(ConfigManager::MAP_STORE_FILE);
 	houseStoreIdentifier = g_config.getString(ConfigManager::HOUSE_STORE_FILE);

@@ -189,8 +189,15 @@ std::string Status::getStatusString()
 	p=xmlNewNode(NULL,(const xmlChar*)"map");
 	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)this->mapname.c_str());
 	xmlSetProp(p, (const xmlChar*) "author", (const xmlChar*)this->mapauthor.c_str());
-	xmlSetProp(p, (const xmlChar*) "width", (const xmlChar*)"");
-	xmlSetProp(p, (const xmlChar*) "height", (const xmlChar*)"");
+
+	uint32_t mapWidth, mapHeight;
+	g_game.getMapDimensions(mapWidth, mapHeight);
+	ss.str("");
+	ss << mapWidth;
+	xmlSetProp(p, (const xmlChar*) "width", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+	ss << mapHeight;
+	xmlSetProp(p, (const xmlChar*) "height", (const xmlChar*)ss.str().c_str());
 	xmlAddChild(root, p);
 
 	xmlNewTextChild(root, NULL, (const xmlChar*)"motd", (const xmlChar*)g_config.getString(ConfigManager::MOTD).c_str());
@@ -260,10 +267,10 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output)
 		output->AddByte(0x30); // map info
 		output->AddString(this->mapname.c_str());
 		output->AddString(this->mapauthor.c_str());
-		int mw, mh;
-		g_game.getMapDimensions(mw, mh);
-		output->AddU16(mw);
-		output->AddU16(mh);
+		uint32_t mapWidth, mapHeight;
+		g_game.getMapDimensions(mapWidth, mapHeight);
+		output->AddU16(mapWidth);
+		output->AddU16(mapHeight);
 	}
 
 	return;   

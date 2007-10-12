@@ -62,12 +62,12 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 	}
 
 	if((nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "width"))){
-		map->mapwidth = atoi(nodeValue);
+		map->mapWidth = atoi(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
 
 	if((nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "height"))){
-		map->mapheight = atoi(nodeValue);
+		map->mapHeight = atoi(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
 	

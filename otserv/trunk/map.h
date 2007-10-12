@@ -229,7 +229,7 @@ public:
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
 
 	/* Map Width and Height - for Info purposes */
-	int mapwidth, mapheight;
+	uint32_t mapWidth, mapHeight;
 
 	MapError_t getLastError() {return lasterrortype;}
 	int getErrorCode() {return lasterrorcode;}

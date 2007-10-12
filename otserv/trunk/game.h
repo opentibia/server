@@ -90,12 +90,12 @@ public:
 
 	/**
 	  * Get the map size - info purpose only
-	  * \param a the referenced witdh var
-	  * \param b the referenced height var
+	  * \param width width of the map
+	  * \param height height of the map
 	  */
-	void getMapDimensions(int& a, int& b) {
-		a = map->mapwidth;
-		b = map->mapheight;
+	void getMapDimensions(uint32_t& width, uint32_t& height){
+		width = map->mapWidth;
+		height = map->mapHeight;
 		return;
 	}
 
