@@ -24,6 +24,12 @@
 #include "configmanager.h"
 extern ConfigManager g_config;
 
+#if SQLITE_VERSION_NUMBER < 3003009
+#define OTS_SQLITE3_PREPARE sqlite3_prepare
+#else
+#define OTS_SQLITE3_PREPARE sqlite3_prepare_v2
+#endif
+
 /** DatabaseSQLite definitions */
 
 DatabaseSQLite::DatabaseSQLite()
@@ -107,9 +113,8 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 	std::string buf = _parse(query);
 	sqlite3_stmt* stmt;
 	// prepares statement
-	if( sqlite3_prepare(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
-//	if( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
-		std::cout << "sqlite3_prepare(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
+	if( OTS_SQLITE3_PREPARE(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
+		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return false;
 	}
 
@@ -139,9 +144,8 @@ DBResult* DatabaseSQLite::storeQuery(const std::string &query)
 	std::string buf = _parse(query);
 	sqlite3_stmt* stmt;
 	// prepares statement
-	if( sqlite3_prepare(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
-//	if( sqlite3_prepare_v2(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
-		std::cout << "sqlite3_prepare(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
+	if( OTS_SQLITE3_PREPARE(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
+		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return NULL;
 	}
 
