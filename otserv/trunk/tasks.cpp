@@ -21,6 +21,9 @@
 
 #include "tasks.h"
 #include "outputmessage.h"
+#include "game.h"
+
+extern Game g_game;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -67,6 +70,7 @@ OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void *p)
 			(*task)();
 			delete task;
 			OutputMessagePool::getInstance()->sendAll();
+			g_game.clearSpectatorCache();
 		}
 	}
 	#if defined __EXCEPTION_TRACER__

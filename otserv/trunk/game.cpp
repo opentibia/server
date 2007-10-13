@@ -1495,13 +1495,6 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
 	return RET_NOTPOSSIBLE;
 }
 
-void Game::getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor /*= false*/,
-	int32_t minRangeX /*= 0*/, int32_t maxRangeX /*= 0*/,
-	int32_t minRangeY /*= 0*/, int32_t maxRangeY /*= 0*/)
-{
-	map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
-}
-
 bool Game::anonymousBroadcastMessage(MessageClasses type, const std::string& text)
 {
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){

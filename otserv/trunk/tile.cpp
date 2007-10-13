@@ -63,93 +63,7 @@ bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 
 	return false;
 }
-/*
-bool Tile::floorChange() const
-{
-	ItemVector::const_iterator iit;
-	if(ground && ground->floorChangeDown())
-		return true;
 
-	for (iit = topItems.begin(); iit != topItems.end(); ++iit){
-		const ItemType& iiType = Item::items[(*iit)->getID()];
-
-		if (iiType.floorChangeNorth || iiType.floorChangeSouth || iiType.floorChangeEast || iiType.floorChangeWest)
-			return true;
-	}
-
-	for (iit = downItems.begin(); iit != downItems.end(); ++iit){
-		const ItemType& iiType = Item::items[(*iit)->getID()];
-
-		if (iiType.floorChangeNorth || iiType.floorChangeSouth || iiType.floorChangeEast || iiType.floorChangeWest)
-			return true;
-	}
-
-	return false;
-}
-
-bool Tile::floorChangeDown() const
-{
-	if(ground && ground->floorChangeDown())
-		return true;
-
-	ItemVector::const_iterator iit;
-	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-		if((*iit)->floorChangeDown())
-			return true;
-	}
-
-	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-		if((*iit)->floorChangeDown())
-			return true;
-	}
-
-	return false;
-}
-
-bool Tile::floorChange(Direction direction) const
-{
-	ItemVector::const_iterator iit;
-	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-		if(direction == NORTH){
-			if((*iit)->floorChangeNorth())
-				return true;
-		}
-		else if(direction == SOUTH){
-			if((*iit)->floorChangeSouth())
-				return true;
-		}
-		else if(direction == EAST){
-			if((*iit)->floorChangeEast())
-				return true;
-		}
-		else if(direction == WEST){
-			if((*iit)->floorChangeWest())
-				return true;
-		}
-	}
-
-	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-		if(direction == NORTH){
-			if((*iit)->floorChangeNorth())
-				return true;
-		}
-		else if(direction == SOUTH){
-			if((*iit)->floorChangeSouth())
-				return true;
-		}
-		else if(direction == EAST){
-			if((*iit)->floorChangeEast())
-				return true;
-		}
-		else if(direction == WEST){
-			if((*iit)->floorChangeWest())
-				return true;
-		}
-	}
-
-	return false;
-}
-*/
 bool Tile::hasHeight(uint32_t n) const
 {
 	uint32_t height = 0;
@@ -704,6 +618,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 {
 	Creature* creature = thing->getCreature();
 	if(creature){
+		g_game.clearSpectatorCache();
 		creature->setParent(this);
 		creatures.insert(creatures.begin(), creature);
 	}
@@ -905,6 +820,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		return; //RET_NOTPOSSIBLE;
 		}
 
+		g_game.clearSpectatorCache();
 		creatures.erase(it);
 		return;
 	}
@@ -1171,6 +1087,7 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 
 	Creature* creature = thing->getCreature();
 	if(creature){
+		g_game.clearSpectatorCache();
 		creatures.insert(creatures.begin(), creature);
 	}
 	else{

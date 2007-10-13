@@ -195,7 +195,15 @@ public:
 
 	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
-		int32_t minRangeY = 0, int32_t maxRangeY = 0);
+		int32_t minRangeY = 0, int32_t maxRangeY = 0){
+		map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
+	}
+
+	void clearSpectatorCache(){
+		if(map){
+			map->clearSpectatorCache();
+		}
+	}
 
 	ReturnValue internalMoveCreature(Creature* creature, Direction direction, bool force = false);
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);

@@ -90,6 +90,7 @@ public:
 
 typedef std::list<Creature*> SpectatorVec;
 typedef std::list<Player*> PlayerList;
+typedef std::map<Position, SpectatorVec> SpectatorCache;
 
 #define FLOOR_BITS 3
 #define FLOOR_SIZE (1 << FLOOR_BITS)
@@ -253,10 +254,13 @@ protected:
 	std::string housefile;
 	std::string mapStoreIdentifier;
 	std::string houseStoreIdentifier;
+	SpectatorCache spectatorCache;
 
 	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0);
+	
+	void clearSpectatorCache();
 
 	QTreeNode root;
 
