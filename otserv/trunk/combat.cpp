@@ -431,7 +431,7 @@ bool Combat::CombatNullFunc(Creature* caster, Creature* target, const CombatPara
 	return true;
 }
 
-void Combat::combatTileEffects(Creature* caster, Tile* tile, const CombatParams& params)
+void Combat::combatTileEffects(SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params)
 {
 	if(params.itemId != 0){
 		Item* item = Item::CreateItem(params.itemId);
@@ -454,7 +454,7 @@ void Combat::combatTileEffects(Creature* caster, Tile* tile, const CombatParams&
 	}
 
 	if(params.impactEffect != NM_ME_NONE){
-		g_game.addMagicEffect(tile->getPosition(), params.impactEffect);
+		g_game.addMagicEffect(list, tile->getPosition(), params.impactEffect);
 	}
 }
 
@@ -489,16 +489,37 @@ void Combat::addDistanceEffect(Creature* caster, const Position& fromPos, const 
 void Combat::CombatFunc(Creature* caster, const Position& pos,
 	const AreaCombat* area, const CombatParams& params, COMBATFUNC func, void* data)
 {
-	std::list<Tile*> list;
+	std::list<Tile*> tileList;
 
 	if(caster){
-		getCombatArea(caster->getPosition(), pos, area, list);
+		getCombatArea(caster->getPosition(), pos, area, tileList);
 	}
 	else{
-		getCombatArea(pos, pos, area, list);
+		getCombatArea(pos, pos, area, tileList);
 	}
 
-	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
+	SpectatorVec list;
+	uint32_t maxX = 0;
+	uint32_t maxY = 0;
+	uint32_t diff;
+
+	//calculate the max viewable range	
+	for(std::list<Tile*>::iterator it = tileList.begin(); it != tileList.end(); ++it){
+		diff = std::abs((*it)->getPosition().x - pos.x);
+		if(diff > maxX){
+			maxX = diff;
+		}
+
+		diff = std::abs((*it)->getPosition().y - pos.y);
+		if(diff > maxY){
+			maxY = diff;
+		}
+	}
+
+	g_game.getSpectators(list, pos, true, maxX + Map::maxViewportX, maxX + Map::maxViewportX,
+		maxY + Map::maxViewportY, maxY + Map::maxViewportY);
+
+	for(std::list<Tile*>::iterator it = tileList.begin(); it != tileList.end(); ++it){
 		bool bContinue = true;
 
 		if(canDoCombat(caster, *it, params.isAggressive) == RET_NOERROR){
@@ -518,7 +539,6 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 					}
 				}
 
-				//if((caster != *cit || !params.isAggressive) && (Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
 				if(!params.isAggressive || (caster != *cit && Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
 					func(caster, *cit, params, data);
 
@@ -528,7 +548,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 				}
 			}
 
-			combatTileEffects(caster, *it, params);
+			combatTileEffects(list, caster, *it, params);
 		}
 	}
 
@@ -692,8 +712,10 @@ void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatPara
 void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatParams& params)
 {
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
+		SpectatorVec list;
+		g_game.getSpectators(list, target->getTile()->getPosition(), true);
 		CombatNullFunc(caster, target, params, NULL);
-		combatTileEffects(caster, target->getTile(), params);
+		combatTileEffects(list, caster, target->getTile(), params);
 
 		if(params.targetCallback){
 			params.targetCallback->onTargetCombat(caster, target);
