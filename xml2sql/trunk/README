@@ -55,15 +55,17 @@ So for example if you have your XML database in non-standard directory you shoul
 
 $ xml2sql /path/to/your/directory/ > database.sql
 
-XML2SQL generates code compatible with MySQL. If you want to import it's output into SQLite, or PostgreSQL database you will have to modify SQL queries.
+By default XML2SQL generate MySQL-compatible queries. If you want to generate SQLite queries, you must pass additional parameter - "sqlite". Order of parameters doesn't matter - following three calls are equal:
+
+$ xml2sql sqlite
+$ xml2sql data sqlite
+$ xml2sql sqlite data
 
 
 ----------
 3. Known problems
 ----------
 
-
-- Generated SQL code is compatible with MySQL. It needs to be converted if you want to use it in SQLite, or PostgreSQL.
 
 - Users has always temple of first town as it is not possible to find out which city they are bound to based on it's coordinates.
 

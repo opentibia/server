@@ -134,16 +134,14 @@ void putSlot(xmlNodePtr items, int slotId, int pid = 0)
 				count = 0;
 			}
 
-			if(pid){
-				id = ++sid;
-			}
-			else{
-				id = slotId;
+			if(!pid){
+				pid = slotId;
 			}
 
-			std::cout << "INSERT INTO `player_items` (`player_id`, `sid`, `pid`, `itemtype`, `count`) VALUES (@PLAYER_ID, " << id << ", " << pid << ", " << itemType << ", " << count << ");" << std::endl;
+			std::cout << "INSERT INTO `player_items` (`player_id`, `sid`, `pid`, `itemtype`, `count`, `attributes`) VALUES ( ( SELECT `value` FROM `xml2sql` WHERE `name` = '@PLAYER_ID' ), " << ++sid << ", " << pid << ", " << itemType << ", " << count << ", '');" << std::endl;
 
 			node = items->children;
+			id = sid;
 
 			if(node && !xmlStrcmp(node->name, (const xmlChar*)"inside") ){
 				putSlot(node->children, slotId, id);
@@ -173,16 +171,14 @@ void putDepot(xmlNodePtr items, int depotId, int pid = 0)
 				count = 0;
 			}
 
-			if(pid){
-				id = ++sid;
-			}
-			else{
-				id = depotId;
+			if(!pid){
+				pid = depotId;
 			}
 
-			std::cout << "INSERT INTO `player_depotitems` (`player_id`, `depot_id`, `sid`, `pid`, `itemtype`, `count`) VALUES (@PLAYER_ID, " << depotId << ", " << id << ", " << pid << ", " << itemType << ", " << count << ");" << std::endl;
+			std::cout << "INSERT INTO `player_depotitems` (`player_id`, `depot_id`, `sid`, `pid`, `itemtype`, `count`, `attributes`) VALUES ( ( SELECT `value` FROM `xml2sql` WHERE `name` = '@PLAYER_ID' ), " << depotId << ", " << ++sid << ", " << pid << ", " << itemType << ", " << count << ", '');" << std::endl;
 
 			node = items->children;
+			id = sid;
 
 			if(node && !xmlStrcmp(node->name, (const xmlChar*)"inside") ){
 				putDepot(node->children, depotId, id);
@@ -195,7 +191,7 @@ void putDepot(xmlNodePtr items, int depotId, int pid = 0)
 
 int main(int argc, char** argv)
 {
-	char* path = (char*)"data";
+	const char* path = "data";
 	std::stringstream dir_name;
 	boost::filesystem::directory_iterator dir_end;
 	std::string leaf;
@@ -204,6 +200,18 @@ int main(int argc, char** argv)
 	char* buf;
 	time_t now = time(NULL);
 	std::map<uint32_t, int> premium;
+	int i;
+	const char* insertId = "LAST_INSERT_ID";
+	const char* timeStamp = "UNIX_TIMESTAMP( NOW() )";
+
+	for(i = 0; i < argc; i++){
+		if( !strcmp(argv[i], "sqlite") ){
+			insertId = "LAST_INSERT_ROWID";
+			timeStamp = "STRFTIME('%s','NOW')";
+			argc--;
+			break;
+		}
+	}
 
 	if(argc > 1){
 		path = argv[1];
@@ -216,11 +224,20 @@ int main(int argc, char** argv)
 
 	std::cerr << "Using " << path << " as XML source directory." << std::endl;
 
+	std::cout << "CREATE TABLE `xml2sql` (`name` VARCHAR(255), `value` INT);" << std::endl;
+	std::cout << "CREATE TABLE `xml2sql2` (`name` VARCHAR(255), `value` INT);" << std::endl;
+	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@DEFAULT_GROUP_ID', 0);" << std::endl;
+	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@GROUP_ID', 0);" << std::endl;
+	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@PLAYER_ID', 0);" << std::endl;
+	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@GUILD_ID', 0);" << std::endl;
+	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@RANK_ID', 0);" << std::endl;
+	std::cout << "INSERT INTO `xml2sql2` (`name`, `value`) VALUES ('@RANK_ID', 0);" << std::endl;
+
 	dir_name.str("");
 	dir_name << path << DIR_SEPARATOR << "accounts" << DIR_SEPARATOR;
 	if( boost::filesystem::exists( dir_name.str() ) ){
 		std::cout << "INSERT INTO `groups` (`name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) VALUES ('XML import group', 0, 0, 1000, 50);" << std::endl;
-		std::cout << "SET @DEFAULT_GROUP_ID := LAST_INSERT_ID();" << std::endl;
+		std::cout << "UPDATE `xml2sql` SET `value` = " << insertId << "() WHERE `name` = '@DEFAULT_GROUP_ID';" << std::endl;
 
 		std::string password;
 		int premDays;
@@ -259,7 +276,7 @@ int main(int argc, char** argv)
 						premium[id] = now + premDays * 86400;
 					}
 
-					std::cout << "INSERT INTO `accounts` (`id`, `group_id`, `password`) VALUES (" << id << ", @DEFAULT_GROUP_ID, " << sqlQuote(password) << ");" << std::endl;
+					std::cout << "INSERT INTO `accounts` (`id`, `group_id`, `password`) VALUES (" << id << ", ( SELECT `value` FROM `xml2sql` WHERE `name` = '@DEFAULT_GROUP_ID' ), " << sqlQuote(password) << ");" << std::endl;
 
 					std::cerr << " done." << std::endl;
 					xmlFreeDoc(xml);
@@ -315,7 +332,7 @@ int main(int argc, char** argv)
 					groupName = playerName + "'s group";
 
 					std::cout << "INSERT INTO `groups` (`name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) VALUES (" << sqlQuote(groupName) << ", " << groupFlags << ", " << groupAccess << ", " << groupMaxDepotItems << ", 50);" << std::endl;
-					std::cout << "SET @GROUP_ID := LAST_INSERT_ID();" << std::endl;
+					std::cout << "UPDATE `xml2sql` SET `value` = " << insertId << "() WHERE `name` = '@GROUP_ID';" << std::endl;
 
 					readXMLInteger(root, "account", playerAccount);
 					readXMLInteger(root, "sex", playerSex);
@@ -422,8 +439,8 @@ int main(int argc, char** argv)
 						playerPosZ = 0;
 					}
 
-					std::cout << "INSERT INTO `players` (`name`, `account_id`, `group_id`, `premend`, `sex`, `vocation`, `town_id`, `experience`, `level`, `maglevel`, `cap`, `soul`, `direction`, `lastlogin`, `loss_experience`, `loss_mana`, `loss_skills`, `health`, `healthmax`, `mana`, `manamax`, `manaspent`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, `posz`, `conditions`) VALUES (" << sqlQuote(playerName) << ", " << playerAccount << ", @GROUP_ID, " << premium[playerAccount] << ", " << playerSex << ", " << playerVocation << ", 1, " << playerExperience << ", " << playerLevel << ", " << playerMagLevel << ", " << playerCap << ", " << playerSoul << ", " << playerDirection << ", " << playerLastLogin << ", " << playerLossExperience << ", " << playerLossMana << ", " << playerLossSkills << ", " << playerHealth << ", " << playerHealthMax << ", " << playerMana << ", " << playerManaMax << ", " << playerManaSpent << ", " << playerLookBody << ", " << playerLookFeet << ", " << playerLookHead << ", " << playerLookLegs << ", " << playerLookType << ", " << playerLookAddons << ", " << playerPosX << ", " << playerPosY << ", " << playerPosZ << ", '');" << std::endl;
-					std::cout << "SET @PLAYER_ID := LAST_INSERT_ID();" << std::endl;
+					std::cout << "INSERT INTO `players` (`name`, `account_id`, `group_id`, `premend`, `sex`, `vocation`, `town_id`, `experience`, `level`, `maglevel`, `cap`, `soul`, `direction`, `lastlogin`, `loss_experience`, `loss_mana`, `loss_skills`, `health`, `healthmax`, `mana`, `manamax`, `manaspent`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, `posz`, `conditions`, `rank_id`) VALUES (" << sqlQuote(playerName) << ", " << playerAccount << ", ( SELECT `value` FROM `xml2sql` WHERE `name` = '@GROUP_ID' ), " << premium[playerAccount] << ", " << playerSex << ", " << playerVocation << ", 1, " << playerExperience << ", " << playerLevel << ", " << playerMagLevel << ", " << playerCap << ", " << playerSoul << ", " << playerDirection << ", " << playerLastLogin << ", " << playerLossExperience << ", " << playerLossMana << ", " << playerLossSkills << ", " << playerHealth << ", " << playerHealthMax << ", " << playerMana << ", " << playerManaMax << ", " << playerManaSpent << ", " << playerLookBody << ", " << playerLookFeet << ", " << playerLookHead << ", " << playerLookLegs << ", " << playerLookType << ", " << playerLookAddons << ", " << playerPosX << ", " << playerPosY << ", " << playerPosZ << ", '', 0);" << std::endl;
+					std::cout << "UPDATE `xml2sql` SET `value` = " << insertId << "() WHERE `name` = '@PLAYER_ID';" << std::endl;
 
 					if(xmlSkills){
 						node = xmlSkills->children;
@@ -434,7 +451,7 @@ int main(int argc, char** argv)
 								readXMLInteger(node, "level", skillValue);
 								readXMLInteger(node, "tries", skillCount);
 
-								std::cout << "UPDATE `player_skills` SET `value` = " << skillValue << ", `count` = " << skillCount << " WHERE `player_id` = @PLAYER_ID AND `skillid` = " << skillId << ";" << std::endl;
+								std::cout << "UPDATE `player_skills` SET `value` = " << skillValue << ", `count` = " << skillCount << " WHERE `player_id` = ( SELECT `value` FROM `xml2sql` WHERE `name` = '@PLAYER_ID' ) AND `skillid` = " << skillId << ";" << std::endl;
 							}
 
 							node = node->next;
@@ -449,7 +466,7 @@ int main(int argc, char** argv)
 								readXMLInteger(node, "key", storageKey);
 								readXMLInteger(node, "value", storageValue);
 
-								std::cout << "INSERT INTO `player_storage` (`player_id`, `key`, `value`) VALUES (@PLAYER_ID, " << storageKey << ", " << storageValue << ");" << std::endl;
+								std::cout << "INSERT INTO `player_storage` (`player_id`, `key`, `value`) VALUES ( ( SELECT `value` FROM `xml2sql` WHERE `name` = '@PLAYER_ID' ), " << storageKey << ", " << storageValue << ");" << std::endl;
 							}
 
 							node = node->next;
@@ -463,7 +480,7 @@ int main(int argc, char** argv)
 							if( !xmlStrcmp(node->name, (const xmlChar*)"spell") ){
 								readXMLString(node, "name", spellName);
 
-								std::cout << "INSERT INTO `player_spells` (`player_id`, `name`) VALUES (@PLAYER_ID, " << sqlQuote(spellName) << ");" << std::endl;
+								std::cout << "INSERT INTO `player_spells` (`player_id`, `name`) VALUES ( ( SELECT `value` FROM `xml2sql` WHERE `name` = '@PLAYER_ID' ), " << sqlQuote(spellName) << ");" << std::endl;
 							}
 
 							node = node->next;
@@ -477,7 +494,7 @@ int main(int argc, char** argv)
 							if( !xmlStrcmp(node->name, (const xmlChar*)"vip") ){
 								readXMLInteger(node, "playerguid", vipId);
 
-								std::cout << "INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES (@PLAYER_ID, " << vipId << ");" << std::endl;
+								std::cout << "INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES ( ( SELECT `value` FROM `xml2sql` WHERE `name` = '@PLAYER_ID' ), " << vipId << ");" << std::endl;
 							}
 
 							node = node->next;
@@ -519,11 +536,12 @@ int main(int argc, char** argv)
 						readXMLString(xmlGuild, "rank", guildRank);
 						readXMLString(xmlGuild, "nick", guildNick);
 
-						std::cout << "INSERT INTO `guilds` (`name`, `ownerid`, `creationdata`) SELECT " << sqlQuote(guildName) << ", @PLAYER_ID, UNIX_TIMESTAMP( NOW() ) FROM `players` WHERE ( SELECT COUNT(`id`) FROM `guilds` WHERE `name` = " << sqlQuote(guildName) << ") = 0 LIMIT 1;" << std::endl;
-						std::cout << "SET @GUILD_ID = ( SELECT `id` FROM `guilds` WHERE `name` = " << sqlQuote(guildName) << " );" << std::endl;
-						std::cout << "INSERT INTO `guild_ranks` (`guild_id`, `name`, `level`) SELECT @GUILD_ID, " << sqlQuote(guildRank) << ", 1 FROM `players` WHERE ( SELECT COUNT(`id`) FROM `guild_ranks` WHERE `name` = " << sqlQuote(guildRank) << " AND `guild_id` = @GUILD_ID) = 0 LIMIT 1;" << std::endl;
-						std::cout << "SET @RANK_ID = ( SELECT `id` FROM `guild_ranks` WHERE `name` = " << sqlQuote(guildRank) << " AND `guild_id` = @GUILD_ID );" << std::endl;
-						std::cout << "UPDATE `players` SET `guildnick` = " << sqlQuote(guildNick) << ", `rank_id` = @RANK_ID WHERE `id` = @PLAYER_ID;" << std::endl;
+						std::cout << "INSERT INTO `guilds` (`name`, `ownerid`, `creationdata`) SELECT " << sqlQuote(guildName) << ", ( SELECT `value` FROM `xml2sql` WHERE `name` = '@PLAYER_ID' ), " << timeStamp << " FROM `players` WHERE ( SELECT COUNT(`id`) FROM `guilds` WHERE `name` = " << sqlQuote(guildName) << ") = 0 LIMIT 1;" << std::endl;
+						std::cout << "UPDATE `xml2sql` SET `value` = ( SELECT `id` FROM `guilds` WHERE `name` = " << sqlQuote(guildName) << " ) WHERE `name` = '@GUILD_ID';" << std::endl;
+						std::cout << "INSERT INTO `guild_ranks` (`guild_id`, `name`, `level`) SELECT ( SELECT `value` FROM `xml2sql` WHERE `name` = '@GUILD_ID' ), " << sqlQuote(guildRank) << ", 1 FROM `players` WHERE ( SELECT COUNT(`id`) FROM `guild_ranks` WHERE `name` = " << sqlQuote(guildRank) << " AND `guild_id` = ( SELECT `value` FROM `xml2sql` WHERE `name` = '@GUILD_ID' ) ) = 0 LIMIT 1;" << std::endl;
+						std::cout << "UPDATE `xml2sql2` SET `value` = ( SELECT `id` FROM `guild_ranks` WHERE `name` = " << sqlQuote(guildRank) << " AND `guild_id` = ( SELECT `value` FROM `xml2sql` WHERE `name` = '@GUILD_ID' ) );" << std::endl;
+						std::cout << "UPDATE `xml2sql` SET `value` = ( SELECT `value` FROM `xml2sql2` ) WHERE `name` = '@RANK_ID';" << std::endl;
+						std::cout << "UPDATE `players` SET `guildnick` = " << sqlQuote(guildNick) << ", `rank_id` = ( SELECT `value` FROM `xml2sql` WHERE `name` = '@RANK_ID' ) WHERE `id` = ( SELECT `value` FROM `xml2sql` WHERE `name` = '@PLAYER_ID' );" << std::endl;
 					}
 
 					std::cerr << " done." << std::endl;
@@ -595,6 +613,9 @@ int main(int argc, char** argv)
 	else{
 		std::cerr << "No bans.xml file." << std::endl;
 	}
+
+	std::cout << "DROP TABLE `xml2sql2`;" << std::endl;
+	std::cout << "DROP TABLE `xml2sql`;" << std::endl;
 
 	return 0;
 }
