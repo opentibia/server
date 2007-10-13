@@ -327,11 +327,15 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	int32_t minRangeY /*= 0*/, int32_t maxRangeY /*= 0*/)
 {
 	bool foundCache = false;
+	bool cacheResult = false;
 	if(minRangeX == 0 && maxRangeX == 0 && minRangeY == 0 && maxRangeY == 0 && multifloor == true){
 		SpectatorCache::iterator it = spectatorCache.find(centerPos);
 		if(it != spectatorCache.end()){
 			list = it->second;
 			foundCache = true;
+		}
+		else{
+			cacheResult = true;
 		}
 	}
 
@@ -445,7 +449,9 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 			}
 		}
 
-		spectatorCache[centerPos] = list;
+		if(cacheResult){
+			spectatorCache[centerPos] = list;
+		}
 	}
 }
 
