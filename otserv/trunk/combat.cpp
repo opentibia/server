@@ -94,6 +94,12 @@ void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 					break;
 				}
 
+				case FORMULA_VALUE:
+				{
+					min = mina;
+					max = maxa;
+				}
+
 				default:
 					min = 0;
 					max = 0;
@@ -103,8 +109,9 @@ void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 			//std::cout << "No callback set for combat" << std::endl;
 		}
 	}
-	else{
-		creature->getCombatValues(min, max);
+	else if(formulaType == FORMULA_VALUE){
+		min = mina;
+		max = maxa;
 	}
 }
 

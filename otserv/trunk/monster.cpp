@@ -81,11 +81,6 @@ Creature()
 	attackStrength = mType->attackStrength;
 	defenseStrength = mType->defenseStrength;
 
-	minCombatValue = 0;
-	maxCombatValue = 0;
-
-	//followDistance = mType->targetDistance;
-
 	strDescription = mType->nameDescription;
 	toLowerCaseString(strDescription);
 
@@ -763,8 +758,6 @@ void Monster::doAttacking(uint32_t interval)
 		}
 
 		if((it->chance >= (uint32_t)random_range(0, 100))){
-			minCombatValue = it->minCombatValue;
-			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, attackedCreature);
 			spellBonusAttack = false;
 		}
@@ -792,8 +785,6 @@ void Monster::onDefending(uint32_t interval)
 		}
 
 		if((it->chance >= (uint32_t)random_range(0, 100))){
-			minCombatValue = it->minCombatValue;
-			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, this);
 		}
 	}
@@ -846,12 +837,6 @@ void Monster::onThinkChangeTarget(uint32_t interval)
 			}
 		}
 	}
-}
-
-void Monster::getCombatValues(int32_t& min, int32_t& max)
-{
-	min = minCombatValue;
-	max = maxCombatValue;
 }
 
 std::string Monster::getDescription(int32_t lookDistance) const

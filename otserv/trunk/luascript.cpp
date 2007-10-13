@@ -999,6 +999,10 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doSetCreatureLight", LuaScriptInterface::luaDoSetCreatureLight);
 	//doPlayerSetLossPercent(cid, lossType, newPercent)
 	lua_register(m_luaState, "doPlayerSetLossPercent", LuaScriptInterface::luaDoPlayerSetLossPercent);
+	//doSetCreatureDropLoot(cid, doDrop)
+	lua_register(m_luaState, "doSetCreatureDropLoot", LuaScriptInterface::luaDoSetCreatureDropLoot);
+	//getPlayerSkullType(cid)
+	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
 
 
 	//isPlayer(cid)
@@ -1891,7 +1895,6 @@ int LuaScriptInterface::luaDoPlayerAddManaSpent(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 {
-	//doPlayerAddHealth(uid,health)
 	//doCreatureAddHealth(uid,health)
 	int32_t healthChange = (int32_t)popNumber(L);
 	uint32_t cid = popNumber(L);
@@ -2111,6 +2114,49 @@ int LuaScriptInterface::luaDoPlayerSetLossPercent(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoSetCreatureDropLoot(lua_State *L)
+{
+	//doSetCreatureDropLoot(cid, doDrop)
+	bool doDrop = popNumber(L) == 1;
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		creature->setDropLoot(doDrop);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
+{
+	//getPlayerSkullType(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+#ifdef __SKULLSYSTEM__
+		lua_pushnumber(L, (uint32_t)player->getSkull());
+#else
+		lua_pushnumber(L, 0);
+#endif
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
 	return 1;
 }
 

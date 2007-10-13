@@ -52,6 +52,7 @@ protected:
 	static int luagetDistanceTo(lua_State *L);
 	static int luaSetNpcFocus(lua_State *L);
 	static int luaGetNpcCid(lua_State *L);
+	static int luaGetNpcPos(lua_State *L);
 	static int luaGetNpcName(lua_State *L);
 	static int luaGetNpcParameter(lua_State *L);
 	
@@ -70,6 +71,7 @@ public:
 	
 	virtual void onCreatureAppear(const Creature* creature){};
 	virtual void onCreatureDisappear(const Creature* creature){};
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos){};
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
 	virtual void onThink(){};
 	
@@ -88,6 +90,7 @@ public:
 	
 	virtual void onCreatureAppear(const Creature* creature);
 	virtual void onCreatureDisappear(const Creature* creature);
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
 	virtual void onThink();
 	
@@ -96,6 +99,7 @@ private:
 	
 	int32_t m_onCreatureAppear;
 	int32_t m_onCreatureDisappear;
+	int32_t m_onCreatureMove;
 	int32_t m_onCreatureSay;
 	int32_t m_onThink;
 };
@@ -151,7 +155,7 @@ protected:
 	
 	bool isImmune(CombatType_t type) const {return true;}
 	bool isImmune(ConditionType_t type) const {return true;}
-	virtual bool isAttackable() const { return false; }
+	virtual bool isAttackable() const { return attackable; }
 	virtual bool getNextStep(Direction& dir);
 	
 	bool canWalkTo(const Position& fromPos, Direction dir);
@@ -163,6 +167,7 @@ protected:
 	std::string name;
 	int32_t autoWalkChance;
 	bool floorChange;
+	bool attackable;
 	uint32_t focusCreature;
 	
 	NpcEventsHandler* m_npcEventHandler;

@@ -146,7 +146,8 @@ enum lossTypes_t {
 enum formulaType_t{
 	FORMULA_UNDEFINED = 0,
 	FORMULA_LEVELMAGIC = 1,
-	FORMULA_SKILL = 2
+	FORMULA_SKILL = 2,
+	FORMULA_VALUE = 3
 };
 
 enum ConditionId_t{

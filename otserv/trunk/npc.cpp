@@ -58,6 +58,7 @@ Creature()
 	name = _name;
 	autoWalkChance = 0;
 	floorChange = false;
+	attackable = false;
 	focusCreature = 0;
 
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
@@ -96,6 +97,10 @@ Creature()
 		}
 		else
 			baseSpeed = 110;
+
+		if(readXMLInteger(root, "attackable", intValue)){
+			attackable = (intValue != 0);
+		}
 
 		if(readXMLInteger(root, "autowalk", intValue)){
 			if(intValue > 100){
@@ -265,6 +270,10 @@ void Npc::onCreatureMove(const Creature* creature, const Position& newPos, const
 	uint32_t oldStackPos, bool teleport)
 {
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
+
+	if(creature->getPlayer()){
+		m_npcEventHandler->onCreatureMove(creature, oldPos, newPos);
+	}
 }
 
 void Npc::onCreatureTurn(const Creature* creature, uint32_t stackpos)
@@ -515,6 +524,7 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getDistanceTo", NpcScriptInterface::luagetDistanceTo);
 	lua_register(m_luaState, "doNpcSetCreatureFocus", NpcScriptInterface::luaSetNpcFocus);
 	lua_register(m_luaState, "getNpcCid", NpcScriptInterface::luaGetNpcCid);
+	lua_register(m_luaState, "getNpcPos", NpcScriptInterface::luaGetNpcPos);
 	lua_register(m_luaState, "getNpcName", NpcScriptInterface::luaGetNpcName);
 	lua_register(m_luaState, "getNpcParameter", NpcScriptInterface::luaGetNpcParameter);
 }
@@ -553,9 +563,9 @@ int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 {
 	//selfGetPosition()
 	ScriptEnviroment* env = getScriptEnv();
-	Npc* mynpc = env->getNpc();
-	if(mynpc){
-		Position pos = mynpc->getPosition();
+	Npc* npc = env->getNpc();
+	if(npc){
+		Position pos = npc->getPosition();
 		lua_pushnumber(L, pos.x);
 		lua_pushnumber(L, pos.y);
 		lua_pushnumber(L, pos.z);
@@ -574,9 +584,11 @@ int NpcScriptInterface::luaActionSay(lua_State* L)
 	//selfSay(words)
 	std::string msg(popString(L));
 	ScriptEnviroment* env = getScriptEnv();
-	Npc* mynpc = env->getNpc();
-	if(mynpc)
-		mynpc->doSay(msg);
+
+	Npc* npc = env->getNpc();
+	if(npc){
+		npc->doSay(msg);
+	}
 		
 	return 0;
 }
@@ -586,9 +598,11 @@ int NpcScriptInterface::luaActionMove(lua_State* L)
 	//selfMove(direction)
 	Direction dir = (Direction)popNumber(L);
 	ScriptEnviroment* env = getScriptEnv();
-	Npc* mynpc = env->getNpc();
-	if(mynpc)
-		mynpc->doMove(dir);
+
+	Npc* npc = env->getNpc();
+	if(npc){
+		npc->doMove(dir);
+	}
 
 	return 0;
 }
@@ -602,9 +616,10 @@ int NpcScriptInterface::luaActionMoveTo(lua_State* L)
 	target.x = (int)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
-	Npc* mynpc = env->getNpc();
-	if(mynpc)
-		mynpc->doMoveTo(target);
+	Npc* npc = env->getNpc();
+	if(npc){
+		npc->doMoveTo(target);
+	}
 	
 	return 0;
 }
@@ -615,9 +630,11 @@ int NpcScriptInterface::luaActionTurn(lua_State* L)
 	Direction dir = (Direction)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
-	Npc* mynpc = env->getNpc();
-	if(mynpc)
-		mynpc->doTurn(dir);
+
+	Npc* npc = env->getNpc();
+	if(npc){
+		npc->doTurn(dir);
+	}
 
 	return 0;
 }
@@ -628,12 +645,12 @@ int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 	uint32_t uid = popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
-	Npc* mynpc = env->getNpc();
 	
+	Npc* npc = env->getNpc();
 	Thing* thing = env->getThingByUID(uid);
-	if(thing && mynpc){
+	if(thing && npc){
 		Position thing_pos = thing->getPosition();
-		Position npc_pos = mynpc->getPosition();
+		Position npc_pos = npc->getPosition();
 		if(npc_pos.z != thing_pos.z){
 			lua_pushnumber(L, -1);
 		}
@@ -657,12 +674,30 @@ int NpcScriptInterface::luaSetNpcFocus(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Npc* mynpc = env->getNpc();
-	if(mynpc){
+	Npc* npc = env->getNpc();
+	if(npc){
 		Creature* creature = env->getCreatureByUID(cid);
-		mynpc->setCreatureFocus(creature);
+		npc->setCreatureFocus(creature);
 	}
 	return 0;
+}
+
+int NpcScriptInterface::luaGetNpcPos(lua_State* L)
+{
+	//getNpcPos()
+	ScriptEnviroment* env = getScriptEnv();
+
+	Position pos(0, 0, 0);
+	uint32_t stackpos = 0;
+
+	Npc* npc = env->getNpc();
+	if(npc){
+		pos = npc->getPosition();
+		stackpos = npc->getParent()->__getIndexOfThing(npc);
+	}
+	
+	pushPosition(L, pos, stackpos);
+	return 1;
 }
 
 int NpcScriptInterface::luaGetNpcCid(lua_State* L)
@@ -670,9 +705,9 @@ int NpcScriptInterface::luaGetNpcCid(lua_State* L)
 	//getNpcCid()
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Npc* mynpc = env->getNpc();
-	if(mynpc){
-		uint32_t cid = env->addThing(mynpc);
+	Npc* npc = env->getNpc();
+	if(npc){
+		uint32_t cid = env->addThing(npc);
 		lua_pushnumber(L, cid);
 	}
 	else{
@@ -687,9 +722,9 @@ int NpcScriptInterface::luaGetNpcName(lua_State* L)
 	//getNpcName()
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Npc* mynpc = env->getNpc();
-	if(mynpc){
-		lua_pushstring(L, mynpc->getName().c_str());
+	Npc* npc = env->getNpc();
+	if(npc){
+		lua_pushstring(L, npc->getName().c_str());
 	}
 	else{
 		lua_pushstring(L, "");
@@ -705,10 +740,10 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Npc* mynpc = env->getNpc();
-	if(mynpc){
-		Npc::ParametersMap::iterator it = mynpc->m_parameters.find(paramKey);
-		if(it != mynpc->m_parameters.end()){
+	Npc* npc = env->getNpc();
+	if(npc){
+		Npc::ParametersMap::iterator it = npc->m_parameters.find(paramKey);
+		if(it != npc->m_parameters.end()){
 			lua_pushstring(L, it->second.c_str());
 		}
 		else{
@@ -754,6 +789,7 @@ NpcEventsHandler(npc)
 	m_onCreatureSay = m_scriptInterface->getEvent("onCreatureSay");
 	m_onCreatureDisappear = m_scriptInterface->getEvent("onCreatureDisappear");
 	m_onCreatureAppear = m_scriptInterface->getEvent("onCreatureAppear");
+	m_onCreatureMove = m_scriptInterface->getEvent("onCreatureMove");
 	m_onThink = m_scriptInterface->getEvent("onThink");
 	m_loaded = true;
 }
@@ -826,6 +862,41 @@ void NpcScript::onCreatureDisappear(const Creature* creature)
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. NpcScript::onCreatureDisappear" << std::endl;
+	}
+}
+
+void NpcScript::onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos)
+{
+	if(m_onCreatureMove == -1){
+		return;	
+	}
+	//onCreatureMove(creature, oldPos, newPos)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "npc " << m_npc->getName();
+		env->setEventDesc(desc.str());
+		#endif
+	
+		lua_State* L = m_scriptInterface->getLuaState();
+	
+		env->setScriptId(m_onCreatureAppear, m_scriptInterface);
+		env->setRealPos(m_npc->getPosition());
+		env->setNpc(m_npc);
+	
+		uint32_t cid = env->addThing(const_cast<Creature*>(creature));
+	
+		m_scriptInterface->pushFunction(m_onCreatureMove);
+		lua_pushnumber(L, cid);
+		LuaScriptInterface::pushPosition(L, oldPos, 0);
+		LuaScriptInterface::pushPosition(L, newPos, 0);
+		m_scriptInterface->callFunction(3);
+		m_scriptInterface->releaseScriptEnv();
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. NpcScript::onCreatureMove" << std::endl;
 	}
 }
 
