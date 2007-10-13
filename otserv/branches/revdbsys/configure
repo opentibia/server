@@ -2299,8 +2299,8 @@ else
   USE_SQLITE_TRUE='#'
   USE_SQLITE_FALSE=
 fi
-    MYSQL_FLAGS=-D__USE_MYSQL__
-    SQLITE_FLAGS=
+	MYSQL_FLAGS=-D__USE_MYSQL__
+	SQLITE_FLAGS=
 
 
 fi
@@ -2328,8 +2328,8 @@ else
   USE_SQLITE_TRUE='#'
   USE_SQLITE_FALSE=
 fi
-    PGSQL_FLAGS=-D__USE_PGSQL__
-    SQLITE_FLAGS=
+	PGSQL_FLAGS=-D__USE_PGSQL__
+	SQLITE_FLAGS=
 
 
 fi
@@ -2357,8 +2357,8 @@ else
   USE_SQLITE_TRUE='#'
   USE_SQLITE_FALSE=
 fi
-    ODBC_FLAGS=-D__USE_ODBC__
-    SQLITE_FLAGS=
+	ODBC_FLAGS=-D__USE_ODBC__
+	SQLITE_FLAGS=
 
 
 fi
@@ -2377,7 +2377,7 @@ else
   USE_SQLITE_TRUE='#'
   USE_SQLITE_FALSE=
 fi
-    SQLITE_FLAGS=-D__USE_SQLITE__
+	SQLITE_FLAGS=-D__USE_SQLITE__
 
 fi
 
@@ -7214,10 +7214,6 @@ fi
 
 
 fi
-
-#AC_CHECK_HEADERS([mysql++.h],[MYSQLPP_LIBS=-lmysqlpp],[AC_MSG_ERROR("mysql++ headers missing.")])
-#AC_CHECK_LIB(mysqlpp, mysqlpp)
-#AC_SUBST(MYSQLPP_LIBS)
 
 ac_config_files="$ac_config_files Makefile"
 

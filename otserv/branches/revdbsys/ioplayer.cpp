@@ -389,9 +389,8 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 		for(uint32_t i = 0; i < container->size(); ++i){
 			++runningId;
 			item = container->getItem(i);
-			Container* container = item->getContainer();
-			if(container){
-				stack.push_back(containerBlock(container, runningId));
+			if(Container* sub = item->getContainer()){
+				stack.push_back(containerBlock(sub, runningId));
 			}
 
 			uint32_t attributesSize;
