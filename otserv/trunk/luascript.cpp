@@ -69,7 +69,7 @@ ScriptEnviroment::~ScriptEnviroment()
 {
 	for(CombatMap::iterator it = m_combatMap.begin(); it != m_combatMap.end(); ++it){
 		delete it->second;
-}
+	}
 
 	m_combatMap.clear();
 
@@ -469,7 +469,7 @@ int32_t LuaScriptInterface::getEvent(const std::string& eventName)
 
 const std::string& LuaScriptInterface::getFileById(int32_t scriptId)
 {
-	static std::string unk = "(Unknown scriptfile)";
+	const static std::string unk = "(Unknown scriptfile)";
 	if(scriptId != EVENT_ID_LOADING){
 		ScriptsCache::iterator it = m_cacheFiles.find(scriptId);
 		if(it != m_cacheFiles.end()){
@@ -870,6 +870,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerLossPercent", LuaScriptInterface::luaGetPlayerLossPercent);
 	//getPlayerPremiumDays(cid)
 	lua_register(m_luaState, "getPlayerPremiumDays", LuaScriptInterface::luaGetPlayerPremiumDays);
+	//getPlayerSkullType(cid)
+	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
 
 	//playerLearnInstantSpell(cid, name)
 	lua_register(m_luaState, "playerLearnInstantSpell", LuaScriptInterface::luaPlayerLearnInstantSpell);	
@@ -1001,9 +1003,6 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doPlayerSetLossPercent", LuaScriptInterface::luaDoPlayerSetLossPercent);
 	//doSetCreatureDropLoot(cid, doDrop)
 	lua_register(m_luaState, "doSetCreatureDropLoot", LuaScriptInterface::luaDoSetCreatureDropLoot);
-	//getPlayerSkullType(cid)
-	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
-
 
 	//isPlayer(cid)
 	lua_register(m_luaState, "isPlayer", LuaScriptInterface::luaIsPlayer);
@@ -1323,6 +1322,13 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoPremiumDays:
 			value = player->getPremiumDays();
 			break;
+		case PlayerInfoSkullType:
+			#ifdef __SKULLSYSTEM__
+			value = (uint32_t)player->getSkull();
+			#else
+			value = 0;
+			#endif
+			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -1412,6 +1418,9 @@ int LuaScriptInterface::luaGetPlayerGUID(lua_State *L){
 
 int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoPremiumDays);}
+
+int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoSkullType);}
 //
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
@@ -1895,6 +1904,7 @@ int LuaScriptInterface::luaDoPlayerAddManaSpent(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 {
+	//doPlayerAddHealth(uid,health)
 	//doCreatureAddHealth(uid,health)
 	int32_t healthChange = (int32_t)popNumber(L);
 	uint32_t cid = popNumber(L);
@@ -2131,29 +2141,6 @@ int LuaScriptInterface::luaDoSetCreatureDropLoot(lua_State *L)
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-	}
-
-	return 1;
-}
-
-int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
-{
-	//getPlayerSkullType(cid)
-	uint32_t cid = popNumber(L);
-
-	ScriptEnviroment* env = getScriptEnv();
-
-	Player* player = env->getPlayerByUID(cid);
-	if(player){
-#ifdef __SKULLSYSTEM__
-		lua_pushnumber(L, (uint32_t)player->getSkull());
-#else
-		lua_pushnumber(L, 0);
-#endif
-	}
-	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
 

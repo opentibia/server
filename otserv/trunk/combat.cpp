@@ -96,8 +96,8 @@ void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 
 				case FORMULA_VALUE:
 				{
-					min = mina;
-					max = maxa;
+					min = (int32_t)mina;
+					max = (int32_t)maxa;
 				}
 
 				default:
@@ -110,8 +110,8 @@ void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 		}
 	}
 	else if(formulaType == FORMULA_VALUE){
-		min = mina;
-		max = maxa;
+		min = (int32_t)mina;
+		max = (int32_t)maxa;
 	}
 }
 

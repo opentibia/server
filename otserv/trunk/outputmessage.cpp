@@ -41,7 +41,7 @@ OutputMessagePool::OutputMessagePool()
 
 void OutputMessagePool::startExecutionFrame()
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
+	//OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	m_frameTime = OTSYS_TIME();
 }
 

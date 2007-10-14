@@ -340,7 +340,7 @@ public:
 		const std::string& receiver, const std::string& text);
 	bool playerChangeOutfit(uint32_t playerId, Outfit_t outfit);
 
-	void flushSendBuffers();
+	void cleanup();
 	void FreeThing(Thing* thing);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);

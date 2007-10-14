@@ -478,7 +478,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	listCreature.removeList(creature->getID());
 	creature->removeList();
-	creature->setRemoved(); //creature->setParent(NULL);
+	creature->setRemoved();
 	FreeThing(creature);
 
 	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
@@ -2869,7 +2869,7 @@ void Game::checkWalk(uint32_t creatureId)
 	Creature* creature = getCreatureByID(creatureId);
 	if(creature && creature->getHealth() > 0){
 		creature->onWalk();
-		flushSendBuffers();
+		cleanup();
 	}
 }
 
@@ -2887,7 +2887,7 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 			removeCreature(creature, false);
 		}
 
-		flushSendBuffers();
+		cleanup();
 	}
 }
 
@@ -3367,7 +3367,7 @@ void Game::checkDecay(int32_t interval)
 	}
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
-	flushSendBuffers();
+	cleanup();
 }
 
 void Game::checkLight(int t)
@@ -3448,10 +3448,8 @@ void Game::resetCommandTag()
 	commandTags.clear();
 }
 
-void Game::flushSendBuffers()
+void Game::cleanup()
 {
-	OutputMessagePool::getInstance()->sendAll();
-
 	//free memory
 	for(std::vector<Thing*>::iterator it = ToReleaseThings.begin(); it != ToReleaseThings.end(); ++it){
 		(*it)->releaseThing2();

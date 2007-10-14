@@ -229,6 +229,8 @@ void Protocol80::deleteProtocolTask()
 		if(player->isOnline() && !player->hasCondition(CONDITION_INFIGHT)){
 			g_game.removeCreature(player, false);
 		}
+		Status::instance()->removePlayer();
+		
 		g_game.FreeThing(player);
 		player = NULL;
 	}
@@ -300,6 +302,8 @@ bool Protocol80::login(const std::string& name)
 
 		player->lastip = player->getIP();
 		player->lastLoginSaved = time(NULL);
+		
+		Status::instance()->addPlayer();
 		return true;
 	}
 	else{
@@ -314,8 +318,10 @@ bool Protocol80::login(const std::string& name)
 			player->client = this;
 			player->client->sendAddCreature(player, false);
 			player->sendIcons();
-			player->lastLoginSaved = time(NULL);
 			player->lastip = player->getIP();
+			player->lastLoginSaved = time(NULL);
+			
+			Status::instance()->addPlayer();
 			return true;
 		}
 	}

@@ -261,9 +261,9 @@ bool Connection::send(OutputMessage* msg)
 		internalSend(msg);
 	}
 	else{
-		//#ifdef __DEBUG_NET_DETAIL__
+		#ifdef __DEBUG_NET__
 		std::cout << "Connection::send Adding to queue " << msg->getMessageLength() << std::endl;
-		//#endif
+		#endif
 		m_outputQueue.push_back(msg);
 	}
 	OTSYS_THREAD_UNLOCK(m_connectionLock, "");

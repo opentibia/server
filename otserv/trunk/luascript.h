@@ -204,7 +204,8 @@ enum PlayerInfo_t{
 	PlayerInfoLookDirection,
 	PlayerInfoTown,
 	PlayerInfoGUID,
-	PlayerInfoPremiumDays
+	PlayerInfoPremiumDays,
+	PlayerInfoSkullType
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
