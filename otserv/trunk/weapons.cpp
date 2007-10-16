@@ -775,7 +775,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 	Position destPos = target->getPosition();
 	Tile* destTile = target->getTile();
 
-	if(random_range(0, 100) < hitChance){
+	if(hitChance >= random_range(1, 100)){
 		Weapon::internalUseWeapon(player, item, target, damageModifier);
 	}
 	else{
@@ -806,7 +806,7 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 
 void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 {
-	if(ammoAction == AMMOACTION_MOVE && breakChance > 0 && random_range(0, 100) < breakChance){
+	if(ammoAction == AMMOACTION_MOVE && breakChance >= random_range(1, 100)){
 		int32_t newCount = std::max(0, item->getItemCount() - 1);
 		g_game.transformItem(item, item->getID(), newCount);
 	}

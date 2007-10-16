@@ -413,7 +413,7 @@ void Monster::onThinkYell(uint32_t interval)
 	if(mType->yellSpeedTicks <= yellTicks){
 		yellTicks = 0;
 
-		if(!mType->voiceVector.empty() && (mType->yellChance >= (uint32_t)random_range(0, 100))){
+		if(!mType->voiceVector.empty() && (mType->yellChance >= (uint32_t)random_range(1, 100))){
 			uint32_t index = random_range(0, mType->voiceVector.size() - 1);
 			const voiceBlock_t& vb = mType->voiceVector[index];
 
@@ -757,7 +757,7 @@ void Monster::doAttacking(uint32_t interval)
 			continue;
 		}
 
-		if((it->chance >= (uint32_t)random_range(0, 100))){
+		if((it->chance >= (uint32_t)random_range(1, 100))){
 			it->spell->castSpell(this, attackedCreature);
 			spellBonusAttack = false;
 		}
@@ -784,7 +784,7 @@ void Monster::onDefending(uint32_t interval)
 			continue;
 		}
 
-		if((it->chance >= (uint32_t)random_range(0, 100))){
+		if((it->chance >= (uint32_t)random_range(1, 100))){
 			it->spell->castSpell(this, this);
 		}
 	}
@@ -805,7 +805,7 @@ void Monster::onDefending(uint32_t interval)
 				continue;
 			}
 
-			if((it->chance >= (uint32_t)random_range(0, 100))){
+			if((it->chance >= (uint32_t)random_range(1, 100))){
 				Monster* summon = Monster::createMonster(it->name);
 				if(summon){
 					const Position& summonPos = getPosition();
@@ -832,7 +832,7 @@ void Monster::onThinkChangeTarget(uint32_t interval)
 		if(mType->changeTargetSpeed >= changeTargetTicks){
 			changeTargetTicks = 0;
 
-			if(mType->changeTargetChance >= random_range(0, 100)){
+			if(mType->changeTargetChance >= random_range(1, 100)){
 				searchTarget();
 			}
 		}

@@ -2972,7 +2972,7 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 			Item* item = getInventoryItem((slots_t)condition->getId());
 			if(item){
 				//25% chance to destroy the item
-				if(25 >= random_range(0, 100)){
+				if(25 >= random_range(1, 100)){
 					g_game.internalRemoveItem(item);
 				}
 			}
