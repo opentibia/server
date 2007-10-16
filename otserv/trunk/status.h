@@ -57,24 +57,21 @@ public:
 	std::string getStatusString();
 	void getInfo(uint32_t requestedInfo, OutputMessage* output);
 
-	int getPlayersOnline(){return playersonline;}
-	int getMaxPlayersOnline(){return playersmax;}
-	
-	//static OTSYS_THREAD_RETURN SendInfoThread(void *p);
+	int getPlayersOnline(){return m_playersonline;}
+	int getMaxPlayersOnline(){return m_playersmax;}
 
-	uint64_t start;
-	int playersmax;
+	void setMaxPlayersOnline(int max){m_playersmax = max;}
+	
+	uint64_t getUptime();
+
+protected:
+	Status();
 
 private:
-	int playersonline, playerspeak;
-	std::string ownername, owneremail;
-	std::string motd;
-	std::string mapname, mapauthor;
-	int mapsizex, mapsizey;
-	std::string servername, location, url;
-	std::string version;
+	uint64_t m_start;
+	int m_playersmax, m_playersonline, m_playerspeak;
+	std::string m_mapname, m_mapauthor;
 
-	Status();
 };
 
 #endif

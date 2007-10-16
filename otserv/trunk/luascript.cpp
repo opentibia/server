@@ -52,21 +52,23 @@ enum{
 
 ScriptEnviroment::ThingMap ScriptEnviroment::m_globalMap;
 ScriptEnviroment::AreaMap ScriptEnviroment::m_areaMap;
+uint32_t ScriptEnviroment::m_lastAreaId = 0;
 ScriptEnviroment::CombatMap ScriptEnviroment::m_combatMap;
+uint32_t ScriptEnviroment::m_lastCombatId = 0;
 ScriptEnviroment::ConditionMap ScriptEnviroment::m_conditionMap;
+uint32_t ScriptEnviroment::m_lastConditionId = 0;
 ScriptEnviroment::StorageMap ScriptEnviroment::m_globalStorageMap;
 
 ScriptEnviroment::ScriptEnviroment()
 {
 	resetEnv();
 	m_lastUID = 70000;
-	m_lastAreaId = 0;
-	m_lastCombatId = 0;
-	m_lastConditionId = 0;
 }
 
 ScriptEnviroment::~ScriptEnviroment()
 {
+	resetEnv();
+	
 	for(CombatMap::iterator it = m_combatMap.begin(); it != m_combatMap.end(); ++it){
 		delete it->second;
 	}
@@ -245,7 +247,7 @@ uint32_t ScriptEnviroment::addCombatArea(AreaCombat* area)
 	return newAreaId;
 }
 
-AreaCombat* ScriptEnviroment::getCombatArea(uint32_t areaId) const
+AreaCombat* ScriptEnviroment::getCombatArea(uint32_t areaId)
 {
 	AreaMap::const_iterator it = m_areaMap.find(areaId);
 	if(it != m_areaMap.end()){
@@ -264,15 +266,6 @@ uint32_t ScriptEnviroment::addCombatObject(Combat* combat)
 	return newCombatId;
 }
 
-const Combat* ScriptEnviroment::getCombatObject(uint32_t combatId) const
-{
-	CombatMap::iterator it = m_combatMap.find(combatId);
-	if(it != m_combatMap.end()){
-		return it->second;
-	}
-
-	return NULL;
-}
 
 Combat* ScriptEnviroment::getCombatObject(uint32_t combatId)
 {
@@ -291,16 +284,6 @@ uint32_t ScriptEnviroment::addConditionObject(Condition* condition)
 
 	m_lastConditionId++;
 	return m_lastConditionId;
-}
-
-const Condition* ScriptEnviroment::getConditionObject(uint32_t conditionId) const
-{
-	ConditionMap::iterator it = m_conditionMap.find(conditionId);
-	if(it != m_conditionMap.end()){
-		return it->second;
-	}
-
-	return NULL;
 }
 
 Condition* ScriptEnviroment::getConditionObject(uint32_t conditionId)
@@ -3026,7 +3009,7 @@ int LuaScriptInterface::luaGetWorldUpTime(lua_State *L)
 
 	Status* status = Status::instance();
 	if(status){
-		uptime = (OTSYS_TIME() - status->start)/1000;
+		uptime = status->getUptime();
 	}
 
 	lua_pushnumber(L, uptime);

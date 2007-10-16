@@ -108,22 +108,22 @@ void ProtocolStatus::deleteProtocolTask()
 
 Status::Status()
 {
-	this->playersonline = 0;
-	this->playersmax    = 0;
-	this->playerspeak   = 0;
-	this->start=OTSYS_TIME();
+	m_playersonline = 0;
+	m_playersmax = 0;
+	m_playerspeak = 0;
+	m_start = OTSYS_TIME();
 }
 
 void Status::addPlayer()
 {
-	this->playersonline++;
-	if(playerspeak < playersonline)
-		playerspeak = playersonline;
+	m_playersonline++;
+	if(m_playerspeak < m_playersonline)
+		m_playerspeak = m_playersonline;
 }
 
 void Status::removePlayer()
 {
-	this->playersonline--;
+	m_playersonline--;
 }
 
 std::string Status::getStatusString()
@@ -142,9 +142,8 @@ std::string Status::getStatusString()
 	xmlSetProp(root, (const xmlChar*) "version", (const xmlChar*)"1.0");
 	
 	
-	p=xmlNewNode(NULL,(const xmlChar*)"serverinfo");
-	uint64_t running = (OTSYS_TIME() - this->start)/1000;
-	ss << running;
+	p = xmlNewNode(NULL,(const xmlChar*)"serverinfo");
+	ss << getUptime();
 	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getString(ConfigManager::IP).c_str());
@@ -161,34 +160,34 @@ std::string Status::getStatusString()
 	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)STATUS_CLIENT_VERISON);
 	xmlAddChild(root, p);
 
-	p=xmlNewNode(NULL,(const xmlChar*)"owner");
+	p = xmlNewNode(NULL,(const xmlChar*)"owner");
 	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)g_config.getString(ConfigManager::OWNER_NAME).c_str());
 	xmlSetProp(p, (const xmlChar*) "email", (const xmlChar*)g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
 	xmlAddChild(root, p);
 
-	p=xmlNewNode(NULL,(const xmlChar*)"players");
-	ss << this->playersonline;
+	p = xmlNewNode(NULL,(const xmlChar*)"players");
+	ss << m_playersonline;
 	xmlSetProp(p, (const xmlChar*) "online", (const xmlChar*)ss.str().c_str());
 	ss.str("");
-	ss << this->playersmax;
+	ss << m_playersmax;
 	xmlSetProp(p, (const xmlChar*) "max", (const xmlChar*)ss.str().c_str());
 	ss.str("");
-	ss << this->playerspeak;
+	ss << m_playerspeak;
 	xmlSetProp(p, (const xmlChar*) "peak", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlAddChild(root, p);
 	
 	/*
-	p=xmlNewNode(NULL,(const xmlChar*)"monsters");
+	p = xmlNewNode(NULL,(const xmlChar*)"monsters");
 	ss << g_game.getMonstersOnline();
 	xmlSetProp(p, (const xmlChar*) "total", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlAddChild(root, p);
 	*/
 
-	p=xmlNewNode(NULL,(const xmlChar*)"map");
-	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)this->mapname.c_str());
-	xmlSetProp(p, (const xmlChar*) "author", (const xmlChar*)this->mapauthor.c_str());
+	p = xmlNewNode(NULL,(const xmlChar*)"map");
+	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)m_mapname.c_str());
+	xmlSetProp(p, (const xmlChar*) "author", (const xmlChar*)m_mapauthor.c_str());
 
 	uint32_t mapWidth, mapHeight;
 	g_game.getMapDimensions(mapWidth, mapHeight);
@@ -202,7 +201,7 @@ std::string Status::getStatusString()
 
 	xmlNewTextChild(root, NULL, (const xmlChar*)"motd", (const xmlChar*)g_config.getString(ConfigManager::MOTD).c_str());
 
-	xmlChar *s = NULL;
+	xmlChar* s = NULL;
 	int len = 0;
 	xmlDocDumpMemory(doc, (xmlChar**)&s, &len);
 	
@@ -225,7 +224,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output)
 	// sent back, so we'll save some bandwidth and 
 	// make many
 	std::stringstream ss;
-	uint64_t running = (OTSYS_TIME() - this->start) / 1000;
+	uint64_t running = getUptime();
 	// since we haven't all the things on the right place like map's 
 	// creator/info and other things, i'll put the info chunked into
 	// operators, so the httpd server will only receive the existing
@@ -258,15 +257,15 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output)
 
 	if(requestedInfo & REQUEST_PLAYERS_INFO){
 		output->AddByte(0x20); // players info
-		output->AddU32(this->playersonline);
-		output->AddU32(this->playersmax);
-		output->AddU32(this->playerspeak);
+		output->AddU32(m_playersonline);
+		output->AddU32(m_playersmax);
+		output->AddU32(m_playerspeak);
 	}
 
 	if(requestedInfo & REQUEST_MAP_INFO){
 		output->AddByte(0x30); // map info
-		output->AddString(this->mapname.c_str());
-		output->AddString(this->mapauthor.c_str());
+		output->AddString(m_mapname.c_str());
+		output->AddString(m_mapauthor.c_str());
 		uint32_t mapWidth, mapHeight;
 		g_game.getMapDimensions(mapWidth, mapHeight);
 		output->AddU16(mapWidth);
@@ -278,5 +277,10 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output)
 
 bool Status::hasSlot()
 {
-	return this->playersonline < this->playersmax;
+	return m_playersonline < m_playersmax;
+}
+
+uint64_t Status::getUptime()
+{
+	return (OTSYS_TIME() - m_start)/1000;
 }

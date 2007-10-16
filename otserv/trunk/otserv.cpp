@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
 	std::cout << ":: Starting Server... ";
 
 	Status* status = Status::instance();
-	status->playersmax = g_config.getNumber(ConfigManager::MAX_PLAYERS);
+	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
 	//OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
 

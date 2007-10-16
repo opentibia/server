@@ -126,16 +126,14 @@ public:
 	Creature* getCreatureByUID(uint32_t uid);
 	Player* getPlayerByUID(uint32_t uid);
 
-	uint32_t addCombatArea(AreaCombat* area);
-	AreaCombat* getCombatArea(uint32_t areaId) const;
+	static uint32_t addCombatArea(AreaCombat* area);
+	static AreaCombat* getCombatArea(uint32_t areaId);
 
-	uint32_t addCombatObject(Combat* combat);
-	const Combat* getCombatObject(uint32_t combatId) const;
-	Combat* getCombatObject(uint32_t combatId);
+	static uint32_t addCombatObject(Combat* combat);
+	static Combat* getCombatObject(uint32_t combatId);
 
-	uint32_t addConditionObject(Condition* condition);
-	const Condition* getConditionObject(uint32_t conditionId) const;
-	Condition* getConditionObject(uint32_t conditionId);
+	static uint32_t addConditionObject(Condition* condition);
+	static Condition* getConditionObject(uint32_t conditionId);
 
 private:
 	typedef std::map<int32_t, Thing*> ThingMap;
@@ -164,15 +162,15 @@ private:
 	ThingMap m_localMap;
 
 	//area map
-	uint32_t m_lastAreaId;
+	static uint32_t m_lastAreaId;
 	static AreaMap m_areaMap;
 
 	//combat map
-	uint32_t m_lastCombatId;
+	static uint32_t m_lastCombatId;
 	static CombatMap m_combatMap;
 
 	//condition map
-	uint32_t m_lastConditionId;
+	static uint32_t m_lastConditionId;
 	static ConditionMap m_conditionMap;
 
 	//for npc scripts
