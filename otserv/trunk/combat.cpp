@@ -895,6 +895,15 @@ void AreaCombat::clear()
 	areas.clear();
 }
 
+AreaCombat::AreaCombat(const AreaCombat& rhs)
+{
+	hasExtArea = rhs.hasExtArea;
+	
+	for(AreaCombatMap::const_iterator it = rhs.areas.begin(); it != rhs.areas.end(); ++it){
+		areas[it->first] = new MatrixArea(*it->second);
+	}
+}
+
 bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const
 {
 	Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);

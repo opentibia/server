@@ -3298,7 +3298,7 @@ int LuaScriptInterface::luaSetCombatArea(lua_State *L)
 		return 1;
 	}
 
-	combat->setArea(area);
+	combat->setArea(new AreaCombat(*area));
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;

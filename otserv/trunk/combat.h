@@ -103,32 +103,47 @@ struct Combat2Var{
 	int32_t maxChange;
 };
 
-
-template <typename T>
-class Matrix
+class MatrixArea
 {
 public:
-	//Matrix() {}
-  Matrix(uint32_t _rows, uint32_t _cols)
-  {
+	MatrixArea(uint32_t _rows, uint32_t _cols)
+	{
 		centerX = 0;
 		centerY = 0;
 
 		rows = _rows;
 		cols = _cols;
 
-		data_ = new T*[rows];
+		data_ = new bool*[rows];
 
 		for(uint32_t row = 0; row < rows; ++row){
-			data_[row] = new T[cols];
+			data_[row] = new bool[cols];
 			
 			for(uint32_t col = 0; col < cols; ++col){
 				data_[row][col] = 0;
 			}
 		}
-  }
+	}
 
-	~Matrix()
+	MatrixArea(const MatrixArea& rhs)
+	{
+		centerX = rhs.centerX;
+		centerY = rhs.centerY;
+		rows = rhs.rows;
+		cols = rhs.cols;
+
+		data_ = new bool*[rows];
+
+		for(uint32_t row = 0; row < rows; ++row){
+			data_[row] = new bool[cols];
+			
+			for(uint32_t col = 0; col < cols; ++col){
+				data_[row][col] = rhs.data_[row][col];
+			}
+		}
+	}
+
+	~MatrixArea()
 	{
 		for(uint32_t row = 0; row < rows; ++row){
 			delete[] data_[row];
@@ -137,8 +152,8 @@ public:
 		delete[] data_;
 	}
 
-	void setValue(uint32_t row, uint32_t col, T value) const {data_[row][col] = value;}
-	T getValue(uint32_t row, uint32_t col) const {return data_[row][col];}
+	void setValue(uint32_t row, uint32_t col, bool value) const {data_[row][col] = value;}
+	bool getValue(uint32_t row, uint32_t col) const {return data_[row][col];}
 
 	void setCenter(uint32_t y, uint32_t x) {centerX = x; centerY = y;}
 	void getCenter(uint32_t& y, uint32_t& x) const {x = centerX; y = centerY;}
@@ -146,25 +161,26 @@ public:
 	size_t getRows() const {return rows;}
 	size_t getCols() const {return cols;}
 
-	inline const T* operator[](uint32_t i) const { return data_[i]; }
-	inline T* operator[](uint32_t i) { return data_[i]; }
+	inline const bool* operator[](uint32_t i) const { return data_[i]; }
+	inline bool* operator[](uint32_t i) { return data_[i]; }
 
-private:
+protected:
 	uint32_t centerX;
 	uint32_t centerY;
 
 	uint32_t rows;
 	uint32_t cols;
-	T** data_;
+	bool** data_;
 };
 
-typedef Matrix<bool> MatrixArea;
 typedef std::map<Direction, MatrixArea* > AreaCombatMap;
 
 class AreaCombat{
 public:
 	AreaCombat() {hasExtArea = false;}
 	~AreaCombat() {clear();}
+
+	AreaCombat(const AreaCombat& rhs);
 
 	ReturnValue doCombat(Creature* attacker, const Position& pos, const Combat& combat) const;
 	bool getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const;
