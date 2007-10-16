@@ -338,8 +338,6 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	bool needTarget = false;
 	bool needDirection = false;
 
-	combat->setPlayerCombatValues(FORMULA_VALUE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
-
 	if(readXMLInteger(node, "length", intValue)){
 		int32_t length = intValue;
 
@@ -618,6 +616,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 		attributeNode = attributeNode->next;
 	}
 
+	combat->setPlayerCombatValues(FORMULA_VALUE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
 	sb.spell = new CombatSpell(combat, needTarget, needDirection);
 	sb.combatSpell = true;
 	return true;
