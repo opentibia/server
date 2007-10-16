@@ -288,7 +288,14 @@ public:
 	CallBack* getCallback(CallBackParam_t key);
 
 	bool setParam(CombatParam_t param, uint32_t value);
-	void setArea(const AreaCombat* _area) {area = new AreaCombat(*_area);}
+	void setArea(AreaCombat* _area)
+	{
+		if(area){
+			delete area;
+		}
+
+		area = _area;
+	}
 	bool hasArea() const {return area != NULL;}
 	void setCondition(const Condition* _condition) {params.condition = _condition->clone();}
 	void setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb);
