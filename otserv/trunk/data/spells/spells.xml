@@ -17,6 +17,7 @@
 <rune name="Chameleon" id="2291" selftarget="1" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" function="chameleon"></rune>
 <rune name="Convince Creature" id="2292" charges="3" lvl="10" maglv="20" exhaustion="1" prem="0" enabled="1" allowfaruse="1" function="convince"></rune>
 <rune name="Destroy Field" id="2261" charges="3" lvl="10" maglv="3" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="destroy field.lua"></rune>
+<rune name="Teleport" id="2296" charges="20" aggressive="0" allowfaruse="1" blockwalls="0" script="teleportrune.lua"></rune>
 
 <instant name="Wild Growth" words="exevo grav vita" direction="1" blocktype="all" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="wild growth.lua">
 <vocation name="Druid"/>
