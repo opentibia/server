@@ -114,6 +114,7 @@ PKG_CHECK_MODULES(LUA, lua5.1 >= 5.1, , [
 	AC_CHECK_LIB(lua, main, , [AC_MSG_ERROR("Linking against lua failed.")])
 ])
 AC_SUBST(LUA_CFLAGS)
+AC_SUBST(LUA_LIBS)
 
 # check for mysql if it is enabled
 if test -n "$MYSQL_FLAGS"; then 
