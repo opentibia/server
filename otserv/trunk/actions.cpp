@@ -140,7 +140,7 @@ ReturnValue Actions::canUse(const Creature* creature, const Position& pos)
 	return RET_NOERROR;
 }
 
-ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, const bool blockWalls)
+ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight)
 {
 	if(toPos.x == 0xFFFF){
 		return RET_NOERROR;
@@ -157,10 +157,9 @@ ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, 
 	else if(!Position::areInRange<7,5,0>(toPos, creaturePos)){
 		return RET_TOOFARAWAY;
 	}
-	
-	if(blockWalls && canUse(creature, toPos) == RET_TOOFARAWAY && 
-		!g_game.getMap()->canThrowObjectTo(creaturePos, toPos)){
-			return RET_CANNOTTHROW;
+
+	if(checkLineOfSight && !g_game.getMap()->canThrowObjectTo(creaturePos, toPos)){
+		return RET_CANNOTTHROW;
 	}
 
 	return RET_NOERROR;
@@ -373,8 +372,8 @@ bool Actions::openContainer(Player* player, Container* container, const uint8_t 
 Action::Action(LuaScriptInterface* _interface) :
 Event(_interface)
 {
-	allowfaruse = false;
-	blockwalls = true;
+	allowFarUse = false;
+	checkLineOfSight = true;
 }
 
 Action::~Action()
@@ -392,7 +391,7 @@ bool Action::configureEvent(xmlNodePtr p)
 	}
 	if(readXMLInteger(p, "blockwalls", intValue)){
 		if(intValue == 0){
-			setBlockWalls(false);
+			setCheckLineOfSight(false);
 		}
 	}
 	
@@ -408,14 +407,14 @@ ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos
 {
 	ReturnValue ret = RET_NOERROR;
 
-	if(!allowFarUse()){
+	if(!getAllowFarUse()){
 		ret = Actions::canUse(player, toPos);
 		if(ret != RET_NOERROR){
 			return ret;
 		}
 	}
 	else{
-		ret = Actions::canUseFar(player, toPos, blockWalls());
+		ret = Actions::canUseFar(player, toPos, getCheckLineOfSight());
 		if(ret != RET_NOERROR){
 			return ret;
 		}

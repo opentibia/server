@@ -107,11 +107,7 @@ public:
 	virtual ~Spell(){};
 
 	bool configureSpell(xmlNodePtr xmlspell);
-
 	const std::string& getName() const {return name;}
-
-	//virtual bool castSpell(Creature* creature) = 0;
-	//virtual bool castSpell(Creature* creature, Creature* target) = 0;
 
 	void postCastSpell(Player* player) const;
 	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;
@@ -145,6 +141,7 @@ protected:
 	int32_t mana;
 	int32_t manaPercent;
 	int32_t soul;
+	int32_t range;
 	bool exhaustion;
 	bool needTarget;
 	bool needWeapon;
@@ -199,6 +196,7 @@ protected:
 
 	bool needDirection;
 	bool hasParam;
+	bool checkLineOfSight;
 	InstantSpellFunction* function;
 };
 

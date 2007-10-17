@@ -343,7 +343,8 @@ public:
 	void cleanup();
 	void FreeThing(Thing* thing);
 
-	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
+	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
+		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
 	bool isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor);
 	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);

@@ -362,6 +362,7 @@ Spell::Spell()
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
+	range = -1;
 	exhaustion = false;
 	needTarget = false;
 	needWeapon = false;
@@ -414,7 +415,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 		std::cout << "Error: [Spell::configureSpell] Spell without name." << std::endl;
 		return false;
 	}
-
+	
 	if(readXMLInteger(p, "lvl", intValue)){
 	 	level = intValue;
 	}
@@ -461,6 +462,10 @@ bool Spell::configureSpell(xmlNodePtr p)
 
 	if(readXMLInteger(p, "needlearn", intValue)){
 		learnable = (intValue == 1);
+	}
+
+	if(readXMLInteger(p, "range", intValue)){
+		range = intValue;
 	}
 
 	if(readXMLInteger(p, "blocking", intValue)){
@@ -677,6 +682,14 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
+			if(range != -1){
+				if(!g_game.canThrowObjectTo(playerPos, toPos, true, range, range)){
+					player->sendCancelMessage(RET_DESTINATIONOUTOFREACH);
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+			}
+
 			ReturnValue ret;
 			if((ret = Combat::canDoCombat(player, tile, isAggressive)) != RET_NOERROR){
 				player->sendCancelMessage(ret);
@@ -822,6 +835,7 @@ TalkAction(_interface)
 {
 	needDirection = false;
 	hasParam = false;
+	checkLineOfSight = true;
 	function = NULL;
 }
 
@@ -854,6 +868,10 @@ bool InstantSpell::configureEvent(xmlNodePtr p)
 
 	if(readXMLInteger(p, "direction", intValue)){
 		needDirection = (intValue == 1);
+	}
+
+	if(readXMLInteger(p, "blockwalls", intValue)){
+		checkLineOfSight = (intValue == 1);
 	}
 
 	return true;
@@ -936,7 +954,8 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 
 		const Position& fromPos = player->getPosition();
 		const Position& toPos = target->getPosition();
-		if(!g_game.canThrowObjectTo(fromPos, toPos) || fromPos.z != toPos.z){
+		if(fromPos.z != toPos.z || ((range == -1 && !g_game.canThrowObjectTo(fromPos, toPos, checkLineOfSight)) ||
+				!g_game.canThrowObjectTo(fromPos, toPos, checkLineOfSight, range, range)) ){
 			player->sendCancelMessage(RET_CREATUREISNOTREACHABLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;

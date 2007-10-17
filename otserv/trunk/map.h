@@ -155,8 +155,10 @@ public:
 	Map();
 	~Map();
 
-	static int32_t maxViewportX;
-	static int32_t maxViewportY;
+	static uint32_t maxViewportX;
+	static uint32_t maxViewportY;
+	static uint32_t maxClientViewportX;
+	static uint32_t maxClientViewportY;
 
 	/**
 	* Load a map.
@@ -206,9 +208,13 @@ public:
 	* Checks if you can throw an object to that position
 	*	\param fromPos from Source point
 	*	\param toPos Destination point
+	*	\param rangex maximum allowed range horizontially
+	*	\param rangey maximum allowed range vertically
+	*	\param checkLineOfSight checks if there is any blocking objects in the way
 	*	\returns The result if you can throw there or not
 	*/
-	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
+	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
+		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
 
 	/**
 	* Checks if view is clear from fromPos to toPos

@@ -355,6 +355,7 @@ protected:
 	//get tile info
 	static int luaGetTilePzInfo(lua_State *L);
 	static int luaGetTileHouseInfo(lua_State *L);
+	static int luaQueryTileAddThing(lua_State *L);
 
 	//houses
 	static int luaGetHouseOwner(lua_State *L);

@@ -48,13 +48,10 @@
 
 extern ConfigManager g_config;
 
-//client viewport: 8, 6
-//minimum viewport 9, 7
-//int32_t Map::maxViewportX = 9;
-//int32_t Map::maxViewportY = 7;
-
-int32_t Map::maxViewportX = 10;
-int32_t Map::maxViewportY = 10;
+uint32_t Map::maxViewportX = 10; //min value: maxClientViewportX + 1
+uint32_t Map::maxViewportY = 10; //min value: maxClientViewportY + 1
+uint32_t Map::maxClientViewportX = 8;
+uint32_t Map::maxClientViewportY = 6;
 
 Map::Map()
 {
@@ -460,7 +457,8 @@ void Map::clearSpectatorCache()
 	spectatorCache.clear();
 }
 
-bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
+bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight /*= true*/,
+	int32_t rangex /*= Map::maxClientViewportX*/, int32_t rangey /*= Map::maxClientViewportY*/)
 {
 	//z checks
 	//underground 8->15
@@ -479,8 +477,12 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	deltaz = std::abs(fromPos.z - toPos.z);
 
 	//distance checks
-	if(deltax - deltaz > 8 || deltay - deltaz > 6){
+	if(deltax - deltaz > rangex || deltay - deltaz > rangey){
 		return false;
+	}
+
+	if(!checkLineOfSight){
+		return true;
 	}
 
 	return isViewClear(fromPos, toPos, false);

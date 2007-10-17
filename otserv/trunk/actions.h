@@ -45,7 +45,7 @@ public:
 	bool openContainer(Player* player,Container* container, const uint8_t index);
 
 	static ReturnValue canUse(const Creature* creature, const Position& pos);
-	static ReturnValue canUseFar(const Creature* creature ,const Position& toPos, const bool blockWalls);
+	static ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
 
 protected:
 	ReturnValue internalUseItem(Player* player, const Position& pos,
@@ -82,11 +82,11 @@ public:
 		const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
 	//
 
-	bool allowFarUse() const {return allowfaruse;};
-	bool blockWalls() const {return blockwalls;};
+	bool getAllowFarUse() const {return allowFarUse;};
+	void setAllowFarUse(bool v){allowFarUse = v;};
 
-	void setAllowFarUse(bool v){allowfaruse = v;};
-	void setBlockWalls(bool v){blockwalls = v;};
+	bool getCheckLineOfSight() const {return checkLineOfSight;};
+	void setCheckLineOfSight(bool v){checkLineOfSight = v;};
 
 	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
 	virtual bool hasOwnErrorHandler() {return false;}
@@ -94,8 +94,8 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 
-	bool allowfaruse;
-	bool blockwalls;
+	bool allowFarUse;
+	bool checkLineOfSight;
 };
 
 #endif

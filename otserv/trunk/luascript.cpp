@@ -895,6 +895,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getThingfromPos", LuaScriptInterface::luaGetThingfromPos);
 	//getThing(uid)
 	lua_register(m_luaState, "getThing", LuaScriptInterface::luaGetThing);
+	//queryTileAddThing(uid, pos, <optional> flags)
+	lua_register(m_luaState, "queryTileAddThing", LuaScriptInterface::luaQueryTileAddThing);
 	//getThingPos(uid)
 	lua_register(m_luaState, "getThingPos", LuaScriptInterface::luaGetThingPos);
 
@@ -1052,7 +1054,7 @@ void LuaScriptInterface::registerFunctions()
 	//getGuildId(guild_name)
 	lua_register(m_luaState, "getGuildId", LuaScriptInterface::luaGetGuildId);
 
-	//createCombatArea( {area}, {extArea} )
+	//createCombatArea( {area}, <optional> {extArea} )
 	lua_register(m_luaState, "createCombatArea", LuaScriptInterface::luaCreateCombatArea);
 
 	//createConditionObject(type)
@@ -3130,6 +3132,42 @@ int LuaScriptInterface::luaGetThing(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaQueryTileAddThing(lua_State *L)
+{
+	//queryTileAddThing(uid, pos, <optional> flags)
+	int32_t parameters = lua_gettop(L);
+
+	uint32_t flags = 0;
+	if(parameters > 2){
+		flags = popNumber(L);
+	}
+
+	Position pos;
+	uint32_t stackpos;
+	popPosition(L, pos, stackpos);
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(!tile){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		lua_pushnumber(L, (uint32_t)RET_NOTPOSSIBLE);
+		return 1;
+	}
+
+	Thing* thing = env->getThingByUID(uid);
+	if(!thing){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
+		lua_pushnumber(L, (uint32_t)RET_NOTPOSSIBLE);
+		return 1;
+	}
+
+	ReturnValue ret = tile->__queryAdd(0, thing, 1, flags);
+	lua_pushnumber(L, (uint32_t)ret);
+	return 1;
+}
+
 int LuaScriptInterface::luaGetThingPos(lua_State *L)
 {
 	//getThingPos(uid)
@@ -3203,7 +3241,7 @@ bool LuaScriptInterface::getArea(lua_State *L, std::list<uint32_t>& list, uint32
 
 int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
 {
-	//createCombatArea( {area}, {extArea} )
+	//createCombatArea( {area}, <optional> {extArea} )
 
 	ScriptEnviroment* env = getScriptEnv();
 

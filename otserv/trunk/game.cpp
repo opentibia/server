@@ -757,7 +757,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 			(std::abs(fromPos.z - toPos.z) * 4 > item->getThrowRange()) ){
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
-	else if(!map->canThrowObjectTo(fromPos, toPos)){
+	else if(!canThrowObjectTo(fromPos, toPos)){
 		ret = RET_CANNOTTHROW;
 	}
 	//check that the player has access to dest tile
@@ -2685,9 +2685,10 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 }
 
 //--
-bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos)
+bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight /*= true*/,
+	int32_t rangex /*= Map::maxClientViewportX*/, int32_t rangey /*= Map::maxClientViewportY*/)
 {
-	return map->canThrowObjectTo(fromPos, toPos);
+	return map->canThrowObjectTo(fromPos, toPos, checkLineOfSight, rangex, rangey);
 }
 
 bool Game::isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor)
