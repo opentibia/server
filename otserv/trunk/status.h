@@ -52,17 +52,17 @@ public:
 	
 	void addPlayer();
 	void removePlayer();
-	bool hasSlot();
+	bool hasSlot() const;
 	
-	std::string getStatusString();
-	void getInfo(uint32_t requestedInfo, OutputMessage* output);
+	std::string getStatusString() const;
+	void getInfo(uint32_t requestedInfo, OutputMessage* output) const;
 
-	int getPlayersOnline(){return m_playersonline;}
-	int getMaxPlayersOnline(){return m_playersmax;}
+	int getPlayersOnline() const {return m_playersonline;}
+	int getMaxPlayersOnline() const {return m_playersmax;}
 
 	void setMaxPlayersOnline(int max){m_playersmax = max;}
 	
-	uint64_t getUptime();
+	uint64_t getUptime() const;
 
 protected:
 	Status();

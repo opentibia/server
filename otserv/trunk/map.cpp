@@ -48,10 +48,10 @@
 
 extern ConfigManager g_config;
 
-uint32_t Map::maxViewportX = 10; //min value: maxClientViewportX + 1
-uint32_t Map::maxViewportY = 10; //min value: maxClientViewportY + 1
-uint32_t Map::maxClientViewportX = 8;
-uint32_t Map::maxClientViewportY = 6;
+int32_t Map::maxViewportX = 10; //min value: maxClientViewportX + 1
+int32_t Map::maxViewportY = 10; //min value: maxClientViewportY + 1
+int32_t Map::maxClientViewportX = 8;
+int32_t Map::maxClientViewportY = 6;
 
 Map::Map()
 {

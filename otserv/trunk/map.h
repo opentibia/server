@@ -155,10 +155,10 @@ public:
 	Map();
 	~Map();
 
-	static uint32_t maxViewportX;
-	static uint32_t maxViewportY;
-	static uint32_t maxClientViewportX;
-	static uint32_t maxClientViewportY;
+	static int32_t maxViewportX;
+	static int32_t maxViewportY;
+	static int32_t maxClientViewportX;
+	static int32_t maxClientViewportY;
 
 	/**
 	* Load a map.

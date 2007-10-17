@@ -37,6 +37,7 @@
 #include "movement.h"
 #include "weapons.h"
 #include "creatureevent.h"
+#include "status.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -1970,6 +1971,8 @@ void Player::removeList()
 	{
 		(*it).second->notifyLogOut(this);
 	}
+	
+	Status::instance()->removePlayer();
 }
 
 void Player::addList()
@@ -1980,6 +1983,8 @@ void Player::addList()
 	}
 
 	listPlayer.addList(this);
+	
+	Status::instance()->addPlayer();
 }
 
 void Player::kickPlayer()

@@ -126,7 +126,7 @@ void Status::removePlayer()
 	m_playersonline--;
 }
 
-std::string Status::getStatusString()
+std::string Status::getStatusString() const
 {
 	std::string xml;
 
@@ -218,7 +218,7 @@ std::string Status::getStatusString()
 	return xml;
 }
 
-void Status::getInfo(uint32_t requestedInfo, OutputMessage* output)
+void Status::getInfo(uint32_t requestedInfo, OutputMessage* output) const
 {
 	// the client selects which information may be 
 	// sent back, so we'll save some bandwidth and 
@@ -275,12 +275,12 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output)
 	return;   
 }
 
-bool Status::hasSlot()
+bool Status::hasSlot() const
 {
 	return m_playersonline < m_playersmax;
 }
 
-uint64_t Status::getUptime()
+uint64_t Status::getUptime() const
 {
 	return (OTSYS_TIME() - m_start)/1000;
 }
