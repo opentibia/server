@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 
 <movements>
+	
+	<!-- Footprint -->
+	<movevent event="StepIn" itemid="6594" script="footprint.lua" />
+	<movevent event="StepIn" itemid="670" script="footprint.lua" />
 
 	<!-- Fields -->
 	<movevent event="StepIn" itemid="1487" function="onStepInField" />

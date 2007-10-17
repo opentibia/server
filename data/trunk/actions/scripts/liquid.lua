@@ -1,17 +1,15 @@
 local drunk = createConditionObject(CONDITION_DRUNK)
 setConditionParam(drunk, CONDITION_PARAM_TICKS, 60000)
 
-local poison = createConditionObject(CONDITION_POISON)
-local rand = math.random(1, 10)
-addDamageCondition(poison, rand, 6000, -5)
-addDamageCondition(poison, rand, 6000, -4)
-addDamageCondition(poison, rand, 6000, -3)
-addDamageCondition(poison, rand, 6000, -2)
-addDamageCondition(poison, rand, 6000, -1)
-
 local fire = createConditionObject(CONDITION_FIRE)
 addDamageCondition(fire, 1, 6000, -20)
 addDamageCondition(fire, 7, 6000, -10)
+
+local poison = createConditionObject(CONDITION_POISON)
+local rand = math.random(1, 10)
+for i = 1,5 do 
+	addDamageCondition(poison, rand, 6000, -i)
+end
 
 function onUse(cid, item, frompos, item2, topos)
 	if item2.itemid == 1 and item2.uid == cid then
@@ -77,5 +75,5 @@ function onUse(cid, item, frompos, item2, topos)
 			doDecayItem(splash)
 		end
 	end
-	return 1
+	return TRUE
 end

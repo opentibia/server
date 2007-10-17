@@ -10,6 +10,7 @@
 	<melee id="7408" level="25" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Wyvern Fang
 	<melee id="7449" level="25" enabled="1" unproperly="1" function="internalLoadWeapon">	--Crystal Sword
 		<vocation name="Knight"/>
+
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
 	<melee id="2392" level="30" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Fire Sword
@@ -19,6 +20,7 @@
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
+
 	<melee id="7451" level="35" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Djinn Blade
 	<melee id="7406" level="35" enabled="1" unproperly="1" function="internalLoadWeapon">	--Blacksteel Sword
 		<vocation name="Knight"/>
@@ -94,6 +96,7 @@
 	<melee id="2415" level="95" enabled="1" unproperly="1" function="internalLoadWeapon">	--Great Axe
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
+
 	</melee>
 	
 -- Clubs	
@@ -157,6 +160,7 @@
 	<wand id="2183" level="33" mana="13" enabled="1" script="tempest_rod.lua">
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
+
 	</wand>
 
 -- Wands
@@ -194,5 +198,6 @@
 	<distance id="7363" level="30" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	-- Piercing Bolt
 	<distance id="2547" level="55" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	-- Power Bolt
 	<distance id="6529" level="70" enabled="1" ammo="removecount" function="internalLoadWeapon"/>	-- Infernal Bolt
+
 
 </weapons>

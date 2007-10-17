@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="slime2" nameDescription="a slime2" race="VENOM" experience="260" speed="120" manacost="0">
+  <health now="150" max="150"/>
+  <look type="19" head="20" body="30" legs="40" feet="50" corpse="1496"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="22" attack="42" poison="90"/>
+    <attack name="poisonfield" interval="1000" chance="17" range="7" radius="1" target="1">
+      <attribute key="shootEffect" value="poison"/>
+    </attack>
+  </attacks>
+  <defenses armor="3" defense="10"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Blubb"/>
+  </voices>
+</monster>

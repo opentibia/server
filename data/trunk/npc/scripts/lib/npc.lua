@@ -36,3 +36,4 @@ function selfGotoIdle()
 		selfAttackCreature(0)
 		target = 0
 end
+

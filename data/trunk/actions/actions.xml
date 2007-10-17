@@ -9,6 +9,7 @@
 	<action uniqueid="1003" script="quest_chest.lua" />
 	
 	<!-- Tools -->
+	<action itemid="5942" script="blessed_wooden_stake.lua" />
 	<action itemid="5908" script="obsidian_knife.lua" />
 	<action itemid="2120" script="rope.lua" />
 	<action itemid="2554" script="shovel.lua" />
@@ -19,6 +20,7 @@
 	<action itemid="2553" script="pick.lua" />
 	<action itemid="2550" script="scythe.lua" />
 	<action itemid="2580" script="fishing_rod.lua" allowfaruse="1" />
+	<action itemid="5865" script="juice_squeezer.lua"/>
 	
 	<!-- Watches and Clocks -->
 	<action itemid="1728" script="watch_clock.lua" />
@@ -70,17 +72,13 @@
 	<action itemid="5553" script="liquid.lua" />
 	
 	<!-- Make Bread -->
-	<action itemid="2692" script="flour.lua" />
-	<action itemid="2694" script="wheat.lua" />
-	<action itemid="2693" script="dough.lua" />
+	<action itemid="2692" script="bread_system.lua" />
+	<action itemid="2694" script="bread_system.lua" />
+	<action itemid="2693" script="bread_system.lua" />
 
 	<!-- Make Rum -->
 	<action itemid="5467" script="rum_system.lua" />
 	<action itemid="5468" script="rum_system.lua" />
-	<action itemid="5469" script="rum_system.lua" />
-	<action itemid="5470" script="rum_system.lua" />
-	<action itemid="5513" script="rum_system.lua" />
-	<action itemid="5514" script="rum_system.lua" />
 	
 	<!-- Foods -->
 	<action itemid="2666" script="food.lua" />

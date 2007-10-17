@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="pirate ghost" nameDescription="a pirate ghost" race="UNDEAD" experience="250" speed="230" manacost="0">
+  <health now="275" max="275"/>
+  <look type="196" head="0" body="0" legs="0" feet="0" corpse="6071"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="0"/>
+    <flag pushable="1"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag staticattack="90"/>
+    <flag targetdistance="1"/>
+    <flag runonhealth="0"/>
+  </flags>
+<attacks>
+    <attack name="melee" interval="2000" min="-0" max="-95" poison="1"/>
+
+    <attack name="lifedrain" interval="1000" chance="34" radius="1" target="0" min="-30" max="-78">
+      <attribute key="areaEffect" value="redshimmer"/>
+    </attack>
+    <attack name="lifedrain" interval="1000" chance="20" range="7" radius="2" target="1" min="-1" max="-65">
+        <attribute key="areaEffect" value="rednote"/>
+    </attack>
+
+</attacks>
+  <defenses armor="20" defense="25">
+    <defense name="healing" interval="1000" chance="15" min="40" max="70">
+      <attribute key="areaEffect" value="blueshimmer"/>
+    </defense>
+  </defenses>
+  <immunities>
+    <immunity physical="1"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="1"/>
+    <immunity paralyze="1"/>
+    <immunity outfit="1"/>
+    <immunity drunk="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Yooh Ho Hooh Ho!"/>
+    <voice sentence="Hell is waiting for You!"/>
+  </voices>
+  <loot>
+    <item id="2148" countmax="45" chance1="52000" chancemax="0"/>
+    <item id="2655" chance="666"/>
+    <item id="2237" chance="6666"/>
+    <item id="2236" chance="4000"/>
+    <item id="2165" chance="666"/>
+    <item id="2383" chance="800"/>
+    <item id="1951" chance="1000"/>
+    <item id="5917" chance="916"/>
+  </loot>
+</monster>

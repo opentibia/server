@@ -1,6 +1,16 @@
 local SWITCHES = { {416, 417}, {426, 425}, {446, 447}, {3216, 3217} }
 local DEPOTS = {2589, 2590, 2591, 2592}
 
+local function doTransformTile(item)
+	for i = 1, table.getn(SWITCHES), 1 do
+		if(item.itemid == SWITCHES[i][1]) then
+			return doTransformItem(item.uid, SWITCHES[i][2])
+		elseif(item.itemid == SWITCHES[i][2]) then
+			return doTransformItem(item.uid, SWITCHES[i][1])
+		end
+	end
+end
+
 function onStepIn(cid, item, pos)
 	if(item.actionid > 0) then
 		return TRUE
@@ -34,14 +44,4 @@ end
 function onStepOut(cid, item, pos)
 	doTransformTile(item)
 	return TRUE
-end
-
-function doTransformTile(item)
-	for i = 1, table.getn(SWITCHES), 1 do
-		if(item.itemid == SWITCHES[i][1]) then
-			return doTransformItem(item.uid, SWITCHES[i][2])
-		elseif(item.itemid == SWITCHES[i][2]) then
-			return doTransformItem(item.uid, SWITCHES[i][1])
-		end
-	end
 end
