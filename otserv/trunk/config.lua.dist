@@ -123,6 +123,11 @@ maxplayers = "900"
 -- options: 0 (no), 1 (yes)
 saveclientdebug = 0
 
+-- Set the max query interval for retrieving status information
+-- default: 5 minutes / IP
+-- set to 0 to disable
+statustimeout = 5 * 60 * 1000
+
 -- md5 passwords for accounts
 -- options: yes, no
 md5passwords = "no"

@@ -98,6 +98,7 @@ public:
 		SAVE_CLIENT_DEBUG_ASSERTIONS,
 		CHECK_ACCOUNTS,
 		PASSWORD_TYPE,
+		STATUSQUERY_TIMEOUT,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

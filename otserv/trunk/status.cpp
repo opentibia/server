@@ -50,8 +50,20 @@ enum RequestedInfo_t{
 	REQUEST_MAP_INFO = 16
 };
 
+std::map<uint32_t, uint64_t> ProtocolStatus::ipConnectMap;
+
 void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 {
+	std::map<uint32_t, uint64_t>::const_iterator it = ipConnectMap.find(getIP());
+	if(it != ipConnectMap.end()){
+		if(OTSYS_TIME() < it->second + g_config.getNumber(ConfigManager::STATUSQUERY_TIMEOUT)){
+			getConnection()->closeConnection();
+			return;
+		}
+	}
+
+	ipConnectMap[getIP()] = OTSYS_TIME();
+
 	switch(msg.GetByte()){
 	//XML info protocol
 	case 0xFF:

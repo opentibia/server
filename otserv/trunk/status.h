@@ -36,6 +36,8 @@ public:
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
 protected:
+	static std::map<uint32_t, uint64_t> ipConnectMap;
+
 	#ifdef __DEBUG_NET_DETAIL__
 	virtual void deleteProtocolTask();		
 	#endif
