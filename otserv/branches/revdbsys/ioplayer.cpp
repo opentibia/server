@@ -191,7 +191,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	db->freeResult(result);
 
 	if(rankid){
-		query << "SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, `guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` FROM `guild_ranks`, `guilds` WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds.id`";
+		query << "SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, `guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` FROM `guild_ranks`, `guilds` WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds`.`id`";
 		if(result = db->storeQuery(query.str())){
 			if(result->next()){
 				player->guildName = result->getDataString("guildname");

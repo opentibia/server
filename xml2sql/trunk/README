@@ -17,7 +17,9 @@ Copyright (C) 2007 OTServ Team
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 Credits:
-	Wrzasq <wrzasq@gmail.com> - coding.
+	Wrzasq <wrzasq@gmail.com> - developer.
+
+For more info see AUTHORS file in OTServ tree.
 
 
 ----------
@@ -25,7 +27,9 @@ Credits:
 ----------
 
 
-This program reads your XML database content and generates SQL queries that represents same data. To use it you will need boost library (boost_filesystem).
+This program reads your XML database content and generates SQL queries
+that represents same data. To use it you will need boost library
+(boost_filesystem).
 
 It imports accounts, players and bans.
 
@@ -37,7 +41,9 @@ For boost library go to http://www.boost.org/.
 ----------
 
 
-By default program will try to import database from ./data/ subdirectory in current path. You can run this program on another directory by calling it:
+By default program will try to import database from ./data/ subdirectory
+in current path. You can run this program on another directory by calling
+it:
 
 $ xml2sql ./foo/
 
@@ -45,17 +51,24 @@ or by using infinitive path:
 
 $ xml2sql /home/wrzasq/otserv/data/
 
-XML2SQL uses two outputs - standard (stdout) for SQL queries and diagnostic (stderr) for operation status information. It is easy to figure out that to save SQL code in file which you will later be able to execute in database you should call XML2SQL this way:
+XML2SQL uses two outputs - standard (stdout) for SQL queries and
+diagnostic (stderr) for operation status information. It is easy to figure
+out that to save SQL code in file which you will later be able to execute
+in database you should call XML2SQL this way:
 
 $ xml2sql > database.sql
 
-This will save SQL export in database.sql file and will keep informing you about conversion process status on standard screen output.
+This will save SQL export in database.sql file and will keep informing you
+about conversion process status on standard screen output.
 
-So for example if you have your XML database in non-standard directory you should use:
+So for example if you have your XML database in non-standard directory you
+should use:
 
 $ xml2sql /path/to/your/directory/ > database.sql
 
-By default XML2SQL generate MySQL-compatible queries. If you want to generate SQLite queries, you must pass additional parameter - "sqlite". Order of parameters doesn't matter - following three calls are equal:
+By default XML2SQL generate MySQL-compatible queries. If you want to
+generate SQLite queries, you must pass additional parameter - "sqlite".
+Order of parameters doesn't matter - following three calls are equal:
 
 $ xml2sql sqlite
 $ xml2sql data sqlite
@@ -67,8 +80,11 @@ $ xml2sql sqlite data
 ----------
 
 
-- Users has always temple of first town as it is not possible to find out which city they are bound to based on it's coordinates.
+- Users has always temple of first town as it is not possible to find out
+which city they are bound to based on it's coordinates.
 
-- For guilds owner is set as a first found member and guild ranks has all the same access level - those informations are not stored in XML and it's impossible to gues them.
+- For guilds owner is set as a first found member and guild ranks has all
+the same access level - those informations are not stored in XML and it's
+impossible to gues them.
 
 - Some binary data are not yet encoded (properly, or at all).
