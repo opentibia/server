@@ -713,6 +713,17 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
+
+#ifdef __SKULLSYSTEM__
+			if(isAggressive && needTarget && player->hasSafeMode() && !tile->creatures.empty()){
+				Player* targetPlayer = tile->getTopCreature()->getPlayer();
+				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE){
+					player->sendCancelMessage(TURNSECUREMODETOATTACKUNMARKEDPLAYERS);
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+			}
+#endif
 		}
 	}
 

@@ -1137,7 +1137,9 @@ void Protocol80::parseFightModes(NetworkMessage& msg)
 {
 	uint8_t rawFightMode = msg.GetByte(); //1 - offensive, 2 - balanced, 3 - defensive
 	uint8_t rawChaseMode = msg.GetByte(); // 0 - stand while fightning, 1 - chase opponent
+	uint8_t rawSafeMode = msg.GetByte();
 
+	bool safeMode = (rawSafeMode == 1);
 	chaseMode_t chaseMode = CHASEMODE_STANDSTILL;
 
 	if(rawChaseMode == 0){
@@ -1159,7 +1161,7 @@ void Protocol80::parseFightModes(NetworkMessage& msg)
 		fightMode = FIGHTMODE_DEFENSE;
 	}
 
-	addGameTask(&Game::playerSetFightModes, player->getID(), fightMode, chaseMode);
+	addGameTask(&Game::playerSetFightModes, player->getID(), fightMode, chaseMode, safeMode);
 }
 
 void Protocol80::parseAttack(NetworkMessage& msg)

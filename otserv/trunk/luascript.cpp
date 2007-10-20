@@ -1018,7 +1018,7 @@ void LuaScriptInterface::registerFunctions()
 	//Returns uid of the created item
 	lua_register(m_luaState, "doPlayerAddItem", LuaScriptInterface::luaDoPlayerAddItem);
 	
-	//doPlayerAddItemEx(cid, uid, <optional> useCidPosOnFail)
+	//doPlayerAddItemEx(cid, uid, <optional: default: 0> useCidPosOnFail)
 	lua_register(m_luaState, "doPlayerAddItemEx", LuaScriptInterface::luaDoPlayerAddItemEx);
 
 	//doPlayerSendTextMessage(cid, MessageClasses, message)

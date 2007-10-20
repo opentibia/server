@@ -2378,6 +2378,7 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	ReturnValue ret = RET_NOERROR;
+
 	if(player->isInPz() && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
 	}
@@ -2395,6 +2396,12 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 			ret = RET_YOUMAYNOTATTACKTHISCREATURE;
 		}
 	}
+#ifdef __SKULLSYSTEM__
+	else if(player->hasSafeMode() && attackCreature->getPlayer() && 
+			attackCreature->getPlayer()->getSkull() == SKULL_NONE){
+		ret = TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
+	}
+#endif
 	else{
 		ret = Combat::canDoCombat(player, attackCreature);
 	}
@@ -2427,7 +2434,7 @@ bool Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 	return player->setFollowCreature(followCreature);
 }
 
-bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMode_t chaseMode)
+bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMode_t chaseMode, bool safeMode)
 {
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
@@ -2435,6 +2442,7 @@ bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMo
 
 	player->setFightMode(fightMode);
 	player->setChaseMode(chaseMode);
+	player->setSafeMode(safeMode);
 	return true;
 }
 

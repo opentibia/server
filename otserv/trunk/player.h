@@ -244,6 +244,8 @@ public:
 
 	void setChaseMode(chaseMode_t mode);
 	void setFightMode(fightMode_t mode);
+	void setSafeMode(bool _safeMode) {safeMode = _safeMode;}
+	bool hasSafeMode() const {return safeMode;}
 
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);
@@ -565,6 +567,7 @@ protected:
 
 	chaseMode_t chaseMode;
 	fightMode_t fightMode;
+	bool safeMode;
 
 	//account variables
 	uint32_t accountNumber;

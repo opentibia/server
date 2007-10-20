@@ -99,6 +99,7 @@ Creature()
 	attackStrength = 100;
 	defenseStrength = 0;
 	fightMode = FIGHTMODE_ATTACK;
+	safeMode = true;
 
 	tradePartner = NULL;
 	tradeState = TRADE_NONE;
@@ -995,6 +996,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 
 	case RET_YOUCANONLYUSEITONCREATURES:
 		sendCancel("You can only use it on creatures.");
+		break;
+
+	case TURNSECUREMODETOATTACKUNMARKEDPLAYERS:
+		sendCancel("Turn secure mode off if you really want to attack unmarked players.");
 		break;
 
 	case RET_NOTPOSSIBLE:
