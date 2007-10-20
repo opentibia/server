@@ -110,6 +110,7 @@ public:
 
 	static void addUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
+	void addTempItem(Item* item);
 
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
@@ -142,6 +143,7 @@ private:
 	typedef std::map<uint32_t, AreaCombat*> AreaMap;
 	typedef std::map<uint32_t, Combat*> CombatMap;
 	typedef std::map<uint32_t, Condition*> ConditionMap;
+	typedef std::list<Item*> ItemList;
 
 	//script file id
 	int32_t m_scriptId;
@@ -160,6 +162,9 @@ private:
 	//item/creature map
 	int32_t m_lastUID;
 	ThingMap m_localMap;
+
+	//temporary item list
+	ItemList m_tempItems;
 
 	//area map
 	static uint32_t m_lastAreaId;
@@ -313,6 +318,7 @@ protected:
 	static int luaDoShowTextDialog(lua_State *L);
 	static int luaDoDecayItem(lua_State *L);
 	static int luaDoCreateItem(lua_State *L);
+	static int luaDoCreateItemEx(lua_State *L);
 	static int luaDoCreateTeleport(lua_State *L);
 	static int luaDoSummonCreature(lua_State *L);
 	static int luaDoPlayerSummonCreature(lua_State *L);
@@ -326,6 +332,8 @@ protected:
 	static int luaDoPlayerAddMana(lua_State *L);
 	static int luaDoPlayerSoul(lua_State *L);
 	static int luaDoPlayerAddItem(lua_State *L);
+	static int luaDoPlayerAddItemEx(lua_State *L);
+	static int luaDoTileAddItemEx(lua_State *L);
 	static int luaDoPlayerSendTextMessage(lua_State *L);
 	static int luaDoPlayerRemoveMoney(lua_State *L);
 	static int luaDoPlayerSetMasterPos(lua_State *L);

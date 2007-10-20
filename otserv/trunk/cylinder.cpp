@@ -21,6 +21,8 @@
 
 #include "cylinder.h"
 
+VirtualCylinder* VirtualCylinder::virtualCylinder = new VirtualCylinder;
+
 int32_t Cylinder::__getIndexOfThing(const Thing* thing) const
 {
 	return -1;

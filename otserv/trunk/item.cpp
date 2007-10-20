@@ -103,17 +103,17 @@ Item::Item(const unsigned short _type, unsigned short _count /*= 0*/) :
 	ItemAttributes()
 {
 	id = _type;
-	count = 1;
 
 	const ItemType& it = items[id];
 
+	count = 1;
 	charges = it.charges;
 	fluid = 0;
 
 	if(it.isFluidContainer() || it.isSplash()){
 		fluid = _count;
 	}
-	else if(it.stackable){
+	else if(it.stackable && _count != 0){
 		count = _count;
 	}
 	else if(it.charges != 0 && _count != 0){

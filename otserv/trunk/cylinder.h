@@ -44,7 +44,7 @@ enum cylinderlink_t{
 };
 
 class Cylinder : virtual public Thing{
-public:	
+public:
 	/**
 	  * Query if the cylinder can add an object
 	  * \param index points to the destination index (inventory slot/container position)
@@ -192,5 +192,37 @@ public:
 
 	virtual void __startDecaying();
 };
+
+
+class VirtualCylinder : public Cylinder
+{
+public:
+	static VirtualCylinder* virtualCylinder;
+
+	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t flags) const {return RET_NOTPOSSIBLE;}
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount, uint32_t flags) const {return RET_NOTPOSSIBLE;}
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const {return RET_NOTPOSSIBLE;}
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+		uint32_t& flags) {return NULL;}
+
+	virtual void __addThing(Thing* thing) {}
+	virtual void __addThing(int32_t index, Thing* thing) {}
+	virtual void __updateThing(Thing* thing, uint32_t count) {}
+	virtual void __replaceThing(uint32_t index, Thing* thing) {}
+	virtual void __removeThing(Thing* thing, uint32_t count) {}
+
+	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER) {}
+	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval,
+		cylinderlink_t link = LINK_OWNER) {}
+
+	virtual bool isPushable() const {return false;}
+	virtual int getThrowRange() const {return 1;}
+	virtual std::string getDescription(int32_t lookDistance) const {return "";}
+
+	virtual bool isRemoved() const {return false;}
+};
+
 
 #endif
