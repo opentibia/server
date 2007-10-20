@@ -1789,7 +1789,7 @@ int LuaScriptInterface::luaDoRemoveItem(lua_State *L)
 	//doRemoveItem(uid, <optional> count)
 	int32_t parameters = lua_gettop(L);
 
-	uint32_t count = -1;
+	int32_t count = -1;
 	if(parameters > 1){
 		count = popNumber(L);
 	}
