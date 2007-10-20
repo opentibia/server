@@ -8,7 +8,7 @@ function onUse(cid, item, frompos, item2, topos)
 	-- Fire Bug
 	if (item.itemid == ITEM_FIRE_BUG) then	
 		if (item2.itemid == ITEM_SUGAR_CANE) then
-			if (math.random(0,10) == 1) then
+			if (math.random(0, 10) == 1) then
 				doPlayerAddHealth(cid, -5)
 				doSendMagicEffect(frompos, CONST_ME_EXPLOSIONAREA)
 				doRemoveItem(item.uid, 1)

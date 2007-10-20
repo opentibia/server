@@ -12,11 +12,6 @@ function getDistanceToCreature(id)
 	return math.max(math.abs(sx-cx), math.abs(sy-cy))	
 end
 
--- do one step to reach position
-function moveToPosition(x,y,z)
-	selfMoveTo(x, y, z)
-end
-
 -- do one step to reach creature
 function moveToCreature(id)
 	if id == 0 or id == nil then
@@ -26,7 +21,7 @@ function moveToCreature(id)
 	if tx == nil then
 		selfGotoIdle()
 	else
-	   moveToPosition(tx, ty, tz)
+	   selfMoveTo(tx, ty, tz)
    end
 end
 

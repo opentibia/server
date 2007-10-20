@@ -25,7 +25,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	if (getPlayerFood(cid) + food > MAX_FOOD) then
+	if (getPlayerFood(cid) + food >= MAX_FOOD) then
 		doPlayerSendCancel(cid, "You are full.")
 		return TRUE
 	end

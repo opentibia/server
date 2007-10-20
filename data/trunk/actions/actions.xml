@@ -70,6 +70,7 @@
 	<action itemid="3942" script="liquid.lua" />
 
 	<action itemid="5553" script="liquid.lua" />
+	<action itemid="6558" script="liquid.lua" />
 	
 	<!-- Make Bread -->
 	<action itemid="2692" script="bread_system.lua" />

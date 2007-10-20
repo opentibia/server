@@ -1,13 +1,17 @@
+-- Storages consts
 STORAGE_RUM_MACHINE = 100000
 
+-- Booleans consts
 TRUE = 1
 FALSE = 0
 
+-- Error consts
 LUA_ERROR = -1
 LUA_NO_ERROR = 0
 
 CONTAINER_POSITION = 65535
 
+-- Directions consts
 NORTH = 0
 EAST = 1
 SOUTH = 2
@@ -17,6 +21,7 @@ SOUTHEAST = 5
 NORTHWEST = 6
 NORTHEAST = 7
 
+-- World Types consts
 WORLD_TYPE_NO_PVP = 1
 WORLD_TYPE_PVP = 2
 WORLD_TYPE_PVP_ENFORCED = 3

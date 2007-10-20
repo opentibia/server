@@ -315,13 +315,13 @@
 	<monster name="Swamp Troll" file="Trolls/swamp troll.xml"/>
 	<monster name="Troll" file="Trolls/troll.xml"/>
 	
-	<!-- Undead Umanoids -->
-	<monster name="Banshee" file="Undead Umanoids/banshee.xml"/>
-	<monster name="Blightwalker" file="Undead Umanoids/blightwalker.xml"/>
-	<monster name="Crypt Shambler" file="Undead Umanoids/crypt shambler.xml"/>
-	<monster name="Ghoul" file="Undead Umanoids/ghoul.xml"/>
-	<monster name="Lich" file="Undead Umanoids/lich.xml"/>
-	<monster name="Mummy" file="Undead Umanoids/mummy.xml"/>
-	<monster name="Vampire" file="Undead Umanoids/vampire.xml"/>
+	<!-- Undead Humanoids -->
+	<monster name="Banshee" file="Undead Humanoids/banshee.xml"/>
+	<monster name="Blightwalker" file="Undead Humanoids/blightwalker.xml"/>
+	<monster name="Crypt Shambler" file="Undead Humanoids/crypt shambler.xml"/>
+	<monster name="Ghoul" file="Undead Humanoids/ghoul.xml"/>
+	<monster name="Lich" file="Undead Humanoids/lich.xml"/>
+	<monster name="Mummy" file="Undead Humanoids/mummy.xml"/>
+	<monster name="Vampire" file="Undead Humanoids/vampire.xml"/>
 
 </monsters>
