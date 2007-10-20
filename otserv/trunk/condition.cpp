@@ -1215,8 +1215,10 @@ bool ConditionDamage::unserialize(xmlNodePtr p)
 				damageInfo.interval = intValue;
 			}
 
-			setTicks(getTicks() + damageInfo.interval);
 			damageList.push_back(damageInfo);
+			if(getTicks() != -1){
+				setTicks(getTicks() + damageInfo.interval);
+			}
 		}
 
 		nodeList = nodeList->next;
@@ -1251,8 +1253,10 @@ bool ConditionDamage::unserializeProp(ConditionAttr_t attr, PropStream& propStre
 			return false;
 		}
 
-		setTicks(getTicks() + damageInfo.interval);
 		damageList.push_back(damageInfo);
+		if(getTicks() != -1){
+			setTicks(getTicks() + damageInfo.interval);
+		}
 		return true;
 	}
 
@@ -1289,7 +1293,9 @@ void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 		damageInfo.value = value;
 		
 		damageList.push_back(damageInfo);
-		ticks += time;
+		if(getTicks() != -1){
+			setTicks(getTicks() + damageInfo.interval);
+		}
 	}
 }
 
@@ -1353,7 +1359,7 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 	if(!damageList.empty()){
 		IntervalInfo& damageInfo = damageList.front();
 
-		bool bRemove = true;
+		bool bRemove = (getTicks() != -1);
 		creature->onTickCondition(getType(), bRemove);
 		damageInfo.timeLeft -= interval;
 
@@ -1385,7 +1391,11 @@ bool ConditionDamage::getNextDamage(int32_t& damage)
 		IntervalInfo& damageInfo = damageList.front();
 
 		damage = damageInfo.value;
-		damageList.pop_front();
+
+		if(getTicks() != -1){
+			damageList.pop_front();
+		}
+
 		return true;
 	}
 
