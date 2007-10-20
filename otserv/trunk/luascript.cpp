@@ -1018,7 +1018,7 @@ void LuaScriptInterface::registerFunctions()
 	//Returns uid of the created item
 	lua_register(m_luaState, "doPlayerAddItem", LuaScriptInterface::luaDoPlayerAddItem);
 	
-	//doPlayerAddItemEx(cid, uid)
+	//doPlayerAddItemEx(cid, uid, <optional> useCidPosOnFail)
 	lua_register(m_luaState, "doPlayerAddItemEx", LuaScriptInterface::luaDoPlayerAddItemEx);
 
 	//doPlayerSendTextMessage(cid, MessageClasses, message)
@@ -2151,7 +2151,14 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 {
-	//doPlayerAddItemEx(cid, uid)
+	//doPlayerAddItemEx(cid, uid, <optional: default: 0> useCidPosOnFail)
+	int32_t parameters = lua_gettop(L);
+
+	bool useCidPosOnFail = false;
+	if(parameters > 2){
+		useCidPosOnFail = popNumber(L) == 1;
+	}
+
 	uint32_t uid = (uint32_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -2176,8 +2183,15 @@ int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
+	
+	ReturnValue ret = RET_NOERROR;
+	if(useCidPosOnFail){
+		ret = g_game.internalPlayerAddItem(player, item);
+	}
+	else{
+		ret = g_game.internalAddItem(player, item);
+	}
 
-	ReturnValue ret = g_game.internalAddItem(player, item);
 	lua_pushnumber(L, ret);
 	return 1;
 }
