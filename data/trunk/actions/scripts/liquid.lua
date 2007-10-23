@@ -28,7 +28,7 @@ end
 
 function onUse(cid, item, frompos, item2, topos)
 	if (item.itemid == ITEM_CDB_FLUID) then
-		local randomFluid = (1, 4)
+		local randomFluid = math.random(1, 4)
 	
 		if (randomFluid == 1) then
 			doChangeTypeItem(item.uid, TYPE_BLOOD)

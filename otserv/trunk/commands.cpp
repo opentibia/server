@@ -385,11 +385,11 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 		pos = tmp.size();
 	}
 
-	int type = atoi(tmp.substr(0, pos).c_str());
-	int count = 100;
+	int32_t type = atoi(tmp.substr(0, pos).c_str());
+	int32_t count = 100;
 	if(pos < tmp.size()){
 		tmp.erase(0, pos+1);
-		count = std::max(1, std::min(atoi(tmp.c_str()), 100));
+		count = std::max(0, std::min(atoi(tmp.c_str()), 100));
 	}
 
 	Item* newItem = Item::CreateItem(type, count);
@@ -431,13 +431,13 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 
 	std::string itemName = param.substr(pos1, pos2 - pos1);
 
-	int count = 1;
+	int32_t count = 1;
 	if(pos2 < param.size()){
 		std::string itemCount = param.substr(pos2 + 1, param.size() - (pos2 + 1));
-		count = std::max(1, std::min(atoi(itemCount.c_str()), 100));
+		count = std::max(0, std::min(atoi(itemCount.c_str()), 100));
 	}
 
-	int itemId = Item::items.getItemIdByName(itemName);
+	int32_t itemId = Item::items.getItemIdByName(itemName);
 	if(itemId == -1){
 		player->sendTextMessage(MSG_STATUS_CONSOLE_RED, "Item could not be summoned.");
 		return false;

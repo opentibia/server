@@ -1036,7 +1036,7 @@ void LuaScriptInterface::registerFunctions()
 	//doDecayItem(uid)
 	lua_register(m_luaState, "doDecayItem", LuaScriptInterface::luaDoDecayItem);
 	
-	//doCreateItem(itemid, type/count, pos)
+	//doCreateItem(itemid, <optional> type/count, pos)
 	//Returns uid of the created item, only works on tiles.
 	lua_register(m_luaState, "doCreateItem", LuaScriptInterface::luaDoCreateItem);
 	
@@ -1088,7 +1088,7 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerAddOutfit(cid, looktype, addons)
 	lua_register(m_luaState, "doPlayerAddOutfit", LuaScriptInterface::luaDoPlayerAddOutfit);
 	
-	//doPlayerRemOutfit(cid,looktype,addons)
+	//doPlayerRemOutfit(cid, looktype, addons)
 	lua_register(m_luaState, "doPlayerRemOutfit", LuaScriptInterface::luaDoPlayerRemOutfit);
 	
 	//doSetCreatureLight(cid, lightLevel, lightColor, time)
@@ -2515,13 +2515,20 @@ int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
 
 int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 {
-	//doCreateItem(itemid, type/count, pos)
+	//doCreateItem(itemid, <optional> type/count, pos)
 	//Returns uid of the created item, only works on tiles.
+
+	uint32_t parameters = lua_gettop(L);
 
 	Position pos;
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
-	uint32_t count = popNumber(L);
+
+	uint32_t count = 0;
+	if(parameters > 2){
+		count = popNumber(L);
+	}
+
 	uint32_t itemId = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
