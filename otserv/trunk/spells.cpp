@@ -718,7 +718,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 			if(isAggressive && needTarget && player->hasSafeMode() && !tile->creatures.empty()){
 				Player* targetPlayer = tile->getTopCreature()->getPlayer();
 				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE){
-					player->sendCancelMessage(TURNSECUREMODETOATTACKUNMARKEDPLAYERS);
+					player->sendCancelMessage(RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
@@ -764,7 +764,6 @@ void Spell::postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) 
 		}
 	}
 }
-
 
 int32_t Spell::getManaCost(const Player* player) const
 {

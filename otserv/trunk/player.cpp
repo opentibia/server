@@ -998,7 +998,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You can only use it on creatures.");
 		break;
 
-	case TURNSECUREMODETOATTACKUNMARKEDPLAYERS:
+	case RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS:
 		sendCancel("Turn secure mode off if you really want to attack unmarked players.");
 		break;
 

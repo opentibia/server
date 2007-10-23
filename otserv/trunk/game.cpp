@@ -2399,7 +2399,7 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 #ifdef __SKULLSYSTEM__
 	else if(player->hasSafeMode() && attackCreature->getPlayer() && 
 			attackCreature->getPlayer()->getSkull() == SKULL_NONE){
-		ret = TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
+		ret = RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
 	}
 #endif
 	else{
