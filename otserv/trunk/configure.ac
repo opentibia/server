@@ -2,7 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([otserv], 1.10)
+AC_INIT([otserv], 0.6)
+AM_AUTOMAKE_VERSION(1.10)
 AC_CONFIG_SRCDIR([raids.h])
 AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([foreign])
@@ -26,9 +27,6 @@ AC_ARG_ENABLE(skulls, [  --enable-skulls      enable skull system], [OPTIONAL_FL
 # check if we want otserv allocator
 AC_ARG_ENABLE(otallocator, [  --enable-otallocator   enable otserv custom allocator], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__OTSERV_ALLOCATOR__"])
 
-# check if we want to use otserv.lua instead config.lua
-AC_ARG_WITH(otconfig, [  --with-otconfig      use otserv.lua configuration], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__LUA_NAME_ALTER__"])
-
 AC_SUBST(OPTIONAL_FLAGS)
 
 AM_CONDITIONAL(USE_MYSQL, false)
@@ -43,7 +41,6 @@ AC_ARG_ENABLE(mysql, [  --enable-mysql          enable MySQL support], [
 	AM_CONDITIONAL(USE_SQLITE, false)
 	MYSQL_FLAGS=-D__USE_MYSQL__
 	SQLITE_FLAGS=
-	AC_SUBST(MYSQL_FLAGS)
 ])
 
 #check if we want postgresql
@@ -52,7 +49,6 @@ AC_ARG_ENABLE(pgsql, [  --enable-pgsql          enable PostgreSQL support], [
 	AM_CONDITIONAL(USE_SQLITE, false)
 	PGSQL_FLAGS=-D__USE_PGSQL__
 	SQLITE_FLAGS=
-	AC_SUBST(PGSQL_FLAGS)
 ])
 
 #check if we want odbc
@@ -61,7 +57,6 @@ AC_ARG_ENABLE(odbc, [  --enable-odbc           enable ODBC support], [
 	AM_CONDITIONAL(USE_SQLITE, false)
 	ODBC_FLAGS=-D__USE_ODBC__
 	SQLITE_FLAGS=
-	AC_SUBST(ODBC_FLAGS)
 ])
 
 #check if we want sqlite
@@ -69,8 +64,6 @@ AC_ARG_ENABLE(sqlite, [  --enable-sqlite         enable SQLite support (default)
 	AM_CONDITIONAL(USE_SQLITE, true)
 	SQLITE_FLAGS=-D__USE_SQLITE__
 ])
-
-AC_SUBST(SQLITE_FLAGS)
 
 #check if we want the profiler
 AC_ARG_ENABLE(profiler, [  --enable-profiler       enable profiler support], [PROFILER_FLAGS=-pg])
