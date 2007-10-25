@@ -85,7 +85,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[MAP_USER] = getGlobalString(L, "map_user");
 		m_confString[MAP_PASS] = getGlobalString(L, "map_pass");
 		m_confString[MAP_DB] = getGlobalString(L, "map_db");
-
+		m_confInteger[SQL_PORT] = getGlobalNumber(L, "sql_port");
 	}
 
 	m_confString[LOGIN_MSG] = getGlobalString(L, "loginmsg", "Welcome.");

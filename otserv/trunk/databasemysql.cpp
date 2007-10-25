@@ -19,6 +19,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+
+#if defined __WINDOWS__ || defined WIN32
+#include <winsock.h>
+#endif
+
+#include "database.h"
 #include "databasemysql.h"
 #ifdef __MYSQL_ALT_INCLUDE__
 #include "errmsg.h"
@@ -29,185 +35,271 @@
 #include "configmanager.h"
 extern ConfigManager g_config;
 
+/** DatabaseMySQL definitions */
+
 DatabaseMySQL::DatabaseMySQL()
 {
-	//load connection parameters
-	m_host   = g_config.getString(ConfigManager::SQL_HOST);
-	m_user   = g_config.getString(ConfigManager::SQL_USER);
-	m_pass   = g_config.getString(ConfigManager::SQL_PASS);
-	m_dbname = g_config.getString(ConfigManager::SQL_DB);
-	
-	init();
+	m_connected = false;
+
+	// connection handle initialization
+	if(!mysql_init(&m_handle)){
+		std::cout << "Failed to initialize MySQL connection handle." << std::endl;
+		return;
+	}
+
+	// automatic reconnect
+	my_bool reconnect = true;
+	mysql_options(&m_handle, MYSQL_OPT_RECONNECT, &reconnect);
+
+	// connects to database
+	if(!mysql_real_connect(&m_handle, g_config.getString(ConfigManager::SQL_HOST).c_str(), g_config.getString(ConfigManager::SQL_USER).c_str(), g_config.getString(ConfigManager::SQL_PASS).c_str(), g_config.getString(ConfigManager::SQL_DB).c_str(), g_config.getNumber(ConfigManager::SQL_PORT), NULL, 0)){
+		std::cout << "Failed to connect to database. MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+		return;
+	}
+
+	m_connected = true;
 }
 
 DatabaseMySQL::~DatabaseMySQL()
 {
-	disconnect();
+	mysql_close(&m_handle);
 }
 
-bool DatabaseMySQL::init()
+int DatabaseMySQL::getParam(DBParam_t param)
 {
-	m_initialized = false;
-	m_connected = false;
-
-	// Initialize mysql
-	if(mysql_init(&m_handle) == NULL){
-		std::cout << "MYSQL ERROR mysql_init" << std::endl;
-	}
-	else
-		m_initialized = true;
-
-	return m_initialized;
-}
-
-bool DatabaseMySQL::connect()
-{
-	if(m_connected){
+	switch(param){
+	case DBPARAM_MULTIINSERT:
 		return true;
-	}
-	
-	if(!m_initialized && !init()){
+		break;
+	default:
 		return false;
+		break;
 	}
-	
-	// Connect to the DatabaseMySQL host
-	if(!mysql_real_connect(&m_handle, m_host.c_str(), m_user.c_str(), m_pass.c_str(), NULL, 0, NULL, 0))
-	{
-		std::cout << "MYSQL ERROR mysql_real_connect: " << mysql_error(&m_handle)  << std::endl;
-		return false;
-	}
-
-	// Select the correct DatabaseMySQL
-	if(mysql_select_db(&m_handle, m_dbname.c_str()))
-	{
-		std::cout << "MYSQL ERROR mysql_select_db"  << std::endl;
-		return false;
-	}
-
-	m_connected = true;
-	return true;
 }
 
-bool DatabaseMySQL::disconnect()
+bool DatabaseMySQL::beginTransaction()
 {
-	if(m_initialized){
-		mysql_close(&m_handle);
-		m_initialized = false;
-		return true;
-	}
-
-	return false;
+	return executeQuery("BEGIN");
 }
-
-bool DatabaseMySQL::executeQuery(DBQuery &q)
-{
-	if(!m_initialized || !m_connected)
-		return false;
-	
-	#ifdef __MYSQL_QUERY_DEBUG__
-	std::cout << q.str() << std::endl;
-	#endif
-	std::string s = q.str();
-	const char* querytext = s.c_str();
-	int querylength = s.length(); //strlen(querytext);
-	// Execute the query
-	if(mysql_real_query(&m_handle, querytext, querylength) != 0)
-	{
-		std::cout << "MYSQL ERROR mysql_real_query: " << q.str() << " " << mysql_error(&m_handle)  << std::endl;
-		int error = mysql_errno(&m_handle);
-		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
-			m_connected = false;
-		}
-		return false;
-	}
-
-	// All is ok
-	q.reset();
-	return true;
-}
-
-bool DatabaseMySQL::storeQuery(DBQuery &q, DBResult &dbres)
-{
-	MYSQL_ROW row;
-	MYSQL_FIELD *fields;
-	MYSQL_RES *r;
-	unsigned int num_fields;
-
-	// Execute the query
-	if(!this->executeQuery(q))
-		return false;
-
-	// Getting results from the query
-	r = mysql_store_result(&m_handle);
-	if(!r)
-	{
-		std::cout << "MYSQL ERROR mysql_store_result: " << q.getText() << " " << mysql_error(&m_handle)  << std::endl;
-		int error = mysql_errno(&m_handle);
-		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
-			m_connected = false;
-		}
-		return false;
-	}
-
-	// Getting the rows of the result
-	num_fields = mysql_num_fields(r);
-
-	dbres.clear();
-	// Getting the field names
-	//dbres.clearFieldNames();
-	fields = mysql_fetch_fields(r);
-	for(uint32_t i=0; i < num_fields; ++i)
-	{
-		dbres.setFieldName(std::string(fields[i].name), i);
-	}
-
-	// Adding the rows to a list
-	//dbres.clearRows();
-	while((row = mysql_fetch_row(r)))
-	{
-		//get column sizes
-		unsigned long* lengths = mysql_fetch_lengths(r);
-		dbres.addRow(row, lengths, num_fields);
-	}
-
-	// Free query result
-	mysql_free_result(r);
-	r = NULL;
-
-	// Check if there are rows in the query
-	if(dbres.getNumRows() > 0)
-		return true;
-	else
-		return false;
-}
-
 
 bool DatabaseMySQL::rollback()
 {
-	if(!m_initialized || !m_connected)
+	if(!m_connected)
 		return false;
-	
-	#ifdef __MYSQL_QUERY_DEBUG__
-	std::cout << "ROLLBACK;" << std::endl;
+
+	#ifdef __SQL_QUERY_DEBUG__
+	std::cout << "ROLLBACK" << std::endl;
 	#endif
-	if(mysql_rollback(&m_handle) != 0){
-		std::cout << "MYSQL ERROR mysql_rollback: " << mysql_error(&m_handle)  << std::endl;
+
+	if( mysql_rollback(&m_handle) != 0){
+		std::cout << "mysql_rollback(): MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		return false;
 	}
+
 	return true;
 }
 
 bool DatabaseMySQL::commit()
 {
-	if(!m_initialized || !m_connected)
+	if(!m_connected)
 		return false;
-	
-	#ifdef __MYSQL_QUERY_DEBUG__
-	std::cout << "COMMIT;" << std::endl;
+
+	#ifdef __SQL_QUERY_DEBUG__
+	std::cout << "COMMIT" << std::endl;
 	#endif
-	if(mysql_commit(&m_handle) != 0){
-		std::cout << "MYSQL ERROR mysql_commit: " << mysql_error(&m_handle)  << std::endl;
-		return false;
-	}
+	if( mysql_commit(&m_handle) != 0){
+		std::cout << "mysql_commit(): MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+	return false;
+}
+
 	return true;
+}
+
+bool DatabaseMySQL::executeQuery(const std::string &query)
+{
+	if(!m_connected)
+		return false;
+
+	//#ifdef __SQL_QUERY_DEBUG__
+	std::cout << "MYSQL QUERY: " << query << std::endl;
+	//#endif
+
+	bool state = true;
+
+	// executes the query
+	if(mysql_real_query(&m_handle, query.c_str(), query.length()) != 0){
+		std::cout << "mysql_real_query(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+		int error = mysql_errno(&m_handle);
+
+		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
+			m_connected = false;
+		}
+
+		state = false;
+	}
+
+	// we should call that every time as someone would call executeQuery('SELECT...')
+	// as it is described in MySQL manual: "it doesn't hurt" :P
+	MYSQL_RES* m_res = mysql_store_result(&m_handle);
+
+	if(m_res)
+		mysql_free_result(m_res);
+
+	return state;
+}
+
+DBResult* DatabaseMySQL::storeQuery(const std::string &query)
+{
+	if(!m_connected)
+		return NULL;
+
+	//#ifdef __SQL_QUERY_DEBUG__
+	std::cout << "MYSQL QUERY: " << query << std::endl;
+	//#endif
+
+	// executes the query
+	if(mysql_real_query(&m_handle, query.c_str(), query.length()) != 0){
+		std::cout << "mysql_real_query(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+		int error = mysql_errno(&m_handle);
+
+		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
+			m_connected = false;
+		}
+
+	}
+
+	// we should call that every time as someone would call executeQuery('SELECT...')
+	// as it is described in MySQL manual: "it doesn't hurt" :P
+	MYSQL_RES* m_res = mysql_store_result(&m_handle);
+
+	// error occured
+	if(!m_res){
+		std::cout << "mysql_store_result(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+		int error = mysql_errno(&m_handle);
+
+		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
+			m_connected = false;
+		}
+
+		return NULL;
+	}
+
+	// retriving results of query
+	DBResult* res = new MySQLResult(m_res);
+	return verifyResult(res);
+}
+
+std::string DatabaseMySQL::escapeString(const std::string &s)
+{
+	return escapeBlob( s.c_str(), s.length() );
+}
+
+std::string DatabaseMySQL::escapeBlob(const char* s, uint32_t length)
+{
+	// remember about quoiting even an empty string!
+	if(!s)
+		return std::string("''");
+
+	// the worst case is 2n + 1
+	char* output = new char[length * 2 + 1];
+
+	// quotes escaped string and frees temporary buffer
+	mysql_real_escape_string(&m_handle, output, s, length);
+	std::string r = "'";
+	r += output;
+	r += "'";
+	delete[] output;
+	return r;
+}
+
+void DatabaseMySQL::freeResult(DBResult* res)
+{
+	delete (MySQLResult*)res;
+}
+
+/** MySQLResult definitions */
+
+int32_t MySQLResult::getDataInt(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() ){
+		if(m_row[it->second] == NULL)
+			return 0;
+	else
+			return atoi(m_row[it->second]);
+}
+
+	std::cout << "Error during getDataInt(" << s << ")." << std::endl;
+	return 0; // Failed
+}
+
+int64_t MySQLResult::getDataLong(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() ){
+		if(m_row[it->second] == NULL)
+			return 0;
+		else
+			return ATOI64(m_row[it->second]);
+	}
+
+	std::cout << "Error during getDataLong(" << s << ")." << std::endl;
+	return 0; // Failed
+}
+
+std::string MySQLResult::getDataString(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() ){
+		if(m_row[it->second] == NULL)
+			return std::string("");
+		else
+			return std::string(m_row[it->second]);
+	}
+
+	std::cout << "Error during getDataString(" << s << ")." << std::endl;
+	return std::string(""); // Failed
+}
+
+const char* MySQLResult::getDataStream(const std::string &s, unsigned long &size)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() ){
+		if(m_row[it->second] == NULL){
+			size = 0;
+			return NULL;
+		}
+		else{
+			size = mysql_fetch_lengths(m_handle)[it->second];
+			return m_row[it->second];
+		}
+	}
+
+	std::cout << "Error during getDataStream(" << s << ")." << std::endl;
+	size = 0;
+	return NULL;
+}
+
+bool MySQLResult::next()
+{
+	m_row = mysql_fetch_row(m_handle);
+	return m_row != NULL;
+}
+
+MySQLResult::MySQLResult(MYSQL_RES* res)
+{
+	m_handle = res;
+	m_listNames.clear();
+
+	MYSQL_FIELD* field;
+	int32_t i = 0;
+	while( field = mysql_fetch_field(m_handle) ){
+		m_listNames[field->name] = i;
+		i++;
+	}
+}
+
+MySQLResult::~MySQLResult()
+{
+	mysql_free_result(m_handle);
 }

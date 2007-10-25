@@ -104,7 +104,7 @@ public:
 	IOMapOTBM(){};
 	~IOMapOTBM(){};
 
-	virtual char* getSourceDescription(){ return "OTBM";};
+	virtual const char* getSourceDescription(){ return "OTBM";};
 	virtual bool loadMap(Map* map, const std::string& identifier);
 	virtual bool loadSpawns(Map* map);
 	virtual bool loadHouses(Map* map);

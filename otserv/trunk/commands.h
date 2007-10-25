@@ -93,7 +93,7 @@ struct Command{
 };
 
 struct s_defcommands{
-	char *name;
+	const char *name;
 	CommandFunc f;
 };
 

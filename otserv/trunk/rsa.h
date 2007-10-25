@@ -30,7 +30,7 @@ class RSA{
 public:
 	RSA();
 	~RSA();
-	void setKey(char* p, char* q, char* d);
+	void setKey(const char* p, const char* q, const char* d);
 	bool setKey(const std::string& file);
 	bool decrypt(char* msg, int32_t size);
 	

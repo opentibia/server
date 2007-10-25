@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,19 +29,16 @@
 
 /** Baseclass for all Player-Loaders */
 class IOAccount {
-  public:
-	static IOAccount* instance();
-	/** Get a textual description of what source is used
-	  * \returns Name of the source*/
-	virtual char* getSourceDescription(){return "Account source: NULL";};
-	virtual Account loadAccount(uint32_t accno);
-	
-	virtual bool getPassword(uint32_t accno, const std::string& name, std::string& password);
+public:
+	IOAccount() {}
+	~IOAccount() {}
+	static IOAccount* instance(){
+		static IOAccount instance;
+		return &instance;
+	}
 
-  protected:
-	IOAccount(){};
-	virtual ~IOAccount(){};
-	static IOAccount* _instance;
+	Account loadAccount(uint32_t accno);
+	bool getPassword(uint32_t accno, const std::string& name, std::string& password);
 };
 
 #endif

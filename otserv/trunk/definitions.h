@@ -42,15 +42,31 @@
 #endif
 
 #ifdef __USE_SQLITE__
-	#define __SPLIT_QUERIES__
+#define SINGLE_SQL_DRIVER
 #endif
 
-#if defined __USE_MYSQL__ || __USE_SQLITE__
-	#define USE_SQL_ENGINE
+#ifdef __USE_MYSQL__
+#ifdef SINGLE_SQL_DRIVER
+#define MULTI_SQL_DRIVERS
+#else
+#define SINGLE_SQL_DRIVER
+#endif
 #endif
 
-#if defined(__USE_MYSQL__) && !defined(__USE_SQLITE__)
-	#define USE_MYSQL_ONLY
+#ifdef __USE_ODBC__
+#ifdef SINGLE_SQL_DRIVER
+#define MULTI_SQL_DRIVERS
+#else
+#define SINGLE_SQL_DRIVER
+#endif
+#endif
+
+#ifdef __USE_PGSQL__
+#ifdef SINGLE_SQL_DRIVER
+#define MULTI_SQL_DRIVERS
+#else
+#define SINGLE_SQL_DRIVER
+#endif
 #endif
 
 enum passwordType_t{

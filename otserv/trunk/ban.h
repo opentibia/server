@@ -89,8 +89,8 @@ public:
 	bool removePlayerBan(uint32_t n);
 	bool removeAccountBan(uint32_t n);
 
-	bool loadBans(const std::string& identifier);
-	bool saveBans(const std::string& identifier);
+	bool loadBans();
+	bool saveBans();
 
 	const IpBanList& getIpBans();
 	const PlayerBanList& getPlayerBans();
@@ -110,49 +110,24 @@ protected:
 
 	OTSYS_THREAD_LOCKVAR banLock;
 
-	friend class IOBanSQL;
-	friend class IOBanXML;
+	friend class IOBan;
 };
 
 class IOBan{
 public:
-	static IOBan* getInstance();
+	static IOBan* getInstance()
+	{
+		static IOBan instance;
+		return &instance;
+	}
 
-	virtual bool loadBans(const std::string& identifier, Ban& banclass) = 0;
-	virtual bool saveBans(const std::string& identifier, const Ban& banclass) = 0;
+	virtual bool loadBans(Ban& banclass);
+	virtual bool saveBans(const Ban& banclass);
 
 protected:
-	IOBan(){};
+	IOBan(){}
 	virtual ~IOBan(){};
-	static IOBan* _instance;
+
 };
-
-#if defined USE_SQL_ENGINE
-class IOBanSQL : public IOBan{
-public:
-	IOBanSQL();
-	virtual ~IOBanSQL(){};
-
-	virtual bool loadBans(const std::string& identifier,Ban& banclass);
-	virtual bool saveBans(const std::string& identifier, const Ban& banclass);
-
-protected:
-	std::string m_host;
-	std::string m_user;
-	std::string m_pass;
-	std::string m_db;
-};
-
-#else
-
-class IOBanXML : public IOBan {
-public:
-	IOBanXML();
-	virtual ~IOBanXML(){};
-
-	virtual bool loadBans(const std::string& identifier,Ban& banclass);
-	virtual bool saveBans(const std::string& identifier, const Ban& banclass);
-};
-#endif
 
 #endif

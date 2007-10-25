@@ -1,3 +1,10 @@
+CREATE TABLE "accounts" (
+    "id" INTEGER PRIMARY KEY NOT NULL,
+    "password" VARCHAR(255) NOT NULL,
+    "email" VARCHAR(255) NOT NULL DEFAULT '',
+    "blocked" BOOLEAN NOT NULL DEFAULT 0
+);
+
 CREATE TABLE "groups" (
     "id" INTEGER PRIMARY KEY,
     "name" VARCHAR(255) NOT NULL,
@@ -5,15 +12,6 @@ CREATE TABLE "groups" (
     "access" INTEGER NOT NULL,
     "maxdepotitems" INTEGER NOT NULL,
     "maxviplist" INTEGER NOT NULL
-);
-
-CREATE TABLE "accounts" (
-    "id" INTEGER PRIMARY KEY NOT NULL,
-    "password" VARCHAR(255) NOT NULL,
-    "group_id" INTEGER NOT NULL,
-    "email" VARCHAR(255) NOT NULL DEFAULT '',
-    "blocked" BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
 );
 
 CREATE TABLE "players" (
@@ -46,16 +44,17 @@ CREATE TABLE "players" (
     "cap" INTEGER NOT NULL DEFAULT 0,
     "lastlogin" INTEGER NOT NULL DEFAULT 0,
     "lastip" INTEGER NOT NULL DEFAULT 0,
-    "save" BOOLEAN NOT NULL DEFAULT TRUE,
+    "save" BOOLEAN NOT NULL DEFAULT 1,
     "conditions" BLOB NOT NULL,
     "redskulltime" INTEGER NOT NULL DEFAULT 0,
-    "redskull" BOOLEAN NOT NULL DEFAULT FALSE,
+    "redskull" BOOLEAN NOT NULL DEFAULT 0,
     "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
-    "rank_id" INTEGER NOT NULL,
-    "town_id" INTEGER NOT NULL,
     "loss_experience" INTEGER NOT NULL DEFAULT 10,
     "loss_mana" INTEGER NOT NULL DEFAULT 10,
     "loss_skills" INTEGER NOT NULL DEFAULT 10,
+    "rank_id" INTEGER NOT NULL,
+    "town_id" INTEGER NOT NULL,
+    UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
 );
@@ -250,32 +249,12 @@ BEGIN
         OR (SELECT "id" FROM "groups" WHERE "id" = NEW."group_id") IS NULL;
 END;
 
-CREATE TRIGGER "oninsert_accounts"
-BEFORE INSERT
-ON "accounts"
-FOR EACH ROW
-BEGIN
-    SELECT RAISE(ROLLBACK, 'INSERT on table "accounts" violates foreign: "group_id"')
-    WHERE NEW."group_id" IS NULL
-        OR (SELECT "id" FROM "groups" WHERE "id" = NEW."group_id") IS NULL;
-END;
-
-CREATE TRIGGER "onupdate_accounts"
-BEFORE UPDATE
-ON "accounts"
-FOR EACH ROW
-BEGIN
-    SELECT RAISE(ROLLBACK, 'UPDATE on table "accounts" violates foreign: "group_id"')
-    WHERE NEW."group_id" IS NULL
-        OR (SELECT "id" FROM "groups" WHERE "id" = NEW."group_id") IS NULL;
-END;
-
 CREATE TRIGGER "ondelete_groups"
 BEFORE DELETE
 ON "groups"
 FOR EACH ROW
 BEGIN
-    SELECT RAISE(ROLLBACK, 'DELETE on table "guilds" violates foreign: "group_id" from table "players"')
+    SELECT RAISE(ROLLBACK, 'DELETE on table "groups" violates foreign: "group_id" from table "players"')
     WHERE (SELECT "id" FROM "players" WHERE "group_id" = OLD."id") IS NOT NULL;
 END;
 
@@ -477,4 +456,16 @@ BEGIN
     SELECT RAISE(ROLLBACK, 'UPDATE on table "player_spells" violates foreign: "player_id"')
     WHERE NEW."player_id" IS NULL
         OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_players_after"
+AFTER UPDATE
+ON "players"
+FOR EACH ROW
+BEGIN
+    DELETE FROM "player_spells" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
+    DELETE FROM "player_items" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
+    DELETE FROM "player_depotitems" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
+    DELETE FROM "player_storage" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
+    DELETE FROM "player_viplist" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
 END;

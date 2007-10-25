@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -50,11 +50,11 @@ enum RequestedInfo_t{
 	REQUEST_MAP_INFO = 16
 };
 
-std::map<uint32_t, uint64_t> ProtocolStatus::ipConnectMap;
+std::map<uint32_t, int64_t> ProtocolStatus::ipConnectMap;
 
 void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 {
-	std::map<uint32_t, uint64_t>::const_iterator it = ipConnectMap.find(getIP());
+	std::map<uint32_t, int64_t>::const_iterator it = ipConnectMap.find(getIP());
 	if(it != ipConnectMap.end()){
 		if(OTSYS_TIME() < it->second + g_config.getNumber(ConfigManager::STATUSQUERY_TIMEOUT)){
 			getConnection()->closeConnection();
@@ -80,7 +80,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	}
 	//Another ServerInfo protocol
 	case 0x01:
-	{	
+	{
 		uint32_t requestedInfo = 0;
 		if(msg.GetByte() == 1){
 			requestedInfo |= REQUEST_BASIC_SERVER_INFO;
@@ -97,7 +97,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 		if(msg.GetByte() == 1){
 			requestedInfo |= REQUEST_MAP_INFO;
 		}
-		
+
 		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		Status* status = Status::instance();
 		status->getInfo(requestedInfo, output);
@@ -150,21 +150,21 @@ std::string Status::getStatusString() const
 	doc = xmlNewDoc((const xmlChar*)"1.0");
 	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"tsqp", NULL);
 	root=doc->children;
-	
+
 	xmlSetProp(root, (const xmlChar*) "version", (const xmlChar*)"1.0");
-	
-	
+
+
 	p = xmlNewNode(NULL,(const xmlChar*)"serverinfo");
 	ss << getUptime();
 	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getString(ConfigManager::IP).c_str());
 	xmlSetProp(p, (const xmlChar*) "servername", (const xmlChar*)g_config.getString(ConfigManager::SERVER_NAME).c_str());
-	
+
 	ss << g_config.getNumber(ConfigManager::PORT);
 	xmlSetProp(p, (const xmlChar*) "port", (const xmlChar*)ss.str().c_str());
 	ss.str("");
-	
+
 	xmlSetProp(p, (const xmlChar*) "location", (const xmlChar*)g_config.getString(ConfigManager::LOCATION).c_str());
 	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getString(ConfigManager::URL).c_str());
 	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)STATUS_SERVER_NAME);
@@ -188,7 +188,7 @@ std::string Status::getStatusString() const
 	xmlSetProp(p, (const xmlChar*) "peak", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlAddChild(root, p);
-	
+
 	/*
 	p = xmlNewNode(NULL,(const xmlChar*)"monsters");
 	ss << g_game.getMonstersOnline();
@@ -216,7 +216,7 @@ std::string Status::getStatusString() const
 	xmlChar* s = NULL;
 	int len = 0;
 	xmlDocDumpMemory(doc, (xmlChar**)&s, &len);
-	
+
 	if(s){
 		xml = std::string((char*)s, len);
 	}
@@ -232,25 +232,25 @@ std::string Status::getStatusString() const
 
 void Status::getInfo(uint32_t requestedInfo, OutputMessage* output) const
 {
-	// the client selects which information may be 
-	// sent back, so we'll save some bandwidth and 
+	// the client selects which information may be
+	// sent back, so we'll save some bandwidth and
 	// make many
 	std::stringstream ss;
 	uint64_t running = getUptime();
-	// since we haven't all the things on the right place like map's 
+	// since we haven't all the things on the right place like map's
 	// creator/info and other things, i'll put the info chunked into
 	// operators, so the httpd server will only receive the existing
 	// properties of the server, such serverinfo, playersinfo and so
-  
+
 	if(requestedInfo & REQUEST_BASIC_SERVER_INFO){
 		output->AddByte(0x10); // server info
 		output->AddString(g_config.getString(ConfigManager::SERVER_NAME).c_str());
-		output->AddString(g_config.getString(ConfigManager::IP).c_str());  
+		output->AddString(g_config.getString(ConfigManager::IP).c_str());
 		ss << g_config.getNumber(ConfigManager::PORT);
 		output->AddString(ss.str().c_str());
-		ss.str(""); 
+		ss.str("");
 	}
-  
+
 	if(requestedInfo & REQUEST_OWNER_SERVER_INFO){
 		output->AddByte(0x11); // server info - owner info
 		output->AddString(g_config.getString(ConfigManager::OWNER_NAME).c_str());
@@ -284,7 +284,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output) const
 		output->AddU16(mapHeight);
 	}
 
-	return;   
+	return;
 }
 
 bool Status::hasSlot() const

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,19 +27,19 @@
 
 #include "protocol.h"
 
-class ProtocolStatus : public Protocol 
+class ProtocolStatus : public Protocol
 {
 public:
 	ProtocolStatus(Connection* connection) : Protocol(connection) {}
 	virtual ~ProtocolStatus() {}
 
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
-	
+
 protected:
-	static std::map<uint32_t, uint64_t> ipConnectMap;
+	static std::map<uint32_t, int64_t> ipConnectMap;
 
 	#ifdef __DEBUG_NET_DETAIL__
-	virtual void deleteProtocolTask();		
+	virtual void deleteProtocolTask();
 	#endif
 };
 
@@ -51,11 +51,11 @@ public:
 		static Status status;
 		return &status;
 	}
-	
+
 	void addPlayer();
 	void removePlayer();
 	bool hasSlot() const;
-	
+
 	std::string getStatusString() const;
 	void getInfo(uint32_t requestedInfo, OutputMessage* output) const;
 
@@ -63,7 +63,7 @@ public:
 	int getMaxPlayersOnline() const {return m_playersmax;}
 
 	void setMaxPlayersOnline(int max){m_playersmax = max;}
-	
+
 	uint64_t getUptime() const;
 
 protected:

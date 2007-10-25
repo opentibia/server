@@ -64,19 +64,29 @@ How do I use this new stuff?
 
 	The word "actions" might be unfamiliar to you. What it is an action?
 	For instance when you click on a door it will open, or drinking mana-fluids.
-	There is other cool stuff such as SQL-support, This is useful if you have a big community of
-	players for your server. You can use the other option which is xml-based which is good for beginners.
+	There is other cool stuff such as SQL-support.
 	Binary map, well this seems quite new doesn't it. For a long time maps have been in xml format
 	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
 	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
 
+How do I compile OTServ?
+	OTServ stores accounts, players and some other tabelar info within relational database. It is very reliable
+	way which also provides huge possibilities of easy data management and manipulation. By default SQLite is
+	selected as database engine. It doesn't require any configuration from you, OTServ is configured for it by default and all what you need is to provide SQLite library for it.
+
+		Instructions to compile OTServ:
+			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
+			2. Compile your OTServ against SQLite:
+				a) On Windows use -lsqlite3
+				b) On POSIX systems use ./configure && make
+
 MySQL Server
-	SQL has been introduced to otserv, in previous releases, players, accounts, items and others were and
-	still are in XML, but now people have the choice to have thier players and accounts and items in an SQL
-	Server database. Having an SQL database is good for people that like to easily edit players, accounts or whatever
-	in the aspect. For example you can set all players have capacity of 1000 in ONE instruction ;). It has
-	many advantages.
-	
+	By default OTServ uses SQLite database which doesn't require any configuration from you. However it is
+	possible to use MySQL database instead of SQLite - MySQL is more powerful database system which is
+	faster, more reliable and gives more possibilities. However MySQL is uses client-server structure which
+	means you will need MySQL server for it.
+
+
 		Instructions to setup a server:
 			1. Download XAMPP (not XAMPP Lite) (http://www.apachefriends.org/download.php?xampp-win32-1.5.3a-installer.exe)
 			2. Install
@@ -92,17 +102,54 @@ MySQL Server
 			12. Now go to your folder and open config.lua and make sure the SQL Stuff there is correct such as the mysql user and password ;).
 				Should be all correct for you anyway ;).
 			13. Start the server and login.
-				
 
-SQLite compilation
-	As an alternative for MySQL, there is SQLite database available. SQLite is an embedable library that works
-	directly on file and doesn't require any server application. It means that you can use SQL advantages without installing anything, just compiling OTServ proper way.
+		Instructions to compile OTServ with MySQL:
+			1. Download MySQL client libraries libraries from http://dev.mysql.com/ (or just install them from packages in your Linux distro).
+			2. Compile your OTServ against MySQL:
+				a) On Windows use -D__USE_MYSQL__ -lmysqlclient
+				b) On POSIX systems use ./configure --enable-mysql
 
-		Instructions to compile OTServ:
+PostgreSQL Server
+	PostgreSQL is, after MySQL, probably most popular open-source database system. It provides huge possibilities and
+	better performance.
+
+		Instructions to compile OTServ with PostgreSQL driver:
+				a) On Windows use -D__USE_PGSQL__ -lpg
+				b) On POSIX systems use ./configure --enable-pgsql
+
+ODBC data sources
+	OTServ contains also ODBC database driver. It allows to connect throught unified ODBC connection mechanism
+	to any ODBC data source. It was first developed under Windows, but there are currently ODBC implementations
+	on various platforms (search for UnixODBC).
+
+	Note: under non-Windows OSes you will need to download UnixODBC. You most likely have it in your Linux
+	ditro repositories as unixodbc and unixodbc-dev packages.
+
+		Instructions to compile OTServ with ODBC driver:
+				a) On Windows use -D__USE_ODBC__ -lodbc
+				b) On POSIX systems use ./configure --enable-odbc
+
+SQLite with other drivers
+	By default any alternative driver like MySQL disables SQLite support. However sometimes you might want
+	to compile more then one driver into your server (then you choose which one you want to use in your
+	config.lua file).
+
+		Instructions to compile OTServ with SQLite and other drivers:
 			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
 			2. Compile your OTServ against SQLite:
-				a) On Windows use -D__USE_SQLITE__ -lsqlite3
-				b) On POSIX systems use ./configure --enable-sqlite
+				a) On Windows use -D__USE_SQLITE__ -lsqlite3 -D__USE_MYSQL__ -lmysqlclient
+				b) On POSIX systems use ./configure --enable-mysql --enable-sqlite
+
+What about old XML files?
+	If you have your old database in XML format and want to switch to SQL database, there is XML2SQL project in our SVN tree.
+
+Different LUA configuration file
+	Default configuration file for OTServ is config.lua. In some cases you might need to use another name for 
+	it as config.lua might be ambiguous. OTServ can use otserv.lua file instead of config.lua file.
+
+		Instructions to compile OTServ to use otserv.lua config file:
+			a) On Windows use -D__LUA_NAME_ALTER__
+			b) On POSIX systems use ./configure --with-otconfig
 
 KDE KDevelop compilation
 	A graphical environment to program and compile otserv without any knowledge about the linux shell, it by 
@@ -114,21 +161,15 @@ KDE KDevelop compilation
 				--enable-debug=full
 				If you don't like or want it, you can delete it.
 		3. After (or replacing) --enable-debug=full you will write:
-			3.1 for MySQL:
+			a) for MySQL:
 				--enable-mysql
-			3.2 for SQLite:
-				--enable-sqlite
+			b) for ODBC:
+				--enable-odbc
 		4. Extra
 			4.1 Different LUA configuration file
 				--with-otconfig
 
 If you find any problem using kdevelop file, please go to http://otserv.org/index.php?title=Compiling_with_KDevelop
-
-Different LUA configuration file
-	Default configuration file for OTServ is config.lua. In some cases you might need to use another name for 
-	it as config.lua might be ambiguous. In order to make your OTServ using otserv.lua file instead of config.lua 
-	compile it with:
-		-D__LUA_NAME_ALTER__
 
 Problems?
 	The server is now stable nowadays, but if you do find bugs you can report them at the 
@@ -144,13 +185,14 @@ Credits?
 	Spin - Developer
 	Anstice - Developer
 	Pedro B. - Developer
+	Wrzasq - Developer
 	GriZzm0 - Scripting
 	Heliton - Scripting
 	Jiddo - Scripting
 	the fike - Developer (advisory/optimization)
 	Vitor - Developer (advisory/optimization)
-	Wrzasq - Database design
 	Arkold Thos - Developer?, Linux porter
+	bruno - ODBC driver
 
 	Yorick - Fansite , Forum administrator
 	Pekay - README Documentation, Forum administrator

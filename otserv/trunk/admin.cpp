@@ -364,7 +364,7 @@ void ProtocolAdmin::adminCommandCloseServer()
 	
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	
-	if(!g_bans.saveBans(g_config.getString(ConfigManager::BAN_FILE))){
+	if(!g_bans.saveBans()){
 		addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Bans");
 		
 		output->AddByte(AP_MSG_COMMAND_FAILED);

@@ -1976,7 +1976,7 @@ void Player::removeList()
 	{
 		(*it).second->notifyLogOut(this);
 	}
-	
+
 	Status::instance()->removePlayer();
 }
 
@@ -1988,7 +1988,7 @@ void Player::addList()
 	}
 
 	listPlayer.addList(this);
-	
+
 	Status::instance()->addPlayer();
 }
 

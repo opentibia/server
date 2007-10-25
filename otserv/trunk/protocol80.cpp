@@ -225,7 +225,7 @@ void Protocol80::deleteProtocolTask()
 		#endif
 
 		player->client = NULL;
-		
+
 		g_game.FreeThing(player);
 		player = NULL;
 	}
@@ -296,8 +296,8 @@ bool Protocol80::login(const std::string& name)
 		}
 
 		player->lastip = player->getIP();
-		player->lastLoginSaved = time(NULL);
-		
+		player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
+
 		return true;
 	}
 	else{
@@ -313,8 +313,8 @@ bool Protocol80::login(const std::string& name)
 			player->client->sendAddCreature(player, false);
 			player->sendIcons();
 			player->lastip = player->getIP();
-			player->lastLoginSaved = time(NULL);
-			
+			player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
+
 			return true;
 		}
 	}

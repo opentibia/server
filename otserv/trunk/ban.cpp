@@ -27,13 +27,9 @@
 #include <sstream>
 #include "tools.h"
 
-#if defined USE_SQL_ENGINE
 #include "database.h"
-#endif
 
 extern ConfigManager g_config;
-
-IOBan* IOBan::_instance = NULL;
 
 Ban::Ban()
 {
@@ -54,6 +50,7 @@ bool Ban::isIpBanished(uint32_t clientip)
 		for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
 			if((it->ip & it->mask) == (clientip & it->mask)){
 				uint32_t currentTime = std::time(NULL);
+
 				if(it->time == 0 || currentTime < it->time){
 					return true;
 				}
@@ -67,9 +64,8 @@ bool Ban::isIpBanished(uint32_t clientip)
 bool Ban::isIpDisabled(uint32_t clientip)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	if(maxLoginTries == 0){
+	if(maxLoginTries == 0)
 		return false;
-	}
 
 	if(clientip != 0){
 		uint32_t currentTime = std::time(NULL);
@@ -89,9 +85,8 @@ bool Ban::acceptConnection(uint32_t clientip)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 
-	if(clientip == 0){
+	if(clientip == 0)
 		return false;
-	}
 
 	uint64_t currentTime = OTSYS_TIME();
 
@@ -132,11 +127,12 @@ void Ban::addLoginAttempt(uint32_t clientip, bool isSuccess)
 			it->second.numberOfLogins = 0;
 		}
 
-		if(!isSuccess || (currentTime < it->second.lastLoginTime + retryTimeout) ){
+		if(!isSuccess || (currentTime < it->second.lastLoginTime + retryTimeout)){
 			++it->second.numberOfLogins;
 		}
-		else
+		else{
 			it->second.numberOfLogins = 0;
+		}
 
 		it->second.lastLoginTime = currentTime;
 	}
@@ -147,9 +143,9 @@ bool Ban::isPlayerBanished(const std::string& name)
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	uint32_t playerId;
 	std::string playerName = name;
-	if(!IOPlayer::instance()->getGuidByName(playerId, playerName)){
+	if(!IOPlayer::instance()->getGuidByName(playerId, playerName))
 		return false;
-	}
+
 	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it){
    		if(it->id  == playerId){
 			uint32_t currentTime = std::time(NULL);
@@ -170,8 +166,9 @@ bool Ban::isAccountBanished(uint32_t account)
 			if(it->time == 0 || currentTime < it->time){
 				return true;
 			}
-		}
+   		}
 	}
+
 	return false;
 }
 
@@ -184,6 +181,7 @@ void Ban::addIpBan(uint32_t ip, uint32_t mask, uint32_t time)
 			return;
 		}
 	}
+
 	IpBanStruct ipBanStruct(ip, mask, time);
 	ipBanList.push_back(ipBanStruct);
 }
@@ -197,6 +195,7 @@ void Ban::addPlayerBan(uint32_t playerId, uint32_t time)
 			return;
 		}
 	}
+
 	PlayerBanStruct playerBanStruct(playerId, time);
 	playerBanList.push_back(playerBanStruct);
 }
@@ -210,6 +209,7 @@ void Ban::addAccountBan(uint32_t account, uint32_t time)
 			return;
 		}
 	}
+
 	AccountBanStruct accountBanStruct(account, time);
 	accountBanList.push_back(accountBanStruct);
 }
@@ -269,327 +269,135 @@ const AccountBanList& Ban::getAccountBans()
 }
 
 
-bool Ban::loadBans(const std::string& identifier)
+bool Ban::loadBans()
 {
-	return IOBan::getInstance()->loadBans(identifier, *this);
+	return IOBan::getInstance()->loadBans(*this);
 }
-bool Ban::saveBans(const std::string& identifier)
+bool Ban::saveBans()
 {
-	return IOBan::getInstance()->saveBans(identifier, *this);
-}
-
-IOBan* IOBan::getInstance()
-{
-	if(!_instance){
-		#if defined USE_SQL_ENGINE
-		_instance = new IOBanSQL();
-		#else
-		_instance = new IOBanXML();
-		#endif
-	}
-	return _instance;
+	return IOBan::getInstance()->saveBans(*this);
 }
 
-#if defined USE_SQL_ENGINE
-
-IOBanSQL::IOBanSQL()
-{
-	m_host = g_config.getString(ConfigManager::SQL_HOST);
-	m_user = g_config.getString(ConfigManager::SQL_USER);
-	m_pass = g_config.getString(ConfigManager::SQL_PASS);
-	m_db   = g_config.getString(ConfigManager::SQL_DB);
-}
-
-
-bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
+bool IOBan::loadBans(Ban& banclass)
 {
 	Database* db = Database::instance();
+	DBResult* result;
 	DBQuery query;
-	DBResult result;
-	
-	if(!db->connect()){
+
+	if(!(result = db->storeQuery("SELECT COUNT(*) FROM `bans`"))){
 		return false;
 	}
 
-	query << "SELECT * FROM bans";
-	if(!db->storeQuery(query, result))
+	uint32_t nbans = result->getDataInt("COUNT(*)");
+	db->freeResult(result);
+	if(nbans == 0){
 		return true;
+	}
+
+	if(!(result = db->storeQuery("SELECT * FROM `bans`"))){
+		return false;
+	}
 
 	uint32_t currentTime = std::time(NULL);
-	for(uint32_t i=0; i < result.getNumRows(); ++i){
-		int banType = result.getDataInt("type", i);
-		int time = result.getDataInt("time", i);
+	do{
+		int banType = result->getDataInt("type");
+		int time = result->getDataInt("time");
 		if(time > (int)currentTime){
 			switch(banType){
 				case BAN_IPADDRESS:
 				{
-					int ip = result.getDataInt("ip", i);
-					int mask = result.getDataInt("mask", i);
+					int ip = result->getDataInt("ip");
+					int mask = result->getDataInt("mask");
 					banclass.addIpBan(ip, mask, time);
 					break;
 				}
 
 				case BAN_PLAYER:
 				{
-					int player = result.getDataInt("player", i);
+					int player = result->getDataInt("player");
 					banclass.addPlayerBan(player, time);
 					break;
 				}
 
 				case BAN_ACCOUNT:
 				{
-					int account = result.getDataInt("account", i);
+					int account = result->getDataInt("account");
 					banclass.addAccountBan(account, time);
 					break;
 				}
 			}
 		}
-	}
-
+	}while(result->next());
+	db->freeResult(result);
 	return true;
 }
 
-bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
+bool IOBan::saveBans(const Ban& banclass)
 {
 	Database* db = Database::instance();
 	DBQuery query;
-	
-	if(!db->connect()){
+	DBTransaction transaction(db);
+
+	if(!transaction.begin())
+		return false;
+
+	if(!db->executeQuery("DELETE FROM `bans`")){
 		return false;
 	}
-
-	DBTransaction trans(db);
-	if(!trans.start())
-		return false;
-
-	query << "DELETE FROM bans;";
-	if(!db->executeQuery(query))
-		return false;
 
 	uint32_t currentTime = std::time(NULL);
 	//save ip bans
-	bool executeQuery = false;
 
-	std::stringstream bans;
+	DBInsert stmt(db);
+	stmt.setQuery("INSERT INTO `bans` (`type`, `ip`, `mask`, `time`) VALUES ");
 
-	DBSplitInsert query_insert(db);
-	
-	query_insert.setQuery("INSERT INTO `bans` (`type` , `ip` , `mask`, `time`) VALUES ");
-	
 	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it){
 		if(it->time > currentTime){
-			executeQuery = true;
-			bans << "(1," << it->ip << "," << it->mask <<
-				"," << it->time << ")";
+			query << 1 << ", " << it->ip << ", " << it->mask << ", " << it->time;
 
-			if(!query_insert.addRow(bans.str()))
+			if(!stmt.addRow(query)){
 				return false;
-
-			bans.str("");
+			}
 		}
 	}
-	if(executeQuery){
-		if(!query_insert.executeQuery())
-			return false;
+
+	if(!stmt.execute()){
+		return false;
 	}
 
 	//save player bans
-	executeQuery = false;
-	query_insert.setQuery("INSERT INTO `bans` (`type` , `player` , `time`) VALUES ");
-	
+	stmt.setQuery("INSERT INTO `bans` (`type`, `player`, `time`) VALUES ");
+
 	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it){
 		if(it->time > currentTime){
-			executeQuery = true;
-			bans  << "(2," << it->id << "," << it->time << ")";
-			
-			if(!query_insert.addRow(bans.str()))
+			query << 2 << ", " << it->id << ", " << it->time;
+
+			if(!stmt.addRow(query)){
 				return false;
-			
-			bans.str("");
+			}
 		}
 	}
-	if(executeQuery){
-		if(!query_insert.executeQuery())
-			return false;
+
+	if(!stmt.execute()){
+		return false;
 	}
 
 	//save account bans
-	executeQuery = false;
-	query_insert.setQuery("INSERT INTO `bans` (`type` , `account` , `time`) VALUES ");
-	
+	stmt.setQuery("INSERT INTO `bans` (`type`, `account`, `time`) VALUES ");
+
 	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it){
 		if(it->time > currentTime){
-			executeQuery = true;
-			bans << "(3," << it->id << "," << it->time << ")";
-			
-			if(!query_insert.addRow(bans.str()))
+			query << 3 << ", " << it->id << ", " << it->time;
+
+			if(!stmt.addRow(query)){
 				return false;
-			
-			bans.str("");
-		}
-	}
-	
-	if(executeQuery){
-		if(!query_insert.executeQuery())
-			return false;
-	}
-
-	return trans.success();
-}
-
-#else
-
-IOBanXML::IOBanXML()
-{
-	//
-}
-
-bool IOBanXML::loadBans(const std::string& identifier, Ban& banclass)
-{
-	xmlDocPtr doc = xmlParseFile(identifier.c_str());
-	if(doc){
-		xmlNodePtr root;
-		root = xmlDocGetRootElement(doc);
-
-		if(xmlStrcmp(root->name,(const xmlChar*)"bans") != 0){
-			xmlFreeDoc(doc);
-			return false;
-		}
-
-		xmlNodePtr banNode = root->children;
-		while(banNode){
-			if(xmlStrcmp(banNode->name,(const xmlChar*)"ban") == 0){
-
-				int banType;
-				if(readXMLInteger(banNode, "type", banType) && banType >= BAN_IPADDRESS && banType <= BAN_ACCOUNT){
-					int time = 0;
-					readXMLInteger(banNode, "time", time);
-
-					switch(banType){
-						case BAN_IPADDRESS:
-						{
-							int ip = 0;
-							int mask = 0;
-
-							if(readXMLInteger(banNode, "ip", ip)){
-
-								readXMLInteger(banNode, "mask", mask);
-								banclass.addIpBan(ip, mask, time);
-							}
-
-							break;
-						}
-
-						case BAN_PLAYER:
-						{
-							int playerguid = 0;
-							if(readXMLInteger(banNode, "player", playerguid)){
-								banclass.addPlayerBan(playerguid, time);
-							}
-
-							break;
-						}
-
-						case BAN_ACCOUNT:
-						{
-							int account = 0;
-							if(readXMLInteger(banNode, "account", account)){
-								banclass.addAccountBan(account, time);
-							}
-
-							break;
-						}
-					}
-				}
-				else{
-					std::cout << "Warning: [IOBanXML::loadBans] could not load ban" << std::endl;
-				}
 			}
-
-			banNode = banNode->next;
 		}
 	}
 
-	return true;
+	if(!stmt.execute()){
+		return false;
+	}
+
+	return transaction.commit();
 }
-
-bool IOBanXML::saveBans(const std::string& identifier, const Ban& banclass)
-{
-	xmlDocPtr doc = xmlNewDoc((xmlChar*) "1.0");
-  xmlNodePtr nodeBans = xmlNewNode(NULL, (xmlChar*) "bans");
-  xmlDocSetRootElement(doc, nodeBans);
-
-	uint32_t currentTime = std::time(NULL);
-
-	//save ip bans
-	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it){
-		if(it->time > currentTime){
-
-			xmlNodePtr nodeBan = xmlNewChild(nodeBans, NULL, (xmlChar*) "ban", NULL);
-
-			std::stringstream ss;
-			ss.str("");
-			ss << (int) BAN_IPADDRESS;
-			xmlNewProp(nodeBan, (xmlChar*) "type", (xmlChar*) ss.str().c_str());
-
-			ss.str("");
-			ss << (int) it->ip;
-			xmlNewProp(nodeBan, (xmlChar*) "ip", (xmlChar*) ss.str().c_str());
-
-			ss.str("");
-			ss << (int) it->mask;
-			xmlNewProp(nodeBan, (xmlChar*) "mask", (xmlChar*) ss.str().c_str());
-
-			ss.str("");
-			ss << (int) it->time;
-			xmlNewProp(nodeBan, (xmlChar*) "time", (xmlChar*) ss.str().c_str());
-		}
-	}
-
-	//save player bans
-	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it){
-		if(it->time > currentTime){
-
-			xmlNodePtr nodeBan = xmlNewChild(nodeBans, NULL, (xmlChar*) "ban", NULL);
-
-			std::stringstream ss;
-			ss.str("");
-			ss << (int) BAN_PLAYER;
-			xmlNewProp(nodeBan, (xmlChar*) "type", (xmlChar*) ss.str().c_str());
-
-			ss.str("");
-			ss << (int) it->id;
-			xmlNewProp(nodeBan, (xmlChar*) "player", (xmlChar*) ss.str().c_str());
-
-			ss.str("");
-			ss << (int) it->time;
-			xmlNewProp(nodeBan, (xmlChar*) "time", (xmlChar*) ss.str().c_str());
-		}
-	}
-
-	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it){
-		if(it->time > currentTime){
-			xmlNodePtr nodeBan = xmlNewChild(nodeBans, NULL, (xmlChar*) "ban", NULL);
-
-			std::stringstream ss;
-			ss.str("");
-			ss << (int) BAN_ACCOUNT;
-			xmlNewProp(nodeBan, (xmlChar*) "type", (xmlChar*) ss.str().c_str());
-
-			ss.str("");
-			ss << (int) it->id;
-			xmlNewProp(nodeBan, (xmlChar*) "account", (xmlChar*) ss.str().c_str());
-
-			ss.str("");
-			ss << (int) it->time;
-			xmlNewProp(nodeBan, (xmlChar*) "time", (xmlChar*) ss.str().c_str());
-		}
-	}
-
-	xmlSaveFormatFileEnc(identifier.c_str(), doc, "UTF-8", 1);
-	xmlFreeDoc(doc);
-
-	return true;
-}
-
-#endif

@@ -415,7 +415,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 		std::cout << "Error: [Spell::configureSpell] Spell without name." << std::endl;
 		return false;
 	}
-	
+
 	if(readXMLInteger(p, "lvl", intValue)){
 	 	level = intValue;
 	}

@@ -106,7 +106,7 @@ bool RSA::setKey(const std::string& file)
 	return true;
 }
 
-void RSA::setKey(char* p, char* q, char* d)
+void RSA::setKey(const char* p, const char* q, const char* d)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
 	

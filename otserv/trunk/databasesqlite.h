@@ -18,78 +18,64 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_DatabaseSqLite_H__
-#define __OTSERV_DatabaseSqLite_H__
+#ifndef __DATABASE_SQLITE_H__
+#define __DATABASE_SQLITE_H__
 
-#ifdef WIN32
-//#include <winsock2.h>
-#include <winsock.h>
+#ifndef __OTSERV_DATABASE_H__
+#error "database.h should be included first."
 #endif
 
 #include <sqlite3.h>
 #include <sstream>
-#include "database.h"
 
-class DatabaseSqLite : protected _Database
+class DatabaseSQLite : public _Database
 {
 public:
-	DatabaseSqLite();
-	virtual ~DatabaseSqLite();
+	DatabaseSQLite();
+	DATABASE_VIRTUAL ~DatabaseSQLite();
 
-	/** Connect to a mysql DatabaseSqLite
-	*\returns
-	* 	TRUE if the connection is ok
-	* 	FALSE if the connection fails
-	*\param db_name The "name" of the DatabaseSqLite used
-	*\param db_host The "host" to connect to
-	*\param db_user The "username" used in the connection
-	*\param db_pass The "password" of the username used
-	*/
-	virtual bool connect();
+	DATABASE_VIRTUAL int getParam(DBParam_t param);
 
-	/** Disconnects from the connected DatabaseSqLite
-	*\returns
-	* 	TRUE if the DatabaseSqLite was disconnected
-	* 	FALSE if the DatabaseSqLite was not disconnected or no DatabaseSqLite selected
-	*/
-	virtual bool disconnect();
+	DATABASE_VIRTUAL bool beginTransaction();
+	DATABASE_VIRTUAL bool rollback();
+	DATABASE_VIRTUAL bool commit();
 
-	/** Execute a query which don't get any information of the DatabaseSqLite (for ex.: INSERT, UPDATE, etc)
-	*\returns
-	* 	TRUE if the query is ok
-	* 	FALSE if the query fails
-	*\ref q The query object
-	*/
-	virtual bool executeQuery(DBQuery &q);
+	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
 
-	/** Store a query which get information of the DatabaseSqLite (for ex.: SELECT)
-	*\returns
-	* 	TRUE if the query is ok
-	* 	FALSE if the query fails
-	*\ref q The query object
-	*\ref res The DBResult object where to insert the results of the query
-	*/
-	virtual bool storeQuery(DBQuery &q, DBResult &res);
+	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
+	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length);
 
-	virtual bool rollback();
-	virtual bool commit();
+	DATABASE_VIRTUAL void freeResult(DBResult *res);
 
-private:
+protected:
+	std::string _parse(const std::string &s);
 
-	/** initialize the DatabaseSqLite
-	*\returns
-	* 	TRUE if the DatabaseSqLite was successfully initialized
-	* 	FALSE if the DatabaseSqLite was not successfully initialized
-	*/
-	bool init();
-	static int callback(void *db, int argc, char **argv, char **azColName);
+	sqlite3* m_handle;
 
-	bool m_initialized;
 	bool m_connected;
-	static bool m_fieldnames;
-	char *zErrMsg;
-	sqlite3 *m_handle;
 };
 
+class SQLiteResult : public _DBResult
+{
+	friend class DatabaseSQLite;
+
+public:
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s);
+	DATABASE_VIRTUAL std::string getDataString(const std::string &s);
+	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size);
+
+	DATABASE_VIRTUAL bool next();
+
+protected:
+	SQLiteResult(sqlite3_stmt* stmt);
+	DATABASE_VIRTUAL ~SQLiteResult();
+
+	typedef std::map<const std::string, uint32_t> listNames_t;
+	listNames_t m_listNames;
+
+	sqlite3_stmt* m_handle;
+};
 
 #endif

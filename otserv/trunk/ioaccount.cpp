@@ -22,34 +22,59 @@
 #include "definitions.h"
 #include "ioaccount.h"
 
-#if defined USE_SQL_ENGINE
-#include "ioaccountsql.h"
-#else
-#include "ioaccountxml.h"
-#endif
+#include <algorithm>
+#include <functional>
+#include <sstream>
 
-IOAccount* IOAccount::_instance = NULL;
+#include "database.h"
+#include <iostream>
 
-IOAccount* IOAccount::instance(){
-	if(!_instance){
-#if defined USE_SQL_ENGINE
-		_instance = (IOAccount*)new IOAccountSQL;
-#else
-		_instance = (IOAccount*)new IOAccountXML;
-#endif
-	}
-	#ifdef __DEBUG__
-	printf("%s \n", _instance->getSourceDescription());
-	#endif
-	return _instance;
-}
+#include "configmanager.h"
 
-Account IOAccount::loadAccount(uint32_t accno){
+extern ConfigManager g_config;
+
+Account IOAccount::loadAccount(uint32_t accno)
+{
 	Account acc;
+
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "SELECT `id`, `password` FROM `accounts` WHERE `id` = " << accno;
+	if((result = db->storeQuery(query.str()))){
+		acc.accnumber = result->getDataInt("id");
+		acc.password = result->getDataString("password");
+		db->freeResult(result);
+
+		query.str("");
+		query << "SELECT `name` FROM `players` WHERE `account_id` = " << accno;
+		if((result = db->storeQuery(query.str()))){
+			do{
+				std::string ss = result->getDataString("name");
+				acc.charList.push_back(ss.c_str());
+			}while(result->next());
+
+			acc.charList.sort();
+			db->freeResult(result);
+		}
+	}
+
 	return acc;
 }
 
-bool IOAccount::getPassword(uint32_t accno, const std::string& name, std::string& password)
+bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string &password)
 {
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`id` = " << accno << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
+	if(result = db->storeQuery(query.str())){
+		password = result->getDataString("password");
+		db->freeResult(result);
+		return true;
+	}
+
 	return false;
 }
