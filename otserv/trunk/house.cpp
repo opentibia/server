@@ -852,10 +852,7 @@ bool Houses::payHouses()
 			}
 
 			Depot* depot = player->getDepot(town->getTownID(), true);
-			// savePlayerHere is an ungly hack
-			// to avoid saving 2 times a not online player
-			// when items are transferred to his depot
-			bool savePlayerHere = true;
+
 			if(depot){
 				//get money from depot
 				if(g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
@@ -885,7 +882,7 @@ bool Houses::payHouses()
 						// transfer house items to his depot and then
 						// will save it, so here should not be saved
 						// again
-						savePlayerHere = false;
+						continue;
 					}
 					else{
 						int daysLeft = 7 - house->getPayRentWarnings();
@@ -926,9 +923,7 @@ bool Houses::payHouses()
 			}
 
 			if(!player->isOnline()){
-				if(savePlayerHere){
-					IOPlayer::instance()->savePlayer(player);
-				}
+				IOPlayer::instance()->savePlayer(player);
 				delete player;
 			}
 		}

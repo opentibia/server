@@ -454,6 +454,15 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
 	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES);
 
+	#ifndef __USE_SQL_PREMDAYS__
+	uint32_t premEnd = 0;
+	if(player->premiumDays > 0){
+		premEnd = time(NULL) + player->premiumDays * 86400;
+	}
+
+	query << ", `premend` = " << premEnd;
+	#endif
+
 #ifdef __SKULLSYSTEM__
 	int32_t redSkullTime = 0;
 	if(player->redSkullTicks > 0){

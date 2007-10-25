@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([otserv], 0.6)
+AC_INIT([otserv], 1.10)
 AC_CONFIG_SRCDIR([raids.h])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
