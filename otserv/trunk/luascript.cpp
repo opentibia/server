@@ -1338,6 +1338,9 @@ void LuaScriptInterface::registerFunctions()
 	//getItemName(itemid)
 	lua_register(m_luaState, "getItemName", LuaScriptInterface::luaGetItemName);
 
+	//getItemDescriptions(itemid)
+	lua_register(m_luaState, "getItemDescriptions", LuaScriptInterface::luaGetItemDescriptions);
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 	
@@ -5254,6 +5257,18 @@ int LuaScriptInterface::luaGetItemName(lua_State *L)
 	const ItemType& it = Item::items[itemid];
 	lua_pushstring(L, it.name.c_str());
 	return 1;
+}
+
+int LuaScriptInterface::luaGetItemDescriptions(lua_State *L)
+{
+	//getItemDescriptions(itemid)
+	//returns the name, the article and the plural name of the item
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	lua_pushstring(L, it.name.c_str());
+	lua_pushstring(L, it.article.c_str());
+	lua_pushstring(L, it.pluralName.c_str());
+	return 3;
 }
 
 int LuaScriptInterface::luaAddEvent(lua_State *L)
