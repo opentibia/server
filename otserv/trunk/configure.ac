@@ -4,7 +4,7 @@
 AC_PREREQ(2.61)
 AC_INIT([otserv], 0.6)
 AC_CONFIG_SRCDIR([raids.h])
-AC_CONFIG_HEADER([config.h])
+AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
@@ -26,27 +26,51 @@ AC_ARG_ENABLE(skulls, [  --enable-skulls      enable skull system], [OPTIONAL_FL
 # check if we want otserv allocator
 AC_ARG_ENABLE(otallocator, [  --enable-otallocator   enable otserv custom allocator], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__OTSERV_ALLOCATOR__"])
 
+# check if we want to use otserv.lua instead config.lua
+AC_ARG_WITH(otconfig, [  --with-otconfig      use otserv.lua configuration], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__LUA_NAME_ALTER__"])
+
 AC_SUBST(OPTIONAL_FLAGS)
 
-AM_CONDITIONAL(USE_SQL, false)
 AM_CONDITIONAL(USE_MYSQL, false)
-AM_CONDITIONAL(USE_SQLITE, false)
+AM_CONDITIONAL(USE_PGSQL, false)
+AM_CONDITIONAL(USE_ODBC, false)
+AM_CONDITIONAL(USE_SQLITE, true)
+SQLITE_FLAGS=-D__USE_SQLITE__
 
 #check if we want mysql
 AC_ARG_ENABLE(mysql, [  --enable-mysql          enable MySQL support], [
-	AM_CONDITIONAL(USE_SQL, true)
 	AM_CONDITIONAL(USE_MYSQL, true)
+	AM_CONDITIONAL(USE_SQLITE, false)
 	MYSQL_FLAGS=-D__USE_MYSQL__
+	SQLITE_FLAGS=
 	AC_SUBST(MYSQL_FLAGS)
 ])
 
+#check if we want postgresql
+AC_ARG_ENABLE(pgsql, [  --enable-pgsql          enable PostgreSQL support], [
+	AM_CONDITIONAL(USE_PGSQL, true)
+	AM_CONDITIONAL(USE_SQLITE, false)
+	PGSQL_FLAGS=-D__USE_PGSQL__
+	SQLITE_FLAGS=
+	AC_SUBST(PGSQL_FLAGS)
+])
+
+#check if we want odbc
+AC_ARG_ENABLE(odbc, [  --enable-odbc           enable ODBC support], [
+	AM_CONDITIONAL(USE_ODBC, true)
+	AM_CONDITIONAL(USE_SQLITE, false)
+	ODBC_FLAGS=-D__USE_ODBC__
+	SQLITE_FLAGS=
+	AC_SUBST(ODBC_FLAGS)
+])
+
 #check if we want sqlite
-AC_ARG_ENABLE(sqlite, [  --enable-sqlite          enable SQLite support], [
-	AM_CONDITIONAL(USE_SQL, true)
+AC_ARG_ENABLE(sqlite, [  --enable-sqlite         enable SQLite support (default))], [
 	AM_CONDITIONAL(USE_SQLITE, true)
 	SQLITE_FLAGS=-D__USE_SQLITE__
-	AC_SUBST(SQLITE_FLAGS)
 ])
+
+AC_SUBST(SQLITE_FLAGS)
 
 #check if we want the profiler
 AC_ARG_ENABLE(profiler, [  --enable-profiler       enable profiler support], [PROFILER_FLAGS=-pg])
@@ -118,16 +142,31 @@ AC_SUBST(LUA_LIBS)
 
 # check for mysql if it is enabled
 if test -n "$MYSQL_FLAGS"; then 
-	AC_CHECK_HEADERS([mysql/mysql.h], ,[AC_MSG_ERROR("mysql-client header not found.")])
-	AC_CHECK_LIB(mysqlclient, main, ,[AC_MSG_ERROR("mysql library not found.")])
+	AC_CHECK_HEADERS([mysql/mysql.h],[MYSQL_LIBS=-lmysqlclient],[AC_MSG_ERROR("mysql headers missing.")])
+	AC_CHECK_LIB(mysqlclient, main,[],[AC_MSG_ERROR("Linking against mysql-client failed.")])
+	AC_SUBST(MYSQL_LIBS)
+fi
+
+# check for postgresql if it is enabled
+if test -n "$PGSQL_FLAGS"; then 
+	AC_CHECK_HEADERS([postgresql/libpq-fe.h],[PGSQL_LIBS=-lpg],[AC_MSG_ERROR("postgresql headers missing.")])
+	AC_CHECK_LIB(pq, main,[],[AC_MSG_ERROR("Linking against libpq failed.")])
+	AC_SUBST(PGSQL_LIBS)
+fi
+
+# check for odbc if it is enabled
+if test -n "$ODBC_FLAGS"; then
+	AC_CHECK_HEADERS([sql.h sqlext.h sqltypes.h],[ODBC_LIBS=-lodbc],[AC_MSG_ERROR("unixodbc headers missing.")])
+	AC_CHECK_LIB(odbc, main, [], [AC_MSG_ERROR("Linking against odbc failed.")])
+	AC_SUBST(ODBC_LIBS)
 fi
 
 # check for sqlite if it is enabled
 if test -n "$SQLITE_FLAGS"; then 
-	AC_CHECK_HEADERS([sqlite3.h], ,[AC_MSG_ERROR("sqlite3 header not found.")])
-	AC_CHECK_LIB(sqlite3, main, ,[AC_MSG_ERROR("sqlite3 library not found.")])
+	AC_CHECK_HEADERS([sqlite3.h],[SQLITE_LIBS=-lsqlite3],[AC_MSG_ERROR("sqlite3 headers missing.")])
+	AC_CHECK_LIB(sqlite3, main,[],[AC_MSG_ERROR("Linking against sqlite3 failed.")])
+	AC_SUBST(SQLITE_LIBS)
 fi
-
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

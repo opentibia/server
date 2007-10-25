@@ -1,8 +1,9 @@
 
 noinst_PROGRAMS = otserv
 
-AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(MYSQL_FLAGS) $(LUA_CFLAGS) $(DEBUG_FLAGS)\
-	$(SQLITE_FLAGS) $(PROFILER_FLAGS) $(OPTIONAL_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Wall
+AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA_CFLAGS) $(DEBUG_FLAGS)\
+	$(MYSQL_FLAGS) $(SQLITE_FLAGS) $(ODBC_FLAGS) $(PGSQL_FLAGS)\
+	$(PROFILER_FLAGS) $(OPTIONAL_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Wall
 
 otserv_LDADD = $(LUA_LIBS)
 
@@ -12,12 +13,14 @@ endif
 if USE_SQLITE
 MAYBE_SQLITE = databasesqlite.cpp databasesqlite.h
 endif
-if USE_SQL
-MAYBE_SQL = ioplayersql.cpp ioplayersql.h ioaccountsql.cpp ioaccountsql.h \
-	database.cpp database.h iomapserializesql.cpp iomapserializesql.h
+if USE_ODBC
+MAYBE_ODBC = databaseodbc.cpp databaseodbc.h
+endif
+if USE_PGSQL
+MAYBE_PGSQL = databasepgsql.cpp databasepgsql.h
 endif
 
-otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
+otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
 	item.cpp items.cpp luascript.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp \

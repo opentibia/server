@@ -28,13 +28,10 @@
 #include "tools.h"
 #include "definitions.h"
 
-#include <boost/tokenizer.hpp>
 #include <iostream>
 #include <iomanip>
 
 extern ConfigManager g_config;
-
-typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 #ifndef __GNUC__
 #pragma warning( disable : 4005)
