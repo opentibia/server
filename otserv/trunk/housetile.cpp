@@ -56,9 +56,19 @@ Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item
 	if(const Creature* creature = thing->getCreature()){
 		if(const Player* player = creature->getPlayer()){
 			if(!house->isInvited(player)){
-				const Position& EntryPos = house->getEntryPosition();
-				Tile* destTile = g_game.getTile(EntryPos.x, EntryPos.y, EntryPos.z);
-				assert(destTile != NULL);
+				const Position& entryPos = house->getEntryPosition();
+				Tile* destTile = g_game.getTile(entryPos.x, entryPos.y, entryPos.z);
+				
+				if(!destTile){
+#ifdef __DEBUG__
+					assert(destTile != NULL);
+#endif
+					std::cout << "Error: [HouseTile::__queryDestination] House entry not correct"
+						<< " - Name: " << house->getName()
+						<< " - House id: " << house->getHouseId()
+						<< " - Tile not found: " << entryPos << std::endl;
+					destTile = &(Tile::null_tile);
+				}
 
 				index = -1;
 				*destItem = NULL;

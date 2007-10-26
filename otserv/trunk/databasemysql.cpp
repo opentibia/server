@@ -120,9 +120,9 @@ bool DatabaseMySQL::executeQuery(const std::string &query)
 	if(!m_connected)
 		return false;
 
-	//#ifdef __SQL_QUERY_DEBUG__
+#ifdef __SQL_QUERY_DEBUG__
 	std::cout << "MYSQL QUERY: " << query << std::endl;
-	//#endif
+#endif
 
 	bool state = true;
 
@@ -153,9 +153,9 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 	if(!m_connected)
 		return NULL;
 
-	//#ifdef __SQL_QUERY_DEBUG__
+#ifdef __SQL_QUERY_DEBUG__
 	std::cout << "MYSQL QUERY: " << query << std::endl;
-	//#endif
+#endif
 
 	// executes the query
 	if(mysql_real_query(&m_handle, query.c_str(), query.length()) != 0){

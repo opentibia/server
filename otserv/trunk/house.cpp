@@ -758,7 +758,7 @@ bool Houses::loadHousesXML(std::string filename)
 		while(houseNode){
 			if(xmlStrcmp(houseNode->name,(const xmlChar*)"house") == 0){
 				int _houseid = 0;
-				Position entryPos;
+				Position entryPos(0, 0, 0);
 
 				if(!readXMLInteger(houseNode, "houseid", _houseid)){
 					xmlFreeDoc(doc);
@@ -786,6 +786,12 @@ bool Houses::loadHousesXML(std::string filename)
 
 				if(readXMLInteger(houseNode, "entryz", intValue)){
 					entryPos.z = intValue;
+				}
+
+				if(entryPos.x == 0 && entryPos.y == 0 && entryPos.z == 0){
+					std::cout << "Warning: [Houses::loadHousesXML] House entry not set"
+						<< " - Name: " << house->getName()
+						<< " - House id: " << _houseid << std::endl;
 				}
 
 				house->setEntryPos(entryPos);
