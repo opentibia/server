@@ -291,10 +291,10 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 	DBQuery query;
 	DBResult* result;
 
-	if((result = db->storeQuery("SELECT * FROM `houses`")))
+	if(!(result = db->storeQuery("SELECT * FROM `houses`")))
 		return false;
 
-	do{
+	while(result->next()){
 		int houseid = result->getDataInt("id");
 		House* house = Houses::getInstance().getHouse(houseid);
 		if(house){
@@ -306,7 +306,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 			house->setPaidUntil(paid);
 			house->setPayRentWarnings(payRentWarnings);
 		}
-	}while(result->next());
+	}
 
 	db->freeResult(result);
 
@@ -315,11 +315,11 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 		if(house->getHouseOwner() != 0 && house->getHouseId() != 0){
 			query << "SELECT `listid`, `list` FROM `house_lists` WHERE `house_id` = " << house->getHouseId();
 			if((result = db->storeQuery(query.str()))){
-				do{
+				while(result->next()){
 					int listid = result->getDataInt("listid");
 					std::string list = result->getDataString("list");
 					house->setAccessList(listid, list);
-				}while(result->next());
+				}
 
 				db->freeResult(result);
 			}
