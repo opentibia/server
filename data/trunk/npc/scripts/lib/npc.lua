@@ -4,11 +4,11 @@ function getDistanceToCreature(id)
 	if id == 0 or id == nil then
 		selfGotoIdle()
 	end
-	cx, cy, cz = creatureGetPosition(id)
+	cx, cy, cz = getCreaturePosition(id)
 	if cx == nil then
 		return nil
 	end
-	sx, sy, sz = selfGetPosition()
+	sx, sy, sz = getCreaturePosition(cid)
 	return math.max(math.abs(sx-cx), math.abs(sy-cy))	
 end
 
@@ -17,7 +17,7 @@ function moveToCreature(id)
 	if id == 0 or id == nil then
 		selfGotoIdle()
 	end
-	tx,ty,tz=creatureGetPosition(id)
+	tx,ty,tz = getCreaturePosition(id)
 	if tx == nil then
 		selfGotoIdle()
 	else

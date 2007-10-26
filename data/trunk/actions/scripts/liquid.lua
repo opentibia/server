@@ -58,7 +58,7 @@ function onUse(cid, item, frompos, item2, topos)
 			doSendMagicEffect(topos, CONST_ME_MAGIC_BLUE)
 		elseif (item.type == TYPE_LIFE_FLUID) then
 			doCreatureSay(cid, "Aaaah...", TEXTCOLOR_ORANGE)
-			doPlayerAddHealth(cid, math.random(40, 80))
+			doPlayerAddHealth(cid, math.random(40, 75))
 			doSendMagicEffect(topos, CONST_ME_MAGIC_BLUE)
 		else
 			doCreatureSay(cid, "Gulp.", TEXTCOLOR_ORANGE)

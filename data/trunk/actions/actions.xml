@@ -82,11 +82,12 @@
 	<action itemid="5468" script="rum_system.lua" />
 	
 	<!-- Foods -->
+	<action itemid="2328" script="food.lua" />
+	<action itemid="2362" script="food.lua" />
 	<action itemid="2666" script="food.lua" />
 	<action itemid="2667" script="food.lua" />
 	<action itemid="2668" script="food.lua" />
 	<action itemid="2669" script="food.lua" />
-
 	<action itemid="2670" script="food.lua" />
 	<action itemid="2671" script="food.lua" />
 	<action itemid="2672" script="food.lua" />
@@ -96,7 +97,6 @@
 	<action itemid="2676" script="food.lua" />
 	<action itemid="2677" script="food.lua" />
 	<action itemid="2678" script="food.lua" />
-
 	<action itemid="2679" script="food.lua" />
 	<action itemid="2680" script="food.lua" />
 	<action itemid="2681" script="food.lua" />
@@ -106,7 +106,6 @@
 	<action itemid="2685" script="food.lua" />
 	<action itemid="2686" script="food.lua" />
 	<action itemid="2687" script="food.lua" />
-
 	<action itemid="2688" script="food.lua" />
 	<action itemid="2689" script="food.lua" />
 	<action itemid="2690" script="food.lua" />
@@ -116,7 +115,6 @@
 	<action itemid="2787" script="food.lua" />
 	<action itemid="2788" script="food.lua" />
 	<action itemid="2789" script="food.lua" />
-
 	<action itemid="2790" script="food.lua" />
 	<action itemid="2791" script="food.lua" />
 	<action itemid="2792" script="food.lua" />
@@ -126,13 +124,25 @@
 	<action itemid="2796" script="food.lua" />
 	<action itemid="5097" script="food.lua" />
 	<action itemid="6125" script="food.lua" />
-
 	<action itemid="6278" script="food.lua" />
 	<action itemid="6279" script="food.lua" />
 	<action itemid="6280" script="food.lua" />
 	<action itemid="6393" script="food.lua" />
 	<action itemid="6394" script="food.lua" />
 	<action itemid="6501" script="food.lua" />
+	<action itemid="6541" script="food.lua" />
+	<action itemid="6542" script="food.lua" />
+	<action itemid="6543" script="food.lua" />
+	<action itemid="6544" script="food.lua" />
+	<action itemid="6545" script="food.lua" />
+	<action itemid="7158" script="food.lua" />
+	<action itemid="7159" script="food.lua" />
+	<action itemid="7372" script="food.lua" />
+	<action itemid="7373" script="food.lua" />
+	<action itemid="7374" script="food.lua" />
+	<action itemid="7375" script="food.lua" />
+	<action itemid="7376" script="food.lua" />
+	<action itemid="7377" script="food.lua" />
 	
 	<!-- Teleport Items -->
 	<action itemid="430" script="teleport.lua" />

@@ -22,6 +22,47 @@
 	<monster name="Spider" file="Aracnids/spider.xml"/>
 	<monster name="Tarantula" file="Aracnids/tarantula.xml"/>
 	
+	<!-- Arena -->
+		<!-- Greenhorn -->
+	<monster name="Achad" file="Arena/Greenhorn/achad.xml"/>
+	<monster name="Axeitus Headbanger" file="Arena/Greenhorn/axeitus headbanger.xml"/>
+	<monster name="Bloodpaw" file="Arena/Greenhorn/bloodpaw.xml"/>
+	<monster name="Bovinus" file="Arena/Greenhorn/bovinus.xml"/>
+	<monster name="Colerian The Barbarian" file="Arena/Greenhorn/colerian the barbarian.xml"/>
+	<monster name="Cursed Gladiator" file="Arena/Greenhorn/cursed gladiator.xml"/>
+	<monster name="Frostfur" file="Arena/Greenhorn/frostfur.xml"/>
+	<monster name="Orcus the Cruel" file="Arena/Greenhorn/orcus the cruel.xml"/>
+	<monster name="Rocky" file="Arena/Greenhorn/rocky.xml"/>
+	<monster name="The Hairy One" file="Arena/Greenhorn/the hairy one.xml"/>
+	
+		<!-- Scrapper -->
+	<monster name="Avalanche" file="Arena/Scrapper/avalanche.xml"/>
+	<monster name="Drasilla" file="Arena/Scrapper/drasilla.xml"/>
+	<monster name="Grimgor Guteater" file="Arena/Scrapper/grimgor guteater.xml"/>
+	<monster name="Keebosh the Exile" file="Arena/Scrapper/kreebosh the exile.xml"/>
+	<monster name="Slim" file="Arena/Scrapper/slim.xml"/>
+	<monster name="Spirit of Earth" file="Arena/Scrapper/spirit of earth.xml"/>
+	<monster name="Spirit of Fire" file="Arena/Scrapper/spirit of fire.xml"/>
+	<monster name="Spirit of Water" file="Arena/Scrapper/spirit of water.xml"/>
+	<monster name="The Dark Dancer" file="Arena/Scrapper/the dark dancer.xml"/>
+	<monster name="Dhe Hag" file="Arena/Scrapper/the hag.xml"/>
+	
+		<!-- Warlord -->
+	<monster name="Darakan the Executioner" file="Arena/Warlord/darakan the executioner.xml"/>
+	<monster name="Deathbringer" file="Arena/Warlord/deathbringer.xml"/>
+	<monster name="Fallen Mooh'tah Master Ghar" file="Arena/Warlord/fallen mooh'tah master ghar.xml"/>
+	<monster name="Gnorre Chyllson" file="Arena/Warlord/gnorre chyllson.xml"/>
+	<monster name="Norgle Glacierbeard" file="Arena/Warlord/norgle glacierbeard.xml"/>
+	<monster name="Svoren the Mad" file="Arena/Warlord/svoren the mad.xml"/>
+	<monster name="The Masked Marauder" file="Arena/Warlord/the masked marauder.xml"/>
+	<monster name="The Obliverator" file="Arena/Warlord/the obliverator.xml"/>
+	<monster name="The Pit Lord" file="Arena/Warlord/the pit lord.xml"/>
+	<monster name="Webster" file="Arena/Warlord/webster.xml"/>	
+		
+		
+		
+	
+	
 	<!-- Barbarians -->
 	<monster name="Barbarian Bloodwalker" file="Barbarians/barbarian bloodwalker.xml"/>
 	<monster name="Barbarian Brutetamer" file="Barbarians/barbarian brutetamer.xml"/>
@@ -59,6 +100,7 @@
 	<monster name="Minishabaal" file="Bosses/minishabaal.xml"/>
 	<monster name="Morgaroth" file="Bosses/morgaroth.xml"/>
 	<monster name="Necropharus" file="Bosses/necropharus.xml"/>
+	<monster name="Orshabaal" file="Bosses/orshabaal.xml"/>
 	<monster name="The Evil Eye" file="Bosses/the evil eye.xml"/>
 	<monster name="The Horned Fox" file="Bosses/the horned fox.xml"/>
 	<monster name="The Old Widow" file="Bosses/the old widow.xml"/>

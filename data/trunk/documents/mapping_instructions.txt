@@ -1,8 +1,23 @@
-* If you need water with fishes use IDs 490 or 4608.
+->Action IDs
 
-* Sand (ID 231) with action ID:
-- 100 is a tumb entrance;
-- 101 is a place for "summon" a scarab (random chance);
-- 102 is a place for add a scarab coin to a player (random chance);
+	Sand (ID: 231)
+	
+	100				-	Used for hidden caves or tombs (can be used with shovel or pick)
+	101				-	May appear Scarabs if shovel is used
+	102				-	May appear Scarabs Coins if shovel is used
+	
+	Tiles (any)
+	
+	383				-   Used for hidden caves (only used by pick)
+	
+	Depots
+	100 + Depot ID	- Used to get the count of a depot
 
-* If a player use a pick in mud with action ID 100 it will be transformed in a opened hole (ID 383 (the hole will decay)).
+	
+->IDs
+	
+	Water with fishes
+		(490 or 4608)
+		
+	Snow for footprints
+		(670)
