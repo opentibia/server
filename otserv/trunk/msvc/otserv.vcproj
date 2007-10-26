@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_CONSOLE;__MYSQL_ALT_INCLUDE__;NOMINMAX"
+				PreprocessorDefinitions="WIN32;_CONSOLE;NOMINMAX;__USE_SQLITE__"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib lualibD.lib luaD.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib"
+				AdditionalOptions="lua51.lib libxml2.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib libgmp-3.lib sqlite3.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -69,7 +69,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_X86_&quot; /c "
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;__MYSQL_ALT_INCLUDE__;NOMINMAX"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;NOMINMAX;__USE_SQLITE__"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
@@ -80,7 +80,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib lualib.lib lua.lib wsock32.lib"
+				AdditionalOptions="lua51.lib libxml2.lib wsock32.lib libgmp-3.lib sqlite3.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -151,19 +151,22 @@
 				RelativePath="..\configmanager.cpp">
 			</File>
 			<File
+				RelativePath="..\connection.cpp">
+			</File>
+			<File
 				RelativePath="..\container.cpp">
 			</File>
 			<File
 				RelativePath="..\creature.cpp">
 			</File>
 			<File
+				RelativePath="..\creatureevent.cpp">
+			</File>
+			<File
 				RelativePath="..\cylinder.cpp">
 			</File>
 			<File
 				RelativePath="..\database.cpp">
-			</File>
-			<File
-				RelativePath="..\databasemysql.cpp">
 			</File>
 			<File
 				RelativePath="..\databasesqlite.cpp">
@@ -190,34 +193,16 @@
 				RelativePath="..\ioaccount.cpp">
 			</File>
 			<File
-				RelativePath="..\ioaccountsql.cpp">
-			</File>
-			<File
-				RelativePath="..\ioaccountxml.cpp">
-			</File>
-			<File
 				RelativePath="..\iomapotbm.cpp">
 			</File>
 			<File
 				RelativePath="..\iomapserialize.cpp">
 			</File>
 			<File
-				RelativePath="..\iomapserializesql.cpp">
-			</File>
-			<File
-				RelativePath="..\iomapserializexml.cpp">
-			</File>
-			<File
 				RelativePath="..\iomapxml.cpp">
 			</File>
 			<File
 				RelativePath="..\ioplayer.cpp">
-			</File>
-			<File
-				RelativePath="..\ioplayersql.cpp">
-			</File>
-			<File
-				RelativePath="..\ioplayerxml.cpp">
 			</File>
 			<File
 				RelativePath="..\item.cpp">
@@ -262,16 +247,22 @@
 				RelativePath="..\outfit.cpp">
 			</File>
 			<File
+				RelativePath="..\outputmessage.cpp">
+			</File>
+			<File
 				RelativePath="..\player.cpp">
 			</File>
 			<File
 				RelativePath="..\position.cpp">
 			</File>
 			<File
-				RelativePath="..\protocol78.cpp">
+				RelativePath="..\protocol.cpp">
 			</File>
 			<File
-				RelativePath="..\protocol79.cpp">
+				RelativePath="..\protocol80.cpp">
+			</File>
+			<File
+				RelativePath="..\protocollogin.cpp">
 			</File>
 			<File
 				RelativePath="..\raids.cpp">
@@ -280,7 +271,13 @@
 				RelativePath="..\rsa.cpp">
 			</File>
 			<File
+				RelativePath="..\scheduler.cpp">
+			</File>
+			<File
 				RelativePath="..\scriptmanager.cpp">
+			</File>
+			<File
+				RelativePath="..\server.cpp">
 			</File>
 			<File
 				RelativePath="..\spawn.cpp">
@@ -293,6 +290,9 @@
 			</File>
 			<File
 				RelativePath="..\talkaction.cpp">
+			</File>
+			<File
+				RelativePath="..\tasks.cpp">
 			</File>
 			<File
 				RelativePath="..\teleport.cpp">
@@ -357,6 +357,9 @@
 				RelativePath="..\configmanager.h">
 			</File>
 			<File
+				RelativePath="..\connection.h">
+			</File>
+			<File
 				RelativePath="..\const79.h">
 			</File>
 			<File
@@ -366,13 +369,13 @@
 				RelativePath="..\creature.h">
 			</File>
 			<File
+				RelativePath="..\creatureevent.h">
+			</File>
+			<File
 				RelativePath="..\cylinder.h">
 			</File>
 			<File
 				RelativePath="..\database.h">
-			</File>
-			<File
-				RelativePath="..\databasemysql.h">
 			</File>
 			<File
 				RelativePath="..\databasesqlite.h">
@@ -405,12 +408,6 @@
 				RelativePath="..\ioaccount.h">
 			</File>
 			<File
-				RelativePath="..\ioaccountsql.h">
-			</File>
-			<File
-				RelativePath="..\ioaccountxml.h">
-			</File>
-			<File
 				RelativePath="..\iomap.h">
 			</File>
 			<File
@@ -420,22 +417,10 @@
 				RelativePath="..\iomapserialize.h">
 			</File>
 			<File
-				RelativePath="..\iomapserializesql.h">
-			</File>
-			<File
-				RelativePath="..\iomapserializexml.h">
-			</File>
-			<File
 				RelativePath="..\iomapxml.h">
 			</File>
 			<File
 				RelativePath="..\ioplayer.h">
-			</File>
-			<File
-				RelativePath="..\ioplayersql.h">
-			</File>
-			<File
-				RelativePath="..\ioplayerxml.h">
 			</File>
 			<File
 				RelativePath="..\item.h">
@@ -486,16 +471,22 @@
 				RelativePath="..\outfit.h">
 			</File>
 			<File
+				RelativePath="..\outputmessage.h">
+			</File>
+			<File
 				RelativePath="..\player.h">
 			</File>
 			<File
 				RelativePath="..\position.h">
 			</File>
 			<File
-				RelativePath="..\protocol78.h">
+				RelativePath="..\protocol.h">
 			</File>
 			<File
-				RelativePath="..\protocol79.h">
+				RelativePath="..\protocol80.h">
+			</File>
+			<File
+				RelativePath="..\protocollogin.h">
 			</File>
 			<File
 				RelativePath="..\raids.h">
@@ -508,6 +499,9 @@
 			</File>
 			<File
 				RelativePath="..\scriptmanager.h">
+			</File>
+			<File
+				RelativePath="..\server.h">
 			</File>
 			<File
 				RelativePath="..\spawn.h">
