@@ -315,11 +315,11 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 		if(house->getHouseOwner() != 0 && house->getHouseId() != 0){
 			query << "SELECT `listid`, `list` FROM `house_lists` WHERE `house_id` = " << house->getHouseId();
 			if((result = db->storeQuery(query.str()))){
-				while(result->next()){
+				do{
 					int listid = result->getDataInt("listid");
 					std::string list = result->getDataString("list");
 					house->setAccessList(listid, list);
-				}
+				}while(result->next());
 
 				db->freeResult(result);
 			}
