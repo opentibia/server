@@ -294,7 +294,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 	if(!(result = db->storeQuery("SELECT * FROM `houses`")))
 		return false;
 
-	while(result->next()){
+	do{
 		int houseid = result->getDataInt("id");
 		House* house = Houses::getInstance().getHouse(houseid);
 		if(house){
@@ -306,7 +306,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 			house->setPaidUntil(paid);
 			house->setPayRentWarnings(payRentWarnings);
 		}
-	}
+	}while(result->next());
 
 	db->freeResult(result);
 

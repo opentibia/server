@@ -21,7 +21,7 @@
 #include <iostream>
 
 #if defined __WINDOWS__ || defined WIN32
-#include <winsock.h>
+#include <winsock2.h>
 #endif
 
 #include "database.h"
