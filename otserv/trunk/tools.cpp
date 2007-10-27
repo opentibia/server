@@ -268,6 +268,11 @@ struct ShootTypeNames{
 	ShootType_t shoot;
 };
 
+struct AmmoTypeNames{
+	char* name;
+	Ammo_t ammoType;
+};
+
 MagicEffectNames magicEffectNames[] = {
 	{"redspark", NM_ME_DRAW_BLOOD},
 	{"bluebubble", NM_ME_LOSE_ENERGY},
@@ -337,6 +342,28 @@ ShootTypeNames shootTypeNames[] = {
 	{"etherealspear", NM_SHOOT_ETHEREALSPEAR}
 };
 
+AmmoTypeNames ammoTypeNames[] = {
+	{"spear", AMMO_SPEAR},
+	{"bolt", AMMO_BOLT},
+	{"arrow", AMMO_BOLT},
+	{"poisonarrow", AMMO_ARROW},
+	{"burstarrow", AMMO_ARROW},
+	{"throwingstar", AMMO_THROWINGSTAR},
+	{"throwingknife", AMMO_THROWINGKNIFE},
+	{"smallstone", AMMO_STONE},
+	{"largerock", AMMO_STONE},
+	{"snowball", AMMO_SNOWBALL},
+	{"powerbolt", AMMO_BOLT},
+	{"infernalbolt", AMMO_BOLT},
+	{"huntingspear", AMMO_SPEAR},
+	{"enchantedspear", AMMO_SPEAR},
+	{"royalspear", AMMO_SPEAR},
+	{"sniperarrow", AMMO_ARROW},
+	{"onyxarrow", AMMO_ARROW},
+	{"piercingbolt", AMMO_BOLT},
+	{"etherealspear", AMMO_SPEAR}
+};
+
 MagicEffectClasses getMagicEffect(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(magicEffectNames)/sizeof(MagicEffectNames); ++i){
@@ -355,4 +382,14 @@ ShootType_t getShootType(const std::string& strValue)
 		}
 	}
 	return NM_SHOOT_UNK;
+}
+
+Ammo_t getAmmoType(const std::string& strValue)
+{
+	for(uint32_t i = 0; i < sizeof(ammoTypeNames)/sizeof(AmmoTypeNames); ++i){
+		if(strValue == ammoTypeNames[i].name){
+			return ammoTypeNames[i].ammoType;
+		}
+	}
+	return AMMO_NONE;
 }

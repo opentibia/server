@@ -569,13 +569,8 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(strcasecmp(strValue.c_str(), "ammoType") == 0){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(strcasecmp(strValue.c_str(), "arrow") == 0){
-										it.amuType = AMMO_ARROW;
-									}
-									else if(strcasecmp(strValue.c_str(), "bolt") == 0){
-										it.amuType = AMMO_BOLT;
-									}
-									else{
+									it.amuType = getAmmoType(strValue);
+									if(it.amuType == AMMO_NONE){
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown ammoType " << strValue  << std::endl;
 									}
 								}

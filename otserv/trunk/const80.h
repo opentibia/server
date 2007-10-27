@@ -242,7 +242,12 @@ enum WeaponType_t {
 enum Ammo_t {
 	AMMO_NONE = 0,
 	AMMO_BOLT = 1,
-	AMMO_ARROW = 2
+	AMMO_ARROW = 2,
+	AMMO_SPEAR = 3,
+	AMMO_THROWINGSTAR = 4,
+	AMMO_THROWINGKNIFE = 5,
+	AMMO_STONE = 6,
+	AMMO_SNOWBALL = 7
 };
 
 enum Skulls_t{
