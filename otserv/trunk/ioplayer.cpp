@@ -115,7 +115,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	propStream.init(conditions, conditionsSize);
 
 	Condition* condition;
-	while(condition = Condition::createCondition(propStream)){
+	while((condition = Condition::createCondition(propStream))){
 		if(condition->unserialize(propStream)){
 			player->storedConditionList.push_back(condition);
 		}
@@ -305,7 +305,7 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	//load vip
 	query.str("");
 	query << "SELECT `vip_id` FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
-	if(result = db->storeQuery(query.str())){
+	if((result = db->storeQuery(query.str()))){
 		do{
 			uint32_t vip_id = result->getDataInt("vip_id");
 			std::string dummy_str;
@@ -521,7 +521,7 @@ bool IOPlayer::savePlayer(Player* player)
 
 	Item* item;
 	for(int32_t slotId = 1; slotId <= 10; ++slotId){
-		if(item = player->inventory[slotId]){
+		if((item = player->inventory[slotId])){
 			itemList.push_back(itemBlock(slotId, item));
 		}
 	}

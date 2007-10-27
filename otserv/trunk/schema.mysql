@@ -1,5 +1,5 @@
 CREATE TABLE `groups` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL COMMENT 'group name',
     `flags` BIGINT UNSIGNED NOT NULL DEFAULT 0,
     `access` INT NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE `groups` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `accounts` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `password` VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL for MD5*/,
     `email` VARCHAR(255) NOT NULL DEFAULT '',
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
@@ -17,10 +17,10 @@ CREATE TABLE `accounts` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `players` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
-    `account_id` BIGINT UNSIGNED NOT NULL,
-    `group_id` BIGINT UNSIGNED NOT NULL COMMENT 'users group',
+    `account_id` INT UNSIGNED NOT NULL,
+    `group_id` INT UNSIGNED NOT NULL COMMENT 'users group',
     `premend` INT UNSIGNED NOT NULL DEFAULT 0,
     `sex` INT UNSIGNED NOT NULL DEFAULT 0,
     `vocation` INT UNSIGNED NOT NULL DEFAULT 0,
@@ -63,7 +63,7 @@ CREATE TABLE `players` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guilds` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL COMMENT 'guild name - nothing else needed here',
     `ownerid` INT NOT NULL,
     `creationdata` INT NOT NULL,
@@ -71,8 +71,8 @@ CREATE TABLE `guilds` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guild_ranks` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `guild_id` BIGINT UNSIGNED NOT NULL COMMENT 'guild',
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `guild_id` INT UNSIGNED NOT NULL COMMENT 'guild',
     `name` VARCHAR(255) NOT NULL COMMENT 'rank name',
     `level` INT NOT NULL COMMENT 'rank level - leader, vice, member, maybe something else',
     PRIMARY KEY (`id`),
@@ -80,27 +80,27 @@ CREATE TABLE `guild_ranks` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_viplist` (
-    `player_id` BIGINT UNSIGNED NOT NULL COMMENT 'id of player whose viplist entry it is',
-    `vip_id` BIGINT UNSIGNED NOT NULL COMMENT 'id of target player of viplist entry',
+    `player_id` INT UNSIGNED NOT NULL COMMENT 'id of player whose viplist entry it is',
+    `vip_id` INT UNSIGNED NOT NULL COMMENT 'id of target player of viplist entry',
     FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`vip_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_spells` (
-    `player_id` BIGINT UNSIGNED NOT NULL,
+    `player_id` INT UNSIGNED NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_storage` (
-    `player_id` BIGINT UNSIGNED NOT NULL,
+    `player_id` INT UNSIGNED NOT NULL,
     `key` INT NOT NULL,
     `value` INT NOT NULL,
     FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_skills` (
-    `player_id` BIGINT UNSIGNED NOT NULL,
+    `player_id` INT UNSIGNED NOT NULL,
     `skillid` INT UNSIGNED NOT NULL,
     `value` INT UNSIGNED NOT NULL DEFAULT 0,
     `count` INT UNSIGNED NOT NULL DEFAULT 0,
@@ -108,7 +108,7 @@ CREATE TABLE `player_skills` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_items` (
-    `player_id` BIGINT UNSIGNED NOT NULL,
+    `player_id` INT UNSIGNED NOT NULL,
     `sid` INT NOT NULL,
     `pid` INT NOT NULL DEFAULT 0,
     `itemtype` INT NOT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE `player_items` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `houses` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id` INT UNSIGNED NOT NULL,
     `owner` INT NOT NULL,
     `paid` INT UNSIGNED NOT NULL DEFAULT 0,
     `warnings` TEXT NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE `houses` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `house_lists` (
-    `house_id` BIGINT UNSIGNED NOT NULL,
+    `house_id` INT UNSIGNED NOT NULL,
     `listid` INT NOT NULL,
     `list` TEXT NOT NULL,
     FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE
@@ -143,7 +143,7 @@ CREATE TABLE `bans` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tiles` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id` INT UNSIGNED NOT NULL,
     `x` INT NOT NULL,
     `y` INT NOT NULL,
     `z` INT NOT NULL,
@@ -151,7 +151,7 @@ CREATE TABLE `tiles` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tile_items` (
-    `tile_id` BIGINT UNSIGNED NOT NULL,
+    `tile_id` INT UNSIGNED NOT NULL,
     `sid` INT NOT NULL,
     `pid` INT NOT NULL DEFAULT 0,
     `itemtype` INT NOT NULL,
@@ -161,7 +161,7 @@ CREATE TABLE `tile_items` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_depotitems` (
-    `player_id` BIGINT UNSIGNED NOT NULL,
+    `player_id` INT UNSIGNED NOT NULL,
     `depot_id` INT NOT NULL DEFAULT 0,
     `sid` INT NOT NULL COMMENT 'any given range eg 0-100 will be reserved for depot lockers and all > 100 will be then normal items inside depots',
     `pid` INT NOT NULL DEFAULT 0,

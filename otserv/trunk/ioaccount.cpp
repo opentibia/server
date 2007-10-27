@@ -70,7 +70,7 @@ bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string
 	DBResult* result;
 
 	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`id` = " << accno << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
-	if(result = db->storeQuery(query.str())){
+	if((result = db->storeQuery(query.str()))){
 		password = result->getDataString("password");
 		db->freeResult(result);
 		return true;

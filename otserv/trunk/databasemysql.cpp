@@ -120,9 +120,9 @@ bool DatabaseMySQL::executeQuery(const std::string &query)
 	if(!m_connected)
 		return false;
 
-#ifdef __SQL_QUERY_DEBUG__
+	#ifdef __SQL_QUERY_DEBUG__
 	std::cout << "MYSQL QUERY: " << query << std::endl;
-#endif
+	#endif
 
 	bool state = true;
 
@@ -153,9 +153,9 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 	if(!m_connected)
 		return NULL;
 
-#ifdef __SQL_QUERY_DEBUG__
+	#ifdef __SQL_QUERY_DEBUG__
 	std::cout << "MYSQL QUERY: " << query << std::endl;
-#endif
+	#endif
 
 	// executes the query
 	if(mysql_real_query(&m_handle, query.c_str(), query.length()) != 0){
@@ -223,11 +223,13 @@ int32_t MySQLResult::getDataInt(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
 	if(it != m_listNames.end() ){
-		if(m_row[it->second] == NULL)
+		if(m_row[it->second] == NULL){
 			return 0;
-	else
+		}
+		else{
 			return atoi(m_row[it->second]);
-}
+		}
+	}
 
 	std::cout << "Error during getDataInt(" << s << ")." << std::endl;
 	return 0; // Failed
@@ -236,11 +238,13 @@ int32_t MySQLResult::getDataInt(const std::string &s)
 int64_t MySQLResult::getDataLong(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
-	if(it != m_listNames.end() ){
-		if(m_row[it->second] == NULL)
+	if(it != m_listNames.end()){
+		if(m_row[it->second] == NULL){
 			return 0;
-		else
+		}
+		else{
 			return ATOI64(m_row[it->second]);
+		}
 	}
 
 	std::cout << "Error during getDataLong(" << s << ")." << std::endl;
@@ -293,7 +297,7 @@ MySQLResult::MySQLResult(MYSQL_RES* res)
 
 	MYSQL_FIELD* field;
 	int32_t i = 0;
-	while( field = mysql_fetch_field(m_handle) ){
+	while((field = mysql_fetch_field(m_handle))){
 		m_listNames[field->name] = i;
 		i++;
 	}
