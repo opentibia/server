@@ -416,6 +416,7 @@ int main(int argc, char *argv[])
 
 	//OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
 
+	g_game.setGameState(GAME_STATE_INIT);
 	g_game.setGameState(GAME_STATE_NORMAL);
 
 	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));

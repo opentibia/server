@@ -29,6 +29,8 @@ extern Game g_game;
 #include "exception.h"
 #endif
 
+bool Dispatcher::m_shutdown = false;
+
 Dispatcher::Dispatcher()
 {
 	OTSYS_THREAD_LOCKVARINIT(m_taskLock);
@@ -36,27 +38,25 @@ Dispatcher::Dispatcher()
 	OTSYS_CREATE_THREAD(Dispatcher::dispatcherThread, NULL);
 }
 
-OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void *p)
+OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void* p)
 {
 	#if defined __EXCEPTION_TRACER__
 	ExceptionHandler dispatcherExceptionHandler;
 	dispatcherExceptionHandler.InstallHandler();
 	#endif
 	srand((unsigned int)OTSYS_TIME());
-	while(true){
+	while(!Dispatcher::m_shutdown){
 		Task* task = NULL;
 
 		// check if there are tasks waiting
 		OTSYS_THREAD_LOCK(getDispatcher().m_taskLock, "")
 
-		size_t listSize = getDispatcher().m_taskList.size();
-
-		if(listSize == 0){
+		if(getDispatcher().m_taskList.empty()){
 			//if the list is empty wait for signal
 			OTSYS_THREAD_WAITSIGNAL(getDispatcher().m_taskSignal, getDispatcher().m_taskLock);
 		}
 
-		if(listSize != 0 || getDispatcher().m_taskList.size() != 0){
+		if(!getDispatcher().m_taskList.empty() && !Dispatcher::m_shutdown){
 			// take the first task
 			task = getDispatcher().m_taskList.front();
 			getDispatcher().m_taskList.pop_front();
@@ -91,7 +91,18 @@ void Dispatcher::addTask(Task* task)
 	OTSYS_THREAD_UNLOCK(m_taskLock, "");
 
 	// send a signal if the list was empty
-	if(isEmpty)
+	if(isEmpty){
 		OTSYS_THREAD_SIGNAL_SEND(m_taskSignal);
+	}
+}
 
+void Dispatcher::stop()
+{
+	OTSYS_THREAD_LOCK(m_taskLock, "");
+	m_shutdown = true;
+
+	while(!m_taskList.empty()){
+		m_taskList.pop_front();
+	}
+	OTSYS_THREAD_UNLOCK(m_taskLock, "");
 }

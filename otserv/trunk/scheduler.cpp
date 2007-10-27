@@ -25,6 +25,8 @@
 #include "exception.h"
 #endif
 
+bool Scheduler::m_shutdown = false;
+
 Scheduler::Scheduler()
 {
 	OTSYS_THREAD_LOCKVARINIT(m_eventLock);
@@ -33,22 +35,22 @@ Scheduler::Scheduler()
 	OTSYS_CREATE_THREAD(Scheduler::schedulerThread, NULL);
 }
 
-OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
+OTSYS_THREAD_RETURN Scheduler::schedulerThread(void* p)
 {
 	#if defined __EXCEPTION_TRACER__
 	ExceptionHandler schedulerExceptionHandler;
 	schedulerExceptionHandler.InstallHandler();
 	#endif
 	srand((unsigned int)OTSYS_TIME());
-	while(true){
-		SchedulerTask* event = NULL;
-		bool runEvent = false;
+	while(!Scheduler::m_shutdown){
+		SchedulerTask* task = NULL;
+		bool runTask = false;
 		int ret;
 
 		// check if there are events waiting...
 		OTSYS_THREAD_LOCK(getScheduler().m_eventLock, "eventThread()")
 
-		if(getScheduler().m_eventList.size() == 0){
+		if(getScheduler().m_eventList.empty()){
 			// unlock mutex and wait for signal
 			ret = OTSYS_THREAD_WAITSIGNAL(getScheduler().m_eventSignal, getScheduler().m_eventLock);
 		}
@@ -58,30 +60,30 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
 		}
 
 		// the mutex is locked again now...
-		if(ret == OTSYS_THREAD_TIMEOUT){
+		if(ret == OTSYS_THREAD_TIMEOUT && !Scheduler::m_shutdown){
 			// ok we had a timeout, so there has to be an event we have to execute...
-			event = getScheduler().m_eventList.top();
+			task = getScheduler().m_eventList.top();
 			getScheduler().m_eventList.pop();
 
 			// check if the event was stopped
-			EventIdSet::iterator it = getScheduler().m_eventIds.find(event->getEventId());
+			EventIdSet::iterator it = getScheduler().m_eventIds.find(task->getEventId());
 			if(it != getScheduler().m_eventIds.end()){
 				// was not stopped so we should run it
-				runEvent = true;
+				runTask = true;
 				getScheduler().m_eventIds.erase(it);
 			}
 		}
 		OTSYS_THREAD_UNLOCK(getScheduler().m_eventLock, "eventThread()");
 
 		// add task to dispatcher
-		if(event){
+		if(task){
 			// if it was not stopped
-			if(runEvent){
-				Dispatcher::getDispatcher().addTask(event);
+			if(runTask){
+				Dispatcher::getDispatcher().addTask(task);
 			}
 			else{
-				// was sttopped, have to be deleted here
-				delete event;
+				// was stopped, have to be deleted here
+				delete task;
 			}
 		}
 	}
@@ -90,36 +92,32 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void *p)
 	#endif
 }
 
-uint32_t Scheduler::addEvent(SchedulerTask* event)
+uint32_t Scheduler::addEvent(SchedulerTask* task)
 {
 	OTSYS_THREAD_LOCK(m_eventLock, "");
 	// check if the event has a valid id
-	if(event->getEventId() == 0){
+	if(task->getEventId() == 0){
 		// if not generate one
 		++m_lastEventId;
-		event->setEventId(m_lastEventId);
+		task->setEventId(m_lastEventId);
 	}
 	// insert the eventid in the list of active events
-	m_eventIds.insert(event->getEventId());
-
-	bool do_signal;
+	m_eventIds.insert(task->getEventId());
 
 	// add the event to the queue
-	m_eventList.push(event);
+	m_eventList.push(task);
 
 	// if the list was empty or this event is the top in the list
 	// we have to signal it
-	if(event == m_eventList.top())
-		do_signal = true;
-	else
-		do_signal = false;
+	bool do_signal = (task == m_eventList.top());
 
 	OTSYS_THREAD_UNLOCK(m_eventLock, "");
 
-	if(do_signal)
+	if(do_signal){
 		OTSYS_THREAD_SIGNAL_SEND(m_eventSignal);
+	}
 
-	return event->getEventId();
+	return task->getEventId();
 }
 
 
@@ -143,3 +141,17 @@ bool Scheduler::stopEvent(uint32_t eventid)
 		return false;
 	}
 }
+
+void Scheduler::stop()
+{
+	OTSYS_THREAD_LOCK(m_eventLock, "clearTaskList()");
+	m_shutdown = true;
+
+	while(!m_eventList.empty()){
+		m_eventList.pop();
+	}
+
+	m_eventIds.clear();
+	OTSYS_THREAD_UNLOCK(m_eventLock, "clearTaskList()");
+}
+

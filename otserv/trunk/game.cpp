@@ -115,14 +115,47 @@ GameState_t Game::getGameState()
 	return gameState;
 }
 
-void Game::setGameState(GameState_t newstate)
+void Game::setGameState(GameState_t newState)
 {
-	if(gameState != GAME_STATE_SHUTDOWN){
-	gameState = newstate;
-		if(newstate == GAME_STATE_SHUTDOWN && g_server){
-			g_server->stop();
-}
+	if(gameState != newState){
+		gameState = newState;
+
+		switch(newState){
+			case GAME_STATE_INIT:
+			{
+				loadGameState();
+				break;
+			}
+
+			case GAME_STATE_SHUTDOWN:
+			{
+				saveGameState();
+				Scheduler::getScheduler().stop();
+				Dispatcher::getDispatcher().stop();
+
+				if(g_server){
+					g_server->stop();
+				}
+				break;
+			}
+			
+			case GAME_STATE_STARTUP:
+			case GAME_STATE_CLOSED:
+			case GAME_STATE_NORMAL:
+			default:
+				break;
+		}
 	}
+}
+
+void Game::saveGameState()
+{
+	ScriptEnviroment::saveGameState();
+}
+
+void Game::loadGameState()
+{
+	ScriptEnviroment::loadGameState();
 }
 
 int Game::loadMap(std::string filename, std::string filekind)

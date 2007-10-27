@@ -163,8 +163,8 @@ public:
 	uint32_t getExperience() const {return experience;}
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
-	const Position& getLoginPosition() {return loginPosition;}
-	const Position& getTemplePosition() {return masterPos;}
+	const Position& getLoginPosition() const {return loginPosition;}
+	const Position& getTemplePosition() const {return masterPos;}
 	uint32_t getTown() const {return town;}
 	void setTown(uint32_t _town) {town = _town;}
 

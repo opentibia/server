@@ -173,6 +173,12 @@ CREATE TABLE `player_depotitems` (
     UNIQUE (`player_id`, `sid`)
 ) ENGINE = InnoDB;
 
+CREATE TABLE `global_storage` (
+    `key` INT UNSIGNED NOT NULL,
+    `value` INT NOT NULL,
+    PRIMARY KEY(`key`)
+) ENGINE = InnoDB;
+
 DELIMITER |
 
 CREATE TRIGGER `ondelete_accounts`

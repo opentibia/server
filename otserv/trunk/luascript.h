@@ -136,6 +136,9 @@ public:
 	static uint32_t addConditionObject(Condition* condition);
 	static Condition* getConditionObject(uint32_t conditionId);
 
+	static bool loadGameState();
+	static bool saveGameState();
+
 private:
 	typedef std::map<int32_t, Thing*> ThingMap;
 	typedef std::vector<const LuaVariant*> VariantVector;

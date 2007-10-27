@@ -172,6 +172,13 @@ CREATE TABLE "player_depotitems" (
     UNIQUE ("player_id", "sid")
 );
 
+CREATE TABLE "global_storage" (
+    "key" INT,
+    "value" INT NOT NULL,
+    PRIMARY KEY("key")
+);
+
+
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
 AS $$

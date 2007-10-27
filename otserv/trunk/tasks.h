@@ -59,8 +59,9 @@ public:
 	}
 	
 	void addTask(Task* task);
+	void stop();
 	
-	static OTSYS_THREAD_RETURN dispatcherThread(void *p);
+	static OTSYS_THREAD_RETURN dispatcherThread(void* p);
 	
 protected:
 	Dispatcher();
@@ -69,6 +70,7 @@ protected:
 	OTSYS_THREAD_SIGNALVAR m_taskSignal;
 	
 	std::list<Task*> m_taskList;
+	static bool m_shutdown;
 };
 
 

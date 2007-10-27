@@ -102,6 +102,65 @@ void ScriptEnviroment::resetEnv()
 	m_realPos.z = 0;
 }
 
+bool ScriptEnviroment::saveGameState()
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	if(!db->executeQuery("DELETE FROM `global_storage`")){
+		return false;
+	}
+
+	DBInsert stmt(db);
+	stmt.setQuery("INSERT INTO `global_storage` (`key`, `value`) VALUES ");
+
+	for(StorageMap::const_iterator it = m_globalStorageMap.begin(); it != m_globalStorageMap.end(); ++it){
+		query << it->first << ", " << it->second;
+
+		if(!stmt.addRow(query)){
+			return false;
+		}
+	}
+
+	if(!stmt.execute()){
+		return false;
+	}
+
+	return true;
+}
+
+bool ScriptEnviroment::loadGameState()
+{
+	Database* db = Database::instance();
+	DBResult* result;
+	DBQuery query;
+
+	if(!(result = db->storeQuery("SELECT COUNT(*) FROM `global_storage`"))){
+		return false;
+	}
+
+	uint32_t count = result->getDataInt("COUNT(*)");
+	db->freeResult(result);
+	if(count == 0){
+		return true;
+	}
+
+	if(!(result = db->storeQuery("SELECT * FROM `global_storage`"))){
+		return false;
+	}
+
+	do{
+		int32_t key = result->getDataInt("key");
+		int32_t value = result->getDataInt("value");
+
+		m_globalStorageMap[key] = value;
+	}while(result->next());
+
+	db->freeResult(result);
+	return true;
+}
+
 bool ScriptEnviroment::setCallbackId(int32_t callbackId, LuaScriptInterface* scriptInterface)
 {
 	if(m_callbackId == 0){

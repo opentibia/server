@@ -57,6 +57,7 @@ enum WorldType_t {
 
 enum GameState_t {
 	GAME_STATE_STARTUP,
+	GAME_STATE_INIT,
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
 	GAME_STATE_SHUTDOWN,
@@ -362,7 +363,9 @@ public:
 #endif
 
 	GameState_t getGameState();
-	void setGameState(GameState_t newstate);
+	void setGameState(GameState_t newState);
+	void saveGameState();
+	void loadGameState();
 
 	//Events
 	void checkWalk(uint32_t creatureId);

@@ -79,10 +79,11 @@ public:
 		return scheduler;
 	}
 	
-	uint32_t addEvent(SchedulerTask* event);
+	uint32_t addEvent(SchedulerTask* task);
 	bool stopEvent(uint32_t eventId);
+	void stop();
 	
-	static OTSYS_THREAD_RETURN schedulerThread(void *p);
+	static OTSYS_THREAD_RETURN schedulerThread(void* p);
 	
 protected:
 	Scheduler();
@@ -94,6 +95,7 @@ protected:
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > m_eventList;
 	typedef std::set<uint32_t> EventIdSet;
 	EventIdSet m_eventIds;
+	static bool m_shutdown;
 };
 
 
