@@ -52,7 +52,7 @@ bool IOMapSerialize::saveMap(Map* map, const std::string& identifier)
 	DBTransaction transaction(db);
 
 	//Start the transaction
-	if(transaction.begin())
+	if(!transaction.begin())
 		return false;
 
 	//clear old tile data
