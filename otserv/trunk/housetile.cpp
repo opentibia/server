@@ -67,7 +67,12 @@ Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item
 						<< " - Name: " << house->getName()
 						<< " - House id: " << house->getHouseId()
 						<< " - Tile not found: " << entryPos << std::endl;
-					destTile = &(Tile::null_tile);
+					
+					const Position& templePos = player->getTemplePosition();
+					destTile = g_game.getTile(templePos.x, templePos.y, templePos.z);
+					if(!destTile){
+						destTile = &(Tile::null_tile);
+					}
 				}
 
 				index = -1;
