@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Colerian The Barbarian" nameDescription="colerian the barbarian" race="blood" experience="90" speed="190" manacost="450">
+  <health now="265" max="265"/>
+  <look type="253" head="76" body="115" legs="115" feet="43" corpse="7349"/>
+  <targetchange interval="2000" chance="15"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag staticattack="100"/>
+    <flag lightlevel="0"/>
+    <flag lightcolor="0"/>
+    <flag targetdistance="1"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="bolt" interval="1000" chance="100" min="-7" max="-28"/>
+    <attack name="melee" interval="2000" min="-30" max="-65"/>
+  </attacks>
+  <defenses armor="19" defense="20"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="1"/>
+    <immunity outfit="1"/>
+    <immunity drunk="1"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <voices interval="2000" chance="5">
+    <voice sentence="You will become my trophy!"/>
+    <voice sentence="Fight harder, coward!"/>
+    <voice sentence="Show that you are a worthy opponent."/>
+  </voices>
+  <loot>
+    <item id="2148" countmax="30" chance1="100000" chancemax="0"/> --Gold Coins
+    <item id="2460" chance="6666"/> --Brass Helmet
+    <item id="7449" chance="777"/> --Crystal Sword
+    <item id="1987" chance="100000"> --Bag
+        <inside>
+           <item id="2050" chance="11111"/> --Torch
+           <item id="7462" chance="888"/> --Ragnir Helmet
+           <item id="2168" chance="1333"/> --Life Ring
+        </inside>
+     </item>
+  </loot>
+</monster>

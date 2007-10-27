@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <monster name="The Dark Dancer" species="undead" tp="1" nameDescription="the dark dancer" race="blood" experience="435" speed="170" manacost="0">
+    <health now="805" max="805"/>
+    <look type="58" head="20" body="30" legs="40" feet="50" corpse="7349"/>
+    <targetchange interval="60000" chance="0"/>
+    <strategy attack="100" defense="0"/>
+    <flags>
+      <flag summonable="0"/>
+      <flag attackable="1"/>
+      <flag hostile="1"/>
+      <flag illusionable="1"/>
+      <flag convinceable="0"/>
+      <flag pushable="0"/>
+      <flag canpushitems="1"/>
+      <flag staticattack="78"/>
+      <flag lightlevel="0"/>
+      <flag lightcolor="0"/>
+      <flag targetdistance="5"/>
+      <flag runonhealth="0"/>
+    </flags>
+    <attacks>
+      <attack name="melee" interval="2000" min="-1" max="-70"/>
+      <attack name="sudden death" interval="3000" chance="70" min="-60" max="-95"/>
+      <attack name="sudden death" interval="6000" chance="90" min="-60" max="-95"/>
+      <attack name="heavy magic missile" interval="2000" chance="45" min="-25" max="-50"/>
+      <attack name="heavy magic missile" interval="4000" chance="90" min="-25" max="-50"/>
+      <attack name="mana drain" interval="4000" chance="30"/>
+    </attacks>
+    <defenses armor="11" defense="12"/>
+    <immunities>
+      <immunity physical="0"/>
+      <immunity energy="1"/>
+      <immunity fire="1"/>
+      <immunity poison="1"/>
+      <immunity lifedrain="0"/>
+      <immunity paralyze="1"/>
+      <immunity outfit="0"/>
+      <immunity drunk="1"/>
+      <immunity invisible="1"/>
+    </immunities>
+    <summons max="5">
+      <summon name="Ghoul" interval="2000" chance="20"/>
+      <summon name="Mummy" interval="3000" chance="20"/>
+      <summon name="Necromancer" interval="4000" chance="20"/>
+    </summons>
+    <voices interval="2000" chance="5">
+    </voices>
+  </monster>

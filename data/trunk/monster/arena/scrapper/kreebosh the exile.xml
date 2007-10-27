@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Kreebosh the Exile" nameDescription="kreebosh the exile" race="blood" experience="350" speed="270" manacost="0">
+  <health now="880" max="880"/>
+  <look type="103" head="20" body="30" legs="40" feet="50" corpse="7349"/>
+  <targetchange interval="2000" chance="5"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag staticattack="78"/>
+    <flag lightlevel="0"/>
+    <flag lightcolor="0"/>
+    <flag targetdistance="1"/>
+    <flag runonhealth="50"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" min="-1" max="-140"/>
+    <attack name="berserk" interval="6000" chance="80"/>
+    <attack name="berserk" interval="1200" chance="10"/>
+ <attack name="heavy magic missile" interval="2000" chance="45" min="-50" max="-200"/>  
+ <attack name="drunk" interval="1000" chance="20" range="7"/>
+      <attribute key="shootEffect" value="energy"/>
+   <attack name="paralyze" interval="3500" chance="35"/>  
+<attack name="sudden death" interval="6000" chance="40" min="-60" max="-100"/>
+ </attacks>
+  <defenses armor="30" defense="40"/> 
+ <immunities>  
+  <immunity physical="0"/>
+    <immunity energy="1"/>
+    <immunity fire="1"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="1"/>
+    <immunity outfit="0"/>
+    <immunity drunk="1"/>
+    <immunity invisible="0"/>
+  </immunities>
+   <summons max="2">
+  <summon name="Green Djinn" interval="5000" chance="20"/>
+    </summons>
+  </monster>
