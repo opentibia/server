@@ -755,7 +755,9 @@ const PlayerGroup* IOPlayer::getPlayerGroupByAccount(uint32_t accno)
 
 	query << "SELECT `group_id` FROM `accounts` WHERE `id`= " << accno;
 	if((result = db->storeQuery(query.str()))){
-		return getPlayerGroup(result->getDataInt("group_id"));
+		uint32_t groupid = result->getDataInt("group_id");
+		db->freeResult(result);
+		return getPlayerGroup(groupid);
 	}
 
 	return NULL;
