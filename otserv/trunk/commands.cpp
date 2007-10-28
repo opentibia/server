@@ -61,11 +61,7 @@ extern Game g_game;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
-#define ipText(a) \
-	(unsigned int)a[0] << "." << \
-	(unsigned int)a[1] << "." << \
-	(unsigned int)a[2] << "." << \
-	(unsigned int)a[3]
+#define ipText(a) (unsigned int)a[0] << "." << (unsigned int)a[1] << "." << (unsigned int)a[2] << "." << (unsigned int)a[3]
 
 //table of commands
 s_defcommands Commands::defined_commands[] = {
@@ -95,7 +91,6 @@ s_defcommands Commands::defined_commands[] = {
 	{"/town",&Commands::teleportToTown},
 	{"/serverinfo",&Commands::serverInfo},
 	{"/raid",&Commands::forceRaid},
-	{"/shutdown",&Commands::shutdownServer},
 };
 
 
@@ -1205,21 +1200,5 @@ bool Commands::forceRaid(Creature* creature, const std::string& cmd, const std::
 	Scheduler::getScheduler().addEvent(createSchedulerTask(event->getDelay(), boost::bind(&Raid::executeRaidEvent, raid, event)));
 
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
-	return true;
-}
-
-bool Commands::shutdownServer(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	int32_t time = atoi(param.c_str()) * 60 * 1000;
-	if(time > 0){
-		std::stringstream time_str;
-		time_str << "The server is shutting down in "
-		    << time/(60*1000) << " minute" << (time>1? "s" : "") << "." << std::endl << "Please Logout.";
-		game->anonymousBroadcastMessage(MSG_STATUS_WARNING, time_str.str());
-		Scheduler::getScheduler().addEvent(createSchedulerTask(time, boost::bind(&Game::setGameState, game, GAME_STATE_SHUTDOWN)));
-	}
-	else{
-		game->setGameState(GAME_STATE_SHUTDOWN);
-	}
 	return true;
 }

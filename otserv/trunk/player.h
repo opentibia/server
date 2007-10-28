@@ -83,15 +83,6 @@ enum tradestate_t {
 	TRADE_TRANSFER
 };
 
-struct PlayerGroup{
-	PlayerGroup(){}
-    std::string m_name;
-	uint64_t m_flags;
-	uint32_t m_access;
-	uint32_t m_maxDepotItems;
-	uint32_t m_maxVip;
-};
-
 typedef std::pair<uint32_t, Container*> containervector_pair;
 typedef std::vector<containervector_pair> ContainerVector;
 typedef std::map<uint32_t, Depot*> DepotMap;
@@ -490,8 +481,6 @@ public:
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
-
-	void setPlayerGroup(const PlayerGroup* _playerGroup, const PlayerGroup* _accountGroup = NULL, bool checkAcc = true);
 
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;

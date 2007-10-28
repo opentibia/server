@@ -366,7 +366,6 @@ public:
 	void setGameState(GameState_t newState);
 	void saveGameState();
 	void loadGameState();
-	void savePlayers();
 
 	//Events
 	void checkWalk(uint32_t creatureId);

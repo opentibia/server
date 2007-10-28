@@ -211,9 +211,7 @@ enum PlayerInfo_t{
 	PlayerInfoTown,
 	PlayerInfoGUID,
 	PlayerInfoPremiumDays,
-	PlayerInfoSkullType,
-	PlayerInfoGroupId,
-	PlayerInfoAccGroupId
+	PlayerInfoSkullType
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -353,7 +351,7 @@ protected:
 	static int luaDoSetCreatureLight(lua_State *L);
 	static int luaDoPlayerSetLossPercent(lua_State *L);
 	static int luaDoSetCreatureDropLoot(lua_State *L);
-	static int luaDoPlayerSetGroup(lua_State *L);
+	static int luaGetPlayerSkullType(lua_State *L);
 
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
@@ -413,9 +411,6 @@ protected:
 	static int luaGetPlayerFlagValue(lua_State *L);
 	static int luaGetPlayerLossPercent(lua_State *L);
 	static int luaGetPlayerPremiumDays(lua_State *L);
-	static int luaGetPlayerSkullType(lua_State *L);
-	static int luaGetPlayerGroupId(lua_State *L);
-	static int luaGetPlayerAccountGroupId(lua_State *L);
 
 	static int luaPlayerLearnInstantSpell(lua_State *L);
 	static int luaCanPlayerLearnInstantSpell(lua_State *L);

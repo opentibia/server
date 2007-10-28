@@ -90,6 +90,9 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void* p)
 	#if defined __EXCEPTION_TRACER__
 	schedulerExceptionHandler.RemoveHandler();
 	#endif
+	#ifndef __WINDOWS__
+	return 0;
+	#endif
 }
 
 uint32_t Scheduler::addEvent(SchedulerTask* task)

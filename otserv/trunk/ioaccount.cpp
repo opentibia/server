@@ -78,19 +78,3 @@ bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string
 
 	return false;
 }
-
-int32_t IOAccount::getAccountGroupId(uint32_t accno)
-{
-	Database* db = Database::instance();
-	DBQuery query;
-	DBResult* result;
-
-	query << "SELECT `group_id` FROM `accounts` WHERE `id` = " << accno;
-	if((result = db->storeQuery(query.str()))){
-		uint32_t id = result->getDataInt("group_id");
-		db->freeResult(result);
-		return id;
-	}
-
-	return -1;
-}

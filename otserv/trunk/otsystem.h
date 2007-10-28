@@ -87,13 +87,13 @@ inline int64_t OTSYS_TIME()
 
 inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock)
 {
-  //LeaveCriticalSection(&lock);
+	//LeaveCriticalSection(&lock);
 	OTSYS_THREAD_UNLOCK(lock, "OTSYS_THREAD_WAITSIGNAL");
-  WaitForSingleObject(signal, INFINITE);
-  //EnterCriticalSection(&lock);
+	WaitForSingleObject(signal, INFINITE);
+	//EnterCriticalSection(&lock);
 	OTSYS_THREAD_LOCK(lock, "OTSYS_THREAD_WAITSIGNAL");
 
-  return -0x4711;
+	return -0x4711;
 }
 
 inline void OTSYS_SLEEP(uint32_t t){
@@ -103,19 +103,19 @@ inline void OTSYS_SLEEP(uint32_t t){
 
 inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, int64_t cycle)
 {
-  int64_t tout64 = (cycle - OTSYS_TIME());
+	int64_t tout64 = (cycle - OTSYS_TIME());
   
-  DWORD tout = 0;
-  if (tout64 > 0)
+	DWORD tout = 0;
+	if(tout64 > 0)
 		tout = (DWORD)(tout64);
 
-  //LeaveCriticalSection(&lock);
+	//LeaveCriticalSection(&lock);
 	OTSYS_THREAD_UNLOCK(lock, "OTSYS_THREAD_WAITSIGNAL_TIMED");
-  int ret = WaitForSingleObject(signal, tout);
-  //EnterCriticalSection(&lock);
+	int ret = WaitForSingleObject(signal, tout);
+	//EnterCriticalSection(&lock);
 	OTSYS_THREAD_LOCK(lock, "OTSYS_THREAD_WAITSIGNAL_TIMED");
 
-  return ret;
+	return ret;
 }
 
 typedef int socklen_t;
@@ -165,20 +165,20 @@ inline void SOCKET_PERROR(const char* a)
 
 inline void OTSYS_CREATE_THREAD(void *(*a)(void*), void *b)
 {
-  pthread_attr_t attr;
-  pthread_t id;
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
-  pthread_create(&id, &attr, a, b);
+	pthread_attr_t attr;
+	pthread_t id;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+	pthread_create(&id, &attr, a, b);
 }
 
 typedef pthread_mutex_t OTSYS_THREAD_LOCKVAR;
 
 inline void OTSYS_THREAD_LOCKVARINIT(OTSYS_THREAD_LOCKVAR& l) {
-		  pthread_mutexattr_t attr;
-		  pthread_mutexattr_init(&attr);
-		  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
-		  pthread_mutex_init(&l, &attr);
+	pthread_mutexattr_t attr;
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+	pthread_mutex_init(&l, &attr);
 }
 
 #define OTSYS_THREAD_LOCKVARRELEASE(a)  //todo: working macro
@@ -194,17 +194,17 @@ typedef pthread_cond_t OTSYS_THREAD_SIGNALVAR;
 
 inline void OTSYS_SLEEP(int t)
 {
-  timespec tv;
-  tv.tv_sec  = t / 1000;
-  tv.tv_nsec = (t % 1000)*1000000;
-  nanosleep(&tv, NULL);
+	timespec tv;
+	tv.tv_sec  = t / 1000;
+	tv.tv_nsec = (t % 1000)*1000000;
+	nanosleep(&tv, NULL);
 }
 
 inline int64_t OTSYS_TIME()
 {
-  timeb t;
-  ftime(&t);
-  return ((int64_t)t.millitm) + ((int64_t)t.time) * 1000;
+	timeb t;
+	ftime(&t);
+	return ((int64_t)t.millitm) + ((int64_t)t.time) * 1000;
 }
 
 inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock){
@@ -212,11 +212,11 @@ inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_
 }
 
 inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, int64_t cycle) {
-		  timespec tv;
-		  tv.tv_sec = (int64_t)(cycle / 1000);
-		  // tv_nsec is in nanoseconds while we only store microseconds...
-		  tv.tv_nsec = (int64_t)(cycle % 1000) * 1000000;
-		  return pthread_cond_timedwait(&signal, &lock, &tv);
+	timespec tv;
+	tv.tv_sec = (int64_t)(cycle / 1000);
+	// tv_nsec is in nanoseconds while we only store microseconds...
+	tv.tv_nsec = (int64_t)(cycle % 1000) * 1000000;
+	return pthread_cond_timedwait(&signal, &lock, &tv);
 }
 
 
