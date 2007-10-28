@@ -37,6 +37,7 @@
 #include "baseevents.h"
 #include "town.h"
 #include "ioplayer.h"
+#include "ioaccount.h"
 #include "configmanager.h"
 #include "teleport.h"
 
@@ -945,6 +946,12 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerGUID(cid)
 	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
 
+	//getPlayerGroupId(cid)
+	lua_register(m_luaState, "getPlayerGroupId", LuaScriptInterface::luaGetPlayerGroupId);
+
+	//getPlayerAccountGroupId(cid)
+	lua_register(m_luaState, "getPlayerAccountGroupId", LuaScriptInterface::luaGetPlayerAccountGroupId);
+
 	//getPlayerFlagValue(cid, flag)
 	lua_register(m_luaState, "getPlayerFlagValue", LuaScriptInterface::luaGetPlayerFlagValue);
 
@@ -956,6 +963,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//getPlayerSkullType(cid)
 	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
+
+	//getPlayerGroupId(cid)
+	lua_register(m_luaState, "getPlayerGroupId", LuaScriptInterface::luaGetPlayerGroupId);
 
 	//playerLearnInstantSpell(cid, name)
 	lua_register(m_luaState, "playerLearnInstantSpell", LuaScriptInterface::luaPlayerLearnInstantSpell);
@@ -1155,6 +1165,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//doPlayerSetLossPercent(cid, lossType, newPercent)
 	lua_register(m_luaState, "doPlayerSetLossPercent", LuaScriptInterface::luaDoPlayerSetLossPercent);
+
+	//doPlayerSetGroup(cid, groupid)
+	lua_register(m_luaState, "doPlayerSetGroup", LuaScriptInterface::luaDoPlayerSetGroup);
 
 	//doSetCreatureDropLoot(cid, doDrop)
 	lua_register(m_luaState, "doSetCreatureDropLoot", LuaScriptInterface::luaDoSetCreatureDropLoot);
@@ -1530,6 +1543,12 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			value = 0;
 			#endif
 			break;
+		case PlayerInfoGroupId:
+			value = IOPlayer::instance()->getPlayerGroupId(player->getGUID());
+			break;
+		case PlayerInfoAccGroupId:
+			value = IOAccount::instance()->getAccountGroupId(player->getAccount());
+			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -1622,6 +1641,12 @@ int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L){
 
 int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoSkullType);}
+
+int LuaScriptInterface::luaGetPlayerGroupId(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoGroupId);}
+
+int LuaScriptInterface::luaGetPlayerAccountGroupId(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoAccGroupId);}
 //
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
@@ -5522,4 +5547,24 @@ int LuaScriptInterface::luaIsPremium(lua_State *L)
 	}
 	return 1;
 
+}
+
+int LuaScriptInterface::luaDoPlayerSetGroup(lua_State *L)
+{
+	//doPlayerSetGroup(cid, groupid)
+	uint32_t groupid = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		const PlayerGroup* group = IOPlayer::instance()->getPlayerGroup(groupid);
+		player->setPlayerGroup(group);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
 }

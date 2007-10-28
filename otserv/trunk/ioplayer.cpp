@@ -55,13 +55,9 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	player->accountNumber = result->getDataInt("account_id");
 	player->setSex((playersex_t)result->getDataInt("sex"));
 
+	const PlayerGroup* accGroup = getPlayerGroupByAccount(player->getAccount());
 	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
-	if(group){
-		player->accessLevel = group->m_access;
-		player->maxDepotLimit = group->m_maxDepotItems;
-		player->maxVipLimit = group->m_maxVip;
-		player->setFlags(group->m_flags);
-	}
+	player->setPlayerGroup(group, accGroup, false);
 
 	#ifdef __USE_SQL_PREMDAYS__
 	player->premiumDays = result->getDataInt("premdays");
@@ -657,14 +653,18 @@ bool IOPlayer::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string& na
 
 	name = result->getDataString("name");
 	guid = result->getDataInt("id");
-	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
 
+	const PlayerGroup* accGroup = getPlayerGroupByAccount(result->getDataInt("account_id"));
+	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
+	uint64_t flags = 0;
 	if(group){
-		specialVip = (0 != (group->m_flags & ((uint64_t)1 << PlayerFlag_SpecialVIP)));
+		flags |= group->m_flags;
 	}
-	else{
-		specialVip = false;
+	if(accGroup){
+		flags |= accGroup->m_flags;
 	}
+
+	specialVip = (0 != (flags & ((uint64_t)1 << PlayerFlag_SpecialVIP)));
 
 	db->freeResult(result);
 	return true;
@@ -697,6 +697,24 @@ bool IOPlayer::playerExists(std::string name)
 	return true;
 }
 
+int32_t IOPlayer::getPlayerGroupId(uint32_t guid) const
+{
+	//Perhaps this should be done in some other way
+	//But I'll keep it like this atm.
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "SELECT `group_id` FROM `players` WHERE `id`=" << guid;
+	if((result = db->storeQuery(query.str()))){
+		int32_t id = result->getDataInt("group_id");
+		db->freeResult(result);
+		return id;
+	}
+
+	return -1;
+}
+
 const PlayerGroup* IOPlayer::getPlayerGroup(uint32_t groupid)
 {
 	PlayerGroupMap::const_iterator it = playerGroupMap.find(groupid);
@@ -726,6 +744,20 @@ const PlayerGroup* IOPlayer::getPlayerGroup(uint32_t groupid)
 			return group;
 		}
 	}
+	return NULL;
+}
+
+const PlayerGroup* IOPlayer::getPlayerGroupByAccount(uint32_t accno)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "SELECT `group_id` FROM `accounts` WHERE `id`= " << accno;
+	if((result = db->storeQuery(query.str()))){
+		return getPlayerGroup(result->getDataInt("group_id"));
+	}
+
 	return NULL;
 }
 

@@ -26,7 +26,7 @@
 #include "player.h"
 #include "database.h"
 
-class PlayerGroup
+/*class PlayerGroup
 {
 public:
 	PlayerGroup(){};
@@ -37,7 +37,7 @@ public:
 	uint32_t m_access;
 	uint32_t m_maxDepotItems;
 	uint32_t m_maxVip;
-};
+};*/
 
 typedef std::pair<int32_t, Item*> itemBlock;
 typedef std::list<itemBlock> ItemBlockList;
@@ -74,11 +74,12 @@ public:
 	bool getNameByGuid(uint32_t guid, std::string& name);
 	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 	bool playerExists(std::string name);
+	int32_t getPlayerGroupId(uint32_t guid) const;
+	const PlayerGroup* getPlayerGroup(uint32_t groupid);
+	const PlayerGroup* getPlayerGroupByAccount(uint32_t accno);
 
 protected:
-	bool storeNameByGuid(Database &mysql, uint32_t guid);
-
-	const PlayerGroup* getPlayerGroup(uint32_t groupid);
+	bool storeNameByGuid(Database &db, uint32_t guid);
 
 	struct StringCompareCase{
 		bool operator()(const std::string& l, const std::string& r) const{

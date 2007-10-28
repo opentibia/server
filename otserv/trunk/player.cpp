@@ -3362,3 +3362,36 @@ bool Player::hasLearnedInstantSpell(const std::string& name) const
 
 	return false;
 }
+
+void Player::setPlayerGroup(const PlayerGroup* playerGroup, const PlayerGroup* _accountGroup /*= NULL*/, bool checkAccount /*= true*/)
+{
+	PlayerGroup* accountGroup = const_cast<PlayerGroup*>(_accountGroup);
+	if(checkAccount && !accountGroup){ //Be sure we don't erase the acc group accidentally
+		accountGroup = const_cast<PlayerGroup*>(IOPlayer::instance()->getPlayerGroupByAccount(getAccount()));
+	}
+
+	if(accountGroup && playerGroup){
+		accessLevel = std::max(accountGroup->m_access, playerGroup->m_access);
+		maxDepotLimit = std::max(accountGroup->m_maxDepotItems, playerGroup->m_maxDepotItems);
+		maxVipLimit = std::max(accountGroup->m_maxVip, playerGroup->m_maxVip);
+		setFlags(accountGroup->m_flags | playerGroup->m_flags);
+	}
+	else if(playerGroup){
+		accessLevel = playerGroup->m_access;
+		maxDepotLimit = playerGroup->m_maxDepotItems;
+		maxVipLimit = playerGroup->m_maxVip;
+		setFlags(playerGroup->m_flags);
+	}
+	else if(accountGroup){
+		accessLevel = accountGroup->m_access;
+		maxDepotLimit = accountGroup->m_maxDepotItems;
+		maxVipLimit = accountGroup->m_maxVip;
+		setFlags(accountGroup->m_flags);
+	}
+	else{
+		accessLevel = 0;
+		maxDepotLimit = 1000; //Even if we don't have a group,
+		maxVipLimit = 50;     //we deserve depot and vip limit!
+		setFlags(0);
+	}
+}

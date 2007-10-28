@@ -13,7 +13,8 @@
 <command cmd="/owner" access="3" />			-- Set a player to house owner
 <command cmd="/goto" access="3" />			-- Teleport to players, creatures or NPCs
 <command cmd="/a" access="3" />				-- Teleport by SQMs
-<command cmd="/raid" access="3" />				-- Start raid
+<command cmd="/raid" access="3" />			-- Start raid
+<command cmd="/shutdown" access="3" />		-- Shutdown server
 
 -- Gamemasters
 <command cmd="/c" access="2" />				-- Teleport a player to you

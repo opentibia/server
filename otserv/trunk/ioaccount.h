@@ -39,6 +39,7 @@ public:
 
 	Account loadAccount(uint32_t accno);
 	bool getPassword(uint32_t accno, const std::string& name, std::string& password);
+	int32_t getAccountGroupId(uint32_t accno);
 };
 
 #endif

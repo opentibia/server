@@ -151,11 +151,19 @@ void Game::setGameState(GameState_t newState)
 void Game::saveGameState()
 {
 	ScriptEnviroment::saveGameState();
+	savePlayers();
 }
 
 void Game::loadGameState()
 {
 	ScriptEnviroment::loadGameState();
+}
+
+void Game::savePlayers()
+{
+    for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		IOPlayer::instance()->savePlayer(it->second);
+	}
 }
 
 int Game::loadMap(std::string filename, std::string filekind)
