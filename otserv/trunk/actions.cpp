@@ -165,32 +165,50 @@ ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, 
 	return RET_NOERROR;
 }
 
-Action* Actions::getAction(const Item* item)
+Action* Actions::getAction(const Item* item, ActionType_t type /* = ACTION_ANY*/)
 {
-	if(item->getUniqueId() != 0){
+	if(item->getUniqueId() != 0 && (type == ACTION_ANY || type == ACTION_UNIQUEID) ){
 		ActionUseMap::iterator it = uniqueItemMap.find(item->getUniqueId());
 		if(it != uniqueItemMap.end()){
 			return it->second;
 		}
 	}
-	if(item->getActionId() != 0){
+	if(item->getActionId() != 0 && (type == ACTION_ANY || type == ACTION_ACTIONID)){
 		ActionUseMap::iterator it = actionItemMap.find(item->getActionId());
 		if (it != actionItemMap.end()){
 			return it->second;
 		}
 	}
-	ActionUseMap::iterator it = useItemMap.find(item->getID());
-	if(it != useItemMap.end()){
-	   	return it->second;
+
+	if(type == ACTION_ANY || type == ACTION_ITEMID){
+		ActionUseMap::iterator it = useItemMap.find(item->getID());
+		if(it != useItemMap.end()){
+	   		return it->second;
+		}
 	}
 
-	//rune items
-	Action* runeSpell = g_spells->getRuneSpell(item->getID());
-	if(runeSpell){
-		return runeSpell;
+	if(type == ACTION_ANY || type == ACTION_RUNEID){
+		//rune items
+		Action* runeSpell = g_spells->getRuneSpell(item->getID());
+		if(runeSpell){
+			return runeSpell;
+		}
 	}
-	
+
 	return NULL;
+}
+
+ReturnValue Actions::executeUse(Player* player, Item* item,
+	const PositionEx& posEx, uint32_t creatureId, ActionType_t type)
+{
+	Action* action = getAction(item, type);
+	if(action){
+		if(action->executeUse(player, item, posEx, posEx, false, creatureId)){
+			return RET_NOERROR;
+		}
+	}
+
+	return RET_CANNOTUSETHISOBJECT;
 }
 
 ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
@@ -203,18 +221,25 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 		}
 	}
 	
-	//look for the item in action maps	
-	Action* action = getAction(item);
-	
-	//if found execute it
-	if(action){
-		int32_t stack = item->getParent()->__getIndexOfThing(item);
-		PositionEx posEx(pos, stack);
-		if(action->executeUse(player, item, posEx, posEx, false, creatureId)){
-			return RET_NOERROR;
-		}
+	int32_t stack = item->getParent()->__getIndexOfThing(item);
+	PositionEx posEx(pos, stack);
+
+	if(executeUse(player, item, posEx, creatureId, ACTION_UNIQUEID) == RET_NOERROR){
+		return RET_NOERROR;
+	}
+
+	if(executeUse(player, item, posEx, creatureId, ACTION_ACTIONID) == RET_NOERROR){
+		return RET_NOERROR;
 	}
 	
+	if(executeUse(player, item, posEx, creatureId, ACTION_ITEMID) == RET_NOERROR){
+		return RET_NOERROR;
+	}
+
+	if(executeUse(player, item, posEx, creatureId, ACTION_RUNEID) == RET_NOERROR){
+		return RET_NOERROR;
+	}
+
 	if(item->isReadable()){
 		if(item->canWriteText()){
 			player->setWriteItem(item, item->getMaxWriteLength());
@@ -273,6 +298,82 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	return true;
 }
 
+ReturnValue Actions::executeUseEx(Player* player, Item* item, const PositionEx& fromPosEx,
+	const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId, ActionType_t type)
+{
+	Action* action = getAction(item, type);
+	if(!action){
+		return RET_NOERROR;
+	}
+
+	ReturnValue ret = action->canExecuteAction(player, toPosEx);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	if(isHotkey){
+		int32_t subType = -1;
+		if(item->hasSubType() && !item->hasCharges()){
+			subType = item->getSubType();
+		}
+
+		if(action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
+			return RET_NOERROR;
+		}
+
+		if(action->hasOwnErrorHandler()){
+			//Should return some kinda silent error, because the action has its own error handler
+			return RET_NOERROR;
+		}
+		else{
+			return RET_CANNOTUSETHISOBJECT;
+		}
+	}
+	else{
+		if(action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
+			return RET_NOERROR;
+		}
+
+		if(action->hasOwnErrorHandler()){
+			//Should return some kinda silent error, because the action has its own error handler
+			return RET_NOERROR;
+		}
+		else{
+			return RET_CANNOTUSETHISOBJECT;
+		}
+	}
+
+	return RET_CANNOTUSETHISOBJECT;
+}
+
+ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
+	Item* item, bool isHotkey, uint32_t creatureId /* = 0*/)
+{
+	ReturnValue ret;
+	
+	ret = executeUseEx(player, item, fromPosEx, toPosEx, isHotkey, creatureId, ACTION_UNIQUEID);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	ret = executeUseEx(player, item, fromPosEx, toPosEx, isHotkey, creatureId, ACTION_ACTIONID);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	ret = executeUseEx(player, item, fromPosEx, toPosEx, isHotkey, creatureId, ACTION_ITEMID);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	ret = executeUseEx(player, item, fromPosEx, toPosEx, isHotkey, creatureId, ACTION_RUNEID);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	return RET_NOERROR;
+}
+
 bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 	uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId /* = 0*/)
 {
@@ -281,15 +382,8 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	}
 
 	Action* action = getAction(item);
-	
 	if(!action){
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-		return false;
-	}
-
-	ReturnValue ret = action->canExecuteAction(player, toPos);
-	if(ret != RET_NOERROR){
-		player->sendCancelMessage(ret);
 		return false;
 	}
 
@@ -304,22 +398,18 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		}
 
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			if(!action->hasOwnErrorHandler()){
-				player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-			}
-
+		ReturnValue ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
 			return false;
 		}
 
 		showUseHotkeyMessage(player, item, itemCount);
 	}
 	else{
-		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			if(!action->hasOwnErrorHandler()){
-				player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-			}
-
+		ReturnValue ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
 			return false;
 		}
 	}

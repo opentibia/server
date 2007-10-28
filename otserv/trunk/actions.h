@@ -32,6 +32,14 @@
 class Action;
 class Container;
 
+enum ActionType_t{
+	ACTION_ANY,
+	ACTION_UNIQUEID,
+	ACTION_ACTIONID,
+	ACTION_ITEMID,
+	ACTION_RUNEID,
+};
+
 class Actions : public BaseEvents
 {
 public:
@@ -42,14 +50,22 @@ public:
 	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 		uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
 
-	bool openContainer(Player* player,Container* container, const uint8_t index);
+	bool openContainer(Player* player, Container* container, const uint8_t index);
 
 	static ReturnValue canUse(const Creature* creature, const Position& pos);
 	static ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
 
 protected:
+	ReturnValue executeUse(Player* player, Item* item,
+		const PositionEx& posEx, uint32_t creatureId, ActionType_t type);
 	ReturnValue internalUseItem(Player* player, const Position& pos,
 		uint8_t index, Item* item, uint32_t creatureId);
+
+	ReturnValue executeUseEx(Player* player, Item* item, const PositionEx& fromPosEx,
+		const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId, ActionType_t type);
+	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
+		Item* item, bool isHotkey, uint32_t creatureId = 0);
+
 	void showUseHotkeyMessage(Player* player, Item* item, uint32_t itemCount);
 
 	virtual void clear();
@@ -63,7 +79,7 @@ protected:
 	ActionUseMap uniqueItemMap;
 	ActionUseMap actionItemMap;
 
-	Action* getAction(const Item* item);
+	Action* getAction(const Item* item, ActionType_t type = ACTION_ANY);
 	void clearMap(ActionUseMap& map);
 
 	LuaScriptInterface m_scriptInterface;
