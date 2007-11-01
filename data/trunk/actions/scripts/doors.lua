@@ -1,3 +1,4 @@
+local isOpenDoor = FALSE
 function onUse(cid, item, frompos, item2, topos)
 	if (isInArray(questDoors, item.itemid) == TRUE) then
 		if (getPlayerStorageValue(cid, item.actionid) ~= -1) then
@@ -31,7 +32,6 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	local isOpenDoor = FALSE
 	if (isInArray(horizontalOpenDoors, item.itemid) == TRUE) then
 		isOpenDoor = TRUE
 		local newPosition = {x = topos.x, y = topos.y + 1, z = topos.z}

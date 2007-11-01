@@ -1,10 +1,10 @@
 local MAX_FOOD = 1200
 
 function onUse(cid, item, frompos, item2, topos)
-	local size = food[item.itemid][1]
-	local sound = food[item.itemid][2]
+	local size = FOODS[item.itemid][1]
+	local sound = FOODS[item.itemid][2]
 
-	if food[item.itemid] == nil then
+	if FOODS[item.itemid] == nil then
 		return FALSE
 	end
 	
