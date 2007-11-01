@@ -166,33 +166,53 @@
 	<movevent event="Equip" itemid="6301" slot="ring" function="onEquipItem" />
 	<movevent event="DeEquip" itemid="6301" slot="ring" function="onDeEquipItem" />
 
-	<!-- Level/Quest Doors
-	<movevent event="StepOut" itemid="1224" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1226" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1228" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1230" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1242" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1244" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1246" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1248" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1256" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1258" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1260" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="1262" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="3541" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="3543" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="3550" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="3552" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="5104" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="5106" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="5113" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="5115" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="5122" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="5124" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="5131" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="5133" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="6264" script="level_quest_door.lua" />
-	<movevent event="StepOut" itemid="6266" script="level_quest_door.lua" /> -->
+	<!-- Doors -->
+	<movevent event="StepOut" itemid="1228" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1230" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1246" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1248" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1260" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1262" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="3541" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="3550" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5104" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5113" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5122" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5131" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5293" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5295" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1224" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1226" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1242" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1244" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1256" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="1258" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="3543" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="3552" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5106" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5115" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5124" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5133" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5289" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5291" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5746" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="5749" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6203" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6205" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6207" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6209" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6260" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6262" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6264" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6266" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6897" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6899" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6906" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="6908" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="7039" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="7041" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="7048" script="closingdoor.lua"/>
+	<movevent event="StepOut" itemid="7050" script="closingdoor.lua"/>
 
 	<!-- Switch Tiles -->
 	<movevent event="StepIn" itemid="416" script="switch_tile.lua" />

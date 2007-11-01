@@ -1,10 +1,6 @@
 function onUse(cid, item, frompos, item2, topos) 
 	doorPos = {x = frompos.x, y = frompos.y, z = frompos.z, stackpos = 253}
 	if isInArray(CLOSED_LEVEL_DOOR, item.itemid) == TRUE then
-		if TEST_SERVER == "ON" then
-			doPlayerSendTextMessage(cid, 22, "It is locked.")
-			return 1
-		end
 		if getPlayerLevel(cid) >= item.actionid - 100 then
 			doTransformItem(item.uid, item.itemid + 1)
 			if getPlayerPosition(cid).x == doorPos.x and getPlayerPosition(cid).y == doorPos.y + 1 then
