@@ -126,6 +126,7 @@ public:
 	Container* getContainerByUID(uint32_t uid);
 	Creature* getCreatureByUID(uint32_t uid);
 	Player* getPlayerByUID(uint32_t uid);
+	void removeItemByUID(uint32_t uid);
 
 	static uint32_t addCombatArea(AreaCombat* area);
 	static AreaCombat* getCombatArea(uint32_t areaId);

@@ -303,6 +303,20 @@ Player* ScriptEnviroment::getPlayerByUID(uint32_t uid)
 	return NULL;
 }
 
+void ScriptEnviroment::removeItemByUID(uint32_t uid)
+{
+	ThingMap::iterator it;	
+	it = m_localMap.find(uid);
+	if(it != m_localMap.end()){
+		m_localMap.erase(it);
+	}
+
+	it = m_globalMap.find(uid);
+	if(it != m_globalMap.end()){
+		m_globalMap.erase(it);
+	}
+}
+
 uint32_t ScriptEnviroment::addCombatArea(AreaCombat* area)
 {
 	uint32_t newAreaId = m_lastAreaId + 1;
@@ -1866,7 +1880,13 @@ int LuaScriptInterface::luaDoRemoveItem(lua_State *L)
 		return 1;
 	}
 
-	g_game.internalRemoveItem(item, count);
+	ReturnValue ret = g_game.internalRemoveItem(item, count);
+	if(ret != RET_NOERROR){
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	env->removeItemByUID(uid);
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
