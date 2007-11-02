@@ -250,6 +250,9 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"move") == 0){
 			ammoAction = AMMOACTION_MOVE;
 		}
+        else if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"moveback") == 0){
+            ammoAction = AMMOACTION_MOVEBACK;
+        }
 		else if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"removecharge") == 0){
 			ammoAction = AMMOACTION_REMOVECHARGE;
 		}
@@ -521,6 +524,9 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 	}
 	else if(ammoAction == AMMOACTION_MOVE){
 		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, FLAG_NOLIMIT);
+	}
+	else if(ammoAction == AMMOACTION_MOVEBACK){
+		//do nothing
 	}
 	else if(item->hasCharges()){
 		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
@@ -806,7 +812,8 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 
 void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 {
-	if(ammoAction == AMMOACTION_MOVE && breakChance >= random_range(1, 100)){
+	if((ammoAction == AMMOACTION_MOVE || ammoAction == AMMOACTION_MOVEBACK) &&
+			breakChance > 0 && random_range(1, 100) < breakChance){
 		int32_t newCount = std::max(0, item->getItemCount() - 1);
 		g_game.transformItem(item, item->getID(), newCount);
 	}
