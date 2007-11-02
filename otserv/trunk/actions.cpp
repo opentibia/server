@@ -198,22 +198,21 @@ Action* Actions::getAction(const Item* item, ActionType_t type /* = ACTION_ANY*/
 	return NULL;
 }
 
-ReturnValue Actions::executeUse(Player* player, Item* item,
-	const PositionEx& posEx, uint32_t creatureId, ActionType_t type)
+bool Actions::executeUse(Action* action, Player* player, Item* item,
+	const PositionEx& posEx, uint32_t creatureId)
 {
-	Action* action = getAction(item, type);
-	if(action){
-		if(action->executeUse(player, item, posEx, posEx, false, creatureId)){
-			return RET_NOERROR;
-		}
+	if(!action->executeUse(player, item, posEx, posEx, false, creatureId)){
+		return false;
 	}
 
-	return RET_CANNOTUSETHISOBJECT;
+	return true;
 }
 
 ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 	uint8_t index, Item* item, uint32_t creatureId)
 {	
+	bool foundAction = (getAction(item) != NULL);
+
 	//check if it is a house door
 	if(Door* door = item->getDoor()){
 		if(!door->canUse(player)){
@@ -224,20 +223,36 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 	int32_t stack = item->getParent()->__getIndexOfThing(item);
 	PositionEx posEx(pos, stack);
 
-	if(executeUse(player, item, posEx, creatureId, ACTION_UNIQUEID) == RET_NOERROR){
-		return RET_NOERROR;
+	Action* action = getAction(item, ACTION_UNIQUEID);
+	if(action){
+		//only continue with next action in the list if the previous returns false
+		if(executeUse(action, player, item, posEx, creatureId)){
+			return RET_NOERROR;
+		}
 	}
 
-	if(executeUse(player, item, posEx, creatureId, ACTION_ACTIONID) == RET_NOERROR){
-		return RET_NOERROR;
+	action = getAction(item, ACTION_ACTIONID);
+	if(action){
+		//only continue with next action in the list if the previous returns false
+		if(executeUse(action, player, item, posEx, creatureId)){
+			return RET_NOERROR;
+		}
 	}
 	
-	if(executeUse(player, item, posEx, creatureId, ACTION_ITEMID) == RET_NOERROR){
-		return RET_NOERROR;
+	action = getAction(item, ACTION_ITEMID);
+	if(action){
+		//only continue with next action in the list if the previous returns false
+		if(executeUse(action, player, item, posEx, creatureId)){
+			return RET_NOERROR;
+		}
 	}
 
-	if(executeUse(player, item, posEx, creatureId, ACTION_RUNEID) == RET_NOERROR){
-		return RET_NOERROR;
+	action = getAction(item, ACTION_RUNEID);
+	if(action){
+		//only continue with next action in the list if the previous returns false
+		if(executeUse(action, player, item, posEx, creatureId)){
+			return RET_NOERROR;
+		}
 	}
 
 	if(item->isReadable()){
@@ -260,8 +275,11 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 		}
 	}
 
-	//we dont know what to do with this item
-	return RET_CANNOTUSETHISOBJECT;
+	if(!foundAction){
+		return RET_CANNOTUSETHISOBJECT;
+	}
+
+	return RET_NOERROR;
 }
 
 bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
@@ -298,80 +316,93 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	return true;
 }
 
-ReturnValue Actions::executeUseEx(Player* player, Item* item, const PositionEx& fromPosEx,
-	const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId, ActionType_t type)
+bool Actions::executeUseEx(Action* action, Player* player, Item* item, const PositionEx& fromPosEx,
+	const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId)
 {
-	Action* action = getAction(item, type);
-	if(!action){
-		return RET_NOERROR;
-	}
-
-	ReturnValue ret = action->canExecuteAction(player, toPosEx);
-	if(ret != RET_NOERROR){
-		return ret;
-	}
-
 	if(isHotkey){
 		int32_t subType = -1;
 		if(item->hasSubType() && !item->hasCharges()){
 			subType = item->getSubType();
 		}
 
-		if(action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			return RET_NOERROR;
-		}
-
-		if(action->hasOwnErrorHandler()){
-			//Should return some kinda silent error, because the action has its own error handler
-			return RET_NOERROR;
-		}
-		else{
-			return RET_CANNOTUSETHISOBJECT;
+		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
+			if(action->hasOwnErrorHandler()){
+				//The error message has already been handled by action itself
+				return true;
+			}
+			return false;
 		}
 	}
 	else{
-		if(action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			return RET_NOERROR;
+		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
+			if(action->hasOwnErrorHandler()){
+				//The error message has already been handled by action itself
+				return true;
+			}
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
+	Item* item, bool isHotkey, uint32_t creatureId)
+{
+	Action* action = getAction(item, ACTION_UNIQUEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPosEx);
+		if(ret != RET_NOERROR){
+			return ret;
 		}
 
-		if(action->hasOwnErrorHandler()){
-			//Should return some kinda silent error, because the action has its own error handler
+		//only continue with next action in the list if the previous returns false
+		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
 			return RET_NOERROR;
 		}
-		else{
-			return RET_CANNOTUSETHISOBJECT;
+	}
+
+	action = getAction(item, ACTION_ACTIONID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPosEx);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		//only continue with next action in the list if the previous returns false
+		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+			return RET_NOERROR;
+		}
+	}
+
+	action = getAction(item, ACTION_ITEMID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPosEx);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		//only continue with next action in the list if the previous returns false
+		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+			return RET_NOERROR;
+		}
+	}
+
+	action = getAction(item, ACTION_RUNEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPosEx);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		//only continue with next action in the list if the previous returns false
+		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+			return RET_NOERROR;
 		}
 	}
 
 	return RET_CANNOTUSETHISOBJECT;
-}
-
-ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-	Item* item, bool isHotkey, uint32_t creatureId /* = 0*/)
-{
-	ReturnValue ret;
-	
-	ret = executeUseEx(player, item, fromPosEx, toPosEx, isHotkey, creatureId, ACTION_UNIQUEID);
-	if(ret != RET_NOERROR){
-		return ret;
-	}
-
-	ret = executeUseEx(player, item, fromPosEx, toPosEx, isHotkey, creatureId, ACTION_ACTIONID);
-	if(ret != RET_NOERROR){
-		return ret;
-	}
-
-	ret = executeUseEx(player, item, fromPosEx, toPosEx, isHotkey, creatureId, ACTION_ITEMID);
-	if(ret != RET_NOERROR){
-		return ret;
-	}
-
-	ret = executeUseEx(player, item, fromPosEx, toPosEx, isHotkey, creatureId, ACTION_RUNEID);
-	if(ret != RET_NOERROR){
-		return ret;
-	}
-
-	return RET_NOERROR;
 }
 
 bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,

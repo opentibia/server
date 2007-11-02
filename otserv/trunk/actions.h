@@ -56,15 +56,14 @@ public:
 	static ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
 
 protected:
-	ReturnValue executeUse(Player* player, Item* item,
-		const PositionEx& posEx, uint32_t creatureId, ActionType_t type);
+	bool executeUse(Action* action, Player* player, Item* item, const PositionEx& posEx, uint32_t creatureId);
 	ReturnValue internalUseItem(Player* player, const Position& pos,
 		uint8_t index, Item* item, uint32_t creatureId);
 
-	ReturnValue executeUseEx(Player* player, Item* item, const PositionEx& fromPosEx,
-		const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId, ActionType_t type);
+	bool executeUseEx(Action* action, Player* player, Item* item, const PositionEx& fromPosEx,
+		const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-		Item* item, bool isHotkey, uint32_t creatureId = 0);
+		Item* item, bool isHotkey, uint32_t creatureId);
 
 	void showUseHotkeyMessage(Player* player, Item* item, uint32_t itemCount);
 
