@@ -208,7 +208,7 @@ InstantSpell* Spells::getInstantSpell(const std::string words)
 	}
 
 	if(result){
-		if(words.length() > result->getWords().length() && !result->getHasParam()){
+		if(words.length() > result->getWords().length()){
 			size_t spellLen = result->getWords().length();
 			size_t paramLen = words.length() - spellLen;
 			std::string paramText = words.substr(spellLen, paramLen);
