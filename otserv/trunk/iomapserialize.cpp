@@ -48,7 +48,6 @@ bool IOMapSerialize::loadMap(Map* map, const std::string& identifier)
 bool IOMapSerialize::saveMap(Map* map, const std::string& identifier)
 {
 	Database* db = Database::instance();
-	DBQuery query;
 	DBTransaction transaction(db);
 
 	//Start the transaction
@@ -64,8 +63,8 @@ bool IOMapSerialize::saveMap(Map* map, const std::string& identifier)
 	}
 
 	uint32_t tileId = 0;
-
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
+	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin();
+		it != Houses::getInstance().getHouseEnd(); ++it){
 
 		//save house items
 		House* house = it->second;
@@ -118,11 +117,10 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 			<< ", " << tilePos.x << ", " << tilePos.y << ", " << tilePos.z
 			<< ")";
 
-			if( !db->executeQuery(query.str()) )
+			if( !db->executeQuery(query.str()))
 				return false;
-
-			storedTile = true;
 			query.str("");
+			storedTile = true;
 		}
 		++runningID;
 

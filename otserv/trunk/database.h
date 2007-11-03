@@ -118,6 +118,7 @@ public:
 	* @return true on success, false on error
 	*/
 	DATABASE_VIRTUAL bool executeQuery(const std::string &query) { return 0; }
+
 	/**
 	* Queries database.
 	*
@@ -265,6 +266,7 @@ public:
 protected:
 	Database* m_db;
 	bool m_multiLine;
+	uint32_t m_rows;
 	std::string m_query;
 	std::string m_buf;
 };

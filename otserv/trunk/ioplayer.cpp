@@ -449,7 +449,7 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `sex` = " << player->sex
 	<< ", `lastlogin` = " << player->lastLoginSaved
 	<< ", `lastip` = " << player->lastip
-	<< ", `conditions` = " << db->escapeString(conditions)
+	<< ", `conditions` = " << db->escapeBlob(conditions, conditionsSize)
 	<< ", `loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE)
 	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
 	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES);
@@ -488,15 +488,16 @@ bool IOPlayer::savePlayer(Player* player)
 	if(!db->executeQuery(query.str())){
 		return false;
 	}
+	query.str("");
 
 	//skills
 	for(int i = 0; i <= 6; i++){
-		query.str("");
 		query << "UPDATE `player_skills` SET `value` = " << player->skills[i][SKILL_LEVEL] << ", `count` = " << player->skills[i][SKILL_TRIES] << " WHERE `player_id` = " << player->getGUID() << " AND `skillid` = " << i;
 
 		if(!db->executeQuery(query.str())){
 			return false;
 		}
+		query.str("");
 	}
 
 	DBInsert stmt(db);

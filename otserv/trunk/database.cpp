@@ -95,6 +95,7 @@ DBQuery::~DBQuery()
 DBInsert::DBInsert(Database* db)
 {
 	m_db = db;
+	m_rows = 0;
 
 	// checks if current database engine supports multiline INSERTs
 	m_multiLine = m_db->getParam(DBPARAM_MULTIINSERT);
@@ -104,11 +105,13 @@ void DBInsert::setQuery(const std::string& query)
 {
 	m_query = query;
 	m_buf = "";
+	m_rows = 0;
 }
 
 bool DBInsert::addRow(const std::string& row)
 {
 	if(m_multiLine){
+		m_rows++;
 		int32_t size = m_buf.length();
 
 		// adds new row to buffer
@@ -143,6 +146,13 @@ bool DBInsert::addRow(std::stringstream& row)
 bool DBInsert::execute()
 {
 	if(m_multiLine && m_buf.length() > 0){
+		if(m_rows == 0){
+			//no rows to execute
+			return true;
+		}
+
+		m_rows = 0;
+
 		// executes buffer
 		bool res = m_db->executeQuery(m_query + m_buf);
 		m_buf = "";
