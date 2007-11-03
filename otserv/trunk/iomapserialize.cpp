@@ -48,6 +48,7 @@ bool IOMapSerialize::loadMap(Map* map, const std::string& identifier)
 bool IOMapSerialize::saveMap(Map* map, const std::string& identifier)
 {
 	Database* db = Database::instance();
+	DBQuery query;
 	DBTransaction transaction(db);
 
 	//Start the transaction
