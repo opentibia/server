@@ -421,6 +421,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	int32_t fromStackPos = item->getParent()->__getIndexOfThing(item);
 	PositionEx fromPosEx(fromPos, fromStackPos);
 	PositionEx toPosEx(toPos, toStackPos);
+	ReturnValue ret = RET_NOERROR;
 
 	if(isHotkey){
 		int32_t subType = -1;
@@ -429,20 +430,16 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		}
 
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		ReturnValue ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-
+		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
 		showUseHotkeyMessage(player, item, itemCount);
 	}
 	else{
-		ReturnValue ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
+		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
+	}
+
+	if(ret != RET_NOERROR){
+		player->sendCancelMessage(ret);
+		return false;
 	}
 
 	player->setLastAction(OTSYS_TIME());
