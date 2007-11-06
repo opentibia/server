@@ -223,6 +223,10 @@ void Creature::onWalk()
 		}
 	}
 
+	if(listWalkDir.empty()){
+		onWalkComplete();
+	}
+
 	if(eventWalk != 0){
 		eventWalk = 0;
 		addEventWalk();

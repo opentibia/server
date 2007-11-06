@@ -158,6 +158,7 @@ public:
 	//walk events
 	void onWalk(Direction& dir);
 	virtual void onWalkAborted() {};
+	virtual void onWalkComplete() {};
 
 	//follow functions
 	virtual const Creature* getFollowCreature() { return followCreature; };
