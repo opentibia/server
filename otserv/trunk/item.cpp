@@ -653,6 +653,11 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.blockSolid && (!it.moveable || getUniqueId() != 0))
 				return true;
 			break;
+		
+		case SUPPORTHANGABLE:
+			if(it.isHorizontal || it.isVertical)
+				return true;
+			break;
 
 		default:
 			return false;
