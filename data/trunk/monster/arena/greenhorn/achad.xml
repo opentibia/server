@@ -1,45 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<monster name="Achad" nameDescription="achad" race="blood" experience="70" speed="185" manacost="450">
-  <health now="185" max="185"/>
-<look type="146" head="93" body="93" legs="57" feet="97" addons="3" corpse="7349"/>
-  <targetchange interval="2000" chance="5"/>
-  <strategy attack="100" defense="1"/>
-  <flags>
-    <flag summonable="0"/>
-    <flag attackable="1"/>
-    <flag hostile="1"/>
-    <flag illusionable="0"/>
-    <flag convinceable="1"/>
-    <flag pushable="0"/>
-    <flag canpushitems="1"/>
-    <flag staticattack="50"/>
-    <flag lightlevel="0"/>
-    <flag lightcolor="0"/>
-    <flag targetdistance="1"/>
-    <flag runonhealth="55"/>
-  </flags>
-  <attacks>
-    <attack name="melee" interval="2000" min="-26" max="-40"/>
-  </attacks>
-  <defenses armor="20" defense="19"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
-  <voices interval="2000" chance="5">
-    <voice sentence="Your money or your life!"/>
-    <voice sentence="Hand me your purse!"/>
-  </voices>
-  <loot>
-    <item id="2148" countmax="15" chance1="100000" chancemax="0"/>
-    <item id="2388" chance="6666"/>
-    <item id="2386" chance="5000"/>
-  </loot>
+<monster name="Achad" nameDescription="achad" race="blood" experience="70" speed="185">
+	<health now="185" max="185"/>
+	<look type="146" head="93" body="93" legs="57" feet="97" addons="3" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="1"/>
+	<flags>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="50"/>
+		<flag runonhealth="55"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-26" max="-40"/>
+	</attacks>
+	<defenses armor="20" defense="19"/>
 </monster>

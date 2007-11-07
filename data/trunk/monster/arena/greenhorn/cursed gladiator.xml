@@ -1,43 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<monster name="Cursed Gladiator" nameDescription="cursed gladiator" race="undead" experience="215" speed="170" manacost="0">
-  <health now="435" max="435"/>
-  <look type="100" head="20" body="30" legs="40" feet="50" corpse="7349"/>
-  <targetchange interval="2000" chance="5"/>
-  <strategy attack="100" defense="0"/>
-  <flags>
-    <flag summonable="0"/>
-    <flag attackable="1"/>
-    <flag hostile="1"/>
-    <flag illusionable="0"/>
-    <flag convinceable="0"/>
-    <flag pushable="0"/>
-    <flag canpushitems="1"/>
-    <flag staticattack="78"/>
-    <flag lightlevel="0"/>
-    <flag lightcolor="0"/>
-    <flag targetdistance="1"/>
-    <flag runonhealth="0"/>
-  </flags>
-  <attacks>
-    <attack name="melee" interval="2000" min="-50" max="-170"/>
-  </attacks>
-  <defenses armor="25" defense="26"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="1"/>
-  </immunities>
-  <voices interval="2000" chance="5">
-    <voice sentence="Chhhhhhh!"/>
-    <voice sentence="Hooooohhh!"/>
-    <voice sentence="Aaaaaahhh!"/>
-  </voices>
-  <loot>
-      </loot>
+<monster name="Cursed Gladiator" nameDescription="cursed gladiator" race="undead" experience="215" speed="170">
+	<health now="435" max="435"/>
+	<look type="100" corpse="7349"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-5" max="-150"/>
+		<attack name="lifedrain" interval="4000" chance="50" range="5" radius="1" target="1" min="0" max="50">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="26"/>
+	<immunities>
+		<immunity name="poison"/>
+		<immunity name="invisible"/>
+	</immunities>
+	<voices interval="2000" chance="5">
+		<voice sentence="Death where are you?"/>
+	</voices>
 </monster>

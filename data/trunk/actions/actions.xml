@@ -189,73 +189,73 @@
 	<action itemid="3938" script="furniture_package.lua" />
 	
 	<!-- Doors -->
-	<action itemid="1210" script="door.lua" />
+	<action itemid="1210" script="doors.lua" />
 
-	<action itemid="1211" script="door.lua" />
-	<action itemid="1213" script="door.lua" />
-	<action itemid="1214" script="door.lua" />
-	<action itemid="1219" script="door.lua" />
-	<action itemid="1220" script="door.lua" /> 
-	<action itemid="1221" script="door.lua" />
-	<action itemid="1222" script="door.lua" />
-	<action itemid="1232" script="door.lua" />
-	<action itemid="1233" script="door.lua" />
+	<action itemid="1211" script="doors.lua" />
+	<action itemid="1213" script="doors.lua" />
+	<action itemid="1214" script="doors.lua" />
+	<action itemid="1219" script="doors.lua" />
+	<action itemid="1220" script="doors.lua" /> 
+	<action itemid="1221" script="doors.lua" />
+	<action itemid="1222" script="doors.lua" />
+	<action itemid="1232" script="doors.lua" />
+	<action itemid="1233" script="doors.lua" />
 
-	<action itemid="1235" script="door.lua" />
-	<action itemid="1236" script="door.lua" />
-	<action itemid="1237" script="door.lua" />
-	<action itemid="1238" script="door.lua" />
-	<action itemid="1239" script="door.lua" />
-	<action itemid="1240" script="door.lua" />
-	<action itemid="1250" script="door.lua" />
-	<action itemid="1251" script="door.lua" />
-	<action itemid="1253" script="door.lua" />
+	<action itemid="1235" script="doors.lua" />
+	<action itemid="1236" script="doors.lua" />
+	<action itemid="1237" script="doors.lua" />
+	<action itemid="1238" script="doors.lua" />
+	<action itemid="1239" script="doors.lua" />
+	<action itemid="1240" script="doors.lua" />
+	<action itemid="1250" script="doors.lua" />
+	<action itemid="1251" script="doors.lua" />
+	<action itemid="1253" script="doors.lua" />
 
-	<action itemid="1254" script="door.lua" />
-	<action itemid="3536" script="door.lua" />
-	<action itemid="3537" script="door.lua" />
-	<action itemid="3538" script="door.lua" />
-	<action itemid="3539" script="door.lua" />
-	<action itemid="3545" script="door.lua" />
-	<action itemid="3546" script="door.lua" />
-	<action itemid="3547" script="door.lua" />
-	<action itemid="3548" script="door.lua" />
+	<action itemid="1254" script="doors.lua" />
+	<action itemid="3536" script="doors.lua" />
+	<action itemid="3537" script="doors.lua" />
+	<action itemid="3538" script="doors.lua" />
+	<action itemid="3539" script="doors.lua" />
+	<action itemid="3545" script="doors.lua" />
+	<action itemid="3546" script="doors.lua" />
+	<action itemid="3547" script="doors.lua" />
+	<action itemid="3548" script="doors.lua" />
 
-	<action itemid="4914" script="door.lua" />
-	<action itemid="4915" script="door.lua" />
-	<action itemid="4917" script="door.lua" />
-	<action itemid="4918" script="door.lua" />
-	<action itemid="5082" script="door.lua" />
-	<action itemid="5083" script="door.lua" />
-	<action itemid="5084" script="door.lua" />
-	<action itemid="5085" script="door.lua" />
-	<action itemid="5099" script="door.lua" />
+	<action itemid="4914" script="doors.lua" />
+	<action itemid="4915" script="doors.lua" />
+	<action itemid="4917" script="doors.lua" />
+	<action itemid="4918" script="doors.lua" />
+	<action itemid="5082" script="doors.lua" />
+	<action itemid="5083" script="doors.lua" />
+	<action itemid="5084" script="doors.lua" />
+	<action itemid="5085" script="doors.lua" />
+	<action itemid="5099" script="doors.lua" />
 
-	<action itemid="5100" script="door.lua" />
-	<action itemid="5101" script="door.lua" />
-	<action itemid="5102" script="door.lua" />
-	<action itemid="5108" script="door.lua" />
-	<action itemid="5109" script="door.lua" />
-	<action itemid="5110" script="door.lua" />
-	<action itemid="5111" script="door.lua" />
-	<action itemid="5117" script="door.lua" />
-	<action itemid="5118" script="door.lua" />
+	<action itemid="5100" script="doors.lua" />
+	<action itemid="5101" script="doors.lua" />
+	<action itemid="5102" script="doors.lua" />
+	<action itemid="5108" script="doors.lua" />
+	<action itemid="5109" script="doors.lua" />
+	<action itemid="5110" script="doors.lua" />
+	<action itemid="5111" script="doors.lua" />
+	<action itemid="5117" script="doors.lua" />
+	<action itemid="5118" script="doors.lua" />
 
-	<action itemid="5119" script="door.lua" />
-	<action itemid="5120" script="door.lua" />
-	<action itemid="5126" script="door.lua" />
-	<action itemid="5127" script="door.lua" />
-	<action itemid="5128" script="door.lua" />
-	<action itemid="5129" script="door.lua" />
-	<action itemid="5135" script="door.lua" />
-	<action itemid="5136" script="door.lua" />
-	<action itemid="5138" script="door.lua" />
+	<action itemid="5119" script="doors.lua" />
+	<action itemid="5120" script="doors.lua" />
+	<action itemid="5126" script="doors.lua" />
+	<action itemid="5127" script="doors.lua" />
+	<action itemid="5128" script="doors.lua" />
+	<action itemid="5129" script="doors.lua" />
+	<action itemid="5135" script="doors.lua" />
+	<action itemid="5136" script="doors.lua" />
+	<action itemid="5138" script="doors.lua" />
 
-	<action itemid="5139" script="door.lua" />
-	<action itemid="5141" script="door.lua" />
-	<action itemid="5142" script="door.lua" />
-	<action itemid="5144" script="door.lua" />
-	<action itemid="5145" script="door.lua" />
+	<action itemid="5139" script="doors.lua" />
+	<action itemid="5141" script="doors.lua" />
+	<action itemid="5142" script="doors.lua" />
+	<action itemid="5144" script="doors.lua" />
+	<action itemid="5145" script="doors.lua" />
 	
 	<!-- Level Doors -->
 	<action itemid="1227" script="level_door.lua" />

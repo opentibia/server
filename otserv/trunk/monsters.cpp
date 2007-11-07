@@ -435,6 +435,9 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	else if(name == "energy"){
 		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_ENERGYDAMAGE);
 	}
+	else if(name == "drown"){
+		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DROWNDAMAGE);
+	}
 	else if(name == "lifedrain"){
 		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_LIFEDRAIN);
 	}

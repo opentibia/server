@@ -1,82 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<monster name="Rocky" nameDescription="rocky" race="undead" experience="190" speed="170" manacost="0">
-  
-<health now="250" max="250"/>
-  
-<look type="95" head="20" body="30" legs="40" feet="50" corpse="7349"/>
-  
-<targetchange interval="2000" chance="5"/>
-  
-<strategy attack="100" defense="0"/>
-  
-<flags>
-    
-<flag summonable="0"/>
-    
-<flag attackable="1"/>
-    
-<flag hostile="1"/>
-    
-<flag illusionable="0"/>
-    
-<flag convinceable="0"/>
-    
-<flag pushable="0"/>
-    
-<flag canpushitems="1"/>
-    
-<flag staticattack="78"/>
-    
-<flag lightlevel="0"/>
-    
-<flag lightcolor="0"/>
-    
-<flag targetdistance="1"/>
-    
-<flag runonhealth="30"/>
-  
-</flags>
-  
-<attacks>
-    
-<attack name="melee" interval="2000" min="-1" max="-140"/>
-    
-<attack name="small stone" interval="2000" chance="90" min="-30" max="-60"/>
-  
-</attacks>
-  <defenses armor="30" defense="30"/>
-  
-<immunities>
-    
-<immunity physical="0"/>
-    
-<immunity energy="0"/>
-    
-<immunity fire="1"/>
-    
-<immunity poison="1"/>
-    
-<immunity lifedrain="0"/>
-    
-<immunity paralyze="0"/>
-    
-<immunity outfit="0"/>
-    
-<immunity drunk="0"/>
-    
-<immunity invisible="0"/>
-  </immunities>
-  <loot>
-    <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
-    <item id="2671" countmax="2" chance1="33333" chancemax="0"/>
-    <item id="2666" countmax="3" chance1="33333" chancemax="0"/>
-    <item id="1987" chance="100000">
-      <inside>
-        <item id="2489" chance="2500"/>
-        <item id="2148" countmax="5" chance1="100000" chancemax="0"/>
-      </inside>
-    </item>
-  </loot>
+<monster name="Rocky" nameDescription="rocky" race="undead" experience="190" speed="170">
+	<health now="250" max="250"/>
+	<look type="95" head="20" body="30" legs="40" feet="50" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag runonhealth="30"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-1" max="-80"/>
+	</attacks>
+	<defenses armor="30" defense="30">
+		<defense name="healing" interval="2000" chance="50" min="15" max="35">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity name="fire"/>
+		<immunity name="poison"/>
+	</immunities>
 </monster>
 
