@@ -239,10 +239,6 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						house->addTile(static_cast<HouseTile*>(tile));
 						isHouseTile = true;
 					}
-					else{
-						map->setLastError(LOADMAPERROR_UNKNOWNNODETYPE, nodeTile);
-						return false;
-					}
 					
 					map->setTile(px, py, pz, tile);
 
