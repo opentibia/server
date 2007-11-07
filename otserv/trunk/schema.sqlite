@@ -165,7 +165,7 @@ CREATE TABLE "bans" (
 );
 
 CREATE TABLE "global_storage" (
-    "key" INTEGER PRIMARY KEY,
+    "key" INTEGER NOT NULL,
     "value" INTEGER NOT NULL
 );
 

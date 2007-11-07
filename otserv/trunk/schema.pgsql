@@ -173,7 +173,7 @@ CREATE TABLE "player_depotitems" (
 );
 
 CREATE TABLE "global_storage" (
-    "key" INT,
+    "key" INT NOT NULL,
     "value" INT NOT NULL,
     PRIMARY KEY("key")
 );
