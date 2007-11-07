@@ -521,6 +521,7 @@ protected:
 	static int luaIsItemMoveable(lua_State *L);
 	static int luaGetItemName(lua_State *L);
 	static int luaGetItemDescriptions(lua_State *L);
+	static int luaGetItemWeight(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);

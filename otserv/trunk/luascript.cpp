@@ -1413,6 +1413,9 @@ void LuaScriptInterface::registerFunctions()
 	//getItemDescriptions(itemid)
 	lua_register(m_luaState, "getItemDescriptions", LuaScriptInterface::luaGetItemDescriptions);
 
+	//getItemWeight(uid)
+	lua_register(m_luaState, "getItemWeight", LuaScriptInterface::luaGetItemWeight);
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 
@@ -5343,10 +5346,30 @@ int LuaScriptInterface::luaGetItemDescriptions(lua_State *L)
 	//returns the name, the article and the plural name of the item
 	uint32_t itemid = popNumber(L);
 	const ItemType& it = Item::items[itemid];
-	lua_pushstring(L, it.name.c_str());
-	lua_pushstring(L, it.article.c_str());
-	lua_pushstring(L, it.pluralName.c_str());
-	return 3;
+
+	lua_newtable(L);
+	setField(L, "name", it.name.c_str());
+	setField(L, "article", it.article.c_str());
+	setField(L, "plural", it.pluralName.c_str());
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemWeight(lua_State *L)
+{
+	//getItemWeight(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(!item){
+		lua_pushnumber(L, LUA_ERROR);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		return 1;
+	}
+
+	lua_pushnumber(L, item->getWeight());
+	return 1;
 }
 
 int LuaScriptInterface::luaAddEvent(lua_State *L)
