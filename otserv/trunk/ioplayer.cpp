@@ -44,7 +44,12 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	DBQuery query;
 	DBResult* result;
 
-	if(!(result = db->storeQuery("SELECT * FROM `players` WHERE `name` = " + db->escapeString(name)))){
+	if(!(result = db->storeQuery("SELECT `id`,`name`,`account_id`,`group_id`,`premend`,`sex`,"
+"`vocation`,`experience`,`level`,`maglevel`,`health`,`healthmax`,`mana`,"
+"`manamax`,`manaspent`,`soul`,`direction`,`lookbody`,`lookfeet`,`lookhead`,"
+"`looklegs`,`looktype`,`lookaddons`,`posx`,`posy`,`posz`,`cap`,`lastlogin`,"
+"`lastip`,`save`,`conditions`,`redskulltime`,`redskull`,`guildnick`,"
+"`rank_id`,`town_id`,`loss_experience`,`loss_mana`,`loss_skills` FROM `players` WHERE `name` = " + db->escapeString(name)))){
 	  	return false;
 	}
 
