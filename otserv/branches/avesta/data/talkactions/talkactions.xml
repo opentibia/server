@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<talkactions>
+
+<talkaction words="open sesame" script="example.lua" />
+
+</talkactions>
