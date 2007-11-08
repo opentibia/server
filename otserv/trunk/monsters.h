@@ -94,6 +94,7 @@ public:
 	int armor;
 
 	bool canPushItems;
+	bool canPushCreatures;
 	uint32_t staticAttackChance;
 	int maxSummons;
 	int targetDistance;
