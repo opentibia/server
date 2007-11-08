@@ -109,6 +109,7 @@ public:
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
 		uint32_t spriteId = 0, stackPosType_t type = STACKPOS_NORMAL);
+	void internalGetPosition(Item* item, Position& pos, uint8_t& stackpos);
 
 	/**
 	  * Get a single tile of the map.
@@ -209,9 +210,6 @@ public:
 	ReturnValue internalMoveCreature(Creature* creature, Direction direction, bool force = false);
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);
 
-	void moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-		Item* item, uint32_t count, uint16_t spriteId);
-
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count, uint32_t flags = 0);
 
@@ -299,6 +297,8 @@ public:
 	bool playerMoveThing(uint32_t playerId, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
 		const Position& toPos, uint8_t count);
 	bool playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId, const Position& toPos);
+	bool playerMoveItem(uint32_t playerId, const Position& fromPos,
+		uint16_t spriteId, uint8_t fromStackPos, const Position& toPos, uint8_t count);
 	bool playerMove(uint32_t playerId, Direction direction);
 	bool playerCreatePrivateChannel(uint32_t playerId);
 	bool playerChannelInvite(uint32_t playerId, const std::string& name);

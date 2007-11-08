@@ -32,8 +32,7 @@ class Creature;
 enum cylinderflags_t {
 	FLAG_NOLIMIT = 1,
 	FLAG_CHILDISOWNER = 2,
-	FLAG_PATHFINDING = 4,
-	FLAG_FROMFARPOSITION = 8
+	FLAG_PATHFINDING = 4
 };
 
 enum cylinderlink_t{

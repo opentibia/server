@@ -451,23 +451,25 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 
 		bool hasHangable = false;
-		bool supportsHangableItems = false;
+		bool supportHangable = false;
 		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
-				//Is not posible 2 hangables in the same tile
-				if(iiType.isHangable && itemIsHangable){
+				if(iiType.isHangable){
 					hasHangable = true;
 				}
 
-				if(iiType.blockSolid){
-					if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
-						supportsHangableItems = true;
-					}
-					else if(item->isPickupable()){
-						//TODO: query script interface
+				if(iiType.isHorizontal || iiType.isVertical){
+					supportHangable = true;
+				}
+				
+				if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
+					//
+				}
+				else if(iiType.blockSolid){
+					if(item->isPickupable()){
 						if(iitem->getTrashHolder()){
 							continue;
 						}
@@ -483,14 +485,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		if(itemIsHangable && supportsHangableItems){
-			if((flags & FLAG_FROMFARPOSITION) == FLAG_FROMFARPOSITION){
-				return RET_TOOFARAWAY;
-			}
-			if(hasHangable){
-				return RET_NOTENOUGHROOM;
-			}
+		if(itemIsHangable && hasHangable && supportHangable){
+			return RET_NEEDEXCHANGE;
 		}
+
 	}
 
 	return RET_NOERROR;

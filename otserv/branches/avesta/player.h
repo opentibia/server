@@ -38,6 +38,7 @@
 class House;
 class Weapon;
 class Protocol80;
+class SchedulerTask;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -241,6 +242,7 @@ public:
 
 	//walk events
 	virtual void onWalkAborted();
+	virtual void onWalkComplete();
 
 	void setChaseMode(chaseMode_t mode);
 	void setFightMode(fightMode_t mode);
@@ -503,6 +505,8 @@ protected:
 	bool NeedUpdateStats();
 	void updateInventoryWeigth();
 
+	void setDelayedWalkTask(SchedulerTask* task);
+
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
@@ -549,6 +553,7 @@ protected:
 	int32_t premiumDays;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
+	SchedulerTask* walkTask;
 
 	double inventoryWeight;
 	double capacity;

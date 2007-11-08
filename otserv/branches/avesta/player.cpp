@@ -105,6 +105,8 @@ Creature()
 	tradeState = TRADE_NONE;
 	tradeItem = NULL;
 
+	walkTask = NULL;
+
 	lastSentStats.health = 0;
 	lastSentStats.healthMax = 0;
 	lastSentStats.freeCapacity = 0;
@@ -1433,6 +1435,12 @@ bool Player::NeedUpdateStats()
 	else{
 		return false;
 	}
+}
+
+void Player::setDelayedWalkTask(SchedulerTask* task)
+{
+	delete walkTask;
+	walkTask = task;
 }
 
 void Player::onThink(uint32_t interval)
@@ -2895,7 +2903,16 @@ void Player::setFightMode(fightMode_t mode)
 
 void Player::onWalkAborted()
 {
+	setDelayedWalkTask(NULL);
 	sendCancelWalk();
+}
+
+void Player::onWalkComplete()
+{
+	if(walkTask){
+		Scheduler::getScheduler().addEvent(walkTask);
+		walkTask = NULL;
+	}
 }
 
 void Player::getCreatureLight(LightInfo& light) const
