@@ -131,4 +131,4 @@ Important note: It is important for triggers if they are executed BEFORE or AFTE
         - After player is created database must create skills with ids 0-6 for him with default values.
 
     * Trigger after update on players.
-        - After updating player if his/her login time was changed (means it was game state update) all it's spells, items, depot items, storage values and viplists must be deleted.
+        - After updating player if his/her save counter was changed (means it was game state update) all it's spells, items, depot items, storage values and viplists must be deleted.

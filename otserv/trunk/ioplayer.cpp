@@ -400,7 +400,7 @@ bool IOPlayer::savePlayer(Player* player)
 	}
 
 	// If save var is not 1 don't save the player info
-	if(result->getDataInt("save") != 1){
+	if(result->getDataInt("save") > 0){
 		db->freeResult(result);
 		return true;
 	}
