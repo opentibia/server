@@ -46,7 +46,7 @@ CREATE TABLE "players" (
     "cap" INT NOT NULL DEFAULT 0,
     "lastlogin" BIGINT NOT NULL DEFAULT 0,
     "lastip" BIGINT NOT NULL DEFAULT 0,
-    "save" SMALLINT NOT NULL DEFAULT 0,
+    "save" INT NOT NULL DEFAULT 1,
     "conditions" BYTEA NOT NULL,
     "redskulltime" BIGINT NOT NULL DEFAULT 0,
     "redskull" SMALLINT NOT NULL DEFAULT 0,
@@ -272,7 +272,7 @@ CREATE FUNCTION "onupdate_players"()
 RETURNS TRIGGER
 AS $$
 BEGIN
-    IF OLD."lastlogin" < NEW."lastlogin" THEN
+    IF OLD."save" < NEW."save" THEN
         DELETE FROM "player_spells" WHERE "player_id" = OLD."id";
         DELETE FROM "player_items" WHERE "player_id" = OLD."id";
         DELETE FROM "player_depotitems" WHERE "player_id" = OLD."id";
