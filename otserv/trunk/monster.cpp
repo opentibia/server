@@ -534,57 +534,64 @@ bool Monster::getNextStep(Direction& dir)
 	}
 
 	//destroy blocking items
-	if(result && canPushItems()){
-		const Position& pos = Spells::getCasterPosition(this, dir);
-		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(result){
+		if(canPushItems() || canPushCreatures()){
+			const Position& pos = Spells::getCasterPosition(this, dir);
+			Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 
-		if(tile){
-			int32_t removeCount = 0;
-			int32_t moveCount = 0;
-			//We can not use iterators here since we can push the item to another tile
-			//which will invalidate the iterator.
-			//start from the end to minimize the amount of traffic
-			int32_t downItemSize = tile->downItems.size();
-			for(int32_t i = downItemSize - 1; i >= 0; --i){
-				Item* item = tile->downItems[i];
-				if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND)
-					|| item->hasProperty(BLOCKSOLID))){
-						if(moveCount < 20 && pushItem(item, 1)){
-							moveCount++;
+			if(tile){
+				int32_t removeCount = 0;
+
+				if(canPushItems()){
+					int32_t moveCount = 0;
+					//We can not use iterators here since we can push the item to another tile
+					//which will invalidate the iterator.
+					//start from the end to minimize the amount of traffic
+					int32_t downItemSize = tile->downItems.size();
+					for(int32_t i = downItemSize - 1; i >= 0; --i){
+						Item* item = tile->downItems[i];
+						if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND)
+							|| item->hasProperty(BLOCKSOLID))){
+								if(moveCount < 20 && pushItem(item, 1)){
+									moveCount++;
+								}
+								else if(g_game.internalRemoveItem(item) == RET_NOERROR){
+									++removeCount;
+								}
 						}
-						else if(g_game.internalRemoveItem(item) == RET_NOERROR){
-							++removeCount;
-						}
-				}
-			}
-
-			if(removeCount > 0){
-				g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
-			}
-
-			removeCount = 0;
-			//We can not use iterators here since we can push a creature to another tile
-			//which will invalidate the iterator.
-			for(uint32_t i = 0; i < tile->creatures.size();){
-				Monster* monster = tile->creatures[i]->getMonster();
-
-				if(monster && monster->isPushable()){
-					if(pushCreature(monster)){
-						continue;
 					}
-					else{
-						monster->changeHealth(-monster->getHealth());
-						monster->setDropLoot(false);
-						//objectRemoved = true;
-						removeCount++;
+
+					if(removeCount > 0){
+						g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 					}
 				}
 
-				++i;
-			}
+				if(canPushCreatures()){
+					removeCount = 0;
+					//We can not use iterators here since we can push a creature to another tile
+					//which will invalidate the iterator.
+					for(uint32_t i = 0; i < tile->creatures.size();){
+						Monster* monster = tile->creatures[i]->getMonster();
 
-			if(removeCount > 0){
-				g_game.addMagicEffect(tile->getPosition(), NM_ME_BLOCKHIT);
+						if(monster && monster->isPushable()){
+							if(pushCreature(monster)){
+								continue;
+							}
+							else{
+								monster->changeHealth(-monster->getHealth());
+								monster->setDropLoot(false);
+								//objectRemoved = true;
+								removeCount++;
+							}
+						}
+
+						++i;
+					}
+
+					if(removeCount > 0){
+						g_game.addMagicEffect(tile->getPosition(), NM_ME_BLOCKHIT);
+					}
+				}
 			}
 		}
 	}

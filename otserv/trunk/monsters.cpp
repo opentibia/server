@@ -765,6 +765,10 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 							mType->canPushItems = (intValue != 0);
 						}
 
+						if(readXMLInteger(tmpNode, "canpushcreatures", intValue)){
+							mType->canPushCreatures = (intValue != 0);
+						}
+
 						if(readXMLInteger(tmpNode, "staticattack", intValue)){
 							if(intValue < 0){
 								SHOW_XML_WARNING("staticattack lower than 0");
