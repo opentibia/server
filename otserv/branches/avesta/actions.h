@@ -52,8 +52,9 @@ public:
 
 	bool openContainer(Player* player, Container* container, const uint8_t index);
 
-	static ReturnValue canUse(const Creature* creature, const Position& pos);
-	static ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
+	ReturnValue canUse(const Player* player, const Position& pos);
+	ReturnValue canUse(const Player* player, const Position& pos, const Item* item);
+	ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
 
 protected:
 	bool executeUse(Action* action, Player* player, Item* item, const PositionEx& posEx, uint32_t creatureId);

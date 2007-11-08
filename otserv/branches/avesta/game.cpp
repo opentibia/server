@@ -1842,9 +1842,9 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	}
 
 	Position walkToPos = fromPos;
-	ReturnValue ret = Actions::canUse(player, fromPos);
+	ReturnValue ret = g_actions->canUse(player, fromPos);
 	if(ret == RET_NOERROR){
-		ret = Actions::canUse(player, toPos);
+		ret = g_actions->canUse(player, toPos, item);
 		if(ret == RET_TOOFARAWAY){
 			walkToPos = toPos;
 		}
@@ -1910,7 +1910,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-	ReturnValue ret = Actions::canUse(player, pos);
+	ReturnValue ret = g_actions->canUse(player, pos);
 	if(ret != RET_NOERROR){
 		if(ret == RET_TOOFARAWAY){
 			std::list<Direction> listDir;
@@ -1970,7 +1970,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		return false;
 	}
 
-	ReturnValue ret = Actions::canUse(player, fromPos);
+	ReturnValue ret = g_actions->canUse(player, fromPos);
 	if(ret != RET_NOERROR){
 		if(ret == RET_TOOFARAWAY){
 			std::list<Direction> listDir;

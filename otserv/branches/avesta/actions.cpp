@@ -45,6 +45,7 @@
 
 extern Game g_game;
 extern Spells* g_spells;
+extern Actions* g_actions;
 extern ConfigManager g_config;
 
 Actions::Actions() :
@@ -121,20 +122,65 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
-ReturnValue Actions::canUse(const Creature* creature, const Position& pos)
+ReturnValue Actions::canUse(const Player* player, const Position& pos)
 {
-	const Position& creaturePos = creature->getPosition();
+	const Position& playerPos = player->getPosition();
 
 	if(pos.x != 0xFFFF){
-		if(creaturePos.z > pos.z){
+		if(playerPos.z > pos.z){
 			return RET_FIRSTGOUPSTAIRS;
 		}
-		else if(creaturePos.z < pos.z){
+		else if(playerPos.z < pos.z){
 			return RET_FIRSTGODOWNSTAIRS;
 		}
-		else if(!Position::areInRange<1,1,0>(creaturePos, pos)){
+		else if(!Position::areInRange<1,1,0>(playerPos, pos)){
 			return RET_TOOFARAWAY;
 		}
+	}
+
+	return RET_NOERROR;
+}
+
+ReturnValue Actions::canUse(const Player* player, const Position& pos, const Item* item)
+{
+	Action* action = getAction(item, ACTION_UNIQUEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_ACTIONID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_ITEMID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_RUNEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
 	}
 
 	return RET_NOERROR;
@@ -526,13 +572,13 @@ ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos
 	ReturnValue ret = RET_NOERROR;
 
 	if(!getAllowFarUse()){
-		ret = Actions::canUse(player, toPos);
+		ret = g_actions->canUse(player, toPos);
 		if(ret != RET_NOERROR){
 			return ret;
 		}
 	}
 	else{
-		ret = Actions::canUseFar(player, toPos, getCheckLineOfSight());
+		ret = g_actions->canUseFar(player, toPos, getCheckLineOfSight());
 		if(ret != RET_NOERROR){
 			return ret;
 		}
