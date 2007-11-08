@@ -55,6 +55,7 @@ void MonsterType::reset()
 	armor = 0;
 
 	canPushItems = false;
+	canPushCreatures = false;
 	staticAttackChance = 95;
 	maxSummons = 0;
 	targetDistance = 1;
@@ -804,6 +805,11 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 					}
 
 					tmpNode = tmpNode->next;
+				}
+				//if a monster can push creatures, 
+				// it should not be pushable
+				if(mType->canPushCreatures && mType->pushable){
+					mType->pushable = false;
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"targetchange") == 0){
