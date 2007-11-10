@@ -988,6 +988,12 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 								mType->conditionImmunities |= CONDITION_POISON;
 							}
 						}
+						else if(readXMLInteger(tmpNode, "drown", intValue)){
+							if(intValue != 0){
+                                mType->damageImmunities |= COMBAT_DROWNDAMAGE;
+								mType->conditionImmunities |= CONDITION_DROWN;
+							}
+						}
 						else if(readXMLInteger(tmpNode, "lifedrain", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
