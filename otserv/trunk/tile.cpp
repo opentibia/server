@@ -1007,6 +1007,9 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 		}
 	}
 
+	//add a reference to this item, it may be deleted after being added (mailbox for example)
+	thing->useThing2();
+
 	if(link == LINK_OWNER){
 		//calling movement scripts
 		Creature* creature = thing->getCreature();
@@ -1036,6 +1039,9 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	if(item){
 		updateTileFlags(item, false);
 	}
+
+	//release the reference to this item onces we are finished
+	thing->releaseThing2();
 }
 
 void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
