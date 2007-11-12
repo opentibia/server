@@ -772,11 +772,9 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) 
 				//"onGetPlayerMinMaxValues"(cid, attackSkill, attackValue, attackStrength)
 				Item* item = player->getWeapon();
 				int32_t attackSkill = player->getWeaponSkill(item);
-				int32_t attackValue;
+				int32_t attackValue = 7;
 				if(item){
 					attackValue = item->getAttack();
-                }else{
-					attackValue = 25;
                 }
 				int32_t attackStrength = player->getAttackStrength();
 
