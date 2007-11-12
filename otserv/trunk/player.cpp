@@ -359,7 +359,7 @@ WeaponType_t Player::getWeaponType()
 int32_t Player::getWeaponSkill(const Item* item) const
 {
 	if(!item){
-		return 0;
+		return getSkill(SKILL_FIST, SKILL_LEVEL);
 	}
 
 	WeaponType_t weaponType = item->getWeaponType();

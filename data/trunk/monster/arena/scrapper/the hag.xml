@@ -1,50 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<monster name="The Hag" nameDescription="the hag" race="blood" experience="510" speed="205" manacost="590">
-  <health now="715" max="715"/>
-  <look type="264" head="78" body="97" legs="95" feet="95" corpse="7349"/>
-  <targetchange interval="2000" chance="5"/>
-  <strategy attack="100" defense="0"/>
-  <flags>
-    <flag summonable="0"/>
-    <flag attackable="1"/>
-    <flag hostile="1"/>
-    <flag illusionable="1"/>
-    <flag convinceable="1"/>
-    <flag pushable="0"/>
-    <flag canpushitems="1"/>
-    <flag staticattack="78"/>
-    <flag lightlevel="0"/>
-    <flag lightcolor="0"/>
-    <flag targetdistance="1"/>
-    <flag runonhealth="0"/>
-  </flags>
-  <attacks>
-    <attack name="melee" interval="2000" min="-53" max="-173"/>
-    <attack name="snowball" interval="2000" chance="95" min="-23" max="-103"/>
-    <attack name="energy missile" interval="2000" chance="95" min="-103" max="-203"/>
-    <attack name="drunk" interval="1000" chance="20" range="7"/>
-    <attack name="paralyze" interval="3500" chance="35"/>
-  </attacks>
-  <defenses armor="24" defense="25"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
-  <summons max="2">
-    <summon name="Ghost" interval="2000" chance="26"/>
-    <summon name="Crypt Shambler" interval="2000" chance="26"/>
-  </summons>
-  <voices interval="2000" chance="5">
-    <voice sentence="If you think I am to old to fight then you're wrong.!"/>
-    <voice sentence="I've forgotten more things then you have ever learned!"/>
-    <voice sentence="Let me teach you a few things youngster!"/>
-    <voice sentence="I'll teach you respect for the old!"/>
-  </voices>
+<monster name="The Hag" nameDescription="the hag" race="blood" experience="510" speed="205">
+	<health now="715" max="715"/>
+	<look type="264" head="78" body="97" legs="95" feet="95" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag targetdistance="5"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-53" max="-173"/>
+		<attack name="drunk" interval="3000" chance="35" range="5" radius="1" target="1" duration="15000"/>
+		<attack name="speed" interval="4000" chance="55" radius="1" target="1" range="5" duration="12000" speed="-400">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="24" defense="25">
+		<defense name="healing" interval="2000" chance="35" min="95" max="155">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="invisible" interval="3000" chance="50" duration="8000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity name="invisible"/>
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="Ghost" interval="2000" chance="26"/>
+		<summon name="Crypt Shambler" interval="2000" chance="26"/>
+	</summons>
+	<voices interval="2000" chance="5">
+		<voice sentence="If you think I am to old to fight then you're wrong!"/>
+		<voice sentence="I've forgotten more things then you have ever learned!"/>
+		<voice sentence="Let me teach you a few things youngster!"/>
+		<voice sentence="I'll teach you respect for the old!"/>
+	</voices>
 </monster>
