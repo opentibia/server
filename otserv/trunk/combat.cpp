@@ -772,10 +772,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) 
 				//"onGetPlayerMinMaxValues"(cid, attackSkill, attackValue, attackStrength)
 				Item* item = player->getWeapon();
 				int32_t attackSkill = player->getWeaponSkill(item);
-				int32_t attackValue = 7;
-				if(item){
-					int32_t attackValue = item->getAttack();
-				}
+				int32_t attackValue = item->getAttack();
 				int32_t attackStrength = player->getAttackStrength();
 
 				lua_pushnumber(L, attackSkill);
