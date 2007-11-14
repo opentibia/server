@@ -3000,7 +3000,11 @@ void Player::onAttackedCreature(Creature* target)
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
+#ifdef __SKULLSYSTEM__
 			if(Player* targetPlayer = target->getPlayer()){
+#else
+			if(target->getPlayer()){
+#endif
 				pzLocked = true;
 
 #ifdef __SKULLSYSTEM__
@@ -3049,11 +3053,13 @@ void Player::onKilledCreature(Creature* target)
 	Creature::onKilledCreature(target);
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
-		if(Player* targetPlayer = target->getPlayer()){
 #ifdef __SKULLSYSTEM__
+		if(Player* targetPlayer = target->getPlayer()){
 			if(!targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
 				addUnjustifiedDead(targetPlayer);
 			}
+#else
+		if(target->getPlayer()){
 #endif
 
 			if(hasCondition(CONDITION_INFIGHT)){

@@ -269,7 +269,7 @@ struct ShootTypeNames{
 };
 
 struct AmmoTypeNames{
-	char* name;
+	const char* name;
 	Ammo_t ammoType;
 };
 

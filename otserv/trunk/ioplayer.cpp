@@ -479,7 +479,7 @@ bool IOPlayer::savePlayer(Player* player)
 	query << ", `redskull` = " << redSkull;
 #endif
 
-	query << ", `save` = `save` + 1 WHERE `id` = " << player->getGUID();
+	query << " WHERE `id` = " << player->getGUID();
 
 	DBTransaction transaction(db);
 	if(!transaction.begin())

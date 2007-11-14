@@ -52,6 +52,9 @@ int DatabasePgSQL::getParam(DBParam_t param)
 		case DBPARAM_MULTIINSERT:
 			return true;
 			break;
+
+		default:
+			return false;
 	}
 }
 
@@ -159,8 +162,7 @@ std::string DatabasePgSQL::_parse(const std::string &s)
 
 	bool inString = false;
 	uint8_t ch;
-	uint8_t param = 0;
-	for(int a = 0; a < s.length(); a++){
+	for(uint32_t a = 0; a < s.length(); a++){
 		ch = s[a];
 
 		if(ch == '\''){
