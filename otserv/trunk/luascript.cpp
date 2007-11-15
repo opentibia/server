@@ -3557,14 +3557,18 @@ int LuaScriptInterface::luaGetThingPos(lua_State *L)
 
 	Thing* thing = env->getThingByUID(uid);
 	Position pos(0, 0, 0);
+	uint32_t stackpos = 0;
 	if(thing){
 		pos = thing->getPosition();
+		if(thing->getParent()){
+			stackpos = thing->getParent()->__getIndexOfThing(thing);
+		}
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
 	}
 
-	pushPosition(L, pos, 0);
+	pushPosition(L, pos, stackpos);
 	return 1;
 }
 
@@ -5221,7 +5225,12 @@ int LuaScriptInterface::luaGetCreaturePosition(lua_State *L)
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
 		Position pos = creature->getPosition();
-		pushPosition(L, pos, 0);
+		uint32_t stackpos = 0;
+		Tile* tile = creature->getTile();
+		if(tile){
+			stackpos = creature->getParent()->__getIndexOfThing(creature);
+		}
+		pushPosition(L, pos, stackpos);
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
