@@ -62,12 +62,6 @@ struct Abilities{
 		absorbPercentLifeDrain = 0;
 		absorbPercentManaDrain = 0;
 		absorbPercentDrown = 0;
-		/*
-		absorbPercentEarth = 0;
-		absorbPercentIce = 0;
-		absorbPercentHoly = 0;
-		absorbPercentDeath = 0;
-		*/
 
 		memset(skills, 0, sizeof(skills));
 

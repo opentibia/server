@@ -96,8 +96,8 @@ void OutputMessagePool::sendAll()
 		//use this define only for debugging
 		bool v = 1;
 		#else
-		//It will send only messages bigger then 1 kb or with a lifetime greater than 50 ms
-		bool v = (*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 50);
+		//It will send only messages bigger then 1 kb or with a lifetime greater than 40 ms
+		bool v = (*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 40);
 		#endif
 		if(v){
 

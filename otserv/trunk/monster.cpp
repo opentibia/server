@@ -633,7 +633,7 @@ bool Monster::despawn()
 			return false;
 		}
 
-		if(!((pos.z >= masterPos.z - despawnRange) && (pos.z <= masterPos.z + despawnRange))){
+		if(abs(pos.z - masterPos.z) > despawnRange){
 			return true;
 		}
 

@@ -40,10 +40,6 @@ enum CombatType_t {
 	COMBAT_MANADRAIN		= 64,
 	COMBAT_HEALING			= 128,
 	COMBAT_DROWNDAMAGE      = 256
-/*  COMBAT_EARTHDAMAGE      = 512,
-	COMBAT_ICEDAMAGE        = 1024,
-	COMBAT_HOLYDAMAGE       = 2048,
-	COMBAT_DEATHDAMAGE      = 4096*/
 };
 
 enum CombatParam_t{

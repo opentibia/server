@@ -820,7 +820,7 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 
 					tmpNode = tmpNode->next;
 				}
-				//if a monster can push creatures, 
+				//if a monster can push creatures,
 				// it should not be pushable
 				if(mType->canPushCreatures && mType->pushable){
 					mType->pushable = false;
@@ -957,24 +957,6 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 								mType->damageImmunities |= COMBAT_DROWNDAMAGE;
 								mType->conditionImmunities |= CONDITION_DROWN;
 							}
-							/*
-							else if(strcasecmp(strValue.c_str(), "earth") == 0){
-								mType->damageImmunities |= COMBAT_EARTHDAMAGE;
-								//mType->conditionImmunities |= CONDITION_EARTH;
-							}
-							else if(strcasecmp(strValue.c_str(), "ice") == 0){
-								mType->damageImmunities |= COMBAT_ICEDAMAGE;
-								//mType->conditionImmunities |= CONDITION_ICE;
-							}
-							else if(strcasecmp(strValue.c_str(), "holy") == 0){
-								mType->damageImmunities |= COMBAT_HOLYDAMAGE;
-								//mType->conditionImmunities |= CONDITION_HOLY;
-							}
-							else if(strcasecmp(strValue.c_str(), "death) == 0){
-								mType->damageImmunities |= COMBAT_DEATHDAMAGE;
-								//mType->conditionImmunities |= CONDITION_DEATH;
-							}
-							*/
 							else if(strcasecmp(strValue.c_str(), "lifedrain") == 0){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;

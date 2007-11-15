@@ -101,7 +101,7 @@ ItemType::ItemType()
 	showDuration  = false;
 	showCharges   = false;
 	charges       = 0;
-	hitChance     = 0; 
+	hitChance     = 0;
 	breakChance   = 0;
 	shootRange    = 1;
 
@@ -815,28 +815,6 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentDrown = intValue;
 								}
 							}
-							/*
-							else if(strcasecmp(strValue.c_str(), "absorbPercentEarth") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilites.absorbPercentEarth = intValue;
-								}
-							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentIce") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilites.absorbPercentIce = intValue;
-								}
-							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentHoly") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilites.absorbPercentHoly = intValue;
-								}
-							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentDeath") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilites.absorbPercentDeath = intValue;
-								}
-							}
-							*/
 							else if(strcasecmp(strValue.c_str(), "absorbPercentPhysical") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentPhysical = intValue;
