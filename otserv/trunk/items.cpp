@@ -815,6 +815,28 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentDrown = intValue;
 								}
 							}
+							/*
+							else if(strcasecmp(strValue.c_str(), "absorbPercentEarth") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilites.absorbPercentEarth = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentIce") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilites.absorbPercentIce = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentHoly") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilites.absorbPercentHoly = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentDeath") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilites.absorbPercentDeath = intValue;
+								}
+							}
+							*/
 							else if(strcasecmp(strValue.c_str(), "absorbPercentPhysical") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentPhysical = intValue;
@@ -877,6 +899,10 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(strcasecmp(strValue.c_str(), "poison") == 0){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
 										combatType = COMBAT_POISONDAMAGE;
+									}
+									else if(strcasecmp(strValue.c_str(), "drown") == 0){
+										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);
+										combatType = COMBAT_DROWNDAMAGE;
 									}
 									//else if(strcasecmp(strValue.c_str(), "physical") == 0){
 									//	damageCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_PHYSICAL);

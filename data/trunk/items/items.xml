@@ -6783,7 +6783,6 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="arrow"/>
-		<attribute key="breakChance" value="80"/>
 	</item>
 	<item id="2545" article="a" name="poison arrow" plural="poison arrows">
 		<attribute key="weight" value="80"/>
@@ -17705,7 +17704,6 @@
 	</item>
 	<item id="6598" name="snow">
 		<attribute key="description" value="Someone must have walked here recently."/>
-		<attribute key="decayTo" value="6594"/>
 		<attribute key="decayTo" value="6594"/>
 	</item>
 	<item id="6599" name="snow">

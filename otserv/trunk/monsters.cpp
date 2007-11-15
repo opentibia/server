@@ -439,6 +439,20 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	else if(name == "drown"){
 		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DROWNDAMAGE);
 	}
+	/*
+	else if(name == "earth"){
+		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_EARTHDAMAGE);
+	}
+	else if(name == "ice"){
+		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_ICEDAMAGE);
+	}
+	else if(name == "holy"){
+		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_HOLYDAMAGE);
+	}
+	else if(name == "death"){
+		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DEATHDAMAGE);
+	}
+	*/
 	else if(name == "lifedrain"){
 		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_LIFEDRAIN);
 	}
@@ -943,6 +957,24 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 								mType->damageImmunities |= COMBAT_DROWNDAMAGE;
 								mType->conditionImmunities |= CONDITION_DROWN;
 							}
+							/*
+							else if(strcasecmp(strValue.c_str(), "earth") == 0){
+								mType->damageImmunities |= COMBAT_EARTHDAMAGE;
+								//mType->conditionImmunities |= CONDITION_EARTH;
+							}
+							else if(strcasecmp(strValue.c_str(), "ice") == 0){
+								mType->damageImmunities |= COMBAT_ICEDAMAGE;
+								//mType->conditionImmunities |= CONDITION_ICE;
+							}
+							else if(strcasecmp(strValue.c_str(), "holy") == 0){
+								mType->damageImmunities |= COMBAT_HOLYDAMAGE;
+								//mType->conditionImmunities |= CONDITION_HOLY;
+							}
+							else if(strcasecmp(strValue.c_str(), "death) == 0){
+								mType->damageImmunities |= COMBAT_DEATHDAMAGE;
+								//mType->conditionImmunities |= CONDITION_DEATH;
+							}
+							*/
 							else if(strcasecmp(strValue.c_str(), "lifedrain") == 0){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
@@ -994,6 +1026,32 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 								mType->conditionImmunities |= CONDITION_DROWN;
 							}
 						}
+						/*
+						else if(readXMLInteger(tmpNode, "earth", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_EARTHDAMAGE;
+								//mType->conditionImmunities |= CONDITION_EARTH;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "ice", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_ICEDAMAGE;
+								//mType->conditionImmunities |= CONDITION_ICE;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "poison", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_HOLYDAMAGE;
+								//mType->conditionImmunities |= CONDITION_HOLY;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "drown", intValue)){
+							if(intValue != 0){
+                                mType->damageImmunities |= COMBAT_DEATHDAMAGE;
+								//mType->conditionImmunities |= CONDITION_DEATH;
+							}
+						}
+						*/
 						else if(readXMLInteger(tmpNode, "lifedrain", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;

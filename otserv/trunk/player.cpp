@@ -1773,6 +1773,44 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 				break;
 			}
 
+/*
+			case COMBAT_EARTHDAMAGE:
+			{
+				if(it.abilities.absorbPercentEarth > 0){
+                    damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentEarth) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_ICEDAMAGE:
+			{
+				if(it.abilities.absorbPercentIce > 0){
+                    damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentIce) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_HOLYDAMAGE:
+			{
+				if(it.abilities.absorbPercentHoly > 0){
+                    damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentHoly) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_DEATHDAMAGE:
+			{
+				if(it.abilities.absorbPercentDeath > 0){
+                    damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDeath) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+*/
+
 			default:
 				break;
 		}

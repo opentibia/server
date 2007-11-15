@@ -3049,6 +3049,8 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 				break;
 
 			case COMBAT_ENERGYDAMAGE:
+            case COMBAT_FIREDAMAGE:
+            case COMBAT_PHYSICALDAMAGE:
 			{
 				hitEffect = NM_ME_BLOCKHIT;
 				break;
@@ -3057,18 +3059,6 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 			case COMBAT_POISONDAMAGE:
 			{
 				hitEffect = NM_ME_POISON_RINGS;
-				break;
-			}
-
-			case COMBAT_FIREDAMAGE:
-			{
-				hitEffect = NM_ME_BLOCKHIT;
-				break;
-			}
-
-			case COMBAT_PHYSICALDAMAGE:
-			{
-				hitEffect = NM_ME_BLOCKHIT;
 				break;
 			}
 
