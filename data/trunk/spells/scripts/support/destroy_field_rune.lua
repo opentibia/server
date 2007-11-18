@@ -3,19 +3,13 @@ local function doRemoveField(cid, pos)
 	local field = getThingfromPos(pos)
 	local playerPos = getPlayerPosition(cid)
 
-	if(getDistanceBetween(playerPos, pos) <= 4) then
-		if(field.uid > 0 and isInArray(FIELDS, field.itemid) == TRUE) then
-			doRemoveItem(field.uid, 1)
-			doSendMagicEffect(pos, CONST_ME_POFF)
-			return LUA_NO_ERROR
-		end
-
-		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
-		doSendMagicEffect(playerPos, CONST_ME_POFF)
-		return LUA_ERROR
+	if(field.uid > 0 and isInArray(FIELDS, field.itemid) == TRUE) then
+		doRemoveItem(field.uid)
+		doSendMagicEffect(pos, CONST_ME_POFF)
+		return LUA_NO_ERROR
 	end
 
-	doPlayerSendDefaultCancel(cid, RETURNVALUE_TOOFARAWAY)
+	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 	doSendMagicEffect(playerPos, CONST_ME_POFF)
 	return LUA_ERROR
 end

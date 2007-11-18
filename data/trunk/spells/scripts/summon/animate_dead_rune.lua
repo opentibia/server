@@ -3,7 +3,7 @@ function doTargetCorpse(cid, pos)
 	getPos.stackpos = 255
 	corpse = getThingfromPos(getPos)
 	if(corpse.uid > 0 and isCreature(corpse.uid) == FALSE and isInArray(CORPSES, corpse.itemid) == TRUE) then
-		doRemoveItem(corpse.uid, 1)
+		doRemoveItem(corpse.uid)
 		doPlayerSummonCreature(cid, "Skeleton", pos)
 		doSendMagicEffect(pos, CONST_ME_MAGIC_BLUE)
 		return LUA_NO_ERROR

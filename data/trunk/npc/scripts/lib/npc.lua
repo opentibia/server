@@ -1,34 +1,27 @@
 
 -- get the distance to a creature
+-- deprecated function
 function getDistanceToCreature(id)
-	if id == 0 or id == nil then
-		selfGotoIdle()
-	end
-	cx, cy, cz = getCreaturePosition(id)
-	if cx == nil then
-		return nil
-	end
-	sx, sy, sz = getCreaturePosition(cid)
-	return math.max(math.abs(sx-cx), math.abs(sy-cy))	
+	debugPrint('getDistanceToCreature(): deprecated function. Use getDistanceTo()')
+	return getDistanceTo(id)	
 end
 
--- do one step to reach creature
+-- move to a creature
 function moveToCreature(id)
-	if id == 0 or id == nil then
-		selfGotoIdle()
+	if(isCreature(id) == FALSE) then
+		debugPrint('moveToCreature(): creature not found.')
+		return LUA_ERROR
 	end
-	tx,ty,tz = getCreaturePosition(id)
-	if tx == nil then
-		selfGotoIdle()
-	else
-	   selfMoveTo(tx, ty, tz)
-   end
+
+	local pos = getCreaturePosition(id)
+	selfMoveTo(pos.x, pos.y, pos.z)
+	return LUA_NO_ERROR
 end
 
 function selfGotoIdle()
-		following = false
-		attacking = false
-		selfAttackCreature(0)
-		target = 0
+	following = false
+	attacking = false
+	selfAttackCreature(0)
+	target = 0
 end
 

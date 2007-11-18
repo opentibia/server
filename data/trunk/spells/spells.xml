@@ -32,8 +32,8 @@
 	<rune name="Animate Dead" id="2316" allowfaruse="1" charges="1" maglv="4" blocktype="solid" script="summon/animate_dead_rune.lua"/>
 	
 	-- Support Runes
-	<rune name="Desintegrate" id="2310" allowfaruse="1" charges="3" maglv="4" script="support/desintegrate_rune.lua"/>
-	<rune name="Destroy Field" id="2261" allowfaruse="1" charges="3" maglv="3" aggressive="0" script="support/destroy_field_rune.lua"/>
+	<rune name="Desintegrate" id="2310" allowfaruse="1" charges="3" maglv="4" range="5" script="support/desintegrate_rune.lua"/>
+	<rune name="Destroy Field" id="2261" allowfaruse="1" charges="3" maglv="3" aggressive="0" range="5" script="support/destroy_field_rune.lua"/>
 	<rune name="Chameleon" id="2291" allowfaruse="1" charges="1" maglv="4" aggressive="0" selftarget="1" blocktype="solid" function="chameleon"/>
 	<rune name="Magic Wall" id="2293" allowfaruse="1" charges="3" maglv="9" aggressive="0" blocktype="all" script="support/magic_wall_rune.lua"/>
 	<rune name="Paralyze" id="2278" allowfaruse="1" charges="1" maglv="18" mana="1400" needtarget="1" blocktype="solid" script="support/paralyze_rune.lua"/>
@@ -59,7 +59,7 @@
 		<vocation name="Master Sorcerer" />
 		<vocation name="Elder Druid" />
 	</instant>
-	<instant name="Whirlwind Throw" words="exori hur" lvl="15" mana="40" prem="1" needtarget="1" needweapon="1" script="attack/whirlwind_throw.lua">
+	<instant name="Whirlwind Throw" words="exori hur" lvl="15" mana="40" prem="1" range="5" needtarget="1" needweapon="1" script="attack/whirlwind_throw.lua">
 		<vocation name="Knight" />
 		<vocation name="Elite Knight" />
 	</instant>
@@ -67,7 +67,7 @@
 		<vocation name="Sorcerer" />
 		<vocation name="Master Sorcerer" />
 	</instant>
-	<instant name="Ethereal Spear" words="exori con" lvl="23" mana="35" prem="1" needtarget="1" script="attack/ethereal_spear.lua">
+	<instant name="Ethereal Spear" words="exori con" lvl="23" mana="35" prem="1" range="5" needtarget="1" script="attack/ethereal_spear.lua">
 		<vocation name="Paladin" />
 		<vocation name="Royal Paladin" />
 	</instant>

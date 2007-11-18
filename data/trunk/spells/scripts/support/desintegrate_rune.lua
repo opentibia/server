@@ -3,24 +3,13 @@ local function doRemoveObject(cid, pos)
 	local object = getThingfromPos(pos)
 	local playerPos = getPlayerPosition(cid)
 
-	if(getDistanceBetween(playerPos, pos) <= 4) then
-		if(object.uid > 0 and isCreature(object.uid) == FALSE and isItemMoveable(object.itemid) == TRUE) then
-			local objectType = 1
-			if(isItemStackable(object.itemid) == TRUE) then
-				objectType = object.type
-			end
-
-			doRemoveItem(object.uid, objectType)
-			doSendMagicEffect(pos, CONST_ME_BLOCKHIT)
-			return LUA_NO_ERROR
-		end
-
-		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
-		doSendMagicEffect(playerPos, CONST_ME_POFF)
-		return LUA_ERROR
+	if(object.uid > 0 and isCreature(object.uid) == FALSE and isItemMoveable(object.itemid) == TRUE) then
+		doRemoveItem(object.uid)
+		doSendMagicEffect(pos, CONST_ME_BLOCKHIT)
+		return LUA_NO_ERROR
 	end
 
-	doPlayerSendDefaultCancel(cid, RETURNVALUE_TOOFARAWAY)
+	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 	doSendMagicEffect(playerPos, CONST_ME_POFF)
 	return LUA_ERROR
 end
