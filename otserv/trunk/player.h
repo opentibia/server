@@ -149,7 +149,7 @@ public:
 
 	uint32_t getAccount() const {return accountNumber;}
 	int32_t getLevel() const {return level;}
-	int32_t getMagicLevel() const {return magLevel + varStats[STAT_MAGICPOINTS];}
+	int32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
 	int32_t getAccessLevel() const {return accessLevel;}
 
 	void setVocation(uint32_t vocId);
@@ -159,7 +159,7 @@ public:
 
 	playersex_t getSex() const {return sex;}
 	void setSex(playersex_t);
-	int getPlayerInfo(playerinfo_t playerinfo) const;
+	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	uint32_t getExperience() const {return experience;}
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
@@ -190,8 +190,8 @@ public:
 			return 0.00;
 	}
 
-	virtual int32_t getMaxHealth() const {return healthMax + varStats[STAT_MAXHITPOINTS];}
-	virtual int32_t getMaxMana() const {return manaMax + varStats[STAT_MAXMANAPOINTS];}
+	virtual int32_t getMaxHealth() const {return getPlayerInfo(PLAYERINFO_MAXHEALTH);}
+	virtual int32_t getMaxMana() const {return getPlayerInfo(PLAYERINFO_MAXMANA);}
 
 	Item* getInventoryItem(slots_t slot) const;
 
@@ -264,7 +264,7 @@ public:
 	virtual void doAttacking(uint32_t interval);
 	int32_t getShootRange() const {return shootRange;}
 
-	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
+	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
