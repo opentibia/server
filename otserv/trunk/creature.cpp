@@ -426,8 +426,12 @@ void Creature::onDie()
 
 		if(mostDamageCreature){
 			mostDamageCreatureMaster = mostDamageCreature->getMaster();
-			if(mostDamageCreature != lastHitCreature && mostDamageCreature != lastHitCreatureMaster &&
-				mostDamageCreatureMaster != lastHitCreature && mostDamageCreatureMaster != lastHitCreatureMaster){
+			bool isNotLastHitMaster = (mostDamageCreature != lastHitCreatureMaster);
+			bool isNotMostDamageMaster = (lastHitCreature != mostDamageCreatureMaster);
+			bool isNotSameMaster = lastHitCreatureMaster != NULL && (mostDamageCreatureMaster != lastHitCreatureMaster);
+
+			if(mostDamageCreature != lastHitCreature && isNotLastHitMaster &&
+				isNotMostDamageMaster && isNotSameMaster){
 				mostDamageCreature->onKilledCreature(this);
 			}
 		}

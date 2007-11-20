@@ -216,6 +216,7 @@ public:
 	uint32_t breakChance;
 	uint32_t hitChance;
 	uint32_t shootRange;
+	AmmoAction_t ammoAction;
 
 	Abilities abilities;
 

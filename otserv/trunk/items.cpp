@@ -22,6 +22,7 @@
 #include "items.h"
 #include "spells.h"
 #include "condition.h"
+#include "weapons.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -72,6 +73,7 @@ ItemType::ItemType()
 	weaponType    = WEAPON_NONE;
 	slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
 	amuType       = AMMO_NONE;
+	ammoAction    = AMMOACTION_NONE;
 	shootType     = (ShootType_t)0;
 	magicEffect   = NM_ME_NONE;
 	attack        = 0;
@@ -652,6 +654,15 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 
 									it.breakChance = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "ammoAction") == 0){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									it.ammoAction = getAmmoAction(strValue);
+
+									if(it.ammoAction == AMMOACTION_NONE){
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown ammoAction " << strValue  << std::endl;
+									}
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "hitChance") == 0){

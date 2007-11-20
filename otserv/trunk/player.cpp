@@ -497,14 +497,14 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 	switch(playerinfo) {
 		case PLAYERINFO_LEVEL: return level; break;
 		case PLAYERINFO_LEVELPERCENT: return level_percent; break;
-		case PLAYERINFO_MAGICLEVEL: return std::max(0, magLevel + varStats[STAT_MAGICPOINTS]); break;
+		case PLAYERINFO_MAGICLEVEL: return std::max((int32_t)0, ((int32_t)magLevel + varStats[STAT_MAGICPOINTS])); break;
 		case PLAYERINFO_MAGICLEVELPERCENT: return maglevel_percent; break;
 		case PLAYERINFO_HEALTH: return health; break;
-		case PLAYERINFO_MAXHEALTH: return std::max(1, healthMax + varStats[STAT_MAXHITPOINTS]); break;
+		case PLAYERINFO_MAXHEALTH: return std::max((int32_t)1, ((int32_t)healthMax + varStats[STAT_MAXHITPOINTS])); break;
 		case PLAYERINFO_MANA: return mana; break;
-		case PLAYERINFO_MAXMANA: return std::max(0, manaMax + varStats[STAT_MAXMANAPOINTS]); break;
+		case PLAYERINFO_MAXMANA: return std::max((int32_t)0, ((int32_t)manaMax + varStats[STAT_MAXMANAPOINTS])); break;
 		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
-		case PLAYERINFO_SOUL: return std::max(0, soul + varStats[STAT_SOULPOINTS]); break;
+		case PLAYERINFO_SOUL: return std::max((int32_t)0, ((int32_t)soul + varStats[STAT_SOULPOINTS])); break;
 		default:
 			return 0; break;
 	}
@@ -520,7 +520,7 @@ int32_t Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
 		n += varSkills[skilltype];
 	}
 
-	return std::max(0, n);
+	return std::max((int32_t)0, (int32_t)n);
 }
 
 std::string Player::getSkillName(int skillid)

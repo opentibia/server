@@ -273,6 +273,11 @@ struct AmmoTypeNames{
 	Ammo_t ammoType;
 };
 
+struct AmmoActionNames{
+	const char* name;
+	AmmoAction_t ammoAction;
+};
+
 MagicEffectNames magicEffectNames[] = {
 	{"redspark", NM_ME_DRAW_BLOOD},
 	{"bluebubble", NM_ME_LOSE_ENERGY},
@@ -364,6 +369,13 @@ AmmoTypeNames ammoTypeNames[] = {
 	{"etherealspear", AMMO_SPEAR}
 };
 
+AmmoActionNames ammoActionNames[] = {
+	{"move", AMMOACTION_MOVE},
+	{"moveback", AMMOACTION_MOVEBACK},
+	{"removecharge", AMMOACTION_REMOVECHARGE},
+	{"removecount", AMMOACTION_REMOVECOUNT}
+};
+
 MagicEffectClasses getMagicEffect(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(magicEffectNames)/sizeof(MagicEffectNames); ++i){
@@ -392,4 +404,14 @@ Ammo_t getAmmoType(const std::string& strValue)
 		}
 	}
 	return AMMO_NONE;
+}
+
+AmmoAction_t getAmmoAction(const std::string& strValue)
+{
+	for(uint32_t i = 0; i < sizeof(ammoActionNames)/sizeof(AmmoActionNames); ++i){
+		if(strValue == ammoActionNames[i].name){
+			return ammoActionNames[i].ammoAction;
+		}
+	}
+	return AMMOACTION_NONE;
 }

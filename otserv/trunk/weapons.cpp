@@ -247,18 +247,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	if(readXMLString(p, "ammo", strValue)){
-		if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"move") == 0){
-			ammoAction = AMMOACTION_MOVE;
-		}
-        else if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"moveback") == 0){
-            ammoAction = AMMOACTION_MOVEBACK;
-        }
-		else if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"removecharge") == 0){
-			ammoAction = AMMOACTION_REMOVECHARGE;
-		}
-		else if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"removecount") == 0){
-			ammoAction = AMMOACTION_REMOVECOUNT;
-		}
+		ammoAction = getAmmoAction(strValue);
 	}
 
 	typedef std::list<std::string> STRING_LIST;
@@ -698,6 +687,7 @@ WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
 
 bool WeaponDistance::configureEvent(xmlNodePtr p)
 {
+	AmmoAction_t oldAmmoAction = ammoAction;
 	if(!Weapon::configureEvent(p)){
 		return false;
 	}
@@ -705,6 +695,10 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 	const ItemType& it = Item::items[id];
 	hitChance = it.hitChance;
 	breakChance = it.breakChance;
+
+	if(oldAmmoAction == ammoAction && it.ammoAction != AMMOACTION_NONE){
+		ammoAction = it.ammoAction;
+	}
 
 	int intValue;
 	if(readXMLInteger(p, "hitChance", intValue)){

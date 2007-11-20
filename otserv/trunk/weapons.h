@@ -29,26 +29,12 @@
 #include "talkaction.h"
 #include "baseevents.h"
 #include "combat.h"
+#include "const80.h"
 
 class Weapon;
 class WeaponMelee;
 class WeaponDistance;
 class WeaponWand;
-
-enum AmmoAction_t{
-	AMMOACTION_NONE,
-	AMMOACTION_REMOVECOUNT,
-	AMMOACTION_REMOVECHARGE,
-	AMMOACTION_MOVE,
-	AMMOACTION_MOVEBACK
-};
-
-enum WieldInfo_t{
-	WIELDINFO_LEVEL = 1,
-	WIELDINFO_MAGLV = 2,
-	WIELDINFO_VOCREQ = 4,
-	WIELDINFO_PREMIUM = 8
-};
 
 class Weapons : public BaseEvents
 {
