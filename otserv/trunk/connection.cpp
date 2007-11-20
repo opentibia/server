@@ -95,7 +95,7 @@ void Connection::closeConnection()
 	m_closeState = CLOSE_STATE_REQUESTED;
 
 	Scheduler::getScheduler().addEvent(
-		createSchedulerTask(1000, boost::bind(&Connection::closeConnectionTask, this)));
+		createSchedulerTask(200, boost::bind(&Connection::closeConnectionTask, this)));
 }
 
 void Connection::closeConnectionTask()
