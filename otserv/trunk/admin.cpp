@@ -373,7 +373,7 @@ void ProtocolAdmin::adminCommandCloseServer()
 		return;
 	}
 	
-	if(!g_game.getMap()->saveMap("")){
+	if(!g_game.getMap()->saveMap()){
 		addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Map");
 		
 		output->AddByte(AP_MSG_COMMAND_FAILED);

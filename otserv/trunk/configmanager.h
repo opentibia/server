@@ -45,7 +45,6 @@ public:
 		HOUSE_STORE_FILE,
 		HOUSE_RENT_PERIOD,
 		MAP_KIND,
-		BAN_FILE,/* deprecated */
 		LOGIN_MSG,
 		SERVER_NAME,
 		WORLD_NAME,
@@ -61,7 +60,6 @@ public:
 		SQL_USER,
 		SQL_PASS,
 		SQL_DB,
-		SQLITE_DB,/* deprecated */
 		SQL_TYPE,
 		MAP_HOST,
 		MAP_USER,

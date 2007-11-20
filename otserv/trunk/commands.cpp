@@ -656,7 +656,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		Houses::getInstance().payHouses();
 	}
 
-	if(!game->getMap()->saveMap("")){
+	if(!game->getMap()->saveMap()){
 		if(player)
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving map.");
 	}

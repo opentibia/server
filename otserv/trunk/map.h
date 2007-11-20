@@ -173,7 +173,7 @@ public:
 	* \param identifier file/database to save to
 	* \returns true if the map was saved successfully
 	*/
-	bool saveMap(const std::string& identifier);
+	bool saveMap();
 
 	/**
 	* Get a single tile.
@@ -258,8 +258,6 @@ protected:
 	unsigned long lasterrorcode;
 	std::string spawnfile;
 	std::string housefile;
-	std::string mapStoreIdentifier;
-	std::string houseStoreIdentifier;
 	SpectatorCache spectatorCache;
 
 	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,

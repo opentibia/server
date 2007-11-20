@@ -58,9 +58,6 @@ Map::Map()
 	defaultMapLoaded = false;
 	mapWidth = 0;
 	mapHeight = 0;
-
-	mapStoreIdentifier = g_config.getString(ConfigManager::MAP_STORE_FILE);
-	houseStoreIdentifier = g_config.getString(ConfigManager::HOUSE_STORE_FILE);
 }
 
 Map::~Map()
@@ -136,24 +133,19 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	delete loader;
 
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
-	IOMapSerialize->loadHouseInfo(this, houseStoreIdentifier);
-	IOMapSerialize->loadMap(this, mapStoreIdentifier);
+	IOMapSerialize->loadHouseInfo(this);
+	IOMapSerialize->loadMap(this);
 
 	return true;
 }
 
 
-bool Map::saveMap(const std::string& identifier)
+bool Map::saveMap()
 {
-	std::string storeIdentifier = identifier;
-	if(storeIdentifier.empty()){
-		storeIdentifier = mapStoreIdentifier;
-	}
-
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
 	bool saved = false;
 	for(uint32_t tries = 0; tries < 3; tries++){
-		if(IOMapSerialize->saveMap(this, storeIdentifier)){
+		if(IOMapSerialize->saveMap(this)){
 			saved = true;
 			break;
 		}
@@ -164,7 +156,7 @@ bool Map::saveMap(const std::string& identifier)
 
 	saved = false;
 	for(uint32_t tries = 0; tries < 3; tries++){
-		if(IOMapSerialize->saveHouseInfo(this, houseStoreIdentifier)){
+		if(IOMapSerialize->saveHouseInfo(this)){
 			saved = true;
 			break;
 		}

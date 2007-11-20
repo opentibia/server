@@ -400,22 +400,3 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	std::cout << "Notice: [OTBM Loader] Loading time : " << (OTSYS_TIME() - start)/(1000.) << " s" << std::endl;
 	return (map->getLastError() == LOADMAPERROR_NONE);
 }
-
-bool IOMapOTBM::loadSpawns(Map* map)
-{
-	if(!map->spawnfile.empty()){
-		Spawns::getInstance()->loadFromXml(map->spawnfile);
-		Spawns::getInstance()->startup();
-	}
-	
-	return true;
-}
-
-bool IOMapOTBM::loadHouses(Map* map)
-{
-	if(!map->housefile.empty()){
-		return Houses::getInstance().loadHousesXML(map->housefile);
-	}
-
-	return true;
-}
