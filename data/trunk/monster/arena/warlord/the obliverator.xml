@@ -38,7 +38,7 @@
     <immunity drunk="1"/>
     <immunity invisible="0"/>
   </immunities>
-  <summons max="3">
+  <summons maxSummons="3">
     <summon name="fire elemental" interval="2000" chance="50"/>
   </summons>
   <voices interval="1000" chance="10">

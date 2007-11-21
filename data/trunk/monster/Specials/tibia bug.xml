@@ -39,7 +39,7 @@
     <immunity drunk="1"/>
     <immunity invisible="0"/>
   </immunities>
-  <summons max="10">
+  <summons maxSummons="10">
     <summon name="tibia bug" interval="1000" chance="15" max="10"/>
   </summons>
   <voices interval="5000" chance="10">
@@ -48,8 +48,8 @@
     <voice sentence="You are bugged ... by me!"/>
   </voices>
   <loot>
-    <item id="2148" countmax="11" chance1="100000" chancemax="0"/> --Gold Coin
-    <item id="6570" chance="5538"/> --Blue Surprise Bag
-    <item id="6571" chance="1538" /> --Red Surprise Bag
+    <item id="2148" countmax="11" chance1="100000" chancemax="0"/> <!-- Gold Coin -->
+    <item id="6570" chance="5538"/> <!-- Blue Surprise Bag -->
+    <item id="6571" chance="1538" /> <!-- Red Surprise Bag -->
   </loot>
 </monster>

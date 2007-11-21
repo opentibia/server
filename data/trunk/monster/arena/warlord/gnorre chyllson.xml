@@ -38,7 +38,7 @@
       <immunity drunk="1"/>
       <immunity invisible="1"/>
     </immunities>
-    <summons max="0">
+    <summons maxSummons="0">
     </summons>
     <voices interval="2000" chance="5">
     </voices>

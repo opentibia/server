@@ -42,33 +42,33 @@
   	<immunity drunk="1" /> 
   	<immunity invisible="1" /> 
   </immunities>
-  <summons max="0">
-  <summon name="" interval="" chance="" /> 
+  <summons maxSummons="0">
+    <summon name="" interval="" chance="" /> 
   </summons>
   <voices interval="5000" chance="10">
-  <voice sentence="We don't need a future!" /> 
-  <voice sentence="I'll rook you all!" /> 
-  <voice sentence="They thought they'd beaten us!" /> 
-  <voice sentence="You are history!" /> 
-  <voice sentence="There can only be one world!" /> 
-  <voice sentence="Valor who?" /> 
-  <voice sentence="Die noob!" /> 
-  <voice sentence="There are no dragons!" /> 
-  <voice sentence="I'll quit forever! Again ..." /> 
-  <voice sentence="You all are noobs!" /> 
-  <voice sentence="Beware of the cyclops!" /> 
-  <voice sentence="Just had a disconnect." /> 
-  <voice sentence="Magic is only good for girls!" /> 
-  <voice sentence="We'll be back!" /> 
+    <voice sentence="We don't need a future!" /> 
+    <voice sentence="I'll rook you all!" /> 
+    <voice sentence="They thought they'd beaten us!" /> 
+    <voice sentence="You are history!" /> 
+    <voice sentence="There can only be one world!" /> 
+    <voice sentence="Valor who?" /> 
+    <voice sentence="Die noob!" /> 
+    <voice sentence="There are no dragons!" /> 
+    <voice sentence="I'll quit forever! Again ..." /> 
+    <voice sentence="You all are noobs!" /> 
+    <voice sentence="Beware of the cyclops!" /> 
+    <voice sentence="Just had a disconnect." /> 
+    <voice sentence="Magic is only good for girls!" /> 
+    <voice sentence="We'll be back!" /> 
   </voices>
   <loot>
-  <item id="2148" chance="100000" countmax="10" /> --Gold Coin
-  <item id="2484" chance="50000" /> --Studded Armor
-  <item id="2482" chance="50000" /> --Studded Helmet
-  <item id="2526" chance="1538" /> --Studded Shield
-  <item id="2385" chance="2000" /> --Sabre
-  <item id="2386" chance="2000" /> --Axe
-  <item id="6570" chance="5538"/> --Blue Surprise Bag
-  <item id="6571" chance="1538" /> --Red Surprise Bag
+    <item id="2148" chance="100000" countmax="10" /> <!-- Gold Coin -->
+    <item id="2484" chance="50000" /> <!-- Studded Armor -->
+    <item id="2482" chance="50000" /> <!-- Studded Helmet -->
+    <item id="2526" chance="1538" /> <!-- Studded Shield -->
+    <item id="2385" chance="2000" /> <!-- Sabre -->
+    <item id="2386" chance="2000" /> <!-- Axe -->
+    <item id="6570" chance="5538"/> <!-- Blue Surprise Bag -->
+    <item id="6571" chance="1538" /> <!-- Red Surprise Bag -->
   </loot>
 </monster>
