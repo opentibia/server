@@ -124,9 +124,9 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 		}
 	}
 
-	player->lossPercent[LOSS_EXPERIENCE] = result->getDataInt("loss_experience");
-	player->lossPercent[LOSS_MANASPENT] = result->getDataInt("loss_mana");
-	player->lossPercent[LOSS_SKILLTRIES] = result->getDataInt("loss_skills");
+	player->setLossPercent(LOSS_EXPERIENCE, result->getDataInt("loss_experience")); 
+	player->setLossPercent(LOSS_MANASPENT, result->getDataInt("loss_mana")); 
+	player->setLossPercent(LOSS_SKILLTRIES, result->getDataInt("loss_skills"));
 
 	player->loginPosition.x = result->getDataInt("posx");
 	player->loginPosition.y = result->getDataInt("posy");

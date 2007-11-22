@@ -210,8 +210,11 @@ public:
 	uint32_t getLossPercent(lossTypes_t lossType) const {return lossPercent[lossType];}
 	void setLossPercent(lossTypes_t lossType, uint32_t newPercent)
 	{
-		if(newPercent <= 100)
-			lossPercent[lossType] = newPercent;
+		if(newPercent > 100){
+			newPercent = 100;
+		}
+		
+		lossPercent[lossType] = newPercent;
 	}
 
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);

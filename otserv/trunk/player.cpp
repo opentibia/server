@@ -1822,14 +1822,13 @@ void Player::onDie()
 
 	lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
 
-	while(lostMana > manaSpent){
+	while(lostMana > manaSpent && magLevel > 0){
 		lostMana -= manaSpent;
 		manaSpent = vocation->getReqMana(magLevel);
 		magLevel--;
 	}
 
-	manaSpent -= lostMana;
-	//
+	manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
 
 	//Skill loss
 	uint32_t lostSkillTries;
@@ -1859,7 +1858,7 @@ void Player::onDie()
 			}
 		}
 
-		skills[i][SKILL_TRIES] -= lostSkillTries;
+		skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)skills[i][SKILL_TRIES] - lostSkillTries); 
 	}
 	//
 
