@@ -6026,7 +6026,7 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="2413" article="a" name="broad sword">
+	<item id="2413" article="a" name="broadsword">
 		<attribute key="weight" value="5250"/>
 		<attribute key="defense" value="23"/>
 		<attribute key="attack" value="26"/>
