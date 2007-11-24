@@ -1858,7 +1858,7 @@ void Player::onDie()
 			}
 		}
 
-		skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)skills[i][SKILL_TRIES] - lostSkillTries); 
+		skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
 	}
 	//
 
