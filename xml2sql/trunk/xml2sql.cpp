@@ -226,7 +226,6 @@ int main(int argc, char** argv)
 
 	std::cout << "CREATE TABLE `xml2sql` (`name` VARCHAR(255), `value` INT);" << std::endl;
 	std::cout << "CREATE TABLE `xml2sql2` (`name` VARCHAR(255), `value` INT);" << std::endl;
-	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@DEFAULT_GROUP_ID', 0);" << std::endl;
 	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@GROUP_ID', 0);" << std::endl;
 	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@PLAYER_ID', 0);" << std::endl;
 	std::cout << "INSERT INTO `xml2sql` (`name`, `value`) VALUES ('@GUILD_ID', 0);" << std::endl;
@@ -236,9 +235,6 @@ int main(int argc, char** argv)
 	dir_name.str("");
 	dir_name << path << DIR_SEPARATOR << "accounts" << DIR_SEPARATOR;
 	if( boost::filesystem::exists( dir_name.str() ) ){
-		std::cout << "INSERT INTO `groups` (`name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) VALUES ('XML import group', 0, 0, 1000, 50);" << std::endl;
-		std::cout << "UPDATE `xml2sql` SET `value` = " << insertId << "() WHERE `name` = '@DEFAULT_GROUP_ID';" << std::endl;
-
 		std::string password;
 		int premDays;
 		uint32_t id;
@@ -276,7 +272,7 @@ int main(int argc, char** argv)
 						premium[id] = now + premDays * 86400;
 					}
 
-					std::cout << "INSERT INTO `accounts` (`id`, `group_id`, `password`) VALUES (" << id << ", ( SELECT `value` FROM `xml2sql` WHERE `name` = '@DEFAULT_GROUP_ID' ), " << sqlQuote(password) << ");" << std::endl;
+					std::cout << "INSERT INTO `accounts` (`id`, `password`) VALUES (" << id << ", " << sqlQuote(password) << ");" << std::endl;
 
 					std::cerr << " done." << std::endl;
 					xmlFreeDoc(xml);
@@ -314,6 +310,19 @@ int main(int argc, char** argv)
 				xml = xmlParseFile( ( dir_name.str() + leaf).c_str() );
 
 				if(xml){
+					xmlMana = NULL;
+					xmlHealth = NULL;
+					xmlLook = NULL;
+					xmlSpawn = NULL;
+					xmlGuild = NULL;
+					xmlSkills = NULL;
+					xmlInventory = NULL;
+					xmlDepots = NULL;
+					xmlStorage = NULL;
+					xmlVipList = NULL;
+					xmlKownSpells = NULL;
+					xmlConditions = NULL;
+
 					root = xmlDocGetRootElement(xml);
 
 					if( xmlStrcmp(root->name, (const xmlChar*)"player") ){
@@ -344,9 +353,21 @@ int main(int argc, char** argv)
 					readXMLInteger(root, "soul", playerSoul);
 					readXMLInteger(root, "lookdir", playerDirection);
 					readXMLInteger(root, "lastlogin", playerLastLogin);
-					readXMLInteger(root, "loss_experience", playerLossExperience);
-					readXMLInteger(root, "loss_mana", playerLossMana);
-					readXMLInteger(root, "loss_skills", playerLossSkills);
+
+					if( !readXMLInteger(root, "loss_experience", playerLossExperience) )
+					{
+						palyerLossExperience = 10;
+					}
+
+					if( !readXMLInteger(root, "loss_mana", playerLossMana) )
+					{
+						playerLossMana = 10;
+					}
+
+					if( !readXMLInteger(root, "loss_skills", playerLossSkills) )
+					{
+						playerLossSkills = 10;
+					}
 
 					node = root->children;
 
