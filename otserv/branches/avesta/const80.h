@@ -258,6 +258,14 @@ enum Skulls_t{
 	SKULL_RED = 4,
 };
 
+enum PartyShields_t{
+	SHIELD_NONE = 0,
+	SHIELD_WHITEYELLOW = 1,
+	SHIELD_WHITEBLUE = 2,
+	SHIELD_BLUE = 3,
+	SHIELD_YELLOW = 4
+};
+
 enum item_t {
 	ITEM_COINS_GOLD       = 2148,
 	ITEM_COINS_PLATINUM   = 2152,

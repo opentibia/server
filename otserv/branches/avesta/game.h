@@ -340,6 +340,11 @@ public:
 	bool playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		const std::string& receiver, const std::string& text);
 	bool playerChangeOutfit(uint32_t playerId, Outfit_t outfit);
+	bool playerInviteToParty(uint32_t playerId, uint32_t invitedId);
+	bool playerJoinParty(uint32_t playerId, uint32_t leaderId);
+	bool playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId);
+	bool playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId);
+	bool playerLeaveParty(uint32_t playerId);
 
 	void cleanup();
 	void FreeThing(Thing* thing);

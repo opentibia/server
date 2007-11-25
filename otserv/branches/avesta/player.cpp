@@ -159,6 +159,8 @@ Creature()
 	editHouse = NULL;
 	editListId = 0;
 
+	setParty(NULL);
+
 #ifdef __SKULLSYSTEM__
 	redSkullTicks = 0;
 	skull = SKULL_NONE;
@@ -1260,6 +1262,11 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 
 		if(eventWalk != 0){
 			setFollowCreature(NULL);
+		}
+
+		clearPartyInvitations();
+		if(getParty()){
+			getParty()->leaveParty(this);
 		}
 
 		if(tradePartner){
@@ -3021,7 +3028,7 @@ void Player::onAttackedCreature(Creature* target)
 				pzLocked = true;
 
 #ifdef __SKULLSYSTEM__
-				if(!targetPlayer->hasAttacked(this)){
+				if(!isPartner(targetPlayer) && !targetPlayer->hasAttacked(this)){
 					if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
 						//add a white skull
 						g_game.changeSkull(this, SKULL_WHITE);
@@ -3068,7 +3075,7 @@ void Player::onKilledCreature(Creature* target)
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(Player* targetPlayer = target->getPlayer()){
 #ifdef __SKULLSYSTEM__
-			if(!targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
+			if(!isPartner(targetPlayer) && !targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
 				addUnjustifiedDead(targetPlayer);
 			}
 #endif
@@ -3156,6 +3163,111 @@ void Player::changeSoul(int32_t soulChange)
 	sendStats();
 }
 
+PartyShields_t Player::getPartyShield(const Player* player) const
+{
+	if(!player){
+		return SHIELD_NONE;
+	}
+
+	if(getParty()){
+		if(getParty()->getLeader() == player){
+			return SHIELD_YELLOW;
+		}
+		if(getParty()->isPlayerMember(player)){
+			return SHIELD_BLUE;
+		}
+		if(isInviting(player)){
+			return SHIELD_WHITEBLUE;
+		}
+	}
+	else if(player->isInviting(this)){
+		return SHIELD_WHITEYELLOW;
+	}
+
+	return SHIELD_NONE;
+}
+
+bool Player::isInviting(const Player* player) const
+{
+	if(!player || !getParty() || getParty()->getLeader() != this){
+		return false;
+	}
+
+    PartyList::const_iterator it = std::find(player->invitingParties.begin(), player->invitingParties.end(), getParty());
+	return (it != player->invitingParties.end());
+}
+
+bool Player::isPartner(const Player* player) const
+{
+	if(!player || !getParty() || !player->getParty()){
+		return false;
+	}
+
+	return (getParty() == player->getParty());
+}
+
+void Player::sendPlayerPartyIcons(Player* player, PartyShields_t shield)
+{
+	sendCreatureShield(player, shield);
+
+#ifdef __SKULLSYSTEM__
+	if(player->getSkull() == SKULL_NONE){
+		if(shield == SHIELD_BLUE || shield == SHIELD_YELLOW){
+			sendCreatureSkull(player, SKULL_GREEN);
+		}
+		else{
+			sendCreatureSkull(player, SKULL_NONE);
+		}
+	}
+#endif
+}
+
+void Player::addPartyInvitation(Party* party)
+{
+	if(!party){
+		return;
+	}
+
+	PartyList::iterator it = std::find(invitingParties.begin(), invitingParties.end(), party);
+	if(it == invitingParties.end()){
+		invitingParties.push_back(party);
+		party->invitations.push_back(this);
+		party->getLeader()->sendCreatureShield(this, SHIELD_WHITEBLUE);
+		sendCreatureShield(party->getLeader(), SHIELD_WHITEYELLOW);
+	}
+}
+
+void Player::removePartyInvitation(Party* party)
+{
+	if(!party){
+		return;
+	}
+
+	if(!invitingParties.empty()){
+		PartyList::iterator it = std::find(invitingParties.begin(), invitingParties.end(), party);
+		if(it != invitingParties.end()){
+			invitingParties.erase(it);
+			party->invitations.remove(this);
+			party->getLeader()->sendCreatureShield(this, SHIELD_NONE);
+			sendCreatureShield(party->getLeader(), SHIELD_NONE);
+		}
+	}
+}
+
+void Player::clearPartyInvitations()
+{
+	if(!invitingParties.empty()){
+		for(PartyList::iterator it = invitingParties.begin(); it != invitingParties.end(); ++it){
+			if(*it){
+				(*it)->getLeader()->sendCreatureShield(this, SHIELD_NONE);
+				(*it)->invitations.remove(this);
+				sendCreatureShield((*it)->getLeader(), SHIELD_NONE);
+			}
+		}
+		invitingParties.clear();
+	}
+}
+
 #ifdef __SKULLSYSTEM__
 Skulls_t Player::getSkull() const
 {
@@ -3175,7 +3287,10 @@ Skulls_t Player::getSkullClient(const Player* player) const
 	Skulls_t skull;
 	skull = player->getSkull();
 	if(skull == SKULL_NONE){
-		if(player->hasAttacked(this)){
+		if(isPartner(player)){
+			skull = SKULL_GREEN;
+		}
+		else if(player->hasAttacked(this)){
 			skull = SKULL_YELLOW;
 		}
 	}

@@ -92,6 +92,12 @@ private:
 	void parseAttack(NetworkMessage& msg);
 	void parseFollow(NetworkMessage& msg);
 
+	void parseInviteToParty(NetworkMessage& msg);
+	void parseJoinParty(NetworkMessage& msg);
+	void parseRevokePartyInvitation(NetworkMessage& msg);
+	void parsePassPartyLeadership(NetworkMessage& msg);
+	void parseLeaveParty(NetworkMessage& msg);
+
 	void parseThrow(NetworkMessage& msg);
 	void parseUseItemEx(NetworkMessage& msg);
 	void parseBattleWindow(NetworkMessage& msg);
@@ -174,7 +180,7 @@ private:
 	void sendWorldLight(const LightInfo& lightInfo);
 
 	void sendCreatureSkull(const Creature* creature, Skulls_t skull);
-	void sendCreatureShield(const Creature* creature);
+	void sendCreatureShield(const Creature* creature, PartyShields_t shield);
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 
 	//tiles

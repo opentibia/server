@@ -600,6 +600,26 @@ void Protocol80::parsePacket(NetworkMessage &msg)
 		parseFollow(msg);
 		break;
 
+	case 0xA3:
+		parseInviteToParty(msg);
+		break;
+
+	case 0xA4:
+		parseJoinParty(msg);
+		break;
+
+	case 0xA5:
+		parseRevokePartyInvitation(msg);
+		break;
+
+	case 0xA6:
+		parsePassPartyLeadership(msg);
+		break;
+
+	case 0xA7:
+		parseLeaveParty(msg);
+		break;
+
 	case 0xAA:
 		parseCreatePrivateChannel(msg);
 		break;
@@ -1178,6 +1198,39 @@ void Protocol80::parseFollow(NetworkMessage& msg)
 	addGameTask(&Game::playerFollowCreature, player->getID(), creatureId);
 }
 
+void Protocol80::parseInviteToParty(NetworkMessage& msg)
+{
+	uint32_t creatureId = msg.GetU32();
+
+	addGameTask(&Game::playerInviteToParty, player->getID(), creatureId);
+}
+
+void Protocol80::parseJoinParty(NetworkMessage& msg)
+{
+	uint32_t creatureId = msg.GetU32();
+
+	addGameTask(&Game::playerJoinParty, player->getID(), creatureId);
+}
+
+void Protocol80::parseRevokePartyInvitation(NetworkMessage& msg)
+{
+	uint32_t creatureId = msg.GetU32();
+
+	addGameTask(&Game::playerRevokePartyInvitation, player->getID(), creatureId);
+}
+
+void Protocol80::parsePassPartyLeadership(NetworkMessage& msg)
+{
+	uint32_t creatureId = msg.GetU32();
+
+	addGameTask(&Game::playerPassPartyLeadership, player->getID(), creatureId);
+}
+
+void Protocol80::parseLeaveParty(NetworkMessage& msg)
+{
+	addGameTask(&Game::playerLeaveParty, player->getID());
+}
+
 void Protocol80::parseTextWindow(NetworkMessage& msg)
 {
 	uint32_t windowTextId = msg.GetU32();
@@ -1340,14 +1393,14 @@ void Protocol80::sendCreatureSkull(const Creature* creature, Skulls_t skull)
 	}
 }
 
-void Protocol80::sendCreatureShield(const Creature* creature)
+void Protocol80::sendCreatureShield(const Creature* creature, PartyShields_t shield)
 {
 	if(canSee(creature)){
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			msg->AddByte(0x91);
 			msg->AddU32(creature->getID());
-			msg->AddByte(0);	//no shield
+			msg->AddByte(shield);
 		}
 	}
 }
@@ -2141,7 +2194,7 @@ void Protocol80::AddCreature(NetworkMessage* msg,const Creature* creature, bool 
 #else
 	msg->AddByte(SKULL_NONE);
 #endif
-	msg->AddByte(0x00); // shield
+	msg->AddByte(player->getPartyShield(creature->getPlayer()));
 }
 
 inline int32_t checkConstrains(int32_t value, int32_t min, int32_t max)

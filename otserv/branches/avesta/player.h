@@ -30,6 +30,7 @@
 #include "enums.h"
 #include "vocation.h"
 #include "protocol80.h"
+#include "party.h"
 
 #include <vector>
 #include <ctime>
@@ -38,6 +39,7 @@
 class House;
 class Weapon;
 class Protocol80;
+class Party;
 class SchedulerTask;
 
 enum skillsid_t {
@@ -91,6 +93,7 @@ typedef std::map<uint32_t, int32_t> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
 typedef std::list<std::string> LearnedInstantSpellList;
+typedef std::list<Party*> PartyList;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -307,6 +310,16 @@ public:
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
+	void setParty(Party* _party) {party = _party;}
+	Party* getParty() const {return party;}
+	PartyShields_t getPartyShield(const Player* player) const;
+	bool isInviting(const Player* player) const;
+	bool isPartner(const Player* player) const;
+	void sendPlayerPartyIcons(Player* player, PartyShields_t shield);
+	void addPartyInvitation(Party* party);
+	void removePartyInvitation(Party* party);
+	void clearPartyInvitations();
+
 #ifdef __SKULLSYSTEM__
 	Skulls_t getSkull() const;
 	Skulls_t getSkullClient(const Player* player) const;
@@ -353,14 +366,16 @@ public:
 	void sendCreatureChangeVisible(const Creature* creature, bool visible)
 		{
 			if(client){
-			if(visible)
-				client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
-			else
-				client->sendCreatureInvisible(creature);
-		}
+				if(visible)
+					client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
+				else
+					client->sendCreatureInvisible(creature);
+			}
 		}
 	void sendCreatureLight(const Creature* creature)
 		{if(client) client->sendCreatureLight(creature);}
+	void sendCreatureShield(const Creature* creature, PartyShields_t shield)
+	    {if(client) client->sendCreatureShield(creature, shield);}
 
 	//container
 	void sendAddContainerItem(const Container* container, const Item* item);
@@ -608,6 +623,10 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
+
+	//party variables
+	Party* party;
+	PartyList invitingParties;
 
 	struct SentStats{
 		int32_t health;
