@@ -116,7 +116,7 @@ void Party::revokeInvitation(Player* player)
 	checkInvitationsAndMembers();
 }
 
-void Party::passPartyLeadership(Player* player, bool isLogout /*= false*/)
+void Party::passPartyLeadership(Player* player)
 {
 	if(!player || getLeader() == player || !isPlayerMember(player)){
 		checkInvitationsAndMembers();
@@ -131,18 +131,17 @@ void Party::passPartyLeadership(Player* player, bool isLogout /*= false*/)
 
 	Player* oldLeader = getLeader();
 	setLeader(player);
-	if(!isLogout){
-		memberList.push_front(oldLeader);
-		updateInvitationIcons(oldLeader, SHIELD_NONE);
-		updatePartyIcons(oldLeader, SHIELD_BLUE);
-	}
-	updateInvitationIcons(oldLeader, SHIELD_YELLOW);
+
+	memberList.push_front(oldLeader);
+	updateInvitationIcons(oldLeader, SHIELD_NONE);
+	updatePartyIcons(oldLeader, SHIELD_BLUE);
+
 	updatePartyIcons(player, SHIELD_YELLOW);
 
 	player->sendTextMessage(MSG_INFO_DESCR, "You are now the leader of the party.");
 }
 
-void Party::leaveParty(Player* player, bool isLogout /*= false*/)
+void Party::leaveParty(Player* player)
 {
 	if(!player || !isPlayerMember(player) && getLeader() != player){
 		checkInvitationsAndMembers();
@@ -151,7 +150,7 @@ void Party::leaveParty(Player* player, bool isLogout /*= false*/)
 
 	if(getLeader() == player){
 		Player* newLeader = memberList.front();
-		passPartyLeadership(newLeader, isLogout);
+		passPartyLeadership(newLeader);
 	}
 
 	//Since we already passed the leadership, we remove the player from the list

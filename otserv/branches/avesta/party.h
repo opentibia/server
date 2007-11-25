@@ -41,8 +41,8 @@ public:
 	void invitePlayer(Player* player);
 	void joinParty(Player* player);
 	void revokeInvitation(Player* player);
-	void passPartyLeadership(Player* player, bool isLogout = false);
-	void leaveParty(Player* player, bool isLogout = false);
+	void passPartyLeadership(Player* player);
+	void leaveParty(Player* player);
 
 	bool isPlayerMember(const Player* player) const;
 	void updatePartyIcons(Player* player, PartyShields_t shield);
