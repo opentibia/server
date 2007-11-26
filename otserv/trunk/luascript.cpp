@@ -1053,6 +1053,9 @@ void LuaScriptInterface::registerFunctions()
 	//doSendMagicEffect(pos, type)
 	lua_register(m_luaState, "doSendMagicEffect", LuaScriptInterface::luaDoSendMagicEffect);
 
+	//doSendDistanceShoot(frompos, topos, type)
+	lua_register(m_luaState, "doSendDistanceShoot", LuaScriptInterface::luaDoSendDistanceShoot);
+
 	//doChangeTypeItem(uid, newtype)
 	lua_register(m_luaState, "doChangeTypeItem", LuaScriptInterface::luaDoChangeTypeItem);
 
@@ -1389,6 +1392,17 @@ void LuaScriptInterface::registerFunctions()
 	//getCreatureMaxHealth(cid)
 	lua_register(m_luaState, "getCreatureMaxHealth", LuaScriptInterface::luaGetCreatureMaxHealth);
 
+	//getCreatureMaster(cid)
+	//returns the creature's master or itself if the creature isn't a summon
+	lua_register(m_luaState, "getCreatureMaster", LuaScriptInterface::luaGetCreatureMaster);
+
+	//getCreatureSummons(cid)
+	//returns a table with all the summons of the creature
+	lua_register(m_luaState, "getCreatureSummons", LuaScriptInterface::luaGetCreatureSummons);
+
+	//hasCondition(cid, conditionid)
+	lua_register(m_luaState, "hasCondition", LuaScriptInterface::luaHasCondition);
+
 	//isItemStackable(itemid)
 	lua_register(m_luaState, "isItemStackable", LuaScriptInterface::luaIsItemStackable);
 
@@ -1415,6 +1429,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//getItemWeight(uid)
 	lua_register(m_luaState, "getItemWeight", LuaScriptInterface::luaGetItemWeight);
+
+	//getItemIdByName(name)
+	lua_register(m_luaState, "getItemIdByName", LuaScriptInterface::luaGetItemIdByName);
 
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -2057,9 +2074,6 @@ int LuaScriptInterface::luaDoSendMagicEffect(lua_State *L)
 	popPosition(L, pos, stackpos);
 
 	ScriptEnviroment* env = getScriptEnv();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
 
 	if(pos.x == 0xFFFF){
 		pos = env->getRealPos();
@@ -5571,6 +5585,126 @@ int LuaScriptInterface::luaIsPremium(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
-	return 1;
 
+	return 1;
+}
+
+int LuaScriptInterface::luaHasCondition(lua_State *L)
+{
+	//hasCondition(cid, conditionid)
+	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		if(creature->hasCondition(conditionType)){
+			lua_pushnumber(L, LUA_TRUE);
+		}
+		else{
+			lua_pushnumber(L, LUA_FALSE);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaDoSendDistanceShoot(lua_State *L)
+{
+	//doSendDistanceShoot(frompos, topos, type)
+	uint8_t type = (uint8_t)popNumber(L);
+	Position toPos; uint32_t tStack;
+	popPosition(L, toPos, tStack);
+	Position fromPos; uint32_t fStack;
+	popPosition(L, fromPos, fStack);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	if(fromPos.x == 0xFFFF){
+		fromPos = env->getRealPos();
+	}
+	if(toPos.x == 0xFFFF){
+		toPos = env->getRealPos();
+	}
+
+	g_game.addDistanceEffect(fromPos, toPos, type);
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureMaster(lua_State *L)
+{
+	//getCreatureMaster(cid)
+	//returns the creature's master or itself if the creature isn't a summon
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+        reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Creature* master = creature->getMaster();
+	if(!master){
+		lua_pushnumber(L, cid);
+		return 1;
+	}
+
+	uint32_t masterId = env->addThing(master);
+	lua_pushnumber(L, masterId);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureSummons(lua_State *L)
+{
+	//getCreatureSummons(cid)
+	//returns a table with all the summons of the creature
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+        reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	std::list<Creature*> summons = creature->getSummons();
+	uint32_t i = 0;
+	lua_newtable(L);
+	while(!summons.empty()){
+		++i;
+		uint32_t summonCid = env->addThing(summons.front());
+		lua_pushnumber(L, i);
+		lua_pushnumber(L, summonCid);
+		lua_settable(L, -3);
+		summons.pop_front();
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemIdByName(lua_State *L)
+{
+	//getItemIdByName(name)
+	std::string name = popString(L);
+
+	int32_t itemid = Item::items.getItemIdByName(name);
+	if(itemid == -1){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	lua_pushnumber(L, itemid);
+	return 1;
 }

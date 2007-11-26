@@ -675,7 +675,6 @@ bool IOPlayer::getGuildIdByName(uint32_t &guildId, const std::string& guildName)
 {
 	Database* db = Database::instance();
 	DBResult* result;
-	DBQuery query;
 
 	if(!(result = db->storeQuery("SELECT `id` FROM `guilds` WHERE `name` = " + db->escapeString(guildName))))
 		return false;
@@ -689,7 +688,6 @@ bool IOPlayer::playerExists(std::string name)
 {
 	Database* db = Database::instance();
 	DBResult* result;
-	DBQuery query;
 
 	if(!(result = db->storeQuery("SELECT `id` FROM `players` WHERE `name`= " + db->escapeString(name))))
 		return false;

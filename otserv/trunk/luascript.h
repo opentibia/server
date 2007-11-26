@@ -316,6 +316,7 @@ protected:
 	static int luaDoTeleportThing(lua_State *L);
 	static int luaDoTransformItem(lua_State *L);
 	static int luaDoSendMagicEffect(lua_State *L);
+	static int luaDoSendDistanceShoot(lua_State *L);
 	static int luaDoChangeTypeItem(lua_State *L);
 	static int luaDoSendAnimatedText(lua_State *L);
 	static int luaDoShowTextWindow(lua_State *L);
@@ -512,6 +513,9 @@ protected:
 	static int luaGetCreatureTarget(lua_State *L);
 	static int luaGetCreatureHealth(lua_State *L);
 	static int luaGetCreatureMaxHealth(lua_State *L);
+	static int luaGetCreatureMaster(lua_State *L);
+	static int luaGetCreatureSummons(lua_State *L);
+	static int luaHasCondition(lua_State *L);
 
 	static int luaIsItemStackable(lua_State *L);
 	static int luaIsItemRune(lua_State *L);
@@ -522,6 +526,7 @@ protected:
 	static int luaGetItemName(lua_State *L);
 	static int luaGetItemDescriptions(lua_State *L);
 	static int luaGetItemWeight(lua_State *L);
+	static int luaGetItemIdByName(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);
