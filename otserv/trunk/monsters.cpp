@@ -604,7 +604,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	xmlNodePtr attributeNode = node->children;
 
 	while(attributeNode){
-        if(xmlStrcmp(attributeNode->name, (const xmlChar*)"attribute") == 0){
+		if(xmlStrcmp(attributeNode->name, (const xmlChar*)"attribute") == 0){
 			if(readXMLString(attributeNode, "key", strValue)){
 				if(strcasecmp(strValue.c_str(), "shootEffect") == 0){
 					if(readXMLString(attributeNode, "value", strValue)){
@@ -1004,36 +1004,10 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 						}
 						else if(readXMLInteger(tmpNode, "drown", intValue)){
 							if(intValue != 0){
-                                mType->damageImmunities |= COMBAT_DROWNDAMAGE;
+								mType->damageImmunities |= COMBAT_DROWNDAMAGE;
 								mType->conditionImmunities |= CONDITION_DROWN;
 							}
 						}
-						/*
-						else if(readXMLInteger(tmpNode, "earth", intValue)){
-							if(intValue != 0){
-								mType->damageImmunities |= COMBAT_EARTHDAMAGE;
-								//mType->conditionImmunities |= CONDITION_EARTH;
-							}
-						}
-						else if(readXMLInteger(tmpNode, "ice", intValue)){
-							if(intValue != 0){
-								mType->damageImmunities |= COMBAT_ICEDAMAGE;
-								//mType->conditionImmunities |= CONDITION_ICE;
-							}
-						}
-						else if(readXMLInteger(tmpNode, "poison", intValue)){
-							if(intValue != 0){
-								mType->damageImmunities |= COMBAT_HOLYDAMAGE;
-								//mType->conditionImmunities |= CONDITION_HOLY;
-							}
-						}
-						else if(readXMLInteger(tmpNode, "drown", intValue)){
-							if(intValue != 0){
-                                mType->damageImmunities |= COMBAT_DEATHDAMAGE;
-								//mType->conditionImmunities |= CONDITION_DEATH;
-							}
-						}
-						*/
 						else if(readXMLInteger(tmpNode, "lifedrain", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;

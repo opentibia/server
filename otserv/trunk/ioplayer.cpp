@@ -124,8 +124,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 		}
 	}
 
-	player->setLossPercent(LOSS_EXPERIENCE, result->getDataInt("loss_experience")); 
-	player->setLossPercent(LOSS_MANASPENT, result->getDataInt("loss_mana")); 
+	player->setLossPercent(LOSS_EXPERIENCE, result->getDataInt("loss_experience"));
+	player->setLossPercent(LOSS_MANASPENT, result->getDataInt("loss_mana"));
 	player->setLossPercent(LOSS_SKILLTRIES, result->getDataInt("loss_skills"));
 
 	player->loginPosition.x = result->getDataInt("posx");
@@ -633,7 +633,6 @@ bool IOPlayer::getGuidByName(uint32_t &guid, std::string& name)
 
 	Database* db = Database::instance();
 	DBResult* result;
-	DBQuery query;
 
 	if(!(result = db->storeQuery("SELECT `name`, `id` FROM `players` WHERE `name` = " + db->escapeString(name))))
 		return false;
@@ -651,7 +650,6 @@ bool IOPlayer::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string& na
 {
 	Database* db = Database::instance();
 	DBResult* result;
-	DBQuery query;
 
 	if(!(result = db->storeQuery("SELECT `name`, `id`, `group_id` FROM `players` WHERE `name`= " + db->escapeString(name))))
 		return false;

@@ -305,7 +305,7 @@ Player* ScriptEnviroment::getPlayerByUID(uint32_t uid)
 
 void ScriptEnviroment::removeItemByUID(uint32_t uid)
 {
-	ThingMap::iterator it;	
+	ThingMap::iterator it;
 	it = m_localMap.find(uid);
 	if(it != m_localMap.end()){
 		m_localMap.erase(it);
@@ -5110,7 +5110,7 @@ int LuaScriptInterface::luaGetDepotId(lua_State *L)
 	//getDepotId(uid)
 	uint32_t uid = popNumber(L);
 
-    ScriptEnviroment* env = getScriptEnv();
+	ScriptEnviroment* env = getScriptEnv();
 	Container* container = env->getContainerByUID(uid);
 	if(container){
 		Depot* depot = container->getDepot();
@@ -5123,7 +5123,7 @@ int LuaScriptInterface::luaGetDepotId(lua_State *L)
 		}
 	}
 	else{
-        reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
 
@@ -5673,7 +5673,7 @@ int LuaScriptInterface::luaGetCreatureSummons(lua_State *L)
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(!creature){
-        reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}

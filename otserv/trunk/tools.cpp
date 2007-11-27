@@ -350,7 +350,7 @@ ShootTypeNames shootTypeNames[] = {
 AmmoTypeNames ammoTypeNames[] = {
 	{"spear", AMMO_SPEAR},
 	{"bolt", AMMO_BOLT},
-	{"arrow", AMMO_BOLT},
+	{"arrow", AMMO_ARROW},
 	{"poisonarrow", AMMO_ARROW},
 	{"burstarrow", AMMO_ARROW},
 	{"throwingstar", AMMO_THROWINGSTAR},
