@@ -5678,16 +5678,15 @@ int LuaScriptInterface::luaGetCreatureSummons(lua_State *L)
 		return 1;
 	}
 
-	std::list<Creature*> summons = creature->getSummons();
-	uint32_t i = 0;
 	lua_newtable(L);
-	while(!summons.empty()){
-		++i;
-		uint32_t summonCid = env->addThing(summons.front());
+	const std::list<Creature*>& summons = creature->getSummons();
+	std::list<Creature*>::const_iterator it = summons.begin();
+	uint32_t i = 0;
+	for( ; it != summons.end(); ++it, ++i){
+		uint32_t summonCid = env->addThing(*it);
 		lua_pushnumber(L, i);
 		lua_pushnumber(L, summonCid);
 		lua_settable(L, -3);
-		summons.pop_front();
 	}
 
 	return 1;
