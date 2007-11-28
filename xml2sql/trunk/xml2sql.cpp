@@ -356,7 +356,7 @@ int main(int argc, char** argv)
 
 					if( !readXMLInteger(root, "loss_experience", playerLossExperience) )
 					{
-						palyerLossExperience = 10;
+						playerLossExperience = 10;
 					}
 
 					if( !readXMLInteger(root, "loss_mana", playerLossMana) )
