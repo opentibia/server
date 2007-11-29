@@ -242,6 +242,16 @@ uint32_t ScriptEnviroment::addThing(Thing* thing)
 	}
 }
 
+void ScriptEnviroment::insertThing(uint32_t uid, Thing* thing)
+{
+	if(!m_localMap[uid]){
+		m_localMap[uid] = thing;
+	}
+	else{
+		std::cout << std::endl << "Lua Script Error: Thing uid already taken.";
+	}
+}
+
 Thing* ScriptEnviroment::getThingByUID(uint32_t uid)
 {
 	Thing* tmp = m_localMap[uid];
@@ -1044,7 +1054,7 @@ void LuaScriptInterface::registerFunctions()
 	//doTeleportThing(uid, newpos)
 	lua_register(m_luaState, "doTeleportThing", LuaScriptInterface::luaDoTeleportThing);
 
-	//doTransformItem(uid, toitemid)
+	//doTransformItem(uid, toitemid, <optional> count/subtype)
 	lua_register(m_luaState, "doTransformItem", LuaScriptInterface::luaDoTransformItem);
 
 	//doPlayerSay(cid, text, type)
@@ -2026,21 +2036,43 @@ int LuaScriptInterface::luaDoTeleportThing(lua_State *L)
 
 int LuaScriptInterface::luaDoTransformItem(lua_State *L)
 {
-	//doTransformItem(uid, toitemid)
+	//doTransformItem(uid, toitemid, <optional> count/subtype)
+	int32_t parameters = lua_gettop(L);
+
+	int32_t count = -1;
+	if(parameters > 2){
+		count = popNumber(L);
+	}
+
 	uint16_t toId = (uint16_t)popNumber(L);
 	uint32_t uid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 
 	Item* item = env->getItemByUID(uid);
-	if(item){
-		g_game.transformItem(item, toId);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
+	if(!item){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
+
+	const ItemType& it = Item::items[toId];
+	if(it.stackable && count > 100){
+		reportErrorFunc("Stack count cannot be higher than 100.");
+		count = 100;
+	}
+
+	Item* newItem = g_game.transformItem(item, toId, count);
+
+	if(item->isRemoved()){
+		env->removeItemByUID(uid);
+	}
+
+	if(newItem && newItem != item){
+		env->insertThing(uid, newItem);
+	}
+
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2093,14 +2125,22 @@ int LuaScriptInterface::luaDoChangeTypeItem(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 
 	Item* item = env->getItemByUID(uid);
-	if(item){
-		g_game.transformItem(item, item->getID(), subtype);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
+	if(!item){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
+
+	Item* newItem = g_game.transformItem(item, item->getID(), subtype);
+
+	if(item->isRemoved()){
+		env->removeItemByUID(uid);
+	}
+
+	if(newItem && newItem != item){
+		env->insertThing(uid, newItem);
+	}
+
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 

@@ -110,6 +110,7 @@ public:
 
 	static void addUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
+	void insertThing(uint32_t uid, Thing* thing);
 	void addTempItem(Item* item);
 
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);

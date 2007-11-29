@@ -181,6 +181,15 @@ Item::~Item()
 	//
 }
 
+void Item::setDefaultSubtype()
+{
+	const ItemType& it = items[id];
+
+	count = 1;
+	charges = it.charges;
+	fluid = 0;
+}
+
 void Item::setID(uint16_t newid)
 {
 	const ItemType& prevIt = Item::items[id];

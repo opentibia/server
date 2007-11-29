@@ -213,15 +213,20 @@ int Items::loadFromOtb(std::string file)
 		iType->group = (itemgroup_t)type;
 
 		switch(type){
+			case ITEM_GROUP_CONTAINER:
+				iType->type = ITEM_TYPE_CONTAINER;
+				break;
+			case ITEM_GROUP_DOOR:
+				iType->type = ITEM_TYPE_DOOR;
+				break;
+			case ITEM_GROUP_MAGICFIELD:
+				iType->type = ITEM_TYPE_MAGICFIELD;
 			case ITEM_GROUP_NONE:
 			case ITEM_GROUP_GROUND:
-			case ITEM_GROUP_CONTAINER:
 			case ITEM_GROUP_RUNE:
 			case ITEM_GROUP_TELEPORT:
-			case ITEM_GROUP_MAGICFIELD:
 			case ITEM_GROUP_SPLASH:
 			case ITEM_GROUP_FLUID:
-			case ITEM_GROUP_DOOR:
 				break;
 			default:
 				return ERROR_INVALID_FORMAT;
@@ -407,6 +412,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 									else if(strcasecmp(strValue.c_str(), "magicfield") == 0){
 										it.group = ITEM_GROUP_MAGICFIELD;
+										it.type = ITEM_TYPE_MAGICFIELD;
 									}
 									else if(strcasecmp(strValue.c_str(), "depot") == 0){
 										it.type = ITEM_TYPE_DEPOT;
@@ -873,6 +879,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							}*/
 							else if(strcasecmp(strValue.c_str(), "field") == 0){
 								it.group = ITEM_GROUP_MAGICFIELD;
+								it.type = ITEM_TYPE_MAGICFIELD;
 								CombatType_t combatType = COMBAT_NONE;
 								ConditionDamage* conditionDamage = NULL;
 

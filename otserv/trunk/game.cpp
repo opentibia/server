@@ -1402,9 +1402,9 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 	return (money == 0);
 }
 
-Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
+Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 {
-	if(item->getID() == newtype && count == -1)
+	if(item->getID() == newId && count == -1)
 		return item;
 
 	Cylinder* cylinder = item->getParent();
@@ -1421,81 +1421,40 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 		return item;
 	}
 
-	//std::cout << "transformItem: " << item << ", current id: " << item->getID() << ", new id: " << newtype << ", name: " << item->getName() << std::endl;
-
-	if(item->getContainer()){
-		//container to container
-		if(Item::items[newtype].isContainer()){
-			cylinder->postRemoveNotification(item, itemIndex, true);
-			item->setID(newtype);
-			cylinder->__updateThing(item, item->getItemCount());
-			cylinder->postAddNotification(item, itemIndex);
-			return item;
-		}
-		//container to none-container
-		else{
-			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 1 : count));
-			cylinder->__replaceThing(itemIndex, newItem);
-
-			cylinder->postAddNotification(newItem, itemIndex);
-
-			item->setParent(NULL);
-			cylinder->postRemoveNotification(item, itemIndex, true);
-			FreeThing(item);
-
-			return newItem;
-		}
+	if(!item->canTransform()){
+		return item;
 	}
-	else{
-		//none-container to container
-		if(Item::items[newtype].isContainer()){
-			Item* newItem = Item::CreateItem(newtype);
-			cylinder->__replaceThing(itemIndex, newItem);
 
-			cylinder->postAddNotification(newItem, itemIndex);
+	const ItemType& curType = Item::items[item->getID()];
+	const ItemType& newType = Item::items[newId];
 
-			item->setParent(NULL);
-			cylinder->postRemoveNotification(item, itemIndex, true);
-			FreeThing(item);
-
-			return newItem;
+	if(curType.type == newType.type){
+		//same type, update count variable only
+		if(curType.id == newType.id){
+			if((item->isStackable() || item->getItemCharge() > 0) && count == 0){
+				internalRemoveItem(item);
+				return NULL;
+			}
+			else{
+				cylinder->__updateThing(item, count);
+				return item;
+			}
 		}
+		//replace item id (and subtype)
 		else{
-			//same type, update count variable only
-			if(item->getID() == newtype){
-				if(item->isStackable()){
-					if(count <= 0){
-						internalRemoveItem(item);
-					}
-					else{
-						internalRemoveItem(item, item->getItemCount() - count);
-						return item;
-					}
-				}
-				else if(item->getItemCharge() > 0){
-					if(count <= 0){
-						internalRemoveItem(item);
-					}
-					else{
-						cylinder->__updateThing(item, (count == -1 ? item->getItemCharge() : count));
-						return item;
-					}
-				}
-				else{
-					cylinder->__updateThing(item, count);
-					return item;
-				}
+			if((item->isStackable() || item->getItemCharge() > 0) && count == 0){
+				internalRemoveItem(item);
+				return NULL;
 			}
 			else{
 				cylinder->postRemoveNotification(item, itemIndex, true);
-				item->setID(newtype);
 
-				if(item->hasSubType()){
-					if(count != -1)
-						item->setItemCountOrSubtype(count);
+				item->setDefaultSubtype();
+				item->setID(newId);
+
+				if(count != -1 && item->hasSubType()){
+					item->setItemCountOrSubtype(count);
 				}
-				else
-					item->setItemCount(1);
 
 				cylinder->__updateThing(item, item->getItemCountOrSubtype());
 				cylinder->postAddNotification(item, itemIndex);
@@ -1503,6 +1462,25 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 			}
 		}
 	}
+	else{
+		//replace whole item
+		Item* newItem = NULL;
+		if(count == -1){
+			newItem = Item::CreateItem(newId);
+		}else{
+			newItem = Item::CreateItem(newId, count);
+		}
+
+		cylinder->__replaceThing(itemIndex, newItem);
+		cylinder->postAddNotification(newItem, itemIndex);
+
+		item->setParent(NULL);
+		cylinder->postRemoveNotification(item, itemIndex, true);
+		FreeThing(item);
+
+		return newItem;
+	}
+
 
 	return NULL;
 }
@@ -1936,9 +1914,9 @@ bool Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 		return false;
 	}
 
-	uint16_t newtype = Item::items[item->getID()].rotateTo;
-	if(newtype != 0){
-		transformItem(item, newtype);
+	uint16_t newId = Item::items[item->getID()].rotateTo;
+	if(newId != 0){
+		transformItem(item, newId);
 	}
 
 	return true;
@@ -1988,9 +1966,9 @@ bool Game::playerWriteItem(uint32_t playerId, uint32_t windowTextId, const std::
 		writeItem->resetWrittenDate();
 	}
 
-	uint16_t newType = Item::items[writeItem->getID()].writeOnceItemId;
-	if(newType != 0){
-		transformItem(writeItem, newType);
+	uint16_t newId = Item::items[writeItem->getID()].writeOnceItemId;
+	if(newId != 0){
+		transformItem(writeItem, newId);
 	}
 
 	player->setWriteItem(NULL);

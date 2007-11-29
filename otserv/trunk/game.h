@@ -264,7 +264,7 @@ public:
 	  * \param count is the new count value, use default value (-1) to not change it
 	  * \returns true if the tranformation was successful
 	  */
-	Item* transformItem(Item* item, uint16_t newtype, int32_t count = -1);
+	Item* transformItem(Item* item, uint16_t newId, int32_t count = -1);
 
 	/**
 	  * Teleports an object to another position

@@ -122,12 +122,13 @@ class HouseTransferItem : public Item
 public:
 	static HouseTransferItem* createHouseTransferItem(House* house);
 	
-	HouseTransferItem(House* _house) : Item(0) {house = _house;};
-	virtual ~HouseTransferItem(){};
+	HouseTransferItem(House* _house) : Item(0) {house = _house;}
+	virtual ~HouseTransferItem(){}
 	
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner);
 
-	House* getHouse(){return house;};
+	House* getHouse(){return house;}
+	virtual bool canTransform() const {return false;}
 	
 protected:
 	House* house;
