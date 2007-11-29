@@ -750,17 +750,19 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 	}
 
 	Item* oldItem = NULL;
+	bool isInserted = false;
 
-	if(ground){
+	if(!isInserted && ground){
 		if(pos == 0){
 			oldItem = ground;
 			ground = item;
+			isInserted = true;
 		}
 
 		--pos;
 	}
 
-	if(pos >= 0 && pos < (int32_t)topItems.size()){
+	if(!isInserted && pos < (int32_t)topItems.size()){
 		ItemVector::iterator it = topItems.begin();
 		it += pos;
 		pos = 0;
@@ -768,11 +770,12 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 		oldItem = (*it);
 		it = topItems.erase(it);
 		topItems.insert(it, item);
+		isInserted = true;
 	}
 
 	pos -= (uint32_t)topItems.size();
 
-	if(pos >= 0 && pos < (int32_t)creatures.size()){
+	if(!isInserted && pos < (int32_t)creatures.size()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
 		DEBUG_REPORT
@@ -782,7 +785,7 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 
 	pos -= (uint32_t)creatures.size();
 
-	if(pos >= 0 && pos < (int32_t)downItems.size()){
+	if(!isInserted && pos < (int32_t)downItems.size()){
 		ItemVector::iterator it = downItems.begin();
 		it += pos;
 		pos = 0;
@@ -790,9 +793,10 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 		oldItem = (*it);
 		it = downItems.erase(it);
 		downItems.insert(it, item);
+		isInserted = true;
 	}
 
-	if(pos == 0){
+	if(isInserted){
 		item->setParent(this);
 		onUpdateTileItem(index, oldItem, item);
 
