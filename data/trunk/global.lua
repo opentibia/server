@@ -1,3 +1,5 @@
+dofile(getDataDir() .. 'functions.lua')
+
 -- Storages consts
 STORAGE_RUM_MACHINE = 100000
 
@@ -296,46 +298,3 @@ questDoors = {1223, 1225, 1241, 1243, 1255, 1257, 3542, 3551, 5105, 5114, 5123, 
 levelDoors = {1227, 1229, 1245, 1247, 1259, 1261, 3540, 3549, 5103, 5112, 5121, 5130, 5292, 5294, 6206, 6208, 6263, 6265, 6896, 6905, 7038, 7047}
 keys = {2086, 2087, 2088, 2089, 2090, 2091, 2092}
 
-ITEM_CRYSTAL_COIN = 2160
-ITEM_PLATINUM_COIN = 2152
-ITEM_GOLD_COIN = 2148
-
-
-function getDistanceBetween(pos1, pos2)
-	local xDif = math.abs(pos1.x - pos2.x)
-	local yDif = math.abs(pos1.y - pos2.y)
-
-	local posDif = math.max(xDif, yDif)
-	if (pos1.z ~= pos2.z) then
-		posDif = (posDif + 9 + 6)
-	end
-	return posDif
-end
-
-function doPlayerAddMoney(cid, amount)
-	local crystals = math.floor(amount/10000)
-	amount = amount - crystals*10000
-	local platinum = math.floor(amount/100)
-	amount = amount - platinum*100
-	local gold = amount
-	local ret = 0
-	if (crystals > 0) then
-		ret = doPlayerAddItem(cid, ITEM_CRYSTAL_COIN, crystals)
-		if(ret ~= LUA_NO_ERROR) then
-			return LUA_ERROR
-		end
-	end
-	if (platinum > 0) then
-		ret = doPlayerAddItem(cid, ITEM_PLATINUM_COIN, platinum)
-		if (ret ~= LUA_NO_ERROR) then
-			return LUA_ERROR
-		end
-	end
-	if (gold > 0) then
-		ret = doPlayerAddItem(cid, ITEM_GOLD_COIN, gold)
-		if (ret ~= LUA_NO_ERROR) then
-			return LUA_ERROR
-		end
-	end
-	return LUA_NO_ERROR
-end
