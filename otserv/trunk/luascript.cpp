@@ -621,12 +621,14 @@ bool LuaScriptInterface::initState()
 #endif
 
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
+    
+    registerFunctions();
 
 	if(loadFile(std::string(datadir + "global.lua")) == -1){
 		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << datadir << "global.lua." << std::endl;
 	}
 
-	registerFunctions();
+	
 
 	lua_newtable(m_luaState);
 	lua_setfield(m_luaState, LUA_REGISTRYINDEX, "EVENTS");
