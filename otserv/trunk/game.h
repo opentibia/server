@@ -398,7 +398,6 @@ public:
 	const Map* getMap() const { return map;}
 
 	int getLightHour() {return light_hour;}
-	int getLightLevel() {return lightlevel;}
 
 	void addCommandTag(std::string tag);
 	void resetCommandTag();

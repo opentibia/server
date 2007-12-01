@@ -138,7 +138,7 @@ void Game::setGameState(GameState_t newState)
 				}
 				break;
 			}
-			
+
 			case GAME_STATE_STARTUP:
 			case GAME_STATE_CLOSED:
 			case GAME_STATE_NORMAL:
@@ -1467,7 +1467,8 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 		Item* newItem = NULL;
 		if(count == -1){
 			newItem = Item::CreateItem(newId);
-		}else{
+		}
+		else{
 			newItem = Item::CreateItem(newId, count);
 		}
 
@@ -1480,7 +1481,6 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 
 		return newItem;
 	}
-
 
 	return NULL;
 }
@@ -3424,8 +3424,7 @@ void Game::checkLight(int t)
 
 	if(lightChange){
 		LightInfo lightInfo;
-		lightInfo.level = lightlevel;
-		lightInfo.color = 0xD7;
+		getWorldLightInfo(lightInfo);
 		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 			(*it).second->sendWorldLight(lightInfo);
 		}

@@ -99,8 +99,12 @@ function splitWords(str)
 end
 
 function getTibiaTime()
-	local varh = (os.date('%M') * 60 + os.date('%S')) / 150
-	local tibH = math.floor(varh)
-	local tibM = math.floor(60 * (varh-tibH))
-	return {hours=tibH, minutes=tibM}
+	local worldTime = getWorldTime()
+	local hours = 0
+	while(worldTime > 60) do
+		hours = hours + 1
+		worldTime = worldTime - 60
+	end
+
+	return {hours = hours, minutes = worldTime}
 end

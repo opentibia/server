@@ -3403,9 +3403,11 @@ int LuaScriptInterface::luaGetWorldTime(lua_State *L)
 int LuaScriptInterface::luaGetWorldLight(lua_State *L)
 {
 	//getWorldLight()
-	uint32_t level = g_game.getLightLevel();
-	lua_pushnumber(L, level);
-	lua_pushnumber(L, 0xD7);//color
+	LightInfo lightInfo;
+	g_game.getWorldLightInfo(lightInfo);
+
+	lua_pushnumber(L, lightInfo.level);
+	lua_pushnumber(L, lightInfo.color);
 	return 2;
 }
 
