@@ -4832,10 +4832,10 @@
 	<item id="2154" article="a" name="yellow gem">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="2155" article="a" name="big emerald">
+	<item id="2155" article="a" name="green gem">
 		<attribute key="weight" value="150"/>
 	</item>
-	<item id="2156" article="a" name="big ruby">
+	<item id="2156" article="a" name="red gem">
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2157" article="a" name="gold nugget" plural="gold nuggets">
