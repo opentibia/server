@@ -5864,7 +5864,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="spear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="10"/> <!-- ? -->
+		<attribute key="breakChance" value="3"/>
 	</item>
 	<item id="2390" article="a" name="magic longsword">
 		<attribute key="description" value="It is the magic Cyclopmania Sword."/>
@@ -7120,7 +7120,7 @@
 		<attribute key="armor" value="3"/>
 		<attribute key="slotType" value="legs"/>
 	</item>
-	<item id="2649" name="leather trousers">
+	<item id="2649" name="leather legs">
 		<attribute key="weight" value="1800"/>
 		<attribute key="armor" value="1"/>
 		<attribute key="slotType" value="legs"/>
@@ -10919,6 +10919,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="huntingspear"/>
 		<attribute key="range" value="5"/>
+		<attribute key="breakChance" value="6"/>
 	</item>
 	<item id="3966" article="a" name="banana staff">
 		<attribute key="weight" value="5000"/>
@@ -19437,6 +19438,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="greenstar"/>
 		<attribute key="range" value="5"/>
+		<attribute key="breakChance" value="9"/>
 	</item>
 	<item id="7367" article="an" name="enchanted spear" plural="enchanted spears">
 		<attribute key="weight" value="2000"/>
@@ -19444,7 +19446,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="enchantedspear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="7"/> <!-- ? -->
+		<attribute key="breakChance" value="2"/>
 	</item>
 	<item id="7368" article="an" name="assassin star" plural="assassin stars">
 		<attribute key="weight" value="200"/>
@@ -19487,7 +19489,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="royalspear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="10"/> <!-- ? -->
+		<attribute key="breakChance" value="2"/>
 	</item>
 	<item id="7379" name="brutetamer's staff">
 		<attribute key="weight" value="3800"/>
