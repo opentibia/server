@@ -6804,7 +6804,7 @@
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="powerbolt"/>
 	</item>
-	<item id="2548" article="a" name="pitch fork">
+	<item id="2548" article="a" name="pitchfork">
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="2549" article="a" name="rake">
@@ -8972,7 +8972,7 @@
 	<item id="3102" article="a" name="dead dog">
 		<attribute key="weight" value="700"/>
 	</item>
-	<item id="3103" article="a" name="dead dog">
+	<item id="3103" article="a" name="dead skeleton">
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="0"/>
