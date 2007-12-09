@@ -22,15 +22,15 @@
  <attacks>
   
   <attack name="melee" interval="2000" min="-200" max="-460"/>
-  <attack name="fire" interval="6000" chance="30" min="-80" max="-300" chance="8" length="8" spread="3" />
+  <attack name="fire" interval="6000" chance="30" min="-80" max="-300" chance="8" length="8" spread="3">
     <attribute key="areaEffect" value="firearea"/>
   </attack>
   <attack name="fireball" interval="3000" chance="45" min="-80" max="-400" /> 
   <attack name="sudden death" interval="4000" chance="30" min="-80" max="-270" /> 
-  <attack name="poisoncondition" interval="4500" chance="40" min="-10" max="-200" range="10" /> 
+  <attack name="poisoncondition" interval="4500" chance="40" min="-10" max="-200" range="10"> 
       <attribute key="shooteffect" value="poison"/>
   </attack>
-  <attack name="poison" interval="5000" chance="30" length="8" spread="3" min="-60" max="-300" /> 
+  <attack name="poison" interval="5000" chance="30" length="8" spread="3" min="-60" max="-300"> 
       <attribute key="areaEffect" value="poison"/>
   </attack>
 </attacks>

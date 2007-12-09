@@ -18,21 +18,16 @@
     <flag targetdistance="1"/>
     <flag runonhealth="0"/>
   </flags>
-
   <attacks>
-    
 <attack name="melee" interval="2000" min="-180" max="-370"/>
-  
-  <attack name="physical" interval="7500" chance="100" min="-100" max="-250"/>
+  <attack name="physical" interval="7500" chance="100" min="-100" max="-250">
 	<attribute key="shootEffect" value="largerock"/>
   </attack>	
  </attacks>
   <defenses armor="46" defense="44">
-   
- <defense name="haste" interval="5000" chance="100"/>
-  
- <defense name="light healing" interval="6000" chance="65" min="20" max="50" />   
-</defenses>
+    <defense name="haste" interval="5000" chance="100"/>
+    <defense name="light healing" interval="6000" chance="65" min="20" max="50" />   
+  </defenses>
   <immunities>
     <immunity physical="0"/>
     <immunity energy="1"/>

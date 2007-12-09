@@ -19,10 +19,9 @@
   </flags>
   <attacks>
      <attack name="melee" interval="2000" min="-150" max="-430" /> 
-     <attack name="physical" interval="2000" chance="40" min="-38" max="-150" /> 
+     <attack name="physical" interval="2000" chance="40" min="-38" max="-150"> 
 		<attribute key="shootEffect" value="throwingknife"/>
 	 </attack>
-     <attack name="dark music" interval="3300" chance="30" min="-60" max="-100" /> 
   </attacks>
   <defenses armor="25" defense="35">
     <defense name="healing" interval="1000" chance="50" min="75" max="125">

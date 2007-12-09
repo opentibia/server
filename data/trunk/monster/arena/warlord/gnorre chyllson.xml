@@ -20,7 +20,7 @@
     </flags>
     <attacks>
       <attack name="melee" interval="2000" min="-350" max="-450"/>
-      <attack name="melee" interval="3000" chance="50" target="0" min="-500" max="-800"/>
+      <attack name="melee" interval="3000" chance="50" target="0" min="-500" max="-800">
 	      <attribute key="areaEffect" value="blackspark"/>
 	  </attack>
       <attack name="sudden death" interval="1000" chance="15" range="7" min="-170" max="-200">

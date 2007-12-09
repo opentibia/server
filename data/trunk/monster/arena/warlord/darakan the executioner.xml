@@ -20,12 +20,12 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-100" max="-210"/>
-    <attack name="physical" interval="1000" chance="100" min="-72" max="-130" /> 
+    <attack name="physical" interval="1000" chance="100" min="-72" max="-130"> 
 	    <attribute key="shootEffect" value="spear"/>
     </attack>
   </attacks>
   <defenses armor="30" defense="31">
-  <defense name="light healing" interval="6000" chance="65" min="20" max="50" /> 
+      <defense name="light healing" interval="6000" chance="65" min="20" max="50" /> 
   </defenses>
 
   <immunities>
