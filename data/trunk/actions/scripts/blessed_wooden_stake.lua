@@ -1,34 +1,23 @@
-local ITEM_VAMPIRE_DUST = 5905
-local ITEM_DEMON_DUST = 5906
+local VAMPIRE_DUST = 5905
+local DEMON_DUST = 5906
 
-local VampireCorpses = 2956
-local DemonsCorpses = 2916
+local stake = {
+	[2956] = VAMPIRE_DUST,
+	[2916] = DEMON_DUST
+}
 
 function onUse(cid, item, frompos, item2, topos) 
-
-	-- Vampire
-	if isInArray(VampireCorpses ,item2.itemid) == TRUE then
-		local randomizer = math.random(1,15)
-		if (randomizer == 1) then
-			doPlayerAddItem(cid, ITEM_VAMPIRE_DUST, 1)
-			doSendMagicEffect(cid, CONST_ME_STUN)
-		else	
-			doSendMagicEffect(topos, CONST_ME_BLOCKHIT)
-		end
-		doTransformItem(item2.uid, item2.itemid + 1)
-		return TRUE
-	-- Demon
-	elseif isInArray(DemonsCorpses, item2.itemid) == TRUE then
-		local randomizer = math.random(1,25)
-		if (randomizer == 1) then
-			doPlayerAddItem(cid, ITEM_DEMON_DUST, 1)
-			doSendMagicEffect(cid, CONST_ME_STUN)
-		else
-			doSendMagicEffect(topos, CONST_ME_BLOCKHIT)
-		end
-		doTransformItem(item2.uid, item2.itemid + 1)
-		return TRUE
+	if (stake[item2.itemid] == nil) then
+		return FALSE
 	end
 	
-	return FALSE
+	if (math.random(1, 15) == 1) then
+		doPlayerAddItem(cid, stake[item2.itemid], 1)
+		doSendMagicEffect(cid, CONST_ME_STUN)
+	else
+		doSendMagicEffect(topos, CONST_ME_BLOCKHIT)
+	end
+		
+	doTransformItem(item2.uid, item2.itemid + 1)
+	return TRUE
 end
