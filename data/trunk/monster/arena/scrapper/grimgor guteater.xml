@@ -29,8 +29,9 @@
   
   <attack name="melee" interval="2000" min="-100" max="-235"/>
 
-   <attack name="throwing star" interval="4000" chance="60" min="-55" max="-130"/>
-
+   <attack name="physical" interval="4000" chance="60" min="-55" max="-130"/>
+       <attribute key="shootEffect" value="throwingstar"/>
+   </attack>
   </attacks>
   
 <defenses armor="45" defense="45"/>

@@ -23,8 +23,9 @@
     
 <attack name="melee" interval="2000" min="-180" max="-370"/>
   
-  <attack name="large rock" interval="7500" chance="100" min="-100" max="-250"/>
- 
+  <attack name="physical" interval="7500" chance="100" min="-100" max="-250"/>
+	<attribute key="shootEffect" value="largerock"/>
+  </attack>	
  </attacks>
   <defenses armor="46" defense="44">
    
