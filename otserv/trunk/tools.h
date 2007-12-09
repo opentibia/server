@@ -34,8 +34,9 @@
 
 
 enum DistributionType_t{
-	DISTRO_NORMAL,
-	DISTRO_SQUARE
+	DISTRO_UNIFORM,
+	DISTRO_SQUARE,
+	DISTRO_NORMAL
 };
 
 bool fileExists(const char* filename);
@@ -49,7 +50,7 @@ bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 
-int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_NORMAL);
+int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM);
 
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);

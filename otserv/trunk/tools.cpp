@@ -121,7 +121,41 @@ uint32_t rand24b()
 	return (rand() << 12) ^ (rand()) & (0xFFFFFF);
 }
 
-int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_NORMAL*/)
+float box_muller(float m, float s)
+{
+	// normal random variate generator 
+	// mean m, standard deviation s 
+
+	float x1, x2, w, y1;
+	static float y2;
+	static int use_last = 0;
+
+	if (use_last)		        // use value from previous call
+	{
+		y1 = y2;
+		use_last = 0;
+	}
+	else
+	{
+		do {
+			double r1 = (((float)(rand()) / RAND_MAX));
+			double r2 = (((float)(rand()) / RAND_MAX));
+
+			x1 = 2.0 * r1 - 1.0;
+			x2 = 2.0 * r2 - 1.0;
+			w = x1 * x1 + x2 * x2;
+		} while ( w >= 1.0 );
+
+		w = sqrt( (-2.0 * log( w ) ) / w );
+		y1 = x1 * w;
+		y2 = x2 * w;
+		use_last = 1;
+	}
+
+	return( m + y1 * s );
+}
+
+int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_UNIFORM*/)
 {
 	if(highest_number == lowest_number){
 		return lowest_number;
@@ -135,9 +169,20 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 
 	int range = highest_number - lowest_number;
 
-	if(type == DISTRO_NORMAL){
+	if(type == DISTRO_UNIFORM){
 		int r = rand24b() % (range + 1);
 		return lowest_number + r;
+	}
+	else if(type == DISTRO_NORMAL){
+		float value = box_muller(0.5, 0.25);
+
+		if(value < 0){
+			value = 0;
+		}else if(value > 1){
+			value = 1;
+		}
+
+		return lowest_number + (int)((float)range * value);
 	}
 	else{
 		float r = 1.f - sqrt((1.f*rand24b())/RAND_MAX24);

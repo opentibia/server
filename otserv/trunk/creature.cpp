@@ -588,9 +588,19 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 		}
 
 		if(checkArmor){
-			int32_t maxArmor = getArmor();
+			int32_t armorValue = getArmor();
+			int32_t minArmorReduction = 0;
+			int32_t maxArmorReduction = 0;
+			if(armorValue > 1){
+				minArmorReduction = std::ceil(armorValue * 0.475);
+				maxArmorReduction = std::ceil( ((armorValue * 0.475) - 1) + minArmorReduction);
+			}
+			else if(armorValue == 1){
+				minArmorReduction = 1;
+				maxArmorReduction = 1;
+			}
 
-			damage -= maxArmor;
+			damage -= random_range(minArmorReduction, maxArmorReduction);
 			if(damage <= 0){
 				damage = 0;
 				blockType = BLOCK_ARMOR;

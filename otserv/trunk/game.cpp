@@ -1448,8 +1448,11 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 			}
 			else{
 				cylinder->postRemoveNotification(item, itemIndex, true);
+				
+				if(newType.group != curType.group){
+					item->setDefaultSubtype();
+				}
 
-				item->setDefaultSubtype();
 				item->setID(newId);
 
 				if(count != -1 && item->hasSubType()){
