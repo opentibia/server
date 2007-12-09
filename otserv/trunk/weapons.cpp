@@ -158,7 +158,7 @@ bool Weapons::registerEvent(Event* event, xmlNodePtr p)
 
 int32_t Weapons::getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue)
 {
-	return std::ceil((attackSkill * (attackValue * 0.0425)) + (attackValue * 0.2)) * 2;
+	return ((int32_t)std::ceil((attackSkill * (attackValue * 0.0425)) + (attackValue * 0.2)) * 2);
 }
 
 Weapon::Weapon(LuaScriptInterface* _interface) :
@@ -830,10 +830,10 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 	int32_t minValue = 0;
 	if(target){
 		if(target->getPlayer()){
-			minValue = std::ceil(player->getLevel() * 0.1);
+			minValue = (int32_t)std::ceil(player->getLevel() * 0.1);
 		}
 		else{
-			minValue = std::ceil(player->getLevel() * 0.2);
+			minValue = (int32_t)std::ceil(player->getLevel() * 0.2);
 		}
 	}
 	return -(random_range(minValue, maxValue, DISTRO_NORMAL) * attackStrength) / 100;

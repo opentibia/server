@@ -58,15 +58,19 @@ Combat::~Combat()
 	delete area;
 }
 
-void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min, int32_t& max) const
+bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min, int32_t& max) const
 {
 	if(!creature){
-		return;
+		return false;
 	}
 
-	if(Player* player = creature->getPlayer()){
+	if(creature->getCombatValues(min, max)){
+		return true;
+	}
+	else if(Player* player = creature->getPlayer()){
 		if(params.valueCallback){
 			params.valueCallback->getMinMaxValues(player, min, max);
+			return true;
 		}
 		else{
 			switch(formulaType){
@@ -74,6 +78,7 @@ void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 				{
 					max = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * mina + minb);
 					min = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * maxa + maxb);
+					return true;
 					break;
 				}
 
@@ -91,6 +96,7 @@ void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 						max = (int32_t)maxb;
 					}
 
+					return true;
 					break;
 				}
 
@@ -98,11 +104,14 @@ void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 				{
 					min = (int32_t)mina;
 					max = (int32_t)maxa;
+					return true;
+					break;
 				}
 
 				default:
 					min = 0;
 					max = 0;
+					return false;
 					break;
 			}
 
@@ -112,7 +121,10 @@ void Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 	else if(formulaType == FORMULA_VALUE){
 		min = (int32_t)mina;
 		max = (int32_t)maxa;
+		return true;
 	}
+
+	return false;
 }
 
 void Combat::getCombatArea(const Position& centerPos, const Position& targetPos, const AreaCombat* area,

@@ -91,9 +91,9 @@ public:
 	bool canPushItems() const {return mType->canPushItems;}
 	bool canPushCreatures() const {return mType->canPushCreatures;}
 	bool isHostile() const { return mType->isHostile;}
-	virtual bool canSeeInvisibility() const { return isImmune(CONDITION_INVISIBLE);}	
-	uint32_t getManaCost() const {return mType->manaCost;}
-
+	virtual bool canSeeInvisibility() const { return isImmune(CONDITION_INVISIBLE);}
+	virtual bool getCombatValues(int32_t& min, int32_t& max);
+	uint32_t getManaCost() const {return mType->manaCost;}	
 	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
 
 private:
@@ -107,6 +107,8 @@ private:
 	bool isActive;
 	bool isWalkActive;
 	bool spellBonusAttack;
+	int32_t minCombatValue;
+	int32_t maxCombatValue;
 
 	typedef std::list<Creature*> TargetList;
 	TargetList targetList;

@@ -592,8 +592,8 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 			int32_t minArmorReduction = 0;
 			int32_t maxArmorReduction = 0;
 			if(armorValue > 1){
-				minArmorReduction = std::ceil(armorValue * 0.475);
-				maxArmorReduction = std::ceil( ((armorValue * 0.475) - 1) + minArmorReduction);
+				minArmorReduction = (int32_t)std::ceil(armorValue * 0.475);
+				maxArmorReduction = (int32_t)std::ceil( ((armorValue * 0.475) - 1) + minArmorReduction);
 			}
 			else if(armorValue == 1){
 				minArmorReduction = 1;
