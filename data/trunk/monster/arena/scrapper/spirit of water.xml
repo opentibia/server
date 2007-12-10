@@ -18,8 +18,12 @@
     <flag targetdistance="1"/>
     <flag runonhealth="0"/>
   </flags>
-  <attacks>
-    <attack name="melee" interval="2000" min="-1" max="-120"/>  <attack name="poison field" interval="2500" chance="40" min="-5" max="-130" /> <attack name="bubble_boom" interval="2000" min="-1" max="-120"/>
+  <attacks
+    <attack name="melee" interval="2000" min="-1" max="-120"/>  
+	<attack name="poison field" interval="2500" chance="40" min="-5" max="-130" /> 
+	<attack name="physical" spread="3" change="40" interval="2000" min="-1" max="-120">
+		<attribute key="areaEffect" value="bluebubble"/>
+    </attack>
  </attacks>
   <defenses armor="0" defense="0"/>
   <immunities>

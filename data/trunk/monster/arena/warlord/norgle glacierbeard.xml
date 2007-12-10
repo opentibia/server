@@ -20,7 +20,7 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-100" max="-230"/>
-    <attack name="Smokewave" interval="1000" chance="35" /> 
+    <!--<attack name="Smokewave" interval="1000" chance="35" /> -->
   </attacks>
   <defenses armor="25" defense="27"/>
   <immunities>

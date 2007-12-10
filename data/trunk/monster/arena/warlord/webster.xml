@@ -21,7 +21,9 @@
   <attacks>
     <attack name="melee" interval="2000" min="-103" max="-210"/>
     <attack name="paralyze" interval="3500" chance="65"/>
-    <attack name="energy missile" interval="3000" chance="75" min="-13" max="-80"/>
+    <attack name="energy" interval="3000" chance="75" min="-13" max="-80" range="7">
+		<attribute key="shootEffect" value="energy"/>
+	</attack>
     <attack name="haste" interval="4000" chance="65"/>
   </attacks>
   <defenses armor="29" defense="34"/>

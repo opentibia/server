@@ -21,7 +21,7 @@
   <attacks>
     <attack name="melee" interval="2000" min="-100" max="-440"/>
     <attack name="paralyze" interval="3500" chance="35"/>
-    <attack name="dark music" interval="4300" chance="40" min="-20" max="-100" /> 
+    <!--<attack name="dark music" interval="4300" chance="40" min="-20" max="-100" /> -->
   </attacks>
   <defenses armor="25" defense="27"/>
   <immunities>
