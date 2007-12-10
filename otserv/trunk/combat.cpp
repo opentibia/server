@@ -184,30 +184,34 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 
 ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
 {
-	if(attacker && attacker->getPlayer()){
-		Player* attackerPlayer = attacker->getPlayer();
-
-		if(target->getPlayer()){
-			if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
-				return RET_YOUMAYNOTATTACKTHISPLAYER;
-			}
-
-			if(target->getPlayer()->hasFlag(PlayerFlag_CannotBeAttacked)){
-				return RET_YOUMAYNOTATTACKTHISPLAYER;
-			}
+	if(attacker){
+		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP && attacker->getMaster() &&
+		   attacker->getMaster() == target && attacker->getMaster()->getPlayer()){
+			return RET_YOUMAYNOTATTACKTHISPLAYER;
 		}
-		else if(target->getMonster()){
-			if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackMonster)){
-				return RET_YOUMAYNOTATTACKTHISCREATURE;
-			}
-		}
-
-		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+		else if(Player* attackerPlayer = attacker->getPlayer()){
 			if(target->getPlayer()){
-				return RET_YOUMAYNOTATTACKTHISPLAYER;
+				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
+					return RET_YOUMAYNOTATTACKTHISPLAYER;
+				}
+
+				if(target->getPlayer()->hasFlag(PlayerFlag_CannotBeAttacked)){
+					return RET_YOUMAYNOTATTACKTHISPLAYER;
+				}
 			}
-			else if(target->getMaster() && target->getMaster()->getPlayer()){
-				return RET_YOUMAYNOTATTACKTHISCREATURE;
+			else if(target->getMonster()){
+				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackMonster)){
+					return RET_YOUMAYNOTATTACKTHISCREATURE;
+				}
+			}
+
+			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+				if(target->getPlayer()){
+					return RET_YOUMAYNOTATTACKTHISPLAYER;
+				}
+				else if(target->getMaster() && target->getMaster()->getPlayer()){
+					return RET_YOUMAYNOTATTACKTHISCREATURE;
+				}
 			}
 		}
 	}
@@ -522,7 +526,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 	uint32_t maxY = 0;
 	uint32_t diff;
 
-	//calculate the max viewable range	
+	//calculate the max viewable range
 	for(std::list<Tile*>::iterator it = tileList.begin(); it != tileList.end(); ++it){
 		diff = std::abs((*it)->getPosition().x - pos.x);
 		if(diff > maxX){
@@ -914,7 +918,7 @@ void AreaCombat::clear()
 AreaCombat::AreaCombat(const AreaCombat& rhs)
 {
 	hasExtArea = rhs.hasExtArea;
-	
+
 	for(AreaCombatMap::const_iterator it = rhs.areas.begin(); it != rhs.areas.end(); ++it){
 		areas[it->first] = new MatrixArea(*it->second);
 	}

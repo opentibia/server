@@ -139,7 +139,7 @@ void Game::setGameState(GameState_t newState)
 				}
 				break;
 			}
-			
+
 			case GAME_STATE_STARTUP:
 			case GAME_STATE_CLOSED:
 			case GAME_STATE_NORMAL:
@@ -635,7 +635,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
-	
+
 	if(!movingCreature->isPushable() && !player->hasFlag(PlayerFlag_CanPushAllCreatures)){
 		player->sendCancelMessage(RET_NOTMOVEABLE);
 		return false;
@@ -648,7 +648,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 		player->sendCancelMessage(RET_DESTINATIONOUTOFREACH);
 		return false;
 	}
-	
+
 	if(player != movingCreature){
 		if(toTile->hasProperty(BLOCKPATHFIND)){
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
@@ -851,12 +851,12 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	const Position& playerPos = player->getPosition();
 	const Position& mapFromPos = fromCylinder->getTile()->getPosition();
 	const Position& mapToPos = toCylinder->getTile()->getPosition();
-	
+
 	if(playerPos.z > mapFromPos.z){
 		player->sendCancelMessage(RET_FIRSTGOUPSTAIRS);
 		return false;
 	}
-	
+
 	if(playerPos.z < mapFromPos.z){
 		player->sendCancelMessage(RET_FIRSTGODOWNSTAIRS);
 		return false;
@@ -896,7 +896,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 
 			Position itemPos = fromPos;
 			uint8_t itemStackPos = fromStackPos;
-			
+
 			if(fromPos.x != 0xFFFF && Position::areInRange<1,1,0>(mapFromPos, player->getPosition())
 				&& !Position::areInRange<1,1,0>(mapFromPos, walkPos)){
 				//need to pickup the item first
@@ -933,7 +933,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		player->sendCancelMessage(RET_DESTINATIONOUTOFREACH);
 		return false;
 	}
-	
+
 	if(!canThrowObjectTo(mapFromPos, mapToPos)){
 		player->sendCancelMessage(RET_CANNOTTHROW);
 		return false;
@@ -3622,7 +3622,9 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 	Player* tmpPlayer = NULL;
 	for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendCreatureSkull(player, newSkull);
+			if(!(player->isPartner(tmpPlayer) && newSkull == SKULL_NONE)){
+				tmpPlayer->sendCreatureSkull(player, newSkull);
+			}
 		}
 	}
 }

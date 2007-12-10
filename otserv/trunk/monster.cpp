@@ -866,7 +866,7 @@ bool Monster::getCombatValues(int32_t& min, int32_t& max)
 
 std::string Monster::getDescription(int32_t lookDistance) const
 {
-	return strDescription;
+	return strDescription + '.';
 }
 
 void Monster::updateLookDirection()
