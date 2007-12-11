@@ -123,8 +123,8 @@ uint32_t rand24b()
 
 float box_muller(float m, float s)
 {
-	// normal random variate generator 
-	// mean m, standard deviation s 
+	// normal random variate generator
+	// mean m, standard deviation s
 
 	float x1, x2, w, y1;
 	static float y2;
@@ -324,107 +324,145 @@ struct AmmoActionNames{
 };
 
 MagicEffectNames magicEffectNames[] = {
-	{"redspark", NM_ME_DRAW_BLOOD},
-	{"bluebubble", NM_ME_LOSE_ENERGY},
-	{"poff", NM_ME_PUFF},
-	{"yellowspark", NM_ME_BLOCKHIT},
-	{"explosionarea", NM_ME_EXPLOSION_AREA},
-	{"explosion", NM_ME_EXPLOSION_DAMAGE},
-	{"firearea", NM_ME_FIRE_AREA},
-	{"yellowbubble", NM_ME_YELLOW_RINGS},
-	{"greenbubble", NM_ME_POISON_RINGS},
-	{"blackspark", NM_ME_HIT_AREA},
-	{"energyarea", NM_ME_ENERGY_AREA},
-	{"energy", NM_ME_ENERGY_DAMAGE},
-	{"blueshimmer", NM_ME_MAGIC_ENERGY},
-	{"redshimmer", NM_ME_MAGIC_BLOOD},
-	{"greenshimmer", NM_ME_MAGIC_POISON},
-	{"fire", NM_ME_HITBY_FIRE},
-	{"greenspark", NM_ME_POISON},
-	{"mortarea", NM_ME_MORT_AREA},
-	{"greennote", NM_ME_SOUND_GREEN},
-	{"rednote", NM_ME_SOUND_RED},
-	{"poison", NM_ME_POISON_AREA},
-	{"yellownote", NM_ME_SOUND_YELLOW},
-	{"purplenote", NM_ME_SOUND_PURPLE},
-	{"bluenote", NM_ME_SOUND_BLUE},
-	{"whitenote", NM_ME_SOUND_WHITE},
-	{"bubbles", NM_ME_BUBBLES},
-	{"dice", NM_ME_CRAPS},
-	{"giftwraps", NM_ME_GIFT_WRAPS},
-	{"yellowfirework", NM_ME_FIREWORK_YELLOW},
-	{"redfirework", NM_ME_FIREWORK_RED},
-	{"bluefirework", NM_ME_FIREWORK_BLUE},
-	{"stun", NM_ME_STUN},
-	{"sleep", NM_ME_SLEEP},
-	{"watercreature", NM_ME_WATERCREATURE},
-	{"groundshaker", NM_ME_GROUNDSHAKER}
+	{"redspark",          NM_ME_DRAW_BLOOD},
+	{"bluebubble",        NM_ME_LOSE_ENERGY},
+	{"poff",              NM_ME_PUFF},
+	{"yellowspark",       NM_ME_BLOCKHIT},
+	{"explosionarea",     NM_ME_EXPLOSION_AREA},
+	{"explosion",         NM_ME_EXPLOSION_DAMAGE},
+	{"firearea",          NM_ME_FIRE_AREA},
+	{"yellowbubble",      NM_ME_YELLOW_RINGS},
+	{"greenbubble",       NM_ME_POISON_RINGS},
+	{"blackspark",        NM_ME_HIT_AREA},
+	{"teleport",          NM_ME_TELEPORT},
+	{"energy",            NM_ME_ENERGY_DAMAGE},
+	{"blueshimmer",       NM_ME_MAGIC_ENERGY},
+	{"redshimmer",        NM_ME_MAGIC_BLOOD},
+	{"greenshimmer",      NM_ME_MAGIC_POISON},
+	{"fire",              NM_ME_HITBY_FIRE},
+	{"greenspark",        NM_ME_POISON},
+	{"mortarea",          NM_ME_MORT_AREA},
+	{"greennote",         NM_ME_SOUND_GREEN},
+	{"rednote",           NM_ME_SOUND_RED},
+	{"poison",            NM_ME_POISON_AREA},
+	{"yellownote",        NM_ME_SOUND_YELLOW},
+	{"purplenote",        NM_ME_SOUND_PURPLE},
+	{"bluenote",          NM_ME_SOUND_BLUE},
+	{"whitenote",         NM_ME_SOUND_WHITE},
+	{"bubbles",           NM_ME_BUBBLES},
+	{"dice",              NM_ME_CRAPS},
+	{"giftwraps",         NM_ME_GIFT_WRAPS},
+	{"yellowfirework",    NM_ME_FIREWORK_YELLOW},
+	{"redfirework",       NM_ME_FIREWORK_RED},
+	{"bluefirework",      NM_ME_FIREWORK_BLUE},
+	{"stun",              NM_ME_STUN},
+	{"sleep",             NM_ME_SLEEP},
+	{"watercreature",     NM_ME_WATERCREATURE},
+	{"groundshaker",      NM_ME_GROUNDSHAKER},
+	{"hearts",            NM_ME_HEARTS},
+	{"fireattack",        NM_ME_FIREATTACK},
+	{"energyarea",        NM_ME_ENERGY_AREA},
+	{"smallclouds",       NM_ME_SMALLCLOUDS},
+	{"holydamage",        NM_ME_HOLYDAMAGE},
+	{"bigclouds",         NM_ME_BIGCLOUDS},
+	{"icearea",           NM_ME_ICEAREA},
+	{"icetornado",        NM_ME_ICETORNADO},
+	{"iceattack",         NM_ME_ICEATTACK},
+	{"stones",            NM_ME_STONES},
+	{"smallplants",       NM_ME_SMALLPLANTS},
+	{"carniphila",        NM_ME_CARNIPHILA},
+	{"purpleenergy",      NM_ME_PURPLEENERGY},
+	{"yellowenergy",      NM_ME_YELLOWENERGY},
+	{"holyarea",          NM_ME_HOLYAREA},
+	{"bigplants",         NM_ME_BIGPLANTS},
+	{"cake",              NM_ME_CAKE},
+	{"giantice",          NM_ME_GIANTICE},
+	{"watersplash",       NM_ME_WATERSPLASH},
+	{"plantattack",       NM_ME_PLANTATTACK}
 };
 
 ShootTypeNames shootTypeNames[] = {
-	{"spear", NM_SHOOT_SPEAR},
-	{"bolt", NM_SHOOT_BOLT},
-	{"arrow", NM_SHOOT_ARROW},
-	{"fire", NM_SHOOT_FIRE},
-	{"energy", NM_SHOOT_ENERGY},
-	{"poisonarrow", NM_SHOOT_POISONARROW},
-	{"burstarrow", NM_SHOOT_BURSTARROW},
-	{"throwingstar", NM_SHOOT_THROWINGSTAR},
-	{"throwingknife", NM_SHOOT_THROWINGKNIFE},
-	{"smallstone", NM_SHOOT_SMALLSTONE},
-	{"suddendeath", NM_SHOOT_SUDDENDEATH},
-	{"largerock", NM_SHOOT_LARGEROCK},
-	{"snowball", NM_SHOOT_SNOWBALL},
-	{"powerbolt", NM_SHOOT_POWERBOLT},
-	{"poison", NM_SHOOT_POISONFIELD},
-	{"infernalbolt", NM_SHOOT_INFERNALBOLT},
-	{"huntingspear", NM_SHOOT_HUNTINGSPEAR},
-	{"enchantedspear", NM_SHOOT_ENCHANTEDSPEAR},
-	{"redstar", NM_SHOOT_REDSTAR},
-	{"greenstar", NM_SHOOT_GREENSTAR},
-	{"royalspear", NM_SHOOT_ROYALSPEAR},
-	{"sniperarrow", NM_SHOOT_SNIPERARROW},
-	{"onyxarrow", NM_SHOOT_ONYXARROW},
-	{"piercingbolt", NM_SHOOT_PIERCINGBOLT},
-	{"whirlwindsword", NM_SHOOT_WHIRLWINDSWORD},
-	{"whirlwindaxe", NM_SHOOT_WHIRLWINDAXE},
-	{"whirlwindclub", NM_SHOOT_WHIRLWINDCLUB},
-	{"etherealspear", NM_SHOOT_ETHEREALSPEAR}
+	{"spear",             NM_SHOOT_SPEAR},
+	{"bolt",              NM_SHOOT_BOLT},
+	{"arrow",             NM_SHOOT_ARROW},
+	{"fire",              NM_SHOOT_FIRE},
+	{"energy",            NM_SHOOT_ENERGY},
+	{"poisonarrow",       NM_SHOOT_POISONARROW},
+	{"burstarrow",        NM_SHOOT_BURSTARROW},
+	{"throwingstar",      NM_SHOOT_THROWINGSTAR},
+	{"throwingknife",     NM_SHOOT_THROWINGKNIFE},
+	{"smallstone",        NM_SHOOT_SMALLSTONE},
+	{"death",             NM_SHOOT_DEATH},
+	{"largerock",         NM_SHOOT_LARGEROCK},
+	{"snowball",          NM_SHOOT_SNOWBALL},
+	{"powerbolt",         NM_SHOOT_POWERBOLT},
+	{"poison",            NM_SHOOT_POISONFIELD},
+	{"infernalbolt",      NM_SHOOT_INFERNALBOLT},
+	{"huntingspear",      NM_SHOOT_HUNTINGSPEAR},
+	{"enchantedspear",    NM_SHOOT_ENCHANTEDSPEAR},
+	{"redstar",           NM_SHOOT_REDSTAR},
+	{"greenstar",         NM_SHOOT_GREENSTAR},
+	{"royalspear",        NM_SHOOT_ROYALSPEAR},
+	{"sniperarrow",       NM_SHOOT_SNIPERARROW},
+	{"onyxarrow",         NM_SHOOT_ONYXARROW},
+	{"piercingbolt",      NM_SHOOT_PIERCINGBOLT},
+	{"whirlwindsword",    NM_SHOOT_WHIRLWINDSWORD},
+	{"whirlwindaxe",      NM_SHOOT_WHIRLWINDAXE},
+	{"whirlwindclub",     NM_SHOOT_WHIRLWINDCLUB},
+	{"etherealspear",     NM_SHOOT_ETHEREALSPEAR},
+	{"ice",               NM_SHOOT_ICE},
+	{"earth",             NM_SHOOT_EARTH},
+	{"holy",              NM_SHOOT_HOLY},
+	{"suddendeath",       NM_SHOOT_SUDDENDEATH},
+	{"flasharrow",        NM_SHOOT_FLASHARROW},
+	{"flammingarrow",     NM_SHOOT_FLAMMINGARROW},
+	{"shiverarrow",       NM_SHOOT_SHIVERARROW},
+	{"energyball",        NM_SHOOT_ENERGYBALL},
+	{"smallice",          NM_SHOOT_SMALLICE},
+	{"smallholy",         NM_SHOOT_SMALLHOLY},
+	{"smallearth",        NM_SHOOT_SMALLEARTH},
+	{"eartharrow",        NM_SHOOT_EARTHARROW},
+	{"explosion",         NM_SHOOT_EXPLOSION},
+	{"cake",              NM_SHOOT_CAKE}
 };
 
 AmmoTypeNames ammoTypeNames[] = {
-	{"spear", AMMO_SPEAR},
-	{"bolt", AMMO_BOLT},
-	{"arrow", AMMO_ARROW},
-	{"poisonarrow", AMMO_ARROW},
-	{"burstarrow", AMMO_ARROW},
-	{"throwingstar", AMMO_THROWINGSTAR},
-	{"throwingknife", AMMO_THROWINGKNIFE},
-	{"smallstone", AMMO_STONE},
-	{"largerock", AMMO_STONE},
-	{"snowball", AMMO_SNOWBALL},
-	{"powerbolt", AMMO_BOLT},
-	{"infernalbolt", AMMO_BOLT},
-	{"huntingspear", AMMO_SPEAR},
+	{"spear",          AMMO_SPEAR},
+	{"bolt",           AMMO_BOLT},
+	{"arrow",          AMMO_ARROW},
+	{"poisonarrow",    AMMO_ARROW},
+	{"burstarrow",     AMMO_ARROW},
+	{"throwingstar",   AMMO_THROWINGSTAR},
+	{"throwingknife",  AMMO_THROWINGKNIFE},
+	{"smallstone",     AMMO_STONE},
+	{"largerock",      AMMO_STONE},
+	{"snowball",       AMMO_SNOWBALL},
+	{"powerbolt",      AMMO_BOLT},
+	{"infernalbolt",   AMMO_BOLT},
+	{"huntingspear",   AMMO_SPEAR},
 	{"enchantedspear", AMMO_SPEAR},
-	{"royalspear", AMMO_SPEAR},
-	{"sniperarrow", AMMO_ARROW},
-	{"onyxarrow", AMMO_ARROW},
-	{"piercingbolt", AMMO_BOLT},
-	{"etherealspear", AMMO_SPEAR}
+	{"royalspear",     AMMO_SPEAR},
+	{"sniperarrow",    AMMO_ARROW},
+	{"onyxarrow",      AMMO_ARROW},
+	{"piercingbolt",   AMMO_BOLT},
+	{"etherealspear",  AMMO_SPEAR},
+	{"flasharrow",     AMMO_ARROW},
+	{"flammingarrow",  AMMO_ARROW},
+	{"shiverarrow",    AMMO_ARROW},
+	{"eartharrow",     AMMO_ARROW}
 };
 
 AmmoActionNames ammoActionNames[] = {
-	{"move", AMMOACTION_MOVE},
-	{"moveback", AMMOACTION_MOVEBACK},
-	{"removecharge", AMMOACTION_REMOVECHARGE},
-	{"removecount", AMMOACTION_REMOVECOUNT}
+	{"move",          AMMOACTION_MOVE},
+	{"moveback",      AMMOACTION_MOVEBACK},
+	{"removecharge",  AMMOACTION_REMOVECHARGE},
+	{"removecount",   AMMOACTION_REMOVECOUNT}
 };
 
 MagicEffectClasses getMagicEffect(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(magicEffectNames)/sizeof(MagicEffectNames); ++i){
-		if(strValue == magicEffectNames[i].name){
+		if(strcasecmp(strValue.c_str(), magicEffectNames[i].name) == 0){
 			return magicEffectNames[i].effect;
 		}
 	}
@@ -434,7 +472,7 @@ MagicEffectClasses getMagicEffect(const std::string& strValue)
 ShootType_t getShootType(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(shootTypeNames)/sizeof(ShootTypeNames); ++i){
-		if(strValue == shootTypeNames[i].name){
+		if(strcasecmp(strValue.c_str(), shootTypeNames[i].name) == 0){
 			return shootTypeNames[i].shoot;
 		}
 	}
@@ -444,7 +482,7 @@ ShootType_t getShootType(const std::string& strValue)
 Ammo_t getAmmoType(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(ammoTypeNames)/sizeof(AmmoTypeNames); ++i){
-		if(strValue == ammoTypeNames[i].name){
+		if(strcasecmp(strValue.c_str(), ammoTypeNames[i].name) == 0){
 			return ammoTypeNames[i].ammoType;
 		}
 	}
@@ -454,7 +492,7 @@ Ammo_t getAmmoType(const std::string& strValue)
 AmmoAction_t getAmmoAction(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(ammoActionNames)/sizeof(AmmoActionNames); ++i){
-		if(strValue == ammoActionNames[i].name){
+		if(strcasecmp(strValue.c_str(), ammoActionNames[i].name) == 0){
 			return ammoActionNames[i].ammoAction;
 		}
 	}

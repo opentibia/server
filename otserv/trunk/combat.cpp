@@ -25,7 +25,7 @@
 #include "condition.h"
 #include "creature.h"
 #include "player.h"
-#include "const80.h"
+#include "consts.h"
 #include "tools.h"
 #include "weapons.h"
 

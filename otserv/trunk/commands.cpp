@@ -351,7 +351,7 @@ bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, con
 {
 	Position destPos = creature->getPosition();
 	if(game->internalTeleport(creature, creature->masterPos) == RET_NOERROR){
-		game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
+		game->addMagicEffect(destPos, NM_ME_TELEPORT);
 		return true;
 	}
 
@@ -364,7 +364,7 @@ bool Commands::teleportHere(Creature* creature, const std::string& cmd, const st
 	if(paramCreature){
 		Position destPos = paramCreature->getPosition();
 		if(game->internalTeleport(paramCreature, creature->getPosition()) == RET_NOERROR){
-			game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(destPos, NM_ME_TELEPORT);
 			return true;
 		}
 	}
@@ -574,7 +574,7 @@ bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const 
 	Town* town = Towns::getInstance().getTown(tmp);
 	if(town){
 		if(game->internalTeleport(creature, town->getTemplePosition()) == RET_NOERROR) {
-			game->addMagicEffect(town->getTemplePosition(), NM_ME_ENERGY_AREA);
+			game->addMagicEffect(town->getTemplePosition(), NM_ME_TELEPORT);
 			return true;
 		}
 	}
@@ -590,7 +590,7 @@ bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std:
 	if(paramCreature){
 		Position destPos = creature->getPosition();
 		if(game->internalTeleport(creature, paramCreature->getPosition()) == RET_NOERROR){
-			game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(destPos, NM_ME_TELEPORT);
 			return true;
 		}
 	}
@@ -739,7 +739,7 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 		}
 
 		if(game->internalTeleport(creature, newPos) == RET_NOERROR){
-			game->addMagicEffect(newPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(newPos, NM_ME_TELEPORT);
 		}
 	}
 

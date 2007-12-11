@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Implementation of tibia v8.0 protocol
+// Implementation of tibia gameworld protocol
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_PROTOCOL80_H__
-#define __OTSERV_PROTOCOL80_H__
+#ifndef __OTSERV_PROTOCOLGAME_H__
+#define __OTSERV_PROTOCOLGAME_H__
 
 #include "definitions.h"
 #include <string>
@@ -44,11 +44,11 @@ class Container;
 class Tile;
 class Connection;
 
-class Protocol80 : public Protocol
+class ProtocolGame : public Protocol
 {
 public:
-	Protocol80(Connection* connection);
-	virtual ~Protocol80();
+	ProtocolGame(Connection* connection);
+	virtual ~ProtocolGame();
 
 	bool login(const std::string& name);
 	bool logout(bool forced);

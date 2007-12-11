@@ -1470,7 +1470,7 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 	}
 
 	if(ret == RET_NOERROR){
-		g_game.addMagicEffect(player->getPosition(), NM_ME_ENERGY_AREA);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_TELEPORT);
 	}
 	else{
 		player->sendCancelMessage(ret);

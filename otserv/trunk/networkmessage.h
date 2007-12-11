@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,7 +24,7 @@
 
 #include "definitions.h"
 #include "otsystem.h"
-#include "const80.h"
+#include "consts.h"
 #include "item.h"
 
 class Creature;
@@ -116,7 +116,7 @@ public:
 	int32_t getMessageLength() const { return m_MsgSize; }
 	void setMessageLength(int32_t newSize) { m_MsgSize = newSize; }
 	int32_t getReadPos() const { return m_ReadPos; }
-		
+
 	int32_t decodeHeader();
 
 	char* getBuffer() { return (char*)&m_MsgBuf[0]; }

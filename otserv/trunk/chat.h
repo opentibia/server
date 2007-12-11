@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,7 +25,7 @@
 #include <list>
 #include <string>
 
-#include "const80.h"
+#include "consts.h"
 #include "definitions.h"
 
 class Player;
@@ -35,20 +35,20 @@ class ChatChannel
 public:
 	ChatChannel(uint16_t channelId, std::string channelName);
 	virtual ~ChatChannel(){};
-	
+
 	bool addUser(Player* player);
 	bool removeUser(Player* player);
-	
+
 	bool talk(Player* fromPlayer, SpeakClasses type, const std::string &text, unsigned short channelId);
-	
+
 	const std::string& getName(){ return m_name; };
 	const uint16_t getId(){ return m_id; };
-	
+
 	virtual const uint32_t getOwner(){ return 0; };
 
 protected:
 	typedef std::map<uint32_t, Player*> UsersMap;
-	
+
 	UsersMap m_users;
 	std::string m_name;
 	uint16_t m_id;
@@ -56,26 +56,26 @@ protected:
 
 class PrivateChatChannel : public ChatChannel
 {
-public:	
+public:
 	PrivateChatChannel(uint16_t channelId, std::string channelName);
 	virtual ~PrivateChatChannel(){};
-		
+
 	virtual const uint32_t getOwner(){return m_owner;};
 	void setOwner(uint32_t id){m_owner = id;};
-		
+
 	bool isInvited(const Player* player);
-	
+
 	void invitePlayer(Player* player, Player* invitePlayer);
 	void excludePlayer(Player* player, Player* excludePlayer);
-	
+
 	bool addInvited(Player* player);
 	bool removeInvited(Player* player);
 
 	void closeChannel();
 
-protected:	
+protected:
 	typedef std::map<uint32_t, Player*> InvitedMap;
-	
+
 	InvitedMap m_invites;
 	uint32_t m_owner;
 };
@@ -89,21 +89,21 @@ public:
 	~Chat(){};
 	ChatChannel* createChannel(Player* player, uint16_t channelId);
 	bool deleteChannel(Player* player, uint16_t channelId);
-	
+
 	bool addUserToChannel(Player* player, uint16_t channelId);
 	bool removeUserFromChannel(Player* player, uint16_t channelId);
 	void removeUserFromAllChannels(Player* player);
-	
-	bool talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);	
-	
-	std::string getChannelName(Player* player, uint16_t channelId);	
+
+	bool talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+
+	std::string getChannelName(Player* player, uint16_t channelId);
 	ChannelList getChannelList(Player* player);
 
 	ChatChannel* getChannel(Player* player, uint16_t channelId);
 	PrivateChatChannel* getPrivateChannel(Player* player);
-	
+
 private:
-	
+
 	typedef std::map<uint16_t, ChatChannel*> NormalChannelMap;
 	typedef std::map<uint32_t, ChatChannel*> GuildChannelMap;
 	NormalChannelMap m_normalChannels;
@@ -111,7 +111,7 @@ private:
 
 	typedef std::map<uint16_t, PrivateChatChannel*> PrivateChannelMap;
 	PrivateChannelMap m_privateChannels;
-	
+
 	ChatChannel* dummyPrivate;
 };
 

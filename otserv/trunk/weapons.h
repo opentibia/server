@@ -29,7 +29,7 @@
 #include "talkaction.h"
 #include "baseevents.h"
 #include "combat.h"
-#include "const80.h"
+#include "consts.h"
 
 class Weapon;
 class WeaponMelee;
@@ -41,7 +41,7 @@ class Weapons : public BaseEvents
 public:
 	Weapons();
 	virtual ~Weapons();
-	
+
 	bool loadDefaults();
 	const Weapon* getWeapon(const Item* item) const;
 
@@ -56,10 +56,10 @@ protected:
 	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
-	
+
 	typedef std::map<uint32_t, Weapon*> WeaponMap;
 	WeaponMap weapons;
-	
+
 	LuaScriptInterface m_scriptInterface;
 };
 

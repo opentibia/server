@@ -51,7 +51,7 @@ AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
 int32_t Player::maxMessageBuffer;
 
-Player::Player(const std::string& _name, Protocol80 *p) :
+Player::Player(const std::string& _name, ProtocolGame *p) :
 Creature()
 {
 	client = p;
@@ -1702,11 +1702,9 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		const ItemType& it = Item::items[item->getID()];
 		absorbedDamage = false;
 
-		if(it.abilities.absorbPercentAll != 0){
-			if(it.abilities.absorbPercentAll > 0){
-				damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentAll) / 100));
-				absorbedDamage = true;
-			}
+		if(it.abilities.absorbPercentAll > 0){
+			damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentAll) / 100));
+			absorbedDamage = true;
 		}
 
 		switch(combatType){
@@ -1737,10 +1735,10 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 				break;
 			}
 
-			case COMBAT_POISONDAMAGE:
+			case COMBAT_EARTHDAMAGE:
 			{
-				if(it.abilities.absorbPercentPoison > 0){
-					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentPoison) / 100));
+				if(it.abilities.absorbPercentEarth > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentEarth) / 100));
 					absorbedDamage = true;
 				}
 				break;
@@ -1768,6 +1766,33 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			{
 				if(it.abilities.absorbPercentDrown > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDrown) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_ICEDAMAGE:
+			{
+				if(it.abilities.absorbPercentIce > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentIce) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_HOLYDAMAGE:
+			{
+				if(it.abilities.absorbPercentHoly > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentHoly) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_DEATHDAMAGE:
+			{
+				if(it.abilities.absorbPercentDeath > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDeath) / 100));
 					absorbedDamage = true;
 				}
 				break;
@@ -2936,17 +2961,21 @@ void Player::onAddCondition(ConditionType_t type)
 
 void Player::onAddCombatCondition(ConditionType_t type)
 {
-	if(type == CONDITION_POISON){
-		sendTextMessage(MSG_STATUS_DEFAULT, "You are poisoned.");
-	}
-	else if(type == CONDITION_DROWN){
-		sendTextMessage(MSG_STATUS_DEFAULT, "You are drowning.");
-	}
-	else if(type == CONDITION_PARALYZE){
-		sendTextMessage(MSG_STATUS_DEFAULT, "You are paralyzed.");
-	}
-	else if(type == CONDITION_DRUNK){
-		sendTextMessage(MSG_STATUS_DEFAULT, "You are drunk.");
+	switch(type){
+		case CONDITION_POISON:
+			sendTextMessage(MSG_STATUS_DEFAULT, "You are poisoned.");
+			break;
+		case CONDITION_DROWN:
+			sendTextMessage(MSG_STATUS_DEFAULT, "You are drowning.");
+			break;
+		case CONDITION_PARALYZE:
+			sendTextMessage(MSG_STATUS_DEFAULT, "You are paralyzed.");
+			break;
+		case CONDITION_DRUNK:
+			sendTextMessage(MSG_STATUS_DEFAULT, "You are drunk.");
+			break;
+		default:
+			break;
 	}
 }
 

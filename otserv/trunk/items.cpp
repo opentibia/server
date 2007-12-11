@@ -803,6 +803,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentAll = intValue;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentPhysical") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentPhysical = intValue;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentEnergy") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentEnergy = intValue;
@@ -813,9 +818,10 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentFire = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentPoison") == 0){
+							else if(strcasecmp(strValue.c_str(), "absorbPercentPoison") == 0 ||
+									strcasecmp(strValue.c_str(), "absorbPercentEarth") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentPoison = intValue;
+									it.abilities.absorbPercentEarth = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentLifeDrain") == 0){
@@ -833,39 +839,66 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentDrown = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentPhysical") == 0){
+							else if(strcasecmp(strValue.c_str(), "absorbPercentIce") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentPhysical = intValue;
+									it.abilities.absorbPercentIce = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentHoly") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentHoly = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentDeath") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentDeath = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "suppressDrunk") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_DRUNK;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "suppressEnergy") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_ENERGY;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "suppressFire") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_FIRE;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "suppressPoison") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_POISON;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "suppressLifeDrain") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_LIFEDRAIN;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "suppressDrown") == 0){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_DROWN;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "suppressFreeze") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
+									it.abilities.conditionSuppressions |= CONDITION_FREEZING;
+								}
+							}
+
+							else if(strcasecmp(strValue.c_str(), "suppressDazzle") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
+									it.abilities.conditionSuppressions |= CONDITION_DAZZLED;
+								}
+							}
+
+							else if(strcasecmp(strValue.c_str(), "suppressCurse") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
+									it.abilities.conditionSuppressions |= CONDITION_CURSED;
 								}
 							}
 							/*else if(strcasecmp(strValue.c_str(), "suppressManaDrain") == 0){
@@ -895,7 +928,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 									else if(strcasecmp(strValue.c_str(), "poison") == 0){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
-										combatType = COMBAT_POISONDAMAGE;
+										combatType = COMBAT_EARTHDAMAGE;
 									}
 									else if(strcasecmp(strValue.c_str(), "drown") == 0){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);

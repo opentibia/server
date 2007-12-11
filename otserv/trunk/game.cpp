@@ -1448,7 +1448,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 			}
 			else{
 				cylinder->postRemoveNotification(item, itemIndex, true);
-				
+
 				if(newType.group != curType.group){
 					item->setDefaultSubtype();
 				}
@@ -3037,7 +3037,7 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 				break;
 			}
 
-			case COMBAT_POISONDAMAGE:
+			case COMBAT_EARTHDAMAGE:
 			{
 				hitEffect = NM_ME_POISON_RINGS;
 				break;
@@ -3141,12 +3141,12 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 					case COMBAT_ENERGYDAMAGE:
 					{
-						textColor = TEXTCOLOR_LIGHTBLUE;
+						textColor = TEXTCOLOR_PURPLE;
 						hitEffect = NM_ME_ENERGY_DAMAGE;
 						break;
 					}
 
-					case COMBAT_POISONDAMAGE:
+					case COMBAT_EARTHDAMAGE:
 					{
 						textColor = TEXTCOLOR_LIGHTGREEN;
 						hitEffect = NM_ME_POISON_RINGS;
@@ -3165,6 +3165,24 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 						textColor = TEXTCOLOR_ORANGE;
 						hitEffect = NM_ME_HITBY_FIRE;
 						break;
+					}
+
+					case COMBAT_ICEDAMAGE:
+					{
+						textColor = TEXTCOLOR_LIGHTBLUE;
+						hitEffect = NM_ME_ICEATTACK;
+					}
+
+					case COMBAT_HOLYDAMAGE:
+					{
+						textColor = TEXTCOLOR_YELLOW;
+						hitEffect = NM_ME_HOLYDAMAGE;
+					}
+
+					case COMBAT_DEATHDAMAGE:
+					{
+						textColor = TEXTCOLOR_RED;
+						hitEffect = NM_ME_SMALLCLOUDS;
 					}
 
 					case COMBAT_LIFEDRAIN:
