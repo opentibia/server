@@ -12,7 +12,7 @@
 	<attacks>
 		<attack name="melee" interval="2000" min="-10" max="-185"/>
 		<attack name="drown" interval="1000" chance="100" length="5" spread="6" min="-10" max="-50">
-			<attribute key="areaEffect" value="energyarea"/>
+			<attribute key="areaEffect" value="teleport"/>
 		</attack>
 		<attack name="speed" interval="4000" chance="100" radius="3" duration="10000" speedchange="-400">
 			<attribute key="areaEffect" value="poff"/>

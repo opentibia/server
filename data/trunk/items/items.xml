@@ -19382,7 +19382,9 @@
 	</item>
 	<item id="7348" article="an" name="old cobbled pavement">
 	</item>
-	<item id="7349" article="a" name="slain hellfire fighter">
+	<item id="7349" name="ashes">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="5"/>
 	</item>
 	<item id="7350" name="sandstone">
 	</item>

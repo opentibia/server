@@ -3171,18 +3171,21 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 					{
 						textColor = TEXTCOLOR_LIGHTBLUE;
 						hitEffect = NM_ME_ICEATTACK;
+						break;
 					}
 
 					case COMBAT_HOLYDAMAGE:
 					{
 						textColor = TEXTCOLOR_YELLOW;
 						hitEffect = NM_ME_HOLYDAMAGE;
+						break;
 					}
 
 					case COMBAT_DEATHDAMAGE:
 					{
-						textColor = TEXTCOLOR_RED;
+						textColor = TEXTCOLOR_DARKRED;
 						hitEffect = NM_ME_SMALLCLOUDS;
+						break;
 					}
 
 					case COMBAT_LIFEDRAIN:
