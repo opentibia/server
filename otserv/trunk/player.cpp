@@ -1002,6 +1002,22 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("Turn secure mode off if you really want to attack unmarked players.");
 		break;
 
+	case RET_YOUNEEDPREMIUMACCOUNT:
+		sendCancel("You need a premium account to use this spell.");
+		break;
+
+	case RET_YOUNEEDTOLEARNTHISSPELL:
+		sendCancel("You need to learn this spell first.");
+		break;
+
+	case RET_YOURVOCATIONCANNOTUSETHISSPELL:
+		sendCancel("Your vocation cannot use this spell.");
+		break;
+
+	case RET_YOUNEEDAWEAPONTOUSETHISSPELL:
+		sendCancel("You need to equip a weapon to use this spell.");
+		break;
+
 	case RET_NOTPOSSIBLE:
 	default:
 		sendCancel("Sorry, not possible.");

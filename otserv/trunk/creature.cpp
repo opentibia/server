@@ -518,7 +518,8 @@ bool Creature::hasBeenAttacked(uint32_t attackerId)
 
 Item* Creature::getCorpse()
 {
-	Item* corpse = Item::CreateItem(getLookCorpse());
+	uint16_t itemId = getLookCorpse();
+	Item* corpse = Item::CreateItem(itemId);
 	return corpse;
 }
 

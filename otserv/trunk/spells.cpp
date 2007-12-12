@@ -524,10 +524,6 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
-		if(isPremium() && !player->isPremium()){
-			return false;
-		}
-
 		if(isAggressive){
 			if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone) && player->getTile()->isPz()){
 				player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
@@ -571,7 +567,7 @@ bool Spell::playerSpellCheck(Player* player) const
 
 		if(isInstant() && isLearnable()){
 			if(!player->hasLearnedInstantSpell(getName())){
-				player->sendCancel("You need to learn this spell first.");
+				player->sendCancelMessage(RET_YOUNEEDTOLEARNTHISSPELL);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
@@ -579,7 +575,7 @@ bool Spell::playerSpellCheck(Player* player) const
 		else{
 			if(!vocSpellMap.empty()){
 				if(vocSpellMap.find(player->getVocationId()) == vocSpellMap.end()){
-					player->sendCancel("Your vocation cannot use this spell.");
+					player->sendCancelMessage(RET_YOURVOCATIONCANNOTUSETHISSPELL);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
@@ -595,11 +591,16 @@ bool Spell::playerSpellCheck(Player* player) const
 
 				default:
 				{
-					player->sendCancel("You need to equip a weapon to use this spell.");
+					player->sendCancelMessage(RET_YOUNEEDAWEAPONTOUSETHISSPELL);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
 			}
+		}
+
+		if(isPremium() && !player->isPremium()){
+			player->sendCancelMessage(RET_YOUNEEDPREMIUMACCOUNT);
+			return false;
 		}
 	}
 
@@ -1502,6 +1503,14 @@ bool InstantSpell::Illusion(const InstantSpell* spell, Creature* creature, const
 
 bool InstantSpell::canCast(const Player* player) const
 {
+	if(player->hasFlag(PlayerFlag_CannotUseSpells)){
+		return false;
+	}
+
+	if(player->hasFlag(PlayerFlag_IgnoreSpellCheck)){
+		return true;
+	}
+
 	if(isLearnable()){
 		if(player->hasLearnedInstantSpell(getName())){
 			return true;
