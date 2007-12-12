@@ -564,13 +564,13 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 		combat->setCondition(condition);
 	}
 	else if(name == "firefield"){
-		combat->setParam(COMBATPARAM_CREATEITEM, 1492);
+		combat->setParam(COMBATPARAM_CREATEITEM, ITEM_FIREFIELD_PVP);
 	}
 	else if(name == "poisonfield"){
-		combat->setParam(COMBATPARAM_CREATEITEM, 1496);
+		combat->setParam(COMBATPARAM_CREATEITEM, ITEM_POISONFIELD_PVP);
 	}
 	else if(name == "energyfield"){
-		combat->setParam(COMBATPARAM_CREATEITEM, 1495);
+		combat->setParam(COMBATPARAM_CREATEITEM, ITEM_ENERGYFIELD_PVP);
 	}
 	else if(name == "firecondition" ||
 			name == "poisoncondition" ||
@@ -953,6 +953,7 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 					tmpNode = tmpNode->next;
 				}
 			}
+			//TODO (piterb#3#): Resistances so monsters can be strong or weak against certain combat types
 			else if(xmlStrcmp(p->name, (const xmlChar*)"immunities") == 0){
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){

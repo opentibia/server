@@ -1003,11 +1003,11 @@ void Player::sendCancelMessage(ReturnValue message) const
 		break;
 
 	case RET_YOUNEEDPREMIUMACCOUNT:
-		sendCancel("You need a premium account to use this spell.");
+		sendCancel("You need a premium account.");
 		break;
 
 	case RET_YOUNEEDTOLEARNTHISSPELL:
-		sendCancel("You need to learn this spell first.");
+		sendCancel("You must learn this spell first.");
 		break;
 
 	case RET_YOURVOCATIONCANNOTUSETHISSPELL:
