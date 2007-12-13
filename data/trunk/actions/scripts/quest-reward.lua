@@ -1,4 +1,4 @@
--- For full information, visit: http://otfans.net/showthread.php?p=849367
+-- For full information, visit http://otfans.net/showthread.php?p=849367
 
 function onUse(cid, item, frompos, item2, topos)
 	if (item.uid == 1000) then
