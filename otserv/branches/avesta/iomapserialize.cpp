@@ -109,7 +109,7 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 			item->getDoor() ||
 			(item->getContainer() && item->getContainer()->size() != 0)||
 			(item->canWriteText())
-			/*item->getBed()*/))
+			/* uncommented for beds system :] */ || item->getBed()))
 			continue;
 
 		if(!storedTile){
@@ -250,6 +250,13 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 						item = findItem;
 						item->setID(type);
 					}
+					//[ added for beds system
+					else if(iType.isBed() && findItem->getBed()) {
+						item = findItem;
+						item->setID(type);
+						item->unserializeAttr(propStream);
+					}
+					//]
 				}
 			}
 

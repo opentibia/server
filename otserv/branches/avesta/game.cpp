@@ -54,6 +54,10 @@
 #include "configmanager.h"
 #include "server.h"
 #include "party.h"
+//[ added for beds system
+#include "beds.h"
+#include <iostream>
+//]
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -497,6 +501,15 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 
 	int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
 	creature->getParent()->postAddNotification(creature, newStackPos);
+	//[ added for beds system
+	Player* player = NULL;
+	if((player = creature->getPlayer()) != NULL) {
+		BedItem* bed = Beds::instance().getBedBySleeper(player->getGUID());
+		if(bed) {
+			bed->wakeUp(player);
+		}
+	}
+	//]
 
 	creature->addEventThink();
 	return true;

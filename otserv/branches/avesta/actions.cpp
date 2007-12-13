@@ -34,6 +34,9 @@
 #include "tools.h"
 #include "spells.h"
 #include "configmanager.h"
+//[ added for beds system
+#include "beds.h"
+//]
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -265,6 +268,15 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 			return RET_CANNOTUSETHISOBJECT;
 		}
 	}
+	//[ added for beds system
+	if(BedItem* bed = item->getBed()) {
+		if(!bed->canUse(player)) {
+			return RET_CANNOTUSETHISOBJECT;
+		}
+		bed->sleep(player);
+		// let's just allow any script execution to occur. :)
+	}
+	//]
 	
 	int32_t stack = item->getParent()->__getIndexOfThing(item);
 	PositionEx posEx(pos, stack);

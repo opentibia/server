@@ -109,6 +109,11 @@ ItemType::ItemType()
 	combatType = COMBAT_NONE;
 
 	replaceable = true;
+	//[ added for beds system
+	isBedItem = false;
+	bedPartnerDir = NORTH;
+	transformToOnUse = 100;
+	//]
 }
 
 ItemType::~ItemType()
@@ -958,6 +963,26 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.replaceable = (intValue != 0);
 								}
 							}
+							//[ added for beds system
+							else if(strcasecmp(strValue.c_str(), "bed") == 0)
+							{
+								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
+									it.isBedItem = (intValue != 0);
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "partnerDirection") == 0)
+							{
+								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
+									it.bedPartnerDir = (Direction)intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "transformTo") == 0)
+							{
+								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
+									it.transformToOnUse = intValue;
+								}
+							}
+							//]
 							else{
 								std::cout << "Warning: [Items::loadFromXml] Unknown key value " << strValue  << std::endl;
 							}

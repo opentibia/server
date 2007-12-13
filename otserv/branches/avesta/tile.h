@@ -31,6 +31,9 @@ class Teleport;
 class TrashHolder;
 class Mailbox;
 class MagicField;
+//[ added for beds system
+class BedItem;
+//]
 
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
@@ -73,6 +76,9 @@ public:
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
 	Mailbox* getMailbox() const;
+	//[ added for beds system
+	BedItem* getBedItem() const;
+	//]
 
 	Creature* getTopCreature();
 	Item* getTopTopItem();

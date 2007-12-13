@@ -33,6 +33,9 @@
 #include "actions.h"
 #include "combat.h"
 #include "weapons.h"
+//[ added for beds system
+#include "beds.h"
+//]
 
 #include <iostream>
 #include <sstream>
@@ -71,6 +74,11 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		else if(it.isMailbox()){
 			newItem = new Mailbox(_type);
 		}
+		//[ added for beds system
+		else if(it.isBed()){
+			newItem = new BedItem(_type);
+		}
+		//]
 		else{
 			newItem = new Item(_type, _count);
 		}

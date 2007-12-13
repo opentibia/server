@@ -33,6 +33,9 @@
 #include "player.h"
 
 class House;
+//[ added for beds system
+class BedItem;
+//]
 
 class AccessList
 {
@@ -115,6 +118,9 @@ enum AccessHouseLevel_t{
 
 typedef std::list<HouseTile*> HouseTileList;
 typedef std::list<Door*> HouseDoorList;
+//[ added for beds system
+typedef std::list<BedItem*> HouseBedItemList;
+//]
 
 
 class HouseTransferItem : public Item
@@ -191,6 +197,11 @@ public:
 
 	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
 	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
+	//[ added for beds system
+	void addBed(BedItem* bed);
+	HouseBedItemList::iterator getHouseBedsBegin() {return bedsList.begin();}
+	HouseBedItemList::iterator getHouseBedsEnd() {return bedsList.end();}
+	//]
 
 private:
 	bool transferToDepot();
@@ -200,6 +211,9 @@ private:
 	uint32_t houseOwner;
 	HouseTileList houseTiles;
 	HouseDoorList doorList;
+	//[ added for beds system
+	HouseBedItemList bedsList;
+	//]
 	AccessList guestList;
 	AccessList subOwnerList;
 	std::string houseName;

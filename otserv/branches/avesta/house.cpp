@@ -28,6 +28,9 @@
 #include "town.h"
 #include "configmanager.h"
 #include "tools.h"
+//[ added for beds system
+#include "beds.h"
+//]
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -73,6 +76,15 @@ void House::setHouseOwner(uint32_t guid)
 
 		//...TODO...
 		//TODO: remove players from beds
+		//[ added for beds system
+		// we need to remove players from beds
+		HouseBedItemList::iterator bit;
+		for(bit = bedsList.begin(); bit != bedsList.end(); ++bit) {
+			if((*bit)->getSleeper() != 0) {
+				(*bit)->wakeUp(NULL);
+			}
+		}
+		//]
 
 		//clean access lists
 		houseOwner = 0;
@@ -295,6 +307,14 @@ void House::addDoor(Door* door)
 	doorList.push_back(door);
 	door->setHouse(this);
 }
+
+//[ added for beds system
+void House::addBed(BedItem* bed)
+{
+	bedsList.push_back(bed);
+	bed->setHouse(this);
+}
+//]
 
 Door* House::getDoorByNumber(uint32_t doorId)
 {

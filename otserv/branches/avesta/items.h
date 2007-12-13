@@ -27,6 +27,9 @@
 #include "const80.h"
 #include "enums.h"
 #include "itemloader.h"
+//[ added for beds system
+#include "position.h"
+//]
 #include <map>
 
 #define SLOTP_WHEREEVER 0xFFFFFFFF
@@ -151,6 +154,13 @@ public:
 	bool isDepot() const {return (type == ITEM_TYPE_DEPOT);}
 	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
+	
+	//[ added for beds system
+	bool isBed() const {return isBedItem;}
+	bool isBedItem;
+	Direction bedPartnerDir;
+	uint16_t transformToOnUse;
+	//]
 
 	uint16_t id;
 	uint16_t clientId;

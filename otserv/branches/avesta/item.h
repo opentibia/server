@@ -41,6 +41,9 @@ class TrashHolder;
 class Mailbox;
 class Door;
 class MagicField;
+//[ added for beds system
+class BedItem;
+//]
 
 enum ITEMPROPERTY{
 	BLOCKSOLID,
@@ -95,6 +98,8 @@ enum AttrTypes_t{
 	ATTR_DECAYING_STATE = 17,
 	ATTR_WRITTENDATE = 18,
 	ATTR_WRITTENBY = 19,
+	ATTR_SLEEPERGUID = 20,
+	ATTR_SLEEPSTART = 21,
 };
 
 class ItemAttributes{
@@ -220,6 +225,10 @@ public:
 	virtual const Door* getDoor() const {return NULL;};
 	virtual MagicField* getMagicField() {return NULL;};
 	virtual const MagicField* getMagicField() const {return NULL;};
+	//[ added for beds system
+	virtual BedItem* getBed(){ return NULL; }
+	virtual const BedItem* getBed() const { return NULL; }
+	//]
 
 	//serialization
 	virtual bool unserialize(xmlNodePtr p);

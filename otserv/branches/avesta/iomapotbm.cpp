@@ -32,6 +32,10 @@
 #include "town.h"
 #include "house.h"
 
+//[ added for beds system
+#include "beds.h"
+//]
+
 typedef uint8_t attribute_t;
 typedef uint32_t flags_t;
 
@@ -315,6 +319,20 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 										if(door && door->getDoorId() != 0){
 											house->addDoor(door);
 										}
+										
+										//[ added for beds system
+										if(!door)
+										{
+											BedItem* bed = item->getBed();
+											if(bed)
+											{
+												// first, try to find the partner
+                                                bed->findPartner();
+                                                // next, add it to the house
+                                                house->addBed(bed);
+											}
+										}
+                                        //]
 									}
 								}
 							}

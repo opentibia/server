@@ -151,6 +151,20 @@ Mailbox* Tile::getMailbox() const
 
 	return NULL;
 }
+//[ added for beds system
+BedItem* Tile::getBedItem() const
+{
+	BedItem* bed = NULL;
+	Item* iiItem = NULL;
+	for(uint32_t i = 0; i < getThingCount(); ++i){
+		iiItem = __getThing(i)->getItem();
+		if(iiItem && (bed = iiItem->getBed()))
+			return bed;
+	}
+
+	return NULL;
+}
+//]
 
 Creature* Tile::getTopCreature()
 {
