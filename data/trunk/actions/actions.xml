@@ -2,8 +2,11 @@
 
 <actions>
 	
-	<!-- Quest Reward (only for example) -->
+	<!-- Quest Rewards (only for example) -->
 	<action uniqueid="1000" script="quest_reward.lua" />
+	<action uniqueid="1001" script="quest_reward.lua" />
+	<action uniqueid="1002" script="quest_reward.lua" />
+	<action uniqueid="1003" script="quest_reward.lua" />
 	
 	<!-- Tools -->
 	<action itemid="5942" script="blessed_wooden_stake.lua" />
