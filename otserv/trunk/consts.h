@@ -67,9 +67,9 @@ enum MagicEffectClasses {
 	NM_ME_SMALLCLOUDS      = 0x26, //38
 	NM_ME_HOLYDAMAGE       = 0x27, //39
 	NM_ME_BIGCLOUDS        = 0x28, //40
-	NM_ME_ICEATTACK        = 0x29, //41
+	NM_ME_ICEAREA          = 0x29, //41
 	NM_ME_ICETORNADO       = 0x2A, //42
-	NM_ME_ICEAREA          = 0x2B, //43
+	NM_ME_ICEATTACK        = 0x2B, //43
 	NM_ME_STONES           = 0x2C, //44
 	NM_ME_SMALLPLANTS      = 0x2D, //45
 	NM_ME_CARNIPHILA       = 0x2E, //46
