@@ -177,6 +177,7 @@ void BedItem::wakeUp(Player* player)
 				
 				if(ret) {
 					regeneratePlayer(player);
+					IOPlayer::instance()->savePlayer(player);
 				}
 				
 				delete player;
