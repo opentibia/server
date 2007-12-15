@@ -79,7 +79,7 @@ bool BedItem::findPartner()
 {
 	Direction dir = Item::items[getID()].bedPartnerDir;
 	Position targetPos = getPosition();
-    switch(dir)
+	switch(dir)
 	{
 		case NORTH: targetPos.y--; break;
 		case SOUTH: targetPos.y++; break;
@@ -118,24 +118,24 @@ bool BedItem::canUse(Player* player) const
 void BedItem::sleep(Player* player)
 {
 	// avoid crashes
-    if((house == NULL) || (partner == NULL)) {
+	if((house == NULL) || (partner == NULL)) {
 		return;
 	}
 	
-    if((player == NULL) || player->isRemoved()) {
+	if((player == NULL) || player->isRemoved()) {
 		return;
 	}
 	
 	// get sleep info
-    std::string desc_str = player->getName() + " is sleeping there.";
-    time_t now = std::time(NULL);
+	std::string desc_str = player->getName() + " is sleeping there.";
+	time_t now = std::time(NULL);
     
 	// set sleep info
 	setSleeper(player->getGUID());
 	setSleepStart(now);
 	setSpecialDescription(desc_str);
 	// and for partner
-    partner->setSleeper(player->getGUID());
+	partner->setSleeper(player->getGUID());
 	partner->setSleepStart(now);
 	partner->setSpecialDescription(desc_str);
 	
@@ -146,11 +146,11 @@ void BedItem::sleep(Player* player)
 	// make the player walk onto the bed
 	player->getTile()->moveCreature(player, getTile());
 	
-	// kick player in ~1 ms
-    Scheduler::getScheduler().addEvent(createSchedulerTask(50, boost::bind(&Player::kickPlayer, player)));
+	// kick player after he sees himself walk onto the bed and it change id
+	Scheduler::getScheduler().addEvent(createSchedulerTask(50, boost::bind(&Player::kickPlayer, player)));
 	
 	// change self and partner's appearance
-    g_game.transformItem(this, Item::items[getID()].transformToOnUse);
+	g_game.transformItem(this, Item::items[getID()].transformToOnUse);
 	g_game.transformItem(partner, Item::items[partner->getID()].transformToOnUse);
 }
 
@@ -161,7 +161,7 @@ void BedItem::wakeUp(Player* player)
 		return;
 	}
     
-    if(sleeperGUID != 0)
+	if(sleeperGUID != 0)
 	{
 		bool playerLoaded = false;
 		std::string name;
