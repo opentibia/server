@@ -178,10 +178,10 @@ std::string DatabaseSQLite::escapeBlob(const char* s, uint32_t length)
 {
 	std::string buf = "x'";
 
-	char* hex = new char[2 + 1]; //need one extra byte for null-character
+	char* hex = new char[2];
 
 	for(uint32_t i = 0; i < length; i++){
-		int size = sprintf(hex, "%02x", ((unsigned char)s[i]));
+		sprintf(hex, "%02x", s[i]);
 		buf += hex;
 	}
 

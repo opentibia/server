@@ -524,6 +524,10 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
+		if(isPremium() && !player->isPremium()){
+			return false;
+		}
+
 		if(isAggressive){
 			if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone) && player->getTile()->isPz()){
 				player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
@@ -567,7 +571,7 @@ bool Spell::playerSpellCheck(Player* player) const
 
 		if(isInstant() && isLearnable()){
 			if(!player->hasLearnedInstantSpell(getName())){
-				player->sendCancelMessage(RET_YOUNEEDTOLEARNTHISSPELL);
+				player->sendCancel("You need to learn this spell first.");
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
@@ -575,7 +579,7 @@ bool Spell::playerSpellCheck(Player* player) const
 		else{
 			if(!vocSpellMap.empty()){
 				if(vocSpellMap.find(player->getVocationId()) == vocSpellMap.end()){
-					player->sendCancelMessage(RET_YOURVOCATIONCANNOTUSETHISSPELL);
+					player->sendCancel("Your vocation cannot use this spell.");
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
@@ -591,16 +595,11 @@ bool Spell::playerSpellCheck(Player* player) const
 
 				default:
 				{
-					player->sendCancelMessage(RET_YOUNEEDAWEAPONTOUSETHISSPELL);
+					player->sendCancel("You need to equip a weapon to use this spell.");
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
 			}
-		}
-
-		if(isPremium() && !player->isPremium()){
-			player->sendCancelMessage(RET_YOUNEEDPREMIUMACCOUNT);
-			return false;
 		}
 	}
 
@@ -1471,7 +1470,7 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 	}
 
 	if(ret == RET_NOERROR){
-		g_game.addMagicEffect(player->getPosition(), NM_ME_TELEPORT);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_ENERGY_AREA);
 	}
 	else{
 		player->sendCancelMessage(ret);
@@ -1503,14 +1502,6 @@ bool InstantSpell::Illusion(const InstantSpell* spell, Creature* creature, const
 
 bool InstantSpell::canCast(const Player* player) const
 {
-	if(player->hasFlag(PlayerFlag_CannotUseSpells)){
-		return false;
-	}
-
-	if(player->hasFlag(PlayerFlag_IgnoreSpellCheck)){
-		return true;
-	}
-
 	if(isLearnable()){
 		if(player->hasLearnedInstantSpell(getName())){
 			return true;

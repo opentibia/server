@@ -518,8 +518,7 @@ bool Creature::hasBeenAttacked(uint32_t attackerId)
 
 Item* Creature::getCorpse()
 {
-	uint16_t itemId = getLookCorpse();
-	Item* corpse = Item::CreateItem(itemId);
+	Item* corpse = Item::CreateItem(getLookCorpse());
 	return corpse;
 }
 
@@ -766,7 +765,7 @@ void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
 		switch(type){
 			case CONDITION_FIRE: bRemove = (field->getCombatType() != COMBAT_FIREDAMAGE); break;
 			case CONDITION_ENERGY: bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE); break;
-			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_EARTHDAMAGE); break;
+			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_POISONDAMAGE); break;
 			case CONDITION_DROWN: bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE); break;
 			default:
 				break;

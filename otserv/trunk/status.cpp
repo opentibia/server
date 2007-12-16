@@ -40,7 +40,7 @@ extern Game g_game;
 #define STATUS_SERVER_VERSION "0.6.0_SVN"
 //#define STATUS_SERVER_VERSION "0.6.0"
 #define STATUS_SERVER_NAME "otserv"
-#define STATUS_CLIENT_VERISON "8.10"
+#define STATUS_CLIENT_VERISON "8.0"
 
 enum RequestedInfo_t{
 	REQUEST_BASIC_SERVER_INFO = 1,

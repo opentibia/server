@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-//
+// 
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,7 +20,7 @@
 #include "otpch.h"
 
 #include "definitions.h"
-#include "consts.h"
+#include "const80.h"
 #include "player.h"
 #include "monster.h"
 #include "npc.h"
@@ -36,7 +36,7 @@
 #include "configmanager.h"
 
 #include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+#include <libxml/parser.h> 
 
 //#include <boost/bind.hpp>
 #include <sstream>
@@ -73,19 +73,19 @@ void Actions::clear()
 	clearMap(useItemMap);
 	clearMap(uniqueItemMap);
 	clearMap(actionItemMap);
-
+	
 	m_scriptInterface.reInitState();
 	m_loaded = false;
 }
 
 LuaScriptInterface& Actions::getScriptInterface()
 {
-	return m_scriptInterface;
+	return m_scriptInterface;	
 }
 
 std::string Actions::getScriptBaseName()
 {
-	return "actions";
+	return "actions";	
 }
 
 Event* Actions::getEvent(const std::string& nodeName)
@@ -103,7 +103,7 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 	Action* action = dynamic_cast<Action*>(event);
 	if(!action)
 		return false;
-
+	
 	int value;
 	if(readXMLInteger(p,"itemid",value)){
 		useItemMap[value] = action;
@@ -117,7 +117,7 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 	else{
 		return false;
 	}
-
+	
 	return true;
 }
 
@@ -210,7 +210,7 @@ bool Actions::executeUse(Action* action, Player* player, Item* item,
 
 ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 	uint8_t index, Item* item, uint32_t creatureId)
-{
+{	
 	bool foundAction = (getAction(item) != NULL);
 
 	//check if it is a house door
@@ -219,7 +219,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 			return RET_CANNOTUSETHISOBJECT;
 		}
 	}
-
+	
 	int32_t stack = item->getParent()->__getIndexOfThing(item);
 	PositionEx posEx(pos, stack);
 
@@ -238,7 +238,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 			return RET_NOERROR;
 		}
 	}
-
+	
 	action = getAction(item, ACTION_ITEMID);
 	if(action){
 		//only continue with next action in the list if the previous returns false
@@ -267,7 +267,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 
 		return RET_NOERROR;
 	}
-
+	
 	//if it is a container try to open it
 	if(Container* container = item->getContainer()){
 		if(openContainer(player, container, index)){
@@ -284,11 +284,11 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 
 bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	Item* item, bool isHotkey)
-{
+{	
 	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
 		return false;
 	}
-
+	
 	if(isHotkey){
 		int32_t subType = -1;
 		if(item->hasSubType() && !item->hasCharges()){
@@ -301,7 +301,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 			player->sendCancelMessage(ret);
 			return false;
 		}
-
+		
 		showUseHotkeyMessage(player, item, itemCount);
 	}
 	else{
@@ -311,7 +311,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 			return false;
 		}
 	}
-
+	
 	player->setLastAction(OTSYS_TIME());
 	return true;
 }
@@ -453,9 +453,9 @@ void Actions::showUseHotkeyMessage(Player* player, Item* item, uint32_t itemCoun
 		ss << "Using the last " << item->getName() << "...";
 	}
 	else{
-		ss << "Using one of " << itemCount << " " << item->getPluralName() << "...";
+		ss << "Using one of " << itemCount << " " << item->getPluralName() << "..."; 
 	}
-
+	
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 }
 
@@ -512,7 +512,7 @@ bool Action::configureEvent(xmlNodePtr p)
 			setCheckLineOfSight(false);
 		}
 	}
-
+	
 	return true;
 }
 
@@ -547,21 +547,21 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
 	//onUse(cid, item1, position1, item2, position2)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-
+	
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
 		desc << player->getName() << " - " << item->getID() << " " << fromPos << "|" << toPos;
 		env->setEventDesc(desc.str());
 		#endif
-
+	
 		env->setScriptId(m_scriptId, m_scriptInterface);
 		env->setRealPos(player->getPosition());
-
+	
 		uint32_t cid = env->addThing(player);
 		uint32_t itemid1 = env->addThing(item);
-
+	
 		lua_State* L = m_scriptInterface->getLuaState();
-
+	
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 		LuaScriptInterface::pushThing(L, item, itemid1);
@@ -578,10 +578,10 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
 			Position posEx;
 			LuaScriptInterface::pushPosition(L, posEx, 0);
 		}
-
+	
 		int32_t result = m_scriptInterface->callFunction(5);
 		m_scriptInterface->releaseScriptEnv();
-
+		
 		return (result == LUA_TRUE);
 	}
 	else{

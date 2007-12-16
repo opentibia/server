@@ -22,7 +22,7 @@
 #define __OTSERV_TOOLS_H__
 
 #include "otsystem.h"
-#include "consts.h"
+#include "const80.h"
 
 #include <string>
 #include <algorithm>

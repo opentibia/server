@@ -24,7 +24,7 @@
 
 
 #include "definitions.h"
-#include "consts.h"
+#include "const80.h"
 #include "enums.h"
 #include "itemloader.h"
 #include <map>
@@ -61,13 +61,10 @@ struct Abilities{
 		absorbPercentPhysical = 0;
 		absorbPercentFire = 0;
 		absorbPercentEnergy = 0;
-		absorbPercentEarth = 0;
+		absorbPercentPoison = 0;
 		absorbPercentLifeDrain = 0;
 		absorbPercentManaDrain = 0;
 		absorbPercentDrown = 0;
-		absorbPercentIce = 0;
-		absorbPercentHoly = 0;
-		absorbPercentDeath = 0;
 
 		memset(skills, 0, sizeof(skills));
 
@@ -93,13 +90,16 @@ struct Abilities{
 	uint8_t absorbPercentPhysical;
 	uint8_t absorbPercentFire;
 	uint8_t absorbPercentEnergy;
-	uint8_t absorbPercentEarth;
+	uint8_t absorbPercentPoison;
 	uint8_t absorbPercentLifeDrain;
 	uint8_t absorbPercentManaDrain;
 	uint8_t absorbPercentDrown;
+	/*
+	uint8_t absorbPercentEarth;
 	uint8_t absorbPercentIce;
 	uint8_t absorbPercentHoly;
 	uint8_t absorbPercentDeath;
+	*/
 
 	//extra skill modifiers
 	int32_t skills[SKILL_LAST + 1];

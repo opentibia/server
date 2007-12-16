@@ -87,7 +87,7 @@ struct CombatParams{
 	bool blockedByShield;
 	bool targetCasterOrTopMost;
 	bool isAggressive;
-	uint32_t itemId;
+	int32_t itemId;
 	uint8_t impactEffect;
 	uint8_t distanceEffect;
 

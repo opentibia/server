@@ -4365,7 +4365,7 @@
 	<item id="2014" article="a" name="jug">
 		<attribute key="weight" value="750"/>
 	</item>
-	<item id="2015" article="a" name="brown flask">
+	<item id="2015" article="a" name="beer bottle">
 		<attribute key="weight" value="250"/>
 	</item>
 	<item id="2016" article="a" name="pool">
@@ -4474,16 +4474,16 @@
 	<item id="2046" article="a" name="lamp">
 		<attribute key="weight" value="3000"/>
 	</item>
-	<item id="2047" article="a" name="candlestick">
+	<item id="2047" article="a" name="candle">
 		<attribute key="weight" value="300"/>
 		<attribute key="stopduration" value="1"/>
 	</item>
-	<item id="2048" article="a" name="candlestick">
+	<item id="2048" article="a" name="candle">
 		<attribute key="weight" value="300"/>
 		<attribute key="decayTo" value="2049"/>
 		<attribute key="duration" value="240"/>
 	</item>
-	<item id="2049" article="a" name="candlestick">
+	<item id="2049" article="a" name="candle">
 		<attribute key="weight" value="200"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="60"/>
@@ -7514,7 +7514,7 @@
 	<item id="2790" name="mushrooms" plural="mushrooms">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="2791" name="wood mushroom" plural="wood mushrooms">
+	<item id="2791" name="mushrooms" plural="mushrooms">
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2792" article="a" name="dark mushroom" plural="dark mushrooms">

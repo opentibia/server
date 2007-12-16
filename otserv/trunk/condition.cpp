@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-//
+// 
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -173,9 +173,6 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_FIRE:
 		case CONDITION_ENERGY:
 		case CONDITION_DROWN:
-		case CONDITION_FREEZING:
-		case CONDITION_DAZZLED:
-		case CONDITION_CURSED:
 		{
 			return new ConditionDamage(_id, _type);
 			break;
@@ -251,7 +248,7 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 Condition* Condition::createCondition(PropStream& propStream)
 {
 	uint8_t attr;
-
+	
 	if(!propStream.GET_UCHAR(attr) || attr != CONDITIONATTR_TYPE){
 		return NULL;
 	}
@@ -336,18 +333,18 @@ uint32_t ConditionGeneric::getIcons() const
 		case CONDITION_MANASHIELD:
 			return ICON_MANASHIELD;
 			break;
-
+		
 		case CONDITION_INFIGHT:
 			return ICON_SWORDS;
 			break;
-
+		
 		case CONDITION_DRUNK:
 			return ICON_DRUNK;
 			break;
-
+		
 		case CONDITION_EXHAUSTED:
 			break;
-
+		
 		default:
 			break;
 	}
@@ -362,7 +359,7 @@ ConditionAttributes::ConditionAttributes(ConditionId_t _id, ConditionType_t _typ
 	currentStat = 0;
 	memset(skills, 0, sizeof(skills));
 	memset(stats, 0, sizeof(stats));
-	memset(statsPercent, 0, sizeof(statsPercent));
+	memset(statsPercent, 0, sizeof(statsPercent));	
 }
 
 void ConditionAttributes::addCondition(Creature* creature, const Condition* addCondition)
@@ -371,7 +368,7 @@ void ConditionAttributes::addCondition(Creature* creature, const Condition* addC
 		if(addCondition->getTicks() > ticks){
 			ticks = addCondition->getTicks();
 		}
-
+		
 		const ConditionAttributes& conditionAttrs = static_cast<const ConditionAttributes&>(*addCondition);
 
 		if(Player* player = creature->getPlayer()){
@@ -383,7 +380,7 @@ void ConditionAttributes::addCondition(Creature* creature, const Condition* addC
 				player->setVarStats((stats_t)i, -stats[i]);
 			}
 		}
-
+		
 		memcpy(skills, conditionAttrs.skills, sizeof(skills));
 		memcpy(stats, conditionAttrs.stats, sizeof(stats));
 		memcpy(statsPercent, conditionAttrs.statsPercent, sizeof(statsPercent));
@@ -745,7 +742,7 @@ void ConditionRegeneration::addCondition(Creature* creature, const Condition* ad
 		if(addCondition->getTicks() > ticks){
 			ticks = addCondition->getTicks();
 		}
-
+		
 		const ConditionRegeneration& conditionRegen = static_cast<const ConditionRegeneration&>(*addCondition);
 
 		healthTicks = conditionRegen.healthTicks;
@@ -945,7 +942,7 @@ void ConditionSoul::addCondition(Creature* creature, const Condition* addConditi
 		if(addCondition->getTicks() > ticks){
 			ticks = addCondition->getTicks();
 		}
-
+		
 		const ConditionSoul& conditionSoul = static_cast<const ConditionSoul&>(*addCondition);
 
 		soulTicks = conditionSoul.soulTicks;
@@ -1101,7 +1098,7 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 			forceUpdate = (value != 0);
 			return true;
 			break;
-		}
+		}		
 
 		case CONDITIONPARAM_DELAYED:
 		{
@@ -1160,7 +1157,7 @@ xmlNodePtr ConditionDamage::serialize()
 
 	for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); ++it){
 		xmlNodePtr nodeValueListNode = xmlNewNode(NULL, (const xmlChar*)"damage");
-
+		
 		ss.str("");
 		ss << (*it).timeLeft;
 		xmlSetProp(nodeValueListNode, (const xmlChar*)"duration", (const xmlChar*)ss.str().c_str());
@@ -1294,7 +1291,7 @@ void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 		damageInfo.interval = time;
 		damageInfo.timeLeft = time;
 		damageInfo.value = value;
-
+		
 		damageList.push_back(damageInfo);
 		if(getTicks() != -1){
 			setTicks(getTicks() + damageInfo.interval);
@@ -1379,7 +1376,7 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 
 			doDamage(creature, damage);
 		}
-
+		
 		if(!bRemove){
 			interval = 0;
 		}
@@ -1427,21 +1424,9 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 			break;
 
 		case CONDITION_POISON:
-			combatType = COMBAT_EARTHDAMAGE;
+			combatType = COMBAT_POISONDAMAGE;
 			break;
-
-		case CONDITION_FREEZING:
-			combatType = COMBAT_ICEDAMAGE;
-			break;
-
-		case CONDITION_DAZZLED:
-			combatType = COMBAT_HOLYDAMAGE;
-			break;
-
-		case CONDITION_CURSED:
-			combatType = COMBAT_DEATHDAMAGE;
-			break;
-
+		
 		default:
 			break;
 	}
@@ -1482,7 +1467,7 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 			}
 
 			damageList = conditionDamage.damageList;
-
+			
 			if(init()){
 				if(!damageList.empty()){
 					//restore last timeLeft
@@ -1535,19 +1520,7 @@ uint32_t ConditionDamage::getIcons() const
 		case CONDITION_POISON:
 			return ICON_POISON;
 			break;
-
-		case CONDITION_FREEZING:
-			return ICON_FREEZING;
-			break;
-
-		case CONDITION_DAZZLED:
-			return ICON_DAZZLED;
-			break;
-
-		case CONDITION_CURSED:
-			return ICON_CURSED;
-			break;
-
+			
 		default:
 			break;
 	}
@@ -1808,7 +1781,7 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 			getFormulaValues(creature->getBaseSpeed(), min, max);
 			speedDelta = random_range(min, max);
 		}
-
+		
 		int32_t newSpeedChange = (speedDelta - oldSpeedDelta);
 		if(newSpeedChange != 0){
 			g_game.changeSpeed(creature, newSpeedChange);
@@ -1826,7 +1799,7 @@ uint32_t ConditionSpeed::getIcons() const
 		case CONDITION_PARALYZE:
 			return ICON_PARALYZE;
 			break;
-
+		
 		default:
 			break;
 	}
@@ -1872,7 +1845,7 @@ xmlNodePtr ConditionOutfit::serialize()
 
 	for(std::vector<Outfit_t>::const_iterator it = outfits.begin(); it != outfits.end(); ++it){
 		xmlNodePtr nodeValueListNode = xmlNewNode(NULL, (const xmlChar*)"outfit");
-
+		
 		ss.str("");
 		ss << (*it).lookType;
 		xmlSetProp(nodeValueListNode, (const xmlChar*)"looktype", (const xmlChar*)ss.str().c_str());
@@ -1969,7 +1942,7 @@ bool ConditionOutfit::serialize(PropWriteStream& propWriteStream)
 	if(!Condition::serialize(propWriteStream)){
 		return false;
 	}
-
+	
 	for(std::vector<Outfit_t>::const_iterator it = outfits.begin(); it != outfits.end(); ++it){
 		propWriteStream.ADD_UCHAR(CONDITIONATTR_OUTFIT);
 		propWriteStream.ADD_VALUE(*it);
@@ -2033,7 +2006,7 @@ Condition(_id, _type, _ticks)
 	internalLightTicks = 0;
 	lightChangeInterval = 0;
 }
-
+	
 bool ConditionLight::startCondition(Creature* creature)
 {
 	internalLightTicks = 0;
@@ -2069,9 +2042,9 @@ void ConditionLight::addCondition(Creature* creature, const Condition* addCondit
 {
 	if(addCondition->getType() == conditionType){
 		const ConditionLight& conditionLight = static_cast<const ConditionLight&>(*addCondition);
-
+		
 		//replace old light values with the new ones
-
+		
 		lightInfo.level = conditionLight.lightInfo.level;
 		lightInfo.color = conditionLight.lightInfo.color;
 		uint32_t addTicks = conditionLight.getTicks();
