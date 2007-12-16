@@ -59,18 +59,19 @@ public:
 	static int32_t spellInFightTime;
 
 	static Position getCasterPosition(Creature* creature, Direction dir);
+	virtual std::string getScriptBaseName();
 
 protected:
 
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
-	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 
 	RunesMap runes;
 	InstantsMap instants;
-
+	
+	friend class CombatSpell;
 	LuaScriptInterface m_scriptInterface;
 };
 
@@ -87,15 +88,23 @@ public:
 	virtual bool castSpell(Creature* creature, Creature* target) = 0;
 };
 
-class CombatSpell : public BaseSpell{
+class CombatSpell : public Event, public BaseSpell{
 public:
 	CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection);
 	virtual ~CombatSpell(){};
 
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);
+	virtual bool configureEvent(xmlNodePtr p) {return true;}
 
-private:
+	//scripting
+	bool executeCastSpell(Creature* creature, const LuaVariant& var);
+
+	bool loadScriptCombat();
+	Combat* getCombat() {return combat;}
+
+protected:
+	virtual std::string getScriptEventName() {return "onCastSpell";}
 	bool needDirection;
 	bool needTarget;
 	Combat* combat;

@@ -28,6 +28,7 @@
 #include "commands.h"
 #include "monsters.h"
 #include "configmanager.h"
+#include "const.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -35,6 +36,7 @@
 #include <sstream>
 
 extern Game g_game;
+extern Spells* g_spells;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
 extern ConfigManager g_config;
@@ -316,15 +318,43 @@ Position Spells::getCasterPosition(Creature* creature, Direction dir)
 }
 
 
-CombatSpell::CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection)
+CombatSpell::CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection) :
+Event(&g_spells->getScriptInterface())
 {
 	combat =_combat;
 	needTarget = _needTarget;
 	needDirection = _needDirection;
 }
 
+bool CombatSpell::loadScriptCombat()
+{
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		combat = env->getCombatObject(env->getLastCombatId());
+
+		env->resetCallback();
+		m_scriptInterface->releaseScriptEnv();
+	}
+
+	return (combat != NULL);
+}
+
 bool CombatSpell::castSpell(Creature* creature)
 {
+	if(m_scripted){
+		LuaVariant var;
+		var.type = VARIANT_POSITION;
+
+		if(needDirection){
+			var.pos = Spells::getCasterPosition(creature, creature->getDirection());
+		}
+		else{
+			var.pos = creature->getPosition();
+		}
+
+		return executeCastSpell(creature, var);
+	}
+
 	Position pos;
 
 	if(needDirection){
@@ -340,6 +370,30 @@ bool CombatSpell::castSpell(Creature* creature)
 
 bool CombatSpell::castSpell(Creature* creature, Creature* target)
 {
+	if(m_scripted){
+		LuaVariant var;
+
+		if(combat->hasArea()){
+			var.type = VARIANT_POSITION;
+
+			if(needTarget){
+				var.pos = target->getPosition();
+			}
+			else if(needDirection){
+				var.pos = Spells::getCasterPosition(creature, creature->getDirection());
+			}
+			else{
+				var.pos = creature->getPosition();
+			}
+		}
+		else{
+			var.type = VARIANT_NUMBER;
+			var.number = target->getID();
+		}
+
+		return executeCastSpell(creature, var);
+	}
+
 	if(combat->hasArea()){
 		if(needTarget){
 			combat->doCombat(creature, target->getPosition());
@@ -353,6 +407,40 @@ bool CombatSpell::castSpell(Creature* creature, Creature* target)
 	}
 
 	return true;
+}
+
+bool CombatSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
+{
+	//onCastSpell(cid, var)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << "onCastSpell - " << creature->getName();
+		env->setEventDesc(desc.str());
+		#endif
+
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(creature->getPosition());
+
+		lua_State* L = m_scriptInterface->getLuaState();
+
+		uint32_t cid = env->addThing(creature);
+
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		m_scriptInterface->pushVariant(L, var);
+
+		int32_t result = m_scriptInterface->callFunction(2);
+		m_scriptInterface->releaseScriptEnv();
+
+		return (result == LUA_NO_ERROR);
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. CombatSpell::executeCastSpell" << std::endl;
+		return false;
+	}
 }
 
 Spell::Spell()

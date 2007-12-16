@@ -141,6 +141,8 @@ public:
 	static bool loadGameState();
 	static bool saveGameState();
 
+	static uint32_t getLastCombatId() {return m_lastCombatId;}
+
 private:
 	typedef std::map<int32_t, Thing*> ThingMap;
 	typedef std::vector<const LuaVariant*> VariantVector;
@@ -541,6 +543,7 @@ protected:
 
 	lua_State* m_luaState;
 	std::string m_lastLuaError;
+
 private:
 
 	static ScriptEnviroment m_scriptEnv[16];
@@ -560,6 +563,7 @@ private:
 		int parameter;
 	};
 	uint32_t m_lastEventTimerId;
+
 	typedef std::map<uint32_t , LuaTimerEventDesc > LuaTimerEvents;
 	LuaTimerEvents m_timerEvents;
 
