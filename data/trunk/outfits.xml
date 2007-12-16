@@ -17,9 +17,6 @@
 	<outfit type="0" looktype="157" addons="3" name="Beggar"/>
 	<outfit type="0" looktype="158" addons="3" name="Shaman"/>
 	<outfit type="0" looktype="252" addons="3" name="Norsewoman"/>
-	<outfit type="0" looktype="269" addons="3" name="Nightmare Knight"/>
-	<outfit type="0" looktype="270" addons="3" name="Jester"/>
-	<outfit type="0" looktype="279" addons="3" name="Brotherhood"/>
 	<!-- Male outfits -->
 	<outfit type="1" looktype="128" addons="3" name="Citizen"/>
 	<outfit type="1" looktype="129" addons="3" name="Hunter"/>
@@ -37,9 +34,6 @@
 	<outfit type="1" looktype="153" addons="3" name="Beggar"/>
 	<outfit type="1" looktype="154" addons="3" name="Shaman"/>
 	<outfit type="1" looktype="251" addons="3" name="Norseman"/>
-	<outfit type="1" looktype="268" addons="3" name="Nightmare Knight"/>
-	<outfit type="1" looktype="273" addons="3" name="Jester"/>
-	<outfit type="1" looktype="278" addons="3" name="Brotherhood"/>
 	<!-- Archdemon -->
 	<outfit type="2" looktype="12" addons="3" name="Archdemon"/>
 	<!-- Elf outfits -->
