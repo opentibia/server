@@ -1,0 +1,244 @@
+============================================
+========== OpenTibia Server 0.6.0 ==========
+============================================
+===== www.otserv.org	www.otfans.net =====
+============================================
+
+
+What is this?
+	OTServ is a free MMORPG emulation, that creates a own gameworld server,
+	based on the CIPSoft's Tibia.
+
+How does it work?
+	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 7.8 and then 7.81.
+	OTServ is now played using Tibia 8.0.
+
+	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here 
+	http://web.telia.com/~u49016513/tibialoaderV143.zip or http://otfans.net/showthread.php?t=20767.
+
+	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
+	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier,
+	then go to Options and Network and tick off "Test Server Login". Then login with the
+	following:
+		Account Number: 111111
+		Password: tibia
+	And check it out. Once you are done, have a look around in the folders
+	and take a look at the config. :)
+
+	NEVER ever enter your real acc# and/or password when
+	not connecting to the CIP servers.
+	Then you are logged in.
+
+Whats New in 0.5.0?
+	- 7.8x Protocol
+	- Houses
+	- New binary map format OTBM
+	- Private channels
+	- New movement system (full inventory movements, stacktable items and more)
+	- Parcels, letters
+	- Follow and chase opponent
+	- Waiting list
+	- Day-Night cycles
+	- SQlite support
+
+Features?
+	- Full rearranged protocol and game system
+	- Actions (when using a tile or item)
+	- SQL databases (for accounts and players)
+	- Crash tracking
+	- Monsters
+	- OTB (You now dont have to convert your map, change any ID, new ID's are just stacked on top of older ID's!)
+	- VIP List
+	- Guild support
+	- Spawns (and Respawn)
+	- Commands
+	- Autowalk
+	- Rotatable items
+	- Enhanced items database
+	- Runes with charges
+	- Depots
+	- And more!
+
+How do I use this new stuff?
+	I'm just going over what might not be familiar to you here.
+
+	The word "actions" might be unfamiliar to you. What it is an action?
+	For instance when you click on a door it will open, or drinking mana-fluids.
+	There is other cool stuff such as SQL-support.
+	Binary map, well this seems quite new doesn't it. For a long time maps have been in xml format
+	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
+	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
+
+How do I compile OTServ?
+	OTServ stores accounts, players and some other tabelar info within relational database. It is very reliable
+	way which also provides huge possibilities of easy data management and manipulation. By default SQLite is
+	selected as database engine. It doesn't require any configuration from you, OTServ is configured for it by default and all what you need is to provide SQLite library for it.
+
+		Instructions to compile OTServ:
+			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
+			2. Compile your OTServ against SQLite:
+				a) On Windows use -lsqlite3
+				b) On POSIX systems use ./configure && make
+
+MySQL Server
+	By default OTServ uses SQLite database which doesn't require any configuration from you. However it is
+	possible to use MySQL database instead of SQLite - MySQL is more powerful database system which is
+	faster, more reliable and gives more possibilities. However MySQL is uses client-server structure which
+	means you will need MySQL server for it.
+
+
+		Instructions to setup a server:
+			1. Download XAMPP (not XAMPP Lite) (http://www.apachefriends.org/download.php?xampp-win32-1.5.3a-installer.exe)
+			2. Install
+			3. Open "xampp-control.exe"
+			4. Click on the buttons Start to open "MySQL" and "Apache"
+			5. Go on your browser and type in the address bar "localhost" or "127.0.0.1"
+			6. Find the name "phpmyadmin" and go to it
+			7. You will find some controls, make a database called "otserv"
+			8. Now you will be taken to the database, click the tab "SQL"
+			9. Goto the file named sample.sql, its in the folder this README is in.
+			10. Copy the text in that file and paste it in that text box on your browser then press ok ;)
+			11. SQL instructions have been executed and a sample account (Account number: 111111, Password: tibia) and player should be made.
+			12. Now go to your folder and open config.lua and make sure the SQL Stuff there is correct such as the mysql user and password ;).
+				Should be all correct for you anyway ;).
+			13. Start the server and login.
+
+		Instructions to compile OTServ with MySQL:
+			1. Download MySQL client libraries libraries from http://dev.mysql.com/ (or just install them from packages in your Linux distro).
+			2. Compile your OTServ against MySQL:
+				a) On Windows use -D__USE_MYSQL__ -lmysqlclient
+				b) On POSIX systems use ./configure --enable-mysql
+
+PostgreSQL Server
+	PostgreSQL is, after MySQL, probably most popular open-source database system. It provides huge possibilities and
+	better performance.
+
+		Instructions to compile OTServ with PostgreSQL driver:
+				a) On Windows use -D__USE_PGSQL__ -lpg
+				b) On POSIX systems use ./configure --enable-pgsql
+
+ODBC data sources
+	OTServ contains also ODBC database driver. It allows to connect throught unified ODBC connection mechanism
+	to any ODBC data source. It was first developed under Windows, but there are currently ODBC implementations
+	on various platforms (search for UnixODBC).
+
+	Note: under non-Windows OSes you will need to download UnixODBC. You most likely have it in your Linux
+	ditro repositories as unixodbc and unixodbc-dev packages.
+
+		Instructions to compile OTServ with ODBC driver:
+				a) On Windows use -D__USE_ODBC__ -lodbc
+				b) On POSIX systems use ./configure --enable-odbc
+
+SQLite with other drivers
+	By default any alternative driver like MySQL disables SQLite support. However sometimes you might want
+	to compile more then one driver into your server (then you choose which one you want to use in your
+	config.lua file).
+
+		Instructions to compile OTServ with SQLite and other drivers:
+			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
+			2. Compile your OTServ against SQLite:
+				a) On Windows use -D__USE_SQLITE__ -lsqlite3 -D__USE_MYSQL__ -lmysqlclient
+				b) On POSIX systems use ./configure --enable-mysql --enable-sqlite
+
+What about old XML files?
+	If you have your old database in XML format and want to switch to SQL database, there is XML2SQL project in our SVN tree.
+
+Different LUA configuration file
+	Default configuration file for OTServ is config.lua. In some cases you might need to use another name for 
+	it as config.lua might be ambiguous. OTServ can use otserv.lua file instead of config.lua file.
+
+		Instructions to compile OTServ to use otserv.lua config file:
+			a) On Windows use -D__LUA_NAME_ALTER__
+			b) On POSIX systems use ./configure --with-otconfig
+
+KDE KDevelop compilation
+	A graphical environment to program and compile otserv without any knowledge about the linux shell, it by 
+	default will run the configuration without any flag, with that I mean that will be compiled with XML and 
+	this can be easily changed opening the project and going to:
+		1. Project -> Project Options
+		2. Configure Options -> Configure arguents:
+			By default debuging enabled, and it will say:
+				--enable-debug=full
+				If you don't like or want it, you can delete it.
+		3. After (or replacing) --enable-debug=full you will write:
+			a) for MySQL:
+				--enable-mysql
+			b) for ODBC:
+				--enable-odbc
+		4. Extra
+			4.1 Different LUA configuration file
+				--with-otconfig
+
+If you find any problem using kdevelop file, please go to http://otserv.org/index.php?title=Compiling_with_KDevelop
+
+Problems?
+	The server is now stable nowadays, but if you do find bugs you can report them at the 
+	CVS Bug Report board on OTFans Forums (http://otfans.net/forumdisplay.php?f=52). If your 
+	server crashes, you should get a report generated at your Otserv folder named report.txt, 
+	you should also report this at the CVS Report Board, this report will help solving bugs a lot.
+
+Credits?
+	Tliff - Developer, some kind of project leader, Forum administrator
+	SimOne - Developer
+	Snack - Developer
+	Primer - Developer
+	Spin - Developer
+	Anstice - Developer
+	Pedro B. - Developer
+	Wrzasq - Developer
+	GriZzm0 - Scripting
+	Heliton - Scripting
+	Jiddo - Scripting
+	the fike - Developer (advisory/optimization)
+	Vitor - Developer (advisory/optimization)
+	Arkold Thos - Developer?, Linux porter
+	bruno - ODBC driver
+
+	Yorick - Fansite , Forum administrator
+	Pekay - README Documentation, Forum administrator
+	Nuker - Forum administrator
+	verkon - Forum administrator
+
+	Shi'Voc - Initial project developer (Inactive)
+	Acrimon - Initial project developer (Inactive)
+	Reebow - Developer, special protocol support (Inactive)
+	Aire - Developer (Inactive)
+	Haktivex - Developer (Inactive)
+	Fandoras - Developer (Inactive)
+	TiMMit - Developer (Inactive)
+	Decar - Fansite (Inactive)
+	Matkus - Developer (Inactive)
+	Privateer - Documentation on the protocol (Inactive)
+	Torvik - Item list (Inactive)
+	j4K3xBl4sT3r - Developer (Inactive)
+	Smygflik - Developer (Inactive)
+
+	And special thanks to all otfans.net moderators.
+
+Help?
+	We always need help. Post on the forum:
+	OTFans - http://otfans.net
+		English community, the official site of OpenTibia.
+
+	OTserv Wiki - http://www.otserv.org
+		OTServ Wiki, documentation resources, essential informtion.
+
+	OTServNews - http://otservnews.org/
+		Always latest news from OpenTibia world.
+
+	Want account maker for your server? Find one here:
+	OTServ-AAC - http://otserv-aac.info
+		Website that promotes "good" AAC scripts.
+
+	Need to promote your server? Put it on servers list:
+	OTServList - http://www.otservlist.org
+		Official OTServ list, you dont need any other ;).
+
+	Note that only websites mentioned in this document are treated as official support of OTServ.
+	No other websites are officialy affiliated with OTServ.
+
+Anything else?
+	Yes! There are utilities available as a seperate package soon at the sourceforge site
+	where the otserv project is, check out Releases there soon on best utilites that are
+	most helpful.
+	We have a chat room now as well on #otserv: http://otfans.net/javachat.php.
