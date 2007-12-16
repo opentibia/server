@@ -26,7 +26,7 @@
 #include <string>
 #include "luascript.h"
 #include "baseevents.h"
-#include "const80.h"
+#include "const.h"
 
 enum TalkActionResult_t{
 	//TALKACTION_NOTFOUND,

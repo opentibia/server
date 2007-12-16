@@ -29,7 +29,7 @@
 #include "talkaction.h"
 #include "baseevents.h"
 #include "combat.h"
-#include "const80.h"
+#include "const.h"
 
 class Weapon;
 class WeaponMelee;

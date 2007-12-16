@@ -50,9 +50,9 @@ enum stackPosType_t{
 };
 
 enum WorldType_t {
-	WORLD_TYPE_NO_PVP,
-	WORLD_TYPE_PVP,
-	WORLD_TYPE_PVP_ENFORCED,
+	WORLD_TYPE_NO_PVP = 1,
+	WORLD_TYPE_PVP = 2,
+	WORLD_TYPE_PVP_ENFORCED = 3
 };
 
 enum GameState_t {
@@ -72,7 +72,7 @@ enum LightState_t {
 
 /**
   * Main Game class.
-  * This class is responsible to controll everything that happens
+  * This class is responsible to control everything that happens
   */
 
 class Game

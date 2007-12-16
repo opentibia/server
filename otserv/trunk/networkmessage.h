@@ -24,7 +24,7 @@
 
 #include "definitions.h"
 #include "otsystem.h"
-#include "const80.h"
+#include "const.h"
 #include "item.h"
 
 class Creature;

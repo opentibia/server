@@ -51,7 +51,7 @@ AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
 int32_t Player::maxMessageBuffer;
 
-Player::Player(const std::string& _name, Protocol80 *p) :
+Player::Player(const std::string& _name, ProtocolGame* p) :
 Creature()
 {
 	client = p;
@@ -1000,6 +1000,22 @@ void Player::sendCancelMessage(ReturnValue message) const
 
 	case RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS:
 		sendCancel("Turn secure mode off if you really want to attack unmarked players.");
+		break;
+
+	case RET_YOUNEEDPREMIUMACCOUNT:
+		sendCancel("You need a premium account to use this spell.");
+		break;
+
+	case RET_YOUNEEDTOLEARNTHISSPELL:
+		sendCancel("You need to learn this spell first.");
+		break;
+
+	case RET_YOURVOCATIONCANNOTUSETHISSPELL:
+		sendCancel("Your vocation cannot use this spell.");
+		break;
+
+	case RET_YOUNEEDAWEAPONTOUSETHISSPELL:
+		sendCancel("You need to equip a weapon to use this spell.");
 		break;
 
 	case RET_NOTPOSSIBLE:
