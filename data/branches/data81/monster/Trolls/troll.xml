@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="troll" nameDescription="a troll" race="blood" experience="20" speed="126" manacost="290">
+  <health now="50" max="50"/>
+  <look type="15" head="20" body="30" legs="40" feet="50" corpse="5960"/>
+  <targetchange interval="2000" chance="0"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="1"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="1"/>
+    <flag pushable="1"/>
+    <flag canpushitems="0"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="15"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="1500" skill="15" attack="10"/>
+  </attacks>
+  <defenses armor="6" defense="8"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Grrrr"/>
+    <voice sentence="Groar"/>
+    <voice sentence="Gruntz!"/>
+    <voice sentence="Hmmm, bugs."/>
+    <voice sentence="Hmmm, dogs."/>
+  </voices>
+  <loot>
+    <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
+    <item id="2148" countmax="10" chance1="100000" chancemax="0"/>
+    <item id="2389" countmax="1" chance1="33333" chancemax="0"/>
+    <item id="2643" chance="10000"/>
+    <item id="2461" chance="20000"/>
+    <item id="2120" chance="23333"/>
+    <item id="2172" chance="3333"/>
+    <item id="1987" chance="100000">
+      <inside>
+        <item id="2512" chance="6666"/>
+        <item id="2666" countmax="2" chance1="30000" chancemax="0"/>
+        <item id="2380" chance="10000"/>
+        <item id="2170" chance="1428"/>
+        <item id="2448" chance="10000"/>
+      </inside>
+    </item>
+  </loot>
+</monster>

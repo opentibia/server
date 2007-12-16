@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="dipthrah" nameDescription="a dipthrah" race="UNDEAD" experience="2900" speed="320" manacost="0">
+  <health now="4200" max="4200"/>
+  <look type="87" head="20" body="30" legs="40" feet="50" corpse="6031"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="1"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" min="-0" max="-800" poison="65"/>
+
+    <attack name="lifedrain" interval="4000" chance="20" range="1" min="-100" max="-800"/>
+
+    <attack name="manadrain" interval="2000" chance="15" range="7" min="-100" max="-500">
+      <attribute key="areaEffect" value="redshimmer"/>
+    </attack>
+
+    <attack name="speed" interval="1000" chance="15" range="7" speedchange="-650" duration="50000">
+      <attribute key="areaEffect" value="redshimmer"/>
+    </attack>
+
+    <attack name="drunk" interval="1000" chance="12" radius="7" target="0">
+      <attribute key="areaEffect" value="bluebubble"/>
+    </attack>
+
+    <attack name="melee" interval="3000" chance="34" radius="3" target="0" min="-50" max="-600">
+      <attribute key="areaEffect" value="bluebubble"/>
+    </attack>
+
+  </attacks>
+  <defenses armor="25" defense="25">
+    <defense name="healing" interval="1000" chance="25" min="100" max="200">
+      <attribute key="areaEffect" value="blueshimmer"/>
+    </defense>
+  </defenses>
+  <immunities>
+    <immunity physical="1"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="1"/>
+    <immunity paralyze="1"/>
+    <immunity outfit="1"/>
+    <immunity drunk="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <summons maxSummons="4">
+    <summon name="priestess" interval="2000" chance="15" max="3"/>
+  </summons>
+  <voices interval="5000" chance="10">
+    <voice sentence="Come closer to learn the final lesson."/>
+    <voice sentence="I sense the weakness of your akh."/>
+    <voice sentence="Mortality and fear are your fate and your doom."/>
+    <voice sentence="Undeath will shatter my shackles."/>
+    <voice sentence="You can't escape death forever."/>
+    <voice sentence="You don't need this magic anymore."/>
+    <voice sentence="Feel the powers of my mind."/>
+  </voices>
+  <loot>
+    <item id="2148" countmax="100" chance1="100000" chancemax="0"/>
+    <item id="2176" chance="2000"/>
+    <item id="2424" chance="100"/>
+    <item id="2148" countmax="100" chance1="100000" chancemax="0"/>
+    <item id="1987" chance="100000">
+      <inside>
+        <item id="2148" countmax="70" chance1="100000" chancemax="0"/>
+        <item id="2550" chance="10000"/>
+        <item id="2688" countmax="5" chance1="4000" chancemax="0"/>
+        <item id="2540" chance="333"/>
+        <item id="2539" chance="200"/>
+        <item id="2533" chance="1428"/>
+        <item id="2486" chance="1000"/>
+        <item id="2658" chance="100"/>
+        <item id="2189" chance="500"/>
+        <item id="2147" countmax="2" chance1="4000" chancemax="0"/>
+        <item id="2678" countmax="4" chance1="4000" chancemax="0"/>
+        <item id="2148" countmax="100" chance1="100000" chancemax="0"/>
+        <item id="2690" countmax="4" chance1="4000" chancemax="0"/>
+      </inside>
+    </item>
+  </loot>
+</monster>
