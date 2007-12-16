@@ -813,9 +813,10 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentFire = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentPoison") == 0){
+							else if(strcasecmp(strValue.c_str(), "absorbPercentPoison") == 0 ||
+									strcasecmp(strValue.c_str(), "absorbPercentEarth") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentPoison = intValue;
+									it.abilities.absorbPercentEarth = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentLifeDrain") == 0){
@@ -868,6 +869,23 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.conditionSuppressions |= CONDITION_DROWN;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "suppressFreeze") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
+									it.abilities.conditionSuppressions |= CONDITION_FREEZING;
+								}
+							}
+
+							else if(strcasecmp(strValue.c_str(), "suppressDazzle") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
+									it.abilities.conditionSuppressions |= CONDITION_DAZZLED;
+								}
+							}
+
+							else if(strcasecmp(strValue.c_str(), "suppressCurse") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
+									it.abilities.conditionSuppressions |= CONDITION_CURSED;
+								}
+							}
 							/*else if(strcasecmp(strValue.c_str(), "suppressManaDrain") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_MANADRAIN;
@@ -895,7 +913,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 									else if(strcasecmp(strValue.c_str(), "poison") == 0){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
-										combatType = COMBAT_POISONDAMAGE;
+										combatType = COMBAT_EARTHDAMAGE;
 									}
 									else if(strcasecmp(strValue.c_str(), "drown") == 0){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);
