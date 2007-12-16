@@ -27,13 +27,14 @@
 struct Wait{
 	uint32_t acc;
 	uint32_t ip;
-
+	std::string name;
 	int64_t timeout;
 	int slot;
 
-	Wait(uint32_t account, uint32_t ipnum, int place){
-		acc = account;
-		ip = ipnum;
+	Wait(const Player* player, int place){
+		name = player->getName();
+		acc = player->getAccount();
+		ip = player->getIP();
 		timeout = OTSYS_TIME();
 		slot = place;
 	};
@@ -51,18 +52,16 @@ public:
 	static Waitlist* instance();
 
 	bool clientLogin(const Player* player);
-	int getClientSlot(const Player* player);
-	int getTime(int slot){return 20;}
+	int32_t getClientSlot(const Player* player);
+	int32_t getTime(int32_t slot);
 
 	OTSYS_THREAD_LOCKVAR waitListLock;
 
 protected:
 	Waitinglist waitList;
-
 	WaitinglistIterator findClient(const Player* player);
-	void addClient(const Player* player);
-
 	void cleanUpList();
+
 private:
 	static Waitlist* _Wait;
 };

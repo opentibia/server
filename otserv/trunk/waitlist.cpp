@@ -47,34 +47,21 @@ Waitlist* Waitlist::instance(){
 
 WaitinglistIterator Waitlist::findClient(const Player* player)
 {
-	int slot = 1;
-	WaitinglistIterator it;
-	for(it = waitList.begin(); it != waitList.end();) {
-		if((*it)->acc == player->getAccount() && (*it)->ip == player->getIP()){
-			(*it)->slot = slot; //update slot
-			(*it)->timeout = OTSYS_TIME(); //update timeout
+	for(WaitinglistIterator it = waitList.begin(); it != waitList.end();){
+		if( (*it)->acc == player->getAccount() && (*it)->ip == player->getIP() &&
+		strcasecmp((*it)->name.c_str(), player->getName().c_str()) == 0){
+			(*it)->timeout = OTSYS_TIME();	//update timeout
 			return it;
 		}
 		else{
-			++it;	
-			slot++;
+			++it;
 		}
 	}
 	
 	return waitList.end();
 }
 
-void Waitlist::addClient(const Player* player)
-{
-	WaitinglistIterator it = findClient(player);
-	
-	if(it == waitList.end()){
-		Wait* wait = new Wait(player->getAccount(), player->getIP(), waitList.size()+1);
-		waitList.push_back(wait);
-	}
-}
-
-int Waitlist::getClientSlot(const Player* player)
+int32_t Waitlist::getClientSlot(const Player* player)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::getClientSlot()");
 	
@@ -91,47 +78,68 @@ int Waitlist::getClientSlot(const Player* player)
 	}
 }
 
+int32_t Waitlist::getTime(int32_t slot)
+{
+	if(slot < 5){
+		return 5;
+	}
+	else if(slot < 10){
+		return 10;
+	}
+	else if(slot < 20){
+		return 20;
+	}
+	else if(slot < 50){
+		return 60;
+	}
+	else{
+		return 240;
+	}
+}
+
 bool Waitlist::clientLogin(const Player* player)
 {		
 	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::clientLogin()");
+	
+	if(waitList.empty() && Status::instance()->getPlayersOnline() < Status::instance()->getMaxPlayersOnline()){
+		//no waiting list and enough room
+		return true;
+	}
 
-	Status* stat = Status::instance();	
-	
-	if(!stat->hasSlot()){
-		addClient(player);
-		return false;
-	}
-	else{
-		cleanUpList();
-		/**
-		For example: Client is in slot 3, maximum is 50 and its 48 online, 
-		then its not this clients turn to sign in...
-		But if its 47 online, let it sign in!
-		**/
-		WaitinglistIterator it = findClient(player);
-		
-		if(it != waitList.end()){
-			if(((*it)->slot + stat->getPlayersOnline()) <= stat->getMaxPlayersOnline()){ 
-				waitList.erase(it); //Should be able to sign in now, so lets erase it
-				return true;	
-			}
+	cleanUpList();
+
+	WaitinglistIterator it = findClient(player);	
+	if(it != waitList.end()){
+		if((Status::instance()->getPlayersOnline() + (*it)->slot) <= Status::instance()->getMaxPlayersOnline()){ 
+			//should be able to login now
+			delete *it;
+			waitList.erase(it);
+			return true;
 		}
-		else{ //Not in queue
-			return true;	
+		else{
+			//let them wait a bit longer
+			return false;
 		}
 	}
-	
+
+	Wait* wait = new Wait(player, waitList.size() + 1);
+	waitList.push_back(wait);
 	return false;
 }
 
 void Waitlist::cleanUpList()
 {
+	uint32_t newSlot = 1;
 	for(WaitinglistIterator it = waitList.begin(); it != waitList.end();){
+		(*it)->slot = newSlot;
+
 		if((OTSYS_TIME() - (*it)->timeout) > getTime((*it)->slot)*1.5*1000){
 			delete *it;
 			waitList.erase(it++);
 		}
-		else
+		else{
+			++newSlot;
 			++it;
+		}
 	}	
 }
