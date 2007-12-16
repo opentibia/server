@@ -3193,8 +3193,7 @@ bool Player::isInviting(const Player* player) const
 		return false;
 	}
 
-    PartyList::const_iterator it = std::find(player->invitingParties.begin(), player->invitingParties.end(), getParty());
-	return (it != player->invitingParties.end());
+	return getParty()->isPlayerInvited(player);
 }
 
 bool Player::isPartner(const Player* player) const
@@ -3222,49 +3221,49 @@ void Player::sendPlayerPartyIcons(Player* player, PartyShields_t shield)
 #endif
 }
 
-void Player::addPartyInvitation(Party* party)
+bool Player::addPartyInvitation(Party* party)
 {
 	if(!party){
-		return;
+		return false;
 	}
 
-	PartyList::iterator it = std::find(invitingParties.begin(), invitingParties.end(), party);
-	if(it == invitingParties.end()){
-		invitingParties.push_back(party);
-		party->invitations.push_back(this);
-		party->getLeader()->sendCreatureShield(this, SHIELD_WHITEBLUE);
-		sendCreatureShield(party->getLeader(), SHIELD_WHITEYELLOW);
+	PartyList::iterator it = std::find(invitePartyList.begin(), invitePartyList.end(), party);
+	if(it != invitePartyList.end()){
+		return false;
 	}
+
+	invitePartyList.push_back(party);
+	return true;
 }
 
-void Player::removePartyInvitation(Party* party)
+bool Player::removePartyInvitation(Party* party)
 {
 	if(!party){
-		return;
+		return false;
 	}
 
-	if(!invitingParties.empty()){
-		PartyList::iterator it = std::find(invitingParties.begin(), invitingParties.end(), party);
-		if(it != invitingParties.end()){
-			invitingParties.erase(it);
-			party->invitations.remove(this);
-			party->getLeader()->sendCreatureShield(this, SHIELD_NONE);
-			sendCreatureShield(party->getLeader(), SHIELD_NONE);
-		}
+	PartyList::iterator it = std::find(invitePartyList.begin(), invitePartyList.end(), party);
+	if(it != invitePartyList.end()){
+		invitePartyList.erase(it);
+		return true;
 	}
+
+	return false;
 }
 
 void Player::clearPartyInvitations()
 {
-	if(!invitingParties.empty()){
-		for(PartyList::iterator it = invitingParties.begin(); it != invitingParties.end(); ++it){
-			if(*it){
-				(*it)->getLeader()->sendCreatureShield(this, SHIELD_NONE);
-				(*it)->invitations.remove(this);
-				sendCreatureShield((*it)->getLeader(), SHIELD_NONE);
-			}
+	if(!invitePartyList.empty()){
+		PartyList list;
+		for(PartyList::iterator it = invitePartyList.begin(); it != invitePartyList.end(); ++it){
+			list.push_back(*it);
 		}
-		invitingParties.clear();
+
+		invitePartyList.clear();
+
+		for(PartyList::iterator it = list.begin(); it != list.end(); ++it){
+			(*it)->removeInvite(this);
+		}
 	}
 }
 

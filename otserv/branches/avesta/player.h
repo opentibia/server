@@ -316,8 +316,8 @@ public:
 	bool isInviting(const Player* player) const;
 	bool isPartner(const Player* player) const;
 	void sendPlayerPartyIcons(Player* player, PartyShields_t shield);
-	void addPartyInvitation(Party* party);
-	void removePartyInvitation(Party* party);
+	bool addPartyInvitation(Party* party);
+	bool removePartyInvitation(Party* party);
 	void clearPartyInvitations();
 
 #ifdef __SKULLSYSTEM__
@@ -626,7 +626,7 @@ protected:
 
 	//party variables
 	Party* party;
-	PartyList invitingParties;
+	PartyList invitePartyList;
 
 	struct SentStats{
 		int32_t health;

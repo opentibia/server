@@ -23,10 +23,13 @@
 
 #include "definitions.h"
 #include "const80.h"
-#include "player.h"
 
 #include <list>
-typedef std::list<Player*> PlayerList;
+
+class Player;
+class Party;
+
+typedef std::vector<Player*> PlayerVector;
 
 class Party
 {
@@ -38,23 +41,25 @@ public:
 	void setLeader(Player* _leader) {leader = _leader;}
 
 	void disband();
-	void invitePlayer(Player* player);
-	void joinParty(Player* player);
-	void revokeInvitation(Player* player);
-	void passPartyLeadership(Player* player);
-	void leaveParty(Player* player);
+	bool invitePlayer(Player* player);
+	bool joinParty(Player* player);
+	bool revokeInvitation(Player* player);
+	bool passPartyLeadership(Player* player);
+	bool leaveParty(Player* player);
+
+	bool removeInvite(Player* player);
 
 	bool isPlayerMember(const Player* player) const;
+	bool isPlayerInvited(const Player* player) const;
 	void updatePartyIcons(Player* player, PartyShields_t shield);
 	void updateInvitationIcons(Player* player, PartyShields_t shield);
 	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
-	void checkInvitationsAndMembers() { if(memberList.empty() && invitations.empty()) delete this; }
-
-	PlayerList invitations;
+	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 
 protected:
 	Player* leader;
-	PlayerList memberList;
+	PlayerVector memberList;
+	PlayerVector inviteList;
 };
 
 #endif

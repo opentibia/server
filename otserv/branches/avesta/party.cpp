@@ -20,6 +20,7 @@
 #include "otpch.h"
 
 #include "party.h"
+#include "player.h"
 
 #include <sstream>
 
@@ -34,35 +35,44 @@ Party::Party(Player* _leader)
 
 Party::~Party()
 {
-	disband();
 }
 
 void Party::disband()
 {
-	//This function is only called when the party is deleted
-	//And the party is deleted only when there are no members, nor invited players in it
-	//So all we need is to remove the leader
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, "The party has been disbanded.");
 	getLeader()->setParty(NULL);
 	getLeader()->sendPlayerPartyIcons(getLeader(), SHIELD_NONE);
 	setLeader(NULL);
+
+	for(uint32_t i = 0; i < inviteList.size(); ++i){
+		inviteList[i]->removePartyInvitation(this);
+	}
+	inviteList.clear();
+	
+	for(uint32_t i = 0; i < memberList.size(); ++i){
+		memberList[i]->setParty(NULL);
+	}
+	memberList.clear();
+
+	delete this;
 }
 
-void Party::invitePlayer(Player* player)
+bool Party::invitePlayer(Player* player)
 {
 	if(!player || player->isRemoved()){
-		checkInvitationsAndMembers();
-		return;
+		return false;
 	}
 
 	std::stringstream ss;
-	if(player->getParty()){
-		ss << player->getName() << " is already in a party.";
-		getLeader()->sendTextMessage(MSG_INFO_DESCR, ss.str());
-		checkInvitationsAndMembers();
-		return;
+
+	if(std::find(inviteList.begin(), inviteList.end(), player) != inviteList.end()){
+		//already on the invitation list
+		return false;
 	}
 
+	inviteList.push_back(player);
+	getLeader()->sendCreatureShield(player, SHIELD_WHITEBLUE);
+	player->sendCreatureShield(getLeader(), SHIELD_WHITEYELLOW);
 	player->addPartyInvitation(this);
 
 	ss << player->getName() << " has been invited.";
@@ -72,38 +82,60 @@ void Party::invitePlayer(Player* player)
 	ss << getLeader()->getName() << " has invited you to " <<
 		(getLeader()->getSex() == PLAYERSEX_FEMALE ? "her" : "his") << " party.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	return true;
 }
 
-void Party::joinParty(Player* player)
+bool Party::joinParty(Player* player)
 {
 	if(!player || player->isRemoved()){
-		checkInvitationsAndMembers();
-		return;
+		return false;
 	}
 
 	std::stringstream ss;
 	ss << player->getName() << " has joined the party.";
 	broadcastPartyMessage(MSG_INFO_DESCR, ss.str());
 
-	player->clearPartyInvitations();
-	player->setParty(this);
 	memberList.push_back(player);
+	player->setParty(this);
+
+	PlayerVector::iterator it = std::find(inviteList.begin(), inviteList.end(), player);
+	if(it != inviteList.end()){
+		inviteList.erase(it);
+	}
+	player->removePartyInvitation(this);
+
 	updatePartyIcons(player, SHIELD_BLUE);
 
 	ss.str("");
 	ss << "You have joined " << getLeader()->getName() << "'s party.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	return true;
 }
 
-void Party::revokeInvitation(Player* player)
+bool Party::removeInvite(Player* player)
 {
-	if(!player || player->isRemoved()){
-		checkInvitationsAndMembers();
-		return;
+	if(!player || player->isRemoved() || !isPlayerInvited(player)){
+		return false;
 	}
 
+	PlayerVector::iterator it = std::find(inviteList.begin(), inviteList.end(), player);
+	if(it != inviteList.end()){
+		inviteList.erase(it);
+	}
 	player->removePartyInvitation(this);
 
+	getLeader()->sendCreatureShield(player, SHIELD_NONE);
+	player->sendCreatureShield(getLeader(), SHIELD_NONE);
+
+	if(disbandParty()){
+		disband();
+	}
+
+	return true;
+}
+
+bool Party::revokeInvitation(Player* player)
+{
 	std::stringstream ss;
 	ss << getLeader()->getName() << " has revoked " <<
 		(getLeader()->getSex() == PLAYERSEX_FEMALE ? "her" : "his") << " invitation.";
@@ -112,18 +144,22 @@ void Party::revokeInvitation(Player* player)
 	ss.str("");
 	ss << "Invitation for " << player->getName() << " has been revoked.";
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	removeInvite(player);
 
-	checkInvitationsAndMembers();
+	return true;
 }
 
-void Party::passPartyLeadership(Player* player)
+bool Party::passPartyLeadership(Player* player)
 {
 	if(!player || getLeader() == player || !isPlayerMember(player)){
-		checkInvitationsAndMembers();
-		return;
+		return false;
 	}
 
-	memberList.remove(player); //Remove it before to broadcast the message correctly
+	 //Remove it before to broadcast the message correctly
+	PlayerVector::iterator it = std::find(memberList.begin(), memberList.end(), player);
+	if(it != memberList.end()){
+		memberList.erase(it);
+	}
 
 	std::stringstream ss;
 	ss << player->getName() << " is now the leader of the party.";
@@ -131,45 +167,78 @@ void Party::passPartyLeadership(Player* player)
 
 	Player* oldLeader = getLeader();
 	setLeader(player);
-
-	memberList.push_front(oldLeader);
+	
+	memberList.insert(memberList.begin(), oldLeader);
 	updateInvitationIcons(oldLeader, SHIELD_NONE);
+	updateInvitationIcons(getLeader(), SHIELD_WHITEYELLOW);
 	updatePartyIcons(oldLeader, SHIELD_BLUE);
 
 	updatePartyIcons(player, SHIELD_YELLOW);
-
 	player->sendTextMessage(MSG_INFO_DESCR, "You are now the leader of the party.");
+	return true;
 }
 
-void Party::leaveParty(Player* player)
+bool Party::leaveParty(Player* player)
 {
-	if(!player || !isPlayerMember(player) && getLeader() != player){
-		checkInvitationsAndMembers();
-		return;
+	if(!player){
+		return false;
 	}
 
+	if(!isPlayerMember(player) && getLeader() != player){
+		return false;
+	}
+
+	bool hasNoLeader = false;
 	if(getLeader() == player){
-		Player* newLeader = memberList.front();
-		passPartyLeadership(newLeader);
+		if(!memberList.empty()){
+			passPartyLeadership(memberList.front());
+		}
+		else{
+			hasNoLeader = true;
+		}
 	}
 
 	//Since we already passed the leadership, we remove the player from the list
-	memberList.remove(player);
+	PlayerVector::iterator it = std::find(memberList.begin(), memberList.end(), player);
+	if(it != memberList.end()){
+		memberList.erase(it);
+	}
+
+	it = std::find(inviteList.begin(), inviteList.end(), player);
+	if(it != inviteList.end()){
+		inviteList.erase(it);
+	}
+
 	player->sendTextMessage(MSG_INFO_DESCR, "You have left the party.");
 	player->setParty(NULL);
 	updatePartyIcons(player, SHIELD_NONE);
+	updateInvitationIcons(player, SHIELD_NONE);
 
 	std::stringstream ss;
 	ss << player->getName() << " has left the party.";
 	broadcastPartyMessage(MSG_INFO_DESCR, ss.str());
 
-	checkInvitationsAndMembers();
+	if(hasNoLeader || disbandParty()){
+		disband();
+	}
+
+	return true;
 }
 
 bool Party::isPlayerMember(const Player* player) const
 {
-	PlayerList::const_iterator it = std::find(memberList.begin(), memberList.end(), player);
+	PlayerVector::const_iterator it = std::find(memberList.begin(), memberList.end(), player);
 	if(it != memberList.end()){
+		return true;
+	}
+
+	return false;
+}
+
+bool Party::isPlayerInvited(const Player* player) const
+{
+	PlayerVector::const_iterator it = std::find(inviteList.begin(), inviteList.end(), player);
+	if(it != inviteList.end()){
 		return true;
 	}
 
@@ -179,7 +248,7 @@ bool Party::isPlayerMember(const Player* player) const
 void Party::updatePartyIcons(Player* player, PartyShields_t shield)
 {
 	if(!memberList.empty()){
-		for(PlayerList::iterator it = memberList.begin(); it != memberList.end(); ++it){
+		for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
 			(*it)->sendPlayerPartyIcons(player, shield);
 			if(shield != SHIELD_NONE){
 				player->sendPlayerPartyIcons((*it), SHIELD_BLUE); //Members are blue
@@ -189,6 +258,7 @@ void Party::updatePartyIcons(Player* player, PartyShields_t shield)
 			}
 		}
 	}
+
 	getLeader()->sendPlayerPartyIcons(player, shield);
 
 	if(shield != SHIELD_NONE){
@@ -197,13 +267,14 @@ void Party::updatePartyIcons(Player* player, PartyShields_t shield)
 	else{
 		player->sendPlayerPartyIcons(getLeader(), SHIELD_NONE);
 	}
+
 	player->sendPlayerPartyIcons(player, shield);
 }
 
 void Party::updateInvitationIcons(Player* player, PartyShields_t shield)
 {
-	if(!invitations.empty()){
-		for(PlayerList::iterator it = invitations.begin(); it != invitations.end(); ++it){
+	if(!inviteList.empty()){
+		for(PlayerVector::iterator it = inviteList.begin(); it != inviteList.end(); ++it){
 			(*it)->sendPlayerPartyIcons(player, shield);
 			if(shield != SHIELD_NONE){
 				player->sendPlayerPartyIcons((*it), SHIELD_WHITEBLUE);
@@ -217,16 +288,17 @@ void Party::updateInvitationIcons(Player* player, PartyShields_t shield)
 
 void Party::broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations /*= false*/)
 {
-	PlayerList::iterator it;
+	PlayerVector::iterator it;
 	if(!memberList.empty()){
 		for(it = memberList.begin(); it != memberList.end(); ++it){
 			(*it)->sendTextMessage(msgClass, msg);
 		}
 	}
+
 	getLeader()->sendTextMessage(msgClass, msg);
 
-	if(sendToInvitations && !invitations.empty()){
-		for(it = invitations.begin(); it != invitations.end(); ++it){
+	if(sendToInvitations && !inviteList.empty()){
+		for(it = inviteList.begin(); it != inviteList.end(); ++it){
 			(*it)->sendTextMessage(msgClass, msg);
 		}
 	}
