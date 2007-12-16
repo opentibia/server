@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="minotaur mage" nameDescription="a minotaur mage" race="blood" experience="150" speed="170" manacost="0">
+  <health now="155" max="155"/>
+  <look type="23" head="20" body="30" legs="40" feet="50" corpse="5981"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="4"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="18" attack="15"/>
+    <attack name="energy" interval="1000" chance="17" range="7" min="-15" max="-45">
+      <attribute key="shootEffect" value="energy"/>
+      <attribute key="areaEffect" value="energy"/>
+    </attack>
+    <attack name="fire" interval="2000" chance="10" range="7" radius="1" target="1" min="-35" max="-95">
+      <attribute key="shootEffect" value="fire"/>
+      <attribute key="areaEffect" value="firearea"/>
+    </attack>
+    <attack name="energyfield" interval="1000" chance="12" range="7" radius="1" target="1">
+      <attribute key="shootEffect" value="energy"/>
+    </attack>
+  </attacks>
+  <defenses armor="18" defense="20"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="1"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="1"/>
+    <immunity drunk="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="#W Learrn tha secrret uf deathhh!"/>
+    <voice sentence="Kaplar!"/>
+  </voices>
+  <loot>
+    <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
+    <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+    <item id="2050" chance="10000"/>
+    <item id="2461" chance="8000"/>
+    <item id="2649" chance="8000"/>
+    <item id="5878" countmax="1" chance1="5000" chancemax="0"/>
+    <item id="1987" chance="100000">
+      <inside>
+        <item id="2189" chance="1333" /> -- wand of cosmic energy
+        <item id="2404" chance="10000"/>
+        <item id="2362" countmax="5" chance1="20000" chancemax="0"/>
+        <item id="2817" chance="10000"/>
+        <item id="2311" chance="2857"/>
+        <item id="2465" chance="4000"/>
+        <item id="2648" chance="4000"/>
+        <item id="7425" chance="1000"/>
+      </inside>
+    </item>
+  </loot>
+</monster>
