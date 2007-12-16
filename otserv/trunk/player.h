@@ -170,7 +170,7 @@ public:
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
-	bool isMuted(uint32_t& muteTime);
+	uint32_t isMuted();
 	void addMessageBuffer();
 	void removeMessageBuffer();
 

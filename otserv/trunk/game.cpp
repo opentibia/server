@@ -2539,8 +2539,8 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	if(!player || player->isRemoved())
 		return false;
 
-	uint32_t muteTime;
-	if(player->isMuted(muteTime)){
+	uint32_t muteTime = muteTime = player->isMuted();
+	if(muteTime > 0){
 		std::stringstream ss;
 		ss << "You are still muted for " << muteTime << " seconds.";
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());

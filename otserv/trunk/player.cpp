@@ -1468,20 +1468,21 @@ void Player::onThink(uint32_t interval)
 #endif
 }
 
-bool Player::isMuted(uint32_t& muteTime)
+uint32_t Player::isMuted()
 {
 	if(hasFlag(PlayerFlag_CannotBeMuted)){
-		return false;
+		return 0;
 	}
 
-	Condition* condition = getCondition(CONDITION_MUTED, CONDITIONID_DEFAULT);
-	if(condition){
-		muteTime = std::max((uint32_t)1, (uint32_t)condition->getTicks() / 1000);
-		return true;
+	uint32_t muteTicks = 0;
+
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == CONDITION_MUTED && (*it)->getTicks() > muteTicks){
+			muteTicks = (*it)->getTicks();
+		}
 	}
 
-	muteTime = 0;
-	return false;
+	return ((uint32_t)muteTicks / 1000);
 }
 
 void Player::addMessageBuffer()
