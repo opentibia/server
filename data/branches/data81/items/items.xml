@@ -5364,9 +5364,9 @@
 		<attribute key="weight" value="120"/>
 	</item>
 	<item id="2268" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adori vita vis"/>
+		<attribute key="runeSpellName" value="adori gran mort"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="1"/>
+		<attribute key="charges" value="3"/>
 	</item>
 	<item id="2269" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5375,7 +5375,9 @@
 		<attribute key="weight" value="120"/>
 	</item>
 	<item id="2271" article="a" name="spell rune">
+		<attribute key="runeSpellName" value="adori frigo"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="5"/>
 	</item>
 	<item id="2272" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5386,7 +5388,9 @@
 		<attribute key="charges" value="1"/>
 	</item>
 	<item id="2274" article="a" name="spell rune">
+		<attribute key="runeSpellName" value="adori mas frigo"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2275" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5435,12 +5439,14 @@
 		<attribute key="charges" value="2"/>
 	</item>
 	<item id="2287" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adori"/>
+		<attribute key="runeSpellName" value="adori min vis"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="5"/>
+		<attribute key="charges" value="10"/>
 	</item>
 	<item id="2288" article="a" name="spell rune">
+		<attribute key="runeSpellName" value="adori mas tera"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2289" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo mas grav pox"/>
@@ -5458,9 +5464,9 @@
 		<attribute key="charges" value="1"/>
 	</item>
 	<item id="2292" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adevo res pox"/>
+		<attribute key="runeSpellName" value="adori tera"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="1"/>
+		<attribute key="charges" value="10"/>
 	</item>
 	<item id="2293" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo grav tera"/>
@@ -5496,7 +5502,7 @@
 	<item id="2302" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adori flam"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="2"/>
+		<attribute key="charges" value="5"/>
 	</item>
 	<item id="2303" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo mas grav flam"/>
@@ -5504,9 +5510,9 @@
 		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2304" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adori gran flam"/>
+		<attribute key="runeSpellName" value="adori mas flam"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="2"/>
+		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2305" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo mas flam"/>
@@ -5522,7 +5528,7 @@
 	<item id="2308" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo res flam"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="2"/>
+		<attribute key="charges" value="3"/>
 	</item>
 	<item id="2309" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5533,9 +5539,9 @@
 		<attribute key="charges" value="3"/>
 	</item>
 	<item id="2311" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adori gran"/>
+		<attribute key="runeSpellName" value="adori vis"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="5"/>
+		<attribute key="charges" value="10"/>
 	</item>
 	<item id="2312" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5543,13 +5549,15 @@
 	<item id="2313" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo mas hur"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="3"/>
+		<attribute key="charges" value="6"/>
 	</item>
 	<item id="2314" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
 	<item id="2315" article="a" name="spell rune">
+		<attribute key="runeSpellName" value="adori mas vis"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2316" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adana mort"/>

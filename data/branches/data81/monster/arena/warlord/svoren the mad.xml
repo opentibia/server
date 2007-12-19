@@ -20,7 +20,9 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-100" max="-440"/>
-    <attack name="paralyze" interval="3500" chance="35"/>
+    <attack name="speed" interval="3500" chance="35" radius="1" target="1" range="1" duration="40" speedchange="-250">
+		<attribute key="areaEffect" value="redshimmer"/>
+	</attack>
     <!--<attack name="dark music" interval="4300" chance="40" min="-20" max="-100" /> -->
   </attacks>
   <defenses armor="25" defense="27"/>

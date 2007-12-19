@@ -3149,7 +3149,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 					case COMBAT_ENERGYDAMAGE:
 					{
-						textColor = TEXTCOLOR_LIGHTBLUE;
+						textColor = TEXTCOLOR_PURPLE;
 						hitEffect = NM_ME_ENERGY_DAMAGE;
 						break;
 					}

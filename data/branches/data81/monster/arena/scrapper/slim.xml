@@ -18,11 +18,15 @@
     <flag targetdistance="1"/>
     <flag runonhealth="0"/>
   </flags>
-  <attacks>
-    <attack name="melee" interval="2000" min="-54" max="-170"/>
-  <attack name="poison field" interval="1000" chance="50" min="-5" max="-13"/>
-  <attack name="berserk" interval="3049" chance="40"/>
-  </attacks>
+	<attacks>
+		<attack name="melee" interval="2000" min="-54" max="-170"/>
+		<attack name="poisonfield" interval="1000" chance="50">
+			<attribute key="shootEffect" value="poison"/>
+		</attack>
+		<attack name="physical" interval="3049" chance="40" min="-10" max="-50">
+			<attribute key="areaEffect" value="blackSpark"/>
+		</attack>
+	</attacks>
   <defenses armor="36" defense="38"/>
   <immunities>
     <immunity physical="0"/>

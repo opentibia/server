@@ -9,7 +9,7 @@ function onCastSpell(cid, var)
 		newpos.y = newpos.y + 1
 		newpos.z = newpos.z - 1
 		doTeleportThing(cid, newpos)
-		doSendMagicEffect(pos, CONST_ME_ENERGYAREA)
+		doSendMagicEffect(pos, CONST_ME_TELEPORT)
 		return LUA_NO_ERROR
 	end
 	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)

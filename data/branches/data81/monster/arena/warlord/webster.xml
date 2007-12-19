@@ -20,13 +20,18 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-103" max="-210"/>
-    <attack name="paralyze" interval="3500" chance="65"/>
+    <attack name="speed" interval="3500" chance="65" radius="1" target="1" range="1" duration="40" speedchange="-500">
+		<attribute key="areaEffect" value="redshimmer"/>
+	</attack>
     <attack name="energy" interval="3000" chance="75" min="-13" max="-80" range="7">
 		<attribute key="shootEffect" value="energy"/>
 	</attack>
-    <attack name="haste" interval="4000" chance="65"/>
   </attacks>
-  <defenses armor="29" defense="34"/>
+  <defenses armor="29" defense="34">
+    <defense name="speed" interval="5000" chance="100" duration="2500" speedchange="500">
+		<attribute key="areaEffect" value="redshimmer"/>
+	</defense>
+	</defenses>
   <immunities>
     <immunity physical="0"/>
     <immunity energy="0"/>

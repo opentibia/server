@@ -451,7 +451,7 @@ Spell::Spell()
 	manaPercent = 0;
 	soul = 0;
 	range = -1;
-	exhaustion = false;
+	exhaustion = true;
 	needTarget = false;
 	needWeapon = false;
 	selfTarget = false;
@@ -1824,6 +1824,8 @@ Action(_interface)
 	hasCharges = true;
 	runeId = 0;
 	function = NULL;
+
+	allowFarUse = true;
 }
 
 RuneSpell::~RuneSpell()
@@ -1958,7 +1960,7 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		manaCost = convinceCreature->getMonster()->getManaCost();
 	}
 
-	if(player->getMana() < manaCost){
+	if(!player->hasFlag(PlayerFlag_HasInfiniteMana) && player->getMana() < manaCost){
 		player->sendCancelMessage(RET_NOTENOUGHMANA);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;

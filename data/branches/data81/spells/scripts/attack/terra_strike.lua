@@ -1,12 +1,12 @@
 local combat = createCombatObject()
-setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_FIREDAMAGE)
-setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_HITBYFIRE)
+setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_EARTHDAMAGE)
+setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_CARNIPHILA)
 setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, -0.4, 0, -0.5, 0)
 
 local distanceCombat = createCombatObject()
-setCombatParam(distanceCombat, COMBAT_PARAM_TYPE, COMBAT_FIREDAMAGE)
-setCombatParam(distanceCombat, COMBAT_PARAM_EFFECT, CONST_ME_HITBYFIRE)
-setCombatParam(distanceCombat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_FIRE)
+setCombatParam(distanceCombat, COMBAT_PARAM_TYPE, COMBAT_EARTHDAMAGE)
+setCombatParam(distanceCombat, COMBAT_PARAM_EFFECT, CONST_ME_CARNIPHILA)
+setCombatParam(distanceCombat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_SMALLEARTH)
 setCombatFormula(distanceCombat, COMBAT_FORMULA_LEVELMAGIC, -0.4, 0, -0.5, 0)
 
 function onCastSpell(cid, var)

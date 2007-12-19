@@ -7,7 +7,7 @@ function onUse(cid, item, frompos, item2, topos)
 	elseif (item.uid == 1001) then
 		-- 5 meats
 		parameters = {reward = {2666, 5}, storageValue = item.uid}
-	if (item.uid == 1002) then
+	elseif (item.uid == 1002) then
 		-- a key with actionId 2049
 		parameters = {reward = {2086, 1, 2149}, storageValue = item.uid}
 	elseif (item.uid == 1003) then

@@ -25,8 +25,12 @@
   </attack>	
  </attacks>
   <defenses armor="46" defense="44">
-    <defense name="haste" interval="5000" chance="100"/>
-    <defense name="light healing" interval="6000" chance="65" min="20" max="50" />   
+    <defense name="speed" interval="5000" chance="100" duration="2500" speedchange="500">
+		<attribute key="areaEffect" value="redshimmer"/>
+	</defense>
+    <defense name="healing" interval="6000" chance="65" min="20" max="50">  
+		<attribute key="areaEffect" value="blueshimmer"/>
+	</defense>
   </defenses>
   <immunities>
     <immunity physical="0"/>

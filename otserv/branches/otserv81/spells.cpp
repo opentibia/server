@@ -1865,6 +1865,7 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 	if(magLevel != -1){
 		//Change magic level in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);
+		iType.runeSpellName = getName();
 		iType.runeMagLevel = magLevel;
 		iType.charges = charges;
 	}
