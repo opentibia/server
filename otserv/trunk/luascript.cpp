@@ -1041,6 +1041,18 @@ void LuaScriptInterface::registerFunctions()
 	//getThingPos(uid)
 	lua_register(m_luaState, "getThingPos", LuaScriptInterface::luaGetThingPos);
 
+	//getTileItemById(pos, itemId, <optional> subType)
+	lua_register(m_luaState, "getTileItemById", LuaScriptInterface::luaGetTileItemById);
+	
+	//getTileItemByType(pos, type)
+	lua_register(m_luaState, "getTileItemByType", LuaScriptInterface::luaGetTileItemByType);
+
+	//getTileThingByPos(pos)
+	lua_register(m_luaState, "getTileThingByPos", LuaScriptInterface::luaGetTileThingByPos);
+
+	//getTopCreature(pos)
+	lua_register(m_luaState, "getTopCreature", LuaScriptInterface::luaGetTopCreature);
+
 	//doRemoveItem(uid, <optional> count)
 	lua_register(m_luaState, "doRemoveItem", LuaScriptInterface::luaDoRemoveItem);
 
@@ -1133,6 +1145,10 @@ void LuaScriptInterface::registerFunctions()
 	//doTileAddItemEx(pos, uid)
 	lua_register(m_luaState, "doTileAddItemEx", LuaScriptInterface::luaDoTileAddItemEx);
 
+	//doRelocate(pos, posTo)
+	//Moves all moveable objects from pos to posTo
+	lua_register(m_luaState, "doRelocate", LuaScriptInterface::luaDoRelocate);
+
 	//doCreateTeleport(teleportID, positionToGo, createPosition)
 	lua_register(m_luaState, "doCreateTeleport", LuaScriptInterface::luaDoCreateTeleport);
 
@@ -1157,7 +1173,7 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerSetVocation(cid, voc)
 	lua_register(m_luaState, "doPlayerSetVocation", LuaScriptInterface::luaDoPlayerSetVocation);
 
-	//doPlayerRemoveItem(cid, itemid, count)
+	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype)
 	lua_register(m_luaState, "doPlayerRemoveItem", LuaScriptInterface::luaDoPlayerRemoveItem);
 
 	//doPlayerAddExp(cid, exp)
@@ -1925,7 +1941,14 @@ int LuaScriptInterface::luaDoRemoveItem(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerRemoveItem(lua_State *L)
 {
-	//doPlayerRemoveItem(cid, itemid, count)
+	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype)
+	int32_t parameters = lua_gettop(L);
+
+	int32_t subType = -1;
+	if(parameters > 3){
+		subType = popNumber(L);
+	}
+
 	uint32_t count = popNumber(L);
 	uint16_t itemId = (uint16_t)popNumber(L);
 	uint32_t cid = popNumber(L);
@@ -1934,7 +1957,7 @@ int LuaScriptInterface::luaDoPlayerRemoveItem(lua_State *L)
 
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		if(g_game.removeItemOfType(player, itemId, count)){
+		if(g_game.removeItemOfType(player, itemId, count, subType)){
 			lua_pushnumber(L, LUA_TRUE);
 		}
 		else{
@@ -2012,16 +2035,15 @@ int LuaScriptInterface::luaDoSendDefaultCancel(lua_State *L)
 int LuaScriptInterface::luaDoTeleportThing(lua_State *L)
 {
 	//doTeleportThing(uid, newpos)
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 	uint32_t uid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 
 	Thing* tmp = env->getThingByUID(uid);
 	if(tmp){
-		if(g_game.internalTeleport(tmp,(Position&)pos) == RET_NOERROR){
+		if(g_game.internalTeleport(tmp, pos) == RET_NOERROR){
 			lua_pushnumber(L, LUA_NO_ERROR);
 		}
 		else{
@@ -2103,9 +2125,8 @@ int LuaScriptInterface::luaDoSendMagicEffect(lua_State *L)
 {
 	//doSendMagicEffect(pos, type)
 	uint32_t type = popNumber(L);
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	ScriptEnviroment* env = getScriptEnv();
 
@@ -2341,9 +2362,8 @@ int LuaScriptInterface::luaDoTileAddItemEx(lua_State *L)
 	//doTileAddItemEx(pos, uid)
 	uint32_t uid = (uint32_t)popNumber(L);
 
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	ScriptEnviroment* env = getScriptEnv();
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
@@ -2369,6 +2389,53 @@ int LuaScriptInterface::luaDoTileAddItemEx(lua_State *L)
 
 	ReturnValue ret = g_game.internalAddItem(tile, item);
 	lua_pushnumber(L, ret);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoRelocate(lua_State *L)
+{
+	//doRelocate(pos, posTo)
+	//Moves all moveable objects from pos to posTo
+
+	PositionEx toPos;
+	popPosition(L, toPos);
+
+	PositionEx fromPos;
+	popPosition(L, fromPos);
+	
+	ScriptEnviroment* env = getScriptEnv();
+
+	Tile* fromTile = g_game.getTile(fromPos.x, fromPos.y, fromPos.z);
+	if(!fromTile){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Tile* toTile = g_game.getTile(toPos.x, toPos.y, toPos.z);
+	if(!toTile){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+
+	int32_t thingCount = fromTile->getThingCount();
+	for(int32_t i = thingCount - 1; i >= 0; --i){
+		Thing* thing = fromTile->__getThing(i);
+		if(thing){
+			if(Item* item = thing->getItem()){
+				if(item->isPushable()){
+					g_game.internalTeleport(item, toPos);
+				}
+			}
+			else if(Creature* creature = thing->getCreature()){
+				g_game.internalTeleport(creature, toPos);
+			}
+		}
+	}
+
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2398,9 +2465,8 @@ int LuaScriptInterface::luaDoSendAnimatedText(lua_State *L)
 	//doSendAnimatedText(pos, text, color)
 	uint32_t color = popNumber(L);
 	std::string text = popString(L);
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	ScriptEnviroment* env = getScriptEnv();
 
@@ -2607,17 +2673,16 @@ int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
 	//	stackpos = 254. Get MagicFieldtItem
 	//	stackpos = 253. Get Creature
 
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	ScriptEnviroment* env = getScriptEnv();
 
 	Tile* tile = g_game.getMap()->getTile(pos);
-	Thing *thing = NULL;
+	Thing* thing = NULL;
 
 	if(tile){
-		if(stackpos == 255){
+		if(pos.stackpos == 255){
 			thing = tile->getTopCreature();
 
 			if(thing == NULL){
@@ -2626,14 +2691,14 @@ int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
 					thing = item;
 			}
 		}
-		else if(stackpos == 254){
+		else if(pos.stackpos == 254){
 			thing = tile->getFieldItem();
 		}
-		else if(stackpos == 253){
+		else if(pos.stackpos == 253){
 			thing = tile->getTopCreature();
 		}
 		else{
-			thing = tile->__getThing(stackpos);
+			thing = tile->__getThing(pos.stackpos);
 		}
 
 		if(thing){
@@ -2653,6 +2718,142 @@ int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
 	}
 }
 
+int LuaScriptInterface::luaGetTileItemById(lua_State *L)
+{
+	//getTileItemById(pos, itemId, <optional> subType)
+	ScriptEnviroment* env = getScriptEnv();
+
+	uint32_t parameters = lua_gettop(L);
+	
+	int32_t subType = -1;
+	if(parameters > 2){
+		subType = (int32_t)popNumber(L);
+	}
+
+	int32_t itemId = (int32_t)popNumber(L);
+
+	PositionEx pos;
+	popPosition(L, pos);
+
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);	
+	if(!tile){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	Item* item = g_game.findItemOfType(tile, itemId, false, subType);
+	if(!item){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	uint32_t uid = env->addThing(item);
+	pushThing(L, item, uid);
+	
+	return 1;
+}
+
+int LuaScriptInterface::luaGetTileItemByType(lua_State *L)
+{
+	//getTileItemByType(pos, type)
+
+	ScriptEnviroment* env = getScriptEnv();
+	
+	uint32_t rType = (uint32_t)popNumber(L);
+
+	if(rType <= ITEM_TYPE_NONE || rType > ITEM_TYPE_LAST){
+		reportErrorFunc("Not a valid item type");
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	PositionEx pos;
+	popPosition(L, pos);
+
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(!tile){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	for(uint32_t i = 0; i < tile->getThingCount(); ++i){
+		if(Item* item = tile->__getThing(i)->getItem()){
+			const ItemType& it = Item::items[item->getID()];
+			if(it.type == (ItemTypes_t) rType){
+				uint32_t uid = env->addThing(item);
+				pushThing(L, item, uid);
+				return 1;
+			}
+		}
+	}
+
+	pushThing(L, NULL, 0);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetTileThingByPos(lua_State *L)
+{
+	//getTileThingByPos(pos)
+	
+	PositionEx pos;
+	popPosition(L, pos);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(!tile){
+		if(pos.stackpos == -1){
+			lua_pushnumber(L, -1);
+			return 1;
+		}
+		else{
+			pushThing(L, NULL, 0);
+			return 1;
+		}
+	}
+
+	if(pos.stackpos == -1){
+		lua_pushnumber(L, tile->getThingCount());
+		return 1;
+	}
+
+	Thing* thing = tile->__getThing(pos.stackpos);
+	if(!thing){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	uint32_t uid = env->addThing(thing);
+	pushThing(L, thing, uid);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetTopCreature(lua_State *L)
+{
+	//getTopCreature(pos)
+
+	PositionEx pos;
+	popPosition(L, pos);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(!tile){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	Thing* thing = tile->getTopCreature();
+	if(!thing || !thing->getCreature()){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	uint32_t uid = env->addThing(thing);
+	pushThing(L, thing, uid);
+	return 1;
+}
+
 int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 {
 	//doCreateItem(itemid, <optional> type/count, pos)
@@ -2660,9 +2861,8 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 
 	uint32_t parameters = lua_gettop(L);
 
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	uint32_t count = 0;
 	if(parameters > 2){
@@ -2673,7 +2873,7 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 
-	Tile* tile = g_game.getMap()->getTile(pos);
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(!tile){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -2747,12 +2947,10 @@ int LuaScriptInterface::luaDoCreateItemEx(lua_State *L)
 int LuaScriptInterface::luaDoCreateTeleport(lua_State *L)
 {
 	//doCreateTeleport(teleportID, positionToGo, createPosition)
-	Position createPos;
-	uint32_t createStackpos;
-	popPosition(L, createPos, createStackpos);
-	Position toPos;
-	uint32_t toStackpos;
-	popPosition(L, toPos, toStackpos);
+	PositionEx createPos;
+	popPosition(L, createPos);
+	PositionEx toPos;
+	popPosition(L, toPos);
 	uint32_t itemId = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2918,9 +3116,8 @@ int LuaScriptInterface::luaDoSetItemSpecialDescription(lua_State *L)
 int LuaScriptInterface::luaGetTilePzInfo(lua_State *L)
 {
 	//getTilePzInfo(pos)
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	Tile *tile = g_game.getMap()->getTile(pos);
 
@@ -2942,9 +3139,8 @@ int LuaScriptInterface::luaGetTilePzInfo(lua_State *L)
 int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 {
 	//getTileHouseInfo(pos)
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	Tile *tile = g_game.getMap()->getTile(pos);
 	if(tile){
@@ -2971,9 +3167,8 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 {
 	//doSummonCreature(name, pos)
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 	const char* name = popString(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -3004,9 +3199,8 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
 {
 	//doPlayerSummonCreature(cid, name, pos)
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 	const char* name = popString(L);
 	uint32_t cid = popNumber(L);
 
@@ -3095,9 +3289,8 @@ int LuaScriptInterface::luaDoPlayerRemoveMoney(lua_State *L)
 int LuaScriptInterface::luaDoPlayerSetMasterPos(lua_State *L)
 {
 	//doPlayerSetMasterPos(cid, pos)
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 	popNumber(L);
 
 	reportErrorFunc("Deprecated function. Use doPlayerSetTown");
@@ -3580,9 +3773,8 @@ int LuaScriptInterface::luaQueryTileAddThing(lua_State *L)
 		flags = popNumber(L);
 	}
 
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 	uint32_t uid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -4150,9 +4342,8 @@ int LuaScriptInterface::luaDoAreaCombatHealth(lua_State *L)
 	int32_t minChange = (int32_t)popNumber(L);
 	uint32_t areaId = popNumber(L);
 
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	CombatType_t combatType = (CombatType_t)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
@@ -4236,9 +4427,8 @@ int LuaScriptInterface::luaDoAreaCombatMana(lua_State *L)
 	int32_t minChange = (int32_t)popNumber(L);
 	uint32_t areaId = popNumber(L);
 
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 
 	uint32_t cid = (uint32_t)popNumber(L);
 
@@ -4315,9 +4505,8 @@ int LuaScriptInterface::luaDoAreaCombatCondition(lua_State *L)
 	uint8_t effect = (uint8_t)popNumber(L);
 	uint32_t conditionId = popNumber(L);
 	uint32_t areaId = popNumber(L);
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -4409,9 +4598,8 @@ int LuaScriptInterface::luaDoAreaCombatDispel(lua_State *L)
 	uint8_t effect = (uint8_t)popNumber(L);
 	ConditionType_t dispelType = (ConditionType_t)popNumber(L);
 	uint32_t areaId = popNumber(L);
-	Position pos;
-	uint32_t stackpos;
-	popPosition(L, pos, stackpos);
+	PositionEx pos;
+	popPosition(L, pos);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -5662,10 +5850,10 @@ int LuaScriptInterface::luaDoSendDistanceShoot(lua_State *L)
 {
 	//doSendDistanceShoot(frompos, topos, type)
 	uint8_t type = (uint8_t)popNumber(L);
-	Position toPos; uint32_t tStack;
-	popPosition(L, toPos, tStack);
-	Position fromPos; uint32_t fStack;
-	popPosition(L, fromPos, fStack);
+	PositionEx toPos;
+	popPosition(L, toPos);
+	PositionEx fromPos;
+	popPosition(L, fromPos);
 
 	ScriptEnviroment* env = getScriptEnv();
 

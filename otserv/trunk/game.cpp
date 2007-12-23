@@ -322,7 +322,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 				}
 			}
 
-			return findItemOfType(player, it.id, subType);
+			return findItemOfType(player, it.id, true, subType);
 		}
 		//inventory
 		else{
@@ -728,14 +728,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 		return ret;
 	}
 
-	//check if the creature is a player and if it is pzlocked and tries to move to a pZone
-	Player* player = creature->getPlayer();
-	if(player){
-		if(player->isPzLocked() && toCylinder->getTile()->hasFlag(TILESTATE_PROTECTIONZONE)){
-			return RET_PLAYERISPZLOCKED;
-		}
-	}
-
 	fromCylinder->getTile()->moveCreature(creature, toCylinder);
 
 	int32_t index = 0;
@@ -1102,7 +1094,8 @@ ReturnValue Game::internalPlayerAddItem(Player* player, Item* item)
 	return RET_NOERROR;
 }
 
-Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType /*= -1*/)
+Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
+	bool depthSearch /*= true*/, int32_t subType /*= -1*/)
 {
 	if(cylinder == NULL){
 		return false;
@@ -1122,7 +1115,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 			else{
 				++i;
 
-				if((tmpContainer = item->getContainer())){
+				if(depthSearch && (tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1404,7 +1397,7 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 
 Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 {
-	if(item->getID() == newId && count == -1)
+	if(item->getID() == newId && (count == -1 || count == item->getItemCountOrSubtype()))
 		return item;
 
 	Cylinder* cylinder = item->getParent();
@@ -1428,45 +1421,61 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 	const ItemType& curType = Item::items[item->getID()];
 	const ItemType& newType = Item::items[newId];
 
-	if(curType.type == newType.type){
-		//same type, update count variable only
-		if(curType.id == newType.id){
-			if((item->isStackable() || item->getItemCharge() > 0) && count == 0){
-				internalRemoveItem(item);
-				return NULL;
-			}
-			else{
-				cylinder->__updateThing(item, count);
-				return item;
-			}
+	if(curType.alwaysOnTop != newType.alwaysOnTop){
+		//This only occurs when you transform items on tiles from a downItem to a topItem (or vice versa)
+		//Remove the old, and add the new
+
+		ReturnValue ret = internalRemoveItem(item);
+		if(ret != RET_NOERROR){
+			return item;
 		}
-		//replace item id (and subtype)
+
+		Item* newItem = NULL;
+		if(count == -1){
+			newItem = Item::CreateItem(newId);
+		}
 		else{
-			if((item->isStackable() || item->getItemCharge() > 0) && count == 0){
-				internalRemoveItem(item);
-				return NULL;
-			}
-			else{
-				cylinder->postRemoveNotification(item, itemIndex, true);
-				
+			newItem = Item::CreateItem(newId, count);
+		}
+
+		ret = internalAddItem(cylinder, newItem, INDEX_WHEREEVER);
+		if(ret != RET_NOERROR){
+			delete newItem;
+			return NULL;
+		}
+
+		return newItem;
+	}
+
+	if(curType.type == newType.type){
+		//Both items has the same type so we can safely change id/subtype
+
+		if((item->isStackable() || item->hasCharges() ) && count == 0){
+			internalRemoveItem(item);
+			return NULL;
+		}
+		else{
+			cylinder->postRemoveNotification(item, itemIndex, true);
+
+			if(curType.id != newType.id){
 				if(newType.group != curType.group){
 					item->setDefaultSubtype();
 				}
 
 				item->setID(newId);
-
-				if(count != -1 && item->hasSubType()){
-					item->setItemCountOrSubtype(count);
-				}
-
-				cylinder->__updateThing(item, item->getItemCountOrSubtype());
-				cylinder->postAddNotification(item, itemIndex);
-				return item;
 			}
+
+			if(count != -1 && item->hasSubType()){
+				item->setItemCountOrSubtype(count);
+			}
+
+			cylinder->__updateThing(item, item->getItemCountOrSubtype());
+			cylinder->postAddNotification(item, itemIndex);
+			return item;
 		}
 	}
 	else{
-		//replace whole item
+		//Replacing the the old item with the new while maintaining the old position
 		Item* newItem = NULL;
 		if(count == -1){
 			newItem = Item::CreateItem(newId);

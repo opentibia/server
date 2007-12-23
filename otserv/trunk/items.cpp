@@ -222,10 +222,12 @@ int Items::loadFromOtb(std::string file)
 			case ITEM_GROUP_MAGICFIELD:
 				iType->type = ITEM_TYPE_MAGICFIELD;
 				break;
+			case ITEM_GROUP_TELEPORT:
+				iType->type = ITEM_TYPE_TELEPORT;
+				break;
 			case ITEM_GROUP_NONE:
 			case ITEM_GROUP_GROUND:
 			case ITEM_GROUP_RUNE:
-			case ITEM_GROUP_TELEPORT:
 			case ITEM_GROUP_SPLASH:
 			case ITEM_GROUP_FLUID:
 				break;

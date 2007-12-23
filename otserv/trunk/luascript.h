@@ -342,6 +342,7 @@ protected:
 	static int luaDoPlayerAddItem(lua_State *L);
 	static int luaDoPlayerAddItemEx(lua_State *L);
 	static int luaDoTileAddItemEx(lua_State *L);
+	static int luaDoRelocate(lua_State *L);
 	static int luaDoPlayerSendTextMessage(lua_State *L);
 	static int luaDoPlayerRemoveMoney(lua_State *L);
 	static int luaDoPlayerSetMasterPos(lua_State *L);
@@ -363,6 +364,11 @@ protected:
 	static int luaGetThingfromPos(lua_State *L);
 	static int luaGetThing(lua_State *L);
 	static int luaGetThingPos(lua_State *L);
+	static int luaGetTileItemById(lua_State *L);
+	static int luaGetTileItemByType(lua_State *L);
+	static int luaGetTileThingByPos(lua_State *L);
+	static int luaGetTopCreature(lua_State *L);
+
 	//set item
 	static int luaDoSetItemActionId(lua_State *L);
 	static int luaDoSetItemText(lua_State *L);
