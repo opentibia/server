@@ -1098,11 +1098,11 @@ void Player::sendPing(uint32_t interval)
 		}
 	}
 
-	if(!hasCondition(CONDITION_INFIGHT)){
+	if(canLogout()){
 		if(!client){
 			g_game.removeCreature(this, true);
 		}
-		else if(npings > 24 && !getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+		else if(npings > 24){
 			client->logout(true);
 		}
 	}
