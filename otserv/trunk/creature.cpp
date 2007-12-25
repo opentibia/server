@@ -350,9 +350,20 @@ void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 	}
 }
 
-void Creature::onAttackedCreatureEnterProtectionZone(const Creature* creature)
+void Creature::onChangeZone(ZoneType_t zone)
 {
-	onCreatureDisappear(creature, false);
+	if(attackedCreature){
+		if(zone == ZONE_PROTECTION){
+			onCreatureDisappear(attackedCreature, false);
+		}
+	}
+}
+
+void Creature::onAttackedCreatureChangeZone(ZoneType_t zone)
+{
+	if(zone == ZONE_PROTECTION){
+		onCreatureDisappear(attackedCreature, false);
+	}
 }
 
 void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
@@ -381,6 +392,19 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 				lastStepCost = 2;
 			}
 		}
+
+		if(isInPz()){
+			onChangeZone(ZONE_PROTECTION);
+		}
+		else if(getTile()->hasFlag(TILESTATE_NOPVPZONE)){
+			onChangeZone(ZONE_NOPVP);
+		}
+		else if(getTile()->hasFlag(TILESTATE_PVPZONE)){
+			onChangeZone(ZONE_PVP);
+		}
+		else{
+			onChangeZone(ZONE_NORMAL);
+		}
 	}
 	else{
 		internalValidatePath = true;
@@ -390,18 +414,24 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
 			onCreatureDisappear(followCreature, false);
 		}
-
-		//validateWalkPath();
-		//internalValidatePath = true;
 	}
 
 	if(attackedCreature == creature || (creature == this && attackedCreature)){
 		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
 			onCreatureDisappear(attackedCreature, false);
 		}
-		else if(attackedCreature->isInPz() || isInPz()){
-			//onCreatureDisappear(attackedCreature, false);
-			onAttackedCreatureEnterProtectionZone(attackedCreature);
+
+		if(attackedCreature->isInPz()){
+			onAttackedCreatureChangeZone(ZONE_PROTECTION);
+		}
+		else if(attackedCreature->getPlayer() && attackedCreature->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
+			onAttackedCreatureChangeZone(ZONE_NOPVP);
+		}
+		else if(attackedCreature->getPlayer() && attackedCreature->getTile()->hasFlag(TILESTATE_PVPZONE)){			
+			onAttackedCreatureChangeZone(ZONE_PVP);
+		}
+		else{
+			onAttackedCreatureChangeZone(ZONE_NORMAL);
 		}
 	}
 }

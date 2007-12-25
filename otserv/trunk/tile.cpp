@@ -401,6 +401,25 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 
+			if(player->getParent() == NULL && hasFlag(TILESTATE_NOLOGOUT)){
+				//player is trying to login to a "no logout" tile
+				return RET_NOTPOSSIBLE;
+			}
+
+			if(player->isPzLocked() && !player->getTile()->hasFlag(TILESTATE_PVPZONE) && hasFlag(TILESTATE_PVPZONE)){
+				//player is trying to enter a pvp zone while being pz-locked
+				return RET_PLAYERISPZLOCKEDENTERPVPZONE;
+			}
+
+			if(player->isPzLocked() && player->getTile()->hasFlag(TILESTATE_PVPZONE) && !hasFlag(TILESTATE_PVPZONE)){
+				//player is trying to leave a pvp zone while being pz-locked
+				return RET_PLAYERISPZLOCKEDLEAVEPVPZONE;
+			}
+
+			if(hasFlag(TILESTATE_NOPVPZONE) && player->isPzLocked()){
+				return RET_PLAYERISPZLOCKED;
+			}
+
 			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->isPzLocked()){
 				return RET_PLAYERISPZLOCKED;
 			}

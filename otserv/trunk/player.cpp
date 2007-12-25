@@ -116,6 +116,7 @@ Creature()
 	lastSentStats.magLevel = 0;
 	level_percent = 0;
 	maglevel_percent = 0;
+	skillLoss = true;
 
 	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;
@@ -1018,6 +1019,22 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You need to equip a weapon to use this spell.");
 		break;
 
+	case RET_PLAYERISPZLOCKEDLEAVEPVPZONE:
+		sendCancel("You can not leave a pvp zone after attacking another player.");
+		break;
+
+	case RET_PLAYERISPZLOCKEDENTERPVPZONE:
+		sendCancel("You can not enter a pvp zone after attacking another player.");
+		break;
+
+	case RET_ACTIONNOTPERMITTEDINANOPVPZONE:
+		sendCancel("This action is not permitted in a none pvp zone.");
+		break;
+
+	case RET_YOUCANNOTLOGOUTHERE:
+		sendCancel("You can not logout here.");
+		break;
+
 	case RET_NOTPOSSIBLE:
 	default:
 		sendCancel("Sorry, not possible.");
@@ -1085,7 +1102,7 @@ void Player::sendPing(uint32_t interval)
 		if(!client){
 			g_game.removeCreature(this, true);
 		}
-		else if(npings > 24){
+		else if(npings > 24 && !getTile()->hasFlag(TILESTATE_NOLOGOUT)){
 			client->logout(true);
 		}
 	}
@@ -1255,12 +1272,49 @@ void Player::onFollowCreatureDissapear(bool isLogout)
 	}
 }
 
-void Player::onAttackedCreatureEnterProtectionZone(const Creature* creature)
+void Player::onChangeZone(ZoneType_t zone)
 {
-	if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
-		Creature::onAttackedCreatureEnterProtectionZone(creature);
+	if(attackedCreature){
+		if(zone == ZONE_PROTECTION){
+			if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+				setAttackedCreature(NULL);
+				onAttackedCreatureDissapear(false);
+			}
+		}
+		else if(zone == ZONE_NOPVP){
+			if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+				setAttackedCreature(NULL);
+				onAttackedCreatureDissapear(false);
+			}
+		}
 	}
 }
+
+void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
+{
+	if(zone == ZONE_PROTECTION){
+		if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+			setAttackedCreature(NULL);
+			onAttackedCreatureDissapear(false);
+		}
+	}
+	else if(zone == ZONE_NOPVP){
+		if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+			setAttackedCreature(NULL);
+			onAttackedCreatureDissapear(false);
+		}
+	}
+	else if(zone == ZONE_NORMAL){
+		//attackedCreature can leave a pvp zone if not pzlocked
+		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+			if(attackedCreature->getPlayer()){
+				setAttackedCreature(NULL);
+				onAttackedCreatureDissapear(false);
+			}
+		}
+	}
+}
+
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
@@ -1824,74 +1878,82 @@ void Player::onDie()
 	Creature::onDie();
 
 	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
-	loginPosition = masterPos;
 
-	//Magic level loss
-	uint32_t sumMana = 0;
-	int32_t lostMana = 0;
-
-	//sum up all the mana
-	for(int32_t i = 1; i <= magLevel; ++i){
-		sumMana += vocation->getReqMana(i);
+	if(getTile()->hasFlag(TILESTATE_PVPZONE)){
+		loginPosition = getPosition();
+	}
+	else{
+		loginPosition = masterPos;
 	}
 
-	sumMana += manaSpent;
+	if(skillLoss){
+		//Magic level loss
+		uint32_t sumMana = 0;
+		int32_t lostMana = 0;
 
-	lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
-
-	while(lostMana > manaSpent && magLevel > 0){
-		lostMana -= manaSpent;
-		manaSpent = vocation->getReqMana(magLevel);
-		magLevel--;
-	}
-
-	manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
-
-	//Skill loss
-	uint32_t lostSkillTries;
-	uint32_t sumSkillTries;
-	for(uint32_t i = 0; i <= 6; ++i){  //for each skill
-		lostSkillTries = 0;         //reset to 0
-		sumSkillTries = 0;
-
-		for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels
-			sumSkillTries += vocation->getReqSkillTries(i, c);
+		//sum up all the mana
+		for(int32_t i = 1; i <= magLevel; ++i){
+			sumMana += vocation->getReqMana(i);
 		}
 
-		sumSkillTries += skills[i][SKILL_TRIES];
-		lostSkillTries = (uint32_t)std::ceil(sumSkillTries * ((double)lossPercent[LOSS_SKILLTRIES]/100));
+		sumMana += manaSpent;
 
-		while(lostSkillTries > skills[i][SKILL_TRIES]){
-			lostSkillTries -= skills[i][SKILL_TRIES];
-			skills[i][SKILL_TRIES] = vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]);
-			if(skills[i][SKILL_LEVEL] > 10){
-				skills[i][SKILL_LEVEL]--;
+		lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
+
+		while(lostMana > manaSpent && magLevel > 0){
+			lostMana -= manaSpent;
+			manaSpent = vocation->getReqMana(magLevel);
+			magLevel--;
+		}
+
+		manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
+
+		//Skill loss
+		uint32_t lostSkillTries;
+		uint32_t sumSkillTries;
+		for(uint32_t i = 0; i <= 6; ++i){  //for each skill
+			lostSkillTries = 0;         //reset to 0
+			sumSkillTries = 0;
+
+			for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels
+				sumSkillTries += vocation->getReqSkillTries(i, c);
 			}
-			else{
-				skills[i][SKILL_LEVEL] = 10;
-				skills[i][SKILL_TRIES] = 0;
-				lostSkillTries = 0;
+
+			sumSkillTries += skills[i][SKILL_TRIES];
+			lostSkillTries = (uint32_t)std::ceil(sumSkillTries * ((double)lossPercent[LOSS_SKILLTRIES]/100));
+
+			while(lostSkillTries > skills[i][SKILL_TRIES]){
+				lostSkillTries -= skills[i][SKILL_TRIES];
+				skills[i][SKILL_TRIES] = vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]);
+				if(skills[i][SKILL_LEVEL] > 10){
+					skills[i][SKILL_LEVEL]--;
+				}
+				else{
+					skills[i][SKILL_LEVEL] = 10;
+					skills[i][SKILL_TRIES] = 0;
+					lostSkillTries = 0;
+					break;
+				}
+			}
+
+			skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
+		}
+		//
+
+		//Level loss
+		int32_t newLevel = level;
+		while((uint32_t)(experience - getLostExperience()) < getExpForLv(newLevel)){
+			if(newLevel > 1)
+				newLevel--;
+			else
 				break;
-			}
 		}
 
-		skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
-	}
-	//
-
-	//Level loss
-	int32_t newLevel = level;
-	while((uint32_t)(experience - getLostExperience()) < getExpForLv(newLevel)){
-		if(newLevel > 1)
-			newLevel--;
-		else
-			break;
-	}
-
-	if(newLevel != level){
-		std::stringstream lvMsg;
-		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-		sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
+		if(newLevel != level){
+			std::stringstream lvMsg;
+			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
+			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
+		}
 	}
 
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
@@ -1949,8 +2011,16 @@ void Player::preSave()
 			capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
 		}
 
-		health = healthMax;
-		mana = manaMax;
+		float healthMod = 1.0f;
+		float manaMod = 1.0f;
+
+		if(getTile()->hasFlag(TILESTATE_PVPZONE)){
+			healthMod = 0.1f;
+			manaMod = 0.0f;
+		}
+
+		health = std::floor(healthMax * healthMod);
+		mana = std::floor(manaMax * manaMod);
 	}
 }
 
@@ -2825,7 +2895,7 @@ int32_t Player::getGainedExperience(Creature* attacker) const
 {
 	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
 		Player* attackerPlayer = attacker->getPlayer();
-		if(attackerPlayer && attackerPlayer != this){
+		if(attackerPlayer && attackerPlayer != this && skillLoss){
 				/*Formula
 				a = attackers level * 0.9
 				b = victims level
@@ -3024,7 +3094,7 @@ void Player::onAttackedCreature(Creature* target)
 				pzLocked = true;
 
 #ifdef __SKULLSYSTEM__
-				if(!targetPlayer->hasAttacked(this)){
+				if(!Combat::isInPvpZone(this, targetPlayer) && !targetPlayer->hasAttacked(this)){
 					if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
 						//add a white skull
 						g_game.changeSkull(this, SKULL_WHITE);
@@ -3071,14 +3141,19 @@ void Player::onKilledCreature(Creature* target)
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 #ifdef __SKULLSYSTEM__
 		if(Player* targetPlayer = target->getPlayer()){
-			if(!targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
+			if(!Combat::isInPvpZone(this, targetPlayer) && !targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
 				addUnjustifiedDead(targetPlayer);
 			}
 #else
 		if(target->getPlayer()){
 #endif
 
-			if(hasCondition(CONDITION_INFIGHT)){
+			if(targetPlayer->getTile()->hasFlag(TILESTATE_PVPZONE)){
+				targetPlayer->setDropLoot(false);
+				targetPlayer->setLossSkill(false);
+			}
+
+			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
 				pzLocked = true;
 				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
 				addCondition(condition);
@@ -3261,6 +3336,20 @@ bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 	}
 	return false;
 }
+
+bool Player::canLogout()
+{
+	if(hasCondition(CONDITION_INFIGHT)){
+		return false;
+	}
+
+	if(getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+		return false;
+	}
+
+	return true;
+}
+
 
 void Player::genReservedStorageRange()
 {

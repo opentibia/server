@@ -37,9 +37,6 @@ typedef uint32_t flags_t;
 
 extern Game g_game;
 
-enum tile_flags_t{
-	TILE_PZ = 1,
-};
 /*
 	OTBM_ROOTV1
 	|
@@ -254,9 +251,20 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								return false;
 							}
 								
-							if(flags & TILE_PZ)
-								tile->setPz();
-								
+							if((flags & TILESTATE_PROTECTIONZONE) == TILESTATE_PROTECTIONZONE){
+								tile->setFlag(TILESTATE_PROTECTIONZONE);
+							}								
+							else if((flags & TILESTATE_NOPVPZONE) == TILESTATE_NOPVPZONE){
+								tile->setFlag(TILESTATE_NOPVPZONE);
+							}
+							else if((flags & TILESTATE_PVPZONE) == TILESTATE_PVPZONE){
+								tile->setFlag(TILESTATE_PVPZONE);
+							}
+							
+							if((flags & TILESTATE_NOLOGOUT) == TILESTATE_NOLOGOUT){
+								tile->setFlag(TILESTATE_NOLOGOUT);
+							}
+
 							break;
 						}
 

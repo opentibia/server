@@ -327,18 +327,23 @@ bool ProtocolGame::logout(bool forced)
 	//dispatcher thread
 	if(!player)
 		return false;
-
-	if(forced || !player->hasCondition(CONDITION_INFIGHT)){
-		bool result = g_game.removeCreature(player);
-		if(Connection* connection = getConnection()){
-			connection->closeConnection();
-		}
-		return result;
+	
+	if(!forced && player->getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+		player->sendCancelMessage(RET_YOUCANNOTLOGOUTHERE);
+		return false;
 	}
-	else{
+
+	if(!forced && player->hasCondition(CONDITION_INFIGHT)){
 		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
 		return false;
 	}
+
+	bool result = g_game.removeCreature(player);
+	if(Connection* connection = getConnection()){
+		connection->closeConnection();
+	}
+
+	return result;
 }
 
 bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)

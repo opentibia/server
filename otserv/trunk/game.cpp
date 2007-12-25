@@ -2402,12 +2402,22 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 
 	ReturnValue ret = RET_NOERROR;
 
+	//pz-zone
 	if(player->isInPz() && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
 	}
-	else if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone) && attackCreature->isInPz()){
+	else if(attackCreature->isInPz() && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 		ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
 	}
+	//nopvp-zone
+	else if(player->getTile()->hasFlag(TILESTATE_NOPVPZONE) && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
+		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
+	}
+	else if(attackCreature->getPlayer() && attackCreature->getTile()->hasFlag(TILESTATE_NOPVPZONE) &&
+		!player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
+		ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
+	}
+	//self-target
 	else if(attackCreature == player){
 		ret = RET_YOUMAYNOTATTACKTHISPLAYER;
 	}
@@ -2421,7 +2431,7 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 #ifdef __SKULLSYSTEM__
 	else if(player->hasSafeMode() && attackCreature->getPlayer() &&
-			attackCreature->getPlayer()->getSkull() == SKULL_NONE){
+		attackCreature->getPlayer()->getSkull() == SKULL_NONE && !Combat::isInPvpZone(player, attackCreature)){
 		ret = RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
 	}
 #endif
@@ -3087,7 +3097,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 		int32_t damage = -healthChange;
 		if(damage != 0){
-			if(target->hasCondition(CONDITION_MANASHIELD)){
+			if(target->hasCondition(CONDITION_MANASHIELD) && combatType != COMBAT_UNDEFINEDDAMAGE){
 				int32_t manaDamage = std::min(target->getMana(), damage);
 				damage = std::max((int32_t)0, damage - manaDamage);
 

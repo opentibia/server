@@ -59,6 +59,13 @@ struct FindPathParams{
 	uint32_t targetDistance;
 };
 
+enum ZoneType_t{
+	ZONE_PROTECTION,
+	ZONE_NOPVP,
+	ZONE_PVP,
+	ZONE_NOLOGOUT,
+	ZONE_NORMAL
+};
 
 class Map;
 class Thing;
@@ -234,7 +241,8 @@ public:
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
-	virtual void onAttackedCreatureEnterProtectionZone(const Creature* creature);
+	virtual void onChangeZone(ZoneType_t zone);
+	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();

@@ -179,11 +179,30 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 		}
 	}
 
+	//pz-zone
 	if(isAggressive && tile->isPz()){
 		return RET_ACTIONNOTPERMITTEDINPROTECTIONZONE;
 	}
 
+	//nopvp-zone
+	if(isAggressive && tile->hasFlag(TILESTATE_NOPVPZONE)){
+		return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
+	}
+
 	return RET_NOERROR;
+}
+
+bool Combat::isInPvpZone(Creature* attacker, Creature* target)
+{
+	if(!attacker->getTile()->hasFlag(TILESTATE_PVPZONE)){
+		return false;
+	}
+
+	if(!target->getTile()->hasFlag(TILESTATE_PVPZONE)){
+		return false;
+	}
+
+	return true;
 }
 
 ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
@@ -219,11 +238,15 @@ ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
 		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
 			if(attacker->getPlayer() || (attacker->hasMaster() && attacker->getMaster()->getPlayer()) ){
 				if(target->getPlayer()){
-					return RET_YOUMAYNOTATTACKTHISPLAYER;
+					if(!isInPvpZone(attacker, target)){
+						return RET_YOUMAYNOTATTACKTHISPLAYER;
+					}
 				}
 				
 				if(target->hasMaster() && target->getMaster()->getPlayer()){
-					return RET_YOUMAYNOTATTACKTHISCREATURE;
+					if(!isInPvpZone(attacker, target)){
+						return RET_YOUMAYNOTATTACKTHISCREATURE;
+					}
 				}
 			}
 		}

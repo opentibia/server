@@ -274,6 +274,8 @@ public:
 
 	static void getCombatArea(const Position& centerPos, const Position& targetPos,
 		const AreaCombat* area, std::list<Tile*>& list);
+
+	static bool isInPvpZone(Creature* attacker, Creature* target);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(Creature* attacker, Creature* target);
 	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);

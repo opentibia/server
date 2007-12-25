@@ -131,6 +131,7 @@ public:
 
 	int getPremiumDays() const {return premiumDays;}
 	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
+	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
 	bool isOnline() const {return (client != NULL);}
 	uint32_t getIP() const;
@@ -304,7 +305,8 @@ public:
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
-	virtual void onAttackedCreatureEnterProtectionZone(const Creature* creature);
+	virtual void onChangeZone(ZoneType_t zone);
+	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
@@ -324,6 +326,7 @@ public:
 	bool canWear(uint32_t _looktype, uint32_t _addons);
 	void addOutfit(uint32_t _looktype, uint32_t _addons);
 	bool remOutfit(uint32_t _looktype, uint32_t _addons);
+	bool canLogout();
 
 	//tile
 	//send methods
@@ -552,6 +555,7 @@ protected:
 	int32_t premiumDays;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
+	bool skillLoss;
 
 	double inventoryWeight;
 	double capacity;
@@ -663,7 +667,7 @@ protected:
 		};
 	}
 
-	virtual int32_t getLostExperience() const { return (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100));}
+	virtual int32_t getLostExperience() const { return (skillLoss ? (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
