@@ -48,6 +48,7 @@ public:
 	static int32_t weaponExhaustionTime;
 	static int32_t weaponInFightTime;
 
+	static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue);
 	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue);
 
 protected:

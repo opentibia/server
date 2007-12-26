@@ -409,7 +409,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			if(readXMLInteger(node, "attack", attack)){
 				if(readXMLInteger(node, "skill", skill)){
 					sb.minCombatValue = 0;
-					sb.maxCombatValue = -Weapons::getMaxWeaponDamage(skill, attack);
+					sb.maxCombatValue = -Weapons::getMaxMeleeDamage(skill, attack);
 				}
 			}
 
