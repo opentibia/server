@@ -1528,7 +1528,7 @@ uint32_t Player::isMuted()
 		return 0;
 	}
 
-	uint32_t muteTicks = 0;
+	int32_t muteTicks = 0;
 
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
 		if((*it)->getType() == CONDITION_MUTED && (*it)->getTicks() > muteTicks){
@@ -1808,10 +1808,10 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 				break;
 			}
 
-			case COMBAT_POISONDAMAGE:
+			case COMBAT_EARTHDAMAGE:
 			{
-				if(it.abilities.absorbPercentPoison > 0){
-					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentPoison) / 100));
+				if(it.abilities.absorbPercentEarth > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentEarth) / 100));
 					absorbedDamage = true;
 				}
 				break;
@@ -1839,6 +1839,33 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			{
 				if(it.abilities.absorbPercentDrown > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDrown) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_ICEDAMAGE:
+			{
+				if(it.abilities.absorbPercentIce > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentIce) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_HOLYDAMAGE:
+			{
+				if(it.abilities.absorbPercentHoly > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentHoly) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_DEATHDAMAGE:
+			{
+				if(it.abilities.absorbPercentDeath > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDeath) / 100));
 					absorbedDamage = true;
 				}
 				break;

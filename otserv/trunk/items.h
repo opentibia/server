@@ -45,16 +45,14 @@
 
 enum ItemTypes_t {
 	ITEM_TYPE_NONE = 0,
-	ITEM_TYPE_DEPOT = 1,
-	ITEM_TYPE_MAILBOX = 2,
-	ITEM_TYPE_TRASHHOLDER = 3,
-	ITEM_TYPE_CONTAINER = 4,
-	ITEM_TYPE_DOOR = 5,
-	ITEM_TYPE_MAGICFIELD = 6,
-	ITEM_TYPE_TELEPORT = 7,
-
-	//If you add a new item type update ITEM_TYPE_LAST below accordingly
-	ITEM_TYPE_LAST = ITEM_TYPE_TELEPORT
+	ITEM_TYPE_DEPOT,
+	ITEM_TYPE_MAILBOX,
+	ITEM_TYPE_TRASHHOLDER,
+	ITEM_TYPE_CONTAINER,
+	ITEM_TYPE_DOOR,
+	ITEM_TYPE_MAGICFIELD,
+	ITEM_TYPE_TELEPORT,
+	ITEM_TYPE_LAST
 };
 
 struct Abilities{
@@ -64,10 +62,13 @@ struct Abilities{
 		absorbPercentPhysical = 0;
 		absorbPercentFire = 0;
 		absorbPercentEnergy = 0;
-		absorbPercentPoison = 0;
+		absorbPercentEarth = 0;
 		absorbPercentLifeDrain = 0;
 		absorbPercentManaDrain = 0;
 		absorbPercentDrown = 0;
+		absorbPercentIce = 0;
+		absorbPercentHoly = 0;
+		absorbPercentDeath = 0;
 
 		memset(skills, 0, sizeof(skills));
 
@@ -93,16 +94,13 @@ struct Abilities{
 	uint8_t absorbPercentPhysical;
 	uint8_t absorbPercentFire;
 	uint8_t absorbPercentEnergy;
-	uint8_t absorbPercentPoison;
+	uint8_t absorbPercentEarth;
 	uint8_t absorbPercentLifeDrain;
 	uint8_t absorbPercentManaDrain;
 	uint8_t absorbPercentDrown;
-	/*
-	uint8_t absorbPercentEarth;
 	uint8_t absorbPercentIce;
 	uint8_t absorbPercentHoly;
 	uint8_t absorbPercentDeath;
-	*/
 
 	//extra skill modifiers
 	int32_t skills[SKILL_LAST + 1];

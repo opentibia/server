@@ -28,10 +28,10 @@
 class Connection;
 class RSA;
 
-#define CLIENT_VERSION_MIN 800
-#define CLIENT_VERSION_MAX 800
+#define CLIENT_VERSION_MIN 810
+#define CLIENT_VERSION_MAX 810
 
-#define STRING_CLIENT_VERSION "This server requires client version 8.0."
+#define STRING_CLIENT_VERSION "This server requires client version 8.1."
 
 class Protocol : boost::noncopyable
 {

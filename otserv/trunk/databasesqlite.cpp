@@ -181,7 +181,7 @@ std::string DatabaseSQLite::escapeBlob(const char* s, uint32_t length)
 	char* hex = new char[2 + 1]; //need one extra byte for null-character
 
 	for(uint32_t i = 0; i < length; i++){
-		int size = sprintf(hex, "%02x", ((unsigned char)s[i]));
+		sprintf(hex, "%02x", ((unsigned char)s[i]));
 		buf += hex;
 	}
 

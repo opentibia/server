@@ -1559,7 +1559,7 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 	}
 
 	if(ret == RET_NOERROR){
-		g_game.addMagicEffect(player->getPosition(), NM_ME_ENERGY_AREA);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_TELEPORT);
 	}
 	else{
 		player->sendCancelMessage(ret);
@@ -1867,6 +1867,7 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 	if(magLevel != -1){
 		//Change magic level in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);
+		iType.runeSpellName = getName();
 		iType.runeMagLevel = magLevel;
 		iType.charges = charges;
 	}

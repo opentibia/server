@@ -621,14 +621,14 @@ bool LuaScriptInterface::initState()
 #endif
 
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
-    
+
     registerFunctions();
 
 	if(loadFile(std::string(datadir + "global.lua")) == -1){
 		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << datadir << "global.lua." << std::endl;
 	}
 
-	
+
 
 	lua_newtable(m_luaState);
 	lua_setfield(m_luaState, LUA_REGISTRYINDEX, "EVENTS");
@@ -1043,7 +1043,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//getTileItemById(pos, itemId, <optional> subType)
 	lua_register(m_luaState, "getTileItemById", LuaScriptInterface::luaGetTileItemById);
-	
+
 	//getTileItemByType(pos, type)
 	lua_register(m_luaState, "getTileItemByType", LuaScriptInterface::luaGetTileItemByType);
 
@@ -2402,8 +2402,6 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 
 	PositionEx fromPos;
 	popPosition(L, fromPos);
-	
-	ScriptEnviroment* env = getScriptEnv();
 
 	Tile* fromTile = g_game.getTile(fromPos.x, fromPos.y, fromPos.z);
 	if(!fromTile){
@@ -2418,7 +2416,6 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
-
 
 	int32_t thingCount = fromTile->getThingCount();
 	for(int32_t i = thingCount - 1; i >= 0; --i){
@@ -2724,7 +2721,7 @@ int LuaScriptInterface::luaGetTileItemById(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 
 	uint32_t parameters = lua_gettop(L);
-	
+
 	int32_t subType = -1;
 	if(parameters > 2){
 		subType = (int32_t)popNumber(L);
@@ -2735,7 +2732,7 @@ int LuaScriptInterface::luaGetTileItemById(lua_State *L)
 	PositionEx pos;
 	popPosition(L, pos);
 
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);	
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(!tile){
 		pushThing(L, NULL, 0);
 		return 1;
@@ -2749,7 +2746,7 @@ int LuaScriptInterface::luaGetTileItemById(lua_State *L)
 
 	uint32_t uid = env->addThing(item);
 	pushThing(L, item, uid);
-	
+
 	return 1;
 }
 
@@ -2758,10 +2755,10 @@ int LuaScriptInterface::luaGetTileItemByType(lua_State *L)
 	//getTileItemByType(pos, type)
 
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	uint32_t rType = (uint32_t)popNumber(L);
 
-	if(rType <= ITEM_TYPE_NONE || rType > ITEM_TYPE_LAST){
+	if(rType >= ITEM_TYPE_LAST){
 		reportErrorFunc("Not a valid item type");
 		pushThing(L, NULL, 0);
 		return 1;
@@ -2794,7 +2791,7 @@ int LuaScriptInterface::luaGetTileItemByType(lua_State *L)
 int LuaScriptInterface::luaGetTileThingByPos(lua_State *L)
 {
 	//getTileThingByPos(pos)
-	
+
 	PositionEx pos;
 	popPosition(L, pos);
 

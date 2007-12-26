@@ -1734,7 +1734,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, bool isLogin)
 				AddMapDescription(msg, player->getPosition());
 
 				if(isLogin){
-					AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
+					AddMagicEffect(msg, player->getPosition(), NM_ME_TELEPORT);
 				}
 
 				AddInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
@@ -1794,7 +1794,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, bool isLogin)
 				AddTileCreature(msg, creature->getPosition(), creature);
 
 				if(isLogin){
-					AddMagicEffect(msg, creature->getPosition(), NM_ME_ENERGY_AREA);
+					AddMagicEffect(msg, creature->getPosition(), NM_ME_TELEPORT);
 				}
 			}
 		}
