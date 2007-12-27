@@ -295,6 +295,7 @@ private:
 	int32_t m_rejectCount;
 
 	bool m_debugAssertSent;
+	bool m_acceptPackets;
 };
 
 #endif

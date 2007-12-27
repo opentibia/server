@@ -38,7 +38,7 @@ extern ConfigManager g_config;
 #pragma warning( disable : 4996)
 #endif
 
-bool IOPlayer::loadPlayer(Player* player, std::string name)
+bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload /*= false*/)
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -48,12 +48,8 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	  	return false;
 	}
 
-
-	// Getting all player properties
 	player->setGUID(result->getDataInt("id"));
-
 	player->accountNumber = result->getDataInt("account_id");
-	player->setSex((playersex_t)result->getDataInt("sex"));
 
 	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
 	if(group){
@@ -63,10 +59,13 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 		player->setFlags(group->m_flags);
 	}
 
-	#ifdef __USE_SQL_PREMDAYS__
-	player->premiumDays = result->getDataInt("premdays");
-	#endif
+	if(preload){
+		//only loading basic info
+		return true;
+	}
 
+	// Getting all player properties
+	player->setSex((playersex_t)result->getDataInt("sex"));
 	player->setDirection((Direction)result->getDataInt("direction"));
 	player->experience = result->getDataInt("experience");
 	player->level = result->getDataInt("level");
@@ -75,7 +74,6 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	player->lastLoginSaved = result->getDataInt("lastlogin");
 	player->setVocation(result->getDataInt("vocation"));
 	player->updateBaseSpeed();
-
 	player->mana = result->getDataInt("mana");
 	player->manaMax = result->getDataInt("manamax");
 	player->manaSpent = result->getDataInt("manaspent");
@@ -96,6 +94,10 @@ bool IOPlayer::loadPlayer(Player* player, std::string name)
 	player->defaultOutfit.lookFeet = result->getDataInt("lookfeet");
 	player->defaultOutfit.lookAddons = result->getDataInt("lookaddons");
 	player->currentOutfit = player->defaultOutfit;
+
+#ifdef __USE_SQL_PREMDAYS__
+	player->premiumDays = result->getDataInt("premdays");
+#endif
 
 	#ifdef __SKULLSYSTEM__
 	int32_t redSkullSeconds = result->getDataInt("redskulltime") - std::time(NULL);

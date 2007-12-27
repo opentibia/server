@@ -204,6 +204,7 @@ ProtocolGame::ProtocolGame(Connection* connection) :
 	m_messageCount = 0;
 	m_rejectCount = 0;
 	m_debugAssertSent = false;
+	m_acceptPackets = false;
 }
 
 ProtocolGame::~ProtocolGame()
@@ -242,9 +243,9 @@ bool ProtocolGame::login(const std::string& name)
 		player->useThing2();
 		player->setID();
 
-		if(!IOPlayer::instance()->loadPlayer(player, name)){
+		if(!IOPlayer::instance()->loadPlayer(player, name, true)){
 #ifdef __DEBUG__
-			std::cout << "ProtocolGame::login - loadPlayer failed - " << name << std::endl;
+			std::cout << "ProtocolGame::login - preloading loadPlayer failed - " << name << std::endl;
 #endif
 			disconnectClient(0x14, "Your character could not be loaded.");
 			return false;
@@ -271,9 +272,9 @@ bool ProtocolGame::login(const std::string& name)
 			return false;
 		}
 
-		if(!player->isPremium() && !player->hasFlag(PlayerFlag_CanAlwaysLogin) && !Waitlist::instance()->clientLogin(player)){
-			int32_t currentSlot = Waitlist::instance()->getClientSlot(player);
-			int32_t retryTime = Waitlist::instance()->getTime(currentSlot);
+		if(!WaitingList::getInstance()->clientLogin(player)){
+			int32_t currentSlot = WaitingList::getInstance()->getClientSlot(player);
+			int32_t retryTime = WaitingList::getTime(currentSlot);
 			std::stringstream ss;
 
 			ss << "Too many players online.\n" << "You are at place "
@@ -288,6 +289,14 @@ bool ProtocolGame::login(const std::string& name)
 			return false;
 		}
 
+		if(!IOPlayer::instance()->loadPlayer(player, name)){
+#ifdef __DEBUG__
+			std::cout << "ProtocolGame::login - loadPlayer failed - " << name << std::endl;
+#endif
+			disconnectClient(0x14, "Your character could not be loaded.");
+			return false;
+		}
+
 		if(!g_game.placePlayer(player, player->getLoginPosition())){
 			if(!g_game.placePlayer(player, player->getTemplePosition(), true)){
 				disconnectClient(0x14, "Temple position is wrong. Contact the administrator.");
@@ -297,6 +306,7 @@ bool ProtocolGame::login(const std::string& name)
 
 		player->lastip = player->getIP();
 		player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
+		m_acceptPackets = true;
 
 		return true;
 	}
@@ -314,6 +324,7 @@ bool ProtocolGame::login(const std::string& name)
 			player->sendIcons();
 			player->lastip = player->getIP();
 			player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
+			m_acceptPackets = true;
 
 			return true;
 		}
@@ -325,9 +336,9 @@ bool ProtocolGame::login(const std::string& name)
 bool ProtocolGame::logout(bool forced)
 {
 	//dispatcher thread
-	if(!player)
+	if(!player || player->isRemoved())
 		return false;
-	
+
 	if(!forced && player->getTile()->hasFlag(TILESTATE_NOLOGOUT)){
 		player->sendCancelMessage(RET_YOUCANNOTLOGOUTHERE);
 		return false;
@@ -424,7 +435,7 @@ void ProtocolGame::disconnectClient(uint8_t error, const char* message)
 
 void ProtocolGame::parsePacket(NetworkMessage &msg)
 {
-	if(msg.getMessageLength() <= 0 || !player)
+	if(!m_acceptPackets || msg.getMessageLength() <= 0 || !player)
 		return;
 
 	m_now = OTSYS_TIME();

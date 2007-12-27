@@ -338,7 +338,6 @@ protected:
 	static int luaDoPlayerAddManaSpent(lua_State *L);
 	static int luaDoPlayerAddHealth(lua_State *L);
 	static int luaDoPlayerAddMana(lua_State *L);
-	static int luaDoPlayerSoul(lua_State *L);
 	static int luaDoPlayerAddItem(lua_State *L);
 	static int luaDoPlayerAddItemEx(lua_State *L);
 	static int luaDoTileAddItemEx(lua_State *L);

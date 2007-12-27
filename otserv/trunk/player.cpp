@@ -3172,7 +3172,7 @@ void Player::onKilledCreature(Creature* target)
 				addUnjustifiedDead(targetPlayer);
 			}
 #else
-		if(target->getPlayer()){
+		if(Player* targetPlayer = target->getPlayer()){
 #endif
 
 			if(targetPlayer->getTile()->hasFlag(TILESTATE_PVPZONE)){
