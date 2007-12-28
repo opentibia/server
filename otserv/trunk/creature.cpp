@@ -420,8 +420,7 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
 			onCreatureDisappear(attackedCreature, false);
 		}
-
-		if(attackedCreature->isInPz()){
+		else if(attackedCreature->isInPz()){
 			onAttackedCreatureChangeZone(ZONE_PROTECTION);
 		}
 		else if(attackedCreature->getPlayer() && attackedCreature->getTile()->hasFlag(TILESTATE_NOPVPZONE)){

@@ -336,6 +336,10 @@ bool ProtocolGame::login(const std::string& name)
 bool ProtocolGame::logout(bool forced)
 {
 	//dispatcher thread
+	if(Connection* connection = getConnection()){
+		connection->closeConnection();
+	}
+
 	if(!player || player->isRemoved())
 		return false;
 
@@ -349,12 +353,7 @@ bool ProtocolGame::logout(bool forced)
 		return false;
 	}
 
-	bool result = g_game.removeCreature(player);
-	if(Connection* connection = getConnection()){
-		connection->closeConnection();
-	}
-
-	return result;
+	return g_game.removeCreature(player);
 }
 
 bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
