@@ -93,8 +93,6 @@ public:
 	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}
 	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
 	void resetFlag(tileflags_t flag) {m_flags &= ~(uint32_t)flag;}
-	bool isPz() const {return hasFlag(TILESTATE_PROTECTIONZONE);}
-	void setPz() {setFlag(TILESTATE_PROTECTIONZONE);}
 
 	bool floorChange() const {return hasFlag(TILESTATE_FLOORCHANGE);}
 	bool floorChangeDown() const {return hasFlag(TILESTATE_FLOORCHANGE_DOWN);}

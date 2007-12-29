@@ -297,8 +297,8 @@ bool ProtocolGame::login(const std::string& name)
 			return false;
 		}
 
-		if(!g_game.placePlayer(player, player->getLoginPosition())){
-			if(!g_game.placePlayer(player, player->getTemplePosition(), true)){
+		if(!g_game.placeCreature(player, player->getLoginPosition())){
+			if(!g_game.placeCreature(player, player->getTemplePosition(), true)){
 				disconnectClient(0x14, "Temple position is wrong. Contact the administrator.");
 				return false;
 			}
@@ -336,21 +336,23 @@ bool ProtocolGame::login(const std::string& name)
 bool ProtocolGame::logout(bool forced)
 {
 	//dispatcher thread
+	if(!player)
+		return false;
+
+	if(player->isRemoved()){
+		if(!forced && player->getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+			player->sendCancelMessage(RET_YOUCANNOTLOGOUTHERE);
+			return false;
+		}
+
+		if(!forced && player->hasCondition(CONDITION_INFIGHT)){
+			player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
+			return false;
+		}
+	}
+
 	if(Connection* connection = getConnection()){
 		connection->closeConnection();
-	}
-
-	if(!player || player->isRemoved())
-		return false;
-
-	if(!forced && player->getTile()->hasFlag(TILESTATE_NOLOGOUT)){
-		player->sendCancelMessage(RET_YOUCANNOTLOGOUTHERE);
-		return false;
-	}
-
-	if(!forced && player->hasCondition(CONDITION_INFIGHT)){
-		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
-		return false;
 	}
 
 	return g_game.removeCreature(player);
@@ -765,13 +767,13 @@ void ProtocolGame::checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &remo
 {
 	// loop through the known player and check if the given player is in
 	std::list<uint32_t>::iterator i;
-	for(i = knownPlayers.begin(); i != knownPlayers.end(); ++i)
+	for(i = knownCreatureList.begin(); i != knownCreatureList.end(); ++i)
 	{
 		if((*i) == id)
 		{
 			// know... make the creature even more known...
-			knownPlayers.erase(i);
-			knownPlayers.push_back(id);
+			knownCreatureList.erase(i);
+			knownCreatureList.push_back(id);
 
 			known = true;
 			return;
@@ -782,28 +784,28 @@ void ProtocolGame::checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &remo
 	known = false;
 
 	// ... but not in future
-	knownPlayers.push_back(id);
+	knownCreatureList.push_back(id);
 
-	// to many known players?
-	if(knownPlayers.size() > 150) //150 for 7.8x
+	// to many known creatures?
+	if(knownCreatureList.size() > 150) //150 for 7.8x
 	{
 		// lets try to remove one from the end of the list
 		for (int n = 0; n < 150; n++)
 		{
-			removedKnown = knownPlayers.front();
+			removedKnown = knownCreatureList.front();
 
-			Creature *c = g_game.getCreatureByID(removedKnown);
+			Creature* c = g_game.getCreatureByID(removedKnown);
 			if ((!c) || (!canSee(c)))
 				break;
 
 			// this creature we can't remove, still in sight, so back to the end
-			knownPlayers.pop_front();
-			knownPlayers.push_back(removedKnown);
+			knownCreatureList.pop_front();
+			knownCreatureList.push_back(removedKnown);
 		}
 
 		// hopefully we found someone to remove :S, we got only 150 tries
 		// if not... lets kick some players with debug errors :)
-		knownPlayers.pop_front();
+		knownCreatureList.pop_front();
 	}
 	else
 	{

@@ -241,7 +241,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 	bool placeInPZ = false;
 
 	if(tile){
-		placeInPZ = tile->isPz();
+		placeInPZ = tile->hasFlag(TILESTATE_PROTECTIONZONE);
 
 		ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
 		if(forceLogin || ret == RET_NOERROR || ret == RET_PLAYERISNOTINVITED){
@@ -274,7 +274,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 			tryPos.y = tryPos.y + dy;
 
 			tile = getTile(tryPos);
-			if(!tile || (placeInPZ && !tile->isPz()))
+			if(!tile || (placeInPZ && !tile->hasFlag(TILESTATE_PROTECTIONZONE)))
 				continue;
 
 			if(tile->__queryAdd(0, creature, 1, 0) == RET_NOERROR){

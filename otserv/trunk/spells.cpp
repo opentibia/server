@@ -613,7 +613,7 @@ bool Spell::playerSpellCheck(Player* player) const
 		}
 
 		if(isAggressive){
-			if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone) && player->getTile()->isPz()){
+			if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone) && player->getZone() == ZONE_PROTECTION){
 				player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
 				return false;
 			}
@@ -1720,6 +1720,12 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 	Player* player = creature->getPlayer();
 
 	if(!player){
+		return false;
+	}
+
+	if(!player->hasFlag(PlayerFlag_IgnoreSpellCheck) && player->getZone() == ZONE_PVP){
+		player->sendCancel("You cannot conjure items here.");
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 

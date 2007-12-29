@@ -1299,7 +1299,7 @@ void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
 		}
 	}
 	else if(zone == ZONE_NOPVP){
-		if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+		if(attackedCreature->getPlayer() && !hasFlag(PlayerFlag_IgnoreProtectionZone)){
 			setAttackedCreature(NULL);
 			onAttackedCreatureDissapear(false);
 		}
@@ -1900,18 +1900,24 @@ uint32_t Player::getIP() const
 	return 0;
 }
 
-void Player::onDie()
+void Player::die()
 {
-	Creature::onDie();
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
+		if((*it)->isPersistent()){
+			Condition* condition = *it;
+			it = conditions.erase(it);
+
+			condition->endCondition(this, CONDITIONEND_DIE);
+			onEndCondition(condition->getType());
+			delete condition;
+		}
+		else{
+			++it;
+		}
+	}
 
 	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
-
-	if(getTile()->hasFlag(TILESTATE_PVPZONE)){
-		loginPosition = getPosition();
-	}
-	else{
-		loginPosition = masterPos;
-	}
+	loginPosition = masterPos;
 
 	if(skillLoss){
 		//Magic level loss
@@ -1983,25 +1989,26 @@ void Player::onDie()
 		}
 	}
 
-	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		if((*it)->isPersistent()){
-			Condition* condition = *it;
-			it = conditions.erase(it);
-
-			condition->endCondition(this, CONDITIONEND_DIE);
-			onEndCondition(condition->getType());
-			delete condition;
-		}
-		else{
-			++it;
-		}
-	}
 
 	/*
 	if(client){
 		client->sendReLoginWindow();
 	}
 	*/
+}
+
+void Player::dropCorpse()
+{
+	if(getZone() == ZONE_PVP){
+		preSave();
+		sendStats();
+		g_game.internalTeleport(this, getTemplePosition());
+		g_game.addCreatureHealth(this);
+		onThink(EVENT_CREATURE_INTERVAL);
+	}
+	else{
+		Creature::dropCorpse();
+	}
 }
 
 Item* Player::getCorpse()
@@ -2038,16 +2045,8 @@ void Player::preSave()
 			capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
 		}
 
-		float healthMod = 1.0f;
-		float manaMod = 1.0f;
-
-		if(getTile()->hasFlag(TILESTATE_PVPZONE)){
-			healthMod = 0.1f;
-			manaMod = 0.0f;
-		}
-
-		health = std::floor(healthMax * healthMod);
-		mana = std::floor(manaMax * manaMod);
+		health = healthMax;
+		mana = manaMax;
 	}
 }
 
@@ -3165,20 +3164,18 @@ void Player::onKilledCreature(Creature* target)
 
 	Creature::onKilledCreature(target);
 
-	if(!hasFlag(PlayerFlag_NotGainInFight)){
+	if(Player* targetPlayer = target->getPlayer()){
+		if(targetPlayer->getZone() == ZONE_PVP){
+			targetPlayer->setDropLoot(false);
+			targetPlayer->setLossSkill(false);
+		}
+
+		if(!hasFlag(PlayerFlag_NotGainInFight)){
 #ifdef __SKULLSYSTEM__
-		if(Player* targetPlayer = target->getPlayer()){
 			if(!Combat::isInPvpZone(this, targetPlayer) && !targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
 				addUnjustifiedDead(targetPlayer);
 			}
-#else
-		if(Player* targetPlayer = target->getPlayer()){
 #endif
-
-			if(targetPlayer->getTile()->hasFlag(TILESTATE_PVPZONE)){
-				targetPlayer->setDropLoot(false);
-				targetPlayer->setLossSkill(false);
-			}
 
 			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
 				pzLocked = true;

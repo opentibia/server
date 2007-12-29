@@ -180,13 +180,8 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 	}
 
 	//pz-zone
-	if(isAggressive && tile->isPz()){
+	if(isAggressive && tile->hasFlag(TILESTATE_PROTECTIONZONE)){
 		return RET_ACTIONNOTPERMITTEDINPROTECTIONZONE;
-	}
-
-	//nopvp-zone
-	if(isAggressive && tile->hasFlag(TILESTATE_NOPVPZONE)){
-		return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
 	}
 
 	return RET_NOERROR;
@@ -194,11 +189,11 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 
 bool Combat::isInPvpZone(Creature* attacker, Creature* target)
 {
-	if(!attacker->getTile()->hasFlag(TILESTATE_PVPZONE)){
+	if(attacker->getZone() != ZONE_PVP){
 		return false;
 	}
 
-	if(!target->getTile()->hasFlag(TILESTATE_PVPZONE)){
+	if(target->getZone() != ZONE_PVP){
 		return false;
 	}
 
@@ -235,8 +230,13 @@ ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
 			}
 		}
 
-		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-			if(attacker->getPlayer() || (attacker->hasMaster() && attacker->getMaster()->getPlayer()) ){
+		if(attacker->getPlayer() || (attacker->hasMaster() && attacker->getMaster()->getPlayer()) ){
+			//nopvp-zone
+			if(target->getPlayer() && target->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
+				return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
+			}
+			
+			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
 				if(target->getPlayer()){
 					if(!isInPvpZone(attacker, target)){
 						return RET_YOUMAYNOTATTACKTHISPLAYER;

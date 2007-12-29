@@ -874,7 +874,7 @@ bool ConditionRegeneration::executeCondition(Creature* creature, int32_t interva
 	internalHealthTicks += interval;
 	internalManaTicks += interval;
 
-	if(!creature->isInPz()){
+	if(creature->getZone() != ZONE_PROTECTION){
 		if(internalHealthTicks >= healthTicks){
 			internalHealthTicks = 0;
 			creature->changeHealth(healthGain);
@@ -1033,7 +1033,7 @@ bool ConditionSoul::executeCondition(Creature* creature, int32_t interval)
 	internalSoulTicks += interval;
 
 	if(Player* player = creature->getPlayer()){
-		if(!player->isInPz()){
+		if(player->getZone() != ZONE_PROTECTION){
 			if(internalSoulTicks >= soulTicks){
 				internalSoulTicks = 0;
 				player->changeSoul(soulGain);

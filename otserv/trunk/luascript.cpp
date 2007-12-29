@@ -3119,7 +3119,7 @@ int LuaScriptInterface::luaGetTilePzInfo(lua_State *L)
 	Tile *tile = g_game.getMap()->getTile(pos);
 
 	if(tile){
-		if(tile->isPz()){
+		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
 			lua_pushnumber(L, LUA_TRUE);
 		}
 		else{

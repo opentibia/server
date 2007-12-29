@@ -56,7 +56,7 @@ public:
 	void setPlayer(Player* p);
 
 private:
-	std::list<uint32_t> knownPlayers;
+	std::list<uint32_t> knownCreatureList;
 
 	void disconnectClient(uint8_t error, const char* message);
 

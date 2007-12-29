@@ -148,7 +148,9 @@ bool Creature::canSeeCreature(const Creature* creature) const
 void Creature::addEventThink()
 {
 	if(eventCheck == 0){
-		eventCheck = Scheduler::getScheduler().addEvent(createSchedulerTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
+		eventCheck = Scheduler::getScheduler().addEvent(
+			createSchedulerTask(EVENT_CREATURE_INTERVAL,
+			boost::bind(&Game::checkCreature, &g_game, getID(), EVENT_CREATURE_INTERVAL)));
 		//onStartThink();
 	}
 }
@@ -393,18 +395,7 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 			}
 		}
 
-		if(isInPz()){
-			onChangeZone(ZONE_PROTECTION);
-		}
-		else if(getTile()->hasFlag(TILESTATE_NOPVPZONE)){
-			onChangeZone(ZONE_NOPVP);
-		}
-		else if(getTile()->hasFlag(TILESTATE_PVPZONE)){
-			onChangeZone(ZONE_PVP);
-		}
-		else{
-			onChangeZone(ZONE_NORMAL);
-		}
+		onChangeZone(getZone());
 	}
 	else{
 		internalValidatePath = true;
@@ -420,17 +411,8 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
 			onCreatureDisappear(attackedCreature, false);
 		}
-		else if(attackedCreature->isInPz()){
-			onAttackedCreatureChangeZone(ZONE_PROTECTION);
-		}
-		else if(attackedCreature->getPlayer() && attackedCreature->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
-			onAttackedCreatureChangeZone(ZONE_NOPVP);
-		}
-		else if(attackedCreature->getPlayer() && attackedCreature->getTile()->hasFlag(TILESTATE_PVPZONE)){			
-			onAttackedCreatureChangeZone(ZONE_PVP);
-		}
 		else{
-			onAttackedCreatureChangeZone(ZONE_NORMAL);
+			onAttackedCreatureChangeZone(attackedCreature->getZone());
 		}
 	}
 }
@@ -472,6 +454,16 @@ void Creature::onDie()
 		}
 	}
 
+	if(getMaster()){
+		getMaster()->removeSummon(this);
+	}
+
+	die();
+	dropCorpse();
+}
+
+void Creature::dropCorpse()
+{
 	Item* splash = NULL;
 	switch(getRace()){
 		case RACE_VENOM:
@@ -505,15 +497,13 @@ void Creature::onDie()
 		g_game.startDecay(corpse);
 	}
 
-	if(getMaster()){
-		getMaster()->removeSummon(this);
-	}
-
 	//scripting event - onDie
 	CreatureEvent* eventDie = getCreatureEvent(CREATURE_EVENT_DIE);
 	if(eventDie){
 		eventDie->executeOnDie(this, corpse);
 	}
+
+	g_game.removeCreature(this, false);
 }
 
 bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCreature)
@@ -1000,13 +990,13 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id) const
 	return NULL;
 }
 
-void Creature::executeConditions(int32_t newticks)
+void Creature::executeConditions(uint32_t interval)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		//(*it)->executeCondition(this, newticks);
 		//if((*it)->getTicks() <= 0){
 
-		if(!(*it)->executeCondition(this, newticks)){
+		if(!(*it)->executeCondition(this, interval)){
 			ConditionType_t type = (*it)->getType();
 
 			Condition* condition = *it;

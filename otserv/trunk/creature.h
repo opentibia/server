@@ -32,6 +32,8 @@
 #include "enums.h"
 #include "creatureevent.h"
 
+#define EVENT_CREATURE_INTERVAL 500
+
 #include <list>
 
 typedef std::list<Condition*> ConditionList;
@@ -155,7 +157,21 @@ public:
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
-	bool isInPz() const {return getTile()->hasProperty(PROTECTIONZONE);}
+	ZoneType_t getZone() {
+		const Tile* tile = getTile();
+		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
+			return ZONE_PROTECTION;
+		}
+		else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
+			return ZONE_NOPVP;
+		}
+		else if(tile->hasFlag(TILESTATE_PVPZONE)){
+			return ZONE_PVP;
+		}
+		else{
+			return ZONE_NORMAL;
+		}
+	}
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -202,7 +218,7 @@ public:
 	void removeCondition(Condition* condition);
 	void removeCondition(const Creature* attacker, ConditionType_t type);
 	Condition* getCondition(ConditionType_t type, ConditionId_t id) const;
-	void executeConditions(int32_t newticks);
+	void executeConditions(uint32_t interval);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
 	virtual bool isImmune(CombatType_t type) const;
@@ -222,7 +238,6 @@ public:
 	virtual bool convinceCreature(Creature* creature) {return false;};
 
 	virtual void onDie();
-	virtual Item* getCorpse();
 	virtual int32_t getGainedExperience(Creature* attacker) const;
 	virtual bool addDamagePoints(Creature* attacker, int32_t damagePoints);
 	bool hasBeenAttacked(uint32_t attackerId);
@@ -354,6 +369,9 @@ protected:
 	virtual void dropLoot(Container* corpse) {};
 	virtual uint16_t getLookCorpse() const { return 0; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
+	virtual void die() {};
+	virtual void dropCorpse();
+	virtual Item* getCorpse();
 
 	friend class Game;
 	friend class Map;

@@ -417,15 +417,6 @@ Player* Game::getPlayerByAccount(uint32_t acc)
 	return NULL;
 }
 
-bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= false*/)
-{
-	if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && getPlayersOnline() >= maxPlayers){
-		return false;
-	}
-
-	return placeCreature(player, pos, forced);
-}
-
 bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
 {
 	if(!map->placeCreature(pos, creature, forced)){
@@ -611,7 +602,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId, cons
 			if(toTile->hasProperty(BLOCKPATHFIND)){
 				ret = RET_NOTENOUGHROOM;
 			}
-			else if(movingCreature->isInPz() && !toTile->hasProperty(PROTECTIONZONE)){
+			else if(movingCreature->getZone() == ZONE_PROTECTION && !toTile->hasFlag(TILESTATE_PROTECTIONZONE)){
 				ret = RET_NOTPOSSIBLE;
 			}
 		}
@@ -2403,17 +2394,17 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	ReturnValue ret = RET_NOERROR;
 
 	//pz-zone
-	if(player->isInPz() && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
+	if(player->getZone() == ZONE_PROTECTION && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
 	}
-	else if(attackCreature->isInPz() && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
+	else if(attackCreature->getZone() == ZONE_PROTECTION && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 		ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
 	}
 	//nopvp-zone
-	else if(player->getTile()->hasFlag(TILESTATE_NOPVPZONE) && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
+	else if(player->getZone() == ZONE_NOPVP && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
 	}
-	else if(attackCreature->getPlayer() && attackCreature->getTile()->hasFlag(TILESTATE_NOPVPZONE) &&
+	else if(attackCreature->getPlayer() && attackCreature->getZone() == ZONE_NOPVP &&
 		!player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 		ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
 	}
@@ -2926,7 +2917,6 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 		}
 		else{
 			creature->onDie();
-			removeCreature(creature, false);
 		}
 
 		cleanup();

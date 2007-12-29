@@ -43,9 +43,6 @@ Tile Tile::null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 
 bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 {
-	if(prop == PROTECTIONZONE && isPz())
-		return true;
-
 	if(ground && ground->hasProperty(prop)){
 		return true;
 	}

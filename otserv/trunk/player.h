@@ -289,8 +289,6 @@ public:
 	void addInFightTicks();
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual void onDie();
-	virtual Item* getCorpse();
 	virtual int32_t getGainedExperience(Creature* attacker) const;
 
 	//combat event functions
@@ -508,6 +506,10 @@ protected:
 
 	bool NeedUpdateStats();
 	void updateInventoryWeigth();
+
+	void die();
+	virtual void dropCorpse();
+	virtual Item* getCorpse();
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,

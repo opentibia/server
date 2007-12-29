@@ -329,7 +329,9 @@ void Monster::searchTarget()
 
 bool Monster::selectTarget(Creature* creature)
 {
-	if(!creature || creature == this || !creature->isAttackable() || creature->isInPz()){
+	if(!creature || creature == this ||
+		!creature->isAttackable() ||
+		creature->getZone() == ZONE_PROTECTION){
 		return false;
 	}
 
@@ -602,10 +604,8 @@ bool Monster::getNextStep(Direction& dir)
 	return result;
 }
 
-void Monster::onDie()
+void Monster::die()
 {
-	Creature::onDie();
-
 	setAttackedCreature(NULL);
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
 		(*cit)->changeHealth(-(*cit)->getHealth());
