@@ -115,6 +115,11 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 	return false;
 }
 
+bool hasBitSet(uint32_t flag, uint32_t flags)
+{
+	return ((flags & flag) == flag);
+}
+
 #define RAND_MAX24 16777216
 uint32_t rand24b()
 {

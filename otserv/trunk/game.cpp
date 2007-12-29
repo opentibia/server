@@ -665,6 +665,8 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 		break;
 	}
 
+	uint32_t flags = 0;
+
 	if(creature->getPlayer()){
 		//try go up
 		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
@@ -672,6 +674,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z - 1);
 				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)){
+					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 					destPos.z -= 1;
 				}
 			}
@@ -683,6 +686,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z + 1);
 
 				if(tmpTile && tmpTile->hasHeight(3)){
+					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 					destPos.z += 1;
 				}
 			}
@@ -693,7 +697,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
 	if(toTile != NULL){
-		uint32_t flags = 0;
 		if(force){
 			flags = FLAG_NOLIMIT;
 		}

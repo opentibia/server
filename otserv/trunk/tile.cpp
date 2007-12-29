@@ -338,11 +338,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	Thing* iithing = NULL;
 
 	if(const Creature* creature = thing->getCreature()){
-		if((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT){
+		if(hasBitSet(FLAG_NOLIMIT, flags)){
 			return RET_NOERROR;
 		}
 
-		if((flags & FLAG_PATHFINDING) == FLAG_PATHFINDING){
+		if(hasBitSet(FLAG_PATHFINDING, flags)){
 			if(floorChange() || getTeleportItem()){
 				return RET_NOTPOSSIBLE;
 			}
@@ -394,8 +394,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
-			if(!creatures.empty()){
-				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
+			if(!creatures.empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+				return RET_NOTENOUGHROOM;
 			}
 
 			if(player->getParent() == NULL && hasFlag(TILESTATE_NOLOGOUT)){
@@ -422,7 +422,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 		else{
-			if(!creatures.empty()){
+			if(!creatures.empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 		}
@@ -432,9 +432,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 				if(iiType.blockSolid){
-					//check if this a creature that just is about to login/spawn
-					//those can be placed here if the blocking item is moveable
-					if(!creature->getParent()){
+					if(hasBitSet(FLAG_IGNOREBLOCKITEM, flags)){
 						if(!iiType.moveable || iitem->getUniqueId() != 0)
 							return RET_NOTPOSSIBLE;
 					}
@@ -445,14 +443,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 	}
 	else if(const Item* item = thing->getItem()){
-		//If its a new (summoned item) always accept it, or FLAG_NOLIMIT is set
 #ifdef __DEBUG__
 		if(thing->getParent() == NULL){
 			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
 		}
 #endif
 
-		if((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT){
+		if(hasBitSet(FLAG_NOLIMIT, flags)){
 			return RET_NOERROR;
 		}
 
@@ -462,7 +459,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOTPOSSIBLE;
 		}
 
-		if(!creatures.empty() && item->isBlocking()){
+		if(!creatures.empty() && item->isBlocking() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 			return RET_NOTENOUGHROOM;
 		}
 
@@ -473,7 +470,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
-				//Is not posible 2 hangables in the same tile
+				//It's not possible with 2 hangables in the same tile
 				if(iiType.isHangable && itemIsHangable){
 					hasHangable = true;
 				}

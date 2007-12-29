@@ -494,8 +494,8 @@ void Combat::combatTileEffects(SpectatorVec& list, Creature* caster, Tile* tile,
 {
 	if(params.itemId != 0){
 		uint32_t itemId = params.itemId;
-		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-			if(caster && (caster->getPlayer() || (caster->hasMaster() && caster->getMaster()->getPlayer())) ){
+		if(caster && (caster->getPlayer() || (caster->hasMaster() && caster->getMaster()->getPlayer())) ){
+			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD_PVP){
 					itemId = ITEM_FIREFIELD_NOPVP;
 				}
@@ -1294,7 +1294,7 @@ void MagicField::onStepInField(Creature* creature)
 			uint32_t owner = getOwner();
 			if(owner != 0){
 				bool harmfulField = true;
-				if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+				if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE) ){
 					Creature* creature = g_game.getCreatureByID(owner);
 					if(creature){
 						if(creature->getPlayer() || (creature->hasMaster() && creature->getMaster()->getPlayer())){

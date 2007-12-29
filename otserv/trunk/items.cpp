@@ -242,30 +242,29 @@ int Items::loadFromOtb(std::string file)
 			return ERROR_INVALID_FORMAT;
 		}
 
-		iType->blockSolid = ((flags & FLAG_BLOCK_SOLID) == FLAG_BLOCK_SOLID);
-		iType->blockProjectile = ((flags & FLAG_BLOCK_PROJECTILE) == FLAG_BLOCK_PROJECTILE);
-		iType->blockPathFind = ((flags & FLAG_BLOCK_PATHFIND) == FLAG_BLOCK_PATHFIND);
-		iType->hasHeight = ((flags & FLAG_HAS_HEIGHT) == FLAG_HAS_HEIGHT);
-		iType->useable = ((flags & FLAG_USEABLE) == FLAG_USEABLE);
-		iType->pickupable = ((flags & FLAG_PICKUPABLE) == FLAG_PICKUPABLE);
-		iType->moveable = ((flags & FLAG_MOVEABLE) == FLAG_MOVEABLE);
-		iType->stackable = ((flags & FLAG_STACKABLE) == FLAG_STACKABLE);
-		iType->floorChangeDown = ((flags & FLAG_FLOORCHANGEDOWN) == FLAG_FLOORCHANGEDOWN);
-		iType->floorChangeNorth = ((flags & FLAG_FLOORCHANGENORTH) == FLAG_FLOORCHANGENORTH);
-		iType->floorChangeEast = ((flags & FLAG_FLOORCHANGEEAST) == FLAG_FLOORCHANGEEAST);
-		iType->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
-		iType->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
-		iType->alwaysOnTop = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
-		iType->isVertical = ((flags & FLAG_VERTICAL) == FLAG_VERTICAL);
-		iType->isHorizontal = ((flags & FLAG_HORIZONTAL) == FLAG_HORIZONTAL);
-		iType->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
-		iType->allowDistRead = ((flags & FLAG_ALLOWDISTREAD) == FLAG_ALLOWDISTREAD);
-		iType->rotable = ((flags & FLAG_ROTABLE) == FLAG_ROTABLE);
+		iType->blockSolid = hasBitSet(FLAG_BLOCK_SOLID, flags);
+		iType->blockProjectile = hasBitSet(FLAG_BLOCK_PROJECTILE, flags);
+		iType->blockPathFind = hasBitSet(FLAG_BLOCK_PATHFIND, flags);
+		iType->hasHeight = hasBitSet(FLAG_HAS_HEIGHT, flags);
+		iType->useable = hasBitSet(FLAG_USEABLE, flags);
+		iType->pickupable = hasBitSet(FLAG_PICKUPABLE, flags);
+		iType->moveable = hasBitSet(FLAG_MOVEABLE, flags);
+		iType->stackable = hasBitSet(FLAG_STACKABLE, flags);
+		iType->floorChangeDown = hasBitSet(FLAG_FLOORCHANGEDOWN, flags);
+		iType->floorChangeNorth = hasBitSet(FLAG_FLOORCHANGENORTH, flags);
+		iType->floorChangeEast = hasBitSet(FLAG_FLOORCHANGEEAST, flags);
+		iType->floorChangeSouth = hasBitSet(FLAG_FLOORCHANGESOUTH, flags);
+		iType->floorChangeWest = hasBitSet(FLAG_FLOORCHANGEWEST, flags);
+		iType->alwaysOnTop = hasBitSet(FLAG_ALWAYSONTOP, flags);
+		iType->isVertical = hasBitSet(FLAG_VERTICAL, flags);
+		iType->isHorizontal = hasBitSet(FLAG_HORIZONTAL, flags);
+		iType->isHangable = hasBitSet(FLAG_HANGABLE, flags);
+		iType->allowDistRead = hasBitSet(FLAG_ALLOWDISTREAD, flags);
+		iType->rotable = hasBitSet(FLAG_ROTABLE, flags);
 
-		if((flags & FLAG_READABLE) == FLAG_READABLE){
+		if(hasBitSet(FLAG_READABLE, flags)){
 			iType->canReadText = true;
 		}
-
 
 		attribute_t attrib;
 		datasize_t datalen = 0;
