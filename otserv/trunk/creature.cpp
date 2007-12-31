@@ -693,7 +693,7 @@ bool Creature::setFollowCreature(Creature* creature)
 
 		if(!listWalkDir.empty()){
 			listWalkDir.clear();
-			onWalkAborted(); //TESTING
+			onWalkAborted();
 		}
 		if(!g_game.getPathToEx(this, creature->getPosition(), 1, fpp.targetDistance, fpp.fullPathSearch, fpp.needReachable, listWalkDir)){
 			followCreature = NULL;

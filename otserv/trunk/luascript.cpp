@@ -2349,7 +2349,7 @@ int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 	}
 
 	ReturnValue ret = RET_NOERROR;
-	if(useCidPosOnFail){
+	if(canDropOnMap){
 		ret = g_game.internalPlayerAddItem(player, item);
 	}
 	else{
@@ -3763,14 +3763,14 @@ int LuaScriptInterface::luaGetPlayerItemById(lua_State *L)
 	bool deepSearch = popNumber(L) == 1;
 	uint32_t cid = popNumber(L);
 
-	const Player* player = env->getPlayerByUID(cid);
+	Player* player = env->getPlayerByUID(cid);
 	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		pushThing(L, NULL, 0);
 		return 1;
 	}
 
-	Item* item = g_game.findItemOfType(tile, itemId, deepSearch, subType);
+	Item* item = g_game.findItemOfType(player, itemId, deepSearch, subType);
 	if(!item){
 		pushThing(L, NULL, 0);
 		return 1;
