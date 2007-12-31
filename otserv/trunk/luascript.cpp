@@ -946,6 +946,9 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerSlotItem(cid, slot)
 	lua_register(m_luaState, "getPlayerSlotItem", LuaScriptInterface::luaGetPlayerSlotItem);
 
+	//getPlayerItemById(cid, deepSearch, itemId, <optional> subType)
+	lua_register(m_luaState, "getPlayerItemById", LuaScriptInterface::luaGetPlayerItemById);
+
 	//getPlayerDepotItems(cid, depotid)
 	lua_register(m_luaState, "getPlayerDepotItems", LuaScriptInterface::luaGetPlayerDepotItems);
 
@@ -1117,7 +1120,7 @@ void LuaScriptInterface::registerFunctions()
 	//Returns uid of the created item
 	lua_register(m_luaState, "doPlayerAddItem", LuaScriptInterface::luaDoPlayerAddItem);
 
-	//doPlayerAddItemEx(cid, uid, <optional: default: 0> useCidPosOnFail)
+	//doPlayerAddItemEx(cid, uid, <optional: default: 0> canDropOnMap)
 	lua_register(m_luaState, "doPlayerAddItemEx", LuaScriptInterface::luaDoPlayerAddItemEx);
 
 	//doPlayerSendTextMessage(cid, MessageClasses, message)
@@ -2312,12 +2315,12 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 {
-	//doPlayerAddItemEx(cid, uid, <optional: default: 0> useCidPosOnFail)
+	//doPlayerAddItemEx(cid, uid, <optional: default: 0> canDropOnMap)
 	int32_t parameters = lua_gettop(L);
 
-	bool useCidPosOnFail = false;
+	bool canDropOnMap = false;
 	if(parameters > 2){
-		useCidPosOnFail = popNumber(L) == 1;
+		canDropOnMap = popNumber(L) == 1;
 	}
 
 	uint32_t uid = (uint32_t)popNumber(L);
@@ -2664,6 +2667,8 @@ int LuaScriptInterface::luaDoDecayItem(lua_State *L)
 
 int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
 {
+	//Consider using getTileItemById/getTileItemByType/getTileThingByPos/getTopCreature instead.
+
 	//getThingfromPos(pos)
 	//Note:
 	//	stackpos = 255. Get the top thing(item moveable or creature)
@@ -3739,6 +3744,40 @@ int LuaScriptInterface::luaGetPlayerSlotItem(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		pushThing(L, NULL, 0);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerItemById(lua_State *L)
+{
+	//getPlayerItemById(cid, deepSearch, itemId, <optional> subType)
+	ScriptEnviroment* env = getScriptEnv();
+
+	uint32_t parameters = lua_gettop(L);
+
+	int32_t subType = -1;
+	if(parameters > 3){
+		subType = (int32_t)popNumber(L);
+	}
+
+	int32_t itemId = (int32_t)popNumber(L);
+	bool deepSearch = popNumber(L) == 1;
+	uint32_t cid = popNumber(L);
+
+	const Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	Item* item = g_game.findItemOfType(tile, itemId, deepSearch, subType);
+	if(!item){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	uint32_t uid = env->addThing(item);
+	pushThing(L, item, uid);
 	return 1;
 }
 

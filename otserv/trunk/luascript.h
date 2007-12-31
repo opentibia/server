@@ -410,6 +410,8 @@ protected:
 	static int luaGetPlayerFreeCap(lua_State *L);
 	static int luaGetPlayerLight(lua_State *L);
 	static int luaGetPlayerSlotItem(lua_State *L);
+	static int luaGetPlayerItemById(lua_State *L);
+
 	static int luaGetPlayerDepotItems(lua_State *L);
 	static int luaGetPlayerGuildId(lua_State *L);
 	static int luaGetPlayerGuildName(lua_State *L);
