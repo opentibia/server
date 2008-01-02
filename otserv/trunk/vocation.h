@@ -80,8 +80,8 @@ protected:
 class Vocations
 {
 public:
-	Vocations(){};
-	~Vocations(){};
+	Vocations();
+	~Vocations();
 	
 	bool loadFromXml(const std::string& datadir);
 	Vocation* getVocation(uint32_t vocId);

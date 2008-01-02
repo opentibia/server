@@ -61,6 +61,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	if(preload){
 		//only loading basic info
+		db->freeResult(result);
 		return true;
 	}
 

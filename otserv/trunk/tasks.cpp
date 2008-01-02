@@ -88,16 +88,21 @@ void Dispatcher::addTask(Task* task)
 {
 	OTSYS_THREAD_LOCK(m_taskLock, "");
 
-	// check if the list was empty
-	bool isEmpty = m_taskList.empty();
-
-	// add the task to the list
-	m_taskList.push_back(task);
+	bool do_signal = false;
+	if(!Dispatcher::m_shutdown){
+		do_signal = m_taskList.empty();
+		m_taskList.push_back(task);
+	}
+#ifdef _DEBUG
+	else{
+		std::cout << "Error: [Dispatcher::addTask] Dispatcher thread is terminated." << std::endl;
+	}
+#endif
 
 	OTSYS_THREAD_UNLOCK(m_taskLock, "");
 
 	// send a signal if the list was empty
-	if(isEmpty){
+	if(do_signal){
 		OTSYS_THREAD_SIGNAL_SEND(m_taskSignal);
 	}
 }

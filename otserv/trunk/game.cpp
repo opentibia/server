@@ -133,6 +133,13 @@ void Game::setGameState(GameState_t newState)
 				Scheduler::getScheduler().stop();
 				Dispatcher::getDispatcher().stop();
 
+				//kick all players that are still online
+				AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
+				while(it != Player::listPlayer.list.end()){
+					(*it).second->kickPlayer();
+					it = Player::listPlayer.list.begin();
+				}
+
 				if(g_server){
 					g_server->stop();
 				}
@@ -2908,6 +2915,17 @@ void Game::checkWalk(uint32_t creatureId)
 		cleanup();
 	}
 }
+
+/*
+void Game::checkCreatures(uint32_t interval)
+{
+	if(!creatures.empty()){
+		Scheduler::getScheduler().addEvent(
+			createSchedulerTask(EVENT_CREATURE_INTERVAL,
+			boost::bind(&Game::checkCreatures, &g_game)));
+	}
+}
+*/
 
 void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 {

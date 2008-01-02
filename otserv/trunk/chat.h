@@ -86,7 +86,7 @@ class Chat
 {
 public:
 	Chat();
-	~Chat(){};
+	~Chat();
 	ChatChannel* createChannel(Player* player, uint16_t channelId);
 	bool deleteChannel(Player* player, uint16_t channelId);
 	

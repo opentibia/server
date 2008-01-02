@@ -1283,7 +1283,7 @@ void Player::onChangeZone(ZoneType_t zone)
 		}
 		else if(zone == ZONE_NOPVP){
 			if( (attackedCreature->getPlayer() ||
-					(attackedCreature->isSummon() && attackedCreature->getMaster()->getPlayer()) ) &&
+					(attackedCreature->getMaster() && attackedCreature->getMaster()->getPlayer()) ) &&
 					!hasFlag(PlayerFlag_IgnoreProtectionZone)){
 				setAttackedCreature(NULL);
 				onAttackedCreatureDissapear(false);

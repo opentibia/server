@@ -20,6 +20,7 @@
 #include "otpch.h"
 
 #include "scheduler.h"
+#include <iostream>
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -101,21 +102,30 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void* p)
 uint32_t Scheduler::addEvent(SchedulerTask* task)
 {
 	OTSYS_THREAD_LOCK(m_eventLock, "");
-	// check if the event has a valid id
-	if(task->getEventId() == 0){
-		// if not generate one
-		++m_lastEventId;
-		task->setEventId(m_lastEventId);
+
+	bool do_signal = false;
+	if(!Scheduler::m_shutdown){
+		// check if the event has a valid id
+		if(task->getEventId() == 0){
+			// if not generate one
+			++m_lastEventId;
+			task->setEventId(m_lastEventId);
+		}
+		// insert the eventid in the list of active events
+		m_eventIds.insert(task->getEventId());
+
+		// add the event to the queue
+		m_eventList.push(task);
+
+		// if the list was empty or this event is the top in the list
+		// we have to signal it
+		do_signal = (task == m_eventList.top());
 	}
-	// insert the eventid in the list of active events
-	m_eventIds.insert(task->getEventId());
-
-	// add the event to the queue
-	m_eventList.push(task);
-
-	// if the list was empty or this event is the top in the list
-	// we have to signal it
-	bool do_signal = (task == m_eventList.top());
+#ifdef _DEBUG
+	else{
+		std::cout << "Error: [Scheduler::addTask] Scheduler thread is terminated." << std::endl;
+	}
+#endif
 
 	OTSYS_THREAD_UNLOCK(m_eventLock, "");
 

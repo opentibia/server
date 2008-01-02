@@ -67,6 +67,24 @@ public:
 		ground = NULL;
 	}
 
+	~Tile()
+	{
+#ifdef _DEBUG
+		delete ground;
+
+		ItemVector::iterator it;
+		for(it = topItems.begin(); it != topItems.end(); ++it){
+			delete *it;
+		}
+		topItems.clear();
+
+		for(it = downItems.begin(); it != downItems.end(); ++it){
+			delete *it;
+		}
+		downItems.clear();
+#endif // _DEBUG
+	}
+
 	virtual int getThrowRange() const {return 0;};
 	virtual bool isPushable() const {return false;};
 
