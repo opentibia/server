@@ -82,6 +82,7 @@ public:
 	uint32_t addEvent(SchedulerTask* task);
 	bool stopEvent(uint32_t eventId);
 	void stop();
+	void shutdown();
 	
 	static OTSYS_THREAD_RETURN schedulerThread(void* p);
 	

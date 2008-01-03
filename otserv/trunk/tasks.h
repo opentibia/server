@@ -65,6 +65,7 @@ public:
 	
 protected:
 	Dispatcher();
+	void flush();
 	
 	OTSYS_THREAD_LOCKVAR m_taskLock;
 	OTSYS_THREAD_SIGNALVAR m_taskSignal;

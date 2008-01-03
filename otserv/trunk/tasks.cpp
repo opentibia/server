@@ -107,13 +107,24 @@ void Dispatcher::addTask(Task* task)
 	}
 }
 
+void Dispatcher::flush()
+{
+	Task* task = NULL;
+	while(!m_taskList.empty()){
+		task = getDispatcher().m_taskList.front();
+		m_taskList.pop_front();
+		(*task)();
+		delete task;
+		OutputMessagePool::getInstance()->sendAll();
+		g_game.clearSpectatorCache();
+	}
+}
+
 void Dispatcher::stop()
 {
 	OTSYS_THREAD_LOCK(m_taskLock, "");
+	flush();
 	m_shutdown = true;
-
-	while(!m_taskList.empty()){
-		m_taskList.pop_front();
-	}
 	OTSYS_THREAD_UNLOCK(m_taskLock, "");
 }
+

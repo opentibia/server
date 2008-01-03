@@ -137,7 +137,6 @@ void Game::setGameState(GameState_t newState)
 				}
 
 				saveGameState();
-				cleanup();
 
 				Dispatcher::getDispatcher().addTask(createTask(
 					boost::bind(&Game::shutdown, this)));
@@ -3526,6 +3525,8 @@ void Game::shutdown()
 	if(g_server){
 		g_server->stop();
 	}
+
+	cleanup();
 }
 
 void Game::cleanup()

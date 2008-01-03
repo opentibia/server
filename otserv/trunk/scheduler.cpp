@@ -142,32 +142,32 @@ bool Scheduler::stopEvent(uint32_t eventid)
 	if(eventid == 0)
 		return false;
 
-	OTSYS_THREAD_LOCK(m_eventLock, "stopEvent()")
+	OTSYS_THREAD_LOCK(m_eventLock, "")
 	// search the event id..
 	EventIdSet::iterator it = m_eventIds.find(eventid);
 	if(it != m_eventIds.end()) {
 		// if it is found erase from the list
 		m_eventIds.erase(it);
-		OTSYS_THREAD_UNLOCK(m_eventLock, "stopEvent()");
+		OTSYS_THREAD_UNLOCK(m_eventLock, "");
 		return true;
 	}
 	else{
 		// this eventid is not valid
-		OTSYS_THREAD_UNLOCK(m_eventLock, "stopEvent()");
+		OTSYS_THREAD_UNLOCK(m_eventLock, "");
 		return false;
 	}
 }
 
 void Scheduler::stop()
 {
-	OTSYS_THREAD_LOCK(m_eventLock, "clearTaskList()");
+	OTSYS_THREAD_LOCK(m_eventLock, "");
 	m_shutdown = true;
 
+	//this list should already be empty
 	while(!m_eventList.empty()){
 		m_eventList.pop();
 	}
-
 	m_eventIds.clear();
-	OTSYS_THREAD_UNLOCK(m_eventLock, "clearTaskList()");
+	OTSYS_THREAD_UNLOCK(m_eventLock, "");
 }
 
