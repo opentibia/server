@@ -59,8 +59,8 @@ public:
 	std::string getStatusString() const;
 	void getInfo(uint32_t requestedInfo, OutputMessage* output) const;
 
-	int getPlayersOnline() const {return m_playersonline;}
-	int getMaxPlayersOnline() const {return m_playersmax;}
+	uint32_t getPlayersOnline() const {return m_playersonline;}
+	uint32_t getMaxPlayersOnline() const {return m_playersmax;}
 
 	void setMaxPlayersOnline(int max){m_playersmax = max;}
 
