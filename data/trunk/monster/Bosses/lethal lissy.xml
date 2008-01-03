@@ -22,7 +22,9 @@
       <attack name="melee" interval="2000" min="-150" max="-250"/>
     </attacks>
     <defenses armor="35" defense="50">
-      <defense name="ultimate healing" interval="1200" chance="35" min="200" max="250"/>
+      <defense name="healing" interval="6000" chance="65" min="200" max="250">  
+		<attribute key="areaEffect" value="blueshimmer"/>
+	</defense>
     </defenses>
     
     <immunities>

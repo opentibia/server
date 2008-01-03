@@ -78,7 +78,7 @@ exhaustion =
 	
 	set = function (cid, storage, time)
 		setPlayerStorageValue(cid, storage, os.time()+time)  
-	end
+	end,
 
 	make = function (cid, storage, time)
 		local exhaust = exhaustion.get(cid, storage)

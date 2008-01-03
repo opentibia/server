@@ -20,12 +20,19 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-200" max="-480"/>
-    <attack name="Great Fireball" interval="1000" chance="20" min="-100" max="-250"/>
+    <attack name="fire" interval="1000" chance="20" range="5" radius="7" target="1" min="-100" max="-250">
+		<attribute key="areaEffect" value="firearea"/>
+		<attribute key="shootEffect" value="fire"/>
+	</attack>
     <!--<attack name="Combustion" interval="2000" chance="20" min="-100" max="-350"/>-->
-    <attack name="Energy Beam" interval="3000" chance="40" min="-200" max="-500"/>
+    <attack name="energy" interval="3000" chance="30" length="8" spread="0" min="-200" max="-500">
+      <attribute key="areaEffect" value="energy"/>
+    </attack>
   </attacks>
   <defenses armor="40" defense="45">
-    <defense name="Ultimate Healing" interval="4000" chance="5" min="50" max="200"/>
+    <defense name="healing" interval="4000" chance="5" min="50" max="200">
+		<attribute key="areaEffect" value="blueshimmer"/>
+	</defense>
   </defenses>
   <immunities>
     <immunity physical="0"/>
