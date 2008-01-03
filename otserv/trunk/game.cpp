@@ -129,10 +129,6 @@ void Game::setGameState(GameState_t newState)
 
 			case GAME_STATE_SHUTDOWN:
 			{
-				saveGameState();
-				Scheduler::getScheduler().stop();
-				Dispatcher::getDispatcher().stop();
-
 				//kick all players that are still online
 				AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 				while(it != Player::listPlayer.list.end()){
@@ -140,9 +136,11 @@ void Game::setGameState(GameState_t newState)
 					it = Player::listPlayer.list.begin();
 				}
 
-				if(g_server){
-					g_server->stop();
-				}
+				saveGameState();
+				cleanup();
+
+				Dispatcher::getDispatcher().addTask(createTask(
+					boost::bind(&Game::shutdown, this)));
 				break;
 			}
 
@@ -2559,7 +2557,7 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	if(!player || player->isRemoved())
 		return false;
 
-	uint32_t muteTime = muteTime = player->isMuted();
+	uint32_t muteTime = player->isMuted();
 	if(muteTime > 0){
 		std::stringstream ss;
 		ss << "You are still muted for " << muteTime << " seconds.";
@@ -3517,6 +3515,17 @@ void Game::addCommandTag(std::string tag)
 void Game::resetCommandTag()
 {
 	commandTags.clear();
+}
+
+
+void Game::shutdown()
+{
+	Scheduler::getScheduler().stop();
+	Dispatcher::getDispatcher().stop();
+
+	if(g_server){
+		g_server->stop();
+	}
 }
 
 void Game::cleanup()

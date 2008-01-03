@@ -336,6 +336,7 @@ public:
 	bool playerChangeOutfit(uint32_t playerId, Outfit_t outfit);
 
 	void cleanup();
+	void shutdown();
 	void FreeThing(Thing* thing);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,

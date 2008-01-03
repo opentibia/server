@@ -297,16 +297,14 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			break;
 		}
 		case CMD_CLOSE_SERVER:
-		{
-			
+		{	
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&ProtocolAdmin::adminCommandCloseServer, this)));
 			
 			break;
 		}
 		case CMD_PAY_HOUSES:
-		{
-			
+		{			
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&ProtocolAdmin::adminCommandPayHouses, this)));
 			
@@ -314,10 +312,8 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		}
 		case CMD_SHUTDOWN_SERVER:
 		{
-			addLogLine(this, LOGTYPE_EVENT, 1, "start server shutdown");
-			g_game.setGameState(GAME_STATE_SHUTDOWN);
-			output->AddByte(AP_MSG_COMMAND_OK);
-			outputPool->send(output);
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&ProtocolAdmin::adminCommandShutdownServer, this)));
 			getConnection()->closeConnection();
 			return;
 			break;
@@ -384,6 +380,17 @@ void ProtocolAdmin::adminCommandCloseServer()
 	
 	addLogLine(this, LOGTYPE_EVENT, 1, "close server ok");
 	
+	output->AddByte(AP_MSG_COMMAND_OK);
+	OutputMessagePool::getInstance()->send(output);
+}
+
+void ProtocolAdmin::adminCommandShutdownServer()
+{
+	g_game.setGameState(GAME_STATE_SHUTDOWN);
+
+	addLogLine(this, LOGTYPE_EVENT, 1, "start server shutdown");
+
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	output->AddByte(AP_MSG_COMMAND_OK);
 	OutputMessagePool::getInstance()->send(output);
 }
