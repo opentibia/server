@@ -916,7 +916,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	if(item->isStackable()) {
 		if(toItem && toItem->getID() == item->getID()){
 			n = std::min((uint32_t)100 - toItem->getItemCount(), m);
-			toCylinder->__updateThing(toItem, toItem->getItemCount() + n);
+			toCylinder->__updateThing(toItem, toItem->getID(), toItem->getItemCount() + n);
 			updateItem = toItem;
 		}
 
@@ -1003,7 +1003,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 		if(item->isStackable()) {
 			if(toItem && toItem->getID() == item->getID()){
 				n = std::min((uint32_t)100 - toItem->getItemCount(), m);
-				toCylinder->__updateThing(toItem, toItem->getItemCount() + n);
+				toCylinder->__updateThing(toItem, toItem->getID(), toItem->getItemCount() + n);
 			}
 
 			if(m - n > 0){
@@ -1393,9 +1393,9 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 	return (money == 0);
 }
 
-Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
+Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 {
-	if(item->getID() == newId && (count == -1 || count == item->getItemCountOrSubtype()))
+	if(item->getID() == newId && (newCount == -1 || newCount == item->getItemCountOrSubtype()))
 		return item;
 
 	Cylinder* cylinder = item->getParent();
@@ -1429,11 +1429,11 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 		}
 
 		Item* newItem = NULL;
-		if(count == -1){
+		if(newCount == -1){
 			newItem = Item::CreateItem(newId);
 		}
 		else{
-			newItem = Item::CreateItem(newId, count);
+			newItem = Item::CreateItem(newId, newCount);
 		}
 
 		ret = internalAddItem(cylinder, newItem, INDEX_WHEREEVER);
@@ -1448,26 +1448,28 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 	if(curType.type == newType.type){
 		//Both items has the same type so we can safely change id/subtype
 
-		if((item->isStackable() || item->hasCharges() ) && count == 0){
+		if((item->isStackable() || item->hasCharges() ) && newCount == 0){
 			internalRemoveItem(item);
 			return NULL;
 		}
 		else{
 			cylinder->postRemoveNotification(item, itemIndex, true);
+			uint16_t itemId = item->getID();
+			uint32_t count = item->getItemCountOrSubtype();
 
 			if(curType.id != newType.id){
 				if(newType.group != curType.group){
 					item->setDefaultSubtype();
 				}
 
-				item->setID(newId);
+				itemId = newId;
 			}
 
 			if(count != -1 && item->hasSubType()){
-				item->setItemCountOrSubtype(count);
+				count = newCount;
 			}
 
-			cylinder->__updateThing(item, item->getItemCountOrSubtype());
+			cylinder->__updateThing(item, itemId, count);
 			cylinder->postAddNotification(item, itemIndex);
 			return item;
 		}
@@ -1475,11 +1477,11 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t count /*= -1*/)
 	else{
 		//Replacing the the old item with the new while maintaining the old position
 		Item* newItem = NULL;
-		if(count == -1){
+		if(newCount == -1){
 			newItem = Item::CreateItem(newId);
 		}
 		else{
-			newItem = Item::CreateItem(newId, count);
+			newItem = Item::CreateItem(newId, newCount);
 		}
 
 		cylinder->__replaceThing(itemIndex, newItem);
@@ -2806,8 +2808,8 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
 	bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList)
 {
-#ifdef __DEBUG__
-	__int64 startTick = OTSYS_TIME();
+#ifdef __DEBUG__PATHING__
+	int64 startTick = OTSYS_TIME();
 #endif
 
 	if(creature->getPosition().z != targetPos.z || !creature->canSee(targetPos)){
@@ -2886,7 +2888,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 		}
 
 		if(minWalkDist != -1){
-#ifdef __DEBUG__
+#ifdef __DEBUG__PATHING__
 			__int64 endTick = OTSYS_TIME();
 			std::cout << "distance: " << tryDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
 #endif
@@ -2896,7 +2898,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 		--tryDist;
 	}
 
-#ifdef __DEBUG__
+#ifdef __DEBUG__PATHING__
 	__int64 endTick = OTSYS_TIME();
 	std::cout << "distance: " << tryDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
 #endif

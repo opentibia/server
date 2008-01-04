@@ -110,9 +110,10 @@ public:
 	/**
 	  * Update the item count or type for an object
 	  * \param thing is the object to update
+	  * \param itemId is the new item id
 	  * \param count is the new count value
 	  */
-	virtual void __updateThing(Thing* thing, uint32_t count) = 0;
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count) = 0;
 
 	/**
 	  * Replace an object with a new
@@ -211,7 +212,7 @@ public:
 
 	virtual void __addThing(Thing* thing) {}
 	virtual void __addThing(int32_t index, Thing* thing) {}
-	virtual void __updateThing(Thing* thing, uint32_t count) {}
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count) {}
 	virtual void __replaceThing(uint32_t index, Thing* thing) {}
 	virtual void __removeThing(Thing* thing, uint32_t count) {}
 

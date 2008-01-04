@@ -47,7 +47,7 @@ public:
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
 
-	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
 	virtual void __replaceThing(uint32_t index, Thing* thing);
 
 	virtual void __removeThing(Thing* thing, uint32_t count);

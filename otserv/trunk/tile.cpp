@@ -219,7 +219,8 @@ void Tile::onAddTileItem(Item* item)
 	}
 }
 
-void Tile::onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem)
+void Tile::onUpdateTileItem(uint32_t index, Item* oldItem,
+		const ItemType& oldType, Item* newItem, const ItemType& newType)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -237,7 +238,7 @@ void Tile::onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem)
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
+		(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, oldType, newItem, newType);
 	}
 }
 
@@ -383,7 +384,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 							return RET_NOTPOSSIBLE;
 						}
 					}
-					else if(iiType.blockSolid || (((flags & FLAG_PATHFINDING) == FLAG_PATHFINDING) && iiType.blockPathFind)){
+					else if(iiType.blockSolid || (hasBitSet(FLAG_PATHFINDING, flags) && iiType.blockPathFind) ){
 						if(!monster->canPushItems() || !iiType.moveable || (iitem->getUniqueId() != 0)){
 							return RET_NOTPOSSIBLE;
 						}
@@ -444,7 +445,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	}
 	else if(const Item* item = thing->getItem()){
 #ifdef __DEBUG__
-		if(thing->getParent() == NULL){
+		if(thing->getParent() == NULL && !hasBitSet(FLAG_NOLIMIT, flags)){
 			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
 		}
 #endif
@@ -653,7 +654,9 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			}
 			else{
 				int32_t index = __getIndexOfThing(ground);
-				onUpdateTileItem(index, ground, item);
+				const ItemType& oldType = Item::items[ground->getID()];
+				const ItemType& newType = Item::items[item->getID()];
+				onUpdateTileItem(index, ground, oldType, item, newType);
 
 				ground->setParent(NULL);
 				g_game.FreeThing(ground);
@@ -725,7 +728,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void Tile::__updateThing(Thing* thing, uint32_t count)
+void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
@@ -745,8 +748,12 @@ void Tile::__updateThing(Thing* thing, uint32_t count)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
+	const ItemType& oldType = Item::items[item->getID()];
+	const ItemType& newType = Item::items[itemId];
+
+	item->setID(itemId);
 	item->setItemCountOrSubtype(count);
-	onUpdateTileItem(index, item, item);
+	onUpdateTileItem(index, item, oldType, item, newType);
 }
 
 void Tile::__replaceThing(uint32_t index, Thing* thing)
@@ -811,7 +818,10 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 
 	if(isInserted){
 		item->setParent(this);
-		onUpdateTileItem(index, oldItem, item);
+
+		const ItemType& oldType = Item::items[oldItem->getID()];
+		const ItemType& newType = Item::items[item->getID()];
+		onUpdateTileItem(index, oldItem, oldType, item, newType);
 
 		oldItem->setParent(NULL);
 		return /*RET_NOERROR*/;
@@ -889,7 +899,8 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 						int newCount = std::max(0, (int)(item->getItemCount() - count));
 						item->setItemCount(newCount);
 
-						onUpdateTileItem(index, item, item);
+						const ItemType& it = Item::items[item->getID()];
+						onUpdateTileItem(index, item, it, item, it);
 					}
 					else {
 

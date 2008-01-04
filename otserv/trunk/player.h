@@ -238,7 +238,7 @@ public:
 	bool addVIP(uint32_t guid, std::string& name, bool isOnline, bool interal = false);
 
 	//follow functions
-	virtual bool setFollowCreature(Creature* creature);
+	virtual bool setFollowCreature(Creature* creature, bool fullPathSearch = false);
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature);
@@ -381,7 +381,8 @@ public:
 
 	//event methods
 	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
+		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void onUpdateTile(const Position& pos);
 
@@ -399,7 +400,8 @@ public:
 
 	//container
 	void onAddContainerItem(const Container* container, const Item* item);
-	void onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem);
+	void onUpdateContainerItem(const Container* container, uint8_t slot,
+		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
 
 	void onCloseContainer(const Container* container);
@@ -408,7 +410,8 @@ public:
 
 	//inventory
 	void onAddInventoryItem(slots_t slot, Item* item);
-	void onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem);
+	void onUpdateInventoryItem(slots_t slot, Item* oldItem, const ItemType& oldType,
+		Item* newItem, const ItemType& newType);
 	void onRemoveInventoryItem(slots_t slot, Item* item);
 
 	//other send messages
@@ -523,7 +526,7 @@ protected:
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
 
-	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
 	virtual void __replaceThing(uint32_t index, Thing* thing);
 
 	virtual void __removeThing(Thing* thing, uint32_t count);

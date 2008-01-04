@@ -1196,9 +1196,10 @@ void Player::onAddTileItem(const Position& pos, const Item* item)
 	Creature::onAddTileItem(pos, item);
 }
 
-void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
+void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
-	Creature::onUpdateTileItem(pos, stackpos, oldItem, newItem);
+	Creature::onUpdateTileItem(pos, stackpos, oldItem, oldType, newItem, newType);
 
 	if(oldItem != newItem){
 		onRemoveTileItem(pos, stackpos, oldItem);
@@ -1387,7 +1388,8 @@ void Player::onAddContainerItem(const Container* container, const Item* item)
 	checkTradeState(item);
 }
 
-void Player::onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem)
+void Player::onUpdateContainerItem(const Container* container, uint8_t slot,
+	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
 	if(oldItem != newItem){
 		onRemoveContainerItem(container, slot, oldItem);
@@ -1441,7 +1443,8 @@ void Player::onAddInventoryItem(slots_t slot, Item* item)
 	//
 }
 
-void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem)
+void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, const ItemType& oldType,
+	Item* newItem, const ItemType& newType)
 {
 	if(oldItem != newItem){
 		onRemoveInventoryItem(slot, oldItem);
@@ -2545,7 +2548,7 @@ void Player::__addThing(int32_t index, Thing* thing)
 	onAddInventoryItem((slots_t)index, item);
 }
 
-void Player::__updateThing(Thing* thing, uint32_t count)
+void Player::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
@@ -2565,13 +2568,17 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
+	const ItemType& oldType = Item::items[item->getID()];
+	const ItemType& newType = Item::items[itemId];
+
+	item->setID(itemId);
 	item->setItemCountOrSubtype(count);
 
 	//send to client
 	sendUpdateInventoryItem((slots_t)index, item, item);
 
 	//event methods
-	onUpdateInventoryItem((slots_t)index, item, item);
+	onUpdateInventoryItem((slots_t)index, item, oldType, item, newType);
 }
 
 void Player::__replaceThing(uint32_t index, Thing* thing)
@@ -2602,11 +2609,14 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
+	const ItemType& oldType = Item::items[oldItem->getID()];
+	const ItemType& newType = Item::items[item->getID()];
+
 	//send to client
 	sendUpdateInventoryItem((slots_t)index, oldItem, item);
 
 	//event methods
-	onUpdateInventoryItem((slots_t)index, oldItem, item);
+	onUpdateInventoryItem((slots_t)index, oldItem, oldType, item, newType);
 
 	item->setParent(this);
 	inventory[index] = item;
@@ -2647,11 +2657,13 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			int newCount = std::max(0, (int)(item->getItemCount() - count));
 			item->setItemCount(newCount);
 
+			const ItemType& it = Item::items[item->getID()];
+
 			//send change to client
 			sendUpdateInventoryItem((slots_t)index, item, item);
 
 			//event methods
-			onUpdateInventoryItem((slots_t)index, item, item);
+			onUpdateInventoryItem((slots_t)index, item, it, item, it);
 		}
 	}
 	else{
@@ -2846,9 +2858,9 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
   }
 }
 
-bool Player::setFollowCreature(Creature* creature)
+bool Player::setFollowCreature(Creature* creature, bool fullPathSearch /*= false*/)
 {
-	if(!Creature::setFollowCreature(creature)){
+	if(!Creature::setFollowCreature(creature, fullPathSearch)){
 		setFollowCreature(NULL);
 		setAttackedCreature(NULL);
 

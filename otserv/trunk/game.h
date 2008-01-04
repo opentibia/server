@@ -255,10 +255,10 @@ public:
 	  * Transform one item to another type/count
 	  * \param item is the item to transform
 	  * \param newtype is the new type
-	  * \param count is the new count value, use default value (-1) to not change it
+	  * \param newCount is the new count value, use default value (-1) to not change it
 	  * \returns true if the tranformation was successful
 	  */
-	Item* transformItem(Item* item, uint16_t newId, int32_t count = -1);
+	Item* transformItem(Item* item, uint16_t newId, int32_t newCount = -1);
 
 	/**
 	  * Teleports an object to another position

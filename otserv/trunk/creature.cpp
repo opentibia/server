@@ -315,7 +315,8 @@ void Creature::onAddTileItem(const Position& pos, const Item* item)
 	internalValidatePath = true;
 }
 
-void Creature::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
+void Creature::onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
 	internalValidatePath = true;
 	//validateWalkPath();
@@ -454,12 +455,12 @@ void Creature::onDie()
 		}
 	}
 
+	die();
+	dropCorpse();
+
 	if(getMaster()){
 		getMaster()->removeSummon(this);
 	}
-
-	die();
-	dropCorpse();
 }
 
 void Creature::dropCorpse()
@@ -677,7 +678,7 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 	}
 }
 
-bool Creature::setFollowCreature(Creature* creature)
+bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= false*/)
 {
 	if(creature){
 		const Position& creaturePos = creature->getPosition();

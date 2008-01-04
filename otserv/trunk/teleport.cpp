@@ -162,7 +162,7 @@ void Teleport::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void Teleport::__updateThing(Thing* thing, uint32_t count)
+void Teleport::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 {
 	//
 }
