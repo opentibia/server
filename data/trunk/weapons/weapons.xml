@@ -33,6 +33,7 @@
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
+	<melee id="7383" level="50" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Relic Sword
 	<melee id="7416" level="55" enabled="1" unproperly="1" function="internalLoadWeapon"/>	--Bloody Edge
 	<melee id="2393" level="55" enabled="1" unproperly="1" function="internalLoadWeapon">	--Giant Sword
 		<vocation name="Knight"/>

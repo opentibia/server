@@ -71,6 +71,14 @@
 
 	<action itemid="5553" script="liquid.lua" />
 	<action itemid="6558" script="liquid.lua" />
+
+	<!-- Potions -->
+	<action itemid="7588" script="potions.lua" />
+	<action itemid="7589" script="potions.lua" />
+	<action itemid="7590" script="potions.lua" />
+	<action itemid="7591" script="potions.lua" />
+	<action itemid="7618" script="potions.lua" />
+	<action itemid="7620" script="potions.lua" />
 	
 	<!-- Make Bread -->
 	<action itemid="2692" script="bread_system.lua" />
