@@ -548,6 +548,14 @@ protected:
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
 
+	static const luaL_Reg luaBitReg[7];
+	static int luaBitNot(lua_State *L);
+	static int luaBitAnd(lua_State *L);
+	static int luaBitOr(lua_State *L);
+	static int luaBitXor(lua_State *L);
+	static int luaBitLeftShift(lua_State *L);
+	static int luaBitRightShift(lua_State *L);
+
 	lua_State* m_luaState;
 	std::string m_lastLuaError;
 

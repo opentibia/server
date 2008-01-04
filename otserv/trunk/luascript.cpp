@@ -608,6 +608,7 @@ bool LuaScriptInterface::initState()
 	if(!m_luaState){
 		return false;
 	}
+
 #ifndef __USE_LUALIBRARIES__
 	//Here you load only the "safe" libraries
 	luaopen_base(m_luaState);
@@ -1478,8 +1479,11 @@ void LuaScriptInterface::registerFunctions()
 
 	//getDataDir()
 	lua_register(m_luaState, "getDataDir", LuaScriptInterface::luaGetDataDirectory);
-}
 
+	//bit operations for Lua, based on bitlib project release 24
+	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
+	luaL_openlib(m_luaState, "bit", LuaScriptInterface::luaBitReg, 0);
+}
 
 int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 {
@@ -5975,3 +5979,47 @@ int LuaScriptInterface::luaGetItemIdByName(lua_State *L)
 	lua_pushnumber(L, itemid);
 	return 1;
 }
+
+const luaL_Reg LuaScriptInterface::luaBitReg[] =
+{
+	//{"cast", LuaScriptInterface::luaBitCast},
+	{"bnot", LuaScriptInterface::luaBitNot},
+	{"band", LuaScriptInterface::luaBitAnd},
+	{"bor", LuaScriptInterface::luaBitOr},
+	{"bxor", LuaScriptInterface::luaBitXor},
+	{"lshift", LuaScriptInterface::luaBitLeftShift},
+	{"rshift", LuaScriptInterface::luaBitRightShift},
+	//{"arshift", LuaScriptInterface::luaBitArithmeticalRightShift},
+	{NULL,NULL}
+};
+
+int LuaScriptInterface::luaBitNot(lua_State *L)
+{
+	int number = popNumber(L);
+	lua_pushnumber(L, ~number);
+	return 1;
+}
+
+#define MULTIOP(name, op) \
+	int LuaScriptInterface::luaBit##name(lua_State *L) { \
+		int n = lua_gettop(L), i, w = popNumber(L); \
+		for(i = 2; i <= n; ++i){ \
+			w op popNumber(L); \
+		} \
+		lua_pushnumber(L, w); \
+		return 1; \
+	}
+
+MULTIOP(And, &=)
+MULTIOP(Or, |=)
+MULTIOP(Xor, ^=)
+
+#define SHIFTOP(name, op) \
+	int LuaScriptInterface::luaBit##name(lua_State *L) { \
+		int n2 = popNumber(L), n1 = popNumber(L); \
+		lua_pushnumber(L, (n1 op n2)); \
+		return 1; \
+	}
+
+SHIFTOP(LeftShift, <<)
+SHIFTOP(RightShift, >>)
