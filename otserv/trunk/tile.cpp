@@ -1069,7 +1069,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	}
 
 	//release the reference to this item onces we are finished
-	thing->releaseThing2();
+	g_game.FreeThing(thing);
 }
 
 void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)

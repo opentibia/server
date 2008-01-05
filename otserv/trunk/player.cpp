@@ -72,11 +72,13 @@ Creature()
 	guildLevel = 0;
 
 	level      = 1;
-	experience = 180;
+	levelPercent = 0;
+	magLevelPercent = 0;
+	magLevel   = 0;
+	experience = 0;
 	damageImmunities = 0;
 	conditionImmunities = 0;
 	conditionSuppressions = 0;
-	magLevel   = 20;
 	accessLevel = 0;
 	lastip = 0;
 	lastLoginSaved = 0;
@@ -114,8 +116,6 @@ Creature()
 	lastSentStats.manaMax = 0;
 	lastSentStats.manaSpent = 0;
 	lastSentStats.magLevel = 0;
-	level_percent = 0;
-	maglevel_percent = 0;
 	skillLoss = true;
 
 	for(int32_t i = 0; i < 11; i++){
@@ -497,14 +497,13 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 {
 	switch(playerinfo) {
 		case PLAYERINFO_LEVEL: return level; break;
-		case PLAYERINFO_LEVELPERCENT: return level_percent; break;
+		case PLAYERINFO_LEVELPERCENT: return levelPercent; break;
 		case PLAYERINFO_MAGICLEVEL: return std::max((int32_t)0, ((int32_t)magLevel + varStats[STAT_MAGICPOINTS])); break;
-		case PLAYERINFO_MAGICLEVELPERCENT: return maglevel_percent; break;
+		case PLAYERINFO_MAGICLEVELPERCENT: return magLevelPercent; break;
 		case PLAYERINFO_HEALTH: return health; break;
 		case PLAYERINFO_MAXHEALTH: return std::max((int32_t)1, ((int32_t)healthMax + varStats[STAT_MAXHITPOINTS])); break;
 		case PLAYERINFO_MANA: return mana; break;
 		case PLAYERINFO_MAXMANA: return std::max((int32_t)0, ((int32_t)manaMax + varStats[STAT_MAXMANAPOINTS])); break;
-		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
 		case PLAYERINFO_SOUL: return std::max((int32_t)0, ((int32_t)soul + varStats[STAT_SOULPOINTS])); break;
 		default:
 			return 0; break;
@@ -1047,29 +1046,31 @@ void Player::sendStats()
 	if(client){
 		//update level and magLevel percents
 		if(lastSentStats.experience != getExperience() || lastSentStats.level != level){
-			uint32_t currentExpLevel = getExpForLv(level);
-			int32_t percent = (100*(experience - currentExpLevel)) / std::max((int32_t)1, (int32_t)(getExpForLv(level + 1) - currentExpLevel));
+			uint32_t currentExpLevel = Player::getExpForLevel(level);
+			uint32_t nextExpLevel = Player::getExpForLevel(level + 1);
+			uint32_t diffExpLevel = nextExpLevel - currentExpLevel;
+			uint32_t gainNextLevel = (getExperience() - currentExpLevel);
 
-			if(percent < 0){
-				percent = 0;
+			if(diffExpLevel > 0){
+				levelPercent = std::min((uint32_t)100, (uint32_t)(gainNextLevel * 100) / diffExpLevel );
 			}
-			else if(percent > 100){
-				percent = 100;
+			else{
+				levelPercent = 100;
 			}
-
-			level_percent = percent;
 		}
 
 		if(lastSentStats.manaSpent != manaSpent || lastSentStats.magLevel != magLevel){
-			int32_t percent = (100 * manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
-			if(percent < 0){
-				percent = 0;
-			}
-			else if(percent > 100){
-				percent = 100;
-			}
+			uint32_t currentManaLevel = vocation->getReqMana(magLevel);
+			uint32_t nextManaLevel = vocation->getReqMana(magLevel + 1);
+			uint32_t diffManaLevel = nextManaLevel - currentManaLevel;
+			uint32_t gainNextLevel = (manaSpent - currentManaLevel);
 
-			maglevel_percent = percent;
+			if(diffManaLevel > 0){
+				magLevelPercent = std::min((uint32_t)100, (uint32_t)(gainNextLevel * 100) / diffManaLevel );
+			}
+			else{
+				magLevelPercent = 100;
+			}
 		}
 
 		//save current stats
@@ -1638,7 +1639,7 @@ void Player::addExperience(uint32_t exp)
 	int prevLevel = getLevel();
 	int newLevel = getLevel();
 
-	while(experience >= getExpForLv(newLevel + 1)){
+	while(experience >= Player::getExpForLevel(newLevel + 1)){
 		++newLevel;
 		healthMax += vocation->getHPGain();
 		health += vocation->getHPGain();
@@ -1980,7 +1981,7 @@ void Player::die()
 
 		//Level loss
 		int32_t newLevel = level;
-		while((uint32_t)(experience - getLostExperience()) < getExpForLv(newLevel)){
+		while((uint32_t)(experience - getLostExperience()) < Player::getExpForLevel(newLevel)){
 			if(newLevel > 1)
 				newLevel--;
 			else
@@ -2043,7 +2044,7 @@ void Player::preSave()
 	if(health <= 0){
 		experience -= getLostExperience();
 
-		while(level > 1 && experience < getExpForLv(level)){
+		while(level > 1 && experience < Player::getExpForLevel(level)){
 			--level;
 			healthMax = std::max((int32_t)0, (healthMax - (int32_t)vocation->getHPGain()));
 			manaMax = std::max((int32_t)0, (manaMax - (int32_t)vocation->getManaGain()));
@@ -3442,46 +3443,6 @@ void Player::setSex(playersex_t player_sex)
 		outfit.looktype = (*it)->looktype;
 		outfit.addons = (*it)->addons;
 		m_playerOutfits.addOutfit(outfit);
-	}
-}
-
-void Player::setSkillsPercents()
-{
-	uint32_t percent = 0;
-
-	percent = (100 * manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
-	if(percent < 0){
-		percent = 0;
-	}
-	else if(percent > 100){
-		percent = 100;
-	}
-
-	maglevel_percent = percent;
-
-	percent = (100*(getExperience() - getExpForLv(getLevel()))) /
-		std::max((int32_t)1, (int32_t)((getExpForLv(getLevel() + 1) - getExpForLv(getLevel()))));
-
-	if(percent < 0){
-		percent = 0;
-	}
-	else if(percent > 100){
-		percent = 100;
-	}
-
-	level_percent = percent;
-
-	for(unsigned int i = SKILL_FIRST; i < SKILL_LAST; ++i){
-		percent = (100*skills[i][SKILL_TRIES]) / std::max((int32_t)1, (int32_t)(vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]+1)));
-
-		if(percent < 0){
-			percent = 0;
-		}
-		else if(percent > 100){
-			percent = 100;
-		}
-
-		skills[i][SKILL_PERCENT] = percent;
 	}
 }
 

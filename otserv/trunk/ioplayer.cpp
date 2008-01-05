@@ -68,26 +68,20 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	// Getting all player properties
 	player->setSex((playersex_t)result->getDataInt("sex"));
 	player->setDirection((Direction)result->getDataInt("direction"));
-	player->experience = result->getDataInt("experience");
-	player->level = result->getDataInt("level");
+	player->level = std::max((uint32_t)1, (uint32_t)result->getDataInt("level"));
+	player->experience = std::max((uint32_t)Player::getExpForLevel(player->level),
+		(uint32_t)result->getDataInt("experience"));
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");
 	player->setVocation(result->getDataInt("vocation"));
-	player->updateBaseSpeed();
 	player->mana = result->getDataInt("mana");
 	player->manaMax = result->getDataInt("manamax");
-	player->manaSpent = result->getDataInt("manaspent");
 	player->magLevel = result->getDataInt("maglevel");
-
+	player->manaSpent = std::max((uint32_t)player->vocation->getReqMana(player->magLevel),
+		(uint32_t)result->getDataInt("manaspent"));
 	player->health = result->getDataInt("health");
-	if(player->health <= 0)
-		player->health = 100;
-
 	player->healthMax = result->getDataInt("healthmax");
-	if(player->healthMax <= 0)
-		player->healthMax = 100;
-
 	player->defaultOutfit.lookType = result->getDataInt("looktype");
 	player->defaultOutfit.lookHead = result->getDataInt("lookhead");
 	player->defaultOutfit.lookBody = result->getDataInt("lookbody");
@@ -201,10 +195,24 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	if((result = db->storeQuery(query.str()))){
 		//now iterate over the skills
 		do{
+			uint32_t currentSkillLevel, nextSkillLevel, diffSkillLevel, gainNextSkill;
+
 			int skillid = result->getDataInt("skillid");
 			if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST){
 				player->skills[skillid][SKILL_LEVEL] = result->getDataInt("value");
-				player->skills[skillid][SKILL_TRIES] = result->getDataInt("count");
+				currentSkillLevel = player->vocation->getReqSkillTries(skillid, player->skills[skillid][SKILL_LEVEL]);
+				player->skills[skillid][SKILL_TRIES] = std::max((uint32_t)currentSkillLevel, (uint32_t)result->getDataInt("count"));
+
+				nextSkillLevel = player->vocation->getReqSkillTries(skillid, player->skills[skillid][SKILL_LEVEL] + 1);
+				diffSkillLevel = nextSkillLevel - currentSkillLevel;
+				gainNextSkill = (player->skills[skillid][SKILL_TRIES] - currentSkillLevel);
+
+				if(diffSkillLevel > 0){
+					player->skills[skillid][SKILL_PERCENT] = std::min((uint32_t)100, (uint32_t)(gainNextSkill * 100) / diffSkillLevel );
+				}
+				else{
+					player->skills[skillid][SKILL_PERCENT] = 100;
+				}
 			}
 		}while(result->next());
 
@@ -251,9 +259,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		db->freeResult(result);
 	}
 
-	player->updateInventoryWeigth();
-	player->updateItemsLight(true);
-	player->setSkillsPercents();
 
 	//load depot items
 	itemMap.clear();
@@ -317,6 +322,10 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		}while(result->next());
 		db->freeResult(result);
 	}
+
+	player->updateBaseSpeed();
+	player->updateInventoryWeigth();
+	player->updateItemsLight(true);
 
 	return true;
 }
@@ -387,7 +396,7 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 	return true;
 }
 
-bool IOPlayer::savePlayer(Player* player)
+bool IOPlayer::savePlayer(Player* player, bool forceSave /*= false*/)
 {
 	player->preSave();
 
@@ -402,8 +411,7 @@ bool IOPlayer::savePlayer(Player* player)
 		return false;
 	}
 
-	// If save var is not 1 don't save the player info
-	if(result->getDataInt("save") == 0){
+	if(!forceSave && result->getDataInt("save") == 0){
 		db->freeResult(result);
 		return true;
 	}

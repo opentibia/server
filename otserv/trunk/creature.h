@@ -112,11 +112,6 @@ public:
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
 
-	uint32_t getExpForLv(const int& lv) const
-	{
-		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
-	}
-
 	virtual RaceType_t getRace() const {return RACE_NONE;}
 	Direction getDirection() const { return direction;}
 	void setDirection(Direction dir) { direction = dir;}

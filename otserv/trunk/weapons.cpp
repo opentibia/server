@@ -144,8 +144,6 @@ Event* Weapons::getEvent(const std::string& nodeName)
 bool Weapons::registerEvent(Event* event, xmlNodePtr p)
 {
 	Weapon* weapon = dynamic_cast<Weapon*>(event);
-	//weapon->init();
-
 	if(weapon){
 		weapons[weapon->getID()] = weapon;
 	}
@@ -254,7 +252,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	if(readXMLString(p, "ammo", strValue)){
-		ammoAction = getAmmoAction(strValue);
+		std::cout << "Warning: ammo is not longer used in weapons.xml." << std::endl;
 	}
 
 	typedef std::list<std::string> STRING_LIST;
@@ -694,40 +692,40 @@ WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
 
 bool WeaponDistance::configureEvent(xmlNodePtr p)
 {
-	AmmoAction_t oldAmmoAction = ammoAction;
 	if(!Weapon::configureEvent(p)){
 		return false;
 	}
 
 	const ItemType& it = Item::items[id];
-	hitChance = it.hitChance;
-	breakChance = it.breakChance;
 
-	if(oldAmmoAction == ammoAction && it.ammoAction != AMMOACTION_NONE){
+	//default values
+	if(it.slot_position & SLOTP_TWO_HAND){
+		//hit chance on two-handed weapons is limited to 90%
+		hitChance = 90;
+	}
+	else{
+		//one-handed is set to 75%
+		hitChance = 75;
+	}
+
+	if(it.hitChance != 0){
+		hitChance = it.hitChance;
+	}
+	
+	if(it.breakChance != 0){
+		breakChance = it.breakChance;
+	}
+
+	if(it.ammoAction != AMMOACTION_NONE){
 		ammoAction = it.ammoAction;
 	}
 
 	int intValue;
 	if(readXMLInteger(p, "hitChance", intValue)){
-		if(intValue < 0){
-			intValue = 0;
-		}
-		else if(intValue > 100){
-			intValue = 100;
-		}
-
-		hitChance = intValue;
+		std::cout << "Warning: hitChance is not longer used in weapons.xml." << std::endl;
 	}
-
 	if(readXMLInteger(p, "breakChance", intValue)){
-		if(intValue < 0){
-			intValue = 0;
-		}
-		else if(intValue > 100){
-			intValue = 100;
-		}
-
-		breakChance = intValue;
+		std::cout << "Warning: breakChance is not longer used in weapons.xml." << std::endl;
 	}
 
 	return true;
@@ -737,36 +735,26 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 {
 	m_scripted = false;
 
-	ammuAttackValue = it.attack;
+	//default values
+	if(it.slot_position & SLOTP_TWO_HAND){
+		//hit chance on two-handed weapons is limited to 90%
+		hitChance = 90;
+	}
+	else{
+		//one-handed is set to 75%
+		hitChance = 75;
+	}
+
 	params.distanceEffect = it.shootType;
 	range = it.shootRange;
+	ammuAttackValue = it.attack;
 
-	if(hitChance == 0){
+	if(it.hitChance != 0){
 		hitChance = it.hitChance;
 	}
 
-	if(breakChance == 0){
+	if(it.breakChance != 0){
 		breakChance = it.breakChance;
-	}
-
-	switch(it.amuType){
-		case AMMO_ARROW:
-		{
-			hitChance = (hitChance > 0 ? hitChance : 80);
-			breakChance = (breakChance > 0 ? breakChance : 7);
-			break;
-		}
-
-		case AMMO_BOLT:
-		{
-			hitChance = (hitChance > 0 ? hitChance : 90);
-			breakChance = (breakChance > 0 ? breakChance : 7);
-			break;
-		}
-
-		default:
-			hitChance = (hitChance > 0 ? hitChance : 50);
-			break;
 	}
 
 	return Weapon::configureWeapon(it);
@@ -779,25 +767,92 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		return false;
 	}
 
-	Position destPos = target->getPosition();
-	Tile* destTile = target->getTile();
+	//hit chance is based on distance to target and distance skill
+	uint32_t chance;
+	uint32_t maxHitChance = hitChance;
+	uint32_t skill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
+	const Position& playerPos = player->getPosition();
+	const Position& targetPos = target->getPosition();
+	uint32_t distance = std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y));
 
-	if(hitChance >= random_range(1, 100)){
+	if(item){
+		const ItemType& it = Item::items[item->getID()];
+		if(it.hitChance != 0){
+			//use the hitChance of the ammunition we are using.
+			maxHitChance = it.hitChance;
+		}
+	}
+
+	if(maxHitChance == 75){
+		//chance for one-handed weapons
+		switch(distance){
+			case 1: chance = (uint32_t)((float)std::min(skill, (uint32_t)74)) + 1; break;
+			case 2: chance = (uint32_t)((float)2.4 * std::min(skill, (uint32_t)28)) + 8; break;
+			case 3: chance = (uint32_t)((float)1.55 * std::min(skill, (uint32_t)45)) + 6; break;
+			case 4: chance = (uint32_t)((float)1.25 * std::min(skill, (uint32_t)58)) + 3; break;
+			case 5: chance = (uint32_t)((float)std::min(skill, (uint32_t)74)) + 1; break;
+			case 6: chance = (uint32_t)((float)0.8 * std::min(skill, (uint32_t)90)) + 3; break;
+			case 7: chance = (uint32_t)((float)0.7 * std::min(skill, (uint32_t)104)) + 2; break;
+			default: chance = hitChance; break;
+		}
+	}
+	else if(maxHitChance == 90){
+		//formula for two-handed weapons
+		switch(distance){
+			case 1: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)74)) + 1; break;
+			case 2: chance = (uint32_t)((float)3.2 * std::min(skill, (uint32_t)28)); break;
+			case 3: chance = (uint32_t)((float)2.0 * std::min(skill, (uint32_t)45)); break;
+			case 4: chance = (uint32_t)((float)1.55 * std::min(skill, (uint32_t)58)); break;
+			case 5: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)74)) + 1; break;
+			case 6: chance = (uint32_t)((float)1.0 * std::min(skill, (uint32_t)90)); break;
+			case 7: chance = (uint32_t)((float)1.0 * std::min(skill, (uint32_t)90)); break;
+			default: chance = hitChance; break;
+		}
+	}
+	else if(maxHitChance == 100){
+		switch(distance){
+			case 1: chance = (uint32_t)((float)1.35 * std::min(skill, (uint32_t)73)) + 1; break;
+			case 2: chance = (uint32_t)((float)3.2 * std::min(skill, (uint32_t)30)) + 5; break;
+			case 3: chance = (uint32_t)((float)2.25 * std::min(skill, (uint32_t)48)) + 2; break;
+			case 4: chance = (uint32_t)((float)1.5 * std::min(skill, (uint32_t)66)) + 2; break;
+			case 5: chance = (uint32_t)((float)1.35 * std::min(skill, (uint32_t)73)) + 1; break;
+			case 6: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)87)) - 4; break;
+			case 7: chance = (uint32_t)((float)1.1 * std::min(skill, (uint32_t)90)) + 1; break;
+			default: chance = hitChance; break;
+		}
+	}
+	else{
+		chance = hitChance;
+	}
+
+	if(chance >= random_range(1, 100)){
 		Weapon::internalUseWeapon(player, item, target, damageModifier);
 	}
 	else{
 		//miss target
-		int dx = random_range(-1, 1);
-		int dy = random_range(-1, 1);
+		typedef std::pair<int32_t, int32_t> dPair;
+		std::vector<dPair> destList;
+		destList.push_back(dPair(-1, -1));
+		destList.push_back(dPair(-1, 0));
+		destList.push_back(dPair(-1, 1));
+		destList.push_back(dPair(0, -1));
+		destList.push_back(dPair(0, 1));
+		destList.push_back(dPair(1, -1));
+		destList.push_back(dPair(1, 0));
+		destList.push_back(dPair(1, 1));
 
-		destTile = g_game.getTile(destPos.x + dx, destPos.y + dy, destPos.z);
+		std::random_shuffle(destList.begin(), destList.end());
 
-		if(destTile && !destTile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
-			destPos.x += dx;
-			destPos.y += dy;
-		}
-		else{
-			destTile = target->getTile();
+		Position destPos = target->getPosition();
+		Tile* destTile = target->getTile();
+		Tile* tmpTile = NULL;
+
+		for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
+			tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
+			if(tmpTile && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
+				destTile = tmpTile;
+				break;
+			}
 		}
 
 		Weapon::internalUseWeapon(player, item, destTile);

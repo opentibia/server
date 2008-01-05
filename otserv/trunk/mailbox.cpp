@@ -163,7 +163,7 @@ bool Mailbox::sendItem(Item* item)
 				g_game.transformItem(item, item->getID() + 1);
 			}
 
-			IOPlayer::instance()->savePlayer(player); 
+			IOPlayer::instance()->savePlayer(player, true); 
 			
 			delete player;			
 			return true;

@@ -52,7 +52,6 @@ enum playerinfo_t {
 	PLAYERINFO_MAXHEALTH,
 	PLAYERINFO_MANA,
 	PLAYERINFO_MAXMANA,
-	PLAYERINFO_MANAPERCENT,
 	PLAYERINFO_MAGICLEVEL,
 	PLAYERINFO_MAGICLEVELPERCENT,
 	PLAYERINFO_SOUL,
@@ -118,6 +117,11 @@ public:
 	void addList();
 	void kickPlayer();
 
+	static uint64_t getExpForLevel(int32_t level)
+	{
+		return std::ceil((double)(50 * level * level * level)/3 - (100 * level * level) + ((850 * level) / 3) - 200);
+	}
+
 	uint32_t getGuildId() const {return guildId;}
 	const std::string& getGuildName() const {return guildName;}
 	const std::string& getGuildRank() const {return guildRank;}
@@ -155,8 +159,6 @@ public:
 
 	void setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
-
-	void setSkillsPercents();
 
 	playersex_t getSex() const {return sex;}
 	void setSex(playersex_t);
@@ -543,8 +545,10 @@ protected:
 protected:
 	ProtocolGame* client;
 
-	int32_t level;
-	int32_t magLevel;
+	uint32_t level;
+	uint32_t levelPercent;
+	uint32_t magLevel;
+	uint32_t magLevelPercent;
 	int32_t accessLevel;
 	uint32_t experience;
 	uint32_t damageImmunities;
@@ -607,9 +611,6 @@ protected:
 	LearnedInstantSpellList learnedInstantSpellList;
 
 	ConditionList storedConditionList;
-
-	unsigned char level_percent;
-	unsigned char maglevel_percent;
 
 	//trade variables
 	Player* tradePartner;
