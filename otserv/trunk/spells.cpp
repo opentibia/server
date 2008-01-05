@@ -961,6 +961,7 @@ bool InstantSpell::configureEvent(xmlNodePtr p)
 	}
 
 	int intValue;
+	std::string strValue;
 
 	if(readXMLInteger(p, "params", intValue)){
 		if(intValue == 1)
@@ -969,6 +970,9 @@ bool InstantSpell::configureEvent(xmlNodePtr p)
 
 	if(readXMLInteger(p, "direction", intValue)){
 		needDirection = (intValue == 1);
+	}
+	else if(readXMLInteger(p, "casterTargetOrDirection", intValue)){
+		casterTargetOrDirection = (intValue == 1);
 	}
 
 	if(readXMLInteger(p, "blockwalls", intValue)){
@@ -1031,41 +1035,53 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 		var.type = VARIANT_NUMBER;
 		var.number = player->getID();
 	}
-	else if(needTarget){
+	else if(needTarget || casterTargetOrDirection){
 		Creature* target = NULL;
+		bool useDirection = false;
 
 		if(hasParam){
 			target = g_game.getPlayerByName(param);
 
 			if(!target || target->getHealth() <= 0){
-				player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
-				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-				return false;
+				if(!casterTargetOrDirection){
+					player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+				useDirection = true;
 			}
 		}
 		else{
 			target = player->getAttackedCreature();
 
 			if(!target || target->getHealth() <= 0){
-				player->sendCancelMessage(RET_YOUCANONLYUSEITONCREATURES);
-				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-				return false;
+				if(!casterTargetOrDirection){
+					player->sendCancelMessage(RET_YOUCANONLYUSEITONCREATURES);
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+				useDirection = true;
 			}
 		}
 
-		const Position& fromPos = player->getPosition();
-		const Position& toPos = target->getPosition();
+		if(!useDirection){
+			if(!canThrowSpell(player, target)){
+				player->sendCancelMessage(RET_CREATUREISNOTREACHABLE);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
 
-		if(fromPos.z != toPos.z ||
-		(range == -1 && !g_game.canThrowObjectTo(fromPos, toPos, checkLineOfSight)) ||
-		(range != -1 && !g_game.canThrowObjectTo(fromPos, toPos, checkLineOfSight, range, range)) ) {
-			player->sendCancelMessage(RET_CREATUREISNOTREACHABLE);
-			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-			return false;
+			var.type = VARIANT_NUMBER;
+			var.number = target->getID();
 		}
+		else{
+			var.type = VARIANT_POSITION;
+			var.pos = Spells::getCasterPosition(player, player->getDirection());
 
-		var.type = VARIANT_NUMBER;
-		var.number = target->getID();
+			if(!playerInstantSpellCheck(player, var.pos)){
+				return false;
+			}
+		}
 	}
 	else if(hasParam){
 		var.type = VARIANT_STRING;
@@ -1094,14 +1110,43 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 	return result;
 }
 
+bool InstantSpell::canThrowSpell(const Creature* creature, const Creature* target) const
+{
+	const Position& fromPos = creature->getPosition();
+	const Position& toPos = target->getPosition();
+
+	if(fromPos.z != toPos.z ||
+	(range == -1 && !g_game.canThrowObjectTo(fromPos, toPos, checkLineOfSight)) ||
+	(range != -1 && !g_game.canThrowObjectTo(fromPos, toPos, checkLineOfSight, range, range)) ){
+		return false;
+	}
+
+	return true;
+}
+
 bool InstantSpell::castSpell(Creature* creature)
 {
 	LuaVariant var;
-	var.type = VARIANT_POSITION;
-	if(needDirection){
+	if(casterTargetOrDirection){
+		Creature* target = creature->getAttackedCreature();
+
+		if(target && target->getHealth() > 0){
+			if(!canThrowSpell(creature, target)){
+				return false;
+			}
+
+			var.type = VARIANT_NUMBER;
+			var.number = target->getID();
+			return internalCastSpell(creature, var);
+		}
+		return false;
+	}
+	else if(needDirection){
+		var.type = VARIANT_POSITION;
 		var.pos = Spells::getCasterPosition(creature, creature->getDirection());
 	}
 	else{
+		var.type = VARIANT_POSITION;
 		var.pos = creature->getPosition();
 	}
 

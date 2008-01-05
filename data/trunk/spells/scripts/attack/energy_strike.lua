@@ -10,9 +10,8 @@ setCombatParam(distanceCombat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_ENERGY)
 setCombatFormula(distanceCombat, COMBAT_FORMULA_LEVELMAGIC, -0.4, 0, -0.5, 0)
 
 function onCastSpell(cid, var)
-	local target = getCreatureTarget(cid)
-	if(target ~= 0) then
-		return doCombat(cid, distanceCombat, numberToVariant(target))
+	if(variantToNumber(var) ~= 0) then
+		return doCombat(cid, distanceCombat, var)
 	end
 	return doCombat(cid, combat, var)
 end

@@ -70,7 +70,7 @@ protected:
 
 	RunesMap runes;
 	InstantsMap instants;
-	
+
 	friend class CombatSpell;
 	LuaScriptInterface m_scriptInterface;
 };
@@ -186,6 +186,7 @@ public:
 	virtual bool isInstant() const { return true;}
 	bool getHasParam() const { return hasParam;}
 	bool canCast(const Player* player) const;
+	bool canThrowSpell(const Creature* creature, const Creature* target) const;
 
 protected:
 	virtual std::string getScriptEventName();
@@ -206,6 +207,7 @@ protected:
 	bool needDirection;
 	bool hasParam;
 	bool checkLineOfSight;
+	bool casterTargetOrDirection;
 	InstantSpellFunction* function;
 };
 
