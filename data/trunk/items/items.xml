@@ -18278,7 +18278,7 @@
 	<!-- Many items from 8.1 are still missing. So far, only the potions are here -->
 	<item id="7588" article="a" name="strong health potion">
 		<attribute key="weight" value="200"/>
-		<attribute key="description" value="This potion can only be consumed by paladins and knights of level 80 or higher."/>
+		<attribute key="description" value="This potion can only be consumed by paladins and knights of level 50 or higher."/>
 	</item>
 	<item id="7589" article="a" name="strong mana potion">
 		<attribute key="weight" value="200"/>

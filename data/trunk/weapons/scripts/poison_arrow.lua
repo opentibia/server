@@ -2,7 +2,7 @@ local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_BLOCKARMOR, 1)
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_POISONDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_POISONARROW)
-setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, -0.1, -30, -0.2, 0)
+setCombatFormula(combat, COMBAT_FORMULA_SKILL, 0, 0, 1.0, 0)
 
 local condition = createConditionObject(CONDITION_POISON)
 setConditionParam(condition, CONDITION_PARAM_DELAYED, 1)

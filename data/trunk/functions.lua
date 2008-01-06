@@ -1,3 +1,39 @@
+function isSorcerer(cid)
+	if(isPlayer(cid) == FALSE) then
+		debugPrint("isSorcerer: Player not found.")
+		return false
+	end
+
+	return (isInArray({1,5}, getPlayerVocation(cid)) == TRUE)
+end
+
+function isDruid(cid)
+	if(isPlayer(cid) == FALSE) then
+		debugPrint("isDruid: Player not found.")
+		return false
+	end
+
+	return (isInArray({2,6}, getPlayerVocation(cid)) == TRUE)
+end
+
+function isPaladin(cid)
+	if(isPlayer(cid) == FALSE) then
+		debugPrint("isPaladin: Player not found.")
+		return false
+	end
+
+	return (isInArray({3,7}, getPlayerVocation(cid)) == TRUE)
+end
+
+function isKnight(cid)
+	if(isPlayer(cid) == FALSE) then
+		debugPrint("isKnight: Player not found.")
+		return false
+	end
+
+	return (isInArray({4,8}, getPlayerVocation(cid)) == TRUE)
+end
+
 function getDistanceBetween(pos1, pos2)
 	local xDif = math.abs(pos1.x - pos2.x)
 	local yDif = math.abs(pos1.y - pos2.y)
@@ -9,7 +45,67 @@ function getDistanceBetween(pos1, pos2)
 	return posDif
 end
 
-function doPlayerAddMoney(cid, amount)
+function doPlayerGiveItem(cid, itemid, count --[[optional]], subtype --[[optional]], placeonfloor --[[optional]])
+	local count = count or 1
+	local subtype = subtype or 0
+	local placeonfloor = placeonfloor or 1
+
+	local hasSubType = (isItemFluidContainer(itemid) == TRUE or isItemRune(itemid) == TRUE)
+
+	local i, newItem
+	local uids = {}
+	if (hasSubType) then
+		for i = 1, count do
+			newItem = doCreateItemEx(itemid, subtype)
+			if(newItem == LUA_ERROR) then
+				return LUA_ERROR
+			end
+
+			table.insert(uids, newItem)
+		end
+	elseif (isItemStackable(item.itemid) == TRUE) then
+		while(count > 100) do
+			newItem = doCreateItemEx(itemid, 100)
+			if(newItem == LUA_ERROR) then
+				return LUA_ERROR
+			end
+
+			count = count - 100
+			table.insert(uids, newItem)
+		end
+		if(count > 0) then
+			newItem = doCreateItemEx(itemid, count)
+			if(newItem == LUA_ERROR) then
+				return LUA_ERROR
+			end
+
+			table.insert(uids, newItem)
+		end
+	else
+		for i = 1, count do
+			newItem = doCreateItemEx(itemid)
+			if(newItem == LUA_ERROR) then
+				return LUA_ERROR
+			end
+
+			table.insert(uids, newItem)
+		end
+	end
+	
+	local ret = RETURNVALUE_NOERROR
+	local rets = {}
+	for i, item in pairs(uids) do
+		ret = doPlayerAddItemEx(cid, item, placeonfloor)
+		if(ret ~= RETURNVALUE_NOERROR) then
+			table.insert(rets, ret)
+		end
+	end
+	return rets
+end
+
+function doPlayerAddMoney(cid, amount, placeonfloor --[[optional]])
+	local placeonfloor = placeonfloor or 1
+
 	local crystals = math.floor(amount / 10000)
 	amount = amount - crystals * 10000
 	local platinum = math.floor(amount / 100)
@@ -17,19 +113,19 @@ function doPlayerAddMoney(cid, amount)
 	local gold = amount
 	local ret = 0
 	if (crystals > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_CRYSTAL_COIN, crystals)
-		if(ret ~= LUA_NO_ERROR) then
+		ret = doPlayerGiveItem(cid, ITEM_CRYSTAL_COIN, crystals, 0, placeonfloor)
+		if(ret == LUA_ERROR) then
 			return LUA_ERROR
 		end
 	end
 	if (platinum > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_PLATINUM_COIN, platinum)
+		ret = doPlayerGiveItem(cid, ITEM_PLATINUM_COIN, platinum, 0, placeonfloor)
 		if (ret ~= LUA_NO_ERROR) then
 			return LUA_ERROR
 		end
 	end
 	if (gold > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_GOLD_COIN, gold)
+		ret = doPlayerGiveItem(cid, ITEM_GOLD_COIN, gold, 0, placeonfloor)
 		if (ret ~= LUA_NO_ERROR) then
 			return LUA_ERROR
 		end
@@ -39,6 +135,7 @@ end
 
 function getConfigInfo(info)
 	if (type(info) ~= 'string') then return nil end
+
 	dofile('config.lua')
 	return _G[info]
 end
@@ -59,7 +156,7 @@ exhaustion =
 
 	check = function (cid, storage)
 		local exhaust = getPlayerStorageValue(cid, storage)  
-		if (os.time() >=  exhaust) then
+		if (os.time() >= exhaust) then
 			return FALSE
 		else
 			return TRUE
