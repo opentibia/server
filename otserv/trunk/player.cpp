@@ -1931,7 +1931,7 @@ void Player::die()
 		int32_t lostMana = 0;
 
 		//sum up all the mana
-		for(int32_t i = 1; i <= magLevel; ++i){
+		for(uint32_t i = 1; i <= magLevel; ++i){
 			sumMana += vocation->getReqMana(i);
 		}
 
@@ -1980,7 +1980,7 @@ void Player::die()
 		//
 
 		//Level loss
-		int32_t newLevel = level;
+		uint32_t newLevel = level;
 		while((uint32_t)(experience - getLostExperience()) < Player::getExpForLevel(newLevel)){
 			if(newLevel > 1)
 				newLevel--;
@@ -3211,7 +3211,7 @@ void Player::onGainExperience(int32_t gainExperience)
 
 	if(gainExperience > 0){
 		//soul regeneration
-		if(gainExperience >= getLevel()){
+		if((uint32_t)gainExperience >= getLevel()){
 			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
 			//Soul regeneration rate is defined by the vocation
 			uint32_t vocSoulTicks = vocation->getSoulGainTicks();

@@ -936,7 +936,7 @@ TalkAction(_interface)
 {
 	needDirection = false;
 	hasParam = false;
-	checkLineOfSight = true;
+	checkLineOfSight = false;
 	function = NULL;
 }
 
@@ -1917,7 +1917,7 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 
 	hasCharges = (charges > 0);
 
-	if(magLevel != -1){
+	if(magLevel != 0){
 		//Change magic level in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);
 		iType.runeSpellName = getName();

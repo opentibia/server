@@ -712,7 +712,7 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 	if(it.hitChance != 0){
 		hitChance = it.hitChance;
 	}
-	
+
 	if(it.breakChance != 0){
 		breakChance = it.breakChance;
 	}
@@ -768,7 +768,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		return false;
 	}
 
-	uint32_t chance;
+	int32_t chance;
 	int32_t _hitChance = hitChance;
 	int32_t _maxHitChance = maxHitChance;
 
@@ -958,6 +958,7 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 	}
 
 	int intValue;
+	std::string strValue;
 
 	if(readXMLInteger(p, "min", intValue)){
 		minChange = intValue;
@@ -967,7 +968,38 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 		maxChange = intValue;
 	}
 
+	if(readXMLString(p, "type", strValue)){
+		//TODO: use a tool-function
+		if(strcasecmp(strValue.c_str(), "earth") == 0){
+			params.combatType = COMBAT_EARTHDAMAGE;
+		}
+		else if(strcasecmp(strValue.c_str(), "ice") == 0){
+			params.combatType = COMBAT_ICEDAMAGE;
+		}
+		else if(strcasecmp(strValue.c_str(), "energy") == 0){
+			params.combatType = COMBAT_ENERGYDAMAGE;
+		}
+		else if(strcasecmp(strValue.c_str(), "fire") == 0){
+			params.combatType = COMBAT_FIREDAMAGE;
+		}
+		else if(strcasecmp(strValue.c_str(), "death") == 0){
+			params.combatType = COMBAT_DEATHDAMAGE;
+		}
+		else if(strcasecmp(strValue.c_str(), "holy") == 0){
+			params.combatType = COMBAT_HOLYDAMAGE;
+		}
+	}
+
 	return true;
+}
+
+bool WeaponWand::configureWeapon(const ItemType& it)
+{
+	m_scripted = false;
+	range = it.shootRange;
+	params.distanceEffect = it.shootType;
+
+	return Weapon::configureWeapon(it);
 }
 
 int32_t WeaponWand::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const

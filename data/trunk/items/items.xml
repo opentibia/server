@@ -1219,6 +1219,7 @@
 		<attribute key="shootType" value="smallstone"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="7"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="1295" article="a" name="stone">
 		<attribute key="weight" value="3000"/>
@@ -3400,6 +3401,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="snowball"/>
 		<attribute key="range" value="5"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2112" article="a" name="teddy bear">
 		<attribute key="weight" value="700"/>
@@ -3672,67 +3674,77 @@
 	</item>
 	<item id="2180" article="an" name="orb of nature">
 	</item>
-	<item id="2181" article="a" name="quagmire rod">
-		<attribute key="description" value="It emits clouds of poisonous swamp gas."/>
+	<item id="2181" article="a" name="terra rod">
+		<attribute key="description" value="Small stones are flying from its tip."/>
 		<attribute key="weight" value="2650"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="2"/>
+		<attribute key="shootType" value="smallearth"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2182" article="a" name="snakebite rod">
 		<attribute key="description" value="It seems to twitch and quiver as if trying to escape your grip."/>
 		<attribute key="weight" value="4300"/>
 		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="smallearth"/>
 		<attribute key="range" value="3"/>
 	</item>
-	<item id="2183" article="a" name="tempest rod">
-		<attribute key="description" value="It grants you the power of striking your foes with furious thunderstorms."/>
+	<item id="2183" article="a" name="hailstorm rod">
+		<attribute key="description" value="It grants you the power of striking your foes with furious hailstorms."/>
 		<attribute key="weight" value="2100"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="1"/>
+		<attribute key="shootType" value="smallice"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2184" article="a" name="crystal wand">
 		<attribute key="weight" value="2800"/>
 	</item>
-	<item id="2185" article="a" name="volcanic rod">
-		<attribute key="description" value="It erupts powerful bursts of magma upon everything in your path."/>
+	<item id="2185" article="a" name="necrotic rod">
+		<attribute key="description" value="It was brought up from hell to deliver death."/>
 		<attribute key="weight" value="2900"/>
 		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="death"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2186" article="a" name="moonlight rod">
-		<attribute key="description" value="Shimmering rays of moonlight radiate from its tip"/>
+		<attribute key="description" value="Icecold rays of moonlight shimmer on its tip."/>
 		<attribute key="weight" value="1950"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="2"/>
+		<attribute key="shootType" value="smallice"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2187" article="a" name="wand of inferno">
 		<attribute key="description" value="It unleashes the very fires of hell."/>
 		<attribute key="weight" value="3050"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="2"/>
+		<attribute key="shootType" value="fire"/>
+		<attribute key="range" value="3"/>
 	</item>
-	<item id="2188" article="a" name="wand of plague">
-		<attribute key="description" value="Infectious goo covers its tip"/>
+	<item id="2188" article="a" name="wand of decay">
+		<attribute key="description" value="It is half-rotten itself and reeks terribly."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="2"/>
+		<attribute key="shootType" value="death"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2189" article="a" name="wand of cosmic energy">
 		<attribute key="description" value="The energy of a radiant star is trapped inside its globe."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="1"/>
+		<attribute key="shootType" value="energy"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2190" article="a" name="wand of vortex">
 		<attribute key="description" value="Surges of energy rush through the tip of this wand."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="energy"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2191" article="a" name="wand of dragonbreath">
 		<attribute key="description" value="Legends say that this wand holds the soul of a young dragon."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="fire"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2192" article="a" name="crystal ball">
@@ -4590,6 +4602,7 @@
 		<attribute key="shootType" value="spear"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="10"/> <!-- ? -->
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="2390" article="a" name="magic longsword">
 		<attribute key="description" value="It is the magic Cyclopmania Sword."/>
@@ -4661,6 +4674,7 @@
 		<attribute key="shootType" value="throwingstar"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="10"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="2400" article="a" name="magic sword">
 		<attribute key="description" value="It is the Sword of Valor."/>
@@ -4737,6 +4751,7 @@
 		<attribute key="shootType" value="throwingknife"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="7"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="2411" article="a" name="poison dagger">
 		<attribute key="weight" value="880"/>
@@ -5501,6 +5516,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="bolt"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2544" article="an" name="arrow" plural="arrows">
 		<attribute key="weight" value="70"/>
@@ -5508,19 +5524,23 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="arrow"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2545" article="a" name="poison arrow" plural="poison arrows">
 		<attribute key="weight" value="80"/>
-		<attribute key="attack" value="20"/>
+		<attribute key="attack" value="22"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="poisonarrow"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2546" article="a" name="burst arrow" plural="burst arrows">
 		<attribute key="weight" value="90"/>
+		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="burstarrow"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2547" article="a" name="power bolt" plural="power bolts">
 		<attribute key="weight" value="80"/>
@@ -5528,6 +5548,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="powerbolt"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2548" article="a" name="pitch fork">
 		<attribute key="weight" value="2500"/>
@@ -9490,6 +9511,8 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="huntingspear"/>
 		<attribute key="range" value="5"/>
+		<attribute key="breakChance" value="10"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="3966" article="a" name="banana staff">
 		<attribute key="weight" value="5000"/>
@@ -15820,10 +15843,11 @@
 	</item>
 	<item id="6529" article="an" name="infernal bolt" plural="infernal bolts">
 		<attribute key="weight" value="90"/>
-		<attribute key="attack" value="50"/>
+		<attribute key="attack" value="43"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="infernalbolt"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="6530" name="worn soft boots">
 		<attribute key="description" value="Someone specialised in shoes might be able to repair them for you."/>
@@ -17725,24 +17749,28 @@
 	</item>
 	<item id="7363" article="a" name="piercing bolt" plural="piercing bolts">
 		<attribute key="weight" value="80"/>
-		<attribute key="attack" value="35"/>
+		<attribute key="attack" value="33"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="piercingbolt"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7364" article="a" name="sniper arrow" plural="sniper arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="30"/>
+		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="sniperarrow"/>
+		<attribute key="maxHitChance" value="100"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7365" article="an" name="onyx arrow" plural="onyx arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="35"/>
+		<attribute key="attack" value="38"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="onyxarrow"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7366" article="a" name="viper star" plural="viper stars">
 		<attribute key="weight" value="200"/>
@@ -17750,6 +17778,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="greenstar"/>
 		<attribute key="range" value="5"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="7367" article="an" name="enchanted spear" plural="enchanted spears">
 		<attribute key="weight" value="2000"/>
@@ -17758,6 +17787,7 @@
 		<attribute key="shootType" value="enchantedspear"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="7"/> <!-- ? -->
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="7368" article="an" name="assassin star" plural="assassin stars">
 		<attribute key="weight" value="200"/>
@@ -17765,7 +17795,8 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="redstar"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="100"/>
+		<attribute key="breakChance" value="30"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="7369" article="a" name="golden trophy">
 		<attribute key="weight" value="3500"/>
@@ -17801,6 +17832,7 @@
 		<attribute key="shootType" value="royalspear"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="10"/> <!-- ? -->
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="7379" name="brutetamer's staff">
 		<attribute key="weight" value="3800"/>

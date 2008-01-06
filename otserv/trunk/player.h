@@ -119,7 +119,7 @@ public:
 
 	static uint64_t getExpForLevel(int32_t level)
 	{
-		return std::ceil((double)(50 * level * level * level)/3 - (100 * level * level) + ((850 * level) / 3) - 200);
+		return (uint64_t)std::ceil((double)(50 * level * level * level)/3 - (100 * level * level) + ((850 * level) / 3) - 200);
 	}
 
 	uint32_t getGuildId() const {return guildId;}
@@ -153,8 +153,8 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
 	uint32_t getAccount() const {return accountNumber;}
-	int32_t getLevel() const {return level;}
-	int32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
+	uint32_t getLevel() const {return level;}
+	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
 	int32_t getAccessLevel() const {return accessLevel;}
 
 	void setVocation(uint32_t vocId);
@@ -216,7 +216,7 @@ public:
 		if(newPercent > 100){
 			newPercent = 100;
 		}
-		
+
 		lossPercent[lossType] = newPercent;
 	}
 
@@ -621,12 +621,12 @@ protected:
 		int32_t health;
 		int32_t healthMax;
 		uint32_t experience;
-		int32_t level;
+		uint32_t level;
 		double freeCapacity;
 		int32_t mana;
 		int32_t manaMax;
 		int32_t manaSpent;
-		int32_t magLevel;
+		uint32_t magLevel;
 	};
 
 	SentStats lastSentStats;
