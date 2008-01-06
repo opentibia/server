@@ -217,8 +217,9 @@ public:
 	bool showDuration;
 	bool showCharges;
 	uint32_t charges;
-	uint32_t breakChance;
-	uint32_t hitChance;
+	int32_t breakChance;
+	int32_t hitChance;
+	int32_t maxHitChance;
 	uint32_t shootRange;
 	AmmoAction_t ammoAction;
 

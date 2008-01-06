@@ -682,7 +682,8 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* targe
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
 	Weapon(_interface)
 {
-	hitChance = 0;
+	hitChance = -1;
+	maxHitChance = 0;
 	breakChance = 0;
 	ammuAttackValue = 0;
 	ammoAction = AMMOACTION_REMOVECOUNT;
@@ -701,11 +702,11 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 	//default values
 	if(it.slot_position & SLOTP_TWO_HAND){
 		//hit chance on two-handed weapons is limited to 90%
-		hitChance = 90;
+		maxHitChance = 90;
 	}
 	else{
 		//one-handed is set to 75%
-		hitChance = 75;
+		maxHitChance = 75;
 	}
 
 	if(it.hitChance != 0){
@@ -738,22 +739,22 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	//default values
 	if(it.slot_position & SLOTP_TWO_HAND){
 		//hit chance on two-handed weapons is limited to 90%
-		hitChance = 90;
+		maxHitChance = 90;
 	}
 	else{
 		//one-handed is set to 75%
-		hitChance = 75;
+		maxHitChance = 75;
 	}
 
 	params.distanceEffect = it.shootType;
 	range = it.shootRange;
 	ammuAttackValue = it.attack;
 
-	if(it.hitChance != 0){
+	if(it.hitChance != -1){
 		hitChance = it.hitChance;
 	}
 
-	if(it.breakChance != 0){
+	if(it.breakChance != -1){
 		breakChance = it.breakChance;
 	}
 
@@ -767,62 +768,74 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		return false;
 	}
 
-	//hit chance is based on distance to target and distance skill
 	uint32_t chance;
-	uint32_t maxHitChance = hitChance;
-	uint32_t skill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
-	const Position& playerPos = player->getPosition();
-	const Position& targetPos = target->getPosition();
-	uint32_t distance = std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y));
+	int32_t _hitChance = hitChance;
+	int32_t _maxHitChance = maxHitChance;
 
 	if(item){
 		const ItemType& it = Item::items[item->getID()];
-		if(it.hitChance != 0){
-			//use the hitChance of the ammunition we are using.
-			maxHitChance = it.hitChance;
+		if(it.hitChance != -1){
+			//use the hitChance of the ammunition
+			_hitChance = it.hitChance;
+		}
+
+		if(it.maxHitChance != -1){
+			//use the maxHitChance of the ammunition
+			_maxHitChance = it.maxHitChance;
 		}
 	}
 
-	if(maxHitChance == 75){
-		//chance for one-handed weapons
-		switch(distance){
-			case 1: chance = (uint32_t)((float)std::min(skill, (uint32_t)74)) + 1; break;
-			case 2: chance = (uint32_t)((float)2.4 * std::min(skill, (uint32_t)28)) + 8; break;
-			case 3: chance = (uint32_t)((float)1.55 * std::min(skill, (uint32_t)45)) + 6; break;
-			case 4: chance = (uint32_t)((float)1.25 * std::min(skill, (uint32_t)58)) + 3; break;
-			case 5: chance = (uint32_t)((float)std::min(skill, (uint32_t)74)) + 1; break;
-			case 6: chance = (uint32_t)((float)0.8 * std::min(skill, (uint32_t)90)) + 3; break;
-			case 7: chance = (uint32_t)((float)0.7 * std::min(skill, (uint32_t)104)) + 2; break;
-			default: chance = hitChance; break;
+	if(_hitChance == -1){
+		//hit chance is based on distance to target and distance skill
+		uint32_t skill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
+		const Position& playerPos = player->getPosition();
+		const Position& targetPos = target->getPosition();
+		uint32_t distance = std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y));
+
+		if(_maxHitChance == 75){
+			//chance for one-handed weapons
+			switch(distance){
+				case 1: chance = (uint32_t)((float)std::min(skill, (uint32_t)74)) + 1; break;
+				case 2: chance = (uint32_t)((float)2.4 * std::min(skill, (uint32_t)28)) + 8; break;
+				case 3: chance = (uint32_t)((float)1.55 * std::min(skill, (uint32_t)45)) + 6; break;
+				case 4: chance = (uint32_t)((float)1.25 * std::min(skill, (uint32_t)58)) + 3; break;
+				case 5: chance = (uint32_t)((float)std::min(skill, (uint32_t)74)) + 1; break;
+				case 6: chance = (uint32_t)((float)0.8 * std::min(skill, (uint32_t)90)) + 3; break;
+				case 7: chance = (uint32_t)((float)0.7 * std::min(skill, (uint32_t)104)) + 2; break;
+				default: chance = hitChance; break;
+			}
 		}
-	}
-	else if(maxHitChance == 90){
-		//formula for two-handed weapons
-		switch(distance){
-			case 1: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)74)) + 1; break;
-			case 2: chance = (uint32_t)((float)3.2 * std::min(skill, (uint32_t)28)); break;
-			case 3: chance = (uint32_t)((float)2.0 * std::min(skill, (uint32_t)45)); break;
-			case 4: chance = (uint32_t)((float)1.55 * std::min(skill, (uint32_t)58)); break;
-			case 5: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)74)) + 1; break;
-			case 6: chance = (uint32_t)((float)1.0 * std::min(skill, (uint32_t)90)); break;
-			case 7: chance = (uint32_t)((float)1.0 * std::min(skill, (uint32_t)90)); break;
-			default: chance = hitChance; break;
+		else if(_maxHitChance == 90){
+			//formula for two-handed weapons
+			switch(distance){
+				case 1: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)74)) + 1; break;
+				case 2: chance = (uint32_t)((float)3.2 * std::min(skill, (uint32_t)28)); break;
+				case 3: chance = (uint32_t)((float)2.0 * std::min(skill, (uint32_t)45)); break;
+				case 4: chance = (uint32_t)((float)1.55 * std::min(skill, (uint32_t)58)); break;
+				case 5: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)74)) + 1; break;
+				case 6: chance = (uint32_t)((float)1.0 * std::min(skill, (uint32_t)90)); break;
+				case 7: chance = (uint32_t)((float)1.0 * std::min(skill, (uint32_t)90)); break;
+				default: chance = hitChance; break;
+			}
 		}
-	}
-	else if(maxHitChance == 100){
-		switch(distance){
-			case 1: chance = (uint32_t)((float)1.35 * std::min(skill, (uint32_t)73)) + 1; break;
-			case 2: chance = (uint32_t)((float)3.2 * std::min(skill, (uint32_t)30)) + 5; break;
-			case 3: chance = (uint32_t)((float)2.25 * std::min(skill, (uint32_t)48)) + 2; break;
-			case 4: chance = (uint32_t)((float)1.5 * std::min(skill, (uint32_t)66)) + 2; break;
-			case 5: chance = (uint32_t)((float)1.35 * std::min(skill, (uint32_t)73)) + 1; break;
-			case 6: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)87)) - 4; break;
-			case 7: chance = (uint32_t)((float)1.1 * std::min(skill, (uint32_t)90)) + 1; break;
-			default: chance = hitChance; break;
+		else if(_maxHitChance == 100){
+			switch(distance){
+				case 1: chance = (uint32_t)((float)1.35 * std::min(skill, (uint32_t)73)) + 1; break;
+				case 2: chance = (uint32_t)((float)3.2 * std::min(skill, (uint32_t)30)) + 4; break;
+				case 3: chance = (uint32_t)((float)2.05 * std::min(skill, (uint32_t)48)) + 2; break;
+				case 4: chance = (uint32_t)((float)1.5 * std::min(skill, (uint32_t)65)) + 2; break;
+				case 5: chance = (uint32_t)((float)1.35 * std::min(skill, (uint32_t)73)) + 1; break;
+				case 6: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)87)) - 4; break;
+				case 7: chance = (uint32_t)((float)1.1 * std::min(skill, (uint32_t)90)) + 1; break;
+				default: chance = hitChance; break;
+			}
+		}
+		else{
+			chance = _maxHitChance;
 		}
 	}
 	else{
-		chance = hitChance;
+		chance = _hitChance;
 	}
 
 	if(chance >= random_range(1, 100)){

@@ -25,6 +25,6 @@
 
 	<distance id="2389" ammo="move" enabled="1" script="poison spear.lua"/>
 	<distance id="2544" enabled="1" ammo="move" function="internalLoadWeapon"></distance>
-	<distance id="2545" enabled="1" exhaustion="1" hitchance="80" ammo="move" script="poison arrow.lua"/>
-	<distance id="2546" enabled="1" exhaustion="1" hitchance="80" ammo="removecount" script="explosive arrow.lua"/>
+	<distance id="2545" enabled="1" exhaustion="1" ammo="move" script="poison arrow.lua"/>
+	<distance id="2546" enabled="1" exhaustion="1" ammo="removecount" script="explosive arrow.lua"/>
 </weapons>

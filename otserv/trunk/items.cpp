@@ -103,8 +103,9 @@ ItemType::ItemType()
 	showDuration  = false;
 	showCharges   = false;
 	charges       = 0;
-	hitChance     = 0;
-	breakChance   = 0;
+	hitChance     = -1;
+	maxHitChance  = -1;
+	breakChance   = -1;
 	shootRange    = 1;
 
 	condition = NULL;
@@ -684,6 +685,18 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 
 									it.hitChance = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "maxHitChance") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									if(intValue < 0){
+										intValue = 0;
+									}
+									else if(intValue > 100){
+										intValue = 100;
+									}
+
+									it.maxHitChance = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "invisible") == 0){

@@ -396,7 +396,7 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 	return true;
 }
 
-bool IOPlayer::savePlayer(Player* player, bool forceSave /*= false*/)
+bool IOPlayer::savePlayer(Player* player)
 {
 	player->preSave();
 
@@ -411,7 +411,7 @@ bool IOPlayer::savePlayer(Player* player, bool forceSave /*= false*/)
 		return false;
 	}
 
-	if(!forceSave && result->getDataInt("save") == 0){
+	if(result->getDataInt("save") == 0){
 		db->freeResult(result);
 		return true;
 	}

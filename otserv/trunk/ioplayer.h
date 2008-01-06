@@ -64,10 +64,9 @@ public:
 
 	/** Save a player
 	  * \param player the player to save
-	  * \param forceSave if set then the player will be saved even if the save field has been to 0
 	  * \returns true if the player was successfully saved
 	  */
-	bool savePlayer(Player* player, bool forceSave = false);
+	bool savePlayer(Player* player);
 
 	//bool loadDepot(Player* player, unsigned long depotId);
 

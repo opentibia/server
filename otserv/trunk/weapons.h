@@ -162,6 +162,7 @@ protected:
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
 
 	int32_t hitChance;
+	int32_t maxHitChance;
 	int32_t breakChance;
 	int32_t ammuAttackValue;
 };
