@@ -344,7 +344,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 
 		if(hasBitSet(FLAG_PATHFINDING, flags)){
-			if(floorChange() || getTeleportItem()){
+			if(floorChange() || positionChange()){
 				return RET_NOTPOSSIBLE;
 			}
 		}
@@ -356,15 +356,17 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(hasFlag(TILESTATE_PROTECTIONZONE))
 				return RET_NOTPOSSIBLE;
 
-			if(floorChange() || getTeleportItem()){
+			if(floorChange() || positionChange()){
 				return RET_NOTPOSSIBLE;
 			}
 
 			if(monster->canPushCreatures()){
-				for(CreatureVector::const_iterator cit = creatures.begin(); cit != creatures.end(); ++cit){
-					if( !(*cit)->getMonster() ||
-						!(*cit)->isPushable() ||
-						((*cit)->getMonster()->hasMaster() && (*cit)->getMonster()->getMaster()->getPlayer()))
+				Creature* creature;
+				for(int i = 0; i < creatures.size(); ++i){
+					creature = creatures[i];
+					if( !creature->getMonster() ||
+						!creature->isPushable() ||
+						(creature->getMonster()->hasMaster() && creature->getMonster()->getMaster()->getPlayer()))
 					{
 						return RET_NOTPOSSIBLE;
 					}
@@ -635,6 +637,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 		g_game.clearSpectatorCache();
 		creature->setParent(this);
 		creatures.insert(creatures.begin(), creature);
+		++thingCount;
 	}
 	else{
 		Item* item = thing->getItem();
@@ -650,6 +653,8 @@ void Tile::__addThing(int32_t index, Thing* thing)
 
 		if(item->isGroundTile()){
 			if(ground == NULL){
+				ground = item;
+				++thingCount;
 				onAddTileItem(item);
 			}
 			else{
@@ -660,10 +665,8 @@ void Tile::__addThing(int32_t index, Thing* thing)
 
 				ground->setParent(NULL);
 				g_game.FreeThing(ground);
-				ground = NULL;
+				ground = item;
 			}
-
-			ground = item;
 		}
 		else if(item->isAlwaysOnTop()){
 			if(item->isSplash()){
@@ -673,7 +676,6 @@ void Tile::__addThing(int32_t index, Thing* thing)
 					if((*iit)->isSplash()){
 						Item* oldSplash = *iit;
 						__removeThing(oldSplash, 1);
-
 						oldSplash->setParent(NULL);
 						g_game.FreeThing(oldSplash);
 						break;
@@ -687,6 +689,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				//Note: this is different from internalAddThing
 				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
 					topItems.insert(iit, item);
+					++thingCount;
 					isInserted = true;
 					break;
 				}
@@ -694,6 +697,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 
 			if(!isInserted){
 				topItems.push_back(item);
+				++thingCount;
 			}
 
 			onAddTileItem(item);
@@ -723,6 +727,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			}
 
 			downItems.insert(downItems.begin(), item);
+			++thingCount;
 			onAddTileItem(item);
 		}
 	}
@@ -849,6 +854,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 
 		g_game.clearSpectatorCache();
 		creatures.erase(it);
+		--thingCount;
 		return;
 	}
 	else{
@@ -876,6 +882,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 
 			ground->setParent(NULL);
 			ground = NULL;
+			--thingCount;
 			return /*RET_NOERROR*/;
 		}
 
@@ -888,6 +895,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 
 					(*iit)->setParent(NULL);
 					topItems.erase(iit);
+					--thingCount;
 					return /*RET_NOERROR*/;
 				}
 			}
@@ -902,12 +910,12 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 						const ItemType& it = Item::items[item->getID()];
 						onUpdateTileItem(index, item, it, item, it);
 					}
-					else {
-
+					else{
 						onRemoveTileItem(index, item);
 
 						(*iit)->setParent(NULL);
 						downItems.erase(iit);
+						--thingCount;
 					}
 
 					return /*RET_NOERROR*/;
@@ -1123,6 +1131,7 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 	if(creature){
 		g_game.clearSpectatorCache();
 		creatures.insert(creatures.begin(), creature);
+		++thingCount;
 	}
 	else{
 		Item* item = thing->getItem();
@@ -1133,6 +1142,7 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 		if(item->isGroundTile()){
 			if(ground == NULL){
 				ground = item;
+				++thingCount;
 			}
 		}
 		else if(item->isAlwaysOnTop()){
@@ -1141,6 +1151,7 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 				if(Item::items[(*iit)->getID()].alwaysOnTopOrder > Item::items[item->getID()].alwaysOnTopOrder){
 					topItems.insert(iit, item);
+					++thingCount;
 					isInserted = true;
 					break;
 				}
@@ -1148,10 +1159,12 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 
 			if(!isInserted){
 				topItems.push_back(item);
+				++thingCount;
 			}
 		}
 		else{
 			downItems.insert(downItems.begin(), item);
+			++thingCount;
 		}
 
 		//update floor change flags
@@ -1184,6 +1197,9 @@ void Tile::updateTileFlags(Item* item, bool removing)
 				setFlag(TILESTATE_FLOORCHANGE);
 				setFlag(TILESTATE_FLOORCHANGE_WEST);
 			}
+			if(item->getTeleport()){
+				setFlag(TILESTATE_POSITIONCHANGE);
+			}
 		}
 	}
 	else{
@@ -1206,6 +1222,9 @@ void Tile::updateTileFlags(Item* item, bool removing)
 		if(item->floorChangeWest()){
 			resetFlag(TILESTATE_FLOORCHANGE);
 			resetFlag(TILESTATE_FLOORCHANGE_WEST);
+		}
+		if(item->getTeleport()){
+			resetFlag(TILESTATE_POSITIONCHANGE);
 		}
 	}
 }

@@ -50,7 +50,8 @@ enum tileflags_t{
 	TILESTATE_FLOORCHANGE_NORTH = 256,
 	TILESTATE_FLOORCHANGE_SOUTH = 512,
 	TILESTATE_FLOORCHANGE_EAST = 1024,
-	TILESTATE_FLOORCHANGE_WEST = 2048
+	TILESTATE_FLOORCHANGE_WEST = 2048,
+	TILESTATE_POSITIONCHANGE = 4096
 };
 
 class Tile : public Cylinder
@@ -63,6 +64,7 @@ public:
 		tilePos.y = y;
 		tilePos.z = z;
 
+		thingCount = 0;
 		m_flags = 0;
 		ground = NULL;
 	}
@@ -104,7 +106,7 @@ public:
 	bool isMoveableBlocking() const;
 	Thing* getTopThing();
 
-	uint32_t getThingCount() const {return (uint32_t)(ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();}
+	uint32_t getThingCount() const {return thingCount;}
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 
@@ -112,6 +114,7 @@ public:
 	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
 	void resetFlag(tileflags_t flag) {m_flags &= ~(uint32_t)flag;}
 
+	bool positionChange() const {return hasFlag(TILESTATE_POSITIONCHANGE);}
 	bool floorChange() const {return hasFlag(TILESTATE_FLOORCHANGE);}
 	bool floorChangeDown() const {return hasFlag(TILESTATE_FLOORCHANGE_DOWN);}
 	bool floorChange(Direction direction) const
@@ -179,6 +182,7 @@ private:
 	void updateTileFlags(Item* item, bool removing);
 
 protected:
+	uint32_t thingCount;
 	Position tilePos;
 	uint16_t m_flags;
 };

@@ -140,6 +140,9 @@ enum passwordType_t{
 
 	#pragma warning(disable:4786) // msvc too long debug names in stl
 	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
+	#pragma warning(disable:4244)
+	#pragma warning(disable:4267)
+	#pragma warning(disable:4018)
 
 #endif
 
