@@ -275,9 +275,13 @@ public:
 	static void getCombatArea(const Position& centerPos, const Position& targetPos,
 		const AreaCombat* area, std::list<Tile*>& list);
 
-	static bool isInPvpZone(Creature* attacker, Creature* target);
+	static bool isInPvpZone(const Creature* attacker, const Creature* target);
+	static bool isPlayerCombat(const Creature* target);
+	static CombatType_t ConditionToDamageType(ConditionType_t type);
+	static ConditionType_t DamageToConditionType(CombatType_t type);
+	static ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
-	static ReturnValue canDoCombat(Creature* attacker, Creature* target);
+	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
 	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
 
 	static void addDistanceEffect(Creature* caster, const Position& fromPos, const Position& toPos,

@@ -145,6 +145,140 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	}
 }
 
+CombatType_t Combat::ConditionToDamageType(ConditionType_t type)
+{
+	switch(type){
+		case CONDITION_FIRE:
+			return COMBAT_FIREDAMAGE;
+			break;
+
+		case CONDITION_ENERGY:
+			return COMBAT_ENERGYDAMAGE;
+			break;
+
+		case CONDITION_DROWN:
+			return COMBAT_DROWNDAMAGE;
+			break;
+
+		case CONDITION_POISON:
+			return COMBAT_EARTHDAMAGE;
+			break;
+
+		case CONDITION_FREEZING:
+			return COMBAT_ICEDAMAGE;
+			break;
+
+		case CONDITION_DAZZLED:
+			return COMBAT_HOLYDAMAGE;
+			break;
+
+		case CONDITION_CURSED:
+			return COMBAT_DEATHDAMAGE;
+			break;
+
+		default:
+			break;
+	}
+
+	return COMBAT_NONE;
+}
+
+ConditionType_t Combat::DamageToConditionType(CombatType_t type)
+{
+	switch(type){
+		case COMBAT_FIREDAMAGE:
+			return CONDITION_FIRE;
+			break;
+
+		case COMBAT_ENERGYDAMAGE:
+			return CONDITION_ENERGY;
+			break;
+
+		case COMBAT_DROWNDAMAGE:
+			return CONDITION_DROWN;
+			break;
+
+		case COMBAT_EARTHDAMAGE:
+			return CONDITION_POISON;
+			break;
+
+		case COMBAT_ICEDAMAGE:
+			return CONDITION_FREEZING;
+			break;
+
+		case COMBAT_HOLYDAMAGE:
+			return CONDITION_DAZZLED;
+			break;
+
+		case COMBAT_DEATHDAMAGE:
+			return CONDITION_CURSED;
+			break;
+
+		default:
+			break;
+	}
+
+	return CONDITION_NONE;
+}
+
+bool Combat::isPlayerCombat(const Creature* target)
+{
+	if(target->getPlayer()){
+		return true;
+	}
+
+	if(target->hasMaster() && target->getMaster()->getPlayer()){
+		return true;
+	}
+
+	return false;
+}
+
+ReturnValue Combat::canTargetCreature(const Player* player, const Creature* target)
+{
+	if(player == target){
+		return RET_YOUMAYNOTATTACKTHISPLAYER;
+	}
+
+	if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
+		//pz-zone
+		if(player->getZone() == ZONE_PROTECTION){
+			return RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
+		}
+		if(target->getZone() == ZONE_PROTECTION){
+			return RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
+		}
+
+		//nopvp-zone
+		if(isPlayerCombat(target)){
+			if(player->getZone() == ZONE_NOPVP){
+				return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
+			}
+			if(target->getZone() == ZONE_NOPVP){
+				return RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
+			}
+		}
+	}
+
+	if(player->hasFlag(PlayerFlag_CannotUseCombat) || !target->isAttackable()){
+		if(target->getPlayer()){
+			return RET_YOUMAYNOTATTACKTHISPLAYER;
+		}
+		else{
+			return RET_YOUMAYNOTATTACKTHISCREATURE;
+		}
+	}
+
+#ifdef __SKULLSYSTEM__
+	if(player->hasSafeMode() && target->getPlayer() &&
+		target->getPlayer()->getSkull() == SKULL_NONE && !Combat::isInPvpZone(player, target)){
+		return RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
+	}
+#endif
+
+	return Combat::canDoCombat(player, target);
+}
+
 ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive)
 {
 	if(tile->hasProperty(BLOCKPROJECTILE)){
@@ -187,7 +321,7 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 	return RET_NOERROR;
 }
 
-bool Combat::isInPvpZone(Creature* attacker, Creature* target)
+bool Combat::isInPvpZone(const Creature* attacker, const Creature* target)
 {
 	if(attacker->getZone() != ZONE_PVP){
 		return false;
@@ -200,22 +334,22 @@ bool Combat::isInPvpZone(Creature* attacker, Creature* target)
 	return true;
 }
 
-ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
+ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target)
 {
 	if(attacker){
-		if(Player* targetPlayer = target->getPlayer()){
+		if(const Player* targetPlayer = target->getPlayer()){
 			if(targetPlayer->hasFlag(PlayerFlag_CannotBeAttacked)){
 				return RET_YOUMAYNOTATTACKTHISPLAYER;
 			}
 
-			if(Player* attackerPlayer = attacker->getPlayer()){
+			if(const Player* attackerPlayer = attacker->getPlayer()){
 				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
 					return RET_YOUMAYNOTATTACKTHISPLAYER;
 				}
 			}
 
 			if(attacker->hasMaster()){
-				if(Player* masterAttackerPlayer = attacker->getMaster()->getPlayer()){
+				if(const Player* masterAttackerPlayer = attacker->getMaster()->getPlayer()){
 					if(masterAttackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
 						return RET_YOUMAYNOTATTACKTHISPLAYER;
 					}
@@ -223,7 +357,7 @@ ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
 			}
 		}
 		else if(target->getMonster()){
-			if(Player* attackerPlayer = attacker->getPlayer()){
+			if(const Player* attackerPlayer = attacker->getPlayer()){
 				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackMonster)){
 					return RET_YOUMAYNOTATTACKTHISCREATURE;
 				}

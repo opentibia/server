@@ -1550,15 +1550,17 @@ void ProtocolGame::sendCloseContainer(uint32_t cid)
 
 void ProtocolGame::sendCreatureTurn(const Creature* creature, uint8_t stackPos)
 {
-	if(canSee(creature)){
-		NetworkMessage* msg = getOutputBuffer();
-		if(msg){
-			msg->AddByte(0x6B);
-			msg->AddPosition(creature->getPosition());
-			msg->AddByte(stackPos);
-			msg->AddU16(0x63); /*99*/
-			msg->AddU32(creature->getID());
-			msg->AddByte(creature->getDirection());
+	if(stackPos < 10){
+		if(canSee(creature)){
+			NetworkMessage* msg = getOutputBuffer();
+			if(msg){
+				msg->AddByte(0x6B);
+				msg->AddPosition(creature->getPosition());
+				msg->AddByte(stackPos);
+				msg->AddU16(0x63); /*99*/
+				msg->AddU32(creature->getID());
+				msg->AddByte(creature->getDirection());
+			}
 		}
 	}
 }

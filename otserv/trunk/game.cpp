@@ -2400,55 +2400,16 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 		return false;
 	}
 
-	ReturnValue ret = RET_NOERROR;
-
-	//pz-zone
-	if(player->getZone() == ZONE_PROTECTION && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
-		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
-	}
-	else if(attackCreature->getZone() == ZONE_PROTECTION && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
-		ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
-	}
-	//nopvp-zone
-	else if(player->getZone() == ZONE_NOPVP && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
-		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
-	}
-	else if(attackCreature->getPlayer() && attackCreature->getZone() == ZONE_NOPVP &&
-		!player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
-		ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
-	}
-	//self-target
-	else if(attackCreature == player){
-		ret = RET_YOUMAYNOTATTACKTHISPLAYER;
-	}
-	else if(player->hasFlag(PlayerFlag_CannotUseCombat) || !attackCreature->isAttackable()){
-		if(attackCreature->getPlayer()){
-			ret = RET_YOUMAYNOTATTACKTHISPLAYER;
-		}
-		else{
-			ret = RET_YOUMAYNOTATTACKTHISCREATURE;
-		}
-	}
-#ifdef __SKULLSYSTEM__
-	else if(player->hasSafeMode() && attackCreature->getPlayer() &&
-		attackCreature->getPlayer()->getSkull() == SKULL_NONE && !Combat::isInPvpZone(player, attackCreature)){
-		ret = RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
-	}
-#endif
-	else{
-		ret = Combat::canDoCombat(player, attackCreature);
-	}
-
-	if(ret == RET_NOERROR){
-		player->setAttackedCreature(attackCreature);
-		return true;
-	}
-	else{
+	ReturnValue ret = Combat::canTargetCreature(player, attackCreature);
+	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		player->sendCancelTarget();
 		player->setAttackedCreature(NULL);
 		return false;
 	}
+
+	player->setAttackedCreature(attackCreature);
+	return true;
 }
 
 bool Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)

@@ -23,6 +23,7 @@
 #include "game.h"
 #include "creature.h"
 #include "tools.h"
+#include "combat.h"
 
 #include <utility>
 #include <sstream>
@@ -1411,41 +1412,7 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 		return true;
 	}
 
-	CombatType_t combatType = COMBAT_NONE;
-
-	switch(conditionType){
-		case CONDITION_FIRE:
-			combatType = COMBAT_FIREDAMAGE;
-			break;
-
-		case CONDITION_ENERGY:
-			combatType = COMBAT_ENERGYDAMAGE;
-			break;
-
-		case CONDITION_DROWN:
-			combatType = COMBAT_DROWNDAMAGE;
-			break;
-
-		case CONDITION_POISON:
-			combatType = COMBAT_EARTHDAMAGE;
-			break;
-
-		case CONDITION_FREEZING:
-			combatType = COMBAT_ICEDAMAGE;
-			break;
-
-		case CONDITION_DAZZLED:
-			combatType = COMBAT_HOLYDAMAGE;
-			break;
-
-		case CONDITION_CURSED:
-			combatType = COMBAT_DEATHDAMAGE;
-			break;
-
-		default:
-			break;
-	}
-
+	CombatType_t combatType = Combat::ConditionToDamageType(conditionType);
 	Creature* attacker = g_game.getCreatureByID(owner);
 
 	if(g_game.combatBlockHit(combatType, attacker, creature, damage, false, false)){
