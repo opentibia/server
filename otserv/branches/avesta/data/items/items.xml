@@ -4843,10 +4843,10 @@
 	<item id="2154" article="a" name="yellow gem">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="2155" article="a" name="big emerald">
+	<item id="2155" article="a" name="green gem">
 		<attribute key="weight" value="150"/>
 	</item>
-	<item id="2156" article="a" name="big ruby">
+	<item id="2156" article="a" name="red gem">
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2157" article="a" name="gold nugget" plural="gold nuggets">
@@ -5875,7 +5875,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="spear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="10"/> <!-- ? -->
+		<attribute key="breakChance" value="3"/>
 	</item>
 	<item id="2390" article="a" name="magic longsword">
 		<attribute key="description" value="It is the magic Cyclopmania Sword."/>
@@ -6037,7 +6037,7 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="2413" article="a" name="broad sword">
+	<item id="2413" article="a" name="broadsword">
 		<attribute key="weight" value="5250"/>
 		<attribute key="defense" value="23"/>
 		<attribute key="attack" value="26"/>
@@ -6208,7 +6208,7 @@
 	<item id="2437" article="a" name="golden mace">
 		<attribute key="weight" value="5000"/>
 		<attribute key="defense" value="24"/>
-		<attribute key="attack" value="45"/>
+		<attribute key="attack" value="47"/>
 		<attribute key="weaponType" value="club"/>
 	</item>
 	<item id="2438" article="an" name="epee">
@@ -6794,7 +6794,6 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="arrow"/>
-		<attribute key="breakChance" value="80"/>
 	</item>
 	<item id="2545" article="a" name="poison arrow" plural="poison arrows">
 		<attribute key="weight" value="80"/>
@@ -6805,6 +6804,7 @@
 	</item>
 	<item id="2546" article="a" name="burst arrow" plural="burst arrows">
 		<attribute key="weight" value="90"/>
+		<attribute key="hitChance" value="100"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="burstarrow"/>
@@ -6816,7 +6816,7 @@
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="powerbolt"/>
 	</item>
-	<item id="2548" article="a" name="pitch fork">
+	<item id="2548" article="a" name="pitchfork">
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="2549" article="a" name="rake">
@@ -7132,7 +7132,7 @@
 		<attribute key="armor" value="3"/>
 		<attribute key="slotType" value="legs"/>
 	</item>
-	<item id="2649" name="leather trousers">
+	<item id="2649" name="leather legs">
 		<attribute key="weight" value="1800"/>
 		<attribute key="armor" value="1"/>
 		<attribute key="slotType" value="legs"/>
@@ -8984,7 +8984,7 @@
 	<item id="3102" article="a" name="dead dog">
 		<attribute key="weight" value="700"/>
 	</item>
-	<item id="3103" article="a" name="dead dog">
+	<item id="3103" article="a" name="dead skeleton">
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="0"/>
@@ -10900,7 +10900,7 @@
 		<attribute key="slotType" value="backpack"/>
 	</item>
 	<item id="3961" article="a" name="lich staff">
-		<attribute key="weight" value="5000"/>
+		<attribute key="weight" value="8000"/>
 		<attribute key="defense" value="30"/>
 		<attribute key="attack" value="40"/>
 		<attribute key="weaponType" value="club"/>
@@ -10931,6 +10931,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="huntingspear"/>
 		<attribute key="range" value="5"/>
+		<attribute key="breakChance" value="6"/>
 	</item>
 	<item id="3966" article="a" name="banana staff">
 		<attribute key="weight" value="5000"/>
@@ -14391,8 +14392,6 @@
 	<item id="5470" article="a" name="distillery">
 	</item>
 	<item id="5471" article="a" name="sugar cane">
-		<attribute key="decayTo" value="5463"/>
-		<attribute key="duration" value="240"/>
 	</item>
 	<item id="5472" article="a" name="chain ball">
 	</item>
@@ -17704,6 +17703,8 @@
 	</item>
 	<item id="6594" name="snow">
 		<attribute key="description" value="Someone must have walked here recently."/>
+		<attribute key="decayTo" value="670"/>
+		<attribute key="duration" value="240"/>
 	</item>
 	<item id="6595" name="snow">
 		<attribute key="description" value="Someone must have walked here recently."/>
@@ -17716,6 +17717,7 @@
 	</item>
 	<item id="6598" name="snow">
 		<attribute key="description" value="Someone must have walked here recently."/>
+		<attribute key="decayTo" value="6594"/>
 	</item>
 	<item id="6599" name="snow">
 		<attribute key="description" value="Someone must have walked here recently."/>
@@ -19423,21 +19425,22 @@
 	</item>
 	<item id="7363" article="a" name="piercing bolt" plural="piercing bolts">
 		<attribute key="weight" value="80"/>
-		<attribute key="attack" value="33"/>
+		<attribute key="attack" value="35"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="piercingbolt"/>
 	</item>
 	<item id="7364" article="a" name="sniper arrow" plural="sniper arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="26"/>
+		<attribute key="attack" value="30"/>
+		<attribute key="maxHitChance" value="100"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="sniperarrow"/>
 	</item>
 	<item id="7365" article="an" name="onyx arrow" plural="onyx arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="38"/>
+		<attribute key="attack" value="35"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="onyxarrow"/>
@@ -19448,6 +19451,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="greenstar"/>
 		<attribute key="range" value="5"/>
+		<attribute key="breakChance" value="9"/>
 	</item>
 	<item id="7367" article="an" name="enchanted spear" plural="enchanted spears">
 		<attribute key="weight" value="2000"/>
@@ -19455,7 +19459,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="enchantedspear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="7"/> <!-- ? -->
+		<attribute key="breakChance" value="2"/>
 	</item>
 	<item id="7368" article="an" name="assassin star" plural="assassin stars">
 		<attribute key="weight" value="200"/>
@@ -19498,7 +19502,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="royalspear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="10"/> <!-- ? -->
+		<attribute key="breakChance" value="2"/>
 	</item>
 	<item id="7379" name="brutetamer's staff">
 		<attribute key="weight" value="3800"/>
@@ -19635,8 +19639,12 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="-2"/>
 	</item>
-	<item id="7405" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7405" article="a" name="shenlong sword">
+		<attribute key="weight" value="8000"/>
+		<attribute key="defense" value="31"/>
+		<attribute key="attack" value="48"/>
+		<attribute key="weaponType" value="sword"/>
+		<attribute key="extradef" value="-2"/>
 	</item>
 	<item id="7406" article="a" name="blacksteel sword">
 		<attribute key="weight" value="5900"/>
@@ -19662,8 +19670,11 @@
 	<item id="7409" name="">
 		<attribute key="weight" value="0"/>
 	</item>
-	<item id="7410" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7410" article="a" name="queen's sceptre">
+		<attribute key="weight" value="2300"/>
+		<attribute key="defense" value="19"/>
+		<attribute key="attack" value="43"/>
+		<attribute key="weaponType" value="club"/>
 	</item>
 	<item id="7411" name="">
 		<attribute key="weight" value="0"/>
