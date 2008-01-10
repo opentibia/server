@@ -34,7 +34,7 @@ Server::Server(uint32_t serverip, uint16_t port)
 
 Server::~Server()
 {
-	closeListenSocekt();
+	closeListenSocket();
 }
 
 void Server::accept()

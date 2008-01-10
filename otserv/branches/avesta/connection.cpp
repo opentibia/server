@@ -22,7 +22,7 @@
 #include "connection.h"
 #include "protocol.h"
 #include "outputmessage.h"
-#include "protocol80.h"
+#include "protocolgame.h"
 #include "protocollogin.h"
 #include "admin.h"
 #include "status.h"
