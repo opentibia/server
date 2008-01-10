@@ -27,13 +27,16 @@
 #include "container.h"
 #include "condition.h"
 #include "combat.h"
+#include "configmanager.h"
 
 #include <string>
 #include <sstream>
-#include <algorithm>
-#include "configmanager.h"
-
 #include <vector>
+#include <algorithm>
+
+#if defined __EXCEPTION_TRACER__
+#include "exception.h"
+#endif
 
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
 OTSYS_THREAD_LOCKVAR Creature::pathLock;
