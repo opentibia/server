@@ -75,7 +75,7 @@ void TrashHolder::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void TrashHolder::__updateThing(Thing* thing, uint32_t count)
+void TrashHolder::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 {
 	//
 }

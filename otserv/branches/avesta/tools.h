@@ -22,7 +22,7 @@
 #define __OTSERV_TOOLS_H__
 
 #include "otsystem.h"
-#include "const80.h"
+#include "const.h"
 
 #include <string>
 #include <algorithm>
@@ -34,8 +34,9 @@
 
 
 enum DistributionType_t{
-	DISTRO_NORMAL,
-	DISTRO_SQUARE
+	DISTRO_UNIFORM,
+	DISTRO_SQUARE,
+	DISTRO_NORMAL
 };
 
 bool fileExists(const char* filename);
@@ -48,8 +49,9 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
+bool hasBitSet(uint32_t flag, uint32_t flags);
 
-int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_NORMAL);
+int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM);
 
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
@@ -69,5 +71,6 @@ void formatDate2(time_t time, char* buffer);
 MagicEffectClasses getMagicEffect(const std::string& strValue);
 ShootType_t getShootType(const std::string& strValue);
 Ammo_t getAmmoType(const std::string& strValue);
+AmmoAction_t getAmmoAction(const std::string& strValue);
 
 #endif

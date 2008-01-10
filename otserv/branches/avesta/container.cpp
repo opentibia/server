@@ -268,7 +268,8 @@ void Container::onAddContainerItem(Item* item)
 	}
 }
 
-void Container::onUpdateContainerItem(uint32_t index, Item* oldItem, Item* newItem)
+void Container::onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemType& oldType,
+	Item* newItem, const ItemType& newType)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -287,7 +288,7 @@ void Container::onUpdateContainerItem(uint32_t index, Item* oldItem, Item* newIt
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it) {
 		if((player = (*it)->getPlayer())){
-			player->onUpdateContainerItem(this, index, oldItem, newItem);
+			player->onUpdateContainerItem(this, index, oldItem, oldType, newItem, newType);
 		}
 	}
 }
@@ -525,7 +526,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void Container::__updateThing(Thing* thing, uint32_t count)
+void Container::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
@@ -545,11 +546,15 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
+	const ItemType& oldType = Item::items[item->getID()];
+	const ItemType& newType = Item::items[itemId];
+
+	item->setID(itemId);
 	item->setItemCountOrSubtype(count);
 
 	//send change to client
 	if(getParent()){
-		onUpdateContainerItem(index, item, item);
+		onUpdateContainerItem(index, item, oldType, item, newType);
 	}
 }
 
@@ -586,7 +591,9 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 
 	//send change to client
 	if(getParent()){
-		onUpdateContainerItem(index, *cit, item);
+		const ItemType& oldType = Item::items[(*cit)->getID()];
+		const ItemType& newType = Item::items[item->getID()];
+		onUpdateContainerItem(index, *cit, oldType, item, newType);
 	}
 
 	(*cit)->setParent(NULL);
@@ -628,7 +635,8 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 
 		//send change to client
 		if(getParent()){
-			onUpdateContainerItem(index, item, item);
+			const ItemType& it = Item::items[item->getID()];
+			onUpdateContainerItem(index, item, it, item, it);
 		}
 	}
 	else{

@@ -75,7 +75,8 @@ public:
 	virtual void onFollowCreatureDissapear(bool isLogout);
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
+		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void onUpdateTile(const Position& pos);
 
@@ -91,9 +92,9 @@ public:
 	bool canPushItems() const {return mType->canPushItems;}
 	bool canPushCreatures() const {return mType->canPushCreatures;}
 	bool isHostile() const { return mType->isHostile;}
-	virtual bool canSeeInvisibility() const { return isImmune(CONDITION_INVISIBLE);}	
-	uint32_t getManaCost() const {return mType->manaCost;}
-
+	virtual bool canSeeInvisibility() const { return isImmune(CONDITION_INVISIBLE);}
+	virtual bool getCombatValues(int32_t& min, int32_t& max);
+	uint32_t getManaCost() const {return mType->manaCost;}	
 	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
 
 private:
@@ -107,6 +108,8 @@ private:
 	bool isActive;
 	bool isWalkActive;
 	bool spellBonusAttack;
+	int32_t minCombatValue;
+	int32_t maxCombatValue;
 
 	typedef std::list<Creature*> TargetList;
 	TargetList targetList;
@@ -138,7 +141,7 @@ private:
 	bool pushCreature(Creature* creature);
 	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 
-	virtual void onDie();
+	void die();
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }
 	virtual void dropLoot(Container* corpse);

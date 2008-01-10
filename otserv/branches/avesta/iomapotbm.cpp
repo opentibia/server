@@ -41,9 +41,6 @@ typedef uint32_t flags_t;
 
 extern Game g_game;
 
-enum tile_flags_t{
-	TILE_PZ = 1,
-};
 /*
 	OTBM_ROOTV1
 	|
@@ -258,9 +255,20 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								return false;
 							}
 								
-							if(flags & TILE_PZ)
-								tile->setPz();
-								
+							if((flags & TILESTATE_PROTECTIONZONE) == TILESTATE_PROTECTIONZONE){
+								tile->setFlag(TILESTATE_PROTECTIONZONE);
+							}								
+							else if((flags & TILESTATE_NOPVPZONE) == TILESTATE_NOPVPZONE){
+								tile->setFlag(TILESTATE_NOPVPZONE);
+							}
+							else if((flags & TILESTATE_PVPZONE) == TILESTATE_PVPZONE){
+								tile->setFlag(TILESTATE_PVPZONE);
+							}
+							
+							if((flags & TILESTATE_NOLOGOUT) == TILESTATE_NOLOGOUT){
+								tile->setFlag(TILESTATE_NOLOGOUT);
+							}
+
 							break;
 						}
 
@@ -417,23 +425,4 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	}
 	std::cout << "Notice: [OTBM Loader] Loading time : " << (OTSYS_TIME() - start)/(1000.) << " s" << std::endl;
 	return (map->getLastError() == LOADMAPERROR_NONE);
-}
-
-bool IOMapOTBM::loadSpawns(Map* map)
-{
-	if(!map->spawnfile.empty()){
-		Spawns::getInstance()->loadFromXml(map->spawnfile);
-		Spawns::getInstance()->startup();
-	}
-	
-	return true;
-}
-
-bool IOMapOTBM::loadHouses(Map* map)
-{
-	if(!map->housefile.empty()){
-		return Houses::getInstance().loadHousesXML(map->housefile);
-	}
-
-	return true;
 }

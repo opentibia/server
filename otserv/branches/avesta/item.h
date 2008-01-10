@@ -50,7 +50,6 @@ enum ITEMPROPERTY{
 	HASHEIGHT,
 	BLOCKPROJECTILE,
 	BLOCKPATHFIND,
-	PROTECTIONZONE,
 	ISVERTICAL,
 	ISHORIZONTAL,
 	MOVEABLE,
@@ -302,6 +301,7 @@ public:
 
 	uint8_t getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
+	void setDefaultSubtype();
 	bool hasSubType() const;
 	uint8_t getSubType() const;
 
@@ -323,6 +323,7 @@ public:
 	bool canDecay();
 
 	virtual bool canRemove() const {return true;}
+	virtual bool canTransform() const {return true;}
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
 	virtual void __startDecaying();

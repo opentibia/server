@@ -41,6 +41,7 @@ AC_ARG_ENABLE(mysql, [  --enable-mysql          enable MySQL support], [
 	AM_CONDITIONAL(USE_SQLITE, false)
 	MYSQL_FLAGS=-D__USE_MYSQL__
 	SQLITE_FLAGS=
+	AC_SUBST(MYSQL_FLAGS)
 ])
 
 #check if we want postgresql
@@ -49,6 +50,7 @@ AC_ARG_ENABLE(pgsql, [  --enable-pgsql          enable PostgreSQL support], [
 	AM_CONDITIONAL(USE_SQLITE, false)
 	PGSQL_FLAGS=-D__USE_PGSQL__
 	SQLITE_FLAGS=
+	AC_SUBST(PGSQL_FLAGS)
 ])
 
 #check if we want odbc
@@ -57,6 +59,7 @@ AC_ARG_ENABLE(odbc, [  --enable-odbc           enable ODBC support], [
 	AM_CONDITIONAL(USE_SQLITE, false)
 	ODBC_FLAGS=-D__USE_ODBC__
 	SQLITE_FLAGS=
+	AC_SUBST(ODBC_FLAGS)
 ])
 
 #check if we want sqlite
@@ -64,6 +67,8 @@ AC_ARG_ENABLE(sqlite, [  --enable-sqlite         enable SQLite support (default)
 	AM_CONDITIONAL(USE_SQLITE, true)
 	SQLITE_FLAGS=-D__USE_SQLITE__
 ])
+
+AC_SUBST(SQLITE_FLAGS)
 
 #check if we want the profiler
 AC_ARG_ENABLE(profiler, [  --enable-profiler       enable profiler support], [PROFILER_FLAGS=-pg])
@@ -119,6 +124,12 @@ AC_CHECK_LIB(boost_system-gcc-mt, main, , [
 	AC_CHECK_LIB(boost_system-mt, main, , [
 		AC_CHECK_LIB(boost_system, main, , [
 			AC_MSG_ERROR("Linking against boost::system library failed.")])
+	])
+])
+AC_CHECK_LIB(boost_date_time-gcc-mt, main, , [
+	AC_CHECK_LIB(boost_date_time-mt, main, , [
+		AC_CHECK_LIB(boost_date_time, main, , [
+			AC_MSG_ERROR("Linking against boost::date-time library failed.")])
 	])
 ])
 

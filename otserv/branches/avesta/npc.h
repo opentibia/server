@@ -138,7 +138,8 @@ public:
 	
 protected:
 	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
+		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void onUpdateTile(const Position& pos);
 

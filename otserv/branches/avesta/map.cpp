@@ -58,9 +58,6 @@ Map::Map()
 	defaultMapLoaded = false;
 	mapWidth = 0;
 	mapHeight = 0;
-
-	mapStoreIdentifier = g_config.getString(ConfigManager::MAP_STORE_FILE);
-	houseStoreIdentifier = g_config.getString(ConfigManager::HOUSE_STORE_FILE);
 }
 
 Map::~Map()
@@ -136,24 +133,19 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	delete loader;
 
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
-	IOMapSerialize->loadHouseInfo(this, houseStoreIdentifier);
-	IOMapSerialize->loadMap(this, mapStoreIdentifier);
+	IOMapSerialize->loadHouseInfo(this);
+	IOMapSerialize->loadMap(this);
 
 	return true;
 }
 
 
-bool Map::saveMap(const std::string& identifier)
+bool Map::saveMap()
 {
-	std::string storeIdentifier = identifier;
-	if(storeIdentifier.empty()){
-		storeIdentifier = mapStoreIdentifier;
-	}
-
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
 	bool saved = false;
 	for(uint32_t tries = 0; tries < 3; tries++){
-		if(IOMapSerialize->saveMap(this, storeIdentifier)){
+		if(IOMapSerialize->saveMap(this)){
 			saved = true;
 			break;
 		}
@@ -164,7 +156,7 @@ bool Map::saveMap(const std::string& identifier)
 
 	saved = false;
 	for(uint32_t tries = 0; tries < 3; tries++){
-		if(IOMapSerialize->saveHouseInfo(this, houseStoreIdentifier)){
+		if(IOMapSerialize->saveHouseInfo(this)){
 			saved = true;
 			break;
 		}
@@ -249,9 +241,9 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 	bool placeInPZ = false;
 
 	if(tile){
-		placeInPZ = tile->isPz();
+		placeInPZ = tile->hasFlag(TILESTATE_PROTECTIONZONE);
 
-		ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
+		ReturnValue ret = tile->__queryAdd(0, creature, 1, FLAG_IGNOREBLOCKITEM);
 		if(forceLogin || ret == RET_NOERROR || ret == RET_PLAYERISNOTINVITED){
 			foundTile = true;
 		}
@@ -282,7 +274,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 			tryPos.y = tryPos.y + dy;
 
 			tile = getTile(tryPos);
-			if(!tile || (placeInPZ && !tile->isPz()))
+			if(!tile || (placeInPZ && !tile->hasFlag(TILESTATE_PROTECTIONZONE)))
 				continue;
 
 			if(tile->__queryAdd(0, creature, 1, 0) == RET_NOERROR){

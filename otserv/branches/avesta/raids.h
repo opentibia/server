@@ -23,7 +23,7 @@
 #include <list>
 
 #include "definitions.h"
-#include "const80.h"
+#include "const.h"
 #include "position.h"
 #include "baseevents.h"
 

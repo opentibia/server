@@ -187,7 +187,8 @@ protected:
 	
 	void adminCommandCloseServer();
 	void adminCommandPayHouses();
-	
+	void adminCommandShutdownServer();
+
 	enum ConnectionState_t{
 		NO_CONNECTED,
 		ENCRYPTION_NO_SET,

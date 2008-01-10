@@ -25,113 +25,149 @@
 #include "waitlist.h"
 #include "status.h"
 
-Waitlist* Waitlist::_Wait = NULL;
-
-Waitlist::Waitlist()
+WaitingList::WaitingList()
 {
-	OTSYS_THREAD_LOCKVARINIT(waitListLock);
-	waitList.clear();
+	//
 }
 
-Waitlist::~Waitlist()
+WaitingList::~WaitingList()
 {
 	waitList.clear();
 }
 
-Waitlist* Waitlist::instance(){
-	if(_Wait == NULL)
-		_Wait = new Waitlist();
-	
-	return _Wait;
-}
-
-WaitinglistIterator Waitlist::findClient(const Player* player)
+WaitListIterator WaitingList::findClient(const Player* player, uint32_t& slot)
 {
-	int slot = 1;
-	WaitinglistIterator it;
-	for(it = waitList.begin(); it != waitList.end();) {
-		if((*it)->acc == player->getAccount() && (*it)->ip == player->getIP()){
-			(*it)->slot = slot; //update slot
-			(*it)->timeout = OTSYS_TIME(); //update timeout
-			return it;
+	slot = 1;
+	for(WaitListIterator it = waitList.begin(); it != waitList.end(); ++it){
+		if((*it)->acc == player->getAccount() && (*it)->ip == player->getIP() &&
+			strcasecmp((*it)->name.c_str(), player->getName().c_str()) == 0){
+				return it;
 		}
-		else{
-			++it;	
-			slot++;
-		}
+
+		++slot;
 	}
-	
+
 	return waitList.end();
 }
 
-void Waitlist::addClient(const Player* player)
+int32_t WaitingList::getTime(int32_t slot)
 {
-	WaitinglistIterator it = findClient(player);
-	
-	if(it == waitList.end()){
-		Wait* wait = new Wait(player->getAccount(), player->getIP(), waitList.size()+1);
-		waitList.push_back(wait);
+	if(slot < 5){
+		return 5;
 	}
-}
-
-int Waitlist::getClientSlot(const Player* player)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::getClientSlot()");
-	
-	WaitinglistIterator it = findClient(player);
-	if(it != waitList.end()){
-		return (*it)->slot;
+	else if(slot < 10){
+		return 10;
+	}
+	else if(slot < 20){
+		return 20;
+	}
+	else if(slot < 50){
+		return 60;
 	}
 	else{
-		#ifdef __DEBUG__WATINGLIST__
-		std::cout << "WaitList::getSlot error, trying to find slot for unknown acc: " << acc << 
-		" with ip " << ip << std::endl;
-		#endif
-		return -1;
+		return 120;
 	}
 }
 
-bool Waitlist::clientLogin(const Player* player)
+int32_t WaitingList::getTimeOut(int32_t slot)
+{
+	//timeout is set to 15 seconds longer than expected retry attempt
+	return getTime(slot) + 15;
+}
+
+bool WaitingList::clientLogin(const Player* player)
 {		
-	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::clientLogin()");
+	if(player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+		return true;
+	}
 
-	Status* stat = Status::instance();	
-	
-	if(!stat->hasSlot()){
-		addClient(player);
-		return false;
+	if(waitList.empty() && Status::instance()->getPlayersOnline() < Status::instance()->getMaxPlayersOnline()){
+		//no waiting list and enough room
+		return true;
+	}
+
+	cleanUpList();
+
+	uint32_t slot;
+	WaitListIterator it = findClient(player, slot);
+	if(it != waitList.end()){
+		if((Status::instance()->getPlayersOnline() + slot) <= Status::instance()->getMaxPlayersOnline()){ 
+			//should be able to login now
+#ifdef __DEBUG__WATINGLIST__
+			std::cout << "Name: " << (*it)->name << " can now login" << std::endl;
+#endif
+			delete *it;
+			waitList.erase(it);
+			return true;
+		}
+		else{
+			//let them wait a bit longer
+			(*it)->timeout = OTSYS_TIME() + getTimeOut(slot) * 1000;
+			return false;
+		}
+	}
+
+	Wait* wait = new Wait();
+
+	if(player->isPremium()){
+		slot = 1;
+		for(WaitListIterator it = waitList.begin(); it != waitList.end(); ++it){
+			if(!(*it)->premium){
+				waitList.insert(it, wait);
+				break;
+			}
+
+			++slot;
+		}
 	}
 	else{
-		cleanUpList();
-		/**
-		For example: Client is in slot 3, maximum is 50 and its 48 online, 
-		then its not this clients turn to sign in...
-		But if its 47 online, let it sign in!
-		**/
-		WaitinglistIterator it = findClient(player);
-		
-		if(it != waitList.end()){
-			if(((*it)->slot + stat->getPlayersOnline()) <= stat->getMaxPlayersOnline()){ 
-				waitList.erase(it); //Should be able to sign in now, so lets erase it
-				return true;	
-			}
-		}
-		else{ //Not in queue
-			return true;	
-		}
+		waitList.push_back(wait);
+		slot = waitList.size();
 	}
+
+	wait->name = player->getName();
+	wait->acc = player->getAccount();
+	wait->ip = player->getIP();
+	wait->premium = player->isPremium();
+	wait->timeout = OTSYS_TIME() + getTimeOut(slot) * 1000;
 	
+#ifdef __DEBUG__WATINGLIST__
+	std::cout << "Name: " << player->getName() << "(" << waitList.size() + 1 << ")" << " has been added to the waiting list" << std::endl;
+#endif
+
 	return false;
 }
 
-void Waitlist::cleanUpList()
+int32_t WaitingList::getClientSlot(const Player* player)
 {
-	for(WaitinglistIterator it = waitList.begin(); it != waitList.end();){
-		if((OTSYS_TIME() - (*it)->timeout) > getTime((*it)->slot)*1.5*1000){
+	uint32_t slot;
+	WaitListIterator it = findClient(player, slot);
+	if(it != waitList.end()){
+		return slot;
+	}
+
+	#ifdef __DEBUG__WATINGLIST__
+	std::cout << "WaitingList::getSlot error, trying to find slot for unknown acc: " << player->getAccount() << 
+	" with ip " << player->getIP() << std::endl;
+	#endif
+
+	return -1;
+}
+
+void WaitingList::cleanUpList()
+{
+	uint32_t slot = 1;
+	for(WaitListIterator it = waitList.begin(); it != waitList.end();){
+		if((*it)->timeout - OTSYS_TIME() <= 0){
+#ifdef __DEBUG__WATINGLIST__
+			std::cout << "Name: " << (*it)->name << " has timed out!" << std::endl;
+#endif
 			delete *it;
 			waitList.erase(it++);
 		}
-		else
+		else{
+			++slot;
 			++it;
+		}
 	}	
 }

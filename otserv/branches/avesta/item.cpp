@@ -52,6 +52,10 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 
 	const ItemType& it = Item::items[_type];
 
+	if(it.group == ITEM_GROUP_DEPRECATED){
+		std::cout << "Error: [Item::CreateItem] Item id " << it.id << " has been declared deprecated."  << std::endl;
+	}
+
 	if(it.id != 0){
 		if(it.isDepot()){
 			newItem = new Depot(_type);
@@ -187,6 +191,15 @@ Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
 	//
+}
+
+void Item::setDefaultSubtype()
+{
+	const ItemType& it = items[id];
+
+	count = 1;
+	charges = it.charges;
+	fluid = 0;
 }
 
 void Item::setID(uint16_t newid)

@@ -154,7 +154,7 @@ void Teleport::__addThing(int32_t index, Thing* thing)
 	if(destTile){
 		if(Creature* creature = thing->getCreature()){
 			getTile()->moveCreature(creature, destTile, true);
-			g_game.addMagicEffect(destTile->getPosition(), NM_ME_ENERGY_AREA);
+			g_game.addMagicEffect(destTile->getPosition(), NM_ME_TELEPORT);
 		}
 		else if(Item* item = thing->getItem()){
 			g_game.internalMoveItem(getTile(), destTile, INDEX_WHEREEVER, item, item->getItemCount());
@@ -162,7 +162,7 @@ void Teleport::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void Teleport::__updateThing(Thing* thing, uint32_t count)
+void Teleport::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 {
 	//
 }

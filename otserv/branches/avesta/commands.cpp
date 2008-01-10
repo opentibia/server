@@ -351,7 +351,7 @@ bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, con
 {
 	Position destPos = creature->getPosition();
 	if(game->internalTeleport(creature, creature->masterPos) == RET_NOERROR){
-		game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
+		game->addMagicEffect(destPos, NM_ME_TELEPORT);
 		return true;
 	}
 
@@ -656,7 +656,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		Houses::getInstance().payHouses();
 	}
 
-	if(!game->getMap()->saveMap("")){
+	if(!game->getMap()->saveMap()){
 		if(player)
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving map.");
 	}
@@ -739,7 +739,7 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 		}
 
 		if(game->internalTeleport(creature, newPos) == RET_NOERROR){
-			game->addMagicEffect(newPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(newPos, NM_ME_TELEPORT);
 		}
 	}
 

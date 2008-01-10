@@ -59,18 +59,19 @@ public:
 	static int32_t spellInFightTime;
 
 	static Position getCasterPosition(Creature* creature, Direction dir);
+	virtual std::string getScriptBaseName();
 
 protected:
 
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
-	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 
 	RunesMap runes;
 	InstantsMap instants;
 
+	friend class CombatSpell;
 	LuaScriptInterface m_scriptInterface;
 };
 
@@ -87,15 +88,23 @@ public:
 	virtual bool castSpell(Creature* creature, Creature* target) = 0;
 };
 
-class CombatSpell : public BaseSpell{
+class CombatSpell : public Event, public BaseSpell{
 public:
 	CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection);
 	virtual ~CombatSpell(){};
 
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);
+	virtual bool configureEvent(xmlNodePtr p) {return true;}
 
-private:
+	//scripting
+	bool executeCastSpell(Creature* creature, const LuaVariant& var);
+
+	bool loadScriptCombat();
+	Combat* getCombat() {return combat;}
+
+protected:
+	virtual std::string getScriptEventName() {return "onCastSpell";}
 	bool needDirection;
 	bool needTarget;
 	Combat* combat;
@@ -114,8 +123,8 @@ public:
 
 	int32_t getManaCost(const Player* player) const;
 	int32_t getSoulCost(const Player* player) const;
-	int32_t getLevel() const { return level;}
-	int32_t getMagicLevel() const { return magLevel;}
+	uint32_t getLevel() const { return level;}
+	uint32_t getMagicLevel() const { return magLevel;}
 	int32_t getMana() const { return mana;}
 	int32_t getManaPercent() const { return manaPercent;}
 	const bool isPremium() const {return premium;}
@@ -135,8 +144,8 @@ protected:
 	bool learnable;
 	bool enabled;
 	bool premium;
-	int32_t level;
-	int32_t magLevel;
+	uint32_t level;
+	uint32_t magLevel;
 
 	int32_t mana;
 	int32_t manaPercent;
@@ -177,6 +186,7 @@ public:
 	virtual bool isInstant() const { return true;}
 	bool getHasParam() const { return hasParam;}
 	bool canCast(const Player* player) const;
+	bool canThrowSpell(const Creature* creature, const Creature* target) const;
 
 protected:
 	virtual std::string getScriptEventName();
@@ -197,6 +207,7 @@ protected:
 	bool needDirection;
 	bool hasParam;
 	bool checkLineOfSight;
+	bool casterTargetOrDirection;
 	InstantSpellFunction* function;
 };
 

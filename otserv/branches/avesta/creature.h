@@ -27,10 +27,12 @@
 #include "templates.h"
 #include "position.h"
 #include "condition.h"
-#include "const80.h"
+#include "const.h"
 #include "tile.h"
 #include "enums.h"
 #include "creatureevent.h"
+
+#define EVENT_CREATURE_INTERVAL 500
 
 #include <list>
 
@@ -59,6 +61,13 @@ struct FindPathParams{
 	uint32_t targetDistance;
 };
 
+enum ZoneType_t{
+	ZONE_PROTECTION,
+	ZONE_NOPVP,
+	ZONE_PVP,
+	ZONE_NOLOGOUT,
+	ZONE_NORMAL
+};
 
 class Map;
 class Thing;
@@ -103,11 +112,6 @@ public:
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
 
-	uint32_t getExpForLv(const int& lv) const
-	{
-		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
-	}
-
 	virtual RaceType_t getRace() const {return RACE_NONE;}
 	Direction getDirection() const { return direction;}
 	void setDirection(Direction dir) { direction = dir;}
@@ -148,7 +152,21 @@ public:
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
-	bool isInPz() const {return getTile()->hasProperty(PROTECTIONZONE);}
+	ZoneType_t getZone() const {
+		const Tile* tile = getTile();
+		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
+			return ZONE_PROTECTION;
+		}
+		else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
+			return ZONE_NOPVP;
+		}
+		else if(tile->hasFlag(TILESTATE_PVPZONE)){
+			return ZONE_PVP;
+		}
+		else{
+			return ZONE_NORMAL;
+		}
+	}
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -162,7 +180,7 @@ public:
 
 	//follow functions
 	virtual const Creature* getFollowCreature() { return followCreature; };
-	virtual bool setFollowCreature(Creature* creature);
+	virtual bool setFollowCreature(Creature* creature, bool fullPathSearch = false);
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature) {};
@@ -183,6 +201,7 @@ public:
 
 	virtual void addSummon(Creature* creature);
 	virtual void removeSummon(const Creature* creature);
+	const std::list<Creature*>& getSummons() {return summons;}
 
 	virtual int32_t getArmor() const {return 0;}
 	virtual int32_t getDefense() const {return 0;}
@@ -194,7 +213,7 @@ public:
 	void removeCondition(Condition* condition);
 	void removeCondition(const Creature* attacker, ConditionType_t type);
 	Condition* getCondition(ConditionType_t type, ConditionId_t id) const;
-	void executeConditions(int32_t newticks);
+	void executeConditions(uint32_t interval);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
 	virtual bool isImmune(CombatType_t type) const;
@@ -214,7 +233,6 @@ public:
 	virtual bool convinceCreature(Creature* creature) {return false;};
 
 	virtual void onDie();
-	virtual Item* getCorpse();
 	virtual int32_t getGainedExperience(Creature* attacker) const;
 	virtual bool addDamagePoints(Creature* attacker, int32_t damagePoints);
 	bool hasBeenAttacked(uint32_t attackerId);
@@ -233,7 +251,8 @@ public:
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
-	virtual void onAttackedCreatureEnterProtectionZone(const Creature* creature);
+	virtual void onChangeZone(ZoneType_t zone);
+	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
@@ -247,7 +266,8 @@ public:
 	virtual bool getNextStep(Direction& dir);
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
+		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void onUpdateTile(const Position& pos);
 
@@ -266,6 +286,7 @@ public:
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
 
 	virtual WeaponType_t getWeaponType() {return WEAPON_NONE;}
+	virtual bool getCombatValues(int32_t& min, int32_t& max) {return false;}
 	int32_t getAttackStrength() const {return attackStrength;}
 	int32_t getDefenseStrength() const {return defenseStrength;}
 
@@ -344,6 +365,9 @@ protected:
 	virtual void dropLoot(Container* corpse) {};
 	virtual uint16_t getLookCorpse() const { return 0; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
+	virtual void die() {};
+	virtual void dropCorpse();
+	virtual Item* getCorpse();
 
 	friend class Game;
 	friend class Map;

@@ -30,9 +30,11 @@ class Creature;
 #define INDEX_WHEREEVER -1
 
 enum cylinderflags_t {
-	FLAG_NOLIMIT = 1,
-	FLAG_CHILDISOWNER = 2,
-	FLAG_PATHFINDING = 4
+	FLAG_NOLIMIT = 1,				//Bypass limits like capacity/container limits, blocking items/creatures etc.
+	FLAG_IGNOREBLOCKITEM = 2,		//Bypass moveable blocking item checks
+	FLAG_IGNOREBLOCKCREATURE = 4,	//Bypass creature checks
+	FLAG_CHILDISOWNER = 8,			//Used by containers to query capacity of the carrier (player)
+	FLAG_PATHFINDING = 16,			//An additional check is done for floor changing/teleport items
 };
 
 enum cylinderlink_t{
@@ -107,9 +109,10 @@ public:
 	/**
 	  * Update the item count or type for an object
 	  * \param thing is the object to update
+	  * \param itemId is the new item id
 	  * \param count is the new count value
 	  */
-	virtual void __updateThing(Thing* thing, uint32_t count) = 0;
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count) = 0;
 
 	/**
 	  * Replace an object with a new
@@ -208,7 +211,7 @@ public:
 
 	virtual void __addThing(Thing* thing) {}
 	virtual void __addThing(int32_t index, Thing* thing) {}
-	virtual void __updateThing(Thing* thing, uint32_t count) {}
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count) {}
 	virtual void __replaceThing(uint32_t index, Thing* thing) {}
 	virtual void __removeThing(Thing* thing, uint32_t count) {}
 

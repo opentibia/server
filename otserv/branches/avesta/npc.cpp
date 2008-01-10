@@ -227,9 +227,10 @@ void Npc::onAddTileItem(const Position& pos, const Item* item)
 	Creature::onAddTileItem(pos, item);
 }
 
-void Npc::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
+void Npc::onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
-	Creature::onUpdateTileItem(pos, stackpos, oldItem, newItem);
+	Creature::onUpdateTileItem(pos, stackpos, oldItem, oldType, newItem, newType);
 }
 
 void Npc::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)

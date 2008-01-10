@@ -41,13 +41,20 @@ typedef std::vector<Creature*> CreatureVector;
 enum tileflags_t{
 	TILESTATE_NONE = 0,
 	TILESTATE_PROTECTIONZONE = 1,
-	TILESTATE_HOUSE = 2,
-	TILESTATE_FLOORCHANGE = 4,
-	TILESTATE_FLOORCHANGE_DOWN = 8,
-	TILESTATE_FLOORCHANGE_NORTH = 16,
-	TILESTATE_FLOORCHANGE_SOUTH = 32,
-	TILESTATE_FLOORCHANGE_EAST = 64,
-	TILESTATE_FLOORCHANGE_WEST = 128
+	TILESTATE_DEPRICATED_HOUSE = 2,
+	TILESTATE_NOPVPZONE = 4,
+	TILESTATE_NOLOGOUT = 8,
+	TILESTATE_PVPZONE = 16,
+
+	//internal usage
+	TILESTATE_HOUSE = 32,
+	TILESTATE_FLOORCHANGE = 64,
+	TILESTATE_FLOORCHANGE_DOWN = 128,
+	TILESTATE_FLOORCHANGE_NORTH = 256,
+	TILESTATE_FLOORCHANGE_SOUTH = 512,
+	TILESTATE_FLOORCHANGE_EAST = 1024,
+	TILESTATE_FLOORCHANGE_WEST = 2048,
+	TILESTATE_POSITIONCHANGE = 4096
 };
 
 class Tile : public Cylinder
@@ -60,8 +67,27 @@ public:
 		tilePos.y = y;
 		tilePos.z = z;
 
+		thingCount = 0;
 		m_flags = 0;
 		ground = NULL;
+	}
+
+	~Tile()
+	{
+#ifdef _DEBUG
+		delete ground;
+
+		ItemVector::iterator it;
+		for(it = topItems.begin(); it != topItems.end(); ++it){
+			delete *it;
+		}
+		topItems.clear();
+
+		for(it = downItems.begin(); it != downItems.end(); ++it){
+			delete *it;
+		}
+		downItems.clear();
+#endif // _DEBUG
 	}
 
 	virtual int getThrowRange() const {return 0;};
@@ -86,16 +112,15 @@ public:
 	bool isMoveableBlocking() const;
 	Thing* getTopThing();
 
-	uint32_t getThingCount() const {return (uint32_t)(ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();}
+	uint32_t getThingCount() const {return thingCount;}
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 
 	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}
 	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
 	void resetFlag(tileflags_t flag) {m_flags &= ~(uint32_t)flag;}
-	bool isPz() const {return hasFlag(TILESTATE_PROTECTIONZONE);}
-	void setPz() {setFlag(TILESTATE_PROTECTIONZONE);}
 
+	bool positionChange() const {return hasFlag(TILESTATE_POSITIONCHANGE);}
 	bool floorChange() const {return hasFlag(TILESTATE_FLOORCHANGE);}
 	bool floorChangeDown() const {return hasFlag(TILESTATE_FLOORCHANGE_DOWN);}
 	bool floorChange(Direction direction) const
@@ -132,7 +157,7 @@ public:
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
 
-	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
 	virtual void __replaceThing(uint32_t index, Thing* thing);
 
 	virtual void __removeThing(Thing* thing, uint32_t count);
@@ -155,13 +180,15 @@ public:
 
 private:
 	void onAddTileItem(Item* item);
-	void onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem);
+	void onUpdateTileItem(uint32_t index, Item* oldItem,
+		const ItemType& oldType, Item* newItem, const ItemType& newType);
 	void onRemoveTileItem(uint32_t index, Item* item);
 	void onUpdateTile();
 
 	void updateTileFlags(Item* item, bool removing);
 
 protected:
+	uint32_t thingCount;
 	Position tilePos;
 	uint16_t m_flags;
 };

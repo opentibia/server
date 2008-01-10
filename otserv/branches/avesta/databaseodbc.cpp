@@ -115,6 +115,9 @@ int DatabaseODBC::getParam(DBParam_t param)
 		case DBPARAM_MULTIINSERT:
 			return false;
 			break;
+
+		default:
+			return false;
 	}
 }
 
@@ -206,7 +209,7 @@ std::string DatabaseODBC::escapeBlob(const char* s, uint32_t length)
 {
 	std::string buf = "'";
 
-	for(int32_t i = 0; i < length; i++){
+	for(uint32_t i = 0; i < length; i++){
 		switch(s[i]){
 			case '\'':
 				buf += "\'\'";
@@ -244,7 +247,7 @@ std::string DatabaseODBC::_parse(const std::string &s)
 	query.reserve(s.size());
 	bool inString = false;
 	uint8_t ch;
-	for(int a = 0; a < s.length(); a++){
+	for(uint32_t a = 0; a < s.length(); a++){
 		ch = s[a];
 
 		if(ch == '\''){

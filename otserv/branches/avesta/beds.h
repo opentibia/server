@@ -64,7 +64,7 @@ public:
 	
 	// mutator / accessor for house
 	House* getHouse() const { return house; }
-	House* setHouse(House* h){ house = h; }
+	void setHouse(House* h){ house = h; }
 	
 	// can a player even use the bed? :o
 	bool canUse(Player* player) const;

@@ -25,7 +25,7 @@
 #include <list>
 #include <string>
 
-#include "const80.h"
+#include "const.h"
 #include "definitions.h"
 
 class Player;
@@ -86,7 +86,7 @@ class Chat
 {
 public:
 	Chat();
-	~Chat(){};
+	~Chat();
 	ChatChannel* createChannel(Player* player, uint16_t channelId);
 	bool deleteChannel(Player* player, uint16_t channelId);
 	

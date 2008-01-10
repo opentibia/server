@@ -44,7 +44,7 @@ CREATE TABLE "players" (
     "cap" INTEGER NOT NULL DEFAULT 0,
     "lastlogin" INTEGER NOT NULL DEFAULT 0,
     "lastip" INTEGER NOT NULL DEFAULT 0,
-    "save" BOOLEAN NOT NULL DEFAULT 1,
+    "save" INTEGER NOT NULL DEFAULT 1,
     "conditions" BLOB NOT NULL,
     "redskulltime" INTEGER NOT NULL DEFAULT 0,
     "redskull" BOOLEAN NOT NULL DEFAULT 0,

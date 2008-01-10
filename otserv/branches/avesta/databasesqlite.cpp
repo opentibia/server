@@ -59,6 +59,9 @@ int DatabaseSQLite::getParam(DBParam_t param)
 		case DBPARAM_MULTIINSERT:
 			return false;
 			break;
+
+		default:
+			return false;
 	}
 }
 
@@ -84,7 +87,7 @@ std::string DatabaseSQLite::_parse(const std::string &s)
 	query.reserve(s.size());
 	bool inString = false;
 	uint8_t ch;
-	for(int a = 0; a < s.length(); a++){
+	for(uint32_t a = 0; a < s.length(); a++){
 		ch = s[a];
 
 		if(ch == '\''){
@@ -175,10 +178,10 @@ std::string DatabaseSQLite::escapeBlob(const char* s, uint32_t length)
 {
 	std::string buf = "x'";
 
-	char* hex = new char[2];
+	char* hex = new char[2 + 1]; //need one extra byte for null-character
 
-	for(int32_t i = 0; i < length; i++){
-		sprintf(hex, "%02x", s[i]);
+	for(uint32_t i = 0; i < length; i++){
+		sprintf(hex, "%02x", ((unsigned char)s[i]));
 		buf += hex;
 	}
 

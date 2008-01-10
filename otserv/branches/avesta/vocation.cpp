@@ -28,6 +28,19 @@
 
 #include "tools.h"
 
+Vocations::Vocations()
+{
+	//
+}
+
+Vocations::~Vocations()
+{
+	for(VocationsMap::iterator it = vocationsMap.begin(); it != vocationsMap.end(); ++it){
+		delete it->second;
+	}
+	vocationsMap.clear();
+}
+
 bool Vocations::loadFromXml(const std::string& datadir)
 {
 	std::string filename = datadir + "vocations.xml";

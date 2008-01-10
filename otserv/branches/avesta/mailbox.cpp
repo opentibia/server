@@ -84,7 +84,7 @@ void Mailbox::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void Mailbox::__updateThing(Thing* thing, uint32_t count)
+void Mailbox::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 {
 	//
 }

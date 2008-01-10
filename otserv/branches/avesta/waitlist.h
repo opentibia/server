@@ -27,43 +27,36 @@
 struct Wait{
 	uint32_t acc;
 	uint32_t ip;
-
+	std::string name;
+	bool premium;
 	int64_t timeout;
-	int slot;
-
-	Wait(uint32_t account, uint32_t ipnum, int place){
-		acc = account;
-		ip = ipnum;
-		timeout = OTSYS_TIME();
-		slot = place;
-	};
 };
 
-typedef std::list<Wait*> Waitinglist;
-typedef Waitinglist::iterator WaitinglistIterator;
+typedef std::list<Wait*> WaitList;
+typedef WaitList::iterator WaitListIterator;
 
-class Waitlist
+class WaitingList
 {
 public:
-	Waitlist();
-	virtual ~Waitlist();
+	WaitingList();
+	virtual ~WaitingList();
 
-	static Waitlist* instance();
+	static WaitingList* getInstance()
+	{
+		static WaitingList waitingList;
+		return &waitingList;
+	}
 
 	bool clientLogin(const Player* player);
-	int getClientSlot(const Player* player);
-	int getTime(int slot){return 20;}
-
-	OTSYS_THREAD_LOCKVAR waitListLock;
+	int32_t getClientSlot(const Player* player);
+	static int32_t getTime(int32_t slot);
 
 protected:
-	Waitinglist waitList;
+	WaitList priorityWaitList;
+	WaitList waitList;
 
-	WaitinglistIterator findClient(const Player* player);
-	void addClient(const Player* player);
-
+	int32_t getTimeOut(int32_t slot);
+	WaitListIterator findClient(const Player* player, uint32_t& slot);
 	void cleanUpList();
-private:
-	static Waitlist* _Wait;
 };
 #endif

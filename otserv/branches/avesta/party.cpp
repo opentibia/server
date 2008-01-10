@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "items.h"
 #include "party.h"
 #include "player.h"
 

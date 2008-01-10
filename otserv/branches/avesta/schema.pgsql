@@ -46,7 +46,7 @@ CREATE TABLE "players" (
     "cap" INT NOT NULL DEFAULT 0,
     "lastlogin" BIGINT NOT NULL DEFAULT 0,
     "lastip" BIGINT NOT NULL DEFAULT 0,
-    "save" SMALLINT NOT NULL DEFAULT 0,
+    "save" SMALLINT NOT NULL DEFAULT 1,
     "conditions" BYTEA NOT NULL,
     "redskulltime" BIGINT NOT NULL DEFAULT 0,
     "redskull" SMALLINT NOT NULL DEFAULT 0,
@@ -200,6 +200,7 @@ RETURNS TRIGGER
 AS $$
 BEGIN
     UPDATE "players" SET "guildnick" = '', "rank_id" = 0 WHERE "rank_id" IN (SELECT "id" FROM "guild_ranks" WHERE "guild_id" = OLD."id");
+	DELETE FROM "guild_ranks" WHERE "guild_id" = OLD."id";
 
     RETURN OLD;
 END;

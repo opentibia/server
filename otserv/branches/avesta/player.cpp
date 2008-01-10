@@ -51,7 +51,7 @@ AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
 int32_t Player::maxMessageBuffer;
 
-Player::Player(const std::string& _name, Protocol80 *p) :
+Player::Player(const std::string& _name, ProtocolGame* p) :
 Creature()
 {
 	client = p;
@@ -72,11 +72,13 @@ Creature()
 	guildLevel = 0;
 
 	level      = 1;
-	experience = 180;
+	levelPercent = 0;
+	magLevelPercent = 0;
+	magLevel   = 0;
+	experience = 0;
 	damageImmunities = 0;
 	conditionImmunities = 0;
 	conditionSuppressions = 0;
-	magLevel   = 20;
 	accessLevel = 0;
 	lastip = 0;
 	lastLoginSaved = 0;
@@ -116,8 +118,7 @@ Creature()
 	lastSentStats.manaMax = 0;
 	lastSentStats.manaSpent = 0;
 	lastSentStats.magLevel = 0;
-	level_percent = 0;
-	maglevel_percent = 0;
+	skillLoss = true;
 
 	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;
@@ -363,7 +364,7 @@ WeaponType_t Player::getWeaponType()
 int32_t Player::getWeaponSkill(const Item* item) const
 {
 	if(!item){
-		return 0;
+		return getSkill(SKILL_FIST, SKILL_LEVEL);
 	}
 
 	WeaponType_t weaponType = item->getWeaponType();
@@ -496,19 +497,18 @@ void Player::updateInventoryWeigth()
 	}
 }
 
-int Player::getPlayerInfo(playerinfo_t playerinfo) const
+int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 {
 	switch(playerinfo) {
 		case PLAYERINFO_LEVEL: return level; break;
-		case PLAYERINFO_LEVELPERCENT: return level_percent; break;
-		case PLAYERINFO_MAGICLEVEL: return magLevel + varStats[STAT_MAGICPOINTS]; break;
-		case PLAYERINFO_MAGICLEVELPERCENT: return maglevel_percent; break;
+		case PLAYERINFO_LEVELPERCENT: return levelPercent; break;
+		case PLAYERINFO_MAGICLEVEL: return std::max((int32_t)0, ((int32_t)magLevel + varStats[STAT_MAGICPOINTS])); break;
+		case PLAYERINFO_MAGICLEVELPERCENT: return magLevelPercent; break;
 		case PLAYERINFO_HEALTH: return health; break;
-		case PLAYERINFO_MAXHEALTH: return healthMax + varStats[STAT_MAXHITPOINTS]; break;
+		case PLAYERINFO_MAXHEALTH: return std::max((int32_t)1, ((int32_t)healthMax + varStats[STAT_MAXHITPOINTS])); break;
 		case PLAYERINFO_MANA: return mana; break;
-		case PLAYERINFO_MAXMANA: return manaMax + varStats[STAT_MAXMANAPOINTS]; break;
-		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
-		case PLAYERINFO_SOUL: return soul + varStats[STAT_SOULPOINTS]; break;
+		case PLAYERINFO_MAXMANA: return std::max((int32_t)0, ((int32_t)manaMax + varStats[STAT_MAXMANAPOINTS])); break;
+		case PLAYERINFO_SOUL: return std::max((int32_t)0, ((int32_t)soul + varStats[STAT_SOULPOINTS])); break;
 		default:
 			return 0; break;
 	}
@@ -516,7 +516,7 @@ int Player::getPlayerInfo(playerinfo_t playerinfo) const
 	return 0;
 }
 
-int Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
+int32_t Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
 {
 	int32_t n = skills[skilltype][skillinfo];
 
@@ -524,7 +524,7 @@ int Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
 		n += varSkills[skilltype];
 	}
 
-	return n;
+	return std::max((int32_t)0, (int32_t)n);
 }
 
 std::string Player::getSkillName(int skillid)
@@ -1006,6 +1006,38 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("Turn secure mode off if you really want to attack unmarked players.");
 		break;
 
+	case RET_YOUNEEDPREMIUMACCOUNT:
+		sendCancel("You need a premium account to use this spell.");
+		break;
+
+	case RET_YOUNEEDTOLEARNTHISSPELL:
+		sendCancel("You need to learn this spell first.");
+		break;
+
+	case RET_YOURVOCATIONCANNOTUSETHISSPELL:
+		sendCancel("Your vocation cannot use this spell.");
+		break;
+
+	case RET_YOUNEEDAWEAPONTOUSETHISSPELL:
+		sendCancel("You need to equip a weapon to use this spell.");
+		break;
+
+	case RET_PLAYERISPZLOCKEDLEAVEPVPZONE:
+		sendCancel("You can not leave a pvp zone after attacking another player.");
+		break;
+
+	case RET_PLAYERISPZLOCKEDENTERPVPZONE:
+		sendCancel("You can not enter a pvp zone after attacking another player.");
+		break;
+
+	case RET_ACTIONNOTPERMITTEDINANOPVPZONE:
+		sendCancel("This action is not permitted in a none pvp zone.");
+		break;
+
+	case RET_YOUCANNOTLOGOUTHERE:
+		sendCancel("You can not logout here.");
+		break;
+
 	case RET_NOTPOSSIBLE:
 	default:
 		sendCancel("Sorry, not possible.");
@@ -1018,29 +1050,31 @@ void Player::sendStats()
 	if(client){
 		//update level and magLevel percents
 		if(lastSentStats.experience != getExperience() || lastSentStats.level != level){
-			uint32_t currentExpLevel = getExpForLv(level);
-			int32_t percent = (100*(experience - currentExpLevel)) / std::max((int32_t)1, (int32_t)(getExpForLv(level + 1) - currentExpLevel));
+			uint32_t currentExpLevel = Player::getExpForLevel(level);
+			uint32_t nextExpLevel = Player::getExpForLevel(level + 1);
+			uint32_t diffExpLevel = nextExpLevel - currentExpLevel;
+			uint32_t gainNextLevel = (getExperience() - currentExpLevel);
 
-			if(percent < 0){
-				percent = 0;
+			if(diffExpLevel > 0){
+				levelPercent = std::min((uint32_t)100, (uint32_t)(gainNextLevel * 100) / diffExpLevel );
 			}
-			else if(percent > 100){
-				percent = 100;
+			else{
+				levelPercent = 100;
 			}
-
-			level_percent = percent;
 		}
 
 		if(lastSentStats.manaSpent != manaSpent || lastSentStats.magLevel != magLevel){
-			int32_t percent = (100 * manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
-			if(percent < 0){
-				percent = 0;
-			}
-			else if(percent > 100){
-				percent = 100;
-			}
+			uint32_t currentManaLevel = vocation->getReqMana(magLevel);
+			uint32_t nextManaLevel = vocation->getReqMana(magLevel + 1);
+			uint32_t diffManaLevel = nextManaLevel - currentManaLevel;
+			uint32_t gainNextLevel = (manaSpent - currentManaLevel);
 
-			maglevel_percent = percent;
+			if(diffManaLevel > 0){
+				magLevelPercent = std::min((uint32_t)100, (uint32_t)(gainNextLevel * 100) / diffManaLevel );
+			}
+			else{
+				magLevelPercent = 100;
+			}
 		}
 
 		//save current stats
@@ -1069,7 +1103,7 @@ void Player::sendPing(uint32_t interval)
 		}
 	}
 
-	if(!hasCondition(CONDITION_INFIGHT)){
+	if(canLogout()){
 		if(!client){
 			g_game.removeCreature(this, true);
 		}
@@ -1167,9 +1201,10 @@ void Player::onAddTileItem(const Position& pos, const Item* item)
 	Creature::onAddTileItem(pos, item);
 }
 
-void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
+void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
-	Creature::onUpdateTileItem(pos, stackpos, oldItem, newItem);
+	Creature::onUpdateTileItem(pos, stackpos, oldItem, oldType, newItem, newType);
 
 	if(oldItem != newItem){
 		onRemoveTileItem(pos, stackpos, oldItem);
@@ -1243,12 +1278,51 @@ void Player::onFollowCreatureDissapear(bool isLogout)
 	}
 }
 
-void Player::onAttackedCreatureEnterProtectionZone(const Creature* creature)
+void Player::onChangeZone(ZoneType_t zone)
 {
-	if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
-		Creature::onAttackedCreatureEnterProtectionZone(creature);
+	if(attackedCreature){
+		if(zone == ZONE_PROTECTION){
+			if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+				setAttackedCreature(NULL);
+				onAttackedCreatureDissapear(false);
+			}
+		}
+		else if(zone == ZONE_NOPVP){
+			if( (attackedCreature->getPlayer() ||
+					(attackedCreature->getMaster() && attackedCreature->getMaster()->getPlayer()) ) &&
+					!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+				setAttackedCreature(NULL);
+				onAttackedCreatureDissapear(false);
+			}
+		}
 	}
 }
+
+void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
+{
+	if(zone == ZONE_PROTECTION){
+		if(!hasFlag(PlayerFlag_IgnoreProtectionZone)){
+			setAttackedCreature(NULL);
+			onAttackedCreatureDissapear(false);
+		}
+	}
+	else if(zone == ZONE_NOPVP){
+		if(attackedCreature->getPlayer() && !hasFlag(PlayerFlag_IgnoreProtectionZone)){
+			setAttackedCreature(NULL);
+			onAttackedCreatureDissapear(false);
+		}
+	}
+	else if(zone == ZONE_NORMAL){
+		//attackedCreature can leave a pvp zone if not pzlocked
+		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+			if(attackedCreature->getPlayer()){
+				setAttackedCreature(NULL);
+				onAttackedCreatureDissapear(false);
+			}
+		}
+	}
+}
+
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
@@ -1324,7 +1398,8 @@ void Player::onAddContainerItem(const Container* container, const Item* item)
 	checkTradeState(item);
 }
 
-void Player::onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem)
+void Player::onUpdateContainerItem(const Container* container, uint8_t slot,
+	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
 	if(oldItem != newItem){
 		onRemoveContainerItem(container, slot, oldItem);
@@ -1378,7 +1453,8 @@ void Player::onAddInventoryItem(slots_t slot, Item* item)
 	//
 }
 
-void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem)
+void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, const ItemType& oldType,
+	Item* newItem, const ItemType& newType)
 {
 	if(oldItem != newItem){
 		onRemoveInventoryItem(slot, oldItem);
@@ -1467,20 +1543,21 @@ void Player::onThink(uint32_t interval)
 #endif
 }
 
-bool Player::isMuted(uint32_t& muteTime)
+uint32_t Player::isMuted()
 {
 	if(hasFlag(PlayerFlag_CannotBeMuted)){
-		return false;
+		return 0;
 	}
 
-	Condition* condition = getCondition(CONDITION_MUTED, CONDITIONID_DEFAULT);
-	if(condition){
-		muteTime = std::max((uint32_t)1, (uint32_t)condition->getTicks() / 1000);
-		return true;
+	int32_t muteTicks = 0;
+
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == CONDITION_MUTED && (*it)->getTicks() > muteTicks){
+			muteTicks = (*it)->getTicks();
+		}
 	}
 
-	muteTime = 0;
-	return false;
+	return ((uint32_t)muteTicks / 1000);
 }
 
 void Player::addMessageBuffer()
@@ -1577,7 +1654,7 @@ void Player::addExperience(uint32_t exp)
 	int prevLevel = getLevel();
 	int newLevel = getLevel();
 
-	while(experience >= getExpForLv(newLevel + 1)){
+	while(experience >= Player::getExpForLevel(newLevel + 1)){
 		++newLevel;
 		healthMax += vocation->getHPGain();
 		health += vocation->getHPGain();
@@ -1752,10 +1829,10 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 				break;
 			}
 
-			case COMBAT_POISONDAMAGE:
+			case COMBAT_EARTHDAMAGE:
 			{
-				if(it.abilities.absorbPercentPoison > 0){
-					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentPoison) / 100));
+				if(it.abilities.absorbPercentEarth > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentEarth) / 100));
 					absorbedDamage = true;
 				}
 				break;
@@ -1783,6 +1860,33 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			{
 				if(it.abilities.absorbPercentDrown > 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDrown) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_ICEDAMAGE:
+			{
+				if(it.abilities.absorbPercentIce > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentIce) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_HOLYDAMAGE:
+			{
+				if(it.abilities.absorbPercentHoly > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentHoly) / 100));
+					absorbedDamage = true;
+				}
+				break;
+			}
+
+			case COMBAT_DEATHDAMAGE:
+			{
+				if(it.abilities.absorbPercentDeath > 0){
+					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDeath) / 100));
 					absorbedDamage = true;
 				}
 				break;
@@ -1817,82 +1921,8 @@ uint32_t Player::getIP() const
 	return 0;
 }
 
-void Player::onDie()
+void Player::die()
 {
-	Creature::onDie();
-
-	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
-	loginPosition = masterPos;
-
-	//Magic level loss
-	uint32_t sumMana = 0;
-	int32_t lostMana = 0;
-
-	//sum up all the mana
-	for(int32_t i = 1; i <= magLevel; ++i){
-		sumMana += vocation->getReqMana(i);
-	}
-
-	sumMana += manaSpent;
-
-	lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
-
-	while(lostMana > manaSpent){
-		lostMana -= manaSpent;
-		manaSpent = vocation->getReqMana(magLevel);
-		magLevel--;
-	}
-
-	manaSpent -= lostMana;
-	//
-
-	//Skill loss
-	uint32_t lostSkillTries;
-	uint32_t sumSkillTries;
-	for(uint32_t i = 0; i <= 6; ++i){  //for each skill
-		lostSkillTries = 0;         //reset to 0
-		sumSkillTries = 0;
-
-		for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels
-			sumSkillTries += vocation->getReqSkillTries(i, c);
-		}
-
-		sumSkillTries += skills[i][SKILL_TRIES];
-		lostSkillTries = (uint32_t)std::ceil(sumSkillTries * ((double)lossPercent[LOSS_SKILLTRIES]/100));
-
-		while(lostSkillTries > skills[i][SKILL_TRIES]){
-			lostSkillTries -= skills[i][SKILL_TRIES];
-			skills[i][SKILL_TRIES] = vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]);
-			if(skills[i][SKILL_LEVEL] > 10){
-				skills[i][SKILL_LEVEL]--;
-			}
-			else{
-				skills[i][SKILL_LEVEL] = 10;
-				skills[i][SKILL_TRIES] = 0;
-				lostSkillTries = 0;
-				break;
-			}
-		}
-
-		skills[i][SKILL_TRIES] -= lostSkillTries;
-	}
-	//
-
-	//Level loss
-	int32_t newLevel = level;
-	while((uint32_t)(experience - getLostExperience()) < getExpForLv(newLevel)){
-		if(newLevel > 1)
-			newLevel--;
-		else
-			break;
-	}
-
-	if(newLevel != level){
-		std::stringstream lvMsg;
-		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-		sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
-	}
-
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		if((*it)->isPersistent()){
 			Condition* condition = *it;
@@ -1907,11 +1937,99 @@ void Player::onDie()
 		}
 	}
 
+	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
+	loginPosition = masterPos;
+
+	if(skillLoss){
+		//Magic level loss
+		uint32_t sumMana = 0;
+		int32_t lostMana = 0;
+
+		//sum up all the mana
+		for(uint32_t i = 1; i <= magLevel; ++i){
+			sumMana += vocation->getReqMana(i);
+		}
+
+		sumMana += manaSpent;
+
+		lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
+
+		while(lostMana > manaSpent && magLevel > 0){
+			lostMana -= manaSpent;
+			manaSpent = vocation->getReqMana(magLevel);
+			magLevel--;
+		}
+
+		manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
+
+		//Skill loss
+		uint32_t lostSkillTries;
+		uint32_t sumSkillTries;
+		for(uint32_t i = 0; i <= 6; ++i){  //for each skill
+			lostSkillTries = 0;         //reset to 0
+			sumSkillTries = 0;
+
+			for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels
+				sumSkillTries += vocation->getReqSkillTries(i, c);
+			}
+
+			sumSkillTries += skills[i][SKILL_TRIES];
+			lostSkillTries = (uint32_t)std::ceil(sumSkillTries * ((double)lossPercent[LOSS_SKILLTRIES]/100));
+
+			while(lostSkillTries > skills[i][SKILL_TRIES]){
+				lostSkillTries -= skills[i][SKILL_TRIES];
+				skills[i][SKILL_TRIES] = vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]);
+				if(skills[i][SKILL_LEVEL] > 10){
+					skills[i][SKILL_LEVEL]--;
+				}
+				else{
+					skills[i][SKILL_LEVEL] = 10;
+					skills[i][SKILL_TRIES] = 0;
+					lostSkillTries = 0;
+					break;
+				}
+			}
+
+			skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
+		}
+		//
+
+		//Level loss
+		uint32_t newLevel = level;
+		while((uint32_t)(experience - getLostExperience()) < Player::getExpForLevel(newLevel)){
+			if(newLevel > 1)
+				newLevel--;
+			else
+				break;
+		}
+
+		if(newLevel != level){
+			std::stringstream lvMsg;
+			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
+			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
+		}
+	}
+
+
 	/*
 	if(client){
 		client->sendReLoginWindow();
 	}
 	*/
+}
+
+void Player::dropCorpse()
+{
+	if(getZone() == ZONE_PVP){
+		preSave();
+		sendStats();
+		g_game.internalTeleport(this, getTemplePosition());
+		g_game.addCreatureHealth(this);
+		onThink(EVENT_CREATURE_INTERVAL);
+	}
+	else{
+		Creature::dropCorpse();
+	}
 }
 
 Item* Player::getCorpse()
@@ -1941,7 +2059,7 @@ void Player::preSave()
 	if(health <= 0){
 		experience -= getLostExperience();
 
-		while(level > 1 && experience < getExpForLv(level)){
+		while(level > 1 && experience < Player::getExpForLevel(level)){
 			--level;
 			healthMax = std::max((int32_t)0, (healthMax - (int32_t)vocation->getHPGain()));
 			manaMax = std::max((int32_t)0, (manaMax - (int32_t)vocation->getManaGain()));
@@ -2446,7 +2564,7 @@ void Player::__addThing(int32_t index, Thing* thing)
 	onAddInventoryItem((slots_t)index, item);
 }
 
-void Player::__updateThing(Thing* thing, uint32_t count)
+void Player::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
@@ -2466,13 +2584,17 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
+	const ItemType& oldType = Item::items[item->getID()];
+	const ItemType& newType = Item::items[itemId];
+
+	item->setID(itemId);
 	item->setItemCountOrSubtype(count);
 
 	//send to client
 	sendUpdateInventoryItem((slots_t)index, item, item);
 
 	//event methods
-	onUpdateInventoryItem((slots_t)index, item, item);
+	onUpdateInventoryItem((slots_t)index, item, oldType, item, newType);
 }
 
 void Player::__replaceThing(uint32_t index, Thing* thing)
@@ -2503,11 +2625,14 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
+	const ItemType& oldType = Item::items[oldItem->getID()];
+	const ItemType& newType = Item::items[item->getID()];
+
 	//send to client
 	sendUpdateInventoryItem((slots_t)index, oldItem, item);
 
 	//event methods
-	onUpdateInventoryItem((slots_t)index, oldItem, item);
+	onUpdateInventoryItem((slots_t)index, oldItem, oldType, item, newType);
 
 	item->setParent(this);
 	inventory[index] = item;
@@ -2548,11 +2673,13 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			int newCount = std::max(0, (int)(item->getItemCount() - count));
 			item->setItemCount(newCount);
 
+			const ItemType& it = Item::items[item->getID()];
+
 			//send change to client
 			sendUpdateInventoryItem((slots_t)index, item, item);
 
 			//event methods
-			onUpdateInventoryItem((slots_t)index, item, item);
+			onUpdateInventoryItem((slots_t)index, item, it, item, it);
 		}
 	}
 	else{
@@ -2747,9 +2874,9 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
   }
 }
 
-bool Player::setFollowCreature(Creature* creature)
+bool Player::setFollowCreature(Creature* creature, bool fullPathSearch /*= false*/)
 {
-	if(!Creature::setFollowCreature(creature)){
+	if(!Creature::setFollowCreature(creature, fullPathSearch)){
 		setFollowCreature(NULL);
 		setAttackedCreature(NULL);
 
@@ -2824,7 +2951,7 @@ int32_t Player::getGainedExperience(Creature* attacker) const
 {
 	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
 		Player* attackerPlayer = attacker->getPlayer();
-		if(attackerPlayer && attackerPlayer != this){
+		if(attackerPlayer && attackerPlayer != this && skillLoss){
 				/*Formula
 				a = attackers level * 0.9
 				b = victims level
@@ -3024,11 +3151,15 @@ void Player::onAttackedCreature(Creature* target)
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
+#ifdef __SKULLSYSTEM__
 			if(Player* targetPlayer = target->getPlayer()){
+#else
+			if(target->getPlayer()){
+#endif
 				pzLocked = true;
 
 #ifdef __SKULLSYSTEM__
-				if(!isPartner(targetPlayer) && !targetPlayer->hasAttacked(this)){
+				if(!isPartner(targetPlayer) && !Combat::isInPvpZone(this, targetPlayer) && !targetPlayer->hasAttacked(this)){
 					if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
 						//add a white skull
 						g_game.changeSkull(this, SKULL_WHITE);
@@ -3072,15 +3203,23 @@ void Player::onKilledCreature(Creature* target)
 
 	Creature::onKilledCreature(target);
 
-	if(!hasFlag(PlayerFlag_NotGainInFight)){
-		if(Player* targetPlayer = target->getPlayer()){
+	if(Player* targetPlayer = target->getPlayer()){
+		if(targetPlayer->getZone() == ZONE_PVP){
+			targetPlayer->setDropLoot(false);
+			targetPlayer->setLossSkill(false);
+		}
+
+		if(!hasFlag(PlayerFlag_NotGainInFight)){
 #ifdef __SKULLSYSTEM__
-			if(!isPartner(targetPlayer) && !targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
+			if( !isPartner(targetPlayer) &&
+					!Combat::isInPvpZone(this, targetPlayer) &&
+					!targetPlayer->hasAttacked(this) &&
+					targetPlayer->getSkull() == SKULL_NONE){
 				addUnjustifiedDead(targetPlayer);
 			}
 #endif
 
-			if(hasCondition(CONDITION_INFIGHT)){
+			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
 				pzLocked = true;
 				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
 				addCondition(condition);
@@ -3099,7 +3238,7 @@ void Player::onGainExperience(int32_t gainExperience)
 
 	if(gainExperience > 0){
 		//soul regeneration
-		if(gainExperience >= getLevel()){
+		if((uint32_t)gainExperience >= getLevel()){
 			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
 			//Soul regeneration rate is defined by the vocation
 			uint32_t vocSoulTicks = vocation->getSoulGainTicks();
@@ -3371,6 +3510,20 @@ bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 	return false;
 }
 
+bool Player::canLogout()
+{
+	if(hasCondition(CONDITION_INFIGHT)){
+		return false;
+	}
+
+	if(getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+		return false;
+	}
+
+	return true;
+}
+
+
 void Player::genReservedStorageRange()
 {
 	uint32_t base_key;
@@ -3424,46 +3577,6 @@ void Player::setSex(playersex_t player_sex)
 		outfit.looktype = (*it)->looktype;
 		outfit.addons = (*it)->addons;
 		m_playerOutfits.addOutfit(outfit);
-	}
-}
-
-void Player::setSkillsPercents()
-{
-	uint32_t percent = 0;
-
-	percent = (100 * manaSpent) / std::max((int32_t)1, (int32_t)(vocation->getReqMana(magLevel + 1)));
-	if(percent < 0){
-		percent = 0;
-	}
-	else if(percent > 100){
-		percent = 100;
-	}
-
-	maglevel_percent = percent;
-
-	percent = (100*(getExperience() - getExpForLv(getLevel()))) /
-		std::max((int32_t)1, (int32_t)((getExpForLv(getLevel() + 1) - getExpForLv(getLevel()))));
-
-	if(percent < 0){
-		percent = 0;
-	}
-	else if(percent > 100){
-		percent = 100;
-	}
-
-	level_percent = percent;
-
-	for(unsigned int i = SKILL_FIRST; i < SKILL_LAST; ++i){
-		percent = (100*skills[i][SKILL_TRIES]) / std::max((int32_t)1, (int32_t)(vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]+1)));
-
-		if(percent < 0){
-			percent = 0;
-		}
-		else if(percent > 100){
-			percent = 100;
-		}
-
-		skills[i][SKILL_PERCENT] = percent;
 	}
 }
 

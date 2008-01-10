@@ -24,7 +24,7 @@
 
 
 #include "definitions.h"
-#include "const80.h"
+#include "const.h"
 #include "enums.h"
 #include "itemloader.h"
 //[ added for beds system
@@ -51,6 +51,10 @@ enum ItemTypes_t {
 	ITEM_TYPE_DEPOT,
 	ITEM_TYPE_MAILBOX,
 	ITEM_TYPE_TRASHHOLDER,
+	ITEM_TYPE_CONTAINER,
+	ITEM_TYPE_DOOR,
+	ITEM_TYPE_MAGICFIELD,
+	ITEM_TYPE_TELEPORT,
 	ITEM_TYPE_LAST
 };
 
@@ -61,20 +65,13 @@ struct Abilities{
 		absorbPercentPhysical = 0;
 		absorbPercentFire = 0;
 		absorbPercentEnergy = 0;
-		absorbPercentPoison = 0;
+		absorbPercentEarth = 0;
 		absorbPercentLifeDrain = 0;
 		absorbPercentManaDrain = 0;
 		absorbPercentDrown = 0;
-
-		/*
-		absorbAll = 0;
-		absorbPhysical = 0;
-		absorbFire = 0;
-		absorbEnergy = 0;
-		absorbPoison = 0;
-		absorbLifeDrain = 0;
-		absorbManaDrain = 0;
-		*/
+		absorbPercentIce = 0;
+		absorbPercentHoly = 0;
+		absorbPercentDeath = 0;
 
 		memset(skills, 0, sizeof(skills));
 
@@ -100,10 +97,13 @@ struct Abilities{
 	uint8_t absorbPercentPhysical;
 	uint8_t absorbPercentFire;
 	uint8_t absorbPercentEnergy;
-	uint8_t absorbPercentPoison;
+	uint8_t absorbPercentEarth;
 	uint8_t absorbPercentLifeDrain;
 	uint8_t absorbPercentManaDrain;
 	uint8_t absorbPercentDrown;
+	uint8_t absorbPercentIce;
+	uint8_t absorbPercentHoly;
+	uint8_t absorbPercentDeath;
 
 	//extra skill modifiers
 	int32_t skills[SKILL_LAST + 1];
@@ -227,9 +227,11 @@ public:
 	bool showDuration;
 	bool showCharges;
 	uint32_t charges;
-	uint32_t breakChance;
-	uint32_t hitChance;
+	int32_t breakChance;
+	int32_t hitChance;
+	int32_t maxHitChance;
 	uint32_t shootRange;
+	AmmoAction_t ammoAction;
 
 	Abilities abilities;
 

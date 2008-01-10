@@ -86,7 +86,7 @@ despawnrange = 2
 despawnradius = 50
 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
-maxmessagebuffer = 0
+maxmessagebuffer = 4
 
 -- motd (the message box that you sometimes get before you choose characters)
 motd = "Welcome to OTServ revdbsys!"

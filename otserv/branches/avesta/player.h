@@ -29,7 +29,7 @@
 #include "outfit.h"
 #include "enums.h"
 #include "vocation.h"
-#include "protocol80.h"
+#include "protocolgame.h"
 #include "party.h"
 
 #include <vector>
@@ -38,7 +38,7 @@
 
 class House;
 class Weapon;
-class Protocol80;
+class ProtocolGame;
 class Party;
 class SchedulerTask;
 
@@ -55,7 +55,6 @@ enum playerinfo_t {
 	PLAYERINFO_MAXHEALTH,
 	PLAYERINFO_MANA,
 	PLAYERINFO_MAXMANA,
-	PLAYERINFO_MANAPERCENT,
 	PLAYERINFO_MAGICLEVEL,
 	PLAYERINFO_MAGICLEVELPERCENT,
 	PLAYERINFO_SOUL,
@@ -101,7 +100,7 @@ typedef std::list<Party*> PartyList;
 class Player : public Creature, public Cylinder
 {
 public:
-	Player(const std::string& name, Protocol80* p);
+	Player(const std::string& name, ProtocolGame* p);
 	virtual ~Player();
 
 	virtual Player* getPlayer() {return this;}
@@ -122,6 +121,11 @@ public:
 	void addList();
 	void kickPlayer();
 
+	static uint64_t getExpForLevel(int32_t level)
+	{
+		return (uint64_t)std::ceil((double)(50 * level * level * level)/3 - (100 * level * level) + ((850 * level) / 3) - 200);
+	}
+
 	uint32_t getGuildId() const {return guildId;}
 	const std::string& getGuildName() const {return guildName;}
 	const std::string& getGuildRank() const {return guildRank;}
@@ -135,6 +139,7 @@ public:
 
 	int getPremiumDays() const {return premiumDays;}
 	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
+	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
 	bool isOnline() const {return (client != NULL);}
 	uint32_t getIP() const;
@@ -152,18 +157,16 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
 	uint32_t getAccount() const {return accountNumber;}
-	int32_t getLevel() const {return level;}
-	int32_t getMagicLevel() const {return magLevel + varStats[STAT_MAGICPOINTS];}
+	uint32_t getLevel() const {return level;}
+	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
 	int32_t getAccessLevel() const {return accessLevel;}
 
 	void setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
 
-	void setSkillsPercents();
-
 	playersex_t getSex() const {return sex;}
 	void setSex(playersex_t);
-	int getPlayerInfo(playerinfo_t playerinfo) const;
+	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	uint32_t getExperience() const {return experience;}
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
@@ -174,7 +177,7 @@ public:
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
-	bool isMuted(uint32_t& muteTime);
+	uint32_t isMuted();
 	void addMessageBuffer();
 	void removeMessageBuffer();
 
@@ -194,8 +197,8 @@ public:
 			return 0.00;
 	}
 
-	virtual int32_t getMaxHealth() const {return healthMax + varStats[STAT_MAXHITPOINTS];}
-	virtual int32_t getMaxMana() const {return manaMax + varStats[STAT_MAXMANAPOINTS];}
+	virtual int32_t getMaxHealth() const {return getPlayerInfo(PLAYERINFO_MAXHEALTH);}
+	virtual int32_t getMaxMana() const {return getPlayerInfo(PLAYERINFO_MAXMANA);}
 
 	Item* getInventoryItem(slots_t slot) const;
 
@@ -214,8 +217,11 @@ public:
 	uint32_t getLossPercent(lossTypes_t lossType) const {return lossPercent[lossType];}
 	void setLossPercent(lossTypes_t lossType, uint32_t newPercent)
 	{
-		if(newPercent <= 100)
-			lossPercent[lossType] = newPercent;
+		if(newPercent > 100){
+			newPercent = 100;
+		}
+
+		lossPercent[lossType] = newPercent;
 	}
 
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
@@ -238,7 +244,7 @@ public:
 	bool addVIP(uint32_t guid, std::string& name, bool isOnline, bool interal = false);
 
 	//follow functions
-	virtual bool setFollowCreature(Creature* creature);
+	virtual bool setFollowCreature(Creature* creature, bool fullPathSearch = false);
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature);
@@ -269,7 +275,7 @@ public:
 	virtual void doAttacking(uint32_t interval);
 	int32_t getShootRange() const {return shootRange;}
 
-	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
+	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
@@ -290,8 +296,6 @@ public:
 	void addInFightTicks();
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual void onDie();
-	virtual Item* getCorpse();
 	virtual int32_t getGainedExperience(Creature* attacker) const;
 
 	//combat event functions
@@ -306,7 +310,8 @@ public:
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
-	virtual void onAttackedCreatureEnterProtectionZone(const Creature* creature);
+	virtual void onChangeZone(ZoneType_t zone);
+	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
@@ -336,6 +341,7 @@ public:
 	bool canWear(uint32_t _looktype, uint32_t _addons);
 	void addOutfit(uint32_t _looktype, uint32_t _addons);
 	bool remOutfit(uint32_t _looktype, uint32_t _addons);
+	bool canLogout();
 
 	//tile
 	//send methods
@@ -394,7 +400,8 @@ public:
 
 	//event methods
 	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
+		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void onUpdateTile(const Position& pos);
 
@@ -412,7 +419,8 @@ public:
 
 	//container
 	void onAddContainerItem(const Container* container, const Item* item);
-	void onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem);
+	void onUpdateContainerItem(const Container* container, uint8_t slot,
+		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
 
 	void onCloseContainer(const Container* container);
@@ -421,7 +429,8 @@ public:
 
 	//inventory
 	void onAddInventoryItem(slots_t slot, Item* item);
-	void onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem);
+	void onUpdateInventoryItem(slots_t slot, Item* oldItem, const ItemType& oldType,
+		Item* newItem, const ItemType& newType);
 	void onRemoveInventoryItem(slots_t slot, Item* item);
 
 	//other send messages
@@ -522,6 +531,10 @@ protected:
 
 	void setDelayedWalkTask(SchedulerTask* task);
 
+	void die();
+	virtual void dropCorpse();
+	virtual Item* getCorpse();
+
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
@@ -534,7 +547,7 @@ protected:
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
 
-	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
 	virtual void __replaceThing(uint32_t index, Thing* thing);
 
 	virtual void __removeThing(Thing* thing, uint32_t count);
@@ -549,10 +562,12 @@ protected:
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
 protected:
-	Protocol80* client;
+	ProtocolGame* client;
 
-	int32_t level;
-	int32_t magLevel;
+	uint32_t level;
+	uint32_t levelPercent;
+	uint32_t magLevel;
+	uint32_t magLevelPercent;
 	int32_t accessLevel;
 	uint32_t experience;
 	uint32_t damageImmunities;
@@ -569,6 +584,7 @@ protected:
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 	SchedulerTask* walkTask;
+	bool skillLoss;
 
 	double inventoryWeight;
 	double capacity;
@@ -616,9 +632,6 @@ protected:
 
 	ConditionList storedConditionList;
 
-	unsigned char level_percent;
-	unsigned char maglevel_percent;
-
 	//trade variables
 	Player* tradePartner;
 	tradestate_t tradeState;
@@ -632,12 +645,12 @@ protected:
 		int32_t health;
 		int32_t healthMax;
 		uint32_t experience;
-		int32_t level;
+		uint32_t level;
 		double freeCapacity;
 		int32_t mana;
 		int32_t manaMax;
 		int32_t manaSpent;
-		int32_t magLevel;
+		uint32_t magLevel;
 	};
 
 	SentStats lastSentStats;
@@ -684,7 +697,7 @@ protected:
 		};
 	}
 
-	virtual int32_t getLostExperience() const { return (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100));}
+	virtual int32_t getLostExperience() const { return (skillLoss ? (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
@@ -698,7 +711,7 @@ protected:
 	friend class Map;
 	friend class Actions;
 	friend class IOPlayer;
-	friend class Protocol80;
+	friend class ProtocolGame;
 };
 
 #endif

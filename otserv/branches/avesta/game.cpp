@@ -134,13 +134,17 @@ void Game::setGameState(GameState_t newState)
 
 			case GAME_STATE_SHUTDOWN:
 			{
-				saveGameState();
-				Scheduler::getScheduler().stop();
-				Dispatcher::getDispatcher().stop();
-
-				if(g_server){
-					g_server->stop();
+				//kick all players that are still online
+				AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
+				while(it != Player::listPlayer.list.end()){
+					(*it).second->kickPlayer();
+					it = Player::listPlayer.list.begin();
 				}
+
+				saveGameState();
+
+				Dispatcher::getDispatcher().addTask(createTask(
+					boost::bind(&Game::shutdown, this)));
 				break;
 			}
 
@@ -327,7 +331,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 				}
 			}
 
-			return findItemOfType(player, it.id, subType);
+			return findItemOfType(player, it.id, true, subType);
 		}
 		//inventory
 		else{
@@ -449,15 +453,6 @@ Player* Game::getPlayerByAccount(uint32_t acc)
 	}
 
 	return NULL;
-}
-
-bool Game::placePlayer(Player* player, const Position& pos, bool forced /*= false*/)
-{
-	if(!player->hasFlag(PlayerFlag_CanAlwaysLogin) && getPlayersOnline() >= maxPlayers){
-		return false;
-	}
-
-	return placeCreature(player, pos, forced);
 }
 
 bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
@@ -667,7 +662,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
 			return false;
 		}
-		else if(movingCreature->isInPz() && !toTile->hasProperty(PROTECTIONZONE)){
+			else if(movingCreature->getZone() == ZONE_PROTECTION && !toTile->hasFlag(TILESTATE_PROTECTIONZONE)){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			return false;
 		}
@@ -728,6 +723,8 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 		break;
 	}
 
+	uint32_t flags = 0;
+
 	if(creature->getPlayer()){
 		//try go up
 		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
@@ -735,6 +732,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z - 1);
 				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)){
+					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 					destPos.z -= 1;
 				}
 			}
@@ -746,6 +744,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z + 1);
 
 				if(tmpTile && tmpTile->hasHeight(3)){
+					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 					destPos.z += 1;
 				}
 			}
@@ -756,7 +755,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
 	if(toTile != NULL){
-		uint32_t flags = 0;
 		if(force){
 			flags = FLAG_NOLIMIT;
 		}
@@ -780,14 +778,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 	ReturnValue ret = toCylinder->__queryAdd(0, creature, 1, flags);
 	if(ret != RET_NOERROR){
 		return ret;
-	}
-
-	//check if the creature is a player and if it is pzlocked and tries to move to a pZone
-	Player* player = creature->getPlayer();
-	if(player){
-		if(player->isPzLocked() && toCylinder->getTile()->hasFlag(TILESTATE_PROTECTIONZONE)){
-			return RET_PLAYERISPZLOCKED;
-		}
 	}
 
 	fromCylinder->getTile()->moveCreature(creature, toCylinder);
@@ -1050,7 +1040,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	if(item->isStackable()) {
 		if(toItem && toItem->getID() == item->getID()){
 			n = std::min((uint32_t)100 - toItem->getItemCount(), m);
-			toCylinder->__updateThing(toItem, toItem->getItemCount() + n);
+			toCylinder->__updateThing(toItem, toItem->getID(), toItem->getItemCount() + n);
 			updateItem = toItem;
 		}
 
@@ -1137,7 +1127,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 		if(item->isStackable()) {
 			if(toItem && toItem->getID() == item->getID()){
 				n = std::min((uint32_t)100 - toItem->getItemCount(), m);
-				toCylinder->__updateThing(toItem, toItem->getItemCount() + n);
+				toCylinder->__updateThing(toItem, toItem->getID(), toItem->getItemCount() + n);
 			}
 
 			if(m - n > 0){
@@ -1226,7 +1216,8 @@ ReturnValue Game::internalPlayerAddItem(Player* player, Item* item)
 	return RET_NOERROR;
 }
 
-Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType /*= -1*/)
+Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
+	bool depthSearch /*= true*/, int32_t subType /*= -1*/)
 {
 	if(cylinder == NULL){
 		return false;
@@ -1246,7 +1237,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType 
 			else{
 				++i;
 
-				if((tmpContainer = item->getContainer())){
+				if(depthSearch && (tmpContainer = item->getContainer())){
 					listContainer.push_back(tmpContainer);
 				}
 			}
@@ -1526,9 +1517,9 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 	return (money == 0);
 }
 
-Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
+Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 {
-	if(item->getID() == newtype && count == -1)
+	if(item->getID() == newId && (newCount == -1 || newCount == item->getItemCountOrSubtype()))
 		return item;
 
 	Cylinder* cylinder = item->getParent();
@@ -1545,88 +1536,87 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 		return item;
 	}
 
-	//std::cout << "transformItem: " << item << ", current id: " << item->getID() << ", new id: " << newtype << ", name: " << item->getName() << std::endl;
-
-	if(item->getContainer()){
-		//container to container
-		if(Item::items[newtype].isContainer()){
-			cylinder->postRemoveNotification(item, itemIndex, true);
-			item->setID(newtype);
-			cylinder->__updateThing(item, item->getItemCount());
-			cylinder->postAddNotification(item, itemIndex);
+	if(!item->canTransform()){
 			return item;
 		}
-		//container to none-container
-		else{
-			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 1 : count));
-			cylinder->__replaceThing(itemIndex, newItem);
 
-			cylinder->postAddNotification(newItem, itemIndex);
+	const ItemType& curType = Item::items[item->getID()];
+	const ItemType& newType = Item::items[newId];
 
-			item->setParent(NULL);
-			cylinder->postRemoveNotification(item, itemIndex, true);
-			FreeThing(item);
+	if(curType.alwaysOnTop != newType.alwaysOnTop){
+		//This only occurs when you transform items on tiles from a downItem to a topItem (or vice versa)
+		//Remove the old, and add the new
 
-			return newItem;
+		ReturnValue ret = internalRemoveItem(item);
+		if(ret != RET_NOERROR){
+			return item;
 		}
+
+		Item* newItem = NULL;
+		if(newCount == -1){
+			newItem = Item::CreateItem(newId);
 	}
 	else{
-		//none-container to container
-		if(Item::items[newtype].isContainer()){
-			Item* newItem = Item::CreateItem(newtype);
-			cylinder->__replaceThing(itemIndex, newItem);
+			newItem = Item::CreateItem(newId, newCount);
+		}
 
-			cylinder->postAddNotification(newItem, itemIndex);
-
-			item->setParent(NULL);
-			cylinder->postRemoveNotification(item, itemIndex, true);
-			FreeThing(item);
+		ret = internalAddItem(cylinder, newItem, INDEX_WHEREEVER);
+		if(ret != RET_NOERROR){
+			delete newItem;
+			return NULL;
+		}
 
 			return newItem;
 		}
-		else{
-			//same type, update count variable only
-			if(item->getID() == newtype){
-				if(item->isStackable()){
-					if(count <= 0){
+
+	if(curType.type == newType.type){
+		//Both items has the same type so we can safely change id/subtype
+
+		if((item->isStackable() || item->hasCharges() ) && newCount == 0){
 						internalRemoveItem(item);
+			return NULL;
 					}
 					else{
-						internalRemoveItem(item, item->getItemCount() - count);
-						return item;
+			cylinder->postRemoveNotification(item, itemIndex, true);
+			uint16_t itemId = item->getID();
+			int32_t count = item->getItemCountOrSubtype();
+
+			if(curType.id != newType.id){
+				if(newType.group != curType.group){
+					item->setDefaultSubtype();
 					}
+
+				itemId = newId;
 				}
-				else if(item->getItemCharge() > 0){
-					if(count <= 0){
-						internalRemoveItem(item);
+
+			if(count != -1 && item->hasSubType()){
+				count = newCount;
 					}
-					else{
-						cylinder->__updateThing(item, (count == -1 ? item->getItemCharge() : count));
+
+			cylinder->__updateThing(item, itemId, count);
+			cylinder->postAddNotification(item, itemIndex);
 						return item;
 					}
 				}
 				else{
-					cylinder->__updateThing(item, count);
-					return item;
+		//Replacing the the old item with the new while maintaining the old position
+		Item* newItem = NULL;
+		if(newCount == -1){
+			newItem = Item::CreateItem(newId);
 				}
+		else{
+			newItem = Item::CreateItem(newId, newCount);
 			}
-			else{
+
+		cylinder->__replaceThing(itemIndex, newItem);
+		cylinder->postAddNotification(newItem, itemIndex);
+
+		item->setParent(NULL);
 				cylinder->postRemoveNotification(item, itemIndex, true);
-				item->setID(newtype);
+		FreeThing(item);
 
-				if(item->hasSubType()){
-					if(count != -1)
-						item->setItemCountOrSubtype(count);
+		return newItem;
 				}
-				else
-					item->setItemCount(1);
-
-				cylinder->__updateThing(item, item->getItemCountOrSubtype());
-				cylinder->postAddNotification(item, itemIndex);
-				return item;
-			}
-		}
-	}
 
 	return NULL;
 }
@@ -2132,9 +2122,9 @@ bool Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 		}
 	}
 
-	uint16_t newtype = Item::items[item->getID()].rotateTo;
-	if(newtype != 0){
-		transformItem(item, newtype);
+	uint16_t newId = Item::items[item->getID()].rotateTo;
+	if(newId != 0){
+		transformItem(item, newId);
 	}
 
 	return true;
@@ -2184,9 +2174,9 @@ bool Game::playerWriteItem(uint32_t playerId, uint32_t windowTextId, const std::
 		writeItem->resetWrittenDate();
 	}
 
-	uint16_t newType = Item::items[writeItem->getID()].writeOnceItemId;
-	if(newType != 0){
-		transformItem(writeItem, newType);
+	uint16_t newId = Item::items[writeItem->getID()].writeOnceItemId;
+	if(newId != 0){
+		transformItem(writeItem, newId);
 	}
 
 	player->setWriteItem(NULL);
@@ -2618,45 +2608,16 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 		return false;
 	}
 
-	ReturnValue ret = RET_NOERROR;
-
-	if(player->isInPz() && !player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
-		ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
-	}
-	else if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone) && attackCreature->isInPz()){
-		ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
-	}
-	else if(attackCreature == player){
-		ret = RET_YOUMAYNOTATTACKTHISPLAYER;
-	}
-	else if(player->hasFlag(PlayerFlag_CannotUseCombat) || !attackCreature->isAttackable()){
-		if(attackCreature->getPlayer()){
-			ret = RET_YOUMAYNOTATTACKTHISPLAYER;
-		}
-		else{
-			ret = RET_YOUMAYNOTATTACKTHISCREATURE;
-		}
-	}
-#ifdef __SKULLSYSTEM__
-	else if(player->hasSafeMode() && attackCreature->getPlayer() &&
-			attackCreature->getPlayer()->getSkull() == SKULL_NONE){
-		ret = RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
-	}
-#endif
-	else{
-		ret = Combat::canDoCombat(player, attackCreature);
-	}
-
-	if(ret == RET_NOERROR){
-		player->setAttackedCreature(attackCreature);
-		return true;
-	}
-	else{
+	ReturnValue ret = Combat::canTargetCreature(player, attackCreature);
+	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		player->sendCancelTarget();
 		player->setAttackedCreature(NULL);
 		return false;
 	}
+
+	player->setAttackedCreature(attackCreature);
+	return true;
 }
 
 bool Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
@@ -2864,8 +2825,8 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	if(!player || player->isRemoved())
 		return false;
 
-	uint32_t muteTime;
-	if(player->isMuted(muteTime)){
+	uint32_t muteTime = player->isMuted();
+	if(muteTime > 0){
 		std::stringstream ss;
 		ss << "You are still muted for " << muteTime << " seconds.";
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
@@ -3114,8 +3075,8 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
 	bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList)
 {
-#ifdef __DEBUG__
-	__int64 startTick = OTSYS_TIME();
+#ifdef __DEBUG__PATHING__
+	int64 startTick = OTSYS_TIME();
 #endif
 
 	if(creature->getPosition().z != targetPos.z || !creature->canSee(targetPos)){
@@ -3194,7 +3155,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 		}
 
 		if(minWalkDist != -1){
-#ifdef __DEBUG__
+#ifdef __DEBUG__PATHING__
 			__int64 endTick = OTSYS_TIME();
 			std::cout << "distance: " << tryDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
 #endif
@@ -3204,7 +3165,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 		--tryDist;
 	}
 
-#ifdef __DEBUG__
+#ifdef __DEBUG__PATHING__
 	__int64 endTick = OTSYS_TIME();
 	std::cout << "distance: " << tryDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
 #endif
@@ -3221,6 +3182,17 @@ void Game::checkWalk(uint32_t creatureId)
 	}
 }
 
+/*
+void Game::checkCreatures(uint32_t interval)
+{
+	if(!creatures.empty()){
+		Scheduler::getScheduler().addEvent(
+			createSchedulerTask(EVENT_CREATURE_INTERVAL,
+			boost::bind(&Game::checkCreatures, &g_game)));
+	}
+}
+*/
+
 void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 {
 	Creature* creature = getCreatureByID(creatureId);
@@ -3232,7 +3204,6 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 		}
 		else{
 			creature->onDie();
-			removeCreature(creature, false);
 		}
 
 		cleanup();
@@ -3355,26 +3326,24 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 				break;
 
 			case COMBAT_ENERGYDAMAGE:
+			case COMBAT_FIREDAMAGE:
+			case COMBAT_PHYSICALDAMAGE:
+			case COMBAT_ICEDAMAGE:
+			case COMBAT_DEATHDAMAGE:
 			{
 				hitEffect = NM_ME_BLOCKHIT;
 				break;
 			}
 
-			case COMBAT_POISONDAMAGE:
+			case COMBAT_EARTHDAMAGE:
 			{
 				hitEffect = NM_ME_POISON_RINGS;
 				break;
 			}
 
-			case COMBAT_FIREDAMAGE:
+			case COMBAT_HOLYDAMAGE:
 			{
-				hitEffect = NM_ME_BLOCKHIT;
-				break;
-			}
-
-			case COMBAT_PHYSICALDAMAGE:
-			{
-				hitEffect = NM_ME_BLOCKHIT;
+				hitEffect = NM_ME_HOLYDAMAGE;
 				break;
 			}
 
@@ -3413,7 +3382,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 		int32_t damage = -healthChange;
 		if(damage != 0){
-			if(target->hasCondition(CONDITION_MANASHIELD)){
+			if(target->hasCondition(CONDITION_MANASHIELD) && combatType != COMBAT_UNDEFINEDDAMAGE){
 				int32_t manaDamage = std::min(target->getMana(), damage);
 				damage = std::max((int32_t)0, damage - manaDamage);
 
@@ -3476,12 +3445,12 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 					case COMBAT_ENERGYDAMAGE:
 					{
-						textColor = TEXTCOLOR_LIGHTBLUE;
+						textColor = TEXTCOLOR_PURPLE;
 						hitEffect = NM_ME_ENERGY_DAMAGE;
 						break;
 					}
 
-					case COMBAT_POISONDAMAGE:
+					case COMBAT_EARTHDAMAGE:
 					{
 						textColor = TEXTCOLOR_LIGHTGREEN;
 						hitEffect = NM_ME_POISON_RINGS;
@@ -3499,6 +3468,27 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 					{
 						textColor = TEXTCOLOR_ORANGE;
 						hitEffect = NM_ME_HITBY_FIRE;
+						break;
+					}
+
+					case COMBAT_ICEDAMAGE:
+					{
+						textColor = TEXTCOLOR_LIGHTBLUE;
+						hitEffect = NM_ME_ICEATTACK;
+						break;
+					}
+
+					case COMBAT_HOLYDAMAGE:
+					{
+						textColor = TEXTCOLOR_YELLOW;
+						hitEffect = NM_ME_HOLYDAMAGE;
+						break;
+					}
+
+					case COMBAT_DEATHDAMAGE:
+					{
+						textColor = TEXTCOLOR_DARKRED;
+						hitEffect = NM_ME_SMALLCLOUDS;
 						break;
 					}
 
@@ -3764,8 +3754,7 @@ void Game::checkLight(int t)
 
 	if(lightChange){
 		LightInfo lightInfo;
-		lightInfo.level = lightlevel;
-		lightInfo.color = 0xD7;
+		getWorldLightInfo(lightInfo);
 		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 			(*it).second->sendWorldLight(lightInfo);
 		}
@@ -3796,6 +3785,19 @@ void Game::addCommandTag(std::string tag)
 void Game::resetCommandTag()
 {
 	commandTags.clear();
+}
+
+
+void Game::shutdown()
+{
+	Scheduler::getScheduler().stop();
+	Dispatcher::getDispatcher().stop();
+
+	if(g_server){
+		g_server->stop();
+	}
+
+	cleanup();
 }
 
 void Game::cleanup()

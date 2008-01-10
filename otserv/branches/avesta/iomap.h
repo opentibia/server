@@ -26,6 +26,8 @@
 
 #include "map.h"
 #include "iomapserialize.h"
+#include "spawn.h"
+#include "house.h"
 
 class IOMap{
 public:
@@ -44,15 +46,31 @@ public:
 	*/
 	virtual bool loadMap(Map* map, const std::string& identifier) = 0;
 
+
 	/** Load the spawns
-	  * \returns Returns true if the spawns was loaded successfully
+	  * \param map pointer to the Map class
+	  * \returns Returns true if the spawns were loaded successfully
 	*/
-	virtual bool loadSpawns(Map* map) = 0;
+	bool loadSpawns(Map* map)
+	{
+		if(!map->spawnfile.empty()){
+			if(!Spawns::getInstance()->loadFromXml(map->spawnfile)) return false;
+			Spawns::getInstance()->startup();
+		}
+		return true;
+	}
 
 	/** Load the houses (not house tile-data)
-	  * \returns Returns true if the houses was loaded successfully
+	  * \param map pointer to the Map class
+	  * \returns Returns true if the houses were loaded successfully
 	*/
-	virtual bool loadHouses(Map* map) = 0;
+	bool loadHouses(Map* map)
+	{
+		if(!map->housefile.empty()){
+			return Houses::getInstance().loadHousesXML(map->housefile);
+		}
+		return true;
+	}
 };
 
 #endif

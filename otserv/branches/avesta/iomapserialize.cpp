@@ -30,7 +30,7 @@
 extern ConfigManager g_config;
 extern Game g_game;
 
-bool IOMapSerialize::loadMap(Map* map, const std::string& identifier)
+bool IOMapSerialize::loadMap(Map* map)
 {
 	Database* db = Database::instance();
 
@@ -45,7 +45,7 @@ bool IOMapSerialize::loadMap(Map* map, const std::string& identifier)
 	return true;
 }
 
-bool IOMapSerialize::saveMap(Map* map, const std::string& identifier)
+bool IOMapSerialize::saveMap(Map* map)
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -291,7 +291,7 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 	return true;
 }
 
-bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
+bool IOMapSerialize::loadHouseInfo(Map* map)
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -336,7 +336,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map, const std::string& identifier)
 	return true;
 }
 
-bool IOMapSerialize::saveHouseInfo(Map* map, const std::string& identifier)
+bool IOMapSerialize::saveHouseInfo(Map* map)
 {
 	Database* db = Database::instance();
 	DBQuery query;

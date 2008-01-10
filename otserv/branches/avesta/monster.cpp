@@ -81,6 +81,9 @@ Creature()
 	attackStrength = mType->attackStrength;
 	defenseStrength = mType->defenseStrength;
 
+	minCombatValue = 0;
+	maxCombatValue = 0;
+
 	strDescription = mType->nameDescription;
 	toLowerCaseString(strDescription);
 
@@ -119,9 +122,10 @@ void Monster::onAddTileItem(const Position& pos, const Item* item)
 	Creature::onAddTileItem(pos, item);
 }
 
-void Monster::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
+void Monster::onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
-	Creature::onUpdateTileItem(pos, stackpos, oldItem, newItem);
+	Creature::onUpdateTileItem(pos, stackpos, oldItem, oldType, newItem, newType);
 }
 
 void Monster::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
@@ -326,7 +330,9 @@ void Monster::searchTarget()
 
 bool Monster::selectTarget(Creature* creature)
 {
-	if(!creature || creature == this || !creature->isAttackable() || creature->isInPz()){
+	if(!creature || creature == this ||
+		!creature->isAttackable() ||
+		creature->getZone() == ZONE_PROTECTION){
 		return false;
 	}
 
@@ -599,10 +605,8 @@ bool Monster::getNextStep(Direction& dir)
 	return result;
 }
 
-void Monster::onDie()
+void Monster::die()
 {
-	Creature::onDie();
-
 	setAttackedCreature(NULL);
 	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
 		(*cit)->changeHealth(-(*cit)->getHealth());
@@ -633,7 +637,7 @@ bool Monster::despawn()
 			return false;
 		}
 
-		if(!((pos.z >= masterPos.z - despawnRange) && (pos.z <= masterPos.z + despawnRange))){
+		if(abs(pos.z - masterPos.z) > despawnRange){
 			return true;
 		}
 
@@ -765,6 +769,8 @@ void Monster::doAttacking(uint32_t interval)
 		}
 
 		if((it->chance >= (uint32_t)random_range(1, 100))){
+			minCombatValue = it->minCombatValue;
+			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, attackedCreature);
 			spellBonusAttack = false;
 		}
@@ -792,6 +798,8 @@ void Monster::onDefending(uint32_t interval)
 		}
 
 		if((it->chance >= (uint32_t)random_range(1, 100))){
+			minCombatValue = it->minCombatValue;
+			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, this);
 		}
 	}
@@ -846,9 +854,20 @@ void Monster::onThinkChangeTarget(uint32_t interval)
 	}
 }
 
+bool Monster::getCombatValues(int32_t& min, int32_t& max)
+{
+	if(minCombatValue == 0 && maxCombatValue == 0){
+		return false;
+	}
+
+	min = minCombatValue;
+	max = maxCombatValue;
+	return true;
+}
+
 std::string Monster::getDescription(int32_t lookDistance) const
 {
-	return strDescription;
+	return strDescription + '.';
 }
 
 void Monster::updateLookDirection()

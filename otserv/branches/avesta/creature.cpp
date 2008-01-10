@@ -148,7 +148,9 @@ bool Creature::canSeeCreature(const Creature* creature) const
 void Creature::addEventThink()
 {
 	if(eventCheck == 0){
-		eventCheck = Scheduler::getScheduler().addEvent(createSchedulerTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
+		eventCheck = Scheduler::getScheduler().addEvent(
+			createSchedulerTask(EVENT_CREATURE_INTERVAL,
+			boost::bind(&Game::checkCreature, &g_game, getID(), EVENT_CREATURE_INTERVAL)));
 		//onStartThink();
 	}
 }
@@ -313,7 +315,8 @@ void Creature::onAddTileItem(const Position& pos, const Item* item)
 	internalValidatePath = true;
 }
 
-void Creature::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
+void Creature::onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
 	internalValidatePath = true;
 	//validateWalkPath();
@@ -350,9 +353,20 @@ void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 	}
 }
 
-void Creature::onAttackedCreatureEnterProtectionZone(const Creature* creature)
+void Creature::onChangeZone(ZoneType_t zone)
 {
-	onCreatureDisappear(creature, false);
+	if(attackedCreature){
+		if(zone == ZONE_PROTECTION){
+			onCreatureDisappear(attackedCreature, false);
+		}
+	}
+}
+
+void Creature::onAttackedCreatureChangeZone(ZoneType_t zone)
+{
+	if(zone == ZONE_PROTECTION){
+		onCreatureDisappear(attackedCreature, false);
+	}
 }
 
 void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
@@ -381,6 +395,8 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 				lastStepCost = 2;
 			}
 		}
+
+		onChangeZone(getZone());
 	}
 	else{
 		internalValidatePath = true;
@@ -390,18 +406,14 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
 			onCreatureDisappear(followCreature, false);
 		}
-
-		//validateWalkPath();
-		//internalValidatePath = true;
 	}
 
 	if(attackedCreature == creature || (creature == this && attackedCreature)){
 		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
 			onCreatureDisappear(attackedCreature, false);
 		}
-		else if(attackedCreature->isInPz() || isInPz()){
-			//onCreatureDisappear(attackedCreature, false);
-			onAttackedCreatureEnterProtectionZone(attackedCreature);
+		else{
+			onAttackedCreatureChangeZone(attackedCreature->getZone());
 		}
 	}
 }
@@ -426,8 +438,12 @@ void Creature::onDie()
 
 		if(mostDamageCreature){
 			mostDamageCreatureMaster = mostDamageCreature->getMaster();
-			if(mostDamageCreature != lastHitCreature && mostDamageCreature != lastHitCreatureMaster &&
-				mostDamageCreatureMaster != lastHitCreature && mostDamageCreatureMaster != lastHitCreatureMaster){
+			bool isNotLastHitMaster = (mostDamageCreature != lastHitCreatureMaster);
+			bool isNotMostDamageMaster = (lastHitCreature != mostDamageCreatureMaster);
+			bool isNotSameMaster = lastHitCreatureMaster != NULL && (mostDamageCreatureMaster != lastHitCreatureMaster);
+
+			if(mostDamageCreature != lastHitCreature && isNotLastHitMaster &&
+				isNotMostDamageMaster && isNotSameMaster){
 				mostDamageCreature->onKilledCreature(this);
 			}
 		}
@@ -439,6 +455,16 @@ void Creature::onDie()
 		}
 	}
 
+	die();
+	dropCorpse();
+
+	if(getMaster()){
+		getMaster()->removeSummon(this);
+	}
+}
+
+void Creature::dropCorpse()
+{
 	Item* splash = NULL;
 	switch(getRace()){
 		case RACE_VENOM:
@@ -472,15 +498,13 @@ void Creature::onDie()
 		g_game.startDecay(corpse);
 	}
 
-	if(getMaster()){
-		getMaster()->removeSummon(this);
-	}
-
 	//scripting event - onDie
 	CreatureEvent* eventDie = getCreatureEvent(CREATURE_EVENT_DIE);
 	if(eventDie){
 		eventDie->executeOnDie(this, corpse);
 	}
+
+	g_game.removeCreature(this, false);
 }
 
 bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCreature)
@@ -584,9 +608,19 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 		}
 
 		if(checkArmor){
-			int32_t maxArmor = getArmor();
+			int32_t armorValue = getArmor();
+			int32_t minArmorReduction = 0;
+			int32_t maxArmorReduction = 0;
+			if(armorValue > 1){
+				minArmorReduction = (int32_t)std::ceil(armorValue * 0.475);
+				maxArmorReduction = (int32_t)std::ceil( ((armorValue * 0.475) - 1) + minArmorReduction);
+			}
+			else if(armorValue == 1){
+				minArmorReduction = 1;
+				maxArmorReduction = 1;
+			}
 
-			damage -= maxArmor;
+			damage -= random_range(minArmorReduction, maxArmorReduction);
 			if(damage <= 0){
 				damage = 0;
 				blockType = BLOCK_ARMOR;
@@ -644,7 +678,7 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 	}
 }
 
-bool Creature::setFollowCreature(Creature* creature)
+bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= false*/)
 {
 	if(creature){
 		const Position& creaturePos = creature->getPosition();
@@ -660,7 +694,7 @@ bool Creature::setFollowCreature(Creature* creature)
 
 		if(!listWalkDir.empty()){
 			listWalkDir.clear();
-			onWalkAborted(); //TESTING
+			onWalkAborted();
 		}
 		if(!g_game.getPathToEx(this, creature->getPosition(), 1, fpp.targetDistance, fpp.fullPathSearch, fpp.needReachable, listWalkDir)){
 			followCreature = NULL;
@@ -751,7 +785,7 @@ void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
 		switch(type){
 			case CONDITION_FIRE: bRemove = (field->getCombatType() != COMBAT_FIREDAMAGE); break;
 			case CONDITION_ENERGY: bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE); break;
-			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_POISONDAMAGE); break;
+			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_EARTHDAMAGE); break;
 			case CONDITION_DROWN: bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE); break;
 			default:
 				break;
@@ -957,13 +991,13 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id) const
 	return NULL;
 }
 
-void Creature::executeConditions(int32_t newticks)
+void Creature::executeConditions(uint32_t interval)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		//(*it)->executeCondition(this, newticks);
 		//if((*it)->getTicks() <= 0){
 
-		if(!(*it)->executeCondition(this, newticks)){
+		if(!(*it)->executeCondition(this, interval)){
 			ConditionType_t type = (*it)->getType();
 
 			Condition* condition = *it;

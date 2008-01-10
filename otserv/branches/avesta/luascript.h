@@ -110,6 +110,7 @@ public:
 
 	static void addUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
+	void insertThing(uint32_t uid, Thing* thing);
 	void addTempItem(Item* item);
 
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
@@ -139,6 +140,8 @@ public:
 
 	static bool loadGameState();
 	static bool saveGameState();
+
+	static uint32_t getLastCombatId() {return m_lastCombatId;}
 
 private:
 	typedef std::map<int32_t, Thing*> ThingMap;
@@ -316,6 +319,7 @@ protected:
 	static int luaDoTeleportThing(lua_State *L);
 	static int luaDoTransformItem(lua_State *L);
 	static int luaDoSendMagicEffect(lua_State *L);
+	static int luaDoSendDistanceShoot(lua_State *L);
 	static int luaDoChangeTypeItem(lua_State *L);
 	static int luaDoSendAnimatedText(lua_State *L);
 	static int luaDoShowTextWindow(lua_State *L);
@@ -334,10 +338,10 @@ protected:
 	static int luaDoPlayerAddManaSpent(lua_State *L);
 	static int luaDoPlayerAddHealth(lua_State *L);
 	static int luaDoPlayerAddMana(lua_State *L);
-	static int luaDoPlayerSoul(lua_State *L);
 	static int luaDoPlayerAddItem(lua_State *L);
 	static int luaDoPlayerAddItemEx(lua_State *L);
 	static int luaDoTileAddItemEx(lua_State *L);
+	static int luaDoRelocate(lua_State *L);
 	static int luaDoPlayerSendTextMessage(lua_State *L);
 	static int luaDoPlayerRemoveMoney(lua_State *L);
 	static int luaDoPlayerSetMasterPos(lua_State *L);
@@ -359,6 +363,11 @@ protected:
 	static int luaGetThingfromPos(lua_State *L);
 	static int luaGetThing(lua_State *L);
 	static int luaGetThingPos(lua_State *L);
+	static int luaGetTileItemById(lua_State *L);
+	static int luaGetTileItemByType(lua_State *L);
+	static int luaGetTileThingByPos(lua_State *L);
+	static int luaGetTopCreature(lua_State *L);
+
 	//set item
 	static int luaDoSetItemActionId(lua_State *L);
 	static int luaDoSetItemText(lua_State *L);
@@ -401,6 +410,8 @@ protected:
 	static int luaGetPlayerFreeCap(lua_State *L);
 	static int luaGetPlayerLight(lua_State *L);
 	static int luaGetPlayerSlotItem(lua_State *L);
+	static int luaGetPlayerItemById(lua_State *L);
+
 	static int luaGetPlayerDepotItems(lua_State *L);
 	static int luaGetPlayerGuildId(lua_State *L);
 	static int luaGetPlayerGuildName(lua_State *L);
@@ -512,6 +523,9 @@ protected:
 	static int luaGetCreatureTarget(lua_State *L);
 	static int luaGetCreatureHealth(lua_State *L);
 	static int luaGetCreatureMaxHealth(lua_State *L);
+	static int luaGetCreatureMaster(lua_State *L);
+	static int luaGetCreatureSummons(lua_State *L);
+	static int luaHasCondition(lua_State *L);
 
 	static int luaIsItemStackable(lua_State *L);
 	static int luaIsItemRune(lua_State *L);
@@ -522,6 +536,7 @@ protected:
 	static int luaGetItemName(lua_State *L);
 	static int luaGetItemDescriptions(lua_State *L);
 	static int luaGetItemWeight(lua_State *L);
+	static int luaGetItemIdByName(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);
@@ -533,8 +548,17 @@ protected:
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
 
+	static const luaL_Reg luaBitReg[7];
+	static int luaBitNot(lua_State *L);
+	static int luaBitAnd(lua_State *L);
+	static int luaBitOr(lua_State *L);
+	static int luaBitXor(lua_State *L);
+	static int luaBitLeftShift(lua_State *L);
+	static int luaBitRightShift(lua_State *L);
+
 	lua_State* m_luaState;
 	std::string m_lastLuaError;
+
 private:
 
 	static ScriptEnviroment m_scriptEnv[16];
@@ -554,6 +578,7 @@ private:
 		int parameter;
 	};
 	uint32_t m_lastEventTimerId;
+
 	typedef std::map<uint32_t , LuaTimerEventDesc > LuaTimerEvents;
 	LuaTimerEvents m_timerEvents;
 

@@ -50,9 +50,9 @@ enum stackPosType_t{
 };
 
 enum WorldType_t {
-	WORLD_TYPE_NO_PVP,
-	WORLD_TYPE_PVP,
-	WORLD_TYPE_PVP_ENFORCED,
+	WORLD_TYPE_NO_PVP = 1,
+	WORLD_TYPE_PVP = 2,
+	WORLD_TYPE_PVP_ENFORCED = 3
 };
 
 enum GameState_t {
@@ -72,7 +72,7 @@ enum LightState_t {
 
 /**
   * Main Game class.
-  * This class is responsible to controll everything that happens
+  * This class is responsible to control everything that happens
   */
 
 class Game
@@ -161,23 +161,15 @@ public:
 	  /* Place Creature on the map without sending out events to the surrounding.
 	  * \param creature Creature to place on the map
 	  * \param pos The position to place the creature
-	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/chests)
+	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/items)
 	  */
 	bool internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/);
-
-	/**
-	  * Place Player on the map.
-	  * \param player Player to place on the map
-	  * \param pos The position to place the player
-	  * \param forced If true, placing the player will not fail becase of obstacles (creatures/chests)
-	  */
-	bool placePlayer(Player* player, const Position& pos, bool forced = false);
 
 	/**
 	  * Place Creature on the map.
 	  * \param creature Creature to place on the map
 	  * \param pos The position to place the creature
-	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/chests)
+	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/items)
 	  */
 	bool placeCreature(Creature* creature, const Position& pos, bool force = false);
 
@@ -223,11 +215,13 @@ public:
 	  * Find an item of a certain type
 	  * \param cylinder to search the item
 	  * \param itemId is the item to remove
+	  * \param depthSearch if true it will check child containers aswell
 	  * \param subType is the extra type an item can have such as charges/fluidtype, default is -1
 		* meaning it's not used
 	  * \returns A pointer to the item to an item and NULL if not found
 	  */
-	Item* findItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t subType = -1);
+	Item* findItemOfType(Cylinder* cylinder, uint16_t itemId,
+		bool depthSearch = true, int32_t subType = -1);
 
 	/**
 	  * Remove item(s) of a certain type
@@ -259,10 +253,10 @@ public:
 	  * Transform one item to another type/count
 	  * \param item is the item to transform
 	  * \param newtype is the new type
-	  * \param count is the new count value, use default value (-1) to not change it
+	  * \param newCount is the new count value, use default value (-1) to not change it
 	  * \returns true if the tranformation was successful
 	  */
-	Item* transformItem(Item* item, uint16_t newtype, int32_t count = -1);
+	Item* transformItem(Item* item, uint16_t newId, int32_t newCount = -1);
 
 	/**
 	  * Teleports an object to another position
@@ -348,6 +342,7 @@ public:
 	bool playerLeaveParty(uint32_t playerId);
 
 	void cleanup();
+	void shutdown();
 	void FreeThing(Thing* thing);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
@@ -404,7 +399,6 @@ public:
 	const Map* getMap() const { return map;}
 
 	int getLightHour() {return light_hour;}
-	int getLightLevel() {return lightlevel;}
 
 	void addCommandTag(std::string tag);
 	void resetCommandTag();

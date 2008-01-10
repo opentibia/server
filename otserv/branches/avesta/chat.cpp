@@ -173,6 +173,26 @@ Chat::Chat()
 	
 }
 
+Chat::~Chat()
+{
+	delete dummyPrivate;
+
+	for(NormalChannelMap::iterator it = m_normalChannels.begin(); it != m_normalChannels.end(); ++it){
+		delete it->second;
+	}
+	m_normalChannels.clear();
+
+	for(GuildChannelMap::iterator it = m_guildChannels.begin(); it != m_guildChannels.end(); ++it){
+		delete it->second;
+	}
+	m_guildChannels.clear();
+
+	for(PrivateChannelMap::iterator it = m_privateChannels.begin(); it != m_privateChannels.end(); ++it){
+		delete it->second;
+	}
+	m_privateChannels.clear();
+}
+
 ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 {
 	if(getChannel(player, channelId))

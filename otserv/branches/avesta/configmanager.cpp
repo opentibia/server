@@ -62,15 +62,11 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[MAP_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "map");
 		m_confString[MAP_STORE_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "mapstore");
 		m_confString[HOUSE_STORE_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "housestore");
-		m_confString[BAN_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "banIdentifier");
-		m_confString[SQLITE_DB] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "sqlite_db");
 #else
 		m_confString[DATA_DIRECTORY] = getGlobalString(L, "datadir");
 		m_confString[MAP_FILE] = getGlobalString(L, "map");
 		m_confString[MAP_STORE_FILE] = getGlobalString(L, "mapstore");
 		m_confString[HOUSE_STORE_FILE] = getGlobalString(L, "housestore");
-		m_confString[BAN_FILE] = getGlobalString(L, "banIdentifier");
-		m_confString[SQLITE_DB] = getGlobalString(L, "sqlite_db");
 #endif
 		m_confString[HOUSE_RENT_PERIOD] = getGlobalString(L, "houserentperiod", "monthly");
 		m_confString[MAP_KIND] = getGlobalString(L, "mapkind");

@@ -29,39 +29,26 @@
 #include "talkaction.h"
 #include "baseevents.h"
 #include "combat.h"
+#include "const.h"
 
 class Weapon;
 class WeaponMelee;
 class WeaponDistance;
 class WeaponWand;
 
-enum AmmoAction_t{
-	AMMOACTION_NONE,
-	AMMOACTION_REMOVECOUNT,
-	AMMOACTION_REMOVECHARGE,
-	AMMOACTION_MOVE,
-	AMMOACTION_MOVEBACK
-};
-
-enum WieldInfo_t{
-	WIELDINFO_LEVEL = 1,
-	WIELDINFO_MAGLV = 2,
-	WIELDINFO_VOCREQ = 4,
-	WIELDINFO_PREMIUM = 8
-};
-
 class Weapons : public BaseEvents
 {
 public:
 	Weapons();
 	virtual ~Weapons();
-	
+
 	bool loadDefaults();
 	const Weapon* getWeapon(const Item* item) const;
 
 	static int32_t weaponExhaustionTime;
 	static int32_t weaponInFightTime;
 
+	static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue);
 	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue);
 
 protected:
@@ -70,10 +57,10 @@ protected:
 	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
-	
+
 	typedef std::map<uint32_t, Weapon*> WeaponMap;
 	WeaponMap weapons;
-	
+
 	LuaScriptInterface m_scriptInterface;
 };
 
@@ -98,8 +85,8 @@ public:
 	static bool useFist(Player* player, Creature* target);
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const = 0;
 
-	const int32_t getReqLevel() const {return level;}
-	const int32_t getReqMagLv() const {return magLevel;}
+	const uint32_t getReqLevel() const {return level;}
+	const uint32_t getReqMagLv() const {return magLevel;}
 	const bool isWieldedUnproperly() const {return wieldUnproperly;}
 	const bool isPremium() const {return premium;}
 	const uint32_t getWieldInfo() const {return wieldInfo;}
@@ -175,6 +162,7 @@ protected:
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
 
 	int32_t hitChance;
+	int32_t maxHitChance;
 	int32_t breakChance;
 	int32_t ammuAttackValue;
 };
@@ -186,6 +174,7 @@ public:
 	virtual ~WeaponWand() {};
 
 	virtual bool configureEvent(xmlNodePtr p);
+	virtual bool configureWeapon(const ItemType& it);
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 

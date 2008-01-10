@@ -30,24 +30,5 @@
 bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 {
 	IOMapSerialize xmlMap;
-	return xmlMap.loadMap(map, identifier);
-}
-
-bool IOMapXML::loadSpawns(Map* map)
-{
-	if(!map->spawnfile.empty()){
-		Spawns::getInstance()->loadFromXml(map->spawnfile);
-		Spawns::getInstance()->startup();
-	}
-	
-	return true;
-}
-
-bool IOMapXML::loadHouses(Map* map)
-{
-	if(!map->housefile.empty()){
-		return Houses::getInstance().loadHousesXML(map->housefile);
-	}
-
-	return true;
+	return xmlMap.loadMap(map);
 }
