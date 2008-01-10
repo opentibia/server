@@ -119,6 +119,7 @@ private:
 
 	void updateTargetList();
 	void clearTargetList();
+	void clearFriendList();
 
 	void die();
 	bool despawn();

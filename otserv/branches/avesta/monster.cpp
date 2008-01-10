@@ -97,6 +97,7 @@ Creature()
 Monster::~Monster()
 {
 	clearTargetList();
+	clearFriendList();
 }
 
 void Monster::onAttackedCreatureDissapear(bool isLogout)
@@ -204,6 +205,14 @@ void Monster::clearTargetList()
 		(*it)->releaseThing2();
 	}
 	targetList.clear();
+}
+
+void Monster::clearFriendList()
+{
+	for(MonsterList::iterator it = friendList.begin(); it != friendList.end(); ++it){
+		(*it)->releaseThing2();
+	}
+	friendList.clear();
 }
 
 void Monster::onCreatureFound(Creature* creature, bool pushFront /*= false*/)
@@ -872,8 +881,10 @@ void Monster::die()
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();
 	}
-
 	summons.clear();
+
+	clearTargetList();
+	clearFriendList();
 }
 
 bool Monster::despawn()
