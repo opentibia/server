@@ -5128,7 +5128,7 @@ int LuaScriptInterface::luaDoMoveCreature(lua_State *L)
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
-		ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)direction, true);
+		ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)direction, FLAG_NOLIMIT);
 		lua_pushnumber(L, ret);
 	}
 	else{

@@ -71,7 +71,9 @@ public:
 	bool isInList(int32_t x, int32_t y);
 	AStarNode* getNodeInList(int32_t x, int32_t y);
 
-	int getMapWalkCost(const Creature* creature, AStarNode* node, const Tile* neighbourTile);
+	int getMapWalkCost(const Creature* creature, AStarNode* node,
+		const Tile* neighbourTile, const Position& neighbourPos);
+	int getTileWalkCost(const Creature* creature, const Tile* tile);
 	int getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal);
 
 private:
@@ -159,6 +161,13 @@ public:
 	static int32_t maxViewportY;
 	static int32_t maxClientViewportX;
 	static int32_t maxClientViewportY;
+	static const int32_t mapCostCacheWidth = 25;
+	static const int32_t mapCostCacheHeight = 25;
+
+	static int32_t mapCostCache[Map::mapCostCacheWidth][Map::mapCostCacheHeight];
+	
+	static void cacheMapCost(const Position& centerPos, const Position& pos, int32_t cost);
+	static int32_t getCacheMapCost(const Position& centerPos, const Position& pos);
 
 	/**
 	* Load a map.
@@ -225,15 +234,22 @@ public:
 	*/
 	bool isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck);
 
+	Tile* isPositionValid(const Creature* creature, const Position& pos, const Position& centerPos);
+
 	/**
 	* Get the path to a specific position on the map.
-	* \param creature The creature that wants a route
-	* \param start The start position of the path
-	* \param to The destination position
-	* \returns A list of all positions you have to traverse to reach the destination
+	* \param creature The creature that wants a path
+	* \param toPosition The position we want a path calculated to
+	* \param centerPos The center position (can be set to toPosition) 
+	* \param listDir contains a list of directions to the destination
+	* \param autoClearCache If not set the cache is not cleared (to clear it manually call clearPathCache)
+	* \returns returns true if a path was found
 	*/
-	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
-	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
+	bool getPathTo(const Creature* creature, const Position& toPosition,
+		const Position& centerPos, std::list<Direction>& listDir, bool autoClearCache = true);
+
+	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir,
+		const Position& destPos);
 
 	/* Map Width and Height - for Info purposes */
 	uint32_t mapWidth, mapHeight;
@@ -265,6 +281,7 @@ protected:
 		int32_t minRangeY = 0, int32_t maxRangeY = 0);
 	
 	void clearSpectatorCache();
+	void clearPathCache();
 
 	QTreeNode root;
 

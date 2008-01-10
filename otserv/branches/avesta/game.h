@@ -70,6 +70,10 @@ enum LightState_t {
 	LIGHT_STATE_SUNRISE,
 };
 
+#define EVENT_LIGHTINTERVAL  10000
+#define EVENT_DECAYINTERVAL  10000
+#define EVENT_CREATUREINTERVAL 500
+
 /**
   * Main Game class.
   * This class is responsible to control everything that happens
@@ -180,6 +184,16 @@ public:
 		*/
 	bool removeCreature(Creature* creature, bool isLogout = true);
 
+	void addCreatureCheck(Creature* creature) {checkCreatureVector.push_back(creature);}
+	void removeCreatureCheck(Creature* creature)
+	{
+		std::vector<Creature*>::iterator cit = std::find(checkCreatureVector.begin(),
+			checkCreatureVector.end(), creature);
+		if(cit != checkCreatureVector.end()){
+			checkCreatureVector.erase(cit);
+		}
+	}
+
 	uint32_t getPlayersOnline() {return (uint32_t)Player::listPlayer.list.size();}
 	uint32_t getMonstersOnline() {return (uint32_t)Monster::listMonster.list.size();}
 	uint32_t getNpcsOnline() {return (uint32_t)Npc::listNpc.list.size();}
@@ -199,7 +213,7 @@ public:
 		}
 	}
 
-	ReturnValue internalMoveCreature(Creature* creature, Direction direction, bool force = false);
+	ReturnValue internalMoveCreature(Creature* creature, Direction direction, uint32_t flags = 0);
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);
 
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
@@ -348,9 +362,6 @@ public:
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
 	bool isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor);
-	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
-	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
-
 	bool getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
 		bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList);
 
@@ -369,9 +380,11 @@ public:
 	void loadGameState();
 
 	//Events
-	void checkWalk(uint32_t creatureId);
-	void checkCreature(uint32_t creatureId, uint32_t interval);
-	void checkLight(int t);
+	void checkCreatureWalk(uint32_t creatureId);
+	void updateCreatureWalk(uint32_t creatureId);
+	void checkCreatureAttack(uint32_t creatureId);
+	void checkCreatures();
+	void checkLight();
 
 	bool combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
 		int32_t& healthChange, bool checkDefense, bool checkArmor);
@@ -418,6 +431,7 @@ protected:
 	std::map<Item*, uint32_t> tradeItems;
 
 	AutoList<Creature> listCreature;
+	std::vector<Creature*> checkCreatureVector;
 
 #ifdef __DEBUG_CRITICALSECTION__
 	static OTSYS_THREAD_RETURN monitorThread(void *p);
@@ -430,8 +444,7 @@ protected:
 		void*    data;
 	};
 
-	#define DECAY_INTERVAL  10000
-	void checkDecay(int32_t interval);
+	void checkDecay();
 	void internalDecayItem(Item* item);
 
 	typedef std::list<Item*> DecayList;

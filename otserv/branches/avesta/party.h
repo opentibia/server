@@ -22,7 +22,7 @@
 #define __OTSERV_PARTY_H__
 
 #include "definitions.h"
-#include "const80.h"
+#include "const.h"
 
 #include <list>
 

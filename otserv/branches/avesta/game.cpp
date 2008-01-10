@@ -79,6 +79,7 @@ Game::Game()
 	worldType = WORLD_TYPE_PVP;
 
 	OTSYS_THREAD_LOCKVARINIT(AutoID::autoIDLock);
+	OTSYS_THREAD_LOCKVARINIT(Creature::pathLock);
 
 #if defined __EXCEPTION_TRACER__
 	OTSYS_THREAD_LOCKVARINIT(maploadlock);
@@ -87,8 +88,6 @@ Game::Game()
 #ifdef __DEBUG_CRITICALSECTION__
 	OTSYS_CREATE_THREAD(monitorThread, this);
 #endif
-
-	Scheduler::getScheduler().addEvent(createSchedulerTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 
 	int daycycle = 3600;
 	//(1440 minutes/day)/(3600 seconds/day)*10 seconds event interval
@@ -100,7 +99,12 @@ Game::Game()
 	lightlevel = LIGHT_LEVEL_DAY;
 	light_state = LIGHT_STATE_DAY;
 
-	Scheduler::getScheduler().addEvent(createSchedulerTask(10000, boost::bind(&Game::checkLight, this, 10000)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL, 
+		boost::bind(&Game::checkLight, this)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_CREATUREINTERVAL,
+		boost::bind(&Game::checkCreatures, this)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
+		boost::bind(&Game::checkDecay, this)));
 }
 
 Game::~Game()
@@ -457,6 +461,10 @@ Player* Game::getPlayerByAccount(uint32_t acc)
 
 bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
 {
+	if(creature->getParent() != NULL){
+		return false;
+	}
+
 	if(!map->placeCreature(pos, creature, forced)){
 		return false;
 	}
@@ -467,7 +475,6 @@ bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool f
 	creature->setID();
 	listCreature.addList(creature);
 	creature->addList();
-
 	return true;
 }
 
@@ -477,6 +484,7 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 		return false;
 	}
 
+	addCreatureCheck(creature);
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 	getSpectators(list, creature->getPosition(), true);
@@ -496,17 +504,6 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 
 	int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
 	creature->getParent()->postAddNotification(creature, newStackPos);
-	//[ added for beds system
-	Player* player = NULL;
-	if((player = creature->getPlayer()) != NULL) {
-		BedItem* bed = Beds::instance().getBedBySleeper(player->getGUID());
-		if(bed) {
-			bed->wakeUp(player);
-		}
-	}
-	//]
-
-	creature->addEventThink();
 	return true;
 }
 
@@ -520,8 +517,6 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 #endif
 
 	//std::cout << "remove: " << creature << " " << creature->getID() << std::endl;
-
-	creature->stopEventThink();
 
 	Cylinder* cylinder = creature->getTile();
 
@@ -550,6 +545,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	listCreature.removeList(creature->getID());
 	creature->removeList();
 	creature->setRemoved();
+	removeCreatureCheck(creature);
 	FreeThing(creature);
 
 	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
@@ -677,7 +673,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	return true;
 }
 
-ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, bool force /*= false*/)
+ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, uint32_t flags /*= 0*/)
 {
 	Cylinder* fromTile = creature->getTile();
 	Cylinder* toTile = NULL;
@@ -723,8 +719,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 		break;
 	}
 
-	uint32_t flags = 0;
-
 	if(creature->getPlayer()){
 		//try go up
 		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
@@ -755,10 +749,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
 	if(toTile != NULL){
-		if(force){
-			flags = FLAG_NOLIMIT;
-		}
-
 		ret = internalMoveCreature(creature, fromTile, toTile, flags);
 	}
 
@@ -914,7 +904,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 			}
 
 			std::list<Direction> listDir;
-			if(getPathTo(player, walkPos, listDir)){
+			if(map->getPathTo(player, walkPos, walkPos, listDir)){
 				Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 					this, player->getID(), listDir)));
 
@@ -3004,16 +2994,6 @@ bool Game::isViewClear(const Position& fromPos, const Position& toPos, bool same
 	return map->isViewClear(fromPos, toPos, sameFloor);
 }
 
-bool Game::getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir)
-{
-	return map->getPathTo(creature, toPosition, listDir);
-}
-
-bool Game::isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos)
-{
-	return map->isPathValid(creature, listDir, destPos);
-}
-
 bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 {
 	if(creature->getDirection() != dir){
@@ -3075,10 +3055,6 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
 	bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList)
 {
-#ifdef __DEBUG__PATHING__
-	int64 startTick = OTSYS_TIME();
-#endif
-
 	if(creature->getPosition().z != targetPos.z || !creature->canSee(targetPos)){
 		return false;
 	}
@@ -3092,13 +3068,17 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 		}
 	}
 
+	//std::cout << "getPathToEx - start" << std::endl;
+#ifdef __DEBUG__
+	uint64_t startTick = OTSYS_TIME();
+#endif
+
 	int32_t dxMin = ((fullPathSearch || (creaturePos.x - targetPos.x) <= 0) ? maxDist : 0);
 	int32_t dxMax = ((fullPathSearch || (creaturePos.x - targetPos.x) >= 0) ? maxDist : 0);
 	int32_t dyMin = ((fullPathSearch || (creaturePos.y - targetPos.y) <= 0) ? maxDist : 0);
 	int32_t dyMax = ((fullPathSearch || (creaturePos.y - targetPos.y) >= 0) ? maxDist : 0);
 
 	std::list<Direction> tmpDirList;
-	Tile* tile;
 
 	Position minWalkPos;
 	Position tmpPos;
@@ -3129,13 +3109,8 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 						}
 
 						if(tmpPos != creaturePos){
-							tile = getTile(tmpPos.x, tmpPos.y, tmpPos.z);
-							if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
-								continue;
-							}
-
-							tmpDirList.clear();
-							if(!getPathTo(creature, tmpPos, tmpDirList)){
+							//std::cout << "x: " << tmpPos.x << "y: " << tmpPos.y << std::endl;
+							if(!map->getPathTo(creature, tmpPos, targetPos, tmpDirList, false)){
 								continue;
 							}
 						}
@@ -3154,10 +3129,12 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 
 		}
 
+		map->clearPathCache();
+
 		if(minWalkDist != -1){
 #ifdef __DEBUG__PATHING__
 			__int64 endTick = OTSYS_TIME();
-			std::cout << "distance: " << tryDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
+			std::cout << "getPathTo - ticks: "<< (__int64 )endTick - startTick << std::endl;
 #endif
 			return true;
 		}
@@ -3165,15 +3142,15 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 		--tryDist;
 	}
 
-#ifdef __DEBUG__PATHING__
+#ifdef __DEBUG__
 	__int64 endTick = OTSYS_TIME();
-	std::cout << "distance: " << tryDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
+	std::cout << "Ticks: "<< (__int64 )endTick - startTick << std::endl;
 #endif
 
 	return false;
 }
 
-void Game::checkWalk(uint32_t creatureId)
+void Game::checkCreatureWalk(uint32_t creatureId)
 {
 	Creature* creature = getCreatureByID(creatureId);
 	if(creature && creature->getHealth() > 0){
@@ -3182,32 +3159,42 @@ void Game::checkWalk(uint32_t creatureId)
 	}
 }
 
-/*
-void Game::checkCreatures(uint32_t interval)
-{
-	if(!creatures.empty()){
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask(EVENT_CREATURE_INTERVAL,
-			boost::bind(&Game::checkCreatures, &g_game)));
-	}
-}
-*/
+void Game::updateCreatureWalk(uint32_t creatureId)
 
-void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 {
 	Creature* creature = getCreatureByID(creatureId);
+	if(creature && creature->getHealth() > 0){
+		creature->getPathToFollowCreature();
 
-	if(creature){
+	}
+}
+
+void Game::checkCreatureAttack(uint32_t creatureId)
+{
+	Creature* creature = getCreatureByID(creatureId);
+	if(creature && creature->getHealth() > 0){
+		creature->onAttacking(0);
+	}
+}
+
+void Game::checkCreatures()
+{
+	Scheduler::getScheduler().addEvent(createSchedulerTask(
+		EVENT_CREATUREINTERVAL, boost::bind(&Game::checkCreatures, this)));
+
+	Creature* creature;
+	for(uint32_t i = 0; i < checkCreatureVector.size(); ++i){
+		creature = checkCreatureVector[i];
 		if(creature->getHealth() > 0){
-			creature->onThink(interval);
-			creature->executeConditions(interval);
+			creature->onThink(EVENT_CREATUREINTERVAL);
+			creature->executeConditions(EVENT_CREATUREINTERVAL);
 		}
 		else{
 			creature->onDie();
 		}
-
-		cleanup();
 	}
+
+	cleanup();
 }
 
 void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
@@ -3681,12 +3668,15 @@ void Game::internalDecayItem(Item* item)
 	}
 }
 
-void Game::checkDecay(int32_t interval)
+void Game::checkDecay()
 {
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
+		boost::bind(&Game::checkDecay, this)));
+
 	Item* item = NULL;
 	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
 		item = *it;
-		item->decreaseDuration(interval);
+		item->decreaseDuration(EVENT_DECAYINTERVAL);
 		//std::cout << "checkDecay: " << item << ", id:" << item->getID() << ", name: " << item->getName() << ", duration: " << item->getDuration() << std::endl;
 
 		if(!item->canDecay()){
@@ -3706,13 +3696,13 @@ void Game::checkDecay(int32_t interval)
 		}
 	}
 
-	Scheduler::getScheduler().addEvent(createSchedulerTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 	cleanup();
 }
 
-void Game::checkLight(int t)
+void Game::checkLight()
 {
-	Scheduler::getScheduler().addEvent(createSchedulerTask(10000, boost::bind(&Game::checkLight, this, 10000)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL, 
+		boost::bind(&Game::checkLight, this)));
 
 	light_hour = light_hour + light_hour_delta;
 	if(light_hour > 1440)
@@ -3792,6 +3782,7 @@ void Game::shutdown()
 {
 	Scheduler::getScheduler().stop();
 	Dispatcher::getDispatcher().stop();
+	Creature::stopPathThread();
 
 	if(g_server){
 		g_server->stop();

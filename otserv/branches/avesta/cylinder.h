@@ -35,6 +35,7 @@ enum cylinderflags_t {
 	FLAG_IGNOREBLOCKCREATURE = 4,	//Bypass creature checks
 	FLAG_CHILDISOWNER = 8,			//Used by containers to query capacity of the carrier (player)
 	FLAG_PATHFINDING = 16,			//An additional check is done for floor changing/teleport items
+	FLAG_IGNOREFIELDDAMAGE = 32,	//Bypass field damage checks
 };
 
 enum cylinderlink_t{

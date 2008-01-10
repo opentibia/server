@@ -30,6 +30,7 @@
 
 #include "player.h"
 #include "ioplayer.h"
+#include "game.h"
 #include "configmanager.h"
 #include "chat.h"
 #include "house.h"
@@ -38,6 +39,7 @@
 #include "weapons.h"
 #include "creatureevent.h"
 #include "status.h"
+#include "beds.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -1247,6 +1249,13 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 			}
 		}
 
+		//[ added for beds system
+		BedItem* bed = Beds::instance().getBedBySleeper(getGUID());
+		if(bed){
+			bed->wakeUp(this);
+		}
+		//]
+
 		if(!storedConditionList.empty()){
 			for(ConditionList::const_iterator it = storedConditionList.begin(); it != storedConditionList.end(); ++it){
 				addCondition(*it);
@@ -2025,7 +2034,7 @@ void Player::dropCorpse()
 		sendStats();
 		g_game.internalTeleport(this, getTemplePosition());
 		g_game.addCreatureHealth(this);
-		onThink(EVENT_CREATURE_INTERVAL);
+		onThink(EVENT_CREATUREINTERVAL);
 	}
 	else{
 		Creature::dropCorpse();

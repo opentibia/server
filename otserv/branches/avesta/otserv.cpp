@@ -415,6 +415,7 @@ int main(int argc, char *argv[])
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
 	//OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
+	OTSYS_CREATE_THREAD(Creature::creaturePathThread, NULL);
 
 	g_game.setGameState(GAME_STATE_INIT);
 	g_game.setGameState(GAME_STATE_NORMAL);

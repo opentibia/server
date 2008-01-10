@@ -113,6 +113,10 @@ Teleport* Tile::getTeleportItem() const
 
 MagicField* Tile::getFieldItem() const
 {
+	if(!hasFlag(TILESTATE_MAGICFIELD)){
+		return NULL;
+	}
+
 	MagicField* field = NULL;
 	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
 		field = (*iit)->getMagicField();
@@ -374,7 +378,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(monster->canPushCreatures()){
+			if(monster->canPushCreatures() && !monster->hasMaster()){
 				Creature* creature;
 				for(int i = 0; i < creatures.size(); ++i){
 					creature = creatures[i];
@@ -395,13 +399,30 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				if(const Item* iitem = iithing->getItem()){
 					const ItemType& iiType = Item::items[iitem->getID()];
 					if(iiType.isMagicField() && !iiType.blockSolid){
-						const MagicField* field = iitem->getMagicField();
-						if(!monster->isImmune(field->getCombatType())){
-							return RET_NOTPOSSIBLE;
+						CombatType_t combatType = iitem->getMagicField()->getCombatType();
+						//There is 3 options for a monster to enter a magic field
+						//1) Monster is immune
+						if(!monster->isImmune(combatType)){
+							//1) Monster is "strong" enough to handle the damage
+							//2) Monster is already afflicated by this type of condition
+							if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
+								if( !(monster->canPushItems() ||
+									monster->hasCondition(Combat::DamageToConditionType(combatType))) ){
+									return RET_NOTPOSSIBLE;
+								}
+							}
+							else{
+								return RET_NOTPOSSIBLE;
+							}
 						}
 					}
 					else if(iiType.blockSolid || (hasBitSet(FLAG_PATHFINDING, flags) && iiType.blockPathFind) ){
-						if(!monster->canPushItems() || !iiType.moveable || (iitem->getUniqueId() != 0)){
+						if(!iiType.moveable || iitem->getUniqueId() != 0){
+							//its not moveable
+							return RET_NOTPOSSIBLE;
+						}
+						//moveable
+						else if(!(hasBitSet(FLAG_IGNOREBLOCKITEM, flags) || monster->canPushItems()) ){
 							return RET_NOTPOSSIBLE;
 						}
 					}
@@ -1212,6 +1233,9 @@ void Tile::updateTileFlags(Item* item, bool removing)
 			if(item->getTeleport()){
 				setFlag(TILESTATE_POSITIONCHANGE);
 			}
+			if(item->getMagicField()){
+				setFlag(TILESTATE_MAGICFIELD);
+			}
 		}
 	}
 	else{
@@ -1237,6 +1261,9 @@ void Tile::updateTileFlags(Item* item, bool removing)
 		}
 		if(item->getTeleport()){
 			resetFlag(TILESTATE_POSITIONCHANGE);
+		}
+		if(item->getMagicField()){
+			resetFlag(TILESTATE_MAGICFIELD);
 		}
 	}
 }

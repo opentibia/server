@@ -32,8 +32,6 @@
 #include "enums.h"
 #include "creatureevent.h"
 
-#define EVENT_CREATURE_INTERVAL 500
-
 #include <list>
 
 typedef std::list<Condition*> ConditionList;
@@ -96,6 +94,17 @@ public:
 	virtual const Npc* getNpc() const {return NULL;};
 	virtual Monster* getMonster() {return NULL;};
 	virtual const Monster* getMonster() const {return NULL;};
+
+	static OTSYS_THREAD_RETURN creaturePathThread(void* p);
+	static void addPathSearch(Creature* creature);
+	static void stopPathThread()
+	{
+		OTSYS_THREAD_LOCK(Creature::pathLock, "")
+		creatureUpdatePathList.clear();
+		OTSYS_THREAD_UNLOCK(Creature::pathLock, "")
+	}
+
+	void getPathToFollowCreature();
 
 	virtual const std::string& getName() const = 0;
 	virtual const std::string& getNameDescription() const = 0;
@@ -179,7 +188,7 @@ public:
 	virtual void onWalkComplete() {};
 
 	//follow functions
-	virtual const Creature* getFollowCreature() { return followCreature; };
+	virtual Creature* getFollowCreature() { return followCreature; };
 	virtual bool setFollowCreature(Creature* creature, bool fullPathSearch = false);
 
 	//follow events
@@ -258,8 +267,6 @@ public:
 	virtual void setNormalCreatureLight();
 	void setCreatureLight(LightInfo& light) {internalLight = light;}
 
-	void addEventThink();
-	void stopEventThink();
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t interval);
 	virtual void onWalk();
@@ -297,6 +304,8 @@ public:
 	bool registerCreatureEvent(const std::string& name);
 
 protected:
+	uint32_t id;
+	bool isInternalRemoved;
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
 	int32_t attackStrength;
@@ -312,33 +321,22 @@ protected:
 	uint32_t baseSpeed;
 	int32_t varSpeed;
 	bool lootDrop;
-
 	Direction direction;
+	ConditionList conditions;
+	LightInfo internalLight;
 
-	uint32_t eventCheck;
-
+	//summon variables
 	Creature* master;
 	bool summon;
 	std::list<Creature*> summons;
-
-	ConditionList conditions;
-
-	//creature script events
-	uint32_t scriptEventsBitField;
-	bool hasEventRegistered(CreatureEventType_t event){
-		return (0 != (scriptEventsBitField & ((uint32_t)1 << event)));
-	}
-	typedef std::list<CreatureEvent*> CreatureEventList;
-	CreatureEventList eventsList;
-	CreatureEventList::iterator findEvent(CreatureEventType_t type);
-	CreatureEvent* getCreatureEvent(CreatureEventType_t type);
 
 	//follow variables
 	Creature* followCreature;
 	uint32_t eventWalk;
 	std::list<Direction> listWalkDir;
-	bool internalUpdateFollow;
-	bool internalValidatePath;
+	uint32_t walkUpdateTicks;
+	bool hasFollowPath;
+	bool internalMapChange;
 
 	//combat variables
 	Creature* attackedCreature;
@@ -354,11 +352,19 @@ protected:
 	uint32_t blockCount;
 	uint32_t blockTicks;
 
+	//creature script events
+	uint32_t scriptEventsBitField;
+	bool hasEventRegistered(CreatureEventType_t event){
+		return (0 != (scriptEventsBitField & ((uint32_t)1 << event)));
+	}
+	typedef std::list<CreatureEvent*> CreatureEventList;
+	CreatureEventList eventsList;
+	CreatureEventList::iterator findEvent(CreatureEventType_t type);
+	CreatureEvent* getCreatureEvent(CreatureEventType_t type);
+
 	void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void doAttacking(uint32_t interval) {};
 
-	LightInfo internalLight;
-	void validateWalkPath();
 	virtual int32_t getLostExperience() const { return 0; };
 	virtual double getDamageRatio(Creature* attacker) const;
 	bool getKillers(Creature** lastHitCreature, Creature** mostDamageCreature);
@@ -369,14 +375,14 @@ protected:
 	virtual void dropCorpse();
 	virtual Item* getCorpse();
 
+	static OTSYS_THREAD_LOCKVAR pathLock;
+	static std::list<uint32_t> creatureUpdatePathList;
+	static bool m_shutdownPathThread;
+
 	friend class Game;
 	friend class Map;
 	friend class Commands;
 	friend class LuaScriptInterface;
-
-	uint32_t id;
-	bool isInternalRemoved;
 };
-
 
 #endif

@@ -36,8 +36,11 @@
 #include <vector>
 
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
+OTSYS_THREAD_LOCKVAR Creature::pathLock;
 uint32_t AutoID::count = 1000;
 AutoID::list_type AutoID::list;
+std::list<uint32_t> Creature::creatureUpdatePathList;
+bool Creature::m_shutdownPathThread = false;
 
 extern Game g_game;
 extern ConfigManager g_config;
@@ -70,20 +73,19 @@ Creature::Creature() :
 	defenseStrength = 0;
 
 	followCreature = NULL;
+	hasFollowPath = false;
 	eventWalk = 0;
-	internalUpdateFollow = false;
-	internalValidatePath = false;
+	internalMapChange = false;
 
-	eventCheck = 0;
 	attackedCreature = NULL;
 	lastHitCreature = 0;
-	//internalDefense = true;
-	//internalArmor = true;
+
 	blockCount = 0;
 	blockTicks = 0;
+	walkUpdateTicks = 0;
 
 	scriptEventsBitField = 0;
-}
+  }
 
 Creature::~Creature()
 {
@@ -145,27 +147,9 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
-void Creature::addEventThink()
-{
-	if(eventCheck == 0){
-		eventCheck = Scheduler::getScheduler().addEvent(
-			createSchedulerTask(EVENT_CREATURE_INTERVAL,
-			boost::bind(&Game::checkCreature, &g_game, getID(), EVENT_CREATURE_INTERVAL)));
-		//onStartThink();
-	}
-}
-
-void Creature::stopEventThink()
-{
-	if(eventCheck != 0){
-		Scheduler::getScheduler().stopEvent(eventCheck);
-		eventCheck = 0;
-		//onStopThink();
-	}
-}
-
 void Creature::onThink(uint32_t interval)
 {
+	/*
 	if(followCreature && getMaster() != followCreature && !canSeeCreature(followCreature)){
 		onCreatureDisappear(followCreature, false);
 	}
@@ -173,11 +157,7 @@ void Creature::onThink(uint32_t interval)
 	if(attackedCreature && getMaster() != attackedCreature && !canSeeCreature(attackedCreature)){
 		onCreatureDisappear(attackedCreature, false);
 	}
-
-	if(internalUpdateFollow && followCreature){
-		internalUpdateFollow = false;
-		setFollowCreature(followCreature);
-	}
+	*/
 
 	blockTicks += interval;
 
@@ -186,12 +166,15 @@ void Creature::onThink(uint32_t interval)
 		blockTicks = 0;
 	}
 
-	onAttacking(interval);
-
-	if(eventCheck != 0){
-		eventCheck = 0;
-		addEventThink();
+	walkUpdateTicks += interval;
+	if(walkUpdateTicks >= 2000){
+		walkUpdateTicks = 0;
+		if(internalMapChange){
+			Creature::addPathSearch(this);
+		}
 	}
+
+	onAttacking(interval);
 }
 
 void Creature::onAttacking(uint32_t interval)
@@ -208,19 +191,11 @@ void Creature::onAttacking(uint32_t interval)
 
 void Creature::onWalk()
 {
-	if(internalValidatePath){
-		internalValidatePath = false;
-		validateWalkPath();
-	}
-
-	if(!internalUpdateFollow && getSleepTicks() <= 0){
+	if(getSleepTicks() <= 0){
 		Direction dir;
 		if(getNextStep(dir)){
-			ReturnValue ret = g_game.internalMoveCreature(this, dir);
-
-			if(ret != RET_NOERROR){
-				internalValidatePath = true;
-				//internalUpdateFollow = true;
+			if(g_game.internalMoveCreature(this, dir, FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
+				internalMapChange = true;
 			}
 		}
 	}
@@ -282,7 +257,8 @@ void Creature::addEventWalk()
 		//std::cout << "addEventWalk() - " << getName() << std::endl;
 
 		int64_t ticks = getEventStepTicks();
-		eventWalk = Scheduler::getScheduler().addEvent(createSchedulerTask(ticks, boost::bind(&Game::checkWalk, &g_game, getID())));
+		eventWalk = Scheduler::getScheduler().addEvent(createSchedulerTask(
+			ticks, boost::bind(&Game::checkCreatureWalk, &g_game, getID())));
 	}
 }
 
@@ -299,45 +275,91 @@ void Creature::stopEventWalk()
 	}
 }
 
-void Creature::validateWalkPath()
+OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 {
-	if(!internalUpdateFollow && followCreature){
-		if(listWalkDir.empty() || !g_game.isPathValid(this, listWalkDir, followCreature->getPosition())){
-			//internalUpdateFollow = true;
-			setFollowCreature(followCreature);
+	uint32_t creatureId;
+
+	while(!Creature::m_shutdownPathThread){
+		OTSYS_THREAD_LOCK(Creature::pathLock, "")
+		
+		if(!Creature::creatureUpdatePathList.empty()){
+			creatureId = Creature::creatureUpdatePathList.front();
+			Creature::creatureUpdatePathList.pop_front();
 		}
+		else{
+			creatureId = 0;
+		}
+
+		OTSYS_THREAD_UNLOCK(Creature::pathLock, "");
+
+		if(creatureId != 0){
+			Dispatcher::getDispatcher().addTask(createTask(
+				boost::bind(&Game::updateCreatureWalk, &g_game, creatureId)));
+
+			//Scheduler::getScheduler().addEvent(createSchedulerTask(
+			//	100, boost::bind(&Game::updateCreatureWalk, &g_game, creatureId)));
+		}
+
+		OTSYS_SLEEP(20);
 	}
+#if defined __EXCEPTION_TRACER__
+	dispatcherExceptionHandler.RemoveHandler();
+#endif
+
+#if defined WIN32 || defined __WINDOWS__
+	//
+#else
+	return 0;
+#endif
+}
+
+void Creature::addPathSearch(Creature* creature)
+{
+	OTSYS_THREAD_LOCK(pathLock, "")
+	std::list<uint32_t>::iterator it = std::find(creatureUpdatePathList.begin(),
+		creatureUpdatePathList.end(), creature->getID() );
+	if(it == creatureUpdatePathList.end()){
+		creatureUpdatePathList.push_back(creature->getID());
+	}
+	OTSYS_THREAD_UNLOCK(pathLock, "");
 }
 
 void Creature::onAddTileItem(const Position& pos, const Item* item)
 {
-	//validateWalkPath();
-	internalValidatePath = true;
+	if( item->hasProperty(BLOCKPATHFIND) ||  item->hasProperty(BLOCKSOLID) ){
+		internalMapChange = true;
+	}
 }
 
 void Creature::onUpdateTileItem(const Position& pos, uint32_t stackpos,
 	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
-	internalValidatePath = true;
-	//validateWalkPath();
+	if( (oldType.blockPathFind || oldType.blockSolid) && (!newType.blockPathFind || !newType.blockSolid) ){
+		internalMapChange = true;
+	}
 }
 
 void Creature::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
-	internalValidatePath = true;
-	//validateWalkPath();
+	if( item->hasProperty(BLOCKPATHFIND) ||  item->hasProperty(BLOCKSOLID) ){
+		internalMapChange = true;
+	}
 }
 
 void Creature::onUpdateTile(const Position& pos)
 {
-	internalValidatePath = true;
-	//validateWalkPath();
+	//
 }
 
 void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	internalValidatePath = true;
-	//validateWalkPath();
+	internalMapChange = true;
+}
+
+void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+{
+	onCreatureDisappear(creature, true);
+	internalMapChange = true;
 }
 
 void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
@@ -369,14 +391,6 @@ void Creature::onAttackedCreatureChangeZone(ZoneType_t zone)
 	}
 }
 
-void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
-{
-	//validateWalkPath();
-	internalValidatePath = true;
-
-	onCreatureDisappear(creature, true);
-}
-
 void Creature::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
 	uint32_t oldStackPos, bool teleport)
 {
@@ -398,17 +412,22 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 
 		onChangeZone(getZone());
 	}
-	else{
-		internalValidatePath = true;
-	}
 
-	if(followCreature == creature || (creature == this && followCreature)){
+	if(creature == followCreature || (creature == this && followCreature)){
+		if(followCreature == creature){
+			internalMapChange = true;
+			if(hasFollowPath){
+				//Force a faster update check
+				walkUpdateTicks = 2000;
+			}
+		}
+
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
 			onCreatureDisappear(followCreature, false);
 		}
 	}
 
-	if(attackedCreature == creature || (creature == this && attackedCreature)){
+	if(creature == attackedCreature || (creature == this && attackedCreature)){
 		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
 			onCreatureDisappear(attackedCreature, false);
 		}
@@ -673,8 +692,28 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 	fpp.needReachable = true;
 	fpp.targetDistance = 1;
 
-	if(followCreature != creature || !g_game.isViewClear(getPosition(), creature->getPosition(), true)){
+	if(!g_game.isViewClear(getPosition(), creature->getPosition(), true)){
 		fpp.fullPathSearch = true;
+	}
+}
+
+void Creature::getPathToFollowCreature()
+{
+	if(followCreature){
+		FindPathParams fpp;
+		getPathSearchParams(followCreature, fpp);
+		if(!hasFollowPath){
+			fpp.fullPathSearch = true;
+		}
+
+		if(g_game.getPathToEx(this, followCreature->getPosition(), 1, fpp.targetDistance,
+			fpp.fullPathSearch, fpp.needReachable, listWalkDir)){
+			hasFollowPath = true;
+			startAutoWalk(listWalkDir);
+		}
+		else{
+			hasFollowPath = false;
+		}
 	}
 }
 
@@ -686,25 +725,20 @@ bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= fal
 			followCreature = NULL;
 			return false;
 		}
-	}
-
-	if(creature){
-		FindPathParams fpp;
-		getPathSearchParams(creature, fpp);
 
 		if(!listWalkDir.empty()){
 			listWalkDir.clear();
 			onWalkAborted();
 		}
-		if(!g_game.getPathToEx(this, creature->getPosition(), 1, fpp.targetDistance, fpp.fullPathSearch, fpp.needReachable, listWalkDir)){
-			followCreature = NULL;
-			return false;
-		}
 
-		startAutoWalk(listWalkDir);
+		hasFollowPath = false;
+		followCreature = creature;
+		Creature::addPathSearch(this);
+	}
+	else{
+		followCreature = NULL;
 	}
 
-	followCreature = creature;
 	onFollowCreature(creature);
 	return true;
 }
