@@ -50,7 +50,10 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 	const ItemType& it = Item::items[_type];
 
 	if(it.group == ITEM_GROUP_DEPRECATED){
+#ifdef __DEBUG__
 		std::cout << "Error: [Item::CreateItem] Item id " << it.id << " has been declared deprecated."  << std::endl;
+#endif
+		return NULL;
 	}
 
 	if(it.id != 0){
