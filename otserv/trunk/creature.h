@@ -152,7 +152,7 @@ public:
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
-	ZoneType_t getZone() {
+	ZoneType_t getZone() const {
 		const Tile* tile = getTile();
 		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
 			return ZONE_PROTECTION;
