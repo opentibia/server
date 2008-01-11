@@ -69,8 +69,15 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->setSex((playersex_t)result->getDataInt("sex"));
 	player->setDirection((Direction)result->getDataInt("direction"));
 	player->level = std::max((uint32_t)1, (uint32_t)result->getDataInt("level"));
-	player->experience = std::max((uint32_t)Player::getExpForLevel(player->level),
-		(uint32_t)result->getDataInt("experience"));
+
+	uint32_t currExpCount = Player::getExpForLevel(player->level);
+	uint32_t nextExpCount = Player::getExpForLevel(player->level + 1);
+	uint32_t experience = (uint32_t)result->getDataInt("experience");
+	if(experience < currExpCount || experience  > nextExpCount){
+		experience = currExpCount;
+	}
+	player->experience = experience;
+	player->levelPercent = Player::getPercentLevel(player->experience, Player::getExpForLevel(player->level + 1));
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");
@@ -78,8 +85,16 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->mana = result->getDataInt("mana");
 	player->manaMax = result->getDataInt("manamax");
 	player->magLevel = result->getDataInt("maglevel");
-	player->manaSpent = std::max((uint32_t)player->vocation->getReqMana(player->magLevel),
-		(uint32_t)result->getDataInt("manaspent"));
+
+	uint32_t nextManaCount = (uint32_t)player->vocation->getReqMana(player->magLevel + 1);
+	uint32_t manaSpent = (uint32_t)result->getDataInt("manaspent");
+	if(manaSpent > nextManaCount){
+		//make sure its not out of bound
+		manaSpent = 0;
+	}
+	player->manaSpent = manaSpent;
+	player->magLevelPercent = Player::getPercentLevel(player->manaSpent,
+		player->vocation->getReqMana(player->magLevel + 1));
 	player->health = result->getDataInt("health");
 	player->healthMax = result->getDataInt("healthmax");
 	player->defaultOutfit.lookType = result->getDataInt("looktype");
@@ -195,24 +210,20 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	if((result = db->storeQuery(query.str()))){
 		//now iterate over the skills
 		do{
-			uint32_t currentSkillLevel, nextSkillLevel, diffSkillLevel, gainNextSkill;
-
 			int skillid = result->getDataInt("skillid");
 			if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST){
-				player->skills[skillid][SKILL_LEVEL] = result->getDataInt("value");
-				currentSkillLevel = player->vocation->getReqSkillTries(skillid, player->skills[skillid][SKILL_LEVEL]);
-				player->skills[skillid][SKILL_TRIES] = std::max((uint32_t)currentSkillLevel, (uint32_t)result->getDataInt("count"));
+				uint32_t skillLevel = result->getDataInt("value");
+				uint32_t skillCount = result->getDataInt("count");
 
-				nextSkillLevel = player->vocation->getReqSkillTries(skillid, player->skills[skillid][SKILL_LEVEL] + 1);
-				diffSkillLevel = nextSkillLevel - currentSkillLevel;
-				gainNextSkill = (player->skills[skillid][SKILL_TRIES] - currentSkillLevel);
+				uint32_t nextSkillCount = player->vocation->getReqSkillTries(skillid, skillLevel + 1);
+				if(skillCount > nextSkillCount){
+					//make sure its not out of bound
+					skillCount = 0;
+				}
 
-				if(diffSkillLevel > 0){
-					player->skills[skillid][SKILL_PERCENT] = std::min((uint32_t)100, (uint32_t)(gainNextSkill * 100) / diffSkillLevel );
-				}
-				else{
-					player->skills[skillid][SKILL_PERCENT] = 100;
-				}
+				player->skills[skillid][SKILL_LEVEL] = skillLevel;
+				player->skills[skillid][SKILL_TRIES] = skillCount;
+				player->skills[skillid][SKILL_PERCENT] = Player::getPercentLevel(skillCount, nextSkillCount);
 			}
 		}while(result->next());
 

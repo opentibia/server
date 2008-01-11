@@ -70,7 +70,7 @@ void House::setHouseOwner(uint32_t guid)
 	if(houseOwner){
 		//send items to depot
 		transferToDepot();
-
+		
 		//...TODO...
 		//TODO: remove players from beds
 
@@ -78,12 +78,8 @@ void House::setHouseOwner(uint32_t guid)
 		houseOwner = 0;
 		setAccessList(SUBOWNER_LIST, "");
 		setAccessList(GUEST_LIST, "");
-		/*
-		guestList.parseList("");
-		subOwnerList.parseList("");
-		*/
-		HouseDoorList::iterator it;
-		for(it = doorList.begin(); it != doorList.end(); ++it){
+
+		for(HouseDoorList::iterator it = doorList.begin(); it != doorList.end(); ++it){
 			(*it)->setAccessList("");
 		}
 
@@ -859,7 +855,7 @@ bool Houses::payHouses()
 
 			Depot* depot = player->getDepot(town->getTownID(), true);
 
-			// savePlayerHere is an ungly hack
+			// savePlayerHere is an ugly hack
 			// to avoid saving 2 times a not online player
 			// when items are transferred to his depot
 			bool savePlayerHere = true;

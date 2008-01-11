@@ -356,15 +356,17 @@ public:
 		{if(client) client->sendCreatureOutfit(creature, outfit);}
 	void sendCreatureChangeVisible(const Creature* creature, bool visible)
 		{
-			if(client){
-			if(visible)
+			if(visible){
 				client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
-			else
+			}
+			else{
 				client->sendCreatureInvisible(creature);
-		}
+			}
 		}
 	void sendCreatureLight(const Creature* creature)
 		{if(client) client->sendCreatureLight(creature);}
+	void sendCreatureShield(const Creature* creature)
+	    {if(client) client->sendCreatureShield(creature);}
 
 	//container
 	void sendAddContainerItem(const Container* container, const Item* item);
@@ -509,7 +511,6 @@ protected:
 	std::string getSkillName(int skillid);
 	void addExperience(uint32_t exp);
 
-	bool NeedUpdateStats();
 	void updateInventoryWeigth();
 
 	void die();
@@ -617,20 +618,6 @@ protected:
 	tradestate_t tradeState;
 	Item* tradeItem;
 
-	struct SentStats{
-		int32_t health;
-		int32_t healthMax;
-		uint32_t experience;
-		uint32_t level;
-		double freeCapacity;
-		int32_t mana;
-		int32_t manaMax;
-		int32_t manaSpent;
-		uint32_t magLevel;
-	};
-
-	SentStats lastSentStats;
-
 	std::string name;
 	std::string nameDescription;
 	uint32_t guid;
@@ -673,6 +660,7 @@ protected:
 		};
 	}
 
+	static uint32_t getPercentLevel(uint32_t count, uint32_t nextLevelCount);
 	virtual int32_t getLostExperience() const { return (skillLoss ? (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
