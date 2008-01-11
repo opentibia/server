@@ -1627,12 +1627,16 @@ void Player::addExperience(uint32_t exp)
 
 uint32_t Player::getPercentLevel(uint32_t count, uint32_t nextLevelCount)
 {
-	uint32_t result = ((uint32_t)((float)count / nextLevelCount * 100));
-	if(result < 0 || result > 100){
-		return 0;
+	if(nextLevelCount > 0){
+		uint32_t result = ((uint32_t)((float)count / nextLevelCount * 100));
+		if(result < 0 || result > 100){
+			return 0;
+		}
+
+		return result;
 	}
 
-	return result;
+	return 0;
 }
 
 void Player::onBlockHit(BlockType_t blockType)
