@@ -362,7 +362,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 			if(monster->canPushCreatures()){
 				Creature* creature;
-				for(int i = 0; i < creatures.size(); ++i){
+				for(uint32_t i = 0; i < creatures.size(); ++i){
 					creature = creatures[i];
 					if( !creature->getMonster() ||
 						!creature->isPushable() ||
