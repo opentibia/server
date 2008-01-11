@@ -726,12 +726,6 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 				pos.y = n->y + neighbourOrderList[i][1];
 
 				if((tile = isPositionValid(creature, pos, centerPos))){
-
-
-
-
-
-
 					//The cost (g) for this neighbour
 					int32_t cost = nodes.getMapWalkCost(creature, n, tile, pos);
 					int32_t extraCost = 0;
@@ -740,8 +734,7 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 						Map::cacheMapCost(centerPos, pos, extraCost);
 					}
 					
-					int32_t newg = n->g + cost + extraCost;
-					
+					int32_t newg = n->g + cost + extraCost;					
 
 					//Check if the node is already in the closed/open list
 					//If it exists and the nodes already on them has a lower cost (g) then we can ignore this neighbour node
@@ -769,7 +762,6 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 						endPos.x, endPos.y);
 					neighbourNode->f = neighbourNode->g + neighbourNode->h;
 				}
-
 			}
 
 			nodes.closeNode(n);
@@ -952,12 +944,12 @@ int AStarNodes::getTileWalkCost(const Creature* creature, const Tile* tile)
 	int cost = 0;
 	if(!tile->creatures.empty()){
 		//destroy creature cost
-		cost += MAP_NORMALWALKCOST * 5;
+		cost += MAP_NORMALWALKCOST * 3;
 	}
 
 	if(const MagicField* field = tile->getFieldItem()){
 		if(!creature->isImmune(field->getCombatType())){
-			cost += MAP_NORMALWALKCOST * 5;
+			cost += MAP_NORMALWALKCOST * 3;
 		}
 	}
 

@@ -161,8 +161,8 @@ public:
 	static int32_t maxViewportY;
 	static int32_t maxClientViewportX;
 	static int32_t maxClientViewportY;
-	static const int32_t mapCostCacheWidth = 25;
-	static const int32_t mapCostCacheHeight = 25;
+	static const int32_t mapCostCacheWidth = 40;
+	static const int32_t mapCostCacheHeight = 40;
 
 	static int32_t mapCostCache[Map::mapCostCacheWidth][Map::mapCostCacheHeight];
 	

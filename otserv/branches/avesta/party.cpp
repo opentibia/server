@@ -64,8 +64,6 @@ bool Party::invitePlayer(Player* player)
 		return false;
 	}
 
-	std::stringstream ss;
-
 	if(std::find(inviteList.begin(), inviteList.end(), player) != inviteList.end()){
 		//already on the invitation list
 		return false;
@@ -76,6 +74,7 @@ bool Party::invitePlayer(Player* player)
 	player->sendCreatureShield(getLeader(), SHIELD_WHITEYELLOW);
 	player->addPartyInvitation(this);
 
+	std::stringstream ss;
 	ss << player->getName() << " has been invited.";
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
