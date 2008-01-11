@@ -280,6 +280,11 @@ void Creature::stopEventWalk()
 
 OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 {
+#if defined __EXCEPTION_TRACER__
+	ExceptionHandler creaturePathExceptionHandler;
+	creaturePathExceptionHandler.InstallHandler();
+#endif
+
 	uint32_t creatureId;
 
 	while(!Creature::m_shutdownPathThread){
@@ -305,8 +310,9 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 
 		OTSYS_SLEEP(20);
 	}
+
 #if defined __EXCEPTION_TRACER__
-	dispatcherExceptionHandler.RemoveHandler();
+	creaturePathExceptionHandler.RemoveHandler();
 #endif
 
 #if defined WIN32 || defined __WINDOWS__

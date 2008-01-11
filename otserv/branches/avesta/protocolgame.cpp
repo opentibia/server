@@ -2216,19 +2216,6 @@ void ProtocolGame::AddCreature(NetworkMessage* msg,const Creature* creature, boo
 	msg->AddByte(0x00); // shield
 }
 
-inline int32_t checkConstrains(int32_t value, int32_t min, int32_t max)
-{
-	if(value > max){
-		return max;
-	}
-	else if(value < min){
-		return min;
-	}
-	else{
-		return value;
-	}
-}
-
 void ProtocolGame::AddPlayerStats(NetworkMessage* msg)
 {
 	msg->AddByte(0xA0);
@@ -2237,11 +2224,11 @@ void ProtocolGame::AddPlayerStats(NetworkMessage* msg)
 	msg->AddU16((int32_t)player->getFreeCapacity());
 	msg->AddU32(player->getExperience());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
-	msg->AddByte(checkConstrains(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT), 0, 100));
+	msg->AddByte(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT));
 	msg->AddU16(player->getMana());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_MAXMANA));
 	msg->AddByte(player->getMagicLevel());
-	msg->AddByte(checkConstrains(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT), 0, 100));
+	msg->AddByte(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT));
 	msg->AddByte(player->getPlayerInfo(PLAYERINFO_SOUL));
 	msg->AddU16(1440); //stamina(minutes)
 }

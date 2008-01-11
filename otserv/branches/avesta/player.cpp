@@ -110,16 +110,6 @@ Creature()
 	tradeItem = NULL;
 
 	walkTask = NULL;
-
-	lastSentStats.health = 0;
-	lastSentStats.healthMax = 0;
-	lastSentStats.freeCapacity = 0;
-	lastSentStats.experience = 0;
-	lastSentStats.level = 0;
-	lastSentStats.mana = 0;
-	lastSentStats.manaMax = 0;
-	lastSentStats.manaSpent = 0;
-	lastSentStats.magLevel = 0;
 	skillLoss = true;
 
 	for(int32_t i = 0; i < 11; i++){
@@ -1050,46 +1040,6 @@ void Player::sendCancelMessage(ReturnValue message) const
 void Player::sendStats()
 {
 	if(client){
-		//update level and magLevel percents
-		if(lastSentStats.experience != getExperience() || lastSentStats.level != level){
-			uint32_t currentExpLevel = Player::getExpForLevel(level);
-			uint32_t nextExpLevel = Player::getExpForLevel(level + 1);
-			uint32_t diffExpLevel = nextExpLevel - currentExpLevel;
-			uint32_t gainNextLevel = (getExperience() - currentExpLevel);
-
-			if(diffExpLevel > 0){
-				levelPercent = std::min((uint32_t)100, (uint32_t)(gainNextLevel * 100) / diffExpLevel );
-			}
-			else{
-				levelPercent = 100;
-			}
-		}
-
-		if(lastSentStats.manaSpent != manaSpent || lastSentStats.magLevel != magLevel){
-			uint32_t currentManaLevel = vocation->getReqMana(magLevel);
-			uint32_t nextManaLevel = vocation->getReqMana(magLevel + 1);
-			uint32_t diffManaLevel = nextManaLevel - currentManaLevel;
-			uint32_t gainNextLevel = (manaSpent - currentManaLevel);
-
-			if(diffManaLevel > 0){
-				magLevelPercent = std::min((uint32_t)100, (uint32_t)(gainNextLevel * 100) / diffManaLevel );
-			}
-			else{
-				magLevelPercent = 100;
-			}
-		}
-
-		//save current stats
-		lastSentStats.health = getHealth();
-		lastSentStats.healthMax = getMaxHealth();
-		lastSentStats.freeCapacity = getFreeCapacity();
-		lastSentStats.experience = getExperience();
-		lastSentStats.level = getLevel();
-		lastSentStats.mana = getMana();
-		lastSentStats.manaMax = getMaxMana();
-		lastSentStats.magLevel = getMagicLevel();
-		lastSentStats.manaSpent = manaSpent;
-
 		client->sendStats();
 	}
 }
@@ -1511,24 +1461,6 @@ void Player::checkTradeState(const Item* item)
 	}
 }
 
-bool Player::NeedUpdateStats()
-{
-	if(lastSentStats.health != getHealth() ||
-		 lastSentStats.healthMax != getMaxHealth() ||
-		 (int)lastSentStats.freeCapacity != (int)getFreeCapacity() ||
-		 lastSentStats.experience != getExperience() ||
-		 lastSentStats.level != getLevel() ||
-		 lastSentStats.mana != getMana() ||
-		 lastSentStats.manaMax != getMaxMana() ||
-		 lastSentStats.manaSpent != manaSpent ||
-		 lastSentStats.magLevel != getMagicLevel()){
-		return true;
-	}
-	else{
-		return false;
-	}
-}
-
 void Player::setDelayedWalkTask(SchedulerTask* task)
 {
 	delete walkTask;
@@ -1654,6 +1586,8 @@ void Player::addManaSpent(uint32_t amount)
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
 			sendStats();
 		}
+
+		magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
 	}
 }
 
@@ -1673,8 +1607,8 @@ void Player::addExperience(uint32_t exp)
 	}
 
 	if(prevLevel != newLevel){
-		//int32_t oldSpeed = getBaseSpeed();
 		level = newLevel;
+		levelPercent = Player::getPercentLevel(getExperience(), Player::getExpForLevel(level + 1));
 		updateBaseSpeed();
 
 		int32_t newSpeed = getBaseSpeed();
@@ -1689,6 +1623,16 @@ void Player::addExperience(uint32_t exp)
 	}
 
 	sendStats();
+}
+
+uint32_t Player::getPercentLevel(uint32_t count, uint32_t nextLevelCount)
+{
+	uint32_t result = ((uint32_t)((float)count / nextLevelCount * 100));
+	if(result < 0 || result > 100){
+		return 0;
+	}
+
+	return result;
 }
 
 void Player::onBlockHit(BlockType_t blockType)
@@ -1970,6 +1914,7 @@ void Player::die()
 		}
 
 		manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
+		magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
 
 		//Skill loss
 		uint32_t lostSkillTries;
@@ -2012,6 +1957,7 @@ void Player::die()
 				break;
 		}
 
+		levelPercent = Player::getPercentLevel(getExperience(), Player::getExpForLevel(level + 1));
 		if(newLevel != level){
 			std::stringstream lvMsg;
 			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";

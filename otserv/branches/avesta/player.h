@@ -526,7 +526,6 @@ protected:
 	std::string getSkillName(int skillid);
 	void addExperience(uint32_t exp);
 
-	bool NeedUpdateStats();
 	void updateInventoryWeigth();
 
 	void setDelayedWalkTask(SchedulerTask* task);
@@ -641,20 +640,6 @@ protected:
 	Party* party;
 	PartyList invitePartyList;
 
-	struct SentStats{
-		int32_t health;
-		int32_t healthMax;
-		uint32_t experience;
-		uint32_t level;
-		double freeCapacity;
-		int32_t mana;
-		int32_t manaMax;
-		int32_t manaSpent;
-		uint32_t magLevel;
-	};
-
-	SentStats lastSentStats;
-
 	std::string name;
 	std::string nameDescription;
 	uint32_t guid;
@@ -697,6 +682,7 @@ protected:
 		};
 	}
 
+	static uint32_t getPercentLevel(uint32_t count, uint32_t nextLevelCount);
 	virtual int32_t getLostExperience() const { return (skillLoss ? (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
