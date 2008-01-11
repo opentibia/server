@@ -543,7 +543,6 @@ int32_t Weapon::getManaCost(const Player* player) const
 	return 0;
 }
 
-
 bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 {
 	//onUseWeapon(cid, var)
@@ -700,7 +699,7 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 	const ItemType& it = Item::items[id];
 
 	//default values
-	if(it.slot_position & SLOTP_TWO_HAND){
+	if(it.amuType != AMMO_NONE){
 		//hit chance on two-handed weapons is limited to 90%
 		maxHitChance = 90;
 	}
@@ -709,11 +708,15 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 		maxHitChance = 75;
 	}
 
-	if(it.hitChance != 0){
+	if(it.hitChance != -1){
 		hitChance = it.hitChance;
 	}
 
-	if(it.breakChance != 0){
+	if(it.maxHitChance != -1){
+		maxHitChance = it.maxHitChance;
+	}
+
+	if(it.breakChance != -1){
 		breakChance = it.breakChance;
 	}
 
@@ -737,7 +740,7 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	m_scripted = false;
 
 	//default values
-	if(it.slot_position & SLOTP_TWO_HAND){
+	if(it.amuType != AMMO_NONE){
 		//hit chance on two-handed weapons is limited to 90%
 		maxHitChance = 90;
 	}
@@ -754,8 +757,16 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 		hitChance = it.hitChance;
 	}
 
+	if(it.maxHitChance != -1){
+		maxHitChance = it.maxHitChance;
+	}
+
 	if(it.breakChance != -1){
 		breakChance = it.breakChance;
+	}
+
+	if(it.ammoAction != AMMOACTION_NONE){
+		ammoAction = it.ammoAction;
 	}
 
 	return Weapon::configureWeapon(it);
@@ -769,30 +780,14 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 	}
 
 	int32_t chance;
-	int32_t _hitChance = hitChance;
-	int32_t _maxHitChance = maxHitChance;
-
-	if(item){
-		const ItemType& it = Item::items[item->getID()];
-		if(it.hitChance != -1){
-			//use the hitChance of the ammunition
-			_hitChance = it.hitChance;
-		}
-
-		if(it.maxHitChance != -1){
-			//use the maxHitChance of the ammunition
-			_maxHitChance = it.maxHitChance;
-		}
-	}
-
-	if(_hitChance == -1){
+	if(hitChance == -1){
 		//hit chance is based on distance to target and distance skill
 		uint32_t skill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
 		const Position& playerPos = player->getPosition();
 		const Position& targetPos = target->getPosition();
 		uint32_t distance = std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y));
 
-		if(_maxHitChance == 75){
+		if(maxHitChance == 75){
 			//chance for one-handed weapons
 			switch(distance){
 				case 1: chance = (uint32_t)((float)std::min(skill, (uint32_t)74)) + 1; break;
@@ -805,7 +800,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 				default: chance = hitChance; break;
 			}
 		}
-		else if(_maxHitChance == 90){
+		else if(maxHitChance == 90){
 			//formula for two-handed weapons
 			switch(distance){
 				case 1: chance = (uint32_t)((float)1.2 * std::min(skill, (uint32_t)74)) + 1; break;
@@ -818,7 +813,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 				default: chance = hitChance; break;
 			}
 		}
-		else if(_maxHitChance == 100){
+		else if(maxHitChance == 100){
 			switch(distance){
 				case 1: chance = (uint32_t)((float)1.35 * std::min(skill, (uint32_t)73)) + 1; break;
 				case 2: chance = (uint32_t)((float)3.2 * std::min(skill, (uint32_t)30)) + 4; break;
@@ -831,11 +826,11 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 			}
 		}
 		else{
-			chance = _maxHitChance;
+			chance = maxHitChance;
 		}
 	}
 	else{
-		chance = _hitChance;
+		chance = hitChance;
 	}
 
 	if(chance >= random_range(1, 100)){
