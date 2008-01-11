@@ -1249,13 +1249,6 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 			}
 		}
 
-		//[ added for beds system
-		BedItem* bed = Beds::instance().getBedBySleeper(getGUID());
-		if(bed){
-			bed->wakeUp(this);
-		}
-		//]
-
 		if(!storedConditionList.empty()){
 			for(ConditionList::const_iterator it = storedConditionList.begin(); it != storedConditionList.end(); ++it){
 				addCondition(*it);
@@ -1263,6 +1256,13 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 
 			storedConditionList.clear();
 		}
+
+		//[ added for beds system
+		BedItem* bed = Beds::instance().getBedBySleeper(getGUID());
+		if(bed){
+			bed->wakeUp(this);
+		}
+		//]
 
 		//scripting event - onLogIn
 		g_creatureEvents->playerLogIn(this);
