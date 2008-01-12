@@ -583,20 +583,21 @@ void Player::setVarStats(stats_t stat, int32_t modifier)
 		case STAT_MAXHITPOINTS:
 		{
 			if(getHealth() > getMaxHealth()){
-				changeHealth(getMaxHealth() - getHealth());
+			   //Creature::changeHealth is called  to avoid sendStats()
+				Creature::changeHealth(getMaxHealth() - getHealth());
 			}
-
-			g_game.addCreatureHealth(this);
+			else{
+            g_game.addCreatureHealth(this);
+			}
 			break;
 		}
 
 		case STAT_MAXMANAPOINTS:
 		{
 			if(getMana() > getMaxMana()){
-				changeMana(getMaxMana() - getMana());
+			   //Creature::changeMana is called  to avoid sendStats()
+				Creature::changeMana(getMaxMana() - getMana());
 			}
-
-			sendStats();
 			break;
 		}
 		default:
@@ -1605,7 +1606,7 @@ void Player::addExperience(uint32_t exp)
 uint32_t Player::getPercentLevel(uint32_t count, uint32_t nextLevelCount)
 {
 	if(nextLevelCount > 0){
-		uint32_t result = ((uint32_t)((float)count / nextLevelCount * 100));
+		uint32_t result = count*100/nextLevelCount;
 		if(result < 0 || result > 100){
 			return 0;
 		}

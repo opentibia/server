@@ -505,21 +505,32 @@ uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 	}
 
 	//skill modifiers
+	bool needUpdateSkills = false;
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		player->setVarSkill((skills_t)i, it.abilities.skills[i]);
+		if(it.abilities.skills[i]){
+			needUpdateSkills = true;
+			player->setVarSkill((skills_t)i, it.abilities.skills[i]);
+		}
 	}
-	player->sendSkills();
+	if(needUpdateSkills){
+		player->sendSkills();
+	}
 
 	//stat modifiers
+	bool needUpdateStats = false;
 	for(int32_t s = STAT_FIRST; s <= STAT_LAST; ++s){
 		if(it.abilities.stats[s]){
+			needUpdateStats = true;
 			player->setVarStats((stats_t)s, it.abilities.stats[s]);
 		}
 		if(it.abilities.statsPercent[s]){
+			needUpdateStats = true;
 			player->setVarStats((stats_t)s, (int32_t)(player->getDefaultStats((stats_t)s) * ((it.abilities.statsPercent[s] - 100) / 100.f)));
 		}
 	}
-	player->sendStats();
+	if(needUpdateStats){
+		player->sendStats();
+	}
 
 	return 1;
 }
@@ -561,21 +572,32 @@ uint32_t MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 	}
 
 	//skill modifiers
+	bool needUpdateSkills = false;
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		player->setVarSkill((skills_t)i, -it.abilities.skills[i]);
+		if(it.abilities.skills[i] != 0){
+			needUpdateSkills = true;
+			player->setVarSkill((skills_t)i, -it.abilities.skills[i]);
+		}
 	}
-	player->sendSkills();
+	if(needUpdateSkills){
+		player->sendSkills();
+	}
 
 	//stat modifiers
+	bool needUpdateStats = false;
 	for(int32_t s = STAT_FIRST; s <= STAT_LAST; ++s){
 		if(it.abilities.stats[s]){
+			needUpdateStats = true;
 			player->setVarStats((stats_t)s, -it.abilities.stats[s]);
 		}
-		if(it.abilities.statsPercent[s]){ //be sure we have statsPercent
+		if(it.abilities.statsPercent[s]){
+			needUpdateStats = true;
 			player->setVarStats((stats_t)s, -(int32_t)(player->getDefaultStats((stats_t)s) * ((it.abilities.statsPercent[s] - 100) / 100.f)));
 		}
 	}
-	player->sendStats();
+	if(needUpdateStats){
+		player->sendStats();
+	}
 
 	return 1;
 }

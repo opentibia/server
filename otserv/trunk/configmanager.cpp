@@ -34,7 +34,7 @@ ConfigManager::~ConfigManager()
 }
 
 bool ConfigManager::loadFile(const std::string& _filename)
-{	
+{
 	lua_State* L = lua_open();
 
 	if(!L) return false;
@@ -51,13 +51,13 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[CONFIG_FILE] = _filename;
 		m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
 		m_confInteger[PORT] = getGlobalNumber(L, "port");
-		
+
 #if defined __CONFIG_V2__
 		unsigned int pos = _filename.rfind("/");
 		std::string configPath = "";
 		if(pos != std::string::npos)
 			configPath = _filename.substr(0, pos+1);
-		
+
 		m_confString[DATA_DIRECTORY] = configPath + getGlobalString(L, "datadir", "data/");
 		m_confString[MAP_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "map");
 		m_confString[MAP_STORE_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "mapstore");
@@ -70,7 +70,10 @@ bool ConfigManager::loadFile(const std::string& _filename)
 #endif
 		m_confString[HOUSE_RENT_PERIOD] = getGlobalString(L, "houserentperiod", "monthly");
 		m_confString[MAP_KIND] = getGlobalString(L, "mapkind");
-		m_confString[MD5_PASS] = getGlobalString(L, "md5passwords");
+		if(getGlobalString(L, "md5passwords") != ""){
+			std::cout << "Warning: [ConfigManager] md5passwords is deprecated. Use passwordtype instead." << std::endl;
+		}
+		m_confString[PASSWORD_TYPE_STR] = getGlobalString(L, "passwordtype");
 		m_confString[WORLD_TYPE] = getGlobalString(L, "worldtype");
 		m_confString[SQL_HOST] = getGlobalString(L, "sql_host");
 		m_confString[SQL_USER] = getGlobalString(L, "sql_user");
@@ -134,8 +137,8 @@ bool ConfigManager::reload()
 	return loadFile(m_confString[CONFIG_FILE]);
 }
 
-const std::string& ConfigManager::getString(uint32_t _what)
-{ 
+const std::string& ConfigManager::getString(uint32_t _what) const
+{
 	if(m_isLoaded && _what < LAST_STRING_CONFIG)
 		return m_confString[_what];
 	else
@@ -145,7 +148,7 @@ const std::string& ConfigManager::getString(uint32_t _what)
 	}
 }
 
-int ConfigManager::getNumber(uint32_t _what)
+int ConfigManager::getNumber(uint32_t _what) const
 {
 	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
 		return m_confInteger[_what];

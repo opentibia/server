@@ -54,7 +54,7 @@ public:
 		LOCATION,
 		IP,
 		MOTD,
-		MD5_PASS,
+		PASSWORD_TYPE_STR,
 		WORLD_TYPE,
 		SQL_HOST,
 		SQL_USER,
@@ -105,8 +105,8 @@ public:
 	bool loadFile(const std::string& _filename);
 	bool reload();
 
-	const std::string& getString(uint32_t _what);
-	int getNumber(uint32_t _what);
+	const std::string& getString(uint32_t _what) const;
+	int getNumber(uint32_t _what) const;
 	bool setNumber(uint32_t _what, int _value);
 
 private:

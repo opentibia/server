@@ -3188,7 +3188,7 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 		return 1;
 	}
 
-	if(!g_game.placeCreature(monster, (Position&)pos)){
+	if(!g_game.placeCreature(monster, pos)){
 		delete monster;
 		std::string error_str = (std::string)"Can not summon monster: " + name;
 		reportErrorFunc(error_str);
@@ -3222,7 +3222,7 @@ int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
 		}
 
 		player->addSummon(monster);
-		if(!g_game.placeCreature(monster, (Position&)pos)){
+		if(!g_game.placeCreature(monster, pos)){
 			player->removeSummon(monster);
 			delete monster;
 			std::string error_str = (std::string)"Can not summon monster: " + name;
@@ -3850,8 +3850,8 @@ int LuaScriptInterface::luaGetThingPos(lua_State *L)
 	uint32_t stackpos = 0;
 	if(thing){
 		pos = thing->getPosition();
-		if(thing->getParent()){
-			stackpos = thing->getParent()->__getIndexOfThing(thing);
+		if(Tile* tile = thing->getTile()){
+			stackpos = tile->__getIndexOfThing(thing);
 		}
 	}
 	else{
@@ -5512,9 +5512,8 @@ int LuaScriptInterface::luaGetCreaturePosition(lua_State *L)
 	if(creature){
 		Position pos = creature->getPosition();
 		uint32_t stackpos = 0;
-		Tile* tile = creature->getTile();
-		if(tile){
-			stackpos = creature->getParent()->__getIndexOfThing(creature);
+		if(Tile* tile = creature->getTile()){
+			stackpos = tile->__getIndexOfThing(creature);
 		}
 		pushPosition(L, pos, stackpos);
 	}

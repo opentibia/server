@@ -316,9 +316,23 @@ int main(int argc, char *argv[])
 	std::cout << ":: Skulls enabled" << std::endl;
 	#endif
 
-	if(g_config.getString(ConfigManager::MD5_PASS) == "yes"){
+	std::string passwordType = g_config.getString(ConfigManager::PASSWORD_TYPE_STR);
+	std::transform(passwordType.begin(), passwordType.end(), passwordType.begin(), upchar);
+	if(passwordType == "" || passwordType == "PLAIN"){
+		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_PLAIN);
+		std::cout << ":: Use plain passwords" << std::endl;
+	}
+	else if(passwordType == "MD5"){
 		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_MD5);
 		std::cout << ":: Use MD5 passwords" << std::endl;
+	}
+	else if(passwordType == "SHA1"){
+		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_SHA1);
+		std::cout << ":: Use SHA1 passwords" << std::endl;
+	}
+	else{
+		ErrorMessage("Unknown password type!");
+		return -1;
 	}
 
 	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE), g_config.getString(ConfigManager::MAP_KIND))){
@@ -327,25 +341,6 @@ int main(int argc, char *argv[])
 
 	Raids::getInstance()->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY) + "raids/raids.xml");
 	Raids::getInstance()->startup();
-/*
-	// Call to WSA Startup on Windows Systems...
-#ifdef WIN32
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	wVersionRequested = MAKEWORD( 1, 1 );
-
-	if(WSAStartup(wVersionRequested, &wsaData) != 0){
-		ErrorMessage("Winsock startup failed!!");
-		return -1;
-	}
-
-	if((LOBYTE(wsaData.wVersion) != 1) || (HIBYTE(wsaData.wVersion) != 1)) {
-		WSACleanup( );
-		ErrorMessage("No Winsock 1.1 found!");
-		return -1;
-	}
-#endif
-*/
 
 	std::pair<uint32_t, uint32_t> IpNetMask;
 	IpNetMask.first  = inet_addr("127.0.0.1");
@@ -413,8 +408,6 @@ int main(int argc, char *argv[])
 
 	Status* status = Status::instance();
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
-
-	//OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
 
 	g_game.setGameState(GAME_STATE_INIT);
 	g_game.setGameState(GAME_STATE_NORMAL);
