@@ -235,6 +235,7 @@ public:
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 
+	virtual void gainHealth(Creature* caster, int32_t healthGain);
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);
 
@@ -243,7 +244,8 @@ public:
 
 	virtual void onDie();
 	virtual int32_t getGainedExperience(Creature* attacker) const;
-	virtual bool addDamagePoints(Creature* attacker, int32_t damagePoints);
+	void addDamagePoints(Creature* attacker, int32_t damagePoints);
+	void addHealPoints(Creature* caster, int32_t healthPoints);
 	bool hasBeenAttacked(uint32_t attackerId);
 
 	//combat event functions
@@ -255,13 +257,16 @@ public:
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target);
-	virtual void onGainExperience(int32_t gainExperience);
+	virtual void onGainExperience(int32_t gainExp);
+	virtual void onGainSharedExperience(int32_t gainExp);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
 	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
+	virtual void onIdleStatus();
 
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
@@ -341,13 +346,14 @@ protected:
 	//combat variables
 	Creature* attackedCreature;
 
-	struct damageBlock_t{
+	struct CountBlock_t{
 		int32_t total;
 		int64_t ticks;
 	};
 
-	typedef std::map<uint32_t, damageBlock_t> DamageMap;
-	DamageMap damageMap;
+	typedef std::map<uint32_t, CountBlock_t> CountMap;
+	CountMap damageMap;
+	CountMap healMap;
 	uint32_t lastHitCreature;
 	uint32_t blockCount;
 	uint32_t blockTicks;

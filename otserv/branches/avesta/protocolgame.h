@@ -109,6 +109,7 @@ private:
 	void parseRevokePartyInvitation(NetworkMessage& msg);
 	void parsePassPartyLeadership(NetworkMessage& msg);
 	void parseLeaveParty(NetworkMessage& msg);
+	void parseEnableSharedPartyExperience(NetworkMessage& msg);
 
 	//trade methods
 	void parseRequestTrade(NetworkMessage& msg);
@@ -181,7 +182,7 @@ private:
 	void sendWorldLight(const LightInfo& lightInfo);
 
 	void sendCreatureSkull(const Creature* creature, Skulls_t skull);
-	void sendCreatureShield(const Creature* creature, PartyShields_t shield);
+	void sendCreatureShield(const Creature* creature);
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 
 	//tiles

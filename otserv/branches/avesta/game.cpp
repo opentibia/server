@@ -2724,6 +2724,20 @@ bool Game::playerLeaveParty(uint32_t playerId)
 	return player->getParty()->leaveParty(player);
 }
 
+bool Game::playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved()){
+		return false;
+	}
+
+	if(!player->getParty() || player->hasCondition(CONDITION_INFIGHT)){
+		return false;
+	}
+
+	return player->getParty()->setSharedExperience(player, sharedExpActive == 1);
+}
+
 bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMode_t chaseMode, bool safeMode)
 {
 	Player* player = getPlayerByID(playerId);
@@ -3356,7 +3370,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 			return false;
 		}
 
-		target->changeHealth(healthChange);
+		target->gainHealth(attacker, healthChange);
 	}
 	else{
 		SpectatorVec list;

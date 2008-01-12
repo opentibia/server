@@ -1348,6 +1348,10 @@ void Player::onCreatureMove(const Creature* creature, const Position& newPos, co
 				}
 			}
 		}
+
+		if(getParty()){
+			getParty()->updateSharedExperience();
+		}
 	}
 }
 
@@ -1616,6 +1620,10 @@ void Player::addExperience(uint32_t exp)
 
 		g_game.changeSpeed(this, 0);
 		g_game.addCreatureHealth(this);
+
+		if(getParty()){
+			getParty()->updateSharedExperience();
+		}
 
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
@@ -3067,7 +3075,7 @@ void Player::onEndCondition(ConditionType_t type)
 	sendIcons();
 
 	if(type == CONDITION_INFIGHT){
-		damageMap.clear();
+		onIdleStatus();
 		pzLocked = false;
 
 #ifdef __SKULLSYSTEM__
@@ -3148,10 +3156,44 @@ void Player::onAttacked()
 	}
 }
 
+void Player::onIdleStatus()
+{
+	Creature::onIdleStatus();
+	if(getParty()){
+		getParty()->clearPlayerPoints(this);
+	}
+}
+
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
-	//TODO: Share damage points with team (share exp)
 	Creature::onAttackedCreatureDrainHealth(target, points);
+
+	if(target && !Combat::isPlayerCombat(target) ){
+		Monster* tmpMonster = target->getMonster();
+		if( tmpMonster && tmpMonster->isHostile()){
+			//We have fulfilled a requirement for shared experience
+			getParty()->addPlayerDamageMonster(this, points);
+		}
+	}
+}
+
+void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
+{
+	Creature::onTargetCreatureGainHealth(target, points);
+	if(target && getParty()){
+		Player* tmpPlayer = NULL;
+		if(target->getPlayer()){
+			tmpPlayer = target->getPlayer();
+		}
+		else if(target->getMaster() && target->getMaster()->getPlayer()){
+			tmpPlayer = target->getMaster()->getPlayer();
+		}
+
+		if( isPartner(tmpPlayer) ){
+			//We have fulfilled a requirement for shared experience
+			getParty()->addPlayerHealedMember(this, points);
+		}
+	}
 }
 
 void Player::onKilledCreature(Creature* target)
@@ -3187,27 +3229,46 @@ void Player::onKilledCreature(Creature* target)
 	}
 }
 
-void Player::onGainExperience(int32_t gainExperience)
+void Player::gainExperience(int32_t gainExp)
+{
+	if(!hasFlag(PlayerFlag_NotGainExperience)){
+		if(gainExp > 0){
+			//soul regeneration
+			if((uint32_t)gainExp >= getLevel()){
+				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
+				//Soul regeneration rate is defined by the vocation
+				uint32_t vocSoulTicks = vocation->getSoulGainTicks();
+				condition->setParam(CONDITIONPARAM_SOULGAIN, 1);
+				condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
+				addCondition(condition);
+			}
+
+			addExperience(gainExp);
+		}
+	}
+}
+
+void Player::onGainExperience(int32_t gainExp)
 {
 	if(hasFlag(PlayerFlag_NotGainExperience)){
-		gainExperience = 0;
+		gainExp = 0;
 	}
 
-	Creature::onGainExperience(gainExperience);
-
-	if(gainExperience > 0){
-		//soul regeneration
-		if((uint32_t)gainExperience >= getLevel()){
-			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
-			//Soul regeneration rate is defined by the vocation
-			uint32_t vocSoulTicks = vocation->getSoulGainTicks();
-			condition->setParam(CONDITIONPARAM_SOULGAIN, 1);
-			condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
-			addCondition(condition);
-		}
-
-		addExperience(gainExperience);
+	Party* party = getParty();
+	if(party && party->isSharedExperienceActive() && party->isSharedExperienceEnabled()){
+		party->shareExperience(gainExp);
+		//We will get a share of the experience through the sharing mechanism
+		gainExp = 0;
 	}
+
+	Creature::onGainExperience(gainExp);
+	gainExperience(gainExp);
+}
+
+void Player::onGainSharedExperience(int32_t gainExp)
+{
+	Creature::onGainSharedExperience(gainExp);
+	gainExperience(gainExp);
 }
 
 bool Player::isImmune(CombatType_t type) const
@@ -3267,12 +3328,43 @@ PartyShields_t Player::getPartyShield(const Player* player) const
 		return SHIELD_NONE;
 	}
 
-	if(getParty()){
-		if(getParty()->getLeader() == player){
-			return SHIELD_YELLOW;
+	Party* party = getParty();
+	if(party){
+		if(party->getLeader() == player){
+			if(party->isSharedExperienceActive()){
+				if(party->isSharedExperienceEnabled()){
+					return SHIELD_YELLOW_SHAREDEXP;
+				}
+				else{
+					if(party->canUseSharedExperience(player)){
+						return SHIELD_YELLOW_NOSHAREDEXP;
+					}
+					else{
+						return SHIELD_YELLOW_NOSHAREDEXP_BLINK;
+					}
+				}
+			}
+			else{
+				return SHIELD_YELLOW;
+			}
 		}
-		if(getParty()->isPlayerMember(player)){
-			return SHIELD_BLUE;
+		if(party->isPlayerMember(player)){
+			if(party->isSharedExperienceActive()){
+				if(party->isSharedExperienceEnabled()){
+					return SHIELD_BLUE_SHAREDEXP;
+				}
+				else{
+					if(party->canUseSharedExperience(player)){
+						return SHIELD_BLUE_NOSHAREDEXP;
+					}
+					else{
+						return SHIELD_BLUE_NOSHAREDEXP_BLINK;
+					}
+				}
+			}
+			else{
+				return SHIELD_BLUE;
+			}
 		}
 		if(isInviting(player)){
 			return SHIELD_WHITEBLUE;
@@ -3303,13 +3395,13 @@ bool Player::isPartner(const Player* player) const
 	return (getParty() == player->getParty());
 }
 
-void Player::sendPlayerPartyIcons(Player* player, PartyShields_t shield)
+void Player::sendPlayerPartyIcons(Player* player)
 {
-	sendCreatureShield(player, shield);
+	sendCreatureShield(player);
 
 #ifdef __SKULLSYSTEM__
 	if(player->getSkull() == SKULL_NONE){
-		if(shield == SHIELD_BLUE || shield == SHIELD_YELLOW){
+		if(isPartner(player)){
 			sendCreatureSkull(player, SKULL_GREEN);
 		}
 		else{

@@ -477,7 +477,7 @@ void Creature::onDie()
 		}
 	}
 
-	for(DamageMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+	for(CountMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
 		if(Creature* attacker = g_game.getCreatureByID((*it).first)){
 			attacker->onAttackedCreatureKilled(this);
 		}
@@ -540,13 +540,13 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 	*_lastHitCreature = g_game.getCreatureByID(lastHitCreature);
 
 	int32_t mostDamage = 0;
-	damageBlock_t db;
-	for(DamageMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		db = it->second;
+	CountBlock_t cb;
+	for(CountMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+		cb = it->second;
 
-		if((db.total > mostDamage && (OTSYS_TIME() - db.ticks <= g_game.getInFightTicks()))){
+		if((cb.total > mostDamage && (OTSYS_TIME() - cb.ticks <= g_game.getInFightTicks()))){
 			if((*_mostDamageCreature = g_game.getCreatureByID((*it).first))){
-				mostDamage = db.total;
+				mostDamage = cb.total;
 			}
 		}
 	}
@@ -556,7 +556,7 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 
 bool Creature::hasBeenAttacked(uint32_t attackerId)
 {
-	DamageMap::iterator it = damageMap.find(attackerId);
+	CountMap::iterator it = damageMap.find(attackerId);
 	if(it != damageMap.end()){
 		return (OTSYS_TIME() - it->second.ticks <= g_game.getInFightTicks());
 	}
@@ -589,6 +589,22 @@ void Creature::changeMana(int32_t manaChange)
 	}
 	else{
 		mana = std::max((int32_t)0, mana + manaChange);
+	}
+}
+
+void Creature::gainHealth(Creature* caster, int32_t healthGain)
+{
+	if(healthGain > 0){
+		int32_t prevHealth = getHealth();
+		changeHealth(healthGain);
+
+		int32_t effectiveGain = getHealth() - prevHealth;
+		if(caster){
+			caster->onTargetCreatureGainHealth(this, effectiveGain);
+		}
+	}
+	else{
+		changeHealth(healthGain);
 	}
 }
 
@@ -757,14 +773,14 @@ double Creature::getDamageRatio(Creature* attacker) const
 	int32_t totalDamage = 0;
 	int32_t attackerDamage = 0;
 
-	damageBlock_t db;
-	for(DamageMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		db = it->second;
+	CountBlock_t cb;
+	for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+		cb = it->second;
 
-		totalDamage += db.total;
+		totalDamage += cb.total;
 
 		if(it->first == attacker->getID()){
-			attackerDamage += db.total;
+			attackerDamage += cb.total;
 		}
 	}
 
@@ -777,19 +793,17 @@ int32_t Creature::getGainedExperience(Creature* attacker) const
 	return (int32_t)std::floor(getDamageRatio(attacker) * lostExperience * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 }
 
-bool Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
+void Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
 {
 	if(damagePoints > 0){
 		uint32_t attackerId = (attacker ? attacker->getID() : 0);
-		//damageMap[attackerId] += damagePoints;
 
-		DamageMap::iterator it = damageMap.find(attackerId);
-
+		CountMap::iterator it = damageMap.find(attackerId);
 		if(it == damageMap.end()){
-			damageBlock_t db;
-			db.ticks = OTSYS_TIME();
-			db.total = damagePoints;
-			damageMap[attackerId] = db;
+			CountBlock_t cb;
+			cb.ticks = OTSYS_TIME();
+			cb.total = damagePoints;
+			damageMap[attackerId] = cb;
 		}
 		else{
 			it->second.total += damagePoints;
@@ -798,8 +812,25 @@ bool Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
 
 		lastHitCreature = attackerId;
 	}
+}
 
-	return true;
+void Creature::addHealPoints(Creature* caster, int32_t healthPoints)
+{
+	if(healthPoints > 0){
+		uint32_t casterId = (caster ? caster->getID() : 0);
+
+		CountMap::iterator it = healMap.find(casterId);
+		if(it == healMap.end()){
+			CountBlock_t cb;
+			cb.ticks = OTSYS_TIME();
+			cb.total = healthPoints;
+			healMap[casterId] = cb;
+		}
+		else{
+			it->second.total += healthPoints;
+			it->second.ticks = OTSYS_TIME();
+		}
+	}
 }
 
 void Creature::onAddCondition(ConditionType_t type)
@@ -851,16 +882,27 @@ void Creature::onAttacked()
 	//
 }
 
+void Creature::onIdleStatus()
+{
+	healMap.clear();
+	damageMap.clear();
+}
+
 void Creature::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	target->addDamagePoints(this, points);
 }
 
+void Creature::onTargetCreatureGainHealth(Creature* target, int32_t points)
+{
+	target->addHealPoints(this, points);
+}
+
 void Creature::onAttackedCreatureKilled(Creature* target)
 {
 	if(target != this){
-		int32_t gainedExperience = target->getGainedExperience(this);
-		onGainExperience(gainedExperience);
+		int32_t gainExp = target->getGainedExperience(this);
+		onGainExperience(gainExp);
 	}
 }
 
@@ -877,20 +919,25 @@ void Creature::onKilledCreature(Creature* target)
 	}
 }
 
-void Creature::onGainExperience(int32_t gainExperience)
+void Creature::onGainExperience(int32_t gainExp)
 {
-	if(gainExperience > 0){
-
+	if(gainExp > 0){
 		if(getMaster()){
-			gainExperience = gainExperience / 2;
-			getMaster()->onGainExperience(gainExperience);
+			gainExp = gainExp / 2;
+			getMaster()->onGainExperience(gainExp);
 		}
 
 		std::stringstream strExp;
-		strExp << gainExperience;
-
+		strExp << gainExp;
 		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
 	}
+}
+
+void Creature::onGainSharedExperience(int32_t gainExp)
+{
+		std::stringstream strExp;
+		strExp << gainExp;
+		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
 }
 
 void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)

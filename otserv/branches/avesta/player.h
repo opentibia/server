@@ -306,12 +306,15 @@ public:
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target);
-	virtual void onGainExperience(int32_t gainExperience);
+	virtual void onGainExperience(int32_t gainExp);
+	virtual void onGainSharedExperience(int32_t gainExp);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
 	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
+	virtual void onIdleStatus();
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
@@ -320,7 +323,7 @@ public:
 	PartyShields_t getPartyShield(const Player* player) const;
 	bool isInviting(const Player* player) const;
 	bool isPartner(const Player* player) const;
-	void sendPlayerPartyIcons(Player* player, PartyShields_t shield);
+	void sendPlayerPartyIcons(Player* player);
 	bool addPartyInvitation(Party* party);
 	bool removePartyInvitation(Party* party);
 	void clearPartyInvitations();
@@ -380,8 +383,8 @@ public:
 		}
 	void sendCreatureLight(const Creature* creature)
 		{if(client) client->sendCreatureLight(creature);}
-	void sendCreatureShield(const Creature* creature, PartyShields_t shield)
-	    {if(client) client->sendCreatureShield(creature, shield);}
+	void sendCreatureShield(const Creature* creature)
+	    {if(client) client->sendCreatureShield(creature);}
 
 	//container
 	void sendAddContainerItem(const Container* container, const Item* item);
@@ -524,6 +527,7 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	std::string getSkillName(int skillid);
+	void gainExperience(int32_t exp);
 	void addExperience(uint32_t exp);
 
 	void updateInventoryWeigth();

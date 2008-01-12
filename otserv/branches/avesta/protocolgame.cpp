@@ -637,6 +637,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseLeaveParty(msg);
 		break;
 
+	case 0xA8:
+		parseEnableSharedPartyExperience(msg);
+		break;
+
 	case 0xAA:
 		parseCreatePrivateChannel(msg);
 		break;
@@ -1248,6 +1252,13 @@ void ProtocolGame::parseLeaveParty(NetworkMessage& msg)
 	addGameTask(&Game::playerLeaveParty, player->getID());
 }
 
+void ProtocolGame::parseEnableSharedPartyExperience(NetworkMessage& msg)
+{
+	uint8_t sharedExpActive = msg.GetByte();
+	uint8_t unknown = msg.GetByte();
+	addGameTask(&Game::playerEnableSharedPartyExperience, player->getID(), sharedExpActive, unknown);
+}
+
 void ProtocolGame::parseTextWindow(NetworkMessage& msg)
 {
 	uint32_t windowTextId = msg.GetU32();
@@ -1410,14 +1421,14 @@ void ProtocolGame::sendCreatureSkull(const Creature* creature, Skulls_t skull)
 	}
 }
 
-void ProtocolGame::sendCreatureShield(const Creature* creature, PartyShields_t shield)
+void ProtocolGame::sendCreatureShield(const Creature* creature)
 {
 	if(canSee(creature)){
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			msg->AddByte(0x91);
 			msg->AddU32(creature->getID());
-			msg->AddByte(shield);
+			msg->AddByte(player->getPartyShield(creature->getPlayer()));
 		}
 	}
 }
@@ -2213,7 +2224,7 @@ void ProtocolGame::AddCreature(NetworkMessage* msg,const Creature* creature, boo
 #else
 	msg->AddByte(SKULL_NONE);
 #endif
-	msg->AddByte(0x00); // shield
+	msg->AddByte(player->getPartyShield(creature->getPlayer()));
 }
 
 void ProtocolGame::AddPlayerStats(NetworkMessage* msg)

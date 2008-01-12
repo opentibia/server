@@ -51,15 +51,43 @@ public:
 
 	bool isPlayerMember(const Player* player) const;
 	bool isPlayerInvited(const Player* player) const;
-	void updatePartyIcons(Player* player, PartyShields_t shield);
-	void updateInvitationIcons(Player* player, PartyShields_t shield);
+	void updateAllPartyIcons();
+	void updatePartyIcons(Player* player);
 	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 
+	void shareExperience(uint32_t experience);
+	bool setSharedExperience(Player* player, bool _sharedExpActive);
+	bool isSharedExperienceActive() const {return sharedExpActive;}
+	bool isSharedExperienceEnabled() const {return sharedExpEnabled;}
+	bool canUseSharedExperience(const Player* player) const;
+	void updateSharedExperience();
+
+	void addPlayerHealedMember(Player* player, uint32_t points);
+	void addPlayerDamageMonster(Player* player, uint32_t points);
+	void clearPlayerPoints(Player* player);
+
 protected:
+	bool sharedExpActive;
+	bool sharedExpEnabled;
+
 	Player* leader;
 	PlayerVector memberList;
 	PlayerVector inviteList;
+
+	struct CountBlock_t{
+		int32_t totalHeal;
+		int32_t totalDamage;
+		int64_t ticks;
+	};
+	typedef std::map<uint32_t, CountBlock_t> CountMap;
+	CountMap pointMap;
+
+	bool canEnableSharedExperience();
+	/*
+	void hasAttackedMonster(Player* player);
+	void hasHealedMember(Player* player);
+	*/
 };
 
 #endif

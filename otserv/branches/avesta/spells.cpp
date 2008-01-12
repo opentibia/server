@@ -934,6 +934,7 @@ ReturnValue Spell::CreateIllusion(Creature* creature, uint32_t itemId, int32_t t
 InstantSpell::InstantSpell(LuaScriptInterface* _interface) :
 TalkAction(_interface)
 {
+	casterTargetOrDirection = false;
 	needDirection = false;
 	hasParam = false;
 	checkLineOfSight = false;

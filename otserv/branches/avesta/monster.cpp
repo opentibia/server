@@ -387,6 +387,7 @@ bool Monster::deactivate()
 		return false;
 	}
 	
+	onIdleStatus();
 	isActivated = false;
 	g_game.removeCreatureCheck(this);
 	return true;
