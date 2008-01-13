@@ -1545,8 +1545,8 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 		Item* newItem = NULL;
 		if(newCount == -1){
 			newItem = Item::CreateItem(newId);
-	}
-	else{
+		}
+		else{
 			newItem = Item::CreateItem(newId, newCount);
 		}
 
@@ -1556,17 +1556,17 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 			return NULL;
 		}
 
-			return newItem;
-		}
+		return newItem;
+	}
 
 	if(curType.type == newType.type){
 		//Both items has the same type so we can safely change id/subtype
 
 		if((item->isStackable() || item->hasCharges() ) && newCount == 0){
-						internalRemoveItem(item);
+			internalRemoveItem(item);
 			return NULL;
-					}
-					else{
+		}
+		else{
 			cylinder->postRemoveNotification(item, itemIndex, true);
 			uint16_t itemId = item->getID();
 			int32_t count = item->getItemCountOrSubtype();
@@ -1574,39 +1574,39 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 			if(curType.id != newType.id){
 				if(newType.group != curType.group){
 					item->setDefaultSubtype();
-					}
-
-				itemId = newId;
 				}
 
-			if(count != -1 && item->hasSubType()){
+				itemId = newId;
+			}
+
+			if(newCount != -1 && item->hasSubType()){
 				count = newCount;
-					}
+			}
 
 			cylinder->__updateThing(item, itemId, count);
 			cylinder->postAddNotification(item, itemIndex);
-						return item;
-					}
-				}
-				else{
+			return item;
+		}
+	}
+	else{
 		//Replacing the the old item with the new while maintaining the old position
 		Item* newItem = NULL;
 		if(newCount == -1){
 			newItem = Item::CreateItem(newId);
-				}
+		}
 		else{
 			newItem = Item::CreateItem(newId, newCount);
-			}
+		}
 
 		cylinder->__replaceThing(itemIndex, newItem);
 		cylinder->postAddNotification(newItem, itemIndex);
 
 		item->setParent(NULL);
-				cylinder->postRemoveNotification(item, itemIndex, true);
+		cylinder->postRemoveNotification(item, itemIndex, true);
 		FreeThing(item);
 
 		return newItem;
-				}
+	}
 
 	return NULL;
 }
