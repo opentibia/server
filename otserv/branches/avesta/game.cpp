@@ -1527,8 +1527,8 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 	}
 
 	if(!item->canTransform()){
-			return item;
-		}
+		return item;
+	}
 
 	const ItemType& curType = Item::items[item->getID()];
 	const ItemType& newType = Item::items[newId];
@@ -1579,7 +1579,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 				itemId = newId;
 			}
 
-			if(newCount != -1 && item->hasSubType()){
+			if(newCount != -1 && newType.hasSubType()){
 				count = newCount;
 			}
 

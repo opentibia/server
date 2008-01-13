@@ -1667,7 +1667,7 @@ InstantSpell(_interface)
 {
 	isAggressive = false;
 	conjureId = 0;
-	conjureCount = 1;
+	conjureCount = 0;
 	conjureReagentId = 0;
 }
 

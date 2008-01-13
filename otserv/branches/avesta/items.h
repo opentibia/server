@@ -154,6 +154,7 @@ public:
 	bool isDepot() const {return (type == ITEM_TYPE_DEPOT);}
 	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
+	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
 	
 	//[ added for beds system
 	bool isBed() const {return isBedItem;}

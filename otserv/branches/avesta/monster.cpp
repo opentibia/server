@@ -280,7 +280,8 @@ void Monster::onCreatureLeave(Creature* creature)
 	}
 
 	//update targetList
-	if(creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)){
+	if( (creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
+		(creature->getMaster() && creature->getMaster()->getPlayer()) ){
 		TargetList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
 		if(it != targetList.end()){
 			(*it)->releaseThing2();
