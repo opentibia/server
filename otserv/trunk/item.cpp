@@ -249,7 +249,7 @@ void Item::setItemCountOrSubtype(unsigned char n)
 bool Item::hasSubType() const
 {
 	const ItemType& it = items[id];
-	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.charges != 0);
+	return it.hasSubType();
 }
 
 uint8_t Item::getSubType() const
