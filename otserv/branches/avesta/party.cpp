@@ -223,6 +223,7 @@ bool Party::leaveParty(Player* player)
 
 	updateSharedExperience();
 	updatePartyIcons(player);
+	clearPlayerPoints(player);
 
 	std::stringstream ss;
 	ss << player->getName() << " has left the party.";
