@@ -567,7 +567,7 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 	}
 	else{
 		//update percent
-		uint32_t newPercent = std::min((uint32_t)100, (100*skills[skill][SKILL_TRIES])/vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1));
+		uint32_t newPercent = Player::getPercentLevel(skills[skill][SKILL_TRIES], vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1));
 	 	if(skills[skill][SKILL_PERCENT] != newPercent){
 			skills[skill][SKILL_PERCENT] = newPercent;
 			sendSkills();
@@ -1586,7 +1586,6 @@ void Player::addExperience(uint32_t exp)
 
 	if(prevLevel != newLevel){
 		level = newLevel;
-		levelPercent = Player::getPercentLevel(getExperience(), Player::getExpForLevel(level + 1));
 		updateBaseSpeed();
 
 		int32_t newSpeed = getBaseSpeed();
@@ -1599,6 +1598,9 @@ void Player::addExperience(uint32_t exp)
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 	}
+
+	uint64_t currLevelExp = Player::getExpForLevel(level);
+	levelPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
 
 	sendStats();
 }
@@ -1896,7 +1898,7 @@ void Player::die()
 		}
 
 		manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
-		magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
+		//magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
 
 		//Skill loss
 		uint32_t lostSkillTries;
@@ -1939,7 +1941,7 @@ void Player::die()
 				break;
 		}
 
-		levelPercent = Player::getPercentLevel(getExperience(), Player::getExpForLevel(level + 1));
+		//levelPercent = Player::getPercentLevel(getExperience(), Player::getExpForLevel(level + 1));
 		if(newLevel != level){
 			std::stringstream lvMsg;
 			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";

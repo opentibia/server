@@ -250,6 +250,13 @@ std::string urlEncode(const char* str)
 bool passwordTest(const std::string &plain, std::string &hash)
 {
 	switch(g_config.getNumber(ConfigManager::PASSWORD_TYPE)){
+	case PASSWORD_TYPE_PLAIN:
+	{
+		if(plain == hash){
+			return true;
+		}
+		break;
+	}
 	case PASSWORD_TYPE_MD5:
 	{
 		MD5_CTX m_md5;
@@ -266,13 +273,6 @@ bool passwordTest(const std::string &plain, std::string &hash)
 
 		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
 		if(hexStream.str() == hash){
-			return true;
-		}
-		break;
-	}
-	case PASSWORD_TYPE_PLAIN:
-	{
-		if(plain == hash){
 			return true;
 		}
 		break;
