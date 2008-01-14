@@ -3338,7 +3338,7 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 
 void Game::startDecay(Item* item)
 {
-	if(item->canDecay()){
+	if(item && item->canDecay()){
 		uint32_t decayState = item->getDecaying();
 		if(decayState == DECAYING_TRUE){
 			//already decaying
