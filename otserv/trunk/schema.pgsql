@@ -10,7 +10,7 @@ CREATE TABLE "groups" (
 
 CREATE TABLE "accounts" (
     "id" BIGSERIAL,
-    "password" VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL for MD5*/,
+    "password" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255) NOT NULL DEFAULT '',
     "blocked" SMALLINT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id")
