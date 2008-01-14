@@ -86,6 +86,9 @@ Creature::Creature() :
 	blockCount = 0;
 	blockTicks = 0;
 	walkUpdateTicks = 0;
+#ifndef __ONECREATURE_EVENT_
+	eventCheck = 0;
+#endif
 
 	scriptEventsBitField = 0;
   }
@@ -150,6 +153,25 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+#ifndef __ONECREATURE_EVENT_
+void Creature::addEventThink()
+{
+	if(eventCheck == 0){
+		eventCheck = Scheduler::getScheduler().addEvent(
+			createSchedulerTask(EVENT_CREATUREINTERVAL,
+			boost::bind(&Game::checkCreature, &g_game, getID())));
+	}
+}
+
+void Creature::stopEventThink()
+{
+	if(eventCheck != 0){
+		Scheduler::getScheduler().stopEvent(eventCheck);
+		eventCheck = 0;
+	}
+}
+#endif
+
 void Creature::onThink(uint32_t interval)
 {
 	/*
@@ -178,6 +200,13 @@ void Creature::onThink(uint32_t interval)
 	}
 
 	onAttacking(interval);
+
+#ifndef __ONECREATURE_EVENT_
+	if(eventCheck != 0){
+		eventCheck = 0;
+		addEventThink();
+	}
+#endif
 }
 
 void Creature::onAttacking(uint32_t interval)
@@ -416,6 +445,25 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 			else if(std::abs(newPos.x - oldPos.x) >=1 && std::abs(newPos.y - oldPos.y) >= 1){
 				//diagonal extra cost
 				lastStepCost = 2;
+			}
+		}
+
+		if(!summons.empty()){
+			//check if any of our summons is out of range (+/- 2 floors or 30 tiles away)
+
+			std::list<Creature*> despawnList;
+			std::list<Creature*>::iterator cit;
+			for(cit = summons.begin(); cit != summons.end(); ++cit){
+				const Position pos = (*cit)->getPosition();
+
+				if( (std::abs(pos.z - newPos.z) > 2) || 
+					(std::max(std::abs((newPos.x) - pos.x), std::abs((newPos.y - 1) - pos.y)) > 30) ){
+					despawnList.push_back((*cit));
+				}
+			}
+
+			for(cit = despawnList.begin(); cit != despawnList.end(); ++cit){
+				g_game.removeCreature((*cit), true);
 			}
 		}
 

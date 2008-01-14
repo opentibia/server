@@ -96,7 +96,6 @@ private:
 	MonsterList friendList;
 
 	MonsterType* mType;
-	Spawn* spawn;
 
 	int32_t minCombatValue;
 	int32_t maxCombatValue;
@@ -108,6 +107,9 @@ private:
 	bool resetTicks;
 	bool isActivated;
 	bool extraAttack;
+
+	Spawn* spawn;
+	bool isMasterInRange;
 
 	std::string strDescription;
 

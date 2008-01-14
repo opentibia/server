@@ -58,6 +58,7 @@ Monster::Monster(MonsterType* _mtype) :
 Creature()
 {
 	isActivated = false;
+	isMasterInRange = false;
 	mType = _mtype;
 	spawn = NULL;
 	defaultOutfit = mType->outfit;
@@ -124,6 +125,9 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 	if(creature == this){
 		//We just spawned lets look around to see who is there.
 		isActivated = true;
+		if(isSummon()){
+			isMasterInRange = true;
+		}
 		updateTargetList();
 	}
 	else{
@@ -154,6 +158,7 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 		updateTargetList();
 
 		/*
+		TODO: Optimizations here
 		if(teleport){
 			//do a full update of the friend/target list
 		}
@@ -246,11 +251,11 @@ void Monster::onCreatureEnter(Creature* creature)
 {
 	//std::cout << "onCreatureEnter - " << creature->getName() << std::endl;
 
-	/*
-	if(getMaster() && getMaster() == creature){
-		//Turn the summon on again if its turned off
+	if(getMaster() == creature){
+		//Turn the summon on again
+		isMasterInRange = true;
+		activate();
 	}
-	*/
 
 	onCreatureFound(creature, true);
 }
@@ -259,11 +264,11 @@ void Monster::onCreatureLeave(Creature* creature)
 {
 	//std::cout << "onCreatureLeave - " << creature->getName() << std::endl;
 
-	/*
 	if(getMaster() == creature){
 		//Turn the monster off until its master comes back
+		isMasterInRange = false;
+		deactivate();
 	}
-	*/
 
 	//update friendList
 	if(creature->getMonster() && !creature->isSummon()){
@@ -365,33 +370,51 @@ bool Monster::selectTarget(Creature* creature)
 
 bool Monster::activate(bool forced /*= false*/)
 {
-	if(isActivated){
-		return true;
+	if(isSummon()){
+		if(isMasterInRange || forced){
+			isActivated = true;
+		}
+	}
+	else{
+		if(!targetList.empty() || forced){
+			isActivated = true;
+		}
 	}
 
-	if(forced || hasMaster() || !conditions.empty() || !targetList.empty()){
-		isActivated = true;
+	if(isActivated || !conditions.empty()){
+#ifdef __ONECREATURE_EVENT_
 		g_game.addCreatureCheck(this);
-		return true;
+#else
+		addEventThink();
+#endif
 	}
 
-	return false;
+	return isActivated;
 }
 
 bool Monster::deactivate()
 {
-	if(!isActivated){
-		return true;
+	if(hasMaster()){
+		if(!isMasterInRange || getMaster()->idle()){
+			isActivated = false;
+		}
+	}
+	else{
+		if(targetList.empty()){
+			isActivated = false;
+		}
 	}
 
-	if(hasMaster() || !conditions.empty() || !targetList.empty()){
-		return false;
+	if(!isActivated && conditions.empty()){
+		onIdleStatus();
+#ifdef __ONECREATURE_EVENT_
+		g_game.removeCreatureCheck(this);
+#else
+		stopEventThink();
+#endif
 	}
-	
-	onIdleStatus();
-	isActivated = false;
-	g_game.removeCreatureCheck(this);
-	return true;
+
+	return !isActivated;
 }
 
 void Monster::onAddCondition(ConditionType_t type)
@@ -406,16 +429,10 @@ void Monster::onEndCondition(ConditionType_t type)
 
 void Monster::onThink(uint32_t interval)
 {
-#ifdef __DEBUG__
-	if(!isActivated){
-		std::cout << "Monster::onThink - isActivated false" << std::endl;
-	}
-#endif
-
 	if(despawn()){
 		g_game.removeCreature(this, true);
 	}
-	else if(hasMaster() || !targetList.empty() ) {
+	else if(!deactivate()){
 		addEventWalk();
 
 		if(isSummon()){
@@ -443,9 +460,6 @@ void Monster::onThink(uint32_t interval)
 		onThinkTarget(interval);
 		onThinkYell(interval);
 		onThinkDefense(interval);
-	}
-	else{
-		deactivate();
 	}
 
 	Creature::onThink(interval);
@@ -734,7 +748,7 @@ void Monster::pushCreatures(Tile* tile)
 
 bool Monster::getNextStep(Direction& dir)
 {
-	if(targetList.empty() && !isSummon() ){
+	if(!isActivated){
 		//we dont have anyone watching might aswell stop walking
 		eventWalk = 0;
 		return false;
@@ -914,20 +928,6 @@ bool Monster::despawn()
 		}
 
 		return false;
-	}
-	else if(hasMaster()){
-		//Despawn if 30 yards or +/- 2 floors away from master
-		const Position& masterPos = getMaster()->getPosition();
-		const Position pos = getPosition();
-
-		if(std::abs(pos.z - masterPos.z) > 2){
-			return true;
-		}
-
-		uint32_t masterDis = std::max(std::abs((masterPos.x) - pos.x), std::abs((masterPos.y - 1) - pos.y));
-		if(masterDis >= 30){
-			return true;
-		}
 	}
 
 	return false;

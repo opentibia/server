@@ -230,7 +230,8 @@ public:
 	virtual uint32_t getDamageImmunities() const { return 0; }
 	virtual uint32_t getConditionImmunities() const { return 0; }
 	virtual uint32_t getConditionSuppressions() const { return 0; }
-	virtual bool isAttackable() const { return true;};
+	virtual bool isAttackable() const { return true;}
+	bool idle() const { return eventCheck == 0;}
 
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
@@ -276,6 +277,11 @@ public:
 	virtual void onAttacking(uint32_t interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);
+
+#ifndef __ONECREATURE_EVENT_
+	void addEventThink();
+	void stopEventThink();
+#endif
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
@@ -338,6 +344,7 @@ protected:
 	//follow variables
 	Creature* followCreature;
 	uint32_t eventWalk;
+	uint32_t eventCheck;
 	std::list<Direction> listWalkDir;
 	uint32_t walkUpdateTicks;
 	bool hasFollowPath;
