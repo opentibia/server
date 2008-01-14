@@ -1667,7 +1667,7 @@ InstantSpell(_interface)
 {
 	isAggressive = false;
 	conjureId = 0;
-	conjureCount = 0;
+	conjureCount = 1;
 	conjureReagentId = 0;
 }
 
@@ -1705,6 +1705,13 @@ bool ConjureSpell::configureEvent(xmlNodePtr p)
 
 	if(readXMLInteger(p, "conjureCount", intValue)){
 		conjureCount = intValue;
+	}
+	else if(conjureId != 0){
+		//load the default charge from items.xml
+		const ItemType& it = Item::items[conjureId];
+		if(it.charges != 0){
+			conjureCount = it.charges;
+		}
 	}
 
 	if(readXMLInteger(p, "reagentId", intValue)){
@@ -1744,7 +1751,8 @@ bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint3
 	return (ret == RET_NOERROR);
 }
 
-bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount, uint32_t reagentId, slots_t slot)
+bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId,
+	uint32_t conjureCount, uint32_t reagentId, slots_t slot)
 {
 	bool result = false;
 	if(reagentId != 0){
@@ -1755,7 +1763,9 @@ bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint3
 			}
 
 			Item* newItem = g_game.transformItem(item, conjureId, conjureCount);
-			g_game.startDecay(newItem);
+			if(newItem){
+				g_game.startDecay(newItem);
+			}
 			result = true;
 		}
 	}
