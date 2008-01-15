@@ -43,12 +43,6 @@ MonsterType::MonsterType()
 
 void MonsterType::reset()
 {
-	isSummonable = false;
-	isIllusionable = false;
-	isConvinceable = false;
-	isAttackable = true;
-	isHostile = true;
-	race = RACE_BLOOD;
 	experience = 0;
 
 	defense = 0;
@@ -62,11 +56,27 @@ void MonsterType::reset()
 	runAwayHealth = 0;
 	pushable = true;
 	base_speed = 200;
-
 	health = 100;
 	health_max = 100;
-	damageImmunities = 0;
+
+	outfit.lookHead   = 0;
+	outfit.lookBody   = 0;
+	outfit.lookLegs   = 0;
+	outfit.lookFeet   = 0;
+	outfit.lookType   = 0;
+	outfit.lookTypeEx = 0;
+	outfit.lookAddons = 0;
+	lookcorpse = 0;
+
 	conditionImmunities = 0;
+	damageImmunities = 0;
+	race = RACE_BLOOD;
+	isSummonable = false;
+	isIllusionable = false;
+	isConvinceable = false;
+	isAttackable = true;
+	isHostile = true;
+
 	lightLevel = 0;
 	lightColor = 0;
 
@@ -101,6 +111,8 @@ void MonsterType::reset()
 
 	attackStrength = 100;
 	defenseStrength = 0;
+
+	scriptList.clear();
 }
 
 MonsterType::~MonsterType()
@@ -212,7 +224,6 @@ bool Monsters::loadFromXml(const std::string& _datadir,bool reloading /*= false*
 	if(doc){
 		loaded = true;
 		xmlNodePtr root, p;
-		uint32_t id = 0;
 		root = xmlDocGetRootElement(doc);
 
 		if(xmlStrcmp(root->name,(const xmlChar*)"monsters") != 0){
@@ -234,16 +245,7 @@ bool Monsters::loadFromXml(const std::string& _datadir,bool reloading /*= false*
 
 				if(readXMLString(p, "file", file) && readXMLString(p, "name", name)){
 					file = datadir + "monster/" + file;
-
-					std::string lowername = name;
-					toLowerCaseString(lowername);
-
-					MonsterType* mType = loadMonster(file, name, reloading);
-					if(mType){
-						id++;
-						monsterNames[lowername] = id;
-						monsters[id] = mType;
-					}
+					loadMonster(file, name, reloading);
 				}
 			}
 			else{
@@ -700,7 +702,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 #define SHOW_XML_WARNING(desc) std::cout << "Warning: [Monsters::loadMonster]. " << desc << ". " << file << std::endl;
 #define SHOW_XML_ERROR(desc) std::cout << "Error: [Monsters::loadMonster]. " << desc << ". " << file << std::endl;
 
-MonsterType* Monsters::loadMonster(const std::string& file, const std::string& monster_name, bool reloading /*= false*/)
+bool Monsters::loadMonster(const std::string& file, const std::string& monster_name, bool reloading /*= false*/)
 {
 	bool monsterLoad;
 	MonsterType* mType = NULL;
@@ -1260,11 +1262,24 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 	}
 
 	if(monsterLoad){
-		return mType;
+
+		static uint32_t id = 0;
+		if(new_mType){
+			std::string lowername = monster_name;
+			toLowerCaseString(lowername);
+
+			id++;
+			monsterNames[lowername] = id;
+			monsters[id] = mType;
+		}
+
+		return true;
 	}
 	else{
-		delete mType;
-		return NULL;
+		if(new_mType){
+			delete mType;
+		}
+		return false;
 	}
 }
 
