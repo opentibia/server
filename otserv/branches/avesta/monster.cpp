@@ -195,7 +195,17 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 
 void Monster::updateTargetList()
 {
-	for(CreatureList::iterator it = targetList.begin(); it != targetList.end();){
+	CreatureList::iterator it;
+	for(it = friendList.begin(); it != friendList.end();){
+		if((*it)->getHealth() <= 0 || !canSee((*it)->getPosition())){
+			(*it)->releaseThing2();
+			it = friendList.erase(it);
+		}
+		else
+			++it;
+	}
+
+	for(it = targetList.begin(); it != targetList.end();){
 		if((*it)->getHealth() <= 0 || !canSee((*it)->getPosition())){
 			(*it)->releaseThing2();
 			it = targetList.erase(it);
@@ -207,7 +217,7 @@ void Monster::updateTargetList()
 	SpectatorVec list;
 	g_game.getSpectators(list, getPosition(), true);
 	for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
-		if((*it) != this & canSee((*it)->getPosition())){
+		if((*it) != this && canSee((*it)->getPosition())){
 			onCreatureFound(*it);
 		}
 	}
@@ -369,7 +379,7 @@ void Monster::onFollowCreatureComplete(const Creature* creature)
 			targetList.push_front(target);
 		}
 	}
-	else{
+	else if(!isSummon()){
 		//Could not find a path, lets try change back to our previous one
 		searchTarget();
 	}
