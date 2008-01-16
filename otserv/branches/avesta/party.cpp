@@ -260,6 +260,7 @@ void Party::updatePartyIcons(Player* player)
 {
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
 		(*it)->sendPlayerPartyIcons(player);
+		player->sendPlayerPartyIcons((*it));
 	}
 
 	getLeader()->sendPlayerPartyIcons(player);

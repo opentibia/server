@@ -788,6 +788,8 @@ void Creature::getPathToFollowCreature()
 			hasFollowPath = false;
 		}
 	}
+	
+	onFollowCreatureComplete(followCreature);
 }
 
 bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= false*/)

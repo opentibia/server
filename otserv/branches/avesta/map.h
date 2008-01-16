@@ -226,7 +226,8 @@ public:
 		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
 
 	/**
-	* Checks if view is clear from fromPos to toPos
+	* Checks if path is clear from fromPos to toPos
+	* Notice: This only checks a straight line if the path is clear, for path finding use getPathTo.
 	*	\param fromPos from Source point
 	*	\param toPos Destination point
 	*	\param floorCheck if true then view is not clear if fromPos.z is not the same as toPos.z
@@ -243,10 +244,12 @@ public:
 	* \param centerPos The center position (can be set to toPosition) 
 	* \param listDir contains a list of directions to the destination
 	* \param autoClearCache If not set the cache is not cleared (to clear it manually call clearPathCache)
+	* \param maxDist Maximum distance from our current position to search, default: -1 (no limit)
 	* \returns returns true if a path was found
 	*/
 	bool getPathTo(const Creature* creature, const Position& toPosition,
-		const Position& centerPos, std::list<Direction>& listDir, bool autoClearCache = true);
+		const Position& centerPos, std::list<Direction>& listDir,
+		bool autoClearCache = true, int32_t maxDist = -1);
 
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir,
 		const Position& destPos);

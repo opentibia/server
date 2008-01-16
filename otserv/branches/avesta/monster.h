@@ -78,6 +78,7 @@ public:
 
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);
+	virtual void onFollowCreatureComplete(const Creature* creature);
 
 	virtual void onThink(uint32_t interval);
 
@@ -90,10 +91,9 @@ public:
 	virtual void doAttacking(uint32_t interval);
 
 private:
-	typedef std::list<Creature*> TargetList;
-	typedef std::list<Monster*> MonsterList;
-	TargetList targetList;
-	MonsterList friendList;
+	typedef std::list<Creature*> CreatureList;
+	CreatureList targetList;
+	CreatureList friendList;
 
 	MonsterType* mType;
 
@@ -133,7 +133,7 @@ private:
 	virtual void onEndCondition(ConditionType_t type);
 
 	bool canDoSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval);
-	bool searchTarget(bool targetChange = false);
+	bool searchTarget();
 	bool selectTarget(Creature* creature);
 	bool getRandomStep(const Position& creaturePos, Direction& dir);
 	bool getDanceStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
@@ -148,6 +148,9 @@ private:
 	void onThinkTarget(uint32_t interval);
 	void onThinkYell(uint32_t interval);
 	void onThinkDefense(uint32_t interval);
+
+	bool isFriend(Creature* creature);
+	bool isOpponent(Creature* creature);
 
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }

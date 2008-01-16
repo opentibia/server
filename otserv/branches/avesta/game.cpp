@@ -156,6 +156,7 @@ void Game::setGameState(GameState_t newState)
 
 			case GAME_STATE_STARTUP:
 			case GAME_STATE_CLOSED:
+			case GAME_STATE_CLOSING:
 			case GAME_STATE_NORMAL:
 			default:
 				break;
@@ -3016,9 +3017,9 @@ bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool
 	return map->canThrowObjectTo(fromPos, toPos, checkLineOfSight, rangex, rangey);
 }
 
-bool Game::isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor)
+bool Game::isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck)
 {
-	return map->isViewClear(fromPos, toPos, sameFloor);
+	return map->isViewClear(fromPos, toPos, floorCheck);
 }
 
 bool Game::internalCreatureTurn(Creature* creature, Direction dir)
@@ -3079,8 +3080,9 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 	return true;
 }
 
-bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
-	bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList)
+bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
+	uint32_t minDist, uint32_t maxDist, bool fullPathSearch, bool targetMustBeReachable,
+	std::list<Direction>& dirList, int32_t maxSearchDist /*= -1*/)
 {
 	if(creature->getPosition().z != targetPos.z || !creature->canSee(targetPos)){
 		return false;
@@ -3137,7 +3139,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 
 						if(tmpPos != creaturePos){
 							//std::cout << "x: " << tmpPos.x << "y: " << tmpPos.y << std::endl;
-							if(!map->getPathTo(creature, tmpPos, targetPos, tmpDirList, false)){
+							if(!map->getPathTo(creature, tmpPos, targetPos, tmpDirList, false, maxSearchDist)){
 								continue;
 							}
 						}

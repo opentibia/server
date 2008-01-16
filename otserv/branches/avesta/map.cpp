@@ -663,7 +663,8 @@ Tile* Map::isPositionValid(const Creature* creature, const Position& pos, const 
 }
 
 bool Map::getPathTo(const Creature* creature, const Position& toPosition,
-	const Position& centerPos, std::list<Direction>& listDir, bool autoClearCache /*= true*/)
+	const Position& centerPos, std::list<Direction>& listDir,
+	bool autoClearCache /*= true*/, int32_t maxSearchDist /*= -1*/)
 {
 	if(isPositionValid(creature, toPosition, centerPos) == NULL){
 		return false;
@@ -725,7 +726,13 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 				pos.x = n->x + neighbourOrderList[i][0];
 				pos.y = n->y + neighbourOrderList[i][1];
 
-				if((tile = isPositionValid(creature, pos, centerPos))){
+				bool outOfRange = false;
+				if(maxSearchDist != -1 && (std::abs(endPos.x - pos.x) +
+					std::abs(endPos.y - pos.y)) > maxSearchDist){
+					outOfRange = true;
+				}
+
+				if(!outOfRange && (tile = isPositionValid(creature, pos, centerPos))){
 					//The cost (g) for this neighbour
 					int32_t cost = nodes.getMapWalkCost(creature, n, tile, pos);
 					int32_t extraCost = 0;

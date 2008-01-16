@@ -180,7 +180,9 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 		else{
 			if(!followCreature && !isSummon()){
 				//we have no target lets try pick this one
-				selectTarget(const_cast<Creature*>(creature));
+				if(isOpponent(const_cast<Creature*>(creature))){
+					selectTarget(const_cast<Creature*>(creature));
+				}
 			}
 			else if((creature == attackedCreature || creature == this) && extraAttack){
 				//our target is moving lets see if we can get in hit
@@ -193,12 +195,19 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 
 void Monster::updateTargetList()
 {
-	clearTargetList();
+	for(CreatureList::iterator it = targetList.begin(); it != targetList.end();){
+		if((*it)->getHealth() <= 0 || !canSee((*it)->getPosition())){
+			(*it)->releaseThing2();
+			it = targetList.erase(it);
+		}
+		else
+			++it;
+	}
 
 	SpectatorVec list;
 	g_game.getSpectators(list, getPosition(), true);
 	for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
-		if((*it) != this){
+		if((*it) != this & canSee((*it)->getPosition())){
 			onCreatureFound(*it);
 		}
 	}
@@ -206,7 +215,7 @@ void Monster::updateTargetList()
 
 void Monster::clearTargetList()
 {
-	for(TargetList::iterator it = targetList.begin(); it != targetList.end(); ++it){
+	for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
 		(*it)->releaseThing2();
 	}
 	targetList.clear();
@@ -214,7 +223,7 @@ void Monster::clearTargetList()
 
 void Monster::clearFriendList()
 {
-	for(MonsterList::iterator it = friendList.begin(); it != friendList.end(); ++it){
+	for(CreatureList::iterator it = friendList.begin(); it != friendList.end(); ++it){
 		(*it)->releaseThing2();
 	}
 	friendList.clear();
@@ -222,16 +231,15 @@ void Monster::clearFriendList()
 
 void Monster::onCreatureFound(Creature* creature, bool pushFront /*= false*/)
 {
-	if(creature->getMonster() && !creature->isSummon()){
+	if(isFriend(creature)){
 		assert(creature != this);
 		if(std::find(friendList.begin(), friendList.end(), creature) == friendList.end()){
 			creature->useThing2();
-			friendList.push_back(creature->getMonster());
+			friendList.push_back(creature);
 		}
 	}
 
-	if( (creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
-		(creature->getMaster() && creature->getMaster()->getPlayer()) ){
+	if(isOpponent(creature)){
 		assert(creature != this);
 		if(std::find(targetList.begin(), targetList.end(), creature) == targetList.end()){
 			creature->useThing2();
@@ -260,6 +268,36 @@ void Monster::onCreatureEnter(Creature* creature)
 	onCreatureFound(creature, true);
 }
 
+
+bool Monster::isFriend(Creature* creature)
+{
+	if(hasMaster() && getMaster()->getPlayer()){
+		return Combat::isPlayerCombat(creature);
+	}
+	else{
+		if(creature->getMonster() && !creature->isSummon()){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Monster::isOpponent(Creature* creature)
+{
+	if(hasMaster() && getMaster()->getPlayer()){
+		return true;
+	}
+	else{
+		if( (creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
+			(creature->getMaster() && creature->getMaster()->getPlayer()) ) {
+			return true;
+		}
+}
+
+	return false;
+}
+
 void Monster::onCreatureLeave(Creature* creature)
 {
 	//std::cout << "onCreatureLeave - " << creature->getName() << std::endl;
@@ -271,8 +309,8 @@ void Monster::onCreatureLeave(Creature* creature)
 	}
 
 	//update friendList
-	if(creature->getMonster() && !creature->isSummon()){
-		MonsterList::iterator it = std::find(friendList.begin(), friendList.end(), creature);
+	if(isFriend(creature)){
+		CreatureList::iterator it = std::find(friendList.begin(), friendList.end(), creature);
 		if(it != friendList.end()){
 			(*it)->releaseThing2();
 			friendList.erase(it);
@@ -285,9 +323,8 @@ void Monster::onCreatureLeave(Creature* creature)
 	}
 
 	//update targetList
-	if( (creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
-		(creature->getMaster() && creature->getMaster()->getPlayer()) ){
-		TargetList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
+	if(isOpponent(creature)){
+		CreatureList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
 		if(it != targetList.end()){
 			(*it)->releaseThing2();
 			targetList.erase(it);
@@ -303,34 +340,39 @@ void Monster::onCreatureLeave(Creature* creature)
 	}
 }
 
-bool Monster::searchTarget(bool targetChange /*= false*/)
+bool Monster::searchTarget()
 {
 #ifdef __DEBUG__
 	std::cout << "Searching target... " << std::endl;
 #endif
 
-	for(TargetList::iterator it = targetList.begin(); it != targetList.end(); ++it){
-		if(targetChange){
-			//used for target changing
-			if(!g_game.isViewClear(getPosition(), (*it)->getPosition(), true)){
-				continue;
-			}
-		}
-
+	for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
 		if(followCreature != (*it) && selectTarget(*it)){
 #ifdef __DEBUG__
 			std::cout << "Selecting target " << (*it)->getName() << std::endl;
 #endif
-
-			//push our target back to the end of the list
-			Creature* target = *it;
-			targetList.erase(it);
-			targetList.push_back(target);
 			return true;
 		}
 	}
 
 	return false;
+}
+
+void Monster::onFollowCreatureComplete(const Creature* creature)
+{
+	if(creature && hasFollowPath){
+		//push target we have found a path to the front
+		CreatureList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
+		if(it != targetList.end()){
+			Creature* target = (*it);
+			targetList.erase(it);
+			targetList.push_front(target);
+		}
+	}
+	else{
+		//Could not find a path, lets try change back to our previous one
+		searchTarget();
+	}
 }
 
 bool Monster::selectTarget(Creature* creature)
@@ -349,7 +391,7 @@ bool Monster::selectTarget(Creature* creature)
 		return false;
 	}
 
-	TargetList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
+	CreatureList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
 	if(it == targetList.end()){
 		//Target not found in our target list.
 #ifdef __DEBUG__
@@ -536,7 +578,7 @@ void Monster::onThinkTarget(uint32_t interval)
 				targetChangeTicks = 0;
 
 				if(mType->changeTargetChance >= random_range(1, 100)){
-					searchTarget(true);
+					searchTarget();
 				}
 			}
 		}
