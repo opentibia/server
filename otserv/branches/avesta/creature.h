@@ -302,6 +302,7 @@ public:
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
 
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
+	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature) {};
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
 
 	virtual WeaponType_t getWeaponType() {return WEAPON_NONE;}

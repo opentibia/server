@@ -131,6 +131,7 @@ private:
 
 	virtual void onAddCondition(ConditionType_t type);
 	virtual void onEndCondition(ConditionType_t type);
+	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature);
 
 	bool canDoSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval);
 	bool searchTarget();
@@ -149,8 +150,8 @@ private:
 	void onThinkYell(uint32_t interval);
 	void onThinkDefense(uint32_t interval);
 
-	bool isFriend(Creature* creature);
-	bool isOpponent(Creature* creature);
+	bool isFriend(const Creature* creature);
+	bool isOpponent(const Creature* creature);
 
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }

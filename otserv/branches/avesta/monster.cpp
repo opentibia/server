@@ -124,11 +124,11 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 
 	if(creature == this){
 		//We just spawned lets look around to see who is there.
-		isActivated = true;
 		if(isSummon()){
 			isMasterInRange = true;
 		}
 		updateTargetList();
+		activate();
 	}
 	else{
 		onCreatureEnter(const_cast<Creature*>(creature));
@@ -181,7 +181,7 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 
 	if(!followCreature && !isSummon()){
 		//we have no target lets try pick this one
-		if(isOpponent(const_cast<Creature*>(creature))){
+		if(isOpponent(creature)){
 			selectTarget(const_cast<Creature*>(creature));
 		}
 	}
@@ -278,11 +278,11 @@ void Monster::onCreatureEnter(Creature* creature)
 }
 
 
-bool Monster::isFriend(Creature* creature)
+bool Monster::isFriend(const Creature* creature)
 {
 	if(hasMaster() && getMaster()->getPlayer()){
-		Player* masterPlayer = getMaster()->getPlayer();
-		Player* tmpPlayer = NULL;
+		const Player* masterPlayer = getMaster()->getPlayer();
+		const Player* tmpPlayer = NULL;
 		if(creature->getPlayer()){
 			tmpPlayer = creature->getPlayer();
 		}
@@ -303,7 +303,7 @@ bool Monster::isFriend(Creature* creature)
 	return false;
 }
 
-bool Monster::isOpponent(Creature* creature)
+bool Monster::isOpponent(const Creature* creature)
 {
 	if(hasMaster() && getMaster()->getPlayer()){
 		return true;
@@ -1142,7 +1142,19 @@ bool Monster::convinceCreature(Creature* creature)
 				(*cit)->releaseThing2();
 			}
 			summons.clear();
+
+			isMasterInRange = true;
 			updateTargetList();
+			activate();
+
+			//Notify surrounding about the change
+			SpectatorVec list;
+			g_game.getSpectators(list, getPosition(), true);
+			g_game.getSpectators(list, creature->getPosition(), true);
+
+			for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
+				(*it)->onCreatureConvinced(creature, this);
+			}
 
 			if(spawn){
 				spawn->removeMonster(this);
@@ -1164,7 +1176,19 @@ bool Monster::convinceCreature(Creature* creature)
 			(*cit)->releaseThing2();
 		}
 		summons.clear();
+
+		isMasterInRange = true;
 		updateTargetList();
+		activate();
+
+		//Notify surrounding about the change
+		SpectatorVec list;
+		g_game.getSpectators(list, getPosition(), true);
+		g_game.getSpectators(list, creature->getPosition(), true);
+
+		for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
+			(*it)->onCreatureConvinced(creature, this);
+		}
 
 		if(spawn){
 			spawn->removeMonster(this);
@@ -1176,6 +1200,14 @@ bool Monster::convinceCreature(Creature* creature)
 	}
 
 	return false;
+}
+
+void Monster::onCreatureConvinced(const Creature* convincer, const Creature* creature)
+{
+	if(convincer != this && (isFriend(creature) || isOpponent(creature))){
+		updateTargetList();
+		activate();
+	}
 }
 
 void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
