@@ -177,19 +177,18 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 		else if(!canSeeNewPos && canSeeOldPos){
 			onCreatureLeave(const_cast<Creature*>(creature));
 		}
-		else{
-			if(!followCreature && !isSummon()){
-				//we have no target lets try pick this one
-				if(isOpponent(const_cast<Creature*>(creature))){
-					selectTarget(const_cast<Creature*>(creature));
-				}
-			}
-			else if((creature == attackedCreature || creature == this) && extraAttack){
-				//our target is moving lets see if we can get in hit
-				Dispatcher::getDispatcher().addTask(createTask(
-					boost::bind(&Game::checkCreatureAttack, &g_game, getID())));
-			}
+	}
+
+	if(!followCreature && !isSummon()){
+		//we have no target lets try pick this one
+		if(isOpponent(const_cast<Creature*>(creature))){
+			selectTarget(const_cast<Creature*>(creature));
 		}
+	}
+	else if((creature == attackedCreature || creature == this) && extraAttack){
+		//our target is moving lets see if we can get in hit
+		Dispatcher::getDispatcher().addTask(createTask(
+			boost::bind(&Game::checkCreatureAttack, &g_game, getID())));
 	}
 }
 
@@ -282,7 +281,18 @@ void Monster::onCreatureEnter(Creature* creature)
 bool Monster::isFriend(Creature* creature)
 {
 	if(hasMaster() && getMaster()->getPlayer()){
-		return Combat::isPlayerCombat(creature);
+		Player* masterPlayer = getMaster()->getPlayer();
+		Player* tmpPlayer = NULL;
+		if(creature->getPlayer()){
+			tmpPlayer = creature->getPlayer();
+		}
+		else if(creature->getMaster() && creature->getMaster()->getPlayer()){
+			tmpPlayer = creature->getMaster()->getPlayer();
+		}
+
+		if(tmpPlayer && (tmpPlayer == getMaster() || masterPlayer->isPartner(tmpPlayer)) ){
+			return true;
+		}
 	}
 	else{
 		if(creature->getMonster() && !creature->isSummon()){
