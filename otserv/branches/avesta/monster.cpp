@@ -594,7 +594,7 @@ void Monster::onThinkTarget(uint32_t interval)
 		if(mType->changeTargetSpeed > 0){
 			targetChangeTicks += interval;
 
-			if(mType->changeTargetSpeed >= targetChangeTicks){
+			if(targetChangeTicks >= mType->changeTargetSpeed){
 				targetChangeTicks = 0;
 
 				if(mType->changeTargetChance >= random_range(1, 100)){
@@ -665,20 +665,22 @@ void Monster::onThinkDefense(uint32_t interval)
 
 void Monster::onThinkYell(uint32_t interval)
 {
-	yellTicks += interval;
+	if(mType->yellSpeedTicks > 0){
+		yellTicks += interval;
 
-	if(mType->yellSpeedTicks <= yellTicks){
-		yellTicks = 0;
+		if(yellTicks >= mType->yellSpeedTicks){
+			yellTicks = 0;
 
-		if(!mType->voiceVector.empty() && (mType->yellChance >= (uint32_t)random_range(1, 100))){
-			uint32_t index = random_range(0, mType->voiceVector.size() - 1);
-			const voiceBlock_t& vb = mType->voiceVector[index];
+			if(!mType->voiceVector.empty() && (mType->yellChance >= (uint32_t)random_range(1, 100))){
+				uint32_t index = random_range(0, mType->voiceVector.size() - 1);
+				const voiceBlock_t& vb = mType->voiceVector[index];
 
-			if(vb.yellText){
-				g_game.internalCreatureSay(this, SPEAK_MONSTER_YELL, vb.text);
-			}
-			else{
-				g_game.internalCreatureSay(this, SPEAK_MONSTER_SAY, vb.text);
+				if(vb.yellText){
+					g_game.internalCreatureSay(this, SPEAK_MONSTER_YELL, vb.text);
+				}
+				else{
+					g_game.internalCreatureSay(this, SPEAK_MONSTER_SAY, vb.text);
+				}
 			}
 		}
 	}

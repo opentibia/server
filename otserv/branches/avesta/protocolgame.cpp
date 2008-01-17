@@ -262,7 +262,7 @@ bool ProtocolGame::login(const std::string& name)
 		}
 
 		if(g_game.getGameState() == GAME_STATE_CLOSING && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
-			disconnectClient(0x14, "The server is being closed. Please try again later.");
+			disconnectClient(0x14, "The game is just going down.\nPlease try again later.");
 			return false;
 		}
 
