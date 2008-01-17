@@ -360,18 +360,31 @@ void Monster::onCreatureLeave(Creature* creature)
 	}
 }
 
-bool Monster::searchTarget()
+bool Monster::searchTarget(bool randomize /*= false*/)
 {
 #ifdef __DEBUG__
 	std::cout << "Searching target... " << std::endl;
 #endif
 
-	for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
-		if(followCreature != (*it) && selectTarget(*it)){
-#ifdef __DEBUG__
-			std::cout << "Selecting target " << (*it)->getName() << std::endl;
-#endif
-			return true;
+	if(randomize){
+		if(!targetList.empty()){
+			uint32_t index = random_range(0, targetList.size() - 1);
+			CreatureList::iterator it = targetList.begin();
+			std::advance(it, index);
+			if(followCreature != (*it) && selectTarget(*it)){
+				return true;
+			}
+		}
+	}
+	else{
+
+		for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
+			if(followCreature != (*it) && selectTarget(*it)){
+	#ifdef __DEBUG__
+				std::cout << "Selecting target " << (*it)->getName() << std::endl;
+	#endif
+				return true;
+			}
 		}
 	}
 
@@ -380,18 +393,25 @@ bool Monster::searchTarget()
 
 void Monster::onFollowCreatureComplete(const Creature* creature)
 {
-	if(creature && hasFollowPath){
-		//push target we have found a path to the front
+	if(creature){
 		CreatureList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
+		Creature* target;
 		if(it != targetList.end()){
-			Creature* target = (*it);
+			target = (*it);
 			targetList.erase(it);
-			targetList.push_front(target);
+
+			if(hasFollowPath){
+				//push target we have found a path to the front
+				targetList.push_front(target);
+			}
+			else if(!isSummon()){
+				//push target we have not found a path to the back
+				targetList.push_back(target);
+
+				//Could not find a path, lets find another one
+				searchTarget();
+			}
 		}
-	}
-	else if(!isSummon()){
-		//Could not find a path, lets try change back to our previous one
-		searchTarget();
 	}
 }
 
@@ -533,7 +553,7 @@ void Monster::doAttacking(uint32_t interval)
 		return;
 	}
 
-	updateLookDirection();
+	bool updateLook = true;
 
 	resetTicks = interval != 0;
 	attackTicks += interval;
@@ -544,6 +564,11 @@ void Monster::doAttacking(uint32_t interval)
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
 		if(canDoSpell(myPos, targetPos, *it, interval)){
 			if(it->chance >= (uint32_t)random_range(1, 100)){
+				if(updateLook){
+					updateLookDirection();
+					updateLook = false;
+				}
+
 				minCombatValue = it->minCombatValue;
 				maxCombatValue = it->maxCombatValue;
 				it->spell->castSpell(this, attackedCreature);
@@ -556,6 +581,10 @@ void Monster::doAttacking(uint32_t interval)
 #endif
 			}
 		}
+	}
+
+	if(updateLook){
+		updateLookDirection();
 	}
 
 	if(resetTicks){
@@ -598,7 +627,7 @@ void Monster::onThinkTarget(uint32_t interval)
 				targetChangeTicks = 0;
 
 				if(mType->changeTargetChance >= random_range(1, 100)){
-					searchTarget();
+					searchTarget(true);
 				}
 			}
 		}
