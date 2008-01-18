@@ -10840,6 +10840,8 @@
 	<item id="4610" name="shallow water">
 		<attribute key="decayTo" value="4608"/>
 		<attribute key="duration" value="1200"/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4611" name="shallow water">
 		<attribute key="type" value="trashholder"/>
@@ -10903,68 +10905,132 @@
 	</item>
 	<!-- Items from ID 4626 to ID 4631 are blank -->
 	<item id="4632" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4633" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4634" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4635" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4636" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4637" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4638" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4639" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4640" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4641" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4642" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4643" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4644" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4645" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4646" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4647" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4648" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4649" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4650" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4651" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4652" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4653" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4654" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4655" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4656" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4657" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4658" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4659" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4660" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4661" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4662" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4663" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4664" name="shallow water">
 		<attribute key="type" value="trashholder"/>
@@ -11335,28 +11401,48 @@
 	<item id="4819" name="dirt">
 	</item>
 	<item id="4820" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4821" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4822" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4823" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4824" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4825" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4826" article="a" name="mountain">
 	</item>
 	<item id="4827" article="a" name="mountain">
 	</item>
 	<item id="4828" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4829" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4830" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4831" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4832" name="dirt">
 	</item>
