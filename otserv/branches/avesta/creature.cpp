@@ -52,6 +52,7 @@ extern CreatureEvents* g_creatureEvents;
 Creature::Creature() :
   isInternalRemoved(false)
 {
+	tile = NULL;
 	direction  = NORTH;
 	master = NULL;
 	lootDrop = true;

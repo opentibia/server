@@ -96,11 +96,10 @@ void OutputMessagePool::sendAll()
 		//use this define only for debugging
 		bool v = 1;
 		#else
-		//It will send only messages bigger then 1 kb or with a lifetime greater than 50 ms
-		bool v = (*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 50);
+		//It will send only messages bigger then 1 kb or with a lifetime greater than 10 ms
+		bool v = (*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 10);
 		#endif
 		if(v){
-
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Sending message - ALL" << std::endl;
 			#endif

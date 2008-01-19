@@ -316,7 +316,16 @@ public:
 	//creature script events
 	bool registerCreatureEvent(const std::string& name);
 
+	virtual void setParent(Cylinder* cylinder){
+		tile = dynamic_cast<Tile*>(cylinder);
+		Thing::setParent(cylinder);
+	}
+
+	virtual Tile* getTile(){return tile;}
+	virtual const Tile* getTile() const{return tile;}
+
 protected:
+	Tile* tile;
 	uint32_t id;
 	bool isInternalRemoved;
 	int32_t health, healthMax;

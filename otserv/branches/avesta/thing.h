@@ -113,8 +113,8 @@ public:
 	Cylinder* getTopParent(); //returns Tile/Container or a Player
 	const Cylinder* getTopParent() const;
 
-	Tile* getTile();
-	const Tile* getTile() const;
+	virtual Tile* getTile();
+	virtual const Tile* getTile() const;
 
 	const Position& getPosition() const;
 	virtual int getThrowRange() const = 0;
