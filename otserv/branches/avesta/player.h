@@ -273,6 +273,7 @@ public:
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
+	virtual bool hasExtraSwing() {return (attackTicks >= getAttackSpeed());}
 	int32_t getShootRange() const {return shootRange;}
 
 	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;

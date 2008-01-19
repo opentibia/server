@@ -185,11 +185,6 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 			selectTarget(const_cast<Creature*>(creature));
 		}
 	}
-	else if((creature == attackedCreature || creature == this) && extraAttack){
-		//our target is moving lets see if we can get in hit
-		Dispatcher::getDispatcher().addTask(createTask(
-			boost::bind(&Game::checkCreatureAttack, &g_game, getID())));
-	}
 }
 
 void Monster::updateTargetList()

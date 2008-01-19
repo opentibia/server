@@ -489,6 +489,12 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 			onCreatureDisappear(attackedCreature, false);
 		}
 		else{
+			if(hasExtraSwing()){
+				//our target is moving lets see if we can get in hit
+				Dispatcher::getDispatcher().addTask(createTask(
+					boost::bind(&Game::checkCreatureAttack, &g_game, getID())));
+			}
+
 			onAttackedCreatureChangeZone(attackedCreature->getZone());
 		}
 	}

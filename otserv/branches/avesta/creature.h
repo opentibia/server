@@ -379,6 +379,7 @@ protected:
 
 	void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void doAttacking(uint32_t interval) {};
+	virtual bool hasExtraSwing() {return false;}
 
 	virtual int32_t getLostExperience() const { return 0; };
 	virtual double getDamageRatio(Creature* attacker) const;
