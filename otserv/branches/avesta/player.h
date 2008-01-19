@@ -336,8 +336,8 @@ public:
 	void clearAttacked();
 	void addUnjustifiedDead(const Player* attacked);
 	void setSkull(Skulls_t newSkull) {skull = newSkull;}
-	void sendCreatureSkull(const Creature* creature, Skulls_t skull) const
-		{if(client) client->sendCreatureSkull(creature, skull);}
+	void sendCreatureSkull(const Creature* creature) const
+		{if(client) client->sendCreatureSkull(creature);}
 	void checkRedSkullTicks(int32_t ticks);
 #endif
 	const OutfitListType& getPlayerOutfits();

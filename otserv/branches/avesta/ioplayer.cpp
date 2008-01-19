@@ -77,7 +77,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		experience = currExpCount;
 	}
 	player->experience = experience;
-	player->levelPercent = Player::getPercentLevel(player->experience, Player::getExpForLevel(player->level + 1));
+	player->levelPercent = Player::getPercentLevel(player->experience - currExpCount, Player::getExpForLevel(player->level + 1) - currExpCount);
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");

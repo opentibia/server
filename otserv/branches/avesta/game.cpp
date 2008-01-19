@@ -3660,10 +3660,8 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 }
 
 #ifdef __SKULLSYSTEM__
-void Game::changeSkull(Player* player, Skulls_t newSkull)
+void Game::updateCreatureSkull(Player* player)
 {
-	player->setSkull(newSkull);
-
 	SpectatorVec list;
 	getSpectators(list, player->getPosition(), true);
 
@@ -3671,9 +3669,7 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 	Player* tmpPlayer = NULL;
 	for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			if(!(player->isPartner(tmpPlayer) && newSkull == SKULL_NONE)){
-				tmpPlayer->sendCreatureSkull(player, newSkull);
-			}
+			tmpPlayer->sendCreatureSkull(player);
 		}
 	}
 }

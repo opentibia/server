@@ -1414,14 +1414,18 @@ void ProtocolGame::sendWorldLight(const LightInfo& lightInfo)
 	}
 }
 
-void ProtocolGame::sendCreatureSkull(const Creature* creature, Skulls_t skull)
+void ProtocolGame::sendCreatureSkull(const Creature* creature)
 {
 	if(canSee(creature)){
 		NetworkMessage* msg = getOutputBuffer();
 		if(msg){
 			msg->AddByte(0x90);
 			msg->AddU32(creature->getID());
-			msg->AddByte(skull);
+#ifdef __SKULLSYSTEM__
+			msg->AddByte(player->getSkullClient(creature->getPlayer()));
+#else
+			msg->AddByte(SKULL_NONE);
+#endif
 		}
 	}
 }

@@ -572,8 +572,8 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 	}
 	else{
 		//update percent
-		uint32_t newPercent = std::min((uint32_t)100, (100*skills[skill][SKILL_TRIES])/vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1));
-	 	if(skills[skill][SKILL_PERCENT] != newPercent){
+		uint32_t newPercent = Player::getPercentLevel(skills[skill][SKILL_TRIES], vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1));
+		if(skills[skill][SKILL_PERCENT] != newPercent){
 			skills[skill][SKILL_PERCENT] = newPercent;
 			sendSkills();
 		}
@@ -1612,7 +1612,6 @@ void Player::addExperience(uint32_t exp)
 
 	if(prevLevel != newLevel){
 		level = newLevel;
-		levelPercent = Player::getPercentLevel(getExperience(), Player::getExpForLevel(level + 1));
 		updateBaseSpeed();
 
 		int32_t newSpeed = getBaseSpeed();
@@ -1629,6 +1628,9 @@ void Player::addExperience(uint32_t exp)
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 	}
+	
+	uint64_t currLevelExp = Player::getExpForLevel(level);
+	levelPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
 
 	sendStats();
 }
@@ -1969,7 +1971,9 @@ void Player::die()
 				break;
 		}
 
-		levelPercent = Player::getPercentLevel(getExperience(), Player::getExpForLevel(level + 1));
+		//uint64_t currLevelExp = Player::getExpForLevel(newLevel);
+		//levelPercent = Player::getPercentLevel(getExperience() - currLevelExp - getLostExperience(), Player::getExpForLevel(newLevel + 1) - currLevelExp);
+
 		if(newLevel != level){
 			std::stringstream lvMsg;
 			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
@@ -3081,7 +3085,8 @@ void Player::onEndCondition(ConditionType_t type)
 #ifdef __SKULLSYSTEM__
 		if(getSkull() != SKULL_RED){
 			clearAttacked();
-			g_game.changeSkull(this, SKULL_NONE);
+			setSkull(SKULL_NONE);
+			g_game.updateCreatureSkull(this);
 		}
 #endif
 	}
@@ -3118,26 +3123,27 @@ void Player::onAttackedCreature(Creature* target)
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
-#ifdef __SKULLSYSTEM__
 			if(Player* targetPlayer = target->getPlayer()){
-#else
-			if(target->getPlayer()){
-#endif
 				pzLocked = true;
 
 #ifdef __SKULLSYSTEM__
-				if(!isPartner(targetPlayer) && !Combat::isInPvpZone(this, targetPlayer) && !targetPlayer->hasAttacked(this)){
-					if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
-						//add a white skull
-						g_game.changeSkull(this, SKULL_WHITE);
-					}
-
-					if(!hasAttacked(targetPlayer) && getSkull() == SKULL_NONE){
-						//show yellow skull
-						targetPlayer->sendCreatureSkull(this, SKULL_YELLOW);
-					}
+				if( !isPartner(targetPlayer) &&
+					!Combat::isInPvpZone(this, targetPlayer) &&
+					!targetPlayer->hasAttacked(this)){
 
 					addAttacked(targetPlayer);
+
+					if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
+						//add a white skull
+						setSkull(SKULL_WHITE);
+						g_game.updateCreatureSkull(this);
+					}
+
+
+					if(getSkull() == SKULL_NONE){
+						//yellow skull
+						targetPlayer->sendCreatureSkull(this);
+					}
 				}
 #endif
 			}
@@ -3400,14 +3406,7 @@ void Player::sendPlayerPartyIcons(Player* player)
 	sendCreatureShield(player);
 
 #ifdef __SKULLSYSTEM__
-	if(player->getSkull() == SKULL_NONE){
-		if(isPartner(player)){
-			sendCreatureSkull(player, SKULL_GREEN);
-		}
-		else{
-			sendCreatureSkull(player, SKULL_NONE);
-		}
-	}
+	sendCreatureSkull(player);
 #endif
 }
 
@@ -3473,18 +3472,19 @@ Skulls_t Player::getSkullClient(const Player* player) const
 		return SKULL_NONE;
 	}
 
-	Skulls_t skull;
-	skull = player->getSkull();
-	if(skull == SKULL_NONE){
-		if(isPartner(player)){
-			skull = SKULL_GREEN;
-		}
-		else if(player->hasAttacked(this)){
-			skull = SKULL_YELLOW;
+	if(getSkull() != SKULL_NONE){
+		if(player->hasAttacked(this) ){
+			return SKULL_YELLOW;
 		}
 	}
 
-	return skull;
+	if(player->getSkull() == SKULL_NONE){
+		if(isPartner(player)){
+			return SKULL_GREEN;
+		}
+	}
+	
+	return player->getSkull();
 }
 
 bool Player::hasAttacked(const Player* attacked) const
@@ -3533,7 +3533,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
 	redSkullTicks = redSkullTicks + 12 * 3600 * 1000;
 	if(redSkullTicks >= 3*24*3600*1000){
-		g_game.changeSkull(this, SKULL_RED);
+		setSkull(SKULL_RED);
+		g_game.updateCreatureSkull(this);
 	}
 }
 
@@ -3543,7 +3544,8 @@ void Player::checkRedSkullTicks(int32_t ticks)
 		redSkullTicks = redSkullTicks - ticks;
 
 	if(redSkullTicks < 1000 && !hasCondition(CONDITION_INFIGHT) && skull != SKULL_NONE){
-		g_game.changeSkull(this, SKULL_NONE);
+		setSkull(SKULL_NONE);
+		g_game.updateCreatureSkull(this);
 	}
 }
 #endif

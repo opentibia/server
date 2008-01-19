@@ -181,7 +181,7 @@ private:
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(const LightInfo& lightInfo);
 
-	void sendCreatureSkull(const Creature* creature, Skulls_t skull);
+	void sendCreatureSkull(const Creature* creature);
 	void sendCreatureShield(const Creature* creature);
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 

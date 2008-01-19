@@ -375,7 +375,7 @@ public:
 	void changeLight(const Creature* creature);
 
 #ifdef __SKULLSYSTEM__
-	void changeSkull(Player* player, Skulls_t newSkull);
+	void updateCreatureSkull(Player* player);
 #endif
 
 	GameState_t getGameState();
