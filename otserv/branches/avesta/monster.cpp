@@ -34,10 +34,12 @@
 
 extern Game g_game;
 extern ConfigManager g_config;
+extern Monsters g_monsters;
 
 AutoList<Monster>Monster::listMonster;
 
-extern Monsters g_monsters;
+int32_t Monster::despawnRange;
+int32_t Monster::despawnRadius;
 
 Monster* Monster::createMonster(MonsterType* mType)
 {
@@ -948,11 +950,7 @@ bool Monster::isInSpawnRange(const Position& toPos)
 		return true;
 	}
 
-	if(spawn && spawn->isInSpawnZone(getPosition())){
-		return Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos);
-	}
-
-	return true;
+	return !inDespawnRange(toPos);
 }
 
 bool Monster::canWalkTo(Position pos, Direction dir)
@@ -991,27 +989,22 @@ void Monster::die()
 	clearFriendList();
 }
 
-bool Monster::despawn()
+bool Monster::inDespawnRange(const Position& pos)
 {
 	if(spawn){
-		const Position& pos = getPosition();
-
-		int32_t despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
-		int32_t despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
-
-		if(despawnRadius == 0){
+		if(Monster::despawnRadius == 0){
 			return false;
 		}
 
-		if(!Spawns::getInstance()->isInZone(masterPos, despawnRadius, pos)){
+		if(!Spawns::getInstance()->isInZone(masterPos, Monster::despawnRadius, pos)){
 			return true;
 		}
 
-		if(despawnRange == 0){
+		if(Monster::despawnRange == 0){
 			return false;
 		}
 
-		if(std::abs(pos.z - masterPos.z) > despawnRange){
+		if(std::abs(pos.z - masterPos.z) > Monster::despawnRange){
 			return true;
 		}
 
@@ -1019,6 +1012,11 @@ bool Monster::despawn()
 	}
 
 	return false;
+}
+
+bool Monster::despawn()
+{
+	return inDespawnRange(getPosition());
 }
 
 bool Monster::getCombatValues(int32_t& min, int32_t& max)

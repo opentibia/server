@@ -38,6 +38,9 @@ private:
 public:
 	static Monster* createMonster(MonsterType* mType);
 	static Monster* createMonster(const std::string& name);
+	static int32_t despawnRange;
+	static int32_t despawnRadius;
+
 	virtual ~Monster();
 
 	virtual Monster* getMonster() {return this;};
@@ -126,6 +129,7 @@ private:
 
 	void die();
 	bool despawn();
+	bool inDespawnRange(const Position& pos);
 
 	bool activate(bool forced = false);
 	bool deactivate();

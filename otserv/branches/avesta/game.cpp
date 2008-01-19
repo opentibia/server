@@ -185,6 +185,8 @@ int Game::loadMap(std::string filename, std::string filekind)
 	exhaustionTicks = g_config.getNumber(ConfigManager::EXHAUSTED);
 	fightExhaustionTicks = g_config.getNumber(ConfigManager::FIGHTEXHAUSTED);
 	Player::maxMessageBuffer = g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER);
+	Monster::despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
+	Monster::despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
 
 	return map->loadMap(filename, filekind);
 }
@@ -3189,12 +3191,10 @@ void Game::checkCreatureWalk(uint32_t creatureId)
 }
 
 void Game::updateCreatureWalk(uint32_t creatureId)
-
 {
 	Creature* creature = getCreatureByID(creatureId);
 	if(creature && creature->getHealth() > 0){
 		creature->getPathToFollowCreature();
-
 	}
 }
 
