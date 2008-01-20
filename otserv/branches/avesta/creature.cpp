@@ -192,11 +192,13 @@ void Creature::onThink(uint32_t interval)
 		blockTicks = 0;
 	}
 
-	walkUpdateTicks += interval;
-	if(walkUpdateTicks >= 2000){
-		walkUpdateTicks = 0;
-		if(internalMapChange){
-			Creature::addPathSearch(this);
+	if(followCreature){
+		walkUpdateTicks += interval;
+		if(walkUpdateTicks >= 2000){
+			walkUpdateTicks = 0;
+			if(internalMapChange){
+				Creature::addPathSearch(this);
+			}
 		}
 	}
 
