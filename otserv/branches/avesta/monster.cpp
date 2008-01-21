@@ -471,20 +471,20 @@ bool Monster::activate(bool forced /*= false*/)
 	return isActivated;
 }
 
-bool Monster::deactivate()
+bool Monster::deactivate(bool forced /*= false*/)
 {
 	if(hasMaster()){
-		if(!isMasterInRange || getMaster()->idle()){
+		if(!isMasterInRange || getMaster()->idle() || forced){
 			isActivated = false;
 		}
 	}
 	else{
-		if(targetList.empty()){
+		if(targetList.empty() || forced){
 			isActivated = false;
 		}
 	}
 
-	if(!isActivated && conditions.empty()){
+	if( (!isActivated && conditions.empty()) || forced){
 		onIdleStatus();
 #ifdef __ONECREATURE_EVENT_
 		g_game.removeCreatureCheck(this);
@@ -987,6 +987,7 @@ void Monster::die()
 
 	clearTargetList();
 	clearFriendList();
+	deactivate(true);
 }
 
 bool Monster::inDespawnRange(const Position& pos)

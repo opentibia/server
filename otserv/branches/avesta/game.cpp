@@ -951,6 +951,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	ReturnValue ret = internalMoveItem(fromCylinder, toCylinder, toIndex, item, count);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
+		return false;
 	}
 
 	return true;

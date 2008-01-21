@@ -132,7 +132,7 @@ private:
 	bool inDespawnRange(const Position& pos);
 
 	bool activate(bool forced = false);
-	bool deactivate();
+	bool deactivate(bool forced = false);
 
 	virtual void onAddCondition(ConditionType_t type);
 	virtual void onEndCondition(ConditionType_t type);
