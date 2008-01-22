@@ -1367,6 +1367,12 @@ void LuaScriptInterface::registerFunctions()
 	//doConvinceCreature(cid, target)
 	lua_register(m_luaState, "doConvinceCreature", LuaScriptInterface::luaDoConvinceCreature);
 
+	//doSetMonsterTarget(cid, target)
+	lua_register(m_luaState, "doSetMonsterTarget", LuaScriptInterface::luaDoSetMonsterTarget);
+
+	//doMonsterChangeTarget(cid)
+	lua_register(m_luaState, "doMonsterChangeTarget", LuaScriptInterface::luaDoMonsterChangeTarget);
+
 	//numberToVariant(number)
 	lua_register(m_luaState, "numberToVariant", LuaScriptInterface::luaNumberToVariant);
 
@@ -4729,14 +4735,13 @@ int LuaScriptInterface::luaDoChallengeCreature(lua_State *L)
 
 	Creature* target = env->getCreatureByUID(targetCid);
 	if(target){
-		target->challengeCreature(creature);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
 
+	target->challengeCreature(creature);
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -4757,15 +4762,80 @@ int LuaScriptInterface::luaDoConvinceCreature(lua_State *L)
 	}
 
 	Creature* target = env->getCreatureByUID(targetCid);
-	if(target){
-		target->convinceCreature(creature);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
+	if(!target){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
 
+	target->convinceCreature(creature);
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoSetMonsterTarget(lua_State *L)
+{
+	//doSetMonsterTarget(cid, target)
+	uint32_t targetCid = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Monster* monster = creature->getMonster();
+	if(!monster){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Creature* target = env->getCreatureByUID(targetCid);
+	if(!target){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	if(!monster->isSummon()){
+		monster->selectTarget(target);
+	}
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoMonsterChangeTarget(lua_State *L)
+{
+	//doMonsterChangeTarget(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Monster* monster = creature->getMonster();
+	if(!monster){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	if(!monster->isSummon()){
+		monster->searchTarget(true);
+	}
+	
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 

@@ -39,6 +39,7 @@
     </attack>
   </attacks>
   <defenses armor="20" defense="30">
+    <defense script="monsters/teleport.lua" interval="10000" chance="40"/>
     <defense name="healing" interval="1000" chance="25" min="100" max="170">
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>

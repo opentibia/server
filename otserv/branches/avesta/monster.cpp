@@ -1133,7 +1133,12 @@ bool Monster::challengeCreature(Creature* creature)
 		return false;
 	}
 	else{
-		return selectTarget(creature);
+		bool result = selectTarget(creature);
+		if(result){
+			targetChangeTicks = 0;
+		}
+		
+		return result;
 	}
 
 	return false;

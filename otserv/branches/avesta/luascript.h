@@ -500,6 +500,8 @@ protected:
 
 	static int luaDoChallengeCreature(lua_State *L);
 	static int luaDoConvinceCreature(lua_State *L);
+	static int luaDoSetMonsterTarget(lua_State *L);
+	static int luaDoMonsterChangeTarget(lua_State *L);
 
 	static int luaNumberToVariant(lua_State *L);
 	static int luaStringToVariant(lua_State *L);

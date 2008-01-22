@@ -94,6 +94,9 @@ public:
 	virtual void doAttacking(uint32_t interval);
 	virtual bool hasExtraSwing() {return extraAttack;}
 
+	bool searchTarget(bool randomize = false);
+	bool selectTarget(Creature* creature);
+
 private:
 	typedef std::list<Creature*> CreatureList;
 	CreatureList targetList;
@@ -139,8 +142,6 @@ private:
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature);
 
 	bool canDoSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval);
-	bool searchTarget(bool randomize = false);
-	bool selectTarget(Creature* creature);
 	bool getRandomStep(const Position& creaturePos, Direction& dir);
 	bool getDanceStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 	bool isInSpawnRange(const Position& toPos);
