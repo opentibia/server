@@ -1,4 +1,10 @@
 dofile(getDataDir() .. 'functions.lua')
+if (ENABLE_GAME_CLASSES) then
+	dofile(getDataDir() .. 'game_classes.lua')
+end
+
+-- Config 
+ENABLE_GAME_CLASSES = true
 
 -- Storages consts
 STORAGE_RUM_MACHINE = 100000
