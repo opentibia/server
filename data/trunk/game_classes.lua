@@ -134,8 +134,8 @@ STORAGE_BANK = 6669
 	function Bank:doTransfer(cid, name, value)
 		local target = getPlayerByName(name)
 		if ((self:isValidValue(value) == TRUE) and (self:getPlayerMoney(cid) >= value) and (isPlayer(target) == TRUE)) then
-			self:doWithdraw(cid, self:getBalance(cid) - value)
-			self:doDeposit(target, self:getBalance(target) + value)
+			self:doWithdraw(cid, value)
+			self:doDeposit(target, value)
 		end
 		return FALSE
 	end
