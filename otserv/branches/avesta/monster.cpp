@@ -145,6 +145,8 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 		if(spawn){
 			spawn->startSpawnCheck();
 		}
+
+		deactivate(true);
 	}
 	else{
 		onCreatureLeave(const_cast<Creature*>(creature));
@@ -420,7 +422,8 @@ bool Monster::selectTarget(Creature* creature)
 
 	if( creature->isRemoved() ||
 		!creature->isAttackable() ||
-		creature->getZone() == ZONE_PROTECTION){
+		creature->getZone() == ZONE_PROTECTION ||
+		!canSeeCreature(creature)){
 		return false;
 	}
 
@@ -510,8 +513,12 @@ void Monster::onThink(uint32_t interval)
 {
 	if(despawn()){
 		g_game.removeCreature(this, true);
+		deactivate(true);
 	}
-	else if(!deactivate()){
+	else if(deactivate()){
+		//deactivated
+	}
+	else{
 		addEventWalk();
 
 		if(isSummon()){
@@ -539,9 +546,9 @@ void Monster::onThink(uint32_t interval)
 		onThinkTarget(interval);
 		onThinkYell(interval);
 		onThinkDefense(interval);
-	}
 
-	Creature::onThink(interval);
+		Creature::onThink(interval);
+	}
 }
 
 void Monster::doAttacking(uint32_t interval)
@@ -766,6 +773,7 @@ void Monster::pushItems(Tile* tile)
 	//start from the end to minimize the amount of traffic
 	int32_t downItemSize = tile->downItems.size();
 	for(int32_t i = downItemSize - 1; i >= 0; --i){
+		assert(i >= 0 && i < tile->downItems.size());
 		Item* item = tile->downItems[i];
 		if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND)
 			|| item->hasProperty(BLOCKSOLID))){
@@ -865,14 +873,20 @@ bool Monster::getNextStep(Direction& dir)
 	if(result && (canPushItems() || canPushCreatures()) ){
 		const Position& pos = Spells::getCasterPosition(this, dir);
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+		if(tile){
+			if(canPushItems()){
+				pushItems(tile);
+			}
 
-		if(canPushItems()){
-			pushItems(tile);
+			if(canPushCreatures()){
+				pushCreatures(tile);
+			}
 		}
-
-		if(canPushCreatures()){
-			pushCreatures(tile);
+#ifdef __DEBUG__
+		else{
+			std::cout << "getNextStep - no tile." << std::endl;
 		}
+#endif
 	}
 
 	return result;

@@ -175,7 +175,6 @@ void Creature::stopEventThink()
 
 void Creature::onThink(uint32_t interval)
 {
-	/*
 	if(followCreature && getMaster() != followCreature && !canSeeCreature(followCreature)){
 		onCreatureDisappear(followCreature, false);
 	}
@@ -183,7 +182,6 @@ void Creature::onThink(uint32_t interval)
 	if(attackedCreature && getMaster() != attackedCreature && !canSeeCreature(attackedCreature)){
 		onCreatureDisappear(attackedCreature, false);
 	}
-	*/
 
 	blockTicks += interval;
 

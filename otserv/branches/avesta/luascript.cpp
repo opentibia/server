@@ -4734,7 +4734,7 @@ int LuaScriptInterface::luaDoChallengeCreature(lua_State *L)
 	}
 
 	Creature* target = env->getCreatureByUID(targetCid);
-	if(target){
+	if(!target){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
