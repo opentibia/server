@@ -515,10 +515,7 @@ void Monster::onThink(uint32_t interval)
 		g_game.removeCreature(this, true);
 		deactivate(true);
 	}
-	else if(deactivate()){
-		//deactivated
-	}
-	else{
+	else if(!deactivate()){
 		addEventWalk();
 
 		if(isSummon()){
@@ -546,9 +543,9 @@ void Monster::onThink(uint32_t interval)
 		onThinkTarget(interval);
 		onThinkYell(interval);
 		onThinkDefense(interval);
-
-		Creature::onThink(interval);
 	}
+
+	Creature::onThink(interval);
 }
 
 void Monster::doAttacking(uint32_t interval)
