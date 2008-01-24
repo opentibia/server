@@ -108,7 +108,7 @@ STORAGE_BANK = 6669
 	function Bank:doWithdraw(cid, value)
 		if ((self:isValidValue(value) == TRUE) and (self:getBalance(cid) >= value)) then	
 			doPlayerAddMoney(cid, value)
-			setPlayerStorageValue(cid, STORAGE_BANK, self:getBalance(cid) - value)
+			self:doAddMoney(cid, -value)
 		end
 		return FALSE
 	end
@@ -121,7 +121,7 @@ STORAGE_BANK = 6669
 	function Bank:doDeposit(cid, value)
 		if ((self:isValidValue(value) == TRUE) and (self:getPlayerMoney(cid) >= value)) then
 			doPlayerRemoveMoney(cid, value)
-			setPlayerStorageValue(cid, self:getBalance(cid) + value)
+			self:doAddMoney(cid, value)
 		end
 		return FALSE
 	end
@@ -130,12 +130,16 @@ STORAGE_BANK = 6669
 		self:doDeposit(cid, self:getPlayerMoney(cid))
 		return TRUE
 	end
-
+	
+	function Bank:doAddMoney(cid, value)
+		setPlayerStorageValue(cid, STORAGE_BANK, self:getBalance(cid) + value)
+	end
+	
 	function Bank:doTransfer(cid, name, value)
 		local target = getPlayerByName(name)
 		if ((self:isValidValue(value) == TRUE) and (self:getPlayerMoney(cid) >= value) and (isPlayer(target) == TRUE)) then
-			self:doWithdraw(cid, value)
-			self:doDeposit(target, value)
+			self:doAddMoney(cid, -value)
+			self:doAddMoney(target, value)
 		end
 		return FALSE
 	end
