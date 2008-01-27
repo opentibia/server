@@ -1,63 +1,3 @@
--- House Class
-
-local HOUSE_CONFIG =
-{
-	tilePrice         = 100 -- in GPs
-}
-	
-House = {}
-House.__index = House
-
-        
-	function House:hasHouse (cid)
-		if (getHouseByPlayerGUID(getPlayerGUID(cid))) then
-			return TRUE
-		end
-		return FALSE
-	end
-
-	function House:buy (cid, doorPos)
-		local housePrice = getHouseTilesSize(houseID) * HOUSE_CONFIG.tilePrice
-		local playerGUID = getPlayerGUID(cid)
-		local houseID = getHouseByPlayerGUID(playerGUID)
-
-		if (getTileHouseInfo(doorPos)) then
-			if (self:hasHouse(cid) == FALSE) then
-				if (getPlayerPremiumDays(cid) > 0) then
-					if (doPlayerRemoveMoney(cid, housePrice)) then
-						setHouseOwner(houseID, playerGUID)
-						doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, 'Congratulations, the house has been bought with success. \n Address: ' .. self:info(doorPos).name ..  ' \n Rent: ' .. self:info(doorPos).rent .. '.')
-					else
-						doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, 'You do not have enought money to buy this house. \n Price: ' .. housePrice .. ' \n Rent: ' .. self:info(doorPos).rent .. '.')
-					end
-				else
-					doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, 'Only premium players are able to buy a house.')
-				end
-			else
-				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, 'You already own a house.')
-			end
-		else
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, 'There is no house around you. Make sure you are facing the house door.')
-		end
-	end
-
-	function House:info (doorPos)
-		--[[if (getTileHouseInfo(doorPos)) then
-			local houseArray = 
-			{
-				name = getHouseName(houseID),
-				owner = getHouseOwner(houseID), 
-				rent = getHouseRent(houseID), 
-				entry = getHouseEntry(houseID), 
-				town = getHouseTown(houseID),
-				size = getHouseTilesSize(houseID)
-			}
-			return houseArray
-		end]]-- TODO: the the houseID as a key for the House class so you won't need 'cid' after the house is created
-		return FALSE
-	end
-
-
 -- Bank Class
 Bank = {}
 Bank.__index = Bank
@@ -140,4 +80,3 @@ STORAGE_BANK = 6669
 		end
 		return FALSE
 	end
-	

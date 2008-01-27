@@ -1,0 +1,23 @@
+TO-DO List for the Data Folder
+===========================
+Items that are done will be removed.
+
+v0.1
+* Optimize scripts already done
+* Fix game classes, add new game classes
+* Add Jiddo's NPC System with some optimizations and NPCs examples
+* Change fishing system so it is not based only on one ID
+* Remove deprecated items from scripts
+* Add normal closed doors to AddItem movements to be transformed into Locked Doors if they have an ActionID
+
+v0.2
+* Rewrite all monsters from zero so their files are lighter and they are like Real Tibia(according to TibiaWiki)
+* Add 8.10(or more) monsters
+* Example of creature scripts for quests(ie. a boss monster that opens a door when it dies)
+* Change map so it works with the quest example scripts
+* Swimming system
+* Update furnitures to 8.10(including bed-furnitures)
+
+v0.3
+* Remove deprecated variables, remove the use of getThingfromPos, and getPlayer* when getCreature* is disponible
+* Optimize door system to support multi-vocations easier(with arrays)

@@ -71,6 +71,21 @@ function getDistanceBetween(pos1, pos2)
 	return posDif
 end
 
+function getPlayerLookPos(cid)
+	local playerPos = getCreaturePosition(cid)
+	local lookDir = getPlayerLookDir(cid)
+	if(lookDir == NORTH) then
+		playerPos.y = playerPos.y-1
+	elseif(lookDir == SOUTH) then
+		playerPos.y = playerPos.y+1
+	elseif(lookDir == WEST) then
+		playerPos.x = playerPos.x-1
+	elseif(lookDir == EAST) then
+		playerPos.x = playerPos.x+1
+	end
+	return playerPos
+end
+
 function doPlayerGiveItem(cid, itemid, count --[[optional]], subtype --[[optional]], placeonfloor --[[optional]])
 	local count = count or 1
 	local subtype = subtype or 0

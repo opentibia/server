@@ -15,18 +15,18 @@ function onUse(cid, item, frompos, item2, topos)
 		elseif (item2.actionid == SCARAB_TILE) then
 			if (math.random(1, 20) == 1) then
 				doSummonCreature("Scarab", topos)
-				doSetItemActionId(item2.uid, SCARAB_TILE + 1)
+				doSetItemActionId(item2.uid, SCARAB_TILE + 2)
 			end
 		elseif (item2.actionid == SCARAB_COIN_TILE) then
 			if (math.random(1, 20) == 1) then
-				doPlayerAddItem(cid, ITEM_SCARAB_COIN, 1)
-				doSetItemActionId(item2.uid, SCARAB_COIN_TILE + 1)
+				doCreateItem(ITEM_SCARAB_COIN, topos)
+				doSetItemActionId(item2.uid, SCARAB_COIN_TILE + 2)
 			end
-		elseif (item2.actionid == SCARAB_TILE + 1) then
+		elseif (item2.actionid == SCARAB_TILE + 2) then
 			if (math.random(1, 40) == 1) then
 				doSetItemActionId(item2.uid, SCARAB_TILE)
 			end
-		elseif (item2.actionid == SCARAB_COIN_TILE + 1) then
+		elseif (item2.actionid == SCARAB_COIN_TILE + 2) then
 			if (math.random(1, 40) == 1) then
 				doSetItemActionId(item2.uid, SCARAB_COIN_TILE)
 			end

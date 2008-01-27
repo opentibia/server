@@ -1,0 +1,51 @@
+Instructions when mapping with this Data Folder
+====================================
+1. Sand
+
+Sand with ActionID 100 will have a 20% chance of turning into
+a cave entrace when a shovel is used in it.
+
+Sand with ActionID 101 will have a 5% chance of summoning a
+Scarab when a shovel is used in it.
+
+Sand with ActionID 102 will have a 5% chance of giving a scarab coin
+when a shovel is used in it.
+
+====================================
+2. Water
+
+---Under construction---
+
+====================================
+3. Doors
+
+When on map editor, closed doors with ActionIDs are locked doors
+and can only be opened by keys with the same ActionID.
+
+====================================
+4. Gate of Expertises(aka. "Level Doors")
+
+Gate of Expertises are normal doors when no reserved actionId is set
+on them.
+
+The reserved actionIds are:
+- 1001 to 1999: Level required to pass the door. Level is the actionId-1000.
+- 2001 to 2008: Vocation required to pass the door.
+-- 2001: Sorcerer
+-- 2002: Druid
+-- 2003: Paladin
+-- 2004: Knight
+-- 2005: Master Sorcerer
+-- 2006: Elder Druid
+-- 2007: Royal Paladin
+-- 2008: Elite Knight
+
+====================================
+5. Sealed Doors(aka. "Quest Doors")
+
+Sealed Doors are normal doors if no actionId is set on them.
+
+Players can only pass these doors if their storage value equal to the actionId
+of that door is 1.
+
+====================================

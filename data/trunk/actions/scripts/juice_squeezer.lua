@@ -6,12 +6,12 @@ local TYPE_JUICE = 21
 
 function onUse(cid, item, frompos, item2, topos)
 	if (isInArray(JUICE_FRUITS, item2.itemid) == TRUE) then
-		if (doPlayerRemoveItem(cid, ITEM_VIAL, 1) == TRUE) then
+		if (doPlayerRemoveItem(cid, ITEM_VIAL, 1, 0) == TRUE) then
 			doRemoveItem(item2.uid, 1)
 			doPlayerAddItem(cid, ITEM_VIAL,TYPE_JUICE)
 		end
 	elseif (item2.itemid == ITEM_COCONUT) then
-		if (doPlayerRemoveItem(cid, ITEM_VIAL, 1) == TRUE) then
+		if (doPlayerRemoveItem(cid, ITEM_VIAL, 1, 0) == TRUE) then
 			doRemoveItem(item2.uid, 1)
 			doPlayerAddItem(cid,ITEM_VIAL, TYPE_COCONUT_MILK)
 		end

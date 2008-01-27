@@ -4,7 +4,10 @@ dofile(getDataDir() .. 'functions.lua')
 ENABLE_GAME_CLASSES = true
 
 if (ENABLE_GAME_CLASSES) then
-	dofile(getDataDir() .. 'game_classes.lua')
+	-- House class
+	dofile(getDataDir() .. 'game_classes/house.lua')
+	-- Bank class
+	dofile(getDataDir() .. 'game_classes/bank.lua')
 end
 
 -- Storages consts
