@@ -8,10 +8,10 @@ function onUse(cid, item, frompos, item2, topos)
 		-- 5 meats
 		parameters = {reward = {2666, 5}, storageValue = item.uid}
 	elseif (item.uid == 1002) then
-		-- a key with actionId 2049
+		-- a key with actionId 2149
 		parameters = {reward = {2086, 1, 2149}, storageValue = item.uid}
 	elseif (item.uid == 1003) then
-		-- a magic sword, 5 meats and a key with actionId 2049
+		-- a magic sword, 5 meats and a key with actionId 2149
 		parameters = {rewards = {{2400}, {2666, 5}, {2086, 1, 2149}}, storageValue = item.uid}
 	else
 		return FALSE

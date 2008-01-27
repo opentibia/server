@@ -1018,12 +1018,14 @@
 	<item id="1208" article="a" name="brick wall">
 	</item>
 	<item id="1209" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1210" article="a" name="closed door">
 	</item>
 	<item id="1211" article="an" name="open door">
 	</item>
 	<item id="1212" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1213" article="a" name="closed door">
 	</item>
@@ -1046,36 +1048,30 @@
 	<item id="1222" article="an" name="open door">
 	</item>
 	<item id="1223" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1224" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1225" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1226" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1227" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1228" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1229" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1230" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1231" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1232" article="a" name="closed door">
 	</item>
 	<item id="1233" article="an" name="open door">
 	</item>
 	<item id="1234" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1235" article="a" name="closed door">
 	</item>
@@ -1090,64 +1086,50 @@
 	<item id="1240" article="an" name="open door">
 	</item>
 	<item id="1241" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
-	<item id="1242" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
+	<item id="1242" article="an" name="open door">
 	</item>
 	<item id="1243" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
-	<item id="1244" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
+	<item id="1244" article="an" name="open door">
 	</item>
 	<item id="1245" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1246" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1247" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1248" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1249" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1250" article="a" name="closed door">
 	</item>
 	<item id="1251" article="an" name="open door">
 	</item>
 	<item id="1252" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1253" article="a" name="closed door">
 	</item>
 	<item id="1254" article="an" name="open door">
 	</item>
 	<item id="1255" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1256" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1257" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1258" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1259" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1260" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1261" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1262" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1263" article="a" name="framework window">
 	</item>
@@ -8551,6 +8533,7 @@
 	<item id="3534" article="a" name="stone wall">
 	</item>
 	<item id="3535" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="3536" article="a" name="closed door">
 	</item>
@@ -8561,18 +8544,15 @@
 	<item id="3539" article="an" name="open door">
 	</item>
 	<item id="3540" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="3541" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="3542" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="3543" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="3544" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="3545" article="a" name="closed door">
 	</item>
@@ -8583,16 +8563,12 @@
 	<item id="3548" article="an" name="open door">
 	</item>
 	<item id="3549" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="3550" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="3551" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="3552" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="3569" article="a" name="waterfall">
 	</item>
@@ -11662,12 +11638,14 @@
 	<item id="4912" article="a" name="ship cabin wall">
 	</item>
 	<item id="4913" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="4914" article="a" name="closed door">
 	</item>
 	<item id="4915" article="an" name="open door">
 	</item>
 	<item id="4916" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="4917" article="a" name="closed door">
 	</item>
@@ -12046,6 +12024,7 @@
 		<attribute key="weight" value="180"/>
 	</item>
 	<item id="5098" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5099" article="a" name="closed door">
 	</item>
@@ -12056,18 +12035,15 @@
 	<item id="5102" article="an" name="open door">
 	</item>
 	<item id="5103" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5104" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5105" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5106" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5107" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5108" article="a" name="closed door">
 	</item>
@@ -12078,18 +12054,15 @@
 	<item id="5111" article="an" name="open door">
 	</item>
 	<item id="5112" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5113" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5114" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5115" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5116" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5117" article="a" name="closed door">
 	</item>
@@ -12100,18 +12073,15 @@
 	<item id="5120" article="an" name="open door">
 	</item>
 	<item id="5121" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5122" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5123" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5124" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5125" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5126" article="a" name="closed door">
 	</item>
@@ -12122,36 +12092,36 @@
 	<item id="5129" article="an" name="open door">
 	</item>
 	<item id="5130" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5131" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5132" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5133" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5134" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5135" article="a" name="closed door">
 	</item>
 	<item id="5136" article="an" name="open door">
 	</item>
 	<item id="5137" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5138" article="a" name="closed door">
 	</item>
 	<item id="5139" article="an" name="open door">
 	</item>
 	<item id="5140" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5141" article="a" name="closed door">
 	</item>
 	<item id="5142" article="an" name="open door">
 	</item>
 	<item id="5143" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5144" article="a" name="closed door">
 	</item>
@@ -12422,12 +12392,14 @@
 	<item id="5277" article="a" name="wooden wall window">
 	</item>
 	<item id="5278" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5279" article="a" name="closed door">
 	</item>
 	<item id="5280" article="an" name="open door">
 	</item>
 	<item id="5281" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5282" article="a" name="closed door">
 	</item>
@@ -12442,28 +12414,20 @@
 	<item id="5287" article="an" name="open door">
 	</item>
 	<item id="5288" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5289" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5290" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5291" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5292" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5293" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5294" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5295" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5296" name="wood">
 	</item>
@@ -13474,12 +13438,14 @@
 	<item id="5731" article="a" name="hole">
 	</item>
 	<item id="5732" name="closed bars">
+		<attribute key="description" value="They are locked."/>
 	</item>
 	<item id="5733" name="closed bars">
 	</item>
 	<item id="5734" name="open bars">
 	</item>
 	<item id="5735" name="closed bars">
+		<attribute key="description" value="They are locked."/>
 	</item>
 	<item id="5736" name="closed bars">
 	</item>
@@ -14989,12 +14955,14 @@
 	<item id="6191" article="a" name="branch">
 	</item>
 	<item id="6192" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6193" article="a" name="closed door">
 	</item>
 	<item id="6194" article="an" name="open door">
 	</item>
 	<item id="6195" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6196" article="a" name="closed door">
 	</item>
@@ -15009,28 +14977,20 @@
 	<item id="6201" article="an" name="open door">
 	</item>
 	<item id="6202" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6203" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6204" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6205" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6206" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6207" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6208" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6209" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6210" article="a" name="bamboo roof">
 	</item>
@@ -15111,12 +15071,14 @@
 	<item id="6248" article="a" name="plant wall">
 	</item>
 	<item id="6249" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6250" article="a" name="closed door">
 	</item>
 	<item id="6251" article="an" name="open door">
 	</item>
 	<item id="6252" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6253" article="a" name="closed door">
 	</item>
@@ -15131,28 +15093,20 @@
 	<item id="6258" article="an" name="open door">
 	</item>
 	<item id="6259" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6260" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6261" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6262" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6263" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6264" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6265" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6266" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6267" article="a" name="stone rubbish">
 	</item>
@@ -16734,6 +16688,7 @@
 	<item id="6890" name="tusks">
 	</item>
 	<item id="6891" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6892" article="a" name="closed door">
 	</item>
@@ -16743,15 +16698,16 @@
 	</item>
 	<item id="6895" article="an" name="open door">
 	</item>
-	<item id="6896" article="a" name="closed door">
+	<item id="6896" article="a" name="gate of expertise">
 	</item>
-	<item id="6897" article="an" name="open door">
+	<item id="6897" article="a" name="gate of expertise">
 	</item>
 	<item id="6898" article="a" name="closed door">
 	</item>
 	<item id="6899" article="an" name="open door">
 	</item>
 	<item id="6900" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6901" article="a" name="closed door">
 	</item>
@@ -16761,9 +16717,9 @@
 	</item>
 	<item id="6904" article="an" name="open door">
 	</item>
-	<item id="6905" article="a" name="closed door">
+	<item id="6905" article="a" name="gate of expertise">
 	</item>
-	<item id="6906" article="an" name="open door">
+	<item id="6906" article="a" name="gate of expertise">
 	</item>
 	<item id="6907" article="a" name="closed door">
 	</item>
@@ -17017,6 +16973,7 @@
 	<item id="7032" article="an" name="ice wall window">
 	</item>
 	<item id="7033" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="7034" article="a" name="closed door">
 	</item>
@@ -17026,15 +16983,16 @@
 	</item>
 	<item id="7037" article="an" name="open door">
 	</item>
-	<item id="7038" article="a" name="closed door">
+	<item id="7038" article="a" name="gate of expertise">
 	</item>
-	<item id="7039" article="an" name="open door">
+	<item id="7039" article="a" name="gate of expertise">
 	</item>
 	<item id="7040" article="a" name="closed door">
 	</item>
 	<item id="7041" article="an" name="open door">
 	</item>
 	<item id="7042" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="7043" article="a" name="closed door">
 	</item>
@@ -17044,9 +17002,9 @@
 	</item>
 	<item id="7046" article="an" name="open door">
 	</item>
-	<item id="7047" article="a" name="closed door">
+	<item id="7047" article="a" name="gate of expertise">
 	</item>
-	<item id="7048" article="an" name="open door">
+	<item id="7048" article="a" name="gate of expertise">
 	</item>
 	<item id="7049" article="a" name="closed door">
 	</item>

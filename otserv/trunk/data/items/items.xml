@@ -4,505 +4,21 @@
 	</item>
 	<item id="101" name="earth">
 	</item>
-	<item id="102" name="grass">
-	</item>
 	<item id="103" name="dirt">
 	</item>
 	<item id="104" name="sand">
 	</item>
-	<item id="105" name="gravel">
-	</item>
 	<item id="106" name="grass">
-	</item>
-	<item id="107" name="rock soil">
 	</item>
 	<item id="108" name="flowers">
 	</item>
 	<item id="109" name="flowers">
-	</item>
-	<item id="110" name="grass">
-	</item>
-	<item id="111" name="grass">
-	</item>
-	<item id="112" name="grass">
-	</item>
-	<item id="113" name="grass">
-	</item>
-	<item id="114" name="grass">
-	</item>
-	<item id="115" name="grass">
-	</item>
-	<item id="116" name="grass">
-	</item>
-	<item id="117" name="grass">
-	</item>
-	<item id="118" name="grass">
-	</item>
-	<item id="119" name="grass">
-	</item>
-	<item id="120" name="grass">
-	</item>
-	<item id="121" name="grass">
-	</item>
-	<item id="122" name="grass">
-	</item>
-	<item id="123" name="grass">
-	</item>
-	<item id="124" name="grass">
-	</item>
-	<item id="125" name="grass">
-	</item>
-	<item id="126" name="grass">
-	</item>
-	<item id="127" name="grass">
-	</item>
-	<item id="128" name="grass">
-	</item>
-	<item id="129" name="grass">
-	</item>
-	<item id="130" name="grass">
-	</item>
-	<item id="131" name="grass">
-	</item>
-	<item id="132" name="grass">
-	</item>
-	<item id="133" name="grass">
-	</item>
-	<item id="134" name="sand">
-	</item>
-	<item id="135" name="sand">
-	</item>
-	<item id="136" name="sand">
-	</item>
-	<item id="137" name="sand">
-	</item>
-	<item id="138" name="sand">
-	</item>
-	<item id="139" name="sand">
-	</item>
-	<item id="140" name="sand">
-	</item>
-	<item id="141" name="sand">
-	</item>
-	<item id="142" name="sand">
-	</item>
-	<item id="143" name="sand">
-	</item>
-	<item id="144" name="sand">
-	</item>
-	<item id="145" name="sand">
-	</item>
-	<item id="146" name="gravel">
-	</item>
-	<item id="147" name="gravel">
-	</item>
-	<item id="148" name="gravel">
-	</item>
-	<item id="149" name="gravel">
-	</item>
-	<item id="150" name="gravel">
-	</item>
-	<item id="151" name="gravel">
-	</item>
-	<item id="152" name="gravel">
-	</item>
-	<item id="153" name="gravel">
-	</item>
-	<item id="154" name="gravel">
-	</item>
-	<item id="155" name="gravel">
-	</item>
-	<item id="156" name="gravel">
-	</item>
-	<item id="157" name="gravel">
-	</item>
-	<item id="158" name="sand">
-	</item>
-	<item id="159" name="sand">
-	</item>
-	<item id="160" name="sand">
-	</item>
-	<item id="161" name="sand">
-	</item>
-	<item id="162" name="sand">
-	</item>
-	<item id="163" name="sand">
-	</item>
-	<item id="164" name="sand">
-	</item>
-	<item id="165" name="sand">
-	</item>
-	<item id="166" name="sand">
-	</item>
-	<item id="167" name="sand">
-	</item>
-	<item id="168" name="sand">
-	</item>
-	<item id="169" name="sand">
-	</item>
-	<item id="170" name="gravel">
-	</item>
-	<item id="171" name="gravel">
-	</item>
-	<item id="172" name="gravel">
-	</item>
-	<item id="173" name="gravel">
-	</item>
-	<item id="174" name="gravel">
-	</item>
-	<item id="175" name="gravel">
-	</item>
-	<item id="176" name="gravel">
-	</item>
-	<item id="177" name="gravel">
-	</item>
-	<item id="178" name="gravel">
-	</item>
-	<item id="179" name="gravel">
-	</item>
-	<item id="180" name="gravel">
-	</item>
-	<item id="181" name="gravel">
-	</item>
-	<item id="182" name="grass">
-	</item>
-	<item id="183" name="grass">
-	</item>
-	<item id="184" name="grass">
-	</item>
-	<item id="185" name="grass">
-	</item>
-	<item id="186" name="grass">
-	</item>
-	<item id="187" name="grass">
-	</item>
-	<item id="188" name="grass">
-	</item>
-	<item id="189" name="grass">
-	</item>
-	<item id="190" name="grass">
-	</item>
-	<item id="191" name="grass">
-	</item>
-	<item id="192" name="grass">
-	</item>
-	<item id="193" name="grass">
-	</item>
-	<item id="194" name="grass">
-	</item>
-	<item id="195" name="grass">
-	</item>
-	<item id="196" name="grass">
-	</item>
-	<item id="197" name="grass">
-	</item>
-	<item id="198" name="grass">
-	</item>
-	<item id="199" name="grass">
-	</item>
-	<item id="200" name="grass">
-	</item>
-	<item id="201" name="grass">
-	</item>
-	<item id="202" name="grass">
-	</item>
-	<item id="203" name="grass">
-	</item>
-	<item id="204" name="grass">
-	</item>
-	<item id="205" name="grass">
-	</item>
-	<item id="206" name="grass">
-	</item>
-	<item id="207" name="gravel">
-	</item>
-	<item id="208" name="gravel">
-	</item>
-	<item id="209" name="gravel">
-	</item>
-	<item id="210" name="gravel">
-	</item>
-	<item id="211" name="gravel">
-	</item>
-	<item id="212" name="gravel">
-	</item>
-	<item id="213" name="gravel">
-	</item>
-	<item id="214" name="gravel">
-	</item>
-	<item id="215" name="gravel">
-	</item>
-	<item id="216" name="gravel">
-	</item>
-	<item id="217" name="gravel">
-	</item>
-	<item id="218" name="gravel">
-	</item>
-	<item id="219" name="grass">
-	</item>
-	<item id="220" name="grass">
-	</item>
-	<item id="221" name="grass">
-	</item>
-	<item id="222" name="grass">
-	</item>
-	<item id="223" name="grass">
-	</item>
-	<item id="224" name="grass">
-	</item>
-	<item id="225" name="grass">
-	</item>
-	<item id="226" name="grass">
-	</item>
-	<item id="227" name="grass">
-	</item>
-	<item id="228" name="grass">
-	</item>
-	<item id="229" name="grass">
-	</item>
-	<item id="230" name="grass">
-	</item>
-	<item id="231" name="sand">
-	</item>
-	<item id="232" name="grass">
-	</item>
-	<item id="233" name="grass">
-	</item>
-	<item id="234" name="grass">
-	</item>
-	<item id="235" name="grass">
-	</item>
-	<item id="236" name="grass">
-	</item>
-	<item id="237" name="grass">
-	</item>
-	<item id="238" name="grass">
-	</item>
-	<item id="239" name="grass">
-	</item>
-	<item id="240" name="grass">
-	</item>
-	<item id="241" name="grass">
-	</item>
-	<item id="242" name="grass">
-	</item>
-	<item id="243" name="grass">
-	</item>
-	<item id="244" name="sand">
-	</item>
-	<item id="245" name="sand">
-	</item>
-	<item id="246" name="sand">
-	</item>
-	<item id="247" name="sand">
-	</item>
-	<item id="248" name="sand">
-	</item>
-	<item id="249" name="sand">
-	</item>
-	<item id="250" name="sand">
-	</item>
-	<item id="251" name="sand">
-	</item>
-	<item id="252" name="sand">
-	</item>
-	<item id="253" name="sand">
-	</item>
-	<item id="254" name="sand">
-	</item>
-	<item id="255" name="sand">
-	</item>
-	<item id="256" name="rock soil">
-	</item>
-	<item id="257" name="rock soil">
-	</item>
-	<item id="258" name="rock soil">
-	</item>
-	<item id="259" name="rock soil">
-	</item>
-	<item id="260" name="rock soil">
-	</item>
-	<item id="261" name="rock soil">
-	</item>
-	<item id="262" name="rock soil">
-	</item>
-	<item id="263" name="rock soil">
-	</item>
-	<item id="264" name="rock soil">
-	</item>
-	<item id="265" name="rock soil">
-	</item>
-	<item id="266" name="rock soil">
-	</item>
-	<item id="267" name="rock soil">
-	</item>
-	<item id="268" name="grass">
-	</item>
-	<item id="269" name="grass">
-	</item>
-	<item id="270" name="grass">
-	</item>
-	<item id="271" name="grass">
-	</item>
-	<item id="272" name="grass">
-	</item>
-	<item id="273" name="grass">
-	</item>
-	<item id="274" name="grass">
-	</item>
-	<item id="275" name="grass">
-	</item>
-	<item id="276" name="grass">
-	</item>
-	<item id="277" name="grass">
-	</item>
-	<item id="278" name="grass">
-	</item>
-	<item id="279" name="grass">
-	</item>
-	<item id="280" name="grass">
-	</item>
-	<item id="281" name="grass">
-	</item>
-	<item id="282" name="grass">
-	</item>
-	<item id="283" name="grass">
-	</item>
-	<item id="284" name="grass">
-	</item>
-	<item id="285" name="grass">
-	</item>
-	<item id="286" name="grass">
-	</item>
-	<item id="287" name="grass">
-	</item>
-	<item id="288" name="grass">
-	</item>
-	<item id="289" name="grass">
-	</item>
-	<item id="290" name="grass">
-	</item>
-	<item id="291" name="grass">
-	</item>
-	<item id="292" name="grass">
 	</item>
 	<item id="293" name="grass">
 	</item>
 	<item id="294" article="a" name="pitfall">
 		<attribute key="decayTo" value="293"/>
 		<attribute key="duration" value="300"/>
-	</item>
-	<item id="295" name="grass">
-	</item>
-	<item id="296" name="grass">
-	</item>
-	<item id="297" name="grass">
-	</item>
-	<item id="298" name="grass">
-	</item>
-	<item id="299" name="grass">
-	</item>
-	<item id="300" name="grass">
-	</item>
-	<item id="301" name="grass">
-	</item>
-	<item id="302" name="grass">
-	</item>
-	<item id="303" name="grass">
-	</item>
-	<item id="304" name="grass">
-	</item>
-	<item id="305" name="grass">
-	</item>
-	<item id="306" name="grass">
-	</item>
-	<item id="307" name="grass">
-	</item>
-	<item id="308" name="grass">
-	</item>
-	<item id="309" name="grass">
-	</item>
-	<item id="310" name="grass">
-	</item>
-	<item id="311" name="grass">
-	</item>
-	<item id="312" name="grass">
-	</item>
-	<item id="313" name="grass">
-	</item>
-	<item id="314" name="grass">
-	</item>
-	<item id="315" name="grass">
-	</item>
-	<item id="316" name="grass">
-	</item>
-	<item id="317" name="grass">
-	</item>
-	<item id="318" name="grass">
-	</item>
-	<item id="319" name="sand">
-	</item>
-	<item id="320" name="sand">
-	</item>
-	<item id="321" name="sand">
-	</item>
-	<item id="322" name="sand">
-	</item>
-	<item id="323" name="sand">
-	</item>
-	<item id="324" name="sand">
-	</item>
-	<item id="325" name="sand">
-	</item>
-	<item id="326" name="sand">
-	</item>
-	<item id="327" name="grass">
-	</item>
-	<item id="328" name="grass">
-	</item>
-	<item id="329" name="grass">
-	</item>
-	<item id="330" name="grass">
-	</item>
-	<item id="331" name="grass">
-	</item>
-	<item id="332" name="grass">
-	</item>
-	<item id="333" name="grass">
-	</item>
-	<item id="334" name="grass">
-	</item>
-	<item id="335" name="sand">
-	</item>
-	<item id="336" name="sand">
-	</item>
-	<item id="337" name="sand">
-	</item>
-	<item id="338" name="sand">
-	</item>
-	<item id="339" name="sand">
-	</item>
-	<item id="340" name="sand">
-	</item>
-	<item id="341" name="sand">
-	</item>
-	<item id="342" name="sand">
-	</item>
-	<item id="343" name="gravel">
-	</item>
-	<item id="344" name="gravel">
-	</item>
-	<item id="345" name="gravel">
-	</item>
-	<item id="346" name="gravel">
-	</item>
-	<item id="347" name="gravel">
-	</item>
-	<item id="348" name="gravel">
-	</item>
-	<item id="349" name="gravel">
-	</item>
-	<item id="350" name="gravel">
 	</item>
 	<item id="351" name="dirt">
 	</item>
@@ -593,30 +109,6 @@
 	<item id="392" article="a" name="hole">
 		<attribute key="decayTo" value="354"/>
 		<attribute key="duration" value="300"/>
-	</item>
-	<item id="393" name="grass">
-	</item>
-	<item id="394" name="grass">
-	</item>
-	<item id="395" name="grass">
-	</item>
-	<item id="396" name="grass">
-	</item>
-	<item id="397" name="grass">
-	</item>
-	<item id="398" name="grass">
-	</item>
-	<item id="399" name="grass">
-	</item>
-	<item id="400" name="grass">
-	</item>
-	<item id="401" name="grass">
-	</item>
-	<item id="402" name="grass">
-	</item>
-	<item id="403" name="grass">
-	</item>
-	<item id="404" name="grass">
 	</item>
 	<item id="405" name="wooden flooring">
 	</item>
@@ -735,7 +227,7 @@
 	</item>
 	<item id="459" name="stairs">
 	</item>
-	<item id="460" name="">
+	<item id="460" name="void">
 	</item>
 	<item id="461" article="a" name="closed trapdoor">
 	</item>
@@ -805,230 +297,7 @@
 		<attribute key="decayTo" value="231"/>
 		<attribute key="duration" value="30"/>
 	</item>
-	<item id="490" name="water">
-		<attribute key="description" value="You see the silvery movement of fish."/>
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="491" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="492" name="water">
-		<attribute key="decayTo" value="490"/>
-		<attribute key="duration" value="120"/>
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
 	<item id="493" name="water">
-	</item>
-	<item id="494" name="water">
-	</item>
-	<item id="495" name="water">
-	</item>
-	<item id="496" name="water">
-	</item>
-	<item id="497" name="water">
-	</item>
-	<item id="498" name="water">
-	</item>
-	<item id="499" name="water">
-	</item>
-	<item id="500" name="water">
-	</item>
-	<item id="501" name="water">
-	</item>
-	<item id="502" name="water">
-	</item>
-	<item id="503" name="water">
-	</item>
-	<item id="504" name="water">
-	</item>
-	<item id="505" name="water">
-	</item>
-	<item id="506" name="water">
-	</item>
-	<item id="507" name="water">
-	</item>
-	<item id="508" name="water">
-	</item>
-	<item id="509" name="water">
-	</item>
-	<item id="510" name="water">
-	</item>
-	<item id="511" name="water">
-	</item>
-	<item id="512" name="water">
-	</item>
-	<item id="513" name="water">
-	</item>
-	<item id="514" name="water">
-	</item>
-	<item id="515" name="water">
-	</item>
-	<item id="516" name="water">
-	</item>
-	<item id="517" name="water">
-	</item>
-	<item id="518" name="lava">
-	</item>
-	<item id="519" name="lava">
-	</item>
-	<item id="520" name="lava">
-	</item>
-	<item id="521" name="lava">
-	</item>
-	<item id="522" name="lava">
-	</item>
-	<item id="523" name="lava">
-	</item>
-	<item id="524" name="lava">
-	</item>
-	<item id="525" name="lava">
-	</item>
-	<item id="526" name="lava">
-	</item>
-	<item id="527" name="lava">
-	</item>
-	<item id="528" name="lava">
-	</item>
-	<item id="529" name="lava">
-	</item>
-	<item id="530" name="swamp">
-	</item>
-	<item id="531" name="swamp">
-	</item>
-	<item id="532" name="swamp">
-	</item>
-	<item id="533" name="swamp">
-	</item>
-	<item id="534" name="swamp">
-	</item>
-	<item id="535" name="swamp">
-	</item>
-	<item id="536" name="swamp">
-	</item>
-	<item id="537" name="swamp">
-	</item>
-	<item id="538" name="swamp">
-	</item>
-	<item id="539" name="swamp">
-	</item>
-	<item id="540" name="swamp">
-	</item>
-	<item id="541" name="swamp">
-	</item>
-	<item id="542" name="lava">
-	</item>
-	<item id="543" name="lava">
-	</item>
-	<item id="544" name="lava">
-	</item>
-	<item id="545" name="lava">
-	</item>
-	<item id="546" name="lava">
-	</item>
-	<item id="547" name="lava">
-	</item>
-	<item id="548" name="lava">
-	</item>
-	<item id="549" name="lava">
-	</item>
-	<item id="550" name="lava">
-	</item>
-	<item id="551" name="lava">
-	</item>
-	<item id="552" name="lava">
-	</item>
-	<item id="553" name="lava">
-	</item>
-	<item id="554" name="lava">
-	</item>
-	<item id="555" name="lava">
-	</item>
-	<item id="556" name="lava">
-	</item>
-	<item id="557" name="lava">
-	</item>
-	<item id="558" name="lava">
-	</item>
-	<item id="559" name="lava">
-	</item>
-	<item id="560" name="lava">
-	</item>
-	<item id="561" name="lava">
-	</item>
-	<item id="562" name="lava">
-	</item>
-	<item id="563" name="lava">
-	</item>
-	<item id="564" name="lava">
-	</item>
-	<item id="565" name="lava">
-	</item>
-	<item id="566" name="water">
-	</item>
-	<item id="567" name="water">
-	</item>
-	<item id="568" name="water">
-	</item>
-	<item id="569" name="water">
-	</item>
-	<item id="570" name="water">
-	</item>
-	<item id="571" name="water">
-	</item>
-	<item id="572" name="water">
-	</item>
-	<item id="573" name="water">
-	</item>
-	<item id="574" name="water">
-	</item>
-	<item id="575" name="water">
-	</item>
-	<item id="576" name="water">
-	</item>
-	<item id="577" name="water">
-	</item>
-	<item id="578" name="water">
-	</item>
-	<item id="579" name="water">
-	</item>
-	<item id="580" name="water">
-	</item>
-	<item id="581" name="water">
-	</item>
-	<item id="582" name="water">
-	</item>
-	<item id="583" name="water">
-	</item>
-	<item id="584" name="water">
-	</item>
-	<item id="585" name="water">
-	</item>
-	<item id="586" name="water">
-	</item>
-	<item id="587" name="water">
-	</item>
-	<item id="588" name="water">
-	</item>
-	<item id="589" name="water">
-	</item>
-	<item id="590" name="water">
-	</item>
-	<item id="591" name="water">
-	</item>
-	<item id="592" name="water">
-	</item>
-	<item id="593" name="water">
-	</item>
-	<item id="594" name="water">
-	</item>
-	<item id="595" name="water">
-	</item>
-	<item id="596" name="water">
-	</item>
-	<item id="597" name="water">
 	</item>
 	<item id="598" name="lava">
 		<attribute key="type" value="trashholder"/>
@@ -1046,250 +315,6 @@
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="fire"/>
 	</item>
-	<item id="602" name="swamp">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenbubble"/>
-	</item>
-	<item id="603" name="swamp">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenbubble"/>
-	</item>
-	<item id="604" name="swamp">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenbubble"/>
-	</item>
-	<item id="605" name="swamp">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenbubble"/>
-	</item>
-	<item id="606" name="water">
-	</item>
-	<item id="607" name="water">
-	</item>
-	<item id="608" name="water">
-	</item>
-	<item id="609" name="water">
-	</item>
-	<item id="610" name="water">
-	</item>
-	<item id="611" name="water">
-	</item>
-	<item id="612" name="water">
-	</item>
-	<item id="613" name="water">
-	</item>
-	<item id="614" name="water">
-	</item>
-	<item id="615" name="water">
-	</item>
-	<item id="616" name="water">
-	</item>
-	<item id="617" name="water">
-	</item>
-	<item id="618" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="619" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="620" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="621" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="622" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="623" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="624" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="625" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="626" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="627" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="628" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="629" name="water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="630" name="water">
-	</item>
-	<item id="631" name="water">
-	</item>
-	<item id="632" name="water">
-	</item>
-	<item id="633" name="water">
-	</item>
-	<item id="634" name="water">
-	</item>
-	<item id="635" name="water">
-	</item>
-	<item id="636" name="water">
-	</item>
-	<item id="637" name="water">
-	</item>
-	<item id="638" name="swamp">
-	</item>
-	<item id="639" name="swamp">
-	</item>
-	<item id="640" name="swamp">
-	</item>
-	<item id="641" name="swamp">
-	</item>
-	<item id="642" name="swamp">
-	</item>
-	<item id="643" name="swamp">
-	</item>
-	<item id="644" name="swamp">
-	</item>
-	<item id="645" name="swamp">
-	</item>
-	<item id="646" name="swamp">
-	</item>
-	<item id="647" name="swamp">
-	</item>
-	<item id="648" name="swamp">
-	</item>
-	<item id="649" name="swamp">
-	</item>
-	<item id="650" name="swamp">
-	</item>
-	<item id="651" name="swamp">
-	</item>
-	<item id="652" name="swamp">
-	</item>
-	<item id="653" name="swamp">
-	</item>
-	<item id="654" name="swamp">
-	</item>
-	<item id="655" name="swamp">
-	</item>
-	<item id="656" name="swamp">
-	</item>
-	<item id="657" name="swamp">
-	</item>
-	<item id="658" name="water">
-	</item>
-	<item id="659" name="water">
-	</item>
-	<item id="660" name="water">
-	</item>
-	<item id="661" name="water">
-	</item>
-	<item id="662" name="water">
-	</item>
-	<item id="663" name="water">
-	</item>
-	<item id="664" name="water">
-	</item>
-	<item id="665" name="water">
-	</item>
-	<item id="666" name="water">
-	</item>
-	<item id="667" name="water">
-	</item>
-	<item id="668" name="water">
-	</item>
-	<item id="669" name="water">
-	</item>
-	<item id="670" name="snow">
-	</item>
-	<item id="671" name="ice">
-	</item>
-	<item id="672" name="grass">
-	</item>
-	<item id="673" name="grass">
-	</item>
-	<item id="674" name="grass">
-	</item>
-	<item id="675" name="grass">
-	</item>
-	<item id="676" name="grass">
-	</item>
-	<item id="677" name="grass">
-	</item>
-	<item id="678" name="grass">
-	</item>
-	<item id="679" name="grass">
-	</item>
-	<item id="680" name="grass">
-	</item>
-	<item id="681" name="grass">
-	</item>
-	<item id="682" name="grass">
-	</item>
-	<item id="683" name="grass">
-	</item>
-	<item id="684" name="ice">
-	</item>
-	<item id="685" name="ice">
-	</item>
-	<item id="686" name="ice">
-	</item>
-	<item id="687" name="ice">
-	</item>
-	<item id="688" name="ice">
-	</item>
-	<item id="689" name="ice">
-	</item>
-	<item id="690" name="ice">
-	</item>
-	<item id="691" name="ice">
-	</item>
-	<item id="692" name="ice">
-	</item>
-	<item id="693" name="ice">
-	</item>
-	<item id="694" name="ice">
-	</item>
-	<item id="695" name="ice">
-	</item>
-	<item id="696" name="ice">
-	</item>
-	<item id="697" name="ice">
-	</item>
-	<item id="698" name="ice">
-	</item>
-	<item id="699" name="ice">
-	</item>
-	<item id="700" name="ice">
-	</item>
-	<item id="701" name="ice">
-	</item>
-	<item id="702" name="ice">
-	</item>
-	<item id="703" name="ice">
-	</item>
-	<item id="704" name="ice">
-	</item>
-	<item id="705" name="ice">
-	</item>
-	<item id="706" name="ice">
-	</item>
-	<item id="707" name="ice">
-	</item>
 	<item id="708" name="tar">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="poff"/>
@@ -1306,135 +331,7 @@
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="poff"/>
 	</item>
-	<item id="712" name="tar">
-	</item>
-	<item id="713" name="tar">
-	</item>
-	<item id="714" name="tar">
-	</item>
-	<item id="715" name="tar">
-	</item>
-	<item id="716" name="tar">
-	</item>
-	<item id="717" name="tar">
-	</item>
-	<item id="718" name="tar">
-	</item>
-	<item id="719" name="tar">
-	</item>
-	<item id="720" name="tar">
-	</item>
-	<item id="721" name="tar">
-	</item>
-	<item id="722" name="tar">
-	</item>
-	<item id="723" name="tar">
-	</item>
 	<item id="724" name="cobbled pavement">
-	</item>
-	<item id="725" name="cobbled pavement">
-	</item>
-	<item id="726" name="cobbled pavement">
-	</item>
-	<item id="727" name="cobbled pavement">
-	</item>
-	<item id="728" name="cobbled pavement">
-	</item>
-	<item id="729" name="cobbled pavement">
-	</item>
-	<item id="730" name="cobbled pavement">
-	</item>
-	<item id="731" name="cobbled pavement">
-	</item>
-	<item id="732" name="cobbled pavement">
-	</item>
-	<item id="733" name="cobbled pavement">
-	</item>
-	<item id="734" name="cobbled pavement">
-	</item>
-	<item id="735" name="cobbled pavement">
-	</item>
-	<item id="736" name="cobbled pavement">
-	</item>
-	<item id="737" name="cobbled pavement">
-	</item>
-	<item id="738" name="cobbled pavement">
-	</item>
-	<item id="739" name="cobbled pavement">
-	</item>
-	<item id="740" name="cobbled pavement">
-	</item>
-	<item id="741" name="cobbled pavement">
-	</item>
-	<item id="742" name="cobbled pavement">
-	</item>
-	<item id="743" name="cobbled pavement">
-	</item>
-	<item id="744" name="cobbled pavement">
-	</item>
-	<item id="745" name="cobbled pavement">
-	</item>
-	<item id="746" name="cobbled pavement">
-	</item>
-	<item id="747" name="cobbled pavement">
-	</item>
-	<item id="748" name="cobbled pavement">
-	</item>
-	<item id="749" name="cobbled pavement">
-	</item>
-	<item id="750" name="cobbled pavement">
-	</item>
-	<item id="751" name="cobbled pavement">
-	</item>
-	<item id="752" name="cobbled pavement">
-	</item>
-	<item id="753" name="cobbled pavement">
-	</item>
-	<item id="754" name="cobbled pavement">
-	</item>
-	<item id="755" name="cobbled pavement">
-	</item>
-	<item id="756" name="cobbled pavement">
-	</item>
-	<item id="757" name="cobbled pavement">
-	</item>
-	<item id="758" name="cobbled pavement">
-	</item>
-	<item id="759" name="cobbled pavement">
-	</item>
-	<item id="760" name="cobbled pavement">
-	</item>
-	<item id="761" name="cobbled pavement">
-	</item>
-	<item id="762" name="cobbled pavement">
-	</item>
-	<item id="763" name="cobbled pavement">
-	</item>
-	<item id="764" name="cobbled pavement">
-	</item>
-	<item id="765" name="cobbled pavement">
-	</item>
-	<item id="766" name="cobbled pavement">
-	</item>
-	<item id="767" name="cobbled pavement">
-	</item>
-	<item id="768" name="cobbled pavement">
-	</item>
-	<item id="769" name="cobbled pavement">
-	</item>
-	<item id="770" name="cobbled pavement">
-	</item>
-	<item id="771" name="cobbled pavement">
-	</item>
-	<item id="772" name="cobbled pavement">
-	</item>
-	<item id="773" name="cobbled pavement">
-	</item>
-	<item id="774" name="cobbled pavement">
-	</item>
-	<item id="775" name="cobbled pavement">
-	</item>
-	<item id="776" name="cobbled pavement">
 	</item>
 	<item id="777" name="sandstone">
 	</item>
@@ -1466,167 +363,11 @@
 	</item>
 	<item id="791" name="grass">
 	</item>
-	<item id="792" name="grass">
-	</item>
-	<item id="793" name="grass">
-	</item>
-	<item id="794" name="grass">
-	</item>
-	<item id="795" name="grass">
-	</item>
-	<item id="796" name="grass">
-	</item>
-	<item id="797" name="grass">
-	</item>
-	<item id="798" name="grass">
-	</item>
-	<item id="799" name="grass">
-	</item>
-	<item id="800" name="grass">
-	</item>
-	<item id="801" name="grass">
-	</item>
-	<item id="802" name="grass">
-	</item>
-	<item id="803" name="grass">
-	</item>
 	<item id="804" name="dirt">
-	</item>
-	<item id="805" name="dirt">
 	</item>
 	<item id="806" name="dirt">
 	</item>
-	<item id="807" name="dirt">
-	</item>
-	<item id="808" name="grass">
-	</item>
-	<item id="809" name="grass">
-	</item>
-	<item id="810" name="grass">
-	</item>
-	<item id="811" name="grass">
-	</item>
-	<item id="812" name="grass">
-	</item>
-	<item id="813" name="grass">
-	</item>
-	<item id="814" name="grass">
-	</item>
-	<item id="815" name="grass">
-	</item>
-	<item id="816" name="sand">
-	</item>
-	<item id="817" name="sand">
-	</item>
-	<item id="818" name="sand">
-	</item>
-	<item id="819" name="sand">
-	</item>
-	<item id="820" name="sand">
-	</item>
-	<item id="821" name="sand">
-	</item>
-	<item id="822" name="sand">
-	</item>
-	<item id="823" name="sand">
-	</item>
-	<item id="824" name="sand">
-	</item>
-	<item id="825" name="sand">
-	</item>
-	<item id="826" name="sand">
-	</item>
-	<item id="827" name="sand">
-	</item>
-	<item id="828" name="grass">
-	</item>
-	<item id="829" name="grass">
-	</item>
-	<item id="830" name="grass">
-	</item>
-	<item id="831" name="grass">
-	</item>
-	<item id="832" name="grass">
-	</item>
-	<item id="833" name="grass">
-	</item>
-	<item id="834" name="grass">
-	</item>
-	<item id="835" name="grass">
-	</item>
 	<item id="836" name="sand">
-	</item>
-	<item id="837" name="sand">
-	</item>
-	<item id="838" name="sand">
-	</item>
-	<item id="839" name="sand">
-	</item>
-	<item id="840" name="sand">
-	</item>
-	<item id="841" name="sand">
-	</item>
-	<item id="842" name="sand">
-	</item>
-	<item id="843" name="sand">
-	</item>
-	<item id="844" name="sand">
-	</item>
-	<item id="845" name="sand">
-	</item>
-	<item id="846" name="sand">
-	</item>
-	<item id="847" name="sand">
-	</item>
-	<item id="848" name="sand">
-	</item>
-	<item id="849" name="grass">
-	</item>
-	<item id="850" name="grass">
-	</item>
-	<item id="851" name="grass">
-	</item>
-	<item id="852" name="grass">
-	</item>
-	<item id="853" name="grass">
-	</item>
-	<item id="854" name="grass">
-	</item>
-	<item id="855" name="grass">
-	</item>
-	<item id="856" name="grass">
-	</item>
-	<item id="857" name="grass">
-	</item>
-	<item id="858" name="grass">
-	</item>
-	<item id="859" name="grass">
-	</item>
-	<item id="860" name="grass">
-	</item>
-	<item id="861" name="sand">
-	</item>
-	<item id="862" name="sand">
-	</item>
-	<item id="863" name="sand">
-	</item>
-	<item id="864" name="sand">
-	</item>
-	<item id="865" name="sand">
-	</item>
-	<item id="866" name="sand">
-	</item>
-	<item id="867" name="sand">
-	</item>
-	<item id="868" name="sand">
-	</item>
-	<item id="869" name="sand">
-	</item>
-	<item id="870" name="sand">
-	</item>
-	<item id="871" name="sand">
-	</item>
-	<item id="872" name="sand">
 	</item>
 	<item id="873" article="a" name="mountain">
 	</item>
@@ -1639,30 +380,6 @@
 	<item id="877" article="a" name="mountain">
 	</item>
 	<item id="878" article="a" name="mountain">
-	</item>
-	<item id="879" name="grass">
-	</item>
-	<item id="880" name="grass">
-	</item>
-	<item id="881" name="grass">
-	</item>
-	<item id="882" name="grass">
-	</item>
-	<item id="883" name="grass">
-	</item>
-	<item id="884" name="grass">
-	</item>
-	<item id="885" name="grass">
-	</item>
-	<item id="886" name="grass">
-	</item>
-	<item id="887" name="grass">
-	</item>
-	<item id="888" name="grass">
-	</item>
-	<item id="889" name="grass">
-	</item>
-	<item id="890" name="grass">
 	</item>
 	<item id="891" name="stone flooring">
 	</item>
@@ -2301,12 +1018,14 @@
 	<item id="1208" article="a" name="brick wall">
 	</item>
 	<item id="1209" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1210" article="a" name="closed door">
 	</item>
 	<item id="1211" article="an" name="open door">
 	</item>
 	<item id="1212" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1213" article="a" name="closed door">
 	</item>
@@ -2329,36 +1048,30 @@
 	<item id="1222" article="an" name="open door">
 	</item>
 	<item id="1223" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1224" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1225" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1226" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1227" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1228" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1229" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1230" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1231" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1232" article="a" name="closed door">
 	</item>
 	<item id="1233" article="an" name="open door">
 	</item>
 	<item id="1234" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1235" article="a" name="closed door">
 	</item>
@@ -2373,64 +1086,50 @@
 	<item id="1240" article="an" name="open door">
 	</item>
 	<item id="1241" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
-	<item id="1242" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
+	<item id="1242" article="an" name="open door">
 	</item>
 	<item id="1243" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
-	<item id="1244" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
+	<item id="1244" article="an" name="open door">
 	</item>
 	<item id="1245" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1246" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1247" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1248" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1249" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1250" article="a" name="closed door">
 	</item>
 	<item id="1251" article="an" name="open door">
 	</item>
 	<item id="1252" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1253" article="a" name="closed door">
 	</item>
 	<item id="1254" article="an" name="open door">
 	</item>
 	<item id="1255" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1256" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1257" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1258" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="1259" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1260" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1261" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1262" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="1263" article="a" name="framework window">
 	</item>
@@ -2502,6 +1201,7 @@
 		<attribute key="shootType" value="smallstone"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="7"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="1295" article="a" name="stone">
 		<attribute key="weight" value="3000"/>
@@ -4683,6 +3383,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="snowball"/>
 		<attribute key="range" value="5"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2112" article="a" name="teddy bear">
 		<attribute key="weight" value="700"/>
@@ -4832,10 +3533,10 @@
 	<item id="2154" article="a" name="yellow gem">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="2155" article="a" name="green gem">
+	<item id="2155" article="a" name="big emerald">
 		<attribute key="weight" value="150"/>
 	</item>
-	<item id="2156" article="a" name="red gem">
+	<item id="2156" article="a" name="big ruby">
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2157" article="a" name="gold nugget" plural="gold nuggets">
@@ -4955,67 +3656,77 @@
 	</item>
 	<item id="2180" article="an" name="orb of nature">
 	</item>
-	<item id="2181" article="a" name="quagmire rod">
-		<attribute key="description" value="It emits clouds of poisonous swamp gas."/>
+	<item id="2181" article="a" name="terra rod">
+		<attribute key="description" value="Small stones are flying from its tip."/>
 		<attribute key="weight" value="2650"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="2"/>
+		<attribute key="shootType" value="smallearth"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2182" article="a" name="snakebite rod">
 		<attribute key="description" value="It seems to twitch and quiver as if trying to escape your grip."/>
 		<attribute key="weight" value="4300"/>
 		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="smallearth"/>
 		<attribute key="range" value="3"/>
 	</item>
-	<item id="2183" article="a" name="tempest rod">
-		<attribute key="description" value="It grants you the power of striking your foes with furious thunderstorms."/>
+	<item id="2183" article="a" name="hailstorm rod">
+		<attribute key="description" value="It grants you the power of striking your foes with furious hailstorms."/>
 		<attribute key="weight" value="2100"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="1"/>
+		<attribute key="shootType" value="smallice"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2184" article="a" name="crystal wand">
 		<attribute key="weight" value="2800"/>
 	</item>
-	<item id="2185" article="a" name="volcanic rod">
-		<attribute key="description" value="It erupts powerful bursts of magma upon everything in your path."/>
+	<item id="2185" article="a" name="necrotic rod">
+		<attribute key="description" value="It was brought up from hell to deliver death."/>
 		<attribute key="weight" value="2900"/>
 		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="death"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2186" article="a" name="moonlight rod">
-		<attribute key="description" value="Shimmering rays of moonlight radiate from its tip"/>
+		<attribute key="description" value="Icecold rays of moonlight shimmer on its tip."/>
 		<attribute key="weight" value="1950"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="2"/>
+		<attribute key="shootType" value="smallice"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2187" article="a" name="wand of inferno">
 		<attribute key="description" value="It unleashes the very fires of hell."/>
 		<attribute key="weight" value="3050"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="2"/>
+		<attribute key="shootType" value="fire"/>
+		<attribute key="range" value="3"/>
 	</item>
-	<item id="2188" article="a" name="wand of plague">
-		<attribute key="description" value="Infectious goo covers its tip"/>
+	<item id="2188" article="a" name="wand of decay">
+		<attribute key="description" value="It is half-rotten itself and reeks terribly."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="2"/>
+		<attribute key="shootType" value="death"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2189" article="a" name="wand of cosmic energy">
 		<attribute key="description" value="The energy of a radiant star is trapped inside its globe."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
-		<attribute key="range" value="1"/>
+		<attribute key="shootType" value="energy"/>
+		<attribute key="range" value="3"/>
 	</item>
 	<item id="2190" article="a" name="wand of vortex">
 		<attribute key="description" value="Surges of energy rush through the tip of this wand."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="energy"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2191" article="a" name="wand of dragonbreath">
 		<attribute key="description" value="Legends say that this wand holds the soul of a young dragon."/>
 		<attribute key="weight" value="2300"/>
 		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="fire"/>
 		<attribute key="range" value="3"/>
 	</item>
 	<item id="2192" article="a" name="crystal ball">
@@ -5364,9 +4075,9 @@
 		<attribute key="weight" value="120"/>
 	</item>
 	<item id="2268" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adori vita vis"/>
+		<attribute key="runeSpellName" value="adori gran mort"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="1"/>
+		<attribute key="charges" value="3"/>
 	</item>
 	<item id="2269" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5375,7 +4086,9 @@
 		<attribute key="weight" value="120"/>
 	</item>
 	<item id="2271" article="a" name="spell rune">
+		<attribute key="runeSpellName" value="adori frigo"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="5"/>
 	</item>
 	<item id="2272" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5386,7 +4099,9 @@
 		<attribute key="charges" value="1"/>
 	</item>
 	<item id="2274" article="a" name="spell rune">
+		<attribute key="runeSpellName" value="adori mas frigo"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2275" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5435,12 +4150,14 @@
 		<attribute key="charges" value="2"/>
 	</item>
 	<item id="2287" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adori"/>
+		<attribute key="runeSpellName" value="adori min vis"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="5"/>
+		<attribute key="charges" value="10"/>
 	</item>
 	<item id="2288" article="a" name="spell rune">
+		<attribute key="runeSpellName" value="adori mas tera"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2289" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo mas grav pox"/>
@@ -5458,9 +4175,9 @@
 		<attribute key="charges" value="1"/>
 	</item>
 	<item id="2292" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adevo res pox"/>
+		<attribute key="runeSpellName" value="adori tera"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="1"/>
+		<attribute key="charges" value="10"/>
 	</item>
 	<item id="2293" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo grav tera"/>
@@ -5496,7 +4213,7 @@
 	<item id="2302" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adori flam"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="2"/>
+		<attribute key="charges" value="5"/>
 	</item>
 	<item id="2303" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo mas grav flam"/>
@@ -5504,9 +4221,9 @@
 		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2304" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adori gran flam"/>
+		<attribute key="runeSpellName" value="adori mas flam"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="2"/>
+		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2305" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo mas flam"/>
@@ -5522,7 +4239,7 @@
 	<item id="2308" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo res flam"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="2"/>
+		<attribute key="charges" value="3"/>
 	</item>
 	<item id="2309" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5533,9 +4250,9 @@
 		<attribute key="charges" value="3"/>
 	</item>
 	<item id="2311" article="a" name="spell rune">
-		<attribute key="runeSpellName" value="adori gran"/>
+		<attribute key="runeSpellName" value="adori vis"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="5"/>
+		<attribute key="charges" value="10"/>
 	</item>
 	<item id="2312" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -5543,13 +4260,15 @@
 	<item id="2313" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adevo mas hur"/>
 		<attribute key="weight" value="120"/>
-		<attribute key="charges" value="3"/>
+		<attribute key="charges" value="6"/>
 	</item>
 	<item id="2314" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
 	<item id="2315" article="a" name="spell rune">
+		<attribute key="runeSpellName" value="adori mas vis"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="4"/>
 	</item>
 	<item id="2316" article="a" name="spell rune">
 		<attribute key="runeSpellName" value="adana mort"/>
@@ -5864,7 +4583,8 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="spear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="3"/>
+		<attribute key="breakChance" value="10"/> <!-- ? -->
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="2390" article="a" name="magic longsword">
 		<attribute key="description" value="It is the magic Cyclopmania Sword."/>
@@ -5936,6 +4656,7 @@
 		<attribute key="shootType" value="throwingstar"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="10"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="2400" article="a" name="magic sword">
 		<attribute key="description" value="It is the Sword of Valor."/>
@@ -6012,6 +4733,7 @@
 		<attribute key="shootType" value="throwingknife"/>
 		<attribute key="range" value="5"/>
 		<attribute key="breakChance" value="7"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="2411" article="a" name="poison dagger">
 		<attribute key="weight" value="880"/>
@@ -6026,7 +4748,7 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="2413" article="a" name="broadsword">
+	<item id="2413" article="a" name="broad sword">
 		<attribute key="weight" value="5250"/>
 		<attribute key="defense" value="23"/>
 		<attribute key="attack" value="26"/>
@@ -6776,6 +5498,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="bolt"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2544" article="an" name="arrow" plural="arrows">
 		<attribute key="weight" value="70"/>
@@ -6783,20 +5506,23 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="arrow"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2545" article="a" name="poison arrow" plural="poison arrows">
 		<attribute key="weight" value="80"/>
-		<attribute key="attack" value="20"/>
+		<attribute key="attack" value="22"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="poisonarrow"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2546" article="a" name="burst arrow" plural="burst arrows">
 		<attribute key="weight" value="90"/>
-		<attribute key="hitChance" value="100"/>
+		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="burstarrow"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2547" article="a" name="power bolt" plural="power bolts">
 		<attribute key="weight" value="80"/>
@@ -6804,8 +5530,9 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="powerbolt"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
-	<item id="2548" article="a" name="pitchfork">
+	<item id="2548" article="a" name="pitch fork">
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="2549" article="a" name="rake">
@@ -7121,7 +5848,7 @@
 		<attribute key="armor" value="3"/>
 		<attribute key="slotType" value="legs"/>
 	</item>
-	<item id="2649" name="leather legs">
+	<item id="2649" name="leather trousers">
 		<attribute key="weight" value="1800"/>
 		<attribute key="armor" value="1"/>
 		<attribute key="slotType" value="legs"/>
@@ -8973,7 +7700,7 @@
 	<item id="3102" article="a" name="dead dog">
 		<attribute key="weight" value="700"/>
 	</item>
-	<item id="3103" article="a" name="dead skeleton">
+	<item id="3103" article="a" name="dead dog">
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="0"/>
@@ -9325,109 +8052,11 @@
 	</item>
 	<item id="3245" name="wooden flooring">
 	</item>
-	<item id="3246" name="cobbled pavement">
-	</item>
-	<item id="3247" name="cobbled pavement">
-	</item>
-	<item id="3248" name="cobbled pavement">
-	</item>
-	<item id="3249" name="cobbled pavement">
-	</item>
-	<item id="3250" name="cobbled pavement">
-	</item>
-	<item id="3251" name="cobbled pavement">
-	</item>
-	<item id="3252" name="cobbled pavement">
-	</item>
-	<item id="3253" name="cobbled pavement">
-	</item>
-	<item id="3254" name="cobbled pavement">
-	</item>
-	<item id="3255" name="cobbled pavement">
-	</item>
-	<item id="3256" name="cobbled pavement">
-	</item>
-	<item id="3257" name="cobbled pavement">
-	</item>
-	<item id="3258" name="shallow water">
-	</item>
-	<item id="3259" name="jungle grass">
-	</item>
-	<item id="3260" name="jungle grass">
-	</item>
-	<item id="3261" name="jungle grass">
-	</item>
-	<item id="3262" name="jungle grass">
-	</item>
 	<item id="3263" name="jungle grass">
 	</item>
 	<item id="3264" name="ground">
 	</item>
 	<item id="3265" name="ground">
-	</item>
-	<item id="3266" name="jungle grass">
-	</item>
-	<item id="3267" name="jungle grass">
-	</item>
-	<item id="3268" name="jungle grass">
-	</item>
-	<item id="3269" name="jungle grass">
-	</item>
-	<item id="3270" name="jungle grass">
-	</item>
-	<item id="3271" name="jungle grass">
-	</item>
-	<item id="3272" name="jungle grass">
-	</item>
-	<item id="3273" name="jungle grass">
-	</item>
-	<item id="3274" name="jungle grass">
-	</item>
-	<item id="3275" name="jungle grass">
-	</item>
-	<item id="3276" name="jungle grass">
-	</item>
-	<item id="3277" name="jungle grass">
-	</item>
-	<item id="3278" name="jungle grass">
-	</item>
-	<item id="3279" name="jungle grass">
-	</item>
-	<item id="3280" name="jungle grass">
-	</item>
-	<item id="3281" name="jungle grass">
-	</item>
-	<item id="3282" name="jungle grass">
-	</item>
-	<item id="3283" name="jungle grass">
-	</item>
-	<item id="3284" name="jungle grass">
-	</item>
-	<item id="3285" name="jungle grass">
-	</item>
-	<item id="3286" name="jungle grass">
-	</item>
-	<item id="3287" name="jungle grass">
-	</item>
-	<item id="3288" name="jungle grass">
-	</item>
-	<item id="3289" name="jungle grass">
-	</item>
-	<item id="3290" name="jungle grass">
-	</item>
-	<item id="3291" name="jungle grass">
-	</item>
-	<item id="3292" name="jungle grass">
-	</item>
-	<item id="3293" name="jungle grass">
-	</item>
-	<item id="3294" name="jungle grass">
-	</item>
-	<item id="3295" name="jungle grass">
-	</item>
-	<item id="3296" name="jungle grass">
-	</item>
-	<item id="3297" name="jungle grass">
 	</item>
 	<item id="3298" name="jungle grass">
 	</item>
@@ -9904,6 +8533,7 @@
 	<item id="3534" article="a" name="stone wall">
 	</item>
 	<item id="3535" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="3536" article="a" name="closed door">
 	</item>
@@ -9914,18 +8544,15 @@
 	<item id="3539" article="an" name="open door">
 	</item>
 	<item id="3540" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="3541" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="3542" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="3543" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="3544" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="3545" article="a" name="closed door">
 	</item>
@@ -9936,48 +8563,12 @@
 	<item id="3548" article="an" name="open door">
 	</item>
 	<item id="3549" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="3550" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="3551" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="3552" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
-	</item>
-	<item id="3553" name="jungle grass">
-	</item>
-	<item id="3554" name="jungle grass">
-	</item>
-	<item id="3555" name="jungle grass">
-	</item>
-	<item id="3556" name="jungle grass">
-	</item>
-	<item id="3557" name="jungle grass">
-	</item>
-	<item id="3558" name="jungle grass">
-	</item>
-	<item id="3559" name="jungle grass">
-	</item>
-	<item id="3560" name="jungle grass">
-	</item>
-	<item id="3561" name="jungle grass">
-	</item>
-	<item id="3562" name="jungle grass">
-	</item>
-	<item id="3563" name="jungle grass">
-	</item>
-	<item id="3564" name="jungle grass">
-	</item>
-	<item id="3565" name="jungle grass">
-	</item>
-	<item id="3566" name="jungle grass">
-	</item>
-	<item id="3567" name="jungle grass">
-	</item>
-	<item id="3568" name="jungle grass">
 	</item>
 	<item id="3569" article="a" name="waterfall">
 	</item>
@@ -9990,30 +8581,6 @@
 	<item id="3573" article="a" name="waterfall">
 	</item>
 	<item id="3574" article="a" name="waterfall">
-	</item>
-	<item id="3575" name="jungle grass">
-	</item>
-	<item id="3576" name="jungle grass">
-	</item>
-	<item id="3577" name="jungle grass">
-	</item>
-	<item id="3578" name="jungle grass">
-	</item>
-	<item id="3579" name="jungle grass">
-	</item>
-	<item id="3580" name="jungle grass">
-	</item>
-	<item id="3581" name="jungle grass">
-	</item>
-	<item id="3582" name="jungle grass">
-	</item>
-	<item id="3583" name="jungle grass">
-	</item>
-	<item id="3584" name="jungle grass">
-	</item>
-	<item id="3585" name="jungle grass">
-	</item>
-	<item id="3586" name="jungle grass">
 	</item>
 	<item id="3587" article="a" name="boat">
 	</item>
@@ -10920,7 +9487,8 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="huntingspear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="6"/>
+		<attribute key="breakChance" value="10"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="3966" article="a" name="banana staff">
 		<attribute key="weight" value="5000"/>
@@ -11882,138 +10450,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="4328" name="">
-	</item>
-	<item id="4329" name="">
-	</item>
-	<item id="4330" name="">
-	</item>
-	<item id="4331" name="">
-	</item>
-	<item id="4332" name="">
-	</item>
-	<item id="4333" name="">
-	</item>
-	<item id="4334" name="">
-	</item>
-	<item id="4335" name="">
-	</item>
-	<item id="4336" name="">
-	</item>
-	<item id="4337" name="">
-	</item>
-	<item id="4338" name="">
-	</item>
-	<item id="4339" name="">
-	</item>
-	<item id="4340" name="">
-	</item>
-	<item id="4341" name="">
-	</item>
-	<item id="4342" name="">
-	</item>
-	<item id="4343" name="">
-	</item>
-	<item id="4344" name="">
-	</item>
-	<item id="4345" name="">
-	</item>
-	<item id="4346" name="">
-	</item>
-	<item id="4347" name="">
-	</item>
-	<item id="4348" name="">
-	</item>
-	<item id="4349" name="">
-	</item>
-	<item id="4350" name="">
-	</item>
-	<item id="4351" name="">
-	</item>
-	<item id="4352" name="">
-	</item>
-	<item id="4353" name="">
-	</item>
-	<item id="4354" name="">
-	</item>
-	<item id="4355" name="">
-	</item>
-	<item id="4356" name="">
-	</item>
-	<item id="4357" name="">
-	</item>
-	<item id="4358" name="">
-	</item>
-	<item id="4359" name="">
-	</item>
-	<item id="4360" name="">
-	</item>
-	<item id="4361" name="">
-	</item>
-	<item id="4362" name="">
-	</item>
-	<item id="4363" name="">
-	</item>
-	<item id="4364" name="">
-	</item>
-	<item id="4365" name="">
-	</item>
-	<item id="4366" name="">
-	</item>
-	<item id="4367" name="">
-	</item>
-	<item id="4368" name="">
-	</item>
-	<item id="4369" name="">
-	</item>
-	<item id="4370" name="">
-	</item>
-	<item id="4371" name="">
-	</item>
-	<item id="4372" name="">
-	</item>
-	<item id="4373" name="">
-	</item>
-	<item id="4374" name="">
-	</item>
-	<item id="4375" name="">
-	</item>
-	<item id="4376" name="">
-	</item>
-	<item id="4377" name="">
-	</item>
-	<item id="4378" name="">
-	</item>
-	<item id="4379" name="">
-	</item>
-	<item id="4380" name="">
-	</item>
-	<item id="4381" name="">
-	</item>
-	<item id="4382" name="">
-	</item>
-	<item id="4383" name="">
-	</item>
-	<item id="4384" name="">
-	</item>
-	<item id="4385" name="">
-	</item>
-	<item id="4386" name="">
-	</item>
-	<item id="4387" name="">
-	</item>
-	<item id="4388" name="">
-	</item>
-	<item id="4389" name="">
-	</item>
-	<item id="4390" name="">
-	</item>
-	<item id="4391" name="">
-	</item>
-	<item id="4392" name="">
-	</item>
-	<item id="4393" name="">
-	</item>
+	<!-- Items from ID 4328 to ID 4393 are all blank -->
 	<item id="4394" article="a" name="red carpet">
 	</item>
 	<item id="4395" article="a" name="red carpet">
@@ -12069,74 +10506,6 @@
 	<item id="4420" name="rocks">
 	</item>
 	<item id="4421" name="rocks">
-	</item>
-	<item id="4422" article="a" name="mountain">
-	</item>
-	<item id="4423" article="a" name="mountain">
-	</item>
-	<item id="4424" article="a" name="mountain">
-	</item>
-	<item id="4425" article="a" name="mountain">
-	</item>
-	<item id="4426" article="a" name="mountain">
-	</item>
-	<item id="4427" article="a" name="mountain">
-	</item>
-	<item id="4428" article="a" name="mountain">
-	</item>
-	<item id="4429" article="a" name="mountain">
-	</item>
-	<item id="4430" article="a" name="mountain">
-	</item>
-	<item id="4431" article="a" name="mountain">
-	</item>
-	<item id="4432" article="a" name="mountain">
-	</item>
-	<item id="4433" article="a" name="mountain">
-	</item>
-	<item id="4434" article="a" name="mountain">
-	</item>
-	<item id="4435" article="a" name="mountain">
-	</item>
-	<item id="4436" article="a" name="mountain">
-	</item>
-	<item id="4437" article="a" name="mountain">
-	</item>
-	<item id="4438" article="a" name="mountain">
-	</item>
-	<item id="4439" article="a" name="mountain">
-	</item>
-	<item id="4440" article="a" name="mountain">
-	</item>
-	<item id="4441" article="a" name="mountain">
-	</item>
-	<item id="4442" article="a" name="mountain">
-	</item>
-	<item id="4443" article="a" name="mountain">
-	</item>
-	<item id="4444" article="a" name="mountain">
-	</item>
-	<item id="4445" article="a" name="mountain">
-	</item>
-	<item id="4446" article="a" name="mountain">
-	</item>
-	<item id="4447" article="a" name="mountain">
-	</item>
-	<item id="4448" article="a" name="mountain">
-	</item>
-	<item id="4449" article="a" name="mountain">
-	</item>
-	<item id="4450" article="a" name="mountain">
-	</item>
-	<item id="4451" article="a" name="mountain">
-	</item>
-	<item id="4452" article="a" name="mountain">
-	</item>
-	<item id="4453" article="a" name="mountain">
-	</item>
-	<item id="4454" article="a" name="mountain">
-	</item>
-	<item id="4455" article="a" name="mountain">
 	</item>
 	<item id="4456" name="rocks">
 	</item>
@@ -12360,12 +10729,6 @@
 	</item>
 	<item id="4566" name="rocks">
 	</item>
-	<item id="4567" name="grass">
-	</item>
-	<item id="4568" name="grass">
-	</item>
-	<item id="4569" name="grass">
-	</item>
 	<item id="4570" name="rocks">
 	</item>
 	<item id="4571" name="rocks">
@@ -12453,6 +10816,8 @@
 	<item id="4610" name="shallow water">
 		<attribute key="decayTo" value="4608"/>
 		<attribute key="duration" value="1200"/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4611" name="shallow water">
 		<attribute key="type" value="trashholder"/>
@@ -12514,81 +10879,134 @@
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
-	<item id="4626" name="">
-	</item>
-	<item id="4627" name="">
-	</item>
-	<item id="4628" name="">
-	</item>
-	<item id="4629" name="">
-	</item>
-	<item id="4630" name="">
-	</item>
-	<item id="4631" name="">
-	</item>
+	<!-- Items from ID 4626 to ID 4631 are blank -->
 	<item id="4632" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4633" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4634" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4635" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4636" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4637" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4638" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4639" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4640" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4641" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4642" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4643" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4644" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4645" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4646" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4647" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4648" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4649" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4650" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4651" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4652" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4653" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4654" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4655" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4656" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4657" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4658" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4659" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4660" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4661" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4662" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4663" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4664" name="shallow water">
 		<attribute key="type" value="trashholder"/>
@@ -12838,16 +11256,6 @@
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="greenbubble"/>
 	</item>
-	<item id="4756" name="grass">
-	</item>
-	<item id="4757" name="rocks">
-	</item>
-	<item id="4758" name="swamp">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="greenbubble"/>
-	</item>
-	<item id="4759" name="rocks">
-	</item>
 	<item id="4760" name="sand">
 	</item>
 	<item id="4761" name="sand">
@@ -12969,28 +11377,48 @@
 	<item id="4819" name="dirt">
 	</item>
 	<item id="4820" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4821" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4822" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4823" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4824" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4825" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4826" article="a" name="mountain">
 	</item>
 	<item id="4827" article="a" name="mountain">
 	</item>
 	<item id="4828" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4829" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4830" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4831" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4832" name="dirt">
 	</item>
@@ -13013,8 +11441,7 @@
 	<item id="4840" article="a" name="small mushroom">
 		<attribute key="weight" value="100"/>
 	</item>
-	<item id="4841" name="">
-	</item>
+	<!-- Item id 4841 is blank -->
 	<item id="4842" article="a" name="parchment">
 		<attribute key="weight" value="100"/>
 		<attribute key="writeable" value="1"/>
@@ -13023,8 +11450,7 @@
 	<item id="4843" article="a" name="giant ape's hair">
 		<attribute key="weight" value="2000"/>
 	</item>
-	<item id="4844" name="">
-	</item>
+	<!-- Item id 4844 is blank -->
 	<item id="4845" article="a" name="silver brooch">
 		<attribute key="weight" value="100"/>
 	</item>
@@ -13212,12 +11638,14 @@
 	<item id="4912" article="a" name="ship cabin wall">
 	</item>
 	<item id="4913" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="4914" article="a" name="closed door">
 	</item>
 	<item id="4915" article="an" name="open door">
 	</item>
 	<item id="4916" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="4917" article="a" name="closed door">
 	</item>
@@ -13578,8 +12006,7 @@
 		<attribute key="description" value="It contains a butterfly."/>
 		<attribute key="weight" value="800"/>
 	</item>
-	<item id="5090" name="">
-	</item>
+	<!-- Item id 5090 is blank -->
 	<item id="5091" article="a" name="treasure map">
 		<attribute key="weight" value="830"/>
 	</item>
@@ -13597,6 +12024,7 @@
 		<attribute key="weight" value="180"/>
 	</item>
 	<item id="5098" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5099" article="a" name="closed door">
 	</item>
@@ -13607,18 +12035,15 @@
 	<item id="5102" article="an" name="open door">
 	</item>
 	<item id="5103" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5104" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5105" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5106" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5107" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5108" article="a" name="closed door">
 	</item>
@@ -13629,18 +12054,15 @@
 	<item id="5111" article="an" name="open door">
 	</item>
 	<item id="5112" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5113" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5114" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5115" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5116" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5117" article="a" name="closed door">
 	</item>
@@ -13651,18 +12073,15 @@
 	<item id="5120" article="an" name="open door">
 	</item>
 	<item id="5121" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5122" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5123" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5124" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5125" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5126" article="a" name="closed door">
 	</item>
@@ -13673,36 +12092,36 @@
 	<item id="5129" article="an" name="open door">
 	</item>
 	<item id="5130" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5131" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5132" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5133" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5134" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5135" article="a" name="closed door">
 	</item>
 	<item id="5136" article="an" name="open door">
 	</item>
 	<item id="5137" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5138" article="a" name="closed door">
 	</item>
 	<item id="5139" article="an" name="open door">
 	</item>
 	<item id="5140" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5141" article="a" name="closed door">
 	</item>
 	<item id="5142" article="an" name="open door">
 	</item>
 	<item id="5143" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5144" article="a" name="closed door">
 	</item>
@@ -13973,12 +12392,14 @@
 	<item id="5277" article="a" name="wooden wall window">
 	</item>
 	<item id="5278" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5279" article="a" name="closed door">
 	</item>
 	<item id="5280" article="an" name="open door">
 	</item>
 	<item id="5281" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5282" article="a" name="closed door">
 	</item>
@@ -13993,28 +12414,20 @@
 	<item id="5287" article="an" name="open door">
 	</item>
 	<item id="5288" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5289" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5290" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5291" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="5292" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5293" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5294" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5295" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="5296" name="wood">
 	</item>
@@ -14899,13 +13312,13 @@
 	<item id="5678" article="a" name="tortoise egg" plural="tortoise eggs">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="5679" name="">
+	<item id="5679" name="shells">
 	</item>
-	<item id="5680" name="">
+	<item id="5680" name="shells">
 	</item>
-	<item id="5681" name="">
+	<item id="5681" name="shells">
 	</item>
-	<item id="5682" name="">
+	<item id="5682" name="shells">
 	</item>
 	<item id="5683" article="a" name="dirt wall">
 	</item>
@@ -15021,17 +13434,18 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="5730" name="">
-	</item>
+	<!-- Item id 5730 is blank -->
 	<item id="5731" article="a" name="hole">
 	</item>
 	<item id="5732" name="closed bars">
+		<attribute key="description" value="They are locked."/>
 	</item>
 	<item id="5733" name="closed bars">
 	</item>
 	<item id="5734" name="open bars">
 	</item>
 	<item id="5735" name="closed bars">
+		<attribute key="description" value="They are locked."/>
 	</item>
 	<item id="5736" name="closed bars">
 	</item>
@@ -15048,8 +13462,7 @@
 		<attribute key="armor" value="9"/>
 		<attribute key="slotType" value="head"/>
 	</item>
-	<item id="5742" name="">
-	</item>
+	<!-- Item id 5742 is blank -->
 	<item id="5743" name="wooden flooring">
 	</item>
 	<item id="5744" name="wooden flooring">
@@ -15127,10 +13540,7 @@
 	</item>
 	<item id="5774" article="a" name="metal bar">
 	</item>
-	<item id="5775" name="">
-	</item>
-	<item id="5776" name="">
-	</item>
+	<!-- Items id 5775 and id 5776 are blank -->
 	<item id="5777" article="a" name="marksman target">
 	</item>
 	<item id="5778" article="a" name="marksman target">
@@ -15157,29 +13567,29 @@
 	</item>
 	<item id="5788" article="a" name="target">
 	</item>
-	<item id="5789" name="">
+	<item id="5789" article="an" name="axe on a target">
 	</item>
-	<item id="5790" name="">
+	<item id="5790" article="an" name="axe on a target">
 	</item>
 	<item id="5791" article="a" name="stuffed dragon">
 		<attribute key="weight" value="850"/>
 	</item>
-	<item id="5792" article="a" name="di">
+	<item id="5792" article="a" name="dice">
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="5793" article="a" name="di">
+	<item id="5793" article="a" name="dice">
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="5794" article="a" name="di">
+	<item id="5794" article="a" name="dice">
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="5795" article="a" name="di">
+	<item id="5795" article="a" name="dice">
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="5796" article="a" name="di">
+	<item id="5796" article="a" name="dice">
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="5797" article="a" name="di">
+	<item id="5797" article="a" name="dice">
 		<attribute key="weight" value="200"/>
 	</item>
 	<item id="5798" article="an" name="abacus">
@@ -15188,14 +13598,15 @@
 	<item id="5799" article="a" name="golden figurine">
 		<attribute key="weight" value="1500"/>
 	</item>
-	<item id="5800" name="">
+	<item id="5800" article="a" name="fishermans rope"> <!-- This isn't a real item -->
+		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5801" article="a" name="key ring">
 		<attribute key="weight" value="50"/>
 		<attribute key="containerSize" value="20"/>
 	</item>
-	<item id="5802" name="">
-		<attribute key="weight" value="0"/>
+	<item id="5802" article="a" name="bottle with a message"> <!-- This isn't a real item -->
+		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5803" article="an" name="arbalest">
 		<attribute key="description" value="It is a bit heavy due to the iron mounting, but very precise."/>
@@ -15334,8 +13745,7 @@
 	</item>
 	<item id="5863" article="an" name="armour rack">
 	</item>
-	<item id="5864" name="">
-	</item>
+	<!-- Item id 5864 is blank -->
 	<item id="5865" article="a" name="juice squeezer">
 		<attribute key="weight" value="1500"/>
 	</item>
@@ -15522,8 +13932,7 @@
 	<item id="5922" article="a" name="holy orchid" plural="holy orchids">
 		<attribute key="weight" value="250"/>
 	</item>
-	<item id="5923" name="">
-	</item>
+	<!-- Item id 5864 is blank -->
 	<item id="5924" article="a" name="damaged steel helmet">
 		<attribute key="description" value="The words 'Ramsay the Reckless' are engraved inside. It appears to be cracked and broken."/>
 		<attribute key="weight" value="4600"/>
@@ -15639,14 +14048,13 @@
 		<attribute key="description" value="It contains a love poem, written by an unknown elven poet."/>
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="5953" name="">
-		<attribute key="weight" value="0"/>
+	<item id="5953" article="a" name="marijuana"> <!-- This isn't a real item -->
+		<attribute key="weight" value="850"/>
 	</item>
 	<item id="5954" article="a" name="demon horn" plural="demon horns">
 		<attribute key="weight" value="1000"/>
 	</item>
-	<item id="5955" name="">
-	</item>
+	<!-- Item id 5955 is blank -->
 	<item id="5956" article="a" name="parchment">
 		<attribute key="weight" value="200"/>
 	</item>
@@ -15656,8 +14064,7 @@
 	<item id="5958" article="a" name="parchment">
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="5959" name="">
-	</item>
+	<!-- Item id 5959 is blank -->
 	<item id="5960" article="a" name="dead troll">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3067"/>
@@ -16336,8 +14743,8 @@
 	<item id="6102" name="deadeye devious' eye patch">
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="6103" name="">
-		<attribute key="weight" value="0"/>
+	<item id="6103" article="a" name="strange book"> <!-- This isn't a real item -->
+		<attribute key="weight" value="1200"/>
 	</item>
 	<item id="6104" article="a" name="jewel case">
 		<attribute key="weight" value="170"/>
@@ -16548,12 +14955,14 @@
 	<item id="6191" article="a" name="branch">
 	</item>
 	<item id="6192" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6193" article="a" name="closed door">
 	</item>
 	<item id="6194" article="an" name="open door">
 	</item>
 	<item id="6195" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6196" article="a" name="closed door">
 	</item>
@@ -16568,28 +14977,20 @@
 	<item id="6201" article="an" name="open door">
 	</item>
 	<item id="6202" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6203" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6204" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6205" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6206" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6207" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6208" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6209" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6210" article="a" name="bamboo roof">
 	</item>
@@ -16670,12 +15071,14 @@
 	<item id="6248" article="a" name="plant wall">
 	</item>
 	<item id="6249" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6250" article="a" name="closed door">
 	</item>
 	<item id="6251" article="an" name="open door">
 	</item>
 	<item id="6252" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6253" article="a" name="closed door">
 	</item>
@@ -16690,28 +15093,20 @@
 	<item id="6258" article="an" name="open door">
 	</item>
 	<item id="6259" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6260" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6261" article="a" name="closed door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6262" article="an" name="open door">
-		<attribute key="description" value="The door seems to be sealed against unwanted intruders."/>
 	</item>
 	<item id="6263" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6264" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6265" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6266" article="a" name="gate of expertise">
-		<attribute key="description" value="Only the worthy may pass."/>
 	</item>
 	<item id="6267" article="a" name="stone rubbish">
 	</item>
@@ -16753,35 +15148,32 @@
 	</item>
 	<item id="6284" article="a" name="brick wall">
 	</item>
-	<item id="6285" name="some cracks">
+	<item id="6285" name="cracks">
 	</item>
-	<item id="6286" name="some cracks">
+	<item id="6286" name="cracks">
 	</item>
-	<item id="6287" name="">
-	</item>
-	<item id="6288" name="">
-	</item>
+	<!-- Items id 6287 and 6288 are blank -->
 	<item id="6289" article="a" name="burning wall">
 	</item>
 	<item id="6290" article="a" name="burning wall">
 	</item>
-	<item id="6291" name="">
+	<item id="6291" name="cracks">
 	</item>
-	<item id="6292" name="">
+	<item id="6292" name="cracks">
 	</item>
-	<item id="6293" name="">
+	<item id="6293" name="cracks">
 	</item>
-	<item id="6294" name="">
+	<item id="6294" name="cracks">
 	</item>
-	<item id="6295" name="">
+	<item id="6295" name="cracks">
 	</item>
-	<item id="6296" name="">
+	<item id="6296" name="cracks">
 	</item>
-	<item id="6297" name="">
+	<item id="6297" name="cracks">
 	</item>
-	<item id="6298" name="">
+	<item id="6298" name="cracks">
 	</item>
-	<item id="6299" name="">
+	<item id="6299" name="cracks">
 	</item>
 	<item id="6300" article="a" name="death ring">
 		<attribute key="weight" value="80"/>
@@ -17043,8 +15435,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="6352" name="">
-	</item>
+	<!-- Item id 6352 is blank -->
 	<item id="6353" name="swamp">
 	</item>
 	<item id="6354" article="a" name="slain blightwalker">
@@ -17382,8 +15773,7 @@
 	</item>
 	<item id="6493" article="a" name="bat decoration">
 	</item>
-	<item id="6494" name="">
-	</item>
+	<!-- Item id 6494 is blank -->
 	<item id="6495" article="a" name="firefly">
 	</item>
 	<item id="6496" article="a" name="bat decoration">
@@ -17392,8 +15782,7 @@
 		<attribute key="description" value="It contains presents which were stolen from Santa. Bring them back to Ruprecht on Vega."/>
 		<attribute key="weight" value="8000"/>
 	</item>
-	<item id="6498" name="">
-	</item>
+	<!-- Item id 6498 is blank -->
 	<item id="6499" article="a" name="diploma">
 		<attribute key="weight" value="1000"/>
 	</item>
@@ -17494,10 +15883,11 @@
 	</item>
 	<item id="6529" article="an" name="infernal bolt" plural="infernal bolts">
 		<attribute key="weight" value="90"/>
-		<attribute key="attack" value="50"/>
+		<attribute key="attack" value="43"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="infernalbolt"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="6530" name="worn soft boots">
 		<attribute key="description" value="Someone specialised in shoes might be able to repair them for you."/>
@@ -17536,8 +15926,8 @@
 	<item id="6539" article="a" name="handmaiden's protector">
 		<attribute key="weight" value="3500"/>
 	</item>
-	<item id="6540" article="a" name="">
-		<attribute key="weight" value="0"/>
+	<item id="6540" article="a" name="juggernaut's spike"> <!-- This isn't a real item -->
+		<attribute key="weight" value="4500"/>
 	</item>
 	<item id="6541" article="a" name="coloured egg" plural="coloured eggs">
 		<attribute key="weight" value="30"/>
@@ -17584,10 +15974,7 @@
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
-	<item id="6554" name="">
-	</item>
-	<item id="6555" name="">
-	</item>
+	<!-- Items id 6554 and 6555 are blank -->
 	<item id="6556" article="a" name="tic-tac-toe token">
 		<attribute key="weight" value="500"/>
 	</item>
@@ -17598,8 +15985,7 @@
 		<attribute key="description" value="Shake it to create a potion."/>
 		<attribute key="weight" value="200"/>
 	</item>
-	<item id="6559" name="">
-	</item>
+	<!-- Item id 6559 is blank -->
 	<item id="6560" article="a" name="dead human">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3065"/>
@@ -18256,8 +16642,7 @@
 	</item>
 	<item id="6867" article="a" name="stone base">
 	</item>
-	<item id="6868" name="">
-	</item>
+	<!-- Item id 6868 is blank -->
 	<item id="6869" name="ice">
 	</item>
 	<item id="6870" name="ice">
@@ -18303,6 +16688,7 @@
 	<item id="6890" name="tusks">
 	</item>
 	<item id="6891" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6892" article="a" name="closed door">
 	</item>
@@ -18312,15 +16698,16 @@
 	</item>
 	<item id="6895" article="an" name="open door">
 	</item>
-	<item id="6896" article="a" name="closed door">
+	<item id="6896" article="a" name="gate of expertise">
 	</item>
-	<item id="6897" article="an" name="open door">
+	<item id="6897" article="a" name="gate of expertise">
 	</item>
 	<item id="6898" article="a" name="closed door">
 	</item>
 	<item id="6899" article="an" name="open door">
 	</item>
 	<item id="6900" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6901" article="a" name="closed door">
 	</item>
@@ -18330,9 +16717,9 @@
 	</item>
 	<item id="6904" article="an" name="open door">
 	</item>
-	<item id="6905" article="a" name="closed door">
+	<item id="6905" article="a" name="gate of expertise">
 	</item>
-	<item id="6906" article="an" name="open door">
+	<item id="6906" article="a" name="gate of expertise">
 	</item>
 	<item id="6907" article="a" name="closed door">
 	</item>
@@ -18396,8 +16783,7 @@
 	</item>
 	<item id="6937" name="ice">
 	</item>
-	<item id="6938" name="">
-	</item>
+	<!-- Item id 6938 is blank -->
 	<item id="6939" name="snow">
 	</item>
 	<item id="6940" name="snow">
@@ -18587,6 +16973,7 @@
 	<item id="7032" article="an" name="ice wall window">
 	</item>
 	<item id="7033" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="7034" article="a" name="closed door">
 	</item>
@@ -18596,15 +16983,16 @@
 	</item>
 	<item id="7037" article="an" name="open door">
 	</item>
-	<item id="7038" article="a" name="closed door">
+	<item id="7038" article="a" name="gate of expertise">
 	</item>
-	<item id="7039" article="an" name="open door">
+	<item id="7039" article="a" name="gate of expertise">
 	</item>
 	<item id="7040" article="a" name="closed door">
 	</item>
 	<item id="7041" article="an" name="open door">
 	</item>
 	<item id="7042" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="7043" article="a" name="closed door">
 	</item>
@@ -18614,9 +17002,9 @@
 	</item>
 	<item id="7046" article="an" name="open door">
 	</item>
-	<item id="7047" article="a" name="closed door">
+	<item id="7047" article="a" name="gate of expertise">
 	</item>
-	<item id="7048" article="an" name="open door">
+	<item id="7048" article="a" name="gate of expertise">
 	</item>
 	<item id="7049" article="a" name="closed door">
 	</item>
@@ -18894,14 +17282,7 @@
 	</item>
 	<item id="7178" article="a" name="seal">
 	</item>
-	<item id="7179" article="a" name="bone wall">
-	</item>
-	<item id="7180" article="a" name="bone wall">
-	</item>
-	<item id="7181" name="">
-	</item>
-	<item id="7182" name="">
-	</item>
+	<!-- Items id 7179 to 7182 are blank -->
 	<item id="7183" article="a" name="baby seal doll">
 		<attribute key="weight" value="850"/>
 	</item>
@@ -19152,10 +17533,7 @@
 	<item id="7286" article="a" name="waterskin">
 		<attribute key="weight" value="800"/>
 	</item>
-	<item id="7287" name="">
-	</item>
-	<item id="7288" name="">
-	</item>
+	<!-- Items id 7287 and 7288 are blank -->
 	<item id="7289" article="a" name="frost charm">
 		<attribute key="weight" value="1900"/>
 	</item>
@@ -19219,8 +17597,7 @@
 	</item>
 	<item id="7312" article="a" name="frozen human">
 	</item>
-	<item id="7313" name="">
-	</item>
+	<!-- Item id 7313 is blank -->
 	<item id="7314" article="a" name="red dragon scale">
 		<attribute key="weight" value="90"/>
 	</item>
@@ -19384,7 +17761,9 @@
 	</item>
 	<item id="7348" article="an" name="old cobbled pavement">
 	</item>
-	<item id="7349" article="a" name="slain hellfire fighter">
+	<item id="7349" name="ashes">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="5"/>
 	</item>
 	<item id="7350" name="sandstone">
 	</item>
@@ -19414,25 +17793,28 @@
 	</item>
 	<item id="7363" article="a" name="piercing bolt" plural="piercing bolts">
 		<attribute key="weight" value="80"/>
-		<attribute key="attack" value="35"/>
+		<attribute key="attack" value="33"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="piercingbolt"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7364" article="a" name="sniper arrow" plural="sniper arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="30"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="sniperarrow"/>
+		<attribute key="maxHitChance" value="100"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7365" article="an" name="onyx arrow" plural="onyx arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="attack" value="35"/>
+		<attribute key="attack" value="38"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="onyxarrow"/>
+		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7366" article="a" name="viper star" plural="viper stars">
 		<attribute key="weight" value="200"/>
@@ -19440,7 +17822,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="greenstar"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="9"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="7367" article="an" name="enchanted spear" plural="enchanted spears">
 		<attribute key="weight" value="2000"/>
@@ -19448,7 +17830,8 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="enchantedspear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="2"/>
+		<attribute key="breakChance" value="7"/> <!-- ? -->
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="7368" article="an" name="assassin star" plural="assassin stars">
 		<attribute key="weight" value="200"/>
@@ -19456,7 +17839,8 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="redstar"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="100"/>
+		<attribute key="breakChance" value="30"/>
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="7369" article="a" name="golden trophy">
 		<attribute key="weight" value="3500"/>
@@ -19491,7 +17875,8 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="shootType" value="royalspear"/>
 		<attribute key="range" value="5"/>
-		<attribute key="breakChance" value="2"/>
+		<attribute key="breakChance" value="10"/> <!-- ? -->
+		<attribute key="ammoAction" value="moveback"/>
 	</item>
 	<item id="7379" name="brutetamer's staff">
 		<attribute key="weight" value="3800"/>
@@ -19522,8 +17907,11 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
-	<item id="7383" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7383" article="a" name="relic sword">
+		<attribute key="weight" value="4800"/>
+		<attribute key="defense" value="24"/>
+		<attribute key="attack" value="42"/>
+		<attribute key="weaponType" value="sword"/>
 	</item>
 	<item id="7384" article="a" name="mystic blade">
 		<attribute key="weight" value="3500"/>
@@ -19574,8 +17962,8 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="3"/>
 	</item>
-	<item id="7391" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7391" article="an" name="unuseful sword"> <!-- This isn't a real item -->
+		<attribute key="weight" value="2000"/>
 	</item>
 	<item id="7392" article="an" name="orcish maul">
 		<attribute key="weight" value="5400"/>
@@ -19618,8 +18006,8 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
-	<item id="7403" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7403" article="a" name="giant unuseful sword"> <!-- This isn't a real item -->
+		<attribute key="weight" value="10000"/>
 	</item>
 	<item id="7404" article="an" name="assassin dagger">
 		<attribute key="weight" value="1700"/>
@@ -19656,8 +18044,8 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="7409" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7409" article="a" name="blue staff"> <!-- This isn't a real item -->
+		<attribute key="weight" value="2300"/>
 	</item>
 	<item id="7410" article="a" name="queen's sceptre">
 		<attribute key="weight" value="2300"/>
@@ -19665,8 +18053,8 @@
 		<attribute key="attack" value="43"/>
 		<attribute key="weaponType" value="club"/>
 	</item>
-	<item id="7411" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7411" article="a" name="relic axe"> <!-- This isn't a real item -->
+		<attribute key="weight" value="5100"/>
 	</item>
 	<item id="7412" article="a" name="butcher's axe">
 		<attribute key="weight" value="2000"/> <!-- ? -->
@@ -19703,11 +18091,11 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="-3"/>
 	</item>
-	<item id="7417" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7417" article="a" name="square sword">  <!-- This isn't a real item -->
+		<attribute key="weight" value="2300"/>
 	</item>
-	<item id="7418" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7418" article="an" name="unknown sword">  <!-- This isn't a real item -->
+		<attribute key="weight" value="5100"/>
 	</item>
 	<item id="7419" article="a" name="dreaded cleaver">
 		<attribute key="weight" value="3800"/>
@@ -19716,16 +18104,16 @@
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="extradef" value="-3"/>
 	</item>
-	<item id="7420" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7420" article="a" name="mechanic sytche">  <!-- This isn't a real item -->
+		<attribute key="weight" value="3300"/>
 	</item>
-	<item id="7421" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7421" article="a" name="cursed star">  <!-- This isn't a real item -->
+		<attribute key="weight" value="3700"/>
 	</item>
-	<item id="7422" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7422" article="a" name="mace of knowledge">  <!-- This isn't a real item -->
+		<attribute key="weight" value="4900"/>
 	</item>
-	<item id="7423" name="">
+	<item id="7423" article="a" name="fur square mace">  <!-- This isn't a real item -->
 		<attribute key="weight" value="0"/>
 	</item>
 	<item id="7424" article="a" name="lunar staff">
@@ -19757,8 +18145,8 @@
 		<attribute key="slotType" value="two-handed"/>
 		<attribute key="description" value="Only those who have descended to the deepest depths may wield this hammer without it cursing them."/>
 	</item>
-	<item id="7428" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7428" article="an" name="ice star">  <!-- This isn't a real item -->
+		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="7429" article="a" name="blessed sceptre">
 		<attribute key="weight" value="3900"/>
@@ -19788,8 +18176,8 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="7433" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7433" article="a" name="cursed axe">  <!-- This isn't a real item -->
+		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="7434" article="a" name="royal axe">
 		<attribute key="weight" value="9200"/>
@@ -19798,11 +18186,11 @@
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="extradef" value="3"/>
 	</item>
-	<item id="7435" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7435" article="a" name="black axe">  <!-- This isn't a real item -->
+		<attribute key="weight" value="5500"/>
 	</item>
-	<item id="7436" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7436" article="a" name="angelwing axe">  <!-- This isn't a real item -->
+		<attribute key="weight" value="1500"/>
 	</item>
 	<item id="7437" article="a" name="sapphire hammer">
 		<attribute key="weight" value="2100"/>
@@ -19859,8 +18247,8 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
-	<item id="7450" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7450" article="the" name="ice hammer">
+		<attribute key="weight" value="5500"/>
 	</item>
 	<item id="7451" article="a" name="shadow sceptre">
 		<attribute key="weight" value="4100"/>
@@ -19875,17 +18263,17 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
-	<item id="7453" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7453" article="a" name="bloodslayer axe">  <!-- This isn't a real item -->
+		<attribute key="weight" value="4900"/>
 	</item>
-	<item id="7454" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7454" article="a" name="destroyer's axe">  <!-- This isn't a real item -->
+		<attribute key="weight" value="5700"/>
 	</item>
-	<item id="7455" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7455" article="an" name="ice double axe">  <!-- This isn't a real item -->
+		<attribute key="weight" value="4600"/>
 	</item>
-	<item id="7456" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7456" article="the" name="hell's axe">  <!-- This isn't a real item -->
+		<attribute key="weight" value="5800"/>
 	</item>
 	<item id="7457" name="fur boots">
 		<attribute key="weight" value="1200"/>
@@ -19893,16 +18281,21 @@
 		<attribute key="slotType" value="feet"/>
 		<attribute key="description" value="These boots keep your toes warm in even the iciest regions but they feel kind of heavy."/>
 	</item>
-	<item id="7458" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7458" article="a" name="fur cap">
+		<attribute key="weight" value="1800"/>
+		<attribute key="armor" value="3"/>
+		<attribute key="slotType" value="head"/>
+		<attribute key="description" value="It feels nice and warm on your ears."/>
 	</item>
 	<item id="7459" name="earmuffs">
 		<attribute key="weight" value="500"/>
 		<attribute key="armor" value="0"/>
 		<attribute key="slotType" value="head"/>
 	</item>
-	<item id="7460" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7460" article="a" name="norse shield">
+		<attribute key="weight" value="4100"/>
+		<attribute key="defense" value="28"/>
+		<attribute key="weapontype" value="shield"/>
 	</item>
 	<item id="7461" article="a" name="krimhorn helmet">
 		<attribute key="weight" value="5100"/>
@@ -19920,8 +18313,46 @@
 		<attribute key="slotType" value="body"/>
 		<attribute key="description" value="It is imbued with protective magic."/>
 	</item>
-	<item id="7464" name="">
-		<attribute key="weight" value="0"/>
+	<item id="7464" name="mammoth fur shorts">
+		<attribute key="weight" value="150"/>
+		<attribute key="armor" value="0"/>
+		<attribute key="slotType" value="legs"/>
+		<attribute key="description" value="They offer little protection but will at least provide some comfort and warmth."/>
+	</item>
+	<!-- Many items from 8.1 are still missing. So far, only the potions are here -->
+	<item id="7588" article="a" name="strong health potion">
+		<attribute key="weight" value="200"/>
+		<attribute key="description" value="This potion can only be consumed by paladins and knights of level 50 or higher."/>
+	</item>
+	<item id="7589" article="a" name="strong mana potion">
+		<attribute key="weight" value="200"/>
+		<attribute key="description" value="This potion can only be consumed by sorcerers, druids and paladins of level 50 or higher."/>
+	</item>
+	<item id="7590" article="a" name="great mana potion">
+		<attribute key="weight" value="220"/>
+		<attribute key="description" value="This potion can only be consumed by sorcerers and druids of level 80 or higher."/>
+	</item>
+	<item id="7951" article="a" name="great health potion">
+		<attribute key="weight" value="220"/>
+		<attribute key="description" value="This potion can only be consumed by knights of level 80 or higher."/>
+	</item>
+	<item id="7618" article="a" name="health potion">
+		<attribute key="weight" value="180"/>
+	</item>
+	<item id="7620" article="a" name="mana potion">
+		<attribute key="weight" value="180"/>
+	</item>
+	<item id="7634" article="an" name="empty potion flask">
+		<attribute key="weight" value="200"/>
+		<attribute key="description" value="Return it to a magic store for deposit."/>
+	</item>
+	<item id="7635" article="an" name="empty potion flask">
+		<attribute key="weight" value="220"/>
+		<attribute key="description" value="Return it to a magic store for deposit."/>
+	</item>
+	<item id="7636" article="an" name="empty potion flask">
+		<attribute key="weight" value="180"/>
+		<attribute key="description" value="Return it to a magic store for deposit."/>
 	</item>
 	<item id="20001" name="water">
 	</item>

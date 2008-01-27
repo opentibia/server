@@ -1,18 +1,19 @@
 function onUse(cid, item, frompos, item2, topos)
-	if isInArray(CLOSED_LOCKED_DOOR, item2.itemid) == TRUE then
-		if item.actionid == item2.actionid then
-			doTransformItem(item2.uid, item2.itemid + 1)
-		else
-			doPlayerSendCancel(cid, "The key does not match.")
-		end
-	elseif isInArray(OPENED_LOCKED_DOOR, item2.itemid) == TRUE then
-		if item.actionid == item2.actionid then
-			doTransformItem(item2.uid, item2.itemid - 1)
-		else
-			doPlayerSendCancel(cid, "The key does not match.")
-		end
-	else
-		return 0
+	if((isInArray(LOCKED_DOORS, item2.itemid) == FALSE and isInArray(LOCKED_DOORS, item2.itemid-2) == FALSE) or item.actionid == 0) then
+		return FALSE
 	end
-	return 1
+
+	local canOpen = (item.actionid == 10000 or item.actionid == item2.actiond)
+	if not(canOpen) then
+		doPlayerSendCancel(cid, "The key does not match.")
+		return TRUE
+	end
+
+	-- Veryfiy if you are opening or closing the door
+	if(isInArray(LOCKED_DOORS, item2.itemid) == TRUE) then -- Opening
+		doTransformItem(item2.uid, item2.itemid+2)
+	else                                                   -- Closing
+		doTransformItem(item2.uid, item2.itemid-2)
+	end
+	return TRUE
 end

@@ -1,22 +1,29 @@
-function onStepOut(cid, item, position, fromPosition)
-	local thingPosition = {x = position.x, y = position.y, z = position.z, stackpos = STACKPOS_MOV_OBJECT}
-	local thing = getThingfromPos(thingPosition)
-	local fieldPosition = {x = position.x, y = position.y, z = position.z, stackpos = STACKPOS_FIELD}
-	local field = getThingfromPos(fieldPosition)
-	if (isInArray(verticalOpenDoors, item.itemid) == TRUE) then
-		position.x = position.x + 1
-	else
-		position.y = position.y + 1
+function onStepOut(cid, item, pos)
+	if(item.actionid == 0) then
+		-- This is not a special door
+		return TRUE
 	end
-	while (field.itemid > 0) do
-		doRemoveItem(field.uid, 1)
-		field = getThingfromPos(fieldPosition)
+
+	local topos = getPlayerPosition(cid)
+	doRelocate(pos, topos)
+
+	-- Remove any item that was not moved
+	-- Happens when there is an unmoveable item on the door, ie. a fire field
+	local tmpPos = {x=pos.x, y=pos.y, z=pos.z, stackpos=-1}
+	local tileCount = getTileThingByPos(tmpPos)
+	local i = 1
+	local tmpItem = {uid = 1}
+
+	while(tmpItem.uid ~= 0 and i < tileCount) do
+		tmpPos.stackpos = i
+		tmpItem = getTileThingByPos(tmpPos)
+		if(tmpItem.uid ~= item.uid and tmpItem.uid ~= 0) then
+			doRemoveItem(tmpItem.uid)
+		else
+			i = i + 1
+		end
 	end
-	thing = getThingfromPos(thingPosition)
-	while (thing.itemid > 0) do
-		doTeleportThing(thing.uid, position, FALSE)
-		thing = getThingfromPos(thingPosition)
-	end
-	doTransformItem(item.uid, item.itemid - 1)
+
+	doTransformItem(item.uid, item.itemid-1)
 	return TRUE
 end

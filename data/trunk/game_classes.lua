@@ -4,25 +4,22 @@ local HOUSE_CONFIG =
 {
 	tilePrice         = 100 -- in GPs
 }
-
-
-local playerGUID = getPlayerGUID(cid)
-local houseID = getHouseByPlayerGUID(playerGUID)
-
 	
 House = {}
 House.__index = House
 
         
 	function House:hasHouse (cid)
-		if (getHouseByPlayerGUID(playerGUID)) then
+		if (getHouseByPlayerGUID(getPlayerGUID(cid))) then
 			return TRUE
 		end
 		return FALSE
 	end
 
 	function House:buy (cid, doorPos)
-		local housePrice = getHouseTilesSize(houseID) * HOUSE_CONFIG.tilePrice 
+		local housePrice = getHouseTilesSize(houseID) * HOUSE_CONFIG.tilePrice
+		local playerGUID = getPlayerGUID(cid)
+		local houseID = getHouseByPlayerGUID(playerGUID)
 
 		if (getTileHouseInfo(doorPos)) then
 			if (self:hasHouse(cid) == FALSE) then
@@ -45,7 +42,7 @@ House.__index = House
 	end
 
 	function House:info (doorPos)
-		if (getTileHouseInfo(doorPos)) then
+		--[[if (getTileHouseInfo(doorPos)) then
 			local houseArray = 
 			{
 				name = getHouseName(houseID),
@@ -56,7 +53,7 @@ House.__index = House
 				size = getHouseTilesSize(houseID)
 			}
 			return houseArray
-		end
+		end]]-- TODO: the the houseID as a key for the House class so you won't need 'cid' after the house is created
 		return FALSE
 	end
 
