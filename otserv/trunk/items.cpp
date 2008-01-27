@@ -834,6 +834,21 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentEarth = intValue;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentIce") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentIce = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentHoly") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentHoly = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentDeath") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentDeath = intValue;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentLifeDrain") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentLifeDrain = intValue;
