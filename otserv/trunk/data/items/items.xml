@@ -14,6 +14,8 @@
 	</item>
 	<item id="109" name="flowers">
 	</item>
+	<item id="231" name="sand">
+	</item>
 	<item id="293" name="grass">
 	</item>
 	<item id="294" article="a" name="pitfall">
@@ -314,6 +316,10 @@
 	<item id="601" name="lava">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="fire"/>
+	</item>
+	<item id="670" name="snow">
+	</item>
+	<item id="671" name="ice">
 	</item>
 	<item id="708" name="tar">
 		<attribute key="type" value="trashholder"/>

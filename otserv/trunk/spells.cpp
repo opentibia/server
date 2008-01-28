@@ -937,7 +937,7 @@ TalkAction(_interface)
 	casterTargetOrDirection = false;
 	needDirection = false;
 	hasParam = false;
-	checkLineOfSight = false;
+	checkLineOfSight = true;
 	function = NULL;
 }
 
