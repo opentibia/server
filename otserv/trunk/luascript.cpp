@@ -3229,7 +3229,6 @@ int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
 		player->addSummon(monster);
 		if(!g_game.placeCreature(monster, pos)){
 			player->removeSummon(monster);
-			delete monster;
 			std::string error_str = (std::string)"Can not summon monster: " + name;
 			reportErrorFunc(error_str);
 			lua_pushnumber(L, LUA_ERROR);
