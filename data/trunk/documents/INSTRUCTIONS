@@ -17,10 +17,23 @@ when a shovel is used in it.
 ---Under construction---
 
 ====================================
-3. Doors
+3. Doors and Keys
 
-When on map editor, closed doors with ActionIDs are locked doors
-and can only be opened by keys with the same ActionID.
+Locked doors can only be placed if one of the locked door id is placed
+on the map with an actionid.
+
+Doors with actionid's can be opened and locked by a key with the same
+actionid.
+
+A key with actionid 10000 is able to open and close any lockable door of the server.
+
+The 'locked door' ids are:
+1209, 1212, 1231, 1234, 1249, 1252, 3535, 3544, 4913, 4916, 5098, 5107, 5116,
+5125, 5134, 5137, 5140, 5143, 5278, 5281, 5732, 5735, 6192, 6195, 6249, 6252, 
+6891, 6900, 7033 and 7042
+
+You can identify a locked door when the next 2 IDs of it are a Closed door and
+an Open door.
 
 ====================================
 4. Gate of Expertises(aka. "Level Doors")
@@ -49,3 +62,6 @@ Players can only pass these doors if their storage value equal to the actionId
 of that door is 1.
 
 ====================================
+6. Hidden holes(aka. pick holes)
+
+To make hidden holes on mud, use mud ID 383 and set action id 100 on it.

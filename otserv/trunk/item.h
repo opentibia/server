@@ -43,15 +43,15 @@ class Door;
 class MagicField;
 
 enum ITEMPROPERTY{
-	BLOCKSOLID,
-	HASHEIGHT,
-	BLOCKPROJECTILE,
-	BLOCKPATHFIND,
-	ISVERTICAL,
-	ISHORIZONTAL,
-	MOVEABLE,
-	BLOCKINGANDNOTMOVEABLE,
-	SUPPORTHANGABLE,
+	BLOCKSOLID = 0,
+	HASHEIGHT = 1,
+	BLOCKPROJECTILE = 2,
+	BLOCKPATHFIND = 3,
+	ISVERTICAL = 4,
+	ISHORIZONTAL = 5,
+	MOVEABLE = 6,
+	BLOCKINGANDNOTMOVEABLE = 7,
+	SUPPORTHANGABLE = 8,
 };
 
 enum TradeEvents_t{
@@ -107,11 +107,11 @@ public:
 			deleteAttrs(m_firstAttr);
 		}
 	}
-	
+
 	void setSpecialDescription(const std::string& desc) {setStrAttr(ATTR_ITEM_DESC, desc);}
 	void resetSpecialDescription() {removeAttribute(ATTR_ITEM_DESC);}
 	const std::string& getSpecialDescription() const {return getStrAttr(ATTR_ITEM_DESC);}
-	
+
 	void setText(const std::string& text) {setStrAttr(ATTR_ITEM_TEXT, text);}
 	void resetText() {removeAttribute(ATTR_ITEM_TEXT);}
 	const std::string& getText() const {return getStrAttr(ATTR_ITEM_TEXT);}
@@ -121,9 +121,9 @@ public:
 	time_t getWrittenDate() const {return (time_t)getIntAttr(ATTR_ITEM_WRITTENDATE);}
 
 	void setWriter(std::string _writer) {setStrAttr(ATTR_ITEM_WRITTENBY, _writer);}
-	void resetWriter() {removeAttribute(ATTR_ITEM_WRITTENBY);}	
+	void resetWriter() {removeAttribute(ATTR_ITEM_WRITTENBY);}
 	const std::string& getWriter() const {return getStrAttr(ATTR_ITEM_WRITTENBY);}
-	
+
 	void setActionId(unsigned short n) {if(n < 100) n = 100; setIntAttr(ATTR_ITEM_ACTIONID, n);}
 	uint16_t getActionId() const {return getIntAttr(ATTR_ITEM_ACTIONID);}
 
@@ -159,7 +159,7 @@ protected:
 
 private:
 	static std::string emptyString;
-	
+
 	struct Attribute{
 		itemAttrTypes type;
 		void* value;
@@ -170,24 +170,24 @@ private:
 			next = NULL;
 		}
 	};
-	
+
 	uint32_t m_attributes;
 	Attribute* m_firstAttr;
-	
+
 	const std::string& getStrAttr(itemAttrTypes type) const;
 	void setStrAttr(itemAttrTypes type, const std::string& value);
-	
+
 	uint32_t getIntAttr(itemAttrTypes type) const;
 	void setIntAttr(itemAttrTypes type, int32_t value);
 	void increaseIntAttr(itemAttrTypes type, int32_t value);
-	
+
 	bool validateIntAttrType(itemAttrTypes type) const;
 	bool validateStrAttrType(itemAttrTypes type) const;
-	
-	void addAttr(Attribute* attr);	
+
+	void addAttr(Attribute* attr);
 	Attribute* getAttrConst(itemAttrTypes type) const;
 	Attribute* getAttr(itemAttrTypes type);
-	
+
 	void deleteAttrs(Attribute* attr);
 };
 
@@ -301,7 +301,7 @@ public:
 
 	uint8_t getFluidType() const {return fluid;};
 	void setFluidType(unsigned char n) {fluid = n;};
-	
+
 	void setUniqueId(unsigned short n);
 
 	void setDefaultDuration(){
@@ -323,7 +323,7 @@ protected:
 	// If weight description is needed from outside of item class
 	// use the other getWeightDescription
 	std::string getWeightDescription(double weight) const;
-	
+
 	unsigned short id;  // the same id as in ItemType
 	unsigned char count; // number of stacked items
 	unsigned char charges; //number of charges on the item

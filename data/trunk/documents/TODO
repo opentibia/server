@@ -8,7 +8,7 @@ v0.1
 * Add Jiddo's NPC System with some optimizations and NPCs examples
 * Change fishing system so it is not based only on one ID
 * Remove deprecated items from scripts
-* Add normal closed doors to AddItem movements to be transformed into Locked Doors if they have an ActionID
+* Review NORMAL_CORPSE_STAGE_I and SWAMP_CORPSE_STAGE_I ids on actions.lua
 
 v0.2
 * Rewrite all monsters from zero so their files are lighter and they are like Real Tibia(according to TibiaWiki)

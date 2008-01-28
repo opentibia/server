@@ -1075,8 +1075,9 @@ void LuaScriptInterface::registerFunctions()
 	//doTransformItem(uid, toitemid, <optional> count/subtype)
 	lua_register(m_luaState, "doTransformItem", LuaScriptInterface::luaDoTransformItem);
 
-	//doPlayerSay(cid, text, type)
-	lua_register(m_luaState, "doPlayerSay", LuaScriptInterface::luaDoPlayerSay);
+	//doCreatureSay(cid, text, type)
+	lua_register(m_luaState, "doCreatureSay", LuaScriptInterface::luaDoCreatureSay);
+	lua_register(m_luaState, "doPlayerSay", LuaScriptInterface::luaDoCreatureSay); //For scripts compatibility
 
 	//doSendMagicEffect(pos, type)
 	lua_register(m_luaState, "doSendMagicEffect", LuaScriptInterface::luaDoSendMagicEffect);
@@ -1434,6 +1435,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//hasCondition(cid, conditionid)
 	lua_register(m_luaState, "hasCondition", LuaScriptInterface::luaHasCondition);
+
+	//hasProperty(uid)
+	lua_register(m_luaState, "hasProperty", LuaScriptInterface::luaHasProperty);
 
 	//isItemStackable(itemid)
 	lua_register(m_luaState, "isItemStackable", LuaScriptInterface::luaIsItemStackable);
@@ -2107,18 +2111,18 @@ int LuaScriptInterface::luaDoTransformItem(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaDoPlayerSay(lua_State *L)
+int LuaScriptInterface::luaDoCreatureSay(lua_State *L)
 {
-	//doPlayerSay(cid, text, type)
+	//doCreatureSay(cid, text, type)
 	uint32_t type = popNumber(L);
 	const char * text = popString(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 
-	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		g_game.internalCreatureSay(player,(SpeakClasses)type,std::string(text));
+	Creature* creature = env->getPlayerByUID(cid);
+	if(creature){
+		g_game.internalCreatureSay(creature, (SpeakClasses)type, std::string(text));
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -5886,6 +5890,30 @@ int LuaScriptInterface::luaHasCondition(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 	}
 
+	return 1;
+}
+
+int LuaScriptInterface::luaHasProperty(lua_State *L)
+{
+	//hasProperty(uid, prop)
+	uint32_t prop = popNumber(L);
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(!item){
+        reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	if(item->hasProperty((ITEMPROPERTY)prop)){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
 	return 1;
 }
 

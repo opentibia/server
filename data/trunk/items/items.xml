@@ -3108,28 +3108,16 @@
 		<attribute key="weight" value="100"/>
 	</item>
 	<item id="2025" article="a" name="pool">
-		<attribute key="decayTo" value="2026"/>
-		<attribute key="duration" value="45"/>
 	</item>
 	<item id="2026" article="a" name="pool">
-		<attribute key="decayTo" value="2027"/>
-		<attribute key="duration" value="45"/>
 	</item>
 	<item id="2027" article="a" name="pool">
-		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="60"/>
 	</item>
 	<item id="2028" article="a" name="pool">
-		<attribute key="decayTo" value="2029"/>
-		<attribute key="duration" value="45"/>
 	</item>
 	<item id="2029" article="a" name="pool">
-		<attribute key="decayTo" value="2030"/>
-		<attribute key="duration" value="45"/>
 	</item>
 	<item id="2030" article="a" name="pool">
-		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="60"/>
 	</item>
 	<item id="2031" article="a" name="waterskin">
 		<attribute key="weight" value="800"/>

@@ -42,43 +42,43 @@
 	<action itemid="2036" script="watch_clock.lua" />
 	
 	<!-- Liquids -->
-	<action itemid="1775" script="liquid.lua" />
-	<action itemid="2005" script="liquid.lua" />
-	<action itemid="2006" script="liquid.lua" />
-	<action itemid="2007" script="liquid.lua" />
+	<action itemid="1775" script="liquids/containers.lua" />
+	<action itemid="2005" script="liquids/containers.lua" />
+	<action itemid="2006" script="liquids/containers.lua" />
+	<action itemid="2007" script="liquids/containers.lua" />
 
-	<action itemid="2008" script="liquid.lua" />
-	<action itemid="2009" script="liquid.lua" />
-	<action itemid="2011" script="liquid.lua" />
-	<action itemid="2012" script="liquid.lua" />
-	<action itemid="2013" script="liquid.lua" />
-	<action itemid="2014" script="liquid.lua" />
-	<action itemid="2015" script="liquid.lua" />
-	<action itemid="2023" script="liquid.lua" />
-	<action itemid="2031" script="liquid.lua" />
+	<action itemid="2008" script="liquids/containers.lua" />
+	<action itemid="2009" script="liquids/containers.lua" />
+	<action itemid="2011" script="liquids/containers.lua" />
+	<action itemid="2012" script="liquids/containers.lua" />
+	<action itemid="2013" script="liquids/containers.lua" />
+	<action itemid="2014" script="liquids/containers.lua" />
+	<action itemid="2015" script="liquids/containers.lua" />
+	<action itemid="2023" script="liquids/containers.lua" />
+	<action itemid="2031" script="liquids/containers.lua" />
 
-	<action itemid="2032" script="liquid.lua" />
-	<action itemid="2033" script="liquid.lua" />
-	<action itemid="2034" script="liquid.lua" />
-	<action itemid="2562" script="liquid.lua" />
-	<action itemid="2574" script="liquid.lua" />
-	<action itemid="2575" script="liquid.lua" />
-	<action itemid="2576" script="liquid.lua" />
-	<action itemid="2577" script="liquid.lua" />
-	<action itemid="3941" script="liquid.lua" />
+	<action itemid="2032" script="liquids/containers.lua" />
+	<action itemid="2033" script="liquids/containers.lua" />
+	<action itemid="2034" script="liquids/containers.lua" />
+	<action itemid="2562" script="liquids/containers.lua" />
+	<action itemid="2574" script="liquids/containers.lua" />
+	<action itemid="2575" script="liquids/containers.lua" />
+	<action itemid="2576" script="liquids/containers.lua" />
+	<action itemid="2577" script="liquids/containers.lua" />
+	<action itemid="3941" script="liquids/containers.lua" />
 
-	<action itemid="3942" script="liquid.lua" />
+	<action itemid="3942" script="liquids/containers.lua" />
 
-	<action itemid="5553" script="liquid.lua" />
-	<action itemid="6558" script="liquid.lua" />
+	<action itemid="5553" script="liquids/containers.lua" />
+	<action itemid="6558" script="liquids/demonic_blood.lua" />
 
 	<!-- Potions -->
-	<action itemid="7588" script="potions.lua" />
-	<action itemid="7589" script="potions.lua" />
-	<action itemid="7590" script="potions.lua" />
-	<action itemid="7591" script="potions.lua" />
-	<action itemid="7618" script="potions.lua" />
-	<action itemid="7620" script="potions.lua" />
+	<action itemid="7588" script="liquids/strong_health.lua" />
+	<action itemid="7589" script="liquids/strong_mana.lua" />
+	<action itemid="7590" script="liquids/great_mana.lua" />
+	<action itemid="7591" script="liquids/great_health.lua" />
+	<action itemid="7618" script="liquids/health_potion.lua" />
+	<action itemid="7620" script="liquids/mana_potion.lua" />
 	
 	<!-- Make Bread -->
 	<action itemid="2692" script="bread_system.lua" />

@@ -332,8 +332,8 @@ protected:
 	static int luaDoPlayerSummonCreature(lua_State *L);
 	static int luaDoRemoveCreature(lua_State *L);
 	static int luaDoMoveCreature(lua_State *L);
+	static int luaDoCreatureSay(lua_State *L);
 
-	static int luaDoPlayerSay(lua_State *L);
 	static int luaDoPlayerAddSkillTry(lua_State *L);
 	static int luaDoPlayerAddManaSpent(lua_State *L);
 	static int luaDoPlayerAddHealth(lua_State *L);
@@ -527,6 +527,7 @@ protected:
 	static int luaGetCreatureSummons(lua_State *L);
 	static int luaHasCondition(lua_State *L);
 
+	static int luaHasProperty(lua_State *L);
 	static int luaIsItemStackable(lua_State *L);
 	static int luaIsItemRune(lua_State *L);
 	static int luaIsItemDoor(lua_State *L);
