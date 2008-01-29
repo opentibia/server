@@ -583,7 +583,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 		onChangeZone(getZone());
 
 		//update map cache
-		if(teleport){
+		if(teleport || oldPos.z != newPos.z){
 			updateMapCache();
 		}
 		else{
