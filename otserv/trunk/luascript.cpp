@@ -1486,7 +1486,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
-	luaL_openlib(m_luaState, "bit", LuaScriptInterface::luaBitReg, 0);
+	luaL_register(m_luaState, "bit", LuaScriptInterface::luaBitReg);
 }
 
 int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)

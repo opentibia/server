@@ -82,8 +82,8 @@ bool ScriptingManager::loadScriptSystems()
 	std::cout << "[done]" << std::endl;
 
 	//load spells data
-	g_spells = new Spells();
 	std::cout << ":: Loading Spells ...";
+	g_spells = new Spells();
 	if(!g_spells->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Spells!");
 		return false;
@@ -97,8 +97,8 @@ bool ScriptingManager::loadScriptSystems()
 	*/
 
 	//load actions data
-	g_actions = new Actions();
 	std::cout << ":: Loading Actions ...";
+	g_actions = new Actions();
 	if(!g_actions->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Actions!");
 		return false;
@@ -106,8 +106,8 @@ bool ScriptingManager::loadScriptSystems()
 	std::cout << "[done]" << std::endl;
 
 	//load talkactions data
-	g_talkactions = new TalkActions();
 	std::cout << ":: Loading Talkactions ...";
+	g_talkactions = new TalkActions();
 	if(!g_talkactions->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Talkactions!");
 		return false;
@@ -115,8 +115,8 @@ bool ScriptingManager::loadScriptSystems()
 	std::cout << "[done]" << std::endl;
 
 	//load moveEvents
-	g_moveEvents = new MoveEvents();
 	std::cout << ":: Loading MoveEvents ...";
+	g_moveEvents = new MoveEvents();
 	if(!g_moveEvents->loadFromXml(datadir)){
 		ErrorMessage("Unable to load MoveEvents!");
 		return false;
@@ -124,8 +124,8 @@ bool ScriptingManager::loadScriptSystems()
 	std::cout << "[done]" << std::endl;
 
 	//load creature events
-	g_creatureEvents = new CreatureEvents();
 	std::cout << ":: Loading CreatureEvents ...";
+	g_creatureEvents = new CreatureEvents();
 	if(!g_creatureEvents->loadFromXml(datadir)){
 		ErrorMessage("Unable to load CreatureEvents!");
 		return false;
