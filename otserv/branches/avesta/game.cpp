@@ -633,7 +633,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	if(!Position::areInRange<1,1,0>(movingCreatureOrigPos, player->getPosition())){
 		//need to walk to the creature first before moving it
 		std::list<Direction> listDir;
-		if(getPathToEx(player, movingCreatureOrigPos, 0, 1, true, true, listDir)){
+		if(getPathToEx(player, movingCreatureOrigPos, listDir, 0, 1, true, true)){
 			Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 				this, player->getID(), listDir)));
 
@@ -874,7 +874,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	if(!Position::areInRange<1,1,0>(playerPos, mapFromPos)){
 		//need to walk to the item first before using it
 		std::list<Direction> listDir;
-		if(getPathToEx(player, item->getPosition(), 0, 1, true, true, listDir)){
+		if(getPathToEx(player, item->getPosition(), listDir, 0, 1, true, true)){
 			Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 				this, player->getID(), listDir)));
 
@@ -1902,7 +1902,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 			}
 
 			std::list<Direction> listDir;
-			if(getPathToEx(player, walkToPos, 0, 1, true, true, listDir)){
+			if(getPathToEx(player, walkToPos, listDir, 0, 1, true, true)){
 				Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 					this, player->getID(), listDir)));
 
@@ -1951,7 +1951,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	if(ret != RET_NOERROR){
 		if(ret == RET_TOOFARAWAY){
 			std::list<Direction> listDir;
-			if(getPathToEx(player, pos, 0, 1, true, true, listDir)){
+			if(getPathToEx(player, pos, listDir, 0, 1, true, true)){
 				Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 					this, player->getID(), listDir)));
 
@@ -2011,7 +2011,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 	if(ret != RET_NOERROR){
 		if(ret == RET_TOOFARAWAY){
 			std::list<Direction> listDir;
-			if(getPathToEx(player, item->getPosition(), 0, 1, true, true, listDir)){
+			if(getPathToEx(player, item->getPosition(), listDir, 0, 1, true, true)){
 				Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 					this, player->getID(), listDir)));
 
@@ -2072,7 +2072,8 @@ bool Game::playerUpdateTile(uint32_t playerId, const Position& pos)
 		return false;
 
 	if(player->canSee(pos)){
-		player->sendUpdateTile(pos);
+		Tile* tile = getTile(pos.x, pos.y, pos.z);
+		player->sendUpdateTile(tile, pos);
 		return true;
 	}
 	return false;
@@ -2114,7 +2115,7 @@ bool Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 
 	if(pos.x != 0xFFFF && !Position::areInRange<1,1,0>(pos, player->getPosition())){
 		std::list<Direction> listDir;
-		if(getPathToEx(player, pos, 0, 1, true, true, listDir)){
+		if(getPathToEx(player, pos, listDir, 0, 1, true, true)){
 			Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 				this, player->getID(), listDir)));
 
@@ -2243,7 +2244,7 @@ bool Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 	}
 	else if(!Position::areInRange<1,1,0>(tradeItem->getPosition(), player->getPosition())){
 		std::list<Direction> listDir;
-		if(getPathToEx(player, pos, 0, 1, true, true, listDir)){
+		if(getPathToEx(player, pos, listDir, 0, 1, true, true)){
 			Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 				this, player->getID(), listDir)));
 
@@ -3083,9 +3084,9 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 	return true;
 }
 
-bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
-	uint32_t minDist, uint32_t maxDist, bool fullPathSearch, bool targetMustBeReachable,
-	std::list<Direction>& dirList, int32_t maxSearchDist /*= -1*/)
+bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
+	uint32_t minDist, uint32_t maxDist, bool fullPathSearch /*= true*/,
+	bool targetMustBeReachable /*= true*/, int32_t maxSearchDist /*= -1*/)
 {
 	if(creature->getPosition().z != targetPos.z || !creature->canSee(targetPos)){
 		return false;
@@ -3142,7 +3143,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 
 						if(tmpPos != creaturePos){
 							//std::cout << "x: " << tmpPos.x << "y: " << tmpPos.y << std::endl;
-							if(!map->getPathTo(creature, tmpPos, targetPos, tmpDirList, false, maxSearchDist)){
+							if(!map->getPathTo(creature, tmpPos, targetPos, tmpDirList, maxSearchDist)){
 								continue;
 							}
 						}
@@ -3160,8 +3161,6 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 			}
 
 		}
-
-		map->clearPathCache();
 
 		if(minWalkDist != -1){
 #ifdef __DEBUG__PATHING__

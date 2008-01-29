@@ -127,7 +127,7 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 	if(creature == this){
 		//We just spawned lets look around to see who is there.
 		if(isSummon()){
-			isMasterInRange = true;
+			isMasterInRange = canSee(getMaster()->getPosition());
 		}
 		updateTargetList();
 		activate();
@@ -153,13 +153,18 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 	}
 }
 
-void Monster::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
-	uint32_t oldStackPos, bool teleport)
+void Monster::onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
+	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
-	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
+	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
+		if(isSummon()){
+			isMasterInRange = canSee(getMaster()->getPosition());
+		}
+
 		updateTargetList();
+		activate();
 
 		/*
 		TODO: Optimizations here
@@ -376,12 +381,12 @@ bool Monster::searchTarget(bool randomize /*= false*/)
 		}
 	}
 	else{
-
 		for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
 			if(followCreature != (*it) && selectTarget(*it)){
 	#ifdef __DEBUG__
 				std::cout << "Selecting target " << (*it)->getName() << std::endl;
 	#endif
+
 				return true;
 			}
 		}
@@ -408,7 +413,7 @@ void Monster::onFollowCreatureComplete(const Creature* creature)
 				targetList.push_back(target);
 
 				//Could not find a path, lets find another one
-				searchTarget();
+				//searchTarget();
 			}
 		}
 	}

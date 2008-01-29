@@ -56,6 +56,7 @@ enum slots_t {
 struct FindPathParams{
 	bool fullPathSearch;
 	bool needReachable;
+	uint32_t maxSearchDist;
 	uint32_t targetDistance;
 };
 
@@ -284,16 +285,17 @@ public:
 	void stopEventThink();
 #endif
 
-	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
 		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
-	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	virtual void onUpdateTile(const Position& pos);
+	virtual void onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+		const ItemType& iType, const Item* item);
+	virtual void onUpdateTile(const Tile* tile, const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
-		uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
+		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual void onAttackedCreatureDissapear(bool isLogout) {};
 	virtual void onFollowCreatureDissapear(bool isLogout) {};
@@ -317,17 +319,23 @@ public:
 	bool registerCreatureEvent(const std::string& name);
 
 	virtual void setParent(Cylinder* cylinder){
-		tile = dynamic_cast<Tile*>(cylinder);
+		_tile = dynamic_cast<Tile*>(cylinder);
 		Thing::setParent(cylinder);
 	}
 
-	virtual Tile* getTile(){return tile;}
-	virtual const Tile* getTile() const{return tile;}
+	virtual Tile* getTile(){return _tile;}
+	virtual const Tile* getTile() const{return _tile;}
+	int32_t getWalkCache(const Position& pos) const;
 
 protected:
-	Tile* tile;
+	static const int32_t mapWalkWidth = /*maxViewportX*/ 9 * 2;
+	static const int32_t mapWalkHeight = /*maxViewportY*/ 9 * 2;
+	bool localMapCache[mapWalkHeight][mapWalkWidth];
+
+	Tile* _tile;
 	uint32_t id;
 	bool isInternalRemoved;
+	bool isInitiated;
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
 	int32_t attackStrength;
@@ -360,6 +368,7 @@ protected:
 	uint32_t walkUpdateTicks;
 	bool hasFollowPath;
 	bool internalMapChange;
+	bool forceUpdateFollowPath;
 
 	//combat variables
 	Creature* attackedCreature;
@@ -386,6 +395,8 @@ protected:
 	CreatureEventList::iterator findEvent(CreatureEventType_t type);
 	CreatureEvent* getCreatureEvent(CreatureEventType_t type);
 
+	void updateMapCache();
+	void updateTileCache(const Tile* tile);
 	void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void doAttacking(uint32_t interval) {};
 	virtual bool hasExtraSwing() {return false;}

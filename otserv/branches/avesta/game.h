@@ -366,8 +366,9 @@ public:
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
 	bool isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor);
-	bool getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
-		bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList, int32_t maxSearchDist = -1);
+	bool getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
+		uint32_t minDist, uint32_t maxDist, bool fullPathSearch = true,
+		bool targetMustBeReachable = true, int32_t maxSearchDist = -1);
 
 	void changeSpeed(Creature* creature, int32_t varSpeedDelta);
 	void internalCreatureChangeOutfit(Creature* creature, const Outfit_t& oufit);

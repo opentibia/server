@@ -349,21 +349,23 @@ public:
 
 	//tile
 	//send methods
-	void sendAddTileItem(const Position& pos, const Item* item)
-		{if(client) client->sendAddTileItem(pos, item);}
-	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
-		{if(client) client->sendUpdateTileItem(pos, stackpos, newitem);}
-	void sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
-		{if(client) client->sendRemoveTileItem(pos, stackpos);}
-	void sendUpdateTile(const Position& pos)
-		{if(client) client->sendUpdateTile(pos);}
+	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item)
+		{if(client) client->sendAddTileItem(tile, pos, item);}
+	void sendUpdateTileItem(const Tile* tile, const Position& pos,
+		uint32_t stackpos, const Item* olditem, const Item* newitem)
+		{if(client) client->sendUpdateTileItem(tile, pos, stackpos, newitem);}
+	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item)
+		{if(client) client->sendRemoveTileItem(tile, pos, stackpos);}
+	void sendUpdateTile(const Tile* tile, const Position& pos)
+		{if(client) client->sendUpdateTile(tile, pos);}
 
 	void sendCreatureAppear(const Creature* creature, bool isLogin)
 		{if(client) client->sendAddCreature(creature, isLogin);}
 	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 		{if(client) client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);}
-	void sendCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos, uint32_t oldStackPos, bool teleport)
-		{if(client) client->sendMoveCreature(creature, newPos, oldPos, oldStackPos, teleport);}
+	void sendCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
+	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+		{if(client) client->sendMoveCreature(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);}
 
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos)
 		{if(client) client->sendCreatureTurn(creature, stackpos);}
@@ -403,16 +405,17 @@ public:
 		{if(client) client->sendRemoveInventoryItem(slot);}
 
 	//event methods
-	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
 		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
-	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	virtual void onUpdateTile(const Position& pos);
+	virtual void onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+		const ItemType& iType, const Item* item);
+	virtual void onUpdateTile(const Tile* tile, const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
-		uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
+		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);

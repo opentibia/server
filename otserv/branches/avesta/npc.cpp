@@ -222,25 +222,26 @@ std::string Npc::getDescription(int32_t lookDistance) const
 	return s.str();
 }
 
-void Npc::onAddTileItem(const Position& pos, const Item* item)
+void Npc::onAddTileItem(const Tile* tile, const Position& pos, const Item* item)
 {
-	Creature::onAddTileItem(pos, item);
+	Creature::onAddTileItem(tile, pos, item);
 }
 
-void Npc::onUpdateTileItem(const Position& pos, uint32_t stackpos,
+void Npc::onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
 	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
-	Creature::onUpdateTileItem(pos, stackpos, oldItem, oldType, newItem, newType);
+	Creature::onUpdateTileItem(tile, pos, stackpos, oldItem, oldType, newItem, newType);
 }
 
-void Npc::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
+void Npc::onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+	const ItemType& iType, const Item* item)
 {
-	Creature::onRemoveTileItem(pos, stackpos, item);
+	Creature::onRemoveTileItem(tile, pos, stackpos, iType, item);
 }
 
-void Npc::onUpdateTile(const Position& pos)
+void Npc::onUpdateTile(const Tile* tile, const Position& pos)
 {
-	Creature::onUpdateTile(pos);
+	Creature::onUpdateTile(tile, pos);
 }
 
 void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
@@ -267,10 +268,10 @@ void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool 
 	}
 }
 
-void Npc::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
-	uint32_t oldStackPos, bool teleport)
+void Npc::onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
+		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
-	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
+	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);
 
 	if(creature->getPlayer()){
 		m_npcEventHandler->onCreatureMove(creature, oldPos, newPos);
@@ -415,7 +416,7 @@ bool Npc::getRandomStep(Direction& dir)
 void Npc::doMoveTo(Position target)
 {
 	std::list<Direction> listDir;
-	if(!g_game.getPathToEx(this, target, 1, 1, true, true, listDir)){
+	if(!g_game.getPathToEx(this, target, listDir, 1, 1, true, true)){
 		return;
 	}
 

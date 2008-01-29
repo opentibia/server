@@ -186,15 +186,15 @@ private:
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 
 	//tiles
-	void sendAddTileItem(const Position& pos, const Item* item);
-	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
-	void sendUpdateTile(const Position& pos);
+	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item);
+	void sendUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
+	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos);
+	void sendUpdateTile(const Tile* tile, const Position& pos);
 
 	void sendAddCreature(const Creature* creature, bool isLogin);
 	void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
-	void sendMoveCreature(const Creature* creature, const Position& newPos, const Position& oldPos,
-		uint32_t oldStackPos, bool teleport);
+	void sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos,
+		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	//containers
 	void sendAddContainerItem(uint8_t cid, const Item* item);

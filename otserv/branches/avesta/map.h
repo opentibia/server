@@ -71,9 +71,9 @@ public:
 	bool isInList(int32_t x, int32_t y);
 	AStarNode* getNodeInList(int32_t x, int32_t y);
 
-	int getMapWalkCost(const Creature* creature, AStarNode* node,
+	int32_t getMapWalkCost(const Creature* creature, AStarNode* node,
 		const Tile* neighbourTile, const Position& neighbourPos);
-	int getTileWalkCost(const Creature* creature, const Tile* tile);
+	static int32_t getTileWalkCost(const Creature* creature, const Tile* tile);
 	int getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal);
 
 private:
@@ -157,17 +157,10 @@ public:
 	Map();
 	~Map();
 
-	static int32_t maxViewportX;
-	static int32_t maxViewportY;
+	static int32_t maxViewportX;		//min value: maxClientViewportX + 1
+	static int32_t maxViewportY;		//min value: maxClientViewportY + 1
 	static int32_t maxClientViewportX;
 	static int32_t maxClientViewportY;
-	static const int32_t mapCostCacheWidth = 40;
-	static const int32_t mapCostCacheHeight = 40;
-
-	static int32_t mapCostCache[Map::mapCostCacheWidth][Map::mapCostCacheHeight];
-	
-	static void cacheMapCost(const Position& centerPos, const Position& pos, int32_t cost);
-	static int32_t getCacheMapCost(const Position& centerPos, const Position& pos);
 
 	/**
 	* Load a map.
@@ -243,13 +236,11 @@ public:
 	* \param toPosition The position we want a path calculated to
 	* \param centerPos The center position (can be set to toPosition) 
 	* \param listDir contains a list of directions to the destination
-	* \param autoClearCache If not set the cache is not cleared (to clear it manually call clearPathCache)
 	* \param maxDist Maximum distance from our current position to search, default: -1 (no limit)
 	* \returns returns true if a path was found
 	*/
 	bool getPathTo(const Creature* creature, const Position& toPosition,
-		const Position& centerPos, std::list<Direction>& listDir,
-		bool autoClearCache = true, int32_t maxDist = -1);
+		const Position& centerPos, std::list<Direction>& listDir, int32_t maxDist = -1);
 
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir,
 		const Position& destPos);
@@ -284,7 +275,7 @@ protected:
 		int32_t minRangeY = 0, int32_t maxRangeY = 0);
 	
 	void clearSpectatorCache();
-	void clearPathCache();
+	//void clearPathCache();
 
 	QTreeNode root;
 

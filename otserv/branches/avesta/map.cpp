@@ -48,47 +48,21 @@
 
 extern ConfigManager g_config;
 
-int32_t Map::maxViewportX = 10; //min value: maxClientViewportX + 1
-int32_t Map::maxViewportY = 10; //min value: maxClientViewportY + 1
+int32_t Map::maxViewportX = 9; //min value: maxClientViewportX + 1
+int32_t Map::maxViewportY = 9; //min value: maxClientViewportY + 1
 int32_t Map::maxClientViewportX = 8;
 int32_t Map::maxClientViewportY = 6;
-int32_t Map::mapCostCache[Map::mapCostCacheWidth][Map::mapCostCacheHeight];
 
 Map::Map()
 {
 	defaultMapLoaded = false;
 	mapWidth = 0;
 	mapHeight = 0;
-	clearPathCache();
 }
 
 Map::~Map()
 {
 	//
-}
-
-void Map::cacheMapCost(const Position& centerPos, const Position& pos, int32_t cost)
-{
-	int32_t dx = pos.x - centerPos.x;
-	int32_t dy = pos.y - centerPos.y;
-
-	if((std::abs(dx) < (mapCostCacheWidth - 1) / 2) &&
-	   (std::abs(dy) < (mapCostCacheHeight - 1) / 2)){
-		mapCostCache[(mapCostCacheWidth - 1) / 2 + dx][(mapCostCacheHeight - 1) / 2 + dy] = cost;
-	}
-}
-
-int32_t Map::getCacheMapCost(const Position& centerPos, const Position& pos)
-{
-	int32_t dx = pos.x - centerPos.x;
-	int32_t dy = pos.y - centerPos.y;
-
-	if((std::abs(dx) < (mapCostCacheWidth - 1) / 2) &&
-	   (std::abs(dy) < (mapCostCacheHeight - 1) / 2)){
-		return mapCostCache[(mapCostCacheWidth - 1) / 2 + dx][(mapCostCacheHeight - 1) / 2 + dy];
-	}
-
-	return 0;
 }
 
 bool Map::loadMap(const std::string& identifier, const std::string& type)
@@ -475,11 +449,6 @@ void Map::clearSpectatorCache()
 	spectatorCache.clear();
 }
 
-void Map::clearPathCache()
-{
-	memset(mapCostCache, -1, sizeof(mapCostCache));
-}
-
 bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight /*= true*/,
 	int32_t rangex /*= Map::maxClientViewportX*/, int32_t rangey /*= Map::maxClientViewportY*/)
 {
@@ -647,14 +616,16 @@ bool Map::isPathValid(const Creature* creature, const std::list<Direction>& list
 
 Tile* Map::isPositionValid(const Creature* creature, const Position& pos, const Position& centerPos)
 {
-	if(getCacheMapCost(centerPos, pos) == -2){
-		return NULL;
+	switch(creature->getWalkCache(pos)){
+		case 0: return NULL;
+		case 1: return getTile(pos);
+		break;
 	}
 
+	//used for none-cached tiles
 	Tile* tile = getTile(pos);
 	if(creature->getTile() != tile){
 		if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING | FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
-			cacheMapCost(centerPos, pos, -2);
 			return NULL;
 		}
 	}
@@ -663,8 +634,7 @@ Tile* Map::isPositionValid(const Creature* creature, const Position& pos, const 
 }
 
 bool Map::getPathTo(const Creature* creature, const Position& toPosition,
-	const Position& centerPos, std::list<Direction>& listDir,
-	bool autoClearCache /*= true*/, int32_t maxSearchDist /*= -1*/)
+	const Position& centerPos, std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/)
 {
 	if(isPositionValid(creature, toPosition, centerPos) == NULL){
 		return false;
@@ -727,21 +697,16 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 				pos.y = n->y + neighbourOrderList[i][1];
 
 				bool outOfRange = false;
-				if(maxSearchDist != -1 && (std::abs(endPos.x - pos.x) +
-					std::abs(endPos.y - pos.y)) > maxSearchDist){
+				if(maxSearchDist != -1 && (std::abs(centerPos.x - pos.x) +
+					std::abs(centerPos.y - pos.y)) > maxSearchDist){
 					outOfRange = true;
 				}
 
 				if(!outOfRange && (tile = isPositionValid(creature, pos, centerPos))){
 					//The cost (g) for this neighbour
 					int32_t cost = nodes.getMapWalkCost(creature, n, tile, pos);
-					int32_t extraCost = 0;
-					if( (extraCost = getCacheMapCost(centerPos, pos)) < 0 ) {
-						extraCost = nodes.getTileWalkCost(creature, tile);
-						Map::cacheMapCost(centerPos, pos, extraCost);
-					}
-					
-					int32_t newg = n->g + cost + extraCost;					
+					int32_t extraCost = nodes.getTileWalkCost(creature, tile);
+					int32_t newg = n->g + cost + extraCost;
 
 					//Check if the node is already in the closed/open list
 					//If it exists and the nodes already on them has a lower cost (g) then we can ignore this neighbour node
@@ -815,10 +780,6 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 		else if(dy == 1){
 			listDir.push_back(SOUTH);
 		}
-	}
-
-	if(autoClearCache){
-		clearPathCache();
 	}
 	
 	return !listDir.empty();
@@ -931,7 +892,7 @@ AStarNode* AStarNodes::getNodeInList(int32_t x, int32_t y)
 	return NULL;
 }
 
-int AStarNodes::getMapWalkCost(const Creature* creature, AStarNode* node,
+int32_t AStarNodes::getMapWalkCost(const Creature* creature, AStarNode* node,
 	const Tile* neighbourTile, const Position& neighbourPos)
 {
 	int cost = 0;
@@ -946,7 +907,7 @@ int AStarNodes::getMapWalkCost(const Creature* creature, AStarNode* node,
 	return cost;
 }
 
-int AStarNodes::getTileWalkCost(const Creature* creature, const Tile* tile)
+int32_t AStarNodes::getTileWalkCost(const Creature* creature, const Tile* tile)
 {
 	int cost = 0;
 	if(!tile->creatures.empty()){

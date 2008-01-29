@@ -1744,7 +1744,7 @@ void ProtocolGame::sendCreatureHealth(const Creature* creature)
 }
 
 //tile
-void ProtocolGame::sendAddTileItem(const Position& pos, const Item* item)
+void ProtocolGame::sendAddTileItem(const Tile* tile, const Position& pos, const Item* item)
 {
 	if(canSee(pos)){
 		NetworkMessage* msg = getOutputBuffer();
@@ -1754,7 +1754,7 @@ void ProtocolGame::sendAddTileItem(const Position& pos, const Item* item)
 	}
 }
 
-void ProtocolGame::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item)
+void ProtocolGame::sendUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item)
 {
 	if(canSee(pos)){
 		NetworkMessage* msg = getOutputBuffer();
@@ -1764,7 +1764,7 @@ void ProtocolGame::sendUpdateTileItem(const Position& pos, uint32_t stackpos, co
 	}
 }
 
-void ProtocolGame::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
+void ProtocolGame::sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos)
 {
 	if(canSee(pos)){
 		NetworkMessage* msg = getOutputBuffer();
@@ -1774,7 +1774,7 @@ void ProtocolGame::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 	}
 }
 
-void ProtocolGame::sendUpdateTile(const Position& pos)
+void ProtocolGame::sendUpdateTile(const Tile* tile, const Position& pos)
 {
 	if(canSee(pos)){
 		NetworkMessage* msg = getOutputBuffer();
@@ -1782,7 +1782,6 @@ void ProtocolGame::sendUpdateTile(const Position& pos)
 			msg->AddByte(0x69);
 			msg->AddPosition(pos);
 
-			Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 			if(tile){
 				GetTileDescription(tile, msg);
 				msg->AddByte(0);
@@ -1902,8 +1901,8 @@ void ProtocolGame::sendRemoveCreature(const Creature* creature, const Position& 
 	}
 }
 
-void ProtocolGame::sendMoveCreature(const Creature* creature, const Position& newPos, const Position& oldPos,
-	uint32_t oldStackPos, bool teleport)
+void ProtocolGame::sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos,
+		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	if(creature == player){
 		NetworkMessage* msg = getOutputBuffer();
@@ -1917,11 +1916,11 @@ void ProtocolGame::sendMoveCreature(const Creature* creature, const Position& ne
 					RemoveTileItem(msg, oldPos, oldStackPos);
 				}
 				else{
-						msg->AddByte(0x6D);
-						msg->AddPosition(oldPos);
-						msg->AddByte(oldStackPos);
-						msg->AddPosition(creature->getPosition());
-					}
+					msg->AddByte(0x6D);
+					msg->AddPosition(oldPos);
+					msg->AddByte(oldStackPos);
+					msg->AddPosition(creature->getPosition());
+				}
 
 				//floor change down
 				if(newPos.z > oldPos.z){

@@ -227,13 +227,13 @@ void Tile::onAddTileItem(Item* item)
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendAddTileItem(cylinderMapPos, item);
+			tmpPlayer->sendAddTileItem(this, cylinderMapPos, item);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onAddTileItem(cylinderMapPos, item);
+		(*it)->onAddTileItem(this, cylinderMapPos, item);
 	}
 }
 
@@ -250,19 +250,20 @@ void Tile::onUpdateTileItem(uint32_t index, Item* oldItem,
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
+			tmpPlayer->sendUpdateTileItem(this, cylinderMapPos, index, oldItem, newItem);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, oldType, newItem, newType);
+		(*it)->onUpdateTileItem(this, cylinderMapPos, index, oldItem, oldType, newItem, newType);
 	}
 }
 
 void Tile::onRemoveTileItem(uint32_t index, Item* item)
 {
 	const Position& cylinderMapPos = getPosition();
+	const ItemType& iType = Item::items[item->getID()];
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -272,13 +273,13 @@ void Tile::onRemoveTileItem(uint32_t index, Item* item)
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendRemoveTileItem(cylinderMapPos, index, item);
+			tmpPlayer->sendRemoveTileItem(this, cylinderMapPos, index, item);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onRemoveTileItem(cylinderMapPos, index, item);
+		(*it)->onRemoveTileItem(this, cylinderMapPos, index, iType, item);
 	}
 }
 
@@ -294,13 +295,13 @@ void Tile::onUpdateTile()
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendUpdateTile(cylinderMapPos);
+			tmpPlayer->sendUpdateTile(this, cylinderMapPos);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onUpdateTile(cylinderMapPos);
+		(*it)->onUpdateTile(this, cylinderMapPos);
 	}
 }
 
@@ -312,11 +313,12 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 	__removeThing(creature, 0);
 
 	//add the creature
-	toCylinder->__addThing(creature);
-	int32_t newStackPos = toCylinder->__getIndexOfThing(creature);
+	Tile* toTile = dynamic_cast<Tile*>(toCylinder);
+	toTile->__addThing(creature);
+	int32_t newStackPos = toTile->__getIndexOfThing(creature);
 
 	Position fromPos = getPosition();
-	Position toPos = toCylinder->getPosition();
+	Position toPos = toTile->getPosition();
 
 	if(!teleport){
 		if(fromPos.y > toPos.y)
@@ -338,16 +340,16 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
+			tmpPlayer->sendCreatureMove(creature, toTile, toPos, this, fromPos, oldStackPos, teleport);
 		}
 	}
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
-		(*it)->onCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
+		(*it)->onCreatureMove(creature, toTile, toPos, this, fromPos, oldStackPos, teleport);
 	}
 
-	toCylinder->postAddNotification(creature, newStackPos);
+	toTile->postAddNotification(creature, newStackPos);
 	postRemoveNotification(creature, oldStackPos, true);
 }
 
