@@ -201,9 +201,9 @@ void Creature::onThink(uint32_t interval)
 	if(followCreature){
 		walkUpdateTicks += interval;
 
-		if(walkUpdateTicks >= 1000){
+		if(walkUpdateTicks >= 2000){
 			walkUpdateTicks = 0;
-			if(forceUpdateFollowPath || (internalMapChange && !hasFollowPath)){
+			if(forceUpdateFollowPath || internalMapChange){
 				forceUpdateFollowPath = false;
 				internalMapChange = false;
 				Creature::addPathSearch(this);
@@ -344,12 +344,9 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 		if(creatureId != 0){
 			Dispatcher::getDispatcher().addTask(createTask(
 				boost::bind(&Game::updateCreatureWalk, &g_game, creatureId)));
-
-			//Scheduler::getScheduler().addEvent(createSchedulerTask(
-			//	100, boost::bind(&Game::updateCreatureWalk, &g_game, creatureId)));
 		}
 
-		OTSYS_SLEEP(5);
+		OTSYS_SLEEP(10);
 	}
 
 #if defined __EXCEPTION_TRACER__
@@ -719,7 +716,6 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 		if(followCreature == creature){
 			internalMapChange = true;
 			if(hasFollowPath){
-				walkUpdateTicks = 1000;
 				forceUpdateFollowPath = true;
 			}
 		}

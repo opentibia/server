@@ -49,18 +49,25 @@ void Party::disband()
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, "Your party has been disbanded.");
 	getLeader()->setParty(NULL);
 	getLeader()->sendPlayerPartyIcons(getLeader());
-	setLeader(NULL);
 
 	for(uint32_t i = 0; i < inviteList.size(); ++i){
 		inviteList[i]->removePartyInvitation(this);
+		inviteList[i]->sendPlayerPartyIcons(getLeader());
+		inviteList[i]->sendPlayerPartyIcons(inviteList[i]);
+		getLeader()->sendPlayerPartyIcons(inviteList[i]);
 	}
 	inviteList.clear();
 	
 	for(uint32_t i = 0; i < memberList.size(); ++i){
 		memberList[i]->setParty(NULL);
+		memberList[i]->sendPlayerPartyIcons(getLeader());
+		memberList[i]->sendPlayerPartyIcons(memberList[i]);
+		memberList[i]->sendTextMessage(MSG_INFO_DESCR, "Your party has been disbanded.");
+		getLeader()->sendPlayerPartyIcons(memberList[i]);
 	}
 	memberList.clear();
 
+	setLeader(NULL);
 	delete this;
 }
 
@@ -76,8 +83,8 @@ bool Party::invitePlayer(Player* player)
 	}
 
 	inviteList.push_back(player);
-	getLeader()->sendCreatureShield(player);
-	player->sendCreatureShield(getLeader());
+	getLeader()->sendPlayerPartyIcons(player);
+	player->sendPlayerPartyIcons(getLeader());
 	player->addPartyInvitation(this);
 
 	std::stringstream ss;
@@ -131,8 +138,8 @@ bool Party::removeInvite(Player* player)
 	}
 	player->removePartyInvitation(this);
 
-	getLeader()->sendCreatureShield(player);
-	player->sendCreatureShield(getLeader());
+	getLeader()->sendPlayerPartyIcons(player);
+	player->sendPlayerPartyIcons(getLeader());
 
 	if(disbandParty()){
 		disband();
@@ -199,14 +206,20 @@ bool Party::leaveParty(Player* player)
 	bool hasNoLeader = false;
 	if(getLeader() == player){
 		if(!memberList.empty()){
-			passPartyLeadership(memberList.front());
+			if(memberList.size() == 1 && inviteList.empty()){
+				//just one member left, disband instead of passing leadership
+				hasNoLeader = true;
+			}
+			else{
+				passPartyLeadership(memberList.front());
+			}
 		}
 		else{
 			hasNoLeader = true;
 		}
 	}
 
-	//Since we already passed the leadership, we remove the player from the list
+	//since we already passed the leadership, we remove the player from the list
 	PlayerVector::iterator it = std::find(memberList.begin(), memberList.end(), player);
 	if(it != memberList.end()){
 		memberList.erase(it);
@@ -263,6 +276,11 @@ void Party::updatePartyIcons(Player* player)
 		player->sendPlayerPartyIcons((*it));
 	}
 
+	for(PlayerVector::iterator it = inviteList.begin(); it != inviteList.end(); ++it){
+		(*it)->sendPlayerPartyIcons(player);
+		player->sendPlayerPartyIcons((*it));
+	}
+
 	getLeader()->sendPlayerPartyIcons(player);
 	player->sendPlayerPartyIcons(getLeader());
 }
@@ -273,9 +291,13 @@ void Party::updateAllPartyIcons()
 		for(PlayerVector::iterator it2 = memberList.begin(); it2 != memberList.end(); ++it2){
 			(*it)->sendPlayerPartyIcons((*it2));
 		}
-		
+
 		(*it)->sendPlayerPartyIcons(getLeader());
 		getLeader()->sendPlayerPartyIcons((*it));
+	}
+
+	for(PlayerVector::iterator it = inviteList.begin(); it != inviteList.end(); ++it){
+		(*it)->sendPlayerPartyIcons(getLeader());
 	}
 
 	getLeader()->sendPlayerPartyIcons(getLeader());
@@ -359,7 +381,8 @@ bool Party::canUseSharedExperience(const Player* player) const
 		}
 	}
 
-	if(player->getLevel() < (highestLevel * 2) / 3){
+	int32_t minLevel = std::ceil(((float)(highestLevel) * 2) / 3);
+	if(player->getLevel() < minLevel){
 		return false;
 	}
 
@@ -390,6 +413,10 @@ bool Party::canUseSharedExperience(const Player* player) const
 
 bool Party::canEnableSharedExperience()
 {
+	if(!canUseSharedExperience(getLeader())){
+		return false;
+	}
+
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
 		if(!canUseSharedExperience(*it)){
 			return false;

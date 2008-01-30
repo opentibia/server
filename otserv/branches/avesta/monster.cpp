@@ -370,25 +370,33 @@ bool Monster::searchTarget(bool randomize /*= false*/)
 	std::cout << "Searching target... " << std::endl;
 #endif
 
-	if(randomize){
-		if(!targetList.empty()){
-			uint32_t index = random_range(0, targetList.size() - 1);
-			CreatureList::iterator it = targetList.begin();
-			std::advance(it, index);
-			if(followCreature != (*it) && selectTarget(*it)){
-				return true;
+	std::list<Creature*> resultList;
+	const Position& myPos = getPosition();
+	for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
+		if(followCreature != (*it) && isTarget(*it)){
+			if(randomize || canUseAttack(myPos, *it)){
+				resultList.push_back(*it);
 			}
 		}
 	}
-	else{
-		for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
-			if(followCreature != (*it) && selectTarget(*it)){
-	#ifdef __DEBUG__
-				std::cout << "Selecting target " << (*it)->getName() << std::endl;
-	#endif
 
-				return true;
-			}
+	if(!resultList.empty()){
+		uint32_t index = random_range(0, resultList.size() - 1);
+		CreatureList::iterator it = resultList.begin();
+		std::advance(it, index);
+#ifdef __DEBUG__
+		std::cout << "Selecting target " << (*it)->getName() << std::endl;
+#endif
+		return selectTarget(*it);
+	}
+
+	//lets just pick the first target in the list
+	for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
+		if(followCreature != (*it) && selectTarget(*it)){
+#ifdef __DEBUG__
+			std::cout << "Selecting target " << (*it)->getName() << std::endl;
+#endif
+			return true;
 		}
 	}
 
@@ -419,12 +427,8 @@ void Monster::onFollowCreatureComplete(const Creature* creature)
 	}
 }
 
-bool Monster::selectTarget(Creature* creature)
+bool Monster::isTarget(Creature* creature)
 {
-#ifdef __DEBUG__
-	std::cout << "Selecting target... " << std::endl;
-#endif
-
 	if( creature->isRemoved() ||
 		!creature->isAttackable() ||
 		creature->getZone() == ZONE_PROTECTION ||
@@ -433,6 +437,19 @@ bool Monster::selectTarget(Creature* creature)
 	}
 
 	if(creature->getPosition().z != getPosition().z){
+		return false;
+	}
+
+	return true;
+}
+
+bool Monster::selectTarget(Creature* creature)
+{
+#ifdef __DEBUG__
+	std::cout << "Selecting target... " << std::endl;
+#endif
+
+	if(!isTarget(creature)){
 		return false;
 	}
 
@@ -568,7 +585,7 @@ void Monster::doAttacking(uint32_t interval)
 	const Position& targetPos = attackedCreature->getPosition();
 
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
-		if(canDoSpell(myPos, targetPos, *it, interval)){
+		if(canUseSpell(myPos, targetPos, *it, interval)){
 			if(it->chance >= (uint32_t)random_range(1, 100)){
 				if(updateLook){
 					updateLookDirection();
@@ -598,7 +615,19 @@ void Monster::doAttacking(uint32_t interval)
 	}
 }
 
-bool Monster::canDoSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval)
+bool Monster::canUseAttack(const Position& pos, const Creature* target)
+{
+	const Position& targetPos = target->getPosition();
+	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
+		if((*it).range != 0 && std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y)) <= (int32_t)(*it).range){
+			return g_game.isViewClear(pos, targetPos, true);
+		}
+	}
+
+	return false;
+}
+
+bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval)
 {
 	if(!extraAttack){
 		if(sb.speed > attackTicks){

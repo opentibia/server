@@ -141,7 +141,8 @@ private:
 	virtual void onEndCondition(ConditionType_t type);
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature);
 
-	bool canDoSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval);
+	bool canUseAttack(const Position& pos, const Creature* target);
+	bool canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval);
 	bool getRandomStep(const Position& creaturePos, Direction& dir);
 	bool getDanceStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 	bool isInSpawnRange(const Position& toPos);
@@ -158,6 +159,7 @@ private:
 
 	bool isFriend(const Creature* creature);
 	bool isOpponent(const Creature* creature);
+	bool isTarget(Creature* creature);
 
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }
