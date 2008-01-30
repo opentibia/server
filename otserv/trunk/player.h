@@ -556,7 +556,7 @@ protected:
 	uint32_t conditionImmunities;
 	uint32_t conditionSuppressions;
 	uint32_t condition;
-	int32_t manaSpent;
+	uint32_t manaSpent;
 	Vocation_t vocation_id;
 	Vocation* vocation;
 	playersex_t sex;

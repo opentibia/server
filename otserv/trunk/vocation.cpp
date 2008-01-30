@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -49,14 +49,14 @@ bool Vocations::loadFromXml(const std::string& datadir)
 	if(doc){
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
-		
+
 		if(xmlStrcmp(root->name,(const xmlChar*)"vocations") != 0){
 			xmlFreeDoc(doc);
 			return false;
 		}
-		
+
 		p = root->children;
-		
+
 		while(p){
 			std::string str;
 			int intVal;
@@ -111,7 +111,7 @@ bool Vocations::loadFromXml(const std::string& datadir)
 								skill_id = intVal;
 								if(skill_id < SKILL_FIRST || skill_id > SKILL_LAST){
 									std::cout << "No valid skill id. " << skill_id << std::endl;
-									
+
 								}
 								else{
 									if(readXMLFloat(skillNode, "multiplier", floatVal)){
@@ -125,11 +125,11 @@ bool Vocations::loadFromXml(const std::string& datadir)
 						}
 						skillNode = skillNode->next;
 					}
-					
+
 					//std::cout << "Voc id: " << voc_id << std::endl;
 					//voc->debugVocation();
 					vocationsMap[voc_id] = voc;
-					
+
 				}
 				else{
 					std::cout << "Missing vocation id." << std::endl;
@@ -218,11 +218,13 @@ uint32_t Vocation::getReqMana(int magLevel)
 	if(it != cacheMana.end()){
 		return it->second;
 	}
-	uint32_t reqMana = (unsigned int)(400*pow(manaMultiplier, magLevel-1));
-	if (reqMana % 20 < 10)
+	uint32_t reqMana = (uint32_t)(1600*pow(manaMultiplier, magLevel-1));
+	/*if(reqMana % 20 < 10){
 		reqMana = reqMana - (reqMana % 20);
-	else
+	}
+	else{
 		reqMana = reqMana - (reqMana % 20) + 20;
+	}*/
 
 	cacheMana[magLevel] = reqMana;
 
@@ -233,7 +235,7 @@ void Vocation::debugVocation()
 {
 	std::cout << "name: " << name << std::endl;
 	std::cout << "gain cap: " << gainCap << " hp: " << gainHP << " mana: " << gainMana << std::endl;
-	std::cout << "gain time: Health(" << gainHealthTicks << " ticks, +" << gainHealthAmount << "). Mana(" << 
+	std::cout << "gain time: Health(" << gainHealthTicks << " ticks, +" << gainHealthAmount << "). Mana(" <<
 		gainManaTicks << " ticks, +" << gainManaAmount << ")" << std::endl;
 	std::cout << "mana multiplier: " << manaMultiplier << std::endl;
 	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){

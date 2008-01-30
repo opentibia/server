@@ -842,9 +842,10 @@ void Spell::postCastSpell(Player* player) const
 
 void Spell::postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const
 {
-	if(!player->hasFlag(PlayerFlag_HasInfiniteMana)){
-		if(manaCost > 0){
-			player->addManaSpent(manaCost);
+
+	if(manaCost > 0){
+		player->addManaSpent(manaCost);
+		if(!player->hasFlag(PlayerFlag_HasInfiniteMana)){
 			player->changeMana(-(int32_t)manaCost);
 		}
 	}

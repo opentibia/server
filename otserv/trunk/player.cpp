@@ -583,11 +583,11 @@ void Player::setVarStats(stats_t stat, int32_t modifier)
 		case STAT_MAXHITPOINTS:
 		{
 			if(getHealth() > getMaxHealth()){
-			   //Creature::changeHealth is called  to avoid sendStats()
+				//Creature::changeHealth is called  to avoid sendStats()
 				Creature::changeHealth(getMaxHealth() - getHealth());
 			}
 			else{
-            g_game.addCreatureHealth(this);
+				g_game.addCreatureHealth(this);
 			}
 			break;
 		}
@@ -595,7 +595,7 @@ void Player::setVarStats(stats_t stat, int32_t modifier)
 		case STAT_MAXMANAPOINTS:
 		{
 			if(getMana() > getMaxMana()){
-			   //Creature::changeMana is called  to avoid sendStats()
+				//Creature::changeMana is called  to avoid sendStats()
 				Creature::changeMana(getMaxMana() - getMana());
 			}
 			break;
@@ -1584,6 +1584,7 @@ void Player::addExperience(uint32_t exp)
 		capacity += vocation->getCapGain();
 	}
 
+	bool needSendStats = false;
 	if(prevLevel != newLevel){
 		level = newLevel;
 		updateBaseSpeed();
@@ -1597,12 +1598,19 @@ void Player::addExperience(uint32_t exp)
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
+		needSendStats = true;
 	}
 
 	uint64_t currLevelExp = Player::getExpForLevel(level);
-	levelPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
+	uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
+	if(newPercent != levelPercent){
+		levelPercent = newPercent;
+		needSendStats = true;
+	}
 
-	sendStats();
+	if(needSendStats){
+		sendStats();
+	}
 }
 
 uint32_t Player::getPercentLevel(uint32_t count, uint32_t nextLevelCount)
@@ -1891,7 +1899,7 @@ void Player::die()
 
 		lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
 
-		while(lostMana > manaSpent && magLevel > 0){
+		while((uint32_t)lostMana > manaSpent && magLevel > 0){
 			lostMana -= manaSpent;
 			manaSpent = vocation->getReqMana(magLevel);
 			magLevel--;
