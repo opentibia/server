@@ -64,6 +64,7 @@ bool OutfitList::remOutfit(const Outfit& outfit)
 	for(it = m_list.begin(); it != m_list.end(); ++it){
 		if((*it)->looktype == outfit.looktype){
 			if(outfit.addons == 0xFF){//remove looktype
+				delete *it;
 				m_list.erase(it);
 			}
 			else{ //remove addons

@@ -116,7 +116,7 @@ public:
 	virtual Tile* getTile();
 	virtual const Tile* getTile() const;
 
-	const Position& getPosition() const;
+	virtual const Position& getPosition() const;
 	virtual int getThrowRange() const = 0;
 	virtual bool isPushable() const = 0;
 

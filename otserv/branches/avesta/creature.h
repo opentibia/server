@@ -323,19 +323,20 @@ public:
 		Thing::setParent(cylinder);
 	}
 
+	virtual const Position& getPosition() const {return _tile->getTilePosition();}
 	virtual Tile* getTile(){return _tile;}
 	virtual const Tile* getTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;
 
 protected:
-	static const int32_t mapWalkWidth = /*maxViewportX*/ 9 * 2;
-	static const int32_t mapWalkHeight = /*maxViewportY*/ 9 * 2;
+	static const int32_t mapWalkWidth = /*maxViewportX*/ 9 * 2 + 1;
+	static const int32_t mapWalkHeight = /*maxViewportY*/ 9 * 2 + 1;
 	bool localMapCache[mapWalkHeight][mapWalkWidth];
 
 	Tile* _tile;
 	uint32_t id;
 	bool isInternalRemoved;
-	bool isInitiated;
+	bool isMapLoaded;
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
 	int32_t attackStrength;
@@ -396,7 +397,11 @@ protected:
 	CreatureEvent* getCreatureEvent(CreatureEventType_t type);
 
 	void updateMapCache();
-	void updateTileCache(const Tile* tile);
+#ifdef __DEBUG__
+	void validateMapCache();
+#endif
+	void updateTileCache(const Tile* tile, int32_t dx, int32_t dy);
+	void updateTileCache(const Tile* tile, const Position& pos);
 	void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void doAttacking(uint32_t interval) {};
 	virtual bool hasExtraSwing() {return false;}

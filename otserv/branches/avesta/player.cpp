@@ -1172,6 +1172,8 @@ void Player::onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t st
 void Player::onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
 	const ItemType& iType, const Item* item)
 {
+	Creature::onRemoveTileItem(tile, pos, stackpos, iType, item);
+
 	if(tradeState != TRADE_TRANSFER){
 		checkTradeState(item);
 
@@ -1186,11 +1188,13 @@ void Player::onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t st
 
 void Player::onUpdateTile(const Tile* tile, const Position& pos)
 {
-	//
+	Creature::onUpdateTile(tile, pos);
 }
 
 void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 {
+	Creature::onCreatureAppear(creature, isLogin);
+
 	if(isLogin && creature == this){
 		Item* item;
 		for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
