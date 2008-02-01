@@ -86,93 +86,118 @@ function getPlayerLookPos(cid)
 	return playerPos
 end
 
-function doPlayerGiveItem(cid, itemid, count --[[optional]], subtype --[[optional]], placeonfloor --[[optional]])
-	local count = count or 1
-	local subtype = subtype or 0
-	local placeonfloor = placeonfloor or 1
-
-	local hasSubType = (isItemFluidContainer(itemid) == TRUE or isItemRune(itemid) == TRUE)
-
-	local i, newItem
-	local uids = {}
-	if (hasSubType) then
-		for i = 1, count do
-			newItem = doCreateItemEx(itemid, subtype)
-			if(newItem == LUA_ERROR) then
-				return LUA_ERROR
-			end
-
-			table.insert(uids, newItem)
-		end
-	elseif (isItemStackable(item.itemid) == TRUE) then
-		while(count > 100) do
-			newItem = doCreateItemEx(itemid, 100)
-			if(newItem == LUA_ERROR) then
-				return LUA_ERROR
-			end
-
-			count = count - 100
-			table.insert(uids, newItem)
-		end
-		if(count > 0) then
-			newItem = doCreateItemEx(itemid, count)
-			if(newItem == LUA_ERROR) then
-				return LUA_ERROR
-			end
-
-			table.insert(uids, newItem)
-		end
-	else
-		for i = 1, count do
-			newItem = doCreateItemEx(itemid)
-			if(newItem == LUA_ERROR) then
-				return LUA_ERROR
-			end
-
-			table.insert(uids, newItem)
-		end
+-- Functions made by Jiddo
+function doPlayerGiveItem(cid, itemid, count, charges)
+	local hasCharges = (isItemRune(itemid) == TRUE or isItemFluidContainer(itemid) == TRUE)
+	if(hasCharges and charges == nil) then
+		charges = 1
 	end
 	
-	local ret = RETURNVALUE_NOERROR
-	local rets = {}
-	for i, item in pairs(uids) do
-		ret = doPlayerAddItemEx(cid, item, placeonfloor)
-		if(ret ~= RETURNVALUE_NOERROR) then
-			table.insert(rets, ret)
-		end
+	while count > 0 do
+    	local tempcount = 1
+    	
+    	if(hasCharges) then
+    		tempcount = charges
+    	end
+    	if(isItemStackable(itemid) == TRUE) then
+    		tempcount = math.min (100, count)
+   		end
+    	
+       	local ret = doPlayerAddItem(cid, itemid, tempcount)
+       	if(ret == LUA_ERROR) then
+        	ret = doCreateItem(itemid, tempcount, getPlayerPosition(cid))
+        end
+        
+        if(ret ~= LUA_ERROR) then
+        	if(hasCharges) then
+        		count = count-1
+        	else
+        		count = count-tempcount
+        	end
+        else
+        	return LUA_ERROR
+        end
 	end
-	return rets
+    return LUA_NO_ERROR
 end
 
-function doPlayerAddMoney(cid, amount, placeonfloor --[[optional]])
-	local placeonfloor = placeonfloor or 1
+function doPlayerTakeItem(cid, itemid, count)
+	if(getPlayerItemCount(cid,itemid) >= count) then
+		
+		while count > 0 do
+			local tempcount = 0
+    		if(isItemStackable(itemid) == TRUE) then
+    			tempcount = math.min (100, count)
+    		else
+    			tempcount = 1
+    		end
+        	local ret = doPlayerRemoveItem(cid, itemid, tempcount)
+        	
+            if(ret ~= LUA_ERROR) then
+            	count = count-tempcount
+            else
+            	return LUA_ERROR
+            end
+		end
+		
+		if(count == 0) then
+			return LUA_NO_ERROR
+		end
+		
+	else
+		return LUA_ERROR
+	end
+end
 
-	local crystals = math.floor(amount / 10000)
-	amount = amount - crystals * 10000
-	local platinum = math.floor(amount / 100)
-	amount = amount - platinum * 100
+function doPlayerAddMoney(cid, amount)
+	local crystals = math.floor(amount/10000)
+	amount = amount - crystals*10000
+	local platinum = math.floor(amount/100)
+	amount = amount - platinum*100
 	local gold = amount
 	local ret = 0
-	if (crystals > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_CRYSTAL_COIN, crystals, 0, placeonfloor)
-		if(ret == LUA_ERROR) then
+	if(crystals > 0) then
+		ret = doPlayerGiveItem(cid, ITEM_CRYSTAL_COIN, crystals)
+		if(ret ~= LUA_NO_ERROR) then
 			return LUA_ERROR
 		end
 	end
-	if (platinum > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_PLATINUM_COIN, platinum, 0, placeonfloor)
-		if (ret ~= LUA_NO_ERROR) then
+	if(platinum > 0) then
+		ret = doPlayerGiveItem(cid, ITEM_PLATINUM_COIN, platinum)
+		if(ret ~= LUA_NO_ERROR) then
 			return LUA_ERROR
 		end
 	end
-	if (gold > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_GOLD_COIN, gold, 0, placeonfloor)
-		if (ret ~= LUA_NO_ERROR) then
+	if(gold > 0) then
+		ret = doPlayerGiveItem(cid, ITEM_GOLD_COIN, gold)
+		if(ret ~= LUA_NO_ERROR) then
 			return LUA_ERROR
 		end
 	end
 	return LUA_NO_ERROR
 end
+
+function doPlayerBuyItem(cid, itemid, count, cost, charges)
+    if(doPlayerRemoveMoney(cid, cost) == TRUE) then
+    	return doPlayerGiveItem(cid, itemid, count, charges)
+    else
+        return LUA_ERROR
+    end
+end
+
+function doPlayerSellItem(cid, itemid, count, cost)
+	
+	if(doPlayerTakeItem(cid, itemid, count) == LUA_NO_ERROR) then
+		if(doPlayerAddMoney(cid, cost) ~= LUA_NO_ERROR) then
+			error('Could not add money to ' .. getPlayerName(cid) .. '(' .. cost .. 'gp)')
+		end
+		return LUA_NO_ERROR
+	else
+		return LUA_ERROR
+	end
+	
+end
+-- End of functions made by Jiddo
 
 function getConfigInfo(info)
 	if (type(info) ~= 'string') then return nil end
@@ -229,18 +254,17 @@ exhaustion =
 	end
 }
 
-table =
-{
-	getPos = function (array, value)
+
+	table.getPos = function (array, value)
 		for i,v in pairs(array) do
 			if (v == value) then
 				return i
 			end
 		end
 	  return FALSE
-	end,
+	end
 
-	isStrIn = function (txt, str)
+	table.isStrIn = function (txt, str)
 		local result = false
 		for i, v in pairs(str) do          
 			result = (string.find(txt, v) and not string.find(txt, '(%w+)' .. v) and not string.find(txt, v .. '(%w+)'))
@@ -249,17 +273,17 @@ table =
 			end
 		end
 		return result
-	end,
+	end
 
-	countElements = function (table, item)
+	table.countElements = function (table, item)
 		local count = 0
 		for i, n in pairs(table) do
 			if (item == n) then count = count + 1 end
 		end
 		return count
-	end,
+	end
 	
-	getCombinations = function (table, num)
+	table.getCombinations = function (table, num)
 		local a, number, select, newlist = {}, #table, num, {}
 		for i = 1, select do
 			a[#a + 1] = i
@@ -283,17 +307,15 @@ table =
 			end
 		return newlist
 	end
-}
 
-string = 
-{
-	split = function (str)
+
+	string.split = function (str)
 		local t = {}
 		local function helper(word) table.insert(t, word) return "" end
 		if (not str:gsub("%w+", helper):find"%S") then return t end
-	end,
+	end
 	
-	separate = function(separator, string)
+	string.separate = function(separator, string)
 		local a, b = {}, 0
 		if (#string == 1) then return string end
 	    while (true) do
@@ -308,5 +330,4 @@ string =
 	    end
 		return a
 	end
-}
 

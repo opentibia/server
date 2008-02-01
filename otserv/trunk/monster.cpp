@@ -649,11 +649,6 @@ bool Monster::despawn()
 
 bool Monster::canWalkTo(const Position& toPos)
 {
-	if(masterRadius == -1){
-		//no restrictions
-		return true;
-	}
-
 	if(spawn && spawn->isInSpawnZone(getPosition())){
 		return Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos);
 	}

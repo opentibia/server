@@ -1,3 +1,8 @@
+-- Include external classes.
+dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/npcsystem.lua')
+
+-- Callback for isPremium(cid) so Jiddo's npcsystem works
+isPlayerPremiumCallback = isPremium
 
 -- get the distance to a creature
 -- deprecated function
@@ -19,9 +24,6 @@ function moveToCreature(id)
 end
 
 function selfGotoIdle()
-	following = false
-	attacking = false
-	selfAttackCreature(0)
-	target = 0
+	debugPrint('selfGotoIdle(): deprecated function. Do not use it anymore!')
+	return nil
 end
-

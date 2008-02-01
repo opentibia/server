@@ -57,7 +57,7 @@ void Party::disband()
 		getLeader()->sendPlayerPartyIcons(inviteList[i]);
 	}
 	inviteList.clear();
-	
+
 	for(uint32_t i = 0; i < memberList.size(); ++i){
 		memberList[i]->setParty(NULL);
 		memberList[i]->sendPlayerPartyIcons(getLeader());
@@ -181,7 +181,7 @@ bool Party::passPartyLeadership(Player* player)
 
 	Player* oldLeader = getLeader();
 	setLeader(player);
-	
+
 	memberList.insert(memberList.begin(), oldLeader);
 
 	updateSharedExperience();
@@ -337,7 +337,7 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 	if(!player || getLeader() != player){
 		return false;
 	}
-	
+
 	if(sharedExpActive == _sharedExpActive){
 		return true;
 	}
@@ -381,16 +381,15 @@ bool Party::canUseSharedExperience(const Player* player) const
 		}
 	}
 
-	int32_t minLevel = std::ceil(((float)(highestLevel) * 2) / 3);
+	int32_t minLevel = (int32_t)std::ceil(((float)(highestLevel) * 2) / 3);
 	if(player->getLevel() < minLevel){
 		return false;
 	}
 
 	const Position& leaderPos = getLeader()->getPosition();
 	const Position& memberPos = player->getPosition();
-	uint32_t distance = std::max(std::abs(leaderPos.x - memberPos.x), std::abs(leaderPos.y - memberPos.y));
 
-	if(distance > 30 || std::abs(leaderPos.z - memberPos.z) > 1){
+	if(!Position::areInRange<30,30,1>(leaderPos, memberPos)){
 		return false;
 	}
 

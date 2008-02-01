@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,7 +52,7 @@ Creature()
 		m_scriptInterface = new NpcScriptInterface();
 		m_scriptInterface->loadNpcLib(std::string(datadir + "npc/scripts/lib/npc.lua"));
 	}
-	
+
 	m_npcEventHandler = NULL;
 	loaded = true;
 	name = _name;
@@ -62,7 +62,7 @@ Creature()
 	focusCreature = 0;
 
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
-	std::string scriptname;
+	std::string scriptname = datadir + "npc/scripts/";
 
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
@@ -79,13 +79,13 @@ Creature()
 		std::string strValue;
 
 		p = root->children;
-		
+
 		if(readXMLString(root, "script", strValue)){
-			scriptname = strValue;
+			scriptname += strValue;
 		}
 		else
 			scriptname = "";
-		
+
 		if(readXMLString(root, "name", strValue)){
 			name = strValue;
 		}
@@ -115,8 +115,8 @@ Creature()
 		}
 
 		if(readXMLInteger(root, "floorchange", intValue)){
-			floorChange = intValue != 0;
-		}		
+			floorChange = (intValue != 0);
+		}
 
 		while(p){
 			if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
@@ -153,10 +153,10 @@ Creature()
 					if(readXMLInteger(p, "feet", intValue)){
 						defaultOutfit.lookFeet = intValue;
 					}
-					
+
 					if(readXMLInteger(p, "addons", intValue)){
 						defaultOutfit.lookAddons = intValue;
-					}					
+					}
 				}
 				else if(readXMLInteger(p, "typeex", intValue)){
 					defaultOutfit.lookTypeEx = intValue;
@@ -165,7 +165,7 @@ Creature()
 				currentOutfit = defaultOutfit;
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"parameters") == 0){
-					
+
 				for(q = p->children; q != NULL; q = q->next){
 					if(xmlStrcmp(q->name, (const xmlChar*)"parameter") == 0){
 						std::string paramKey;
@@ -179,14 +179,14 @@ Creature()
 						m_parameters[paramKey] = paramValue;
 					}
 				}
-				
+
 			}
-			
+
 			p = p->next;
 		}
 
 		xmlFreeDoc(doc);
-		
+
 		//now try to load the script
 		if(scriptname != ""){
 			m_npcEventHandler = new NpcScript(scriptname, this);
@@ -197,7 +197,7 @@ Creature()
 		else{ //default npcs
 			//TODO
 			loaded = false;
-		}	
+		}
 	}
 	else{
 		loaded = false;
@@ -250,7 +250,7 @@ void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 	if(creature == this && autoWalkChance > 0){
 		addEventWalk();
 	}
-	
+
 	//only players for script events
 	if(creature->getPlayer()){
 		m_npcEventHandler->onCreatureAppear(creature);
@@ -260,7 +260,7 @@ void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
-	
+
 	//only players for script events
 	if(creature->getPlayer()){
 		m_npcEventHandler->onCreatureDisappear(creature);
@@ -286,7 +286,7 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 {
 	if(creature->getID() == this->getID())
 		return;
-	
+
 	//only players for script events
 	if(creature->getPlayer()){
 		m_npcEventHandler->onCreatureSay(creature, type, text);
@@ -337,11 +337,6 @@ bool Npc::getNextStep(Direction& dir)
 
 bool Npc::canWalkTo(const Position& fromPos, Direction dir)
 {
-	if(masterRadius == -1){
-		//no restrictions
-		return true;
-	}
-
 	Position toPos = fromPos;
 
 	switch(dir){
@@ -468,7 +463,7 @@ void Npc::setCreatureFocus(Creature* creature)
 
 NpcScriptInterface* Npc::getScriptInterface()
 {
-	return m_scriptInterface;	
+	return m_scriptInterface;
 }
 
 NpcScriptInterface::NpcScriptInterface() :
@@ -499,12 +494,12 @@ bool NpcScriptInterface::loadNpcLib(std::string file)
 {
 	if(m_libLoaded)
 		return true;
-		
+
 	if(loadFile(file) == -1){
 		std::cout << "Warning: [NpcScriptInterface::loadNpcLib] Can not load " << file  << std::endl;
 		return false;
 	}
-		
+
 	m_libLoaded = true;
 	return true;
 }
@@ -512,7 +507,7 @@ bool NpcScriptInterface::loadNpcLib(std::string file)
 void NpcScriptInterface::registerFunctions()
 {
 	LuaScriptInterface::registerFunctions();
-	
+
 	//npc exclusive functions
 	lua_register(m_luaState, "selfSay", NpcScriptInterface::luaActionSay);
 	lua_register(m_luaState, "selfMove", NpcScriptInterface::luaActionMove);
@@ -576,7 +571,7 @@ int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 		lua_pushnil(L);
 		lua_pushnil(L);
 	}
-	
+
 	return 3;
 }
 
@@ -590,7 +585,7 @@ int NpcScriptInterface::luaActionSay(lua_State* L)
 	if(npc){
 		npc->doSay(msg);
 	}
-		
+
 	return 0;
 }
 
@@ -615,13 +610,13 @@ int NpcScriptInterface::luaActionMoveTo(lua_State* L)
 	target.z = (int)popNumber(L);
 	target.y = (int)popNumber(L);
 	target.x = (int)popNumber(L);
-	
+
 	ScriptEnviroment* env = getScriptEnv();
 	Npc* npc = env->getNpc();
 	if(npc){
 		npc->doMoveTo(target);
 	}
-	
+
 	return 0;
 }
 
@@ -629,7 +624,7 @@ int NpcScriptInterface::luaActionTurn(lua_State* L)
 {
 	//selfTurn(direction)
 	Direction dir = (Direction)popNumber(L);
-	
+
 	ScriptEnviroment* env = getScriptEnv();
 
 	Npc* npc = env->getNpc();
@@ -644,9 +639,9 @@ int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 {
 	//getDistanceTo(uid)
 	uint32_t uid = popNumber(L);
-	
+
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	Npc* npc = env->getNpc();
 	Thing* thing = env->getThingByUID(uid);
 	if(thing && npc){
@@ -658,13 +653,13 @@ int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 		else{
 			int32_t dist = std::max(std::abs(npc_pos.x - thing_pos.x), std::abs(npc_pos.y - thing_pos.y));
 			lua_pushnumber(L, dist);
-		}	
+		}
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
 		lua_pushnil(L);
 	}
-	
+
 	return 1;
 }
 
@@ -674,7 +669,7 @@ int NpcScriptInterface::luaSetNpcFocus(lua_State *L)
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	Npc* npc = env->getNpc();
 	if(npc){
 		Creature* creature = env->getCreatureByUID(cid);
@@ -696,7 +691,7 @@ int NpcScriptInterface::luaGetNpcPos(lua_State* L)
 		pos = npc->getPosition();
 		stackpos = npc->getParent()->__getIndexOfThing(npc);
 	}
-	
+
 	pushPosition(L, pos, stackpos);
 	return 1;
 }
@@ -705,7 +700,7 @@ int NpcScriptInterface::luaGetNpcCid(lua_State* L)
 {
 	//getNpcCid()
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	Npc* npc = env->getNpc();
 	if(npc){
 		uint32_t cid = env->addThing(npc);
@@ -714,7 +709,7 @@ int NpcScriptInterface::luaGetNpcCid(lua_State* L)
 	else{
 		lua_pushnil(L);
 	}
-	
+
 	return 1;
 }
 
@@ -722,7 +717,7 @@ int NpcScriptInterface::luaGetNpcName(lua_State* L)
 {
 	//getNpcName()
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	Npc* npc = env->getNpc();
 	if(npc){
 		lua_pushstring(L, npc->getName().c_str());
@@ -730,7 +725,7 @@ int NpcScriptInterface::luaGetNpcName(lua_State* L)
 	else{
 		lua_pushstring(L, "");
 	}
-	
+
 	return 1;
 }
 
@@ -738,9 +733,9 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 {
 	//getNpcParameter(paramKey)
 	std::string paramKey = popString(L);
-	
+
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	Npc* npc = env->getNpc();
 	if(npc){
 		Npc::ParametersMap::iterator it = npc->m_parameters.find(paramKey);
@@ -754,7 +749,7 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 	else{
 		lua_pushnil(L);
 	}
-	
+
 	return 1;
 }
 
@@ -779,14 +774,14 @@ NpcScript::NpcScript(std::string file, Npc* npc) :
 NpcEventsHandler(npc)
 {
 	m_scriptInterface = npc->getScriptInterface();
-	
+
 	if(m_scriptInterface->loadFile(file, npc) == -1){
 		std::cout << "Warning: [NpcScript::NpcScript] Can not load script. " << file << std::endl;
 		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
 		m_loaded = false;
 		return;
 	}
-	
+
 	m_onCreatureSay = m_scriptInterface->getEvent("onCreatureSay");
 	m_onCreatureDisappear = m_scriptInterface->getEvent("onCreatureDisappear");
 	m_onCreatureAppear = m_scriptInterface->getEvent("onCreatureAppear");
@@ -799,32 +794,32 @@ NpcScript::~NpcScript()
 {
 	//
 }
-	
+
 void NpcScript::onCreatureAppear(const Creature* creature)
 {
 	if(m_onCreatureAppear == -1){
-		return;	
+		return;
 	}
 	//onCreatureAppear(creature)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-	
+
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
 		desc << "npc " << m_npc->getName();
 		env->setEventDesc(desc.str());
 		#endif
-	
+
 		lua_State* L = m_scriptInterface->getLuaState();
-	
+
 		env->setScriptId(m_onCreatureAppear, m_scriptInterface);
 		env->setRealPos(m_npc->getPosition());
 		env->setNpc(m_npc);
-	
+
 		uint32_t cid = env->addThing(const_cast<Creature*>(creature));
-	
+
 		m_scriptInterface->pushFunction(m_onCreatureAppear);
-		lua_pushnumber(L, cid);	
+		lua_pushnumber(L, cid);
 		m_scriptInterface->callFunction(1);
 		m_scriptInterface->releaseScriptEnv();
 	}
@@ -836,28 +831,28 @@ void NpcScript::onCreatureAppear(const Creature* creature)
 void NpcScript::onCreatureDisappear(const Creature* creature)
 {
 	if(m_onCreatureDisappear == -1){
-		return;	
+		return;
 	}
 	//onCreatureDisappear(id)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-	
+
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
 		desc << "npc " << m_npc->getName();
 		env->setEventDesc(desc.str());
 		#endif
-	
+
 		lua_State* L = m_scriptInterface->getLuaState();
-	
+
 		env->setScriptId(m_onCreatureDisappear, m_scriptInterface);
 		env->setRealPos(m_npc->getPosition());
 		env->setNpc(m_npc);
-	
+
 		uint32_t cid = env->addThing(const_cast<Creature*>(creature));
-	
+
 		m_scriptInterface->pushFunction(m_onCreatureDisappear);
-		lua_pushnumber(L, cid);	
+		lua_pushnumber(L, cid);
 		m_scriptInterface->callFunction(1);
 		m_scriptInterface->releaseScriptEnv();
 	}
@@ -869,26 +864,26 @@ void NpcScript::onCreatureDisappear(const Creature* creature)
 void NpcScript::onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos)
 {
 	if(m_onCreatureMove == -1){
-		return;	
+		return;
 	}
 	//onCreatureMove(creature, oldPos, newPos)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-	
+
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
 		desc << "npc " << m_npc->getName();
 		env->setEventDesc(desc.str());
 		#endif
-	
+
 		lua_State* L = m_scriptInterface->getLuaState();
-	
+
 		env->setScriptId(m_onCreatureAppear, m_scriptInterface);
 		env->setRealPos(m_npc->getPosition());
 		env->setNpc(m_npc);
-	
+
 		uint32_t cid = env->addThing(const_cast<Creature*>(creature));
-	
+
 		m_scriptInterface->pushFunction(m_onCreatureMove);
 		lua_pushnumber(L, cid);
 		LuaScriptInterface::pushPosition(L, oldPos, 0);
@@ -904,24 +899,24 @@ void NpcScript::onCreatureMove(const Creature* creature, const Position& oldPos,
 void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
 {
 	if(m_onCreatureSay == -1){
-		return;	
+		return;
 	}
 	//onCreatureSay(cid, type, msg)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-	
+
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
 		desc << "npc " << m_npc->getName();
 		env->setEventDesc(desc.str());
 		#endif
-	
+
 		env->setScriptId(m_onCreatureSay, m_scriptInterface);
 		env->setRealPos(m_npc->getPosition());
 		env->setNpc(m_npc);
-	
+
 		uint32_t cid = env->addThing(const_cast<Creature*>(creature));
-	
+
 		lua_State* L = m_scriptInterface->getLuaState();
 		m_scriptInterface->pushFunction(m_onCreatureSay);
 		lua_pushnumber(L, cid);
@@ -938,22 +933,22 @@ void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const
 void NpcScript::onThink()
 {
 	if(m_onThink == -1){
-		return;	
+		return;
 	}
 	//onThink()
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-	
+
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
 		desc << "npc " << m_npc->getName();
 		env->setEventDesc(desc.str());
 		#endif
-	
+
 		env->setScriptId(m_onThink, m_scriptInterface);
 		env->setRealPos(m_npc->getPosition());
 		env->setNpc(m_npc);
-	
+
 		m_scriptInterface->pushFunction(m_onThink);
 		m_scriptInterface->callFunction(0);
 		m_scriptInterface->releaseScriptEnv();

@@ -1,0 +1,13 @@
+<!-- This is an example NPC that can be used on Jiddo's NPC system -->
+<!-- It is not in an in-game spawn -->
+
+<!-- This is an example NPC that sells runes and uses parameter callbacks -->
+<npc name="Mike" script="runes.lua" autowalk="25">
+	<health now="150" max="150"/>
+	<look type="130" head="39" body="122" legs="125" feet="57" corpse="2212"/>
+	<parameters>
+		<parameter key="message_greet" value="Hello |PLAYERNAME|. Do you want to buy any spell runes?" />
+		<parameter key="message_needmoremoney" value="You do not have enough money." />
+		<parameter key="message_decline" value="Is |TOTALCOST| gold coins too much for you? Get out of here!" />
+	</parameters>
+</npc>

@@ -5,7 +5,6 @@ Items that are done will be removed.
 v0.1
 * Optimize scripts already done
 * Fix game classes, add new game classes
-* Add Jiddo's NPC System with some optimizations and NPCs examples
 * Change fishing system so it is not based only on one ID
 * Remove deprecated items from scripts
 * Review NORMAL_CORPSE_STAGE_I and SWAMP_CORPSE_STAGE_I ids on actions.lua
@@ -19,5 +18,6 @@ v0.2
 * Update furnitures to 8.10(including bed-furnitures)
 
 v0.3
+* New modules to npc system
 * Remove deprecated variables, remove the use of getThingfromPos, and getPlayer* when getCreature* is disponible
 * Optimize door system to support multi-vocations easier(with arrays)

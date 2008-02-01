@@ -1553,7 +1553,7 @@ void Player::addManaSpent(uint32_t amount)
 {
 	if(amount != 0 && !hasFlag(PlayerFlag_NotGainMana)){
 		manaSpent += amount * g_config.getNumber(ConfigManager::RATE_MAGIC);
-		int reqMana = vocation->getReqMana(magLevel + 1);
+		uint32_t reqMana = vocation->getReqMana(magLevel + 1);
 
 		if(manaSpent >= reqMana){
 			manaSpent -= reqMana;

@@ -1,0 +1,13 @@
+<!-- This is an example NPC that can be used on Jiddo's NPC system -->
+<!-- It is not in an in-game spawn -->
+
+<!-- This is an example of a NPC that buys and sells distance items only with XML parameters -->
+<npc name="Frenzy" script="default.lua" autowalk="25">
+	<health now="150" max="150"/>
+	<look type="134" head="57" body="59" legs="40" feet="76" corpse="2212"/>
+	<parameters>
+		<parameter key="module_shop" value="1" />
+		<parameter key="shop_sellable" value="crossbow,2455,150;bow,2456,130" />
+		<parameter key="shop_buyable" value="crossbow,2455,360;bow,2456,200;spear,2389,20;power bolt,2547,200;burst arrow,2546,56;poison arrow,2545,18;bolt,2543,3;arrow,2544,2" />
+	</parameters>
+</npc>
