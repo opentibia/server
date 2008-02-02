@@ -201,7 +201,7 @@ void Creature::onThink(uint32_t interval)
 	if(followCreature){
 		walkUpdateTicks += interval;
 
-		if(walkUpdateTicks >= 2000){
+		if(forceUpdateFollowPath || walkUpdateTicks >= 2000){
 			walkUpdateTicks = 0;
 			if(forceUpdateFollowPath || internalMapChange){
 				forceUpdateFollowPath = false;
@@ -1011,7 +1011,7 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 	fpp.fullPathSearch = false;
 	fpp.needReachable = true;
 	fpp.targetDistance = 1;
-	fpp.maxSearchDist = 15;
+	fpp.maxSearchDist = 10;
 
 	if(!g_game.isViewClear(getPosition(), creature->getPosition(), true)){
 		fpp.fullPathSearch = true;

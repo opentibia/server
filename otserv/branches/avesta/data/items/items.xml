@@ -14361,6 +14361,7 @@
 		<attribute key="weight" value="21000"/>
 		<attribute key="armor" value="2"/>
 		<attribute key="slotType" value="head"/>
+		<attribute key="suppressDrown" value="1"/>
 	</item>
 	<item id="5462" name="pirate boots">
 		<attribute key="weight" value="800"/>

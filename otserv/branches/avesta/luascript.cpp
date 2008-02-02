@@ -1373,6 +1373,12 @@ void LuaScriptInterface::registerFunctions()
 	//doMonsterChangeTarget(cid)
 	lua_register(m_luaState, "doMonsterChangeTarget", LuaScriptInterface::luaDoMonsterChangeTarget);
 
+	//doAddCondition(cid, condition)
+	lua_register(m_luaState, "doAddCondition", LuaScriptInterface::luaDoAddCondition);
+
+	//doRemoveCondition(cid, type)
+	lua_register(m_luaState, "doRemoveCondition", LuaScriptInterface::luaDoRemoveCondition);
+
 	//numberToVariant(number)
 	lua_register(m_luaState, "numberToVariant", LuaScriptInterface::luaNumberToVariant);
 
@@ -4835,6 +4841,63 @@ int LuaScriptInterface::luaDoMonsterChangeTarget(lua_State *L)
 		monster->searchTarget(true);
 	}
 	
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoAddCondition(lua_State *L)
+{
+	//doAddCondition(cid, condition)
+
+	uint32_t conditionId = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Condition* condition = env->getConditionObject(conditionId);
+	if(!condition){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	creature->addCondition(condition->clone());
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
+{
+	//doRemoveCondition(cid, type)
+
+	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Condition* condition = creature->getCondition(conditionType, CONDITIONID_COMBAT);
+	if(!condition){
+		condition = creature->getCondition(conditionType, CONDITIONID_DEFAULT);
+	}
+
+	if(condition){
+		creature->removeCondition(condition);
+	}
+
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }

@@ -349,8 +349,8 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		(*it)->onCreatureMove(creature, toTile, toPos, this, fromPos, oldStackPos, teleport);
 	}
 
-	toTile->postAddNotification(creature, newStackPos);
 	postRemoveNotification(creature, oldStackPos, true);
+	toTile->postAddNotification(creature, newStackPos);
 }
 
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,

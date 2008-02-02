@@ -329,8 +329,8 @@ public:
 	int32_t getWalkCache(const Position& pos) const;
 
 protected:
-	static const int32_t mapWalkWidth = /*maxViewportX*/ 9 * 2 + 1;
-	static const int32_t mapWalkHeight = /*maxViewportY*/ 9 * 2 + 1;
+	static const int32_t mapWalkWidth = /*maxViewportX*/ 11 * 2 + 1;
+	static const int32_t mapWalkHeight = /*maxViewportY*/ 11 * 2 + 1;
 	bool localMapCache[mapWalkHeight][mapWalkWidth];
 
 	Tile* _tile;
