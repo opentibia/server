@@ -130,7 +130,7 @@
 <movevent event="StepIn" itemid="5405" script="drowning.lua" />
 <movevent event="StepOut" itemid="5405" script="drowning.lua" />
 
-<movevent event="Equip" itemid="5461" slot="helmet" function="onEquipItem" />
-<movevent event="DeEquip" itemid="5461" slot="helmet" function="onDeEquipItem" />
+<movevent event="Equip" itemid="5461" slot="head" function="onEquipItem" />
+<movevent event="DeEquip" itemid="5461" slot="head" function="onDeEquipItem" />
 
 </movements>
