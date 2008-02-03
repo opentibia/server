@@ -1009,7 +1009,7 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 	fpp.fullPathSearch = false;
 	fpp.needReachable = true;
 	fpp.targetDistance = 1;
-	fpp.maxSearchDist = 10;
+	fpp.maxSearchDist = 12;
 
 	if(!g_game.isViewClear(getPosition(), creature->getPosition(), true)){
 		fpp.fullPathSearch = true;

@@ -48,8 +48,8 @@
 
 extern ConfigManager g_config;
 
-int32_t Map::maxViewportX = 11; //min value: maxClientViewportX + 1
-int32_t Map::maxViewportY = 11; //min value: maxClientViewportY + 1
+int32_t Map::maxViewportX = 13; //min value: maxClientViewportX + 1
+int32_t Map::maxViewportY = 13; //min value: maxClientViewportY + 1
 int32_t Map::maxClientViewportX = 8;
 int32_t Map::maxClientViewportY = 6;
 
@@ -680,7 +680,7 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 	Tile* tile = NULL;
 	AStarNode* found = NULL;
 
-	while(nodes.countClosedNodes() < 100){
+	while(maxSearchDist != -1 || nodes.countClosedNodes() < 100){
 		AStarNode* n = nodes.getBestNode();
 		if(!n){
 			listDir.clear();
@@ -697,8 +697,8 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 				pos.y = n->y + neighbourOrderList[i][1];
 
 				bool outOfRange = false;
-				if(maxSearchDist != -1 && (std::abs(endPos.x - pos.x) +
-					std::abs(endPos.y - pos.y)) > maxSearchDist){
+				if(maxSearchDist != -1 && (std::abs(endPos.x - pos.x) > maxSearchDist ||
+					std::abs(endPos.y - pos.y) > maxSearchDist) ){
 					outOfRange = true;
 				}
 
