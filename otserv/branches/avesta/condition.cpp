@@ -289,7 +289,7 @@ bool Condition::isPersistent() const
 		return false;
 	}
 
-	if(!(CONDITIONID_DEFAULT || id == CONDITIONID_COMBAT)){
+	if(!(id == CONDITIONID_DEFAULT || id == CONDITIONID_COMBAT)){
 		return false;
 	}
 

@@ -346,7 +346,7 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 				boost::bind(&Game::updateCreatureWalk, &g_game, creatureId)));
 		}
 
-		OTSYS_SLEEP(10);
+		OTSYS_SLEEP(1);
 	}
 
 #if defined __EXCEPTION_TRACER__
@@ -713,11 +713,9 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 	}
 
 	if(creature == followCreature || (creature == this && followCreature)){
-		if(followCreature == creature){
-			internalMapChange = true;
-			if(hasFollowPath){
-				forceUpdateFollowPath = true;
-			}
+		internalMapChange = true;
+		if(hasFollowPath){
+			forceUpdateFollowPath = true;
 		}
 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
