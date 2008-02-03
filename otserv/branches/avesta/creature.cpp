@@ -79,7 +79,6 @@ Creature::Creature() :
 	followCreature = NULL;
 	hasFollowPath = false;
 	eventWalk = 0;
-	internalMapChange = false;
 	forceUpdateFollowPath = false;
 	isMapLoaded = false;
 	memset(localMapCache, false, sizeof(localMapCache));
@@ -203,11 +202,8 @@ void Creature::onThink(uint32_t interval)
 
 		if(forceUpdateFollowPath || walkUpdateTicks >= 2000){
 			walkUpdateTicks = 0;
-			if(forceUpdateFollowPath || internalMapChange){
-				forceUpdateFollowPath = false;
-				internalMapChange = false;
-				Creature::addPathSearch(this);
-			}
+			forceUpdateFollowPath = false;
+			Creature::addPathSearch(this);
 		}
 	}
 
@@ -474,7 +470,6 @@ void Creature::onAddTileItem(const Tile* tile, const Position& pos, const Item* 
 {
 	if(isMapLoaded){
 		if(pos.z == getPosition().z){
-			internalMapChange = true;
 			updateTileCache(tile, pos);
 		}
 	}
@@ -486,7 +481,6 @@ void Creature::onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t 
 	if(isMapLoaded){
 		if(oldType.blockSolid || oldType.blockPathFind || newType.blockPathFind || newType.blockSolid){
 			if(pos.z == getPosition().z){
-				internalMapChange = true;
 				updateTileCache(tile, pos);
 			}
 		}
@@ -499,7 +493,6 @@ void Creature::onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t 
 	if(isMapLoaded){
 		if(iType.blockSolid || iType.blockPathFind){
 			if(pos.z == getPosition().z){
-				internalMapChange = true;
 				updateTileCache(tile, pos);
 			}
 		}
@@ -519,7 +512,6 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 	}
 	else if(isMapLoaded){
 		if(creature->getPosition().z == getPosition().z){
-			internalMapChange = true;
 			updateTileCache(creature->getTile(), creature->getPosition());
 		}
 	}
@@ -532,7 +524,6 @@ void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, 
 	if(creature != this){
 		if(isMapLoaded){
 			if(creature->getPosition().z == getPosition().z){
-				internalMapChange = true;
 				updateTileCache(creature->getTile(), creature->getPosition());
 			}
 		}
@@ -713,7 +704,6 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 	}
 
 	if(creature == followCreature || (creature == this && followCreature)){
-		internalMapChange = true;
 		if(hasFollowPath){
 			forceUpdateFollowPath = true;
 		}
@@ -1058,7 +1048,6 @@ bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= fal
 
 		hasFollowPath = false;
 		forceUpdateFollowPath = false;
-		internalMapChange = false;
 		followCreature = creature;
 		Creature::addPathSearch(this);
 	}

@@ -961,31 +961,39 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
 
 	std::vector<Direction> dirList;
 	
-	tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
-	if(tmpDist == centerToDist && canWalkTo(creaturePos, NORTH)){
-		if(canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), attackedCreature)){
-			dirList.push_back(NORTH);
+	if(creaturePos.y - centerPos.y >= 0){
+		tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
+		if(tmpDist == centerToDist && canWalkTo(creaturePos, NORTH)){
+			if(canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), attackedCreature)){
+				dirList.push_back(NORTH);
+			}
 		}
 	}
 
-	tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y + 1) - centerPos.y));
-	if(tmpDist == centerToDist && canWalkTo(creaturePos, SOUTH)){
-		if(canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), attackedCreature)){
-			dirList.push_back(SOUTH);
+	if(creaturePos.y - centerPos.y <= 0){
+		tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y + 1) - centerPos.y));
+		if(tmpDist == centerToDist && canWalkTo(creaturePos, SOUTH)){
+			if(canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), attackedCreature)){
+				dirList.push_back(SOUTH);
+			}
 		}
 	}
 
-	tmpDist = std::max(std::abs((creaturePos.x + 1) - centerPos.x), std::abs((creaturePos.y) - centerPos.y));
-	if(tmpDist == centerToDist && canWalkTo(creaturePos, EAST)){
-		if(canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), attackedCreature)){
-			dirList.push_back(EAST);
+	if(creaturePos.x - centerPos.x >= 0){
+		tmpDist = std::max(std::abs((creaturePos.x + 1) - centerPos.x), std::abs((creaturePos.y) - centerPos.y));
+		if(tmpDist == centerToDist && canWalkTo(creaturePos, EAST)){
+			if(canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), attackedCreature)){
+				dirList.push_back(EAST);
+			}
 		}
 	}
 
-	tmpDist = std::max(std::abs((creaturePos.x - 1) - centerPos.x), std::abs((creaturePos.y) - centerPos.y));
-	if(tmpDist == centerToDist && canWalkTo(creaturePos, WEST)){
-		if(canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), attackedCreature)){
-			dirList.push_back(WEST);
+	if(creaturePos.x - centerPos.x <= 0){
+		tmpDist = std::max(std::abs((creaturePos.x - 1) - centerPos.x), std::abs((creaturePos.y) - centerPos.y));
+		if(tmpDist == centerToDist && canWalkTo(creaturePos, WEST)){
+			if(canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), attackedCreature)){
+				dirList.push_back(WEST);
+			}
 		}
 	}
 

@@ -368,7 +368,6 @@ protected:
 	std::list<Direction> listWalkDir;
 	uint32_t walkUpdateTicks;
 	bool hasFollowPath;
-	bool internalMapChange;
 	bool forceUpdateFollowPath;
 
 	//combat variables
