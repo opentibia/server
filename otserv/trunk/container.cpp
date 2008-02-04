@@ -725,7 +725,9 @@ void Container::postAddNotification(Thing* thing, int32_t index, cylinderlink_t 
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postAddNotification(thing, index, LINK_NEAR);
+			if(topParent->getParent()){
+				topParent->getParent()->postAddNotification(thing, index, LINK_NEAR);
+			}
 		}
 		else{
 			topParent->postAddNotification(thing, index, LINK_PARENT);
@@ -743,7 +745,9 @@ void Container::postRemoveNotification(Thing* thing, int32_t index, bool isCompl
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
+			if(topParent->getParent()){
+				topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
+			}
 		}
 		else{
 			topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
