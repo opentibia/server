@@ -1328,14 +1328,23 @@ bool ConditionDamage::serialize(PropWriteStream& propWriteStream)
 	return true;
 }
 
-void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
+bool ConditionDamage::addDamage(int32_t rounds, int32_t time, int32_t value)
 {
-	if(periodDamage > 0){
-		return;
+	if(rounds == -1){
+		//periodic damage
+		periodDamage = value;
+		setParam(CONDITIONPARAM_TICKINTERVAL, time);
+		setParam(CONDITIONPARAM_TICKS, -1);
+		return true;
 	}
 
+	if(periodDamage > 0){
+		return false;
+	}
+
+
 	//rounds, time, damage
-	for(unsigned int i = 0; i < rounds; ++i){
+	for(int32_t i = 0; i < rounds; ++i){
 		IntervalInfo damageInfo;
 		damageInfo.interval = time;
 		damageInfo.timeLeft = time;
@@ -1346,6 +1355,8 @@ void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 			setTicks(getTicks() + damageInfo.interval);
 		}
 	}
+
+	return true;
 }
 
 

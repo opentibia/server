@@ -240,8 +240,6 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						house->addTile(static_cast<HouseTile*>(tile));
 						isHouseTile = true;
 					}
-					
-					map->setTile(px, py, pz, tile);
 
 					//read tile attributes
 					unsigned char attribute;
@@ -356,6 +354,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 
 						nodeItem = f.getNextNode(nodeItem, type);
 					}
+	
+					map->setTile(px, py, pz, tile);
 				}
 				else{
 					map->setLastError(LOADMAPERROR_UNKNOWNNODETYPE, nodeTile);

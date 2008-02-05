@@ -191,6 +191,49 @@ int Game::loadMap(std::string filename, std::string filekind)
 	return map->loadMap(filename, filekind);
 }
 
+void Game::refreshMap()
+{
+	Tile* tile;
+	Item* item;
+
+	for(Map::TileMap::iterator it = map->refreshTileMap.begin(); it != map->refreshTileMap.end(); ++it){
+		tile = it->first;
+
+		//remove garbage
+		int32_t downItemSize = tile->downItems.size();
+		for(int32_t i = downItemSize - 1; i >= 0; --i){
+			item = tile->downItems[i];
+			if(item){
+				ReturnValue ret = internalRemoveItem(item);
+#ifdef __DEBUG__
+				if(ret != RET_NOERROR){
+					std::cout << "Could not refresh item: " << item->getID() << "pos: " << tile->getPosition() << std::endl;
+				}
+#endif
+			}
+		}
+
+		cleanup();
+
+		//restore to original state
+		ItemVector list = it->second.list;
+		for(ItemVector::reverse_iterator it = list.rbegin(); it != list.rend(); ++it){
+			Item* item = (*it)->clone();
+			ReturnValue ret = internalAddItem(tile, item , INDEX_WHEREEVER, FLAG_NOLIMIT);
+			if(ret == RET_NOERROR){
+				if(item->getUniqueId() != 0){
+					ScriptEnviroment::addUniqueThing(item);
+				}
+				startDecay(item);
+			}
+			else{
+				std::cout << "Could not refresh item: " << item->getID() << "pos: " << tile->getPosition() << std::endl;
+				delete item;
+			}
+		}
+	}
+}
+
 /*****************************************************************************/
 
 #ifdef __DEBUG_CRITICALSECTION__
@@ -920,7 +963,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 			}
 
 			std::list<Direction> listDir;
-			if(map->getPathTo(player, walkPos, walkPos, listDir)){
+			if(map->getPathTo(player, walkPos, listDir)){
 				Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 					this, player->getID(), listDir)));
 
@@ -3143,7 +3186,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std:
 
 						if(tmpPos != creaturePos){
 							//std::cout << "x: " << tmpPos.x << "y: " << tmpPos.y << std::endl;
-							if(!map->getPathTo(creature, tmpPos, targetPos, tmpDirList, maxSearchDist)){
+							if(!map->getPathTo(creature, tmpPos, tmpDirList, maxSearchDist)){
 								continue;
 							}
 						}

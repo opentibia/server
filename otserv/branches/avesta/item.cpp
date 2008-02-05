@@ -144,53 +144,30 @@ Item::Item(const Item &i) :
 	charges = i.charges;
 	fluid = i.fluid;
 
-	uint16_t _actionId;
-	if((_actionId = i.getActionId())){
-		setActionId(_actionId);
+	m_attributes = i.m_attributes;
+	if(i.m_firstAttr){
+		m_firstAttr = new Attribute(*i.m_firstAttr); 
 	}
+}
 
-	uint16_t _uniqueId;
-	if((_uniqueId = i.getUniqueId())){
-		setUniqueId(_uniqueId);
+Item* Item::clone() const
+{
+	Item* _item = Item::CreateItem(id, count);
+	_item->m_attributes = m_attributes;
+	if(m_firstAttr){
+		_item->m_firstAttr = new Attribute(*m_firstAttr); 
 	}
-
-	if(i.getSpecialDescription() != ""){
-		setSpecialDescription(i.getSpecialDescription());
-	}
-
-	if(i.getText() != ""){
-		setText(i.getText());
-	}
-
-	uint32_t _writtenDate;
-	if((_writtenDate = i.getWrittenDate())){
-		setWrittenDate(_writtenDate);
-	}
-
-	if(i.getWriter() != ""){
-		setWriter(i.getWriter());
-	}
-
-	uint32_t _owner;
-	if((_owner = i.getOwner())){
-		setOwner(_owner);
-	}
-
-	uint32_t _duration;
-	if((_duration = i.getDuration())){
-		setDuration(_duration);
-	}
-
-	uint32_t _decayState;
-	if((_decayState = i.getDecaying())){
-		setDecaying((ItemDecayState_t)_decayState);
-	}
+	
+	return _item;
 }
 
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
-	//
+
+	if(getUniqueId() != 0){
+		ScriptEnviroment::removeUniqueThing(this);
+	}
 }
 
 void Item::setDefaultSubtype()
@@ -1069,7 +1046,7 @@ void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
 	}
 }
 
-inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
+bool ItemAttributes::validateIntAttrType(itemAttrTypes type)
 {
 	//list of numeric type attributes
 	switch(type){
@@ -1089,7 +1066,7 @@ inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 	return false;
 }
 
-inline bool ItemAttributes::validateStrAttrType(itemAttrTypes type) const
+bool ItemAttributes::validateStrAttrType(itemAttrTypes type)
 {
 	//list of text type attributes
 	switch(type){

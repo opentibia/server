@@ -55,7 +55,6 @@ int32_t Map::maxClientViewportY = 6;
 
 Map::Map()
 {
-	defaultMapLoaded = false;
 	mapWidth = 0;
 	mapHeight = 0;
 }
@@ -84,8 +83,6 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	std::cout << ":: Loading map from: " << identifier << " " << loader->getSourceDescription() << std::endl;
 
 	bool loadMapSuccess = loader->loadMap(this, identifier);
-	defaultMapLoaded = true;
-
 	if(!loadMapSuccess){
 		switch(getLastError()){
 		case LOADMAPERROR_CANNOTOPENFILE:
@@ -230,6 +227,15 @@ void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 	}
 	else{
 		std::cout << "Error: Map::setTile() already exists." << std::endl;
+	}
+
+	if(newtile->hasFlag(TILESTATE_REFRESH)){
+		RefreshBlock_t rb;
+		rb.lastRefresh = OTSYS_TIME();
+		for(ItemVector::iterator it = newtile->downItems.begin(); it != newtile->downItems.end(); ++it){
+			rb.list.push_back((*it)->clone());
+		}
+		refreshTileMap[newtile] = rb;
 	}
 }
 
@@ -602,7 +608,7 @@ bool Map::isPathValid(const Creature* creature, const std::list<Direction>& list
 		}
 
 		Tile* tile = getTile(pos);
-		if(!tile || !tile->creatures.empty() ||  tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
+		if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
 			return false;
 		}
 	}
@@ -614,7 +620,7 @@ bool Map::isPathValid(const Creature* creature, const std::list<Direction>& list
 	return false;
 }
 
-Tile* Map::isPositionValid(const Creature* creature, const Position& pos, const Position& centerPos)
+Tile* Map::isPositionValid(const Creature* creature, const Position& pos)
 {
 	switch(creature->getWalkCache(pos)){
 		case 0: return NULL;
@@ -633,16 +639,16 @@ Tile* Map::isPositionValid(const Creature* creature, const Position& pos, const 
 	return tile;
 }
 
-bool Map::getPathTo(const Creature* creature, const Position& toPosition,
-	const Position& centerPos, std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/)
+bool Map::getPathTo(const Creature* creature, const Position& destPos,
+	std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/)
 {
-	if(isPositionValid(creature, toPosition, centerPos) == NULL){
+	if(isPositionValid(creature, destPos) == NULL){
 		return false;
 	}
 
 	listDir.clear();
 
-	Position startPos = toPosition;
+	Position startPos = destPos;
 	Position endPos = creature->getPosition();
 
 	if(startPos.z != endPos.z){
@@ -702,7 +708,7 @@ bool Map::getPathTo(const Creature* creature, const Position& toPosition,
 					outOfRange = true;
 				}
 
-				if(!outOfRange && (tile = isPositionValid(creature, pos, centerPos))){
+				if(!outOfRange && (tile = isPositionValid(creature, pos))){
 					//The cost (g) for this neighbour
 					int32_t cost = nodes.getMapWalkCost(creature, n, tile, pos);
 					int32_t extraCost = nodes.getTileWalkCost(creature, tile);

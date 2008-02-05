@@ -112,6 +112,12 @@ public:
 			deleteAttrs(m_firstAttr);
 		}
 	}
+	ItemAttributes(const ItemAttributes &i){
+		m_attributes = i.m_attributes;
+		if(i.m_firstAttr){
+			m_firstAttr = new Attribute(*i.m_firstAttr);
+		}
+	}
 	
 	void setSpecialDescription(const std::string& desc) {setStrAttr(ATTR_ITEM_DESC, desc);}
 	void resetSpecialDescription() {removeAttribute(ATTR_ITEM_DESC);}
@@ -162,10 +168,11 @@ protected:
 	bool hasAttribute(itemAttrTypes type) const;
 	void removeAttribute(itemAttrTypes type);
 
-private:
+protected:
 	static std::string emptyString;
 	
-	struct Attribute{
+	class Attribute{
+	public:
 		itemAttrTypes type;
 		void* value;
 		Attribute* next;
@@ -173,6 +180,24 @@ private:
 			type = _type;
 			value = NULL;
 			next = NULL;
+		}
+
+		Attribute(const Attribute &i){
+			type = i.type;
+			if(ItemAttributes::validateIntAttrType(type)){
+				value = (void*)((long)i.value);
+			}
+			else if(ItemAttributes::validateStrAttrType(type)){
+				value = (void*)new std::string( *((std::string*)i.value) );
+			}
+			else{
+				value = NULL;
+			}
+
+			next = NULL;
+			if(i.next){
+				next = new Attribute(*i.next);
+			}
 		}
 	};
 	
@@ -186,8 +211,8 @@ private:
 	void setIntAttr(itemAttrTypes type, int32_t value);
 	void increaseIntAttr(itemAttrTypes type, int32_t value);
 	
-	bool validateIntAttrType(itemAttrTypes type) const;
-	bool validateStrAttrType(itemAttrTypes type) const;
+	static bool validateIntAttrType(itemAttrTypes type);
+	static bool validateStrAttrType(itemAttrTypes type);
 	
 	void addAttr(Attribute* attr);	
 	Attribute* getAttrConst(itemAttrTypes type) const;
@@ -207,6 +232,7 @@ public:
 	// Constructor for items
 	Item(const unsigned short _type, unsigned short _count = 0);
 	Item(const Item &i);
+	virtual Item* clone() const;
 
 	virtual ~Item();
 

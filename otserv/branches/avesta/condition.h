@@ -285,7 +285,7 @@ public:
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
-	void addDamage(uint32_t rounds, uint32_t time, int32_t value);
+	bool addDamage(int32_t rounds, int32_t time, int32_t value);
 	bool doForceUpdate() const { return forceUpdate;}
 
 	//serialization

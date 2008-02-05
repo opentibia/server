@@ -188,15 +188,15 @@ public:
 
 	/**
 	* Set a single tile.
-	* \param a tile to set for the
+	* \param a tile to set for the position
 	*/
 	void setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile);
 
 	/**
 	* Place a creature on the map
 	* \param pos The position to place the creature
-  * \param creature Creature to place on the map
-  * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
+	* \param creature Creature to place on the map
+	* \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	*/
 	bool placeCreature(const Position& centerPos, Creature* creature, bool forceLogin = false);
 	
@@ -228,19 +228,18 @@ public:
 	*/
 	bool isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck);
 
-	Tile* isPositionValid(const Creature* creature, const Position& pos, const Position& centerPos);
+	Tile* isPositionValid(const Creature* creature, const Position& pos);
 
 	/**
 	* Get the path to a specific position on the map.
 	* \param creature The creature that wants a path
-	* \param toPosition The position we want a path calculated to
-	* \param centerPos The center position (can be set to toPosition) 
+	* \param destPos The position we want a path calculated to
 	* \param listDir contains a list of directions to the destination
 	* \param maxDist Maximum distance from our current position to search, default: -1 (no limit)
 	* \returns returns true if a path was found
 	*/
-	bool getPathTo(const Creature* creature, const Position& toPosition,
-		const Position& centerPos, std::list<Direction>& listDir, int32_t maxDist = -1);
+	bool getPathTo(const Creature* creature, const Position& destPos,
+		std::list<Direction>& listDir, int32_t maxDist = -1);
 
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir,
 		const Position& destPos);
@@ -263,7 +262,6 @@ public:
 	}
 
 protected:
-	bool defaultMapLoaded;
 	MapError_t lasterrortype;
 	unsigned long lasterrorcode;
 	std::string spawnfile;
@@ -275,9 +273,16 @@ protected:
 		int32_t minRangeY = 0, int32_t maxRangeY = 0);
 	
 	void clearSpectatorCache();
-	//void clearPathCache();
 
 	QTreeNode root;
+	
+	struct RefreshBlock_t{
+		ItemVector list;
+		uint64_t lastRefresh;
+	};
+
+	typedef std::map<Tile*, RefreshBlock_t> TileMap;
+	TileMap refreshTileMap;
 
 	friend class Game;
 

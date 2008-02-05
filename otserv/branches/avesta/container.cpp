@@ -35,14 +35,28 @@ Container::Container(uint16_t _type) : Item(_type)
 Container::~Container()
 {
 	//std::cout << "Container destructor " << this << std::endl;
-	for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
-		
+	for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){		
 		(*cit)->setParent(NULL);
 		(*cit)->releaseThing2();
 	}
 
 	itemlist.clear();
 }
+
+Item* Container::clone() const
+{
+	Container* _item = static_cast<Container*>(Item::clone());
+	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
+		_item->addItem((*it)->clone());
+	}
+	return _item;
+}
+
+void Container::addItem(Item* item)
+{
+	itemlist.push_back(item);
+	item->setParent(this);
+}		
 
 bool Container::unserialize(xmlNodePtr nodeItem)
 {
@@ -54,7 +68,6 @@ bool Container::unserialize(xmlNodePtr nodeItem)
 			return true; //container is empty
 		}
 	  
-		//char* nodeValue;
 		int intValue;
 
 		while(nodeContainer){
@@ -81,7 +94,7 @@ bool Container::unserialize(xmlNodePtr nodeItem)
 							return false;
 						}
 						
-						__internalAddThing(item);
+						addItem(item);
 					}
 
 					nodeContainerItem = nodeContainerItem->next;
@@ -140,7 +153,7 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 					return false;
 				}
 				
-				__internalAddThing(item);
+				addItem(item);
 			}
 			else /*unknown type*/
 				return false;

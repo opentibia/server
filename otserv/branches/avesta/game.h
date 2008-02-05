@@ -383,6 +383,7 @@ public:
 	void setGameState(GameState_t newState);
 	void saveGameState();
 	void loadGameState();
+	void refreshMap();
 
 	//Events
 	void checkCreatureWalk(uint32_t creatureId);

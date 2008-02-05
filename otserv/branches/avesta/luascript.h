@@ -109,6 +109,7 @@ public:
 	void getEventInfo(int32_t& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, int32_t& callbackId, bool& timerEvent);
 
 	static void addUniqueThing(Thing* thing);
+	static void removeUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
 	void insertThing(uint32_t uid, Thing* thing);
 	void addTempItem(Item* item);

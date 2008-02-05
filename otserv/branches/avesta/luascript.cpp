@@ -201,6 +201,18 @@ void ScriptEnviroment::addUniqueThing(Thing* thing)
 	}
 }
 
+void ScriptEnviroment::removeUniqueThing(Thing* thing)
+{
+	Item* item = thing->getItem();
+	if(item && item->getUniqueId() != 0 ){
+		int32_t uid = item->getUniqueId();
+		ThingMap::iterator it = m_globalMap.find(uid);
+		if(it != m_globalMap.end()){
+			m_globalMap.erase(it);
+		}
+	}
+}
+
 uint32_t ScriptEnviroment::addThing(Thing* thing)
 {
 	if(thing){
