@@ -77,12 +77,18 @@ public:
 	// find the partner bed item
 	bool findPartner();
 	
-	// regenerate player
-	void regeneratePlayer(Player* player);
-	
 	// should I make a partner accessor/mutator?
 
-private:
+protected:
+	// change itemid when a player sleeps in this bed
+	void updateAppearance(const Player* player);
+	// regenerate player
+	void regeneratePlayer(Player* player) const;
+	// set all sleeper information
+	void internalSetSleeper(const Player* player);
+	// remove all sleeper information
+	void internalRemoveSleeper();
+
 	// GUID of the player sleeping in bed
 	uint32_t sleeperGUID;
 	// when he fell asleep

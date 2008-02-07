@@ -1217,6 +1217,9 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		BedItem* bed = Beds::instance().getBedBySleeper(getGUID());
 		if(bed){
 			bed->wakeUp(this);
+			#ifdef __DEBUG__
+			std::cout << "Player " << getName() << " waking up." << std::endl;
+			#endif
 		}
 		//]
 

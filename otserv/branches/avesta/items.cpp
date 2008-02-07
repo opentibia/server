@@ -115,7 +115,9 @@ ItemType::ItemType()
 	//[ added for beds system
 	isBedItem = false;
 	bedPartnerDir = NORTH;
-	transformToOnUse = 100;
+	maleSleeperID = 100;
+	femaleSleeperID = 100;
+	noSleeperID = 100;
 	//]
 }
 
@@ -1047,10 +1049,22 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.bedPartnerDir = (Direction)intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "transformTo") == 0)
+							else if(strcasecmp(strValue.c_str(), "maleSleeper") == 0)
 							{
 								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
-									it.transformToOnUse = intValue;
+									it.maleSleeperID = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "femaleSleeper") == 0)
+							{
+								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
+									it.femaleSleeperID = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "noSleeper") == 0)
+							{
+								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
+									it.noSleeperID = intValue;
 								}
 							}
 							//]

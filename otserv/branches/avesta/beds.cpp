@@ -26,19 +26,14 @@
 #include "game.h"
 #include "player.h"
 
-#include <iostream>
-
 extern Game g_game;
 
 
 BedItem::BedItem(uint16_t _id) : Item(_id)
 {
-	// set everything to default [no sleeper]
-	sleeperGUID = 0;
-	sleepStart = 0;
 	house = NULL;
 	partner = NULL;
-	setSpecialDescription("Nobody is sleeping there.");
+	internalRemoveSleeper();
 }
 
 BedItem::~BedItem(){}
@@ -150,22 +145,11 @@ void BedItem::sleep(Player* player)
 		return;
 	}
 
-	// get sleep info
-	std::string desc_str = player->getName() + " is sleeping there.";
-	time_t now = std::time(NULL);
-
-	// set sleep info
-	setSleeper(player->getGUID());
-	setSleepStart(now);
-	setSpecialDescription(desc_str);
-	// and for partner
-	partner->setSleeper(player->getGUID());
-	partner->setSleepStart(now);
-	partner->setSpecialDescription(desc_str);
+	internalSetSleeper(player);
+	partner->internalSetSleeper(player);
 
 	// update the BedSleepersMap
 	Beds::instance().setBedSleeper(this, player->getGUID());
-
 
 	// make the player walk onto the bed
 	player->getTile()->moveCreature(player, getTile());
@@ -174,8 +158,8 @@ void BedItem::sleep(Player* player)
 	Scheduler::getScheduler().addEvent(createSchedulerTask(50, boost::bind(&Player::kickPlayer, player)));
 
 	// change self and partner's appearance
-	g_game.transformItem(this, Item::items[getID()].transformToOnUse);
-	g_game.transformItem(partner, Item::items[partner->getID()].transformToOnUse);
+	updateAppearance(player);
+	partner->updateAppearance(player);
 }
 
 void BedItem::wakeUp(Player* player)
@@ -187,6 +171,7 @@ void BedItem::wakeUp(Player* player)
 
 	if(sleeperGUID != 0)
 	{
+		// TODO: Clean up
 		std::string name;
 
 		// if player == NULL - most likely the house the player is sleeping in was sold
@@ -203,7 +188,7 @@ void BedItem::wakeUp(Player* player)
 					IOPlayer::instance()->savePlayer(player);
 				}
 
-				delete player;
+				player->releaseThing2();
 			}
 		} else {
 			regeneratePlayer(player);
@@ -215,44 +200,77 @@ void BedItem::wakeUp(Player* player)
 	Beds::instance().setBedSleeper(NULL, sleeperGUID);
 
 	// unset sleep info
-	setSleeper(0);
-	setSleepStart(0);
-	setSpecialDescription("Nobody is sleeping there.");
-	// and for partner
-	partner->setSleeper(0);
-	partner->setSleepStart(0);
-	partner->setSpecialDescription("Nobody is sleeping there.");
+	internalRemoveSleeper();
+	partner->internalRemoveSleeper();
 
 	// change self and partner's appearance
-	g_game.transformItem(this, Item::items[getID()].transformToOnUse);
-	g_game.transformItem(partner, Item::items[partner->getID()].transformToOnUse);
+	updateAppearance(NULL);
+	partner->updateAppearance(NULL);
 }
 
-void BedItem::regeneratePlayer(Player* player)
+void BedItem::regeneratePlayer(Player* player) const
 {
 	// Note: time_t is in seconds
-	uint32_t sleptTime = int32_t(std::time(NULL) - sleepStart);
+	int32_t sleptTime = int32_t(std::time(NULL) - sleepStart);
 
 	Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
 	if(condition)
 	{
 	    // regenerate 1 health and 1 mana every 30 seconds that the player had food for
-		int32_t regen = std::min(uint32_t(condition->getTicks()/1000), sleptTime) / 30;
+		int32_t regen;
+		
+		if(condition->getTicks() != -1) {
+			regen = std::min((condition->getTicks()/1000), sleptTime) / 30;
+			int32_t newRegenTicks = condition->getTicks() - (regen*30000);
+			if(newRegenTicks <= 0){
+				player->removeCondition(condition);
+				condition = NULL;
+			}
+			else{
+				condition->setTicks(newRegenTicks);
+			}
+		}
+		else {
+			regen = sleptTime / 30;
+		}
+
 		player->changeHealth(regen);
 		player->changeMana(regen);
-		int32_t newRegenTicks = condition->getTicks() - (regen*30000);
-		if(newRegenTicks <= 0){
-			player->removeCondition(condition);
-			condition = NULL;
-		}
-		else{
-			condition->setTicks(newRegenTicks);
-		}
 	}
 
 	// regenerate 1 soul every 15 minutes
-	uint32_t soulRegen = std::max((uint32_t)0, sleptTime/(60*15));
+	int32_t soulRegen = std::max(0, sleptTime/(60*15));
 	player->changeSoul(soulRegen);
+}
+
+void BedItem::updateAppearance(const Player* player)
+{
+	const ItemType& it = Item::items[getID()];
+	if(player == NULL) {
+		g_game.transformItem(this, it.noSleeperID);
+	}
+	else if(player->getSex() == PLAYERSEX_FEMALE) {
+		g_game.transformItem(this, it.femaleSleeperID);
+	}
+	else {
+		g_game.transformItem(this, it.maleSleeperID);
+	}
+}
+
+void BedItem::internalSetSleeper(const Player* player)
+{
+	std::string desc_str = player->getName() + " is sleeping there.";
+
+	setSleeper(player->getGUID());
+	setSleepStart(std::time(NULL));
+	setSpecialDescription(desc_str);
+}
+
+void BedItem::internalRemoveSleeper()
+{
+	setSleeper(0);
+	setSleepStart(0);
+	setSpecialDescription("Nobody is sleeping there.");
 }
 
 Beds& Beds::instance()

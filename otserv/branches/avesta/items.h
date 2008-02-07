@@ -160,7 +160,10 @@ public:
 	bool isBed() const {return isBedItem;}
 	bool isBedItem;
 	Direction bedPartnerDir;
-	uint16_t transformToOnUse;
+	//uint16_t transformToOnUse;
+	uint16_t maleSleeperID;
+	uint16_t femaleSleeperID;
+	uint16_t noSleeperID;
 	//]
 
 	uint16_t id;
