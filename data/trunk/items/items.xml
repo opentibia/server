@@ -18194,11 +18194,11 @@
 	</item>
 	<item id="7439" article="a" name="berserk potion">
 		<attribute key="weight" value="200"/>
-		<attribute key="description" value="Drinking this is said to increase your fighting skills for a while, but to decrease your defense."/>
+		<attribute key="description" value="Drinking this potion increases temporarily your fighting skill while decreasing your defense."/>
 	</item>
 	<item id="7440" article="a" name="mastermind potion">
 		<attribute key="weight" value="200"/>
-		<attribute key="description" value="Drinking this is said to increase your magical skills for a while, but to decrease your defense."/>
+		<attribute key="description" value="Drinking this is said to increase your magical skills for awhile, but to decrease your defense."/>
 	</item>
 	<item id="7441" article="an" name="ice cube">
 		<attribute key="weight" value="1000"/>
@@ -18208,7 +18208,7 @@
 	</item>
 	<item id="7443" article="a" name="bullseye potion">
 		<attribute key="weight" value="200"/>
-		<attribute key="description" value="Drinking this is said to increase your distance skill for a while, but to decrease your defense."/>
+		<attribute key="description" value="Drinking this potion increases temporarily your distance skill while decreasing your defense."/>
 	</item>
 	<item id="7444" article="an" name="ice cube">
 		<attribute key="weight" value="8000"/>

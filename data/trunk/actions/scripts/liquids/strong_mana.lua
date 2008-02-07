@@ -12,10 +12,11 @@ function onUse(cid, item, frompos, item2, topos)
 		return TRUE
 	end
 
-	if(doTargetCombatMana(cid, item2.uid, MIN, MAX, CONST_ME_MAGIC_BLUE) == LUA_ERROR) then
+	if(doPlayerAddMana(item2.uid, math.random(MIN, MAX)) == LUA_ERROR) then
 		return FALSE
 	end
 
+	doSendMagicEffect(getThingPos(item2.uid), CONST_ME_MAGIC_BLUE)
 	doCreatureSay(item2.uid, "Aaaah...", TALKTYPE_ORANGE_1) 
 	doTransformItem(item.uid, EMPTY_POTION)
 	return TRUE

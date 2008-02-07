@@ -73,12 +73,16 @@
 	<action itemid="6558" script="liquids/demonic_blood.lua" />
 
 	<!-- Potions -->
-	<action itemid="7588" script="liquids/strong_health.lua" />
-	<action itemid="7589" script="liquids/strong_mana.lua" />
-	<action itemid="7590" script="liquids/great_mana.lua" />
-	<action itemid="7591" script="liquids/great_health.lua" />
-	<action itemid="7618" script="liquids/health_potion.lua" />
-	<action itemid="7620" script="liquids/mana_potion.lua" />
+	<action itemid="7439" script="liquids/berserk_potion.lua" />
+	<action itemid="7440" script="liquids/mastermind_potion.lua" />
+	<action itemid="7443" script="liquids/bullseye_potion.lua" />
+
+	<action itemid="7588" script="liquids/strong_health.lua" allowfaruse="1" />
+	<action itemid="7589" script="liquids/strong_mana.lua" allowfaruse="1" />
+	<action itemid="7590" script="liquids/great_mana.lua" allowfaruse="1" />
+	<action itemid="7591" script="liquids/great_health.lua" allowfaruse="1" />
+	<action itemid="7618" script="liquids/health_potion.lua" allowfaruse="1" />
+	<action itemid="7620" script="liquids/mana_potion.lua" allowfaruse="1" />
 	
 	<!-- Make Bread -->
 	<action itemid="2692" script="bread_system.lua" />

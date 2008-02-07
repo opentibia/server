@@ -1290,11 +1290,9 @@ void LuaScriptInterface::registerFunctions()
 	//getWorldUpTime()
 	lua_register(m_luaState, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
 
-	//broadcastMessage(message)
+	//broadcastMessage(<optional> messageClass, message)
 	lua_register(m_luaState, "broadcastMessage", LuaScriptInterface::luaBroadcastMessage);
-
-	//broadcastMessageEx(messageClass, message)
-	lua_register(m_luaState, "broadcastMessageEx", LuaScriptInterface::luaBroadcastMessageEx);
+	lua_register(m_luaState, "broadcastMessageEx", LuaScriptInterface::luaBroadcastMessage);
 
 	//getGuildId(guild_name)
 	lua_register(m_luaState, "getGuildId", LuaScriptInterface::luaGetGuildId);
@@ -3671,20 +3669,16 @@ int LuaScriptInterface::luaGetWorldUpTime(lua_State *L)
 
 int LuaScriptInterface::luaBroadcastMessage(lua_State *L)
 {
-	//broadcastMessage(message)
-	std::string message = popString(L);
-	g_game.anonymousBroadcastMessage(MSG_STATUS_WARNING, message);
-	lua_pushnumber(L, LUA_NO_ERROR);
-	return 1;
-}
+	//broadcastMessage(<optional> messageClass, message)
+	int32_t parameters = lua_gettop(L);
 
-int LuaScriptInterface::luaBroadcastMessageEx(lua_State *L)
-{
-	//broadcastMessageEx(messageClass, message)
 	std::string message = popString(L);
-	uint32_t type = popNumber(L);
+	uint32_t type = 0x12;
+	if(parameters >= 2){
+		type = popNumber(L);
+	}
 
-	if(type >= 0x12 && type <= 0x19){
+	if((type >= 0x11 && type <= 0x19) || type == 0x01 || type == 0x04){
 		g_game.anonymousBroadcastMessage((MessageClasses)type, message);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
