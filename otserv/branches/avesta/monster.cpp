@@ -284,7 +284,7 @@ void Monster::onCreatureEnter(Creature* creature)
 
 bool Monster::isFriend(const Creature* creature)
 {
-	if(hasMaster() && getMaster()->getPlayer()){
+	if(isSummon() && getMaster()->getPlayer()){
 		const Player* masterPlayer = getMaster()->getPlayer();
 		const Player* tmpPlayer = NULL;
 		if(creature->getPlayer()){
@@ -309,7 +309,7 @@ bool Monster::isFriend(const Creature* creature)
 
 bool Monster::isOpponent(const Creature* creature)
 {
-	if(hasMaster() && getMaster()->getPlayer()){
+	if(isSummon() && getMaster()->getPlayer()){
 		return true;
 	}
 	else{
@@ -498,7 +498,7 @@ bool Monster::activate(bool forced /*= false*/)
 
 bool Monster::deactivate(bool forced /*= false*/)
 {
-	if(hasMaster()){
+	if(isSummon()){
 		if(!isMasterInRange || getMaster()->idle() || forced){
 			isActivated = false;
 		}
@@ -692,7 +692,7 @@ void Monster::onThinkDefense(uint32_t interval)
 		}
 	}
 
-	if(!hasMaster() && (int32_t)summons.size() < mType->maxSummons){
+	if(!isSummon() && (int32_t)summons.size() < mType->maxSummons){
 		for(SummonList::iterator it = mType->summonList.begin(); it != mType->summonList.end(); ++it){
 			if(it->speed > defenseTicks){
 				resetTicks = false;
@@ -877,7 +877,7 @@ void Monster::pushCreatures(Tile* tile)
 
 bool Monster::getNextStep(Direction& dir)
 {
-	if(!isActivated){
+	if(!isActivated || getHealth() <= 0){
 		//we dont have anyone watching might aswell stop walking
 		eventWalk = 0;
 		return false;
@@ -1192,7 +1192,7 @@ void Monster::changeHealth(int32_t healthChange)
 
 bool Monster::challengeCreature(Creature* creature)
 {
-	if(hasMaster()){
+	if(isSummon()){
 		return false;
 	}
 	else{
@@ -1216,7 +1216,7 @@ bool Monster::convinceCreature(Creature* creature)
 		}
 	}
 
-	if(hasMaster()){
+	if(isSummon()){
 		if(getMaster()->getPlayer()){
 			return false;
 		}
@@ -1309,7 +1309,7 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 
 	fpp.targetDistance = mType->targetDistance;
 
-	if(hasMaster()){
+	if(isSummon()){
 		if(getMaster() == creature){
 			fpp.targetDistance = 2;
 		}

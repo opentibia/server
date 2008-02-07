@@ -380,13 +380,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(monster->canPushCreatures() && !monster->hasMaster()){
+			if(monster->canPushCreatures() && !monster->isSummon()){
 				Creature* creature;
 				for(uint32_t i = 0; i < creatures.size(); ++i){
 					creature = creatures[i];
 					if( !creature->getMonster() ||
 						!creature->isPushable() ||
-						(creature->getMonster()->hasMaster() && creature->getMonster()->getMaster()->getPlayer()))
+						(creature->getMonster()->isSummon() && creature->getMonster()->getMaster()->getPlayer()))
 					{
 						return RET_NOTPOSSIBLE;
 					}

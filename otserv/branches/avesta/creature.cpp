@@ -1246,7 +1246,6 @@ void Creature::onBlockHit(BlockType_t blockType)
 void Creature::addSummon(Creature* creature)
 {
 	//std::cout << "addSummon: " << this << " summon=" << creature << std::endl;
-	creature->setSummon(true);
 	creature->setDropLoot(false);
 	creature->setMaster(this);
 	creature->useThing2();
@@ -1258,7 +1257,6 @@ void Creature::removeSummon(const Creature* creature)
 	//std::cout << "removeSummon: " << this << " summon=" << creature << std::endl;
 	std::list<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
 	if(cit != summons.end()){
-		(*cit)->setSummon(false);
 		(*cit)->setDropLoot(false);
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();

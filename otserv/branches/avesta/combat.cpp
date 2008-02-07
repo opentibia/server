@@ -227,7 +227,7 @@ bool Combat::isPlayerCombat(const Creature* target)
 		return true;
 	}
 
-	if(target->hasMaster() && target->getMaster()->getPlayer()){
+	if(target->isSummon() && target->getMaster()->getPlayer()){
 		return true;
 	}
 
@@ -348,7 +348,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 				}
 			}
 
-			if(attacker->hasMaster()){
+			if(attacker->isSummon()){
 				if(const Player* masterAttackerPlayer = attacker->getMaster()->getPlayer()){
 					if(masterAttackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
 						return RET_YOUMAYNOTATTACKTHISPLAYER;
@@ -364,7 +364,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 			}
 		}
 
-		if(attacker->getPlayer() || (attacker->hasMaster() && attacker->getMaster()->getPlayer()) ){
+		if(attacker->getPlayer() || (attacker->isSummon() && attacker->getMaster()->getPlayer()) ){
 			//nopvp-zone
 			if(target->getPlayer() && target->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
 				return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
@@ -377,7 +377,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					}
 				}
 				
-				if(target->hasMaster() && target->getMaster()->getPlayer()){
+				if(target->isSummon() && target->getMaster()->getPlayer()){
 					if(!isInPvpZone(attacker, target)){
 						return RET_YOUMAYNOTATTACKTHISCREATURE;
 					}
@@ -628,7 +628,7 @@ void Combat::combatTileEffects(SpectatorVec& list, Creature* caster, Tile* tile,
 {
 	if(params.itemId != 0){
 		uint32_t itemId = params.itemId;
-		if(caster && (caster->getPlayer() || (caster->hasMaster() && caster->getMaster()->getPlayer())) ){
+		if(caster && (caster->getPlayer() || (caster->isSummon() && caster->getMaster()->getPlayer())) ){
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD_PVP){
 					itemId = ITEM_FIREFIELD_NOPVP;
@@ -1431,7 +1431,7 @@ void MagicField::onStepInField(Creature* creature)
 				if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE) ){
 					Creature* creature = g_game.getCreatureByID(owner);
 					if(creature){
-						if(creature->getPlayer() || (creature->hasMaster() && creature->getMaster()->getPlayer())){
+						if(creature->getPlayer() || (creature->isSummon() && creature->getMaster()->getPlayer())){
 							harmfulField = false;
 						}
 					}

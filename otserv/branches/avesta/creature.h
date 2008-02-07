@@ -204,11 +204,8 @@ public:
 
 	void setMaster(Creature* creature) {master = creature;}
 	Creature* getMaster() {return master;}
-	bool hasMaster() const {return master != NULL;}
+	bool isSummon() const {return master != NULL;}
 	const Creature* getMaster() const {return master;}
-
-	void setSummon(bool _summon) { summon = _summon;}
-	bool isSummon() const {return summon;}
 
 	virtual void addSummon(Creature* creature);
 	virtual void removeSummon(const Creature* creature);
