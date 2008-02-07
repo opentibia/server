@@ -72,18 +72,33 @@ function getDistanceBetween(pos1, pos2)
 end
 
 function getPlayerLookPos(cid)
-	local playerPos = getCreaturePosition(cid)
-	local lookDir = getPlayerLookDir(cid)
-	if(lookDir == NORTH) then
-		playerPos.y = playerPos.y-1
-	elseif(lookDir == SOUTH) then
-		playerPos.y = playerPos.y+1
-	elseif(lookDir == WEST) then
-		playerPos.x = playerPos.x-1
-	elseif(lookDir == EAST) then
-		playerPos.x = playerPos.x+1
+	return getPosByDir(getThingPos(cid), getPlayerLookDir(cid))
+end
+
+function getPosByDir(basePos, dir)
+	local pos = basePos
+	if(dir == NORTH) then
+		pos.y = pos.y-1
+	elseif(dir == SOUTH) then
+		pos.y = pos.y + 1
+	elseif(dir == WEST) then
+		pos.x = pos.x-1
+	elseif(dir == EAST) then
+		pos.x = pos.x+1
+	elseif(dir == NORTHWEST) then
+		pos.y = pos.y-1
+		pos.x = pos.x-1
+	elseif(dir == NORTHEAST) then
+		pos.y = pos.y-1
+		pos.x = pos.x+1
+	elseif(dir == SOUTHWEST) then
+		pos.y = pos.y+1
+		pos.x = pos.x-1
+	elseif(dir == SOUTHEAST) then
+		pos.y = pos.y+1
+		pos.x = pos.x+1
 	end
-	return playerPos
+	return pos
 end
 
 -- Functions made by Jiddo

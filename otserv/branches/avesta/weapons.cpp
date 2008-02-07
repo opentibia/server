@@ -488,11 +488,12 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		}
 	}
 
-	if(!player->hasFlag(PlayerFlag_HasInfiniteMana)){
-		int32_t manaCost = getManaCost(player);
 
-		if(manaCost > 0){
-			player->addManaSpent(manaCost);
+	int32_t manaCost = getManaCost(player);
+
+	if(manaCost > 0){
+		player->addManaSpent(manaCost);
+		if(!player->hasFlag(PlayerFlag_HasInfiniteMana)){
 			player->changeMana(-manaCost);
 		}
 	}

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,7 +27,7 @@
 #include "configmanager.h"
 
 #include <libxml/xmlmemory.h>
-#include <libxml/parser.h> 
+#include <libxml/parser.h>
 
 extern ConfigManager g_config;
 extern Monsters g_monsters;
@@ -52,15 +52,15 @@ bool Spawns::loadFromXml(const std::string& _filename)
 	if(isLoaded()){
 		return true;
 	}
-	
+
 	filename = _filename;
-	
+
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
-		xmlNodePtr root, spawnNode;		
+		xmlNodePtr root, spawnNode;
 		root = xmlDocGetRootElement(doc);
-		
+
 		if(xmlStrcmp(root->name,(const xmlChar*)"spawns") != 0){
 			xmlFreeDoc(doc);
 			return false;
@@ -175,7 +175,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-						
+
 						if(readXMLInteger(tmpNode, "direction", intValue)){
 							switch(intValue){
 								case 0: direction = NORTH; break;
@@ -200,7 +200,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-						
+
 						Npc* npc = new Npc(name);
 						if(!npc->isLoaded()){
 							delete npc;
@@ -208,7 +208,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-						
+
 						npc->setDirection(direction);
 						npc->setMasterPos(placePos, radius);
 
@@ -232,12 +232,12 @@ bool Spawns::loadFromXml(const std::string& _filename)
 		loaded = true;
 		return true;
 	}
-	
+
 	return false;
 }
 
 void Spawns::startup()
-{	
+{
 	if(!isLoaded() || isStarted() || spawnList.empty())
 		return;
 
@@ -263,6 +263,10 @@ void Spawns::clear()
 
 bool Spawns::isInZone(const Position& centerPos, int32_t radius, const Position& pos)
 {
+	if(radius == -1){
+		return true;
+	}
+
 	return ((pos.x >= centerPos.x - radius) && (pos.x <= centerPos.x + radius) &&
 			(pos.y >= centerPos.y - radius) && (pos.y <= centerPos.y + radius));
 }
@@ -304,7 +308,7 @@ bool Spawn::findPlayer(const Position& pos)
 {
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(list, pos, true);
+	g_game.getSpectators(list, pos);
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
@@ -392,7 +396,7 @@ void Spawn::checkSpawn()
 			++it;
 		}
 	}
-	
+
 	uint32_t spawnCount = 0;
 	for(SpawnMap::iterator it = spawnMap.begin(); it != spawnMap.end(); ++it) {
 		spawnId = it->first;
@@ -433,7 +437,7 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 		std::cout << "[Spawn::addMonster] Can not find " << _name << std::endl;
 		return false;
 	}
-	
+
 	if(_interval < interval){
 		interval = _interval;
 	}

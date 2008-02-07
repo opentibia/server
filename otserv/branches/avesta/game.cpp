@@ -99,7 +99,7 @@ Game::Game()
 	lightlevel = LIGHT_LEVEL_DAY;
 	light_state = LIGHT_STATE_DAY;
 
-	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL, 
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL,
 		boost::bind(&Game::checkLight, this)));
 #ifdef __ONECREATURE_EVENT_
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_CREATUREINTERVAL,
@@ -204,8 +204,11 @@ void Game::refreshMap()
 		for(int32_t i = downItemSize - 1; i >= 0; --i){
 			item = tile->downItems[i];
 			if(item){
+#ifndef __DEBUG__
+				// So the compiler doesn't generates warnings
+				internalRemoveItem(item);
+#else
 				ReturnValue ret = internalRemoveItem(item);
-#ifdef __DEBUG__
 				if(ret != RET_NOERROR){
 					std::cout << "Could not refresh item: " << item->getID() << "pos: " << tile->getPosition() << std::endl;
 				}
@@ -621,7 +624,7 @@ bool Game::playerMoveThing(uint32_t playerId, const Position& fromPos,
 	if(!player || player->isRemoved())
 		return false;
 
-	Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
+	//Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
 
 	uint8_t fromIndex = 0;
 	if(fromPos.x == 0xFFFF){
@@ -654,7 +657,7 @@ bool Game::playerMoveThing(uint32_t playerId, const Position& fromPos,
 				toCylinder->getPosition());
 		}
 	}
-	else if(Item* movingItem = thing->getItem()){
+	else if(thing->getItem()){
 		playerMoveItem(playerId, fromPos, spriteId, fromStackPos, toPos, count);
 	}
 
@@ -3788,7 +3791,7 @@ void Game::checkDecay()
 
 void Game::checkLight()
 {
-	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL, 
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL,
 		boost::bind(&Game::checkLight, this)));
 
 	light_hour = light_hour + light_hour_delta;

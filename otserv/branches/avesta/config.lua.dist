@@ -125,9 +125,9 @@ saveclientdebug = 0
 -- set to 0 to disable
 statustimeout = 5 * 60 * 1000
 
--- md5 passwords for accounts
--- options: yes, no
-md5passwords = "no"
+-- accounts password type
+-- options: plain, md5, sha1
+passwordtype = "plain"
 
 -- SQL type
 -- options: mysql, sqlite, odbc or pgsql

@@ -14,6 +14,8 @@
 	</item>
 	<item id="109" name="flowers">
 	</item>
+	<item id="194" name="grass">
+	</item>
 	<item id="231" name="sand">
 	</item>
 	<item id="293" name="grass">
@@ -21,6 +23,8 @@
 	<item id="294" article="a" name="pitfall">
 		<attribute key="decayTo" value="293"/>
 		<attribute key="duration" value="300"/>
+	</item>
+	<item id="280" name="grass">
 	</item>
 	<item id="351" name="dirt">
 	</item>
@@ -3108,28 +3112,16 @@
 		<attribute key="weight" value="100"/>
 	</item>
 	<item id="2025" article="a" name="pool">
-		<attribute key="decayTo" value="2026"/>
-		<attribute key="duration" value="45"/>
 	</item>
 	<item id="2026" article="a" name="pool">
-		<attribute key="decayTo" value="2027"/>
-		<attribute key="duration" value="45"/>
 	</item>
 	<item id="2027" article="a" name="pool">
-		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="60"/>
 	</item>
 	<item id="2028" article="a" name="pool">
-		<attribute key="decayTo" value="2029"/>
-		<attribute key="duration" value="45"/>
 	</item>
 	<item id="2029" article="a" name="pool">
-		<attribute key="decayTo" value="2030"/>
-		<attribute key="duration" value="45"/>
 	</item>
 	<item id="2030" article="a" name="pool">
-		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="60"/>
 	</item>
 	<item id="2031" article="a" name="waterskin">
 		<attribute key="weight" value="800"/>
@@ -11383,28 +11375,16 @@
 	<item id="4819" name="dirt">
 	</item>
 	<item id="4820" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4821" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4822" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4823" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4824" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4825" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4826" article="a" name="mountain">
 	</item>
@@ -18325,7 +18305,7 @@
 		<attribute key="slotType" value="legs"/>
 		<attribute key="description" value="They offer little protection but will at least provide some comfort and warmth."/>
 	</item>
-	<!-- Many items from 8.1 are still missing. So far, only the potions are here -->
+	<!-- Many items from 8.1 are still missing. -->
 	<item id="7588" article="a" name="strong health potion">
 		<attribute key="weight" value="200"/>
 		<attribute key="description" value="This potion can only be consumed by paladins and knights of level 50 or higher."/>
@@ -18338,7 +18318,7 @@
 		<attribute key="weight" value="220"/>
 		<attribute key="description" value="This potion can only be consumed by sorcerers and druids of level 80 or higher."/>
 	</item>
-	<item id="7951" article="a" name="great health potion">
+	<item id="7591" article="a" name="great health potion">
 		<attribute key="weight" value="220"/>
 		<attribute key="description" value="This potion can only be consumed by knights of level 80 or higher."/>
 	</item>
@@ -18359,6 +18339,34 @@
 	<item id="7636" article="an" name="empty potion flask">
 		<attribute key="weight" value="180"/>
 		<attribute key="description" value="Return it to a magic store for deposit."/>
+	</item>
+	<item id="7943" name="shallow water">
+	</item>
+	<item id="7944" name="shallow water">
+	</item>
+	<item id="7945" name="shallow water">
+	</item>
+	<item id="7946" name="shallow water">
+	</item>
+	<item id="7947" name="shallow water">
+	</item>
+	<item id="7948" name="shallow water">
+	</item>
+	<item id="7949" name="shallow water">
+	</item>
+	<item id="7950" name="shallow water">
+	</item>
+	<item id="7951" name="shallow water">
+	</item>
+	<item id="7952" name="shallow water">
+	</item>
+	<item id="7953" name="shallow water">
+	</item>
+	<item id="7954" name="shallow water">
+	</item>
+	<item id="7956" article="a" name="waterpolo ball">
+	</item>
+	<item id="8170" name="stairs">
 	</item>
 	<item id="20001" name="water">
 	</item>

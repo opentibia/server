@@ -308,7 +308,7 @@ bool Spawn::findPlayer(const Position& pos)
 {
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(list, pos, true);
+	g_game.getSpectators(list, pos);
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {

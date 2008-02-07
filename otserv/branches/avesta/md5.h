@@ -52,9 +52,11 @@
 #ifndef ___MD5_H___
 #define ___MD5_H___
 
+#include "definitions.h"
+
 /* Typedef a 32 bit type */
 #ifndef UINT4
-typedef unsigned long int UINT4;
+typedef uint32_t UINT4;
 #endif
 
 /* Data structure for MD5 (Message Digest) computation */

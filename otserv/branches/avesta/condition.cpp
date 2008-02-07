@@ -391,24 +391,16 @@ void ConditionAttributes::addCondition(Creature* creature, const Condition* addC
 		ticks = addCondition->getTicks();
 
 		const ConditionAttributes& conditionAttrs = static_cast<const ConditionAttributes&>(*addCondition);
+		//Remove the old condition
+		endCondition(creature, CONDITIONEND_ABORT);
 
-		if(Player* player = creature->getPlayer()){
-			for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-				player->setVarSkill((skills_t)i, -skills[i]);
-			}
-
-			for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
-				player->setVarStats((stats_t)i, -stats[i]);
-			}
-		}
-
+		//Apply the new one
 		memcpy(skills, conditionAttrs.skills, sizeof(skills));
 		memcpy(stats, conditionAttrs.stats, sizeof(stats));
 		memcpy(statsPercent, conditionAttrs.statsPercent, sizeof(statsPercent));
 
 		if(Player* player = creature->getPlayer()){
 			updateSkills(player);
-
 			updatePercentStats(player);
 			updateStats(player);
 		}
@@ -560,20 +552,34 @@ void ConditionAttributes::updatePercentStats(Player* player)
 
 void ConditionAttributes::updateSkills(Player* player)
 {
+	bool needUpdateSkills = false;
+
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		player->setVarSkill((skills_t)i, skills[i]);
+		if(skills[i]){
+			needUpdateSkills = true;
+			player->setVarSkill((skills_t)i, skills[i]);
+		}
 	}
 
-	player->sendSkills();
+	if(needUpdateSkills){
+		player->sendSkills();
+	}
 }
 
 void ConditionAttributes::updateStats(Player* player)
 {
+	bool needUpdateStats = false;
+
 	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
-		player->setVarStats((stats_t)i, stats[i]);
+		if(stats[i]){
+			needUpdateStats = true;
+			player->setVarStats((stats_t)i, stats[i]);
+		}
 	}
 
-	player->sendStats();
+	if(needUpdateStats){
+		player->sendStats();
+	}
 }
 
 bool ConditionAttributes::executeCondition(Creature* creature, int32_t interval)
@@ -583,20 +589,29 @@ bool ConditionAttributes::executeCondition(Creature* creature, int32_t interval)
 
 void ConditionAttributes::endCondition(Creature* creature, ConditionEnd_t reason)
 {
-	if(Player* player = creature->getPlayer()){
+	Player* player = creature->getPlayer();
+	if(player){
+		bool needUpdateSkills = false;
 		for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-			player->setVarSkill((skills_t)i, -skills[i]);
+			if(skills[i]){
+				needUpdateSkills = true;
+				player->setVarSkill((skills_t)i, -skills[i]);
+			}
+		}
+		if(needUpdateSkills){
+			player->sendSkills();
 		}
 
-		player->sendSkills();
-	}
-
-	if(Player* player = creature->getPlayer()){
+		bool needUpdateStats = false;
 		for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
-			player->setVarStats((stats_t)i, -stats[i]);
+			if(stats[i]){
+				needUpdateStats = true;
+				player->setVarStats((stats_t)i, -stats[i]);
+			}
 		}
-
-		player->sendStats();
+		if(needUpdateStats){
+			player->sendStats();
+		}
 	}
 }
 
@@ -1342,7 +1357,6 @@ bool ConditionDamage::addDamage(int32_t rounds, int32_t time, int32_t value)
 		return false;
 	}
 
-
 	//rounds, time, damage
 	for(int32_t i = 0; i < rounds; ++i){
 		IntervalInfo damageInfo;
@@ -1358,7 +1372,6 @@ bool ConditionDamage::addDamage(int32_t rounds, int32_t time, int32_t value)
 
 	return true;
 }
-
 
 bool ConditionDamage::init()
 {
@@ -1527,7 +1540,7 @@ bool ConditionDamage::updateCondition(const ConditionDamage* addCondition)
 void ConditionDamage::addCondition(Creature* creature, const Condition* addCondition)
 {
 	if(addCondition->getType() == conditionType){
-		const ConditionDamage& conditionDamage = static_cast<const ConditionDamage&>(*addCondition);		
+		const ConditionDamage& conditionDamage = static_cast<const ConditionDamage&>(*addCondition);
 
 		if(updateCondition(&conditionDamage)){
 			ticks = addCondition->getTicks();

@@ -107,7 +107,7 @@ public:
 
 	void setWorldType(WorldType_t type);
 	WorldType_t getWorldType() const {return worldType;}
-	int32_t getInFightTicks() {return inFightTicks;}
+	uint32_t getInFightTicks() {return inFightTicks;}
 	int32_t getExhaustionTicks() {return exhaustionTicks;}
 	int32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
 

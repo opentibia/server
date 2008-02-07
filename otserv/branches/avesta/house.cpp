@@ -73,7 +73,7 @@ void House::setHouseOwner(uint32_t guid)
 	if(houseOwner){
 		//send items to depot
 		transferToDepot();
-
+		
 		//[ added for beds system
 		// we need to remove players from beds
 		HouseBedItemList::iterator bit;

@@ -25,6 +25,7 @@
 #include "tools.h"
 #include "configmanager.h"
 #include "md5.h"
+#include "sha1.h"
 #include <sstream>
 #include <iomanip>
 
@@ -248,31 +249,55 @@ std::string urlEncode(const char* str)
 
 bool passwordTest(const std::string &plain, std::string &hash)
 {
-	if(g_config.getNumber(ConfigManager::PASSWORD_TYPE) == PASSWORD_TYPE_MD5){
+	switch(g_config.getNumber(ConfigManager::PASSWORD_TYPE)){
+	case PASSWORD_TYPE_PLAIN:
+	{
+		if(plain == hash){
+			return true;
+		}
+		break;
+	}
+	case PASSWORD_TYPE_MD5:
+	{
 		MD5_CTX m_md5;
 		std::stringstream hexStream;
-		std::string plainHash;
 
 		MD5Init(&m_md5, 0);
 		MD5Update(&m_md5, (const unsigned char*)plain.c_str(), plain.length());
 		MD5Final(&m_md5);
 
-		hexStream.flags(std::ios::hex);
+		hexStream.flags(std::ios::hex | std::ios::uppercase);
 		for(uint32_t i = 0; i < 16; ++i){
 			hexStream << std::setw(2) << std::setfill('0') << (uint32_t)m_md5.digest[i];
 		}
 
-		plainHash = hexStream.str();
-		std::transform(plainHash.begin(), plainHash.end(), plainHash.begin(), upchar);
 		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
-		if(plainHash == hash){
+		if(hexStream.str() == hash){
 			return true;
 		}
+		break;
 	}
-	else{
-		if(plain == hash){
+	case PASSWORD_TYPE_SHA1:
+	{
+		SHA1 sha1;
+		unsigned sha1Hash[5];
+		std::stringstream hexStream;
+
+		sha1.Input((const unsigned char*)plain.c_str(), plain.length());
+		sha1.Result(sha1Hash);
+
+		hexStream.flags(std::ios::hex | std::ios::uppercase);
+		for(uint32_t i = 0; i < 5; ++i){
+			hexStream << std::setw(8) << std::setfill('0') << (uint32_t)sha1Hash[i];
+		}
+
+		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
+		if(hexStream.str() == hash){
 			return true;
 		}
+
+		break;
+	}
 	}
 	return false;
 }

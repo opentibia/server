@@ -161,7 +161,7 @@ private:
 		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
 	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "");
 
-	MonsterType* loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
+	bool loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
 
 	bool loadLootContainer(xmlNodePtr, LootBlock&);
 	bool loadLootItem(xmlNodePtr, LootBlock&);

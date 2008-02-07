@@ -70,7 +70,7 @@ static unsigned char MD5_PADDING[64] = {
 
 /* ROTATE_LEFT rotates x left n bits */
 #ifndef ROTATE_LEFT
-#define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
+#define ROTATE_LEFT(x, n) ((((x) << (n)) & 0xffffffffU) | ((x) >> (32-(n))))
 #endif
 
 /* MD5_FF, MD5_GG, MD5_HH, and MD5_II transformations for rounds 1, 2, 3, and 4 */

@@ -90,6 +90,7 @@ enum ConditionAttr_t{
 	CONDITIONATTR_SKILLS = 22,
 	CONDITIONATTR_STATS = 23,
 	CONDITIONATTR_OUTFIT = 24,
+	CONDITIONATTR_PERIODDAMAGE = 25,
 
 	//reserved for serialization
 	CONDITIONATTR_END      = 254
@@ -138,6 +139,8 @@ protected:
 	ConditionId_t id;
 	int32_t ticks;
 	ConditionType_t conditionType;
+
+	virtual bool updateCondition(const Condition* addCondition);
 };
 
 class ConditionGeneric: public Condition
@@ -282,7 +285,7 @@ public:
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
-	void addDamage(uint32_t rounds, uint32_t time, int32_t value);
+	bool addDamage(int32_t rounds, uint32_t time, int32_t value);
 	bool doForceUpdate() const { return forceUpdate;}
 
 	//serialization
@@ -296,6 +299,8 @@ protected:
 	int32_t maxDamage;
 	int32_t minDamage;
 	int32_t startDamage;
+	int32_t periodDamage;
+	int32_t periodDamageTick;
 	int32_t tickInterval;
 
 	bool forceUpdate;
@@ -310,6 +315,7 @@ protected:
 
 	bool getNextDamage(int32_t& damage);
 	bool doDamage(Creature* creature, int32_t damage);
+	bool updateCondition(const ConditionDamage* addCondition);
 };
 
 class ConditionSpeed: public Condition

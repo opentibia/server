@@ -71,7 +71,8 @@
 
 enum passwordType_t{
 	PASSWORD_TYPE_PLAIN = 0,
-	PASSWORD_TYPE_MD5 = 1,
+	PASSWORD_TYPE_MD5,
+	PASSWORD_TYPE_SHA1,
 };
 
 #if defined __WINDOWS__ || defined WIN32

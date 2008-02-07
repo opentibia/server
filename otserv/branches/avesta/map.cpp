@@ -416,7 +416,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 								for(int lx = 0; lx < FLOOR_SIZE; ++lx){
 									if((nx + lx >= floorx1 && nx + lx <= floorx2) && (ny + ly >= floory1 && ny + ly <= floory2)){
 										if((tile = floor->tiles[(nx + lx) & FLOOR_MASK][(ny + ly) & FLOOR_MASK])){
-											for(int i = 0; i < tile->creatures.size(); ++i){
+											for(uint32_t i = 0; i < tile->creatures.size(); ++i){
 												creature = tile->creatures[i];
 												if(std::find(list.begin(), list.end(), creature) == list.end()){
 													list.push_back(creature);
@@ -792,7 +792,7 @@ bool Map::getPathTo(const Creature* creature, const Position& destPos,
 			listDir.push_back(SOUTH);
 		}
 	}
-	
+
 	return !listDir.empty();
 }
 //*********** AStarNodes *************

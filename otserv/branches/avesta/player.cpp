@@ -588,20 +588,21 @@ void Player::setVarStats(stats_t stat, int32_t modifier)
 		case STAT_MAXHITPOINTS:
 		{
 			if(getHealth() > getMaxHealth()){
-				changeHealth(getMaxHealth() - getHealth());
+				//Creature::changeHealth is called  to avoid sendStats()
+				Creature::changeHealth(getMaxHealth() - getHealth());
 			}
-
-			g_game.addCreatureHealth(this);
+			else{
+				g_game.addCreatureHealth(this);
+			}
 			break;
 		}
 
 		case STAT_MAXMANAPOINTS:
 		{
 			if(getMana() > getMaxMana()){
-				changeMana(getMaxMana() - getMana());
+				//Creature::changeMana is called  to avoid sendStats()
+				Creature::changeMana(getMaxMana() - getMana());
 			}
-
-			sendStats();
 			break;
 		}
 		default:
@@ -1584,7 +1585,7 @@ void Player::addManaSpent(uint32_t amount)
 {
 	if(amount != 0 && !hasFlag(PlayerFlag_NotGainMana)){
 		manaSpent += amount * g_config.getNumber(ConfigManager::RATE_MAGIC);
-		int reqMana = vocation->getReqMana(magLevel + 1);
+		uint32_t reqMana = vocation->getReqMana(magLevel + 1);
 
 		if(manaSpent >= reqMana){
 			manaSpent -= reqMana;
@@ -1615,6 +1616,7 @@ void Player::addExperience(uint32_t exp)
 		capacity += vocation->getCapGain();
 	}
 
+	bool needSendStats = false;
 	if(prevLevel != newLevel){
 		level = newLevel;
 		updateBaseSpeed();
@@ -1632,12 +1634,19 @@ void Player::addExperience(uint32_t exp)
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
+		needSendStats = true;
 	}
-	
-	uint64_t currLevelExp = Player::getExpForLevel(level);
-	levelPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
 
-	sendStats();
+	uint64_t currLevelExp = Player::getExpForLevel(level);
+	uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
+	if(newPercent != levelPercent){
+		levelPercent = newPercent;
+		needSendStats = true;
+	}
+
+	if(needSendStats){
+		sendStats();
+	}
 }
 
 uint32_t Player::getPercentLevel(uint32_t count, uint32_t nextLevelCount)
@@ -1912,7 +1921,7 @@ void Player::die()
 
 		lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
 
-		while(lostMana > manaSpent && magLevel > 0){
+		while((uint32_t)lostMana > manaSpent && magLevel > 0){
 			lostMana -= manaSpent;
 			manaSpent = vocation->getReqMana(magLevel);
 			magLevel--;
@@ -3474,7 +3483,7 @@ Skulls_t Player::getSkullClient(const Player* player) const
 			return SKULL_GREEN;
 		}
 	}
-	
+
 	return player->getSkull();
 }
 

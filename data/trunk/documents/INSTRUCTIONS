@@ -14,7 +14,14 @@ when a shovel is used in it.
 ====================================
 2. Water
 
----Under construction---
+To make water that you can swim through, you must use water IDs 4820-4825.
+
+To use borders that makes you with swimmable outfit, use borders 4828-4831(general)
+or borders 7943-7954(sand).
+
+Be aware when using those IDs, because you can walk over them.
+
+Remember to make the water as a PZ and Non-Logout zone.
 
 ====================================
 3. Doors and Keys
@@ -65,3 +72,10 @@ of that door is 1.
 6. Hidden holes(aka. pick holes)
 
 To make hidden holes on mud, use mud ID 383 and set action id 100 on it.
+
+====================================
+7. Underwater
+
+To make the underwater system work properly, use only underwater IDs set on movements.xml,
+and for the escape-teleport of it, set actionID 5005 on it, or any AID you want, depending
+of what you defined on movements.xml.

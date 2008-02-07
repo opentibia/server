@@ -76,6 +76,45 @@
 	<movevent event="StepIn" itemid="7360" function="onStepInField" />
 	<movevent event="AddItem" itemid="7360" function="onAddField" />
 
+	<!-- Swimming -->
+	<movevent event="StepIn" itemid="4828" script="swimming/north.lua" />
+	<movevent event="StepIn" itemid="4829" script="swimming/east.lua" />
+	<movevent event="StepIn" itemid="4830" script="swimming/south.lua" />
+	<movevent event="StepIn" itemid="4831" script="swimming/west.lua" />
+
+	<movevent event="StepIn" itemid="7943" script="swimming/north.lua" />
+	<movevent event="StepIn" itemid="7944" script="swimming/west.lua" />
+	<movevent event="StepIn" itemid="7945" script="swimming/south.lua" />
+	<movevent event="StepIn" itemid="7946" script="swimming/east.lua" />
+	<movevent event="StepIn" itemid="7947" script="swimming/south.lua" />
+	<movevent event="StepIn" itemid="7948" script="swimming/south.lua" />
+	<movevent event="StepIn" itemid="7949" script="swimming/north.lua" />
+	<movevent event="StepIn" itemid="7950" script="swimming/north.lua" />
+	<movevent event="StepIn" itemid="7951" script="swimming/south.lua" />
+	<movevent event="StepIn" itemid="7952" script="swimming/south.lua" />
+	<movevent event="StepIn" itemid="7953" script="swimming/north.lua" />
+	<movevent event="StepIn" itemid="7954" script="swimming/north.lua" />
+
+	<!-- Walkable waters -->
+	<movevent event="AddItem" itemid="4820" tileitem="1" script="water.lua" />
+	<movevent event="AddItem" itemid="4821" tileitem="1" script="water.lua" />
+	<movevent event="AddItem" itemid="4822" tileitem="1" script="water.lua" />
+	<movevent event="AddItem" itemid="4823" tileitem="1" script="water.lua" />
+	<movevent event="AddItem" itemid="4824" tileitem="1" script="water.lua" />
+	<movevent event="AddItem" itemid="4825" tileitem="1" script="water.lua" />
+
+	<!-- Underwater -->
+	<movevent event="StepIn" itemid="5405" script="underwater.lua" />
+	<movevent event="StepIn" itemid="5406" script="underwater.lua" />
+	<movevent event="StepIn" itemid="5407" script="underwater.lua" />
+	<movevent event="StepIn" itemid="5408" script="underwater.lua" />
+	<movevent event="StepIn" itemid="5409" script="underwater.lua" />
+	<movevent event="StepIn" itemid="5410" script="underwater.lua" />
+	<movevent event="StepIn" itemid="5743" script="underwater.lua" />
+	<movevent event="StepIn" itemid="5744" script="underwater.lua" />
+	<movevent event="StepIn" itemid="5764" script="underwater.lua" />
+	<movevent event="StepIn" actionid="5005" script="remove_drown.lua" /> <!-- Change the AID if you wish -->
+
 	<!-- Campfires -->
 	<movevent event="StepIn" itemid="1423" function="onStepInField" />
 	<movevent event="AddItem" itemid="1423" function="onAddField" />

@@ -381,7 +381,7 @@ bool Party::canUseSharedExperience(const Player* player) const
 		}
 	}
 
-	int32_t minLevel = (int32_t)std::ceil(((float)(highestLevel) * 2) / 3);
+	uint32_t minLevel = (int32_t)std::ceil(((float)(highestLevel) * 2) / 3);
 	if(player->getLevel() < minLevel){
 		return false;
 	}

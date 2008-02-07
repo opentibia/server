@@ -262,7 +262,7 @@ void Monster::onCreatureFound(Creature* creature, bool pushFront /*= false*/)
 			else{
 				targetList.push_back(creature);
 			}
-			
+
 			activate();
 		}
 	}
@@ -658,7 +658,7 @@ void Monster::onThinkTarget(uint32_t interval)
 		if(mType->changeTargetSpeed > 0){
 			targetChangeTicks += interval;
 
-			if(targetChangeTicks >= mType->changeTargetSpeed){
+			if(targetChangeTicks >= (uint32_t)mType->changeTargetSpeed){
 				targetChangeTicks = 0;
 
 				if(mType->changeTargetChance >= random_range(1, 100)){
@@ -804,7 +804,7 @@ void Monster::pushItems(Tile* tile)
 	//start from the end to minimize the amount of traffic
 	int32_t downItemSize = tile->downItems.size();
 	for(int32_t i = downItemSize - 1; i >= 0; --i){
-		assert(i >= 0 && i < tile->downItems.size());
+		assert(i >= 0 && i < (int32_t)tile->downItems.size());
 		Item* item = tile->downItems[i];
 		if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND)
 			|| item->hasProperty(BLOCKSOLID))){
@@ -960,7 +960,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
 	uint32_t tmpDist;
 
 	std::vector<Direction> dirList;
-	
+
 	if(creaturePos.y - centerPos.y >= 0){
 		tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, NORTH)){
@@ -1200,7 +1200,7 @@ bool Monster::challengeCreature(Creature* creature)
 		if(result){
 			targetChangeTicks = 0;
 		}
-		
+
 		return result;
 	}
 
