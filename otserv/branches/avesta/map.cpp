@@ -729,6 +729,11 @@ bool Map::getPathTo(const Creature* creature, const Position& destPos,
 					else{
 						//Does not exist in the open/closed list, create a new node
 						neighbourNode = nodes.createOpenNode();
+						if(!neighbourNode){
+							//seems we ran out of nodes
+							listDir.clear();
+							return false;
+						}
 					}
 
 					//This node is the best node so far with this state
@@ -800,8 +805,9 @@ AStarNodes::AStarNodes()
 
 AStarNode* AStarNodes::createOpenNode()
 {
-	if(curNode >= MAX_NODES)
+	if(curNode >= MAX_NODES){
 		return NULL;
+	}
 
 	uint32_t ret_node = curNode;
 	curNode++;
@@ -837,6 +843,7 @@ void AStarNodes::closeNode(AStarNode* node)
 {
 	uint32_t pos = GET_NODE_INDEX(node);
 	if(pos >= MAX_NODES){
+		assert(pos >= MAX_NODES);
 		std::cout << "AStarNodes. trying to close node out of range" << std::endl;
 		return;
 	}
@@ -848,6 +855,7 @@ void AStarNodes::openNode(AStarNode* node)
 {
 	uint32_t pos = GET_NODE_INDEX(node);
 	if(pos >= MAX_NODES){
+		assert(pos >= MAX_NODES);
 		std::cout << "AStarNodes. trying to open node out of range" << std::endl;
 		return;
 	}
