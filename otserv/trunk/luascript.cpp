@@ -2124,7 +2124,7 @@ int LuaScriptInterface::luaDoCreatureSay(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 
-	Creature* creature = env->getPlayerByUID(cid);
+	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
 		g_game.internalCreatureSay(creature, (SpeakClasses)type, std::string(text));
 		lua_pushnumber(L, LUA_NO_ERROR);
