@@ -199,7 +199,6 @@ void Creature::onThink(uint32_t interval)
 
 	if(followCreature){
 		walkUpdateTicks += interval;
-
 		if(forceUpdateFollowPath || walkUpdateTicks >= 2000){
 			walkUpdateTicks = 0;
 			forceUpdateFollowPath = false;
@@ -1000,10 +999,6 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 	fpp.needReachable = true;
 	fpp.targetDistance = 1;
 	fpp.maxSearchDist = 12;
-
-	if(!g_game.isViewClear(getPosition(), creature->getPosition(), true)){
-		fpp.fullPathSearch = true;
-	}
 }
 
 void Creature::getPathToFollowCreature()
@@ -1011,6 +1006,7 @@ void Creature::getPathToFollowCreature()
 	if(followCreature){
 		FindPathParams fpp;
 		getPathSearchParams(followCreature, fpp);
+
 		if(!hasFollowPath){
 			fpp.fullPathSearch = true;
 		}

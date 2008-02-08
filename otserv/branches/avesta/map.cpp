@@ -590,37 +590,7 @@ bool Map::isViewClear(const Position& fromPos, const Position& toPos, bool floor
 	return true;
 }
 
-bool Map::isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos)
-{
-	Position pos = creature->getPosition();
-
-	std::list<Direction>::const_iterator it;
-	for(it = listDir.begin(); it != listDir.end(); ++it) {
-		switch(*it){
-			case NORTH: pos.y -= 1; break;
-			case SOUTH: pos.y += 1; break;
-			case WEST: pos.x -= 1; break;
-			case EAST: pos.x += 1; break;
-			case NORTHEAST: pos.x += 1; pos.y -= 1; break;
-			case NORTHWEST: pos.x -= 1; pos.y -= 1; break;
-			case SOUTHEAST: pos.x += 1; pos.y += 1; break;
-			case SOUTHWEST: pos.x -= 1; pos.y += 1; break;
-		}
-
-		Tile* tile = getTile(pos);
-		if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
-			return false;
-		}
-	}
-
-	if(std::abs(destPos.x - pos.x) <= 1 && std::abs(destPos.y - pos.y) <= 1){
-		return true;
-	}
-
-	return false;
-}
-
-Tile* Map::isPositionValid(const Creature* creature, const Position& pos)
+Tile* Map::isValidPosition(const Creature* creature, const Position& pos)
 {
 	switch(creature->getWalkCache(pos)){
 		case 0: return NULL;
@@ -642,7 +612,7 @@ Tile* Map::isPositionValid(const Creature* creature, const Position& pos)
 bool Map::getPathTo(const Creature* creature, const Position& destPos,
 	std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/)
 {
-	if(isPositionValid(creature, destPos) == NULL){
+	if(isValidPosition(creature, destPos) == NULL){
 		return false;
 	}
 
@@ -708,7 +678,7 @@ bool Map::getPathTo(const Creature* creature, const Position& destPos,
 					outOfRange = true;
 				}
 
-				if(!outOfRange && (tile = isPositionValid(creature, pos))){
+				if(!outOfRange && (tile = isValidPosition(creature, pos))){
 					//The cost (g) for this neighbour
 					int32_t cost = nodes.getMapWalkCost(creature, n, tile, pos);
 					int32_t extraCost = nodes.getTileWalkCost(creature, tile);

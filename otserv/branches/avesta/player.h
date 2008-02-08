@@ -698,6 +698,7 @@ protected:
 	virtual uint32_t getConditionSuppressions() const { return conditionSuppressions; }
 	virtual uint16_t getLookCorpse() const;
 	virtual uint32_t getAttackSpeed();
+	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;
 	friend class LuaScriptInterface;

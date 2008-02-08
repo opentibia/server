@@ -141,8 +141,9 @@ private:
 	virtual void onEndCondition(ConditionType_t type);
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature);
 
-	bool canUseAttack(const Position& pos, const Creature* target);
-	bool canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval);
+	bool canUseAttack(const Position& pos, const Creature* target) const;
+	bool canUseSpell(const Position& pos, const Position& targetPos,
+		const spellBlock_t& sb, uint32_t interval);
 	bool getRandomStep(const Position& creaturePos, Direction& dir);
 	bool getDanceStep(const Position& creaturePos, Direction& dir);
 	bool isInSpawnRange(const Position& toPos);

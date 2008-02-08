@@ -3130,6 +3130,12 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 	return true;
 }
 
+bool Game::getPathTo(const Creature* creature, const Position& destPos,
+	std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/)
+{
+	return map->getPathTo(creature, destPos, listDir, maxSearchDist);
+}
+
 bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
 	uint32_t minDist, uint32_t maxDist, bool fullPathSearch /*= true*/,
 	bool targetMustBeReachable /*= true*/, int32_t maxSearchDist /*= -1*/)

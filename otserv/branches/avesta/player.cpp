@@ -2883,6 +2883,11 @@ bool Player::setAttackedCreature(Creature* creature)
 	return true;
 }
 
+void Player::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
+{
+	fpp.fullPathSearch = true;
+}
+
 uint32_t Player::getAttackSpeed()
 {
 	return 2000;

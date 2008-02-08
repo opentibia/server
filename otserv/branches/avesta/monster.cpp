@@ -615,7 +615,7 @@ void Monster::doAttacking(uint32_t interval)
 	}
 }
 
-bool Monster::canUseAttack(const Position& pos, const Creature* target)
+bool Monster::canUseAttack(const Position& pos, const Creature* target) const
 {
 	const Position& targetPos = target->getPosition();
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
@@ -627,7 +627,8 @@ bool Monster::canUseAttack(const Position& pos, const Creature* target)
 	return false;
 }
 
-bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval)
+bool Monster::canUseSpell(const Position& pos, const Position& targetPos,
+	const spellBlock_t& sb, uint32_t interval)
 {
 	if(!extraAttack){
 		if(sb.speed > attackTicks){
@@ -1312,6 +1313,10 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 	if(isSummon()){
 		if(getMaster() == creature){
 			fpp.targetDistance = 2;
+			fpp.fullPathSearch = true;
+		}
+		else{
+			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
 		}
 	}
 	else{
@@ -1319,6 +1324,10 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 			//Distance should be higher than visible viewport (defined in Map::maxViewportX/maxViewportY)
 			fpp.targetDistance = 10;
 			fpp.needReachable = false;
+			fpp.fullPathSearch = true;
+		}
+		else{
+			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
 		}
 	}
 }
