@@ -239,7 +239,7 @@ void BedItem::regeneratePlayer(Player* player) const
 	}
 
 	// regenerate 1 soul every 15 minutes
-	int32_t soulRegen = std::max(0, sleptTime/(60*15));
+	int32_t soulRegen = (int32_t)std::max((float)0, ((float)sleptTime/(60*15)));
 	player->changeSoul(soulRegen);
 }
 

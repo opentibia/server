@@ -228,7 +228,7 @@ public:
 	*/
 	bool isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck);
 
-	Tile* isPositionValid(const Creature* creature, const Position& pos);
+	Tile* isValidPosition(const Creature* creature, const Position& pos);
 
 	/**
 	* Get the path to a specific position on the map.
@@ -240,12 +240,6 @@ public:
 	*/
 	bool getPathTo(const Creature* creature, const Position& destPos,
 		std::list<Direction>& listDir, int32_t maxDist = -1);
-
-	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir,
-		const Position& destPos);
-
-	/* Map Width and Height - for Info purposes */
-	uint32_t mapWidth, mapHeight;
 
 	MapError_t getLastError() {return lasterrortype;}
 	int getErrorCode() {return lasterrorcode;}
@@ -262,6 +256,7 @@ public:
 	}
 
 protected:
+	uint32_t mapWidth, mapHeight;
 	MapError_t lasterrortype;
 	unsigned long lasterrorcode;
 	std::string spawnfile;
