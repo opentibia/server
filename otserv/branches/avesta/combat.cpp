@@ -1441,7 +1441,7 @@ void MagicField::onStepInField(Creature* creature)
 				}
 			}
 
-			creature->addCombatCondition(conditionCopy);
+			creature->addCondition(conditionCopy);
 		}
 	}
 }
