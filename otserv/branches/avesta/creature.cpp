@@ -520,11 +520,14 @@ void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, 
 {
 	onCreatureDisappear(creature, true);
 
-	if(creature != this){
-		if(isMapLoaded){
-			if(creature->getPosition().z == getPosition().z){
-				updateTileCache(creature->getTile(), creature->getPosition());
-			}
+	if(creature == this){
+		if(getMaster()){
+			getMaster()->removeSummon(this);
+		}
+	}
+	else if(isMapLoaded){
+		if(creature->getPosition().z == getPosition().z){
+			updateTileCache(creature->getTile(), creature->getPosition());
 		}
 	}
 }

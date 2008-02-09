@@ -1417,19 +1417,6 @@ bool ConditionDamage::startCondition(Creature* creature)
 	}
 
 	return true;
-
-	/*
-	if(delayed){
-		return true;
-	}
-
-	int32_t damage = 0;
-	if(getNextDamage(damage)){
-		return doDamage(creature, damage);
-	}
-
-	return false;
-	*/
 }
 
 bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
