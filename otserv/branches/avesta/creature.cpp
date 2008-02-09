@@ -521,7 +521,7 @@ void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, 
 	onCreatureDisappear(creature, true);
 
 	if(creature == this){
-		if(getMaster()){
+		if(getMaster() && !getMaster()->isRemoved()){
 			getMaster()->removeSummon(this);
 		}
 	}
