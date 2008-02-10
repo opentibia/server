@@ -1,4 +1,7 @@
--- Bank Class
+--[[
+Bank Class 0.1.1
+Nostradamus
+--]]
 Bank = {}
 Bank.__index = Bank
 

@@ -1,21 +1,7 @@
--- House Class
-
-local HOUSE_CONFIG =
-{
-	tilePrice         = 100, -- in GPs
-	needPremium       = true -- need premium to buy houses? true/false
-}
-	
-House = {
-	id = 0
-}
--- Constructor of the class
-function House:New(o)
-	local o = o or {}
-	setmetatable(o, self)
-	self.__index = self
-	return o
-end
+--[[
+House Class 0.2.1
+Nostradamus & Pedro B.
+--]]
 
 -- House constants
 CONST_GUEST_LIST = 256
@@ -24,7 +10,25 @@ CONST_SUBOWNER_LIST = 257
 -- Internal use
 LIST_FIRST = CONST_GUEST_LIST
 LIST_LAST = CONST_SUBOWNER_LIST
---
+
+
+local HOUSE_CONFIG =
+{
+	tilePrice	= 100, -- in GPs
+	needPremium = true -- need premium to buy houses? true/false
+}
+	
+local House = {
+	id = 0
+}
+
+-- Constructor of the class
+function House:New(o)
+	local o = o or {}
+	setmetatable(o, self)
+	self.__index = self
+	return o
+end
 
 	-- Independent functions
 	function House.getHouseByOwnerGUID(guid)
