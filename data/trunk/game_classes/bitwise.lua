@@ -9,7 +9,7 @@ This is only for educational purposes, if you really want to use bitwise operato
 ------------------------------------------------------------------------------------------------------------
 --]]
 
-Bitwise = {
+Bit = {
 	numberToBinary = function(number)
 		if (number < 3) then
 			if (number == 1) then
