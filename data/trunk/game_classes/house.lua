@@ -18,7 +18,7 @@ local HOUSE_CONFIG =
 	needPremium = true -- need premium to buy houses? true/false
 }
 	
-local House = {
+House = {
 	id = 0
 }
 

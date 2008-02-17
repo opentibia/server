@@ -34,7 +34,7 @@ Bit = {
     stringToBinary = function(str) 
 	    local ret = ""
 	    for w in string.gmatch(str, ".") do
-	        ret = ret .. numberToBinary(string.byte(W)) .. ' '
+	        ret = ret .. Bit.numberToBinary(string.byte(w)) .. ' '
 	    end
 	    return ret
 	end,

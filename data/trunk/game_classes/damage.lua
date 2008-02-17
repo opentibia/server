@@ -42,10 +42,10 @@ Damage.__index = Damage
 
 	-- Returns all the possible combinations between the desired level, magic level, min and max damages
 	function Damage:getSpellCombinations(level, magic, min, max)
-		for x in ipairs(LEVEL) do
-			for y in ipairs(MAGIC) do
-			    for z in ipairs(MIN) do
-			        for w in ipairs(MAX) do
+		for _,x in ipairs(LEVEL) do
+			for _,y in ipairs(MAGIC) do
+			    for _,z in ipairs(MIN) do
+			        for _,w in ipairs(MAX) do
 				        minA, maxA, avg = self:getSpellFormula(x, y, z, w)
 				        print('Level: ' .. x .. ' | Magic: ' .. y .. ' | Min: ' .. z .. ' | Max: ' .. w .. ' | minA: ' .. minA .. ' | maxA: ' .. maxA .. ' | avg: ' .. avg)
 			        end
@@ -56,6 +56,6 @@ Damage.__index = Damage
 	
 	-- Returns the maximum melee damage giving the factor (full attack, balanced or full defense), player level, player skill and the attack of the weapon
 	function Damage:getMelee(factor, playerLevel, playerSkill, weaponAttack)
-		return (weaponAttack / 20 * playerSkill + weaponAttack + playerSkill + playerLevel / 10) / 10 * factor
+		return (weaponAttack / 20 * playerSkill*2 + weaponAttack + playerLevel / 10) / 10 * factor
 	end
 		

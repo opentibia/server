@@ -341,6 +341,10 @@ bool Monster::selectTarget(Creature* creature)
 		return false;
 	}
 
+	if(creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters) && !hasMaster()){
+		return false;
+	}
+
 	if(isHostile() || hasMaster()){
 		setAttackedCreature(creature);
 	}

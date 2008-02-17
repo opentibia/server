@@ -14,7 +14,7 @@ Calculator.__index = Calculator
 
 	-- Returns the experience of the desired level
 	function Calculator:getLevelExp(level)
-		return (50 / 3) level ^ 3 - (100 * level ^ 2) + ((850 / 3) * level) - 200
+		return (50 / 3) * level ^ 3 - (100 * level ^ 2) + ((850 / 3) * level) - 200
 	end
 
 	-- Returns the experience left between a current level and a desired level
@@ -24,7 +24,7 @@ Calculator.__index = Calculator
 
 	-- Returns how much creatures the player have to kill to get the desired level beeing in the current level
 	function Calculator:getCreatureLeft(currentLevel, desiredLevel, creatureExp)
-		return self:getExpLeft(currentLevel, desiredLevel) / getConfigInfo(rateExp)) * (1 / creatureExp)
+		return (self:getExpLeft(currentLevel, desiredLevel) / getConfigInfo(rateExp)) * (1 / creatureExp)
 	end
 	
 	-- Returns how much the creature's exp represents in percent in the current level exp of a player
@@ -58,5 +58,5 @@ Calculator.__index = Calculator
 
 	-- Returns how much worms a player can buy with a desired amount of money
 	function Calculator:getWormsAmount(money)
-		return money * (6/5)
+		return money * 1.2
 	end
