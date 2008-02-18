@@ -8,6 +8,7 @@ local TYPE_BEER = 3
 local TYPE_SLIME = 4
 local TYPE_MANA_FLUID = 7
 local TYPE_LIFE_FLUID = 10
+local TYPE_OIL = 11
 local TYPE_WINE = 15
 local TYPE_MUD = 19
 local TYPE_RUM = 27
@@ -46,15 +47,17 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 
 		if(item.type == TYPE_MANA_FLUID) then
-			if(doTargetCombatMana(cid, cid, 80, 160, CONST_ME_MAGIC_BLUE) == LUA_ERROR) then
-				return FALSE
-			end
-			doCreatureSay(cid, "Aaaah...", TALKTYPE_ORANGE_1) 
-		elseif(item.type == TYPE_LIFE_FLUID) then
-			if(doTargetCombatHealth(cid, cid, COMBAT_HEALING, 40, 75, CONST_ME_MAGIC_BLUE) == LUA_ERROR) then
+			if(doPlayerAddMana(cid, math.random(80, 160)) == LUA_ERROR) then
 				return FALSE
 			end
 			doCreatureSay(cid, "Aaaah...", TALKTYPE_ORANGE_1)
+			doSendMagicEffect(topos, CONST_ME_MAGIC_BLUE)
+		elseif(item.type == TYPE_LIFE_FLUID) then
+			if(doPlayerAddHealth(cid, math.random(40, 75)) == LUA_ERROR) then
+				return FALSE
+			end
+			doCreatureSay(cid, "Aaaah...", TALKTYPE_ORANGE_1)
+			doSendMagicEffect(topos, CONST_ME_MAGIC_BLUE)
 		elseif(isInArray(alcoholDrinks, item.type) == TRUE) then
 			if(doTargetCombatCondition(0, cid, drunk, CONST_ME_NONE) == LUA_ERROR) then
 				return FALSE
@@ -72,7 +75,7 @@ function onUse(cid, item, frompos, item2, topos)
 	end
 
 	if(isCreature(item2.uid) == FALSE) then
-		if(item.type == TYPE_EMPTY and isCreature(item2.uid) == FALSE) then
+		if(item.type == TYPE_EMPTY) then
 			if(item.itemid == ITEM_RUM_FLASK and isInArray(DISTILLERY, item2.itemid) == TRUE) then
 				if(item2.actionid == DISTILLERY_FULL) then
 					doSetItemSpecialDescription(item2.uid, '')
@@ -82,7 +85,7 @@ function onUse(cid, item, frompos, item2, topos)
 					doPlayerSendCancel(cid, "You have to process the bunch into the distillery to get rum.")
 				end
 				return TRUE
-			end			
+			end
 
 			if(isItemFluidContainer(item2.itemid) == TRUE and item2.type ~= TYPE_EMPTY) then
 				doChangeTypeItem(item.uid, item2.type)
@@ -116,6 +119,12 @@ function onUse(cid, item, frompos, item2, topos)
 			end
 
 			doPlayerSendCancel(cid, "It is empty.")
+			return TRUE
+		end
+
+		if(item.type == TYPE_OIL and oilLamps[item2.itemid] ~= nil) then
+			doTransformItem(item2.uid, oilLamps[item2.itemid])
+			doChangeTypeItem(item.uid, TYPE_NONE)
 			return TRUE
 		end
 

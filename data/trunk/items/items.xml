@@ -9239,59 +9239,59 @@
 	<item id="3900" article="a" name="strange carving">
 	</item>
 	<item id="3901" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a wooden chair."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3902" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a sofa chair."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3903" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a red cushioned chair."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3904" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a green cushioned chair."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3905" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a tusk chair."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3906" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for an ivory chair."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3907" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a small trunk."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3908" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a coal basin."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3909" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a big table."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3910" article="a" name="furniture package">
 		<attribute key="description" value="It is a kit for a square table."/>
 		<attribute key="weight" value="2500"/>
 	</item>
-	<item id="3911" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a round table."/>
+	<item id="3902" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a small round table."/>
 		<attribute key="weight" value="2500"/>
 	</item>
-	<item id="3912" article="a" name="furniture package">
+	<item id="3903" article="a" name="furniture package">
 		<attribute key="description" value="It is a kit for a small table."/>
 		<attribute key="weight" value="2500"/>
 	</item>
+	<item id="3904" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a wooden chair."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3905" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a sofa chair."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3906" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a red cushioned chair."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3907" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a green cushioned chair."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3908" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a rocking chair."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3909" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for drawers."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3910" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a bookcase."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3911" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a pendulum clock."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3912" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a locker."/>
+		<attribute key="weight" value="2500"/>
+	</item>
 	<item id="3913" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a stone table."/>
+		<attribute key="description" value="It is a kit for a piano."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3914" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a tusk table."/>
+		<attribute key="description" value="It is a kit for a harp."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3915" article="a" name="furniture package">
@@ -9299,51 +9299,51 @@
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3916" article="a" name="furniture package">
-		<attribute key="description" value="It is empty."/>
+		<attribute key="description" value="It is a kit for a dresser."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3917" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a harp."/>
+		<attribute key="description" value="It is a kit for a rocking horse."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3918" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a bird cage."/>
+		<attribute key="description" value="It is a kit for a telescope."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3919" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a bamboo table."/>
+		<attribute key="description" value="It is a kit for a stone table."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3920" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a thick trunk."/>
+		<attribute key="description" value="It is a kit for a tusk table."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3921" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a drawer."/>
+		<attribute key="description" value="It is a kit for a bamboo table."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3922" article="a" name="furniture package">
-		<attribute key="description" value="It is empty."/>
+		<attribute key="description" value="It is a kit for a water-pipe."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3923" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a barrel."/>
+		<attribute key="description" value="It is a kit for a bird cage."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3924" article="a" name="furniture package">
-		<attribute key="description" value="It is empty."/>
+		<attribute key="description" value="It is a kit for a globe."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3925" article="a" name="furniture package">
-		<attribute key="description" value="It is empty."/>
+		<attribute key="description" value="It is a kit for an indoor plant."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3926" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a piano."/>
+		<attribute key="description" value="It is a kit for a bookcase."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3927" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a globe."/>
+		<attribute key="description" value="It is a kit for a wooden telescope."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3928" article="a" name="furniture package">
@@ -9351,43 +9351,41 @@
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3929" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a indoor plant."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3930" article="a" name="furniture package">
-		<attribute key="description" value="It is empty."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3931" article="a" name="furniture package">
 		<attribute key="description" value="It is a kit for a christmas tree."/>
 		<attribute key="weight" value="2500"/>
 	</item>
+	<item id="3930" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a tusk chair."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3931" article="a" name="furniture package">
+		<attribute key="weight" value="2500"/>
+	</item>
 	<item id="3932" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a dresser."/>
+		<attribute key="description" value="It is a kit for a bookcase."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3933" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a pendelum clock."/>
+		<attribute key="description" value="It is a kit for a bookcase."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3934" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a locker."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3935" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a trough."/>
-		<attribute key="weight" value="2500"/>
-	</item>
-	<item id="3936" article="a" name="furniture package">
 		<attribute key="description" value="It is a kit for a bamboo drawer."/>
 		<attribute key="weight" value="2500"/>
 	</item>
+	<item id="3935" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for an ivory chair."/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="3936" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a bookcase."/>
+		<attribute key="weight" value="2500"/>
+	</item>
 	<item id="3937" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a table lamp."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3938" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a large trunk."/>
+		<attribute key="description" value="It is a kit for a big table."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="3939" article="a" name="bag">
@@ -10804,76 +10802,101 @@
 	<item id="4607" name="rocks">
 	</item>
 	<item id="4608" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4609" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4610" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
+	</item>
+	<item id="4611" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
+	</item>
+	<item id="4612" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
+	</item>
+	<item id="4613" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
+	</item>
+	<item id="4614" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
+	</item>
+	<item id="4615" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
+	</item>
+	<item id="4616" name="shallow water">
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
+	</item>
+	<item id="4617" name="shallow water">
 		<attribute key="decayTo" value="4608"/>
 		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
-	<item id="4611" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="4612" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="4613" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="4614" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="4615" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="4616" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
-	<item id="4617" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-	</item>
 	<item id="4618" name="shallow water">
+		<attribute key="decayTo" value="4609"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4619" name="shallow water">
+		<attribute key="decayTo" value="4610"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4620" name="shallow water">
+		<attribute key="decayTo" value="4611"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4621" name="shallow water">
+		<attribute key="decayTo" value="4612"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4622" name="shallow water">
+		<attribute key="decayTo" value="4613"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4623" name="shallow water">
+		<attribute key="decayTo" value="4614"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4624" name="shallow water">
+		<attribute key="decayTo" value="4615"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
 	<item id="4625" name="shallow water">
+		<attribute key="decayTo" value="4616"/>
+		<attribute key="duration" value="1200"/>
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
@@ -11986,6 +12009,7 @@
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5088" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a water-pipe."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5089" article="a" name="butterfly conservation kit">
@@ -15497,7 +15521,8 @@
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="6373" article="a" name="furniture package">
-		<attribute key="weight" value="1000"/>
+		<attribute key="description" value="It is a kit for a mirror."/>
+		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="6374" name="gravel">
 	</item>
@@ -17379,9 +17404,11 @@
 	<item id="7235" article="a" name="shield">
 	</item>
 	<item id="7236" article="an" name="ice hole">
-		<attribute key="description" value="You can see a moving fish there."/>
+		<attribute key="description" value="You can see the movement of fish."/>
 	</item>
 	<item id="7237" article="an" name="ice hole">
+		<attribute key="decayTo" value="7200"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="7238" article="a" name="shield">
 	</item>
@@ -18304,6 +18331,93 @@
 		<attribute key="armor" value="0"/>
 		<attribute key="slotType" value="legs"/>
 		<attribute key="description" value="They offer little protection but will at least provide some comfort and warmth."/>
+	</item>
+	<item id="7465" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7466" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7467" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7468" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7469" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7470" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7471" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7472" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7473" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7474" article="a" name="sarcophagus">
+	</item>
+	<item id="7475" article="a" name="sarcophagus">
+	</item>
+	<item id="7476" article="a" name="flower">
 	</item>
 	<!-- Many items from 8.1 are still missing. -->
 	<item id="7588" article="a" name="strong health potion">

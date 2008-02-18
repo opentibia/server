@@ -12,7 +12,7 @@ Sand with ActionID 102 will have a 5% chance of giving a scarab coin
 when a shovel is used in it.
 
 ====================================
-2. Water
+2. Swimmable Water
 
 To make water that you can swim through, you must use water IDs 4820-4825.
 
@@ -71,7 +71,8 @@ of that door is 1.
 ====================================
 6. Hidden holes(aka. pick holes)
 
-To make hidden holes on mud, use mud ID 383 and set action id 100 on it.
+To make hidden holes on mud, simply add actionID 100 to a mud tile, then you can use a
+pick on it.
 
 ====================================
 7. Underwater
@@ -79,3 +80,9 @@ To make hidden holes on mud, use mud ID 383 and set action id 100 on it.
 To make the underwater system work properly, use only underwater IDs set on movements.xml,
 and for the escape-teleport of it, set actionID 5005 on it, or any AID you want, depending
 of what you defined on movements.xml.
+
+====================================
+8. Fishable water
+
+To make water you can fish through, use water with ID 4608 to ID 4616. Waters with ID 4617 to 4625
+will take a bit longer to be "fishable" after the server begins(nothing special).

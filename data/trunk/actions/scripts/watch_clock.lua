@@ -1,4 +1,5 @@
 function onUse(cid, item, frompos, item2, topos)
-    doPlayerSendTextMessage(cid, TEXTCOLOR_LIGHTGREEN, "The time is " .. getWorldTime() .. ".")
+	local tibiaTime = getTibiaTime()
+    doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "The time is " .. tibiaTime.hours .. ":" .. tibiaTime.minutes .. ".")
     return TRUE
 end

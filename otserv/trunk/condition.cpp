@@ -1513,16 +1513,16 @@ void ConditionDamage::endCondition(Creature* creature, ConditionEnd_t reason)
 
 bool ConditionDamage::updateCondition(const ConditionDamage* addCondition)
 {
+	if(addCondition->doForceUpdate()){
+		return true;
+	}
+
 	if(getTicks() == -1 && addCondition->getTicks() > 0){
 		return false;
 	}
 
 	if(addCondition->getTicks() <= getTicks()){
 		return false;
-	}
-
-	if(addCondition->doForceUpdate()){
-		return true;
 	}
 
 	if(addCondition->getTotalDamage() < getTotalDamage()){
