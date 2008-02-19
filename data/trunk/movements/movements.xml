@@ -113,7 +113,15 @@
 	<movevent event="StepIn" itemid="5743" script="underwater.lua" />
 	<movevent event="StepIn" itemid="5744" script="underwater.lua" />
 	<movevent event="StepIn" itemid="5764" script="underwater.lua" />
-	<movevent event="StepIn" actionid="5005" script="remove_drown.lua" /> <!-- Change the AID if you wish -->
+	<movevent event="StepOut" itemid="5405" script="underwater.lua" />
+	<movevent event="StepOut" itemid="5406" script="underwater.lua" />
+	<movevent event="StepOut" itemid="5407" script="underwater.lua" />
+	<movevent event="StepOut" itemid="5408" script="underwater.lua" />
+	<movevent event="StepOut" itemid="5409" script="underwater.lua" />
+	<movevent event="StepOut" itemid="5410" script="underwater.lua" />
+	<movevent event="StepOut" itemid="5743" script="underwater.lua" />
+	<movevent event="StepOut" itemid="5744" script="underwater.lua" />
+	<movevent event="StepOut" itemid="5764" script="underwater.lua" />
 
 	<!-- Campfires -->
 	<movevent event="StepIn" itemid="1423" function="onStepInField" />

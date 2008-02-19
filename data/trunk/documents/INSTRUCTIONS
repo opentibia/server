@@ -75,14 +75,7 @@ To make hidden holes on mud, simply add actionID 100 to a mud tile, then you can
 pick on it.
 
 ====================================
-7. Underwater
-
-To make the underwater system work properly, use only underwater IDs set on movements.xml,
-and for the escape-teleport of it, set actionID 5005 on it, or any AID you want, depending
-of what you defined on movements.xml.
-
-====================================
-8. Fishable water
+7. Fishable water
 
 To make water you can fish through, use water with ID 4608 to ID 4616. Waters with ID 4617 to 4625
 will take a bit longer to be "fishable" after the server begins(nothing special).
