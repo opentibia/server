@@ -122,7 +122,7 @@ function doPlayerAddQuestReward(cid, parameters)
 		local descr = getItemDescriptions(rItem.itemid)
 		local str = "You have found "
 		if(rItem.type > 1 and isItemStackable(rItem.itemid) == TRUE) then
-			str = str .. rItem.type .. " " .. rItem.plural
+			str = str .. rItem.type .. " " .. descr.plural
 		else
 			str = str .. descr.article .. " " .. descr.name
 		end
@@ -181,12 +181,7 @@ function doPlayerAddQuestReward(cid, parameters)
 		local rItem = getThing(containerEx)
 
 		local descr = getItemDescriptions(rItem.itemid)
-		local str = "You have found "
-		if(rItem.type > 1 and isItemStackable(rItem.itemid) == TRUE) then
-			str = str .. rItem.type .. " " .. rItem.plural
-		else
-			str = str .. descr.article .. " " .. descr.name
-		end
+		local str = "You have found " .. descr.article .. " " .. descr.name
 
 		local ret = doPlayerAddItemEx(cid, rItem.uid)
 		local failed = false
