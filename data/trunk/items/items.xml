@@ -6477,12 +6477,12 @@
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2844" article="a" name="dead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="3104"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2845" article="a" name="dead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 	</item>
 	<item id="2846" article="a" name="slain ghoul">
 		<attribute key="containerSize" value="10"/>
@@ -6640,18 +6640,18 @@
 	<item id="2880" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 	</item>
-	<item id="2881" article="a" name="dead dragon lord">
-		<attribute key="containerSize" value="8"/>
+	<item id="2881" article="a" name="dead dragon">
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="2882"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2882" article="a" name="dead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="2883"/>
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="2883" article="a" name="dead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -7705,17 +7705,17 @@
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3104" article="a" name="dead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="3105"/>
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3105" article="a" name="dead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="3106"/>
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3106" article="a" name="dead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -15221,17 +15221,17 @@
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="6306" article="a" name="slain undead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="6307"/>
 		<attribute key="duration" value="10"/>
 	</item>
 	<item id="6307" article="a" name="slain undead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="6308"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="6308" article="a" name="slain undead dragon">
-		<attribute key="containerSize" value="10"/>
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="6309"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -17101,22 +17101,22 @@
 	</item>
 	<item id="7090" name="frozen mud">
 	</item>
-	<item id="7091" article="a" name="dead frost dragon">
-		<attribute key="containerSize" value="10"/>
+	<item id="7091" article="a" name="dead dragon">
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="7092"/>
 		<attribute key="duration" value="10"/>
 	</item>
-	<item id="7092" article="a" name="dead frost dragon">
-		<attribute key="containerSize" value="10"/>
+	<item id="7092" article="a" name="dead dragon">
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="7093"/>
 		<attribute key="duration" value="900"/>
 	</item>
-	<item id="7093" article="a" name="dead frost dragon">
-		<attribute key="containerSize" value="10"/>
+	<item id="7093" article="a" name="dead dragon">
+		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="7094"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="7094" article="a" name="dead frost dragon">
+	<item id="7094" article="a" name="dead dragon">
 		<atrribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
@@ -18441,6 +18441,40 @@
 	</item>
 	<item id="7620" article="a" name="mana potion">
 		<attribute key="weight" value="180"/>
+	</item>
+	<item id="7621" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7623"/>
+		<attribute key="duration" value="10"/>
+	</item>
+	<item id="7622" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7624"/>
+		<attribute key="duration" value="10"/>
+	</item>
+	<item id="7623" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7626"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="7624" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7625"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="7625" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7627"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="7626" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7627"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="7627" article="a" name="dead dragon hatchling">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="7634" article="an" name="empty potion flask">
 		<attribute key="weight" value="200"/>

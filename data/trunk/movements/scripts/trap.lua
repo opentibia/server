@@ -25,3 +25,9 @@ function onRemoveItem(item, tile, pos)
 	end
 	return TRUE
 end
+
+function onAddItem(item, tileitem, pos)
+	doTransformItem(item.uid, item.itemid - 1)
+	doSendMagicEffect(pos, CONST_ME_POFF)
+	return TRUE
+end
