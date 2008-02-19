@@ -5,8 +5,9 @@ Jovial
 
 OBS:
 This is an example class of bitwise operators implementation, since it is already implemented, it is an alternative and a way to make it and understand it.
-This is only for educational purposes, if you really want to use bitwise operators, you can use the built-in functions already in OpenTibia project.
+This is only for educational purposes, if you really want to use bitwise operators, you can use the built-in functions already in this project.
 ------------------------------------------------------------------------------------------------------------
+This should NOT be added to global.lua as a class
 --]]
 
 Bit = {

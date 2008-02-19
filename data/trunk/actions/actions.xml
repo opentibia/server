@@ -85,13 +85,13 @@
 	<action itemid="7620" script="liquids/mana_potion.lua" allowfaruse="1" />
 	
 	<!-- Make Bread -->
-	<action itemid="2692" script="bread_system.lua" />
-	<action itemid="2694" script="bread_system.lua" />
-	<action itemid="2693" script="bread_system.lua" />
+	<action itemid="2692" script="flour.lua" />
+	<action itemid="2693" script="dough.lua" />
+	<action itemid="2694" script="wheat.lua" />
 
 	<!-- Make Rum -->
-	<action itemid="5467" script="rum_system.lua" />
-	<action itemid="5468" script="rum_system.lua" />
+	<action itemid="5467" script="bunch.lua" />
+	<action itemid="5468" script="fire_bug.lua" />
 	
 	<!-- Foods -->
 	<action itemid="2328" script="food.lua" />

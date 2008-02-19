@@ -1,6 +1,8 @@
 --[[
 Bank Class 0.1.1
 Nostradamus
+
+OBS: Transfer money to offline players does not works yet
 --]]
 Bank = {}
 Bank.__index = Bank

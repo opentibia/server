@@ -1,6 +1,9 @@
 --[[
 Tibia Calculator Class 0.1.1
 Nostradamus
+
+OBS: This is just a helpful library. If you feel that you need these functions, add the following line to global.lua:
+dofile(getDataDir() .. "game_classes/calculator.lua")
 --]]
 
 -- Global consts

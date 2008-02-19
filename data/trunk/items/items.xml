@@ -6452,13 +6452,13 @@
 	</item>
 	<item id="2839" article="a" name="dead dog">
 		<attribute key="weight" value="1000"/>
-		<attribute key="containerSize" value="5"/>
+		<attribute key="containerSize" value="2"/>
 		<attribute key="decayTo" value="2840"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="2840" article="a" name="dead dog">
 		<attribute key="weight" value="21000"/>
-		<attribute key="containerSize" value="5"/>
+		<attribute key="containerSize" value="2"/>
 		<attribute key="decayTo" value="2841"/>
 		<attribute key="duration" value="60"/>
 	</item>
@@ -7684,13 +7684,13 @@
 	</item>
 	<item id="3099" article="a" name="dead dog">
 		<attribute key="weight" value="1000"/>
-		<attribute key="containerSize" value="5"/>
+		<attribute key="containerSize" value="2"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="3100" article="a" name="dead dog">
 		<attribute key="weight" value="1000"/>
-		<attribute key="containerSize" value="5"/>
+		<attribute key="containerSize" value="2"/>
 	</item>
 	<item id="3101" article="a" name="dead dog">
 		<attribute key="weight" value="700"/>
@@ -7700,7 +7700,7 @@
 	</item>
 	<item id="3103" article="a" name="dead dog">
 		<attribute key="weight" value="10000"/>
-		<attribute key="containerSize" value="5"/>
+		<attribute key="containerSize" value="2"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>

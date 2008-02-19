@@ -3,16 +3,16 @@
 function onUse(cid, item, frompos, item2, topos)
 	if (item.uid == 1000) then
 		-- a magic sword
-		parameters = {reward = {2400}, storageValue = item.uid}
+		parameters = {reward = {2400}, storageValue = item.uid, itemName = getItemName(item.itemid)}
 	elseif (item.uid == 1001) then
 		-- 5 meats
-		parameters = {reward = {2666, 5}, storageValue = item.uid}
+		parameters = {reward = {2666, 5}, storageValue = item.uid, itemName = getItemName(item.itemid)}
 	elseif (item.uid == 1002) then
 		-- a key with actionId 2149
-		parameters = {reward = {2086, 1, 2149}, storageValue = item.uid}
+		parameters = {reward = {2086, 1, 2149}, storageValue = item.uid, itemName = getItemName(item.itemid)}
 	elseif (item.uid == 1003) then
 		-- a magic sword, 5 meats and a key with actionId 2149
-		parameters = {rewards = {{2400}, {2666, 5}, {2086, 1, 2149}}, storageValue = item.uid}
+		parameters = {rewards = {{2400}, {2666, 5}, {2086, 1, 2149}}, storageValue = item.uid, itemName = getItemName(item.itemid)}
 	else
 		return FALSE
 	end
@@ -26,38 +26,28 @@ function doPlayerAddQuestReward(cid, parameters)
 	local rewardProtection = parameters.rewardProtection
 	local requiredVocation = parameters.requiredVocation
 	local requiredSex = parameters.requiredSex
-	local requiredLevel = parameters.requiredLevel
-	local requiredMagicLevel = parameters.requiredMagicLevel
-	local requiredSoul = parameters.requiredSoul
+	local requiredLevel = parameters.requiredLevel or 0
+	local requiredMagicLevel = parameters.requiredMagicLevel or 0
+	local requiredSoul = parameters.requiredSoul or 0
 	local requiredStorageValue = parameters.requiredStorageValue
-	local premiumRequired = parameters.premiumRequired
+	local premiumRequired = parameters.premiumRequired or FALSE
 	local itemName = parameters.itemName
 	local storageValue = parameters.storageValue
-	local containerId = parameters.containerId
+	local containerId = parameters.containerId or 1987
 	local reward = parameters.reward
 	local rewards = parameters.rewards
-	local playerMagicEffect = parameters.playerMagicEffect
+	local playerMagicEffect = parameters.playerMagicEffect or CONST_ME_NONE
 	
 	if (rewardProtection ~= nil) then
 		if (getPlayerAccess(cid) >= rewardProtection) then
-			if (itemName ~= nil) then
-				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "This " .. itemName .. " is empty.")
-			else
-				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "This chest is empty.")
-			end
-			
+			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "This " .. itemName .. " is empty.")
 			return TRUE
 		end
 	end
 	
 	if (storageValue ~= nil) then
 		if (getPlayerStorageValue(cid, storageValue) > 0) then
-			if (itemName ~= nil) then
-				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "This " .. itemName .. " is empty.")
-			else
-				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "This chest is empty.")
-			end
-			
+			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "This " .. itemName .. " is empty.")
 			return TRUE
 		end
 	end
@@ -66,13 +56,11 @@ function doPlayerAddQuestReward(cid, parameters)
 		if (type(requiredVocation) == "table") then
 			if (isInArray(requiredVocation, getPlayerVocation(cid)) == FALSE) then
 				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Your vocation can not to take this reward.")
-				
 				return TRUE
 			end
 		else
 			if (getPlayerVocation(cid) ~= requiredVocation) then
 				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Your vocation can not to take this reward.")
-				
 				return TRUE
 			end
 		end
@@ -81,64 +69,37 @@ function doPlayerAddQuestReward(cid, parameters)
 	if (requiredSex ~= nil) then
 		if (getPlayerSex(cid) ~= requiredSex) then
 			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Your sex can not to take this reward.")
-			
 			return FALSE
 		end
 	end
-	
-	if (requiredLevel ~= nil) then
-		if (getPlayerLevel(cid) < requiredLevel) then
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought level to take this reward.")
-			
-			return FALSE
-		end
+
+	if (getPlayerLevel(cid) < requiredLevel) then
+		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought level to take this reward.")
+		return FALSE
 	end
-	
-	if (requiredMagicLevel ~= nil) then
-		if (getPlayerMagLevel(cid) < requiredMagicLevel) then
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought magic level to take this reward.")
-			
-			return FALSE
-		end
+
+	if (getPlayerMagLevel(cid) < requiredMagicLevel) then
+		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought magic level to take this reward.")
+		return FALSE
 	end
-	
-	if (requiredSoul ~= nil) then
-		if (getPlayerSoul(cid) < requiredSoul) then
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought soul to take this reward.")
-			
-			return FALSE
-		end
+
+	if (getPlayerSoul(cid) < requiredSoul) then
+		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought soul to take this reward.")
+		return FALSE
 	end
 	
 	if (requiredStorageValue ~= nil) then
 		if (getPlayerStorageValue(cid, requiredStorageValue) <= 0) then
 			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not can take this reward yet.")
-			
 			return FALSE
 		end
 	end
 	
-	if (premiumRequired ~= nil and premiumRequired >= 1) then
-		if (isPremium(cid) == FALSE) then
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "A premium account is required to take this reward.")
-			
-			return FALSE
-		end
+	if (premiumRequired ~= FALSE and isPremium(cid) == FALSE) then
+		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "A premium account is required to take this reward.")
+		return FALSE
 	end
-	
-	local leftSlot = getPlayerSlotItem(cid, CONST_SLOT_LEFT)
-	local rightSlot = getPlayerSlotItem(cid, CONST_SLOT_RIGHT)
-	local ammunitionSlot = getPlayerSlotItem(cid, CONST_SLOT_AMMO)
-	local backpackSlot = getPlayerSlotItem(cid, CONST_SLOT_BACKPACK)
-	
-	if (leftSlot.itemid > 0 and rightSlot.itemid > 0 and ammunitionSlot.itemid > 0) then
-		if (isContainer(backpackSlot.uid) == FALSE or getContainerCap(backpackSlot.uid) == getContainerSize(backpackSlot.uid)) then
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought room to take this reward.")
-			
-			return FALSE
-		end
-	end
-	
+
 	if (reward ~= nil and rewards == nil) then
 		if (reward[1] == nil) then
 			debugPrint("doPlayerAddQuestReward() - reward ID not found")
@@ -147,93 +108,111 @@ function doPlayerAddQuestReward(cid, parameters)
 			
 			return FALSE
 		end
-		
-		if (reward[2] == 0 or reward[2] == nil) then
-			reward[2] = 1
-		end
-		
-		if (reward[3] == nil) then
-			reward[3] = 0
-		end
+
+		reward[2] = reward[2] or 0
+		reward[3] = reward[3] or 0
 		
 		local rewardEx = doCreateItemEx(reward[1], reward[2])
-		local rewardWeight = getItemWeight(rewardEx)
-		local i = 1
-		
-		if (rewardWeight > getPlayerFreeCap(cid)) then
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought capacity to take this reward.")
-			
+		if(reward[3] > 0) then
+			doSetItemActionId(rewardEx, reward[3])
+		end
+
+		local rItem = getThing(rewardEx)
+
+		local descr = getItemDescriptions(rItem.itemid)
+		local str = "You have found "
+		if(rItem.type > 1 and isItemStackable(rItem.itemid) == TRUE) then
+			str = str .. rItem.type .. " " .. rItem.plural
+		else
+			str = str .. descr.article .. " " .. descr.name
+		end
+
+		local ret = doPlayerAddItemEx(cid, rItem.uid)
+		local failed = false
+		if(ret == RETURNVALUE_NOTENOUGHCAPACITY) then
+			str = str .. " weighing " .. getItemWeigh(rItem) .. " oz it's too heavy"
+			failed = true
+		elseif(ret == RETURNVALUE_NOTENOUGHROOM or ret == RETURNVALUE_NEEDEXCHANGE) then
+			str = str .. " but you do not have space to take it"
+			failed = true
+		elseif(ret == RETURNVALUE_CANNOTPICKUP) then
+			str = str .. " but you can not pick it up"
+			failed = true
+		end
+		str = str .. "."
+
+		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, str)
+		if(failed) then
+			doRemoveItem(rItem.uid)
 			return FALSE
 		end
-		
-		local rewardDescriptions = getItemDescriptions(reward[1])
-		
-		if (reward[2] == 1 or isItemRune(reward[1]) == TRUE or isItemFluidContainer(reward[1]) == TRUE) then
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You have found " .. rewardDescriptions.article .. " " ..  rewardDescriptions.name .. ".")
-		else
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You have found " .. reward[2] .. " " ..  rewardDescriptions.plural .. ".")
-		end
-		
-		local reward_ = doPlayerAddItem(cid, reward[1], reward[2])
-		
-		doSetItemActionId(reward_, reward[3])
 	else
-		if (containerId == nil) then
-			containerId = 1987
-		end
-		
-		local containerEx = doCreateItemEx(containerId, 1)
-		local containerWeight = getItemWeight(containerEx)
-		local rewardWeight = containerWeight
-		local i = 1
+		local containerEx = doCreateItemEx(containerId)
+		local tmpc = containerEx
+		local tmpc2 = {}
+		local reward = {}
 		
 		for i, j in ipairs(rewards) do
 			if (j[1] == nil) then
-				debugPrint("doPlayerAddQuestReward() - #" .. i .. ", reward ID not found")
-				
-				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Error. Please report to a gamemaster.")
-				
+				debugPrint("doPlayerAddQuestReward() - #" .. i .. ", reward ID not found")				
+				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Error. Please report to a gamemaster.")				
 				return FALSE
 			end
 			
-			if (j[2] == 0 or j[2] == nil) then
-				j[2] = 1
+			j[2] = j[2] or 0
+			j[3] = j[3] or 0
+
+			if(getContainerCap(tmpc) <= 1) then --Jewel case mostly
+				containerId = 1987
 			end
-			
-			rewardWeight = rewardWeight + getItemWeight(doCreateItemEx(j[1], j[2]))
+
+			-- Verify if we can add the next item. If we can't, create a new container and add it.
+			if((getContainerCap(tmpc) - getContainerSize(tmpc)) <= 1) then
+				tmpc2 = doAddContainerItem(tmpc, containerId)
+				tmpc = tmpc2
+			end
+
+			reward = doAddContainerItem(tmpc, j[1], j[2])
+			if(j[3] > 0) then
+				doSetItemActionId(reward, j[3])
+			end
 		end
 		
-		if (rewardWeight > getPlayerFreeCap(cid)) then
-			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You do not have enought capacity to take this reward.")
-			
+		local rItem = getThing(containerEx)
+
+		local descr = getItemDescriptions(rItem.itemid)
+		local str = "You have found "
+		if(rItem.type > 1 and isItemStackable(rItem.itemid) == TRUE) then
+			str = str .. rItem.type .. " " .. rItem.plural
+		else
+			str = str .. descr.article .. " " .. descr.name
+		end
+
+		local ret = doPlayerAddItemEx(cid, rItem.uid)
+		local failed = false
+		if(ret == RETURNVALUE_NOTENOUGHCAPACITY) then
+			str = str .. " weighing " .. getItemWeigh(rItem) .. " oz it's too heavy"
+			failed = true
+		elseif(ret == RETURNVALUE_NOTENOUGHROOM or ret == RETURNVALUE_NEEDEXCHANGE) then
+			str = str .. " but you do not have space to take it"
+			failed = true
+		elseif(ret == RETURNVALUE_CANNOTPICKUP) then
+			str = str .. " but you can not pick it up"
+			failed = true
+		end
+		str = str .. "."
+
+		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, str)
+		if(failed) then
+			doRemoveItem(rItem.uid)
 			return FALSE
 		end
-		
-		local containerDescriptions = getItemDescriptions(containerId)
-		
-		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You have found " .. containerDescriptions.article .. " " ..  containerDescriptions.name .. ".")
-		
-		for i, j in ipairs(rewards) do
-			if (j[2] == 0 or j[2] == nil) then
-				j[2] = 1
-			end
-			
-			if (j[3] == nil) then
-				j[3] = 0
-			end
-			
-			reward = doAddContainerItem(containerEx, j[1], j[2])
-			
-			doSetItemActionId(reward, j[3])
-		end
-		
-		doPlayerAddItemEx(cid, containerEx)
 	end
-	
-	if (playerMagicEffect ~= nil) then
+
+	if(playerMagicEffect ~= CONST_ME_NONE) then
 		doSendMagicEffect(getPlayerPosition(cid), playerMagicEffect)
 	end
-	
+
 	if (storageValue ~= nil) then
 		setPlayerStorageValue(cid, storageValue, 1)
 	end
