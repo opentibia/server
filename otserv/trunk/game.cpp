@@ -1448,9 +1448,22 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 	if(curType.type == newType.type){
 		//Both items has the same type so we can safely change id/subtype
 
-		if((item->isStackable() || item->hasCharges() ) && newCount == 0){
-			internalRemoveItem(item);
-			return NULL;
+		if(newCount == 0){
+			if(item->isStackable()){
+				internalRemoveItem(item);
+				return NULL;
+			}
+			else if(item->hasCharges()){
+				uint16_t newItemId = curType.decayTo;
+				if(newItemId == item->getID() || newItemId == newId){
+					item = transformItem(item, newItemId);
+					return item;
+				}
+				else{
+					internalRemoveItem(item);
+					return NULL;
+				}
+			}
 		}
 		else{
 			cylinder->postRemoveNotification(item, itemIndex, true);
