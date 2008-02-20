@@ -681,6 +681,7 @@ protected:
 #endif
 
 	void updateItemsLight(bool internal = false);
+	virtual int32_t getStepSpeed() const {return std::max((int32_t)55, getSpeed());}
 	void updateBaseSpeed(){
 		if(!hasFlag(PlayerFlag_SetMaxSpeed)){
 			baseSpeed = 220 + (2* (level - 1));

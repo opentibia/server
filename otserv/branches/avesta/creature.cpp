@@ -222,7 +222,7 @@ void Creature::onAttacking(uint32_t interval)
 		onAttacked();
 		attackedCreature->onAttacked();
 
-		if(g_game.isViewClear(getPosition(), attackedCreature->getPosition(), true)){
+		if(g_game.isSightClear(getPosition(), attackedCreature->getPosition(), true)){
 			doAttacking(interval);
 		}
 	}
@@ -292,7 +292,7 @@ bool Creature::startAutoWalk(std::list<Direction>& listDir)
 
 void Creature::addEventWalk()
 {
-	if(eventWalk == 0 && getBaseSpeed() > 0){
+	if(eventWalk == 0 && getStepSpeed() > 0){
 		//std::cout << "addEventWalk() - " << getName() << std::endl;
 
 		int64_t ticks = getEventStepTicks();
@@ -1430,22 +1430,20 @@ std::string Creature::getDescription(int32_t lookDistance) const
 	return str;
 }
 
-int Creature::getStepDuration() const
+int32_t Creature::getStepDuration() const
 {
-	int32_t duration = 0;
-
 	if(isRemoved()){
-		return duration;
+		return 0;
 	}
 
-	const Position& tilePos = getPosition();
-	Tile* tile = g_game.getTile(tilePos.x, tilePos.y, tilePos.z);
+	int32_t duration = 0;
+	const Tile* tile = getTile();
 	if(tile && tile->ground){
 		uint32_t groundId = tile->ground->getID();
-		uint16_t stepSpeed = Item::items[groundId].speed;
-
+		uint16_t groundSpeed = Item::items[groundId].speed;
+		uint32_t stepSpeed = getStepSpeed();
 		if(stepSpeed != 0){
-			duration =  (1000 * stepSpeed) / getSpeed();
+			duration = (1000 * groundSpeed) / stepSpeed;
 		}
 	}
 

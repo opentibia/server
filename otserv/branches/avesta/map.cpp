@@ -483,10 +483,10 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool 
 		return true;
 	}
 
-	return isViewClear(fromPos, toPos, false);
+	return isSightClear(fromPos, toPos, false);
 }
 
-bool Map::isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck)
+bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck)
 {
 	if(floorCheck && fromPos.z != toPos.z){
 		return false;

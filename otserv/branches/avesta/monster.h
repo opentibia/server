@@ -29,6 +29,8 @@ class Creature;
 class Game;
 class Spawn;
 
+typedef std::list<Creature*> CreatureList;
+
 class Monster : public Creature
 {
 private:
@@ -97,8 +99,12 @@ public:
 	bool searchTarget(bool randomize = false);
 	bool selectTarget(Creature* creature);
 
+	const CreatureList& getTargetList() {return targetList;}
+	const CreatureList& getFriendList() {return friendList;}
+
+	bool isTarget(Creature* creature);
+
 private:
-	typedef std::list<Creature*> CreatureList;
 	CreatureList targetList;
 	CreatureList friendList;
 
@@ -160,7 +166,6 @@ private:
 
 	bool isFriend(const Creature* creature);
 	bool isOpponent(const Creature* creature);
-	bool isTarget(Creature* creature);
 
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }

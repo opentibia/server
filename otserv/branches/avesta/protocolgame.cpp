@@ -2226,7 +2226,7 @@ void ProtocolGame::AddCreature(NetworkMessage* msg,const Creature* creature, boo
 	msg->AddByte(lightInfo.level);
 	msg->AddByte(lightInfo.color);
 
-	msg->AddU16(creature->getSpeed());
+	msg->AddU16(creature->getStepSpeed());
 #ifdef __SKULLSYSTEM__
 	msg->AddByte(player->getSkullClient(creature->getPlayer()));
 #else

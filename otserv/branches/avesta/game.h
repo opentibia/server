@@ -365,7 +365,7 @@ public:
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
-	bool isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor);
+	bool isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor);
 
 	bool getPathTo(const Creature* creature, const Position& destPos,
 		std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/);

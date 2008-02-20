@@ -620,7 +620,7 @@ bool Monster::canUseAttack(const Position& pos, const Creature* target) const
 	const Position& targetPos = target->getPosition();
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
 		if((*it).range != 0 && std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y)) <= (int32_t)(*it).range){
-			return g_game.isViewClear(pos, targetPos, true);
+			return g_game.isSightClear(pos, targetPos, true);
 		}
 	}
 

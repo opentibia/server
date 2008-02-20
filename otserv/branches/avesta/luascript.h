@@ -501,6 +501,8 @@ protected:
 
 	static int luaDoChallengeCreature(lua_State *L);
 	static int luaDoConvinceCreature(lua_State *L);
+	static int luaGetMonsterTargetList(lua_State *L);
+	static int luaGetMonsterFriendList(lua_State *L);
 	static int luaDoSetMonsterTarget(lua_State *L);
 	static int luaDoMonsterChangeTarget(lua_State *L);
 	static int luaDoAddCondition(lua_State *L);
@@ -543,6 +545,7 @@ protected:
 	static int luaGetItemDescriptions(lua_State *L);
 	static int luaGetItemWeight(lua_State *L);
 	static int luaGetItemIdByName(lua_State *L);
+	static int luaIsSightClear(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);

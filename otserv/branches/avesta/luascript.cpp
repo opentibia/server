@@ -1380,6 +1380,12 @@ void LuaScriptInterface::registerFunctions()
 	//doConvinceCreature(cid, target)
 	lua_register(m_luaState, "doConvinceCreature", LuaScriptInterface::luaDoConvinceCreature);
 
+	//getMonsterTargetList(cid)
+	lua_register(m_luaState, "getMonsterTargetList", LuaScriptInterface::luaGetMonsterTargetList);
+	
+	//getMonsterFriendList(cid)
+	lua_register(m_luaState, "getMonsterFriendList", LuaScriptInterface::luaGetMonsterFriendList);
+
 	//doSetMonsterTarget(cid, target)
 	lua_register(m_luaState, "doSetMonsterTarget", LuaScriptInterface::luaDoSetMonsterTarget);
 
@@ -1427,6 +1433,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//getCreatureOutfit(cid)
 	lua_register(m_luaState, "getCreatureOutfit", LuaScriptInterface::luaGetCreatureOutfit);
+
+	//getCreaturePos(cid)
+	lua_register(m_luaState, "getCreaturePos", LuaScriptInterface::luaGetCreaturePosition);
 
 	//getCreaturePosition(cid)
 	lua_register(m_luaState, "getCreaturePosition", LuaScriptInterface::luaGetCreaturePosition);
@@ -1493,6 +1502,9 @@ void LuaScriptInterface::registerFunctions()
 	//getItemIdByName(name)
 	lua_register(m_luaState, "getItemIdByName", LuaScriptInterface::luaGetItemIdByName);
 
+	//isSightClear(fromPos, toPos, floorCheck)
+	lua_register(m_luaState, "isSightClear", LuaScriptInterface::luaIsSightClear);
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 
@@ -1507,7 +1519,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//getDataDir()
 	lua_register(m_luaState, "getDataDir", LuaScriptInterface::luaGetDataDirectory);
-
+	
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
 	luaL_register(m_luaState, "bit", LuaScriptInterface::luaBitReg);
@@ -4799,6 +4811,84 @@ int LuaScriptInterface::luaDoConvinceCreature(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetMonsterTargetList(lua_State *L)
+{
+	//getMonsterTargetList(cid)
+
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Monster* monster = creature->getMonster();
+	if(!monster){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	lua_newtable(L);
+	uint32_t i = 0;
+	const CreatureList& targetList = monster->getTargetList();
+	for(CreatureList::const_iterator it = targetList.begin(); it != targetList.end(); ++it){
+		if(monster->isTarget(*it)){
+			uint32_t targetCid = env->addThing(*it);
+			lua_pushnumber(L, i);
+			lua_pushnumber(L, targetCid);
+			lua_settable(L, -3);
+			++i;
+		}
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaGetMonsterFriendList(lua_State *L)
+{
+	//getMonsterFriendList(cid)
+
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Monster* monster = creature->getMonster();
+	if(!monster){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	lua_newtable(L);
+	uint32_t i = 0;
+	Creature* friendCreature;
+	const CreatureList& friendList = monster->getFriendList();
+	for(CreatureList::const_iterator it = friendList.begin(); it != friendList.end(); ++it){
+		friendCreature = *it;
+		if(!friendCreature->isRemoved() && friendCreature->getPosition().z == monster->getPosition().z){
+			uint32_t friendCid = env->addThing(*it);
+			lua_pushnumber(L, i);
+			lua_pushnumber(L, friendCid);
+			lua_settable(L, -3);
+			++i;
+		}
+	}
+
+	return 1;
+}
+
 int LuaScriptInterface::luaDoSetMonsterTarget(lua_State *L)
 {
 	//doSetMonsterTarget(cid, target)
@@ -6153,6 +6243,19 @@ int LuaScriptInterface::luaGetItemIdByName(lua_State *L)
 	}
 
 	lua_pushnumber(L, itemid);
+	return 1;
+}
+
+int LuaScriptInterface::luaIsSightClear(lua_State *L)
+{
+	//isSightClear(fromPos, toPos, floorCheck)
+	PositionEx fromPos, toPos;
+	bool floorCheck = (popNumber(L) == 1);
+	popPosition(L, toPos);
+	popPosition(L, fromPos);
+
+	bool result = g_game.isSightClear(fromPos, toPos, floorCheck);
+	lua_pushnumber(L, (result ? LUA_TRUE : LUA_FALSE));
 	return 1;
 }
 

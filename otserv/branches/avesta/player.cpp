@@ -2885,6 +2885,7 @@ bool Player::setAttackedCreature(Creature* creature)
 
 void Player::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
 {
+	Creature::getPathSearchParams(creature, fpp);
 	fpp.fullPathSearch = true;
 }
 
@@ -2962,15 +2963,6 @@ void Player::setChaseMode(chaseMode_t mode)
 {
 	chaseMode_t prevChaseMode = chaseMode;
 	chaseMode = mode;
-
-	/*
-	if(mode == 1){
-		chaseMode = CHASEMODE_FOLLOW;
-	}
-	else{
-		chaseMode = CHASEMODE_STANDSTILL;
-	}
-	*/
 
 	if(prevChaseMode != chaseMode){
 		if(chaseMode == CHASEMODE_FOLLOW){

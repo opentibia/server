@@ -135,20 +135,31 @@ public:
 	virtual bool canSeeInvisibility() const { return false;}
 
 	int64_t getSleepTicks() const{
-		int64_t delay;
-		int stepDuration = getStepDuration();
-		if(lastMove != 0)
-			delay = (((int64_t)(lastMove)) + ((int64_t)(stepDuration))) - ((int64_t)(OTSYS_TIME()));
-		else
-			delay = 0;
-		return delay;
+		if(lastMove != 0){
+			int64_t stepDuration = getStepDuration();
+			int64_t delay = (((int64_t)(lastMove)) + ((int64_t)(stepDuration))) - ((int64_t)(OTSYS_TIME()));
+			return delay;
+		}
+
+		return 0;
 	}
 
-	int64_t getEventStepTicks() const;
-	int getStepDuration() const;
+	virtual int64_t getEventStepTicks() const;
+	int32_t getStepDuration() const;
+	virtual int32_t getStepSpeed() const {return getSpeed();}
 
-	uint32_t getSpeed() const {int32_t n = baseSpeed + varSpeed; return std::max(n, (int32_t)1);}
-	void setSpeed(int32_t varSpeedDelta){ varSpeed = varSpeedDelta; }
+	int32_t getSpeed() const {return baseSpeed + varSpeed;}
+	void setSpeed(int32_t varSpeedDelta)
+	{
+		int32_t oldSpeed = getSpeed();
+		varSpeed = varSpeedDelta;
+		if(getSpeed() <= 0){
+			stopEventWalk();
+		}
+		else if(oldSpeed <= 0 && !listWalkDir.empty()){
+			addEventWalk();
+		}
+	}
 
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
 	int getBaseSpeed() {return baseSpeed;}

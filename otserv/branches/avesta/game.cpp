@@ -3067,9 +3067,9 @@ bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool
 	return map->canThrowObjectTo(fromPos, toPos, checkLineOfSight, rangex, rangey);
 }
 
-bool Game::isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck)
+bool Game::isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck)
 {
-	return map->isViewClear(fromPos, toPos, floorCheck);
+	return map->isSightClear(fromPos, toPos, floorCheck);
 }
 
 bool Game::internalCreatureTurn(Creature* creature, Direction dir)
@@ -3148,7 +3148,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std:
 
 	uint32_t currentDist = std::max(std::abs(creaturePos.x - targetPos.x), std::abs(creaturePos.y - targetPos.y));
 	if(currentDist == maxDist){
-		if(!targetMustBeReachable || map->isViewClear(creaturePos, targetPos, true)){
+		if(!targetMustBeReachable || map->isSightClear(creaturePos, targetPos, true)){
 			return true;
 		}
 	}
@@ -3189,7 +3189,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std:
 
 					if(tmpWalkDist <= minWalkDist || tmpPos == creaturePos || minWalkDist == -1){
 
-						if(targetMustBeReachable && !isViewClear(tmpPos, targetPos, true)){
+						if(targetMustBeReachable && !isSightClear(tmpPos, targetPos, true)){
 							continue;
 						}
 
