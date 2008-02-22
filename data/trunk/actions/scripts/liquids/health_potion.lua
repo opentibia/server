@@ -19,6 +19,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return TRUE
 	end
 
+	doAddCondition(cid, exhaust)
 	doSendMagicEffect(getThingPos(item2.uid), CONST_ME_MAGIC_BLUE)
 	doCreatureSay(item2.uid, "Aaaah...", TALKTYPE_ORANGE_1) 
 	doTransformItem(item.uid, EMPTY_POTION)
