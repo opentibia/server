@@ -3,7 +3,6 @@
 	<!-- Amazons -->
 	<monster name="Amazon" file="Amazons/amazon.xml"/>
 	<monster name="Valkyrie" file="Amazons/valkyrie.xml"/>
-	<monster name="Valkyrie" file="Amazons/valkyrie.xml"/>
 	
 	<!-- Annelids -->
 	<monster name="Carrion Worm" file="Annelids/carrion worm.xml"/>
@@ -11,7 +10,7 @@
 	
 	<!-- Apes -->
 	<monster name="Kongra" file="Apes/kongra.xml"/>
-	<monster name="Merklin" file="Apes/merlkin.xml"/>
+	<monster name="Merlkin" file="Apes/merlkin.xml"/>
 	<monster name="Sibang" file="Apes/sibang.xml"/>
 	
 	<!-- Aracnids -->
@@ -160,7 +159,7 @@
 	<monster name="Dwarf Geomancer" file="Dwarves/dwarf geomancer.xml"/>
 	<monster name="Dwarf Guard" file="Dwarves/dwarf guard.xml"/>
 	<monster name="Dwarf Soldier" file="Dwarves/dwarf soldier.xml"/>
-	<monster name="Darf" file="Dwarves/dwarf.xml"/>
+	<monster name="Dwarf" file="Dwarves/dwarf.xml"/>
 	
 	<!-- Dworcs -->
 	<monster name="Dworc fleshhunter" file="Dworcs/dworc fleshhunter.xml"/>

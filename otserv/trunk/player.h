@@ -119,7 +119,7 @@ public:
 
 	static uint64_t getExpForLevel(int32_t level)
 	{
-		return (uint64_t)std::ceil((double)(50 * level * level * level)/3 - (100 * level * level) + ((850 * level) / 3) - 200);
+		return (uint64_t)std::ceil((double)((50*level/3 - 100)*level + 850/3)*level - 200);
 	}
 
 	uint32_t getGuildId() const {return guildId;}

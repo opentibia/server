@@ -77,7 +77,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		experience = currExpCount;
 	}
 	player->experience = experience;
-	player->levelPercent = Player::getPercentLevel(player->experience - currExpCount, Player::getExpForLevel(player->level + 1) - currExpCount);
+	player->levelPercent = Player::getPercentLevel(player->experience - currExpCount, nextExpCount - currExpCount);
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");
@@ -93,8 +93,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		manaSpent = 0;
 	}
 	player->manaSpent = manaSpent;
-	player->magLevelPercent = Player::getPercentLevel(player->manaSpent,
-		player->vocation->getReqMana(player->magLevel + 1));
+	player->magLevelPercent = Player::getPercentLevel(player->manaSpent, nextManaCount);
 	player->health = result->getDataInt("health");
 	player->healthMax = result->getDataInt("healthmax");
 	player->defaultOutfit.lookType = result->getDataInt("looktype");
