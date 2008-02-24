@@ -36,6 +36,7 @@ static void addLogLine(ProtocolAdmin* conn, eLogType type, int level, std::strin
 extern Game g_game;
 extern ConfigManager g_config;
 extern Ban g_bans;
+extern RSA* g_otservRSA;
 
 AdminProtocolConfig* g_adminConfig = NULL;
 
@@ -515,6 +516,14 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 									delete m_key_RSA1024XTEA;
 									m_key_RSA1024XTEA = NULL;
 									std::cout << "Can not load key from " << directory << str << std::endl;
+								}
+							}
+							else if(readXMLString(q, "use", str)){
+								if(strcasecmp(str.c_str(), "otserv") == 0){
+									m_key_RSA1024XTEA = g_otservRSA;
+								}
+								else{
+									std::cout << "Uknown RSA source " << str << std::endl;
 								}
 							}
 							else{

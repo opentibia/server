@@ -2,6 +2,13 @@
 <otadmin enabled="1">
 <security onlylocalhost="1" maxconnections="2" loginrequired="1" loginpassword="test" />
 <encryption required="0" >
-<!-- key type="RSA1024XTEA" file="rsakey.private" -->
+<!--
+Use this line to use RSA key from custom fiel
+<key type="RSA1024XTEA" file="rsakey.private" />
+ -->
+<!--
+Use this line to use the same key that OTServ uses for login packet encryption
+<key type="RSA1024XTEA" use="otserv" />
+-->
 </encryption>
 </otadmin>

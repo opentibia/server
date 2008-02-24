@@ -3,10 +3,9 @@
 
 AC_PREREQ(2.61)
 AC_INIT([otserv], 0.6)
-AM_AUTOMAKE_VERSION(1.10)
+AM_INIT_AUTOMAKE([1.10])
 AC_CONFIG_SRCDIR([raids.h])
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.
 AC_PROG_CXX
