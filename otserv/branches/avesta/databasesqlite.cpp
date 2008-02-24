@@ -111,7 +111,7 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 	if(!m_connected)
 		return false;
 
-	#ifdef __SQL_QUERY_DEBUG__
+	#ifdef __DEBUG_SQL__
 	std::cout << "SQLITE QUERY: " << query << std::endl;
 	#endif
 
@@ -142,7 +142,7 @@ DBResult* DatabaseSQLite::storeQuery(const std::string &query)
 	if(!m_connected)
 		return NULL;
 
-	#ifdef __SQL_QUERY_DEBUG__
+	#ifdef __DEBUG_SQL__
 	std::cout << "SQLITE QUERY: " << query << std::endl;
 	#endif
 

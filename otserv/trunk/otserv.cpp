@@ -111,7 +111,8 @@ int main(int argc, char *argv[])
 	std::cout << "::" << std::endl;
 
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ \
-	|| defined __DEBUG_LUASCRIPTS__ || defined __DEBUG_RAID__ || defined __DEBUG_NET__
+	|| defined __DEBUG_LUASCRIPTS__ || defined __DEBUG_RAID__ || defined __DEBUG_NET__ \
+	|| defined __DEBUG_SQL__
 
 	std::cout << ":: Debugging:";
 	#ifdef __DEBUG__MOVESYS__
@@ -131,6 +132,9 @@ int main(int argc, char *argv[])
 	#endif
 	#ifdef __DEBUG_NET__
 	std::cout << " NET-ASIO";
+	#endif
+	#ifdef __DEBUG_SQL__
+	std::cout << " SQL";
 	#endif
 	std::cout << std::endl;
 #endif

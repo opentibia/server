@@ -87,7 +87,7 @@ bool DatabaseMySQL::rollback()
 	if(!m_connected)
 		return false;
 
-	#ifdef __SQL_QUERY_DEBUG__
+	#ifdef __DEBUG_SQL__
 	std::cout << "ROLLBACK" << std::endl;
 	#endif
 
@@ -104,7 +104,7 @@ bool DatabaseMySQL::commit()
 	if(!m_connected)
 		return false;
 
-	#ifdef __SQL_QUERY_DEBUG__
+	#ifdef __DEBUG_SQL__
 	std::cout << "COMMIT" << std::endl;
 	#endif
 	if( mysql_commit(&m_handle) != 0){
@@ -120,7 +120,7 @@ bool DatabaseMySQL::executeQuery(const std::string &query)
 	if(!m_connected)
 		return false;
 
-	#ifdef __SQL_QUERY_DEBUG__
+	#ifdef __DEBUG_SQL__
 	std::cout << "MYSQL QUERY: " << query << std::endl;
 	#endif
 
@@ -153,7 +153,7 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 	if(!m_connected)
 		return NULL;
 
-	#ifdef __SQL_QUERY_DEBUG__
+	#ifdef __DEBUG_SQL__
 	std::cout << "MYSQL QUERY: " << query << std::endl;
 	#endif
 
