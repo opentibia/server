@@ -15,7 +15,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return TRUE
 	end
 
-	if(hasCondition(cid, CONDITION_EXHAUSTED)) then
+	if(hasCondition(cid, CONDITION_EXHAUSTED) == TRUE) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_YOUAREEXHAUSTED)
 		return TRUE
 	end

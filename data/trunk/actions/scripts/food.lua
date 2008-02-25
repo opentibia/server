@@ -20,7 +20,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return TRUE
 	end
 	doPlayerFeed(cid, size)
-	doRemoveItem(item.uid)
+	doRemoveItem(item.uid, 1)
 	doPlayerSay(cid, sound, TALKTYPE_ORANGE_1)
 	return TRUE
 

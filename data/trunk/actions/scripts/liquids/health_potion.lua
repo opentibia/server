@@ -10,13 +10,13 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	if(doPlayerAddHealth(item2.uid, math.random(MIN, MAX)) == LUA_ERROR) then
-		return FALSE
-	end
-
-	if(hasCondition(cid, CONDITION_EXHAUSTED)) then
+	if(hasCondition(cid, CONDITION_EXHAUSTED) == TRUE) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_YOUAREEXHAUSTED)
 		return TRUE
+	end
+
+	if(doPlayerAddHealth(item2.uid, math.random(MIN, MAX)) == LUA_ERROR) then
+		return FALSE
 	end
 
 	doAddCondition(cid, exhaust)
