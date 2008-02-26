@@ -4334,27 +4334,33 @@
 		<attribute key="type" value="mailbox"/>
 	</item>
 	<item id="2335" article="a" name="helmet ornament">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
 		<attribute key="weight" value="160"/>
 	</item>
-	<item id="2336" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="200"/>
+	<item id="2336" article="a" name="gem holder">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="80"/>
 	</item>
-	<item id="2337" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="500"/>
+	<item id="2337" article="a" name="right horn">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="140"/>
 	</item>
-	<item id="2338" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="500"/>
+	<item id="2338" article="a" name="left horn">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="140"/>
 	</item>
 	<item id="2339" article="a" name="damaged helmet">
-		<attribute key="description" value="This item seems to be a singlepart of a bigger helmet."/>
-		<attribute key="weight" value="2700"/>
+		<attribute key="description" value="This item seems to have several parts missing."/>
+		<attribute key="weight" value="1800"/>
 		<attribute key="armor" value="5"/>
 	</item>
-	<item id="2340" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="100"/>
+	<item id="2340" article="a" name="helmet piece">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="260"/>
 	</item>
-	<item id="2341" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="150"/>
+	<item id="2341" article="a" name="helmet adornment">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="180"/>
 	</item>
 	<item id="2342" article="a" name="helmet of the ancients">
 		<attribute key="description" value="The gem of the helmet is burned out and should be replaced."/>
@@ -4367,6 +4373,8 @@
 		<attribute key="weight" value="2760"/>
 		<attribute key="armor" value="11"/>
 		<attribute key="slotType" value="head"/>
+		<attribute key="duration" value="1800"/>
+		<attribute key="decayTo" value="2342"/>
 	</item>
 	<item id="2344" article="an" name="oil lamp">
 		<attribute key="weight" value="500"/>
@@ -18487,6 +18495,18 @@
 	<item id="7636" article="an" name="empty potion flask">
 		<attribute key="weight" value="180"/>
 		<attribute key="description" value="Return it to a magic store for deposit."/>
+	</item>
+	<item id="7759" article="a" value="small enchanted sapphire" plural="small enchanted sapphires">
+		<attribute key="weight" value="10"/>
+	</item>
+	<item id="7760" article="a" value="small enchanted ruby" plural="small enchanted rubies">
+		<attribute key="weight" value="10"/>
+	</item>
+	<item id="7761" article="a" value="small enchanted emerald" plural="small enchanted emeralds">
+		<attribute key="weight" value="10"/>
+	</item>
+	<item id="7762" article="a" value="small enchanted amethyst" plural="small enchanted amethysts">
+		<attribute key="weight" value="10"/>
 	</item>
 	<item id="7943" name="shallow water">
 	</item>

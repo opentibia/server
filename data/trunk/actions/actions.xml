@@ -686,5 +686,6 @@
 	
 	<!-- Others -->
 	<action itemid="2785" script="blueberry_bush.lua" />
+	<action itemid="2147" script="gems.lua" />
 	
 </actions>
