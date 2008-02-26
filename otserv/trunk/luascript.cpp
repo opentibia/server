@@ -2443,7 +2443,7 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 			}
 			else if(Creature* creature = thing->getCreature()){
 				if(Position::areInRange<1,1>(fromPos, toPos)){
-					g_game.internalMoveCreature(creature, fromTile, toTile);
+					g_game.internalMoveCreature(creature, fromTile, toTile, true);
 				}
 				else{
 					g_game.internalTeleport(creature, toPos);

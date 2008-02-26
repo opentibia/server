@@ -6237,19 +6237,19 @@
 	<item id="2789" article="a" name="brown mushroom" plural="brown mushrooms">
 		<attribute key="weight" value="20"/>
 	</item>
-	<item id="2790" name="mushrooms" plural="mushrooms">
+	<item id="2790" article="a" name="orange mushroom" plural="orange mushrooms">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="2791" name="mushrooms" plural="mushrooms">
+	<item id="2791" article="a" name="wood mushroom" plural="wood mushrooms">
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2792" article="a" name="dark mushroom" plural="dark mushrooms">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="2793" name="mushrooms" plural="mushrooms">
+	<item id="2793" name="some mushrooms" plural="some mushrooms">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="2794" name="mushrooms" plural="mushrooms">
+	<item id="2794" name="some mushrooms" plural="some mushrooms">
 		<attribute key="weight" value="10"/>
 	</item>
 	<item id="2795" article="a" name="fire mushroom" plural="fire mushrooms">
