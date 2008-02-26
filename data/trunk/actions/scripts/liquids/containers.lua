@@ -34,6 +34,9 @@ setConditionParam(poison, CONDITION_PARAM_STARTVALUE, -5) -- The damage the cond
 setConditionParam(poison, CONDITION_PARAM_TICKINTERVAL, 4000) -- Delay between damages
 setConditionParam(poison, CONDITION_PARAM_FORCEUPDATE, TRUE) -- Re-update condition when adding it(ie. min/max value)
 
+local exhaust = createConditionObject(CONDITION_EXHAUSTED)
+setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))
+
 function onUse(cid, item, frompos, item2, topos)
 	if(topos.x == 31 and topos.y == 31 and topos.z == 7) then
 		item2 = item
@@ -43,6 +46,11 @@ function onUse(cid, item, frompos, item2, topos)
 	if(item2.uid == cid) then -- Player is using on himself
 		if(item.type == TYPE_EMPTY) then
 			doPlayerSendCancel(cid, "It is empty.")
+			return TRUE
+		end
+
+		if(hasCondition(cid, CONDITION_EXHAUSTED) == TRUE) then
+			doPlayerSendDefaultCancel(cid, RETURNVALUE_YOUAREEXHAUSTED)
 			return TRUE
 		end
 
@@ -70,6 +78,7 @@ function onUse(cid, item, frompos, item2, topos)
 		else
 			doCreatureSay(cid, "Glup.", TALKTYPE_ORANGE_1)
 		end
+		doAddCondition(cid, exhaust)
 		doChangeTypeItem(item.uid, TYPE_EMPTY)
 		return TRUE
 	end
