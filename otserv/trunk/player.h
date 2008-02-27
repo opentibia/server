@@ -356,11 +356,13 @@ public:
 		{if(client) client->sendCreatureOutfit(creature, outfit);}
 	void sendCreatureChangeVisible(const Creature* creature, bool visible)
 		{
-			if(visible){
-				client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
-			}
-			else{
-				client->sendCreatureInvisible(creature);
+			if(client){
+				if(visible){
+					client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
+				}
+				else{
+					client->sendCreatureInvisible(creature);
+				}
 			}
 		}
 	void sendCreatureLight(const Creature* creature)
