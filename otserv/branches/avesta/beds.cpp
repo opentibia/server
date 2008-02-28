@@ -124,10 +124,17 @@ bool BedItem::findPartner()
 	return false;
 }
 
-bool BedItem::canUse(Player* player) const
+bool BedItem::canUse(Player* player)
 {
-	if((house == NULL) || (partner == NULL) || (sleeperGUID != 0)) {
+	if((house == NULL) || (sleeperGUID != 0)) {
 		return false;
+	}
+
+	//Sometimes the partner of the bed could not be found when loading the map
+	//This happens because the tile of the first partner was loaded, but the second wasn't
+	//Then let's verify if the bed really has the partner.
+	if(partner == NULL){
+		return findPartner();
 	}
 
 	// todo: prem check?
@@ -218,7 +225,7 @@ void BedItem::regeneratePlayer(Player* player) const
 	{
 	    // regenerate 1 health and 1 mana every 30 seconds that the player had food for
 		int32_t regen;
-		
+
 		if(condition->getTicks() != -1) {
 			regen = std::min((condition->getTicks()/1000), sleptTime) / 30;
 			int32_t newRegenTicks = condition->getTicks() - (regen*30000);

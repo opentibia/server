@@ -149,7 +149,7 @@ Item::Item(const Item &i) :
 
 	m_attributes = i.m_attributes;
 	if(i.m_firstAttr){
-		m_firstAttr = new Attribute(*i.m_firstAttr); 
+		m_firstAttr = new Attribute(*i.m_firstAttr);
 	}
 }
 
@@ -158,9 +158,9 @@ Item* Item::clone() const
 	Item* _item = Item::CreateItem(id, count);
 	_item->m_attributes = m_attributes;
 	if(m_firstAttr){
-		_item->m_firstAttr = new Attribute(*m_firstAttr); 
+		_item->m_firstAttr = new Attribute(*m_firstAttr);
 	}
-	
+
 	return _item;
 }
 
@@ -654,7 +654,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.blockSolid && (!it.moveable || getUniqueId() != 0))
 				return true;
 			break;
-		
+
 		case SUPPORTHANGABLE:
 			if(it.isHorizontal || it.isVertical)
 				return true;

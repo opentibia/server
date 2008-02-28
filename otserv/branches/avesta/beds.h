@@ -37,7 +37,7 @@ class BedItem : public Item
 public:
 	BedItem(uint16_t id);
 	virtual ~BedItem();
-	
+
 	virtual BedItem* getBed(){ return this; }
 	virtual const BedItem* getBed() const { return this; }
 
@@ -49,34 +49,34 @@ public:
 
     virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream);
-	
+
 	//override
 	virtual bool canRemove() const {return (house == NULL); }
-	
-	
+
+
 	// mutator / accessor for sleeperGUID
 	uint32_t getSleeper() const { return sleeperGUID; }
 	void setSleeper(uint32_t guid){ sleeperGUID = guid; }
-	
+
 	// mutator / accessor for sleepStart
 	time_t getSleepStart() const { return sleepStart; }
 	void setSleepStart(time_t now){ sleepStart = now; }
-	
+
 	// mutator / accessor for house
 	House* getHouse() const { return house; }
 	void setHouse(House* h){ house = h; }
-	
+
 	// can a player even use the bed? :o
-	bool canUse(Player* player) const;
-	
+	bool canUse(Player* player);
+
 	// player is sleeping in the bed
 	void sleep(Player* player);
 	// player is waking up or being kicked because the house is sold.
 	void wakeUp(Player* player);
-	
+
 	// find the partner bed item
 	bool findPartner();
-	
+
 	// should I make a partner accessor/mutator?
 
 protected:
@@ -104,7 +104,7 @@ class Beds
 {
 public:
 	~Beds(){}
-	
+
 	static Beds& instance();
 
 	BedItem* getBedBySleeper(uint32_t guid);
