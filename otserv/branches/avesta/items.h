@@ -55,6 +55,7 @@ enum ItemTypes_t {
 	ITEM_TYPE_DOOR,
 	ITEM_TYPE_MAGICFIELD,
 	ITEM_TYPE_TELEPORT,
+	ITEM_TYPE_BED,
 	ITEM_TYPE_LAST
 };
 
@@ -155,12 +156,11 @@ public:
 	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
 	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
-	
+
 	//[ added for beds system
-	bool isBed() const {return isBedItem;}
-	bool isBedItem;
+	bool isBed() const {return type == ITEM_TYPE_BED;}
+
 	Direction bedPartnerDir;
-	//uint16_t transformToOnUse;
 	uint16_t maleSleeperID;
 	uint16_t femaleSleeperID;
 	uint16_t noSleeperID;

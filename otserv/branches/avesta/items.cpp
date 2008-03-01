@@ -113,7 +113,6 @@ ItemType::ItemType()
 
 	replaceable = true;
 	//[ added for beds system
-	isBedItem = false;
 	bedPartnerDir = NORTH;
 	maleSleeperID = 100;
 	femaleSleeperID = 100;
@@ -434,6 +433,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(strcasecmp(strValue.c_str(), "trashholder") == 0){
 										it.type = ITEM_TYPE_TRASHHOLDER;
 									}
+									//[ added for beds system
+									else if(strcasecmp(strValue.c_str(), "bed") == 0){
+										it.type = ITEM_TYPE_BED;
+									}
+									//]
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown type " << strValue  << std::endl;
 									}
@@ -1037,12 +1041,6 @@ bool Items::loadFromXml(const std::string& datadir)
 								}
 							}
 							//[ added for beds system
-							else if(strcasecmp(strValue.c_str(), "bed") == 0)
-							{
-								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
-									it.isBedItem = (intValue != 0);
-								}
-							}
 							else if(strcasecmp(strValue.c_str(), "partnerDirection") == 0)
 							{
 								if(readXMLInteger(itemAttributesNode, "value", intValue)) {

@@ -2403,12 +2403,12 @@
 		<attribute key="containerSize" value="18"/>
 	</item>
 	<item id="1754" article="a" name="bed">
-		<attribute key="bed" value="1" />
+		<attribute key="type" value="bed" />
 		<attribute key="partnerDirection" value="2" />
 		<attribute key="maleSleeper" value="1762" />
 	</item>
 	<item id="1755" article="a" name="bed">
-		<attribute key="bed" value="1" />
+		<attribute key="type" value="bed" />
 		<attribute key="partnerDirection" value="0" />
 		<attribute key="maleSleeper" value="1763" />
 	</item>
@@ -2425,12 +2425,12 @@
 	<item id="1761" article="a" name="bed">
 	</item>
 	<item id="1762" article="a" name="bed">
-		<attribute key="bed" value="1" />
+		<attribute key="type" value="bed" />
 		<attribute key="partnerDirection" value="2" />
 		<attribute key="noSleeper" value="1754" />
 	</item>
 	<item id="1763" article="a" name="bed">
-		<attribute key="bed" value="1" />
+		<attribute key="type" value="bed" />
 		<attribute key="partnerDirection" value="0" />
 		<attribute key="noSleeper" value="1755" />
 	</item>
