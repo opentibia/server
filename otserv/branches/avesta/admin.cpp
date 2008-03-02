@@ -253,7 +253,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			{
 				RSA* rsa = g_adminConfig->getRSAKey(ENCRYPTION_RSA1024XTEA);
 				if(!rsa){
-					output->AddByte(AP_MSG_KEY_EXCHANGE);
+					output->AddByte(AP_MSG_KEY_EXCHANGE_FAILED);
 					addLogLine(this, LOGTYPE_WARNING, 1, "no valid server key type");
 					break;
 				}
