@@ -44,6 +44,7 @@ transfer_container(ITEM_LOCKER1)
 	paidUntil = 0;
 	houseid = _houseid;
 	rentWarnings = 0;
+	lastWarning = 0;
 	rent = 0;
 	townid = 0;
 	transferItem = NULL;
@@ -105,6 +106,8 @@ void House::setHouseOwner(uint32_t guid)
 	for(it = doorList.begin(); it != doorList.end(); ++it){
 		(*it)->setSpecialDescription(houseDescription.str());
 	}
+
+	setLastWarning(std::time(NULL)); //So the new owner has one day before he start the payement
 }
 
 AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
@@ -887,7 +890,7 @@ bool Houses::payHouses()
 
 					house->setPaidUntil(paidUntil);
 				}
-				else{
+				else if(currentTime >= house->getLastWarning() + 24 * 60 * 60){
 					if(house->getPayRentWarnings() >= 7){
 						house->setHouseOwner(0);
 						// setHouseOwner will load the player,
@@ -930,6 +933,7 @@ bool Houses::payHouses()
 						g_game.internalAddItem(depot, letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 						house->setPayRentWarnings(house->getPayRentWarnings() + 1);
+						house->setLastWarning(currentTime);
 					}
 				}
 			}

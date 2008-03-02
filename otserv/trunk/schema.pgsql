@@ -123,7 +123,8 @@ CREATE TABLE "houses" (
     "id" BIGSERIAL,
     "owner" INT NOT NULL,
     "paid" BIGINT NOT NULL DEFAULT 0,
-    "warnings" TEXT NOT NULL,
+    "warnings" INT NOT NULL DEFAULT 0,
+	"lastwarning" BIGINT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id")
 );
 

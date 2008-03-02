@@ -300,10 +300,12 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 			int ownerid = result->getDataInt("owner");
 			int paid = result->getDataInt("paid");
 			int payRentWarnings = result->getDataInt("warnings");
+			uint32_t lastWarning = result->getDataInt("lastwarning");
 
 			house->setHouseOwner(ownerid);
 			house->setPaidUntil(paid);
 			house->setPayRentWarnings(payRentWarnings);
+			house->setLastWarning(lastWarning);
 		}
 	}while(result->next());
 
@@ -344,12 +346,13 @@ bool IOMapSerialize::saveHouseInfo(Map* map)
 
 	DBInsert stmt(db);
 
-	stmt.setQuery("INSERT INTO `houses` (`id`, `owner`, `paid`, `warnings`) VALUES ");
+	stmt.setQuery("INSERT INTO `houses` (`id`, `owner`, `paid`, `warnings`, `lastwarning`) VALUES ");
 
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		House* house = it->second;
 
-		query << house->getHouseId() << ", " << house->getHouseOwner() << ", " << house->getPaidUntil() << ", " << house->getPayRentWarnings();
+		query << house->getHouseId() << ", " << house->getHouseOwner() << ", "
+		<< house->getPaidUntil() << ", " << house->getPayRentWarnings() << ", " << house->getLastWarning();
 
 		if(!stmt.addRow(query)){
 			return false;

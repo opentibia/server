@@ -123,7 +123,8 @@ CREATE TABLE `houses` (
     `id` INT UNSIGNED NOT NULL,
     `owner` INT NOT NULL,
     `paid` INT UNSIGNED NOT NULL DEFAULT 0,
-    `warnings` TEXT NOT NULL,
+    `warnings` INT NOT NULL DEFAULT 0,
+	`lastwarning` INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
