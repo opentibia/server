@@ -4,10 +4,13 @@ Nostradamus
 
 OBS: Transfer money to offline players does not works yet
 --]]
-Bank = {}
+Bank = 
+{
+	STORAGE_BANK = 6669
+}
 Bank.__index = Bank
 
-STORAGE_BANK = 6669
+
 
 
 	function Bank:getPlayerMoney(cid)
@@ -22,7 +25,7 @@ STORAGE_BANK = 6669
 	end
 
 	function Bank:getBalance(cid)
-		return getPlayerStorageValue(cid, STORAGE_BANK)
+		return getPlayerStorageValue(cid, self.STORAGE_BANK)
 	end
 
 	function Bank:doConvertMoney(value)
@@ -74,7 +77,7 @@ STORAGE_BANK = 6669
 	end
 	
 	function Bank:doAddMoney(cid, value)
-		setPlayerStorageValue(cid, STORAGE_BANK, self:getBalance(cid) + value)
+		setPlayerStorageValue(cid, self.STORAGE_BANK, self:getBalance(cid) + value)
 	end
 	
 	function Bank:doTransfer(cid, name, value)

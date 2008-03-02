@@ -24,6 +24,11 @@ Calculator.__index = Calculator
 	function Calculator:getExpLeft(currentLevel, desiredLevel)
 		return self:getLevelExp(desiredLevel) - self:getLevelExp(currentLevel)
 	end
+	
+	-- Returns the exp gain percent into the exp left to up a level
+	function Calculator:getExpGainPercent(creatureExp, currentLevel)
+		return (100 * creatureExp) / (self:getExpLeft(currentLevel, currentLevel + 1))
+	end
 
 	-- Returns how much creatures the player have to kill to get the desired level beeing in the current level
 	function Calculator:getCreatureLeft(currentLevel, desiredLevel, creatureExp)

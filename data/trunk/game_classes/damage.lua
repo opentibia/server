@@ -21,13 +21,16 @@ Use the constant values refering to attack types as factors.
 ------------------------------------------------------------------------------------------------------------
 --]]
 
-Damage = {}
+Damage = 
+{
+	LEVEL = {8, 100},
+	MAGIC = {0, 60},
+	MIN = {1, 2},
+	MAX = {1, 2}
+}
 Damage.__index = Damage
 	
 	-- Global consts
-	LEVEL = {8, 100}
-	MAGIC = {0, 60}
-	MIN, MAX = {1, 2}, {1, 2}
 	FULL_ATTACK  = 10
 	BALANCED 	 = 7
 	FULL_DEFENSE = 5
@@ -42,10 +45,10 @@ Damage.__index = Damage
 
 	-- Returns all the possible combinations between the desired level, magic level, min and max damages
 	function Damage:getSpellCombinations(level, magic, min, max)
-		for _,x in ipairs(LEVEL) do
-			for _,y in ipairs(MAGIC) do
-			    for _,z in ipairs(MIN) do
-			        for _,w in ipairs(MAX) do
+		for _,x in ipairs(self.LEVEL) do
+			for _,y in ipairs(self.MAGIC) do
+			    for _,z in ipairs(self.MIN) do
+			        for _,w in ipairs(self.MAX) do
 				        minA, maxA, avg = self:getSpellFormula(x, y, z, w)
 				        print('Level: ' .. x .. ' | Magic: ' .. y .. ' | Min: ' .. z .. ' | Max: ' .. w .. ' | minA: ' .. minA .. ' | maxA: ' .. maxA .. ' | avg: ' .. avg)
 			        end
@@ -56,6 +59,6 @@ Damage.__index = Damage
 	
 	-- Returns the maximum melee damage giving the factor (full attack, balanced or full defense), player level, player skill and the attack of the weapon
 	function Damage:getMelee(factor, playerLevel, playerSkill, weaponAttack)
-		return (weaponAttack / 20 * playerSkill*2 + weaponAttack + playerLevel / 10) / 10 * factor
+		return (weaponAttack / 20 * playerSkill * 2 + weaponAttack + playerLevel / 10) / 10 * factor
 	end
 		
