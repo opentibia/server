@@ -1382,7 +1382,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//getMonsterTargetList(cid)
 	lua_register(m_luaState, "getMonsterTargetList", LuaScriptInterface::luaGetMonsterTargetList);
-	
+
 	//getMonsterFriendList(cid)
 	lua_register(m_luaState, "getMonsterFriendList", LuaScriptInterface::luaGetMonsterFriendList);
 
@@ -1519,7 +1519,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//getDataDir()
 	lua_register(m_luaState, "getDataDir", LuaScriptInterface::luaGetDataDirectory);
-	
+
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
 	luaL_register(m_luaState, "bit", LuaScriptInterface::luaBitReg);
@@ -4834,7 +4834,7 @@ int LuaScriptInterface::luaGetMonsterTargetList(lua_State *L)
 	}
 
 	lua_newtable(L);
-	uint32_t i = 0;
+	uint32_t i = 1;
 	const CreatureList& targetList = monster->getTargetList();
 	for(CreatureList::const_iterator it = targetList.begin(); it != targetList.end(); ++it){
 		if(monster->isTarget(*it)){
@@ -4872,7 +4872,7 @@ int LuaScriptInterface::luaGetMonsterFriendList(lua_State *L)
 	}
 
 	lua_newtable(L);
-	uint32_t i = 0;
+	uint32_t i = 1;
 	Creature* friendCreature;
 	const CreatureList& friendList = monster->getFriendList();
 	for(CreatureList::const_iterator it = friendList.begin(); it != friendList.end(); ++it){
@@ -4950,7 +4950,7 @@ int LuaScriptInterface::luaDoMonsterChangeTarget(lua_State *L)
 	if(!monster->isSummon()){
 		monster->searchTarget(true);
 	}
-	
+
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
@@ -4989,7 +4989,7 @@ int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
 
 	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
 	uint32_t cid = popNumber(L);
-	
+
 	ScriptEnviroment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
@@ -6219,8 +6219,7 @@ int LuaScriptInterface::luaGetCreatureSummons(lua_State *L)
 	lua_newtable(L);
 	const std::list<Creature*>& summons = creature->getSummons();
 	std::list<Creature*>::const_iterator it = summons.begin();
-	uint32_t i = 0;
-	for( ; it != summons.end(); ++it, ++i){
+	for(uint32_t i = 1; it != summons.end(); ++it, ++i){
 		uint32_t summonCid = env->addThing(*it);
 		lua_pushnumber(L, i);
 		lua_pushnumber(L, summonCid);

@@ -2,6 +2,6 @@
 
 <talkactions>
 
-<talkaction words="open sesame" script="example.lua" />
+<talkaction words="!online" script="onlinelist.lua"/>
 
 </talkactions>

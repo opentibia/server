@@ -448,6 +448,7 @@ protected:
 	static int luaGetWorldLight(lua_State *L);
 	static int luaGetWorldCreatures(lua_State *L);
 	static int luaGetWorldUpTime(lua_State *L);
+	static int luaGetPlayersOnlineList(lua_State *L);
 	static int luaBroadcastMessage(lua_State *L);
 	static int luaGetGuildId(lua_State *L);
 

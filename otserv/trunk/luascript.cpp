@@ -1290,6 +1290,9 @@ void LuaScriptInterface::registerFunctions()
 	//getWorldUpTime()
 	lua_register(m_luaState, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
 
+	//getPlayersOnlineList()
+	lua_register(m_luaState, "getPlayersOnlineList", LuaScriptInterface::luaGetPlayersOnlineList);
+
 	//broadcastMessage(<optional> messageClass, message)
 	lua_register(m_luaState, "broadcastMessage", LuaScriptInterface::luaBroadcastMessage);
 	lua_register(m_luaState, "broadcastMessageEx", LuaScriptInterface::luaBroadcastMessage);
@@ -3667,6 +3670,23 @@ int LuaScriptInterface::luaGetWorldUpTime(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetPlayersOnlineList(lua_State *L)
+{
+	//getPlayersOnlineList()
+	ScriptEnviroment* env = getScriptEnv();
+
+	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
+	lua_newtable(L);
+	for(uint32_t i = 1; it != Player::listPlayer.list.end(); ++it, ++i){
+		uint32_t cid = env->addThing(it->second);
+		lua_pushnumber(L, i);
+		lua_pushnumber(L, cid);
+		lua_settable(L, -3);
+	}
+
+	return 1;
+}
+
 int LuaScriptInterface::luaBroadcastMessage(lua_State *L)
 {
 	//broadcastMessage(<optional> messageClass, message)
@@ -6041,8 +6061,7 @@ int LuaScriptInterface::luaGetCreatureSummons(lua_State *L)
 	lua_newtable(L);
 	const std::list<Creature*>& summons = creature->getSummons();
 	std::list<Creature*>::const_iterator it = summons.begin();
-	uint32_t i = 0;
-	for( ; it != summons.end(); ++it, ++i){
+	for(uint32_t i = 1; it != summons.end(); ++it, ++i){
 		uint32_t summonCid = env->addThing(*it);
 		lua_pushnumber(L, i);
 		lua_pushnumber(L, summonCid);
