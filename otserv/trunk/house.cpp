@@ -70,7 +70,7 @@ void House::setHouseOwner(uint32_t guid)
 	if(houseOwner){
 		//send items to depot
 		transferToDepot();
-		
+
 		//...TODO...
 		//TODO: remove players from beds
 
@@ -861,7 +861,9 @@ bool Houses::payHouses()
 			bool savePlayerHere = true;
 			if(depot){
 				//get money from depot
-				if(g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
+				bool useAccBalance = (g_config.getString(ConfigManager::USE_ACCBALANCE) == "yes");
+				if((useAccBalance && player->balance >= house->getRent()) ||
+					g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
 
 					uint32_t paidUntil = currentTime;
 					switch(rentPeriod){
@@ -877,6 +879,10 @@ bool Houses::payHouses()
 					case RENTPERIOD_YEARLY:
 						paidUntil += 24 * 60 * 60 * 365;
 						break;
+					}
+
+					if(useAccBalance){
+						player->balance -= house->getRent();
 					}
 
 					house->setPaidUntil(paidUntil);

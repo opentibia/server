@@ -158,61 +158,48 @@ function doPlayerTakeItem(cid, itemid, count)
 		if(count == 0) then
 			return LUA_NO_ERROR
 		end
-		
-	else
-		return LUA_ERROR
 	end
-end
-
-function doPlayerAddMoney(cid, amount)
-	local crystals = math.floor(amount/10000)
-	amount = amount - crystals*10000
-	local platinum = math.floor(amount/100)
-	amount = amount - platinum*100
-	local gold = amount
-	local ret = 0
-	if(crystals > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_CRYSTAL_COIN, crystals)
-		if(ret ~= LUA_NO_ERROR) then
-			return LUA_ERROR
-		end
-	end
-	if(platinum > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_PLATINUM_COIN, platinum)
-		if(ret ~= LUA_NO_ERROR) then
-			return LUA_ERROR
-		end
-	end
-	if(gold > 0) then
-		ret = doPlayerGiveItem(cid, ITEM_GOLD_COIN, gold)
-		if(ret ~= LUA_NO_ERROR) then
-			return LUA_ERROR
-		end
-	end
-	return LUA_NO_ERROR
+	return LUA_ERROR
 end
 
 function doPlayerBuyItem(cid, itemid, count, cost, charges)
     if(doPlayerRemoveMoney(cid, cost) == TRUE) then
     	return doPlayerGiveItem(cid, itemid, count, charges)
-    else
-        return LUA_ERROR
     end
+	return LUA_ERROR
 end
 
 function doPlayerSellItem(cid, itemid, count, cost)
-	
 	if(doPlayerTakeItem(cid, itemid, count) == LUA_NO_ERROR) then
 		if(doPlayerAddMoney(cid, cost) ~= LUA_NO_ERROR) then
 			error('Could not add money to ' .. getPlayerName(cid) .. '(' .. cost .. 'gp)')
 		end
 		return LUA_NO_ERROR
-	else
-		return LUA_ERROR
 	end
+	return LUA_ERROR
 	
 end
 -- End of functions made by Jiddo
+
+function getPlayerMoney(cid)
+	return ((getPlayerItemCount(cid, ITEM_CRYSTAL_COIN) * 10000) + (getPlayerItemCount(cid, ITEM_PLATINUM_COIN) * 100) + getPlayerItemCount(cid, ITEM_GOLD_COIN))
+end
+
+function doPlayerWithdrawAllMoney(cid)
+	return doPlayerWithdrawMoney(cid, getPlayerBalance(cid))
+end
+
+function doPlayerDepositAllMoney(cid)
+	return doPlayerDepositMoney(cid, getPlayerMoney(cid))
+end
+
+function doPlayerTransferAllMoneyTo(cid, target)
+	return doPlayerTransferMoneyTo(cid, target, getPlayerBalance(cid))
+end
+
+function playerExists(name)
+	return (getPlayerGUIDByName(name) ~= 0)
+end
 
 function getConfigInfo(info)
 	if (type(info) ~= 'string') then return nil end

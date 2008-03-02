@@ -986,6 +986,9 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerSkullType(cid)
 	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
 
+	//getPlayerAccountBalance(cid)
+	lua_register(m_luaState, "getPlayerBalance", LuaScriptInterface::luaGetPlayerBalance);
+
 	//playerLearnInstantSpell(cid, name)
 	lua_register(m_luaState, "playerLearnInstantSpell", LuaScriptInterface::luaPlayerLearnInstantSpell);
 
@@ -1130,6 +1133,18 @@ void LuaScriptInterface::registerFunctions()
 
 	//doPlayerRemoveMoney(cid, money)
 	lua_register(m_luaState, "doPlayerRemoveMoney", LuaScriptInterface::luaDoPlayerRemoveMoney);
+
+	//doPlayerAddMoney(cid, money)
+	lua_register(m_luaState, "doPlayerAddMoney", LuaScriptInterface::luaDoPlayerAddMoney);
+
+	//doPlayerWithdrawMoney(cid, money)
+	lua_register(m_luaState, "doPlayerWithdrawMoney", LuaScriptInterface::luaDoPlayerWithdrawMoney);
+
+	//doPlayerDepositMoney(cid, money)
+	lua_register(m_luaState, "doPlayerDepositMoney", LuaScriptInterface::luaDoPlayerDepositMoney);
+
+	//doPlayerTransferMoneyTo(cid, target, money)
+	lua_register(m_luaState, "doPlayerTransferMoneyTo", LuaScriptInterface::luaDoPlayerTransferMoneyTo);
 
 	//doShowTextWindow(cid, maxlen, canWrite)
 	lua_register(m_luaState, "doShowTextWindow", LuaScriptInterface::luaDoShowTextWindow);
@@ -1609,6 +1624,16 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			value = 0;
 			#endif
 			break;
+		case PlayerInfoBalance:
+		{
+			if(g_config.getString(ConfigManager::USE_ACCBALANCE) == "no"){
+				value = 0;
+			}
+			else{
+				value = player->balance;
+			}
+			break;
+		}
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -1701,6 +1726,8 @@ int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L){
 
 int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoSkullType);}
+int LuaScriptInterface::luaGetPlayerBalance(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoBalance);}
 //
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
@@ -3307,6 +3334,103 @@ int LuaScriptInterface::luaDoPlayerRemoveMoney(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaDoPlayerAddMoney(lua_State *L)
+{
+	//doPlayerAddMoney(cid, money)
+	uint32_t money = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(g_game.addMoney(player, money)){
+			lua_pushnumber(L, LUA_TRUE);
+		}
+		else{
+			lua_pushnumber(L, LUA_FALSE);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerWithdrawMoney(lua_State *L)
+{
+	//doPlayerWithdrawMoney(cid, money)
+	uint32_t money = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(player->withdrawMoney(money)){
+			lua_pushnumber(L, LUA_TRUE);
+		}
+		else{
+			lua_pushnumber(L, LUA_FALSE);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerDepositMoney(lua_State *L)
+{
+	//doPlayerDepositMoney(cid, money)
+	uint32_t money = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(player->depositMoney(money)){
+			lua_pushnumber(L, LUA_TRUE);
+		}
+		else{
+			lua_pushnumber(L, LUA_FALSE);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerTransferMoneyTo(lua_State *L)
+{
+	//doPlayerTransferMoneyTo(cid, target, money)
+	uint32_t money = popNumber(L);
+	std::string target = popString(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(player->transferMoneyTo(target, money)){
+			lua_pushnumber(L, LUA_TRUE);
+		}
+		else{
+			lua_pushnumber(L, LUA_FALSE);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
 int LuaScriptInterface::luaDoPlayerSetMasterPos(lua_State *L)
 {
 	//doPlayerSetMasterPos(cid, pos)
@@ -3678,10 +3802,12 @@ int LuaScriptInterface::luaGetPlayersOnlineList(lua_State *L)
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	lua_newtable(L);
 	for(uint32_t i = 1; it != Player::listPlayer.list.end(); ++it, ++i){
-		uint32_t cid = env->addThing(it->second);
-		lua_pushnumber(L, i);
-		lua_pushnumber(L, cid);
-		lua_settable(L, -3);
+		if(it->second->isOnline()){
+			uint32_t cid = env->addThing(it->second);
+			lua_pushnumber(L, i);
+			lua_pushnumber(L, cid);
+			lua_settable(L, -3);
+		}
 	}
 
 	return 1;

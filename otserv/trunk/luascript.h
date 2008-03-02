@@ -215,7 +215,8 @@ enum PlayerInfo_t{
 	PlayerInfoTown,
 	PlayerInfoGUID,
 	PlayerInfoPremiumDays,
-	PlayerInfoSkullType
+	PlayerInfoSkullType,
+	PlayerInfoBalance
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -344,6 +345,10 @@ protected:
 	static int luaDoRelocate(lua_State *L);
 	static int luaDoPlayerSendTextMessage(lua_State *L);
 	static int luaDoPlayerRemoveMoney(lua_State *L);
+	static int luaDoPlayerAddMoney(lua_State *L);
+	static int luaDoPlayerWithdrawMoney(lua_State *L);
+	static int luaDoPlayerDepositMoney(lua_State *L);
+	static int luaDoPlayerTransferMoneyTo(lua_State *L);
 	static int luaDoPlayerSetMasterPos(lua_State *L);
 	static int luaDoPlayerSetTown(lua_State *L);
 	static int luaDoPlayerSetVocation(lua_State *L);
@@ -423,6 +428,7 @@ protected:
 	static int luaGetPlayerFlagValue(lua_State *L);
 	static int luaGetPlayerLossPercent(lua_State *L);
 	static int luaGetPlayerPremiumDays(lua_State *L);
+	static int luaGetPlayerBalance(lua_State *L);
 
 	static int luaPlayerLearnInstantSpell(lua_State *L);
 	static int luaCanPlayerLearnInstantSpell(lua_State *L);

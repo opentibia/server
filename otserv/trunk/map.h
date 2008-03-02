@@ -112,7 +112,7 @@ public:
 	QTreeLeafNode* getLeaf(uint32_t x, uint32_t y);
 	static QTreeLeafNode* getLeafStatic(QTreeNode* root, uint32_t x, uint32_t y);
 	QTreeLeafNode* createLeaf(uint32_t x, uint32_t y, uint32_t level);
-	
+
 protected:
 	bool m_isLeaf;
 	QTreeNode* m_child[4];
@@ -164,20 +164,20 @@ public:
 	* Load a map.
 	* \param identifier file/database to load
 	* \param type map type "OTBM", "XML"
-	* \returns true if the map was loaded successfully
+	* \return true if the map was loaded successfully
 	*/
 	bool loadMap(const std::string& identifier, const std::string& type);
 
 	/**
 	* Save a map.
 	* \param identifier file/database to save to
-	* \returns true if the map was saved successfully
+	* \return true if the map was saved successfully
 	*/
 	bool saveMap();
 
 	/**
 	* Get a single tile.
-	* \returns A pointer to that tile.
+	* \return A pointer to that tile.
 	*/
 	Tile* getTile(uint16_t x, uint16_t y, uint8_t z);
 	Tile* getTile(const Position& pos);
@@ -197,7 +197,7 @@ public:
   * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	*/
 	bool placeCreature(const Position& centerPos, Creature* creature, bool forceLogin = false);
-	
+
 	/**
 	* Remove a creature from the map.
 	* \param c Creature pointer to the creature to remove
@@ -211,7 +211,7 @@ public:
 	*	\param rangex maximum allowed range horizontially
 	*	\param rangey maximum allowed range vertically
 	*	\param checkLineOfSight checks if there is any blocking objects in the way
-	*	\returns The result if you can throw there or not
+	*	\return The result if you can throw there or not
 	*/
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
@@ -221,7 +221,7 @@ public:
 	*	\param fromPos from Source point
 	*	\param toPos Destination point
 	*	\param floorCheck if true then view is not clear if fromPos.z is not the same as toPos.z
-	*	\returns The result if there is no obstacles
+	*	\return The result if there is no obstacles
 	*/
 	bool isViewClear(const Position& fromPos, const Position& toPos, bool floorCheck);
 
@@ -230,7 +230,7 @@ public:
 	* \param creature The creature that wants a route
 	* \param start The start position of the path
 	* \param to The destination position
-	* \returns A list of all positions you have to traverse to reach the destination
+	* \return A list of all positions you have to traverse to reach the destination
 	*/
 	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
@@ -263,7 +263,7 @@ protected:
 	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0);
-	
+
 	void clearSpectatorCache();
 
 	QTreeNode root;

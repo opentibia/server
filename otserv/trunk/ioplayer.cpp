@@ -177,6 +177,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 	#endif
 
+	player->balance = result->getDataInt("balance");
+
 	player->guildNick = result->getDataString("guildnick");
 	db->freeResult(result);
 
@@ -473,7 +475,8 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `conditions` = " << db->escapeBlob(conditions, conditionsSize)
 	<< ", `loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE)
 	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
-	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES);
+	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES)
+	<< ", `balance` = " << player->balance;
 
 	#ifndef __USE_SQL_PREMDAYS__
 	uint32_t premEnd = 0;

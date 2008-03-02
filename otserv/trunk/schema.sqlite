@@ -54,6 +54,7 @@ CREATE TABLE "players" (
     "loss_skills" INTEGER NOT NULL DEFAULT 10,
     "rank_id" INTEGER NOT NULL,
     "town_id" INTEGER NOT NULL,
+	"balance" INTEGER NOT NULL DEFAULT 0,
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups" ("id")

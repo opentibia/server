@@ -136,6 +136,7 @@ Creature()
 	maxVipLimit = 50;
 	groupFlags = 0;
 	premiumDays = 0;
+	balance = 0;
 
  	vocation_id = (Vocation_t)0;
 
@@ -3435,4 +3436,63 @@ bool Player::hasLearnedInstantSpell(const std::string& name) const
 	}
 
 	return false;
+}
+
+bool Player::withdrawMoney(uint32_t amount)
+{
+	if(g_config.getString(ConfigManager::USE_ACCBALANCE) == "no"){
+		return false;
+	}
+
+	if(balance < amount){
+		return false;
+	}
+
+	bool ret = g_game.addMoney(this, amount);
+	if(ret){
+		balance -= amount;
+	}
+	return ret;
+}
+
+bool Player::depositMoney(uint32_t amount)
+{
+	if(g_config.getString(ConfigManager::USE_ACCBALANCE) == "no"){
+		return false;
+	}
+
+	bool ret = g_game.removeMoney(this, amount);
+	if(ret){
+		balance += amount;
+	}
+
+	return ret;
+}
+
+bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
+{
+	if(g_config.getString(ConfigManager::USE_ACCBALANCE) == "no"){
+		return false;
+	}
+
+	Player* target = g_game.getPlayerByName(name);
+	if(!target){
+		target = new Player(name, NULL);
+		if(!IOPlayer::instance()->loadPlayer(target, name)){
+#ifdef __DEBUG__
+			std::cout << "Failure: [Player::transferMoneyTo], can not load player: " << name << std::endl;
+#endif
+			delete target;
+			return false;
+		}
+	}
+
+	this->balance -= amount;
+	target->balance += amount;
+	if(!target->isOnline()){
+		IOPlayer::instance()->savePlayer(target);
+		delete target;
+	}
+
+	return true;
 }

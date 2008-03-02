@@ -1,14 +1,8 @@
+-- Load Lua-made functions
 dofile(getDataDir() .. 'functions.lua')
 
--- Config 
-ENABLE_GAME_CLASSES = true
-
-if (ENABLE_GAME_CLASSES) then
-	-- House class
-	dofile(getDataDir() .. 'game_classes/house.lua')
-	-- Bank class
-	dofile(getDataDir() .. 'game_classes/bank.lua')
-end
+-- Load House class
+dofile(getDataDir() .. 'game_classes/house.lua')
 
 -- Storages consts
 STORAGE_RUM_MACHINE = 100000

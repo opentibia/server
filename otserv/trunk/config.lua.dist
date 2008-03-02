@@ -71,6 +71,9 @@ minactionexinterval = 1000
 -- options: daily, weekly, monthly
 houserentperiod = "monthly"
 
+-- Should the server use account balance system or depot system for paying houses?
+useaccbalance = "no"
+
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
 rate_skill = 1

@@ -1347,41 +1347,9 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 			money = money - it2->first;
 		}
 		else{
-		  /* Remove a monetary value from an item*/
+			/* Remove a monetary value from an item*/
 			int remaind = item->getWorth() - money;
-			int crys = remaind / 10000;
-			remaind = remaind - crys * 10000;
-			int plat = remaind / 100;
-			remaind = remaind - plat * 100;
-			int gold = remaind;
-
-			if(crys != 0){
-				Item* remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, crys);
-
-				ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
-				if(ret != RET_NOERROR){
-					internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
-				}
-			}
-
-			if(plat != 0){
-				Item* remaindItem = Item::CreateItem(ITEM_COINS_PLATINUM, plat);
-
-				ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
-				if(ret != RET_NOERROR){
-					internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
-				}
-			}
-
-			if(gold != 0){
-				Item* remaindItem = Item::CreateItem(ITEM_COINS_GOLD, gold);
-
-				ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
-				if(ret != RET_NOERROR){
-					internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
-				}
-			}
-
+			addMoney(cylinder, remaind, flags);
 			money = 0;
 		}
 
@@ -1391,6 +1359,43 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 	moneyMap.clear();
 
 	return (money == 0);
+}
+
+bool Game::addMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
+{
+	int crys = money / 10000;
+	money -= crys * 10000;
+	int plat = money / 100;
+	money -= plat * 100;
+	int gold = money;
+
+	if(crys != 0){
+		Item* remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, crys);
+
+		ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
+		if(ret != RET_NOERROR){
+			internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		}
+	}
+
+	if(plat != 0){
+		Item* remaindItem = Item::CreateItem(ITEM_COINS_PLATINUM, plat);
+
+		ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
+		if(ret != RET_NOERROR){
+			internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		}
+	}
+
+	if(gold != 0){
+		Item* remaindItem = Item::CreateItem(ITEM_COINS_GOLD, gold);
+
+		ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
+		if(ret != RET_NOERROR){
+			internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		}
+	}
+	return true;
 }
 
 Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)

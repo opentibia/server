@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -55,7 +55,7 @@ public:
 	  * \param count is the amount that we want to move/add
 	  * \param flags if FLAG_CHILDISOWNER if set the query is from a child-cylinder (check cap etc.)
 		* if FLAG_NOLIMIT is set blocking items/container limits is ignored
-	  * \returns ReturnValue holds the return value
+	  * \return ReturnValue holds the return value
 	  */
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* Item, uint32_t count,
 		uint32_t flags) const = 0;
@@ -68,7 +68,7 @@ public:
 	  * \param count is the amount that we want to move/add
 	  * \param maxQueryCount is the max amount that the cylinder can accept
 	  * \param flags optional flags to modifiy the default behaviour
-	  * \returns ReturnValue holds the return value
+	  * \return ReturnValue holds the return value
 	  */
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
 		uint32_t flags) const = 0;
@@ -77,7 +77,7 @@ public:
 	  * Query if the cylinder can remove an object
 	  * \param item the object to move/remove
 	  * \param count is the amount that we want to remove
-	  * \returns ReturnValue holds the return value
+	  * \return ReturnValue holds the return value
 	  */
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const = 0;
 
@@ -89,7 +89,7 @@ public:
 	  * \param destItem is the destination object
 	  * \param flags optional flags to modifiy the default behaviour
 		* this method can modifiy the flags
-	  * \returns Cylinder returns the destination cylinder
+	  * \return Cylinder returns the destination cylinder
 	  */
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 		uint32_t& flags) = 0;
@@ -149,28 +149,28 @@ public:
 	/**
 	  * Gets the index of an object
 	  * \param thing the object to get the index value from
-	  * \returns the index of the object, returns -1 if not found
+	  * \return the index of the object, returns -1 if not found
 	  */
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 
 	/**
 	  * Returns the first index
-	  * \returns the first index, if not implemented -1 is returned
+	  * \return the first index, if not implemented -1 is returned
 	  */
 	virtual int32_t __getFirstIndex() const;
 
 	/**
 	  * Returns the last index
-	  * \returns the last index, if not implemented -1 is returned
+	  * \return the last index, if not implemented -1 is returned
 	  */
 	virtual int32_t __getLastIndex() const;
 
 	/**
 	  * Gets the object based on index
-	  * \returns the object, returns NULL if not found
+	  * \return the object, returns NULL if not found
 	  */
 	virtual Thing* __getThing(uint32_t index) const;
-	
+
 	/**
 	  * Get the amount of items of a certain type
 	  * \param itemId is the item type to the get the count of

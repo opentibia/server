@@ -98,6 +98,7 @@ public:
 		PASSWORD_TYPE,
 		SQL_PORT,
 		STATUSQUERY_TIMEOUT,
+		USE_ACCBALANCE,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
