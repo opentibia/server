@@ -249,7 +249,8 @@ bool House::transferToDepot()
 	}
 
 	for(std::list<Item*>::iterator it = moveItemList.begin(); it != moveItemList.end(); ++it){
-		g_game.internalMoveItem((*it)->getParent(), depot, INDEX_WHEREEVER, (*it), (*it)->getItemCount(), FLAG_NOLIMIT);
+		g_game.internalMoveItem((*it)->getParent(), depot, INDEX_WHEREEVER,
+			(*it), (*it)->getItemCount(), NULL, FLAG_NOLIMIT);
 	}
 
 	if(!player->isOnline()){

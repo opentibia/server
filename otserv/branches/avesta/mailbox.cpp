@@ -131,7 +131,8 @@ bool Mailbox::sendItem(Item* item)
 		Depot* depot = player->getDepot(dp, true);
 
 		if(depot){
-			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER, item, item->getItemCount(), FLAG_NOLIMIT) == RET_NOERROR){
+			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
+				item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR){
 				g_game.transformItem(item, item->getID() + 1); /**Change it to stamped!**/	
 			}
 			return true;
@@ -159,7 +160,8 @@ bool Mailbox::sendItem(Item* item)
 
 		Depot* depot = player->getDepot(dp, true);
 		if(depot){
-			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER, item, item->getItemCount(), FLAG_NOLIMIT) == RET_NOERROR){
+			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
+				item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR){
 				g_game.transformItem(item, item->getID() + 1);
 			}
 

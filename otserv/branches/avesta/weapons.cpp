@@ -518,7 +518,7 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 		g_game.transformItem(item, item->getID(), newCharge);
 	}
 	else if(ammoAction == AMMOACTION_MOVE){
-		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, FLAG_NOLIMIT);
+		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, NULL, FLAG_NOLIMIT);
 	}
 	else if(ammoAction == AMMOACTION_MOVEBACK){
 		//do nothing

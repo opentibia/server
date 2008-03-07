@@ -406,24 +406,25 @@ void Game::internalGetPosition(Item* item, Position& pos, uint8_t& stackpos)
 	stackpos = 0;
 
 	Cylinder* topParent = item->getTopParent();
+	if(topParent){
+		if(Player* player = dynamic_cast<Player*>(topParent)){
+			pos.x = 0xFFFF;
 
-	if(Player* player = dynamic_cast<Player*>(topParent)){
-		pos.x = 0xFFFF;
-
-		Container* container = dynamic_cast<Container*>(item->getParent());
-		if(container){
-			pos.y = ((uint16_t) ((uint16_t)0x40) | ((uint16_t)player->getContainerID(container)) );
-			pos.z = container->__getIndexOfThing(item);
-			stackpos = pos.z;
+			Container* container = dynamic_cast<Container*>(item->getParent());
+			if(container){
+				pos.y = ((uint16_t) ((uint16_t)0x40) | ((uint16_t)player->getContainerID(container)) );
+				pos.z = container->__getIndexOfThing(item);
+				stackpos = pos.z;
+			}
+			else{
+				pos.y = player->__getIndexOfThing(item);
+				stackpos = pos.y;
+			}
 		}
-		else{
-			pos.y = player->__getIndexOfThing(item);
-			stackpos = pos.y;
+		else if(Tile* tile = topParent->getTile()){
+			pos = tile->getPosition();
+			stackpos = tile->__getIndexOfThing(item);
 		}
-	}
-	else if(Tile* tile = topParent->getTile()){
-		pos = tile->getPosition();
-		stackpos = tile->__getIndexOfThing(item);
 	}
 }
 
@@ -955,14 +956,15 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 			if(fromPos.x != 0xFFFF && Position::areInRange<1,1,0>(mapFromPos, player->getPosition())
 				&& !Position::areInRange<1,1,0>(mapFromPos, walkPos)){
 				//need to pickup the item first
-				ReturnValue ret = internalMoveItem(fromCylinder, player, INDEX_WHEREEVER, item, count);
+				Item* moveItem = NULL;
+				ReturnValue ret = internalMoveItem(fromCylinder, player, INDEX_WHEREEVER, item, count, &moveItem);
 				if(ret != RET_NOERROR){
 					player->sendCancelMessage(ret);
 					return false;
 				}
 
 				//changing the position since its now in the inventory of the player
-				internalGetPosition(item, itemPos, itemStackPos);
+				internalGetPosition(moveItem, itemPos, itemStackPos);
 			}
 
 			std::list<Direction> listDir;
@@ -994,7 +996,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		return false;
 	}
 
-	ReturnValue ret = internalMoveItem(fromCylinder, toCylinder, toIndex, item, count);
+	ReturnValue ret = internalMoveItem(fromCylinder, toCylinder, toIndex, item, count, NULL);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
@@ -1004,7 +1006,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 }
 
 ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
-	int32_t index, Item* item, uint32_t count, uint32_t flags /*= 0*/)
+	int32_t index, Item* item, uint32_t count, Item** _moveItem, uint32_t flags /*= 0*/)
 {
 	if(!toCylinder){
 		return RET_NOTPOSSIBLE;
@@ -1130,6 +1132,10 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 		if(updateItemIndex != -1){
 			toCylinder->postAddNotification(updateItem, updateItemIndex);
 		}
+	}
+
+	if(_moveItem){
+		*_moveItem = moveItem;
 	}
 
 	//we could not move all, inform the player
@@ -1688,7 +1694,7 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
 			return RET_NOERROR;
 		}
 		else if(Item* item = thing->getItem()){
-			return internalMoveItem(item->getParent(), toTile, INDEX_WHEREEVER, item, item->getItemCount());
+			return internalMoveItem(item->getParent(), toTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 		}
 	}
 
@@ -1937,14 +1943,16 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 			if(fromPos.x != 0xFFFF && toPos.x != 0xFFFF && Position::areInRange<1,1,0>(fromPos, player->getPosition()) &&
 				!Position::areInRange<1,1,0>(fromPos, toPos)){
 				//need to pickup the item first
-				ReturnValue ret = internalMoveItem(item->getParent(), player, INDEX_WHEREEVER, item, item->getItemCount());
+				Item* moveItem = NULL;
+				ReturnValue ret = internalMoveItem(item->getParent(), player, INDEX_WHEREEVER,
+					item, item->getItemCount(), &moveItem);
 				if(ret != RET_NOERROR){
 					player->sendCancelMessage(ret);
 					return false;
 				}
 
 				//changing the position since its now in the inventory of the player
-				internalGetPosition(item, itemPos, itemStackPos);
+				internalGetPosition(moveItem, itemPos, itemStackPos);
 			}
 
 			std::list<Direction> listDir;
@@ -2409,8 +2417,8 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 				Cylinder* cylinder1 = tradeItem1->getParent();
 				Cylinder* cylinder2 = tradeItem2->getParent();
 
-				internalMoveItem(cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, tradeItem1->getItemCount());
-				internalMoveItem(cylinder2, player, INDEX_WHEREEVER, tradeItem2, tradeItem2->getItemCount());
+				internalMoveItem(cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, tradeItem1->getItemCount(), NULL);
+				internalMoveItem(cylinder2, player, INDEX_WHEREEVER, tradeItem2, tradeItem2->getItemCount(), NULL);
 
 				tradeItem1->onTradeEvent(ON_TRADE_TRANSFER, tradePartner);
 				tradeItem2->onTradeEvent(ON_TRADE_TRANSFER, player);

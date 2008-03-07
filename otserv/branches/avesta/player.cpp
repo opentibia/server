@@ -714,7 +714,7 @@ void Player::dropLoot(Container* corpse)
 	#else
 			if(item && ((item->getContainer()) || random_range(1, 100) <= 10)){
 	#endif
-				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount());
+				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 			}
 		}
 	}
