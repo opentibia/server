@@ -3,7 +3,7 @@ setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_GREEN)
 setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
 
 local condition = createConditionObject(CONDITION_HASTE)
-setConditionParam(condition, CONDITION_PARAM_TICKS, 20000)
+setConditionParam(condition, CONDITION_PARAM_TICKS, 22 * 60 * 1000)
 setConditionFormula(condition, 0.7, -56, 0.7, -56)
 setCombatCondition(combat, condition)
 
