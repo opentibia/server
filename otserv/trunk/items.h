@@ -90,17 +90,17 @@ struct Abilities{
 	};
 
 	//damage abilities modifiers
-	uint8_t absorbPercentAll;
-	uint8_t absorbPercentPhysical;
-	uint8_t absorbPercentFire;
-	uint8_t absorbPercentEnergy;
-	uint8_t absorbPercentEarth;
-	uint8_t absorbPercentLifeDrain;
-	uint8_t absorbPercentManaDrain;
-	uint8_t absorbPercentDrown;
-	uint8_t absorbPercentIce;
-	uint8_t absorbPercentHoly;
-	uint8_t absorbPercentDeath;
+	int16_t absorbPercentAll;
+	int16_t absorbPercentPhysical;
+	int16_t absorbPercentFire;
+	int16_t absorbPercentEnergy;
+	int16_t absorbPercentEarth;
+	int16_t absorbPercentLifeDrain;
+	int16_t absorbPercentManaDrain;
+	int16_t absorbPercentDrown;
+	int16_t absorbPercentIce;
+	int16_t absorbPercentHoly;
+	int16_t absorbPercentDeath;
 
 	//extra skill modifiers
 	int32_t skills[SKILL_LAST + 1];

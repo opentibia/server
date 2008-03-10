@@ -1741,99 +1741,97 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		absorbedDamage = false;
 
 		if(it.abilities.absorbPercentAll != 0){
-			if(it.abilities.absorbPercentAll > 0){
-				damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentAll) / 100));
-				absorbedDamage = true;
-			}
+			damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentAll) / 100));
+			absorbedDamage = (it.abilities.absorbPercentAll > 0);
 		}
 
 		switch(combatType){
 			case COMBAT_PHYSICALDAMAGE:
 			{
-				if(it.abilities.absorbPercentPhysical > 0){
+				if(it.abilities.absorbPercentPhysical != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentPhysical) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentPhysical > 0);
 				}
 				break;
 			}
 
 			case COMBAT_FIREDAMAGE:
 			{
-				if(it.abilities.absorbPercentFire > 0){
+				if(it.abilities.absorbPercentFire != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentFire) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentFire > 0);
 				}
 				break;
 			}
 
 			case COMBAT_ENERGYDAMAGE:
 			{
-				if(it.abilities.absorbPercentEnergy > 0){
+				if(it.abilities.absorbPercentEnergy != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentEnergy) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentEnergy > 0);
 				}
 				break;
 			}
 
 			case COMBAT_EARTHDAMAGE:
 			{
-				if(it.abilities.absorbPercentEarth > 0){
+				if(it.abilities.absorbPercentEarth != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentEarth) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentEarth > 0);
 				}
 				break;
 			}
 
 			case COMBAT_LIFEDRAIN:
 			{
-				if(it.abilities.absorbPercentLifeDrain > 0){
+				if(it.abilities.absorbPercentLifeDrain != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentLifeDrain) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentLifeDrain > 0);
 				}
 				break;
 			}
 
 			case COMBAT_MANADRAIN:
 			{
-				if(it.abilities.absorbPercentManaDrain > 0){
+				if(it.abilities.absorbPercentManaDrain != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentManaDrain) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentManaDrain > 0);
 				}
 				break;
 			}
 
 			case COMBAT_DROWNDAMAGE:
 			{
-				if(it.abilities.absorbPercentDrown > 0){
+				if(it.abilities.absorbPercentDrown != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDrown) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentDrown > 0);
 				}
 				break;
 			}
 
 			case COMBAT_ICEDAMAGE:
 			{
-				if(it.abilities.absorbPercentIce > 0){
+				if(it.abilities.absorbPercentIce != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentIce) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentIce > 0);
 				}
 				break;
 			}
 
 			case COMBAT_HOLYDAMAGE:
 			{
-				if(it.abilities.absorbPercentHoly > 0){
+				if(it.abilities.absorbPercentHoly != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentHoly) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentHoly > 0);
 				}
 				break;
 			}
 
 			case COMBAT_DEATHDAMAGE:
 			{
-				if(it.abilities.absorbPercentDeath > 0){
+				if(it.abilities.absorbPercentDeath != 0){
 					damage = (int32_t)std::ceil(damage * ((float)(100 - it.abilities.absorbPercentDeath) / 100));
-					absorbedDamage = true;
+					absorbedDamage = (it.abilities.absorbPercentDeath > 0);
 				}
 				break;
 			}
