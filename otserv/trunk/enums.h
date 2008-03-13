@@ -55,6 +55,7 @@ enum CombatParam_t{
 	COMBATPARAM_CREATEITEM				= 7,
 	COMBATPARAM_AGGRESSIVE				= 8,
 	COMBATPARAM_DISPEL					= 9,
+	COMBATPARAM_USECHARGES				= 10
 };
 
 enum CallBackParam_t{

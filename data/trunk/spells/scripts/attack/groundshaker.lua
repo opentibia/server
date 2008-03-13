@@ -1,6 +1,8 @@
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_PHYSICALDAMAGE)
+setCombatParam(combat, COMBAT_PARAM_BLOCKARMOR, TRUE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_GROUNDSHAKER)
+setCombatParam(combat, COMBAT_PARAM_USECHARGES, TRUE)
 setCombatFormula(combat, COMBAT_FORMULA_SKILL, 0.3, 0, 0.6, 0)
 
 local area = createCombatArea(AREA_CIRCLE3X3)

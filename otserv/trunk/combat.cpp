@@ -69,7 +69,7 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 	}
 	else if(Player* player = creature->getPlayer()){
 		if(params.valueCallback){
-			params.valueCallback->getMinMaxValues(player, min, max);
+			params.valueCallback->getMinMaxValues(player, min, max, params.useCharges);
 			return true;
 		}
 		else{
@@ -91,7 +91,7 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 
 					if(weapon){
 						max = (int32_t)(weapon->getWeaponDamage(player, target, tool, true) * maxa + maxb);
-						if(tool->hasCharges()){
+						if(params.useCharges && tool->hasCharges()){
 							int32_t newCharge = std::max(0, tool->getItemCharge() - 1);
 							g_game.transformItem(tool, tool->getID(), newCharge);
 						}
@@ -369,14 +369,14 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 			if(target->getPlayer() && target->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
 				return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
 			}
-			
+
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
 				if(target->getPlayer()){
 					if(!isInPvpZone(attacker, target)){
 						return RET_YOUMAYNOTATTACKTHISPLAYER;
 					}
 				}
-				
+
 				if(target->hasMaster() && target->getMaster()->getPlayer()){
 					if(!isInPvpZone(attacker, target)){
 						return RET_YOUMAYNOTATTACKTHISCREATURE;
@@ -460,6 +460,13 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 		case COMBATPARAM_DISPEL:
 		{
 			params.dispelType = (ConditionType_t)value;
+			return true;
+			break;
+		}
+
+		case COMBATPARAM_USECHARGES:
+		{
+			params.useCharges = (value != 0);
 			return true;
 			break;
 		}
@@ -940,7 +947,7 @@ void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatPar
 
 //**********************************************************
 
-void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) const
+void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, bool useCharges) const
 {
 	//"onGetPlayerMinMaxValues"(...)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -976,7 +983,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) 
 				if(tool){
 					attackValue = tool->getAttack();
 
-					if(tool->hasCharges()){
+					if(useCharges && tool->hasCharges()){
 						int32_t newCharge = std::max(0, tool->getItemCharge() - 1);
 						g_game.transformItem(tool, tool->getID(), newCharge);
 					}
