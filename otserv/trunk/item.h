@@ -68,9 +68,9 @@ enum ItemDecayState_t{
 /*from iomapotbm.h*/
 #pragma pack(1)
 struct TeleportDest{
-	unsigned short _x;
-	unsigned short _y;
-	unsigned char	_z;
+	uint16_t _x;
+	uint16_t _y;
+	uint8_t	_z;
 };
 #pragma pack()
 
@@ -124,10 +124,10 @@ public:
 	void resetWriter() {removeAttribute(ATTR_ITEM_WRITTENBY);}
 	const std::string& getWriter() const {return getStrAttr(ATTR_ITEM_WRITTENBY);}
 
-	void setActionId(unsigned short n) {if(n < 100) n = 100; setIntAttr(ATTR_ITEM_ACTIONID, n);}
+	void setActionId(uint16_t n) {if(n < 100) n = 100; setIntAttr(ATTR_ITEM_ACTIONID, n);}
 	uint16_t getActionId() const {return getIntAttr(ATTR_ITEM_ACTIONID);}
 
-	void setUniqueId(unsigned short n) {if(n < 1000) n = 1000; setIntAttr(ATTR_ITEM_UNIQUEID, n);}
+	void setUniqueId(uint16_t n) {if(n < 1000) n = 1000; setIntAttr(ATTR_ITEM_UNIQUEID, n);}
 	uint16_t getUniqueId() const {return getIntAttr(ATTR_ITEM_UNIQUEID);}
 
 	void setOwner(uint32_t _owner) {setIntAttr(ATTR_ITEM_OWNER, _owner);}
@@ -195,12 +195,12 @@ class Item : virtual public Thing, public ItemAttributes
 {
 public:
 	//Factory member to create item of right type based on type
-	static Item* CreateItem(const unsigned short _type, unsigned short _count = 1);
+	static Item* CreateItem(const uint16_t _type, uint16_t _count = 1);
 	static Item* CreateItem(PropStream& propStream);
 	static Items items;
 
 	// Constructor for items
-	Item(const unsigned short _type, unsigned short _count = 0);
+	Item(const uint16_t _type, uint16_t _count = 0);
 	Item(const Item &i);
 
 	virtual ~Item();
@@ -291,18 +291,18 @@ public:
 	void setItemCount(uint8_t n) {count = n;}
 
 	uint8_t getItemCountOrSubtype() const;
-	void setItemCountOrSubtype(unsigned char n);
+	void setItemCountOrSubtype(uint8_t n);
 	void setDefaultSubtype();
 	bool hasSubType() const;
 	uint8_t getSubType() const;
 
-	uint8_t getItemCharge() const {return charges;};
-	void setItemCharge(unsigned char n) {charges = n;};
+	uint16_t getItemCharge() const {return charges;};
+	void setItemCharge(uint16_t n) {charges = n;};
 
 	uint8_t getFluidType() const {return fluid;};
-	void setFluidType(unsigned char n) {fluid = n;};
+	void setFluidType(uint8_t n) {fluid = n;};
 
-	void setUniqueId(unsigned short n);
+	void setUniqueId(uint16_t n);
 
 	void setDefaultDuration(){
 		uint32_t duration = getDefaultDuration();
@@ -324,10 +324,10 @@ protected:
 	// use the other getWeightDescription
 	std::string getWeightDescription(double weight) const;
 
-	unsigned short id;  // the same id as in ItemType
-	unsigned char count; // number of stacked items
-	unsigned char charges; //number of charges on the item
-	unsigned char fluid; //fluid type
+	uint16_t id;  // the same id as in ItemType
+	uint8_t count; // number of stacked items
+	uint16_t charges; //number of charges on the item
+	uint8_t fluid; //fluid type
 };
 
 #endif
