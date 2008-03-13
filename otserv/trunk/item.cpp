@@ -468,7 +468,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_RUNE_CHARGES:
 		{
 			uint8_t _charges = 1;
-			if(!propStream.GET_USHORT(_charges)){
+			if(!propStream.GET_UCHAR(_charges)){
 				return false;
 			}
 
@@ -573,9 +573,9 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 	*/
 
 	if(hasCharges()){
-		uint16_t _count = getItemCharge();
+		uint8_t _count = getItemCharge();
 		propWriteStream.ADD_UCHAR(ATTR_RUNE_CHARGES);
-		propWriteStream.ADD_USHORT(_count);
+		propWriteStream.ADD_UCHAR(_count);
 	}
 
 	if(!isNotMoveable() /*moveable*/){

@@ -296,8 +296,8 @@ public:
 	bool hasSubType() const;
 	uint8_t getSubType() const;
 
-	uint16_t getItemCharge() const {return charges;};
-	void setItemCharge(uint16_t n) {charges = n;};
+	uint8_t getItemCharge() const {return charges;};
+	void setItemCharge(uint8_t n) {charges = n;};
 
 	uint8_t getFluidType() const {return fluid;};
 	void setFluidType(uint8_t n) {fluid = n;};
@@ -326,7 +326,7 @@ protected:
 
 	uint16_t id;  // the same id as in ItemType
 	uint8_t count; // number of stacked items
-	uint16_t charges; //number of charges on the item
+	uint8_t charges; //number of charges on the item
 	uint8_t fluid; //fluid type
 };
 
