@@ -1315,6 +1315,10 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 			g_game.internalCloseTrade(this);
 		}
 
+		if(g_game.getRuleViolations().find(getID()) != g_game.getRuleViolations().end()){
+			g_game.cancelRuleViolation(this);
+		}
+
 		g_chat.removeUserFromAllChannels(this);
 
 		//scripting event - onLogOut

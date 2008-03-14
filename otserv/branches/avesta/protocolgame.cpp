@@ -610,6 +610,18 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseOpenPriv(msg);
 		break;
 
+	case 0x9B: //process report
+		parseProcessRuleViolation(msg);
+		break;
+
+	case 0x9C: //gm closes report
+		parseCloseRuleViolation(msg);
+		break;
+
+	case 0x9D: //player cancels report
+		parseCancelRuleViolation(msg);
+		break;
+
 	case 0xA0: // set attack and follow mode
 		parseFightModes(msg);
 		break;
@@ -943,6 +955,25 @@ void ProtocolGame::parseOpenPriv(NetworkMessage& msg)
 	addGameTask(&Game::playerOpenPrivateChannel, player->getID(), receiver);
 }
 
+void ProtocolGame::parseProcessRuleViolation(NetworkMessage& msg)
+{
+	const std::string reporter = msg.GetString();
+
+	addGameTask(&Game::playerProcessRuleViolation, player->getID(), reporter);
+}
+
+void ProtocolGame::parseCloseRuleViolation(NetworkMessage& msg)
+{
+	const std::string reporter = msg.GetString();
+
+	addGameTask(&Game::playerCloseRuleViolation, player->getID(), reporter);
+}
+
+void ProtocolGame::parseCancelRuleViolation(NetworkMessage& msg)
+{
+	addGameTask(&Game::playerCancelRuleViolation, player->getID());
+}
+
 void ProtocolGame::parseCancelMove(NetworkMessage& msg)
 {
 	addGameTask(&Game::playerCancelAttackAndFollow, player->getID());
@@ -1163,6 +1194,7 @@ void ProtocolGame::parseSay(NetworkMessage& msg)
 	switch(type){
 	case SPEAK_PRIVATE:
 	case SPEAK_PRIVATE_RED:
+	case SPEAK_RVR_ANSWER:
 		receiver = msg.GetString();
 		break;
 	case SPEAK_CHANNEL_Y:
@@ -1520,6 +1552,48 @@ void ProtocolGame::sendChannel(uint16_t channelId, const std::string& channelNam
 	}
 }
 
+void ProtocolGame::sendRuleViolationsChannel(uint16_t channelId)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		msg->AddByte(0xAE);
+		msg->AddU16(channelId);
+		RuleViolationsMap::iterator it = g_game.getRuleViolations().begin();
+		for( ; it != g_game.getRuleViolations().end(); ++it){
+			RuleViolation rvr = it->second;
+			if(rvr.open && rvr.reporter){
+				AddCreatureSpeak(msg, rvr.reporter, SPEAK_RVR_CHANNEL, rvr.text, channelId, rvr.time);
+			}
+		}
+	}
+}
+
+void ProtocolGame::sendRemoveReport(const std::string& name)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		msg->AddByte(0xAF);
+		msg->AddString(name);
+	}
+}
+
+void ProtocolGame::sendRuleViolationCancel(const std::string& name)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		msg->AddByte(0xB0);
+		msg->AddString(name);
+	}
+}
+
+void ProtocolGame::sendLockRuleViolation()
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		msg->AddByte(0xB1);
+	}
+}
+
 void ProtocolGame::sendIcons(int icons)
 {
 	NetworkMessage* msg = getOutputBuffer();
@@ -1666,7 +1740,7 @@ void ProtocolGame::sendCancelTarget()
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
-		msg->AddByte(0xa3);
+		msg->AddByte(0xA3);
 	}
 }
 
@@ -2272,25 +2346,35 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage* msg)
 }
 
 void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creature,
-	SpeakClasses type, std::string text, uint16_t channelId)
+	SpeakClasses type, std::string text, uint16_t channelId, uint32_t time /*= 0*/)
 {
 	msg->AddByte(0xAA);
-	msg->AddU32(0);
+	msg->AddU32(0x00000000);
 
 	//Do not add name for anonymous channel talk
 	if(type != SPEAK_CHANNEL_R2){
-		msg->AddString(creature->getName());
+		if(type != SPEAK_RVR_ANSWER){
+			msg->AddString(creature->getName());
+		}
+		else{
+			msg->AddString("Gamemaster");
+		}
 	}
 	else{
 		msg->AddString("");
 	}
 
 	//Add level only for players
-	if(const Player* player = creature->getPlayer()){
-		msg->AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
+	if(const Player* speaker = creature->getPlayer()){
+		if(type != SPEAK_RVR_ANSWER){
+			msg->AddU16(speaker->getPlayerInfo(PLAYERINFO_LEVEL));
+		}
+		else{
+			msg->AddU16(0x0000);
+		}
 	}
 	else{
-		msg->AddU16(0);
+		msg->AddU16(0x0000);
 	}
 
 	msg->AddByte(type);
@@ -2307,6 +2391,9 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creatur
 		case SPEAK_CHANNEL_R2:
 		case SPEAK_CHANNEL_O:
 			msg->AddU16(channelId);
+			break;
+		case SPEAK_RVR_CHANNEL:
+			msg->AddU32(std::time(NULL) - time);
 			break;
 		default:
 			break;

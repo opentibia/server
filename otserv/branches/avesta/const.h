@@ -139,18 +139,18 @@ enum SpeakClasses {
 	SPEAK_SAY           = 0x01,
 	SPEAK_WHISPER       = 0x02,
 	SPEAK_YELL          = 0x03,
-	//SPEAK_            = 0x0D,
-	SPEAK_BROADCAST     = 0x09,
 	SPEAK_PRIVATE       = 0x04,
-	SPEAK_PRIVATE_RED   = 0x0B,	//@name@text
-	//SPEAK_            = 0x0F,
-	//SPEAK_CHANNEL??   = 0x06,
-	//SPEAK_CHANNEL??   = 0x07,
-	//SPEAK_CHANNEL??   = 0x08,
 	SPEAK_CHANNEL_Y     = 0x05,	//yellow
+	SPEAK_RVR_CHANNEL   = 0x06,
+	SPEAK_RVR_ANSWER    = 0x07,
+	SPEAK_RVR_CONTINUE  = 0x08,
+	SPEAK_BROADCAST     = 0x09,
 	SPEAK_CHANNEL_R1    = 0x0A,	//red - #c text
-	SPEAK_CHANNEL_R2    = 0x0E,	//red anonymous - #d text
+	SPEAK_PRIVATE_RED   = 0x0B,	//@name@text
 	SPEAK_CHANNEL_O     = 0x0C,	//orange
+	//SPEAK_            = 0x0D,
+	SPEAK_CHANNEL_R2    = 0x0E,	//red anonymous - #d text
+	//SPEAK_            = 0x0F,
 	SPEAK_MONSTER_SAY   = 0x10,
 	SPEAK_MONSTER_YELL  = 0x11,
 };

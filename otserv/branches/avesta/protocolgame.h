@@ -131,6 +131,9 @@ private:
 	void parseOpenChannel(NetworkMessage& msg);
 	void parseOpenPriv(NetworkMessage& msg);
 	void parseCloseChannel(NetworkMessage& msg);
+	void parseProcessRuleViolation(NetworkMessage& msg);
+	void parseCloseRuleViolation(NetworkMessage& msg);
+	void parseCancelRuleViolation(NetworkMessage& msg);
 
 	void parseDebugAssert(NetworkMessage& msg);
 
@@ -142,8 +145,12 @@ private:
 
 	void sendChannelsDialog();
 	void sendChannel(uint16_t channelId, const std::string& channelName);
+	void sendRuleViolationsChannel(uint16_t channelId);
 	void sendOpenPrivateChannel(const std::string& receiver);
 	void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
+	void sendRemoveReport(const std::string& name);
+	void sendLockRuleViolation();
+	void sendRuleViolationCancel(const std::string& name);
 	void sendIcons(int icons);
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
@@ -229,7 +236,7 @@ private:
 	void AddDistanceShoot(NetworkMessage* msg,const Position& from, const Position& to, uint8_t type);
 	void AddCreature(NetworkMessage* msg,const Creature* creature, bool known, uint32_t remove);
 	void AddPlayerStats(NetworkMessage* msg);
-	void AddCreatureSpeak(NetworkMessage* msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
+	void AddCreatureSpeak(NetworkMessage* msg, const Creature* creature, SpeakClasses type, std::string text, uint16_t channelId, uint32_t time = 0);
 	void AddCreatureHealth(NetworkMessage* msg,const Creature* creature);
 	void AddCreatureOutfit(NetworkMessage* msg, const Creature* creature, const Outfit_t& outfit);
 	void AddCreatureInvisible(NetworkMessage* msg, const Creature* creature);

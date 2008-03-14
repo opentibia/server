@@ -71,6 +71,22 @@ enum LightState_t {
 	LIGHT_STATE_SUNRISE,
 };
 
+struct RuleViolation{
+	Player* reporter;
+	Player* responser;
+	std::string text;
+	uint32_t time;
+	bool open;
+	RuleViolation(){
+		reporter = NULL;
+		responser = NULL;
+		text = "";
+		time = 0;
+		open = false;
+	}
+};
+typedef std::map< uint32_t, RuleViolation > RuleViolationsMap;
+
 #define EVENT_LIGHTINTERVAL  10000
 #define EVENT_DECAYINTERVAL  10000
 #define EVENT_CREATUREINTERVAL 500
@@ -319,6 +335,9 @@ public:
 	bool playerOpenChannel(uint32_t playerId, uint16_t channelId);
 	bool playerCloseChannel(uint32_t playerId, uint16_t channelId);
 	bool playerOpenPrivateChannel(uint32_t playerId, const std::string& receiver);
+	bool playerProcessRuleViolation(uint32_t playerId, const std::string& reporter);
+	bool playerCloseRuleViolation(uint32_t playerId, const std::string& reporter);
+	bool playerCancelRuleViolation(uint32_t playerId);
 	bool playerReceivePing(uint32_t playerId);
 	bool playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(uint32_t playerId);
@@ -430,6 +449,9 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
+	RuleViolationsMap getRuleViolations() const {return ruleViolations;}
+	bool cancelRuleViolation(Player* player);
+
 protected:
 
 	bool playerSayCommand(Player* player, SpeakClasses type, const std::string& text);
@@ -438,11 +460,16 @@ protected:
 	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+	bool playerReportRuleViolation(Player* player, const std::string& text);
+	bool playerContinueReport(Player* player, const std::string& text);
 
 	std::vector<Thing*> ToReleaseThings;
 
 	//list of items that are in trading state, mapped to the player
 	std::map<Item*, uint32_t> tradeItems;
+
+	//list of reported rule violations, for correct channel listing
+	RuleViolationsMap ruleViolations;
 
 	AutoList<Creature> listCreature;
 #ifdef __ONECREATURE_EVENT_

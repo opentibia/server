@@ -1846,7 +1846,14 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 		return false;
 	}
 
-	player->sendChannel(channel->getId(), channel->getName());
+	if(channel->getId() != 0x03){
+		player->sendChannel(channel->getId(), channel->getName());
+	}
+	else{
+		// 0x03 is the Rule Violations channel, send it properly
+		player->sendRuleViolationsChannel(channel->getId());
+	}
+
 	return true;
 }
 
@@ -1873,6 +1880,78 @@ bool Game::playerOpenPrivateChannel(uint32_t playerId, const std::string& receiv
 
 	player->sendOpenPrivateChannel(playerPriv->getName());
 	return true;
+}
+
+bool Game::playerProcessRuleViolation(uint32_t playerId, const std::string& reporter)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	RuleViolationsMap::iterator it = ruleViolations.begin();
+	for( ; it != ruleViolations.end(); ++it){
+		if(!it->second.open || !it->second.reporter){
+			continue;
+		}
+
+		if(it->second.reporter->getName() == reporter){
+			it->second.open = false;
+			it->second.responser = player;
+			ChatChannel* channel = g_chat.getChannelById(0x03);
+			if(channel){
+				for(UsersMap::const_iterator ut = channel->getUsers().begin();
+				    ut != channel->getUsers().end(); ++ut)
+				{
+					if(ut->second){
+						ut->second->sendRemoveReport(reporter);
+					}
+				}
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Game::playerCloseRuleViolation(uint32_t playerId, const std::string& reporter)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	bool remove = false;
+	for(RuleViolationsMap::iterator it = ruleViolations.begin(); it != ruleViolations.end(); ++it){
+		if(it->second.reporter && it->second.reporter->getName() == reporter){
+			remove = it->second.open;
+			it->second.reporter->sendLockRuleViolation();
+
+			ruleViolations.erase(it);
+			it = NULL;
+			break;
+		}
+	}
+
+	ChatChannel* channel = g_chat.getChannelById(0x03);
+	if(remove && channel){
+		for(UsersMap::const_iterator ut = channel->getUsers().begin(); ut != channel->getUsers().end(); ++ut){
+			if(ut->second){
+				ut->second->sendRemoveReport(reporter);
+			}
+		}
+	}
+
+	return true;
+}
+
+bool Game::playerCancelRuleViolation(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved()){
+		return false;
+	}
+
+	return cancelRuleViolation(player);
 }
 
 bool Game::playerReceivePing(uint32_t playerId)
@@ -2931,6 +3010,7 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 			break;
 		case SPEAK_PRIVATE:
 		case SPEAK_PRIVATE_RED:
+		case SPEAK_RVR_ANSWER:
 			return playerSpeakTo(player, type, receiver, text);
 			break;
 		case SPEAK_CHANNEL_Y:
@@ -2940,6 +3020,12 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 			break;
 		case SPEAK_BROADCAST:
 			return internalBroadcastMessage(player, text);
+			break;
+		case SPEAK_RVR_CHANNEL:
+			return playerReportRuleViolation(player, text);
+			break;
+		case SPEAK_RVR_CONTINUE:
+			return playerContinueReport(player, text);
 			break;
 
 		default:
@@ -3050,7 +3136,14 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 	toPlayer->onCreatureSay(player, type, text);
 
 	std::stringstream ss;
-	ss << "Message sent to " << toPlayer->getName() << ".";
+	ss << "Message sent to ";
+	if(type != SPEAK_RVR_ANSWER){
+		ss << toPlayer->getName();
+	}
+	else{
+		ss << "Gamemaster";
+	}
+	ss << ".";
 	player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 	return true;
 }
@@ -3065,6 +3158,52 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 	}
 
 	g_chat.talkToChannel(player, type, text, channelId);
+	return true;
+}
+
+bool Game::playerReportRuleViolation(Player* player, const std::string& text)
+{
+	//Do not allow reports on multiclones worlds
+	//Since reports are name-based
+	if(g_config.getNumber(ConfigManager::ALLOW_CLONES)){
+		player->sendTextMessage(MSG_INFO_DESCR, "Rule reports are disabled.");
+		return false;
+	}
+
+	RuleViolation rvr;
+	rvr.reporter = player;
+	rvr.text = text;
+	rvr.time = std::time(NULL);
+	rvr.open = true;
+
+	ruleViolations[player->getID()] = rvr;
+
+	ChatChannel* channel = g_chat.getChannelById(0x03); //Rule Violations channel
+	if(channel){
+		channel->talk(player, SPEAK_RVR_CHANNEL, text);
+		return true;
+	}
+	return false;
+}
+
+bool Game::playerContinueReport(Player* player, const std::string& text)
+{
+	RuleViolationsMap::iterator it = ruleViolations.find(player->getID());
+	if(it == ruleViolations.end()){
+		return false;
+	}
+
+	RuleViolation rvr = it->second;
+	Player* toPlayer = rvr.responser;
+	if(!toPlayer){
+		return false;
+	}
+
+	toPlayer->sendCreatureSay(player, SPEAK_RVR_CONTINUE, text);
+
+	std::stringstream ss;
+	ss << "Message sent to " << toPlayer->getName() << ".";
+	player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 	return true;
 }
 
@@ -3859,6 +3998,35 @@ void Game::getWorldLightInfo(LightInfo& lightInfo)
 {
 	lightInfo.level = lightlevel;
 	lightInfo.color = 0xD7;
+}
+
+bool Game::cancelRuleViolation(Player* player)
+{
+	RuleViolationsMap::iterator it = ruleViolations.find(player->getID());
+	if(it == ruleViolations.end()){
+		return false;
+	}
+
+	Player* responser = it->second.responser;
+	if(!it->second.open && responser){
+		//Send to the responser
+		responser->sendRuleViolationCancel(player->getName());
+	}
+	else{
+		//Send to channel
+		ChatChannel* channel = g_chat.getChannelById(0x03);
+		if(channel){
+			for(UsersMap::const_iterator ut = channel->getUsers().begin(); ut != channel->getUsers().end(); ++ut){
+				if(ut->second){
+					ut->second->sendRemoveReport(player->getName());
+				}
+			}
+		}
+	}
+
+	//Now erase it
+	ruleViolations.erase(it);
+	return true;
 }
 
 void Game::addCommandTag(std::string tag)
