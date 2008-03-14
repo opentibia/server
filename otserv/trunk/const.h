@@ -396,6 +396,7 @@ enum PlayerFlags{
 	PlayerFlag_IgnoreWeaponCheck,           //2^35 = 34359738368
 	PlayerFlag_CannotBeMuted,               //2^36 = 68719476736
 	PlayerFlag_IsAlwaysPremium,             //2^37 = 137438953472
+	//PlayerFlag_CanAnswerRuleViolations,     //2^38 = 274877906944
 	//add new flags here
 	PlayerFlag_LastFlag
 };

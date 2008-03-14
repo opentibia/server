@@ -117,6 +117,10 @@ bool ChatChannel::addUser(Player* player)
 	if(it != m_users.end())
 		return false;
 
+	if(getId() == 0x03 && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule Violations channel
+		return false;
+	}
+
 	m_users[player->getID()] = player;
 
 	return true;
@@ -357,7 +361,10 @@ ChannelList Chat::getChannelList(Player* player)
 	}
 
 	for(itn = m_normalChannels.begin(); itn != m_normalChannels.end(); ++itn){
-		//TODO: Permisions for channels and checks
+		if(itn->first == 0x03 && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule violations channel
+			continue;
+		}
+
 		ChatChannel *channel = itn->second;
 		list.push_back(channel);
 	}
@@ -392,6 +399,10 @@ ChatChannel* Chat::getChannel(Player* player, uint16_t channelId)
 
 	NormalChannelMap::iterator nit = m_normalChannels.find(channelId);
 	if(nit != m_normalChannels.end()){
+		if(channelId == 0x03 && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule violations channel
+			return NULL;
+		}
+
 		return nit->second;
 	}
 

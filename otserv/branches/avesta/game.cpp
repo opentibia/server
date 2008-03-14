@@ -1888,6 +1888,9 @@ bool Game::playerProcessRuleViolation(uint32_t playerId, const std::string& repo
 	if(!player || player->isRemoved())
 		return false;
 
+	if(!player->hasFlag(PlayerFlag_CanAnswerRuleViolations))
+		return false;
+
 	RuleViolationsMap::iterator it = ruleViolations.begin();
 	for( ; it != ruleViolations.end(); ++it){
 		if(!it->second.open || !it->second.reporter){
