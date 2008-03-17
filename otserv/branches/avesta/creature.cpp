@@ -999,9 +999,10 @@ bool Creature::setAttackedCreature(Creature* creature)
 void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
 {
 	fpp.fullPathSearch = false;
-	fpp.needReachable = true;
-	fpp.targetDistance = 1;
+	fpp.clearSight = true;
 	fpp.maxSearchDist = 12;
+	fpp.minTargetDist = 1;
+	fpp.maxTargetDist = 1;
 }
 
 void Creature::getPathToFollowCreature()
@@ -1013,9 +1014,9 @@ void Creature::getPathToFollowCreature()
 		if(!hasFollowPath){
 			fpp.fullPathSearch = true;
 		}
-
-		if(g_game.getPathToEx(this, followCreature->getPosition(), listWalkDir, 1, fpp.targetDistance,
-			fpp.fullPathSearch, fpp.needReachable, fpp.maxSearchDist)){
+		
+		if(g_game.getPathToEx(this, followCreature->getPosition(), listWalkDir,
+		fpp.minTargetDist, fpp.maxTargetDist, fpp.fullPathSearch, fpp.clearSight, fpp.maxSearchDist)){
 			hasFollowPath = true;
 			startAutoWalk(listWalkDir);
 		}
@@ -1514,3 +1515,64 @@ CreatureEvent* Creature::getCreatureEvent(CreatureEventType_t type)
 	}
 	return NULL;
 }
+
+FrozenPathingConditionCall::FrozenPathingConditionCall(const Position& _targetPos)
+{
+	targetPos = _targetPos;
+}
+
+bool FrozenPathingConditionCall::operator()(const Position& startPos, const Position& testPos,
+	const FindPathParams& fpp, int32_t& bestMatchDist)
+{
+	int32_t dxMin = ((fpp.fullPathSearch || (startPos.x - targetPos.x) <= 0) ? fpp.maxTargetDist : 0);
+	int32_t dxMax = ((fpp.fullPathSearch || (startPos.x - targetPos.x) >= 0) ? fpp.maxTargetDist : 0);
+	int32_t dyMin = ((fpp.fullPathSearch || (startPos.y - targetPos.y) <= 0) ? fpp.maxTargetDist : 0);
+	int32_t dyMax = ((fpp.fullPathSearch || (startPos.y - targetPos.y) >= 0) ? fpp.maxTargetDist : 0);
+
+	if(testPos.x > targetPos.x + dxMax){
+		return false;
+	}
+
+	if(testPos.x < targetPos.x - dxMin){
+		return false;
+	}
+
+	if(testPos.y > targetPos.y + dyMax){
+		return false;
+	}
+
+	if(testPos.y < targetPos.y - dyMin){
+		return false;
+	}
+
+	if(fpp.clearSight && !g_game.isSightClear(testPos, targetPos, true)){
+		return false;
+	}
+
+	int32_t testDist = std::max(std::abs(targetPos.x - testPos.x), std::abs(targetPos.y - testPos.y));
+	if(fpp.maxTargetDist == 1){
+		if(testDist > fpp.maxTargetDist){
+			return false;
+		}
+
+		return true;
+	}
+	else if(testDist <= fpp.maxTargetDist){
+		if(testDist < fpp.minTargetDist){
+			return false;
+		}
+
+		if(testDist == fpp.maxTargetDist){
+			bestMatchDist = 0;
+			return true;
+		}
+		else if(testDist > bestMatchDist){
+			//not quite what we want, but the best so far
+			bestMatchDist = testDist;
+			return true;
+		}
+	}
+
+	return false;
+}
+

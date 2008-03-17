@@ -1309,11 +1309,12 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 {
 	Creature::getPathSearchParams(creature, fpp);
 
-	fpp.targetDistance = mType->targetDistance;
+	fpp.minTargetDist = 1;
+	fpp.maxTargetDist = mType->targetDistance;
 
 	if(isSummon()){
 		if(getMaster() == creature){
-			fpp.targetDistance = 2;
+			fpp.maxTargetDist = 2;
 			fpp.fullPathSearch = true;
 		}
 		else{
@@ -1323,8 +1324,8 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 	else{
 		if(getHealth() <= mType->runAwayHealth){
 			//Distance should be higher than visible viewport (defined in Map::maxViewportX/maxViewportY)
-			fpp.targetDistance = 10;
-			fpp.needReachable = false;
+			fpp.maxTargetDist = 10;
+			fpp.clearSight = false;
 			fpp.fullPathSearch = true;
 		}
 		else{

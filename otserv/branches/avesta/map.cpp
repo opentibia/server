@@ -765,6 +765,168 @@ bool Map::getPathTo(const Creature* creature, const Position& destPos,
 
 	return !listDir.empty();
 }
+
+bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirList,
+	FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp)
+{
+	dirList.clear();
+
+	Position startPos = creature->getPosition();
+	Position endPos;
+
+	AStarNodes nodes;
+	AStarNode* startNode = nodes.createOpenNode();
+
+	startNode->x = startPos.x;
+	startNode->y = startPos.y;
+
+	startNode->f = 0;
+	startNode->parent = NULL;
+
+	Position pos;
+	pos.z = startPos.z;
+	int32_t bestMatch = 0;
+
+	static int32_t neighbourOrderList[8][2] =
+	{
+		{-1, 0},
+		{0, 1},
+		{1, 0},
+		{0, -1},
+
+		//diagonal
+		{-1, -1},
+		{1, -1},
+		{1, 1},
+		{-1, 1},
+	};
+
+	Tile* tile = NULL;
+	AStarNode* found = NULL;
+	
+	while(fpp.maxSearchDist != -1 || nodes.countClosedNodes() < 100){
+		AStarNode* n = nodes.getBestNode();
+		if(!n){
+			if(found){
+				//not quite what we want, but we found something
+				break;
+			}
+
+			dirList.clear();
+			return false; //no path found
+		}
+		
+		if(pathCondition(startPos, Position(n->x, n->y, startPos.z), fpp, bestMatch)){
+			found = n;
+			endPos = Position(n->x, n->y, startPos.z);
+			if(bestMatch == 0){
+				break;
+			}
+		}
+
+		for(int i = 0; i < 8; ++i){
+			pos.x = n->x + neighbourOrderList[i][0];
+			pos.y = n->y + neighbourOrderList[i][1];
+
+			bool inRange = true;
+			if(fpp.maxSearchDist != -1 && (std::abs(startPos.x - pos.x) > fpp.maxSearchDist ||
+				std::abs(startPos.y - pos.y) > fpp.maxSearchDist) ){
+				inRange = false;
+			}
+
+			if(inRange && (tile = isValidPosition(creature, pos))){
+				//The cost (g) for this neighbour
+				int32_t cost = nodes.getMapWalkCost(creature, n, tile, pos);
+				int32_t extraCost = nodes.getTileWalkCost(creature, tile);
+				int32_t newf = n->f + cost + extraCost;
+
+				//Check if the node is already in the closed/open list
+				//If it exists and the nodes already on them has a lower cost (g) then we can ignore this neighbour node
+
+				AStarNode* neighbourNode = nodes.getNodeInList(pos.x, pos.y);
+				if(neighbourNode){
+					if(neighbourNode->f <= newf){
+						//The node on the closed/open list is cheaper than this one
+						continue;
+					}
+
+					nodes.openNode(neighbourNode);
+				}
+				else{
+					//Does not exist in the open/closed list, create a new node
+					neighbourNode = nodes.createOpenNode();
+					if(!neighbourNode){
+						if(found){
+							//not quite what we want, but we found something
+							break;
+						}
+
+						//seems we ran out of nodes
+						dirList.clear();
+						return false;
+					}
+				}
+
+				//This node is the best node so far with this state
+				neighbourNode->x = pos.x;
+				neighbourNode->y = pos.y;
+				neighbourNode->parent = n;
+				neighbourNode->f = newf;
+			}
+		}
+
+		nodes.closeNode(n);
+	}
+	
+	int32_t prevx = endPos.x;
+	int32_t prevy = endPos.y;
+	int32_t dx, dy;
+
+	if(!found){
+		return false;
+	}
+
+	found = found->parent;
+	while(found){
+		pos.x = found->x;
+		pos.y = found->y;
+		
+		found = found->parent;
+		dx = pos.x - prevx;
+		dy = pos.y - prevy;
+
+		prevx = pos.x;
+		prevy = pos.y;
+
+		if(dx == 1 && dy == 1){
+			dirList.push_front(NORTHWEST);
+		}
+		else if(dx == -1 && dy == 1){
+			dirList.push_front(NORTHEAST);
+		}
+		else if(dx == 1 && dy == -1){
+			dirList.push_front(SOUTHWEST);
+		}
+		else if(dx == -1 && dy == -1){
+			dirList.push_front(SOUTHEAST);
+		}
+		else if(dx == 1){
+			dirList.push_front(WEST);
+		}
+		else if(dx == -1){
+			dirList.push_front(EAST);
+		}
+		else if(dy == 1){
+			dirList.push_front(NORTH);
+		}
+		else if(dy == -1){
+			dirList.push_front(SOUTH);
+		}
+	}
+
+	return true;
+}
+
 //*********** AStarNodes *************
 
 AStarNodes::AStarNodes()

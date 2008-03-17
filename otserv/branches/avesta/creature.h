@@ -55,9 +55,10 @@ enum slots_t {
 
 struct FindPathParams{
 	bool fullPathSearch;
-	bool needReachable;
-	uint32_t maxSearchDist;
-	uint32_t targetDistance;
+	bool clearSight;
+	int32_t maxSearchDist;
+	int32_t minTargetDist;
+	int32_t maxTargetDist;
 };
 
 enum ZoneType_t{
@@ -75,6 +76,18 @@ class Player;
 class Monster;
 class Npc;
 class Item;
+
+class FrozenPathingConditionCall {
+public:
+	FrozenPathingConditionCall(const Position& _targetPos);
+	virtual ~FrozenPathingConditionCall() {}
+	
+	virtual bool operator()(const Position& startPos, const Position& testPos,
+		const FindPathParams& fpp, int32_t& bestMatchDist);
+
+protected:
+	Position targetPos;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which
@@ -104,7 +117,7 @@ public:
 		creatureUpdatePathList.clear();
 		OTSYS_THREAD_UNLOCK(Creature::pathLock, "")
 	}
-
+	
 	void getPathToFollowCreature();
 
 	virtual const std::string& getName() const = 0;
@@ -200,7 +213,7 @@ public:
 	virtual void onWalkComplete() {};
 
 	//follow functions
-	virtual Creature* getFollowCreature() { return followCreature; };
+	virtual Creature* getFollowCreature() const { return followCreature; };
 	virtual bool setFollowCreature(Creature* creature, bool fullPathSearch = false);
 
 	//follow events

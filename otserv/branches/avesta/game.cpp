@@ -1135,7 +1135,12 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	}
 
 	if(_moveItem){
-		*_moveItem = moveItem;
+		if(moveItem){
+			*_moveItem = moveItem;
+		}
+		else{
+			*_moveItem = item;
+		}
 	}
 
 	//we could not move all, inform the player
@@ -3287,100 +3292,17 @@ bool Game::getPathTo(const Creature* creature, const Position& destPos,
 }
 
 bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
-	uint32_t minDist, uint32_t maxDist, bool fullPathSearch /*= true*/,
-	bool targetMustBeReachable /*= true*/, int32_t maxSearchDist /*= -1*/)
+	uint32_t minTargetDist, uint32_t maxTargetDist, bool fullPathSearch /*= true*/,
+	bool clearSight /*= true*/, int32_t maxSearchDist /*= -1*/)
 {
-	if(creature->getPosition().z != targetPos.z || !creature->canSee(targetPos)){
-		return false;
-	}
+	FindPathParams fpp;
+	fpp.fullPathSearch = fullPathSearch;
+	fpp.maxSearchDist = maxSearchDist;
+	fpp.clearSight = clearSight;
+	fpp.minTargetDist = minTargetDist;
+	fpp.maxTargetDist = maxTargetDist;
 
-	const Position& creaturePos = creature->getPosition();
-
-	uint32_t currentDist = std::max(std::abs(creaturePos.x - targetPos.x), std::abs(creaturePos.y - targetPos.y));
-	if(currentDist == maxDist){
-		if(!targetMustBeReachable || map->isSightClear(creaturePos, targetPos, true)){
-			return true;
-		}
-	}
-
-	//std::cout << "getPathToEx - start" << std::endl;
-#ifdef __DEBUG__
-	uint64_t startTick = OTSYS_TIME();
-#endif
-
-	int32_t dxMin = ((fullPathSearch || (creaturePos.x - targetPos.x) <= 0) ? maxDist : 0);
-	int32_t dxMax = ((fullPathSearch || (creaturePos.x - targetPos.x) >= 0) ? maxDist : 0);
-	int32_t dyMin = ((fullPathSearch || (creaturePos.y - targetPos.y) <= 0) ? maxDist : 0);
-	int32_t dyMax = ((fullPathSearch || (creaturePos.y - targetPos.y) >= 0) ? maxDist : 0);
-
-	std::list<Direction> tmpDirList;
-
-	Position minWalkPos;
-	Position tmpPos;
-	int minWalkDist = -1;
-
-	int tmpDist;
-	int tmpWalkDist;
-
-	int32_t tryDist = maxDist;
-
-	while(tryDist >= (int32_t)minDist){
-		for(int y = targetPos.y - dyMin; y <= targetPos.y + dyMax; ++y) {
-			for(int x = targetPos.x - dxMin; x <= targetPos.x + dxMax; ++x) {
-
-				tmpDist = std::max( std::abs(targetPos.x - x), std::abs(targetPos.y - y) );
-
-				if(tmpDist == tryDist){
-					tmpWalkDist = std::abs(creaturePos.x - x) + std::abs(creaturePos.y - y);
-
-					tmpPos.x = x;
-					tmpPos.y = y;
-					tmpPos.z = creaturePos.z;
-
-					if(tmpWalkDist <= minWalkDist || tmpPos == creaturePos || minWalkDist == -1){
-
-						if(targetMustBeReachable && !isSightClear(tmpPos, targetPos, true)){
-							continue;
-						}
-
-						if(tmpPos != creaturePos){
-							//std::cout << "x: " << tmpPos.x << "y: " << tmpPos.y << std::endl;
-							if(!map->getPathTo(creature, tmpPos, tmpDirList, maxSearchDist)){
-								continue;
-							}
-						}
-						else{
-							tmpDirList.clear();
-						}
-
-						if(tmpWalkDist < minWalkDist || tmpDirList.size() < dirList.size() || minWalkDist == -1){
-							minWalkDist = tmpWalkDist;
-							minWalkPos = tmpPos;
-							dirList = tmpDirList;
-						}
-					}
-				}
-			}
-
-		}
-
-		if(minWalkDist != -1){
-#ifdef __DEBUG__PATHING__
-			__int64 endTick = OTSYS_TIME();
-			std::cout << "getPathTo - ticks: "<< (__int64 )endTick - startTick << std::endl;
-#endif
-			return true;
-		}
-
-		--tryDist;
-	}
-
-#ifdef __DEBUG__
-	__int64 endTick = OTSYS_TIME();
-	std::cout << "Ticks: "<< (__int64 )endTick - startTick << std::endl;
-#endif
-
-	return false;
+	return(map->getPathMatching(creature, dirList, FrozenPathingConditionCall(targetPos), fpp));
 }
 
 void Game::checkCreatureWalk(uint32_t creatureId)

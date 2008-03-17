@@ -18,6 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "otpch.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -57,10 +59,12 @@ __cdecl _SEHHandler(
 void printPointer(std::ostream* output,unsigned long p);
 #endif
 
+#ifndef COMPILER_STRING
 #ifdef __GNUC__
 #define COMPILER_STRING  "gcc " __VERSION__
 #else
 #define COMPILER_STRING  ""
+#endif
 #endif
 
 #define COMPILATION_DATE  __DATE__ " " __TIME__
