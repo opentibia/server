@@ -1522,7 +1522,7 @@ FrozenPathingConditionCall::FrozenPathingConditionCall(const Position& _targetPo
 }
 
 bool FrozenPathingConditionCall::operator()(const Position& startPos, const Position& testPos,
-	const FindPathParams& fpp, int32_t& bestMatchDist)
+	const FindPathParams& fpp, int32_t& bestMatchDist) const
 {
 	int32_t dxMin = ((fpp.fullPathSearch || (startPos.x - targetPos.x) <= 0) ? fpp.maxTargetDist : 0);
 	int32_t dxMax = ((fpp.fullPathSearch || (startPos.x - targetPos.x) >= 0) ? fpp.maxTargetDist : 0);

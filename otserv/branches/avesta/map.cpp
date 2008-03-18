@@ -767,7 +767,7 @@ bool Map::getPathTo(const Creature* creature, const Position& destPos,
 }
 
 bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirList,
-	FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp)
+	const FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp)
 {
 	dirList.clear();
 
@@ -881,50 +881,49 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 	int32_t prevx = endPos.x;
 	int32_t prevy = endPos.y;
 	int32_t dx, dy;
-
-	if(!found){
-		return false;
-	}
-
-	found = found->parent;
-	while(found){
-		pos.x = found->x;
-		pos.y = found->y;
-		
+	
+	if(found){
 		found = found->parent;
-		dx = pos.x - prevx;
-		dy = pos.y - prevy;
+		while(found){
+			pos.x = found->x;
+			pos.y = found->y;
+			
+			dx = pos.x - prevx;
+			dy = pos.y - prevy;
 
-		prevx = pos.x;
-		prevy = pos.y;
+			prevx = pos.x;
+			prevy = pos.y;
 
-		if(dx == 1 && dy == 1){
-			dirList.push_front(NORTHWEST);
-		}
-		else if(dx == -1 && dy == 1){
-			dirList.push_front(NORTHEAST);
-		}
-		else if(dx == 1 && dy == -1){
-			dirList.push_front(SOUTHWEST);
-		}
-		else if(dx == -1 && dy == -1){
-			dirList.push_front(SOUTHEAST);
-		}
-		else if(dx == 1){
-			dirList.push_front(WEST);
-		}
-		else if(dx == -1){
-			dirList.push_front(EAST);
-		}
-		else if(dy == 1){
-			dirList.push_front(NORTH);
-		}
-		else if(dy == -1){
-			dirList.push_front(SOUTH);
+			if(dx == 1 && dy == 1){
+				dirList.push_front(NORTHWEST);
+			}
+			else if(dx == -1 && dy == 1){
+				dirList.push_front(NORTHEAST);
+			}
+			else if(dx == 1 && dy == -1){
+				dirList.push_front(SOUTHWEST);
+			}
+			else if(dx == -1 && dy == -1){
+				dirList.push_front(SOUTHEAST);
+			}
+			else if(dx == 1){
+				dirList.push_front(WEST);
+			}
+			else if(dx == -1){
+				dirList.push_front(EAST);
+			}
+			else if(dy == 1){
+				dirList.push_front(NORTH);
+			}
+			else if(dy == -1){
+				dirList.push_front(SOUTH);
+			}
+
+			found = found->parent;
 		}
 	}
 
-	return true;
+	return !dirList.empty();
 }
 
 //*********** AStarNodes *************

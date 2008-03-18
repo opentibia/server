@@ -242,7 +242,7 @@ public:
 		std::list<Direction>& listDir, int32_t maxDist = -1);
 
 	bool getPathMatching(const Creature* creature, std::list<Direction>& dirList,
-		FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp);
+		const FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp);
 
 	MapError_t getLastError() {return lasterrortype;}
 	int getErrorCode() {return lasterrorcode;}

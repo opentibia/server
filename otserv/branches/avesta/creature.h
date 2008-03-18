@@ -83,7 +83,7 @@ public:
 	virtual ~FrozenPathingConditionCall() {}
 	
 	virtual bool operator()(const Position& startPos, const Position& testPos,
-		const FindPathParams& fpp, int32_t& bestMatchDist);
+		const FindPathParams& fpp, int32_t& bestMatchDist) const;
 
 protected:
 	Position targetPos;
