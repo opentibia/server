@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT([otserv], 0.6)
-AM_INIT_AUTOMAKE([1.10])
+AM_INIT_AUTOMAKE([1.10 foreign])
 AC_CONFIG_SRCDIR([raids.h])
 AC_CONFIG_HEADER([config.h])
 
