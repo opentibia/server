@@ -3144,14 +3144,7 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 	toPlayer->onCreatureSay(player, type, text);
 
 	std::stringstream ss;
-	ss << "Message sent to ";
-	if(type != SPEAK_RVR_ANSWER){
-		ss << toPlayer->getName();
-	}
-	else{
-		ss << "Gamemaster";
-	}
-	ss << ".";
+	ss << "Message sent to " << toPlayer->getName() << ".";
 	player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 	return true;
 }
@@ -3209,9 +3202,7 @@ bool Game::playerContinueReport(Player* player, const std::string& text)
 
 	toPlayer->sendCreatureSay(player, SPEAK_RVR_CONTINUE, text);
 
-	std::stringstream ss;
-	ss << "Message sent to " << toPlayer->getName() << ".";
-	player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
+	player->sendTextMessage(MSG_STATUS_SMALL, "Message sent to Gamemaster.");
 	return true;
 }
 

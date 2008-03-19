@@ -45,7 +45,7 @@ public:
 
 	const std::string& getName(){ return m_name; }
 	const uint16_t getId(){ return m_id; }
-	const UsersMap getUsers(){ return m_users; }
+	const UsersMap& getUsers(){ return m_users; }
 
 	virtual const uint32_t getOwner(){ return 0; }
 

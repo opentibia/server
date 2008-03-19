@@ -449,7 +449,7 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
-	RuleViolationsMap getRuleViolations() const {return ruleViolations;}
+	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
 
 protected:

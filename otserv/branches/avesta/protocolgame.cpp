@@ -1558,7 +1558,7 @@ void ProtocolGame::sendRuleViolationsChannel(uint16_t channelId)
 	if(msg){
 		msg->AddByte(0xAE);
 		msg->AddU16(channelId);
-		RuleViolationsMap::iterator it = g_game.getRuleViolations().begin();
+		RuleViolationsMap::const_iterator it = g_game.getRuleViolations().begin();
 		for( ; it != g_game.getRuleViolations().end(); ++it){
 			RuleViolation rvr = it->second;
 			if(rvr.open && rvr.reporter){

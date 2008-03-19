@@ -83,35 +83,35 @@ std::string Weapons::getScriptBaseName()
 bool Weapons::loadDefaults()
 {
 	for(uint32_t i = 0; i < Item::items.size(); ++i){
-		const ItemType& it = Item::items[i];
+		const ItemType* it = Item::items.getElement(i);
 
-		if(it.id == 0 || weapons.find(it.id) != weapons.end()){
+		if(!it || weapons.find(it->id) != weapons.end()){
 			continue;
 		}
 
-		if(it.weaponType != WEAPON_NONE){
-			switch(it.weaponType){
+		if(it->weaponType != WEAPON_NONE){
+			switch(it->weaponType){
 				case WEAPON_AXE:
 				case WEAPON_SWORD:
 				case WEAPON_CLUB:
 				{
 					WeaponMelee* weapon = new WeaponMelee(&m_scriptInterface);
-					weapon->configureWeapon(it);
-					weapons[it.id] = weapon;
+					weapon->configureWeapon(*it);
+					weapons[it->id] = weapon;
 					break;
 				}
 
 				case WEAPON_AMMO:
 				case WEAPON_DIST:
 				{
-					if(it.weaponType == WEAPON_DIST && it.amuType != AMMO_NONE){
+					if(it->weaponType == WEAPON_DIST && it->amuType != AMMO_NONE){
 						//distance weapons with ammunitions are configured seperatly
 						continue;
 					}
 
 					WeaponDistance* weapon = new WeaponDistance(&m_scriptInterface);
-					weapon->configureWeapon(it);
-					weapons[it.id] = weapon;
+					weapon->configureWeapon(*it);
+					weapons[it->id] = weapon;
 					break;
 				}
 				default:
