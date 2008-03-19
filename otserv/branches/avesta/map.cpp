@@ -882,48 +882,50 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 	int32_t prevy = endPos.y;
 	int32_t dx, dy;
 	
-	if(found){
-		found = found->parent;
-		while(found){
-			pos.x = found->x;
-			pos.y = found->y;
-			
-			dx = pos.x - prevx;
-			dy = pos.y - prevy;
+	if(!found){
+		return false;
+	}
+	
+	found = found->parent;
+	while(found){
+		pos.x = found->x;
+		pos.y = found->y;
+		
+		dx = pos.x - prevx;
+		dy = pos.y - prevy;
 
-			prevx = pos.x;
-			prevy = pos.y;
+		prevx = pos.x;
+		prevy = pos.y;
 
-			if(dx == 1 && dy == 1){
-				dirList.push_front(NORTHWEST);
-			}
-			else if(dx == -1 && dy == 1){
-				dirList.push_front(NORTHEAST);
-			}
-			else if(dx == 1 && dy == -1){
-				dirList.push_front(SOUTHWEST);
-			}
-			else if(dx == -1 && dy == -1){
-				dirList.push_front(SOUTHEAST);
-			}
-			else if(dx == 1){
-				dirList.push_front(WEST);
-			}
-			else if(dx == -1){
-				dirList.push_front(EAST);
-			}
-			else if(dy == 1){
-				dirList.push_front(NORTH);
-			}
-			else if(dy == -1){
-				dirList.push_front(SOUTH);
-			}
-
-			found = found->parent;
+		if(dx == 1 && dy == 1){
+			dirList.push_front(NORTHWEST);
 		}
+		else if(dx == -1 && dy == 1){
+			dirList.push_front(NORTHEAST);
+		}
+		else if(dx == 1 && dy == -1){
+			dirList.push_front(SOUTHWEST);
+		}
+		else if(dx == -1 && dy == -1){
+			dirList.push_front(SOUTHEAST);
+		}
+		else if(dx == 1){
+			dirList.push_front(WEST);
+		}
+		else if(dx == -1){
+			dirList.push_front(EAST);
+		}
+		else if(dy == 1){
+			dirList.push_front(NORTH);
+		}
+		else if(dy == -1){
+			dirList.push_front(SOUTH);
+		}
+
+		found = found->parent;
 	}
 
-	return !dirList.empty();
+	return true;
 }
 
 //*********** AStarNodes *************
