@@ -134,6 +134,7 @@ void Game::setGameState(GameState_t newState)
 		switch(newState){
 			case GAME_STATE_INIT:
 			{
+				Spawns::getInstance()->startup();
 				loadGameState();
 				break;
 			}
@@ -1935,7 +1936,6 @@ bool Game::playerCloseRuleViolation(uint32_t playerId, const std::string& report
 			it->second.reporter->sendLockRuleViolation();
 
 			ruleViolations.erase(it);
-			it = NULL;
 			break;
 		}
 	}

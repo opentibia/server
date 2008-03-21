@@ -30,7 +30,8 @@
 #include "otsystem.h"
 #include "tasks.h"
 
-class SchedulerTask : public Task{
+class SchedulerTask : public Task
+{
 public:
 	~SchedulerTask() {}
 		
@@ -57,11 +58,14 @@ protected:
 	friend SchedulerTask* createSchedulerTask(uint32_t, boost::function<void (void)>);
 };
 
-inline SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f){
+inline SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f)
+{
+	assert(delay != 0);
 	return new SchedulerTask(delay, f);
 }
 
-class lessSchedTask : public std::binary_function<SchedulerTask*&, SchedulerTask*&, bool>{
+class lessSchedTask : public std::binary_function<SchedulerTask*&, SchedulerTask*&, bool>
+{
 public:
 	bool operator()(SchedulerTask*& t1, SchedulerTask*& t2)
 	{
@@ -69,7 +73,8 @@ public:
 	}
 };
 
-class Scheduler{
+class Scheduler
+{
 public:
 	~Scheduler() {}
 	

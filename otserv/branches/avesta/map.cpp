@@ -590,7 +590,7 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 	return true;
 }
 
-Tile* Map::isValidPosition(const Creature* creature, const Position& pos)
+const Tile* Map::canWalkTo(const Creature* creature, const Position& pos)
 {
 	switch(creature->getWalkCache(pos)){
 		case 0: return NULL;
@@ -612,7 +612,7 @@ Tile* Map::isValidPosition(const Creature* creature, const Position& pos)
 bool Map::getPathTo(const Creature* creature, const Position& destPos,
 	std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/)
 {
-	if(isValidPosition(creature, destPos) == NULL){
+	if(canWalkTo(creature, destPos) == NULL){
 		return false;
 	}
 
@@ -653,7 +653,7 @@ bool Map::getPathTo(const Creature* creature, const Position& destPos,
 		{-1, 1},
 	};
 
-	Tile* tile = NULL;
+	const Tile* tile = NULL;
 	AStarNode* found = NULL;
 
 	while(maxSearchDist != -1 || nodes.countClosedNodes() < 100){
@@ -678,7 +678,7 @@ bool Map::getPathTo(const Creature* creature, const Position& destPos,
 					outOfRange = true;
 				}
 
-				if(!outOfRange && (tile = isValidPosition(creature, pos))){
+				if(!outOfRange && (tile = canWalkTo(creature, pos))){
 					//The cost (g) for this neighbour
 					int32_t cost = nodes.getMapWalkCost(creature, n, tile, pos);
 					int32_t extraCost = nodes.getTileWalkCost(creature, tile);
@@ -801,7 +801,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 		{-1, 1},
 	};
 
-	Tile* tile = NULL;
+	const Tile* tile = NULL;
 	AStarNode* found = NULL;
 	
 	while(fpp.maxSearchDist != -1 || nodes.countClosedNodes() < 100){
@@ -834,7 +834,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 				inRange = false;
 			}
 
-			if(inRange && (tile = isValidPosition(creature, pos))){
+			if(inRange && (tile = canWalkTo(creature, pos))){
 				//The cost (g) for this neighbour
 				int32_t cost = nodes.getMapWalkCost(creature, n, tile, pos);
 				int32_t extraCost = nodes.getTileWalkCost(creature, tile);

@@ -160,7 +160,8 @@ int main(int argc, char *argv[])
 
 //	LOG_MESSAGE("main", EVENT, 1, "Starting server");
 
-	g_game.setGameState(GAME_STATE_STARTUP);
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(&Game::setGameState, &g_game, GAME_STATE_STARTUP)));
 
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... ";
@@ -413,11 +414,13 @@ int main(int argc, char *argv[])
 	Status* status = Status::instance();
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
-	//OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
 	OTSYS_CREATE_THREAD(Creature::creaturePathThread, NULL);
 
-	g_game.setGameState(GAME_STATE_INIT);
-	g_game.setGameState(GAME_STATE_NORMAL);
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(&Game::setGameState, &g_game, GAME_STATE_INIT)));
+
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(&Game::setGameState, &g_game, GAME_STATE_NORMAL)));
 
 	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
 		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;

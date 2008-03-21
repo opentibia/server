@@ -92,7 +92,7 @@ public:
 
 typedef std::list<Creature*> SpectatorVec;
 typedef std::list<Player*> PlayerList;
-typedef std::map<Position, SpectatorVec> SpectatorCache;
+typedef std::map<Position, SpectatorVec > SpectatorCache;
 
 #define FLOOR_BITS 3
 #define FLOOR_SIZE (1 << FLOOR_BITS)
@@ -228,7 +228,7 @@ public:
 	*/
 	bool isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck);
 
-	Tile* isValidPosition(const Creature* creature, const Position& pos);
+	const Tile* canWalkTo(const Creature* creature, const Position& pos);
 
 	/**
 	* Get the path to a specific position on the map.

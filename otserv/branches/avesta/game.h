@@ -182,15 +182,15 @@ public:
 	  /* Place Creature on the map without sending out events to the surrounding.
 	  * \param creature Creature to place on the map
 	  * \param pos The position to place the creature
-	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/items)
+	  * \param forced If true, placing the creature will not fail because of obstacles (creatures/items)
 	  */
-	bool internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/);
+	bool internalPlaceCreature(Creature* creature, const Position& pos, bool forced = false);
 
 	/**
 	  * Place Creature on the map.
 	  * \param creature Creature to place on the map
 	  * \param pos The position to place the creature
-	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/items)
+	  * \param forced If true, placing the creature will not fail because of obstacles (creatures/items)
 	  */
 	bool placeCreature(Creature* creature, const Position& pos, bool force = false);
 

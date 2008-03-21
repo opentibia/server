@@ -1441,7 +1441,7 @@ int32_t Creature::getStepDuration() const
 	const Tile* tile = getTile();
 	if(tile && tile->ground){
 		uint32_t groundId = tile->ground->getID();
-		uint16_t groundSpeed = Item::items[groundId].speed;
+		uint16_t groundSpeed = std::max((uint16_t)Item::items[groundId].speed, (uint16_t)1);
 		uint32_t stepSpeed = getStepSpeed();
 		if(stepSpeed != 0){
 			duration = (1000 * groundSpeed) / stepSpeed;

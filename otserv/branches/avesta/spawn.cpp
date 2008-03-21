@@ -211,14 +211,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 
 						npc->setDirection(direction);
 						npc->setMasterPos(placePos, radius);
-
-						// Place the npc
-						if(!g_game.placeCreature(npc, placePos)){
-							delete npc;
-
-							tmpNode = tmpNode->next;
-							continue;
-						}
+						npcList.push_back(npc);
 					}
 
 					tmpNode = tmpNode->next;
@@ -238,8 +231,13 @@ bool Spawns::loadFromXml(const std::string& _filename)
 
 void Spawns::startup()
 {
-	if(!isLoaded() || isStarted() || spawnList.empty())
+	if(!isLoaded() || isStarted())
 		return;
+
+	for(NpcList::iterator it = npcList.begin(); it != npcList.end(); ++it){
+		g_game.placeCreature((*it), (*it)->getMasterPos(), true);
+	}
+	npcList.clear();
 
 	for(SpawnList::iterator it = spawnList.begin(); it != spawnList.end(); ++it){
 		(*it)->startup();
