@@ -30,6 +30,8 @@
 #include "otsystem.h"
 #include "tasks.h"
 
+#define SCHEDULER_MINTICKS 50
+
 class SchedulerTask : public Task
 {
 public:
@@ -61,6 +63,9 @@ protected:
 inline SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f)
 {
 	assert(delay != 0);
+	if(delay < SCHEDULER_MINTICKS){
+		delay = SCHEDULER_MINTICKS;
+	}
 	return new SchedulerTask(delay, f);
 }
 

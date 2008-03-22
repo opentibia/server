@@ -145,7 +145,6 @@ bool Raids::loadFromXml(const std::string& _filename)
 }
 
 #define MAX_RAND_RANGE 10000000
-#define CHECK_RAIDS_INTERVAL 60
 
 void Raids::startup()
 {
@@ -323,7 +322,8 @@ void Raid::executeRaidEvent(RaidEvent* raidEvent)
 		nextEvent++;
 		RaidEvent* newRaidEvent = getNextRaidEvent();
 		if(newRaidEvent){
-			nextEventEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(newRaidEvent->getDelay()-raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
+			uint32_t ticks = (uint32_t)std::max(((uint32_t)RAID_MINTICKS), ((int32_t)newRaidEvent->getDelay() - raidEvent->getDelay()));
+			nextEventEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(ticks, boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
 		}
 		else{
 			resetRaid();
@@ -372,6 +372,9 @@ bool RaidEvent::configureRaidEvent(xmlNodePtr eventNode)
 	int intValue;
 	if(readXMLInteger(eventNode, "delay", intValue)){
 		m_delay = intValue;
+		if(m_delay < RAID_MINTICKS){
+			m_delay = RAID_MINTICKS;
+		}
 		return true;
 	}
 	else{
@@ -688,7 +691,6 @@ bool AreaSpawnEvent::executeEvent()
 
 			if(!success){
 				delete monster;
-				//return false;
 			}
 		}
 	}

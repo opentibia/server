@@ -43,6 +43,8 @@ struct MonsterSpawn {
 
 //How many times it will try to find a tile to add the monster to before giving up
 #define MAXIMUM_TRIES_PER_MONSTER 10
+#define CHECK_RAIDS_INTERVAL 60
+#define RAID_MINTICKS 1000
 
 class Raid;
 class RaidEvent;

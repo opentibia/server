@@ -159,8 +159,13 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-
-						spawn->addMonster(name, pos, dir, interval);
+						
+						if(interval > 0){
+							spawn->addMonster(name, pos, dir, interval);
+						}
+						else{
+							std::cout << "[Warning] Spawns::loadFromXml " << name << " " << pos << " spawntime can not be 0." << std::endl;
+						}
 					}
 					else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"npc") == 0){
 
