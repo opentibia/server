@@ -217,6 +217,8 @@ Thing* Tile::getTopThing()
 
 void Tile::onAddTileItem(Item* item)
 {
+	updateTileFlags(item, false);
+
 	const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
@@ -240,6 +242,9 @@ void Tile::onAddTileItem(Item* item)
 void Tile::onUpdateTileItem(uint32_t index, Item* oldItem,
 		const ItemType& oldType, Item* newItem, const ItemType& newType)
 {
+	updateTileFlags(oldItem, true);
+	updateTileFlags(newItem, false);
+
 	const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
@@ -262,6 +267,8 @@ void Tile::onUpdateTileItem(uint32_t index, Item* oldItem,
 
 void Tile::onRemoveTileItem(uint32_t index, Item* item)
 {
+	updateTileFlags(item, true);
+
 	const Position& cylinderMapPos = getPosition();
 	const ItemType& iType = Item::items[item->getID()];
 
@@ -396,6 +403,43 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 
+			if(hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)){
+				return RET_NOTPOSSIBLE;
+			}
+
+			if(hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH)){
+				return RET_NOTPOSSIBLE;
+			}
+
+			if(hasFlag(TILESTATE_BLOCKSOLID) || (hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILESTATE_NOFIELDBLOCKPATH))){
+				if(!(monster->canPushItems() || hasBitSet(FLAG_IGNOREBLOCKITEM, flags) ) ){
+					return RET_NOTPOSSIBLE;
+				}
+			}
+
+			if(hasFlag(TILESTATE_MAGICFIELD)){
+				MagicField* field = getFieldItem();
+				if(!field->isBlocking()){
+					CombatType_t combatType = field->getCombatType();
+					//There is 3 options for a monster to enter a magic field
+					//1) Monster is immune
+					if(!monster->isImmune(combatType)){
+						//1) Monster is "strong" enough to handle the damage
+						//2) Monster is already afflicated by this type of condition
+						if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
+							if( !(monster->canPushItems() ||
+								monster->hasCondition(Combat::DamageToConditionType(combatType))) ){
+								return RET_NOTPOSSIBLE;
+							}
+						}
+						else{
+							return RET_NOTPOSSIBLE;
+						}
+					}
+				}
+			}
+
+			/*
 			for(uint32_t i = 0; i < getThingCount(); ++i){
 				iithing = __getThing(i);
 				if(const Item* iitem = iithing->getItem()){
@@ -410,10 +454,18 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 							if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
 								if( !(monster->canPushItems() ||
 									monster->hasCondition(Combat::DamageToConditionType(combatType))) ){
+									if(ret != RET_NOTPOSSIBLE){
+										this->__queryAdd(index, thing, count, flags);
+										std::cout << "missmatch" << std::endl;
+									}
 									return RET_NOTPOSSIBLE;
 								}
 							}
 							else{
+								if(ret != RET_NOTPOSSIBLE){
+									this->__queryAdd(index, thing, count, flags);
+									std::cout << "missmatch" << std::endl;
+								}
 								return RET_NOTPOSSIBLE;
 							}
 						}
@@ -421,16 +473,30 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					else if(iiType.blockSolid || (hasBitSet(FLAG_PATHFINDING, flags) && iiType.blockPathFind) ){
 						if(!iiType.moveable || iitem->getUniqueId() != 0){
 							//its not moveable
+							if(ret != RET_NOTPOSSIBLE){
+								this->__queryAdd(index, thing, count, flags);
+								std::cout << "missmatch" << std::endl;
+							}
 							return RET_NOTPOSSIBLE;
 						}
 						//moveable
 						else if(!(hasBitSet(FLAG_IGNOREBLOCKITEM, flags) || monster->canPushItems()) ){
+							assert(ret == RET_NOTPOSSIBLE);
+							if(ret != RET_NOTPOSSIBLE){
+								this->__queryAdd(index, thing, count, flags);
+								std::cout << "missmatch" << std::endl;
+							}
 							return RET_NOTPOSSIBLE;
 						}
 					}
 				}
 			}
 
+			if(ret != RET_NOERROR){
+				this->__queryAdd(index, thing, count, flags);
+				std::cout << "missmatch RET_NOERROR" << std::endl;
+			}
+			*/
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
@@ -696,11 +762,12 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				int32_t index = __getIndexOfThing(ground);
 				const ItemType& oldType = Item::items[ground->getID()];
 				const ItemType& newType = Item::items[item->getID()];
-				onUpdateTileItem(index, ground, oldType, item, newType);
 
+				Item* oldGround = ground;
 				ground->setParent(NULL);
 				g_game.FreeThing(ground);
 				ground = item;
+				onUpdateTileItem(index, oldGround, oldType, item, newType);
 			}
 		}
 		else if(item->isAlwaysOnTop()){
@@ -912,12 +979,11 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		}
 
 		if(item == ground){
-
-			onRemoveTileItem(index, item);
-
 			ground->setParent(NULL);
 			ground = NULL;
 			--thingCount;
+			onRemoveTileItem(index, ground);
+
 			return /*RET_NOERROR*/;
 		}
 
@@ -925,12 +991,10 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		if(item->isAlwaysOnTop()){
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 				if(*iit == item){
-
-					onRemoveTileItem(index, item);
-
 					(*iit)->setParent(NULL);
 					topItems.erase(iit);
 					--thingCount;
+					onRemoveTileItem(index, item);
 					return /*RET_NOERROR*/;
 				}
 			}
@@ -946,11 +1010,10 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 						onUpdateTileItem(index, item, it, item, it);
 					}
 					else{
-						onRemoveTileItem(index, item);
-
 						(*iit)->setParent(NULL);
 						downItems.erase(iit);
 						--thingCount;
+						onRemoveTileItem(index, item);
 					}
 
 					return /*RET_NOERROR*/;
@@ -1232,12 +1295,29 @@ void Tile::updateTileFlags(Item* item, bool removing)
 				setFlag(TILESTATE_FLOORCHANGE);
 				setFlag(TILESTATE_FLOORCHANGE_WEST);
 			}
-			if(item->getTeleport()){
-				setFlag(TILESTATE_POSITIONCHANGE);
-			}
-			if(item->getMagicField()){
-				setFlag(TILESTATE_MAGICFIELD);
-			}
+		}
+
+		if(item->getTeleport()){
+			setFlag(TILESTATE_POSITIONCHANGE);
+		}
+		if(item->getMagicField()){
+			setFlag(TILESTATE_MAGICFIELD);
+		}
+
+		if(item->hasProperty(BLOCKSOLID)){
+			setFlag(TILESTATE_BLOCKSOLID);
+		}
+		if(item->hasProperty(IMMOVABLEBLOCKSOLID)){
+			setFlag(TILESTATE_IMMOVABLEBLOCKSOLID);
+		}
+		if(item->hasProperty(BLOCKPATH)){
+			setFlag(TILESTATE_BLOCKPATH);
+		}
+		if(item->hasProperty(NOFIELDBLOCKPATH)){
+			setFlag(TILESTATE_NOFIELDBLOCKPATH);
+		}
+		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH)){
+			setFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
 		}
 	}
 	else{
@@ -1266,6 +1346,25 @@ void Tile::updateTileFlags(Item* item, bool removing)
 		}
 		if(item->getMagicField()){
 			resetFlag(TILESTATE_MAGICFIELD);
+		}
+
+		if(item->hasProperty(BLOCKSOLID) && !hasProperty(BLOCKSOLID)){
+			resetFlag(TILESTATE_BLOCKSOLID);
+		}
+		if(item->hasProperty(IMMOVABLEBLOCKSOLID) && !hasProperty(IMMOVABLEBLOCKSOLID)){
+			resetFlag(TILESTATE_IMMOVABLEBLOCKSOLID);
+		}
+		if(item->hasProperty(BLOCKPATH) && !hasProperty(BLOCKPATH)){
+			resetFlag(TILESTATE_BLOCKPATH);
+		}
+		if(item->hasProperty(NOFIELDBLOCKPATH) && !hasProperty(NOFIELDBLOCKPATH)){
+			resetFlag(TILESTATE_NOFIELDBLOCKPATH);
+		}
+		if(item->hasProperty(IMMOVABLEBLOCKPATH) && !hasProperty(IMMOVABLEBLOCKPATH)){
+			resetFlag(TILESTATE_IMMOVABLEBLOCKPATH);
+		}
+		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH) && !hasProperty(IMMOVABLENOFIELDBLOCKPATH)){
+			resetFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
 		}
 	}
 }

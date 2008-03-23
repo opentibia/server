@@ -88,7 +88,7 @@ Creature::Creature() :
 
 	blockCount = 0;
 	blockTicks = 0;
-	walkUpdateTicks = 0;
+	walkUpdateTicks = 0;	
 #ifndef __ONECREATURE_EVENT_
 	eventCheck = 0;
 #endif
@@ -160,9 +160,11 @@ bool Creature::canSeeCreature(const Creature* creature) const
 void Creature::addEventThink()
 {
 	if(eventCheck == 0){
-		if(!isMapLoaded){
-			isMapLoaded = true;
-			updateMapCache();
+		if(useCacheMap()){
+			if(!isMapLoaded){
+				isMapLoaded = true;
+				updateMapCache();
+			}
 		}
 
 		eventCheck = Scheduler::getScheduler().addEvent(
@@ -427,6 +429,10 @@ void Creature::updateTileCache(const Tile* tile, const Position& pos)
 
 int32_t Creature::getWalkCache(const Position& pos) const
 {
+	if(!useCacheMap()){
+		return 2;
+	}
+
 	const Position& myPos = getPosition();
 	if(myPos.z != pos.z){
 		return 0;
@@ -508,8 +514,10 @@ void Creature::onUpdateTile(const Tile* tile, const Position& pos)
 void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	if(creature == this){
-		isMapLoaded = true;
-		updateMapCache();
+		if(useCacheMap()){
+			isMapLoaded = true;
+			updateMapCache();
+		}
 	}
 	else if(isMapLoaded){
 		if(creature->getPosition().z == getPosition().z){

@@ -635,7 +635,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 				return true;
 			break;
 
-		case BLOCKPATHFIND:
+		case BLOCKPATH:
 			if(it.blockPathFind)
 				return true;
 			break;
@@ -650,13 +650,28 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 				return true;
 			break;
 
-		case BLOCKINGANDNOTMOVEABLE:
+		case IMMOVABLEBLOCKSOLID:
 			if(it.blockSolid && (!it.moveable || getUniqueId() != 0))
+				return true;
+			break;
+
+		case IMMOVABLEBLOCKPATH:
+			if(it.blockPathFind && (!it.moveable || getUniqueId() != 0))
 				return true;
 			break;
 
 		case SUPPORTHANGABLE:
 			if(it.isHorizontal || it.isVertical)
+				return true;
+			break;
+
+		case IMMOVABLENOFIELDBLOCKPATH:
+			if(!it.isMagicField() && it.blockPathFind && (!it.moveable || getUniqueId() != 0))
+				return true;
+			break;
+
+		case NOFIELDBLOCKPATH:
+			if(!it.isMagicField() && it.blockPathFind)
 				return true;
 			break;
 

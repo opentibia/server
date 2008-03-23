@@ -174,6 +174,7 @@ private:
 	virtual uint32_t getConditionImmunities() const { return mType->conditionImmunities; }
 	virtual uint16_t getLookCorpse() const { return mType->lookcorpse; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
+	virtual bool useCacheMap() const {return true;}
 };
 
 #endif

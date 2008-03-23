@@ -153,6 +153,7 @@ protected:
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 	virtual void onThink(uint32_t interval);
+	virtual uint32_t getThinkInterval() const {return 2000;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	bool isImmune(CombatType_t type) const {return true;}

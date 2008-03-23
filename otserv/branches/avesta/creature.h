@@ -77,6 +77,8 @@ class Monster;
 class Npc;
 class Item;
 
+#define EVENT_CREATUREINTERVAL 1000
+
 class FrozenPathingConditionCall {
 public:
 	FrozenPathingConditionCall(const Position& _targetPos);
@@ -297,6 +299,8 @@ public:
 	void setCreatureLight(LightInfo& light) {internalLight = light;}
 
 	virtual void onThink(uint32_t interval);
+	virtual uint32_t getThinkInterval() const {return EVENT_CREATUREINTERVAL;}
+
 	virtual void onAttacking(uint32_t interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);
@@ -353,6 +357,8 @@ protected:
 	static const int32_t mapWalkWidth = /*maxViewportX*/ 13 * 2 + 1;
 	static const int32_t mapWalkHeight = /*maxViewportY*/ 13 * 2 + 1;
 	bool localMapCache[mapWalkHeight][mapWalkWidth];
+
+	virtual bool useCacheMap() const {return false;}
 
 	Tile* _tile;
 	uint32_t id;

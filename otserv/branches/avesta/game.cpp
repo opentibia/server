@@ -711,14 +711,14 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 
 	//check throw distance
 	if((std::abs(movingCreaturePos.x - toPos.x) > movingCreature->getThrowRange()) ||
-	(std::abs(movingCreaturePos.y - toPos.y) > movingCreature->getThrowRange()) ||
-	(std::abs(movingCreaturePos.z - toPos.z) * 4 > movingCreature->getThrowRange())){
+			(std::abs(movingCreaturePos.y - toPos.y) > movingCreature->getThrowRange()) ||
+			(std::abs(movingCreaturePos.z - toPos.z) * 4 > movingCreature->getThrowRange())){
 		player->sendCancelMessage(RET_DESTINATIONOUTOFREACH);
 		return false;
 	}
 
 	if(player != movingCreature){
-		if(toTile->hasProperty(BLOCKPATHFIND)){
+		if(toTile->hasProperty(BLOCKPATH)){
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
 			return false;
 		}
@@ -3345,11 +3345,12 @@ void Game::checkCreatures()
 void Game::checkCreature(uint32_t creatureId)
 {
 	Creature* creature = getCreatureByID(creatureId);
-
+	
 	if(creature){
+		uint32_t interval = creature->getThinkInterval();
 		if(creature->getHealth() > 0){
-			creature->onThink(EVENT_CREATUREINTERVAL);
-			creature->executeConditions(EVENT_CREATUREINTERVAL);
+			creature->onThink(interval);
+			creature->executeConditions(interval);
 		}
 		else{
 			creature->onDie();

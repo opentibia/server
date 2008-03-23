@@ -317,7 +317,7 @@ bool Monster::isOpponent(const Creature* creature)
 			(creature->getMaster() && creature->getMaster()->getPlayer()) ) {
 			return true;
 		}
-}
+	}
 
 	return false;
 }
@@ -419,9 +419,6 @@ void Monster::onFollowCreatureComplete(const Creature* creature)
 			else if(!isSummon()){
 				//push target we have not found a path to the back
 				targetList.push_back(target);
-
-				//Could not find a path, lets find another one
-				//searchTarget();
 			}
 		}
 	}
@@ -808,7 +805,7 @@ void Monster::pushItems(Tile* tile)
 	for(int32_t i = downItemSize - 1; i >= 0; --i){
 		assert(i >= 0 && i < (int32_t)tile->downItems.size());
 		Item* item = tile->downItems[i];
-		if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATHFIND)
+		if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATH)
 			|| item->hasProperty(BLOCKSOLID))){
 				if(moveCount < 20 && pushItem(item, 1)){
 					moveCount++;
@@ -840,7 +837,7 @@ bool Monster::pushCreature(Creature* creature)
 		const Position& tryPos = Spells::getCasterPosition(creature, *it);
 		Tile* toTile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
 
-		if(toTile && !toTile->hasProperty(BLOCKPATHFIND)){
+		if(toTile && !toTile->hasProperty(BLOCKPATH)){
 			if(g_game.internalMoveCreature(creature, *it) == RET_NOERROR){
 				return true;
 			}
@@ -1030,6 +1027,10 @@ bool Monster::canWalkTo(Position pos, Direction dir)
 	}
 
 	if(isInSpawnRange(pos)){
+		if(getWalkCache(pos) == 0){
+			return false;
+		}
+
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			return true;

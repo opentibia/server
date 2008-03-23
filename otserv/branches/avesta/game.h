@@ -89,7 +89,6 @@ typedef std::map< uint32_t, RuleViolation > RuleViolationsMap;
 
 #define EVENT_LIGHTINTERVAL  10000
 #define EVENT_DECAYINTERVAL  10000
-#define EVENT_CREATUREINTERVAL 500
 
 /**
   * Main Game class.
