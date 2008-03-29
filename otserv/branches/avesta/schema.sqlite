@@ -462,15 +462,3 @@ BEGIN
     WHERE NEW."player_id" IS NULL
         OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
 END;
-
-CREATE TRIGGER "onupdate_players_after"
-AFTER UPDATE
-ON "players"
-FOR EACH ROW
-BEGIN
-    DELETE FROM "player_spells" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
-    DELETE FROM "player_items" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
-    DELETE FROM "player_depotitems" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
-    DELETE FROM "player_storage" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
-    DELETE FROM "player_viplist" WHERE OLD."lastlogin" < NEW."lastlogin" AND "player_id" = OLD."id";
-END;

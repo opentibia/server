@@ -522,6 +522,43 @@ bool IOPlayer::savePlayer(Player* player)
 		query.str("");
 	}
 
+	// deletes all player-related stuff
+
+	query << "DELETE FROM `player_spells` WHERE `player_id` = " << player->getGUID();
+
+	if(!db->executeQuery(query.str())){
+		return false;
+	}
+	query.str("");
+
+	query << "DELETE FROM `player_items` WHERE `player_id` = " << player->getGUID();
+
+	if(!db->executeQuery(query.str())){
+		return false;
+	}
+	query.str("");
+
+	query << "DELETE FROM `player_depotitems` WHERE `player_id` = " << player->getGUID();
+
+	if(!db->executeQuery(query.str())){
+		return false;
+	}
+	query.str("");
+
+	query << "DELETE FROM `player_storage` WHERE `player_id` = " << player->getGUID();
+
+	if(!db->executeQuery(query.str())){
+		return false;
+	}
+	query.str("");
+
+	query << "DELETE FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
+
+	if(!db->executeQuery(query.str())){
+		return false;
+	}
+	query.str("");
+
 	DBInsert stmt(db);
 
 	//learned spells

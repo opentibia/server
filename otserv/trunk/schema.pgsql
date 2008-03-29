@@ -270,25 +270,3 @@ AFTER INSERT
 ON "players"
 FOR EACH ROW
 EXECUTE PROCEDURE "oncreate_players"();
-
-CREATE FUNCTION "onupdate_players"()
-RETURNS TRIGGER
-AS $$
-BEGIN
-    IF OLD."lastlogin" < NEW."lastlogin" THEN
-        DELETE FROM "player_spells" WHERE "player_id" = OLD."id";
-        DELETE FROM "player_items" WHERE "player_id" = OLD."id";
-        DELETE FROM "player_depotitems" WHERE "player_id" = OLD."id";
-        DELETE FROM "player_storage" WHERE "player_id" = OLD."id";
-        DELETE FROM "player_viplist" WHERE "player_id" = OLD."id";
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER "onupdate_players"
-AFTER UPDATE
-ON "players"
-FOR EACH ROW
-EXECUTE PROCEDURE "onupdate_players"();
