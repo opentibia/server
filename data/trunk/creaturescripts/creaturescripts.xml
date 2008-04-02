@@ -1,3 +1,4 @@
 <?xml version="1.0"?>
-<!-- No creature scripts yet -->
-<creaturescripts/>
+<creaturescripts>
+	<event name="PlayerLogin" type="login" script="login.lua"/>
+</creaturescripts>

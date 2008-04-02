@@ -448,6 +448,7 @@ protected:
 
 	static int luaDoPlayerAddOutfit(lua_State *L);
 	static int luaDoPlayerRemOutfit(lua_State *L);
+	static int luaCanPlayerWearOutfit(lua_State *L);
 
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);
@@ -520,6 +521,7 @@ protected:
 
 	static int luaDoChangeSpeed(lua_State *L);
 
+	static int luaDoCreatureChangeOutfit(lua_State *L);
 	static int luaSetCreatureOutfit(lua_State *L);
 	static int luaGetCreatureOutfit(lua_State *L);
 	static int luaSetMonsterOutfit(lua_State *L);

@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -43,7 +43,7 @@ OutfitList::~OutfitList()
 }
 
 void OutfitList::addOutfit(const Outfit& outfit)
-{	
+{
 	OutfitListType::iterator it;
 	for(it = m_list.begin(); it != m_list.end(); ++it){
 		if((*it)->looktype == outfit.looktype){
@@ -101,12 +101,12 @@ Outfits::Outfits()
 		outfit.looktype = i;
 		m_female_list.addOutfit(outfit);
 	}
-		
+
 	for(int i = PLAYER_MALE_1; i <= PLAYER_MALE_7; i++){
 		outfit.looktype = i;
 		m_male_list.addOutfit(outfit);
 	}
-	
+
 	m_list.resize(10, NULL);
 }
 
@@ -127,15 +127,15 @@ bool Outfits::loadFromXml(const std::string& datadir)
 	if(doc){
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
-		
+
 		if(xmlStrcmp(root->name,(const xmlChar*)"outfits") != 0){
 			xmlFreeDoc(doc);
 			std::cout << "Warning: outfits.xml not found, using defaults." << std::endl;
 			return true;
 		}
-		
+
 		p = root->children;
-		
+
 		while(p){
 			std::string str;
 			int intVal;
@@ -146,7 +146,7 @@ bool Outfits::loadFromXml(const std::string& datadir)
 					}
 					else{
 						OutfitList* list;
-						
+
 						if(m_list[intVal] != NULL){
 							list = m_list[intVal];
 						}
@@ -154,20 +154,31 @@ bool Outfits::loadFromXml(const std::string& datadir)
 							list = new OutfitList;
 							m_list[intVal] = list;
 						}
-						
+
 						Outfit outfit;
 						std::string outfitName;
+						bool enabled = true;
 						readXMLString(p, "name", outfitName);
 						if(readXMLInteger(p, "looktype", intVal)){
 							outfit.looktype = intVal;
 						}
+						else{
+							std::cout << "Missing looktype on an outfit." << std::endl;
+						}
+
 						if(readXMLInteger(p, "addons", intVal)){
 							outfit.addons = intVal;
 						}
-						
+
+						if(readXMLInteger(p, "enabled", intVal)){
+							enabled = (intVal != 0);
+						}
+
 						outfitNamesMap[outfit.looktype] = outfitName;
-						
-						list->addOutfit(outfit);
+
+						if(enabled){ //This way you can add names for outfits without adding them to default list
+							list->addOutfit(outfit);
+						}
 					}
 				}
 				else{
