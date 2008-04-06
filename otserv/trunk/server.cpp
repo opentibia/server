@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "otsystem.h"
 #include "server.h"
 #include "connection.h"
 
