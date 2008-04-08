@@ -14,7 +14,6 @@
 				<Compiler>
 					<Add option="-pg" />
 					<Add option="-g" />
-					<Add option="-W,-map=otserv.map" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-D__USE_SQLITE__" />
 					<Add option="-D__DEBUG__" />
@@ -22,13 +21,15 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add library="libxml2" />
+					<Add option="-Wl,-Map=../otserv.map" />
+					<Add library="liblibxml2" />
 					<Add library="gmp" />
 					<Add library="lua5.1" />
 					<Add library="boost_system" />
 					<Add library="wsock32" />
 					<Add library="ws2_32" />
 					<Add library="boost_regex" />
+					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
@@ -45,12 +46,13 @@
 				<Linker>
 					<Add option="-s" />
 					<Add library="boost_regex" />
-					<Add library="libxml2" />
+					<Add library="liblibxml2" />
 					<Add library="gmp" />
 					<Add library="lua5.1" />
 					<Add library="boost_system" />
 					<Add library="wsock32" />
 					<Add library="ws2_32" />
+					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 			<Target title="Debug Unix">
