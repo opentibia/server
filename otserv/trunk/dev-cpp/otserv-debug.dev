@@ -1,7 +1,7 @@
 [Project]
 FileName=otserv-debug.dev
 Name=otserv
-UnitCount=148
+UnitCount=149
 Type=1
 Ver=1
 ObjFiles=
@@ -11,8 +11,8 @@ PrivateResource=otserv-debug_private.rc
 ResourceIncludes=
 MakeIncludes=
 Compiler=
-CppCompiler=-D__USE_SQLITE___@@_-D__DEBUG___@@_-D__EXCEPTION_TRACER___@@_
-Linker=-llibxml2_@@_-lgmp_@@_-llua5.1_@@_-lboost_system_@@_-lwsock32_@@_-lws2_32_@@_-lboost_regex_@@_-lsqlite3_@@__@@_-Wl,-Map=C:\otserv\otserv.map_@@_
+CppCompiler=-D__USE_SQLITE___@@_-D__USE_MYSQL___@@_-D__DEBUG___@@_-D__EXCEPTION_TRACER___@@_
+Linker=-llibxml2_@@_-lgmp_@@_-llua5.1_@@_-lboost_system_@@_-lwsock32_@@_-lws2_32_@@_-lboost_regex_@@_-lsqlite3_@@_-lmysql_@@__@@_-Wl,-Map=C:\otserv\otserv.map_@@_
 IsCpp=1
 Icon=
 ExeOutput=C:\otserv\
@@ -1480,7 +1480,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit149]
-FileName=..\waitlist.h
+FileName=..\databasemysql.cpp
 CompileCpp=1
 Folder=otserv
 Compile=1

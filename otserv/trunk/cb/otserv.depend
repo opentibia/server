@@ -364,11 +364,11 @@
 	"baseevents.h"
 	<vector>
 
-1207693024 c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\house.h
+1207697948 c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\house.h
 	<string>
 	<list>
 	<map>
-	<boost/regex.hpp>
+	"boost/regex.hpp"
 	"definitions.h"
 	"position.h"
 	"housetile.h"
@@ -1288,4 +1288,21 @@
 	<sstream>
 	<libxml/xmlmemory.h>
 	<libxml/parser.h>
+
+1207697766 source:c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\cb\otserv.rc
+
+1207490138 source:c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\databasemysql.cpp
+	<iostream>
+	<winsock2.h>
+	"database.h"
+	"databasemysql.h"
+	"errmsg.h"
+	<mysql/errmsg.h>
+	"configmanager.h"
+
+1207702040 source:c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\databasepgsql.cpp
+	<iostream>
+	"database.h"
+	"databasepgsql.h"
+	"configmanager.h"
 

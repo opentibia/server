@@ -1,7 +1,7 @@
 [Project]
 FileName=otserv.dev
 Name=otserv
-UnitCount=147
+UnitCount=148
 Type=1
 Ver=1
 ObjFiles=
@@ -11,8 +11,8 @@ PrivateResource=otserv_private.rc
 ResourceIncludes=
 MakeIncludes=
 Compiler=
-CppCompiler=-D__USE_SQLITE___@@_-D__SKULL_SYSTEM___@@_
-Linker=-llibxml2_@@_-lgmp_@@_-llua5.1_@@_-lboost_system_@@_-lwsock32_@@_-lws2_32_@@_-lboost_regex_@@_-lsqlite3_@@_
+CppCompiler=-D__USE_SQLITE___@@_-D__USE_MYSQL___@@_-D__SKULL_SYSTEM___@@_
+Linker=-llibxml2_@@_-lgmp_@@_-llua5.1_@@_-lboost_system_@@_-lwsock32_@@_-lws2_32_@@_-lboost_regex_@@_-lsqlite3_@@_-lmysql_@@_
 IsCpp=1
 Icon=otserv.ico
 ExeOutput=C:\otserv\
@@ -1470,7 +1470,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit148]
-FileName=..\waitlist.cpp
+FileName=..\databasemysql.cpp
 CompileCpp=1
 Folder=otserv
 Compile=1

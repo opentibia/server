@@ -206,7 +206,7 @@ std::string PgSQLResult::getDataString(const std::string &s)
 const char* PgSQLResult::getDataStream(const std::string &s, unsigned long &size)
 {
 	std::string buf = PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) );
-	unsigned char* temp = PQunescapeBytea( (const unsigned char*)buf.c_str(), &size);
+	unsigned char* temp = PQunescapeBytea( (const unsigned char*)buf.c_str(), (size_t*)&size);
 	char* value = new char[buf.size()];
 	strcpy(value, (char*)temp);
 	PQfreemem(temp);

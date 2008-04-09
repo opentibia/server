@@ -16,12 +16,14 @@
 					<Add option="-g" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-D__USE_SQLITE__" />
+					<Add option="-D__USE_MYSQL__" />
 					<Add option="-D__DEBUG__" />
 					<Add option="-D__EXCEPTION_TRACER__" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
+					<Add library="mysql" />
 					<Add library="liblibxml2" />
 					<Add library="gmp" />
 					<Add library="lua5.1" />
@@ -41,10 +43,12 @@
 					<Add option="-O1" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-D__USE_SQLITE__" />
+					<Add option="-D__USE_MYSQL__" />
 					<Add option="-D__SKULLSYSTEM__" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="mysql" />
 					<Add library="boost_regex" />
 					<Add library="liblibxml2" />
 					<Add library="gmp" />
@@ -137,6 +141,10 @@
 		<Unit filename="..\cylinder.h" />
 		<Unit filename="..\database.cpp" />
 		<Unit filename="..\database.h" />
+		<Unit filename="..\databasemysql.cpp">
+			<Option target="Debug Windows" />
+			<Option target="Release Windows" />
+		</Unit>
 		<Unit filename="..\databasemysql.h" />
 		<Unit filename="..\databaseodbc.h" />
 		<Unit filename="..\databasepgsql.h" />
