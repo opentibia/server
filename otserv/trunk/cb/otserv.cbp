@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug Windows">
-				<Option output="..\otserv" prefix_auto="1" extension_auto="1" />
+				<Option output="C:\otserv\otserv" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -21,7 +21,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-Wl,-Map=../otserv.map" />
+					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
 					<Add library="liblibxml2" />
 					<Add library="gmp" />
 					<Add library="lua5.1" />
@@ -33,7 +33,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
-				<Option output="..\otserv" prefix_auto="1" extension_auto="1" />
+				<Option output="C:\otserv\otserv" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -107,6 +107,11 @@
 		<Unit filename="..\ban.h" />
 		<Unit filename="..\baseevents.cpp" />
 		<Unit filename="..\baseevents.h" />
+		<Unit filename="otserv.rc">
+			<Option compilerVar="WINDRES" />
+			<Option target="Debug Windows" />
+			<Option target="Release Windows" />
+		</Unit>
 		<Unit filename="..\chat.cpp" />
 		<Unit filename="..\chat.h" />
 		<Unit filename="..\combat.cpp" />

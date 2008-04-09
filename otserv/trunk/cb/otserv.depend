@@ -7,7 +7,7 @@
 	"definitions.h"
 	"account.h"
 
-1207490138 c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\otpch.h
+1207696974 c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\otpch.h
 	"definitions.h"
 	<libxml/xmlmemory.h>
 	<libxml/parser.h>
@@ -364,11 +364,11 @@
 	"baseevents.h"
 	<vector>
 
-1207490138 c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\house.h
+1207693024 c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\house.h
 	<string>
 	<list>
 	<map>
-	"boost/regex.hpp"
+	<boost/regex.hpp>
 	"definitions.h"
 	"position.h"
 	"housetile.h"
@@ -435,7 +435,7 @@
 	"otsystem.h"
 	<list>
 
-1207490138 c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\rsa.h
+1207696996 c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\rsa.h
 	"otsystem.h"
 	"gmp.h"
 
@@ -580,7 +580,7 @@
 	"configmanager.h"
 	<iostream>
 
-1207493959 source:c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\connection.cpp
+1207691638 source:c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\connection.cpp
 	"otpch.h"
 	"protocol.h"
 	"outputmessage.h"
@@ -1238,7 +1238,7 @@
 	"combat.h"
 	"movement.h"
 
-1207494532 source:c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\server.cpp
+1207691638 source:c:\documents and settings\root\desktop\opentibia svn\otserv\trunk\server.cpp
 	"otpch.h"
 	"otsystem.h"
 	"server.h"
