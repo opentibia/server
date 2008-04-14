@@ -326,6 +326,7 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 #endif
 
 	uint32_t creatureId;
+	uint64_t startTime = OTSYS_TIME();
 
 	while(!Creature::m_shutdownPathThread){
 		OTSYS_THREAD_LOCK(Creature::pathLock, "")
@@ -343,6 +344,12 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 		if(creatureId != 0){
 			Dispatcher::getDispatcher().addTask(createTask(
 				boost::bind(&Game::updateCreatureWalk, &g_game, creatureId)));
+		}
+		
+		uint64_t endTime = OTSYS_TIME();
+		if((endTime - startTime) > 100){
+			startTime = OTSYS_TIME();
+			OTSYS_SLEEP(10);
 		}
 
 		OTSYS_SLEEP(1);
