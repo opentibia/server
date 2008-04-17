@@ -162,18 +162,16 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	#ifndef __USE_SQL_PREMDAYS__
 	time_t premEnd = result->getDataInt("premend");
 	time_t timeNow = time(NULL);
-	if(premEnd != 0 && premEnd < timeNow){
-		//TODO: remove every premium property of the player
-		// outfit, vocation, temple, ...
-		// can it be done as database trigger?
-
-		//update table
-		query << "UPDATE `players` SET `premend` = 0 WHERE `id` = " << player->getGUID();
-		db->executeQuery(query.str());
-		query.str("");
-	}
-	else{
-		player->premiumDays = (premEnd - timeNow)/86400;
+	if(premEnd > 0){
+		if(premEnd < timeNow){
+			//update table
+			query << "UPDATE `players` SET `premend` = 0 WHERE `id` = " << player->getGUID();
+			db->executeQuery(query.str());
+			query.str("");
+		}
+		else{
+			player->premiumDays = (premEnd - timeNow)/86400;
+		}
 	}
 	#endif
 
