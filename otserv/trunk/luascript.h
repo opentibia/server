@@ -586,7 +586,7 @@ private:
 	struct LuaTimerEventDesc{
 		int32_t scriptId;
 		int function;
-		int parameter;
+		std::list<int> parameters;
 	};
 	uint32_t m_lastEventTimerId;
 

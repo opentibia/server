@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 	mainExceptionHandler.InstallHandler();
 #endif
 
-	std::cout << ":: OTServ Development-Version revdbsys - SVN Preview" << std::endl;
+	std::cout << ":: OTServ Development-Version 0.6.0 - SVN Preview" << std::endl;
 	std::cout << ":: ==============================================" << std::endl;
 	//std::cout << ":: OTServ Version 0.6.0" << std::endl;
 	//std::cout << ":: ====================" << std::endl;

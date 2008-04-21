@@ -629,8 +629,6 @@ bool LuaScriptInterface::initState()
 		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << datadir << "global.lua." << std::endl;
 	}
 
-
-
 	lua_newtable(m_luaState);
 	lua_setfield(m_luaState, LUA_REGISTRYINDEX, "EVENTS");
 
@@ -645,7 +643,10 @@ bool LuaScriptInterface::closeState()
 
 		LuaTimerEvents::iterator it;
 		for(it = m_timerEvents.begin(); it != m_timerEvents.end(); ++it){
-			luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+			for(std::list<int>::iterator lt = it->second.parameters.begin(); lt != it->second.parameters.end(); ++lt){
+				luaL_unref(m_luaState, LUA_REGISTRYINDEX, *lt);
+			}
+			it->second.parameters.clear();
 			luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.function);
 		}
 		m_timerEvents.clear();
@@ -664,14 +665,17 @@ void LuaScriptInterface::executeTimerEvent(uint32_t eventIndex)
 		lua_rawgeti(m_luaState, LUA_REGISTRYINDEX, it->second.function);
 
 		//push parameters
-		lua_rawgeti(m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+		for(std::list<int>::reverse_iterator rt = it->second.parameters.rbegin();
+			rt != it->second.parameters.rend(); ++rt){
+			lua_rawgeti(m_luaState, LUA_REGISTRYINDEX, *rt);
+		}
 
 		//call the function
 		if(reserveScriptEnv()){
 			ScriptEnviroment* env = getScriptEnv();
 			env->setTimerEvent();
 			env->setScriptId(it->second.scriptId, this);
-			callFunction(1);
+			callFunction(it->second.parameters.size());
 			releaseScriptEnv();
 		}
 		else{
@@ -679,7 +683,10 @@ void LuaScriptInterface::executeTimerEvent(uint32_t eventIndex)
 		}
 
 		//free resources
-		luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+		for(std::list<int>::iterator lt = it->second.parameters.begin(); lt != it->second.parameters.end(); ++lt){
+			luaL_unref(m_luaState, LUA_REGISTRYINDEX, *lt);
+		}
+		it->second.parameters.clear();
 		luaL_unref(m_luaState, LUA_REGISTRYINDEX, it->second.function);
 		m_timerEvents.erase(it);
 	}
@@ -1503,7 +1510,7 @@ void LuaScriptInterface::registerFunctions()
 	//isInArray(array, value)
 	lua_register(m_luaState, "isInArray", LuaScriptInterface::luaIsInArray);
 
-	//addEvent(callback, delay, parameter)
+	//addEvent(callback, delay, ...)
 	lua_register(m_luaState, "addEvent", LuaScriptInterface::luaAddEvent);
 
 	//stopEvent(eventid)
@@ -5932,7 +5939,7 @@ int LuaScriptInterface::luaGetItemWeight(lua_State *L)
 
 int LuaScriptInterface::luaAddEvent(lua_State *L)
 {
-	//addEvent(callback, delay, parameter)
+	//addEvent(callback, delay, ...)
 	ScriptEnviroment* env = getScriptEnv();
 
 	LuaScriptInterface* script_interface = env->getScriptInterface();
@@ -5942,18 +5949,21 @@ int LuaScriptInterface::luaAddEvent(lua_State *L)
 		return 1;
 	}
 
-	if(lua_isfunction(L, -3) == 0){
+	uint32_t parameters = lua_gettop(L);
+	if(lua_isfunction(L, -parameters) == 0){ //-parameters means the first parameter from left to right
 		reportError(__FUNCTION__, "callback parameter should be a function.");
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
 
 	LuaTimerEventDesc eventDesc;
-	eventDesc.parameter = luaL_ref(L, LUA_REGISTRYINDEX);
-	uint32_t delay = popNumber(L);
-	if(delay < 100){
-		delay = 100;
+	std::list<int> params;
+	for(uint32_t i = 0; i < parameters-2; ++i){ //-2 because addEvent needs at least two parameters
+		params.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
 	}
+	eventDesc.parameters = params;
+
+	uint32_t delay = std::max((uint32_t)100, popNumber(L));
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
 
 	eventDesc.scriptId = env->getScriptId();
@@ -5982,7 +5992,10 @@ int LuaScriptInterface::luaStopEvent(lua_State *L)
 
 	LuaTimerEvents::iterator it = script_interface->m_timerEvents.find(eventId);
 	if(it != script_interface->m_timerEvents.end()){
-		luaL_unref(script_interface->m_luaState, LUA_REGISTRYINDEX, it->second.parameter);
+		for(std::list<int>::iterator lt = it->second.parameters.begin(); lt != it->second.parameters.end(); ++lt){
+			luaL_unref(script_interface->m_luaState, LUA_REGISTRYINDEX, *lt);
+		}
+		it->second.parameters.clear();
 		luaL_unref(script_interface->m_luaState, LUA_REGISTRYINDEX, it->second.function);
 		script_interface->m_timerEvents.erase(it);
 		lua_pushnumber(L, LUA_NO_ERROR);
