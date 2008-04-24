@@ -24,7 +24,6 @@
 
 #include "exception.h"
 
-
 #ifdef XML_GCC_FREE
 	#define xmlFreeOTSERV(s)	free(s)
 #else
@@ -74,6 +73,12 @@ enum passwordType_t{
 	PASSWORD_TYPE_MD5,
 	PASSWORD_TYPE_SHA1,
 };
+
+#ifdef _WIN32
+#  ifndef WIN32
+#    define WIN32
+#  endif
+#endif
 
 #if defined __WINDOWS__ || defined WIN32
 

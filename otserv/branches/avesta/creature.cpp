@@ -89,7 +89,9 @@ Creature::Creature() :
 	blockCount = 0;
 	blockTicks = 0;
 	walkUpdateTicks = 0;	
-#ifndef __ONECREATURE_EVENT_
+#ifdef __ONECREATURE_EVENT_
+	checkCreatureVectorIndex = 0;
+#else
 	eventCheck = 0;
 #endif
 
@@ -168,7 +170,7 @@ void Creature::addEventThink()
 		}
 
 		eventCheck = Scheduler::getScheduler().addEvent(
-			createSchedulerTask(EVENT_CREATUREINTERVAL,
+			createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL,
 			boost::bind(&Game::checkCreature, &g_game, getID())));
 	}
 }
@@ -359,7 +361,7 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 	creaturePathExceptionHandler.RemoveHandler();
 #endif
 
-#if defined WIN32 || defined __WINDOWS__
+#if defined WIN32 || defined __WINDOWS__ || _WIN32
 	//
 #else
 	return 0;

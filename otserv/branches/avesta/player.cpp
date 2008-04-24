@@ -2003,7 +2003,7 @@ void Player::dropCorpse()
 		sendStats();
 		g_game.internalTeleport(this, getTemplePosition());
 		g_game.addCreatureHealth(this);
-		onThink(EVENT_CREATUREINTERVAL);
+		onThink(EVENT_CREATURE_THINK_INTERVAL);
 	}
 	else{
 		Creature::dropCorpse();

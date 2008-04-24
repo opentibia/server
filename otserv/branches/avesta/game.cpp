@@ -102,7 +102,8 @@ Game::Game()
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL,
 		boost::bind(&Game::checkLight, this)));
 #ifdef __ONECREATURE_EVENT_
-	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_CREATUREINTERVAL,
+	checkCreatureLastIndex = 0;
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL,
 		boost::bind(&Game::checkCreatures, this)));
 #endif
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
@@ -3322,23 +3323,68 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 }
 
 #ifdef __ONECREATURE_EVENT_
+void Game::addCreatureCheck(Creature* creature)
+{
+	if(creature->checkCreatureVectorIndex != 0) {
+		// Already in a vector
+		return;
+	}
+	size_t min = std::numeric_limits<size_t>::max();
+	size_t insertindex = 0;
+	for(size_t i = 0; i < EVENT_CREATURECOUNT; ++i) {
+		if(checkCreatureVectors[i].size() < min) {
+			insertindex = i;
+			min = checkCreatureVectors[i].size();
+		}
+	}
+	checkCreatureVectors[insertindex].push_back(creature);
+	creature->checkCreatureVectorIndex = insertindex + 1;
+}
+
+void Game::removeCreatureCheck(Creature* creature)
+{
+	if(creature->checkCreatureVectorIndex == 0) {
+		// Not in any vector
+		return;
+	}
+	std::vector<Creature*>& checkCreatureVector = checkCreatureVectors[creature->checkCreatureVectorIndex - 1];
+
+	std::vector<Creature*>::iterator cit = std::find(checkCreatureVector.begin(),
+	checkCreatureVector.end(), creature);
+	if(cit != checkCreatureVector.end()) {
+		// Swap & pop is more effective than erase
+		std::swap(*cit, checkCreatureVector.back());
+		checkCreatureVector.pop_back();
+		/*
+		if(cit != checkCreatureVector.end()){
+		checkCreatureVector.erase(cit);
+		}*/
+	}
+	creature->checkCreatureVectorIndex = 0;
+}
+
 void Game::checkCreatures()
 {
 	Scheduler::getScheduler().addEvent(createSchedulerTask(
-		EVENT_CREATUREINTERVAL, boost::bind(&Game::checkCreatures, this)));
+		EVENT_CHECK_CREATURE_INTERVAL, boost::bind(&Game::checkCreatures, this)));
+
+	if(checkCreatureLastIndex == EVENT_CREATURECOUNT) {
+		checkCreatureLastIndex = 0;
+	}
+	std::vector<Creature*>& checkCreatureVector = checkCreatureVectors[checkCreatureLastIndex];
+	checkCreatureLastIndex++;
 
 	Creature* creature;
 	for(uint32_t i = 0; i < checkCreatureVector.size(); ++i){
 		creature = checkCreatureVector[i];
 		if(creature->getHealth() > 0){
-			creature->onThink(EVENT_CREATUREINTERVAL);
-			creature->executeConditions(EVENT_CREATUREINTERVAL);
+			creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
+			creature->executeConditions(EVENT_CREATURE_THINK_INTERVAL);
 		}
 		else{
 			creature->onDie();
 		}
 	}
-
 	cleanup();
 }
 #else

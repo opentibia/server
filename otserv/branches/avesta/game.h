@@ -201,15 +201,8 @@ public:
 	bool removeCreature(Creature* creature, bool isLogout = true);
 
 #ifdef __ONECREATURE_EVENT_
-	void addCreatureCheck(Creature* creature) {checkCreatureVector.push_back(creature);}
-	void removeCreatureCheck(Creature* creature)
-	{
-		std::vector<Creature*>::iterator cit = std::find(checkCreatureVector.begin(),
-			checkCreatureVector.end(), creature);
-		if(cit != checkCreatureVector.end()){
-			checkCreatureVector.erase(cit);
-		}
-	}
+	void addCreatureCheck(Creature* creature);
+	void removeCreatureCheck(Creature* creature);
 #endif
 
 	uint32_t getPlayersOnline() {return (uint32_t)Player::listPlayer.list.size();}
@@ -472,7 +465,8 @@ protected:
 
 	AutoList<Creature> listCreature;
 #ifdef __ONECREATURE_EVENT_
-	std::vector<Creature*> checkCreatureVector;
+	size_t checkCreatureLastIndex;
+	std::vector<Creature*> checkCreatureVectors[EVENT_CREATURECOUNT];
 #endif
 
 #ifdef __DEBUG_CRITICALSECTION__

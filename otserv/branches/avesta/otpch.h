@@ -9,6 +9,10 @@
 
 #include "definitions.h"
 
+#if defined __WINDOWS__ || defined WIN32
+#include <winerror.h>
+#endif
+
 //libxml
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -27,10 +31,5 @@
 #include <string>
 //otserv
 #include "thing.h"
-#include "creature.h"
-#include "player.h"
-#include "monster.h"
-#include "item.h"
-#include "game.h"
 
 #endif

@@ -77,7 +77,14 @@ class Monster;
 class Npc;
 class Item;
 
-#define EVENT_CREATUREINTERVAL 1000
+#ifdef __ONECREATURE_EVENT_
+#  define EVENT_CREATURECOUNT 10
+#  define EVENT_CREATURE_THINK_INTERVAL 1000
+#  define EVENT_CHECK_CREATURE_INTERVAL (EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT)
+#else
+#  define EVENT_CREATURE_THINK_INTERVAL 1000
+#  define EVENT_CHECK_CREATURE_INTERVAL 1000
+#endif
 
 class FrozenPathingConditionCall {
 public:
@@ -299,7 +306,7 @@ public:
 	void setCreatureLight(LightInfo& light) {internalLight = light;}
 
 	virtual void onThink(uint32_t interval);
-	virtual uint32_t getThinkInterval() const {return EVENT_CREATUREINTERVAL;}
+	virtual uint32_t getThinkInterval() const {return EVENT_CREATURE_THINK_INTERVAL;}
 
 	virtual void onAttacking(uint32_t interval);
 	virtual void onWalk();
@@ -364,6 +371,14 @@ protected:
 	uint32_t id;
 	bool isInternalRemoved;
 	bool isMapLoaded;
+#ifdef __ONECREATURE_EVENT_
+	// The creature onThink event vector this creature belongs to
+	// The value stored here is actually 1 larger than the index,
+	// this is to allow 0 to represent the special value of not
+	// being stored in any onThink vector
+	size_t checkCreatureVectorIndex;
+#endif
+
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
 	int32_t attackStrength;
