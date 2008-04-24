@@ -371,6 +371,7 @@ protected:
 	uint32_t id;
 	bool isInternalRemoved;
 	bool isMapLoaded;
+	bool isInSearchPathList;
 #ifdef __ONECREATURE_EVENT_
 	// The creature onThink event vector this creature belongs to
 	// The value stored here is actually 1 larger than the index,

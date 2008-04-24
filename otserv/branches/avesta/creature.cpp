@@ -81,6 +81,7 @@ Creature::Creature() :
 	eventWalk = 0;
 	forceUpdateFollowPath = false;
 	isMapLoaded = false;
+	isInSearchPathList = false;
 	memset(localMapCache, false, sizeof(localMapCache));
 
 	attackedCreature = NULL;
@@ -371,9 +372,8 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 void Creature::addPathSearch(Creature* creature)
 {
 	OTSYS_THREAD_LOCK(pathLock, "")
-	std::list<uint32_t>::iterator it = std::find(creatureUpdatePathList.begin(),
-		creatureUpdatePathList.end(), creature->getID() );
-	if(it == creatureUpdatePathList.end()){
+	if(creature->isInSearchPathList == false) {
+		creature->isInSearchPathList = true;
 		creatureUpdatePathList.push_back(creature->getID());
 	}
 	OTSYS_THREAD_UNLOCK(pathLock, "");

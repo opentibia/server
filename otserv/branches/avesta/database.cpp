@@ -98,7 +98,7 @@ DBInsert::DBInsert(Database* db)
 	m_rows = 0;
 
 	// checks if current database engine supports multiline INSERTs
-	m_multiLine = m_db->getParam(DBPARAM_MULTIINSERT);
+	m_multiLine = m_db->getParam(DBPARAM_MULTIINSERT) != 0;
 }
 
 void DBInsert::setQuery(const std::string& query)
