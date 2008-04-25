@@ -579,11 +579,13 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	Cylinder* cylinder = creature->getTile();
 
+	SpectatorVec list;
+	getSpectators(list, cylinder->getPosition());
+	SpectatorVec::const_iterator it;
+
 	int32_t index = cylinder->__getIndexOfThing(creature);
 	cylinder->__removeThing(creature, 0);
 
-	const SpectatorVec& list = getSpectators(cylinder->getPosition());
-	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* player = NULL;
