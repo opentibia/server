@@ -61,6 +61,29 @@ bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 	return false;
 }
 
+bool Tile::hasProperty(Item* exclude, enum ITEMPROPERTY prop) const
+{
+	assert(exclude);
+	if(ground && exclude != ground && ground->hasProperty(prop)){
+		return true;
+	}
+
+	ItemVector::const_iterator iit;
+	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+		Item* item = *iit;
+		if(item != exclude && item->hasProperty(prop))
+			return true;
+	}
+
+	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+		Item* item = *iit;
+		if(item != exclude && item->hasProperty(prop))
+			return true;
+	}
+
+	return false;
+}
+
 bool Tile::hasHeight(uint32_t n) const
 {
 	uint32_t height = 0;
@@ -1348,22 +1371,22 @@ void Tile::updateTileFlags(Item* item, bool removing)
 			resetFlag(TILESTATE_MAGICFIELD);
 		}
 
-		if(item->hasProperty(BLOCKSOLID) && !hasProperty(BLOCKSOLID)){
+		if(item->hasProperty(BLOCKSOLID) && !hasProperty(item, BLOCKSOLID)){
 			resetFlag(TILESTATE_BLOCKSOLID);
 		}
-		if(item->hasProperty(IMMOVABLEBLOCKSOLID) && !hasProperty(IMMOVABLEBLOCKSOLID)){
+		if(item->hasProperty(IMMOVABLEBLOCKSOLID) && !hasProperty(item, IMMOVABLEBLOCKSOLID)){
 			resetFlag(TILESTATE_IMMOVABLEBLOCKSOLID);
 		}
-		if(item->hasProperty(BLOCKPATH) && !hasProperty(BLOCKPATH)){
+		if(item->hasProperty(BLOCKPATH) && !hasProperty(item, BLOCKPATH)){
 			resetFlag(TILESTATE_BLOCKPATH);
 		}
-		if(item->hasProperty(NOFIELDBLOCKPATH) && !hasProperty(NOFIELDBLOCKPATH)){
+		if(item->hasProperty(NOFIELDBLOCKPATH) && !hasProperty(item, NOFIELDBLOCKPATH)){
 			resetFlag(TILESTATE_NOFIELDBLOCKPATH);
 		}
-		if(item->hasProperty(IMMOVABLEBLOCKPATH) && !hasProperty(IMMOVABLEBLOCKPATH)){
+		if(item->hasProperty(IMMOVABLEBLOCKPATH) && !hasProperty(item, IMMOVABLEBLOCKPATH)){
 			resetFlag(TILESTATE_IMMOVABLEBLOCKPATH);
 		}
-		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH) && !hasProperty(IMMOVABLENOFIELDBLOCKPATH)){
+		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH) && !hasProperty(item, IMMOVABLENOFIELDBLOCKPATH)){
 			resetFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
 		}
 	}

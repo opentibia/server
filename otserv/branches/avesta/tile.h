@@ -123,6 +123,7 @@ public:
 	uint32_t getThingCount() const {return thingCount;}
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
+	bool hasProperty(Item* exclude, enum ITEMPROPERTY prop) const;
 
 	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}
 	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
