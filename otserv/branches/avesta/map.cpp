@@ -317,6 +317,80 @@ bool Map::removeCreature(Creature* creature)
 	return false;
 }
 
+void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, int32_t minRangeX, int32_t maxRangeX, int32_t minRangeY, int32_t maxRangeY, int32_t minRangeZ, int32_t maxRangeZ) {
+	int32_t minoffset = centerPos.z - maxRangeZ;
+	int32_t x1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + minoffset  )));
+	int32_t y1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + minoffset )));
+
+	int32_t maxoffset = centerPos.z - minRangeZ;
+	int32_t x2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + maxoffset )));
+	int32_t y2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + maxoffset )));
+
+	int32_t startx1 = x1 - (x1 % FLOOR_SIZE);
+	int32_t starty1 = y1 - (y1 % FLOOR_SIZE);
+	int32_t endx2 = x2 - (x2 % FLOOR_SIZE);
+	int32_t endy2 = y2 - (y2 % FLOOR_SIZE);
+
+	int32_t floorx1, floory1, floorx2, floory2;
+
+	QTreeLeafNode* startLeaf;
+	QTreeLeafNode* leafE;
+	QTreeLeafNode* leafS;
+	Floor* floor;
+	int32_t offsetZ;
+
+	startLeaf = getLeaf(startx1, starty1);
+	leafS = startLeaf;
+
+	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
+		leafE = leafS;
+		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
+			if(leafE){
+				for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
+
+					if((floor = leafE->getFloor(nz))){
+						//get current floor limits
+						offsetZ = centerPos.z - nz;
+
+						floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
+						floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
+						floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
+						floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
+
+						for(int ly = 0; ly < FLOOR_SIZE; ++ly){
+							for(int lx = 0; lx < FLOOR_SIZE; ++lx){
+								if((nx + lx >= floorx1 && nx + lx <= floorx2) && (ny + ly >= floory1 && ny + ly <= floory2)){
+									Tile* tile;
+									if((tile = floor->tiles[(nx + lx) & FLOOR_MASK][(ny + ly) & FLOOR_MASK])){
+										for(uint32_t i = 0; i < tile->creatures.size(); ++i){
+											Creature* creature = tile->creatures[i];
+											if(std::find(list.begin(), list.end(), creature) == list.end()){
+												list.push_back(creature);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				leafE = leafE->stepEast();
+			}
+			else{
+				leafE = getLeaf(nx + FLOOR_SIZE, ny);
+			}
+		}
+
+		if(leafS){
+			leafS = leafS->stepSouth();
+		}
+		else{
+			leafS = getLeaf(startx1, ny + FLOOR_SIZE);
+		}
+	}
+}
+
 void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor /*= false*/,
 	int32_t minRangeX /*= 0*/, int32_t maxRangeX /*= 0*/,
 	int32_t minRangeY /*= 0*/, int32_t maxRangeY /*= 0*/)
@@ -326,7 +400,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 	if(minRangeX == 0 && maxRangeX == 0 && minRangeY == 0 && maxRangeY == 0 && multifloor == true){
 		SpectatorCache::iterator it = spectatorCache.find(centerPos);
 		if(it != spectatorCache.end()){
-			list = it->second;
+			list = *it->second;
 			foundCache = true;
 		}
 		else{
@@ -370,83 +444,62 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 			maxRangeZ = centerPos.z;
 		}
 
-		static Tile* tile;
-		static Creature* creature;
-
-		int32_t minoffset = centerPos.z - maxRangeZ;
-		int32_t x1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + minoffset  )));
-		int32_t y1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + minoffset )));
-
-		int32_t maxoffset = centerPos.z - minRangeZ;
-		int32_t x2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + maxoffset )));
-		int32_t y2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + maxoffset )));
-
-		int32_t startx1 = x1 - (x1 % FLOOR_SIZE);
-		int32_t starty1 = y1 - (y1 % FLOOR_SIZE);
-		int32_t endx2 = x2 - (x2 % FLOOR_SIZE);
-		int32_t endy2 = y2 - (y2 % FLOOR_SIZE);
-
-		int32_t floorx1, floory1, floorx2, floory2;
-
-		QTreeLeafNode* startLeaf;
-		QTreeLeafNode* leafE;
-		QTreeLeafNode* leafS;
-		Floor* floor;
-		int32_t offsetZ;
-
-		startLeaf = getLeaf(startx1, starty1);
-		leafS = startLeaf;
-
-		for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
-			leafE = leafS;
-			for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
-				if(leafE){
-					for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
-
-						if((floor = leafE->getFloor(nz))){
-							//get current floor limits
-							offsetZ = centerPos.z - nz;
-
-							floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
-							floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
-							floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
-							floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
-
-							for(int ly = 0; ly < FLOOR_SIZE; ++ly){
-								for(int lx = 0; lx < FLOOR_SIZE; ++lx){
-									if((nx + lx >= floorx1 && nx + lx <= floorx2) && (ny + ly >= floory1 && ny + ly <= floory2)){
-										if((tile = floor->tiles[(nx + lx) & FLOOR_MASK][(ny + ly) & FLOOR_MASK])){
-											for(uint32_t i = 0; i < tile->creatures.size(); ++i){
-												creature = tile->creatures[i];
-												if(std::find(list.begin(), list.end(), creature) == list.end()){
-													list.push_back(creature);
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-
-					leafE = leafE->stepEast();
-				}
-				else{
-					leafE = getLeaf(nx + FLOOR_SIZE, ny);
-				}
-			}
-
-			if(leafS){
-				leafS = leafS->stepSouth();
-			}
-			else{
-				leafS = getLeaf(startx1, ny + FLOOR_SIZE);
-			}
-		}
+		getSpectatorsInternal(list, centerPos,
+			minRangeX, maxRangeX,
+			minRangeY, maxRangeY,
+			minRangeZ, maxRangeZ);
 
 		if(cacheResult){
-			spectatorCache[centerPos] = list;
+			spectatorCache[centerPos].reset(new SpectatorVec(list));
 		}
+	}
+}
+
+const SpectatorVec& Map::getSpectators(const Position& centerPos)
+{
+	SpectatorCache::iterator it = spectatorCache.find(centerPos);
+	if(it != spectatorCache.end()) {
+		return *it->second;
+	} else {
+		boost::shared_ptr<SpectatorVec> p(new SpectatorVec());
+		spectatorCache[centerPos] = p;
+		SpectatorVec& list = *p;
+
+		int32_t minRangeX = -maxViewportX;
+		int32_t maxRangeX = maxViewportX;
+		int32_t minRangeY = -maxViewportY;
+		int32_t maxRangeY = maxViewportY;
+
+		int32_t minRangeZ;
+		int32_t maxRangeZ;
+
+		if(centerPos.z > 7){
+			//underground
+
+			//8->15
+			minRangeZ = std::max(centerPos.z - 2, 0);
+			maxRangeZ = std::min(centerPos.z + 2, MAP_MAX_LAYERS - 1);
+		}
+		//above ground
+		else if(centerPos.z == 6){
+			minRangeZ = 0;
+			maxRangeZ = 8;
+		}
+		else if(centerPos.z == 7){
+			minRangeZ = 0;
+			maxRangeZ = 9;
+		}
+		else{
+			minRangeZ = 0;
+			maxRangeZ = 7;
+		}
+		
+		getSpectatorsInternal(list, centerPos,
+			minRangeX, maxRangeX,
+			minRangeY, maxRangeY,
+			minRangeZ, maxRangeZ);
+
+		return list;
 	}
 }
 

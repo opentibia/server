@@ -319,7 +319,7 @@ protected:
 	static bool CombatDispelFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 
-	static void combatTileEffects(SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params);
+	static void combatTileEffects(const SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params);
 	bool getMinMaxValues(Creature* creature, Creature* target, int32_t& min, int32_t& max) const;
 
 	//configureable

@@ -218,6 +218,10 @@ public:
 		map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
 	}
 
+	const SpectatorVec& getSpectators(const Position& centerPos){
+		return map->getSpectators(centerPos);
+	}
+
 	void clearSpectatorCache(){
 		if(map){
 			map->clearSpectatorCache();

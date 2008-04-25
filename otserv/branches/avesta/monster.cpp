@@ -217,9 +217,8 @@ void Monster::updateTargetList()
 			++it;
 	}
 
-	SpectatorVec list;
-	g_game.getSpectators(list, getPosition(), true);
-	for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
+	const SpectatorVec& list = g_game.getSpectators(getPosition());
+	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
 		if((*it) != this && canSee((*it)->getPosition())){
 			onCreatureFound(*it);
 		}

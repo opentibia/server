@@ -624,7 +624,7 @@ bool Combat::CombatNullFunc(Creature* caster, Creature* target, const CombatPara
 	return true;
 }
 
-void Combat::combatTileEffects(SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params)
+void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params)
 {
 	if(params.itemId != 0){
 		uint32_t itemId = params.itemId;
@@ -919,8 +919,7 @@ void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatPara
 void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatParams& params)
 {
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
-		SpectatorVec list;
-		g_game.getSpectators(list, target->getTile()->getPosition(), true);
+		const SpectatorVec& list = g_game.getSpectators(target->getTile()->getPosition());
 		CombatNullFunc(caster, target, params, NULL);
 		combatTileEffects(list, caster, target->getTile(), params);
 

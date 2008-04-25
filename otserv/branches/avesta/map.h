@@ -25,6 +25,8 @@
 #include <bitset>
 #include <map>
 
+#include <boost/shared_ptr.hpp>
+
 #include "definitions.h"
 #include "position.h"
 #include "item.h"
@@ -92,7 +94,7 @@ public:
 
 typedef std::list<Creature*> SpectatorVec;
 typedef std::list<Player*> PlayerList;
-typedef std::map<Position, SpectatorVec > SpectatorCache;
+typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
 
 #define FLOOR_BITS 3
 #define FLOOR_SIZE (1 << FLOOR_BITS)
@@ -266,9 +268,21 @@ protected:
 	std::string housefile;
 	SpectatorCache spectatorCache;
 
+	// Actually scans the map for spectators
+	void getSpectatorsInternal(SpectatorVec& list, const Position& centerPos,
+		int32_t minRangeX, int32_t maxRangeX,
+		int32_t minRangeY, int32_t maxRangeY,
+		int32_t minRangeZ, int32_t maxRangeZ);
+
+	// Use this when a custom spectator vector is needed, this support many
+	// more parameters than the heavily cached version below.
 	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0);
+	// The returned SpectatorVec is a temporary and should not be kept around
+	// Take special heed in that the vector will be destroyed if any function
+	// that calls clearSpectatorCache is called.
+	const SpectatorVec& getSpectators(const Position& centerPos);
 	
 	void clearSpectatorCache();
 

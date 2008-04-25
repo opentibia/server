@@ -244,9 +244,8 @@ void Tile::onAddTileItem(Item* item)
 
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* tmpPlayer = NULL;
@@ -270,9 +269,8 @@ void Tile::onUpdateTileItem(uint32_t index, Item* oldItem,
 
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* tmpPlayer = NULL;
@@ -295,9 +293,8 @@ void Tile::onRemoveTileItem(uint32_t index, Item* item)
 	const Position& cylinderMapPos = getPosition();
 	const ItemType& iType = Item::items[item->getID()];
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* tmpPlayer = NULL;
@@ -317,9 +314,8 @@ void Tile::onUpdateTile()
 {
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* tmpPlayer = NULL;
@@ -1153,9 +1149,8 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 {
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -1205,9 +1200,8 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 {
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	if(/*isCompleteRemoval &&*/ getThingCount() > 8){
 		onUpdateTile();
