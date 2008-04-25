@@ -188,7 +188,7 @@ protected:
 		Attribute(const Attribute &i){
 			type = i.type;
 			if(ItemAttributes::validateIntAttrType(type)){
-				value = (void*)((long)i.value);
+				value = i.value;
 			}
 			else if(ItemAttributes::validateStrAttrType(type)){
 				value = (void*)new std::string( *((std::string*)i.value) );

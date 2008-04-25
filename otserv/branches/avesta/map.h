@@ -26,6 +26,7 @@
 #include <map>
 
 #include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
 
 #include "definitions.h"
 #include "position.h"

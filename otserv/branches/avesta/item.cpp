@@ -1035,7 +1035,7 @@ uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
 
 	Attribute* attr = getAttrConst(type);
 	if(attr){
-		return (uint32_t)(long)attr->value;
+		return static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value));
 	}
 	else{
 		return 0;
@@ -1049,7 +1049,7 @@ void ItemAttributes::setIntAttr(itemAttrTypes type, int32_t value)
 
 	Attribute* attr = getAttr(type);
 	if(attr){
-		attr->value = (void*)value;
+		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(value));
 	}
 }
 
@@ -1060,7 +1060,7 @@ void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
 
 	Attribute* attr = getAttr(type);
 	if(attr){
-		attr->value = (void*)((long)attr->value + value);
+		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value)) + value));
 	}
 }
 

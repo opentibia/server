@@ -579,13 +579,11 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	Cylinder* cylinder = creature->getTile();
 
-	SpectatorVec list;
-	getSpectators(list, cylinder->getPosition());
-	SpectatorVec::const_iterator it;
-
 	int32_t index = cylinder->__getIndexOfThing(creature);
 	cylinder->__removeThing(creature, 0);
 
+	const SpectatorVec& list = getSpectators(cylinder->getPosition());
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* player = NULL;
@@ -594,13 +592,31 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 			player->sendCreatureDisappear(creature, index, isLogout);
 		}
 	}
+	player = creature->getPlayer();
+	if(player) {
+		player->sendCreatureDisappear(creature, index, isLogout);
+	}
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onCreatureDisappear(creature, index, isLogout);
 	}
+	creature->onCreatureDisappear(creature, index, isLogout);
 
 	creature->getParent()->postRemoveNotification(creature, index, true);
+
+	if(player && player->hasFlag(PlayerFlag_CanAnswerRuleViolations)) {
+		std::vector<shared_ptr<RuleViolation> > stack;
+		for(RuleViolationsMap::iterator rt = ruleViolations.begin(); rt != ruleViolations.end(); ++rt) {
+			shared_ptr<RuleViolation> rvr = rt->second;
+			if(rvr->gamemaster == player) {
+				stack.push_back(rvr);
+			}
+		}
+		for(std::vector<shared_ptr<RuleViolation> >::iterator rt = stack.begin(); rt != stack.end(); ++rt) {
+			playerCloseRuleViolation((*rt)->gamemaster->getID(), (*rt)->reporter->getName());
+		}
+	}
 
 	listCreature.removeList(creature->getID());
 	creature->removeList();
@@ -1898,15 +1914,15 @@ bool Game::playerProcessRuleViolation(uint32_t playerId, const std::string& repo
 	if(!player->hasFlag(PlayerFlag_CanAnswerRuleViolations))
 		return false;
 
-	RuleViolationsMap::iterator it = ruleViolations.begin();
-	for( ; it != ruleViolations.end(); ++it){
-		if(!it->second.open || !it->second.reporter){
+	for(RuleViolationsMap::iterator it = ruleViolations.begin(); it != ruleViolations.end(); ++it){
+		RuleViolation& rvr = *it->second;
+		if(!rvr.open || rvr.gamemaster){
 			continue;
 		}
 
-		if(it->second.reporter->getName() == reporter){
-			it->second.open = false;
-			it->second.responser = player;
+		if(rvr.reporter->getName() == reporter){
+			rvr.open = false;
+			rvr.gamemaster = player;
 			ChatChannel* channel = g_chat.getChannelById(0x03);
 			if(channel){
 				for(UsersMap::const_iterator ut = channel->getUsers().begin();
@@ -1932,9 +1948,10 @@ bool Game::playerCloseRuleViolation(uint32_t playerId, const std::string& report
 
 	bool remove = false;
 	for(RuleViolationsMap::iterator it = ruleViolations.begin(); it != ruleViolations.end(); ++it){
-		if(it->second.reporter && it->second.reporter->getName() == reporter){
-			remove = it->second.open;
-			it->second.reporter->sendLockRuleViolation();
+		RuleViolation& rvr = *it->second;
+		if(rvr.reporter && rvr.reporter->getName() == reporter){
+			remove = rvr.open;
+			rvr.reporter->sendLockRuleViolation();
 
 			ruleViolations.erase(it);
 			break;
@@ -3132,7 +3149,7 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 	const std::string& text)
 {
 	Player* toPlayer = getPlayerByName(receiver);
-	if(!toPlayer) {
+	if(!toPlayer || player->isRemoved()) {
 		player->sendTextMessage(MSG_STATUS_SMALL, "A player with this name is not online.");
 		return false;
 	}
@@ -3172,11 +3189,11 @@ bool Game::playerReportRuleViolation(Player* player, const std::string& text)
 		return false;
 	}
 
-	RuleViolation rvr;
-	rvr.reporter = player;
-	rvr.text = text;
-	rvr.time = std::time(NULL);
-	rvr.open = true;
+	shared_ptr<RuleViolation> rvr(new RuleViolation(
+		player,
+		text,
+		std::time(NULL)
+		));
 
 	ruleViolations[player->getID()] = rvr;
 
@@ -3195,8 +3212,8 @@ bool Game::playerContinueReport(Player* player, const std::string& text)
 		return false;
 	}
 
-	RuleViolation rvr = it->second;
-	Player* toPlayer = rvr.responser;
+	RuleViolation& rvr = *it->second;
+	Player* toPlayer = rvr.gamemaster;
 	if(!toPlayer){
 		return false;
 	}
@@ -3964,10 +3981,10 @@ bool Game::cancelRuleViolation(Player* player)
 		return false;
 	}
 
-	Player* responser = it->second.responser;
-	if(!it->second.open && responser){
-		//Send to the responser
-		responser->sendRuleViolationCancel(player->getName());
+	Player* gamemaster = it->second->gamemaster;
+	if(!it->second->open && gamemaster){
+		//Send to the responder
+		gamemaster->sendRuleViolationCancel(player->getName());
 	}
 	else{
 		//Send to channel

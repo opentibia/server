@@ -71,21 +71,28 @@ enum LightState_t {
 	LIGHT_STATE_SUNRISE,
 };
 
-struct RuleViolation{
+struct RuleViolation {
+	RuleViolation(Player* reporter, const std::string& msg, uint32_t time);
+
 	Player* reporter;
-	Player* responser;
+	Player* gamemaster;
 	std::string text;
 	uint32_t time;
 	bool open;
-	RuleViolation(){
-		reporter = NULL;
-		responser = NULL;
-		text = "";
-		time = 0;
-		open = false;
-	}
+private:
+	RuleViolation(const RuleViolation&);
 };
-typedef std::map< uint32_t, RuleViolation > RuleViolationsMap;
+
+inline RuleViolation::RuleViolation(Player* reporter, const std::string& msg, uint32_t time) :
+	reporter(reporter),
+	gamemaster(NULL),
+	text(msg),
+	time(time),
+	open(true)
+{
+};
+
+typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 
 #define EVENT_LIGHTINTERVAL  10000
 #define EVENT_DECAYINTERVAL  10000
