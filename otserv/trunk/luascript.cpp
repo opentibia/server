@@ -5949,7 +5949,7 @@ int LuaScriptInterface::luaAddEvent(lua_State *L)
 		return 1;
 	}
 
-	uint32_t parameters = lua_gettop(L);
+	int32_t parameters = lua_gettop(L);
 	if(lua_isfunction(L, -parameters) == 0){ //-parameters means the first parameter from left to right
 		reportError(__FUNCTION__, "callback parameter should be a function.");
 		lua_pushnumber(L, LUA_ERROR);
@@ -5958,7 +5958,7 @@ int LuaScriptInterface::luaAddEvent(lua_State *L)
 
 	LuaTimerEventDesc eventDesc;
 	std::list<int> params;
-	for(uint32_t i = 0; i < parameters-2; ++i){ //-2 because addEvent needs at least two parameters
+	for(int32_t i = 0; i < parameters-2; ++i){ //-2 because addEvent needs at least two parameters
 		params.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
 	}
 	eventDesc.parameters = params;

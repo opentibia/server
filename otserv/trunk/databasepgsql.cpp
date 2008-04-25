@@ -46,7 +46,7 @@ DatabasePgSQL::~DatabasePgSQL()
 	PQfinish(m_handle);
 }
 
-int DatabasePgSQL::getParam(DBParam_t param)
+bool DatabasePgSQL::getParam(DBParam_t param)
 {
 	switch(param){
 		case DBPARAM_MULTIINSERT:

@@ -47,7 +47,9 @@ enum RequestedInfo_t{
 	REQUEST_OWNER_SERVER_INFO = 2,
 	REQUEST_MISC_SERVER_INFO = 4,
 	REQUEST_PLAYERS_INFO = 8,
-	REQUEST_MAP_INFO = 16
+	REQUEST_MAP_INFO = 16,
+	REQUEST_EXT_PLAYERS_INFO = 32,
+	REQUEST_PLAYER_STATUS_INFO = 64,
 };
 
 std::map<uint32_t, int64_t> ProtocolStatus::ipConnectMap;
@@ -82,25 +84,39 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	case 0x01:
 	{
 		uint32_t requestedInfo = 0;
-		if(msg.GetByte() == 1){
+		int32_t length = msg.getMessageLength() - 2; //2 bytes: 0xFF and 0x01
+		if(length > 0 && msg.GetByte() != 0){
+			length--;
 			requestedInfo |= REQUEST_BASIC_SERVER_INFO;
 		}
-		if(msg.GetByte() == 1){
+		if(length > 0 && msg.GetByte() != 0){
+			length--;
 			requestedInfo |= REQUEST_OWNER_SERVER_INFO;
 		}
-		if(msg.GetByte() == 1){
+		if(length > 0 && msg.GetByte() != 0){
+			length--;
 			requestedInfo |= REQUEST_MISC_SERVER_INFO;
 		}
-		if(msg.GetByte() == 1){
+		if(length > 0 && msg.GetByte() != 0){
+			length--;
 			requestedInfo |= REQUEST_PLAYERS_INFO;
 		}
-		if(msg.GetByte() == 1){
+		if(length > 0 && msg.GetByte() != 0){
+			length--;
 			requestedInfo |= REQUEST_MAP_INFO;
+		}
+		if(length > 0 && msg.GetByte() != 0){
+			length--;
+			requestedInfo |= REQUEST_EXT_PLAYERS_INFO;
+		}
+		if(length > 0 && msg.GetByte() != 0){
+			length--;
+			requestedInfo |= REQUEST_PLAYER_STATUS_INFO;
 		}
 
 		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		Status* status = Status::instance();
-		status->getInfo(requestedInfo, output);
+		status->getInfo(requestedInfo, output, msg);
 		OutputMessagePool::getInstance()->send(output);
 		break;
 	}
@@ -230,7 +246,7 @@ std::string Status::getStatusString() const
 	return xml;
 }
 
-void Status::getInfo(uint32_t requestedInfo, OutputMessage* output) const
+void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessage& msg) const
 {
 	// the client selects which information may be
 	// sent back, so we'll save some bandwidth and
@@ -282,6 +298,25 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output) const
 		g_game.getMapDimensions(mapWidth, mapHeight);
 		output->AddU16(mapWidth);
 		output->AddU16(mapHeight);
+	}
+
+	if(requestedInfo & REQUEST_EXT_PLAYERS_INFO){
+		output->AddU32(m_playersonline);
+		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+			//Send the most common info
+			output->AddString(it->second->getName());
+			output->AddU32(it->second->getLevel());
+		}
+	}
+
+	if(requestedInfo & REQUEST_PLAYER_STATUS_INFO){
+		const std::string name = msg.GetString();
+		if(g_game.getPlayerByName(name) != NULL){
+			output->AddByte(0x01);
+		}
+		else{
+			output->AddByte(0x00);
+		}
 	}
 
 	return;

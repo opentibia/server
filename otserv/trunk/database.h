@@ -91,7 +91,7 @@ public:
 	* @param DBParam_t parameter to get
 	* @return suitable for given parameter
 	*/
-	DATABASE_VIRTUAL int getParam(DBParam_t param) { return 0; }
+	DATABASE_VIRTUAL bool getParam(DBParam_t param) { return false; }
 
 protected:
 	/**

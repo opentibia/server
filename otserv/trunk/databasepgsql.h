@@ -33,7 +33,7 @@ public:
 	DatabasePgSQL();
 	DATABASE_VIRTUAL ~DatabasePgSQL();
 
-	DATABASE_VIRTUAL int getParam(DBParam_t param);
+	DATABASE_VIRTUAL bool getParam(DBParam_t param);
 
 	DATABASE_VIRTUAL bool beginTransaction();
 	DATABASE_VIRTUAL bool rollback();

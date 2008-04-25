@@ -318,6 +318,13 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			return;
 			break;
 		}
+		case CMD_KICK:
+		{
+			const std::string name = msg.GetString();
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&ProtocolAdmin::adminCommandKickPlayer, this, name)));
+			break;
+		}
 		default:
 		{
 			output->AddByte(AP_MSG_COMMAND_FAILED);
@@ -413,6 +420,26 @@ void ProtocolAdmin::adminCommandPayHouses()
 	OutputMessagePool::getInstance()->send(output);
 
 	return ;
+}
+
+void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
+{
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+
+	Player* player = g_game.getPlayerByName(name);
+	if(player){
+		player->kickPlayer();
+		addLogLine(this, LOGTYPE_EVENT, 1, "kicked player " + name);
+
+		output->AddByte(AP_MSG_COMMAND_OK);
+	}
+	else{
+		addLogLine(this, LOGTYPE_WARNING, 1, "Could not kick player(not online): " + name);
+
+		output->AddByte(AP_MSG_COMMAND_FAILED);
+		output->AddString("player is not online");
+	}
+	OutputMessagePool::getInstance()->send(output);
 }
 
 /////////////////////////////////////////////

@@ -65,7 +65,7 @@ DatabaseMySQL::~DatabaseMySQL()
 	mysql_close(&m_handle);
 }
 
-int DatabaseMySQL::getParam(DBParam_t param)
+bool DatabaseMySQL::getParam(DBParam_t param)
 {
 	switch(param){
 	case DBPARAM_MULTIINSERT:
