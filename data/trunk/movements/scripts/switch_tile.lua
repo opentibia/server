@@ -1,12 +1,11 @@
 local SWITCHES = { {416, 417}, {426, 425}, {446, 447}, {3216, 3217} }
-local DEPOTS = {2589, 2590, 2591, 2592}
 
 local function doTransformTile(item)
-	for i = 1, table.getn(SWITCHES), 1 do
-		if(item.itemid == SWITCHES[i][1]) then
-			return doTransformItem(item.uid, SWITCHES[i][2])
-		elseif(item.itemid == SWITCHES[i][2]) then
-			return doTransformItem(item.uid, SWITCHES[i][1])
+	for i, v in pairs(SWITCHES) do
+		if(item.itemid == v[1]) then
+			return doTransformItem(item.uid, v[2])
+		elseif(item.itemid == v[2]) then
+			return doTransformItem(item.uid, v[1])
 		end
 	end
 end
@@ -22,9 +21,8 @@ function onStepIn(cid, item, pos)
 		for y = -1, 1 do
 			pos.x = pos.x + x
 			pos.y = pos.y + y
-			pos.stackpos = 2 -- ground = 0, table = 1, depot should be 2
-			depot = getThingfromPos(pos)
-			if(depot.uid > 0 and isInArray(DEPOTS, depot.itemid) == TRUE) then
+			depot = getTileThingByType(pos, ITEM_TYPE_DEPOT)
+			if(depot.uid > 0) then
 				local depotItems = getPlayerDepotItems(cid, getDepotId(depot.uid))
 				local depotStr = "Your depot contains " .. depotItems .. " items."
 				if(depotItems == 1) then
