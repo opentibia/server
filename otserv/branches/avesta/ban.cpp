@@ -45,17 +45,21 @@ void Ban::init()
 
 bool Ban::isIpBanished(uint32_t clientip)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	if(clientip != 0){
+		OTSYS_THREAD_LOCK(banLock, "");
+
 		for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
 			if((it->ip & it->mask) == (clientip & it->mask)){
 				uint32_t currentTime = std::time(NULL);
 
 				if(it->time == 0 || currentTime < it->time){
+					OTSYS_THREAD_UNLOCK(banLock, "");
 					return true;
 				}
 			}
 		}
+
+		OTSYS_THREAD_UNLOCK(banLock, "");
 	}
 
 	return false;
@@ -63,19 +67,24 @@ bool Ban::isIpBanished(uint32_t clientip)
 
 bool Ban::isIpDisabled(uint32_t clientip)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	if(maxLoginTries == 0)
 		return false;
 
 	if(clientip != 0){
+		OTSYS_THREAD_LOCK(banLock, "");
+
 		uint32_t currentTime = std::time(NULL);
 		IpLoginMap::const_iterator it = ipLoginMap.find(clientip);
 		if(it != ipLoginMap.end()){
 			if( (it->second.numberOfLogins >= maxLoginTries) &&
-				(currentTime < it->second.lastLoginTime + loginTimeout) ){
+				(currentTime < it->second.lastLoginTime + loginTimeout) )
+			{
+				OTSYS_THREAD_UNLOCK(banLock, "");
 				return true;
 			}
 		}
+
+		OTSYS_THREAD_UNLOCK(banLock, "");
 	}
 
 	return false;
@@ -83,10 +92,10 @@ bool Ban::isIpDisabled(uint32_t clientip)
 
 bool Ban::acceptConnection(uint32_t clientip)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-
 	if(clientip == 0)
 		return false;
+
+	OTSYS_THREAD_LOCK(banLock, "");
 
 	uint64_t currentTime = OTSYS_TIME();
 
@@ -96,21 +105,27 @@ bool Ban::acceptConnection(uint32_t clientip)
 		cb.lastConnection = currentTime;
 
 		ipConnectMap[clientip] = cb;
+
+		OTSYS_THREAD_UNLOCK(banLock, "");
 		return true;
 	}
 
 	if(currentTime - it->second.lastConnection < 1000){
+		OTSYS_THREAD_UNLOCK(banLock, "");
 		return false;
 	}
 
 	it->second.lastConnection = currentTime;
+
+	OTSYS_THREAD_UNLOCK(banLock, "");
 	return true;
 }
 
 void Ban::addLoginAttempt(uint32_t clientip, bool isSuccess)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	if(clientip != 0){
+		OTSYS_THREAD_LOCK(banLock, "");
+
 		uint32_t currentTime = std::time(NULL);
 
 		IpLoginMap::iterator it = ipLoginMap.find(clientip);
@@ -135,25 +150,32 @@ void Ban::addLoginAttempt(uint32_t clientip, bool isSuccess)
 		}
 
 		it->second.lastLoginTime = currentTime;
+
+		OTSYS_THREAD_UNLOCK(banLock, "");
 	}
 }
 
 bool Ban::isPlayerBanished(const std::string& name)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
+
 	uint32_t playerId;
 	std::string playerName = name;
 	if(!IOPlayer::instance()->getGuidByName(playerId, playerName))
 		return false;
 
+	OTSYS_THREAD_LOCK(banLock, "");
+
 	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it){
    		if(it->id  == playerId){
 			uint32_t currentTime = std::time(NULL);
 			if(it->time == 0 || currentTime < it->time){
+				OTSYS_THREAD_UNLOCK(banLock, "");
 				return true;
 			}
 		}
 	}
+
+	OTSYS_THREAD_UNLOCK(banLock, "");
 	return false;
 }
 

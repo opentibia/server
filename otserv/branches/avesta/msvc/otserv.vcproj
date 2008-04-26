@@ -136,6 +136,9 @@
 				RelativePath="..\baseevents.cpp">
 			</File>
 			<File
+				RelativePath="..\beds.cpp">
+			</File>
+			<File
 				RelativePath="..\chat.cpp">
 			</File>
 			<File
@@ -250,6 +253,9 @@
 				RelativePath="..\outputmessage.cpp">
 			</File>
 			<File
+				RelativePath="..\party.cpp">
+			</File>
+			<File
 				RelativePath="..\player.cpp">
 			</File>
 			<File
@@ -340,6 +346,9 @@
 			</File>
 			<File
 				RelativePath="..\baseevents.h">
+			</File>
+			<File
+				RelativePath="..\beds.h">
 			</File>
 			<File
 				RelativePath="..\chat.h">
@@ -472,6 +481,9 @@
 			</File>
 			<File
 				RelativePath="..\outputmessage.h">
+			</File>
+			<File
+				RelativePath="..\party.h>
 			</File>
 			<File
 				RelativePath="..\player.h">

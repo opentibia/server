@@ -89,7 +89,7 @@ Creature::Creature() :
 
 	blockCount = 0;
 	blockTicks = 0;
-	walkUpdateTicks = 0;	
+	walkUpdateTicks = 0;
 #ifdef __ONECREATURE_EVENT_
 	checkCreatureVectorIndex = 0;
 #else
@@ -333,7 +333,7 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 
 	while(!Creature::m_shutdownPathThread){
 		OTSYS_THREAD_LOCK(Creature::pathLock, "")
-		
+
 		if(!Creature::creatureUpdatePathList.empty()){
 			creatureId = Creature::creatureUpdatePathList.front();
 			Creature::creatureUpdatePathList.pop_front();
@@ -348,7 +348,7 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 			Dispatcher::getDispatcher().addTask(createTask(
 				boost::bind(&Game::updateCreatureWalk, &g_game, creatureId)));
 		}
-		
+
 		uint64_t endTime = OTSYS_TIME();
 		if((endTime - startTime) > 100){
 			startTime = OTSYS_TIME();
@@ -371,12 +371,12 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 
 void Creature::addPathSearch(Creature* creature)
 {
-	OTSYS_THREAD_LOCK(pathLock, "")
 	if(creature->isInSearchPathList == false) {
+		OTSYS_THREAD_LOCK(Creature::pathLock, "");
 		creature->isInSearchPathList = true;
 		creatureUpdatePathList.push_back(creature->getID());
+		OTSYS_THREAD_UNLOCK(Creature::pathLock, "");
 	}
-	OTSYS_THREAD_UNLOCK(pathLock, "");
 }
 
 void Creature::updateMapCache()
@@ -612,7 +612,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 			for(cit = summons.begin(); cit != summons.end(); ++cit){
 				const Position pos = (*cit)->getPosition();
 
-				if( (std::abs(pos.z - newPos.z) > 2) || 
+				if( (std::abs(pos.z - newPos.z) > 2) ||
 					(std::max(std::abs((newPos.x) - pos.x), std::abs((newPos.y - 1) - pos.y)) > 30) ){
 					despawnList.push_back((*cit));
 				}
@@ -1040,7 +1040,7 @@ void Creature::getPathToFollowCreature()
 		if(!hasFollowPath){
 			fpp.fullPathSearch = true;
 		}
-		
+
 		if(g_game.getPathToEx(this, followCreature->getPosition(), listWalkDir,
 		fpp.minTargetDist, fpp.maxTargetDist, fpp.fullPathSearch, fpp.clearSight, fpp.maxSearchDist)){
 			hasFollowPath = true;
@@ -1050,7 +1050,7 @@ void Creature::getPathToFollowCreature()
 			hasFollowPath = false;
 		}
 	}
-	
+
 	onFollowCreatureComplete(followCreature);
 }
 
