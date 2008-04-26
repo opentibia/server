@@ -1064,6 +1064,14 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 		}
 		else if(TrashHolder* trashHolder = getTrashHolder()){
 			trashHolder->__addThing(thing);
+			if(thing != trashHolder){
+				Item* item = thing->getItem();
+				if(item){
+					updateTileFlags(item, true);
+				}
+				g_game.FreeThing(thing);
+				return;
+			}
 		}
 		else if(Mailbox* mailbox = getMailbox()){
 			mailbox->__addThing(thing);
