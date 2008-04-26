@@ -1001,7 +1001,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 			ground->setParent(NULL);
 			ground = NULL;
 			--thingCount;
-			onRemoveTileItem(index, ground);
+			onRemoveTileItem(index, item);
 
 			return /*RET_NOERROR*/;
 		}
