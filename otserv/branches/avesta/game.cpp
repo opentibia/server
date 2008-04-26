@@ -3340,15 +3340,15 @@ void Game::addCreatureCheck(Creature* creature)
 	}
 	size_t min = std::numeric_limits<size_t>::max();
 	size_t insertindex = 0;
-	size_t total_size = 0;
+	//size_t total_size = 0;
 	for(size_t i = 0; i < EVENT_CREATURECOUNT; ++i) {
-		total_size += checkCreatureVectors[i].size();
+		//total_size += checkCreatureVectors[i].size();
 		if(checkCreatureVectors[i].size() < min) {
 			insertindex = i;
 			min = checkCreatureVectors[i].size();
 		}
 	}
-	std::cout << total_size << std::endl;
+	//std::cout << total_size << std::endl;
 	checkCreatureVectors[insertindex].push_back(creature);
 	creature->checkCreatureVectorIndex = insertindex + 1;
 }
