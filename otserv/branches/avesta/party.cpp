@@ -362,9 +362,9 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 	return true;
 }
 
-void Party::shareExperience(uint32_t experience)
+void Party::shareExperience(uint64_t experience)
 {
-	uint32_t shareExperience = (uint32_t)std::ceil(((float)experience / (memberList.size() + 1)));
+	uint32_t shareExperience = (uint64_t)std::ceil(((double)experience / (memberList.size() + 1)));
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
 		(*it)->onGainSharedExperience(shareExperience);
 	}

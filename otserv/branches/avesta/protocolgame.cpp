@@ -2315,7 +2315,13 @@ void ProtocolGame::AddPlayerStats(NetworkMessage* msg)
 	msg->AddU16(player->getHealth());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
 	msg->AddU16((int32_t)player->getFreeCapacity());
-	msg->AddU32(player->getExperience());
+	uint64_t experience = player->getExperience();
+	if(experience <= 0x7FFFFFFF){
+		msg->AddU32(player->getExperience());
+	}
+	else{
+		msg->AddU32(0x00); //Client debugs after 2,147,483,647 exp
+	}
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
 	msg->AddByte(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT));
 	msg->AddU16(player->getMana());

@@ -70,9 +70,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->setDirection((Direction)result->getDataInt("direction"));
 	player->level = std::max((uint32_t)1, (uint32_t)result->getDataInt("level"));
 
-	uint32_t currExpCount = Player::getExpForLevel(player->level);
-	uint32_t nextExpCount = Player::getExpForLevel(player->level + 1);
-	uint32_t experience = (uint32_t)result->getDataInt("experience");
+	uint64_t currExpCount = Player::getExpForLevel(player->level);
+	uint64_t nextExpCount = Player::getExpForLevel(player->level + 1);
+	uint64_t experience = (uint64_t)result->getDataLong("experience");
 	if(experience < currExpCount || experience  > nextExpCount){
 		experience = currExpCount;
 	}

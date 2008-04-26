@@ -56,7 +56,7 @@ public:
 	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 
-	void shareExperience(uint32_t experience);
+	void shareExperience(uint64_t experience);
 	bool setSharedExperience(Player* player, bool _sharedExpActive);
 	bool isSharedExperienceActive() const {return sharedExpActive;}
 	bool isSharedExperienceEnabled() const {return sharedExpEnabled;}

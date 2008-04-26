@@ -88,7 +88,7 @@ public:
 
 	std::string name;
 	std::string nameDescription;
-	int experience;
+	uint64_t experience;
 
 	int defense;
 	int armor;

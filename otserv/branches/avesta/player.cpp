@@ -1620,7 +1620,7 @@ void Player::addManaSpent(uint32_t amount)
 	}
 }
 
-void Player::addExperience(uint32_t exp)
+void Player::addExperience(uint64_t exp)
 {
 	experience += exp;
 	int prevLevel = getLevel();
@@ -1668,10 +1668,10 @@ void Player::addExperience(uint32_t exp)
 	}
 }
 
-uint32_t Player::getPercentLevel(uint32_t count, uint32_t nextLevelCount)
+uint32_t Player::getPercentLevel(uint64_t count, uint32_t nextLevelCount)
 {
 	if(nextLevelCount > 0){
-		uint32_t result = ((uint32_t)((float)count / nextLevelCount * 100));
+		uint32_t result = ((uint32_t)((double)count / nextLevelCount * 100));
 		if(result < 0 || result > 100){
 			return 0;
 		}
@@ -1983,7 +1983,7 @@ void Player::die()
 
 		//Level loss
 		uint32_t newLevel = level;
-		while((uint32_t)(experience - getLostExperience()) < Player::getExpForLevel(newLevel)){
+		while((uint64_t)(experience - getLostExperience()) < Player::getExpForLevel(newLevel)){
 			if(newLevel > 1)
 				newLevel--;
 			else
@@ -2943,7 +2943,7 @@ void Player::doAttacking(uint32_t interval)
 	}
 }
 
-int32_t Player::getGainedExperience(Creature* attacker) const
+uint64_t Player::getGainedExperience(Creature* attacker) const
 {
 	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
 		Player* attackerPlayer = attacker->getPlayer();
@@ -2958,9 +2958,9 @@ int32_t Player::getGainedExperience(Creature* attacker) const
 
 				int32_t a = (int32_t)std::floor(attackerPlayer->getLevel() * 0.9);
 				int32_t b = getLevel();
-				int32_t c = getExperience();
+				int64_t c = getExperience();
 
-				int32_t result = std::max((int32_t)0, (int32_t)std::floor( getDamageRatio(attacker) * ((double)(1 - (((double)a / b)))) * 0.05 * c ) );
+				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor( getDamageRatio(attacker) * ((double)(1 - (((double)a / b)))) * 0.05 * c ) );
 				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
 		}
 	}
@@ -3251,7 +3251,7 @@ void Player::onKilledCreature(Creature* target)
 	}
 }
 
-void Player::gainExperience(int32_t gainExp)
+void Player::gainExperience(uint64_t gainExp)
 {
 	if(!hasFlag(PlayerFlag_NotGainExperience)){
 		if(gainExp > 0){
@@ -3270,7 +3270,7 @@ void Player::gainExperience(int32_t gainExp)
 	}
 }
 
-void Player::onGainExperience(int32_t gainExp)
+void Player::onGainExperience(uint64_t gainExp)
 {
 	if(hasFlag(PlayerFlag_NotGainExperience)){
 		gainExp = 0;
@@ -3287,7 +3287,7 @@ void Player::onGainExperience(int32_t gainExp)
 	gainExperience(gainExp);
 }
 
-void Player::onGainSharedExperience(int32_t gainExp)
+void Player::onGainSharedExperience(uint64_t gainExp)
 {
 	Creature::onGainSharedExperience(gainExp);
 	gainExperience(gainExp);

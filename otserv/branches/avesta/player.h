@@ -123,7 +123,7 @@ public:
 
 	static uint64_t getExpForLevel(int32_t level)
 	{
-		return (uint64_t)std::ceil((double)(50 * level * level * level)/3 - (100 * level * level) + ((850 * level) / 3) - 200);
+		return (((uint64_t)50) * level * level * level)/3 - (100 * level * level) + ((850 * level) / 3) - 200;
 	}
 
 	uint32_t getGuildId() const {return guildId;}
@@ -167,7 +167,7 @@ public:
 	playersex_t getSex() const {return sex;}
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
-	uint32_t getExperience() const {return experience;}
+	uint64_t getExperience() const {return experience;}
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
 	const Position& getLoginPosition() const {return loginPosition;}
@@ -297,7 +297,7 @@ public:
 	void addInFightTicks();
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual int32_t getGainedExperience(Creature* attacker) const;
+	virtual uint64_t getGainedExperience(Creature* attacker) const;
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);
@@ -309,8 +309,8 @@ public:
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target);
-	virtual void onGainExperience(int32_t gainExp);
-	virtual void onGainSharedExperience(int32_t gainExp);
+	virtual void onGainExperience(uint64_t gainExp);
+	virtual void onGainSharedExperience(uint64_t gainExp);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
@@ -539,8 +539,8 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	std::string getSkillName(int skillid);
-	void gainExperience(int32_t exp);
-	void addExperience(uint32_t exp);
+	void gainExperience(uint64_t exp);
+	void addExperience(uint64_t exp);
 
 	void updateInventoryWeigth();
 
@@ -584,7 +584,7 @@ protected:
 	uint32_t magLevel;
 	uint32_t magLevelPercent;
 	int32_t accessLevel;
-	uint32_t experience;
+	uint64_t experience;
 	uint32_t damageImmunities;
 	uint32_t conditionImmunities;
 	uint32_t conditionSuppressions;
@@ -699,8 +699,8 @@ protected:
 		};
 	}
 
-	static uint32_t getPercentLevel(uint32_t count, uint32_t nextLevelCount);
-	virtual int32_t getLostExperience() const { return (skillLoss ? (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
+	static uint32_t getPercentLevel(uint64_t count, uint32_t nextLevelCount);
+	virtual uint64_t getLostExperience() const { return (skillLoss ? (uint64_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }

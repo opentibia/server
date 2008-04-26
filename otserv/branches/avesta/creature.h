@@ -276,7 +276,7 @@ public:
 	virtual bool convinceCreature(Creature* creature) {return false;};
 
 	virtual void onDie();
-	virtual int32_t getGainedExperience(Creature* attacker) const;
+	virtual uint64_t getGainedExperience(Creature* attacker) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
 	void addHealPoints(Creature* caster, int32_t healthPoints);
 	bool hasBeenAttacked(uint32_t attackerId);
@@ -293,8 +293,8 @@ public:
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target);
-	virtual void onGainExperience(int32_t gainExp);
-	virtual void onGainSharedExperience(int32_t gainExp);
+	virtual void onGainExperience(uint64_t gainExp);
+	virtual void onGainSharedExperience(uint64_t gainExp);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
@@ -448,7 +448,7 @@ protected:
 	virtual void doAttacking(uint32_t interval) {};
 	virtual bool hasExtraSwing() {return false;}
 
-	virtual int32_t getLostExperience() const { return 0; };
+	virtual uint64_t getLostExperience() const { return 0; };
 	virtual double getDamageRatio(Creature* attacker) const;
 	bool getKillers(Creature** lastHitCreature, Creature** mostDamageCreature);
 	virtual void dropLoot(Container* corpse) {};

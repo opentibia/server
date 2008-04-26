@@ -167,7 +167,7 @@ private:
 	bool isFriend(const Creature* creature);
 	bool isOpponent(const Creature* creature);
 
-	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
+	virtual uint64_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return mType->damageImmunities; }
