@@ -475,7 +475,12 @@ int32_t Creature::getWalkCache(const Position& pos) const
 		}
 #endif
 
-		return (localMapCache[y][x] == 1);
+		if(localMapCache[y][x]){
+			return 1;
+		}
+		else{
+			return 0;
+		}
 	}
 
 	//out of range
@@ -1026,6 +1031,8 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 
 void Creature::getPathToFollowCreature()
 {
+	isInSearchPathList = false;
+
 	if(followCreature){
 		FindPathParams fpp;
 		getPathSearchParams(followCreature, fpp);

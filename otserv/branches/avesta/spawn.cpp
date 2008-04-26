@@ -33,6 +33,7 @@ extern ConfigManager g_config;
 extern Monsters g_monsters;
 extern Game g_game;
 
+#define MINSPAWN_INTERVAL 10000
 #define DEFAULTSPAWN_INTERVAL 60000
 
 Spawns::Spawns()
@@ -160,11 +161,11 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							continue;
 						}
 						
-						if(interval > 0){
+						if(interval >= MINSPAWN_INTERVAL){
 							spawn->addMonster(name, pos, dir, interval);
 						}
 						else{
-							std::cout << "[Warning] Spawns::loadFromXml " << name << " " << pos << " spawntime can not be 0." << std::endl;
+							std::cout << "[Warning] Spawns::loadFromXml " << name << " " << pos << " spawntime can not be less than " << MINSPAWN_INTERVAL / 1000 << " seconds." << std::endl;
 						}
 					}
 					else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"npc") == 0){

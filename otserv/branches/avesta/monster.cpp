@@ -924,27 +924,17 @@ bool Monster::getNextStep(Direction& dir)
 bool Monster::getRandomStep(const Position& creaturePos, Direction& dir)
 {
 	std::vector<Direction> dirList;
+	dirList.push_back(NORTH);
+	dirList.push_back(SOUTH);
+	dirList.push_back(WEST);
+	dirList.push_back(EAST);
+	std::random_shuffle(dirList.begin(), dirList.end());
 
-	if(canWalkTo(creaturePos, NORTH)){
-		dirList.push_back(NORTH);
-	}
-
-	if(canWalkTo(creaturePos, SOUTH)){
-		dirList.push_back(SOUTH);
-	}
-
-	if(canWalkTo(creaturePos, EAST)){
-		dirList.push_back(EAST);
-	}
-
-	if(canWalkTo(creaturePos, WEST)){
-		dirList.push_back(WEST);
-	}
-
-	if(!dirList.empty()){
-		std::random_shuffle(dirList.begin(), dirList.end());
-		dir = dirList[random_range(0, dirList.size() - 1)];
-		return true;
+	for(std::vector<Direction>::iterator it = dirList.begin(); it != dirList.end(); ++it){
+		if(canWalkTo(creaturePos, *it)){
+			dir = *it;
+			return true;
+		}
 	}
 
 	return false;
@@ -1323,8 +1313,8 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 	}
 	else{
 		if(getHealth() <= mType->runAwayHealth){
-			//Distance should be higher than visible viewport (defined in Map::maxViewportX/maxViewportY)
-			fpp.maxTargetDist = 10;
+			//Distance should be higher than the client view range (Map::maxClientViewportX/Map::maxClientViewportY)
+			fpp.maxTargetDist = Map::maxViewportX;
 			fpp.clearSight = false;
 			fpp.fullPathSearch = true;
 		}
