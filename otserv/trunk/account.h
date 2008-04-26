@@ -30,14 +30,16 @@
 class Account
 {
 public:
-  Account();
-  ~Account();
+	Account();
+	~Account();
 
-  uint32_t accnumber;
+	uint32_t accnumber;
 
-  std::string password;
+	uint32_t premDays;
 
-  std::list<std::string> charList;
+	std::string password;
+
+	std::list<std::string> charList;
 };
 
 #endif  // #ifndef __ACCOUNT_H__

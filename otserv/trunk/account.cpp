@@ -30,6 +30,7 @@
 Account::Account()
 {
 	accnumber = 0;
+	premDays = 0;
 }
 
 Account::~Account()

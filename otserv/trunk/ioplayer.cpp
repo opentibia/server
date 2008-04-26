@@ -108,7 +108,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->premiumDays = result->getDataInt("premdays");
 #endif
 
-	#ifdef __SKULLSYSTEM__
+#ifdef __SKULLSYSTEM__
 	int32_t redSkullSeconds = result->getDataInt("redskulltime") - std::time(NULL);
 	if(redSkullSeconds > 0){
 		//ensure that we round up the number of ticks
@@ -118,7 +118,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 			player->skull = SKULL_RED;
 		}
 	}
-	#endif
+#endif
 
 	unsigned long conditionsSize = 0;
 	const char* conditions = result->getDataStream("conditions", conditionsSize);
@@ -476,14 +476,16 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES)
 	<< ", `balance` = " << player->balance;
 
-	#ifndef __USE_SQL_PREMDAYS__
-	uint32_t premEnd = 0;
+#ifndef __USE_SQL_PREMDAYS__
+	// there's no need to update prem end here, especially if it hasn't changed!
+	// just be sure to only change premium time via a database query.
+	/*uint32_t premEnd = 0;
 	if(player->premiumDays > 0){
 		premEnd = time(NULL) + player->premiumDays * 86400;
 	}
 
-	query << ", `premend` = " << premEnd;
-	#endif
+	query << ", `premend` = " << premEnd;*/
+#endif
 
 #ifdef __SKULLSYSTEM__
 	int32_t redSkullTime = 0;

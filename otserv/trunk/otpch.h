@@ -9,6 +9,10 @@
 
 #include "definitions.h"
 
+#if defined __WINDOWS__ || defined WIN32
+#include <winerror.h>
+#endif
+
 //libxml
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -18,8 +22,8 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/tokenizer.hpp>
-#include "boost/regex.hpp"
-#include "boost/asio.hpp"
+#include <boost/regex.hpp>
+#include <boost/asio.hpp>
 //std
 #include <list>
 #include <vector>
@@ -27,10 +31,5 @@
 #include <string>
 //otserv
 #include "thing.h"
-#include "creature.h"
-#include "player.h"
-#include "monster.h"
-#include "item.h"
-#include "game.h"
 
 #endif
