@@ -1295,6 +1295,19 @@ void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
+	
+	if(hasFlag(PlayerFlag_CanAnswerRuleViolations)) {
+		std::vector<shared_ptr<RuleViolation> > stack;
+		for(RuleViolationsMap::const_iterator rt = g_game.getRuleViolations().begin(); rt != g_game.getRuleViolations().end(); ++rt) {
+			shared_ptr<RuleViolation> rvr = rt->second;
+			if(rvr->gamemaster == this) {
+				stack.push_back(rvr);
+			}
+		}
+		for(std::vector<shared_ptr<RuleViolation> >::iterator rt = stack.begin(); rt != stack.end(); ++rt) {
+			g_game.playerCloseRuleViolation(this->getID(), (*rt)->reporter->getName());
+		}
+	}
 
 	if(creature == this){
 

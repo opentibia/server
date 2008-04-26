@@ -1180,6 +1180,14 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 		}
 		else if(TrashHolder* trashHolder = getTrashHolder()){
 			trashHolder->__addThing(thing);
+			if(thing != trashHolder) {
+				Item* item = thing->getItem();
+				if(item) {
+					updateTileFlags(item, true);
+				}
+				g_game.FreeThing(thing);
+				return;
+			}
 		}
 		else if(Mailbox* mailbox = getMailbox()){
 			mailbox->__addThing(thing);
@@ -1362,7 +1370,10 @@ void Tile::updateTileFlags(Item* item, bool removing)
 			resetFlag(TILESTATE_POSITIONCHANGE);
 		}
 		if(item->getMagicField()){
-			resetFlag(TILESTATE_MAGICFIELD);
+			// If transformItem is called on a field, this might not be true
+			//if(getFieldItem() == item) {
+				resetFlag(TILESTATE_MAGICFIELD);
+			//}
 		}
 
 		if(item->hasProperty(BLOCKSOLID) && !hasProperty(item, BLOCKSOLID)){

@@ -130,8 +130,6 @@ GameState_t Game::getGameState()
 void Game::setGameState(GameState_t newState)
 {
 	if(gameState != newState){
-		gameState = newState;
-
 		switch(newState){
 			case GAME_STATE_INIT:
 			{
@@ -163,6 +161,7 @@ void Game::setGameState(GameState_t newState)
 			default:
 				break;
 		}
+		gameState = newState;
 	}
 }
 
@@ -604,19 +603,6 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	creature->onCreatureDisappear(creature, index, isLogout);
 
 	creature->getParent()->postRemoveNotification(creature, index, true);
-
-	if(player && player->hasFlag(PlayerFlag_CanAnswerRuleViolations)) {
-		std::vector<shared_ptr<RuleViolation> > stack;
-		for(RuleViolationsMap::iterator rt = ruleViolations.begin(); rt != ruleViolations.end(); ++rt) {
-			shared_ptr<RuleViolation> rvr = rt->second;
-			if(rvr->gamemaster == player) {
-				stack.push_back(rvr);
-			}
-		}
-		for(std::vector<shared_ptr<RuleViolation> >::iterator rt = stack.begin(); rt != stack.end(); ++rt) {
-			playerCloseRuleViolation((*rt)->gamemaster->getID(), (*rt)->reporter->getName());
-		}
-	}
 
 	listCreature.removeList(creature->getID());
 	creature->removeList();
@@ -3354,12 +3340,15 @@ void Game::addCreatureCheck(Creature* creature)
 	}
 	size_t min = std::numeric_limits<size_t>::max();
 	size_t insertindex = 0;
+	size_t total_size = 0;
 	for(size_t i = 0; i < EVENT_CREATURECOUNT; ++i) {
+		total_size += checkCreatureVectors[i].size();
 		if(checkCreatureVectors[i].size() < min) {
 			insertindex = i;
 			min = checkCreatureVectors[i].size();
 		}
 	}
+	std::cout << total_size << std::endl;
 	checkCreatureVectors[insertindex].push_back(creature);
 	creature->checkCreatureVectorIndex = insertindex + 1;
 }
