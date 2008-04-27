@@ -263,7 +263,12 @@ public:
 	virtual uint32_t getConditionImmunities() const { return 0; }
 	virtual uint32_t getConditionSuppressions() const { return 0; }
 	virtual bool isAttackable() const { return true;}
+
+#ifdef __ONECREATURE_EVENT_
+	bool idle() const { return checkCreatureVectorIndex == 0;}
+#else
 	bool idle() const { return eventCheck == 0;}
+#endif
 
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
@@ -378,6 +383,8 @@ protected:
 	// this is to allow 0 to represent the special value of not
 	// being stored in any onThink vector
 	size_t checkCreatureVectorIndex;
+#else
+	uint32_t eventCheck;
 #endif
 
 	int32_t health, healthMax;
@@ -407,7 +414,6 @@ protected:
 	//follow variables
 	Creature* followCreature;
 	uint32_t eventWalk;
-	uint32_t eventCheck;
 	std::list<Direction> listWalkDir;
 	uint32_t walkUpdateTicks;
 	bool hasFollowPath;

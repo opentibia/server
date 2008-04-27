@@ -342,7 +342,6 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 			delete monster;
 			return false;
 		}
-		monster->onCreatureAppear(monster, false);
 	}
 	else{
 		if(!g_game.placeCreature(monster, pos, true)){

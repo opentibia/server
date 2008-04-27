@@ -1636,7 +1636,6 @@ void Player::addExperience(uint64_t exp)
 		capacity += vocation->getCapGain();
 	}
 
-	bool needSendStats = false;
 	if(prevLevel != newLevel){
 		level = newLevel;
 		updateBaseSpeed();
@@ -1654,19 +1653,15 @@ void Player::addExperience(uint64_t exp)
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
-		needSendStats = true;
 	}
 
 	uint64_t currLevelExp = Player::getExpForLevel(level);
 	uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
 	if(newPercent != levelPercent){
 		levelPercent = newPercent;
-		needSendStats = true;
 	}
 
-	if(needSendStats){
-		sendStats();
-	}
+	sendStats();
 }
 
 uint32_t Player::getPercentLevel(uint64_t count, uint32_t nextLevelCount)

@@ -187,6 +187,11 @@ void Creature::stopEventThink()
 
 void Creature::onThink(uint32_t interval)
 {
+	if(!isMapLoaded && useCacheMap()){
+		isMapLoaded = true;
+		updateMapCache();
+	}
+
 	if(followCreature && getMaster() != followCreature && !canSeeCreature(followCreature)){
 		onCreatureDisappear(followCreature, false);
 	}
