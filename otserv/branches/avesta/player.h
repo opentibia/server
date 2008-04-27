@@ -123,7 +123,7 @@ public:
 
 	static uint64_t getExpForLevel(int32_t level)
 	{
-		return (((uint64_t)50) * level * level * level)/3 - (100 * level * level) + ((850 * level) / 3) - 200;
+		return (((uint64_t)50) * level * level * level)/3 - (((uint64_t)100) * level * level) + ((((uint64_t)850) * level) / 3) - ((uint64_t)200);
 	}
 
 	uint32_t getGuildId() const {return guildId;}
@@ -172,7 +172,7 @@ public:
 	playersex_t getSex() const {return sex;}
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
-	uint64_t getExperience() const {return experience;}
+	int64_t getExperience() const {return experience;}
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
 	const Position& getLoginPosition() const {return loginPosition;}
