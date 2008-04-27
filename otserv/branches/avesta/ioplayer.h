@@ -58,13 +58,13 @@ public:
 	  * \param player Player structure to load to
 	  * \param name Name of the player
 	  * \param preload if set to true only group, guid and account id will be loaded, default: false
-	  * \returns returns true if the player was successfully loaded
+	  * \return returns true if the player was successfully loaded
 	  */
 	bool loadPlayer(Player* player, const std::string& name, bool preload = false);
 
 	/** Save a player
 	  * \param player the player to save
-	  * \returns true if the player was successfully saved
+	  * \return true if the player was successfully saved
 	  */
 	bool savePlayer(Player* player);
 

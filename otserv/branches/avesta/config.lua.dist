@@ -12,12 +12,6 @@ map = "data/world/map.otbm"
 -- options: OTBM for binary map, XML for OTX map
 mapkind = "OTBM"
 
--- map store location (for XML only)
-mapstore = "data/world/map-mapstore.xml"
-
--- house store location (for XML only)
-housestore = "data/world/map-housestore.xml"
-
 -- server name
 servername = "OTServ"
 
@@ -71,6 +65,9 @@ minactionexinterval = 1000
 -- options: daily, weekly, monthly
 houserentperiod = "monthly"
 
+-- Should the server use account balance system or depot system for paying houses?
+useaccbalance = "no"
+
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
 rate_skill = 1
@@ -89,7 +86,7 @@ despawnradius = 50
 maxmessagebuffer = 4
 
 -- motd (the message box that you sometimes get before you choose characters)
-motd = "Welcome to OTServ revdbsys!"
+motd = "Welcome to OTServ!"
 motdnum = "1"
 
 -- login message

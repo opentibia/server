@@ -55,25 +55,25 @@ public:
 
 	/** Load the map from a file/database
 	  * \param map pointer to the Map class
-	  * \returns Returns true if the map was loaded successfully
+	  * \return Returns true if the map was loaded successfully
 	*/
 	bool loadMap(Map* map);
 
 	/** Save the map to a file/database
 	  * \param map pointer to the Map class
-	  * \returns Returns true if the map was saved successfully
+	  * \return Returns true if the map was saved successfully
 	*/
 	bool saveMap(Map* map);
 
 	/** Load the house access list to a file/database
 	  * \param map pointer to the Map class
-	  * \returns Returns true if the house access list was opened successfully
+	  * \return Returns true if the house access list was opened successfully
 	*/
 	bool loadHouseInfo(Map* map);
 
 	/** Save the house access list to a file/database
 	  * \param map pointer to the Map class
-	  * \returns Returns true if the house access list was saved successfully
+	  * \return Returns true if the house access list was saved successfully
 	*/
 	bool saveHouseInfo(Map* map);
 

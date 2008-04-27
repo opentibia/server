@@ -53,7 +53,7 @@ DatabaseSQLite::~DatabaseSQLite()
 	sqlite3_close(m_handle);
 }
 
-int DatabaseSQLite::getParam(DBParam_t param)
+bool DatabaseSQLite::getParam(DBParam_t param)
 {
 	switch(param){
 		case DBPARAM_MULTIINSERT:

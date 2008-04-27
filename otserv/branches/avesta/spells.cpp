@@ -1964,7 +1964,7 @@ bool RuneSpell::Illusion(const RuneSpell* spell, Creature* creature, Item* item,
 		return false;
 	}
 
-	Thing* thing = g_game.internalGetThing(player, posTo, STACKPOS_MOVE);
+	Thing* thing = g_game.internalGetThing(player, posTo, 0, 0, STACKPOS_MOVE);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);

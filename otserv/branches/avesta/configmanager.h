@@ -66,6 +66,7 @@ public:
 		MAP_PASS,
 		MAP_DB,
 		OTSERV_DB_HOST,
+		USE_ACCBALANCE,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 

@@ -46,7 +46,7 @@ extern Weapons* g_weapons;
 
 Items Item::items;
 
-Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/)
+Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 1*/)
 {
 	Item* newItem = NULL;
 
@@ -103,7 +103,7 @@ Item* Item::CreateItem(PropStream& propStream)
 	}
 
 	const ItemType& iType = Item::items[_id];
-	unsigned char _count = 0;
+	uint8_t _count = 0;
 
 	if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
 		if(!propStream.GET_UCHAR(_count)){
@@ -114,7 +114,7 @@ Item* Item::CreateItem(PropStream& propStream)
 	return Item::CreateItem(_id, _count);
 }
 
-Item::Item(const unsigned short _type, unsigned short _count /*= 0*/) :
+Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 	ItemAttributes()
 {
 	id = _type;
@@ -216,7 +216,7 @@ uint8_t Item::getItemCountOrSubtype() const
 	}
 }
 
-void Item::setItemCountOrSubtype(unsigned char n)
+void Item::setItemCountOrSubtype(uint8_t n)
 {
 	const ItemType& it = items[id];
 
@@ -502,7 +502,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		//Door class
 		case ATTR_HOUSEDOORID:
 		{
-			unsigned char _doorId;
+			uint8_t _doorId;
 			if(!propStream.GET_UCHAR(_doorId)){
 				return false;
 			}
@@ -531,7 +531,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 
 bool Item::unserializeAttr(PropStream& propStream)
 {
-	unsigned char attr_type;
+	uint8_t attr_type;
 	while(propStream.GET_UCHAR(attr_type)){
 		if(!readAttr((AttrTypes_t)attr_type, propStream)){
 			return false;
@@ -551,20 +551,20 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 {
 	/*
 	if(isStackable() || isSplash() || isFluidContainer()){
-		unsigned char _count = getItemCountOrSubtype();
+		uint8_t _count = getItemCountOrSubtype();
 		propWriteStream.ADD_UCHAR(ATTR_COUNT);
 		propWriteStream.ADD_UCHAR(_count);
 	}
 	*/
 
-	if(isRune()){
-		unsigned char _count = getItemCharge();
+	if(hasCharges()){
+		uint8_t _count = getItemCharge();
 		propWriteStream.ADD_UCHAR(ATTR_RUNE_CHARGES);
 		propWriteStream.ADD_UCHAR(_count);
 	}
 
 	if(!isNotMoveable() /*moveable*/){
-		unsigned short _actionId = getActionId();
+		uint16_t _actionId = getActionId();
 		if(_actionId){
 			propWriteStream.ADD_UCHAR(ATTR_ACTION_ID);
 			propWriteStream.ADD_USHORT(_actionId);
@@ -829,7 +829,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 		}
 	}
 	else if(it.showCharges){
-		uint32_t charges = getItemCharge();
+		uint16_t charges = getItemCharge();
 		if(charges > 1){
 			s << " that has " << (int)charges << " charges left.";
 		}
@@ -900,7 +900,7 @@ std::string Item::getWeightDescription(double weight) const
 	return ss.str();
 }
 
-void Item::setUniqueId(unsigned short n)
+void Item::setUniqueId(uint16_t n)
 {
 	if(getUniqueId() != 0)
 		return;

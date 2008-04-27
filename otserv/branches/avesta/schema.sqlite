@@ -54,6 +54,7 @@ CREATE TABLE "players" (
     "loss_skills" INTEGER NOT NULL DEFAULT 10,
     "rank_id" INTEGER NOT NULL,
     "town_id" INTEGER NOT NULL,
+	"balance" INTEGER NOT NULL DEFAULT 0,
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
@@ -79,7 +80,8 @@ CREATE TABLE "houses" (
     "id" INTEGER PRIMARY KEY,
     "owner" INTEGER NOT NULL,
     "paid" INTEGER NOT NULL DEFAULT 0,
-    "warnings" TEXT NOT NULL
+    "warnings" INTEGER NOT NULL DEFAULT 0,
+	"lastwarning" INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "house_lists" (

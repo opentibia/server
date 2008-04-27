@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -38,7 +38,7 @@ class Item;
 class ValueCallback : public CallBack{
 public:
 	ValueCallback(formulaType_t _type) {type = _type;}
-	void getMinMaxValues(Player* player, int32_t& min, int32_t& max) const;
+	void getMinMaxValues(Player* player, int32_t& min, int32_t& max, bool useCharges) const;
 
 protected:
 	formulaType_t type;
@@ -51,7 +51,7 @@ public:
 
 protected:
 	formulaType_t type;
-};	
+};
 
 class TargetCallback : public CallBack{
 public:
@@ -60,7 +60,7 @@ public:
 
 protected:
 	formulaType_t type;
-};	
+};
 
 struct CombatParams{
 	CombatParams() {
@@ -74,6 +74,7 @@ struct CombatParams{
 		distanceEffect = NM_ME_NONE;
 		condition = NULL;
 		dispelType = CONDITION_NONE;
+		useCharges = false;
 
 		valueCallback = NULL;
 		tileCallback = NULL;
@@ -90,6 +91,7 @@ struct CombatParams{
 	uint32_t itemId;
 	uint8_t impactEffect;
 	uint8_t distanceEffect;
+	bool useCharges;
 
 	ValueCallback* valueCallback;
 	TileCallback* tileCallback;
@@ -118,7 +120,7 @@ public:
 
 		for(uint32_t row = 0; row < rows; ++row){
 			data_[row] = new bool[cols];
-			
+
 			for(uint32_t col = 0; col < cols; ++col){
 				data_[row][col] = 0;
 			}
@@ -136,7 +138,7 @@ public:
 
 		for(uint32_t row = 0; row < rows; ++row){
 			data_[row] = new bool[cols];
-			
+
 			for(uint32_t col = 0; col < cols; ++col){
 				data_[row][col] = rhs.data_[row][col];
 			}
@@ -239,7 +241,7 @@ protected:
 		if(it != areas.end()){
 			return it->second;
 		}
-		
+
 		return NULL;
 	}
 
@@ -345,7 +347,7 @@ public:
 
 	bool isReplaceable() const {return Item::items[getID()].replaceable;}
 	CombatType_t getCombatType() const {
-		const ItemType& it = items[getID()]; 
+		const ItemType& it = items[getID()];
 		return it.combatType;
 	}
 	void onStepInField(Creature* creature);

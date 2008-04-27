@@ -47,6 +47,7 @@ transfer_container(ITEM_LOCKER1)
 	paidUntil = 0;
 	houseid = _houseid;
 	rentWarnings = 0;
+	lastWarning = 0;
 	rent = 0;
 	townid = 0;
 	transferItem = NULL;
@@ -73,7 +74,7 @@ void House::setHouseOwner(uint32_t guid)
 	if(houseOwner){
 		//send items to depot
 		transferToDepot();
-		
+
 		//[ added for beds system
 		// we need to remove players from beds
 		HouseBedItemList::iterator bit;
@@ -115,6 +116,8 @@ void House::setHouseOwner(uint32_t guid)
 	for(it = doorList.begin(); it != doorList.end(); ++it){
 		(*it)->setSpecialDescription(houseDescription.str());
 	}
+
+	setLastWarning(std::time(NULL)); //So the new owner has one day before he start the payement
 }
 
 AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
@@ -880,7 +883,9 @@ bool Houses::payHouses()
 			bool savePlayerHere = true;
 			if(depot){
 				//get money from depot
-				if(g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
+				bool useAccBalance = (g_config.getString(ConfigManager::USE_ACCBALANCE) == "yes");
+				if((useAccBalance && player->balance >= house->getRent()) ||
+					g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
 
 					uint32_t paidUntil = currentTime;
 					switch(rentPeriod){
@@ -898,9 +903,13 @@ bool Houses::payHouses()
 						break;
 					}
 
+					if(useAccBalance){
+						player->balance -= house->getRent();
+					}
+
 					house->setPaidUntil(paidUntil);
 				}
-				else{
+				else if(currentTime >= house->getLastWarning() + 24 * 60 * 60){
 					if(house->getPayRentWarnings() >= 7){
 						house->setHouseOwner(0);
 						// setHouseOwner will load the player,
@@ -943,6 +952,7 @@ bool Houses::payHouses()
 						g_game.internalAddItem(depot, letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 						house->setPayRentWarnings(house->getPayRentWarnings() + 1);
+						house->setLastWarning(currentTime);
 					}
 				}
 			}

@@ -153,6 +153,11 @@ public:
 	bool getStorageValue(const uint32_t key, int32_t& value) const;
 	void genReservedStorageRange();
 
+	bool withdrawMoney(uint32_t amount);
+	bool depositMoney(uint32_t amount);
+	bool transferMoneyTo(const std::string& name, uint32_t amount);
+	uint32_t balance;
+
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
@@ -378,10 +383,12 @@ public:
 	void sendCreatureChangeVisible(const Creature* creature, bool visible)
 		{
 			if(client){
-				if(visible)
+				if(visible){
 					client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
-				else
+				}
+				else{
 					client->sendCreatureInvisible(creature);
+				}
 			}
 		}
 	void sendCreatureLight(const Creature* creature)

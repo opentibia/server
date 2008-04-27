@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -56,7 +56,7 @@ void ProtocolAdmin::onRecvFirstMessage(NetworkMessage& msg)
 		getConnection()->closeConnection();
 		return;
 	}
-	
+
 	m_state = NO_CONNECTED;
 	//is allowed this ip?
 	if(!g_adminConfig->allowIP(getIP())){
@@ -64,14 +64,14 @@ void ProtocolAdmin::onRecvFirstMessage(NetworkMessage& msg)
 		getConnection()->closeConnection();
 		return;
 	}
-	
+
 	//max connections limit
 	if(!g_adminConfig->addConnection()){
 		addLogLine(this, LOGTYPE_EVENT, 1, "cannot add new connection");
 		getConnection()->closeConnection();
 		return;
 	}
-	
+
 	addLogLine(this, LOGTYPE_EVENT, 1, "sending HELLO");
 	//send hello
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
@@ -81,7 +81,7 @@ void ProtocolAdmin::onRecvFirstMessage(NetworkMessage& msg)
 	output->AddU16(g_adminConfig->getProtocolPolicy()); //security policy
 	output->AddU32(g_adminConfig->getProtocolOptions()); //protocol options(encryption, ...)
 	OutputMessagePool::getInstance()->send(output);
-	
+
 	m_lastCommand = time(NULL);
 	m_state = ENCRYPTION_NO_SET;
 }
@@ -94,13 +94,13 @@ void ProtocolAdmin::deleteProtocolTask()
 }
 
 void ProtocolAdmin::parsePacket(NetworkMessage& msg)
-{	
+{
 	uint8_t recvbyte = msg.GetByte();
-	
+
 	OutputMessagePool* outputPool = OutputMessagePool::getInstance();
-	
+
 	OutputMessage* output = outputPool->getOutputMessage(this, false);
-	
+
 	switch(m_state){
 	case ENCRYPTION_NO_SET:
 	{
@@ -111,7 +111,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 				getConnection()->closeConnection();
 				return;
 			}
-		
+
 			if(recvbyte != AP_MSG_ENCRYPTION && recvbyte != AP_MSG_KEY_EXCHANGE){
 				output->AddByte(AP_MSG_ERROR);
 				output->AddString("encryption needed");
@@ -167,9 +167,9 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		getConnection()->closeConnection();
 		return;
 	}
-	
+
 	m_lastCommand = time(NULL);
-	
+
 	switch(recvbyte){
 	case AP_MSG_LOGIN:
 	{
@@ -207,7 +207,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 					addLogLine(this, LOGTYPE_WARNING, 1, "no valid server key type");
 					break;
 				}
-				
+
 				if(RSA_decrypt(rsa, msg)){
 					m_state = NO_LOGGED_IN;
 					uint32_t k[4];
@@ -215,11 +215,11 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 					k[1] = msg.GetU32();
 					k[2] = msg.GetU32();
 					k[3] = msg.GetU32();
-					
+
 					//use for in/out the new key we have
 					enableXTEAEncryption();
 					setXTEAKey(k);
-					
+
 					output->AddByte(AP_MSG_ENCRYPTION_OK);
 					addLogLine(this, LOGTYPE_EVENT, 1, "encryption ok");
 				}
@@ -257,7 +257,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 					addLogLine(this, LOGTYPE_WARNING, 1, "no valid server key type");
 					break;
 				}
-				
+
 				output->AddByte(AP_MSG_KEY_EXCHANGE_OK);
 				output->AddByte(ENCRYPTION_RSA1024XTEA);
 				char RSAPublicKey[128];
@@ -293,22 +293,22 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			addLogLine(this, LOGTYPE_EVENT, 1, "broadcast: " + message);
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Game::anonymousBroadcastMessage, &g_game, MSG_STATUS_WARNING, message)));
-			
+
 			output->AddByte(AP_MSG_COMMAND_OK);
 			break;
 		}
 		case CMD_CLOSE_SERVER:
-		{	
+		{
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&ProtocolAdmin::adminCommandCloseServer, this)));
-			
+
 			break;
 		}
 		case CMD_PAY_HOUSES:
-		{			
+		{
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&ProtocolAdmin::adminCommandPayHouses, this)));
-			
+
 			break;
 		}
 		case CMD_SHUTDOWN_SERVER:
@@ -317,6 +317,13 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 				createTask(boost::bind(&ProtocolAdmin::adminCommandShutdownServer, this)));
 			getConnection()->closeConnection();
 			return;
+			break;
+		}
+		case CMD_KICK:
+		{
+			const std::string name = msg.GetString();
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&ProtocolAdmin::adminCommandKickPlayer, this, name)));
 			break;
 		}
 		default:
@@ -346,7 +353,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 }
 
 void ProtocolAdmin::adminCommandCloseServer()
-{	
+{
 	g_game.setGameState(GAME_STATE_CLOSED);
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end()){
@@ -358,29 +365,29 @@ void ProtocolAdmin::adminCommandCloseServer()
 			++it;
 		}
 	}
-	
+
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-	
+
 	if(!g_bans.saveBans()){
 		addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Bans");
-		
+
 		output->AddByte(AP_MSG_COMMAND_FAILED);
 		output->AddString("Bans");
 		OutputMessagePool::getInstance()->send(output);
 		return;
 	}
-	
+
 	if(!g_game.getMap()->saveMap()){
 		addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Map");
-		
+
 		output->AddByte(AP_MSG_COMMAND_FAILED);
 		output->AddString("Map");
 		OutputMessagePool::getInstance()->send(output);
 		return;
 	}
-	
+
 	addLogLine(this, LOGTYPE_EVENT, 1, "close server ok");
-	
+
 	output->AddByte(AP_MSG_COMMAND_OK);
 	OutputMessagePool::getInstance()->send(output);
 }
@@ -399,21 +406,41 @@ void ProtocolAdmin::adminCommandShutdownServer()
 void ProtocolAdmin::adminCommandPayHouses()
 {
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-	
+
 	if(Houses::getInstance().payHouses()){
 		addLogLine(this, LOGTYPE_EVENT, 1, "pay houses ok");
-		
+
 		output->AddByte(AP_MSG_COMMAND_OK);
 	}
 	else{
 		addLogLine(this, LOGTYPE_WARNING, 1, "pay houses fail");
-		
+
 		output->AddByte(AP_MSG_COMMAND_FAILED);
 		output->AddString(" ");
 	}
 	OutputMessagePool::getInstance()->send(output);
-	
+
 	return ;
+}
+
+void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
+{
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+
+	Player* player = g_game.getPlayerByName(name);
+	if(player){
+		player->kickPlayer();
+		addLogLine(this, LOGTYPE_EVENT, 1, "kicked player " + name);
+
+		output->AddByte(AP_MSG_COMMAND_OK);
+	}
+	else{
+		addLogLine(this, LOGTYPE_WARNING, 1, "Could not kick player(not online): " + name);
+
+		output->AddByte(AP_MSG_COMMAND_FAILED);
+		output->AddString("player is not online");
+	}
+	OutputMessagePool::getInstance()->send(output);
 }
 
 /////////////////////////////////////////////
@@ -436,9 +463,9 @@ AdminProtocolConfig::~AdminProtocolConfig()
 }
 
 bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
-{	
+{
 	std::string filename = directory + "admin.xml";
-	
+
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	if(!doc){
 		return false;
@@ -446,12 +473,12 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 
 	xmlNodePtr root, p, q;
 	root = xmlDocGetRootElement(doc);
-	
+
 	if(!xmlStrEqual(root->name,(const xmlChar*)"otadmin")){
 		xmlFreeDoc(doc);
 		return false;
 	}
-		
+
 	int enabled;
 	if(readXMLInteger(root, "enabled", enabled)){
 		if(enabled){
@@ -461,7 +488,7 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 			m_enabled = false;
 		}
 	}
-		
+
 	int value;
 	p = root->children;
 	while(p){

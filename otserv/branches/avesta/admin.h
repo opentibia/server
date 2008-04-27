@@ -115,7 +115,7 @@ enum{
 	//CMD_RELOAD_SCRIPTS = 6,
 	//CMD_PLAYER_INFO = 7,
 	//CMD_GETONLINE = 8,
-	//CMD_KICK = 9,
+	CMD_KICK = 9,
 	//CMD_BAN_MANAGER = 10,
 	//CMD_SERVER_INFO = 11,
 	//CMD_GETHOUSE = 12,
@@ -188,6 +188,7 @@ protected:
 	void adminCommandCloseServer();
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();
+	void adminCommandKickPlayer(const std::string& name);
 
 	enum ConnectionState_t{
 		NO_CONNECTED,

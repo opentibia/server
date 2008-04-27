@@ -19,7 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "connection.h"
 #include "protocol.h"
 #include "outputmessage.h"
 #include "protocolgame.h"
@@ -28,6 +27,7 @@
 #include "status.h"
 #include "tasks.h"
 #include "scheduler.h"
+#include "connection.h"
 
 #include <boost/bind.hpp>
 

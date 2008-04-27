@@ -35,21 +35,21 @@ public:
 	virtual ~IOMap() {}
 
 	/** Get a textual description of what source is used
-	* \returns Name of the source
+	* \return Name of the source
 	*/
 	virtual const char* getSourceDescription() = 0;
 
 	/** Load the map from a file/database
 	  * \param map pointer to the Map class
 	  * \param identifier is the mapfile/database to open
-	  * \returns Returns true if the map was loaded successfully
+	  * \return Returns true if the map was loaded successfully
 	*/
 	virtual bool loadMap(Map* map, const std::string& identifier) = 0;
 
 
 	/** Load the spawns
 	  * \param map pointer to the Map class
-	  * \returns Returns true if the spawns were loaded successfully
+	  * \return Returns true if the spawns were loaded successfully
 	*/
 	bool loadSpawns(Map* map)
 	{
@@ -62,7 +62,7 @@ public:
 
 	/** Load the houses (not house tile-data)
 	  * \param map pointer to the Map class
-	  * \returns Returns true if the houses were loaded successfully
+	  * \return Returns true if the houses were loaded successfully
 	*/
 	bool loadHouses(Map* map)
 	{

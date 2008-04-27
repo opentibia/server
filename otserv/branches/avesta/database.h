@@ -91,7 +91,7 @@ public:
 	* @param DBParam_t parameter to get
 	* @return suitable for given parameter
 	*/
-	DATABASE_VIRTUAL int getParam(DBParam_t param) { return 0; }
+	DATABASE_VIRTUAL bool getParam(DBParam_t param) { return false; }
 
 protected:
 	/**
@@ -173,22 +173,22 @@ class _DBResult
 
 public:
 	/** Get the Integer value of a field in database
-	*\returns The Integer value of the selected field and row
+	*\return The Integer value of the selected field and row
 	*\param s The name of the field
 	*/
 	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s) { return 0; }
 	/** Get the Long value of a field in database
-	*\returns The Long value of the selected field and row
+	*\return The Long value of the selected field and row
 	*\param s The name of the field
 	*/
 	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s) { return 0; }
 	/** Get the String of a field in database
-	*\returns The String of the selected field and row
+	*\return The String of the selected field and row
 	*\param s The name of the field
 	*/
 	DATABASE_VIRTUAL std::string getDataString(const std::string &s) { return "''"; }
 	/** Get the blob of a field in database
-	*\returns a PropStream that is initiated with the blob data field, if not exist it returns NULL.
+	*\return a PropStream that is initiated with the blob data field, if not exist it returns NULL.
 	*\param s The name of the field
 	*/
 	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size) { return 0; }
@@ -196,7 +196,7 @@ public:
 	/**
 	* Moves to next result in set.
 	*
-	* @return true if moved, false if there are no more results.
+	* \return true if moved, false if there are no more results.
 	*/
 	DATABASE_VIRTUAL bool next() {return false;};
 

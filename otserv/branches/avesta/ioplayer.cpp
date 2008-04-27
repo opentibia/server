@@ -77,7 +77,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		experience = currExpCount;
 	}
 	player->experience = experience;
-	player->levelPercent = Player::getPercentLevel(player->experience - currExpCount, Player::getExpForLevel(player->level + 1) - currExpCount);
+	player->levelPercent = Player::getPercentLevel(player->experience - currExpCount, nextExpCount - currExpCount);
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");
@@ -93,8 +93,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		manaSpent = 0;
 	}
 	player->manaSpent = manaSpent;
-	player->magLevelPercent = Player::getPercentLevel(player->manaSpent,
-		player->vocation->getReqMana(player->magLevel + 1));
+	player->magLevelPercent = Player::getPercentLevel(player->manaSpent, nextManaCount);
 	player->health = result->getDataInt("health");
 	player->healthMax = result->getDataInt("healthmax");
 	player->defaultOutfit.lookType = result->getDataInt("looktype");
@@ -109,7 +108,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->premiumDays = result->getDataInt("premdays");
 #endif
 
-	#ifdef __SKULLSYSTEM__
+#ifdef __SKULLSYSTEM__
 	int32_t redSkullSeconds = result->getDataInt("redskulltime") - std::time(NULL);
 	if(redSkullSeconds > 0){
 		//ensure that we round up the number of ticks
@@ -119,7 +118,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 			player->skull = SKULL_RED;
 		}
 	}
-	#endif
+#endif
 
 	unsigned long conditionsSize = 0;
 	const char* conditions = result->getDataStream("conditions", conditionsSize);
@@ -163,20 +162,20 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	#ifndef __USE_SQL_PREMDAYS__
 	time_t premEnd = result->getDataInt("premend");
 	time_t timeNow = time(NULL);
-	if(premEnd != 0 && premEnd < timeNow){
-		//TODO: remove every premium property of the player
-		// outfit, vocation, temple, ...
-		// can it be done as database trigger?
-
-		//update table
-		query << "UPDATE `players` SET `premend` = 0 WHERE `id` = " << player->getGUID();
-		db->executeQuery(query.str());
-		query.str("");
-	}
-	else{
-		player->premiumDays = (premEnd - timeNow)/86400;
+	if(premEnd > 0){
+		if(premEnd < timeNow){
+			//update table
+			query << "UPDATE `players` SET `premend` = 0 WHERE `id` = " << player->getGUID();
+			db->executeQuery(query.str());
+			query.str("");
+		}
+		else{
+			player->premiumDays = (premEnd - timeNow)/86400;
+		}
 	}
 	#endif
+
+	player->balance = result->getDataInt("balance");
 
 	player->guildNick = result->getDataString("guildnick");
 	db->freeResult(result);
@@ -474,16 +473,19 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `conditions` = " << db->escapeBlob(conditions, conditionsSize)
 	<< ", `loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE)
 	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
-	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES);
+	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES)
+	<< ", `balance` = " << player->balance;
 
-	#ifndef __USE_SQL_PREMDAYS__
-	uint32_t premEnd = 0;
+#ifndef __USE_SQL_PREMDAYS__
+	// there's no need to update prem end here, especially if it hasn't changed!
+	// just be sure to only change premium time via a database query.
+	/*uint32_t premEnd = 0;
 	if(player->premiumDays > 0){
 		premEnd = time(NULL) + player->premiumDays * 86400;
 	}
 
-	query << ", `premend` = " << premEnd;
-	#endif
+	query << ", `premend` = " << premEnd;*/
+#endif
 
 #ifdef __SKULLSYSTEM__
 	int32_t redSkullTime = 0;

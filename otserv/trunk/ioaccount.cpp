@@ -40,7 +40,7 @@ Account IOAccount::loadAccount(uint32_t accno)
 	time_t premEnd;
 #endif
 	uint32_t premDays;
-	uint32_t today = uint32_t(std::time(NULL) / 86400);
+	uint32_t today = uint32_t(time(NULL) / 86400);
 
 	Database* db = Database::instance();
 	DBQuery query;

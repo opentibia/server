@@ -20,8 +20,6 @@
 #include "otpch.h"
 
 #include "definitions.h"
-#include <boost/asio.hpp>
-#include "server.h"
 
 #include <string>
 #include <iostream>
@@ -30,6 +28,7 @@
 
 #include "otsystem.h"
 #include "server.h"
+#include <boost/asio.hpp>
 
 #include <stdlib.h>
 #include <time.h>

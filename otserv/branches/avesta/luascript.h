@@ -216,7 +216,8 @@ enum PlayerInfo_t{
 	PlayerInfoTown,
 	PlayerInfoGUID,
 	PlayerInfoPremiumDays,
-	PlayerInfoSkullType
+	PlayerInfoSkullType,
+	PlayerInfoBalance
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -345,6 +346,10 @@ protected:
 	static int luaDoRelocate(lua_State *L);
 	static int luaDoPlayerSendTextMessage(lua_State *L);
 	static int luaDoPlayerRemoveMoney(lua_State *L);
+	static int luaDoPlayerAddMoney(lua_State *L);
+	static int luaDoPlayerWithdrawMoney(lua_State *L);
+	static int luaDoPlayerDepositMoney(lua_State *L);
+	static int luaDoPlayerTransferMoneyTo(lua_State *L);
 	static int luaDoPlayerSetMasterPos(lua_State *L);
 	static int luaDoPlayerSetTown(lua_State *L);
 	static int luaDoPlayerSetVocation(lua_State *L);
@@ -424,6 +429,7 @@ protected:
 	static int luaGetPlayerFlagValue(lua_State *L);
 	static int luaGetPlayerLossPercent(lua_State *L);
 	static int luaGetPlayerPremiumDays(lua_State *L);
+	static int luaGetPlayerBalance(lua_State *L);
 
 	static int luaPlayerLearnInstantSpell(lua_State *L);
 	static int luaCanPlayerLearnInstantSpell(lua_State *L);
@@ -443,14 +449,15 @@ protected:
 
 	static int luaDoPlayerAddOutfit(lua_State *L);
 	static int luaDoPlayerRemOutfit(lua_State *L);
+	static int luaCanPlayerWearOutfit(lua_State *L);
 
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);
 	static int luaGetWorldLight(lua_State *L);
 	static int luaGetWorldCreatures(lua_State *L);
 	static int luaGetWorldUpTime(lua_State *L);
+	static int luaGetPlayersOnlineList(lua_State *L);
 	static int luaBroadcastMessage(lua_State *L);
-	static int luaBroadcastMessageEx(lua_State *L);
 	static int luaGetGuildId(lua_State *L);
 
 	//type validation
@@ -519,6 +526,7 @@ protected:
 
 	static int luaDoChangeSpeed(lua_State *L);
 
+	static int luaDoCreatureChangeOutfit(lua_State *L);
 	static int luaSetCreatureOutfit(lua_State *L);
 	static int luaGetCreatureOutfit(lua_State *L);
 	static int luaSetMonsterOutfit(lua_State *L);
@@ -584,7 +592,7 @@ private:
 	struct LuaTimerEventDesc{
 		int32_t scriptId;
 		int function;
-		int parameter;
+		std::list<int> parameters;
 	};
 	uint32_t m_lastEventTimerId;
 

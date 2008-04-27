@@ -112,7 +112,7 @@ public:
 	  * Load a map.
 	  * \param filename Mapfile to load
 	  * \param filekind Kind of the map, BIN SQL or TXT
-	  * \returns Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
+	  * \return Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
 	  */
 	int loadMap(std::string filename, std::string filekind);
 
@@ -140,52 +140,52 @@ public:
 
 	/**
 	  * Get a single tile of the map.
-	  * \returns A pointer to the tile
+	  * \return A pointer to the tile
 		*/
 	Tile* getTile(uint32_t x, uint32_t y, uint32_t z);
 
 	/**
 	  * Get a leaf of the map.
-	  * \returns A pointer to a leaf
+	  * \return A pointer to a leaf
 		*/
 	QTreeLeafNode* getLeaf(uint32_t x, uint32_t y);
 
 	/**
 	  * Returns a creature based on the unique creature identifier
 	  * \param id is the unique creature id to get a creature pointer to
-	  * \returns A Creature pointer to the creature
+	  * \return A Creature pointer to the creature
 	  */
 	Creature* getCreatureByID(uint32_t id);
 
 	/**
 	  * Returns a player based on the unique creature identifier
 	  * \param id is the unique player id to get a player pointer to
-	  * \returns A Pointer to the player
+	  * \return A Pointer to the player
 	  */
 	Player* getPlayerByID(uint32_t id);
 
 	/**
 	  * Returns a creature based on a string name identifier
 	  * \param s is the name identifier
-	  * \returns A Pointer to the creature
+	  * \return A Pointer to the creature
 	  */
 	Creature* getCreatureByName(const std::string& s);
 
 	/**
 	  * Returns a player based on a string name identifier
 	  * \param s is the name identifier
-	  * \returns A Pointer to the player
+	  * \return A Pointer to the player
 	  */
 	Player* getPlayerByName(const std::string& s);
 
 	/**
 	  * Returns a player based on an account number identifier
 	  * \param acc is the account identifier
-	  * \returns A Pointer to the player
+	  * \return A Pointer to the player
 	  */
 	Player* getPlayerByAccount(uint32_t acc);
 
-	  /* Place Creature on the map without sending out events to the surrounding.
+	/** Place Creature on the map without sending out events to the surrounding.
 	  * \param creature Creature to place on the map
 	  * \param pos The position to place the creature
 	  * \param forced If true, placing the creature will not fail because of obstacles (creatures/items)
@@ -254,7 +254,7 @@ public:
 	  * \param depthSearch if true it will check child containers aswell
 	  * \param subType is the extra type an item can have such as charges/fluidtype, default is -1
 		* meaning it's not used
-	  * \returns A pointer to the item to an item and NULL if not found
+	  * \return A pointer to the item to an item and NULL if not found
 	  */
 	Item* findItemOfType(Cylinder* cylinder, uint16_t itemId,
 		bool depthSearch = true, int32_t subType = -1);
@@ -266,13 +266,13 @@ public:
 	  * \param count is the amount to remove
 	  * \param subType is the extra type an item can have such as charges/fluidtype, default is -1
 		* meaning it's not used
-	  * \returns true if the removal was successful
+	  * \return true if the removal was successful
 	  */
 	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, int32_t subType = -1);
 
 	/**
 	  * Get the amount of money in a a cylinder
-	  * \returns the amount of money found
+	  * \return the amount of money found
 	  */
 	uint32_t getMoney(Cylinder* cylinder);
 
@@ -281,16 +281,25 @@ public:
 	  * \param cylinder to remove the money from
 	  * \param money is the amount to remove
 	  * \param flags optional flags to modifiy the default behaviour
-	  * \returns true if the removal was successful
+	  * \return true if the removal was successful
 	  */
 	bool removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags = 0);
+
+	/**
+	  * Add item(s) with monetary value
+	  * \param cylinder which will receive money
+	  * \param money the amount to give
+	  * \param flags optional flags to modify default behavior
+	  * \return true
+	  */
+	bool addMoney(Cylinder* cylinder, int32_t money, uint32_t flags = 0);
 
 	/**
 	  * Transform one item to another type/count
 	  * \param item is the item to transform
 	  * \param newtype is the new type
 	  * \param newCount is the new count value, use default value (-1) to not change it
-	  * \returns true if the tranformation was successful
+	  * \return true if the tranformation was successful
 	  */
 	Item* transformItem(Item* item, uint16_t newId, int32_t newCount = -1);
 
@@ -298,7 +307,7 @@ public:
 	  * Teleports an object to another position
 	  * \param thing is the object to teleport
 	  * \param newPos is the new position
-	  * \returns true if the teleportation was successful
+	  * \return true if the teleportation was successful
 	  */
 	ReturnValue internalTeleport(Thing* thing, const Position& newPos);
 

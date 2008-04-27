@@ -36,6 +36,11 @@ extern ConfigManager g_config;
 Account IOAccount::loadAccount(uint32_t accno)
 {
 	Account acc;
+#ifndef __USE_SQL_PREMDAYS__
+	time_t premEnd;
+#endif
+	uint32_t premDays;
+	uint32_t today = uint32_t(time(NULL) / 86400);
 
 	Database* db = Database::instance();
 	DBQuery query;
@@ -48,11 +53,29 @@ Account IOAccount::loadAccount(uint32_t accno)
 		db->freeResult(result);
 
 		query.str("");
-		query << "SELECT `name` FROM `players` WHERE `account_id` = " << accno;
+#ifndef __USE_SQL_PREMDAYS__
+		query << "SELECT `name`, `premend` FROM `players` WHERE `account_id` = " << accno;
+#else
+		query << "SELECT `name`, `premdays` FROM `players` WHERE `account_id` = " << accno;
+#endif
 		if((result = db->storeQuery(query.str()))){
 			do{
 				std::string ss = result->getDataString("name");
 				acc.charList.push_back(ss.c_str());
+#ifndef __USE_SQL_PREMDAYS__
+				premEnd = result->getDataInt("premend");
+				premDays = uint32_t(premEnd / 86400) - today;
+				// give the account the highest number of premium days
+				if(premDays > acc.premDays) {
+					acc.premDays = premDays;
+				}
+#else
+				premDays = result->getDataInt("premdays");
+				// give the account the highest number of premium days
+				if(premDays > acc.premDays) {
+					acc.premDays = premDays;
+				}
+#endif
 			}while(result->next());
 
 			acc.charList.sort();

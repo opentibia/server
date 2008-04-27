@@ -109,7 +109,7 @@ DatabaseODBC::~DatabaseODBC()
 	SQLFreeHandle(SQL_HANDLE_ENV, m_env);
 }
 
-int DatabaseODBC::getParam(DBParam_t param)
+bool DatabaseODBC::getParam(DBParam_t param)
 {
 	switch(param){
 		case DBPARAM_MULTIINSERT:
