@@ -3275,28 +3275,26 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 	// is used if available and if it can be used, else a local vector is
 	// used. (Hopefully the compiler will optimize away the construction of
 	// the temporary when it's not used.
-	const SpectatorVec* list;
-	SpectatorVec tmp_list;
+	SpectatorVec list;
 	SpectatorVec::const_iterator it;
 
 	if(type == SPEAK_YELL || type == SPEAK_MONSTER_YELL){
-		getSpectators(tmp_list, creature->getPosition(), true, 18, 18, 14, 14);
-		list = &tmp_list;
+		getSpectators(list, creature->getPosition(), true, 18, 18, 14, 14);
 	}
 	else{
-		list = &getSpectators(creature->getPosition());
+		getSpectators(list, creature->getPosition(), false);
 	}
 
 	//send to client
 	Player* tmpPlayer = NULL;
-	for(it = list->begin(); it != list->end(); ++it){
+	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->sendCreatureSay(creature, type, text);
 		}
 	}
 
 	//event method
-	for(it = list->begin(); it != list->end(); ++it){
+	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onCreatureSay(creature, type, text);
 	}
 

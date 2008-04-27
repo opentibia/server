@@ -353,9 +353,9 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 		if((endTime - startTime) > 100){
 			startTime = OTSYS_TIME();
 			OTSYS_SLEEP(10);
+		} else {
+			OTSYS_SLEEP(1);
 		}
-
-		OTSYS_SLEEP(1);
 	}
 
 #if defined __EXCEPTION_TRACER__
@@ -731,7 +731,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 
 	if(creature == followCreature || (creature == this && followCreature)){
 		if(hasFollowPath){
-			forceUpdateFollowPath = true;
+			Creature::addPathSearch(this);
 		}
 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){

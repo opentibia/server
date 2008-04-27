@@ -1162,6 +1162,8 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	//add a reference to this item, it may be deleted after being added (mailbox for example)
 	thing->useThing2();
 
+	bool removal = false;
+
 	if(link == LINK_OWNER){
 		//calling movement scripts
 		Creature* creature = thing->getCreature();
@@ -1180,14 +1182,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 		}
 		else if(TrashHolder* trashHolder = getTrashHolder()){
 			trashHolder->__addThing(thing);
-			if(thing != trashHolder){
-				Item* item = thing->getItem();
-				if(item){
-					updateTileFlags(item, true);
-				}
-				g_game.FreeThing(thing);
-				return;
-			}
+			removal = thing != trashHolder;
 		}
 		else if(Mailbox* mailbox = getMailbox()){
 			mailbox->__addThing(thing);
@@ -1197,7 +1192,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	//update floor change flags
 	Item* item = thing->getItem();
 	if(item){
-		updateTileFlags(item, false);
+		updateTileFlags(item, removal);
 	}
 
 	//release the reference to this item onces we are finished
