@@ -43,13 +43,13 @@ extern Game g_game;
 #define STATUS_CLIENT_VERISON "8.0"
 
 enum RequestedInfo_t{
-	REQUEST_BASIC_SERVER_INFO = 1,
-	REQUEST_OWNER_SERVER_INFO = 2,
-	REQUEST_MISC_SERVER_INFO = 4,
-	REQUEST_PLAYERS_INFO = 8,
-	REQUEST_MAP_INFO = 16,
-	REQUEST_EXT_PLAYERS_INFO = 32,
-	REQUEST_PLAYER_STATUS_INFO = 64,
+	REQUEST_BASIC_SERVER_INFO  = 0x01,
+	REQUEST_OWNER_SERVER_INFO  = 0x02,
+	REQUEST_MISC_SERVER_INFO   = 0x04,
+	REQUEST_PLAYERS_INFO       = 0x08,
+	REQUEST_MAP_INFO           = 0x10,
+	REQUEST_EXT_PLAYERS_INFO   = 0x20,
+	REQUEST_PLAYER_STATUS_INFO = 0x40,
 };
 
 std::map<uint32_t, int64_t> ProtocolStatus::ipConnectMap;
@@ -83,36 +83,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	//Another ServerInfo protocol
 	case 0x01:
 	{
-		uint32_t requestedInfo = 0;
-		int32_t length = msg.getMessageLength() - 2; //2 bytes: 0xFF and 0x01
-		if(length > 0 && msg.GetByte() != 0){
-			length--;
-			requestedInfo |= REQUEST_BASIC_SERVER_INFO;
-		}
-		if(length > 0 && msg.GetByte() != 0){
-			length--;
-			requestedInfo |= REQUEST_OWNER_SERVER_INFO;
-		}
-		if(length > 0 && msg.GetByte() != 0){
-			length--;
-			requestedInfo |= REQUEST_MISC_SERVER_INFO;
-		}
-		if(length > 0 && msg.GetByte() != 0){
-			length--;
-			requestedInfo |= REQUEST_PLAYERS_INFO;
-		}
-		if(length > 0 && msg.GetByte() != 0){
-			length--;
-			requestedInfo |= REQUEST_MAP_INFO;
-		}
-		if(length > 0 && msg.GetByte() != 0){
-			length--;
-			requestedInfo |= REQUEST_EXT_PLAYERS_INFO;
-		}
-		if(length > 0 && msg.GetByte() != 0){
-			length--;
-			requestedInfo |= REQUEST_PLAYER_STATUS_INFO;
-		}
+		uint32_t requestedInfo = msg.GetU16(); //Only a Byte is necessary, though we could add new infos here
 
 		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		Status* status = Status::instance();
@@ -301,6 +272,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 	}
 
 	if(requestedInfo & REQUEST_EXT_PLAYERS_INFO){
+		output->AddByte(0x21); // players info - online players list
 		output->AddU32(m_playersonline);
 		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 			//Send the most common info
@@ -310,6 +282,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 	}
 
 	if(requestedInfo & REQUEST_PLAYER_STATUS_INFO){
+		output->AddByte(0x22); // players info - online status info of a player
 		const std::string name = msg.GetString();
 		if(g_game.getPlayerByName(name) != NULL){
 			output->AddByte(0x01);
