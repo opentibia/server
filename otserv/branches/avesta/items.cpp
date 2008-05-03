@@ -1090,6 +1090,38 @@ bool Items::loadFromXml(const std::string& datadir)
 		xmlFreeDoc(doc);
 	}
 
+	//check for loops
+	for(uint32_t i = 0; i < Item::items.size(); ++i){
+		const ItemType* it = Item::items.getElement(i);
+		if(!it || it->decayTo <= 0 || !it->moveable){
+			continue;
+		}
+	
+		std::vector<int32_t> decayList;
+		decayList.push_back(it->id);
+		int32_t decayTo = it->decayTo;
+		while(decayTo > 0){
+			if(decayList.size() >= 10){
+				std::cout << "Warning: [Items::loadFromXml] Item  " << *decayList.begin() << " an unsual long decay-chain" << std::endl;
+			}
+
+			if(std::find(decayList.begin(), decayList.end(), decayTo) == decayList.end()){
+				decayList.push_back(decayTo);
+
+				const ItemType& it = Item::items.getItemType(decayTo);
+				if(it.id == 0){
+					break;
+				}
+
+				decayTo = it.decayTo;
+			}
+			else{
+				std::cout << "Warning: [Items::loadFromXml] Item  " << it->id << " has an infinate decay-chain" << std::endl;
+				break;
+			}
+		}
+	}
+
 	return true;
 }
 
