@@ -20,6 +20,8 @@
 
 #include "otpch.h"
 
+#if defined __EXCEPTION_TRACER__
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -478,3 +480,5 @@ void ExceptionHandler::dumpStack()
 	output << "*****************************************************" << std::endl;
 	output.close();
 }
+
+#endif
