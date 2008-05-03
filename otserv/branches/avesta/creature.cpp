@@ -216,8 +216,13 @@ void Creature::onThink(uint32_t interval)
 			walkUpdateTicks = 0;
 			forceUpdateFollowPath = false;
 			//Creature::addPathSearch(this);
-			getPathToFollowCreature();
+			isUpdatingPath = true;
 		}
+	}
+
+	if(isUpdatingPath){
+		isUpdatingPath = false;
+		getPathToFollowCreature();
 	}
 
 	onAttacking(interval);
@@ -1054,8 +1059,6 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 
 void Creature::getPathToFollowCreature()
 {
-	isUpdatingPath = false;
-
 	if(followCreature){
 		FindPathParams fpp;
 		getPathSearchParams(followCreature, fpp);
