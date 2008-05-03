@@ -42,16 +42,12 @@
 #include "map.h"
 #include "tile.h"
 #include "combat.h"
+#include "creature.h"
 
 #include "player.h"
 #include "configmanager.h"
 
 extern ConfigManager g_config;
-
-int32_t Map::maxViewportX = 13; //min value: maxClientViewportX + 1
-int32_t Map::maxViewportY = 13; //min value: maxClientViewportY + 1
-int32_t Map::maxClientViewportX = 8;
-int32_t Map::maxClientViewportY = 6;
 
 Map::Map()
 {

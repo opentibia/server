@@ -31,7 +31,7 @@ using boost::shared_ptr;
 #include "definitions.h"
 #include "position.h"
 #include "item.h"
-#include "creature.h"
+//#include "creature.h"
 #include "iomapserialize.h"
 #include "fileloader.h"
 
@@ -41,6 +41,7 @@ using boost::shared_ptr;
 class Creature;
 class Player;
 class Game;
+struct FindPathParams;
 
 #define MAP_MAX_LAYERS 16
 
@@ -106,6 +107,7 @@ struct Floor{
 	Tile* tiles[FLOOR_SIZE][FLOOR_SIZE];
 };
 
+class FrozenPathingConditionCall;
 class QTreeLeafNode;
 
 class QTreeNode{
@@ -160,10 +162,10 @@ public:
 	Map();
 	~Map();
 
-	static int32_t maxViewportX;		//min value: maxClientViewportX + 1
-	static int32_t maxViewportY;		//min value: maxClientViewportY + 1
-	static int32_t maxClientViewportX;
-	static int32_t maxClientViewportY;
+	static const int32_t maxViewportX = 11;		//min value: maxClientViewportX + 1
+	static const int32_t maxViewportY = 11;		//min value: maxClientViewportY + 1
+	static const int32_t maxClientViewportX = 8;
+	static const int32_t maxClientViewportY = 6;
 
 	/**
 	* Load a map.

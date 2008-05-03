@@ -39,11 +39,14 @@
 #endif
 
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
-OTSYS_THREAD_LOCKVAR Creature::pathLock;
 uint32_t AutoID::count = 1000;
 AutoID::list_type AutoID::list;
+/*
+OTSYS_THREAD_LOCKVAR Creature::pathLock;
+OTSYS_THREAD_SIGNALVAR Creature::pathSignal;
 std::list<uint32_t> Creature::creatureUpdatePathList;
 bool Creature::m_shutdownPathThread = false;
+*/
 
 extern Game g_game;
 extern ConfigManager g_config;
@@ -81,7 +84,7 @@ Creature::Creature() :
 	eventWalk = 0;
 	forceUpdateFollowPath = false;
 	isMapLoaded = false;
-	isInSearchPathList = false;
+	isUpdatingPath = false;
 	memset(localMapCache, false, sizeof(localMapCache));
 
 	attackedCreature = NULL;
@@ -212,7 +215,8 @@ void Creature::onThink(uint32_t interval)
 		if(forceUpdateFollowPath || walkUpdateTicks >= 2000){
 			walkUpdateTicks = 0;
 			forceUpdateFollowPath = false;
-			Creature::addPathSearch(this);
+			//Creature::addPathSearch(this);
+			getPathToFollowCreature();
 		}
 	}
 
@@ -326,6 +330,7 @@ void Creature::stopEventWalk()
 	}
 }
 
+/*
 OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 {
 #if defined __EXCEPTION_TRACER__
@@ -335,6 +340,7 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 
 	uint32_t creatureId;
 	uint64_t startTime = OTSYS_TIME();
+	OTSYS_THREAD_SIGNALVARINIT(Creature::pathSignal);
 
 	while(!Creature::m_shutdownPathThread){
 		OTSYS_THREAD_LOCK(Creature::pathLock, "")
@@ -344,6 +350,7 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 			Creature::creatureUpdatePathList.pop_front();
 		}
 		else{
+			OTSYS_THREAD_WAITSIGNAL(Creature::pathSignal, Creature::pathLock);
 			creatureId = 0;
 		}
 
@@ -355,11 +362,9 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 		}
 
 		uint64_t endTime = OTSYS_TIME();
-		if((endTime - startTime) > 100){
+		if((endTime - startTime) > 50){
 			startTime = OTSYS_TIME();
 			OTSYS_SLEEP(10);
-		} else {
-			OTSYS_SLEEP(1);
 		}
 	}
 
@@ -373,16 +378,28 @@ OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
 	return 0;
 #endif
 }
+*/
 
+/*
 void Creature::addPathSearch(Creature* creature)
 {
-	if(creature->isInSearchPathList == false) {
+	if(creature->isInSearchPathList == false){
+		creature->isInSearchPathList = true;
+
+		bool do_signal = false;
+
 		OTSYS_THREAD_LOCK(Creature::pathLock, "");
 		creature->isInSearchPathList = true;
+		do_signal = creatureUpdatePathList.empty();
 		creatureUpdatePathList.push_back(creature->getID());
 		OTSYS_THREAD_UNLOCK(Creature::pathLock, "");
+
+		if(do_signal){
+			OTSYS_THREAD_SIGNAL_SEND(Creature::pathSignal);
+		}
 	}
 }
+*/
 
 void Creature::updateMapCache()
 {
@@ -736,7 +753,8 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 
 	if(creature == followCreature || (creature == this && followCreature)){
 		if(hasFollowPath){
-			Creature::addPathSearch(this);
+			//Creature::addPathSearch(this);
+			isUpdatingPath = true;
 		}
 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
@@ -1036,7 +1054,7 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 
 void Creature::getPathToFollowCreature()
 {
-	isInSearchPathList = false;
+	isUpdatingPath = false;
 
 	if(followCreature){
 		FindPathParams fpp;
@@ -1080,7 +1098,8 @@ bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= fal
 		hasFollowPath = false;
 		forceUpdateFollowPath = false;
 		followCreature = creature;
-		Creature::addPathSearch(this);
+		//Creature::addPathSearch(this);
+		isUpdatingPath = true;
 	}
 	else{
 		followCreature = NULL;

@@ -22,7 +22,6 @@
 #include "combat.h"
 
 #include "game.h"
-#include "condition.h"
 #include "creature.h"
 #include "player.h"
 #include "const.h"

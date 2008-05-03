@@ -23,6 +23,7 @@
 
 #include "thing.h"
 #include "definitions.h"
+#include "condition.h"
 #include "enums.h"
 #include "map.h"
 #include "baseevents.h"

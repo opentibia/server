@@ -79,7 +79,7 @@ Game::Game()
 	worldType = WORLD_TYPE_PVP;
 
 	OTSYS_THREAD_LOCKVARINIT(AutoID::autoIDLock);
-	OTSYS_THREAD_LOCKVARINIT(Creature::pathLock);
+	//OTSYS_THREAD_LOCKVARINIT(Creature::pathLock);
 
 #if defined __EXCEPTION_TRACER__
 	OTSYS_THREAD_LOCKVARINIT(maploadlock);
@@ -4032,7 +4032,7 @@ void Game::shutdown()
 {
 	Scheduler::getScheduler().stop();
 	Dispatcher::getDispatcher().stop();
-	Creature::stopPathThread();
+	//Creature::stopPathThread();
 
 	if(g_server){
 		g_server->stop();

@@ -25,6 +25,7 @@
 #include "definitions.h"
 
 #include "templates.h"
+#include "map.h"
 #include "position.h"
 #include "condition.h"
 #include "const.h"
@@ -76,6 +77,7 @@ class Player;
 class Monster;
 class Npc;
 class Item;
+class Tile;
 
 #ifdef __ONECREATURE_EVENT_
 #  define EVENT_CREATURECOUNT 10
@@ -118,14 +120,18 @@ public:
 	virtual Monster* getMonster() {return NULL;};
 	virtual const Monster* getMonster() const {return NULL;};
 
+	/*
 	static OTSYS_THREAD_RETURN creaturePathThread(void* p);
 	static void addPathSearch(Creature* creature);
 	static void stopPathThread()
 	{
 		OTSYS_THREAD_LOCK(Creature::pathLock, "")
 		creatureUpdatePathList.clear();
+		m_shutdownPathThread = true;
 		OTSYS_THREAD_UNLOCK(Creature::pathLock, "")
+		OTSYS_THREAD_SIGNAL_SEND(Creature::pathSignal);
 	}
+	*/
 	
 	void getPathToFollowCreature();
 
@@ -366,8 +372,8 @@ public:
 	int32_t getWalkCache(const Position& pos) const;
 
 protected:
-	static const int32_t mapWalkWidth = /*maxViewportX*/ 13 * 2 + 1;
-	static const int32_t mapWalkHeight = /*maxViewportY*/ 13 * 2 + 1;
+	static const int32_t mapWalkWidth = Map::maxViewportX * 2 + 1;
+	static const int32_t mapWalkHeight = Map::maxViewportY * 2 + 1;
 	bool localMapCache[mapWalkHeight][mapWalkWidth];
 
 	virtual bool useCacheMap() const {return false;}
@@ -376,7 +382,7 @@ protected:
 	uint32_t id;
 	bool isInternalRemoved;
 	bool isMapLoaded;
-	bool isInSearchPathList;
+	bool isUpdatingPath;
 #ifdef __ONECREATURE_EVENT_
 	// The creature onThink event vector this creature belongs to
 	// The value stored here is actually 1 larger than the index,
@@ -464,9 +470,12 @@ protected:
 	virtual void dropCorpse();
 	virtual Item* getCorpse();
 
+	/*
 	static OTSYS_THREAD_LOCKVAR pathLock;
+	static OTSYS_THREAD_SIGNALVAR pathSignal;
 	static std::list<uint32_t> creatureUpdatePathList;
 	static bool m_shutdownPathThread;
+	*/
 
 	friend class Game;
 	friend class Map;

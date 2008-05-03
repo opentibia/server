@@ -413,7 +413,7 @@ int main(int argc, char *argv[])
 	Status* status = Status::instance();
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
-	OTSYS_CREATE_THREAD(Creature::creaturePathThread, NULL);
+	//OTSYS_CREATE_THREAD(Creature::creaturePathThread, NULL);
 
 	Dispatcher::getDispatcher().addTask(
 		createTask(boost::bind(&Game::setGameState, &g_game, GAME_STATE_INIT)));
