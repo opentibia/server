@@ -22,6 +22,7 @@
 #include "admin.h"
 #include "game.h"
 #include "connection.h"
+#include "outputmessage.h"
 #include "networkmessage.h"
 #include "configmanager.h"
 #include "house.h"

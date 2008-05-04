@@ -27,6 +27,7 @@
 #include "game.h"
 #include "connection.h"
 #include "networkmessage.h"
+#include "outputmessage.h"
 #include "tools.h"
 
 #ifndef WIN32

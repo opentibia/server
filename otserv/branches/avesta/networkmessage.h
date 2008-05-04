@@ -25,8 +25,8 @@
 #include "definitions.h"
 #include "otsystem.h"
 #include "const.h"
-#include "item.h"
 
+class Item;
 class Creature;
 class Player;
 class Position;
@@ -103,14 +103,8 @@ public:
 	void AddPosition(const Position &pos);
 	void AddItem(uint16_t id, uint8_t count);
 	void AddItem(const Item *item);
-	void AddItemId(const Item *item){
-		const ItemType &it = Item::items[item->getID()];
-		AddU16(it.clientId);
-	}
-	void AddItemId(uint16_t itemId){
-		const ItemType &it = Item::items[itemId];
-		AddU16(it.clientId);
-	}
+	void AddItemId(const Item *item);
+	void AddItemId(uint16_t itemId);
 	void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
 	int32_t getMessageLength() const { return m_MsgSize; }

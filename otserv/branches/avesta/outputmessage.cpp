@@ -144,10 +144,12 @@ void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/
 		if(it != m_autoSendOutputMessages.end()){
 			m_autoSendOutputMessages.erase(it);
 		}
+		m_outputMessages.push_back(msg);
 		msg->freeMessage();
 		break;
 	}
 	case OutputMessage::STATE_ALLOCATED_NO_AUTOSEND:
+		m_outputMessages.push_back(msg);
 		msg->freeMessage();
 		break;
 	case OutputMessage::STATE_WAITING:
@@ -155,6 +157,7 @@ void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/
 			std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_WAITING OutputMessage." << std::endl;
 		}
 		else{
+			m_outputMessages.push_back(msg);
 			msg->freeMessage();
 		}
 		break;
@@ -179,16 +182,15 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 	#endif
 
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
-	OutputMessageVector::iterator it;
-	for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
-		if((*it)->getState() == OutputMessage::STATE_FREE){
-			configureOutputMessage(*it, protocol, autosend);
-			return *it;
-		}
+	OutputMessage* outputmessage;
+	if(m_outputMessages.empty()) {
+		outputmessage = new OutputMessage;
+	} else {
+		outputmessage = m_outputMessages.back();
+		assert(outputmessage->getState() == OutputMessage::STATE_FREE);
+		m_outputMessages.pop_back();
 	}
 
-	OutputMessage* outputmessage = new OutputMessage;
-	m_outputMessages.push_back(outputmessage);
 	configureOutputMessage(outputmessage, protocol, autosend);
 	return outputmessage;
 }

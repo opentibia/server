@@ -64,6 +64,20 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 	parsePacket(msg);
 }
 
+OutputMessage* Protocol::getOutputBuffer()
+{
+	if(m_outputBuffer){
+		return m_outputBuffer;
+	}
+	else if(m_connection){
+		m_outputBuffer = OutputMessagePool::getInstance()->getOutputMessage(this);
+		return m_outputBuffer;
+	}
+	else{
+		return NULL;
+	}
+}
+
 void Protocol::deleteProtocolTask()
 {
 	//dispather thread

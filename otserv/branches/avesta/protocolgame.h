@@ -25,7 +25,6 @@
 #include "definitions.h"
 #include <string>
 #include "protocol.h"
-#include "outputmessage.h"
 #include "enums.h"
 #include "creature.h"
 

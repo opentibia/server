@@ -22,6 +22,7 @@
 #include "protocolgame.h"
 #include "definitions.h"
 #include "networkmessage.h"
+#include "outputmessage.h"
 #include "items.h"
 #include "tile.h"
 #include "creature.h"

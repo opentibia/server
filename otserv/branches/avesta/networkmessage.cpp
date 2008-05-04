@@ -137,3 +137,13 @@ void NetworkMessage::AddItem(const Item* item)
 		AddByte(fluidMap[fluidIndex]);
 	}
 }
+
+void NetworkMessage::AddItemId(const Item *item){
+	const ItemType &it = Item::items[item->getID()];
+	AddU16(it.clientId);
+}
+
+void NetworkMessage::AddItemId(uint16_t itemId){
+	const ItemType &it = Item::items[itemId];
+	AddU16(it.clientId);
+}

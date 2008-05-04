@@ -23,8 +23,9 @@
 
 #include "definitions.h"
 #include <boost/utility.hpp>
-#include "outputmessage.h"
 
+class NetworkMessage;
+class OutputMessage;
 class Connection;
 class RSA;
 
@@ -61,19 +62,7 @@ public:
 
 protected:
 	//Use this function for autosend messages only
-	OutputMessage* getOutputBuffer()
-	{
-		if(m_outputBuffer){
-			return m_outputBuffer;
-		}
-		else if(m_connection){
-			m_outputBuffer = OutputMessagePool::getInstance()->getOutputMessage(this);
-			return m_outputBuffer;
-		}
-		else{
-			return NULL;
-		}
-	}
+	OutputMessage* getOutputBuffer();
 
 	void enableXTEAEncryption() { m_encryptionEnabled = true; }
 	void disableXTEAEncryption() { m_encryptionEnabled = false; }
