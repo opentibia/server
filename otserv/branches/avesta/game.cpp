@@ -3279,10 +3279,10 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 	SpectatorVec::const_iterator it;
 
 	if(type == SPEAK_YELL || type == SPEAK_MONSTER_YELL){
-		getSpectators(list, creature->getPosition(), true, 18, 18, 14, 14);
+		getSpectators(list, creature->getPosition(), false, true, 18, 18, 14, 14);
 	}
 	else{
-		getSpectators(list, creature->getPosition(), false);
+		getSpectators(list, creature->getPosition(), false, false);
 	}
 
 	//send to client
@@ -3825,8 +3825,8 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 	uint8_t effect)
 {
 	SpectatorVec list;
-	getSpectators(list, fromPos, true);
-	getSpectators(list, toPos, true);
+	getSpectators(list, fromPos, false, true);
+	getSpectators(list, toPos, true, true);
 
 	//send to client
 	Player* tmpPlayer = NULL;

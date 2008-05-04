@@ -219,10 +219,11 @@ public:
 
 	void getWorldLightInfo(LightInfo& lightInfo);
 
-	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
+	void getSpectators(SpectatorVec& list, const Position& centerPos, 
+		bool checkforduplicate = false, bool multifloor = false,
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0){
-		map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
+		map->getSpectators(list, centerPos, checkforduplicate, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
 	}
 
 	const SpectatorVec& getSpectators(const Position& centerPos){

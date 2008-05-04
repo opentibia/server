@@ -1234,8 +1234,8 @@ bool Monster::convinceCreature(Creature* creature)
 
 			//Notify surrounding about the change
 			SpectatorVec list;
-			g_game.getSpectators(list, getPosition(), true);
-			g_game.getSpectators(list, creature->getPosition(), true);
+			g_game.getSpectators(list, getPosition(), false, true);
+			g_game.getSpectators(list, creature->getPosition(), true, true);
 
 			for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
 				(*it)->onCreatureConvinced(creature, this);
@@ -1268,8 +1268,8 @@ bool Monster::convinceCreature(Creature* creature)
 
 		//Notify surrounding about the change
 		SpectatorVec list;
-		g_game.getSpectators(list, getPosition(), true);
-		g_game.getSpectators(list, creature->getPosition(), true);
+		g_game.getSpectators(list, getPosition(), false, true);
+		g_game.getSpectators(list, creature->getPosition(), true, true);
 
 		for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
 			(*it)->onCreatureConvinced(creature, this);

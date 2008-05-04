@@ -313,7 +313,7 @@ bool Map::removeCreature(Creature* creature)
 	return false;
 }
 
-void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, int32_t minRangeX, int32_t maxRangeX, int32_t minRangeY, int32_t maxRangeY, int32_t minRangeZ, int32_t maxRangeZ) {
+void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, bool checkforduplicate, int32_t minRangeX, int32_t maxRangeX, int32_t minRangeY, int32_t maxRangeY, int32_t minRangeZ, int32_t maxRangeZ) {
 	int32_t minoffset = centerPos.z - maxRangeZ;
 	int32_t x1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + minoffset  )));
 	int32_t y1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + minoffset )));
@@ -360,7 +360,11 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, i
 									if((tile = floor->tiles[(nx + lx) & FLOOR_MASK][(ny + ly) & FLOOR_MASK])){
 										for(uint32_t i = 0; i < tile->creatures.size(); ++i){
 											Creature* creature = tile->creatures[i];
-											if(std::find(list.begin(), list.end(), creature) == list.end()){
+											if(checkforduplicate) {
+												if(std::find(list.begin(), list.end(), creature) == list.end()){
+													list.push_back(creature);
+												}
+											} else {
 												list.push_back(creature);
 											}
 										}
@@ -387,13 +391,14 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, i
 	}
 }
 
-void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor /*= false*/,
+void Map::getSpectators(SpectatorVec& list, const Position& centerPos,
+	bool checkforduplicate /*= false*/, bool multifloor /*= false*/,
 	int32_t minRangeX /*= 0*/, int32_t maxRangeX /*= 0*/,
 	int32_t minRangeY /*= 0*/, int32_t maxRangeY /*= 0*/)
 {
 	bool foundCache = false;
 	bool cacheResult = false;
-	if(minRangeX == 0 && maxRangeX == 0 && minRangeY == 0 && maxRangeY == 0 && multifloor == true){
+	if(minRangeX == 0 && maxRangeX == 0 && minRangeY == 0 && maxRangeY == 0 && multifloor == true && checkforduplicate == false) {
 		SpectatorCache::iterator it = spectatorCache.find(centerPos);
 		if(it != spectatorCache.end()){
 			list = *it->second;
@@ -440,7 +445,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 			maxRangeZ = centerPos.z;
 		}
 
-		getSpectatorsInternal(list, centerPos,
+		getSpectatorsInternal(list, centerPos, true,
 			minRangeX, maxRangeX,
 			minRangeY, maxRangeY,
 			minRangeZ, maxRangeZ);
@@ -490,7 +495,7 @@ const SpectatorVec& Map::getSpectators(const Position& centerPos)
 			maxRangeZ = 7;
 		}
 		
-		getSpectatorsInternal(list, centerPos,
+		getSpectatorsInternal(list, centerPos, false,
 			minRangeX, maxRangeX,
 			minRangeY, maxRangeY,
 			minRangeZ, maxRangeZ);

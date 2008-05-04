@@ -359,8 +359,8 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(list, fromPos, true);
-	g_game.getSpectators(list, toPos, true);
+	g_game.getSpectators(list, fromPos, false, true);
+	g_game.getSpectators(list, toPos, true, true);
 
 	//send to client
 	Player* tmpPlayer = NULL;

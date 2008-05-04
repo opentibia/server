@@ -729,7 +729,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 		}
 	}
 
-	g_game.getSpectators(list, pos, true, maxX + Map::maxViewportX, maxX + Map::maxViewportX,
+	g_game.getSpectators(list, pos, false, true, maxX + Map::maxViewportX, maxX + Map::maxViewportX,
 		maxY + Map::maxViewportY, maxY + Map::maxViewportY);
 
 	for(std::list<Tile*>::iterator it = tileList.begin(); it != tileList.end(); ++it){
