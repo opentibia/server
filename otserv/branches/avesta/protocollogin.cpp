@@ -48,6 +48,7 @@ void ProtocolLogin::deleteProtocolTask()
 void ProtocolLogin::disconnectClient(uint8_t error, const char* message)
 {
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	TRACK_MESSAGE(output);
 	output->AddByte(error);
 	output->AddString(message);
 	OutputMessagePool::getInstance()->send(output);
@@ -133,6 +134,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		
 	
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	TRACK_MESSAGE(output);
 	//Add MOTD
 	std::stringstream motd;
 	output->AddByte(0x14);

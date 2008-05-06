@@ -76,6 +76,7 @@ void ProtocolAdmin::onRecvFirstMessage(NetworkMessage& msg)
 	addLogLine(this, LOGTYPE_EVENT, 1, "sending HELLO");
 	//send hello
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	TRACK_MESSAGE(output);
 	output->AddByte(AP_MSG_HELLO);
 	output->AddU32(1); //version
 	output->AddString("OTADMIN");
@@ -101,6 +102,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 	OutputMessagePool* outputPool = OutputMessagePool::getInstance();
 
 	OutputMessage* output = outputPool->getOutputMessage(this, false);
+	TRACK_MESSAGE(output);
 
 	switch(m_state){
 	case ENCRYPTION_NO_SET:
@@ -368,6 +370,7 @@ void ProtocolAdmin::adminCommandCloseServer()
 	}
 
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	TRACK_MESSAGE(output);
 
 	if(!g_bans.saveBans()){
 		addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Bans");
@@ -400,6 +403,7 @@ void ProtocolAdmin::adminCommandShutdownServer()
 	addLogLine(this, LOGTYPE_EVENT, 1, "start server shutdown");
 
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	TRACK_MESSAGE(output);
 	output->AddByte(AP_MSG_COMMAND_OK);
 	OutputMessagePool::getInstance()->send(output);
 }
@@ -407,6 +411,7 @@ void ProtocolAdmin::adminCommandShutdownServer()
 void ProtocolAdmin::adminCommandPayHouses()
 {
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	TRACK_MESSAGE(output);
 
 	if(Houses::getInstance().payHouses()){
 		addLogLine(this, LOGTYPE_EVENT, 1, "pay houses ok");
@@ -427,6 +432,7 @@ void ProtocolAdmin::adminCommandPayHouses()
 void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 {
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	TRACK_MESSAGE(output);
 
 	Player* player = g_game.getPlayerByName(name);
 	if(player){

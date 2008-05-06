@@ -187,7 +187,15 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 		outputmessage = new OutputMessage;
 	} else {
 		outputmessage = m_outputMessages.back();
+#ifdef __TRACK_NETWORK__
+		// Print message trace
+		if(outputmessage->getState() != OutputMessage::STATE_FREE) {
+			std::cout << "Using allocated message, message trace:" << std::endl;
+			outputmessage->PrintTrace();
+		}
+#else
 		assert(outputmessage->getState() == OutputMessage::STATE_FREE);
+#endif
 		m_outputMessages.pop_back();
 	}
 

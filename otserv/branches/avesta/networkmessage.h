@@ -42,7 +42,7 @@ public:
 	NetworkMessage(){
 		Reset();
 	}
-	~NetworkMessage(){};
+	virtual ~NetworkMessage(){};
 
 	// resets the internal buffer to an empty message
 protected:
