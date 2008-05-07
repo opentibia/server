@@ -135,6 +135,7 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 {
 	//Simulate that the message is sent and then liberate it
 	msg->getProtocol()->onSendMessage(msg);
+	m_outputMessages.push_back(msg);
 	msg->freeMessage();
 }
 
