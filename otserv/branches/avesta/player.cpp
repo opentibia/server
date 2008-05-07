@@ -2003,6 +2003,8 @@ void Player::die()
 void Player::dropCorpse()
 {
 	if(getZone() == ZONE_PVP){
+		setDropLoot(true);
+		setLossSkill(true);
 		preSave();
 		sendStats();
 		g_game.internalTeleport(this, getTemplePosition());
