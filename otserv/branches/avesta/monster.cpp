@@ -482,11 +482,7 @@ bool Monster::activate(bool forced /*= false*/)
 	}
 
 	if(isActivated || !conditions.empty()){
-#ifdef __ONECREATURE_EVENT_
 		g_game.addCreatureCheck(this);
-#else
-		addEventThink();
-#endif
 	}
 
 	return isActivated;
@@ -507,11 +503,7 @@ bool Monster::deactivate(bool forced /*= false*/)
 
 	if( (!isActivated && conditions.empty()) || forced){
 		onIdleStatus();
-#ifdef __ONECREATURE_EVENT_
 		g_game.removeCreatureCheck(this);
-#else
-		stopEventThink();
-#endif
 	}
 
 	return !isActivated;

@@ -101,11 +101,11 @@ Game::Game()
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL,
 		boost::bind(&Game::checkLight, this)));
-#ifdef __ONECREATURE_EVENT_
 	checkCreatureLastIndex = 0;
+
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL,
 		boost::bind(&Game::checkCreatures, this)));
-#endif
+
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
 		boost::bind(&Game::checkDecay, this)));
 }
@@ -556,12 +556,7 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 	int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
 	creature->getParent()->postAddNotification(creature, newStackPos);
 
-#ifdef __ONECREATURE_EVENT_
 	addCreatureCheck(creature);
-#else
-	creature->addEventThink();
-#endif
-
 	return true;
 }
 
@@ -609,11 +604,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	creature->setRemoved();
 	FreeThing(creature);
 
-#ifdef __ONECREATURE_EVENT_
 	removeCreatureCheck(creature);
-#else
-	creature->stopEventThink();
-#endif
 
 	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
 		removeCreature(*cit);
@@ -3346,7 +3337,6 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 	}
 }
 
-#ifdef __ONECREATURE_EVENT_
 void Game::addCreatureCheck(Creature* creature)
 {
 	if(creature->checkCreatureVectorIndex != 0) {
@@ -3398,6 +3388,7 @@ void Game::checkCreatures()
 	if(checkCreatureLastIndex == EVENT_CREATURECOUNT) {
 		checkCreatureLastIndex = 0;
 	}
+
 	std::vector<Creature*>& checkCreatureVector = checkCreatureVectors[checkCreatureLastIndex];
 	checkCreatureLastIndex++;
 
@@ -3414,25 +3405,6 @@ void Game::checkCreatures()
 	}
 	cleanup();
 }
-#else
-void Game::checkCreature(uint32_t creatureId)
-{
-	Creature* creature = getCreatureByID(creatureId);
-	
-	if(creature){
-		uint32_t interval = creature->getThinkInterval();
-		if(creature->getHealth() > 0){
-			creature->onThink(interval);
-			creature->executeConditions(interval);
-		}
-		else{
-			creature->onDie();
-		}
-
-		cleanup();
-	}
-}
-#endif
 
 void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 {

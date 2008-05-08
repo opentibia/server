@@ -79,14 +79,9 @@ class Npc;
 class Item;
 class Tile;
 
-#ifdef __ONECREATURE_EVENT_
-#  define EVENT_CREATURECOUNT 10
-#  define EVENT_CREATURE_THINK_INTERVAL 1000
-#  define EVENT_CHECK_CREATURE_INTERVAL (EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT)
-#else
-#  define EVENT_CREATURE_THINK_INTERVAL 1000
-#  define EVENT_CHECK_CREATURE_INTERVAL 1000
-#endif
+#define EVENT_CREATURECOUNT 10
+#define EVENT_CREATURE_THINK_INTERVAL 1000
+#define EVENT_CHECK_CREATURE_INTERVAL (EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT)
 
 class FrozenPathingConditionCall {
 public:
@@ -119,19 +114,6 @@ public:
 	virtual const Npc* getNpc() const {return NULL;};
 	virtual Monster* getMonster() {return NULL;};
 	virtual const Monster* getMonster() const {return NULL;};
-
-	/*
-	static OTSYS_THREAD_RETURN creaturePathThread(void* p);
-	static void addPathSearch(Creature* creature);
-	static void stopPathThread()
-	{
-		OTSYS_THREAD_LOCK(Creature::pathLock, "")
-		creatureUpdatePathList.clear();
-		m_shutdownPathThread = true;
-		OTSYS_THREAD_UNLOCK(Creature::pathLock, "")
-		OTSYS_THREAD_SIGNAL_SEND(Creature::pathSignal);
-	}
-	*/
 	
 	void getPathToFollowCreature();
 
@@ -269,13 +251,7 @@ public:
 	virtual uint32_t getConditionImmunities() const { return 0; }
 	virtual uint32_t getConditionSuppressions() const { return 0; }
 	virtual bool isAttackable() const { return true;}
-
-#ifdef __ONECREATURE_EVENT_
 	bool idle() const { return checkCreatureVectorIndex == 0;}
-#else
-	bool idle() const { return eventCheck == 0;}
-#endif
-
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 
@@ -322,11 +298,6 @@ public:
 	virtual void onAttacking(uint32_t interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);
-
-#ifndef __ONECREATURE_EVENT_
-	void addEventThink();
-	void stopEventThink();
-#endif
 
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
@@ -383,15 +354,11 @@ protected:
 	bool isInternalRemoved;
 	bool isMapLoaded;
 	bool isUpdatingPath;
-#ifdef __ONECREATURE_EVENT_
 	// The creature onThink event vector this creature belongs to
 	// The value stored here is actually 1 larger than the index,
 	// this is to allow 0 to represent the special value of not
 	// being stored in any onThink vector
 	size_t checkCreatureVectorIndex;
-#else
-	uint32_t eventCheck;
-#endif
 
 	int32_t health, healthMax;
 	int32_t mana, manaMax;

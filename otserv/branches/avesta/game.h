@@ -207,10 +207,8 @@ public:
 		*/
 	bool removeCreature(Creature* creature, bool isLogout = true);
 
-#ifdef __ONECREATURE_EVENT_
 	void addCreatureCheck(Creature* creature);
 	void removeCreatureCheck(Creature* creature);
-#endif
 
 	uint32_t getPlayersOnline() {return (uint32_t)Player::listPlayer.list.size();}
 	uint32_t getMonstersOnline() {return (uint32_t)Monster::listMonster.list.size();}
@@ -425,11 +423,7 @@ public:
 	void checkCreatureWalk(uint32_t creatureId);
 	void updateCreatureWalk(uint32_t creatureId);
 	void checkCreatureAttack(uint32_t creatureId);
-#ifdef __ONECREATURE_EVENT_
 	void checkCreatures();
-#else
-	void checkCreature(uint32_t creatureId);
-#endif
 	void checkLight();
 
 	bool combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
@@ -485,10 +479,8 @@ protected:
 	RuleViolationsMap ruleViolations;
 
 	AutoList<Creature> listCreature;
-#ifdef __ONECREATURE_EVENT_
 	size_t checkCreatureLastIndex;
 	std::vector<Creature*> checkCreatureVectors[EVENT_CREATURECOUNT];
-#endif
 
 #ifdef __DEBUG_CRITICALSECTION__
 	static OTSYS_THREAD_RETURN monitorThread(void *p);

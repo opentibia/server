@@ -41,12 +41,6 @@
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
 uint32_t AutoID::count = 1000;
 AutoID::list_type AutoID::list;
-/*
-OTSYS_THREAD_LOCKVAR Creature::pathLock;
-OTSYS_THREAD_SIGNALVAR Creature::pathSignal;
-std::list<uint32_t> Creature::creatureUpdatePathList;
-bool Creature::m_shutdownPathThread = false;
-*/
 
 extern Game g_game;
 extern ConfigManager g_config;
@@ -93,12 +87,7 @@ Creature::Creature() :
 	blockCount = 0;
 	blockTicks = 0;
 	walkUpdateTicks = 0;
-#ifdef __ONECREATURE_EVENT_
 	checkCreatureVectorIndex = 0;
-#else
-	eventCheck = 0;
-#endif
-
 	scriptEventsBitField = 0;
   }
 
@@ -162,32 +151,6 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
-#ifndef __ONECREATURE_EVENT_
-void Creature::addEventThink()
-{
-	if(eventCheck == 0){
-		if(useCacheMap()){
-			if(!isMapLoaded){
-				isMapLoaded = true;
-				updateMapCache();
-			}
-		}
-
-		eventCheck = Scheduler::getScheduler().addEvent(
-			createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL,
-			boost::bind(&Game::checkCreature, &g_game, getID())));
-	}
-}
-
-void Creature::stopEventThink()
-{
-	if(eventCheck != 0){
-		Scheduler::getScheduler().stopEvent(eventCheck);
-		eventCheck = 0;
-	}
-}
-#endif
-
 void Creature::onThink(uint32_t interval)
 {
 	if(!isMapLoaded && useCacheMap()){
@@ -215,7 +178,6 @@ void Creature::onThink(uint32_t interval)
 		if(forceUpdateFollowPath || walkUpdateTicks >= 2000){
 			walkUpdateTicks = 0;
 			forceUpdateFollowPath = false;
-			//Creature::addPathSearch(this);
 			isUpdatingPath = true;
 		}
 	}
@@ -226,13 +188,6 @@ void Creature::onThink(uint32_t interval)
 	}
 
 	onAttacking(interval);
-
-#ifndef __ONECREATURE_EVENT_
-	if(eventCheck != 0){
-		eventCheck = 0;
-		addEventThink();
-	}
-#endif
 }
 
 void Creature::onAttacking(uint32_t interval)
@@ -334,77 +289,6 @@ void Creature::stopEventWalk()
 		}
 	}
 }
-
-/*
-OTSYS_THREAD_RETURN Creature::creaturePathThread(void *p)
-{
-#if defined __EXCEPTION_TRACER__
-	ExceptionHandler creaturePathExceptionHandler;
-	creaturePathExceptionHandler.InstallHandler();
-#endif
-
-	uint32_t creatureId;
-	uint64_t startTime = OTSYS_TIME();
-	OTSYS_THREAD_SIGNALVARINIT(Creature::pathSignal);
-
-	while(!Creature::m_shutdownPathThread){
-		OTSYS_THREAD_LOCK(Creature::pathLock, "")
-
-		if(!Creature::creatureUpdatePathList.empty()){
-			creatureId = Creature::creatureUpdatePathList.front();
-			Creature::creatureUpdatePathList.pop_front();
-		}
-		else{
-			OTSYS_THREAD_WAITSIGNAL(Creature::pathSignal, Creature::pathLock);
-			creatureId = 0;
-		}
-
-		OTSYS_THREAD_UNLOCK(Creature::pathLock, "");
-
-		if(creatureId != 0){
-			Dispatcher::getDispatcher().addTask(createTask(
-				boost::bind(&Game::updateCreatureWalk, &g_game, creatureId)));
-		}
-
-		uint64_t endTime = OTSYS_TIME();
-		if((endTime - startTime) > 50){
-			startTime = OTSYS_TIME();
-			OTSYS_SLEEP(10);
-		}
-	}
-
-#if defined __EXCEPTION_TRACER__
-	creaturePathExceptionHandler.RemoveHandler();
-#endif
-
-#if defined WIN32 || defined __WINDOWS__ || _WIN32
-	//
-#else
-	return 0;
-#endif
-}
-*/
-
-/*
-void Creature::addPathSearch(Creature* creature)
-{
-	if(creature->isInSearchPathList == false){
-		creature->isInSearchPathList = true;
-
-		bool do_signal = false;
-
-		OTSYS_THREAD_LOCK(Creature::pathLock, "");
-		creature->isInSearchPathList = true;
-		do_signal = creatureUpdatePathList.empty();
-		creatureUpdatePathList.push_back(creature->getID());
-		OTSYS_THREAD_UNLOCK(Creature::pathLock, "");
-
-		if(do_signal){
-			OTSYS_THREAD_SIGNAL_SEND(Creature::pathSignal);
-		}
-	}
-}
-*/
 
 void Creature::updateMapCache()
 {
@@ -758,7 +642,6 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 
 	if(creature == followCreature || (creature == this && followCreature)){
 		if(hasFollowPath){
-			//Creature::addPathSearch(this);
 			isUpdatingPath = true;
 		}
 
@@ -1101,7 +984,6 @@ bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= fal
 		hasFollowPath = false;
 		forceUpdateFollowPath = false;
 		followCreature = creature;
-		//Creature::addPathSearch(this);
 		isUpdatingPath = true;
 	}
 	else{
