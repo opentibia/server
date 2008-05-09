@@ -293,8 +293,6 @@ public:
 	void setCreatureLight(LightInfo& light) {internalLight = light;}
 
 	virtual void onThink(uint32_t interval);
-	virtual uint32_t getThinkInterval() const {return EVENT_CREATURE_THINK_INTERVAL;}
-
 	virtual void onAttacking(uint32_t interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);

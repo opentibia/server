@@ -117,6 +117,7 @@ private:
 	uint32_t targetChangeTicks;
 	uint32_t defenseTicks;
 	uint32_t yellTicks;
+	int32_t targetChangeCooldown;
 	bool resetTicks;
 	bool isActivated;
 	bool extraAttack;

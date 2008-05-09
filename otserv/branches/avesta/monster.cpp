@@ -80,6 +80,7 @@ Creature()
 
 	targetTicks = 0;
 	targetChangeTicks = 0;
+	targetChangeCooldown = 0;
 	attackTicks = 0;
 	defenseTicks = 0;
 	yellTicks = 0;
@@ -109,6 +110,7 @@ void Monster::onAttackedCreatureDissapear(bool isLogout)
 	std::cout << "Attacked creature dissapeared." << std::endl;
 #endif
 
+	extraAttack = true;
 }
 
 void Monster::onFollowCreatureDissapear(bool isLogout)
@@ -116,8 +118,6 @@ void Monster::onFollowCreatureDissapear(bool isLogout)
 #ifdef __DEBUG__
 	std::cout << "Follow creature dissapeared." << std::endl;
 #endif
-
-	extraAttack = false;
 }
 
 void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
@@ -521,6 +521,8 @@ void Monster::onEndCondition(ConditionType_t type)
 
 void Monster::onThink(uint32_t interval)
 {
+	Creature::onThink(interval);
+
 	if(despawn()){
 		g_game.removeCreature(this, true);
 		deactivate(true);
@@ -554,8 +556,6 @@ void Monster::onThink(uint32_t interval)
 		onThinkYell(interval);
 		onThinkDefense(interval);
 	}
-
-	Creature::onThink(interval);
 }
 
 void Monster::doAttacking(uint32_t interval)
@@ -574,7 +574,12 @@ void Monster::doAttacking(uint32_t interval)
 
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
 		if(canUseSpell(myPos, targetPos, *it, interval)){
-			if(it->chance >= (uint32_t)random_range(1, 100)){
+			uint32_t modChance = 1;
+			if(extraAttack){
+				modChance = random_range(1, 2);
+			}
+
+			if(it->chance * modChance >= (uint32_t)random_range(1, 100)){
 				if(updateLook){
 					updateLookDirection();
 					updateLook = false;
@@ -645,13 +650,28 @@ void Monster::onThinkTarget(uint32_t interval)
 {
 	if(!isSummon()){
 		if(mType->changeTargetSpeed > 0){
-			targetChangeTicks += interval;
+			bool canChangeTarget = true;
+			if(targetChangeCooldown > 0){
+				targetChangeCooldown -= interval;
+				if(targetChangeCooldown <= 0){
+					targetChangeCooldown = 0;
+					targetChangeTicks = (uint32_t)mType->changeTargetSpeed;
+				}
+				else{
+					canChangeTarget = false;
+				}
+			}
 
-			if(targetChangeTicks >= (uint32_t)mType->changeTargetSpeed){
-				targetChangeTicks = 0;
+			if(canChangeTarget){
+				targetChangeTicks += interval;
 
-				if(mType->changeTargetChance >= random_range(1, 100)){
-					searchTarget(true);
+				if(targetChangeTicks >= (uint32_t)mType->changeTargetSpeed){
+					targetChangeTicks = 0;
+					targetChangeCooldown = (uint32_t)mType->changeTargetSpeed;
+
+					if(mType->changeTargetChance >= random_range(1, 100)){
+						searchTarget(true);
+					}
 				}
 			}
 		}
@@ -1182,6 +1202,7 @@ bool Monster::challengeCreature(Creature* creature)
 	else{
 		bool result = selectTarget(creature);
 		if(result){
+			targetChangeCooldown = 8000;
 			targetChangeTicks = 0;
 		}
 

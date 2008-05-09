@@ -3397,6 +3397,7 @@ void Game::checkCreatures()
 		creature = checkCreatureVector[i];
 		if(creature->getHealth() > 0){
 			creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
+			creature->onAttacking(EVENT_CREATURE_THINK_INTERVAL);
 			creature->executeConditions(EVENT_CREATURE_THINK_INTERVAL);
 		}
 		else{

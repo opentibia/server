@@ -89,7 +89,8 @@ Creature::Creature() :
 	walkUpdateTicks = 0;
 	checkCreatureVectorIndex = 0;
 	scriptEventsBitField = 0;
-  }
+	onIdleStatus();
+}
 
 Creature::~Creature()
 {
@@ -186,8 +187,6 @@ void Creature::onThink(uint32_t interval)
 		isUpdatingPath = false;
 		getPathToFollowCreature();
 	}
-
-	onAttacking(interval);
 }
 
 void Creature::onAttacking(uint32_t interval)
@@ -987,6 +986,7 @@ bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= fal
 		isUpdatingPath = true;
 	}
 	else{
+		isUpdatingPath = false;
 		followCreature = NULL;
 	}
 
