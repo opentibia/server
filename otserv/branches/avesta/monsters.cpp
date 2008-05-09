@@ -286,6 +286,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	sb.minCombatValue = 0;
 	sb.maxCombatValue = 0;
 	sb.combatSpell = false;
+	sb.isMelee = false;
 
 	std::string name = "";
 	std::string scriptName = "";
@@ -408,6 +409,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 		if(name == "melee"){
 			int attack = 0;
 			int skill = 0;
+			sb.isMelee = true;
 			if(readXMLInteger(node, "attack", attack)){
 				if(readXMLInteger(node, "skill", skill)){
 					sb.minCombatValue = 0;

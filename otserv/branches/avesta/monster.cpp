@@ -84,7 +84,7 @@ Creature()
 	attackTicks = 0;
 	defenseTicks = 0;
 	yellTicks = 0;
-	extraAttack = false;
+	extraMeleeAttack = false;
 
 	strDescription = mType->nameDescription;
 	toLowerCaseString(strDescription);
@@ -110,7 +110,7 @@ void Monster::onAttackedCreatureDissapear(bool isLogout)
 	std::cout << "Attacked creature dissapeared." << std::endl;
 #endif
 
-	extraAttack = true;
+	extraMeleeAttack = true;
 }
 
 void Monster::onFollowCreatureDissapear(bool isLogout)
@@ -576,12 +576,7 @@ void Monster::doAttacking(uint32_t interval)
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
 		bool inRange = false;
 		if(canUseSpell(myPos, targetPos, *it, interval, inRange)){
-			uint32_t modChance = 1;
-			if(extraAttack){
-				modChance = random_range(1, 2);
-			}
-
-			if(it->chance * modChance >= (uint32_t)random_range(1, 100)){
+			if(it->chance >= (uint32_t)random_range(1, 100)){
 				if(updateLook){
 					updateLookDirection();
 					updateLook = false;
@@ -590,7 +585,9 @@ void Monster::doAttacking(uint32_t interval)
 				minCombatValue = it->minCombatValue;
 				maxCombatValue = it->maxCombatValue;
 				it->spell->castSpell(this, attackedCreature);
-				extraAttack = false;
+				if(it->isMelee){
+					extraMeleeAttack = false;
+				}
 
 #ifdef __DEBUG__
 				static uint64_t prevTicks = OTSYS_TIME();
@@ -603,10 +600,10 @@ void Monster::doAttacking(uint32_t interval)
 		if(inRange){
 			outOfRange = false;
 		}
-	}
-
-	if(outOfRange){
-		extraAttack = true;
+		else if(it->isMelee){
+			//melee swing out of reach
+			extraMeleeAttack = true;
+		}
 	}
 
 	if(updateLook){
@@ -634,7 +631,8 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos,
 	const spellBlock_t& sb, uint32_t interval, bool& inRange)
 {
 	inRange = true;
-	if(!extraAttack){
+
+	if(!sb.isMelee || !extraMeleeAttack){
 		if(sb.speed > attackTicks){
 			resetTicks = false;
 			return false;

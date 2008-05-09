@@ -94,7 +94,7 @@ public:
 	virtual bool getCombatValues(int32_t& min, int32_t& max);
 
 	virtual void doAttacking(uint32_t interval);
-	virtual bool hasExtraSwing() {return extraAttack;}
+	virtual bool hasExtraSwing() {return extraMeleeAttack;}
 
 	bool searchTarget(bool randomize = false);
 	bool selectTarget(Creature* creature);
@@ -120,7 +120,7 @@ private:
 	int32_t targetChangeCooldown;
 	bool resetTicks;
 	bool isActivated;
-	bool extraAttack;
+	bool extraMeleeAttack;
 
 	Spawn* spawn;
 	bool isMasterInRange;
