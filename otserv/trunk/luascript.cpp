@@ -3815,12 +3815,10 @@ int LuaScriptInterface::luaGetPlayersOnlineList(lua_State *L)
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	lua_newtable(L);
 	for(uint32_t i = 1; it != Player::listPlayer.list.end(); ++it, ++i){
-		if(it->second->isOnline()){
-			uint32_t cid = env->addThing(it->second);
-			lua_pushnumber(L, i);
-			lua_pushnumber(L, cid);
-			lua_settable(L, -3);
-		}
+		uint32_t cid = env->addThing(it->second);
+		lua_pushnumber(L, i);
+		lua_pushnumber(L, cid);
+		lua_settable(L, -3);
 	}
 
 	return 1;

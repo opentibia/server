@@ -68,7 +68,10 @@ void OutputMessagePool::send(OutputMessage* msg)
 
 		if(msg->getConnection()){
 			if(msg->getConnection()->send(msg)){
-				msg->setState(OutputMessage::STATE_WAITING);
+				// Note: if we ever decide to change how the pool works this will have to change
+				if(msg->getState() != OutputMessage::STATE_FREE){
+					msg->setState(OutputMessage::STATE_WAITING);
+				}
 			}
 			else{
 				internalReleaseMessage(msg);
@@ -107,7 +110,10 @@ void OutputMessagePool::sendAll()
 
 			if((*it)->getConnection()){
 				if((*it)->getConnection()->send(*it)){
-					(*it)->setState(OutputMessage::STATE_WAITING);
+					// Note: if we ever decide to change how the pool works this will have to change
+					if((*it)->getState() != OutputMessage::STATE_FREE){
+						(*it)->setState(OutputMessage::STATE_WAITING);
+					}
 				}
 				else{
 					internalReleaseMessage(*it);
@@ -131,6 +137,7 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 {
 	//Simulate that the message is sent and then liberate it
 	msg->getProtocol()->onSendMessage(msg);
+	m_outputMessages.push_back(msg);
 	msg->freeMessage();
 }
 

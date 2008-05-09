@@ -9,7 +9,7 @@
 
 #include "definitions.h"
 
-#if defined __WINDOWS__ || defined WIN32
+#ifdef __WINDOWS__
 #include <winerror.h>
 #endif
 

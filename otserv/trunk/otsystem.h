@@ -30,7 +30,7 @@
 
 typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
 
-#if defined WIN32 || defined __WINDOWS__
+#ifdef __WINDOWS__
 #ifdef __WIN_LOW_FRAG_HEAP__
 #define _WIN32_WINNT 0x0501
 #endif
@@ -146,7 +146,7 @@ inline void SOCKET_PERROR(const char* a)
 		LocalFree(lpMsg); 
 };
 
-#else  // #if defined WIN32 || defined __WINDOWS__
+#else  // #if defined __WINDOWS__
 
 #include <pthread.h>
 #include <semaphore.h>
@@ -231,7 +231,7 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
 #define PERROR(a) perror(a)
 #define SOCKET_PERROR(a) perror(a)
 
-#endif // #if defined WIN32 || defined __WINDOWS__
+#endif // #if defined __WINDOWS__
 
 
 #ifdef __DEBUG_CRITICALSECTION__

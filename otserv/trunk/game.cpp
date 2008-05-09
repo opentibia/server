@@ -3502,6 +3502,7 @@ void Game::shutdown()
 {
 	Scheduler::getScheduler().stop();
 	Dispatcher::getDispatcher().stop();
+	Spawns::getInstance()->clear();
 
 	if(g_server){
 		g_server->stop();

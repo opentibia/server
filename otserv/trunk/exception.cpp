@@ -35,7 +35,7 @@
 typedef std::map<unsigned long, char*> FunctionMap;
 
 
-#if defined WIN32 || defined __WINDOWS__
+#ifdef __WINDOWS__
 #include "excpt.h"
 #include "tlhelp32.h"
 #endif

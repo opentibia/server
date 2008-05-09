@@ -55,6 +55,7 @@ Chat g_chat;
 
 
 #ifdef __SERVER_PROTECTION__
+#error "You should not define __SERVER_PROTECTION__"
 #define ADD_TASK_INTERVAL 40
 #define CHECK_TASK_INTERVAL 5000
 #else
@@ -1837,7 +1838,7 @@ void ProtocolGame::sendMoveCreature(const Creature* creature, const Position& ne
 		if(msg){
 			if(teleport || oldStackPos >= 10){
 				RemoveTileItem(msg, oldPos, oldStackPos);
-				AddMapDescription(msg, player->getPosition());
+				AddMapDescription(msg, newPos);
 			}
 			else{
 				if(oldPos.z == 7 && newPos.z >= 8){
@@ -1847,7 +1848,7 @@ void ProtocolGame::sendMoveCreature(const Creature* creature, const Position& ne
 						msg->AddByte(0x6D);
 						msg->AddPosition(oldPos);
 						msg->AddByte(oldStackPos);
-						msg->AddPosition(creature->getPosition());
+						msg->AddPosition(newPos);
 					}
 
 				//floor change down
