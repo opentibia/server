@@ -150,7 +150,7 @@ private:
 
 	bool canUseAttack(const Position& pos, const Creature* target) const;
 	bool canUseSpell(const Position& pos, const Position& targetPos,
-		const spellBlock_t& sb, uint32_t interval);
+		const spellBlock_t& sb, uint32_t interval, bool& inRange);
 	bool getRandomStep(const Position& creaturePos, Direction& dir);
 	bool getDanceStep(const Position& creaturePos, Direction& dir);
 	bool isInSpawnRange(const Position& toPos);

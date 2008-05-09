@@ -565,6 +565,7 @@ void Monster::doAttacking(uint32_t interval)
 	}
 
 	bool updateLook = true;
+	bool outOfRange = true;
 
 	resetTicks = interval != 0;
 	attackTicks += interval;
@@ -573,7 +574,8 @@ void Monster::doAttacking(uint32_t interval)
 	const Position& targetPos = attackedCreature->getPosition();
 
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
-		if(canUseSpell(myPos, targetPos, *it, interval)){
+		bool inRange = false;
+		if(canUseSpell(myPos, targetPos, *it, interval, inRange)){
 			uint32_t modChance = 1;
 			if(extraAttack){
 				modChance = random_range(1, 2);
@@ -597,6 +599,14 @@ void Monster::doAttacking(uint32_t interval)
 #endif
 			}
 		}
+
+		if(inRange){
+			outOfRange = false;
+		}
+	}
+
+	if(outOfRange){
+		extraAttack = true;
 	}
 
 	if(updateLook){
@@ -621,8 +631,9 @@ bool Monster::canUseAttack(const Position& pos, const Creature* target) const
 }
 
 bool Monster::canUseSpell(const Position& pos, const Position& targetPos,
-	const spellBlock_t& sb, uint32_t interval)
+	const spellBlock_t& sb, uint32_t interval, bool& inRange)
 {
+	inRange = true;
 	if(!extraAttack){
 		if(sb.speed > attackTicks){
 			resetTicks = false;
@@ -636,10 +647,7 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos,
 	}
 
 	if(sb.range != 0 && std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y)) > (int32_t)sb.range){
-		//out of range
-		if(interval != 0){
-			extraAttack = true;
-		}
+		inRange = false;
 		return false;
 	}
 
