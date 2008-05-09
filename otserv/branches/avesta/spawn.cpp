@@ -295,11 +295,12 @@ Spawn::~Spawn()
 	Monster* monster;
 	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end(); ++it){
 		monster = it->second;
+		it->second = NULL;
 
+		monster->setSpawn(NULL);
 		if(monster->isRemoved()){
 			monster->releaseThing2();
 		}
-		monster->setSpawn(NULL);
 	}
 
 	spawnedMap.clear();
