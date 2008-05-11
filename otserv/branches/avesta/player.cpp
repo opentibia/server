@@ -1202,7 +1202,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
 			if((item = getInventoryItem((slots_t)slot))){
 				item->__startDecaying();
-				g_moveEvents->onPlayerEquip(this, item, (slots_t)slot, true);
+				g_moveEvents->onPlayerEquip(this, item, (slots_t)slot);
 			}
 		}
 
@@ -2758,7 +2758,7 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 {
 	if(link == LINK_OWNER){
 		//calling movement scripts
-		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index, true);
+		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index);
 	}
 
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
@@ -2793,7 +2793,7 @@ void Player::postRemoveNotification(Thing* thing, int32_t index, bool isComplete
 {
 	if(link == LINK_OWNER){
 		//calling movement scripts
-		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index, false);
+		g_moveEvents->onPlayerDeEquip(this, thing->getItem(), (slots_t)index, isCompleteRemoval);
 	}
 
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){

@@ -1654,7 +1654,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 			}
 		}
 		else{
-			cylinder->postRemoveNotification(item, itemIndex, true);
+			cylinder->postRemoveNotification(item, itemIndex, false);
 			uint16_t itemId = item->getID();
 			int32_t count = item->getItemCountOrSubtype();
 
