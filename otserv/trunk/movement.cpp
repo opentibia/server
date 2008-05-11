@@ -206,19 +206,20 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 	return ret;
 }
 
-uint32_t MoveEvents::onPlayerEquip(Player* player, Item* item, slots_t slot, bool isEquip)
+uint32_t MoveEvents::onPlayerEquip(Player* player, Item* item, slots_t slot)
 {
-	MoveEvent_t eventType;
-	if(isEquip){
-		eventType = MOVE_EVENT_EQUIP;
+	MoveEvent* moveEvent = getEvent(item, MOVE_EVENT_EQUIP);
+	if(moveEvent && slot == moveEvent->getSlot()){
+		return moveEvent->fireEquip(player, item, slot, false);
 	}
-	else{
-		eventType = MOVE_EVENT_DEEQUIP;
-	}
+	return 1;
+}
 
-	MoveEvent* event = getEvent(item, eventType);
-	if(event && slot == event->getSlot()){
-		return event->fireEquip(player, item, slot);
+uint32_t MoveEvents::onPlayerDeEquip(Player* player, Item* item, slots_t slot, bool isRemoval)
+{
+	MoveEvent* moveEvent = getEvent(item, MOVE_EVENT_DEEQUIP);
+	if(moveEvent && slot == moveEvent->getSlot()){
+		return moveEvent->fireEquip(player, item, slot, isRemoval);
 	}
 	return 1;
 }
@@ -448,7 +449,7 @@ uint32_t MoveEvent::RemoveItemField(Item* item, Item* tileItem, const Position& 
 	return 1;
 }
 
-uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
+uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot, bool transform)
 {
 	if(player->isItemAbilityEnabled(slot)){
 		return 1;
@@ -457,8 +458,8 @@ uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 	const ItemType& it = Item::items[item->getID()];
 
 	if(it.transformEquipTo != 0){
-		g_game.transformItem(item, it.transformEquipTo);
-		g_game.startDecay(item);
+		Item* newItem = g_game.transformItem(item, it.transformEquipTo);
+		g_game.startDecay(newItem);
 	}
 	else{
 		player->setItemAbility(slot, true);
@@ -535,7 +536,7 @@ uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 	return 1;
 }
 
-uint32_t MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
+uint32_t MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot, bool isRemoval)
 {
 	if(!player->isItemAbilityEnabled(slot)){
 		return 1;
@@ -545,7 +546,7 @@ uint32_t MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 
 	const ItemType& it = Item::items[item->getID()];
 
-	if(it.transformDeEquipTo != 0){
+	if(isRemoval && it.transformDeEquipTo != 0){
 		g_game.transformItem(item, it.transformDeEquipTo);
 		g_game.startDecay(item);
 	}
@@ -649,13 +650,13 @@ uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& 
 	}
 }
 
-uint32_t MoveEvent::fireEquip(Player* player, Item* item, slots_t slot)
+uint32_t MoveEvent::fireEquip(Player* player, Item* item, slots_t slot, bool isRemoval)
 {
 	if(m_scripted){
 		return executeEquip(player, item, slot);
 	}
 	else{
-		return equipFunction(player, item, slot);
+		return equipFunction(player, item, slot, isRemoval);
 	}
 }
 

@@ -5809,7 +5809,7 @@
 		<attribute key="slotType" value="feet"/>
 		<attribute key="decayTo" value="6530"/>
 		<attribute key="transformDeEquipTo" value="6132"/>
-		<attribute key="duration" value="14400"/>
+		<attribute key="duration" value="1"/>
 		<attribute key="healthGain" value="1"/>
 		<attribute key="healthTicks" value="2000"/>
 		<attribute key="manaGain" value="2"/>

@@ -57,7 +57,8 @@ public:
 	virtual ~MoveEvents();
 	
 	uint32_t onCreatureMove(Creature* creature, Tile* tile, bool isIn);
-	uint32_t onPlayerEquip(Player* player, Item* item, slots_t slot, bool isEquip);
+	uint32_t onPlayerEquip(Player* player, Item* item, slots_t slot);
+	uint32_t onPlayerDeEquip(Player* player, Item* item, slots_t slot, bool isRemoval);
 	uint32_t onItemMove(Item* item, Tile* tile, bool isAdd);
 	
 protected:
@@ -81,7 +82,7 @@ protected:
 
 typedef uint32_t (StepFunction)(Creature* creature, Item* item, const Position& pos);
 typedef uint32_t (MoveFunction)(Item* item, Item* tileItem, const Position& pos);
-typedef uint32_t (EquipFunction)(Player* player, Item* item, slots_t slot);
+typedef uint32_t (EquipFunction)(Player* player, Item* item, slots_t slot, bool isRemoval);
 
 class MoveEvent : public Event
 {
@@ -97,7 +98,7 @@ public:
 
 	uint32_t fireStepEvent(Creature* creature, Item* item, const Position& pos);
 	uint32_t fireAddRemItem(Item* item, Item* tileItem, const Position& pos);
-	uint32_t fireEquip(Player* player, Item* item, slots_t slot);
+	uint32_t fireEquip(Player* player, Item* item, slots_t slot, bool isRemoval);
 
 	slots_t getSlot() const {return slot;}
 
