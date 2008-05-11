@@ -318,6 +318,8 @@ public:
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature) {};
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
+	virtual void onPlacedCreature() {};
+	virtual void onRemovedCreature() {};
 
 	virtual WeaponType_t getWeaponType() {return WEAPON_NONE;}
 	virtual bool getCombatValues(int32_t& min, int32_t& max) {return false;}
@@ -434,13 +436,6 @@ protected:
 	virtual void die() {};
 	virtual void dropCorpse();
 	virtual Item* getCorpse();
-
-	/*
-	static OTSYS_THREAD_LOCKVAR pathLock;
-	static OTSYS_THREAD_SIGNALVAR pathSignal;
-	static std::list<uint32_t> creatureUpdatePathList;
-	static bool m_shutdownPathThread;
-	*/
 
 	friend class Game;
 	friend class Map;

@@ -1223,9 +1223,6 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 			#endif
 		}
 		//]
-
-		//scripting event - onLogIn
-		g_creatureEvents->playerLogIn(this);
 	}
 }
 
@@ -1333,9 +1330,6 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		}
 
 		g_chat.removeUserFromAllChannels(this);
-
-		//scripting event - onLogOut
-		g_creatureEvents->playerLogOut(this);
 
 		bool saved = false;
 		for(uint32_t tries = 0; tries < 3; ++tries){
@@ -3178,6 +3172,18 @@ void Player::onIdleStatus()
 	if(getParty()){
 		getParty()->clearPlayerPoints(this);
 	}
+}
+
+void Player::onPlacedCreature()
+{
+	//scripting event - onLogIn
+	g_creatureEvents->playerLogIn(this);
+}
+
+void Player::onRemovedCreature()
+{
+	//scripting event - onLogOut
+	g_creatureEvents->playerLogOut(this);
 }
 
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
