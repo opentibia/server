@@ -661,6 +661,8 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving map.");
 	}
 
+	g_game.saveGameState();
+
 	return true;
 }
 
