@@ -1486,7 +1486,7 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 
 	int32_t testDist = std::max(std::abs(targetPos.x - testPos.x), std::abs(targetPos.y - testPos.y));
 	if(fpp.maxTargetDist == 1){
-		if(testDist > fpp.maxTargetDist){
+		if(testDist < fpp.minTargetDist || testDist > fpp.maxTargetDist){
 			return false;
 		}
 
