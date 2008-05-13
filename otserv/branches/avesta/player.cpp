@@ -3187,13 +3187,14 @@ void Player::onIdleStatus()
 void Player::onPlacedCreature()
 {
 	//scripting event - onLogIn
-	g_creatureEvents->playerLogIn(this);
+	if(!g_creatureEvents->playerLogIn(this)){
+		kickPlayer(); //The script won't let the player be online for now.
+	}
 }
 
 void Player::onRemovedCreature()
 {
-	//scripting event - onLogOut
-	g_creatureEvents->playerLogOut(this);
+	//
 }
 
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)

@@ -645,7 +645,7 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
 		int32_t result = m_scriptInterface->callFunction(5);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. Action::executeUse" << std::endl;

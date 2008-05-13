@@ -38,6 +38,7 @@
 #include "ban.h"
 #include "ioaccount.h"
 #include "connection.h"
+#include "creatureevent.h"
 
 #include <string>
 #include <iostream>
@@ -52,11 +53,12 @@ extern ConfigManager g_config;
 extern Actions actions;
 extern RSA* g_otservRSA;
 extern Ban g_bans;
+extern CreatureEvents* g_creatureEvents;
 Chat g_chat;
 
 
 #ifdef __SERVER_PROTECTION__
-#error "You should not use __SERVER_PROTECTION__
+#error "You should not use __SERVER_PROTECTION__"
 #define ADD_TASK_INTERVAL 40
 #define CHECK_TASK_INTERVAL 5000
 #else
@@ -348,14 +350,22 @@ bool ProtocolGame::logout(bool forced)
 		return false;
 
 	if(!player->isRemoved()){
-		if(!forced && player->getTile()->hasFlag(TILESTATE_NOLOGOUT)){
-			player->sendCancelMessage(RET_YOUCANNOTLOGOUTHERE);
-			return false;
-		}
+		if(!forced){
+			if(player->getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+				player->sendCancelMessage(RET_YOUCANNOTLOGOUTHERE);
+				return false;
+			}
 
-		if(!forced && player->hasCondition(CONDITION_INFIGHT)){
-			player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
-			return false;
+			if(player->hasCondition(CONDITION_INFIGHT)){
+				player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
+				return false;
+			}
+
+			//scripting event - onLogOut
+			if(!g_creatureEvents->playerLogOut(player)){
+				//Let the script handle the error message
+				return false;
+			}
 		}
 	}
 

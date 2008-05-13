@@ -642,7 +642,7 @@ uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& 
 		int32_t result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. MoveEvent::executeStep" << std::endl;
@@ -689,7 +689,7 @@ uint32_t MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
 		int32_t result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. MoveEvent::executeEquip" << std::endl;
@@ -739,7 +739,7 @@ uint32_t MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position
 		int32_t result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. MoveEvent::executeAddRemItem" << std::endl;

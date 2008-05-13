@@ -435,7 +435,7 @@ bool CombatSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_NO_ERROR);
+		return (result != LUA_ERROR);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CombatSpell::executeCastSpell" << std::endl;
@@ -1211,7 +1211,7 @@ bool InstantSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_NO_ERROR);
+		return (result != LUA_ERROR);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. InstantSpell::executeCastSpell" << std::endl;
@@ -2166,7 +2166,7 @@ bool RuneSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_NO_ERROR);
+		return (result != LUA_ERROR);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. RuneSpell::executeCastSpell" << std::endl;

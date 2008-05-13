@@ -178,7 +178,7 @@ uint32_t TalkAction::executeSay(Creature* creature, const std::string& words, co
 		int32_t result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 		
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. TalkAction::executeSay" << std::endl;
