@@ -3029,6 +3029,9 @@ void Player::stopWalk()
 	if(!listWalkDir.empty()){
 		stopEventWalk();
 	}
+	else{
+		sendCancelWalk();
+	}
 }
 
 void Player::getCreatureLight(LightInfo& light) const
