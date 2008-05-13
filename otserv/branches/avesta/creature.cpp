@@ -641,7 +641,9 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 
 	if(creature == followCreature || (creature == this && followCreature)){
 		if(hasFollowPath){
-			isUpdatingPath = true;
+			isUpdatingPath = false;
+			Dispatcher::getDispatcher().addTask(createTask(
+				boost::bind(&Creature::getPathToFollowCreature, this)));
 		}
 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){

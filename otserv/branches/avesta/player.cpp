@@ -3233,19 +3233,21 @@ void Player::onKilledCreature(Creature* target)
 		}
 
 		if(!hasFlag(PlayerFlag_NotGainInFight)){
+			if(hasCondition(CONDITION_INFIGHT)){
 #ifdef __SKULLSYSTEM__
-			if( !isPartner(targetPlayer) &&
-					!Combat::isInPvpZone(this, targetPlayer) &&
-					!targetPlayer->hasAttacked(this) &&
-					targetPlayer->getSkull() == SKULL_NONE){
-				addUnjustifiedDead(targetPlayer);
-			}
+				if( !isPartner(targetPlayer) &&
+						!Combat::isInPvpZone(this, targetPlayer) &&
+						!targetPlayer->hasAttacked(this) &&
+						targetPlayer->getSkull() == SKULL_NONE){
+					addUnjustifiedDead(targetPlayer);
+				}
 #endif
 
-			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
-				pzLocked = true;
-				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
-				addCondition(condition);
+				if(!Combat::isInPvpZone(this, targetPlayer)){
+					pzLocked = true;
+					Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
+					addCondition(condition);
+				}
 			}
 		}
 	}
