@@ -1997,9 +1997,9 @@ void Player::die()
 void Player::dropCorpse()
 {
 	if(getZone() == ZONE_PVP){
+		preSave();
 		setDropLoot(true);
 		setLossSkill(true);
-		preSave();
 		sendStats();
 		g_game.internalTeleport(this, getTemplePosition());
 		g_game.addCreatureHealth(this);
