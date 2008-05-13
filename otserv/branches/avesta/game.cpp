@@ -1750,9 +1750,10 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 			break;
 	}
 
-	float delay = player->getSleepTicks()*multiplier;
+	float delay = player->getSleepTicks() * multiplier;
 	if(delay > 0){
-		player->stopWalk();
+		Scheduler::getScheduler().addEvent(createSchedulerTask(
+			delay, boost::bind(&Game::playerMove, this, player->getID(), direction)));
 		return false;
 	}
 
