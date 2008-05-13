@@ -3024,6 +3024,13 @@ void Player::onWalkComplete()
 	}
 }
 
+void Player::stopWalk()
+{
+	if(!listWalkDir.empty()){
+		stopEventWalk();
+	}
+}
+
 void Player::getCreatureLight(LightInfo& light) const
 {
 	if(internalLight.level > itemsLight.level){

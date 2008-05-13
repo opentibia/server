@@ -346,6 +346,8 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
 		return false;
 	}
+	
+	player->stopWalk();
 
 	if(isHotkey){
 		int32_t subType = -1;
@@ -471,6 +473,8 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME)){
 		return false;
 	}
+
+	player->stopWalk();
 
 	Action* action = getAction(item);
 	if(!action){

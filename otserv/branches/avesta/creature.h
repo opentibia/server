@@ -157,7 +157,6 @@ public:
 	virtual int64_t getEventStepTicks() const;
 	int32_t getStepDuration() const;
 	virtual int32_t getStepSpeed() const {return getSpeed();}
-
 	int32_t getSpeed() const {return baseSpeed + varSpeed;}
 	void setSpeed(int32_t varSpeedDelta)
 	{

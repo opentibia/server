@@ -623,8 +623,6 @@ bool Game::playerMoveThing(uint32_t playerId, const Position& fromPos,
 	if(!player || player->isRemoved())
 		return false;
 
-	//Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
-
 	uint8_t fromIndex = 0;
 	if(fromPos.x == 0xFFFF){
 		if(fromPos.y & 0x40){
@@ -1754,16 +1752,13 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 
 	float delay = player->getSleepTicks()*multiplier;
 	if(delay > 0){
-		Scheduler::getScheduler().addEvent(
-			createSchedulerTask((int64_t)delay, boost::bind(&Game::playerMove, this, playerId, direction)));
+		player->stopWalk();
+		return false;
+	}
 
-		return true;
-	}
-	else{
-		player->setFollowCreature(NULL);
-		player->onWalk(direction);
-		return (internalMoveCreature(player, direction) == RET_NOERROR);
-	}
+	player->setFollowCreature(NULL);
+	player->onWalk(direction);
+	return (internalMoveCreature(player, direction) == RET_NOERROR);
 }
 
 bool Game::internalBroadcastMessage(Player* player, const std::string& text)
@@ -2003,7 +1998,7 @@ bool Game::playerStopAutoWalk(uint32_t playerId)
 	if(!player || player->isRemoved())
 		return false;
 
-	player->stopEventWalk();
+	player->stopWalk();
 	return true;
 }
 
@@ -2750,8 +2745,14 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 
 bool Game::playerCancelAttackAndFollow(uint32_t playerId)
 {
-	return playerSetAttackedCreature(playerId, 0) &&
-			playerFollowCreature(playerId, 0);
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	playerSetAttackedCreature(playerId, 0);
+	playerFollowCreature(playerId, 0);
+	player->stopWalk();
+	return true;
 }
 
 bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)

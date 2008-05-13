@@ -531,6 +531,7 @@ public:
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
+	void stopWalk();
 
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;

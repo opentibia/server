@@ -643,7 +643,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 		if(hasFollowPath){
 			isUpdatingPath = false;
 			Dispatcher::getDispatcher().addTask(createTask(
-				boost::bind(&Creature::getPathToFollowCreature, this)));
+				boost::bind(&Game::updateCreatureWalk, &g_game, getID())));
 		}
 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
