@@ -680,7 +680,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 			Dispatcher::getDispatcher().addTask(createTask(boost::bind(&Game::playerAutoWalk,
 				this, player->getID(), listDir)));
 
-			SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerMoveCreature, this,
+			SchedulerTask* task = createSchedulerTask(1500, boost::bind(&Game::playerMoveCreature, this,
 				playerId, movingCreatureId, movingCreatureOrigPos, toPos));
 			player->setDelayedWalkTask(task);
 			return true;
@@ -1750,12 +1750,22 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 			break;
 	}
 
-	float delay = player->getSleepTicks() * multiplier;
+	int32_t delay = (int32_t)(((float)player->getSleepTicks() * multiplier));
 	if(delay > 0){
+		player->lastMove = OTSYS_TIME();
 		Scheduler::getScheduler().addEvent(createSchedulerTask(
-			delay, boost::bind(&Game::playerMove, this, player->getID(), direction)));
+			((uint32_t)delay), boost::bind(&Game::internalPlayerMove, this, playerId, direction)));
 		return false;
 	}
+
+	return internalPlayerMove(playerId, direction);
+}
+
+bool Game::internalPlayerMove(uint32_t playerId, Direction direction)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
 
 	player->setFollowCreature(NULL);
 	player->onWalk(direction);

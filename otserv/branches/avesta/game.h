@@ -407,6 +407,7 @@ public:
 	void changeSpeed(Creature* creature, int32_t varSpeedDelta);
 	void internalCreatureChangeOutfit(Creature* creature, const Outfit_t& oufit);
 	void internalCreatureChangeVisible(Creature* creature, bool visible);
+	bool internalPlayerMove(uint32_t playerId, Direction direction);
 	void changeLight(const Creature* creature);
 
 #ifdef __SKULLSYSTEM__

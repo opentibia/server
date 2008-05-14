@@ -110,6 +110,7 @@ Creature()
 	tradeItem = NULL;
 
 	walkTask = NULL;
+	walkTaskEvent = 0;
 	skillLoss = true;
 
 	for(int32_t i = 0; i < 11; i++){
@@ -1487,6 +1488,10 @@ void Player::checkTradeState(const Item* item)
 
 void Player::setDelayedWalkTask(SchedulerTask* task)
 {
+	if(walkTaskEvent != 0){
+		Scheduler::getScheduler().stopEvent(walkTaskEvent);
+		walkTaskEvent = 0;
+	}
 	delete walkTask;
 	walkTask = task;
 }
@@ -3019,7 +3024,7 @@ void Player::onWalkAborted()
 void Player::onWalkComplete()
 {
 	if(walkTask){
-		Scheduler::getScheduler().addEvent(walkTask);
+		walkTaskEvent = Scheduler::getScheduler().addEvent(walkTask);
 		walkTask = NULL;
 	}
 }
@@ -3028,9 +3033,6 @@ void Player::stopWalk()
 {
 	if(!listWalkDir.empty()){
 		stopEventWalk();
-	}
-	else{
-		sendCancelWalk();
 	}
 }
 

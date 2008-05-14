@@ -608,6 +608,7 @@ protected:
 	int32_t premiumDays;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
+	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 	bool skillLoss;
 
