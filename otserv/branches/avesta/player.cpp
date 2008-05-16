@@ -57,7 +57,7 @@ Player::Player(const std::string& _name, ProtocolGame* p) :
 Creature()
 {
 	client = p;
-
+	isConnecting = false;
 	if(client){
 		client->setPlayer(this);
 	}
@@ -3588,6 +3588,10 @@ bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 
 bool Player::canLogout()
 {
+	if(isConnecting){
+		return false;
+	}
+
 	if(hasCondition(CONDITION_INFIGHT)){
 		return false;
 	}

@@ -143,6 +143,7 @@ public:
 	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
 	bool isOnline() const {return (client != NULL);}
+	void disconnect() {if(client) client->disconnect();}
 	uint32_t getIP() const;
 
 	void addContainer(uint32_t cid, Container* container);
@@ -620,6 +621,7 @@ protected:
 	int64_t lastAction;
 
 	bool pzLocked;
+	bool isConnecting;
 	int32_t bloodHitCount;
 	int32_t shieldBlockCount;
 	BlockType_t lastAttackBlockType;

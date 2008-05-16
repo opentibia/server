@@ -31,7 +31,6 @@
 
 #include <boost/bind.hpp>
 
-
 Connection* ConnectionManager::createConnection(boost::asio::io_service& io_service)
 {
 	#ifdef __DEBUG_NET_DETAIL__
@@ -94,8 +93,8 @@ void Connection::closeConnection()
 
 	m_closeState = CLOSE_STATE_REQUESTED;
 
-	Scheduler::getScheduler().addEvent(
-		createSchedulerTask(1000, boost::bind(&Connection::closeConnectionTask, this)));
+	Dispatcher::getDispatcher().addTask(
+		createTask(boost::bind(&Connection::closeConnectionTask, this)));
 }
 
 void Connection::closeConnectionTask()

@@ -57,7 +57,9 @@ public:
 private:
 	std::list<uint32_t> knownCreatureList;
 
+	bool connect(uint32_t playerId);
 	void disconnectClient(uint8_t error, const char* message);
+	void disconnect();
 
 	virtual void deleteProtocolTask();
 

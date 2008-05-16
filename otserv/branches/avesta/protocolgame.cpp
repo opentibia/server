@@ -322,22 +322,36 @@ bool ProtocolGame::login(const std::string& name)
 	}
 	else{
 		if(_player->isOnline()){
-			disconnectClient(0x14, "You are already logged in.");
-			return false;
-		}
-
-		if(!_player->isRemoved()){
-			player = _player;
-			player->useThing2();
-			player->client = this;
-			player->client->sendAddCreature(player, false);
-			player->sendIcons();
-			player->lastip = player->getIP();
-			player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
-			m_acceptPackets = true;
+			_player->disconnect();
+			_player->isConnecting = true;
+			Scheduler::getScheduler().addEvent(
+				createSchedulerTask(2000, boost::bind(&ProtocolGame::connect, this, _player->getID())));
 
 			return true;
 		}
+
+		return connect(_player->getID());
+	}
+
+	return false;
+}
+
+bool ProtocolGame::connect(uint32_t playerId)
+{
+	Player* _player = g_game.getPlayerByID(playerId);
+	if(_player && !_player->isRemoved()){
+		assert(player == NULL);
+		player = _player;
+		player->useThing2();
+		player->isConnecting = false;
+		player->client = this;
+		player->client->sendAddCreature(player, false);
+		player->sendIcons();
+		player->lastip = player->getIP();
+		player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
+		m_acceptPackets = true;
+
+		return true;
 	}
 
 	return false;
@@ -450,7 +464,14 @@ void ProtocolGame::disconnectClient(uint8_t error, const char* message)
 	output->AddByte(error);
 	output->AddString(message);
 	OutputMessagePool::getInstance()->send(output);
-	getConnection()->closeConnection();
+	disconnect();
+}
+
+void ProtocolGame::disconnect()
+{
+	if(getConnection()){
+		getConnection()->closeConnection();
+	}
 }
 
 void ProtocolGame::parsePacket(NetworkMessage &msg)
