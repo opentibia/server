@@ -129,10 +129,10 @@ void Connection::closeConnectionTask()
 void Connection::acceptConnection()
 {
 	// Read size of te first packet
+	m_pendingRead++;
 	boost::asio::async_read(m_socket,
 		boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
 		boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
-	m_pendingRead++;
 }
 
 void Connection::parseHeader(const boost::system::error_code& error)
@@ -149,10 +149,10 @@ void Connection::parseHeader(const boost::system::error_code& error)
 	int32_t size = m_msg.decodeHeader();
 	if(!error && size > 0 && size < NETWORKMESSAGE_MAXSIZE - 16){
 		// Read packet content
+		m_pendingRead++;
 		m_msg.setMessageLength(size + NetworkMessage::header_length);
 		boost::asio::async_read(m_socket, boost::asio::buffer(m_msg.getBodyBuffer(), size),
 			boost::bind(&Connection::parsePacket, this, boost::asio::placeholders::error));
-		m_pendingRead++;
 	}
 	else{
 		handleReadError(error);
@@ -204,10 +204,10 @@ void Connection::parsePacket(const boost::system::error_code& error)
 		}
 
 		// Wait to the next packet
+		m_pendingRead++;
 		boost::asio::async_read(m_socket,
 			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
 			boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
-		m_pendingRead++;
 	}
 	else{
 		handleReadError(error);
@@ -265,6 +265,7 @@ bool Connection::send(OutputMessage* msg)
 		std::cout << "Connection::send Adding to queue " << msg->getMessageLength() << std::endl;
 		#endif
 		m_outputQueue.push_back(msg);
+		m_pendingWrite++;
 	}
 	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 	return true;
@@ -272,11 +273,10 @@ bool Connection::send(OutputMessage* msg)
 
 void Connection::internalSend(OutputMessage* msg)
 {
+	m_pendingWrite++;
 	boost::asio::async_write(m_socket,
 		boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
 		boost::bind(&Connection::onWriteOperation, this, msg, boost::asio::placeholders::error));
-
-	m_pendingWrite++;
 }
 
 uint32_t Connection::getIP() const
@@ -305,15 +305,16 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 
 	if(!error){
 		if(m_pendingWrite > 0){
-			m_pendingWrite--;
-			if(m_outputQueue.size() != 0){
+			if(!m_outputQueue.empty()){
 				OutputMessage* msg = m_outputQueue.front();
 				m_outputQueue.pop_front();
+				m_pendingWrite--;
 				internalSend(msg);
 				#ifdef __DEBUG_NET_DETAIL__
 				std::cout << "Connection::onWriteOperation send " << msg->getMessageLength() << std::endl;
 				#endif
 			}
+			m_pendingWrite--;
 		}
 		else{
 			std::cout << "Error: [Connection::onWriteOperation] Getting unexpected notification!" << std::endl;
@@ -322,6 +323,7 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 		}
 	}
 	else{
+		m_pendingWrite--;
 		handleWriteError(error);
 	}
 
@@ -408,5 +410,10 @@ bool Connection::closingConnection()
 void Connection::deleteConnectionTask()
 {
 	//dispather thread
+	while(!m_outputQueue.empty()){
+		OutputMessagePool::getInstance()->releaseMessage(m_outputQueue.back(), true);
+		m_outputQueue.pop_back();
+		--m_pendingWrite;
+	}
 	delete this;
 }

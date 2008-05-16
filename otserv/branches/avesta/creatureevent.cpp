@@ -146,7 +146,7 @@ uint32_t CreatureEvents::playerLogIn(Player* player)
 	if(m_logInEvent){
 		return m_logInEvent->executeOnLogin(player);
 	}
-	return 0;
+	return 1;
 }
 
 uint32_t CreatureEvents::playerLogOut(Player* player)
@@ -155,7 +155,7 @@ uint32_t CreatureEvents::playerLogOut(Player* player)
 	if(m_logOutEvent){
 		return m_logOutEvent->executeOnLogout(player);
 	}
-	return 0;
+	return 1;
 }
 
 /////////////////////////////////////
