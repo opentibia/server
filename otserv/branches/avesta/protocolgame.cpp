@@ -339,22 +339,20 @@ bool ProtocolGame::login(const std::string& name)
 bool ProtocolGame::connect(uint32_t playerId)
 {
 	Player* _player = g_game.getPlayerByID(playerId);
-	if(_player && !_player->isRemoved()){
-		assert(player == NULL);
-		player = _player;
-		player->useThing2();
-		player->isConnecting = false;
-		player->client = this;
-		player->client->sendAddCreature(player, false);
-		player->sendIcons();
-		player->lastip = player->getIP();
-		player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
-		m_acceptPackets = true;
-
-		return true;
+	if(!_player || _player->isRemoved() || _player->isOnline()){
+		return false;
 	}
 
-	return false;
+	player = _player;
+	player->useThing2();
+	player->isConnecting = false;
+	player->client = this;
+	player->client->sendAddCreature(player, false);
+	player->sendIcons();
+	player->lastip = player->getIP();
+	player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
+	m_acceptPackets = true;
+	return true;
 }
 
 bool ProtocolGame::logout(bool forced)
