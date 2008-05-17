@@ -393,8 +393,10 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 	}
 
 	Item* newItem = Item::CreateItem(type, count);
-	if(!newItem)
+	if(!newItem){
 		return false;
+	}
+	g_game.startDecay(newItem);
 
 	ReturnValue ret = game->internalAddItem(player, newItem);
 
@@ -444,8 +446,10 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 	}
 
 	Item* newItem = Item::CreateItem(itemId, count);
-	if(!newItem)
+	if(!newItem){
 		return false;
+	}
+	g_game.startDecay(newItem);
 
 	ReturnValue ret = game->internalAddItem(player, newItem);
 
