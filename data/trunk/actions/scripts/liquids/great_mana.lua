@@ -10,7 +10,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	if not(isSorcerer(item2.uid) or isDruid(item2.uid)) or (getPlayerLevel(item2.uid) < 50) and not(getPlayerAccess(cid) == 0) then
+	if not(isSorcerer(item2.uid) or isDruid(item2.uid)) or (getPlayerLevel(item2.uid) < 80) and not(getPlayerAccess(cid) > 0) then
 		doCreatureSay(item2.uid, "Only sorcerers and druids of level 80 or above may drink this fluid.", TALKTYPE_ORANGE_1)
 		return TRUE
 	end

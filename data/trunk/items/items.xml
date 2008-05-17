@@ -18512,6 +18512,14 @@
 	</item>
 	<item id="8170" name="stairs">
 	</item>
+	<item id="8376" article="a" name="great spirit potion">
+		<attribute key="description" value="This potion can only be consumed by paladins of level 80 or higher."/>
+		<attribute key="weight" value="220"/>
+	</item>
+	<item id="8377" article="an" name="ultimate health potion">
+		<attribute key="description" value="This potion can only be consumed by knights of level 130 or higher."/>
+		<attribute key="weight" value="220"/>
+	</item>
 	<item id="20001" name="water">
 	</item>
 	<item id="20002" name="blood">

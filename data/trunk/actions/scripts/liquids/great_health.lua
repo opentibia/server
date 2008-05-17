@@ -1,5 +1,5 @@
-local MIN = 600
-local MAX = 800
+local MIN = 400
+local MAX = 600
 local EMPTY_POTION = 7635
 
 local exhaust = createConditionObject(CONDITION_EXHAUSTED)
@@ -10,7 +10,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	if (not(isKnight(item2.uid)) or (getPlayerLevel(item2.uid) < 50)) and not(getPlayerAccess(cid) == 0) then
+	if (not(isKnight(item2.uid)) or (getPlayerLevel(item2.uid) < 80)) and not(getPlayerAccess(cid) > 0) then
 		doCreatureSay(item2.uid, "Only knights of level 80 or above may drink this fluid.", TALKTYPE_ORANGE_1)
 		return TRUE
 	end
