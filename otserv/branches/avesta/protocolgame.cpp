@@ -209,6 +209,7 @@ ProtocolGame::ProtocolGame(Connection* connection) :
 	m_rejectCount = 0;
 	m_debugAssertSent = false;
 	m_acceptPackets = false;
+	eventConnect = 0;
 }
 
 ProtocolGame::~ProtocolGame()
@@ -224,6 +225,11 @@ void ProtocolGame::setPlayer(Player* p)
 void ProtocolGame::deleteProtocolTask()
 {
 	//dispatcher thread
+	if(eventConnect != 0){
+		Scheduler::getScheduler().stopEvent(eventConnect);
+		eventConnect = 0;
+	}
+
 	if(player){
 		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Deleting ProtocolGame - Protocol:" << this << ", Player: " << player << std::endl;
@@ -321,7 +327,8 @@ bool ProtocolGame::login(const std::string& name)
 		return true;
 	}
 	else{
-		if(_player->isConnecting){
+		if(eventConnect != 0){
+			//Already trying to connect
 			disconnectClient(0x14, "Your already logged in.");
 			return false;
 		}
@@ -329,9 +336,8 @@ bool ProtocolGame::login(const std::string& name)
 		if(_player->isOnline()){
 			_player->disconnect();
 			_player->isConnecting = true;
-			Scheduler::getScheduler().addEvent(
-				createSchedulerTask(2000, boost::bind(&ProtocolGame::connect, this, _player->getID())));
-
+			eventConnect = Scheduler::getScheduler().addEvent(
+				createSchedulerTask(1000, boost::bind(&ProtocolGame::connect, this, _player->getID())));
 			return true;
 		}
 
@@ -343,6 +349,7 @@ bool ProtocolGame::login(const std::string& name)
 
 bool ProtocolGame::connect(uint32_t playerId)
 {
+	eventConnect = 0;
 	Player* _player = g_game.getPlayerByID(playerId);
 	if(!_player || _player->isRemoved() || _player->isOnline()){
 		disconnectClient(0x14, "Your already logged in.");
@@ -450,6 +457,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	g_bans.addLoginAttempt(getIP(), true);
+
 	Dispatcher::getDispatcher().addTask(
 		createTask(boost::bind(&ProtocolGame::login, this, name)));
 
