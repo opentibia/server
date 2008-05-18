@@ -284,11 +284,11 @@ bool IOBan::loadBans(Ban& banclass)
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery("SELECT COUNT(*) FROM `bans`"))){
+	if(!(result = db->storeQuery("SELECT COUNT(*) AS count FROM `bans`"))){
 		return false;
 	}
 
-	uint32_t nbans = result->getDataInt("COUNT(*)");
+	uint32_t nbans = result->getDataInt("count");
 	db->freeResult(result);
 	if(nbans == 0){
 		return true;
