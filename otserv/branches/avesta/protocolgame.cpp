@@ -796,7 +796,7 @@ void ProtocolGame::GetMapDescription(uint16_t x, uint16_t y, unsigned char z,
 	int startz, endz, zstep = 0;
 
 	if (z > 7) {
-		startz = z - 2;
+		startz = std::max(8, z - 2); //underground can't see ground or above
 		endz = std::min(MAP_MAX_LAYERS - 1, z + 2);
 		zstep = 1;
 	}
