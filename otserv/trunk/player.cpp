@@ -711,7 +711,6 @@ void Player::dropLoot(Container* corpse)
 	if(getSkull() == SKULL_RED){
 		itemLoss = 100;
 	}
-	else 
 #endif
 	if(!lootDrop){
 		itemLoss = 0;
