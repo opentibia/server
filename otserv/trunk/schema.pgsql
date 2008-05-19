@@ -54,6 +54,7 @@ CREATE TABLE "players" (
     "loss_experience" INT NOT NULL DEFAULT 10,
     "loss_mana" INT NOT NULL DEFAULT 10,
     "loss_skills" INT NOT NULL DEFAULT 10,
+	"loss_items" INT NOT NULL DEFAULT 10,
     "rank_id" INT NOT NULL,
     "town_id" INT NOT NULL,
 	"balance" INT NOT NULL DEFAULT 0,

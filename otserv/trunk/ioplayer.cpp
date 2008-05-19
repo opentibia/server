@@ -138,6 +138,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->setLossPercent(LOSS_EXPERIENCE, result->getDataInt("loss_experience"));
 	player->setLossPercent(LOSS_MANASPENT, result->getDataInt("loss_mana"));
 	player->setLossPercent(LOSS_SKILLTRIES, result->getDataInt("loss_skills"));
+	player->setLossPercent(LOSS_ITEMS, result->getDataInt("loss_items"));
 
 	player->loginPosition.x = result->getDataInt("posx");
 	player->loginPosition.y = result->getDataInt("posy");
@@ -474,6 +475,7 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE)
 	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
 	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES)
+	<< ", `loss_items` = " << (int)player->getLossPercent(LOSS_ITEMS)
 	<< ", `balance` = " << player->balance;
 
 #ifndef __USE_SQL_PREMDAYS__

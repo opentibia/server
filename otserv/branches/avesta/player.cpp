@@ -708,14 +708,24 @@ uint16_t Player::getLookCorpse() const
 
 void Player::dropLoot(Container* corpse)
 {
-	if(corpse && lootDrop){
+	if(!corpse){
+		return;
+	}
+
+	uint32_t itemLoss = lossPercent[LOSS_ITEMS];
+#ifdef __SKULLSYSTEM__
+	if(getSkull() == SKULL_RED){
+		itemLoss = 100;
+	}
+#endif
+	if(!lootDrop){
+		itemLoss = 0;
+	}
+
+	if(itemLoss > 0)){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
-	#ifdef __SKULLSYSTEM__
-			if(item && ((item->getContainer()) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
-	#else
-			if(item && ((item->getContainer()) || random_range(1, 100) <= 10)){
-	#endif
+			if(item && ((item->getContainer()) || random_range(1, 100) <= itemLoss)){
 				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 			}
 		}
