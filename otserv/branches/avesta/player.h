@@ -140,7 +140,6 @@ public:
 
 	int getPremiumDays() const {return premiumDays;}
 	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
-	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
 	bool isOnline() const {return (client != NULL);}
 	void disconnect() {if(client) client->disconnect();}
@@ -611,7 +610,6 @@ protected:
 	int32_t MessageBufferCount;
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
-	bool skillLoss;
 
 	double inventoryWeight;
 	double capacity;

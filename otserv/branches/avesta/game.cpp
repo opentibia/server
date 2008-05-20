@@ -609,6 +609,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	removeCreatureCheck(creature);
 
 	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
+		(*cit)->setLossSkill(false);
 		removeCreature(*cit);
 	}
 

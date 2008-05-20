@@ -111,7 +111,6 @@ Creature()
 
 	walkTask = NULL;
 	walkTaskEvent = 0;
-	skillLoss = true;
 
 	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;

@@ -321,6 +321,7 @@ public:
 
 	uint32_t getSummonCount() const {return summons.size();}
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
+	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
 	//creature script events
 	bool registerCreatureEvent(const std::string& name);
@@ -367,6 +368,7 @@ protected:
 	uint32_t lastStepCost;
 	uint32_t baseSpeed;
 	int32_t varSpeed;
+	bool skillLoss;
 	bool lootDrop;
 	Direction direction;
 	ConditionList conditions;
@@ -374,7 +376,6 @@ protected:
 
 	//summon variables
 	Creature* master;
-	bool summon;
 	std::list<Creature*> summons;
 
 	//follow variables
