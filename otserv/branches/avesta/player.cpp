@@ -722,7 +722,7 @@ void Player::dropLoot(Container* corpse)
 		itemLoss = 0;
 	}
 
-	if(itemLoss > 0)){
+	if(itemLoss > 0){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
 			if(item && ((item->getContainer()) || random_range(1, 100) <= itemLoss)){
