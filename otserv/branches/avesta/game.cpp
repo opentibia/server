@@ -1736,23 +1736,8 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 	if(!player || player->isRemoved())
 		return false;
 
-	float multiplier;
-	switch(direction){
-		case NORTHWEST:
-		case NORTHEAST:
-		case SOUTHWEST:
-		case SOUTHEAST:
-			multiplier = 1.5f;
-			break;
-
-		default:
-			multiplier = 1.0f;
-			break;
-	}
-
-	int32_t delay = (int32_t)(((float)player->getSleepTicks() * multiplier));
+	int32_t delay = player->getWalkDelay(direction);
 	if(delay > 0){
-		player->lastMove = OTSYS_TIME();
 		Scheduler::getScheduler().addEvent(createSchedulerTask(
 			((uint32_t)delay), boost::bind(&Game::internalPlayerMove, this, playerId, direction)));
 		return false;
@@ -1767,9 +1752,17 @@ bool Game::internalPlayerMove(uint32_t playerId, Direction direction)
 	if(!player || player->isRemoved())
 		return false;
 
-	player->setFollowCreature(NULL);
-	player->onWalk(direction);
-	return (internalMoveCreature(player, direction) == RET_NOERROR);
+	int32_t delay = player->getWalkDelay(direction);
+	if(delay <= 0) {
+		player->lastMove = OTSYS_TIME();
+		player->setFollowCreature(NULL);
+		player->onWalk(direction);
+		return (internalMoveCreature(player, direction) == RET_NOERROR);
+	} else {
+		// Prevent players from getting stuck
+		player->sendCancelWalk();
+	}
+	return false;
 }
 
 bool Game::internalBroadcastMessage(Player* player, const std::string& text)

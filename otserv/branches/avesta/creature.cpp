@@ -152,6 +152,25 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+int64_t Creature::getSleepTicks() const{
+	if(lastMove != 0){
+		int64_t ct = OTSYS_TIME();
+		int64_t stepDuration = getStepDuration();
+		int64_t delay = stepDuration - (ct - lastMove);
+		return delay;
+	}
+
+	return 0;
+}
+
+int32_t Creature::getWalkDelay(Direction dir) const{
+	float mul = 1.0f;
+	if(dir == NORTHWEST || dir == NORTHEAST || dir == SOUTHWEST || dir == SOUTHEAST) {
+		mul = 1.5f;
+	}
+	return int32_t(getSleepTicks() * mul);
+}
+
 void Creature::onThink(uint32_t interval)
 {
 	if(!isMapLoaded && useCacheMap()){

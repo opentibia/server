@@ -144,15 +144,8 @@ public:
 	virtual bool isRemoved() const {return isInternalRemoved;};
 	virtual bool canSeeInvisibility() const { return false;}
 
-	int64_t getSleepTicks() const{
-		if(lastMove != 0){
-			int64_t stepDuration = getStepDuration();
-			int64_t delay = (((int64_t)(lastMove)) + ((int64_t)(stepDuration))) - ((int64_t)(OTSYS_TIME()));
-			return delay;
-		}
-
-		return 0;
-	}
+	int64_t getSleepTicks() const;
+	int32_t getWalkDelay(Direction dir) const;
 
 	virtual int64_t getEventStepTicks() const;
 	int32_t getStepDuration() const;
