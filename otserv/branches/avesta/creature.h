@@ -146,6 +146,7 @@ public:
 
 	int64_t getSleepTicks() const;
 	int32_t getWalkDelay(Direction dir) const;
+	int64_t getTimeSinceLastMove() const;
 
 	virtual int64_t getEventStepTicks() const;
 	int32_t getStepDuration() const;

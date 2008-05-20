@@ -152,6 +152,12 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+int64_t Creature::getTimeSinceLastMove() const {
+	if(lastMove)
+		return OTSYS_TIME() - lastMove;
+	return 0x7FFFFFFFFFFFFFFFLL;
+}
+
 int64_t Creature::getSleepTicks() const{
 	if(lastMove != 0){
 		int64_t ct = OTSYS_TIME();

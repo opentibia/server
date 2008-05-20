@@ -901,8 +901,11 @@ bool Monster::getNextStep(Direction& dir)
 
 	bool result = false;
 	if((!followCreature || !hasFollowPath) && !isSummon()){
-		//choose a random direction
-		result = getRandomStep(getPosition(), dir);
+		// Walk randomly once every 1-2 seconds, not run around like if we're on drugs
+		if(getTimeSinceLastMove() > 1000) {
+			//choose a random direction
+			result = getRandomStep(getPosition(), dir);
+		}
 	}
 	else if(isSummon() || followCreature){
 		result = Creature::getNextStep(dir);
