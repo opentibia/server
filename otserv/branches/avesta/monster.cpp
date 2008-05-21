@@ -110,6 +110,7 @@ void Monster::onAttackedCreatureDissapear(bool isLogout)
 	std::cout << "Attacked creature dissapeared." << std::endl;
 #endif
 
+	attackTicks = 0;
 	extraMeleeAttack = true;
 }
 
@@ -316,6 +317,10 @@ bool Monster::isOpponent(const Creature* creature)
 			(creature->getMaster() && creature->getMaster()->getPlayer()) ) {
 			return true;
 		}
+	}
+
+	if(creature->getNpc()){
+		return true;
 	}
 
 	return false;

@@ -356,15 +356,13 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 		}
 
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		std::string currentName = item->getName(); //For correct hotkey message
-		std::string currentPlural = item->getPluralName();
 		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
 		if(ret != RET_NOERROR){
 			player->sendCancelMessage(ret);
 			return false;
 		}
 
-		showUseHotkeyMessage(player, currentName, itemCount, currentPlural);
+		showUseHotkeyMessage(player, item, itemCount);
 	}
 	else{
 		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
@@ -494,9 +492,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		}
 
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		std::string currentName = item->getName(); //For correct hotkey message
-		std::string currentPlural = item->getPluralName();
-		showUseHotkeyMessage(player, currentName, itemCount, currentPlural);
+		showUseHotkeyMessage(player, item, itemCount);
 	}
 
 	ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
@@ -509,14 +505,14 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	return true;
 }
 
-void Actions::showUseHotkeyMessage(Player* player, const std::string& name, uint32_t itemCount, const std::string& plural)
+void Actions::showUseHotkeyMessage(Player* player, const Item* item, uint32_t itemCount)
 {
 	std::stringstream ss;
 	if(itemCount == 1){
-		ss << "Using the last " << name << "...";
+		ss << "Using the last " << item->getName() << "...";
 	}
 	else{
-		ss << "Using one of " << itemCount << " " << plural << "...";
+		ss << "Using one of " << itemCount << " " << item->getPluralName() << "...";
 	}
 
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());

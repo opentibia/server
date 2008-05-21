@@ -2933,10 +2933,6 @@ void Player::doAttacking(uint32_t interval)
 			attackTicks = 0;
 			result = weapon->useWeapon(this, tool, attackedCreature);
 		}
-		else{
-			attackTicks = 0;
-			result = Weapon::useFist(this, attackedCreature);
-		}
 
 		if(!result){
 			//make next instant
