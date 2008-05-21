@@ -82,6 +82,11 @@ enum passwordType_t{
 
 #if defined __WINDOWS__ || defined WIN32
 
+#if defined _MSC_VER && defined NDEBUG
+#define _SECURE_SCL 0
+#define HAS_ITERATOR_DEBUGGING 0
+#endif
+
 #ifndef __FUNCTION__
 	#define	__FUNCTION__ __func__
 #endif
@@ -167,6 +172,13 @@ enum passwordType_t{
 
 	#define ATOI64 atoll
 
+#endif
+
+// OpenTibia configuration
+#ifndef __SKULLSYSTEM__
+#   ifndef __NO_SKULLSYSTEM__
+#       define __SKULLSYSTEM__
+#   endif
 #endif
 
 #endif

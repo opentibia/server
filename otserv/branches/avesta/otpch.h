@@ -1,13 +1,14 @@
 #ifdef __OTSERV_OTCP_H__
-#error "Including more than one time precompiled header."
+#error "Precompiled header should only be included once"
 #endif
 #define __OTSERV_OTCP_H__
 
 //#undef __USE_OTPCH__
 
-#ifdef __USE_OTPCH__
-
+// Definitions should be global.
 #include "definitions.h"
+
+#ifdef __USE_OTPCH__
 
 #if defined __WINDOWS__ || defined WIN32
 #include <winerror.h>

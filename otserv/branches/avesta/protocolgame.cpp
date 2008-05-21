@@ -662,7 +662,7 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0x9C: //gm closes report
-		parseCloseRuleViolation(msg);
+			parseCloseRuleViolation(msg);
 		break;
 
 	case 0x9D: //player cancels report
@@ -1792,12 +1792,12 @@ void ProtocolGame::sendCreatureSay(const Creature* creature, SpeakClasses type, 
 	}
 }
 
-void ProtocolGame::sendToChannel(const Creature * creature, SpeakClasses type, const std::string& text, uint16_t channelId)
+void ProtocolGame::sendToChannel(const Creature * creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time /*= 0*/)
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		TRACK_MESSAGE(msg);
-		AddCreatureSpeak(msg, creature, type, text, channelId);
+		AddCreatureSpeak(msg, creature, type, text, channelId, time);
 	}
 }
 
@@ -2503,9 +2503,10 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creatur
 		case SPEAK_CHANNEL_O:
 			msg->AddU16(channelId);
 			break;
-		case SPEAK_RVR_CHANNEL:
-			msg->AddU32(time);
-			break;
+		case SPEAK_RVR_CHANNEL: {
+			uint32_t t = (OTSYS_TIME() / 1000) & 0xFFFFFFFF;
+			msg->AddU32(t - time);
+		} break;
 		default:
 			break;
 	}

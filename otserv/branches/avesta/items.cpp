@@ -1116,7 +1116,7 @@ bool Items::loadFromXml(const std::string& datadir)
 				decayTo = it.decayTo;
 			}
 			else{
-				std::cout << "Warning: [Items::loadFromXml] Item  " << it->id << " has an infinate decay-chain" << std::endl;
+				std::cout << "Warning: [Items::loadFromXml] Item  " << it->id << " has an infinite decay-chain" << std::endl;
 				break;
 			}
 		}

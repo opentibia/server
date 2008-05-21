@@ -41,7 +41,7 @@ public:
 	bool addUser(Player* player);
 	bool removeUser(Player* player);
 
-	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text);
+	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time = 0);
 
 	const std::string& getName(){ return m_name; }
 	const uint16_t getId(){ return m_id; }

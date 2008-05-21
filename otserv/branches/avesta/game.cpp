@@ -842,7 +842,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 		toCylinder = subCylinder;
 		flags = 0;
 
-		//to prevent infinate loop
+		//to prevent infinite loop
 		if(++n >= MAP_MAX_LAYERS)
 			break;
 	}
@@ -3203,7 +3203,7 @@ bool Game::playerReportRuleViolation(Player* player, const std::string& text)
 
 	ChatChannel* channel = g_chat.getChannelById(0x03); //Rule Violations channel
 	if(channel){
-		channel->talk(player, SPEAK_RVR_CHANNEL, text);
+		channel->talk(player, SPEAK_RVR_CHANNEL, text, rvr->time);
 		return true;
 	}
 	return false;
