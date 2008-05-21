@@ -2504,7 +2504,7 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creatur
 			msg->AddU16(channelId);
 			break;
 		case SPEAK_RVR_CHANNEL:
-			msg->AddU32(std::time(NULL) - time);
+			msg->AddU32(time);
 			break;
 		default:
 			break;
