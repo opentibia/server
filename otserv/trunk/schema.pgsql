@@ -54,10 +54,10 @@ CREATE TABLE "players" (
     "loss_experience" INT NOT NULL DEFAULT 10,
     "loss_mana" INT NOT NULL DEFAULT 10,
     "loss_skills" INT NOT NULL DEFAULT 10,
-	"loss_items" INT NOT NULL DEFAULT 10,
+    "loss_items" INT NOT NULL DEFAULT 10,
     "rank_id" INT NOT NULL,
     "town_id" INT NOT NULL,
-	"balance" INT NOT NULL DEFAULT 0,
+    "balance" INT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id"),
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE,
@@ -125,7 +125,7 @@ CREATE TABLE "houses" (
     "owner" INT NOT NULL,
     "paid" BIGINT NOT NULL DEFAULT 0,
     "warnings" INT NOT NULL DEFAULT 0,
-	"lastwarning" BIGINT NOT NULL DEFAULT 0,
+    "lastwarning" BIGINT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id")
 );
 

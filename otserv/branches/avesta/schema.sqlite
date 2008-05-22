@@ -52,10 +52,10 @@ CREATE TABLE "players" (
     "loss_experience" INTEGER NOT NULL DEFAULT 10,
     "loss_mana" INTEGER NOT NULL DEFAULT 10,
     "loss_skills" INTEGER NOT NULL DEFAULT 10,
-	"loss_items" INTEGER NOT NULL DEFAULT 10,
+    "loss_items" INTEGER NOT NULL DEFAULT 10,
     "rank_id" INTEGER NOT NULL,
     "town_id" INTEGER NOT NULL,
-	"balance" INTEGER NOT NULL DEFAULT 0,
+    "balance" INTEGER NOT NULL DEFAULT 0,
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
@@ -82,7 +82,7 @@ CREATE TABLE "houses" (
     "owner" INTEGER NOT NULL,
     "paid" INTEGER NOT NULL DEFAULT 0,
     "warnings" INTEGER NOT NULL DEFAULT 0,
-	"lastwarning" INTEGER NOT NULL DEFAULT 0
+    "lastwarning" INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "house_lists" (
