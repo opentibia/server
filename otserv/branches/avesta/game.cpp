@@ -1745,20 +1745,11 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 		}
 
 		player->setNextStep(OTSYS_TIME() + delay);
-		player->setNextAction(OTSYS_TIME() + delay);
+		player->setNextAction(OTSYS_TIME() + player->getStepDuration());
 		Scheduler::getScheduler().addEvent(createSchedulerTask(
-			((uint32_t)delay), boost::bind(&Game::internalPlayerMove, this, playerId, direction)));
+			((uint32_t)delay), boost::bind(&Game::playerMove, this, playerId, direction)));
 		return false;
 	}
-
-	return internalPlayerMove(playerId, direction);
-}
-
-bool Game::internalPlayerMove(uint32_t playerId, Direction direction)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
 
 	player->setFollowCreature(NULL);
 	player->onWalk(direction);
@@ -2077,6 +2068,14 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return false;
 	}
 
+	if(!player->canDoAction()){
+		uint32_t delay = player->getNextActionTime();
+		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseItemEx, this,
+			playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
+		player->setDelayedActionTask(task);
+		return false;
+	}
+
 	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item, isHotkey);
 }
 
@@ -2121,6 +2120,14 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		}
 
 		player->sendCancelMessage(ret);
+		return false;
+	}
+
+	if(!player->canDoAction()){
+		uint32_t delay = player->getNextActionTime();
+		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseItem, this,
+			playerId, pos, stackPos, index, spriteId, isHotkey));
+		player->setDelayedActionTask(task);
 		return false;
 	}
 
@@ -2181,6 +2188,14 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		}
 
 		player->sendCancelMessage(ret);
+		return false;
+	}
+
+	if(!player->canDoAction()){
+		uint32_t delay = player->getNextActionTime();
+		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseBattleWindow, this,
+			playerId, fromPos, fromStackPos, creatureId, spriteId, isHotkey));
+		player->setDelayedActionTask(task);
 		return false;
 	}
 

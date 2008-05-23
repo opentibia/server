@@ -111,7 +111,8 @@ Creature()
 	tradeItem = NULL;
 
 	walkTask = NULL;
-	walkTaskEvent = 0;
+	walkTaskEvent = 0;	
+	actionTaskEvent = 0;
 
 	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;
@@ -1363,7 +1364,7 @@ void Player::onWalk(Direction& dir)
 {
 	Creature::onWalk(dir);
 	setNextStep(OTSYS_TIME() + getWalkDelay(dir));
-	setNextAction(OTSYS_TIME() + getWalkDelay(dir));
+	setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
 }
 
 void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
@@ -1513,13 +1514,33 @@ void Player::setDelayedWalkTask(SchedulerTask* task)
 	walkTask = task;
 }
 
+void Player::setDelayedActionTask(SchedulerTask* task)
+{
+	if(actionTaskEvent != 0){
+		Scheduler::getScheduler().stopEvent(actionTaskEvent);
+		actionTaskEvent = 0;
+	}
+	
+	actionTaskEvent = Scheduler::getScheduler().addEvent(task);
+}
+
+uint32_t Player::getNextActionTime() const
+{
+	int64_t time = nextAction - OTSYS_TIME();
+	if(time < SCHEDULER_MINTICKS){
+		return SCHEDULER_MINTICKS;
+	}
+
+	return time;
+}
+
+
 void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
 	sendPing(interval);
 
 	MessageBufferTicks += interval;
-
 	if(MessageBufferTicks >= 1500){
 		MessageBufferTicks = 0;
 		addMessageBuffer();
@@ -2932,19 +2953,14 @@ void Player::onAttacking(uint32_t interval)
 void Player::doAttacking(uint32_t interval)
 {
 	if(getAttackSpeed() <= attackTicks){
-		bool result = false;
-
 		Item* tool = getWeapon();
 		const Weapon* weapon = g_weapons->getWeapon(tool);
 
-		if(weapon && canDoAction()){
-			attackTicks = 0;
-			result = weapon->useWeapon(this, tool, attackedCreature);
-		}
-
-		if(!result){
-			//make next instant
-			attackTicks = getAttackSpeed();
+		if(weapon && (!weapon->interuptSwing() || canDoAction()) ){
+			bool result = weapon->useWeapon(this, tool, attackedCreature);
+			if(result){
+				attackTicks = 0;
+			}
 		}
 	}
 }

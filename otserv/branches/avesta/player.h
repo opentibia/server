@@ -528,9 +528,10 @@ public:
 	
 	void setNextAction(uint64_t time) {nextAction = time;}
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
+	uint32_t getNextActionTime() const;
 
 	void setNextStep(uint64_t time) {nextStep = time;}
-	bool canDoStep() const {return nextStep <= OTSYS_TIME();}
+	bool canDoStep() const {return (nextStep <= OTSYS_TIME() && eventWalk == 0);}
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
@@ -558,6 +559,7 @@ protected:
 	void updateInventoryWeigth();
 
 	void setDelayedWalkTask(SchedulerTask* task);
+	void setDelayedActionTask(SchedulerTask* task);
 
 	void die();
 	virtual void dropCorpse();
@@ -611,6 +613,7 @@ protected:
 	int32_t premiumDays;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
+	uint32_t actionTaskEvent;
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 
