@@ -86,9 +86,10 @@ Creature()
 	lastLoginSaved = 0;
 	npings = 0;
 	internal_ping = 0;
-	lastAction = 0;
 	MessageBufferTicks = 0;
 	MessageBufferCount = 0;
+	nextAction = 0;
+	nextStep = 0;
 
 	pzLocked = false;
 	bloodHitCount = 0;
@@ -1356,6 +1357,13 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		std::cout << (uint32_t)g_game.getPlayersOnline() << " players online." << std::endl;
 #endif
 	}
+}
+
+void Player::onWalk(Direction& dir)
+{
+	Creature::onWalk(dir);
+	setNextStep(OTSYS_TIME() + getWalkDelay(dir));
+	setNextAction(OTSYS_TIME() + getWalkDelay(dir));
 }
 
 void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
@@ -2929,7 +2937,7 @@ void Player::doAttacking(uint32_t interval)
 		Item* tool = getWeapon();
 		const Weapon* weapon = g_weapons->getWeapon(tool);
 
-		if(weapon && weapon->checkLastAction(this, 100)){
+		if(weapon && canDoAction()){
 			attackTicks = 0;
 			result = weapon->useWeapon(this, tool, attackedCreature);
 		}

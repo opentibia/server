@@ -145,7 +145,7 @@ protected:
 	bool enabled;
 	bool premium;
 	uint32_t level;
-	uint32_t magLevel;
+	int32_t magLevel;
 
 	int32_t mana;
 	int32_t manaPercent;

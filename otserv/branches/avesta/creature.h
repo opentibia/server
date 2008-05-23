@@ -198,7 +198,7 @@ public:
 	void stopEventWalk();
 
 	//walk events
-	void onWalk(Direction& dir);
+	virtual void onWalk(Direction& dir);
 	virtual void onWalkAborted() {};
 	virtual void onWalkComplete() {};
 
@@ -364,7 +364,7 @@ protected:
 
 	Position masterPos;
 	int32_t masterRadius;
-	uint64_t lastMove;
+	uint64_t lastStep;
 	uint32_t lastStepCost;
 	uint32_t baseSpeed;
 	int32_t varSpeed;

@@ -343,7 +343,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	Item* item, bool isHotkey)
 {
-	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
+	if(!player->canDoAction()){
 		return false;
 	}
 	
@@ -372,7 +372,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 		}
 	}
 
-	player->setLastAction(OTSYS_TIME());
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
 	return true;
 }
 
@@ -468,7 +468,7 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 	uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId /* = 0*/)
 {
-	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME)){
+	if(!player->canDoAction()){
 		return false;
 	}
 
@@ -501,7 +501,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		return false;
 	}
 
-	player->setLastAction(OTSYS_TIME());
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
 	return true;
 }
 

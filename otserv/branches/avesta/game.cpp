@@ -718,7 +718,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
 			return false;
 		}
-			else if(movingCreature->getZone() == ZONE_PROTECTION && !toTile->hasFlag(TILESTATE_PROTECTIONZONE)){
+		else if(movingCreature->getZone() == ZONE_PROTECTION && !toTile->hasFlag(TILESTATE_PROTECTIONZONE)){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			return false;
 		}
@@ -1739,6 +1739,13 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 
 	int32_t delay = player->getWalkDelay(direction);
 	if(delay > 0){
+		if(!player->canDoStep()){
+			player->sendCancelWalk();
+			return false;
+		}
+
+		player->setNextStep(OTSYS_TIME() + delay);
+		player->setNextAction(OTSYS_TIME() + delay);
 		Scheduler::getScheduler().addEvent(createSchedulerTask(
 			((uint32_t)delay), boost::bind(&Game::internalPlayerMove, this, playerId, direction)));
 		return false;
@@ -1753,17 +1760,9 @@ bool Game::internalPlayerMove(uint32_t playerId, Direction direction)
 	if(!player || player->isRemoved())
 		return false;
 
-	int32_t delay = player->getWalkDelay(direction);
-	if(delay <= 0) {
-		player->lastMove = OTSYS_TIME();
-		player->setFollowCreature(NULL);
-		player->onWalk(direction);
-		return (internalMoveCreature(player, direction) == RET_NOERROR);
-	} else {
-		// Prevent players from getting stuck
-		player->sendCancelWalk();
-	}
-	return false;
+	player->setFollowCreature(NULL);
+	player->onWalk(direction);
+	return (internalMoveCreature(player, direction) == RET_NOERROR);
 }
 
 bool Game::internalBroadcastMessage(Player* player, const std::string& text)

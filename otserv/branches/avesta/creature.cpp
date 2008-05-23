@@ -60,7 +60,7 @@ Creature::Creature() :
 	mana = 0;
 	manaMax = 0;
 
-	lastMove = 0;
+	lastStep = 0;
 	lastStepCost = 1;
 	baseSpeed = 220;
 	varSpeed = 0;
@@ -152,17 +152,20 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
-int64_t Creature::getTimeSinceLastMove() const {
-	if(lastMove)
-		return OTSYS_TIME() - lastMove;
+int64_t Creature::getTimeSinceLastMove() const
+{
+	if(lastStep){
+		return OTSYS_TIME() - lastStep;
+	}
+
 	return 0x7FFFFFFFFFFFFFFFLL;
 }
 
 int64_t Creature::getSleepTicks() const{
-	if(lastMove != 0){
+	if(lastStep != 0){
 		int64_t ct = OTSYS_TIME();
 		int64_t stepDuration = getStepDuration();
-		int64_t delay = stepDuration - (ct - lastMove);
+		int64_t delay = stepDuration - (ct - lastStep);
 		return delay;
 	}
 
@@ -524,8 +527,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	if(creature == this){
-		lastMove = OTSYS_TIME();
-
+		lastStep = OTSYS_TIME();
 		lastStepCost = 1;
 
 		if(!teleport){

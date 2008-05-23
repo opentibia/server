@@ -256,6 +256,7 @@ public:
 	virtual void onFollowCreature(const Creature* creature);
 
 	//walk events
+	virtual void onWalk(Direction& dir);
 	virtual void onWalkAborted();
 	virtual void onWalkComplete();
 
@@ -519,15 +520,17 @@ public:
 	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
 	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
-	void setLastAction(uint64_t time) {lastAction = time;}
-
 	Item* getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen);
 	void setWriteItem(Item* item, uint16_t _maxWriteLen = 0);
 
 	House* getEditHouse(uint32_t& _windowTextId, uint32_t& _listId);
 	void setEditHouse(House* house, uint32_t listId = 0);
+	
+	void setNextAction(uint64_t time) {nextAction = time;}
+	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 
-	int64_t getLastAction() const {return lastAction;}
+	void setNextStep(uint64_t time) {nextStep = time;}
+	bool canDoStep() const {return nextStep <= OTSYS_TIME();}
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
@@ -616,7 +619,8 @@ protected:
 
 	uint32_t internal_ping;
 	uint32_t npings;
-	int64_t lastAction;
+	int64_t nextAction;
+	int64_t nextStep;
 
 	bool pzLocked;
 	bool isConnecting;
