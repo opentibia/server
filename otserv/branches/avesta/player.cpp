@@ -2954,13 +2954,19 @@ void Player::doAttacking(uint32_t interval)
 {
 	if(getAttackSpeed() <= attackTicks){
 		Item* tool = getWeapon();
+		bool result = false;
 		const Weapon* weapon = g_weapons->getWeapon(tool);
-
-		if(weapon && (!weapon->interuptSwing() || canDoAction()) ){
-			bool result = weapon->useWeapon(this, tool, attackedCreature);
-			if(result){
-				attackTicks = 0;
+		if(weapon){
+			if(!weapon->interuptSwing() || canDoAction() ){
+				result = weapon->useWeapon(this, tool, attackedCreature);
 			}
+		}
+		else{
+			result = Weapon::useFist(this, attackedCreature);
+		}
+
+		if(result){
+			attackTicks = 0;
 		}
 	}
 }
