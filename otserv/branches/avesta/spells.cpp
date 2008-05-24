@@ -635,7 +635,7 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
-		if(player->getMagicLevel() < magLevel){
+		if(((int32_t)player->getMagicLevel()) < magLevel){
 			player->sendCancelMessage(RET_NOTENOUGHMAGICLEVEL);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
