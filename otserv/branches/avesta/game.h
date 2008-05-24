@@ -132,6 +132,7 @@ public:
 	uint32_t getInFightTicks() {return inFightTicks;}
 	int32_t getExhaustionTicks() {return exhaustionTicks;}
 	int32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
+	int32_t getHealExhaustionTicks() {return healExhaustionTicks;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
@@ -513,6 +514,7 @@ protected:
 	uint32_t inFightTicks;
 	uint32_t exhaustionTicks;
 	uint32_t fightExhaustionTicks;
+	uint32_t healExhaustionTicks;
 
 	GameState_t gameState;
 	WorldType_t worldType;

@@ -619,7 +619,8 @@ bool Spell::playerSpellCheck(Player* player) const
 			}
 		}
 
-		if(player->hasCondition(CONDITION_EXHAUSTED)){
+		if((isAggressive && player->hasCondition(CONDITION_EXHAUST_COMBAT)) || 
+			player->hasCondition(CONDITION_EXHAUST_HEAL)){
 			player->sendCancelMessage(RET_YOUAREEXHAUSTED);
 
 			if(isInstant()){
@@ -825,7 +826,12 @@ void Spell::postCastSpell(Player* player) const
 {
 	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
 		if(exhaustion){
-			player->addExhaustionTicks(isAggressive ? g_game.getFightExhaustionTicks() : g_game.getExhaustionTicks());
+			if(isAggressive){
+				player->addCombatExhaust(g_game.getFightExhaustionTicks());
+			}
+			else{
+				player->addHealExhaust(g_game.getHealExhaustionTicks());
+			}
 		}
 	}
 

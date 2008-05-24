@@ -1363,6 +1363,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 void Player::onWalk(Direction& dir)
 {
 	Creature::onWalk(dir);
+	setNextActionTask(NULL);
 	setNextAction(OTSYS_TIME() + getStepDuration());
 }
 
@@ -2105,9 +2106,15 @@ void Player::preSave()
 	}
 }
 
-void Player::addExhaustionTicks(uint32_t ticks)
+void Player::addCombatExhaust(uint32_t ticks)
 {
-	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, ticks, 0);
+	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, ticks, 0);
+	addCondition(condition);
+}
+
+void Player::addHealExhaust(uint32_t ticks)
+{
+	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_HEAL, ticks, 0);
 	addCondition(condition);
 }
 
@@ -2970,7 +2977,16 @@ void Player::doAttacking(uint32_t interval)
 		bool result = false;
 		const Weapon* weapon = g_weapons->getWeapon(tool);
 		if(weapon){
-			if(!weapon->interuptSwing() || canDoAction() ){
+			if(!weapon->interuptSwing()){
+				result = weapon->useWeapon(this, tool, attackedCreature);
+			}
+			else if(!canDoAction()){
+				uint32_t delay = getNextActionTime();
+				SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::checkCreatureAttack,
+					&g_game, getID()));
+				setNextActionTask(task);
+			}
+			else if(!hasCondition(CONDITION_EXHAUST_COMBAT)){
 				result = weapon->useWeapon(this, tool, attackedCreature);
 			}
 		}

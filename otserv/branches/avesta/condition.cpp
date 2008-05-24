@@ -234,6 +234,8 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
+		case CONDITION_EXHAUST_COMBAT:
+		case CONDITION_EXHAUST_HEAL:
 		case CONDITION_MUTED:
 		{
 			return new ConditionGeneric(_id, _type,_ticks);
