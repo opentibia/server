@@ -530,9 +530,6 @@ public:
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 	uint32_t getNextActionTime() const;
 
-	void setNextStep(uint64_t time) {nextStep = time;}
-	bool canDoStep() const {return (nextStep <= OTSYS_TIME() && eventWalk == 0);}
-
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
@@ -558,8 +555,9 @@ protected:
 
 	void updateInventoryWeigth();
 
-	void setDelayedWalkTask(SchedulerTask* task);
-	void setDelayedActionTask(SchedulerTask* task);
+	void setNextWalkActionTask(SchedulerTask* task);
+	void setNextWalkTask(SchedulerTask* task);
+	void setNextActionTask(SchedulerTask* task);
 
 	void die();
 	virtual void dropCorpse();
@@ -614,6 +612,7 @@ protected:
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 	uint32_t actionTaskEvent;
+	uint32_t nextStepEvent;
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 
@@ -623,7 +622,6 @@ protected:
 	uint32_t internal_ping;
 	uint32_t npings;
 	int64_t nextAction;
-	int64_t nextStep;
 
 	bool pzLocked;
 	bool isConnecting;

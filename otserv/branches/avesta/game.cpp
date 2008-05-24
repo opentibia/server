@@ -683,7 +683,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 
 			SchedulerTask* task = createSchedulerTask(1500, boost::bind(&Game::playerMoveCreature, this,
 				playerId, movingCreatureId, movingCreatureOrigPos, toPos));
-			player->setDelayedWalkTask(task);
+			player->setNextWalkActionTask(task);
 			return true;
 		}
 		else{
@@ -857,6 +857,14 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	if(!player || player->isRemoved())
 		return false;
 
+	if(!player->canDoAction()){
+		uint32_t delay = player->getNextActionTime();
+		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerMoveItem, this,
+			playerId, fromPos, spriteId, fromStackPos, toPos, count));
+		player->setNextActionTask(task);
+		return false;
+	}
+
 	Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
 	uint8_t fromIndex = 0;
 
@@ -924,7 +932,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 
 			SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerMoveItem, this,
 				playerId, fromPos, spriteId, fromStackPos, toPos, count));
-			player->setDelayedWalkTask(task);
+			player->setNextWalkActionTask(task);
 			return true;
 		}
 		else{
@@ -971,7 +979,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerMoveItem, this,
 					playerId, itemPos, spriteId, itemStackPos, toPos, count));
-				player->setDelayedWalkTask(task);
+				player->setNextWalkActionTask(task);
 				return true;
 			}
 			else{
@@ -1739,15 +1747,10 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 
 	int32_t delay = player->getWalkDelay(direction);
 	if(delay > 0){
-		if(!player->canDoStep()){
-			player->sendCancelWalk();
-			return false;
-		}
-
-		player->setNextStep(OTSYS_TIME() + delay);
 		player->setNextAction(OTSYS_TIME() + player->getStepDuration());
-		Scheduler::getScheduler().addEvent(createSchedulerTask(
-			((uint32_t)delay), boost::bind(&Game::playerMove, this, playerId, direction)));
+		SchedulerTask* task = createSchedulerTask( ((uint32_t)delay), boost::bind(&Game::playerMove, this,
+			playerId, direction));
+		player->setNextWalkTask(task);
 		return false;
 	}
 
@@ -1984,6 +1987,7 @@ bool Game::playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir)
 	if(!player || player->isRemoved())
 		return false;
 
+	player->setNextWalkTask(NULL);
 	return player->startAutoWalk(listDir);
 }
 
@@ -2055,7 +2059,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseItemEx, this,
 					playerId, itemPos, itemStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
-				player->setDelayedWalkTask(task);
+				player->setNextWalkActionTask(task);
 				return true;
 			}
 			else{
@@ -2072,7 +2076,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		uint32_t delay = player->getNextActionTime();
 		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseItemEx, this,
 			playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
-		player->setDelayedActionTask(task);
+		player->setNextActionTask(task);
 		return false;
 	}
 
@@ -2112,7 +2116,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseItem, this,
 					playerId, pos, stackPos, index, spriteId, isHotkey));
-				player->setDelayedWalkTask(task);
+				player->setNextWalkActionTask(task);
 				return true;
 			}
 
@@ -2127,7 +2131,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		uint32_t delay = player->getNextActionTime();
 		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseItem, this,
 			playerId, pos, stackPos, index, spriteId, isHotkey));
-		player->setDelayedActionTask(task);
+		player->setNextActionTask(task);
 		return false;
 	}
 
@@ -2180,7 +2184,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseBattleWindow, this,
 					playerId, fromPos, fromStackPos, creatureId, spriteId, isHotkey));
-				player->setDelayedWalkTask(task);
+				player->setNextWalkActionTask(task);
 				return true;
 			}
 
@@ -2195,7 +2199,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		uint32_t delay = player->getNextActionTime();
 		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseBattleWindow, this,
 			playerId, fromPos, fromStackPos, creatureId, spriteId, isHotkey));
-		player->setDelayedActionTask(task);
+		player->setNextActionTask(task);
 		return false;
 	}
 
@@ -2292,7 +2296,7 @@ bool Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 
 			SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerRotateItem, this,
 				playerId, pos, stackPos, spriteId));
-			player->setDelayedWalkTask(task);
+			player->setNextWalkActionTask(task);
 			return true;
 		}
 		else{
@@ -2421,7 +2425,7 @@ bool Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 
 			SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerRequestTrade, this,
 				playerId, pos, stackPos, tradePlayerId, spriteId));
-			player->setDelayedWalkTask(task);
+			player->setNextWalkActionTask(task);
 			return true;
 		}
 		else{

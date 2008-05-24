@@ -89,7 +89,6 @@ Creature()
 	MessageBufferTicks = 0;
 	MessageBufferCount = 0;
 	nextAction = 0;
-	nextStep = 0;
 
 	pzLocked = false;
 	bloodHitCount = 0;
@@ -113,6 +112,7 @@ Creature()
 	walkTask = NULL;
 	walkTaskEvent = 0;	
 	actionTaskEvent = 0;
+	nextStepEvent = 0;
 
 	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;
@@ -1363,8 +1363,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 void Player::onWalk(Direction& dir)
 {
 	Creature::onWalk(dir);
-	setNextStep(OTSYS_TIME() + getWalkDelay(dir));
-	setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
+	setNextAction(OTSYS_TIME() + getStepDuration());
 }
 
 void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
@@ -1504,7 +1503,7 @@ void Player::checkTradeState(const Item* item)
 	}
 }
 
-void Player::setDelayedWalkTask(SchedulerTask* task)
+void Player::setNextWalkActionTask(SchedulerTask* task)
 {
 	if(walkTaskEvent != 0){
 		Scheduler::getScheduler().stopEvent(walkTaskEvent);
@@ -1514,14 +1513,28 @@ void Player::setDelayedWalkTask(SchedulerTask* task)
 	walkTask = task;
 }
 
-void Player::setDelayedActionTask(SchedulerTask* task)
+void Player::setNextWalkTask(SchedulerTask* task)
+{
+	if(nextStepEvent != 0){
+		Scheduler::getScheduler().stopEvent(nextStepEvent);
+		nextStepEvent = 0;
+	}
+
+	if(task){
+		nextStepEvent = Scheduler::getScheduler().addEvent(task);
+	}
+}
+
+void Player::setNextActionTask(SchedulerTask* task)
 {
 	if(actionTaskEvent != 0){
 		Scheduler::getScheduler().stopEvent(actionTaskEvent);
 		actionTaskEvent = 0;
 	}
 	
-	actionTaskEvent = Scheduler::getScheduler().addEvent(task);
+	if(task){
+		actionTaskEvent = Scheduler::getScheduler().addEvent(task);
+	}
 }
 
 uint32_t Player::getNextActionTime() const
@@ -3052,7 +3065,7 @@ void Player::setFightMode(fightMode_t mode)
 
 void Player::onWalkAborted()
 {
-	setDelayedWalkTask(NULL);
+	setNextWalkActionTask(NULL);
 	sendCancelWalk();
 }
 
