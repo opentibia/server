@@ -822,28 +822,32 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 	return true;
 }
 
-void Spell::postCastSpell(Player* player) const
+void Spell::postCastSpell(Player* player, bool finishedCast /*= true*/, bool payCost /*= true*/) const
 {
-	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
-		if(exhaustion){
+	if(finishedCast){
+		if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
+			if(exhaustion){
+				if(isAggressive){
+					player->addCombatExhaust(g_game.getFightExhaustionTicks());
+				}
+				else{
+					player->addHealExhaust(g_game.getHealExhaustionTicks());
+				}
+			}
+		}
+
+		if(!player->hasFlag(PlayerFlag_NotGainInFight)){
 			if(isAggressive){
-				player->addCombatExhaust(g_game.getFightExhaustionTicks());
-			}
-			else{
-				player->addHealExhaust(g_game.getHealExhaustionTicks());
+				player->addInFightTicks();
 			}
 		}
 	}
 
-	if(!player->hasFlag(PlayerFlag_NotGainInFight)){
-		if(isAggressive){
-			player->addInFightTicks();
-		}
+	if(payCost){
+		int32_t manaCost = getManaCost(player);
+		int32_t soulCost = getSoulCost(player);
+		postCastSpell(player, (uint32_t)manaCost, (uint32_t)soulCost);
 	}
-
-	int32_t manaCost = getManaCost(player);
-	int32_t soulCost = getSoulCost(player);
-	postCastSpell(player, manaCost, soulCost);
 }
 
 void Spell::postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const
@@ -1566,7 +1570,7 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 	ReturnValue ret = Commands::placeSummon(creature, param);
 
 	if(ret == RET_NOERROR){
-		spell->postCastSpell(player, manaCost, spell->getSoulCost(player));
+		spell->postCastSpell(player, (uint32_t)manaCost, (uint32_t)spell->getSoulCost(player));
 		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
 	}
 	else{
@@ -1803,19 +1807,26 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 		}
 
 		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
-		spell->getReagentId(), SLOT_LEFT)){
-			spell->postCastSpell(player);
+			spell->getReagentId(), SLOT_LEFT)){
+			spell->postCastSpell(player, false);
 			result = true;
 		}
 
 		if(!spell->playerSpellCheck(player)){
+			//Finished the cast, add exhaustion and stuff
+			spell->postCastSpell(player, true, false);
 			return false;
 		}
 
 		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
-		spell->getReagentId(), SLOT_RIGHT)){
-			spell->postCastSpell(player);
+			spell->getReagentId(), SLOT_RIGHT)){
+			spell->postCastSpell(player, false);
 			result = true;
+		}
+
+		if(result){
+			//Finished the cast, add exhaustion and stuff
+			spell->postCastSpell(player, true, false);
 		}
 	}
 	else{
@@ -2044,7 +2055,7 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		return false;
 	}
 
-	spell->postCastSpell(player, manaCost, spell->getSoulCost(player));
+	spell->postCastSpell(player, (uint32_t)manaCost, (uint32_t)spell->getSoulCost(player));
 	g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
 	return true;
 }

@@ -118,7 +118,7 @@ public:
 	bool configureSpell(xmlNodePtr xmlspell);
 	const std::string& getName() const {return name;}
 
-	void postCastSpell(Player* player) const;
+	void postCastSpell(Player* player, bool finishedSpell = true, bool payCost = true) const;
 	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;
 
 	int32_t getManaCost(const Player* player) const;
