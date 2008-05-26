@@ -1746,6 +1746,7 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 	if(!player || player->isRemoved())
 		return false;
 
+	player->stopWalk();
 	int32_t delay = player->getWalkDelay(direction);
 	if(delay > 0){
 		player->setNextAction(OTSYS_TIME() + player->getStepDuration());
