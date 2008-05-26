@@ -953,7 +953,6 @@ bool Creature::setAttackedCreature(Creature* creature)
 
 	std::list<Creature*>::iterator cit;
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
-		(*cit)->setFollowCreature(NULL);
 		(*cit)->setAttackedCreature(creature);
 	}
 

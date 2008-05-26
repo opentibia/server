@@ -3450,7 +3450,7 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendChangeSpeed(creature, creature->getSpeed());
+			tmpPlayer->sendChangeSpeed(creature, creature->getStepSpeed());
 		}
 	}
 }

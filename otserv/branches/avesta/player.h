@@ -94,6 +94,9 @@ typedef std::map<uint32_t, uint32_t> MuteCountMap;
 typedef std::list<std::string> LearnedInstantSpellList;
 typedef std::list<Party*> PartyList;
 
+#define PLAYER_MAX_SPEED 1500
+#define PLAYER_MIN_SPEED 10
+
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
 
@@ -706,8 +709,19 @@ protected:
 #endif
 
 	void updateItemsLight(bool internal = false);
-	virtual int32_t getStepSpeed() const {return std::max((int32_t)55, getSpeed());}
-	void updateBaseSpeed(){
+	virtual int32_t getStepSpeed() const
+	{
+		if(getSpeed() > PLAYER_MAX_SPEED){
+			return PLAYER_MIN_SPEED;
+		}
+		else if(getSpeed() < PLAYER_MIN_SPEED){
+			return PLAYER_MIN_SPEED;
+		}
+		
+		return getSpeed();
+	}
+	void updateBaseSpeed()
+	{
 		if(!hasFlag(PlayerFlag_SetMaxSpeed)){
 			baseSpeed = 220 + (2* (level - 1));
 		}

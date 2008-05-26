@@ -319,10 +319,6 @@ bool Monster::isOpponent(const Creature* creature)
 		}
 	}
 
-	if(creature->getNpc()){
-		return true;
-	}
-
 	return false;
 }
 
@@ -536,11 +532,7 @@ void Monster::onThink(uint32_t interval)
 		addEventWalk();
 
 		if(isSummon()){
-			if(attackedCreature && attackedCreature != this && followCreature != attackedCreature){
-				//This happens just after a master orders an attack, so lets follow it aswell.
-				setFollowCreature(attackedCreature);
-			}
-			else if(!attackedCreature){
+			if(!attackedCreature){
 				if(getMaster() && getMaster()->getAttackedCreature()){
 					///This happens if the monster is summoned during combat
 					selectTarget(getMaster()->getAttackedCreature());
@@ -549,6 +541,13 @@ void Monster::onThink(uint32_t interval)
 					//Our master has not ordered us to attack anything, lets follow him around instead.
 					setFollowCreature(getMaster());
 				}
+			}
+			else if(attackedCreature == this){
+				setFollowCreature(NULL);
+			}
+			else if(followCreature != attackedCreature){
+				//This happens just after a master orders an attack, so lets follow it aswell.
+				setFollowCreature(attackedCreature);
 			}
 		}
 		else if(!targetList.empty()){
