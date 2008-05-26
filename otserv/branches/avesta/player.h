@@ -530,7 +530,7 @@ public:
 	House* getEditHouse(uint32_t& _windowTextId, uint32_t& _listId);
 	void setEditHouse(House* house, uint32_t listId = 0);
 	
-	void setNextAction(uint64_t time) {nextAction = time;}
+	void setNextAction(uint64_t time) {if(time > nextAction) {nextAction = time;}}
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 	uint32_t getNextActionTime() const;
 
