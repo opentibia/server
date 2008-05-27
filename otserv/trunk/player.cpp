@@ -1213,9 +1213,6 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 
 			storedConditionList.clear();
 		}
-
-		//scripting event - onLogIn
-		g_creatureEvents->playerLogIn(this);
 	}
 }
 
@@ -1302,9 +1299,6 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		}
 
 		g_chat.removeUserFromAllChannels(this);
-
-		//scripting event - onLogOut
-		g_creatureEvents->playerLogOut(this);
 
 		bool saved = false;
 		for(uint32_t tries = 0; tries < 3; ++tries){
@@ -3136,6 +3130,19 @@ void Player::onAttacked()
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		addInFightTicks();
 	}
+}
+
+void Player::onPlacedCreature()
+{
+	//scripting event - onLogIn
+	if(!g_creatureEvents->playerLogIn(this)){
+		kickPlayer();
+	}
+}
+
+void Player::onRemovedCreature()
+{
+	//
 }
 
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)

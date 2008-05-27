@@ -146,7 +146,7 @@ uint32_t CreatureEvents::playerLogIn(Player* player)
 	if(m_logInEvent){
 		return m_logInEvent->executeOnLogin(player);
 	}
-	return 0;
+	return 1;
 }
 
 uint32_t CreatureEvents::playerLogOut(Player* player)
@@ -155,7 +155,7 @@ uint32_t CreatureEvents::playerLogOut(Player* player)
 	if(m_logOutEvent){
 		return m_logOutEvent->executeOnLogout(player);
 	}
-	return 0;
+	return 1;
 }
 
 /////////////////////////////////////
@@ -275,7 +275,7 @@ uint32_t CreatureEvent::executeOnLogin(Player* player)
 		int32_t result = m_scriptInterface->callFunction(1);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnLogin" << std::endl;
@@ -308,7 +308,7 @@ uint32_t CreatureEvent::executeOnLogout(Player* player)
 		int32_t result = m_scriptInterface->callFunction(1);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnLogout" << std::endl;
@@ -343,7 +343,7 @@ uint32_t CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnDie" << std::endl;
@@ -378,7 +378,7 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target)
 		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnKill" << std::endl;

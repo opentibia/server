@@ -392,6 +392,10 @@ bool ProtocolGame::logout(bool forced)
 				return false;
 			}
 		}
+		else{
+			//execute the script even when we log out
+			g_creatureEvents->playerLogOut(player);
+		}
 	}
 
 	if(Connection* connection = getConnection()){

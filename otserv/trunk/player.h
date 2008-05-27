@@ -312,7 +312,8 @@ public:
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
 	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
-
+	virtual void onPlacedCreature();
+	virtual void onRemovedCreature();
 	virtual void getCreatureLight(LightInfo& light) const;
 
 #ifdef __SKULLSYSTEM__

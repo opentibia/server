@@ -464,6 +464,8 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 	creature->getParent()->postAddNotification(creature, newStackPos);
 
 	creature->addEventThink();
+
+	creature->onPlacedCreature();
 	return true;
 }
 
@@ -513,6 +515,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 		removeCreature(*cit);
 	}
 
+	creature->onRemovedCreature();
 	return true;
 }
 

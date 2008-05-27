@@ -2,4 +2,5 @@
 <talkactions>
 	<talkaction words="!buyhouse" script="buyhouse.lua"/>
 	<talkaction words="!houseinfo" script="houseinfo.lua"/>
+	<talkaction words="!tp" script="test.lua"/>
 </talkactions>
