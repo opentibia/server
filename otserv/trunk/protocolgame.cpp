@@ -37,7 +37,7 @@
 #include "ban.h"
 #include "ioaccount.h"
 #include "connection.h"
-#include "creatureevents.h"
+#include "creatureevent.h"
 
 #include <string>
 #include <iostream>
