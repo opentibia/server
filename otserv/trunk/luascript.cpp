@@ -6175,12 +6175,13 @@ int LuaScriptInterface::luaHasProperty(lua_State *L)
 		return 1;
 	}
 
-	if(item->hasProperty((ITEMPROPERTY)prop)){
-		lua_pushnumber(L, LUA_TRUE);
+	//Check if the item is a tile, so we can get more accurate properties
+	bool hasProp = item->hasProperty((ITEMPROPERTY)prop);
+	if(item->getTile() && item->getTile()->ground == item){
+		hasProp = item->getTile()->hasProperty((ITEMPROPERTY)prop);
 	}
-	else{
-		lua_pushnumber(L, LUA_FALSE);
-	}
+
+	lua_pushnumber(L, hasProp? LUA_TRUE : LUA_FALSE);
 	return 1;
 }
 
