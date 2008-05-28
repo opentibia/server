@@ -726,10 +726,10 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 	}
 
 	int intValue;
-	if(readXMLInteger(p, "hitChance", intValue)){
+	if(readXMLInteger(p, "hitChance", intValue) || readXMLInteger(p, "hitchance", intValue)){
 		std::cout << "Warning: hitChance is not longer used in weapons.xml." << std::endl;
 	}
-	if(readXMLInteger(p, "breakChance", intValue)){
+	if(readXMLInteger(p, "breakChance", intValue) || readXMLInteger(p, "breakchance", intValue)){
 		std::cout << "Warning: breakChance is not longer used in weapons.xml." << std::endl;
 	}
 

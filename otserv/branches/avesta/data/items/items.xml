@@ -5539,6 +5539,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="burstarrow"/>
+		<attribute key="hitChance" value="100"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2547" article="a" name="power bolt" plural="power bolts">
