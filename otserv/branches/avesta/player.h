@@ -712,7 +712,7 @@ protected:
 	virtual int32_t getStepSpeed() const
 	{
 		if(getSpeed() > PLAYER_MAX_SPEED){
-			return PLAYER_MIN_SPEED;
+			return PLAYER_MAX_SPEED;
 		}
 		else if(getSpeed() < PLAYER_MIN_SPEED){
 			return PLAYER_MIN_SPEED;
