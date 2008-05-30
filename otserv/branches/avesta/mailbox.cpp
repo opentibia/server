@@ -206,21 +206,25 @@ bool Mailbox::getReceiver(Item* item, std::string& name, uint32_t& dp)
 
 	std::string temp;
 	std::istringstream iss(item->getText(), std::istringstream::in);
-	int i = 0;
-	std::string line[2];
+
+	std::string strTown = "";
+	uint32_t curLine = 1;
 
 	while(getline(iss, temp, '\n')){
-		line[i] = temp;
-
-		if(i == 1){ /**Just read the two first lines.**/
+		if(curLine == 1){
+			name = temp;
+		}
+		else if(curLine == 2){
+			strTown = temp;
+		}
+		else{
 			break;
 		}
-		i++;
+
+		++curLine;
 	}
 
-	name = line[0];
-
-	Town* town = Towns::getInstance().getTown(line[1]);
+	Town* town = Towns::getInstance().getTown(strTown);
 	if(town){
 		dp = town->getTownID();
 	}

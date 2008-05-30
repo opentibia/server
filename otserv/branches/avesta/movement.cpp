@@ -50,7 +50,7 @@ void MoveEvents::clear()
 	MoveListMap::iterator it = m_itemIdMap.begin();
 	while(it != m_itemIdMap.end()){
 		for(int i = 0; i < MOVE_EVENT_LAST; ++i){
-			delete it->second.event[i];
+			delete it->second.moveEvent[i];
 		}
 		m_itemIdMap.erase(it);
 		it = m_itemIdMap.begin();
@@ -59,7 +59,7 @@ void MoveEvents::clear()
 	it = m_actionIdMap.begin();
 	while(it != m_actionIdMap.end()){
 		for(int i = 0; i < MOVE_EVENT_LAST; ++i){
-			delete it->second.event[i];
+			delete it->second.moveEvent[i];
 		}
 		m_actionIdMap.erase(it);
 		it = m_actionIdMap.begin();
@@ -68,7 +68,7 @@ void MoveEvents::clear()
 	it = m_uniqueIdMap.begin();
 	while(it != m_uniqueIdMap.end()){
 		for(int i = 0; i < MOVE_EVENT_LAST; ++i){
-			delete it->second.event[i];
+			delete it->second.moveEvent[i];
 		}
 		m_uniqueIdMap.erase(it);
 		it = m_uniqueIdMap.begin();
@@ -133,9 +133,18 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	else if(readXMLInteger(p,"actionid",id)){
 		addEvent(moveEvent, id, m_actionIdMap);
 	}
-	else if(readXMLString(p,"position",str)){
-		//TODO
-		success = false;
+	else if(readXMLString(p,"pos",str)){
+		std::vector<std::string> posList = explodeString(str, ";");
+		if(posList.size() < 3){
+			success = false;
+		}
+		else{
+			Position pos;
+			pos.x = atoi(posList[0].c_str());
+			pos.y = atoi(posList[1].c_str());
+			pos.z = atoi(posList[2].c_str());
+			addEvent(moveEvent, pos, m_positionMap);
+		}
 	}
 	else{
 		success = false;
@@ -143,18 +152,17 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	return success;
 }
 
-void MoveEvents::addEvent(MoveEvent* event, int32_t id, MoveListMap& map)
+void MoveEvents::addEvent(MoveEvent* moveEvent, int32_t id, MoveListMap& map)
 {
 	MoveListMap::iterator it = map.find(id);
 	if(it == map.end()){
 		MoveEventList moveEventList;
-		moveEventList.event[event->getEventType()] = event;
+		moveEventList.moveEvent[moveEvent->getEventType()] = moveEvent;
 		map[id] = moveEventList;
 	}
 	else{
-		it->second.event[event->getEventType()] = event;
+		it->second.moveEvent[moveEvent->getEventType()] = moveEvent;
 	}
-	return;
 }
 
 MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
@@ -163,21 +171,45 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
 	if(item->getUniqueId() != 0){
 		it = m_uniqueIdMap.find(item->getUniqueId());
 		if(it != m_uniqueIdMap.end()){
-			return it->second.event[eventType];
+			return it->second.moveEvent[eventType];
 		}
 	}
+
 	if(item->getActionId() != 0){
 		it = m_actionIdMap.find(item->getActionId());
 		if(it != m_actionIdMap.end()){
-			return it->second.event[eventType];
+			return it->second.moveEvent[eventType];
 		}
 	}
 
 	it = m_itemIdMap.find(item->getID());
 	if(it != m_itemIdMap.end()){
-	   	return it->second.event[eventType];
+	   	return it->second.moveEvent[eventType];
 	}
 
+	return NULL;
+}
+
+void MoveEvents::addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& map)
+{
+	MovePosListMap::iterator it = map.find(pos);
+	if(it == map.end()){
+		MoveEventList moveEventList;
+		moveEventList.moveEvent[moveEvent->getEventType()] = moveEvent;
+		map[pos] = moveEventList;
+	}
+	else{
+		it->second.moveEvent[moveEvent->getEventType()] = moveEvent;
+	}
+}
+
+MoveEvent* MoveEvents::getEvent(Tile* tile, MoveEvent_t eventType)
+{
+	MovePosListMap::iterator it = m_positionMap.find(tile->getPosition());
+	if(it != m_positionMap.end()){
+		return it->second.moveEvent[eventType];
+	}
+	
 	return NULL;
 }
 
@@ -192,14 +224,19 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 	}
 
 	uint32_t ret = 1;
+	MoveEvent* moveEvent = getEvent(tile, eventType);
+	if(moveEvent){
+		ret = ret & moveEvent->fireStepEvent(creature, NULL, tile->getPosition());
+	}
+
 	int32_t j = tile->__getLastIndex();
 	Item* tileItem = NULL;
 	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
 		if(thing && (tileItem = thing->getItem())){
-			MoveEvent* event = getEvent(tileItem, eventType);
-			if(event){
-				ret = ret & event->fireStepEvent(creature, tileItem, tile->getPosition());
+			moveEvent = getEvent(tileItem, eventType);
+			if(moveEvent){
+				ret = ret & moveEvent->fireStepEvent(creature, tileItem, tile->getPosition());
 			}
 		}
 	}
@@ -238,9 +275,15 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 	}
 
 	uint32_t ret = 1;
-	MoveEvent* event = getEvent(item, eventType1);
-	if(event){
-		ret = ret & event->fireAddRemItem(item, NULL, tile->getPosition());
+
+	MoveEvent* moveEvent = getEvent(tile, eventType1);
+	if(moveEvent){
+		ret = ret & moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
+	}
+
+	moveEvent = getEvent(item, eventType1);
+	if(moveEvent){
+		ret = ret & moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
 	}
 
 	int32_t j = tile->__getLastIndex();
@@ -248,9 +291,9 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
 		if(thing && (tileItem = thing->getItem()) && (tileItem != item)){
-			MoveEvent* event = getEvent(tileItem, eventType2);
-			if(event){
-				ret = ret & event->fireAddRemItem(item, tileItem, tile->getPosition());
+			moveEvent = getEvent(tileItem, eventType2);
+			if(moveEvent){
+				ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
 			}
 		}
 	}

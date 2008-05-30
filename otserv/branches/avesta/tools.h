@@ -49,6 +49,7 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
+std::vector<std::string> explodeString(const std::string& inString, const std::string& separator);
 bool hasBitSet(uint32_t flag, uint32_t flags);
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM);
