@@ -72,7 +72,7 @@ ConfigManager g_config;
 Game g_game;
 Commands commands(&g_game);
 Monsters g_monsters;
-Ban g_bans;
+BanManager g_bans;
 Vocations g_vocations;
 
 RSA* g_otservRSA = NULL;
@@ -203,6 +203,7 @@ int main(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 
 	//load bans
+	/*
 	std::cout << ":: Loading bans... ";
 	g_bans.init();
 	if(!g_bans.loadBans()){
@@ -210,6 +211,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
+	*/
 
 	std::stringstream filename;
 

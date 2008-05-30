@@ -39,9 +39,11 @@
 #include "ioplayer.h"
 #include "configmanager.h"
 #include "teleport.h"
+#include "ban.h"
 
 extern Game g_game;
 extern Monsters g_monsters;
+extern BanManager g_bans;
 extern ConfigManager g_config;
 extern Spells* g_spells;
 
@@ -628,6 +630,8 @@ bool LuaScriptInterface::initState()
 	luaopen_os(m_luaState);
 	luaopen_string(m_luaState);
 	luaopen_math(m_luaState);
+	// Unsafe, but immensely useful
+	luaopen_debug(m_luaState);
 #else
 	//And here you load both "safe" and "unsafe" libraries
 	luaL_openlibs(m_luaState);
@@ -704,18 +708,41 @@ void LuaScriptInterface::executeTimerEvent(uint32_t eventIndex)
 	}
 }
 
+int luaErrorHandler(lua_State *L) {
+	lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+	if (!lua_istable(L, -1)) {
+		lua_pop(L, 1);
+		return 1;
+	}
+	lua_getfield(L, -1, "traceback");
+	if (!lua_isfunction(L, -1)) {
+		lua_pop(L, 2);
+		return 1;
+	}
+	lua_pushvalue(L, 1);
+	lua_pushinteger(L, 2);
+	lua_call(L, 2, 1);
+	return 1;
+}
+
 int32_t LuaScriptInterface::callFunction(uint32_t nParams)
 {
 	int32_t result = LUA_NO_ERROR;
 
 	int size0 = lua_gettop(m_luaState);
-	if(lua_pcall(m_luaState, nParams, 1, 0) != 0){
+	
+	int error_index = lua_gettop(m_luaState) - nParams;
+	lua_pushcfunction(m_luaState, luaErrorHandler);
+	lua_insert(m_luaState, error_index);
+
+	int ret = lua_pcall(m_luaState, nParams, 1, error_index);
+	if(ret != 0){
 		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(m_luaState)));
 		result = LUA_ERROR;
-	}
-	else{
+	} else {
 		result = (int32_t)LuaScriptInterface::popNumber(m_luaState);
 	}
+	lua_remove(m_luaState, error_index);
 
 	if((lua_gettop(m_luaState) + (int)nParams  + 1) != size0){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
@@ -878,7 +905,8 @@ double LuaScriptInterface::popFloatNumber(lua_State *L)
 const char* LuaScriptInterface::popString(lua_State *L)
 {
 	lua_pop(L,1);
-	return lua_tostring(L, 0);
+	const char* str = lua_tostring(L, 0);
+	return str? str : "";
 }
 
 int32_t LuaScriptInterface::getField(lua_State *L, const char *key)
@@ -1545,6 +1573,46 @@ void LuaScriptInterface::registerFunctions()
 
 	//stopEvent(eventid)
 	lua_register(m_luaState, "stopEvent", LuaScriptInterface::luaStopEvent);
+
+
+	//addPlayerBan(playerName = 0xFFFFFFFF[, length = 0[, admin = 0[, comment = "No comment"]]])
+	lua_register(m_luaState, "addPlayerBan", LuaScriptInterface::luaAddPlayerBan);
+
+	//addAccountBan(accounNumber = 0xFFFFFFFF[, length = 0[, admin = 0[, comment = "No comment"]]])
+	lua_register(m_luaState, "addAccountBan", LuaScriptInterface::luaAddAccountBan);
+
+	//addIPBan(ip[, mask = 0xFFFFFFFF[, length = 0[, admin = 0[, comment = "No comment"]]]])
+	lua_register(m_luaState, "addIPBan", LuaScriptInterface::luaAddIPBan);
+
+	//removePlayerBan(playerName)
+	lua_register(m_luaState, "removePlayerBan", LuaScriptInterface::luaRemovePlayerBan);
+
+	//removeAccountBan(account)
+	lua_register(m_luaState, "removeAccountBan", LuaScriptInterface::luaRemoveAccountBan);
+	
+	//removeIPBan(ip[, mask])
+	lua_register(m_luaState, "removeIPBan", LuaScriptInterface::luaRemoveIPBan);
+
+	//getPlayerBanList()
+	lua_register(m_luaState, "getPlayerBanList", LuaScriptInterface::luaGetPlayerBanList);
+	
+	//getAccountBanList()
+	lua_register(m_luaState, "getAccountBanList", LuaScriptInterface::luaGetAccountBanList);
+	
+	//getIPBanList()
+	lua_register(m_luaState, "getIPBanList", LuaScriptInterface::luaGetIPBanList);
+	
+	//getPlayersByAccountNumber(account)
+	lua_register(m_luaState, "getPlayersByAccountNumber", LuaScriptInterface::luaGetPlayersByAccountNumber);
+
+	//getAccountNumberByPlayerName(name)
+	lua_register(m_luaState, "getAccountNumberByPlayerName", LuaScriptInterface::luaGetAccountNumberByPlayerName);
+	
+	//getIPByPlayerName(name)
+	lua_register(m_luaState, "getIPByPlayerName", LuaScriptInterface::luaGetIPByPlayerName);
+
+	//getPlayersByIPNumber(ip[, mask = 0xFFFFFFFF])
+	lua_register(m_luaState, "getPlayersByIPAddress", LuaScriptInterface::luaGetPlayersByIPAddress);
 
 	//getDataDir()
 	lua_register(m_luaState, "getDataDir", LuaScriptInterface::luaGetDataDirectory);
@@ -5614,7 +5682,92 @@ int LuaScriptInterface::luaGetPlayerByName(lua_State *L)
 		lua_pushnumber(L, LUA_NULL);
 	}
 	return 1;
+}
 
+int LuaScriptInterface::luaGetPlayersByAccountNumber(lua_State *L)
+{
+	//GetPlayerByAccountNumber(accountNumber)
+	uint32_t accno = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	lua_newtable(L);
+	PlayerVector players = g_game.getPlayersByAccount(accno);
+	int index = 0;
+	PlayerVector::iterator iter = players.begin();
+	while(iter != players.end()) {
+		uint32_t cid = env->addThing(*iter);
+
+		lua_pushnumber(L, index);
+		lua_pushnumber(L, cid);
+		lua_settable(L, -3);
+
+		++iter, ++index;
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetIPByPlayerName(lua_State *L)
+{
+	//getIPByPlayerName(playerName)
+	std::string name = popString(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	if(Player* player = g_game.getPlayerByName(name)){
+		lua_pushnumber(L, player->getIP());
+	}
+	else{
+		lua_pushnumber(L, LUA_NULL);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayersByIPAddress(lua_State *L)
+{
+	//getPlayersByIPAddress(ip[, mask])
+	int parameters = lua_gettop(L);
+	
+	uint32_t mask = 0xFFFFFFFF;
+	if(parameters > 1)
+		mask = (uint32_t)popNumber(L);
+	uint32_t ip = (uint32_t)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	lua_newtable(L);
+	PlayerVector players = g_game.getPlayersByIP(ip);
+	int index = 0;
+	PlayerVector::iterator iter = players.begin();
+	while(iter != players.end()) {
+		uint32_t cid = env->addThing(*iter);
+
+		lua_pushnumber(L, index);
+		lua_pushnumber(L, cid);
+		lua_settable(L, -3);
+
+		++iter, ++index;
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetAccountNumberByPlayerName(lua_State *L)
+{
+	//getPlayerGUIDByName(name)
+	std::string name = popString(L);
+
+	Player* player = g_game.getPlayerByName(name);
+	uint32_t value = LUA_NULL;
+
+	if(player){
+		value = player->getAccount();
+	}
+	else{
+		IOPlayer::instance()->getAccountByName(value, name);
+	}
+
+	lua_pushnumber(L, value);
+	return 1;
 }
 
 int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
@@ -6463,6 +6616,192 @@ int LuaScriptInterface::luaIsSightClear(lua_State *L)
 	return 1;
 }
 
+// Bans
+
+int LuaScriptInterface::luaAddPlayerBan(lua_State *L)
+{
+	//addPlayerBan(playerName[, length[, admin[, comment]]])
+	int32_t parameters = lua_gettop(L);
+
+	std::string comment = "No comment";
+	uint32_t admin = 0;
+	uint32_t length = 0;
+
+	if(parameters > 3)
+		comment = popString(L);
+	if(parameters > 2)
+		admin = popNumber(L);
+	if(parameters > 1)
+		length = popNumber(L);
+	std::string name = popString(L);
+
+	g_bans.addPlayerBan(name, (length > 0? std::time(NULL) + length : 0), admin, comment);
+
+	lua_pushnumber(L, LUA_TRUE);
+	return 1;
+}
+
+int LuaScriptInterface::luaAddIPBan(lua_State *L)
+{
+	//addIPBan(accno[, mask[, length[, admin[, comment]]]])
+	int32_t parameters = lua_gettop(L);
+
+	std::string comment = "No comment";
+	uint32_t admin = 0;
+	uint32_t length = 0;
+	uint32_t mask = 0xFFFFFFFF;
+
+	if(parameters > 4)
+		comment = popString(L);
+	if(parameters > 3)
+		admin = popNumber(L);
+	if(parameters > 2)
+		length = popNumber(L);
+	if(parameters > 1)
+		mask = popNumber(L);
+	uint32_t ip = popNumber(L);
+
+	g_bans.addIpBan(ip, mask, (length > 0? std::time(NULL) + length : 0), admin, comment);
+
+	lua_pushnumber(L, LUA_TRUE);
+	return 1;
+}
+
+int LuaScriptInterface::luaAddAccountBan(lua_State *L)
+{
+	//addAccountBan(accno[, length[, admin[, comment]]])
+	int32_t parameters = lua_gettop(L);
+
+	std::string comment = "No comment";
+	uint32_t admin = 0;
+	uint32_t length = 0;
+
+	if(parameters > 3)
+		comment = popString(L);
+	if(parameters > 2)
+		admin = popNumber(L);
+	if(parameters > 1)
+		length = popNumber(L);
+	uint32_t accno = popNumber(L);
+
+	g_bans.addAccountBan(accno, (length > 0? std::time(NULL) + length : 0), admin, comment);
+
+	lua_pushnumber(L, LUA_TRUE);
+	return 1;
+}
+
+int LuaScriptInterface::luaRemovePlayerBan(lua_State *L)
+{
+	//removePlayerBan(name)
+	std::string name = popString(L);
+
+	bool b = g_bans.removePlayerBans(name);
+
+	lua_pushnumber(L, b? LUA_TRUE : LUA_FALSE);
+	return 1;
+}
+
+int LuaScriptInterface::luaRemoveAccountBan(lua_State *L)
+{
+	//removeAccountBan(accno)
+	uint32_t accno = popNumber(L);
+
+	bool b = g_bans.removeAccountBans(accno);
+
+	lua_pushnumber(L, b? LUA_TRUE : LUA_FALSE);
+	return 1;
+}
+
+int LuaScriptInterface::luaRemoveIPBan(lua_State *L)
+{
+	//removeIPBan(accno)
+	int32_t parameters = lua_gettop(L);
+
+	uint32_t mask = 0xFFFFFFFF;
+	if(parameters > 1)
+		mask = popNumber(L);
+	uint32_t ip = popNumber(L);
+	bool b = g_bans.removeIpBans(ip, mask);
+
+	lua_pushnumber(L, b? LUA_TRUE : LUA_FALSE);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerBanList(lua_State *L)
+{
+	//getPlayerBanList()
+	std::vector<Ban> bans = g_bans.getBans(BAN_PLAYER);
+
+	lua_createtable(L, bans.size(), 0);
+	int index = 1;
+	for(std::vector<Ban>::const_iterator iter = bans.begin(); iter != bans.end(); ++iter, ++index) {
+		const Ban& ban = *iter;
+
+		lua_pushnumber(L, index);
+		lua_createtable(L, 5, 0);
+		setField(L, "player", ban.value);
+		std::string playername;
+		IOPlayer::instance()->getNameByGuid(atoi(ban.value.c_str()), playername);
+		setField(L, "playername", playername);
+		setField(L, "added", ban.added);
+		setField(L, "expires", ban.expires);
+		setField(L, "admin", ban.adminid);
+		setField(L, "reason", ban.reason);
+		setField(L, "comment", ban.comment);
+		lua_settable(L, -3);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetAccountBanList(lua_State *L)
+{
+	//getPlayerBanList()
+	std::vector<Ban> bans = g_bans.getBans(BAN_ACCOUNT);
+	
+	lua_createtable(L, bans.size(), 0);
+	int index = 1;
+	for(std::vector<Ban>::const_iterator iter = bans.begin(); iter != bans.end(); ++iter, ++index) {
+		const Ban& ban = *iter;
+		
+		lua_pushnumber(L, index);
+		lua_createtable(L, 5, 0);
+		setField(L, "type", ban.type);
+		setField(L, "account", ban.value);
+		setField(L, "added", ban.added);
+		setField(L, "expires", ban.expires);
+		setField(L, "admin", ban.adminid);
+		setField(L, "comment", ban.comment);
+		lua_settable(L, -3);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetIPBanList(lua_State *L)
+{
+	//getIPBanList()
+	std::vector<Ban> bans = g_bans.getBans(BAN_IPADDRESS);
+
+	lua_createtable(L, bans.size(), 0);
+	int index = 1;
+	for(std::vector<Ban>::const_iterator iter = bans.begin(); iter != bans.end(); ++iter, ++index) {
+		const Ban& ban = *iter;
+		
+		lua_pushnumber(L, index);
+		lua_createtable(L, 6, 0);
+		setField(L, "type", ban.type);
+		setField(L, "ip", ban.value);
+		setField(L, "mask", ban.param);
+		setField(L, "added", ban.added);
+		setField(L, "expires", ban.expires);
+		setField(L, "admin", ban.adminid);
+		setField(L, "comment", ban.comment);
+		lua_settable(L, -3);
+	}
+	return 1;
+}
+
+// Bit lib
+
 const luaL_Reg LuaScriptInterface::luaBitReg[] =
 {
 	//{"cast", LuaScriptInterface::luaBitCast},
@@ -6472,20 +6811,35 @@ const luaL_Reg LuaScriptInterface::luaBitReg[] =
 	{"bxor", LuaScriptInterface::luaBitXor},
 	{"lshift", LuaScriptInterface::luaBitLeftShift},
 	{"rshift", LuaScriptInterface::luaBitRightShift},
+	// Unsigned
+	{"ubnot", LuaScriptInterface::luaBitUNot},
+	{"uband", LuaScriptInterface::luaBitUAnd},
+	{"ubor", LuaScriptInterface::luaBitUOr},
+	{"ubxor", LuaScriptInterface::luaBitUXor},
+	{"ulshift", LuaScriptInterface::luaBitULeftShift},
+	{"urshift", LuaScriptInterface::luaBitURightShift},
 	//{"arshift", LuaScriptInterface::luaBitArithmeticalRightShift},
 	{NULL,NULL}
 };
 
 int LuaScriptInterface::luaBitNot(lua_State *L)
 {
-	int number = popNumber(L);
+	int32_t number = (int32_t)popNumber(L);
 	lua_pushnumber(L, ~number);
 	return 1;
 }
 
-#define MULTIOP(name, op) \
+int LuaScriptInterface::luaBitUNot(lua_State *L)
+{
+	uint32_t number = (uint32_t)popNumber(L);
+	lua_pushnumber(L, ~number);
+	return 1;
+}
+
+#define MULTIOP(type, name, op) \
 	int LuaScriptInterface::luaBit##name(lua_State *L) { \
-		int n = lua_gettop(L), i, w = popNumber(L); \
+		int n = lua_gettop(L); \
+		type i, w = (type)popNumber(L); \
 		for(i = 2; i <= n; ++i){ \
 			w op popNumber(L); \
 		} \
@@ -6493,16 +6847,21 @@ int LuaScriptInterface::luaBitNot(lua_State *L)
 		return 1; \
 	}
 
-MULTIOP(And, &=)
-MULTIOP(Or, |=)
-MULTIOP(Xor, ^=)
+MULTIOP(int32_t, And, &=)
+MULTIOP(int32_t, Or, |=)
+MULTIOP(int32_t, Xor, ^=)
+MULTIOP(uint32_t, UAnd, &=)
+MULTIOP(uint32_t, UOr, |=)
+MULTIOP(uint32_t, UXor, ^=)
 
-#define SHIFTOP(name, op) \
+#define SHIFTOP(type, name, op) \
 	int LuaScriptInterface::luaBit##name(lua_State *L) { \
-		int n2 = popNumber(L), n1 = popNumber(L); \
+		type n2 = (type)popNumber(L), n1 = (type)popNumber(L); \
 		lua_pushnumber(L, (n1 op n2)); \
 		return 1; \
 	}
 
-SHIFTOP(LeftShift, <<)
-SHIFTOP(RightShift, >>)
+SHIFTOP(int32_t, LeftShift, <<)
+SHIFTOP(int32_t, RightShift, >>)
+SHIFTOP(uint32_t, ULeftShift, <<)
+SHIFTOP(uint32_t, URightShift, >>)

@@ -34,7 +34,7 @@
 extern RSA* g_otservRSA;
 extern ConfigManager g_config;
 extern IPList serverIPs;
-extern Ban g_bans;
+extern BanManager g_bans;
 extern Game g_game;
 
 #ifdef __DEBUG_NET_DETAIL__
@@ -100,6 +100,11 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 
 	if(g_game.getGameState() == GAME_STATE_STARTUP){
 		disconnectClient(0x0A, "Gameworld is starting up. Please wait.");
+		return false;
+	}
+	
+	if(g_bans.isAccountDeleted(accnumber)){
+		disconnectClient(0x0A, "Your account has been deleted!");
 		return false;
 	}
 

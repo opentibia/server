@@ -13,6 +13,8 @@ CREATE TABLE `accounts` (
     `password` VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL COMMENT 'MD5'*//* VARCHAR(40) NOT NULL COMMENT 'SHA1'*/,
     `email` VARCHAR(255) NOT NULL DEFAULT '',
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
+    `deleted` TINYINT(1) NOT NULL DEFAULT 0,
+    `warned` TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
@@ -137,12 +139,19 @@ CREATE TABLE `house_lists` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `bans` (
-    `type` INT NOT NULL COMMENT 'this field defines if its ip, account, player, or any else ban',
-    `ip` INT UNSIGNED NOT NULL DEFAULT 0,
-    `mask` INT UNSIGNED NOT NULL DEFAULT 4294967295,
-    `player` INT UNSIGNED NOT NULL DEFAULT 0,
-    `account` INT UNSIGNED NOT NULL DEFAULT 0,
-    `time` INT UNSIGNED NOT NULL DEFAULT 0
+  `id` int(11) NOT NULL auto_increment,
+  `type` tinyint(1) unsigned NOT NULL,
+  `value` int(10) unsigned NOT NULL COMMENT 'ip, player guid, account number',
+  `param` int(10) unsigned NOT NULL default '0' COMMENT 'mask',
+  `active` tinyint(1) NOT NULL default '1',
+  `expires` int(10) unsigned NOT NULL,
+  `added` int(10) unsigned NOT NULL,
+  `adminid` int(11) NOT NULL default '0' COMMENT 'can be 0',
+  `comment` varchar(255) NOT NULL default 'No comment',
+  `reason` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `type` (`type`,`value`),
+  KEY `expires` (`expires`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tiles` (

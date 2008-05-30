@@ -364,6 +364,14 @@ protected:
 	static int luaDoSetCreatureDropLoot(lua_State *L);
 	static int luaGetPlayerSkullType(lua_State *L);
 
+	//queries
+	static int luaGetPlayerByName(lua_State *L);
+	static int luaGetPlayerGUIDByName(lua_State *L);
+	static int luaGetPlayersByAccountNumber(lua_State *L);
+	static int luaGetAccountNumberByPlayerName(lua_State *L);
+	static int luaGetIPByPlayerName(lua_State *L);
+	static int luaGetPlayersByIPAddress(lua_State *L);
+
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
 	static int luaGetThingfromPos(lua_State *L);
@@ -466,10 +474,6 @@ protected:
 	static int luaIsContainer(lua_State *L);
 	static int luaIsMoveable(lua_State *L);
 
-	static int luaGetPlayerByName(lua_State *L);
-	static int luaGetPlayerGUIDByName(lua_State *L);
-	static int luaRegisterCreatureEvent(lua_State *L);
-
 	//container
 	static int luaGetContainerSize(lua_State *L);
 	static int luaGetContainerCap(lua_State *L);
@@ -477,6 +481,17 @@ protected:
 	static int luaDoAddContainerItem(lua_State *L);
 	static int luaGetDepotId(lua_State *L);
 
+	// bans
+	static int luaAddPlayerBan(lua_State *L);
+	static int luaAddAccountBan(lua_State *L);
+	static int luaAddIPBan(lua_State *L);
+	static int luaRemoveAccountBan(lua_State *L);
+	static int luaRemovePlayerBan(lua_State *L);
+	static int luaRemoveIPBan(lua_State *L);
+	static int luaGetPlayerBanList(lua_State *L);
+	static int luaGetAccountBanList(lua_State *L);
+	static int luaGetIPBanList(lua_State *L);
+	
 	//
 	static int luaCreateCombatObject(lua_State *L);
 	static int luaCreateCombatArea(lua_State *L);
@@ -559,19 +574,26 @@ protected:
 	static int luaIsInArray(lua_State *L);
 	static int luaAddEvent(lua_State *L);
 	static int luaStopEvent(lua_State *L);
+	static int luaRegisterCreatureEvent(lua_State *L);
 
 	static int luaGetDataDirectory(lua_State *L);
 	//
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
 
-	static const luaL_Reg luaBitReg[7];
+	static const luaL_Reg luaBitReg[13];
 	static int luaBitNot(lua_State *L);
 	static int luaBitAnd(lua_State *L);
 	static int luaBitOr(lua_State *L);
 	static int luaBitXor(lua_State *L);
 	static int luaBitLeftShift(lua_State *L);
 	static int luaBitRightShift(lua_State *L);
+	static int luaBitUNot(lua_State *L);
+	static int luaBitUAnd(lua_State *L);
+	static int luaBitUOr(lua_State *L);
+	static int luaBitUXor(lua_State *L);
+	static int luaBitULeftShift(lua_State *L);
+	static int luaBitURightShift(lua_State *L);
 
 	lua_State* m_luaState;
 	std::string m_lastLuaError;

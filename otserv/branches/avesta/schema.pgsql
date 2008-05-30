@@ -13,6 +13,8 @@ CREATE TABLE "accounts" (
     "password" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255) NOT NULL DEFAULT '',
     "blocked" SMALLINT NOT NULL DEFAULT 0,
+    "deleted" SMALLINT NOT NULL DEFAULT 0,
+    "warned" SMALLINT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id")
 );
 
@@ -136,13 +138,19 @@ CREATE TABLE "house_lists" (
     FOREIGN KEY ("house_id") REFERENCES "houses" ("id") ON DELETE CASCADE
 );
 
-CREATE TABLE "bans" (
-    "type" INT NOT NULL,
-    "ip" BIGINT NOT NULL DEFAULT 0,
-    "mask" BIGINT NOT NULL DEFAULT 4294967295,
-    "player" BIGINT NOT NULL DEFAULT 0,
-    "account" BIGINT NOT NULL DEFAULT 0,
-    "time" BIGINT NOT NULL DEFAULT 0
+CREATE TABLE `bans` (
+  "id" BIGSERIAL,
+  "type" BIGINT NOT NULL,
+  "param" BIGINT NOT NULL,
+  "active" SMALLINT DEFAULT 0,
+  "expires" BIGINT NOT NULL,
+  "added" BIGINT NOT NULL,
+  "adminid" INT DEFAULT 0,
+  "comment" VARCHAR(255) NOT NULL DEFAULT "No comment",
+  "reason" INT DEFAULT 0,
+  PRIMARY KEY  ("id"),
+  KEY ("type", "value"),
+  KEY "expires"
 );
 
 CREATE TABLE "tiles" (

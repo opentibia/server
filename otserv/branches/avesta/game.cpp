@@ -54,6 +54,7 @@
 #include "configmanager.h"
 #include "server.h"
 #include "party.h"
+#include "ban.h"
 //[ added for beds system
 #include "beds.h"
 #include <iostream>
@@ -68,6 +69,7 @@ extern ConfigManager g_config;
 extern Server* g_server;
 extern Actions* g_actions;
 extern Commands commands;
+extern BanManager g_bans;
 extern Chat g_chat;
 extern TalkActions* g_talkactions;
 extern Spells* g_spells;
@@ -511,6 +513,34 @@ Player* Game::getPlayerByAccount(uint32_t acc)
 	}
 
 	return NULL;
+}
+
+PlayerVector Game::getPlayersByAccount(uint32_t acc)
+{
+	PlayerVector players;
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(!it->second->isRemoved()){
+			if(it->second->getAccount() == acc){
+				players.push_back(it->second);
+			}
+		}
+	}
+
+	return players;
+}
+
+PlayerVector Game::getPlayersByIP(uint32_t ipadress, uint32_t mask)
+{
+	PlayerVector players;
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(!it->second->isRemoved()){
+			if((it->second->getIP() & mask) == (ipadress & mask)){
+				players.push_back(it->second);
+			}
+		}
+	}
+
+	return players;
 }
 
 bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
@@ -3038,6 +3068,13 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return false;
 	}
 
+	
+	TalkActionResult_t result;
+	result = g_talkactions->onPlayerSpeak(player, type, text);
+	if(result == TALKACTION_BREAK){
+		return true;
+	}
+
 	if(playerSayCommand(player, type, text)){
 		return true;
 	}
@@ -3102,11 +3139,6 @@ bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string
 bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
 {
 	TalkActionResult_t result;
-	result = g_talkactions->playerSaySpell(player, type, text);
-	if(result == TALKACTION_BREAK){
-		return true;
-	}
-
 	result = g_spells->playerSaySpell(player, type, text);
 	if(result == TALKACTION_BREAK){
 		return internalCreatureSay(player, SPEAK_SAY, text);
@@ -4035,6 +4067,7 @@ void Game::shutdown()
 	Scheduler::getScheduler().stop();
 	Dispatcher::getDispatcher().stop();
 	Spawns::getInstance()->clear();
+	g_bans.clearTemporaryBans();
 
 	if(g_server){
 		g_server->stop();

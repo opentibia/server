@@ -52,7 +52,7 @@ extern Game g_game;
 extern ConfigManager g_config;
 extern Actions actions;
 extern RSA* g_otservRSA;
-extern Ban g_bans;
+extern BanManager g_bans;
 extern CreatureEvents* g_creatureEvents;
 Chat g_chat;
 
@@ -440,6 +440,11 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 
 	if(g_game.getGameState() == GAME_STATE_STARTUP){
 		disconnectClient(0x14, "Gameworld is starting up. Please wait.");
+		return false;
+	}
+
+	if(g_bans.isAccountDeleted(accnumber)){
+		disconnectClient(0x14, "Your account has been deleted!");
 		return false;
 	}
 
@@ -840,6 +845,7 @@ void ProtocolGame::GetFloorDescription(NetworkMessage* msg, int x, int y, int z,
 					msg->AddByte(0xFF);
 				}
 				skip = 0;
+
 
 				GetTileDescription(tile, msg);
 			}

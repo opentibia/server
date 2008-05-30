@@ -36,7 +36,7 @@ static void addLogLine(ProtocolAdmin* conn, eLogType type, int level, std::strin
 
 extern Game g_game;
 extern ConfigManager g_config;
-extern Ban g_bans;
+extern BanManager g_bans;
 extern RSA* g_otservRSA;
 
 AdminProtocolConfig* g_adminConfig = NULL;
@@ -371,15 +371,6 @@ void ProtocolAdmin::adminCommandCloseServer()
 
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	TRACK_MESSAGE(output);
-
-	if(!g_bans.saveBans()){
-		addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Bans");
-
-		output->AddByte(AP_MSG_COMMAND_FAILED);
-		output->AddString("Bans");
-		OutputMessagePool::getInstance()->send(output);
-		return;
-	}
 
 	if(!g_game.getMap()->saveMap()){
 		addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Map");

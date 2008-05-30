@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
-
 <talkactions>
-
-<talkaction words="!online" script="onlinelist.lua"/>
-
+	<talkaction words="!online" script="onlinelist.lua"/>
+	<talkaction words="/b" filter="first word" script="banmanager.lua"/>
+	<talkaction words="/bans" filter="first word" script="banmanager.lua"/>
 </talkactions>

@@ -709,6 +709,21 @@ bool IOPlayer::getGuidByName(uint32_t &guid, std::string& name)
 	return true;
 }
 
+bool IOPlayer::getAccountByName(uint32_t& account, std::string& name)
+{
+	Database* db = Database::instance();
+	DBResult* result;
+	DBQuery query;
+
+	if(!(result = db->storeQuery("SELECT `account_id` FROM `players` WHERE `name` = " + db->escapeString(name))))
+		return false;
+
+	account = result->getDataInt("account_id");
+
+	db->freeResult(result);
+	return true;
+}
+
 
 bool IOPlayer::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string& name)
 {
