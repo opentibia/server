@@ -74,10 +74,8 @@ public:
 	// player is waking up or being kicked because the house is sold.
 	void wakeUp(Player* player);
 
-	// find the partner bed item
-	bool findPartner();
-
-	// should I make a partner accessor/mutator?
+	// find the adjoin bed item
+	BedItem* getNextBedItem();
 
 protected:
 	// change itemid when a player sleeps in this bed
@@ -95,8 +93,6 @@ protected:
 	time_t sleepStart;
 	// House the bed belongs to
 	House* house;
-	// Partner Item
-	BedItem* partner;
 };
 
 

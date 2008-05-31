@@ -274,7 +274,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 			return RET_CANNOTUSETHISOBJECT;
 		}
 		bed->sleep(player);
-		// let's just allow any script execution to occur. :)
+		return RET_NOERROR;
 	}
 	//]
 

@@ -1128,10 +1128,21 @@ bool Items::loadFromXml(const std::string& datadir)
 		xmlFreeDoc(doc);
 	}
 
-	//check for loops
+	//Lets do some checks..
 	for(uint32_t i = 0; i < Item::items.size(); ++i){
 		const ItemType* it = Item::items.getElement(i);
-		if(!it || it->decayTo <= 0 || !it->moveable){
+
+		if(!it){
+			continue;
+		}
+
+		//check bed items
+		if((it->noSleeperID != 0 || it->maleSleeperID != 0 || it->femaleSleeperID != 0) && it->type != ITEM_TYPE_BED){
+			std::cout << "Warning: [Items::loadFromXml] Item " << it->id <<  "is not set as a bed-type." << std::endl;
+		}
+
+		//check looping decaying items
+		if(it->decayTo <= 0 || !it->moveable){
 			continue;
 		}
 	

@@ -332,8 +332,6 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 											BedItem* bed = item->getBed();
 											if(bed)
 											{
-												// first, try to find the partner
-                                                bed->findPartner();
                                                 // next, add it to the house
                                                 house->addBed(bed);
 											}

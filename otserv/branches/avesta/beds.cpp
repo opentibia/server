@@ -32,7 +32,6 @@ extern Game g_game;
 BedItem::BedItem(uint16_t _id) : Item(_id)
 {
 	house = NULL;
-	partner = NULL;
 	internalRemoveSleeper();
 }
 
@@ -94,7 +93,7 @@ bool BedItem::serializeAttr(PropWriteStream& propWriteStream)
 	return true;
 }
 
-bool BedItem::findPartner()
+BedItem* BedItem::getNextBedItem()
 {
 	Direction dir = Item::items[getID()].bedPartnerDir;
 	Position targetPos = getPosition();
@@ -104,24 +103,15 @@ bool BedItem::findPartner()
 		case SOUTH: targetPos.y++; break;
 		case EAST: targetPos.x++; break;
 		case WEST: targetPos.x--; break;
-		default: break;           // there are no diagonal beds
+		default: break;
 	}
 
 	Tile* tile = g_game.getMap()->getTile(targetPos);
-	if((tile != NULL))
-	{
-		partner = tile->getBedItem();
-
-		// if partner's partner hasn't already been set, do so
-		// I have it find its partner for support for larger beds - you never know,
-		// it may happen in the future.
-		if((partner != NULL) && (partner->partner == NULL)) {
-			partner->findPartner();
-		}
-
-		return (partner != NULL);
+	if(tile != NULL){
+		return tile->getBedItem();
 	}
-	return false;
+
+	return NULL;
 }
 
 bool BedItem::canUse(Player* player)
@@ -130,30 +120,22 @@ bool BedItem::canUse(Player* player)
 		return false;
 	}
 
-	//Sometimes the partner of the bed could not be found when loading the map
-	//This happens because the tile of the first partner was loaded, but the second wasn't
-	//Then let's verify if the bed really has the partner.
-	if(partner == NULL){
-		return findPartner();
-	}
-
-	// todo: prem check?
-	return true;
+	//TODO: premium check?
+	return isBed();
 }
 
 void BedItem::sleep(Player* player)
 {
-	// avoid crashes
-	if((house == NULL) || (partner == NULL)) {
-		return;
-	}
-
-	if((player == NULL) || player->isRemoved()) {
+	if((house == NULL) || (player == NULL) || player->isRemoved()) {
 		return;
 	}
 
 	internalSetSleeper(player);
-	partner->internalSetSleeper(player);
+
+	BedItem* nextBedItem = getNextBedItem();
+	if(nextBedItem){
+		nextBedItem->internalSetSleeper(player);
+	}
 
 	// update the BedSleepersMap
 	Beds::instance().setBedSleeper(this, player->getGUID());
@@ -162,17 +144,18 @@ void BedItem::sleep(Player* player)
 	player->getTile()->moveCreature(player, getTile());
 
 	// kick player after he sees himself walk onto the bed and it change id
-	Scheduler::getScheduler().addEvent(createSchedulerTask(50, boost::bind(&Player::kickPlayer, player)));
+	Scheduler::getScheduler().addEvent(createSchedulerTask(SCHEDULER_MINTICKS, boost::bind(&Player::kickPlayer, player)));
 
 	// change self and partner's appearance
 	updateAppearance(player);
-	partner->updateAppearance(player);
+	if(nextBedItem){
+		nextBedItem->updateAppearance(player);
+	}
 }
 
 void BedItem::wakeUp(Player* player)
 {
-	// avoid crashes
-	if((house == NULL) || (partner == NULL)) {
+	if(house == NULL){
 		return;
 	}
 
@@ -208,11 +191,17 @@ void BedItem::wakeUp(Player* player)
 
 	// unset sleep info
 	internalRemoveSleeper();
-	partner->internalRemoveSleeper();
+
+	BedItem* nextBedItem = getNextBedItem();
+	if(nextBedItem){
+		nextBedItem->internalRemoveSleeper();
+	}
 
 	// change self and partner's appearance
 	updateAppearance(NULL);
-	partner->updateAppearance(NULL);
+	if(nextBedItem){
+		nextBedItem->updateAppearance(NULL);
+	}
 }
 
 void BedItem::regeneratePlayer(Player* player) const
@@ -253,14 +242,22 @@ void BedItem::regeneratePlayer(Player* player) const
 void BedItem::updateAppearance(const Player* player)
 {
 	const ItemType& it = Item::items[getID()];
-	if(player == NULL) {
-		g_game.transformItem(this, it.noSleeperID);
-	}
-	else if(player->getSex() == PLAYERSEX_FEMALE) {
-		g_game.transformItem(this, it.femaleSleeperID);
-	}
-	else {
-		g_game.transformItem(this, it.maleSleeperID);
+	if(it.type == ITEM_TYPE_BED){
+		if(player == NULL) {
+			if(it.noSleeperID != 0){
+				g_game.transformItem(this, it.noSleeperID);
+			}
+		}
+		else if(player->getSex() == PLAYERSEX_FEMALE) {
+			if(it.femaleSleeperID != 0){
+				g_game.transformItem(this, it.femaleSleeperID);
+			}
+		}
+		else{
+			if(it.maleSleeperID != 0){
+				g_game.transformItem(this, it.maleSleeperID);
+			}
+		}
 	}
 }
 
