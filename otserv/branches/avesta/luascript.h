@@ -286,6 +286,7 @@ public:
 
 	bool pushFunction(int32_t functionId);
 
+	static int luaErrorHandler(lua_State* L);
 	int32_t callFunction(uint32_t nParams);
 
 	//push/pop common structures

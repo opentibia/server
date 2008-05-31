@@ -114,9 +114,9 @@ ItemType::ItemType()
 	replaceable = true;
 	//[ added for beds system
 	bedPartnerDir = NORTH;
-	maleSleeperID = 100;
-	femaleSleeperID = 100;
-	noSleeperID = 100;
+	maleSleeperID = 0;
+	femaleSleeperID = 0;
+	noSleeperID = 0;
 	//]
 }
 
@@ -1035,37 +1035,75 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "replaceable") == 0){
+							else if(strValue == "replaceable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.replaceable = (intValue != 0);
 								}
 							}
-							//[ added for beds system
-							else if(strcasecmp(strValue.c_str(), "partnerDirection") == 0)
+							else if(strValue == "partnerDirection")
 							{
-								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
-									it.bedPartnerDir = (Direction)intValue;
+								if(readXMLString(itemAttributesNode, "value", strValue)) {
+									if(strValue == "0" || strValue == "north" || strValue == "n") {
+										it.bedPartnerDir = NORTH;
+									} else if(strValue == "1" || strValue == "east" || strValue == "e") {
+										it.bedPartnerDir = EAST;
+									} else if(strValue == "2" || strValue == "south" || strValue == "s") {
+										it.bedPartnerDir = SOUTH;
+									} else if(strValue == "3" || strValue == "west" || strValue == "w") {
+										it.bedPartnerDir = WEST;
+									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "maleSleeper") == 0)
+							else if(strValue == "maleSleeper")
 							{
 								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
 									it.maleSleeperID = intValue;
+									ItemType& other = getItemType(intValue);
+									if(other.noSleeperID == 0) {
+										other.noSleeperID = it.id;
+
+										if(it.bedPartnerDir == NORTH)
+											other.bedPartnerDir = SOUTH;
+										if(it.bedPartnerDir == EAST)
+											other.bedPartnerDir = WEST;
+										if(it.bedPartnerDir == SOUTH)
+											other.bedPartnerDir = NORTH;
+										if(it.bedPartnerDir == WEST)
+											other.bedPartnerDir = EAST;
+									}
+									if(it.femaleSleeperID == 0)
+										it.femaleSleeperID = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "femaleSleeper") == 0)
+							else if(strValue == "femaleSleeper")
 							{
 								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
 									it.femaleSleeperID = intValue;
+									ItemType& other = getItemType(intValue);
+									if(other.noSleeperID == 0) {
+										other.noSleeperID = it.id;
+
+										if(it.bedPartnerDir == NORTH)
+											other.bedPartnerDir = SOUTH;
+										if(it.bedPartnerDir == EAST)
+											other.bedPartnerDir = WEST;
+										if(it.bedPartnerDir == SOUTH)
+											other.bedPartnerDir = NORTH;
+										if(it.bedPartnerDir == WEST)
+											other.bedPartnerDir = EAST;
+									}
+									if(it.maleSleeperID == 0)
+										it.maleSleeperID = intValue;
 								}
 							}
+							/*
 							else if(strcasecmp(strValue.c_str(), "noSleeper") == 0)
 							{
 								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
 									it.noSleeperID = intValue;
 								}
 							}
-							//]
+							*/
 							else{
 								std::cout << "Warning: [Items::loadFromXml] Unknown key value " << strValue  << std::endl;
 							}

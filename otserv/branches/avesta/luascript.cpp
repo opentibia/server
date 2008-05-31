@@ -708,7 +708,7 @@ void LuaScriptInterface::executeTimerEvent(uint32_t eventIndex)
 	}
 }
 
-int luaErrorHandler(lua_State *L) {
+int LuaScriptInterface::luaErrorHandler(lua_State *L) {
 	lua_getfield(L, LUA_GLOBALSINDEX, "debug");
 	if (!lua_istable(L, -1)) {
 		lua_pop(L, 1);
