@@ -1061,15 +1061,6 @@ bool Items::loadFromXml(const std::string& datadir)
 									ItemType& other = getItemType(intValue);
 									if(other.noSleeperID == 0) {
 										other.noSleeperID = it.id;
-
-										if(it.bedPartnerDir == NORTH)
-											other.bedPartnerDir = SOUTH;
-										if(it.bedPartnerDir == EAST)
-											other.bedPartnerDir = WEST;
-										if(it.bedPartnerDir == SOUTH)
-											other.bedPartnerDir = NORTH;
-										if(it.bedPartnerDir == WEST)
-											other.bedPartnerDir = EAST;
 									}
 									if(it.femaleSleeperID == 0)
 										it.femaleSleeperID = intValue;
@@ -1082,15 +1073,6 @@ bool Items::loadFromXml(const std::string& datadir)
 									ItemType& other = getItemType(intValue);
 									if(other.noSleeperID == 0) {
 										other.noSleeperID = it.id;
-
-										if(it.bedPartnerDir == NORTH)
-											other.bedPartnerDir = SOUTH;
-										if(it.bedPartnerDir == EAST)
-											other.bedPartnerDir = WEST;
-										if(it.bedPartnerDir == SOUTH)
-											other.bedPartnerDir = NORTH;
-										if(it.bedPartnerDir == WEST)
-											other.bedPartnerDir = EAST;
 									}
 									if(it.maleSleeperID == 0)
 										it.maleSleeperID = intValue;
