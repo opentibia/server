@@ -1074,6 +1074,28 @@ void Monster::die()
 	deactivate(true);
 }
 
+Item* Monster::getCorpse()
+{
+	Item* corpse = Creature::getCorpse();
+	if(corpse && corpse->isCorpse()){
+		Creature* _lastHitCreature = NULL;
+		Creature* _mostDamageCreature = NULL;
+		if(getKillers(&_lastHitCreature, &_mostDamageCreature) && _mostDamageCreature){
+			Player* killer = NULL;
+			if(_mostDamageCreature->getPlayer()){
+				killer = _mostDamageCreature->getPlayer();
+			}
+			else if(_mostDamageCreature->isSummon() && _mostDamageCreature->getMaster()->getPlayer()){
+				killer = _mostDamageCreature->getMaster()->getPlayer();
+			}
+
+			corpse->setCorpseOwner(killer->getID());
+		}
+	}
+
+	return corpse;
+}
+
 bool Monster::inDespawnRange(const Position& pos)
 {
 	if(spawn){

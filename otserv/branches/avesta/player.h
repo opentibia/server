@@ -152,6 +152,7 @@ public:
 	void closeContainer(uint32_t cid);
 	int32_t getContainerID(const Container* container) const;
 	Container* getContainer(uint32_t cid);
+	bool canOpenCorpse(uint32_t ownerId);
 
 	void addStorageValue(const uint32_t key, const int32_t value);
 	bool getStorageValue(const uint32_t key, int32_t& value) const;

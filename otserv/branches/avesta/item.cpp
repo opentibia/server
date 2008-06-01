@@ -124,6 +124,7 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 	count = 1;
 	charges = it.charges;
 	fluid = 0;
+	corpseOwner = 0;
 
 	if(it.isFluidContainer() || it.isSplash()){
 		fluid = _count;
@@ -146,6 +147,7 @@ Item::Item(const Item &i) :
 	count = i.count;
 	charges = i.charges;
 	fluid = i.fluid;
+	corpseOwner = i.corpseOwner;
 
 	m_attributes = i.m_attributes;
 	if(i.m_firstAttr){

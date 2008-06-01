@@ -699,6 +699,19 @@ void Player::closeContainer(uint32_t cid)
 #endif
 }
 
+bool Player::canOpenCorpse(uint32_t ownerId)
+{
+	if(getID() == ownerId){
+		return true;
+	}
+
+	if(party && party->canOpenCorpse(ownerId)){
+		return true;
+	}
+
+	return false;
+}
+
 uint16_t Player::getLookCorpse() const
 {
 	if(sex != 0)

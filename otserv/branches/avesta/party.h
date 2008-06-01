@@ -55,6 +55,7 @@ public:
 	void updatePartyIcons(Player* player);
 	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
+	bool canOpenCorpse(uint32_t ownerId);
 
 	void shareExperience(uint64_t experience);
 	bool setSharedExperience(Player* player, bool _sharedExpActive);

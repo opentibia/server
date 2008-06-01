@@ -83,6 +83,7 @@ ItemType::ItemType()
 	decayTo       = -1;
 	decayTime     = 0;
 	stopTime      = false;
+	isCorpse      = false;
 
 	allowDistRead = false;
 
@@ -268,10 +269,8 @@ int Items::loadFromOtb(std::string file)
 		iType->isHangable = hasBitSet(FLAG_HANGABLE, flags);
 		iType->allowDistRead = hasBitSet(FLAG_ALLOWDISTREAD, flags);
 		iType->rotable = hasBitSet(FLAG_ROTABLE, flags);
-
-		if(hasBitSet(FLAG_READABLE, flags)){
-			iType->canReadText = true;
-		}
+		iType->canReadText = hasBitSet(FLAG_READABLE, flags);
+		iType->isCorpse = hasBitSet(FLAG_CORPSE, flags);
 
 		attribute_t attrib;
 		datasize_t datalen = 0;

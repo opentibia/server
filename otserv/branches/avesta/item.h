@@ -314,6 +314,7 @@ public:
 	bool isRoteable() const {const ItemType& it = items[id]; return it.rotable && it.rotateTo;}
 	bool isDoor() const {return items[id].isDoor();}
 	bool isBed() const {return items[id].isBed();}
+	bool isCorpse() const {return items[id].isCorpse;}
 	bool hasCharges() const {return items[id].charges != 0;}
 
 	bool floorChangeDown() const {return items[id].floorChangeDown;}
@@ -352,6 +353,9 @@ public:
 	uint32_t getDefaultDuration() const {return items[id].decayTime * 1000;}
 	bool canDecay();
 
+	uint32_t getCorpseOwner() const {return corpseOwner;}
+	void setCorpseOwner(uint32_t newOwner) {corpseOwner = newOwner;}
+
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
@@ -367,6 +371,8 @@ protected:
 	uint8_t count; // number of stacked items
 	uint8_t charges; //number of charges on the item
 	uint8_t fluid; //fluid type
+
+	uint32_t corpseOwner; //anti-looting system
 };
 
 #endif

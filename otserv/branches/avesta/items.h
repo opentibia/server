@@ -193,6 +193,7 @@ public:
 	int32_t        decayTo;
 	uint32_t       decayTime;
 	bool           stopTime;
+	bool           isCorpse;
 
 	bool            canReadText;
 	bool            canWriteText;

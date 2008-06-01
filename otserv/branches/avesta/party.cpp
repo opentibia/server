@@ -475,3 +475,22 @@ void Party::clearPlayerPoints(Player* player)
 		updateSharedExperience();
 	}
 }
+
+bool Party::canOpenCorpse(uint32_t ownerId)
+{
+	Player* player = g_game.getPlayerByID(ownerId);
+	if(!player){
+		return false;
+	}
+
+	PlayerVector::iterator it = std::find(memberList.begin(), memberList.end(), player);
+	if(it == memberList.end()){
+		return false;
+	}
+
+	if(leader->getID() != ownerId){
+		return false;
+	}
+
+	return true;
+}

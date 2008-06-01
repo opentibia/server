@@ -64,7 +64,7 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 		uint32_t currentTime = std::time(NULL);
 		query << 
 			"SELECT "
-				"COUNT(*) AS count "
+				"COUNT(*) AS `count` "
 			"FROM "
 				"`bans` "
 			"WHERE "
@@ -192,7 +192,7 @@ bool BanManager::isPlayerBanished(uint32_t playerId) const
 	uint32_t currentTime = std::time(NULL);
 	query << 
 		"SELECT "
-			"COUNT(*) AS count "
+			"COUNT(*) AS `count` "
 		"FROM "
 			"`bans` "
 		"WHERE "
@@ -218,7 +218,7 @@ bool BanManager::isAccountBanished(uint32_t account) const
 	uint32_t currentTime = std::time(NULL);
 	query << 
 		"SELECT "
-			"COUNT(*) AS count "
+			"COUNT(*) AS `count` "
 		"FROM "
 			"`bans` "
 		"WHERE "
