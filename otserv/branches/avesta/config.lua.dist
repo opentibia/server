@@ -65,6 +65,9 @@ minactionexinterval = 1000
 -- options: daily, weekly, monthly
 houserentperiod = "monthly"
 
+-- whether or not to check for premium accounts when using beds
+premonlybeds = "no"
+
 -- Should the server use account balance system or depot system for paying houses?
 useaccbalance = "no"
 

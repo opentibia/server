@@ -100,6 +100,7 @@ public:
 		PASSWORD_TYPE,
 		SQL_PORT,
 		STATUSQUERY_TIMEOUT,
+		PREMIUM_ONLY_BEDS,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

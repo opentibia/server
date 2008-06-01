@@ -22,11 +22,13 @@
 
 #include "beds.h"
 #include "house.h"
-#include "ioplayer.h" // getNameByGUID :o
+#include "ioplayer.h"
 #include "game.h"
 #include "player.h"
+#include "configmanager.h"
 
 extern Game g_game;
+extern ConfigManager g_config;
 
 
 BedItem::BedItem(uint16_t _id) : Item(_id)
@@ -107,7 +109,7 @@ BedItem* BedItem::getNextBedItem()
 	}
 
 	Tile* tile = g_game.getMap()->getTile(targetPos);
-	if(tile != NULL){
+	if(tile != NULL) {
 		return tile->getBedItem();
 	}
 
@@ -116,14 +118,14 @@ BedItem* BedItem::getNextBedItem()
 
 bool BedItem::canUse(Player* player)
 {
-	if(house == NULL || !player->isPremium())
+
+	if(house == NULL || (g_config.getNumber(PREMIUM_ONLY_BEDS) != 0 &&
+		!player->isPremium()))
 	{
 		return false;
 	}
 	else if(sleeperGUID != 0)
 	{
-		// this check saves us the hassle of loading the player if it's not needed
-		// - thus a performance gain :>
 		if(house->getHouseAccessLevel(player) != HOUSE_OWNER)
 		{
 			std::string name;
@@ -154,14 +156,11 @@ bool BedItem::canUse(Player* player)
 
 void BedItem::sleep(Player* player)
 {
-	if((house == NULL) || (player == NULL) || player->isRemoved())
-	{
+	if((house == NULL) || (player == NULL) || player->isRemoved()) {
 		return;
 	}
 
-	if(sleeperGUID != 0)
-	{
-		// wakeup + poof, that's all we are doing here :-)
+	if(sleeperGUID != 0) {
 		g_game.addMagicEffect(this->getPosition(), NM_ME_PUFF);
 		wakeUp(g_game.getPlayerByID(sleeperGUID));
 	}
@@ -177,10 +176,8 @@ void BedItem::sleep(Player* player)
 		// update the BedSleepersMap
 		Beds::instance().setBedSleeper(this, player->getGUID());
 
-		// make the player walk onto the bed
+		// make the player walk onto the bed and kick him
 		player->getTile()->moveCreature(player, getTile());
-
-		// kick player after he sees himself walk onto the bed and it change id
 		Scheduler::getScheduler().addEvent(createSchedulerTask(SCHEDULER_MINTICKS, boost::bind(&Player::kickPlayer, player)));
 
 		// change self and partner's appearance
@@ -193,19 +190,15 @@ void BedItem::sleep(Player* player)
 
 void BedItem::wakeUp(Player* player)
 {
-	if(house == NULL)
-	{
+	if(house == NULL) {
 		return;
 	}
 
 	if(sleeperGUID != 0)
 	{
-		// TODO: Clean up
-		std::string name;
-
-		// if player == NULL - most likely the house the player is sleeping in was sold
 		if((player == NULL))
 		{
+			std::string name;
 			if(IOPlayer::instance()->getNameByGuid(sleeperGUID, name))
 			{
 				player = new Player(name, NULL);
@@ -229,7 +222,6 @@ void BedItem::wakeUp(Player* player)
 	// update the BedSleepersMap
 	Beds::instance().setBedSleeper(NULL, sleeperGUID);
 
-	// unset sleep info
 	internalRemoveSleeper();
 
 	BedItem* nextBedItem = getNextBedItem();

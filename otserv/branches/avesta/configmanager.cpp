@@ -120,6 +120,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalNumber(L, "saveclientdebug", 0);
 	m_confInteger[CHECK_ACCOUNTS] = getGlobalNumber(L, "checkaccounts", 0);
 	m_confString[USE_ACCBALANCE] = getGlobalString(L, "useaccbalance", "no");
+	m_confInteger[PREMIUM_ONLY_BEDS] = (getGlobalString(L, "premonlybeds", "yes") == "yes");
 
 	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
 	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
