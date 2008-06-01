@@ -119,7 +119,7 @@ BedItem* BedItem::getNextBedItem()
 bool BedItem::canUse(Player* player)
 {
 
-	if(house == NULL || (g_config.getNumber(PREMIUM_ONLY_BEDS) != 0 &&
+	if(house == NULL || (g_config.getNumber(ConfigManager::PREMIUM_ONLY_BEDS) != 0 &&
 		!player->isPremium()))
 	{
 		return false;
