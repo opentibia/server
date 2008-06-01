@@ -116,46 +116,85 @@ BedItem* BedItem::getNextBedItem()
 
 bool BedItem::canUse(Player* player)
 {
-	if((house == NULL) || (sleeperGUID != 0)) {
+	if(house == NULL || !player->isPremium())
+	{
 		return false;
 	}
+	else if(sleeperGUID != 0)
+	{
+		// this check saves us the hassle of loading the player if it's not needed
+		// - thus a performance gain :>
+		if(house->getHouseAccessLevel(player) != HOUSE_OWNER)
+		{
+			std::string name;
 
-	//TODO: premium check?
+			if(IOPlayer::instance()->getNameByGuid(sleeperGUID, name))
+			{
+				Player* sleeper = new Player(name, NULL);
+
+				if(IOPlayer::instance()->loadPlayer(sleeper, name))
+				{
+					// compares house access of the kicker (player) to the sleeper
+					// kicker can only kick if he has greater or equal access to the house
+					// IE: Guest cannot kick sub-owner, sub-owner can kick guest; sub-owner cannot kick owner, owner can kick sub-owner
+					if(house->getHouseAccessLevel(sleeper) <= house->getHouseAccessLevel(player))
+					{
+						return isBed();
+					}
+
+					sleeper->releaseThing2();
+				}
+			}
+			return false;
+		}
+	}
+
 	return isBed();
 }
 
 void BedItem::sleep(Player* player)
 {
-	if((house == NULL) || (player == NULL) || player->isRemoved()) {
+	if((house == NULL) || (player == NULL) || player->isRemoved())
+	{
 		return;
 	}
 
-	internalSetSleeper(player);
-
-	BedItem* nextBedItem = getNextBedItem();
-	if(nextBedItem){
-		nextBedItem->internalSetSleeper(player);
+	if(sleeperGUID != 0)
+	{
+		// wakeup + poof, that's all we are doing here :-)
+		g_game.addMagicEffect(this->getPosition(), NM_ME_PUFF);
+		wakeUp(g_game.getPlayerByID(sleeperGUID));
 	}
+	else
+	{
+		internalSetSleeper(player);
 
-	// update the BedSleepersMap
-	Beds::instance().setBedSleeper(this, player->getGUID());
+		BedItem* nextBedItem = getNextBedItem();
+		if(nextBedItem) {
+			nextBedItem->internalSetSleeper(player);
+		}
 
-	// make the player walk onto the bed
-	player->getTile()->moveCreature(player, getTile());
+		// update the BedSleepersMap
+		Beds::instance().setBedSleeper(this, player->getGUID());
 
-	// kick player after he sees himself walk onto the bed and it change id
-	Scheduler::getScheduler().addEvent(createSchedulerTask(SCHEDULER_MINTICKS, boost::bind(&Player::kickPlayer, player)));
+		// make the player walk onto the bed
+		player->getTile()->moveCreature(player, getTile());
 
-	// change self and partner's appearance
-	updateAppearance(player);
-	if(nextBedItem){
-		nextBedItem->updateAppearance(player);
+		// kick player after he sees himself walk onto the bed and it change id
+		Scheduler::getScheduler().addEvent(createSchedulerTask(SCHEDULER_MINTICKS, boost::bind(&Player::kickPlayer, player)));
+
+		// change self and partner's appearance
+		updateAppearance(player);
+		if(nextBedItem) {
+			nextBedItem->updateAppearance(player);
+		}
 	}
 }
 
 void BedItem::wakeUp(Player* player)
 {
-	if(house == NULL){
+	if(house == NULL)
+	{
 		return;
 	}
 
@@ -167,20 +206,21 @@ void BedItem::wakeUp(Player* player)
 		// if player == NULL - most likely the house the player is sleeping in was sold
 		if((player == NULL))
 		{
-			bool ret = IOPlayer::instance()->getNameByGuid(sleeperGUID, name);
-			if(ret)
+			if(IOPlayer::instance()->getNameByGuid(sleeperGUID, name))
 			{
 				player = new Player(name, NULL);
-				ret = IOPlayer::instance()->loadPlayer(player, name);
 
-				if(ret) {
+				if(IOPlayer::instance()->loadPlayer(player, name))
+				{
 					regeneratePlayer(player);
 					IOPlayer::instance()->savePlayer(player);
 				}
 
 				player->releaseThing2();
 			}
-		} else {
+		}
+		else
+		{
 			regeneratePlayer(player);
 			g_game.addCreatureHealth(player);
 		}

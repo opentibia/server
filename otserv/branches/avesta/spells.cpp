@@ -642,13 +642,13 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
-		if(player->getMana() < getManaCost(player)){
+		if(player->getMana() < getManaCost(player) && !player->hasFlag(PlayerFlag_HasInfiniteMana)){
 			player->sendCancelMessage(RET_NOTENOUGHMANA);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
 
-		if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){
+		if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul && !player->hasFlag(PlayerFlag_HasInfiniteSoul)){
 			player->sendCancelMessage(RET_NOTENOUGHSOUL);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
