@@ -668,7 +668,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 		while(attributeNode){
 			if(xmlStrcmp(attributeNode->name, (const xmlChar*)"attribute") == 0){
 				if(readXMLString(attributeNode, "key", strValue)){
-					if(strcasecmp(strValue.c_str(), "shootEffect") == 0){
+					if(strValue == "shootEffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
 							ShootType_t shoot = getShootType(strValue);
 							if(shoot != NM_SHOOT_UNK){
@@ -679,7 +679,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 							}
 						}
 					}
-					else if(strcasecmp(strValue.c_str(), "areaEffect") == 0){
+					else if(strValue == "areaEffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
 							MagicEffectClasses effect = getMagicEffect(strValue);
 							if(effect != NM_ME_UNK){
@@ -755,16 +755,16 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 		}
 
 		if(readXMLString(root, "race", strValue)){
-			if((strcasecmp(strValue.c_str(), "venom") == 0) || (atoi(strValue.c_str()) == 1)){
+			if((strValue == "venom") || (atoi(strValue.c_str()) == 1)){
 				mType->race = RACE_VENOM;
 			}
-			else if((strcasecmp(strValue.c_str(), "blood") == 0) || (atoi(strValue.c_str()) == 2)){
+			else if((strValue == "blood") || (atoi(strValue.c_str()) == 2)){
 				mType->race = RACE_BLOOD;
 			}
-			else if((strcasecmp(strValue.c_str(), "undead") == 0) || (atoi(strValue.c_str()) == 3)){
+			else if((strValue == "undead") || (atoi(strValue.c_str()) == 3)){
 				mType->race = RACE_UNDEAD;
 			}
-			else if((strcasecmp(strValue.c_str(), "fire") == 0) || (atoi(strValue.c_str()) == 4)){
+			else if((strValue == "fire") || (atoi(strValue.c_str()) == 4)){
 				mType->race = RACE_FIRE;
 			}
 			else{
@@ -998,53 +998,53 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 
 						if(readXMLString(tmpNode, "name", strValue)){
 
-							if(strcasecmp(strValue.c_str(), "physical") == 0){
+							if(strValue == "physical"){
 								mType->damageImmunities |= COMBAT_PHYSICALDAMAGE;
 								//mType->conditionImmunities |= CONDITION_PHYSICAL;
 							}
-							else if(strcasecmp(strValue.c_str(), "energy") == 0){
+							else if(strValue == "energy"){
 								mType->damageImmunities |= COMBAT_ENERGYDAMAGE;
 								mType->conditionImmunities |= CONDITION_ENERGY;
 							}
-							else if(strcasecmp(strValue.c_str(), "fire") == 0){
+							else if(strValue == "fire"){
 								mType->damageImmunities |= COMBAT_FIREDAMAGE;
 								mType->conditionImmunities |= CONDITION_FIRE;
 							}
-							else if(strcasecmp(strValue.c_str(), "poison") == 0 ||
-									strcasecmp(strValue.c_str(), "earth") == 0){
+							else if(strValue == "poison" ||
+									strValue == "earth"){
 								mType->damageImmunities |= COMBAT_EARTHDAMAGE;
 								mType->conditionImmunities |= CONDITION_POISON;
 							}
-							else if(strcasecmp(strValue.c_str(), "drown") == 0){
+							else if(strValue == "drown"){
 								mType->damageImmunities |= COMBAT_DROWNDAMAGE;
 								mType->conditionImmunities |= CONDITION_DROWN;
 							}
-							else if(strcasecmp(strValue.c_str(), "ice") == 0){
+							else if(strValue == "ice"){
 								mType->damageImmunities |= COMBAT_ICEDAMAGE;
 								mType->conditionImmunities |= CONDITION_FREEZING;
 							}
-							else if(strcasecmp(strValue.c_str(), "holy") == 0){
+							else if(strValue == "holy"){
 								mType->damageImmunities |= COMBAT_HOLYDAMAGE;
 								mType->conditionImmunities |= CONDITION_DAZZLED;
 							}
-							else if(strcasecmp(strValue.c_str(), "death") == 0){
+							else if(strValue == "death"){
 								mType->damageImmunities |= COMBAT_DEATHDAMAGE;
 								mType->conditionImmunities |= CONDITION_CURSED;
 							}
-							else if(strcasecmp(strValue.c_str(), "lifedrain") == 0){
+							else if(strValue == "lifedrain"){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
 							}
-							else if(strcasecmp(strValue.c_str(), "paralyze") == 0){
+							else if(strValue == "paralyze"){
 								mType->conditionImmunities |= CONDITION_PARALYZE;
 							}
-							else if(strcasecmp(strValue.c_str(), "outfit") == 0){
+							else if(strValue == "outfit"){
 								mType->conditionImmunities |= CONDITION_OUTFIT;
 							}
-							else if(strcasecmp(strValue.c_str(), "drunk") == 0){
+							else if(strValue == "drunk"){
 								mType->conditionImmunities |= CONDITION_DRUNK;
 							}
-							else if(strcasecmp(strValue.c_str(), "invisible") == 0){
+							else if(strValue == "invisible"){
 								mType->conditionImmunities |= CONDITION_INVISIBLE;
 							}
 							else{

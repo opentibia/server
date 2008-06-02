@@ -374,34 +374,34 @@ bool MoveEvent::configureEvent(xmlNodePtr p)
 
 		if(m_eventType == MOVE_EVENT_EQUIP || m_eventType == MOVE_EVENT_DEEQUIP){
 			if(readXMLString(p, "slot", str)){
-				if(strcasecmp(str.c_str(), "head") == 0){
+				if(str == "head"){
 					slot = SLOT_HEAD;
 				}
-				else if(strcasecmp(str.c_str(), "necklace") == 0){
+				else if(str == "necklace"){
 					slot = SLOT_NECKLACE;
 				}
-				else if(strcasecmp(str.c_str(), "backpack") == 0){
+				else if(str == "backpack"){
 					slot = SLOT_BACKPACK;
 				}
-				else if(strcasecmp(str.c_str(), "armor") == 0){
+				else if(str == "armor"){
 					slot = SLOT_ARMOR;
 				}
-				else if(strcasecmp(str.c_str(), "right-hand") == 0){
+				else if(str, "right-hand"){
 					slot = SLOT_RIGHT;
 				}
-				else if(strcasecmp(str.c_str(), "left-hand") == 0){
+				else if(str, "left-hand"){
 					slot = SLOT_LEFT;
 				}
-				else if(strcasecmp(str.c_str(), "legs") == 0){
+				else if(str == "legs"){
 					slot = SLOT_LEGS;
 				}
-				else if(strcasecmp(str.c_str(), "feet") == 0){
+				else if(str == "feet"){
 					slot = SLOT_FEET;
 				}
-				else if(strcasecmp(str.c_str(), "ring") == 0){
+				else if(str == "ring"){
 					slot = SLOT_RING;
 				}
-				else if(strcasecmp(str.c_str(), "ammo") == 0){
+				else if(str == "ammo"){
 					slot = SLOT_AMMO;
 				}
 				else{

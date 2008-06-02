@@ -544,7 +544,7 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 								}
 							}
 							else if(readXMLString(q, "use", str)){
-								if(strcasecmp(str.c_str(), "otserv") == 0){
+								if(str == "otserv"){
 									m_key_RSA1024XTEA = g_otservRSA;
 								}
 								else{

@@ -414,26 +414,26 @@ bool Items::loadFromXml(const std::string& datadir)
 
 					while(itemAttributesNode){
 						if(readXMLString(itemAttributesNode, "key", strValue)){
-							if(strcasecmp(strValue.c_str(), "type") == 0){
+							if(strValue == "type"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(strcasecmp(strValue.c_str(), "key") == 0){
+									if(strValue == "key"){
 										it.group = ITEM_GROUP_KEY;
 									}
-									else if(strcasecmp(strValue.c_str(), "magicfield") == 0){
+									else if(strValue == "magicfield"){
 										it.group = ITEM_GROUP_MAGICFIELD;
 										it.type = ITEM_TYPE_MAGICFIELD;
 									}
-									else if(strcasecmp(strValue.c_str(), "depot") == 0){
+									else if(strValue == "depot"){
 										it.type = ITEM_TYPE_DEPOT;
 									}
-									else if(strcasecmp(strValue.c_str(), "mailbox") == 0){
+									else if(strValue == "mailbox"){
 										it.type = ITEM_TYPE_MAILBOX;
 									}
-									else if(strcasecmp(strValue.c_str(), "trashholder") == 0){
+									else if(strValue == "trashholder"){
 										it.type = ITEM_TYPE_TRASHHOLDER;
 									}
 									//[ added for beds system
-									else if(strcasecmp(strValue.c_str(), "bed") == 0){
+									else if(strValue == "bed"){
 										it.type = ITEM_TYPE_BED;
 									}
 									//]
@@ -442,115 +442,115 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "name") == 0){
+							else if(strValue == "name"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.name = strValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "article") == 0){
+							else if(strValue == "article"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.article = strValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "plural") == 0){
+							else if(strValue == "plural"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.pluralName = strValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "description") == 0){
+							else if(strValue == "description"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.description = strValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "runeSpellName") == 0){
+							else if(strValue == "runeSpellName"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.runeSpellName = strValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "weight") == 0){
+							else if(strValue == "weight"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.weight = intValue / 100.f;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "showcount") == 0){
+							else if(strValue == "showcount"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.showCount = (intValue != 0);
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "armor") == 0){
+							else if(strValue == "armor"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.armor = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "defense") == 0){
+							else if(strValue == "defense"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.defence = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "extradef") == 0){
+							else if(strValue == "extradef"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.extraDef = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "attack") == 0){
+							else if(strValue == "attack"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.attack = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "rotateTo") == 0){
+							else if(strValue == "rotateTo"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.rotateTo = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "containerSize") == 0){
+							else if(strValue == "containerSize"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.maxItems = intValue;
 								}
 							}
 							/*
-							else if(strcasecmp(strValue.c_str(), "readable") == 0){
+							else if(strValue == "readable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.canReadText = true;
 								}
 							}
 							*/
-							else if(strcasecmp(strValue.c_str(), "writeable") == 0){
+							else if(strValue == "writeable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.canWriteText = (intValue != 0);
 									it.canReadText = (intValue != 0);
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "maxTextLen") == 0){
+							else if(strValue == "maxTextLen"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.maxTextLen = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "writeOnceItemId") == 0){
+							else if(strValue == "writeOnceItemId"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.writeOnceItemId = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "weaponType") == 0){
+							else if(strValue == "weaponType"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(strcasecmp(strValue.c_str(), "sword") == 0){
+									if(strValue == "sword"){
 										it.weaponType = WEAPON_SWORD;
 									}
-									else if(strcasecmp(strValue.c_str(), "club") == 0){
+									else if(strValue == "club"){
 										it.weaponType = WEAPON_CLUB;
 									}
-									else if(strcasecmp(strValue.c_str(), "axe") == 0){
+									else if(strValue == "axe"){
 										it.weaponType = WEAPON_AXE;
 									}
-									else if(strcasecmp(strValue.c_str(), "shield") == 0){
+									else if(strValue == "shield"){
 										it.weaponType = WEAPON_SHIELD;
 									}
-									else if(strcasecmp(strValue.c_str(), "distance") == 0){
+									else if(strValue == "distance"){
 										it.weaponType = WEAPON_DIST;
 									}
-									else if(strcasecmp(strValue.c_str(), "wand") == 0){
+									else if(strValue == "wand"){
 										it.weaponType = WEAPON_WAND;
 									}
-									else if(strcasecmp(strValue.c_str(), "ammunition") == 0){
+									else if(strValue == "ammunition"){
 										it.weaponType = WEAPON_AMMO;
 									}
 									else{
@@ -558,30 +558,30 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "slotType") == 0){
+							else if(strValue == "slotType"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(strcasecmp(strValue.c_str(), "head") == 0){
+									if(strValue == "head"){
 										it.slot_position |= SLOTP_HEAD;
 									}
-									else if(strcasecmp(strValue.c_str(), "body") == 0){
+									else if(strValue == "body"){
 										it.slot_position |= SLOTP_ARMOR;
 									}
-									else if(strcasecmp(strValue.c_str(), "legs") == 0){
+									else if(strValue == "legs"){
 										it.slot_position |= SLOTP_LEGS;
 									}
-									else if(strcasecmp(strValue.c_str(), "feet") == 0){
+									else if(strValue == "feet"){
 										it.slot_position |= SLOTP_FEET;
 									}
-									else if(strcasecmp(strValue.c_str(), "backpack") == 0){
+									else if(strValue == "backpack"){
 										it.slot_position |= SLOTP_BACKPACK;
 									}
 									else if(strcasecmp(strValue.c_str(), "two-handed") == 0){
 										it.slot_position |= SLOTP_TWO_HAND;
 									}
-									else if(strcasecmp(strValue.c_str(), "necklace") == 0){
+									else if(strValue == "necklace"){
 										it.slot_position |= SLOTP_NECKLACE;
 									}
-									else if(strcasecmp(strValue.c_str(), "ring") == 0){
+									else if(strValue == "ring"){
 										it.slot_position |= SLOTP_RING;
 									}
 									else{
@@ -589,7 +589,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "ammoType") == 0){
+							else if(strValue == "ammoType"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.amuType = getAmmoType(strValue);
 									if(it.amuType == AMMO_NONE){
@@ -597,7 +597,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "shootType") == 0){
+							else if(strValue == "shootType"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									ShootType_t shoot = getShootType(strValue);
 									if(shoot != NM_SHOOT_UNK){
@@ -608,7 +608,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "effect") == 0){
+							else if(strValue == "effect"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									MagicEffectClasses effect = getMagicEffect(strValue);
 									if(effect != NM_ME_UNK){
@@ -619,52 +619,52 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "range") == 0){
+							else if(strValue == "range"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.shootRange = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "stopduration") == 0){
+							else if(strValue == "stopduration"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.stopTime = (intValue != 0);
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "decayTo") == 0){
+							else if(strValue == "decayTo"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.decayTo = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "transformEquipTo") == 0){
+							else if(strValue == "transformEquipTo"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.transformEquipTo = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "transformDeEquipTo") == 0){
+							else if(strValue == "transformDeEquipTo"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.transformDeEquipTo = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "duration") == 0){
+							else if(strValue == "duration"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.decayTime = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "showduration") == 0){
+							else if(strValue == "showduration"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.showDuration = (intValue != 0);
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "charges") == 0){
+							else if(strValue == "charges"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.charges = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "showcharges") == 0){
+							else if(strValue == "showcharges"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.showCharges = (intValue != 0);
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "breakChance") == 0){
+							else if(strValue == "breakChance"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									if(intValue < 0){
 										intValue = 0;
@@ -676,7 +676,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.breakChance = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "ammoAction") == 0){
+							else if(strValue == "ammoAction"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									it.ammoAction = getAmmoAction(strValue);
 
@@ -685,7 +685,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "hitChance") == 0){
+							else if(strValue == "hitChance"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									if(intValue < 0){
 										intValue = 0;
@@ -697,7 +697,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.hitChance = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "maxHitChance") == 0){
+							else if(strValue == "maxHitChance"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									if(intValue < 0){
 										intValue = 0;
@@ -709,257 +709,257 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.maxHitChance = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "invisible") == 0){
+							else if(strValue == "invisible"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.invisible = (intValue != 0);
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "speed") == 0){
+							else if(strValue == "speed"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.speed = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "healthGain") == 0){
+							else if(strValue == "healthGain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.regeneration = true;
 									it.abilities.healthGain = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "healthTicks") == 0){
+							else if(strValue == "healthTicks"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.regeneration = true;
 									it.abilities.healthTicks = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "manaGain") == 0){
+							else if(strValue == "manaGain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.regeneration = true;
 									it.abilities.manaGain = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "manaTicks") == 0){
+							else if(strValue == "manaTicks"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.regeneration = true;
 									it.abilities.manaTicks = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "manaShield") == 0){
+							else if(strValue == "manaShield"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.manaShield = (intValue != 0);
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "skillSword") == 0){
+							else if(strValue == "skillSword"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.skills[SKILL_SWORD] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "skillAxe") == 0){
+							else if(strValue == "skillAxe"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.skills[SKILL_AXE] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "skillClub") == 0){
+							else if(strValue == "skillClub"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.skills[SKILL_CLUB] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "skillDist") == 0){
+							else if(strValue == "skillDist"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.skills[SKILL_DIST] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "skillFish") == 0){
+							else if(strValue == "skillFish"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.skills[SKILL_FISH] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "skillShield") == 0){
+							else if(strValue == "skillShield"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.skills[SKILL_SHIELD] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "skillFist") == 0){
+							else if(strValue == "skillFist"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.skills[SKILL_FIST] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "maxHitPoints") == 0){
+							else if(strValue == "maxHitPoints"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.stats[STAT_MAXHITPOINTS] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "maxHitPointsPercent") == 0){
+							else if(strValue == "maxHitPointsPercent"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.statsPercent[STAT_MAXHITPOINTS] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "maxManaPoints") == 0){
+							else if(strValue == "maxManaPoints"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.stats[STAT_MAXMANAPOINTS] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "maxManaPointsPercent") == 0){
+							else if(strValue == "maxManaPointsPercent"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.statsPercent[STAT_MAXMANAPOINTS] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "soulPoints") == 0){
+							else if(strValue == "soulPoints"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.stats[STAT_SOULPOINTS] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "soulPointsPercent") == 0){
+							else if(strValue == "soulPointsPercent"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.statsPercent[STAT_SOULPOINTS] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "magicPoints") == 0){
+							else if(strValue == "magicPoints"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.stats[STAT_MAGICPOINTS] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "magicPointsPercent") == 0){
+							else if(strValue == "magicPointsPercent"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.statsPercent[STAT_MAGICPOINTS] = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentAll") == 0){
+							else if(strValue == "absorbPercentAll"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentAll = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentEnergy") == 0){
+							else if(strValue == "absorbPercentEnergy"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentEnergy = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentFire") == 0){
+							else if(strValue == "absorbPercentFire"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentFire = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentPoison") == 0 ||
-									strcasecmp(strValue.c_str(), "absorbPercentEarth") == 0){
+							else if(strValue == "absorbPercentPoison" ||
+									strValue == "absorbPercentEarth"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentEarth = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentIce") == 0){
+							else if(strValue == "absorbPercentIce"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentIce = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentHoly") == 0){
+							else if(strValue == "absorbPercentHoly"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentHoly = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentDeath") == 0){
+							else if(strValue == "absorbPercentDeath"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentDeath = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentLifeDrain") == 0){
+							else if(strValue == "absorbPercentLifeDrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentLifeDrain = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentManaDrain") == 0){
+							else if(strValue == "absorbPercentManaDrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentManaDrain = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentDrown") == 0){
+							else if(strValue == "absorbPercentDrown"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentDrown = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentPhysical") == 0){
+							else if(strValue == "absorbPercentPhysical"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentPhysical = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressDrunk") == 0){
+							else if(strValue == "suppressDrunk"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_DRUNK;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressEnergy") == 0){
+							else if(strValue == "suppressEnergy"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_ENERGY;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressFire") == 0){
+							else if(strValue == "suppressFire"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_FIRE;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressPoison") == 0){
+							else if(strValue == "suppressPoison"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_POISON;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressLifeDrain") == 0){
+							else if(strValue == "suppressLifeDrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_LIFEDRAIN;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressDrown") == 0){
+							else if(strValue == "suppressDrown"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_DROWN;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressFreeze") == 0){
+							else if(strValue == "suppressFreeze"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_FREEZING;
 								}
 							}
 
-							else if(strcasecmp(strValue.c_str(), "suppressDazzle") == 0){
+							else if(strValue == "suppressDazzle"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_DAZZLED;
 								}
 							}
 
-							else if(strcasecmp(strValue.c_str(), "suppressCurse") == 0){
+							else if(strValue == "suppressCurse"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_CURSED;
 								}
 							}
-							/*else if(strcasecmp(strValue.c_str(), "suppressManaDrain") == 0){
+							/*else if(strValue == "suppressManaDrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_MANADRAIN;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "suppressPhysical") == 0){
+							else if(strValue == "suppressPhysical"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.conditionSuppressions |= CONDITION_PHYSICAL;
 								}
 							}*/
-							else if(strcasecmp(strValue.c_str(), "field") == 0){
+							else if(strValue == "field"){
 								it.group = ITEM_GROUP_MAGICFIELD;
 								it.type = ITEM_TYPE_MAGICFIELD;
 								CombatType_t combatType = COMBAT_NONE;
 								ConditionDamage* conditionDamage = NULL;
 
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(strcasecmp(strValue.c_str(), "fire") == 0){
+									if(strValue == "fire"){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
 										combatType = COMBAT_FIREDAMAGE;
 									}
-									else if(strcasecmp(strValue.c_str(), "energy") == 0){
+									else if(strValue == "energy"){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_ENERGY);
 										combatType = COMBAT_ENERGYDAMAGE;
 									}
-									else if(strcasecmp(strValue.c_str(), "poison") == 0){
+									else if(strValue == "poison"){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
 										combatType = COMBAT_EARTHDAMAGE;
 									}
-									else if(strcasecmp(strValue.c_str(), "drown") == 0){
+									else if(strValue == "drown"){
 										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);
 										combatType = COMBAT_DROWNDAMAGE;
 									}
-									//else if(strcasecmp(strValue.c_str(), "physical") == 0){
+									//else if(strValue == "physical"){
 									//	damageCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_PHYSICAL);
 									//	combatType = COMBAT_PHYSICALDAMAGE;
 									//}
@@ -979,13 +979,13 @@ bool Items::loadFromXml(const std::string& datadir)
 										xmlNodePtr fieldAttributesNode = itemAttributesNode->children;
 										while(fieldAttributesNode){
 											if(readXMLString(fieldAttributesNode, "key", strValue)){
-												if(strcasecmp(strValue.c_str(), "ticks") == 0){
+												if(strValue == "ticks"){
 													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
 														ticks = std::max(0, intValue);
 													}
 												}
 
-												if(strcasecmp(strValue.c_str(), "count") == 0){
+												if(strValue == "count"){
 													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
 														if(intValue > 0){
 															count = intValue;
@@ -996,7 +996,7 @@ bool Items::loadFromXml(const std::string& datadir)
 													}
 												}
 
-												if(strcasecmp(strValue.c_str(), "start") == 0){
+												if(strValue == "start"){
 													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
 														if(intValue > 0){
 															start = intValue;
@@ -1007,7 +1007,7 @@ bool Items::loadFromXml(const std::string& datadir)
 													}
 												}
 
-												if(strcasecmp(strValue.c_str(), "damage") == 0){
+												if(strValue == "damage"){
 													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
 
 														damage = -intValue;
@@ -1058,7 +1058,7 @@ bool Items::loadFromXml(const std::string& datadir)
 								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
 									it.maleSleeperID = intValue;
 									ItemType& other = getItemType(intValue);
-									if(other.noSleeperID == 0) {
+									if(other.id != 0 && other.noSleeperID == 0) {
 										other.noSleeperID = it.id;
 									}
 									if(it.femaleSleeperID == 0)
@@ -1070,7 +1070,7 @@ bool Items::loadFromXml(const std::string& datadir)
 								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
 									it.femaleSleeperID = intValue;
 									ItemType& other = getItemType(intValue);
-									if(other.noSleeperID == 0) {
+									if(other.id != 0 && other.noSleeperID == 0) {
 										other.noSleeperID = it.id;
 									}
 									if(it.maleSleeperID == 0)
@@ -1078,7 +1078,7 @@ bool Items::loadFromXml(const std::string& datadir)
 								}
 							}
 							/*
-							else if(strcasecmp(strValue.c_str(), "noSleeper") == 0)
+							else if(strValue == "noSleeper")
 							{
 								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
 									it.noSleeperID = intValue;
