@@ -268,7 +268,7 @@ void BanManager::addIpBan(uint32_t ip, uint32_t mask, uint32_t time, uint32_t ad
 	Database* db = Database::instance();
 	DBInsert stmt(db);
 
-	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `param`, `expires`, `added`, `adminid`, `comment`) VALUES ");
+	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `param`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
 
 	std::ostringstream query;
 	query << BAN_IPADDRESS << ", " << ip << ", " << mask << ", " << time << ", " << std::time(NULL) << ", " << adminid << ", " << db->escapeString(comment);
@@ -288,7 +288,7 @@ void BanManager::addPlayerBan(uint32_t playerId, uint32_t time, uint32_t adminid
 	Database* db = Database::instance();
 	DBInsert stmt(db);
 
-	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `adminid`, `comment`) VALUES ");
+	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
 
 	std::ostringstream query;
 	query << BAN_PLAYER << ", " << playerId << ", " << time << ", " << std::time(NULL) << ", " << adminid << ", " << db->escapeString(comment);
@@ -316,7 +316,7 @@ void BanManager::addAccountBan(uint32_t account, uint32_t time, uint32_t adminid
 	Database* db = Database::instance();
 	DBInsert stmt(db);
 
-	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `adminid`, `comment`) VALUES ");
+	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
 
 	std::ostringstream query;
 	query << BAN_ACCOUNT << ", " << account << ", " << time << ", " << std::time(NULL) << ", " << adminid << ", " << db->escapeString(comment);
@@ -386,7 +386,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type) const {
 			"`param`, "
 			"`expires`, "
 			"`added`, "
-			"`adminid`, "
+			"`admin_id`, "
 			"`comment`, "
 			"`reason` "
 		"FROM "
@@ -406,7 +406,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type) const {
 			ban.param = result->getDataString("param");
 			ban.expires = (uint32_t)result->getDataLong("expires");
 			ban.added = (uint32_t)result->getDataLong("id");
-			ban.adminid = result->getDataInt("adminid");
+			ban.adminid = result->getDataInt("admin_id");
 			ban.reason = (uint32_t)result->getDataLong("reason");
 			ban.comment = result->getDataString("comment");
 			vec.push_back(ban);

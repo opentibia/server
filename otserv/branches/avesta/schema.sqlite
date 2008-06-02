@@ -4,7 +4,7 @@ CREATE TABLE "accounts" (
     "email" VARCHAR(255) NOT NULL DEFAULT '',
     "blocked" BOOLEAN NOT NULL DEFAULT 0,
     "deleted" BOOLEAN NOT NULL DEFAULT 0,
-    "warned" BOOLEAN NOT NULL DEFAULT 0,
+    "warned" BOOLEAN NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "groups" (
@@ -161,16 +161,16 @@ CREATE TABLE "player_spells" (
 );
 
 CREATE TABLE "bans" (
-  "id" INTEGER PRIMARY KEY NOT NULL,
-  "type" INTEGER NOT NULL,
-  "value" INTEGER NOT NULL,
-  "param" INTEGER NOT NULL DEFAULT 0,
-  "active" BOOLEAN NOT NULL DEFAULT 1,
-  "expires" INTEGER NOT NULL DEFAULT 0,
-  "added" INTEGER NOT NULL DEFAULT 0,
-  "adminid" INTEGER NOT NULL DEFAULT 0,
-  "comment" VARCHAR(255) NOT NULL DEFAULT "",
-  "reason" INTEGER NOT NULL DEFAULT 0
+    "id" INTEGER PRIMARY KEY,
+    "type" INTEGER NOT NULL,
+    "value" INTEGER NOT NULL,
+    "param" INTEGER NOT NULL DEFAULT 0,
+    "active" BOOLEAN NOT NULL DEFAULT 1,
+    "expires" INTEGER NOT NULL DEFAULT 0,
+    "added" INTEGER NOT NULL DEFAULT 0,
+    "admin_id" INTEGER NOT NULL DEFAULT 0,
+    "comment" VARCHAR(255) NOT NULL DEFAULT '',
+    "reason" INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "global_storage" (
@@ -205,7 +205,7 @@ ON "accounts"
 FOR EACH ROW
 BEGIN
     DELETE FROM "players" WHERE "account_id" = OLD."id";
-    DELETE FROM "bans" WHERE "type" = 3 AND "account" = OLD."id";
+    DELETE FROM "bans" WHERE "type" = 3 AND "value" = OLD."id";
 END;
 
 CREATE TRIGGER "ondelete_players"
@@ -222,7 +222,7 @@ BEGIN
     DELETE FROM "player_items" WHERE "player_id" = OLD."id";
     DELETE FROM "player_depotitems" WHERE "player_id" = OLD."id";
     DELETE FROM "player_spells" WHERE "player_id" = OLD."id";
-    DELETE FROM "bans" WHERE "type" = 2 AND "player" = OLD."id";
+    DELETE FROM "bans" WHERE "type" = 2 AND "value" = OLD."id";
     UPDATE "houses" SET "owner" = 0 WHERE "owner" = OLD."id";
 END;
 

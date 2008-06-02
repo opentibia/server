@@ -1,5 +1,5 @@
 CREATE TABLE "groups" (
-    "id" BIGSERIAL,
+    "id" SERIAL,
     "name" VARCHAR(255) NOT NULL,
     "flags" BIGINT NOT NULL DEFAULT 0,
     "access" INT NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE "groups" (
 );
 
 CREATE TABLE "accounts" (
-    "id" BIGSERIAL,
+    "id" SERIAL,
     "password" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255) NOT NULL DEFAULT '',
     "blocked" SMALLINT NOT NULL DEFAULT 0,
@@ -19,13 +19,13 @@ CREATE TABLE "accounts" (
 );
 
 CREATE TABLE "players" (
-    "id" BIGSERIAL,
+    "id" SERIAL,
     "name" VARCHAR(255) NOT NULL,
     "account_id" INT NOT NULL,
     "group_id" INT NOT NULL,
     "premend" BIGINT NOT NULL DEFAULT 0,
-    "sex" BIGINT NOT NULL DEFAULT 0,
-    "vocation" BIGINT NOT NULL DEFAULT 0,
+    "sex" SMALLINT NOT NULL DEFAULT 0,
+    "vocation" SMALLINT NOT NULL DEFAULT 0,
     "experience" BIGINT NOT NULL DEFAULT 0,
     "level" BIGINT NOT NULL DEFAULT 1,
     "maglevel" BIGINT NOT NULL DEFAULT 0,
@@ -35,7 +35,7 @@ CREATE TABLE "players" (
     "manamax" BIGINT NOT NULL DEFAULT 100,
     "manaspent" BIGINT NOT NULL DEFAULT 0,
     "soul" BIGINT NOT NULL DEFAULT 0,
-    "direction" BIGINT NOT NULL DEFAULT 0,
+    "direction" SMALLINT NOT NULL DEFAULT 0,
     "lookbody" BIGINT NOT NULL DEFAULT 10,
     "lookfeet" BIGINT NOT NULL DEFAULT 10,
     "lookhead" BIGINT NOT NULL DEFAULT 10,
@@ -67,7 +67,7 @@ CREATE TABLE "players" (
 );
 
 CREATE TABLE "guilds" (
-    "id" BIGSERIAL,
+    "id" SERIAL,
     "name" VARCHAR(255) NOT NULL,
     "ownerid" INT NOT NULL,
     "creationdata" INT NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE "guilds" (
 );
 
 CREATE TABLE "guild_ranks" (
-    "id" BIGSERIAL,
+    "id" SERIAL,
     "guild_id" INT NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "level" INT NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE "player_items" (
 );
 
 CREATE TABLE "houses" (
-    "id" BIGSERIAL,
+    "id" SERIAL,
     "owner" INT NOT NULL,
     "paid" BIGINT NOT NULL DEFAULT 0,
     "warnings" INT NOT NULL DEFAULT 0,
@@ -138,23 +138,22 @@ CREATE TABLE "house_lists" (
     FOREIGN KEY ("house_id") REFERENCES "houses" ("id") ON DELETE CASCADE
 );
 
-CREATE TABLE `bans` (
-  "id" BIGSERIAL,
-  "type" BIGINT NOT NULL,
-  "param" BIGINT NOT NULL,
-  "active" SMALLINT DEFAULT 0,
-  "expires" BIGINT NOT NULL,
-  "added" BIGINT NOT NULL,
-  "adminid" INT DEFAULT 0,
-  "comment" VARCHAR(255) NOT NULL DEFAULT "No comment",
-  "reason" INT DEFAULT 0,
-  PRIMARY KEY  ("id"),
-  KEY ("type", "value"),
-  KEY "expires"
+CREATE TABLE "bans" (
+    "id" SERIAL,
+    "type" BIGINT NOT NULL,
+    "param" BIGINT NOT NULL,
+    "active" SMALLINT DEFAULT 0,
+    "expires" BIGINT NOT NULL,
+    "added" BIGINT NOT NULL,
+    "admin_id" INT DEFAULT 0,
+    "comment" VARCHAR(255) NOT NULL DEFAULT '',
+    "reason" INT DEFAULT 0,
+    PRIMARY KEY ("id"),
+    UNIQUE ("type", "value")
 );
 
 CREATE TABLE "tiles" (
-    "id" BIGSERIAL,
+    "id" SERIAL,
     "x" INT NOT NULL,
     "y" INT NOT NULL,
     "z" INT NOT NULL,
@@ -189,12 +188,11 @@ CREATE TABLE "global_storage" (
     PRIMARY KEY("key")
 );
 
-
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
 AS $$
 BEGIN
-    DELETE FROM "bans" WHERE "type" = 3 AND "account" = OLD."id";
+    DELETE FROM "bans" WHERE "type" = 3 AND "value" = OLD."id";
 
     RETURN OLD;
 END;
@@ -227,7 +225,7 @@ CREATE FUNCTION "ondelete_players"()
 RETURNS TRIGGER
 AS $$
 BEGIN
-    DELETE FROM "bans" WHERE "type" = 2 AND "player" = OLD."id";
+    DELETE FROM "bans" WHERE "type" = 2 AND "value" = OLD."id";
     UPDATE "houses" SET "owner" = 0 WHERE "owner" = OLD."id";
 
     RETURN OLD;
