@@ -41,31 +41,37 @@
 #endif
 
 #ifdef __USE_SQLITE__
-#define SINGLE_SQL_DRIVER
+	#define SINGLE_SQL_DRIVER
 #endif
 
 #ifdef __USE_MYSQL__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
-#endif
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
 
 #ifdef __USE_ODBC__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
-#endif
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
 
 #ifdef __USE_PGSQL__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
+
+//Default sql driver
+#if !defined(SINGLE_SQL_DRIVER) && !defined(MULTI_SQL_DRIVERS)
+	#define __USE_SQLITE__
+	#define SINGLE_SQL_DRIVER
 #endif
 
 enum passwordType_t{
@@ -180,5 +186,11 @@ enum passwordType_t{
 #       define __SKULLSYSTEM__
 #   endif
 #endif
+
+namespace std {
+	inline bool operator==(const string& s1, const string& s2) { return (strcasecmp(s1.c_str(), s2.c_str()) == 0); }
+	inline bool operator==(const string& s1, const char* s2) { return (strcasecmp(s1.c_str(), s2) == 0); }
+	inline bool operator==(const char* s1, const string& s2) { return (strcasecmp(s1, s2.c_str()) == 0); }
+}
 
 #endif
