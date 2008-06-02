@@ -187,10 +187,4 @@ enum passwordType_t{
 #   endif
 #endif
 
-namespace std {
-	inline bool operator==(const string& s1, const string& s2) { return (strcasecmp(s1.c_str(), s2.c_str()) == 0); }
-	inline bool operator==(const string& s1, const char* s2) { return (strcasecmp(s1.c_str(), s2) == 0); }
-	inline bool operator==(const char* s1, const string& s2) { return (strcasecmp(s1, s2.c_str()) == 0); }
-}
-
 #endif
