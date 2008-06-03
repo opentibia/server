@@ -629,7 +629,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.stopTime = (intValue != 0);
 								}
 							}
-							else if(asLowerCaseString(strValue) == "decayTo"){
+							else if(asLowerCaseString(strValue) == "decayto"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.decayTo = intValue;
 								}
