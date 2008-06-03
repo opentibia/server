@@ -668,7 +668,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 		while(attributeNode){
 			if(xmlStrcmp(attributeNode->name, (const xmlChar*)"attribute") == 0){
 				if(readXMLString(attributeNode, "key", strValue)){
-					if(strValue == "shootEffect"){
+					if(asLowerCaseString(strValue) == "shooteffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
 							ShootType_t shoot = getShootType(strValue);
 							if(shoot != NM_SHOOT_UNK){
@@ -679,7 +679,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 							}
 						}
 					}
-					else if(strValue == "areaEffect"){
+					else if(asLowerCaseString(strValue) == "areaeffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
 							MagicEffectClasses effect = getMagicEffect(strValue);
 							if(effect != NM_ME_UNK){
@@ -755,16 +755,16 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 		}
 
 		if(readXMLString(root, "race", strValue)){
-			if((strValue == "venom") || (atoi(strValue.c_str()) == 1)){
+			if((asLowerCaseString(strValue) == "venom") || (atoi(strValue.c_str()) == 1)){
 				mType->race = RACE_VENOM;
 			}
-			else if((strValue == "blood") || (atoi(strValue.c_str()) == 2)){
+			else if((asLowerCaseString(strValue) == "blood") || (atoi(strValue.c_str()) == 2)){
 				mType->race = RACE_BLOOD;
 			}
-			else if((strValue == "undead") || (atoi(strValue.c_str()) == 3)){
+			else if((asLowerCaseString(strValue) == "undead") || (atoi(strValue.c_str()) == 3)){
 				mType->race = RACE_UNDEAD;
 			}
-			else if((strValue == "fire") || (atoi(strValue.c_str()) == 4)){
+			else if((asLowerCaseString(strValue) == "fire") || (atoi(strValue.c_str()) == 4)){
 				mType->race = RACE_FIRE;
 			}
 			else{
@@ -998,53 +998,53 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 
 						if(readXMLString(tmpNode, "name", strValue)){
 
-							if(strValue == "physical"){
+							if(asLowerCaseString(strValue) == "physical"){
 								mType->damageImmunities |= COMBAT_PHYSICALDAMAGE;
 								//mType->conditionImmunities |= CONDITION_PHYSICAL;
 							}
-							else if(strValue == "energy"){
+							else if(asLowerCaseString(strValue) == "energy"){
 								mType->damageImmunities |= COMBAT_ENERGYDAMAGE;
 								mType->conditionImmunities |= CONDITION_ENERGY;
 							}
-							else if(strValue == "fire"){
+							else if(asLowerCaseString(strValue) == "fire"){
 								mType->damageImmunities |= COMBAT_FIREDAMAGE;
 								mType->conditionImmunities |= CONDITION_FIRE;
 							}
-							else if(strValue == "poison" ||
-									strValue == "earth"){
+							else if(asLowerCaseString(strValue) == "poison" ||
+									asLowerCaseString(strValue) == "earth"){
 								mType->damageImmunities |= COMBAT_EARTHDAMAGE;
 								mType->conditionImmunities |= CONDITION_POISON;
 							}
-							else if(strValue == "drown"){
+							else if(asLowerCaseString(strValue) == "drown"){
 								mType->damageImmunities |= COMBAT_DROWNDAMAGE;
 								mType->conditionImmunities |= CONDITION_DROWN;
 							}
-							else if(strValue == "ice"){
+							else if(asLowerCaseString(strValue) == "ice"){
 								mType->damageImmunities |= COMBAT_ICEDAMAGE;
 								mType->conditionImmunities |= CONDITION_FREEZING;
 							}
-							else if(strValue == "holy"){
+							else if(asLowerCaseString(strValue) == "holy"){
 								mType->damageImmunities |= COMBAT_HOLYDAMAGE;
 								mType->conditionImmunities |= CONDITION_DAZZLED;
 							}
-							else if(strValue == "death"){
+							else if(asLowerCaseString(strValue) == "death"){
 								mType->damageImmunities |= COMBAT_DEATHDAMAGE;
 								mType->conditionImmunities |= CONDITION_CURSED;
 							}
-							else if(strValue == "lifedrain"){
+							else if(asLowerCaseString(strValue) == "lifedrain"){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
 							}
-							else if(strValue == "paralyze"){
+							else if(asLowerCaseString(strValue) == "paralyze"){
 								mType->conditionImmunities |= CONDITION_PARALYZE;
 							}
-							else if(strValue == "outfit"){
+							else if(asLowerCaseString(strValue) == "outfit"){
 								mType->conditionImmunities |= CONDITION_OUTFIT;
 							}
-							else if(strValue == "drunk"){
+							else if(asLowerCaseString(strValue) == "drunk"){
 								mType->conditionImmunities |= CONDITION_DRUNK;
 							}
-							else if(strValue == "invisible"){
+							else if(asLowerCaseString(strValue) == "invisible"){
 								mType->conditionImmunities |= CONDITION_INVISIBLE;
 							}
 							else{

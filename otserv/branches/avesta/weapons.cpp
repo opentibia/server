@@ -966,22 +966,22 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 
 	if(readXMLString(p, "type", strValue)){
 		//TODO: use a tool-function
-		if(strValue == "earth"){
+		if(asLowerCaseString(strValue) == "earth"){
 			params.combatType = COMBAT_EARTHDAMAGE;
 		}
-		else if(strValue == "ice"){
+		else if(asLowerCaseString(strValue) == "ice"){
 			params.combatType = COMBAT_ICEDAMAGE;
 		}
-		else if(strValue == "energy"){
+		else if(asLowerCaseString(strValue) == "energy"){
 			params.combatType = COMBAT_ENERGYDAMAGE;
 		}
-		else if(strValue == "fire"){
+		else if(asLowerCaseString(strValue) == "fire"){
 			params.combatType = COMBAT_FIREDAMAGE;
 		}
-		else if(strValue == "death"){
+		else if(asLowerCaseString(strValue) == "death"){
 			params.combatType = COMBAT_DEATHDAMAGE;
 		}
-		else if(strValue == "holy"){
+		else if(asLowerCaseString(strValue) == "holy"){
 			params.combatType = COMBAT_HOLYDAMAGE;
 		}
 	}

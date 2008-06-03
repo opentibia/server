@@ -564,14 +564,14 @@ bool Spell::configureSpell(xmlNodePtr p)
 	}
 
 	if(readXMLString(p, "blocktype", strValue)){
-		if(strValue == "all"){
+		if(asLowerCaseString(strValue) == "all"){
 			blockingSolid = true;
 			blockingCreature = true;
 		}
-		else if(strValue == "solid"){
+		else if(asLowerCaseString(strValue) == "solid"){
 			blockingSolid = true;
 		}
-		else if(strValue == "creature"){
+		else if(asLowerCaseString(strValue) == "creature"){
 			blockingCreature = true;
 		}
 	}

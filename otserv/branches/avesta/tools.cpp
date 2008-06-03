@@ -71,6 +71,13 @@ void toLowerCaseString(std::string& source)
 	std::transform(source.begin(), source.end(), source.begin(), tolower);
 }
 
+std::string asLowerCaseString(const std::string& source)
+{
+	std::string s = source;
+	toLowerCaseString(s);
+	return s;
+}
+
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);

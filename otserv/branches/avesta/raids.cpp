@@ -400,25 +400,25 @@ bool AnnounceEvent::configureRaidEvent(xmlNodePtr eventNode)
 	}
 
 	if(readXMLString(eventNode, "type", strValue)){
-		if(strValue == "warning"){
+		if(asLowerCaseString(strValue) == "warning"){
 			m_messageType = MSG_STATUS_WARNING;
 		}
-		else if(strValue == "event"){
+		else if(asLowerCaseString(strValue) == "event"){
 			m_messageType = MSG_EVENT_ADVANCE;
 		}
-		else if(strValue == "default"){
+		else if(asLowerCaseString(strValue) == "default"){
 			m_messageType = MSG_EVENT_DEFAULT;
 		}
-		else if(strValue == "description"){
+		else if(asLowerCaseString(strValue) == "description"){
 			m_messageType = MSG_INFO_DESCR;
 		}
-		else if(strValue == "smallstatus"){
+		else if(asLowerCaseString(strValue) == "smallstatus"){
 			m_messageType = MSG_STATUS_SMALL;
 		}
-		else if(strValue == "blueconsole"){
+		else if(asLowerCaseString(strValue) == "blueconsole"){
 			m_messageType = MSG_STATUS_CONSOLE_BLUE;
 		}
-		else if(strValue == "redconsole"){
+		else if(asLowerCaseString(strValue) == "redconsole"){
 			m_messageType = MSG_STATUS_CONSOLE_RED;
 		}
 		else{

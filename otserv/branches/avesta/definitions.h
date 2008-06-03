@@ -187,17 +187,4 @@ enum passwordType_t{
 #   endif
 #endif
 
-//string/char comparison
-inline bool operator==(const std::string& s1, const std::string& s2) { return (strcasecmp(s1.c_str(), s2.c_str()) == 0); }
-inline bool operator==(const std::string& s1, const char* s2) { return (strcasecmp(s1.c_str(), s2) == 0); }
-inline bool operator==(const char* s1, const std::string& s2) { return (strcasecmp(s1, s2.c_str()) == 0); }
-//should I add this?
-//inline bool operator==(const char* s1, const char* s2) { return (strcasecmp(s1, s2) == 0); }
-inline bool operator!=(const std::string& s1, const std::string& s2) { return !(s1 == s2); }
-inline bool operator!=(const std::string& s1, const char* s2) { return !(s1 == s2); }
-inline bool operator!=(const char* s1, const std::string& s2) { return !(s1 == s2); }
-//inline bool operator!=(const char* s1, const char* s2) { return !(s1 == s2); }
-
-//xmlChar/char comparison?
-
 #endif
