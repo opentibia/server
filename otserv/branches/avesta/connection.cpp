@@ -31,6 +31,8 @@
 
 #include <boost/bind.hpp>
 
+//uint32_t Connection::connectionCount = 0;
+
 Connection* ConnectionManager::createConnection(boost::asio::io_service& io_service)
 {
 	#ifdef __DEBUG_NET_DETAIL__
@@ -264,7 +266,6 @@ bool Connection::send(OutputMessage* msg)
 		std::cout << "Connection::send Adding to queue " << msg->getMessageLength() << std::endl;
 		#endif
 		m_outputQueue.push_back(msg);
-		m_pendingWrite++;
 	}
 	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 	return true;
@@ -307,7 +308,6 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 			if(!m_outputQueue.empty()){
 				OutputMessage* msg = m_outputQueue.front();
 				m_outputQueue.pop_front();
-				m_pendingWrite--;
 				internalSend(msg);
 				#ifdef __DEBUG_NET_DETAIL__
 				std::cout << "Connection::onWriteOperation send " << msg->getMessageLength() << std::endl;
@@ -412,7 +412,6 @@ void Connection::deleteConnectionTask()
 	while(!m_outputQueue.empty()){
 		OutputMessagePool::getInstance()->releaseMessage(m_outputQueue.back(), true);
 		m_outputQueue.pop_back();
-		--m_pendingWrite;
 	}
 	delete this;
 }

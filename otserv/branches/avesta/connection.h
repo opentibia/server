@@ -73,6 +73,8 @@ protected:
 class Connection : boost::noncopyable
 {
 public:
+	//static uint32_t connectionCount;
+
 	enum {
 		CLOSE_STATE_NONE = 0,
 		CLOSE_STATE_REQUESTED = 1,

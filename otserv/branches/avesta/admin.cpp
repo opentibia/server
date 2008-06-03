@@ -134,6 +134,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			if((time(NULL) - m_startTime) > 30000){
 				//login timeout
 				addLogLine(this, LOGTYPE_WARNING, 1, "login timeout");
+				outputPool->releaseMessage(output);
 				getConnection()->closeConnection();
 				return;
 			}
@@ -167,6 +168,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 	}
 	default:
 		addLogLine(this, LOGTYPE_ERROR, 1, "no valid connection state!!!");
+		outputPool->releaseMessage(output);
 		getConnection()->closeConnection();
 		return;
 	}
@@ -318,6 +320,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		{
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&ProtocolAdmin::adminCommandShutdownServer, this)));
+			outputPool->releaseMessage(output);
 			getConnection()->closeConnection();
 			return;
 			break;

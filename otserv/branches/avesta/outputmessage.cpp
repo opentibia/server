@@ -34,7 +34,11 @@ OutputMessagePool::OutputMessagePool()
 {
 	OTSYS_THREAD_LOCKVARINIT(m_outputPoolLock);
 	for(uint32_t i = 0; i < OUTPUT_POOL_SIZE; ++i){
-		m_outputMessages.push_back(new OutputMessage);
+		OutputMessage* msg = new OutputMessage();
+		m_outputMessages.push_back(msg);
+#ifdef __TRACK_NETWORK__
+		m_allOutputMessages.push_back(msg);
+#endif
 	}
 	m_frameTime = OTSYS_TIME();
 }
@@ -190,7 +194,17 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
 	OutputMessage* outputmessage;
 	if(m_outputMessages.empty()) {
+#ifdef __TRACK_NETWORK__
+		if(m_allOutputMessages.size() >= 5000){
+			std::cout << "High usage of outputmessages: " << std::endl;
+			m_allOutputMessages.back()->PrintTrace();
+		}
+#endif
 		outputmessage = new OutputMessage;
+
+#ifdef __TRACK_NETWORK__
+		m_allOutputMessages.push_back(outputmessage);
+#endif
 	} else {
 		outputmessage = m_outputMessages.back();
 #ifdef __TRACK_NETWORK__
