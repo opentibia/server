@@ -81,7 +81,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");
-	player->setVocation(result->getDataInt("vocation"));
 	player->mana = result->getDataInt("mana");
 	player->manaMax = result->getDataInt("manamax");
 	player->magLevel = result->getDataInt("maglevel");
@@ -134,6 +133,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 			delete condition;
 		}
 	}
+	// you need to set the vocation after conditions in order to ensure the proper regeneration rates for the vocation
+	player->setVocation(result->getDataInt("vocation"));
 
 	player->setLossPercent(LOSS_EXPERIENCE, result->getDataInt("loss_experience"));
 	player->setLossPercent(LOSS_MANASPENT, result->getDataInt("loss_mana"));
