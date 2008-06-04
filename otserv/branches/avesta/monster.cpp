@@ -41,6 +41,10 @@ AutoList<Monster>Monster::listMonster;
 int32_t Monster::despawnRange;
 int32_t Monster::despawnRadius;
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+uint32_t Monster::monsterCount = 0;
+#endif
+
 Monster* Monster::createMonster(MonsterType* mType)
 {
 	return new Monster(mType);
@@ -96,12 +100,21 @@ Creature()
 			std::cout << "Warning: [Monster::Monster]. Unknown event name - " << *it << std::endl;
 		}
 	}
+
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	monsterCount++;
+#endif
 }
 
 Monster::~Monster()
 {
 	clearTargetList();
 	clearFriendList();
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	monsterCount--;
+#endif
 }
 
 void Monster::onAttackedCreatureDissapear(bool isLogout)
@@ -905,9 +918,9 @@ bool Monster::getNextStep(Direction& dir)
 
 	bool result = false;
 	if((!followCreature || !hasFollowPath) && !isSummon()){
-		if(followCreature) {
+		if(followCreature){
 			result = getRandomStep(getPosition(), dir);
-		} else {
+		}else{
 			// Walk randomly once every 1-2 seconds, not run around like if we're on drugs
 			if(getTimeSinceLastMove() > 1000) {
 				//choose a random direction

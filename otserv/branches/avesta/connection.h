@@ -73,7 +73,9 @@ protected:
 class Connection : boost::noncopyable
 {
 public:
-	//static uint32_t connectionCount;
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t connectionCount;
+#endif
 
 	enum {
 		CLOSE_STATE_NONE = 0,
@@ -92,6 +94,10 @@ private:
 		OTSYS_THREAD_LOCKVARINIT(m_connectionLock);
 		m_writeError = false;
 		m_readError = false;
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		connectionCount++;
+#endif
 	}
 	friend class ConnectionManager;
 	
@@ -100,6 +106,10 @@ public:
 	{
 		ConnectionManager::getInstance()->releaseConnection(this);
 		OTSYS_THREAD_LOCKVARRELEASE(m_connectionLock);
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		connectionCount--;
+#endif
 	}
 
 	boost::asio::ip::tcp::socket& getHandle() { return m_socket; }

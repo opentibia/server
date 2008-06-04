@@ -45,6 +45,14 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "weapons.h"
 #include "raids.h"
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+#include "outputmessage.h"
+#include "connection.h"
+#include "admin.h"
+#include "status.h"
+#include "protocollogin.h"
+#endif
+
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
@@ -90,7 +98,10 @@ s_defcommands Commands::defined_commands[] = {
 	//{"/bans",&Commands::bansManager},
 	{"/town",&Commands::teleportToTown},
 	{"/serverinfo",&Commands::serverInfo},
-	{"/raid",&Commands::forceRaid},
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	{"/serverdiag",&Commands::serverDiag},
+#endif
+	{"/raid",&Commands::forceRaid}
 };
 
 
@@ -866,6 +877,48 @@ bool Commands::serverInfo(Creature* creature, const std::string& cmd, const std:
 
 	return true;
 }
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+bool Commands::serverDiag(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(!player)
+		return false;
+
+	std::stringstream text;
+	text << "Server diagonostic:\n";
+	text << "World:" << "\n";
+	text << "Player: " << g_game.getPlayersOnline() << " (" << Player::playerCount << ")\n";
+	text << "Npc: " << g_game.getNpcsOnline() << " (" << Npc::npcCount << ")\n";
+	text << "Monster: " << g_game.getMonstersOnline() << " (" << Monster::monsterCount << ")\n";
+
+	text << "\nProtocols:" << "\n";
+	text << "--------------------\n";
+	text << "ProtocolGame: " << ProtocolGame::protocolGameCount << "\n";
+	text << "ProtocolLogin: " << ProtocolLogin::protocolLoginCount << "\n";
+	text << "ProtocolAdmin: " << ProtocolAdmin::protocolAdminCount << "\n";
+	text << "ProtocolStatus: " << ProtocolStatus::protocolStatusCount << "\n\n";
+
+	text << "\nConnections:\n";
+	text << "--------------------\n";
+	text << "Active connections: " << Connection::connectionCount << "\n";
+	text << "Total message pool: " << OutputMessagePool::getInstance()->getTotalMessageCount() << "\n";
+	text << "Auto message pool: " << OutputMessagePool::getInstance()->getAutoMessageCount() << "\n";
+	text << "Free message pool: " << OutputMessagePool::getInstance()->getAvailableMessageCount() << "\n";
+
+	text << "\nLibraries:\n";
+	text << "--------------------\n";
+	text << "asio: " << BOOST_ASIO_VERSION << "\n";
+	text << "libxml: " << XML_DEFAULT_VERSION << "\n";
+	text << "lua: " << LUA_VERSION << "\n";
+
+	//TODO: more information that could be useful
+
+	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, text.str().c_str());
+
+	return true;
+}
+#endif
 
 void showTime(std::stringstream& str, uint32_t time)
 {

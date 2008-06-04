@@ -1119,7 +1119,7 @@ bool Items::loadFromXml(const std::string& datadir)
 
 		//check bed items
 		if((it->noSleeperID != 0 || it->maleSleeperID != 0 || it->femaleSleeperID != 0) && it->type != ITEM_TYPE_BED){
-			std::cout << "Warning: [Items::loadFromXml] Item " << it->id <<  "is not set as a bed-type." << std::endl;
+			std::cout << "Warning: [Items::loadFromXml] Item " << it->id <<  " is not set as a bed-type." << std::endl;
 		}
 
 		//check looping decaying items

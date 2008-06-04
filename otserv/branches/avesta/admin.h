@@ -174,8 +174,13 @@ protected:
 class ProtocolAdmin : public Protocol
 {
 public:
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t protocolAdminCount;
+#endif
+
 	ProtocolAdmin(Connection* connection);
-	virtual ~ProtocolAdmin() {};
+	virtual ~ProtocolAdmin();
 	
 	virtual void parsePacket(NetworkMessage& msg);
 	

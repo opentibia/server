@@ -76,6 +76,10 @@ protected:
 	//bool bansManager(Creature* creature, const std::string& cmd, const std::string& param);
 	bool serverInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool forceRaid(Creature* creature, const std::string& cmd, const std::string& param);
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	bool serverDiag(Creature* creature, const std::string& cmd, const std::string& param);
+#endif
 	
 	//table of commands
 	static s_defcommands defined_commands[];

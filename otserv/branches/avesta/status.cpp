@@ -43,6 +43,10 @@ extern Game g_game;
 #define STATUS_SERVER_NAME "otserv"
 #define STATUS_CLIENT_VERISON "8.0"
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+uint32_t ProtocolStatus::protocolStatusCount = 0;
+#endif
+
 enum RequestedInfo_t{
 	REQUEST_BASIC_SERVER_INFO  = 0x01,
 	REQUEST_OWNER_SERVER_INFO  = 0x02,

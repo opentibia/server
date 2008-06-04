@@ -141,6 +141,10 @@ public:
 
 	void releaseMessage(OutputMessage* msg, bool sent = false);
 
+	size_t getTotalMessageCount() const {return m_allOutputMessages.size();}
+	size_t getAvailableMessageCount() const {return m_outputMessages.size();}
+	size_t getAutoMessageCount() const {return m_autoSendOutputMessages.size();}
+
 protected:
 
 	void configureOutputMessage(OutputMessage* msg, Protocol* protocol, bool autosend);
@@ -151,9 +155,7 @@ protected:
 
 	OutputMessageVector m_outputMessages;
 	OutputMessageVector m_autoSendOutputMessages;
-#ifdef __TRACK_NETWORK__
 	OutputMessageVector m_allOutputMessages;
-#endif
 	OTSYS_THREAD_LOCKVAR m_outputPoolLock;
 	uint64_t m_frameTime;
 };

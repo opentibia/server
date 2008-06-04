@@ -31,7 +31,9 @@
 
 #include <boost/bind.hpp>
 
-//uint32_t Connection::connectionCount = 0;
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+uint32_t Connection::connectionCount = 0;
+#endif
 
 Connection* ConnectionManager::createConnection(boost::asio::io_service& io_service)
 {

@@ -3,6 +3,7 @@
 <commands>
 
 -- Gods
+<command cmd="/serverdiag" access="3" />
 <command cmd="/i" access="3" />				-- Create a item by ID
 <command cmd="/n" access="3" />				-- Create a item by name
 <command cmd="/reload" access="3" />		-- Reload configurations

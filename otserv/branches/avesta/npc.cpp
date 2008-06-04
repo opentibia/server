@@ -44,6 +44,10 @@ AutoList<Npc> Npc::listNpc;
 
 NpcScriptInterface* Npc::m_scriptInterface = NULL;
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+uint32_t Npc::npcCount = 0;
+#endif
+
 Npc::Npc(const std::string& _name) :
 Creature()
 {
@@ -202,12 +206,21 @@ Creature()
 	else{
 		loaded = false;
 	}
+
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	npcCount++;
+#endif
 }
 
 
 Npc::~Npc()
 {
 	delete m_npcEventHandler;
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	npcCount--;
+#endif
 }
 
 bool Npc::canSee(const Position& pos) const
