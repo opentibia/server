@@ -150,7 +150,8 @@ CREATE TABLE `bans` (
     `comment` VARCHAR(255) NOT NULL DEFAULT '',
     `reason` INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY  (`id`),
-    UNIQUE (`type`, `value`)
+    KEY (`type`, `value`),
+    KEY (`expires`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tiles` (
