@@ -148,8 +148,7 @@ CREATE TABLE "bans" (
     "admin_id" INT DEFAULT 0,
     "comment" VARCHAR(255) NOT NULL DEFAULT '',
     "reason" INT DEFAULT 0,
-    PRIMARY KEY ("id"),
-    UNIQUE ("type", "value")
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE "tiles" (
