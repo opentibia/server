@@ -81,18 +81,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");
-	player->mana = result->getDataInt("mana");
-	player->manaMax = result->getDataInt("manamax");
-	player->magLevel = result->getDataInt("maglevel");
-
-	uint32_t nextManaCount = (uint32_t)player->vocation->getReqMana(player->magLevel + 1);
-	uint32_t manaSpent = (uint32_t)result->getDataInt("manaspent");
-	if(manaSpent > nextManaCount){
-		//make sure its not out of bound
-		manaSpent = 0;
-	}
-	player->manaSpent = manaSpent;
-	player->magLevelPercent = Player::getPercentLevel(player->manaSpent, nextManaCount);
+	
 	player->health = result->getDataInt("health");
 	player->healthMax = result->getDataInt("healthmax");
 	player->defaultOutfit.lookType = result->getDataInt("looktype");
@@ -135,6 +124,19 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 	// you need to set the vocation after conditions in order to ensure the proper regeneration rates for the vocation
 	player->setVocation(result->getDataInt("vocation"));
+	// this stuff has to go after the vocation is set
+	player->mana = result->getDataInt("mana");
+	player->manaMax = result->getDataInt("manamax");
+	player->magLevel = result->getDataInt("maglevel");
+
+	uint32_t nextManaCount = (uint32_t)player->vocation->getReqMana(player->magLevel + 1);
+	uint32_t manaSpent = (uint32_t)result->getDataInt("manaspent");
+	if(manaSpent > nextManaCount){
+		//make sure its not out of bound
+		manaSpent = 0;
+	}
+	player->manaSpent = manaSpent;
+	player->magLevelPercent = Player::getPercentLevel(player->manaSpent, nextManaCount);
 
 	player->setLossPercent(LOSS_EXPERIENCE, result->getDataInt("loss_experience"));
 	player->setLossPercent(LOSS_MANASPENT, result->getDataInt("loss_mana"));
