@@ -99,7 +99,7 @@ Creature()
 	shieldBlockCount = 0;
 	lastAttackBlockType = BLOCK_NONE;
 	addAttackSkillPoint = false;
-	attackTicks = 0;
+	lastAttack = 0;
 	shootRange = 1;
 
 	chaseMode = CHASEMODE_STANDSTILL;
@@ -2988,16 +2988,16 @@ uint32_t Player::getAttackSpeed()
 
 void Player::onAttacking(uint32_t interval)
 {
-	if(attackTicks < getAttackSpeed()){
-		attackTicks += interval;
-	}
-
 	Creature::onAttacking(interval);
 }
 
 void Player::doAttacking(uint32_t interval)
 {
-	if(getAttackSpeed() <= attackTicks){
+	if(lastAttack == 0){
+		lastAttack = OTSYS_TIME() - interval;
+	}
+
+	if((OTSYS_TIME() - lastAttack) >= getAttackSpeed() ){
 		Item* tool = getWeapon();
 		bool result = false;
 		const Weapon* weapon = g_weapons->getWeapon(tool);
@@ -3020,7 +3020,7 @@ void Player::doAttacking(uint32_t interval)
 		}
 
 		if(result){
-			attackTicks = 0;
+			lastAttack = OTSYS_TIME();
 		}
 	}
 }

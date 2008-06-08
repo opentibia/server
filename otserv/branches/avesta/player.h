@@ -288,7 +288,7 @@ public:
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
-	virtual bool hasExtraSwing() {return (attackTicks >= getAttackSpeed());}
+	virtual bool hasExtraSwing() {return lastAttack > 0 && ((OTSYS_TIME() - lastAttack) >= getAttackSpeed());}
 	int32_t getShootRange() const {return shootRange;}
 
 	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;
@@ -638,7 +638,7 @@ protected:
 	int32_t shieldBlockCount;
 	BlockType_t lastAttackBlockType;
 	bool addAttackSkillPoint;
-	uint32_t attackTicks;
+	uint64_t lastAttack;
 	int32_t shootRange;
 
 	chaseMode_t chaseMode;
