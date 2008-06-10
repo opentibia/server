@@ -105,7 +105,7 @@ private:
 	uint32_t checkSpawnEvent;
 
 	bool findPlayer(const Position& pos);
-	bool spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir);
+	bool spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup = false);
 	void checkSpawn();
 };
 

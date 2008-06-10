@@ -330,14 +330,14 @@ bool Spawn::isInSpawnZone(const Position& pos)
 	return Spawns::getInstance()->isInZone(centerPos, radius, pos);
 }
 
-bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir)
+bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup /*= false*/)
 {
 	Monster* monster = Monster::createMonster(mType);
 	if(!monster){
 		return false;
 	}
 
-	if(g_game.getGameState() == GAME_STATE_STARTUP){
+	if(startup){
 		//No need to send out events to the surrounding since there is no one out there to listen!
 		if(!g_game.internalPlaceCreature(monster, pos, true)){
 			delete monster;
@@ -367,7 +367,7 @@ void Spawn::startup()
 		uint32_t spawnId = it->first;
 		spawnBlock_t& sb = it->second;
 
-		spawnMonster(spawnId, sb.mType, sb.pos, sb.direction);
+		spawnMonster(spawnId, sb.mType, sb.pos, sb.direction, true);
 	}
 }
 

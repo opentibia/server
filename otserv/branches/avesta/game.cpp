@@ -131,6 +131,11 @@ GameState_t Game::getGameState()
 
 void Game::setGameState(GameState_t newState)
 {
+	if(gameState == GAME_STATE_SHUTDOWN){
+		//Can't go back from this state.
+		return;
+	}
+
 	if(gameState != newState){
 		switch(newState){
 			case GAME_STATE_INIT:
