@@ -64,7 +64,7 @@ protected:
 	bool executeUseEx(Action* action, Player* player, Item* item, const PositionEx& fromPosEx,
 		const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-		Item* item, bool isHotkey, uint32_t creatureId);
+		Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
 
 	void showUseHotkeyMessage(Player* player, const Item* item, uint32_t itemCount);
 

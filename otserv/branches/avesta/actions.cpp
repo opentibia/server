@@ -386,20 +386,11 @@ bool Actions::executeUseEx(Action* action, Player* player, Item* item, const Pos
 		}
 
 		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			if(action->hasOwnErrorHandler()){
-				//The error message has already been handled by action itself
-				return true;
-			}
 			return false;
 		}
 	}
 	else{
 		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			if(action->hasOwnErrorHandler()){
-				//The error message has already been handled by action itself
-				return true;
-			}
-
 			return false;
 		}
 	}
@@ -408,8 +399,10 @@ bool Actions::executeUseEx(Action* action, Player* player, Item* item, const Pos
 }
 
 ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-	Item* item, bool isHotkey, uint32_t creatureId)
+	Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess)
 {
+	isSuccess = false;
+
 	Action* action = getAction(item, ACTION_UNIQUEID);
 	if(action){
 		ReturnValue ret = action->canExecuteAction(player, toPosEx);
@@ -418,7 +411,8 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 		}
 
 		//only continue with next action in the list if the previous returns false
-		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		}
 	}
@@ -427,11 +421,13 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 	if(action){
 		ReturnValue ret = action->canExecuteAction(player, toPosEx);
 		if(ret != RET_NOERROR){
+			isSuccess = false;
 			return ret;
 		}
 
 		//only continue with next action in the list if the previous returns false
-		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		}
 	}
@@ -444,7 +440,8 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 		}
 
 		//only continue with next action in the list if the previous returns false
-		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		}
 	}
@@ -457,7 +454,8 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 		}
 
 		//only continue with next action in the list if the previous returns false
-		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		}
 	}
@@ -484,6 +482,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	PositionEx fromPosEx(fromPos, fromStackPos);
 	PositionEx toPosEx(toPos, toStackPos);
 	ReturnValue ret = RET_NOERROR;
+	bool isSuccess = false;
 
 	if(isHotkey){
 		int32_t subType = -1;
@@ -492,10 +491,16 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		}
 
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		showUseHotkeyMessage(player, item, itemCount);
+		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
+
+		if(isSuccess){
+			showUseHotkeyMessage(player, item, itemCount);
+		}
+	}
+	else{
+		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
 	}
 
-	ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;

@@ -3011,7 +3011,7 @@ void Player::doAttacking(uint32_t interval)
 					&g_game, getID()));
 				setNextActionTask(task);
 			}
-			else if(!hasCondition(CONDITION_EXHAUST_COMBAT)){
+			else{
 				result = weapon->useWeapon(this, tool, attackedCreature);
 			}
 		}
