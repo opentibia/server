@@ -705,6 +705,14 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	if(!player || player->isRemoved())
 		return false;
 
+	if(!player->canDoAction()){
+		uint32_t delay = player->getNextActionTime();
+		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerMoveCreature, this, playerId, movingCreatureId,
+			movingCreatureOrigPos, toPos));
+		player->setNextActionTask(task);
+		return false;
+	}
+
 	Creature* movingCreature = getCreatureByID(movingCreatureId);
 
 	if(!movingCreature || movingCreature->isRemoved())

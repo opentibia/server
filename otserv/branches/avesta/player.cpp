@@ -3218,7 +3218,14 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 	}
 
 	if(remove){
-		removeCondition(condition);
+		if(!canDoAction()){
+			uint32_t delay = getNextActionTime();
+			delay -= (delay % EVENT_CREATURE_THINK_INTERVAL);
+			condition->setTicks(delay);
+		}
+		else{
+			removeCondition(condition);
+		}
 	}
 }
 
