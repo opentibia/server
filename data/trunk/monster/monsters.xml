@@ -44,7 +44,7 @@
 	<monster name="Spirit of Fire" file="arena/scrapper/spirit of fire.xml"/>
 	<monster name="Spirit of Water" file="arena/scrapper/spirit of water.xml"/>
 	<monster name="The Dark Dancer" file="arena/scrapper/the dark dancer.xml"/>
-	<monster name="Dhe Hag" file="arena/scrapper/the hag.xml"/>
+	<monster name="The Hag" file="arena/scrapper/the hag.xml"/>
 	
 		<!-- Warlord -->
 	<monster name="Darakan the Executioner" file="arena/warlord/darakan the executioner.xml"/>
