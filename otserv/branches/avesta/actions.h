@@ -31,6 +31,7 @@
 
 class Action;
 class Container;
+class ItemType;
 
 enum ActionType_t{
 	ACTION_ANY,
@@ -66,7 +67,7 @@ protected:
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
 		Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
 
-	void showUseHotkeyMessage(Player* player, const Item* item, uint32_t itemCount);
+	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);
 
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
