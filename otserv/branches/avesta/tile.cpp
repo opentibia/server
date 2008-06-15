@@ -1106,7 +1106,7 @@ uint32_t Tile::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, boo
 				}
 				else{
 					if(item->isRune()){
-						count+= item->getItemCharge();
+						count+= item->getCharges();
 					}
 					else{
 						count+= item->getItemCount();
@@ -1281,7 +1281,12 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 			}
 		}
 		else{
-			downItems.insert(downItems.begin(), item);
+			if(!downItems.empty()){
+				downItems.insert(downItems.begin(), item);
+			}
+			else{
+				downItems.push_back(item);
+			}
 			++thingCount;
 		}
 

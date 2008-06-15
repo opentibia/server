@@ -2116,7 +2116,7 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 		Spell::postCastSpell(player);
 
 		if(hasCharges && item){
-			int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+			int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
 			g_game.transformItem(item, item->getID(), newCharge);
 		}
 	}

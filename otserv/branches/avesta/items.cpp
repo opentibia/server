@@ -1039,9 +1039,8 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.replaceable = (intValue != 0);
 								}
 							}
-							else if(asLowerCaseString(strValue) == "partnerdirection")
-							{
-								if(readXMLString(itemAttributesNode, "value", strValue)) {
+							else if(asLowerCaseString(strValue) == "partnerdirection"){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "0" || asLowerCaseString(strValue) == "north" || asLowerCaseString(strValue) == "n") {
 										it.bedPartnerDir = NORTH;
 									} else if(asLowerCaseString(strValue) == "1" || asLowerCaseString(strValue) == "east" || asLowerCaseString(strValue) == "e") {
@@ -1053,24 +1052,22 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							else if(asLowerCaseString(strValue) == "malesleeper")
-							{
-								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
+							else if(asLowerCaseString(strValue) == "malesleeper"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.maleSleeperID = intValue;
 									ItemType& other = getItemType(intValue);
-									if(other.id != 0 && other.noSleeperID == 0) {
+									if(other.id != 0 && other.noSleeperID == 0){
 										other.noSleeperID = it.id;
 									}
 									if(it.femaleSleeperID == 0)
 										it.femaleSleeperID = intValue;
 								}
 							}
-							else if(asLowerCaseString(strValue) == "femalesleeper")
-							{
-								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
+							else if(asLowerCaseString(strValue) == "femalesleeper"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.femaleSleeperID = intValue;
 									ItemType& other = getItemType(intValue);
-									if(other.id != 0 && other.noSleeperID == 0) {
+									if(other.id != 0 && other.noSleeperID == 0){
 										other.noSleeperID = it.id;
 									}
 									if(it.maleSleeperID == 0)
@@ -1078,13 +1075,36 @@ bool Items::loadFromXml(const std::string& datadir)
 								}
 							}
 							/*
-							else if(asLowerCaseString(strValue) == "nosleeper")
-							{
-								if(readXMLInteger(itemAttributesNode, "value", intValue)) {
+							else if(asLowerCaseString(strValue) == "nosleeper"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.noSleeperID = intValue;
 								}
 							}
 							*/
+							else if(asLowerCaseString(strValue) == "elementice"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.elementDamage = intValue;
+									it.abilities.elementType = COMBAT_ICEDAMAGE;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "elementearth"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.elementDamage = intValue;
+									it.abilities.elementType = COMBAT_EARTHDAMAGE;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "elementfire"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.elementDamage = intValue;
+									it.abilities.elementType = COMBAT_FIREDAMAGE;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "elementenergy"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.elementDamage = intValue;
+									it.abilities.elementType = COMBAT_ENERGYDAMAGE;
+								}
+							}
 							else{
 								std::cout << "Warning: [Items::loadFromXml] Unknown key value " << strValue  << std::endl;
 							}

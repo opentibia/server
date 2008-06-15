@@ -1951,7 +1951,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		}
 
 		if(absorbedDamage){
-			int32_t charges = item->getItemCharge();
+			int32_t charges = item->getCharges();
 
 			if(charges != 0){
 				g_game.transformItem(item, item->getID(), charges - 1);
@@ -2798,7 +2798,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 				}
 				else{
 					if(item->isRune()){
-						count+= item->getItemCharge();
+						count+= item->getCharges();
 					}
 					else{
 						count+= item->getItemCount();

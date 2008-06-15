@@ -700,7 +700,7 @@ uint32_t Container::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/
 			}
 			else{
 				if(item->isRune()){
-					count+= item->getItemCharge();
+					count+= item->getCharges();
 				}
 				else{
 					count+= item->getItemCount();

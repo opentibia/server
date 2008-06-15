@@ -102,6 +102,7 @@ enum AttrTypes_t{
 	ATTR_WRITTENBY = 19,
 	ATTR_SLEEPERGUID = 20,
 	ATTR_SLEEPSTART = 21,
+	ATTR_CHARGES = 22
 };
 
 class ItemAttributes{
@@ -144,8 +145,17 @@ public:
 	void setUniqueId(uint16_t n) {if(n < 1000) n = 1000; setIntAttr(ATTR_ITEM_UNIQUEID, n);}
 	uint16_t getUniqueId() const {return getIntAttr(ATTR_ITEM_UNIQUEID);}
 
+	void setCharges(uint16_t n) {setIntAttr(ATTR_ITEM_CHARGES, n);}
+	uint16_t getCharges() const {return getIntAttr(ATTR_ITEM_CHARGES);}
+
+	void setFluidType(uint16_t n) {setIntAttr(ATTR_ITEM_FLUIDTYPE, n);}
+	uint16_t getFluidType() const {return getIntAttr(ATTR_ITEM_FLUIDTYPE);}
+
 	void setOwner(uint32_t _owner) {setIntAttr(ATTR_ITEM_OWNER, _owner);}
 	uint32_t getOwner() const {return getIntAttr(ATTR_ITEM_OWNER);}
+
+	void setCorpseOwner(uint32_t _corpseOwner) {setIntAttr(ATTR_ITEM_CORPSEOWNER, _corpseOwner);}
+	uint32_t getCorpseOwner() {return getIntAttr(ATTR_ITEM_CORPSEOWNER);}
 
 	void setDuration(int32_t time) {setIntAttr(ATTR_ITEM_DURATION, time);}
 	void decreaseDuration(int32_t time) {increaseIntAttr(ATTR_ITEM_DURATION, -time);}
@@ -162,10 +172,12 @@ protected:
 		ATTR_ITEM_TEXT = 8,
 		ATTR_ITEM_WRITTENDATE = 16,
 		ATTR_ITEM_WRITTENBY = 32,
-
 		ATTR_ITEM_OWNER = 65536,
 		ATTR_ITEM_DURATION = 131072,
-		ATTR_ITEM_DECAYING = 262144
+		ATTR_ITEM_DECAYING = 262144,
+		ATTR_ITEM_CORPSEOWNER = 524288,
+		ATTR_ITEM_CHARGES = 1048576,
+		ATTR_ITEM_FLUIDTYPE = 2097152
 	};
 
 	bool hasAttribute(itemAttrTypes type) const;
@@ -327,20 +339,14 @@ public:
 	const std::string& getPluralName() const {return items[id].pluralName;}
 
 	// get the number of items
-	uint8_t getItemCount() const {return count;}
-	void setItemCount(uint8_t n) {count = n;}
+	uint16_t getItemCount() const {return count;}
+	void setItemCount(uint16_t n) {count = n;}
 
-	uint8_t getItemCountOrSubtype() const;
-	void setItemCountOrSubtype(uint8_t n);
+	uint16_t getItemCountOrSubtype() const;
+	void setItemCountOrSubtype(uint16_t n);
 	void setDefaultSubtype();
 	bool hasSubType() const;
-	uint8_t getSubType() const;
-
-	uint8_t getItemCharge() const {return charges;};
-	void setItemCharge(uint8_t n) {charges = n;};
-
-	uint8_t getFluidType() const {return fluid;};
-	void setFluidType(uint8_t n) {fluid = n;};
+	uint16_t getSubType() const;
 
 	void setUniqueId(uint16_t n);
 
@@ -352,9 +358,6 @@ public:
 	}
 	uint32_t getDefaultDuration() const {return items[id].decayTime * 1000;}
 	bool canDecay();
-
-	uint32_t getCorpseOwner() const {return corpseOwner;}
-	void setCorpseOwner(uint32_t newOwner) {corpseOwner = newOwner;}
 
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
@@ -369,10 +372,8 @@ protected:
 
 	uint16_t id;  // the same id as in ItemType
 	uint8_t count; // number of stacked items
-	uint8_t charges; //number of charges on the item
-	uint8_t fluid; //fluid type
 
-	uint32_t corpseOwner; //anti-looting system
+	//Don't add variables here, use the ItemAttribute class.
 };
 
 #endif

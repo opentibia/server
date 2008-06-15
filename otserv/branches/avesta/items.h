@@ -74,6 +74,8 @@ struct Abilities{
 		absorbPercentHoly = 0;
 		absorbPercentDeath = 0;
 
+		elementType = COMBAT_NONE;
+		elementDamage = 0;
 		memset(skills, 0, sizeof(skills));
 
 		memset(stats, 0 , sizeof(stats));
@@ -105,6 +107,10 @@ struct Abilities{
 	int16_t absorbPercentIce;
 	int16_t absorbPercentHoly;
 	int16_t absorbPercentDeath;
+
+	//elemental damage
+	CombatType_t elementType;
+	int16_t elementDamage;
 
 	//extra skill modifiers
 	int32_t skills[SKILL_LAST + 1];

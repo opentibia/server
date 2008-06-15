@@ -437,6 +437,29 @@ void Monster::onFollowCreatureComplete(const Creature* creature)
 	}
 }
 
+BlockType_t Monster::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
+	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
+{
+	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+
+	if(damage != 0){
+		int32_t elementMod = 0;
+		ElementMap::iterator it = mType->elementMap.find(combatType);
+		if(it != mType->elementMap.end()){
+			elementMod = it->second;
+		}
+
+		if(elementMod != 0)
+			damage = (int32_t)std::ceil(damage * ((float)(100 - elementMod) / 100));
+			if(damage <= 0){
+				damage = 0;
+				blockType = BLOCK_DEFENSE;
+			}
+	}
+
+	return blockType;
+}
+
 bool Monster::isTarget(Creature* creature)
 {
 	if( creature->isRemoved() ||

@@ -83,6 +83,7 @@ void MonsterType::reset()
 	manaCost = 0;
 	summonList.clear();
 	lootItems.clear();
+	elementMap.clear();
 
 	for(SpellList::iterator it = spellAttackList.begin(); it != spellAttackList.end(); ++it){
 		if(it->combatSpell){
@@ -1192,6 +1193,41 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 						SHOW_XML_WARNING("Cant load loot");
 					}
 
+					tmpNode = tmpNode->next;
+				}
+			}
+		else if(xmlStrcmp(p->name, (const xmlChar*)"elements") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"element") == 0){
+						CombatType_t type = COMBAT_NONE;
+						int32_t percent = 0;
+
+						if(readXMLInteger(tmpNode, "physicalPercent", intValue)){
+							type = COMBAT_PHYSICALDAMAGE;
+							percent = intValue;
+						}
+						if(readXMLInteger(tmpNode, "icePercent", intValue)){
+							type = COMBAT_ICEDAMAGE;
+							percent = intValue;
+						}
+						else if(readXMLInteger(tmpNode, "earthPercent", intValue)){
+							type = COMBAT_EARTHDAMAGE;
+							percent = intValue;
+						}
+						else if(readXMLInteger(tmpNode, "firePercent", intValue)){
+							type = COMBAT_FIREDAMAGE;
+							percent = intValue;
+						}
+						else if(readXMLInteger(tmpNode, "energyPercent", intValue)){
+							type = COMBAT_ENERGYDAMAGE;
+							percent = intValue;
+						}
+						
+						if(percent != 0 && type != COMBAT_NONE){
+							mType->elementMap[type] = percent;
+						}
+					}
 					tmpNode = tmpNode->next;
 				}
 			}

@@ -79,6 +79,7 @@ typedef std::list<summonBlock_t> SummonList;
 typedef std::list<spellBlock_t> SpellList;
 typedef std::vector<voiceBlock_t> VoiceVector;
 typedef std::list<std::string> MonsterScriptList;
+typedef std::map<CombatType_t, int32_t> ElementMap;
 
 class MonsterType{
 public:
@@ -122,6 +123,7 @@ public:
 	uint32_t manaCost;
 	SummonList summonList;
 	LootItems lootItems;
+	ElementMap elementMap;
 	SpellList spellAttackList;
 	SpellList spellDefenseList;
 

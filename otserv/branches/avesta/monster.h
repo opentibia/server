@@ -108,6 +108,9 @@ public:
 
 	bool isTarget(Creature* creature);
 
+	BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
+		bool checkDefense = false, bool checkArmor = false);
+
 private:
 	CreatureList targetList;
 	CreatureList friendList;

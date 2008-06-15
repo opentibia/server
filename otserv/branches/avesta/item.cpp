@@ -122,18 +122,18 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 	const ItemType& it = items[id];
 
 	count = 1;
-	charges = it.charges;
-	fluid = 0;
-	corpseOwner = 0;
+	if(it.charges != 0){
+		setCharges(it.charges);
+	}
 
 	if(it.isFluidContainer() || it.isSplash()){
-		fluid = _count;
+		setFluidType(count);
 	}
 	else if(it.stackable && _count != 0){
 		count = _count;
 	}
 	else if(it.charges != 0 && _count != 0){
-		charges = _count;
+		setCharges(_count);
 	}
 
 	setDefaultDuration();
@@ -145,9 +145,6 @@ Item::Item(const Item &i) :
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
-	charges = i.charges;
-	fluid = i.fluid;
-	corpseOwner = i.corpseOwner;
 
 	m_attributes = i.m_attributes;
 	if(i.m_firstAttr){
@@ -180,8 +177,9 @@ void Item::setDefaultSubtype()
 	const ItemType& it = items[id];
 
 	count = 1;
-	charges = it.charges;
-	fluid = 0;
+	if(it.charges != 0){
+		setCharges(it.charges);
+	}
 }
 
 void Item::setID(uint16_t newid)
@@ -203,30 +201,30 @@ void Item::setID(uint16_t newid)
 	}
 }
 
-uint8_t Item::getItemCountOrSubtype() const
+uint16_t Item::getItemCountOrSubtype() const
 {
 	const ItemType& it = items[getID()];
 
 	if(it.isFluidContainer() || it.isSplash()){
-		return fluid;
+		return getFluidType();
 	}
 	else if(it.charges != 0){
-		return charges;
+		return getCharges();
 	}
 	else{
 		return count;
 	}
 }
 
-void Item::setItemCountOrSubtype(uint8_t n)
+void Item::setItemCountOrSubtype(uint16_t n)
 {
 	const ItemType& it = items[id];
 
 	if(it.isFluidContainer() || it.isSplash()){
-		fluid = n;
+		setFluidType(n);
 	}
 	else if(it.charges != 0){
-		charges = n;
+		setCharges(n);
 	}
 	else{
 		count = n;
@@ -239,15 +237,15 @@ bool Item::hasSubType() const
 	return it.hasSubType();
 }
 
-uint8_t Item::getSubType() const
+uint16_t Item::getSubType() const
 {
 	const ItemType& it = items[getID()];
 
 	if(it.isFluidContainer() || it.isSplash()){
-		return fluid;
+		return getFluidType();
 	}
 	else if(it.charges != 0){
-		return charges;
+		return getCharges();
 	}
 
 	return 0;
@@ -318,7 +316,7 @@ xmlNodePtr Item::serialize()
 
 	if(hasSubType()){
 		ss.str("");
-		ss << (int)getItemCountOrSubtype();
+		ss << (int32_t)getItemCountOrSubtype();
 		xmlSetProp(nodeItem, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 
@@ -463,6 +461,17 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			break;
 		}
 
+		case ATTR_CHARGES:
+		{
+			uint16_t _charges = 1;
+			if(!propStream.GET_USHORT(_charges)){
+				return false;
+			}
+
+			setItemCountOrSubtype(_charges);
+			break;
+		}
+
 		case ATTR_DURATION:
 		{
 			uint32_t duration = 0;
@@ -560,9 +569,9 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 	*/
 
 	if(hasCharges()){
-		uint8_t _count = getItemCharge();
-		propWriteStream.ADD_UCHAR(ATTR_RUNE_CHARGES);
-		propWriteStream.ADD_UCHAR(_count);
+		uint16_t _count = getCharges();
+		propWriteStream.ADD_UCHAR(ATTR_CHARGES);
+		propWriteStream.ADD_USHORT(_count);
 	}
 
 	if(!isNotMoveable() /*moveable*/){
@@ -686,7 +695,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 double Item::getWeight() const
 {
 	if(isStackable()){
-		return items[id].weight * std::max(1, (int)count);
+		return items[id].weight * std::max((int32_t)1, (int32_t)count);
 	}
 
 	return items[id].weight;
@@ -700,7 +709,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 	if(it.name.length()){
 		if(isStackable() && getItemCount() > 1){
 			if(it.showCount){
-				s << (int)getItemCount() << " ";
+				s << (int32_t)getItemCount() << " ";
 			}
 
 			s << it.pluralName;
@@ -717,10 +726,10 @@ std::string Item::getDescription(int32_t lookDistance) const
 	}
 
 	if(it.isRune()){
-		s << " for magic level " << (int)it.runeMagLevel << "." << std::endl;
+		s << " for magic level " << (int32_t)it.runeMagLevel << "." << std::endl;
 		s << "It's an \"" << it.runeSpellName << "\" spell(";
-		if(getItemCharge()){
-			s << (int)getItemCharge();
+		if(getCharges()){
+			s << (int32_t)getCharges();
 		}
 		else{
 			s << "1";
@@ -732,16 +741,27 @@ std::string Item::getDescription(int32_t lookDistance) const
 		if(getWeaponType() != WEAPON_AMMO){ // Arrows and Bolts doesn't show atk
 			if(getAttack()){
 				if(getExtraDef()){
-					s << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << " " << std::showpos << (int)getExtraDef() << ")" << std::noshowpos;
+					s << " (Atk:" << (int32_t)getAttack() << " Def:" << (int32_t)getDefense() << " " << std::showpos << (int32_t)getExtraDef() << ")" << std::noshowpos;
 				}
 				else{
-					s << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")";
+					s << " (Atk:" << (int32_t)getAttack() << " Def:" << (int32_t)getDefense() << ")";
 				}
 			}
 			else if(getDefense()){
-				s << std::endl << " (Def:" << (int)getDefense() << ")";
+				s << std::endl << " (Def:" << (int32_t)getDefense() << ")";
 			}
 		}
+
+		if(it.showCharges){
+			uint16_t charges = getCharges();
+			if(charges > 1){
+				s << " that has " << (int32_t)charges << " charges left";
+			}
+			else{
+				s << " that has 1 charge left";
+			}
+		}
+
 		s << ".";
 
 		const Weapon* weapon = g_weapons->getWeapon(this);
@@ -760,7 +780,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 			}
 
 			if(wieldInfo & WIELDINFO_LEVEL){
-				s << " of level " << (int)weapon->getReqLevel() << " or higher";
+				s << " of level " << (int32_t)weapon->getReqLevel() << " or higher";
 			}
 
 			if(wieldInfo & WIELDINFO_MAGLV){
@@ -770,36 +790,36 @@ std::string Item::getDescription(int32_t lookDistance) const
 				else{
 					s << " of";
 				}
-				s << " magic level " << (int)weapon->getReqMagLv() << " or higher";
+				s << " magic level " << (int32_t)weapon->getReqMagLv() << " or higher";
 			}
 			s << ".";
 		}
 	}
 	else if(getArmor()){
-		s << " (Arm:" << (int)getArmor() << ").";
+		s << " (Arm:" << (int32_t)getArmor() << ").";
 	}
 	else if(isFluidContainer()){
-		if(fluid == 0){
+		if(getFluidType() == 0){
 			s << ". It is empty.";
 		}
 		else{
-			s << " of " << items[fluid].name << ".";
+			s << " of " << items[getFluidType()].name << ".";
 		}
 	}
 	else if(isSplash()){
 		s << " of ";
-		if(fluid == 0){
+		if(getFluidType() == 0){
 			s << items[1].name << ".";
 		}
 		else{
-			s << items[fluid].name << ".";
+			s << items[getFluidType()].name << ".";
 		}
 	}
 	else if(it.isKey()){
-		s << " (Key:" << (int)getActionId() << ").";
+		s << " (Key:" << (int32_t)getActionId() << ").";
 	}
 	else if(it.isContainer()){
-		s << " (Vol:" << (int)getContainer()->capacity() << ").";
+		s << " (Vol:" << (int32_t)getContainer()->capacity() << ").";
 	}
 	else if(it.allowDistRead){
 		s << "." << std::endl;
@@ -831,9 +851,9 @@ std::string Item::getDescription(int32_t lookDistance) const
 		}
 	}
 	else if(it.showCharges){
-		uint16_t charges = getItemCharge();
+		uint16_t charges = getCharges();
 		if(charges > 1){
-			s << " that has " << (int)charges << " charges left.";
+			s << " that has " << (int32_t)charges << " charges left.";
 		}
 		else{
 			s << " that has 1 charge left.";
@@ -867,6 +887,21 @@ std::string Item::getDescription(int32_t lookDistance) const
 		if(weight > 0){
 			s << std::endl << getWeightDescription(weight);
 		}
+	}
+
+	if(it.abilities.elementType != COMBAT_NONE && it.charges != 0){
+		s << " It is temporarily enchanted with ";
+		std::string strElement = "";
+		int32_t elementDamage = it.abilities.elementDamage;
+		switch(it.abilities.elementType){
+			case COMBAT_ICEDAMAGE: strElement = "ice"; break;
+			case COMBAT_EARTHDAMAGE: strElement = "earth"; break;
+			case COMBAT_FIREDAMAGE: strElement = "fire"; break;
+			case COMBAT_ENERGYDAMAGE: strElement = "energy"; break;
+			default: break;
+		}
+
+		s << strElement << " (" << getAttack() - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
 	}
 
 	if(getSpecialDescription() != ""){
@@ -1076,6 +1111,9 @@ bool ItemAttributes::validateIntAttrType(itemAttrTypes type)
 	case ATTR_ITEM_DURATION:
 	case ATTR_ITEM_DECAYING:
 	case ATTR_ITEM_WRITTENDATE:
+	case ATTR_ITEM_CORPSEOWNER:
+	case ATTR_ITEM_CHARGES:
+	case ATTR_ITEM_FLUIDTYPE:
 		return true;
 		break;
 

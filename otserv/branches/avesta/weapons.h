@@ -84,6 +84,7 @@ public:
 
 	static bool useFist(Player* player, Creature* target);
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const = 0;
+	virtual int32_t getElementDamage(const Player* player, const Creature* target) const {return 0;}
 
 	const uint32_t getReqLevel() const {return level;}
 	const uint32_t getReqMagLv() const {return magLevel;}
@@ -135,12 +136,18 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
+
+	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
+	virtual int32_t getElementDamage(const Player* player, const Item* item) const;
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual void onUsedAmmo(Player* player, Item* item, Tile* destTile) const;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
+
+	CombatType_t elementType;
+	int16_t elementDamage;
 };
 
 class WeaponDistance : public Weapon

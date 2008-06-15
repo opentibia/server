@@ -314,7 +314,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 
 bool Weapon::loadFunction(const std::string& functionName)
 {
-	if(functionName == "internalLoadWeapon"){
+	if(asLowerCaseString(functionName) == "internalloadweapon" || asLowerCaseString(functionName) == "default"){
 		if(configureWeapon(Item::items[getID()])){
 			return true;
 		}
@@ -514,7 +514,7 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 		g_game.transformItem(item, item->getID(), newCount);
 	}
 	else if(ammoAction == AMMOACTION_REMOVECHARGE){
-		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
 		g_game.transformItem(item, item->getID(), newCharge);
 	}
 	else if(ammoAction == AMMOACTION_MOVE){
@@ -524,7 +524,7 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 		//do nothing
 	}
 	else if(item->hasCharges()){
-		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
 		g_game.transformItem(item, item->getID(), newCharge);
 	}
 }
@@ -584,6 +584,8 @@ WeaponMelee::WeaponMelee(LuaScriptInterface* _interface) :
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
+	elementType = COMBAT_NONE;
+	elementDamage = 0;
 }
 
 bool WeaponMelee::configureEvent(xmlNodePtr p)
@@ -598,7 +600,27 @@ bool WeaponMelee::configureEvent(xmlNodePtr p)
 bool WeaponMelee::configureWeapon(const ItemType& it)
 {
 	m_scripted = false;
+	elementType = it.abilities.elementType;
+	elementDamage = it.abilities.elementDamage;
 	return Weapon::configureWeapon(it);
+}
+
+bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
+{
+	if(!Weapon::useWeapon(player, item, target)){
+		return false;
+	}
+
+	if(elementDamage != 0){
+		int32_t damage = getElementDamage(player, item);
+		CombatParams eParams;
+		eParams.combatType = elementType;
+		eParams.isAggressive = true;
+		eParams.useCharges = true;
+		Combat::doCombatHealth(player, target, damage, damage, eParams);
+	}
+
+	return true;
 }
 
 void WeaponMelee::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
@@ -665,11 +687,18 @@ bool WeaponMelee::getSkillType(const Player* player, const Item* item,
 	}
 }
 
+int32_t WeaponMelee::getElementDamage(const Player* player, const Item* item) const
+{
+	int32_t attackSkill = player->getWeaponSkill(item);
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, elementDamage);
+	return -random_range(0, maxValue, DISTRO_NORMAL);
+}
+
 int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t attackSkill = player->getWeaponSkill(item);
 	int32_t attackStrength = player->getAttackStrength();
-	int32_t attackValue = item->getAttack();
+	int32_t attackValue = item->getAttack() - getElementDamage(player, item);
 	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
 
 	if(maxDamage){
