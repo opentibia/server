@@ -127,7 +127,7 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 	}
 
 	if(it.isFluidContainer() || it.isSplash()){
-		setFluidType(count);
+		setFluidType(_count);
 	}
 	else if(it.stackable && _count != 0){
 		count = _count;
