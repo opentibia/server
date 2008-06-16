@@ -57,9 +57,20 @@ enum slots_t {
 struct FindPathParams{
 	bool fullPathSearch;
 	bool clearSight;
+	bool keepDistance;
 	int32_t maxSearchDist;
 	int32_t minTargetDist;
 	int32_t maxTargetDist;
+
+	FindPathParams()
+	{
+		clearSight = true;
+		fullPathSearch = true;
+		keepDistance = false;
+		maxSearchDist = -1;
+		minTargetDist = -1;
+		maxTargetDist = -1;
+	}
 };
 
 enum ZoneType_t{

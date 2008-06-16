@@ -1404,7 +1404,7 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 			//Distance should be higher than the client view range (Map::maxClientViewportX/Map::maxClientViewportY)
 			fpp.maxTargetDist = Map::maxViewportX;
 			fpp.clearSight = false;
-			fpp.fullPathSearch = true;
+			fpp.keepDistance = true;
 		}
 		else{
 			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);

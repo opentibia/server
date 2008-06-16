@@ -3373,6 +3373,12 @@ bool Game::getPathTo(const Creature* creature, const Position& destPos,
 }
 
 bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
+	const FindPathParams& fpp)
+{
+	return(map->getPathMatching(creature, dirList, FrozenPathingConditionCall(targetPos), fpp));
+}
+
+bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
 	uint32_t minTargetDist, uint32_t maxTargetDist, bool fullPathSearch /*= true*/,
 	bool clearSight /*= true*/, int32_t maxSearchDist /*= -1*/)
 {
@@ -3383,7 +3389,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std:
 	fpp.minTargetDist = minTargetDist;
 	fpp.maxTargetDist = maxTargetDist;
 
-	return(map->getPathMatching(creature, dirList, FrozenPathingConditionCall(targetPos), fpp));
+	return getPathToEx(creature, targetPos, dirList, fpp);
 }
 
 void Game::checkCreatureWalk(uint32_t creatureId)

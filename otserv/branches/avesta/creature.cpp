@@ -978,8 +978,7 @@ void Creature::getPathToFollowCreature()
 			fpp.fullPathSearch = true;
 		}
 
-		if(g_game.getPathToEx(this, followCreature->getPosition(), listWalkDir,
-		fpp.minTargetDist, fpp.maxTargetDist, fpp.fullPathSearch, fpp.clearSight, fpp.maxSearchDist)){
+		if(g_game.getPathToEx(this, followCreature->getPosition(), listWalkDir, fpp)){
 			hasFollowPath = true;
 			startAutoWalk(listWalkDir);
 		}
@@ -1513,6 +1512,12 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 
 	if(fpp.clearSight && !g_game.isSightClear(testPos, targetPos, true)){
 		return false;
+	}
+	
+	if(fpp.keepDistance){
+		if(testPos.x == targetPos.x || testPos.y == targetPos.y){
+			return false;
+		}
 	}
 
 	int32_t testDist = std::max(std::abs(targetPos.x - testPos.x), std::abs(targetPos.y - testPos.y));
