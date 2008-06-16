@@ -3372,10 +3372,10 @@ bool Game::getPathTo(const Creature* creature, const Position& destPos,
 	return map->getPathTo(creature, destPos, listDir, maxSearchDist);
 }
 
-bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
-	const FindPathParams& fpp)
+bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
+	std::list<Direction>& dirList, const FindPathParams& fpp)
 {
-	return(map->getPathMatching(creature, dirList, FrozenPathingConditionCall(targetPos), fpp));
+	return map->getPathMatching(creature, dirList, FrozenPathingConditionCall(targetPos), fpp);
 }
 
 bool Game::getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,

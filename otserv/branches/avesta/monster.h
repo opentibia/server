@@ -107,6 +107,7 @@ public:
 	const CreatureList& getFriendList() {return friendList;}
 
 	bool isTarget(Creature* creature);
+	bool isFleeing() const {return getHealth() <= mType->runAwayHealth;}
 
 	BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);

@@ -944,8 +944,7 @@ bool Monster::getNextStep(Direction& dir)
 		if(followCreature){
 			result = getRandomStep(getPosition(), dir);
 		}else{
-			// Walk randomly once every 1-2 seconds, not run around like if we're on drugs
-			if(getTimeSinceLastMove() > 1000) {
+			if(getTimeSinceLastMove() > 1000){
 				//choose a random direction
 				result = getRandomStep(getPosition(), dir);
 			}
@@ -1007,6 +1006,8 @@ bool Monster::getRandomStep(const Position& creaturePos, Direction& dir)
 
 bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
 {
+	bool canDoAttackNow = canUseAttack(creaturePos, attackedCreature);
+
 	assert(attackedCreature != NULL);
 	const Position& centerPos = attackedCreature->getPosition();
 	uint32_t centerToDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs(creaturePos.y - centerPos.y));
@@ -1017,7 +1018,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
 	if(creaturePos.y - centerPos.y >= 0){
 		tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, NORTH)){
-			if(canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), attackedCreature)){
+			if(!canDoAttackNow || canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), attackedCreature)){
 				dirList.push_back(NORTH);
 			}
 		}
@@ -1026,7 +1027,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
 	if(creaturePos.y - centerPos.y <= 0){
 		tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y + 1) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, SOUTH)){
-			if(canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), attackedCreature)){
+			if(!canDoAttackNow || canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), attackedCreature)){
 				dirList.push_back(SOUTH);
 			}
 		}
@@ -1035,7 +1036,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
 	if(creaturePos.x - centerPos.x >= 0){
 		tmpDist = std::max(std::abs((creaturePos.x + 1) - centerPos.x), std::abs((creaturePos.y) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, EAST)){
-			if(canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), attackedCreature)){
+			if(!canDoAttackNow || canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), attackedCreature)){
 				dirList.push_back(EAST);
 			}
 		}
@@ -1044,7 +1045,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
 	if(creaturePos.x - centerPos.x <= 0){
 		tmpDist = std::max(std::abs((creaturePos.x - 1) - centerPos.x), std::abs((creaturePos.y) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, WEST)){
-			if(canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), attackedCreature)){
+			if(!canDoAttackNow || canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), attackedCreature)){
 				dirList.push_back(WEST);
 			}
 		}
@@ -1400,7 +1401,7 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 		}
 	}
 	else{
-		if(getHealth() <= mType->runAwayHealth){
+		if(isFleeing()){
 			//Distance should be higher than the client view range (Map::maxClientViewportX/Map::maxClientViewportY)
 			fpp.maxTargetDist = Map::maxViewportX;
 			fpp.clearSight = false;
