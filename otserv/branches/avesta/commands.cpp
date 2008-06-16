@@ -659,14 +659,20 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 
 	g_game.saveGameState();
 
-	if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now closed.");
+	if(player){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now closed.");
+	}
 	return true;
 }
 
 bool Commands::openServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	game->setGameState(GAME_STATE_NORMAL);
-	if(creature->getPlayer()) creature->getPlayer()->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now open.");
+
+	Player* player = creature->getPlayer();
+	if(player){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now open.");
+	}
 	return true;
 }
 
