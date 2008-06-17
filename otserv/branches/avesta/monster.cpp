@@ -660,14 +660,18 @@ void Monster::doAttacking(uint32_t interval)
 
 bool Monster::canUseAttack(const Position& pos, const Creature* target) const
 {
-	const Position& targetPos = target->getPosition();
-	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
-		if((*it).range != 0 && std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y)) <= (int32_t)(*it).range){
-			return g_game.isSightClear(pos, targetPos, true);
+	if(isHostile()){
+		const Position& targetPos = target->getPosition();
+		for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
+			if((*it).range != 0 && std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y)) <= (int32_t)(*it).range){
+				return g_game.isSightClear(pos, targetPos, true);
+			}
 		}
+
+		return false;
 	}
 
-	return false;
+	return true;
 }
 
 bool Monster::canUseSpell(const Position& pos, const Position& targetPos,
