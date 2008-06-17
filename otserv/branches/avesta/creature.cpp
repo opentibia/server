@@ -961,7 +961,7 @@ bool Creature::setAttackedCreature(Creature* creature)
 
 void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
 {
-	fpp.fullPathSearch = false;
+	fpp.fullPathSearch = !hasFollowPath;
 	fpp.clearSight = true;
 	fpp.maxSearchDist = 12;
 	fpp.minTargetDist = 1;
@@ -973,10 +973,6 @@ void Creature::getPathToFollowCreature()
 	if(followCreature){
 		FindPathParams fpp;
 		getPathSearchParams(followCreature, fpp);
-
-		if(!hasFollowPath){
-			fpp.fullPathSearch = true;
-		}
 
 		if(g_game.getPathToEx(this, followCreature->getPosition(), listWalkDir, fpp)){
 			hasFollowPath = true;
@@ -1486,38 +1482,32 @@ FrozenPathingConditionCall::FrozenPathingConditionCall(const Position& _targetPo
 	targetPos = _targetPos;
 }
 
-bool FrozenPathingConditionCall::operator()(const Position& startPos, const Position& testPos,
-	const FindPathParams& fpp, int32_t& bestMatchDist) const
+bool FrozenPathingConditionCall::isInRange(const Position& startPos, const Position& testPos,
+	const FindPathParams& fpp) const
 {
 	int32_t dxMin = ((fpp.fullPathSearch || (startPos.x - targetPos.x) <= 0) ? fpp.maxTargetDist : 0);
 	int32_t dxMax = ((fpp.fullPathSearch || (startPos.x - targetPos.x) >= 0) ? fpp.maxTargetDist : 0);
 	int32_t dyMin = ((fpp.fullPathSearch || (startPos.y - targetPos.y) <= 0) ? fpp.maxTargetDist : 0);
 	int32_t dyMax = ((fpp.fullPathSearch || (startPos.y - targetPos.y) >= 0) ? fpp.maxTargetDist : 0);
 
-	if(testPos.x > targetPos.x + dxMax){
+	if(testPos.x > targetPos.x + dxMax || testPos.x < targetPos.x - dxMin){
 		return false;
 	}
 
-	if(testPos.x < targetPos.x - dxMin){
+	if(testPos.y > targetPos.y + dyMax || testPos.y < targetPos.y - dyMin){
 		return false;
 	}
+}
 
-	if(testPos.y > targetPos.y + dyMax){
-		return false;
-	}
-
-	if(testPos.y < targetPos.y - dyMin){
+bool FrozenPathingConditionCall::operator()(const Position& startPos, const Position& testPos,
+	const FindPathParams& fpp, int32_t& bestMatchDist) const
+{
+	if(!isInRange(startPos, testPos, fpp)){
 		return false;
 	}
 
 	if(fpp.clearSight && !g_game.isSightClear(testPos, targetPos, true)){
 		return false;
-	}
-	
-	if(fpp.keepDistance){
-		if(testPos.x == targetPos.x || testPos.y == targetPos.y){
-			return false;
-		}
 	}
 
 	int32_t testDist = std::max(std::abs(targetPos.x - testPos.x), std::abs(targetPos.y - testPos.y));

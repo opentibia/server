@@ -590,6 +590,9 @@ void Monster::onThink(uint32_t interval)
 			if(!followCreature || !hasFollowPath){
 				searchTarget();
 			}
+			else if(attackedCreature && !canUseAttack(getPosition(), attackedCreature)){
+				searchTarget();
+			}
 		}
 
 		onThinkTarget(interval);
@@ -955,7 +958,10 @@ bool Monster::getNextStep(Direction& dir)
 
 		if(!result){
 			//target dancing
-			if(attackedCreature && attackedCreature == followCreature){
+			if(isFleeing()){
+				result = getDanceStep(getPosition(), dir, false, false);
+			}
+			else if(attackedCreature && attackedCreature == followCreature){
 				if(mType->staticAttackChance < (uint32_t)random_range(1, 100)){
 					result = getDanceStep(getPosition(), dir);
 				}
@@ -988,6 +994,7 @@ bool Monster::getNextStep(Direction& dir)
 bool Monster::getRandomStep(const Position& creaturePos, Direction& dir)
 {
 	std::vector<Direction> dirList;
+
 	dirList.push_back(NORTH);
 	dirList.push_back(SOUTH);
 	dirList.push_back(WEST);
@@ -1004,7 +1011,8 @@ bool Monster::getRandomStep(const Position& creaturePos, Direction& dir)
 	return false;
 }
 
-bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
+bool Monster::getDanceStep(const Position& creaturePos, Direction& dir,
+	bool keepAttack /*= true*/, bool keepDistance /*= true*/)
 {
 	bool canDoAttackNow = canUseAttack(creaturePos, attackedCreature);
 
@@ -1015,37 +1023,53 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& dir)
 
 	std::vector<Direction> dirList;
 
-	if(creaturePos.y - centerPos.y >= 0){
+	if(!keepDistance || creaturePos.y - centerPos.y >= 0){
 		tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, NORTH)){
-			if(!canDoAttackNow || canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), attackedCreature)){
+			bool result = true;
+			if(keepAttack){
+				result = (!canDoAttackNow || canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), attackedCreature));
+			}
+			if(result){
 				dirList.push_back(NORTH);
 			}
 		}
 	}
 
-	if(creaturePos.y - centerPos.y <= 0){
+	if(!keepDistance || creaturePos.y - centerPos.y <= 0){
 		tmpDist = std::max(std::abs((creaturePos.x) - centerPos.x), std::abs((creaturePos.y + 1) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, SOUTH)){
-			if(!canDoAttackNow || canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), attackedCreature)){
+			bool result = true;
+			if(keepAttack){
+				result = (!canDoAttackNow || canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), attackedCreature));
+			}
+			if(result){
 				dirList.push_back(SOUTH);
 			}
 		}
 	}
 
-	if(creaturePos.x - centerPos.x >= 0){
+	if(!keepDistance || creaturePos.x - centerPos.x >= 0){
 		tmpDist = std::max(std::abs((creaturePos.x + 1) - centerPos.x), std::abs((creaturePos.y) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, EAST)){
-			if(!canDoAttackNow || canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), attackedCreature)){
+			bool result = true;
+			if(keepAttack){
+				result = (!canDoAttackNow || canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), attackedCreature));
+			}
+			if(result){
 				dirList.push_back(EAST);
 			}
 		}
 	}
 
-	if(creaturePos.x - centerPos.x <= 0){
+	if(!keepDistance || creaturePos.x - centerPos.x <= 0){
 		tmpDist = std::max(std::abs((creaturePos.x - 1) - centerPos.x), std::abs((creaturePos.y) - centerPos.y));
 		if(tmpDist == centerToDist && canWalkTo(creaturePos, WEST)){
-			if(!canDoAttackNow || canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), attackedCreature)){
+			bool result = true;
+			if(keepAttack){
+				result = (!canDoAttackNow || canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), attackedCreature));
+			}
+			if(result){
 				dirList.push_back(WEST);
 			}
 		}
@@ -1406,6 +1430,7 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 			fpp.maxTargetDist = Map::maxViewportX;
 			fpp.clearSight = false;
 			fpp.keepDistance = true;
+			fpp.fullPathSearch = false;
 		}
 		else{
 			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);

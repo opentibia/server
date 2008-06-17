@@ -841,8 +841,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 	pos.z = startPos.z;
 	int32_t bestMatch = 0;
 
-	static int32_t neighbourOrderList[8][2] =
-	{
+	static int32_t neighbourOrderList[8][2] = {
 		{-1, 0},
 		{0, 1},
 		{1, 0},
@@ -878,7 +877,8 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 			}
 		}
 
-		for(int i = 0; i < 8; ++i){
+		int32_t dirCount = (fpp.allowDiagonal ? 8 : 4);
+		for(int32_t i = 0; i < dirCount; ++i){
 			pos.x = n->x + neighbourOrderList[i][0];
 			pos.y = n->y + neighbourOrderList[i][1];
 
@@ -886,6 +886,12 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 			if(fpp.maxSearchDist != -1 && (std::abs(startPos.x - pos.x) > fpp.maxSearchDist ||
 				std::abs(startPos.y - pos.y) > fpp.maxSearchDist) ){
 				inRange = false;
+			}
+
+			if(fpp.keepDistance){
+				if(!pathCondition.isInRange(startPos, pos, fpp)){
+					inRange = false;
+				}
 			}
 
 			if(inRange && (tile = canWalkTo(creature, pos))){

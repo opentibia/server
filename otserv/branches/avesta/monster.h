@@ -161,7 +161,8 @@ private:
 	bool canUseSpell(const Position& pos, const Position& targetPos,
 		const spellBlock_t& sb, uint32_t interval, bool& inRange);
 	bool getRandomStep(const Position& creaturePos, Direction& dir);
-	bool getDanceStep(const Position& creaturePos, Direction& dir);
+	bool getDanceStep(const Position& creaturePos, Direction& dir,
+		bool keepAttack = true, bool keepDistance = true);
 	bool isInSpawnRange(const Position& toPos);
 	bool canWalkTo(Position pos, Direction dir);
 

@@ -57,6 +57,7 @@ enum slots_t {
 struct FindPathParams{
 	bool fullPathSearch;
 	bool clearSight;
+	bool allowDiagonal;
 	bool keepDistance;
 	int32_t maxSearchDist;
 	int32_t minTargetDist;
@@ -66,6 +67,7 @@ struct FindPathParams{
 	{
 		clearSight = true;
 		fullPathSearch = true;
+		allowDiagonal = true;
 		keepDistance = false;
 		maxSearchDist = -1;
 		minTargetDist = -1;
@@ -101,6 +103,9 @@ public:
 	
 	virtual bool operator()(const Position& startPos, const Position& testPos,
 		const FindPathParams& fpp, int32_t& bestMatchDist) const;
+
+	bool isInRange(const Position& startPos, const Position& testPos,
+		const FindPathParams& fpp) const;
 
 protected:
 	Position targetPos;
