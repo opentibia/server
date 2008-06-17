@@ -958,11 +958,11 @@ bool Monster::getNextStep(Direction& dir)
 
 		if(!result){
 			//target dancing
-			if(isFleeing()){
-				result = getDanceStep(getPosition(), dir, false, false);
-			}
-			else if(attackedCreature && attackedCreature == followCreature){
-				if(mType->staticAttackChance < (uint32_t)random_range(1, 100)){
+			if(attackedCreature && attackedCreature == followCreature){
+				if(isFleeing()){
+					result = getDanceStep(getPosition(), dir, false, false);
+				}
+				else if(mType->staticAttackChance < (uint32_t)random_range(1, 100)){
 					result = getDanceStep(getPosition(), dir);
 				}
 			}
