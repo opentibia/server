@@ -11,10 +11,10 @@ What is this?
 
 How does it work?
 	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 7.8 and then 7.81.
-	OTServ is now played using Tibia 8.0.
+	OTServ is now played using Tibia 8.11.
 
 	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here 
-	http://web.telia.com/~u49016513/tibialoaderV143.zip or http://otfans.net/showthread.php?t=20767.
+	http://otfans.net/attachment.php?attachmentid=1149 or http://otfans.net/showthread.php?t=20767.
 
 	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
 	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier,
@@ -29,22 +29,24 @@ How does it work?
 	not connecting to the CIP servers.
 	Then you are logged in.
 
-Whats New in 0.5.0?
-	- 7.8x Protocol
-	- Houses
-	- New binary map format OTBM
-	- Private channels
-	- New movement system (full inventory movements, stacktable items and more)
-	- Parcels, letters
-	- Follow and chase opponent
-	- Waiting list
-	- Day-Night cycles
-	- SQlite support
+Whats New in 0.6.0?
+	- 8.11 Protocol
+	- Complete redesign of the database system, now it is a lot more efficient, including new PostgreSQL and ODBC support
+	- Removal of XML as a database driver, since it is slow, inefficient and only messes up more and more
+	- Complete redesign of battle and Lua systems, including new scripting events like onAddItem, onLogin, onSay, etc...
+	- Complete redesign of networking system, now it is a lot more efficient, including the use of ASIO
+	- Support for account balance systems(so you can have "bank" systems like on real Tibia)
+	- New format for items.otb - now items attributes are saved again on items.xml, while OTB has the "client" information
+	- OTAdmin protocol - a new protocol for private information of your server, which you can handle by programs or by PHP(with POT, for example)
+	- A lot new Lua functions
+	- A completely new data folder - now it has useful scripts for servers, and useful scripts for developers also
+	- Maany bugfixes and optimizations
+	- And much, much more(so much that it's not possible to remember)!	
 
 Features?
 	- Full rearranged protocol and game system
 	- Actions (when using a tile or item)
-	- SQL databases (for accounts and players)
+	- SQL databases (for accounts and players), including SQLite, MySQL, PostgreSQL and ODBC support
 	- Crash tracking
 	- Monsters
 	- OTB (You now dont have to convert your map, change any ID, new ID's are just stacked on top of older ID's!)
@@ -54,9 +56,16 @@ Features?
 	- Commands
 	- Autowalk
 	- Rotatable items
-	- Enhanced items database
 	- Runes with charges
 	- Depots
+	- Houses
+	- New binary map format OTBM
+	- Private channels
+	- New movement system (full inventory movements, stacktable items and more)
+	- Parcels, letters
+	- Follow and chase opponent
+	- Waiting list
+	- Day-Night cycles
 	- And more!
 
 How do I use this new stuff?
@@ -64,7 +73,14 @@ How do I use this new stuff?
 
 	The word "actions" might be unfamiliar to you. What it is an action?
 	For instance when you click on a door it will open, or drinking mana-fluids.
-	There is other cool stuff such as SQL-support.
+	"movement" is any thing you do when moving: stepping in or out a tile, adding
+	or removing an item from/to somewhere, equipping or de-equipping an item, etc..
+	"talkactions" are like actions, but they mean for talking. So, everytime you
+	say something, it's a talkaction.
+
+	There is other cool stuff such as SQL-support. It includes MySQL, SQLite, PostgreSQL and ODBC support.
+	Google it if you don't know it, we won't explain other softwares here ;p
+
 	Binary map, well this seems quite new doesn't it. For a long time maps have been in xml format
 	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
 	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
@@ -143,7 +159,7 @@ SQLite with other drivers
 What about old XML files?
 	If you have your old database in XML format and want to switch to SQL database, there is XML2SQL project in our SVN tree.
 
-Different LUA configuration file
+Different Lua configuration file
 	Default configuration file for OTServ is config.lua. In some cases you might need to use another name for 
 	it as config.lua might be ambiguous. OTServ can use otserv.lua file instead of config.lua file.
 
@@ -166,16 +182,16 @@ KDE KDevelop compilation
 			b) for ODBC:
 				--enable-odbc
 		4. Extra
-			4.1 Different LUA configuration file
+			4.1 Different Lua configuration file
 				--with-otconfig
 
 If you find any problem using kdevelop file, please go to http://otserv.org/index.php?title=Compiling_with_KDevelop
 
 Problems?
 	The server is now stable nowadays, but if you do find bugs you can report them at the 
-	CVS Bug Report board on OTFans Forums (http://otfans.net/forumdisplay.php?f=52). If your 
+	OpenTibia Project Tools forum at OTFans(http://otfans.net/project.php?projectid=1). When the
 	server crashes, you should get a report generated at your Otserv folder named report.txt, 
-	you should also report this at the CVS Report Board, this report will help solving bugs a lot.
+	you should also report this at the Project Tools forum, this report will help solving bugs a lot.
 
 Credits?
 	Tliff - Developer, some kind of project leader, Forum administrator
@@ -187,9 +203,7 @@ Credits?
 	Pedro B. - Developer, Scripting
 	Wrzasq - Developer
 	GriZzm0 - Scripting
-	Heliton - Scripting
 	Jiddo - Scripting
-	Nostradamus - Scripting
 	the fike - Developer (advisory/optimization)
 	Vitor - Developer (advisory/optimization)
 	Arkold Thos - Developer?, Linux porter
@@ -213,6 +227,8 @@ Credits?
 	Torvik - Item list (Inactive)
 	j4K3xBl4sT3r - Developer (Inactive)
 	Smygflik - Developer (Inactive)
+	Nostradamus - Scripting (Inactive)
+	Heliton - Scripting (Inactive)
 
 	And special thanks to all otfans.net moderators.
 
@@ -242,4 +258,4 @@ Anything else?
 	Yes! There are utilities available as a seperate package soon at the sourceforge site
 	where the otserv project is, check out Releases there soon on best utilites that are
 	most helpful.
-	We have a chat room now as well on #otserv: http://otfans.net/javachat.php.
+	We have a chat room now as well on #otserv at irc.quakenet.org.

@@ -1497,6 +1497,8 @@ bool FrozenPathingConditionCall::isInRange(const Position& startPos, const Posit
 	if(testPos.y > targetPos.y + dyMax || testPos.y < targetPos.y - dyMin){
 		return false;
 	}
+
+	return true;
 }
 
 bool FrozenPathingConditionCall::operator()(const Position& startPos, const Position& testPos,

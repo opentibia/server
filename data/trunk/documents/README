@@ -6,9 +6,6 @@ This is NOT a data-project.
 The Data folder under the Open Tibia SVN is a folder
 to be released together with OTServ.
 
-This data folder contains experimental systems and should have
-some bugs, so, it is an experimental folder.
-
 Thus, since it is under the otserv project, it is under
 the GPLv2 license. For further information, read the README
 and the LICENSE on OTServ project, under this same subversion
