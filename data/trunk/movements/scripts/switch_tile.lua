@@ -21,14 +21,14 @@ function onStepIn(cid, item, pos)
 		for y = -1, 1 do
 			pos.x = pos.x + x
 			pos.y = pos.y + y
-			depot = getTileThingByType(pos, ITEM_TYPE_DEPOT)
+			depot = getTileItemByType(pos, ITEM_TYPE_DEPOT)
 			if(depot.uid > 0) then
 				local depotItems = getPlayerDepotItems(cid, getDepotId(depot.uid))
 				local depotStr = "Your depot contains " .. depotItems .. " items."
 				if(depotItems == 1) then
 					depotStr = "Your depot contains 1 item."
 				end
-				doPlayerSendTextMessage(cid, MESSAGE_STATUS_DEFAULT, depotStr)
+				doPlayerSendTextMessage(cid, MESSAGE_EVENT_DEFAULT, depotStr)
 				return TRUE
 			end
 			-- The pos has changed, change it back
