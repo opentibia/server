@@ -161,14 +161,14 @@ enum SpeakClasses {
 
 enum MessageClasses {
 	MSG_STATUS_CONSOLE_RED		= 0x11, //Red message in the console
-	MSG_STATUS_CONSOLE_ORANGE	= 0x13, //Orange message in the console
-	MSG_STATUS_WARNING			= 0x14, //Red message in game window and in the console
-	MSG_EVENT_ADVANCE			= 0x15, //White message in game window and in the console
-	MSG_EVENT_DEFAULT			= 0x16, //White message at the bottom of the game window and in the console
-	MSG_STATUS_DEFAULT			= 0x17, //White message at the bottom of the game window and in the console
-	MSG_INFO_DESCR				= 0x18, //Green message in game window and in the console
-	MSG_STATUS_SMALL			= 0x19, //White message at the bottom of the game window"
-	MSG_STATUS_CONSOLE_BLUE		= 0x20, //Blue message in the console
+	MSG_STATUS_CONSOLE_ORANGE	= 0x12, //Orange message in the console
+	MSG_STATUS_WARNING			= 0x13, //Red message in game window and in the console
+	MSG_EVENT_ADVANCE			= 0x14, //White message in game window and in the console
+	MSG_EVENT_DEFAULT			= 0x15, //White message at the bottom of the game window and in the console
+	MSG_STATUS_DEFAULT			= 0x16, //White message at the bottom of the game window and in the console
+	MSG_INFO_DESCR				= 0x17, //Green message in game window and in the console
+	MSG_STATUS_SMALL			= 0x18, //White message at the bottom of the game window"
+	MSG_STATUS_CONSOLE_BLUE		= 0x19, //Blue message in the console
 };
 
 enum FluidColors {

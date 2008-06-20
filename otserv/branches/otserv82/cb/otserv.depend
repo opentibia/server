@@ -1387,7 +1387,7 @@
 	<sstream>
 	"actions.h"
 
-1213931410 c:\documents and settings\root\desktop\opentibia svn\otserv\branches\otserv82\const.h
+1213972214 c:\documents and settings\root\desktop\opentibia svn\otserv\branches\otserv82\const.h
 	"definitions.h"
 
 1213931035 c:\documents and settings\root\desktop\opentibia svn\otserv\branches\otserv82\player.h
@@ -2559,7 +2559,7 @@
 	"combat.h"
 	"movement.h"
 
-1213931031 source:c:\documents and settings\root\desktop\opentibia svn\otserv\branches\otserv82\tools.cpp
+1213939183 source:c:\documents and settings\root\desktop\opentibia svn\otserv\branches\otserv82\tools.cpp
 	"definitions.h"
 	"otsystem.h"
 	"boost/asio.hpp"
