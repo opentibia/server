@@ -409,7 +409,10 @@ MagicEffectNames magicEffectNames[] = {
 	{"cake",              NM_ME_CAKE},
 	{"giantice",          NM_ME_GIANTICE},
 	{"watersplash",       NM_ME_WATERSPLASH},
-	{"plantattack",       NM_ME_PLANTATTACK}
+	{"plantattack",       NM_ME_PLANTATTACK},
+	{"tutorialarrow",		NM_ME_TUTORIALARROW},
+	{"tutorialsquare",		NM_ME_TUTORIALSQUARE}
+
 };
 
 ShootTypeNames shootTypeNames[] = {

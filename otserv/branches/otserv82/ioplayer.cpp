@@ -81,7 +81,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");
-	
+
 	player->health = result->getDataInt("health");
 	player->healthMax = result->getDataInt("healthmax");
 	player->defaultOutfit.lookType = result->getDataInt("looktype");
@@ -480,17 +480,6 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES)
 	<< ", `loss_items` = " << (int)player->getLossPercent(LOSS_ITEMS)
 	<< ", `balance` = " << player->balance;
-
-#ifndef __USE_SQL_PREMDAYS__
-	// there's no need to update prem end here, especially if it hasn't changed!
-	// just be sure to only change premium time via a database query.
-	/*uint32_t premEnd = 0;
-	if(player->premiumDays > 0){
-		premEnd = time(NULL) + player->premiumDays * 86400;
-	}
-
-	query << ", `premend` = " << premEnd;*/
-#endif
 
 #ifdef __SKULLSYSTEM__
 	int32_t redSkullTime = 0;
