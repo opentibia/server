@@ -1089,7 +1089,7 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doCreatureSay", LuaScriptInterface::luaDoCreatureSay);
 	lua_register(m_luaState, "doPlayerSay", LuaScriptInterface::luaDoCreatureSay); //For scripts compatibility
 
-	//doSendMagicEffect(pos, type)
+	//doSendMagicEffect(pos, type[, player])
 	lua_register(m_luaState, "doSendMagicEffect", LuaScriptInterface::luaDoSendMagicEffect);
 
 	//doSendDistanceShoot(frompos, topos, type)
@@ -2181,18 +2181,34 @@ int LuaScriptInterface::luaDoCreatureSay(lua_State *L)
 
 int LuaScriptInterface::luaDoSendMagicEffect(lua_State *L)
 {
-	//doSendMagicEffect(pos, type)
+	//doSendMagicEffect(pos, type[, player])
+	ScriptEnviroment* env = getScriptEnv();
+
+	uint32_t parameters = lua_gettop(L);
+	SpectatorVec list;
+	bool useList = false;
+	if(parameters > 2){
+		uint32_t cid = popNumber(L);
+		Player* player = env->getPlayerByUID(cid);
+		if(player){
+			list.push_back(player);
+		}
+	}
+
 	uint32_t type = popNumber(L);
 	PositionEx pos;
 	popPosition(L, pos);
-
-	ScriptEnviroment* env = getScriptEnv();
 
 	if(pos.x == 0xFFFF){
 		pos = env->getRealPos();
 	}
 
-	g_game.addMagicEffect(pos, type);
+	if(!list.empty()){
+		g_game.addMagicEffect(list, pos, type);
+	}
+	else{
+		g_game.addMagicEffect(pos, type);
+	}
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
