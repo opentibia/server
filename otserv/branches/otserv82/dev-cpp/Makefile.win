@@ -10,21 +10,21 @@ LINKOBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.
 LIBS =  -L"C:/MinGW/lib" -llibxml2 -lgmp -llua5.1 -lboost_system -lwsock32 -lws2_32 -lboost_regex -lsqlite3 -lmysql  
 INCS =  -I"C:/MinGW/include" 
 CXXINCS =  -I"C:/MinGW/include"  -I"C:/MinGW/include/c++/3.4.5"  -I"C:/MinGW/include/c++/3.4.5/backward" 
-BIN  = ../../../../../../../otserv/otserv.exe
+BIN  = ../../../../../../../../otserv/otserv.exe
 CXXFLAGS = $(CXXINCS) -D__USE_SQLITE__ -D__USE_MYSQL__ -D__SKULL_SYSTEM__  
 CFLAGS = $(INCS)  
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom
 
-all: all-before ../../../../../../../otserv/otserv.exe all-after
+all: all-before ../../../../../../../../otserv/otserv.exe all-after
 
 
 clean: clean-custom
 	${RM} $(OBJ) $(BIN)
 
 $(BIN): $(OBJ)
-	$(CPP) $(LINKOBJ) -o "..\..\..\..\..\..\..\otserv\otserv.exe" $(LIBS)
+	$(CPP) $(LINKOBJ) -o "..\..\..\..\..\..\..\..\otserv\otserv.exe" $(LIBS)
 
 obj//account.o: ../account.cpp
 	$(CPP) -c ../account.cpp -o obj//account.o $(CXXFLAGS)
