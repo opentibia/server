@@ -406,6 +406,8 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
+	bool npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize);
+
 protected:
 
 	bool playerSayCommand(Player* player, SpeakClasses type, const std::string& text);
@@ -414,6 +416,7 @@ protected:
 	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+	bool playerSpeakToNpc(Player* player, const std::string& text);
 
 	std::vector<Thing*> ToReleaseThings;
 

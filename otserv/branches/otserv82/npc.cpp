@@ -307,9 +307,9 @@ void Npc::onThink(uint32_t interval)
 	m_npcEventHandler->onThink();
 }
 
-void Npc::doSay(std::string msg)
+void Npc::doSay(std::string msg, Player* focus /*= NULL*/, bool publicize /*= false*/)
 {
-	g_game.internalCreatureSay(this, SPEAK_SAY, msg);
+	g_game.npcSpeakToPlayer(this, focus, msg, publicize);
 }
 
 void Npc::doMove(Direction dir)
@@ -577,13 +577,30 @@ int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 
 int NpcScriptInterface::luaActionSay(lua_State* L)
 {
-	//selfSay(words)
+	//selfSay(words [[, target], send_to_all])
+	    // send_to_all defaults to true if there is no target, false otherwise
+	uint32_t parameters = lua_gettop(L);
+	uint32_t target = 0;
+	bool send_to_all = true;
+	
+	if(parameters == 3)
+	{
+		send_to_all = (popNumber(L) == LUA_TRUE);
+		target = popNumber(L);
+	}
+	else if(parameters == 2)
+	{
+		target = popNumber(L);
+		send_to_all = false;
+	}
 	std::string msg(popString(L));
+	
 	ScriptEnviroment* env = getScriptEnv();
 
 	Npc* npc = env->getNpc();
+	Player* focus = env->getPlayerByUID(target);
 	if(npc){
-		npc->doSay(msg);
+		npc->doSay(msg, focus, send_to_all);
 	}
 
 	return 0;
