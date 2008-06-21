@@ -328,6 +328,16 @@ void Npc::onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
 	m_npcEventHandler->onPlayerTrade(player, callback, itemid, count, amount);
 }
 
+void Npc::onPlayerEndTrade(const Player* player, int32_t buyCallback,
+		int32_t sellCallback)
+{
+    lua_State* L = getScriptInterface()->getLuaState();
+    if(buyCallback != -1)
+		luaL_unref(L, LUA_REGISTRYINDEX, buyCallback);
+	if(sellCallback != -1)
+		luaL_unref(L, LUA_REGISTRYINDEX, sellCallback);
+}
+
 bool Npc::getNextStep(Direction& dir)
 {
 	if(Creature::getNextStep(dir)){
@@ -531,6 +541,7 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getNpcParameter", NpcScriptInterface::luaGetNpcParameter);
 	// new: shop
 	lua_register(m_luaState, "sendShopWindow", NpcScriptInterface::luaSendShop);
+	lua_register(m_luaState, "closeShopWindow", NpcScriptInterface::luaCloseShop);
 }
 
 
@@ -782,7 +793,6 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 int NpcScriptInterface::luaSendShop(lua_State *L)
 {
 	//sendShopWindow(cid, items, onBuy callback, onSell callback)
-	uint32_t parameters = lua_gettop(L);
 	int32_t buyCallback = -1;
 	int32_t sellCallback = -1;
 	std::list<ShopInfo> items;
@@ -791,22 +801,30 @@ int NpcScriptInterface::luaSendShop(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Npc* npc = env->getNpc();
 
-	if((lua_isfunction(L, -1) == 0) || (lua_isfunction(L, -2) == 0))
+	if(lua_isfunction(L, -1) == 0)
 	{
-        reportError(__FUNCTION__, "callback should be a function.");
+        lua_pop(L, 1); // skip it - use default value
+	}
+	else
+	{
+		sellCallback = popCallback(L);
+	}
+	
+	if(lua_isfunction(L, -1) == 0)
+	{
+		lua_pop(L, 1); // skip it - use default value
+	}
+	else
+	{
+		buyCallback = popCallback(L);
+	}
+
+	if(lua_istable(L, -1) == 0)
+	{
+        reportError(__FUNCTION__, "item list is not a table.");
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
-
-	if((lua_istable(L, -3) == 0))
-	{
-        reportError(__FUNCTION__, "item list should be a table.");
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-
-	sellCallback = popCallback(L);
-    buyCallback = popCallback(L);
 
 	// first key
 	lua_pushnil(L);
@@ -839,6 +857,32 @@ int NpcScriptInterface::luaSendShop(lua_State *L)
 	player->sendShop(items);
 	player->sendCash(g_game.getMoney(player));
 	
+	return 1;
+}
+
+int NpcScriptInterface::luaCloseShop(lua_State *L)
+{
+	//closeShopWindow(cid)
+	ScriptEnviroment* env = getScriptEnv();
+	Npc* npc = env->getNpc();
+	Player* player = env->getPlayerByUID(popNumber(L));
+
+	int32_t buyCallback;
+	int32_t sellCallback;
+
+	if(player == NULL) {
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	player->sendCloseShop();
+	player->getShopOwner(buyCallback, sellCallback);
+	if(buyCallback != -1)
+		luaL_unref(L, LUA_REGISTRYINDEX, buyCallback);
+	if(sellCallback != -1)
+		luaL_unref(L, LUA_REGISTRYINDEX, sellCallback);
+	player->setShopOwner(NULL, -1, -1);
+
 	return 1;
 }
 

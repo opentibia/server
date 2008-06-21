@@ -107,6 +107,7 @@ private:
 	void parseLookInShop(NetworkMessage &msg);
 	void parsePlayerPurchase(NetworkMessage &msg);
 	void parsePlayerSale(NetworkMessage &msg);
+	void parseCloseShop(NetworkMessage &msg);
 
 	//trade methods
 	void parseRequestTrade(NetworkMessage& msg);
@@ -163,6 +164,7 @@ private:
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
 
 	void sendShop(const std::list<ShopInfo>& shop);
+	void sendCloseShop();
 	void sendPlayerCash(uint32_t amount);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();

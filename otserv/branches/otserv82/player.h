@@ -483,9 +483,11 @@ public:
 		{if(client) client->sendToChannel(creature, type, text, channelId);}
 	// new: shop window
 	void sendShop(const std::list<ShopInfo>& shop) const
-	    {if(client) client->sendShop(shop); }
+	    {if(client) client->sendShop(shop);}
 	void sendCash(uint32_t amount) const
-		{if(client) client->sendPlayerCash(amount); }
+		{if(client) client->sendPlayerCash(amount);}
+	void sendCloseShop() const
+	    {if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const

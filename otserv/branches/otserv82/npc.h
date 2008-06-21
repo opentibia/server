@@ -57,6 +57,7 @@ protected:
 	static int luaGetNpcParameter(lua_State *L);
 	// new: shop
 	static int luaSendShop(lua_State *L);
+	static int luaCloseShop(lua_State *L);
 
 private:
 	virtual bool initState();
@@ -140,6 +141,8 @@ public:
 	
 	void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
 	    uint8_t count, uint8_t amount);
+	void onPlayerEndTrade(const Player* player, int32_t buyCallback,
+		int32_t sellCallback);
 
 	void setCreatureFocus(Creature* creature);
 
