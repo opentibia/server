@@ -635,6 +635,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseOpenPriv(msg);
 		break;
 
+	case 0x9E: // close NPC
+	    //parseCloseNpc(msg);
+	    break;
+
 	case 0xA0: // set attack and follow mode
 		parseFightModes(msg);
 		break;
