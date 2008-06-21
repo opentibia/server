@@ -1142,19 +1142,20 @@ void Monster::die()
 Item* Monster::getCorpse()
 {
 	Item* corpse = Creature::getCorpse();
-	if(corpse && corpse->isCorpse()){
-		Creature* _lastHitCreature = NULL;
-		Creature* _mostDamageCreature = NULL;
-		if(getKillers(&_lastHitCreature, &_mostDamageCreature) && _mostDamageCreature){
+	if(corpse){
+		Creature* _lastHitCreature = g_game.getPlayerByID(lastHitCreature);
+		if(_lastHitCreature){
 			Player* killer = NULL;
-			if(_mostDamageCreature->getPlayer()){
-				killer = _mostDamageCreature->getPlayer();
+			if(_lastHitCreature->getPlayer()){
+				killer = _lastHitCreature->getPlayer();
 			}
-			else if(_mostDamageCreature->isSummon() && _mostDamageCreature->getMaster()->getPlayer()){
-				killer = _mostDamageCreature->getMaster()->getPlayer();
+			else if(_lastHitCreature->isSummon() && _lastHitCreature->getMaster()->getPlayer()){
+				killer = _lastHitCreature->getMaster()->getPlayer();
 			}
 
-			corpse->setCorpseOwner(killer->getID());
+			if(killer){
+				corpse->setCorpseOwner(killer->getID());
+			}
 		}
 	}
 

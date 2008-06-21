@@ -473,6 +473,7 @@ protected:
 	static int luaIsPlayer(lua_State *L);
 	static int luaIsCreature(lua_State *L);
 	static int luaIsContainer(lua_State *L);
+	static int luaIsCorpse(lua_State *L);
 	static int luaIsMoveable(lua_State *L);
 
 	//container
@@ -573,6 +574,7 @@ protected:
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);
+	static int luaGetFluidSourceType(lua_State *L);
 	static int luaAddEvent(lua_State *L);
 	static int luaStopEvent(lua_State *L);
 	static int luaRegisterCreatureEvent(lua_State *L);

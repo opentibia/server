@@ -179,17 +179,17 @@ public:
 	std::string    article;
 	std::string    pluralName;
 	std::string    description;
-	unsigned short maxItems;
+	uint16_t       maxItems;
 	float          weight;
 	bool           showCount;
 	WeaponType_t   weaponType;
 	Ammo_t         amuType;
 	ShootType_t    shootType;
 	MagicEffectClasses magicEffect;
-	int            attack;
-	int            defence;
-	int            extraDef;
-	int            armor;
+	int32_t        attack;
+	int32_t        defence;
+	int32_t        extraDef;
+	int32_t        armor;
 	uint16_t       slot_position;
 	bool           isVertical;
 	bool           isHorizontal;
@@ -199,27 +199,27 @@ public:
 	int32_t        decayTo;
 	uint32_t       decayTime;
 	bool           stopTime;
-	bool           isCorpse;
+	RaceType_t     corpseType;
 
-	bool            canReadText;
-	bool            canWriteText;
-	unsigned short  maxTextLen;
-	unsigned short  writeOnceItemId;
+	bool           canReadText;
+	bool           canWriteText;
+	uint16_t       maxTextLen;
+	uint16_t       writeOnceItemId;
 
-	bool            stackable;
-	bool            useable;
-	bool            moveable;
-	bool            alwaysOnTop;
-	int             alwaysOnTopOrder;
-	bool            pickupable;
-	bool            rotable;
-	int             rotateTo;
+	bool           stackable;
+	bool           useable;
+	bool           moveable;
+	bool           alwaysOnTop;
+	int32_t        alwaysOnTopOrder;
+	bool           pickupable;
+	bool           rotable;
+	int32_t        rotateTo;
 
-	int             runeMagLevel;
-	std::string     runeSpellName;
+	int32_t        runeMagLevel;
+	std::string    runeSpellName;
 
-	int lightLevel;
-	int lightColor;
+	int32_t        lightLevel;
+	int32_t        lightColor;
 
 	bool floorChangeDown;
 	bool floorChangeNorth;
@@ -243,6 +243,7 @@ public:
 	int32_t maxHitChance;
 	uint32_t shootRange;
 	AmmoAction_t ammoAction;
+	int32_t fluidSource;
 
 	Abilities abilities;
 

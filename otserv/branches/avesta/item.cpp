@@ -195,6 +195,10 @@ void Item::setID(uint16_t newid)
 		removeAttribute(ATTR_ITEM_DURATION);
 	}
 
+	if(hasAttribute(ATTR_ITEM_CORPSEOWNER)){
+		removeAttribute(ATTR_ITEM_CORPSEOWNER);
+	}
+
 	if(newDuration > 0 && (!prevIt.stopTime || !hasAttribute(ATTR_ITEM_DURATION)) ){
 		setDecaying(DECAYING_FALSE);
 		setDuration(newDuration);

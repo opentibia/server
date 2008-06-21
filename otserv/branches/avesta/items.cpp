@@ -83,7 +83,8 @@ ItemType::ItemType()
 	decayTo       = -1;
 	decayTime     = 0;
 	stopTime      = false;
-	isCorpse      = false;
+	corpseType    = RACE_NONE;
+	fluidSource  = -1;
 
 	allowDistRead = false;
 
@@ -270,7 +271,6 @@ int Items::loadFromOtb(std::string file)
 		iType->allowDistRead = hasBitSet(FLAG_ALLOWDISTREAD, flags);
 		iType->rotable = hasBitSet(FLAG_ROTABLE, flags);
 		iType->canReadText = hasBitSet(FLAG_READABLE, flags);
-		iType->isCorpse = hasBitSet(FLAG_CORPSE, flags);
 
 		attribute_t attrib;
 		datasize_t datalen = 0;
@@ -355,7 +355,7 @@ int Items::loadFromOtb(std::string file)
 		}
 
 		reverseItemMap[iType->clientId] = iType->id;
-
+		
 		// store the found item
 		items.addElement(iType, iType->id);
 		node = f.getNextNode(node, type);
@@ -502,9 +502,88 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.rotateTo = intValue;
 								}
 							}
+							else if(asLowerCaseString(strValue) == "moveable"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.moveable = (intValue == 1);
+								}
+							}
+							else if(asLowerCaseString(strValue) == "corpsetype"){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(asLowerCaseString(strValue) == "venom"){
+										it.corpseType = RACE_VENOM;
+									}
+									else if(asLowerCaseString(strValue) == "blood"){
+										it.corpseType = RACE_BLOOD;
+									}
+									else if(asLowerCaseString(strValue) == "undead"){
+										it.corpseType = RACE_UNDEAD;
+									}
+									else if(asLowerCaseString(strValue) == "fire"){
+										it.corpseType = RACE_FIRE;
+									}
+								}
+							}
 							else if(asLowerCaseString(strValue) == "containersize"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.maxItems = intValue;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "fluidsource"){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(asLowerCaseString(strValue) == "water"){
+										it.fluidSource = FLUID_WATER;
+									}
+									else if(asLowerCaseString(strValue) == "blood"){
+										it.fluidSource = FLUID_BLOOD;
+									}
+									else if(asLowerCaseString(strValue) == "beer"){
+										it.fluidSource = FLUID_BEER;
+									}
+									else if(asLowerCaseString(strValue) == "slime"){
+										it.fluidSource = FLUID_SLIME;
+									}
+									else if(asLowerCaseString(strValue) == "lemonade"){
+										it.fluidSource = FLUID_LEMONADE;
+									}
+									else if(asLowerCaseString(strValue) == "milk"){
+										it.fluidSource = FLUID_MILK;
+									}
+									else if(asLowerCaseString(strValue) == "mana"){
+										it.fluidSource = FLUID_MANA;
+									}
+									else if(asLowerCaseString(strValue) == "life"){
+										it.fluidSource = FLUID_LIFE;
+									}
+									else if(asLowerCaseString(strValue) == "oil"){
+										it.fluidSource = FLUID_OIL;
+									}
+									else if(asLowerCaseString(strValue) == "urine"){
+										it.fluidSource = FLUID_URINE;
+									}
+									else if(asLowerCaseString(strValue) == "coconut"){
+										it.fluidSource = FLUID_COCONUTMILK;
+									}
+									else if(asLowerCaseString(strValue) == "wine"){
+										it.fluidSource = FLUID_WINE;
+									}
+									else if(asLowerCaseString(strValue) == "mud"){
+										it.fluidSource = FLUID_MUD;
+									}
+									else if(asLowerCaseString(strValue) == "fruitjuice"){
+										it.fluidSource = FLUID_FRUITJUICE;
+									}
+									else if(asLowerCaseString(strValue) == "lava"){
+										it.fluidSource = FLUID_LAVA;
+									}
+									else if(asLowerCaseString(strValue) == "rum"){
+										it.fluidSource = FLUID_RUM;
+									}
+									else if(asLowerCaseString(strValue) == "swamp"){
+										it.fluidSource = FLUID_SWAMP;
+									}
+									else{
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown fluidSource " << strValue  << std::endl;
+									}
 								}
 							}
 							/*

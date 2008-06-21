@@ -1282,6 +1282,9 @@ void LuaScriptInterface::registerFunctions()
 	//isContainer(uid)
 	lua_register(m_luaState, "isContainer", LuaScriptInterface::luaIsContainer);
 
+	//isCorpse(uid)
+	lua_register(m_luaState, "isCorpse", LuaScriptInterface::luaIsCorpse);
+
 	//isMoveable(uid)
 	lua_register(m_luaState, "isMoveable", LuaScriptInterface::luaIsMoveable);
 
@@ -1562,8 +1565,8 @@ void LuaScriptInterface::registerFunctions()
 	//isSightClear(fromPos, toPos, floorCheck)
 	lua_register(m_luaState, "isSightClear", LuaScriptInterface::luaIsSightClear);
 
-	//debugPrint(text)
-	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
+	//getFluidSourceType(type)
+	lua_register(m_luaState, "getFluidSourceType", LuaScriptInterface::luaGetFluidSourceType);
 
 	//isInArray(array, value)
 	lua_register(m_luaState, "isInArray", LuaScriptInterface::luaIsInArray);
@@ -1573,7 +1576,6 @@ void LuaScriptInterface::registerFunctions()
 
 	//stopEvent(eventid)
 	lua_register(m_luaState, "stopEvent", LuaScriptInterface::luaStopEvent);
-
 
 	//addPlayerBan(playerName = 0xFFFFFFFF[, length = 0[, admin = 0[, comment = "No comment"]]])
 	lua_register(m_luaState, "addPlayerBan", LuaScriptInterface::luaAddPlayerBan);
@@ -1616,6 +1618,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//getDataDir()
 	lua_register(m_luaState, "getDataDir", LuaScriptInterface::luaGetDataDirectory);
+
+	//debugPrint(text)
+	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
@@ -5648,6 +5653,24 @@ int LuaScriptInterface::luaIsContainer(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaIsCorpse(lua_State *L)
+{
+	//isCorpse(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(item){
+		const ItemType& it = Item::items[item->getID()];
+		lua_pushnumber(L, (it.corpseType != RACE_NONE ? LUA_TRUE : LUA_FALSE));
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}
+
 int LuaScriptInterface::luaIsMoveable(lua_State *L)
 {
 	//isMoveable(uid)
@@ -5946,6 +5969,24 @@ int LuaScriptInterface::luaGetDepotId(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 	}
 
+	return 1;
+}
+
+int LuaScriptInterface::luaGetFluidSourceType(lua_State *L)
+{
+	//getFluidSourceType(type)
+	uint32_t type = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	const ItemType& it = Item::items[type];
+	if(it.id != 0){
+		lua_pushnumber(L, it.fluidSource);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
 	return 1;
 }
 

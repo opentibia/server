@@ -539,11 +539,10 @@ bool Actions::openContainer(Player* player, Container* container, const uint8_t 
 		openContainer = container;
 	}
 
-	//Verify if the container isn't a body
-	if(container->isCorpse() && container->getCorpseOwner() != 0){
+	if(container->getCorpseOwner() != 0){
 		if(!player->canOpenCorpse(container->getCorpseOwner())){
 			player->sendCancel("You are not the owner.");
-			return false;
+			return true;
 		}
 	}
 
