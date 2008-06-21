@@ -17,7 +17,7 @@ end
 function onCreatureSay(cid, type, msg)
 	if((msg == "hi") and (focus == 0))then
 		selfSay("Welcome, ".. getCreatureName(cid) ..".")
-		selfSay("Do you want to see my {wares}?", cid)
+		addEvent(selfSay, 1000, "Do you want to see my {wares}?", cid)
 		focus = cid
 	elseif((focus == cid) and (msg == "wares" or msg == "trade"))then
 		selfSay("Pretty nice, right?", cid)
@@ -27,11 +27,18 @@ function onCreatureSay(cid, type, msg)
 	elseif((focus == cid) and (msg == "bye" or msg == "goodbye" or msg == "cya"))then
 		selfSay("Goodbye!", cid, TRUE)
 		focus = 0
-	else
-		selfSay("I don't understand you.", cid)
 	end
-	
-	return 1
+end
+
+function onPlayerCloseChannel(cid)
+	if(focus == cid)then
+		selfSay("Hmph!")
+		focus = 0
+	end
+end
+
+function onPlayerEndTrade(cid)
+	selfSay("It was a pleasure doing business with you.", cid)
 end
 
 function onThink()

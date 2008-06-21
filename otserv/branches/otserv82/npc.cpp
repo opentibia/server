@@ -293,6 +293,11 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 	}
 }
 
+void Npc::onPlayerCloseChannel(const Player* player)
+{
+	m_npcEventHandler->onPlayerCloseChannel(player);
+}
+
 void Npc::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
 {
 	#ifdef __DEBUG_NPC__
@@ -336,6 +341,9 @@ void Npc::onPlayerEndTrade(const Player* player, int32_t buyCallback,
 		luaL_unref(L, LUA_REGISTRYINDEX, buyCallback);
 	if(sellCallback != -1)
 		luaL_unref(L, LUA_REGISTRYINDEX, sellCallback);
+
+	//Tell the script it
+	m_npcEventHandler->onPlayerEndTrade(player);
 }
 
 bool Npc::getNextStep(Direction& dir)
@@ -920,6 +928,8 @@ NpcEventsHandler(npc)
 	m_onCreatureDisappear = m_scriptInterface->getEvent("onCreatureDisappear");
 	m_onCreatureAppear = m_scriptInterface->getEvent("onCreatureAppear");
 	m_onCreatureMove = m_scriptInterface->getEvent("onCreatureMove");
+	m_onPlayerCloseChannel = m_scriptInterface->getEvent("onPlayerCloseChannel");
+	m_onPlayerEndTrade = m_scriptInterface->getEvent("onPlayerEndTrade");
 	m_onThink = m_scriptInterface->getEvent("onThink");
 	m_loaded = true;
 }
@@ -1070,6 +1080,7 @@ void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t i
 	if(callback == -1){
 		return;
 	}
+	//"onBuy"(cid, itemid, count, amount)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		env->setScriptId(-1, m_scriptInterface);
@@ -1088,7 +1099,57 @@ void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t i
 		//todo
 	}
 	else{
-		std::cout << "[Error] Call stack overflow. NpcScript::onThink" << std::endl;
+		std::cout << "[Error] Call stack overflow. NpcScript::onPlayerTrade" << std::endl;
+	}
+}
+
+void NpcScript::onPlayerCloseChannel(const Player* player)
+{
+	if(m_onPlayerCloseChannel == -1){
+		return;
+	}
+	//onPlayerCloseChannel(cid)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		env->setScriptId(m_onPlayerCloseChannel, m_scriptInterface);
+		env->setRealPos(m_npc->getPosition());
+		env->setNpc(m_npc);
+
+		uint32_t cid = env->addThing(const_cast<Player*>(player));
+
+		lua_State* L = m_scriptInterface->getLuaState();
+		m_scriptInterface->pushFunction(m_onPlayerCloseChannel);
+		lua_pushnumber(L, cid);
+		m_scriptInterface->callFunction(1);
+		m_scriptInterface->releaseScriptEnv();
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. NpcScript::onPlayerCloseChannel" << std::endl;
+	}
+}
+
+void NpcScript::onPlayerEndTrade(const Player* player)
+{
+	if(m_onPlayerCloseChannel == -1){
+		return;
+	}
+	//onPlayerEndTrade(cid)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		env->setScriptId(m_onPlayerCloseChannel, m_scriptInterface);
+		env->setRealPos(m_npc->getPosition());
+		env->setNpc(m_npc);
+
+		uint32_t cid = env->addThing(const_cast<Player*>(player));
+
+		lua_State* L = m_scriptInterface->getLuaState();
+		m_scriptInterface->pushFunction(m_onPlayerEndTrade);
+		lua_pushnumber(L, cid);
+		m_scriptInterface->callFunction(1);
+		m_scriptInterface->releaseScriptEnv();
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. NpcScript::onPlayerEndTrade" << std::endl;
 	}
 }
 

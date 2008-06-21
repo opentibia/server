@@ -310,6 +310,7 @@ public:
 	bool playerOpenChannel(uint32_t playerId, uint16_t channelId);
 	bool playerCloseChannel(uint32_t playerId, uint16_t channelId);
 	bool playerOpenPrivateChannel(uint32_t playerId, const std::string& receiver);
+	bool playerCloseNpcChannel(uint32_t playerId);
 	bool playerReceivePing(uint32_t playerId);
 	bool playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(uint32_t playerId);
@@ -335,6 +336,7 @@ public:
 		uint8_t amount);
 	bool playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		uint8_t amount);
+	bool playerCloseShop(uint32_t playerId);
 	bool playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count);
 	bool playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerFollowCreature(uint32_t playerId, uint32_t creatureId);

@@ -1713,6 +1713,25 @@ bool Game::playerOpenPrivateChannel(uint32_t playerId, const std::string& receiv
 	return true;
 }
 
+bool Game::playerCloseNpcChannel(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	getSpectators(list, player->getPosition());
+	Npc* npc;
+
+	for(it = list.begin(); it != list.end(); ++it){
+		if((npc = (*it)->getNpc())){
+			npc->onPlayerCloseChannel(player);
+		}
+	}
+	return true;
+}
+
 bool Game::playerReceivePing(uint32_t playerId)
 {
 	Player* player = getPlayerByID(playerId);
@@ -2402,6 +2421,25 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 	return true;
 }
 
+bool Game::playerCloseShop(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
+		return false;
+
+	//unreference callbacks
+	int32_t onBuy;
+	int32_t onSell;
+
+	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	if(merchant){
+		merchant->onPlayerEndTrade(player, onBuy, onSell);
+	}
+
+	player->setShopOwner(NULL, -1, -1);
+	return true;
+}
+
 bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 {
 	Player* player = getPlayerByID(playerId);
@@ -2419,6 +2457,7 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
 	delete item;
+	return true;
 }
 
 bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteId, uint8_t stackPos)
@@ -2818,6 +2857,7 @@ bool Game::npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, b
 			}
 		}
 	}
+	return true;
 }
 
 //--

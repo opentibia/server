@@ -562,6 +562,7 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 
 	case 0x7C: // player closed shop window
 	    parseCloseShop(msg);
+		break;
 
 	case 0x7D: // Request trade
 		parseRequestTrade(msg);
@@ -636,7 +637,7 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0x9E: // close NPC
-	    //parseCloseNpc(msg);
+	    parseCloseNpc(msg);
 	    break;
 
 	case 0xA0: // set attack and follow mode
@@ -946,6 +947,11 @@ void ProtocolGame::parseOpenPriv(NetworkMessage& msg)
 	const std::string receiver = msg.GetString();
 
 	addGameTask(&Game::playerOpenPrivateChannel, player->getID(), receiver);
+}
+
+void ProtocolGame::parseCloseNpc(NetworkMessage& msg)
+{
+	addGameTask(&Game::playerCloseNpcChannel, player->getID());
 }
 
 void ProtocolGame::parseCancelMove(NetworkMessage& msg)
@@ -1282,15 +1288,7 @@ void ProtocolGame::parsePlayerSale(NetworkMessage &msg)
 
 void ProtocolGame::parseCloseShop(NetworkMessage &msg)
 {
-    // unreference the callbacks
-	int32_t buyCallback;
-	int32_t sellCallback;
-	Npc* npc = player->getShopOwner(buyCallback, sellCallback);
-	if(npc != NULL)
-	{
-		npc->onPlayerEndTrade(player, buyCallback, sellCallback);
-	}
-	player->setShopOwner(NULL, -1, -1);
+	addGameTask(&Game::playerCloseShop, player->getID());
 }
 
 void ProtocolGame::parseRequestTrade(NetworkMessage& msg)

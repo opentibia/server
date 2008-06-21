@@ -78,6 +78,8 @@ public:
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
 	    uint8_t count, uint8_t amount){};
+	virtual void onPlayerCloseChannel(const Player* player){};
+	virtual void onPlayerEndTrade(const Player* player){};
 	virtual void onThink(){};
 
 	bool isLoaded();
@@ -99,6 +101,8 @@ public:
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
 	    uint8_t count, uint8_t amount);
+	virtual void onPlayerCloseChannel(const Player* player);
+	virtual void onPlayerEndTrade(const Player* player);
 	virtual void onThink();
 
 private:
@@ -108,6 +112,8 @@ private:
 	int32_t m_onCreatureDisappear;
 	int32_t m_onCreatureMove;
 	int32_t m_onCreatureSay;
+	int32_t m_onPlayerCloseChannel;
+	int32_t m_onPlayerEndTrade;
 	int32_t m_onThink;
 };
 
@@ -138,7 +144,8 @@ public:
 	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
-	
+
+	void onPlayerCloseChannel(const Player* player);
 	void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
 	    uint8_t count, uint8_t amount);
 	void onPlayerEndTrade(const Player* player, int32_t buyCallback,

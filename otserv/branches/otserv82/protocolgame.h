@@ -129,6 +129,7 @@ private:
 	void parseOpenChannel(NetworkMessage& msg);
 	void parseOpenPriv(NetworkMessage& msg);
 	void parseCloseChannel(NetworkMessage& msg);
+	void parseCloseNpc(NetworkMessage& msg);
 
 	void parseDebugAssert(NetworkMessage& msg);
 
