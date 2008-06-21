@@ -38,6 +38,7 @@
 class House;
 class Weapon;
 class ProtocolGame;
+class Npc;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -237,6 +238,23 @@ public:
 	void setTradeState(tradestate_t state) {tradeState = state;};
 	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
+	
+	//shop functions
+	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell) {
+			shopOwner = owner;
+			purchaseCallback = onBuy;
+			saleCallback = onSell;
+		};
+	Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) {
+			onBuy = purchaseCallback;
+			onSell = saleCallback;
+			return shopOwner;
+		};
+	const Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) const {
+			onBuy = purchaseCallback;
+			onSell = saleCallback;
+			return shopOwner;
+		};
 
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
@@ -463,6 +481,11 @@ public:
 		{if(client) client->sendTextWindow(windowTextId, itemId, text);}
 	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId) const
 		{if(client) client->sendToChannel(creature, type, text, channelId);}
+	// new: shop window
+	void sendShop(const std::list<ShopInfo>& shop) const
+	    {if(client) client->sendShop(shop); }
+	void sendCash(uint32_t amount) const
+		{if(client) client->sendPlayerCash(amount); }
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const
@@ -625,6 +648,11 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
+	//shop variables
+	Npc* shopOwner;
+	int32_t purchaseCallback;
+	int32_t saleCallback;
+	
 
 	std::string name;
 	std::string nameDescription;

@@ -791,6 +791,11 @@ void LuaScriptInterface::pushPosition(lua_State *L, const Position& position, ui
 	setField(L, "stackpos", stackpos);
 }
 
+void LuaScriptInterface::pushCallback(lua_State *L, int32_t callback)
+{
+    lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
+}
+
 LuaVariant LuaScriptInterface::popVariant(lua_State *L)
 {
 	uint32_t type = getField(L, "type");
@@ -867,6 +872,11 @@ const char* LuaScriptInterface::popString(lua_State *L)
 {
 	lua_pop(L,1);
 	return lua_tostring(L, 0);
+}
+
+int32_t LuaScriptInterface::popCallback(lua_State *L)
+{
+	return luaL_ref(L, LUA_REGISTRYINDEX);
 }
 
 int32_t LuaScriptInterface::getField(lua_State *L, const char *key)

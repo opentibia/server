@@ -322,6 +322,12 @@ void Npc::doTurn(Direction dir)
 	g_game.internalCreatureTurn(this, dir);
 }
 
+void Npc::onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	    uint8_t count, uint8_t amount)
+{
+	m_npcEventHandler->onPlayerTrade(player, callback, itemid, count, amount);
+}
+
 bool Npc::getNextStep(Direction& dir)
 {
 	if(Creature::getNextStep(dir)){
@@ -523,6 +529,8 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getNpcPos", NpcScriptInterface::luaGetNpcPos);
 	lua_register(m_luaState, "getNpcName", NpcScriptInterface::luaGetNpcName);
 	lua_register(m_luaState, "getNpcParameter", NpcScriptInterface::luaGetNpcParameter);
+	// new: shop
+	lua_register(m_luaState, "sendShopWindow", NpcScriptInterface::luaSendShop);
 }
 
 
@@ -770,6 +778,71 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 	return 1;
 }
 
+// new: shop
+int NpcScriptInterface::luaSendShop(lua_State *L)
+{
+	//sendShopWindow(cid, items, onBuy callback, onSell callback)
+	uint32_t parameters = lua_gettop(L);
+	int32_t buyCallback = -1;
+	int32_t sellCallback = -1;
+	std::list<ShopInfo> items;
+	Player* player = NULL;
+
+	ScriptEnviroment* env = getScriptEnv();
+	Npc* npc = env->getNpc();
+
+	if((lua_isfunction(L, -1) == 0) || (lua_isfunction(L, -2) == 0))
+	{
+        reportError(__FUNCTION__, "callback should be a function.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	if((lua_istable(L, -3) == 0))
+	{
+        reportError(__FUNCTION__, "item list should be a table.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	sellCallback = popCallback(L);
+    buyCallback = popCallback(L);
+
+	// first key
+	lua_pushnil(L);
+	while(lua_next(L, -2) != 0)
+	{
+        ShopInfo item;
+        item.itemId = getField(L, "id");
+        item.itemCharges = getField(L, "charges");
+		item.buyPrice = getField(L, "buy");
+		item.salePrice = getField(L, "sell");
+#ifdef __DEBUG_820__
+		std::cout 	<< "Added Item " << item.itemId
+					<< " with charges " << item.itemCharges
+					<< " costs " << item.buyPrice
+					<< " and sells for " << item.salePrice
+					<< std::endl;
+#endif
+		items.push_back(item);
+		
+		lua_pop(L, 1);
+	}
+	lua_pop(L, 1);
+	
+	player = env->getPlayerByUID(popNumber(L));
+	if(player == NULL) {
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	player->setShopOwner(env->getNpc(), buyCallback, sellCallback);
+	player->sendShop(items);
+	player->sendCash(g_game.getMoney(player));
+	
+	return 1;
+}
+
+
 NpcEventsHandler::NpcEventsHandler(Npc* npc)
 {
 	m_npc = npc;
@@ -944,6 +1017,34 @@ void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. NpcScript::onCreatureSay" << std::endl;
+	}
+}
+
+void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	uint8_t count, uint8_t amount)
+{
+	if(callback == -1){
+		return;
+	}
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		env->setScriptId(-1, m_scriptInterface);
+		env->setRealPos(m_npc->getPosition());
+		env->setNpc(m_npc);
+		
+		uint32_t cid = env->addThing(const_cast<Player*>(player));
+		lua_State* L = m_scriptInterface->getLuaState();
+		LuaScriptInterface::pushCallback(L, callback);
+		lua_pushnumber(L, cid);
+		lua_pushnumber(L, itemid);
+		lua_pushnumber(L, count);
+		lua_pushnumber(L, amount);
+		m_scriptInterface->callFunction(4);
+		m_scriptInterface->releaseScriptEnv();
+		//todo
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. NpcScript::onThink" << std::endl;
 	}
 }
 

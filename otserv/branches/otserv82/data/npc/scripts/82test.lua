@@ -1,5 +1,13 @@
 local focus = 0
 
+local onBuy = function(cid, item, count, amount)
+	selfSay("You can't buy this, noob!", cid)
+end
+
+local onSell = function(cid, item, count, amount)
+	selfSay("You want to sell me this trash? No way!", cid)
+end
+
 function onCreatureAppear(cid)
 end
 
@@ -12,7 +20,10 @@ function onCreatureSay(cid, type, msg)
 		selfSay("Do you want to see my {wares}?", cid)
 		focus = cid
 	elseif((focus == cid) and (msg == "wares" or msg == "trade"))then
-		selfSay("I don't have anything to trade, sorry.", cid)
+		selfSay("Pretty nice, right?", cid)
+		sendShopWindow(cid, {{id=2160, charges=1, buy=10000, sell=10000},
+							{id=2152, charges=1, buy=100, sell=100},
+							{id=2148, charges=1, buy=1, sell=1}}, onBuy, onSell)
 	elseif((focus == cid) and (msg == "bye" or msg == "goodbye" or msg == "cya"))then
 		selfSay("Goodbye!", cid, TRUE)
 		focus = 0

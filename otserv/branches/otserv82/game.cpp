@@ -2360,6 +2360,67 @@ bool Game::internalCloseTrade(Player* player)
 	return true;
 }
 
+bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+	uint8_t amount)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
+		return false;
+
+	int32_t onBuy;
+	int32_t onSell;
+
+	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	if(merchant == NULL)
+		return false;
+
+	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+
+	merchant->onPlayerTrade(player, onBuy,
+	    it.id, count, amount);
+	return true;
+}
+
+bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+	uint8_t amount)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
+		return false;
+
+	int32_t onBuy;
+	int32_t onSell;
+
+	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	if(merchant == NULL)
+		return false;
+
+	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+
+	merchant->onPlayerTrade(player, onSell,
+	    it.id, count, amount);
+	return true;
+}
+
+bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
+		return false;
+
+    const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+    
+    Item* item = Item::CreateItem(it.id, count);
+	if(item == NULL)
+		return false;
+
+	std::stringstream ss;
+	ss << "You see " << item->getDescription(1);
+	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+
+	delete item;
+}
+
 bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteId, uint8_t stackPos)
 {
 	Player* player = getPlayerByID(playerId);

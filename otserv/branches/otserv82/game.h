@@ -331,6 +331,11 @@ public:
 	bool playerAcceptTrade(uint32_t playerId);
 	bool playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(uint32_t playerId);
+	bool playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+		uint8_t amount);
+	bool playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+		uint8_t amount);
+	bool playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count);
 	bool playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerFollowCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerCancelAttackAndFollow(uint32_t playerId);

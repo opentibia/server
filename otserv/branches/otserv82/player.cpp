@@ -149,6 +149,10 @@ Creature()
 
 	editHouse = NULL;
 	editListId = 0;
+	
+	shopOwner = NULL;
+	purchaseCallback = -1;
+	saleCallback = -1;
 
 #ifdef __SKULLSYSTEM__
 	redSkullTicks = 0;

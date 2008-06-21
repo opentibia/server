@@ -55,6 +55,8 @@ protected:
 	static int luaGetNpcPos(lua_State *L);
 	static int luaGetNpcName(lua_State *L);
 	static int luaGetNpcParameter(lua_State *L);
+	// new: shop
+	static int luaSendShop(lua_State *L);
 
 private:
 	virtual bool initState();
@@ -73,6 +75,8 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature){};
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos){};
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
+	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	    uint8_t count, uint8_t amount){};
 	virtual void onThink(){};
 
 	bool isLoaded();
@@ -92,6 +96,8 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature);
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
+	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	    uint8_t count, uint8_t amount);
 	virtual void onThink();
 
 private:
@@ -131,6 +137,9 @@ public:
 	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
+	
+	void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	    uint8_t count, uint8_t amount);
 
 	void setCreatureFocus(Creature* creature);
 

@@ -103,6 +103,11 @@ private:
 	void parseTextWindow(NetworkMessage& msg);
 	void parseHouseWindow(NetworkMessage& msg);
 
+	//shop methods
+	void parseLookInShop(NetworkMessage &msg);
+	void parsePlayerPurchase(NetworkMessage &msg);
+	void parsePlayerSale(NetworkMessage &msg);
+
 	//trade methods
 	void parseRequestTrade(NetworkMessage& msg);
 	void parseLookInTrade(NetworkMessage& msg);
@@ -157,6 +162,8 @@ private:
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
 
+	void sendShop(const std::list<ShopInfo>& shop);
+	void sendPlayerCash(uint32_t amount);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 
@@ -249,6 +256,9 @@ private:
 	void AddInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void UpdateInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void RemoveInventoryItem(NetworkMessage* msg, slots_t slot);
+	
+	//shop
+	void AddShopItem(NetworkMessage* msg, const ShopInfo item);
 
 	friend class Player;
 

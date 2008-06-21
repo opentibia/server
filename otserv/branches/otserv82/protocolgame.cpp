@@ -548,6 +548,18 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseThrow(msg);
 		break;
 
+	case 0x79: // description in shop window
+		parseLookInShop(msg);
+		break;
+
+	case 0x7A: // player bought from shop
+	    parsePlayerPurchase(msg);
+	    break;
+
+	case 0x7B: // player sold to shop
+	    parsePlayerSale(msg);
+	    break;
+
 	case 0x7D: // Request trade
 		parseRequestTrade(msg);
 		break;
@@ -677,10 +689,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	default:
-#ifdef __DEBUG__
+//#ifdef __DEBUG__
 		printf("unknown packet header: %x \n", recvbyte);
 		parseDebug(msg);
-#endif
+//#endif
 		break;
 	}
 }
@@ -936,7 +948,7 @@ void ProtocolGame::parseCancelMove(NetworkMessage& msg)
 
 void ProtocolGame::parseDebug(NetworkMessage& msg)
 {
-	int dataLength = msg.getMessageLength() - 3;
+	int dataLength = msg.getMessageLength() - 1;
 	if(dataLength != 0){
 		printf("data: ");
 		int data = msg.GetByte();
@@ -1227,6 +1239,40 @@ void ProtocolGame::parseHouseWindow(NetworkMessage &msg)
 	addGameTask(&Game::playerUpdateHouseWindow, player->getID(), doorId, id, text);
 }
 
+void ProtocolGame::parseLookInShop(NetworkMessage &msg)
+{
+	uint16_t id = msg.GetU16();
+	uint16_t count = msg.GetByte();
+	
+	addGameTask(&Game::playerLookInShop, player->getID(), id, count);
+}
+
+void ProtocolGame::parsePlayerPurchase(NetworkMessage &msg)
+{
+	uint16_t id = msg.GetU16();
+	uint16_t count = msg.GetByte();
+	uint16_t amount = msg.GetByte();
+#ifdef __DEBUG_820__
+	const ItemType& it = Item::items.getItemIdByClientId(id);
+	std::cout << "Player Bought " << amount*count << " of " << it.name
+			   << "(" << it.id << ")" << std::endl;
+#endif
+	addGameTask(&Game::playerPurchaseItem, player->getID(), id, count, amount);
+}
+
+void ProtocolGame::parsePlayerSale(NetworkMessage &msg)
+{
+	uint16_t id = msg.GetU16();
+	uint16_t count = msg.GetByte();
+	uint16_t amount = msg.GetByte();
+#ifdef __DEBUG_820__
+	const ItemType& it = Item::items.getItemIdByClientId(id);
+	std::cout << "Player Sold " << amount*count << " of " << it.name
+			   << "(" << it.id << ")" << std::endl;
+#endif
+	addGameTask(&Game::playerSellItem, player->getID(), id, count, amount);
+}
+
 void ProtocolGame::parseRequestTrade(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
@@ -1493,6 +1539,40 @@ void ProtocolGame::sendContainer(uint32_t cid, const Container* container, bool 
 		for(cit = container->getItems(); cit != container->getEnd() && i < 255; ++cit, ++i){
 			msg->AddItem(*cit);
 		}
+	}
+}
+
+void ProtocolGame::sendShop(const std::list<ShopInfo>& shop)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg)
+	{
+		msg->AddByte(0x7A);
+		if(shop.size() > 255)
+		{
+			msg->AddByte(255);
+		}
+		else
+		{
+			msg->AddByte(shop.size());
+		}
+		
+		std::list<ShopInfo>::const_iterator it;
+		uint32_t i = 0;
+		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i)
+		{
+			AddShopItem(msg, (*it));
+		}
+	}
+}
+
+void ProtocolGame::sendPlayerCash(uint32_t amount)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg)
+	{
+		msg->AddByte(0x7B);
+		msg->AddU32(amount);
 	}
 }
 
@@ -2488,4 +2568,15 @@ void ProtocolGame::RemoveContainerItem(NetworkMessage* msg, uint8_t cid, uint8_t
 	msg->AddByte(0x72);
 	msg->AddByte(cid);
 	msg->AddByte(slot);
+}
+
+// shop
+void ProtocolGame::AddShopItem(NetworkMessage* msg, const ShopInfo item)
+{
+	const ItemType& it = Item::items[item.itemId];
+	msg->AddU16(it.clientId);
+	msg->AddByte(item.itemCharges);
+	msg->AddString(it.name);
+	msg->AddU32(item.buyPrice);
+	msg->AddU32(item.salePrice);
 }
