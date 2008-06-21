@@ -2432,11 +2432,10 @@ bool Game::playerCloseShop(uint32_t playerId)
 	int32_t onSell;
 
 	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	player->setShopOwner(NULL, -1, -1);
 	if(merchant){
 		merchant->onPlayerEndTrade(player, onBuy, onSell);
 	}
-
-	player->setShopOwner(NULL, -1, -1);
 	return true;
 }
 

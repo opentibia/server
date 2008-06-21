@@ -1096,7 +1096,6 @@ void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t i
 		lua_pushnumber(L, amount);
 		m_scriptInterface->callFunction(4);
 		m_scriptInterface->releaseScriptEnv();
-		//todo
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. NpcScript::onPlayerTrade" << std::endl;
