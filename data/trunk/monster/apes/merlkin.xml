@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="merlkin" nameDescription="a merlkin" race="blood" experience="145" speed="200" manacost="0">
+  <health now="230" max="230"/>
+  <look type="117" head="20" body="30" legs="40" feet="50" corpse="6044"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="4"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="25" attack="15"/>
+    <attack name="fire" interval="2000" chance="13" range="7" min="-30" max="-90">
+      <attribute key="shootEffect" value="fire"/>
+      <attribute key="areaEffect" value="firearea"/>
+    </attack>
+    <attack name="energy" interval="3000" chance="34" range="7" min="-15" max="-45">
+      <attribute key="shootEffect" value="energy"/>
+      <attribute key="areaEffect" value="energy"/>
+    </attack>
+    <attack name="poisonfield" interval="1000" chance="15" range="7" radius="1" target="1">
+      <attribute key="shootEffect" value="energy"/>
+    </attack>
+  </attacks>
+  <defenses armor="16" defense="10">
+    <defense name="healing" interval="1000" chance="10" min="10" max="40">
+      <attribute key="areaEffect" value="blueshimmer"/>
+    </defense>
+  </defenses>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="1"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="1"/>
+    <immunity drunk="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Ugh! Ugh! Ugh!"/>
+    <voice sentence="Holy banana!"/>
+    <voice sentence="Chakka! Chakka!"/>
+  </voices>
+<loot>
+<item id="2148" chance="100000" countmax="50" /> -- gold coin
+<item id="2188" chance="1538" /> -- wand of plague
+<item id="2675" chance="10000" countmax="5" /> -- orange
+<item id="2162" chance="2222" /> -- magic lightwand
+<item id="5883" chance="1000" countmax="2" /> -- ape fur
+<item id="3966" chance="1333" /> -- banana staff
+<item id="2150" chance="1538" countmax="3" /> -- small amethyst
+</loot>
+
+</monster>

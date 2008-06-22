@@ -331,6 +331,7 @@ void Npc::onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
 	    uint8_t count, uint8_t amount)
 {
 	m_npcEventHandler->onPlayerTrade(player, callback, itemid, count, amount);
+	player->sendCash(g_game.getMoney(const_cast<Player*>(player)));
 }
 
 void Npc::onPlayerEndTrade(const Player* player, int32_t buyCallback,

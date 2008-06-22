@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="dwarf soldier" nameDescription="a dwarf soldier" race="blood" experience="70" speed="170" manacost="360">
+  <health now="135" max="135"/>
+  <look type="71" head="20" body="30" legs="40" feet="50" corpse="6014"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="1"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" min="-30" max="-100"/>
+    <attack name="physical" interval="3000" chance="13" range="7" min="-20" max="-40">
+      <attribute key="shootEffect" value="bolt"/>
+    </attack>
+  </attacks>
+  <defenses armor="9" defense="20"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Hail Durin!"/>
+  </voices>
+  <loot>
+    <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
+    <item id="2148" countmax="15" chance1="100000" chancemax="0"/>
+    <item id="2543" countmax="10" chance1="20000" chancemax="0"/>
+    <item id="2481" chance="10000"/>
+    <item id="2455" chance="10000"/>
+    <item id="2554" chance="3333"/>
+    <item id="2464" chance="20000"/>
+    <item id="2643" chance="25000"/>
+    <item id="2696" chance="15000"/>
+    <item id="7363" countmax="8" chance1="6000" chancemax="0"/>
+    <item id="5880" chance="2500" countmax="2" /> -- iron ore
+    <item id="1987" chance="100000">
+      <inside>
+        <item id="2525" chance="1666"/>
+        <item id="2378" chance="3333"/>
+        <item id="2213" chance="2500"/>
+      </inside>
+    </item>
+  </loot>
+</monster>
