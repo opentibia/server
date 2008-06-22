@@ -168,7 +168,7 @@ enum MessageClasses {
 	MSG_STATUS_DEFAULT			= 0x17, //White message at the bottom of the game window and in the console
 	MSG_INFO_DESCR				= 0x18, //Green message in game window and in the console
 	MSG_STATUS_SMALL			= 0x19, //White message at the bottom of the game window"
-	MSG_STATUS_CONSOLE_BLUE		= 0x20, //Blue message in the console
+	MSG_STATUS_CONSOLE_BLUE		= 0x0A, //Blue message in the console
 };
 
 enum FluidColors {
