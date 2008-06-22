@@ -1349,20 +1349,18 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 			g_game.internalCloseTrade(this);
 		}
 
-		if(g_game.getRuleViolations().find(getID()) != g_game.getRuleViolations().end()){
-			g_game.cancelRuleViolation(this);
-		}
+		g_game.cancelRuleViolation(this);
 
-		if(hasFlag(PlayerFlag_CanAnswerRuleViolations)) {
-			std::vector<shared_ptr<RuleViolation> > stack;
-			for(RuleViolationsMap::const_iterator rt = g_game.getRuleViolations().begin(); rt != g_game.getRuleViolations().end(); ++rt) {
-				shared_ptr<RuleViolation> rvr = rt->second;
-				if(rvr->gamemaster == this) {
-					stack.push_back(rvr);
+		if(hasFlag(PlayerFlag_CanAnswerRuleViolations)){
+			std::list<Player*> closeReportList;
+			for(RuleViolationsMap::const_iterator it = g_game.getRuleViolations().begin(); it != g_game.getRuleViolations().end(); ++it){
+				if(it->second->gamemaster == this){
+					closeReportList.push_back(it->second->reporter);
 				}
 			}
-			for(std::vector<shared_ptr<RuleViolation> >::iterator rt = stack.begin(); rt != stack.end(); ++rt) {
-				g_game.playerCloseRuleViolation(this->getID(), (*rt)->reporter->getName());
+
+			for(std::list<Player*>::iterator it = closeReportList.begin(); it != closeReportList.end(); ++it){
+				g_game.closeRuleViolation(*it);
 			}
 		}
 

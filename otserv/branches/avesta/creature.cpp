@@ -815,6 +815,25 @@ bool Creature::hasBeenAttacked(uint32_t attackerId)
 Item* Creature::getCorpse()
 {
 	Item* corpse = Item::CreateItem(getLookCorpse());
+	if(corpse){
+		Creature* lastHitCreature = NULL;
+		Creature* mostDamageCreature = NULL;
+
+		if(getKillers(&lastHitCreature, &mostDamageCreature) && mostDamageCreature){
+			uint32_t corpseOwner = 0;
+			if(mostDamageCreature->getPlayer()){
+				corpseOwner = mostDamageCreature->getID();
+			}
+			else if(mostDamageCreature->getMaster() && mostDamageCreature->getMaster()->getPlayer()){
+				corpseOwner = mostDamageCreature->getMaster()->getID();
+			}
+
+			if(corpseOwner != 0){
+				corpse->setCorpseOwner(corpseOwner);
+			}
+		}
+	}
+
 	return corpse;
 }
 
@@ -1134,8 +1153,10 @@ void Creature::onAttacked()
 
 void Creature::onIdleStatus()
 {
-	healMap.clear();
-	damageMap.clear();
+	if(getHealth() > 0){
+		healMap.clear();
+		damageMap.clear();
+	}
 }
 
 void Creature::onAttackedCreatureDrainHealth(Creature* target, int32_t points)

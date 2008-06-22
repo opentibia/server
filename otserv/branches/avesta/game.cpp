@@ -1941,7 +1941,7 @@ bool Game::playerOpenPrivateChannel(uint32_t playerId, const std::string& receiv
 	return true;
 }
 
-bool Game::playerProcessRuleViolation(uint32_t playerId, const std::string& reporter)
+bool Game::playerProcessRuleViolation(uint32_t playerId, const std::string& name)
 {
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
@@ -1950,60 +1950,49 @@ bool Game::playerProcessRuleViolation(uint32_t playerId, const std::string& repo
 	if(!player->hasFlag(PlayerFlag_CanAnswerRuleViolations))
 		return false;
 
-	for(RuleViolationsMap::iterator it = ruleViolations.begin(); it != ruleViolations.end(); ++it){
-		RuleViolation& rvr = *it->second;
-		if(!rvr.open || rvr.gamemaster){
-			continue;
-		}
-
-		if(rvr.reporter->getName() == reporter){
-			rvr.open = false;
-			rvr.gamemaster = player;
-			ChatChannel* channel = g_chat.getChannelById(0x03);
-			if(channel){
-				for(UsersMap::const_iterator ut = channel->getUsers().begin();
-				    ut != channel->getUsers().end(); ++ut)
-				{
-					if(ut->second){
-						ut->second->sendRemoveReport(reporter);
-					}
-				}
-			}
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool Game::playerCloseRuleViolation(uint32_t playerId, const std::string& reporter)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
+	Player* reporter = getPlayerByName(name);
+	if(!reporter){
 		return false;
-
-	bool remove = false;
-	for(RuleViolationsMap::iterator it = ruleViolations.begin(); it != ruleViolations.end(); ++it){
-		RuleViolation& rvr = *it->second;
-		if(rvr.reporter && rvr.reporter->getName() == reporter){
-			remove = rvr.open;
-			rvr.reporter->sendLockRuleViolation();
-
-			ruleViolations.erase(it);
-			break;
-		}
 	}
+
+	RuleViolationsMap::iterator it = ruleViolations.find(reporter->getID());
+	if(it == ruleViolations.end()){
+		return false;
+	}
+
+	RuleViolation& rvr = *it->second;
+
+	if(!rvr.isOpen){
+		return false;
+	}
+
+	rvr.isOpen = false;
+	rvr.gamemaster = player;
 
 	ChatChannel* channel = g_chat.getChannelById(0x03);
-	if(remove && channel){
-		for(UsersMap::const_iterator ut = channel->getUsers().begin(); ut != channel->getUsers().end(); ++ut){
-			if(ut->second){
-				ut->second->sendRemoveReport(reporter);
+	if(channel){
+		for(UsersMap::const_iterator it = channel->getUsers().begin(); it != channel->getUsers().end(); ++it){
+			if(it->second){
+				it->second->sendRemoveReport(reporter->getName());
 			}
 		}
 	}
 
 	return true;
+}
+
+bool Game::playerCloseRuleViolation(uint32_t playerId, const std::string& name)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	Player* reporter = getPlayerByName(name);
+	if(!reporter){
+		return false;
+	}
+
+	return closeRuleViolation(reporter);
 }
 
 bool Game::playerCancelRuleViolation(uint32_t playerId)
@@ -3254,9 +3243,11 @@ bool Game::playerReportRuleViolation(Player* player, const std::string& text)
 	//Do not allow reports on multiclones worlds
 	//Since reports are name-based
 	if(g_config.getNumber(ConfigManager::ALLOW_CLONES)){
-		player->sendTextMessage(MSG_INFO_DESCR, "Rule reports are disabled.");
+		player->sendTextMessage(MSG_INFO_DESCR, "Rule violations reports are disabled.");
 		return false;
 	}
+
+	cancelRuleViolation(player);
 
 	shared_ptr<RuleViolation> rvr(new RuleViolation(
 		player,
@@ -4039,7 +4030,7 @@ bool Game::cancelRuleViolation(Player* player)
 	}
 
 	Player* gamemaster = it->second->gamemaster;
-	if(!it->second->open && gamemaster){
+	if(!it->second->isOpen && gamemaster){
 		//Send to the responder
 		gamemaster->sendRuleViolationCancel(player->getName());
 	}
@@ -4057,6 +4048,28 @@ bool Game::cancelRuleViolation(Player* player)
 
 	//Now erase it
 	ruleViolations.erase(it);
+	return true;
+}
+
+bool Game::closeRuleViolation(Player* player)
+{
+	RuleViolationsMap::iterator it = ruleViolations.find(player->getID());
+	if(it == ruleViolations.end()){
+		return false;
+	}
+
+	ruleViolations.erase(it);
+	player->sendLockRuleViolation();
+
+	ChatChannel* channel = g_chat.getChannelById(0x03);
+	if(channel){
+		for(UsersMap::const_iterator ut = channel->getUsers().begin(); ut != channel->getUsers().end(); ++ut){
+			if(ut->second){
+				ut->second->sendRemoveReport(player->getName());
+			}
+		}
+	}
+
 	return true;
 }
 

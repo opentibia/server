@@ -1644,7 +1644,7 @@ void ProtocolGame::sendRuleViolationsChannel(uint16_t channelId)
 		RuleViolationsMap::const_iterator it = g_game.getRuleViolations().begin();
 		for( ; it != g_game.getRuleViolations().end(); ++it){
 			RuleViolation& rvr = *it->second;
-			if(rvr.open && rvr.reporter){
+			if(rvr.isOpen && rvr.reporter){
 				AddCreatureSpeak(msg, rvr.reporter, SPEAK_RVR_CHANNEL, rvr.text, channelId, rvr.time);
 			}
 		}

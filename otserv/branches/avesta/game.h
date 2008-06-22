@@ -72,24 +72,23 @@ enum LightState_t {
 };
 
 struct RuleViolation {
-	RuleViolation(Player* reporter, const std::string& msg, uint32_t time);
+	RuleViolation(Player* _reporter, const std::string& _text, uint32_t _time) :
+		text(_text),
+		time(_time),
+		reporter(_reporter),
+		gamemaster(NULL),
+		isOpen(true)
+	{
+	}
 
 	Player* reporter;
 	Player* gamemaster;
 	std::string text;
 	uint32_t time;
-	bool open;
+	bool isOpen;
+
 private:
 	RuleViolation(const RuleViolation&);
-};
-
-inline RuleViolation::RuleViolation(Player* reporter, const std::string& msg, uint32_t time) :
-	reporter(reporter),
-	gamemaster(NULL),
-	text(msg),
-	time(time),
-	open(true)
-{
 };
 
 typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
@@ -362,8 +361,8 @@ public:
 	bool playerOpenChannel(uint32_t playerId, uint16_t channelId);
 	bool playerCloseChannel(uint32_t playerId, uint16_t channelId);
 	bool playerOpenPrivateChannel(uint32_t playerId, const std::string& receiver);
-	bool playerProcessRuleViolation(uint32_t playerId, const std::string& reporter);
-	bool playerCloseRuleViolation(uint32_t playerId, const std::string& reporter);
+	bool playerProcessRuleViolation(uint32_t playerId, const std::string& name);
+	bool playerCloseRuleViolation(uint32_t playerId, const std::string& name);
 	bool playerCancelRuleViolation(uint32_t playerId);
 	bool playerReceivePing(uint32_t playerId);
 	bool playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir);
@@ -477,6 +476,7 @@ public:
 
 	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
+	bool closeRuleViolation(Player* player);
 
 protected:
 
