@@ -32,14 +32,21 @@ local function lookAtFocus()
 end
 
 local itemWindow = {
-	{id=2160, charges=1, buy=10000, sell=10000},
-	{id=2152, charges=1, buy=100, sell=100},
-	{id=2148, charges=1, buy=1, sell=1}
+	{id=2160, charges=0, buy=10000, sell=10000},
+	{id=2152, charges=0, buy=100, sell=100},
+	{id=2148, charges=0, buy=1, sell=1},
+	{id=2173, charges=0, buy=10000, sell=5000}
 }
 
 local items = {}
 for _, item in ipairs(itemWindow) do
 	items[item.id] = {buyPrice = item.buy, sellPrice = item.sell, charges = item.charges}
+end
+
+local function getPlayerMoney(cid)
+	return ((getPlayerItemCount(cid, 2160) * 10000) + 
+	(getPlayerItemCount(cid, 2152) * 100) + 
+	getPlayerItemCount(cid, 2148))
 end
 
 local onBuy = function(cid, item, charges, amount)
@@ -48,9 +55,19 @@ local onBuy = function(cid, item, charges, amount)
 		return
 	end
 
-	if(doPlayerRemoveMoney(cid, amount*items[item].buyPrice) == TRUE) then
-		doPlayerAddItem(cid, item, amount)
-		selfSay("Thanks for the money!", cid)
+	if(getPlayerMoney(cid) >= amount*items[item].buyPrice) then
+		local itemz, i = doPlayerAddItem(cid, item, charges, amount)
+		if(i < amount) then
+			if(i == 0) then
+				selfSay("Sorry, but you don't have space to take it.", cid)
+			else
+				selfSay("I've sold some for you, but it seems you can't carry more than this. I won't take more money than necessary.", cid)
+				doPlayerRemoveMoney(cid, i*items[item].buyPrice)
+			end
+		else
+			selfSay("Thanks for the money!", cid)
+			doPlayerRemoveMoney(cid, amount*items[item].buyPrice)
+		end
 	else
 		selfSay("Stfu noob, you don't have money.", cid)
 	end
@@ -61,7 +78,7 @@ local onSell = function(cid, item, charges, amount)
 		selfSay("Ehm.. sorry... this shouldn't be there, I'm not buying it.", cid)
 	end
 
-	if(charges <= 1) then
+	if(charges < 1) then
 		charges = -1
 	end
 	if(doPlayerRemoveItem(cid, item, amount, charges) == TRUE) then
