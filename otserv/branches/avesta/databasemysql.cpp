@@ -59,6 +59,13 @@ DatabaseMySQL::DatabaseMySQL()
 		return;
 	}
 
+	if(MYSQL_VERSION_ID < 50019){
+		//mySQL servers < 5.0.19 has a bug where MYSQL_OPT_RECONNECT is (incorrectly) reset by mysql_real_connect calls
+		//See http://dev.mysql.com/doc/refman/5.0/en/mysql-options.html for more information.
+		mysql_options(&m_handle, MYSQL_OPT_RECONNECT, &reconnect);
+		std::cout << "[Warning] Outdated mySQL server detected. Consider upgrading to a newer version." << std::endl;
+	}
+
 	m_connected = true;
 }
 
