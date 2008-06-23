@@ -17124,6 +17124,7 @@
 	<item id="6598" name="snow">
 		<attribute key="description" value="Someone must have walked here recently."/>
 		<attribute key="decayTo" value="6594"/>
+		<attribute key="duration" value="240"/>
 	</item>
 	<item id="6599" name="snow">
 		<attribute key="description" value="Someone must have walked here recently."/>
