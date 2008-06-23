@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<outfits>
+	<!-- Female outfits -->
+	<outfit type="0" looktype="136" enabled="1" name="Citizen"/>
+	<outfit type="0" looktype="137" enabled="1" name="Hunter"/>
+	<outfit type="0" looktype="138" enabled="1" name="Mage"/>
+	<outfit type="0" looktype="139" enabled="1" name="Knight"/>
+	<outfit type="0" looktype="140" enabled="0" name="Noblewoman"/>
+	<outfit type="0" looktype="141" enabled="0" name="Summoner"/>
+	<outfit type="0" looktype="142" enabled="0" name="Warrior"/>
+	<outfit type="0" looktype="147" enabled="0" name="Barbarian"/>
+	<outfit type="0" looktype="148" enabled="0" name="Druid"/>
+	<outfit type="0" looktype="149" enabled="0" name="Wizard"/>
+	<outfit type="0" looktype="150" enabled="0" name="Oriental"/>
+	<outfit type="0" looktype="155" enabled="0" name="Pirate"/>
+	<outfit type="0" looktype="156" enabled="0" name="Assassin"/>
+	<outfit type="0" looktype="157" enabled="0" name="Beggar"/>
+	<outfit type="0" looktype="158" enabled="0" name="Shaman"/>
+	<outfit type="0" looktype="252" enabled="0" name="Norsewoman"/>
+	<outfit type="0" looktype="269" enabled="0" name="Nightmare"/>
+	<outfit type="0" looktype="270" enabled="0" name="Jester"/>
+	<outfit type="0" looktype="279" enabled="0" name="Brotherhood"/>
+	<!-- Male outfits -->
+	<outfit type="1" looktype="128" enabled="1" name="Citizen"/>
+	<outfit type="1" looktype="129" enabled="1" name="Hunter"/>
+	<outfit type="1" looktype="130" enabled="1" name="Mage"/>
+	<outfit type="1" looktype="131" enabled="1" name="Knight"/>
+	<outfit type="1" looktype="132" enabled="0" name="Nobleman"/>
+	<outfit type="1" looktype="133" enabled="0" name="Summoner"/>
+	<outfit type="1" looktype="134" enabled="0" name="Warrior"/>
+	<outfit type="1" looktype="143" enabled="0" name="Barbarian"/>
+	<outfit type="1" looktype="144" enabled="0" name="Druid"/>
+	<outfit type="1" looktype="145" enabled="0" name="Wizard"/>
+	<outfit type="1" looktype="146" enabled="0" name="Oriental"/>
+	<outfit type="1" looktype="151" enabled="0" name="Pirate"/>
+	<outfit type="1" looktype="152" enabled="0" name="Assassin"/>
+	<outfit type="1" looktype="153" enabled="0" name="Beggar"/>
+	<outfit type="1" looktype="154" enabled="0" name="Shaman"/>
+	<outfit type="1" looktype="251" enabled="0" name="Norseman"/>
+	<outfit type="1" looktype="268" enabled="0" name="Nightmare"/>
+	<outfit type="1" looktype="273" enabled="0" name="Jester"/>
+	<outfit type="1" looktype="278" enabled="0" name="Brotherhood"/>
+	<!-- Archdemon -->
+	<outfit type="2" looktype="12" enabled="1" name="Archdemon"/>
+	<!-- Elf outfits -->
+	<outfit type="2" looktype="159" enabled="1" name="Elf"/>
+	<!-- Dwarf outfits -->
+	<outfit type="2" looktype="160" enabled="1" name="Dwarf"/>
+	<!-- Frog outfits -->
+	<outfit type="2" looktype="226" enabled="1" name="Frog"/>
+	<!-- Cult -->
+	<outfit type="2" looktype="194" enabled="1" name="Cult"/>
+	<!-- Barbarians -->
+	<outfit type="2" looktype="253" enabled="1" name="Headsplitter"/>
+	<outfit type="2" looktype="254" enabled="1" name="Skullhunter"/>
+	<outfit type="2" looktype="255" enabled="1" name="Bloodwalker"/>
+	<outfit type="2" looktype="264" enabled="1" name="Brutetamer"/>
+	<!-- GM Outfits -->
+	<outfit type="0" looktype="75" enabled="0" name="Gamemaster"/>
+	<outfit type="0" looktype="266" enabled="0" name="Com. Manager"/>
+</outfits>

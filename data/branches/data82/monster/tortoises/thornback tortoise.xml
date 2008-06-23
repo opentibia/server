@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="thornback tortoise" nameDescription="a thornback tortoise" race="blood" experience="150" speed="200" manacost="490">
+  <health now="300" max="300"/>
+  <look type="198" head="0" body="0" legs="0" feet="0" corpse="6073"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="1"/>
+    <flag staticattack="90"/>
+    <flag targetdistance="1"/>
+    <flag runonhealth="0"/>
+  </flags>
+<attacks>
+    <attack name="melee" interval="2000" min="-0" max="-100"/>
+</attacks>
+  <defenses armor="18" defense="18"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <loot>
+    <item id="2148" countmax="80" chance1="100000" chancemax="0"/>
+    <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+    <item id="5678" countmax="3" chance1="14000" chancemax="0"/>
+    <item id="2667" countmax="3" chance1="10000" chancemax="0"/>
+    <item id="2789" countmax="4" chance1="2000" chancemax="0"/>
+    <item id="2391" chance="2000"/>
+    <item id="2787" countmax="2" chance1="15000" chancemax="0"/>
+    <item id="2671" countmax="2" chance1="17000" chancemax="0"/>
+  </loot>
+</monster>

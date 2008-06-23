@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<talkactions>
+	<talkaction words="!buyhouse" script="buyhouse.lua"/>
+	<talkaction words="!houseinfo" script="houseinfo.lua"/>
+</talkactions>

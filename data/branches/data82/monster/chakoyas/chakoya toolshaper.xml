@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+  <monster name="Chakoya Toolshaper" tp="1" nameDescription="a Chakoya Toolshaper" race="blood" experience="40" speed="270" manacost="0">
+    <health now="80" max="80"/>
+    <look type="259" head="0" body="0" legs="0" feet="0" corpse="7320"/>
+    <targetchange interval="60000" chance="0"/>
+    <strategy attack="100" defense="0"/>
+    <flags>
+      <flag summonable="0"/>
+      <flag attackable="1"/>
+      <flag hostile="1"/>
+      <flag illusionable="0"/>
+      <flag convinceable="0"/>
+      <flag pushable="0"/>
+      <flag canpushitems="1"/>
+      <flag staticattack="50"/>
+      <flag lightlevel="0"/>
+      <flag lightcolor="0"/>
+      <flag targetdistance="1"/>
+      <flag runonhealth="0"/>
+    </flags>
+    <attacks>
+      <attack name="melee" interval="2000" min="-0" max="-35"/>
+	  <attack name="physical" interval="1000" chance="34" range="7" radius="3" target="1" min="-5" max="-15">
+      <attribute key="shootEffect" value="snowball"/>
+    </attack>
+    </attacks>
+    <defenses armor="30" defense="30">
+    </defenses>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="1"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+    <voices interval="2000" chance="5">
+      <voice sentence="Chikuva!!"/>
+      <voice sentence="Jinuma jamjam!"/>
+    </voices>
+    <loot>
+      <item id="2667" countmax="2" chance1="20000" chancemax="0"/>
+      <item id="2148" countmax="20" chance1="20000" chancemax="0"/>
+      <item id="2553" chance="2000"/>
+    </loot>
+  </monster>
