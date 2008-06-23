@@ -690,124 +690,127 @@ double Item::getWeight() const
 	return items[id].weight;
 }
 
-std::string Item::getDescription(int32_t lookDistance) const
+std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const Item* item /*= NULL*/)
 {
 	std::stringstream s;
-	const ItemType& it = items[id];
 
 	if(it.name.length()){
-		if(isStackable() && getItemCount() > 1){
+		if(it.stackable && item && item->getItemCount() > 1){
 			if(it.showCount){
-				s << (int)getItemCount() << " ";
+				s << (int)item->getItemCount() << " ";
 			}
 
 			s << it.pluralName;
 		}
 		else{
-			if(it.article.length()){
+			if(!it.article.empty()){
 				s << it.article << " ";
 			}
 			s << it.name;
 		}
 	}
 	else{
-		s << "an item of type " << getID();
+		s << "an item of type " << it.id;
 	}
 
 	if(it.isRune()){
 		s << " for magic level " << (int)it.runeMagLevel << "." << std::endl;
-		s << "It's an \"" << it.runeSpellName << "\" spell(";
-		if(getItemCharge()){
-			s << (int)getItemCharge();
+		s << "It's an \"" << it.runeSpellName << "\" spell (";
+		uint32_t charges = (item == NULL ? it.charges : item->getItemCharge());
+		if(charges > 0){
+			s << (int)charges;
 		}
 		else{
 			s << "1";
 		}
 		s << "x).";
 	}
-	else if(isWeapon())
-	{
-		if(getWeaponType() != WEAPON_AMMO){ // Arrows and Bolts doesn't show atk
-			if(getAttack()){
-				if(getExtraDef()){
-					s << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << " " << std::showpos << (int)getExtraDef() << ")" << std::noshowpos;
+	else if(it.weaponType != WEAPON_NONE){
+		if(it.weaponType != WEAPON_AMMO){ // Arrows and Bolts doesn't show atk
+			if(it.attack != 0){
+				if(it.extraDef != 0){
+					s << " (Atk:" << (int)it.attack << " Def:" << (int)it.defence << " " << std::showpos << (int)it.extraDef << ")" << std::noshowpos;
 				}
 				else{
-					s << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")";
+					s << " (Atk:" << (int)it.attack << " Def:" << (int)it.defence << ")";
 				}
 			}
-			else if(getDefense()){
-				s << std::endl << " (Def:" << (int)getDefense() << ")";
+			else if(it.defence != 0){
+				s << std::endl << " (Def:" << (int)it.defence << ")";
 			}
 		}
 		s << ".";
 
-		const Weapon* weapon = g_weapons->getWeapon(this);
-		if(weapon && weapon->getWieldInfo()){
-			const uint32_t wieldInfo = weapon->getWieldInfo();
+		if(it.wieldInfo != 0){
 			s << std::endl << "It can only be wielded properly by ";
-			if(wieldInfo & WIELDINFO_PREMIUM){
+			if(it.wieldInfo & WIELDINFO_PREMIUM){
 				s << "premium ";
 			}
 
-			if(wieldInfo & WIELDINFO_VOCREQ){
-				s << weapon->getVocationString();
+			if(it.wieldInfo & WIELDINFO_VOCREQ){
+				s << it.vocationString;
 			}
 			else{
 				s << "players";
 			}
 
-			if(wieldInfo & WIELDINFO_LEVEL){
-				s << " of level " << (int)weapon->getReqLevel() << " or higher";
+			if(it.wieldInfo & WIELDINFO_LEVEL){
+				s << " of level " << (int)it.minReqLevel << " or higher";
 			}
 
-			if(wieldInfo & WIELDINFO_MAGLV){
-				if(wieldInfo & WIELDINFO_LEVEL){
+			if(it.wieldInfo & WIELDINFO_MAGLV){
+				if(it.wieldInfo & WIELDINFO_LEVEL){
 					s << " and";
 				}
 				else{
 					s << " of";
 				}
-				s << " magic level " << (int)weapon->getReqMagLv() << " or higher";
+				s << " magic level " << (int)it.minReqMagicLevel << " or higher";
 			}
+
 			s << ".";
 		}
 	}
-	else if(getArmor()){
-		s << " (Arm:" << (int)getArmor() << ").";
+	else if(it.armor != 0){
+		s << " (Arm:" << it.armor << ").";
 	}
-	else if(isFluidContainer()){
-		if(fluid == 0){
+	else if(it.isFluidContainer()){
+		if(item && item->getFluidType() != 0){
+			s << " of " << items[item->getFluidType()].name << ".";
+		}
+		else{
 			s << ". It is empty.";
 		}
-		else{
-			s << " of " << items[fluid].name << ".";
-		}
 	}
-	else if(isSplash()){
+	else if(it.isSplash()){
 		s << " of ";
-		if(fluid == 0){
-			s << items[1].name << ".";
+		if(item && item->getFluidType() != 0){
+			s << items[item->getFluidType()].name;
 		}
 		else{
-			s << items[fluid].name << ".";
+			s << items[1].name;
 		}
-	}
-	else if(it.isKey()){
-		s << " (Key:" << (int)getActionId() << ").";
 	}
 	else if(it.isContainer()){
-		s << " (Vol:" << (int)getContainer()->capacity() << ").";
+		s << " (Vol:" << (int)it.maxItems << ").";
+	}
+	else if(it.isKey()){
+		if(item){
+			s << " (Key:" << (int)item->getActionId() << ").";
+		}
+		else{
+			s << " (Key:" << (int)0 << ").";
+		}
 	}
 	else if(it.allowDistRead){
-		s << "." << std::endl;
+		s << std::endl;
 
-		if(getText() != ""){
+		if(item && item->getText() != ""){
 			if(lookDistance <= 4){
-				if(getWriter().length()){
-					s << getWriter() << " wrote";
+				if(item->getWriter().length()){
+					s << item->getWriter() << " wrote";
 
-					time_t wDate = getWrittenDate();
+					time_t wDate = item->getWrittenDate();
 					if(wDate > 0){
 						char date[16];
 						formatDate2(wDate, date);
@@ -818,7 +821,8 @@ std::string Item::getDescription(int32_t lookDistance) const
 				else{
 					s << "You read: ";
 				}
-				s << getText();
+
+				s << item->getText();
 			}
 			else{
 				s << "You are too far away to read it.";
@@ -829,7 +833,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 		}
 	}
 	else if(it.showCharges){
-		uint16_t charges = getItemCharge();
+		uint32_t charges = (item == NULL ? it.charges : item->getItemCharge());
 		if(charges > 1){
 			s << " that has " << (int)charges << " charges left.";
 		}
@@ -838,8 +842,8 @@ std::string Item::getDescription(int32_t lookDistance) const
 		}
 	}
 	else if(it.showDuration){
-		if(hasAttribute(ATTR_ITEM_DURATION)){
-			uint32_t duration = getDuration() / 1000;
+		if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
+			uint32_t duration = item->getDuration() / 1000;
 			s << " that has energy for ";
 
 			if(duration >= 120){
@@ -861,19 +865,28 @@ std::string Item::getDescription(int32_t lookDistance) const
 	}
 
 	if(lookDistance <= 1 ){
-		double weight = getWeight();
+		double weight = (item == NULL ? it.weight : item->getWeight());
 		if(weight > 0){
-			s << std::endl << getWeightDescription(weight);
+			s << std::endl << getWeightDescription(it, weight);
 		}
 	}
 
-	if(getSpecialDescription() != ""){
-		s << std::endl << getSpecialDescription().c_str();
+	if(item && item->getSpecialDescription() != ""){
+		s << std::endl << item->getSpecialDescription().c_str();
 	}
 	else if(it.description.length() && lookDistance <= 1){
 		s << std::endl << it.description;
 	}
 
+	return s.str();
+}
+
+std::string Item::getDescription(int32_t lookDistance) const
+{
+	std::stringstream s;
+	const ItemType& it = items[id];
+
+	s << getDescription(it, lookDistance, this);
 	return s.str();
 }
 
@@ -890,8 +903,14 @@ std::string Item::getWeightDescription() const
 
 std::string Item::getWeightDescription(double weight) const
 {
+	const ItemType& it = Item::items[id];
+	return getWeightDescription(it, weight, count);
+}
+
+std::string Item::getWeightDescription(const ItemType& it, double weight, uint32_t count /*= 1*/)
+{
 	std::stringstream ss;
-	if(isStackable() && count > 1){
+	if(it.stackable && count > 1){
 		ss << "They weigh " << std::fixed << std::setprecision(2) << weight << " oz.";
 	}
 	else{
@@ -899,6 +918,7 @@ std::string Item::getWeightDescription(double weight) const
 	}
 	return ss.str();
 }
+
 
 void Item::setUniqueId(uint16_t n)
 {

@@ -220,6 +220,9 @@ public:
 	virtual MagicField* getMagicField() {return NULL;};
 	virtual const MagicField* getMagicField() const {return NULL;};
 
+	static std::string getDescription(const ItemType& it, int32_t lookDistance, const Item* item = NULL);
+	static std::string getWeightDescription(const ItemType& it, double weight, uint32_t count = 1);
+
 	//serialization
 	virtual bool unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();

@@ -2394,6 +2394,9 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 		return false;
 
 	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+	if(it.id == 0){
+		return false;
+	}
 
 	merchant->onPlayerTrade(player, onBuy,
 	    it.id, count, amount);
@@ -2415,6 +2418,9 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		return false;
 
 	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+	if(it.id == 0){
+		return false;
+	}
 
 	merchant->onPlayerTrade(player, onSell,
 	    it.id, count, amount);
@@ -2446,16 +2452,14 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 		return false;
 
     const ItemType& it = Item::items.getItemIdByClientId(spriteId);
-    
-    Item* item = Item::CreateItem(it.id, count);
-	if(item == NULL)
+	if(it.id == 0){
 		return false;
+	}
 
 	std::stringstream ss;
-	ss << "You see " << item->getDescription(1);
+	ss << "You see " << Item::getDescription(it, 1);
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
-	delete item;
 	return true;
 }
 

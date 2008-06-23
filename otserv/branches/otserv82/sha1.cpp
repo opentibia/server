@@ -37,6 +37,7 @@
  *
  */
 
+#include "otpch.h"
 
 #include "sha1.h"
 

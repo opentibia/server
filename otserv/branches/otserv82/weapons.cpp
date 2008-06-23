@@ -183,8 +183,6 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	exhaustion = 0;
 	range = 1;
 	ammoAction = AMMOACTION_NONE;
-	wieldInfo = 0;
-	vocationString = "";
 }
 
 Weapon::~Weapon()
@@ -279,8 +277,8 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	range = Item::items[id].shootRange;
-
-	//Set few information for the lookDescription
+	
+	std::string vocationString;
 	if(!vocStringList.empty()){
 		for(STRING_LIST::iterator it = vocStringList.begin(); it != vocStringList.end(); ++it){
 			if(*it != vocStringList.front()){
@@ -296,17 +294,26 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		}
 	}
 
+	uint32_t wieldInfo = 0;
 	if(getReqLevel() > 0){
 		wieldInfo |= WIELDINFO_LEVEL;
 	}
 	if(getReqMagLv() > 0){
 		wieldInfo |= WIELDINFO_MAGLV;
 	}
-	if(!getVocationString().empty()){
+	if(!vocationString.empty()){
 		wieldInfo |= WIELDINFO_VOCREQ;
 	}
 	if(isPremium()){
 		wieldInfo |= WIELDINFO_PREMIUM;
+	}
+
+	if(wieldInfo != 0){
+		ItemType& it = Item::items.getItemType(id);
+		it.wieldInfo = wieldInfo;
+		it.vocationString = vocationString;
+		it.minReqLevel = getReqLevel();
+		it.minReqMagicLevel = getReqMagLv();
 	}
 
 	return true;

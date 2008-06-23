@@ -89,8 +89,6 @@ public:
 	const uint32_t getReqMagLv() const {return magLevel;}
 	const bool isWieldedUnproperly() const {return wieldUnproperly;}
 	const bool isPremium() const {return premium;}
-	const uint32_t getWieldInfo() const {return wieldInfo;}
-	const std::string& getVocationString() const {return vocationString;}
 
 protected:
 	virtual std::string getScriptEventName();
@@ -118,8 +116,6 @@ protected:
 	int32_t range;
 	AmmoAction_t ammoAction;
 	CombatParams params;
-	uint32_t wieldInfo;
-	std::string vocationString;
 
 private:
 	typedef std::map<int32_t, bool> VocWeaponMap;

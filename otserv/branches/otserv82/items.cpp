@@ -61,10 +61,14 @@ ItemType::ItemType()
 	blockProjectile = false;
 	blockPathFind = false;
 
-	std::string runeSpellName;
-	runeMagLevel    = 0;
+	wieldInfo        = 0;
+	minReqLevel      = 0;
+	minReqMagicLevel = 0;
 
-	speed		      = 0;
+	std::string runeSpellName;
+	runeMagLevel  = 0;
+
+	speed		  = 0;
 	id            = 0;
 	clientId      = 100;
 	maxItems      = 8;  // maximum size if this is a container
@@ -1078,9 +1082,6 @@ const ItemType& Items::getItemType(int32_t id) const
 		return *iType;
 	}
 	else{
-		#ifdef __DEBUG__
-		std::cout << "WARNING! unknown itemtypeid " << id << ". using defaults." << std::endl;
-		#endif
 		static ItemType dummyItemType; // use this for invalid ids
 		return dummyItemType;
 	}
@@ -1098,9 +1099,6 @@ const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
 		i++;
 	}while(iType);
 
-	#ifdef __DEBUG__
-	std::cout << "WARNING! unknown sprite id " << spriteId << ". using defaults." << std::endl;
-	#endif
 	static ItemType dummyItemType; // use this for invalid ids
 	return dummyItemType;
 }
