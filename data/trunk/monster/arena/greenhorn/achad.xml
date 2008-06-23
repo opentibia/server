@@ -7,7 +7,7 @@
 	<flags>
 		<flag pushable="0"/>
 		<flag canpushitems="1"/>
-		<flag staticattack="50"/>
+		<flag staticattack="90"/>
 		<flag runonhealth="55"/>
 	</flags>
 	<attacks>

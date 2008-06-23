@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="pirate marauder" nameDescription="a pirate marauder" race="blood" experience="125" speed="230" manacost="490">
+  <health now="210" max="210"/>
+  <look type="93" head="0" body="0" legs="0" feet="0" corpse="6080"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag staticattack="90"/>
+    <flag staticattack="90"/>
+    <flag targetdistance="1"/>
+    <flag runonhealth="0"/>
+  </flags>
+<attacks>
+    <attack name="melee" interval="2000" min="-0" max="-140"/>
+    <attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-65">
+      <attribute key="shootEffect" value="spear"/>
+    </attack>
+</attacks>
+  <defenses armor="15" defense="20"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Plundeeeeer!"/>
+  </voices>
+  <loot>
+    <item id="2148" countmax="80" chance1="42000" chancemax="183"/>
+    <item id="2376" chance="15000"/>
+    <item id="2050" chance="18000"/>
+    <item id="5917" chance="916"/>
+    <item id="2464" chance="6666"/>
+    <item id="6098" countmax="1" chance1="5000" chancemax="0"/>
+    <item id="6095" chance="5000"/>
+    <item id="5926" chance="100000">
+      <inside>
+        <item id="5091" chance="1666"/>
+        <item id="5792" chance="3333"/>
+        <item id="6126" countmax="1" chance1="1428" chancemax="0"/>
+        <item id="6098" countmax="1" chance1="1428" chancemax="0"/>
+        <item id="6097" countmax="1" chance1="1428" chancemax="0"/>
+      </inside>
+    </item>
+  </loot>
+</monster>

@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="amazon" nameDescription="a amazon" race="blood" experience="60" speed="210" manacost="390">
+  <health now="110" max="110"/>
+  <look type="137" head="113" body="120" legs="114" feet="132" corpse="6081"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="1"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="4"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="10"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="24" attack="16"/>
+    <attack name="physical" interval="1000" chance="10" range="7" min="-20" max="-30">
+      <attribute key="shootEffect" value="throwingknife"/>
+    </attack>
+  </attacks>
+  <defenses armor="11" defense="11"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Yeee ha!"/>
+    <voice sentence="Your head will be mine!"/>
+  </voices>
+  <loot>
+    <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
+    <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+    <item id="2467" chance="5000"/>
+    <item id="2385" chance="20000"/>
+    <item id="2229" countmax="1" chance1="10000" chancemax="0"/>
+    <item id="1987" chance="100000">
+      <inside>
+        <item id="2385" chance="5000"/>
+        <item id="2690" countmax="2" chance1="20000" chancemax="0"/>
+        <item id="2050" chance="20000"/>
+      </inside>
+    </item>
+  </loot>
+</monster>

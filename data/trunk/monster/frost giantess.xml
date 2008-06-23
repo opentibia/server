@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Frost Giantess" nameDescription="a frost giantess" race="blood" experience="150" speed="195" manacost="490">
+  <health now="275" max="275"/>
+  <look type="265" head="20" body="30" legs="40" feet="50" corpse="7330"/>
+  <targetchange interval="2000" chance="5"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag staticattack="90"/>
+    <flag lightlevel="0"/>
+    <flag lightcolor="0"/>
+    <flag targetdistance="7"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" min="-14" max="-100"/>
+  </attacks>
+  <defenses armor="22" defense="23"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <voices interval="2000" chance="5">
+    <voice sentence="Ymirs Mjalle!"/>
+    <voice sentence="No run so much, must stay fat!"/>
+    <voice sentence="Horre, Sjan Flan!"/>
+    <voice sentence="Damned fast food."/>
+    <voice sentence="Come kiss the cook!"/>
+  </voices>
+  <loot>
+    <item id="2148" countmax="10" chance1="100000" chancemax="0"/> --Gold Coins
+    <item id="2406" chance="25000"/> --Short Sword
+    <item id="2381" chance="1955"/> --Halberd
+    <item id="2209" chance="2055"/> --Club Ring
+    <item id="2510" chance="5333"/> --Plate Shield
+    <item id="7290" chance="4444"/> --Shard
+    <item id="2490" chance="2777"/> --Dark Helmet
+    <item id="2666" countmax="2" chance1="33333" chancemax="0"/> --Meat
+    <item id="1987" chance="100000"> --Bag
+      <inside>
+        <item id="2513" chance="2500"/> --Battle Shield
+        <item id="7441" chance="3444"/> --Ice Cube
+        <item id="2671" countmax="2" chance1="33333" chancemax="0"/> --Ham
+      </inside>
+    </item>
+  </loot>
+</monster>

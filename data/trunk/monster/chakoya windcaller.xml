@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+  <monster name="Chakoya Windcaller" tp="1" nameDescription="a Chakoya Windcaller" race="blood" experience="48" speed="270" manacost="305">
+    <health now="84" max="84"/>
+    <look type="260" head="0" body="0" legs="0" feet="0" corpse="7320"/>
+    <targetchange interval="60000" chance="0"/>
+    <strategy attack="100" defense="0"/>
+    <flags>
+      <flag summonable="0"/>
+      <flag attackable="1"/>
+      <flag hostile="1"/>
+      <flag illusionable="0"/>
+      <flag convinceable="1"/>
+      <flag pushable="0"/>
+      <flag canpushitems="1"/>
+      <flag staticattack="90"/>
+      <flag lightlevel="0"/>
+      <flag lightcolor="0"/>
+      <flag targetdistance="4"/>
+      <flag runonhealth="0"/>
+    </flags>
+    <attacks>
+	<attack name="melee" interval="1000" chance="15" range="7" radius="3" target="0" min="-5" max="-15">
+ 	 <attribute key="areaEffect" value="poff"/>
+	</attack>
+    <attack name="energy" interval="1000" chance="20" range="7" min="-5" max="-35">
+      <attribute key="shootEffect" value="fire"/>
+      <attribute key="areaEffect" value="energy"/>
+    </attack>
+    <attack name="lifedrain" interval="1000" chance="18" length="3" spread="2" min="-5" max="-20">
+      <attribute key="areaEffect" value="poff"/>
+    </attack>
+    </attacks>
+    <defenses armor="30" defense="30">
+    </defenses>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="1"/>
+    <immunity fire="0"/>
+    <immunity poison="0"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+    <voices interval="2000" chance="5">
+      <voice sentence="Chikuva!"/>
+      <voice sentence="Siqsiq ji jusipa!"/>
+      <voice sentence="Jagura taluka taqua!"/>
+    </voices>
+    <loot>
+      <item id="2148" countmax="25" chance1="3333" chancemax="0"/>
+      <item id="7290" chance="2000"/>
+      <item id="7158" countmax="1" chance1="250" chancemax="0"/>
+    </loot>
+  </monster>
