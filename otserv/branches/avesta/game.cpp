@@ -1700,7 +1700,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 				return NULL;
 			}
 			else{
-				uint16_t newItemId = newId;
+				int32_t newItemId = newId;
 				if(curType.id == newType.id){
 					newItemId = curType.decayTo;
 				}
