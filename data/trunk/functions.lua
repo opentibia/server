@@ -257,14 +257,15 @@ exhaustion =
 }
 
 
-	table.getPos = function (array, value)
-		for i,v in pairs(array) do
+	table.find = function (table, value)
+		for i,v in pairs(table) do
 			if (v == value) then
 				return i
 			end
 		end
-	  return FALSE
+		return nil
 	end
+	table.getPos = table.find
 
 	table.isStrIn = function (txt, str)
 		local result = false
