@@ -260,7 +260,7 @@ public:
 	virtual uint32_t getConditionImmunities() const { return 0; }
 	virtual uint32_t getConditionSuppressions() const { return 0; }
 	virtual bool isAttackable() const { return true;}
-	bool idle() const { return checkCreatureVectorIndex == 0;}
+	bool isIdle() const { return checkCreatureVectorIndex == 0;}
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 

@@ -47,7 +47,6 @@
 #include "ban.h"
 #include "rsa.h"
 #include "admin.h"
-#include "raids.h"
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
@@ -78,6 +77,9 @@ Vocations g_vocations;
 RSA* g_otservRSA = NULL;
 Server* g_server = NULL;
 
+OTSYS_THREAD_LOCKVAR g_loaderLock;
+OTSYS_THREAD_SIGNALVAR g_loaderSignal;
+
 extern AdminProtocolConfig* g_adminConfig;
 
 #if defined __EXCEPTION_TRACER__
@@ -92,6 +94,8 @@ void ErrorMessage(const char* message) {
 	std::cin >> s;
 }
 
+void mainLoader(int argc, char *argv[]);
+
 int main(int argc, char *argv[])
 {
 #ifdef __OTSERV_ALLOCATOR_STATS__
@@ -105,8 +109,6 @@ int main(int argc, char *argv[])
 
 	std::cout << ":: OTServ Development-Version 0.6.0 - Avesta branch" << std::endl;
 	std::cout << ":: ==============================================" << std::endl;
-	//std::cout << ":: OTServ Version 0.6.0" << std::endl;
-	//std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ \
@@ -157,10 +159,29 @@ int main(int argc, char *argv[])
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 
-//	LOG_MESSAGE("main", EVENT, 1, "Starting server");
+	OTSYS_THREAD_LOCKVARINIT(g_loaderLock);
+	OTSYS_THREAD_SIGNALVARINIT(g_loaderSignal);
 
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::setGameState, &g_game, GAME_STATE_STARTUP)));
+	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, argc, argv)));
+
+	OTSYS_THREAD_WAITSIGNAL(g_loaderSignal, g_loaderLock);
+
+	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
+	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
+	g_server = &server;
+	server.run();
+
+#if defined __EXCEPTION_TRACER__
+	mainExceptionHandler.RemoveHandler();
+#endif
+}
+
+void mainLoader(int argc, char *argv[])
+{
+	//	LOG_MESSAGE("main", EVENT, 1, "Starting server");
+
+	//dispatcher thread
+	g_game.setGameState(GAME_STATE_STARTUP);
 
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... ";
@@ -188,7 +209,7 @@ int main(int argc, char *argv[])
 		char errorMessage[26];
 		sprintf(errorMessage, "Unable to load %s!", configname);
 		ErrorMessage(errorMessage);
-		return -1;
+		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -202,17 +223,6 @@ int main(int argc, char *argv[])
 
 	std::cout << "[done]" << std::endl;
 
-	//load bans
-	/*
-	std::cout << ":: Loading bans... ";
-	g_bans.init();
-	if(!g_bans.loadBans()){
-		ErrorMessage("Unable to load bans!");
-		return -1;
-	}
-	std::cout << "[done]" << std::endl;
-	*/
-
 	std::stringstream filename;
 
 	//load vocations
@@ -221,7 +231,7 @@ int main(int argc, char *argv[])
 	std::cout << ":: Loading " << filename.str() << "... ";
 	if(!g_vocations.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		ErrorMessage("Unable to load vocations!");
-		return -1;
+		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -233,7 +243,7 @@ int main(int argc, char *argv[])
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		return -1;
+		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -245,7 +255,7 @@ int main(int argc, char *argv[])
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		return -1;
+		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -256,13 +266,13 @@ int main(int argc, char *argv[])
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		return -1;
+		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
 
 	//load scripts
 	if(ScriptingManager::getInstance()->loadScriptSystems() == false){
-		return -1;
+		exit(-1);
 	}
 
 	// load monster data
@@ -273,7 +283,7 @@ int main(int argc, char *argv[])
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		return -1;
+		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -286,7 +296,7 @@ int main(int argc, char *argv[])
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		return -1;
+		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -299,7 +309,7 @@ int main(int argc, char *argv[])
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		return -1;
+		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -314,7 +324,7 @@ int main(int argc, char *argv[])
 		g_game.setWorldType(WORLD_TYPE_PVP_ENFORCED);
 	else{
 		ErrorMessage("Unknown world type!");
-		return -1;
+		exit(-1);
 	}
 	std::cout << ":: Worldtype: " << worldType << std::endl;
 
@@ -338,15 +348,15 @@ int main(int argc, char *argv[])
 	}
 	else{
 		ErrorMessage("Unknown password type!");
-		return -1;
+		exit(-1);
 	}
 
-	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE), g_config.getString(ConfigManager::MAP_KIND))){
-		return -1;
+	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE),
+		g_config.getString(ConfigManager::MAP_KIND))){
+		exit(-1);
 	}
 
-	Raids::getInstance()->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY) + "raids/raids.xml");
-	Raids::getInstance()->startup();
+	g_game.setGameState(GAME_STATE_INIT);
 
 	std::pair<uint32_t, uint32_t> IpNetMask;
 	IpNetMask.first  = inet_addr("127.0.0.1");
@@ -399,7 +409,7 @@ int main(int argc, char *argv[])
 		else{
 			std::string error_msg = "Can't resolve: " + ip;
 			ErrorMessage(error_msg.c_str());
-			return -1;
+			exit(-1);
 		}
 	}
 
@@ -415,22 +425,6 @@ int main(int argc, char *argv[])
 	Status* status = Status::instance();
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
-	//OTSYS_CREATE_THREAD(Creature::creaturePathThread, NULL);
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::setGameState, &g_game, GAME_STATE_INIT)));
-
-	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&Game::setGameState, &g_game, GAME_STATE_NORMAL)));
-
-	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
-		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-	g_server = &server;
-	server.run();
-
-#if defined __EXCEPTION_TRACER__
-	mainExceptionHandler.RemoveHandler();
-#endif
-
-	return 0;
+	g_game.setGameState(GAME_STATE_NORMAL);
+	OTSYS_THREAD_SIGNAL_SEND(g_loaderSignal);
 }

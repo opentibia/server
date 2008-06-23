@@ -528,7 +528,7 @@ bool Monster::activate(bool forced /*= false*/)
 bool Monster::deactivate(bool forced /*= false*/)
 {
 	if(isSummon()){
-		if(!isMasterInRange || getMaster()->idle() || forced){
+		if(!isMasterInRange || getMaster()->isIdle() || forced){
 			isActivated = false;
 		}
 	}
@@ -1142,6 +1142,25 @@ void Monster::die()
 Item* Monster::getCorpse()
 {
 	Item* corpse = Creature::getCorpse();
+	if(corpse){
+		Creature* lastHitCreature = NULL;
+		Creature* mostDamageCreature = NULL;
+
+		if(getKillers(&lastHitCreature, &mostDamageCreature) && mostDamageCreature){
+			uint32_t corpseOwner = 0;
+			if(mostDamageCreature->getPlayer()){
+				corpseOwner = mostDamageCreature->getID();
+			}
+			else if(mostDamageCreature->getMaster() && mostDamageCreature->getMaster()->getPlayer()){
+				corpseOwner = mostDamageCreature->getMaster()->getID();
+			}
+
+			if(corpseOwner != 0){
+				corpse->setCorpseOwner(corpseOwner);
+			}
+		}
+	}
+
 	return corpse;
 }
 

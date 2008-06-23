@@ -960,7 +960,12 @@ bool Item::canDecay()
 		return false;
 	}
 
-	return (items[id].decayTo != -1);
+	const ItemType& it = Item::items[id];
+	if(it.decayTo == -1 || it.decayTime == 0){
+		return false;
+	}
+
+	return true;
 }
 
 int Item::getWorth() const

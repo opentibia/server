@@ -55,6 +55,7 @@
 #include "server.h"
 #include "party.h"
 #include "ban.h"
+#include "raids.h"
 //[ added for beds system
 #include "beds.h"
 #include <iostream>
@@ -81,7 +82,6 @@ Game::Game()
 	worldType = WORLD_TYPE_PVP;
 
 	OTSYS_THREAD_LOCKVARINIT(AutoID::autoIDLock);
-	//OTSYS_THREAD_LOCKVARINIT(Creature::pathLock);
 
 #if defined __EXCEPTION_TRACER__
 	OTSYS_THREAD_LOCKVARINIT(maploadlock);
@@ -140,6 +140,10 @@ void Game::setGameState(GameState_t newState)
 		switch(newState){
 			case GAME_STATE_INIT:
 			{
+				Raids::getInstance()->loadFromXml(g_config.getString(
+					ConfigManager::DATA_DIRECTORY) + "raids/raids.xml");
+				Raids::getInstance()->startup();
+
 				Spawns::getInstance()->startup();
 				loadGameState();
 				break;
@@ -1696,8 +1700,12 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 				return NULL;
 			}
 			else{
-				uint16_t newItemId = curType.decayTo;
-				if(newItemId == item->getID() || newItemId == newId){
+				uint16_t newItemId = newId;
+				if(curType.id == newType.id){
+					newItemId = curType.decayTo;
+				}
+
+				if(newItemId != -1){
 					item = transformItem(item, newItemId);
 					return item;
 				}
