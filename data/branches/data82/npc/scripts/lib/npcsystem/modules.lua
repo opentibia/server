@@ -53,7 +53,7 @@ if(Modules == nil) then
 				[TAG_PLAYERNAME] = getPlayerName(cid),
 			}
 		msgout = npcHandler:parseMessage(parameters.text or parameters.message, parseInfo)
-		npcHandler:say(msgout, onlyFocus and cid, parameters.publicize and true)
+		npcHandler:say(msgout, cid, parameters.publicize and true)
 		if(parameters.reset == true) then
 			npcHandler:resetNpc()
 		elseif(parameters.moveup ~= nil and type(parameters.moveup) == 'number') then
