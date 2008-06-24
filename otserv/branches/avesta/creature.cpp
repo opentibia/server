@@ -70,9 +70,6 @@ Creature::Creature() :
 	masterPos.y = 0;
 	masterPos.z = 0;
 
-	attackStrength = 0;
-	defenseStrength = 0;
-
 	followCreature = NULL;
 	hasFollowPath = false;
 	eventWalk = 0;
@@ -115,10 +112,8 @@ Creature::~Creature()
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
 }
 
-bool Creature::canSee(const Position& pos) const
+bool Creature::canSee(const Position& myPos, const Position& pos, uint32_t viewRangeX, uint32_t viewRangeY)
 {
-	const Position& myPos = getPosition();
-
 	if(myPos.z <= 7){
 		//we are on ground level or above (7 -> 0)
 		//view is from 7 -> 0
@@ -136,11 +131,16 @@ bool Creature::canSee(const Position& pos) const
 
 	int offsetz = myPos.z - pos.z;
 
-	if ((pos.x >= myPos.x - Map::maxViewportX + offsetz) && (pos.x <= myPos.x + Map::maxViewportX + offsetz) &&
-		(pos.y >= myPos.y - Map::maxViewportY + offsetz) && (pos.y <= myPos.y + Map::maxViewportY + offsetz))
+	if ((pos.x >= myPos.x - viewRangeX + offsetz) && (pos.x <= myPos.x + viewRangeX + offsetz) &&
+		(pos.y >= myPos.y - viewRangeY + offsetz) && (pos.y <= myPos.y + viewRangeY + offsetz))
 		return true;
 
 	return false;
+}
+
+bool Creature::canSee(const Position& pos) const
+{
+	return canSee(getPosition(), pos, Map::maxViewportX, Map::maxViewportY); 
 }
 
 bool Creature::canSeeCreature(const Creature* creature) const
@@ -889,9 +889,8 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 
 		if(checkDefense && hasDefense){
 			int32_t maxDefense = getDefense();
-			maxDefense = maxDefense + (maxDefense * defenseStrength) / 100;
-
-			damage -= maxDefense;
+			int32_t minDefense = maxDefense / 2;
+			damage -= random_range(minDefense, maxDefense);
 			if(damage <= 0){
 				damage = 0;
 				blockType = BLOCK_DEFENSE;

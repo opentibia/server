@@ -974,7 +974,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 
 			case FORMULA_SKILL:
 			{
-				//"onGetPlayerMinMaxValues"(cid, attackSkill, attackValue, attackStrength)
+				//"onGetPlayerMinMaxValues"(cid, attackSkill, attackValue, attackFactor)
 				Item* tool = player->getWeapon();
 				int32_t attackSkill = player->getWeaponSkill(tool);
 				int32_t attackValue = 7;
@@ -986,11 +986,11 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 						g_game.transformItem(tool, tool->getID(), newCharge);
 					}
                 }
-				int32_t attackStrength = player->getAttackStrength();
+				float attackFactor = player->getAttackFactor();
 
 				lua_pushnumber(L, attackSkill);
 				lua_pushnumber(L, attackValue);
-				lua_pushnumber(L, attackStrength);
+				lua_pushnumber(L, attackFactor);
 				parameters += 3;
 				break;
 			}

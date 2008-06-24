@@ -307,6 +307,8 @@ public:
 
 	virtual int32_t getArmor() const;
 	virtual int32_t getDefense() const;
+	virtual float getAttackFactor() const;
+	virtual float getDefenseFactor() const;
 
 	void addCombatExhaust(uint32_t ticks);
 	void addHealExhaust(uint32_t ticks);
@@ -742,7 +744,7 @@ protected:
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
 	virtual uint32_t getConditionSuppressions() const { return conditionSuppressions; }
 	virtual uint16_t getLookCorpse() const;
-	virtual uint32_t getAttackSpeed();
+	virtual uint32_t getAttackSpeed() const;
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;

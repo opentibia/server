@@ -243,6 +243,8 @@ public:
 
 	virtual int32_t getArmor() const {return 0;}
 	virtual int32_t getDefense() const {return 0;}
+	virtual float getAttackFactor() const {return 1.0f;}
+	virtual float getDefenseFactor() const {return 1.0f;}
 
 	bool addCondition(Condition* condition);
 	bool addCombatCondition(Condition* condition);
@@ -332,8 +334,6 @@ public:
 
 	virtual WeaponType_t getWeaponType() {return WEAPON_NONE;}
 	virtual bool getCombatValues(int32_t& min, int32_t& max) {return false;}
-	int32_t getAttackStrength() const {return attackStrength;}
-	int32_t getDefenseStrength() const {return defenseStrength;}
 
 	uint32_t getSummonCount() const {return summons.size();}
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
@@ -351,6 +351,8 @@ public:
 	virtual Tile* getTile(){return _tile;}
 	virtual const Tile* getTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;
+
+	static bool canSee(const Position& myPos, const Position& pos, uint32_t viewRangeX, uint32_t viewRangeY);
 
 protected:
 	static const int32_t mapWalkWidth = Map::maxViewportX * 2 + 1;
@@ -372,8 +374,6 @@ protected:
 
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
-	int32_t attackStrength;
-	int32_t defenseStrength;
 
 	Outfit_t currentOutfit;
 	Outfit_t defaultOutfit;

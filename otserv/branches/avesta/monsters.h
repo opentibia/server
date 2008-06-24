@@ -134,9 +134,6 @@ public:
 	int32_t changeTargetSpeed;
 	int32_t changeTargetChance;
 
-	int32_t attackStrength;
-	int32_t defenseStrength;
-
 	MonsterScriptList scriptList;
 
 	void createLoot(Container* corpse);

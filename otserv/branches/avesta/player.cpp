@@ -103,9 +103,6 @@ Creature()
 	shootRange = 1;
 
 	chaseMode = CHASEMODE_STANDSTILL;
-
-	attackStrength = 100;
-	defenseStrength = 0;
 	fightMode = FIGHTMODE_ATTACK;
 	safeMode = true;
 
@@ -454,25 +451,85 @@ void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
 int32_t Player::getDefense() const
 {
 	int32_t baseDefense = 5;
-	int32_t defense = 0;
-	int32_t extraDef = 0;
+	int32_t defenseValue = 0;
 	int32_t defenseSkill = 0;
-	const Item* weapon;
-	const Item* shield;
+	int32_t extraDef = 0;
+	float defenseFactor = getDefenseFactor();
+	const Item* weapon = NULL;
+	const Item* shield = NULL;
 	getShieldAndWeapon(shield, weapon);
 
 	if(weapon){
-		defense = weapon->getDefense();
+		defenseValue = baseDefense + weapon->getDefense();
 		extraDef = weapon->getExtraDef();
 		defenseSkill = getWeaponSkill(weapon);
 	}
 
-	if(shield && shield->getDefense() >= defense){
-		defense = shield->getDefense() + extraDef;
+	if(shield && shield->getDefense() >= defenseValue){
+		defenseValue = baseDefense + shield->getDefense() + extraDef;
 		defenseSkill = getSkill(SKILL_SHIELD, SKILL_LEVEL);
 	}
 
-	return baseDefense + (defense * defenseSkill) / 100;
+	return ((int32_t)std::ceil(((float)(defenseSkill * (defenseValue * 0.015)) + (defenseValue * 0.1)) * defenseFactor));
+}
+
+float Player::getAttackFactor() const
+{
+	switch(fightMode){
+		case FIGHTMODE_ATTACK:
+		{
+			return 1.0f;
+			break;
+		}
+
+		case FIGHTMODE_BALANCED:
+		{
+			return 1.2f;
+			break;
+		}
+
+		case FIGHTMODE_DEFENSE:
+		{
+			return 2.0f;
+			break;
+		}
+
+		default:
+			return 1.0f;
+			break;
+	}
+}
+
+float Player::getDefenseFactor() const
+{
+	switch(fightMode){
+		case FIGHTMODE_ATTACK:
+		{
+			return 1.0f;
+			break;
+		}
+
+		case FIGHTMODE_BALANCED:
+		{
+			return 1.2f;
+			break;
+		}
+
+		case FIGHTMODE_DEFENSE:
+		{
+			if((OTSYS_TIME() - lastAttack) < getAttackSpeed()){
+				//Attacking will cause us to get into normal defense
+				return 1.0f;
+			}
+
+			return 2.0f;
+			break;
+		}
+
+		default:
+			return 1.0f;
+			break;
+	}
 }
 
 void Player::sendIcons() const
@@ -2979,7 +3036,7 @@ void Player::getPathSearchParams(const Creature* creature, FindPathParams& fpp) 
 	fpp.fullPathSearch = true;
 }
 
-uint32_t Player::getAttackSpeed()
+uint32_t Player::getAttackSpeed() const
 {
 	return 2000;
 }
@@ -3077,29 +3134,6 @@ void Player::setChaseMode(chaseMode_t mode)
 void Player::setFightMode(fightMode_t mode)
 {
 	fightMode = mode;
-
-	switch(fightMode){
-		case FIGHTMODE_ATTACK:
-		{
-			attackStrength = 100;
-			defenseStrength = 0;
-			break;
-		}
-
-		case FIGHTMODE_BALANCED:
-		{
-			attackStrength = 50;
-			defenseStrength = 50;
-			break;
-		}
-
-		case FIGHTMODE_DEFENSE:
-		{
-			attackStrength = 30;
-			defenseStrength = 70;
-			break;
-		}
-	}
 }
 
 void Player::onWalkAborted()

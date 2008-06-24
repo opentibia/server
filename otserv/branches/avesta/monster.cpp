@@ -76,9 +76,6 @@ Creature()
 	internalLight.level = mType->lightLevel;
 	internalLight.color = mType->lightColor;
 
-	attackStrength = mType->attackStrength;
-	defenseStrength = mType->defenseStrength;
-
 	minCombatValue = 0;
 	maxCombatValue = 0;
 

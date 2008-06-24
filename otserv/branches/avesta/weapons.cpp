@@ -161,9 +161,9 @@ int32_t Weapons::getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
 }
 
 //players
-int32_t Weapons::getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue)
+int32_t Weapons::getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue, float attackFactor)
 {
-	return ((int32_t)std::ceil((attackSkill * (attackValue * 0.0425)) + (attackValue * 0.2)) * 2);
+	return std::ceil(((float)(attackSkill * (attackValue * 0.0425) + (attackValue * 0.2)) / attackFactor)) * 2;
 }
 
 Weapon::Weapon(LuaScriptInterface* _interface) :
@@ -411,12 +411,12 @@ bool Weapon::useFist(Player* player, Creature* target)
 	const Position& targetPos = target->getPosition();
 
 	if(Position::areInRange<1,1>(playerPos, targetPos)){
-		int32_t attackStrength = player->getAttackStrength();
+		float attackFactor = player->getAttackFactor();
 		int32_t attackSkill = player->getSkill(SKILL_FIST, SKILL_LEVEL);
 		int32_t attackValue = 7;
 
-		int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
-		int32_t damage = -(random_range(0, maxDamage, DISTRO_NORMAL) * attackStrength) / 100;
+		int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, attackValue, attackFactor);
+		int32_t damage = -random_range(0, maxDamage, DISTRO_NORMAL);
 
 		CombatParams params;
 		params.combatType = COMBAT_PHYSICALDAMAGE;
@@ -690,22 +690,23 @@ bool WeaponMelee::getSkillType(const Player* player, const Item* item,
 int32_t WeaponMelee::getElementDamage(const Player* player, const Item* item) const
 {
 	int32_t attackSkill = player->getWeaponSkill(item);
-	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, elementDamage);
+	float attackFactor = player->getAttackFactor();
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, elementDamage, attackFactor);
 	return -random_range(0, maxValue, DISTRO_NORMAL);
 }
 
 int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t attackSkill = player->getWeaponSkill(item);
-	int32_t attackStrength = player->getAttackStrength();
-	int32_t attackValue = item->getAttack() - getElementDamage(player, item);
-	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
+	int32_t attackValue = std::max((int32_t)0, ((int32_t)item->getAttack() - elementDamage));
+	float attackFactor = player->getAttackFactor();
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue, attackFactor);
 
 	if(maxDamage){
 		return -maxValue;
 	}
 
-	return -(random_range(0, maxValue, DISTRO_NORMAL) * attackStrength) / 100;
+	return -random_range(0, maxValue, DISTRO_NORMAL);
 }
 
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
@@ -919,9 +920,8 @@ void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) cons
 int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t attackSkill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
-
-	int32_t attackStrength = player->getAttackStrength();
-	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, ammuAttackValue);
+	float attackFactor = player->getAttackFactor();
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, ammuAttackValue, attackFactor);
 
 	if(maxDamage){
 		return -maxValue;
@@ -936,7 +936,8 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 			minValue = (int32_t)std::ceil(player->getLevel() * 0.2);
 		}
 	}
-	return -(random_range(minValue, maxValue, DISTRO_NORMAL) * attackStrength) / 100;
+	
+	return -random_range(minValue, maxValue, DISTRO_NORMAL);
 }
 
 bool WeaponDistance::getSkillType(const Player* player, const Item* item,

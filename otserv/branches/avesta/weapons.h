@@ -49,7 +49,7 @@ public:
 	static int32_t weaponInFightTime;
 
 	static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue);
-	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue);
+	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue, float attackFactor);
 
 protected:
 	virtual void clear();
