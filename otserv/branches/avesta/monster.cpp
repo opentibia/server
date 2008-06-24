@@ -200,12 +200,20 @@ void Monster::onCreatureMove(const Creature* creature, const Tile* newTile, cons
 		else if(!canSeeNewPos && canSeeOldPos){
 			onCreatureLeave(const_cast<Creature*>(creature));
 		}
-	}
 
-	if(!followCreature && !isSummon()){
-		//we have no target lets try pick this one
-		if(isOpponent(creature)){
-			selectTarget(const_cast<Creature*>(creature));
+		if(isSummon() && getMaster() == creature){
+			if(canSeeNewPos){
+				//Turn the summon on again
+				isMasterInRange = true;
+				activate();
+			}
+		}
+
+		if(!followCreature && !isSummon()){
+			//we have no target lets try pick this one
+			if(isOpponent(creature)){
+				selectTarget(const_cast<Creature*>(creature));
+			}
 		}
 	}
 }

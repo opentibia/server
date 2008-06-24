@@ -730,13 +730,13 @@ Houses::Houses()
 
 	rentPeriod = RENTPERIOD_MONTHLY;
 
-	if(strRentPeriod == "yearly"){
+	if(asLowerCaseString(strRentPeriod) == "yearly"){
 		rentPeriod = RENTPERIOD_YEARLY;
 	}
-	else if(strRentPeriod == "weekly"){
+	else if(asLowerCaseString(strRentPeriod) == "weekly"){
 		rentPeriod = RENTPERIOD_WEEKLY;
 	}
-	else if(strRentPeriod == "daily"){
+	else if(asLowerCaseString(strRentPeriod) == "daily"){
 		rentPeriod = RENTPERIOD_DAILY;
 	}
 }

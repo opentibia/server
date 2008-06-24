@@ -407,7 +407,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			combat->setArea(area);
 		}
 
-		if(name == "melee"){
+		if(asLowerCaseString(name) == "melee"){
 			int attack = 0;
 			int skill = 0;
 			sb.isMelee = true;
@@ -488,42 +488,42 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			combat->setParam(COMBATPARAM_BLOCKEDBYARMOR, 1);
 			combat->setParam(COMBATPARAM_BLOCKEDBYSHIELD, 1);
 		}
-		else if(name == "physical"){
+		else if(asLowerCaseString(name) == "physical"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_PHYSICALDAMAGE);
 			combat->setParam(COMBATPARAM_BLOCKEDBYARMOR, 1);
 		}
-		else if(name == "poison" || name == "earth"){
+		else if(asLowerCaseString(name) == "poison" || asLowerCaseString(name) == "earth"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_EARTHDAMAGE);
 		}
-		else if(name == "fire"){
+		else if(asLowerCaseString(name) == "fire"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_FIREDAMAGE);
 		}
-		else if(name == "energy"){
+		else if(asLowerCaseString(name) == "energy"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_ENERGYDAMAGE);
 		}
-		else if(name == "drown"){
+		else if(asLowerCaseString(name) == "drown"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DROWNDAMAGE);
 		}
-		else if(name == "ice"){
+		else if(asLowerCaseString(name) == "ice"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_ICEDAMAGE);
 		}
-		else if(name == "holy"){
+		else if(asLowerCaseString(name) == "holy"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_HOLYDAMAGE);
 		}
-		else if(name == "death"){
+		else if(asLowerCaseString(name) == "death"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DEATHDAMAGE);
 		}
-		else if(name == "lifedrain"){
+		else if(asLowerCaseString(name) == "lifedrain"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_LIFEDRAIN);
 		}
-		else if(name == "manadrain"){
+		else if(asLowerCaseString(name) == "manadrain"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_MANADRAIN);
 		}
-		else if(name == "healing"){
+		else if(asLowerCaseString(name) == "healing"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_HEALING);
 			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
 		}
-		else if(name == "speed"){
+		else if(asLowerCaseString(name) == "speed"){
 			int32_t speedChange = 0;
 			int32_t duration = 10000;
 
@@ -553,7 +553,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			condition->setFormulaVars(speedChange / 1000.0, 0, speedChange / 1000.0, 0);
 			combat->setCondition(condition);
 		}
-		else if(name == "outfit"){
+		else if(asLowerCaseString(name) == "outfit"){
 			int32_t duration = 10000;
 
 			if(readXMLInteger(node, "duration", intValue)){
@@ -579,7 +579,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 				combat->setCondition(condition);
 			}
 		}
-		else if(name == "invisible"){
+		else if(asLowerCaseString(name) == "invisible"){
 			int32_t duration = 10000;
 
 			if(readXMLInteger(node, "duration", intValue)){
@@ -590,7 +590,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
 			combat->setCondition(condition);
 		}
-		else if(name == "drunk"){
+		else if(asLowerCaseString(name) == "drunk"){
 			int32_t duration = 10000;
 
 			if(readXMLInteger(node, "duration", intValue)){
@@ -600,19 +600,19 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, 0);
 			combat->setCondition(condition);
 		}
-		else if(name == "firefield"){
+		else if(asLowerCaseString(name) == "firefield"){
 			combat->setParam(COMBATPARAM_CREATEITEM, 1492);
 		}
-		else if(name == "poisonfield"){
+		else if(asLowerCaseString(name) == "poisonfield"){
 			combat->setParam(COMBATPARAM_CREATEITEM, 1496);
 		}
-		else if(name == "energyfield"){
+		else if(asLowerCaseString(name) == "energyfield"){
 			combat->setParam(COMBATPARAM_CREATEITEM, 1495);
 		}
-		else if(name == "firecondition" ||
-				name == "poisoncondition" ||
-				name == "energycondition" ||
-				name == "drowncondition"){
+		else if(asLowerCaseString(name) == "firecondition" ||
+				asLowerCaseString(name) == "poisoncondition" ||
+				asLowerCaseString(name) == "energycondition" ||
+				asLowerCaseString(name) == "drowncondition"){
 			ConditionType_t conditionType = CONDITION_NONE;
 			uint32_t tickInterval = 2000;
 
@@ -652,7 +652,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
 			combat->setCondition(condition);
 		}
-		else if(name == "strength") {
+		else if(asLowerCaseString(name) == "strength"){
 			//
 		}
 		else{

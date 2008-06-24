@@ -77,7 +77,7 @@ std::string CreatureEvents::getScriptBaseName()
 
 Event* CreatureEvents::getEvent(const std::string& nodeName)
 {
-	if(nodeName == "event"){
+	if(asLowerCaseString(nodeName) == "event"){
 		return new CreatureEvent(&m_scriptInterface);
 	}
 	return NULL;
@@ -184,17 +184,18 @@ bool CreatureEvent::configureEvent(xmlNodePtr p)
 		std::cout << "Error: [CreatureEvent::configureEvent] No name for creature event." << std::endl;
 		return false;
 	}
+
 	if(readXMLString(p, "type", str)){
-		if(str == "login"){
+		if(asLowerCaseString(str) == "login"){
 			m_type = CREATURE_EVENT_LOGIN;
 		}
-		else if(str == "logout"){
+		else if(asLowerCaseString(str) == "logout"){
 			m_type = CREATURE_EVENT_LOGOUT;
 		}
-		else if(str == "die"){
+		else if(asLowerCaseString(str) == "die"){
 			m_type = CREATURE_EVENT_DIE;
 		}
-		else if(str == "kill"){
+		else if(asLowerCaseString(str) == "kill"){
 			m_type = CREATURE_EVENT_KILL;
 		}
 		else{

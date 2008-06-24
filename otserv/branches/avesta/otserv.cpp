@@ -316,11 +316,11 @@ void mainLoader(int argc, char *argv[])
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
 
-	if(worldType == "PVP")
+	if(asLowerCaseString(worldType) == "pvp")
 		g_game.setWorldType(WORLD_TYPE_PVP);
-	else if(worldType == "NO-PVP")
+	else if(asLowerCaseString(worldType) == "no-pvp")
 		g_game.setWorldType(WORLD_TYPE_NO_PVP);
-	else if(worldType == "PVP-ENFORCED")
+	else if(asLowerCaseString(worldType) == "pvp-enforced")
 		g_game.setWorldType(WORLD_TYPE_PVP_ENFORCED);
 	else{
 		ErrorMessage("Unknown world type!");
@@ -333,16 +333,15 @@ void mainLoader(int argc, char *argv[])
 	#endif
 
 	std::string passwordType = g_config.getString(ConfigManager::PASSWORD_TYPE_STR);
-	std::transform(passwordType.begin(), passwordType.end(), passwordType.begin(), upchar);
-	if(passwordType == "" || passwordType == "PLAIN"){
+	if(passwordType.empty() || asLowerCaseString(passwordType) == "plain"){
 		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_PLAIN);
 		std::cout << ":: Use plain passwords" << std::endl;
 	}
-	else if(passwordType == "MD5"){
+	else if(asLowerCaseString(passwordType) == "md5"){
 		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_MD5);
 		std::cout << ":: Use MD5 passwords" << std::endl;
 	}
-	else if(passwordType == "SHA1"){
+	else if(asLowerCaseString(passwordType) == "sha1"){
 		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_SHA1);
 		std::cout << ":: Use SHA1 passwords" << std::endl;
 	}

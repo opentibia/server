@@ -552,7 +552,7 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 				if(xmlStrEqual(q->name, (const xmlChar*)"key")){
 					std::string str;
 					if(readXMLString(q, "type", str)){
-						if(str == "RSA1024XTEA"){
+						if(asLowerCaseString(str) == "rsa1024xtea"){
 							if(readXMLString(q, "file", str)){
 								m_key_RSA1024XTEA = new RSA();
 								if(!m_key_RSA1024XTEA->setKey(directory + str)){
@@ -562,7 +562,7 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 								}
 							}
 							else if(readXMLString(q, "use", str)){
-								if(str == "otserv"){
+								if(asLowerCaseString(str) == "otserv"){
 									m_key_RSA1024XTEA = g_otservRSA;
 								}
 								else{

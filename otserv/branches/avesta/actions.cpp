@@ -94,7 +94,7 @@ std::string Actions::getScriptBaseName()
 
 Event* Actions::getEvent(const std::string& nodeName)
 {
-	if(nodeName == "action"){
+	if(asLowerCaseString(nodeName) == "action"){
 		return new Action(&m_scriptInterface);
 	}
 	else{

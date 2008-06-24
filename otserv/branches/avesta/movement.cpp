@@ -90,7 +90,7 @@ std::string MoveEvents::getScriptBaseName()
 
 Event* MoveEvents::getEvent(const std::string& nodeName)
 {
-	if(nodeName == "movevent"){
+	if(asLowerCaseString(nodeName) == "movevent"){
 		return new MoveEvent(&m_scriptInterface);
 	}
 	else{
@@ -349,22 +349,22 @@ bool MoveEvent::configureEvent(xmlNodePtr p)
 {
 	std::string str;
 	if(readXMLString(p, "event", str)){
-		if(str == "StepIn"){
+		if(asLowerCaseString(str) == "stepin"){
 			m_eventType = MOVE_EVENT_STEP_IN;
 		}
-		else if(str == "StepOut"){
+		else if(asLowerCaseString(str) == "stepout"){
 			m_eventType = MOVE_EVENT_STEP_OUT;
 		}
-		else if(str == "Equip"){
+		else if(asLowerCaseString(str) == "equip"){
 			m_eventType = MOVE_EVENT_EQUIP;
 		}
-		else if(str == "DeEquip"){
+		else if(asLowerCaseString(str) == "deequip"){
 			m_eventType = MOVE_EVENT_DEEQUIP;
 		}
-		else if(str == "AddItem"){
+		else if(asLowerCaseString(str) == "additem"){
 			m_eventType = MOVE_EVENT_ADD_ITEM;
 		}
-		else if(str == "RemoveItem"){
+		else if(asLowerCaseString(str) == "removeitem"){
 			m_eventType = MOVE_EVENT_REMOVE_ITEM;
 		}
 		else{
@@ -374,34 +374,34 @@ bool MoveEvent::configureEvent(xmlNodePtr p)
 
 		if(m_eventType == MOVE_EVENT_EQUIP || m_eventType == MOVE_EVENT_DEEQUIP){
 			if(readXMLString(p, "slot", str)){
-				if(str == "head"){
+				if(asLowerCaseString(str) == "head"){
 					slot = SLOT_HEAD;
 				}
-				else if(str == "necklace"){
+				else if(asLowerCaseString(str) == "necklace"){
 					slot = SLOT_NECKLACE;
 				}
-				else if(str == "backpack"){
+				else if(asLowerCaseString(str) == "backpack"){
 					slot = SLOT_BACKPACK;
 				}
-				else if(str == "armor"){
+				else if(asLowerCaseString(str) == "armor"){
 					slot = SLOT_ARMOR;
 				}
-				else if(str, "right-hand"){
+				else if(asLowerCaseString(str) == "right-hand"){
 					slot = SLOT_RIGHT;
 				}
-				else if(str, "left-hand"){
+				else if(asLowerCaseString(str) == "left-hand"){
 					slot = SLOT_LEFT;
 				}
-				else if(str == "legs"){
+				else if(asLowerCaseString(str) == "legs"){
 					slot = SLOT_LEGS;
 				}
-				else if(str == "feet"){
+				else if(asLowerCaseString(str) == "feet"){
 					slot = SLOT_FEET;
 				}
-				else if(str == "ring"){
+				else if(asLowerCaseString(str) == "ring"){
 					slot = SLOT_RING;
 				}
-				else if(str == "ammo"){
+				else if(asLowerCaseString(str) == "ammo"){
 					slot = SLOT_AMMO;
 				}
 				else{
@@ -419,22 +419,22 @@ bool MoveEvent::configureEvent(xmlNodePtr p)
 
 bool MoveEvent::loadFunction(const std::string& functionName)
 {
-	if(functionName == "onStepInField"){
+	if(asLowerCaseString(functionName) == "onstepinfield"){
 		stepFunction = StepInField;
 	}
-	else if(functionName == "onStepOutField"){
+	else if(asLowerCaseString(functionName) == "onstepoutfield"){
 		stepFunction = StepOutField;
 	}
-	else if(functionName == "onAddField"){
+	else if(asLowerCaseString(functionName) == "onaddfield"){
 		moveFunction = AddItemField;
 	}
-	else if(functionName == "onRemoveField"){
+	else if(asLowerCaseString(functionName) == "onremovefield"){
 		moveFunction = RemoveItemField;
 	}
-	else if(functionName == "onEquipItem"){
+	else if(asLowerCaseString(functionName) == "onequipitem"){
 		equipFunction = EquipItem;
 	}
-	else if(functionName == "onDeEquipItem"){
+	else if(asLowerCaseString(functionName) == "ondeequipitem"){
 		equipFunction = DeEquipItem;
 	}
 	else{

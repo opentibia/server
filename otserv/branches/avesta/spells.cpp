@@ -125,13 +125,13 @@ std::string Spells::getScriptBaseName()
 
 Event* Spells::getEvent(const std::string& nodeName)
 {
-	if(nodeName == "rune"){
+	if(asLowerCaseString(nodeName) == "rune"){
 		return new RuneSpell(&m_scriptInterface);
 	}
-	else if(nodeName == "instant"){
+	else if(asLowerCaseString(nodeName) == "instant"){
 		return new InstantSpell(&m_scriptInterface);
 	}
-	else if(nodeName == "conjure"){
+	else if(asLowerCaseString(nodeName) == "conjure"){
 		return new ConjureSpell(&m_scriptInterface);
 	}
 	else{
@@ -996,34 +996,34 @@ bool InstantSpell::configureEvent(xmlNodePtr p)
 
 bool InstantSpell::loadFunction(const std::string& functionName)
 {
-	if(functionName == "editHouseGuest"){
+	if(asLowerCaseString(functionName) == "edithouseguest"){
 		isAggressive = false;
 		function = HouseGuestList;
 	}
-	else if(functionName == "editHouseSubOwner"){
+	else if(asLowerCaseString(functionName) == "edithousesubowner"){
 		isAggressive = false;
 		function = HouseSubOwnerList;
 	}
-	else if(functionName == "editHouseDoor"){
+	else if(asLowerCaseString(functionName) == "edithousedoor"){
 		isAggressive = false;
 		function = HouseDoorList;
 	}
-	else if(functionName == "houseKick"){
+	else if(asLowerCaseString(functionName) == "housekick"){
 		isAggressive = false;
 		function = HouseKick;
 	}
-	else if(functionName == "searchPlayer"){
+	else if(asLowerCaseString(functionName) == "searchplayer"){
 		isAggressive = false;
 		function = SearchPlayer;
 	}
-	else if(functionName == "summonMonster"){
+	else if(asLowerCaseString(functionName) == "summonmonster"){
 		function = SummonMonster;
 	}
-	else if(functionName == "levitate"){
+	else if(asLowerCaseString(functionName) == "levitate"){
 		isAggressive = false;
 		function = Levitate;
 	}
-	else if(functionName == "illusion"){
+	else if(asLowerCaseString(functionName) == "illusion"){
 		isAggressive = false;
 		function = Illusion;
 	}
@@ -1592,7 +1592,7 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 	const Position& destPos = Spells::getCasterPosition(creature, creature->getDirection());
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
-	if(param == "up"){
+	if(asLowerCaseString(param) == "up"){
 		if(currentPos.z != 8){
 			Tile* tmpTile = g_game.getTile(currentPos.x, currentPos.y, currentPos.z - 1);
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID))){
@@ -1604,7 +1604,7 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 			}
 		}
 	}
-	else if(param == "down"){
+	else if(asLowerCaseString(param) == "down"){
 		if(currentPos.z != 7){
 			Tile* tmpTile = g_game.getTile(destPos.x, destPos.y, destPos.z);
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
@@ -1734,13 +1734,13 @@ bool ConjureSpell::configureEvent(xmlNodePtr p)
 
 bool ConjureSpell::loadFunction(const std::string& functionName)
 {
-	if(functionName == "conjureItem"){
+	if(asLowerCaseString(functionName) == "conjureitem"){
 		function = ConjureItem;
 	}
-	else if(functionName == "conjureRune"){
+	else if(asLowerCaseString(functionName) == "conjurerune"){
 		function = ConjureItem;
 	}
-	else if(functionName == "conjureFood"){
+	else if(asLowerCaseString(functionName) == "conjurefood"){
 		function = ConjureFood;
 	}
 	else{
