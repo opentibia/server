@@ -42,13 +42,7 @@ enum MoveEvent_t{
 class MoveEvent;
 
 struct MoveEventList{
-	MoveEvent* moveEvent[MOVE_EVENT_LAST];
-	MoveEventList()
-	{
-		for(uint32_t i = 0; i < MOVE_EVENT_LAST; ++i){
-			moveEvent[i] = NULL;	
-		}
-	}
+	std::list<MoveEvent*> moveEvent[MOVE_EVENT_LAST];
 };
 
 class MoveEvents : public BaseEvents
@@ -76,6 +70,8 @@ protected:
 
 	void addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& map);
 	MoveEvent* getEvent(Tile* tile, MoveEvent_t eventType);
+
+	MoveEvent* getEvent(Item* item, MoveEvent_t eventType, slots_t slot);
 		
 	MoveListMap m_uniqueIdMap;
 	MoveListMap m_actionIdMap;
