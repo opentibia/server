@@ -451,8 +451,8 @@ void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
 int32_t Player::getDefense() const
 {
 	int32_t baseDefense = 5;
-	int32_t defenseValue = 0;
 	int32_t defenseSkill = 0;
+	int32_t defenseValue = 0;
 	int32_t extraDef = 0;
 	float defenseFactor = getDefenseFactor();
 	const Item* weapon = NULL;
@@ -460,15 +460,17 @@ int32_t Player::getDefense() const
 	getShieldAndWeapon(shield, weapon);
 
 	if(weapon){
-		defenseValue = baseDefense + weapon->getDefense();
-		extraDef = weapon->getExtraDef();
+		defenseValue = weapon->getDefense();
 		defenseSkill = getWeaponSkill(weapon);
+		extraDef = weapon->getExtraDef();
 	}
 
 	if(shield && shield->getDefense() >= defenseValue){
-		defenseValue = baseDefense + shield->getDefense() + extraDef;
+		defenseValue = shield->getDefense() + extraDef;
 		defenseSkill = getSkill(SKILL_SHIELD, SKILL_LEVEL);
 	}
+
+	defenseValue += baseDefense;
 
 	return ((int32_t)std::ceil(((float)(defenseSkill * (defenseValue * 0.015)) + (defenseValue * 0.1)) * defenseFactor));
 }
