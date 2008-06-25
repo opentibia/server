@@ -493,7 +493,7 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	}
 	else if(param == "commands"){
 		this->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded actions.");
+		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded commands.");
 	}
 	else if(param == "monsters"){
 		g_monsters.reload();

@@ -164,6 +164,7 @@ int main(int argc, char *argv[])
 
 	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, argc, argv)));
 
+	OTSYS_THREAD_LOCK(g_loaderLock, "main()");
 	OTSYS_THREAD_WAITSIGNAL(g_loaderSignal, g_loaderLock);
 
 	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));

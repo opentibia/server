@@ -4309,7 +4309,7 @@ int LuaScriptInterface::luaSetCombatCondition(lua_State *L)
 		return 1;
 	}
 
-	combat->setCondition(condition);
+	combat->setCondition(condition->clone());
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;

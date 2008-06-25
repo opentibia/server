@@ -91,7 +91,7 @@ public:
 class CombatSpell : public Event, public BaseSpell{
 public:
 	CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection);
-	virtual ~CombatSpell(){};
+	virtual ~CombatSpell();
 
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);

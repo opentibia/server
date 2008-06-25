@@ -326,6 +326,13 @@ Event(&g_spells->getScriptInterface())
 	needDirection = _needDirection;
 }
 
+CombatSpell::~CombatSpell()
+{
+	if(combat){
+		delete combat;
+	}
+}
+
 bool CombatSpell::loadScriptCombat()
 {
 	if(m_scriptInterface->reserveScriptEnv()){
