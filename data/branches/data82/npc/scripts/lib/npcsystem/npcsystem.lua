@@ -18,11 +18,13 @@ if(NpcSystem == nil) then
 	-- Keyword nestling behavior. For more information look at the top of keywordhandler.lua
 	KEYWORD_BEHAVIOR = BEHAVIOR_NORMAL_EXTENDED
 	
-	-- Gerrting and unGreeting keywords. For mor information look at the top of modules.lua
+	-- Gerrting and unGreeting keywords. For more information look at the top of modules.lua
 	FOCUS_GREETWORDS = {'hi', 'hello'}
 	FOCUS_FAREWELLWORDS = {'bye', 'farewell', 'cya'}
 	
-	
+	-- The word for requesting trade window. For more information look at the top of modules.lua
+	SHOP_TRADEREQUEST = {'offer', 'trade'}
+
 	-- The word for accepting/declining an offer. CAN ONLY CONTAIN ONE FIELD! For more information look at the top of modules.lua
 	SHOP_YESWORD = {'yes'}
 	SHOP_NOWORD = {'no'}
@@ -84,14 +86,6 @@ if(NpcSystem == nil) then
 		if(ret ~= nil) then
 			npcHandler:setMessage(MESSAGE_FAREWELL, ret)
 		end
-		local ret = NpcSystem.getParameter('message_buy')
-		if(ret ~= nil) then
-			npcHandler:setMessage(MESSAGE_BUY, ret)
-		end
-		local ret = NpcSystem.getParameter('message_sell')
-		if(ret ~= nil) then
-			npcHandler:setMessage(MESSAGE_SELL, ret)
-		end
 		local ret = NpcSystem.getParameter('message_onbuy')
 		if(ret ~= nil) then
 			npcHandler:setMessage(MESSAGE_ONBUY, ret)
@@ -119,6 +113,26 @@ if(NpcSystem == nil) then
 		local ret = NpcSystem.getParameter('message_decline')
 		if(ret ~= nil) then
 			npcHandler:setMessage(MESSAGE_DECLINE, ret)
+		end
+		local ret = NpcSystem.getParameter('message_needmorespace')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_NEEDMORESPACE, ret)
+		end
+		local ret = NpcSystem.getParameter('message_onbuy_needspace')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_ONBUYNEEDSPACE, ret)
+		end
+		local ret = NpcSystem.getParameter('message_sendtrade')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_SENDTRADE, ret)
+		end
+		local ret = NpcSystem.getParameter('message_noshop')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_NOSHOP, ret)
+		end
+		local ret = NpcSystem.getParameter('message_oncloseshop')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_ONCLOSESHOP, ret)
 		end
 		
 		-- Parse modules.

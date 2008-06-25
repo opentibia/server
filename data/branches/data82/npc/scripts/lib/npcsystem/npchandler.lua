@@ -20,15 +20,18 @@ if(NpcHandler == nil) then
 	-- Constant indexes for defining default messages.
 	MESSAGE_GREET 		= 1 -- When the player greets the npc.
 	MESSAGE_FAREWELL 	= 2 -- When the player unGreets the npc.
-	MESSAGE_BUY 		= 3 -- When the npc asks the player if he wants to buy something.
-	MESSAGE_SELL 		= 4 -- When the npc asks the player if he wants to sell something.
-	MESSAGE_ONBUY 		= 5 -- When the player successfully buys something
-	MESSAGE_ONSELL 		= 6 -- When the player successfully sells something
-	MESSAGE_NEEDMOREMONEY = 7 -- When the player does not have enough money
-	MESSAGE_NOTHAVEITEM = 8 -- When the player is trying to sell an item he does not have.
-	MESSAGE_IDLETIMEOUT = 9 -- When the player has been idle for longer then idleTime allows.
-	MESSAGE_WALKAWAY 	= 10 -- When the player walks out of the talkRadius of the npc.
-	MESSAGE_DECLINE 	= 11 -- When the player says no to something.
+	MESSAGE_ONBUY 		= 3 -- When the player successfully buys something
+	MESSAGE_ONSELL 		= 4 -- When the player successfully sells something
+	MESSAGE_NEEDMOREMONEY = 5 -- When the player does not have enough money
+	MESSAGE_NOTHAVEITEM = 6 -- When the player is trying to sell an item he does not have.
+	MESSAGE_IDLETIMEOUT = 7 -- When the player has been idle for longer then idleTime allows.
+	MESSAGE_WALKAWAY 	= 8 -- When the player walks out of the talkRadius of the npc.
+	MESSAGE_DECLINE 	= 9 -- When the player says no to something.
+	MESSAGE_NEEDMORESPACE = 10 -- When the player don't have any space to buy an item
+	MESSAGE_ONBUYNEEDSPACE = 11 -- When the player has some space to buy an item, but not enough space
+	MESSAGE_SENDTRADE   = 12 -- When the npc sends the trade window to the player
+	MESSAGE_NOSHOP		= 13 -- When the npc's shop is requested but he doesn't have any
+	MESSAGE_ONCLOSESHOP	= 14 -- When the player closes the npc's shop window
 	
 	-- Constant indexes for callback functions. These are also used for module callback ids.
 	CALLBACK_CREATURE_APPEAR 	= 1
@@ -40,10 +43,12 @@ if(NpcHandler == nil) then
 	CALLBACK_MESSAGE_DEFAULT 	= 7
 	CALLBACK_PLAYER_ENDTRADE 	= 8
 	CALLBACK_PLAYER_CLOSECHANNEL= 9
+	CALLBACK_ONBUY				= 10
+	CALLBACK_ONSELL				= 11
 	
 	-- Addidional module callback ids
-	CALLBACK_MODULE_INIT		= 10
-	CALLBACK_MODULE_RESET		= 11
+	CALLBACK_MODULE_INIT		= 12
+	CALLBACK_MODULE_RESET		= 13
 	
 	
 	-- Constant strings defining the keywords to replace in the default messages.
@@ -63,19 +68,23 @@ if(NpcHandler == nil) then
 		talkDelay = nil,
 		callbackFunctions = nil,
 		modules = nil,
+		shopItems = nil, -- They must be here since ShopModule uses "static" functions
 		messages = {
 				-- These are the default replies of all npcs. They can/should be changed individually for each npc.
 			[MESSAGE_GREET] 		= 'Welcome, |PLAYERNAME|! I have been expecting you.',
 			[MESSAGE_FAREWELL] 		= 'Good bye, |PLAYERNAME|!',
-			[MESSAGE_BUY] 			= 'Do you want to buy |ITEMCOUNT| |ITEMNAME| for |TOTALCOST| gold coins?',
-			[MESSAGE_SELL] 			= 'Do you want to sell |ITEMCOUNT| |ITEMNAME| for |TOTALCOST| gold coins?',
 			[MESSAGE_ONBUY] 		= 'It was a pleasure doing business with you.',
 			[MESSAGE_ONSELL] 		= 'Thank you for this item, |PLAYERNAME|.',
 			[MESSAGE_NEEDMOREMONEY] = 'You do not have enough money.',
 			[MESSAGE_NOTHAVEITEM] 	= 'You don\'t even have that item!',
 			[MESSAGE_IDLETIMEOUT] 	= 'Next please!',
 			[MESSAGE_WALKAWAY] 		= 'How rude!',
-			[MESSAGE_DECLINE]		= 'Not good enough, is it?'
+			[MESSAGE_DECLINE]		= 'Not good enough, is it?',
+			[MESSAGE_NEEDMORESPACE]	= 'You don\'t have enough space to carry these items.',
+			[MESSAGE_ONBUYNEEDSPACE]= 'Here you are some of them, though you don\'t got space to carry the rest.',
+			[MESSAGE_SENDTRADE]		= 'These are my offers. Don\'t you like it?',
+			[MESSAGE_NOSHOP]		= 'I\'m not offering anything.',
+			[MESSAGE_ONCLOSESHOP]	= 'Thank you, come back when you want something more.'
 		}
 	}
 	
@@ -90,6 +99,7 @@ if(NpcHandler == nil) then
 		obj.talkStart = {}
 		obj.keywordHandler = keywordHandler
 		obj.messages = {}
+		obj.shopItems = {}
 		setmetatable(obj.messages, self.messages)
 		self.messages.__index = self.messages
 		
@@ -144,6 +154,7 @@ if(NpcHandler == nil) then
 		local pos = table.find(self.focuses, focus)
 		table.remove(self.focuses, pos)
 		self.talkStart[focus] = nil
+		closeShopWindow(focus) --Even if it can not exist, we need to prevent it.
 		self:updateFocus()
 	end
 	
@@ -190,6 +201,13 @@ if(NpcHandler == nil) then
 				
 			elseif(id == CALLBACK_PLAYER_CLOSECHANNEL and module.callbackOnPlayerCloseChannel ~= nil) then
 				tmpRet = module:callbackOnPlayerCloseChannel(unpack(arg))
+			
+			elseif(id == CALLBACK_ONBUY and module.callbackOnBuy ~= nil) then
+				tmpRet = module:callbackOnBuy(unpack(arg))
+				
+			elseif(id == CALLBACK_ONSELL and module.callbackOnSell ~= nil) then
+				tmpRet = module:callbackOnSell(unpack(arg))
+				
 			elseif(id == CALLBACK_ONTHINK and module.callbackOnThink ~= nil) then
 				tmpRet = module:callbackOnThink(unpack(arg))
 				
@@ -328,7 +346,11 @@ if(NpcHandler == nil) then
 		local callback = self:getCallback(CALLBACK_PLAYER_ENDTRADE)
 		if(callback == nil or callback(cid)) then
 			if(self:processModuleCallback(CALLBACK_PLAYER_ENDTRADE, cid, msgtype, msg)) then
-				--todo
+				if(self:isFocused(cid)) then
+					local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
+					local msg = self:parseMessage(self:getMessage(MESSAGE_ONCLOSESHOP), parseInfo)
+					self:say(msg, cid)
+				end
 			end
 		end
 	end
@@ -338,7 +360,29 @@ if(NpcHandler == nil) then
 		local callback = self:getCallback(CALLBACK_PLAYER_CLOSECHANNEL)
 		if(callback == nil or callback(cid)) then
 			if(self:processModuleCallback(CALLBACK_PLAYER_CLOSECHANNEL, cid, msgtype, msg)) then
-				--todo
+				if(self:isFocused(cid)) then
+					self:unGreet(cid)
+				end
+			end
+		end
+	end
+
+	-- Handles onBuy events. If you wish to handle this yourself, use the CALLBACK_ONBUY callback.
+	function NpcHandler:onBuy(cid, itemid, subType, amount)
+		local callback = self:getCallback(CALLBACK_ONBUY)
+		if(callback == nil or callback(cid, itemid, subType, amount)) then
+			if(self:processModuleCallback(CALLBACK_ONBUY, cid, itemid, subType, amount)) then
+				--
+			end
+		end
+	end
+
+	-- Handles onSell events. If you wish to handle this yourself, use the CALLBACK_ONSELL callback.
+	function NpcHandler:onSell(cid, itemid, subType, amount)
+		local callback = self:getCallback(CALLBACK_ONSELL)
+		if(callback == nil or callback(cid, itemid, subType, amount)) then
+			if(self:processModuleCallback(CALLBACK_ONSELL, cid, itemid, subType, amount)) then
+				--
 			end
 		end
 	end

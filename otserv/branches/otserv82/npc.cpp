@@ -861,6 +861,7 @@ int NpcScriptInterface::luaSendShop(lua_State *L)
 	if(player == NULL) {
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
 	player->setShopOwner(env->getNpc(), buyCallback, sellCallback);
 	player->sendShop(items);
@@ -882,6 +883,7 @@ int NpcScriptInterface::luaCloseShop(lua_State *L)
 	if(player == NULL) {
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
 
 	player->sendCloseShop();
