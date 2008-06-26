@@ -9,6 +9,7 @@ if(NpcSystem == nil) then
 	
 	-- Loads the underlying classes of the npcsystem.
 	dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/keywordhandler.lua')
+	dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/queue.lua')
 	dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/npchandler.lua')
 	dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/modules.lua')
 	
@@ -32,8 +33,11 @@ if(NpcSystem == nil) then
 	-- Pattern used to get the amount of an item a player wants to buy/sell.
 	PATTERN_COUNT = '%d+'
 	
-	-- Talkdelay behavior. For mor information, look at the top of npchandler.lua.
+	-- Talkdelay behavior. For more information, look at the top of npchandler.lua.
 	NPCHANDLER_TALKDELAY = TALKDELAY_ONTHINK
+
+	-- Conversation behavior. For more information, look at the top of npchandler.lua.
+	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_PRIVATE
 	
 	-- Constant strings defining the keywords to replace in the default messages.
 	--	For more information, look at the top of npchandler.lua...
@@ -41,6 +45,7 @@ if(NpcSystem == nil) then
 	TAG_ITEMCOUNT = '|ITEMCOUNT|'
 	TAG_TOTALCOST = '|TOTALCOST|'
 	TAG_ITEMNAME = '|ITEMNAME|'
+	TAG_QUEUESIZE = '|QUEUESIZE|'
 	
 	
 	
@@ -133,6 +138,22 @@ if(NpcSystem == nil) then
 		local ret = NpcSystem.getParameter('message_oncloseshop')
 		if(ret ~= nil) then
 			npcHandler:setMessage(MESSAGE_ONCLOSESHOP, ret)
+		end
+		local ret = NpcSystem.getParameter('message_alreadyfocused')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_ALREADYFOCUSED, ret)
+		end
+		local ret = NpcSystem.getParameter('message_placedinqueue')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_PLACEDINQUEUE, ret)
+		end
+		local ret = NpcSystem.getParameter('message_buy')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_BUY, ret)
+		end
+		local ret = NpcSystem.getParameter('message_sell')
+		if(ret ~= nil) then
+			npcHandler:setMessage(MESSAGE_SELL, ret)
 		end
 		
 		-- Parse modules.

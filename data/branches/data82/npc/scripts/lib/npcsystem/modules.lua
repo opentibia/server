@@ -695,6 +695,11 @@ if(Modules == nil) then
 			parseInfo[TAG_ITEMCOUNT] = i
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)
+			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
+				self.npcHandler.talkStart[cid] = os.time()
+			else
+				self.npcHandler.talkStart = os.time()
+			end
 			if(i > 0) then
 				doPlayerRemoveMoney(cid, i*self.npcHandler.shopItems[itemid].buyPrice)
 				return true
@@ -705,6 +710,11 @@ if(Modules == nil) then
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)
 			doPlayerRemoveMoney(cid, amount*self.npcHandler.shopItems[itemid].buyPrice)
+			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
+				self.npcHandler.talkStart[cid] = os.time()
+			else
+				self.npcHandler.talkStart = os.time()
+			end
 			return true
 		end
 	end
@@ -725,16 +735,26 @@ if(Modules == nil) then
 		if(subType < 1) then
 			subType = -1
 		end
-		if(doPlayerRemoveItem(cid, item, amount, subType) == TRUE) then
+		if(doPlayerRemoveItem(cid, itemid, amount, subType) == TRUE) then
 			local msg = self.npcHandler:getMessage(MESSAGE_ONSELL)
-			msg = self.npcHandler:parseMessage(parseInfo)
+			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)
 			doPlayerAddMoney(cid, amount*self.npcHandler.shopItems[itemid].sellPrice)
+			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
+				self.npcHandler.talkStart[cid] = os.time()
+			else
+				self.npcHandler.talkStart = os.time()
+			end
 			return true
 		else
 			local msg = self.npcHandler:getMessage(MESSAGE_NOTHAVEITEM)
-			msg = self.npcHandler:parseMessage(parseInfo)
+			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)
+			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
+				self.npcHandler.talkStart[cid] = os.time()
+			else
+				self.npcHandler.talkStart = os.time()
+			end
 			return false
 		end
 	end
