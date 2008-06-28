@@ -197,16 +197,14 @@ void Raids::clear()
 
 	loaded = false;
 	started = false;
-	filename = "";
 	running = NULL;
 	lastRaidEnd = 0;
 }
 
 void Raids::reload()
 {
-	std::string file = filename;
 	clear();
-	loadFromXml(file);
+	loadFromXml(filename);
 }
 
 Raid* Raids::getRaidByName(const std::string& name)
@@ -249,6 +247,7 @@ bool Raid::loadFromXml(const std::string& _filename)
 		return true;
 	}
 
+	filename = _filename;
 	xmlDocPtr doc = xmlParseFile(_filename.c_str());
 
 	if(doc){

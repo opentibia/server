@@ -595,7 +595,7 @@ void Monster::onThink(uint32_t interval)
 			if(!followCreature || !hasFollowPath){
 				searchTarget();
 			}
-			else if(attackedCreature && !canUseAttack(getPosition(), attackedCreature)){
+			else if(!hasFollowPath && attackedCreature && !canUseAttack(getPosition(), attackedCreature)){
 				searchTarget();
 			}
 		}

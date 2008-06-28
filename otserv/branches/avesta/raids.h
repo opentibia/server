@@ -55,8 +55,6 @@ typedef std::list<MonsterSpawn*> MonsterSpawnList;
 
 class Raids
 {
-private:
-	Raids();
 public:
 	static Raids* getInstance(){
 		static Raids instance;
@@ -85,6 +83,7 @@ public:
 	void checkRaids();
 	
 private:
+	Raids();
 	RaidList raidList;
 	bool loaded, started;
 	Raid* running;
@@ -126,6 +125,7 @@ private:
 	uint64_t margin;
 	RaidState_t state;
 	uint32_t nextEventEvent;
+	std::string filename;
 	bool loaded;
 };
 

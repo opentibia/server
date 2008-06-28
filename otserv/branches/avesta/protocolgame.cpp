@@ -39,6 +39,7 @@
 #include "ioaccount.h"
 #include "connection.h"
 #include "creatureevent.h"
+#include "quests.h"
 
 #include <string>
 #include <iostream>
@@ -1364,6 +1365,18 @@ void ProtocolGame::parseEnableSharedPartyExperience(NetworkMessage& msg)
 	addGameTask(&Game::playerEnableSharedPartyExperience, player->getID(), sharedExpActive, unknown);
 }
 
+void ProtocolGame::parseQuestLog(NetworkMessage& msg)
+{
+	addGameTask(&Game::playerShowQuestLog, player->getID());
+}
+
+void ProtocolGame::parseQuestLine(NetworkMessage& msg)
+{
+	uint16_t questId = msg.GetU16();
+
+	addGameTask(&Game::playerShowQuestLine, player->getID(), questId);
+}
+
 void ProtocolGame::parseTextWindow(NetworkMessage& msg)
 {
 	uint32_t windowTextId = msg.GetU32();
@@ -1918,6 +1931,43 @@ void ProtocolGame::sendCreatureHealth(const Creature* creature)
 	if(msg){
 		TRACK_MESSAGE(msg);
 		AddCreatureHealth(msg, creature);
+	}
+}
+
+void ProtocolGame::sendQuestLog()
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+
+		msg->AddByte(0xF0);
+		msg->AddU16(Quests::getInstance()->getQuestsCount(player));
+		for(QuestsList::const_iterator it = Quests::getInstance()->getFirstQuest();
+			it != Quests::getInstance()->getEndQuest(); ++it){
+			if((*it)->isStarted(player)){
+				msg->AddU16((*it)->getID());
+				msg->AddString((*it)->getName());
+				msg->AddByte((*it)->isCompleted(player));
+			}
+		}
+	}
+}
+
+void ProtocolGame::sendQuestLine(const Quest* quest)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+
+		msg->AddByte(0xF1);
+		msg->AddU16(quest->getID());
+		msg->AddByte(quest->getMissionsCount(player));
+		for(MissionsList::const_iterator it = quest->getFirstMission(); it != quest->getEndMission(); ++it){
+			if((*it)->isStarted(player)){
+				msg->AddString((*it)->getName(player));
+				msg->AddString((*it)->getDescription(player));
+			}
+		}
 	}
 }
 

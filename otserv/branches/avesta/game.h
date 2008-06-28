@@ -288,7 +288,7 @@ public:
 	  * Get the amount of money in a a cylinder
 	  * \return the amount of money found
 	  */
-	uint32_t getMoney(Cylinder* cylinder);
+	uint32_t getMoney(const Cylinder* cylinder);
 
 	/**
 	  * Remove item(s) with a monetary value
@@ -403,6 +403,8 @@ public:
 	bool playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId);
 	bool playerLeaveParty(uint32_t playerId);
 	bool playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown);
+	bool playerShowQuestLog(uint32_t playerId);
+	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
 
 	void cleanup();
 	void shutdown();

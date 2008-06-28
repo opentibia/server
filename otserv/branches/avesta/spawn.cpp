@@ -55,7 +55,6 @@ bool Spawns::loadFromXml(const std::string& _filename)
 	}
 
 	filename = _filename;
-
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){

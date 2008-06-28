@@ -42,6 +42,7 @@ class House;
 class Container;
 class Tile;
 class Connection;
+class Quest;
 
 class ProtocolGame : public Protocol
 {
@@ -115,6 +116,8 @@ private:
 	void parsePassPartyLeadership(NetworkMessage& msg);
 	void parseLeaveParty(NetworkMessage& msg);
 	void parseEnableSharedPartyExperience(NetworkMessage& msg);
+	void parseQuestLog(NetworkMessage& msg);
+	void parseQuestLine(NetworkMessage& msg);
 
 	//trade methods
 	void parseRequestTrade(NetworkMessage& msg);
@@ -179,6 +182,8 @@ private:
 
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
+	void sendQuestLog();
+	void sendQuestLine(const Quest* quest);
 
 	void sendTextWindow(uint32_t windowTextId, Item* item, uint16_t maxlen, bool canWrite);
 	void sendTextWindow(uint32_t windowTextId, uint32_t itemId, const std::string& text);

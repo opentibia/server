@@ -522,6 +522,10 @@ public:
 		{if(client) client->sendLockRuleViolation();}
 	void sendRuleViolationCancel(const std::string& name)
 		{if(client) client->sendRuleViolationCancel(name);}
+	void sendQuestLog()
+		{if(client) client->sendQuestLog();}
+	void sendQuestLine(const Quest* quest)
+		{if(client) client->sendQuestLine(quest);}
 
 	void receivePing() {if(npings > 0) npings--;}
 
@@ -748,6 +752,7 @@ protected:
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;
+	friend class Npc;
 	friend class LuaScriptInterface;
 	friend class Commands;
 	friend class Map;

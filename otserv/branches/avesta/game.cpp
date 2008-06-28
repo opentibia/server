@@ -40,7 +40,6 @@
 #include "creature.h"
 #include "player.h"
 #include "monster.h"
-#include "npc.h"
 #include "game.h"
 #include "tile.h"
 #include "house.h"
@@ -48,7 +47,6 @@
 #include "combat.h"
 #include "ioplayer.h"
 #include "chat.h"
-#include "luascript.h"
 #include "talkaction.h"
 #include "spells.h"
 #include "configmanager.h"
@@ -56,10 +54,8 @@
 #include "party.h"
 #include "ban.h"
 #include "raids.h"
-//[ added for beds system
-#include "beds.h"
-#include <iostream>
-//]
+#include "spawn.h"
+#include "quests.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -140,11 +136,15 @@ void Game::setGameState(GameState_t newState)
 		switch(newState){
 			case GAME_STATE_INIT:
 			{
+				Spawns::getInstance()->startup();
+
 				Raids::getInstance()->loadFromXml(g_config.getString(
-					ConfigManager::DATA_DIRECTORY) + "raids/raids.xml");
+					ConfigManager::DATA_DIRECTORY) + "/raids/raids.xml");
 				Raids::getInstance()->startup();
 
-				Spawns::getInstance()->startup();
+				Quests::getInstance()->loadFromXml(g_config.getString(
+					ConfigManager::DATA_DIRECTORY) + "/quests.xml");
+
 				loadGameState();
 				break;
 			}
@@ -1468,7 +1468,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 	return (count == 0);
 }
 
-uint32_t Game::getMoney(Cylinder* cylinder)
+uint32_t Game::getMoney(const Cylinder* cylinder)
 {
 	if(cylinder == NULL){
 		return 0;
@@ -2977,6 +2977,33 @@ bool Game::playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedEx
 	}
 
 	return player->getParty()->setSharedExperience(player, sharedExpActive == 1);
+}
+
+bool Game::playerShowQuestLog(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved()){
+		return false;
+	}
+
+	player->sendQuestLog();
+	return true;
+}
+
+bool Game::playerShowQuestLine(uint32_t playerId, uint16_t questId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved()){
+		return false;
+	}
+
+	Quest* quest = Quests::getInstance()->getQuestByID(questId);
+	if(!quest){
+		return true;
+	}
+	
+	player->sendQuestLine(quest);
+	return true;
 }
 
 bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMode_t chaseMode, bool safeMode)

@@ -147,6 +147,8 @@ public:
 
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
+	virtual int32_t getViewRangeX() const {return Map::maxViewportX;}
+	virtual int32_t getViewRangeY() const {return Map::maxViewportY;}
 
 	virtual RaceType_t getRace() const {return RACE_NONE;}
 	Direction getDirection() const { return direction;}

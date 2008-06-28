@@ -47,7 +47,7 @@ public:
 
 	~Spawns();
 	
-	bool loadFromXml(const std::string& _filename);
+	bool loadFromXml(const std::string& datadir);
 	void startup();
 	void clear();
 	
