@@ -163,6 +163,7 @@ int main(int argc, char *argv[])
 
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... ";
+	fflush(stdout);
 	srand((unsigned int)OTSYS_TIME());
 	std::cout << "[done]" << std::endl;
 
@@ -174,6 +175,7 @@ int main(int argc, char *argv[])
 
 	// read global config
 	std::cout << ":: Loading lua script " << configname << "... ";
+	fflush(stdout);
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
 	std::string configpath;
 	configpath = getenv("HOME");
@@ -193,6 +195,7 @@ int main(int argc, char *argv[])
 
 	//load RSA key
 	std::cout << ":: Loading RSA key...";
+	fflush(stdout);
 	const char* p("14299623962416399520070177382898895550795403345466153217470516082934737582776038882967213386204600674145392845853859217990626450972452084065728686565928113");
 	const char* q("7630979195970404721891201847792002125535401292779123937207447574596692788513647179235335529307251350570728407373705564708871762033017096809910315212884101");
 	const char* d("46730330223584118622160180015036832148732986808519344675210555262940258739805766860224610646919605860206328024326703361630109888417839241959507572247284807035235569619173792292786907845791904955103601652822519121908367187885509270025388641700821735345222087940578381210879116823013776808975766851829020659073");
@@ -203,6 +206,7 @@ int main(int argc, char *argv[])
 
 	//load bans
 	std::cout << ":: Loading bans... ";
+	fflush(stdout);
 	g_bans.init();
 	if(!g_bans.loadBans()){
 		ErrorMessage("Unable to load bans!");
@@ -216,6 +220,7 @@ int main(int argc, char *argv[])
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "vocations.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
+	fflush(stdout);
 	if(!g_vocations.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		ErrorMessage("Unable to load vocations!");
 		return -1;
@@ -226,6 +231,7 @@ int main(int argc, char *argv[])
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "commands.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
+	fflush(stdout);
 	if(!commands.loadXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -238,6 +244,7 @@ int main(int argc, char *argv[])
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.otb";
 	std::cout << ":: Loading " << filename.str() << "... ";
+	fflush(stdout);
 	if(Item::items.loadFromOtb(filename.str())){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -249,6 +256,7 @@ int main(int argc, char *argv[])
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
+	fflush(stdout);
 	if(!Item::items.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -266,6 +274,7 @@ int main(int argc, char *argv[])
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "monsters/monsters.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
+	fflush(stdout);
 	if(!g_monsters.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -278,6 +287,7 @@ int main(int argc, char *argv[])
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "outfits.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
+	fflush(stdout);
 	Outfits* outfits = Outfits::getInstance();
 	if(!outfits->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
@@ -292,6 +302,7 @@ int main(int argc, char *argv[])
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "admin.xml";
 	g_adminConfig = new AdminProtocolConfig();
 	std::cout << ":: Loading admin protocol config... ";
+	fflush(stdout);
 	if(!g_adminConfig->loadXMLConfig(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
