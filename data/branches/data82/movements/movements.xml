@@ -284,6 +284,8 @@
 	<movevent event="AddItem" itemid="6905" script="onadd_gateofexp.lua"/>
 	<movevent event="AddItem" itemid="7038" script="onadd_gateofexp.lua"/>
 	<movevent event="AddItem" itemid="7047" script="onadd_gateofexp.lua"/>
+	<movevent event="AddItem" itemid="8459" script="onadd_gateofexp.lua"/>
+	<movevent event="AddItem" itemid="8461" script="onadd_gateofexp.lua"/>
 
 	<!-- Adding quest doors to the map -->
 	<movevent event="AddItem" itemid="1223" script="onadd_questdoor.lua"/>
@@ -310,6 +312,8 @@
 	<movevent event="AddItem" itemid="6907" script="onadd_questdoor.lua"/>
 	<movevent event="AddItem" itemid="7040" script="onadd_questdoor.lua"/>
 	<movevent event="AddItem" itemid="7049" script="onadd_questdoor.lua"/>
+	<movevent event="AddItem" itemid="8455" script="onadd_questdoor.lua"/>
+	<movevent event="AddItem" itemid="8457" script="onadd_questdoor.lua"/>
 
 	<!-- Adding locked doors to the map -->
 	<movevent event="AddItem" itemid="1209" script="onadd_lockeddoor.lua"/>
@@ -342,6 +346,8 @@
 	<movevent event="AddItem" itemid="6900" script="onadd_lockeddoor.lua"/>
 	<movevent event="AddItem" itemid="7033" script="onadd_lockeddoor.lua"/>
 	<movevent event="AddItem" itemid="7042" script="onadd_lockeddoor.lua"/>
+	<movevent event="AddItem" itemid="8445" script="onadd_lockeddoor.lua"/>
+	<movevent event="AddItem" itemid="8448" script="onadd_lockeddoor.lua"/>
 
 	<!-- Switch Tiles -->
 	<movevent event="StepIn" itemid="416" script="switch_tile.lua" />

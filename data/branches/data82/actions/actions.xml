@@ -501,6 +501,25 @@
 	<action itemid="7056" script="increment.lua"/>
 	<action itemid="7057" script="doors/door_open_vertical.lua"/>
 
+	<action itemid="8445" script="doors/door_locked.lua"/>
+	<action itemid="8446" script="increment.lua"/>
+	<action itemid="8447" script="doors/door_open_horizontal.lua"/>
+	<action itemid="8448" script="doors/door_locked.lua"/>
+	<action itemid="8449" script="increment.lua"/>
+	<action itemid="8450" script="doors/door_open_vertical.lua"/>
+	<action itemid="8451" script="increment.lua"/>
+	<action itemid="8452" script="doors/door_open_horizontal.lua"/>
+	<action itemid="8453" script="increment.lua"/>
+	<action itemid="8454" script="doors/door_open_horizontal.lua"/>
+	<action itemid="8455" script="doors/questdoor_closed.lua"/>
+	<action itemid="8456" script="doors/door_open_horizontal.lua"/>
+	<action itemid="8457" script="doors/questdoor_closed.lua"/>
+	<action itemid="8458" script="doors/door_open_vertical.lua"/>
+	<action itemid="8459" script="doors/gateofexp_closed.lua"/>
+	<action itemid="8460" script="doors/door_open_horizontal.lua"/>
+	<action itemid="8461" script="doors/gateofexp_closed.lua"/>
+	<action itemid="8462" script="doors/door_open_vertical.lua"/>
+
 	<!-- Windows -->
 	<action itemid="6436" script="doors/window_open.lua"/>
 	<action itemid="6437" script="doors/window_open.lua"/>

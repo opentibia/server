@@ -18520,6 +18520,49 @@
 		<attribute key="description" value="This potion can only be consumed by knights of level 130 or higher."/>
 		<attribute key="weight" value="220"/>
 	</item>
+	<item id="8378" article="an" name="antidote potion">
+		<attribute key="weight" value="175"/>
+	</item>
+	<item id="8445" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
+	</item>
+	<item id="8446" article="a" name="closed door">
+	</item>
+	<item id="8447" article="an" name="open door">
+	</item>
+	<item id="8448" article="a" name="closed door">
+	</item>
+	<item id="8449" article="a" name="closed door">
+	</item>
+	<item id="8450" article="an" name="open door">
+	</item>
+	<item id="8451" article="a" name="closed door">
+	</item>
+	<item id="8452" article="an" name="open door">
+	</item>
+	<item id="8453" article="a" name="closed door">
+	</item>
+	<item id="8454" article="an" name="open door">
+	</item>
+	<item id="8455" article="a" name="closed door">
+	</item>
+	<item id="8456" article="an" name="open door">
+	</item>
+	<item id="8457" article="a" name="closed door">
+	</item>
+	<item id="8458" article="an" name="open door">
+	</item>
+	<item id="8459" article="a" name="gate of expertise">
+	</item>
+	<item id="8460" article="an" name="gate of expertise">
+	</item>
+	<item id="8461" article="a" name="gate of expertise">
+	</item>
+	<item id="8462" article="an" name="gate of expertise">
+	</item>
+	<item id="8610" article="a" name="small health potion">
+		<attribute key="weight" value="175"/>
+	</item>
 	<item id="20001" name="water">
 	</item>
 	<item id="20002" name="blood">
