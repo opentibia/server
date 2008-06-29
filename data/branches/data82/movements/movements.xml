@@ -213,6 +213,97 @@
 	<movevent event="Equip" itemid="6301" slot="ring" function="onEquipItem" />
 	<movevent event="DeEquip" itemid="6301" slot="ring" function="onDeEquipItem" />
 
+	<!-- Armors -->
+	<movevent event="Equip" itemid="8776" slot="armor" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8776" slot="armor" function="onDeEquipItem"/>
+
+	<movevent event="Equip" itemid="8794" slot="armor" level="100" function="onEquipItem">
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8794" slot="armor" function="onDeEquipItem"/>
+
+	<movevent event="Equip" itemid="8796" slot="armor" level="100" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8796" slot="armor" function="onDeEquipItem"/>
+
+	<movevent event="Equip" itemid="8798" slot="armor" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8798" slot="armor" function="onDeEquipItem"/>
+
+	<movevent event="Equip" itemid="8807" slot="left-hand" level="40" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8807" slot="left-hand" function="onDeEquipItem"/>
+	<movevent event="Equip" itemid="8807" slot="right-hand" level="40" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8807" slot="right-hand" function="onDeEquipItem"/>
+
+	<movevent event="Equip" itemid="8808" slot="left-hand" level="50" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8808" slot="left-hand" function="onDeEquipItem"/>
+	<movevent event="Equip" itemid="8808" slot="right-hand" level="50" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8808" slot="right-hand" function="onDeEquipItem"/>
+
+	<movevent event="Equip" itemid="8809" slot="left-hand" level="60" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8809" slot="left-hand" function="onDeEquipItem"/>
+	<movevent event="Equip" itemid="8809" slot="right-hand" level="60" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8809" slot="right-hand" function="onDeEquipItem"/>
+
+	<movevent event="Equip" itemid="8824" slot="left-hand" level="80" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8824" slot="left-hand" function="onDeEquipItem"/>
+	<movevent event="Equip" itemid="8824" slot="right-hand" level="80" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</movevent>
+	<movevent event="DeEquip" itemid="8824" slot="right-hand" function="onDeEquipItem"/>
+
 	<!-- Doors -->
 	<movevent event="StepOut" itemid="1224" script="closingdoor.lua"/>
 	<movevent event="StepOut" itemid="1226" script="closingdoor.lua"/>

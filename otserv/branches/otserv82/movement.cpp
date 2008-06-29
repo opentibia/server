@@ -26,6 +26,7 @@
 #include <sstream>
 #include "tools.h"
 #include "combat.h"
+#include "vocation.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -33,6 +34,8 @@
 #include "movement.h"
 
 extern Game g_game;
+extern Vocations g_vocations;
+extern MoveEvents* g_moveEvents;
 
 MoveEvents::MoveEvents() :
 m_scriptInterface("MoveEvents Interface")
@@ -125,6 +128,14 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	}
 
 	if(readXMLInteger(p,"itemid",id)){
+		if(moveEvent->getEventType() == MOVE_EVENT_EQUIP){
+			ItemType& it = Item::items.getItemType(id);
+			it.wieldInfo = moveEvent->getWieldInfo();
+			it.minReqLevel = moveEvent->getReqLevel();
+			it.minReqMagicLevel = moveEvent->getReqMagLv();
+			it.vocationString = moveEvent->getVocationString();
+		}
+
 		addEvent(moveEvent, id, m_itemIdMap);
 	}
 	else if(readXMLInteger(p,"uniqueid",id)){
@@ -267,6 +278,9 @@ Event(_interface)
 	moveFunction = NULL;
 	equipFunction = NULL;
 	slot = SLOT_WHEREEVER;
+	reqLevel = 0;
+	reqMagLevel = 0;
+	premium = false;
 }
 
 MoveEvent::~MoveEvent()
@@ -305,6 +319,7 @@ std::string MoveEvent::getScriptEventName()
 bool MoveEvent::configureEvent(xmlNodePtr p)
 {
 	std::string str;
+	int intValue;
 	if(readXMLString(p, "event", str)){
 		if(str == "StepIn"){
 			m_eventType = MOVE_EVENT_STEP_IN;
@@ -361,6 +376,66 @@ bool MoveEvent::configureEvent(xmlNodePtr p)
 				else{
 					std::cout << "Warning: [MoveEvent::configureMoveEvent] " << "Unknown slot type " << str << std::endl;
 				}
+			}
+
+			wieldInfo = 0;
+			if(readXMLInteger(p, "lvl", intValue) || readXMLInteger(p, "level", intValue)){
+	 			reqLevel = intValue;
+				if(reqLevel > 0){
+					wieldInfo |= WIELDINFO_LEVEL;
+				}
+			}
+			if(readXMLInteger(p, "maglv", intValue) || readXMLInteger(p, "maglevel", intValue)){
+	 			reqMagLevel = intValue;
+				if(reqMagLevel > 0){
+					wieldInfo |= WIELDINFO_MAGLV;
+				}
+			}
+			if(readXMLInteger(p, "prem", intValue) || readXMLInteger(p, "premium", intValue)){
+				premium = (intValue != 0);
+				if(premium){
+					wieldInfo |= WIELDINFO_PREMIUM;
+				}
+			}
+
+			//Gather vocation information
+			typedef std::list<std::string> STRING_LIST;
+			STRING_LIST vocStringList;
+			xmlNodePtr vocationNode = p->children;
+			while(vocationNode){
+				if(xmlStrcmp(vocationNode->name,(const xmlChar*)"vocation") == 0){
+					if(readXMLString(vocationNode, "name", str)){
+						int32_t vocationId = g_vocations.getVocationId(str);
+
+						if(vocationId != -1){
+							vocEquipMap[vocationId] = true;
+							intValue = 1;
+							readXMLInteger(vocationNode, "showInDescription", intValue);
+							if(intValue != 0){
+								toLowerCaseString(str);
+								vocStringList.push_back(str);
+							}
+						}
+					}
+				}
+
+				vocationNode = vocationNode->next;
+			}
+
+			if(!vocStringList.empty()){
+				for(STRING_LIST::iterator it = vocStringList.begin(); it != vocStringList.end(); ++it){
+					if(*it != vocStringList.front()){
+						if(*it != vocStringList.back()){
+							vocationString += ", ";
+						}
+						else{
+							vocationString += " and ";
+						}
+					}
+					vocationString += *it;
+					vocationString += "s";
+				}
+				wieldInfo |= WIELDINFO_VOCREQ;
 			}
 		}
 	}
@@ -453,6 +528,17 @@ uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot, bool tra
 {
 	if(player->isItemAbilityEnabled(slot)){
 		return 1;
+	}
+
+	//Enable item only when requirements are complete
+	//This includes item transforming
+	MoveEvent* moveEvent = g_moveEvents->getEvent(item, MOVE_EVENT_EQUIP);
+	if(!player->hasFlag(PlayerFlag_IgnoreWeaponCheck)){
+		if(player->getLevel() < moveEvent->getReqLevel() || player->getMagicLevel() < moveEvent->getReqMagLv() ||
+			!player->isPremium() && moveEvent->isPremium() || !moveEvent->getVocEquipMap().empty() &&
+			moveEvent->getVocEquipMap().find(player->getVocationId()) == moveEvent->getVocEquipMap().end()){
+				return 1;
+		}
 	}
 
 	const ItemType& it = Item::items[item->getID()];

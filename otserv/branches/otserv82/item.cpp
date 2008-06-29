@@ -714,65 +714,131 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 	}
 
 	if(it.isRune()){
-		s << " for magic level " << (int)it.runeMagLevel << "." << std::endl;
-		s << "It's an \"" << it.runeSpellName << "\" spell (";
-		uint32_t charges = (item == NULL ? it.charges : item->getItemCharge());
-		if(charges > 0){
-			s << (int)charges;
-		}
-		else{
-			s << "1";
-		}
-		s << "x).";
-	}
-	else if(it.weaponType != WEAPON_NONE){
-		if(it.weaponType != WEAPON_AMMO){ // Arrows and Bolts doesn't show atk
-			if(it.attack != 0){
-				if(it.extraDef != 0){
-					s << " (Atk:" << (int)it.attack << " Def:" << (int)it.defence << " " << std::showpos << (int)it.extraDef << ")" << std::noshowpos;
-				}
-				else{
-					s << " (Atk:" << (int)it.attack << " Def:" << (int)it.defence << ")";
-				}
-			}
-			else if(it.defence != 0){
-				s << std::endl << " (Def:" << (int)it.defence << ")";
-			}
-		}
-		s << ".";
+		uint32_t charges = std::max((uint32_t)1, (uint32_t)(item == NULL ? it.charges : item->getItemCharge()));
 
-		if(it.wieldInfo != 0){
-			s << std::endl << "It can only be wielded properly by ";
-			if(it.wieldInfo & WIELDINFO_PREMIUM){
-				s << "premium ";
+		s << "(\"" << it.runeSpellName << "\", Charges:" << charges <<").";
+		if(it.runeLevel > 0 || it.runeMagLevel > 0){
+			s << std::endl << "It can only be used with ";
+			if(it.runeLevel > 0){
+				s << "level " << it.runeLevel;
 			}
-
-			if(it.wieldInfo & WIELDINFO_VOCREQ){
-				s << it.vocationString;
-			}
-			else{
-				s << "players";
-			}
-
-			if(it.wieldInfo & WIELDINFO_LEVEL){
-				s << " of level " << (int)it.minReqLevel << " or higher";
-			}
-
-			if(it.wieldInfo & WIELDINFO_MAGLV){
-				if(it.wieldInfo & WIELDINFO_LEVEL){
+			if(it.runeMagLevel > 0){
+				if(it.runeLevel > 0){
 					s << " and";
 				}
-				else{
-					s << " of";
-				}
-				s << " magic level " << (int)it.minReqMagicLevel << " or higher";
+				s << " magic level " << it.runeMagLevel;
 			}
-
-			s << ".";
+			s << " or higher.";
 		}
 	}
+	else if(it.weaponType != WEAPON_NONE){
+		if(it.weaponType != WEAPON_AMMO && it.weaponType != WEAPON_AMMO){ // Arrows and Bolts doesn't show atk
+			s << " (";
+			if(it.attack != 0){
+				s << "Atk:" << (int)it.attack;
+			}
+
+			if(it.defence != 0 || it.extraDef != 0){
+				if(it.attack != 0)
+					s << " ";
+
+				s << "Def:" << (int)it.defence;
+				if(it.extraDef != 0){
+					s << " " << std::showpos << (int)it.extraDef << std::noshowpos;
+				}
+			}
+
+			if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
+				if(it.attack != 0 || it.defence != 0 || it.extraDef != 0)
+					s << ", ";
+
+				s << "magic level " << std::showpos << (int)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+			}
+			s << ")";
+		}
+		s << ".";
+	}
 	else if(it.armor != 0){
-		s << " (Arm:" << it.armor << ").";
+		s << " (Arm:" << it.armor;
+
+		if(it.abilities.absorbPercentAll != 0 || it.abilities.absorbPercentDeath != 0 || 
+			it.abilities.absorbPercentDrown != 0 || it.abilities.absorbPercentEarth != 0 ||
+			it.abilities.absorbPercentEnergy != 0 || it.abilities.absorbPercentFire != 0 ||
+			it.abilities.absorbPercentHoly != 0 || it.abilities.absorbPercentIce != 0 ||
+			it.abilities.absorbPercentLifeDrain != 0 || it.abilities.absorbPercentManaDrain != 0 ||
+			it.abilities.absorbPercentPhysical != 0)
+		{
+			bool isBegin = true;
+			s << ", protection";
+			if(it.abilities.absorbPercentAll != 0){
+				s << " all " << std::showpos << it.abilities.absorbPercentAll << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentDeath != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " death " << std::showpos << it.abilities.absorbPercentDeath << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentDrown != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " drown " << std::showpos << it.abilities.absorbPercentDrown << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentEarth != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " earth " << std::showpos << it.abilities.absorbPercentEnergy << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentEnergy != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " energy " << std::showpos << it.abilities.absorbPercentFire << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentHoly != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " holy " << std::showpos << it.abilities.absorbPercentHoly << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentIce != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " ice " << std::showpos << it.abilities.absorbPercentIce << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentLifeDrain != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " life drain " << std::showpos << it.abilities.absorbPercentLifeDrain << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentManaDrain != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " mana drain " << std::showpos << it.abilities.absorbPercentManaDrain << std::noshowpos << "%";
+				isBegin = false;
+			}
+			if(it.abilities.absorbPercentPhysical != 0){
+				if(!isBegin){
+					s << ",";
+				}
+				s << " physical " << std::showpos << it.abilities.absorbPercentPhysical << std::noshowpos << "%";
+				isBegin = false;
+			}
+		}
+		s << ").";
 	}
 	else if(it.isFluidContainer()){
 		if(item && item->getFluidType() != 0){
@@ -864,7 +930,37 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		s << ".";
 	}
 
-	if(lookDistance <= 1 ){
+	if(it.wieldInfo != 0){
+		s << std::endl << "It can only be wielded properly by ";
+		if(it.wieldInfo & WIELDINFO_PREMIUM){
+			s << "premium ";
+		}
+
+		if(it.wieldInfo & WIELDINFO_VOCREQ){
+			s << it.vocationString;
+		}
+		else{
+			s << "players";
+		}
+
+		if(it.wieldInfo & WIELDINFO_LEVEL){
+			s << " of level " << (int)it.minReqLevel << " or higher";
+		}
+
+		if(it.wieldInfo & WIELDINFO_MAGLV){
+			if(it.wieldInfo & WIELDINFO_LEVEL){
+				s << " and";
+			}
+			else{
+				s << " of";
+			}
+			s << " magic level " << (int)it.minReqMagicLevel << " or higher";
+		}
+
+		s << ".";
+	}
+
+	if(lookDistance <= 1){
 		double weight = (item == NULL ? it.weight : item->getWeight());
 		if(weight > 0){
 			s << std::endl << getWeightDescription(it, weight);

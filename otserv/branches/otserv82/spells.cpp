@@ -1929,11 +1929,12 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 
 	hasCharges = (charges > 0);
 
-	if(magLevel != 0){
-		//Change magic level in the ItemType to get accurate description
+	if(magLevel != 0 || level != 0){
+		//Change information in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);
 		iType.runeSpellName = getName();
 		iType.runeMagLevel = magLevel;
+		iType.runeLevel = level;
 		iType.charges = charges;
 	}
 

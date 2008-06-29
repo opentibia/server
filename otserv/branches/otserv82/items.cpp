@@ -65,8 +65,8 @@ ItemType::ItemType()
 	minReqLevel      = 0;
 	minReqMagicLevel = 0;
 
-	std::string runeSpellName;
 	runeMagLevel  = 0;
+	runeLevel     = 0;
 
 	speed		  = 0;
 	id            = 0;

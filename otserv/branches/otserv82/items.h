@@ -196,6 +196,7 @@ public:
 	int             rotateTo;
 
 	int             runeMagLevel;
+	int             runeLevel;
 	std::string     runeSpellName;
 
 	uint32_t        wieldInfo;

@@ -228,13 +228,13 @@ if(NpcHandler == nil) then
 		for i, module in pairs(self.modules) do
 			local tmpRet = true
 			if(id == CALLBACK_CREATURE_APPEAR and module.callbackOnCreatureAppear ~= nil) then
-				tmpRet = module:callbackCreatureAppear(unpack(arg))
+				tmpRet = module:callbackOnCreatureAppear(unpack(arg))
 				
 			elseif(id == CALLBACK_CREATURE_DISAPPEAR and module.callbackOnCreatureDisappear ~= nil) then
-				tmpRet = module:callbackCreatureDisappear(unpack(arg))
+				tmpRet = module:callbackOnCreatureDisappear(unpack(arg))
 				
 			elseif(id == CALLBACK_CREATURE_SAY and module.callbackOnCreatureSay ~= nil) then
-				tmpRet = module:callbackCreatureSay(unpack(arg))
+				tmpRet = module:callbackOnCreatureSay(unpack(arg))
 				
 			elseif(id == CALLBACK_PLAYER_ENDTRADE and module.callbackOnPlayerEndTrade ~= nil) then
 				tmpRet = module:callbackOnPlayerEndTrade(unpack(arg))

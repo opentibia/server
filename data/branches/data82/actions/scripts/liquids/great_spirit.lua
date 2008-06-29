@@ -3,18 +3,18 @@ local MANA_REGEN = {100, 200} --min 100, max 200
 local EMPTY_POTION = 7635
 
 local combatHealth = createCombatObject()
-setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_HEALING)
-setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
-setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
-setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
-setCombatParam(combat, COMBAT_PARAM_DISPEL, CONDITION_PARALYZE)
-setCombatFormula(combat, COMBAT_FORMULA_DAMAGE, HEALTH_REGEN[1], 0, HEALTH_REGEN[2], 0)
+setCombatParam(combatHealth, COMBAT_PARAM_TYPE, COMBAT_HEALING)
+setCombatParam(combatHealth, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
+setCombatParam(combatHealth, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
+setCombatParam(combatHealth, COMBAT_PARAM_AGGRESSIVE, FALSE)
+setCombatParam(combatHealth, COMBAT_PARAM_DISPEL, CONDITION_PARALYZE)
+setCombatFormula(combatHealth, COMBAT_FORMULA_DAMAGE, HEALTH_REGEN[1], 0, HEALTH_REGEN[2], 0)
 
 local combatMana = createCombatObject()
-setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_MANADRAIN)
-setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
-setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
-setCombatFormula(combat, COMBAT_FORMULA_DAMAGE, MANA_REGEN[1], 0, MANA_REGEN[2], 0)
+setCombatParam(combatMana, COMBAT_PARAM_TYPE, COMBAT_MANADRAIN)
+setCombatParam(combatMana, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
+setCombatParam(combatMana, COMBAT_PARAM_AGGRESSIVE, FALSE)
+setCombatFormula(combatMana, COMBAT_FORMULA_DAMAGE, MANA_REGEN[1], 0, MANA_REGEN[2], 0)
 
 local exhaust = createConditionObject(CONDITION_EXHAUSTED)
 setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))

@@ -21,6 +21,13 @@
 	<action itemid="2550" script="scythe.lua"/>
 	<action itemid="2580" script="fishing_rod.lua" allowfaruse="1"/>
 	<action itemid="5865" script="juice_squeezer.lua"/>
+
+	<!-- Spellbooks -->
+	<action itemid="2175" script="spellbook.lua"/>
+	<action itemid="8807" script="spellbook.lua"/>
+	<action itemid="8808" script="spellbook.lua"/>
+	<action itemid="8809" script="spellbook.lua"/>
+	<action itemid="8824" script="spellbook.lua"/>	
 	
 	<!-- Watches and Clocks -->
 	<action itemid="1728" script="watch_clock.lua"/>
