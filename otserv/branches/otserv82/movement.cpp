@@ -533,7 +533,7 @@ uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot, bool tra
 	//Enable item only when requirements are complete
 	//This includes item transforming
 	MoveEvent* moveEvent = g_moveEvents->getEvent(item, MOVE_EVENT_EQUIP);
-	if(!player->hasFlag(PlayerFlag_IgnoreWeaponCheck)){
+	if(moveEvent && !player->hasFlag(PlayerFlag_IgnoreWeaponCheck)){
 		if(player->getLevel() < moveEvent->getReqLevel() || player->getMagicLevel() < moveEvent->getReqMagLv() ||
 			!player->isPremium() && moveEvent->isPremium() || !moveEvent->getVocEquipMap().empty() &&
 			moveEvent->getVocEquipMap().find(player->getVocationId()) == moveEvent->getVocEquipMap().end()){
