@@ -143,7 +143,7 @@ void Game::setGameState(GameState_t newState)
 				Raids::getInstance()->startup();
 
 				Quests::getInstance()->loadFromXml(g_config.getString(
-					ConfigManager::DATA_DIRECTORY) + "/quests.xml");
+					ConfigManager::DATA_DIRECTORY) + "quests.xml");
 
 				loadGameState();
 				break;

@@ -47,7 +47,9 @@ void toLowerCaseString(std::string& source);
 std::string asLowerCaseString(const std::string& source);
 
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
+#if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value);
+#endif
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);

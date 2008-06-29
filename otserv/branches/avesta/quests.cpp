@@ -170,7 +170,7 @@ bool Quests::reload()
 
 bool Quests::loadFromXml(const std::string& _filename)
 {
-	std::string filename = filename;
+	std::string filename = _filename;
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	if(doc){
 		xmlNodePtr root, p;
