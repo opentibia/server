@@ -87,7 +87,7 @@
 	<monster name="Apocalypse" file="bosses/apocalypse.xml"/>
 	<monster name="Brutus Bloodbeard" file="bosses/brutus bloodbeard.xml" />
 	<monster name="Deadeye Devious" file="bosses/deadeye devious.xml" />
-	<monster name="Demondras" file="bosses/demodras.xml"/>
+	<monster name="Demodras" file="bosses/demodras.xml"/>
 	<monster name="Dharalion" file="bosses/dharalion.xml"/>
 	<monster name="Fernfang" file="bosses/fernfang.xml"/>
 	<monster name="Ferumbras" file="bosses/ferumbras.xml"/>
