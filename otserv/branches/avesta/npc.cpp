@@ -394,7 +394,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						scriptVars.b2 = intValue == 1;
 					}
 
-					if(readXMLInteger(tmpNode, "b2", intValue)){
+					if(readXMLInteger(tmpNode, "b3", intValue)){
 						scriptVars.b3 = intValue == 1;
 					}
 
