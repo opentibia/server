@@ -537,6 +537,7 @@ int32_t LuaScriptInterface::loadBuffer(const std::string& text, Npc* npc /* = NU
 	int ret = luaL_loadbuffer(m_luaState, buffer, strlen(buffer), "loadBuffer");
 	if(ret != 0){
 		m_lastLuaError = popString(m_luaState);
+		reportError(NULL, m_lastLuaError);
 		return -1;
 	}
 	//check that it is loaded as a function

@@ -546,6 +546,19 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.actionType = ACTION_SCRIPT;
 										action.strValue = strValue;
 									}
+									else{
+										xmlNodePtr scriptNode = subNode->children;
+										while(scriptNode){
+											if(xmlStrcmp(scriptNode->name, (const xmlChar*)"text") == 0){
+												action.actionType = ACTION_SCRIPT;
+												char* nodeValue = (char*)xmlNodeGetContent(scriptNode);
+												action.strValue = nodeValue;
+												xmlFreeOTSERV(nodeValue);
+											}
+
+											scriptNode = scriptNode->next;
+										}
+									}
 								}
 								else if(asLowerCaseString(strValue) == "scriptparam"){
 									if(readXMLString(subNode, "value", strValue)){
@@ -1120,25 +1133,23 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 				case ACTION_SCRIPT:
 				{
-					LuaScriptInterface scriptInterface("ACTION_SCRIPT");
-					scriptInterface.initState();
-
+					NpcScriptInterface scriptInterface;
 					if(scriptInterface.reserveScriptEnv()){
 						ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 
-						std::stringstream script;
+						std::stringstream scriptstream;
 						//attach various variables that could be interesting
-						script << "cid = " << env->addThing(player) << std::endl;
-						script << "topic = " << npcState->topic << std::endl;
-						script << "itemid = " << npcState->itemId << std::endl;
-						script << "subtype = " << npcState->subType << std::endl;
-						script << "amount = " << npcState->amount << std::endl;
-						script << "price = " << npcState->price << std::endl;
-						script << "level = " << npcState->level << std::endl;
-						script << "spellname = '" << npcState->spellName << "'" << std::endl;
-						script << (*it).strValue;
+						scriptstream << "cid = " << env->addThing(player) << std::endl;
+						scriptstream << "topic = " << npcState->topic << std::endl;
+						scriptstream << "itemid = " << npcState->itemId << std::endl;
+						scriptstream << "subtype = " << npcState->subType << std::endl;
+						scriptstream << "amount = " << npcState->amount << std::endl;
+						scriptstream << "price = " << npcState->price << std::endl;
+						scriptstream << "level = " << npcState->level << std::endl;
+						scriptstream << "spellname = '" << npcState->spellName << "'" << std::endl;
+						scriptstream << (*it).strValue;
 
-						scriptInterface.loadBuffer(script.str(), this);
+						scriptInterface.loadBuffer(scriptstream.str(), this);
 						lua_State* L = scriptInterface.getLuaState();
 
 						lua_getglobal(L, "n1");
@@ -1205,7 +1216,9 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 		if(response->getResponseType() == RESPONSE_DEFAULT){
 			std::string responseString = formatResponse(player, npcState, response);
-			g_game.internalCreatureSay(this, SPEAK_SAY, responseString);
+			if(!responseString.empty()){
+				g_game.internalCreatureSay(this, SPEAK_SAY, responseString);
+			}
 		}
 		else{
 			int32_t functionId = -1;
@@ -1612,6 +1625,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 					(*it)->setAmount(amount);
 				}
 				else{
+					(*it)->setAmount(1);
 					continue;
 				}
 			}
@@ -1628,9 +1642,14 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				}
 			}
 
-			wordIter = wordIter + 1;
-
 			++matchCount;
+
+			if(wordIter + 1 == wordList.end()){
+				break;
+			}
+			else{
+				wordIter = wordIter + 1;
+			}
 		}
 
 		bool foundBetterMatch = false;
