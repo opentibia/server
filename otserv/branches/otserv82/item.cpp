@@ -718,9 +718,9 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 
 		s << "(\"" << it.runeSpellName << "\", Charges:" << charges <<").";
 		if(it.runeLevel > 0 || it.runeMagLevel > 0){
-			s << std::endl << "It can only be used with ";
+			s << std::endl << "It can only be used with";
 			if(it.runeLevel > 0){
-				s << "level " << it.runeLevel;
+				s << " level " << it.runeLevel;
 			}
 			if(it.runeMagLevel > 0){
 				if(it.runeLevel > 0){
@@ -732,7 +732,17 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		}
 	}
 	else if(it.weaponType != WEAPON_NONE){
-		if(it.weaponType != WEAPON_AMMO && it.weaponType != WEAPON_AMMO){ // Arrows and Bolts doesn't show atk
+		if(it.weaponType == WEAPON_DIST && it.amuType != AMMO_NONE){
+			s << " (Range:" << it.shootRange;
+			if(it.attack != 0){
+				s << ", Atk" << std::showpos << it.attack << std::noshowpos;
+			}
+			if(it.hitChance != 0){
+				s << ", Hit%" << std::showpos << it.hitChance << std::noshowpos;
+			}
+			s << ")";
+		}
+		else if(it.weaponType != WEAPON_AMMO && it.weaponType != WEAPON_WAND){ // Arrows and Bolts doesn't show atk
 			s << " (";
 			if(it.attack != 0){
 				s << "Atk:" << (int)it.attack;

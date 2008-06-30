@@ -290,7 +290,7 @@ void Player::setConditionSuppressions(uint32_t conditions, bool remove)
 	}
 }
 
-Item* Player::getWeapon()
+Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 {
 	Item* item;
 
@@ -316,7 +316,7 @@ Item* Player::getWeapon()
 
 			case WEAPON_DIST:
 			{
-				if(item->getAmuType() != AMMO_NONE){
+				if(!ignoreAmmu && item->getAmuType() != AMMO_NONE){
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
 
 					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
@@ -330,6 +330,7 @@ Item* Player::getWeapon()
 				else{
 					const Weapon* weapon = g_weapons->getWeapon(item);
 					if(weapon){
+						shootRange = item->getShootRange();
 						return item;
 					}
 				}

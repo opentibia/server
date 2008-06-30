@@ -297,7 +297,7 @@ public:
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
-	Item* getWeapon();
+	Item* getWeapon(bool ignoreAmmu = false);
 	virtual WeaponType_t getWeaponType();
 	int32_t getWeaponSkill(const Item* item) const;
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;

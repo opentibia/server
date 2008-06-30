@@ -148,7 +148,7 @@ public:
 	virtual bool configureWeapon(const ItemType& it);
 
 	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
-	//virtual uint32_t playerWeaponCheck(Player* player, Creature* target) const;
+	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 

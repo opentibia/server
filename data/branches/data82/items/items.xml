@@ -5053,7 +5053,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="slotType" value="two-handed"/>
 		<attribute key="ammoType" value="arrow"/>
-		<attribute key="range" value="5"/>
+		<attribute key="range" value="6"/>
 	</item>
 	<item id="2457" article="a" name="steel helmet">
 		<attribute key="weight" value="4600"/>
@@ -18199,12 +18199,13 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="description" value="A beautiful gem is embedded in this weapon."/>
 	</item>
-	<item id="7438" article="a" name="golden bow">
-		<attribute key="weight" value="0"/>
+	<item id="7438" article="a" name="elvish bow">
+		<attribute key="weight" value="3100"/> <!-- ? -->
 		<attribute key="slotType" value="two-handed"/>	
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="ammoType" value="arrow"/>
-		<attribute key="range" value="5"/>
+		<attribute key="range" value="6"/>
+		<attribute key="hitChance" value="5"/>
 	</item>
 	<item id="7439" article="a" name="berserk potion">
 		<attribute key="weight" value="200"/>
@@ -18571,6 +18572,48 @@
 		<attribute key="slotType" value="body"/>
 		<attribute key="weight" value="2500"/>
 		<attribute key="description" value="This robe feels soft and light as a feather."/>
+	</item>
+	<item id="8755" article="a" name="modified crossbow">
+		<attribute key="weight" value="3500"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="5"/>
+		<attribute key="hitChance" value="1"/>
+	</item>
+	<item id="8756" article="a" name="chain bolter">
+		<attribute key="weight" value="5500"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="3"/>
+		<attribute key="attack" value="8"/>
+	</item>
+	<item id="8757" article="a" name="royal crossbow">
+		<attribute key="weight" value="12000"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="6"/>
+		<attribute key="hitChance" value="3"/>
+		<attribute key="attack" value="5"/>
+	</item>
+	<item id="8758" article="the" name="devileye">
+		<attribute key="weight" value="12000"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="6"/>
+		<attribute key="hitChance" value="-20"/>
+		<attribute key="attack" value="20"/>
+	</item>
+	<item id="8759" article="a" name="iron worker">
+		<attribute key="weight" value="5500"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="5"/>
+		<attribute key="attack" value="4"/>
 	</item>
 	<item id="8776" article="a" name="spirit cloak">
 		<attribute key="armor" value="8"/>

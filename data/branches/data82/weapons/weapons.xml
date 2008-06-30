@@ -208,11 +208,33 @@
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
-	
+
+	<!-- Bows and Crossbows -->
+	<distance id="8755" level="45" enabled="1" function="internalLoadWeapon"> <!-- Modified Crossbow -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+	<distance id="8756" level="60" enabled="1" function="internalLoadWeapon"> <!-- Chain Bolter -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+	<distance id="8757" level="130" enabled="1" function="internalLoadWeapon"> <!-- Royal Crossbow -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+	<distance id="8758" level="100" enabled="1" function="internalLoadWeapon"> <!-- Devileye -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+	<distance id="8759" level="80" enabled="1" function="internalLoadWeapon"> <!-- Ironworker -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+
 	<!-- Ammunition -->
-	<distance id="2545" enabled="1" hitchance="80" script="poison_arrow.lua"/>
-	<distance id="2546" enabled="1" hitchance="80" script="explosive_arrow.lua"/>
-	<distance id="7366" enabled="1" hitchance="80" script="viper_star.lua"/>
+	<distance id="2545" enabled="1" script="poison_arrow.lua"/>
+	<distance id="2546" enabled="1" script="explosive_arrow.lua"/>
+	<distance id="7366" enabled="1" script="viper_star.lua"/>
 	<distance id="3965" level="20" enabled="1" function="internalLoadWeapon"/>	<!--Hunting Spear-->
 	<distance id="7378" level="25" enabled="1" function="internalLoadWeapon"/>	<!--Royal Spear-->
 	<distance id="7367" level="42" enabled="1" function="internalLoadWeapon"/>	<!--Enchanted Spear-->

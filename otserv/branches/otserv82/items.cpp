@@ -107,9 +107,9 @@ ItemType::ItemType()
 	showDuration  = false;
 	showCharges   = false;
 	charges       = 0;
-	hitChance     = -1;
-	maxHitChance  = -1;
-	breakChance   = -1;
+	hitChance     = 0;
+	maxHitChance  = 0;
+	breakChance   = 0;
 	shootRange    = 1;
 
 	condition = NULL;
