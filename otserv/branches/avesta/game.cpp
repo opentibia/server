@@ -993,6 +993,19 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	if(item->isHangable() && toCylinder->getTile()->hasProperty(SUPPORTHANGABLE)){
 		//destination supports hangable objects so need to move there first
 
+		if(toCylinder->getTile()->hasProperty(ISVERTICAL)){
+			if(player->getPosition().x + 1 == mapToPos.x){
+				player->sendCancelMessage(RET_NOTPOSSIBLE);
+				return false;
+			}
+		}
+		else if(toCylinder->getTile()->hasProperty(ISHORIZONTAL)){
+			if(player->getPosition().y + 1 == mapToPos.y){
+				player->sendCancelMessage(RET_NOTPOSSIBLE);
+				return false;
+			}
+		}
+
 		if(!Position::areInRange<1,1,0>(playerPos, mapToPos)){
 			Position walkPos = mapToPos;
 			if(toCylinder->getTile()->hasProperty(ISVERTICAL)){

@@ -140,6 +140,8 @@ enum ReponseActionParam_t{
 	ACTION_GIVEMONEY,
 	ACTION_SELLITEM,
 	ACTION_BUYITEM,
+	ACTION_GIVEITEM,
+	ACTION_TAKEITEM,
 	ACTION_AMOUNT,
 	ACTION_ITEM,
 	ACTION_SUBTYPE,
@@ -148,6 +150,7 @@ enum ReponseActionParam_t{
 	ACTION_TEACHSPELL,
 	ACTION_STORAGE,
 	ACTION_TELEPORT,
+	ACTION_SCRIPT,
 	ACTION_SCRIPTPARAM,
 	ACTION_ADDQUEUE,
 	ACTION_IDLE
@@ -194,6 +197,31 @@ public:
 	Position pos;
 };
 
+struct ScriptVars{
+	ScriptVars()
+	{
+		n1 = -1;
+		n2 = -1;
+		n3 = -1;
+		b1 = false;
+		b2 = false;
+		b3 = false;
+		s1 = "";
+		s2 = "";
+		s3 = "";
+	}
+
+	int32_t n1;
+	int32_t n2;
+	int32_t n3;
+	bool b1;
+	bool b2;
+	bool b3;
+	std::string s1;
+	std::string s2;
+	std::string s3;
+};
+
 typedef std::list<ResponseAction> ActionList;
 typedef std::map<std::string, int32_t> ResponseScriptMap;
 typedef std::list<NpcResponse*> ResponseList;
@@ -213,7 +241,8 @@ public:
 		int32_t _storageValue,
 		StorageComparision_t _storageComp,
 		const std::string& _knowSpell,
-		uint32_t _params)
+		uint32_t _params,
+		ScriptVars _scriptVars)
 	{
 		interactType = _interactType;
 		responseType = _responseType;
@@ -227,7 +256,8 @@ public:
 		storageId = _storageId;
 		storageValue = _storageValue;
 		storageComp = _storageComp;
-		knowSpell = _knowSpell;		
+		knowSpell = _knowSpell;
+		scriptVars = _scriptVars;
 	};
 
 	virtual ~NpcResponse() {}
@@ -253,6 +283,8 @@ public:
 
 	ActionList::const_iterator getFirstAction() const {return actionList.begin();}
 	ActionList::const_iterator getEndAction() const {return actionList.end();}
+
+	ScriptVars scriptVars;
 
 protected:
 	int32_t topic;
@@ -287,6 +319,9 @@ struct NpcState{
 	uint32_t respondToCreature;
 	std::string prevRespondToText;
 	const NpcResponse* lastResponse;
+
+	//script variables
+	ScriptVars scriptVars;
 };
 
 class Npc : public Creature
@@ -370,6 +405,7 @@ protected:
 	NpcState* getState(const Player* player, bool makeNew = true);
 
 	std::string name;
+	std::string m_datadir;
 	uint32_t walkTicks;
 	bool floorChange;
 	bool attackable;
