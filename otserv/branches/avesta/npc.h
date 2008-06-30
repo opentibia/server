@@ -28,6 +28,7 @@
 //////////////////////////////////////////////////////////////////////
 // Defines an NPC...
 class Npc;
+class NpcResponse;
 
 class NpcScriptInterface : public LuaScriptInterface
 {
@@ -104,6 +105,190 @@ private:
 	int32_t m_onThink;
 };
 
+enum RespondParam_t{
+	RESPOND_DEFAULT = 0,
+	RESPOND_MALE = 1,
+	RESPOND_FEMALE = 2,
+	RESPOND_PZBLOCK = 4,
+	RESPOND_LOWMONEY = 8,
+	RESPOND_NOAMOUNT = 16,
+	RESPOND_LOWAMOUNT = 32,
+	RESPOND_PREMIUM = 64,
+	RESPOND_DRUID = 128,
+	RESPOND_KNIGHT = 256,
+	RESPOND_PALADIN = 512,
+	RESPOND_SORCERER = 1024,
+	RESPOND_LOWLEVEL = 2048
+};
+
+enum ResponseType_t{
+	RESPONSE_DEFAULT,
+	RESPONSE_SCRIPT,
+};
+
+enum InteractType_t{
+	INTERACT_TEXT,
+	INTERACT_EVENT
+};
+
+enum ReponseActionParam_t{
+	ACTION_NONE,
+	ACTION_SETTOPIC,
+	ACTION_SETLEVEL,
+	ACTION_PRICE,
+	ACTION_TAKEMONEY,
+	ACTION_GIVEMONEY,
+	ACTION_SELLITEM,
+	ACTION_BUYITEM,
+	ACTION_AMOUNT,
+	ACTION_ITEM,
+	ACTION_SUBTYPE,
+	ACTION_EFFECT,
+	ACTION_SPELL,
+	ACTION_TEACHSPELL,
+	ACTION_STORAGE,
+	ACTION_TELEPORT,
+	ACTION_SCRIPTPARAM,
+	ACTION_ADDQUEUE,
+	ACTION_IDLE
+};
+
+enum StorageComparision_t{
+	STORAGE_LESS,
+	STORAGE_LESSOREQUAL,
+	STORAGE_EQUAL,
+	STORAGE_GREATEROREQUAL,
+	STORAGE_GREATER
+};
+
+enum NpcEvent_t{
+	EVENT_NONE,
+	EVENT_BUSY,
+	EVENT_PLAYER_ENTER,
+	EVENT_PLAYER_MOVE,
+	EVENT_PLAYER_LEAVE
+	/*
+	EVENT_CREATURE_ENTER,
+	EVENT_CREATURE_MOVE,
+	EVENT_CREATURE_LEAVE,
+	*/
+};
+
+struct ResponseAction{
+public:
+	ResponseAction()
+	{
+		actionType = ACTION_NONE;
+		key = 0;
+		intValue = 0;
+		strValue = "";
+		pos.x = 0;
+		pos.y = 0;
+		pos.z = 0;
+	}
+
+	ReponseActionParam_t actionType;
+	int32_t key;
+	int32_t intValue;
+	std::string strValue;
+	Position pos;
+};
+
+typedef std::list<ResponseAction> ActionList;
+typedef std::map<std::string, int32_t> ResponseScriptMap;
+typedef std::list<NpcResponse*> ResponseList;
+
+class NpcResponse
+{
+public:
+
+	NpcResponse(
+		InteractType_t _interactType,
+		ResponseType_t _responseType,
+		const std::string& _input,
+		const std::string& _output,
+		int32_t _topic,
+		int32_t _focusStatus,
+		int32_t _storageId,
+		int32_t _storageValue,
+		StorageComparision_t _storageComp,
+		const std::string& _knowSpell,
+		uint32_t _params)
+	{
+		interactType = _interactType;
+		responseType = _responseType;
+		input = _input;
+		output = _output;
+		params = _params;
+		topic = _topic;
+		focusStatus = _focusStatus;
+		price = -1;
+		amount = -1;
+		storageId = _storageId;
+		storageValue = _storageValue;
+		storageComp = _storageComp;
+		knowSpell = _knowSpell;		
+	};
+
+	virtual ~NpcResponse() {}
+
+	uint32_t getParams() const {return params;}
+	const std::string& getInputText() const {return input;}
+	int32_t getTopic() const {return topic;}
+	int32_t getFocusState() const {return focusStatus;}
+	int32_t getStorageId() const {return storageId;}
+	int32_t getStorageValue() const {return storageValue;}
+	ResponseType_t getResponseType() const {return responseType;}
+	InteractType_t getInteractType() const {return interactType;}
+	StorageComparision_t getStorageComp() const {return storageComp;}
+	const std::string& getKnowSpell() const {return knowSpell;}
+	const std::string& getText() const {return output;}
+	int32_t getAmount() const {return amount;}
+
+	std::string formatResponseString(Creature* creature) const;
+	void addAction(ResponseAction action) {actionList.push_back(action);}
+	void setResponseList(ResponseList _list) { subResponseList.insert(subResponseList.end(),_list.begin(),_list.end());}
+	const ResponseList& getResponseList() const { return subResponseList;}
+	void setAmount(int32_t _amount) { amount = _amount;}
+
+	ActionList::const_iterator getFirstAction() const {return actionList.begin();}
+	ActionList::const_iterator getEndAction() const {return actionList.end();}
+
+protected:
+	int32_t topic;
+	int32_t price;
+	int32_t amount;
+	int32_t focusStatus;
+	std::string input;
+	std::string output;
+	InteractType_t interactType;
+	ResponseType_t responseType;
+	uint32_t params;
+	int32_t storageId;
+	int32_t storageValue;
+	StorageComparision_t storageComp;
+	std::string knowSpell;
+	ActionList actionList;
+	ResponseList subResponseList;
+};
+
+struct NpcState{
+	int32_t topic;
+	bool isIdle;
+	bool isQueued;
+	int32_t price;
+	int32_t amount;
+	int32_t itemId;
+	int32_t subType;
+	std::string spellName;
+	int32_t level;
+	uint64_t prevInteraction;
+	std::string respondToText;
+	uint32_t respondToCreature;
+	std::string prevRespondToText;
+	const NpcResponse* lastResponse;
+};
+
 class Npc : public Creature
 {
 public:
@@ -167,16 +352,42 @@ protected:
 	bool canWalkTo(const Position& fromPos, Direction dir);
 	bool getRandomStep(Direction& dir);
 
+	const NpcResponse* getResponse(const ResponseList& list, const Player* player,
+		NpcState* npcState, const std::string& text, bool exactMatch = false);
+	const NpcResponse* getResponse(const Player* player, NpcState* npcState, const std::string& text);
+	const NpcResponse* getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType);
+
+	void executeResponse(Player* player, NpcState* npcState, const NpcResponse* response);
+
+	std::string formatResponse(Creature* creature, const NpcState* npcState, const NpcResponse* response) const;
+
 	typedef std::map<std::string, std::string> ParametersMap;
 	ParametersMap m_parameters;
 
+	uint32_t loadParams(xmlNodePtr node);
+	ResponseList loadInteraction(xmlNodePtr node);
+
+	NpcState* getState(const Player* player, bool makeNew = true);
+
 	std::string name;
-	int32_t autoWalkChance;
+	uint32_t walkTicks;
 	bool floorChange;
 	bool attackable;
-	uint32_t focusCreature;
+	bool isIdle;
+	bool hasBusyReply;
+	int32_t talkRadius;
+	int32_t idleTime;
+	int32_t focusCreature;
 
+	ResponseScriptMap responseScriptMap;
+	ResponseList responseList;
+
+	typedef std::list<NpcState*> StateList;
+	StateList stateList;
 	NpcEventsHandler* m_npcEventHandler;
+
+	typedef std::list<uint32_t> QueueList;
+	QueueList queueList;
 	bool loaded;
 
 	static NpcScriptInterface* m_scriptInterface;

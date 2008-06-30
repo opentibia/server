@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-
-<npc name="A Bug" script="data/npc/scripts/bug.lua" autowalk="25">
-	<health now="40" max="40"/>
-	<look type="45" head="20" body="30" legs="40" feet="50" corpse="2115"/>
-</npc>

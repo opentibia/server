@@ -382,7 +382,7 @@ void Monster::onCreatureLeave(Creature* creature)
 	}
 }
 
-bool Monster::searchTarget(bool randomize /*= false*/)
+bool Monster::searchTarget(TargetSearchType_t searchType /*= TARGETSEARCH_DEFAULT*/)
 {
 #ifdef __DEBUG__
 	std::cout << "Searching target... " << std::endl;
@@ -392,7 +392,7 @@ bool Monster::searchTarget(bool randomize /*= false*/)
 	const Position& myPos = getPosition();
 	for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
 		if(followCreature != (*it) && isTarget(*it)){
-			if(randomize || canUseAttack(myPos, *it)){
+			if(searchType == TARGETSEARCH_RANDOM || canUseAttack(myPos, *it)){
 				resultList.push_back(*it);
 			}
 		}
@@ -406,6 +406,10 @@ bool Monster::searchTarget(bool randomize /*= false*/)
 		std::cout << "Selecting target " << (*it)->getName() << std::endl;
 #endif
 		return selectTarget(*it);
+	}
+
+	if(searchType == TARGETSEARCH_ATTACKRANGE){
+		return false;
 	}
 
 	//lets just pick the first target in the list
@@ -595,8 +599,10 @@ void Monster::onThink(uint32_t interval)
 			if(!followCreature || !hasFollowPath){
 				searchTarget();
 			}
-			else if(!hasFollowPath && attackedCreature && !canUseAttack(getPosition(), attackedCreature)){
-				searchTarget();
+			else if(isFleeing()){
+				if(attackedCreature && !canUseAttack(getPosition(), attackedCreature)){
+					searchTarget(TARGETSEARCH_ATTACKRANGE);
+				}
 			}
 		}
 
@@ -728,7 +734,7 @@ void Monster::onThinkTarget(uint32_t interval)
 					targetChangeCooldown = (uint32_t)mType->changeTargetSpeed;
 
 					if(mType->changeTargetChance >= random_range(1, 100)){
-						searchTarget(true);
+						searchTarget(TARGETSEARCH_RANDOM);
 					}
 				}
 			}

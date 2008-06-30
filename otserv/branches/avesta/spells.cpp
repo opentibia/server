@@ -1766,6 +1766,9 @@ bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint3
 	}
 
 	ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
+	if(ret != RET_NOERROR){
+		delete newItem;
+	}
 	return (ret == RET_NOERROR);
 }
 

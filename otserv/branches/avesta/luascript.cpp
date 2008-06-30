@@ -5172,7 +5172,7 @@ int LuaScriptInterface::luaDoMonsterChangeTarget(lua_State *L)
 	}
 
 	if(!monster->isSummon()){
-		monster->searchTarget(true);
+		monster->searchTarget(TARGETSEARCH_RANDOM);
 	}
 
 	lua_pushnumber(L, LUA_NO_ERROR);

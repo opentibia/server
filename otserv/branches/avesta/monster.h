@@ -31,6 +31,12 @@ class Spawn;
 
 typedef std::list<Creature*> CreatureList;
 
+enum TargetSearchType_t{
+	TARGETSEARCH_DEFAULT,
+	TARGETSEARCH_RANDOM,
+	TARGETSEARCH_ATTACKRANGE
+};
+
 class Monster : public Creature
 {
 private:
@@ -100,7 +106,7 @@ public:
 	virtual void doAttacking(uint32_t interval);
 	virtual bool hasExtraSwing() {return extraMeleeAttack;}
 
-	bool searchTarget(bool randomize = false);
+	bool searchTarget(TargetSearchType_t searchType = TARGETSEARCH_DEFAULT);
 	bool selectTarget(Creature* creature);
 
 	const CreatureList& getTargetList() {return targetList;}

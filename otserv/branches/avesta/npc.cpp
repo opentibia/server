@@ -25,6 +25,7 @@
 #include "tools.h"
 #include "configmanager.h"
 #include "position.h"
+#include "spells.h"
 
 #include <algorithm>
 #include <functional>
@@ -39,6 +40,7 @@
 
 extern ConfigManager g_config;
 extern Game g_game;
+extern Spells* g_spells;
 
 AutoList<Npc> Npc::listNpc;
 
@@ -60,10 +62,14 @@ Creature()
 	m_npcEventHandler = NULL;
 	loaded = true;
 	name = _name;
-	autoWalkChance = 0;
+	walkTicks = 1500;
 	floorChange = false;
 	attackable = false;
+	hasBusyReply = false;
 	focusCreature = 0;
+	isIdle = true;
+	talkRadius = 2;
+	idleTime = 30;
 
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
 	std::string scriptname = datadir + "npc/scripts/";
@@ -71,7 +77,7 @@ Creature()
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
-		xmlNodePtr root, p, q;
+		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
 		if(xmlStrcmp(root->name,(const xmlChar*)"npc") != 0){
@@ -106,16 +112,14 @@ Creature()
 			attackable = (intValue != 0);
 		}
 
+		if(readXMLInteger(root, "walkinterval", intValue)){
+			walkTicks = intValue;
+		}
 		if(readXMLInteger(root, "autowalk", intValue)){
-			if(intValue > 100){
-				intValue = 100;
+			//Depricated attribute.
+			if(intValue == 0){
+				walkTicks = 2000;
 			}
-
-			if(intValue < 0){
-				intValue = 0;
-			}
-
-			autoWalkChance = intValue;
 		}
 
 		if(readXMLInteger(root, "floorchange", intValue)){
@@ -169,8 +173,8 @@ Creature()
 				currentOutfit = defaultOutfit;
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"parameters") == 0){
-
-				for(q = p->children; q != NULL; q = q->next){
+				
+				for(xmlNodePtr q = p->children; q != NULL; q = q->next){
 					if(xmlStrcmp(q->name, (const xmlChar*)"parameter") == 0){
 						std::string paramKey;
 						std::string paramValue;
@@ -184,6 +188,17 @@ Creature()
 					}
 				}
 
+			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"interaction") == 0){
+				if(readXMLInteger(p, "talkradius", intValue)){
+					talkRadius = intValue;
+				}
+
+				if(readXMLInteger(p, "idletime", intValue)){
+					idleTime = intValue;
+				}
+				
+				responseList = loadInteraction(p->children);
 			}
 
 			p = p->next;
@@ -199,8 +214,7 @@ Creature()
 			}
 		}
 		else{ //default npcs
-			//TODO
-			loaded = false;
+			loaded = true;
 		}
 	}
 	else{
@@ -213,7 +227,6 @@ Creature()
 #endif
 }
 
-
 Npc::~Npc()
 {
 	delete m_npcEventHandler;
@@ -223,9 +236,368 @@ Npc::~Npc()
 #endif
 }
 
+uint32_t Npc::loadParams(xmlNodePtr node)
+{
+	uint32_t params = RESPOND_DEFAULT;
+	std::string strValue;
+
+	if(readXMLString(node, "param", strValue)){
+		std::vector<std::string> paramList = explodeString(strValue, ";");
+		for(std::vector<std::string>::iterator it = paramList.begin(); it != paramList.end(); ++it){
+			if(asLowerCaseString(*it) == "male"){
+				params |= RESPOND_MALE;
+			}
+			else if(asLowerCaseString(*it) == "female"){
+				params |= RESPOND_FEMALE;
+			}
+			else if(asLowerCaseString(*it) == "pzblock"){
+				params |= RESPOND_PZBLOCK;
+			}
+			else if(asLowerCaseString(*it) == "lowmoney"){
+				params |= RESPOND_LOWMONEY;
+			}
+			else if(asLowerCaseString(*it) == "noamount"){
+				params |= RESPOND_NOAMOUNT;
+			}
+			else if(asLowerCaseString(*it) == "lowamount"){
+				params |= RESPOND_LOWAMOUNT;
+			}
+			else if(asLowerCaseString(*it) == "premium"){
+				params |= RESPOND_PREMIUM;
+			}
+			else if(asLowerCaseString(*it) == "druid"){
+				params |= RESPOND_DRUID;
+			}
+			else if(asLowerCaseString(*it) == "knight"){
+				params |= RESPOND_KNIGHT;
+			}
+			else if(asLowerCaseString(*it) == "paladin"){
+				params |= RESPOND_PALADIN;
+			}
+			else if(asLowerCaseString(*it) == "sorcerer"){
+				params |= RESPOND_SORCERER;
+			}
+			else if(asLowerCaseString(*it) == "lowlevel"){
+				params |= RESPOND_LOWLEVEL;
+			}
+			else{
+				std::cout << "Warning: [Npc::loadParams] Unknown param " << (*it) << std::endl;
+			}
+		}
+	}
+
+	return params;
+}
+
+ResponseList Npc::loadInteraction(xmlNodePtr node)
+{
+	ResponseList _responseList;
+	std::string strValue ;
+	int32_t intValue;
+
+	while(node){
+		if(xmlStrcmp(node->name, (const xmlChar*)"interact") == 0){
+			std::string input = "";
+			int32_t topic = -1;
+			int32_t focusStatus = -1;
+			int32_t storageId = -1;
+			int32_t storageValue = -1;
+			StorageComparision_t storageComp = STORAGE_EQUAL;
+			InteractType_t interactType = INTERACT_TEXT;
+
+			if(readXMLString(node, "keywords", strValue)){
+				input = asLowerCaseString(strValue);
+			}
+			else if(readXMLString(node, "event", strValue)){
+				input = asLowerCaseString(strValue);
+				if(input == "onbusy"){
+					hasBusyReply = true;
+				}
+				interactType = INTERACT_EVENT;
+			}
+
+			if(readXMLInteger(node, "topic", intValue)){
+				topic = intValue;
+			}
+
+			if(readXMLInteger(node, "focus", intValue)){
+				focusStatus = intValue;
+			}
+			
+			if(readXMLInteger(node, "storageId", intValue)){
+				storageId = intValue;
+			}
+
+			if(readXMLInteger(node, "storageValue", intValue)){
+				storageValue = intValue;
+			}
+
+			uint32_t interactParams = loadParams(node);
+
+			if(readXMLString(node, "storageComp", strValue)){
+				if(asLowerCaseString(strValue) == "equal"){
+					storageComp = STORAGE_EQUAL;
+				}
+				if(asLowerCaseString(strValue) == "greaterorequal"){
+					storageComp = STORAGE_GREATEROREQUAL;
+				}
+				if(asLowerCaseString(strValue) == "greater"){
+					storageComp = STORAGE_GREATER;
+				}
+				if(asLowerCaseString(strValue) == "less"){
+					storageComp = STORAGE_LESS;
+				}
+				if(asLowerCaseString(strValue) == "lessorequal"){
+					storageComp = STORAGE_LESSOREQUAL;
+				}
+			}
+
+			xmlNodePtr tmpNode = node->children;
+			while(tmpNode){
+				if(xmlStrcmp(tmpNode->name, (const xmlChar*)"response") == 0){
+
+					std::list<std::string> scriptParamList;
+					std::string output;
+					uint32_t params = interactParams | loadParams(tmpNode);
+					std::string knowSpell = "";
+
+					if(readXMLString(tmpNode, "knowspell", strValue)){
+						knowSpell = strValue;
+					}
+					
+					ResponseType_t responseType = RESPONSE_DEFAULT;
+					if(readXMLString(tmpNode, "text", strValue)){
+						output = strValue;
+					}
+					else if(readXMLString(tmpNode, "function", strValue)){
+						responseType = RESPONSE_SCRIPT;
+						output = strValue;
+					}
+
+					NpcResponse* response = new NpcResponse(
+						interactType,
+						responseType,
+						input,
+						output,
+						topic,
+						focusStatus,
+						storageId,
+						storageValue,
+						storageComp,
+						knowSpell,
+						params);
+
+					xmlNodePtr subNode = tmpNode->children;
+					while(subNode){
+						if(xmlStrcmp(subNode->name, (const xmlChar*)"action") == 0){
+							ResponseAction action;
+
+							if(readXMLString(subNode, "name", strValue)){
+								if(asLowerCaseString(strValue) == "topic"){
+									if(readXMLInteger(subNode, "value", intValue)){
+										action.actionType = ACTION_SETTOPIC;
+										action.intValue = intValue;
+									}
+								}
+								else if(asLowerCaseString(strValue) == "price"){
+									if(readXMLInteger(subNode, "value", intValue)){
+										action.actionType = ACTION_PRICE;
+										action.intValue = intValue;
+									}
+								}
+								else if(asLowerCaseString(strValue) == "amount"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_AMOUNT;
+										action.strValue = strValue;
+										action.intValue = atoi(strValue.c_str());
+									}
+								}
+								else if(asLowerCaseString(strValue) == "item"){
+									if(readXMLInteger(subNode, "value", intValue)){
+										action.actionType = ACTION_ITEM;
+										action.intValue = intValue;
+									}
+								}
+								else if(asLowerCaseString(strValue) == "subtype"){
+									if(readXMLInteger(subNode, "value", intValue)){
+										action.actionType = ACTION_SUBTYPE;
+										action.intValue = intValue;
+									}
+								}
+								else if(asLowerCaseString(strValue) == "spell"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_SPELL;
+										action.strValue = strValue;
+
+										InstantSpell* spell = g_spells->getInstantSpellByName(strValue);
+										if(!spell){					
+											std::cout << "Warning: [Npc::loadInteraction] Could not find an instant spell called " << strValue << std::endl;
+										}
+									}
+								}
+								else if(asLowerCaseString(strValue) == "teachspell"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_TEACHSPELL;
+										action.strValue = strValue;
+
+										InstantSpell* spell = g_spells->getInstantSpellByName(strValue);
+										if(!spell){					
+											std::cout << "Warning: [Npc::loadInteraction] Could not find an instant spell called " << strValue << std::endl;
+										}
+									}
+								}
+								else if(asLowerCaseString(strValue) == "sell"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_SELLITEM;
+										action.strValue = strValue;
+										action.intValue = atoi(strValue.c_str());
+									}
+								}
+								else if(asLowerCaseString(strValue) == "buy"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_BUYITEM;
+										action.strValue = strValue;
+										action.intValue = atoi(strValue.c_str());
+									}
+								}
+								else if(asLowerCaseString(strValue) == "takemoney"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_TAKEMONEY;
+										action.strValue = strValue;
+										action.intValue = atoi(strValue.c_str());
+									}
+								}
+								else if(asLowerCaseString(strValue) == "givemoney"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_GIVEMONEY;
+										action.strValue = strValue;
+										action.intValue = atoi(strValue.c_str());
+									}
+								}
+								else if(asLowerCaseString(strValue) == "level"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_SETLEVEL;
+										action.strValue = strValue;
+										action.intValue = atoi(strValue.c_str());
+									}
+								}
+								else if(asLowerCaseString(strValue) == "effect"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_EFFECT;
+										action.intValue = getMagicEffect(strValue);
+									}
+								}
+								else if(asLowerCaseString(strValue) == "idle"){
+									if(readXMLInteger(subNode, "value", intValue)){
+										action.actionType = ACTION_IDLE;
+										action.intValue = intValue;
+									}
+								}
+								else if(asLowerCaseString(strValue) == "scriptparam"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_SCRIPTPARAM;
+										action.strValue = strValue;
+									}
+								}
+								else if(asLowerCaseString(strValue) == "storage"){
+									if(readXMLInteger(subNode, "value", intValue)){
+										action.actionType = ACTION_STORAGE;
+										action.intValue = intValue;
+									}
+								}
+								else if(asLowerCaseString(strValue) == "addqueue"){
+									if(readXMLString(subNode, "value", strValue)){
+										action.actionType = ACTION_ADDQUEUE;
+										action.strValue = strValue;
+										action.intValue = atoi(strValue.c_str());
+									}
+								}
+								else if(asLowerCaseString(strValue) == "teleport"){
+									if(readXMLString(subNode, "value", strValue)){
+										std::vector<std::string> posList = explodeString(strValue, ";");
+										action.actionType = ACTION_TELEPORT;
+										action.strValue = strValue;
+										action.pos.x = 0;
+										action.pos.y = 0;
+										action.pos.z = 0;
+
+										if(posList.size() == 3){
+											action.pos.x = atoi(posList[0].c_str());
+											action.pos.y = atoi(posList[1].c_str());
+											action.pos.z = atoi(posList[2].c_str());
+										}
+									}
+								}
+								else{
+									std::cout << "Warning: [Npc::loadInteraction] Unknown action " << strValue << std::endl;
+								}
+							}
+							
+							if(readXMLInteger(subNode, "key", intValue)){
+								action.key = intValue;
+							}
+
+							response->addAction(action);
+						}
+						else if(xmlStrcmp(subNode->name, (const xmlChar*)"interact") == 0){
+							response->setResponseList(loadInteraction(subNode));
+						}
+
+						subNode = subNode->next;
+					}
+
+					_responseList.push_back(response);
+				}
+
+				tmpNode = tmpNode->next;
+			}
+		}
+
+		node = node->next;
+	}
+
+	return _responseList;
+}
+
+NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
+{
+	for(StateList::iterator it = stateList.begin(); it != stateList.end(); ++it){
+		if((*it)->respondToCreature == player->getID()){
+			return *it;
+		}
+	}
+
+	if(!makeNew){
+		return NULL;
+	}
+
+	NpcState* state = new NpcState;
+	state->prevInteraction = 0;
+	state->price = 0;
+	state->amount = 1;
+	state->itemId = 0;
+	state->subType = -1;
+	state->spellName = "";
+	state->level = -1;
+	state->topic = -1;
+	state->isIdle = true;
+	state->isQueued = false;
+	state->respondToText = "";
+	state->respondToCreature = 0;
+	state->lastResponse = NULL;
+	state->prevRespondToText = "";
+	
+	stateList.push_back(state);
+	return state;
+}
+
 bool Npc::canSee(const Position& pos) const
 {
-	return Creature::canSee(pos);
+	if(pos.z != getPosition().z){
+		return false;
+	}
+
+	return Creature::canSee(getPosition(), pos, Map::maxClientViewportX, Map::maxClientViewportY);
 }
 
 std::string Npc::getDescription(int32_t lookDistance) const
@@ -261,13 +633,23 @@ void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	Creature::onCreatureAppear(creature, isLogin);
 
-	if(creature == this && autoWalkChance > 0){
+	if(creature == this && walkTicks > 0){
 		addEventWalk();
 	}
 
 	//only players for script events
-	if(creature->getPlayer()){
-		m_npcEventHandler->onCreatureAppear(creature);
+	if(Player* player = const_cast<Player*>(creature->getPlayer())){
+		if(m_npcEventHandler){
+			m_npcEventHandler->onCreatureAppear(creature);
+		}
+
+		NpcState* npcState = getState(player, false);
+		if(npcState && !npcState->isIdle){
+			if(canSee(player->getPosition())){
+				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_LEAVE);
+				executeResponse(player, npcState, response);
+			}
+		}
 	}
 }
 
@@ -276,8 +658,16 @@ void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool 
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 
 	//only players for script events
-	if(creature->getPlayer()){
-		m_npcEventHandler->onCreatureDisappear(creature);
+	if(Player* player = const_cast<Player*>(creature->getPlayer())){
+		if(m_npcEventHandler){
+			m_npcEventHandler->onCreatureDisappear(creature);
+		}
+
+		NpcState* npcState = getState(player, false);
+		if(npcState && !npcState->isIdle){
+			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_LEAVE);
+			executeResponse(player, npcState, response);
+		}
 	}
 }
 
@@ -286,8 +676,29 @@ void Npc::onCreatureMove(const Creature* creature, const Tile* newTile, const Po
 {
 	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);
 
-	if(creature->getPlayer()){
-		m_npcEventHandler->onCreatureMove(creature, oldPos, newPos);
+	if(Player* player = const_cast<Player*>(creature->getPlayer())){
+		if(m_npcEventHandler){
+			m_npcEventHandler->onCreatureMove(creature, oldPos, newPos);
+		}
+
+		NpcState* npcState = getState(player, false);
+		if(npcState && !npcState->isIdle){
+			bool canSeeNewPos = canSee(newPos);
+			bool canSeeOldPos = canSee(oldPos);
+
+			if(canSeeNewPos && !canSeeOldPos){
+				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_ENTER);
+				executeResponse(player, npcState, response);
+			}
+			else if(!canSeeNewPos && canSeeOldPos){
+				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_LEAVE);
+				executeResponse(player, npcState, response);
+			}
+			else if(canSeeNewPos && canSeeOldPos){
+				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_MOVE);
+				executeResponse(player, npcState, response);
+			}
+		}
 	}
 }
 
@@ -302,8 +713,25 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 		return;
 
 	//only players for script events
-	if(creature->getPlayer()){
-		m_npcEventHandler->onCreatureSay(creature, type, text);
+	if(const Player* player = creature->getPlayer()){
+
+		if(m_npcEventHandler){
+			m_npcEventHandler->onCreatureSay(player, type, text);
+		}
+		
+		if(type == SPEAK_SAY){
+			const Position& myPos = getPosition();
+			const Position& pos = creature->getPosition();
+			if(canSee(myPos)){
+				if ((pos.x >= myPos.x - talkRadius) && (pos.x <= myPos.x + talkRadius) &&
+					(pos.y >= myPos.y - talkRadius) && (pos.y <= myPos.y + talkRadius)){
+
+					NpcState* npcState = getState(player);
+					npcState->respondToText = text;
+					npcState->respondToCreature = player->getID();
+				}
+			}
+		}
 	}
 }
 
@@ -312,13 +740,374 @@ void Npc::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfi
 	#ifdef __DEBUG_NPC__
 		std::cout << "Npc::onCreatureChangeOutfit" << std::endl;
 	#endif
-	//we dont care about filthy player changing his ugly clothes
 }
 
 void Npc::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
-	m_npcEventHandler->onThink();
+	if(m_npcEventHandler){
+		m_npcEventHandler->onThink();
+	}
+
+	isIdle = true;
+	for(StateList::iterator it = stateList.begin(); it != stateList.end();){
+		NpcState* npcState = *it;
+		const NpcResponse* response = NULL;
+
+		Player* player = g_game.getPlayerByID(npcState->respondToCreature);
+		bool closeConversation = false;
+		bool idleTimeout = false;
+		if(!npcState->isQueued){
+			if(npcState->isIdle && npcState->respondToText.empty()){
+				closeConversation = true;
+			}
+			else if(npcState->prevInteraction > 0 && (OTSYS_TIME() - npcState->prevInteraction) > idleTime * 1000){
+				idleTimeout = true;
+				closeConversation = true;
+			}
+		}
+
+		if(!player || closeConversation){
+			if(queueList.empty()){
+				if(idleTimeout){
+					response = getResponse(player, npcState, EVENT_PLAYER_LEAVE);
+					if(response){
+						executeResponse(player, npcState, response);
+					}
+				}
+			}
+			else{
+				Player* nextPlayer = NULL;
+				while(!queueList.empty()){
+					nextPlayer = g_game.getPlayerByID(*queueList.begin());
+					if(nextPlayer){
+						NpcState* nextPlayerState = getState(nextPlayer, false);
+						if(nextPlayerState){
+							nextPlayerState->respondToText = nextPlayerState->prevRespondToText;
+							nextPlayerState->isQueued = false;
+							break;
+						}
+					}
+
+					queueList.erase(queueList.begin());
+				}
+			}
+
+			delete *it;
+			stateList.erase(it++);
+			//std::cout << "Closing conversation." << std::endl;
+
+			continue;
+		}
+
+		if(!npcState->respondToText.empty()){
+			if(hasBusyReply && !isIdle){
+				//Check if we have a busy reply
+				response = getResponse(player, npcState, EVENT_BUSY);
+				if(response){
+					executeResponse(player, npcState, response);
+				}
+			}
+			else{
+				if(npcState->lastResponse){
+					//Check previous response chain first
+					const ResponseList& list = npcState->lastResponse->getResponseList();
+					response = getResponse(list, player, npcState, npcState->respondToText);
+				}
+				
+				if(!response){
+					response = getResponse(player, npcState, npcState->respondToText);
+				}
+				
+				if(response){
+					setCreatureFocus(player);
+					executeResponse(player, npcState, response);
+				}
+			}
+
+			npcState->prevRespondToText = npcState->respondToText;
+			npcState->respondToText = "";
+		}
+
+		if(!npcState->isIdle){
+			isIdle = false;
+
+			if(hasBusyReply){
+				setCreatureFocus(player);
+			}
+		}
+
+		++it;
+	}
+
+	if(isIdle){
+		setCreatureFocus(NULL);
+	}
+}
+
+void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse* response)
+{
+	if(response){
+		npcState->lastResponse = response;
+
+		if(response->getFocusState() == 0){
+			npcState->isIdle = true;
+		}
+		else if(response->getFocusState() == 1){
+			npcState->isIdle = false;
+		}
+		
+		if(response->getAmount() != -1){
+			npcState->amount = response->getAmount();
+		}
+
+		for(ActionList::const_iterator it = response->getFirstAction(); it != response->getEndAction(); ++it){
+			switch((*it).actionType){
+				case ACTION_SETTOPIC: npcState->topic = (*it).intValue; break;
+				case ACTION_PRICE: npcState->price = (*it).intValue; break;
+				case ACTION_ITEM: npcState->itemId = (*it).intValue; break;
+				case ACTION_SUBTYPE: npcState->subType = (*it).intValue; break;
+				case ACTION_EFFECT: g_game.addMagicEffect(player->getPosition(), (*it).intValue); break;
+				case ACTION_TELEPORT:
+				{
+					Position teleportTo = (*it).pos;
+					if((*it).strValue == "|TEMPLE|"){
+						teleportTo = player->getTemplePosition();
+					}
+					g_game.internalTeleport(player, teleportTo);
+					break;
+				}
+
+				case ACTION_IDLE:
+				{
+					npcState->isIdle = ((*it).intValue == 1);
+					break;
+				}
+
+				case ACTION_SETLEVEL:
+				{
+					if((*it).strValue == "|SPELLLEVEL|"){
+						npcState->level = -1;
+						InstantSpell* spell = g_spells->getInstantSpellByName(npcState->spellName);
+						if(spell){					
+							npcState->level = spell->getLevel();
+						}
+					}
+					else{
+						npcState->level = (*it).intValue;
+					}
+					break;
+				}
+
+				case ACTION_SPELL:
+				{
+					npcState->spellName = "";
+					InstantSpell* spell = g_spells->getInstantSpellByName((*it).strValue);
+					if(spell){					
+						npcState->spellName = (*it).strValue;
+					}
+					break;
+				}
+
+				case ACTION_AMOUNT:
+				{
+					int32_t amount = 1;
+					if((*it).strValue == "|AMOUNT|"){
+						amount = npcState->amount;
+					}
+					else{
+						amount = (*it).intValue;
+					}
+
+					npcState->amount = amount;
+					break;
+				}
+
+				case ACTION_TEACHSPELL:
+				{
+					std::string spellName = "";
+					if((*it).strValue == "|SPELL|"){
+						spellName = npcState->spellName;
+					}
+					else{
+						spellName = (*it).strValue;
+					}
+
+					player->learnInstantSpell(spellName);
+					break;
+				}
+
+				case ACTION_STORAGE:
+				{
+					if((*it).key > 0){
+						player->addStorageValue((*it).key, (*it).intValue);
+					}
+					break;
+				}
+
+				case ACTION_ADDQUEUE:
+				{
+					QueueList::iterator it = std::find(queueList.begin(), queueList.end(), player->getID());
+					if(it == queueList.end()){
+						queueList.push_back(player->getID());
+						npcState->isQueued = true;
+					}
+					break;
+				}
+
+				case ACTION_SELLITEM:
+				{
+					uint32_t moneyCount = 0;
+					if((*it).strValue == "|PRICE|"){
+						moneyCount = npcState->price * npcState->amount;
+					}
+					else{
+						moneyCount = (*it).intValue;
+					}
+
+					uint32_t itemCount = player->__getItemTypeCount(npcState->itemId, npcState->subType);
+					if(itemCount >= npcState->amount){
+						g_game.removeItemOfType(player, npcState->itemId, npcState->amount, npcState->subType);
+						g_game.addMoney(player, moneyCount, FLAG_NOLIMIT);
+					}
+					break;
+				}
+
+				case ACTION_BUYITEM:
+				{
+					uint32_t moneyCount = 0;
+					if((*it).strValue == "|PRICE|"){
+						moneyCount = npcState->price * npcState->amount;
+					}
+					else{
+						moneyCount = (*it).intValue;
+					}
+
+					if(g_game.removeMoney(player, moneyCount)){
+						for(int32_t i = 0; i < npcState->amount; ++i){
+							Item* item = Item::CreateItem(npcState->itemId, npcState->subType);
+							if(g_game.internalPlayerAddItem(player, item) != RET_NOERROR){
+								delete item;
+							}
+						}
+					}
+
+					break;
+				}
+
+				case ACTION_TAKEMONEY:
+				{
+					uint32_t moneyCount = 0;
+					if((*it).strValue == "|PRICE|"){
+						moneyCount = npcState->price * npcState->amount;
+					}
+					else{
+						moneyCount = (*it).intValue;
+					}
+
+					g_game.removeMoney(player, moneyCount);
+					break;
+				}
+
+				case ACTION_GIVEMONEY:
+				{
+					uint32_t moneyCount = 0;
+					if((*it).strValue == "|PRICE|"){
+						moneyCount = npcState->price * npcState->amount;
+					}
+					else{
+						moneyCount = (*it).intValue;
+					}
+
+					g_game.addMoney(player, moneyCount);
+					break;
+				}
+
+				default: break;
+			}
+		}
+
+
+		/*
+		if(npcState.amount == 0){
+			npcState.amount = player->__getItemTypeCount(npcState.itemId);
+		}
+		*/
+
+		if(response->getResponseType() == RESPONSE_DEFAULT){
+			std::string responseString = formatResponse(player, npcState, response);
+			g_game.internalCreatureSay(this, SPEAK_SAY, responseString);
+		}
+		else{
+			int32_t functionId = -1;
+			ResponseScriptMap::iterator it = responseScriptMap.find(response->getText());
+			if(it != responseScriptMap.end()){
+				functionId = it->second; 
+			}
+			else{
+				functionId = m_scriptInterface->getEvent(response->getText());
+				responseScriptMap[response->getText()] = functionId;
+			}
+
+			if(functionId != -1){
+				if(m_scriptInterface->reserveScriptEnv()){
+					ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+
+					#ifdef __DEBUG_LUASCRIPTS__
+					std::stringstream desc;
+					desc << "npc " << m_npc->getName();
+					env->setEventDesc(desc.str());
+					#endif
+
+					lua_State* L = m_scriptInterface->getLuaState();
+
+					env->setScriptId(functionId, m_scriptInterface);
+					env->setRealPos(getPosition());
+					env->setNpc(this);
+
+					m_scriptInterface->pushFunction(functionId);
+					int32_t paramCount = 0;
+					for(ActionList::const_iterator it = response->getFirstAction(); it != response->getEndAction(); ++it){
+						if((*it).actionType == ACTION_SCRIPTPARAM){
+							if((*it).strValue == "|PLAYER|"){
+								uint32_t cid = env->addThing(player);
+								lua_pushnumber(L, cid);
+							}
+							else if((*it).strValue == "|TEXT|"){
+								lua_pushstring(L, npcState->respondToText.c_str());
+							}
+							else if((*it).strValue == "|STATE|"){
+								lua_newtable(L);				
+								
+								LuaScriptInterface::setField(L, "price", npcState->price);
+								LuaScriptInterface::setField(L, "amount", npcState->amount);
+								LuaScriptInterface::setField(L, "itemid", npcState->itemId);
+								LuaScriptInterface::setField(L, "topic", npcState->topic);
+								LuaScriptInterface::setField(L, "isidle", npcState->isIdle);
+							}
+							else{
+								std::cout << "Warning [Npc::executeResponse] Unknown script param: " << (*it).strValue << std::endl;
+								break;
+							}
+
+							++paramCount;
+						}
+					}
+
+					m_scriptInterface->callFunction(paramCount);
+					m_scriptInterface->releaseScriptEnv();
+				}
+				else{
+					std::cout << "[Error] Call stack overflow." << std::endl;
+				}
+			}
+		}
+
+		if(response->getTopic() == npcState->topic){
+			npcState->topic = -1;
+		}
+		npcState->prevInteraction = OTSYS_TIME();
+	}
 }
 
 void Npc::doSay(std::string msg)
@@ -342,11 +1131,15 @@ bool Npc::getNextStep(Direction& dir)
 		return true;
 	}
 
-	if(autoWalkChance > 0 && autoWalkChance >= random_range(1, 100) && focusCreature == 0){
-		return getRandomStep(dir);
+	if(!isIdle || focusCreature != 0){
+		return false;
 	}
 
-	return false;
+	if(getTimeSinceLastMove() < walkTicks){
+		return false;
+	}
+
+	return getRandomStep(dir);
 }
 
 bool Npc::canWalkTo(const Position& fromPos, Direction dir)
@@ -435,7 +1228,6 @@ void Npc::setCreatureFocus(Creature* creature)
 {
 	if(creature){
 		focusCreature = creature->getID();
-
 		const Position& creaturePos = creature->getPosition();
 		const Position& myPos = getPosition();
 		int32_t dx = myPos.x - creaturePos.x;
@@ -473,6 +1265,277 @@ void Npc::setCreatureFocus(Creature* creature)
 	else{
 		focusCreature = 0;
 	}
+}
+
+const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* player,
+	NpcState* npcState, const std::string& text, bool exactMatch /*= false*/)
+{
+	std::string textString = asLowerCaseString(text);
+	std::vector<std::string> wordList = explodeString(textString, " ");
+	NpcResponse* response = NULL;
+	int32_t bestMatchCount = 0;
+	bool bestMatchAll = false;
+
+	for(ResponseList::const_iterator it = list.begin(); it != list.end(); ++it){
+		if((*it)->getParams() != RESPOND_DEFAULT){
+			uint32_t params = (*it)->getParams();
+
+			if(hasBitSet(RESPOND_MALE, params) && !player->getSex() == PLAYERSEX_MALE){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_FEMALE, params) && !player->getSex() == PLAYERSEX_FEMALE){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_PZBLOCK, params) && !player->isPzLocked()){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_PREMIUM, params) && !player->isPremium()){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_DRUID, params) && player->getVocationId() != VOCATION_DRUID){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_KNIGHT, params) && player->getVocationId() != VOCATION_KNIGHT){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_PALADIN, params) && player->getVocationId() != VOCATION_PALADIN){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_SORCERER, params) && player->getVocationId() != VOCATION_SORCERER){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_LOWLEVEL, params) && player->getLevel() > npcState->level){
+				continue;
+			}
+
+			if(hasBitSet(RESPOND_LOWMONEY, params)){
+				uint32_t moneyCount = g_game.getMoney(player);
+				if(moneyCount >= npcState->price){
+					continue;
+				}
+			}
+
+			if(hasBitSet(RESPOND_LOWAMOUNT, params) || hasBitSet(RESPOND_NOAMOUNT, params)){
+				uint32_t itemCount = player->__getItemTypeCount(npcState->itemId);
+				
+				if(itemCount >= npcState->amount){
+					continue;
+				}
+
+				if(npcState->amount == 1 && hasBitSet(RESPOND_LOWAMOUNT, params)){
+					continue;
+				}
+
+				if(npcState->amount > 1 && hasBitSet(RESPOND_NOAMOUNT, params)){
+					continue;
+				}
+			}
+		}
+
+		if((*it)->getKnowSpell() != ""){
+			std::string spellName = (*it)->getKnowSpell();
+			if(spellName == "|SPELL|"){
+				spellName = npcState->spellName;
+			}
+
+			if(!player->hasLearnedInstantSpell(spellName)){
+				continue;
+			}
+		}
+
+		if((*it)->getStorageId() != -1){
+			int32_t playerStorageValue = -1;
+			if(!player->getStorageValue((*it)->getStorageId(), playerStorageValue)){
+				playerStorageValue = -1;
+			}
+
+			int32_t storageValue = (*it)->getStorageValue();
+			StorageComparision_t comp = (*it)->getStorageComp();
+			switch(comp){
+				case STORAGE_LESS:
+				{
+					if(playerStorageValue >= storageValue){
+						continue;
+					}
+					break;
+				}
+				case STORAGE_LESSOREQUAL:
+				{
+					if(playerStorageValue > storageValue){
+						continue;
+					}
+					break;
+				}
+				case STORAGE_EQUAL:
+				{
+					if(playerStorageValue != storageValue){
+						continue;
+					}
+					break;
+				}
+				case STORAGE_GREATEROREQUAL:
+				{
+					if(playerStorageValue < storageValue){
+						continue;
+					}
+					break;
+				}
+				case STORAGE_GREATER:
+				{
+					if(playerStorageValue <= storageValue){
+						continue;
+					}
+					break;
+				}
+
+				default: break;
+			}
+		}
+
+		if((*it)->getInteractType() == INTERACT_EVENT){
+			if((*it)->getInputText() == asLowerCaseString(text)){
+				return (*it);
+			}
+		}
+
+		if(npcState->isIdle && (*it)->getFocusState() != 1){
+			//We are idle, and this response does not activate the npc.
+			continue;
+		}
+
+		if(!npcState->isIdle && (*it)->getFocusState() == 1){
+			//We are not idle, and this response would activate us again.
+			continue;
+		}
+
+		if((*it)->getInteractType() != INTERACT_TEXT){
+			continue;
+		}
+
+		int32_t matchCount = 0;
+		bool matchAll = false;
+		std::vector<std::string>::iterator wordIter = wordList.begin();
+		std::vector<std::string> keywordList = explodeString((*it)->getInputText(), ";");
+		for(std::vector<std::string>::iterator keyIter = keywordList.begin(); keyIter != keywordList.end(); ++keyIter){
+
+			if(!exactMatch && (*keyIter) == "|*|"){
+				//Match anything.
+				matchAll = true;
+			}
+			else if((*keyIter) == "|amount|"){
+				//TODO: Should iterate through each word until a number or a new keyword is found.
+				int32_t amount = atoi((*wordIter).c_str());
+				if(amount > 0){
+					(*it)->setAmount(amount);
+				}
+				else{
+					continue;
+				}
+			}
+			else{
+				wordIter = std::find(wordIter, wordList.end(), (*keyIter));
+				if(wordIter == wordList.end()){
+					if(exactMatch){
+						break;
+					}
+					else{
+						wordIter = wordList.begin();
+						continue;
+					}
+				}
+			}
+
+			wordIter = wordIter + 1;
+
+			++matchCount;
+		}
+
+		bool foundBetterMatch = false;
+		if(matchCount > bestMatchCount){
+			if(npcState->topic == -1 && (*it)->getTopic() != -1){
+				foundBetterMatch = false;
+			}
+			else{
+				foundBetterMatch = true;
+			}
+		}
+		else if(matchCount == bestMatchCount){
+			if(response){
+				if(!bestMatchAll && matchAll){
+					foundBetterMatch = false;
+				}
+				else if(bestMatchAll && !matchAll){
+					foundBetterMatch = true;
+				}
+				else if(npcState->topic == (*it)->getTopic() && response->getTopic() != npcState->topic){
+					foundBetterMatch = true;
+				}
+			}
+		}
+
+		if(foundBetterMatch){
+			response = (*it);
+			bestMatchCount = matchCount;
+			bestMatchAll = matchAll;
+
+			//std::cout << "Found response string: " << (*it)->getText() << std::endl;
+		}
+	}
+
+	return response;
+}
+
+const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, const std::string& text)
+{
+	return getResponse(responseList, player, npcState, text);
+}
+
+const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType)
+{
+	switch(eventType){
+		case EVENT_BUSY: return getResponse(responseList, player, npcState, "onBusy", true); break;
+		case EVENT_PLAYER_ENTER: return getResponse(responseList, player, npcState, "onPlayerEnter", true); break;
+		case EVENT_PLAYER_MOVE: return getResponse(responseList, player, npcState, "onPlayerMove", true); break;
+		case EVENT_PLAYER_LEAVE: return getResponse(responseList, player, npcState, "onPlayerLeave", true); break;
+		default: return NULL; break;
+	}
+
+	return NULL;
+}
+
+std::string Npc::formatResponse(Creature* creature, const NpcState* npcState, const NpcResponse* response) const
+{
+	std::string responseString = response->getText();
+
+	std::stringstream ss;
+	ss << npcState->price * npcState->amount;
+	replaceString(responseString, "|PRICE|", ss.str());
+
+	ss.str("");
+	ss << npcState->amount;
+	replaceString(responseString, "|AMOUNT|", ss.str());
+
+	ss.str("");
+	ss << npcState->level;
+	replaceString(responseString, "|LEVEL|", ss.str());
+
+	ss.str("");
+	if(npcState->itemId != -1){
+		const ItemType& it = Item::items[npcState->itemId];
+		ss << it.article + it.name;
+		replaceString(responseString, "|ITEMNAME|", ss.str());
+	}
+	replaceString(responseString, "|NAME|", creature->getName());
+	replaceString(responseString, "|NPCNAME|", getName());
+	return responseString;
 }
 
 NpcScriptInterface* Npc::getScriptInterface()
