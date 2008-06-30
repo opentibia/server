@@ -3099,7 +3099,7 @@ uint64_t Player::getGainedExperience(Creature* attacker) const
 				uint32_t b = getLevel();
 				uint64_t c = getExperience();
 
-				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor( getDamageRatio(attacker) * ((double)(1 - (((double)a / b)))) * 0.05 * c ) );
+				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor( getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ) );
 				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
 		}
 	}
