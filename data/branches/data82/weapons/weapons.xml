@@ -188,7 +188,7 @@
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
-	<wand id="8817" level="22" mana="5" min="27" max="33" type="fire" enabled="1" function="internalLoadWeapon"> <!-- Wand of Draconia -->
+	<wand id="8827" level="22" mana="5" min="27" max="33" type="fire" enabled="1" function="internalLoadWeapon"> <!-- Wand of Draconia -->
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>

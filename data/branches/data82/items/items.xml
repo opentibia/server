@@ -18599,7 +18599,7 @@
 		<attribute key="attack" value="5"/>
 	</item>
 	<item id="8758" article="the" name="devileye">
-		<attribute key="weight" value="12000"/>
+		<attribute key="weight" value="5500"/>
 		<attribute key="slotType" value="two-handed"/>
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="ammoType" value="bolt"/>
