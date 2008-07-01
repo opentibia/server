@@ -483,14 +483,9 @@ bool Party::canOpenCorpse(uint32_t ownerId)
 		return false;
 	}
 
-	PlayerVector::iterator it = std::find(memberList.begin(), memberList.end(), player);
-	if(it == memberList.end()){
-		return false;
+	if(leader->getID() == ownerId || isPlayerMember(player)){
+		return true;
 	}
 
-	if(leader->getID() != ownerId){
-		return false;
-	}
-
-	return true;
+	return false;
 }
