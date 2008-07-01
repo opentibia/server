@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<outfits>
+	<!-- Female outfits -->
+	<outfit type="0" looktype="136" addons="3" name="Citizen"/>
+	<outfit type="0" looktype="137" addons="3" name="Hunter"/>
+	<outfit type="0" looktype="138" addons="3" name="Mage"/>
+	<outfit type="0" looktype="139" addons="3" name="Knight"/>
+	<outfit type="0" looktype="140" addons="3" name="Noblewoman"/>
+	<outfit type="0" looktype="141" addons="3" name="Summoner"/>
+	<outfit type="0" looktype="142" addons="3" name="Warrior"/>
+	<outfit type="0" looktype="147" addons="3" name="Barbarian"/>
+	<outfit type="0" looktype="148" addons="3" name="Druid"/>
+	<outfit type="0" looktype="149" addons="3" name="Wizard"/>
+	<outfit type="0" looktype="150" addons="3" name="Oriental"/>
+	<outfit type="0" looktype="155" addons="3" name="Pirate"/>
+	<outfit type="0" looktype="156" addons="3" name="Assassin"/>
+	<outfit type="0" looktype="157" addons="3" name="Beggar"/>
+	<outfit type="0" looktype="158" addons="3" name="Shaman"/>
+	<outfit type="0" looktype="252" addons="3" name="Norsewoman"/>
+	<!-- Male outfits -->
+	<outfit type="1" looktype="128" addons="3" name="Citizen"/>
+	<outfit type="1" looktype="129" addons="3" name="Hunter"/>
+	<outfit type="1" looktype="130" addons="3" name="Mage"/>
+	<outfit type="1" looktype="131" addons="3" name="Knight"/>
+	<outfit type="1" looktype="132" addons="3" name="Nobleman"/>
+	<outfit type="1" looktype="133" addons="3" name="Summoner"/>
+	<outfit type="1" looktype="134" addons="3" name="Warrior"/>
+	<outfit type="1" looktype="143" addons="3" name="Barbarian"/>
+	<outfit type="1" looktype="144" addons="3" name="Druid"/>
+	<outfit type="1" looktype="145" addons="3" name="Wizard"/>
+	<outfit type="1" looktype="146" addons="3" name="Oriental"/>
+	<outfit type="1" looktype="151" addons="3" name="Pirate"/>
+	<outfit type="1" looktype="152" addons="3" name="Assassin"/>
+	<outfit type="1" looktype="153" addons="3" name="Beggar"/>
+	<outfit type="1" looktype="154" addons="3" name="Shaman"/>
+	<outfit type="0" looktype="251" addons="3" name="Norseman"/>
+	<!-- Archdemon -->
+	<outfit type="2" looktype="12" addons="3" name="Archdemon"/>
+	<!-- Elf outfits -->
+	<outfit type="2" looktype="159" addons="3" name="Elf"/>
+	<!-- Dwarf outfits -->
+	<outfit type="2" looktype="160" addons="3" name="Dwarf"/>
+	<!-- Frog outfits -->
+	<outfit type="2" looktype="226" addons="3" name="Frog"/>
+	<!-- Cult -->
+	<outfit type="2" looktype="194" addons="3" name="Cult"/>
+	<!-- Barbarians -->
+	<outfit type="2" looktype="253" addons="3" name="Headsplitter"/>
+	<outfit type="2" looktype="254" addons="3" name="Skullhunter"/>
+	<outfit type="2" looktype="255" addons="3" name="Bloodwalker"/>
+	<outfit type="2" looktype="264" addons="3" name="Brutetamer"/>
+</outfits>

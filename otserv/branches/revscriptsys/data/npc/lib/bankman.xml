@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+
+<interaction>
+
+  <interact keywords="bank">
+    <response text="The depots are very easy to use. Just step in front of them and you will find your items in them. They are free for all tibian citizens."/>
+  </interact>
+
+  <interact keywords="offer;sell;buy;money;change;exchange">
+    <response text="We exchange gold, platinum and crystal coins."/>
+  </interact>
+
+  <interact keywords="change;gold">
+    <response text="How many platinum coins do you want to get?">
+
+      <interact keywords="|AMOUNT|">
+        <response text="So I should change |N1| of your gold coins to |AMOUNT| platinum coins for you?">
+          <action name="script" value="
+                  n1 = amount*100
+                  b1 = getPlayerItemCount(cid, 2148) >= amount * 100
+                  "/>
+
+          <interact keywords="yes">
+            <response b1="1" text="Here you are.">
+              <action name="script" value="
+                      doPlayerRemoveItem(cid, 2148, amount * 100)
+                      doPlayerAddItem(cid, 2152, amount)
+                       "/>
+            </response>
+            <response text="Sorry, you don't have enough gold coins."/>
+          </interact>
+
+          <interact keywords="|*|">
+            <response text="Well, can I help you with something else?"/>
+          </interact>
+          
+        </response>
+      </interact>
+      
+    </response>
+  </interact>
+
+  <interact keywords="change;platinum">
+    <response text="Do you want to change your platinum coins to gold or crystal?">
+      
+      <interact keywords="gold">
+        <response text="How many platinum coins do you want to change to gold?">
+          
+          <interact keywords="|AMOUNT|">
+            <response text="So I should change |AMOUNT| of your platinum coins to |N1| gold coins for you?">
+              <action name="script" value="
+                  n1 = amount*100
+                  b1 = getPlayerItemCount(cid, 2152) >= amount
+                  "/>
+
+              <interact keywords="yes">
+                <response b1="1" text="Here you are.">
+                  <action name="script" value="
+                      doPlayerRemoveItem(cid, 2152, amount)
+                      doPlayerAddItem(cid, 2148, amount * 100)
+                       "/>
+                </response>
+                <response text="Sorry, you don't have enough platinum coins."/>
+              </interact>
+
+              <interact keywords="|*|">
+                <response text="Well, can I help you with something else?"/>
+              </interact>
+
+            </response>
+          </interact>
+
+        </response>
+      </interact>
+      
+      <interact keywords="crystal">
+
+        <response text="How many crystal coins do you want to get?">
+
+          <interact keywords="|AMOUNT|">
+            <response text="So I should change |N1| of your platinum coins to |AMOUNT| crystal coins for you?">
+              <action name="script" value="
+                  n1 = amount*100
+                  b1 = getPlayerItemCount(cid, 2152) >= amount * 100
+                  "/>
+
+              <interact keywords="yes">
+                <response b1="1" text="Here you are.">
+                  <action name="script" value="
+                      doPlayerRemoveItem(cid, 2152, amount * 100)
+                      doPlayerAddItem(cid, 2160, amount)
+                       "/>
+                </response>
+                <response text="Sorry, you don't have enough platinum coins."/>
+              </interact>
+
+              <interact keywords="|*|">
+                <response text="Well, can I help you with something else?"/>
+              </interact>
+
+            </response>
+          </interact>
+
+        </response>
+
+      </interact>
+
+    </response>
+  </interact>
+
+
+  <interact keywords="change;crystal">
+    <response text="How many crystal coins do you want to change to platinum?">
+
+      <interact keywords="|AMOUNT|">
+        <response text="So I should change |AMOUNT| of your crystal coins to |N1| platinum coins for you?">
+          <action name="script" value="
+                  n1 = amount*100
+                  b1 = getPlayerItemCount(cid, 2160) >= amount
+                  "/>
+
+          <interact keywords="yes">
+            <response b1="1" text="Here you are.">
+              <action name="script" value="
+                      doPlayerRemoveItem(cid, 2160, amount)
+                      doPlayerAddItem(cid, 2152, amount * 100)
+                       "/>
+            </response>
+            <response text="Sorry, you don't have enough crystal coins."/>
+          </interact>
+
+          <interact keywords="|*|">
+            <response text="Well, can I help you with something else?"/>
+          </interact>
+
+        </response>
+      </interact>
+
+    </response>
+  </interact>
+    
+</interaction>
