@@ -742,7 +742,10 @@ protected:
 	}
 
 	static uint32_t getPercentLevel(uint64_t count, uint32_t nextLevelCount);
-	virtual uint64_t getLostExperience() const { return (skillLoss ? (uint64_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
+	virtual uint64_t getLostExperience() const {
+		return (skillLoss ? (experience * lossPercent[LOSS_EXPERIENCE]/100) : 0);
+	}
+
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }

@@ -2115,22 +2115,12 @@ void Player::die()
 				break;
 		}
 
-		//uint64_t currLevelExp = Player::getExpForLevel(newLevel);
-		//levelPercent = Player::getPercentLevel(getExperience() - currLevelExp - getLostExperience(), Player::getExpForLevel(newLevel + 1) - currLevelExp);
-
 		if(newLevel != level){
 			std::stringstream lvMsg;
 			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
 			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 		}
 	}
-
-
-	/*
-	if(client){
-		client->sendReLoginWindow();
-	}
-	*/
 }
 
 void Player::dropCorpse()
@@ -3326,7 +3316,9 @@ void Player::onPlacedCreature()
 
 void Player::onRemovedCreature()
 {
-	//
+	if(client){
+		client->sendReLoginWindow();
+	}
 }
 
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)

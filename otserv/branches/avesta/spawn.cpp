@@ -206,10 +206,8 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							continue;
 						}
 
-						Npc* npc = new Npc(name);
-						if(!npc->isLoaded()){
-							delete npc;
-
+						Npc* npc = Npc::createNpc(name);
+						if(!npc){
 							tmpNode = tmpNode->next;
 							continue;
 						}

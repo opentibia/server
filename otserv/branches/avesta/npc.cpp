@@ -50,18 +50,71 @@ NpcScriptInterface* Npc::m_scriptInterface = NULL;
 uint32_t Npc::npcCount = 0;
 #endif
 
-Npc::Npc(const std::string& _name) :
-Creature()
+void Npcs::reload()
 {
+	for(AutoList<Npc>::listiterator it = Npc::listNpc.list.begin(); it != Npc::listNpc.list.end(); ++it){
+		it->second->reload();
+	}
+}
+
+Npc* Npc::createNpc(const std::string& name)
+{
+	Npc* npc = new Npc();
+	if(!npc){
+		return NULL;
+	}
+
+	if(!npc->load(name)){
+		delete npc;
+		return NULL;
+	}
+
+	return npc;
+}
+
+Npc::Npc() :
+	Creature()
+{
+	m_npcEventHandler = NULL;
+	reset();
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	npcCount++;
+#endif
+}
+
+Npc::~Npc()
+{
+	reset();
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	npcCount--;
+#endif
+}
+
+bool Npc::load(const std::string& _name)
+{
+	if(isLoaded()){
+		return true;
+	}
+
+	reset();
+
 	m_datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
+	m_scriptdir = m_datadir + "npc/scripts/";
+
 	if(!m_scriptInterface){
 		m_scriptInterface = new NpcScriptInterface();
 		m_scriptInterface->loadNpcLib(std::string(m_datadir + "npc/scripts/lib/npc.lua"));
 	}
 
-	m_npcEventHandler = NULL;
-	loaded = true;
-	name = _name;
+	loaded = loadFromXml(_name);
+	return isLoaded();
+}
+
+void Npc::reset()
+{
+	loaded = false;
 	walkTicks = 1500;
 	floorChange = false;
 	attackable = false;
@@ -71,9 +124,32 @@ Creature()
 	talkRadius = 2;
 	idleTime = 30;
 
-	std::string filename = m_datadir + "npc/" + std::string(name) + ".xml";
-	std::string scriptname = m_datadir + "npc/scripts/";
+	delete m_npcEventHandler;
+	m_npcEventHandler = NULL;
 
+	for(ResponseList::iterator it = responseList.begin(); it != responseList.end(); ++it){
+		delete *it;
+	}
+
+	for(StateList::iterator it = stateList.begin(); it != stateList.end(); ++it){
+		delete *it;
+	}
+
+	responseList.clear();
+	stateList.clear();
+	queueList.clear();
+	m_parameters.clear();
+}
+
+void Npc::reload()
+{
+	reset();
+	load(getName());
+}
+
+bool Npc::loadFromXml(const std::string& _name)
+{
+	std::string filename = m_datadir + "npc/" + _name + ".xml";
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
@@ -81,20 +157,19 @@ Creature()
 		root = xmlDocGetRootElement(doc);
 
 		if(xmlStrcmp(root->name,(const xmlChar*)"npc") != 0){
-			//TODO: use exceptions here
 			std::cerr << "Malformed XML" << std::endl;
+			return false;
 		}
 
 		int intValue;
 		std::string strValue;
 
 		p = root->children;
-
+		
+		std::string scriptfile = "";
 		if(readXMLString(root, "script", strValue)){
-			scriptname += strValue;
+			scriptfile = strValue;
 		}
-		else
-			scriptname = "";
 
 		if(readXMLString(root, "name", strValue)){
 			name = strValue;
@@ -206,34 +281,17 @@ Creature()
 
 		xmlFreeDoc(doc);
 
-		//now try to load the script
-		if(scriptname != ""){
-			m_npcEventHandler = new NpcScript(scriptname, this);
+		if(!scriptfile.empty()){
+			m_npcEventHandler = new NpcScript(m_scriptdir + scriptfile, this);
 			if(!m_npcEventHandler->isLoaded()){
-				loaded = false;
+				return false;
 			}
 		}
-		else{ //default npcs
-			loaded = true;
-		}
-	}
-	else{
-		loaded = false;
+
+		return true;
 	}
 
-
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	npcCount++;
-#endif
-}
-
-Npc::~Npc()
-{
-	delete m_npcEventHandler;
-
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	npcCount--;
-#endif
+	return false;
 }
 
 uint32_t Npc::loadParams(xmlNodePtr node)
@@ -317,7 +375,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 			}			
 		}
 		else if(xmlStrcmp(node->name, (const xmlChar*)"interact") == 0){
-			std::string input = "";
+			std::list<std::string> inputList;
 			int32_t topic = -1;
 			int32_t focusStatus = -1;
 			int32_t storageId = -1;
@@ -326,14 +384,16 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 			InteractType_t interactType = INTERACT_TEXT;
 
 			if(readXMLString(node, "keywords", strValue)){
-				input = asLowerCaseString(strValue);
+				inputList.push_back(asLowerCaseString(strValue));
 			}
 			else if(readXMLString(node, "event", strValue)){
-				input = asLowerCaseString(strValue);
-				if(input == "onbusy"){
+				strValue = asLowerCaseString(strValue);
+				if(strValue == "onbusy"){
 					hasBusyReply = true;
 				}
 				interactType = INTERACT_EVENT;
+
+				inputList.push_back(strValue);
 			}
 
 			if(readXMLInteger(node, "topic", intValue)){
@@ -374,6 +434,24 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 
 			xmlNodePtr tmpNode = node->children;
 			while(tmpNode){
+				if(xmlStrcmp(tmpNode->name, (const xmlChar*)"keywords") == 0){
+					//alternative input keywords
+					xmlNodePtr altKeyNode = tmpNode->children;
+					while(altKeyNode){
+						if(xmlStrcmp(altKeyNode->name, (const xmlChar*)"text") == 0){
+							char* nodeValue = (char*)xmlNodeGetContent(tmpNode);
+							inputList.push_back(asLowerCaseString(nodeValue));
+							xmlFreeOTSERV(nodeValue);
+						}
+
+						altKeyNode = altKeyNode->next;
+					}
+				}
+				tmpNode = tmpNode->next;
+			}
+
+			tmpNode = node->children;
+			while(tmpNode){
 				if(xmlStrcmp(tmpNode->name, (const xmlChar*)"response") == 0){
 
 					std::list<std::string> scriptParamList;
@@ -410,7 +488,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 					NpcResponse* response = new NpcResponse(
 						interactType,
 						responseType,
-						input,
+						inputList,
 						output,
 						topic,
 						focusStatus,
@@ -1147,6 +1225,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "price = " << npcState->price << std::endl;
 						scriptstream << "level = " << npcState->level << std::endl;
 						scriptstream << "spellname = '" << npcState->spellName << "'" << std::endl;
+						scriptstream << "name = '" << player->getName() << "'" << std::endl;
 						scriptstream << (*it).strValue;
 
 						scriptInterface.loadBuffer(scriptstream.str(), this);
@@ -1456,7 +1535,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 	std::vector<std::string> wordList = explodeString(textString, " ");
 	NpcResponse* response = NULL;
 	int32_t bestMatchCount = 0;
-	bool bestMatchAll = false;
+	uint32_t totalMatchCount = 0;
 
 	for(ResponseList::const_iterator it = list.begin(); it != list.end(); ++it){
 		if((*it)->getParams() != RESPOND_DEFAULT){
@@ -1608,10 +1687,50 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			continue;
 		}
 
-		int32_t matchCount = 0;
 		bool matchAll = false;
-		std::vector<std::string>::iterator wordIter = wordList.begin();
-		std::vector<std::string> keywordList = explodeString((*it)->getInputText(), ";");
+		int32_t matchCount = getMatchCount(*it, wordList, exactMatch, matchAll);
+
+		bool foundMatch = false;
+		if(matchCount > 0 && matchCount >= bestMatchCount){
+			if(npcState->topic == -1 && (*it)->getTopic() != -1){
+				foundMatch = false;
+			}
+			else{
+				foundMatch = true;
+			}
+		}
+
+		if(foundMatch){
+			if(matchCount > bestMatchCount){
+				bestMatchCount = matchCount;
+				totalMatchCount = 0;
+			}
+
+			response = (*it);
+			totalMatchCount++;
+
+			//std::cout << "Found response string: " << (*it)->getText() << std::endl;
+		}
+	}
+
+	if(totalMatchCount > 1){
+		return NULL;
+	}
+
+	return response;
+}
+
+uint32_t Npc::getMatchCount(NpcResponse* response, std::vector<std::string> wordList, bool exactMatch, bool& matchAll)
+{
+	matchAll = false;
+	int32_t bestMatchCount = 0;
+
+	const std::list<std::string>& inputList = response->getInputList();
+	for(std::list<std::string>::const_iterator it = inputList.begin(); it != inputList.end(); ++it){
+		int32_t matchCount = 0;
+		std::vector<std::string>::iterator lastWordMatchIter = wordList.begin();
+		std::vector<std::string> keywordList = explodeString(*it, ";");
+
 		for(std::vector<std::string>::iterator keyIter = keywordList.begin(); keyIter != keywordList.end(); ++keyIter){
 
 			if(!exactMatch && (*keyIter) == "|*|"){
@@ -1620,71 +1739,43 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 			else if((*keyIter) == "|amount|"){
 				//TODO: Should iterate through each word until a number or a new keyword is found.
-				int32_t amount = atoi((*wordIter).c_str());
+				int32_t amount = atoi((*lastWordMatchIter).c_str());
 				if(amount > 0){
-					(*it)->setAmount(amount);
+					response->setAmount(amount);
 				}
 				else{
-					(*it)->setAmount(1);
+					response->setAmount(1);
 					continue;
 				}
 			}
 			else{
-				wordIter = std::find(wordIter, wordList.end(), (*keyIter));
-				if(wordIter == wordList.end()){
-					if(exactMatch){
-						break;
+				std::vector<std::string>::iterator wordIter = std::find(lastWordMatchIter, wordList.end(), (*keyIter));
+				if(wordIter != wordList.end()){
+					if(wordIter + 1 != wordList.end()){
+						lastWordMatchIter = wordIter + 1;
 					}
 					else{
-						wordIter = wordList.begin();
-						continue;
+						lastWordMatchIter = wordList.end();
 					}
+				}
+				else{
+					continue;
 				}
 			}
 
 			++matchCount;
 
-			if(wordIter + 1 == wordList.end()){
+			if(matchCount > bestMatchCount){
+				bestMatchCount = matchCount;
+			}
+
+			if(lastWordMatchIter == wordList.end()){
 				break;
 			}
-			else{
-				wordIter = wordIter + 1;
-			}
-		}
-
-		bool foundBetterMatch = false;
-		if(matchCount > bestMatchCount){
-			if(npcState->topic == -1 && (*it)->getTopic() != -1){
-				foundBetterMatch = false;
-			}
-			else{
-				foundBetterMatch = true;
-			}
-		}
-		else if(matchCount == bestMatchCount){
-			if(response){
-				if(!bestMatchAll && matchAll){
-					foundBetterMatch = false;
-				}
-				else if(bestMatchAll && !matchAll){
-					foundBetterMatch = true;
-				}
-				else if(npcState->topic == (*it)->getTopic() && response->getTopic() != npcState->topic){
-					foundBetterMatch = true;
-				}
-			}
-		}
-
-		if(foundBetterMatch){
-			response = (*it);
-			bestMatchCount = matchCount;
-			bestMatchAll = matchAll;
-
-			//std::cout << "Found response string: " << (*it)->getText() << std::endl;
 		}
 	}
 
-	return response;
+	return bestMatchCount;
 }
 
 const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, const std::string& text)

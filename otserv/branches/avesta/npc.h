@@ -30,6 +30,14 @@
 class Npc;
 class NpcResponse;
 
+typedef std::list<Npc*> NpcList;
+class Npcs{
+public:
+	Npcs() {};
+	~Npcs() {};
+	void reload();
+};
+
 class NpcScriptInterface : public LuaScriptInterface
 {
 public:
@@ -233,7 +241,7 @@ public:
 	NpcResponse(
 		InteractType_t _interactType,
 		ResponseType_t _responseType,
-		const std::string& _input,
+		std::list<std::string> _inputList,
 		const std::string& _output,
 		int32_t _topic,
 		int32_t _focusStatus,
@@ -246,7 +254,10 @@ public:
 	{
 		interactType = _interactType;
 		responseType = _responseType;
-		input = _input;
+		inputList = _inputList;
+		if(!inputList.empty()){
+			input = *inputList.begin();
+		}
 		output = _output;
 		params = _params;
 		topic = _topic;
@@ -260,7 +271,14 @@ public:
 		scriptVars = _scriptVars;
 	};
 
-	virtual ~NpcResponse() {}
+	~NpcResponse()
+	{
+		for(ResponseList::iterator it = subResponseList.begin(); it != subResponseList.end(); ++it){
+			delete *it;
+		}
+
+		subResponseList.clear();
+	}
 
 	uint32_t getParams() const {return params;}
 	const std::string& getInputText() const {return input;}
@@ -279,6 +297,7 @@ public:
 	void addAction(ResponseAction action) {actionList.push_back(action);}
 	void setResponseList(ResponseList _list) { subResponseList.insert(subResponseList.end(),_list.begin(),_list.end());}
 	const ResponseList& getResponseList() const { return subResponseList;}
+	const std::list<std::string>& getInputList() const { return inputList;}
 	void setAmount(int32_t _amount) { amount = _amount;}
 
 	ActionList::const_iterator getFirstAction() const {return actionList.begin();}
@@ -292,6 +311,7 @@ protected:
 	int32_t amount;
 	int32_t focusStatus;
 	std::string input;
+	std::list<std::string> inputList;
 	std::string output;
 	InteractType_t interactType;
 	ResponseType_t responseType;
@@ -331,7 +351,6 @@ public:
 	static uint32_t npcCount;
 #endif
 
-	Npc(const std::string& name);
 	virtual ~Npc();
 
 	virtual Npc* getNpc() {return this;};
@@ -344,9 +363,13 @@ public:
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}
 
+	static Npc* createNpc(const std::string& name);
+
 	virtual bool canSee(const Position& pos) const;
 
-	void speak(const std::string& text){};
+	bool load(const std::string& _name);
+	void reload();
+
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};
 
@@ -361,6 +384,8 @@ public:
 	NpcScriptInterface* getScriptInterface();
 
 protected:
+	Npc();
+
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
 		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
@@ -387,10 +412,14 @@ protected:
 	bool canWalkTo(const Position& fromPos, Direction dir);
 	bool getRandomStep(Direction& dir);
 
+	void reset();
+	bool loadFromXml(const std::string& name);
+
 	const NpcResponse* getResponse(const ResponseList& list, const Player* player,
 		NpcState* npcState, const std::string& text, bool exactMatch = false);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState, const std::string& text);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType);
+	uint32_t getMatchCount(NpcResponse* response, std::vector<std::string> wordList, bool exactMatch, bool& matchAll);
 
 	void executeResponse(Player* player, NpcState* npcState, const NpcResponse* response);
 
@@ -406,6 +435,7 @@ protected:
 
 	std::string name;
 	std::string m_datadir;
+	std::string m_scriptdir;
 	uint32_t walkTicks;
 	bool floorChange;
 	bool attackable;

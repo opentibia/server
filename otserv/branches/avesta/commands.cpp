@@ -59,6 +59,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 extern ConfigManager g_config;
 extern Actions* g_actions;
 extern Monsters g_monsters;
+extern Npcs g_npcs;
 extern BanManager g_bans;
 extern TalkActions* g_talkactions;
 extern MoveEvents* g_moveEvents;
@@ -105,10 +106,10 @@ s_defcommands Commands::defined_commands[] = {
 };
 
 
-Commands::Commands(Game* igame):
-game(igame),
-loaded(false)
+Commands::Commands()
 {
+	loaded = false;
+
 	//setup command map
 	for(uint32_t i = 0; i < sizeof(defined_commands) / sizeof(defined_commands[0]); i++){
 		Command* cmd = new Command;
@@ -179,7 +180,7 @@ bool Commands::loadXml(const std::string& _datadir)
 			std::cout << "Warning: Missing access level for command " << it->first << std::endl;
 		}
 		//register command tag in game
-		game->addCommandTag(it->first.substr(0,1));
+		g_game.addCommandTag(it->first.substr(0,1));
 	}
 
 
@@ -188,13 +189,14 @@ bool Commands::loadXml(const std::string& _datadir)
 
 bool Commands::reload()
 {
-	this->loaded = false;
+	loaded = false;
 	for(CommandMap::iterator it = commandMap.begin(); it != commandMap.end(); ++it){
 		it->second->accesslevel = 1;
 		it->second->loaded = false;
 	}
-	game->resetCommandTag();
-	this->loadXml(datadir);
+	g_game.resetCommandTag();
+
+	loadXml(datadir);
 	return true;
 }
 
@@ -240,15 +242,14 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 
 bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Npc* npc = new Npc(param);
-	if(!npc->isLoaded()){
-		delete npc;
-		return true;
+	Npc* npc = Npc::createNpc(param);
+	if(!npc){
+		return false;
 	}
 
 	// Place the npc
-	if(game->placeCreature(npc, creature->getPosition())){
-		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
+	if(g_game.placeCreature(npc, creature->getPosition())){
+		g_game.addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
 	else{
@@ -256,7 +257,7 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 		Player* player = creature->getPlayer();
 		if(player){
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
-			game->addMagicEffect(creature->getPosition(), NM_ME_PUFF);
+			g_game.addMagicEffect(creature->getPosition(), NM_ME_PUFF);
 		}
 		return true;
 	}
@@ -272,21 +273,21 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 	if(!monster){
 		if(player){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
-			game->addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 		return false;
 	}
 
 	// Place the monster
-	if(game->placeCreature(monster, creature->getPosition())){
-		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
+	if(g_game.placeCreature(monster, creature->getPosition())){
+		g_game.addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
 	else{
 		delete monster;
 		if(player){
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
-			game->addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 	}
 
@@ -330,15 +331,15 @@ bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, cons
 	if(!player)
 		return false;
 
-	game->internalBroadcastMessage(player, param);
+	g_game.internalBroadcastMessage(player, param);
 	return true;
 }
 
 bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Position destPos = creature->getPosition();
-	if(game->internalTeleport(creature, creature->masterPos) == RET_NOERROR){
-		game->addMagicEffect(destPos, NM_ME_TELEPORT);
+	if(g_game.internalTeleport(creature, creature->masterPos) == RET_NOERROR){
+		g_game.addMagicEffect(destPos, NM_ME_TELEPORT);
 		return true;
 	}
 
@@ -347,11 +348,11 @@ bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, con
 
 bool Commands::teleportHere(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Creature* paramCreature = game->getCreatureByName(param);
+	Creature* paramCreature = g_game.getCreatureByName(param);
 	if(paramCreature){
 		Position destPos = paramCreature->getPosition();
-		if(game->internalTeleport(paramCreature, creature->getPosition()) == RET_NOERROR){
-			game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
+		if(g_game.internalTeleport(paramCreature, creature->getPosition()) == RET_NOERROR){
+			g_game.addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 			return true;
 		}
 	}
@@ -385,10 +386,10 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 	}
 	g_game.startDecay(newItem);
 
-	ReturnValue ret = game->internalAddItem(player, newItem);
+	ReturnValue ret = g_game.internalAddItem(player, newItem);
 
 	if(ret != RET_NOERROR){
-		ret = game->internalAddItem(player->getTile(), newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		ret = g_game.internalAddItem(player->getTile(), newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 		if(ret != RET_NOERROR){
 			delete newItem;
@@ -396,7 +397,7 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 		}
 	}
 
-	game->addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
+	g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
 	return true;
 }
 
@@ -438,10 +439,10 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 	}
 	g_game.startDecay(newItem);
 
-	ReturnValue ret = game->internalAddItem(player, newItem);
+	ReturnValue ret = g_game.internalAddItem(player, newItem);
 
 	if(ret != RET_NOERROR){
-		ret = game->internalAddItem(player->getTile(), newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		ret = g_game.internalAddItem(player->getTile(), newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 		if(ret != RET_NOERROR){
 			delete newItem;
@@ -449,7 +450,7 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 		}
 	}
 
-	game->addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
+	g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
 	return true;
 }
 
@@ -460,7 +461,7 @@ bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const s
 		return false;
 
 	int count = atoi(param.c_str());
-	uint32_t money = game->getMoney(player);
+	uint32_t money = g_game.getMoney(player);
 	if(!count){
 		std::stringstream info;
 		info << "You have " << money << " gold.";
@@ -474,7 +475,7 @@ bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const s
 		return true;
 	}
 
-	if(!game->removeMoney(player, count)){
+	if(!g_game.removeMoney(player, count)){
 		std::stringstream info;
 		info << "Can not subtract money!";
 		player->sendCancel(info.str().c_str());
@@ -487,23 +488,27 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 {
 	Player* player = creature->getPlayer();
 
-	if(param == "actions"){
+	if(param == "actions" || param == "action"){
 		g_actions->reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded actions.");
 	}
-	else if(param == "commands"){
+	else if(param == "commands" || param == "command"){
 		this->reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded commands.");
 	}
-	else if(param == "monsters"){
+	else if(param == "monsters" || param == "monster"){
 		g_monsters.reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded monsters.");
+	}
+	else if(param == "npc"){
+		g_npcs.reload();
+		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded npcs.");
 	}
 	else if(param == "config"){
 		g_config.reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
 	}
-	else if(param == "talk" || param == "talkactions" || param == "talk actions"){
+	else if(param == "talk" || param == "talkactions" || param == "talk actions" || param == "ta"){
 		g_talkactions->reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded talk actions.");
 	}
@@ -511,12 +516,12 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 		g_moveEvents->reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded movement actions.");
 	}
-	else if(param == "spells"){
+	else if(param == "spells" || param == "spell"){
 		g_spells->reload();
 		g_monsters.reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded spells and monsters.");
 	}
-	else if(param == "raids"){
+	else if(param == "raids" || param == "raid"){
 		Raids::getInstance()->reload();
 		Raids::getInstance()->startup();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded raids.");
@@ -545,18 +550,7 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 	int color = atoi(param.c_str());
 	Player* player = creature->getPlayer();
 	if(player) {
-		//Outfit_t ot = player->getCurrentOutfit();
-		//ot.lookType = color;
-		//game->internalCreatureChangeOutfit(player, ot);
-
 		player->sendMagicEffect(player->getPosition(), color);
-		/*
-		LightInfo lightInfo;
-		lightInfo.level = color / 0x100;
-		lightInfo.color = color & 0xFF;
-		player->setCreatureLight(lightInfo);
-		game->changeLight(player);
-		*/
 	}
 
 	return true;
@@ -573,8 +567,8 @@ bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const 
 
 	Town* town = Towns::getInstance().getTown(tmp);
 	if(town){
-		if(game->internalTeleport(creature, town->getTemplePosition()) == RET_NOERROR) {
-			game->addMagicEffect(town->getTemplePosition(), NM_ME_ENERGY_AREA);
+		if(g_game.internalTeleport(creature, town->getTemplePosition()) == RET_NOERROR) {
+			g_game.addMagicEffect(town->getTemplePosition(), NM_ME_ENERGY_AREA);
 			return true;
 		}
 	}
@@ -586,11 +580,11 @@ bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const 
 
 bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Creature* paramCreature = game->getCreatureByName(param);
+	Creature* paramCreature = g_game.getCreatureByName(param);
 	if(paramCreature){
 		Position destPos = creature->getPosition();
-		if(game->internalTeleport(creature, paramCreature->getPosition()) == RET_NOERROR){
-			game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
+		if(g_game.internalTeleport(creature, paramCreature->getPosition()) == RET_NOERROR){
+			g_game.addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 			return true;
 		}
 	}
@@ -604,7 +598,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 	if(!player)
 		return true;
 
-	Player* paramPlayer = game->getPlayerByName(param);
+	Player* paramPlayer = g_game.getPlayerByName(param);
 	if(paramPlayer) {
 		std::stringstream info;
 		if(paramPlayer->getAccessLevel() >= player->getAccessLevel() && player != paramPlayer){
@@ -631,7 +625,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 
 bool Commands::closeServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	game->setGameState(GAME_STATE_CLOSED);
+	g_game.setGameState(GAME_STATE_CLOSED);
 	//kick players with access = 0
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end())
@@ -652,7 +646,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		g_bans.clearTemporaryBans();
 	}
 
-	if(!game->getMap()->saveMap()){
+	if(!g_game.getMap()->saveMap()){
 		if(player)
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving map.");
 	}
@@ -667,7 +661,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 
 bool Commands::openServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	game->setGameState(GAME_STATE_NORMAL);
+	g_game.setGameState(GAME_STATE_NORMAL);
 
 	Player* player = creature->getPlayer();
 	if(player){
@@ -744,8 +738,8 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 			break;
 		}
 
-		if(game->internalTeleport(creature, newPos) == RET_NOERROR){
-			game->addMagicEffect(newPos, NM_ME_TELEPORT);
+		if(g_game.internalTeleport(creature, newPos) == RET_NOERROR){
+			g_game.addMagicEffect(newPos, NM_ME_TELEPORT);
 		}
 	}
 
@@ -754,7 +748,7 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 
 bool Commands::kickPlayer(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Player* playerKick = game->getPlayerByName(param);
+	Player* playerKick = g_game.getPlayerByName(param);
 	if(playerKick){
 		Player* player = creature->getPlayer();
 		if(player && player->getAccessLevel() <= playerKick->getAccessLevel()){
@@ -804,7 +798,7 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 			return false;
 		}
 
-		Player* tradePartner = game->getPlayerByName(param);
+		Player* tradePartner = g_game.getPlayerByName(param);
 		if(!(tradePartner && tradePartner != player)){
 			player->sendCancel("Trade player not found.");
 			return false;
@@ -832,7 +826,7 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 		}
 
 		transferItem->getParent()->setParent(player);
-		if(game->internalStartTrade(player, tradePartner, transferItem)){
+		if(g_game.internalStartTrade(player, tradePartner, transferItem)){
 			return true;
 		}
 		else{

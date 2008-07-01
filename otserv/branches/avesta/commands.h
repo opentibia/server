@@ -26,14 +26,13 @@
 #include <map>
 #include "creature.h"
 
-class Game;
 struct Command;
 struct s_defcommands;
 
 class Commands{
 public:
-	Commands():game(NULL),loaded(false){};
-	Commands(Game* igame);
+	//Commands():game(NULL),loaded(false){};
+	Commands();
 
 	bool loadXml(const std::string& _datadir);	
 	bool isLoaded(){return loaded;}
@@ -44,7 +43,6 @@ public:
 	static ReturnValue placeSummon(Creature* creature, const std::string& name);
 	
 protected:
-	Game* game;
 	bool loaded;
 	std::string datadir;
 

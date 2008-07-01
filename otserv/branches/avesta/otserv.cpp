@@ -37,6 +37,7 @@
 
 #include "status.h"
 #include "monsters.h"
+#include "npc.h"
 #include "commands.h"
 #include "outfit.h"
 #include "vocation.h"
@@ -69,7 +70,8 @@ IPList serverIPs;
 ConfigManager g_config;
 
 Game g_game;
-Commands commands(&g_game);
+Commands commands;
+Npcs g_npcs;
 Monsters g_monsters;
 BanManager g_bans;
 Vocations g_vocations;
@@ -315,7 +317,6 @@ void mainLoader(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
-	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
 
 	if(asLowerCaseString(worldType) == "pvp")
 		g_game.setWorldType(WORLD_TYPE_PVP);
@@ -327,6 +328,8 @@ void mainLoader(int argc, char *argv[])
 		ErrorMessage("Unknown world type!");
 		exit(-1);
 	}
+
+	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
 	std::cout << ":: Worldtype: " << worldType << std::endl;
 
 	#ifdef __SKULLSYSTEM__

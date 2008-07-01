@@ -7,11 +7,17 @@
     <!--This will include the postman interaction, in this way several npc can use the same interaction-->
     <include file="postman.xml"/>
     
-    <interact keywords="hi;hello" focus="1">
+    <interact keywords="hi" focus="1">
+      <!--These are the alternative keywords-->
+      <keywords>hello</keywords>
+      
       <response text="Hello. How may I help you |NAME|?"/>
     </interact>
 
-    <interact keywords="bye;farewell" focus="0">
+    <interact keywords="bye" focus="0">
+      <!--These are the alternative keywords-->
+      <keywords>farewell</keywords>
+      
       <response text="It was a pleasure to help you."/>
     </interact>
 

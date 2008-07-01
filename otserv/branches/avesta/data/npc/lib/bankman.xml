@@ -15,19 +15,20 @@
 
       <interact keywords="|AMOUNT|">
         <response text="So I should change |N1| of your gold coins to |AMOUNT| platinum coins for you?">
-          <action name="script" value="
-                  n1 = amount*100
-                  b1 = getPlayerItemCount(cid, 2148) >= amount * 100
-                  "/>
+          <action name="script" value="n1 = amount*100"/>
 
           <interact keywords="yes">
-            <response b1="1" text="Here you are.">
-              <action name="script" value="
-                      doPlayerRemoveItem(cid, 2148, amount * 100)
-                      doPlayerAddItem(cid, 2152, amount)
-                       "/>
+            <response>
+              <action name="script">
+                if(getPlayerItemCount(cid, 2148) >= amount*100) then
+                selfSay('Here you are.')
+                doPlayerRemoveItem(cid, 2148, amount*100)
+                doPlayerAddItem(cid, 2152, amount)
+                else
+                selfSay('Sorry, you don\'t have enough gold coins.')
+                end
+              </action>
             </response>
-            <response text="Sorry, you don't have enough gold coins."/>
           </interact>
 
           <interact keywords="|*|">
@@ -48,19 +49,20 @@
           
           <interact keywords="|AMOUNT|">
             <response text="So I should change |AMOUNT| of your platinum coins to |N1| gold coins for you?">
-              <action name="script" value="
-                  n1 = amount*100
-                  b1 = getPlayerItemCount(cid, 2152) >= amount
-                  "/>
+              <action name="script" value="n1 = amount*100"/>
 
               <interact keywords="yes">
-                <response b1="1" text="Here you are.">
-                  <action name="script" value="
+                <response>
+                  <action name="script">
+                    if(getPlayerItemCount(cid, 2152) >= amount) then
+                      selfSay('Here you are.')
                       doPlayerRemoveItem(cid, 2152, amount)
                       doPlayerAddItem(cid, 2148, amount * 100)
-                       "/>
+                    else
+                      selfSay('Sorry, you don\'t have enough platinum coins.')
+                  end
+                </action>
                 </response>
-                <response text="Sorry, you don't have enough platinum coins."/>
               </interact>
 
               <interact keywords="|*|">
@@ -79,19 +81,21 @@
 
           <interact keywords="|AMOUNT|">
             <response text="So I should change |N1| of your platinum coins to |AMOUNT| crystal coins for you?">
-              <action name="script" value="
-                  n1 = amount*100
-                  b1 = getPlayerItemCount(cid, 2152) >= amount * 100
-                  "/>
+              <action name="script" value="n1 = amount*100"/>
 
               <interact keywords="yes">
-                <response b1="1" text="Here you are.">
-                  <action name="script" value="
-                      doPlayerRemoveItem(cid, 2152, amount * 100)
-                      doPlayerAddItem(cid, 2160, amount)
-                       "/>
+                <response>
+                  <action name="script">
+                    if(getPlayerItemCount(cid, 2152) >= amount*100) then
+                    selfSay('Here you are.')
+                    doPlayerRemoveItem(cid, 2152, amount*100)
+                    doPlayerAddItem(cid, 2160, amount)
+                    else
+                    selfSay('Sorry, you don\'t have enough platinum coins.')
+                    end
+                  </action>
+                "/>
                 </response>
-                <response text="Sorry, you don't have enough platinum coins."/>
               </interact>
 
               <interact keywords="|*|">
@@ -114,19 +118,20 @@
 
       <interact keywords="|AMOUNT|">
         <response text="So I should change |AMOUNT| of your crystal coins to |N1| platinum coins for you?">
-          <action name="script" value="
-                  n1 = amount*100
-                  b1 = getPlayerItemCount(cid, 2160) >= amount
-                  "/>
+          <action name="script" value="n1 = amount*100"/>
 
           <interact keywords="yes">
-            <response b1="1" text="Here you are.">
-              <action name="script" value="
-                      doPlayerRemoveItem(cid, 2160, amount)
-                      doPlayerAddItem(cid, 2152, amount * 100)
-                       "/>
-            </response>
-            <response text="Sorry, you don't have enough crystal coins."/>
+            <response>
+              <action name="script">
+                if(getPlayerItemCount(cid, 2160) >= amount) then
+                  selfSay('Here you are.')
+                  doPlayerRemoveItem(cid, 2160, amount)
+                  doPlayerAddItem(cid, 2160, amount*100)
+                else
+                  selfSay('Sorry, you don\'t have enough crystal coins.')
+                end
+                </action>
+              </response>
           </interact>
 
           <interact keywords="|*|">

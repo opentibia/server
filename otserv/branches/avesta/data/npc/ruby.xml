@@ -4,13 +4,25 @@
 	<look type="133" head="20" body="120" legs="75" feet="13"/>
 
   <interaction range="3" idletime="30">
-
+    
     <interact keywords="hi" focus="1">
-      <response param="female" text="Welcome on board, Madam |NAME|."/>
-      <response param="male" text="Welcome on board, Sir |NAME|."/>
+      <!--These are the keywords will trigger this interaction-->
+      <keywords>howdy</keywords>
+      <keywords>hello</keywords>
+
+      <response>
+        <action name="script">
+          if(getPlayerSex(cid)) == 0 then
+            selfSay("Welcome on board, Madam " .. getCreatureName(cid) .. ".")
+          else
+            selfSay("Welcome on board, Sir " .. getCreatureName(cid) .. ".")
+          end
+        </action>
+      </response>
     </interact>
 
     <interact keywords="bye" focus="0">
+      <keywords>farewell</keywords>
       <response text="Good bye. Recommend us, if you were satisfied with our service."/>
     </interact>
 
@@ -45,7 +57,25 @@
     </interact>
 
     <!---Example of calling a script function, check ruby.lua-->
-    <interact keywords="fuck;cock;penis" focus="1">
+    <interact focus="1">
+      <!--These are the keywords will trigger this interaction-->
+      <keywords>hell</keywords>
+      <keywords>damn</keywords>
+      <keywords>god;damn</keywords>
+      
+      <response function="onSayCurse">
+        <action name="idle" value="1"/>
+        <action name="scriptparam" value="|PLAYER|"/>
+        <action name="scriptparam" value="|TEXT|"/>
+      </response>
+    </interact>
+
+    <interact focus="0">
+      <!--These are the keywords will trigger this interaction-->
+      <keywords>hell</keywords>
+      <keywords>damn</keywords>
+      <keywords>god;damn</keywords>
+      
       <response function="onSayCurse">
         <action name="idle" value="1"/>
         <action name="scriptparam" value="|PLAYER|"/>
@@ -118,6 +148,8 @@
 
     <!-- Sell item(s) interaction-->
     <interact keywords="sell;|AMOUNT|;brass;helmet">
+      <keywords>sell;brass;helmet</keywords>
+      
       <response text="Do you want to sell |AMOUNT| brass helmet for |PRICE| gold?">
         <action name="topic" value="2"/>
         <action name="item" value="2460"/>
@@ -126,11 +158,13 @@
       </response>
     </interact>
     
-    <interact keywords="sell;|AMOUNT|;leather;legs">
-      <response text="Do you want to sell |AMOUNT| brass helmet for |PRICE| gold?">
+    <interact keywords="sell;|AMOUNT|;brass;legs">
+      <keywords>sell;brass;legs</keywords>
+      
+      <response text="Do you want to sell |AMOUNT| brass legs for |PRICE| gold?">
         <action name="topic" value="2"/>
-        <action name="item" value="2460"/>
-        <action name="price" value="200"/>
+        <action name="item" value="2468"/>
+        <action name="price" value="400"/>
         <action name="amount" value="|AMOUNT|"/>
       </response>
     </interact>
@@ -146,6 +180,8 @@
 
     <!-- Buy item(s) interaction-->
     <interact keywords="buy;|AMOUNT|;brass;helmet">
+      <keywords>buy;brass;legs</keywords>
+      
       <response text="Do you want to buy |AMOUNT| brass helmet for |PRICE| gold?">
         <action name="topic" value="3"/>
         <action name="item" value="2460"/>

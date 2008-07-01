@@ -5,15 +5,24 @@
 
   <interaction range="3" idletime="30">
 
-    <interact keywords="hi;hello" param="sorcerer" focus="1">
+    <interact keywords="hi" param="sorcerer" focus="1">
+      <!--These are the alternative keywords-->
+      <keywords>hello</keywords>
+      
       <response text="Oh, be welcome |NAME|."/>
     </interact>
 
-    <interact keywords="hi;hello" focus="1">
+    <interact keywords="hi" focus="1">
+      <!--These are the alternative keywords-->
+      <keywords>hello</keywords>
+      
       <response text="Hello..."/>
     </interact>
 
-    <interact keywords="bye;goodbye" focus="0">
+    <interact keywords="bye" focus="0">
+      <!--These are the alternative keywords-->
+      <keywords>farewell</keywords>
+      
       <response text="Farewell."/>
     </interact>
 

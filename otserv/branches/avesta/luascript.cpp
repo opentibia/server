@@ -6094,6 +6094,8 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
+
+	return 0;
 }
 
 int LuaScriptInterface::luaGetDepotId(lua_State *L)
