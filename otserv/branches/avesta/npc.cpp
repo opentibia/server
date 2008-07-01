@@ -1535,6 +1535,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 	std::vector<std::string> wordList = explodeString(textString, " ");
 	NpcResponse* response = NULL;
 	int32_t bestMatchCount = 0;
+	bool bestMatchAll = false;
 	uint32_t totalMatchCount = 0;
 
 	for(ResponseList::const_iterator it = list.begin(); it != list.end(); ++it){
@@ -1692,11 +1693,28 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		bool foundMatch = false;
 		if(matchCount > 0 && matchCount >= bestMatchCount){
+			foundMatch = true;
+
 			if(npcState->topic == -1 && (*it)->getTopic() != -1){
 				foundMatch = false;
 			}
-			else{
-				foundMatch = true;
+
+			if(!bestMatchAll && matchAll){
+				foundMatch = false;
+			}
+
+			if(response){
+				if(response->getParams() != 0){
+					foundMatch = false;	
+				}
+
+				if(response->getKnowSpell() != ""){
+					foundMatch = false;
+				}
+
+				if(response->getStorageId() != -1){
+					foundMatch = false;
+				}
 			}
 		}
 
@@ -1706,6 +1724,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				totalMatchCount = 0;
 			}
 
+			bestMatchAll = matchAll;
 			response = (*it);
 			totalMatchCount++;
 
