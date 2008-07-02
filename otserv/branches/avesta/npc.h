@@ -29,6 +29,7 @@
 // Defines an NPC...
 class Npc;
 class NpcResponse;
+struct NpcState;
 
 typedef std::list<Npc*> NpcList;
 class Npcs{
@@ -46,6 +47,9 @@ public:
 
 	bool loadNpcLib(std::string file);
 
+	static void pushState(lua_State *L, NpcState* state);
+	static void popState(lua_State *L, NpcState* &state);
+
 protected:
 
 	virtual void registerFunctions();
@@ -54,6 +58,7 @@ protected:
 	static int luaActionMove(lua_State *L);
 	static int luaActionMoveTo(lua_State *L);
 	static int luaActionTurn(lua_State* L);
+	static int luaActionFollow(lua_State* L);
 	static int luaCreatureGetName(lua_State *L);
 	static int luaCreatureGetName2(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
@@ -62,6 +67,8 @@ protected:
 	static int luaSetNpcFocus(lua_State *L);
 	static int luaGetNpcCid(lua_State *L);
 	static int luaGetNpcPos(lua_State *L);
+	static int luaGetNpcState(lua_State *L);
+	static int luaSetNpcState(lua_State *L);
 	static int luaGetNpcName(lua_State *L);
 	static int luaGetNpcParameter(lua_State *L);
 
@@ -343,6 +350,8 @@ struct NpcState{
 
 	//script variables
 	ScriptVars scriptVars;
+
+	//Do not forget to update pushState/popState if you add more variables
 };
 
 class Npc : public Creature

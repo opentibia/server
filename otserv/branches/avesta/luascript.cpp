@@ -952,10 +952,27 @@ int32_t LuaScriptInterface::getField(lua_State *L, const char *key)
 	return result;
 }
 
-void LuaScriptInterface::setField(lua_State *L, const char* index, uint32_t val)
+bool LuaScriptInterface::getFieldBool(lua_State *L, const char *key)
+{
+	bool result;
+	lua_pushstring(L, key);
+	lua_gettable(L, -2);  // get table[key]
+	result = lua_toboolean(L, -1);
+	lua_pop(L, 1);  // remove number and key
+	return result;
+}
+
+void LuaScriptInterface::setField(lua_State *L, const char* index, int32_t val)
 {
 	lua_pushstring(L, index);
 	lua_pushnumber(L, (double)val);
+	lua_settable(L, -3);
+}
+
+void LuaScriptInterface::setFieldBool(lua_State *L, const char* index, bool val)
+{
+	lua_pushstring(L, index);
+	lua_pushboolean(L, (double)val);
 	lua_settable(L, -3);
 }
 
@@ -1558,6 +1575,9 @@ void LuaScriptInterface::registerFunctions()
 	//getCreatureSummons(cid)
 	//returns a table with all the summons of the creature
 	lua_register(m_luaState, "getCreatureSummons", LuaScriptInterface::luaGetCreatureSummons);
+
+	//getSpectators(centerPos, rangex, rangey, multifloor)
+	lua_register(m_luaState, "getSpectators", LuaScriptInterface::luaGetSpectators);
 
 	//hasCondition(cid, conditionid)
 	lua_register(m_luaState, "hasCondition", LuaScriptInterface::luaHasCondition);
@@ -6773,6 +6793,37 @@ int LuaScriptInterface::luaGetCreatureSummons(lua_State *L)
 		uint32_t summonCid = env->addThing(*it);
 		lua_pushnumber(L, i);
 		lua_pushnumber(L, summonCid);
+		lua_settable(L, -3);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaGetSpectators(lua_State *L)
+{
+	//getSpectators(centerPos, rangex, rangey, multifloor)
+
+	bool multifloor = popNumber(L) == 1;
+	uint32_t rangey = popNumber(L);
+	uint32_t rangex = popNumber(L);
+
+	PositionEx centerPos;
+	popPosition(L, centerPos);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	SpectatorVec list;
+	g_game.getSpectators(list, centerPos, false, multifloor, rangex, rangex, rangey, rangey);
+	if(list.empty()){
+		lua_pushnil(L);
+		return 1;
+	}
+
+	lua_newtable(L);
+	SpectatorVec::const_iterator it = list.begin();
+	for(uint32_t i = 1; it != list.end(); ++it, ++i){
+		lua_pushnumber(L, i);
+		lua_pushnumber(L, (*it)->getID());
 		lua_settable(L, -3);
 	}
 

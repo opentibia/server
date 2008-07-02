@@ -527,12 +527,13 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	if(creature == this){
-		stopEventWalk();
-
 		lastStep = OTSYS_TIME();
 		lastStepCost = 1;
 
-		if(!teleport){
+		if(teleport){
+			stopEventWalk();
+		}
+		else{
 			if(oldPos.z != newPos.z){
 				//floor change extra cost
 				lastStepCost = 2;

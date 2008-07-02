@@ -304,8 +304,10 @@ public:
 	static const char* popString(lua_State *L);
 
 	static int32_t getField(lua_State *L, const char *key);
-	static void setField(lua_State *L, const char* index, uint32_t val);
+	static void setField(lua_State *L, const char* index, int32_t val);
 	static void setField(lua_State *L, const char* index, const std::string& val);
+	static void setFieldBool(lua_State *L, const char* index, bool val);
+	static bool getFieldBool(lua_State *L, const char *key);
 
 protected:
 	virtual bool closeState();
@@ -558,6 +560,7 @@ protected:
 	static int luaGetCreatureMaxHealth(lua_State *L);
 	static int luaGetCreatureMaster(lua_State *L);
 	static int luaGetCreatureSummons(lua_State *L);
+	static int luaGetSpectators(lua_State *L);
 	static int luaHasCondition(lua_State *L);
 
 	static int luaHasProperty(lua_State *L);

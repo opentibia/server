@@ -145,6 +145,11 @@ void Npc::reload()
 {
 	reset();
 	load(getName());
+
+	//Simulate that the creature is placed on the map again.
+	if(m_npcEventHandler){
+		m_npcEventHandler->onCreatureAppear(this);
+	}
 }
 
 bool Npc::loadFromXml(const std::string& _name)
@@ -783,8 +788,13 @@ void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 		addEventWalk();
 	}
 
+	if(creature == this){
+		if(m_npcEventHandler){
+			m_npcEventHandler->onCreatureAppear(creature);
+		}
+	}
 	//only players for script events
-	if(Player* player = const_cast<Player*>(creature->getPlayer())){
+	else if(Player* player = const_cast<Player*>(creature->getPlayer())){
 		if(m_npcEventHandler){
 			m_npcEventHandler->onCreatureAppear(creature);
 		}
@@ -804,8 +814,13 @@ void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool 
 {
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 
+	if(creature == this){
+		if(m_npcEventHandler){
+			m_npcEventHandler->onCreatureDisappear(creature);
+		}
+	}
 	//only players for script events
-	if(Player* player = const_cast<Player*>(creature->getPlayer())){
+	else if(Player* player = const_cast<Player*>(creature->getPlayer())){
 		if(m_npcEventHandler){
 			m_npcEventHandler->onCreatureDisappear(creature);
 		}
@@ -1252,51 +1267,8 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptInterface.loadBuffer(scriptstream.str(), this);
 						lua_State* L = scriptInterface.getLuaState();
 
-						lua_getglobal(L, "n1");
-						if(lua_isnumber(L, -1)){
-							npcState->scriptVars.n1 = (int)lua_tonumber(L, -1);
-						}
-
-						lua_getglobal(L, "n2");
-						if(lua_isnumber(L, -1)){
-							npcState->scriptVars.n2 = (int)lua_tonumber(L, -1);
-						}
-
-						lua_getglobal(L, "n3");
-						if(lua_isnumber(L, -1)){
-							npcState->scriptVars.n3 = (int)lua_tonumber(L, -1);
-						}
-
-						lua_getglobal(L, "b1");
-						if(lua_isboolean(L, -1)){
-							npcState->scriptVars.b1 = (bool)(lua_toboolean(L, -1) == 1);
-						}
-
-						lua_getglobal(L, "b2");
-						if(lua_isboolean(L, -1)){
-							npcState->scriptVars.b2 = (bool)(lua_toboolean(L, -1) == 1);
-						}
-
-						lua_getglobal(L, "b3");
-						if(lua_isboolean(L, -1)){
-							npcState->scriptVars.b3 = (bool)(lua_toboolean(L, -1) == 1);
-						}
-
-						lua_getglobal(L, "s1");
-						if(lua_isstring(L, -1)){
-							npcState->scriptVars.s1 = lua_tostring(L, -1);
-						}
-
-						lua_getglobal(L, "s2");
-						if(lua_isstring(L, -1)){
-							npcState->scriptVars.s2 = lua_tostring(L, -1);
-						}
-
-						lua_getglobal(L, "s3");
-						if(lua_isstring(L, -1)){
-							npcState->scriptVars.s3 = lua_tostring(L, -1);
-						}
-
+						lua_getglobal(L, "_state");
+						NpcScriptInterface::popState(L, npcState);
 						scriptInterface.releaseScriptEnv();
 					}
 
@@ -1358,15 +1330,6 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 							else if((*it).strValue == "|TEXT|"){
 								lua_pushstring(L, npcState->respondToText.c_str());
 							}
-							else if((*it).strValue == "|STATE|"){
-								lua_newtable(L);				
-								
-								LuaScriptInterface::setField(L, "price", npcState->price);
-								LuaScriptInterface::setField(L, "amount", npcState->amount);
-								LuaScriptInterface::setField(L, "itemid", npcState->itemId);
-								LuaScriptInterface::setField(L, "topic", npcState->topic);
-								LuaScriptInterface::setField(L, "isidle", npcState->isIdle);
-							}
 							else{
 								std::cout << "Warning [Npc::executeResponse] Unknown script param: " << (*it).strValue << std::endl;
 								break;
@@ -1376,7 +1339,11 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 						}
 					}
 
+					NpcScriptInterface::pushState(L, npcState);
+					lua_setglobal(L, "_state");
 					m_scriptInterface->callFunction(paramCount);
+					lua_getglobal(L, "_state");
+					NpcScriptInterface::popState(L, npcState);
 					m_scriptInterface->releaseScriptEnv();
 				}
 				else{
@@ -1937,6 +1904,7 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "selfMove", NpcScriptInterface::luaActionMove);
 	lua_register(m_luaState, "selfMoveTo", NpcScriptInterface::luaActionMoveTo);
 	lua_register(m_luaState, "selfTurn", NpcScriptInterface::luaActionTurn);
+	lua_register(m_luaState, "selfFollow", NpcScriptInterface::luaActionFollow);
 	lua_register(m_luaState, "selfGetPosition", NpcScriptInterface::luaSelfGetPos);
 	lua_register(m_luaState, "creatureGetName", NpcScriptInterface::luaCreatureGetName);
 	lua_register(m_luaState, "creatureGetName2", NpcScriptInterface::luaCreatureGetName2);
@@ -1945,6 +1913,8 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doNpcSetCreatureFocus", NpcScriptInterface::luaSetNpcFocus);
 	lua_register(m_luaState, "getNpcCid", NpcScriptInterface::luaGetNpcCid);
 	lua_register(m_luaState, "getNpcPos", NpcScriptInterface::luaGetNpcPos);
+	lua_register(m_luaState, "getNpcState", NpcScriptInterface::luaGetNpcState);
+	lua_register(m_luaState, "setNpcState", NpcScriptInterface::luaSetNpcState);
 	lua_register(m_luaState, "getNpcName", NpcScriptInterface::luaGetNpcName);
 	lua_register(m_luaState, "getNpcParameter", NpcScriptInterface::luaGetNpcParameter);
 }
@@ -2059,6 +2029,30 @@ int NpcScriptInterface::luaActionTurn(lua_State* L)
 	return 0;
 }
 
+int NpcScriptInterface::luaActionFollow(lua_State* L)
+{
+	//selfFollow(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(cid != 0 && !player){
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Npc* npc = env->getNpc();
+	if(!npc){
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	npc->setFollowCreature(player, true);
+	lua_pushboolean(L, true);
+	return 1;
+}
+
 int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 {
 	//getDistanceTo(uid)
@@ -2120,6 +2114,54 @@ int NpcScriptInterface::luaGetNpcPos(lua_State* L)
 	return 1;
 }
 
+int NpcScriptInterface::luaGetNpcState(lua_State* L)
+{
+	//getNpcState(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	const Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		lua_pushnil(L);
+		return 1;
+	}
+
+	Npc* npc = env->getNpc();
+	if(!npc){
+		lua_pushnil(L);
+		return 1;
+	}
+
+	NpcState* state = npc->getState(player);
+	NpcScriptInterface::pushState(L, state);
+	return 1;
+}
+
+int NpcScriptInterface::luaSetNpcState(lua_State* L)
+{
+	//setNpcState(state, cid)
+
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	const Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		lua_pushnil(L);
+		return 1;
+	}
+
+	Npc* npc = env->getNpc();
+	if(!npc){
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	NpcState* state = npc->getState(player);
+	NpcScriptInterface::popState(L, state);
+	lua_pushboolean(L, true);
+	return 1;
+}
+
 int NpcScriptInterface::luaGetNpcCid(lua_State* L)
 {
 	//getNpcCid()
@@ -2175,6 +2217,53 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 	}
 
 	return 1;
+}
+
+void NpcScriptInterface::pushState(lua_State *L, NpcState* state)
+{
+	lua_newtable(L);
+	setField(L, "price", state->price);
+	setField(L, "amount", state->amount);
+	setField(L, "itemid", state->itemId);
+	setField(L, "subtype", state->subType);
+	setField(L, "topic", state->topic);
+	setField(L, "level", state->level);
+	setFieldBool(L, "isidle", state->isIdle);
+
+	setField(L, "n1", state->scriptVars.n1);
+	setField(L, "n2", state->scriptVars.n2);
+	setField(L, "n3", state->scriptVars.n3);
+
+	setFieldBool(L, "b1", state->scriptVars.b1);
+	setFieldBool(L, "b2", state->scriptVars.b2);
+	setFieldBool(L, "b3", state->scriptVars.b3);
+
+	setField(L, "s1", state->scriptVars.s1);
+	setField(L, "s2", state->scriptVars.s2);
+	setField(L, "s3", state->scriptVars.s3);
+}
+
+void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
+{
+	state->price = getField(L, "price");
+	state->amount = getField(L, "amount");
+	state->itemId = getField(L, "itemid");
+	state->subType = getField(L, "subtype");
+	state->topic = getField(L, "topic");
+	state->level = getField(L, "level");
+	state->isIdle = getFieldBool(L, "isidle");
+
+	state->scriptVars.n1 = getField(L, "n1");
+	state->scriptVars.n2 = getField(L, "n2");
+	state->scriptVars.n3 = getField(L, "n3");
+
+	state->scriptVars.b1 = getFieldBool(L, "b1");
+	state->scriptVars.b2 = getFieldBool(L, "b2");
+	state->scriptVars.n3 = getFieldBool(L, "b3");
+
+	state->scriptVars.s1 = getField(L, "s1");
+	state->scriptVars.s2 = getField(L, "s2");
+	state->scriptVars.s3 = getField(L, "s3");
 }
 
 NpcEventsHandler::NpcEventsHandler(Npc* npc)

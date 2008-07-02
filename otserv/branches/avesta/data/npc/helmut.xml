@@ -1,28 +1,28 @@
 <?xml version="1.0"?>
 <npc name="Helmut" floorchange="0" walkinterval="2500">
-	<health now="150" max="150"/>
-	<look type="133" head="20" body="120" legs="75" feet="13"/>
+  <health now="150" max="150"/>
+  <look type="133" head="20" body="120" legs="75" feet="13"/>
 
   <interaction range="3" idletime="30">
 
     <interact keywords="hi" param="sorcerer" focus="1">
       <!--These are the alternative keywords-->
       <keywords>hello</keywords>
-      
+
       <response text="Oh, be welcome |NAME|."/>
     </interact>
 
     <interact keywords="hi" focus="1">
       <!--These are the alternative keywords-->
       <keywords>hello</keywords>
-      
+
       <response text="Hello..."/>
     </interact>
 
     <interact keywords="bye" focus="0">
       <!--These are the alternative keywords-->
       <keywords>farewell</keywords>
-      
+
       <response text="Farewell."/>
     </interact>
 
@@ -63,15 +63,15 @@
     <interact keywords="instant;rune" topic="1">
       <response text="I sell attack spells, healing spells, support spells and summon spells. Which of these interests you most?"/>
     </interact>
-    
+
     <interact keywords="attack;rune" topic="1">
       <response text="I sell missile rune spells, explosive rune spells, field rune spells, wall rune spells and bomb rune spells."/>
     </interact>
-    
+
     <interact keywords="support;rune" topic="1">
       <response text="In this category I have 'Destroy Field'."/>
     </interact>
-    
+
     <interact keywords="missile;rune;spell" topic="1">
       <response text="In this category I have 'Light Magic Missile', 'Heavy Magic Missile' and 'Sudden Death'."/>
     </interact>
@@ -103,10 +103,10 @@
     <interact keywords="summon;spell" topic="1">
       <response text="In this category I have 'Summon Creature'."/>
     </interact>
-    
+
     <interact keywords="8" topic="2">
       <response text="For level 8 I have 'Find Person' and 'Light'.">
-      <action name="topic" value="2"/>
+        <action name="topic" value="2"/>
       </response>
     </interact>
 
@@ -233,11 +233,11 @@
     <interact keywords="|*|" topic="3">
       <response text="Maybe some other time."/>
     </interact>
-    
+
     <!-- Mainly for testing purposes, will trigger when we do not have any other response -->
     <interact keywords="|*|">
       <response text="I have no idea what your talking about."/>
     </interact>
-    
+
   </interaction>
 </npc>
