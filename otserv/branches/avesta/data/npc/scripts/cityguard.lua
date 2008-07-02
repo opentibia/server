@@ -9,7 +9,7 @@ local followTimeout = 10
 
 function isSkulled(cid)
 	local skullType = getPlayerSkullType(cid)
-	if(skullType == 0) then
+	if(skullType >= 3) then
 		return true
 	end
 	
