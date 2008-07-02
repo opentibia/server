@@ -577,8 +577,9 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*
 		return false;
 	}
 
-	const SpectatorVec& list = getSpectators(creature->getPosition());
-	SpectatorVec::const_iterator it;
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	getSpectators(list, creature->getPosition(), false, true);
 
 	//send to client
 	Player* tmpPlayer = NULL;
@@ -618,8 +619,9 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	int32_t index = cylinder->__getIndexOfThing(creature);
 	cylinder->__removeThing(creature, 0);
 
-	const SpectatorVec& list = getSpectators(cylinder->getPosition());
-	SpectatorVec::const_iterator it;
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	getSpectators(list, cylinder->getPosition(), false, true);
 
 	//send to client
 	Player* player = NULL;
@@ -628,16 +630,11 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 			player->sendCreatureDisappear(creature, index, isLogout);
 		}
 	}
-	player = creature->getPlayer();
-	if(player) {
-		player->sendCreatureDisappear(creature, index, isLogout);
-	}
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onCreatureDisappear(creature, index, isLogout);
 	}
-	creature->onCreatureDisappear(creature, index, isLogout);
 
 	creature->getParent()->postRemoveNotification(creature, index, true);
 

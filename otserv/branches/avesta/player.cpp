@@ -3316,9 +3316,11 @@ void Player::onPlacedCreature()
 
 void Player::onRemovedCreature()
 {
+	/*
 	if(client){
 		client->sendReLoginWindow();
 	}
+	*/
 }
 
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)

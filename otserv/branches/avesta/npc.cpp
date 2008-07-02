@@ -439,9 +439,9 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 					xmlNodePtr altKeyNode = tmpNode->children;
 					while(altKeyNode){
 						if(xmlStrcmp(altKeyNode->name, (const xmlChar*)"text") == 0){
-							char* nodeValue = (char*)xmlNodeGetContent(tmpNode);
-							inputList.push_back(asLowerCaseString(nodeValue));
-							xmlFreeOTSERV(nodeValue);
+							if(readXMLContentString(altKeyNode, strValue)){
+								inputList.push_back(asLowerCaseString(strValue));
+							}
 						}
 
 						altKeyNode = altKeyNode->next;
@@ -628,10 +628,10 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										xmlNodePtr scriptNode = subNode->children;
 										while(scriptNode){
 											if(xmlStrcmp(scriptNode->name, (const xmlChar*)"text") == 0){
-												action.actionType = ACTION_SCRIPT;
-												char* nodeValue = (char*)xmlNodeGetContent(scriptNode);
-												action.strValue = nodeValue;
-												xmlFreeOTSERV(nodeValue);
+												if(readXMLContentString(scriptNode, strValue)){
+													action.actionType = ACTION_SCRIPT;
+													action.strValue = strValue;
+												}
 											}
 
 											scriptNode = scriptNode->next;
@@ -789,10 +789,11 @@ void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 			m_npcEventHandler->onCreatureAppear(creature);
 		}
 
-		NpcState* npcState = getState(player, false);
-		if(npcState && !npcState->isIdle){
+		NpcState* npcState = getState(player);
+		if(npcState){
 			if(canSee(player->getPosition())){
-				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_LEAVE);
+				npcState->respondToCreature = player->getID();
+				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_ENTER);
 				executeResponse(player, npcState, response);
 			}
 		}
@@ -809,8 +810,9 @@ void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool 
 			m_npcEventHandler->onCreatureDisappear(creature);
 		}
 
-		NpcState* npcState = getState(player, false);
-		if(npcState && !npcState->isIdle){
+		NpcState* npcState = getState(player);
+		if(npcState){
+			npcState->respondToCreature = player->getID();
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_LEAVE);
 			executeResponse(player, npcState, response);
 		}
@@ -827,20 +829,23 @@ void Npc::onCreatureMove(const Creature* creature, const Tile* newTile, const Po
 			m_npcEventHandler->onCreatureMove(creature, oldPos, newPos);
 		}
 
-		NpcState* npcState = getState(player, false);
-		if(npcState && !npcState->isIdle){
+		NpcState* npcState = getState(player);
+		if(npcState){
 			bool canSeeNewPos = canSee(newPos);
 			bool canSeeOldPos = canSee(oldPos);
 
 			if(canSeeNewPos && !canSeeOldPos){
+				npcState->respondToCreature = player->getID();
 				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_ENTER);
 				executeResponse(player, npcState, response);
 			}
 			else if(!canSeeNewPos && canSeeOldPos){
+				npcState->respondToCreature = player->getID();
 				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_LEAVE);
 				executeResponse(player, npcState, response);
 			}
 			else if(canSeeNewPos && canSeeOldPos){
+				npcState->respondToCreature = player->getID();
 				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_MOVE);
 				executeResponse(player, npcState, response);
 			}
@@ -974,6 +979,9 @@ void Npc::onThink(uint32_t interval)
 			npcState->prevRespondToText = npcState->respondToText;
 			npcState->respondToText = "";
 		}
+
+		response = getResponse(player, npcState, EVENT_THINK);
+		executeResponse(player, npcState, response);
 
 		if(!npcState->isIdle){
 			isIdle = false;
@@ -1226,6 +1234,19 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "level = " << npcState->level << std::endl;
 						scriptstream << "spellname = '" << npcState->spellName << "'" << std::endl;
 						scriptstream << "name = '" << player->getName() << "'" << std::endl;
+
+						scriptstream << "n1 = " << npcState->scriptVars.n1 << std::endl;
+						scriptstream << "n2 = " << npcState->scriptVars.n2 << std::endl;
+						scriptstream << "n3 = " << npcState->scriptVars.n3 << std::endl;
+
+						scriptstream << "b1 = " << (npcState->scriptVars.b1 ? "true" : "false" ) << std::endl;
+						scriptstream << "b2 = " << (npcState->scriptVars.b2 ? "true" : "false" ) << std::endl;
+						scriptstream << "b3 = " << (npcState->scriptVars.b3 ? "true" : "false" ) << std::endl;
+
+						scriptstream << "s1 = '" << npcState->scriptVars.s1 << "'" << std::endl;
+						scriptstream << "s2 = '" << npcState->scriptVars.s2 << "'" << std::endl;
+						scriptstream << "s3 = '" << npcState->scriptVars.s3 << "'" << std::endl;
+
 						scriptstream << (*it).strValue;
 
 						scriptInterface.loadBuffer(scriptstream.str(), this);
@@ -1390,6 +1411,10 @@ bool Npc::getNextStep(Direction& dir)
 {
 	if(Creature::getNextStep(dir)){
 		return true;
+	}
+
+	if(walkTicks <= 0){
+		return false;
 	}
 
 	if(!isIdle || focusCreature != 0){
@@ -1806,6 +1831,7 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, Np
 {
 	switch(eventType){
 		case EVENT_BUSY: return getResponse(responseList, player, npcState, "onBusy", true); break;
+		case EVENT_THINK: return getResponse(responseList, player, npcState, "onThink", true); break;
 		case EVENT_PLAYER_ENTER: return getResponse(responseList, player, npcState, "onPlayerEnter", true); break;
 		case EVENT_PLAYER_MOVE: return getResponse(responseList, player, npcState, "onPlayerMove", true); break;
 		case EVENT_PLAYER_LEAVE: return getResponse(responseList, player, npcState, "onPlayerLeave", true); break;
