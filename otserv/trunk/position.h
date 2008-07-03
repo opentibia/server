@@ -49,9 +49,9 @@ public:
 
 	template<int deltax, int deltay, int deltaz>
 	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(p1.x - p2.x) > deltax ||
-			std::abs(p1.y - p2.y) > deltay ||
-			std::abs(p1.z - p2.z) > deltaz){
+		if(std::abs(float(p1.x - p2.x)) > deltax ||
+			std::abs(float(p1.y - p2.y)) > deltay ||
+			std::abs(float(p1.z - p2.z)) > deltaz){
 			return false;
 		}
 		return true;
@@ -59,8 +59,8 @@ public:
 	
 	template<int deltax, int deltay>
 	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(p1.x - p2.x) > deltax ||
-			std::abs(p1.y - p2.y) > deltay){
+		if(std::abs(float(p1.x - p2.x)) > deltax ||
+			std::abs(float(p1.y - p2.y)) > deltay){
 			return false;
 		}
 		return true;
