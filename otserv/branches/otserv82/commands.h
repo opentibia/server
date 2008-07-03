@@ -63,6 +63,7 @@ protected:
 	bool subtractMoney(Creature* creature, const std::string& cmd, const std::string& param);
 	bool reloadInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool testCommand(Creature* creature, const std::string& cmd, const std::string& param);
+	bool testTutorialCommand(Creature* creature, const std::string& cmd, const std::string& param);
 	bool getInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool closeServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool openServer(Creature* creature, const std::string& cmd, const std::string& param);

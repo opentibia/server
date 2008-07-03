@@ -505,6 +505,11 @@ public:
 	void sendChannel(uint16_t channelId, const std::string& channelName)
 		{if(client) client->sendChannel(channelId, channelName);}
 
+	void sendTutorial(uint8_t tutorialId)
+		{if(client) client->sendTutorial(tutorialId);}
+	void sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc)
+		{if (client) client->sendAddMarker(pos, markType, desc);}
+
 	void receivePing() {if(npings > 0) npings--;}
 
 	virtual void onThink(uint32_t interval);
