@@ -696,6 +696,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseDebugAssert(msg);
 		break;
 
+	//case 0xF0:
+	//	parse*(msg);
+	//	break;
+
 	default:
 //#ifdef __DEBUG__
 		printf("unknown packet header: %x \n", recvbyte);
@@ -1256,7 +1260,7 @@ void ProtocolGame::parseLookInShop(NetworkMessage &msg)
 {
 	uint16_t id = msg.GetU16();
 	uint16_t count = msg.GetByte();
-	
+
 	addGameTask(&Game::playerLookInShop, player->getID(), id, count);
 }
 
@@ -1574,7 +1578,7 @@ void ProtocolGame::sendShop(const std::list<ShopInfo>& shop)
 		{
 			msg->AddByte(shop.size());
 		}
-		
+
 		std::list<ShopInfo>::const_iterator it;
 		uint32_t i = 0;
 		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i)
@@ -2197,6 +2201,26 @@ void ProtocolGame::sendVIP(uint32_t guid, const std::string& name, bool isOnline
 		msg->AddU32(guid);
 		msg->AddString(name);
 		msg->AddByte(isOnline == true ? 1 : 0);
+	}
+}
+
+void ProtocolGame::sendTutorial(uint8_t tutorialId)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		msg->AddByte(0xDC);
+		msg->AddByte(tutorialId);
+	}
+}
+
+void ProtocolGame::sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		msg->AddByte(0xDD);
+		msg->AddPosition(pos);
+		msg->AddByte(markType);
+		msg->AddString(desc);
 	}
 }
 

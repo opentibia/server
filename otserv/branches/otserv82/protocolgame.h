@@ -180,6 +180,9 @@ private:
 	void sendVIP(uint32_t guid, const std::string& name, bool isOnline);
 	void sendReLoginWindow();
 
+	void sendTutorial(uint8_t tutorialId);
+	void sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc);
+
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(const LightInfo& lightInfo);
 
@@ -259,7 +262,7 @@ private:
 	void AddInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void UpdateInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void RemoveInventoryItem(NetworkMessage* msg, slots_t slot);
-	
+
 	//shop
 	void AddShopItem(NetworkMessage* msg, const ShopInfo item);
 
