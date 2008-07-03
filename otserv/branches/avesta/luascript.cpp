@@ -939,7 +939,32 @@ const char* LuaScriptInterface::popString(lua_State *L)
 {
 	lua_pop(L,1);
 	const char* str = lua_tostring(L, 0);
-	return str? str : "";
+	if(!str || strlen(str) == 0){
+		return "";
+	}
+
+	return str;
+}
+
+void LuaScriptInterface::setField(lua_State *L, const char* index, int32_t val)
+{
+	lua_pushstring(L, index);
+	lua_pushnumber(L, (double)val);
+	lua_settable(L, -3);
+}
+
+void LuaScriptInterface::setField(lua_State *L, const char* index, const std::string& val)
+{
+	lua_pushstring(L, index);
+	lua_pushstring(L, val.c_str());
+	lua_settable(L, -3);
+}
+
+void LuaScriptInterface::setFieldBool(lua_State *L, const char* index, bool val)
+{
+	lua_pushstring(L, index);
+	lua_pushboolean(L, val);
+	lua_settable(L, -3);
 }
 
 int32_t LuaScriptInterface::getField(lua_State *L, const char *key)
@@ -957,30 +982,19 @@ bool LuaScriptInterface::getFieldBool(lua_State *L, const char *key)
 	bool result;
 	lua_pushstring(L, key);
 	lua_gettable(L, -2);  // get table[key]
-	result = lua_toboolean(L, -1);
+	result = (lua_toboolean(L, -1) == 1);
 	lua_pop(L, 1);  // remove number and key
 	return result;
 }
 
-void LuaScriptInterface::setField(lua_State *L, const char* index, int32_t val)
+std::string LuaScriptInterface::getFieldString(lua_State *L, const char *key)
 {
-	lua_pushstring(L, index);
-	lua_pushnumber(L, (double)val);
-	lua_settable(L, -3);
-}
-
-void LuaScriptInterface::setFieldBool(lua_State *L, const char* index, bool val)
-{
-	lua_pushstring(L, index);
-	lua_pushboolean(L, (double)val);
-	lua_settable(L, -3);
-}
-
-void LuaScriptInterface::setField(lua_State *L, const char* index, const std::string& val)
-{
-	lua_pushstring(L, index);
-	lua_pushstring(L, val.c_str());
-	lua_settable(L, -3);
+	std::string result;
+	lua_pushstring(L, key);
+	lua_gettable(L, -2);  // get table[key]
+	result = lua_tostring(L, -1);
+	lua_pop(L, 1);  // remove number and key
+	return result;
 }
 
 void LuaScriptInterface::registerFunctions()

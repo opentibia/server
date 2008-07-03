@@ -1240,35 +1240,40 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 						std::stringstream scriptstream;
 						//attach various variables that could be interesting
-						scriptstream << "cid = " << env->addThing(player) << std::endl;
-						scriptstream << "topic = " << npcState->topic << std::endl;
-						scriptstream << "itemid = " << npcState->itemId << std::endl;
-						scriptstream << "subtype = " << npcState->subType << std::endl;
-						scriptstream << "amount = " << npcState->amount << std::endl;
-						scriptstream << "price = " << npcState->price << std::endl;
-						scriptstream << "level = " << npcState->level << std::endl;
-						scriptstream << "spellname = '" << npcState->spellName << "'" << std::endl;
-						scriptstream << "name = '" << player->getName() << "'" << std::endl;
+						scriptstream << "cid = " << env->addThing(player) << "\n";
 
-						scriptstream << "n1 = " << npcState->scriptVars.n1 << std::endl;
-						scriptstream << "n2 = " << npcState->scriptVars.n2 << std::endl;
-						scriptstream << "n3 = " << npcState->scriptVars.n3 << std::endl;
+						scriptstream << "_state = {" << std::endl;
+						scriptstream << "topic = " << npcState->topic << ',' << std::endl;
+						scriptstream << "itemid = " << npcState->itemId << ',' << std::endl;
+						scriptstream << "subtype = " << npcState->subType << ',' << std::endl;
+						scriptstream << "amount = " << npcState->amount << ',' << std::endl;
+						scriptstream << "price = " << npcState->price << ',' << std::endl;
+						scriptstream << "level = " << npcState->level << ',' << std::endl;
+						scriptstream << "spellname = \"" << npcState->spellName << "\"" << ',' << std::endl;
+						scriptstream << "name = \"" << player->getName() << "\"" << ',' << std::endl;
 
-						scriptstream << "b1 = " << (npcState->scriptVars.b1 ? "true" : "false" ) << std::endl;
-						scriptstream << "b2 = " << (npcState->scriptVars.b2 ? "true" : "false" ) << std::endl;
-						scriptstream << "b3 = " << (npcState->scriptVars.b3 ? "true" : "false" ) << std::endl;
+						scriptstream << "n1 = " << npcState->scriptVars.n1 << ',' << std::endl;
+						scriptstream << "n2 = " << npcState->scriptVars.n2 << ',' << std::endl;
+						scriptstream << "n3 = " << npcState->scriptVars.n3 << ',' << std::endl;
 
-						scriptstream << "s1 = '" << npcState->scriptVars.s1 << "'" << std::endl;
-						scriptstream << "s2 = '" << npcState->scriptVars.s2 << "'" << std::endl;
-						scriptstream << "s3 = '" << npcState->scriptVars.s3 << "'" << std::endl;
+						scriptstream << "b1 = " << (npcState->scriptVars.b1 ? "true" : "false" ) << ',' << std::endl;
+						scriptstream << "b2 = " << (npcState->scriptVars.b2 ? "true" : "false" ) << ',' << std::endl;
+						scriptstream << "b3 = " << (npcState->scriptVars.b3 ? "true" : "false" ) << ',' << std::endl;
+
+						scriptstream << "s1 = \"" << npcState->scriptVars.s1 << "\"" << ',' << std::endl;
+						scriptstream << "s2 = \"" << npcState->scriptVars.s2 << "\"" << ',' << std::endl;
+						scriptstream << "s3 = \"" << npcState->scriptVars.s3 << "\"" << std::endl;
+						scriptstream << "}" << std::endl;
 
 						scriptstream << (*it).strValue;
 
-						scriptInterface.loadBuffer(scriptstream.str(), this);
-						lua_State* L = scriptInterface.getLuaState();
+						//std::cout << scriptstream.str() << std::endl;
 
-						lua_getglobal(L, "_state");
-						NpcScriptInterface::popState(L, npcState);
+						if(scriptInterface.loadBuffer(scriptstream.str(), this) != -1){
+							lua_State* L = scriptInterface.getLuaState();
+							lua_getglobal(L, "_state");
+							NpcScriptInterface::popState(L, npcState);
+						}
 						scriptInterface.releaseScriptEnv();
 					}
 
@@ -1660,12 +1665,6 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 		}
 
-		if((*it)->getInteractType() == INTERACT_EVENT){
-			if((*it)->getInputText() == asLowerCaseString(text)){
-				return (*it);
-			}
-		}
-
 		if(npcState->isIdle && (*it)->getFocusState() != 1){
 			//We are idle, and this response does not activate the npc.
 			continue;
@@ -1674,6 +1673,12 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 		if(!npcState->isIdle && (*it)->getFocusState() == 1){
 			//We are not idle, and this response would activate us again.
 			continue;
+		}
+
+		if((*it)->getInteractType() == INTERACT_EVENT){
+			if((*it)->getInputText() == asLowerCaseString(text)){
+				return (*it);
+			}
 		}
 
 		if((*it)->getInteractType() != INTERACT_TEXT){
@@ -2228,6 +2233,7 @@ void NpcScriptInterface::pushState(lua_State *L, NpcState* state)
 	setField(L, "subtype", state->subType);
 	setField(L, "topic", state->topic);
 	setField(L, "level", state->level);
+	setField(L, "spellname", state->spellName);
 	setFieldBool(L, "isidle", state->isIdle);
 
 	setField(L, "n1", state->scriptVars.n1);
@@ -2251,6 +2257,7 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->subType = getField(L, "subtype");
 	state->topic = getField(L, "topic");
 	state->level = getField(L, "level");
+	state->spellName = getFieldString(L, "spellname");
 	state->isIdle = getFieldBool(L, "isidle");
 
 	state->scriptVars.n1 = getField(L, "n1");
@@ -2261,9 +2268,9 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->scriptVars.b2 = getFieldBool(L, "b2");
 	state->scriptVars.n3 = getFieldBool(L, "b3");
 
-	state->scriptVars.s1 = getField(L, "s1");
-	state->scriptVars.s2 = getField(L, "s2");
-	state->scriptVars.s3 = getField(L, "s3");
+	state->scriptVars.s1 = getFieldString(L, "s1");
+	state->scriptVars.s2 = getFieldString(L, "s2");
+	state->scriptVars.s3 = getFieldString(L, "s3");
 }
 
 NpcEventsHandler::NpcEventsHandler(Npc* npc)

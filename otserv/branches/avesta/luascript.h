@@ -306,6 +306,7 @@ public:
 	static int32_t getField(lua_State *L, const char *key);
 	static void setField(lua_State *L, const char* index, int32_t val);
 	static void setField(lua_State *L, const char* index, const std::string& val);
+	static std::string getFieldString(lua_State *L, const char *key);
 	static void setFieldBool(lua_State *L, const char* index, bool val);
 	static bool getFieldBool(lua_State *L, const char *key);
 
