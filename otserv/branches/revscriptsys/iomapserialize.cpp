@@ -24,7 +24,6 @@
 
 #include "house.h"
 #include "configmanager.h"
-#include "luascript.h"
 #include "game.h"
 
 extern ConfigManager g_config;
@@ -222,7 +221,7 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 
 					if(pid == 0){
 						tile->__internalAddThing(item);
-						item->__startDecaying();
+						g_game.startDecay(item);
 					}
 				}
 				else

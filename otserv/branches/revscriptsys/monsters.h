@@ -56,10 +56,8 @@ struct summonBlock_t{
 	uint32_t speed;
 };
 
-class BaseSpell;
-
 struct spellBlock_t{
-	BaseSpell* spell;
+	//BaseSpell* spell;
 	uint32_t chance;
 	uint32_t speed;
 	uint32_t range;
@@ -159,7 +157,7 @@ public:
 private:
 	ConditionDamage* getDamageCondition(ConditionType_t conditionType,
 		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
-	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "");
+	//bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "");
 
 	bool loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
 

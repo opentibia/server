@@ -135,6 +135,7 @@ struct Abilities{
 };
 
 class Condition;
+class Weapon;
 
 class ItemType {
 private:
@@ -183,6 +184,7 @@ public:
 	float          weight;
 	bool           showCount;
 	WeaponType_t   weaponType;
+	Weapon*        weaponInstance;
 	Ammo_t         amuType;
 	ShootType_t    shootType;
 	MagicEffectClasses magicEffect;
@@ -297,9 +299,12 @@ public:
 	void addItemType(ItemType* iType);
 
 	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
+	ItemType* getElement(uint32_t id) {return items.getElement(id);}
 	uint32_t size() {return items.size();}
 
 protected:
+	void loadWeaponDefaults();
+
 	typedef std::map<int32_t, int32_t> ReverseItemMap;
 	ReverseItemMap reverseItemMap;
 

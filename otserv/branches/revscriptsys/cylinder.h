@@ -192,8 +192,6 @@ public:
 	  * \param index points to the destination index (inventory slot/container position)
 	  */
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
-
-	virtual void __startDecaying();
 };
 
 

@@ -31,7 +31,6 @@
 #include "const.h"
 #include "tile.h"
 #include "enums.h"
-#include "creatureevent.h"
 
 #include <list>
 
@@ -339,9 +338,6 @@ public:
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
 	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
-	//creature script events
-	bool registerCreatureEvent(const std::string& name);
-
 	virtual void setParent(Cylinder* cylinder){
 		_tile = dynamic_cast<Tile*>(cylinder);
 		Thing::setParent(cylinder);
@@ -416,16 +412,6 @@ protected:
 	uint32_t lastHitCreature;
 	uint32_t blockCount;
 	uint32_t blockTicks;
-
-	//creature script events
-	uint32_t scriptEventsBitField;
-	bool hasEventRegistered(CreatureEventType_t event){
-		return (0 != (scriptEventsBitField & ((uint32_t)1 << event)));
-	}
-	typedef std::list<CreatureEvent*> CreatureEventList;
-	CreatureEventList eventsList;
-	CreatureEventList::iterator findEvent(CreatureEventType_t type);
-	CreatureEvent* getCreatureEvent(CreatureEventType_t type);
 
 	void updateMapCache();
 #ifdef __DEBUG__

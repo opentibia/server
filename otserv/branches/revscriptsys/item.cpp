@@ -21,28 +21,22 @@
 
 #include "definitions.h"
 #include "item.h"
+#include "tools.h"
+
+// Item subtypes
+#include "beds.h"
 #include "container.h"
 #include "depot.h"
+#include "mailbox.h"
 #include "teleport.h"
 #include "trashholder.h"
-#include "mailbox.h"
-#include "house.h"
-#include "game.h"
-#include "luascript.h"
-
-#include "actions.h"
-#include "combat.h"
+#include "house.h" // Door item
+#include "combat.h" // Magic Field item
 #include "weapons.h"
-//[ added for beds system
-#include "beds.h"
-//]
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-
-extern Game g_game;
-extern Weapons* g_weapons;
 
 Items Item::items;
 
@@ -166,10 +160,11 @@ Item* Item::clone() const
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
-
+/* REVSCRIPT TODO Remember to remove things from the script enviroment!
 	if(getUniqueId() != 0){
 		ScriptEnviroment::removeUniqueThing(this);
 	}
+*/
 }
 
 void Item::setDefaultSubtype()
@@ -768,7 +763,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 
 		s << ".";
 
-		const Weapon* weapon = g_weapons->getWeapon(this);
+		const Weapon* weapon = getWeapon();
 		if(weapon && weapon->getWieldInfo()){
 			const uint32_t wieldInfo = weapon->getWieldInfo();
 			s << std::endl << "It can only be wielded properly by ";
@@ -947,7 +942,8 @@ void Item::setUniqueId(uint16_t n)
 		return;
 
 	ItemAttributes::setUniqueId(n);
-	ScriptEnviroment::addUniqueThing(this);
+	// REVSCRIPT TODO Make sure they are added to the enviroment
+	//ScriptEnviroment::addUniqueThing(this);
 }
 
 bool Item::canDecay()
@@ -1230,9 +1226,4 @@ void ItemAttributes::deleteAttrs(Attribute* attr)
 		}
 		delete attr;
 	}
-}
-
-void Item::__startDecaying()
-{
-	g_game.startDecay(this);
 }

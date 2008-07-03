@@ -35,19 +35,14 @@
 #include "chat.h"
 #include "house.h"
 #include "combat.h"
-#include "movement.h"
-#include "weapons.h"
-#include "creatureevent.h"
 #include "status.h"
 #include "beds.h"
+#include "weapons.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
 extern Chat g_chat;
 extern Vocations g_vocations;
-extern MoveEvents* g_moveEvents;
-extern Weapons* g_weapons;
-extern CreatureEvents* g_creatureEvents;
 
 AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
@@ -318,7 +313,7 @@ Item* Player::getWeapon()
 			case WEAPON_CLUB:
 			case WEAPON_WAND:
 			{
-				const Weapon* weapon = g_weapons->getWeapon(item);
+				const Weapon* weapon = item->getWeapon();
 				if(weapon){
 					return item;
 				}
@@ -332,7 +327,7 @@ Item* Player::getWeapon()
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
 
 					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
-						const Weapon* weapon = g_weapons->getWeapon(ammuItem);
+						const Weapon* weapon = ammuItem->getWeapon();
 						if(weapon){
 							shootRange = item->getShootRange();
 							return ammuItem;
@@ -340,7 +335,7 @@ Item* Player::getWeapon()
 					}
 				}
 				else{
-					const Weapon* weapon = g_weapons->getWeapon(item);
+					const Weapon* weapon = item->getWeapon();
 					if(weapon){
 						return item;
 					}
@@ -1297,8 +1292,9 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		Item* item;
 		for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
 			if((item = getInventoryItem((slots_t)slot))){
-				item->__startDecaying();
-				g_moveEvents->onPlayerEquip(this, item, (slots_t)slot);
+				g_game.startDecay(item);
+				// REVSCRIPT TODO Event callback
+				//g_moveEvents->onPlayerEquip(this, item, (slots_t)slot);
 			}
 		}
 
@@ -2896,8 +2892,8 @@ Thing* Player::__getThing(uint32_t index) const
 void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
-		//calling movement scripts
-		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index);
+		// REVSCRIPT TODO Event callback
+		//g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index);
 	}
 
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
@@ -2931,8 +2927,8 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 void Player::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
-		//calling movement scripts
-		g_moveEvents->onPlayerDeEquip(this, thing->getItem(), (slots_t)index, isCompleteRemoval);
+		// REVSCRIPT TODO Event callback
+		//g_moveEvents->onPlayerDeEquip(this, thing->getItem(), (slots_t)index, isCompleteRemoval);
 	}
 
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
@@ -3057,7 +3053,7 @@ void Player::doAttacking(uint32_t interval)
 	if((OTSYS_TIME() - lastAttack) >= getAttackSpeed() ){
 		Item* tool = getWeapon();
 		bool result = false;
-		const Weapon* weapon = g_weapons->getWeapon(tool);
+		const Weapon* weapon = tool->getWeapon();
 		if(weapon){
 			if(!weapon->interuptSwing()){
 				result = weapon->useWeapon(this, tool, attackedCreature);
@@ -3318,10 +3314,10 @@ void Player::onIdleStatus()
 
 void Player::onPlacedCreature()
 {
-	//scripting event - onLogIn
-	if(!g_creatureEvents->playerLogIn(this)){
-		kickPlayer(); //The script won't let the player be online for now.
-	}
+	// REVSCRIPT TODO Event callback (onLogIn)
+	//if(!g_creatureEvents->playerLogIn(this)){
+	//	kickPlayer(); //The script won't let the player be online for now.
+	//}
 }
 
 void Player::onRemovedCreature()

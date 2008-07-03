@@ -40,7 +40,6 @@
 #include "commands.h"
 #include "outfit.h"
 #include "vocation.h"
-#include "scriptmanager.h"
 #include "configmanager.h"
 
 #include "tools.h"
@@ -107,7 +106,7 @@ int main(int argc, char *argv[])
 	mainExceptionHandler.InstallHandler();
 #endif
 
-	std::cout << ":: OTServ Development-Version 0.6.0 - Avesta branch" << std::endl;
+	std::cout << ":: OTServ Development-Version 0.6.0 - revscriptsys branch" << std::endl;
 	std::cout << ":: ==============================================" << std::endl;
 	std::cout << "::" << std::endl;
 
@@ -270,11 +269,6 @@ void mainLoader(int argc, char *argv[])
 		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
-
-	//load scripts
-	if(ScriptingManager::getInstance()->loadScriptSystems() == false){
-		exit(-1);
-	}
 
 	// load monster data
 	filename.str("");

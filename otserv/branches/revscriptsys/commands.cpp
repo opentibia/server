@@ -31,19 +31,12 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "npc.h"
 #include "monsters.h"
 #include "game.h"
-#include "actions.h"
 #include "house.h"
 #include "ioplayer.h"
 #include "tools.h"
 #include "ban.h"
 #include "configmanager.h"
 #include "town.h"
-#include "spells.h"
-#include "talkaction.h"
-#include "movement.h"
-#include "spells.h"
-#include "weapons.h"
-#include "raids.h"
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 #include "outputmessage.h"
@@ -57,14 +50,8 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include <libxml/parser.h>
 
 extern ConfigManager g_config;
-extern Actions* g_actions;
 extern Monsters g_monsters;
 extern BanManager g_bans;
-extern TalkActions* g_talkactions;
-extern MoveEvents* g_moveEvents;
-extern Spells* g_spells;
-extern Weapons* g_weapons;
-extern CreatureEvents* g_creatureEvents;
 extern Game g_game;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
@@ -73,7 +60,6 @@ extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
 //table of commands
 s_defcommands Commands::defined_commands[] = {
-	{"/s",&Commands::placeNpc},
 	{"/m",&Commands::placeMonster},
 	{"/summon",&Commands::placeSummon},
 	{"/B",&Commands::broadcastMessage},
@@ -101,7 +87,6 @@ s_defcommands Commands::defined_commands[] = {
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	{"/serverdiag",&Commands::serverDiag},
 #endif
-	{"/raid",&Commands::forceRaid}
 };
 
 
@@ -236,32 +221,6 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 		player->sendTextMessage(MSG_STATUS_CONSOLE_RED, cmd.c_str());
 
 	return true;
-}
-
-bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Npc* npc = new Npc(param);
-	if(!npc->isLoaded()){
-		delete npc;
-		return true;
-	}
-
-	// Place the npc
-	if(game->placeCreature(npc, creature->getPosition())){
-		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
-		return true;
-	}
-	else{
-		delete npc;
-		Player* player = creature->getPlayer();
-		if(player){
-			player->sendCancelMessage(RET_NOTENOUGHROOM);
-			game->addMagicEffect(creature->getPosition(), NM_ME_PUFF);
-		}
-		return true;
-	}
-
-	return false;
 }
 
 bool Commands::placeMonster(Creature* creature, const std::string& cmd, const std::string& param)
@@ -486,12 +445,8 @@ bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const s
 bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Player* player = creature->getPlayer();
-
-	if(param == "actions"){
-		g_actions->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded actions.");
-	}
-	else if(param == "commands"){
+	
+	if(param == "commands"){
 		this->reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded commands.");
 	}
@@ -503,36 +458,11 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 		g_config.reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
 	}
-	else if(param == "talk" || param == "talkactions" || param == "talk actions"){
-		g_talkactions->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded talk actions.");
-	}
-	else if(param == "move" || param == "movement" || param == "movement actions"){
-		g_moveEvents->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded movement actions.");
-	}
-	else if(param == "spells"){
-		g_spells->reload();
-		g_monsters.reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded spells and monsters.");
-	}
-	else if(param == "raids"){
-		Raids::getInstance()->reload();
-		Raids::getInstance()->startup();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded raids.");
-	}
 	/*
-	else if(param == "weapons"){
-		g_weapons->reload();
-	}
 	else if(param == "items"){
 		Item::items.reload();
 	}
 	*/
-	else if(param == "creaturescripts" || param == "creature scripts" || param == "cs"){
-		g_creatureEvents->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded creature scripts.");
-	}
 	else{
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Option not found.");
 	}
@@ -1160,44 +1090,3 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 	return true;
 }
 */
-bool Commands::forceRaid(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Player* player = creature->getPlayer();
-	if(!player){
-		return false;
-	}
-
-	Raid* raid = Raids::getInstance()->getRaidByName(param);
-	if(!raid || !raid->isLoaded()){
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "No such raid exists.");
-		return false;
-	}
-
-	if(Raids::getInstance()->getRunning()){
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Another raid is already being executed.");
-		return false;
-	}
-
-	Raids::getInstance()->setRunning(raid);
-	RaidEvent* event = raid->getNextRaidEvent();
-
-	if(!event){
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "The raid does not contain any data.");
-		return false;
-	}
-
-	raid->setState(RAIDSTATE_EXECUTING);
-	uint32_t ticks = event->getDelay();
-	if(ticks > 0){
-		Scheduler::getScheduler().addEvent(createSchedulerTask(ticks,
-			boost::bind(&Raid::executeRaidEvent, raid, event)));
-	}
-	else{
-		Dispatcher::getDispatcher().addTask(createTask(
-		boost::bind(&Raid::executeRaidEvent, raid, event)));
-
-	}
-
-	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
-	return true;
-}

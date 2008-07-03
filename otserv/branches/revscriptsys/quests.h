@@ -86,29 +86,4 @@ class Quest
 		MissionsList missions;
 };
 
-class Quests
-{
-	public:
-		Quests();
-		~Quests();
-
-		static Quests* getInstance()
-		{
-			static Quests instance;
-			return &instance;
-		}
-
-		QuestsList::const_iterator getFirstQuest() const {return quests.begin();}
-		QuestsList::const_iterator getEndQuest() const {return quests.end();}
-
-		bool loadFromXml(const std::string& _filename);
-		Quest* getQuestByID(uint16_t id);
-		uint16_t getQuestsCount(Player* player);
-		bool reload();
-
-private:
-	std::string filename;
-	QuestsList quests;
-};
-
 #endif

@@ -452,17 +452,33 @@ public:
 	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange);
 	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
 
+	// Action helper function
+public:
+	ReturnValue canUse(const Player* player, const Position& pos);
+	ReturnValue canUse(const Player* player, const Position& pos, const Item* item);
+	ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
+
+	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey);
+	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
+		uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
+
+protected:
+	ReturnValue internalUseItem(Player* player, const Position& pos,
+		uint8_t index, Item* item, uint32_t creatureId);
+	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
+		Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
+	bool openContainer(Player* player, Container* container, const uint8_t index);
+	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);
+
 	//animation help functions
+public:
 	void addCreatureHealth(const Creature* target);
 	void addCreatureHealth(const SpectatorVec& list, const Creature* target);
-	void addAnimatedText(const Position& pos, uint8_t textColor,
-		const std::string& text);
-	void addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor,
-		const std::string& text);
+	void addAnimatedText(const Position& pos, uint8_t textColor, const std::string& text);
+	void addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor, const std::string& text);
 	void addMagicEffect(const Position& pos, uint8_t effect);
 	void addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t effect);
-	void addDistanceEffect(const Position& fromPos, const Position& toPos,
-	uint8_t effect);
+	void addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect);
 
 	std::string getTradeErrorDescription(ReturnValue ret, Item* item);
 
@@ -482,8 +498,6 @@ public:
 
 protected:
 
-	bool playerSayCommand(Player* player, SpeakClasses type, const std::string& text);
-	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
 	bool playerWhisper(Player* player, const std::string& text);
 	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);

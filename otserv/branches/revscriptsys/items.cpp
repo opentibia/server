@@ -20,8 +20,9 @@
 #include "otpch.h"
 
 #include "items.h"
-#include "spells.h"
+#include "item.h"
 #include "condition.h"
+#include "tools.h"
 #include "weapons.h"
 
 #include <libxml/xmlmemory.h>
@@ -33,8 +34,6 @@
 uint32_t Items::dwMajorVersion = 0;
 uint32_t Items::dwMinorVersion = 0;
 uint32_t Items::dwBuildNumber = 0;
-
-extern Spells* g_spells;
 
 ItemType::ItemType()
 {
@@ -71,6 +70,7 @@ ItemType::ItemType()
 	weight        = 0;  // weight of the item, e.g. throwing distance depends on it
 	showCount     = true;
 	weaponType    = WEAPON_NONE;
+	weaponInstance= NULL;
 	slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
 	amuType       = AMMO_NONE;
 	ammoAction    = AMMOACTION_NONE;
@@ -1251,7 +1251,52 @@ bool Items::loadFromXml(const std::string& datadir)
 		}
 	}
 
+	loadWeaponDefaults();
+
 	return true;
+}
+
+void Items::loadWeaponDefaults() {
+	for(uint32_t i = 0; i < Item::items.size(); ++i){
+		ItemType* it = Item::items.getElement(i);
+
+		if(!it || it->weaponInstance != NULL){
+			continue;
+		}
+
+		if(it->weaponType != WEAPON_NONE){
+			Weapon* weapon = NULL;
+			switch(it->weaponType){
+				case WEAPON_AXE:
+				case WEAPON_SWORD:
+				case WEAPON_CLUB:
+				{
+					weapon = new WeaponMelee();
+					break;
+				}
+
+				case WEAPON_AMMO:
+				case WEAPON_DIST:
+				{
+					if(it->weaponType == WEAPON_DIST && it->amuType != AMMO_NONE){
+						//distance weapons with ammunitions are configured seperatly
+						continue;
+					}
+
+					weapon = new WeaponDistance();
+					break;
+				}
+				default:
+				{
+					break;
+				}
+			}
+			if(weapon) {
+				weapon->configureWeapon(*it);
+				it->weaponInstance = weapon;
+			}
+		}
+	}
 }
 
 ItemType& Items::getItemType(int32_t id)

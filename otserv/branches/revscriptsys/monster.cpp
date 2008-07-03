@@ -27,7 +27,6 @@
 #include "monster.h"
 #include "monsters.h"
 #include "game.h"
-#include "spells.h"
 #include "combat.h"
 #include "spawn.h"
 #include "configmanager.h"
@@ -89,15 +88,6 @@ Creature()
 
 	strDescription = mType->nameDescription;
 	toLowerCaseString(strDescription);
-
-	// register creature events
-	MonsterScriptList::iterator it;
-	for(it = mType->scriptList.begin(); it != mType->scriptList.end(); ++it){
-		if(!registerCreatureEvent(*it)){
-			std::cout << "Warning: [Monster::Monster]. Unknown event name - " << *it << std::endl;
-		}
-	}
-
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	monsterCount++;
@@ -638,7 +628,8 @@ void Monster::doAttacking(uint32_t interval)
 
 				minCombatValue = it->minCombatValue;
 				maxCombatValue = it->maxCombatValue;
-				it->spell->castSpell(this, attackedCreature);
+				// REVSCRIPT TODO Monsters should cast spells
+				//it->spell->castSpell(this, attackedCreature);
 				if(it->isMelee){
 					extraMeleeAttack = false;
 				}
@@ -761,7 +752,8 @@ void Monster::onThinkDefense(uint32_t interval)
 		if((it->chance >= (uint32_t)random_range(1, 100))){
 			minCombatValue = it->minCombatValue;
 			maxCombatValue = it->maxCombatValue;
-			it->spell->castSpell(this, this);
+			// REVSCRIPT TODO Monsters should cast spells
+			// it->spell->castSpell(this, this);
 		}
 	}
 
@@ -909,7 +901,7 @@ bool Monster::pushCreature(Creature* creature)
 	std::random_shuffle(dirList.begin(), dirList.end());
 
 	for(std::vector<Direction>::iterator it = dirList.begin(); it != dirList.end(); ++it){
-		const Position& tryPos = Spells::getCasterPosition(creature, *it);
+		const Position& tryPos = Combat::getCasterPosition(creature, *it);
 		Tile* toTile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
 
 		if(toTile && !toTile->hasProperty(BLOCKPATH)){
@@ -985,7 +977,7 @@ bool Monster::getNextStep(Direction& dir)
 	}
 
 	if(result && (canPushItems() || canPushCreatures()) ){
-		const Position& pos = Spells::getCasterPosition(this, dir);
+		const Position& pos = Combat::getCasterPosition(this, dir);
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 		if(tile){
 			if(canPushItems()){

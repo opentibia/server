@@ -43,19 +43,15 @@
 #include "game.h"
 #include "tile.h"
 #include "house.h"
-#include "actions.h"
 #include "combat.h"
 #include "ioplayer.h"
 #include "chat.h"
-#include "talkaction.h"
-#include "spells.h"
 #include "configmanager.h"
 #include "server.h"
 #include "party.h"
 #include "ban.h"
-#include "raids.h"
 #include "spawn.h"
-#include "quests.h"
+#include "beds.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -64,12 +60,9 @@ extern OTSYS_THREAD_LOCKVAR maploadlock;
 
 extern ConfigManager g_config;
 extern Server* g_server;
-extern Actions* g_actions;
 extern Commands commands;
 extern BanManager g_bans;
 extern Chat g_chat;
-extern TalkActions* g_talkactions;
-extern Spells* g_spells;
 
 Game::Game()
 {
@@ -138,13 +131,6 @@ void Game::setGameState(GameState_t newState)
 			{
 				Spawns::getInstance()->startup();
 
-				Raids::getInstance()->loadFromXml(g_config.getString(
-					ConfigManager::DATA_DIRECTORY) + "/raids/raids.xml");
-				Raids::getInstance()->startup();
-
-				Quests::getInstance()->loadFromXml(g_config.getString(
-					ConfigManager::DATA_DIRECTORY) + "quests.xml");
-
 				loadGameState();
 				break;
 			}
@@ -178,12 +164,12 @@ void Game::setGameState(GameState_t newState)
 
 void Game::saveGameState()
 {
-	ScriptEnviroment::saveGameState();
+	// REVSCRIPT TODO Save global storage
 }
 
 void Game::loadGameState()
 {
-	ScriptEnviroment::loadGameState();
+	// REVSCRIPT TODO Load global storage
 }
 
 int Game::loadMap(std::string filename, std::string filekind)
@@ -237,9 +223,10 @@ void Game::refreshMap()
 			Item* item = (*it)->clone();
 			ReturnValue ret = internalAddItem(tile, item , INDEX_WHEREEVER, FLAG_NOLIMIT);
 			if(ret == RET_NOERROR){
-				if(item->getUniqueId() != 0){
-					ScriptEnviroment::addUniqueThing(item);
-				}
+				// REVSCRIPT TODO Add unique items
+				//if(item->getUniqueId() != 0){
+				//	ScriptEnviroment::addUniqueThing(item);
+				//}
 				startDecay(item);
 			}
 			else{
@@ -303,6 +290,410 @@ OTSYS_THREAD_RETURN Game::monitorThread(void *p)
 	}
 }
 #endif
+
+/*****************************************************************************/
+
+ReturnValue Game::canUse(const Player* player, const Position& pos)
+{
+	const Position& playerPos = player->getPosition();
+
+	if(pos.x != 0xFFFF){
+		if(playerPos.z > pos.z){
+			return RET_FIRSTGOUPSTAIRS;
+		}
+		else if(playerPos.z < pos.z){
+			return RET_FIRSTGODOWNSTAIRS;
+		}
+		else if(!Position::areInRange<1,1,0>(playerPos, pos)){
+			return RET_TOOFARAWAY;
+		}
+	}
+
+	return RET_NOERROR;
+}
+
+ReturnValue Game::canUse(const Player* player, const Position& pos, const Item* item)
+{
+	/*
+	Action* action = getAction(item, ACTION_UNIQUEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_ACTIONID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_ITEMID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_RUNEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+*/
+	return RET_NOERROR;
+}
+
+ReturnValue Game::canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight)
+{
+	if(toPos.x == 0xFFFF){
+		return RET_NOERROR;
+	}
+
+	const Position& creaturePos = creature->getPosition();
+
+	if(creaturePos.z > toPos.z){
+		return RET_FIRSTGOUPSTAIRS;
+	}
+	else if(creaturePos.z < toPos.z){
+		return RET_FIRSTGODOWNSTAIRS;
+	}
+	else if(!Position::areInRange<7,5,0>(toPos, creaturePos)){
+		return RET_TOOFARAWAY;
+	}
+
+	if(checkLineOfSight && !canThrowObjectTo(creaturePos, toPos)){
+		return RET_CANNOTTHROW;
+	}
+
+	return RET_NOERROR;
+}
+/*
+bool Game::executeUse(Action* action, Player* player, Item* item,
+	const PositionEx& posEx, uint32_t creatureId)
+{
+	if(!action->executeUse(player, item, posEx, posEx, false, creatureId)){
+		return false;
+	}
+
+	return true;
+}
+*/
+
+ReturnValue Game::internalUseItem(Player* player, const Position& pos,
+	uint8_t index, Item* item, uint32_t creatureId)
+{
+	bool foundAction = false; //(getAction(item) != NULL);
+
+	//check if it is a house door
+	if(Door* door = item->getDoor()){
+		if(!door->canUse(player)){
+			return RET_CANNOTUSETHISOBJECT;
+		}
+	}
+	if(BedItem* bed = item->getBed()) {
+		if(!bed->canUse(player)) {
+			return RET_CANNOTUSETHISOBJECT;
+		}
+		bed->sleep(player);
+		return RET_NOERROR;
+	}
+
+	int32_t stack = item->getParent()->__getIndexOfThing(item);
+	PositionEx posEx(pos, stack);
+/*
+	Action* action = getAction(item, ACTION_UNIQUEID);
+	if(action){
+		//only continue with next action in the list if the previous returns false
+		if(executeUse(action, player, item, posEx, creatureId)){
+			return RET_NOERROR;
+		}
+	}
+
+	action = getAction(item, ACTION_ACTIONID);
+	if(action){
+		//only continue with next action in the list if the previous returns false
+		if(executeUse(action, player, item, posEx, creatureId)){
+			return RET_NOERROR;
+		}
+	}
+
+	action = getAction(item, ACTION_ITEMID);
+	if(action){
+		//only continue with next action in the list if the previous returns false
+		if(executeUse(action, player, item, posEx, creatureId)){
+			return RET_NOERROR;
+		}
+	}
+
+	action = getAction(item, ACTION_RUNEID);
+	if(action){
+		//only continue with next action in the list if the previous returns false
+		if(executeUse(action, player, item, posEx, creatureId)){
+			return RET_NOERROR;
+		}
+	}
+*/
+	if(item->isReadable()){
+		if(item->canWriteText()){
+			player->setWriteItem(item, item->getMaxWriteLength());
+			player->sendTextWindow(item, item->getMaxWriteLength(), true);
+		}
+		else{
+			player->setWriteItem(NULL);
+			player->sendTextWindow(item, 0, false);
+		}
+
+		return RET_NOERROR;
+	}
+
+	//if it is a container try to open it
+	if(Container* container = item->getContainer()){
+		if(openContainer(player, container, index)){
+			return RET_NOERROR;
+		}
+	}
+
+	if(!foundAction){
+		return RET_CANNOTUSETHISOBJECT;
+	}
+
+	return RET_NOERROR;
+}
+
+bool Game::useItem(Player* player, const Position& pos, uint8_t index,
+	Item* item, bool isHotkey)
+{
+	if(!player->canDoAction()){
+		return false;
+	}
+	
+	player->stopWalk();
+
+	if(isHotkey){
+		int32_t subType = -1;
+		if(item->hasSubType() && !item->hasCharges()){
+			subType = item->getSubType();
+		}
+
+		const ItemType& it = Item::items[item->getID()];
+		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			return false;
+		}
+
+		showUseHotkeyMessage(player, it, itemCount);
+	}
+	else{
+		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			return false;
+		}
+	}
+
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
+	return true;
+}
+/*
+bool Game::executeUseEx(Action* action, Player* player, Item* item, const PositionEx& fromPosEx,
+	const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId)
+{
+	if(isHotkey){
+		int32_t subType = -1;
+		if(item->hasSubType() && !item->hasCharges()){
+			subType = item->getSubType();
+		}
+
+		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
+			return false;
+		}
+	}
+	else{
+		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
+			return false;
+		}
+	}
+
+	return true;
+}
+*/
+ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
+	Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess)
+{
+	isSuccess = false;
+/*
+	Action* action = getAction(item, ACTION_UNIQUEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPosEx);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		//only continue with next action in the list if the previous returns false
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
+			return RET_NOERROR;
+		}
+	}
+
+	action = getAction(item, ACTION_ACTIONID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPosEx);
+		if(ret != RET_NOERROR){
+			isSuccess = false;
+			return ret;
+		}
+
+		//only continue with next action in the list if the previous returns false
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
+			return RET_NOERROR;
+		}
+	}
+
+	action = getAction(item, ACTION_ITEMID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPosEx);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		//only continue with next action in the list if the previous returns false
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
+			return RET_NOERROR;
+		}
+	}
+
+	action = getAction(item, ACTION_RUNEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, toPosEx);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		//only continue with next action in the list if the previous returns false
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
+			return RET_NOERROR;
+		}
+	}
+*/
+	return RET_CANNOTUSETHISOBJECT;
+}
+
+bool Game::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
+	uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId /* = 0*/)
+{
+	if(!player->canDoAction()){
+		return false;
+	}
+
+	player->stopWalk();
+/*
+	Action* action = getAction(item);
+	if(!action){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+*/
+	int32_t fromStackPos = item->getParent()->__getIndexOfThing(item);
+	PositionEx fromPosEx(fromPos, fromStackPos);
+	PositionEx toPosEx(toPos, toStackPos);
+	ReturnValue ret = RET_NOERROR;
+	bool isSuccess = false;
+
+	if(isHotkey){
+		int32_t subType = -1;
+		if(item->hasSubType() && !item->hasCharges()){
+			subType = item->getSubType();
+		}
+
+		const ItemType& it = Item::items[item->getID()];
+		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
+
+		if(isSuccess){
+			showUseHotkeyMessage(player, it, itemCount);
+		}
+	}
+	else{
+		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
+	}
+
+	if(ret != RET_NOERROR){
+		player->sendCancelMessage(ret);
+		return false;
+	}
+
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
+	return true;
+}
+
+void Game::showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount)
+{
+	std::stringstream ss;
+	if(itemCount == 1){
+		ss << "Using the last " << it.name << "...";
+	}
+	else{
+		ss << "Using one of " << itemCount << " " << it.pluralName << "...";
+	}
+
+	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+}
+
+bool Game::openContainer(Player* player, Container* container, const uint8_t index)
+{
+	Container* openContainer = NULL;
+
+	//depot container
+	if(Depot* depot = container->getDepot()){
+		Depot* myDepot = player->getDepot(depot->getDepotId(), true);
+		myDepot->setParent(depot->getParent());
+		openContainer = myDepot;
+	}
+	else{
+		openContainer = container;
+	}
+
+	if(container->getCorpseOwner() != 0){
+		if(!player->canOpenCorpse(container->getCorpseOwner())){
+			player->sendCancel("You are not the owner.");
+			return true;
+		}
+	}
+
+	//open/close container
+	int32_t oldcid = player->getContainerID(openContainer);
+	if(oldcid != -1){
+		player->onCloseContainer(openContainer);
+		player->closeContainer(oldcid);
+	}
+	else{
+		player->addContainer(index, openContainer);
+		player->onSendContainer(openContainer);
+	}
+
+	return true;
+}
 
 /*****************************************************************************/
 
@@ -2080,9 +2471,9 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	}
 
 	Position walkToPos = fromPos;
-	ReturnValue ret = g_actions->canUse(player, fromPos);
+	ReturnValue ret = canUse(player, fromPos);
 	if(ret == RET_NOERROR){
-		ret = g_actions->canUse(player, toPos, item);
+		ret = canUse(player, toPos, item);
 		if(ret == RET_TOOFARAWAY){
 			walkToPos = toPos;
 		}
@@ -2135,7 +2526,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return false;
 	}
 
-	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item, isHotkey);
+	return useItemEx(player, fromPos, toPos, toStackPos, item, isHotkey);
 }
 
 bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPos,
@@ -2161,7 +2552,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-	ReturnValue ret = g_actions->canUse(player, pos);
+	ReturnValue ret = canUse(player, pos);
 	if(ret != RET_NOERROR){
 		if(ret == RET_TOOFARAWAY){
 			std::list<Direction> listDir;
@@ -2190,7 +2581,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-	g_actions->useItem(player, pos, index, item, isHotkey);
+	useItem(player, pos, index, item, isHotkey);
 	return true;
 }
 
@@ -2229,7 +2620,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		return false;
 	}
 
-	ReturnValue ret = g_actions->canUse(player, fromPos);
+	ReturnValue ret = canUse(player, fromPos);
 	if(ret != RET_NOERROR){
 		if(ret == RET_TOOFARAWAY){
 			std::list<Direction> listDir;
@@ -2258,7 +2649,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		return false;
 	}
 
-	return g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), item, isHotkey, creatureId);
+	return useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), item, isHotkey, creatureId);
 }
 
 bool Game::playerCloseContainer(uint32_t playerId, uint8_t cid)
@@ -3010,12 +3401,9 @@ bool Game::playerShowQuestLine(uint32_t playerId, uint16_t questId)
 		return false;
 	}
 
-	Quest* quest = Quests::getInstance()->getQuestByID(questId);
-	if(!quest){
-		return true;
-	}
+	// REVSCRIPT TODO Event callback
 	
-	player->sendQuestLine(quest);
+	//player->sendQuestLine(quest);
 	return true;
 }
 
@@ -3118,20 +3506,16 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return false;
 	}
 
-	
-	TalkActionResult_t result;
-	result = g_talkactions->onPlayerSpeak(player, type, text);
-	if(result == TALKACTION_BREAK){
-		return true;
+	//First, check if this was a builtin command
+	for(uint32_t i = 0; i < commandTags.size(); i++){
+		if(commandTags[i] == text.substr(0,1)){
+			if(commands.exeCommand(player, text) || player->getAccessLevel() > 0){
+				return true;
+			}
+		}
 	}
 
-	if(playerSayCommand(player, type, text)){
-		return true;
-	}
-
-	if(playerSaySpell(player, type, text)){
-		return true;
-	}
+	// REVSCRIPT TODO Event callback
 
 	player->removeMessageBuffer();
 
@@ -3167,34 +3551,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 
 		default:
 			break;
-	}
-
-	return false;
-}
-
-bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string& text)
-{
-	//First, check if this was a command
-	for(uint32_t i = 0; i < commandTags.size(); i++){
-		if(commandTags[i] == text.substr(0,1)){
-			if(commands.exeCommand(player, text) || player->getAccessLevel() > 0){
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
-{
-	TalkActionResult_t result;
-	result = g_spells->playerSaySpell(player, type, text);
-	if(result == TALKACTION_BREAK){
-		return internalCreatureSay(player, SPEAK_SAY, text);
-	}
-	else if(result == TALKACTION_FAILED){
-		return true;
 	}
 
 	return false;

@@ -799,10 +799,3 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 	itemlist.push_front(item);
 	item->setParent(this);
 }
-
-void Container::__startDecaying()
-{
-	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
-		(*it)->__startDecaying();
-	}
-}

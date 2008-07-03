@@ -41,9 +41,8 @@ class TrashHolder;
 class Mailbox;
 class Door;
 class MagicField;
-//[ added for beds system
 class BedItem;
-//]
+class Weapon;
 
 enum ITEMPROPERTY{
 	BLOCKSOLID = 0,
@@ -292,6 +291,7 @@ public:
 	void setID(uint16_t newid);
 
 	WeaponType_t getWeaponType() const {return items[id].weaponType;}
+	Weapon* getWeapon() const {return items[id].weaponInstance;}
 	Ammo_t	getAmuType() const {return items[id].amuType;}
 	int32_t	getShootRange() const {return items[id].shootRange;}
 
@@ -361,8 +361,6 @@ public:
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
-
-	virtual void __startDecaying();
 
 protected:
 	// If weight description is needed from outside of item class

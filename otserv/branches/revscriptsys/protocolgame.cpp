@@ -30,7 +30,6 @@
 #include "chat.h"
 #include "configmanager.h"
 #include "otsystem.h"
-#include "actions.h"
 #include "game.h"
 #include "ioplayer.h"
 #include "house.h"
@@ -38,8 +37,6 @@
 #include "ban.h"
 #include "ioaccount.h"
 #include "connection.h"
-#include "creatureevent.h"
-#include "quests.h"
 
 #include <string>
 #include <iostream>
@@ -51,10 +48,8 @@
 
 extern Game g_game;
 extern ConfigManager g_config;
-extern Actions actions;
 extern RSA* g_otservRSA;
 extern BanManager g_bans;
-extern CreatureEvents* g_creatureEvents;
 Chat g_chat;
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -398,15 +393,16 @@ bool ProtocolGame::logout(bool forced)
 				return false;
 			}
 
-			//scripting event - onLogOut
-			if(!g_creatureEvents->playerLogOut(player)){
+			// REVSCRIPT TODO Event callback onLogOut
+			//if(!g_creatureEvents->playerLogOut(player)){
 				//Let the script handle the error message
-				return false;
-			}
+			//	return false;
+			//}
 		}
 		else{
 			//execute the script even when we log out
-			g_creatureEvents->playerLogOut(player);
+			// REVSCRIPT TODO Event callback onLogOut
+			//g_creatureEvents->playerLogOut(player);
 		}
 	}
 
@@ -1949,7 +1945,8 @@ void ProtocolGame::sendQuestLog()
 		TRACK_MESSAGE(msg);
 
 		msg->AddByte(0xF0);
-		msg->AddU16(Quests::getInstance()->getQuestsCount(player));
+		msg->AddU16(0 /*quest count*/);
+		/*
 		for(QuestsList::const_iterator it = Quests::getInstance()->getFirstQuest();
 			it != Quests::getInstance()->getEndQuest(); ++it){
 			if((*it)->isStarted(player)){
@@ -1958,11 +1955,13 @@ void ProtocolGame::sendQuestLog()
 				msg->AddByte((*it)->isCompleted(player));
 			}
 		}
+		*/
 	}
 }
 
 void ProtocolGame::sendQuestLine(const Quest* quest)
 {
+	/*
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		TRACK_MESSAGE(msg);
@@ -1977,6 +1976,7 @@ void ProtocolGame::sendQuestLine(const Quest* quest)
 			}
 		}
 	}
+	*/
 }
 
 //tile

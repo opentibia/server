@@ -88,7 +88,6 @@ public:
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
-	virtual void __startDecaying();
 
 private:
 	void onAddContainerItem(Item* item);

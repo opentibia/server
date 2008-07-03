@@ -34,10 +34,8 @@
 #include "trashholder.h"
 #include "mailbox.h"
 #include "combat.h"
-#include "movement.h"
 
 extern Game g_game;
-extern MoveEvents* g_moveEvents;
 
 Tile Tile::null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 
@@ -1168,12 +1166,14 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 		//calling movement scripts
 		Creature* creature = thing->getCreature();
 		if(creature){
-			g_moveEvents->onCreatureMove(creature, this, true);
+			// REVSCRIPT TODO Event callback
+			//g_moveEvents->onCreatureMove(creature, this, true);
 		}
 		else{
 			Item* item = thing->getItem();
 			if(item){
-				g_moveEvents->onItemMove(item, this, true);
+				// REVSCRIPT TODO Event callback
+				//g_moveEvents->onItemMove(item, this, true);
 			}
 		}
 
@@ -1220,12 +1220,14 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 	//calling movement scripts
 	Creature* creature = thing->getCreature();
 	if(creature){
-		g_moveEvents->onCreatureMove(creature, this, false);
+		// REVSCRIPT TODO Event callback
+		//g_moveEvents->onCreatureMove(creature, this, false);
 	}
 	else{
 		Item* item = thing->getItem();
 		if(item){
-			g_moveEvents->onItemMove(item, this, false);
+			// REVSCRIPT TODO Event callback
+			//g_moveEvents->onItemMove(item, this, false);
 		}
 	}
 

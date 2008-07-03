@@ -36,6 +36,7 @@
 #include <ctime>
 #include <algorithm>
 
+class Quest;
 class House;
 class Weapon;
 class ProtocolGame;
@@ -753,10 +754,8 @@ protected:
 
 	friend class Game;
 	friend class Npc;
-	friend class LuaScriptInterface;
 	friend class Commands;
 	friend class Map;
-	friend class Actions;
 	friend class IOPlayer;
 	friend class ProtocolGame;
 };

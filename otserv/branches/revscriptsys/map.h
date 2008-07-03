@@ -31,7 +31,6 @@ using boost::shared_ptr;
 #include "definitions.h"
 #include "position.h"
 #include "item.h"
-//#include "creature.h"
 #include "iomapserialize.h"
 #include "fileloader.h"
 

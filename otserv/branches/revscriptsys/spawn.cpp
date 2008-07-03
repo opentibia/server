@@ -207,12 +207,6 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						}
 
 						Npc* npc = new Npc(name);
-						if(!npc->isLoaded()){
-							delete npc;
-
-							tmpNode = tmpNode->next;
-							continue;
-						}
 
 						npc->setDirection(direction);
 						npc->setMasterPos(placePos, radius);
@@ -438,7 +432,8 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 {
 	MonsterType* mType = g_monsters.getMonsterType(_name);
 	if(!mType){
-		std::cout << "[Spawn::addMonster] Can not find " << _name << std::endl;
+		// REVSCRIPT TODO Enable again
+		//std::cout << "[Spawn::addMonster] Can not find " << _name << std::endl;
 		return false;
 	}
 

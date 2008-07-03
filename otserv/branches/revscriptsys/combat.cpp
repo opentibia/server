@@ -31,14 +31,10 @@
 #include <sstream>
 
 extern Game g_game;
-extern Weapons* g_weapons;
 
 Combat::Combat()
 {
 	params.condition = NULL;
-	params.valueCallback = NULL;
-	params.tileCallback = NULL;
-	params.targetCallback = NULL;
 	area = NULL;
 
 	formulaType = FORMULA_UNDEFINED;
@@ -51,9 +47,6 @@ Combat::Combat()
 Combat::~Combat()
 {
 	delete params.condition;
-	delete params.valueCallback;
-	delete params.tileCallback;
-	delete params.targetCallback;
 	delete area;
 }
 
@@ -67,8 +60,8 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 		return true;
 	}
 	else if(Player* player = creature->getPlayer()){
-		if(params.valueCallback){
-			params.valueCallback->getMinMaxValues(player, min, max, params.useCharges);
+		if(params.damageCallback){
+			params.damageCallback(player, min, max, params.useCharges);
 			return true;
 		}
 		else{
@@ -84,7 +77,7 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 				case FORMULA_SKILL:
 				{
 					Item* tool = player->getWeapon();
-					const Weapon* weapon = g_weapons->getWeapon(tool);
+					const Weapon* weapon = tool->getWeapon();
 
 					min = (int32_t)minb;
 
@@ -478,26 +471,21 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 
 	return false;
 }
-
+/*
 bool Combat::setCallback(CallBackParam_t key)
 {
 	switch(key){
 		case CALLBACKPARAM_LEVELMAGICVALUE:
 		{
-			delete params.valueCallback;
-			params.valueCallback = new ValueCallback(FORMULA_LEVELMAGIC);
+			params.damageCallback = CombatDamageCalculationCallback(FORMULA_LEVELMAGIC);
 			return true;
-			break;
 		}
 
 		case CALLBACKPARAM_SKILLVALUE:
 		{
-			delete params.valueCallback;
-			params.valueCallback = new ValueCallback(FORMULA_SKILL);
+			params.damageCallback = CombatDamageCalculationCallback(FORMULA_SKILL);
 			return true;
-			break;
 		}
-
 		case CALLBACKPARAM_TARGETTILECALLBACK:
 		{
 			delete params.tileCallback;
@@ -511,7 +499,6 @@ bool Combat::setCallback(CallBackParam_t key)
 			params.targetCallback = new TargetCallback();
 			break;
 		}
-
 		default:
 		{
 			std::cout << "Combat::setCallback - Unknown callback type: " << (uint32_t)key << std::endl;
@@ -521,7 +508,6 @@ bool Combat::setCallback(CallBackParam_t key)
 
 	return false;
 }
-
 CallBack* Combat::getCallback(CallBackParam_t key)
 {
 	switch(key){
@@ -547,7 +533,7 @@ CallBack* Combat::getCallback(CallBackParam_t key)
 
 	return NULL;
 }
-
+*/
 bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	Combat2Var* var = (Combat2Var*)data;
@@ -662,9 +648,10 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 		}
 	}
 
-	if(params.tileCallback){
-		params.tileCallback->onTileCombat(caster, tile);
-	}
+	// REVSCRIPT TODO EVENT CALL
+	//if(params.tileCallback){
+	//	params.tileCallback->onTileCombat(caster, tile);
+	//}
 
 	if(params.impactEffect != NM_ME_NONE){
 		g_game.addMagicEffect(list, tile->getPosition(), params.impactEffect);
@@ -755,9 +742,10 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 				if(!params.isAggressive || (caster != *cit && Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
 					func(caster, *cit, params, data);
 
-					if(params.targetCallback){
-						params.targetCallback->onTargetCombat(caster, *cit);
-					}
+					// REVSCRIPT TODO EVENT CALL
+					//if(params.targetCallback){
+					//	params.targetCallback->onTargetCombat(caster, *cit);
+					//}
 				}
 			}
 
@@ -848,9 +836,10 @@ void Combat::doCombatMana(Creature* caster, Creature* target,
 		var.maxChange = maxChange;
 		CombatManaFunc(caster, target, params, (void*)&var);
 
-		if(params.targetCallback){
-			params.targetCallback->onTargetCombat(caster, target);
-		}
+		// REVSCRIPT TODO EVENT CALL
+		//if(params.targetCallback){
+		//	params.targetCallback->onTargetCombat(caster, target);
+		//}
 
 		if(params.impactEffect != NM_ME_NONE){
 			g_game.addMagicEffect(target->getPosition(), params.impactEffect);
@@ -883,9 +872,10 @@ void Combat::doCombatCondition(Creature* caster, Creature* target, const CombatP
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		CombatConditionFunc(caster, target, params, NULL);
 
-		if(params.targetCallback){
-			params.targetCallback->onTargetCombat(caster, target);
-		}
+		// REVSCRIPT TODO EVENT CALL
+		//if(params.targetCallback){
+		//	params.targetCallback->onTargetCombat(caster, target);
+		//}
 
 		if(params.impactEffect != NM_ME_NONE){
 			g_game.addMagicEffect(target->getPosition(), params.impactEffect);
@@ -908,9 +898,10 @@ void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatPara
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		CombatDispelFunc(caster, target, params, NULL);
 
-		if(params.targetCallback){
-			params.targetCallback->onTargetCombat(caster, target);
-		}
+		// REVSCRIPT TODO EVENT CALL
+		//if(params.targetCallback){
+		//	params.targetCallback->onTargetCombat(caster, target);
+		//}
 
 		if(params.impactEffect != NM_ME_NONE){
 			g_game.addMagicEffect(target->getPosition(), params.impactEffect);
@@ -929,9 +920,10 @@ void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatPar
 		CombatNullFunc(caster, target, params, NULL);
 		combatTileEffects(list, caster, target->getTile(), params);
 
-		if(params.targetCallback){
-			params.targetCallback->onTargetCombat(caster, target);
-		}
+		// REVSCRIPT TODO EVENT CALL
+		//if(params.targetCallback){
+		//	params.targetCallback->onTargetCombat(caster, target);
+		//}
 
 		if(params.impactEffect != NM_ME_NONE){
 			g_game.addMagicEffect(target->getPosition(), params.impactEffect);
@@ -945,157 +937,8 @@ void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatPar
 
 //**********************************************************
 
-void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, bool useCharges) const
-{
-	//"onGetPlayerMinMaxValues"(...)
-	if(m_scriptInterface->reserveScriptEnv()){
-		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-		lua_State* L = m_scriptInterface->getLuaState();
-
-		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
-			return;
-
-		uint32_t cid = env->addThing(player);
-
-		m_scriptInterface->pushFunction(m_scriptId);
-		lua_pushnumber(L, cid);
-
-		int32_t parameters = 1;
-
-		switch(type){
-			case FORMULA_LEVELMAGIC:
-			{
-				//"onGetPlayerMinMaxValues"(cid, level, maglevel)
-				lua_pushnumber(L, player->getLevel());
-				lua_pushnumber(L, player->getMagicLevel());
-				parameters += 2;
-				break;
-			}
-
-			case FORMULA_SKILL:
-			{
-				//"onGetPlayerMinMaxValues"(cid, attackSkill, attackValue, attackFactor)
-				Item* tool = player->getWeapon();
-				int32_t attackSkill = player->getWeaponSkill(tool);
-				int32_t attackValue = 7;
-				if(tool){
-					attackValue = tool->getAttack();
-
-					if(useCharges && tool->hasCharges()){
-						int32_t newCharge = std::max(0, tool->getCharges() - 1);
-						g_game.transformItem(tool, tool->getID(), newCharge);
-					}
-                }
-				float attackFactor = player->getAttackFactor();
-
-				lua_pushnumber(L, attackSkill);
-				lua_pushnumber(L, attackValue);
-				lua_pushnumber(L, attackFactor);
-				parameters += 3;
-				break;
-			}
-
-			default:
-				std::cout << "ValueCallback::getMinMaxValues - unknown callback type" << std::endl;
-				return;
-				break;
-		}
-
-		int size0 = lua_gettop(L);
-		if(lua_pcall(L, parameters, 2 /*nReturnValues*/, 0) != 0){
-			LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
-		}
-		else{
-			max = LuaScriptInterface::popNumber(L);
-			min = LuaScriptInterface::popNumber(L);
-		}
-
-		if((lua_gettop(L) + parameters /*nParams*/  + 1) != size0){
-			LuaScriptInterface::reportError(NULL, "Stack size changed!");
-		}
-
-		env->resetCallback();
-		m_scriptInterface->releaseScriptEnv();
-	}
-	else{
-		std::cout << "[Error] Call stack overflow. ValueCallback::getMinMaxValues" << std::endl;
-		return;
-	}
-}
-
-//**********************************************************
-
-void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
-{
-	//"onTileCombat"(cid, pos)
-	if(m_scriptInterface->reserveScriptEnv()){
-		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-		lua_State* L = m_scriptInterface->getLuaState();
-
-		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
-			return;
-
-		uint32_t cid = 0;
-
-		if(creature){
-			cid = env->addThing(creature);
-		}
-
-		m_scriptInterface->pushFunction(m_scriptId);
-		lua_pushnumber(L, cid);
-		m_scriptInterface->pushPosition(L, tile->getPosition(), 0);
-
-		m_scriptInterface->callFunction(2);
-
-		env->resetCallback();
-		m_scriptInterface->releaseScriptEnv();
-	}
-	else{
-		std::cout << "[Error] Call stack overflow. TileCallback::onTileCombat" << std::endl;
-		return;
-	}
-}
-
-//**********************************************************
-
-void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const
-{
-	//"onTargetCombat"(cid, target)
-	if(m_scriptInterface->reserveScriptEnv()){
-		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-		lua_State* L = m_scriptInterface->getLuaState();
-
-		if(!env->setCallbackId(m_scriptId, m_scriptInterface))
-			return;
-
-		uint32_t cid = 0;
-
-		if(creature){
-			cid = env->addThing(creature);
-		}
-
-		uint32_t targetCid = env->addThing(target);
-
-		m_scriptInterface->pushFunction(m_scriptId);
-		lua_pushnumber(L, cid);
-		lua_pushnumber(L, targetCid);
-
-		int size0 = lua_gettop(L);
-		if(lua_pcall(L, 2, 0 /*nReturnValues*/, 0) != 0){
-			LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
-		}
-
-		if((lua_gettop(L) + 2 /*nParams*/  + 1) != size0){
-			LuaScriptInterface::reportError(NULL, "Stack size changed!");
-		}
-
-		env->resetCallback();
-		m_scriptInterface->releaseScriptEnv();
-	}
-	else{
-		std::cout << "[Error] Call stack overflow. TargetCallback::onTargetCombat" << std::endl;
-		return;
-	}
+void CombatDamageCalculationCallback::operator()(Player* player, int32_t& min, int32_t& max, bool useCharges) const {
+	// REVSCRIPT TODO Event callback??
 }
 
 //**********************************************************
@@ -1449,4 +1292,52 @@ void MagicField::onStepInField(Creature* creature)
 			creature->addCondition(conditionCopy);
 		}
 	}
+}
+
+Position Combat::getCasterPosition(const Creature* creature, Direction dir)
+{
+	Position pos = creature->getPosition();
+
+	switch(dir){
+		case NORTH:
+			pos.y -= 1;
+			break;
+
+		case SOUTH:
+			pos.y += 1;
+			break;
+
+		case EAST:
+			pos.x += 1;
+			break;
+
+		case WEST:
+			pos.x -= 1;
+			break;
+
+		case SOUTHWEST:
+			pos.x -= 1;
+			pos.y += 1;
+		break;
+
+		case NORTHWEST:
+			pos.x -= 1;
+			pos.y -= 1;
+		break;
+
+		case NORTHEAST:
+			pos.x += 1;
+			pos.y -= 1;
+		break;
+
+		case SOUTHEAST:
+			pos.x += 1;
+			pos.y += 1;
+		break;
+
+		default:
+			break;
+	}
+
+	return pos;
 }
