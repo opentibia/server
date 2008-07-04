@@ -73,9 +73,11 @@ void OutputMessagePool::send(OutputMessage* msg)
 		if(msg->getConnection()){
 			if(msg->getConnection()->send(msg)){
 				// Note: if we ever decide to change how the pool works this will have to change
+				OTSYS_THREAD_LOCK(m_outputPoolLock, "");
 				if(msg->getState() != OutputMessage::STATE_FREE) {
 					msg->setState(OutputMessage::STATE_WAITING);
 				}
+				OTSYS_THREAD_UNLOCK(m_outputPoolLock, "");
 			}
 			else{
 				internalReleaseMessage(msg);
@@ -113,6 +115,7 @@ void OutputMessagePool::sendAll()
 
 			if((*it)->getConnection()){
 				if((*it)->getConnection()->send(*it)){
+					// Note: if we ever decide to change how the pool works this will have to change
 					if((*it)->getState() != OutputMessage::STATE_FREE) {
 						(*it)->setState(OutputMessage::STATE_WAITING);
 					}
@@ -139,8 +142,8 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 {
 	//Simulate that the message is sent and then liberate it
 	msg->getProtocol()->onSendMessage(msg);
-	m_outputMessages.push_back(msg);
 	msg->freeMessage();
+	m_outputMessages.push_back(msg);
 }
 
 void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/)
@@ -154,21 +157,21 @@ void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/
 		if(it != m_autoSendOutputMessages.end()){
 			m_autoSendOutputMessages.erase(it);
 		}
-		m_outputMessages.push_back(msg);
 		msg->freeMessage();
+		m_outputMessages.push_back(msg);
 		break;
 	}
 	case OutputMessage::STATE_ALLOCATED_NO_AUTOSEND:
-		m_outputMessages.push_back(msg);
 		msg->freeMessage();
+		m_outputMessages.push_back(msg);
 		break;
 	case OutputMessage::STATE_WAITING:
 		if(!sent){
 			std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_WAITING OutputMessage." << std::endl;
 		}
 		else{
-			m_outputMessages.push_back(msg);
 			msg->freeMessage();
+			m_outputMessages.push_back(msg);
 		}
 		break;
 	case OutputMessage::STATE_FREE:

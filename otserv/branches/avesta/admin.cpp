@@ -124,9 +124,9 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 	{
 		if(g_adminConfig->requireEncryption()){
 			if((time(NULL) - m_startTime) > 30000){
-				addLogLine(this, LOGTYPE_WARNING, 1, "encryption timeout");
 				outputPool->releaseMessage(output);
 				getConnection()->closeConnection();
+				addLogLine(this, LOGTYPE_WARNING, 1, "encryption timeout");
 				return;
 			}
 
@@ -134,6 +134,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 				output->AddByte(AP_MSG_ERROR);
 				output->AddString("encryption needed");
 				outputPool->send(output);
+				getConnection()->closeConnection();
 				addLogLine(this, LOGTYPE_WARNING, 1, "wrong command while ENCRYPTION_NO_SET");
 				return;
 			}
@@ -148,9 +149,9 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		if(g_adminConfig->requireLogin()){
 			if((time(NULL) - m_startTime) > 30000){
 				//login timeout
-				addLogLine(this, LOGTYPE_WARNING, 1, "login timeout");
 				outputPool->releaseMessage(output);
 				getConnection()->closeConnection();
+				addLogLine(this, LOGTYPE_WARNING, 1, "login timeout");
 				return;
 			}
 
@@ -158,8 +159,8 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 				output->AddByte(AP_MSG_ERROR);
 				output->AddString("too many login tries");
 				outputPool->send(output);
-				addLogLine(this, LOGTYPE_WARNING, 1, "too many login tries");
 				getConnection()->closeConnection();
+				addLogLine(this, LOGTYPE_WARNING, 1, "too many login tries");
 				return;
 			}
 
@@ -167,6 +168,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 				output->AddByte(AP_MSG_ERROR);
 				output->AddString("you are not logged in");
 				outputPool->send(output);
+				getConnection()->closeConnection();
 				addLogLine(this, LOGTYPE_WARNING, 1, "wrong command while NO_LOGGED_IN");
 				return;
 			}
