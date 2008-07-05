@@ -914,8 +914,10 @@ void Npc::onThink(uint32_t interval)
 	if(m_npcEventHandler){
 		m_npcEventHandler->onThink();
 	}
+	else {
+		isIdle = true;
+	}
 
-	isIdle = true;
 	for(StateList::iterator it = stateList.begin(); it != stateList.end();){
 		NpcState* npcState = *it;
 		const NpcResponse* response = NULL;
