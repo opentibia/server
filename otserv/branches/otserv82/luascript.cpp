@@ -1169,6 +1169,12 @@ void LuaScriptInterface::registerFunctions()
 	//doShowTextDialog(cid, itemid, text)
 	lua_register(m_luaState, "doShowTextDialog", LuaScriptInterface::luaDoShowTextDialog);
 
+	//doSendTutorial(cid, tutorialid)
+	lua_register(m_luaState, "doSendTutorial", LuaScriptInterface::luaDoSendTutorial);
+
+	//doAddMapMark(cid, pos, type, <optional> description)
+	lua_register(m_luaState, "doAddMapMark", LuaScriptInterface::luaDoAddMark);
+
 	//doDecayItem(uid)
 	lua_register(m_luaState, "doDecayItem", LuaScriptInterface::luaDoDecayItem);
 
@@ -2703,6 +2709,53 @@ int LuaScriptInterface::luaDoShowTextDialog(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 	}
 	return 1;
+}
+
+int LuaScriptInterface::luaDoSendTutorial(lua_State *L)
+{
+	//doSendTutorial(cid, tutorialid)
+	uint32_t tutorial = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+
+	if(player){
+		player->sendTutorial(tutorial);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+}
+
+int LuaScriptInterface::luaDoAddMark(lua_State *L)
+{
+	//doAddMapMark(cid, pos, type, <optional> description)
+	int32_t parameters = lua_gettop(L);
+	std::string description = "";
+	Position pos;
+	uint32_t stackpos;
+
+	if(parameters > 3) {
+		description = popString(L);
+	}
+	uint32_t type = popNumber(L);
+	popPosition(L, pos, stackpos);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+
+	if(player){
+		player->sendAddMarker(pos, type, description);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
 }
 
 int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)

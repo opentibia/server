@@ -364,6 +364,8 @@ protected:
 	static int luaDoPlayerSetLossPercent(lua_State *L);
 	static int luaDoSetCreatureDropLoot(lua_State *L);
 	static int luaGetPlayerSkullType(lua_State *L);
+	static int luaDoSendTutorial(lua_State *L);
+	static int luaDoAddMark(lua_State *L);
 
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
