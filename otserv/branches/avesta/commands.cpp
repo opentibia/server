@@ -374,7 +374,7 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 	}
 
 	int32_t type = atoi(tmp.substr(0, pos).c_str());
-	int32_t count = 100;
+	int32_t count = 1;
 	if(pos < tmp.size()){
 		tmp.erase(0, pos+1);
 		count = std::max(0, std::min(atoi(tmp.c_str()), 100));

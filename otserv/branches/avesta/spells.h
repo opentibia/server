@@ -232,8 +232,8 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 
-	static bool internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount);
-	static bool internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount, uint32_t reagentId, slots_t slot);
+	static ReturnValue internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount);
+	static ReturnValue internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount, uint32_t reagentId, slots_t slot, bool test = false);
 
 	static ConjureSpellFunction ConjureItem;
 	static ConjureSpellFunction ConjureFood;

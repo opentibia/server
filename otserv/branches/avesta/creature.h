@@ -382,6 +382,7 @@ protected:
 	int32_t masterRadius;
 	uint64_t lastStep;
 	uint32_t lastStepCost;
+	uint32_t extraStepDuration;
 	uint32_t baseSpeed;
 	int32_t varSpeed;
 	bool skillLoss;

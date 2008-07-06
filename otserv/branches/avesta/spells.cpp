@@ -1758,40 +1758,45 @@ bool ConjureSpell::loadFunction(const std::string& functionName)
 	return true;
 }
 
-bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount)
+ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount)
 {
 	Item* newItem = Item::CreateItem(conjureId, conjureCount);
 	if(!newItem){
-		return false;
+		return RET_NOTPOSSIBLE;
 	}
 
-	ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
-	if(ret != RET_NOERROR){
+	ReturnValue result = g_game.internalPlayerAddItem(player, newItem);
+	if(result != RET_NOERROR){
 		delete newItem;
 	}
-	return (ret == RET_NOERROR);
+
+	return result;
 }
 
-bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId,
-	uint32_t conjureCount, uint32_t reagentId, slots_t slot)
+ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId,
+	uint32_t conjureCount, uint32_t reagentId, slots_t slot, bool test /*= false*/)
 {
-	bool result = false;
 	if(reagentId != 0){
 		Item* item = player->getInventoryItem(slot);
 		if(item && item->getID() == reagentId){
 			if(item->isStackable() && item->getItemCount() != 1){ //TODO? reagentCount
-				return false;
+				return RET_YOUNEEDTOSPLITYOURSPEARS;
+			}
+
+			if(test){
+				return RET_NOERROR;
 			}
 
 			Item* newItem = g_game.transformItem(item, conjureId, conjureCount);
 			if(newItem){
 				g_game.startDecay(newItem);
 			}
-			result = true;
+
+			return RET_NOERROR;
 		}
 	}
 
-	return result;
+	return RET_YOUNEEDAMAGICITEMTOCASTSPELL;
 }
 
 bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, const std::string& param)
@@ -1803,58 +1808,75 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 	}
 
 	if(!player->hasFlag(PlayerFlag_IgnoreSpellCheck) && player->getZone() == ZONE_PVP){
-		player->sendCancel("You cannot conjure items here.");
+		player->sendCancelMessage(RET_CANNOTCONJUREITEMHERE);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
-	bool result = false;
-
+	ReturnValue result = RET_NOERROR;
 	if(spell->getReagentId() != 0){
+		//Test if we can cast the conjure spell on left hand
+		ReturnValue result1 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
+			spell->getReagentId(), SLOT_LEFT, true);
+	
+		if(result1 == RET_NOERROR){
+			//Check level/mana etc.
+			if(!spell->playerSpellCheck(player)){
+				return false;
+			}
 
-		if(!spell->playerSpellCheck(player)){
-			return false;
+			result1 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
+				spell->getReagentId(), SLOT_LEFT);
+
+			if(result1 == RET_NOERROR){
+				spell->postCastSpell(player, false);
+			}
 		}
 
-		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
-			spell->getReagentId(), SLOT_LEFT)){
-			spell->postCastSpell(player, false);
-			result = true;
+		//Check if we can cast the conjure spell on the right hand
+		ReturnValue result2 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
+			spell->getReagentId(), SLOT_RIGHT, true);
+	
+		if(result2 == RET_NOERROR){
+			//Check level/mana etc.
+			if(!spell->playerSpellCheck(player)){
+				//Finished the cast, add exhaustion and stuff
+				spell->postCastSpell(player, true, false);
+				return false;
+			}
+		
+			result2 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
+				spell->getReagentId(), SLOT_RIGHT);
+
+			if(result2 == RET_NOERROR){
+				spell->postCastSpell(player, false);
+			}
 		}
 
-		if(!spell->playerSpellCheck(player)){
+		if(result1 == RET_NOERROR || result2 == RET_NOERROR){
 			//Finished the cast, add exhaustion and stuff
 			spell->postCastSpell(player, true, false);
-			return false;
+			g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
+			return true;
 		}
 
-		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
-			spell->getReagentId(), SLOT_RIGHT)){
-			spell->postCastSpell(player, false);
-			result = true;
-		}
-
-		if(result){
-			//Finished the cast, add exhaustion and stuff
-			spell->postCastSpell(player, true, false);
+		result = result1;
+		if((result == RET_NOERROR && result2 != RET_NOERROR) || 
+			(result == RET_YOUNEEDAMAGICITEMTOCASTSPELL && result2 == RET_YOUNEEDTOSPLITYOURSPEARS) ) {
+			result = result2;
 		}
 	}
 	else{
-		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount())){
+		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount()) == RET_NOERROR){
 			spell->postCastSpell(player);
-			result = true;
+			g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
+			return true;
 		}
 	}
 
-	if(result){
-		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
-	}
-	else if(spell->getReagentId() != 0){
-		player->sendCancel("You need a magic item to cast this spell.");
-		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-	}
-
-	return result;
+	player->sendCancelMessage(result);
+	g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+	return false;
 }
 
 bool ConjureSpell::ConjureFood(const ConjureSpell* spell, Creature* creature, const std::string& param)
@@ -1864,20 +1886,19 @@ bool ConjureSpell::ConjureFood(const ConjureSpell* spell, Creature* creature, co
 	if(!player){
 		return false;
 	}
+		
+	uint32_t foodType[8] = { 
+		{ITEM_MEAT},
+		{ITEM_HAM},
+		{ITEM_GRAPE},
+		{ITEM_APPLE},
+		{ITEM_BREAD},
+		{ITEM_CHEESE},
+		{ITEM_ROLL},
+		{ITEM_BREAD}
+	};
 
-	uint32_t foodType = 0;
-	switch(random_range(0, 7)){
-		case 0: foodType = ITEM_MEAT; break;
-		case 1: foodType = ITEM_HAM; break;
-		case 2: foodType = ITEM_GRAPE; break;
-		case 3: foodType = ITEM_APPLE; break;
-		case 4: foodType = ITEM_BREAD; break;
-		case 5: foodType = ITEM_CHEESE; break;
-		case 6: foodType = ITEM_ROLL; break;
-		case 7: foodType = ITEM_BREAD; break;
-	}
-
-	bool result = internalConjureItem(player, foodType, 1);
+	bool result = (internalConjureItem(player, foodType[random_range(0, 7)], 1) == RET_NOERROR);
 
 	if(result){
 		spell->postCastSpell(player);

@@ -62,6 +62,7 @@ Creature::Creature() :
 
 	lastStep = 0;
 	lastStepCost = 1;
+	extraStepDuration = 0;
 	baseSpeed = 220;
 	varSpeed = 0;
 
@@ -165,7 +166,7 @@ int64_t Creature::getSleepTicks() const{
 	if(lastStep != 0){
 		int64_t ct = OTSYS_TIME();
 		int64_t stepDuration = getStepDuration();
-		int64_t delay = stepDuration - (ct - lastStep);
+		int64_t delay = stepDuration - (ct - lastStep) + extraStepDuration;
 		return delay;
 	}
 
@@ -528,6 +529,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 {
 	if(creature == this){
 		lastStep = OTSYS_TIME();
+		extraStepDuration = 0;
 		lastStepCost = 1;
 
 		if(teleport){

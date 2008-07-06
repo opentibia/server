@@ -873,7 +873,7 @@ LuaVariant LuaScriptInterface::popVariant(lua_State *L)
 	switch(type){
 		case VARIANT_NUMBER:
 		{
-			var.number = getField(L, "number");
+			var.number = getFieldU32(L, "number");
 			break;
 		}
 
@@ -973,6 +973,16 @@ int32_t LuaScriptInterface::getField(lua_State *L, const char *key)
 	lua_pushstring(L, key);
 	lua_gettable(L, -2);  // get table[key]
 	result = (int32_t)lua_tonumber(L, -1);
+	lua_pop(L, 1);  // remove number and key
+	return result;
+}
+
+uint32_t LuaScriptInterface::getFieldU32(lua_State *L, const char *key)
+{
+	uint32_t result;
+	lua_pushstring(L, key);
+	lua_gettable(L, -2);  // get table[key]
+	result = (uint32_t)lua_tonumber(L, -1);
 	lua_pop(L, 1);  // remove number and key
 	return result;
 }

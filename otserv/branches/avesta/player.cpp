@@ -810,7 +810,7 @@ void Player::dropLoot(Container* corpse)
 	if(itemLoss > 0){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
-			if(item && ((item->getContainer()) || random_range(1, 100) <= itemLoss)){
+			if(item && ((item->getContainer()) || ((uint32_t)random_range(1, 100)) <= itemLoss)){
 				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 			}
 		}
@@ -1126,6 +1126,18 @@ void Player::sendCancelMessage(ReturnValue message) const
 
 	case RET_YOUCANNOTLOGOUTHERE:
 		sendCancel("You can not logout here.");
+		break;
+
+	case RET_YOUNEEDAMAGICITEMTOCASTSPELL:
+		sendCancel("You need a magic item to cast this spell.");
+		break;
+
+	case RET_CANNOTCONJUREITEMHERE:
+		sendCancel("You cannot conjure items here.");
+		break;
+
+	case RET_YOUNEEDTOSPLITYOURSPEARS:
+		sendCancel("You need to split your spears first.");
 		break;
 
 	case RET_NOTPOSSIBLE:
@@ -2429,18 +2441,29 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				else{
 					//check if we already carry a double-handed item
 					if(inventory[SLOT_LEFT]){
-						if(inventory[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
+						const Item* leftItem = inventory[SLOT_LEFT];
+						if(leftItem->getSlotPosition() & SLOTP_TWO_HAND){
 							ret = RET_DROPTWOHANDEDITEM;
 						}
-						//check if weapon, can only carry one weapon
-						else if(item != inventory[SLOT_LEFT] && inventory[SLOT_LEFT]->isWeapon() &&
-							(inventory[SLOT_LEFT]->getWeaponType() != WEAPON_SHIELD) &&
-							(inventory[SLOT_LEFT]->getWeaponType() != WEAPON_AMMO) &&
-							item->isWeapon() && (item->getWeaponType() != WEAPON_SHIELD) && (item->getWeaponType() != WEAPON_AMMO)){
+						else{
+							//check if weapon, can only carry one weapon
+							if(item == leftItem && count == item->getItemCount()){
+								ret = RET_NOERROR;
+							}
+							else if(!item->isWeapon() || 
+								item->getWeaponType() == WEAPON_SHIELD ||
+								item->getWeaponType() == WEAPON_AMMO){
+									ret = RET_NOERROR;
+							}
+							else if(!leftItem->isWeapon() || 
+								leftItem->getWeaponType() == WEAPON_AMMO ||
+								leftItem->getWeaponType() == WEAPON_SHIELD){
+								ret = RET_NOERROR;
+							}
+							else{
 								ret = RET_CANONLYUSEONEWEAPON;
+							}
 						}
-						else
-							ret = RET_NOERROR;
 					}
 					else
 						ret = RET_NOERROR;
@@ -2460,18 +2483,29 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				else{
 					//check if we already carry a double-handed item
 					if(inventory[SLOT_RIGHT]){
-						if(inventory[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
+						const Item* rightItem = inventory[SLOT_RIGHT];
+						if(rightItem->getSlotPosition() & SLOTP_TWO_HAND){
 							ret = RET_DROPTWOHANDEDITEM;
 						}
-						//check if weapon, can only carry one weapon
-						else if(item != inventory[SLOT_RIGHT] && inventory[SLOT_RIGHT]->isWeapon() &&
-							(inventory[SLOT_RIGHT]->getWeaponType() != WEAPON_SHIELD) &&
-							(inventory[SLOT_RIGHT]->getWeaponType() != WEAPON_AMMO) &&
-							item->isWeapon() && (item->getWeaponType() != WEAPON_SHIELD) && (item->getWeaponType() != WEAPON_AMMO)){
+						else{
+							//check if weapon, can only carry one weapon
+							if(item == rightItem && count == item->getItemCount()){
+								ret = RET_NOERROR;
+							}
+							else if(!item->isWeapon() || 
+								item->getWeaponType() == WEAPON_SHIELD ||
+								item->getWeaponType() == WEAPON_AMMO){
+									ret = RET_NOERROR;
+							}
+							else if(!rightItem->isWeapon() || 
+								rightItem->getWeaponType() == WEAPON_AMMO ||
+								rightItem->getWeaponType() == WEAPON_SHIELD){
+								ret = RET_NOERROR;
+							}
+							else{
 								ret = RET_CANONLYUSEONEWEAPON;
+							}
 						}
-						else
-							ret = RET_NOERROR;
 					}
 					else
 						ret = RET_NOERROR;
@@ -3145,6 +3179,7 @@ void Player::onWalkComplete()
 void Player::stopWalk()
 {
 	if(!listWalkDir.empty()){
+		extraStepDuration = getStepDuration();
 		stopEventWalk();
 	}
 }
