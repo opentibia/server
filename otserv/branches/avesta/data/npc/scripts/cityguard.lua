@@ -2,12 +2,12 @@
 local target = 0
 local prevTarget = 0
 local maxChaseDistance = 20
-local origPos = {}
+local origPos = 0
+local origDir = NORTH
 local lastAttack = 0
 local followTimeout = 10
---local origLook = NORTH
 
-function isSkulled(cid)
+local function isSkulled(cid)
 	local skullType = getPlayerSkullType(cid)
 	if(skullType >= 3) then
 		return true
@@ -16,17 +16,18 @@ function isSkulled(cid)
 	return false
 end
 
-function goToOrigPos()
+local function goToOrigPos()
 	target = 0
 	lastAttack  = 0
 	selfFollow(0)
 	doTeleportThing(getNpcCid(), origPos)
 end
 
-function updateTarget()
+local function updateTarget()
 	if(isPlayer(target) == FALSE) then
 		goToOrigPos()
 	elseif(not isSkulled(target)) then
+		target = 0
 		selfSay("Now, behave in the future.")
 	end
 	
@@ -54,7 +55,7 @@ end
 function onCreatureAppear(cid)
 	if(cid == getNpcCid()) then
 		--Wake up call
-		origPos = getCreaturePosition(cid)
+		origPos = getNpcPos()
 		--origLook = getCreatureDir(cid)
 	end
 end

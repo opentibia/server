@@ -25,17 +25,17 @@
   </interact>
 
   <interact keywords="parcel">
-    <response text="Do you want to buy a letter for |PRICE| gold?">
+    <response text="Do you want to buy a parcel for |PRICE| gold?">
       <action name="price" value="15"/>
 
       <interact keywords="yes">
         <response param="lowmoney" text="Oh, you have not enough gold to buy a parcel."/>
-        <response text="Here it is. Don't forget to write the name of the receiver in the first line and the address in the second one before you put the letter in a mailbox.">
+        <response text="Here you are. Don't forget to write the name and the address of the receiver on the label. The label has to be in the parcel before you put the parcel in a mailbox.">
           <action name="takemoney" value="|PRICE|"/>
           <action name="amount" value="1"/>
-          <action name="giveitem" key="2595"/>
+          <action name="giveitem" value="2595"/>
           <action name="amount" value="1"/>
-          <action name="giveitem" key="2599"/>
+          <action name="giveitem" value="2599"/>
         </response>
       </interact>
 
@@ -55,9 +55,7 @@
         <response text="Here it is. Don't forget to write the name of the receiver in the first line and the address in the second one before you put the letter in a mailbox.">
           <action name="takemoney" value="|PRICE|"/>
           <action name="amount" value="1"/>
-          <action name="giveitem" key="2595"/>
-          <action name="amount" value="1"/>
-          <action name="giveitem" key="2599"/>
+          <action name="giveitem" value="2597"/>
         </response>
       </interact>
 

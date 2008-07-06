@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<interaction>
+  <!--armor list-->
+  <itemlist listid="armor">
+    <item keywords="brass;armor" id="2465" price="200"/>
+    <item keywords="golden;armor" id="2466" price="200"/>
+    <item keywords="leather;armor" id="2467" price="10"/>
+    <item keywords="magic;plate;armor" id="2472" price="500"/>
+  </itemlist>
+
+  <itemlist listid="helmet">
+    <item keywords="crown" id="2128" price="100000"/>
+    <item keywords="steel;helmet" id="2457" price="165"/>
+    <item keywords="demon;helmet" id="2493" price="1000"/>
+    <item keywords="horned;helmet" id="2496" price="10"/>
+    <item keywords="mystic;turban" id="2663" price="200"/>
+  </itemlist>
+
+  <!--food list-->
+  <itemlist listid="food">
+    <item keywords="meat" id="2666" price="8"/>
+    <item keywords="ham" id="2671" price="10"/>
+    <item keywords="dragon;ham" id="2672" price="20"/>
+  </itemlist>
+
+  <!--tapestry list-->
+  <itemlist listid="tapestry">
+    <item keywords="purple;tapestry" id="1857" price="40"/>
+    <item keywords="green;tapestry" id="1860" price="40"/>
+    <item keywords="yellow;tapestry" id="1863" price="40"/>
+    <item keywords="orange;tapestry" id="1866" price="40"/>
+    <item keywords="red;tapestry" id="1869" price="40"/>
+  </itemlist>
+
+  <!--vial list-->
+  <itemlist listid="vials">
+    <!--If no name tag is used the default name from items.xml is used.-->
+    <!--With fluid containers it would be "vial", so we override that description here-->
+    <item keywords="vial;water" id="2006" subtype="1"  price="100" name="a vial of water" pname="vials of water"/>
+    <item keywords="vial;blood" id="2006" name="a vial of blood" subtype="2"  price="100" pname="vials of blood"/>
+    <item keywords="vial;beer" id="2006" name="a vial of beer" subtype="3"  price="100" pname="vials of beer"/>
+    <item keywords="vial;slime" id="2006" name="a vial of slime" subtype="4"  price="100" pname="vials of slime"/>
+    <item keywords="vial;lemonade" id="2006" name="a vial of lemonade" subtype="5"  price="100" pname="vials of lemonade"/>
+  </itemlist>
+
+  <!--backpack list-->
+  <itemlist listid="backpack">
+    <!--If no name tag is used the default name from items.xml is used.-->
+    <!--With backpacks it would be just "backpack" regardless of color, so we override that description here-->
+    <item keywords="standard;backpack" id="1988" price="20"/>
+    <item keywords="green;backpack" id="1998" price="20" name="a green backpack" pname="green backpacks"/>
+    <item keywords="red;backpack" id="2000" price="20" name="a red backpack" pname="red backpacks"/>
+    <item keywords="purple;backpack" id="2001" price="20" name="a purple backpack" pname="purple backpacks"/>
+    <item keywords="blue;backpack" id="2002" price="20" name="a blue backpack" pname="blue backpacks"/>
+    <item keywords="yellow;backpack" id="2004" price="20" name="a yellow backpack" pname="green backpacks"/>
+  </itemlist>
+  
+  <!-- Rune list -->
+  <itemlist listid="runes">
+    <!--If no name tag is used the default name from items.xml is used.-->
+    <!--With runes it would be "rune spell", so we override that description here-->
+    <item keywords="sudden;death" id="2268" subtype="100"  price="600" name="a sudden death rune" pname="sudden death runes"/>
+    <item keywords="heavy;magic;missile" id="2311" price="400" name="a heavy magic missile" pname="heavy magic missiles"/>
+    <item keywords="ultimate;healing;rune" id="2273" price="400" name="an ultimate healing rune" pname="ultimate healing runes"/>
+  </itemlist>
+
+</interaction>

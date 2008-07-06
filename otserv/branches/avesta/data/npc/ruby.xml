@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<npc name="Ruby" floorchange="0" walkinterval="2500"  script="ruby.lua">
+<npc name="Ruby" floorchange="0" walkinterval="4000"  script="ruby.lua">
 	<health now="150" max="150"/>
 	<look type="133" head="20" body="120" legs="75" feet="13"/>
-
+  
   <interaction range="3" idletime="30">
     
     <interact keywords="hi" focus="1">
@@ -22,17 +22,6 @@
 
     <interact keywords="bye" focus="0">
       <keywords>farewell</keywords>
-
-      <!--Example of where the npc simply log out-->
-      <!--
-      <response>
-        <action name="script">
-          doRemoveCreature(getNpcCid())
-          selfSay("So long!")
-        </action>
-      </response>
-      -->
-      
       <response text="Good bye. Recommend us, if you were satisfied with our service."/>
     </interact>
 
@@ -46,20 +35,6 @@
         <action name="addqueue" value="|PLAYER|"/>
       </response>
     </interact>
-    
-    <!--This could be used to automatically respond to a player when he comes near the npc-->
-    <!--
-    <interact event="onPlayerEnter" focus="1">
-      <response text="Hello |NAME|!"/>
-    </interact>
-    -->
-
-    <!--Another event that can be used-->
-    <!--
-    <interact event="onPlayerMove">
-      <response text="Hello |NAME|!"/>
-    </interact>
-    -->
 
     <!--This event triggers if the player goes to far away from the npc/logout/idle timeout-->
     <interact event="onPlayerLeave" focus="0">
@@ -69,10 +44,12 @@
     <!---Example of calling a script function, check ruby.lua-->
     <interact focus="1">
       <!--These are the keywords will trigger this interaction-->
-      <keywords>hell</keywords>
-      <keywords>damn</keywords>
-      <keywords>god;damn</keywords>
-      
+      <keywords>asshole</keywords>
+      <keywords>stupid</keywords>
+      <keywords>idiot</keywords>
+      <keywords>fuck</keywords>
+      <keywords>fag</keywords>
+
       <response function="onSayCurse">
         <action name="idle" value="1"/>
         <action name="scriptparam" value="|PLAYER|"/>
@@ -82,10 +59,12 @@
 
     <interact focus="0">
       <!--These are the keywords will trigger this interaction-->
-      <keywords>hell</keywords>
-      <keywords>damn</keywords>
-      <keywords>god;damn</keywords>
-      
+      <keywords>asshole</keywords>
+      <keywords>stupid</keywords>
+      <keywords>idiot</keywords>
+      <keywords>fuck</keywords>
+      <keywords>fag</keywords>
+
       <response function="onSayCurse">
         <action name="idle" value="1"/>
         <action name="scriptparam" value="|PLAYER|"/>
@@ -112,7 +91,7 @@
     </interact>
 
     <!-- Example of another way to do it, instead of using topic variable-->
-    <interact keywords="Thais">
+    <interact keywords="thais">
       <response text="Do you want a passage to Thais for |PRICE| gold?">
         <action name="price" value="200"/>
 
@@ -156,7 +135,7 @@
     </interact>
     <!-->End of example of using storage value-->
 
-    <!-- Sell item(s) interaction-->
+    <!-- Sell item(s) interaction, see merchant glut with an example of an npc with list items-->
     <interact keywords="sell;|AMOUNT|;brass;helmet">
       <keywords>sell;brass;helmet</keywords>
       
@@ -188,7 +167,7 @@
     </interact>
     <!-- End of sell item(s) interaction-->
 
-    <!-- Buy item(s) interaction-->
+    <!-- Buy item(s) interaction, see merchant glut for a real seller/buyer npc-->
     <interact keywords="buy;|AMOUNT|;brass;helmet">
       <keywords>buy;brass;legs</keywords>
       

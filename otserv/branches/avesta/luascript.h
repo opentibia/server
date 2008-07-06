@@ -145,7 +145,7 @@ public:
 	static uint32_t getLastCombatId() {return m_lastCombatId;}
 
 private:
-	typedef std::map<int32_t, Thing*> ThingMap;
+	typedef std::map<uint32_t, Thing*> ThingMap;
 	typedef std::vector<const LuaVariant*> VariantVector;
 	typedef std::map<uint32_t, int32_t> StorageMap;
 	typedef std::map<uint32_t, AreaCombat*> AreaMap;

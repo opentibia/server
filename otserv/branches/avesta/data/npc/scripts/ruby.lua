@@ -15,6 +15,6 @@ function onThink()
 end
 
 function onSayCurse(cid, text)
-	selfSay('Take this!')
+	selfSay("Take this!")
 	doTargetCombatHealth(getNpcCid(), cid, COMBAT_LIFEDRAIN, -100, -200, CONST_ME_BLOCKHIT)
 end

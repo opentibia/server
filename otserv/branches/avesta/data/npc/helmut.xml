@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<npc name="Helmut" floorchange="0" walkinterval="2500">
+<npc name="Helmut" floorchange="0" walkinterval="7500">
   <health now="150" max="150"/>
   <look type="133" head="20" body="120" legs="75" feet="13"/>
 
@@ -139,6 +139,12 @@
         <action name="topic" value="2"/>
       </response>
     </interact>
+
+    <interact keywords="|*|" topic="2">
+      <response text="Hmm, I have no spells for this level, but for many levels from 8 to 14.">
+        <action name="topic" value="2"/>
+      </response>
+      </interact>
 
     <interact keywords="find;person" param="sorcerer">
       <response text="Do you want to learn the spell 'Find person' for |PRICE| gold?">

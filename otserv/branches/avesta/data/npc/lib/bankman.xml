@@ -132,7 +132,7 @@
                 if(getPlayerItemCount(cid, 2160) >= _state.amount) then
                   selfSay("Here you are.")
                   doPlayerRemoveItem(cid, 2160, _state.amount)
-                  doPlayerAddItem(cid, 2160, _state.amount*100)
+                  doPlayerAddItem(cid, 2152, _state.amount*100)
                 else
                   selfSay("Sorry, you don't have enough crystal coins.")
                 end

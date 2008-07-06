@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<npc name="Merchant Glut" floorchange="0" walkinterval="1000" speed="200">
+	<health now="150" max="150"/>
+	<look type="100" head="0" body="0" legs="0" feet="0"/>
+
+  <interaction range="3" idletime="30">
+    <!--This will include the bankman interaction, in this way several npc can use the same interaction-->
+    <include file="merchant.xml"/>
+    
+    <interact keywords="hi" focus="1">
+      <!--These are the alternative keywords-->
+      <keywords>hello</keywords>
+      
+      <response text="Hello. How may I help you |NAME|?"/>
+    </interact>
+
+    <interact keywords="bye" focus="0">
+      <!--These are the alternative keywords-->
+      <keywords>farewell</keywords>
+      
+      <response text="It was a pleasure to help you."/>
+    </interact>
+
+    <interact event="onBusy">
+      <response text="One moment please, |NAME|.">
+        <action name="addqueue" value="|PLAYER|"/>
+      </response>
+    </interact>
+
+    <interact event="onPlayerLeave" focus="0">
+      <response text="It was a pleasure to help you |NAME|."/>
+    </interact>
+    
+    <interact keywords="name">
+      <response text="My name is |NPCNAME|."/>
+    </interact>
+
+    <interact keywords="job">
+      <response text="I am a merchant, my job is to serve you!"/>
+    </interact>
+
+    <interact keywords="sell;|AMOUNT|;|LIST|">
+      <!-- See merchant.xml to add more items/lists-->
+      <list>armor</list>
+      <list>helmet</list>
+      <list>vials</list>
+
+      <response>
+        <action name="amount" value="|AMOUNT|"/>
+
+        <action name="script">
+          if(_state.amount > 1) then
+            selfSay("Do you want to sell " .. _state.amount .. " " .. _state.listpname .. " for " ..  _state.price * _state.amount .. " gold?")
+          else
+            selfSay("Do you want to sell " .. _state.listname .. " for " .. _state.price .. " gold?")
+          end
+        </action>
+
+        <interact keywords="yes">
+          <response param="noamount" text="Sorry, you do not have one."/>
+          <response param="lowamount" text="Sorry, you do not have that many."/>
+          <response text="Ok. Here is your money.">
+            <action name="sell" value="|PRICE|"/>
+          </response>
+        </interact>
+        
+      </response>
+    </interact>
+
+    <interact keywords="buy;|AMOUNT|;|LIST|">
+      <!-- See merchant.xml to add more items/lists-->
+      <list>runes</list>
+      <list>tapestry</list>
+      <list>food</list>
+      <list>vials</list>
+      <list>backpack</list>
+
+      <response>
+        <action name="amount" value="|AMOUNT|"/>
+
+        <action name="script">
+          if(_state.amount > 1) then
+            selfSay("Do you want to buy " .. _state.amount .. " " .. _state.listpname .. " for " ..  _state.price * _state.amount .. " gold?")
+          else
+            selfSay("Do you want to buy " .. _state.listname .. " for " .. _state.price .. " gold?")
+          end
+        </action>
+
+        <interact keywords="yes">
+          <response param="lowmoney" text="Sorry, you do not have enough gold."/>
+          <response text="Thank you. Here it is.">
+            <action name="buy" value="|PRICE|"/>
+          </response>
+        </interact>
+
+      </response>
+    </interact>
+  </interaction>
+  
+</npc>

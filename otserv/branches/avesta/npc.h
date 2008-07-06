@@ -150,25 +150,27 @@ enum ReponseActionParam_t{
 	ACTION_NONE,
 	ACTION_SETTOPIC,
 	ACTION_SETLEVEL,
-	ACTION_PRICE,
+	ACTION_SETPRICE,
 	ACTION_TAKEMONEY,
 	ACTION_GIVEMONEY,
 	ACTION_SELLITEM,
 	ACTION_BUYITEM,
 	ACTION_GIVEITEM,
 	ACTION_TAKEITEM,
-	ACTION_AMOUNT,
-	ACTION_ITEM,
-	ACTION_SUBTYPE,
-	ACTION_EFFECT,
-	ACTION_SPELL,
+	ACTION_SETAMOUNT,
+	ACTION_SETITEM,
+	ACTION_SETSUBTYPE,
+	ACTION_SETEFFECT,
+	ACTION_SETSPELL,
+	ACTION_SETLISTNAME,
+	ACTION_SETLISTPNAME,
 	ACTION_TEACHSPELL,
-	ACTION_STORAGE,
-	ACTION_TELEPORT,
+	ACTION_SETSTORAGE,
+	ACTION_SETTELEPORT,
 	ACTION_SCRIPT,
 	ACTION_SCRIPTPARAM,
 	ACTION_ADDQUEUE,
-	ACTION_IDLE
+	ACTION_SETIDLE
 };
 
 enum StorageComparision_t{
@@ -238,6 +240,26 @@ struct ScriptVars{
 	std::string s3;
 };
 
+struct ListItem{
+	ListItem()
+	{
+		itemId = 0;
+		subType = 1;
+		price = 0;
+		keywords = "";
+		name = "";
+		pluralName = "";
+	}
+
+	int32_t price;
+	int32_t itemId;
+	int32_t subType;
+	std::string keywords;
+	std::string name;
+	std::string pluralName;
+};
+
+
 typedef std::list<ResponseAction> ActionList;
 typedef std::map<std::string, int32_t> ResponseScriptMap;
 typedef std::list<NpcResponse*> ResponseList;
@@ -245,39 +267,55 @@ typedef std::list<NpcResponse*> ResponseList;
 class NpcResponse
 {
 public:
+	struct ResponseProperties{
+		ResponseProperties()
+		{
+			topic = -1;
+			amount = -1;
+			focusStatus = -1;
+			output = "";
+			interactType = INTERACT_TEXT;
+			responseType = RESPONSE_DEFAULT;
+			params = 0;
+			storageId = -1;
+			storageValue = -1;
+			storageComp = STORAGE_EQUAL;
+			knowSpell = "";
+		}
 
-	NpcResponse(
-		InteractType_t _interactType,
-		ResponseType_t _responseType,
-		std::list<std::string> _inputList,
-		const std::string& _output,
-		int32_t _topic,
-		int32_t _focusStatus,
-		int32_t _storageId,
-		int32_t _storageValue,
-		StorageComparision_t _storageComp,
-		const std::string& _knowSpell,
-		uint32_t _params,
+		int32_t topic;
+		int32_t amount;
+		int32_t focusStatus;
+		std::list<std::string> inputList;
+		std::string output;
+		InteractType_t interactType;
+		ResponseType_t responseType;
+		uint32_t params;
+		int32_t storageId;
+		int32_t storageValue;
+		StorageComparision_t storageComp;
+		std::string knowSpell;
+		ActionList actionList;
+	};
+
+	NpcResponse(const ResponseProperties& _prop,
+		ResponseList _subResponseList,
 		ScriptVars _scriptVars)
 	{
-		interactType = _interactType;
-		responseType = _responseType;
-		inputList = _inputList;
-		if(!inputList.empty()){
-			input = *inputList.begin();
-		}
-		output = _output;
-		params = _params;
-		topic = _topic;
-		focusStatus = _focusStatus;
-		price = -1;
-		amount = -1;
-		storageId = _storageId;
-		storageValue = _storageValue;
-		storageComp = _storageComp;
-		knowSpell = _knowSpell;
+		prop = _prop;
+		subResponseList = _subResponseList;
 		scriptVars = _scriptVars;
 	};
+
+	NpcResponse(NpcResponse& rhs)
+	{
+		prop = rhs.prop;
+		scriptVars = rhs.scriptVars;
+		for(ResponseList::iterator it = rhs.subResponseList.begin(); it != rhs.subResponseList.end(); ++it){
+			NpcResponse* response = new NpcResponse(*(*it));
+			subResponseList.push_back(response);
+		}
+	}
 
 	~NpcResponse()
 	{
@@ -288,48 +326,33 @@ public:
 		subResponseList.clear();
 	}
 
-	uint32_t getParams() const {return params;}
-	const std::string& getInputText() const {return input;}
-	int32_t getTopic() const {return topic;}
-	int32_t getFocusState() const {return focusStatus;}
-	int32_t getStorageId() const {return storageId;}
-	int32_t getStorageValue() const {return storageValue;}
-	ResponseType_t getResponseType() const {return responseType;}
-	InteractType_t getInteractType() const {return interactType;}
-	StorageComparision_t getStorageComp() const {return storageComp;}
-	const std::string& getKnowSpell() const {return knowSpell;}
-	const std::string& getText() const {return output;}
-	int32_t getAmount() const {return amount;}
+	uint32_t getParams() const {return prop.params;}
+	std::string getInputText() const {return (prop.inputList.empty() ? "" : *prop.inputList.begin());}
+	int32_t getTopic() const {return prop.topic;}
+	int32_t getFocusState() const {return prop.focusStatus;}
+	int32_t getStorageId() const {return prop.storageId;}
+	int32_t getStorageValue() const {return prop.storageValue;}
+	ResponseType_t getResponseType() const {return prop.responseType;}
+	InteractType_t getInteractType() const {return prop.interactType;}
+	StorageComparision_t getStorageComp() const {return prop.storageComp;}
+	const std::string& getKnowSpell() const {return prop.knowSpell;}
+	const std::string& getText() const {return prop.output;}
+	int32_t getAmount() const {return prop.amount;}
+	void setAmount(int32_t _amount) { prop.amount = _amount;}
 
 	std::string formatResponseString(Creature* creature) const;
-	void addAction(ResponseAction action) {actionList.push_back(action);}
+	void addAction(ResponseAction action) {prop.actionList.push_back(action);}
+	const std::list<std::string>& getInputList() const { return prop.inputList;}
+
 	void setResponseList(ResponseList _list) { subResponseList.insert(subResponseList.end(),_list.begin(),_list.end());}
 	const ResponseList& getResponseList() const { return subResponseList;}
-	const std::list<std::string>& getInputList() const { return inputList;}
-	void setAmount(int32_t _amount) { amount = _amount;}
 
-	ActionList::const_iterator getFirstAction() const {return actionList.begin();}
-	ActionList::const_iterator getEndAction() const {return actionList.end();}
+	ActionList::const_iterator getFirstAction() const {return prop.actionList.begin();}
+	ActionList::const_iterator getEndAction() const {return prop.actionList.end();}
 
-	ScriptVars scriptVars;
-
-protected:
-	int32_t topic;
-	int32_t price;
-	int32_t amount;
-	int32_t focusStatus;
-	std::string input;
-	std::list<std::string> inputList;
-	std::string output;
-	InteractType_t interactType;
-	ResponseType_t responseType;
-	uint32_t params;
-	int32_t storageId;
-	int32_t storageValue;
-	StorageComparision_t storageComp;
-	std::string knowSpell;
-	ActionList actionList;
+	ResponseProperties prop;
 	ResponseList subResponseList;
+	ScriptVars scriptVars;
 };
 
 struct NpcState{
@@ -341,6 +364,8 @@ struct NpcState{
 	int32_t itemId;
 	int32_t subType;
 	std::string spellName;
+	std::string listName;
+	std::string listPluralName;
 	int32_t level;
 	uint64_t prevInteraction;
 	std::string respondToText;
@@ -377,7 +402,7 @@ public:
 
 	virtual bool canSee(const Position& pos) const;
 
-	bool load(const std::string& _name);
+	bool load();
 	void reload();
 
 	virtual const std::string& getName() const {return name;};
@@ -394,7 +419,7 @@ public:
 	NpcScriptInterface* getScriptInterface();
 
 protected:
-	Npc();
+	Npc(const std::string& _name);
 
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
@@ -429,7 +454,8 @@ protected:
 		NpcState* npcState, const std::string& text, bool exactMatch = false);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState, const std::string& text);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType);
-	uint32_t getMatchCount(NpcResponse* response, std::vector<std::string> wordList, bool exactMatch, bool& matchAll);
+	uint32_t getMatchCount(NpcResponse* response, std::vector<std::string> wordList,
+		bool exactMatch, int32_t& matchAllCount, int32_t& totalKeywordCount);
 
 	void executeResponse(Player* player, NpcState* npcState, const NpcResponse* response);
 
@@ -446,14 +472,19 @@ protected:
 	std::string name;
 	std::string m_datadir;
 	std::string m_scriptdir;
+	std::string m_filename;
 	uint32_t walkTicks;
 	bool floorChange;
 	bool attackable;
 	bool isIdle;
 	bool hasBusyReply;
+	bool hasScriptedFocus;
 	int32_t talkRadius;
 	int32_t idleTime;
 	int32_t focusCreature;
+
+	typedef std::map<std::string, std::list<ListItem> > ItemListMap;
+	ItemListMap itemListMap;
 
 	ResponseScriptMap responseScriptMap;
 	ResponseList responseList;
@@ -468,6 +499,7 @@ protected:
 
 	static NpcScriptInterface* m_scriptInterface;
 
+	friend class Npcs;
 	friend class NpcScriptInterface;
 };
 
