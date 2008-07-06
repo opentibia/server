@@ -1888,14 +1888,14 @@ bool ConjureSpell::ConjureFood(const ConjureSpell* spell, Creature* creature, co
 	}
 		
 	uint32_t foodType[8] = { 
-		{ITEM_MEAT},
-		{ITEM_HAM},
-		{ITEM_GRAPE},
-		{ITEM_APPLE},
-		{ITEM_BREAD},
-		{ITEM_CHEESE},
-		{ITEM_ROLL},
-		{ITEM_BREAD}
+		ITEM_MEAT,
+		ITEM_HAM,
+		ITEM_GRAPE,
+		ITEM_APPLE,
+		ITEM_BREAD,
+		ITEM_CHEESE,
+		ITEM_ROLL,
+		ITEM_BREAD
 	};
 
 	bool result = (internalConjureItem(player, foodType[random_range(0, 7)], 1) == RET_NOERROR);
