@@ -1519,7 +1519,8 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 						std::stringstream scriptstream;
 						//attach various variables that could be interesting
-						scriptstream << "cid = " << env->addThing(player) << "\n";
+						scriptstream << "cid = " << env->addThing(player) << std::endl;
+						scriptstream << "text = \"" << npcState->respondToText << "\"" << std::endl;
 
 						scriptstream << "_state = {" << std::endl;
 						scriptstream << "topic = " << npcState->topic << ',' << std::endl;
@@ -2021,7 +2022,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		if(npcState->topic != -1 && npcState->topic == (*it)->getTopic()){
 			//Topic is right
-			++matchCount;
+			matchCount += 1000;
 		}
 
 		/*
@@ -2051,8 +2052,8 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				//Remove points for not full match
 				matchWordCount -= (totalKeywordCount - matchAllCount - matchWordCount);
 
-				//Total "points" for this response, word matches worth more
-				matchCount += matchWordCount * 100;
+				//Total "points" for this response, word matches are worth more
+				matchCount += matchWordCount * 100000;
 			}
 			else{
 				matchCount = 0;
