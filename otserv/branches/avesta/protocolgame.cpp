@@ -606,6 +606,22 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseThrow(msg);
 		break;
 
+	case 0x79: // description in shop window
+		parseLookInShop(msg);
+		break;
+
+	case 0x7A: // player bought from shop
+	    parsePlayerPurchase(msg);
+	    break;
+
+	case 0x7B: // player sold to shop
+	    parsePlayerSale(msg);
+	    break;
+
+	case 0x7C: // player closed shop window
+	    parseCloseShop(msg);
+		break;
+
 	case 0x7D: // Request trade
 		parseRequestTrade(msg);
 		break;
@@ -690,6 +706,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseCancelRuleViolation(msg);
 		break;
 
+	case 0x9E: // close NPC
+		parseCloseNpc(msg);
+		break;
+
 	case 0xA0: // set attack and follow mode
 		parseFightModes(msg);
 		break;
@@ -770,6 +790,9 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseDebugAssert(msg);
 		break;
 
+
+
+
 	case 0xF0:
 		parseQuestLog(msg);
 		break;
@@ -780,9 +803,11 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 
 	default:
 #ifdef __DEBUG__
+
 		printf("unknown packet header: %x \n", recvbyte);
 		parseDebug(msg);
 #endif
+
 		break;
 	}
 }
@@ -1051,6 +1076,11 @@ void ProtocolGame::parseCancelRuleViolation(NetworkMessage& msg)
 	addGameTask(&Game::playerCancelRuleViolation, player->getID());
 }
 
+void ProtocolGame::parseCloseNpc(NetworkMessage& msg)
+{
+	addGameTask(&Game::playerCloseNpcChannel, player->getID());
+}
+
 void ProtocolGame::parseCancelMove(NetworkMessage& msg)
 {
 	addGameTask(&Game::playerCancelAttackAndFollow, player->getID());
@@ -1058,7 +1088,7 @@ void ProtocolGame::parseCancelMove(NetworkMessage& msg)
 
 void ProtocolGame::parseDebug(NetworkMessage& msg)
 {
-	int dataLength = msg.getMessageLength() - 3;
+	int dataLength = msg.getMessageLength() - 1;
 	if(dataLength != 0){
 		printf("data: ");
 		int data = msg.GetByte();
@@ -1402,6 +1432,45 @@ void ProtocolGame::parseHouseWindow(NetworkMessage &msg)
 	addGameTask(&Game::playerUpdateHouseWindow, player->getID(), doorId, id, text);
 }
 
+void ProtocolGame::parseLookInShop(NetworkMessage &msg)
+{
+	uint16_t id = msg.GetU16();
+	uint16_t count = msg.GetByte();
+
+	addGameTask(&Game::playerLookInShop, player->getID(), id, count);
+}
+
+void ProtocolGame::parsePlayerPurchase(NetworkMessage &msg)
+{
+	uint16_t id = msg.GetU16();
+	uint16_t count = msg.GetByte();
+	uint16_t amount = msg.GetByte();
+#ifdef __DEBUG_820__
+	const ItemType& it = Item::items.getItemIdByClientId(id);
+	std::cout << "Player Bought " << amount*count << " of " << it.name
+			   << "(" << it.id << ")" << std::endl;
+#endif
+	addGameTask(&Game::playerPurchaseItem, player->getID(), id, count, amount);
+}
+
+void ProtocolGame::parsePlayerSale(NetworkMessage &msg)
+{
+	uint16_t id = msg.GetU16();
+	uint16_t count = msg.GetByte();
+	uint16_t amount = msg.GetByte();
+#ifdef __DEBUG_820__
+	const ItemType& it = Item::items.getItemIdByClientId(id);
+	std::cout << "Player Sold " << amount*count << " of " << it.name
+			   << "(" << it.id << ")" << std::endl;
+#endif
+	addGameTask(&Game::playerSellItem, player->getID(), id, count, amount);
+}
+
+void ProtocolGame::parseCloseShop(NetworkMessage &msg)
+{
+	addGameTask(&Game::playerCloseShop, player->getID());
+}
+
 void ProtocolGame::parseRequestTrade(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
@@ -1734,6 +1803,52 @@ void ProtocolGame::sendContainer(uint32_t cid, const Container* container, bool 
 		for(cit = container->getItems(); cit != container->getEnd() && i < 255; ++cit, ++i){
 			msg->AddItem(*cit);
 		}
+	}
+}
+
+void ProtocolGame::sendShop(const std::list<ShopInfo>& shop)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg)
+	{
+		TRACK_MESSAGE(msg);
+		msg->AddByte(0x7A);
+		if(shop.size() > 255)
+		{
+			msg->AddByte(255);
+		}
+		else
+		{
+			msg->AddByte(shop.size());
+		}
+
+		std::list<ShopInfo>::const_iterator it;
+		uint32_t i = 0;
+		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i)
+		{
+			AddShopItem(msg, (*it));
+		}
+	}
+}
+
+void ProtocolGame::sendCloseShop()
+{
+    NetworkMessage* msg = getOutputBuffer();
+	if(msg)
+	{
+		TRACK_MESSAGE(msg);
+		msg->AddByte(0x7C);
+	}
+}
+
+void ProtocolGame::sendPlayerCash(uint32_t amount)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg)
+	{
+		TRACK_MESSAGE(msg);
+		msg->AddByte(0x7B);
+		msg->AddU32(amount);
 	}
 }
 
@@ -2407,6 +2522,28 @@ void ProtocolGame::sendVIP(uint32_t guid, const std::string& name, bool isOnline
 	}
 }
 
+void ProtocolGame::sendTutorial(uint8_t tutorialId)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+		msg->AddByte(0xDC);
+		msg->AddByte(tutorialId);
+	}
+}
+
+void ProtocolGame::sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+		msg->AddByte(0xDD);
+		msg->AddPosition(pos);
+		msg->AddByte(markType);
+		msg->AddString(desc);
+	}
+}
+
 void ProtocolGame::sendReLoginWindow()
 {
 	NetworkMessage* msg = getOutputBuffer();
@@ -2574,6 +2711,7 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creatur
 		case SPEAK_YELL:
 		case SPEAK_MONSTER_SAY:
 		case SPEAK_MONSTER_YELL:
+		case SPEAK_PRIVATE_NP:
 			msg->AddPosition(creature->getPosition());
 			break;
 		case SPEAK_CHANNEL_Y:
@@ -2816,4 +2954,15 @@ void ProtocolGame::RemoveContainerItem(NetworkMessage* msg, uint8_t cid, uint8_t
 	msg->AddByte(0x72);
 	msg->AddByte(cid);
 	msg->AddByte(slot);
+}
+
+// shop
+void ProtocolGame::AddShopItem(NetworkMessage* msg, const ShopInfo item)
+{
+	const ItemType& it = Item::items[item.itemId];
+	msg->AddU16(it.clientId);
+	msg->AddByte(item.itemCharges);
+	msg->AddString(it.name);
+	msg->AddU32(item.buyPrice);
+	msg->AddU32(item.salePrice);
 }

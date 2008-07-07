@@ -1,12 +1,13 @@
-local MIN = 70
-local MAX = 130
+local MIN = 50
+local MAX = 100
 local EMPTY_POTION = 7636
 
 local combat = createCombatObject()
-setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_MANADRAIN)
+setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_HEALING)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
 setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
 setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
+setCombatParam(combat, COMBAT_PARAM_DISPEL, CONDITION_PARALYZE)
 setCombatFormula(combat, COMBAT_FORMULA_DAMAGE, MIN, 0, MAX, 0)
 
 local exhaust = createConditionObject(CONDITION_EXHAUSTED)

@@ -33,6 +33,7 @@
 extern Game g_game;
 extern Vocations g_vocations;
 extern ConfigManager g_config;
+extern Weapons* g_weapons;
 
 Weapons::Weapons():
 m_scriptInterface("Weapon Interface")
@@ -183,8 +184,6 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	exhaustion = 0;
 	range = 1;
 	ammoAction = AMMOACTION_NONE;
-	wieldInfo = 0;
-	vocationString = "";
 }
 
 Weapon::~Weapon()
@@ -279,8 +278,8 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	range = Item::items[id].shootRange;
-
-	//Set few information for the lookDescription
+	
+	std::string vocationString;
 	if(!vocStringList.empty()){
 		for(STRING_LIST::iterator it = vocStringList.begin(); it != vocStringList.end(); ++it){
 			if(*it != vocStringList.front()){
@@ -296,17 +295,26 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		}
 	}
 
+	uint32_t wieldInfo = 0;
 	if(getReqLevel() > 0){
 		wieldInfo |= WIELDINFO_LEVEL;
 	}
 	if(getReqMagLv() > 0){
 		wieldInfo |= WIELDINFO_MAGLV;
 	}
-	if(!getVocationString().empty()){
+	if(!vocationString.empty()){
 		wieldInfo |= WIELDINFO_VOCREQ;
 	}
 	if(isPremium()){
 		wieldInfo |= WIELDINFO_PREMIUM;
+	}
+
+	if(wieldInfo != 0){
+		ItemType& it = Item::items.getItemType(id);
+		it.wieldInfo = wieldInfo;
+		it.vocationString = vocationString;
+		it.minReqLevel = getReqLevel();
+		it.minReqMagicLevel = getReqMagLv();
 	}
 
 	return true;
@@ -754,15 +762,15 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	range = it.shootRange;
 	ammuAttackValue = it.attack;
 
-	if(it.hitChance != -1){
+	if(it.hitChance > 0){
 		hitChance = it.hitChance;
 	}
 
-	if(it.maxHitChance != -1){
+	if(it.maxHitChance > 0){
 		maxHitChance = it.maxHitChance;
 	}
 
-	if(it.breakChance != -1){
+	if(it.breakChance > 0){
 		breakChance = it.breakChance;
 	}
 
@@ -771,6 +779,20 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	}
 
 	return Weapon::configureWeapon(it);
+}
+
+int32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
+{
+	const ItemType& it = Item::items[id];
+	Item* bow = player->getWeapon(true);
+	if(bow && bow->getWeaponType() == WEAPON_DIST && bow->getID() != id){ //Be sure we are using a bow
+		const Weapon* weap = g_weapons->getWeapon(bow);
+		if(weap){
+			return weap->playerWeaponCheck(player, target);
+		}
+	}
+
+	return Weapon::playerWeaponCheck(player, target);
 }
 
 bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) const
@@ -834,6 +856,11 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		chance = hitChance;
 	}
 
+	Item* bow = player->getWeapon(true);
+	if(bow && bow != item && bow->getHitChance() > 0){ //Be sure we are using a bow, not a spear
+		chance += bow->getHitChance();
+	}
+
 	if(chance >= random_range(1, 100)){
 		Weapon::internalUseWeapon(player, item, target, damageModifier);
 	}
@@ -889,10 +916,18 @@ void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) cons
 
 int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
+	int32_t attackValue = ammuAttackValue;
+	if(item->getWeaponType() == WEAPON_AMMO){
+		Item* bow = const_cast<Player*>(player)->getWeapon(true);
+		if(bow){
+			attackValue += bow->getAttack();
+		}
+	}
+
 	int32_t attackSkill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
 
 	int32_t attackStrength = player->getAttackStrength();
-	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, ammuAttackValue);
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
 
 	if(maxDamage){
 		return -maxValue;

@@ -77,6 +77,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/q",&Commands::subtractMoney},
 	{"/reload",&Commands::reloadInfo},
 	{"/z",&Commands::testCommand},
+	{"/zt",&Commands::testTutorialCommand},
 	{"/goto",&Commands::teleportTo},
 	{"/info",&Commands::getInfo},
 	{"/closeserver",&Commands::closeServer},
@@ -565,6 +566,18 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 
 	return true;
 }
+
+bool Commands::testTutorialCommand(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	int color = atoi(param.c_str());
+	Player* player = creature->getPlayer();
+	if(player) {
+		player->sendTutorial(color);
+	}
+
+	return true;
+}
+
 
 bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const std::string& param)
 {

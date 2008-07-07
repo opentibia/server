@@ -29,10 +29,10 @@ class OutputMessage;
 class Connection;
 class RSA;
 
-#define CLIENT_VERSION_MIN 811
-#define CLIENT_VERSION_MAX 811
+#define CLIENT_VERSION_MIN 820
+#define CLIENT_VERSION_MAX 820
 
-#define STRING_CLIENT_VERSION "This server requires client version 8.11."
+#define STRING_CLIENT_VERSION "This server requires client version 8.20."
 
 class Protocol : boost::noncopyable
 {

@@ -45,6 +45,8 @@ struct MoveEventList{
 	std::list<MoveEvent*> moveEvent[MOVE_EVENT_LAST];
 };
 
+typedef std::map<int32_t, bool> VocEquipMap;
+
 class MoveEvents : public BaseEvents
 {
 public:
@@ -55,6 +57,8 @@ public:
 	uint32_t onPlayerEquip(Player* player, Item* item, slots_t slot);
 	uint32_t onPlayerDeEquip(Player* player, Item* item, slots_t slot, bool isRemoval);
 	uint32_t onItemMove(Item* item, Tile* tile, bool isAdd);
+
+	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
 	
 protected:
 	typedef std::map<int32_t, MoveEventList> MoveListMap;
@@ -108,7 +112,15 @@ public:
 	uint32_t executeEquip(Player* player, Item* item, slots_t slot);
 	uint32_t executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	//
-	
+
+	//onEquip information
+	int32_t getReqLevel() const {return reqLevel;}
+	int32_t getReqMagLv() const {return reqMagLevel;}
+	bool isPremium() const {return premium;}
+	const std::string& getVocationString() const {return vocationString;}
+	uint32_t getWieldInfo() const {return wieldInfo;}
+	const VocEquipMap& getVocEquipMap() const {return vocEquipMap;}
+
 protected:
 	virtual std::string getScriptEventName();
 	
@@ -125,6 +137,15 @@ protected:
 	MoveFunction* moveFunction;
 	EquipFunction* equipFunction;
 	slots_t slot;
+
+	//onEquip information
+	int32_t reqLevel;
+	int32_t reqMagLevel;
+	bool premium;
+	std::string vocationString;
+	uint32_t wieldInfo;
+	VocEquipMap vocEquipMap;
+
 };
 
 

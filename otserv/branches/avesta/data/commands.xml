@@ -25,6 +25,7 @@
 <command cmd="/B" access="1" />				-- Red broadcast message
 <command cmd="/q" access="1" />				-- Check your money
 <command cmd="/z" access="1" />				-- Check effects (0-26)
+<command cmd="/zt" access="1" />			-- Check tutorials (?)
 <command cmd="/info" access="1" />			-- Info about a player
 <command cmd="/getonline" access="1" />		-- Info about how many players are online
 <command cmd="/gethouse" access="1" />		-- Info about house of a player

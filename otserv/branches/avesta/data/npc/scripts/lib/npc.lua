@@ -1,4 +1,32 @@
 
+do
+	doPlayerAddStackable = doPlayerAddItem
+	--Returns table with UIDs of added items
+	doPlayerAddItem = function(cid, itemid, subType, amount)
+		local amount = amount or 1
+		local subAmount = 0
+		local subType = subType or 0
+
+		if(isItemStackable(itemid) == TRUE) then
+			return doPlayerAddStackable(cid, itemid, amount), amount
+		end
+
+		local items = {}
+		local ret = 0
+		local a = 0
+		for i = 1, amount do
+			items[i] = doCreateItemEx(itemid, subType)
+			ret = doPlayerAddItemEx(cid, items[i])
+			if(ret ~= RETURNVALUE_NOERROR) then
+				break
+			end
+			a = a + 1
+		end
+
+		return items, a
+	end
+end
+
 -- get the distance to a creature
 function getDistanceToCreature(id)
 	if id == 0 or id == nil then

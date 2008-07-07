@@ -227,4 +227,26 @@ struct LightInfo{
 	};
 };
 
+struct ShopInfo{
+	uint32_t itemId;
+	uint32_t itemCharges;
+	uint32_t buyPrice;
+	uint32_t salePrice;
+	// Name can be found using Item::items[itemId].
+	
+	ShopInfo(){
+		itemId = 0;
+		itemCharges = 0;
+		buyPrice = 0;
+		salePrice = 0;
+	};
+	ShopInfo(uint32_t id, uint32_t charges = 0,
+		uint32_t buy = 0, uint32_t sell = 0){
+		itemId = id;
+		itemCharges = charges;
+		buyPrice = buy;
+		salePrice = sell;
+	};
+};
+
 #endif

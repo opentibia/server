@@ -9,5 +9,8 @@
 		<parameter key="module_shop" value="1" />
 		<parameter key="shop_sellable" value="crossbow,2455,150;bow,2456,130" />
 		<parameter key="shop_buyable" value="crossbow,2455,360;bow,2456,200;spear,2389,20;power bolt,2547,200;burst arrow,2546,56;poison arrow,2545,18;bolt,2543,3;arrow,2544,2" />
+		<parameter key="message_greet" value="Hello |PLAYERNAME|. Please, take a look at my {offer}, you'll surely like it!"/>
+		<parameter key="message_sendtrade" value="I buy and sell various kind of distance equipment. Take a look at the list."/>
+		<parameter key="message_oncloseshop" value="Good luck while running and hitting!"/>
 	</parameters>
 </npc>

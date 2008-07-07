@@ -310,6 +310,7 @@ public:
 	bool playerOpenChannel(uint32_t playerId, uint16_t channelId);
 	bool playerCloseChannel(uint32_t playerId, uint16_t channelId);
 	bool playerOpenPrivateChannel(uint32_t playerId, const std::string& receiver);
+	bool playerCloseNpcChannel(uint32_t playerId);
 	bool playerReceivePing(uint32_t playerId);
 	bool playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(uint32_t playerId);
@@ -331,6 +332,12 @@ public:
 	bool playerAcceptTrade(uint32_t playerId);
 	bool playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(uint32_t playerId);
+	bool playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+		uint8_t amount);
+	bool playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+		uint8_t amount);
+	bool playerCloseShop(uint32_t playerId);
+	bool playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count);
 	bool playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerFollowCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerCancelAttackAndFollow(uint32_t playerId);
@@ -406,6 +413,8 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
+	bool npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize);
+
 protected:
 
 	bool playerSayCommand(Player* player, SpeakClasses type, const std::string& text);
@@ -414,6 +423,7 @@ protected:
 	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+	bool playerSpeakToNpc(Player* player, const std::string& text);
 
 	std::vector<Thing*> ToReleaseThings;
 

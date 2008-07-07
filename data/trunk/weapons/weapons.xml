@@ -149,8 +149,12 @@
 	<wand id="2186" level="13" mana="3" min="13" max="25" type="ice" enabled="1" function="internalLoadWeapon"> <!-- Moonlight Rod -->
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
-	</wand> 
+	</wand>
 	<wand id="2185" level="19" mana="5" min="27" max="33" type="death" enabled="1" function="internalLoadWeapon"> <!-- Necrotic Rod -->
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</wand>
+	<wand id="8817" level="22" mana="5" min="27" max="33" type="ice" enabled="1" function="internalLoadWeapon"> <!-- Northwind Rod -->
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
 	</wand>
@@ -161,7 +165,14 @@
 	<wand id="2183" level="33" mana="13" min="55" max="75" type="ice" enabled="1" function="internalLoadWeapon"> <!-- Hailstorm Rod -->
 		<vocation name="Druid"/>
 		<vocation name="Elder Druid" showInDescription="0"/>
-
+	</wand>
+	<wand id="8818" level="37" mana="13" min="55" max="75" type="earth" enabled="1" function="internalLoadWeapon"> <!-- Springsprout Rod -->
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</wand>
+	<wand id="8816" level="42" mana="13" min="55" max="75" type="death" enabled="1" function="internalLoadWeapon"> <!-- Underworld Rod -->
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
 	</wand>
 
 	<!-- Wands -->
@@ -177,6 +188,10 @@
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
+	<wand id="8827" level="22" mana="5" min="27" max="33" type="fire" enabled="1" function="internalLoadWeapon"> <!-- Wand of Draconia -->
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+	</wand>
 	<wand id="2189" level="26" mana="8" min="42" max="48" type="energy" enabled="1" function="internalLoadWeapon"> <!-- Wand of Cosmic Energy -->
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
@@ -185,11 +200,41 @@
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 	</wand>
-	
+	<wand id="8826" level="37" mana="13" min="55" max="75" type="energy" enabled="1" function="internalLoadWeapon"> <!-- Wand of Starmstorm -->
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+	</wand>
+	<wand id="8828" level="42" mana="13" min="55" max="75" type="death" enabled="1" function="internalLoadWeapon"> <!-- Wand of Voodoo -->
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+	</wand>
+
+	<!-- Bows and Crossbows -->
+	<distance id="8755" level="45" enabled="1" function="internalLoadWeapon"> <!-- Modified Crossbow -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+	<distance id="8756" level="60" enabled="1" function="internalLoadWeapon"> <!-- Chain Bolter -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+	<distance id="8757" level="130" enabled="1" function="internalLoadWeapon"> <!-- Royal Crossbow -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+	<distance id="8758" level="100" enabled="1" function="internalLoadWeapon"> <!-- Devileye -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+	<distance id="8759" level="80" enabled="1" function="internalLoadWeapon"> <!-- Ironworker -->
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</distance>
+
 	<!-- Ammunition -->
-	<distance id="2545" enabled="1" hitchance="80" script="poison_arrow.lua"/>
-	<distance id="2546" enabled="1" hitchance="80" script="explosive_arrow.lua"/>
-	<distance id="7366" enabled="1" hitchance="80" script="viper_star.lua"/>
+	<distance id="2545" enabled="1" script="poison_arrow.lua"/>
+	<distance id="2546" enabled="1" script="explosive_arrow.lua"/>
+	<distance id="7366" enabled="1" script="viper_star.lua"/>
 	<distance id="3965" level="20" enabled="1" function="internalLoadWeapon"/>	<!--Hunting Spear-->
 	<distance id="7378" level="25" enabled="1" function="internalLoadWeapon"/>	<!--Royal Spear-->
 	<distance id="7367" level="42" enabled="1" function="internalLoadWeapon"/>	<!--Enchanted Spear-->

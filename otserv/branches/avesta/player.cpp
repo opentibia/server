@@ -155,6 +155,10 @@ Creature()
 
 	editHouse = NULL;
 	editListId = 0;
+	
+	shopOwner = NULL;
+	purchaseCallback = -1;
+	saleCallback = -1;
 
 	setParty(NULL);
 
@@ -302,7 +306,7 @@ void Player::setConditionSuppressions(uint32_t conditions, bool remove)
 	}
 }
 
-Item* Player::getWeapon()
+Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 {
 	Item* item;
 
@@ -328,7 +332,7 @@ Item* Player::getWeapon()
 
 			case WEAPON_DIST:
 			{
-				if(item->getAmuType() != AMMO_NONE){
+				if(!ignoreAmmu && item->getAmuType() != AMMO_NONE){
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
 
 					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
@@ -342,6 +346,7 @@ Item* Player::getWeapon()
 				else{
 					const Weapon* weapon = g_weapons->getWeapon(item);
 					if(weapon){
+						shootRange = item->getShootRange();
 						return item;
 					}
 				}
@@ -811,7 +816,7 @@ void Player::dropLoot(Container* corpse)
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
 			if(item && ((item->getContainer()) || ((uint32_t)random_range(1, 100)) <= itemLoss)){
-				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
+				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), 0);
 			}
 		}
 	}

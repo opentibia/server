@@ -292,6 +292,7 @@ public:
 	static void pushVariant(lua_State *L, const LuaVariant& var);
 	static void pushPosition(lua_State *L, const PositionEx& position);
 	static void pushPosition(lua_State *L, const Position& position, uint32_t stackpos);
+	static void pushCallback(lua_State *L, int32_t callback);
 
 	static LuaVariant popVariant(lua_State *L);
 	static void popPosition(lua_State *L, PositionEx& position);
@@ -299,6 +300,7 @@ public:
 	static uint32_t popNumber(lua_State *L);
 	static double popFloatNumber(lua_State *L);
 	static const char* popString(lua_State *L);
+	static int32_t popCallback(lua_State *L);
 
 	static int32_t getField(lua_State *L, const char *key);
 	static void setField(lua_State *L, const char* index, uint32_t val);
@@ -362,6 +364,8 @@ protected:
 	static int luaDoPlayerSetLossPercent(lua_State *L);
 	static int luaDoSetCreatureDropLoot(lua_State *L);
 	static int luaGetPlayerSkullType(lua_State *L);
+	static int luaDoSendTutorial(lua_State *L);
+	static int luaDoAddMark(lua_State *L);
 
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);

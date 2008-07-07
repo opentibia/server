@@ -55,6 +55,9 @@ protected:
 	static int luaGetNpcPos(lua_State *L);
 	static int luaGetNpcName(lua_State *L);
 	static int luaGetNpcParameter(lua_State *L);
+	// new: shop
+	static int luaSendShop(lua_State *L);
+	static int luaCloseShop(lua_State *L);
 
 private:
 	virtual bool initState();
@@ -73,6 +76,10 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature){};
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos){};
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
+	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	    uint8_t count, uint8_t amount){};
+	virtual void onPlayerCloseChannel(const Player* player){};
+	virtual void onPlayerEndTrade(const Player* player){};
 	virtual void onThink(){};
 
 	bool isLoaded();
@@ -92,6 +99,10 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature);
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
+	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	    uint8_t count, uint8_t amount);
+	virtual void onPlayerCloseChannel(const Player* player);
+	virtual void onPlayerEndTrade(const Player* player);
 	virtual void onThink();
 
 private:
@@ -101,6 +112,8 @@ private:
 	int32_t m_onCreatureDisappear;
 	int32_t m_onCreatureMove;
 	int32_t m_onCreatureSay;
+	int32_t m_onPlayerCloseChannel;
+	int32_t m_onPlayerEndTrade;
 	int32_t m_onThink;
 };
 
@@ -126,11 +139,17 @@ public:
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};
 
-	void doSay(std::string msg);
+	void doSay(std::string msg, Player* focus = NULL, bool publicize = false);
 	void doMove(Direction dir);
 	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
+
+	void onPlayerCloseChannel(const Player* player);
+	void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	    uint8_t count, uint8_t amount);
+	void onPlayerEndTrade(const Player* player, int32_t buyCallback,
+		int32_t sellCallback);
 
 	void setCreatureFocus(Creature* creature);
 

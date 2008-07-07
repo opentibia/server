@@ -38,6 +38,7 @@
 class House;
 class Weapon;
 class ProtocolGame;
+class Npc;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -237,6 +238,23 @@ public:
 	void setTradeState(tradestate_t state) {tradeState = state;};
 	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
+	
+	//shop functions
+	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell) {
+			shopOwner = owner;
+			purchaseCallback = onBuy;
+			saleCallback = onSell;
+		};
+	Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) {
+			onBuy = purchaseCallback;
+			onSell = saleCallback;
+			return shopOwner;
+		};
+	const Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) const {
+			onBuy = purchaseCallback;
+			onSell = saleCallback;
+			return shopOwner;
+		};
 
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
@@ -279,7 +297,7 @@ public:
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
-	Item* getWeapon();
+	Item* getWeapon(bool ignoreAmmu = false);
 	virtual WeaponType_t getWeaponType();
 	int32_t getWeaponSkill(const Item* item) const;
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
@@ -463,6 +481,13 @@ public:
 		{if(client) client->sendTextWindow(windowTextId, itemId, text);}
 	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId) const
 		{if(client) client->sendToChannel(creature, type, text, channelId);}
+	// new: shop window
+	void sendShop(const std::list<ShopInfo>& shop) const
+	    {if(client) client->sendShop(shop);}
+	void sendCash(uint32_t amount) const
+		{if(client) client->sendPlayerCash(amount);}
+	void sendCloseShop() const
+	    {if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const
@@ -479,6 +504,11 @@ public:
 		{if(client) client->sendCloseContainer(cid);}
 	void sendChannel(uint16_t channelId, const std::string& channelName)
 		{if(client) client->sendChannel(channelId, channelName);}
+
+	void sendTutorial(uint8_t tutorialId)
+		{if(client) client->sendTutorial(tutorialId);}
+	void sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc)
+		{if (client) client->sendAddMarker(pos, markType, desc);}
 
 	void receivePing() {if(npings > 0) npings--;}
 
@@ -625,6 +655,11 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
+	//shop variables
+	Npc* shopOwner;
+	int32_t purchaseCallback;
+	int32_t saleCallback;
+	
 
 	std::string name;
 	std::string nameDescription;

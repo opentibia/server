@@ -91,8 +91,6 @@ public:
 	const bool hasExhaustion() const {return exhaustion;}
 	const bool isWieldedUnproperly() const {return wieldUnproperly;}
 	const bool isPremium() const {return premium;}
-	const uint32_t getWieldInfo() const {return wieldInfo;}
-	const std::string& getVocationString() const {return vocationString;}
 
 protected:
 	virtual std::string getScriptEventName();
@@ -120,8 +118,6 @@ protected:
 	int32_t range;
 	AmmoAction_t ammoAction;
 	CombatParams params;
-	uint32_t wieldInfo;
-	std::string vocationString;
 
 private:
 	typedef std::map<int32_t, bool> VocWeaponMap;
@@ -160,6 +156,8 @@ public:
 	virtual bool configureWeapon(const ItemType& it);
 	virtual bool interuptSwing() const {return true;}
 
+	//virtual uint32_t playerWeaponCheck(Player* player, Creature* target) const;
+	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 

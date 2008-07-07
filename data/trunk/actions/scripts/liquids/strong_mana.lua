@@ -2,6 +2,13 @@ local MIN = 110
 local MAX = 190
 local EMPTY_POTION = 7634
 
+local combat = createCombatObject()
+setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_MANADRAIN)
+setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
+setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
+setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
+setCombatFormula(combat, COMBAT_FORMULA_DAMAGE, MIN, 0, MAX, 0)
+
 local exhaust = createConditionObject(CONDITION_EXHAUSTED)
 setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))
 
@@ -20,12 +27,11 @@ function onUse(cid, item, frompos, item2, topos)
 		return TRUE
 	end
 
-	if(doPlayerAddMana(item2.uid, math.random(MIN, MAX)) == LUA_ERROR) then
+	if(doCombat(cid, combat, numberToVariant(item2.uid)) == LUA_ERROR) then
 		return FALSE
 	end
 
 	doAddCondition(cid, exhaust)
-	doSendMagicEffect(getThingPos(item2.uid), CONST_ME_MAGIC_BLUE)
 	doCreatureSay(item2.uid, "Aaaah...", TALKTYPE_ORANGE_1) 
 	doTransformItem(item.uid, EMPTY_POTION)
 	return TRUE

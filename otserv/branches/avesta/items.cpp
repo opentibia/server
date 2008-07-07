@@ -61,10 +61,14 @@ ItemType::ItemType()
 	blockProjectile = false;
 	blockPathFind = false;
 
-	std::string runeSpellName;
-	runeMagLevel    = 0;
+	wieldInfo        = 0;
+	minReqLevel      = 0;
+	minReqMagicLevel = 0;
 
-	speed		      = 0;
+	runeMagLevel  = 0;
+	runeLevel     = 0;
+
+	speed		  = 0;
 	id            = 0;
 	clientId      = 100;
 	maxItems      = 8;  // maximum size if this is a container
@@ -105,9 +109,9 @@ ItemType::ItemType()
 	showDuration  = false;
 	showCharges   = false;
 	charges       = 0;
-	hitChance     = -1;
-	maxHitChance  = -1;
-	breakChance   = -1;
+	hitChance     = 0;
+	maxHitChance  = 0;
+	breakChance   = 0;
 	shootRange    = 1;
 
 	condition = NULL;
@@ -204,7 +208,7 @@ int Items::loadFromOtb(std::string file)
 	if(Items::dwMajorVersion == 0xFFFFFFFF){
 		std::cout << "[Warning] Items::loadFromOtb items.otb using generic client version." << std::endl;
 	}
-	else if(Items::dwMinorVersion != CLIENT_VERSION_811){
+	else if(Items::dwMinorVersion != CLIENT_VERSION_820){
 		std::cout << "Not supported items.otb client version." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -1276,9 +1280,6 @@ const ItemType& Items::getItemType(int32_t id) const
 		return *iType;
 	}
 	else{
-		#ifdef __DEBUG__
-		std::cout << "WARNING! unknown itemtypeid " << id << ". using defaults." << std::endl;
-		#endif
 		static ItemType dummyItemType; // use this for invalid ids
 		return dummyItemType;
 	}
@@ -1296,9 +1297,6 @@ const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
 		i++;
 	}while(iType);
 
-	#ifdef __DEBUG__
-	std::cout << "WARNING! unknown sprite id " << spriteId << ". using defaults." << std::endl;
-	#endif
 	static ItemType dummyItemType; // use this for invalid ids
 	return dummyItemType;
 }

@@ -2023,6 +2023,25 @@ bool Game::playerCancelRuleViolation(uint32_t playerId)
 	return cancelRuleViolation(player);
 }
 
+bool Game::playerCloseNpcChannel(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	getSpectators(list, player->getPosition());
+	Npc* npc;
+
+	for(it = list.begin(); it != list.end(); ++it){
+		if((npc = (*it)->getNpc())){
+			npc->onPlayerCloseChannel(player);
+		}
+	}
+	return true;
+}
+
 bool Game::playerReceivePing(uint32_t playerId)
 {
 	Player* player = getPlayerByID(playerId);
@@ -2782,6 +2801,90 @@ bool Game::internalCloseTrade(Player* player)
 	return true;
 }
 
+bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+	uint8_t amount)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
+		return false;
+
+	int32_t onBuy;
+	int32_t onSell;
+
+	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	if(merchant == NULL)
+		return false;
+
+	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+	if(it.id == 0){
+		return false;
+	}
+
+	merchant->onPlayerTrade(player, onBuy,
+	    it.id, count, amount);
+	return true;
+}
+
+bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+	uint8_t amount)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
+		return false;
+
+	int32_t onBuy;
+	int32_t onSell;
+
+	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	if(merchant == NULL)
+		return false;
+
+	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+	if(it.id == 0){
+		return false;
+	}
+
+	merchant->onPlayerTrade(player, onSell,
+	    it.id, count, amount);
+	return true;
+}
+
+bool Game::playerCloseShop(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
+		return false;
+
+	//unreference callbacks
+	int32_t onBuy;
+	int32_t onSell;
+
+	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	player->setShopOwner(NULL, -1, -1);
+	if(merchant){
+		merchant->onPlayerEndTrade(player, onBuy, onSell);
+	}
+	return true;
+}
+
+bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
+		return false;
+
+    const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+	if(it.id == 0){
+		return false;
+	}
+
+	std::stringstream ss;
+	ss << "You see " << Item::getDescription(it, 1);
+	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+
+	return true;
+}
+
 bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteId, uint8_t stackPos)
 {
 	Player* player = getPlayerByID(playerId);
@@ -3152,6 +3255,9 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		case SPEAK_CHANNEL_R2:
 			return playerTalkToChannel(player, type, text, channelId);
 			break;
+		case SPEAK_PRIVATE_PN:
+			return playerSpeakToNpc(player, text);
+			break;
 		case SPEAK_BROADCAST:
 			return internalBroadcastMessage(player, text);
 			break;
@@ -3280,6 +3386,56 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 	}
 
 	g_chat.talkToChannel(player, type, text, channelId);
+	return true;
+}
+
+bool Game::playerSpeakToNpc(Player* player, const std::string& text)
+{
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	getSpectators(list, player->getPosition());
+
+	//send to npcs only
+	Npc* tmpNpc = NULL;
+	for(it = list.begin(); it != list.end(); ++it){
+		if((tmpNpc = (*it)->getNpc())){
+			(*it)->onCreatureSay(player, SPEAK_PRIVATE_PN, text);
+		}
+	}
+
+	return true;
+}
+
+bool Game::npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize)
+{
+	if(player != NULL)
+	{
+        player->sendCreatureSay(npc, SPEAK_PRIVATE_NP, text);
+		player->onCreatureSay(npc, SPEAK_PRIVATE_NP, text);
+	}
+	if(publicize)
+	{
+		SpectatorVec list;
+		SpectatorVec::iterator it;
+		getSpectators(list, npc->getPosition());
+
+        //send to client
+		Player* tmpPlayer = NULL;
+		for(it = list.begin(); it != list.end(); ++it){
+			tmpPlayer = (*it)->getPlayer();
+			if((tmpPlayer != NULL) && (tmpPlayer != player)){
+				tmpPlayer->sendCreatureSay(npc, SPEAK_SAY, text);
+			}
+		}
+
+		//event method
+		for(it = list.begin(); it != list.end(); ++it){
+			if((*it) != player)
+			{
+				(*it)->onCreatureSay(npc, SPEAK_SAY, text);
+			}
+		}
+	}
 	return true;
 }
 

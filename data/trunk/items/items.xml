@@ -3637,7 +3637,10 @@
 		<attribute key="weight" value="200"/>
 	</item>
 	<item id="2175" article="a" name="spellbook">
+		<attribute key="description" value="It shows your spells and can also shield against attack when worn."/>
 		<attribute key="weight" value="5800"/>
+		<attribute key="defense" value="14"/>
+		<attribute key="weaponType" value="shield"/>
 	</item>
 	<item id="2176" article="an" name="orb">
 		<attribute key="weight" value="800"/>
@@ -4072,7 +4075,7 @@
 	<item id="2267" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2268" article="a" name="spell rune">
+	<item id="2268" article="a" name="sudden death rune">
 		<attribute key="runeSpellName" value="adori gran mort"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
@@ -4083,7 +4086,7 @@
 	<item id="2270" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2271" article="a" name="spell rune">
+	<item id="2271" article="an" name="icicle rune">
 		<attribute key="runeSpellName" value="adori frigo"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="5"/>
@@ -4091,12 +4094,12 @@
 	<item id="2272" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2273" article="a" name="spell rune">
+	<item id="2273" article="an" name="ultimate healing rune">
 		<attribute key="runeSpellName" value="adura vita"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="1"/>
 	</item>
-	<item id="2274" article="a" name="spell rune">
+	<item id="2274" article="an" name="avalanche rune">
 		<attribute key="runeSpellName" value="adori mas frigo"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="4"/>
@@ -4107,17 +4110,17 @@
 	<item id="2276" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2277" article="a" name="spell rune">
+	<item id="2277" article="an" name="energy field rune">
 		<attribute key="runeSpellName" value="adevo grav vis"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
 	</item>
-	<item id="2278" article="a" name="spell rune">
+	<item id="2278" article="a" name="paralyze rune">
 		<attribute key="runeSpellName" value="adana ani"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="1"/>
 	</item>
-	<item id="2279" article="a" name="spell rune">
+	<item id="2279" article="an" name="energy wall rune">
 		<attribute key="runeSpellName" value="adevo mas grav vis"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="4"/>
@@ -4137,47 +4140,47 @@
 	<item id="2284" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2285" article="a" name="spell rune">
+	<item id="2285" article="a" name="poison field rune">
 		<attribute key="runeSpellName" value="adevo grav pox"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
 	</item>
-	<item id="2286" article="a" name="spell rune">
+	<item id="2286" article="a" name="poison bomb rune">
 		<attribute key="runeSpellName" value="adevo mas pox"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="2"/>
 	</item>
-	<item id="2287" article="a" name="spell rune">
+	<item id="2287" article="a" name="light magic missile rune">
 		<attribute key="runeSpellName" value="adori min vis"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="10"/>
 	</item>
-	<item id="2288" article="a" name="spell rune">
+	<item id="2288" article="a" name="stone shower rune">
 		<attribute key="runeSpellName" value="adori mas tera"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="4"/>
 	</item>
-	<item id="2289" article="a" name="spell rune">
+	<item id="2289" article="a" name="poison wall rune">
 		<attribute key="runeSpellName" value="adevo mas grav pox"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="4"/>
 	</item>
-	<item id="2290" article="a" name="spell rune">
+	<item id="2290" article="a" name="convince creature rune">
 		<attribute key="runeSpellName" value="adeta sio"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="1"/>
 	</item>
-	<item id="2291" article="a" name="spell rune">
+	<item id="2291" article="a" name="chameleon rune">
 		<attribute key="runeSpellName" value="adevo ina"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="1"/>
 	</item>
-	<item id="2292" article="a" name="spell rune">
+	<item id="2292" article="a" name="stalagmite rune">
 		<attribute key="runeSpellName" value="adori tera"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="10"/>
 	</item>
-	<item id="2293" article="a" name="spell rune">
+	<item id="2293" article="a" name="magic wall rune">
 		<attribute key="runeSpellName" value="adevo grav tera"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
@@ -4203,27 +4206,27 @@
 	<item id="2300" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2301" article="a" name="spell rune">
+	<item id="2301" article="a" name="fire field rune">
 		<attribute key="runeSpellName" value="adevo grav flam"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
 	</item>
-	<item id="2302" article="a" name="spell rune">
+	<item id="2302" article="a" name="fireball rune">
 		<attribute key="runeSpellName" value="adori flam"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="5"/>
 	</item>
-	<item id="2303" article="a" name="spell rune">
+	<item id="2303" article="a" name="fire wall rune">
 		<attribute key="runeSpellName" value="adevo mas grav flam"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="4"/>
 	</item>
-	<item id="2304" article="a" name="spell rune">
+	<item id="2304" article="a" name="great fireball rune">
 		<attribute key="runeSpellName" value="adori mas flam"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="4"/>
 	</item>
-	<item id="2305" article="a" name="spell rune">
+	<item id="2305" article="a" name="firebomb rune">
 		<attribute key="runeSpellName" value="adevo mas flam"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="2"/>
@@ -4234,7 +4237,7 @@
 	<item id="2307" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2308" article="a" name="spell rune">
+	<item id="2308" article="a" name="soulfire rune">
 		<attribute key="runeSpellName" value="adevo res flam"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
@@ -4242,12 +4245,12 @@
 	<item id="2309" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2310" article="a" name="spell rune">
+	<item id="2310" article="a" name="desintegrate rune">
 		<attribute key="runeSpellName" value="adito tera"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
 	</item>
-	<item id="2311" article="a" name="spell rune">
+	<item id="2311" article="a" name="heavy magic missile rune">
 		<attribute key="runeSpellName" value="adori vis"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="10"/>
@@ -4255,7 +4258,7 @@
 	<item id="2312" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2313" article="a" name="spell rune">
+	<item id="2313" article="an" name="explosion rune">
 		<attribute key="runeSpellName" value="adevo mas hur"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="6"/>
@@ -4263,12 +4266,12 @@
 	<item id="2314" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2315" article="a" name="spell rune">
+	<item id="2315" article="a" name="thunderstorm rune">
 		<attribute key="runeSpellName" value="adori mas vis"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="4"/>
 	</item>
-	<item id="2316" article="a" name="spell rune">
+	<item id="2316" article="an" name="animate dead rune">
 		<attribute key="runeSpellName" value="adana mort"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="1"/>
@@ -5050,7 +5053,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="slotType" value="two-handed"/>
 		<attribute key="ammoType" value="arrow"/>
-		<attribute key="range" value="5"/>
+		<attribute key="range" value="6"/>
 	</item>
 	<item id="2457" article="a" name="steel helmet">
 		<attribute key="weight" value="4600"/>
@@ -18196,12 +18199,13 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="description" value="A beautiful gem is embedded in this weapon."/>
 	</item>
-	<item id="7438" article="a" name="golden bow">
-		<attribute key="weight" value="0"/>
+	<item id="7438" article="a" name="elvish bow">
+		<attribute key="weight" value="3100"/> <!-- ? -->
 		<attribute key="slotType" value="two-handed"/>	
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="ammoType" value="arrow"/>
-		<attribute key="range" value="5"/>
+		<attribute key="range" value="6"/>
+		<attribute key="hitChance" value="5"/>
 	</item>
 	<item id="7439" article="a" name="berserk potion">
 		<attribute key="weight" value="200"/>
@@ -18519,6 +18523,189 @@
 	<item id="8377" article="an" name="ultimate health potion">
 		<attribute key="description" value="This potion can only be consumed by knights of level 130 or higher."/>
 		<attribute key="weight" value="220"/>
+	</item>
+	<item id="8378" article="an" name="antidote potion">
+		<attribute key="weight" value="175"/>
+	</item>
+	<item id="8445" article="a" name="closed door">
+		<attribute key="description" value="It is locked."/>
+	</item>
+	<item id="8446" article="a" name="closed door">
+	</item>
+	<item id="8447" article="an" name="open door">
+	</item>
+	<item id="8448" article="a" name="closed door">
+	</item>
+	<item id="8449" article="a" name="closed door">
+	</item>
+	<item id="8450" article="an" name="open door">
+	</item>
+	<item id="8451" article="a" name="closed door">
+	</item>
+	<item id="8452" article="an" name="open door">
+	</item>
+	<item id="8453" article="a" name="closed door">
+	</item>
+	<item id="8454" article="an" name="open door">
+	</item>
+	<item id="8455" article="a" name="closed door">
+	</item>
+	<item id="8456" article="an" name="open door">
+	</item>
+	<item id="8457" article="a" name="closed door">
+	</item>
+	<item id="8458" article="an" name="open door">
+	</item>
+	<item id="8459" article="a" name="gate of expertise">
+	</item>
+	<item id="8460" article="an" name="gate of expertise">
+	</item>
+	<item id="8461" article="a" name="gate of expertise">
+	</item>
+	<item id="8462" article="an" name="gate of expertise">
+	</item>
+	<item id="8610" article="a" name="small health potion">
+		<attribute key="weight" value="175"/>
+	</item>
+	<item id="8725" article="a" name="magician's robe">
+		<attribute key="armor" value="6"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="weight" value="2500"/>
+		<attribute key="description" value="This robe feels soft and light as a feather."/>
+	</item>
+	<item id="8755" article="a" name="modified crossbow">
+		<attribute key="weight" value="3500"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="5"/>
+		<attribute key="hitChance" value="1"/>
+	</item>
+	<item id="8756" article="a" name="chain bolter">
+		<attribute key="weight" value="5500"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="3"/>
+		<attribute key="attack" value="8"/>
+	</item>
+	<item id="8757" article="a" name="royal crossbow">
+		<attribute key="weight" value="12000"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="6"/>
+		<attribute key="hitChance" value="3"/>
+		<attribute key="attack" value="5"/>
+	</item>
+	<item id="8758" article="the" name="devileye">
+		<attribute key="weight" value="5500"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="6"/>
+		<attribute key="hitChance" value="-20"/>
+		<attribute key="attack" value="20"/>
+	</item>
+	<item id="8759" article="a" name="iron worker">
+		<attribute key="weight" value="5500"/>
+		<attribute key="slotType" value="two-handed"/>
+		<attribute key="weaponType" value="distance"/>
+		<attribute key="ammoType" value="bolt"/>
+		<attribute key="range" value="5"/>
+		<attribute key="attack" value="4"/>
+	</item>
+	<item id="8776" article="a" name="spirit cloak">
+		<attribute key="armor" value="8"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="weight" value="2650"/>
+		<attribute key="magicpoints" value="1"/>
+	</item>
+	<item id="8794" article="a" name="master archer's armor">
+		<attribute key="armor" value="15"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="weight" value="6900"/>
+		<attribute key="skillDist" value="3"/>
+	</item>
+	<item id="8796" article="a" name="robe of the underworld">
+		<attribute key="armor" value="12"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="weight" value="1900"/>
+		<attribute key="absorbPercentDeath" value="12"/>
+		<attribute key="absorbPercentHoly" value="-12"/>
+	</item>
+	<item id="8798" article="a" name="ethno coat">
+		<attribute key="armor" value="7"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="weight" value="2550"/>
+		<attribute key="magicpoints" value="1"/>
+	</item>
+	<item id="8807" article="a" name="spellbook of warding">
+		<attribute key="description" value="It shows your spells and can also shield against attack when worn."/>
+		<attribute key="weight" value="4500"/>
+		<attribute key="magicpoints" value="1"/>
+		<attribute key="defense" value="22"/>
+		<attribute key="weaponType" value="shield"/>
+	</item>
+	<item id="8808" article="a" name="spellbook of mind control">
+		<attribute key="description" value="It shows your spells and can also shield against attack when worn."/>
+		<attribute key="weight" value="4500"/>
+		<attribute key="magicpoints" value="2"/>
+		<attribute key="defense" value="16"/>
+		<attribute key="weaponType" value="shield"/>
+	</item>
+	<item id="8809" article="a" name="spellbook of lost souls">
+		<attribute key="description" value="It shows your spells and can also shield against attack when worn."/>
+		<attribute key="weight" value="4650"/>
+		<attribute key="magicpoints" value="2"/>
+		<attribute key="defense" value="20"/>
+		<attribute key="weaponType" value="shield"/>
+	</item>
+	<item id="8816" article="a" name="underworld rod">
+		<attribute key="weight" value="2900"/>
+		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="death"/>
+		<attribute key="range" value="3"/>
+	</item>
+	<item id="8817" article="a" name="northwind rod">
+		<attribute key="weight" value="2900"/>
+		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="ice"/>
+		<attribute key="range" value="3"/>
+	</item>
+	<item id="8818" article="a" name="springsprout rod">
+		<attribute key="weight" value="2700"/>
+		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="earth"/>
+		<attribute key="range" value="3"/>
+	</item>
+	<item id="8826" article="a" name="wand of starstorm">
+		<attribute key="description" value="It is sparkling with universal energy."/>
+		<attribute key="weight" value="2550"/>
+		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="energy"/>
+		<attribute key="range" value="3"/>
+	</item>
+	<item id="8827" article="a" name="wand of draconia">
+		<attribute key="description" value="This wand holds the spirit and soul of a dragon lord."/>
+		<attribute key="weight" value="2700"/>
+		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="fire"/>
+		<attribute key="range" value="3"/>
+	</item>
+	<item id="8828" article="a" name="wand of voodoo">
+		<attribute key="description" value="It is filled with the dark hatred and rage of a tormented demonic being."/>
+		<attribute key="weight" value="2850"/>
+		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="death"/>
+		<attribute key="range" value="3"/>
+	</item>
+	<item id="8824" article="a" name="spellbook of dark mysteries">
+		<attribute key="description" value="It shows your spells and can also shield against attack when worn."/>
+		<attribute key="weight" value="2850"/>
+		<attribute key="magicpoints" value="3"/>
+		<attribute key="defense" value="16"/>
+		<attribute key="weaponType" value="shield"/>
 	</item>
 	<item id="20001" name="water">
 	</item>

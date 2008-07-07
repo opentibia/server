@@ -218,8 +218,13 @@ public:
 	int32_t        runeMagLevel;
 	std::string    runeSpellName;
 
-	int32_t        lightLevel;
-	int32_t        lightColor;
+	uint32_t        wieldInfo;
+	std::string     vocationString;
+	uint32_t		minReqLevel;
+	uint32_t        minReqMagicLevel;
+
+	int32_t lightLevel;
+	int32_t lightColor;
 
 	bool floorChangeDown;
 	bool floorChangeNorth;
