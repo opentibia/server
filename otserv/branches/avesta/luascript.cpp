@@ -2936,14 +2936,15 @@ int LuaScriptInterface::luaDoSendTutorial(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
 
-	if(player){
-		player->sendTutorial(tutorial);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
+	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
+
+	player->sendTutorial(tutorial);
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
 int LuaScriptInterface::luaDoAddMark(lua_State *L)
@@ -2964,14 +2965,14 @@ int LuaScriptInterface::luaDoAddMark(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
 
-	if(player){
-		player->sendAddMarker(pos, type, description);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
+	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
+
+	player->sendAddMarker(pos, type, description);
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
 int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)

@@ -2855,15 +2855,7 @@ bool Game::playerCloseShop(uint32_t playerId)
 	if(player == NULL || player->isRemoved())
 		return false;
 
-	//unreference callbacks
-	int32_t onBuy;
-	int32_t onSell;
-
-	Npc* merchant = player->getShopOwner(onBuy, onSell);
-	player->setShopOwner(NULL, -1, -1);
-	if(merchant){
-		merchant->onPlayerEndTrade(player, onBuy, onSell);
-	}
+	player->closeShopWindow();
 	return true;
 }
 

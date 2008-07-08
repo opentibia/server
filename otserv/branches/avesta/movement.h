@@ -70,8 +70,6 @@ protected:
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	
 	void addEvent(MoveEvent* moveEvent, int32_t id, MoveListMap& map);
-	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
-
 	void addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& map);
 	MoveEvent* getEvent(Tile* tile, MoveEvent_t eventType);
 

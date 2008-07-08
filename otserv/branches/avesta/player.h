@@ -253,21 +253,26 @@ public:
 	Item* getTradeItem() {return tradeItem;};
 	
 	//shop functions
-	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell) {
-			shopOwner = owner;
-			purchaseCallback = onBuy;
-			saleCallback = onSell;
-		};
-	Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) {
-			onBuy = purchaseCallback;
-			onSell = saleCallback;
-			return shopOwner;
-		};
-	const Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) const {
-			onBuy = purchaseCallback;
-			onSell = saleCallback;
-			return shopOwner;
-		};
+	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell)
+	{
+		shopOwner = owner;
+		purchaseCallback = onBuy;
+		saleCallback = onSell;
+	}
+
+	Npc* getShopOwner(int32_t& onBuy, int32_t& onSell)
+	{
+		onBuy = purchaseCallback;
+		onSell = saleCallback;
+		return shopOwner;
+	}
+
+	const Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) const
+	{
+		onBuy = purchaseCallback;
+		onSell = saleCallback;
+		return shopOwner;
+	}
 
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
@@ -578,6 +583,7 @@ public:
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
+	void closeShopWindow();
 
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;

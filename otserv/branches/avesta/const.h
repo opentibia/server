@@ -147,7 +147,7 @@ enum SpeakClasses {
 	SPEAK_CHANNEL_Y     	= 0x07,	//Yellow message on chat
 	SPEAK_RVR_CHANNEL		= 0x08, //Reporting rule violation - Ctrl+R
 	SPEAK_RVR_ANSWER		= 0x09, //Answering report
-	SPEAK_RVR_CONTINUE		= 0x0A  //Answering the answer of the report
+	SPEAK_RVR_CONTINUE		= 0x0A, //Answering the answer of the report
 	SPEAK_BROADCAST     	= 0x0B,	//Broadcast a message - #b
 	SPEAK_CHANNEL_R1    	= 0x0C,	//Talk red on chat - #c
 	SPEAK_PRIVATE_RED   	= 0x0D,	//Red private - @name@ text

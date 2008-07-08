@@ -729,7 +729,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 	}
 
 	if(it.isRune()){
-		uint32_t charges = std::max((uint32_t)1, (uint32_t)(item == NULL ? it.charges : item->getItemCharge()));
+		uint32_t charges = std::max((uint32_t)1, (uint32_t)(item == NULL ? it.charges : item->getCharges()));
 
 		s << "(\"" << it.runeSpellName << "\", Charges:" << charges <<").";
 		if(it.runeLevel > 0 || it.runeMagLevel > 0){
@@ -783,7 +783,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		}
 
 		if(it.showCharges){
-			uint16_t charges = getCharges();
+			uint32_t charges = (item == NULL ? it.charges : item->getCharges());
 			if(charges > 1){
 				s << " that has " << (int32_t)charges << " charges left";
 			}
@@ -935,7 +935,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		}
 	}
 	else if(it.showCharges){
-		uint32_t charges = (item == NULL ? it.charges : item->getItemCharge());
+		uint32_t charges = (item == NULL ? it.charges : item->getCharges());
 		if(charges > 1){
 			s << " that has " << (int32_t)charges << " charges left.";
 		}
@@ -1015,11 +1015,11 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 			default: break;
 		}
 
-		s << strElement << " (" << getAttack() - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
+		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
 	}
 
-	if(getSpecialDescription() != ""){
-		s << std::endl << getSpecialDescription().c_str();
+	if(item && item->getSpecialDescription() != ""){
+		s << std::endl << item->getSpecialDescription().c_str();
 	}
 	else if(it.description.length() && lookDistance <= 1){
 		s << std::endl << it.description;

@@ -1809,23 +1809,19 @@ void ProtocolGame::sendContainer(uint32_t cid, const Container* container, bool 
 void ProtocolGame::sendShop(const std::list<ShopInfo>& shop)
 {
 	NetworkMessage* msg = getOutputBuffer();
-	if(msg)
-	{
+	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7A);
-		if(shop.size() > 255)
-		{
+		if(shop.size() > 255){
 			msg->AddByte(255);
 		}
-		else
-		{
+		else{
 			msg->AddByte(shop.size());
 		}
 
 		std::list<ShopInfo>::const_iterator it;
 		uint32_t i = 0;
-		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i)
-		{
+		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i){
 			AddShopItem(msg, (*it));
 		}
 	}
@@ -1834,8 +1830,7 @@ void ProtocolGame::sendShop(const std::list<ShopInfo>& shop)
 void ProtocolGame::sendCloseShop()
 {
     NetworkMessage* msg = getOutputBuffer();
-	if(msg)
-	{
+	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7C);
 	}
@@ -1844,8 +1839,7 @@ void ProtocolGame::sendCloseShop()
 void ProtocolGame::sendPlayerCash(uint32_t amount)
 {
 	NetworkMessage* msg = getOutputBuffer();
-	if(msg)
-	{
+	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7B);
 		msg->AddU32(amount);

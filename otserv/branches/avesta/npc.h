@@ -28,6 +28,7 @@
 //////////////////////////////////////////////////////////////////////
 // Defines an NPC...
 class Npc;
+class Player;
 class NpcResponse;
 struct NpcState;
 
@@ -488,6 +489,10 @@ protected:
 
 	NpcState* getState(const Player* player, bool makeNew = true);
 
+	void addShopPlayer(Player* player);
+	void removeShopPlayer(const Player* player);
+	void closeAllShopWindows();
+
 	std::string name;
 	std::string m_datadir;
 	std::string m_scriptdir;
@@ -501,6 +506,9 @@ protected:
 	int32_t talkRadius;
 	int32_t idleTime;
 	int32_t focusCreature;
+
+	typedef std::list<Player*> ShopPlayerList;
+	ShopPlayerList shopPlayerList;
 
 	typedef std::map<std::string, std::list<ListItem> > ItemListMap;
 	ItemListMap itemListMap;
