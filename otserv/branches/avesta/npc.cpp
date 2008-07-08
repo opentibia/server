@@ -1111,7 +1111,9 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 
 void Npc::onPlayerCloseChannel(const Player* player)
 {
-	m_npcEventHandler->onPlayerCloseChannel(player);
+	if(m_npcEventHandler){
+		m_npcEventHandler->onPlayerCloseChannel(player);
+	}
 }
 
 void Npc::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
