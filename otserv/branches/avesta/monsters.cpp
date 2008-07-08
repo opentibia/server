@@ -165,7 +165,7 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 
 	if(tmpItem){
 		if(lootBlock.subType != -1){
-			tmpItem->setItemCountOrSubtype(lootBlock.subType);
+			tmpItem->setSubType(lootBlock.subType);
 		}
 
 		if(lootBlock.actionId != -1){

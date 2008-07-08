@@ -395,7 +395,7 @@ HouseTransferItem* HouseTransferItem::createHouseTransferItem(House* house)
 	HouseTransferItem* transferItem = new HouseTransferItem(house);
 	transferItem->useThing2();
 	transferItem->setID(ITEM_DOCUMENT_RO);
-	transferItem->setItemCountOrSubtype(1);
+	transferItem->setSubType(1);
 	std::stringstream stream;
 	stream << " It is a house transfer document for '" << house->getName() << "'.";
 	transferItem->setSpecialDescription(stream.str());

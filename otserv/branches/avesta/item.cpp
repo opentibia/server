@@ -205,36 +205,6 @@ void Item::setID(uint16_t newid)
 	}
 }
 
-uint16_t Item::getItemCountOrSubtype() const
-{
-	const ItemType& it = items[getID()];
-
-	if(it.isFluidContainer() || it.isSplash()){
-		return getFluidType();
-	}
-	else if(it.charges != 0){
-		return getCharges();
-	}
-	else{
-		return count;
-	}
-}
-
-void Item::setItemCountOrSubtype(uint16_t n)
-{
-	const ItemType& it = items[id];
-
-	if(it.isFluidContainer() || it.isSplash()){
-		setFluidType(n);
-	}
-	else if(it.charges != 0){
-		setCharges(n);
-	}
-	else{
-		count = n;
-	}
-}
-
 bool Item::hasSubType() const
 {
 	const ItemType& it = items[id];
@@ -252,7 +222,22 @@ uint16_t Item::getSubType() const
 		return getCharges();
 	}
 
-	return 0;
+	return count;
+}
+
+void Item::setSubType(uint16_t n)
+{
+	const ItemType& it = items[id];
+
+	if(it.isFluidContainer() || it.isSplash()){
+		setFluidType(n);
+	}
+	else if(it.charges != 0){
+		setCharges(n);
+	}
+	else{
+		count = n;
+	}
 }
 
 bool Item::unserialize(xmlNodePtr nodeItem)
@@ -268,7 +253,7 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 	}
 
 	if(readXMLInteger(nodeItem, "count", intValue)){
-		setItemCountOrSubtype(intValue);
+		setSubType(intValue);
 	}
 
 	if(readXMLString(nodeItem, "special_description", strValue)){
@@ -320,7 +305,7 @@ xmlNodePtr Item::serialize()
 
 	if(hasSubType()){
 		ss.str("");
-		ss << (int32_t)getItemCountOrSubtype();
+		ss << (int32_t)getSubType();
 		xmlSetProp(nodeItem, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 
@@ -384,7 +369,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 				return false;
 			}
 
-			setItemCountOrSubtype(_count);
+			setSubType(_count);
 			break;
 		}
 
@@ -461,7 +446,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 				return false;
 			}
 
-			setItemCountOrSubtype(_charges);
+			setSubType(_charges);
 			break;
 		}
 
@@ -472,7 +457,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 				return false;
 			}
 
-			setItemCountOrSubtype(_charges);
+			setSubType(_charges);
 			break;
 		}
 
@@ -566,7 +551,7 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 {
 	/*
 	if(isStackable() || isSplash() || isFluidContainer()){
-		uint8_t _count = getItemCountOrSubtype();
+		uint8_t _count = getSubType();
 		propWriteStream.ADD_UCHAR(ATTR_COUNT);
 		propWriteStream.ADD_UCHAR(_count);
 	}
@@ -705,14 +690,19 @@ double Item::getWeight() const
 	return items[id].weight;
 }
 
-std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const Item* item /*= NULL*/)
+std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
+	const Item* item /*= NULL*/, int32_t subType /*= -1*/)
 {
 	std::stringstream s;
 
+	if(item){
+		subType = item->getSubType();
+	}
+
 	if(it.name.length()){
-		if(it.stackable && item && item->getItemCount() > 1){
+		if(it.stackable && subType > 1){
 			if(it.showCount){
-				s << (int)item->getItemCount() << " ";
+				s << subType << " ";
 			}
 
 			s << it.pluralName;
@@ -729,9 +719,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 	}
 
 	if(it.isRune()){
-		uint32_t charges = std::max((uint32_t)1, (uint32_t)(item == NULL ? it.charges : item->getCharges()));
-
-		s << "(\"" << it.runeSpellName << "\", Charges:" << charges <<").";
+		s << "(\"" << it.runeSpellName << "\", Charges:" << subType <<").";
 		if(it.runeLevel > 0 || it.runeMagLevel > 0){
 			s << std::endl << "It can only be used with";
 			if(it.runeLevel > 0){
@@ -783,9 +771,8 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		}
 
 		if(it.showCharges){
-			uint32_t charges = (item == NULL ? it.charges : item->getCharges());
-			if(charges > 1){
-				s << " that has " << (int32_t)charges << " charges left";
+			if(subType > 1){
+				s << " that has " << (int32_t)subType << " charges left";
 			}
 			else{
 				s << " that has 1 charge left";
@@ -877,8 +864,8 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		s << ").";
 	}
 	else if(it.isFluidContainer()){
-		if(item && item->getFluidType() != 0){
-			s << " of " << items[item->getFluidType()].name << ".";
+		if(subType > 0){
+			s << " of " << items[subType].name << ".";
 		}
 		else{
 			s << ". It is empty.";
@@ -886,8 +873,8 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 	}
 	else if(it.isSplash()){
 		s << " of ";
-		if(item && item->getFluidType() != 0){
-			s << items[item->getFluidType()].name;
+		if(subType > 0){
+			s << items[subType].name;
 		}
 		else{
 			s << items[1].name;
@@ -935,9 +922,8 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		}
 	}
 	else if(it.showCharges){
-		uint32_t charges = (item == NULL ? it.charges : item->getCharges());
-		if(charges > 1){
-			s << " that has " << (int32_t)charges << " charges left.";
+		if(subType > 1){
+			s << " that has " << (int32_t)subType << " charges left.";
 		}
 		else{
 			s << " that has 1 charge left.";

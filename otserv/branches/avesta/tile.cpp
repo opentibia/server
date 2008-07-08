@@ -878,7 +878,7 @@ void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	const ItemType& newType = Item::items[itemId];
 
 	item->setID(itemId);
-	item->setItemCountOrSubtype(count);
+	item->setSubType(count);
 	onUpdateTileItem(index, item, oldType, item, newType);
 }
 

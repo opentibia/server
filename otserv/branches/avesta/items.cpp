@@ -1225,6 +1225,7 @@ bool Items::loadFromXml(const std::string& datadir)
 			std::cout << "Warning: [Items::loadFromXml] Item " << it->id <<  " is not set as a bed-type." << std::endl;
 		}
 
+		/*
 		//check looping decaying items
 		if(it->decayTo <= 0 || !it->moveable){
 			continue;
@@ -1253,6 +1254,7 @@ bool Items::loadFromXml(const std::string& datadir)
 				break;
 			}
 		}
+		*/
 	}
 
 	return true;

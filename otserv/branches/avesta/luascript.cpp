@@ -814,7 +814,7 @@ void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, uint32_t thingid)
 		setField(L, "itemid", item->getID());
 
 		if(item->hasSubType())
-			setField(L, "type", item->getItemCountOrSubtype());
+			setField(L, "type", item->getSubType());
 		else
 			setField(L, "type", 0);
 
@@ -2526,8 +2526,13 @@ int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 {
-	//doPlayerAddItem(cid, itemid, <optional> count/subtype)
+	//doPlayerAddItem(cid, itemid, <optional> count/subtype, <optional: default: 1> canDropOnMap)
 	int32_t parameters = lua_gettop(L);
+
+	bool canDropOnMap = true;
+	if(parameters > 3){
+		canDropOnMap = (popNumber(L) == 1);
+	}
 
 	uint32_t count = 0;
 	if(parameters > 2){
@@ -2558,7 +2563,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 				return 1;
 			}
 
-			ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
+			ReturnValue ret = g_game.internalPlayerAddItem(player, newItem, canDropOnMap);
 
 			if(ret != RET_NOERROR){
 				delete newItem;
@@ -2592,7 +2597,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 			return 1;
 		}
 
-		ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
+		ReturnValue ret = g_game.internalPlayerAddItem(player, newItem, canDropOnMap);
 
 		if(ret != RET_NOERROR){
 			delete newItem;

@@ -270,7 +270,8 @@ public:
 	virtual const BedItem* getBed() const { return NULL; }
 	//]
 
-	static std::string getDescription(const ItemType& it, int32_t lookDistance, const Item* item = NULL);
+	static std::string getDescription(const ItemType& it, int32_t lookDistance,
+		const Item* item = NULL, int32_t subType = -1);
 	static std::string getWeightDescription(const ItemType& it, double weight, uint32_t count = 1);
 
 	//serialization
@@ -345,11 +346,10 @@ public:
 	uint16_t getItemCount() const {return count;}
 	void setItemCount(uint16_t n) {count = n;}
 
-	uint16_t getItemCountOrSubtype() const;
-	void setItemCountOrSubtype(uint16_t n);
 	void setDefaultSubtype();
 	bool hasSubType() const;
 	uint16_t getSubType() const;
+	void setSubType(uint16_t n);
 
 	void setUniqueId(uint16_t n);
 

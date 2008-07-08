@@ -259,7 +259,7 @@ public:
 		uint32_t flags = 0, bool test = false);
 	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
 
-	ReturnValue internalPlayerAddItem(Player* player, Item* item);
+	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true);
 
 	/**
 	  * Find an item of a certain type

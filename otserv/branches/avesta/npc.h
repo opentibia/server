@@ -72,9 +72,8 @@ protected:
 	static int luaSetNpcState(lua_State *L);
 	static int luaGetNpcName(lua_State *L);
 	static int luaGetNpcParameter(lua_State *L);
-	// new: shop
-	static int luaSendShop(lua_State *L);
-	static int luaCloseShop(lua_State *L);
+	static int luaOpenShopWindow(lua_State *L);
+	static int luaCloseShopWindow(lua_State *L);
 
 private:
 	virtual bool initState();
@@ -165,6 +164,8 @@ enum ReponseActionParam_t{
 	ACTION_SETTOPIC,
 	ACTION_SETLEVEL,
 	ACTION_SETPRICE,
+	ACTION_SETBUYPRICE,
+	ACTION_SETSELLPRICE,
 	ACTION_TAKEMONEY,
 	ACTION_GIVEMONEY,
 	ACTION_SELLITEM,
@@ -201,12 +202,22 @@ enum NpcEvent_t{
 	EVENT_THINK,
 	EVENT_PLAYER_ENTER,
 	EVENT_PLAYER_MOVE,
-	EVENT_PLAYER_LEAVE
+	EVENT_PLAYER_LEAVE,
+	EVENT_PLAYER_SHOPSELL,
+	EVENT_PLAYER_SHOPBUY,
+	EVENT_PLAYER_SHOPCLOSE
+
 	/*
 	EVENT_CREATURE_ENTER,
 	EVENT_CREATURE_MOVE,
 	EVENT_CREATURE_LEAVE,
 	*/
+};
+
+enum ShopEvent_t{
+	SHOPEVENT_SELL,
+	SHOPEVENT_BUY,
+	SHOPEVENT_CLOSE
 };
 
 struct ResponseAction{
@@ -259,13 +270,15 @@ struct ListItem{
 	{
 		itemId = 0;
 		subType = 1;
-		price = 0;
+		sellPrice = 0;
+		buyPrice = 0;
 		keywords = "";
 		name = "";
 		pluralName = "";
 	}
 
-	int32_t price;
+	int32_t sellPrice;
+	int32_t buyPrice;
 	int32_t itemId;
 	int32_t subType;
 	std::string keywords;
@@ -295,6 +308,7 @@ public:
 			storageValue = -1;
 			storageComp = STORAGE_EQUAL;
 			knowSpell = "";
+			publicize = true;
 		}
 
 		int32_t topic;
@@ -310,6 +324,8 @@ public:
 		StorageComparision_t storageComp;
 		std::string knowSpell;
 		ActionList actionList;
+		std::list<ListItem> itemList;
+		bool publicize;
 	};
 
 	NpcResponse(const ResponseProperties& _prop,
@@ -353,6 +369,7 @@ public:
 	const std::string& getText() const {return prop.output;}
 	int32_t getAmount() const {return prop.amount;}
 	void setAmount(int32_t _amount) { prop.amount = _amount;}
+	bool publicize() const {return prop.publicize;}
 
 	std::string formatResponseString(Creature* creature) const;
 	void addAction(ResponseAction action) {prop.actionList.push_back(action);}
@@ -374,6 +391,8 @@ struct NpcState{
 	bool isIdle;
 	bool isQueued;
 	int32_t price;
+	int32_t sellPrice;
+	int32_t buyPrice;
 	int32_t amount;
 	int32_t itemId;
 	int32_t subType;
@@ -429,9 +448,9 @@ public:
 	bool isLoaded(){return loaded;}
 
 	void onPlayerCloseChannel(const Player* player);
-	void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
+	void onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
 	    uint8_t count, uint8_t amount);
-	void onPlayerEndTrade(const Player* player, int32_t buyCallback,
+	void onPlayerEndTrade(Player* player, int32_t buyCallback,
 		int32_t sellCallback);
 
 	void setCreatureFocus(Creature* creature);
@@ -481,6 +500,9 @@ protected:
 
 	std::string formatResponse(Creature* creature, const NpcState* npcState, const NpcResponse* response) const;
 
+	void onPlayerEnter(Player* player, NpcState* state);
+	void onPlayerLeave(Player* player, NpcState* state);
+
 	typedef std::map<std::string, std::string> ParametersMap;
 	ParametersMap m_parameters;
 
@@ -492,6 +514,7 @@ protected:
 	void addShopPlayer(Player* player);
 	void removeShopPlayer(const Player* player);
 	void closeAllShopWindows();
+	uint32_t getListItemPrice(uint16_t itemId, ShopEvent_t type);
 
 	std::string name;
 	std::string m_datadir;

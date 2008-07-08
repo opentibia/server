@@ -1327,20 +1327,15 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 	return RET_NOERROR;
 }
 
-ReturnValue Game::internalPlayerAddItem(Player* player, Item* item)
+ReturnValue Game::internalPlayerAddItem(Player* player, Item* item, bool dropOnMap /*= true*/)
 {
 	ReturnValue ret = internalAddItem(player, item);
 
-	if(ret != RET_NOERROR){
-		Tile* tile = player->getTile();
-		ret = internalAddItem(tile, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
-		if(ret != RET_NOERROR){
-			delete item;
-			return ret;
-		}
+	if(ret != RET_NOERROR && dropOnMap){
+		ret = internalAddItem(player->getTile(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	}
 
-	return RET_NOERROR;
+	return ret;
 }
 
 Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
@@ -1651,7 +1646,7 @@ bool Game::addMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
 
 Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 {
-	if(item->getID() == newId && (newCount == -1 || newCount == item->getItemCountOrSubtype()))
+	if(item->getID() == newId && (newCount == -1 || newCount == item->getSubType()))
 		return item;
 
 	Cylinder* cylinder = item->getParent();
@@ -1728,7 +1723,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 		else{
 			cylinder->postRemoveNotification(item, itemIndex, false);
 			uint16_t itemId = item->getID();
-			int32_t count = item->getItemCountOrSubtype();
+			int32_t count = item->getSubType();
 
 			if(curType.id != newType.id){
 				if(newType.group != curType.group){
@@ -2820,8 +2815,18 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 		return false;
 	}
 
-	merchant->onPlayerTrade(player, onBuy,
-	    it.id, count, amount);
+	uint8_t subType = 0;
+	if(it.isFluidContainer()){
+		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+		if(count < maxFluidType){
+			subType = (uint8_t)reverseFluidMap[count];
+		}
+	}
+	else{
+		subType = count;
+	}
+
+	merchant->onPlayerTrade(player, SHOPEVENT_BUY, onBuy, it.id, subType, amount);
 	return true;
 }
 
@@ -2844,8 +2849,18 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		return false;
 	}
 
-	merchant->onPlayerTrade(player, onSell,
-	    it.id, count, amount);
+	uint8_t subType = 0;
+	if(it.isFluidContainer()){
+		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+		if(count < maxFluidType){
+			subType = (uint8_t)reverseFluidMap[count];
+		}
+	}
+	else{
+		subType = count;
+	}
+
+	merchant->onPlayerTrade(player, SHOPEVENT_SELL, onSell, it.id, subType, amount);
 	return true;
 }
 
@@ -2870,8 +2885,19 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 		return false;
 	}
 
+	int32_t subType = 0;
+	if(it.isFluidContainer()){
+		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+		if(count < maxFluidType){
+			subType = reverseFluidMap[count];
+		}
+	}
+	else{
+		subType = count;
+	}
+
 	std::stringstream ss;
-	ss << "You see " << Item::getDescription(it, 1);
+	ss << "You see " << Item::getDescription(it, 1, NULL, subType);
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
 	return true;
