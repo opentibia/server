@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-
-<monsters>
-
-<monster name="demon" file="demon.xml"/>
-<monster name="minotaur archer" file="minotaur archer.xml"/>
-<monster name="poison spider" file="poison spider.xml"/>
-</monsters>
