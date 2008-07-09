@@ -19620,6 +19620,106 @@
 	<item id="8078" article="a" name="bed">
 		<attribute key="type" value="bed" />
 	</item>
+	<item id="8882" name="dirt" editorsuffix="thick borders">
+	</item>
+	<item id="8883" name="dirt" editorsuffix="thick borders">
+	</item>
+	<item id="8884" name="dirt" editorsuffix="thick borders">
+	</item>
+	<item id="8885" name="dirt" editorsuffix="thick borders">
+	</item>
+	<item id="8886" name="dirt" editorsuffix="thick borders">
+	</item>
+	<item id="8887" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8888" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8889" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8890" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8891" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8892" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8893" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8894" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8895" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8896" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8897" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8898" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8899" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8900" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8901" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8902" name="grass" editorsuffix="thick borders">
+	</item>
+	<item id="8903" article="a" name="wooden pillar">
+	</item>
+	<item id="6904" article="a" name="wooden pillar">
+	</item>
+	<item id="8905" name="sand" editorsuffix="old borders">
+	</item>
+	<item id="8906" name="sand" editorsuffix="">
+	</item>
+	<item id="8907" name="frozen mud" editorsuffix="thick borders">
+	</item>
+	<item id="8908" name="frozen mud" editorsuffix="thick borders">
+	</item>
+	<item id="8909" name="frozen mud" editorsuffix="thick borders">
+	</item>
+	<item id="8910" name="frozen mud" editorsuffix="thick borders">
+	</item>
+	<item id="8911" name="frozen mud" editorsuffix="thick borders">
+	</item>
+	<item id="8912" article="a" name="framework wall" editorsuffix="dirty">
+	</item>
+	<item id="8914" article="a" name="wooden pillar">
+	</item>
+	<item id="8915" article="a" name="wooden pillar">
+	</item>
+	<item id="8916" article="a" name="wooden pillar">
+	</item>
+	<item id="8917" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8918" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8919" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8920" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8921" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8922" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8923" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8924" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8925" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8926" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8927" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8928" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8929" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8930" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8931" name="earth" editorsuffix="stone borders">
+	</item>
+	<item id="8932" name="earth" editorsuffix="stone borders">
+	</item>
 	<item id="20001" name="water">
 	</item>
 	<item id="20002" name="blood">
