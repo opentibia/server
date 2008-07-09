@@ -51,8 +51,8 @@ public:
 protected:
 	std::string _parse(const std::string &s);
 
+	OTSYS_THREAD_LOCKVAR sqliteLock;
 	sqlite3* m_handle;
-
 	bool m_connected;
 };
 
