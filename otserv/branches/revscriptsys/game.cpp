@@ -3516,6 +3516,8 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	}
 
 	// REVSCRIPT TODO Event callback
+	ScriptEvent_OnTalk evt(player, type, text, receiver);
+	script_system.dispatchEvent(evt);
 
 	player->removeMessageBuffer();
 
