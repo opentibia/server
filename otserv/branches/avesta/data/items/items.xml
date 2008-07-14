@@ -1411,6 +1411,7 @@
 	</item>
 	<item id="1387" article="a" name="magic forcefield">
 		<attribute key="description" value="You can see the other side through it."/>
+		<attribute key="type" value="teleport"/>
 	</item>
 	<item id="1388" article="a" name="ramp">
 	</item>
@@ -12527,8 +12528,10 @@
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="5023" article="a" name="magic forcefield">
+		<attribute key="type" value="teleport"/>
 	</item>
 	<item id="5024" article="a" name="magic forcefield">
+		<attribute key="type" value="teleport"/>
 	</item>
 	<item id="5025" article="a" name="wooden lamp">
 	</item>
