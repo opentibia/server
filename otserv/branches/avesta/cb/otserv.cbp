@@ -7,7 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug Windows">
-				<Option output="C:\otserv\otserv" prefix_auto="1" extension_auto="1" />
+				<Option platforms="Windows;" />
+				<Option output="..\otserv" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -21,21 +22,16 @@
 					<Add option="-D__EXCEPTION_TRACER__" />
 				</Compiler>
 				<Linker>
+					<Add option="-pg" />
 					<Add option="-pg -lgmon" />
 					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
-					<Add library="mysql" />
-					<Add library="liblibxml2" />
-					<Add library="gmp" />
-					<Add library="lua5.1" />
-					<Add library="boost_system" />
 					<Add library="wsock32" />
 					<Add library="ws2_32" />
-					<Add library="boost_regex" />
-					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
-				<Option output="C:\otserv\otserv" prefix_auto="1" extension_auto="1" />
+				<Option platforms="Windows;" />
+				<Option output="..\otserv" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -48,18 +44,12 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="mysql" />
-					<Add library="boost_regex" />
-					<Add library="liblibxml2" />
-					<Add library="gmp" />
-					<Add library="lua5.1" />
-					<Add library="boost_system" />
 					<Add library="wsock32" />
 					<Add library="ws2_32" />
-					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 			<Target title="Debug Unix">
+				<Option platforms="Unix;" />
 				<Option output="..\otserv" prefix_auto="0" extension_auto="0" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -69,12 +59,16 @@
 					<Add option="-g" />
 					<Add option="-D__DEBUG__" />
 					<Add option="-D__USE_SQLITE__" />
+					<Add directory="\usr\include\libxml2\" />
+					<Add directory="\usr\include\lua5.1\" />
 				</Compiler>
 				<Linker>
+					<Add option="-pg" />
 					<Add option="-pg -lgmon" />
 				</Linker>
 			</Target>
 			<Target title="Release Unix">
+				<Option platforms="Unix;" />
 				<Option output="..\otserv" prefix_auto="0" extension_auto="0" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -83,15 +77,31 @@
 					<Add option="-O2" />
 					<Add option="-D__USE_SQLITE__" />
 					<Add option="-D__SKULLSYSTEM__" />
+					<Add directory="\usr\include\libxml2\" />
+					<Add directory="\usr\include\lua5.1\" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 				</Linker>
 			</Target>
 		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Debug Windows;Release Windows;Debug Unix;Release Unix;" />
+			<Add alias="All Debug" targets="Debug Windows;Debug Unix;" />
+			<Add alias="All Release" targets="Release Windows;Release Unix;" />
+		</VirtualTargets>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add library="mysql" />
+			<Add library="boost_regex" />
+			<Add library="liblibxml2" />
+			<Add library="gmp" />
+			<Add library="lua5.1" />
+			<Add library="boost_system" />
+			<Add library="sqlite3" />
+		</Linker>
 		<Unit filename="..\AUTHORS" />
 		<Unit filename="..\Doxyfile" />
 		<Unit filename="..\LICENSE" />
@@ -143,7 +153,10 @@
 		<Unit filename="..\cylinder.h" />
 		<Unit filename="..\database.cpp" />
 		<Unit filename="..\database.h" />
-		<Unit filename="..\databasemysql.cpp" />
+		<Unit filename="..\databasemysql.cpp">
+			<Option target="Debug Windows" />
+			<Option target="Release Windows" />
+		</Unit>
 		<Unit filename="..\databasemysql.h" />
 		<Unit filename="..\databaseodbc.h" />
 		<Unit filename="..\databasepgsql.h" />
@@ -223,6 +236,8 @@
 		<Unit filename="..\protocolgame.h" />
 		<Unit filename="..\protocollogin.cpp" />
 		<Unit filename="..\protocollogin.h" />
+		<Unit filename="..\quests.cpp" />
+		<Unit filename="..\quests.h" />
 		<Unit filename="..\raids.cpp" />
 		<Unit filename="..\raids.h" />
 		<Unit filename="..\rsa.cpp" />
@@ -269,6 +284,7 @@
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
