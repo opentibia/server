@@ -149,7 +149,7 @@ Creature()
 
 	editHouse = NULL;
 	editListId = 0;
-	
+
 	shopOwner = NULL;
 	purchaseCallback = -1;
 	saleCallback = -1;
@@ -1303,6 +1303,8 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 			g_game.internalCloseTrade(this);
 		}
 
+		closeShopWindow();
+
 		g_chat.removeUserFromAllChannels(this);
 
 		bool saved = false;
@@ -1319,6 +1321,20 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 #ifdef __DEBUG_PLAYERS__
 		std::cout << (uint32_t)g_game.getPlayersOnline() << " players online." << std::endl;
 #endif
+	}
+}
+
+void Player::closeShopWindow()
+{
+	//unreference callbacks
+	int32_t onBuy;
+	int32_t onSell;
+
+	Npc* npc = getShopOwner(onBuy, onSell);
+	if(npc){
+		setShopOwner(NULL, -1, -1);
+		npc->onPlayerEndTrade(this, onBuy, onSell);
+		sendCloseShop();
 	}
 }
 

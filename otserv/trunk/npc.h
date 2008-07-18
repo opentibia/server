@@ -184,11 +184,18 @@ protected:
 	typedef std::map<std::string, std::string> ParametersMap;
 	ParametersMap m_parameters;
 
+	void addShopPlayer(Player* player);
+	void removeShopPlayer(const Player* player);
+	void closeAllShopWindows();
+
 	std::string name;
 	int32_t autoWalkChance;
 	bool floorChange;
 	bool attackable;
 	uint32_t focusCreature;
+
+	typedef std::list<Player*> ShopPlayerList;
+	ShopPlayerList shopPlayerList;
 
 	NpcEventsHandler* m_npcEventHandler;
 	bool loaded;

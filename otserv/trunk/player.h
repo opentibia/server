@@ -238,7 +238,7 @@ public:
 	void setTradeState(tradestate_t state) {tradeState = state;};
 	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
-	
+
 	//shop functions
 	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell) {
 			shopOwner = owner;
@@ -531,6 +531,8 @@ public:
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 
+	void closeShopWindow();
+
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;
 
@@ -659,7 +661,7 @@ protected:
 	Npc* shopOwner;
 	int32_t purchaseCallback;
 	int32_t saleCallback;
-	
+
 
 	std::string name;
 	std::string nameDescription;
