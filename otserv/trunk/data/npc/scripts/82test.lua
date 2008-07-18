@@ -95,7 +95,7 @@ end
 function onCreatureDisappear(cid)
 	if(isFocused(cid)) then
 		selfSay("Hmph!")
-		focus = 0
+		removeFocus(cid)
 		if(isPlayer(cid) == TRUE) then --Be sure he's online
 			closeShopWindow(cid)
 		end
@@ -109,11 +109,11 @@ function onCreatureSay(cid, type, msg)
 		addFocus(cid)
 	elseif((isFocused(cid)) and (msg == "wares" or msg == "trade")) then
 		selfSay("Pretty nice, right?", cid)
-		sendShopWindow(cid, itemWindow, onBuy, onSell)
+		openShopWindow(cid, itemWindow, onBuy, onSell)
 	elseif((isFocused(cid)) and (msg == "bye" or msg == "goodbye" or msg == "cya")) then
 		selfSay("Goodbye!", cid, TRUE)
 		closeShopWindow(cid)
-		focus = 0
+		removeFocus(cid)
 	end
 end
 
@@ -121,7 +121,7 @@ function onPlayerCloseChannel(cid)
 	if(isFocused(cid)) then
 		selfSay("Hmph!")
 		closeShopWindow(cid)
-		focus = 0
+		removeFocus(cid)
 	end
 end
 
