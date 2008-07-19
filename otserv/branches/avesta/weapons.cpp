@@ -278,7 +278,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	range = Item::items[id].shootRange;
-	
+
 	std::string vocationString;
 	if(!vocStringList.empty()){
 		for(STRING_LIST::iterator it = vocStringList.begin(); it != vocStringList.end(); ++it){
@@ -317,7 +317,12 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		it.minReqMagicLevel = getReqMagLv();
 	}
 
-	return true;
+	// the weapon must be configured in order for FORMULA_SKILL to function properly
+	if(configureWeapon(Item::items[getID()])){
+		return true;
+	}
+
+	return false;
 }
 
 bool Weapon::loadFunction(const std::string& functionName)
@@ -972,7 +977,7 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 			minValue = (int32_t)std::ceil(player->getLevel() * 0.2);
 		}
 	}
-	
+
 	return -random_range(minValue, maxValue, DISTRO_NORMAL);
 }
 
