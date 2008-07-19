@@ -441,6 +441,11 @@ void Game::internalGetPosition(Item* item, Position& pos, uint8_t& stackpos)
 	}
 }
 
+void Game::setTile(Tile* newtile)
+{
+	return map->setTile(newtile->getPosition(), newtile);
+}
+
 Tile* Game::getTile(uint32_t x, uint32_t y, uint32_t z)
 {
 	return map->getTile(x, y, z);

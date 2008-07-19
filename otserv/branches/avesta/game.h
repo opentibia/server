@@ -145,6 +145,11 @@ public:
 	Tile* getTile(uint32_t x, uint32_t y, uint32_t z);
 
 	/**
+	  * Set a single tile of the map, position is read from this tile
+		*/
+	void setTile(Tile* newtile);
+
+	/**
 	  * Get a leaf of the map.
 	  * \return A pointer to a leaf
 		*/

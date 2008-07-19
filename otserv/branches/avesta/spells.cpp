@@ -725,9 +725,8 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
 
 			if(!tile){
-				player->sendCancelMessage(RET_NOTPOSSIBLE);
-				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-				return false;
+				tile = new Tile(toPos.x, toPos.y, toPos.z);
+				g_game.setTile(tile);
 			}
 
 			ReturnValue ret;

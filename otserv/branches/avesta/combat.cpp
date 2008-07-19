@@ -138,9 +138,11 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	}
 	else{
 		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
-		if(tile){
-			list.push_back(tile);
+		if(!tile) {
+			tile = new Tile(targetPos.x, targetPos.y, targetPos.z);
+			g_game.setTile(tile);
 		}
+		list.push_back(tile);
 	}
 }
 
@@ -284,9 +286,9 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 		return RET_NOTENOUGHROOM;
 	}
 
-	if(!tile->ground){
-		return RET_NOTPOSSIBLE;
-	}
+	//if(!tile->ground){
+	//	return RET_NOTPOSSIBLE;
+	//}
 
 	if(tile->floorChange()){
 		return RET_NOTENOUGHROOM;
@@ -1122,10 +1124,6 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 {
 	Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 
-	if(!tile){
-		return false;
-	}
-
 	const MatrixArea* area = getArea(centerPos, targetPos);
 	if(!area){
 		return false;
@@ -1148,10 +1146,11 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 			if(area->getValue(y, x) != 0){
 				if(g_game.isSightClear(targetPos, tmpPos, true)){
 					tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
-
-					if(tile){
-						list.push_back(tile);
+					if(!tile){
+						tile = new Tile(tmpPos.x, tmpPos.y, tmpPos.z);
+						g_game.setTile(tile);
 					}
+					list.push_back(tile);
 				}
 			}
 
