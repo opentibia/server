@@ -24,6 +24,8 @@
 #include "database.h"
 #include "databasesqlite.h"
 
+#include "tools.h"
+
 #include "configmanager.h"
 extern ConfigManager g_config;
 
@@ -39,6 +41,12 @@ DatabaseSQLite::DatabaseSQLite()
 {
 	OTSYS_THREAD_LOCKVARINIT(sqliteLock);
 	m_connected = false;
+
+	// test for existence of database file;
+	// sqlite3_open will create a new one if it isn't there (which we don't want)
+	if(!fileExists(g_config.getString(ConfigManager::SQL_DB).c_str())){
+		return;
+	}
 
 	// Initialize sqlite
 	if( sqlite3_open(g_config.getString(ConfigManager::SQL_DB).c_str(), &m_handle) != SQLITE_OK){

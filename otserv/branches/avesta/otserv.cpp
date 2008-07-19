@@ -216,6 +216,15 @@ void mainLoader(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 
+	std::cout << ":: Checking Database Connection... ";
+	Database* db = Database::instance();
+	if(db == NULL || !db->isConnected())
+	{
+		ErrorMessage("Database Connection Failed!");
+		exit(-1);
+	}
+	std::cout << "[done]" << std::endl;
+
 	//load RSA key
 	std::cout << ":: Loading RSA key...";
 	const char* p("14299623962416399520070177382898895550795403345466153217470516082934737582776038882967213386204600674145392845853859217990626450972452084065728686565928113");

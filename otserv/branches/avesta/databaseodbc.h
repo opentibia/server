@@ -71,8 +71,6 @@ protected:
 
 	SQLHDBC m_handle;
 	SQLHENV m_env;
-
-	bool m_connected;
 };
 
 class ODBCResult : public _DBResult

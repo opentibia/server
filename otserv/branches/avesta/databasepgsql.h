@@ -51,8 +51,6 @@ protected:
 	std::string _parse(const std::string &s);
 
 	PGconn* m_handle;
-
-	bool m_connected;
 };
 
 class PgSQLResult : public _DBResult

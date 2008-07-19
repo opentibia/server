@@ -54,8 +54,6 @@ public:
 
 protected:
 	MYSQL m_handle;
-
-	bool m_connected;
 };
 
 class MySQLResult : public _DBResult

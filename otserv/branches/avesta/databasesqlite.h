@@ -53,7 +53,6 @@ protected:
 
 	OTSYS_THREAD_LOCKVAR sqliteLock;
 	sqlite3* m_handle;
-	bool m_connected;
 };
 
 class SQLiteResult : public _DBResult
