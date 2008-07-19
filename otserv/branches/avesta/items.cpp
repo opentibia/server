@@ -109,9 +109,9 @@ ItemType::ItemType()
 	showDuration  = false;
 	showCharges   = false;
 	charges       = 0;
-	hitChance     = 0;
-	maxHitChance  = 0;
-	breakChance   = 0;
+	hitChance     = -1;
+	maxHitChance  = -1;
+	breakChance   = -1;
 	shootRange    = 1;
 
 	condition = NULL;
@@ -359,7 +359,7 @@ int Items::loadFromOtb(std::string file)
 		}
 
 		reverseItemMap[iType->clientId] = iType->id;
-		
+
 		// store the found item
 		items.addElement(iType, iType->id);
 		node = f.getNextNode(node, type);
@@ -1230,7 +1230,7 @@ bool Items::loadFromXml(const std::string& datadir)
 		if(it->decayTo <= 0 || !it->moveable){
 			continue;
 		}
-	
+
 		std::vector<int32_t> decayList;
 		decayList.push_back(it->id);
 		int32_t decayTo = it->decayTo;
