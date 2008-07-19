@@ -21,7 +21,7 @@ if(NpcHandler == nil) then
 		--Small Note: Private conversations also means the NPC will use multi-focus system.
 
 	-- Currently applied conversation behavior. CONVERSATION_PRIVATE is default.
-	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_DEFAULT
+	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_PRIVATE
 	
 	
 	
@@ -156,12 +156,19 @@ if(NpcHandler == nil) then
 		self:updateFocus()
 	end
 	NpcHandler.changeFocus = NpcHandler.addFocus --"changeFocus" looks better for CONVERSATION_DEFAULT
-
+	
 	-- Function used to verify if npc is focused to certain player
 	function NpcHandler:isFocused(focus)
 		if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
-			return (table.find(self.focuses, focus) ~= nil)
+			for k,v in pairs(self.focuses) do
+				if v == focus then
+					return true
+				end
+			end
+			
+			return false
 		end
+
 		return (self.focuses == focus)
 	end
 	
@@ -188,7 +195,13 @@ if(NpcHandler == nil) then
 				return
 			end
 
-			local pos = table.find(self.focuses, focus)
+			local pos = nil
+			for k,v in pairs(self.focuses) do
+				if v == focus then
+					pos = k
+				end
+			end
+			
 			table.remove(self.focuses, pos)
 			self.talkStart[focus] = nil
 			closeShopWindow(focus) --Even if it can not exist, we need to prevent it.
