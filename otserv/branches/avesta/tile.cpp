@@ -333,13 +333,19 @@ void Tile::onUpdateTile()
 
 void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
 {
+	Tile* toTile = toCylinder->getTile();
 	int32_t oldStackPos = __getIndexOfThing(creature);
 
 	//remove the creature
 	__removeThing(creature, 0);
 
+	// Switch the node ownership
+	if(qt_node != toTile->qt_node) {
+		qt_node->removeCreature(creature);
+		toTile->qt_node->addCreature(creature);
+	}
+	
 	//add the creature
-	Tile* toTile = dynamic_cast<Tile*>(toCylinder);
 	toTile->__addThing(creature);
 	int32_t newStackPos = toTile->__getIndexOfThing(creature);
 

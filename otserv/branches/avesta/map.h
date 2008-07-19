@@ -139,11 +139,15 @@ public:
 	QTreeLeafNode* stepSouth(){return m_leafS;}
 	QTreeLeafNode* stepEast(){return m_leafE;}
 
+	void addCreature(Creature* c);
+	void removeCreature(Creature* c);
+
 protected:
 	static bool newLeaf;
 	QTreeLeafNode* m_leafS;
 	QTreeLeafNode* m_leafE;
 	Floor* m_array[MAP_MAX_LAYERS];
+	CreatureVector creature_list;
 
 	friend class Map;
 	friend class QTreeNode;
@@ -307,5 +311,16 @@ protected:
 	friend class IOMap;
 	friend class IOMapSerialize;
 };
+
+inline void QTreeLeafNode::addCreature(Creature* c) {
+	creature_list.push_back(c);
+}
+
+inline void QTreeLeafNode::removeCreature(Creature* c) {
+	CreatureVector::iterator iter = std::find(creature_list.begin(), creature_list.end(), c);
+	assert(iter != creature_list.end());
+	std::swap(*iter, creature_list.back());
+	creature_list.pop_back();
+}
 
 #endif

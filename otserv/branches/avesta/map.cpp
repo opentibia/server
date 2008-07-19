@@ -220,6 +220,7 @@ void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 	uint32_t offsetY = y & FLOOR_MASK;
 	if(!floor->tiles[offsetX][offsetY]){
 		floor->tiles[offsetX][offsetY] = newtile;
+		newtile->qt_node = leaf;
 	}
 	else{
 		std::cout << "Error: Map::setTile() already exists." << std::endl;
@@ -292,6 +293,8 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 		uint32_t flags = 0;
 		Cylinder* toCylinder = tile->__queryDestination(index, creature, &toItem, flags);
 		toCylinder->__internalAddThing(creature);
+		Tile* toTile = toCylinder->getTile();
+		toTile->qt_node->addCreature(creature);
 		return true;
 	}
 
@@ -327,13 +330,13 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 	int32_t endx2 = x2 - (x2 % FLOOR_SIZE);
 	int32_t endy2 = y2 - (y2 % FLOOR_SIZE);
 
-	int32_t floorx1, floory1, floorx2, floory2;
+	//int32_t floorx1, floory1, floorx2, floory2;
 
 	QTreeLeafNode* startLeaf;
 	QTreeLeafNode* leafE;
 	QTreeLeafNode* leafS;
-	Floor* floor;
-	int32_t offsetZ;
+	//Floor* floor;
+	//int32_t offsetZ;
 
 	startLeaf = getLeaf(startx1, starty1);
 	leafS = startLeaf;
@@ -342,6 +345,27 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 		leafE = leafS;
 		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
 			if(leafE){
+				CreatureVector& node_list = leafE->creature_list;
+				CreatureVector::const_iterator node_iter = node_list.begin();
+				CreatureVector::const_iterator node_end = node_list.end();
+				if(node_iter != node_end) {
+					do {
+						Creature* creature = *node_iter;
+						const Position& cpos = creature->getPosition();
+						if(cpos.z < minRangeZ || cpos.z > maxRangeZ) continue;
+						if(cpos.y < centerPos.y + minRangeY || cpos.y > centerPos.y + maxRangeY) continue;
+						if(cpos.x < centerPos.x + minRangeX || cpos.x > centerPos.x + maxRangeX) continue;
+
+						if(checkforduplicate) {
+							if(std::find(list.begin(), list.end(), creature) == list.end()){
+								list.push_back(creature);
+							}
+						} else {
+							list.push_back(creature);
+						}
+					} while(++node_iter != node_end);
+				}
+				/*
 				for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
 
 					if((floor = leafE->getFloor(nz))){
@@ -374,7 +398,7 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 						}
 					}
 				}
-
+				*/
 				leafE = leafE->stepEast();
 			}
 			else{

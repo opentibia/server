@@ -31,6 +31,7 @@ class Teleport;
 class TrashHolder;
 class Mailbox;
 class MagicField;
+class QTreeLeafNode;
 //[ added for beds system
 class BedItem;
 //]
@@ -74,6 +75,7 @@ public:
 		tilePos.x = x;
 		tilePos.y = y;
 		tilePos.z = z;
+		qt_node = NULL;
 
 		thingCount = 0;
 		m_flags = 0;
@@ -105,6 +107,7 @@ public:
 	ItemVector     topItems;
 	CreatureVector creatures;
 	ItemVector     downItems;
+	QTreeLeafNode* qt_node;
 
 	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
