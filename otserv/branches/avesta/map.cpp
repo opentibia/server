@@ -309,6 +309,7 @@ bool Map::removeCreature(Creature* creature)
 {
 	Tile* tile = creature->getTile();
 	if(tile){
+		tile->qt_node->removeCreature(creature);
 		tile->__removeThing(creature, 0);
 		return true;
 	}
