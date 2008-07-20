@@ -626,7 +626,9 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	getSpectators(list, cylinder->getPosition(), false, true);
 
 	int32_t index = cylinder->__getIndexOfThing(creature);
-	cylinder->__removeThing(creature, 0);
+	if(!map->removeCreature(creature)){
+		return false;
+	}
 
 	//send to client
 	Player* player = NULL;
