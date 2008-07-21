@@ -626,7 +626,7 @@ bool Spell::playerSpellCheck(Player* player) const
 			}
 		}
 
-		if((isAggressive && player->hasCondition(CONDITION_EXHAUST_COMBAT)) || 
+		if((isAggressive && player->hasCondition(CONDITION_EXHAUST_COMBAT)) ||
 			player->hasCondition(CONDITION_EXHAUST_HEAL)){
 			player->sendCancelMessage(RET_YOUAREEXHAUSTED);
 
@@ -1058,11 +1058,13 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 		bool useDirection = false;
 
 		if(hasParam){
-			target = g_game.getPlayerByName(param);
+			Player* pTarget = NULL;
+			ReturnValue ret = g_game.getPlayerByNameWildcard(param, &pTarget);
+			target = pTarget;
 
 			if(!target || target->getHealth() <= 0){
 				if(!casterTargetOrDirection){
-					player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
+					player->sendCancelMessage(ret);//RET_PLAYERWITHTHISNAMEISNOTONLINE);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
@@ -1364,7 +1366,8 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 		LEVEL_SAME,
 	};
 
-	Player* playerExiva = g_game.getPlayerByName(param);
+	Player* playerExiva = NULL;
+	ReturnValue ret = g_game.getPlayerByNameWildcard(param, &playerExiva);
 	if(playerExiva && playerExiva->getAccessLevel() <= player->getAccessLevel()){
 		const Position lookPos = player->getPosition();
 		const Position searchPos = playerExiva->getPosition();
@@ -1531,7 +1534,7 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 		return true;
 	}
 	else{
-		player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
+		player->sendCancelMessage(ret);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 	}
 
@@ -1817,7 +1820,7 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 		//Test if we can cast the conjure spell on left hand
 		ReturnValue result1 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
 			spell->getReagentId(), SLOT_LEFT, true);
-	
+
 		if(result1 == RET_NOERROR){
 			//Check level/mana etc.
 			if(!spell->playerSpellCheck(player)){
@@ -1835,7 +1838,7 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 		//Check if we can cast the conjure spell on the right hand
 		ReturnValue result2 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
 			spell->getReagentId(), SLOT_RIGHT, true);
-	
+
 		if(result2 == RET_NOERROR){
 			//Check level/mana etc.
 			if(!spell->playerSpellCheck(player)){
@@ -1843,7 +1846,7 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 				spell->postCastSpell(player, true, false);
 				return false;
 			}
-		
+
 			result2 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
 				spell->getReagentId(), SLOT_RIGHT);
 
@@ -1860,7 +1863,7 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 		}
 
 		result = result1;
-		if((result == RET_NOERROR && result2 != RET_NOERROR) || 
+		if((result == RET_NOERROR && result2 != RET_NOERROR) ||
 			(result == RET_YOUNEEDAMAGICITEMTOCASTSPELL && result2 == RET_YOUNEEDTOSPLITYOURSPEARS) ) {
 			result = result2;
 		}
@@ -1885,8 +1888,8 @@ bool ConjureSpell::ConjureFood(const ConjureSpell* spell, Creature* creature, co
 	if(!player){
 		return false;
 	}
-		
-	uint32_t foodType[8] = { 
+
+	uint32_t foodType[8] = {
 		ITEM_MEAT,
 		ITEM_HAM,
 		ITEM_GRAPE,

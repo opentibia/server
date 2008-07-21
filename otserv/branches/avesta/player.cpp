@@ -111,7 +111,7 @@ Creature()
 	tradeItem = NULL;
 
 	walkTask = NULL;
-	walkTaskEvent = 0;	
+	walkTaskEvent = 0;
 	actionTaskEvent = 0;
 	nextStepEvent = 0;
 
@@ -155,7 +155,7 @@ Creature()
 
 	editHouse = NULL;
 	editListId = 0;
-	
+
 	shopOwner = NULL;
 	purchaseCallback = -1;
 	saleCallback = -1;
@@ -1145,6 +1145,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You need to split your spears first.");
 		break;
 
+	case RET_NAMEISTOOAMBIGIOUS:
+		sendCancel("Name is too ambigious.");
+		break;
+
 	case RET_NOTPOSSIBLE:
 	default:
 		sendCancel("Sorry, not possible.");
@@ -1647,7 +1651,7 @@ void Player::setNextActionTask(SchedulerTask* task)
 		Scheduler::getScheduler().stopEvent(actionTaskEvent);
 		actionTaskEvent = 0;
 	}
-	
+
 	if(task){
 		actionTaskEvent = Scheduler::getScheduler().addEvent(task);
 	}
@@ -2471,12 +2475,12 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 							if(item == leftItem && count == item->getItemCount()){
 								ret = RET_NOERROR;
 							}
-							else if(!item->isWeapon() || 
+							else if(!item->isWeapon() ||
 								item->getWeaponType() == WEAPON_SHIELD ||
 								item->getWeaponType() == WEAPON_AMMO){
 									ret = RET_NOERROR;
 							}
-							else if(!leftItem->isWeapon() || 
+							else if(!leftItem->isWeapon() ||
 								leftItem->getWeaponType() == WEAPON_AMMO ||
 								leftItem->getWeaponType() == WEAPON_SHIELD){
 								ret = RET_NOERROR;
@@ -2513,12 +2517,12 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 							if(item == rightItem && count == item->getItemCount()){
 								ret = RET_NOERROR;
 							}
-							else if(!item->isWeapon() || 
+							else if(!item->isWeapon() ||
 								item->getWeaponType() == WEAPON_SHIELD ||
 								item->getWeaponType() == WEAPON_AMMO){
 									ret = RET_NOERROR;
 							}
-							else if(!rightItem->isWeapon() || 
+							else if(!rightItem->isWeapon() ||
 								rightItem->getWeaponType() == WEAPON_AMMO ||
 								rightItem->getWeaponType() == WEAPON_SHIELD){
 								ret = RET_NOERROR;

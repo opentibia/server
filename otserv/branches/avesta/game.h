@@ -184,6 +184,14 @@ public:
 	Player* getPlayerByName(const std::string& s);
 
 	/**
+	  * Returns a player based on a string name identifier, with support for the "~" wildcard.
+	  * \param s is the name identifier, with or without wildcard
+	  * \param player will point to the pointer to the player
+	  * \return "RET_PLAYERWITHTHISNAMEISNOTONLINE" or "RET_NAMEISTOOAMBIGIOUS"
+	  */
+	ReturnValue getPlayerByNameWildcard(const std::string& s, Player** player);
+
+	/**
 	  * Returns a player based on an account number identifier
 	  * \param acc is the account identifier
 	  * \return A Pointer to the player
@@ -237,7 +245,7 @@ public:
 
 	void getWorldLightInfo(LightInfo& lightInfo);
 
-	void getSpectators(SpectatorVec& list, const Position& centerPos, 
+	void getSpectators(SpectatorVec& list, const Position& centerPos,
 		bool checkforduplicate = false, bool multifloor = false,
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0){

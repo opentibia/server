@@ -516,6 +516,41 @@ Player* Game::getPlayerByName(const std::string& s)
 	return NULL; //just in case the player doesnt exist
 }
 
+ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player** player)
+{
+	if(s[s.length()-1] != '~'){
+		(*player) = getPlayerByName(s);
+		if(!(*player)){
+			return RET_PLAYERWITHTHISNAMEISNOTONLINE;
+		}
+		return RET_NOERROR;
+	}
+
+	Player* lastFound = NULL;
+	std::string txt1 = s;
+	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
+	txt1.erase(txt1.length()-1);
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(!(*it).second->isRemoved()){
+			std::string txt2 = (*it).second->getName();
+			std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
+			if(txt2.substr(0, txt1.length()) == txt1){
+				if(lastFound == NULL)
+					lastFound = (*it).second;
+				else
+					return RET_NAMEISTOOAMBIGIOUS;
+			}
+		}
+	}
+
+	if(lastFound != NULL){
+		(*player) = lastFound;
+		return RET_NOERROR;
+	}
+
+	return RET_PLAYERWITHTHISNAMEISNOTONLINE;
+}
+
 Player* Game::getPlayerByAccount(uint32_t acc)
 {
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
@@ -3139,7 +3174,7 @@ bool Game::playerShowQuestLine(uint32_t playerId, uint16_t questId)
 	if(!quest){
 		return true;
 	}
-	
+
 	player->sendQuestLine(quest);
 	return true;
 }
@@ -3243,7 +3278,7 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return false;
 	}
 
-	
+
 	TalkActionResult_t result;
 	result = g_talkactions->onPlayerSpeak(player, type, text);
 	if(result == TALKACTION_BREAK){
