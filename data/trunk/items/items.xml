@@ -20138,21 +20138,11 @@
 	<item id="7762" article="a" value="small enchanted amethyst" plural="small enchanted amethysts">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="7924" name="stairs">
-		<attribute key="floorchange" value="south"/>
+	<item id="7778" article="a" name="bed">
+		<attribute key="type" value="bed" />
 	</item>
-	<item id="7925" name="stairs">
-		<attribute key="floorchange" value="east"/>
-	</item>
-	<item id="7943" name="shallow water">
-	</item>
-	<item id="7944" name="shallow water">
-	</item>
-	<item id="7945" name="shallow water">
-	</item>
-	<item id="7946" name="shallow water">
-	</item>
-	<item id="7947" name="shallow water">
+	<item id="7779" article="a" name="bed">
+		<attribute key="type" value="bed" />
 	</item>
 	<item id="7780" article="a" name="bed">
 		<attribute key="type" value="bed" />
