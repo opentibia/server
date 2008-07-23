@@ -102,16 +102,7 @@ Item* Item::CreateItem(PropStream& propStream)
 		return NULL;
 	}
 
-	const ItemType& iType = Item::items[_id];
-	uint8_t _count = 0;
-
-	if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
-		if(!propStream.GET_UCHAR(_count)){
-			return NULL;
-		}
-	}
-
-	return Item::CreateItem(_id, _count);
+	return Item::CreateItem(_id, 0);
 }
 
 Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
@@ -161,6 +152,17 @@ Item* Item::clone() const
 	}
 
 	return _item;
+}
+
+void Item::copyAttributes(Item* item)
+{
+	m_attributes = item->m_attributes;
+	if(item->m_firstAttr){
+		m_firstAttr = new Attribute(*item->m_firstAttr);
+	}
+
+	removeAttribute(ATTR_ITEM_DECAYING);
+	removeAttribute(ATTR_ITEM_DURATION);
 }
 
 Item::~Item()
@@ -549,13 +551,11 @@ bool Item::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
 
 bool Item::serializeAttr(PropWriteStream& propWriteStream)
 {
-	/*
-	if(isStackable() || isSplash() || isFluidContainer()){
+	if(isStackable() || isFluidContainer() || isSplash()){
 		uint8_t _count = getSubType();
 		propWriteStream.ADD_UCHAR(ATTR_COUNT);
 		propWriteStream.ADD_UCHAR(_count);
 	}
-	*/
 
 	if(hasCharges()){
 		uint16_t _count = getCharges();
@@ -1242,6 +1242,7 @@ bool ItemAttributes::validateIntAttrType(itemAttrTypes type)
 	case ATTR_ITEM_CORPSEOWNER:
 	case ATTR_ITEM_CHARGES:
 	case ATTR_ITEM_FLUIDTYPE:
+	case ATTR_ITEM_DOORID:
 		return true;
 		break;
 

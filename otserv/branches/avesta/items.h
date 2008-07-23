@@ -56,6 +56,7 @@ enum ItemTypes_t {
 	ITEM_TYPE_MAGICFIELD,
 	ITEM_TYPE_TELEPORT,
 	ITEM_TYPE_BED,
+	ITEM_TYPE_KEY,
 	ITEM_TYPE_LAST
 };
 
@@ -150,18 +151,18 @@ public:
 
 	bool isGroundTile() const {return (group == ITEM_GROUP_GROUND);}
 	bool isContainer() const {return (group == ITEM_GROUP_CONTAINER);}
-	bool isDoor() const {return (group == ITEM_GROUP_DOOR);}
-	bool isTeleport() const {return (group == ITEM_GROUP_TELEPORT);}
-	bool isMagicField() const {return (group == ITEM_GROUP_MAGICFIELD);}
 	bool isSplash() const {return (group == ITEM_GROUP_SPLASH);}
 	bool isFluidContainer() const {return (group == ITEM_GROUP_FLUID);}
 
-	bool isKey() const {return (group == ITEM_GROUP_KEY);}
-	bool isRune() const {return (group == ITEM_GROUP_RUNE);}
+	bool isDoor() const {return (type == ITEM_TYPE_DOOR);}
+	bool isMagicField() const {return (type == ITEM_TYPE_MAGICFIELD);}
+	bool isTeleport() const {return (type == ITEM_TYPE_TELEPORT);}
+	bool isKey() const {return (type == ITEM_TYPE_KEY);}
 	bool isDepot() const {return (type == ITEM_TYPE_DEPOT);}
 	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
 	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
+	bool isRune() const {return clientCharges;}
 
 	//[ added for beds system
 	bool isBed() const {return type == ITEM_TYPE_BED;}
@@ -195,6 +196,7 @@ public:
 	bool           isHorizontal;
 	bool           isHangable;
 	bool           allowDistRead;
+	bool           clientCharges;
 	uint16_t       speed;
 	int32_t        decayTo;
 	uint32_t       decayTime;

@@ -256,24 +256,8 @@ public:
 	bool getPathMatching(const Creature* creature, std::list<Direction>& dirList,
 		const FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp);
 
-	MapError_t getLastError() {return lasterrortype;}
-	int getErrorCode() {return lasterrorcode;}
-
-	void setLastError(MapError_t errtype, NODE _code = 0)
-	{
-		if(_code){
-			lasterrorcode = _code->start;
-		}
-		else{
-			lasterrorcode = 0;
-		}
-		lasterrortype = errtype;
-	}
-
 protected:
 	uint32_t mapWidth, mapHeight;
-	MapError_t lasterrortype;
-	unsigned long lasterrorcode;
 	std::string spawnfile;
 	std::string housefile;
 	SpectatorCache spectatorCache;

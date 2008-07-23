@@ -71,6 +71,19 @@ public:
 		}
 		return true;
 	}
+
+	const std::string& getLastErrorString() const
+	{
+		return errorString;
+	}
+
+	void setLastErrorString(const std::string& _errorString)
+	{
+		errorString = _errorString;
+	}
+
+protected:
+	std::string errorString;
 };
 
 #endif

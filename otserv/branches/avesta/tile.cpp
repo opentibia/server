@@ -464,64 +464,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 
-			/*
-			for(uint32_t i = 0; i < getThingCount(); ++i){
-				iithing = __getThing(i);
-				if(const Item* iitem = iithing->getItem()){
-					const ItemType& iiType = Item::items[iitem->getID()];
-					if(iiType.isMagicField() && !iiType.blockSolid){
-						CombatType_t combatType = iitem->getMagicField()->getCombatType();
-						//There is 3 options for a monster to enter a magic field
-						//1) Monster is immune
-						if(!monster->isImmune(combatType)){
-							//1) Monster is "strong" enough to handle the damage
-							//2) Monster is already afflicated by this type of condition
-							if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
-								if( !(monster->canPushItems() ||
-									monster->hasCondition(Combat::DamageToConditionType(combatType))) ){
-									if(ret != RET_NOTPOSSIBLE){
-										this->__queryAdd(index, thing, count, flags);
-										std::cout << "missmatch" << std::endl;
-									}
-									return RET_NOTPOSSIBLE;
-								}
-							}
-							else{
-								if(ret != RET_NOTPOSSIBLE){
-									this->__queryAdd(index, thing, count, flags);
-									std::cout << "missmatch" << std::endl;
-								}
-								return RET_NOTPOSSIBLE;
-							}
-						}
-					}
-					else if(iiType.blockSolid || (hasBitSet(FLAG_PATHFINDING, flags) && iiType.blockPathFind) ){
-						if(!iiType.moveable || iitem->getUniqueId() != 0){
-							//its not moveable
-							if(ret != RET_NOTPOSSIBLE){
-								this->__queryAdd(index, thing, count, flags);
-								std::cout << "missmatch" << std::endl;
-							}
-							return RET_NOTPOSSIBLE;
-						}
-						//moveable
-						else if(!(hasBitSet(FLAG_IGNOREBLOCKITEM, flags) || monster->canPushItems()) ){
-							assert(ret == RET_NOTPOSSIBLE);
-							if(ret != RET_NOTPOSSIBLE){
-								this->__queryAdd(index, thing, count, flags);
-								std::cout << "missmatch" << std::endl;
-							}
-							return RET_NOTPOSSIBLE;
-						}
-					}
-				}
-			}
-
-			if(ret != RET_NOERROR){
-				this->__queryAdd(index, thing, count, flags);
-				std::cout << "missmatch RET_NOERROR" << std::endl;
-			}
-			*/
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){

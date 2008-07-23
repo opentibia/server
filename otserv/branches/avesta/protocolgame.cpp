@@ -790,9 +790,6 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseDebugAssert(msg);
 		break;
 
-
-
-
 	case 0xF0:
 		parseQuestLog(msg);
 		break;
@@ -803,11 +800,9 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 
 	default:
 #ifdef __DEBUG__
-
 		printf("unknown packet header: %x \n", recvbyte);
 		parseDebug(msg);
 #endif
-
 		break;
 	}
 }

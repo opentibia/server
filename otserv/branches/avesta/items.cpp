@@ -89,7 +89,7 @@ ItemType::ItemType()
 	stopTime      = false;
 	corpseType    = RACE_NONE;
 	fluidSource  = -1;
-
+	clientCharges = false;
 	allowDistRead = false;
 
 	isVertical		= false;
@@ -200,16 +200,15 @@ int Items::loadFromOtb(std::string file)
 		}
 	}
 
-	if(Items::dwMajorVersion != 2){
-		std::cout << "Not supported items.otb version." << std::endl;
-		return ERROR_INVALID_FORMAT;
-	}
-
 	if(Items::dwMajorVersion == 0xFFFFFFFF){
 		std::cout << "[Warning] Items::loadFromOtb items.otb using generic client version." << std::endl;
 	}
+	else if(Items::dwMajorVersion != 3){
+		std::cout << "Old version detected, a newer version of items.otb is required." << std::endl;
+		return ERROR_INVALID_FORMAT;
+	}
 	else if(Items::dwMinorVersion != CLIENT_VERSION_820){
-		std::cout << "Not supported items.otb client version." << std::endl;
+		std::cout << "A newer version of items.otb is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
 
@@ -230,17 +229,20 @@ int Items::loadFromOtb(std::string file)
 				iType->type = ITEM_TYPE_CONTAINER;
 				break;
 			case ITEM_GROUP_DOOR:
+				//not used
 				iType->type = ITEM_TYPE_DOOR;
 				break;
 			case ITEM_GROUP_MAGICFIELD:
+				//not used
 				iType->type = ITEM_TYPE_MAGICFIELD;
 				break;
 			case ITEM_GROUP_TELEPORT:
+				//not used
 				iType->type = ITEM_TYPE_TELEPORT;
 				break;
 			case ITEM_GROUP_NONE:
 			case ITEM_GROUP_GROUND:
-			case ITEM_GROUP_RUNE:
+			case ITEM_GROUP_CHARGES:
 			case ITEM_GROUP_SPLASH:
 			case ITEM_GROUP_FLUID:
 			case ITEM_GROUP_DEPRECATED:
@@ -263,11 +265,14 @@ int Items::loadFromOtb(std::string file)
 		iType->pickupable = hasBitSet(FLAG_PICKUPABLE, flags);
 		iType->moveable = hasBitSet(FLAG_MOVEABLE, flags);
 		iType->stackable = hasBitSet(FLAG_STACKABLE, flags);
+
+		//not longer saved in otb_version >= 3
 		iType->floorChangeDown = hasBitSet(FLAG_FLOORCHANGEDOWN, flags);
 		iType->floorChangeNorth = hasBitSet(FLAG_FLOORCHANGENORTH, flags);
 		iType->floorChangeEast = hasBitSet(FLAG_FLOORCHANGEEAST, flags);
 		iType->floorChangeSouth = hasBitSet(FLAG_FLOORCHANGESOUTH, flags);
 		iType->floorChangeWest = hasBitSet(FLAG_FLOORCHANGEWEST, flags);
+
 		iType->alwaysOnTop = hasBitSet(FLAG_ALWAYSONTOP, flags);
 		iType->isVertical = hasBitSet(FLAG_VERTICAL, flags);
 		iType->isHorizontal = hasBitSet(FLAG_HORIZONTAL, flags);
@@ -275,6 +280,7 @@ int Items::loadFromOtb(std::string file)
 		iType->allowDistRead = hasBitSet(FLAG_ALLOWDISTREAD, flags);
 		iType->rotable = hasBitSet(FLAG_ROTABLE, flags);
 		iType->canReadText = hasBitSet(FLAG_READABLE, flags);
+		iType->clientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
 
 		attribute_t attrib;
 		datasize_t datalen = 0;
@@ -358,6 +364,13 @@ int Items::loadFromOtb(std::string file)
 			}
 		}
 
+		/*
+		ItemType* cmpType = items.getElement(iType->id);
+		if(cmpType && cmpType->group != ITEM_GROUP_DEPRECATED && type == ITEM_GROUP_DEPRECATED){
+			std::cout << "id: " << iType->id << std::endl;
+		}
+		*/
+
 		reverseItemMap[iType->clientId] = iType->id;
 
 		// store the found item
@@ -421,10 +434,9 @@ bool Items::loadFromXml(const std::string& datadir)
 							if(asLowerCaseString(strValue) == "type"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "key"){
-										it.group = ITEM_GROUP_KEY;
+										it.type = ITEM_TYPE_KEY;
 									}
 									else if(asLowerCaseString(strValue) == "magicfield"){
-										it.group = ITEM_GROUP_MAGICFIELD;
 										it.type = ITEM_TYPE_MAGICFIELD;
 									}
 									else if(asLowerCaseString(strValue) == "depot"){
@@ -435,6 +447,12 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 									else if(asLowerCaseString(strValue) == "trashholder"){
 										it.type = ITEM_TYPE_TRASHHOLDER;
+									}
+									else if(asLowerCaseString(strValue) == "teleport"){
+										it.type = ITEM_TYPE_TELEPORT;
+									}
+									else if(asLowerCaseString(strValue) == "door"){
+										it.type = ITEM_TYPE_DOOR;
 									}
 									//[ added for beds system
 									else if(asLowerCaseString(strValue) == "bed"){
@@ -509,6 +527,30 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(asLowerCaseString(strValue) == "moveable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.moveable = (intValue == 1);
+								}
+							}
+							else if(asLowerCaseString(strValue) == "blockprojectile"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.blockProjectile = (intValue == 1);
+								}
+							}
+							else if(asLowerCaseString(strValue) == "floorchange"){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(asLowerCaseString(strValue) == "down"){
+										it.floorChangeDown = true;
+									}
+									else if(asLowerCaseString(strValue) == "north"){
+										it.floorChangeNorth = true;
+									}
+									else if(asLowerCaseString(strValue) == "south"){
+										it.floorChangeSouth = true;
+									}
+									else if(asLowerCaseString(strValue) == "west"){
+										it.floorChangeWest = true;
+									}
+									else if(asLowerCaseString(strValue) == "east"){
+										it.floorChangeEast = true;
+									}
 								}
 							}
 							else if(asLowerCaseString(strValue) == "corpsetype"){

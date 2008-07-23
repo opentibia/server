@@ -177,7 +177,8 @@ protected:
 		ATTR_ITEM_DECAYING = 262144,
 		ATTR_ITEM_CORPSEOWNER = 524288,
 		ATTR_ITEM_CHARGES = 1048576,
-		ATTR_ITEM_FLUIDTYPE = 2097152
+		ATTR_ITEM_FLUIDTYPE = 2097152,
+		ATTR_ITEM_DOORID = 4194304
 	};
 
 	bool hasAttribute(itemAttrTypes type) const;
@@ -248,6 +249,7 @@ public:
 	Item(const uint16_t _type, uint16_t _count = 0);
 	Item(const Item &i);
 	virtual Item* clone() const;
+	virtual void copyAttributes(Item* item);
 
 	virtual ~Item();
 
@@ -364,6 +366,7 @@ public:
 
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
+	virtual void onRemoved() {};
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
 	virtual void __startDecaying();

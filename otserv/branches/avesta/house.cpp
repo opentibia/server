@@ -99,13 +99,23 @@ void House::setHouseOwner(uint32_t guid)
 		rentWarnings = 0;
 	}
 
-	std::stringstream houseDescription;
-	houseDescription << "It belongs to house '" << houseName << "'. " << std::endl;
-
 	std::string name;
 	if(guid != 0 && IOPlayer::instance()->getNameByGuid(guid, name)){
 		houseOwner = guid;
-		houseDescription << name;
+		houseOwnerName = name;
+	}
+
+	updateDoorDescription();
+	setLastWarning(std::time(NULL)); //So the new owner has one day before he start the payment
+}
+
+void House::updateDoorDescription()
+{
+	std::stringstream houseDescription;
+	houseDescription << "It belongs to house '" << houseName << "'. " << std::endl;
+
+	if(houseOwner != 0){
+		houseDescription << houseOwnerName;
 	}
 	else{
 		houseDescription << "Nobody";
@@ -116,8 +126,6 @@ void House::setHouseOwner(uint32_t guid)
 	for(it = doorList.begin(); it != doorList.end(); ++it){
 		(*it)->setSpecialDescription(houseDescription.str());
 	}
-
-	setLastWarning(std::time(NULL)); //So the new owner has one day before he start the payement
 }
 
 AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
@@ -304,7 +312,18 @@ void House::addDoor(Door* door)
 	door->useThing2();
 	doorList.push_back(door);
 	door->setHouse(this);
+	updateDoorDescription();
 }
+
+void House::removeDoor(Door* door)
+{
+	HouseDoorList::iterator it = std::find(doorList.begin(), doorList.end(), door);
+	if(it != doorList.end()){
+		(*it)->releaseThing2();
+		doorList.erase(it);
+	}
+}
+
 
 //[ added for beds system
 void House::addBed(BedItem* bed)
@@ -608,7 +627,6 @@ Item(_type)
 {
 	house = NULL;
 	accessList = NULL;
-	doorId = 0;
 }
 
 Door::~Door()
@@ -722,6 +740,13 @@ bool Door::getAccessList(std::string& list) const
 	}
 	accessList->getList(list);
 	return true;
+}
+
+void Door::onRemoved()
+{
+	if(house){
+		house->removeDoor(this);
+	}
 }
 
 Houses::Houses()

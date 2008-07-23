@@ -229,8 +229,6 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 					continue;
 			}
 			else{
-				bool isDoor = iType.isDoor();
-
 				//find this type in the tile
 				for(uint32_t i = 0; i < tile->getThingCount(); ++i){
 					Item* findItem = tile->__getThing(i)->getItem();
@@ -246,15 +244,17 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 
 						break;
 					}
-					else if(isDoor && findItem->getDoor()){
+					else if(iType.isDoor() && findItem->getDoor()){
 						item = findItem;
 						item->setID(type);
+						//item = g_game.transformItem(item, type);
 					}
 					//[ added for beds system
 					else if(iType.isBed() && findItem->getBed()) {
 						item = findItem;
 						item->setID(type);
 						item->unserializeAttr(propStream);
+						//item = g_game.transformItem(item, type);
 					}
 					//]
 				}

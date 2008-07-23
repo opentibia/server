@@ -37,6 +37,46 @@ HouseTile::~HouseTile()
 	//
 }
 
+void HouseTile::__addThing(int32_t index, Thing* thing)
+{
+	Tile::__addThing(index, thing);
+
+	if(Item* item = thing->getItem()){
+		updateHouse(item);
+	}
+}
+
+void HouseTile::__internalAddThing(uint32_t index, Thing* thing)
+{
+	Tile::__internalAddThing(index, thing);
+
+	if(Item* item = thing->getItem()){
+		updateHouse(item);
+	}
+}
+
+void HouseTile::updateHouse(Item* item)
+{
+	if(item->getTile() == this){
+		Door* door = item->getDoor();
+		if(door && door->getDoorId() != 0){
+			house->addDoor(door);
+		}
+
+		//[ added for beds system
+		if(!door)
+		{
+			BedItem* bed = item->getBed();
+			if(bed)
+			{
+				// next, add it to the house
+				house->addBed(bed);
+			}
+		}
+		//]
+	}
+}
+
 ReturnValue HouseTile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {

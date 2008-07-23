@@ -1366,6 +1366,8 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 		cylinder->postRemoveNotification(item, index, isCompleteRemoval);
 	}
 
+	item->onRemoved();
+
 	return RET_NOERROR;
 }
 
@@ -1728,6 +1730,8 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 		else{
 			newItem = Item::CreateItem(newId, newCount);
 		}
+
+		newItem->copyAttributes(item);
 
 		ret = internalAddItem(cylinder, newItem, INDEX_WHEREEVER);
 		if(ret != RET_NOERROR){
