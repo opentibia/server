@@ -14,13 +14,18 @@
 	</item>
 	<item id="109" name="flowers">
 	</item>
+	<item id="194" name="grass">
+	</item>
 	<item id="231" name="sand">
 	</item>
 	<item id="293" name="grass">
 	</item>
 	<item id="294" article="a" name="pitfall">
+		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="293"/>
 		<attribute key="duration" value="300"/>
+	</item>
+	<item id="280" name="grass">
 	</item>
 	<item id="351" name="dirt">
 	</item>
@@ -60,8 +65,10 @@
 	<item id="368" name="ground">
 	</item>
 	<item id="369" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="370" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="371" article="a" name="stone wall">
 	</item>
@@ -88,6 +95,7 @@
 	<item id="382" article="a" name="stone wall">
 	</item>
 	<item id="383" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="384" article="a" name="rope spot">
 		<attribute key="description" value="There is a hole in the ceiling."/>
@@ -120,12 +128,16 @@
 	<item id="407" article="a" name="black marble tile">
 	</item>
 	<item id="408" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="409" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="410" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="411" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="412" article="a" name="sandstone tile">
 	</item>
@@ -153,6 +165,7 @@
 	<item id="422" article="a" name="sandstone floor">
 	</item>
 	<item id="423" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="424" article="a" name="stone tile">
 	</item>
@@ -163,18 +176,23 @@
 		<attribute key="description" value="It seems to be a switch."/>
 	</item>
 	<item id="427" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="428" article="a" name="ladder">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="429" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="430" article="a" name="sewer grate">
 	</item>
 	<item id="431" name="stone flooring">
 	</item>
 	<item id="432" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="433" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="434" name="wooden flooring">
 	</item>
@@ -229,12 +247,14 @@
 	<item id="458" name="wooden flooring">
 	</item>
 	<item id="459" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="460" name="void">
 	</item>
 	<item id="461" article="a" name="closed trapdoor">
 	</item>
 	<item id="462" article="an" name="open trapdoor">
+		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="461"/>
 		<attribute key="duration" value="120"/>
 	</item>
@@ -251,10 +271,12 @@
 	<item id="468" article="a" name="stone pile">
 	</item>
 	<item id="469" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="468"/>
 		<attribute key="duration" value="60"/>
 	</item>
 	<item id="470" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="471" article="a" name="time tile">
 	</item>
@@ -265,30 +287,37 @@
 	<item id="474" article="a" name="time tile">
 	</item>
 	<item id="475" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="476" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="477" article="a" name="ramp">
 	</item>
 	<item id="478" article="a" name="ramp">
 	</item>
 	<item id="479" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="480" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="481" article="a" name="loose stone pile">
 	</item>
 	<item id="482" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="481"/>
 		<attribute key="duration" value="300"/>
 	</item>
 	<item id="483" article="a" name="loose ice pile">
 	</item>
 	<item id="484" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="483"/>
 		<attribute key="duration" value="300"/>
 	</item>
 	<item id="485" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="486" article="a" name="snow heap">
 	</item>
@@ -297,6 +326,7 @@
 	<item id="488" article="a" name="ramp">
 	</item>
 	<item id="489" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="231"/>
 		<attribute key="duration" value="30"/>
 	</item>
@@ -455,6 +485,7 @@
 	<item id="923" article="a" name="flat roof">
 	</item>
 	<item id="924" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="925" article="a" name="tiled roof">
 	</item>
@@ -1031,18 +1062,29 @@
 	<item id="1208" article="a" name="brick wall">
 	</item>
 	<item id="1209" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1210" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1211" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1212" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1213" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1214" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1215" article="a" name="buttress">
 	</item>
@@ -1053,96 +1095,164 @@
 	<item id="1218" article="a" name="buttress">
 	</item>
 	<item id="1219" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1220" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1221" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1222" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1223" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1224" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1225" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1226" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1227" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1228" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1229" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1230" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1231" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1232" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1233" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1234" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1235" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1236" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1237" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1238" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1239" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1240" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1241" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1242" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1243" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1244" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1245" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1246" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1247" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1248" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1249" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1250" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1251" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1252" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="1253" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1254" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1255" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1256" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1257" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1258" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1259" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1260" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1261" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1262" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1263" article="a" name="framework window">
 	</item>
@@ -1406,6 +1516,7 @@
 	<item id="1384" article="a" name="mill">
 	</item>
 	<item id="1385" name="stairs">
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="1386" article="a" name="ladder">
 	</item>
@@ -1414,38 +1525,47 @@
 		<attribute key="type" value="teleport"/>
 	</item>
 	<item id="1388" article="a" name="ramp">
+		<attribute key="floorchange" value="east"/>
 	</item>
 	<item id="1389" article="a" name="ramp">
 	</item>
 	<item id="1390" article="a" name="ramp">
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="1391" article="a" name="ramp">
 	</item>
 	<item id="1392" article="a" name="ramp">
+		<attribute key="floorchange" value="south"/>
 	</item>
 	<item id="1393" article="a" name="ramp">
 	</item>
 	<item id="1394" article="a" name="ramp">
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="1395" article="a" name="ramp">
 	</item>
 	<item id="1396" name="stairs">
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="1397" article="a" name="mystic flame">
 	</item>
 	<item id="1398" article="a" name="ramp">
+		<attribute key="floorchange" value="east"/>
 	</item>
 	<item id="1399" article="a" name="ramp">
 	</item>
 	<item id="1400" article="a" name="ramp">
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="1401" article="a" name="ramp">
 	</item>
 	<item id="1402" article="a" name="ramp">
+		<attribute key="floorchange" value="south"/>
 	</item>
 	<item id="1403" article="a" name="ramp">
 	</item>
 	<item id="1404" article="a" name="ramp">
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="1405" article="a" name="ramp">
 	</item>
@@ -1885,12 +2005,16 @@
 	<item id="1538" article="a" name="fence">
 	</item>
 	<item id="1539" article="a" name="closed fence gate">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1540" article="an" name="open fence gate">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1541" article="a" name="closed fence gate">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1542" article="an" name="open fence gate">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1543" article="a" name="fence">
 	</item>
@@ -1913,18 +2037,26 @@
 	<item id="1552" article="a" name="ramp">
 	</item>
 	<item id="1553" article="a" name="ramp">
+		<attribute key="floorchange" value="north"/>
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="1554" article="a" name="ramp">
 	</item>
 	<item id="1555" article="a" name="ramp">
+		<attribute key="floorchange" value="north"/>
+		<attribute key="floorchange" value="east"/>
 	</item>
 	<item id="1556" article="a" name="ramp">
 	</item>
 	<item id="1557" article="a" name="ramp">
+		<attribute key="floorchange" value="south"/>
+		<attribute key="floorchange" value="east"/>
 	</item>
 	<item id="1558" article="a" name="ramp">
 	</item>
 	<item id="1559" article="a" name="ramp">
+		<attribute key="floorchange" value="south"/>
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="1560" article="an" name="obelisk">
 	</item>
@@ -2075,20 +2207,29 @@
 	<item id="1633" article="a" name="table">
 	</item>
 	<item id="1634" article="a" name="table">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1635" article="a" name="table">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1636" article="a" name="table">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1637" article="a" name="table">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1638" article="a" name="table">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1639" article="a" name="table">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="1640" article="a" name="table">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1641" article="a" name="table">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="1642" article="an" name="altar stone">
 	</item>
@@ -4414,27 +4555,33 @@
 		<attribute key="type" value="mailbox"/>
 	</item>
 	<item id="2335" article="a" name="helmet ornament">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
 		<attribute key="weight" value="160"/>
 	</item>
-	<item id="2336" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="200"/>
+	<item id="2336" article="a" name="gem holder">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="80"/>
 	</item>
-	<item id="2337" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="500"/>
+	<item id="2337" article="a" name="right horn">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="140"/>
 	</item>
-	<item id="2338" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="500"/>
+	<item id="2338" article="a" name="left horn">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="140"/>
 	</item>
 	<item id="2339" article="a" name="damaged helmet">
-		<attribute key="description" value="This item seems to be a singlepart of a bigger helmet."/>
-		<attribute key="weight" value="2700"/>
+		<attribute key="description" value="This item seems to have several parts missing."/>
+		<attribute key="weight" value="1800"/>
 		<attribute key="armor" value="5"/>
 	</item>
-	<item id="2340" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="100"/>
+	<item id="2340" article="a" name="helmet piece">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="260"/>
 	</item>
-	<item id="2341" article="a" name="piece of the helmet of the ancient">
-		<attribute key="weight" value="150"/>
+	<item id="2341" article="a" name="helmet adornment">
+		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
+		<attribute key="weight" value="180"/>
 	</item>
 	<item id="2342" article="a" name="helmet of the ancients">
 		<attribute key="description" value="The gem of the helmet is burned out and should be replaced."/>
@@ -4447,6 +4594,8 @@
 		<attribute key="weight" value="2760"/>
 		<attribute key="armor" value="11"/>
 		<attribute key="slotType" value="head"/>
+		<attribute key="duration" value="1800"/>
+		<attribute key="decayTo" value="2342"/>
 	</item>
 	<item id="2344" article="an" name="oil lamp">
 		<attribute key="weight" value="500"/>
@@ -5124,7 +5273,7 @@
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="slotType" value="two-handed"/>
 		<attribute key="ammoType" value="arrow"/>
-		<attribute key="range" value="5"/>
+		<attribute key="range" value="6"/>
 	</item>
 	<item id="2457" article="a" name="steel helmet">
 		<attribute key="weight" value="4600"/>
@@ -6320,19 +6469,19 @@
 	<item id="2789" article="a" name="brown mushroom" plural="brown mushrooms">
 		<attribute key="weight" value="20"/>
 	</item>
-	<item id="2790" name="mushrooms" plural="mushrooms">
+	<item id="2790" article="a" name="orange mushroom" plural="orange mushrooms">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="2791" name="mushrooms" plural="mushrooms">
+	<item id="2791" article="a" name="wood mushroom" plural="wood mushrooms">
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2792" article="a" name="dark mushroom" plural="dark mushrooms">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="2793" name="mushrooms" plural="mushrooms">
+	<item id="2793" name="some mushrooms" plural="some mushrooms">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="2794" name="mushrooms" plural="mushrooms">
+	<item id="2794" name="some mushrooms" plural="some mushrooms">
 		<attribute key="weight" value="10"/>
 	</item>
 	<item id="2795" article="a" name="fire mushroom" plural="fire mushrooms">
@@ -8322,12 +8471,16 @@
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="3135" article="a" name="ladder">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3136" article="a" name="ladder">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3137" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3138" article="a" name="stairway">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3139" name="wooden flooring">
 	</item>
@@ -8490,8 +8643,10 @@
 	<item id="3218" article="a" name="stone roof">
 	</item>
 	<item id="3219" article="a" name="stone stairway">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3220" article="a" name="stone stairway">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3221" article="a" name="stone roof">
 	</item>
@@ -8574,8 +8729,10 @@
 	<item id="3309" name="jungle grass">
 	</item>
 	<item id="3310" article="a" name="mud stain">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3311" article="a" name="pitfall">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3312" article="an" name="ant trail">
 	</item>
@@ -8602,6 +8759,7 @@
 	<item id="3323" article="an" name="anthill">
 	</item>
 	<item id="3324" article="a" name="pitfall">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="3325" article="a" name="rock">
 	</item>
@@ -9024,42 +9182,70 @@
 	<item id="3534" article="a" name="stone wall">
 	</item>
 	<item id="3535" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="3536" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="3537" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="3538" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="3539" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="3540" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="3541" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="3542" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="3543" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="3544" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="3545" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="3546" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="3547" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="3548" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="3549" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="3550" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="3551" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="3552" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="3569" article="a" name="waterfall">
 	</item>
@@ -9258,14 +9444,17 @@
 	<item id="3678" article="a" name="ladder">
 	</item>
 	<item id="3679" article="a" name="ramp">
+		<attribute key="floorchange" value="east"/>
 	</item>
 	<item id="3680" article="a" name="ramp">
 	</item>
 	<item id="3681" article="a" name="ramp">
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="3682" article="a" name="ramp">
 	</item>
 	<item id="3683" article="a" name="ramp">
+		<attribute key="floorchange" value="south"/>
 	</item>
 	<item id="3684" article="a" name="ramp">
 	</item>
@@ -9274,8 +9463,10 @@
 	<item id="3686" article="a" name="ramp">
 	</item>
 	<item id="3687" name="stairs">
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="3688" name="stairs">
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="3689" article="a" name="large cauldron">
 	</item>
@@ -12083,12 +12274,16 @@
 	<item id="4833" name="dirt">
 	</item>
 	<item id="4834" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="4835" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="4836" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="4837" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="4838" article="a" name="stone herb" plural="stone herbs">
 		<attribute key="weight" value="20"/>
@@ -12299,18 +12494,28 @@
 	<item id="4912" article="a" name="ship cabin wall">
 	</item>
 	<item id="4913" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="4914" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="4915" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="4916" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="4917" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="4918" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="4919" article="a" name="ship railing">
 	</item>
@@ -12651,14 +12856,21 @@
 		<attribute key="weight" value="600"/>
 	</item>
 	<item id="5081" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="5082" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5083" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5084" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5085" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5086" article="a" name="furniture package">
 		<attribute key="weight" value="2500"/>
@@ -12667,6 +12879,7 @@
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5088" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a water-pipe."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5089" article="a" name="butterfly conservation kit">
@@ -12691,108 +12904,184 @@
 		<attribute key="weight" value="180"/>
 	</item>
 	<item id="5098" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5099" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5100" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5101" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5102" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5103" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5104" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5105" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5106" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5107" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5108" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5109" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5110" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5111" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5112" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5113" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5114" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5115" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5116" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5117" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5118" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5119" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5120" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5121" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5122" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5123" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5124" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5125" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5126" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5127" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5128" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5129" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5130" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5131" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5132" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5133" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5134" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5135" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5136" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5137" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5138" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5139" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5140" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5141" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5142" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5143" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5144" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5145" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5146" article="a" name="framework wall">
 	</item>
@@ -13019,10 +13308,13 @@
 	<item id="5257" article="a" name="window">
 	</item>
 	<item id="5258" name="stairs">
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="5259" name="stairs">
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="5260" name="stairs">
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="5261" article="a" name="wooden wall">
 	</item>
@@ -13059,42 +13351,70 @@
 	<item id="5277" article="a" name="wooden wall window">
 	</item>
 	<item id="5278" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5279" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5280" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5281" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="5282" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5283" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5284" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5285" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5286" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5287" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5288" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5289" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5290" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5291" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5292" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5293" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5294" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5295" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5296" name="wood">
 	</item>
@@ -13555,12 +13875,18 @@
 		<attribute key="duration" value="15"/>
 	</item>
 	<item id="5515" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5516" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5517" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="5518" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5519" article="a" name="stone wall">
 	</item>
@@ -13695,6 +14021,7 @@
 	<item id="5544" article="a" name="cart">
 	</item>
 	<item id="5545" article="a" name="ladder">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="5546" article="a" name="cart">
 	</item>
@@ -14060,6 +14387,7 @@
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="5691" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="5692" article="a" name="ballista">
 	</item>
@@ -14155,20 +14483,27 @@
 	</item>
 	<!-- Item id 5730 is blank -->
 	<item id="5731" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="5732" name="closed bars">
+		<attribute key="type" value="door"/>
 		<attribute key="description" value="They are locked."/>
 	</item>
 	<item id="5733" name="closed bars">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5734" name="open bars">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5735" name="closed bars">
+		<attribute key="type" value="door"/>
 		<attribute key="description" value="They are locked."/>
 	</item>
 	<item id="5736" name="closed bars">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5737" name="open bars">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="5738" article="a" name="shark">
 	</item>
@@ -14187,17 +14522,23 @@
 	<item id="5744" name="wooden flooring">
 	</item>
 	<item id="5745" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="The door seems to be sealed against unwanted intrueders."/>
 	</item>
 	<item id="5746" article="an" name="open door">
+		<attribute key="type" value="door"/>
 		<attribute key="description" value="The door seems to be sealed against unwanted intrueders."/>
 	</item>
 	<item id="5747" name="rocks">
 	</item>
 	<item id="5748" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="The door seems to be sealed against unwanted intrueders."/>
 	</item>
 	<item id="5749" article="an" name="open door">
+		<attribute key="type" value="door"/>
 		<attribute key="description" value="The door seems to be sealed against unwanted intrueders."/>
 	</item>
 	<item id="5750" name="rocks">
@@ -14229,6 +14570,7 @@
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="5763" article="a" name="ladder">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="5764" article="a" name="ventilation grille">
 	</item>
@@ -15769,12 +16111,16 @@
 		<attribute key="weight" value="500"/>
 	</item>
 	<item id="6127" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6128" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6129" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6130" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6131" article="a" name="tortoise shield">
 		<attribute key="weight" value="5200"/>
@@ -15869,8 +16215,10 @@
 	<item id="6172" article="a" name="grass roof">
 	</item>
 	<item id="6173" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6174" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6175" article="a" name="tree archway">
 	</item>
@@ -15907,42 +16255,70 @@
 	<item id="6191" article="a" name="branch">
 	</item>
 	<item id="6192" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6193" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6194" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6195" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6196" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6197" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6198" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6199" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6200" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6201" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6202" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6203" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6204" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6205" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6206" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6207" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6208" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6209" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6210" article="a" name="bamboo roof">
 	</item>
@@ -16023,42 +16399,70 @@
 	<item id="6248" article="a" name="plant wall">
 	</item>
 	<item id="6249" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6250" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6251" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6252" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6253" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6254" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6255" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6256" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6257" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6258" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6259" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6260" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6261" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6262" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6263" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6264" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6265" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6266" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6267" article="a" name="stone rubbish">
 	</item>
@@ -16533,7 +16937,8 @@
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="6373" article="a" name="furniture package">
-		<attribute key="weight" value="1000"/>
+		<attribute key="description" value="It is a kit for a mirror."/>
+		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="6374" name="gravel">
 	</item>
@@ -16677,80 +17082,134 @@
 	<item id="6435" article="a" name="demon trophy">
 	</item>
 	<item id="6436" article="a" name="framework window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6437" article="a" name="framework window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6438" article="a" name="framework window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6439" article="a" name="framework window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6440" article="a" name="brick window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6441" article="a" name="brick window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6442" article="a" name="brick window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6443" article="a" name="brick window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6444" article="a" name="stone window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6445" article="a" name="stone window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6446" article="a" name="stone window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6447" article="a" name="stone window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6448" article="a" name="marble window">
 	</item>
 	<item id="6449" article="a" name="marble window">
 	</item>
 	<item id="6450" article="a" name="tree window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6451" article="a" name="tree window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6452" article="a" name="tree window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6453" article="a" name="tree window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6454" article="a" name="sandstone window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6455" article="a" name="sandstone window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6456" article="a" name="sandstone window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6457" article="a" name="sandstone window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6458" article="a" name="bamboo window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6459" article="a" name="bamboo window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6460" article="a" name="bamboo window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6461" article="a" name="bamboo window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6462" article="a" name="sandstone window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6463" article="a" name="sandstone window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6464" article="a" name="sandstone window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6465" article="a" name="sandstone window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6466" article="a" name="stone window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6467" article="a" name="stone window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6468" article="a" name="stone window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6469" article="a" name="stone window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6470" article="a" name="wooden window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6471" article="a" name="wooden window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6472" article="a" name="wooden window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6473" article="a" name="wooden window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6474" name="planks">
 	</item>
@@ -17518,12 +17977,18 @@
 	<item id="6787" article="a" name="fur wall">
 	</item>	
 	<item id="6788" article="a" name="fur wall window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6789" article="a" name="fur wall window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6790" article="a" name="fur wall window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6791" article="a" name="fur wall window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6792" article="a" name="fur archway">
 	</item>
@@ -17532,20 +17997,32 @@
 	<item id="6794" article="a" name="barbarian banner">
 	</item>
 	<item id="6795" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6796" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6797" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6798" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6799" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6800" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6801" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6802" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6803" article="a" name="fur archway">
 	</item>
@@ -17723,74 +18200,114 @@
 	<item id="6890" name="tusks">
 	</item>
 	<item id="6891" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6892" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6893" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6894" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6895" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6896" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6897" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6898" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6899" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6900" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="6901" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6902" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6903" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6904" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6905" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6906" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6907" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="6908" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="6909" article="an" name="ice ramp">
+		<attribute key="floorchange" value="east"/>
 	</item>
 	<item id="6910" article="an" name="ice ramp">
 	</item>
 	<item id="6911" article="an" name="ice ramp">
+		<attribute key="floorchange" value="west"/>
 	</item>
 	<item id="6912" article="an" name="ice ramp">
 	</item>
 	<item id="6913" article="an" name="ice ramp">
+		<attribute key="floorchange" value="south"/>
 	</item>
 	<item id="6914" article="an" name="ice ramp">
 	</item>
 	<item id="6915" article="an" name="ice ramp">
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="6916" article="an" name="ice ramp">
 	</item>
 	<item id="6917" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6918" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6919" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6920" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6921" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6922" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6923" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6924" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="6925" name="ice">
 	</item>
@@ -17992,72 +18509,119 @@
 	<item id="7024" article="a" name="tree">
 	</item>
 	<item id="7025" article="a" name="nordic wall window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7026" article="a" name="nordic wall window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7027" article="a" name="nordic wall window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7028" article="a" name="nordic wall window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7029" article="an" name="ice wall window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7030" article="an" name="ice wall window">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7031" article="an" name="ice wall window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7032" article="an" name="ice wall window">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7033" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="7034" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7035" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7036" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7037" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7038" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7039" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7040" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7041" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7042" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="7043" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7044" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7045" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7046" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7047" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7048" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7049" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7050" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7051" article="an" name="ice archway">
 	</item>
 	<item id="7052" article="an" name="ice archway">
 	</item>
 	<item id="7053" article="a" name="trap door">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="7054" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7055" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7056" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="7057" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
 	<item id="7058" article="a" name="skull pillar">
 	</item>
@@ -19290,7 +19854,8 @@
 		<attribute key="slotType" value="two-handed"/>	
 		<attribute key="weaponType" value="distance"/>
 		<attribute key="ammoType" value="arrow"/>
-		<attribute key="range" value="5"/>
+		<attribute key="range" value="6"/>
+		<attribute key="hitChance" value="5"/>
 	</item>
 	<item id="7439" article="a" name="berserk potion">
 		<attribute key="weight" value="200"/>
@@ -19405,7 +19970,94 @@
 		<attribute key="slotType" value="legs"/>
 		<attribute key="description" value="They offer little protection but will at least provide some comfort and warmth."/>
 	</item>
-	<!-- Many items from 8.1 are still missing. So far, only the potions are here -->
+	<item id="7465" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7466" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7467" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7468" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7469" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7470" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7471" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7472" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7473" article="a" name="searing fire">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="1507"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="replaceable" value="0"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="300"/>
+		</attribute>
+	</item>
+	<item id="7474" article="a" name="sarcophagus">
+	</item>
+	<item id="7475" article="a" name="sarcophagus">
+	</item>
+	<item id="7476" article="a" name="flower">
+	</item>
+	<!-- Many items from 8.1 are still missing. -->
 	<item id="7588" article="a" name="strong health potion">
 		<attribute key="weight" value="200"/>
 		<attribute key="description" value="This potion can only be consumed by paladins and knights of level 50 or higher."/>
@@ -19428,6 +20080,40 @@
 	<item id="7620" article="a" name="mana potion">
 		<attribute key="weight" value="180"/>
 	</item>
+	<item id="7621" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7623"/>
+		<attribute key="duration" value="10"/>
+	</item>
+	<item id="7622" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7624"/>
+		<attribute key="duration" value="10"/>
+	</item>
+	<item id="7623" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7626"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="7624" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7625"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="7625" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7627"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="7626" article="a" name="dead dragon hatchling">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="7627"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="7627" article="a" name="dead dragon hatchling">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="7634" article="an" name="empty potion flask">
 		<attribute key="weight" value="200"/>
 		<attribute key="description" value="Return it to a magic store for deposit."/>
@@ -19440,11 +20126,33 @@
 		<attribute key="weight" value="180"/>
 		<attribute key="description" value="Return it to a magic store for deposit."/>
 	</item>
-	<item id="7778" article="a" name="bed">
-		<attribute key="type" value="bed" />
+	<item id="7759" article="a" value="small enchanted sapphire" plural="small enchanted sapphires">
+		<attribute key="weight" value="10"/>
 	</item>
-	<item id="7779" article="a" name="bed">
-		<attribute key="type" value="bed" />
+	<item id="7760" article="a" value="small enchanted ruby" plural="small enchanted rubies">
+		<attribute key="weight" value="10"/>
+	</item>
+	<item id="7761" article="a" value="small enchanted emerald" plural="small enchanted emeralds">
+		<attribute key="weight" value="10"/>
+	</item>
+	<item id="7762" article="a" value="small enchanted amethyst" plural="small enchanted amethysts">
+		<attribute key="weight" value="10"/>
+	</item>
+	<item id="7924" name="stairs">
+		<attribute key="floorchange" value="south"/>
+	</item>
+	<item id="7925" name="stairs">
+		<attribute key="floorchange" value="east"/>
+	</item>
+	<item id="7943" name="shallow water">
+	</item>
+	<item id="7944" name="shallow water">
+	</item>
+	<item id="7945" name="shallow water">
+	</item>
+	<item id="7946" name="shallow water">
+	</item>
+	<item id="7947" name="shallow water">
 	</item>
 	<item id="7780" article="a" name="bed">
 		<attribute key="type" value="bed" />
@@ -19611,117 +20319,193 @@
 		<attribute key="maleSleeper" value="7798" />
 		<attribute key="femaleSleeper" value="7810" />
 	</item>
-	<item id="8075" article="a" name="bed">
-		<attribute key="type" value="bed" />
+	<item id="7924" name="stairs">
+		<attribute key="floorchange" value="south"/>
 	</item>
-	<item id="8076" article="a" name="bed">
-		<attribute key="type" value="bed" />
+	<item id="7925" name="stairs">
+		<attribute key="floorchange" value="east"/>
 	</item>
-	<item id="8077" article="a" name="bed">
-		<attribute key="type" value="bed" />
+	<item id="7943" name="shallow water">
 	</item>
-	<item id="8078" article="a" name="bed">
-		<attribute key="type" value="bed" />
+	<item id="7944" name="shallow water">
 	</item>
-	<item id="8882" name="dirt" editorsuffix="thick borders">
+	<item id="7945" name="shallow water">
 	</item>
-	<item id="8883" name="dirt" editorsuffix="thick borders">
+	<item id="7946" name="shallow water">
 	</item>
-	<item id="8884" name="dirt" editorsuffix="thick borders">
+	<item id="7947" name="shallow water">
 	</item>
-	<item id="8885" name="dirt" editorsuffix="thick borders">
+	<item id="7948" name="shallow water">
 	</item>
-	<item id="8886" name="dirt" editorsuffix="thick borders">
+	<item id="7949" name="shallow water">
 	</item>
-	<item id="8887" name="grass" editorsuffix="thick borders">
+	<item id="7950" name="shallow water">
 	</item>
-	<item id="8888" name="grass" editorsuffix="thick borders">
+	<item id="7951" name="shallow water">
 	</item>
-	<item id="8889" name="grass" editorsuffix="thick borders">
+	<item id="7952" name="shallow water">
 	</item>
-	<item id="8890" name="grass" editorsuffix="thick borders">
+	<item id="7953" name="shallow water">
 	</item>
-	<item id="8891" name="grass" editorsuffix="thick borders">
+	<item id="7954" name="shallow water">
 	</item>
-	<item id="8892" name="grass" editorsuffix="thick borders">
+	<item id="7956" article="a" name="waterpolo ball">
 	</item>
-	<item id="8893" name="grass" editorsuffix="thick borders">
+	<item id="8170" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8894" name="grass" editorsuffix="thick borders">
+	<item id="8276" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8895" name="grass" editorsuffix="thick borders">
+	<item id="8277" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8896" name="grass" editorsuffix="thick borders">
+	<item id="8279" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8897" name="grass" editorsuffix="thick borders">
+	<item id="8280" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8898" name="grass" editorsuffix="thick borders">
+	<item id="8281" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8899" name="grass" editorsuffix="thick borders">
+	<item id="8282" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8900" name="grass" editorsuffix="thick borders">
+	<item id="8283" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8901" name="grass" editorsuffix="thick borders">
+	<item id="8284" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8902" name="grass" editorsuffix="thick borders">
+	<item id="8285" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8903" article="a" name="wooden pillar">
+	<item id="8286" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="6904" article="a" name="wooden pillar">
+	<item id="8323" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8905" name="sand" editorsuffix="old borders">
+	<item id="8541" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8906" name="sand" editorsuffix="">
+	<item id="8542" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8907" name="frozen mud" editorsuffix="thick borders">
+	<item id="8543" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
-	<item id="8908" name="frozen mud" editorsuffix="thick borders">
+	<item id="8544" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8909" name="frozen mud" editorsuffix="thick borders">
+	<item id="8545" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8910" name="frozen mud" editorsuffix="thick borders">
+	<item id="8546" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
-	<item id="8911" name="frozen mud" editorsuffix="thick borders">
+	<item id="8547" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8912" article="a" name="framework wall" editorsuffix="dirty">
+	<item id="8548" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
-	<item id="8914" article="a" name="wooden pillar">
+	<item id="8549" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8915" article="a" name="wooden pillar">
+	<item id="8550" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
-	<item id="8916" article="a" name="wooden pillar">
+	<item id="8551" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8917" name="earth" editorsuffix="stone borders">
+	<item id="8552" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
-	<item id="8918" name="earth" editorsuffix="stone borders">
+	<item id="8553" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8919" name="earth" editorsuffix="stone borders">
+	<item id="8554" article="an" name="open door">
+		<attribute key="type" value="door"/>
 	</item>
-	<item id="8920" name="earth" editorsuffix="stone borders">
+	<item id="8555" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8921" name="earth" editorsuffix="stone borders">
+	<item id="8556" article="an" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
-	<item id="8922" name="earth" editorsuffix="stone borders">
+	<item id="8557" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8923" name="earth" editorsuffix="stone borders">
+	<item id="8558" article="an" name="gate of expertise">
+		<attribute key="type" value="door"/>
 	</item>
-	<item id="8924" name="earth" editorsuffix="stone borders">
+	<item id="8559" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8925" name="earth" editorsuffix="stone borders">
+	<item id="8560" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8926" name="earth" editorsuffix="stone borders">
+	<item id="8561" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8927" name="earth" editorsuffix="stone borders">
+	<item id="8562" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8928" name="earth" editorsuffix="stone borders">
+	<item id="8563" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8929" name="earth" editorsuffix="stone borders">
+	<item id="8564" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8930" name="earth" editorsuffix="stone borders">
+	<item id="8565" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8931" name="earth" editorsuffix="stone borders">
+	<item id="8566" name="stairs">
+		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8932" name="earth" editorsuffix="stone borders">
+	<item id="8567" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8585" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8595" name="stairs">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8596" article="a" name="trapdoor">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8696" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="8697" article="an" name="open door">
+		<attribute key="type" value="door"/>
+	</item>
+	<item id="8709" name="stairs">
+		<attribute key="floorchange" value="west"/>
+	</item>
+	<item id="8715" name="stairs">
+		<attribute key="floorchange" value="west"/>
+	</item>
+	<item id="8769" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="8716" name="stairs">
+		<attribute key="floorchange" value="south"/>
 	</item>
 	<item id="20001" name="water">
 	</item>
