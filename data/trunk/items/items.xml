@@ -20341,6 +20341,22 @@
 	</item>
 	<item id="7956" article="a" name="waterpolo ball">
 	</item>
+	<item id="8075" article="a" name="bed">
+		<attribute key="type" value="bed" />
+		<attribute key="partnerDirection" value="north" />
+	</item>
+	<item id="8076" article="a" name="bed">
+		<attribute key="type" value="bed" />
+		<attribute key="partnerDirection" value="west" />
+	</item>
+	<item id="8077" article="a" name="hammock">
+		<attribute key="type" value="bed" />
+		<attribute key="partnerDirection" value="north" />
+	</item>
+	<item id="8078" article="a" name="hammock">
+		<attribute key="type" value="bed" />
+		<attribute key="partnerDirection" value="west" />
+	</item>
 	<item id="8170" article="a" name="trapdoor">
 		<attribute key="floorchange" value="down"/>
 	</item>
