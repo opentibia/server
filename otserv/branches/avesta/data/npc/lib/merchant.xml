@@ -48,7 +48,7 @@
   <itemlist listid="backpack">
     <!--If no name tag is used the default name from items.xml is used.-->
     <!--With backpacks it would be just "backpack" regardless of color, so we override that description here-->
-    <item keywords="standard;backpack" id="1988" sellprice="20" buyprice="40"/>
+    <item keywords="brown;backpack" id="1988" sellprice="20" buyprice="40" name="a brown backpack" pname="brown backpacks"/>
     <item keywords="green;backpack" id="1998" sellprice="20" buyprice="40" name="a green backpack" pname="green backpacks"/>
     <item keywords="red;backpack" id="2000" sellprice="20" buyprice="40" name="a red backpack" pname="red backpacks"/>
     <item keywords="purple;backpack" id="2001" sellprice="20" buyprice="40" name="a purple backpack" pname="purple backpacks"/>

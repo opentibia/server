@@ -21,11 +21,13 @@
       <response text="It was a pleasure to help you."/>
     </interact>
 
+    <!--
     <interact event="onBusy">
       <response text="One moment please, |NAME|.">
         <action name="addqueue" value="|PLAYER|"/>
       </response>
     </interact>
+    -->
 
     <interact event="onPlayerLeave" focus="0">
       <response text="It was a pleasure to help you |NAME|."/>

@@ -2,8 +2,8 @@
 <npc name="Merchant Glut" floorchange="0" walkinterval="4000" speed="220">
 	<health now="150" max="150"/>
 	<look type="100" head="0" body="0" legs="0" feet="0"/>
-
-  <interaction range="3" idletime="0">
+  
+  <interaction range="3" idletime="0" defaultpublic="0">
     <!--This will include the bankman interaction, in this way several npc can use the same interaction-->
     <include file="merchant.xml"/>
     
@@ -47,7 +47,9 @@
       <list>helmet</list>
       <response>
         <action name="script">
+        <![CDATA[
           openShopWindow(cid, itemlist, -1, -1)
+        ]]>
         </action>
       </response>
     </interact>
@@ -56,12 +58,14 @@
       <response>
         <action name="price" value="|SELLPRICE|"/>
         <action name="script">
+        <![CDATA[
           if(doPlayerRemoveItem(cid, _state.itemid, _state.amount, _state.subtype) == TRUE) then
             doPlayerAddMoney(cid, _state.price * _state.amount)
             selfSay("Here you are.", cid)
           else
             selfSay("Sorry, you do not have one.", cid)
           end
+        ]]>
         </action>
       </response>
     </interact>
@@ -70,6 +74,7 @@
       <response>
         <action name="price" value="|BUYPRICE|"/>
         <action name="script">
+        <![CDATA[
           if(getPlayerMoney(cid) >= _state.amount * _state.price) then
             local count
             for count=0, _state.amount-1 do
@@ -92,6 +97,7 @@
           else
             selfSay("Sorry, you do not have enough gold.", cid)
           end
+        ]]>
         </action>
       </response>
     </interact>
@@ -111,17 +117,19 @@
         <action name="price" value="|SELLPRICE|"/>
 
         <action name="script">
+        <![CDATA[
           if(_state.amount > 1) then
             selfSay("Do you want to sell " .. _state.amount .. " " .. _state.listpname .. " for " ..  _state.price * _state.amount .. " gold?", cid)
           else
             selfSay("Do you want to sell " .. _state.listname .. " for " .. _state.price .. " gold?", cid)
           end
+        ]]>
         </action>
 
         <interact keywords="yes">
-          <response param="noamount" text="Sorry, you do not have one." public="0"/>
-          <response param="lowamount" text="Sorry, you do not have that many." public="0"/>
-          <response text="Ok. Here is your money." public="0">
+          <response param="noamount" text="Sorry, you do not have one."/>
+          <response param="lowamount" text="Sorry, you do not have that many."/>
+          <response text="Ok. Here is your money.">
             <action name="sell" value="|PRICE|"/>
           </response>
         </interact>
@@ -142,17 +150,19 @@
         <action name="price" value="|BUYPRICE|"/>
 
         <action name="script">
+        <![CDATA[
           if(_state.amount > 1) then
             selfSay("Do you want to buy " .. _state.amount .. " " .. _state.listpname .. " for " ..  _state.price * _state.amount .. " gold?", cid)
           else
             selfSay("Do you want to buy " .. _state.listname .. " for " .. _state.price .. " gold?", cid)
           end
+        ]]>
         </action>
 
         <interact keywords="yes">
-          <response param="lowmoney" text="Sorry, you do not have enough gold." public="0"/>
-          <response text="Thank you. Here it is." public="0">
-            <action name="buy" value="|PRICE|" public="0"/>
+          <response param="lowmoney" text="Sorry, you do not have enough gold."/>
+          <response text="Thank you. Here it is.">
+            <action name="buy" value="|PRICE|"/>
           </response>
         </interact>
 

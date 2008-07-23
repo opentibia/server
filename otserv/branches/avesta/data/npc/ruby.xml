@@ -11,25 +11,34 @@
 
       <response>
         <action name="script">
+        <![CDATA[
           if(getPlayerSex(cid)) == 0 then
-            selfSay("Welcome on board, Madam " .. getCreatureName(cid) .. ".")
+            selfSay("Welcome on board, Madam " .. getCreatureName(cid) .. ".", cid)
           else
-            selfSay("Welcome on board, Sir " .. getCreatureName(cid) .. ".")
+            selfSay("Welcome on board, Sir " .. getCreatureName(cid) .. ".", cid)
           end
+        ]]>
         </action>
       </response>
+      
     </interact>
 
     <interact keywords="bye" focus="0">
       <keywords>farewell</keywords>
-      <response text="Good bye. Recommend us, if you were satisfied with our service."/>
+      <response text="Good bye. Recommend us, if you were satisfied with our service.">
+        <!--
+        <action name="script">
+          doRemoveCreature(getNpcCid());
+        </action>
+        -->
+      </response>
     </interact>
-
+    
     <!--
     If the event onBusy exists, the npc will make a queue like Tibia, if the event is removed
     the npc will be able to talk to all customers at the same time without problems.
     -->
- 
+
     <interact event="onBusy">
       <response text="One moment please, |NAME|.">
         <action name="addqueue" value="|PLAYER|"/>

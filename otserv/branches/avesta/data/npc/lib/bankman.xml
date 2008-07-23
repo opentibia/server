@@ -27,13 +27,15 @@
           <interact keywords="yes">
             <response>
               <action name="script">
+              <![CDATA[
                 if(getPlayerItemCount(cid, 2148) >= _state.amount*100) then
-                  selfSay("Here you are.")
+                  selfSay("Here you are.", cid)
                   doPlayerRemoveItem(cid, 2148, _state.amount*100)
                   doPlayerAddItem(cid, 2152, _state.amount)
                 else
-                  selfSay("Sorry, you don't have enough gold coins.")
+                  selfSay("Sorry, you don't have enough gold coins.", cid)
                 end
+              ]]>
               </action>
             </response>
           </interact>
@@ -61,13 +63,15 @@
               <interact keywords="yes">
                 <response>
                   <action name="script">
+                  <![CDATA[
                     if(getPlayerItemCount(cid, 2152) >= _state.amount) then
-                      selfSay("Here you are.")
+                      selfSay("Here you are.", cid)
                       doPlayerRemoveItem(cid, 2152, _state.amount)
                       doPlayerAddItem(cid, 2148, _state.amount * 100)
                     else
-                      selfSay("Sorry, you don't have enough platinum coins")
+                      selfSay("Sorry, you don't have enough platinum coins", cid)
                     end
+                  ]]>
                   </action>
                 </response>
               </interact>
@@ -93,13 +97,15 @@
               <interact keywords="yes">
                 <response>
                   <action name="script">
+                  <![CDATA[
                     if(getPlayerItemCount(cid, 2152) >= _state.amount*100) then
-                      selfSay("Here you are.")
+                      selfSay("Here you are.", cid)
                       doPlayerRemoveItem(cid, 2152, _state.amount*100)
                       doPlayerAddItem(cid, 2160, _state.amount)
                     else
-                      selfSay("Sorry, you don't have enough platinum coins.")
+                      selfSay("Sorry, you don't have enough platinum coins.", cid)
                     end
+                  ]]>
                   </action>
                 </response>
               </interact>
@@ -129,13 +135,15 @@
           <interact keywords="yes">
             <response>
               <action name="script">
+              <![CDATA[
                 if(getPlayerItemCount(cid, 2160) >= _state.amount) then
-                  selfSay("Here you are.")
+                  selfSay("Here you are.", cid)
                   doPlayerRemoveItem(cid, 2160, _state.amount)
                   doPlayerAddItem(cid, 2152, _state.amount*100)
                 else
-                  selfSay("Sorry, you don't have enough crystal coins.")
+                  selfSay("Sorry, you don't have enough crystal coins.", cid)
                 end
+              ]]>
               </action>
               </response>
           </interact>
