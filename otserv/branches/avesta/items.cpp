@@ -364,13 +364,6 @@ int Items::loadFromOtb(std::string file)
 			}
 		}
 
-		/*
-		ItemType* cmpType = items.getElement(iType->id);
-		if(cmpType && cmpType->group != ITEM_GROUP_DEPRECATED && type == ITEM_GROUP_DEPRECATED){
-			std::cout << "id: " << iType->id << std::endl;
-		}
-		*/
-
 		reverseItemMap[iType->clientId] = iType->id;
 
 		// store the found item

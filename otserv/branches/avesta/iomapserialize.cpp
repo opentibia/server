@@ -238,29 +238,28 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 
 					if(findItem->getID() == type){
 						item = findItem;
-						if(!item->unserializeAttr(propStream)){
-							std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
-						}
-
 						break;
 					}
 					else if(iType.isDoor() && findItem->getDoor()){
 						item = findItem;
-						item->setID(type);
-						//item = g_game.transformItem(item, type);
+						break;
 					}
 					//[ added for beds system
 					else if(iType.isBed() && findItem->getBed()) {
 						item = findItem;
-						item->setID(type);
-						item->unserializeAttr(propStream);
-						//item = g_game.transformItem(item, type);
+						break;
 					}
 					//]
 				}
 			}
 
 			if(item){
+				if(!item->unserializeAttr(propStream)){
+					std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
+				}
+
+				item = g_game.transformItem(item, type);
+
 				std::pair<Item*, int> myPair(item, pid);
 				itemMap[sid] = myPair;
 			}

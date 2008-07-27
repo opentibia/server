@@ -705,7 +705,10 @@ void Door::setHouse(House* _house)
 		return;
 	}
 	house = _house;
-	accessList = new AccessList();
+	
+	if(!accessList){
+		accessList = new AccessList();
+	}
 }
 
 bool Door::canUse(const Player* player)
@@ -721,12 +724,10 @@ bool Door::canUse(const Player* player)
 
 void Door::setAccessList(const std::string& textlist)
 {
-	if(!house){
-		#ifdef __DEBUG_HOUSES__
-		std::cout << "Failure: [Door::setAccessList] house == NULL" << std::endl;
-		#endif
-		return;
+	if(!accessList){
+		accessList = new AccessList();
 	}
+
 	accessList->parseList(textlist);
 }
 
@@ -738,8 +739,21 @@ bool Door::getAccessList(std::string& list) const
 		#endif
 		return false;
 	}
+
 	accessList->getList(list);
 	return true;
+}
+
+void Door::copyAttributes(Item* item)
+{
+	Item::copyAttributes(item);
+
+	if(Door* door = item->getDoor()){
+		std::string list;
+		if(door->getAccessList(list)){
+			setAccessList(list);
+		}
+	}
 }
 
 void Door::onRemoved()

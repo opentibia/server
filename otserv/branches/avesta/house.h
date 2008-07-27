@@ -93,6 +93,7 @@ public:
 
 	//overrides
 	virtual void onRemoved();
+	void copyAttributes(Item* item);
 
 protected:
 	void setHouse(House* _house);
