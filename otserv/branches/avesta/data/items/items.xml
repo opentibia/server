@@ -20513,6 +20513,99 @@
 	<item id="8716" name="stairs">
 		<attribute key="floorchange" value="south"/>
 	</item>
+	<item id="9021" name="dirt">
+	</item>
+	<item id="9022" name="dirt">
+	</item>
+	<item id="9023" name="dirt">
+	</item>
+	<item id="9024" name="dirt">
+	</item>
+	<item id="9025" article="a" name="muddy floor">
+		<attribute key="fluidSource" value="mud"/>
+	</item>
+	<item id="9026" name="earth">
+	</item>
+	<item id="9027" name="earth">
+	</item>
+	<item id="9028" name="earth">
+	</item>
+	<item id="9029" name="earth">
+	</item>
+	<item id="9030" name="earth">
+	</item>
+	<item id="9031" name="earth">
+	</item>
+	<item id="9032" name="earth">
+	</item>
+	<item id="9033" name="earth">
+	</item>
+	<item id="9034" name="earth">
+	</item>
+	<item id="9035" name="earth">
+	</item>
+	<item id="9036" name="earth">
+	</item>
+	<item id="9037" name="earth">
+	</item>
+	<item id="9038" name="earth">
+	</item>
+	<item id="9039" name="earth">
+	</item>
+	<item id="9040" name="earth">
+	</item>
+	<item id="9041" name="earth">
+	</item>
+	<item id="9042" name="earth">
+	</item>
+	<item id="9043" name="grass">
+	</item>
+	<item id="9044" name="grass">
+	</item>
+	<item id="9045" name="grass">
+	</item>
+	<item id="9046" name="grass">
+	</item>
+	<item id="9047" name="grass">
+	</item>
+	<item id="9048" name="grass">
+	</item>
+	<item id="9049" name="grass">
+	</item>
+	<item id="9050" name="grass">
+	</item>
+	<item id="9051" name="grass">
+	</item>
+	<item id="9052" name="grass">
+	</item>
+	<item id="9053" name="grass">
+	</item>
+	<item id="9054" name="grass">
+	</item>
+	<item id="9055" name="grass">
+	</item>
+	<item id="9056" name="grass">
+	</item>
+	<item id="9057" name="grass">
+	</item>
+	<item id="9058" name="grass">
+	</item>
+	<item id="9059" name="sand">
+	</item>
+	<item id="9060" article="a" name="framework wall">
+	</item>
+	<item id="9061" name="grass">
+	</item>
+	<item id="9062" article="a" name="wooden pillar">
+	</item>
+	<item id="9063" article="a" name="wooden pillar">
+	</item>
+	<item id="9064" article="a" name="wooden pillar">
+	</item>
+	<item id="9065" article="a" name="wooden pillar">
+	</item>
+	<item id="9066" article="a" name="wooden pillar">
+	</item>
 	<item id="20001" name="water">
 	</item>
 	<item id="20002" name="blood">
