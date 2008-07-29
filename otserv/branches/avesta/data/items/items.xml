@@ -3995,14 +3995,14 @@
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="250"/>
 		<attribute key="showcharges" value="1"/>
-	<attribute key="absorbPercentPhysical" value="10"/>
+		<attribute key="absorbPercentPhysical" value="10"/>
 	</item>
 	<item id="2201" article="a" name="dragon necklace">
 		<attribute key="weight" value="630"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="200"/>
 		<attribute key="showcharges" value="1"/>
-	<attribute key="absorbPercentFire" value="10"/>
+		<attribute key="absorbPercentFire" value="10"/>
 	</item>
 	<item id="2202" article="a" name="stealth ring">
 		<attribute key="weight" value="100"/>
@@ -12216,31 +12216,31 @@
 	</item>
 	<item id="4819" name="dirt">
 	</item>
-	<item id="4820" name="shallow water">
+	<item id="4820" name="shallow water" editorsuffix=" (walkable)">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
-	<item id="4821" name="shallow water">
+	<item id="4821" name="shallow water" editorsuffix=" (walkable)">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
-	<item id="4822" name="shallow water">
+	<item id="4822" name="shallow water" editorsuffix=" (walkable)">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 	</item>
-	<item id="4823" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
-		<attribute key="fluidSource" value="water"/>
-	</item>
-	<item id="4824" name="shallow water">
+	<item id="4823" name="shallow water" editorsuffix=" (walkable)">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
-	<item id="4825" name="shallow water">
+	<item id="4824" name="shallow water" editorsuffix=" (walkable)">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="4825" name="shallow water" editorsuffix=" (walkable)">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
@@ -16854,7 +16854,7 @@
 		<attribute key="corpseType" value="undead"/>
 	</item>
 	<!-- Item id 6352 is blank -->
-	<item id="6353" name="swamp">
+	<item id="6353" name="swamp" editorsuffix=" (walkable)">
 	</item>
 	<item id="6354" article="a" name="slain blightwalker">
 		<attribute key="containerSize" value="10"/>
@@ -20506,105 +20506,620 @@
 	<item id="8715" name="stairs">
 		<attribute key="floorchange" value="west"/>
 	</item>
+	<item id="8716" name="stairs">
+		<attribute key="floorchange" value="south"/>
+	</item>
 	<item id="8769" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="8716" name="stairs">
-		<attribute key="floorchange" value="south"/>
+	<item id="8769">
 	</item>
-	<item id="9021" name="dirt">
+	<item id="8770">
 	</item>
-	<item id="9022" name="dirt">
+	<item id="8771">
 	</item>
-	<item id="9023" name="dirt">
+	<item id="8772">
 	</item>
-	<item id="9024" name="dirt">
+	<item id="8773">
 	</item>
-	<item id="9025" article="a" name="muddy floor">
-		<attribute key="fluidSource" value="mud"/>
+	<item id="8774">
 	</item>
-	<item id="9026" name="earth">
+	<item id="8775">
 	</item>
-	<item id="9027" name="earth">
+	<item id="8776">
 	</item>
-	<item id="9028" name="earth">
+	<item id="8777">
 	</item>
-	<item id="9029" name="earth">
+	<item id="8778">
 	</item>
-	<item id="9030" name="earth">
+	<item id="8779">
 	</item>
-	<item id="9031" name="earth">
+	<item id="8780">
 	</item>
-	<item id="9032" name="earth">
+	<item id="8781">
 	</item>
-	<item id="9033" name="earth">
+	<item id="8782">
 	</item>
-	<item id="9034" name="earth">
+	<item id="8783">
 	</item>
-	<item id="9035" name="earth">
+	<item id="8784">
 	</item>
-	<item id="9036" name="earth">
+	<item id="8785">
 	</item>
-	<item id="9037" name="earth">
+	<item id="8786">
 	</item>
-	<item id="9038" name="earth">
+	<item id="8787">
 	</item>
-	<item id="9039" name="earth">
+	<item id="8788">
 	</item>
-	<item id="9040" name="earth">
+	<item id="8789">
 	</item>
-	<item id="9041" name="earth">
+	<item id="8790">
 	</item>
-	<item id="9042" name="earth">
+	<item id="8791">
 	</item>
-	<item id="9043" name="grass">
+	<item id="8792">
 	</item>
-	<item id="9044" name="grass">
+	<item id="8793">
 	</item>
-	<item id="9045" name="grass">
+	<item id="8794">
 	</item>
-	<item id="9046" name="grass">
+	<item id="8795">
 	</item>
-	<item id="9047" name="grass">
+	<item id="8796">
 	</item>
-	<item id="9048" name="grass">
+	<item id="8797">
 	</item>
-	<item id="9049" name="grass">
+	<item id="8798">
 	</item>
-	<item id="9050" name="grass">
+	<item id="8799">
 	</item>
-	<item id="9051" name="grass">
+	<item id="8800">
 	</item>
-	<item id="9052" name="grass">
+	<item id="8801">
 	</item>
-	<item id="9053" name="grass">
+	<item id="8802">
 	</item>
-	<item id="9054" name="grass">
+	<item id="8803">
 	</item>
-	<item id="9055" name="grass">
+	<item id="8804">
 	</item>
-	<item id="9056" name="grass">
+	<item id="8805">
 	</item>
-	<item id="9057" name="grass">
+	<item id="8806">
 	</item>
-	<item id="9058" name="grass">
+	<item id="8807">
 	</item>
-	<item id="9059" name="sand">
+	<item id="8808">
 	</item>
-	<item id="9060" article="a" name="framework wall">
+	<item id="8809">
 	</item>
-	<item id="9061" name="grass">
+	<item id="8810">
 	</item>
-	<item id="9062" article="a" name="wooden pillar">
+	<item id="8811">
 	</item>
-	<item id="9063" article="a" name="wooden pillar">
+	<item id="8812">
 	</item>
-	<item id="9064" article="a" name="wooden pillar">
+	<item id="8813">
 	</item>
-	<item id="9065" article="a" name="wooden pillar">
+	<item id="8814">
 	</item>
-	<item id="9066" article="a" name="wooden pillar">
+	<item id="8815">
+	</item>
+	<item id="8816">
+	</item>
+	<item id="8817">
+	</item>
+	<item id="8818">
+	</item>
+	<item id="8819">
+	</item>
+	<item id="8820">
+	</item>
+	<item id="8821">
+	</item>
+	<item id="8822">
+	</item>
+	<item id="8823">
+	</item>
+	<item id="8824">
+	</item>
+	<item id="8825">
+	</item>
+	<item id="8826">
+	</item>
+	<item id="8827">
+	</item>
+	<item id="8828">
+	</item>
+	<item id="8829">
+	</item>
+	<item id="8830">
+	</item>
+	<item id="8831">
+	</item>
+	<item id="8832">
+	</item>
+	<item id="8833">
+	</item>
+	<item id="8834">
+	</item>
+	<item id="8835">
+	</item>
+	<item id="8836">
+	</item>
+	<item id="8837">
+	</item>
+	<item id="8838">
+	</item>
+	<item id="8839">
+	</item>
+	<item id="8840">
+	</item>
+	<item id="8841">
+	</item>
+	<item id="8842">
+	</item>
+	<item id="8843">
+	</item>
+	<item id="8844">
+	</item>
+	<item id="8845">
+	</item>
+	<item id="8846">
+	</item>
+	<item id="8847">
+	</item>
+	<item id="8848">
+	</item>
+	<item id="8849">
+	</item>
+	<item id="8850">
+	</item>
+	<item id="8851">
+	</item>
+	<item id="8852">
+	</item>
+	<item id="8853">
+	</item>
+	<item id="8854">
+	</item>
+	<item id="8855">
+	</item>
+	<item id="8856">
+	</item>
+	<item id="8857">
+	</item>
+	<item id="8858">
+	</item>
+	<item id="8859">
+	</item>
+	<item id="8860">
+	</item>
+	<item id="8861">
+	</item>
+	<item id="8862">
+	</item>
+	<item id="8863">
+	</item>
+	<item id="8864">
+	</item>
+	<item id="8865">
+	</item>
+	<item id="8866">
+	</item>
+	<item id="8867">
+	</item>
+	<item id="8868">
+	</item>
+	<item id="8869">
+	</item>
+	<item id="8870">
+	</item>
+	<item id="8871">
+	</item>
+	<item id="8872">
+	</item>
+	<item id="8873">
+	</item>
+	<item id="8874">
+	</item>
+	<item id="8875">
+	</item>
+	<item id="8876">
+	</item>
+	<item id="8877">
+	</item>
+	<item id="8878">
+	</item>
+	<item id="8879">
+	</item>
+	<item id="8880">
+	</item>
+	<item id="8881">
+	</item>
+	<item id="8882">
+	</item>
+	<item id="8883">
+	</item>
+	<item id="8884">
+	</item>
+	<item id="8885">
+	</item>
+	<item id="8886">
+	</item>
+	<item id="8887">
+	</item>
+	<item id="8888">
+	</item>
+	<item id="8889">
+	</item>
+	<item id="8890">
+	</item>
+	<item id="8891">
+	</item>
+	<item id="8892">
+	</item>
+	<item id="8893">
+	</item>
+	<item id="8894">
+	</item>
+	<item id="8895">
+	</item>
+	<item id="8896">
+	</item>
+	<item id="8897">
+	</item>
+	<item id="8898">
+	</item>
+	<item id="8899">
+	</item>
+	<item id="8900">
+	</item>
+	<item id="8901">
+	</item>
+	<item id="8902">
+	</item>
+	<item id="8903">
+	</item>
+	<item id="8904">
+	</item>
+	<item id="8905">
+	</item>
+	<item id="8906">
+	</item>
+	<item id="8907">
+	</item>
+	<item id="8908">
+	</item>
+	<item id="8909">
+	</item>
+	<item id="8910">
+	</item>
+	<item id="8911">
+	</item>
+	<item id="8912">
+	</item>
+	<item id="8913">
+	</item>
+	<item id="8914">
+	</item>
+	<item id="8915">
+	</item>
+	<item id="8916">
+	</item>
+	<item id="8917">
+	</item>
+	<item id="8918">
+	</item>
+	<item id="8919">
+	</item>
+	<item id="8920">
+	</item>
+	<item id="8921">
+	</item>
+	<item id="8922">
+	</item>
+	<item id="8923">
+	</item>
+	<item id="8924">
+	</item>
+	<item id="8925">
+	</item>
+	<item id="8926">
+	</item>
+	<item id="8927">
+	</item>
+	<item id="8928">
+	</item>
+	<item id="8929">
+	</item>
+	<item id="8930">
+	</item>
+	<item id="8931">
+	</item>
+	<item id="8932">
+	</item>
+	<item id="8933">
+	</item>
+	<item id="8934">
+	</item>
+	<item id="8935">
+	</item>
+	<item id="8936">
+	</item>
+	<item id="8937">
+	</item>
+	<item id="8938">
+	</item>
+	<item id="8939">
+	</item>
+	<item id="8940">
+	</item>
+	<item id="8941">
+	</item>
+	<item id="8942">
+	</item>
+	<item id="8943">
+	</item>
+	<item id="8944">
+	</item>
+	<item id="8945">
+	</item>
+	<item id="8946">
+	</item>
+	<item id="8947">
+	</item>
+	<item id="8948">
+	</item>
+	<item id="8949">
+	</item>
+	<item id="8950">
+	</item>
+	<item id="8951">
+	</item>
+	<item id="8952">
+	</item>
+	<item id="8953">
+	</item>
+	<item id="8954">
+	</item>
+	<item id="8955">
+	</item>
+	<item id="8956">
+	</item>
+	<item id="8957">
+	</item>
+	<item id="8958">
+	</item>
+	<item id="8959">
+	</item>
+	<item id="8960">
+	</item>
+	<item id="8961">
+	</item>
+	<item id="8962">
+	</item>
+	<item id="8963">
+	</item>
+	<item id="8964">
+	</item>
+	<item id="8965">
+	</item>
+	<item id="8966">
+	</item>
+	<item id="8967">
+	</item>
+	<item id="8968">
+	</item>
+	<item id="8969">
+	</item>
+	<item id="8970">
+	</item>
+	<item id="8971">
+	</item>
+	<item id="8972">
+	</item>
+	<item id="8973">
+	</item>
+	<item id="8974">
+	</item>
+	<item id="8975">
+	</item>
+	<item id="8976">
+	</item>
+	<item id="8977">
+	</item>
+	<item id="8978">
+	</item>
+	<item id="8979">
+	</item>
+	<item id="8980">
+	</item>
+	<item id="8981">
+	</item>
+	<item id="8982">
+	</item>
+	<item id="8983">
+	</item>
+	<item id="8984">
+	</item>
+	<item id="8985">
+	</item>
+	<item id="8986">
+	</item>
+	<item id="8987">
+	</item>
+	<item id="8988">
+	</item>
+	<item id="8989">
+	</item>
+	<item id="8990">
+	</item>
+	<item id="8991">
+	</item>
+	<item id="8992">
+	</item>
+	<item id="8993">
+	</item>
+	<item id="8994">
+	</item>
+	<item id="8995">
+	</item>
+	<item id="8996">
+	</item>
+	<item id="8997">
+	</item>
+	<item id="8998">
+	</item>
+	<item id="8999">
+	</item>
+	<item id="9000">
+	</item>
+	<item id="9001">
+	</item>
+	<item id="9002">
+	</item>
+	<item id="9003">
+	</item>
+	<item id="9004">
+	</item>
+	<item id="9005">
+	</item>
+	<item id="9006">
+	</item>
+	<item id="9007">
+	</item>
+	<item id="9008">
+	</item>
+	<item id="9009">
+	</item>
+	<item id="9010">
+	</item>
+	<item id="9011">
+	</item>
+	<item id="9012">
+	</item>
+	<item id="9013">
+	</item>
+	<item id="9014">
+	</item>
+	<item id="9015">
+	</item>
+	<item id="9016">
+	</item>
+	<item id="9017">
+	</item>
+	<item id="9018">
+	</item>
+	<item id="9019">
+	</item>
+	<item id="9020">
+	</item>
+	<item id="9021" name="dirt" editorsuffix=" (thick border)">
+	</item>
+	<item id="9022" name="dirt" editorsuffix=" (thick border)">
+	</item>
+	<item id="9023" name="dirt" editorsuffix=" (thick border)">
+	</item>
+	<item id="9024" name="dirt" editorsuffix=" (thick border)">
+	</item>
+	<item id="9025" name="muddy floor" editorsuffix=" (thick border)">
+	</item>
+	<item id="9026" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9027" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9028" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9029" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9030" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9031" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9032" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9033" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9034" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9035" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9036" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9037" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9038" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9039" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9040" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9041" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9042" name="earth" editorsuffix=" (stone border)">
+	</item>
+	<item id="9043" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9044" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9045" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9046" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9047" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9048" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9049" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9050" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9051" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9052" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9053" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9054" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9055" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9056" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9057" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9058" name="grass" editorsuffix=" (stone border)">
+	</item>
+	<item id="9059" name="sand" editorsuffix=" (alternate border)">
+	</item>
+	<item id="9060">
+	</item>
+	<item id="9061" name="framework wall" editorsuffix=" (damaged)">
+	</item>
+	<item id="9062" name="wooden wall" editorsuffix=" (ornamented)">
+	</item>
+	<item id="9063" name="wooden wall" editorsuffix=" (low stone)">
+	</item>
+	<item id="9064" name="wooden wall" editorsuffix=" (ornamented low stone)">
+	</item>
+	<item id="9065" name="wooden wall" editorsuffix=" (high stone)">
+	</item>
+	<item id="9066" name="wooden wall" editorsuffix=" (ornamented high stone)">
+	</item>
+	<item id="9067" name="wooden floor" editorsuffix=" (with border)">
+	</item>
+	<item id="9068" name="frozen mud" editorsuffix=" (thick border)">
+	</item>
+	<item id="9069" name="frozen mud" editorsuffix=" (thick border)">
+	</item>
+	<item id="9070" name="frozen mud" editorsuffix=" (thick border)">
+	</item>
+	<item id="9071" name="frozen mud" editorsuffix=" (thick border)">
+	</item>
+	<item id="9072" name="frozen mud" editorsuffix=" (thick border)">
 	</item>
 	<item id="20001" name="water">
 	</item>
