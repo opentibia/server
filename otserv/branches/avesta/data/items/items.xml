@@ -120,6 +120,7 @@
 	<item id="392" article="a" name="hole">
 		<attribute key="decayTo" value="354"/>
 		<attribute key="duration" value="300"/>
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="405" name="wooden flooring">
 	</item>
