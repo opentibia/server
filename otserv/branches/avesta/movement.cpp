@@ -87,6 +87,18 @@ void MoveEvents::clear()
 		it = m_uniqueIdMap.begin();
 	}
 
+	MovePosListMap::iterator posIter = m_positionMap.begin();
+	while(posIter != m_positionMap.end()){
+		for(int i = 0; i < MOVE_EVENT_LAST; ++i){
+			std::list<MoveEvent*>& moveEventList = posIter->second.moveEvent[i];
+			for(std::list<MoveEvent*>::iterator it = moveEventList.begin(); it != moveEventList.end(); ++it){
+				delete (*it);
+			}
+		}
+		m_positionMap.erase(posIter);
+		posIter = m_positionMap.begin();
+	}
+
 	m_scriptInterface.reInitState();
 }
 

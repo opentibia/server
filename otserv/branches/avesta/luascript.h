@@ -113,6 +113,7 @@ public:
 	uint32_t addThing(Thing* thing);
 	void insertThing(uint32_t uid, Thing* thing);
 	void addTempItem(Item* item);
+	void removeTempItem(Item* item);
 
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
@@ -351,6 +352,7 @@ protected:
 	static int luaDoPlayerAddItem(lua_State *L);
 	static int luaDoPlayerAddItemEx(lua_State *L);
 	static int luaDoTileAddItemEx(lua_State *L);
+	static int luaAddContainerItemEx(lua_State *L);
 	static int luaDoRelocate(lua_State *L);
 	static int luaDoPlayerSendTextMessage(lua_State *L);
 	static int luaDoPlayerRemoveMoney(lua_State *L);

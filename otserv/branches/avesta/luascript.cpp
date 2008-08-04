@@ -404,6 +404,14 @@ void ScriptEnviroment::addTempItem(Item* item)
 	m_tempItems.push_back(item);
 }
 
+void ScriptEnviroment::removeTempItem(Item* item)
+{
+	ItemList::iterator it = std::find(m_tempItems.begin(), m_tempItems.end(), item);
+	if(it != m_tempItems.end()){
+		m_tempItems.erase(it);
+	}
+}
+
 void ScriptEnviroment::addGlobalStorageValue(const uint32_t key, const int32_t value)
 {
 	m_globalStorageMap[key] = value;
@@ -1301,6 +1309,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//doTileAddItemEx(pos, uid)
 	lua_register(m_luaState, "doTileAddItemEx", LuaScriptInterface::luaDoTileAddItemEx);
+
+	//doAddContainerItemEx(uid, virtuid)
+    lua_register(m_luaState, "doAddContainerItemEx", LuaScriptInterface::luaAddContainerItemEx);
 
 	//doRelocate(pos, posTo)
 	//Moves all moveable objects from pos to posTo
@@ -2703,6 +2714,46 @@ int LuaScriptInterface::luaDoTileAddItemEx(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaAddContainerItemEx(lua_State *L)
+{
+    //doAddContainerItemEx(uid, virtuid)
+   	uint32_t virtuid = (uint32_t)popNumber(L);
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Container* container = env->getContainerByUID(uid);
+	if(container){
+       	Item* item = env->getItemByUID(virtuid);
+
+	    if(!item){
+            reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+    	    lua_pushnumber(L, LUA_ERROR);
+		    return 1;
+        }
+
+		if(item->getParent() != VirtualCylinder::virtualCylinder){
+			reportErrorFunc("Item already has a parent");
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+
+        ReturnValue ret = RET_NOERROR;
+        ret = g_game.internalAddItem(container, item);
+
+		if(ret == RET_NOERROR){
+			env->removeTempItem(item);
+		}
+
+	    lua_pushnumber(L, ret);
+	    return 1;
+    }
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+}
+
 int LuaScriptInterface::luaDoRelocate(lua_State *L)
 {
 	//doRelocate(pos, posTo)
@@ -2739,7 +2790,7 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 			}
 			else if(Creature* creature = thing->getCreature()){
 				if(Position::areInRange<1,1>(fromPos, toPos)){
-					g_game.internalMoveCreature(creature, fromTile, toTile, true);
+					g_game.internalMoveCreature(creature, fromTile, toTile, FLAG_NOLIMIT);
 				}
 				else{
 					g_game.internalTeleport(creature, toPos);
