@@ -44,7 +44,9 @@ void replaceString(std::string& str, const std::string sought, const std::string
 void trim_right(std::string& source, const std::string& t);
 void trim_left(std::string& source, const std::string& t);
 void toLowerCaseString(std::string& source);
+void toUpperCaseString(std::string& source);
 std::string asLowerCaseString(const std::string& source);
+std::string asUpperCaseString(const std::string& source);
 bool utf8ToLatin1(char* intext, std::string& outtext);
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
 #if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__

@@ -71,10 +71,22 @@ void toLowerCaseString(std::string& source)
 	std::transform(source.begin(), source.end(), source.begin(), tolower);
 }
 
+void toUpperCaseString(std::string& source)
+{
+	std::transform(source.begin(), source.end(), source.begin(), upchar);
+}
+
 std::string asLowerCaseString(const std::string& source)
 {
 	std::string s = source;
 	toLowerCaseString(s);
+	return s;
+}
+
+std::string asUpperCaseString(const std::string& source)
+{
+	std::string s = source;
+	toUpperCaseString(s);
 	return s;
 }
 

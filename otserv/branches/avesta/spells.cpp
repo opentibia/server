@@ -1058,9 +1058,9 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 		bool useDirection = false;
 
 		if(hasParam){
-			Player* pTarget = NULL;
-			ReturnValue ret = g_game.getPlayerByNameWildcard(param, &pTarget);
-			target = pTarget;
+			Player* playerTarget = NULL;
+			ReturnValue ret = g_game.getPlayerByNameWildcard(param, playerTarget);
+			target = playerTarget;
 
 			if(!target || target->getHealth() <= 0){
 				if(!casterTargetOrDirection){
@@ -1367,8 +1367,15 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 	};
 
 	Player* playerExiva = NULL;
-	ReturnValue ret = g_game.getPlayerByNameWildcard(param, &playerExiva);
-	if(playerExiva && playerExiva->getAccessLevel() <= player->getAccessLevel()){
+	ReturnValue ret = g_game.getPlayerByNameWildcard(param, playerExiva);
+
+	if(playerExiva && ret == RET_NOERROR){
+		if(playerExiva->getAccessLevel() <= player->getAccessLevel()){
+			player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+
 		const Position lookPos = player->getPosition();
 		const Position searchPos = playerExiva->getPosition();
 

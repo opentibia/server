@@ -486,12 +486,10 @@ Player* Game::getPlayerByID(uint32_t id)
 
 Creature* Game::getCreatureByName(const std::string& s)
 {
-	std::string txt1 = s;
-	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
+	std::string txt1 = asUpperCaseString(s);
 	for(AutoList<Creature>::listiterator it = listCreature.list.begin(); it != listCreature.list.end(); ++it){
 		if(!(*it).second->isRemoved()){
-			std::string txt2 = (*it).second->getName();
-			std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
+			std::string txt2 = asUpperCaseString((*it).second->getName());
 			if(txt1 == txt2)
 				return it->second;
 		}
@@ -502,12 +500,10 @@ Creature* Game::getCreatureByName(const std::string& s)
 
 Player* Game::getPlayerByName(const std::string& s)
 {
-	std::string txt1 = s;
-	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
+	std::string txt1 = asUpperCaseString(s);
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		if(!(*it).second->isRemoved()){
-			std::string txt2 = (*it).second->getName();
-			std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
+			std::string txt2 = asUpperCaseString((*it).second->getName());
 			if(txt1 == txt2)
 				return it->second;
 		}
@@ -516,24 +512,28 @@ Player* Game::getPlayerByName(const std::string& s)
 	return NULL; //just in case the player doesnt exist
 }
 
-ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player** player)
+ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player* &player)
 {
-	if(s[s.length()-1] != '~'){
-		(*player) = getPlayerByName(s);
-		if(!(*player)){
+	player = NULL;
+
+	if(s.empty()){
+		return RET_PLAYERWITHTHISNAMEISNOTONLINE;
+	}
+
+	if((*s.rbegin()) != '~'){
+		player = getPlayerByName(s);
+		if(!player){
 			return RET_PLAYERWITHTHISNAMEISNOTONLINE;
 		}
 		return RET_NOERROR;
 	}
 
 	Player* lastFound = NULL;
-	std::string txt1 = s;
-	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
-	txt1.erase(txt1.length()-1);
+	std::string txt1 = asUpperCaseString(s.substr(0, s.length()-1));
+
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		if(!(*it).second->isRemoved()){
-			std::string txt2 = (*it).second->getName();
-			std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
+			std::string txt2 = asUpperCaseString((*it).second->getName());
 			if(txt2.substr(0, txt1.length()) == txt1){
 				if(lastFound == NULL)
 					lastFound = (*it).second;
@@ -544,7 +544,7 @@ ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player** player)
 	}
 
 	if(lastFound != NULL){
-		(*player) = lastFound;
+		player = lastFound;
 		return RET_NOERROR;
 	}
 
@@ -3400,9 +3400,7 @@ bool Game::playerYell(Player* player, const std::string& text)
 	bool isExhausted = false;
 	if(!player->hasCondition(CONDITION_EXHAUSTED)){
 		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED);
-		std::string yellText = text;
-		std::transform(yellText.begin(), yellText.end(), yellText.begin(), upchar);
-		internalCreatureSay(player, SPEAK_YELL, yellText);
+		internalCreatureSay(player, SPEAK_YELL, asUpperCaseString(text));
 	}
 	else{
 		isExhausted = true;

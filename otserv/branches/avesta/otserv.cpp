@@ -338,8 +338,7 @@ void mainLoader(int argc, char *argv[])
 		exit(-1);
 	}
 
-	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
-	std::cout << ":: Worldtype: " << worldType << std::endl;
+	std::cout << ":: Worldtype: " << asUpperCaseString(worldType) << std::endl;
 
 	#ifdef __SKULLSYSTEM__
 	std::cout << ":: Skulls enabled" << std::endl;
