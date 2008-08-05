@@ -18,6 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#ifdef __USE_PGSQL__
+
 #ifndef __DATABASE_PGSQL_H__
 #define __DATABASE_PGSQL_H__
 
@@ -72,5 +74,7 @@ protected:
 	int32_t m_rows, m_cursor;
 	PGresult* m_handle;
 };
+
+#endif
 
 #endif

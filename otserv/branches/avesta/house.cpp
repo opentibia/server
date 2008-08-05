@@ -778,6 +778,9 @@ Houses::Houses()
 	else if(asLowerCaseString(strRentPeriod) == "daily"){
 		rentPeriod = RENTPERIOD_DAILY;
 	}
+	else if(asLowerCaseString(strRentPeriod) == "never"){
+		rentPeriod = RENTPERIOD_NEVER;
+	}
 }
 
 Houses::~Houses()
@@ -876,6 +879,9 @@ bool Houses::loadHousesXML(std::string filename)
 
 bool Houses::payHouses()
 {
+	if(rentPeriod == RENTPERIOD_NEVER) {
+		return true;
+	}
 	uint32_t currentTime = std::time(NULL);
 
 	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
@@ -977,7 +983,7 @@ bool Houses::payHouses()
 							break;
 
 							case RENTPERIOD_YEARLY:
-								period = "yearly";
+								period = "annual";
 							break;
 						}
 

@@ -27,6 +27,9 @@
 // Author: Bruno R Ferreira <brf_coldf@yahoo.com.br>, (C) 2007
 //
 //
+
+#ifdef __USE_ODBC__
+
 #ifndef __DATABASE_ODBC_H__
 #define __DATABASE_ODBC_H__
 
@@ -94,5 +97,7 @@ protected:
 
 	SQLHSTMT m_handle;
 };
+
+#endif
 
 #endif

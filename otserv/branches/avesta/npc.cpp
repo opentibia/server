@@ -302,7 +302,7 @@ bool Npc::loadFromXml(const std::string& filename)
 				}
 
 				if(readXMLInteger(p, "defaultpublic", intValue)){
-					defaultPublic = intValue;
+					defaultPublic = intValue != 0;
 				}
 
 				responseList = loadInteraction(p->children);

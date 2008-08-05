@@ -18,6 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#ifdef __USE_SQLITE__
+
 #ifndef __DATABASE_SQLITE_H__
 #define __DATABASE_SQLITE_H__
 
@@ -76,5 +78,7 @@ protected:
 
 	sqlite3_stmt* m_handle;
 };
+
+#endif
 
 #endif

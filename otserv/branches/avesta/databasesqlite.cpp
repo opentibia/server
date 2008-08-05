@@ -19,6 +19,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "otpch.h"
+
+#ifdef __USE_SQLITE__
+
 #include <iostream>
 
 #include "database.h"
@@ -278,3 +281,5 @@ SQLiteResult::~SQLiteResult()
 {
 	sqlite3_finalize(m_handle);
 }
+
+#endif
