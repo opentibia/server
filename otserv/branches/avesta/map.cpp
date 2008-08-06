@@ -286,7 +286,11 @@ bool Map::removeCreature(Creature* creature)
 	return false;
 }
 
-void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, bool checkforduplicate, int32_t minRangeX, int32_t maxRangeX, int32_t minRangeY, int32_t maxRangeY, int32_t minRangeZ, int32_t maxRangeZ) {
+void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, bool checkforduplicate,
+	int32_t minRangeX, int32_t maxRangeX,
+	int32_t minRangeY, int32_t maxRangeY,
+	int32_t minRangeZ, int32_t maxRangeZ)
+{
 	int32_t minoffset = centerPos.z - maxRangeZ;
 	int32_t x1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + minoffset  )));
 	int32_t y1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + minoffset )));
@@ -300,52 +304,32 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 	int32_t endx2 = x2 - (x2 % FLOOR_SIZE);
 	int32_t endy2 = y2 - (y2 % FLOOR_SIZE);
 
-	//int32_t floorx1, floory1, floorx2, floory2;
-
 	QTreeLeafNode* startLeaf;
 	QTreeLeafNode* leafE;
 	QTreeLeafNode* leafS;
-	//Floor* floor;
-	//int32_t offsetZ;
 
 	startLeaf = getLeaf(startx1, starty1);
 	leafS = startLeaf;
 
+	/*
+	SpectatorVec oldList;
 	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
 		leafE = leafS;
 		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
 			if(leafE){
-				CreatureVector& node_list = leafE->creature_list;
-				CreatureVector::const_iterator node_iter = node_list.begin();
-				CreatureVector::const_iterator node_end = node_list.end();
-				if(node_iter != node_end) {
-					do {
-						Creature* creature = *node_iter;
-						const Position& cpos = creature->getPosition();
-						if(cpos.z < minRangeZ || cpos.z > maxRangeZ) continue;
-						if(cpos.y < centerPos.y + minRangeY || cpos.y > centerPos.y + maxRangeY) continue;
-						if(cpos.x < centerPos.x + minRangeX || cpos.x > centerPos.x + maxRangeX) continue;
 
-						if(checkforduplicate) {
-							if(std::find(list.begin(), list.end(), creature) == list.end()){
-								list.push_back(creature);
-							}
-						} else {
-							list.push_back(creature);
-						}
-					} while(++node_iter != node_end);
-				}
-				/*
+				Floor* floor;
+				int32_t offsetZ;
 				for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
 
 					if((floor = leafE->getFloor(nz))){
 						//get current floor limits
 						offsetZ = centerPos.z - nz;
 
-						floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
-						floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
-						floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
-						floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
+						int32_t floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
+						int32_t floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
+						int32_t floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
+						int32_t floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
 
 						for(int ly = 0; ly < FLOOR_SIZE; ++ly){
 							for(int lx = 0; lx < FLOOR_SIZE; ++lx){
@@ -355,11 +339,11 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 										for(uint32_t i = 0; i < tile->creatures.size(); ++i){
 											Creature* creature = tile->creatures[i];
 											if(checkforduplicate) {
-												if(std::find(list.begin(), list.end(), creature) == list.end()){
-													list.push_back(creature);
+												if(std::find(oldList.begin(), oldList.end(), creature) == oldList.end()){
+													oldList.push_back(creature);
 												}
 											} else {
-												list.push_back(creature);
+												oldList.push_back(creature);
 											}
 										}
 									}
@@ -368,7 +352,7 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 						}
 					}
 				}
-				*/
+
 				leafE = leafE->stepEast();
 			}
 			else{
@@ -383,6 +367,63 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 			leafS = getLeaf(startx1, ny + FLOOR_SIZE);
 		}
 	}
+	*/
+
+	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
+		leafE = leafS;
+		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
+			if(leafE){
+
+				CreatureVector& node_list = leafE->creature_list;
+				CreatureVector::const_iterator node_iter = node_list.begin();
+				CreatureVector::const_iterator node_end = node_list.end();
+				if(node_iter != node_end){
+					do{
+						Creature* creature = *node_iter;
+						const Position& cpos = creature->getPosition();
+						int32_t offsetZ = centerPos.z - cpos.z;
+
+						if(cpos.z < minRangeZ || cpos.z > maxRangeZ){
+							continue;
+						}
+						if(cpos.y < (centerPos.y + minRangeY + offsetZ) || cpos.y > (centerPos.y + maxRangeY + offsetZ)){
+							continue;
+						}
+						if(cpos.x < (centerPos.x + minRangeX + offsetZ) || cpos.x > (centerPos.x + maxRangeX + offsetZ) ){
+							continue;
+						}
+
+						if(checkforduplicate){
+							if(std::find(list.begin(), list.end(), creature) == list.end()){
+								list.push_back(creature);
+							}
+						}
+						else{
+							list.push_back(creature);
+						}
+					}while(++node_iter != node_end);
+				}
+
+				leafE = leafE->stepEast();
+			}
+			else{
+				leafE = getLeaf(nx + FLOOR_SIZE, ny);
+			}
+		}
+
+		if(leafS){
+			leafS = leafS->stepSouth();
+		}
+		else{
+			leafS = getLeaf(startx1, ny + FLOOR_SIZE);
+		}
+	}
+
+	/*
+	if(list.size() != oldList.size()){
+		std::cout << "missmatch size" << std::endl;
+	}
+	*/
 }
 
 void Map::getSpectators(SpectatorVec& list, const Position& centerPos,
