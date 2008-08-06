@@ -41,7 +41,7 @@ Connection* ConnectionManager::createConnection(boost::asio::io_service& io_serv
 	std::cout << "Create new Connection" << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK_CLASS(m_connectionManagerLock, "");
+	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionManagerLock);
 	Connection* connection = new Connection(io_service);
 	m_connections.push_back(connection);
 	return connection;

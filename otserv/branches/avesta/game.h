@@ -73,10 +73,10 @@ enum LightState_t {
 
 struct RuleViolation {
 	RuleViolation(Player* _reporter, const std::string& _text, uint32_t _time) :
-		text(_text),
-		time(_time),
 		reporter(_reporter),
 		gamemaster(NULL),
+		text(_text),
+		time(_time),
 		isOpen(true)
 	{
 	}
@@ -524,10 +524,6 @@ protected:
 	AutoList<Creature> listCreature;
 	size_t checkCreatureLastIndex;
 	std::vector<Creature*> checkCreatureVectors[EVENT_CREATURECOUNT];
-
-#ifdef __DEBUG_CRITICALSECTION__
-	static OTSYS_THREAD_RETURN monitorThread(void *p);
-#endif
 
 	struct GameEvent
 	{

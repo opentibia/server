@@ -53,10 +53,6 @@
 #include "allocator.h"
 #endif
 
-#ifdef __DEBUG_CRITICALSECTION__
-OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
-#endif
-
 
 #ifdef BOOST_NO_EXCEPTIONS
 	#include <exception>

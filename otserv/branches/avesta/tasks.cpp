@@ -76,12 +76,6 @@ OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void* p)
 #if defined __EXCEPTION_TRACER__
 	dispatcherExceptionHandler.RemoveHandler();
 #endif
-
-#if defined WIN32 || defined __WINDOWS__
-	//
-#else
-	return 0;
-#endif
 }
 
 void Dispatcher::addTask(Task* task)

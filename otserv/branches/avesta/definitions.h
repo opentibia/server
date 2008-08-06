@@ -165,7 +165,7 @@ enum passwordType_t{
 
 //*nix systems
 #else
-	#define OTSYS_THREAD_RETURN void*
+	#define OTSYS_THREAD_RETURN void
 
 	#include <stdint.h>
 	#include <string.h>

@@ -25,11 +25,6 @@
 #include <sstream>
 #include <map>
 
-#ifdef __DEBUG_CRITICALSECTION__
-#include <iostream>
-#include <fstream>
-#endif
-
 #include <boost/config.hpp>
 #include <boost/bind.hpp>
 
@@ -81,10 +76,6 @@ Game::Game()
 
 #if defined __EXCEPTION_TRACER__
 	OTSYS_THREAD_LOCKVARINIT(maploadlock);
-#endif
-
-#ifdef __DEBUG_CRITICALSECTION__
-	OTSYS_CREATE_THREAD(monitorThread, this);
 #endif
 
 	int daycycle = 3600;
@@ -249,60 +240,6 @@ void Game::refreshMap()
 		}
 	}
 }
-
-/*****************************************************************************/
-
-#ifdef __DEBUG_CRITICALSECTION__
-
-OTSYS_THREAD_RETURN Game::monitorThread(void *p)
-{
-  Game* _this = (Game*)p;
-
-	while (true) {
-		OTSYS_SLEEP(6000);
-
-		int ret = OTSYS_THREAD_LOCKEX(_this->gameLock, 60 * 2 * 1000);
-		if(ret != OTSYS_THREAD_TIMEOUT) {
-			OTSYS_THREAD_UNLOCK(_this->gameLock, NULL);
-			continue;
-		}
-
-		bool file = false;
-		std::ostream *outdriver;
-		std::cout << "Error: generating critical section file..." <<std::endl;
-		std::ofstream output("deadlock.txt",std::ios_base::app);
-		if(output.fail()){
-			outdriver = &std::cout;
-			file = false;
-		}
-		else{
-			file = true;
-			outdriver = &output;
-		}
-
-		time_t rawtime;
-		time(&rawtime);
-		*outdriver << "*****************************************************" << std::endl;
-		*outdriver << "Error report - " << std::ctime(&rawtime) << std::endl;
-
-		OTSYS_THREAD_LOCK_CLASS::LogList::iterator it;
-		for(it = OTSYS_THREAD_LOCK_CLASS::loglist.begin(); it != OTSYS_THREAD_LOCK_CLASS::loglist.end(); ++it) {
-			*outdriver << (it->lock ? "lock - " : "unlock - ") << it->str
-				<< " threadid: " << it->threadid
-				<< " time: " << it->time
-				<< " ptr: " << it->mutexaddr
-				<< std::endl;
-		}
-
-		*outdriver << "*****************************************************" << std::endl;
-		if(file)
-			((std::ofstream*)outdriver)->close();
-
-		std::cout << "Error report generated. Killing server." <<std::endl;
-		exit(1); //force exit
-	}
-}
-#endif
 
 /*****************************************************************************/
 
