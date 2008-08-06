@@ -251,7 +251,7 @@ public:
 	void setTradeState(tradestate_t state) {tradeState = state;};
 	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
-	
+
 	//shop functions
 	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell)
 	{
@@ -575,8 +575,8 @@ public:
 
 	House* getEditHouse(uint32_t& _windowTextId, uint32_t& _listId);
 	void setEditHouse(House* house, uint32_t listId = 0);
-	
-	void setNextAction(uint64_t time) {if(time > nextAction) {nextAction = time;}}
+
+	void setNextAction(int64_t time) {if(time > nextAction) {nextAction = time;}}
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 	uint32_t getNextActionTime() const;
 
@@ -722,7 +722,7 @@ protected:
 	Npc* shopOwner;
 	int32_t purchaseCallback;
 	int32_t saleCallback;
-	
+
 
 	//party variables
 	Party* party;
@@ -769,7 +769,7 @@ protected:
 		else if(getSpeed() < PLAYER_MIN_SPEED){
 			return PLAYER_MIN_SPEED;
 		}
-		
+
 		return getSpeed();
 	}
 	void updateBaseSpeed()

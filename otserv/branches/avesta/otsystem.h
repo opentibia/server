@@ -32,27 +32,31 @@ typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
 
 #include <boost/thread.hpp>
 
-#define OTSYS_CREATE_THREAD(a, b) 				boost::thread(boost::bind(&a, (void*)b))
+#define OTSYS_CREATE_THREAD(a, b)		boost::thread(boost::bind(&a, (void*)b))
 
-#define OTSYS_THREAD_LOCKVAR 					boost::mutex
+#define OTSYS_THREAD_LOCKVAR			boost::mutex
 #define OTSYS_THREAD_LOCKVARINIT(a)
 #define OTSYS_THREAD_LOCKVARRELEASE(a)
-#define OTSYS_THREAD_LOCK(a, b) 				a.lock();
-#define OTSYS_THREAD_UNLOCK(a, b) 				a.unlock();
-#define OTSYS_THREAD_UNLOCK_PTR(a, b) 			a->unlock();
+#define OTSYS_THREAD_LOCK(a, b)			a.lock();
+#define OTSYS_THREAD_UNLOCK(a, b)		a.unlock();
+#define OTSYS_THREAD_UNLOCK_PTR(a, b)	a->unlock();
 
-#define OTSYS_SLEEP(time)						boost::this_thread::sleep(time)
+#define OTSYS_SLEEP(time)				boost::this_thread::sleep(boost::posix_time::milliseconds(time))
 
-#define OTSYS_THREAD_TIMEOUT 					false
-#define OTSYS_THREAD_SIGNALVAR					boost::timed_mutex
+#define OTSYS_THREAD_TIMEOUT			false
+#define OTSYS_THREAD_SIGNALVAR			boost::condition_variable
 #define OTSYS_THREAD_SIGNALVARINIT(a)
-#define OTSYS_THREAD_SIGNAL_SEND(a) 			a.unlock()
+#define OTSYS_THREAD_SIGNAL_SEND(a)		a.notify_all()
 inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& a, OTSYS_THREAD_LOCKVAR& b) {
-	a.lock();
+	boost::unique_lock<boost::mutex> lock(b);
+	a.wait(lock);
 	return (int)true;
 }
-#define OTSYS_THREAD_WAITSIGNAL_TIMED(a, b, c) 	a.timed_lock(boost::posix_time::milliseconds(c))
-
+inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR&a, OTSYS_THREAD_LOCKVAR&b, uint64_t c)
+{
+	boost::unique_lock<boost::mutex> lock(b);
+	return (int)a.timed_wait(lock, boost::get_system_time() + boost::posix_time::milliseconds(c));
+}
 
 #if defined WIN32 || defined __WINDOWS__
 #ifdef __WIN_LOW_FRAG_HEAP__

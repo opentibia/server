@@ -53,6 +53,7 @@ OTSYS_THREAD_RETURN Dispatcher::dispatcherThread(void* p)
 
 		if(getDispatcher().m_taskList.empty()){
 			//if the list is empty wait for signal
+			OTSYS_THREAD_UNLOCK(getDispatcher().m_taskLock, "");
 			OTSYS_THREAD_WAITSIGNAL(getDispatcher().m_taskSignal, getDispatcher().m_taskLock);
 		}
 
