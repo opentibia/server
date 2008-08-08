@@ -64,6 +64,8 @@
 					<Add option="-D__DEBUG__" />
 					<Add option="-D__USE_SQLITE__" />
 					<Add option="-D__EXCEPTION_TRACER__" />
+					<Add option="-D__DEBUG_SCHEDULER__" />
+					<Add option="-D__DEBUG_NET__" />
 					<Add directory="/usr/include/libxml2/" />
 					<Add directory="/usr/include/lua5.1/" />
 				</Compiler>

@@ -117,7 +117,7 @@ void Dispatcher::addTask(Task* task)
 
 	// send a signal if the list was empty
 	if(do_signal){
-		m_taskSignal.notify_all();
+		m_taskSignal.notify_one();
 	}
 }
 

@@ -136,8 +136,7 @@ uint32_t Scheduler::addEvent(SchedulerTask* task)
 		do_signal = (task == m_eventList.top());
 
 		#ifdef __DEBUG_SCHEDULER__
-		std::cout << "Scheduler: Added event " << task->getEventId() << " to run after "
-				<< task->getCycle()-OTSYS_TIME() << "ms" << std::endl;
+		std::cout << "Scheduler: Added event " << task->getEventId() << std::endl;
 		#endif
 	}
 #ifdef _DEBUG
@@ -149,7 +148,7 @@ uint32_t Scheduler::addEvent(SchedulerTask* task)
 	m_eventLock.unlock();
 
 	if(do_signal){
-		m_eventSignal.notify_all();
+		m_eventSignal.notify_one();
 	}
 
 	return task->getEventId();
