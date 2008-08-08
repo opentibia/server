@@ -230,7 +230,7 @@ public:
 	~DBQuery();
 
 protected:
-	static boost::mutex database_lock;
+	static boost::recursive_mutex database_lock;
 };
 
 /**

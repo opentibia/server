@@ -54,7 +54,7 @@ public:
 class AutoID {
 public:
 	AutoID() {
-		boost::mutex::scoped_lock lockClass(autoIDLock);
+		boost::recursive_mutex::scoped_lock lockClass(autoIDLock);
 		count++;
 		if(count >= 0xFFFFFF)
 			count = 1000;
@@ -77,7 +77,7 @@ public:
 	typedef std::set<uint32_t> list_type;
 
 	uint32_t auto_id;
-	static boost::mutex autoIDLock;
+	static boost::recursive_mutex autoIDLock;
 
 protected:
 	static uint32_t count;

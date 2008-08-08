@@ -41,7 +41,7 @@ Connection* ConnectionManager::createConnection(boost::asio::io_service& io_serv
 	std::cout << "Create new Connection" << std::endl;
 	#endif
 
-	boost::mutex::scoped_lock lockClass(m_connectionManagerLock);
+	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
 	Connection* connection = new Connection(io_service);
 	m_connections.push_back(connection);
 	return connection;
@@ -53,7 +53,7 @@ void ConnectionManager::releaseConnection(Connection* connection)
 	std::cout << "Releasing connection" << std::endl;
 	#endif
 
-	boost::mutex::scoped_lock lockClass(m_connectionManagerLock);
+	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
 	std::list<Connection*>::iterator it =
 		std::find(m_connections.begin(), m_connections.end(), connection);
 
@@ -70,7 +70,7 @@ void ConnectionManager::closeAll()
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Closing all connections" << std::endl;
 	#endif
-	boost::mutex::scoped_lock lockClass(m_connectionManagerLock);
+	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
 	std::list<Connection*>::iterator it = m_connections.begin();
 	while(it != m_connections.end()){
 		boost::system::error_code error;
@@ -91,7 +91,7 @@ void Connection::closeConnection()
 	std::cout << "Connection::closeConnection" << std::endl;
 	#endif
 
-	boost::mutex::scoped_lock lockClass(m_connectionLock);
+	boost::recursive_mutex::scoped_lock lockClass(m_connectionLock);
 	if(m_closeState != CLOSE_STATE_NONE)
 		return;
 

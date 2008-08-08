@@ -40,7 +40,7 @@
 extern ConfigManager g_config;
 #endif
 
-boost::mutex DBQuery::database_lock;
+boost::recursive_mutex DBQuery::database_lock;
 
 Database* _Database::_instance = NULL;
 

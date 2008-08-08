@@ -161,7 +161,6 @@ int main(int argc, char *argv[])
 
 	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, argc, argv)));
 
-	// note: no need to lock g_loaderLock, construction of g_loaderUniqueLock did it already
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
 	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));

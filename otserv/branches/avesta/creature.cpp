@@ -38,7 +38,7 @@
 #include "exception.h"
 #endif
 
-boost::mutex AutoID::autoIDLock;
+boost::recursive_mutex AutoID::autoIDLock;
 uint32_t AutoID::count = 1000;
 AutoID::list_type AutoID::list;
 
@@ -1332,6 +1332,18 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id) const
 {
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
 		if((*it)->getType() == type && (*it)->getId() == id){
+			return *it;
+		}
+	}
+
+	return NULL;
+}
+
+Condition* Creature::getCondition(ConditionType_t type) const
+{
+	//This one just returns the first one found.
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type){
 			return *it;
 		}
 	}

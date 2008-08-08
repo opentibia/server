@@ -92,7 +92,7 @@ protected:
 	uint32_t maxLoginTries;
 	uint32_t retryTimeout;
 
-	mutable boost::mutex banLock;
+	mutable boost::recursive_mutex banLock;
 
 	friend class IOBan;
 };

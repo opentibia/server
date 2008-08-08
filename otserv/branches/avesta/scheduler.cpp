@@ -66,11 +66,11 @@ void Scheduler::schedulerThread(void* p)
 			#ifdef __DEBUG_SCHEDULER__
 			std::cout << "Scheduler: Waiting for event" << std::endl;
 			#endif
-			ret = getScheduler().m_eventSignal.timed_wait(eventLockUnique, boost::get_system_time() + boost::posix_time::milliseconds(getScheduler().m_eventList.top()->getCycle()));
+			ret = getScheduler().m_eventSignal.timed_wait(eventLockUnique, getScheduler().m_eventList.top()->getCycle());
 		}
 
 		#ifdef __DEBUG_SCHEDULER__
-		std::cout << "Scheduler: Signalled" << std::endl;
+		std::cout << "Scheduler: Signaled" << std::endl;
 		#endif
 
 		// the mutex is locked again now...
@@ -87,6 +87,7 @@ void Scheduler::schedulerThread(void* p)
 				getScheduler().m_eventIds.erase(it);
 			}
 		}
+
 		eventLockUnique.unlock();
 
 		// add task to dispatcher

@@ -156,7 +156,7 @@ protected:
 	OutputMessageVector m_outputMessages;
 	OutputMessageVector m_autoSendOutputMessages;
 	OutputMessageVector m_allOutputMessages;
-	boost::mutex m_outputPoolLock;
+	boost::recursive_mutex m_outputPoolLock;
 	uint64_t m_frameTime;
 };
 

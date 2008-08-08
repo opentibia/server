@@ -44,7 +44,7 @@ OutputMessagePool::OutputMessagePool()
 
 void OutputMessagePool::startExecutionFrame()
 {
-	//boost::mutex::scoped_lock lockClass(m_outputPoolLock);
+	//boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
 	m_frameTime = OTSYS_TIME();
 }
 
@@ -96,7 +96,7 @@ void OutputMessagePool::send(OutputMessage* msg)
 
 void OutputMessagePool::sendAll()
 {
-	boost::mutex::scoped_lock lockClass(m_outputPoolLock);
+	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
 	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
 		#ifdef __NO_PLAYER_SENDBUFFER__
@@ -146,7 +146,7 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 
 void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/)
 {
-	boost::mutex::scoped_lock lockClass(m_outputPoolLock);
+	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
 	switch(msg->getState()){
 	case OutputMessage::STATE_ALLOCATED:
 	{
@@ -192,7 +192,7 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 	std::cout << "request output message - auto = " << autosend << std::endl;
 	#endif
 
-	boost::mutex::scoped_lock lockClass(m_outputPoolLock);
+	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
 	OutputMessage* outputmessage;
 	if(m_outputMessages.empty()) {
 #ifdef __TRACK_NETWORK__

@@ -54,7 +54,7 @@
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
-extern boost::mutex maploadlock;
+extern boost::recursive_mutex maploadlock;
 #endif
 
 extern ConfigManager g_config;

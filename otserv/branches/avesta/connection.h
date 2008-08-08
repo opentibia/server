@@ -65,7 +65,7 @@ protected:
 	}
 
 	std::list<Connection*> m_connections;
-	boost::mutex m_connectionManagerLock;
+	boost::recursive_mutex m_connectionManagerLock;
 };
 
 class Connection : boost::noncopyable
@@ -144,7 +144,7 @@ private:
 	int32_t m_pendingRead;
 	uint32_t m_closeState;
 
-	boost::mutex m_connectionLock;
+	boost::recursive_mutex m_connectionLock;
 
 	Protocol* m_protocol;
 };

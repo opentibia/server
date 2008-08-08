@@ -41,7 +41,7 @@ protected:
 
 	bool m_keySet;
 
-	boost::mutex rsaLock;
+	boost::recursive_mutex rsaLock;
 
 	//use only GMP
 	mpz_t m_p, m_q, m_u, m_d, m_dp, m_dq, m_mod;

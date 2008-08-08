@@ -48,7 +48,7 @@ unsigned long max_off;
 unsigned long min_off;
 FunctionMap functionMap;
 bool maploaded = false;
-boost::mutex maploadlock;
+boost::recursive_mutex maploadlock;
 
 #if defined WIN32 || defined __WINDOWS__
 EXCEPTION_DISPOSITION
@@ -84,7 +84,7 @@ ExceptionHandler::~ExceptionHandler(){
 
 bool ExceptionHandler::InstallHandler(){
 	#if defined WIN32 || defined __WINDOWS__
-	boost::mutex::scoped_lock lockObj(maploadlock);
+	boost::recursive_mutex::scoped_lock lockObj(maploadlock);
 	if(maploaded == false)
 		LoadMap();
 	if( installed == true)

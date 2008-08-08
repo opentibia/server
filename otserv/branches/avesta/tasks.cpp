@@ -55,7 +55,7 @@ void Dispatcher::dispatcherThread(void* p)
 		Task* task = NULL;
 
 		// check if there are tasks waiting
-		taskLockUnique.lock();//getDispatcher().m_taskLock.lock();
+		taskLockUnique.lock(); //getDispatcher().m_taskLock.lock();
 
 		if(getDispatcher().m_taskList.empty()){
 			//if the list is empty wait for signal

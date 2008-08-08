@@ -47,7 +47,7 @@ RSA::~RSA()
 /*
 void RSA::setKey(char* p, char* q, char* d)
 {
-	boost::mutex::scoped_lock lockClass(rsaLock);
+	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
 
 	m_p = p;
 	m_q = q;
@@ -62,7 +62,7 @@ void RSA::setKey(char* p, char* q, char* d)
 
 bool RSA::decrypt(char* msg, int32_t size)
 {
-	boost::mutex::scoped_lock lockClass(rsaLock);
+	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
 
 	if(!m_keySet){
 		std::cout << "Failure: [RSA::derypt]. Key not set" << std::endl;
@@ -107,7 +107,7 @@ bool RSA::setKey(const std::string& file)
 
 void RSA::setKey(const char* p, const char* q, const char* d)
 {
-	boost::mutex::scoped_lock lockClass(rsaLock);
+	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
 
 	mpz_set_str(m_p, p, 10);
 	mpz_set_str(m_q, q, 10);
@@ -131,7 +131,7 @@ void RSA::setKey(const char* p, const char* q, const char* d)
 
 bool RSA::decrypt(char* msg, int32_t size)
 {
-	boost::mutex::scoped_lock lockClass(rsaLock);
+	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
 
 	mpz_t c,v1,v2,u2,tmp;
 	mpz_init2(c, 1024);

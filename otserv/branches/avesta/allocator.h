@@ -242,7 +242,7 @@ private:
 		dummyallocator<std::pair<const size_t, t_PoolStats* > > > PoolsStats;
 	PoolsStats poolsStats;
 	#endif
-	boost::mutex poolLock;
+	boost::recursive_mutex poolLock;
 };
 
 #endif
