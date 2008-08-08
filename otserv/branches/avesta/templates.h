@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,25 +26,25 @@
 
 
 #include "creature.h"
-#include "otsystem.h"
+#include <boost/thread.hpp>
 
 template<class T> class AutoList
 {
 public:
 	AutoList(){}
-	
+
 	~AutoList(){
 		list.clear();
 	}
-	
+
 	void addList(T* t){
 		list[t->getID()] = t;
 	}
-	
+
 	void removeList(uint32_t _id){
 		list.erase(_id);
 	}
-	
+
 	typedef std::map<uint32_t, T*> list_type;
 	list_type list;
 
@@ -54,11 +54,11 @@ public:
 class AutoID {
 public:
 	AutoID() {
-		OTSYS_THREAD_LOCK_CLASS lockClass(autoIDLock);
+		boost::mutex::scoped_lock lockClass(autoIDLock);
 		count++;
 		if(count >= 0xFFFFFF)
 			count = 1000;
-		
+
 		while(list.find(count) != list.end()){
 			if(count >= 0xFFFFFF)
 				count = 1000;
@@ -77,8 +77,8 @@ public:
 	typedef std::set<uint32_t> list_type;
 
 	uint32_t auto_id;
-	static OTSYS_THREAD_LOCKVAR autoIDLock;
-	
+	static boost::mutex autoIDLock;
+
 protected:
 	static uint32_t count;
 	static list_type list;

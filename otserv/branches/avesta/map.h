@@ -28,7 +28,6 @@
 #include <boost/shared_ptr.hpp>
 using boost::shared_ptr;
 
-#include "definitions.h"
 #include "position.h"
 #include "item.h"
 //#include "creature.h"
@@ -278,11 +277,11 @@ protected:
 	// Take special heed in that the vector will be destroyed if any function
 	// that calls clearSpectatorCache is called.
 	const SpectatorVec& getSpectators(const Position& centerPos);
-	
+
 	void clearSpectatorCache();
 
 	QTreeNode root;
-	
+
 	struct RefreshBlock_t{
 		ItemVector list;
 		uint64_t lastRefresh;

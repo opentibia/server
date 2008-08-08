@@ -21,7 +21,6 @@
 #ifndef __OTSERV_CONDITION_H__
 #define __OTSERV_CONDITION_H__
 
-#include "definitions.h"
 #include "fileloader.h"
 #include "enums.h"
 

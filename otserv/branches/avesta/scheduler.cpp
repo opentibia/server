@@ -30,42 +30,51 @@ bool Scheduler::m_shutdown = false;
 
 Scheduler::Scheduler()
 {
-	OTSYS_THREAD_LOCKVARINIT(m_eventLock);
-	OTSYS_THREAD_SIGNALVARINIT(m_eventSignal);
 	m_lastEventId = 0;
-	OTSYS_CREATE_THREAD(Scheduler::schedulerThread, NULL);
+	boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)NULL));
 }
 
-OTSYS_THREAD_RETURN Scheduler::schedulerThread(void* p)
+void Scheduler::schedulerThread(void* p)
 {
 	#if defined __EXCEPTION_TRACER__
 	ExceptionHandler schedulerExceptionHandler;
 	schedulerExceptionHandler.InstallHandler();
 	#endif
 	srand((unsigned int)OTSYS_TIME());
+	#ifdef __DEBUG_SCHEDULER__
+	std::cout << "Starting Scheduler" << std::endl;
+	#endif
+
+	// NOTE: second argument defer_lock is to prevent from immediate locking
+	boost::unique_lock<boost::mutex> eventLockUnique(getScheduler().m_eventLock, boost::defer_lock);
 
 	while(!Scheduler::m_shutdown){
 		SchedulerTask* task = NULL;
 		bool runTask = false;
-		int ret;
+		bool ret = true;
 
 		// check if there are events waiting...
-		OTSYS_THREAD_LOCK(getScheduler().m_eventLock, "eventThread()")
+		eventLockUnique.lock();
 
 		if(getScheduler().m_eventList.empty()){
-			// unlock mutex and wait for signal
-			OTSYS_THREAD_UNLOCK(getScheduler().m_eventLock, "eventThread()");
-			ret = OTSYS_THREAD_WAITSIGNAL(getScheduler().m_eventSignal, getScheduler().m_eventLock);
+			#ifdef __DEBUG_SCHEDULER__
+			std::cout << "Scheduler: No events" << std::endl;
+			#endif
+			getScheduler().m_eventSignal.wait(eventLockUnique);
 		}
 		else{
-			// unlock mutex and wait for signal or timeout
-			OTSYS_THREAD_UNLOCK(getScheduler().m_eventLock, "eventThread()");
-			ret = OTSYS_THREAD_WAITSIGNAL_TIMED(getScheduler().m_eventSignal, getScheduler().m_eventLock, getScheduler().m_eventList.top()->getCycle());
+			#ifdef __DEBUG_SCHEDULER__
+			std::cout << "Scheduler: Waiting for event" << std::endl;
+			#endif
+			ret = getScheduler().m_eventSignal.timed_wait(eventLockUnique, boost::get_system_time() + boost::posix_time::milliseconds(getScheduler().m_eventList.top()->getCycle()));
 		}
-		OTSYS_THREAD_LOCK(getScheduler().m_eventLock, "eventThread()")
+
+		#ifdef __DEBUG_SCHEDULER__
+		std::cout << "Scheduler: Signalled" << std::endl;
+		#endif
 
 		// the mutex is locked again now...
-		if(ret == OTSYS_THREAD_TIMEOUT && !Scheduler::m_shutdown){
+		if(ret == false && !Scheduler::m_shutdown){
 			// ok we had a timeout, so there has to be an event we have to execute...
 			task = getScheduler().m_eventList.top();
 			getScheduler().m_eventList.pop();
@@ -78,12 +87,15 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void* p)
 				getScheduler().m_eventIds.erase(it);
 			}
 		}
-		OTSYS_THREAD_UNLOCK(getScheduler().m_eventLock, "eventThread()");
+		eventLockUnique.unlock();
 
 		// add task to dispatcher
 		if(task){
 			// if it was not stopped
 			if(runTask){
+				#ifdef __DEBUG_SCHEDULER__
+				std::cout << "Scheduler: Executing event " << task->getEventId() << std::endl;
+				#endif
 				Dispatcher::getDispatcher().addTask(task);
 			}
 			else{
@@ -99,7 +111,7 @@ OTSYS_THREAD_RETURN Scheduler::schedulerThread(void* p)
 
 uint32_t Scheduler::addEvent(SchedulerTask* task)
 {
-	OTSYS_THREAD_LOCK(m_eventLock, "");
+	m_eventLock.lock();
 
 	bool do_signal = false;
 	if(!Scheduler::m_shutdown){
@@ -121,6 +133,11 @@ uint32_t Scheduler::addEvent(SchedulerTask* task)
 		// if the list was empty or this event is the top in the list
 		// we have to signal it
 		do_signal = (task == m_eventList.top());
+
+		#ifdef __DEBUG_SCHEDULER__
+		std::cout << "Scheduler: Added event " << task->getEventId() << " to run after "
+				<< task->getCycle()-OTSYS_TIME() << "ms" << std::endl;
+		#endif
 	}
 #ifdef _DEBUG
 	else{
@@ -128,10 +145,10 @@ uint32_t Scheduler::addEvent(SchedulerTask* task)
 	}
 #endif
 
-	OTSYS_THREAD_UNLOCK(m_eventLock, "");
+	m_eventLock.unlock();
 
 	if(do_signal){
-		OTSYS_THREAD_SIGNAL_SEND(m_eventSignal);
+		m_eventSignal.notify_all();
 	}
 
 	return task->getEventId();
@@ -143,26 +160,33 @@ bool Scheduler::stopEvent(uint32_t eventid)
 	if(eventid == 0)
 		return false;
 
-	OTSYS_THREAD_LOCK(m_eventLock, "")
+	#ifdef __DEBUG_SCHEDULER__
+	std::cout << "Scheduler: Stopping event " << eventid << std::endl;
+	#endif
+
+	m_eventLock.lock();
 
 	// search the event id..
 	EventIdSet::iterator it = m_eventIds.find(eventid);
 	if(it != m_eventIds.end()) {
 		// if it is found erase from the list
 		m_eventIds.erase(it);
-		OTSYS_THREAD_UNLOCK(m_eventLock, "");
+		m_eventLock.unlock();
 		return true;
 	}
 	else{
 		// this eventid is not valid
-		OTSYS_THREAD_UNLOCK(m_eventLock, "");
+		m_eventLock.unlock();
 		return false;
 	}
 }
 
 void Scheduler::stop()
 {
-	OTSYS_THREAD_LOCK(m_eventLock, "");
+	#ifdef __DEBUG_SCHEDULER__
+	std::cout << "Stopping Scheduler" << std::endl;
+	#endif
+	m_eventLock.lock();
 	m_shutdown = true;
 
 	//this list should already be empty
@@ -170,6 +194,6 @@ void Scheduler::stop()
 		m_eventList.pop();
 	}
 	m_eventIds.clear();
-	OTSYS_THREAD_UNLOCK(m_eventLock, "");
+	m_eventLock.unlock();
 }
 

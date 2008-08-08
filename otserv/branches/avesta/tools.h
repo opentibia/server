@@ -21,7 +21,6 @@
 #ifndef __OTSERV_TOOLS_H__
 #define __OTSERV_TOOLS_H__
 
-#include "otsystem.h"
 #include "const.h"
 
 #include <string>

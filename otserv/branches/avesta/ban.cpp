@@ -33,7 +33,6 @@ extern ConfigManager g_config;
 
 BanManager::BanManager()
 {
-	OTSYS_THREAD_LOCKVARINIT(banLock);
 }
 
 BanManager::~BanManager()
@@ -62,7 +61,7 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 		DBResult* result;
 
 		uint32_t currentTime = std::time(NULL);
-		query << 
+		query <<
 			"SELECT "
 				"COUNT(*) AS `count` "
 			"FROM "
@@ -73,7 +72,7 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 				"`active` = 1 AND "
 				"(`expires` >= " << currentTime << " OR `expires` = 0)";
 
-		if(result = db->storeQuery(query.str())){
+		if((result = db->storeQuery(query.str())) != NULL){
 			int t = result->getDataInt("count");
 			db->freeResult(result);
 			return t > 0;
@@ -90,7 +89,7 @@ bool BanManager::isIpDisabled(uint32_t clientip) const
 		return false;
 
 	if(clientip != 0){
-		OTSYS_THREAD_LOCK(banLock, "");
+		banLock.lock();
 
 		uint32_t currentTime = std::time(NULL);
 		IpLoginMap::const_iterator it = ipLoginMap.find(clientip);
@@ -98,12 +97,12 @@ bool BanManager::isIpDisabled(uint32_t clientip) const
 			if( (it->second.numberOfLogins >= maxLoginTries) &&
 				(currentTime < it->second.lastLoginTime + loginTimeout) )
 			{
-				OTSYS_THREAD_UNLOCK(banLock, "");
+				banLock.unlock();
 				return true;
 			}
 		}
 
-		OTSYS_THREAD_UNLOCK(banLock, "");
+		banLock.unlock();
 	}
 
 	return false;
@@ -114,7 +113,7 @@ bool BanManager::acceptConnection(uint32_t clientip)
 	if(clientip == 0)
 		return false;
 
-	OTSYS_THREAD_LOCK(banLock, "");
+	banLock.lock();
 
 	uint64_t currentTime = OTSYS_TIME();
 
@@ -125,25 +124,25 @@ bool BanManager::acceptConnection(uint32_t clientip)
 
 		ipConnectMap[clientip] = cb;
 
-		OTSYS_THREAD_UNLOCK(banLock, "");
+		banLock.unlock();
 		return true;
 	}
 
 	if(currentTime - it->second.lastConnection < 1000){
-		OTSYS_THREAD_UNLOCK(banLock, "");
+		banLock.unlock();
 		return false;
 	}
 
 	it->second.lastConnection = currentTime;
 
-	OTSYS_THREAD_UNLOCK(banLock, "");
+	banLock.unlock();
 	return true;
 }
 
 void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 {
 	if(clientip != 0){
-		OTSYS_THREAD_LOCK(banLock, "");
+		banLock.lock();
 
 		uint32_t currentTime = std::time(NULL);
 
@@ -170,7 +169,7 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 
 		it->second.lastLoginTime = currentTime;
 
-		OTSYS_THREAD_UNLOCK(banLock, "");
+		banLock.unlock();
 	}
 }
 
@@ -190,7 +189,7 @@ bool BanManager::isPlayerBanished(uint32_t playerId) const
 	DBResult* result;
 
 	uint32_t currentTime = std::time(NULL);
-	query << 
+	query <<
 		"SELECT "
 			"COUNT(*) AS `count` "
 		"FROM "
@@ -201,7 +200,7 @@ bool BanManager::isPlayerBanished(uint32_t playerId) const
 			"`active` = 1 AND "
 			"(`expires` >= " << currentTime << " OR `expires` = 0)";
 
-	if(result = db->storeQuery(query.str())){
+	if((result = db->storeQuery(query.str())) != NULL){
 		int t = result->getDataInt("count");
 		db->freeResult(result);
 		return t > 0;
@@ -216,7 +215,7 @@ bool BanManager::isAccountBanished(uint32_t account) const
 	DBResult* result;
 
 	uint32_t currentTime = std::time(NULL);
-	query << 
+	query <<
 		"SELECT "
 			"COUNT(*) AS `count` "
 		"FROM "
@@ -227,7 +226,7 @@ bool BanManager::isAccountBanished(uint32_t account) const
 			"`active` = 1 AND "
 			"(`expires` >= " << currentTime << " OR `expires` = 0)";
 
-	if(result = db->storeQuery(query.str())){
+	if((result = db->storeQuery(query.str())) != NULL){
 		int t = result->getDataInt("count");
 		db->freeResult(result);
 		return t > 0;
@@ -242,8 +241,7 @@ bool BanManager::isAccountDeleted(uint32_t account) const
 	DBQuery query;
 	DBResult* result;
 
-	uint32_t currentTime = std::time(NULL);
-	query << 
+	query <<
 		"SELECT "
 			"`deleted` "
 		"FROM "
@@ -251,7 +249,7 @@ bool BanManager::isAccountDeleted(uint32_t account) const
 		"WHERE "
 			"`id` = " << account;
 
-	if(result = db->storeQuery(query.str())){
+	if((result = db->storeQuery(query.str())) != NULL){
 		int b = result->getDataInt("deleted");
 		db->freeResult(result);
 		return b != 0;
@@ -355,7 +353,7 @@ bool BanManager::removePlayerBans(uint32_t guid)
 
 bool BanManager::removePlayerBans(std::string name) {
 	uint32_t playerId = 0;
-	if(!IOPlayer::instance()->getGuidByName(playerId, name)) 
+	if(!IOPlayer::instance()->getGuidByName(playerId, name))
 		return false;
 	return removePlayerBans(playerId);
 }
@@ -379,7 +377,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type) const {
 	DBResult* result;
 
 	uint32_t currentTime = std::time(NULL);
-	query << 
+	query <<
 		"SELECT "
 			"`id`, "
 			"`value`, "
@@ -394,10 +392,10 @@ std::vector<Ban> BanManager::getBans(BanType_t type) const {
 		"WHERE "
 			"`type` = " << type << " AND "
 			"`active` = 1 AND " <<
-			"(`expires` >= " << std::time(NULL) << " OR `expires` = 0)";
-	
+			"(`expires` >= " << currentTime << " OR `expires` = 0)";
+
 	std::vector<Ban> vec;
-	if(result = db->storeQuery(query.str())){
+	if((result = db->storeQuery(query.str())) != NULL){
 		do {
 			Ban ban;
 			ban.type = type;

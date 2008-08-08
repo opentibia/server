@@ -19,7 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "const.h"
 #include "player.h"
 #include "monster.h"
@@ -28,7 +27,6 @@
 #include "item.h"
 #include "container.h"
 #include "combat.h"
-#include "depot.h"
 #include "house.h"
 #include "tasks.h"
 #include "tools.h"
@@ -346,7 +344,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	if(!player->canDoAction()){
 		return false;
 	}
-	
+
 	player->stopWalk();
 
 	if(isHotkey){

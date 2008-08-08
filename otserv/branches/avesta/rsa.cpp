@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,7 +23,6 @@
 
 RSA::RSA()
 {
-	OTSYS_THREAD_LOCKVARINIT(rsaLock);
 	m_keySet = false;
 	mpz_init2(m_p, 1024);
 	mpz_init2(m_q, 1024);
@@ -48,28 +47,28 @@ RSA::~RSA()
 /*
 void RSA::setKey(char* p, char* q, char* d)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
-	
+	boost::mutex::scoped_lock lockClass(rsaLock);
+
 	m_p = p;
 	m_q = q;
 	m_d = d;
-	
+
 	m_u = inverse(m_p, m_q);
   	m_dp = m_d % (m_p-1);
   	m_dq = m_d % (m_q-1);
-	
+
 	m_keySet = true;
 }
 
 bool RSA::decrypt(char* msg, int32_t size)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
-	
+	boost::mutex::scoped_lock lockClass(rsaLock);
+
 	if(!m_keySet){
 		std::cout << "Failure: [RSA::derypt]. Key not set" << std::endl;
 		return false;
 	}
-	
+
 	Big c = from_binary(size, msg);
 	//chinese remainder theorem
 	Big v1 = pow( c % m_p, m_dp, m_p );
@@ -79,11 +78,11 @@ bool RSA::decrypt(char* msg, int32_t size)
 		u2 = u2 + m_q;
 	}
   	Big z = v1 + u2*m_p;
-  	
+
 	//Big z = pow(c, m_d, m_p*m_q);
-  	
+
 	int len = to_binary(z, size, msg, TRUE);
-	
+
 	return true;
 }
 */
@@ -95,7 +94,7 @@ bool RSA::setKey(const std::string& file)
 	if(!f){
 		return false;
 	}
-	
+
 	char p[512];
 	char q[512];
 	char d[512];
@@ -108,12 +107,12 @@ bool RSA::setKey(const std::string& file)
 
 void RSA::setKey(const char* p, const char* q, const char* d)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
-	
+	boost::mutex::scoped_lock lockClass(rsaLock);
+
 	mpz_set_str(m_p, p, 10);
 	mpz_set_str(m_q, q, 10);
 	mpz_set_str(m_d, d, 10);
-	
+
 	mpz_t pm1,qm1;
 	mpz_init2(pm1,520);
 	mpz_init2(qm1,520);
@@ -123,24 +122,24 @@ void RSA::setKey(const char* p, const char* q, const char* d)
 	mpz_invert(m_u, m_p, m_q);
 	mpz_mod(m_dp, m_d, pm1);
 	mpz_mod(m_dq, m_d, qm1);
-	
+
 	mpz_mul(m_mod, m_p, m_q);
-	
+
 	mpz_clear(pm1);
 	mpz_clear(qm1);
 }
 
 bool RSA::decrypt(char* msg, int32_t size)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
-	
+	boost::mutex::scoped_lock lockClass(rsaLock);
+
 	mpz_t c,v1,v2,u2,tmp;
 	mpz_init2(c, 1024);
 	mpz_init2(v1, 1024);
 	mpz_init2(v2, 1024);
 	mpz_init2(u2, 1024);
 	mpz_init2(tmp, 1024);
-	
+
 	mpz_import(c, 128, 1, 1, 0, 0, msg);
 
 	mpz_mod(tmp, c, m_p);
@@ -157,17 +156,17 @@ bool RSA::decrypt(char* msg, int32_t size)
 	mpz_mul(tmp, u2, m_p);
 	mpz_set_ui(c, 0);
 	mpz_add(c, v1, tmp);
-		
+
 	size_t count = (mpz_sizeinbase(c, 2) + 7)/8;
 	memset(msg, 0, 128 - count);
 	mpz_export(&msg[128 - count], NULL, 1, 1, 0, 0, c);
-	
+
 	mpz_clear(c);
 	mpz_clear(v1);
 	mpz_clear(v2);
 	mpz_clear(u2);
 	mpz_clear(tmp);
-	
+
 	return true;
 }
 

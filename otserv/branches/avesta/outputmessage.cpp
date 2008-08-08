@@ -32,7 +32,6 @@ OutputMessage::OutputMessage()
 
 OutputMessagePool::OutputMessagePool()
 {
-	OTSYS_THREAD_LOCKVARINIT(m_outputPoolLock);
 	for(uint32_t i = 0; i < OUTPUT_POOL_SIZE; ++i){
 		OutputMessage* msg = new OutputMessage();
 		m_outputMessages.push_back(msg);
@@ -45,7 +44,7 @@ OutputMessagePool::OutputMessagePool()
 
 void OutputMessagePool::startExecutionFrame()
 {
-	//OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
+	//boost::mutex::scoped_lock lockClass(m_outputPoolLock);
 	m_frameTime = OTSYS_TIME();
 }
 
@@ -56,14 +55,13 @@ OutputMessagePool::~OutputMessagePool()
 		delete *it;
 	}
 	m_outputMessages.clear();
-	OTSYS_THREAD_LOCKVARRELEASE(m_outputPoolLock);
 }
 
 void OutputMessagePool::send(OutputMessage* msg)
 {
-	OTSYS_THREAD_LOCK(m_outputPoolLock, "");
+	m_outputPoolLock.lock();
 	OutputMessage::OutputMessageState state = msg->getState();
-	OTSYS_THREAD_UNLOCK(m_outputPoolLock, "");
+	m_outputPoolLock.unlock();
 
 	if(state == OutputMessage::STATE_ALLOCATED_NO_AUTOSEND){
 		#ifdef __DEBUG_NET_DETAIL__
@@ -73,11 +71,11 @@ void OutputMessagePool::send(OutputMessage* msg)
 		if(msg->getConnection()){
 			if(msg->getConnection()->send(msg)){
 				// Note: if we ever decide to change how the pool works this will have to change
-				OTSYS_THREAD_LOCK(m_outputPoolLock, "");
+				m_outputPoolLock.lock();
 				if(msg->getState() != OutputMessage::STATE_FREE) {
 					msg->setState(OutputMessage::STATE_WAITING);
 				}
-				OTSYS_THREAD_UNLOCK(m_outputPoolLock, "");
+				m_outputPoolLock.unlock();
 			}
 			else{
 				internalReleaseMessage(msg);
@@ -98,7 +96,7 @@ void OutputMessagePool::send(OutputMessage* msg)
 
 void OutputMessagePool::sendAll()
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
+	boost::mutex::scoped_lock lockClass(m_outputPoolLock);
 	OutputMessageVector::iterator it;
 	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
 		#ifdef __NO_PLAYER_SENDBUFFER__
@@ -148,7 +146,7 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 
 void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
+	boost::mutex::scoped_lock lockClass(m_outputPoolLock);
 	switch(msg->getState()){
 	case OutputMessage::STATE_ALLOCATED:
 	{
@@ -194,7 +192,7 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 	std::cout << "request output message - auto = " << autosend << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_outputPoolLock);
+	boost::mutex::scoped_lock lockClass(m_outputPoolLock);
 	OutputMessage* outputmessage;
 	if(m_outputMessages.empty()) {
 #ifdef __TRACK_NETWORK__

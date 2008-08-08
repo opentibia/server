@@ -38,7 +38,7 @@
 #include "exception.h"
 #endif
 
-OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
+boost::mutex AutoID::autoIDLock;
 uint32_t AutoID::count = 1000;
 AutoID::list_type AutoID::list;
 

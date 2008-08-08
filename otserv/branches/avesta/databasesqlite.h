@@ -53,7 +53,7 @@ public:
 protected:
 	std::string _parse(const std::string &s);
 
-	OTSYS_THREAD_LOCKVAR sqliteLock;
+	boost::mutex sqliteLock;
 	sqlite3* m_handle;
 };
 

@@ -22,7 +22,7 @@
 #define __OTSERV_DATABASE_H__
 
 #include "definitions.h"
-#include "otsystem.h"
+#include <boost/thread.hpp>
 
 #include <sstream>
 
@@ -230,7 +230,7 @@ public:
 	~DBQuery();
 
 protected:
-	static OTSYS_THREAD_LOCKVAR database_lock;
+	static boost::mutex database_lock;
 };
 
 /**

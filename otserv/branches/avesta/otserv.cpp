@@ -28,6 +28,7 @@
 
 #include "otsystem.h"
 #include "server.h"
+#include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
 #include <stdlib.h>
@@ -75,8 +76,9 @@ Vocations g_vocations;
 RSA* g_otservRSA = NULL;
 Server* g_server = NULL;
 
-OTSYS_THREAD_LOCKVAR g_loaderLock;
-OTSYS_THREAD_SIGNALVAR g_loaderSignal;
+boost::mutex g_loaderLock;
+boost::condition_variable g_loaderSignal;
+boost::unique_lock<boost::mutex> g_loaderUniqueLock(g_loaderLock);
 
 extern AdminProtocolConfig* g_adminConfig;
 
@@ -97,7 +99,7 @@ void mainLoader(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
 #ifdef __OTSERV_ALLOCATOR_STATS__
-	OTSYS_CREATE_THREAD(allocatorStatsThread, NULL);
+	boost::thread(boost::bind(&allocatorStatsThread, NULL));
 #endif
 
 #if defined __EXCEPTION_TRACER__
@@ -157,13 +159,10 @@ int main(int argc, char *argv[])
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 
-	OTSYS_THREAD_LOCKVARINIT(g_loaderLock);
-	OTSYS_THREAD_SIGNALVARINIT(g_loaderSignal);
-
 	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, argc, argv)));
 
-	//OTSYS_THREAD_LOCK(g_loaderLock, "main()");
-	OTSYS_THREAD_WAITSIGNAL(g_loaderSignal, g_loaderLock);
+	// note: no need to lock g_loaderLock, construction of g_loaderUniqueLock did it already
+	g_loaderSignal.wait(g_loaderUniqueLock);
 
 	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
 	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
@@ -433,5 +432,5 @@ void mainLoader(int argc, char *argv[])
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
 	g_game.setGameState(GAME_STATE_NORMAL);
-	OTSYS_THREAD_SIGNAL_SEND(g_loaderSignal);
+	g_loaderSignal.notify_all();
 }

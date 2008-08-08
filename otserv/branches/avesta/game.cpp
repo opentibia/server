@@ -54,7 +54,7 @@
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
-extern OTSYS_THREAD_LOCKVAR maploadlock;
+extern boost::mutex maploadlock;
 #endif
 
 extern ConfigManager g_config;
@@ -71,12 +71,6 @@ Game::Game()
 	gameState = GAME_STATE_NORMAL;
 	map = NULL;
 	worldType = WORLD_TYPE_PVP;
-
-	OTSYS_THREAD_LOCKVARINIT(AutoID::autoIDLock);
-
-#if defined __EXCEPTION_TRACER__
-	OTSYS_THREAD_LOCKVARINIT(maploadlock);
-#endif
 
 	int daycycle = 3600;
 	//(1440 minutes/day)/(3600 seconds/day)*10 seconds event interval

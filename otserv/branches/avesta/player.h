@@ -21,7 +21,7 @@
 #ifndef __OTSERV_PLAYER_H__
 #define __OTSERV_PLAYER_H__
 
-#include "definitions.h"
+#include "otsystem.h"
 #include "creature.h"
 #include "container.h"
 #include "depot.h"

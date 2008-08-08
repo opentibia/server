@@ -21,7 +21,6 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
-#include "definitions.h"
 #include <boost/utility.hpp>
 
 class NetworkMessage;

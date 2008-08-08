@@ -22,8 +22,6 @@
 #ifndef __OTSERV_DEFINITIONS_H__
 #define __OTSERV_DEFINITIONS_H__
 
-#include "exception.h"
-
 #ifdef XML_GCC_FREE
 	#define xmlFreeOTSERV(s)	free(s)
 #else
@@ -97,7 +95,6 @@ enum passwordType_t{
 	#define	__FUNCTION__ __func__
 #endif
 
-#define OTSYS_THREAD_RETURN  void
 #ifndef EWOULDBLOCK
 #define EWOULDBLOCK WSAEWOULDBLOCK
 #endif
@@ -165,8 +162,6 @@ enum passwordType_t{
 
 //*nix systems
 #else
-	#define OTSYS_THREAD_RETURN void
-
 	#include <stdint.h>
 	#include <string.h>
 	#include <ext/hash_map>

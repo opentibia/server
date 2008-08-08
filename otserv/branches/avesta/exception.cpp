@@ -24,24 +24,20 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <iomanip>
 #include <ctime>
 #include <stdlib.h>
 #include <map>
 
-#include "otsystem.h"
+#include <boost/thread.hpp>
 #include "exception.h"
-
-#include <map>
-#include <string>
 
 typedef std::map<unsigned long, char*> FunctionMap;
 
 
 #if defined WIN32 || defined __WINDOWS__
-#include "excpt.h"
-#include "tlhelp32.h"
+#include <excpt.h>
+#include <tlhelp32.h>
 #else //Unix/Linux
 #include <execinfo.h>
 #include <signal.h>
@@ -52,7 +48,7 @@ unsigned long max_off;
 unsigned long min_off;
 FunctionMap functionMap;
 bool maploaded = false;
-OTSYS_THREAD_LOCKVAR maploadlock;
+boost::mutex maploadlock;
 
 #if defined WIN32 || defined __WINDOWS__
 EXCEPTION_DISPOSITION
@@ -88,7 +84,7 @@ ExceptionHandler::~ExceptionHandler(){
 
 bool ExceptionHandler::InstallHandler(){
 	#if defined WIN32 || defined __WINDOWS__
-	OTSYS_THREAD_LOCK_CLASS lockObj(maploadlock);
+	boost::mutex::scoped_lock lockObj(maploadlock);
 	if(maploaded == false)
 		LoadMap();
 	if( installed == true)

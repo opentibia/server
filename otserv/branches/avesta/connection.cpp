@@ -41,7 +41,7 @@ Connection* ConnectionManager::createConnection(boost::asio::io_service& io_serv
 	std::cout << "Create new Connection" << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionManagerLock);
+	boost::mutex::scoped_lock lockClass(m_connectionManagerLock);
 	Connection* connection = new Connection(io_service);
 	m_connections.push_back(connection);
 	return connection;
@@ -53,7 +53,7 @@ void ConnectionManager::releaseConnection(Connection* connection)
 	std::cout << "Releasing connection" << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionManagerLock);
+	boost::mutex::scoped_lock lockClass(m_connectionManagerLock);
 	std::list<Connection*>::iterator it =
 		std::find(m_connections.begin(), m_connections.end(), connection);
 
@@ -70,7 +70,7 @@ void ConnectionManager::closeAll()
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Closing all connections" << std::endl;
 	#endif
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionManagerLock);
+	boost::mutex::scoped_lock lockClass(m_connectionManagerLock);
 	std::list<Connection*>::iterator it = m_connections.begin();
 	while(it != m_connections.end()){
 		boost::system::error_code error;
@@ -91,7 +91,7 @@ void Connection::closeConnection()
 	std::cout << "Connection::closeConnection" << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(m_connectionLock);
+	boost::mutex::scoped_lock lockClass(m_connectionLock);
 	if(m_closeState != CLOSE_STATE_NONE)
 		return;
 
@@ -108,10 +108,10 @@ void Connection::closeConnectionTask()
 	std::cout << "Connection::closeConnectionTask" << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK(m_connectionLock, "");
+	m_connectionLock.lock();
 	if(m_closeState != CLOSE_STATE_REQUESTED){
 		std::cout << "Error: [Connection::closeConnectionTask] m_closeState = " << m_closeState << std::endl;
-		OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+		m_connectionLock.unlock();
 		return;
 	}
 
@@ -125,7 +125,7 @@ void Connection::closeConnectionTask()
 	}
 
 	if(!closingConnection()){
-		OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+		m_connectionLock.unlock();
 	}
 }
 
@@ -140,11 +140,11 @@ void Connection::acceptConnection()
 
 void Connection::parseHeader(const boost::system::error_code& error)
 {
-	OTSYS_THREAD_LOCK(m_connectionLock, "");
+	m_connectionLock.lock();
 	m_pendingRead--;
 	if(m_closeState == CLOSE_STATE_CLOSING){
 		if(!closingConnection()){
-			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+			m_connectionLock.unlock();
 		}
 		return;
 	}
@@ -160,16 +160,16 @@ void Connection::parseHeader(const boost::system::error_code& error)
 	else{
 		handleReadError(error);
 	}
-	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+	m_connectionLock.unlock();
 }
 
 void Connection::parsePacket(const boost::system::error_code& error)
 {
-	OTSYS_THREAD_LOCK(m_connectionLock, "");
+	m_connectionLock.lock();
 	m_pendingRead--;
 	if(m_closeState == CLOSE_STATE_CLOSING){
 		if(!closingConnection()){
-			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+			m_connectionLock.unlock();
 		}
 		return;
 	}
@@ -195,7 +195,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 			default:
 				// No valid protocol
 				closeConnection();
-				OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+				m_connectionLock.unlock();
 				return;
 				break;
 			}
@@ -215,7 +215,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 	else{
 		handleReadError(error);
 	}
-	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+	m_connectionLock.unlock();
 }
 
 void Connection::handleReadError(const boost::system::error_code& error)
@@ -249,9 +249,9 @@ bool Connection::send(OutputMessage* msg)
 	std::cout << "Connection::send init" << std::endl;
 	#endif
 
-	OTSYS_THREAD_LOCK(m_connectionLock, "");
+	m_connectionLock.lock();
 	if(m_closeState == CLOSE_STATE_CLOSING || m_writeError){
-		OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+		m_connectionLock.unlock();
 		return false;
 	}
 
@@ -269,7 +269,7 @@ bool Connection::send(OutputMessage* msg)
 		#endif
 		m_outputQueue.push_back(msg);
 	}
-	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+	m_connectionLock.unlock();
 	return true;
 }
 
@@ -303,7 +303,7 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 
 	OutputMessagePool::getInstance()->releaseMessage(msg, true);
 
-	OTSYS_THREAD_LOCK(m_connectionLock, "");
+	m_connectionLock.lock();
 
 	if(!error){
 		if(m_pendingWrite > 0){
@@ -330,12 +330,12 @@ void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error
 
 	if(m_closeState == CLOSE_STATE_CLOSING){
 		if(!closingConnection()){
-			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+			m_connectionLock.unlock();
 		}
 		return;
 	}
 
-	OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+	m_connectionLock.unlock();
 }
 
 void Connection::handleWriteError(const boost::system::error_code& error)
@@ -397,7 +397,7 @@ bool Connection::closingConnection()
 			std::cout << "Deleting Connection" << std::endl;
 			#endif
 
-			OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+			m_connectionLock.unlock();
 
 			Dispatcher::getDispatcher().addTask(
 				createTask(boost::bind(&Connection::deleteConnectionTask, this)));
