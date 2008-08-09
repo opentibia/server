@@ -1147,9 +1147,11 @@ void Npc::onPlayerEnter(Player* player, NpcState* state)
 
 void Npc::onPlayerLeave(Player* player, NpcState* state)
 {
-	player->closeShopWindow();
-	const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_LEAVE);
-	executeResponse(player, state, response);
+	if(player){
+		player->closeShopWindow();
+		const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_LEAVE);
+		executeResponse(player, state, response);
+	}
 }
 
 void Npc::onThink(uint32_t interval)
