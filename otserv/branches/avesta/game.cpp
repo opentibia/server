@@ -656,9 +656,10 @@ bool Game::playerMoveThing(uint32_t playerId, const Position& fromPos,
 
 	if(Creature* movingCreature = thing->getCreature()){
 		if(Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition())){
-			Scheduler::getScheduler().addEvent(createSchedulerTask(2000,
+			SchedulerTask* task = createSchedulerTask(2000,
 				boost::bind(&Game::playerMoveCreature, this, player->getID(),
-				movingCreature->getID(), movingCreature->getPosition(), toCylinder->getPosition())));
+				movingCreature->getID(), movingCreature->getPosition(), toCylinder->getPosition()));
+			player->setNextActionTask(task);
 		}
 		else{
 			playerMoveCreature(playerId, movingCreature->getID(), movingCreature->getPosition(),
@@ -686,6 +687,8 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 		player->setNextActionTask(task);
 		return false;
 	}
+
+	player->setNextActionTask(NULL);
 
 	Creature* movingCreature = getCreatureByID(movingCreatureId);
 
@@ -882,6 +885,8 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		player->setNextActionTask(task);
 		return false;
 	}
+	
+	player->setNextActionTask(NULL);
 
 	Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
 	uint8_t fromIndex = 0;
@@ -2123,6 +2128,8 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return false;
 	}
 
+	player->setNextActionTask(NULL);
+
 	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item, isHotkey);
 }
 
@@ -2177,6 +2184,8 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		player->setNextActionTask(task);
 		return false;
 	}
+
+	player->setNextActionTask(NULL);
 
 	g_actions->useItem(player, pos, index, item, isHotkey);
 	return true;
@@ -2245,6 +2254,8 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		player->setNextActionTask(task);
 		return false;
 	}
+
+	player->setNextActionTask(NULL);
 
 	return g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), item, isHotkey, creatureId);
 }

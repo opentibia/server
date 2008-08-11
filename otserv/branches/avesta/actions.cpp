@@ -345,6 +345,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 		return false;
 	}
 
+	player->setNextActionTask(NULL);
 	player->stopWalk();
 
 	if(isHotkey){
@@ -469,6 +470,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 		return false;
 	}
 
+	player->setNextActionTask(NULL);
 	player->stopWalk();
 
 	Action* action = getAction(item);
