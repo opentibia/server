@@ -70,7 +70,7 @@ protected:
 		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	virtual void onCreatureSay(const Creature* creature, SpeakClass type, const std::string& text);
 	virtual void onThink(uint32_t interval);
 	virtual std::string getDescription(int32_t lookDistance) const;
 

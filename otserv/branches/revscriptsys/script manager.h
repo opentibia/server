@@ -21,60 +21,63 @@
 
 #include "lua manager.h"
 
-class ScriptManager : public LuaStateManager {
-public:
-	ScriptManager(ScriptEnviroment& e);
-	~ScriptManager();
+namespace Script {
+	class Event;
+	class Enviroment;
 
-	// Event handling
-	void dispatchEvent(ScriptEvent& event);
+	class Manager : public LuaStateManager {
+	public:
+		Manager(Enviroment& e);
+		~Manager();
 
-protected:
-	typedef (ScriptManager::*CallbackFunctionType)();
-	struct ComposedTypeDeclaration {
-		std::string name;
-		std::vector<std::string> types;
-		int optional_level;
+		// Event handling
+		void dispatchEvent(Event& event);
+	protected:
+		// This actually registers functions!
+		// Defined in script functions.cpp
+		void registerFunctions();
+		void registerClasses();
+
+	protected:
+		virtual Manager* getManager();
+
+		// Internal representation of functions
+		typedef int (LuaState::*CallbackFunctionType)();
+
+		struct ComposedTypeDeclaration {
+			std::string name;
+			std::vector<std::string> types;
+			int optional_level;
+		};
+
+		struct ComposedCallback {
+			CallbackFunctionType func;
+			std::string name;
+			std::vector<ComposedTypeDeclaration> parameters;
+		};
+
+		typedef shared_ptr<ComposedCallback> ComposedCallback_ptr;
+		typedef std::map<uint32_t, ComposedCallback_ptr> FunctionMap;
+
+		FunctionMap function_map;
+		uint32_t function_id_counter;
+
+		// Expose functions/classes to lua
+		void registerClass(const std::string& cname);
+		void registerClass(const std::string& cname, const std::string& parent_class);
+		
+		void registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc);
+		void registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc);
+
+		// Callback from lua
+		static int luaFunctionCallback(lua_State* L);
+
+		// Parse arguments
+		ComposedCallback_ptr parseFunctionDeclaration(std::string s);
+		void parseWhitespace(std::string& str);
+		std::string parseIdentifier(std::string& s);
+		ComposedTypeDeclaration parseTypeDeclaration(std::string& s);
 	};
-	struct ComposedCallback {
-		CallbackFunctionType func;
-		std::string name;
-		std::vector<ComposedTypeDeclaration> parameters;
-	};
-	typedef shared_ptr<ComposedCallback> ComposedCallback_ptr;
-	typedef std::map<uint32_t, ComposedCallback_ptr> function_map;
-	uint32_t function_id_counter;
-
-	// Single
-	void registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc);
-	void registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc);
-	// Hidden implantation
-	static int luaFunctionCallback(lua_State* L);
-
-	// Parse arguments
-	ComposedCallback_ptr parseFunctionDeclaration(std::string s);
-	std::string parseIdentifier(std::string& s);
-	ComposedTypeDeclaration parseTypeDeclaration(std::string& s);
-
-
-	// This actually registers functions!
-	void registerFunctions();
-	void registerClasses();
-
-	// And finally lua functions that are available for scripts
-	// Global
-	// - Utility
-	int lua_wait(CallbackFunction& w);
-	// - Register Events
-	int lua_registerGenericEvent_OnSay();
-	int lua_registerSpecificEvent_OnSay();
-	// Classes
-	// - Thing
-	int lua_Thing_getPosition();
-	int lua_Thing_moveToXYZ();
-	// - - Creature
-	int lua_Creature_getHealth();
-	int lua_Creature_getHealthMax();
-};
+}
 
 #endif

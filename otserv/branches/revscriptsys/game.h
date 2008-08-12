@@ -36,6 +36,10 @@
 #include "templates.h"
 #include "scheduler.h"
 
+namespace Script {
+	class Manager;
+	class Enviroment;
+}
 class Creature;
 class Monster;
 class Npc;
@@ -114,6 +118,12 @@ public:
 	  * \return Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
 	  */
 	int loadMap(std::string filename, std::string filekind);
+
+	/**
+	* Load all scripts
+	* \return bool true on success, false on error
+	*/
+	bool loadScripts();
 
 	/**
 	  * Get the map size - info purpose only
@@ -338,7 +348,7 @@ public:
 	  * \param type Type of message
 	  * \param text The text to say
 	  */
-	bool internalCreatureSay(Creature* creature, SpeakClasses type, const std::string& text);
+	bool internalCreatureSay(Creature* creature, SpeakClass type, const std::string& text);
 
 	bool internalStartTrade(Player* player, Player* partner, Item* tradeItem);
 	bool internalCloseTrade(Player* player);
@@ -394,8 +404,8 @@ public:
 	bool playerRequestRemoveVip(uint32_t playerId, uint32_t guid);
 	bool playerTurn(uint32_t playerId, Direction dir);
 	bool playerRequestOutfit(uint32_t playerId);
-	bool playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
-		const std::string& receiver, const std::string& text);
+	bool playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
+		std::string receiver, std::string text);
 	bool playerChangeOutfit(uint32_t playerId, Outfit_t outfit);
 	bool playerInviteToParty(uint32_t playerId, uint32_t invitedId);
 	bool playerJoinParty(uint32_t playerId, uint32_t leaderId);
@@ -500,8 +510,8 @@ protected:
 
 	bool playerWhisper(Player* player, const std::string& text);
 	bool playerYell(Player* player, const std::string& text);
-	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
-	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+	bool playerSpeakTo(Player* player, SpeakClass type, const std::string& receiver, const std::string& text);
+	bool playerTalkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId);
 	bool playerReportRuleViolation(Player* player, const std::string& text);
 	bool playerContinueReport(Player* player, const std::string& text);
 
@@ -516,6 +526,10 @@ protected:
 	AutoList<Creature> listCreature;
 	size_t checkCreatureLastIndex;
 	std::vector<Creature*> checkCreatureVectors[EVENT_CREATURECOUNT];
+
+	// Script handling
+	Script::Enviroment* script_enviroment;
+	Script::Manager* script_system;
 
 #ifdef __DEBUG_CRITICALSECTION__
 	static OTSYS_THREAD_RETURN monitorThread(void *p);

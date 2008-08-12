@@ -81,9 +81,6 @@ protected:
 	bool serverDiag(Creature* creature, const std::string& cmd, const std::string& param);
 #endif
 	
-	//table of commands
-	static s_defcommands defined_commands[];
-	
 	typedef std::map<std::string,Command*> CommandMap;
 	CommandMap commandMap;
 };

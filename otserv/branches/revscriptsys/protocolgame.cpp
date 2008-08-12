@@ -1260,7 +1260,7 @@ void ProtocolGame::parseLookAt(NetworkMessage& msg)
 
 void ProtocolGame::parseSay(NetworkMessage& msg)
 {
-	SpeakClasses type = (SpeakClasses)msg.GetByte();
+	SpeakClass type = (SpeakClass)msg.GetByte();
 
 	std::string receiver;
 	uint16_t channelId = 0;
@@ -1821,7 +1821,7 @@ void ProtocolGame::sendCreatureTurn(const Creature* creature, uint8_t stackPos)
 	}
 }
 
-void ProtocolGame::sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+void ProtocolGame::sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text)
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
@@ -1830,7 +1830,7 @@ void ProtocolGame::sendCreatureSay(const Creature* creature, SpeakClasses type, 
 	}
 }
 
-void ProtocolGame::sendToChannel(const Creature * creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time /*= 0*/)
+void ProtocolGame::sendToChannel(const Creature * creature, SpeakClass type, const std::string& text, uint16_t channelId, uint32_t time /*= 0*/)
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
@@ -2536,7 +2536,7 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage* msg)
 }
 
 void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creature,
-	SpeakClasses type, std::string text, uint16_t channelId, uint32_t time /*= 0*/)
+	SpeakClass type, std::string text, uint16_t channelId, uint32_t time /*= 0*/)
 {
 	msg->AddByte(0xAA);
 	msg->AddU32(0x00000000);

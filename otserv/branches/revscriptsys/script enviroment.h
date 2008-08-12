@@ -19,94 +19,81 @@
 #ifndef __OTSERV_SCRIPT_ENVIROMENT__
 #define __OTSERV_SCRIPT_ENVIROMENT__
 
-#include "otpch.h"
-
+#include <boost/bimap.hpp>
 #include <string>
-#include "shared_ptr.h"
+#include "boost_common.h"
 
-class EventListener;
-typedef boost::shared_ptr<EventListener> EventListener_ptr;
-typedef boost::weak_ptr<EventListener> EventListener_wptr;
+class Combat;
+class Thing;
 
-typedef std::vector<EventListener_ptr> GenericCreatureEventList;
-typedef std::multimap<Creature*, GenericCreatureEventList> SpecificCreatureEventMap;
+namespace Script {
+	class Listener;
+	typedef boost::shared_ptr<Listener> Listener_ptr;
+	typedef boost::weak_ptr<Listener> Listener_wptr;
 
-typedef ptrdiff_t ScriptObjectID;
+	typedef std::vector<Listener_ptr> GenericCreatureEventList;
+	typedef std::map<Creature*, GenericCreatureEventList> SpecificCreatureEventMap;
 
-class ScriptEnviroment {
-public:
-	ScriptEnviroment();
-	~ScriptEnviroment();
+	typedef uint64_t ObjectID;
 
-	struct ScriptObjectBlock {
-		// Only instansiate with pointers
-		template<T> ScriptObjectBlock(const T& t) : type(typeid(T)), id(reinterpret_cast<ScripbObjectID>(t)) {}
-		const std::type_info& type;
-		const ScriptObjectID id;
+	class Enviroment {
+	public:
+		Enviroment();
+		~Enviroment();
 
-		bool operator<(const ScriptObjectBlock& rhs) {
-			return id < rhs.id;
+		void cleanup();
+
+		typedef boost::bimap<ObjectID, void*> ObjectMap;
+
+		// Make sure to use a pointer to the superclass of the object
+		ObjectID addObject(Thing* thing);
+		ObjectID addObject(Combat* combat);
+		// If the object is not scripted already, it will be added
+		Thing* getThing(ObjectID id);
+		bool removeObject(ObjectID id);
+
+	public: // Event maps
+		struct {
+			SpecificCreatureEventMap OnSay;
+		} Specific;
+		struct {
+			GenericCreatureEventList OnSay;
+		} Generic;
+	protected:
+		ObjectID objectID_counter;
+		ObjectMap object_map;
+
+		ObjectID getFreeID() {
+			return ++objectID_counter;
 		}
 	};
 
-	typedef std::set<ScriptObjectBlock> ObjectMap;
-
-	// Make sure to use a pointer to the superclass of the object
-	template<typename T> ScriptObjectID addObject(T* p);
-	// If the object is not scripted already, it will be added
-	template<typename T> T* getObject(ScriptObjectID p);
-	template<typename T> bool removeObject(T* p);
-
-public: // Event maps
-	struct {
-		SpecificCreatureEventMap OnSay;
-	} Specific;
-	struct {
-		GenericCreatureEventList OnSay;
-	} Generic;
-
-protected:
-	ObjectMap object_map;
-};
-
-inline template<typename T>
-ScriptObjectID ScriptEnviroment::addObject(T* p) {
-	ScriptObjectBlock(p) b;
-	ObjectMap::iterator iter = object_map.find(b);
-	if(iter == object_map.end()) {
-		object_map.insert(b);
-	} else if(typeid(T*) != iter->type) {
-		// This guarantees a limited form of type safety
-		return 0;
+	inline ObjectID Enviroment::addObject(Thing* thing) {
+		ObjectMap::right_iterator thing_iter = object_map.right.find(thing);
+		if(thing_iter == object_map.right.end()) {
+			ObjectID id = getFreeID();
+			object_map.left.insert(std::make_pair(id, reinterpret_cast<void*>(thing)));
+			return id;
+		}
+		return thing_iter->second;
 	}
-	return b.id;
-}
 
-inline template<typename T>
-T* getObject(ScriptObjectID p) {
-	ScriptObjectBlock(p) b;
-	ObjectMap::iterator iter = object_map.find(b);
-	if(iter == object_map.end()) {
-		return NULL;
-	} else if(typeid(T*) != iter->type) {
-		// This guarantees a limited form of type safety
-		return NULL;
+	inline Thing* Enviroment::getThing(ObjectID id) {
+		ObjectMap::left_iterator id_iter = object_map.left.find(id);
+		if(id_iter == object_map.left.end()) {
+			return NULL;
+		}
+		return reinterpret_cast<Thing*>(id_iter->second);
 	}
-	return b.id;
-}
 
-inline template<typename T>
-bool removeObject(T* p) {
-	ScriptObjectBlock(p) b;
-	ObjectMap::iterator iter = object_map.find(b);
-	if(iter == object_map.end()) {
-		return false;
-	} else if(typeid(T*) != iter->type) {
-		// This guarantees a limited form of type safety
-		return false;
+	inline bool Enviroment::removeObject(ObjectID id) {
+		ObjectMap::left_iterator id_iter = object_map.left.find(id);
+		if(id_iter == object_map.left.end()) {
+			return false;
+		}
+		object_map.left.erase(id_iter);
+		return true;
 	}
-	object_map.erase(iter);
-	return true;
 }
 
 #endif

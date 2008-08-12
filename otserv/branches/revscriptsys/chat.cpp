@@ -136,7 +136,7 @@ bool ChatChannel::removeUser(Player* player)
 	return true;
 }
 
-bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time /*= 0*/)
+bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time /*= 0*/)
 {
 	bool success = false;
 	UsersMap::iterator it;
@@ -307,7 +307,7 @@ void Chat::removeUserFromAllChannels(Player* player)
 	}
 }
 
-bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& text, uint16_t channelId)
+bool Chat::talkToChannel(Player* player, SpeakClass type, const std::string& text, uint16_t channelId)
 {
 	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel)

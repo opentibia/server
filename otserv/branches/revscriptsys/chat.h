@@ -41,7 +41,7 @@ public:
 	bool addUser(Player* player);
 	bool removeUser(Player* player);
 
-	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time = 0);
+	bool talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time = 0);
 
 	const std::string& getName(){ return m_name; }
 	const uint16_t getId(){ return m_id; }
@@ -95,7 +95,7 @@ public:
 	bool removeUserFromChannel(Player* player, uint16_t channelId);
 	void removeUserFromAllChannels(Player* player);
 
-	bool talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+	bool talkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId);
 
 	std::string getChannelName(Player* player, uint16_t channelId);
 	ChannelList getChannelList(Player* player);

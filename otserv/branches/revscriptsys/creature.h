@@ -323,7 +323,7 @@ public:
 	virtual void onFollowCreatureDissapear(bool isLogout) {};
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
+	virtual void onCreatureSay(const Creature* creature, SpeakClass type, const std::string& text) { };
 
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature) {};

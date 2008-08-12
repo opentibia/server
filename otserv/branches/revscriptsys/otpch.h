@@ -20,7 +20,7 @@
 #include <libxml/threads.h>
 //boost
 #include <boost/config.hpp>
-#include "shared_ptr.h"
+#include "boost_common.h"
 #include <boost/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>

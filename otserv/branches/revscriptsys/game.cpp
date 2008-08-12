@@ -53,6 +53,10 @@
 #include "spawn.h"
 #include "beds.h"
 
+#include "script enviroment.h"
+#include "script manager.h"
+#include "script event.h"
+
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
 extern OTSYS_THREAD_LOCKVAR maploadlock;
@@ -103,6 +107,9 @@ Game::Game()
 
 Game::~Game()
 {
+	script_enviroment->cleanup();
+	delete script_enviroment;
+	delete script_system;
 	if(map){
 		delete map;
 	}
@@ -188,6 +195,24 @@ int Game::loadMap(std::string filename, std::string filekind)
 	Monster::despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
 
 	return map->loadMap(filename, filekind);
+}
+
+bool Game::loadScripts() {
+	// Unload any old
+	delete script_enviroment;
+	delete script_system;
+	script_enviroment = NULL;
+	script_system = NULL;
+
+	// Load fresh!
+	try {
+		script_enviroment = new Script::Enviroment();
+		script_system = new Script::Manager(*script_enviroment);
+		script_system->loadFile(g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/main.lua");
+	} catch(Script::Error&) {
+		return false;
+	}
+	return true;
 }
 
 void Game::refreshMap()
@@ -3491,8 +3516,8 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 	return true;
 }
 
-bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
-	const std::string& receiver, const std::string& text)
+bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
+	std::string receiver, std::string text)
 {
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
@@ -3506,6 +3531,11 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return false;
 	}
 
+	Script::OnSay::Event evt(player, type, receiver, text);
+	script_system->dispatchEvent(evt);
+
+	if(text.empty()) return false;
+
 	//First, check if this was a builtin command
 	for(uint32_t i = 0; i < commandTags.size(); i++){
 		if(commandTags[i] == text.substr(0,1)){
@@ -3514,10 +3544,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 			}
 		}
 	}
-
-	// REVSCRIPT TODO Event callback
-	ScriptEvent_OnTalk evt(player, type, text, receiver);
-	script_system.dispatchEvent(evt);
 
 	player->removeMessageBuffer();
 
@@ -3609,7 +3635,7 @@ bool Game::playerYell(Player* player, const std::string& text)
 	return !isExhausted;
 }
 
-bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver,
+bool Game::playerSpeakTo(Player* player, SpeakClass type, const std::string& receiver,
 	const std::string& text)
 {
 	Player* toPlayer = getPlayerByName(receiver);
@@ -3631,7 +3657,7 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 	return true;
 }
 
-bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId)
+bool Game::playerTalkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId)
 {
 	if(type == SPEAK_CHANNEL_R1 && !player->hasFlag(PlayerFlag_CanTalkRedChannel)){
 		type = SPEAK_CHANNEL_Y;
@@ -3731,7 +3757,7 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 	return false;
 }
 
-bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std::string& text)
+bool Game::internalCreatureSay(Creature* creature, SpeakClass type, const std::string& text)
 {
 	// This somewhat complex construct ensures that the cached SpectatorVec
 	// is used if available and if it can be used, else a local vector is

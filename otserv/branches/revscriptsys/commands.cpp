@@ -58,47 +58,49 @@ extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
 #define ipText(a) (unsigned int)a[0] << "." << (unsigned int)a[1] << "." << (unsigned int)a[2] << "." << (unsigned int)a[3]
 
-//table of commands
-s_defcommands Commands::defined_commands[] = {
-	{"/m",&Commands::placeMonster},
-	{"/summon",&Commands::placeSummon},
-	{"/B",&Commands::broadcastMessage},
-	//{"/b",&Commands::banPlayer},
-	{"/t",&Commands::teleportMasterPos},
-	{"/c",&Commands::teleportHere},
-	{"/i",&Commands::createItemById},
-	{"/n",&Commands::createItemByName},
-	{"/q",&Commands::subtractMoney},
-	{"/reload",&Commands::reloadInfo},
-	{"/z",&Commands::testCommand},
-	{"/goto",&Commands::teleportTo},
-	{"/info",&Commands::getInfo},
-	{"/closeserver",&Commands::closeServer},
-	{"/openserver",&Commands::openServer},
-	{"/getonline",&Commands::onlineList},
-	{"/a",&Commands::teleportNTiles},
-	{"/kick",&Commands::kickPlayer},
-	{"/owner",&Commands::setHouseOwner},
-	{"/sellhouse",&Commands::sellHouse},
-	{"/gethouse",&Commands::getHouse},
-	//{"/bans",&Commands::bansManager},
-	{"/town",&Commands::teleportToTown},
-	{"/serverinfo",&Commands::serverInfo},
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	{"/serverdiag",&Commands::serverDiag},
-#endif
-};
-
 
 Commands::Commands(Game* igame):
 game(igame),
 loaded(false)
 {
+	//table of commands
+	s_defcommands defined_commands[] = {
+		{"/m",&Commands::placeMonster},
+		{"/summon",&Commands::placeSummon},
+		{"/B",&Commands::broadcastMessage},
+		//{"/b",&Commands::banPlayer},
+		{"/t",&Commands::teleportMasterPos},
+		{"/c",&Commands::teleportHere},
+		{"/i",&Commands::createItemById},
+		{"/n",&Commands::createItemByName},
+		{"/q",&Commands::subtractMoney},
+		{"/reload",&Commands::reloadInfo},
+		{"/z",&Commands::testCommand},
+		{"/goto",&Commands::teleportTo},
+		{"/info",&Commands::getInfo},
+		{"/closeserver",&Commands::closeServer},
+		{"/openserver",&Commands::openServer},
+		{"/getonline",&Commands::onlineList},
+		{"/a",&Commands::teleportNTiles},
+		{"/kick",&Commands::kickPlayer},
+		{"/owner",&Commands::setHouseOwner},
+		{"/sellhouse",&Commands::sellHouse},
+		{"/gethouse",&Commands::getHouse},
+		//{"/bans",&Commands::bansManager},
+		{"/town",&Commands::teleportToTown},
+		{"/serverinfo",&Commands::serverInfo},
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		{"/serverdiag",&Commands::serverDiag},
+#endif
+	};
+
 	//setup command map
 	for(uint32_t i = 0; i < sizeof(defined_commands) / sizeof(defined_commands[0]); i++){
 		Command* cmd = new Command;
 		cmd->loaded = false;
 		cmd->accesslevel = 1;
+		if(defined_commands[i].f == NULL || defined_commands[i].name == NULL)
+			continue;
 		cmd->f = defined_commands[i].f;
 		std::string key = defined_commands[i].name;
 		commandMap[key] = cmd;
@@ -457,6 +459,10 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	else if(param == "config"){
 		g_config.reload();
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
+	}
+	else if(param == "scripts"){
+		g_game.loadScripts();
+		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded scripts.");
 	}
 	/*
 	else if(param == "items"){

@@ -135,7 +135,7 @@ enum ShootType_t {
 	NM_SHOOT_UNK            = 0xFFFF
 };
 
-enum SpeakClasses {
+enum SpeakClass {
 	SPEAK_SAY           = 0x01,
 	SPEAK_WHISPER       = 0x02,
 	SPEAK_YELL          = 0x03,

@@ -16,64 +16,89 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-class ScriptManager;
-class ScriptEnviroment;
+#ifndef __OTSERV_SCRIPT_EVENT__
+#define __OTSERV_SCRIPT_EVENT__
 
 #include <string>
 #include "boost/any.hpp"
-#include "shared_ptr.h"
+#include "boost_common.h"
+
+#include "script enviroment.h"
+
+#include "const.h"
 
 class Creature;
 
-///////////////////////////////////////////////////////////////////////////////
-// Event Listener
+class LuaState;
 
-class EventListener {
-public:
-	EventListener(const std::string& name);
-	~EventListener();
+namespace Script {
 
-	std::string getLuaTag() const;
+	class Manager;
 
-	boost::any data;
-protected:
-	static uint32_t ID_counter;
-	uint32_t ID;
-	std::string name;
-};
+	class Listener;
+	typedef boost::shared_ptr<Listener> Listener_ptr;
+	typedef boost::weak_ptr<Listener> Listener_wptr;
 
-typedef boost::shared_ptr<EventListener> EventListener_ptr;
-typedef boost::weak_ptr<EventListener> EventListener_wptr;
+	///////////////////////////////////////////////////////////////////////////////
+	// Event template
 
-///////////////////////////////////////////////////////////////////////////////
-// Event template
+	class Event {
+	public:
+		Event();
+		virtual ~Event();
 
-class ScriptEvent {
-public:
-	ScriptEvent();
-	virtual ~ScriptEvent();
+		virtual bool dispatch(Manager& state, Script::Enviroment& enviroment) = 0;
+		virtual void push_instance(LuaState& state, Script::Enviroment& enviroment) = 0;
+	protected:
 
-	virtual void dispatch(ScriptManager& script_system, ScriptEnviroment& enviroment) = 0;
-protected:
-	uint32_t eventID;
-	static uint32_t eventID_counter;
-};
+		uint32_t eventID;
+		static uint32_t eventID_counter;
+		std::string lua_tag;
+	};
 
-///////////////////////////////////////////////////////////////////////////////
-// OnSay event
-// Triggered when a creature talks
+	///////////////////////////////////////////////////////////////////////////////
+	// OnSay event
+	// Triggered when a creature talks
 
-class ScriptEvent_OnSay : public ScriptEvent {
-public:
-	ScriptEvent_OnSay(Creature* speaker, SpeakClass type, std::string receiver, std::string text);
-	~ScriptEvent_OnSay();
+	namespace OnSay {
+		enum FilterType {
+			FILTER_ALL,
+			FILTER_SUBSTRING,
+			FILTER_MATCH_BEGINNING,
+			FILTER_EXACT,
+		};
+
+		struct ScriptInformation {
+			std::string filter;
+			FilterType method;
+			bool case_sensitive;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Creature* speaker, SpeakClass& type, std::string& receiver, std::string& text);
+			~Event();
+			
+			bool dispatch(Manager& state, Enviroment& enviroment);
+			void push_instance(LuaState& state, Enviroment& enviroment);
+		protected:
+			bool dispatch(Manager& state, Enviroment& enviroment, GenericCreatureEventList& specific_list);
+			bool check_match(const ScriptInformation& info);
+			bool call(Manager& state, Enviroment& enviroment, Listener_ptr listener);
+
+			Creature* speaker;
+			SpeakClass& type;
+			std::string& text;
+			std::string& receiver;
+		};
+	}
 	
-	void dispatch(ScriptManager& script_system, ScriptEnviroment& enviroment);
-protected:
-	void call(ScriptManager& script_system, ScriptEnviroment& enviroment, EventListener_ptr listener);
+	/* To add a new event
+	 * 1. Create the event class
+	 * 2. Expose a registerListener function to lua
+	 * 3. Add the class to lua_stopListener
+	 * 4. Add callback from an arbitrary location in otserv source
+	 */
+}
 
-	Creature* speaker;
-	SpeakClass type;
-	std::string text;
-	std::string receiver;
-};
+#endif // __OTSERV_SCRIPT_EVENT__

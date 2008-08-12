@@ -1,6 +1,8 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
+// Lua script interface
+//////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -16,28 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#include "otpch.h"
+// This is just a helper file to avoid having to type using in all files
+// that uses smart pointers
 
-#include "script enviroment.h"
+#include <boost/shared_ptr.hpp>
 
-#include "thing.h"
-#include "item.h"
-#include "container.h"
-#include "player.h"
-#include "creature.h"
-#include "player.h"
-
-using namespace Script;
-
-Enviroment::Enviroment() {
-}
-
-Enviroment::~Enviroment() {
-}
-
-void Enviroment::cleanup() {
-	object_map.clear();
-	objectID_counter = 0;
-	Specific.OnSay.clear();
-	Generic.OnSay.clear();
-}
+using boost::shared_ptr;
+using boost::weak_ptr;
+using boost::dynamic_pointer_cast;
+using boost::static_pointer_cast;
+using boost::const_pointer_cast;

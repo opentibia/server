@@ -18,10 +18,38 @@
 
 #include "otpch.h"
 
+#include "configmanager.h"
+
 #include "lua manager.h"
+#include "script manager.h"
+#include "script enviroment.h"
+#include "script listener.h"
+#include "script event.h"
 
+#include "container.h"
+#include "player.h"
 
-LuaState::LuaState(lua_State* state) : state(state) {
+extern ConfigManager g_config;
+
+LuaState::LuaState(Script::Enviroment& env) : enviroment(env) {
+	;
+}
+
+LuaState::~LuaState() {
+	;
+}
+
+void LuaState::HandleError(Script::ErrorMode mode, const std::string& error) {
+	if(mode == Script::ERROR_THROW) {
+		throw Script::Error(error);
+	} else if(mode == Script::ERROR_WARN) {
+		std::cout << "Lua warning:" << error << std::endl;
+	}
+	// pass
+}
+
+void LuaState::HandleError(const std::string& error) {
+	HandleError(Script::ERROR_WARN, error);
 }
 
 // Stack manipulation
@@ -29,100 +57,156 @@ int LuaState::getStackTop() {
 	return lua_gettop(state);
 }
 
-bool LuaState::checkStackSize(int low, int high = -1) {
+bool LuaState::checkStackSize(int low, int high) {
 	int t = getStackTop();
 	if(t < low) return false;
 	if(high != -1 && t > high) return false;
 	return true;
 }
 
+void LuaState::duplicate(int idx /* = -1 */) {
+	lua_pushvalue(state, idx);
+}
+
+// Table manipulation
+
+void LuaState::newTable() {
+	lua_newtable(state);
+}
+
+void LuaState::getField(int index, const std::string& field_name) {
+	lua_getfield(state, index, field_name.c_str());
+}
+
+void LuaState::setField(int index, const std::string& field_name) {
+	lua_setfield(state, index, field_name.c_str());
+}
+
+void LuaState::clearStack() {
+	lua_settop(state, 0);
+}
+
+void LuaState::insert(int idx) {
+	lua_insert(state, idx);
+}
+
+void LuaState::swap(int idx) {
+	lua_insert(state, idx);
+	lua_pushvalue(state, idx+1);
+	lua_remove(state, idx+1);
+}
+
+std::string LuaState::typeOf(int idx) {
+	return lua_typename(state, lua_type(state, idx));
+}
+
 // Check
-bool LuaState::isBoolean(int index = 1) {
+bool LuaState::isNil(int index) {
+	return lua_isnil(state, index);
+}
+
+bool LuaState::isBoolean(int index) {
 	return lua_isboolean(state, index) || lua_isnil(state, index);
 }
 
-bool LuaState::isNumber(int index = 1) {
-	return lua_isnumber(state, index);
+bool LuaState::isNumber(int index) {
+	return lua_isnumber(state, index) != 0;
 }
 
-bool LuaState::isString(int index = 1) {
-	return lua_isstring(state, index);
+bool LuaState::isString(int index) {
+	return lua_isstring(state, index) != 0;
 }
 
-bool LuaState::isUserdata(int index = 1) {
-	return lua_isuserdata(state, index);
+bool LuaState::isUserdata(int index) {
+	return lua_isuserdata(state, index) != 0;
 }
 
-bool LuaState::isLuaFunction(int index = 1) {
-	return lua_isfunction(state, index);
+bool LuaState::isLuaFunction(int index) {
+	return lua_isfunction(state, index) != 0;
 }
 
-bool LuaState::isCFunction(int index = 1) {
-	return lua_iscfunction(state, index);
+bool LuaState::isCFunction(int index) {
+	return lua_iscfunction(state, index) != 0;
+}
+
+bool LuaState::isThread(int index) {
+	return lua_isthread(state, index) != 0;
+}
+
+bool LuaState::isTable(int index) {
+	return lua_istable(state, index) != 0;
+}
+
+bool LuaState::isFunction(int index) {
+	return lua_isfunction(state, index) != 0 || lua_iscfunction(state, index) != 0;
 }
 
 // Pop
-void LuaState::pop(int n = 1) {
+void LuaState::pop(int n) {
 	lua_pop(state, n);
 }
 
 bool LuaState::popBoolean() {
-	bool b = lua_toboolean(state, 1);
+	bool b = (lua_toboolean(state, -1) != 0);
 	pop();
 	return b;
 }
 
 int32_t LuaState::popInteger() {
-	int32_t i = lua_tointeger(state, 1);
+	int32_t i = lua_tointeger(state, -1);
 	pop();
 	return i;
 }
 
 uint32_t LuaState::popUnsignedInteger() {
-	double d = lua_tonumber(state, 1);
+	double d = lua_tonumber(state, -1);
 	pop();
 	return uint32_t(d);
 }
 
 double LuaState::popFloat() {
-	double d = lua_tonumber(state, 1);
+	double d = lua_tonumber(state, -1);
 	pop();
 	return d;
 }
 
 std::string LuaState::popString() {
 	size_t len;
-	const char* cstr = lua_tostring(state, 1, &len);
+	const char* cstr = lua_tolstring(state, -1, &len);
 	std::string str(cstr, len);
 	pop();
 	return str;
 }
 
-voidLuaState::* getUserdata() {
-	void* p = lua_touserdata(state, 1);
+void* LuaState::getUserdata() {
+	void* p = lua_touserdata(state, -1);
 	pop();
 	return p;
 }
 
 // Push
+void LuaState::pushNil() {
+	lua_pushnil(state);
+}
+
 void LuaState::pushBoolean(bool b) {
-	lua_pushboolean(b);
+	lua_pushboolean(state, b);
 }
 
 void LuaState::pushInteger(int32_t i) {
-	lua_pushnumber(i);
+	lua_pushnumber(state, i);
 }
 
 void LuaState::pushUnsignedInteger(uint32_t ui) {
-	lua_pushnumber(ui);
+	lua_pushnumber(state, ui);
 }
 
 void LuaState::pushFloat(double d) {
-	lua_pushnumber(d);
+	lua_pushnumber(state, d);
 }
 
 void LuaState::pushString(const std::string& str) {
-	lua_pushstring(str.c_str());
+	lua_pushstring(state, str.c_str());
 }
 
 void LuaState::pushUserdata(void* ptr) {
@@ -130,65 +214,49 @@ void LuaState::pushUserdata(void* ptr) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Creating Lua Classes etc.
+// Push an empty instance of a class
 
-void ScriptManager::registerClass(const std::string& cname) {
-	lua_newtable(state); // Metatable
-	lua_pushvalue(state, 1); // Another reference to the table
-	lua_setfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
-	lua_newtable(state); // Class table
-	lua_pushvalue(state, 1); // Another reference to the table
-	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
-
-	lua_setfield(state, 2, "__index"); // Set the index metamethod for the class metatable to the class table
-	
-	lua_pop(l, 1); // Pop the class metatable
-}
-
-
-void ScriptManager::registerClass(const std::string& cname, const std::string& parent_class) {
-	lua_newtable(state); // Metatable
-	lua_pushvalue(state, 1); // Another reference to the table
-	lua_setfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
-	lua_newtable(state); // Class table
-	lua_pushvalue(state, 1); // Another reference to the table
-	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
-
-	lua_setfield(state, 2, "__index"); // Set the index metamethod for the class metatable to the class table
-	
-	lua_pop(l, 1); // Pop the class metatable
-
-	lua_getfield(state, LUA_GLOBALSINDEX, cname.c_str()); // Add the derived class table to the top of the stack
-	lua_newtable(state); // Create a small redirect table
-	lua_getfield(state, LUA_GLOBALSINDEX, parent_class.c_str()); // Get the parent table
-	lua_setfield(state, 2, "__index"); // Set the index metamethod for the redirect table to the base class table
-	lua_pop(state, 1); // Remove the base class table from the stack
-	lua_setmetatable(state, 2); // Set the metatable of the derived class table to the redirect table
-	lua_pop(state, 1); // Pop the derived class table
-}
-
-ScriptEnviroment::ObjectID* LuaState::pushClassInstance(std::string cname) {
-	ScriptEnviroment::ObjectID* p = (ScriptEnviroment::ObjectID*)
-		lua_newuserdata(state, sizeof(ScriptEnviroment::ObjectID));
+Script::ObjectID* LuaState::pushClassInstance(const std::string& cname) {
+	Script::ObjectID* p = (Script::ObjectID*)lua_newuserdata(state, sizeof(Script::ObjectID));
 	lua_getfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
-	lua_setmetatable(state, 2);
+	lua_setmetatable(state, -2);
 	return p;
+}
+
+void LuaState::pushClassTableInstance(const std::string& cname) {
+	newTable();
+	lua_getfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
+	lua_setmetatable(state, -2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Event pushing/popping
 
-void LuaState::pushEventCallback(EventListener_ptr listener) {
+void LuaState::pushCallback(Script::Listener_ptr listener) {
 	lua_getfield(state, LUA_REGISTRYINDEX, listener->getLuaTag().c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Advanced type pushing/popping
 
+void LuaState::pushEvent(Script::Event& event) {
+	event.push_instance(*this, enviroment);
+}
+
+void LuaState::pushPosition(const Position& pos) {
+	newTable();
+	pushInteger(pos.x);
+	setField(2, "x");
+	pushInteger(pos.y);
+	setField(2, "y");
+	pushInteger(pos.z);
+	setField(2, "z");
+}
+
 void LuaState::pushThing(Thing* thing) {
 	if(thing && thing->getItem()){
 		Item* item = thing->getItem();
-		ScriptEnviroment::ObjectID* objid;
+		Script::ObjectID* objid;
 
 		if(const Container* container = item->getContainer()) {
 			objid = pushClassInstance("Container");
@@ -199,10 +267,11 @@ void LuaState::pushThing(Thing* thing) {
 		else {
 			objid = pushClassInstance("Item");
 		}
+		*objid = enviroment.addObject(item);
 	}
 	else if(thing && thing->getCreature()) {
 		Creature* creature = thing->getCreature();
-		ScriptEnviroment::ObjectID* objid;
+		Script::ObjectID* objid;
 
 		if(creature->getPlayer()) {
 			objid = pushClassInstance("Player");
@@ -213,18 +282,57 @@ void LuaState::pushThing(Thing* thing) {
 		else if(creature->getNpc()) {
 			objid = pushClassInstance("NPC");
 		}
-		*objid = enviroment.addObject<Thing*>(creature);
+		*objid = enviroment.addObject(creature);
 	} else {
-		ScriptEnviroment::ObjectID* objid;
+		Script::ObjectID* objid;
 		objid = pushClassInstance("Thing");
-		*objid = enviroment.addObject<Thing*>(creature);
+		*objid = enviroment.addObject(thing);
 	}
+}
+
+Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	Position pos(0, 0, 0);
+	if(!isTable(-1)) {
+		HandleError(mode, "Attempt to treat non-table value as a position.");
+		return pos;
+	}
+	getField(-1, "x");
+	pos.x = popInteger();
+	getField(-1, "y");
+	pos.y = popInteger();
+	getField(-1, "z");
+	pos.z = popInteger();
+	pop();
+	return pos;
+}
+
+Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	if(!isUserdata(-1)) {
+		HandleError(mode, std::string("Couldn't pop thing, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		return NULL;
+	}
+
+	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
+	Thing* thing = enviroment.getThing(*objid);
+	if(!thing) HandleError(mode, "Object does not exist in object list.");
+
+	return thing;
+}
+
+Creature* LuaState::popCreature(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	Thing* t = popThing(mode);
+	if(t) {
+		Creature* c = t->getCreature();
+		if(!c) HandleError(mode, "Object is not a creature.");
+		return c;
+	}
+	return NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Lua State Thread
 
-LuaStateManager::LuaStateManager(ScriptEnviroment& enviroment) : LuaState(), enviroment(enviroment) {
+LuaStateManager::LuaStateManager(Script::Enviroment& enviroment) : LuaState(enviroment) {
 	state = luaL_newstate();
 	if(!state){
 		throw std::exception("Could not create lua context, fatal error");
@@ -232,25 +340,35 @@ LuaStateManager::LuaStateManager(ScriptEnviroment& enviroment) : LuaState(), env
 
 	// Load all standard libraries
 	luaL_openlibs(state);
+
+	//getGlobal("package");
+	lua_getfield(state, LUA_GLOBALSINDEX, "package");
+	assert(lua_istable(state, 1));
+	//pushString(g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/?.lua");
+	lua_pushstring(state, (g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/?.lua").c_str());
+	//setField(2, "path");
+	lua_setfield(state, -2, "path");
 }
 
 LuaStateManager::~LuaStateManager() {
+	lua_close(state);
 }
 
 bool LuaStateManager::loadFile(std::string file) {
 	//loads file as a chunk at stack top
-	int ret = luaL_loadfile(m_luaState, file.c_str());
+	int ret = luaL_loadfile(state, file.c_str());
+
 	if(ret != 0){
-		std::cout << "Lua Error: " << popString(m_luaState) << "\n";
+		std::cout << "Lua Error: " << popString() << "\n";
 		return false;
 	}
 	//check that it is loaded as a function
-	if(lua_isfunction(m_luaState, -1) == 0){
+	if(lua_isfunction(state, -1) == 0){
 		return false;
 	}
 
 	//execute it
-	ret = lua_pcall(m_luaState, 0, 0, 0);
+	ret = lua_pcall(state, 0, 0, 0);
 	if(ret != 0) {
 		std::cout << "Lua Error: Failed to load file - " << popString();
 		return false;
@@ -258,26 +376,32 @@ bool LuaStateManager::loadFile(std::string file) {
 	return true;
 }
 
-LuaThread_ptr LuaStateManager::newThread() {
-	return new LuaThread(*this);
-}
-
-void LuaStateManager::runThread(LuaThread_ptr thread, int args) {
+LuaThread_ptr LuaStateManager::newThread(const std::string& name) {
+	LuaThread_ptr p(new LuaThread(*this, name));
+	threads[p->state] = p;
+	return p;
 }
 
 void LuaStateManager::scheduleThread(int32_t schedule, LuaThread_ptr thread) {
-	LuaThreadSchedule s;
-	s.schedule = schedule;
+	ThreadSchedule s;
+	s.scheduled_time = OTSYS_TIME() + schedule;
 	s.thread = thread;
-	threads.push(s);
+	queued_threads.push(s);
 }
 
 void LuaStateManager::runScheduledThreads() {
-	while(true) {
-		LuaThreadSchedule& scheduled = threads.top();
-		if(scheduled.schedule < current_time) {
-			scheduled.thread->run(0);
-			threads.pop();
+	int64_t current_time = OTSYS_TIME();
+	while(queued_threads.empty() == false) {
+		ThreadSchedule& scheduled = queued_threads.top();
+		if(scheduled.scheduled_time < current_time) {
+			int32_t t = scheduled.thread->run(0);
+			if(t > 0) {
+				scheduleThread(t, scheduled.thread);
+			} else {
+				ThreadMap::iterator iter = threads.find(scheduled.thread->state);
+				threads.erase(iter);
+			}
+			queued_threads.pop();
 		} else {
 			break;
 		}
@@ -287,40 +411,64 @@ void LuaStateManager::runScheduledThreads() {
 ///////////////////////////////////////////////////////////////////////////////
 // Child Thread
 
-LuaThread::LuaThread(LuaStateManager& manager, const std::string& name) : LuaState(), manager(manager), name(name) {
+LuaThread::LuaThread(LuaStateManager& manager, const std::string& name) :
+	LuaState(manager.enviroment),
+	manager(manager),
+	name(name),
+	thread_state(0)
+{
 	state = lua_newthread(manager.state);
-	manager.pop();
+	lua_pop(manager.state, 1); // Remove the thread from the main stack
 }
 
 LuaThread::~LuaThread() {
 }
 
-void LuaThread::run(int args) {
+bool LuaThread::ok() const {
+	return thread_state == 0 || thread_state == LUA_YIELD;
+}
+
+Script::Manager* LuaThread::getManager() {
+	return static_cast<Script::Manager*>(&manager);
+}
+
+int32_t LuaThread::run(int args) {
 	int ret = lua_resume(state, args);
+	thread_state = ret;
 	if(ret == LUA_YIELD) {
 		// Thread yielded, add us to the manager
 		int32_t schedule = popInteger();
-		manager.scheduleThread(schedule, this);
+		return schedule;
 	} else if(ret == 0) {
 		// Thread exited normally, do nothing, it will be garbage collected
 	} else if(ret == LUA_ERRRUN) {
 		std::string errmsg = popString();
 		std::cout << "Lua Error: " << errmsg << "\n";
+		std::cout << "Stack trace:\n";
+		std::cout << "Line\tFunction\t\tSource\n";
 
-		lua_getfield(L, LUA_GLOBALSINDEX, "debug");
-		if (!lua_istable(L, -1)) {
-			lua_pop(L, 1);
-			return;
+		lua_Debug ar;
+		
+		int level = 0;
+		while(lua_getstack(state, ++level, &ar) != 0) {
+			lua_getinfo(state, "nSl", &ar);
+
+			if(ar.currentline != -1) {
+				std::cout << ar.currentline;
+			}
+			std::cout << "\t";
+			
+			int tabcount = 2;
+			if(ar.name) {
+				std::cout << ar.name;
+				tabcount = 2 - strlen(ar.name) / 8;
+			}
+			while(tabcount-- > 0) std::cout << "\t";
+
+			std::cout << ar.short_src;
+			std::cout << "\n";
 		}
-		lua_getfield(L, -1, "traceback");
-		if (!lua_isfunction(L, -1)) {
-			lua_pop(L, 2);
-			return;
-		}
-		lua_pushvalue(L, 1);
-		lua_pushinteger(L, 2);
-		lua_call(L, 2, 1);
-		return;
+
 	} else if(ret == LUA_ERRERR) {
 		// Can't handle, just print error message
 		std::cout << "Lua Error when recovering from error (thread " << name << ")\n";
@@ -329,4 +477,5 @@ void LuaThread::run(int args) {
 	} else {
 		// ??
 	}
+	return 0;
 }

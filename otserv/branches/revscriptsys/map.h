@@ -25,7 +25,7 @@
 #include <bitset>
 #include <map>
 
-#include "shared_ptr.h"
+#include "boost_common.h"
 
 #include "definitions.h"
 #include "position.h"

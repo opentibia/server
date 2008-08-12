@@ -19,35 +19,53 @@
 #include "otpch.h"
 
 #include "script manager.h"
+#include "script event.h"
+#include "script enviroment.h"
 
-ScriptManager::ScriptManager(ScriptEnviroment& e) : LuaStateManager(e) {
+using namespace Script;
 
+Manager::Manager(Script::Enviroment& e) : LuaStateManager(e), function_id_counter(1) {
+	registerFunctions();
+	registerClasses();
 }
 
-ScriptManager::~ScriptManager() {
+Manager::~Manager() {
 }
 
-void ScriptManager::handleEvent(ScriptEvent& event) {
-	event->dispatch(*this, enviroment);
+void Manager::dispatchEvent(Script::Event& event) {
+	event.dispatch(*this, enviroment);
 }
 
+Manager* Manager::getManager() {
+	return this;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register functions
 
-void ScriptManager::luaFunctionCallback(lua_State* L) {
-	uint32_t callbackID = uint32_t(lua_tonumber(L, lua_upvalueindex(1)));
-	ScriptManager* interface = (ScriptManager*)(lua_touserdata(L, lua_upvalueindex(2)));
+int Manager::luaFunctionCallback(lua_State* L) {
+	uint32_t callbackID = uint32_t(lua_tonumber(L, lua_upvalueindex(2)));
+	Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
+	LuaState* interface = NULL;
+	if(L == manager->state) {
+		interface = manager;
+	} else {
+		LuaThread_ptr p = manager->threads[L];
+		interface = p.get();
+	}
 	
+	assert(interface);
+
 	try {
-		ComposedCallback_ptr cc = function_map[callback];
+		ComposedCallback_ptr cc = manager->function_map[callbackID];
 		
-		int argument_count = getStackSize();
+		int argument_count = interface->getStackTop();
 		if(argument_count > cc->parameters.size()) {
-			throw LuaScriptError("Too many arguments passed to function " + cc->name);
+			throw Script::Error("Too many arguments passed to function " + cc->name);
 		}
 		int parsed_argument_count = 0;
 		int last_optional_level = 0;
+
 		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
 				ctditer != cc->parameters.end();
 				++ctditer)
@@ -58,7 +76,7 @@ void ScriptManager::luaFunctionCallback(lua_State* L) {
 			if(ctd.optional_level == 0) {
 				// Required argument
 				if(argument_count < parsed_argument_count) {
-					throw LuaScriptError("Too few arguments passed to function " + cc->name);
+					throw Script::Error("Too few arguments passed to function " + cc->name);
 				}
 			} else {
 				// Optional argument
@@ -79,107 +97,89 @@ void ScriptManager::luaFunctionCallback(lua_State* L) {
 			const ComposedTypeDeclaration& ctd = *ctditer;
 			parsed_argument_count += 1;
 
+			std::string expected_type = "";
+
 			for(std::vector<std::string>::const_iterator type_iter = ctd.types.begin();
 					type_iter != ctd.types.end();
 					++type_iter)
 			{
-				if(*type_iter == "boolean" && !isBoolean(argument_count - parsed_argument_count + 1)) {
-					throw LuaScriptError("Expected boolean for argument '" + ctd.name + "'");
-				} else if(*type_iter == "number" && !isNumber(argument_count - parsed_argument_count + 1)) {
-					throw LuaScriptError("Expected number for argument '" + ctd.name + "'");
-				} else if(*type_iter == "string" && !isString(argument_count - parsed_argument_count + 1)) {
-					throw LuaScriptError("Expected string for argument '" + ctd.name + "'");
-				} else if(*type_iter == "function" && !isFunction(argument_count - parsed_argument_count + 1)) {
-					throw LuaScriptError("Expected function for argument '" + ctd.name + "'");
-				} else if(*type_iter == "userdata" && !isUserdata(argument_count - parsed_argument_count + 1)) {
-					throw LuaScriptError("Expected userdata for argument '" + ctd.name + "'");
-				} else if(*type_iter == "thread" && !isThread(argument_count - parsed_argument_count + 1)) {
-					throw LuaScriptError("Expected thread for argument '" + ctd.name + "'");
-				} else if(*type_iter == "table" && !isTable(argument_count - parsed_argument_count + 1)) {
-					throw LuaScriptError("Expected table for argument '" + ctd.name + "'");
+				if(*type_iter == "boolean") {
+					if(interface->isBoolean(parsed_argument_count)) {
+						expected_type = "";
+						break;
+					}
+					expected_type = "boolean";
 				}
+				else if(*type_iter == "number") {
+					if(interface->isNumber(parsed_argument_count)) {
+						expected_type = "";
+						break;
+					}
+					expected_type = "number";
+				}
+				else if(*type_iter == "string") {
+					if(interface->isString(parsed_argument_count)) {
+						expected_type = "";
+						break;
+					}
+					expected_type = "string";
+				}
+				else if(*type_iter == "function") {
+					if(interface->isFunction(parsed_argument_count)) {
+						expected_type = "";
+						break;
+					}
+					expected_type = "function";
+				}
+				else if(*type_iter == "userdata") {
+					if(interface->isUserdata(parsed_argument_count)) {
+						expected_type = "";
+						break;
+					}
+					expected_type = "userdata";
+				}
+				else if(*type_iter == "thread") {
+					if(interface->isThread(parsed_argument_count)) {
+						expected_type = "";
+						break;
+					}
+					expected_type = "thread";
+				}
+				else if(*type_iter == "table") {
+					if(interface->isTable(parsed_argument_count)) {
+						expected_type = "";
+						break;
+					}
+					expected_type = "table";
+				}
+			}
+			if(expected_type != "") {
+				std::ostringstream os;
+				os <<
+					"When calling function " <<
+					"'" << cc->name << "'" <<
+					" - Expected '" << expected_type << "' for argument " <<
+					"'" << ctd.name << "'" << 
+					" type was " << 
+					"'" << interface->typeOf(parsed_argument_count) << "'"; 
+				throw Error(os.str());
 			}
 		}
 		// All arguments checked out, call the function!
-		return (interface)->*(cc->func);
-	} catch(LuaScriptError& err) {
+		return (interface->*(cc->func))();
+	} catch(Script::Error& err) {
 		// We can't use lua_error in the C++ function as it doesn't call destructors properly.
-		lua_pushstring(state, err.what());
-		lua_error(state);
+		std::cout << "top:" << interface->getStackTop() << "\n";
+		interface->clearStack();
+		interface->pushString(err.what());
+		return lua_error(interface->state);
 	}
-}
-
-void ScriptManager::registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc) {
-	ComposedCallback_ptr func = parseFunctionDeclaration(fdecl);
-	func.func = cfunc;
-	
-	uint32_t function_id = ++function_id_counter;
-	function_map[function_id] = func;
-
-	lua_pushlightuserdata(state, (ScriptManager*)this);
-	lua_pushnumber(state, function_id);
-	lua_pushcclosure(state, luaFunctionCallback, 2);
-
-	lua_setfield(state, LUA_GLOBALSINDEX, func->name.c_str());
-}
-
-void ScriptManager::registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc) {
-	ComposedCallback func = parseFunctionDeclaration(fdecl);
-	
-	// Add the hidden "self" parameter
-	ComposedTypeDeclaration ctd;
-	ctd.name = "thing";
-	ctd.optional_level = 0;
-	ctd.types.push_back("userdata");
-	func->parameters.insert(func->parameters.begin(), ctd);
-
-	func->name = cname + ":" + func->name;
-	func->func = cfunc;
-	
-	uint32_t function_id = ++function_id_counter;
-	function_map[function_id] = func;
-
-	lua_getfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
-	
-	lua_pushlightuserdata(state, (ScriptManager*)this);
-	lua_pushnumber(state, function_id);
-	lua_pushcclosure(state, luaFunctionCallback, 2);
-
-	lua_setfield(state, 2, func->name.c_str());
-}
-
-void ScriptManager::registerClasses() {
-	registerClass("Thing");
-	registerMemberFunction("Thing", "getPosition()", lua_Thing_getPosition);
-	registerMemberFunction("Thing", "moveTo(int x, int y, int z)", lua_Thing_moveToXYZ);
-
-	registerClass("Creature", "Thing");
-	registerMemberFunction("Creature", "getHealth()", lua_Creature_getHealth);
-	registerMemberFunction("Creature", "getHealthMax()", lua_Creature_getHealthMax);
-
-	registerClass("Monster", "Creature");
-
-	registerClass("Player", "Creature");
-
-	registerClass("Item", "Thing");
-
-	registerClass("Teleport", "Item");
-
-	registerClass("Container", "Item");
-
-	registerClass("Tile");
-}
-
-void ScriptManager::registerFreeFunctions() {
-	registerGlobalFunction("wait(int delay)"), lua_wait);
-
-	registerGlobalFunction("registerGenericOnSayListener(string method, string filter, function callback)"), lua_registerGenericEvent_OnSay);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Internal parsing of arguments
 
-ComposedCallback_ptr ScriptManager::parseFunctionDeclaration(std::string s) {
+Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 	ComposedCallback_ptr cc(new ComposedCallback);
 	// Parse name
 	parseWhitespace(s);
@@ -191,8 +191,8 @@ ComposedCallback_ptr ScriptManager::parseFunctionDeclaration(std::string s) {
 	}
 	assert(s[0] == '(');
 	s.erase(s.begin());
-	bool optional_level = 0;
-	
+	int optional_level = 0;
+
 	parseWhitespace(s);
 	// Size must at least be 1 so there can be a closing )
 	assert(s.size() > 0);
@@ -220,7 +220,7 @@ ComposedCallback_ptr ScriptManager::parseFunctionDeclaration(std::string s) {
 			if(s[0] == ',') {
 				s.erase(s.begin());
 			} else if(s[0] == '[')  {
-				s.erase(s.begin();
+				s.erase(s.begin());
 				parseWhitespace(s);
 				assert(s.size() > 0);
 				assert(s[0]  == ',');
@@ -229,14 +229,14 @@ ComposedCallback_ptr ScriptManager::parseFunctionDeclaration(std::string s) {
 				assert(optional_level > 0);
 				while(optional_level > 0) {
 					// After a ']' only another ']' can follow
-					assert(s[0] == ']')
+					assert(s[0] == ']');
 					parseWhitespace(s);
 					optional_level -= 1;
 				}
 				// There must be an equal amount of [ and ]
 				assert(optional_level == 0);
 				// After ]]]] the declaration must end
-				assert(s[0] == ')')
+				assert(s[0] == ')');
 				break;
 			} else if(s[0] == ')') {
 				// There must be an equal amount of [ and ]
@@ -248,7 +248,7 @@ ComposedCallback_ptr ScriptManager::parseFunctionDeclaration(std::string s) {
 	return cc;
 }
 
-void ScriptManager::parseWhitespace(std::string& s) {
+void Manager::parseWhitespace(std::string& s) {
 	std::string::iterator iter = s.begin();
 	while(*iter == ' ' || *iter == '\t' || *iter == '\n') {
 		++iter;
@@ -256,7 +256,7 @@ void ScriptManager::parseWhitespace(std::string& s) {
 	s.erase(s.begin(), iter);
 }
 
-std::string ScriptManager::parseIdentifier(std::string &s) {
+std::string Manager::parseIdentifier(std::string &s) {
 	std::string::iterator iter = s.begin();
 	assert(
 		(*iter >= 'a' && *iter <= 'z') || 
@@ -276,7 +276,7 @@ std::string ScriptManager::parseIdentifier(std::string &s) {
 	return r;
 }
 
-ComposedTypeDeclaration ScriptManager::parseTypeDeclaration(std::string& s) {
+Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 	ComposedTypeDeclaration ctd;
 	while(true) {
 		std::string type = parseIdentifier(s);
@@ -298,58 +298,92 @@ ComposedTypeDeclaration ScriptManager::parseTypeDeclaration(std::string& s) {
 		}
 	}
 	ctd.name = parseIdentifier(s);
-}
 
-///////////////////////////////////////////////////////////////////////////////
-// Lua functions!
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Utility functions
-
-int ScriptManager::lua_wait() {
-	checkStackSize(1);
-	int32_t ms = popInteger();
-	pushInteger(ms);
-	return lua_yield(state, 1);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Register Events
-int ScriptManager::lua_registerGenericEvent_OnSay() {
-	return lua_yield(state, 1);
+	return ctd;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Member functions
+// Register Lua Classes
 
-int ScriptManager::lua_Thing_getPosition() {
-	Thing* thing = popThing();
-	pushPosition(thing->getPosition());
-	return 1;
+void Manager::registerClass(const std::string& cname) {
+	lua_newtable(state); // Metatable
+	lua_pushvalue(state, -1); // Another reference to the table
+	lua_setfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
+
+	lua_newtable(state); // Class table
+	lua_pushvalue(state, -1); // Another reference to the table
+	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
+
+	lua_setfield(state, -2, "__index"); // Set the index metamethod for the class metatable to the class table
+
+	lua_pop(state, 1); // Pop the class metatable
 }
 
-int ScriptManager::lua_Thing_moveToXYZ() {
-	Thing* thing = popThing();
-	int x, y, z;
-	z = popInteger();
-	y = popInteger();
-	x = popInteger();
+
+void Manager::registerClass(const std::string& cname, const std::string& parent_class) {
+	lua_newtable(state); // Metatable
+	lua_pushvalue(state, -1); // Another reference to the table
+	lua_setfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
 	
+	lua_newtable(state); // Class table
+	lua_pushvalue(state, -1); // Another reference to the table
+	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
+
+	lua_setfield(state, -2, "__index"); // Set the index metamethod for the class metatable to the class table
+
+	lua_pop(state, 1); // Pop the class metatable
+
+	lua_getfield(state, LUA_GLOBALSINDEX, cname.c_str()); // Add the derived class table to the top of the stack
 	
+	lua_newtable(state); // Create a small redirect table
+	lua_getfield(state, LUA_GLOBALSINDEX, parent_class.c_str()); // Get the parent table
+	lua_setfield(state, -2, "__index"); // Set the index metamethod for the redirect table to the base class table
 
-	return 1;
+	lua_setmetatable(state, -2); // Set the metatable of the derived class table to the redirect table
+	lua_pop(state, 1); // Pop the derived class table
 }
 
-int ScriptManager::lua_Creature_getHealth() {
-	Creature* creature = popCreature();
-	pushInteger(creature->getHealth());
-	return 1;
+///////////////////////////////////////////////////////////////////////////////
+// Register handling functions
+
+void Manager::registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc) {
+	ComposedCallback_ptr func = parseFunctionDeclaration(fdecl);
+	func->func = cfunc;
+	
+	uint32_t function_id = ++function_id_counter;
+	function_map[function_id] = func;
+
+	lua_pushlightuserdata(state, (Manager*)this);
+	lua_pushnumber(state, function_id);
+	lua_pushcclosure(state, luaFunctionCallback, 2);
+
+	lua_setfield(state, LUA_GLOBALSINDEX, func->name.c_str());
 }
 
-int ScriptManager::lua_Creature_getHealthMax() {
-	Creature* creature = popCreature();
-	pushInteger(creature->getMaxHealth());
-	return 1;
+void Manager::registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc) {
+	ComposedCallback_ptr func = parseFunctionDeclaration(fdecl);
+	
+	// Add the hidden "self" parameter
+	ComposedTypeDeclaration ctd;
+	ctd.name = cname;
+	ctd.optional_level = 0;
+	ctd.types.push_back("userdata");
+	func->parameters.insert(func->parameters.begin(), ctd);
+
+	std::string funcname = func->name;
+	func->name = cname + ":" + funcname;
+	func->func = cfunc;
+	
+	uint32_t function_id = ++function_id_counter;
+	function_map[function_id] = func;
+
+	lua_getfield(state, LUA_GLOBALSINDEX, cname.c_str());
+	lua_pushlightuserdata(state, (Manager*)this);
+	lua_pushnumber(state, function_id);
+	lua_pushcclosure(state, luaFunctionCallback, 2);
+
+	lua_setfield(state, -2, funcname.c_str());
+
+	lua_pop(state, 1);
 }

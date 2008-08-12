@@ -19,50 +19,161 @@
 #include "otpch.h"
 
 #include "script event.h"
+#include "script enviroment.h"
+#include "script listener.h"
+#include "script manager.h"
+#include "tools.h"
 
-uint32_t ScriptEvent::eventID_counter = 0;
+#include "creature.h"
 
-ScriptEvent::ScriptEvent() : eventID(++eventID_counter) {
+uint32_t Script::Event::eventID_counter = 0;
+
+using namespace Script;
+
+Event::Event() : eventID(++eventID_counter) {
+	std::ostringstream os;
+	os << "EI_" << eventID; // Event instance tag
+	lua_tag = os.str();
 }
 
-ScriptEvent::~ScriptEvent() {
+Event::~Event() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ScriptEvent_OnSay::ScriptEvent_OnSay(Creature* _speaker, SpeakClass _type, std::string _receiver, std::string _text) {
-	speaker = _speaker;
-	type = _type;
-	text = _text;
-	receiver = _receiver;
+OnSay::Event::Event(Creature* _speaker, SpeakClass& _type, std::string& _receiver, std::string& _text) :
+	speaker(_speaker),
+	type(_type),
+	receiver(_receiver),
+	text(_text)
+{
 }
 
-ScripEvent_OnSay::~ScriptEvent_OnSay() {
+OnSay::Event::~Event() {
 }
 
-ScriptEvent_OnSay::dispatch(ScriptManager& script_system, ScriptEnviroment& enviroment) {
-	SpecificCreatureEventMap& specific_map = enviroment.Specific.OnSay;
-	SpecificCreatureEventMap::iterator creatures_found = specific_map.equal_range(speaker);
+bool OnSay::Event::check_match(const ScriptInformation& info) {
+	std::string match_text = text;
+	if(!info.case_sensitive) {
+		toLowerCaseString(match_text);
+	}
 
-	if(creatures_found != specific_map.end()) {
-		GenericCreatureEventList& specific_list = *creatures_found;
-		for(GenericCreatureEventList::iterator event_iter = specific_list.first;
-				event_iter != specific_list.second;
-				++event_iter)
-		{
-			// Call handler
-			call(script_system, enviroment, *event_iter);
+	switch(info.method) {
+		case FILTER_ALL: 
+			return true;
+		case FILTER_SUBSTRING:
+			return match_text.find(info.filter) != std::string::npos;
+		case FILTER_MATCH_BEGINNING:
+			return match_text.find(info.filter) == 0;
+		case FILTER_EXACT:
+			return match_text == info.filter;
+		default: break;
+	}
+	return false;
+}
+
+bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment, GenericCreatureEventList& specific_list) {
+	for(GenericCreatureEventList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
+
+		// Call handler
+		if(check_match(info)) {
+			if(call(state, enviroment, *event_iter) == true) {
+				// Handled
+				return true;
+			}
 		}
 	}
+	return true;
 }
 
-ScriptEvent_OnSay::call(ScriptManager& script_system, ScriptEnviroment& enviroment, EventListener_ptr listener) {	
-	EventListener_ptr listener = *event_iter;
-	LuaThread_ptr thread = script_system->newEventThread(this, "OnSay");
-	thread->pushEventCallback(listener);
-	thread->pushThing(speaker);
-	thread->pushInteger(type);
-	thread->pushString(receiver);
-	thread->pushString(text);
-	thread->run();
+bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	SpecificCreatureEventMap& specific_map = enviroment.Specific.OnSay;
+	SpecificCreatureEventMap::iterator creatures_found = specific_map.find(speaker);
+	
+	if(creatures_found != specific_map.end()) {
+		if(dispatch(state, enviroment, creatures_found->second)) {
+			return true;
+		}
+	}
+	return dispatch(state, enviroment, enviroment.Generic.OnSay);
+}
+
+bool OnSay::Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) {
+	LuaThread_ptr thread = state.newThread("OnSay");
+
+	// Stack is empty
+	// Push callback
+	thread->pushCallback(listener);
+	
+	if(thread->isNil()) {
+		thread->HandleError("Attempt to call destroyed 'OnSay' listener.");
+		thread->pop();
+		return false;
+	}
+
+	// Push event
+	thread->pushEvent(*this);
+	thread->duplicate();
+	thread->setRegistryItem(lua_tag);
+	
+
+	// Run thread
+	thread->run(1);
+
+	if(thread->ok() == false) {
+		state.pushNil();
+		state.setRegistryItem(lua_tag);
+		return false;
+	}
+
+	// Retrieve event info
+	thread->getRegistryItem(lua_tag);
+
+	thread->getField(-1, "type");
+	if(thread->isNumber()) {
+		type = (SpeakClass)thread->popInteger();
+	} else {
+		thread->HandleError("Event 'OnSay' invalid value of 'type'");
+		thread->pop();
+	}
+
+	thread->getField(-1, "receiver");
+	if(thread->isString()) {
+		receiver = thread->popString();
+	} else {
+		thread->HandleError("Event 'OnSay' invalid value of 'receiver'");
+		thread->pop();
+	}
+
+	thread->getField(-1, "text");
+	if(thread->isString()) {
+		text = thread->popString();
+	} else {
+		thread->HandleError("Event 'OnSay' invalid value of 'text'");
+		thread->pop();
+	}
+	
+	thread->pushNil();
+	thread->setRegistryItem(lua_tag);
+	thread->pop(); // pop event table, will be garbage collected as we cleared the registry from it
+
+	return true;
+}
+
+void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	//std::cout << "pushing instance" << std::endl;
+	state.pushClassTableInstance("OnSayEvent");
+	state.pushThing(speaker);
+	state.setField(-2, "speaker");
+	state.setField(-1, "type", int32_t(type));
+	state.setField(-1, "receiver", receiver);
+	state.setField(-1, "text", text);
+	//std::cout << state.typeOf() << ":" << state.getStackTop() << std::endl;
+	//std::cout << "endof" << std::endl;
 }

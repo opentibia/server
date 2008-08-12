@@ -132,7 +132,7 @@ void Npc::onCreatureTurn(const Creature* creature, uint32_t stackpos)
 	Creature::onCreatureTurn(creature, stackpos);
 }
 
-void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+void Npc::onCreatureSay(const Creature* creature, SpeakClass type, const std::string& text)
 {
 	if(creature->getID() == this->getID())
 		return;

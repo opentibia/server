@@ -18,26 +18,20 @@
 
 #include "otpch.h"
 
-#include "script enviroment.h"
+#include "script listener.h"
+#include "script manager.h"
 
-#include "thing.h"
-#include "item.h"
-#include "container.h"
-#include "player.h"
-#include "creature.h"
-#include "player.h"
+uint32_t Script::Listener::ID_counter = 0;
 
 using namespace Script;
 
-Enviroment::Enviroment() {
+Listener::Listener(const std::string& name, const boost::any& data, Manager& manager) : ID(++ID_counter), active(true), name(name), data(data), manager(manager) {
+	std::ostringstream os;
+	os << "Listener_" << name << "_" << ID;
+	datatag = os.str();
 }
 
-Enviroment::~Enviroment() {
-}
-
-void Enviroment::cleanup() {
-	object_map.clear();
-	objectID_counter = 0;
-	Specific.OnSay.clear();
-	Generic.OnSay.clear();
+Listener::~Listener() {
+	manager.pushNil();
+	manager.setRegistryItem(getLuaTag());
 }
