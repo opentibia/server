@@ -29,6 +29,7 @@
 #include <fstream>
 #include <ctime>
 #include <boost/pool/pool.hpp>
+#include <boost/thread.hpp>
 
 #include "definitions.h"
 

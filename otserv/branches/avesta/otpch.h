@@ -32,6 +32,13 @@
 #include <vector>
 #include <map>
 #include <string>
+//lua
+extern "C"
+{
+	#include <lua.h>
+	#include <lauxlib.h>
+	#include <lualib.h>
+}
 //otserv
 #include "thing.h"
 

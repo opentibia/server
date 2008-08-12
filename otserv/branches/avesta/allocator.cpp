@@ -23,8 +23,6 @@
 
 #include "allocator.h"
 
-#include <boost/thread.hpp>
-
 //normal new/delete
 void* operator new(size_t bytes)
 {
