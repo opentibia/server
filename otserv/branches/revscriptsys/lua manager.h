@@ -186,6 +186,12 @@ public:
 	int lua_Creature_getOrientation();
 	int lua_Creature_getHealth();
 	int lua_Creature_getHealthMax();
+	// - - Player
+	int lua_Player_setStorageValue();
+	int lua_Player_getStorageValue();
+
+	// - Game
+	int lua_sendMagicEffect();
 
 protected:
 	virtual Script::Manager* getManager() = 0;

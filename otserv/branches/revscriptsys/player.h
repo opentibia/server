@@ -89,7 +89,7 @@ enum tradestate_t {
 typedef std::pair<uint32_t, Container*> containervector_pair;
 typedef std::vector<containervector_pair> ContainerVector;
 typedef std::map<uint32_t, Depot*> DepotMap;
-typedef std::map<uint32_t, int32_t> StorageMap;
+typedef std::map<std::string, std::string> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
 typedef std::list<std::string> LearnedInstantSpellList;
@@ -159,9 +159,8 @@ public:
 	Container* getContainer(uint32_t cid);
 	bool canOpenCorpse(uint32_t ownerId);
 
-	void addStorageValue(const uint32_t key, const int32_t value);
-	bool getStorageValue(const uint32_t key, int32_t& value) const;
-	void genReservedStorageRange();
+	void addStorageValue(const std::string& key, const std::string& value);
+	bool getStorageValue(const std::string& key, std::string& value) const;
 
 	bool withdrawMoney(uint32_t amount);
 	bool depositMoney(uint32_t amount);

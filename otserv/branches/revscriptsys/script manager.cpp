@@ -49,7 +49,8 @@ int Manager::luaFunctionCallback(lua_State* L) {
 	LuaState* interface = NULL;
 	if(L == manager->state) {
 		interface = manager;
-	} else {
+	}
+	else {
 		LuaThread_ptr p = manager->threads[L];
 		interface = p.get();
 	}
@@ -78,7 +79,8 @@ int Manager::luaFunctionCallback(lua_State* L) {
 				if(argument_count < parsed_argument_count) {
 					throw Script::Error("Too few arguments passed to function " + cc->name);
 				}
-			} else {
+			}
+			else {
 				// Optional argument
 				if(argument_count < parsed_argument_count) {
 					// Optional argument!
@@ -198,7 +200,8 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 	assert(s.size() > 0);
 	if(s[0] == ')') {
 		// Do nothing
-	} else {
+	}
+	else {
 		if(s[0] == '[') {
 			optional_level += 1;
 			s.erase(s.begin());
@@ -219,13 +222,15 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 
 			if(s[0] == ',') {
 				s.erase(s.begin());
-			} else if(s[0] == '[')  {
+			}
+			else if(s[0] == '[')  {
 				s.erase(s.begin());
 				parseWhitespace(s);
 				assert(s.size() > 0);
 				assert(s[0]  == ',');
 				optional_level += 1;
-			} else if(s[0] == ']') {
+			}
+			else if(s[0] == ']') {
 				assert(optional_level > 0);
 				while(optional_level > 0) {
 					// After a ']' only another ']' can follow
@@ -238,7 +243,8 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 				// After ]]]] the declaration must end
 				assert(s[0] == ')');
 				break;
-			} else if(s[0] == ')') {
+			}
+			else if(s[0] == ')') {
 				// There must be an equal amount of [ and ]
 				assert(optional_level == 0);
 				break;
@@ -280,8 +286,18 @@ Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 	ComposedTypeDeclaration ctd;
 	while(true) {
 		std::string type = parseIdentifier(s);
-		if(type == "int") type = "number";
+		ctd.type_name = type;
 		// Argument must be a valid lua type
+
+		// Adjust custom types
+		if(type == "int" || type == "float") {
+			type = "number";
+		}
+		if(type == "position") {
+			type = "table";
+		}
+
+		// Checked on server start
 		assert(
 			type == "boolean" ||
 			type == "number" ||
@@ -291,6 +307,7 @@ Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 			type == "thread" ||
 			type == "table"
 			);
+
 		ctd.types.push_back(type);
 		parseWhitespace(s);
 		if(s[0] != '|') {

@@ -31,7 +31,11 @@ Listener::Listener(const std::string& name, const boost::any& data, Manager& man
 	datatag = os.str();
 }
 
-Listener::~Listener() {
+void Listener::deactive() {
+	active = false;
 	manager.pushNil();
 	manager.setRegistryItem(getLuaTag());
+}
+
+Listener::~Listener() {
 }

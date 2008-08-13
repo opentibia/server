@@ -6,7 +6,7 @@ function otstd.Commands.MoveForward.Handler(event)
 	
 	local param = event.text:sub(6)
 	
-	if #param == 0 then
+	if #param == 0 or tonumber(param) == nil then
 		return
 	end
 	
@@ -22,7 +22,10 @@ function otstd.Commands.MoveForward.Handler(event)
 		return
 	end
 	
-	event.speaker:moveTo(pos)
+	if event.speaker:moveTo(pos) then
+		--sendMagicEffect(old_pos, CONST_ME_TELEPORT)
+		sendMagicEffect(pos, CONST_ME_TELEPORT)
+	end
 	
 	event.text = "" -- Don't display a message
 end

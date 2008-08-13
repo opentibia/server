@@ -246,11 +246,11 @@ void LuaState::pushEvent(Script::Event& event) {
 void LuaState::pushPosition(const Position& pos) {
 	newTable();
 	pushInteger(pos.x);
-	setField(2, "x");
+	setField(-2, "x");
 	pushInteger(pos.y);
-	setField(2, "y");
+	setField(-2, "y");
 	pushInteger(pos.z);
-	setField(2, "z");
+	setField(-2, "z");
 }
 
 void LuaState::pushThing(Thing* thing) {
@@ -313,6 +313,7 @@ Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	}
 
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
+	pop();
 	Thing* thing = enviroment.getThing(*objid);
 	if(!thing) HandleError(mode, "Object does not exist in object list.");
 
@@ -325,6 +326,16 @@ Creature* LuaState::popCreature(Script::ErrorMode mode /* = Script::ERROR_THROW 
 		Creature* c = t->getCreature();
 		if(!c) HandleError(mode, "Object is not a creature.");
 		return c;
+	}
+	return NULL;
+}
+
+Player* LuaState::popPlayer(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	Creature* c = popCreature(mode);
+	if(c) {
+		Player* p = c->getPlayer();
+		if(!p) HandleError(mode, "Object is not a player.");
+		return p;
 	}
 	return NULL;
 }

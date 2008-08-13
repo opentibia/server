@@ -96,7 +96,7 @@ namespace Script {
 	/* To add a new event
 	 * 1. Create the event class
 	 * 2. Expose a registerListener function to lua
-	 * 3. Add the class to lua_stopListener
+	 * 3. Add the class to Enviroment::stopListener
 	 * 4. Add callback from an arbitrary location in otserv source
 	 */
 }

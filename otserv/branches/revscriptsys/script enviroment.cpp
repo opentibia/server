@@ -19,13 +19,7 @@
 #include "otpch.h"
 
 #include "script enviroment.h"
-
-#include "thing.h"
-#include "item.h"
-#include "container.h"
-#include "player.h"
-#include "creature.h"
-#include "player.h"
+#include "script listener.h"
 
 using namespace Script;
 
@@ -40,4 +34,82 @@ void Enviroment::cleanup() {
 	objectID_counter = 0;
 	Specific.OnSay.clear();
 	Generic.OnSay.clear();
+}
+
+void Enviroment::cleanupUnusedListeners(GenericCreatureEventList& list) {
+	for(GenericCreatureEventList::iterator giter = list.begin(),
+		gend = list.end();
+		giter != gend;)
+	{
+		if((*giter)->isActive() == false) {
+			giter = list.erase(giter);
+		} else ++giter;
+	}
+}
+
+void Enviroment::cleanupUnusedListeners(SpecificCreatureEventMap& map) {
+	for(SpecificCreatureEventMap::iterator siter = map.begin(),
+		send = map.end();
+		siter != send;
+		++siter)
+	{
+		cleanupUnusedListeners(siter->second);
+	}
+}
+
+void Enviroment::cleanupUnusedListeners() {
+	cleanupUnusedListeners(Specific.OnSay);
+	cleanupUnusedListeners(Generic.OnSay);
+}
+
+bool Enviroment::stopListener(GenericCreatureEventList& list, const std::string& tag) {
+	for(GenericCreatureEventList::iterator giter = list.begin(),
+		gend = list.end();
+		giter != gend;
+		++giter)
+	{
+		if((*giter)->getLuaTag() == tag && (*giter)->isActive()) {
+			(*giter)->deactive();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Enviroment::stopListener(SpecificCreatureEventMap& map, const std::string& tag) {
+	for(SpecificCreatureEventMap::iterator siter = map.begin(),
+		send = map.end();
+		siter != send;
+		++siter)
+	{
+		GenericCreatureEventList& li = siter->second;
+		if(stopListener(li, tag))
+			return true;
+	}
+	return false;
+}
+
+bool Enviroment::stopListener(const std::string& tag) {
+	size_t _pos = tag.find("_") + 1;
+	if(_pos == std::string::npos) {
+		return false;
+	}
+	size_t _2pos = tag.find("_", _pos);
+	if(_2pos == std::string::npos) {
+		return false;
+	}
+	std::string type = tag.substr(_pos, _2pos - _pos);
+
+	bool found = false;
+	if(type == "OnSay") {
+		found =
+			stopListener(Specific.OnSay, tag) ||
+			stopListener(Generic.OnSay, tag);
+	}
+
+	return found;
+}
+
+bool Enviroment::stopListener(Script::Listener* listener) {
+	return stopListener(listener->getLuaTag());
 }

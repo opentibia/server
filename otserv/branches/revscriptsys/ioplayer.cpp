@@ -317,9 +317,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	query << "SELECT `key`, `value` FROM `player_storage` WHERE `player_id` = " << player->getGUID();
 	if((result = db->storeQuery(query.str()))){
 		do{
-			uint32_t key = result->getDataInt("key");
-			int32_t value = result->getDataInt("value");
-			player->addStorageValue(key,value);
+			std::string key = result->getDataString("key");
+			std::string value = result->getDataString("value");
+			player->addStorageValue(key, value);
 		}while(result->next());
 		db->freeResult(result);
 	}
@@ -614,9 +614,8 @@ bool IOPlayer::savePlayer(Player* player)
 
 	stmt.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
 
-	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
-		query << player->getGUID() << ", " << cit->first << ", " << cit->second;
+		query << player->getGUID() << ", " << db->escapeString(cit->first) << ", " << db->escapeString(cit->second);
 
 		if(!stmt.addRow(query)){
 			return false;

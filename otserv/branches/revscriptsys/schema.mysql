@@ -98,8 +98,8 @@ CREATE TABLE `player_spells` (
 
 CREATE TABLE `player_storage` (
     `player_id` INT UNSIGNED NOT NULL,
-    `key` INT NOT NULL,
-    `value` INT NOT NULL,
+    `key` TEXT NOT NULL,
+    `value` TEXT NOT NULL,
     FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 

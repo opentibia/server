@@ -138,7 +138,8 @@ bool OnSay::Event::call(Manager& state, Enviroment& enviroment, Listener_ptr lis
 	thread->getField(-1, "type");
 	if(thread->isNumber()) {
 		type = (SpeakClass)thread->popInteger();
-	} else {
+	}
+	else {
 		thread->HandleError("Event 'OnSay' invalid value of 'type'");
 		thread->pop();
 	}
@@ -146,7 +147,8 @@ bool OnSay::Event::call(Manager& state, Enviroment& enviroment, Listener_ptr lis
 	thread->getField(-1, "receiver");
 	if(thread->isString()) {
 		receiver = thread->popString();
-	} else {
+	}
+	else {
 		thread->HandleError("Event 'OnSay' invalid value of 'receiver'");
 		thread->pop();
 	}
@@ -154,7 +156,8 @@ bool OnSay::Event::call(Manager& state, Enviroment& enviroment, Listener_ptr lis
 	thread->getField(-1, "text");
 	if(thread->isString()) {
 		text = thread->popString();
-	} else {
+	} 
+	else {
 		thread->HandleError("Event 'OnSay' invalid value of 'text'");
 		thread->pop();
 	}

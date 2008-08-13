@@ -812,31 +812,12 @@ void Player::dropLoot(Container* corpse)
 	}
 }
 
-void Player::addStorageValue(const uint32_t key, const int32_t value)
+void Player::addStorageValue(const std::string& key, const std::string& value)
 {
-	if(IS_IN_KEYRANGE(key, RESERVED_RANGE)){
-		if(IS_IN_KEYRANGE(key, OUTFITS_RANGE)){
-			Outfit outfit;
-			outfit.looktype = value >> 16;
-			outfit.addons = value & 0xFF;
-			if(outfit.addons > 3){
-				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int)(value & 0xFF) << " player: " << getName() << std::endl;
-			}
-			else{
-				m_playerOutfits.addOutfit(outfit);
-			}
-		}
-		else{
-			//warning
-			std::cout << "Warning: unknown reserved key: " << key << " player: " << getName() << std::endl;
-		}
-	}
-	else{
-		storageMap[key] = value;
-	}
+	storageMap[key] = value;
 }
 
-bool Player::getStorageValue(const uint32_t key, int32_t& value) const
+bool Player::getStorageValue(const std::string& key, std::string& value) const
 {
 	StorageMap::const_iterator it;
 	it = storageMap.find(key);
@@ -844,10 +825,7 @@ bool Player::getStorageValue(const uint32_t key, int32_t& value) const
 		value = it->second;
 		return true;
 	}
-	else{
-		value = 0;
-		return false;
-	}
+	return false;
 }
 
 bool Player::canSee(const Position& pos) const
@@ -3727,32 +3705,6 @@ bool Player::canLogout()
 	}
 
 	return true;
-}
-
-
-void Player::genReservedStorageRange()
-{
-	uint32_t base_key;
-	//generate outfits range
-	base_key = PSTRG_OUTFITS_RANGE_START + 1;
-
-	const OutfitList& global_outfits = Outfits::getInstance()->getOutfitList(sex);
-
-	const OutfitListType& outfits = m_playerOutfits.getOutfits();
-	OutfitListType::const_iterator it;
-	for(it = outfits.begin(); it != outfits.end(); ++it){
-		uint32_t looktype = (*it)->looktype;
-		uint32_t addons = (*it)->addons;
-		if(!global_outfits.isInList(looktype, addons)){
-			int32_t value = (looktype << 16) | (addons & 0xFF);
-			storageMap[base_key] = value;
-			base_key++;
-			if(base_key > PSTRG_OUTFITS_RANGE_START + PSTRG_OUTFITS_RANGE_SIZE){
-				std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 outfits!." << std::endl;
-				break;
-			}
-		}
-	}
 }
 
 void Player::addOutfit(uint32_t _looktype, uint32_t _addons)

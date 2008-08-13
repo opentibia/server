@@ -38,7 +38,7 @@ namespace Script {
 		const boost::any& getData() const;
 		
 		bool isActive() const {return active;}
-		void deactive() {active = false;}
+		void deactive();
 
 	protected:
 		static uint32_t ID_counter;

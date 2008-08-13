@@ -99,6 +99,7 @@ typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 
 #define EVENT_LIGHTINTERVAL  10000
 #define EVENT_DECAYINTERVAL  10000
+#define EVENT_SCRIPT_CLEANUP_INTERVAL  90000
 
 /**
   * Main Game class.
@@ -124,6 +125,11 @@ public:
 	* \return bool true on success, false on error
 	*/
 	bool loadScripts();
+
+	/**
+	* Cleans up script handles etc.
+	*/
+	void scriptCleanup();
 
 	/**
 	  * Get the map size - info purpose only

@@ -51,8 +51,17 @@ namespace Script {
 		// If the object is not scripted already, it will be added
 		Thing* getThing(ObjectID id);
 		bool removeObject(ObjectID id);
+		bool removeThing(Thing* thing);
 
 	public: // Event maps
+
+		// Listener API
+		// Cleanup must be called when no scripts are running as it will invalidate the listener maps
+		void cleanupUnusedListeners();
+
+		bool stopListener(Listener* listener);
+		bool stopListener(const std::string& tag);
+
 		struct {
 			SpecificCreatureEventMap OnSay;
 		} Specific;
@@ -60,6 +69,11 @@ namespace Script {
 			GenericCreatureEventList OnSay;
 		} Generic;
 	protected:
+		bool stopListener(GenericCreatureEventList& list, const std::string& tag);
+		bool stopListener(SpecificCreatureEventMap& map, const std::string& tag);
+		void cleanupUnusedListeners(GenericCreatureEventList& list);
+		void cleanupUnusedListeners(SpecificCreatureEventMap& map);
+
 		ObjectID objectID_counter;
 		ObjectMap object_map;
 
@@ -92,6 +106,15 @@ namespace Script {
 			return false;
 		}
 		object_map.left.erase(id_iter);
+		return true;
+	}
+
+	inline bool Enviroment::removeThing(Thing* thing) {
+		ObjectMap::right_iterator thing_iter = object_map.right.find(thing);
+		if(thing_iter == object_map.right.end()) {
+			return false;
+		}
+		object_map.right.erase(thing_iter);
 		return true;
 	}
 }

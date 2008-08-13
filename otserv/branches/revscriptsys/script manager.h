@@ -46,6 +46,7 @@ namespace Script {
 
 		struct ComposedTypeDeclaration {
 			std::string name;
+			std::string type_name;
 			std::vector<std::string> types;
 			int optional_level;
 		};

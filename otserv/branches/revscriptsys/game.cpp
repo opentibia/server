@@ -103,6 +103,9 @@ Game::Game()
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
 		boost::bind(&Game::checkDecay, this)));
+
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_CLEANUP_INTERVAL,
+		boost::bind(&Game::scriptCleanup, this)));
 }
 
 Game::~Game()
@@ -213,6 +216,13 @@ bool Game::loadScripts() {
 		return false;
 	}
 	return true;
+}
+
+void Game::scriptCleanup() {
+	script_enviroment->cleanupUnusedListeners();
+
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_CLEANUP_INTERVAL,
+		boost::bind(&Game::scriptCleanup, this)));
 }
 
 void Game::refreshMap()
@@ -4544,6 +4554,7 @@ void Game::cleanup()
 {
 	//free memory
 	for(std::vector<Thing*>::iterator it = ToReleaseThings.begin(); it != ToReleaseThings.end(); ++it){
+		script_enviroment->removeThing(*it);
 		(*it)->releaseThing2();
 	}
 
