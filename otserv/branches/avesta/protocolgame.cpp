@@ -343,6 +343,7 @@ bool ProtocolGame::login(const std::string& name)
 		}
 
 		if(_player->isOnline()){
+			g_chat.removeUserFromAllChannels(_player);
 			_player->disconnect();
 			_player->isConnecting = true;
 			eventConnect = Scheduler::getScheduler().addEvent(
@@ -696,7 +697,7 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0x9C: //gm closes report
-			parseCloseRuleViolation(msg);
+		parseCloseRuleViolation(msg);
 		break;
 
 	case 0x9D: //player cancels report
