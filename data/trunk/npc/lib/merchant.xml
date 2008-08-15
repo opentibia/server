@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<interaction>
+  <!--armor list-->
+  <itemlist listid="armor">
+    <item keywords="brass;armor" id="2465" sellprice="200" buyprice="200"/>
+    <item keywords="golden;armor" id="2466" sellprice="200" buyprice="200"/>
+    <item keywords="leather;armor" id="2467" sellprice="10" buyprice="100"/>
+    <item keywords="magic;plate;armor" id="2472" sellprice="50000" buyprice="100"/>
+  </itemlist>
+
+  <itemlist listid="helmet">
+    <item keywords="crown" id="2128" sellprice="100000" buyprice="1000"/>
+    <item keywords="steel;helmet" id="2457" sellprice="165" buyprice="1000"/>
+    <item keywords="demon;helmet" id="2493" sellprice="1000" buyprice="200"/>
+    <item keywords="horned;helmet" id="2496" sellprice="10" buyprice="300"/>
+    <item keywords="mystic;turban" id="2663" sellprice="200" buyprice="5000"/>
+  </itemlist>
+
+  <!--food list-->
+  <itemlist listid="food">
+    <item keywords="meat" id="2666" sellprice="8" buyprice="2"/>
+    <item keywords="ham" id="2671" sellprice="10" buyprice="2"/>
+    <item keywords="dragon;ham" id="2672" sellprice="20" buyprice="5"/>
+  </itemlist>
+
+  <!--tapestry list-->
+  <itemlist listid="tapestry">
+    <item keywords="purple;tapestry" id="1857" sellprice="40" buyprice="10"/>
+    <item keywords="green;tapestry" id="1860" sellprice="40" buyprice="10"/>
+    <item keywords="yellow;tapestry" id="1863" sellprice="40" buyprice="10"/>
+    <item keywords="orange;tapestry" id="1866" sellprice="40" buyprice="10"/>
+    <item keywords="red;tapestry" id="1869" sellprice="40" buyprice="10"/>
+  </itemlist>
+
+  <!--vial list-->
+  <itemlist listid="vials">
+    <!--If no name tag is used the default name from items.xml is used.-->
+    <!--With fluid containers it would be "vial", so we override that description here-->
+    <item keywords="vial;water" id="2006" subtype="1" sellprice="100" name="a vial of water" pname="vials of water"/>
+    <item keywords="vial;blood" id="2006" subtype="2" sellprice="100" name="a vial of blood" pname="vials of blood"/>
+    <item keywords="vial;beer" id="2006" subtype="3" sellprice="100" name="a vial of beer" pname="vials of beer"/>
+    <item keywords="vial;slime" id="2006" subtype="4" sellprice="100" name="a vial of slime" pname="vials of slime"/>
+    <item keywords="vial;lemonade" id="2006" subtype="5" sellprice="100" name="a vial of lemonade" pname="vials of lemonade"/>
+  </itemlist>
+
+  <!--backpack list-->
+  <itemlist listid="backpack">
+    <!--If no name tag is used the default name from items.xml is used.-->
+    <!--With backpacks it would be just "backpack" regardless of color, so we override that description here-->
+    <item keywords="brown;backpack" id="1988" sellprice="20" buyprice="40" name="a brown backpack" pname="brown backpacks"/>
+    <item keywords="green;backpack" id="1998" sellprice="20" buyprice="40" name="a green backpack" pname="green backpacks"/>
+    <item keywords="red;backpack" id="2000" sellprice="20" buyprice="40" name="a red backpack" pname="red backpacks"/>
+    <item keywords="purple;backpack" id="2001" sellprice="20" buyprice="40" name="a purple backpack" pname="purple backpacks"/>
+    <item keywords="blue;backpack" id="2002" sellprice="20" buyprice="40" name="a blue backpack" pname="blue backpacks"/>
+    <item keywords="yellow;backpack" id="2004" sellprice="20" buyprice="40" name="a yellow backpack" pname="green backpacks"/>
+  </itemlist>
+
+  <!-- Rune list -->
+  <itemlist listid="runes">
+    <!--If no name tag is used the default name from items.xml is used.-->
+    <!--With runes it would be "rune spell", so we override that description here-->
+    <item keywords="sudden;death" id="2268" subtype="100" sellprice="600" name="a sudden death rune" pname="sudden death runes"/>
+    <item keywords="heavy;magic;missile" id="2311" sellprice="400" name="a heavy magic missile" pname="heavy magic missiles"/>
+    <item keywords="ultimate;healing;rune" id="2273" sellprice="400" name="an ultimate healing rune" pname="ultimate healing runes"/>
+  </itemlist>
+
+</interaction>
