@@ -48,7 +48,7 @@ void BanManager::loadSettings()
 
 bool BanManager::clearTemporaryBans() {
 	Database* db = Database::instance();
-	std::ostringstream query;
+	DBQuery query;
 	query << "UPDATE `bans` SET `active` = 0 WHERE `expires` = 0";
 	return db->executeQuery(query.str());
 }
@@ -265,10 +265,10 @@ void BanManager::addIpBan(uint32_t ip, uint32_t mask, uint32_t time, uint32_t ad
 
 	Database* db = Database::instance();
 	DBInsert stmt(db);
+	DBQuery query;
 
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `param`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
 
-	std::ostringstream query;
 	query << BAN_IPADDRESS << ", " << ip << ", " << mask << ", " << time << ", " << std::time(NULL) << ", " << adminid << ", " << db->escapeString(comment);
 	if(!stmt.addRow(query.str())){
 		return;
@@ -285,10 +285,10 @@ void BanManager::addPlayerBan(uint32_t playerId, uint32_t time, uint32_t adminid
 
 	Database* db = Database::instance();
 	DBInsert stmt(db);
+	DBQuery query;
 
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
 
-	std::ostringstream query;
 	query << BAN_PLAYER << ", " << playerId << ", " << time << ", " << std::time(NULL) << ", " << adminid << ", " << db->escapeString(comment);
 	if(!stmt.addRow(query.str())){
 		return;
@@ -313,10 +313,10 @@ void BanManager::addAccountBan(uint32_t account, uint32_t time, uint32_t adminid
 
 	Database* db = Database::instance();
 	DBInsert stmt(db);
+	DBQuery query;
 
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
 
-	std::ostringstream query;
 	query << BAN_ACCOUNT << ", " << account << ", " << time << ", " << std::time(NULL) << ", " << adminid << ", " << db->escapeString(comment);
 	if(!stmt.addRow(query.str())){
 		return;
@@ -334,7 +334,7 @@ bool BanManager::removeIpBans(uint32_t ip, uint32_t mask)
 	}
 
 	Database* db = Database::instance();
-	std::ostringstream query;
+	DBQuery query;
 	query << "UPDATE `bans` SET `active` = 0 WHERE `type` = " << BAN_IPADDRESS << " AND (`value` & `param` & " << mask << ") = (" << ip << " & `param` & " << mask << ")" << " AND `active` = 1";
 	return db->executeQuery(query.str());
 }
@@ -346,7 +346,7 @@ bool BanManager::removePlayerBans(uint32_t guid)
 	}
 
 	Database* db = Database::instance();
-	std::ostringstream query;
+	DBQuery query;
 	query << "UPDATE `bans` SET `active` = 0 WHERE `type` = " << BAN_PLAYER << " AND `value` = " << guid << " AND `active` = 1";
 	return db->executeQuery(query.str());
 }
@@ -364,7 +364,7 @@ bool BanManager::removeAccountBans(uint32_t accno)
 		return false;
 	}
 	Database* db = Database::instance();
-	std::ostringstream query;
+	DBQuery query;
 	query << "UPDATE `bans` SET `active` = 0 WHERE `type` = " << BAN_ACCOUNT << " AND `value` = " << accno << " AND `active` = 1";
 	return db->executeQuery(query.str());
 }
