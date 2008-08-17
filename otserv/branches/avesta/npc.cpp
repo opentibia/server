@@ -133,7 +133,7 @@ void Npc::reset()
 	focusCreature = 0;
 	isIdle = true;
 	talkRadius = 2;
-	idleTime = 30;
+	idleTime = 0;
 	idleInterval = 5 * 60;
 	defaultPublic = true;
 
