@@ -111,23 +111,23 @@ void Mailbox::postRemoveNotification(Thing* thing, int32_t index, bool isComplet
 
 bool Mailbox::sendItem(Item* item)
 {
-	std::string reciever = std::string("");
+	std::string receiver = std::string("");
 	uint32_t dp = 0;
 
-	if(!getReceiver(item, reciever, dp)){
+	if(!getReceiver(item, receiver, dp)){
 		return false;
 	}
 
-	if(reciever == "" || dp == 0){ /**No need to continue if its still empty**/
+	if(receiver == "" || dp == 0){ /**No need to continue if its still empty**/
 		return false;
 	}
 	
 	uint32_t guid;
-	if(!IOPlayer::instance()->getGuidByName(guid, reciever)){
+	if(!IOPlayer::instance()->getGuidByName(guid, receiver)){
 		return false;
 	}
 	
-	if(Player* player = g_game.getPlayerByName(reciever)){ 
+	if(Player* player = g_game.getPlayerByName(receiver)){ 
 		Depot* depot = player->getDepot(dp, true);
 
 		if(depot){
@@ -138,12 +138,12 @@ bool Mailbox::sendItem(Item* item)
 			return true;
 		}
 	}
-	else if(IOPlayer::instance()->playerExists(reciever)){
-		Player* player = new Player(reciever, NULL);
+	else if(IOPlayer::instance()->playerExists(receiver)){
+		Player* player = new Player(receiver, NULL);
 		
-		if(!IOPlayer::instance()->loadPlayer(player, reciever)){
+		if(!IOPlayer::instance()->loadPlayer(player, receiver)){
 			#ifdef __DEBUG_MAILBOX__
-			std::cout << "Failure: [Mailbox::sendItem], can not load player: " << reciever << std::endl;
+			std::cout << "Failure: [Mailbox::sendItem], can not load player: " << receiver << std::endl;
 			#endif
 			delete player;
 			return false;
@@ -152,7 +152,7 @@ bool Mailbox::sendItem(Item* item)
 		#ifdef __DEBUG_MAILBOX__
 		std::string playerName = player->getName();
 		if(g_game.getPlayerByName(playerName)){
-			std::cout << "Failure: [Mailbox::sendItem], reciever is online: " << reciever << "," << playerName << std::endl;
+			std::cout << "Failure: [Mailbox::sendItem], receiver is online: " << receiver << "," << playerName << std::endl;
 			delete player;
 			return false;
 		}
