@@ -2432,6 +2432,7 @@ int LuaScriptInterface::luaDoChangeTypeItem(lua_State *L)
 	if(!item){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
 
 	Item* newItem = g_game.transformItem(item, item->getID(), subtype);
