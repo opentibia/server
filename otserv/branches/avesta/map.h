@@ -26,7 +26,8 @@
 #include <map>
 
 #ifdef __DEBUG__
-#define <iostream>
+#include <iostream>
+#include "creature.h"
 #endif //__DEBUG__
 
 #include <boost/shared_ptr.hpp>
