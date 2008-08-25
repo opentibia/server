@@ -25,6 +25,10 @@
 #include <bitset>
 #include <map>
 
+#ifdef __DEBUG__
+#define <iostream>
+#endif //__DEBUG__
+
 #include <boost/shared_ptr.hpp>
 using boost::shared_ptr;
 
@@ -303,10 +307,23 @@ inline void QTreeLeafNode::addCreature(Creature* c) {
 }
 
 inline void QTreeLeafNode::removeCreature(Creature* c) {
-	CreatureVector::iterator iter = std::find(creature_list.begin(), creature_list.end(), c);
-	assert(iter != creature_list.end());
-	std::swap(*iter, creature_list.back());
-	creature_list.pop_back();
+	if(c != NULL) {
+		CreatureVector::iterator iter = std::find(creature_list.begin(), creature_list.end(), c);
+		if(iter != creature_list.end()) {
+			std::swap(*iter, creature_list.back());
+			creature_list.pop_back();
+			// Why is creature_list.erase not used? Performance reasons?
+			// creature_list.erase(iter);
+		}
+#ifdef __DEBUG__
+		else {
+			std::cout << "Warning: attempting to remove creature from a section of the map it does not belong in" << std::endl
+				<<  ((c->getPlayer() ? "Player") : (c->getMonster() ? "Monster") :
+					(c->getNpc() ? "Npc") : "Creature")
+				<< " Name: " << c->getName() << std::endl;
+		}
+#endif
+	}
 }
 
 #endif
