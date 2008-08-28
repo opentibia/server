@@ -57,7 +57,7 @@ CREATE TABLE `players` (
     `loss_mana` INT NOT NULL DEFAULT 10,
     `loss_skills` INT NOT NULL DEFAULT 10,
     `loss_items` INT NOT NULL DEFAULT 10,
-    `rank_id` INT NOT NULL COMMENT 'by this field everything with guilds is done - player has a rank which belongs to certain guild',
+    `rank_id` INT UNSIGNED NOT NULL COMMENT 'by this field everything with guilds is done - player has a rank which belongs to certain guild',
     `town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
     `balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
     PRIMARY KEY (`id`),
