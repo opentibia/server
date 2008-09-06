@@ -1733,7 +1733,13 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 		else{
 			newItem = Item::CreateItem(newId, newCount);
 		}
-
+		if(newItem == NULL) {
+			// Decaying into deprecated item?
+#ifdef __DEBUG__
+			std::cout << "Error: [Game::transformItem] Item of type " << item->getID() << " transforming into invalid type " << newId << std::endl;
+#endif
+			return NULL;
+		}
 		cylinder->__replaceThing(itemIndex, newItem);
 		cylinder->postAddNotification(newItem, itemIndex);
 
