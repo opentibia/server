@@ -69,7 +69,7 @@ bool Npc::canSee(const Position& pos) const
 		return false;
 	}
 
-	return Creature::canSee(getPosition(), pos, Map::maxClientViewportX, Map::maxClientViewportY);
+	return Creature::canSee(getPosition(), pos, Map_maxClientViewportX, Map_maxClientViewportY);
 }
 
 std::string Npc::getDescription(int32_t lookDistance) const

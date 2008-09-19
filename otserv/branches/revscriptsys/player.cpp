@@ -817,6 +817,17 @@ void Player::addStorageValue(const std::string& key, const std::string& value)
 	storageMap[key] = value;
 }
 
+bool Player::eraseStorageValue(const std::string& key)
+{
+	StorageMap::const_iterator it;
+	it = storageMap.find(key);
+	if(it != storageMap.end()){
+		storageMap.erase(it);
+		return true;
+	}
+	return false;
+}
+
 bool Player::getStorageValue(const std::string& key, std::string& value) const
 {
 	StorageMap::const_iterator it;

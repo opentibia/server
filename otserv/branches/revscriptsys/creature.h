@@ -25,11 +25,9 @@
 #include "definitions.h"
 
 #include "templates.h"
-#include "map.h"
 #include "position.h"
 #include "condition.h"
 #include "const.h"
-#include "tile.h"
 #include "enums.h"
 
 #include <list>
@@ -88,8 +86,15 @@ class Container;
 class Player;
 class Monster;
 class Npc;
+class ItemType;
 class Item;
 class Tile;
+namespace Script {
+	class Listener;
+	typedef boost::shared_ptr<Listener> Listener_ptr;
+	typedef boost::weak_ptr<Listener> Listener_wptr;
+	typedef std::vector<Listener_ptr> ListenerList;
+}
 
 #define EVENT_CREATURECOUNT 10
 #define EVENT_CREATURE_THINK_INTERVAL 1000
@@ -191,21 +196,7 @@ public:
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
-	ZoneType_t getZone() const {
-		const Tile* tile = getTile();
-		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
-			return ZONE_PROTECTION;
-		}
-		else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
-			return ZONE_NOPVP;
-		}
-		else if(tile->hasFlag(TILESTATE_PVPZONE)){
-			return ZONE_PVP;
-		}
-		else{
-			return ZONE_NORMAL;
-		}
-	}
+	ZoneType_t getZone() const;
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -338,21 +329,22 @@ public:
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
 	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
-	virtual void setParent(Cylinder* cylinder){
-		_tile = dynamic_cast<Tile*>(cylinder);
-		Thing::setParent(cylinder);
-	}
+	virtual void setParent(Cylinder* cylinder);
 
-	virtual const Position& getPosition() const {return _tile->getTilePosition();}
+	virtual const Position& getPosition() const;
 	virtual Tile* getTile(){return _tile;}
 	virtual const Tile* getTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;
 
 	static bool canSee(const Position& myPos, const Position& pos, uint32_t viewRangeX, uint32_t viewRangeY);
 
+	void addListener(Script::Listener_ptr listener);
+	Script::ListenerList getListeners(Script::ListenerType type);
+	void clearListeners();
+
 protected:
-	static const int32_t mapWalkWidth = Map::maxViewportX * 2 + 1;
-	static const int32_t mapWalkHeight = Map::maxViewportY * 2 + 1;
+	static const int32_t mapWalkWidth = Map_maxViewportX * 2 + 1;
+	static const int32_t mapWalkHeight = Map_maxViewportY * 2 + 1;
 	bool localMapCache[mapWalkHeight][mapWalkWidth];
 
 	virtual bool useCacheMap() const {return false;}
@@ -367,6 +359,8 @@ protected:
 	// this is to allow 0 to represent the special value of not
 	// being stored in any onThink vector
 	size_t checkCreatureVectorIndex;
+
+	Script::ListenerList registered_listeners;
 
 	int32_t health, healthMax;
 	int32_t mana, manaMax;

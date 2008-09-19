@@ -716,8 +716,8 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 		}
 	}
 
-	g_game.getSpectators(list, pos, false, true, maxX + Map::maxViewportX, maxX + Map::maxViewportX,
-		maxY + Map::maxViewportY, maxY + Map::maxViewportY);
+	g_game.getSpectators(list, pos, false, true, maxX + Map_maxViewportX, maxX + Map_maxViewportX,
+		maxY + Map_maxViewportY, maxY + Map_maxViewportY);
 
 	for(std::list<Tile*>::iterator it = tileList.begin(); it != tileList.end(); ++it){
 		bool bContinue = true;

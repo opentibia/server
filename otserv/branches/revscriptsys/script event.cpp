@@ -72,8 +72,11 @@ bool OnSay::Event::check_match(const ScriptInformation& info) {
 	return false;
 }
 
-bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment, GenericCreatureEventList& specific_list) {
-	for(GenericCreatureEventList::iterator event_iter = specific_list.begin();
+bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment, ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(ListenerList::iterator event_iter = specific_list.begin();
 		event_iter != specific_list.end();
 		++event_iter)
 	{
@@ -83,24 +86,19 @@ bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment, GenericCreat
 
 		// Call handler
 		if(check_match(info)) {
-			if(call(state, enviroment, *event_iter) == true) {
+			if(call(state, enviroment, listener) == true) {
 				// Handled
 				return true;
 			}
 		}
 	}
-	return true;
+	return false;
 }
 
 bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment) {
-	SpecificCreatureEventMap& specific_map = enviroment.Specific.OnSay;
-	SpecificCreatureEventMap::iterator creatures_found = specific_map.find(speaker);
-	
-	if(creatures_found != specific_map.end()) {
-		if(dispatch(state, enviroment, creatures_found->second)) {
-			return true;
-		}
-	}
+	if(dispatch(state, enviroment, speaker->getListeners(ONSAY_LISTENER)))
+		return true;
+
 	return dispatch(state, enviroment, enviroment.Generic.OnSay);
 }
 

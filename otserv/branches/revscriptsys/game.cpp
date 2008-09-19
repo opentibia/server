@@ -3728,7 +3728,7 @@ bool Game::playerContinueReport(Player* player, const std::string& text)
 
 //--
 bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight /*= true*/,
-	int32_t rangex /*= Map::maxClientViewportX*/, int32_t rangey /*= Map::maxClientViewportY*/)
+	int32_t rangex /*= Map_maxClientViewportX*/, int32_t rangey /*= Map_maxClientViewportY*/)
 {
 	return map->canThrowObjectTo(fromPos, toPos, checkLineOfSight, rangex, rangey);
 }
@@ -4554,7 +4554,6 @@ void Game::cleanup()
 {
 	//free memory
 	for(std::vector<Thing*>::iterator it = ToReleaseThings.begin(); it != ToReleaseThings.end(); ++it){
-		script_enviroment->removeThing(*it);
 		(*it)->releaseThing2();
 	}
 
@@ -4572,3 +4571,13 @@ void Game::FreeThing(Thing* thing)
 	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);
 }
+
+/*
+script_enviroment->removeThing(*it);
+Creature* c = (*it)->getCreature();
+if(c) {
+for(ListenerList::iterator iter = c->registered_events.begin(), end = c->registered_events.end(); iter != end; ++iter) {
+script_enviroment->stopListener(*iter);
+}
+}
+*/

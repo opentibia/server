@@ -22,17 +22,19 @@
 #include <boost/bimap.hpp>
 #include <string>
 #include "boost_common.h"
+#include "enums.h"
 
 class Combat;
+class Creature;
 class Thing;
 
 namespace Script {
 	class Listener;
 	typedef boost::shared_ptr<Listener> Listener_ptr;
 	typedef boost::weak_ptr<Listener> Listener_wptr;
+	//typedef boost::shared_ptr<const Listener> Listener_cptr;
 
-	typedef std::vector<Listener_ptr> GenericCreatureEventList;
-	typedef std::map<Creature*, GenericCreatureEventList> SpecificCreatureEventMap;
+	typedef std::vector<Listener_ptr> ListenerList;
 
 	typedef uint64_t ObjectID;
 
@@ -60,19 +62,14 @@ namespace Script {
 		void cleanupUnusedListeners();
 
 		bool stopListener(Listener* listener);
-		bool stopListener(const std::string& tag);
+		bool stopListener(ListenerType type, uint32_t id);
 
 		struct {
-			SpecificCreatureEventMap OnSay;
-		} Specific;
-		struct {
-			GenericCreatureEventList OnSay;
+			ListenerList OnSay;
 		} Generic;
 	protected:
-		bool stopListener(GenericCreatureEventList& list, const std::string& tag);
-		bool stopListener(SpecificCreatureEventMap& map, const std::string& tag);
-		void cleanupUnusedListeners(GenericCreatureEventList& list);
-		void cleanupUnusedListeners(SpecificCreatureEventMap& map);
+		bool stopListener(ListenerList& list, uint32_t id);
+		void cleanupUnusedListeners(ListenerList& list);
 
 		ObjectID objectID_counter;
 		ObjectMap object_map;

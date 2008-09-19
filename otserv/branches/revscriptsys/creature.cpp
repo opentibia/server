@@ -138,7 +138,7 @@ bool Creature::canSee(const Position& myPos, const Position& pos, uint32_t viewR
 
 bool Creature::canSee(const Position& pos) const
 {
-	return canSee(getPosition(), pos, Map::maxViewportX, Map::maxViewportY);
+	return canSee(getPosition(), pos, Map_maxViewportX, Map_maxViewportY);
 }
 
 bool Creature::canSeeCreature(const Creature* creature) const
@@ -870,6 +870,15 @@ void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 	changeMana(-manaLoss);
 }
 
+void Creature::setParent(Cylinder* cylinder){
+	_tile = dynamic_cast<Tile*>(cylinder);
+	Thing::setParent(cylinder);
+}
+
+const Position& Creature::getPosition() const {
+	return _tile->getTilePosition();
+}
+
 BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 	bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
@@ -955,6 +964,22 @@ bool Creature::setAttackedCreature(Creature* creature)
 	}
 
 	return true;
+}
+
+ZoneType_t Creature::getZone() const {
+	const Tile* tile = getTile();
+	if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
+		return ZONE_PROTECTION;
+	}
+	else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
+		return ZONE_NOPVP;
+	}
+	else if(tile->hasFlag(TILESTATE_PVPZONE)){
+		return ZONE_PVP;
+	}
+	else{
+		return ZONE_NORMAL;
+	}
 }
 
 void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
@@ -1496,3 +1521,14 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 	return false;
 }
 
+void Creature::addListener(Script::Listener_ptr listener) {
+	registered_listeners.push_back(listener);
+}
+
+Script::ListenerList Creature::getListeners(Script::ListenerType type) {
+	Script::ListenerList li;
+	for(Script::ListenerList::iterator i = registered_listeners.begin(), end = registered_listeners.end(); i != end; ++i) {
+		li.push_back(*i);
+	}
+	return li;
+}

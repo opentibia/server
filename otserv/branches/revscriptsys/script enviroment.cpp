@@ -32,12 +32,11 @@ Enviroment::~Enviroment() {
 void Enviroment::cleanup() {
 	object_map.clear();
 	objectID_counter = 0;
-	Specific.OnSay.clear();
 	Generic.OnSay.clear();
 }
 
-void Enviroment::cleanupUnusedListeners(GenericCreatureEventList& list) {
-	for(GenericCreatureEventList::iterator giter = list.begin(),
+void Enviroment::cleanupUnusedListeners(ListenerList& list) {
+	for(ListenerList::iterator giter = list.begin(),
 		gend = list.end();
 		giter != gend;)
 	{
@@ -47,28 +46,17 @@ void Enviroment::cleanupUnusedListeners(GenericCreatureEventList& list) {
 	}
 }
 
-void Enviroment::cleanupUnusedListeners(SpecificCreatureEventMap& map) {
-	for(SpecificCreatureEventMap::iterator siter = map.begin(),
-		send = map.end();
-		siter != send;
-		++siter)
-	{
-		cleanupUnusedListeners(siter->second);
-	}
-}
-
 void Enviroment::cleanupUnusedListeners() {
-	cleanupUnusedListeners(Specific.OnSay);
 	cleanupUnusedListeners(Generic.OnSay);
 }
 
-bool Enviroment::stopListener(GenericCreatureEventList& list, const std::string& tag) {
-	for(GenericCreatureEventList::iterator giter = list.begin(),
+bool Enviroment::stopListener(ListenerList& list, uint32_t id) {
+	for(ListenerList::iterator giter = list.begin(),
 		gend = list.end();
 		giter != gend;
 		++giter)
 	{
-		if((*giter)->getLuaTag() == tag && (*giter)->isActive()) {
+		if((*giter)->getID() == id && (*giter)->isActive()) {
 			(*giter)->deactive();
 			return true;
 		}
@@ -76,40 +64,17 @@ bool Enviroment::stopListener(GenericCreatureEventList& list, const std::string&
 	return false;
 }
 
-bool Enviroment::stopListener(SpecificCreatureEventMap& map, const std::string& tag) {
-	for(SpecificCreatureEventMap::iterator siter = map.begin(),
-		send = map.end();
-		siter != send;
-		++siter)
-	{
-		GenericCreatureEventList& li = siter->second;
-		if(stopListener(li, tag))
-			return true;
+bool Enviroment::stopListener(ListenerType type, uint32_t id) {
+	if(type == ONSAY_LISTENER) {
+		if(stopListener(Generic.OnSay, id)) return true;
 	}
+
+	// Try creatures
+	;
+
 	return false;
 }
 
-bool Enviroment::stopListener(const std::string& tag) {
-	size_t _pos = tag.find("_") + 1;
-	if(_pos == std::string::npos) {
-		return false;
-	}
-	size_t _2pos = tag.find("_", _pos);
-	if(_2pos == std::string::npos) {
-		return false;
-	}
-	std::string type = tag.substr(_pos, _2pos - _pos);
-
-	bool found = false;
-	if(type == "OnSay") {
-		found =
-			stopListener(Specific.OnSay, tag) ||
-			stopListener(Generic.OnSay, tag);
-	}
-
-	return found;
-}
-
-bool Enviroment::stopListener(Script::Listener* listener) {
-	return stopListener(listener->getLuaTag());
+bool Enviroment::stopListener(Listener* listener) {
+	return stopListener(listener->type(), listener->getID());
 }

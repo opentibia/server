@@ -25,17 +25,23 @@ uint32_t Script::Listener::ID_counter = 0;
 
 using namespace Script;
 
-Listener::Listener(const std::string& name, const boost::any& data, Manager& manager) : ID(++ID_counter), active(true), name(name), data(data), manager(manager) {
+Listener::Listener(ListenerType t, const boost::any& data, Manager& manager) :
+	ID(++ID_counter),
+	active(true),
+	type_(t),
+	data(data),
+	manager(manager)
+{
 	std::ostringstream os;
-	os << "Listener_" << name << "_" << ID;
+	os << "Listener_" << type_ << "_" << ID;
 	datatag = os.str();
+}
+
+Listener::~Listener() {
 }
 
 void Listener::deactive() {
 	active = false;
 	manager.pushNil();
 	manager.setRegistryItem(getLuaTag());
-}
-
-Listener::~Listener() {
 }

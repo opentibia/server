@@ -227,4 +227,10 @@ struct LightInfo{
 	};
 };
 
+namespace Script {
+	enum ListenerType {
+		ONSAY_LISTENER,
+	};
+}
+
 #endif

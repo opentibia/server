@@ -160,11 +160,6 @@ public:
 	Map();
 	~Map();
 
-	static const int32_t maxViewportX = 11;		//min value: maxClientViewportX + 1
-	static const int32_t maxViewportY = 11;		//min value: maxClientViewportY + 1
-	static const int32_t maxClientViewportX = 8;
-	static const int32_t maxClientViewportY = 6;
-
 	/**
 	* Load a map.
 	* \param identifier file/database to load
@@ -219,7 +214,7 @@ public:
 	*	\return The result if you can throw there or not
 	*/
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
-		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
+		int32_t rangex = Map_maxClientViewportX, int32_t rangey = Map_maxClientViewportY);
 
 	/**
 	* Checks if path is clear from fromPos to toPos

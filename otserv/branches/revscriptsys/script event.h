@@ -82,7 +82,7 @@ namespace Script {
 			bool dispatch(Manager& state, Enviroment& enviroment);
 			void push_instance(LuaState& state, Enviroment& enviroment);
 		protected:
-			bool dispatch(Manager& state, Enviroment& enviroment, GenericCreatureEventList& specific_list);
+			bool dispatch(Manager& state, Enviroment& enviroment, ListenerList& specific_list);
 			bool check_match(const ScriptInformation& info);
 			bool call(Manager& state, Enviroment& enviroment, Listener_ptr listener);
 

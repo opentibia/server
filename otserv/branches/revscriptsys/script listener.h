@@ -22,29 +22,38 @@
 #include "boost_common.h"
 #include <boost/any.hpp>
 
+#include "enums.h"
+
 namespace Script {
 	class Manager;
 
 	///////////////////////////////////////////////////////////////////////////////
 	// Event Listener
 
+	// ListenerType is declared in enums.h
+
 	class Listener {
 	public:
 		// Listener MUST be destroyed before the manager
-		Listener(const std::string& name, const boost::any& data, Manager& manager);
+		Listener(ListenerType type, const boost::any& data, Manager& manager);
 		~Listener();
+
+		uint32_t getID() const {return ID;}
 
 		std::string getLuaTag() const;
 		const boost::any& getData() const;
 		
 		bool isActive() const {return active;}
 		void deactive();
-
+		
+		ListenerType type() const {return type_;}
+		static std::string type2name();
+		static ListenerType name2type();
 	protected:
 		static uint32_t ID_counter;
 		uint32_t ID;
 		bool active;
-		std::string name;
+		ListenerType type_;
 		std::string datatag;
 		boost::any data;
 		Manager& manager;

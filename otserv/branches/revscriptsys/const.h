@@ -25,6 +25,12 @@
 
 #define NETWORKMESSAGE_MAXSIZE 15360
 
+
+const int32_t Map_maxViewportX = 11;		//min value: maxClientViewportX + 1
+const int32_t Map_maxViewportY = 11;		//min value: maxClientViewportY + 1
+const int32_t Map_maxClientViewportX = 8;
+const int32_t Map_maxClientViewportY = 6;
+
 enum MagicEffectClasses {
 	NM_ME_DRAW_BLOOD       = 0x00,
 	NM_ME_LOSE_ENERGY      = 0x01,

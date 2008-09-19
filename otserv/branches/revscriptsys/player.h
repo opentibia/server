@@ -160,6 +160,7 @@ public:
 	bool canOpenCorpse(uint32_t ownerId);
 
 	void addStorageValue(const std::string& key, const std::string& value);
+	bool eraseStorageValue(const std::string& key);
 	bool getStorageValue(const std::string& key, std::string& value) const;
 
 	bool withdrawMoney(uint32_t amount);
