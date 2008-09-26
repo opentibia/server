@@ -33,6 +33,7 @@
 #include <mysql/mysql.h>
 #endif
 #include <sstream>
+#include <map>
 
 class DatabaseMySQL : public _Database
 {
