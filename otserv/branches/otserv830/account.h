@@ -33,6 +33,8 @@ public:
 	Account();
 	~Account();
 
+	std::string name;
+
 	uint32_t accnumber;
 
 	uint32_t premDays;

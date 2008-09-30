@@ -10,10 +10,12 @@ CREATE TABLE `groups` (
 
 CREATE TABLE `accounts` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL COMMENT 'Tibia 8.30 and later identify via name rather than id',
     `password` VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL COMMENT 'MD5'*//* VARCHAR(40) NOT NULL COMMENT 'SHA1'*/,
     `email` VARCHAR(255) NOT NULL DEFAULT '',
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+	UNIQUE(`name`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `players` (

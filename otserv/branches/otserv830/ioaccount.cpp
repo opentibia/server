@@ -33,7 +33,7 @@
 
 extern ConfigManager g_config;
 
-Account IOAccount::loadAccount(uint32_t accno)
+Account IOAccount::loadAccount(const std::string& name)
 {
 	Account acc;
 #ifndef __USE_SQL_PREMDAYS__
@@ -46,17 +46,18 @@ Account IOAccount::loadAccount(uint32_t accno)
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `id`, `password` FROM `accounts` WHERE `id` = " << accno;
+	query << "SELECT `name`, `id`, `password` FROM `accounts` WHERE `name` = " << db->escapeString(name);
 	if((result = db->storeQuery(query.str()))){
 		acc.accnumber = result->getDataInt("id");
 		acc.password = result->getDataString("password");
+		acc.name = result->getDataInt("name");
 		db->freeResult(result);
 
 		query.str("");
 #ifndef __USE_SQL_PREMDAYS__
-		query << "SELECT `name`, `premend` FROM `players` WHERE `account_id` = " << accno;
+		query << "SELECT `name`, `premend` FROM `players` WHERE `account_id` = " << acc.accnumber;
 #else
-		query << "SELECT `name`, `premdays` FROM `players` WHERE `account_id` = " << accno;
+		query << "SELECT `name`, `premdays` FROM `players` WHERE `account_id` = " << acc.accnumber;
 #endif
 		if((result = db->storeQuery(query.str()))){
 			do{
@@ -86,13 +87,13 @@ Account IOAccount::loadAccount(uint32_t accno)
 	return acc;
 }
 
-bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string &password)
+bool IOAccount::getPassword(const std::string& accountname, const std::string &name, std::string &password)
 {
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`id` = " << accno << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`name` = " << db->escapeString(accountname) << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
 	if((result = db->storeQuery(query.str()))){
 		password = result->getDataString("password");
 		db->freeResult(result);

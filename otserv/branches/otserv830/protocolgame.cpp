@@ -397,7 +397,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	setXTEAKey(key);
 
 	/*uint8_t isSetGM =*/ msg.GetByte();
-	uint32_t accnumber = msg.GetU32();
+	std::string accname = msg.GetString();
 	const std::string name = msg.GetString();
 	const std::string password = msg.GetString();
 
@@ -422,7 +422,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	std::string acc_pass;
-	if(!(IOAccount::instance()->getPassword(accnumber, name, acc_pass) && passwordTest(password,acc_pass))){
+	if(!(IOAccount::instance()->getPassword(accname, name, acc_pass) && passwordTest(password,acc_pass))){
 		g_bans.addLoginAttempt(getIP(), false);
 		getConnection()->closeConnection();
 		return false;
