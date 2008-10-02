@@ -50,6 +50,12 @@ public:
 		m_outputBufferStart = 2;
 	}
 
+	// 8.3x function
+	void writeChecksum()
+	{
+		*(uint32_t*)(m_MsgBuf + 4) = checksum();
+	}
+
 	void addCryptoHeader()
 	{
 		*(uint16_t*)(m_MsgBuf) = m_MsgSize;

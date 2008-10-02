@@ -25,6 +25,8 @@
 #include "outputmessage.h"
 #include "rsa.h"
 
+#define __DEBUG_CRC__
+
 void Protocol::onSendMessage(OutputMessage* msg)
 {
 	#ifdef __DEBUG_NET_DETAIL__
@@ -33,7 +35,7 @@ void Protocol::onSendMessage(OutputMessage* msg)
 
 	if(!m_rawMessages){
 		msg->writeMessageLength();
-		
+
 		if(m_encryptionEnabled){
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Protocol::onSendMessage - encrypt" << std::endl;
@@ -42,7 +44,7 @@ void Protocol::onSendMessage(OutputMessage* msg)
 			XTEA_encrypt(*msg);
 		}
 	}
-	
+
 	if(msg == m_outputBuffer){
 		m_outputBuffer = NULL;
 	}
@@ -61,6 +63,14 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 
 		XTEA_decrypt(msg);
 	}
+
+	if(msg.getChecksum() != msg.checksum()) {
+		#ifdef __DEBUG_CRC__
+		std::cout << "Protocol::onRecvMessage - checksum mismatch" << std::endl;
+		#endif
+		return; // ignore packet. is this proper?
+	}
+
 	parsePacket(msg);
 }
 

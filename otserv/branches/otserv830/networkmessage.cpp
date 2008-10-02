@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,10 +32,42 @@
 #include "position.h"
 #include "rsa.h"
 
+uint32_t NetworkMessage::checksum()
+{
+    // implementation of adler algorithm as per wikipedia
+    const uint16_t MOD_ADLER=65521;
+    uint8_t* data = ((uint8_t*)m_MsgBuf) + 2;
+    size_t len = m_MsgSize-2;
+
+    uint32_t a = 1, b = 0;
+
+    while (len > 0)
+    {
+        size_t tlen = len > 5552 ? 5552 : len;
+        len -= tlen;
+        do
+        {
+            a += *data++;
+            b += a;
+        } while (--tlen);
+
+        a %= MOD_ADLER;
+        b %= MOD_ADLER;
+    }
+
+    return (b << 16) | a;
+}
+
+uint32_t NetworkMessage::getChecksum()
+{
+	// get the checksum from a recieved message
+	return *(uint32_t*)(&m_MsgBuf[4]);
+}
+
 int32_t NetworkMessage::decodeHeader()
 {
 	return (int32_t)(m_MsgBuf[0] | m_MsgBuf[1] << 8);
-		}
+}
 
 /******************************************************************************/
 std::string NetworkMessage::GetString()
@@ -75,7 +107,7 @@ void NetworkMessage::AddString(const char* value)
 	uint32_t stringlen = (uint32_t)strlen(value);
 	if(!canAdd(stringlen+2) || stringlen > 8192)
 		return;
-	
+
 	AddU16(stringlen);
 	strcpy((char*)(m_MsgBuf + m_ReadPos), value);
 	m_ReadPos += stringlen;
@@ -86,7 +118,7 @@ void NetworkMessage::AddBytes(const char* bytes, uint32_t size)
 {
 	if(!canAdd(size) || size > 8192)
 		return;
-	
+
 	memcpy(m_MsgBuf + m_ReadPos, bytes, size);
 	m_ReadPos += size;
 	m_MsgSize += size;
@@ -96,7 +128,7 @@ void NetworkMessage::AddPaddingBytes(uint32_t n)
 {
 	if(!canAdd(n))
 		return;
-	
+
 	memset((void*)&m_MsgBuf[m_ReadPos], 0x33, n);
 	m_MsgSize = m_MsgSize + n;
 }
