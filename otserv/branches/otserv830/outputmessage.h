@@ -53,7 +53,9 @@ public:
 	// 8.3x function
 	void writeChecksum()
 	{
-		*(uint32_t*)(m_MsgBuf + 4) = checksum();
+		*(uint32_t*)(m_MsgBuf + 2) = checksum();
+		m_MsgSize = m_MsgSize + 4;
+		m_outputBufferStart = 6;
 	}
 
 	void addCryptoHeader()

@@ -35,6 +35,7 @@ void Protocol::onSendMessage(OutputMessage* msg)
 
 	if(!m_rawMessages){
 		msg->writeMessageLength();
+		msg->writeChecksum();
 
 		if(m_encryptionEnabled){
 			#ifdef __DEBUG_NET_DETAIL__

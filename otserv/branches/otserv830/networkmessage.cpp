@@ -61,7 +61,7 @@ uint32_t NetworkMessage::checksum()
 uint32_t NetworkMessage::getChecksum()
 {
 	// get the checksum from a recieved message
-	return *(uint32_t*)(&m_MsgBuf[4]);
+	return *(uint32_t*)(&m_MsgBuf[2]);
 }
 
 int32_t NetworkMessage::decodeHeader()
