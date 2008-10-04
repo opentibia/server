@@ -614,66 +614,43 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 	uint32_t& flags)
 {
-	Tile* destTile = NULL;
+	Tile* destTile = this;
 	*destItem = NULL;
 
 	if(floorChangeDown()){
-		Tile* downTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
+		int dx = getTilePosition().x;
+		int dy = getTilePosition().y;
+		int dz = getTilePosition().z + 1;
+		Tile* downTile = g_game.getTile(dx, dy, dz);
 
 		if(downTile){
-			if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(NORTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
-			}
-			else
+			if(downTile->floorChange(NORTH))
+				dy += 1;
+			if(downTile->floorChange(SOUTH))
+				dy -= 1;
+			if(downTile->floorChange(EAST))
+				dx -= 1;
+			if(downTile->floorChange(WEST))
+				dx += 1;
+			downTile = g_game.getTile(dx, dy, dz);
+			if(downTile)
 				destTile = downTile;
 		}
 	}
 	else if(floorChange()){
-		if(floorChange(NORTH) && floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(NORTH) && floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH) && floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH) && floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(NORTH)){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH)){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z - 1);
-		}
-		else if(floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z - 1);
-		}
+		int dx = getTilePosition().x;
+		int dy = getTilePosition().y;
+		int dz = getTilePosition().z + 1;
+
+		if(destTile->floorChange(NORTH))
+			dy += 1;
+		if(destTile->floorChange(SOUTH))
+			dy -= 1;
+		if(destTile->floorChange(EAST))
+			dx -= 1;
+		if(destTile->floorChange(WEST))
+			dx += 1;
+		destTile = g_game.getTile(dx, dy, dz);
 	}
 
 
