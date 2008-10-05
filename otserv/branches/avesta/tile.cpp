@@ -640,16 +640,16 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 	else if(floorChange()){
 		int dx = getTilePosition().x;
 		int dy = getTilePosition().y;
-		int dz = getTilePosition().z + 1;
+		int dz = getTilePosition().z - 1;
 
 		if(destTile->floorChange(NORTH))
-			dy += 1;
-		if(destTile->floorChange(SOUTH))
 			dy -= 1;
+		if(destTile->floorChange(SOUTH))
+			dy += 1;
 		if(destTile->floorChange(EAST))
-			dx -= 1;
-		if(destTile->floorChange(WEST))
 			dx += 1;
+		if(destTile->floorChange(WEST))
+			dx -= 1;
 		destTile = g_game.getTile(dx, dy, dz);
 	}
 

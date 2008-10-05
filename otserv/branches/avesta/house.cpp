@@ -74,6 +74,20 @@ void House::setHouseOwner(uint32_t guid)
 	if(houseOwner){
 		//send items to depot
 		transferToDepot();
+		
+		PlayerVector to_kick;
+		for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
+			for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
+				Creature* creature = (*it)->__getThing(i)->getCreature();
+				if(creature != NULL && creature->getPlayer())
+					to_kick.push_back(creature->getPlayer());
+			}
+		}
+		while(to_kick.empty() == false) {
+			Player* c = to_kick.back();
+			to_kick.pop_back();
+			kickPlayer(NULL, c->getName());
+		}
 
 		//[ added for beds system
 		// we need to remove players from beds
@@ -130,6 +144,9 @@ void House::updateDoorDescription()
 
 AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
 {
+	if(player == NULL) // By script
+		return HOUSE_OWNER;
+
 	if(player->hasFlag(PlayerFlag_CanEditHouses))
 		return HOUSE_OWNER;
 

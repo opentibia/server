@@ -1144,7 +1144,7 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 		for(size_t x = 0; x < cols; ++x){
 
 			if(area->getValue(y, x) != 0){
-				if(g_game.isSightClear(targetPos, tmpPos, true)){
+				if(g_game.isSightClear(centerPos, tmpPos, true)){
 					tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
 					if(!tile){
 						tile = new Tile(tmpPos.x, tmpPos.y, tmpPos.z);
