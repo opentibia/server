@@ -315,4 +315,55 @@ protected:
 	std::string m_datadir;
 };
 
+
+
+template<typename A>
+inline Array<A>::Array(uint32_t n)
+{
+	m_data = (A*)malloc(sizeof(A)*n);
+	memset(m_data, 0, sizeof(A)*n);
+	m_size = n;
+}
+
+template<typename A>
+inline Array<A>::~Array()
+{
+	free(m_data);
+}
+
+template<typename A>
+inline A Array<A>::getElement(uint32_t id)
+{
+	if(id < m_size){
+		return m_data[id];
+	}
+	else{
+		return 0;
+	}
+}
+
+template<typename A>
+inline const A Array<A>::getElement(uint32_t id) const
+{
+	if(id < m_size){
+		return m_data[id];
+	}
+	else{
+		return 0;
+	}
+}
+
+template<typename A>
+inline void Array<A>::addElement(A a, uint32_t pos)
+{
+#define INCREMENT 5000
+	if(pos >= m_size){
+		m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
+		memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
+		m_size = pos + INCREMENT;
+	}
+	m_data[pos] = a;
+}
+
+
 #endif
