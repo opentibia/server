@@ -23,6 +23,7 @@
 
 #include "networkmessage.h"
 #include "otsystem.h"
+#include "tools.h"
 #include <list>
 
 #include <boost/utility.hpp>
@@ -44,22 +45,16 @@ public:
 
 	void writeMessageLength()
 	{
-		*(uint16_t*)(m_MsgBuf + 2) = m_MsgSize;
+		*(uint16_t*)(m_MsgBuf + 6) = m_MsgSize;
 		//added header size to the message size
 		m_MsgSize = m_MsgSize + 2;
-		m_outputBufferStart = 2;
-	}
-
-	// 8.3x function
-	void writeChecksum()
-	{
-		*(uint32_t*)(m_MsgBuf + 2) = checksum();
-		m_MsgSize = m_MsgSize + 4;
 		m_outputBufferStart = 6;
 	}
 
 	void addCryptoHeader()
 	{
+		*(uint32_t*)(m_MsgBuf + 2) = adlerChecksum((uint8_t*)(m_MsgBuf + 6), m_MsgSize);
+		m_MsgSize = m_MsgSize + 4;
 		*(uint16_t*)(m_MsgBuf) = m_MsgSize;
 		m_MsgSize = m_MsgSize + 2;
 		m_outputBufferStart = 0;
@@ -82,7 +77,7 @@ protected:
 		setConnection(NULL);
 		setProtocol(NULL);
 		m_frame = 0;
-		m_outputBufferStart = 4;
+		m_outputBufferStart = 8;
 		//setState have to be the last one
 		setState(OutputMessage::STATE_FREE);
 	}

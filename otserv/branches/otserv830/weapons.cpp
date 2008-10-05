@@ -278,7 +278,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	range = Item::items[id].shootRange;
-	
+
 	std::string vocationString;
 	if(!vocStringList.empty()){
 		for(STRING_LIST::iterator it = vocStringList.begin(); it != vocStringList.end(); ++it){
@@ -783,7 +783,7 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 
 int32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
 {
-	const ItemType& it = Item::items[id];
+	//const ItemType& it = Item::items[id];
 	Item* bow = player->getWeapon(true);
 	if(bow && bow->getWeaponType() == WEAPON_DIST && bow->getID() != id){ //Be sure we are using a bow
 		const Weapon* weap = g_weapons->getWeapon(bow);

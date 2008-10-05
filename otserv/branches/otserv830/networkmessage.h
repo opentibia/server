@@ -50,12 +50,7 @@ protected:
 		m_MsgSize = 0;
 		m_ReadPos = 8;
 	}
-
 public:
-	// 8.3x functions
-	uint32_t getChecksum();
-	uint32_t checksum();
-
 	// simply read functions for incoming message
 	uint8_t  GetByte(){return m_MsgBuf[m_ReadPos++];}
 	uint16_t GetU16(){
@@ -69,6 +64,10 @@ public:
 	uint32_t GetU32(){
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		m_ReadPos += 4;
+		return v;
+	}
+	uint32_t PeekU32(){
+		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		return v;
 	}
 	std::string GetString();

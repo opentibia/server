@@ -534,7 +534,7 @@ uint32_t MoveEvent::EquipItem(Player* player, Item* item, slots_t slot, bool tra
 	//This includes item transforming
 	MoveEvent* moveEvent = g_moveEvents->getEvent(item, MOVE_EVENT_EQUIP);
 	if(moveEvent && !player->hasFlag(PlayerFlag_IgnoreWeaponCheck)){
-		if(player->getLevel() < moveEvent->getReqLevel() || player->getMagicLevel() < moveEvent->getReqMagLv() ||
+		if((int32_t)player->getLevel() < moveEvent->getReqLevel() || (int32_t)player->getMagicLevel() < moveEvent->getReqMagLv() ||
 			!player->isPremium() && moveEvent->isPremium() || !moveEvent->getVocEquipMap().empty() &&
 			moveEvent->getVocEquipMap().find(player->getVocationId()) == moveEvent->getVocEquipMap().end()){
 				return 1;

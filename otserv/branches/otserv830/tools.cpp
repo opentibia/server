@@ -534,3 +534,23 @@ AmmoAction_t getAmmoAction(const std::string& strValue)
 	}
 	return AMMOACTION_NONE;
 }
+#define MOD_ADLER 65521
+uint32_t adlerChecksum(uint8_t *data, size_t len)
+{
+    uint32_t a = 1, b = 0;
+    while (len > 0)
+    {
+        size_t tlen = len > 5552 ? 5552 : len;
+        len -= tlen;
+        do
+        {
+            a += *data++;
+            b += a;
+        } while (--tlen);
+
+        a %= MOD_ADLER;
+        b %= MOD_ADLER;
+    }
+
+    return (b << 16) | a;
+}

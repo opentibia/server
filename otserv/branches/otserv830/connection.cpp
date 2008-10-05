@@ -28,6 +28,7 @@
 #include "tasks.h"
 #include "scheduler.h"
 #include "connection.h"
+#include "tools.h"
 
 #include <boost/bind.hpp>
 
@@ -172,6 +173,33 @@ void Connection::parsePacket(const boost::system::error_code& error)
 	}
 
 	if(!error){
+		//Check packet checksum
+		uint32_t recvChecksum = m_msg.PeekU32();
+		uint32_t checksum = adlerChecksum((uint8_t*)(m_msg.getBuffer() + m_msg.getReadPos() + 4),
+					m_msg.getMessageLength() - m_msg.getReadPos() - 4);
+
+		//if they dont match
+		if(recvChecksum != checksum){
+			uint8_t protocolId = m_msg.GetByte();
+			switch(protocolId){
+			case 0xFE: // Admin protocol
+				m_protocol = new ProtocolAdmin(this);
+				break;
+			case 0xFF: // Status protocol
+				m_protocol = new ProtocolStatus(this);
+				break;
+			default:
+				closeConnection();
+				OTSYS_THREAD_UNLOCK(m_connectionLock, "");
+				return;
+			}
+			m_protocol->onRecvFirstMessage(m_msg);
+		}
+		else{
+			//else, we can remove the checksum
+			m_msg.GetU32();
+		}
+
 		// Protocol selection
 		if(!m_protocol){
 			// Protocol depends on the first byte of the packet
@@ -183,18 +211,11 @@ void Connection::parsePacket(const boost::system::error_code& error)
 			case 0x0A: // World server protocol
 				m_protocol = new ProtocolGame(this);
 				break;
-			case 0xFE: // Admin protocol
-				m_protocol = new ProtocolAdmin(this);
-				break;
-			case 0xFF: // Status protocol
-				m_protocol = new ProtocolStatus(this);
-				break;
 			default:
 				// No valid protocol
 				closeConnection();
 				OTSYS_THREAD_UNLOCK(m_connectionLock, "");
 				return;
-				break;
 			}
 			m_protocol->onRecvFirstMessage(m_msg);
 		}

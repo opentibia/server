@@ -724,7 +724,7 @@ void Player::dropLoot(Container* corpse)
 	if(itemLoss > 0){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
-			if(item && ((item->getContainer()) || random_range(1, 100) <= itemLoss)){
+			if(item && ((item->getContainer()) || (uint32_t)random_range(1, 100) <= itemLoss)){
 				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), 0);
 			}
 		}

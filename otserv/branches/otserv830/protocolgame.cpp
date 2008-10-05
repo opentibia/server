@@ -397,7 +397,9 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	setXTEAKey(key);
 
 	/*uint8_t isSetGM =*/ msg.GetByte();
-	std::string accname = msg.GetString();
+
+	std::string accnumberstr = msg.GetString();
+	uint32_t accnumber = atoi(accnumberstr.c_str());
 	const std::string name = msg.GetString();
 	const std::string password = msg.GetString();
 
@@ -422,7 +424,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	std::string acc_pass;
-	if(!(IOAccount::instance()->getPassword(accname, name, acc_pass) && passwordTest(password,acc_pass))){
+	if(!(IOAccount::instance()->getPassword(accnumber, name, acc_pass) && passwordTest(password,acc_pass))){
 		g_bans.addLoginAttempt(getIP(), false);
 		getConnection()->closeConnection();
 		return false;
@@ -2314,7 +2316,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage* msg)
 	msg->AddByte(0xA0);
 	msg->AddU16(player->getHealth());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
-	msg->AddU16((int32_t)player->getFreeCapacity());
+	msg->AddU32((uint32_t)(player->getFreeCapacity() * 100));
 	uint32_t experience = player->getExperience();
 	if(experience <= 0x7FFFFFFF){
 		msg->AddU32(player->getExperience());

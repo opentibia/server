@@ -2202,7 +2202,7 @@ int LuaScriptInterface::luaDoSendMagicEffect(lua_State *L)
 
 	uint32_t parameters = lua_gettop(L);
 	SpectatorVec list;
-	bool useList = false;
+	//bool useList = false;
 	if(parameters > 2){
 		uint32_t cid = popNumber(L);
 		Player* player = env->getPlayerByUID(cid);
@@ -2728,6 +2728,7 @@ int LuaScriptInterface::luaDoSendTutorial(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
+	return 1;
 }
 
 int LuaScriptInterface::luaDoAddMark(lua_State *L)
@@ -2756,6 +2757,7 @@ int LuaScriptInterface::luaDoAddMark(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
+	return 1;
 }
 
 int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)

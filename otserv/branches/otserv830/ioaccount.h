@@ -37,8 +37,8 @@ public:
 		return &instance;
 	}
 
-	Account loadAccount(const std::string& name);
-	bool getPassword(const std::string& accountname, const std::string& name, std::string& password);
+	Account loadAccount(uint32_t accno);
+	bool getPassword(uint32_t accno, const std::string& name, std::string& password);
 };
 
 #endif

@@ -32,41 +32,11 @@
 #include "position.h"
 #include "rsa.h"
 
-uint32_t NetworkMessage::checksum()
-{
-    // implementation of adler algorithm as per wikipedia
-    const uint16_t MOD_ADLER=65521;
-    uint8_t* data = ((uint8_t*)m_MsgBuf) + 2;
-    size_t len = m_MsgSize-2;
-
-    uint32_t a = 1, b = 0;
-
-    while (len > 0)
-    {
-        size_t tlen = len > 5552 ? 5552 : len;
-        len -= tlen;
-        do
-        {
-            a += *data++;
-            b += a;
-        } while (--tlen);
-
-        a %= MOD_ADLER;
-        b %= MOD_ADLER;
-    }
-
-    return (b << 16) | a;
-}
-
-uint32_t NetworkMessage::getChecksum()
-{
-	// get the checksum from a recieved message
-	return *(uint32_t*)(&m_MsgBuf[2]);
-}
-
 int32_t NetworkMessage::decodeHeader()
 {
-	return (int32_t)(m_MsgBuf[0] | m_MsgBuf[1] << 8);
+	int32_t size = (int32_t)(m_MsgBuf[0] | m_MsgBuf[1] << 8);
+	m_MsgSize = size;
+	return size;
 }
 
 /******************************************************************************/
