@@ -2727,8 +2727,12 @@ void ProtocolGame::AddCreatureHealth(NetworkMessage* msg,const Creature* creatur
 
 void ProtocolGame::AddCreatureInvisible(NetworkMessage* msg, const Creature* creature)
 {
-	msg->AddU16(0);
-	msg->AddU16(0);
+	if(player->canSeeInvisibility()) {
+		AddCreatureOutfit(msg, creature, creature->getCurrentOutfit());
+	} else {
+		msg->AddU16(0);
+		msg->AddU16(0);
+	}
 }
 
 void ProtocolGame::AddCreatureOutfit(NetworkMessage* msg, const Creature* creature, const Outfit_t& outfit)
