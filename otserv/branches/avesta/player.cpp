@@ -3747,7 +3747,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
 	redSkullTicks = redSkullTicks + 12 * 3600 * 1000;
-	if(redSkullTicks >= 3*24*3600*1000){
+	if(redSkullTicks > 2*12*3600*1000){
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
 	}

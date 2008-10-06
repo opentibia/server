@@ -104,8 +104,6 @@ protected:
 	uint32_t maxSize;
 	double total_weight;
 	ItemList itemlist;
-
-	friend void Item::setParent(Cylinder* cylinder);
 };
 
 #endif
