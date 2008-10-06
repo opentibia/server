@@ -84,11 +84,11 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(key);
 
-	std::string accnumberstr = msg.GetString();
-	uint32_t accnumber = atoi(accnumberstr.c_str());
+	std::string accname = msg.GetString();
 	std::string password = msg.GetString();
-	if(!accnumber){
-		disconnectClient(0x0A, "You must enter your account number.");
+
+	if(!accname.length()){
+		disconnectClient(0x0A, "You must enter your account name.");
 		return false;
 	}
 
@@ -120,8 +120,8 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		}
 	}
 
-	Account account = IOAccount::instance()->loadAccount(accnumber);
-	if(!(accnumber != 0 && account.accnumber == accnumber &&
+	Account account = IOAccount::instance()->loadAccount(accname);
+	if(!(account.name == accname &&
 			passwordTest(password, account.password))){
 
 		g_bans.addLoginAttempt(clientip, false);

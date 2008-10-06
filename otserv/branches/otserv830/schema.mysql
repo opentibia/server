@@ -5,7 +5,8 @@ CREATE TABLE `groups` (
     `access` INT NOT NULL,
     `maxdepotitems` INT NOT NULL,
     `maxviplist` INT NOT NULL,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+	UNIQUE(`name`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `accounts` (
