@@ -486,6 +486,8 @@ public:
 	    {if(client) client->sendShop(shop);}
 	void sendCash(uint32_t amount) const
 		{if(client) client->sendPlayerCash(amount);}
+	void sendCashAndSaleItems(uint32_t amount, const std::list<ShopInfo>& shop) const
+		{if(client) client->sendPlayerCashAndSaleItems(amount, shop);}
 	void sendCloseShop() const
 	    {if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const

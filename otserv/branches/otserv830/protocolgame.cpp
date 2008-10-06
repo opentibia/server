@@ -1604,6 +1604,40 @@ void ProtocolGame::sendPlayerCash(uint32_t amount)
 	{
 		msg->AddByte(0x7B);
 		msg->AddU32(amount);
+
+		// this might not be right, be prepared to correct it
+		msg->AddByte(0);
+	}
+}
+
+void ProtocolGame::sendPlayerCashAndSaleItems(uint32_t amount, const std::list<ShopInfo>& shop)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg)
+	{
+		msg->AddByte(0x7B);
+		msg->AddU32(amount);
+
+		// the rest of this might not be right, be prepared to correct it
+		if(shop.size() > 255)
+		{
+			msg->AddByte(255);
+		}
+		else
+		{
+			msg->AddByte(shop.size());
+		}
+
+		std::list<ShopInfo>::const_iterator it;
+		uint32_t i = 0;
+		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i)
+		{
+			int8_t subtype = ((*it).itemCharges == 0) ? (-1) :((*it).itemCharges);
+			uint32_t count = player->__getItemTypeCount((*it).itemId, subtype, false);
+
+			msg->AddU16((*it).itemId);
+			msg->AddByte(count);
+		}
 	}
 }
 
@@ -2628,6 +2662,7 @@ void ProtocolGame::AddShopItem(NetworkMessage* msg, const ShopInfo item)
 	msg->AddU16(it.clientId);
 	msg->AddByte(item.itemCharges);
 	msg->AddString(it.name);
+	msg->AddU32((uint32_t)(it.weight*100));
 	msg->AddU32(item.buyPrice);
 	msg->AddU32(item.salePrice);
 }

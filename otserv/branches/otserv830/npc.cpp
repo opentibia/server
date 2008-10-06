@@ -900,7 +900,7 @@ int NpcScriptInterface::luaSendShop(lua_State *L)
 	npc->addShopPlayer(player);
 	player->setShopOwner(npc, buyCallback, sellCallback);
 	player->sendShop(items);
-	player->sendCash(g_game.getMoney(player));
+	player->sendCashAndSaleItems(g_game.getMoney(player), items);
 
 	return 1;
 }
