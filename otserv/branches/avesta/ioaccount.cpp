@@ -36,7 +36,6 @@ extern ConfigManager g_config;
 Account IOAccount::loadAccount(uint32_t accno)
 {
 	Account acc;
-	time_t premEnd;
 
 	Database* db = Database::instance();
 	DBQuery query;
