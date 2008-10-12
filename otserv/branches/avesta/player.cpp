@@ -2225,6 +2225,15 @@ void Player::preSave()
 
 void Player::addCombatExhaust(uint32_t ticks)
 {
+	// Delay next attack
+	lastAttack = OTSYS_TIME();
+	uint32_t delay = getNextActionTime();
+	Scheduler::getScheduler().stopEvent(actionTaskEvent);
+	SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::checkCreatureAttack,
+		&g_game, getID()));
+	setNextActionTask(task);
+
+	// Add exhaust condition
 	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, ticks, 0);
 	addCondition(condition);
 }
