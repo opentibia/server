@@ -427,6 +427,23 @@ bool IOPlayer::savePlayer(Player* player)
 
 	if(result->getDataInt("save") == 0){
 		db->freeResult(result);
+
+		query.str("");
+		query << "UPDATE `players` SET "
+			<< "  `lastlogin` = " << player->lastLoginSaved
+			<< ", `lastip` = " << player->lastip;
+		query << " WHERE `id` = " << player->getGUID();
+
+		DBTransaction transaction(db);
+		if(!transaction.begin())
+			return false;
+
+		if(!db->executeQuery(query.str())){
+			return false;
+		}
+
+		transaction.commit();
+
 		return true;
 	}
 	db->freeResult(result);
