@@ -634,9 +634,11 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 	z = start.z;
 
 	int lastrx = x, lastry = y, lastrz = z;
-
+	int ay = 0, az = 0;
+	
 	for( ; x != end.x + stepx; x += stepx){
 		int rx, ry, rz;
+
 		switch(dir){
 		case 1:
 			rx = y; ry = x; rz = z;
@@ -660,19 +662,32 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 
 			Tile* tile = getTile(rx, ry, rz);
 			if(tile){
-				if(tile->hasProperty(BLOCKPROJECTILE))
-					return false;
+				if(tile->hasProperty(BLOCKPROJECTILE)) {
+					if(ay != 0 || az != 0) {
+						tile = getTile(rx, ry + ay, rz + az);
+						if(tile) {
+							if(tile->hasProperty(BLOCKPROJECTILE)) {
+								return false;
+							}
+						}
+					} else {
+						return false;
+					}
+				}
 			}
+			ay = az = 0;
 		}
 
 		errory += deltay;
 		errorz += deltaz;
 		if(2*errory >= deltax){
 			y += stepy;
+			if(std::abs(deltax) != std::abs(deltay)) ay = -stepy;
 			errory -= deltax;
 		}
 		if(2*errorz >= deltax){
 			z += stepz;
+			//az = -stepz; // Is this required??
 			errorz -= deltax;
 		}
 	}
