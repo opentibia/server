@@ -154,7 +154,8 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
-	virtual bool interuptSwing() const {return true;}
+	// Distance weapons don't interrupt swings either.
+	//virtual bool interuptSwing() const {return true;}
 
 	//virtual uint32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;

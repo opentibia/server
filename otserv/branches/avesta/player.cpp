@@ -524,11 +524,12 @@ float Player::getDefenseFactor() const
 
 		case FIGHTMODE_DEFENSE:
 		{
+			/*
 			if((OTSYS_TIME() - lastAttack) < getAttackSpeed()){
 				//Attacking will cause us to get into normal defense
-				return 1.0f;
+				return 1.2f;
 			}
-
+*/
 			return 2.0f;
 			break;
 		}
@@ -2356,14 +2357,6 @@ void Player::preSave()
 
 void Player::addCombatExhaust(uint32_t ticks)
 {
-	// Delay next attack
-	lastAttack = OTSYS_TIME();
-	uint32_t delay = getNextActionTime();
-	Scheduler::getScheduler().stopEvent(actionTaskEvent);
-	SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::checkCreatureAttack,
-		&g_game, getID()));
-	setNextActionTask(task);
-
 	// Add exhaust condition
 	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, ticks, 0);
 	addCondition(condition);
@@ -3265,8 +3258,15 @@ void Player::doAttacking(uint32_t interval)
 					&g_game, getID()));
 				setNextActionTask(task);
 			}
-			else if(!hasCondition(CONDITION_EXHAUST_COMBAT) || !weapon->hasExhaustion() ){
-				result = weapon->useWeapon(this, tool, attackedCreature);
+			else {
+				// If the player is not exhausted OR if the player's weapon
+				// does not have hasExhaust, use the weapon.
+				if(!(hasCondition(CONDITION_EXHAUST_COMBAT) ||
+					 hasCondition(CONDITION_EXHAUST_HEAL)) ||
+					 weapon->hasExhaustion())
+				{
+					result = weapon->useWeapon(this, tool, attackedCreature);
+				}
 			}
 		}
 		else{
