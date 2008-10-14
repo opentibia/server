@@ -601,11 +601,13 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 
 	switch(dir){
 	case 0:
+		// horizontal
 		//x -> x
 		//y -> y
 		//z -> z
 		break;
 	case 1:
+		// vertical
 		//x -> y
 		//y -> x
 		//z -> z
@@ -614,6 +616,7 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 		std::swap(deltax, deltay);
 		break;
 	case 2:
+		// depth
 		//x -> z
 		//y -> y
 		//z -> x
@@ -634,7 +637,7 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 	z = start.z;
 
 	int lastrx = x, lastry = y, lastrz = z;
-	int ay = 0, az = 0;
+	int ax = 0, ay = 0, az = 0;
 	
 	for( ; x != end.x + stepx; x += stepx){
 		int rx, ry, rz;
@@ -663,8 +666,8 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 			Tile* tile = getTile(rx, ry, rz);
 			if(tile){
 				if(tile->hasProperty(BLOCKPROJECTILE)) {
-					if(ay != 0 || az != 0) {
-						tile = getTile(rx, ry + ay, rz + az);
+					if(ax != 0 || ay != 0 || az != 0) {
+						tile = getTile(rx + ax, ry + ay, rz + az);
 						if(tile) {
 							if(tile->hasProperty(BLOCKPROJECTILE)) {
 								return false;
@@ -675,14 +678,22 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 					}
 				}
 			}
-			ay = az = 0;
+			ax = ay = az = 0;
 		}
 
 		errory += deltay;
 		errorz += deltaz;
 		if(2*errory >= deltax){
 			y += stepy;
-			if(std::abs(deltax) != std::abs(deltay)) ay = -stepy;
+			if(std::abs(deltax) != std::abs(deltay)) {
+				if(dir == 0) {
+					// Horizontal thorw
+					ay = -stepy;
+				} else {
+					// Vertical throw
+					ax = -stepy;
+				}
+			}
 			errory -= deltax;
 		}
 		if(2*errorz >= deltax){
