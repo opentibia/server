@@ -72,6 +72,7 @@ Game::Game()
 	map = NULL;
 	worldType = WORLD_TYPE_PVP;
 
+	last_bucket = 0;
 	int daycycle = 3600;
 	//(1440 minutes/day)/(3600 seconds/day)*10 seconds event interval
 	light_hour_delta = 1440*10/daycycle;
@@ -4126,7 +4127,8 @@ void Game::startDecay(Item* item)
 			return;
 		}
 
-		if(item->getDuration() > 0){
+		int32_t dur = item->getDuration();
+		if(dur > 0){
 			item->useThing2();
 			item->setDecaying(DECAYING_TRUE);
 			toDecayItems.push_back(item);
@@ -4158,29 +4160,45 @@ void Game::checkDecay()
 {
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
 		boost::bind(&Game::checkDecay, this)));
+	
+	size_t bucket = (last_bucket + 1) % EVENT_DECAY_BUCKETS;
 
-	Item* item = NULL;
-	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
-		item = *it;
-		item->decreaseDuration(EVENT_DECAYINTERVAL);
+	for(DecayList::iterator it = decayItems[bucket].begin(); it != decayItems[bucket].end();){
+		Item* item = *it;
+		item->decreaseDuration(EVENT_DECAYINTERVAL*EVENT_DECAY_BUCKETS);
 		//std::cout << "checkDecay: " << item << ", id:" << item->getID() << ", name: " << item->getName() << ", duration: " << item->getDuration() << std::endl;
 
 		if(!item->canDecay()){
 			item->setDecaying(DECAYING_FALSE);
 			FreeThing(item);
-			it = decayItems.erase(it);
+			it = decayItems[bucket].erase(it);
 			continue;
 		}
 
-		if(item->getDuration() <= 0){
-			it = decayItems.erase(it);
+		int32_t dur = item->getDuration();
+
+		if(dur <= 0) {
+			it = decayItems[bucket].erase(it);
 			internalDecayItem(item);
 			FreeThing(item);
+		}
+		else if(dur < EVENT_DECAYINTERVAL*EVENT_DECAY_BUCKETS)
+		{
+			it = decayItems[bucket].erase(it);
+			size_t new_bucket = (bucket + ((dur + EVENT_DECAYINTERVAL/2) / 1000)) % EVENT_DECAY_BUCKETS;
+			if(new_bucket == bucket) {
+				internalDecayItem(item);
+				FreeThing(item);
+			} else {
+				decayItems[new_bucket].push_back(item);
+			}
 		}
 		else{
 			++it;
 		}
 	}
+
+	last_bucket = bucket;
 
 	cleanup();
 }
@@ -4339,7 +4357,12 @@ void Game::cleanup()
 	ToReleaseThings.clear();
 
 	for(DecayList::iterator it = toDecayItems.begin(); it != toDecayItems.end(); ++it){
-		decayItems.push_back(*it);
+		int32_t dur = (*it)->getDuration();
+		if(dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
+			decayItems[last_bucket].push_back(*it);
+		} else {
+			decayItems[(last_bucket + 1 + (*it)->getDuration() / 1000) % EVENT_DECAY_BUCKETS].push_back(*it);
+		}
 	}
 
 	toDecayItems.clear();
