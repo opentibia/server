@@ -109,11 +109,18 @@ enum passwordType_t{
 #define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
-	#include <ext/hash_map>
-	#include <ext/hash_set>
+	#if __GNUC__ < 4
+		#include <ext/hash_map>
+		#include <ext/hash_set>
+		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
+		#define OTSERV_HASH_SET __gnu_cxx::hash_set
+	#else
+		#include <unordered_map>
+		#include <unordered_set>
+		#define OTSERV_HASH_MAP std::tr1::unordered_map;
+		#define OTSERV_HASH_SET std::tr1::unordered_set;
+	#endif
 	#include <assert.h>
-	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
-	#define OTSERV_HASH_SET __gnu_cxx::hash_set
 	#define ATOI64 atoll
 
 #else
