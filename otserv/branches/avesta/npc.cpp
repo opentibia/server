@@ -2889,7 +2889,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 		item.sellPrice = getField(L, "sell");
 #ifdef __DEBUG_820__
 		std::cout 	<< "Added Item " << item.itemId
-					<< " with charges " << item.itemCharges
+					//<< " with charges " << item.itemCharges
 					<< " costs " << item.buyPrice
 					<< " and sells for " << item.sellPrice
 					<< std::endl;
