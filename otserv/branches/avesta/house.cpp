@@ -944,11 +944,19 @@ bool Houses::payHouses()
 			// when items are transferred to his depot
 			bool savePlayerHere = true;
 			if(depot){
-				//get money from depot
 				bool useAccBalance = (g_config.getString(ConfigManager::USE_ACCBALANCE) == "yes");
-				if((useAccBalance && player->balance >= house->getRent()) ||
-					g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
+				bool hasEnoughMoney = false;
 
+				if(useAccBalance && player->balance >= house->getRent()){
+					player->balance -= house->getRent();
+					hasEnoughMoney = true;
+				}
+				else{
+					hasEnoughMoney = g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT);
+				}
+
+				//get money from depot
+				if(hasEnoughMoney){
 					uint32_t paidUntil = currentTime;
 					switch(rentPeriod){
 					case RENTPERIOD_DAILY:
@@ -963,10 +971,6 @@ bool Houses::payHouses()
 					case RENTPERIOD_YEARLY:
 						paidUntil += 24 * 60 * 60 * 365;
 						break;
-					}
-
-					if(useAccBalance){
-						player->balance -= house->getRent();
 					}
 
 					house->setPaidUntil(paidUntil);
