@@ -119,7 +119,7 @@ void Connection::closeConnectionTask()
 
 	if(m_protocol){
 		Dispatcher::getDispatcher().addTask(
-			createTask(boost::bind(&Protocol::deleteProtocolTask, m_protocol)));
+			createTask(boost::bind(&Protocol::releaseProtocol, m_protocol)));
 		m_protocol->setConnection(NULL);
 		m_protocol = NULL;
 	}
@@ -127,6 +127,65 @@ void Connection::closeConnectionTask()
 	if(!closingConnection()){
 		m_connectionLock.unlock();
 	}
+}
+
+bool Connection::closingConnection()
+{
+	//any thread
+	#ifdef __DEBUG_NET_DETAIL__
+	std::cout << "Connection::closingConnection" << std::endl;
+	#endif
+
+	if(m_pendingWrite == 0 || m_writeError == true){
+		if(!m_socketClosed){
+			#ifdef __DEBUG_NET_DETAIL__
+			std::cout << "Closing socket" << std::endl;
+			#endif
+
+			boost::system::error_code error;
+			m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			if(error){
+				if(error == boost::asio::error::not_connected){
+					//Transport endpoint is not connected.
+				}
+				else{
+					PRINT_ASIO_ERROR("Shutdown");
+				}
+			}
+			m_socket.close(error);
+			m_socketClosed = true;
+			if(error){
+				PRINT_ASIO_ERROR("Close");
+			}
+		}
+
+		if(m_refCount == 0 && m_pendingRead == 0){
+			#ifdef __DEBUG_NET_DETAIL__
+			std::cout << "Deleting Connection" << std::endl;
+			#endif
+
+			m_connectionLock.unlock();
+
+			Dispatcher::getDispatcher().addTask(
+				createTask(boost::bind(&Connection::deleteConnectionTask, this)));
+
+			return true;
+		}
+	}
+	return false;
+}
+
+void Connection::deleteConnectionTask()
+{
+	//dispather thread
+	assert(m_refCount == 0);
+
+	while(!m_outputQueue.empty()){
+		OutputMessagePool::getInstance()->releaseMessage(m_outputQueue.back(), true);
+		m_outputQueue.pop_back();
+	}
+
+	delete this;
 }
 
 void Connection::acceptConnection()
@@ -361,59 +420,4 @@ void Connection::handleWriteError(const boost::system::error_code& error)
 		closeConnection();
 	}
 	m_writeError = true;
-}
-
-bool Connection::closingConnection()
-{
-	//any thread
-	#ifdef __DEBUG_NET_DETAIL__
-	std::cout << "Connection::closingConnection" << std::endl;
-	#endif
-
-	if(m_pendingWrite == 0 || m_writeError == true){
-		if(!m_socketClosed){
-			#ifdef __DEBUG_NET_DETAIL__
-			std::cout << "Closing socket" << std::endl;
-			#endif
-
-			boost::system::error_code error;
-			m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
-			if(error){
-				if(error == boost::asio::error::not_connected){
-					//Transport endpoint is not connected.
-				}
-				else{
-					PRINT_ASIO_ERROR("Shutdown");
-				}
-			}
-			m_socket.close(error);
-			m_socketClosed = true;
-			if(error){
-				PRINT_ASIO_ERROR("Close");
-			}
-		}
-		if(m_pendingRead == 0){
-			#ifdef __DEBUG_NET_DETAIL__
-			std::cout << "Deleting Connection" << std::endl;
-			#endif
-
-			m_connectionLock.unlock();
-
-			Dispatcher::getDispatcher().addTask(
-				createTask(boost::bind(&Connection::deleteConnectionTask, this)));
-
-			return true;
-		}
-	}
-	return false;
-}
-
-void Connection::deleteConnectionTask()
-{
-	//dispather thread
-	while(!m_outputQueue.empty()){
-		OutputMessagePool::getInstance()->releaseMessage(m_outputQueue.back(), true);
-		m_outputQueue.pop_back();
-	}
-	delete this;
 }

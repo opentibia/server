@@ -84,6 +84,7 @@ public:
 private:
 	Connection(boost::asio::io_service& io_service) : m_socket(io_service)
 	{
+		m_refCount = 0;
 		m_protocol = NULL;
 		m_pendingWrite = 0;
 		m_pendingRead = 0;
@@ -117,6 +118,9 @@ public:
 
 	uint32_t getIP() const;
 
+	int32_t addRef() {return ++m_refCount;}
+	int32_t unRef() {return --m_refCount;}
+
 private:
 	void parseHeader(const boost::system::error_code& error);
 	void parsePacket(const boost::system::error_code& error);
@@ -143,6 +147,7 @@ private:
 	std::list <OutputMessage*> m_outputQueue;
 	int32_t m_pendingRead;
 	uint32_t m_closeState;
+	uint32_t m_refCount;
 
 	boost::recursive_mutex m_connectionLock;
 

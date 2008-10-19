@@ -52,10 +52,12 @@ void ProtocolLogin::deleteProtocolTask()
 void ProtocolLogin::disconnectClient(uint8_t error, const char* message)
 {
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-	TRACK_MESSAGE(output);
-	output->AddByte(error);
-	output->AddString(message);
-	OutputMessagePool::getInstance()->send(output);
+	if(output){
+		TRACK_MESSAGE(output);
+		output->AddByte(error);
+		output->AddString(message);
+		OutputMessagePool::getInstance()->send(output);
+	}
 	getConnection()->closeConnection();
 }
 
@@ -143,27 +145,30 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		
 	
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-	TRACK_MESSAGE(output);
-	//Add MOTD
-	std::stringstream motd;
-	output->AddByte(0x14);
-	motd << g_config.getNumber(ConfigManager::MOTD_NUM) << "\n";
-	motd << g_config.getString(ConfigManager::MOTD);
-	output->AddString(motd.str());
-	//Add char list
-	output->AddByte(0x64);
-	output->AddByte((uint8_t)account.charList.size());
-	std::list<std::string>::iterator it;
-	for(it = account.charList.begin(); it != account.charList.end(); it++){
-		output->AddString((*it));
-		output->AddString(g_config.getString(ConfigManager::WORLD_NAME));
-		output->AddU32(serverip);
-		output->AddU16(g_config.getNumber(ConfigManager::PORT));
+	if(output){
+		TRACK_MESSAGE(output);
+		//Add MOTD
+		std::stringstream motd;
+		output->AddByte(0x14);
+		motd << g_config.getNumber(ConfigManager::MOTD_NUM) << "\n";
+		motd << g_config.getString(ConfigManager::MOTD);
+		output->AddString(motd.str());
+		//Add char list
+		output->AddByte(0x64);
+		output->AddByte((uint8_t)account.charList.size());
+		std::list<std::string>::iterator it;
+		for(it = account.charList.begin(); it != account.charList.end(); it++){
+			output->AddString((*it));
+			output->AddString(g_config.getString(ConfigManager::WORLD_NAME));
+			output->AddU32(serverip);
+			output->AddU16(g_config.getNumber(ConfigManager::PORT));
+		}
+		//Add premium days
+		output->AddU16(account.getPremiumDaysLeft());//output->AddU16(0);
+		
+		OutputMessagePool::getInstance()->send(output);
 	}
-	//Add premium days
-	output->AddU16(account.getPremiumDaysLeft());//output->AddU16(0);
-	
-	OutputMessagePool::getInstance()->send(output);
+
 	getConnection()->closeConnection();
 
 	return true;

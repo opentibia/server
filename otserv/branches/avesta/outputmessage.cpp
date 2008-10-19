@@ -78,6 +78,7 @@ void OutputMessagePool::send(OutputMessage* msg)
 				m_outputPoolLock.unlock();
 			}
 			else{
+				msg->getProtocol()->onSendMessage(msg);
 				internalReleaseMessage(msg);
 			}
 		}
@@ -119,6 +120,7 @@ void OutputMessagePool::sendAll()
 					}
 				}
 				else{
+					(*it)->getProtocol()->onSendMessage((*it));
 					internalReleaseMessage(*it);
 				}
 			}
@@ -138,8 +140,26 @@ void OutputMessagePool::sendAll()
 
 void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 {
-	//Simulate that the message is sent and then liberate it
-	msg->getProtocol()->onSendMessage(msg);
+	if(msg->getProtocol()){
+		msg->getProtocol()->unRef();
+#ifdef __DEBUG_NET_DETAIL__
+		std::cout << "Removing reference to protocol " << msg->getProtocol() << std::endl;
+#endif
+	}
+	else{
+		std::cout << "No protocol found." << std::endl;
+	}
+
+	if(msg->getConnection()){
+		msg->getConnection()->unRef();
+#ifdef __DEBUG_NET_DETAIL__
+		std::cout << "Removing reference to connection " << msg->getConnection() << std::endl;
+#endif
+	}
+	else{
+		std::cout << "No connection found." << std::endl;
+	}
+
 	msg->freeMessage();
 	m_outputMessages.push_back(msg);
 }
@@ -155,21 +175,18 @@ void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/
 		if(it != m_autoSendOutputMessages.end()){
 			m_autoSendOutputMessages.erase(it);
 		}
-		msg->freeMessage();
-		m_outputMessages.push_back(msg);
+		internalReleaseMessage(msg);
 		break;
 	}
 	case OutputMessage::STATE_ALLOCATED_NO_AUTOSEND:
-		msg->freeMessage();
-		m_outputMessages.push_back(msg);
+		internalReleaseMessage(msg);
 		break;
 	case OutputMessage::STATE_WAITING:
 		if(!sent){
 			std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_WAITING OutputMessage." << std::endl;
 		}
 		else{
-			msg->freeMessage();
-			m_outputMessages.push_back(msg);
+			internalReleaseMessage(msg);
 		}
 		break;
 	case OutputMessage::STATE_FREE:
@@ -183,16 +200,16 @@ void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/
 
 OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool autosend /*= true*/)
 {
-	#ifdef __DEBUG_NET__
-	if(protocol->getConnection() == NULL){
-		std::cout << "Warning: [OutputMessagePool::getOutputMessage] NULL connection." << std::endl;
-	}
-	#endif
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "request output message - auto = " << autosend << std::endl;
 	#endif
 
 	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
+
+	if(protocol->getConnection() == NULL){
+		return NULL;
+	}
+
 	OutputMessage* outputmessage;
 	if(m_outputMessages.empty()) {
 #ifdef __TRACK_NETWORK__
@@ -234,7 +251,19 @@ void OutputMessagePool::configureOutputMessage(OutputMessage* msg, Protocol* pro
 	else{
 		msg->setState(OutputMessage::STATE_ALLOCATED_NO_AUTOSEND);
 	}
+
+	Connection* connection = protocol->getConnection();
+	assert(connection != NULL);
+
 	msg->setProtocol(protocol);
-	msg->setConnection(protocol->getConnection());
+	protocol->addRef();
+#ifdef __DEBUG_NET_DETAIL__
+	std::cout << "Adding reference to protocol - " << protocol << std::endl;
+#endif
+	msg->setConnection(connection);
+	connection->addRef();
+#ifdef __DEBUG_NET_DETAIL__
+	std::cout << "Adding reference to connection - " << connection << std::endl;
+#endif
 	msg->setFrame(m_frameTime);
 }
