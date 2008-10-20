@@ -4950,8 +4950,6 @@
 		<attribute key="attack" value="26"/>
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
-		<attribute key="elementIce" value="4"/>
-		<attribute key="charges" value="5" />
 	</item>
 	<item id="2410" article="a" name="throwing knife" plural="throwing knives">
 		<attribute key="weight" value="500"/>
@@ -24344,21 +24342,21 @@
 	<item id="8941" article="a" name="slain wyrm">
 		<attribute key="weight" value="50000"/>
 		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8848"/>
+		<attribute key="decayTo" value="8942"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="8942" article="a" name="slain wyrm">
 		<attribute key="weight" value="35000"/>
 		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8849"/>
+		<attribute key="decayTo" value="8943"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="8943" article="a" name="slain wyrm">
 		<attribute key="weight" value="20000"/>
 		<attribute key="containerSize" value="8"/>
-		<attribute key="decayTo" value="8850"/>
+		<attribute key="decayTo" value="8944"/>
 		<attribute key="duration" value="300"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
