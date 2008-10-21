@@ -162,23 +162,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	uint32_t rankid = result->getDataInt("rank_id");
 
-	// place it here and now we can drop all additional query instances as all data were loaded
-	#ifndef __USE_SQL_PREMDAYS__
-	time_t premEnd = result->getDataInt("premend");
-	time_t timeNow = time(NULL);
-	if(premEnd > 0){
-		if(premEnd < timeNow){
-			//update table
-			query << "UPDATE `players` SET `premend` = 0 WHERE `id` = " << player->getGUID();
-			db->executeQuery(query.str());
-			query.str("");
-		}
-		else{
-			player->premiumDays = (premEnd - timeNow)/86400;
-		}
-	}
-	#endif
-
 	player->balance = result->getDataInt("balance");
 
 	player->guildNick = result->getDataString("guildnick");
