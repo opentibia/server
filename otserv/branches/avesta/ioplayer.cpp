@@ -44,7 +44,22 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	DBQuery query;
 	DBResult* result;
 
-	if(!(result = db->storeQuery("SELECT * FROM `players` WHERE `name` = " + db->escapeString(name)))){
+	if(!(result = db->storeQuery(std::string("") +
+		"SELECT " +
+			"*, " +
+			"(SELECT " +
+				"`premend` " +
+			"FROM " +
+				"`accounts` " +
+			"WHERE " +
+				"`id`=`players`.`account_id`) " +
+			"AS `premend` " +
+		"FROM " +
+			"`players` " +
+		"WHERE " +
+			"`name` = " + db->escapeString(name)))
+		)
+	{
 	  	return false;
 	}
 
@@ -91,10 +106,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->defaultOutfit.lookFeet = result->getDataInt("lookfeet");
 	player->defaultOutfit.lookAddons = result->getDataInt("lookaddons");
 	player->currentOutfit = player->defaultOutfit;
-
-#ifdef __USE_SQL_PREMDAYS__
-	player->premiumDays = result->getDataInt("premdays");
-#endif
 
 #ifdef __SKULLSYSTEM__
 	int32_t redSkullSeconds = result->getDataInt("redskulltime") - std::time(NULL);
@@ -162,6 +173,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	uint32_t rankid = result->getDataInt("rank_id");
 
+	// place it here and now we can drop all additional query instances as all data were loaded
+	player->premiumEnd = result->getDataInt("premend");
 	player->balance = result->getDataInt("balance");
 
 	player->guildNick = result->getDataString("guildnick");

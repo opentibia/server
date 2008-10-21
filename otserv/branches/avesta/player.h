@@ -146,8 +146,8 @@ public:
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
-	int getPremiumDays() const {return premiumDays;}
-	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
+	int getPremiumDays() const;
+	bool isPremium() const;
 
 	bool isOnline() const {return (client != NULL);}
 	void disconnect() {if(client) client->disconnect();}
@@ -660,7 +660,7 @@ protected:
 	playersex_t sex;
 	int32_t soul, soulMax;
 	uint64_t groupFlags;
-	int32_t premiumDays;
+	int32_t premiumEnd;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 	uint32_t actionTaskEvent;

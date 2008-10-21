@@ -141,7 +141,7 @@ Creature()
 	maxDepotLimit = 1000;
 	maxVipLimit = 50;
 	groupFlags = 0;
-	premiumDays = 0;
+	premiumEnd = 0;
 	balance = 0;
 
  	vocation_id = (Vocation_t)0;
@@ -717,6 +717,18 @@ int32_t Player::getDefaultStats(stats_t stat)
 			return 0;
 			break;
 	}
+}
+
+int Player::getPremiumDays() const {
+	time_t t = std::time(NULL);
+	if(premiumEnd < t) {
+		return 0;
+	}
+	return int((t - premiumEnd) / 86400);
+}
+
+bool Player::isPremium() const {
+	return (premiumEnd > std::time(NULL) || hasFlag(PlayerFlag_IsAlwaysPremium));
 }
 
 Container* Player::getContainer(uint32_t cid)
@@ -1806,13 +1818,21 @@ void Player::addExperience(uint64_t exp)
 	int prevLevel = getLevel();
 	int newLevel = getLevel();
 
-	while(experience >= Player::getExpForLevel(newLevel + 1)){
+	uint64_t currLevelExp = Player::getExpForLevel(newLevel);
+	uint64_t nextLevelExp = Player::getExpForLevel(newLevel + 1);
+	if(nextLevelExp < currLevelExp) {
+		// Cannot gain more experience
+		// Perhaps some sort of notice should be printed here?
+		return;
+	}
+	while(experience >= nextLevelExp) {
 		++newLevel;
 		healthMax += vocation->getHPGain();
 		health += vocation->getHPGain();
 		manaMax += vocation->getManaGain();
 		mana += vocation->getManaGain();
 		capacity += vocation->getCapGain();
+		nextLevelExp = Player::getExpForLevel(newLevel + 1);
 	}
 
 	if(prevLevel != newLevel){
@@ -1834,10 +1854,13 @@ void Player::addExperience(uint64_t exp)
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 	}
 
-	uint64_t currLevelExp = Player::getExpForLevel(level);
-	uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
-	if(newPercent != levelPercent){
+	currLevelExp = Player::getExpForLevel(level);
+	nextLevelExp = Player::getExpForLevel(level + 1);
+	if(nextLevelExp > currLevelExp) {
+		uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
 		levelPercent = newPercent;
+	} else {
+		levelPercent = 0;
 	}
 
 	sendStats();
@@ -3912,10 +3935,7 @@ const OutfitListType& Player::getPlayerOutfits()
 
 bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 {
-	if(m_playerOutfits.isInList(_looktype, _addons)){
-		return true;
-	}
-	return false;
+	return m_playerOutfits.isInList(_looktype, _addons);
 }
 
 bool Player::canLogout()
