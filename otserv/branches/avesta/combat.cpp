@@ -273,7 +273,7 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 #ifdef __SKULLSYSTEM__
 	if(player->hasSafeMode() && target->getPlayer()) {
 		if(player->getParty()) {
-            if(player->getParty()->isPlayerMember(target->getPlayer())) {
+            if(player->getParty()->isPlayerMember(target->getPlayer()) || player->getParty()->getLeader() == target) {
                 return Combat::canDoCombat(player, target);
             }
         }
