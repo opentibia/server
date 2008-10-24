@@ -575,73 +575,67 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool 
 	return isSightClear(fromPos, toPos, false);
 }
 
-bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck)
+bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 {
-	if(floorCheck && fromPos.z != toPos.z){
-		return false;
-	}
-
 	Position start = fromPos;
 	Position end = toPos;
 
-	int deltax, deltay, deltaz;
-	deltax = abs(start.x - end.x);
-	deltay = abs(start.y - end.y);
-	deltaz = abs(start.z - end.z);
+	int x, y, z;
+	int dx, dy, dz;
+	int sx, sy, sz;
+	int ey, ez;
 
-	int max = deltax, dir = 0;
-	if(deltay > max){
-		max = deltay;
+	dx = abs(start.x - end.x);
+	dy = abs(start.y - end.y);
+	dz = abs(start.z - end.z);
+
+	int max = dx, dir = 0;
+	if(dy > max){
+		max = dy;
 		dir = 1;
 	}
-	if(deltaz > max){
-		max = deltaz;
+	if(dz > max){
+		max = dz;
 		dir = 2;
 	}
 
 	switch(dir){
-	case 0:
-		// horizontal
-		//x -> x
-		//y -> y
-		//z -> z
-		break;
-	case 1:
-		// vertical
-		//x -> y
-		//y -> x
-		//z -> z
-		std::swap(start.x, start.y);
-		std::swap(end.x, end.y);
-		std::swap(deltax, deltay);
-		break;
-	case 2:
-		// depth
-		//x -> z
-		//y -> y
-		//z -> x
-		std::swap(start.x, start.z);
-		std::swap(end.x, end.z);
-		std::swap(deltax, deltaz);
-		break;
+		case 0:
+			//x -> x
+			//y -> y
+			//z -> z
+			break;
+		case 1:
+			//x -> y
+			//y -> x
+			//z -> z
+			std::swap(start.x, start.y);
+			std::swap(end.x, end.y);
+			std::swap(dx, dy);
+			break;
+		case 2:
+			//x -> z
+			//y -> y
+			//z -> x
+			std::swap(start.x, start.z);
+			std::swap(end.x, end.z);
+			std::swap(dx, dz);
+			break;
 	}
 
-	int stepx = ((start.x < end.x) ? 1 : -1);
-	int stepy = ((start.y < end.y) ? 1 : -1);
-	int stepz = ((start.z < end.z) ? 1 : -1);
+	sx = ((start.x < end.x) ? 1 : -1);
+	sy = ((start.y < end.y) ? 1 : -1);
+	sz = ((start.z < end.z) ? 1 : -1);
 
-	int x, y, z;
-	int errory = 0, errorz = 0;
+	ey = 0, ez = 0;
 	x = start.x;
 	y = start.y;
 	z = start.z;
 
 	int lastrx = x, lastry = y, lastrz = z;
-	int ax = 0, ay = 0, az = 0;
-	
-	for( ; x != end.x + stepx; x += stepx){
-		int rx, ry, rz;
 
+	for( ; x != end.x + sx; x += sx){
+		int rx, ry, rz;
 		switch(dir){
 		case 1:
 			rx = y; ry = x; rz = z;
@@ -657,52 +651,47 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 		if(!(toPos.x == rx && toPos.y == ry && toPos.z == rz) &&
 		  !(fromPos.x == rx && fromPos.y == ry && fromPos.z == rz)){
 			if(lastrz != rz){
-				if(getTile(lastrx, lastry, std::min(lastrz, rz))){
+				if(const_cast<Map*>(this)->getTile(lastrx, lastry, std::min(lastrz, rz))){
 					return false;
 				}
 			}
 			lastrx = rx; lastry = ry; lastrz = rz;
 
-			Tile* tile = getTile(rx, ry, rz);
-			if(tile){
-				if(tile->hasProperty(BLOCKPROJECTILE)) {
-					if(ax != 0 || ay != 0 || az != 0) {
-						tile = getTile(rx + ax, ry + ay, rz + az);
-						if(tile) {
-							if(tile->hasProperty(BLOCKPROJECTILE)) {
-								return false;
-							}
-						}
-					} else {
-						return false;
-					}
+			const Tile* tile = const_cast<Map*>(this)->getTile(rx, ry, rz);
+			if(tile)
+			{
+				if(tile->hasProperty(BLOCKPROJECTILE))
+				{
+					return false;
 				}
 			}
-			ax = ay = az = 0;
 		}
 
-		errory += deltay;
-		errorz += deltaz;
-		if(2*errory >= deltax){
-			y += stepy;
-			if(std::abs(deltax) != std::abs(deltay)) {
-				if(dir == 0) {
-					// Horizontal thorw
-					ay = -stepy;
-				} else {
-					// Vertical throw
-					ax = -stepy;
-				}
-			}
-			errory -= deltax;
+		ey += dy;
+		ez += dz;
+		if(2*ey >= dx){
+			y  += sy;
+			ey -= dx;
 		}
-		if(2*errorz >= deltax){
-			z += stepz;
-			//az = -stepz; // Is this required??
-			errorz -= deltax;
+		if(2*ez >= dx){
+			z  += sz;
+			ez -= dx;
+
 		}
 	}
 	return true;
+}
+
+bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck) const
+{
+	if(floorCheck && fromPos.z != toPos.z){
+		return false;
+	}
+
+	// Cast two converging rays and see if either yields a result.
+	return
+		checkSightLine(fromPos, toPos) ||
+		checkSightLine(toPos, fromPos);
 }
 
 const Tile* Map::canWalkTo(const Creature* creature, const Position& pos)
