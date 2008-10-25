@@ -813,11 +813,8 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z - 1);
 				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)){
-					Tile* belowTile = map->getTile(destPos.x, destPos.y, destPos.z);
-					if(belowTile == NULL || belowTile->hasProperty(IMMOVABLEBLOCKSOLID)) {
-						flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
-						destPos.z -= 1;
-					}
+					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
+					destPos.z -= 1;
 				}
 			}
 		}
@@ -825,14 +822,11 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 			//try go down
 			Tile* tmpTile = map->getTile(destPos);
 			if(currentPos.z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID)))){
-				Tile* belowTile = map->getTile(currentPos.x, currentPos.y, currentPos.z + 1);
-				if(belowTile == NULL || belowTile->hasProperty(IMMOVABLEBLOCKSOLID)) {
-					tmpTile = map->getTile(destPos.x, destPos.y, destPos.z + 1);
+				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z + 1);
 
-					if(tmpTile && tmpTile->hasHeight(3)){
-						flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
-						destPos.z += 1;
-					}
+				if(tmpTile && tmpTile->hasHeight(3)){
+					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
+					destPos.z += 1;
 				}
 			}
 		}
