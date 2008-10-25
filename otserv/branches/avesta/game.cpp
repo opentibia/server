@@ -763,45 +763,50 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 	const Position& currentPos = creature->getPosition();
 	Position destPos = currentPos;
 
+	bool canChangeFloor = true;
 	switch(direction){
 		case NORTH:
 			destPos.y -= 1;
-		break;
+			break;
 
 		case SOUTH:
 			destPos.y += 1;
-		break;
+			break;
 
 		case WEST:
 			destPos.x -= 1;
-		break;
+			break;
 
 		case EAST:
 			destPos.x += 1;
-		break;
+			break;
 
 		case SOUTHWEST:
 			destPos.x -= 1;
 			destPos.y += 1;
-		break;
+			canChangeFloor = false;
+			break;
 
 		case NORTHWEST:
 			destPos.x -= 1;
 			destPos.y -= 1;
-		break;
+			canChangeFloor = false;
+			break;
 
 		case NORTHEAST:
 			destPos.x += 1;
 			destPos.y -= 1;
-		break;
+			canChangeFloor = false;
+			break;
 
 		case SOUTHEAST:
 			destPos.x += 1;
 			destPos.y += 1;
-		break;
+			canChangeFloor = false;
+			break;
 	}
 
-	if(creature->getPlayer()){
+	if(creature->getPlayer() && canChangeFloor){
 		//try go up
 		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
 			Tile* tmpTile = map->getTile(currentPos.x, currentPos.y, currentPos.z - 1);
