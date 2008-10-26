@@ -379,7 +379,7 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target)
 		int32_t result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnKill" << std::endl;

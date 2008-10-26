@@ -137,11 +137,11 @@ bool ScriptEnviroment::loadGameState()
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery("SELECT COUNT(*) FROM `global_storage`"))){
+	if(!(result = db->storeQuery("SELECT COUNT(*) AS `count` FROM `global_storage`"))){
 		return false;
 	}
 
-	uint32_t count = result->getDataInt("COUNT(*)");
+	uint32_t count = result->getDataInt("count");
 	db->freeResult(result);
 	if(count == 0){
 		return true;

@@ -22,6 +22,12 @@
 #ifndef __OTSERV_DEFINITIONS_H__
 #define __OTSERV_DEFINITIONS_H__
 
+#include "exception.h"
+
+#if defined(WIN32) && !defined(__WINDOWS__)
+#define __WINDOWS__
+#endif
+
 #ifdef XML_GCC_FREE
 	#define xmlFreeOTSERV(s)	free(s)
 #else

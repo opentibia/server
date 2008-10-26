@@ -30,7 +30,7 @@
 
 typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
 
-#if defined WIN32 || defined __WINDOWS__
+#ifdef __WINDOWS__
 #ifdef __WIN_LOW_FRAG_HEAP__
 #define _WIN32_WINNT 0x0501
 #endif
@@ -48,7 +48,7 @@ inline int64_t OTSYS_TIME()
 
 typedef int socklen_t;
 
-#else  // #if defined WIN32 || defined __WINDOWS__
+#else  // #if defined __WINDOWS__
 
 #include <time.h>
 #include <sys/types.h>
@@ -75,6 +75,6 @@ inline int64_t OTSYS_TIME()
 #define closesocket close
 #endif
 
-#endif // #if defined WIN32 || defined __WINDOWS__
+#endif // #if defined __WINDOWS__
 
 #endif // #ifndef __OTSYSTEM_H__

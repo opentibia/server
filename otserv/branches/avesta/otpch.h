@@ -10,7 +10,7 @@
 
 #ifdef __USE_OTPCH__
 
-#if defined __WINDOWS__ || defined WIN32
+#ifdef __WINDOWS__
 #include <winerror.h>
 #endif
 

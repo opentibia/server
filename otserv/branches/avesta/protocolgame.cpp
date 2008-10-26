@@ -799,10 +799,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	default:
-#ifdef __DEBUG__
+//#ifdef __DEBUG__
 		printf("unknown packet header: %x \n", recvbyte);
 		parseDebug(msg);
-#endif
+//#endif
 		break;
 	}
 }

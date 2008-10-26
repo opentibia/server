@@ -2239,7 +2239,7 @@ uint32_t Npc::getMatchCount(NpcResponse* response, std::vector<std::string> word
 			else{
 				std::vector<std::string>::iterator wordIter = wordList.end();				
 				for(wordIter = lastWordMatchIter; wordIter != wordList.end(); ++wordIter){
-					size_t pos = (*wordIter).find_first_of("!\"#¤%&/()=?`{[]}\\^*><,.-_'~");
+					size_t pos = (*wordIter).find_first_of("!\"#ï¿½%&/()=?`{[]}\\^*><,.-_'~");
 					if(pos == std::string::npos){
 						pos = 0;
 					}
