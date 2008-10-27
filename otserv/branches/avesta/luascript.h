@@ -415,6 +415,8 @@ protected:
 	static int luaGetHouseTilesSize(lua_State *L);
 	static int luaSetHouseOwner(lua_State *L);
 	static int luaSetHouseAccessList(lua_State *L);
+	static int luaGetHouseList(lua_State *L);
+	static int luaCleanHouse(lua_State *L);
 
 	//get player info functions
 	static int luaGetPlayerFood(lua_State *L);

@@ -89,7 +89,6 @@ void House::setHouseOwner(uint32_t guid)
 			kickPlayer(NULL, c->getName());
 		}
 
-		//[ added for beds system
 		// we need to remove players from beds
 		HouseBedItemList::iterator bit;
 		for(bit = bedsList.begin(); bit != bedsList.end(); ++bit) {
@@ -97,7 +96,6 @@ void House::setHouseOwner(uint32_t guid)
 				(*bit)->wakeUp(NULL);
 			}
 		}
-		//]
 
 		//clean access lists
 		houseOwner = 0;
@@ -229,30 +227,32 @@ void House::setAccessList(uint32_t listId, const std::string& textlist)
 
 bool House::transferToDepot()
 {
-	if(townid == 0 || houseOwner == 0){
+	if(townid == 0) {
 		return false;
 	}
 
-	std::string ownerName;
-	if(!IOPlayer::instance()->getNameByGuid(houseOwner, ownerName)){
-		return false;
-	}
+	Player* player = NULL;
+	// Empty house is just cleared.
+	if(houseOwner != 0) {
+		std::string ownerName;
+		if(IOPlayer::instance()->getNameByGuid(houseOwner, ownerName)){
+			player = g_game.getPlayerByName(ownerName);
 
-	Player* player = g_game.getPlayerByName(ownerName);
+			if(!player){
+				player = new Player(ownerName, NULL);
 
-	if(!player){
-		player = new Player(ownerName, NULL);
-
-		if(!IOPlayer::instance()->loadPlayer(player, ownerName)){
+				if(!IOPlayer::instance()->loadPlayer(player, ownerName)){
 #ifdef __DEBUG__
-			std::cout << "Failure: [House::transferToDepot], can not load player: " << ownerName << std::endl;
+					std::cout << "Failure: [House::transferToDepot], can not load player: " << ownerName << std::endl;
 #endif
-			delete player;
-			return false;
+					delete player;
+					player = NULL;
+				}
+			}
 		}
 	}
 
-	Depot* depot = player->getDepot(townid, true);
+	Depot* depot = player? player->getDepot(townid, true) : NULL;
 
 	std::list<Item*> moveItemList;
 	Container* tmpContainer = NULL;
@@ -277,16 +277,46 @@ bool House::transferToDepot()
 	}
 
 	for(std::list<Item*>::iterator it = moveItemList.begin(); it != moveItemList.end(); ++it){
-		g_game.internalMoveItem((*it)->getParent(), depot, INDEX_WHEREEVER,
-			(*it), (*it)->getItemCount(), NULL, FLAG_NOLIMIT);
+		if(depot) {
+			g_game.internalMoveItem((*it)->getParent(), depot, INDEX_WHEREEVER,
+				(*it), (*it)->getItemCount(), NULL, FLAG_NOLIMIT);
+		} else {
+			g_game.internalRemoveItem(*it);
+		}
 	}
 
-	if(!player->isOnline()){
+	if(player && !player->isOnline()){
 		IOPlayer::instance()->savePlayer(player);
 		delete player;
 	}
 
 	return true;
+}
+
+void House::cleanHouse() {	
+	transferToDepot();
+	
+	PlayerVector to_kick;
+	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
+		for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
+			Creature* creature = (*it)->__getThing(i)->getCreature();
+			if(creature != NULL && creature->getPlayer())
+				to_kick.push_back(creature->getPlayer());
+		}
+	}
+	while(to_kick.empty() == false) {
+		Player* c = to_kick.back();
+		to_kick.pop_back();
+		kickPlayer(NULL, c->getName());
+	}
+
+	// we need to remove players from beds
+	HouseBedItemList::iterator bit;
+	for(bit = bedsList.begin(); bit != bedsList.end(); ++bit) {
+		if((*bit)->getSleeper() != 0) {
+			(*bit)->wakeUp(NULL);
+		}
+	}
 }
 
 bool House::getAccessList(uint32_t listId, std::string& list) const

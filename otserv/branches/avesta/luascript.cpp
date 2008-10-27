@@ -1443,6 +1443,12 @@ void LuaScriptInterface::registerFunctions()
 	//setHouseOwner(houseid, ownerGUID)
 	lua_register(m_luaState, "setHouseOwner", LuaScriptInterface::luaSetHouseOwner);
 
+	//getHouseList(townid)
+	lua_register(m_luaState, "getHouseList", LuaScriptInterface::luaGetHouseList);
+
+	//cleanHouse(houseid)
+	lua_register(m_luaState, "cleanHouse", LuaScriptInterface::luaCleanHouse);
+
 	//getWorldType()
 	lua_register(m_luaState, "getWorldType", LuaScriptInterface::luaGetWorldType);
 
@@ -4116,6 +4122,49 @@ int LuaScriptInterface::luaSetHouseOwner(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetHouseList(lua_State *L)
+{
+	//getHouseList(townid = 0)
+	uint32_t townid = 0;
+
+	if(lua_gettop(L) > 0)
+		townid = popNumber(L);
+
+	lua_newtable(L);
+	int n = 1;
+	for(HouseMap::iterator iter = Houses::getInstance().getHouseBegin();
+		iter != Houses::getInstance().getHouseEnd();
+		++n, ++iter)
+	{
+		House* house = iter->second;
+
+		if(townid != 0 && house->getTownId() != townid)
+			continue;
+		lua_pushnumber(L, n);
+		lua_pushnumber(L, house->getHouseId());
+		lua_settable(L, -3);
+	}
+		
+	return 1;
+}
+
+int LuaScriptInterface::luaCleanHouse(lua_State *L)
+{
+	//cleanHouse(houseid)
+	uint32_t houseid = popNumber(L);
+
+	House* house = Houses::getInstance().getHouse(houseid);
+
+	if(house) {
+		house->cleanHouse();
+		lua_pushboolean(L, 1);
+	} else {
+		lua_pushboolean(L, 0);
+	}
+
 	return 1;
 }
 

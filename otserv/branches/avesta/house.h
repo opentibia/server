@@ -202,11 +202,13 @@ public:
 
 	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
 	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
-	//[ added for beds system
+
 	void addBed(BedItem* bed);
 	HouseBedItemList::iterator getHouseBedsBegin() {return bedsList.begin();}
 	HouseBedItemList::iterator getHouseBedsEnd() {return bedsList.end();}
-	//]
+
+	// Transfers all items to depot and clicks all players (useful for map updates, for example)
+	void cleanHouse();
 
 private:
 	void updateDoorDescription();
