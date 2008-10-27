@@ -19,10 +19,10 @@
 #include "otpch.h"
 
 #include "lua manager.h"
-#include "script manager.h"
+#include "script_manager.h"
 
-#include "script event.h"
-#include "script listener.h"
+#include "script_event.h"
+#include "script_listener.h"
 
 #include "game.h"
 #include "creature.h"

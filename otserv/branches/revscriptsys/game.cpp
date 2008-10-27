@@ -53,9 +53,9 @@
 #include "spawn.h"
 #include "beds.h"
 
-#include "script enviroment.h"
-#include "script manager.h"
-#include "script event.h"
+#include "script_enviroment.h"
+#include "script_manager.h"
+#include "script_event.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"

@@ -21,10 +21,10 @@
 #include "configmanager.h"
 
 #include "lua manager.h"
-#include "script manager.h"
-#include "script enviroment.h"
-#include "script listener.h"
-#include "script event.h"
+#include "script_manager.h"
+#include "script_enviroment.h"
+#include "script_listener.h"
+#include "script_event.h"
 
 #include "container.h"
 #include "player.h"

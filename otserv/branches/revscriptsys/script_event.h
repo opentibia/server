@@ -23,7 +23,7 @@
 #include "boost/any.hpp"
 #include "boost_common.h"
 
-#include "script enviroment.h"
+#include "script_enviroment.h"
 
 #include "const.h"
 

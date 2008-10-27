@@ -18,8 +18,8 @@
 
 #include "otpch.h"
 
-#include "script listener.h"
-#include "script manager.h"
+#include "script_listener.h"
+#include "script_manager.h"
 
 uint32_t Script::Listener::ID_counter = 0;
 

@@ -18,8 +18,8 @@
 
 #include "otpch.h"
 
-#include "script enviroment.h"
-#include "script listener.h"
+#include "script_enviroment.h"
+#include "script_listener.h"
 
 using namespace Script;
 
