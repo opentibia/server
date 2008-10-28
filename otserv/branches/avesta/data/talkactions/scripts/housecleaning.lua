@@ -1,4 +1,9 @@
 function onSay(cid, words, param)
+	local access = getPlayerAccess(cid)
+	if access ~= LUA_ERROR and access < 3 then
+		return TRUE
+	end
+	
     local townid = string.match(param, "(%d+)")
     local houselist = {}
     if townid == nil then
@@ -18,5 +23,5 @@ function onSay(cid, words, param)
     end
 
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "" .. s .. " houses cleaned (" .. f .. " failed)")
-	return FALSE
+	return TRUE
 end
