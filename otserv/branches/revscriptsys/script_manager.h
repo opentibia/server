@@ -19,7 +19,7 @@
 #ifndef __OTSERV_SCRIPT_MANAGER__
 #define __OTSERV_SCRIPT_MANAGER__
 
-#include "lua manager.h"
+#include "lua_manager.h"
 
 namespace Script {
 	class Event;

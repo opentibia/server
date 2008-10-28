@@ -20,7 +20,7 @@
 
 #include "configmanager.h"
 
-#include "lua manager.h"
+#include "lua_manager.h"
 #include "script_manager.h"
 #include "script_enviroment.h"
 #include "script_listener.h"
@@ -472,7 +472,7 @@ int32_t LuaThread::run(int args) {
 			int tabcount = 16;
 			if(ar.name) {
 				std::cout << ar.name;
-				tabcount -= 16 strlen(ar.name);
+				tabcount -= 16 - strlen(ar.name);
 			}
 			while(tabcount-- > 0) std::cout << " ";
 

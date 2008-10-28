@@ -18,7 +18,7 @@
 
 #include "otpch.h"
 
-#include "lua manager.h"
+#include "lua_manager.h"
 #include "script_manager.h"
 
 #include "script_event.h"
