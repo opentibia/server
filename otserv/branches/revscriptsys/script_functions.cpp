@@ -86,6 +86,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
 
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
+	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
 
 	registerClass("Monster", "Creature");
 

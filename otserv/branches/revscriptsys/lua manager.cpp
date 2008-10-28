@@ -469,12 +469,12 @@ int32_t LuaThread::run(int args) {
 			}
 			std::cout << "\t";
 			
-			int tabcount = 2;
+			int tabcount = 16;
 			if(ar.name) {
 				std::cout << ar.name;
-				tabcount = 2 - strlen(ar.name) / 8;
+				tabcount -= 16 strlen(ar.name);
 			}
-			while(tabcount-- > 0) std::cout << "\t";
+			while(tabcount-- > 0) std::cout << " ";
 
 			std::cout << ar.short_src;
 			std::cout << "\n";

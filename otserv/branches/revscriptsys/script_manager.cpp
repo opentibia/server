@@ -328,13 +328,16 @@ void Manager::registerClass(const std::string& cname) {
 	lua_pushvalue(state, -1); // Another reference to the table
 	lua_setfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
 
+	// Create the meta-relations
 	lua_newtable(state); // Class table
 	lua_pushvalue(state, -1); // Another reference to the table
 	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
+	
+	// Set the index metamethod for the class metatable to the class table
+	lua_setfield(state, -2, "__index"); 
 
-	lua_setfield(state, -2, "__index"); // Set the index metamethod for the class metatable to the class table
-
-	lua_pop(state, 1); // Pop the class metatable
+	// Pop the class metatable
+	lua_pop(state, 1); 
 }
 
 
@@ -347,38 +350,52 @@ void Manager::registerClass(const std::string& cname, const std::string& parent_
 	lua_pushvalue(state, -1); // Another reference to the table
 	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
 
-	lua_setfield(state, -2, "__index"); // Set the index metamethod for the class metatable to the class table
+	// Set the index metamethod for the class metatable to the class table
+	lua_setfield(state, -2, "__index"); 
 
 	lua_pop(state, 1); // Pop the class metatable
 
-	lua_getfield(state, LUA_GLOBALSINDEX, cname.c_str()); // Add the derived class table to the top of the stack
+	// Add the derived class table to the top of the stack
+	lua_getfield(state, LUA_GLOBALSINDEX, cname.c_str()); 
 	
+	// Create the meta-relations
 	lua_newtable(state); // Create a small redirect table
 	lua_getfield(state, LUA_GLOBALSINDEX, parent_class.c_str()); // Get the parent table
 	lua_setfield(state, -2, "__index"); // Set the index metamethod for the redirect table to the base class table
 
-	lua_setmetatable(state, -2); // Set the metatable of the derived class table to the redirect table
-	lua_pop(state, 1); // Pop the derived class table
+	// Set the metatable of the derived class table to the redirect table
+	lua_setmetatable(state, -2); 
+	// Pop the derived class table
+	lua_pop(state, 1); 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register handling functions
 
 void Manager::registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc) {
+	// Create the composed callback containing all the type info etc.
 	ComposedCallback_ptr func = parseFunctionDeclaration(fdecl);
+	// Store the C callback in the composed callback
 	func->func = cfunc;
 	
+	// Generate unique function ID, and associate it with the composed function
 	uint32_t function_id = ++function_id_counter;
 	function_map[function_id] = func;
 
+	// Push this manager (pointer cast is important!)
 	lua_pushlightuserdata(state, (Manager*)this);
+	// Push the function ID
 	lua_pushnumber(state, function_id);
+	// Create the function, with the manager & id stored in the closure
+	// the callback extracts the function and manager and calls it.
 	lua_pushcclosure(state, luaFunctionCallback, 2);
 
+	// Store the function in the global lua table
 	lua_setfield(state, LUA_GLOBALSINDEX, func->name.c_str());
 }
 
 void Manager::registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc) {
+	// Create the composed callback containing all type info etc.
 	ComposedCallback_ptr func = parseFunctionDeclaration(fdecl);
 	
 	// Add the hidden "self" parameter
@@ -388,19 +405,28 @@ void Manager::registerMemberFunction(const std::string& cname, const std::string
 	ctd.types.push_back("userdata");
 	func->parameters.insert(func->parameters.begin(), ctd);
 
+	// Construct function name, for debug purposes
 	std::string funcname = func->name;
 	func->name = cname + ":" + funcname;
 	func->func = cfunc;
 	
+	// Create a unique ID for the function, and associate it with the composed callback
 	uint32_t function_id = ++function_id_counter;
 	function_map[function_id] = func;
 
+	// Push the class table
 	lua_getfield(state, LUA_GLOBALSINDEX, cname.c_str());
+	// Push this manager (pointer cast is important!)
 	lua_pushlightuserdata(state, (Manager*)this);
+	// Push the function ID
 	lua_pushnumber(state, function_id);
+	// Create the function, with the manager & id stored in the closure
+	// the callback extracts the function and manager and calls it.
 	lua_pushcclosure(state, luaFunctionCallback, 2);
-
+	
+	// Store the function at the class field funcname
 	lua_setfield(state, -2, funcname.c_str());
 
+	// Remove the class table
 	lua_pop(state, 1);
 }
