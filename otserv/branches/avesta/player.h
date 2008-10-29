@@ -149,7 +149,7 @@ public:
 	int getPremiumDays() const;
 	bool isPremium() const;
 
-	bool isOnline() const {return (client != NULL);}
+	bool isOffline() const {return (getID() == 0);}
 	void disconnect() {if(client) client->disconnect();}
 	uint32_t getIP() const;
 

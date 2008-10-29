@@ -339,7 +339,7 @@ bool ProtocolGame::login(const std::string& name)
 			return false;
 		}
 
-		if(_player->isOnline()){
+		if(_player->client){
 			g_chat.removeUserFromAllChannels(_player);
 			_player->disconnect();
 			_player->isConnecting = true;
@@ -361,7 +361,7 @@ bool ProtocolGame::connect(uint32_t playerId)
 	unRef();
 	eventConnect = 0;
 	Player* _player = g_game.getPlayerByID(playerId);
-	if(!_player || _player->isRemoved() || _player->isOnline()){
+	if(!_player || _player->isRemoved() || _player->client){
 		disconnectClient(0x14, "Your already logged in.");
 		return false;
 	}

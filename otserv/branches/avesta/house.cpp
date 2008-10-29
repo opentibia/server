@@ -240,7 +240,6 @@ bool House::transferToDepot()
 
 			if(!player){
 				player = new Player(ownerName, NULL);
-
 				if(!IOPlayer::instance()->loadPlayer(player, ownerName)){
 #ifdef __DEBUG__
 					std::cout << "Failure: [House::transferToDepot], can not load player: " << ownerName << std::endl;
@@ -285,7 +284,7 @@ bool House::transferToDepot()
 		}
 	}
 
-	if(player && !player->isOnline()){
+	if(player && player->isOffline()){
 		IOPlayer::instance()->savePlayer(player);
 		delete player;
 	}
@@ -954,10 +953,8 @@ bool Houses::payHouses()
 			}
 
 			Player* player = g_game.getPlayerByName(name);
-
 			if(!player){
 				player = new Player(name, NULL);
-
 				if(!IOPlayer::instance()->loadPlayer(player, name)){
 		#ifdef __DEBUG__
 					std::cout << "Failure: [Houses::payHouses], can not load player: " << name << std::endl;
@@ -1053,7 +1050,7 @@ bool Houses::payHouses()
 				}
 			}
 
-			if(!player->isOnline()){
+			if(player->isOffline()){
 				if(savePlayerHere){
 					IOPlayer::instance()->savePlayer(player);
 				}

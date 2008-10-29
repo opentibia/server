@@ -4088,9 +4088,14 @@ bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 		}
 	}
 
-	this->balance -= amount;
+	if(balance < amount){
+		return false;
+	}
+
+	balance -= amount;
 	target->balance += amount;
-	if(!target->isOnline()){
+
+	if(target->isOffline()){
 		IOPlayer::instance()->savePlayer(target);
 		delete target;
 	}
