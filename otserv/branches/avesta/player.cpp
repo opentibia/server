@@ -1197,6 +1197,8 @@ void Player::sendPing(uint32_t interval)
 
 	if(canLogout()){
 		if(!client){
+			//Occurs when the player closes the game without logging out (x-logging).
+			g_creatureEvents->playerLogOut(this);
 			g_game.removeCreature(this, true);
 		}
 		else if(npings > 24){
