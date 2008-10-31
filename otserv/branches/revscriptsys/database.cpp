@@ -40,7 +40,7 @@
 extern ConfigManager g_config;
 #endif
 
-OTSYS_THREAD_LOCKVAR DBQuery::database_lock;
+boost::recursive_mutex DBQuery::database_lock;
 
 Database* _Database::_instance = NULL;
 
@@ -66,7 +66,6 @@ Database* _Database::instance(){
 #else
 		_instance = new Database;
 #endif
-		OTSYS_THREAD_LOCKVARINIT(DBQuery::database_lock);
 	}
 	return _instance;
 }
@@ -84,12 +83,12 @@ DBResult* _Database::verifyResult(DBResult* result)
 
 DBQuery::DBQuery()
 {
-	OTSYS_THREAD_LOCK(database_lock, NULL);
+	database_lock.lock();
 }
 
 DBQuery::~DBQuery()
 {
-	OTSYS_THREAD_UNLOCK(database_lock, NULL);
+	database_lock.unlock();
 }
 
 DBInsert::DBInsert(Database* db)

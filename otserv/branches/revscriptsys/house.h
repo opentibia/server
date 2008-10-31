@@ -83,8 +83,8 @@ public:
 	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream);
 
-	void setDoorId(uint32_t _doorId){ doorId = _doorId;};
-	uint32_t getDoorId() const{ return doorId;};
+	void setDoorId(uint32_t _doorId){ setIntAttr(ATTR_ITEM_DOORID, (uint32_t)_doorId);};
+	uint32_t getDoorId() const{ return getIntAttr(ATTR_ITEM_DOORID);};
 
 	bool canUse(const Player* player);
 
@@ -92,13 +92,13 @@ public:
 	bool getAccessList(std::string& list) const;
 
 	//overrides
-	virtual bool canRemove() const {return (house == NULL);}
+	virtual void onRemoved();
+	void copyAttributes(Item* item);
 
 protected:
 	void setHouse(House* _house);
 
 private:
-	uint32_t doorId;
 	House* house;
 	AccessList* accessList;
 	friend class House;
@@ -187,6 +187,7 @@ public:
 	uint32_t getHouseId() const {return houseid;}
 
 	void addDoor(Door* door);
+	void removeDoor(Door* door);
 	Door* getDoorByNumber(uint32_t doorId);
 	Door* getDoorByNumber(uint32_t doorId) const;
 	Door* getDoorByPosition(const Position& pos);
@@ -201,18 +202,22 @@ public:
 
 	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
 	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
-	//[ added for beds system
+
 	void addBed(BedItem* bed);
 	HouseBedItemList::iterator getHouseBedsBegin() {return bedsList.begin();}
 	HouseBedItemList::iterator getHouseBedsEnd() {return bedsList.end();}
-	//]
+
+	// Transfers all items to depot and clicks all players (useful for map updates, for example)
+	void cleanHouse();
 
 private:
+	void updateDoorDescription();
 	bool transferToDepot();
 
 	bool isLoaded;
 	uint32_t houseid;
 	uint32_t houseOwner;
+	std::string houseOwnerName;
 	HouseTileList houseTiles;
 	HouseDoorList doorList;
 	//[ added for beds system
@@ -239,6 +244,7 @@ enum RentPeriod_t{
 	RENTPERIOD_WEEKLY,
 	RENTPERIOD_MONTHLY,
 	RENTPERIOD_YEARLY,
+	RENTPERIOD_NEVER,
 };
 
 class Houses

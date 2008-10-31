@@ -56,6 +56,7 @@ public:
 	void doMove(Direction dir);
 	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
+
 protected:
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
@@ -81,7 +82,6 @@ protected:
 
 	bool canWalkTo(const Position& fromPos, Direction dir);
 	bool getRandomStep(Direction& dir);
-
 	std::string name;
 	uint32_t walkTicks;
 	bool floorChange;

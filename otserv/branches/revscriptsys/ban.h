@@ -21,7 +21,7 @@
 #ifndef __OTSERV_BAN_H__
 #define __OTSERV_BAN_H__
 
-#include "otsystem.h"
+#include <boost/thread.hpp>
 #include <list>
 
 struct LoginBlock{
@@ -92,7 +92,7 @@ protected:
 	uint32_t maxLoginTries;
 	uint32_t retryTimeout;
 
-	mutable OTSYS_THREAD_LOCKVAR banLock;
+	mutable boost::recursive_mutex banLock;
 
 	friend class IOBan;
 };

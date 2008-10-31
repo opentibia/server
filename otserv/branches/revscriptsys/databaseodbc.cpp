@@ -30,6 +30,8 @@
 
 #include "otpch.h"
 
+#ifdef __USE_ODBC__
+
 #include <iostream>
 
 #include "database.h"
@@ -373,3 +375,5 @@ ODBCResult::~ODBCResult()
 {
 	SQLFreeHandle(SQL_HANDLE_STMT, m_handle);
 }
+
+#endif

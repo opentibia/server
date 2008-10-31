@@ -71,10 +71,22 @@ void toLowerCaseString(std::string& source)
 	std::transform(source.begin(), source.end(), source.begin(), tolower);
 }
 
+void toUpperCaseString(std::string& source)
+{
+	std::transform(source.begin(), source.end(), source.begin(), upchar);
+}
+
 std::string asLowerCaseString(const std::string& source)
 {
 	std::string s = source;
 	toLowerCaseString(s);
+	return s;
+}
+
+std::string asUpperCaseString(const std::string& source)
+{
+	std::string s = source;
+	toUpperCaseString(s);
 	return s;
 }
 
@@ -128,11 +140,56 @@ bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
 	return false;
 }
 
+bool utf8ToLatin1(char* intext, std::string& outtext)
+{
+	outtext = "";
+
+	if(intext == NULL){
+		return false;
+	}
+
+	int inlen  = strlen(intext);
+	if(inlen == 0){
+		return false;
+	}
+
+	int outlen = inlen*2;
+	unsigned char* outbuf = new unsigned char[outlen];
+	int res = UTF8Toisolat1(outbuf, &outlen, (unsigned char*)intext, &inlen);
+	if(res < 0){
+		delete[] outbuf;
+		return false;
+	}
+
+	outbuf[outlen] = '\0';
+	outtext = (char*)outbuf;
+	delete[] outbuf;
+	return true;
+}
+
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
-		value = nodeValue;
+		if(!utf8ToLatin1(nodeValue, value)){
+			value = nodeValue;
+		}
+
+		xmlFreeOTSERV(nodeValue);
+		return true;
+	}
+
+	return false;
+}
+
+bool readXMLContentString(xmlNodePtr node, std::string& value)
+{
+	char* nodeValue = (char*)xmlNodeGetContent(node);
+	if(nodeValue){
+		if(!utf8ToLatin1(nodeValue, value)){
+			value = nodeValue;
+		}
+
 		xmlFreeOTSERV(nodeValue);
 		return true;
 	}
@@ -448,7 +505,10 @@ MagicEffectNames magicEffectNames[] = {
 	{"cake",              NM_ME_CAKE},
 	{"giantice",          NM_ME_GIANTICE},
 	{"watersplash",       NM_ME_WATERSPLASH},
-	{"plantattack",       NM_ME_PLANTATTACK}
+	{"plantattack",       NM_ME_PLANTATTACK},
+	{"tutorialarrow",		NM_ME_TUTORIALARROW},
+	{"tutorialsquare",		NM_ME_TUTORIALSQUARE}
+
 };
 
 ShootTypeNames shootTypeNames[] = {

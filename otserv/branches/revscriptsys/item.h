@@ -176,7 +176,8 @@ protected:
 		ATTR_ITEM_DECAYING = 262144,
 		ATTR_ITEM_CORPSEOWNER = 524288,
 		ATTR_ITEM_CHARGES = 1048576,
-		ATTR_ITEM_FLUIDTYPE = 2097152
+		ATTR_ITEM_FLUIDTYPE = 2097152,
+		ATTR_ITEM_DOORID = 4194304
 	};
 
 	bool hasAttribute(itemAttrTypes type) const;
@@ -247,6 +248,7 @@ public:
 	Item(const uint16_t _type, uint16_t _count = 0);
 	Item(const Item &i);
 	virtual Item* clone() const;
+	virtual void copyAttributes(Item* item);
 
 	virtual ~Item();
 
@@ -268,6 +270,10 @@ public:
 	virtual BedItem* getBed(){ return NULL; }
 	virtual const BedItem* getBed() const { return NULL; }
 	//]
+
+	static std::string getDescription(const ItemType& it, int32_t lookDistance,
+		const Item* item = NULL, int32_t subType = -1);
+	static std::string getWeightDescription(const ItemType& it, double weight, uint32_t count = 1);
 
 	//serialization
 	virtual bool unserialize(xmlNodePtr p);
@@ -301,6 +307,7 @@ public:
 	int getDefense() const {return items[id].defence;}
 	int getExtraDef() const {return items[id].extraDef;}
 	int getSlotPosition() const {return items[id].slot_position;}
+	int getHitChance() const {return items[id].hitChance;}
 
 	bool isReadable() const {return items[id].canReadText;}
 	bool canWriteText() const {return items[id].canWriteText;}
@@ -341,11 +348,10 @@ public:
 	uint16_t getItemCount() const {return count;}
 	void setItemCount(uint16_t n) {count = n;}
 
-	uint16_t getItemCountOrSubtype() const;
-	void setItemCountOrSubtype(uint16_t n);
 	void setDefaultSubtype();
 	bool hasSubType() const;
 	uint16_t getSubType() const;
+	void setSubType(uint16_t n);
 
 	void setUniqueId(uint16_t n);
 
@@ -360,6 +366,7 @@ public:
 
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
+	virtual void onRemoved() {};
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
 protected:

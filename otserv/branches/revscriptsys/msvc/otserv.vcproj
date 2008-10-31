@@ -122,7 +122,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_X86_&quot; /c "
 				Optimization="2"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;NOMINMAX;__USE_SQLITE__;__SKULLSYSTEM__;__USE_OTPCH__"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;NOMINMAX;__USE_MYSQL__"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
@@ -143,14 +143,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="lua51.lib libxml2.lib wsock32.lib libgmp-3.lib sqlite3.lib"
+				AdditionalOptions="lua51.lib libxml2.lib wsock32.lib libgmp-3.lib libmysql.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				LinkTimeCodeGeneration="1"
+				LinkTimeCodeGeneration="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -259,7 +259,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\databasesqlite.cpp"
+				RelativePath="..\databasemysql.cpp"
 				>
 			</File>
 			<File
@@ -549,7 +549,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\databasesqlite.h"
+				RelativePath="..\databasemysql.h"
 				>
 			</File>
 			<File

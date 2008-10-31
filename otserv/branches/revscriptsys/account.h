@@ -35,7 +35,10 @@ public:
 
 	uint32_t accnumber;
 
-	uint32_t premDays;
+	// < current time is none, (time_t)(-1) is infinite.
+	time_t premEnd;
+
+	uint16_t getPremiumDaysLeft() const;
 
 	std::string password;
 

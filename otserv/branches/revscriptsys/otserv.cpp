@@ -28,6 +28,7 @@
 
 #include "otsystem.h"
 #include "server.h"
+#include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
 #include <stdlib.h>
@@ -37,6 +38,7 @@
 
 #include "status.h"
 #include "monsters.h"
+#include "npc.h"
 #include "commands.h"
 #include "outfit.h"
 #include "vocation.h"
@@ -49,10 +51,6 @@
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
-#endif
-
-#ifdef __DEBUG_CRITICALSECTION__
-OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 #endif
 
 
@@ -68,7 +66,7 @@ IPList serverIPs;
 ConfigManager g_config;
 
 Game g_game;
-Commands commands(&g_game);
+Commands commands;
 Monsters g_monsters;
 BanManager g_bans;
 Vocations g_vocations;
@@ -76,8 +74,9 @@ Vocations g_vocations;
 RSA* g_otservRSA = NULL;
 Server* g_server = NULL;
 
-OTSYS_THREAD_LOCKVAR g_loaderLock;
-OTSYS_THREAD_SIGNALVAR g_loaderSignal;
+boost::mutex g_loaderLock;
+boost::condition_variable g_loaderSignal;
+boost::unique_lock<boost::mutex> g_loaderUniqueLock(g_loaderLock);
 
 extern AdminProtocolConfig* g_adminConfig;
 
@@ -98,7 +97,7 @@ void mainLoader(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
 #ifdef __OTSERV_ALLOCATOR_STATS__
-	OTSYS_CREATE_THREAD(allocatorStatsThread, NULL);
+	boost::thread(boost::bind(&allocatorStatsThread, NULL));
 #endif
 
 #if defined __EXCEPTION_TRACER__
@@ -158,13 +157,9 @@ int main(int argc, char *argv[])
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 
-	OTSYS_THREAD_LOCKVARINIT(g_loaderLock);
-	OTSYS_THREAD_SIGNALVARINIT(g_loaderSignal);
-
 	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, argc, argv)));
 
-	OTSYS_THREAD_LOCK(g_loaderLock, "main()");
-	OTSYS_THREAD_WAITSIGNAL(g_loaderSignal, g_loaderLock);
+	g_loaderSignal.wait(g_loaderUniqueLock);
 
 	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
 	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
@@ -184,7 +179,7 @@ void mainLoader(int argc, char *argv[])
 	g_game.setGameState(GAME_STATE_STARTUP);
 
 	// random numbers generator
-	std::cout << ":: Initializing the random numbers... ";
+	std::cout << ":: Initializing the random numbers... " << std::flush;
 	srand((unsigned int)OTSYS_TIME());
 	std::cout << "[done]" << std::endl;
 
@@ -197,7 +192,7 @@ void mainLoader(int argc, char *argv[])
 #endif
 
 	// read global config
-	std::cout << ":: Loading lua script " << configname << "... ";
+	std::cout << ":: Loading lua script " << configname << "... " << std::flush;
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
 	std::string configpath;
 	configpath = getenv("HOME");
@@ -215,8 +210,17 @@ void mainLoader(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 
+	std::cout << ":: Checking Database Connection... ";
+	Database* db = Database::instance();
+	if(db == NULL || !db->isConnected())
+	{
+		ErrorMessage("Database Connection Failed!");
+		exit(-1);
+	}
+	std::cout << "[done]" << std::endl;
+
 	//load RSA key
-	std::cout << ":: Loading RSA key...";
+	std::cout << ":: Loading RSA key..." << std::flush;
 	const char* p("14299623962416399520070177382898895550795403345466153217470516082934737582776038882967213386204600674145392845853859217990626450972452084065728686565928113");
 	const char* q("7630979195970404721891201847792002125535401292779123937207447574596692788513647179235335529307251350570728407373705564708871762033017096809910315212884101");
 	const char* d("46730330223584118622160180015036832148732986808519344675210555262940258739805766860224610646919605860206328024326703361630109888417839241959507572247284807035235569619173792292786907845791904955103601652822519121908367187885509270025388641700821735345222087940578381210879116823013776808975766851829020659073");
@@ -230,7 +234,7 @@ void mainLoader(int argc, char *argv[])
 	//load vocations
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "vocations.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
+	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(!g_vocations.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		ErrorMessage("Unable to load vocations!");
 		exit(-1);
@@ -240,7 +244,7 @@ void mainLoader(int argc, char *argv[])
 	//load commands
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "commands.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
+	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(!commands.loadXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -252,7 +256,7 @@ void mainLoader(int argc, char *argv[])
 	// load item data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.otb";
-	std::cout << ":: Loading " << filename.str() << "... ";
+	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(Item::items.loadFromOtb(filename.str())){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -263,7 +267,7 @@ void mainLoader(int argc, char *argv[])
 
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
+	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(!Item::items.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -275,7 +279,7 @@ void mainLoader(int argc, char *argv[])
 	// load monster data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "monsters/monsters.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
+	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(!g_monsters.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -287,7 +291,7 @@ void mainLoader(int argc, char *argv[])
 	// load outfits data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "outfits.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
+	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	Outfits* outfits = Outfits::getInstance();
 	if(!outfits->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
@@ -301,7 +305,7 @@ void mainLoader(int argc, char *argv[])
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "admin.xml";
 	g_adminConfig = new AdminProtocolConfig();
-	std::cout << ":: Loading admin protocol config... ";
+	std::cout << ":: Loading admin protocol config... " << std::flush;
 	if(!g_adminConfig->loadXMLConfig(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
@@ -311,7 +315,6 @@ void mainLoader(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
-	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
 
 	if(asLowerCaseString(worldType) == "pvp")
 		g_game.setWorldType(WORLD_TYPE_PVP);
@@ -323,7 +326,8 @@ void mainLoader(int argc, char *argv[])
 		ErrorMessage("Unknown world type!");
 		exit(-1);
 	}
-	std::cout << ":: Worldtype: " << worldType << std::endl;
+
+	std::cout << ":: Worldtype: " << asUpperCaseString(worldType) << std::endl;
 
 	#ifdef __SKULLSYSTEM__
 	std::cout << ":: Skulls enabled" << std::endl;
@@ -428,5 +432,5 @@ void mainLoader(int argc, char *argv[])
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
 	g_game.setGameState(GAME_STATE_NORMAL);
-	OTSYS_THREAD_SIGNAL_SEND(g_loaderSignal);
+	g_loaderSignal.notify_all();
 }

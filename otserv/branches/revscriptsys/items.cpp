@@ -60,10 +60,14 @@ ItemType::ItemType()
 	blockProjectile = false;
 	blockPathFind = false;
 
-	std::string runeSpellName;
-	runeMagLevel    = 0;
+	wieldInfo        = 0;
+	minReqLevel      = 0;
+	minReqMagicLevel = 0;
 
-	speed		      = 0;
+	runeMagLevel  = 0;
+	runeLevel     = 0;
+
+	speed		  = 0;
 	id            = 0;
 	clientId      = 100;
 	maxItems      = 8;  // maximum size if this is a container
@@ -85,7 +89,7 @@ ItemType::ItemType()
 	stopTime      = false;
 	corpseType    = RACE_NONE;
 	fluidSource  = -1;
-
+	clientCharges = false;
 	allowDistRead = false;
 
 	isVertical		= false;
@@ -196,16 +200,15 @@ int Items::loadFromOtb(std::string file)
 		}
 	}
 
-	if(Items::dwMajorVersion != 2){
-		std::cout << "Not supported items.otb version." << std::endl;
-		return ERROR_INVALID_FORMAT;
-	}
-
 	if(Items::dwMajorVersion == 0xFFFFFFFF){
 		std::cout << "[Warning] Items::loadFromOtb items.otb using generic client version." << std::endl;
 	}
-	else if(Items::dwMinorVersion != CLIENT_VERSION_811){
-		std::cout << "Not supported items.otb client version." << std::endl;
+	else if(Items::dwMajorVersion != 3){
+		std::cout << "Old version detected, a newer version of items.otb is required." << std::endl;
+		return ERROR_INVALID_FORMAT;
+	}
+	else if(Items::dwMinorVersion != CLIENT_VERSION_820){
+		std::cout << "A newer version of items.otb is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
 
@@ -226,17 +229,20 @@ int Items::loadFromOtb(std::string file)
 				iType->type = ITEM_TYPE_CONTAINER;
 				break;
 			case ITEM_GROUP_DOOR:
+				//not used
 				iType->type = ITEM_TYPE_DOOR;
 				break;
 			case ITEM_GROUP_MAGICFIELD:
+				//not used
 				iType->type = ITEM_TYPE_MAGICFIELD;
 				break;
 			case ITEM_GROUP_TELEPORT:
+				//not used
 				iType->type = ITEM_TYPE_TELEPORT;
 				break;
 			case ITEM_GROUP_NONE:
 			case ITEM_GROUP_GROUND:
-			case ITEM_GROUP_RUNE:
+			case ITEM_GROUP_CHARGES:
 			case ITEM_GROUP_SPLASH:
 			case ITEM_GROUP_FLUID:
 			case ITEM_GROUP_DEPRECATED:
@@ -259,11 +265,14 @@ int Items::loadFromOtb(std::string file)
 		iType->pickupable = hasBitSet(FLAG_PICKUPABLE, flags);
 		iType->moveable = hasBitSet(FLAG_MOVEABLE, flags);
 		iType->stackable = hasBitSet(FLAG_STACKABLE, flags);
+
+		//not longer saved in otb_version >= 3
 		iType->floorChangeDown = hasBitSet(FLAG_FLOORCHANGEDOWN, flags);
 		iType->floorChangeNorth = hasBitSet(FLAG_FLOORCHANGENORTH, flags);
 		iType->floorChangeEast = hasBitSet(FLAG_FLOORCHANGEEAST, flags);
 		iType->floorChangeSouth = hasBitSet(FLAG_FLOORCHANGESOUTH, flags);
 		iType->floorChangeWest = hasBitSet(FLAG_FLOORCHANGEWEST, flags);
+
 		iType->alwaysOnTop = hasBitSet(FLAG_ALWAYSONTOP, flags);
 		iType->isVertical = hasBitSet(FLAG_VERTICAL, flags);
 		iType->isHorizontal = hasBitSet(FLAG_HORIZONTAL, flags);
@@ -271,6 +280,7 @@ int Items::loadFromOtb(std::string file)
 		iType->allowDistRead = hasBitSet(FLAG_ALLOWDISTREAD, flags);
 		iType->rotable = hasBitSet(FLAG_ROTABLE, flags);
 		iType->canReadText = hasBitSet(FLAG_READABLE, flags);
+		iType->clientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
 
 		attribute_t attrib;
 		datasize_t datalen = 0;
@@ -355,7 +365,7 @@ int Items::loadFromOtb(std::string file)
 		}
 
 		reverseItemMap[iType->clientId] = iType->id;
-		
+
 		// store the found item
 		items.addElement(iType, iType->id);
 		node = f.getNextNode(node, type);
@@ -417,10 +427,9 @@ bool Items::loadFromXml(const std::string& datadir)
 							if(asLowerCaseString(strValue) == "type"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "key"){
-										it.group = ITEM_GROUP_KEY;
+										it.type = ITEM_TYPE_KEY;
 									}
 									else if(asLowerCaseString(strValue) == "magicfield"){
-										it.group = ITEM_GROUP_MAGICFIELD;
 										it.type = ITEM_TYPE_MAGICFIELD;
 									}
 									else if(asLowerCaseString(strValue) == "depot"){
@@ -431,6 +440,12 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 									else if(asLowerCaseString(strValue) == "trashholder"){
 										it.type = ITEM_TYPE_TRASHHOLDER;
+									}
+									else if(asLowerCaseString(strValue) == "teleport"){
+										it.type = ITEM_TYPE_TELEPORT;
+									}
+									else if(asLowerCaseString(strValue) == "door"){
+										it.type = ITEM_TYPE_DOOR;
 									}
 									//[ added for beds system
 									else if(asLowerCaseString(strValue) == "bed"){
@@ -505,6 +520,30 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(asLowerCaseString(strValue) == "moveable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.moveable = (intValue == 1);
+								}
+							}
+							else if(asLowerCaseString(strValue) == "blockprojectile"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.blockProjectile = (intValue == 1);
+								}
+							}
+							else if(asLowerCaseString(strValue) == "floorchange"){
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(asLowerCaseString(strValue) == "down"){
+										it.floorChangeDown = true;
+									}
+									else if(asLowerCaseString(strValue) == "north"){
+										it.floorChangeNorth = true;
+									}
+									else if(asLowerCaseString(strValue) == "south"){
+										it.floorChangeSouth = true;
+									}
+									else if(asLowerCaseString(strValue) == "west"){
+										it.floorChangeWest = true;
+									}
+									else if(asLowerCaseString(strValue) == "east"){
+										it.floorChangeEast = true;
+									}
 								}
 							}
 							else if(asLowerCaseString(strValue) == "corpsetype"){
@@ -1221,11 +1260,12 @@ bool Items::loadFromXml(const std::string& datadir)
 			std::cout << "Warning: [Items::loadFromXml] Item " << it->id <<  " is not set as a bed-type." << std::endl;
 		}
 
+		/*
 		//check looping decaying items
 		if(it->decayTo <= 0 || !it->moveable){
 			continue;
 		}
-	
+
 		std::vector<int32_t> decayList;
 		decayList.push_back(it->id);
 		int32_t decayTo = it->decayTo;
@@ -1249,6 +1289,7 @@ bool Items::loadFromXml(const std::string& datadir)
 				break;
 			}
 		}
+		*/
 	}
 
 	loadWeaponDefaults();
@@ -1321,9 +1362,6 @@ const ItemType& Items::getItemType(int32_t id) const
 		return *iType;
 	}
 	else{
-		#ifdef __DEBUG__
-		std::cout << "WARNING! unknown itemtypeid " << id << ". using defaults." << std::endl;
-		#endif
 		static ItemType dummyItemType; // use this for invalid ids
 		return dummyItemType;
 	}
@@ -1341,9 +1379,6 @@ const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
 		i++;
 	}while(iType);
 
-	#ifdef __DEBUG__
-	std::cout << "WARNING! unknown sprite id " << spriteId << ". using defaults." << std::endl;
-	#endif
 	static ItemType dummyItemType; // use this for invalid ids
 	return dummyItemType;
 }
@@ -1364,52 +1399,4 @@ int32_t Items::getItemIdByName(const std::string& name)
 		}while(iType);
 	}
 	return -1;
-}
-
-template<typename A>
-Array<A>::Array(uint32_t n)
-{
-	m_data = (A*)malloc(sizeof(A)*n);
-	memset(m_data, 0, sizeof(A)*n);
-	m_size = n;
-}
-
-template<typename A>
-Array<A>::~Array()
-{
-	free(m_data);
-}
-
-template<typename A>
-A Array<A>::getElement(uint32_t id)
-{
-	if(id < m_size){
-		return m_data[id];
-	}
-	else{
-		return 0;
-	}
-}
-
-template<typename A>
-const A Array<A>::getElement(uint32_t id) const
-{
-	if(id < m_size){
-		return m_data[id];
-	}
-	else{
-		return 0;
-	}
-}
-
-template<typename A>
-void Array<A>::addElement(A a, uint32_t pos)
-{
-	#define INCREMENT 5000
-	if(pos >= m_size){
-		m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
-		memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
-		m_size = pos + INCREMENT;
-	}
-	m_data[pos] = a;
 }

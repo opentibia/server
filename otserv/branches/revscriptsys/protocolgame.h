@@ -22,7 +22,6 @@
 #ifndef __OTSERV_PROTOCOLGAME_H__
 #define __OTSERV_PROTOCOLGAME_H__
 
-#include "definitions.h"
 #include <string>
 #include "protocol.h"
 #include "enums.h"
@@ -109,6 +108,12 @@ private:
 	void parseTextWindow(NetworkMessage& msg);
 	void parseHouseWindow(NetworkMessage& msg);
 
+	//shop methods
+	void parseLookInShop(NetworkMessage& msg);
+	void parsePlayerPurchase(NetworkMessage& msg);
+	void parsePlayerSale(NetworkMessage& msg);
+	void parseCloseShop(NetworkMessage& msg);
+
 	//party methods
 	void parseInviteToParty(NetworkMessage& msg);
 	void parseJoinParty(NetworkMessage& msg);
@@ -139,6 +144,7 @@ private:
 	void parseOpenChannel(NetworkMessage& msg);
 	void parseOpenPriv(NetworkMessage& msg);
 	void parseCloseChannel(NetworkMessage& msg);
+	void parseCloseNpc(NetworkMessage& msg);
 	void parseProcessRuleViolation(NetworkMessage& msg);
 	void parseCloseRuleViolation(NetworkMessage& msg);
 	void parseCancelRuleViolation(NetworkMessage& msg);
@@ -180,6 +186,9 @@ private:
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
 
+	void sendShop(const std::list<ShopInfo>& shop);
+	void sendCloseShop();
+	void sendPlayerCash(uint32_t amount);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	void sendQuestLog();
@@ -194,6 +203,9 @@ private:
 	void sendVIPLogOut(uint32_t guid);
 	void sendVIP(uint32_t guid, const std::string& name, bool isOnline);
 	void sendReLoginWindow();
+
+	void sendTutorial(uint8_t tutorialId);
+	void sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc);
 
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(const LightInfo& lightInfo);
@@ -274,6 +286,9 @@ private:
 	void AddInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void UpdateInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
 	void RemoveInventoryItem(NetworkMessage* msg, slots_t slot);
+
+	//shop
+	void AddShopItem(NetworkMessage* msg, const ShopInfo item);
 
 	friend class Player;
 

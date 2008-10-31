@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,7 +22,7 @@
 #ifndef __OTSERV_RSA_H__
 #define __OTSERV_RSA_H__
 
-#include "otsystem.h"
+#include <boost/thread.hpp>
 
 #include "gmp.h"
 
@@ -33,16 +33,16 @@ public:
 	void setKey(const char* p, const char* q, const char* d);
 	bool setKey(const std::string& file);
 	bool decrypt(char* msg, int32_t size);
-	
+
 	int32_t getKeySize();
 	void getPublicKey(char* buffer);
-	
+
 protected:
-	
+
 	bool m_keySet;
-	
-	OTSYS_THREAD_LOCKVAR rsaLock;
-	
+
+	boost::recursive_mutex rsaLock;
+
 	//use only GMP
 	mpz_t m_p, m_q, m_u, m_d, m_dp, m_dq, m_mod;
 };

@@ -21,9 +21,8 @@
 #ifndef __OTSERV_FILELOADER_H__
 #define __OTSERV_FILELOADER_H__
 
-#include "definitions.h"
 #include <string>
-#include "stdio.h"
+#include <stdio.h>
 
 
 struct NodeStruct;
@@ -276,7 +275,7 @@ public:
 		_size = size;
 		return buffer;
 	}
-	
+
 	//TODO: might need temp buffer and zero fill the memory chunk allocated by realloc
 	template <typename T>
 	inline void ADD_TYPE(T* add){

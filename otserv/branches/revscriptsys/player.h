@@ -21,7 +21,7 @@
 #ifndef __OTSERV_PLAYER_H__
 #define __OTSERV_PLAYER_H__
 
-#include "definitions.h"
+#include "otsystem.h"
 #include "creature.h"
 #include "container.h"
 #include "depot.h"
@@ -40,6 +40,7 @@ class Quest;
 class House;
 class Weapon;
 class ProtocolGame;
+class Npc;
 class Party;
 class SchedulerTask;
 
@@ -146,10 +147,10 @@ public:
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
-	int getPremiumDays() const {return premiumDays;}
-	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
+	int getPremiumDays() const;
+	bool isPremium() const;
 
-	bool isOnline() const {return (client != NULL);}
+	bool isOffline() const {return (getID() == 0);}
 	void disconnect() {if(client) client->disconnect();}
 	uint32_t getIP() const;
 
@@ -192,6 +193,7 @@ public:
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
+	virtual bool canSeeInvisibility() const;
 	uint32_t isMuted();
 	void addMessageBuffer();
 	void removeMessageBuffer();
@@ -252,6 +254,28 @@ public:
 	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
 
+	//shop functions
+	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell)
+	{
+		shopOwner = owner;
+		purchaseCallback = onBuy;
+		saleCallback = onSell;
+	}
+
+	Npc* getShopOwner(int32_t& onBuy, int32_t& onSell)
+	{
+		onBuy = purchaseCallback;
+		onSell = saleCallback;
+		return shopOwner;
+	}
+
+	const Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) const
+	{
+		onBuy = purchaseCallback;
+		onSell = saleCallback;
+		return shopOwner;
+	}
+
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
 	void notifyLogOut(Player* player);
@@ -296,7 +320,7 @@ public:
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
-	Item* getWeapon();
+	Item* getWeapon(bool ignoreAmmu = false);
 	virtual WeaponType_t getWeaponType();
 	int32_t getWeaponSkill(const Item* item) const;
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
@@ -499,6 +523,13 @@ public:
 		{if(client) client->sendTextWindow(windowTextId, itemId, text);}
 	void sendToChannel(Creature* creature, SpeakClass type, const std::string& text, uint16_t channelId, uint32_t time = 0) const
 		{if(client) client->sendToChannel(creature, type, text, channelId, time);}
+	// new: shop window
+	void sendShop(const std::list<ShopInfo>& shop) const
+	    {if(client) client->sendShop(shop);}
+	void sendCash(uint32_t amount) const
+		{if(client) client->sendPlayerCash(amount);}
+	void sendCloseShop() const
+	    {if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const
@@ -528,6 +559,11 @@ public:
 	void sendQuestLine(const Quest* quest)
 		{if(client) client->sendQuestLine(quest);}
 
+	void sendTutorial(uint8_t tutorialId)
+		{if(client) client->sendTutorial(tutorialId);}
+	void sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc)
+		{if (client) client->sendAddMarker(pos, markType, desc);}
+
 	void receivePing() {if(npings > 0) npings--;}
 
 	virtual void onThink(uint32_t interval);
@@ -541,14 +577,15 @@ public:
 
 	House* getEditHouse(uint32_t& _windowTextId, uint32_t& _listId);
 	void setEditHouse(House* house, uint32_t listId = 0);
-	
-	void setNextAction(uint64_t time) {if(time > nextAction) {nextAction = time;}}
+
+	void setNextAction(int64_t time) {if(time > nextAction) {nextAction = time;}}
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 	uint32_t getNextActionTime() const;
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
+	void closeShopWindow();
 
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;
@@ -624,7 +661,7 @@ protected:
 	playersex_t sex;
 	int32_t soul, soulMax;
 	uint64_t groupFlags;
-	int32_t premiumDays;
+	int32_t premiumEnd;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 	uint32_t actionTaskEvent;
@@ -683,6 +720,11 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
+	//shop variables
+	Npc* shopOwner;
+	int32_t purchaseCallback;
+	int32_t saleCallback;
+
 
 	//party variables
 	Party* party;
@@ -729,7 +771,7 @@ protected:
 		else if(getSpeed() < PLAYER_MIN_SPEED){
 			return PLAYER_MIN_SPEED;
 		}
-		
+
 		return getSpeed();
 	}
 	void updateBaseSpeed()
@@ -743,7 +785,10 @@ protected:
 	}
 
 	static uint32_t getPercentLevel(uint64_t count, uint32_t nextLevelCount);
-	virtual uint64_t getLostExperience() const { return (skillLoss ? (uint64_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
+	virtual uint64_t getLostExperience() const {
+		return (skillLoss ? (experience * lossPercent[LOSS_EXPERIENCE]/100) : 0);
+	}
+
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }

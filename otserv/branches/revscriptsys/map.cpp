@@ -78,39 +78,8 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 
 	std::cout << ":: Loading map from: " << identifier << " " << loader->getSourceDescription() << std::endl;
 
-	bool loadMapSuccess = loader->loadMap(this, identifier);
-	if(!loadMapSuccess){
-		switch(getLastError()){
-		case LOADMAPERROR_CANNOTOPENFILE:
-			std::cout << "FATAL: Could not open the map stream." << std::endl;
-			break;
-		case LOADMAPERROR_GETPROPFAILED:
-			std::cout << "FATAL: Failed to read stream properties. Code: " << getErrorCode() << std::endl;
-			break;
-		case LOADMAPERROR_OUTDATEDHEADER:
-			std::cout << "FATAL: Header information is outdated. Code: " << getErrorCode() << std::endl;
-			break;
-		case LOADMAPERROR_GETROOTHEADERFAILED:
-			std::cout << "FATAL: Failed to read header information. Code: " << getErrorCode() << std::endl;
-			break;
-		case LOADMAPERROR_FAILEDTOCREATEITEM:
-			std::cout << "FATAL: Failed to create an object. Code: " << getErrorCode() << std::endl;
-			break;
-		case LOADMAPERROR_FAILEDUNSERIALIZEITEM:
-			std::cout << "FATAL: Failed to unserialize an object. Code: " << getErrorCode() << std::endl;
-			break;
-		case LOADMAPERROR_FAILEDTOREADCHILD:
-			std::cout << "FATAL: Failed to read child stream. Code: " << getErrorCode() << std::endl;
-			break;
-		case LOADMAPERROR_UNKNOWNNODETYPE:
-			std::cout << "FATAL: Unknown stream node found. Code: " << getErrorCode() << std::endl;
-			break;
-
-		default:
-			std::cout << "FATAL: Unknown error!" << std::endl;
-			break;
-		}
-
+	if(!loader->loadMap(this, identifier)){
+		std::cout << "FATAL: [OTBM loader] " << loader->getLastErrorString() << std::endl;
 		std::cin.get();
 		return false;
 	}
@@ -220,6 +189,7 @@ void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 	uint32_t offsetY = y & FLOOR_MASK;
 	if(!floor->tiles[offsetX][offsetY]){
 		floor->tiles[offsetX][offsetY] = newtile;
+		newtile->qt_node = leaf;
 	}
 	else{
 		std::cout << "Error: Map::setTile() already exists." << std::endl;
@@ -292,6 +262,8 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 		uint32_t flags = 0;
 		Cylinder* toCylinder = tile->__queryDestination(index, creature, &toItem, flags);
 		toCylinder->__internalAddThing(creature);
+		Tile* toTile = toCylinder->getTile();
+		toTile->qt_node->addCreature(creature);
 		return true;
 	}
 
@@ -306,6 +278,7 @@ bool Map::removeCreature(Creature* creature)
 {
 	Tile* tile = creature->getTile();
 	if(tile){
+		tile->qt_node->removeCreature(creature);
 		tile->__removeThing(creature, 0);
 		return true;
 	}
@@ -313,7 +286,11 @@ bool Map::removeCreature(Creature* creature)
 	return false;
 }
 
-void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, bool checkforduplicate, int32_t minRangeX, int32_t maxRangeX, int32_t minRangeY, int32_t maxRangeY, int32_t minRangeZ, int32_t maxRangeZ) {
+void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, bool checkforduplicate,
+	int32_t minRangeX, int32_t maxRangeX,
+	int32_t minRangeY, int32_t maxRangeY,
+	int32_t minRangeZ, int32_t maxRangeZ)
+{
 	int32_t minoffset = centerPos.z - maxRangeZ;
 	int32_t x1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + minoffset  )));
 	int32_t y1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + minoffset )));
@@ -327,31 +304,32 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 	int32_t endx2 = x2 - (x2 % FLOOR_SIZE);
 	int32_t endy2 = y2 - (y2 % FLOOR_SIZE);
 
-	int32_t floorx1, floory1, floorx2, floory2;
-
 	QTreeLeafNode* startLeaf;
 	QTreeLeafNode* leafE;
 	QTreeLeafNode* leafS;
-	Floor* floor;
-	int32_t offsetZ;
 
 	startLeaf = getLeaf(startx1, starty1);
 	leafS = startLeaf;
 
+	/*
+	SpectatorVec oldList;
 	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
 		leafE = leafS;
 		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
 			if(leafE){
+
+				Floor* floor;
+				int32_t offsetZ;
 				for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
 
 					if((floor = leafE->getFloor(nz))){
 						//get current floor limits
 						offsetZ = centerPos.z - nz;
 
-						floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
-						floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
-						floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
-						floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
+						int32_t floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
+						int32_t floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
+						int32_t floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
+						int32_t floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
 
 						for(int ly = 0; ly < FLOOR_SIZE; ++ly){
 							for(int lx = 0; lx < FLOOR_SIZE; ++lx){
@@ -361,11 +339,11 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 										for(uint32_t i = 0; i < tile->creatures.size(); ++i){
 											Creature* creature = tile->creatures[i];
 											if(checkforduplicate) {
-												if(std::find(list.begin(), list.end(), creature) == list.end()){
-													list.push_back(creature);
+												if(std::find(oldList.begin(), oldList.end(), creature) == oldList.end()){
+													oldList.push_back(creature);
 												}
 											} else {
-												list.push_back(creature);
+												oldList.push_back(creature);
 											}
 										}
 									}
@@ -389,6 +367,63 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 			leafS = getLeaf(startx1, ny + FLOOR_SIZE);
 		}
 	}
+	*/
+
+	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
+		leafE = leafS;
+		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
+			if(leafE){
+
+				CreatureVector& node_list = leafE->creature_list;
+				CreatureVector::const_iterator node_iter = node_list.begin();
+				CreatureVector::const_iterator node_end = node_list.end();
+				if(node_iter != node_end){
+					do{
+						Creature* creature = *node_iter;
+						const Position& cpos = creature->getPosition();
+						int32_t offsetZ = centerPos.z - cpos.z;
+
+						if(cpos.z < minRangeZ || cpos.z > maxRangeZ){
+							continue;
+						}
+						if(cpos.y < (centerPos.y + minRangeY + offsetZ) || cpos.y > (centerPos.y + maxRangeY + offsetZ)){
+							continue;
+						}
+						if(cpos.x < (centerPos.x + minRangeX + offsetZ) || cpos.x > (centerPos.x + maxRangeX + offsetZ) ){
+							continue;
+						}
+
+						if(checkforduplicate){
+							if(std::find(list.begin(), list.end(), creature) == list.end()){
+								list.push_back(creature);
+							}
+						}
+						else{
+							list.push_back(creature);
+						}
+					}while(++node_iter != node_end);
+				}
+
+				leafE = leafE->stepEast();
+			}
+			else{
+				leafE = getLeaf(nx + FLOOR_SIZE, ny);
+			}
+		}
+
+		if(leafS){
+			leafS = leafS->stepSouth();
+		}
+		else{
+			leafS = getLeaf(startx1, ny + FLOOR_SIZE);
+		}
+	}
+
+	/*
+	if(list.size() != oldList.size()){
+		std::cout << "missmatch size" << std::endl;
+	}
+	*/
 }
 
 void Map::getSpectators(SpectatorVec& list, const Position& centerPos,
@@ -540,67 +575,66 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool 
 	return isSightClear(fromPos, toPos, false);
 }
 
-bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck)
+bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 {
-	if(floorCheck && fromPos.z != toPos.z){
-		return false;
-	}
-
 	Position start = fromPos;
 	Position end = toPos;
 
-	int deltax, deltay, deltaz;
-	deltax = abs(start.x - end.x);
-	deltay = abs(start.y - end.y);
-	deltaz = abs(start.z - end.z);
+	int x, y, z;
+	int dx, dy, dz;
+	int sx, sy, sz;
+	int ey, ez;
 
-	int max = deltax, dir = 0;
-	if(deltay > max){
-		max = deltay;
+	dx = abs(start.x - end.x);
+	dy = abs(start.y - end.y);
+	dz = abs(start.z - end.z);
+
+	int max = dx, dir = 0;
+	if(dy > max){
+		max = dy;
 		dir = 1;
 	}
-	if(deltaz > max){
-		max = deltaz;
+	if(dz > max){
+		max = dz;
 		dir = 2;
 	}
 
 	switch(dir){
-	case 0:
-		//x -> x
-		//y -> y
-		//z -> z
-		break;
-	case 1:
-		//x -> y
-		//y -> x
-		//z -> z
-		std::swap(start.x, start.y);
-		std::swap(end.x, end.y);
-		std::swap(deltax, deltay);
-		break;
-	case 2:
-		//x -> z
-		//y -> y
-		//z -> x
-		std::swap(start.x, start.z);
-		std::swap(end.x, end.z);
-		std::swap(deltax, deltaz);
-		break;
+		case 0:
+			//x -> x
+			//y -> y
+			//z -> z
+			break;
+		case 1:
+			//x -> y
+			//y -> x
+			//z -> z
+			std::swap(start.x, start.y);
+			std::swap(end.x, end.y);
+			std::swap(dx, dy);
+			break;
+		case 2:
+			//x -> z
+			//y -> y
+			//z -> x
+			std::swap(start.x, start.z);
+			std::swap(end.x, end.z);
+			std::swap(dx, dz);
+			break;
 	}
 
-	int stepx = ((start.x < end.x) ? 1 : -1);
-	int stepy = ((start.y < end.y) ? 1 : -1);
-	int stepz = ((start.z < end.z) ? 1 : -1);
+	sx = ((start.x < end.x) ? 1 : -1);
+	sy = ((start.y < end.y) ? 1 : -1);
+	sz = ((start.z < end.z) ? 1 : -1);
 
-	int x, y, z;
-	int errory = 0, errorz = 0;
+	ey = 0, ez = 0;
 	x = start.x;
 	y = start.y;
 	z = start.z;
 
 	int lastrx = x, lastry = y, lastrz = z;
 
-	for( ; x != end.x + stepx; x += stepx){
+	for( ; x != end.x + sx; x += sx){
 		int rx, ry, rz;
 		switch(dir){
 		case 1:
@@ -617,31 +651,47 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 		if(!(toPos.x == rx && toPos.y == ry && toPos.z == rz) &&
 		  !(fromPos.x == rx && fromPos.y == ry && fromPos.z == rz)){
 			if(lastrz != rz){
-				if(getTile(lastrx, lastry, std::min(lastrz, rz))){
+				if(const_cast<Map*>(this)->getTile(lastrx, lastry, std::min(lastrz, rz))){
 					return false;
 				}
 			}
 			lastrx = rx; lastry = ry; lastrz = rz;
 
-			Tile* tile = getTile(rx, ry, rz);
-			if(tile){
+			const Tile* tile = const_cast<Map*>(this)->getTile(rx, ry, rz);
+			if(tile)
+			{
 				if(tile->hasProperty(BLOCKPROJECTILE))
+				{
 					return false;
+				}
 			}
 		}
 
-		errory += deltay;
-		errorz += deltaz;
-		if(2*errory >= deltax){
-			y += stepy;
-			errory -= deltax;
+		ey += dy;
+		ez += dz;
+		if(2*ey >= dx){
+			y  += sy;
+			ey -= dx;
 		}
-		if(2*errorz >= deltax){
-			z += stepz;
-			errorz -= deltax;
+		if(2*ez >= dx){
+			z  += sz;
+			ez -= dx;
+
 		}
 	}
 	return true;
+}
+
+bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck) const
+{
+	if(floorCheck && fromPos.z != toPos.z){
+		return false;
+	}
+
+	// Cast two converging rays and see if either yields a result.
+	return
+		checkSightLine(fromPos, toPos) ||
+		checkSightLine(toPos, fromPos);
 }
 
 const Tile* Map::canWalkTo(const Creature* creature, const Position& pos)

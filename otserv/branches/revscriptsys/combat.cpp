@@ -131,9 +131,11 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	}
 	else{
 		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
-		if(tile){
-			list.push_back(tile);
+		if(!tile) {
+			tile = new Tile(targetPos.x, targetPos.y, targetPos.z);
+			g_game.setTile(tile);
 		}
+		list.push_back(tile);
 	}
 }
 
@@ -262,9 +264,17 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 	}
 
 #ifdef __SKULLSYSTEM__
-	if(player->hasSafeMode() && target->getPlayer() &&
-		target->getPlayer()->getSkull() == SKULL_NONE && !Combat::isInPvpZone(player, target)){
-		return RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
+	if(player->hasSafeMode() && target->getPlayer()) {
+		if(player->getParty()) {
+            if(player->getParty()->isPlayerMember(target->getPlayer()) || player->getParty()->getLeader() == target) {
+                return Combat::canDoCombat(player, target);
+            }
+        }
+        if(target->getPlayer()->getSkull() == SKULL_NONE) {
+            if(!Combat::isInPvpZone(player, target)) {
+                return RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
+            }
+        }
 	}
 #endif
 
@@ -277,9 +287,9 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 		return RET_NOTENOUGHROOM;
 	}
 
-	if(!tile->ground){
-		return RET_NOTPOSSIBLE;
-	}
+	//if(!tile->ground){
+	//	return RET_NOTPOSSIBLE;
+	//}
 
 	if(tile->floorChange()){
 		return RET_NOTENOUGHROOM;
@@ -965,10 +975,6 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 {
 	Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 
-	if(!tile){
-		return false;
-	}
-
 	const MatrixArea* area = getArea(centerPos, targetPos);
 	if(!area){
 		return false;
@@ -989,12 +995,13 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 		for(size_t x = 0; x < cols; ++x){
 
 			if(area->getValue(y, x) != 0){
-				if(g_game.isSightClear(targetPos, tmpPos, true)){
+				if(g_game.isSightClear(centerPos, tmpPos, true)){
 					tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
-
-					if(tile){
-						list.push_back(tile);
+					if(!tile){
+						tile = new Tile(tmpPos.x, tmpPos.y, tmpPos.z);
+						g_game.setTile(tile);
 					}
+					list.push_back(tile);
 				}
 			}
 

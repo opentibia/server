@@ -27,7 +27,6 @@
 
 #include "boost_common.h"
 
-#include "definitions.h"
 #include "position.h"
 #include "item.h"
 #include "iomapserialize.h"
@@ -137,11 +136,15 @@ public:
 	QTreeLeafNode* stepSouth(){return m_leafS;}
 	QTreeLeafNode* stepEast(){return m_leafE;}
 
+	void addCreature(Creature* c);
+	void removeCreature(Creature* c);
+
 protected:
 	static bool newLeaf;
 	QTreeLeafNode* m_leafS;
 	QTreeLeafNode* m_leafE;
 	Floor* m_array[MAP_MAX_LAYERS];
+	CreatureVector creature_list;
 
 	friend class Map;
 	friend class QTreeNode;
@@ -189,6 +192,9 @@ public:
 	* \param a tile to set for the position
 	*/
 	void setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile);
+	void setTile(const Position& pos, Tile* newtile) {
+		setTile(pos.x, pos.y, pos.z, newtile);
+	}
 
 	/**
 	* Place a creature on the map
@@ -224,7 +230,8 @@ public:
 	*	\param floorCheck if true then view is not clear if fromPos.z is not the same as toPos.z
 	*	\return The result if there is no obstacles
 	*/
-	bool isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck);
+	bool isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck) const;
+	bool checkSightLine(const Position& fromPos, const Position& toPos) const;
 
 	const Tile* canWalkTo(const Creature* creature, const Position& pos);
 
@@ -242,24 +249,8 @@ public:
 	bool getPathMatching(const Creature* creature, std::list<Direction>& dirList,
 		const FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp);
 
-	MapError_t getLastError() {return lasterrortype;}
-	int getErrorCode() {return lasterrorcode;}
-
-	void setLastError(MapError_t errtype, NODE _code = 0)
-	{
-		if(_code){
-			lasterrorcode = _code->start;
-		}
-		else{
-			lasterrorcode = 0;
-		}
-		lasterrortype = errtype;
-	}
-
 protected:
 	uint32_t mapWidth, mapHeight;
-	MapError_t lasterrortype;
-	unsigned long lasterrorcode;
 	std::string spawnfile;
 	std::string housefile;
 	SpectatorCache spectatorCache;
@@ -280,11 +271,11 @@ protected:
 	// Take special heed in that the vector will be destroyed if any function
 	// that calls clearSpectatorCache is called.
 	const SpectatorVec& getSpectators(const Position& centerPos);
-	
+
 	void clearSpectatorCache();
 
 	QTreeNode root;
-	
+
 	struct RefreshBlock_t{
 		ItemVector list;
 		uint64_t lastRefresh;
@@ -300,5 +291,16 @@ protected:
 	friend class IOMap;
 	friend class IOMapSerialize;
 };
+
+inline void QTreeLeafNode::addCreature(Creature* c) {
+	creature_list.push_back(c);
+}
+
+inline void QTreeLeafNode::removeCreature(Creature* c) {
+	CreatureVector::iterator iter = std::find(creature_list.begin(), creature_list.end(), c);
+	assert(iter != creature_list.end());
+	std::swap(*iter, creature_list.back());
+	creature_list.pop_back();
+}
 
 #endif

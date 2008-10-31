@@ -87,6 +87,8 @@ enum MagicEffectClasses {
 	NM_ME_GIANTICE         = 0x34, //52
 	NM_ME_WATERSPLASH      = 0x35, //53
 	NM_ME_PLANTATTACK      = 0x36, //54
+	NM_ME_TUTORIALARROW    = 0x37, //55
+	NM_ME_TUTORIALSQUARE   = 0x38, //56
 	//for internal use, dont send to client
 	NM_ME_NONE             = 0xFF,
 	NM_ME_UNK              = 0xFFFF
@@ -142,37 +144,37 @@ enum ShootType_t {
 };
 
 enum SpeakClass {
-	SPEAK_SAY           = 0x01,
-	SPEAK_WHISPER       = 0x02,
-	SPEAK_YELL          = 0x03,
-	SPEAK_PRIVATE       = 0x04,
-	SPEAK_CHANNEL_Y     = 0x05,	//yellow
-	SPEAK_RVR_CHANNEL   = 0x06,
-	SPEAK_RVR_ANSWER    = 0x07,
-	SPEAK_RVR_CONTINUE  = 0x08,
-	SPEAK_BROADCAST     = 0x09,
-	SPEAK_CHANNEL_R1    = 0x0A,	//red - #c text
-	SPEAK_PRIVATE_RED   = 0x0B,	//@name@text
-	SPEAK_CHANNEL_O     = 0x0C,	//orange
-	//SPEAK_            = 0x0D,
-	SPEAK_CHANNEL_R2    = 0x0E,	//red anonymous - #d text
-	//SPEAK_            = 0x0F,
-	SPEAK_MONSTER_SAY   = 0x10,
-	SPEAK_MONSTER_YELL  = 0x11,
+	SPEAK_SAY				= 0x01,	//normal talk
+	SPEAK_WHISPER			= 0x02,	//whispering - #w text
+	SPEAK_YELL				= 0x03,	//yelling - #y text
+	SPEAK_PRIVATE_PN		= 0x04, //Player-to-NPC speaking(NPCs channel)
+	SPEAK_PRIVATE_NP		= 0x05, //NPC-to-Player speaking
+	SPEAK_PRIVATE			= 0x06, //Players speaking privately to players
+	SPEAK_CHANNEL_Y     	= 0x07,	//Yellow message on chat
+	SPEAK_RVR_CHANNEL		= 0x08, //Reporting rule violation - Ctrl+R
+	SPEAK_RVR_ANSWER		= 0x09, //Answering report
+	SPEAK_RVR_CONTINUE		= 0x0A, //Answering the answer of the report
+	SPEAK_BROADCAST     	= 0x0B,	//Broadcast a message - #b
+	SPEAK_CHANNEL_R1    	= 0x0C,	//Talk red on chat - #c
+	SPEAK_PRIVATE_RED   	= 0x0D,	//Red private - @name@ text
+	SPEAK_CHANNEL_O     	= 0x0E,	//Talk orange on text
+	//SPEAK_                = 0x0F, //?
+	SPEAK_CHANNEL_R2    	= 0x10,	//Talk red anonymously on chat - #d
+	//SPEAK_                = 0x11, //?
+	SPEAK_MONSTER_SAY   	= 0x12,	//Talk orange
+	SPEAK_MONSTER_YELL  	= 0x13,	//Yell orange
 };
 
 enum MessageClasses {
-	MSG_STATUS_CONSOLE_YELLOW	= 0x01, //Yellow message in the console
-	MSG_STATUS_CONSOLE_LBLUE	= 0x04, //Light blue message in the console
-	MSG_STATUS_CONSOLE_ORANGE	= 0x11, //Orange message in the console
-	MSG_STATUS_WARNING			= 0x12, //Red message in game window and in the console
-	MSG_EVENT_ADVANCE			= 0x13, //White message in game window and in the console
-	MSG_EVENT_DEFAULT			= 0x14, //White message at the bottom of the game window and in the console
-	MSG_STATUS_DEFAULT			= 0x15, //White message at the bottom of the game window and in the console
-	MSG_INFO_DESCR				= 0x16, //Green message in game window and in the console
-	MSG_STATUS_SMALL			= 0x17, //White message at the bottom of the game window"
-	MSG_STATUS_CONSOLE_BLUE		= 0x18, //Blue message in the console
-	MSG_STATUS_CONSOLE_RED		= 0x19, //Red message in the console
+	MSG_STATUS_CONSOLE_RED		= 0x11, //Red message in the console
+	MSG_STATUS_CONSOLE_ORANGE	= 0x13, //Orange message in the console
+	MSG_STATUS_WARNING			= 0x14, //Red message in game window and in the console
+	MSG_EVENT_ADVANCE			= 0x15, //White message in game window and in the console
+	MSG_EVENT_DEFAULT			= 0x16, //White message at the bottom of the game window and in the console
+	MSG_STATUS_DEFAULT			= 0x17, //White message at the bottom of the game window and in the console
+	MSG_INFO_DESCR				= 0x18, //Green message in game window and in the console
+	MSG_STATUS_SMALL			= 0x19, //White message at the bottom of the game window"
+	MSG_STATUS_CONSOLE_BLUE		= 0x1A, //Blue message in the console
 };
 
 enum FluidColors_t {

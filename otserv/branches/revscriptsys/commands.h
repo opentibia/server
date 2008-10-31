@@ -26,14 +26,13 @@
 #include <map>
 #include "creature.h"
 
-class Game;
 struct Command;
 struct s_defcommands;
 
 class Commands{
 public:
-	Commands():game(NULL),loaded(false){};
-	Commands(Game* igame);
+	//Commands():game(NULL),loaded(false){};
+	Commands();
 
 	bool loadXml(const std::string& _datadir);	
 	bool isLoaded(){return loaded;}
@@ -44,7 +43,6 @@ public:
 	static ReturnValue placeSummon(Creature* creature, const std::string& name);
 	
 protected:
-	Game* game;
 	bool loaded;
 	std::string datadir;
 
@@ -63,6 +61,7 @@ protected:
 	bool subtractMoney(Creature* creature, const std::string& cmd, const std::string& param);
 	bool reloadInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool testCommand(Creature* creature, const std::string& cmd, const std::string& param);
+	bool testTutorialCommand(Creature* creature, const std::string& cmd, const std::string& param);
 	bool getInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool closeServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool openServer(Creature* creature, const std::string& cmd, const std::string& param);

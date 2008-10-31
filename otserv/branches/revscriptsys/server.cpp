@@ -19,7 +19,10 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "otsystem.h"
+#if defined __WINDOWS__ || defined WIN32
+#include <winerror.h>
+#endif
+
 #include "server.h"
 #include "connection.h"
 

@@ -233,4 +233,26 @@ namespace Script {
 	};
 }
 
+struct ShopInfo{
+	uint32_t itemId;
+	int32_t subType;
+	uint32_t buyPrice;
+	uint32_t sellPrice;
+	// Name can be found using Item::items[itemId].
+	
+	ShopInfo(){
+		itemId = 0;
+		subType = 1;
+		buyPrice = 0;
+		sellPrice = 0;
+	};
+	ShopInfo(uint32_t _itemId, int32_t _subType = 0,
+		uint32_t _buyPrice = 0, uint32_t _sellPrice = 0){
+		itemId = _itemId;
+		subType = _subType;
+		buyPrice = _buyPrice;
+		sellPrice = _sellPrice;
+	};
+};
+
 #endif

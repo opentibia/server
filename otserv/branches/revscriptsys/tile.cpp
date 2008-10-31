@@ -331,13 +331,19 @@ void Tile::onUpdateTile()
 
 void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
 {
+	Tile* toTile = toCylinder->getTile();
 	int32_t oldStackPos = __getIndexOfThing(creature);
 
 	//remove the creature
 	__removeThing(creature, 0);
 
+	// Switch the node ownership
+	if(qt_node != toTile->qt_node) {
+		qt_node->removeCreature(creature);
+		toTile->qt_node->addCreature(creature);
+	}
+	
 	//add the creature
-	Tile* toTile = dynamic_cast<Tile*>(toCylinder);
 	toTile->__addThing(creature);
 	int32_t newStackPos = toTile->__getIndexOfThing(creature);
 
@@ -456,64 +462,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 
-			/*
-			for(uint32_t i = 0; i < getThingCount(); ++i){
-				iithing = __getThing(i);
-				if(const Item* iitem = iithing->getItem()){
-					const ItemType& iiType = Item::items[iitem->getID()];
-					if(iiType.isMagicField() && !iiType.blockSolid){
-						CombatType_t combatType = iitem->getMagicField()->getCombatType();
-						//There is 3 options for a monster to enter a magic field
-						//1) Monster is immune
-						if(!monster->isImmune(combatType)){
-							//1) Monster is "strong" enough to handle the damage
-							//2) Monster is already afflicated by this type of condition
-							if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
-								if( !(monster->canPushItems() ||
-									monster->hasCondition(Combat::DamageToConditionType(combatType))) ){
-									if(ret != RET_NOTPOSSIBLE){
-										this->__queryAdd(index, thing, count, flags);
-										std::cout << "missmatch" << std::endl;
-									}
-									return RET_NOTPOSSIBLE;
-								}
-							}
-							else{
-								if(ret != RET_NOTPOSSIBLE){
-									this->__queryAdd(index, thing, count, flags);
-									std::cout << "missmatch" << std::endl;
-								}
-								return RET_NOTPOSSIBLE;
-							}
-						}
-					}
-					else if(iiType.blockSolid || (hasBitSet(FLAG_PATHFINDING, flags) && iiType.blockPathFind) ){
-						if(!iiType.moveable || iitem->getUniqueId() != 0){
-							//its not moveable
-							if(ret != RET_NOTPOSSIBLE){
-								this->__queryAdd(index, thing, count, flags);
-								std::cout << "missmatch" << std::endl;
-							}
-							return RET_NOTPOSSIBLE;
-						}
-						//moveable
-						else if(!(hasBitSet(FLAG_IGNOREBLOCKITEM, flags) || monster->canPushItems()) ){
-							assert(ret == RET_NOTPOSSIBLE);
-							if(ret != RET_NOTPOSSIBLE){
-								this->__queryAdd(index, thing, count, flags);
-								std::cout << "missmatch" << std::endl;
-							}
-							return RET_NOTPOSSIBLE;
-						}
-					}
-				}
-			}
-
-			if(ret != RET_NOERROR){
-				this->__queryAdd(index, thing, count, flags);
-				std::cout << "missmatch RET_NOERROR" << std::endl;
-			}
-			*/
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
@@ -610,7 +558,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 							continue;
 						}
 
-						if(!iiType.hasHeight || iiType.pickupable){
+						if(!iiType.hasHeight || iiType.pickupable || iiType.isBed()){
 							return RET_NOTENOUGHROOM;
 						}
 					}
@@ -668,62 +616,37 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 	*destItem = NULL;
 
 	if(floorChangeDown()){
-		Tile* downTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
+		int dx = getTilePosition().x;
+		int dy = getTilePosition().y;
+		int dz = getTilePosition().z + 1;
+		Tile* downTile = g_game.getTile(dx, dy, dz);
 
 		if(downTile){
-			if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(NORTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
-			}
-			else
-				destTile = downTile;
+			if(downTile->floorChange(NORTH))
+				dy += 1;
+			if(downTile->floorChange(SOUTH))
+				dy -= 1;
+			if(downTile->floorChange(EAST))
+				dx -= 1;
+			if(downTile->floorChange(WEST))
+				dx += 1;
+			destTile = g_game.getTile(dx, dy, dz);
 		}
 	}
 	else if(floorChange()){
-		if(floorChange(NORTH) && floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(NORTH) && floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH) && floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH) && floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(NORTH)){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH)){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z - 1);
-		}
-		else if(floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z - 1);
-		}
+		int dx = getTilePosition().x;
+		int dy = getTilePosition().y;
+		int dz = getTilePosition().z - 1;
+
+		if(floorChange(NORTH))
+			dy -= 1;
+		if(floorChange(SOUTH))
+			dy += 1;
+		if(floorChange(EAST))
+			dx += 1;
+		if(floorChange(WEST))
+			dx -= 1;
+		destTile = g_game.getTile(dx, dy, dz);
 	}
 
 
@@ -876,7 +799,7 @@ void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	const ItemType& newType = Item::items[itemId];
 
 	item->setID(itemId);
-	item->setItemCountOrSubtype(count);
+	item->setSubType(count);
 	onUpdateTileItem(index, item, oldType, item, newType);
 }
 

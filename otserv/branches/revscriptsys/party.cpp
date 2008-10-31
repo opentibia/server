@@ -434,6 +434,7 @@ void Party::addPlayerHealedMember(Player* player, uint32_t points)
 				CountBlock_t cb;
 				cb.ticks = OTSYS_TIME();
 				cb.totalHeal = points;
+				cb.totalDamage = 0;
 				pointMap[player->getID()] = cb;
 			}
 			else{
@@ -455,6 +456,7 @@ void Party::addPlayerDamageMonster(Player* player, uint32_t points)
 				CountBlock_t cb;
 				cb.ticks = OTSYS_TIME();
 				cb.totalDamage = points;
+				cb.totalHeal = 0;
 				pointMap[player->getID()] = cb;
 			}
 			else{

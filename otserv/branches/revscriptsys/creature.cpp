@@ -38,7 +38,7 @@
 #include "exception.h"
 #endif
 
-OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
+boost::recursive_mutex AutoID::autoIDLock;
 uint32_t AutoID::count = 1000;
 AutoID::list_type AutoID::list;
 
@@ -48,6 +48,7 @@ extern ConfigManager g_config;
 Creature::Creature() :
   isInternalRemoved(false)
 {
+	id = 0;
 	_tile = NULL;
 	direction  = NORTH;
 	master = NULL;
@@ -61,6 +62,7 @@ Creature::Creature() :
 
 	lastStep = 0;
 	lastStepCost = 1;
+	extraStepDuration = 0;
 	baseSpeed = 220;
 	varSpeed = 0;
 
@@ -163,7 +165,7 @@ int64_t Creature::getSleepTicks() const{
 	if(lastStep != 0){
 		int64_t ct = OTSYS_TIME();
 		int64_t stepDuration = getStepDuration();
-		int64_t delay = stepDuration - (ct - lastStep);
+		int64_t delay = stepDuration - (ct - lastStep) + extraStepDuration;
 		return delay;
 	}
 
@@ -526,9 +528,13 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 {
 	if(creature == this){
 		lastStep = OTSYS_TIME();
+		extraStepDuration = 0;
 		lastStepCost = 1;
 
-		if(!teleport){
+		if(teleport){
+			stopEventWalk();
+		}
+		else{
 			if(oldPos.z != newPos.z){
 				//floor change extra cost
 				lastStepCost = 2;
@@ -1351,6 +1357,18 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id) const
 {
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
 		if((*it)->getType() == type && (*it)->getId() == id){
+			return *it;
+		}
+	}
+
+	return NULL;
+}
+
+Condition* Creature::getCondition(ConditionType_t type) const
+{
+	//This one just returns the first one found.
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type){
 			return *it;
 		}
 	}

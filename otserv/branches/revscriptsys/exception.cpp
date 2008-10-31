@@ -24,31 +24,31 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <iomanip>
 #include <ctime>
 #include <stdlib.h>
 #include <map>
 
-#include "otsystem.h"
+#include <boost/thread.hpp>
 #include "exception.h"
-
-#include <map>
-#include <string>
 
 typedef std::map<unsigned long, char*> FunctionMap;
 
 
-#if defined WIN32 || defined __WINDOWS__
-#include "excpt.h"
-#include "tlhelp32.h"
+#ifdef __WINDOWS__
+#include <excpt.h>
+#include <tlhelp32.h>
+#else //Unix/Linux
+#include <execinfo.h>
+#include <signal.h>
+#include <ucontext.h>
 #endif
 
 unsigned long max_off;
 unsigned long min_off;
 FunctionMap functionMap;
 bool maploaded = false;
-OTSYS_THREAD_LOCKVAR maploadlock;
+boost::recursive_mutex maploadlock;
 
 #if defined WIN32 || defined __WINDOWS__
 EXCEPTION_DISPOSITION
@@ -59,6 +59,8 @@ __cdecl _SEHHandler(
 	void * DispatcherContext
 );
 void printPointer(std::ostream* output,unsigned long p);
+#else
+void _SigHandler(int signum);
 #endif
 
 #ifndef COMPILER_STRING
@@ -82,7 +84,7 @@ ExceptionHandler::~ExceptionHandler(){
 
 bool ExceptionHandler::InstallHandler(){
 	#if defined WIN32 || defined __WINDOWS__
-	OTSYS_THREAD_LOCK_CLASS lockObj(maploadlock);
+	boost::recursive_mutex::scoped_lock lockObj(maploadlock);
 	if(maploaded == false)
 		LoadMap();
 	if( installed == true)
@@ -102,6 +104,10 @@ bool ExceptionHandler::InstallHandler(){
 	chain.SEHfunction = (void*)&_SEHHandler;
 	__asm__("movl %0,%%eax;movl %%eax,%%fs:0;": : "g" (&chain):"%eax");
 	#endif//__GNUC__
+	#else //Unix/Linux
+	signal(SIGILL, &_SigHandler);	// illegal instruction
+	signal(SIGSEGV, &_SigHandler);	// segmentation fault
+	signal(SIGFPE, &_SigHandler);	// floating-point exception
 	#endif//WIN32 || defined __WINDOWS__
 	installed = true;
 	return true;
@@ -119,11 +125,16 @@ bool ExceptionHandler::RemoveHandler(){
 	#ifdef __GNUC__
 	__asm__ ("movl %0,%%eax;movl %%eax,%%fs:0;"::"r"(chain.prev):"%eax" );
 	#endif //__GNUC__
+	#else //Unix/Linux
+	signal(SIGILL, SIG_DFL);	// illegal instruction
+	signal(SIGSEGV, SIG_DFL);	// segmentation fault
+	signal(SIGFPE, SIG_DFL);	// floating-point exception
 	#endif //WIN32 || defined __WINDOWS__
 	installed = false;
 	return true;
 }
 
+#if defined WIN32 || defined __WINDOWS__
 char* getFunctionName(unsigned long addr, unsigned long& start)
 {
 	FunctionMap::iterator functions;
@@ -140,7 +151,6 @@ char* getFunctionName(unsigned long addr, unsigned long& start)
 	return NULL;
 }
 
-#if defined WIN32 || defined __WINDOWS__
 EXCEPTION_DISPOSITION
 __cdecl _SEHHandler(
 	struct _EXCEPTION_RECORD *ExceptionRecord,
@@ -306,7 +316,7 @@ __cdecl _SEHHandler(
 	*outdriver << "*****************************************************" << std::endl;
 	if(file)
 		((std::ofstream*)outdriver)->close();
-	MessageBox(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);
+	MessageBoxA(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);
 	std::cout << "Error report generated. Killing server." <<std::endl;
 	exit(1); //force exit
 	return ExceptionContinueSearch;
@@ -318,9 +328,104 @@ void printPointer(std::ostream* output,unsigned long p){
 		*output << " -> " << *(unsigned long*)p;
 	}
 }
+#else //Unix/Linux
+#define BACKTRACE_DEPTH 128
+void _SigHandler(int signum)
+{
+	// TODO
+	int addrs;
+	void* buffer[BACKTRACE_DEPTH];
+	char** symbols;
+	ucontext_t context;
+	greg_t esp = 0;
+	bool file;
 
+	std::ostream *outdriver;
+	std::cout << "Error: generating report file..." <<std::endl;
+	std::ofstream output("report.txt",std::ios_base::app);
+	if(output.fail()){
+		outdriver = &std::cout;
+		file = false;
+	}
+	else{
+		file = true;
+		outdriver = &output;
+	}
+
+	time_t rawtime;
+	time(&rawtime);
+	*outdriver << "*****************************************************" << std::endl;
+	*outdriver << "Error report - " << std::ctime(&rawtime) << std::endl;
+	*outdriver << "Compiler info - " << COMPILER_STRING << std::endl;
+	*outdriver << "Compilation Date - " << COMPILATION_DATE << std::endl << std::endl;
+
+	// There doesn't appear to be a portable way to get the information displayed
+	//	here by the windows exception tracer, so consider that a "TODO" at best
+	*outdriver << std::endl;
+
+
+	outdriver->flags(std::ios::hex | std::ios::showbase);
+	*outdriver << "Signal: " << signum;
+
+	// register information - how do we get the information of the thread causing the signal
+	// rather than this one? Or are they the same?
+	/*if(getcontext(&context) == 0)
+	{
+	#if __WORDSIZE == 32
+		*outdriver << " at eip = " << context.uc_mcontext.gregs[REG_EIP] << std::endl;
+		*outdriver << "eax = " << context.uc_mcontext.gregs[REG_EAX] << std::endl;
+		*outdriver << "ebx = " << context.uc_mcontext.gregs[REG_EBX] << std::endl;
+		*outdriver << "ecx = " << context.uc_mcontext.gregs[REG_ECX] << std::endl;
+		*outdriver << "edx = " << context.uc_mcontext.gregs[REG_EDX] << std::endl;
+		*outdriver << "esi = " << context.uc_mcontext.gregs[REG_ESI] << std::endl;
+		*outdriver << "edi = " << context.uc_mcontext.gregs[REG_EDI] << std::endl;
+		*outdriver << "ebp = " << context.uc_mcontext.gregs[REG_EBP] << std::endl;
+		*outdriver << "esp = " << context.uc_mcontext.gregs[REG_ESP] << std::endl;
+		*outdriver << "efl = " << context.uc_mcontext.gregs[REG_EFL] << std::endl;
+		esp = context.uc_mcontext.gregs[REG_ESP];
+	#else // assumably 64-bit
+		*outdriver << " at rip = " << context.uc_mcontext.gregs[REG_RIP] << std::endl;
+		*outdriver << "rax = " << context.uc_mcontext.gregs[REG_RAX] << std::endl;
+		*outdriver << "rbx = " << context.uc_mcontext.gregs[REG_RBX] << std::endl;
+		*outdriver << "rcx = " << context.uc_mcontext.gregs[REG_RCX] << std::endl;
+		*outdriver << "rdx = " << context.uc_mcontext.gregs[REG_RDX] << std::endl;
+		*outdriver << "rsi = " << context.uc_mcontext.gregs[REG_RSI] << std::endl;
+		*outdriver << "rdi = " << context.uc_mcontext.gregs[REG_RDI] << std::endl;
+		*outdriver << "rbp = " << context.uc_mcontext.gregs[REG_RBP] << std::endl;
+		*outdriver << "rsp = " << context.uc_mcontext.gregs[REG_RSP] << std::endl;
+		*outdriver << "efl = " << context.uc_mcontext.gregs[REG_EFL] << std::endl;
+		esp = gregs[REG_RSP];
+	#endif
+	}*/
+	outdriver->flush();
+	*outdriver << std::endl;
+
+	// stack backtrace
+	addrs = backtrace(buffer, BACKTRACE_DEPTH);
+	symbols = backtrace_symbols(buffer, addrs);
+	if(symbols != NULL && addrs != 0) {
+		*outdriver << "---Stack Trace---" << std::endl;
+		if(esp != 0) {
+			*outdriver << "From: " << (unsigned long)esp <<
+				" to: " << (unsigned long)(esp+addrs) << std::endl;
+		}
+		for(int i = 0; i != addrs; ++i)
+		{
+			*outdriver << symbols[i] << std::endl;
+		}
+	}
+	outdriver->flush();
+
+	if(file) {
+		((std::ofstream*)outdriver)->close();
+	}
+
+	_exit(1);
+}
 #endif //WIN32 || defined __WINDOWS__
 
+
+#if defined WIN32 || defined __WINDOWS__
 #ifdef __GNUC__
 bool ExceptionHandler::LoadMap(){
 	if(maploaded == true){
@@ -401,6 +506,7 @@ bool ExceptionHandler::LoadMap(){
 };
 #endif //__GNUC__
 
+
 void ExceptionHandler::dumpStack()
 {
 	#ifndef __GNUC__
@@ -480,5 +586,6 @@ void ExceptionHandler::dumpStack()
 	output << "*****************************************************" << std::endl;
 	output.close();
 }
+#endif //WIN32
 
 #endif

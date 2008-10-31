@@ -24,6 +24,10 @@
 
 #include "exception.h"
 
+#if defined(WIN32) && !defined(__WINDOWS__)
+#define __WINDOWS__
+#endif
+
 #ifdef XML_GCC_FREE
 	#define xmlFreeOTSERV(s)	free(s)
 #else
@@ -80,13 +84,19 @@ enum passwordType_t{
 	PASSWORD_TYPE_SHA1,
 };
 
-#ifdef _WIN32
+#if defined _WIN32 || defined __WINDOWS__ || defined WIN32
 #  ifndef WIN32
 #    define WIN32
 #  endif
+#  ifndef __WINDOWS__
+#    define __WINDOWS__
+#  endif
+#  ifndef _WIN32
+#    define _WIN32
+#  endif
 #endif
 
-#if defined __WINDOWS__ || defined WIN32
+#if defined WIN32
 
 #if defined _MSC_VER && defined NDEBUG
 #define _SECURE_SCL 0
@@ -97,7 +107,6 @@ enum passwordType_t{
 	#define	__FUNCTION__ __func__
 #endif
 
-#define OTSYS_THREAD_RETURN  void
 #ifndef EWOULDBLOCK
 #define EWOULDBLOCK WSAEWOULDBLOCK
 #endif
@@ -112,11 +121,18 @@ enum passwordType_t{
 #define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
-	#include <ext/hash_map>
-	#include <ext/hash_set>
+	#if __GNUC__ < 4
+		#include <ext/hash_map>
+		#include <ext/hash_set>
+		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
+		#define OTSERV_HASH_SET __gnu_cxx::hash_set
+	#else
+		#include <unordered_map>
+		#include <unordered_set>
+		#define OTSERV_HASH_MAP std::tr1::unordered_map;
+		#define OTSERV_HASH_SET std::tr1::unordered_set;
+	#endif
 	#include <assert.h>
-	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
-	#define OTSERV_HASH_SET __gnu_cxx::hash_set
 	#define ATOI64 atoll
 
 #else
@@ -165,8 +181,6 @@ enum passwordType_t{
 
 //*nix systems
 #else
-	#define OTSYS_THREAD_RETURN void*
-
 	#include <stdint.h>
 	#include <string.h>
 	#include <ext/hash_map>

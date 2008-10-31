@@ -22,7 +22,7 @@
 #define __OTSERV_OUTPUT_MESSAGE_H__
 
 #include "networkmessage.h"
-#include "otsystem.h"
+#include <boost/thread.hpp>
 #include <list>
 
 #include <boost/utility.hpp>
@@ -156,14 +156,14 @@ protected:
 	OutputMessageVector m_outputMessages;
 	OutputMessageVector m_autoSendOutputMessages;
 	OutputMessageVector m_allOutputMessages;
-	OTSYS_THREAD_LOCKVAR m_outputPoolLock;
+	boost::recursive_mutex m_outputPoolLock;
 	uint64_t m_frameTime;
 };
 
 #ifdef __TRACK_NETWORK__
 #define TRACK_MESSAGE(omsg) if(dynamic_cast<OutputMessage*>(omsg)) dynamic_cast<OutputMessage*>(omsg)->Track(__FILE__, __LINE__, __FUNCTION__)
 #else
-#define TRACK_MESSAGE(omsg) 
+#define TRACK_MESSAGE(omsg)
 #endif
 
 #endif

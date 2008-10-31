@@ -22,10 +22,9 @@
 #define __OTSERV_COMBAT_H__
 
 #include "thing.h"
-#include "definitions.h"
 #include "condition.h"
-#include "enums.h"
 #include "map.h"
+#include "otsystem.h"
 
 #include <vector>
 

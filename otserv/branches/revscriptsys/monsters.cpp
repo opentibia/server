@@ -144,7 +144,7 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 
 	if(tmpItem){
 		if(lootBlock.subType != -1){
-			tmpItem->setItemCountOrSubtype(lootBlock.subType);
+			tmpItem->setSubType(lootBlock.subType);
 		}
 
 		if(lootBlock.actionId != -1){
@@ -1184,28 +1184,25 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 						int32_t percent = 0;
 
 						if(readXMLInteger(tmpNode, "physicalPercent", intValue)){
-							type = COMBAT_PHYSICALDAMAGE;
-							percent = intValue;
+							mType->elementMap[COMBAT_PHYSICALDAMAGE] = intValue;
 						}
 						if(readXMLInteger(tmpNode, "icePercent", intValue)){
-							type = COMBAT_ICEDAMAGE;
-							percent = intValue;
+							mType->elementMap[COMBAT_ICEDAMAGE] = intValue;
 						}
-						else if(readXMLInteger(tmpNode, "earthPercent", intValue)){
-							type = COMBAT_EARTHDAMAGE;
-							percent = intValue;
+						if(readXMLInteger(tmpNode, "earthPercent", intValue)){
+							mType->elementMap[COMBAT_EARTHDAMAGE] = intValue;
 						}
-						else if(readXMLInteger(tmpNode, "firePercent", intValue)){
-							type = COMBAT_FIREDAMAGE;
-							percent = intValue;
+						if(readXMLInteger(tmpNode, "firePercent", intValue)){
+							mType->elementMap[COMBAT_FIREDAMAGE] = intValue;
 						}
-						else if(readXMLInteger(tmpNode, "energyPercent", intValue)){
-							type = COMBAT_ENERGYDAMAGE;
-							percent = intValue;
+						if(readXMLInteger(tmpNode, "energyPercent", intValue)){
+							mType->elementMap[COMBAT_ENERGYDAMAGE] = intValue;
 						}
-						
-						if(percent != 0 && type != COMBAT_NONE){
-							mType->elementMap[type] = percent;
+						if(readXMLInteger(tmpNode, "holyPercent", intValue)){
+							mType->elementMap[COMBAT_HOLYDAMAGE] = intValue;
+						}
+						if(readXMLInteger(tmpNode, "deathPercent", intValue)){
+							mType->elementMap[COMBAT_DEATHDAMAGE] = intValue;
 						}
 					}
 					tmpNode = tmpNode->next;

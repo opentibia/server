@@ -95,8 +95,13 @@ private:
 		Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(uint32_t index, Item* item);
 
+	Container* getParentContainer();
+	void updateItemWeight(double diff);
+
+
 protected:
 	uint32_t maxSize;
+	double total_weight;
 	ItemList itemlist;
 };
 

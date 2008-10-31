@@ -19,10 +19,15 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "otpch.h"
+
+#ifdef __USE_SQLITE__
+
 #include <iostream>
 
 #include "database.h"
 #include "databasesqlite.h"
+
+#include "tools.h"
 
 #include "configmanager.h"
 extern ConfigManager g_config;
@@ -38,6 +43,12 @@ extern ConfigManager g_config;
 DatabaseSQLite::DatabaseSQLite()
 {
 	m_connected = false;
+
+	// test for existence of database file;
+	// sqlite3_open will create a new one if it isn't there (which we don't want)
+	if(!fileExists(g_config.getString(ConfigManager::SQL_DB).c_str())){
+		return;
+	}
 
 	// Initialize sqlite
 	if( sqlite3_open(g_config.getString(ConfigManager::SQL_DB).c_str(), &m_handle) != SQLITE_OK){
@@ -109,6 +120,8 @@ std::string DatabaseSQLite::_parse(const std::string &s)
 
 bool DatabaseSQLite::executeQuery(const std::string &query)
 {
+	boost::recursive_mutex::scoped_lock lockClass(sqliteLock);
+
 	if(!m_connected)
 		return false;
 
@@ -140,6 +153,8 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 
 DBResult* DatabaseSQLite::storeQuery(const std::string &query)
 {
+	boost::recursive_mutex::scoped_lock lockClass(sqliteLock);
+
 	if(!m_connected)
 		return NULL;
 
@@ -265,3 +280,5 @@ SQLiteResult::~SQLiteResult()
 {
 	sqlite3_finalize(m_handle);
 }
+
+#endif

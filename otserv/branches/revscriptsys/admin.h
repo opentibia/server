@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -76,7 +76,6 @@
 //		message(string)
 //
 
-#include "otsystem.h"
 #include "player.h"
 #include "logger.h"
 #include <string>
@@ -135,38 +134,38 @@ class AdminProtocolConfig{
 public:
 	AdminProtocolConfig();
 	~AdminProtocolConfig();
-	
+
 	bool loadXMLConfig(const std::string& directory);
-	
+
 	bool isEnabled();
-	
+
 	bool onlyLocalHost();
 	bool addConnection();
 	void removeConnection();
-	
+
 	bool requireLogin();
 	bool requireEncryption();
-	
+
 	uint16_t getProtocolPolicy();
 	uint32_t getProtocolOptions();
-	
+
 	bool allowIP(uint32_t ip);
-	
+
 	bool passwordMatch(std::string& password);
-	
+
 	RSA* getRSAKey(uint8_t type);
-	
+
 protected:
 	bool m_enabled;
 	bool m_onlyLocalHost;
 	int32_t m_maxConnections;
 	int32_t m_currrentConnections;
-	
+
 	std::string m_password;
-	
+
 	bool m_requireLogin;
 	bool m_requireEncryption;
-	
+
 	RSA* m_key_RSA1024XTEA;
 };
 
@@ -181,15 +180,15 @@ public:
 
 	ProtocolAdmin(Connection* connection);
 	virtual ~ProtocolAdmin();
-	
+
 	virtual void parsePacket(NetworkMessage& msg);
-	
+
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
-	
+
 protected:
-	
+
 	virtual void deleteProtocolTask();
-	
+
 	void adminCommandCloseServer();
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();
@@ -202,11 +201,11 @@ protected:
 		NO_LOGGED_IN,
 		LOGGED_IN,
 	};
-	
-	
-	
+
+
+
 private:
-	
+
 	int32_t m_loginTries;
 	ConnectionState_t m_state;
 	uint32_t m_lastCommand;

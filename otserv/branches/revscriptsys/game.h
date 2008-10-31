@@ -77,10 +77,10 @@ enum LightState_t {
 
 struct RuleViolation {
 	RuleViolation(Player* _reporter, const std::string& _text, uint32_t _time) :
-		text(_text),
-		time(_time),
 		reporter(_reporter),
 		gamemaster(NULL),
+		text(_text),
+		time(_time),
 		isOpen(true)
 	{
 	}
@@ -98,7 +98,8 @@ private:
 typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 
 #define EVENT_LIGHTINTERVAL  10000
-#define EVENT_DECAYINTERVAL  10000
+#define EVENT_DECAYINTERVAL  1000
+#define EVENT_DECAY_BUCKETS  16
 #define EVENT_SCRIPT_CLEANUP_INTERVAL  90000
 
 /**
@@ -161,6 +162,11 @@ public:
 	Tile* getTile(uint32_t x, uint32_t y, uint32_t z);
 
 	/**
+	  * Set a single tile of the map, position is read from this tile
+		*/
+	void setTile(Tile* newtile);
+
+	/**
 	  * Get a leaf of the map.
 	  * \return A pointer to a leaf
 		*/
@@ -193,6 +199,14 @@ public:
 	  * \return A Pointer to the player
 	  */
 	Player* getPlayerByName(const std::string& s);
+
+	/**
+	  * Returns a player based on a string name identifier, with support for the "~" wildcard.
+	  * \param s is the name identifier, with or without wildcard
+	  * \param player will point to the found player (if any)
+	  * \return "RET_PLAYERWITHTHISNAMEISNOTONLINE" or "RET_NAMEISTOOAMBIGIOUS"
+	  */
+	ReturnValue getPlayerByNameWildcard(const std::string& s, Player* &player);
 
 	/**
 	  * Returns a player based on an account number identifier
@@ -248,7 +262,7 @@ public:
 
 	void getWorldLightInfo(LightInfo& lightInfo);
 
-	void getSpectators(SpectatorVec& list, const Position& centerPos, 
+	void getSpectators(SpectatorVec& list, const Position& centerPos,
 		bool checkforduplicate = false, bool multifloor = false,
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0){
@@ -275,7 +289,7 @@ public:
 		uint32_t flags = 0, bool test = false);
 	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
 
-	ReturnValue internalPlayerAddItem(Player* player, Item* item);
+	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true);
 
 	/**
 	  * Find an item of a certain type
@@ -377,6 +391,7 @@ public:
 	bool playerOpenChannel(uint32_t playerId, uint16_t channelId);
 	bool playerCloseChannel(uint32_t playerId, uint16_t channelId);
 	bool playerOpenPrivateChannel(uint32_t playerId, const std::string& receiver);
+	bool playerCloseNpcChannel(uint32_t playerId);
 	bool playerProcessRuleViolation(uint32_t playerId, const std::string& name);
 	bool playerCloseRuleViolation(uint32_t playerId, const std::string& name);
 	bool playerCancelRuleViolation(uint32_t playerId);
@@ -401,6 +416,12 @@ public:
 	bool playerAcceptTrade(uint32_t playerId);
 	bool playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(uint32_t playerId);
+	bool playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+		uint8_t amount);
+	bool playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+		uint8_t amount);
+	bool playerCloseShop(uint32_t playerId);
+	bool playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count);
 	bool playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerFollowCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerCancelAttackAndFollow(uint32_t playerId);
@@ -508,6 +529,7 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
+	bool npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize);
 	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
 	bool closeRuleViolation(Player* player);
@@ -518,6 +540,7 @@ protected:
 	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClass type, const std::string& receiver, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId);
+	bool playerSpeakToNpc(Player* player, const std::string& text);
 	bool playerReportRuleViolation(Player* player, const std::string& text);
 	bool playerContinueReport(Player* player, const std::string& text);
 
@@ -552,8 +575,9 @@ protected:
 	void internalDecayItem(Item* item);
 
 	typedef std::list<Item*> DecayList;
-	DecayList decayItems;
+	DecayList decayItems[EVENT_DECAY_BUCKETS];
 	DecayList toDecayItems;
+	size_t last_bucket;
 
 	static const int LIGHT_LEVEL_DAY = 250;
 	static const int LIGHT_LEVEL_NIGHT = 40;
