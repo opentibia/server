@@ -35,6 +35,8 @@ namespace Script {
 
 	class Manager;
 
+	class LuaThread;
+	typedef boost::shared_ptr<LuaThread> LuaThread_ptr;
 	class Listener;
 	typedef boost::shared_ptr<Listener> Listener_ptr;
 	typedef boost::weak_ptr<Listener> Listener_wptr;
@@ -47,8 +49,10 @@ namespace Script {
 		Event();
 		virtual ~Event();
 
+		bool call(Manager& stae, Enviroment& enviroment, Listener_ptr listener);
 		virtual bool dispatch(Manager& state, Script::Enviroment& enviroment) = 0;
 		virtual void push_instance(LuaState& state, Script::Enviroment& enviroment) = 0;
+		virtual void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread) = 0;
 	protected:
 
 		uint32_t eventID;
@@ -76,18 +80,18 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* speaker, SpeakClass& type, std::string& receiver, std::string& text);
+			Event(Creature* speaker, SpeakClass& speak_class, std::string& receiver, std::string& text);
 			~Event();
 			
 			bool dispatch(Manager& state, Enviroment& enviroment);
 			void push_instance(LuaState& state, Enviroment& enviroment);
-		protected:
-			bool dispatch(Manager& state, Enviroment& enviroment, ListenerList& specific_list);
 			bool check_match(const ScriptInformation& info);
 			bool call(Manager& state, Enviroment& enviroment, Listener_ptr listener);
 
+			std::string name() const {return "OnSay";}
+		protected:
 			Creature* speaker;
-			SpeakClass& type;
+			SpeakClass& speak_class;
 			std::string& text;
 			std::string& receiver;
 		};

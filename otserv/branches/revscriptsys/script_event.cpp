@@ -39,11 +39,37 @@ Event::Event() : eventID(++eventID_counter) {
 Event::~Event() {
 }
 
+///////////////////////////////////////////////////////////////////////////////C
+
+template<class T, class ScriptInformation>
+bool dispatchEvent(T* e, Manager& state, Enviroment& enviroment, ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
+
+		// Call handler
+		if(e->check_match(info)) {
+			if(e->call(state, enviroment, listener) == true) {
+				// Handled
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
-OnSay::Event::Event(Creature* _speaker, SpeakClass& _type, std::string& _receiver, std::string& _text) :
+OnSay::Event::Event(Creature* _speaker, SpeakClass& _type, std::string& _receiver, std::string& _class) :
 	speaker(_speaker),
-	type(_type),
+	speak_class(_class),
 	receiver(_receiver),
 	text(_text)
 {
@@ -72,37 +98,14 @@ bool OnSay::Event::check_match(const ScriptInformation& info) {
 	return false;
 }
 
-bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment, ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
-		return false;
-	}
-	for(ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
-
-		// Call handler
-		if(check_match(info)) {
-			if(call(state, enviroment, listener) == true) {
-				// Handled
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
 bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment) {
-	if(dispatch(state, enviroment, speaker->getListeners(ONSAY_LISTENER)))
+	if(dispatchEvent<OnSay::Event, ScriptInformation>(this, state, enviroment, speaker->getListeners(ONSAY_LISTENER)))
 		return true;
 
-	return dispatch(state, enviroment, enviroment.Generic.OnSay);
+	return dispatchEvent<OnSay::Event, ScriptInformation>(this, state, enviroment, enviroment.Generic.OnSay);
 }
 
-bool OnSay::Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) {
+bool Event::call(Manager& stae, Enviroment& enviroment, Listener_ptr listener) {
 	LuaThread_ptr thread = state.newThread("OnSay");
 
 	// Stack is empty
@@ -110,7 +113,7 @@ bool OnSay::Event::call(Manager& state, Enviroment& enviroment, Listener_ptr lis
 	thread->pushCallback(listener);
 	
 	if(thread->isNil()) {
-		thread->HandleError("Attempt to call destroyed 'OnSay' listener.");
+		thread->HandleError("Attempt to call destroyed '" + name() + "' listener.");
 		thread->pop();
 		return false;
 	}
@@ -132,13 +135,25 @@ bool OnSay::Event::call(Manager& state, Enviroment& enviroment, Listener_ptr lis
 
 	// Retrieve event info
 	thread->getRegistryItem(lua_tag);
+	
+	// Update this instance with values from lua
+	update_instance(state, enviroment, thread);
+	
+	// clean up
+	thread->pushNil();
+	thread->setRegistryItem(lua_tag);
+	thread->pop(); // pop event table, will be garbage collected as we cleared the registry from it
 
-	thread->getField(-1, "type");
+	return true;
+}
+
+bool OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	thread->getField(-1, "class");
 	if(thread->isNumber()) {
-		type = (SpeakClass)thread->popInteger();
+		speak_class = (SpeakClass)thread->popInteger();
 	}
 	else {
-		thread->HandleError("Event 'OnSay' invalid value of 'type'");
+		thread->HandleError("Event 'OnSay' invalid value of 'class'");
 		thread->pop();
 	}
 
@@ -159,11 +174,6 @@ bool OnSay::Event::call(Manager& state, Enviroment& enviroment, Listener_ptr lis
 		thread->HandleError("Event 'OnSay' invalid value of 'text'");
 		thread->pop();
 	}
-	
-	thread->pushNil();
-	thread->setRegistryItem(lua_tag);
-	thread->pop(); // pop event table, will be garbage collected as we cleared the registry from it
-
 	return true;
 }
 
@@ -172,7 +182,7 @@ void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnSayEvent");
 	state.pushThing(speaker);
 	state.setField(-2, "speaker");
-	state.setField(-1, "type", int32_t(type));
+	state.setField(-1, "class", int32_t(speak_class));
 	state.setField(-1, "receiver", receiver);
 	state.setField(-1, "text", text);
 	//std::cout << state.typeOf() << ":" << state.getStackTop() << std::endl;
