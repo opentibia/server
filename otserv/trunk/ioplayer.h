@@ -71,6 +71,7 @@ public:
 	//bool loadDepot(Player* player, unsigned long depotId);
 
 	bool getGuidByName(uint32_t& guid, std::string& name);
+	bool getAccountByName(uint32_t& acc, std::string& name);
 	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
 	bool getNameByGuid(uint32_t guid, std::string& name);
 	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);

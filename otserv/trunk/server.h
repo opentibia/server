@@ -46,7 +46,7 @@ private:
 	void accept();
 
 	void openListenSocket();
-	void closeListenSocekt();
+	void closeListenSocket();
 
 	boost::asio::io_service m_io_service;
 	boost::asio::ip::tcp::acceptor* m_acceptor;

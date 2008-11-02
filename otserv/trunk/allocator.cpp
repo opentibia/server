@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,7 +21,6 @@
 
 #ifdef __OTSERV_ALLOCATOR__
 
-#include "otsystem.h"
 #include "allocator.h"
 
 //normal new/delete
@@ -67,9 +66,10 @@ void operator delete[](void* p, int dummy)
 #endif
 
 #ifdef __OTSERV_ALLOCATOR_STATS__
-OTSYS_THREAD_RETURN allocatorStatsThread(void *a){
+void allocatorStatsThread(void *a){
 	while(1){
-		OTSYS_SLEEP(30000);
+		boost::this_thread::sleep(30000);
+		//OTSYS_SLEEP(30000);
 		PoolManager::getInstance().dumpStats();
 		//PoolManager::getInstance().releaseMemory();
 	}

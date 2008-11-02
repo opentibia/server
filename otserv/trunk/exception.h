@@ -18,6 +18,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#if defined __EXCEPTION_TRACER__
 
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
@@ -42,3 +43,5 @@ private:
 };
 
 #endif  // #ifndef __EXCEPTION_H__
+
+#endif

@@ -66,6 +66,7 @@ struct spellBlock_t{
 	int32_t minCombatValue;
 	int32_t maxCombatValue;
 	bool combatSpell;
+	bool isMelee;
 };
 
 struct voiceBlock_t{
@@ -78,6 +79,7 @@ typedef std::list<summonBlock_t> SummonList;
 typedef std::list<spellBlock_t> SpellList;
 typedef std::vector<voiceBlock_t> VoiceVector;
 typedef std::list<std::string> MonsterScriptList;
+typedef std::map<CombatType_t, int32_t> ElementMap;
 
 class MonsterType{
 public:
@@ -88,7 +90,7 @@ public:
 
 	std::string name;
 	std::string nameDescription;
-	int experience;
+	uint64_t experience;
 
 	int defense;
 	int armor;
@@ -121,6 +123,7 @@ public:
 	uint32_t manaCost;
 	SummonList summonList;
 	LootItems lootItems;
+	ElementMap elementMap;
 	SpellList spellAttackList;
 	SpellList spellDefenseList;
 
@@ -130,9 +133,6 @@ public:
 
 	int32_t changeTargetSpeed;
 	int32_t changeTargetChance;
-
-	int32_t attackStrength;
-	int32_t defenseStrength;
 
 	MonsterScriptList scriptList;
 

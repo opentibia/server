@@ -234,6 +234,8 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
+		case CONDITION_EXHAUST_COMBAT:
+		case CONDITION_EXHAUST_HEAL:
 		case CONDITION_MUTED:
 		{
 			return new ConditionGeneric(_id, _type,_ticks);
@@ -1343,7 +1345,7 @@ bool ConditionDamage::serialize(PropWriteStream& propWriteStream)
 	return true;
 }
 
-bool ConditionDamage::addDamage(int32_t rounds, uint32_t time, int32_t value)
+bool ConditionDamage::addDamage(int32_t rounds, int32_t time, int32_t value)
 {
 	if(rounds == -1){
 		//periodic damage
@@ -1358,7 +1360,7 @@ bool ConditionDamage::addDamage(int32_t rounds, uint32_t time, int32_t value)
 	}
 
 	//rounds, time, damage
-	for(int i = 0; i < rounds; ++i){
+	for(int32_t i = 0; i < rounds; ++i){
 		IntervalInfo damageInfo;
 		damageInfo.interval = time;
 		damageInfo.timeLeft = time;
@@ -1369,6 +1371,7 @@ bool ConditionDamage::addDamage(int32_t rounds, uint32_t time, int32_t value)
 			setTicks(getTicks() + damageInfo.interval);
 		}
 	}
+
 	return true;
 }
 
@@ -1416,19 +1419,6 @@ bool ConditionDamage::startCondition(Creature* creature)
 	}
 
 	return true;
-
-	/*
-	if(delayed){
-		return true;
-	}
-
-	int32_t damage = 0;
-	if(getNextDamage(damage)){
-		return doDamage(creature, damage);
-	}
-
-	return false;
-	*/
 }
 
 bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)

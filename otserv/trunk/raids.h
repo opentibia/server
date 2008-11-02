@@ -43,6 +43,8 @@ struct MonsterSpawn {
 
 //How many times it will try to find a tile to add the monster to before giving up
 #define MAXIMUM_TRIES_PER_MONSTER 10
+#define CHECK_RAIDS_INTERVAL 60
+#define RAID_MINTICKS 1000
 
 class Raid;
 class RaidEvent;
@@ -53,8 +55,6 @@ typedef std::list<MonsterSpawn*> MonsterSpawnList;
 
 class Raids
 {
-private:
-	Raids();
 public:
 	static Raids* getInstance(){
 		static Raids instance;
@@ -83,6 +83,7 @@ public:
 	void checkRaids();
 	
 private:
+	Raids();
 	RaidList raidList;
 	bool loaded, started;
 	Raid* running;
@@ -124,6 +125,7 @@ private:
 	uint64_t margin;
 	RaidState_t state;
 	uint32_t nextEventEvent;
+	std::string filename;
 	bool loaded;
 };
 

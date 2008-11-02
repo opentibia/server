@@ -42,12 +42,7 @@ enum MoveEvent_t{
 class MoveEvent;
 
 struct MoveEventList{
-	MoveEvent* event[MOVE_EVENT_LAST];
-MoveEventList(){
-	for(int i=0; i < MOVE_EVENT_LAST; ++i){
-		event[i] = NULL;	
-	}
-};	
+	std::list<MoveEvent*> moveEvent[MOVE_EVENT_LAST];
 };
 
 typedef std::map<int32_t, bool> VocEquipMap;
@@ -66,18 +61,24 @@ public:
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
 	
 protected:
-	typedef std::map<int32_t , MoveEventList> MoveListMap;
+	typedef std::map<int32_t, MoveEventList> MoveListMap;
+	typedef std::map<Position, MoveEventList> MovePosListMap;
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
 	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	
-	void addEvent(MoveEvent* event, int32_t id, MoveListMap& map);
-	
+	void addEvent(MoveEvent* moveEvent, int32_t id, MoveListMap& map);
+	void addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& map);
+	MoveEvent* getEvent(Tile* tile, MoveEvent_t eventType);
+
+	MoveEvent* getEvent(Item* item, MoveEvent_t eventType, slots_t slot);
+		
 	MoveListMap m_uniqueIdMap;
 	MoveListMap m_actionIdMap;
 	MoveListMap m_itemIdMap;
+	MovePosListMap m_positionMap;
 	
 	LuaScriptInterface m_scriptInterface;
 };
@@ -143,7 +144,6 @@ protected:
 	uint32_t wieldInfo;
 	VocEquipMap vocEquipMap;
 
-private:
 };
 
 

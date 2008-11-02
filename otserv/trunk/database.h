@@ -22,7 +22,7 @@
 #define __OTSERV_DATABASE_H__
 
 #include "definitions.h"
-#include "otsystem.h"
+#include <boost/thread.hpp>
 
 #include <sstream>
 
@@ -93,6 +93,15 @@ public:
 	*/
 	DATABASE_VIRTUAL bool getParam(DBParam_t param) { return false; }
 
+	/**
+	* Database connected.
+	*
+	* Returns whether or not the database is connected.
+	*
+	* @return whether or not the database is connected.
+	*/
+	bool isConnected() { return m_connected; }
+
 protected:
 	/**
 	* Transaction related methods.
@@ -162,6 +171,8 @@ protected:
 
 	DBResult* verifyResult(DBResult* result);
 
+	bool m_connected;
+
 private:
 	static Database* _instance;
 };
@@ -219,7 +230,7 @@ public:
 	~DBQuery();
 
 protected:
-	static OTSYS_THREAD_LOCKVAR database_lock;
+	static boost::recursive_mutex database_lock;
 };
 
 /**

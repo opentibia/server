@@ -30,8 +30,23 @@
 class ProtocolStatus : public Protocol
 {
 public:
-	ProtocolStatus(Connection* connection) : Protocol(connection) {}
-	virtual ~ProtocolStatus() {}
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t protocolStatusCount;
+#endif
+
+	ProtocolStatus(Connection* connection) : Protocol(connection)
+	{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		protocolStatusCount++;
+#endif
+	}
+
+	virtual ~ProtocolStatus()
+	{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		protocolStatusCount--;
+#endif
+	}
 
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
 

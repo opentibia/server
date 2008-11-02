@@ -84,32 +84,58 @@ bool TalkActions::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
-TalkActionResult_t TalkActions::playerSaySpell(Player* player, SpeakClasses type, const std::string& words)
+TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type, const std::string& words)
 {
 	if(type != SPEAK_SAY){
 		return TALKACTION_CONTINUE;
 	}
+
+	std::string str_words_quote;
+	std::string str_param_quote;
+	std::string str_words_first_word;
+	std::string str_param_first_word;
 	
-	std::string str_words;
-	std::string str_param;
+	// With quotation filtering
 	size_t loc = words.find( '"', 0 );
 	if(loc != std::string::npos && loc >= 0){
-		str_words = std::string(words, 0, loc);
-		str_param = std::string(words, (loc+1), words.size()-loc-1);
+		str_words_quote = std::string(words, 0, loc);
+		str_param_quote = std::string(words, (loc+1), words.size()-loc-1);
 	}
 	else {
-		str_words = words;
-		str_param = std::string(""); 
+		str_words_quote = words;
+		str_param_quote = std::string(""); 
 	}
 	
-	trim_left(str_words, " ");
-	trim_right(str_words, " ");
+	trim_left(str_words_quote, " ");
+	trim_right(str_param_quote, " ");
+	
+	// With whitespace filtering
+	loc = words.find( ' ', 0 );
+	if(loc != std::string::npos && loc >= 0){
+		str_words_first_word = std::string(words, 0, loc);
+		str_param_first_word = std::string(words, (loc+1), words.size()-loc-1);
+	}
+	else {
+		str_words_first_word = words;
+		str_param_first_word = std::string(""); 
+	}
 
 	TalkActionList::iterator it;
 	for(it = wordsMap.begin(); it != wordsMap.end(); ++it){
-		if(it->first == str_words){
+		std::string cmdstring;
+		std::string paramstring;
+		if(it->second->getFilterType() == TALKACTION_MATCH_QUOTATION) {
+			cmdstring = str_words_quote;
+			paramstring = str_param_quote;
+		} else if(it->second->getFilterType() == TALKACTION_MATCH_FIRST_WORD) {
+			cmdstring = str_words_first_word;
+			paramstring = str_param_first_word;
+		} else {
+			continue;
+		}
+		if(cmdstring == it->first) {
 			TalkAction* talkAction = it->second;
-			uint32_t ret =  talkAction->executeSay(player, str_words, str_param);
+			uint32_t ret =  talkAction->executeSay(player, cmdstring, paramstring);
 			if(ret == 1){
 				return TALKACTION_CONTINUE;
 			}
@@ -123,7 +149,8 @@ TalkActionResult_t TalkActions::playerSaySpell(Player* player, SpeakClasses type
 
 
 TalkAction::TalkAction(LuaScriptInterface* _interface) :
-Event(_interface)
+Event(_interface),
+filterType(TALKACTION_MATCH_QUOTATION)
 {
 	//
 }
@@ -137,12 +164,21 @@ bool TalkAction::configureEvent(xmlNodePtr p)
 {
 	std::string str;
 	if(readXMLString(p, "words", str)){
-		m_words = str;
+		commandString = str;
 	}
 	else{
 		std::cout << "Error: [TalkAction::configureEvent] No words for TalkAction or Spell." << std::endl;
 		return false;
 	}
+
+	if(readXMLString(p, "filter", str)){
+		if(str == "quotation") {
+			filterType = TALKACTION_MATCH_QUOTATION;
+		} else if(str == "first word") {
+			filterType = TALKACTION_MATCH_FIRST_WORD;
+		}
+	}
+
 	return true;
 }
 
@@ -178,7 +214,7 @@ uint32_t TalkAction::executeSay(Creature* creature, const std::string& words, co
 		int32_t result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 		
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. TalkAction::executeSay" << std::endl;

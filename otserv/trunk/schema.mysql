@@ -12,7 +12,10 @@ CREATE TABLE `accounts` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `password` VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL COMMENT 'MD5'*//* VARCHAR(40) NOT NULL COMMENT 'SHA1'*/,
     `email` VARCHAR(255) NOT NULL DEFAULT '',
+    `premend` INT UNSIGNED NOT NULL DEFAULT 0,
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
+    `deleted` TINYINT(1) NOT NULL DEFAULT FALSE,
+    `warned` TINYINT(1) NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
@@ -21,10 +24,9 @@ CREATE TABLE `players` (
     `name` VARCHAR(255) NOT NULL,
     `account_id` INT UNSIGNED NOT NULL,
     `group_id` INT UNSIGNED NOT NULL COMMENT 'users group',
-    `premend` INT UNSIGNED NOT NULL DEFAULT 0,
     `sex` INT UNSIGNED NOT NULL DEFAULT 0,
     `vocation` INT UNSIGNED NOT NULL DEFAULT 0,
-    `experience` INT UNSIGNED NOT NULL DEFAULT 0,
+    `experience` BIGINT UNSIGNED NOT NULL DEFAULT 0,
     `level` INT UNSIGNED NOT NULL DEFAULT 1,
     `maglevel` INT UNSIGNED NOT NULL DEFAULT 0,
     `health` INT UNSIGNED NOT NULL DEFAULT 100,
@@ -137,12 +139,19 @@ CREATE TABLE `house_lists` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `bans` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `type` INT NOT NULL COMMENT 'this field defines if its ip, account, player, or any else ban',
-    `ip` INT UNSIGNED NOT NULL DEFAULT 0,
-    `mask` INT UNSIGNED NOT NULL DEFAULT 4294967295,
-    `player` INT UNSIGNED NOT NULL DEFAULT 0,
-    `account` INT UNSIGNED NOT NULL DEFAULT 0,
-    `time` INT UNSIGNED NOT NULL DEFAULT 0
+    `value` INT UNSIGNED NOT NULL COMMENT 'ip, player guid, account number',
+    `param` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'mask',
+    `active` TINYINT(1) NOT NULL DEFAULT TRUE,
+    `expires` INT UNSIGNED NOT NULL,
+    `added` INT UNSIGNED NOT NULL,
+    `admin_id` INT UNSIGNED NOT NULL DEFAULT 0,
+    `comment` VARCHAR(255) NOT NULL DEFAULT '',
+    `reason` INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY  (`id`),
+    KEY (`type`, `value`),
+    KEY (`expires`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tiles` (
@@ -189,7 +198,7 @@ BEFORE DELETE
 ON `accounts`
 FOR EACH ROW
 BEGIN
-    DELETE FROM `bans` WHERE `type` = 3 AND `account` = OLD.`id`;
+    DELETE FROM `bans` WHERE `type` = 3 AND `value` = OLD.`id`;
 END|
 
 CREATE TRIGGER `ondelete_guilds`
@@ -206,7 +215,7 @@ BEFORE DELETE
 ON `players`
 FOR EACH ROW
 BEGIN
-    DELETE FROM `bans` WHERE `type` = 2 AND `player` = OLD.`id`;
+    DELETE FROM `bans` WHERE `type` = 2 AND `value` = OLD.`id`;
     UPDATE `houses` SET `owner` = 0 WHERE `owner` = OLD.`id`;
 END|
 

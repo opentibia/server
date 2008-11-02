@@ -35,6 +35,11 @@ enum TalkActionResult_t{
 	TALKACTION_FAILED,
 };
 
+enum TalkActionFilterType{
+	TALKACTION_MATCH_QUOTATION,
+	TALKACTION_MATCH_FIRST_WORD,
+};
+
 class TalkAction;
 
 class TalkActions : public BaseEvents
@@ -43,7 +48,7 @@ public:
 	TalkActions();
 	virtual ~TalkActions();
 	
-	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
+	TalkActionResult_t onPlayerSpeak(Player* player, SpeakClasses type, const std::string& words);
 	
 protected:
 	virtual LuaScriptInterface& getScriptInterface();
@@ -66,8 +71,8 @@ public:
 	
 	virtual bool configureEvent(xmlNodePtr p);
 	
-	std::string getWords() const {return m_words;};
-	
+	std::string getWords() const {return commandString;}
+	TalkActionFilterType getFilterType() const {return filterType;}
 	//scripting
 	uint32_t executeSay(Creature* creature, const std::string& words, const std::string& param);
 	//
@@ -75,7 +80,8 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 	
-	std::string m_words;
+	std::string commandString;
+	TalkActionFilterType filterType;
 };
 
 #endif

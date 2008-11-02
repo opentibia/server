@@ -19,7 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "const.h"
 #include "player.h"
 #include "monster.h"
@@ -28,12 +27,14 @@
 #include "item.h"
 #include "container.h"
 #include "combat.h"
-#include "depot.h"
 #include "house.h"
 #include "tasks.h"
 #include "tools.h"
 #include "spells.h"
 #include "configmanager.h"
+//[ added for beds system
+#include "beds.h"
+//]
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -45,6 +46,7 @@
 
 extern Game g_game;
 extern Spells* g_spells;
+extern Actions* g_actions;
 extern ConfigManager g_config;
 
 Actions::Actions() :
@@ -90,7 +92,7 @@ std::string Actions::getScriptBaseName()
 
 Event* Actions::getEvent(const std::string& nodeName)
 {
-	if(nodeName == "action"){
+	if(asLowerCaseString(nodeName) == "action"){
 		return new Action(&m_scriptInterface);
 	}
 	else{
@@ -121,20 +123,65 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
-ReturnValue Actions::canUse(const Creature* creature, const Position& pos)
+ReturnValue Actions::canUse(const Player* player, const Position& pos)
 {
-	const Position& creaturePos = creature->getPosition();
+	const Position& playerPos = player->getPosition();
 
 	if(pos.x != 0xFFFF){
-		if(creaturePos.z > pos.z){
+		if(playerPos.z > pos.z){
 			return RET_FIRSTGOUPSTAIRS;
 		}
-		else if(creaturePos.z < pos.z){
+		else if(playerPos.z < pos.z){
 			return RET_FIRSTGODOWNSTAIRS;
 		}
-		else if(!Position::areInRange<1,1,0>(creaturePos, pos)){
+		else if(!Position::areInRange<1,1,0>(playerPos, pos)){
 			return RET_TOOFARAWAY;
 		}
+	}
+
+	return RET_NOERROR;
+}
+
+ReturnValue Actions::canUse(const Player* player, const Position& pos, const Item* item)
+{
+	Action* action = getAction(item, ACTION_UNIQUEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_ACTIONID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_ITEMID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
+	}
+
+	action = getAction(item, ACTION_RUNEID);
+	if(action){
+		ReturnValue ret = action->canExecuteAction(player, pos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		return RET_NOERROR;
 	}
 
 	return RET_NOERROR;
@@ -158,7 +205,7 @@ ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, 
 		return RET_TOOFARAWAY;
 	}
 
-	if(checkLineOfSight && !g_game.getMap()->canThrowObjectTo(creaturePos, toPos)){
+	if(checkLineOfSight && !g_game.canThrowObjectTo(creaturePos, toPos)){
 		return RET_CANNOTTHROW;
 	}
 
@@ -219,6 +266,15 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 			return RET_CANNOTUSETHISOBJECT;
 		}
 	}
+	//[ added for beds system
+	if(BedItem* bed = item->getBed()) {
+		if(!bed->canUse(player)) {
+			return RET_CANNOTUSETHISOBJECT;
+		}
+		bed->sleep(player);
+		return RET_NOERROR;
+	}
+	//]
 
 	int32_t stack = item->getParent()->__getIndexOfThing(item);
 	PositionEx posEx(pos, stack);
@@ -285,9 +341,12 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	Item* item, bool isHotkey)
 {
-	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONTIME)){
+	if(!player->canDoAction()){
 		return false;
 	}
+
+	player->setNextActionTask(NULL);
+	player->stopWalk();
 
 	if(isHotkey){
 		int32_t subType = -1;
@@ -295,16 +354,15 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 			subType = item->getSubType();
 		}
 
+		const ItemType& it = Item::items[item->getID()];
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		std::string currentName = item->getName(); //For correct hotkey message
-		std::string currentPlural = item->getPluralName();
 		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
 		if(ret != RET_NOERROR){
 			player->sendCancelMessage(ret);
 			return false;
 		}
 
-		showUseHotkeyMessage(player, currentName, itemCount, currentPlural);
+		showUseHotkeyMessage(player, it, itemCount);
 	}
 	else{
 		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
@@ -314,7 +372,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 		}
 	}
 
-	player->setLastAction(OTSYS_TIME());
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
 	return true;
 }
 
@@ -328,20 +386,11 @@ bool Actions::executeUseEx(Action* action, Player* player, Item* item, const Pos
 		}
 
 		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			if(action->hasOwnErrorHandler()){
-				//The error message has already been handled by action itself
-				return true;
-			}
 			return false;
 		}
 	}
 	else{
 		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			if(action->hasOwnErrorHandler()){
-				//The error message has already been handled by action itself
-				return true;
-			}
-
 			return false;
 		}
 	}
@@ -350,8 +399,10 @@ bool Actions::executeUseEx(Action* action, Player* player, Item* item, const Pos
 }
 
 ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-	Item* item, bool isHotkey, uint32_t creatureId)
+	Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess)
 {
+	isSuccess = false;
+
 	Action* action = getAction(item, ACTION_UNIQUEID);
 	if(action){
 		ReturnValue ret = action->canExecuteAction(player, toPosEx);
@@ -360,7 +411,8 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 		}
 
 		//only continue with next action in the list if the previous returns false
-		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		}
 	}
@@ -369,11 +421,13 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 	if(action){
 		ReturnValue ret = action->canExecuteAction(player, toPosEx);
 		if(ret != RET_NOERROR){
+			isSuccess = false;
 			return ret;
 		}
 
 		//only continue with next action in the list if the previous returns false
-		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		}
 	}
@@ -386,7 +440,8 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 		}
 
 		//only continue with next action in the list if the previous returns false
-		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		}
 	}
@@ -399,7 +454,8 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 		}
 
 		//only continue with next action in the list if the previous returns false
-		if(executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId)){
+		isSuccess = executeUseEx(action, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || action->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		}
 	}
@@ -410,9 +466,12 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 	uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId /* = 0*/)
 {
-	if(OTSYS_TIME() - player->getLastAction() < g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME)){
+	if(!player->canDoAction()){
 		return false;
 	}
+
+	player->setNextActionTask(NULL);
+	player->stopWalk();
 
 	Action* action = getAction(item);
 	if(!action){
@@ -424,6 +483,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	PositionEx fromPosEx(fromPos, fromStackPos);
 	PositionEx toPosEx(toPos, toStackPos);
 	ReturnValue ret = RET_NOERROR;
+	bool isSuccess = false;
 
 	if(isHotkey){
 		int32_t subType = -1;
@@ -431,30 +491,35 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 			subType = item->getSubType();
 		}
 
+		const ItemType& it = Item::items[item->getID()];
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		std::string currentName = item->getName(); //For correct hotkey message
-		std::string currentPlural = item->getPluralName();
-		showUseHotkeyMessage(player, currentName, itemCount, currentPlural);
+		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
+
+		if(isSuccess){
+			showUseHotkeyMessage(player, it, itemCount);
+		}
+	}
+	else{
+		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
 	}
 
-	ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
 	}
 
-	player->setLastAction(OTSYS_TIME());
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
 	return true;
 }
 
-void Actions::showUseHotkeyMessage(Player* player, const std::string& name, uint32_t itemCount, const std::string& plural)
+void Actions::showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount)
 {
 	std::stringstream ss;
 	if(itemCount == 1){
-		ss << "Using the last " << name << "...";
+		ss << "Using the last " << it.name << "...";
 	}
 	else{
-		ss << "Using one of " << itemCount << " " << plural << "...";
+		ss << "Using one of " << itemCount << " " << it.pluralName << "...";
 	}
 
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
@@ -472,6 +537,13 @@ bool Actions::openContainer(Player* player, Container* container, const uint8_t 
 	}
 	else{
 		openContainer = container;
+	}
+
+	if(container->getCorpseOwner() != 0){
+		if(!player->canOpenCorpse(container->getCorpseOwner())){
+			player->sendCancel("You are not the owner.");
+			return true;
+		}
 	}
 
 	//open/close container
@@ -527,13 +599,13 @@ ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos
 	ReturnValue ret = RET_NOERROR;
 
 	if(!getAllowFarUse()){
-		ret = Actions::canUse(player, toPos);
+		ret = g_actions->canUse(player, toPos);
 		if(ret != RET_NOERROR){
 			return ret;
 		}
 	}
 	else{
-		ret = Actions::canUseFar(player, toPos, getCheckLineOfSight());
+		ret = g_actions->canUseFar(player, toPos, getCheckLineOfSight());
 		if(ret != RET_NOERROR){
 			return ret;
 		}
@@ -583,7 +655,7 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
 		int32_t result = m_scriptInterface->callFunction(5);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return (result != LUA_FALSE);
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. Action::executeUse" << std::endl;

@@ -27,6 +27,9 @@
 #include "const.h"
 #include "enums.h"
 #include "itemloader.h"
+//[ added for beds system
+#include "position.h"
+//]
 #include <map>
 
 #define SLOTP_WHEREEVER 0xFFFFFFFF
@@ -52,6 +55,8 @@ enum ItemTypes_t {
 	ITEM_TYPE_DOOR,
 	ITEM_TYPE_MAGICFIELD,
 	ITEM_TYPE_TELEPORT,
+	ITEM_TYPE_BED,
+	ITEM_TYPE_KEY,
 	ITEM_TYPE_LAST
 };
 
@@ -70,6 +75,8 @@ struct Abilities{
 		absorbPercentHoly = 0;
 		absorbPercentDeath = 0;
 
+		elementType = COMBAT_NONE;
+		elementDamage = 0;
 		memset(skills, 0, sizeof(skills));
 
 		memset(stats, 0 , sizeof(stats));
@@ -101,6 +108,10 @@ struct Abilities{
 	int16_t absorbPercentIce;
 	int16_t absorbPercentHoly;
 	int16_t absorbPercentDeath;
+
+	//elemental damage
+	CombatType_t elementType;
+	int16_t elementDamage;
 
 	//extra skill modifiers
 	int32_t skills[SKILL_LAST + 1];
@@ -140,18 +151,27 @@ public:
 
 	bool isGroundTile() const {return (group == ITEM_GROUP_GROUND);}
 	bool isContainer() const {return (group == ITEM_GROUP_CONTAINER);}
-	bool isDoor() const {return (group == ITEM_GROUP_DOOR);}
-	bool isTeleport() const {return (group == ITEM_GROUP_TELEPORT);}
-	bool isMagicField() const {return (group == ITEM_GROUP_MAGICFIELD);}
 	bool isSplash() const {return (group == ITEM_GROUP_SPLASH);}
 	bool isFluidContainer() const {return (group == ITEM_GROUP_FLUID);}
 
-	bool isKey() const {return (group == ITEM_GROUP_KEY);}
-	bool isRune() const {return (group == ITEM_GROUP_RUNE);}
+	bool isDoor() const {return (type == ITEM_TYPE_DOOR);}
+	bool isMagicField() const {return (type == ITEM_TYPE_MAGICFIELD);}
+	bool isTeleport() const {return (type == ITEM_TYPE_TELEPORT);}
+	bool isKey() const {return (type == ITEM_TYPE_KEY);}
 	bool isDepot() const {return (type == ITEM_TYPE_DEPOT);}
 	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
 	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
+	bool isRune() const {return clientCharges;}
+
+	//[ added for beds system
+	bool isBed() const {return type == ITEM_TYPE_BED;}
+
+	Direction bedPartnerDir;
+	uint16_t maleSleeperID;
+	uint16_t femaleSleeperID;
+	uint16_t noSleeperID;
+	//]
 
 	uint16_t id;
 	uint16_t clientId;
@@ -160,52 +180,54 @@ public:
 	std::string    article;
 	std::string    pluralName;
 	std::string    description;
-	unsigned short maxItems;
+	uint16_t       maxItems;
 	float          weight;
 	bool           showCount;
 	WeaponType_t   weaponType;
 	Ammo_t         amuType;
 	ShootType_t    shootType;
 	MagicEffectClasses magicEffect;
-	int            attack;
-	int            defence;
-	int            extraDef;
-	int            armor;
+	int32_t        attack;
+	int32_t        defence;
+	int32_t        extraDef;
+	int32_t        armor;
 	uint16_t       slot_position;
 	bool           isVertical;
 	bool           isHorizontal;
 	bool           isHangable;
 	bool           allowDistRead;
+	bool           clientCharges;
 	uint16_t       speed;
 	int32_t        decayTo;
 	uint32_t       decayTime;
 	bool           stopTime;
+	RaceType_t     corpseType;
 
-	bool            canReadText;
-	bool            canWriteText;
-	unsigned short  maxTextLen;
-	unsigned short  writeOnceItemId;
+	bool           canReadText;
+	bool           canWriteText;
+	uint16_t       maxTextLen;
+	uint16_t       writeOnceItemId;
 
-	bool            stackable;
-	bool            useable;
-	bool            moveable;
-	bool            alwaysOnTop;
-	int             alwaysOnTopOrder;
-	bool            pickupable;
-	bool            rotable;
-	int             rotateTo;
+	bool           stackable;
+	bool           useable;
+	bool           moveable;
+	bool           alwaysOnTop;
+	int32_t        alwaysOnTopOrder;
+	bool           pickupable;
+	bool           rotable;
+	int32_t        rotateTo;
 
-	int             runeMagLevel;
-	int             runeLevel;
-	std::string     runeSpellName;
+	int32_t        runeMagLevel;
+	int32_t        runeLevel;
+	std::string    runeSpellName;
 
-	uint32_t        wieldInfo;
-	std::string     vocationString;
-	uint32_t		minReqLevel;
-	uint32_t        minReqMagicLevel;
+	uint32_t       wieldInfo;
+	std::string    vocationString;
+	uint32_t       minReqLevel;
+	uint32_t       minReqMagicLevel;
 
-	int lightLevel;
-	int lightColor;
+	int32_t lightLevel;
+	int32_t lightColor;
 
 	bool floorChangeDown;
 	bool floorChangeNorth;
@@ -229,6 +251,8 @@ public:
 	int32_t maxHitChance;
 	uint32_t shootRange;
 	AmmoAction_t ammoAction;
+	int32_t fluidSource;
+
 	Abilities abilities;
 
 	Condition* condition;
@@ -280,6 +304,7 @@ public:
 
 	void addItemType(ItemType* iType);
 
+	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
 	uint32_t size() {return items.size();}
 
 protected:
@@ -289,5 +314,56 @@ protected:
 	Array<ItemType*> items;
 	std::string m_datadir;
 };
+
+
+
+template<typename A>
+inline Array<A>::Array(uint32_t n)
+{
+	m_data = (A*)malloc(sizeof(A)*n);
+	memset(m_data, 0, sizeof(A)*n);
+	m_size = n;
+}
+
+template<typename A>
+inline Array<A>::~Array()
+{
+	free(m_data);
+}
+
+template<typename A>
+inline A Array<A>::getElement(uint32_t id)
+{
+	if(id < m_size){
+		return m_data[id];
+	}
+	else{
+		return 0;
+	}
+}
+
+template<typename A>
+inline const A Array<A>::getElement(uint32_t id) const
+{
+	if(id < m_size){
+		return m_data[id];
+	}
+	else{
+		return 0;
+	}
+}
+
+template<typename A>
+inline void Array<A>::addElement(A a, uint32_t pos)
+{
+#define INCREMENT 5000
+	if(pos >= m_size){
+		m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
+		memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
+		m_size = pos + INCREMENT;
+	}
+	m_data[pos] = a;
+}
+
 
 #endif

@@ -84,35 +84,35 @@ std::string Weapons::getScriptBaseName()
 bool Weapons::loadDefaults()
 {
 	for(uint32_t i = 0; i < Item::items.size(); ++i){
-		const ItemType& it = Item::items[i];
+		const ItemType* it = Item::items.getElement(i);
 
-		if(it.id == 0 || weapons.find(it.id) != weapons.end()){
+		if(!it || weapons.find(it->id) != weapons.end()){
 			continue;
 		}
 
-		if(it.weaponType != WEAPON_NONE){
-			switch(it.weaponType){
+		if(it->weaponType != WEAPON_NONE){
+			switch(it->weaponType){
 				case WEAPON_AXE:
 				case WEAPON_SWORD:
 				case WEAPON_CLUB:
 				{
 					WeaponMelee* weapon = new WeaponMelee(&m_scriptInterface);
-					weapon->configureWeapon(it);
-					weapons[it.id] = weapon;
+					weapon->configureWeapon(*it);
+					weapons[it->id] = weapon;
 					break;
 				}
 
 				case WEAPON_AMMO:
 				case WEAPON_DIST:
 				{
-					if(it.weaponType == WEAPON_DIST && it.amuType != AMMO_NONE){
+					if(it->weaponType == WEAPON_DIST && it->amuType != AMMO_NONE){
 						//distance weapons with ammunitions are configured seperatly
 						continue;
 					}
 
 					WeaponDistance* weapon = new WeaponDistance(&m_scriptInterface);
-					weapon->configureWeapon(it);
-					weapons[it.id] = weapon;
+					weapon->configureWeapon(*it);
+					weapons[it->id] = weapon;
 					break;
 				}
 				default:
@@ -162,9 +162,9 @@ int32_t Weapons::getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
 }
 
 //players
-int32_t Weapons::getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue)
+int32_t Weapons::getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue, float attackFactor)
 {
-	return ((int32_t)std::ceil((attackSkill * (attackValue * 0.0425)) + (attackValue * 0.2)) * 2);
+	return ((int32_t)std::ceil(((float)(attackSkill * (attackValue * 0.0425) + (attackValue * 0.2)) / attackFactor)) * 2);
 }
 
 Weapon::Weapon(LuaScriptInterface* _interface) :
@@ -278,7 +278,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	range = Item::items[id].shootRange;
-	
+
 	std::string vocationString;
 	if(!vocStringList.empty()){
 		for(STRING_LIST::iterator it = vocStringList.begin(); it != vocStringList.end(); ++it){
@@ -317,12 +317,17 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		it.minReqMagicLevel = getReqMagLv();
 	}
 
-	return true;
+	// the weapon must be configured in order for FORMULA_SKILL to function properly
+	if(configureWeapon(Item::items[getID()])){
+		return true;
+	}
+
+	return false;
 }
 
 bool Weapon::loadFunction(const std::string& functionName)
 {
-	if(functionName == "internalLoadWeapon"){
+	if(asLowerCaseString(functionName) == "internalloadweapon" || asLowerCaseString(functionName) == "default"){
 		if(configureWeapon(Item::items[getID()])){
 			return true;
 		}
@@ -419,12 +424,12 @@ bool Weapon::useFist(Player* player, Creature* target)
 	const Position& targetPos = target->getPosition();
 
 	if(Position::areInRange<1,1>(playerPos, targetPos)){
-		int32_t attackStrength = player->getAttackStrength();
+		float attackFactor = player->getAttackFactor();
 		int32_t attackSkill = player->getSkill(SKILL_FIST, SKILL_LEVEL);
 		int32_t attackValue = 7;
 
-		int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
-		int32_t damage = -(random_range(0, maxDamage, DISTRO_NORMAL) * attackStrength) / 100;
+		int32_t maxDamage = Weapons::getMaxWeaponDamage(attackSkill, attackValue, attackFactor);
+		int32_t damage = -random_range(0, maxDamage, DISTRO_NORMAL);
 
 		CombatParams params;
 		params.combatType = COMBAT_PHYSICALDAMAGE;
@@ -492,7 +497,7 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 
 	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
 		if(exhaustion){
-			player->addExhaustionTicks(g_game.getFightExhaustionTicks());
+			player->addCombatExhaust(g_game.getFightExhaustionTicks());
 		}
 	}
 
@@ -522,17 +527,17 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 		g_game.transformItem(item, item->getID(), newCount);
 	}
 	else if(ammoAction == AMMOACTION_REMOVECHARGE){
-		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
 		g_game.transformItem(item, item->getID(), newCharge);
 	}
 	else if(ammoAction == AMMOACTION_MOVE){
-		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, FLAG_NOLIMIT);
+		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, NULL, FLAG_NOLIMIT);
 	}
 	else if(ammoAction == AMMOACTION_MOVEBACK){
 		//do nothing
 	}
 	else if(item->hasCharges()){
-		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
 		g_game.transformItem(item, item->getID(), newCharge);
 	}
 }
@@ -592,6 +597,8 @@ WeaponMelee::WeaponMelee(LuaScriptInterface* _interface) :
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
+	elementType = COMBAT_NONE;
+	elementDamage = 0;
 }
 
 bool WeaponMelee::configureEvent(xmlNodePtr p)
@@ -606,7 +613,27 @@ bool WeaponMelee::configureEvent(xmlNodePtr p)
 bool WeaponMelee::configureWeapon(const ItemType& it)
 {
 	m_scripted = false;
+	elementType = it.abilities.elementType;
+	elementDamage = it.abilities.elementDamage;
 	return Weapon::configureWeapon(it);
+}
+
+bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
+{
+	if(!Weapon::useWeapon(player, item, target)){
+		return false;
+	}
+
+	if(elementDamage != 0){
+		int32_t damage = getElementDamage(player, item);
+		CombatParams eParams;
+		eParams.combatType = elementType;
+		eParams.isAggressive = true;
+		eParams.useCharges = true;
+		Combat::doCombatHealth(player, target, damage, damage, eParams);
+	}
+
+	return true;
 }
 
 void WeaponMelee::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
@@ -673,18 +700,26 @@ bool WeaponMelee::getSkillType(const Player* player, const Item* item,
 	}
 }
 
+int32_t WeaponMelee::getElementDamage(const Player* player, const Item* item) const
+{
+	int32_t attackSkill = player->getWeaponSkill(item);
+	float attackFactor = player->getAttackFactor();
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, elementDamage, attackFactor);
+	return -random_range(0, maxValue, DISTRO_NORMAL);
+}
+
 int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t attackSkill = player->getWeaponSkill(item);
-	int32_t attackStrength = player->getAttackStrength();
-	int32_t attackValue = item->getAttack();
-	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
+	int32_t attackValue = std::max((int32_t)0, ((int32_t)item->getAttack() - elementDamage));
+	float attackFactor = player->getAttackFactor();
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue, attackFactor);
 
 	if(maxDamage){
 		return -maxValue;
 	}
 
-	return -(random_range(0, maxValue, DISTRO_NORMAL) * attackStrength) / 100;
+	return -random_range(0, maxValue, DISTRO_NORMAL);
 }
 
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
@@ -734,10 +769,10 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 	}
 
 	int intValue;
-	if(readXMLInteger(p, "hitChance", intValue)){
+	if(readXMLInteger(p, "hitChance", intValue) || readXMLInteger(p, "hitchance", intValue)){
 		std::cout << "Warning: hitChance is not longer used in weapons.xml." << std::endl;
 	}
-	if(readXMLInteger(p, "breakChance", intValue)){
+	if(readXMLInteger(p, "breakChance", intValue) || readXMLInteger(p, "breakchance", intValue)){
 		std::cout << "Warning: breakChance is not longer used in weapons.xml." << std::endl;
 	}
 
@@ -783,7 +818,7 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 
 int32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
 {
-	const ItemType& it = Item::items[id];
+	//const ItemType& it = Item::items[id];
 	Item* bow = player->getWeapon(true);
 	if(bow && bow->getWeaponType() == WEAPON_DIST && bow->getID() != id){ //Be sure we are using a bow
 		const Weapon* weap = g_weapons->getWeapon(bow);
@@ -885,7 +920,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 
 		for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
 			tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
-			if(tmpTile && !tmpTile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
+			if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID)){
 				destTile = tmpTile;
 				break;
 			}
@@ -925,9 +960,9 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 	}
 
 	int32_t attackSkill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
+	float attackFactor = player->getAttackFactor();
+	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue, attackFactor);
 
-	int32_t attackStrength = player->getAttackStrength();
-	int32_t maxValue = Weapons::getMaxWeaponDamage(attackSkill, attackValue);
 
 	if(maxDamage){
 		return -maxValue;
@@ -942,7 +977,8 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 			minValue = (int32_t)std::ceil(player->getLevel() * 0.2);
 		}
 	}
-	return -(random_range(minValue, maxValue, DISTRO_NORMAL) * attackStrength) / 100;
+
+	return -random_range(minValue, maxValue, DISTRO_NORMAL);
 }
 
 bool WeaponDistance::getSkillType(const Player* player, const Item* item,
@@ -1001,22 +1037,22 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 
 	if(readXMLString(p, "type", strValue)){
 		//TODO: use a tool-function
-		if(strcasecmp(strValue.c_str(), "earth") == 0){
+		if(asLowerCaseString(strValue) == "earth"){
 			params.combatType = COMBAT_EARTHDAMAGE;
 		}
-		else if(strcasecmp(strValue.c_str(), "ice") == 0){
+		else if(asLowerCaseString(strValue) == "ice"){
 			params.combatType = COMBAT_ICEDAMAGE;
 		}
-		else if(strcasecmp(strValue.c_str(), "energy") == 0){
+		else if(asLowerCaseString(strValue) == "energy"){
 			params.combatType = COMBAT_ENERGYDAMAGE;
 		}
-		else if(strcasecmp(strValue.c_str(), "fire") == 0){
+		else if(asLowerCaseString(strValue) == "fire"){
 			params.combatType = COMBAT_FIREDAMAGE;
 		}
-		else if(strcasecmp(strValue.c_str(), "death") == 0){
+		else if(asLowerCaseString(strValue) == "death"){
 			params.combatType = COMBAT_DEATHDAMAGE;
 		}
-		else if(strcasecmp(strValue.c_str(), "holy") == 0){
+		else if(asLowerCaseString(strValue) == "holy"){
 			params.combatType = COMBAT_HOLYDAMAGE;
 		}
 	}

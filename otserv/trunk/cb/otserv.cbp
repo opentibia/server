@@ -27,6 +27,8 @@
 					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
 					<Add library="wsock32" />
 					<Add library="ws2_32" />
+					<Add library="mysql" />
+					<Add library="liblibxml2" />
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
@@ -46,6 +48,8 @@
 					<Add option="-s" />
 					<Add library="wsock32" />
 					<Add library="ws2_32" />
+					<Add library="mysql" />
+					<Add library="liblibxml2" />
 				</Linker>
 			</Target>
 			<Target title="Debug Unix">
@@ -59,12 +63,16 @@
 					<Add option="-g" />
 					<Add option="-D__DEBUG__" />
 					<Add option="-D__USE_SQLITE__" />
+					<Add option="-D__EXCEPTION_TRACER__" />
+					<Add option="-D__DEBUG_SCHEDULER__" />
+					<Add option="-D__DEBUG_NET__" />
 					<Add directory="/usr/include/libxml2/" />
 					<Add directory="/usr/include/lua5.1/" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
-					<Add option="-pg -lgmon" />
+					<Add library="mysqlclient" />
+					<Add library="xml2" />
 				</Linker>
 			</Target>
 			<Target title="Release Unix">
@@ -82,6 +90,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="mysqlclient" />
+					<Add library="xml2" />
 				</Linker>
 			</Target>
 		</Build>
@@ -94,13 +104,12 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
-			<Add library="mysql" />
 			<Add library="boost_regex" />
-			<Add library="liblibxml2" />
 			<Add library="gmp" />
 			<Add library="lua5.1" />
 			<Add library="boost_system" />
 			<Add library="sqlite3" />
+			<Add library="boost_thread" />
 		</Linker>
 		<Unit filename="../AUTHORS" />
 		<Unit filename="../Doxyfile" />
@@ -121,6 +130,8 @@
 		<Unit filename="../ban.h" />
 		<Unit filename="../baseevents.cpp" />
 		<Unit filename="../baseevents.h" />
+		<Unit filename="../beds.cpp" />
+		<Unit filename="../beds.h" />
 		<Unit filename="otserv.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Debug Windows" />
@@ -156,7 +167,9 @@
 			<Option target="Release Windows" />
 		</Unit>
 		<Unit filename="../databasemysql.h" />
+		<Unit filename="../databaseodbc.cpp" />
 		<Unit filename="../databaseodbc.h" />
+		<Unit filename="../databasepgsql.cpp" />
 		<Unit filename="../databasepgsql.h" />
 		<Unit filename="../databasesqlite.cpp" />
 		<Unit filename="../databasesqlite.h" />
@@ -221,6 +234,8 @@
 		<Unit filename="../outfit.h" />
 		<Unit filename="../outputmessage.cpp" />
 		<Unit filename="../outputmessage.h" />
+		<Unit filename="../party.cpp" />
+		<Unit filename="../party.h" />
 		<Unit filename="../pch.mak" />
 		<Unit filename="../player.cpp" />
 		<Unit filename="../player.h" />
@@ -232,6 +247,8 @@
 		<Unit filename="../protocolgame.h" />
 		<Unit filename="../protocollogin.cpp" />
 		<Unit filename="../protocollogin.h" />
+		<Unit filename="../quests.cpp" />
+		<Unit filename="../quests.h" />
 		<Unit filename="../raids.cpp" />
 		<Unit filename="../raids.h" />
 		<Unit filename="../rsa.cpp" />

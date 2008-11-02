@@ -145,7 +145,6 @@ bool Raids::loadFromXml(const std::string& _filename)
 }
 
 #define MAX_RAND_RANGE 10000000
-#define CHECK_RAIDS_INTERVAL 60
 
 void Raids::startup()
 {
@@ -198,16 +197,14 @@ void Raids::clear()
 
 	loaded = false;
 	started = false;
-	filename = "";
 	running = NULL;
 	lastRaidEnd = 0;
 }
 
 void Raids::reload()
 {
-	std::string file = filename;
 	clear();
-	loadFromXml(file);
+	loadFromXml(filename);
 }
 
 Raid* Raids::getRaidByName(const std::string& name)
@@ -250,6 +247,7 @@ bool Raid::loadFromXml(const std::string& _filename)
 		return true;
 	}
 
+	filename = _filename;
 	xmlDocPtr doc = xmlParseFile(_filename.c_str());
 
 	if(doc){
@@ -323,7 +321,8 @@ void Raid::executeRaidEvent(RaidEvent* raidEvent)
 		nextEvent++;
 		RaidEvent* newRaidEvent = getNextRaidEvent();
 		if(newRaidEvent){
-			nextEventEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(newRaidEvent->getDelay()-raidEvent->getDelay(), boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
+			uint32_t ticks = (uint32_t)std::max(((uint32_t)RAID_MINTICKS), ((int32_t)newRaidEvent->getDelay() - raidEvent->getDelay()));
+			nextEventEvent = Scheduler::getScheduler().addEvent(createSchedulerTask(ticks, boost::bind(&Raid::executeRaidEvent, this, newRaidEvent)));
 		}
 		else{
 			resetRaid();
@@ -372,6 +371,9 @@ bool RaidEvent::configureRaidEvent(xmlNodePtr eventNode)
 	int intValue;
 	if(readXMLInteger(eventNode, "delay", intValue)){
 		m_delay = intValue;
+		if(m_delay < RAID_MINTICKS){
+			m_delay = RAID_MINTICKS;
+		}
 		return true;
 	}
 	else{
@@ -397,25 +399,25 @@ bool AnnounceEvent::configureRaidEvent(xmlNodePtr eventNode)
 	}
 
 	if(readXMLString(eventNode, "type", strValue)){
-		if(strcasecmp(strValue.c_str(), "warning") == 0){
+		if(asLowerCaseString(strValue) == "warning"){
 			m_messageType = MSG_STATUS_WARNING;
 		}
-		else if(strcasecmp(strValue.c_str(), "event") == 0){
+		else if(asLowerCaseString(strValue) == "event"){
 			m_messageType = MSG_EVENT_ADVANCE;
 		}
-		else if(strcasecmp(strValue.c_str(), "default") == 0){
+		else if(asLowerCaseString(strValue) == "default"){
 			m_messageType = MSG_EVENT_DEFAULT;
 		}
-		else if(strcasecmp(strValue.c_str(), "description") == 0){
+		else if(asLowerCaseString(strValue) == "description"){
 			m_messageType = MSG_INFO_DESCR;
 		}
-		else if(strcasecmp(strValue.c_str(), "smallstatus") == 0){
+		else if(asLowerCaseString(strValue) == "smallstatus"){
 			m_messageType = MSG_STATUS_SMALL;
 		}
-		else if(strcasecmp(strValue.c_str(), "blueconsole") == 0){
+		else if(asLowerCaseString(strValue) == "blueconsole"){
 			m_messageType = MSG_STATUS_CONSOLE_BLUE;
 		}
-		else if(strcasecmp(strValue.c_str(), "redconsole") == 0){
+		else if(asLowerCaseString(strValue) == "redconsole"){
 			m_messageType = MSG_STATUS_CONSOLE_RED;
 		}
 		else{
@@ -688,7 +690,6 @@ bool AreaSpawnEvent::executeEvent()
 
 			if(!success){
 				delete monster;
-				//return false;
 			}
 		}
 	}

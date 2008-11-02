@@ -32,15 +32,15 @@ local function lookAtFocus()
 end
 
 local itemWindow = {
-	{id=2160, charges=0, buy=10000, sell=10000},
-	{id=2152, charges=0, buy=100, sell=100},
-	{id=2148, charges=0, buy=1, sell=1},
-	{id=2173, charges=0, buy=10000, sell=5000}
+	{id=2160, subtype=0, buy=10000, sell=10000},
+	{id=2152, subtype=0, buy=100, sell=100},
+	{id=2148, subtype=0, buy=1, sell=1},
+	{id=2173, subtype=0, buy=10000, sell=5000}
 }
 
 local items = {}
 for _, item in ipairs(itemWindow) do
-	items[item.id] = {buyPrice = item.buy, sellPrice = item.sell, charges = item.charges}
+	items[item.id] = {buyPrice = item.buy, sellPrice = item.sell, subtype = item.subtype}
 end
 
 local function getPlayerMoney(cid)
@@ -49,14 +49,14 @@ local function getPlayerMoney(cid)
 	getPlayerItemCount(cid, 2148))
 end
 
-local onBuy = function(cid, item, charges, amount)
+local onBuy = function(cid, item, subtype, amount)
 	if(items[item] == nil) then
 		selfSay("Ehm.. sorry... this shouldn't be there, I'm not selling it.", cid)
 		return
 	end
 
 	if(getPlayerMoney(cid) >= amount*items[item].buyPrice) then
-		local itemz, i = doPlayerAddItem(cid, item, charges, amount)
+		local itemz, i = doPlayerAddItem(cid, item, subtype, amount)
 		if(i < amount) then
 			if(i == 0) then
 				selfSay("Sorry, but you don't have space to take it.", cid)
@@ -73,15 +73,15 @@ local onBuy = function(cid, item, charges, amount)
 	end
 end
 
-local onSell = function(cid, item, charges, amount)
+local onSell = function(cid, item, subtype, amount)
 	if(items[item] == nil) then
 		selfSay("Ehm.. sorry... this shouldn't be there, I'm not buying it.", cid)
 	end
 
-	if(charges < 1) then
-		charges = -1
+	if(subtype < 1) then
+		subtype = -1
 	end
-	if(doPlayerRemoveItem(cid, item, amount, charges) == TRUE) then
+	if(doPlayerRemoveItem(cid, item, amount, subtype) == TRUE) then
 		doPlayerAddMoney(cid, items[item].sellPrice*amount)
 		selfSay("Here you are.", cid)
 	else

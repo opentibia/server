@@ -33,6 +33,9 @@
 #include "actions.h"
 #include "combat.h"
 #include "weapons.h"
+//[ added for beds system
+#include "beds.h"
+//]
 
 #include <iostream>
 #include <sstream>
@@ -78,6 +81,11 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 1*/)
 		else if(it.isMailbox()){
 			newItem = new Mailbox(_type);
 		}
+		//[ added for beds system
+		else if(it.isBed()){
+			newItem = new BedItem(_type);
+		}
+		//]
 		else{
 			newItem = new Item(_type, _count);
 		}
@@ -94,16 +102,7 @@ Item* Item::CreateItem(PropStream& propStream)
 		return NULL;
 	}
 
-	const ItemType& iType = Item::items[_id];
-	uint8_t _count = 0;
-
-	if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
-		if(!propStream.GET_UCHAR(_count)){
-			return NULL;
-		}
-	}
-
-	return Item::CreateItem(_id, _count);
+	return Item::CreateItem(_id, 0);
 }
 
 Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
@@ -114,17 +113,18 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 	const ItemType& it = items[id];
 
 	count = 1;
-	charges = it.charges;
-	fluid = 0;
+	if(it.charges != 0){
+		setCharges(it.charges);
+	}
 
 	if(it.isFluidContainer() || it.isSplash()){
-		fluid = _count;
+		setFluidType(_count);
 	}
 	else if(it.stackable && _count != 0){
 		count = _count;
 	}
 	else if(it.charges != 0 && _count != 0){
-		charges = _count;
+		setCharges(_count);
 	}
 
 	setDefaultDuration();
@@ -136,56 +136,42 @@ Item::Item(const Item &i) :
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
-	charges = i.charges;
-	fluid = i.fluid;
 
-	uint16_t _actionId;
-	if((_actionId = i.getActionId())){
-		setActionId(_actionId);
+	m_attributes = i.m_attributes;
+	if(i.m_firstAttr){
+		m_firstAttr = new Attribute(*i.m_firstAttr);
+	}
+}
+
+Item* Item::clone() const
+{
+	Item* _item = Item::CreateItem(id, count);
+	_item->m_attributes = m_attributes;
+	if(m_firstAttr){
+		_item->m_firstAttr = new Attribute(*m_firstAttr);
 	}
 
-	uint16_t _uniqueId;
-	if((_uniqueId = i.getUniqueId())){
-		setUniqueId(_uniqueId);
+	return _item;
+}
+
+void Item::copyAttributes(Item* item)
+{
+	m_attributes = item->m_attributes;
+	if(item->m_firstAttr){
+		m_firstAttr = new Attribute(*item->m_firstAttr);
 	}
 
-	if(i.getSpecialDescription() != ""){
-		setSpecialDescription(i.getSpecialDescription());
-	}
-
-	if(i.getText() != ""){
-		setText(i.getText());
-	}
-
-	uint32_t _writtenDate;
-	if((_writtenDate = i.getWrittenDate())){
-		setWrittenDate(_writtenDate);
-	}
-
-	if(i.getWriter() != ""){
-		setWriter(i.getWriter());
-	}
-
-	uint32_t _owner;
-	if((_owner = i.getOwner())){
-		setOwner(_owner);
-	}
-
-	uint32_t _duration;
-	if((_duration = i.getDuration())){
-		setDuration(_duration);
-	}
-
-	uint32_t _decayState;
-	if((_decayState = i.getDecaying())){
-		setDecaying((ItemDecayState_t)_decayState);
-	}
+	removeAttribute(ATTR_ITEM_DECAYING);
+	removeAttribute(ATTR_ITEM_DURATION);
 }
 
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
-	//
+
+	if(getUniqueId() != 0){
+		ScriptEnviroment::removeUniqueThing(this);
+	}
 }
 
 void Item::setDefaultSubtype()
@@ -193,8 +179,9 @@ void Item::setDefaultSubtype()
 	const ItemType& it = items[id];
 
 	count = 1;
-	charges = it.charges;
-	fluid = 0;
+	if(it.charges != 0){
+		setCharges(it.charges);
+	}
 }
 
 void Item::setID(uint16_t newid)
@@ -210,39 +197,13 @@ void Item::setID(uint16_t newid)
 		removeAttribute(ATTR_ITEM_DURATION);
 	}
 
+	if(hasAttribute(ATTR_ITEM_CORPSEOWNER)){
+		removeAttribute(ATTR_ITEM_CORPSEOWNER);
+	}
+
 	if(newDuration > 0 && (!prevIt.stopTime || !hasAttribute(ATTR_ITEM_DURATION)) ){
 		setDecaying(DECAYING_FALSE);
 		setDuration(newDuration);
-	}
-}
-
-uint8_t Item::getItemCountOrSubtype() const
-{
-	const ItemType& it = items[getID()];
-
-	if(it.isFluidContainer() || it.isSplash()){
-		return fluid;
-	}
-	else if(it.charges != 0){
-		return charges;
-	}
-	else{
-		return count;
-	}
-}
-
-void Item::setItemCountOrSubtype(uint8_t n)
-{
-	const ItemType& it = items[id];
-
-	if(it.isFluidContainer() || it.isSplash()){
-		fluid = n;
-	}
-	else if(it.charges != 0){
-		charges = n;
-	}
-	else{
-		count = n;
 	}
 }
 
@@ -252,18 +213,33 @@ bool Item::hasSubType() const
 	return it.hasSubType();
 }
 
-uint8_t Item::getSubType() const
+uint16_t Item::getSubType() const
 {
 	const ItemType& it = items[getID()];
 
 	if(it.isFluidContainer() || it.isSplash()){
-		return fluid;
+		return getFluidType();
 	}
 	else if(it.charges != 0){
-		return charges;
+		return getCharges();
 	}
 
-	return 0;
+	return count;
+}
+
+void Item::setSubType(uint16_t n)
+{
+	const ItemType& it = items[id];
+
+	if(it.isFluidContainer() || it.isSplash()){
+		setFluidType(n);
+	}
+	else if(it.charges != 0){
+		setCharges(n);
+	}
+	else{
+		count = n;
+	}
 }
 
 bool Item::unserialize(xmlNodePtr nodeItem)
@@ -279,7 +255,7 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 	}
 
 	if(readXMLInteger(nodeItem, "count", intValue)){
-		setItemCountOrSubtype(intValue);
+		setSubType(intValue);
 	}
 
 	if(readXMLString(nodeItem, "special_description", strValue)){
@@ -331,7 +307,7 @@ xmlNodePtr Item::serialize()
 
 	if(hasSubType()){
 		ss.str("");
-		ss << (int)getItemCountOrSubtype();
+		ss << (int32_t)getSubType();
 		xmlSetProp(nodeItem, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 
@@ -395,7 +371,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 				return false;
 			}
 
-			setItemCountOrSubtype(_count);
+			setSubType(_count);
 			break;
 		}
 
@@ -472,7 +448,18 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 				return false;
 			}
 
-			setItemCountOrSubtype(_charges);
+			setSubType(_charges);
+			break;
+		}
+
+		case ATTR_CHARGES:
+		{
+			uint16_t _charges = 1;
+			if(!propStream.GET_USHORT(_charges)){
+				return false;
+			}
+
+			setSubType(_charges);
 			break;
 		}
 
@@ -564,18 +551,16 @@ bool Item::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
 
 bool Item::serializeAttr(PropWriteStream& propWriteStream)
 {
-	/*
-	if(isStackable() || isSplash() || isFluidContainer()){
-		uint8_t _count = getItemCountOrSubtype();
+	if(isStackable() || isFluidContainer() || isSplash()){
+		uint8_t _count = getSubType();
 		propWriteStream.ADD_UCHAR(ATTR_COUNT);
 		propWriteStream.ADD_UCHAR(_count);
 	}
-	*/
 
 	if(hasCharges()){
-		uint8_t _count = getItemCharge();
-		propWriteStream.ADD_UCHAR(ATTR_RUNE_CHARGES);
-		propWriteStream.ADD_UCHAR(_count);
+		uint16_t _count = getCharges();
+		propWriteStream.ADD_UCHAR(ATTR_CHARGES);
+		propWriteStream.ADD_USHORT(_count);
 	}
 
 	if(!isNotMoveable() /*moveable*/){
@@ -650,7 +635,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 				return true;
 			break;
 
-		case BLOCKPATHFIND:
+		case BLOCKPATH:
 			if(it.blockPathFind)
 				return true;
 			break;
@@ -665,13 +650,28 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 				return true;
 			break;
 
-		case BLOCKINGANDNOTMOVEABLE:
+		case IMMOVABLEBLOCKSOLID:
 			if(it.blockSolid && (!it.moveable || getUniqueId() != 0))
+				return true;
+			break;
+
+		case IMMOVABLEBLOCKPATH:
+			if(it.blockPathFind && (!it.moveable || getUniqueId() != 0))
 				return true;
 			break;
 
 		case SUPPORTHANGABLE:
 			if(it.isHorizontal || it.isVertical)
+				return true;
+			break;
+
+		case IMMOVABLENOFIELDBLOCKPATH:
+			if(!it.isMagicField() && it.blockPathFind && (!it.moveable || getUniqueId() != 0))
+				return true;
+			break;
+
+		case NOFIELDBLOCKPATH:
+			if(!it.isMagicField() && it.blockPathFind)
 				return true;
 			break;
 
@@ -684,20 +684,25 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 double Item::getWeight() const
 {
 	if(isStackable()){
-		return items[id].weight * std::max(1, (int)count);
+		return items[id].weight * std::max((int32_t)1, (int32_t)count);
 	}
 
 	return items[id].weight;
 }
 
-std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const Item* item /*= NULL*/)
+std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
+	const Item* item /*= NULL*/, int32_t subType /*= -1*/)
 {
 	std::stringstream s;
 
+	if(item){
+		subType = item->getSubType();
+	}
+
 	if(it.name.length()){
-		if(it.stackable && item && item->getItemCount() > 1){
+		if(it.stackable && subType > 1){
 			if(it.showCount){
-				s << (int)item->getItemCount() << " ";
+				s << subType << " ";
 			}
 
 			s << it.pluralName;
@@ -714,9 +719,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 	}
 
 	if(it.isRune()){
-		uint32_t charges = std::max((uint32_t)1, (uint32_t)(item == NULL ? it.charges : item->getItemCharge()));
-
-		s << "(\"" << it.runeSpellName << "\", Charges:" << charges <<").";
+		s << "(\"" << it.runeSpellName << "\", Charges:" << subType <<").";
 		if(it.runeLevel > 0 || it.runeMagLevel > 0){
 			s << std::endl << "It can only be used with";
 			if(it.runeLevel > 0){
@@ -766,6 +769,16 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 			}
 			s << ")";
 		}
+
+		if(it.showCharges){
+			if(subType > 1){
+				s << " that has " << (int32_t)subType << " charges left";
+			}
+			else{
+				s << " that has 1 charge left";
+			}
+		}
+
 		s << ".";
 	}
 	else if(it.armor != 0){
@@ -858,8 +871,8 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		s << ").";
 	}
 	else if(it.isFluidContainer()){
-		if(item && item->getFluidType() != 0){
-			s << " of " << items[item->getFluidType()].name << ".";
+		if(subType > 0){
+			s << " of " << items[subType].name << ".";
 		}
 		else{
 			s << ". It is empty.";
@@ -867,8 +880,8 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 	}
 	else if(it.isSplash()){
 		s << " of ";
-		if(item && item->getFluidType() != 0){
-			s << items[item->getFluidType()].name;
+		if(subType > 0){
+			s << items[subType].name;
 		}
 		else{
 			s << items[1].name;
@@ -882,7 +895,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 			s << " (Key:" << (int)item->getActionId() << ").";
 		}
 		else{
-			s << " (Key:" << (int)0 << ").";
+			s << " (Key:0).";
 		}
 	}
 	else if(it.allowDistRead){
@@ -916,9 +929,8 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		}
 	}
 	else if(it.showCharges){
-		uint32_t charges = (item == NULL ? it.charges : item->getItemCharge());
-		if(charges > 1){
-			s << " that has " << (int)charges << " charges left.";
+		if(subType > 1){
+			s << " that has " << (int32_t)subType << " charges left.";
 		}
 		else{
 			s << " that has 1 charge left.";
@@ -982,6 +994,21 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance, const
 		if(weight > 0){
 			s << std::endl << getWeightDescription(it, weight);
 		}
+	}
+
+	if(it.abilities.elementType != COMBAT_NONE && it.charges != 0){
+		s << " It is temporarily enchanted with ";
+		std::string strElement = "";
+		int32_t elementDamage = it.abilities.elementDamage;
+		switch(it.abilities.elementType){
+			case COMBAT_ICEDAMAGE: strElement = "ice"; break;
+			case COMBAT_EARTHDAMAGE: strElement = "earth"; break;
+			case COMBAT_FIREDAMAGE: strElement = "fire"; break;
+			case COMBAT_ENERGYDAMAGE: strElement = "energy"; break;
+			default: break;
+		}
+
+		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
 	}
 
 	if(item && item->getSpecialDescription() != ""){
@@ -1052,7 +1079,12 @@ bool Item::canDecay()
 		return false;
 	}
 
-	return (items[id].decayTo != -1);
+	const ItemType& it = Item::items[id];
+	if(it.decayTo == -1 || it.decayTime == 0){
+		return false;
+	}
+
+	return true;
 }
 
 int Item::getWorth() const
@@ -1168,7 +1200,7 @@ uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
 
 	Attribute* attr = getAttrConst(type);
 	if(attr){
-		return (uint32_t)(long)attr->value;
+		return static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value));
 	}
 	else{
 		return 0;
@@ -1182,7 +1214,7 @@ void ItemAttributes::setIntAttr(itemAttrTypes type, int32_t value)
 
 	Attribute* attr = getAttr(type);
 	if(attr){
-		attr->value = (void*)value;
+		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(value));
 	}
 }
 
@@ -1193,11 +1225,11 @@ void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
 
 	Attribute* attr = getAttr(type);
 	if(attr){
-		attr->value = (void*)((long)attr->value + value);
+		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value)) + value));
 	}
 }
 
-inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
+bool ItemAttributes::validateIntAttrType(itemAttrTypes type)
 {
 	//list of numeric type attributes
 	switch(type){
@@ -1207,6 +1239,10 @@ inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 	case ATTR_ITEM_DURATION:
 	case ATTR_ITEM_DECAYING:
 	case ATTR_ITEM_WRITTENDATE:
+	case ATTR_ITEM_CORPSEOWNER:
+	case ATTR_ITEM_CHARGES:
+	case ATTR_ITEM_FLUIDTYPE:
+	case ATTR_ITEM_DOORID:
 		return true;
 		break;
 
@@ -1217,7 +1253,7 @@ inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 	return false;
 }
 
-inline bool ItemAttributes::validateStrAttrType(itemAttrTypes type) const
+bool ItemAttributes::validateStrAttrType(itemAttrTypes type)
 {
 	//list of text type attributes
 	switch(type){

@@ -20,7 +20,13 @@
 #include "otpch.h"
 
 #include "definitions.h"
+
+#if defined WIN32
+#include <winerror.h>
+#endif
+
 #include "protocol.h"
+#include "scheduler.h"
 #include "connection.h"
 #include "outputmessage.h"
 #include "rsa.h"
@@ -64,12 +70,42 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 	parsePacket(msg);
 }
 
+OutputMessage* Protocol::getOutputBuffer()
+{
+	if(m_outputBuffer){
+		return m_outputBuffer;
+	}
+	else if(m_connection){
+		m_outputBuffer = OutputMessagePool::getInstance()->getOutputMessage(this);
+		return m_outputBuffer;
+	}
+	else{
+		return NULL;
+	}
+}
+
+void Protocol::releaseProtocol()
+{
+	if(m_refCount > 0){
+		//Reschedule it and try again.
+		Scheduler::getScheduler().addEvent( createSchedulerTask(SCHEDULER_MINTICKS,
+			boost::bind(&Protocol::releaseProtocol, this)));
+	}
+	else{
+		deleteProtocolTask();
+	}
+}
+
 void Protocol::deleteProtocolTask()
 {
 	//dispather thread
+	assert(m_refCount == 0);
+	setConnection(NULL);
+
 	if(m_outputBuffer){
 		OutputMessagePool::getInstance()->releaseMessage(m_outputBuffer);
 	}
+
 	delete this;
 }
 

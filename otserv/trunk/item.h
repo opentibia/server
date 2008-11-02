@@ -41,17 +41,23 @@ class TrashHolder;
 class Mailbox;
 class Door;
 class MagicField;
+//[ added for beds system
+class BedItem;
+//]
 
 enum ITEMPROPERTY{
 	BLOCKSOLID = 0,
-	HASHEIGHT = 1,
-	BLOCKPROJECTILE = 2,
-	BLOCKPATHFIND = 3,
-	ISVERTICAL = 4,
-	ISHORIZONTAL = 5,
-	MOVEABLE = 6,
-	BLOCKINGANDNOTMOVEABLE = 7,
-	SUPPORTHANGABLE = 8,
+	HASHEIGHT,
+	BLOCKPROJECTILE,
+	BLOCKPATH,
+	ISVERTICAL,
+	ISHORIZONTAL,
+	MOVEABLE,
+	IMMOVABLEBLOCKSOLID,
+	IMMOVABLEBLOCKPATH,
+	IMMOVABLENOFIELDBLOCKPATH,
+	NOFIELDBLOCKPATH,
+	SUPPORTHANGABLE
 };
 
 enum TradeEvents_t{
@@ -94,6 +100,9 @@ enum AttrTypes_t{
 	ATTR_DECAYING_STATE = 17,
 	ATTR_WRITTENDATE = 18,
 	ATTR_WRITTENBY = 19,
+	ATTR_SLEEPERGUID = 20,
+	ATTR_SLEEPSTART = 21,
+	ATTR_CHARGES = 22
 };
 
 class ItemAttributes{
@@ -107,7 +116,13 @@ public:
 			deleteAttrs(m_firstAttr);
 		}
 	}
-
+	ItemAttributes(const ItemAttributes &i){
+		m_attributes = i.m_attributes;
+		if(i.m_firstAttr){
+			m_firstAttr = new Attribute(*i.m_firstAttr);
+		}
+	}
+	
 	void setSpecialDescription(const std::string& desc) {setStrAttr(ATTR_ITEM_DESC, desc);}
 	void resetSpecialDescription() {removeAttribute(ATTR_ITEM_DESC);}
 	const std::string& getSpecialDescription() const {return getStrAttr(ATTR_ITEM_DESC);}
@@ -130,8 +145,17 @@ public:
 	void setUniqueId(uint16_t n) {if(n < 1000) n = 1000; setIntAttr(ATTR_ITEM_UNIQUEID, n);}
 	uint16_t getUniqueId() const {return getIntAttr(ATTR_ITEM_UNIQUEID);}
 
+	void setCharges(uint16_t n) {setIntAttr(ATTR_ITEM_CHARGES, n);}
+	uint16_t getCharges() const {return getIntAttr(ATTR_ITEM_CHARGES);}
+
+	void setFluidType(uint16_t n) {setIntAttr(ATTR_ITEM_FLUIDTYPE, n);}
+	uint16_t getFluidType() const {return getIntAttr(ATTR_ITEM_FLUIDTYPE);}
+
 	void setOwner(uint32_t _owner) {setIntAttr(ATTR_ITEM_OWNER, _owner);}
 	uint32_t getOwner() const {return getIntAttr(ATTR_ITEM_OWNER);}
+
+	void setCorpseOwner(uint32_t _corpseOwner) {setIntAttr(ATTR_ITEM_CORPSEOWNER, _corpseOwner);}
+	uint32_t getCorpseOwner() {return getIntAttr(ATTR_ITEM_CORPSEOWNER);}
 
 	void setDuration(int32_t time) {setIntAttr(ATTR_ITEM_DURATION, time);}
 	void decreaseDuration(int32_t time) {increaseIntAttr(ATTR_ITEM_DURATION, -time);}
@@ -148,19 +172,23 @@ protected:
 		ATTR_ITEM_TEXT = 8,
 		ATTR_ITEM_WRITTENDATE = 16,
 		ATTR_ITEM_WRITTENBY = 32,
-
 		ATTR_ITEM_OWNER = 65536,
 		ATTR_ITEM_DURATION = 131072,
-		ATTR_ITEM_DECAYING = 262144
+		ATTR_ITEM_DECAYING = 262144,
+		ATTR_ITEM_CORPSEOWNER = 524288,
+		ATTR_ITEM_CHARGES = 1048576,
+		ATTR_ITEM_FLUIDTYPE = 2097152,
+		ATTR_ITEM_DOORID = 4194304
 	};
 
 	bool hasAttribute(itemAttrTypes type) const;
 	void removeAttribute(itemAttrTypes type);
 
-private:
+protected:
 	static std::string emptyString;
 
-	struct Attribute{
+	class Attribute{
+	public:
 		itemAttrTypes type;
 		void* value;
 		Attribute* next;
@@ -168,6 +196,24 @@ private:
 			type = _type;
 			value = NULL;
 			next = NULL;
+		}
+
+		Attribute(const Attribute &i){
+			type = i.type;
+			if(ItemAttributes::validateIntAttrType(type)){
+				value = i.value;
+			}
+			else if(ItemAttributes::validateStrAttrType(type)){
+				value = (void*)new std::string( *((std::string*)i.value) );
+			}
+			else{
+				value = NULL;
+			}
+
+			next = NULL;
+			if(i.next){
+				next = new Attribute(*i.next);
+			}
 		}
 	};
 
@@ -181,8 +227,8 @@ private:
 	void setIntAttr(itemAttrTypes type, int32_t value);
 	void increaseIntAttr(itemAttrTypes type, int32_t value);
 
-	bool validateIntAttrType(itemAttrTypes type) const;
-	bool validateStrAttrType(itemAttrTypes type) const;
+	static bool validateIntAttrType(itemAttrTypes type);
+	static bool validateStrAttrType(itemAttrTypes type);
 
 	void addAttr(Attribute* attr);
 	Attribute* getAttrConst(itemAttrTypes type) const;
@@ -202,6 +248,8 @@ public:
 	// Constructor for items
 	Item(const uint16_t _type, uint16_t _count = 0);
 	Item(const Item &i);
+	virtual Item* clone() const;
+	virtual void copyAttributes(Item* item);
 
 	virtual ~Item();
 
@@ -219,8 +267,13 @@ public:
 	virtual const Door* getDoor() const {return NULL;};
 	virtual MagicField* getMagicField() {return NULL;};
 	virtual const MagicField* getMagicField() const {return NULL;};
+	//[ added for beds system
+	virtual BedItem* getBed(){ return NULL; }
+	virtual const BedItem* getBed() const { return NULL; }
+	//]
 
-	static std::string getDescription(const ItemType& it, int32_t lookDistance, const Item* item = NULL);
+	static std::string getDescription(const ItemType& it, int32_t lookDistance,
+		const Item* item = NULL, int32_t subType = -1);
 	static std::string getWeightDescription(const ItemType& it, double weight, uint32_t count = 1);
 
 	//serialization
@@ -279,6 +332,7 @@ public:
 	bool isHangable() const {return items[id].isHangable;}
 	bool isRoteable() const {const ItemType& it = items[id]; return it.rotable && it.rotateTo;}
 	bool isDoor() const {return items[id].isDoor();}
+	bool isBed() const {return items[id].isBed();}
 	bool hasCharges() const {return items[id].charges != 0;}
 
 	bool floorChangeDown() const {return items[id].floorChangeDown;}
@@ -291,20 +345,13 @@ public:
 	const std::string& getPluralName() const {return items[id].pluralName;}
 
 	// get the number of items
-	uint8_t getItemCount() const {return count;}
-	void setItemCount(uint8_t n) {count = n;}
+	uint16_t getItemCount() const {return count;}
+	void setItemCount(uint16_t n) {count = n;}
 
-	uint8_t getItemCountOrSubtype() const;
-	void setItemCountOrSubtype(uint8_t n);
 	void setDefaultSubtype();
 	bool hasSubType() const;
-	uint8_t getSubType() const;
-
-	uint8_t getItemCharge() const {return charges;};
-	void setItemCharge(uint8_t n) {charges = n;};
-
-	uint8_t getFluidType() const {return fluid;};
-	void setFluidType(uint8_t n) {fluid = n;};
+	uint16_t getSubType() const;
+	void setSubType(uint16_t n);
 
 	void setUniqueId(uint16_t n);
 
@@ -319,6 +366,7 @@ public:
 
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
+	virtual void onRemoved() {};
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
 	virtual void __startDecaying();
@@ -330,8 +378,8 @@ protected:
 
 	uint16_t id;  // the same id as in ItemType
 	uint8_t count; // number of stacked items
-	uint8_t charges; //number of charges on the item
-	uint8_t fluid; //fluid type
+
+	//Don't add variables here, use the ItemAttribute class.
 };
 
 #endif

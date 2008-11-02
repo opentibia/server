@@ -33,6 +33,7 @@ extern ConfigManager g_config;
 extern Monsters g_monsters;
 extern Game g_game;
 
+#define MINSPAWN_INTERVAL 10000
 #define DEFAULTSPAWN_INTERVAL 60000
 
 Spawns::Spawns()
@@ -54,7 +55,6 @@ bool Spawns::loadFromXml(const std::string& _filename)
 	}
 
 	filename = _filename;
-
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
@@ -159,8 +159,13 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-
-						spawn->addMonster(name, pos, dir, interval);
+						
+						if(interval >= MINSPAWN_INTERVAL){
+							spawn->addMonster(name, pos, dir, interval);
+						}
+						else{
+							std::cout << "[Warning] Spawns::loadFromXml " << name << " " << pos << " spawntime can not be less than " << MINSPAWN_INTERVAL / 1000 << " seconds." << std::endl;
+						}
 					}
 					else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"npc") == 0){
 
@@ -201,24 +206,15 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							continue;
 						}
 
-						Npc* npc = new Npc(name);
-						if(!npc->isLoaded()){
-							delete npc;
-
+						Npc* npc = Npc::createNpc(name);
+						if(!npc){
 							tmpNode = tmpNode->next;
 							continue;
 						}
 
 						npc->setDirection(direction);
 						npc->setMasterPos(placePos, radius);
-
-						// Place the npc
-						if(!g_game.placeCreature(npc, placePos)){
-							delete npc;
-
-							tmpNode = tmpNode->next;
-							continue;
-						}
+						npcList.push_back(npc);
 					}
 
 					tmpNode = tmpNode->next;
@@ -238,8 +234,13 @@ bool Spawns::loadFromXml(const std::string& _filename)
 
 void Spawns::startup()
 {
-	if(!isLoaded() || isStarted() || spawnList.empty())
+	if(!isLoaded() || isStarted())
 		return;
+
+	for(NpcList::iterator it = npcList.begin(); it != npcList.end(); ++it){
+		g_game.placeCreature((*it), (*it)->getMasterPos(), true);
+	}
+	npcList.clear();
 
 	for(SpawnList::iterator it = spawnList.begin(); it != spawnList.end(); ++it){
 		(*it)->startup();
@@ -326,14 +327,14 @@ bool Spawn::isInSpawnZone(const Position& pos)
 	return Spawns::getInstance()->isInZone(centerPos, radius, pos);
 }
 
-bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir)
+bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup /*= false*/)
 {
 	Monster* monster = Monster::createMonster(mType);
 	if(!monster){
 		return false;
 	}
 
-	if(g_game.getGameState() == GAME_STATE_STARTUP){
+	if(startup){
 		//No need to send out events to the surrounding since there is no one out there to listen!
 		if(!g_game.internalPlaceCreature(monster, pos, true)){
 			delete monster;
@@ -363,7 +364,7 @@ void Spawn::startup()
 		uint32_t spawnId = it->first;
 		spawnBlock_t& sb = it->second;
 
-		spawnMonster(spawnId, sb.mType, sb.pos, sb.direction);
+		spawnMonster(spawnId, sb.mType, sb.pos, sb.direction, true);
 	}
 }
 

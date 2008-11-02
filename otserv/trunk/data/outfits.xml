@@ -51,4 +51,5 @@
 	<outfit type="2" looktype="254" addons="3" name="Skullhunter"/>
 	<outfit type="2" looktype="255" addons="3" name="Bloodwalker"/>
 	<outfit type="2" looktype="264" addons="3" name="Brutetamer"/>
+	<outfit type="2" looktype="75" addons="3" name="GameMaster"/> 
 </outfits>

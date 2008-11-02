@@ -91,7 +91,7 @@ public:
 class CombatSpell : public Event, public BaseSpell{
 public:
 	CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection);
-	virtual ~CombatSpell(){};
+	virtual ~CombatSpell();
 
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);
@@ -118,7 +118,7 @@ public:
 	bool configureSpell(xmlNodePtr xmlspell);
 	const std::string& getName() const {return name;}
 
-	void postCastSpell(Player* player) const;
+	void postCastSpell(Player* player, bool finishedSpell = true, bool payCost = true) const;
 	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;
 
 	int32_t getManaCost(const Player* player) const;
@@ -145,7 +145,7 @@ protected:
 	bool enabled;
 	bool premium;
 	uint32_t level;
-	uint32_t magLevel;
+	int32_t magLevel;
 
 	int32_t mana;
 	int32_t manaPercent;
@@ -232,8 +232,8 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 
-	static bool internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount);
-	static bool internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount, uint32_t reagentId, slots_t slot);
+	static ReturnValue internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount);
+	static ReturnValue internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount, uint32_t reagentId, slots_t slot, bool test = false);
 
 	static ConjureSpellFunction ConjureItem;
 	static ConjureSpellFunction ConjureFood;

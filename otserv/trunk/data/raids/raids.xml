@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <raids>
-<raid name="Testraid" file="testraid.xml" interval2="30" margin="0" /><!-- executed on average once every 30 minutes -->
+<raid name="Testraid" file="testraid.xml" interval2="300" margin="0" /><!-- executed on average once every 300 minutes -->
 </raids>

@@ -47,7 +47,7 @@ public:
 
 	~Spawns();
 	
-	bool loadFromXml(const std::string& _filename);
+	bool loadFromXml(const std::string& datadir);
 	void startup();
 	void clear();
 	
@@ -55,6 +55,8 @@ public:
 	bool isStarted() { return started; }
 	
 private:
+	typedef std::list<Npc*> NpcList;
+	NpcList npcList;
 	SpawnList spawnList;
 	bool loaded, started;
 	std::string filename;
@@ -103,7 +105,7 @@ private:
 	uint32_t checkSpawnEvent;
 
 	bool findPlayer(const Position& pos);
-	bool spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir);
+	bool spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup = false);
 	void checkSpawn();
 };
 

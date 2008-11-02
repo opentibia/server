@@ -71,6 +71,25 @@ void toLowerCaseString(std::string& source)
 	std::transform(source.begin(), source.end(), source.begin(), tolower);
 }
 
+void toUpperCaseString(std::string& source)
+{
+	std::transform(source.begin(), source.end(), source.begin(), upchar);
+}
+
+std::string asLowerCaseString(const std::string& source)
+{
+	std::string s = source;
+	toLowerCaseString(s);
+	return s;
+}
+
+std::string asUpperCaseString(const std::string& source)
+{
+	std::string s = source;
+	toUpperCaseString(s);
+	return s;
+}
+
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
@@ -82,6 +101,20 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 
 	return false;
 }
+
+#if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
+bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
+{
+	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
+	if(nodeValue){
+		value = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+		return true;
+	}
+
+	return false;
+}
+#endif
 
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 {
@@ -107,17 +140,78 @@ bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
 	return false;
 }
 
+bool utf8ToLatin1(char* intext, std::string& outtext)
+{
+	outtext = "";
+
+	if(intext == NULL){
+		return false;
+	}
+
+	int inlen  = strlen(intext);
+	if(inlen == 0){
+		return false;
+	}
+
+	int outlen = inlen*2;
+	unsigned char* outbuf = new unsigned char[outlen];
+	int res = UTF8Toisolat1(outbuf, &outlen, (unsigned char*)intext, &inlen);
+	if(res < 0){
+		delete[] outbuf;
+		return false;
+	}
+
+	outbuf[outlen] = '\0';
+	outtext = (char*)outbuf;
+	delete[] outbuf;
+	return true;
+}
+
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
-		value = nodeValue;
+		if(!utf8ToLatin1(nodeValue, value)){
+			value = nodeValue;
+		}
+
 		xmlFreeOTSERV(nodeValue);
 		return true;
 	}
 
 	return false;
 }
+
+bool readXMLContentString(xmlNodePtr node, std::string& value)
+{
+	char* nodeValue = (char*)xmlNodeGetContent(node);
+	if(nodeValue){
+		if(!utf8ToLatin1(nodeValue, value)){
+			value = nodeValue;
+		}
+
+		xmlFreeOTSERV(nodeValue);
+		return true;
+	}
+
+	return false;
+}
+
+std::vector<std::string> explodeString(const std::string& inString, const std::string& separator)
+{
+   std::vector<std::string> returnVector;
+   std::string::size_type start = 0;
+   std::string::size_type end = 0;
+
+   while((end=inString.find (separator, start)) != std::string::npos){
+      returnVector.push_back (inString.substr (start, end-start));
+      start = end+separator.size();
+   }
+
+   returnVector.push_back (inString.substr (start));
+   return returnVector;
+
+} 
 
 bool hasBitSet(uint32_t flag, uint32_t flags)
 {

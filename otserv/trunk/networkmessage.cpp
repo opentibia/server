@@ -130,10 +130,20 @@ void NetworkMessage::AddItem(const Item* item)
 	AddU16(it.clientId);
 
 	if(it.stackable || it.isRune()){
-		AddByte(item->getItemCountOrSubtype());
+		AddByte(item->getSubType());
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		uint32_t fluidIndex = item->getItemCountOrSubtype() % 8;
+		uint32_t fluidIndex = item->getSubType() % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
+}
+
+void NetworkMessage::AddItemId(const Item *item){
+	const ItemType &it = Item::items[item->getID()];
+	AddU16(it.clientId);
+}
+
+void NetworkMessage::AddItemId(uint16_t itemId){
+	const ItemType &it = Item::items[itemId];
+	AddU16(it.clientId);
 }

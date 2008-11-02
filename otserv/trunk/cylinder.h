@@ -30,12 +30,12 @@ class Creature;
 #define INDEX_WHEREEVER -1
 
 enum cylinderflags_t {
-	FLAG_NOLIMIT = 1,					//Bypass limits like capacity/container limits, blocking items/creatures etc.
+	FLAG_NOLIMIT = 1,				//Bypass limits like capacity/container limits, blocking items/creatures etc.
 	FLAG_IGNOREBLOCKITEM = 2,		//Bypass moveable blocking item checks
 	FLAG_IGNOREBLOCKCREATURE = 4,	//Bypass creature checks
-	FLAG_CHILDISOWNER = 8,				//Used by containers to query capacity of the carrier (player)
-	FLAG_PATHFINDING = 16,				//An additional check is done for floor changing/teleport items
-	FLAG_FROMFARPOSITION = 32
+	FLAG_CHILDISOWNER = 8,			//Used by containers to query capacity of the carrier (player)
+	FLAG_PATHFINDING = 16,			//An additional check is done for floor changing/teleport items
+	FLAG_IGNOREFIELDDAMAGE = 32,	//Bypass field damage checks
 };
 
 enum cylinderlink_t{

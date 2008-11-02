@@ -27,6 +27,7 @@
 #include "game.h"
 #include "connection.h"
 #include "networkmessage.h"
+#include "outputmessage.h"
 #include "tools.h"
 
 #ifndef WIN32
@@ -41,6 +42,10 @@ extern Game g_game;
 //#define STATUS_SERVER_VERSION "0.6.0"
 #define STATUS_SERVER_NAME "otserv"
 #define STATUS_CLIENT_VERISON "8.0"
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+uint32_t ProtocolStatus::protocolStatusCount = 0;
+#endif
 
 enum RequestedInfo_t{
 	REQUEST_BASIC_SERVER_INFO  = 0x01,
@@ -72,11 +77,14 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	{
 		if(msg.GetRaw() == "info"){
 			OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-			Status* status = Status::instance();
-			std::string str = status->getStatusString();
-			output->AddBytes(str.c_str(), str.size());
-			setRawMessages(true); // we dont want the size header, nor encryption
-			OutputMessagePool::getInstance()->send(output);
+			if(output){
+				TRACK_MESSAGE(output);
+				Status* status = Status::instance();
+				std::string str = status->getStatusString();
+				output->AddBytes(str.c_str(), str.size());
+				setRawMessages(true); // we dont want the size header, nor encryption
+				OutputMessagePool::getInstance()->send(output);
+			}
 		}
 		break;
 	}
@@ -86,9 +94,12 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 		uint32_t requestedInfo = msg.GetU16(); //Only a Byte is necessary, though we could add new infos here
 
 		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-		Status* status = Status::instance();
-		status->getInfo(requestedInfo, output, msg);
-		OutputMessagePool::getInstance()->send(output);
+		if(output){
+			TRACK_MESSAGE(output);
+			Status* status = Status::instance();
+			status->getInfo(requestedInfo, output, msg);
+			OutputMessagePool::getInstance()->send(output);
+		}
 		break;
 	}
 	default:

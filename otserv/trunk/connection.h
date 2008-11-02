@@ -26,7 +26,7 @@
 
 #include <boost/utility.hpp>
 
-#include "otsystem.h"
+#include <boost/thread.hpp>
 
 #include "networkmessage.h"
 
@@ -47,57 +47,66 @@ class ConnectionManager
 public:
 	~ConnectionManager()
 	{
-		OTSYS_THREAD_LOCKVARRELEASE(m_connectionManagerLock);
 	}
-	
+
 	static ConnectionManager* getInstance(){
 		static ConnectionManager instance;
 		return &instance;
 	}
-	
+
 	Connection* createConnection(boost::asio::io_service& io_service);
 	void releaseConnection(Connection* connection);
 	void closeAll();
-	
+
 protected:
-	
+
 	ConnectionManager()
 	{
-		OTSYS_THREAD_LOCKVARINIT(m_connectionManagerLock);
 	}
-	
+
 	std::list<Connection*> m_connections;
-	OTSYS_THREAD_LOCKVAR m_connectionManagerLock;
+	boost::recursive_mutex m_connectionManagerLock;
 };
 
 class Connection : boost::noncopyable
 {
 public:
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t connectionCount;
+#endif
+
 	enum {
 		CLOSE_STATE_NONE = 0,
 		CLOSE_STATE_REQUESTED = 1,
 		CLOSE_STATE_CLOSING = 2,
 	};
-	
+
 private:
 	Connection(boost::asio::io_service& io_service) : m_socket(io_service)
 	{
+		m_refCount = 0;
 		m_protocol = NULL;
 		m_pendingWrite = 0;
 		m_pendingRead = 0;
 		m_closeState = CLOSE_STATE_NONE;
 		m_socketClosed = false;
-		OTSYS_THREAD_LOCKVARINIT(m_connectionLock);
 		m_writeError = false;
 		m_readError = false;
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		connectionCount++;
+#endif
 	}
 	friend class ConnectionManager;
-	
+
 public:
 	~Connection()
 	{
 		ConnectionManager::getInstance()->releaseConnection(this);
-		OTSYS_THREAD_LOCKVARRELEASE(m_connectionLock);
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		connectionCount--;
+#endif
 	}
 
 	boost::asio::ip::tcp::socket& getHandle() { return m_socket; }
@@ -108,6 +117,9 @@ public:
 	bool send(OutputMessage* msg);
 
 	uint32_t getIP() const;
+
+	int32_t addRef() {return ++m_refCount;}
+	int32_t unRef() {return --m_refCount;}
 
 private:
 	void parseHeader(const boost::system::error_code& error);
@@ -135,8 +147,9 @@ private:
 	std::list <OutputMessage*> m_outputQueue;
 	int32_t m_pendingRead;
 	uint32_t m_closeState;
+	uint32_t m_refCount;
 
-	OTSYS_THREAD_LOCKVAR m_connectionLock;
+	boost::recursive_mutex m_connectionLock;
 
 	Protocol* m_protocol;
 };

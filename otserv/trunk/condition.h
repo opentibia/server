@@ -21,7 +21,6 @@
 #ifndef __OTSERV_CONDITION_H__
 #define __OTSERV_CONDITION_H__
 
-#include "definitions.h"
 #include "fileloader.h"
 #include "enums.h"
 
@@ -34,28 +33,30 @@ class Player;
 class PropStream;
 
 enum ConditionType_t {
-	CONDITION_NONE          = 0,
-	CONDITION_POISON        = 1,
-	CONDITION_FIRE          = 2,
-	CONDITION_ENERGY        = 4,
-	CONDITION_LIFEDRAIN     = 8,
-	CONDITION_HASTE         = 16,
-	CONDITION_PARALYZE		= 32,
-	CONDITION_OUTFIT        = 64,
-	CONDITION_INVISIBLE     = 128,
-	CONDITION_LIGHT         = 256,
-	CONDITION_MANASHIELD    = 512,
-	CONDITION_INFIGHT       = 1024,
-	CONDITION_DRUNK         = 2048,
-	CONDITION_EXHAUSTED     = 4096,
-	CONDITION_REGENERATION  = 8192,
-	CONDITION_SOUL          = 16384,
-	CONDITION_DROWN         = 32768,
-	CONDITION_MUTED         = 65536,
-	CONDITION_ATTRIBUTES    = 131072,
-	CONDITION_FREEZING      = 262144,
-	CONDITION_DAZZLED       = 524288,
-	CONDITION_CURSED        = 1048576
+	CONDITION_NONE           = 0,
+	CONDITION_POISON         = 1,
+	CONDITION_FIRE           = 2,
+	CONDITION_ENERGY         = 4,
+	CONDITION_LIFEDRAIN      = 8,
+	CONDITION_HASTE          = 16,
+	CONDITION_PARALYZE	     = 32,
+	CONDITION_OUTFIT         = 64,
+	CONDITION_INVISIBLE      = 128,
+	CONDITION_LIGHT          = 256,
+	CONDITION_MANASHIELD     = 512,
+	CONDITION_INFIGHT        = 1024,
+	CONDITION_DRUNK          = 2048,
+	CONDITION_EXHAUSTED      = 4096,
+	CONDITION_REGENERATION   = 8192,
+	CONDITION_SOUL           = 16384,
+	CONDITION_DROWN          = 32768,
+	CONDITION_MUTED          = 65536,
+	CONDITION_ATTRIBUTES     = 131072,
+	CONDITION_FREEZING       = 262144,
+	CONDITION_DAZZLED        = 524288,
+	CONDITION_CURSED         = 1048576,
+	CONDITION_EXHAUST_COMBAT = 2097152,
+	CONDITION_EXHAUST_HEAL   = 4194304
 };
 
 enum ConditionEnd_t{
@@ -285,7 +286,7 @@ public:
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
-	bool addDamage(int32_t rounds, uint32_t time, int32_t value);
+	bool addDamage(int32_t rounds, int32_t time, int32_t value);
 	bool doForceUpdate() const { return forceUpdate;}
 
 	//serialization

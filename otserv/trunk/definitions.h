@@ -45,31 +45,37 @@
 #endif
 
 #ifdef __USE_SQLITE__
-#define SINGLE_SQL_DRIVER
+	#define SINGLE_SQL_DRIVER
 #endif
 
 #ifdef __USE_MYSQL__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
-#endif
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
 
 #ifdef __USE_ODBC__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
-#endif
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
 
 #ifdef __USE_PGSQL__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
+
+//Default sql driver
+#if !defined(SINGLE_SQL_DRIVER) && !defined(MULTI_SQL_DRIVERS)
+	#define __USE_SQLITE__
+	#define SINGLE_SQL_DRIVER
 #endif
 
 enum passwordType_t{
@@ -78,13 +84,23 @@ enum passwordType_t{
 	PASSWORD_TYPE_SHA1,
 };
 
-#ifdef __WINDOWS__
+#ifdef _WIN32
+#  ifndef WIN32
+#    define WIN32
+#  endif
+#endif
+
+#if defined __WINDOWS__ || defined WIN32
+
+#if defined _MSC_VER && defined NDEBUG
+#define _SECURE_SCL 0
+#define HAS_ITERATOR_DEBUGGING 0
+#endif
 
 #ifndef __FUNCTION__
 	#define	__FUNCTION__ __func__
 #endif
 
-#define OTSYS_THREAD_RETURN  void
 #ifndef EWOULDBLOCK
 #define EWOULDBLOCK WSAEWOULDBLOCK
 #endif
@@ -99,11 +115,18 @@ enum passwordType_t{
 #define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
-	#include <ext/hash_map>
-	#include <ext/hash_set>
+	#if __GNUC__ < 4
+		#include <ext/hash_map>
+		#include <ext/hash_set>
+		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
+		#define OTSERV_HASH_SET __gnu_cxx::hash_set
+	#else
+		#include <unordered_map>
+		#include <unordered_set>
+		#define OTSERV_HASH_MAP std::tr1::unordered_map;
+		#define OTSERV_HASH_SET std::tr1::unordered_set;
+	#endif
 	#include <assert.h>
-	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
-	#define OTSERV_HASH_SET __gnu_cxx::hash_set
 	#define ATOI64 atoll
 
 #else
@@ -152,8 +175,6 @@ enum passwordType_t{
 
 //*nix systems
 #else
-	#define OTSYS_THREAD_RETURN void*
-
 	#include <stdint.h>
 	#include <string.h>
 	#include <ext/hash_map>
@@ -165,6 +186,13 @@ enum passwordType_t{
 
 	#define ATOI64 atoll
 
+#endif
+
+// OpenTibia configuration
+#ifndef __SKULLSYSTEM__
+#   ifndef __NO_SKULLSYSTEM__
+#       define __SKULLSYSTEM__
+#   endif
 #endif
 
 #endif

@@ -36,47 +36,25 @@ extern ConfigManager g_config;
 Account IOAccount::loadAccount(uint32_t accno)
 {
 	Account acc;
-#ifndef __USE_SQL_PREMDAYS__
-	time_t premEnd;
-#endif
-	uint32_t premDays;
-	uint32_t today = uint32_t(time(NULL) / 86400);
 
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `id`, `password` FROM `accounts` WHERE `id` = " << accno;
+	query << "SELECT `id`, `password`, `premend` FROM `accounts` WHERE `id` = " << accno;
 	if((result = db->storeQuery(query.str()))){
 		acc.accnumber = result->getDataInt("id");
 		acc.password = result->getDataString("password");
+		acc.premEnd = result->getDataInt("premend");
 		db->freeResult(result);
 
 		query.str("");
-#ifndef __USE_SQL_PREMDAYS__
-		query << "SELECT `name`, `premend` FROM `players` WHERE `account_id` = " << accno;
-#else
-		query << "SELECT `name`, `premdays` FROM `players` WHERE `account_id` = " << accno;
-#endif
+		query << "SELECT `name` FROM `players` WHERE `account_id` = " << accno;
 		if((result = db->storeQuery(query.str()))){
-			do{
+			do {
 				std::string ss = result->getDataString("name");
 				acc.charList.push_back(ss.c_str());
-#ifndef __USE_SQL_PREMDAYS__
-				premEnd = result->getDataInt("premend");
-				premDays = uint32_t(premEnd / 86400) - today;
-				// give the account the highest number of premium days
-				if(premDays > acc.premDays) {
-					acc.premDays = premDays;
-				}
-#else
-				premDays = result->getDataInt("premdays");
-				// give the account the highest number of premium days
-				if(premDays > acc.premDays) {
-					acc.premDays = premDays;
-				}
-#endif
-			}while(result->next());
+			} while(result->next());
 
 			acc.charList.sort();
 			db->freeResult(result);

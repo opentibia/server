@@ -30,18 +30,42 @@ Container::Container(uint16_t _type) : Item(_type)
 {
 	//std::cout << "Container constructor " << this << std::endl;
 	maxSize = items[this->getID()].maxItems;
+	total_weight = 0.0;
 }
 
 Container::~Container()
 {
 	//std::cout << "Container destructor " << this << std::endl;
-	for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
-		
+	for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){		
 		(*cit)->setParent(NULL);
 		(*cit)->releaseThing2();
 	}
 
 	itemlist.clear();
+}
+
+Item* Container::clone() const
+{
+	Container* _item = static_cast<Container*>(Item::clone());
+	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
+		_item->addItem((*it)->clone());
+	}
+	return _item;
+}
+
+Container* Container::getParentContainer() {
+	if(Thing* thing = getParent()) {
+		if(Item* item = thing->getItem()) {
+			return item->getContainer();
+		}
+	}
+	return NULL;
+}
+
+void Container::addItem(Item* item)
+{
+	itemlist.push_back(item);
+	item->setParent(this);
 }
 
 bool Container::unserialize(xmlNodePtr nodeItem)
@@ -54,7 +78,6 @@ bool Container::unserialize(xmlNodePtr nodeItem)
 			return true; //container is empty
 		}
 	  
-		//char* nodeValue;
 		int intValue;
 
 		while(nodeContainer){
@@ -81,7 +104,7 @@ bool Container::unserialize(xmlNodePtr nodeItem)
 							return false;
 						}
 						
-						__internalAddThing(item);
+						addItem(item);
 					}
 
 					nodeContainerItem = nodeContainerItem->next;
@@ -140,7 +163,7 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 					return false;
 				}
 				
-				__internalAddThing(item);
+				addItem(item);
 			}
 			else /*unknown type*/
 				return false;
@@ -154,8 +177,17 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 	return false;
 }
 
+void Container::updateItemWeight(double diff) {
+	total_weight += diff;
+	if(Container* parent_container = getParentContainer()) {
+		parent_container->updateItemWeight(diff);
+	}
+}
+
 double Container::getWeight() const
 {
+	return Item::getWeight() + total_weight;
+	/*
 	double weight = items[id].weight;
 	std::list<const Container*> listContainer;
 	ItemList::const_iterator cit;
@@ -178,6 +210,7 @@ double Container::getWeight() const
 	}
 
 	return weight;
+	*/
 }
 
 Item* Container::getItem(uint32_t index)
@@ -250,7 +283,7 @@ void Container::onAddContainerItem(Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
+	g_game.getSpectators(list, cylinderMapPos, false, false, 2, 2, 2, 2);
 
 	//send to client
 	Player* player = NULL;
@@ -275,7 +308,7 @@ void Container::onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemT
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
+	g_game.getSpectators(list, cylinderMapPos, false, false, 2, 2, 2, 2);
 
 	//send to client
 	Player* player = NULL;
@@ -299,7 +332,7 @@ void Container::onRemoveContainerItem(uint32_t index, Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
+	g_game.getSpectators(list, cylinderMapPos, false, false, 2, 2, 2, 2);
 
 	//send change to client
 	Player* player = NULL;
@@ -519,6 +552,10 @@ void Container::__addThing(int32_t index, Thing* thing)
 
 	item->setParent(this);
 	itemlist.push_front(item);
+	total_weight += item->getWeight();
+	if(Container* parent_container = getParentContainer()) {
+		parent_container->updateItemWeight(item->getWeight());
+	}
 
 	//send change to client
 	if(getParent()){
@@ -548,9 +585,17 @@ void Container::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 
 	const ItemType& oldType = Item::items[item->getID()];
 	const ItemType& newType = Item::items[itemId];
+	
+	const double old_weight = item->getWeight();
 
 	item->setID(itemId);
-	item->setItemCountOrSubtype(count);
+	item->setSubType(count);
+
+	const double diff_weight = -old_weight + item->getWeight();
+	total_weight += diff_weight;
+	if(Container* parent_container = getParentContainer()) {
+		parent_container->updateItemWeight(diff_weight);
+	}
 
 	//send change to client
 	if(getParent()){
@@ -586,6 +631,13 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 	
+	total_weight -= (*cit)->getWeight();
+	total_weight += item->getWeight();
+
+	if(Container* parent_container = getParentContainer()) {
+		parent_container->updateItemWeight(-(*cit)->getWeight() + item->getWeight());
+	}
+
 	itemlist.insert(cit, item);
 	item->setParent(this);
 
@@ -631,10 +683,17 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 
 	if(item->isStackable() && count != item->getItemCount()){
 		int newCount = std::max(0, (int)(item->getItemCount() - count));
+
+		const double old_weight = -item->getWeight();
 		item->setItemCount(newCount);
+		const double diff_weight = old_weight + item->getWeight();
+		total_weight += diff_weight;
 
 		//send change to client
 		if(getParent()){
+			if(Container* parent_container = getParentContainer()) {
+				parent_container->updateItemWeight(diff_weight);
+			}
 			const ItemType& it = Item::items[item->getID()];
 			onUpdateContainerItem(index, item, it, item, it);
 		}
@@ -642,9 +701,13 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	else{
 		//send change to client
 		if(getParent()){
+			if(Container* parent_container = getParentContainer()) {
+				parent_container->updateItemWeight(-item->getWeight());\
+			}
 			onRemoveContainerItem(index, item);
 		}
 
+		total_weight -= item->getWeight();
 		item->setParent(NULL);
 		itemlist.erase(cit);
 	}
@@ -687,7 +750,7 @@ uint32_t Container::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/
 			}
 			else{
 				if(item->isRune()){
-					count+= item->getItemCharge();
+					count+= item->getCharges();
 				}
 				else{
 					count+= item->getItemCount();
@@ -783,6 +846,10 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 	}
 	*/
 
+	total_weight += item->getWeight();
+	if(Container* parent_container = getParentContainer()) {
+		parent_container->updateItemWeight(item->getWeight());
+	}
 	itemlist.push_front(item);
 	item->setParent(this);
 }

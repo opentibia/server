@@ -31,6 +31,7 @@
 
 class Action;
 class Container;
+class ItemType;
 
 enum ActionType_t{
 	ACTION_ANY,
@@ -52,8 +53,9 @@ public:
 
 	bool openContainer(Player* player, Container* container, const uint8_t index);
 
-	static ReturnValue canUse(const Creature* creature, const Position& pos);
-	static ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
+	ReturnValue canUse(const Player* player, const Position& pos);
+	ReturnValue canUse(const Player* player, const Position& pos, const Item* item);
+	ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
 
 protected:
 	bool executeUse(Action* action, Player* player, Item* item, const PositionEx& posEx, uint32_t creatureId);
@@ -63,9 +65,9 @@ protected:
 	bool executeUseEx(Action* action, Player* player, Item* item, const PositionEx& fromPosEx,
 		const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-		Item* item, bool isHotkey, uint32_t creatureId);
+		Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
 
-	void showUseHotkeyMessage(Player* player, const std::string& name, uint32_t itemCount, const std::string& plural);
+	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);
 
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();

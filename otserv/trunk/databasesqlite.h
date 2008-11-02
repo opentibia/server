@@ -18,6 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#ifdef __USE_SQLITE__
+
 #ifndef __DATABASE_SQLITE_H__
 #define __DATABASE_SQLITE_H__
 
@@ -27,6 +29,7 @@
 
 #include <sqlite3.h>
 #include <sstream>
+#include <map>
 
 class DatabaseSQLite : public _Database
 {
@@ -51,9 +54,8 @@ public:
 protected:
 	std::string _parse(const std::string &s);
 
+	boost::recursive_mutex sqliteLock;
 	sqlite3* m_handle;
-
-	bool m_connected;
 };
 
 class SQLiteResult : public _DBResult
@@ -77,5 +79,7 @@ protected:
 
 	sqlite3_stmt* m_handle;
 };
+
+#endif
 
 #endif

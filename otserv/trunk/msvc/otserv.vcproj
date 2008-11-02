@@ -97,7 +97,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\Executable"
+			OutputDirectory="..\..\..\..\..\Executable"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -122,10 +122,11 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_X86_&quot; /c "
 				Optimization="2"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;NOMINMAX;__USE_MYSQL__;__SKULLSYSTEM__"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;NOMINMAX;__USE_MYSQL__"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
+				PrecompiledHeaderThrough=""
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -149,6 +150,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -206,6 +208,10 @@
 			</File>
 			<File
 				RelativePath="..\baseevents.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\beds.cpp"
 				>
 			</File>
 			<File
@@ -361,6 +367,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\party.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\player.cpp"
 				>
 			</File>
@@ -484,6 +494,10 @@
 			</File>
 			<File
 				RelativePath="..\baseevents.h"
+				>
+			</File>
+			<File
+				RelativePath="..\beds.h"
 				>
 			</File>
 			<File
@@ -660,6 +674,10 @@
 			</File>
 			<File
 				RelativePath="..\outputmessage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\party.h"
 				>
 			</File>
 			<File

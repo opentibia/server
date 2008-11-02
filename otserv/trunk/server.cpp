@@ -19,7 +19,10 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "otsystem.h"
+#if defined __WINDOWS__ || defined WIN32
+#include <winerror.h>
+#endif
+
 #include "server.h"
 #include "connection.h"
 
@@ -35,7 +38,7 @@ Server::Server(uint32_t serverip, uint16_t port)
 
 Server::~Server()
 {
-	closeListenSocekt();
+	closeListenSocket();
 }
 
 void Server::accept()
@@ -53,7 +56,7 @@ void Server::accept()
 		boost::asio::placeholders::error));
 }
 
-void Server::closeListenSocekt()
+void Server::closeListenSocket()
 {
 	if(m_acceptor){
 		if(m_acceptor->is_open()){
@@ -90,7 +93,7 @@ void Server::onAccept(Connection* connection, const boost::system::error_code& e
 		if(error != boost::asio::error::operation_aborted){
 			m_listenErrors++;
 			PRINT_ASIO_ERROR("Accepting");
-			closeListenSocekt();
+			closeListenSocket();
 			if(m_listenErrors < 100){
 				openListenSocket();
 			}
@@ -113,6 +116,6 @@ void Server::stop()
 
 void Server::onStopServer()
 {
-	closeListenSocekt();
+	closeListenSocket();
 	ConnectionManager::getInstance()->closeAll();
 }

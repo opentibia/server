@@ -21,7 +21,6 @@
 #ifndef __OTSERV_TOOLS_H__
 #define __OTSERV_TOOLS_H__
 
-#include "otsystem.h"
 #include "const.h"
 
 #include <string>
@@ -44,11 +43,19 @@ void replaceString(std::string& str, const std::string sought, const std::string
 void trim_right(std::string& source, const std::string& t);
 void trim_left(std::string& source, const std::string& t);
 void toLowerCaseString(std::string& source);
-
+void toUpperCaseString(std::string& source);
+std::string asLowerCaseString(const std::string& source);
+std::string asUpperCaseString(const std::string& source);
+bool utf8ToLatin1(char* intext, std::string& outtext);
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
+#if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
+bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value);
+#endif
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
+bool readXMLContentString(xmlNodePtr node, std::string& value);
+std::vector<std::string> explodeString(const std::string& inString, const std::string& separator);
 bool hasBitSet(uint32_t flag, uint32_t flags);
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM);

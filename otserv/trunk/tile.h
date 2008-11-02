@@ -31,6 +31,10 @@ class Teleport;
 class TrashHolder;
 class Mailbox;
 class MagicField;
+class QTreeLeafNode;
+//[ added for beds system
+class BedItem;
+//]
 
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
@@ -42,16 +46,24 @@ enum tileflags_t{
 	TILESTATE_NOPVPZONE = 4,
 	TILESTATE_NOLOGOUT = 8,
 	TILESTATE_PVPZONE = 16,
+	TILESTATE_REFRESH = 32,
 
 	//internal usage
-	TILESTATE_HOUSE = 32,
-	TILESTATE_FLOORCHANGE = 64,
-	TILESTATE_FLOORCHANGE_DOWN = 128,
-	TILESTATE_FLOORCHANGE_NORTH = 256,
-	TILESTATE_FLOORCHANGE_SOUTH = 512,
-	TILESTATE_FLOORCHANGE_EAST = 1024,
-	TILESTATE_FLOORCHANGE_WEST = 2048,
-	TILESTATE_POSITIONCHANGE = 4096
+	TILESTATE_HOUSE = 64,
+	TILESTATE_FLOORCHANGE = 128,
+	TILESTATE_FLOORCHANGE_DOWN = 256,
+	TILESTATE_FLOORCHANGE_NORTH = 512,
+	TILESTATE_FLOORCHANGE_SOUTH = 1024,
+	TILESTATE_FLOORCHANGE_EAST = 2048,
+	TILESTATE_FLOORCHANGE_WEST = 4096,
+	TILESTATE_POSITIONCHANGE = 8192,
+	TILESTATE_MAGICFIELD = 16384,
+	TILESTATE_BLOCKSOLID = 32768,
+	TILESTATE_BLOCKPATH = 65536,
+	TILESTATE_IMMOVABLEBLOCKSOLID = 131072,
+	TILESTATE_IMMOVABLEBLOCKPATH = 262144,
+	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 524288,
+	TILESTATE_NOFIELDBLOCKPATH = 1048576
 };
 
 class Tile : public Cylinder
@@ -63,6 +75,7 @@ public:
 		tilePos.x = x;
 		tilePos.y = y;
 		tilePos.z = z;
+		qt_node = NULL;
 
 		thingCount = 0;
 		m_flags = 0;
@@ -94,11 +107,15 @@ public:
 	ItemVector     topItems;
 	CreatureVector creatures;
 	ItemVector     downItems;
+	QTreeLeafNode* qt_node;
 
 	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
 	Mailbox* getMailbox() const;
+	//[ added for beds system
+	BedItem* getBedItem() const;
+	//]
 
 	Creature* getTopCreature();
 	Item* getTopTopItem();
@@ -109,6 +126,7 @@ public:
 	uint32_t getThingCount() const {return thingCount;}
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
+	bool hasProperty(Item* exclude, enum ITEMPROPERTY prop) const;
 
 	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}
 	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
@@ -168,7 +186,8 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
-	const Position& getTilePosition() const {return tilePos;};
+	virtual const Position& getPosition() const {return tilePos;}
+	const Position& getTilePosition() const {return tilePos;}
 
 	virtual bool isRemoved() const {return false;};
 
@@ -184,7 +203,7 @@ private:
 protected:
 	uint32_t thingCount;
 	Position tilePos;
-	uint16_t m_flags;
+	uint32_t m_flags;
 };
 
 #endif

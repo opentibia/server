@@ -1,7 +1,7 @@
 [Project]
 FileName=otserv.dev
 Name=otserv
-UnitCount=148
+UnitCount=152
 Type=1
 Ver=1
 ObjFiles=
@@ -11,7 +11,7 @@ PrivateResource=otserv_private.rc
 ResourceIncludes=
 MakeIncludes=
 Compiler=
-CppCompiler=-D__USE_SQLITE___@@_-D__USE_MYSQL___@@_-D__SKULL_SYSTEM___@@_
+CppCompiler=-D__USE_SQLITE___@@_-D__USE_MYSQL___@@_-D__SKULL_SYSTEM___@@__@@_-D__USE_OTPCH___@@_
 Linker=-llibxml2_@@_-lgmp_@@_-llua5.1_@@_-lboost_system_@@_-lwsock32_@@_-lws2_32_@@_-lboost_regex_@@_-lsqlite3_@@_-lmysql_@@_
 IsCpp=1
 Icon=otserv.ico
@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=0000000000000000000000
+CompilerSettings=0000000000100000000100
 
 [Unit1]
 FileName=..\weapons.h
@@ -1480,7 +1480,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit149]
-FileName=..\waitlist.h
+FileName=..\beds.h
 CompileCpp=1
 Folder=otserv
 Compile=1
@@ -1490,7 +1490,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit150]
-FileName=..\weapons.cpp
+FileName=..\party.cpp
 CompileCpp=1
 Folder=otserv
 Compile=1
@@ -1539,6 +1539,26 @@ BuildCmd=
 
 [Unit39]
 FileName=..\databasepgsql.h
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit151]
+FileName=..\party.h
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit152]
+FileName=..\beds.cpp
 CompileCpp=1
 Folder=otserv
 Compile=1

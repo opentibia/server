@@ -26,14 +26,13 @@
 #include <map>
 #include "creature.h"
 
-class Game;
 struct Command;
 struct s_defcommands;
 
 class Commands{
 public:
-	Commands():game(NULL),loaded(false){};
-	Commands(Game* igame);
+	//Commands():game(NULL),loaded(false){};
+	Commands();
 
 	bool loadXml(const std::string& _datadir);	
 	bool isLoaded(){return loaded;}
@@ -44,7 +43,6 @@ public:
 	static ReturnValue placeSummon(Creature* creature, const std::string& name);
 	
 protected:
-	Game* game;
 	bool loaded;
 	std::string datadir;
 
@@ -74,9 +72,13 @@ protected:
 	bool setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param);
 	bool sellHouse(Creature* creature, const std::string& cmd, const std::string& param);
 	bool getHouse(Creature* creature, const std::string& cmd, const std::string& param);
-	bool bansManager(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool bansManager(Creature* creature, const std::string& cmd, const std::string& param);
 	bool serverInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool forceRaid(Creature* creature, const std::string& cmd, const std::string& param);
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	bool serverDiag(Creature* creature, const std::string& cmd, const std::string& param);
+#endif
 	
 	//table of commands
 	static s_defcommands defined_commands[];

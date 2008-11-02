@@ -3,7 +3,7 @@
 <commands>
 
 -- Gods
-<command cmd="/b" access="3" />				-- BAN a player by IP
+<command cmd="/serverdiag" access="3" />
 <command cmd="/i" access="3" />				-- Create a item by ID
 <command cmd="/n" access="3" />				-- Create a item by name
 <command cmd="/reload" access="3" />		-- Reload configurations
@@ -19,7 +19,6 @@
 <command cmd="/c" access="2" />				-- Teleport a player to you
 <command cmd="/m" access="2" />				-- Summon a "wild" monster
 <command cmd="/summon" access="2" />		-- Summon a monster
-<command cmd="/bans" access="2" />			-- Bans manager
 <command cmd="/kick" access="2" />			-- Kick a player
 
 -- Tutors

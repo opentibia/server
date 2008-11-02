@@ -29,6 +29,7 @@
 #include <fstream>
 #include <ctime>
 #include <boost/pool/pool.hpp>
+#include <boost/thread.hpp>
 
 #include "definitions.h"
 
@@ -81,7 +82,7 @@ void operator delete[](void* p, int dummy);
 #endif
 
 #ifdef __OTSERV_ALLOCATOR_STATS__
-OTSYS_THREAD_RETURN allocatorStatsThread(void *a);
+void allocatorStatsThread(void *a);
 #endif
 
 struct poolTag {
@@ -97,7 +98,7 @@ public:
 
 	void* allocate(size_t size) {
 		Pools::iterator it;
-		OTSYS_THREAD_LOCK(poolLock, NULL);
+		poolLock.lock();
 
 		for(it = pools.begin(); it != pools.end(); ++it) {
 			if(it->first >= size + sizeof(poolTag)) {
@@ -108,7 +109,7 @@ public:
 				poolsStats[it->first]->allocations++;
 				poolsStats[it->first]->unused+= it->first - (size + sizeof(poolTag));
 				#endif
-				OTSYS_THREAD_UNLOCK(poolLock, NULL);
+				poolLock.unlock();
 				return tag + 1;
 			}
 		}
@@ -119,7 +120,7 @@ public:
 		poolsStats[0]->unused += size;
 		#endif
 		tag->poolbytes = 0;
-		OTSYS_THREAD_UNLOCK(poolLock, NULL);
+		poolLock.unlock();
 		return tag + 1;
 	}
 
@@ -128,7 +129,7 @@ public:
 			return;
 
 		poolTag* const tag = reinterpret_cast<poolTag*>(deletable) - 1U;
-		OTSYS_THREAD_LOCK(poolLock, NULL);
+		poolLock.lock();
 		if(tag->poolbytes) {
 			Pools::iterator it;
 
@@ -145,7 +146,7 @@ public:
 			poolsStats[0]->deallocations++;
 			#endif
 		}
-		OTSYS_THREAD_UNLOCK(poolLock, NULL);
+		poolLock.unlock();
 	}
 
 	/*
@@ -208,7 +209,6 @@ private:
 	}
 
 	PoolManager() {
-		OTSYS_THREAD_LOCKVARINIT(poolLock);
 		addPool(32, 32768);
 		addPool(48, 32768);
 		addPool(96, 16384);
@@ -243,7 +243,7 @@ private:
 		dummyallocator<std::pair<const size_t, t_PoolStats* > > > PoolsStats;
 	PoolsStats poolsStats;
 	#endif
-	OTSYS_THREAD_LOCKVAR poolLock;
+	boost::recursive_mutex poolLock;
 };
 
 #endif

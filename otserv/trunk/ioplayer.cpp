@@ -44,7 +44,22 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	DBQuery query;
 	DBResult* result;
 
-	if(!(result = db->storeQuery("SELECT * FROM `players` WHERE `name` = " + db->escapeString(name)))){
+	if(!(result = db->storeQuery(std::string("") +
+		"SELECT " +
+			"*, " +
+			"(SELECT " +
+				"`premend` " +
+			"FROM " +
+				"`accounts` " +
+			"WHERE " +
+				"`id`=`players`.`account_id`) " +
+			"AS `premend` " +
+		"FROM " +
+			"`players` " +
+		"WHERE " +
+			"`name` = " + db->escapeString(name)))
+		)
+	{
 	  	return false;
 	}
 
@@ -70,9 +85,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->setDirection((Direction)result->getDataInt("direction"));
 	player->level = std::max((uint32_t)1, (uint32_t)result->getDataInt("level"));
 
-	uint32_t currExpCount = Player::getExpForLevel(player->level);
-	uint32_t nextExpCount = Player::getExpForLevel(player->level + 1);
-	uint32_t experience = (uint32_t)result->getDataInt("experience");
+	uint64_t currExpCount = Player::getExpForLevel(player->level);
+	uint64_t nextExpCount = Player::getExpForLevel(player->level + 1);
+	uint64_t experience = (uint64_t)result->getDataLong("experience");
 	if(experience < currExpCount || experience  > nextExpCount){
 		experience = currExpCount;
 	}
@@ -91,10 +106,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->defaultOutfit.lookFeet = result->getDataInt("lookfeet");
 	player->defaultOutfit.lookAddons = result->getDataInt("lookaddons");
 	player->currentOutfit = player->defaultOutfit;
-
-#ifdef __USE_SQL_PREMDAYS__
-	player->premiumDays = result->getDataInt("premdays");
-#endif
 
 #ifdef __SKULLSYSTEM__
 	int32_t redSkullSeconds = result->getDataInt("redskulltime") - std::time(NULL);
@@ -163,22 +174,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	uint32_t rankid = result->getDataInt("rank_id");
 
 	// place it here and now we can drop all additional query instances as all data were loaded
-	#ifndef __USE_SQL_PREMDAYS__
-	time_t premEnd = result->getDataInt("premend");
-	time_t timeNow = time(NULL);
-	if(premEnd > 0){
-		if(premEnd < timeNow){
-			//update table
-			query << "UPDATE `players` SET `premend` = 0 WHERE `id` = " << player->getGUID();
-			db->executeQuery(query.str());
-			query.str("");
-		}
-		else{
-			player->premiumDays = (premEnd - timeNow)/86400;
-		}
-	}
-	#endif
-
+	player->premiumEnd = result->getDataInt("premend");
 	player->balance = result->getDataInt("balance");
 
 	player->guildNick = result->getDataString("guildnick");
@@ -370,7 +366,7 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 		item->serializeAttr(propWriteStream);
 		const char* attributes = propWriteStream.getStream(attributesSize);
 
-		stream << player->getGUID() << ", " << pid << ", " << runningId << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
+		stream << player->getGUID() << ", " << pid << ", " << runningId << ", " << item->getID() << ", " << (int32_t)item->getSubType() << ", " << db->escapeBlob(attributes, attributesSize);
 
 		if(!query_insert.addRow(stream)){
 			return false;
@@ -400,7 +396,7 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 			item->serializeAttr(propWriteStream);
 			const char* attributes = propWriteStream.getStream(attributesSize);
 
-			stream << player->getGUID() << ", " << parentId << ", " << runningId << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
+			stream << player->getGUID() << ", " << parentId << ", " << runningId << ", " << item->getID() << ", " << (int32_t)item->getSubType() << ", " << db->escapeBlob(attributes, attributesSize);
 
 			if(!query_insert.addRow(stream))
 				return false;
@@ -427,6 +423,23 @@ bool IOPlayer::savePlayer(Player* player)
 
 	if(result->getDataInt("save") == 0){
 		db->freeResult(result);
+
+		query.str("");
+		query << "UPDATE `players` SET "
+			<< "  `lastlogin` = " << player->lastLoginSaved
+			<< ", `lastip` = " << player->lastip;
+		query << " WHERE `id` = " << player->getGUID();
+
+		DBTransaction transaction(db);
+		if(!transaction.begin())
+			return false;
+
+		if(!db->executeQuery(query.str())){
+			return false;
+		}
+
+		transaction.commit();
+
 		return true;
 	}
 	db->freeResult(result);
@@ -697,6 +710,21 @@ bool IOPlayer::getGuidByName(uint32_t &guid, std::string& name)
 	guid = result->getDataInt("id");
 
 	guidCacheMap[name] = guid;
+	db->freeResult(result);
+	return true;
+}
+
+bool IOPlayer::getAccountByName(uint32_t& account, std::string& name)
+{
+	Database* db = Database::instance();
+	DBResult* result;
+	DBQuery query;
+
+	if(!(result = db->storeQuery("SELECT `account_id` FROM `players` WHERE `name` = " + db->escapeString(name))))
+		return false;
+
+	account = result->getDataInt("account_id");
+
 	db->freeResult(result);
 	return true;
 }

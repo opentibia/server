@@ -21,7 +21,7 @@
 #ifndef __OTSERV_PLAYER_H__
 #define __OTSERV_PLAYER_H__
 
-#include "definitions.h"
+#include "otsystem.h"
 #include "creature.h"
 #include "container.h"
 #include "depot.h"
@@ -30,6 +30,7 @@
 #include "enums.h"
 #include "vocation.h"
 #include "protocolgame.h"
+#include "party.h"
 
 #include <vector>
 #include <ctime>
@@ -39,6 +40,8 @@ class House;
 class Weapon;
 class ProtocolGame;
 class Npc;
+class Party;
+class SchedulerTask;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -90,6 +93,10 @@ typedef std::map<uint32_t, int32_t> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
 typedef std::list<std::string> LearnedInstantSpellList;
+typedef std::list<Party*> PartyList;
+
+#define PLAYER_MAX_SPEED 1500
+#define PLAYER_MIN_SPEED 10
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -97,6 +104,10 @@ typedef std::list<std::string> LearnedInstantSpellList;
 class Player : public Creature, public Cylinder
 {
 public:
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t playerCount;
+#endif
+
 	Player(const std::string& name, ProtocolGame* p);
 	virtual ~Player();
 
@@ -120,7 +131,8 @@ public:
 
 	static uint64_t getExpForLevel(int32_t level)
 	{
-		return (uint64_t)std::ceil((double)((50*level/3 - 100)*level + 850/3)*level - 200);
+		level--;
+		return ((50ULL * level * level * level) - (150ULL * level * level) + (400ULL * level))/3ULL;
 	}
 
 	uint32_t getGuildId() const {return guildId;}
@@ -134,17 +146,18 @@ public:
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
-	int getPremiumDays() const {return premiumDays;}
-	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
-	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
+	int getPremiumDays() const;
+	bool isPremium() const;
 
-	bool isOnline() const {return (client != NULL);}
+	bool isOffline() const {return (getID() == 0);}
+	void disconnect() {if(client) client->disconnect();}
 	uint32_t getIP() const;
 
 	void addContainer(uint32_t cid, Container* container);
 	void closeContainer(uint32_t cid);
 	int32_t getContainerID(const Container* container) const;
 	Container* getContainer(uint32_t cid);
+	bool canOpenCorpse(uint32_t ownerId);
 
 	void addStorageValue(const uint32_t key, const int32_t value);
 	bool getStorageValue(const uint32_t key, int32_t& value) const;
@@ -169,7 +182,7 @@ public:
 	playersex_t getSex() const {return sex;}
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
-	uint32_t getExperience() const {return experience;}
+	int64_t getExperience() const {return experience;}
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
 	const Position& getLoginPosition() const {return loginPosition;}
@@ -179,6 +192,7 @@ public:
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
+	virtual bool canSeeInvisibility() const;
 	uint32_t isMuted();
 	void addMessageBuffer();
 	void removeMessageBuffer();
@@ -240,21 +254,26 @@ public:
 	Item* getTradeItem() {return tradeItem;};
 
 	//shop functions
-	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell) {
-			shopOwner = owner;
-			purchaseCallback = onBuy;
-			saleCallback = onSell;
-		};
-	Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) {
-			onBuy = purchaseCallback;
-			onSell = saleCallback;
-			return shopOwner;
-		};
-	const Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) const {
-			onBuy = purchaseCallback;
-			onSell = saleCallback;
-			return shopOwner;
-		};
+	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell)
+	{
+		shopOwner = owner;
+		purchaseCallback = onBuy;
+		saleCallback = onSell;
+	}
+
+	Npc* getShopOwner(int32_t& onBuy, int32_t& onSell)
+	{
+		onBuy = purchaseCallback;
+		onSell = saleCallback;
+		return shopOwner;
+	}
+
+	const Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) const
+	{
+		onBuy = purchaseCallback;
+		onSell = saleCallback;
+		return shopOwner;
+	}
 
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
@@ -269,7 +288,9 @@ public:
 	virtual void onFollowCreature(const Creature* creature);
 
 	//walk events
+	virtual void onWalk(Direction& dir);
 	virtual void onWalkAborted();
+	virtual void onWalkComplete();
 
 	void setChaseMode(chaseMode_t mode);
 	void setFightMode(fightMode_t mode);
@@ -291,6 +312,7 @@ public:
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
+	virtual bool hasExtraSwing() {return lastAttack > 0 && ((OTSYS_TIME() - lastAttack) >= getAttackSpeed());}
 	int32_t getShootRange() const {return shootRange;}
 
 	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;
@@ -309,12 +331,15 @@ public:
 
 	virtual int32_t getArmor() const;
 	virtual int32_t getDefense() const;
+	virtual float getAttackFactor() const;
+	virtual float getDefenseFactor() const;
 
-	void addExhaustionTicks(uint32_t ticks);
+	void addCombatExhaust(uint32_t ticks);
+	void addHealExhaust(uint32_t ticks);
 	void addInFightTicks();
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual int32_t getGainedExperience(Creature* attacker) const;
+	virtual uint64_t getGainedExperience(Creature* attacker) const;
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);
@@ -324,15 +349,28 @@ public:
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target);
-	virtual void onGainExperience(int32_t gainExperience);
+	virtual void onGainExperience(uint64_t gainExp);
+	virtual void onGainSharedExperience(uint64_t gainExp);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
 	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
+	virtual void onIdleStatus();
 	virtual void onPlacedCreature();
 	virtual void onRemovedCreature();
 	virtual void getCreatureLight(LightInfo& light) const;
+
+	void setParty(Party* _party) {party = _party;}
+	Party* getParty() const {return party;}
+	PartyShields_t getPartyShield(const Player* player) const;
+	bool isInviting(const Player* player) const;
+	bool isPartner(const Player* player) const;
+	void sendPlayerPartyIcons(Player* player);
+	bool addPartyInvitation(Party* party);
+	bool removePartyInvitation(Party* party);
+	void clearPartyInvitations();
 
 #ifdef __SKULLSYSTEM__
 	Skulls_t getSkull() const;
@@ -342,8 +380,8 @@ public:
 	void clearAttacked();
 	void addUnjustifiedDead(const Player* attacked);
 	void setSkull(Skulls_t newSkull) {skull = newSkull;}
-	void sendCreatureSkull(const Creature* creature, Skulls_t skull) const
-		{if(client) client->sendCreatureSkull(creature, skull);}
+	void sendCreatureSkull(const Creature* creature) const
+		{if(client) client->sendCreatureSkull(creature);}
 	void checkRedSkullTicks(int32_t ticks);
 #endif
 	const OutfitListType& getPlayerOutfits();
@@ -354,21 +392,23 @@ public:
 
 	//tile
 	//send methods
-	void sendAddTileItem(const Position& pos, const Item* item)
-		{if(client) client->sendAddTileItem(pos, item);}
-	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
-		{if(client) client->sendUpdateTileItem(pos, stackpos, newitem);}
-	void sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
-		{if(client) client->sendRemoveTileItem(pos, stackpos);}
-	void sendUpdateTile(const Position& pos)
-		{if(client) client->sendUpdateTile(pos);}
+	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item)
+		{if(client) client->sendAddTileItem(tile, pos, item);}
+	void sendUpdateTileItem(const Tile* tile, const Position& pos,
+		uint32_t stackpos, const Item* olditem, const Item* newitem)
+		{if(client) client->sendUpdateTileItem(tile, pos, stackpos, newitem);}
+	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item)
+		{if(client) client->sendRemoveTileItem(tile, pos, stackpos);}
+	void sendUpdateTile(const Tile* tile, const Position& pos)
+		{if(client) client->sendUpdateTile(tile, pos);}
 
 	void sendCreatureAppear(const Creature* creature, bool isLogin)
 		{if(client) client->sendAddCreature(creature, isLogin);}
 	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 		{if(client) client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);}
-	void sendCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos, uint32_t oldStackPos, bool teleport)
-		{if(client) client->sendMoveCreature(creature, newPos, oldPos, oldStackPos, teleport);}
+	void sendCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
+	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+		{if(client) client->sendMoveCreature(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);}
 
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos)
 		{if(client) client->sendCreatureTurn(creature, stackpos);}
@@ -410,16 +450,17 @@ public:
 		{if(client) client->sendRemoveInventoryItem(slot);}
 
 	//event methods
-	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos,
+	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
 		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
-	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	virtual void onUpdateTile(const Position& pos);
+	virtual void onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+		const ItemType& iType, const Item* item);
+	virtual void onUpdateTile(const Tile* tile, const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
-		uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
+		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
@@ -479,8 +520,8 @@ public:
 		{if(client) client->sendTextWindow(windowTextId, item, maxlen, canWrite);}
 	void sendTextWindow(uint32_t itemId, const std::string& text) const
 		{if(client) client->sendTextWindow(windowTextId, itemId, text);}
-	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId) const
-		{if(client) client->sendToChannel(creature, type, text, channelId);}
+	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time = 0) const
+		{if(client) client->sendToChannel(creature, type, text, channelId, time);}
 	// new: shop window
 	void sendShop(const std::list<ShopInfo>& shop) const
 	    {if(client) client->sendShop(shop);}
@@ -504,6 +545,18 @@ public:
 		{if(client) client->sendCloseContainer(cid);}
 	void sendChannel(uint16_t channelId, const std::string& channelName)
 		{if(client) client->sendChannel(channelId, channelName);}
+	void sendRuleViolationsChannel(uint16_t channelId)
+		{if(client) client->sendRuleViolationsChannel(channelId);}
+	void sendRemoveReport(const std::string& name)
+		{if(client) client->sendRemoveReport(name);}
+	void sendLockRuleViolation()
+		{if(client) client->sendLockRuleViolation();}
+	void sendRuleViolationCancel(const std::string& name)
+		{if(client) client->sendRuleViolationCancel(name);}
+	void sendQuestLog()
+		{if(client) client->sendQuestLog();}
+	void sendQuestLine(const Quest* quest)
+		{if(client) client->sendQuestLine(quest);}
 
 	void sendTutorial(uint8_t tutorialId)
 		{if(client) client->sendTutorial(tutorialId);}
@@ -518,19 +571,19 @@ public:
 	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
 	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
-	void setLastAction(uint64_t time) {lastAction = time;}
-
 	Item* getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen);
 	void setWriteItem(Item* item, uint16_t _maxWriteLen = 0);
 
 	House* getEditHouse(uint32_t& _windowTextId, uint32_t& _listId);
 	void setEditHouse(House* house, uint32_t listId = 0);
 
-	int64_t getLastAction() const {return lastAction;}
+	void setNextAction(int64_t time) {if(time > nextAction) {nextAction = time;}}
+	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
+	uint32_t getNextActionTime() const;
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
-
+	void stopWalk();
 	void closeShopWindow();
 
 	VIPListSet VIPList;
@@ -549,9 +602,14 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	std::string getSkillName(int skillid);
-	void addExperience(uint32_t exp);
+	void gainExperience(uint64_t exp);
+	void addExperience(uint64_t exp);
 
 	void updateInventoryWeigth();
+
+	void setNextWalkActionTask(SchedulerTask* task);
+	void setNextWalkTask(SchedulerTask* task);
+	void setNextActionTask(SchedulerTask* task);
 
 	void die();
 	virtual void dropCorpse();
@@ -591,7 +649,7 @@ protected:
 	uint32_t magLevel;
 	uint32_t magLevelPercent;
 	int32_t accessLevel;
-	uint32_t experience;
+	uint64_t experience;
 	uint32_t damageImmunities;
 	uint32_t conditionImmunities;
 	uint32_t conditionSuppressions;
@@ -602,24 +660,28 @@ protected:
 	playersex_t sex;
 	int32_t soul, soulMax;
 	uint64_t groupFlags;
-	int32_t premiumDays;
+	int32_t premiumEnd;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
-	bool skillLoss;
+	uint32_t actionTaskEvent;
+	uint32_t nextStepEvent;
+	uint32_t walkTaskEvent;
+	SchedulerTask* walkTask;
 
 	double inventoryWeight;
 	double capacity;
 
 	uint32_t internal_ping;
 	uint32_t npings;
-	int64_t lastAction;
+	int64_t nextAction;
 
 	bool pzLocked;
+	bool isConnecting;
 	int32_t bloodHitCount;
 	int32_t shieldBlockCount;
 	BlockType_t lastAttackBlockType;
 	bool addAttackSkillPoint;
-	uint32_t attackTicks;
+	uint64_t lastAttack;
 	int32_t shootRange;
 
 	chaseMode_t chaseMode;
@@ -663,6 +725,10 @@ protected:
 	int32_t saleCallback;
 
 
+	//party variables
+	Party* party;
+	PartyList invitePartyList;
+
 	std::string name;
 	std::string nameDescription;
 	uint32_t guid;
@@ -696,7 +762,19 @@ protected:
 #endif
 
 	void updateItemsLight(bool internal = false);
-	void updateBaseSpeed(){
+	virtual int32_t getStepSpeed() const
+	{
+		if(getSpeed() > PLAYER_MAX_SPEED){
+			return PLAYER_MAX_SPEED;
+		}
+		else if(getSpeed() < PLAYER_MIN_SPEED){
+			return PLAYER_MIN_SPEED;
+		}
+
+		return getSpeed();
+	}
+	void updateBaseSpeed()
+	{
 		if(!hasFlag(PlayerFlag_SetMaxSpeed)){
 			baseSpeed = 220 + (2* (level - 1));
 		}
@@ -705,16 +783,21 @@ protected:
 		};
 	}
 
-	static uint32_t getPercentLevel(uint32_t count, uint32_t nextLevelCount);
-	virtual int32_t getLostExperience() const { return (skillLoss ? (int32_t)std::ceil(experience * ((double)lossPercent[LOSS_EXPERIENCE]/100)) : 0);}
+	static uint32_t getPercentLevel(uint64_t count, uint32_t nextLevelCount);
+	virtual uint64_t getLostExperience() const {
+		return (skillLoss ? (experience * lossPercent[LOSS_EXPERIENCE]/100) : 0);
+	}
+
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
 	virtual uint32_t getConditionSuppressions() const { return conditionSuppressions; }
 	virtual uint16_t getLookCorpse() const;
-	virtual uint32_t getAttackSpeed();
+	virtual uint32_t getAttackSpeed() const;
+	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;
+	friend class Npc;
 	friend class LuaScriptInterface;
 	friend class Commands;
 	friend class Map;

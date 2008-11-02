@@ -21,7 +21,6 @@
 #ifndef __THING_H__
 #define __THING_H__
 
-#include "definitions.h"
 #include "position.h"
 
 /*Notice: remember to add new error codes to global.lua*/
@@ -81,7 +80,11 @@ enum ReturnValue{
 	RET_PLAYERISPZLOCKEDLEAVEPVPZONE = 53,
 	RET_PLAYERISPZLOCKEDENTERPVPZONE = 54,
 	RET_ACTIONNOTPERMITTEDINANOPVPZONE = 55,
-	RET_YOUCANNOTLOGOUTHERE = 56
+	RET_YOUCANNOTLOGOUTHERE = 56,
+	RET_YOUNEEDAMAGICITEMTOCASTSPELL = 57,
+	RET_CANNOTCONJUREITEMHERE = 58,
+	RET_YOUNEEDTOSPLITYOURSPEARS = 59,
+	RET_NAMEISTOOAMBIGIOUS = 60
 };
 
 class Tile;
@@ -113,10 +116,10 @@ public:
 	Cylinder* getTopParent(); //returns Tile/Container or a Player
 	const Cylinder* getTopParent() const;
 
-	Tile* getTile();
-	const Tile* getTile() const;
+	virtual Tile* getTile();
+	virtual const Tile* getTile() const;
 
-	const Position& getPosition() const;
+	virtual const Position& getPosition() const;
 	virtual int getThrowRange() const = 0;
 	virtual bool isPushable() const = 0;
 

@@ -53,11 +53,11 @@ public:
 	*/
 	bool loadSpawns(Map* map)
 	{
-		if(!map->spawnfile.empty()){
-			if(!Spawns::getInstance()->loadFromXml(map->spawnfile)) return false;
-			Spawns::getInstance()->startup();
+		if(map->spawnfile.empty()){
+			return true;
 		}
-		return true;
+		
+		return Spawns::getInstance()->loadFromXml(map->spawnfile);
 	}
 
 	/** Load the houses (not house tile-data)
@@ -71,6 +71,19 @@ public:
 		}
 		return true;
 	}
+
+	const std::string& getLastErrorString() const
+	{
+		return errorString;
+	}
+
+	void setLastErrorString(const std::string& _errorString)
+	{
+		errorString = _errorString;
+	}
+
+protected:
+	std::string errorString;
 };
 
 #endif

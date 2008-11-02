@@ -61,6 +61,29 @@ bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 	return false;
 }
 
+bool Tile::hasProperty(Item* exclude, enum ITEMPROPERTY prop) const
+{
+	assert(exclude);
+	if(ground && exclude != ground && ground->hasProperty(prop)){
+		return true;
+	}
+
+	ItemVector::const_iterator iit;
+	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+		Item* item = *iit;
+		if(item != exclude && item->hasProperty(prop))
+			return true;
+	}
+
+	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+		Item* item = *iit;
+		if(item != exclude && item->hasProperty(prop))
+			return true;
+	}
+
+	return false;
+}
+
 bool Tile::hasHeight(uint32_t n) const
 {
 	uint32_t height = 0;
@@ -113,6 +136,10 @@ Teleport* Tile::getTeleportItem() const
 
 MagicField* Tile::getFieldItem() const
 {
+	if(!hasFlag(TILESTATE_MAGICFIELD)){
+		return NULL;
+	}
+
 	MagicField* field = NULL;
 	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
 		field = (*iit)->getMagicField();
@@ -148,6 +175,20 @@ Mailbox* Tile::getMailbox() const
 
 	return NULL;
 }
+//[ added for beds system
+BedItem* Tile::getBedItem() const
+{
+	BedItem* bed = NULL;
+	Item* iiItem = NULL;
+	for(uint32_t i = 0; i < getThingCount(); ++i){
+		iiItem = __getThing(i)->getItem();
+		if(iiItem && (bed = iiItem->getBed()))
+			return bed;
+	}
+
+	return NULL;
+}
+//]
 
 Creature* Tile::getTopCreature()
 {
@@ -199,68 +240,73 @@ Thing* Tile::getTopThing()
 
 void Tile::onAddTileItem(Item* item)
 {
+	updateTileFlags(item, false);
+
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendAddTileItem(cylinderMapPos, item);
+			tmpPlayer->sendAddTileItem(this, cylinderMapPos, item);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onAddTileItem(cylinderMapPos, item);
+		(*it)->onAddTileItem(this, cylinderMapPos, item);
 	}
 }
 
 void Tile::onUpdateTileItem(uint32_t index, Item* oldItem,
 		const ItemType& oldType, Item* newItem, const ItemType& newType)
 {
+	updateTileFlags(oldItem, true);
+	updateTileFlags(newItem, false);
+
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
+			tmpPlayer->sendUpdateTileItem(this, cylinderMapPos, index, oldItem, newItem);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, oldType, newItem, newType);
+		(*it)->onUpdateTileItem(this, cylinderMapPos, index, oldItem, oldType, newItem, newType);
 	}
 }
 
 void Tile::onRemoveTileItem(uint32_t index, Item* item)
 {
-	const Position& cylinderMapPos = getPosition();
+	updateTileFlags(item, true);
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const Position& cylinderMapPos = getPosition();
+	const ItemType& iType = Item::items[item->getID()];
+
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendRemoveTileItem(cylinderMapPos, index, item);
+			tmpPlayer->sendRemoveTileItem(this, cylinderMapPos, index, item);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onRemoveTileItem(cylinderMapPos, index, item);
+		(*it)->onRemoveTileItem(this, cylinderMapPos, index, iType, item);
 	}
 }
 
@@ -268,37 +314,43 @@ void Tile::onUpdateTile()
 {
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendUpdateTile(cylinderMapPos);
+			tmpPlayer->sendUpdateTile(this, cylinderMapPos);
 		}
 	}
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onUpdateTile(cylinderMapPos);
+		(*it)->onUpdateTile(this, cylinderMapPos);
 	}
 }
 
 void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
 {
+	Tile* toTile = toCylinder->getTile();
 	int32_t oldStackPos = __getIndexOfThing(creature);
 
 	//remove the creature
 	__removeThing(creature, 0);
 
+	// Switch the node ownership
+	if(qt_node != toTile->qt_node) {
+		qt_node->removeCreature(creature);
+		toTile->qt_node->addCreature(creature);
+	}
+	
 	//add the creature
-	toCylinder->__addThing(creature);
-	int32_t newStackPos = toCylinder->__getIndexOfThing(creature);
+	toTile->__addThing(creature);
+	int32_t newStackPos = toTile->__getIndexOfThing(creature);
 
 	Position fromPos = getPosition();
-	Position toPos = toCylinder->getPosition();
+	Position toPos = toTile->getPosition();
 
 	if(!teleport){
 		if(fromPos.y > toPos.y)
@@ -313,24 +365,24 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(list, fromPos, true);
-	g_game.getSpectators(list, toPos, true);
+	g_game.getSpectators(list, fromPos, false, true);
+	g_game.getSpectators(list, toPos, true, true);
 
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
+			tmpPlayer->sendCreatureMove(creature, toTile, toPos, this, fromPos, oldStackPos, teleport);
 		}
 	}
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
-		(*it)->onCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
+		(*it)->onCreatureMove(creature, toTile, toPos, this, fromPos, oldStackPos, teleport);
 	}
 
 	postRemoveNotification(creature, oldStackPos, true);
-	toCylinder->postAddNotification(creature, newStackPos);
+	toTile->postAddNotification(creature, newStackPos);
 }
 
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -360,13 +412,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(monster->canPushCreatures()){
+			if(monster->canPushCreatures() && !monster->isSummon()){
 				Creature* creature;
 				for(uint32_t i = 0; i < creatures.size(); ++i){
 					creature = creatures[i];
 					if( !creature->getMonster() ||
 						!creature->isPushable() ||
-						(creature->getMonster()->hasMaster() && creature->getMonster()->getMaster()->getPlayer()))
+						(creature->getMonster()->isSummon() && creature->getMonster()->getMaster()->getPlayer()))
 					{
 						return RET_NOTPOSSIBLE;
 					}
@@ -376,18 +428,36 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 
-			for(uint32_t i = 0; i < getThingCount(); ++i){
-				iithing = __getThing(i);
-				if(const Item* iitem = iithing->getItem()){
-					const ItemType& iiType = Item::items[iitem->getID()];
-					if(iiType.isMagicField() && !iiType.blockSolid){
-						const MagicField* field = iitem->getMagicField();
-						if(!monster->isImmune(field->getCombatType())){
-							return RET_NOTPOSSIBLE;
+			if(hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)){
+				return RET_NOTPOSSIBLE;
+			}
+
+			if(hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH)){
+				return RET_NOTPOSSIBLE;
+			}
+
+			if(hasFlag(TILESTATE_BLOCKSOLID) || (hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILESTATE_NOFIELDBLOCKPATH))){
+				if(!(monster->canPushItems() || hasBitSet(FLAG_IGNOREBLOCKITEM, flags) ) ){
+					return RET_NOTPOSSIBLE;
+				}
+			}
+
+			if(hasFlag(TILESTATE_MAGICFIELD)){
+				MagicField* field = getFieldItem();
+				if(!field->isBlocking()){
+					CombatType_t combatType = field->getCombatType();
+					//There is 3 options for a monster to enter a magic field
+					//1) Monster is immune
+					if(!monster->isImmune(combatType)){
+						//1) Monster is "strong" enough to handle the damage
+						//2) Monster is already afflicated by this type of condition
+						if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
+							if( !(monster->canPushItems() ||
+								monster->hasCondition(Combat::DamageToConditionType(combatType))) ){
+								return RET_NOTPOSSIBLE;
+							}
 						}
-					}
-					else if(iiType.blockSolid || (hasBitSet(FLAG_PATHFINDING, flags) && iiType.blockPathFind) ){
-						if(!monster->canPushItems() || !iiType.moveable || (iitem->getUniqueId() != 0)){
+						else{
 							return RET_NOTPOSSIBLE;
 						}
 					}
@@ -467,28 +537,30 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 
 		bool hasHangable = false;
-		bool supportsHangableItems = false;
+		bool supportHangable = false;
 		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
-				//It's not possible with 2 hangables in the same tile
-				if(iiType.isHangable && itemIsHangable){
+				if(iiType.isHangable){
 					hasHangable = true;
 				}
 
-				if(iiType.blockSolid){
-					if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
-						supportsHangableItems = true;
-					}
-					else if(item->isPickupable()){
-						//TODO: query script interface
+				if(iiType.isHorizontal || iiType.isVertical){
+					supportHangable = true;
+				}
+				
+				if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
+					//
+				}
+				else if(iiType.blockSolid){
+					if(item->isPickupable()){
 						if(iitem->getTrashHolder()){
 							continue;
 						}
 
-						if(!iiType.hasHeight || iiType.pickupable){
+						if(!iiType.hasHeight || iiType.pickupable || iiType.isBed()){
 							return RET_NOTENOUGHROOM;
 						}
 					}
@@ -499,14 +571,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		if(itemIsHangable && supportsHangableItems){
-			if((flags & FLAG_FROMFARPOSITION) == FLAG_FROMFARPOSITION){
-				return RET_TOOFARAWAY;
-			}
-			if(hasHangable){
-				return RET_NOTENOUGHROOM;
-			}
+		if(itemIsHangable && hasHangable && supportHangable){
+			return RET_NEEDEXCHANGE;
 		}
+
 	}
 
 	return RET_NOERROR;
@@ -550,62 +618,37 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 	*destItem = NULL;
 
 	if(floorChangeDown()){
-		Tile* downTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
+		int dx = getTilePosition().x;
+		int dy = getTilePosition().y;
+		int dz = getTilePosition().z + 1;
+		Tile* downTile = g_game.getTile(dx, dy, dz);
 
 		if(downTile){
-			if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(NORTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(SOUTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z + 1);
-			}
-			else if(downTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
-			}
-			else
-				destTile = downTile;
+			if(downTile->floorChange(NORTH))
+				dy += 1;
+			if(downTile->floorChange(SOUTH))
+				dy -= 1;
+			if(downTile->floorChange(EAST))
+				dx -= 1;
+			if(downTile->floorChange(WEST))
+				dx += 1;
+			destTile = g_game.getTile(dx, dy, dz);
 		}
 	}
 	else if(floorChange()){
-		if(floorChange(NORTH) && floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(NORTH) && floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH) && floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH) && floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(NORTH)){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(SOUTH)){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z - 1);
-		}
-		else if(floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z - 1);
-		}
-		else if(floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z - 1);
-		}
+		int dx = getTilePosition().x;
+		int dy = getTilePosition().y;
+		int dz = getTilePosition().z - 1;
+
+		if(floorChange(NORTH))
+			dy -= 1;
+		if(floorChange(SOUTH))
+			dy += 1;
+		if(floorChange(EAST))
+			dx += 1;
+		if(floorChange(WEST))
+			dx -= 1;
+		destTile = g_game.getTile(dx, dy, dz);
 	}
 
 
@@ -661,11 +704,12 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				int32_t index = __getIndexOfThing(ground);
 				const ItemType& oldType = Item::items[ground->getID()];
 				const ItemType& newType = Item::items[item->getID()];
-				onUpdateTileItem(index, ground, oldType, item, newType);
 
+				Item* oldGround = ground;
 				ground->setParent(NULL);
 				g_game.FreeThing(ground);
 				ground = item;
+				onUpdateTileItem(index, oldGround, oldType, item, newType);
 			}
 		}
 		else if(item->isAlwaysOnTop()){
@@ -757,7 +801,7 @@ void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	const ItemType& newType = Item::items[itemId];
 
 	item->setID(itemId);
-	item->setItemCountOrSubtype(count);
+	item->setSubType(count);
 	onUpdateTileItem(index, item, oldType, item, newType);
 }
 
@@ -877,12 +921,11 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		}
 
 		if(item == ground){
-
-			onRemoveTileItem(index, item);
-
 			ground->setParent(NULL);
 			ground = NULL;
 			--thingCount;
+			onRemoveTileItem(index, item);
+
 			return /*RET_NOERROR*/;
 		}
 
@@ -890,12 +933,10 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		if(item->isAlwaysOnTop()){
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 				if(*iit == item){
-
-					onRemoveTileItem(index, item);
-
 					(*iit)->setParent(NULL);
 					topItems.erase(iit);
 					--thingCount;
+					onRemoveTileItem(index, item);
 					return /*RET_NOERROR*/;
 				}
 			}
@@ -911,11 +952,10 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 						onUpdateTileItem(index, item, it, item, it);
 					}
 					else{
-						onRemoveTileItem(index, item);
-
 						(*iit)->setParent(NULL);
 						downItems.erase(iit);
 						--thingCount;
+						onRemoveTileItem(index, item);
 					}
 
 					return /*RET_NOERROR*/;
@@ -989,7 +1029,7 @@ uint32_t Tile::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, boo
 				}
 				else{
 					if(item->isRune()){
-						count+= item->getItemCharge();
+						count+= item->getCharges();
 					}
 					else{
 						count+= item->getItemCount();
@@ -1032,9 +1072,8 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 {
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -1045,6 +1084,8 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 
 	//add a reference to this item, it may be deleted after being added (mailbox for example)
 	thing->useThing2();
+
+	bool removal = false;
 
 	if(link == LINK_OWNER){
 		//calling movement scripts
@@ -1064,14 +1105,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 		}
 		else if(TrashHolder* trashHolder = getTrashHolder()){
 			trashHolder->__addThing(thing);
-			if(thing != trashHolder){
-				Item* item = thing->getItem();
-				if(item){
-					updateTileFlags(item, true);
-				}
-				g_game.FreeThing(thing);
-				return;
-			}
+			removal = thing != trashHolder;
 		}
 		else if(Mailbox* mailbox = getMailbox()){
 			mailbox->__addThing(thing);
@@ -1081,7 +1115,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	//update floor change flags
 	Item* item = thing->getItem();
 	if(item){
-		updateTileFlags(item, false);
+		updateTileFlags(item, removal);
 	}
 
 	//release the reference to this item onces we are finished
@@ -1092,9 +1126,8 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 {
 	const Position& cylinderMapPos = getPosition();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(list, cylinderMapPos, true);
+	const SpectatorVec& list = g_game.getSpectators(cylinderMapPos);
+	SpectatorVec::const_iterator it;
 
 	if(/*isCompleteRemoval &&*/ getThingCount() > 8){
 		onUpdateTile();
@@ -1171,7 +1204,12 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 			}
 		}
 		else{
-			downItems.insert(downItems.begin(), item);
+			if(!downItems.empty()){
+				downItems.insert(downItems.begin(), item);
+			}
+			else{
+				downItems.push_back(item);
+			}
 			++thingCount;
 		}
 
@@ -1205,9 +1243,29 @@ void Tile::updateTileFlags(Item* item, bool removing)
 				setFlag(TILESTATE_FLOORCHANGE);
 				setFlag(TILESTATE_FLOORCHANGE_WEST);
 			}
-			if(item->getTeleport()){
-				setFlag(TILESTATE_POSITIONCHANGE);
-			}
+		}
+
+		if(item->getTeleport()){
+			setFlag(TILESTATE_POSITIONCHANGE);
+		}
+		if(item->getMagicField()){
+			setFlag(TILESTATE_MAGICFIELD);
+		}
+
+		if(item->hasProperty(BLOCKSOLID)){
+			setFlag(TILESTATE_BLOCKSOLID);
+		}
+		if(item->hasProperty(IMMOVABLEBLOCKSOLID)){
+			setFlag(TILESTATE_IMMOVABLEBLOCKSOLID);
+		}
+		if(item->hasProperty(BLOCKPATH)){
+			setFlag(TILESTATE_BLOCKPATH);
+		}
+		if(item->hasProperty(NOFIELDBLOCKPATH)){
+			setFlag(TILESTATE_NOFIELDBLOCKPATH);
+		}
+		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH)){
+			setFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
 		}
 	}
 	else{
@@ -1233,6 +1291,31 @@ void Tile::updateTileFlags(Item* item, bool removing)
 		}
 		if(item->getTeleport()){
 			resetFlag(TILESTATE_POSITIONCHANGE);
+		}
+		if(item->getMagicField()){
+			// If transformItem is called on a field, this might not be true
+			//if(getFieldItem() == item) {
+				resetFlag(TILESTATE_MAGICFIELD);
+			//}
+		}
+
+		if(item->hasProperty(BLOCKSOLID) && !hasProperty(item, BLOCKSOLID)){
+			resetFlag(TILESTATE_BLOCKSOLID);
+		}
+		if(item->hasProperty(IMMOVABLEBLOCKSOLID) && !hasProperty(item, IMMOVABLEBLOCKSOLID)){
+			resetFlag(TILESTATE_IMMOVABLEBLOCKSOLID);
+		}
+		if(item->hasProperty(BLOCKPATH) && !hasProperty(item, BLOCKPATH)){
+			resetFlag(TILESTATE_BLOCKPATH);
+		}
+		if(item->hasProperty(NOFIELDBLOCKPATH) && !hasProperty(item, NOFIELDBLOCKPATH)){
+			resetFlag(TILESTATE_NOFIELDBLOCKPATH);
+		}
+		if(item->hasProperty(IMMOVABLEBLOCKPATH) && !hasProperty(item, IMMOVABLEBLOCKPATH)){
+			resetFlag(TILESTATE_IMMOVABLEBLOCKPATH);
+		}
+		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH) && !hasProperty(item, IMMOVABLENOFIELDBLOCKPATH)){
+			resetFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
 		}
 	}
 }

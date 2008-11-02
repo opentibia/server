@@ -22,10 +22,10 @@
 #define __OTSERV_COMBAT_H__
 
 #include "thing.h"
-#include "definitions.h"
-#include "enums.h"
+#include "condition.h"
 #include "map.h"
 #include "baseevents.h"
+#include "otsystem.h"
 
 #include <vector>
 
@@ -305,7 +305,7 @@ public:
 		area = _area;
 	}
 	bool hasArea() const {return area != NULL;}
-	void setCondition(const Condition* _condition) {params.condition = _condition->clone();}
+	void setCondition(const Condition* _condition) {params.condition = _condition;}
 	void setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb);
 	void postCombatEffects(Creature* caster, const Position& pos) const {Combat::postCombatEffects(caster, pos, params);}
 
@@ -321,7 +321,7 @@ protected:
 	static bool CombatDispelFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 
-	static void combatTileEffects(SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params);
+	static void combatTileEffects(const SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params);
 	bool getMinMaxValues(Creature* creature, Creature* target, int32_t& min, int32_t& max) const;
 
 	//configureable

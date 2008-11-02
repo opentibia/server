@@ -49,7 +49,7 @@ public:
 	static int32_t weaponInFightTime;
 
 	static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue);
-	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue);
+	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue, float attackFactor);
 
 protected:
 	virtual void clear();
@@ -73,8 +73,8 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 	virtual bool configureWeapon(const ItemType& it);
+	virtual bool interuptSwing() const {return false;}
 
-	virtual bool checkLastAction(Player* player, int32_t interval) const {return true;}
 	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 
@@ -84,9 +84,11 @@ public:
 
 	static bool useFist(Player* player, Creature* target);
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const = 0;
+	virtual int32_t getElementDamage(const Player* player, const Creature* target) const {return 0;}
 
 	const uint32_t getReqLevel() const {return level;}
 	const uint32_t getReqMagLv() const {return magLevel;}
+	const bool hasExhaustion() const {return exhaustion;}
 	const bool isWieldedUnproperly() const {return wieldUnproperly;}
 	const bool isPremium() const {return premium;}
 
@@ -130,12 +132,18 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
+
+	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
+	virtual int32_t getElementDamage(const Player* player, const Item* item) const;
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual void onUsedAmmo(Player* player, Item* item, Tile* destTile) const;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
+
+	CombatType_t elementType;
+	int16_t elementDamage;
 };
 
 class WeaponDistance : public Weapon
@@ -146,8 +154,9 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
+	// Distance weapons don't interrupt swings either.
+	//virtual bool interuptSwing() const {return true;}
 
-	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
 	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
@@ -171,7 +180,6 @@ public:
 
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
-	virtual bool checkLastAction(Player* player, int32_t interval) const {return (player->getLastAction() + interval < OTSYS_TIME());}
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 
 protected:

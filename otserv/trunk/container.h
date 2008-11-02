@@ -34,6 +34,7 @@ class Container : public Item, public Cylinder
 public:
 	Container(uint16_t _type);
 	virtual ~Container();
+	virtual Item* clone() const;
 
 	virtual Container* getContainer() {return this;};
 	virtual const Container* getContainer() const {return this;};
@@ -52,6 +53,7 @@ public:
 	ItemList::const_iterator getItems() const {return itemlist.begin();}
 	ItemList::const_iterator getEnd() const {return itemlist.end();}
 
+	void addItem(Item* item);
 	Item* getItem(uint32_t index);
 	bool isHoldingItem(const Item* item) const;
 
@@ -94,8 +96,13 @@ private:
 		Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(uint32_t index, Item* item);
 
+	Container* getParentContainer();
+	void updateItemWeight(double diff);
+
+
 protected:
 	uint32_t maxSize;
+	double total_weight;
 	ItemList itemlist;
 };
 

@@ -83,6 +83,7 @@ void MonsterType::reset()
 	manaCost = 0;
 	summonList.clear();
 	lootItems.clear();
+	elementMap.clear();
 
 	for(SpellList::iterator it = spellAttackList.begin(); it != spellAttackList.end(); ++it){
 		if(it->combatSpell){
@@ -108,9 +109,6 @@ void MonsterType::reset()
 
 	changeTargetSpeed = 0;
 	changeTargetChance = 0;
-
-	attackStrength = 100;
-	defenseStrength = 0;
 
 	scriptList.clear();
 }
@@ -167,7 +165,7 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 
 	if(tmpItem){
 		if(lootBlock.subType != -1){
-			tmpItem->setItemCountOrSubtype(lootBlock.subType);
+			tmpItem->setSubType(lootBlock.subType);
 		}
 
 		if(lootBlock.actionId != -1){
@@ -286,6 +284,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	sb.minCombatValue = 0;
 	sb.maxCombatValue = 0;
 	sb.combatSpell = false;
+	sb.isMelee = false;
 
 	std::string name = "";
 	std::string scriptName = "";
@@ -405,9 +404,10 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			combat->setArea(area);
 		}
 
-		if(name == "melee"){
+		if(asLowerCaseString(name) == "melee"){
 			int attack = 0;
 			int skill = 0;
+			sb.isMelee = true;
 			if(readXMLInteger(node, "attack", attack)){
 				if(readXMLInteger(node, "skill", skill)){
 					sb.minCombatValue = 0;
@@ -485,42 +485,42 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			combat->setParam(COMBATPARAM_BLOCKEDBYARMOR, 1);
 			combat->setParam(COMBATPARAM_BLOCKEDBYSHIELD, 1);
 		}
-		else if(name == "physical"){
+		else if(asLowerCaseString(name) == "physical"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_PHYSICALDAMAGE);
 			combat->setParam(COMBATPARAM_BLOCKEDBYARMOR, 1);
 		}
-		else if(name == "poison" || name == "earth"){
+		else if(asLowerCaseString(name) == "poison" || asLowerCaseString(name) == "earth"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_EARTHDAMAGE);
 		}
-		else if(name == "fire"){
+		else if(asLowerCaseString(name) == "fire"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_FIREDAMAGE);
 		}
-		else if(name == "energy"){
+		else if(asLowerCaseString(name) == "energy"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_ENERGYDAMAGE);
 		}
-		else if(name == "drown"){
+		else if(asLowerCaseString(name) == "drown"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DROWNDAMAGE);
 		}
-		else if(name == "ice"){
+		else if(asLowerCaseString(name) == "ice"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_ICEDAMAGE);
 		}
-		else if(name == "holy"){
+		else if(asLowerCaseString(name) == "holy"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_HOLYDAMAGE);
 		}
-		else if(name == "death"){
+		else if(asLowerCaseString(name) == "death"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DEATHDAMAGE);
 		}
-		else if(name == "lifedrain"){
+		else if(asLowerCaseString(name) == "lifedrain"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_LIFEDRAIN);
 		}
-		else if(name == "manadrain"){
+		else if(asLowerCaseString(name) == "manadrain"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_MANADRAIN);
 		}
-		else if(name == "healing"){
+		else if(asLowerCaseString(name) == "healing"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_HEALING);
 			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
 		}
-		else if(name == "speed"){
+		else if(asLowerCaseString(name) == "speed"){
 			int32_t speedChange = 0;
 			int32_t duration = 10000;
 
@@ -550,7 +550,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			condition->setFormulaVars(speedChange / 1000.0, 0, speedChange / 1000.0, 0);
 			combat->setCondition(condition);
 		}
-		else if(name == "outfit"){
+		else if(asLowerCaseString(name) == "outfit"){
 			int32_t duration = 10000;
 
 			if(readXMLInteger(node, "duration", intValue)){
@@ -576,7 +576,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 				combat->setCondition(condition);
 			}
 		}
-		else if(name == "invisible"){
+		else if(asLowerCaseString(name) == "invisible"){
 			int32_t duration = 10000;
 
 			if(readXMLInteger(node, "duration", intValue)){
@@ -587,7 +587,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
 			combat->setCondition(condition);
 		}
-		else if(name == "drunk"){
+		else if(asLowerCaseString(name) == "drunk"){
 			int32_t duration = 10000;
 
 			if(readXMLInteger(node, "duration", intValue)){
@@ -597,19 +597,19 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, 0);
 			combat->setCondition(condition);
 		}
-		else if(name == "firefield"){
+		else if(asLowerCaseString(name) == "firefield"){
 			combat->setParam(COMBATPARAM_CREATEITEM, 1492);
 		}
-		else if(name == "poisonfield"){
+		else if(asLowerCaseString(name) == "poisonfield"){
 			combat->setParam(COMBATPARAM_CREATEITEM, 1496);
 		}
-		else if(name == "energyfield"){
+		else if(asLowerCaseString(name) == "energyfield"){
 			combat->setParam(COMBATPARAM_CREATEITEM, 1495);
 		}
-		else if(name == "firecondition" ||
-				name == "poisoncondition" ||
-				name == "energycondition" ||
-				name == "drowncondition"){
+		else if(asLowerCaseString(name) == "firecondition" ||
+				asLowerCaseString(name) == "poisoncondition" ||
+				asLowerCaseString(name) == "energycondition" ||
+				asLowerCaseString(name) == "drowncondition"){
 			ConditionType_t conditionType = CONDITION_NONE;
 			uint32_t tickInterval = 2000;
 
@@ -649,7 +649,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
 			combat->setCondition(condition);
 		}
-		else if(name == "strength") {
+		else if(asLowerCaseString(name) == "strength"){
 			//
 		}
 		else{
@@ -666,7 +666,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 		while(attributeNode){
 			if(xmlStrcmp(attributeNode->name, (const xmlChar*)"attribute") == 0){
 				if(readXMLString(attributeNode, "key", strValue)){
-					if(strcasecmp(strValue.c_str(), "shootEffect") == 0){
+					if(asLowerCaseString(strValue) == "shooteffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
 							ShootType_t shoot = getShootType(strValue);
 							if(shoot != NM_SHOOT_UNK){
@@ -677,7 +677,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 							}
 						}
 					}
-					else if(strcasecmp(strValue.c_str(), "areaEffect") == 0){
+					else if(asLowerCaseString(strValue) == "areaeffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
 							MagicEffectClasses effect = getMagicEffect(strValue);
 							if(effect != NM_ME_UNK){
@@ -753,16 +753,16 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 		}
 
 		if(readXMLString(root, "race", strValue)){
-			if((strcasecmp(strValue.c_str(), "venom") == 0) || (atoi(strValue.c_str()) == 1)){
+			if((asLowerCaseString(strValue) == "venom") || (atoi(strValue.c_str()) == 1)){
 				mType->race = RACE_VENOM;
 			}
-			else if((strcasecmp(strValue.c_str(), "blood") == 0) || (atoi(strValue.c_str()) == 2)){
+			else if((asLowerCaseString(strValue) == "blood") || (atoi(strValue.c_str()) == 2)){
 				mType->race = RACE_BLOOD;
 			}
-			else if((strcasecmp(strValue.c_str(), "undead") == 0) || (atoi(strValue.c_str()) == 3)){
+			else if((asLowerCaseString(strValue) == "undead") || (atoi(strValue.c_str()) == 3)){
 				mType->race = RACE_UNDEAD;
 			}
-			else if((strcasecmp(strValue.c_str(), "fire") == 0) || (atoi(strValue.c_str()) == 4)){
+			else if((asLowerCaseString(strValue) == "fire") || (atoi(strValue.c_str()) == 4)){
 				mType->race = RACE_FIRE;
 			}
 			else{
@@ -904,11 +904,11 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 			else if(xmlStrcmp(p->name, (const xmlChar*)"strategy") == 0){
 
 				if(readXMLInteger(p, "attack", intValue)){
-					mType->attackStrength = intValue;
+					//mType->attackStrength = intValue;
 				}
 
 				if(readXMLInteger(p, "defense", intValue)){
-					mType->defenseStrength = intValue;
+					//mType->defenseStrength = intValue;
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
@@ -996,53 +996,53 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 
 						if(readXMLString(tmpNode, "name", strValue)){
 
-							if(strcasecmp(strValue.c_str(), "physical") == 0){
+							if(asLowerCaseString(strValue) == "physical"){
 								mType->damageImmunities |= COMBAT_PHYSICALDAMAGE;
 								//mType->conditionImmunities |= CONDITION_PHYSICAL;
 							}
-							else if(strcasecmp(strValue.c_str(), "energy") == 0){
+							else if(asLowerCaseString(strValue) == "energy"){
 								mType->damageImmunities |= COMBAT_ENERGYDAMAGE;
 								mType->conditionImmunities |= CONDITION_ENERGY;
 							}
-							else if(strcasecmp(strValue.c_str(), "fire") == 0){
+							else if(asLowerCaseString(strValue) == "fire"){
 								mType->damageImmunities |= COMBAT_FIREDAMAGE;
 								mType->conditionImmunities |= CONDITION_FIRE;
 							}
-							else if(strcasecmp(strValue.c_str(), "poison") == 0 ||
-									strcasecmp(strValue.c_str(), "earth") == 0){
+							else if(asLowerCaseString(strValue) == "poison" ||
+									asLowerCaseString(strValue) == "earth"){
 								mType->damageImmunities |= COMBAT_EARTHDAMAGE;
 								mType->conditionImmunities |= CONDITION_POISON;
 							}
-							else if(strcasecmp(strValue.c_str(), "drown") == 0){
+							else if(asLowerCaseString(strValue) == "drown"){
 								mType->damageImmunities |= COMBAT_DROWNDAMAGE;
 								mType->conditionImmunities |= CONDITION_DROWN;
 							}
-							else if(strcasecmp(strValue.c_str(), "ice") == 0){
+							else if(asLowerCaseString(strValue) == "ice"){
 								mType->damageImmunities |= COMBAT_ICEDAMAGE;
 								mType->conditionImmunities |= CONDITION_FREEZING;
 							}
-							else if(strcasecmp(strValue.c_str(), "holy") == 0){
+							else if(asLowerCaseString(strValue) == "holy"){
 								mType->damageImmunities |= COMBAT_HOLYDAMAGE;
 								mType->conditionImmunities |= CONDITION_DAZZLED;
 							}
-							else if(strcasecmp(strValue.c_str(), "death") == 0){
+							else if(asLowerCaseString(strValue) == "death"){
 								mType->damageImmunities |= COMBAT_DEATHDAMAGE;
 								mType->conditionImmunities |= CONDITION_CURSED;
 							}
-							else if(strcasecmp(strValue.c_str(), "lifedrain") == 0){
+							else if(asLowerCaseString(strValue) == "lifedrain"){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
 							}
-							else if(strcasecmp(strValue.c_str(), "paralyze") == 0){
+							else if(asLowerCaseString(strValue) == "paralyze"){
 								mType->conditionImmunities |= CONDITION_PARALYZE;
 							}
-							else if(strcasecmp(strValue.c_str(), "outfit") == 0){
+							else if(asLowerCaseString(strValue) == "outfit"){
 								mType->conditionImmunities |= CONDITION_OUTFIT;
 							}
-							else if(strcasecmp(strValue.c_str(), "drunk") == 0){
+							else if(asLowerCaseString(strValue) == "drunk"){
 								mType->conditionImmunities |= CONDITION_DRUNK;
 							}
-							else if(strcasecmp(strValue.c_str(), "invisible") == 0){
+							else if(asLowerCaseString(strValue) == "invisible"){
 								mType->conditionImmunities |= CONDITION_INVISIBLE;
 							}
 							else{
@@ -1190,6 +1190,38 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 						SHOW_XML_WARNING("Cant load loot");
 					}
 
+					tmpNode = tmpNode->next;
+				}
+			}
+		else if(xmlStrcmp(p->name, (const xmlChar*)"elements") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"element") == 0){
+						//CombatType_t type = COMBAT_NONE;
+						//int32_t percent = 0;
+
+						if(readXMLInteger(tmpNode, "physicalPercent", intValue)){
+							mType->elementMap[COMBAT_PHYSICALDAMAGE] = intValue;
+						}
+						if(readXMLInteger(tmpNode, "icePercent", intValue)){
+							mType->elementMap[COMBAT_ICEDAMAGE] = intValue;
+						}
+						if(readXMLInteger(tmpNode, "earthPercent", intValue)){
+							mType->elementMap[COMBAT_EARTHDAMAGE] = intValue;
+						}
+						if(readXMLInteger(tmpNode, "firePercent", intValue)){
+							mType->elementMap[COMBAT_FIREDAMAGE] = intValue;
+						}
+						if(readXMLInteger(tmpNode, "energyPercent", intValue)){
+							mType->elementMap[COMBAT_ENERGYDAMAGE] = intValue;
+						}
+						if(readXMLInteger(tmpNode, "holyPercent", intValue)){
+							mType->elementMap[COMBAT_HOLYDAMAGE] = intValue;
+						}
+						if(readXMLInteger(tmpNode, "deathPercent", intValue)){
+							mType->elementMap[COMBAT_DEATHDAMAGE] = intValue;
+						}
+					}
 					tmpNode = tmpNode->next;
 				}
 			}

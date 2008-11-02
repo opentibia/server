@@ -21,17 +21,17 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
-#include "definitions.h"
 #include <boost/utility.hpp>
-#include "outputmessage.h"
 
+class NetworkMessage;
+class OutputMessage;
 class Connection;
 class RSA;
 
 #define CLIENT_VERSION_MIN 820
-#define CLIENT_VERSION_MAX 821
+#define CLIENT_VERSION_MAX 822
 
-#define STRING_CLIENT_VERSION "This server requires client version 8.21."
+#define STRING_CLIENT_VERSION "This server requires client version 8.22."
 
 class Protocol : boost::noncopyable
 {
@@ -43,6 +43,7 @@ public:
 		m_rawMessages = false;
 		m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
 		m_outputBuffer = NULL;
+		m_refCount = 0;
 	}
 
 	virtual ~Protocol() {}
@@ -58,22 +59,12 @@ public:
 	void setConnection(Connection* connection) { m_connection = connection; }
 
 	uint32_t getIP() const;
+	int32_t addRef() {return ++m_refCount;}
+	int32_t unRef() {return --m_refCount;}
 
 protected:
 	//Use this function for autosend messages only
-	OutputMessage* getOutputBuffer()
-	{
-		if(m_outputBuffer){
-			return m_outputBuffer;
-		}
-		else if(m_connection){
-			m_outputBuffer = OutputMessagePool::getInstance()->getOutputMessage(this);
-			return m_outputBuffer;
-		}
-		else{
-			return NULL;
-		}
-	}
+	OutputMessage* getOutputBuffer();
 
 	void enableXTEAEncryption() { m_encryptionEnabled = true; }
 	void disableXTEAEncryption() { m_encryptionEnabled = false; }
@@ -87,6 +78,7 @@ protected:
 
 	void setRawMessages(bool value) { m_rawMessages = value; }
 
+	void releaseProtocol();
 	virtual void deleteProtocolTask();
 	friend class Connection;
 
@@ -97,6 +89,7 @@ private:
 	bool m_encryptionEnabled;
 	bool m_rawMessages;
 	uint32_t m_key[4];
+	uint32_t m_refCount;
 };
 
 #endif

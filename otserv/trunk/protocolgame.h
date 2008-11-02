@@ -22,10 +22,8 @@
 #ifndef __OTSERV_PROTOCOLGAME_H__
 #define __OTSERV_PROTOCOLGAME_H__
 
-#include "definitions.h"
 #include <string>
 #include "protocol.h"
-#include "outputmessage.h"
 #include "enums.h"
 #include "creature.h"
 
@@ -43,10 +41,15 @@ class House;
 class Container;
 class Tile;
 class Connection;
+class Quest;
 
 class ProtocolGame : public Protocol
 {
 public:
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t protocolGameCount;
+#endif
+
 	ProtocolGame(Connection* connection);
 	virtual ~ProtocolGame();
 
@@ -58,7 +61,9 @@ public:
 private:
 	std::list<uint32_t> knownCreatureList;
 
+	bool connect(uint32_t playerId);
 	void disconnectClient(uint8_t error, const char* message);
+	void disconnect();
 
 	virtual void deleteProtocolTask();
 
@@ -104,10 +109,20 @@ private:
 	void parseHouseWindow(NetworkMessage& msg);
 
 	//shop methods
-	void parseLookInShop(NetworkMessage &msg);
-	void parsePlayerPurchase(NetworkMessage &msg);
-	void parsePlayerSale(NetworkMessage &msg);
-	void parseCloseShop(NetworkMessage &msg);
+	void parseLookInShop(NetworkMessage& msg);
+	void parsePlayerPurchase(NetworkMessage& msg);
+	void parsePlayerSale(NetworkMessage& msg);
+	void parseCloseShop(NetworkMessage& msg);
+
+	//party methods
+	void parseInviteToParty(NetworkMessage& msg);
+	void parseJoinParty(NetworkMessage& msg);
+	void parseRevokePartyInvitation(NetworkMessage& msg);
+	void parsePassPartyLeadership(NetworkMessage& msg);
+	void parseLeaveParty(NetworkMessage& msg);
+	void parseEnableSharedPartyExperience(NetworkMessage& msg);
+	void parseQuestLog(NetworkMessage& msg);
+	void parseQuestLine(NetworkMessage& msg);
 
 	//trade methods
 	void parseRequestTrade(NetworkMessage& msg);
@@ -130,6 +145,9 @@ private:
 	void parseOpenPriv(NetworkMessage& msg);
 	void parseCloseChannel(NetworkMessage& msg);
 	void parseCloseNpc(NetworkMessage& msg);
+	void parseProcessRuleViolation(NetworkMessage& msg);
+	void parseCloseRuleViolation(NetworkMessage& msg);
+	void parseCancelRuleViolation(NetworkMessage& msg);
 
 	void parseDebugAssert(NetworkMessage& msg);
 
@@ -141,8 +159,12 @@ private:
 
 	void sendChannelsDialog();
 	void sendChannel(uint16_t channelId, const std::string& channelName);
+	void sendRuleViolationsChannel(uint16_t channelId);
 	void sendOpenPrivateChannel(const std::string& receiver);
-	void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
+	void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time = 0);
+	void sendRemoveReport(const std::string& name);
+	void sendLockRuleViolation();
+	void sendRuleViolationCancel(const std::string& name);
 	void sendIcons(int icons);
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
@@ -169,6 +191,8 @@ private:
 	void sendPlayerCash(uint32_t amount);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
+	void sendQuestLog();
+	void sendQuestLine(const Quest* quest);
 
 	void sendTextWindow(uint32_t windowTextId, Item* item, uint16_t maxlen, bool canWrite);
 	void sendTextWindow(uint32_t windowTextId, uint32_t itemId, const std::string& text);
@@ -186,20 +210,20 @@ private:
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(const LightInfo& lightInfo);
 
-	void sendCreatureSkull(const Creature* creature, Skulls_t skull);
+	void sendCreatureSkull(const Creature* creature);
 	void sendCreatureShield(const Creature* creature);
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 
 	//tiles
-	void sendAddTileItem(const Position& pos, const Item* item);
-	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
-	void sendUpdateTile(const Position& pos);
+	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item);
+	void sendUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
+	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos);
+	void sendUpdateTile(const Tile* tile, const Position& pos);
 
 	void sendAddCreature(const Creature* creature, bool isLogin);
 	void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
-	void sendMoveCreature(const Creature* creature, const Position& newPos, const Position& oldPos,
-		uint32_t oldStackPos, bool teleport);
+	void sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos,
+		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	//containers
 	void sendAddContainerItem(uint8_t cid, const Item* item);
@@ -234,7 +258,7 @@ private:
 	void AddDistanceShoot(NetworkMessage* msg,const Position& from, const Position& to, uint8_t type);
 	void AddCreature(NetworkMessage* msg,const Creature* creature, bool known, uint32_t remove);
 	void AddPlayerStats(NetworkMessage* msg);
-	void AddCreatureSpeak(NetworkMessage* msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
+	void AddCreatureSpeak(NetworkMessage* msg, const Creature* creature, SpeakClasses type, std::string text, uint16_t channelId, uint32_t time = 0);
 	void AddCreatureHealth(NetworkMessage* msg,const Creature* creature);
 	void AddCreatureOutfit(NetworkMessage* msg, const Creature* creature, const Outfit_t& outfit);
 	void AddCreatureInvisible(NetworkMessage* msg, const Creature* creature);
@@ -309,6 +333,7 @@ private:
 	int64_t m_lastTaskCheck;
 	int32_t m_messageCount;
 	int32_t m_rejectCount;
+	uint32_t eventConnect;
 
 	bool m_debugAssertSent;
 	bool m_acceptPackets;

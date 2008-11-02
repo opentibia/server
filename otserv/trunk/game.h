@@ -61,6 +61,7 @@ enum GameState_t {
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
 	GAME_STATE_SHUTDOWN,
+	GAME_STATE_CLOSING
 };
 
 enum LightState_t {
@@ -69,6 +70,32 @@ enum LightState_t {
 	LIGHT_STATE_SUNSET,
 	LIGHT_STATE_SUNRISE,
 };
+
+struct RuleViolation {
+	RuleViolation(Player* _reporter, const std::string& _text, uint32_t _time) :
+		reporter(_reporter),
+		gamemaster(NULL),
+		text(_text),
+		time(_time),
+		isOpen(true)
+	{
+	}
+
+	Player* reporter;
+	Player* gamemaster;
+	std::string text;
+	uint32_t time;
+	bool isOpen;
+
+private:
+	RuleViolation(const RuleViolation&);
+};
+
+typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
+
+#define EVENT_LIGHTINTERVAL  10000
+#define EVENT_DECAYINTERVAL  1000
+#define EVENT_DECAY_BUCKETS  16
 
 /**
   * Main Game class.
@@ -102,19 +129,26 @@ public:
 
 	void setWorldType(WorldType_t type);
 	WorldType_t getWorldType() const {return worldType;}
-	int32_t getInFightTicks() {return inFightTicks;}
+	uint32_t getInFightTicks() {return inFightTicks;}
 	int32_t getExhaustionTicks() {return exhaustionTicks;}
 	int32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
+	int32_t getHealExhaustionTicks() {return healExhaustionTicks;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
 		uint32_t spriteId = 0, stackPosType_t type = STACKPOS_NORMAL);
+	void internalGetPosition(Item* item, Position& pos, uint8_t& stackpos);
 
 	/**
 	  * Get a single tile of the map.
 	  * \return A pointer to the tile
 		*/
 	Tile* getTile(uint32_t x, uint32_t y, uint32_t z);
+
+	/**
+	  * Set a single tile of the map, position is read from this tile
+		*/
+	void setTile(Tile* newtile);
 
 	/**
 	  * Get a leaf of the map.
@@ -151,24 +185,47 @@ public:
 	Player* getPlayerByName(const std::string& s);
 
 	/**
+	  * Returns a player based on a string name identifier, with support for the "~" wildcard.
+	  * \param s is the name identifier, with or without wildcard
+	  * \param player will point to the found player (if any)
+	  * \return "RET_PLAYERWITHTHISNAMEISNOTONLINE" or "RET_NAMEISTOOAMBIGIOUS"
+	  */
+	ReturnValue getPlayerByNameWildcard(const std::string& s, Player* &player);
+
+	/**
 	  * Returns a player based on an account number identifier
 	  * \param acc is the account identifier
 	  * \return A Pointer to the player
 	  */
 	Player* getPlayerByAccount(uint32_t acc);
 
+	/**
+	  * Returns all players based on their account number identifier
+	  * \param acc is the account identifier
+	  * \return A vector of all players with the selected account number
+	  */
+	PlayerVector getPlayersByAccount(uint32_t acc);
+
+	/**
+	  * Returns all players with a certain IP address
+	  * \param ip is the IP address of the clients, as an unsigned long
+	  * \param mask An IP mask, default 255.255.255.255
+	  * \return A vector of all players with the selected IP
+	  */
+	PlayerVector getPlayersByIP(uint32_t ip, uint32_t mask = 0xFFFFFFFF);
+
 	/** Place Creature on the map without sending out events to the surrounding.
 	  * \param creature Creature to place on the map
 	  * \param pos The position to place the creature
-	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/items)
+	  * \param forced If true, placing the creature will not fail because of obstacles (creatures/items)
 	  */
-	bool internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/);
+	bool internalPlaceCreature(Creature* creature, const Position& pos, bool forced = false);
 
 	/**
 	  * Place Creature on the map.
 	  * \param creature Creature to place on the map
 	  * \param pos The position to place the creature
-	  * \param forced If true, placing the creature will not fail becase of obstacles (creatures/items)
+	  * \param forced If true, placing the creature will not fail because of obstacles (creatures/items)
 	  */
 	bool placeCreature(Creature* creature, const Position& pos, bool force = false);
 
@@ -179,6 +236,9 @@ public:
 		*/
 	bool removeCreature(Creature* creature, bool isLogout = true);
 
+	void addCreatureCheck(Creature* creature);
+	void removeCreatureCheck(Creature* creature);
+
 	uint32_t getPlayersOnline() {return (uint32_t)Player::listPlayer.list.size();}
 	uint32_t getMonstersOnline() {return (uint32_t)Monster::listMonster.list.size();}
 	uint32_t getNpcsOnline() {return (uint32_t)Npc::listNpc.list.size();}
@@ -186,10 +246,15 @@ public:
 
 	void getWorldLightInfo(LightInfo& lightInfo);
 
-	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
+	void getSpectators(SpectatorVec& list, const Position& centerPos,
+		bool checkforduplicate = false, bool multifloor = false,
 		int32_t minRangeX = 0, int32_t maxRangeX = 0,
 		int32_t minRangeY = 0, int32_t maxRangeY = 0){
-		map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
+		map->getSpectators(list, centerPos, checkforduplicate, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
+	}
+
+	const SpectatorVec& getSpectators(const Position& centerPos){
+		return map->getSpectators(centerPos);
 	}
 
 	void clearSpectatorCache(){
@@ -198,20 +263,17 @@ public:
 		}
 	}
 
-	ReturnValue internalMoveCreature(Creature* creature, Direction direction, bool force = false);
+	ReturnValue internalMoveCreature(Creature* creature, Direction direction, uint32_t flags = 0);
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);
 
-	void moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-		Item* item, uint32_t count, uint16_t spriteId);
-
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-		Item* item, uint32_t count, uint32_t flags = 0);
+		Item* item, uint32_t count, Item** _moveItem, uint32_t flags = 0);
 
 	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
 		uint32_t flags = 0, bool test = false);
 	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
 
-	ReturnValue internalPlayerAddItem(Player* player, Item* item);
+	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true);
 
 	/**
 	  * Find an item of a certain type
@@ -240,7 +302,7 @@ public:
 	  * Get the amount of money in a a cylinder
 	  * \return the amount of money found
 	  */
-	uint32_t getMoney(Cylinder* cylinder);
+	uint32_t getMoney(const Cylinder* cylinder);
 
 	/**
 	  * Remove item(s) with a monetary value
@@ -301,7 +363,10 @@ public:
 	//Implementation of player invoked events
 	bool playerMoveThing(uint32_t playerId, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
 		const Position& toPos, uint8_t count);
-	bool playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId, const Position& toPos);
+	bool playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
+		const Position& movingCreatureOrigPos, const Position& toPos);
+	bool playerMoveItem(uint32_t playerId, const Position& fromPos,
+		uint16_t spriteId, uint8_t fromStackPos, const Position& toPos, uint8_t count);
 	bool playerMove(uint32_t playerId, Direction direction);
 	bool playerCreatePrivateChannel(uint32_t playerId);
 	bool playerChannelInvite(uint32_t playerId, const std::string& name);
@@ -311,6 +376,9 @@ public:
 	bool playerCloseChannel(uint32_t playerId, uint16_t channelId);
 	bool playerOpenPrivateChannel(uint32_t playerId, const std::string& receiver);
 	bool playerCloseNpcChannel(uint32_t playerId);
+	bool playerProcessRuleViolation(uint32_t playerId, const std::string& name);
+	bool playerCloseRuleViolation(uint32_t playerId, const std::string& name);
+	bool playerCancelRuleViolation(uint32_t playerId);
 	bool playerReceivePing(uint32_t playerId);
 	bool playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(uint32_t playerId);
@@ -350,6 +418,14 @@ public:
 	bool playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		const std::string& receiver, const std::string& text);
 	bool playerChangeOutfit(uint32_t playerId, Outfit_t outfit);
+	bool playerInviteToParty(uint32_t playerId, uint32_t invitedId);
+	bool playerJoinParty(uint32_t playerId, uint32_t leaderId);
+	bool playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId);
+	bool playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId);
+	bool playerLeaveParty(uint32_t playerId);
+	bool playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown);
+	bool playerShowQuestLog(uint32_t playerId);
+	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
 
 	void cleanup();
 	void shutdown();
@@ -357,12 +433,17 @@ public:
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
-	bool isViewClear(const Position& fromPos, const Position& toPos, bool sameFloor);
-	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
-	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
+	bool isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor);
 
-	bool getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
-		bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList);
+	bool getPathTo(const Creature* creature, const Position& destPos,
+		std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/);
+
+	bool getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
+		const FindPathParams& fpp);
+
+	bool getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
+		uint32_t minTargetDist, uint32_t maxTargetDist, bool fullPathSearch = true,
+		bool clearSight = true, int32_t maxSearchDist = -1);
 
 	void changeSpeed(Creature* creature, int32_t varSpeedDelta);
 	void internalCreatureChangeOutfit(Creature* creature, const Outfit_t& oufit);
@@ -370,18 +451,21 @@ public:
 	void changeLight(const Creature* creature);
 
 #ifdef __SKULLSYSTEM__
-	void changeSkull(Player* player, Skulls_t newSkull);
+	void updateCreatureSkull(Player* player);
 #endif
 
 	GameState_t getGameState();
 	void setGameState(GameState_t newState);
 	void saveGameState();
 	void loadGameState();
+	void refreshMap();
 
 	//Events
-	void checkWalk(uint32_t creatureId);
-	void checkCreature(uint32_t creatureId, uint32_t interval);
-	void checkLight(int t);
+	void checkCreatureWalk(uint32_t creatureId);
+	void updateCreatureWalk(uint32_t creatureId);
+	void checkCreatureAttack(uint32_t creatureId);
+	void checkCreatures();
+	void checkLight();
 
 	bool combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
 		int32_t& healthChange, bool checkDefense, bool checkArmor);
@@ -414,6 +498,9 @@ public:
 	void resetCommandTag();
 
 	bool npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize);
+	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
+	bool cancelRuleViolation(Player* player);
+	bool closeRuleViolation(Player* player);
 
 protected:
 
@@ -424,17 +511,20 @@ protected:
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 	bool playerSpeakToNpc(Player* player, const std::string& text);
+	bool playerReportRuleViolation(Player* player, const std::string& text);
+	bool playerContinueReport(Player* player, const std::string& text);
 
 	std::vector<Thing*> ToReleaseThings;
 
 	//list of items that are in trading state, mapped to the player
 	std::map<Item*, uint32_t> tradeItems;
 
-	AutoList<Creature> listCreature;
+	//list of reported rule violations, for correct channel listing
+	RuleViolationsMap ruleViolations;
 
-#ifdef __DEBUG_CRITICALSECTION__
-	static OTSYS_THREAD_RETURN monitorThread(void *p);
-#endif
+	AutoList<Creature> listCreature;
+	size_t checkCreatureLastIndex;
+	std::vector<Creature*> checkCreatureVectors[EVENT_CREATURECOUNT];
 
 	struct GameEvent
 	{
@@ -443,13 +533,13 @@ protected:
 		void*    data;
 	};
 
-	#define DECAY_INTERVAL  10000
-	void checkDecay(int32_t interval);
+	void checkDecay();
 	void internalDecayItem(Item* item);
 
 	typedef std::list<Item*> DecayList;
-	DecayList decayItems;
+	DecayList decayItems[EVENT_DECAY_BUCKETS];
 	DecayList toDecayItems;
+	size_t last_bucket;
 
 	static const int LIGHT_LEVEL_DAY = 250;
 	static const int LIGHT_LEVEL_NIGHT = 40;
@@ -464,6 +554,7 @@ protected:
 	uint32_t inFightTicks;
 	uint32_t exhaustionTicks;
 	uint32_t fightExhaustionTicks;
+	uint32_t healExhaustionTicks;
 
 	GameState_t gameState;
 	WorldType_t worldType;

@@ -20,6 +20,8 @@
 
 #include "otpch.h"
 
+#ifdef __USE_MYSQL__
+
 #include <iostream>
 
 #if defined __WINDOWS__ || defined WIN32
@@ -57,6 +59,13 @@ DatabaseMySQL::DatabaseMySQL()
 	if(!mysql_real_connect(&m_handle, g_config.getString(ConfigManager::SQL_HOST).c_str(), g_config.getString(ConfigManager::SQL_USER).c_str(), g_config.getString(ConfigManager::SQL_PASS).c_str(), g_config.getString(ConfigManager::SQL_DB).c_str(), g_config.getNumber(ConfigManager::SQL_PORT), NULL, 0)){
 		std::cout << "Failed to connect to database. MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		return;
+	}
+
+	if(MYSQL_VERSION_ID < 50019){
+		//mySQL servers < 5.0.19 has a bug where MYSQL_OPT_RECONNECT is (incorrectly) reset by mysql_real_connect calls
+		//See http://dev.mysql.com/doc/refman/5.0/en/mysql-options.html for more information.
+		mysql_options(&m_handle, MYSQL_OPT_RECONNECT, &reconnect);
+		std::cout << "[Warning] Outdated mySQL server detected. Consider upgrading to a newer version." << std::endl;
 	}
 
 	m_connected = true;
@@ -309,3 +318,5 @@ MySQLResult::~MySQLResult()
 {
 	mysql_free_result(m_handle);
 }
+
+#endif

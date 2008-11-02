@@ -109,7 +109,7 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 			item->getDoor() ||
 			(item->getContainer() && item->getContainer()->size() != 0)||
 			(item->canWriteText())
-			/*item->getBed()*/))
+			/* uncommented for beds system :] */ || item->getBed()))
 			continue;
 
 		if(!storedTile){
@@ -131,7 +131,7 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 		item->serializeAttr(propWriteStream);
 		const char* attributes = propWriteStream.getStream(attributesSize);
 
-		query << tileId << ", " << runningID << ", " << parentid << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
+		query << tileId << ", " << runningID << ", " << parentid << ", " << item->getID() << ", " << (int32_t)item->getSubType() << ", " << db->escapeBlob(attributes, attributesSize);
 
 		if(!stmt.addRow(query))
 			return false;
@@ -158,7 +158,7 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 			item->serializeAttr(propWriteStream);
 			const char* attributes = propWriteStream.getStream(attributesSize);
 
-			query << tileId << ", " << runningID << ", " << parentid << ", " << item->getID() << ", " << (int32_t)item->getItemCountOrSubtype() << ", " << db->escapeBlob(attributes, attributesSize);
+			query << tileId << ", " << runningID << ", " << parentid << ", " << item->getID() << ", " << (int32_t)item->getSubType() << ", " << db->escapeBlob(attributes, attributesSize);
 
 			if(!stmt.addRow(query))
 				return false;
@@ -229,8 +229,6 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 					continue;
 			}
 			else{
-				bool isDoor = iType.isDoor();
-
 				//find this type in the tile
 				for(uint32_t i = 0; i < tile->getThingCount(); ++i){
 					Item* findItem = tile->__getThing(i)->getItem();
@@ -240,20 +238,28 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 
 					if(findItem->getID() == type){
 						item = findItem;
-						if(!item->unserializeAttr(propStream)){
-							std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
-						}
-
 						break;
 					}
-					else if(isDoor && findItem->getDoor()){
+					else if(iType.isDoor() && findItem->getDoor()){
 						item = findItem;
-						item->setID(type);
+						break;
 					}
+					//[ added for beds system
+					else if(iType.isBed() && findItem->getBed()) {
+						item = findItem;
+						break;
+					}
+					//]
 				}
 			}
 
 			if(item){
+				if(!item->unserializeAttr(propStream)){
+					std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
+				}
+
+				item = g_game.transformItem(item, type);
+
 				std::pair<Item*, int> myPair(item, pid);
 				itemMap[sid] = myPair;
 			}

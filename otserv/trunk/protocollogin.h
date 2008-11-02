@@ -29,8 +29,23 @@ class OutputMessage;
 class ProtocolLogin : public Protocol
 {
 public:
-	ProtocolLogin(Connection* connection) : Protocol(connection) {}
-	virtual ~ProtocolLogin() {}
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t protocolLoginCount;
+#endif
+
+	ProtocolLogin(Connection* connection) : Protocol(connection)
+	{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		protocolLoginCount++;
+#endif
+	}
+
+	virtual ~ProtocolLogin()
+	{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+		protocolLoginCount--;
+#endif
+	}
 
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
