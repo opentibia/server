@@ -270,7 +270,7 @@ bool ProtocolGame::login(const std::string& name)
 			return false;
 		}
 
-		if(g_bans.isAccountBanished(player->getAccount()) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
+		if(g_bans.isAccountBanished(player->getAccountId()) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
 			disconnectClient(0x14, "Your account is banished!");
 			return false;
 		}
@@ -286,7 +286,7 @@ bool ProtocolGame::login(const std::string& name)
 		}
 
 		if(g_config.getNumber(ConfigManager::CHECK_ACCOUNTS) && !player->hasFlag(PlayerFlag_CanAlwaysLogin)
-			&& g_game.getPlayerByAccount(player->getAccount())){
+			&& g_game.getPlayerByAccount(player->getAccountId())){
 			disconnectClient(0x14, "You may only login with one character per account.");
 			return false;
 		}
@@ -439,7 +439,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	setXTEAKey(key);
 
 	/*uint8_t isSetGM =*/ msg.GetByte();
-	uint32_t accnumber = msg.GetU32();
+	std::string accname = msg.GetString();
 	const std::string name = msg.GetString();
 	const std::string password = msg.GetString();
 
@@ -453,7 +453,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 		return false;
 	}
 
-	if(g_bans.isAccountDeleted(accnumber)){
+	if(g_bans.isAccountDeleted(accname)){
 		disconnectClient(0x14, "Your account has been deleted!");
 		return false;
 	}
@@ -469,7 +469,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	std::string acc_pass;
-	if(!(IOAccount::instance()->getPassword(accnumber, name, acc_pass) && passwordTest(password,acc_pass))){
+	if(!(IOAccount::instance()->getPassword(accname, name, acc_pass) && passwordTest(password,acc_pass))){
 		g_bans.addLoginAttempt(getIP(), false);
 		getConnection()->closeConnection();
 		return false;
@@ -1440,11 +1440,6 @@ void ProtocolGame::parsePlayerPurchase(NetworkMessage &msg)
 	uint16_t id = msg.GetU16();
 	uint16_t count = msg.GetByte();
 	uint16_t amount = msg.GetByte();
-#ifdef __DEBUG_820__
-	const ItemType& it = Item::items.getItemIdByClientId(id);
-	std::cout << "Player Bought " << amount*count << " of " << it.name
-			   << "(" << it.id << ")" << std::endl;
-#endif
 	addGameTask(&Game::playerPurchaseItem, player->getID(), id, count, amount);
 }
 
@@ -1453,11 +1448,7 @@ void ProtocolGame::parsePlayerSale(NetworkMessage &msg)
 	uint16_t id = msg.GetU16();
 	uint16_t count = msg.GetByte();
 	uint16_t amount = msg.GetByte();
-#ifdef __DEBUG_820__
-	const ItemType& it = Item::items.getItemIdByClientId(id);
-	std::cout << "Player Sold " << amount*count << " of " << it.name
-			   << "(" << it.id << ")" << std::endl;
-#endif
+
 	addGameTask(&Game::playerSellItem, player->getID(), id, count, amount);
 }
 
@@ -1838,6 +1829,40 @@ void ProtocolGame::sendPlayerCash(uint32_t amount)
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7B);
 		msg->AddU32(amount);
+
+		// this might not be right, be prepared to correct it
+		msg->AddByte(0);
+	}
+}
+
+void ProtocolGame::sendPlayerCashAndSaleItems(uint32_t amount, const std::list<ShopInfo>& shop)
+{
+	NetworkMessage* msg = getOutputBuffer();
+	if(msg)
+	{
+		msg->AddByte(0x7B);
+		msg->AddU32(amount);
+
+		// the rest of this might not be right, be prepared to correct it
+		if(shop.size() > 255)
+		{
+			msg->AddByte(255);
+		}
+		else
+		{
+			msg->AddByte(shop.size());
+		}
+
+		std::list<ShopInfo>::const_iterator it;
+		uint32_t i = 0;
+		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i)
+		{
+			int8_t subtype = ((*it).subType == 0) ? (-1) :((*it).subType);
+			uint32_t count = player->__getItemTypeCount((*it).itemId, subtype, false);
+
+			msg->AddU16((*it).itemId);
+			msg->AddByte(count);
+		}
 	}
 }
 
@@ -2624,7 +2649,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage* msg)
 	msg->AddByte(0xA0);
 	msg->AddU16(player->getHealth());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
-	msg->AddU16((int32_t)player->getFreeCapacity());
+	msg->AddU32((uint32_t)(player->getFreeCapacity() * 100));
 	uint64_t experience = player->getExperience();
 	if(experience <= 0x7FFFFFFF){
 		msg->AddU32(player->getExperience());
@@ -2956,6 +2981,7 @@ void ProtocolGame::AddShopItem(NetworkMessage* msg, const ShopInfo item)
 	msg->AddU16(it.clientId);
 	msg->AddByte(item.subType);
 	msg->AddString(it.name);
+	msg->AddU32((uint32_t)(it.weight*100));
 	msg->AddU32(item.buyPrice);
 	msg->AddU32(item.sellPrice);
 }

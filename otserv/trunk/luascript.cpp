@@ -6120,7 +6120,7 @@ int LuaScriptInterface::luaGetAccountNumberByPlayerName(lua_State *L)
 	uint32_t value = LUA_NULL;
 
 	if(player){
-		value = player->getAccount();
+		value = player->getAccountId();
 	}
 	else{
 		IOPlayer::instance()->getAccountByName(value, name);

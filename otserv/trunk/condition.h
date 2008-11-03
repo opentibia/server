@@ -25,6 +25,7 @@
 #include "enums.h"
 
 #include <list>
+#include <vector>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 

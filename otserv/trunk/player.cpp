@@ -65,7 +65,7 @@ Creature()
 	if(client){
 		client->setPlayer(this);
 	}
-
+	accountId   = 0;
 	name        = _name;
 	setVocation(VOCATION_NONE);
 	capacity   = 300.00;
@@ -889,7 +889,7 @@ bool Player::canSeeInvisibility() const {
 bool Player::canSeeCreature(const Creature* creature) const
 {
 	if(creature->isInvisible() &&
-		!creature->getPlayer() && 
+		!creature->getPlayer() &&
 		!hasFlag(PlayerFlag_CanSenseInvisibility) &&
 		!canSeeInvisibility())
 	{
@@ -1949,167 +1949,167 @@ bool Player::hasShield() const
 
 	return result;
 }
-BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage, 
-							 bool checkDefense /* = false*/, bool checkArmor /* = false*/) 
-{ 
-	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor); 
+BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
+							 bool checkDefense /* = false*/, bool checkArmor /* = false*/)
+{
+	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
-	if(attacker) 
-		sendCreatureSquare(attacker, SQ_COLOR_BLACK); 
+	if(attacker)
+		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
 
-	if(blockType != BLOCK_NONE) 
-		return blockType; 
+	if(blockType != BLOCK_NONE)
+		return blockType;
 
 	int32_t absorbPercentAll       = 0;
-	int32_t absorbPercentPhysical  = 0; 
-	int32_t absorbPercentFire      = 0; 
-	int32_t absorbPercentEnergy    = 0; 
-	int32_t absorbPercentEarth     = 0; 
-	int32_t absorbPercentLifeDrain = 0; 
-	int32_t absorbPercentManaDrain = 0; 
-	int32_t absorbPercentDrown     = 0; 
-	int32_t absorbPercentIce       = 0; 
-	int32_t absorbPercentHoly      = 0; 
-	int32_t absorbPercentDeath     = 0; 
-	int32_t blocked_damage         = 0; 
+	int32_t absorbPercentPhysical  = 0;
+	int32_t absorbPercentFire      = 0;
+	int32_t absorbPercentEnergy    = 0;
+	int32_t absorbPercentEarth     = 0;
+	int32_t absorbPercentLifeDrain = 0;
+	int32_t absorbPercentManaDrain = 0;
+	int32_t absorbPercentDrown     = 0;
+	int32_t absorbPercentIce       = 0;
+	int32_t absorbPercentHoly      = 0;
+	int32_t absorbPercentDeath     = 0;
+	int32_t blocked_damage         = 0;
 
-	if(damage != 0) 
-	{ 
-		bool absorbedDamage; 
+	if(damage != 0)
+	{
+		bool absorbedDamage;
 
-		//reduce damage against inventory items 
-		Item* item = NULL; 
-		for(int32_t slot = SLOT_FIRST; slot < SLOT_LAST; ++slot) 
-		{ 
-			if(!isItemAbilityEnabled((slots_t)slot)) 
-				continue; 
+		//reduce damage against inventory items
+		Item* item = NULL;
+		for(int32_t slot = SLOT_FIRST; slot < SLOT_LAST; ++slot)
+		{
+			if(!isItemAbilityEnabled((slots_t)slot))
+				continue;
 
-			if(!(item = getInventoryItem((slots_t)slot))) 
-				continue; 
+			if(!(item = getInventoryItem((slots_t)slot)))
+				continue;
 
-			const ItemType& it = Item::items[item->getID()]; 
-			absorbedDamage = false; 
+			const ItemType& it = Item::items[item->getID()];
+			absorbedDamage = false;
 
-			if(it.abilities.absorbPercentAll != 0) 
-			{ 
-				absorbPercentAll += it.abilities.absorbPercentAll; 
-				absorbedDamage = (it.abilities.absorbPercentAll > 0); 
-			} 
+			if(it.abilities.absorbPercentAll != 0)
+			{
+				absorbPercentAll += it.abilities.absorbPercentAll;
+				absorbedDamage = (it.abilities.absorbPercentAll > 0);
+			}
 
-			switch(combatType) 
-			{ 
-			case COMBAT_PHYSICALDAMAGE: 
-				{ 
-					if(it.abilities.absorbPercentPhysical != 0) 
-					{ 
-						absorbPercentPhysical += it.abilities.absorbPercentPhysical; 
-						absorbedDamage = (it.abilities.absorbPercentPhysical > 0); 
-					} 
-					break; 
-				} 
+			switch(combatType)
+			{
+			case COMBAT_PHYSICALDAMAGE:
+				{
+					if(it.abilities.absorbPercentPhysical != 0)
+					{
+						absorbPercentPhysical += it.abilities.absorbPercentPhysical;
+						absorbedDamage = (it.abilities.absorbPercentPhysical > 0);
+					}
+					break;
+				}
 
-			case COMBAT_FIREDAMAGE: 
-				{ 
-					if(it.abilities.absorbPercentFire != 0) 
-					{ 
-						absorbPercentFire += it.abilities.absorbPercentFire; 
-						absorbedDamage = (it.abilities.absorbPercentFire > 0); 
-					} 
-					break; 
-				} 
+			case COMBAT_FIREDAMAGE:
+				{
+					if(it.abilities.absorbPercentFire != 0)
+					{
+						absorbPercentFire += it.abilities.absorbPercentFire;
+						absorbedDamage = (it.abilities.absorbPercentFire > 0);
+					}
+					break;
+				}
 
-			case COMBAT_ENERGYDAMAGE: 
-				{ 
-					if(it.abilities.absorbPercentEnergy != 0) 
-					{ 
-						absorbPercentEnergy += it.abilities.absorbPercentEnergy; 
-						absorbedDamage = (it.abilities.absorbPercentEnergy > 0); 
-					} 
-					break; 
-				} 
+			case COMBAT_ENERGYDAMAGE:
+				{
+					if(it.abilities.absorbPercentEnergy != 0)
+					{
+						absorbPercentEnergy += it.abilities.absorbPercentEnergy;
+						absorbedDamage = (it.abilities.absorbPercentEnergy > 0);
+					}
+					break;
+				}
 
-			case COMBAT_EARTHDAMAGE: 
-				{ 
-					if(it.abilities.absorbPercentEarth != 0) 
-					{ 
-						absorbPercentEarth += it.abilities.absorbPercentEarth; 
-						absorbedDamage = (it.abilities.absorbPercentEarth > 0); 
-					} 
-					break; 
-				} 
+			case COMBAT_EARTHDAMAGE:
+				{
+					if(it.abilities.absorbPercentEarth != 0)
+					{
+						absorbPercentEarth += it.abilities.absorbPercentEarth;
+						absorbedDamage = (it.abilities.absorbPercentEarth > 0);
+					}
+					break;
+				}
 
-			case COMBAT_LIFEDRAIN: 
-				{ 
-					if(it.abilities.absorbPercentLifeDrain != 0) 
-					{ 
-						absorbPercentLifeDrain += it.abilities.absorbPercentLifeDrain; 
-						absorbedDamage = (it.abilities.absorbPercentLifeDrain > 0); 
-	
-					} 
-					break; 
-				} 
+			case COMBAT_LIFEDRAIN:
+				{
+					if(it.abilities.absorbPercentLifeDrain != 0)
+					{
+						absorbPercentLifeDrain += it.abilities.absorbPercentLifeDrain;
+						absorbedDamage = (it.abilities.absorbPercentLifeDrain > 0);
 
-			case COMBAT_MANADRAIN: 
-				{ 
-					if(it.abilities.absorbPercentManaDrain != 0) 
-					{ 
-						absorbPercentManaDrain += it.abilities.absorbPercentManaDrain; 
-						absorbedDamage = (it.abilities.absorbPercentManaDrain > 0); 
-					} 
-					break; 
-				} 
+					}
+					break;
+				}
 
-			case COMBAT_DROWNDAMAGE: 
-				{ 
-					if(it.abilities.absorbPercentDrown != 0) 
-					{ 
-						absorbPercentDrown += it.abilities.absorbPercentDrown; 
-						absorbedDamage = (it.abilities.absorbPercentDrown > 0); 
-					} 
-					break; 
-				} 
+			case COMBAT_MANADRAIN:
+				{
+					if(it.abilities.absorbPercentManaDrain != 0)
+					{
+						absorbPercentManaDrain += it.abilities.absorbPercentManaDrain;
+						absorbedDamage = (it.abilities.absorbPercentManaDrain > 0);
+					}
+					break;
+				}
 
-			case COMBAT_ICEDAMAGE: 
-				{ 
-					if(it.abilities.absorbPercentIce != 0) 
-					{ 
-						absorbPercentIce += it.abilities.absorbPercentIce; 
-						absorbedDamage = (it.abilities.absorbPercentIce > 0); 
-					} 
-					break; 
-				} 
+			case COMBAT_DROWNDAMAGE:
+				{
+					if(it.abilities.absorbPercentDrown != 0)
+					{
+						absorbPercentDrown += it.abilities.absorbPercentDrown;
+						absorbedDamage = (it.abilities.absorbPercentDrown > 0);
+					}
+					break;
+				}
 
-			case COMBAT_HOLYDAMAGE: 
-				{ 
-					if(it.abilities.absorbPercentHoly != 0) 
-					{ 
-						absorbPercentHoly += it.abilities.absorbPercentHoly; 
-						absorbedDamage = (it.abilities.absorbPercentHoly > 0); 
-					} 
-					break; 
-				} 
+			case COMBAT_ICEDAMAGE:
+				{
+					if(it.abilities.absorbPercentIce != 0)
+					{
+						absorbPercentIce += it.abilities.absorbPercentIce;
+						absorbedDamage = (it.abilities.absorbPercentIce > 0);
+					}
+					break;
+				}
 
-			case COMBAT_DEATHDAMAGE: 
-				{ 
-					if(it.abilities.absorbPercentDeath != 0) 
-					{ 
-						absorbPercentDeath += it.abilities.absorbPercentDeath; 
-						absorbedDamage = (it.abilities.absorbPercentDeath > 0); 
-					} 
-					break; 
-				} 
+			case COMBAT_HOLYDAMAGE:
+				{
+					if(it.abilities.absorbPercentHoly != 0)
+					{
+						absorbPercentHoly += it.abilities.absorbPercentHoly;
+						absorbedDamage = (it.abilities.absorbPercentHoly > 0);
+					}
+					break;
+				}
 
-			default: 
-				break; 
-			} 
+			case COMBAT_DEATHDAMAGE:
+				{
+					if(it.abilities.absorbPercentDeath != 0)
+					{
+						absorbPercentDeath += it.abilities.absorbPercentDeath;
+						absorbedDamage = (it.abilities.absorbPercentDeath > 0);
+					}
+					break;
+				}
 
-			if(absorbedDamage) 
-			{ 
-				int32_t charges = item->getCharges(); 
-				if(charges != 0) 
-					g_game.transformItem(item, item->getID(), charges - 1); 
-			} 
-		} 
+			default:
+				break;
+			}
+
+			if(absorbedDamage)
+			{
+				int32_t charges = item->getCharges();
+				if(charges != 0)
+					g_game.transformItem(item, item->getID(), charges - 1);
+			}
+		}
 
 		 absorbPercentPhysical  += absorbPercentAll;
 		 absorbPercentFire      += absorbPercentAll;
@@ -2123,107 +2123,107 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		 absorbPercentDeath     += absorbPercentAll;
 		 blocked_damage         += absorbPercentAll;
 
-		switch(combatType) 
-		{ 
-		case COMBAT_PHYSICALDAMAGE: 
+		switch(combatType)
+		{
+		case COMBAT_PHYSICALDAMAGE:
 			{
 				blocked_damage += damage * absorbPercentPhysical / 100;
-				break; 
-			} 
+				break;
+			}
 
-		case COMBAT_FIREDAMAGE: 
-			{ 
-				if(absorbPercentFire != 0) 
-				{ 
+		case COMBAT_FIREDAMAGE:
+			{
+				if(absorbPercentFire != 0)
+				{
 					blocked_damage += damage * absorbPercentFire / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		case COMBAT_ENERGYDAMAGE: 
-			{ 
-				if(absorbPercentEnergy != 0) 
-				{ 
+		case COMBAT_ENERGYDAMAGE:
+			{
+				if(absorbPercentEnergy != 0)
+				{
 					blocked_damage += damage * absorbPercentEnergy / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		case COMBAT_EARTHDAMAGE: 
-			{ 
-				if(absorbPercentEarth != 0) 
-				{ 
+		case COMBAT_EARTHDAMAGE:
+			{
+				if(absorbPercentEarth != 0)
+				{
 					blocked_damage += damage * absorbPercentEarth / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		case COMBAT_LIFEDRAIN: 
-			{ 
-				if(absorbPercentLifeDrain != 0) 
-				{ 
+		case COMBAT_LIFEDRAIN:
+			{
+				if(absorbPercentLifeDrain != 0)
+				{
 					blocked_damage += damage * absorbPercentLifeDrain / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		case COMBAT_MANADRAIN: 
-			{ 
-				if(absorbPercentManaDrain != 0) 
-				{ 
+		case COMBAT_MANADRAIN:
+			{
+				if(absorbPercentManaDrain != 0)
+				{
 					blocked_damage += damage * absorbPercentManaDrain / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		case COMBAT_DROWNDAMAGE: 
-			{ 
-				if(absorbPercentDrown != 0) 
-				{ 
+		case COMBAT_DROWNDAMAGE:
+			{
+				if(absorbPercentDrown != 0)
+				{
 					blocked_damage += damage * absorbPercentDrown / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		case COMBAT_ICEDAMAGE: 
-			{ 
-				if(absorbPercentIce != 0) 
-				{ 
+		case COMBAT_ICEDAMAGE:
+			{
+				if(absorbPercentIce != 0)
+				{
 					blocked_damage += damage * absorbPercentIce / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		case COMBAT_HOLYDAMAGE: 
-			{ 
-				if(absorbPercentHoly != 0) 
-				{ 
+		case COMBAT_HOLYDAMAGE:
+			{
+				if(absorbPercentHoly != 0)
+				{
 					blocked_damage += damage * absorbPercentHoly / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		case COMBAT_DEATHDAMAGE: 
-			{ 
-				if(absorbPercentDeath != 0) 
-				{ 
+		case COMBAT_DEATHDAMAGE:
+			{
+				if(absorbPercentDeath != 0)
+				{
 					blocked_damage += damage * absorbPercentDeath / 100;
-				} 
-				break; 
-			} 
+				}
+				break;
+			}
 
-		default: 
-			break; 
-		} 
+		default:
+			break;
+		}
 
-		damage -= blocked_damage; 
-		if(damage <= 0) 
-		{ 
-			damage = 0; 
-			blockType = BLOCK_DEFENSE; 
-		} 
-	} 
-	return blockType; 
+		damage -= blocked_damage;
+		if(damage <= 0)
+		{
+			damage = 0;
+			blockType = BLOCK_DEFENSE;
+		}
+	}
+	return blockType;
 }
 
 uint32_t Player::getIP() const

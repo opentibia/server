@@ -28,6 +28,7 @@
 #include "tasks.h"
 #include "scheduler.h"
 #include "connection.h"
+#include "tools.h"
 
 #include <boost/bind.hpp>
 
@@ -234,33 +235,56 @@ void Connection::parsePacket(const boost::system::error_code& error)
 	}
 
 	if(!error){
-		// Protocol selection
+		//Check packet checksum
+		uint32_t recvChecksum = m_msg.PeekU32();
+		uint32_t checksum = 0;
+		int32_t len = m_msg.getMessageLength() - m_msg.getReadPos() - 4;
+		if(len > 0){
+			checksum = adlerChecksum((uint8_t*)(m_msg.getBuffer() + m_msg.getReadPos() + 4), len);
+		}
+
 		if(!m_protocol){
-			// Protocol depends on the first byte of the packet
-			uint8_t protocolId = m_msg.GetByte();
-			switch(protocolId){
-			case 0x01: // Login server protocol
-				m_protocol = new ProtocolLogin(this);
-				break;
-			case 0x0A: // World server protocol
-				m_protocol = new ProtocolGame(this);
-				break;
-			case 0xFE: // Admin protocol
-				m_protocol = new ProtocolAdmin(this);
-				break;
-			case 0xFF: // Status protocol
-				m_protocol = new ProtocolStatus(this);
-				break;
-			default:
-				// No valid protocol
-				closeConnection();
-				m_connectionLock.unlock();
-				return;
-				break;
+
+			if(recvChecksum == checksum){
+				// remove the checksum
+				m_msg.GetU32();
+				// Protocol depends on the first byte of the packet
+				uint8_t protocolId = m_msg.GetByte();
+				switch(protocolId){
+				case 0x01: // Login server protocol
+					m_protocol = new ProtocolLogin(this);
+					break;
+				case 0x0A: // World server protocol
+					m_protocol = new ProtocolGame(this);
+					break;
+				default:
+					// No valid protocol
+					closeConnection();
+					m_connectionLock.unlock();
+					return;
+				}
+				m_protocol->onRecvFirstMessage(m_msg);
 			}
-			m_protocol->onRecvFirstMessage(m_msg);
+			else{
+				//Protocols without checksum
+				uint8_t protocolId = m_msg.GetByte();
+				switch(protocolId){
+				case 0xFE: // Admin protocol
+					m_protocol = new ProtocolAdmin(this);
+					break;
+				case 0xFF: // Status protocol
+					m_protocol = new ProtocolStatus(this);
+					break;
+				default:
+					closeConnection();
+					m_connectionLock.unlock();
+					return;
+				}
+				m_protocol->onRecvFirstMessage(m_msg);
+			}
 		}
 		else{
+			if(recvChecksum == checksum) m_msg.GetU32();
 			// Send the packet to the current protocol
 			m_protocol->onRecvMessage(m_msg);
 		}

@@ -1,9 +1,10 @@
 #ifdef __OTSERV_OTCP_H__
 #error "Precompiled header should only be included once"
 #endif
+
 #define __OTSERV_OTCP_H__
 
-#undef __USE_OTPCH__
+//#undef __USE_OTPCH__
 
 // Definitions should be global.
 #include "definitions.h"
@@ -43,3 +44,4 @@ extern "C"
 #include "thing.h"
 
 #endif
+

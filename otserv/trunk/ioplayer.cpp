@@ -64,7 +64,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 
 	player->setGUID(result->getDataInt("id"));
-	player->accountNumber = result->getDataInt("account_id");
+	player->accountId = result->getDataInt("account_id");
 
 	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
 	if(group){
@@ -194,7 +194,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 
 	//get password
-	query << "SELECT `password` FROM `accounts` WHERE `id` = " << player->accountNumber;
+	query << "SELECT `password` FROM `accounts` WHERE `id` = " << player->accountId;
 	if(!(result = db->storeQuery(query.str()))){
 		return false;
 	}

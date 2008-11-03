@@ -487,7 +487,7 @@ Player* Game::getPlayerByAccount(uint32_t acc)
 {
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		if(!it->second->isRemoved()){
-			if(it->second->getAccount() == acc){
+			if(it->second->getAccountId() == acc){
 				return it->second;
 			}
 		}
@@ -501,7 +501,7 @@ PlayerVector Game::getPlayersByAccount(uint32_t acc)
 	PlayerVector players;
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		if(!it->second->isRemoved()){
-			if(it->second->getAccount() == acc){
+			if(it->second->getAccountId() == acc){
 				players.push_back(it->second);
 			}
 		}
@@ -891,7 +891,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		player->setNextActionTask(task);
 		return false;
 	}
-	
+
 	player->setNextActionTask(NULL);
 
 	Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
@@ -4165,7 +4165,7 @@ void Game::checkDecay()
 {
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
 		boost::bind(&Game::checkDecay, this)));
-	
+
 	size_t bucket = (last_bucket + 1) % EVENT_DECAY_BUCKETS;
 
 	for(DecayList::iterator it = decayItems[bucket].begin(); it != decayItems[bucket].end();){

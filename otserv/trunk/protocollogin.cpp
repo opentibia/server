@@ -62,7 +62,7 @@ void ProtocolLogin::disconnectClient(uint8_t error, const char* message)
 }
 
 bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
-{	
+{
 	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
 		getConnection()->closeConnection();
 		return false;
@@ -73,7 +73,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 	msg.SkipBytes(12);
-	
+
 	if(version <= 760){
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
 	}
@@ -91,11 +91,11 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(key);
 
-	uint32_t accnumber = msg.GetU32();
+	std::string accname = msg.GetString();
 	std::string password = msg.GetString();
 
-	if(!accnumber){
-		disconnectClient(0x0A, "You must enter your account number.");
+	if(!accname.length()){
+		disconnectClient(0x0A, "You must enter your account name.");
 		return false;
 	}
 
@@ -108,8 +108,8 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		disconnectClient(0x0A, "Gameworld is starting up. Please wait.");
 		return false;
 	}
-	
-	if(g_bans.isAccountDeleted(accnumber)){
+
+	if(g_bans.isAccountDeleted(accname)){
 		disconnectClient(0x0A, "Your account has been deleted!");
 		return false;
 	}
@@ -118,7 +118,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		disconnectClient(0x0A, "Too many connections attempts from this IP. Try again later.");
 		return false;
 	}
-	
+
 	if(g_bans.isIpBanished(clientip)){
 		disconnectClient(0x0A, "Your IP is banished!");
 		return false;
@@ -131,9 +131,9 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			break;
 		}
 	}
-	
-	Account account = IOAccount::instance()->loadAccount(accnumber);
-	if(!(accnumber != 0 && account.accnumber == accnumber &&
+
+	Account account = IOAccount::instance()->loadAccount(accname);
+	if(!(account.name == accname &&
 			passwordTest(password, account.password))){
 
 		g_bans.addLoginAttempt(clientip, false);
@@ -142,8 +142,8 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	g_bans.addLoginAttempt(clientip, true);
-		
-	
+
+
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
@@ -165,10 +165,9 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		}
 		//Add premium days
 		output->AddU16(account.getPremiumDaysLeft());//output->AddU16(0);
-		
+
 		OutputMessagePool::getInstance()->send(output);
 	}
-
 	getConnection()->closeConnection();
 
 	return true;

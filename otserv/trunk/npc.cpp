@@ -2881,13 +2881,6 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
         item.subType = getField(L, "subtype");
 		item.buyPrice = getField(L, "buy");
 		item.sellPrice = getField(L, "sell");
-#ifdef __DEBUG_820__
-		std::cout 	<< "Added Item " << item.itemId
-					//<< " with charges " << item.itemCharges
-					<< " costs " << item.buyPrice
-					<< " and sells for " << item.sellPrice
-					<< std::endl;
-#endif
 		items.push_back(item);
 
 		lua_pop(L, 1);
@@ -2913,7 +2906,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 	npc->addShopPlayer(player);
 	player->setShopOwner(npc, buyCallback, sellCallback);
 	player->sendShop(items);
-	player->sendCash(g_game.getMoney(player));
+	player->sendCashAndSaleItems(g_game.getMoney(player), items);
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;

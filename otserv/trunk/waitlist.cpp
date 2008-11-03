@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,7 +39,7 @@ WaitListIterator WaitingList::findClient(const Player* player, uint32_t& slot)
 {
 	slot = 1;
 	for(WaitListIterator it = waitList.begin(); it != waitList.end(); ++it){
-		if((*it)->acc == player->getAccount() && (*it)->ip == player->getIP() &&
+		if((*it)->acc == player->getAccountId() && (*it)->ip == player->getIP() &&
 			strcasecmp((*it)->name.c_str(), player->getName().c_str()) == 0){
 				return it;
 		}
@@ -76,7 +76,7 @@ int32_t WaitingList::getTimeOut(int32_t slot)
 }
 
 bool WaitingList::clientLogin(const Player* player)
-{		
+{
 	if(player->hasFlag(PlayerFlag_CanAlwaysLogin)){
 		return true;
 	}
@@ -91,7 +91,7 @@ bool WaitingList::clientLogin(const Player* player)
 	uint32_t slot;
 	WaitListIterator it = findClient(player, slot);
 	if(it != waitList.end()){
-		if((Status::instance()->getPlayersOnline() + slot) <= Status::instance()->getMaxPlayersOnline()){ 
+		if((Status::instance()->getPlayersOnline() + slot) <= Status::instance()->getMaxPlayersOnline()){
 			//should be able to login now
 #ifdef __DEBUG__WATINGLIST__
 			std::cout << "Name: " << (*it)->name << " can now login" << std::endl;
@@ -126,11 +126,11 @@ bool WaitingList::clientLogin(const Player* player)
 	}
 
 	wait->name = player->getName();
-	wait->acc = player->getAccount();
+	wait->acc = player->getAccountId();
 	wait->ip = player->getIP();
 	wait->premium = player->isPremium();
 	wait->timeout = OTSYS_TIME() + getTimeOut(slot) * 1000;
-	
+
 #ifdef __DEBUG__WATINGLIST__
 	std::cout << "Name: " << player->getName() << "(" << waitList.size() + 1 << ")" << " has been added to the waiting list" << std::endl;
 #endif
@@ -147,7 +147,7 @@ int32_t WaitingList::getClientSlot(const Player* player)
 	}
 
 	#ifdef __DEBUG__WATINGLIST__
-	std::cout << "WaitingList::getSlot error, trying to find slot for unknown acc: " << player->getAccount() << 
+	std::cout << "WaitingList::getSlot error, trying to find slot for unknown acc: " << player->getAccountId() <<
 	" with ip " << player->getIP() << std::endl;
 	#endif
 
@@ -169,5 +169,5 @@ void WaitingList::cleanUpList()
 			++slot;
 			++it;
 		}
-	}	
+	}
 }

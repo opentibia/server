@@ -65,8 +65,8 @@ public:
 	bool isIpBanished(uint32_t clientip, uint32_t mask = 0xFFFFFFFF) const;
 	bool isPlayerBanished(const std::string& name) const;
 	bool isPlayerBanished(uint32_t guid) const;
-	bool isAccountBanished(uint32_t account) const;
-	bool isAccountDeleted(uint32_t account) const;
+	bool isAccountBanished(uint32_t accountId) const;
+	bool isAccountDeleted(const std::string& account) const;
 	bool isIpDisabled(uint32_t clientip) const;
 
 	bool acceptConnection(uint32_t clientip);
@@ -80,8 +80,9 @@ public:
 
 	bool removeIpBans(uint32_t ip, uint32_t mask = 0xFFFFFFFF);
 	bool removePlayerBans(uint32_t guid);
-	bool removePlayerBans(std::string name);
+	bool removePlayerBans(std::string& name);
 	bool removeAccountBans(uint32_t accno);
+	//bool removeAccountBans(const std::string& name);
 
 	std::vector<Ban> getBans(BanType_t type) const;
 protected:

@@ -34,6 +34,7 @@ public:
 	~Account();
 
 	uint32_t accnumber;
+	std::string name;
 
 	// < current time is none, (time_t)(-1) is infinite.
 	time_t premEnd;

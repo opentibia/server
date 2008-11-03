@@ -211,7 +211,7 @@ std::vector<std::string> explodeString(const std::string& inString, const std::s
    returnVector.push_back (inString.substr (start));
    return returnVector;
 
-} 
+}
 
 bool hasBitSet(uint32_t flag, uint32_t flags)
 {
@@ -627,4 +627,30 @@ AmmoAction_t getAmmoAction(const std::string& strValue)
 		}
 	}
 	return AMMOACTION_NONE;
+}
+
+#define MOD_ADLER 65521
+uint32_t adlerChecksum(uint8_t *data, int32_t len)
+{
+	if(len < 0){
+		std::cout << "[Error] adlerChecksum. len < 0" << std::endl;
+		return 0;
+	}
+
+    uint32_t a = 1, b = 0;
+    while (len > 0)
+    {
+        size_t tlen = len > 5552 ? 5552 : len;
+        len -= tlen;
+        do
+        {
+            a += *data++;
+            b += a;
+        } while (--tlen);
+
+        a %= MOD_ADLER;
+        b %= MOD_ADLER;
+    }
+
+    return (b << 16) | a;
 }

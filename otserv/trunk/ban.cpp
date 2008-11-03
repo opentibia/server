@@ -208,7 +208,7 @@ bool BanManager::isPlayerBanished(uint32_t playerId) const
 	return false;
 }
 
-bool BanManager::isAccountBanished(uint32_t account) const
+bool BanManager::isAccountBanished(uint32_t accountId) const
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -222,7 +222,7 @@ bool BanManager::isAccountBanished(uint32_t account) const
 			"`bans` "
 		"WHERE "
 			"`type` = " << BAN_ACCOUNT << " AND "
-			"`value` = " << account << " AND "
+			"`value` = " << accountId << " AND "
 			"`active` = 1 AND "
 			"(`expires` >= " << currentTime << " OR `expires` = 0)";
 
@@ -235,7 +235,7 @@ bool BanManager::isAccountBanished(uint32_t account) const
 	return false;
 }
 
-bool BanManager::isAccountDeleted(uint32_t account) const
+bool BanManager::isAccountDeleted(const std::string& account) const
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -247,7 +247,7 @@ bool BanManager::isAccountDeleted(uint32_t account) const
 		"FROM "
 			"`accounts` "
 		"WHERE "
-			"`id` = " << account;
+			"`name` = " << account;
 
 	if((result = db->storeQuery(query.str())) != NULL){
 		int b = result->getDataInt("deleted");
@@ -351,7 +351,7 @@ bool BanManager::removePlayerBans(uint32_t guid)
 	return db->executeQuery(query.str());
 }
 
-bool BanManager::removePlayerBans(std::string name) {
+bool BanManager::removePlayerBans(std::string& name) {
 	uint32_t playerId = 0;
 	if(!IOPlayer::instance()->getGuidByName(playerId, name))
 		return false;

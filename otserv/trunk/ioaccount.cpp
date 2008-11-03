@@ -33,7 +33,7 @@
 
 extern ConfigManager g_config;
 
-Account IOAccount::loadAccount(uint32_t accno)
+Account IOAccount::loadAccount(const std::string& name)
 {
 	Account acc;
 
@@ -41,15 +41,17 @@ Account IOAccount::loadAccount(uint32_t accno)
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `id`, `password`, `premend` FROM `accounts` WHERE `id` = " << accno;
+	query << "SELECT `id`, `name`, `password`, `premend` FROM `accounts` WHERE `name` = " << db->escapeString(name);;
 	if((result = db->storeQuery(query.str()))){
 		acc.accnumber = result->getDataInt("id");
 		acc.password = result->getDataString("password");
 		acc.premEnd = result->getDataInt("premend");
+		acc.name = result->getDataString("name");
 		db->freeResult(result);
 
 		query.str("");
-		query << "SELECT `name` FROM `players` WHERE `account_id` = " << accno;
+		query << "SELECT `name` FROM `players` WHERE `account_id` = " << acc.accnumber;
+
 		if((result = db->storeQuery(query.str()))){
 			do {
 				std::string ss = result->getDataString("name");
@@ -64,13 +66,13 @@ Account IOAccount::loadAccount(uint32_t accno)
 	return acc;
 }
 
-bool IOAccount::getPassword(uint32_t accno, const std::string &name, std::string &password)
+bool IOAccount::getPassword(const std::string& accountname, const std::string &name, std::string &password)
 {
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`id` = " << accno << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`name` = " << db->escapeString(accountname) << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
 	if((result = db->storeQuery(query.str()))){
 		password = result->getDataString("password");
 		db->freeResult(result);
