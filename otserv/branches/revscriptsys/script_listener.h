@@ -61,6 +61,7 @@ namespace Script {
 
 	typedef boost::shared_ptr<Listener> Listener_ptr;
 	typedef boost::weak_ptr<Listener> Listener_wptr;
+	typedef std::vector<Listener_ptr> ListenerList;
 
 	inline std::string Listener::getLuaTag() const {
 		return datatag;

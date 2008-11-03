@@ -18,6 +18,7 @@
 
 #include "otpch.h"
 
+#include "lua_manager.h"
 #include "script_event.h"
 #include "script_enviroment.h"
 #include "script_listener.h"
@@ -39,35 +40,51 @@ Event::Event() : eventID(++eventID_counter) {
 Event::~Event() {
 }
 
-///////////////////////////////////////////////////////////////////////////////C
+bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) {
+	LuaThread_ptr thread = state.newThread("OnSay");
 
-template<class T, class ScriptInformation>
-bool dispatchEvent(T* e, Manager& state, Enviroment& enviroment, ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
+	// Stack is empty
+	// Push callback
+	thread->pushCallback(listener);
+	
+	if(thread->isNil()) {
+		thread->HandleError("Attempt to call destroyed '" + getName() + "' listener.");
+		thread->pop();
 		return false;
 	}
-	for(ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
 
-		// Call handler
-		if(e->check_match(info)) {
-			if(e->call(state, enviroment, listener) == true) {
-				// Handled
-				return true;
-			}
-		}
+	// Push event
+	thread->pushEvent(*this);
+	thread->duplicate();
+	thread->setRegistryItem(lua_tag);
+	
+
+	// Run thread
+	thread->run(1);
+
+	if(thread->ok() == false) {
+		state.pushNil();
+		state.setRegistryItem(lua_tag);
+		return false;
 	}
-	return false;
+
+	// Retrieve event info
+	thread->getRegistryItem(lua_tag);
+	
+	// Update this instance with values from lua
+	update_instance(state, enviroment, thread);
+	
+	// clean up
+	thread->pushNil();
+	thread->setRegistryItem(lua_tag);
+	thread->pop(); // pop event table, will be garbage collected as we cleared the registry from it
+
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-OnSay::Event::Event(Creature* _speaker, SpeakClass& _type, std::string& _receiver, std::string& _class) :
+OnSay::Event::Event(Creature* _speaker, SpeakClass& _class, std::string& _receiver, std::string& _text) :
 	speaker(_speaker),
 	speak_class(_class),
 	receiver(_receiver),
@@ -105,49 +122,7 @@ bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment) {
 	return dispatchEvent<OnSay::Event, ScriptInformation>(this, state, enviroment, enviroment.Generic.OnSay);
 }
 
-bool Event::call(Manager& stae, Enviroment& enviroment, Listener_ptr listener) {
-	LuaThread_ptr thread = state.newThread("OnSay");
-
-	// Stack is empty
-	// Push callback
-	thread->pushCallback(listener);
-	
-	if(thread->isNil()) {
-		thread->HandleError("Attempt to call destroyed '" + name() + "' listener.");
-		thread->pop();
-		return false;
-	}
-
-	// Push event
-	thread->pushEvent(*this);
-	thread->duplicate();
-	thread->setRegistryItem(lua_tag);
-	
-
-	// Run thread
-	thread->run(1);
-
-	if(thread->ok() == false) {
-		state.pushNil();
-		state.setRegistryItem(lua_tag);
-		return false;
-	}
-
-	// Retrieve event info
-	thread->getRegistryItem(lua_tag);
-	
-	// Update this instance with values from lua
-	update_instance(state, enviroment, thread);
-	
-	// clean up
-	thread->pushNil();
-	thread->setRegistryItem(lua_tag);
-	thread->pop(); // pop event table, will be garbage collected as we cleared the registry from it
-
-	return true;
-}
-
-bool OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
 	thread->getField(-1, "class");
 	if(thread->isNumber()) {
 		speak_class = (SpeakClass)thread->popInteger();
@@ -174,7 +149,6 @@ bool OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaTh
 		thread->HandleError("Event 'OnSay' invalid value of 'text'");
 		thread->pop();
 	}
-	return true;
 }
 
 void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
