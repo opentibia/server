@@ -247,7 +247,7 @@ bool BanManager::isAccountDeleted(const std::string& account) const
 		"FROM "
 			"`accounts` "
 		"WHERE "
-			"`name` = " << account;
+			"`name` = " << db->escapeString(account);
 
 	if((result = db->storeQuery(query.str())) != NULL){
 		int b = result->getDataInt("deleted");
