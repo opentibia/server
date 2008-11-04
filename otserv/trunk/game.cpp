@@ -3335,7 +3335,9 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 {
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	getSpectators(list, player->getPosition());
+	getSpectators(list, player->getPosition(), false, false,
+		Map::maxClientViewportX, Map::maxClientViewportX,
+		Map::maxClientViewportY, Map::maxClientViewportY);
 
 	//send to client
 	Player* tmpPlayer = NULL;
@@ -3565,7 +3567,9 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 		getSpectators(list, creature->getPosition(), false, true, 18, 18, 14, 14);
 	}
 	else{
-		getSpectators(list, creature->getPosition(), false, false);
+		getSpectators(list, creature->getPosition(), false, false,
+			Map::maxClientViewportX, Map::maxClientViewportX,
+			Map::maxClientViewportY, Map::maxClientViewportY);
 	}
 
 	//send to client

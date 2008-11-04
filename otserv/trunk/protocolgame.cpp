@@ -37,6 +37,7 @@
 #include "connection.h"
 #include "creatureevent.h"
 #include "quests.h"
+#include "definitions.h"
 
 #include <string>
 #include <iostream>

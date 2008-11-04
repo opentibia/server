@@ -70,6 +70,9 @@ public:
 	Protocol* getProtocol() { return m_protocol;}
 	Connection* getConnection() { return m_connection;}
 
+	void setOutputBufferStart(uint32_t pos) {m_outputBufferStart = pos;}
+	uint32_t getOutputBufferStart() const {return m_outputBufferStart;}
+
 #ifdef __TRACK_NETWORK__
 	void Track(std::string file, long line, std::string func)
 	{

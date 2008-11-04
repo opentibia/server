@@ -269,6 +269,14 @@ void Connection::parsePacket(const boost::system::error_code& error)
 				//Protocols without checksum
 				uint8_t protocolId = m_msg.GetByte();
 				switch(protocolId){
+				case 0x01: // Login server protocol
+					//This occurs if you try login with an old client version ( < 8.3)
+					m_protocol = new ProtocolLogin(this);
+					break;
+				case 0x0A: // World server protocol
+					//This occurs if you try login with an old client version (< 8.3)
+					m_protocol = new ProtocolGame(this);
+					break;
 				case 0xFE: // Admin protocol
 					m_protocol = new ProtocolAdmin(this);
 					break;

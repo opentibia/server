@@ -46,6 +46,7 @@ void Protocol::onSendMessage(OutputMessage* msg)
 			#endif
 
 			XTEA_encrypt(*msg);
+			msg->addCryptoHeader();
 		}
 	}
 
@@ -139,7 +140,6 @@ void Protocol::XTEA_encrypt(OutputMessage& msg)
 		buffer[read_pos] = v0; buffer[read_pos + 1] = v1;
 		read_pos = read_pos + 2;
 	}
-	msg.addCryptoHeader();
 }
 
 bool Protocol::XTEA_decrypt(NetworkMessage& msg)

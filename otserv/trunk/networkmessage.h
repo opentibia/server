@@ -114,6 +114,7 @@ public:
 	int32_t getMessageLength() const { return m_MsgSize; }
 	void setMessageLength(int32_t newSize) { m_MsgSize = newSize; }
 	int32_t getReadPos() const { return m_ReadPos; }
+	void setReadPos(int32_t pos) {m_ReadPos = pos; }
 
 	int32_t decodeHeader();
 

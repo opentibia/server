@@ -3244,6 +3244,11 @@ bool Player::setAttackedCreature(Creature* creature)
 		setFollowCreature(NULL);
 	}
 
+	if(creature){
+		Dispatcher::getDispatcher().addTask(createTask(
+			boost::bind(&Game::checkCreatureAttack, &g_game, getID())));
+	}
+
 	return true;
 }
 
