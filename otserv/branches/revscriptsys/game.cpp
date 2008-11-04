@@ -62,6 +62,7 @@ extern Server* g_server;
 extern Commands commands;
 extern BanManager g_bans;
 extern Chat g_chat;
+extern Game g_game;
 
 Game::Game()
 {
@@ -4774,6 +4775,17 @@ void Game::FreeThing(Thing* thing)
 {
 	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);
+}
+
+void Game::unscriptThing(Thing* thing)
+{
+	script_enviroment->removeThing(thing);
+}
+
+// Shortens compilation time as it can be called without including game.h
+void g_gameUnscriptThing(Thing* thing)
+{
+	g_game.unscriptThing(thing);
 }
 
 /*

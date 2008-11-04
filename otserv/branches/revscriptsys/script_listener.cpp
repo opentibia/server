@@ -40,7 +40,7 @@ Listener::Listener(ListenerType t, const boost::any& data, Manager& manager) :
 Listener::~Listener() {
 }
 
-void Listener::deactive() {
+void Listener::deactivate() {
 	active = false;
 	manager.pushNil();
 	manager.setRegistryItem(getLuaTag());

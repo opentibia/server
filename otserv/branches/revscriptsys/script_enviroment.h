@@ -52,6 +52,8 @@ namespace Script {
 		ObjectID addObject(Combat* combat);
 		// If the object is not scripted already, it will be added
 		Thing* getThing(ObjectID id);
+		// Removes an object from the scripted object list
+		// called when a Thing is destroyed, for example
 		bool removeObject(ObjectID id);
 		bool removeThing(Thing* thing);
 
@@ -71,6 +73,8 @@ namespace Script {
 		bool stopListener(ListenerList& list, uint32_t id);
 		void cleanupUnusedListeners(ListenerList& list);
 
+		void debugOutput() const; // noop unless passed preprocessor directive
+
 		ObjectID objectID_counter;
 		ObjectMap object_map;
 
@@ -84,6 +88,10 @@ namespace Script {
 		if(thing_iter == object_map.right.end()) {
 			ObjectID id = getFreeID();
 			object_map.left.insert(std::make_pair(id, reinterpret_cast<void*>(thing)));
+#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+		std::cout << "Added thing " << thing << " with id " << id << std::endl;
+		debugOutput();
+#endif
 			return id;
 		}
 		return thing_iter->second;
@@ -103,6 +111,10 @@ namespace Script {
 			return false;
 		}
 		object_map.left.erase(id_iter);
+#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+		std::cout << "Removed object with ID " << id << std::endl;
+		debugOutput();
+#endif
 		return true;
 	}
 
@@ -112,7 +124,20 @@ namespace Script {
 			return false;
 		}
 		object_map.right.erase(thing_iter);
+#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+		std::cout << "Removed Thing " << thing << std::endl;
+		debugOutput();
+#endif
 		return true;
+	}
+
+	inline void Enviroment::debugOutput() const {
+		ObjectMap::left_const_iterator debug_iter = object_map.left.begin();
+		std::cout << "Object map, counter is at " << objectID_counter << " :" << std::endl;
+		while(debug_iter != object_map.left.end()) {
+			std::cout << "\tID: " << debug_iter->first << " ptr: " << debug_iter->second << std::endl;
+			++debug_iter;
+		}
 	}
 }
 

@@ -26,17 +26,22 @@
 #include "item.h"
 #include "player.h"
 
+// Avoid unnecessary includes!
+extern void g_gameUnscriptThing(Thing* thing);
+
 Thing::Thing()
 {
 	parent = NULL;
 	useCount = 0;
 }
 
-
 Thing::~Thing()
 {
 	//
 	//std::cout << "thing destructor " << this << std::endl;
+
+	// Kind of ugly to put it here, but what choice is there?
+	g_gameUnscriptThing(this);
 }
 
 Cylinder* Thing::getTopParent()

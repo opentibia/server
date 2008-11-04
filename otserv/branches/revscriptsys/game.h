@@ -446,6 +446,7 @@ public:
 	void cleanup();
 	void shutdown();
 	void FreeThing(Thing* thing);
+	void unscriptThing(Thing* thing);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map_maxClientViewportX, int32_t rangey = Map_maxClientViewportY);

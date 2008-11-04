@@ -24,6 +24,7 @@
 using namespace Script;
 
 Enviroment::Enviroment() {
+	objectID_counter = 0;
 }
 
 Enviroment::~Enviroment() {
@@ -57,7 +58,7 @@ bool Enviroment::stopListener(ListenerList& list, uint32_t id) {
 		++giter)
 	{
 		if((*giter)->getID() == id && (*giter)->isActive()) {
-			(*giter)->deactive();
+			(*giter)->deactivate();
 			return true;
 		}
 	}

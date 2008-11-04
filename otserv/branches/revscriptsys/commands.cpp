@@ -63,30 +63,7 @@ Commands::Commands()
 {
 	//table of commands
 	s_defcommands defined_commands[] = {
-		{"/m",&Commands::placeMonster},
-		{"/summon",&Commands::placeSummon},
-		{"/B",&Commands::broadcastMessage},
-		//{"/b",&Commands::banPlayer},
-		{"/t",&Commands::teleportMasterPos},
-		{"/c",&Commands::teleportHere},
-		{"/i",&Commands::createItemById},
-		{"/n",&Commands::createItemByName},
-		{"/q",&Commands::subtractMoney},
 		{"/reload",&Commands::reloadInfo},
-		{"/z",&Commands::testCommand},
-		{"/goto",&Commands::teleportTo},
-		{"/info",&Commands::getInfo},
-		{"/closeserver",&Commands::closeServer},
-		{"/openserver",&Commands::openServer},
-		{"/getonline",&Commands::onlineList},
-		{"/a",&Commands::teleportNTiles},
-		{"/kick",&Commands::kickPlayer},
-		{"/owner",&Commands::setHouseOwner},
-		{"/sellhouse",&Commands::sellHouse},
-		{"/gethouse",&Commands::getHouse},
-		//{"/bans",&Commands::bansManager},
-		{"/town",&Commands::teleportToTown},
-		{"/serverinfo",&Commands::serverInfo},
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		{"/serverdiag",&Commands::serverDiag},
 #endif

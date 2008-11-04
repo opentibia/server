@@ -197,8 +197,13 @@ int LuaState::lua_registerSpecificEvent_OnSay() {
 	si_onsay.filter = filter;
 	si_onsay.case_sensitive = case_sensitive;
 
+	// This here explains why boost is so awesome, thanks to our custom
+	// delete function, the listener is cleanly stopped when all references
+	// to it is removed. :)
 	boost::any p(si_onsay);
-	Listener_ptr listener(new Listener(ONSAY_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(
+		new Listener(ONSAY_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
 
 	who->addListener(listener);
 

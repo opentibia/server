@@ -44,7 +44,7 @@ namespace Script {
 		const boost::any& getData() const;
 		
 		bool isActive() const {return active;}
-		void deactive();
+		void deactivate();
 		
 		ListenerType type() const {return type_;}
 		static std::string type2name();
