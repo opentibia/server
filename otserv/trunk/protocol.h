@@ -40,6 +40,7 @@ public:
 	{
 		m_connection = connection;
 		m_encryptionEnabled = false;
+		m_checksumEnabled = true;
 		m_rawMessages = false;
 		m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
 		m_outputBuffer = NULL;
@@ -71,6 +72,8 @@ protected:
 	void setXTEAKey(const uint32_t* key){
 		memcpy(m_key, key, sizeof(uint32_t)*4);
 	}
+	void enableChecksum() { m_checksumEnabled = true; }
+	void disableChecksum() { m_checksumEnabled = false; }
 
 	void XTEA_encrypt(OutputMessage& msg);
 	bool XTEA_decrypt(NetworkMessage& msg);
@@ -87,6 +90,7 @@ private:
 	OutputMessage* m_outputBuffer;
 	Connection* m_connection;
 	bool m_encryptionEnabled;
+	bool m_checksumEnabled;
 	bool m_rawMessages;
 	uint32_t m_key[4];
 	uint32_t m_refCount;

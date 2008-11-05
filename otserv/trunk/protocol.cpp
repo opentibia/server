@@ -46,7 +46,7 @@ void Protocol::onSendMessage(OutputMessage* msg)
 			#endif
 
 			XTEA_encrypt(*msg);
-			msg->addCryptoHeader();
+			msg->addCryptoHeader(m_checksumEnabled);
 		}
 	}
 

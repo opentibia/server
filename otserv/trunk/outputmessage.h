@@ -45,19 +45,15 @@ public:
 
 	void writeMessageLength()
 	{
-		*(uint16_t*)(m_MsgBuf + 6) = m_MsgSize;
-		//added header size to the message size
-		m_MsgSize = m_MsgSize + 2;
-		m_outputBufferStart = 6;
+		add_header((uint16_t)(m_MsgSize));
 	}
 
-	void addCryptoHeader()
+	void addCryptoHeader(bool addChecksum)
 	{
-		*(uint32_t*)(m_MsgBuf + 2) = adlerChecksum((uint8_t*)(m_MsgBuf + 6), m_MsgSize);
-		m_MsgSize = m_MsgSize + 4;
-		*(uint16_t*)(m_MsgBuf) = m_MsgSize;
-		m_MsgSize = m_MsgSize + 2;
-		m_outputBufferStart = 0;
+		if(addChecksum){
+			add_header((uint32_t)(adlerChecksum((uint8_t*)(m_MsgBuf + m_outputBufferStart), m_MsgSize)));
+		}
+		add_header((uint16_t)(m_MsgSize));
 	}
 
 	enum OutputMessageState{
@@ -70,8 +66,8 @@ public:
 	Protocol* getProtocol() { return m_protocol;}
 	Connection* getConnection() { return m_connection;}
 
-	void setOutputBufferStart(uint32_t pos) {m_outputBufferStart = pos;}
-	uint32_t getOutputBufferStart() const {return m_outputBufferStart;}
+	//void setOutputBufferStart(uint32_t pos) {m_outputBufferStart = pos;}
+	//uint32_t getOutputBufferStart() const {return m_outputBufferStart;}
 
 #ifdef __TRACK_NETWORK__
 	void Track(std::string file, long line, std::string func)
@@ -96,12 +92,31 @@ protected:
 	std::list<std::string> last_uses;
 #endif
 
+	template <typename T>
+	inline void add_header(T add){
+		if((int32_t)m_outputBufferStart - (int32_t)sizeof(T) < 0){
+			std::cout << "Error: [OutputMessage::add_header] m_outputBufferStart(" << m_outputBufferStart <<
+					") < " << sizeof(T) << std::endl;
+			return;
+		}
+		m_outputBufferStart = m_outputBufferStart - sizeof(T);
+		*(T*)(m_MsgBuf + m_outputBufferStart) = add;
+		//added header size to the message size
+		m_MsgSize = m_MsgSize + sizeof(T);
+	}
+
+
 	void freeMessage()
 	{
 		setConnection(NULL);
 		setProtocol(NULL);
 		m_frame = 0;
+		//allocate enough size for headers
+		//2 bytes for unencrypted message size
+		//4 bytes for checksum
+		//2 bytes for encrypted message size
 		m_outputBufferStart = 8;
+
 		//setState have to be the last one
 		setState(OutputMessage::STATE_FREE);
 	}

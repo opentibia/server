@@ -23,6 +23,7 @@
 #include "outputmessage.h"
 #include "protocolgame.h"
 #include "protocollogin.h"
+#include "protocolold.h"
 #include "admin.h"
 #include "status.h"
 #include "tasks.h"
@@ -269,13 +270,10 @@ void Connection::parsePacket(const boost::system::error_code& error)
 				//Protocols without checksum
 				uint8_t protocolId = m_msg.GetByte();
 				switch(protocolId){
-				case 0x01: // Login server protocol
+				case 0x01: // Old Login server protocol
+				case 0x0A: // Old World server protocol
 					//This occurs if you try login with an old client version ( < 8.3)
-					m_protocol = new ProtocolLogin(this);
-					break;
-				case 0x0A: // World server protocol
-					//This occurs if you try login with an old client version (< 8.3)
-					m_protocol = new ProtocolGame(this);
+					m_protocol = new ProtocolOld(this);
 					break;
 				case 0xFE: // Admin protocol
 					m_protocol = new ProtocolAdmin(this);

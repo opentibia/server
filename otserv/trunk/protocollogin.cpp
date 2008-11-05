@@ -91,40 +91,6 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(key);
 
-	if(version <= 822){
-		//Client above this version has a checksum added, so we have to do stuff manually :(
-
-		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-		if(output){
-			setRawMessages(true);
-			output->setOutputBufferStart(4);
-			output->setReadPos(4);
-
-			TRACK_MESSAGE(output);
-			output->AddByte(0x0A);
-			output->AddString(STRING_CLIENT_VERSION);
-
-			char* buffer = output->getBuffer();
-
-			//writeMessageLength
-			*(uint16_t*)(buffer + 2) = output->getMessageLength();
-			output->setMessageLength(output->getMessageLength() + 2);
-			output->setOutputBufferStart(2);
-
-			XTEA_encrypt(*output);
-			//addCryptoHeader
-			*(uint16_t*)(buffer) = output->getMessageLength();
-			output->setMessageLength(output->getMessageLength() + 2);
-			output->setOutputBufferStart(0);
-
-			OutputMessagePool::getInstance()->send(output);
-			setRawMessages(false);
-		}
-
-		getConnection()->closeConnection();
-		return false;
-	}
-
 	std::string accname = msg.GetString();
 	std::string password = msg.GetString();
 
