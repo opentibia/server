@@ -23,12 +23,19 @@ function otstd.Commands.TestCommand.StorageTestGetHandler(event)
 	end
 end
 
+goof_listener = ""
+
 function otstd.Commands.TestCommand.TestSpecific(event)
-	registerSpecificOnSayListener(event.speaker, "substring", false, "remere", otstd.Commands.TestCommand.GoofHandler)
+	goof_listener = registerSpecificOnSayListener(event.speaker, "substring", false, "remere", otstd.Commands.TestCommand.GoofHandler)
+end
+
+function otstd.Commands.TestCommand.TestSpecificStop(event)
+	stopListener(goof_listener);
 end
 
 --registerGenericOnSayListener("substring", false, "remere", otstd.Commands.TestCommand.GoofHandler)
 registerGenericOnSayListener("beginning", false, "/set", otstd.Commands.TestCommand.StorageTestSetHandler)
 registerGenericOnSayListener("beginning", false, "/get", otstd.Commands.TestCommand.StorageTestGetHandler)
 
-registerGenericOnSayListener("beginning", false, "/tie", otstd.Commands.TestCommand.TestSpecific)
+registerGenericOnSayListener("beginning", false, "/tie",   otstd.Commands.TestCommand.TestSpecific)
+registerGenericOnSayListener("beginning", false, "/untie", otstd.Commands.TestCommand.TestSpecificStop)

@@ -148,6 +148,7 @@ public:
 
 	// Generic
 	void push(bool b) {pushBoolean(b);}
+	void push(int i) {pushInteger(i);}
 	void push(int32_t i) {pushInteger(i);}
 	void push(uint32_t ui) {pushUnsignedInteger(ui);}
 	void push(double d) {pushFloat(d);}
@@ -173,7 +174,13 @@ public:
 
 	int lua_stopListener();
 
+	//////////////////////////////////////////////////////////////////////////////
 	// Classes
+	// As C++ does not support partial class definitions, we have to put all lua
+	// functions declarations here.
+	// *********************************************************************
+	// PLEASE document the functions on the otfans.net when adding new ones!
+	// *********************************************************************
 
 	// - Event
 	int lua_Event_skip();
@@ -186,9 +193,31 @@ public:
 	int lua_Creature_getOrientation();
 	int lua_Creature_getHealth();
 	int lua_Creature_getHealthMax();
+	int lua_Creature_getName();
+
 	// - - Player
+	int lua_Player_getFood();
+	int lua_Player_getMana();
+	int lua_Player_getManaMax();
+	int lua_Player_getSoulPoints();
+	int lua_Player_getFreeCap();
+	int lua_Player_getMaximumCap();
+
+	int lua_Player_getSex();
+	int lua_Player_getAccess();
+	int lua_Player_getVocationID();
+	int lua_Player_getTownID();
+	int lua_Player_getGUID();
+	int lua_Player_getPremiumDays();
+	int lua_Player_getSkullType();
+
 	int lua_Player_setStorageValue();
 	int lua_Player_getStorageValue();
+
+	int lua_Player_getGuildID();
+	int lua_Player_getGuildName();
+	int lua_Player_getGuildRank();
+	int lua_Player_getGuildNick();
 
 	// - Game
 	int lua_sendMagicEffect();

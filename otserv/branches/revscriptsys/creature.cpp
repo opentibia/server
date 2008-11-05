@@ -1550,3 +1550,7 @@ Script::ListenerList Creature::getListeners(Script::ListenerType type) {
 	}
 	return li;
 }
+
+void Creature::clearListeners() {
+	registered_listeners.clear();
+}

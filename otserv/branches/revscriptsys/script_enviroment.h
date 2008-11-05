@@ -35,6 +35,7 @@ namespace Script {
 	//typedef boost::shared_ptr<const Listener> Listener_cptr;
 
 	typedef std::vector<Listener_ptr> ListenerList;
+	typedef std::map<uint32_t, Listener_ptr> ListenerMap;
 
 	typedef uint64_t ObjectID;
 
@@ -63,12 +64,18 @@ namespace Script {
 		// Cleanup must be called when no scripts are running as it will invalidate the listener maps
 		void cleanupUnusedListeners();
 
+		// This is just so it can be found & stopped effectively
+		void registerSpecificListener(Listener_ptr listener);
+
+		// Stop a listener!
 		bool stopListener(Listener* listener);
 		bool stopListener(ListenerType type, uint32_t id);
 
 		struct {
 			ListenerList OnSay;
 		} Generic;
+		ListenerMap specific_listeners;
+
 	protected:
 		bool stopListener(ListenerList& list, uint32_t id);
 		void cleanupUnusedListeners(ListenerList& list);

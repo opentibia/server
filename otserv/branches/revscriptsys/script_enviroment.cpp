@@ -47,8 +47,12 @@ void Enviroment::cleanupUnusedListeners(ListenerList& list) {
 	}
 }
 
-void Enviroment::cleanupUnusedListeners() {
+ void Enviroment::cleanupUnusedListeners() {
 	cleanupUnusedListeners(Generic.OnSay);
+}
+
+void Enviroment::registerSpecificListener(Listener_ptr listener) {
+	specific_listeners[listener->getID()] = listener;
 }
 
 bool Enviroment::stopListener(ListenerList& list, uint32_t id) {
@@ -70,8 +74,13 @@ bool Enviroment::stopListener(ListenerType type, uint32_t id) {
 		if(stopListener(Generic.OnSay, id)) return true;
 	}
 
-	// Try creatures
-	;
+	// Try specific
+	ListenerMap::iterator iter = specific_listeners.find(id);
+	if(iter != specific_listeners.end()) {
+		Listener_ptr listener = iter->second;
+		listener->deactivate();
+		return true;
+	}
 
 	return false;
 }

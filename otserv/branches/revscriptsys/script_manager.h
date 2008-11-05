@@ -21,9 +21,13 @@
 
 #include "lua_manager.h"
 
+#include <set>
+
 namespace Script {
 	class Event;
 	class Enviroment;
+	class LuaClassType;
+	typedef shared_ptr<LuaClassType> LuaClassType_ptr;
 
 	class Manager : public LuaStateManager {
 	public:
@@ -58,8 +62,9 @@ namespace Script {
 		};
 
 		typedef shared_ptr<ComposedCallback> ComposedCallback_ptr;
-		typedef std::map<uint32_t, ComposedCallback_ptr> FunctionMap;
+		typedef std::map<uint32_t, ComposedCallback_ptr> FunctionMap; 
 
+		std::map<std::string, LuaClassType_ptr> class_list;
 		FunctionMap function_map;
 		uint32_t function_id_counter;
 
@@ -78,6 +83,20 @@ namespace Script {
 		void parseWhitespace(std::string& str);
 		std::string parseIdentifier(std::string& s);
 		ComposedTypeDeclaration parseTypeDeclaration(std::string& s);
+
+		friend class LuaClassType;
+	};
+	
+
+	class LuaClassType {
+	public:
+		LuaClassType(Manager& manager, std::string name, std::string parent_name = "");
+		
+		bool isType(const std::string& type) const;
+	protected:
+		Manager& manager;
+		std::string name;
+		std::vector<std::string> parent_classes;
 	};
 }
 

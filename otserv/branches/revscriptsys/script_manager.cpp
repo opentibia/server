@@ -25,8 +25,8 @@
 using namespace Script;
 
 Manager::Manager(Script::Enviroment& e) : LuaStateManager(e), function_id_counter(1) {
-	registerFunctions();
 	registerClasses();
+	registerFunctions();
 }
 
 Manager::~Manager() {
@@ -305,7 +305,8 @@ Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 			type == "function" ||
 			type == "userdata" ||
 			type == "thread" ||
-			type == "table"
+			type == "table" ||
+			class_list.find(type) != class_list.end()
 			);
 
 		ctd.types.push_back(type);
@@ -319,6 +320,34 @@ Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 	return ctd;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Lua class type
+
+LuaClassType::LuaClassType(Manager& manager, std::string name, std::string parent_name) :
+	manager(manager),
+	name(name)
+{
+	if(parent_name == "") {
+		return;
+	}
+	std::map<std::string, LuaClassType_ptr>::iterator iter = manager.class_list.find(parent_name);
+	// If this fails you have a class inheriting from a non-existant class
+	assert(iter != manager.class_list.end());
+
+	LuaClassType_ptr pc = iter->second;
+	parent_classes.push_back(iter->first);
+	std::copy(pc->parent_classes.begin(), pc->parent_classes.end(), parent_classes.begin());
+}
+
+bool LuaClassType::isType(const std::string& typestring) const {
+	if(typestring == name) {
+		return true;
+	}
+	if(std::find(parent_classes.begin(), parent_classes.end(), typestring) == parent_classes.end()) {
+		return false;
+	}
+	return false;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register Lua Classes
@@ -338,6 +367,9 @@ void Manager::registerClass(const std::string& cname) {
 
 	// Pop the class metatable
 	lua_pop(state, 1); 
+
+	// Insert into the C++ class list for future reference
+	class_list[cname] = LuaClassType_ptr(new LuaClassType(*this, cname));
 }
 
 
@@ -366,7 +398,10 @@ void Manager::registerClass(const std::string& cname, const std::string& parent_
 	// Set the metatable of the derived class table to the redirect table
 	lua_setmetatable(state, -2); 
 	// Pop the derived class table
-	lua_pop(state, 1); 
+	lua_pop(state, 1);
+
+	// Insert into the C++ class list for future reference
+	class_list[cname] = LuaClassType_ptr(new LuaClassType(*this, cname, parent_class));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -402,7 +437,7 @@ void Manager::registerMemberFunction(const std::string& cname, const std::string
 	ComposedTypeDeclaration ctd;
 	ctd.name = cname;
 	ctd.optional_level = 0;
-	ctd.types.push_back("userdata");
+	ctd.types.push_back(cname); // Class name is first parameter type
 	func->parameters.insert(func->parameters.begin(), ctd);
 
 	// Construct function name, for debug purposes

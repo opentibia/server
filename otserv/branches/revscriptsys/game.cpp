@@ -189,10 +189,18 @@ int Game::loadMap(std::string filename, std::string filekind)
 
 bool Game::loadScripts() {
 	// Unload any old
-	delete script_enviroment;
-	delete script_system;
-	script_enviroment = NULL;
-	script_system = NULL;
+	if(script_enviroment || script_system) {
+		for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
+			it != Game::listCreature.list.end();
+			++it)
+		{
+			it->second->clearListeners();
+		}
+		delete script_enviroment;
+		delete script_system;
+		script_enviroment = NULL;
+		script_system = NULL;
+	}
 
 	// Load fresh!
 	try {
