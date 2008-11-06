@@ -73,6 +73,7 @@ namespace Script {
 
 		struct {
 			ListenerList OnSay;
+			ListenerList OnUseItem;
 		} Generic;
 		ListenerMap specific_listeners;
 

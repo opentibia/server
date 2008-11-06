@@ -25,7 +25,9 @@
 #include "script_manager.h"
 #include "tools.h"
 
+#include "player.h"
 #include "creature.h"
+#include "item.h"
 
 uint32_t Script::Event::eventID_counter = 0;
 
@@ -73,16 +75,33 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 	
 	// Update this instance with values from lua
 	update_instance(state, enviroment, thread);
-	
+
+	// Find out if the event should propagate
+	bool propagate = false;
+	thread->getField(-1, "skipped");
+	if(thread->isNil(-1)) {
+		thread->pop();
+	} else {
+		if(thread->isBoolean(-1)) {
+			propagate = thread->popBoolean();
+		} else {
+			thread->HandleError("Invalid type of value 'skipped' of event table from '" + getName() + "' listener.");
+			thread->pop();
+		}
+	}
+
 	// clean up
 	thread->pushNil();
 	thread->setRegistryItem(lua_tag);
 	thread->pop(); // pop event table, will be garbage collected as we cleared the registry from it
 
-	return true;
+	return !propagate;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// OnSay Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature speaks
 
 OnSay::Event::Event(Creature* _speaker, SpeakClass& _class, std::string& _receiver, std::string& _text) :
 	speaker(_speaker),
@@ -116,10 +135,25 @@ bool OnSay::Event::check_match(const ScriptInformation& info) {
 }
 
 bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment) {
-	if(dispatchEvent<OnSay::Event, ScriptInformation>(this, state, enviroment, speaker->getListeners(ONSAY_LISTENER)))
+	if(dispatchEvent<OnSay::Event, ScriptInformation>
+			(this, state, enviroment, speaker->getListeners(ONSAY_LISTENER))
+		)
 		return true;
 
-	return dispatchEvent<OnSay::Event, ScriptInformation>(this, state, enviroment, enviroment.Generic.OnSay);
+	return dispatchEvent<OnSay::Event, ScriptInformation>
+		(this, state, enviroment, enviroment.Generic.OnSay);
+}
+
+void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	//std::cout << "pushing instance" << std::endl;
+	state.pushClassTableInstance("OnSayEvent");
+	state.pushThing(speaker);
+	state.setField(-2, "speaker");
+	state.setField(-1, "class", int32_t(speak_class));
+	state.setField(-1, "receiver", receiver);
+	state.setField(-1, "text", text);
+	//std::cout << state.typeOf() << ":" << state.getStackTop() << std::endl;
+	//std::cout << "endof" << std::endl;
 }
 
 void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
@@ -151,14 +185,56 @@ void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaTh
 	}
 }
 
-void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
-	//std::cout << "pushing instance" << std::endl;
-	state.pushClassTableInstance("OnSayEvent");
-	state.pushThing(speaker);
-	state.setField(-2, "speaker");
-	state.setField(-1, "class", int32_t(speak_class));
-	state.setField(-1, "receiver", receiver);
-	state.setField(-1, "text", text);
-	//std::cout << state.typeOf() << ":" << state.getStackTop() << std::endl;
-	//std::cout << "endof" << std::endl;
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnUseItem Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature speaks
+
+OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos) :
+	user(user),
+	item(item),
+	targetPos(toPos)
+{
 }
+
+OnUseItem::Event::~Event() {
+}
+
+bool OnUseItem::Event::check_match(const ScriptInformation& info) {
+	switch(info.method) {
+		case FILTER_ITEMID: 
+			return item->getID() == info.id;
+		case FILTER_ACTIONID:
+			return item->getActionId() == info.id;
+		case FILTER_UNIQUEID:
+			return item->getUniqueId() == info.id;
+		default: break;
+	}
+	return false;
+}
+
+bool OnUseItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	return dispatchEvent<OnUseItem::Event, ScriptInformation>
+		(this, state, enviroment, enviroment.Generic.OnUseItem);
+}
+
+void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnUseItemEvent");
+	state.pushThing(user);
+	state.setField(-2, "user");
+	state.pushThing(item);
+	state.setField(-2, "item");
+	if(targetPos) {
+		state.pushPosition(*targetPos);
+	} else {
+		state.pushNil();
+	}
+	state.setField(-2, "target");
+}
+
+void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	// Nothing can change...
+}
+

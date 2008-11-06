@@ -142,8 +142,10 @@ public:
 	Thing* popThing(Script::ErrorMode mode = Script::ERROR_THROW);
 	Creature* popCreature(Script::ErrorMode mode = Script::ERROR_THROW);
 	Player* popPlayer(Script::ErrorMode mode = Script::ERROR_THROW);
+	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
 	// Push
 	void pushThing(Thing* thing);
+	void pushTile(Tile* tile);
 	
 
 	// Generic
@@ -205,6 +207,7 @@ public:
 
 	int lua_Player_getSex();
 	int lua_Player_getAccess();
+	int lua_Player_getGroup();
 	int lua_Player_getVocationID();
 	int lua_Player_getTownID();
 	int lua_Player_getGUID();

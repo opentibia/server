@@ -1,3 +1,6 @@
+
+-- STRING
+
 function string.explode(str, delimiter)
 	if str == nil then
 		return {}
@@ -25,13 +28,20 @@ function string.strip_whitespace(str)
 	return str
 end
 
-function getPlayerByAccountNumber(acc)
-	players = getPlayersByAccountNumber(acc)
-	if #players == 0 then
-		return 0
+
+-- TABLE
+
+function table.contains(t, val)
+	for k, v in pairs(t) do
+		if v == val then
+			return true
+		end
 	end
-	return players[1]
+	return false
 end
+
+
+-- IP
 
 function convertIntToIP(int, mask)
 	local b4 = bit.urshift(bit.uband(int,  4278190080), 24)

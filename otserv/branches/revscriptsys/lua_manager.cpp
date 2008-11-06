@@ -26,6 +26,7 @@
 #include "script_listener.h"
 #include "script_event.h"
 
+#include "tile.h"
 #include "container.h"
 #include "player.h"
 
@@ -283,10 +284,25 @@ void LuaState::pushThing(Thing* thing) {
 			objid = pushClassInstance("NPC");
 		}
 		*objid = enviroment.addObject(creature);
-	} else {
+	} else if(thing && thing->getTile()) {
+		pushTile(thing->getTile());
+	} else if(thing) {
 		Script::ObjectID* objid;
 		objid = pushClassInstance("Thing");
 		*objid = enviroment.addObject(thing);
+	} else {
+		pushNil();
+	}
+}
+
+void LuaState::pushTile(Tile* tile) {
+	if(tile) {
+		pushClassTableInstance("Tile");
+		setField(-1, "__x", tile->getPosition().x);
+		setField(-1, "__y", tile->getPosition().y);
+		setField(-1, "__z", tile->getPosition().z);
+	} else {
+		pushNil();
 	}
 }
 

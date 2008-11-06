@@ -73,6 +73,8 @@ void Manager::registerClasses() {
 	// Classes...
 	registerClass("Event");
 	registerClass("OnSayEvent");
+	registerClass("OnUseItemEvent");
+
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
 	registerClass("Monster", "Creature");
@@ -80,6 +82,7 @@ void Manager::registerClasses() {
 	registerClass("Item", "Thing");
 	registerClass("Teleport", "Item");
 	registerClass("Container", "Item");
+
 	registerClass("Tile");
 
 	// Event classes
@@ -109,13 +112,13 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getVocationID()", &Manager::lua_Player_getVocationID);
 	registerMemberFunction("Player", "getTownID()", &Manager::lua_Player_getTownID);
 	registerMemberFunction("Player", "getGUID()", &Manager::lua_Player_getGUID);
+	registerMemberFunction("Player", "getAccessGroup()", &Manager::lua_Player_getGroup);
 	registerMemberFunction("Player", "getPremiumDays()", &Manager::lua_Player_getPremiumDays);
 	registerMemberFunction("Player", "getSkull()", &Manager::lua_Player_getSkullType);
 	registerMemberFunction("Player", "getGuildID()", &Manager::lua_Player_getGuildID);
 	registerMemberFunction("Player", "getGuildName()", &Manager::lua_Player_getGuildName);
 	registerMemberFunction("Player", "getGuildRank()", &Manager::lua_Player_getGuildRank);
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
-
 }
 
 void Manager::registerFunctions() {
@@ -126,7 +129,12 @@ void Manager::registerFunctions() {
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
+
+	registerGlobalFunction("wait(int delay)", &Manager::lua_wait);
+
+	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
 	registerGlobalFunction("sendMagicEffect(position where, int type)", &Manager::lua_sendMagicEffect);
+
 
 	luaL_register(state, "bit", lua_BitReg);
 }
@@ -268,10 +276,14 @@ int LuaState::lua_stopListener() {
 // Class Event
 
 int LuaState::lua_Event_skip() {
+	// Event table is ontop of stack
+	setField(-2, "skipped", true);
 	return 1;
 }
 
 int LuaState::lua_Event_propagate() {
+	// Event table is ontop of stack
+	setField(-2, "skipped", false);
 	return 1;
 }
 
@@ -452,6 +464,12 @@ int LuaState::lua_Player_getGUID() {
 	return 1;
 }
 
+int LuaState::lua_Player_getGroup() {
+	Player* p = popPlayer();
+	push(p->getAccessGroup());
+	return 1;
+}
+
 int LuaState::lua_Player_getPremiumDays() {
 	Player* p = popPlayer();
 	push(p->getPremiumDays());
@@ -478,6 +496,12 @@ int LuaState::lua_sendMagicEffect()
 	g_game.addMagicEffect(pos, type);
 	pushBoolean(true);
 	return 1;
+}
+
+int LuaState::lua_getTile()
+{
+	//getTile(x, y, z)
+	pushTile(g_game.getTile(x, y, z));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

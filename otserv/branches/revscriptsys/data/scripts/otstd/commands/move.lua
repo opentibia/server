@@ -1,6 +1,10 @@
-otstd.Commands.MoveForward = {}
 
-function otstd.Commands.MoveForward.Handler(event)
+otstd.Commands.MoveForward = Command:new()
+
+otstd.Commands.MoveForward.words = "/a"
+otstd.Commands.MoveForward.groups = {"GM"}
+
+otstd.Commands.MoveForward.handler = function(event)
 	local dir = event.speaker:getOrientation()
 	local pos = event.speaker:getPosition()
 	
@@ -19,7 +23,7 @@ function otstd.Commands.MoveForward.Handler(event)
 	elseif dir == EAST then
 		pos.x = pos.x + tonumber(param)
 	else
-		return
+		error("Player facing invalid direction when invoking /a command!")
 	end
 	
 	if event.speaker:moveTo(pos) then
@@ -30,5 +34,4 @@ function otstd.Commands.MoveForward.Handler(event)
 	event.text = "" -- Don't display a message
 end
 
-otstd.Commands.MoveForward.Listener = registerGenericOnSayListener("beginning", false, "/move", otstd.Commands.MoveForward.Handler)
-
+otstd.Commands.MoveForward:register()

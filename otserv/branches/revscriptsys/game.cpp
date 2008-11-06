@@ -208,6 +208,16 @@ bool Game::loadScripts() {
 		script_system = new Script::Manager(*script_enviroment);
 		script_system->loadFile(g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/main.lua");
 	} catch(Script::Error&) {
+		for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
+			it != Game::listCreature.list.end();
+			++it)
+		{
+			it->second->clearListeners();
+		}
+		delete script_enviroment;
+		delete script_system;
+		script_enviroment = NULL;
+		script_system = NULL;
 		return false;
 	}
 	return true;
@@ -391,6 +401,11 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos,
 
 	int32_t stack = item->getParent()->__getIndexOfThing(item);
 	PositionEx posEx(pos, stack);
+
+	Script::OnUseItem::Event evt(player, item, NULL);
+	if(evt.dispatch(*script_system, *script_enviroment)) {
+		return RET_NOERROR;
+	}
 /*
 	Action* action = getAction(item, ACTION_UNIQUEID);
 	if(action){

@@ -176,6 +176,7 @@ public:
 	uint32_t getLevel() const {return level;}
 	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
 	int32_t getAccessLevel() const {return accessLevel;}
+	const std::string& getAccessGroup() const {return groupName;}
 
 	void setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
@@ -650,6 +651,7 @@ protected:
 	uint32_t magLevel;
 	uint32_t magLevelPercent;
 	int32_t accessLevel;
+	std::string groupName;
 	uint64_t experience;
 	uint32_t damageImmunities;
 	uint32_t conditionImmunities;

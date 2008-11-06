@@ -124,6 +124,46 @@ namespace Script {
 			std::string& receiver;
 		};
 	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// Use event
+	// Triggered when a player uses an item
+
+	namespace OnUseItem {
+		enum FilterType {
+			FILTER_ITEMID,
+			FILTER_UNIQUEID,
+			FILTER_ACTIONID,
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			uint16_t id;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* user, Item* item, const PositionEx* toPos);
+			~Event();
+
+			std::string getName() const {return "OnUseItem";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+			
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Player* user;
+			Item* item;
+			const PositionEx* targetPos;
+		};
+	}
 	
 	/* To add a new event
 	 * 1. Create the event class
