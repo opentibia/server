@@ -25,7 +25,7 @@
 <instant name="Levitate" words="exani hur" params="1" soul="0" exhaustion="1" prem="0" enabled="1" function="Levitate"></instant>
 <instant name="Summon Creature" words="utevo res" aggressive="1" params="1" lvl="10" soul="0" exhaustion="1" prem="0" enabled="1" function="summonMonster"></instant>
 <instant name="Find Person" words="exiva" aggressive="0" params="1" lvl="10" mana="100" soul="0" exhaustion="1" prem="0" enabled="1" function="searchPlayer"></instant>
-<instant name="Heal Friend" words="exura sio" aggressive="0" params="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="healfriend.lua">
+<instant name="Heal Friend" words="exura sio" aggressive="0" params="1" needtarget="1" range="5" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="healfriend.lua">
 <vocation name="Druid"/>
 </instant>
 <instant name="Energy Wave" words="exevo mort hur" direction="1" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" script="energy wave.lua"></instant>
