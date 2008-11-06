@@ -781,7 +781,7 @@ if(Modules == nil) then
 
 		local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
 		local msg = module.npcHandler:parseMessage(module.npcHandler:getMessage(MESSAGE_SENDTRADE), parseInfo)
-		sendShopWindow(cid, itemWindow,
+		openShopWindow(cid, itemWindow,
 						function(cid, itemid, subType, amount) module.npcHandler:onBuy(cid, itemid, subType, amount) end,
 						function(cid, itemid, subType, amount) module.npcHandler:onSell(cid, itemid, subType, amount) end)
 		module.npcHandler:say(msg, cid)
