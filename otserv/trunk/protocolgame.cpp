@@ -1799,12 +1799,7 @@ void ProtocolGame::sendShop(const std::list<ShopInfo>& shop)
 	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7A);
-		if(shop.size() > 255){
-			msg->AddByte(255);
-		}
-		else{
-			msg->AddByte(shop.size());
-		}
+		msg->AddByte(std::min((size_t)255, shop.size()));
 
 		std::list<ShopInfo>::const_iterator it;
 		uint32_t i = 0;
@@ -1823,46 +1818,29 @@ void ProtocolGame::sendCloseShop()
 	}
 }
 
-void ProtocolGame::sendPlayerCash(uint32_t amount)
+void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
-		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7B);
-		msg->AddU32(amount);
+		msg->AddU32(g_game.getMoney(player));
 
-		// this might not be right, be prepared to correct it
-		msg->AddByte(0);
-	}
-}
-
-void ProtocolGame::sendPlayerCashAndSaleItems(uint32_t amount, const std::list<ShopInfo>& shop)
-{
-	NetworkMessage* msg = getOutputBuffer();
-	if(msg)
-	{
-		msg->AddByte(0x7B);
-		msg->AddU32(amount);
-
-		// the rest of this might not be right, be prepared to correct it
-		if(shop.size() > 255)
-		{
-			msg->AddByte(255);
+		std::map<uint32_t, uint32_t> saleMap;
+		for(std::list<ShopInfo>::const_iterator it = shop.begin(); it != shop.end(); ++it){
+			if((*it).sellPrice > 0){
+				int8_t subtype = ((*it).subType == 0) ? (-1) :((*it).subType);
+				uint32_t count = player->__getItemTypeCount((*it).itemId, subtype);
+				if(count > 0){
+					saleMap[(*it).itemId] =  count;
+				}
+			}
 		}
-		else
-		{
-			msg->AddByte(shop.size());
-		}
+		msg->AddByte(std::min((size_t)255, saleMap.size()));
 
-		std::list<ShopInfo>::const_iterator it;
 		uint32_t i = 0;
-		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i)
-		{
-			int8_t subtype = ((*it).subType == 0) ? (-1) :((*it).subType);
-			uint32_t count = player->__getItemTypeCount((*it).itemId, subtype, false);
-
-			msg->AddU16((*it).itemId);
-			msg->AddByte(count);
+		for(std::map<uint32_t, uint32_t>::const_iterator it = saleMap.begin(); it != saleMap.end() && i < 255; ++it, ++i){
+			msg->AddItemId(it->first);
+			msg->AddByte(it->second);
 		}
 	}
 }

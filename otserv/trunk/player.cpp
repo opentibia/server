@@ -1207,6 +1207,19 @@ void Player::sendPing(uint32_t interval)
 	}
 }
 
+void Player::updateSaleShopList(uint32_t itemId)
+{
+	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
+		if((*it).itemId == itemId){
+			if(client){
+				client->sendSaleItemList(shopItemList);
+			}
+
+			break;
+		}
+	}
+}
+
 Item* Player::getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen)
 {
 	_windowTextId = windowTextId;
@@ -1488,6 +1501,13 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	}
 }
 
+void Player::openShopWindow(const std::list<ShopInfo>& shop)
+{
+	shopItemList = shop;
+	sendShop();
+	sendSaleItemList();
+}
+
 void Player::closeShopWindow()
 {
 	//unreference callbacks
@@ -1500,6 +1520,7 @@ void Player::closeShopWindow()
 		npc->onPlayerEndTrade(this, onBuy, onSell);
 		sendCloseShop();
 	}
+	shopItemList.clear();
 }
 
 void Player::onWalk(Direction& dir)
@@ -3125,6 +3146,10 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 		if(const Container* container = item->getContainer()){
 			onSendContainer(container);
 		}
+
+		if(shopOwner){
+			updateSaleShopList(item->getID());
+		}
 	}
 	else if(const Creature* creature = thing->getCreature()){
 		if(creature == this){
@@ -3166,6 +3191,10 @@ void Player::postRemoveNotification(Thing* thing, int32_t index, bool isComplete
 			else{
 				autoCloseContainers(container);
 			}
+		}
+
+		if(shopOwner){
+			updateSaleShopList(item->getID());
 		}
 	}
 }

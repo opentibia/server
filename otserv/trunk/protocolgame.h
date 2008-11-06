@@ -189,7 +189,7 @@ private:
 	void sendShop(const std::list<ShopInfo>& shop);
 	void sendCloseShop();
 	void sendPlayerCash(uint32_t amount);
-	void sendPlayerCashAndSaleItems(uint32_t amount, const std::list<ShopInfo>& shop);
+	void sendSaleItemList(const std::list<ShopInfo>& shop);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	void sendQuestLog();

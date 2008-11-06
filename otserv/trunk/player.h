@@ -390,6 +390,7 @@ public:
 	void addOutfit(uint32_t _looktype, uint32_t _addons);
 	bool remOutfit(uint32_t _looktype, uint32_t _addons);
 	bool canLogout();
+	void updateSaleShopList(uint32_t itemId);
 
 	//tile
 	//send methods
@@ -524,12 +525,10 @@ public:
 	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time = 0) const
 		{if(client) client->sendToChannel(creature, type, text, channelId, time);}
 	// new: shop window
-	void sendShop(const std::list<ShopInfo>& shop) const
-	    {if(client) client->sendShop(shop);}
-	void sendCash(uint32_t amount) const
-		{if(client) client->sendPlayerCash(amount);}
-	void sendCashAndSaleItems(uint32_t amount, const std::list<ShopInfo>& shop) const
-		{if(client) client->sendPlayerCashAndSaleItems(amount, shop);}
+	void sendShop()
+		{if(client){client->sendShop(shopItemList);}}
+	void sendSaleItemList() const
+		{if(client) client->sendSaleItemList(shopItemList);}
 	void sendCloseShop() const
 	    {if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
@@ -587,6 +586,7 @@ public:
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
+	void openShopWindow(const std::list<ShopInfo>& shop);
 	void closeShopWindow();
 
 	VIPListSet VIPList;
@@ -727,7 +727,7 @@ protected:
 	Npc* shopOwner;
 	int32_t purchaseCallback;
 	int32_t saleCallback;
-
+	std::list<ShopInfo> shopItemList;
 
 	//party variables
 	Party* party;
