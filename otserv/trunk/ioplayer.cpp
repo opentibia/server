@@ -44,24 +44,12 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	DBQuery query;
 	DBResult* result;
 
-	if(!(result = db->storeQuery(std::string("") +
-		"SELECT " +
-			"*, " +
-			"(SELECT " +
-				"`premend` " +
-			"FROM " +
-				"`accounts` " +
-			"WHERE " +
-				"`id`=`players`.`account_id`) " +
-			"AS `premend` " +
-		"FROM " +
-			"`players` " +
-		"WHERE " +
-			"`name` = " + db->escapeString(name)))
-		)
+	query << "SELECT *, (SELECT `premend` FROM `accounts` WHERE `id`=`players`.`account_id`) AS `premend` FROM `players` WHERE `name` = " + db->escapeString(name);
+	if(!(result = db->storeQuery(query.str())))
 	{
 	  	return false;
 	}
+	query.str("");
 
 	player->setGUID(result->getDataInt("id"));
 	player->accountId = result->getDataInt("account_id");
