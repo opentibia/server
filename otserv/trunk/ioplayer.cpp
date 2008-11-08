@@ -44,7 +44,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT *, (SELECT `premend` FROM `accounts` WHERE `id`=`players`.`account_id`) AS `premend` FROM `players` WHERE `name` = " + db->escapeString(name);
+	query << "SELECT `players`.`id` AS `id`, `players`.`name` AS `name`, `account_id`, `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, `healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, `posz`, `cap`, `lastlogin`, `lastip`, `save`, `conditions`, `redskulltime`, `redskull`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, `loss_items`, `rank_id`, `town_id`, `balance`, `premend` FROM `players` LEFT JOIN `account` ON `id_account` = `accounts`.`id` WHERE `players`.`name` = " + db->escapeString(name);
 	if(!(result = db->storeQuery(query.str())))
 	{
 	  	return false;
@@ -413,10 +413,9 @@ bool IOPlayer::savePlayer(Player* player)
 		db->freeResult(result);
 
 		query.str("");
-		query << "UPDATE `players` SET "
-			<< "  `lastlogin` = " << player->lastLoginSaved
-			<< ", `lastip` = " << player->lastip;
-		query << " WHERE `id` = " << player->getGUID();
+		query << "UPDATE `players` SET `lastlogin` = " << player->lastLoginSaved
+			<< ", `lastip` = " << player->lastip
+			<< " WHERE `id` = " << player->getGUID();
 
 		DBTransaction transaction(db);
 		if(!transaction.begin())
