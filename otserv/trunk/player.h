@@ -199,19 +199,27 @@ public:
 	void removeMessageBuffer();
 
 	double getCapacity() const {
-		if(!hasFlag(PlayerFlag_HasInfiniteCapacity)){
+		if(hasFlag(PlayerFlag_CannotPickupItem)){
+			return 0.00;
+		}
+		else if(hasFlag(PlayerFlag_HasInfiniteCapacity)){
+			return 10000.00;
+		}
+		else{
 			return capacity;
 		}
-		else
-			return 0.00;
 	}
 
 	double getFreeCapacity() const {
-		if(!hasFlag(PlayerFlag_HasInfiniteCapacity)) {
+		if(hasFlag(PlayerFlag_CannotPickupItem)){
+			return 0.00;
+		}
+		else if(hasFlag(PlayerFlag_HasInfiniteCapacity)){
+			return 10000.00;
+		}
+		else{
 			return std::max(0.00, capacity - inventoryWeight);
 		}
-		else
-			return 0.00;
 	}
 
 	virtual int32_t getMaxHealth() const {return getPlayerInfo(PLAYERINFO_MAXHEALTH);}

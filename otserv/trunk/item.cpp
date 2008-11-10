@@ -691,7 +691,7 @@ double Item::getWeight() const
 }
 
 std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
-	const Item* item /*= NULL*/, int32_t subType /*= -1*/)
+	const Item* item /*= NULL*/, int32_t subType /*= -1*/, bool addArticle /*= true*/)
 {
 	std::stringstream s;
 
@@ -708,7 +708,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			s << it.pluralName;
 		}
 		else{
-			if(!it.article.empty()){
+			if(addArticle && !it.article.empty()){
 				s << it.article << " ";
 			}
 			s << it.name;

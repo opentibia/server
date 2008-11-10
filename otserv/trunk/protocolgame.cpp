@@ -2958,8 +2958,19 @@ void ProtocolGame::AddShopItem(NetworkMessage* msg, const ShopInfo item)
 {
 	const ItemType& it = Item::items[item.itemId];
 	msg->AddU16(it.clientId);
-	msg->AddByte(item.subType);
-	msg->AddString(it.name);
+
+	if(it.stackable || it.isRune()){
+		msg->AddByte(item.subType);
+	}
+	else if(it.isSplash() || it.isFluidContainer()){
+		uint32_t fluidIndex = item.subType % 8;
+		msg->AddByte(fluidMap[fluidIndex]);
+	}
+	else{
+		msg->AddByte(1);
+	}
+
+	msg->AddString(Item::getDescription(it, -1, NULL, item.subType, false));
 	msg->AddU32((uint32_t)(it.weight*100));
 	msg->AddU32(item.buyPrice);
 	msg->AddU32(item.sellPrice);

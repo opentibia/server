@@ -119,8 +119,9 @@ public:
 	virtual Condition* clone() const = 0;
 
 	ConditionType_t getType() const { return conditionType;}
+	uint64_t getEndTime() const {return endTime;}
 	int32_t getTicks() const { return ticks; }
-	void setTicks(int32_t newTicks) { ticks = newTicks; }
+	void setTicks(int32_t newTicks);
 
 	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param);
 	static Condition* createCondition(PropStream& propStream);
@@ -140,6 +141,7 @@ public:
 protected:
 	ConditionId_t id;
 	int32_t ticks;
+	uint64_t endTime;
 	ConditionType_t conditionType;
 
 	virtual bool updateCondition(const Condition* addCondition);
