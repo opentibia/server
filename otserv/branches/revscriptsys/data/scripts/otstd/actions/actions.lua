@@ -1,0 +1,1 @@
+require("otstd/actions/doors")

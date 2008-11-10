@@ -26,10 +26,12 @@
 #include "script_listener.h"
 #include "script_event.h"
 
+#include "game.h"
 #include "tile.h"
 #include "container.h"
 #include "player.h"
 
+extern Game g_game;
 extern ConfigManager g_config;
 
 LuaState::LuaState(Script::Enviroment& env) : enviroment(env) {
@@ -81,6 +83,12 @@ void LuaState::getField(int index, const std::string& field_name) {
 
 void LuaState::setField(int index, const std::string& field_name) {
 	lua_setfield(state, index, field_name.c_str());
+}
+
+void LuaState::setField(int index, int field_index) {
+	push(field_index);
+	lua_insert(state, -2);
+	lua_settable(state, index);
 }
 
 void LuaState::clearStack() {
@@ -322,6 +330,24 @@ Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW *
 	return pos;
 }
 
+Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	if(!isTable(-1)) {
+		HandleError(mode, std::string("Couldn't pop thing, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		return NULL;
+	}
+
+	getField(-1, "__x");
+	int x = popInteger();
+	getField(-1, "__y");
+	int y = popInteger();
+	getField(-1, "__z");
+	int z = popInteger();
+
+	Tile* tile = g_game.getTile(x, y, z);
+	if(!tile) HandleError(mode, "Tile position is invalid.");
+	return tile;
+}
+
 Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	if(!isUserdata(-1)) {
 		HandleError(mode, std::string("Couldn't pop thing, top object is not of valid type (") + luaL_typename(state, -1) + ")");
@@ -352,6 +378,16 @@ Player* LuaState::popPlayer(Script::ErrorMode mode /* = Script::ERROR_THROW */) 
 		Player* p = c->getPlayer();
 		if(!p) HandleError(mode, "Object is not a player.");
 		return p;
+	}
+	return NULL;
+}
+
+Item* LuaState::popItem(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	Thing* t = popThing(mode);
+	if(t) {
+		Item* i = t->getItem();
+		if(!i) HandleError(mode, "Object is not an item.");
+		return i;
 	}
 	return NULL;
 }

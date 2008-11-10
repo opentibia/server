@@ -2141,6 +2141,9 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 			return NULL;
 		}
 
+		// Update script enviroment
+		script_enviroment->reassignObject(item, newItem);
+
 		return newItem;
 	}
 
@@ -2212,6 +2215,9 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 		item->setParent(NULL);
 		cylinder->postRemoveNotification(item, itemIndex, true);
 		FreeThing(item);
+
+		// Update script enviroment
+		script_enviroment->reassignObject(item, newItem);
 
 		return newItem;
 	}

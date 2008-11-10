@@ -216,6 +216,8 @@ bool OnUseItem::Event::check_match(const ScriptInformation& info) {
 }
 
 bool OnUseItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	// Extremely naive solution
+	// Should be a map with id:callback instead.
 	return dispatchEvent<OnUseItem::Event, ScriptInformation>
 		(this, state, enviroment, enviroment.Generic.OnUseItem);
 }

@@ -51,8 +51,10 @@ namespace Script {
 		// Make sure to use a pointer to the superclass of the object
 		ObjectID addObject(Thing* thing);
 		ObjectID addObject(Combat* combat);
-		// If the object is not scripted already, it will be added
+		bool reassignObject(Thing* oldthing, Thing* newthing);
+		// Returns NULL if there is no object with that ID
 		Thing* getThing(ObjectID id);
+
 		// Removes an object from the scripted object list
 		// called when a Thing is destroyed, for example
 		bool removeObject(ObjectID id);
@@ -103,6 +105,26 @@ namespace Script {
 			return id;
 		}
 		return thing_iter->second;
+	}
+
+	inline bool Enviroment::reassignObject(Thing* oldthing, Thing* newthing) {
+		ObjectMap::right_iterator obj_iter = object_map.right.find(reinterpret_cast<void*>(oldthing));
+		if(obj_iter == object_map.right.end()) {
+			return false;
+		}
+		// Store the ID
+		ObjectID id = obj_iter->second;
+
+		// Remove old
+		object_map.right.erase(obj_iter);
+
+		// Add the new one back in
+		object_map.left.insert(std::make_pair(id, reinterpret_cast<void*>(newthing)));
+#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+		std::cout << "Reassigned thing " << oldthing << " with new ref " << newthing << " using id " << id << std::endl;
+		debugOutput();
+#endif
+		return true;
 	}
 
 	inline Thing* Enviroment::getThing(ObjectID id) {

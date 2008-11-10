@@ -87,10 +87,16 @@ public:
 
 	// Top value as value, index is position of the target table on the stack
 	void setField(int index, const std::string& field_name);
+	void setField(int index, int field_index);
 	template<typename T>
 	void setField(int index, const std::string& field_name, const T& t) {
 		push(t);
 		setField((index <= -10000? index : (index < 0? index - 1 : index)), field_name);
+	}
+	template<typename T>
+	void setField(int index, int field_index, const T& t) {
+		push(t);
+		setField((index <= -10000? index : (index < 0? index - 1 : index)), field_index);
 	}
 	// Pushes value onto the stack
 	void getField(int index, const std::string& field_name);
@@ -142,7 +148,9 @@ public:
 	Thing* popThing(Script::ErrorMode mode = Script::ERROR_THROW);
 	Creature* popCreature(Script::ErrorMode mode = Script::ERROR_THROW);
 	Player* popPlayer(Script::ErrorMode mode = Script::ERROR_THROW);
+	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
+
 	// Push
 	void pushThing(Thing* thing);
 	void pushTile(Tile* tile);
@@ -165,17 +173,6 @@ public:
 	void HandleError(Script::ErrorMode mode, const std::string& error);
 	void HandleError(const std::string& error);
 
-	// And finally lua functions that are available for scripts
-	// They are instanced in script functions.cpp
-	// Global
-	// - Utility
-	int lua_wait();
-	// - Register Events
-	int lua_registerGenericEvent_OnSay();
-	int lua_registerSpecificEvent_OnSay();
-
-	int lua_stopListener();
-
 	//////////////////////////////////////////////////////////////////////////////
 	// Classes
 	// As C++ does not support partial class definitions, we have to put all lua
@@ -184,12 +181,22 @@ public:
 	// PLEASE document the functions on the otfans.net when adding new ones!
 	// *********************************************************************
 
+	// - Utility
+	int lua_wait();
+	// - Register Events
+	int lua_registerGenericEvent_OnSay();
+	int lua_registerSpecificEvent_OnSay();
+	int lua_registerGenericEvent_OnUseItem();
+
+	int lua_stopListener();
+
 	// - Event
 	int lua_Event_skip();
 	int lua_Event_propagate();
 
 	// - Thing
 	int lua_Thing_getPosition();
+	int lua_Thing_getParentTile();
 	int lua_Thing_moveToPosition();
 	// - - Creature
 	int lua_Creature_getOrientation();
@@ -197,7 +204,9 @@ public:
 	int lua_Creature_getHealthMax();
 	int lua_Creature_getName();
 
-	// - - Player
+	int lua_Creature_walk();
+
+	// - - - Player
 	int lua_Player_getFood();
 	int lua_Player_getMana();
 	int lua_Player_getManaMax();
@@ -222,8 +231,19 @@ public:
 	int lua_Player_getGuildRank();
 	int lua_Player_getGuildNick();
 
+	// - - Item
+	int lua_Item_getItemID();
+	int lua_Item_setItemID();
+
+	// - Tile
+	int lua_Tile_getThing();
+	int lua_Tile_getCreatures();
+	int lua_Tile_getMoveableItems();
+	int lua_Tile_getItems();
+
 	// - Game
 	int lua_sendMagicEffect();
+	int lua_getTile();
 
 protected:
 	virtual Script::Manager* getManager() = 0;

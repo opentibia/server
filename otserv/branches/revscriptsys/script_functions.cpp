@@ -91,15 +91,20 @@ void Manager::registerClasses() {
 
 	// Game classes
 	registerMemberFunction("Thing", "getPosition()", &Manager::lua_Thing_getPosition);
+	registerMemberFunction("Thing", "getParentTile()", &Manager::lua_Thing_getParentTile);
 	registerMemberFunction("Thing", "moveTo(table pos)", &Manager::lua_Thing_moveToPosition);
 
+	// Creature
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
 
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getName()", &Manager::lua_Creature_getName);
+	
+	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
 
+	// Player
 	registerMemberFunction("Player", "setStorageValue(string key, string value)", &Manager::lua_Player_setStorageValue);
 	registerMemberFunction("Player", "getStorageValue(string key)", &Manager::lua_Player_getStorageValue);
 	registerMemberFunction("Player", "getFood()", &Manager::lua_Player_getFood);
@@ -119,6 +124,18 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getGuildName()", &Manager::lua_Player_getGuildName);
 	registerMemberFunction("Player", "getGuildRank()", &Manager::lua_Player_getGuildRank);
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
+
+	// Item
+	registerMemberFunction("Item", "getItemID()", &Manager::lua_Item_getItemID);
+
+	registerMemberFunction("Item", "setItemID(int newid)", &Manager::lua_Item_setItemID);
+
+	// Tile
+	registerMemberFunction("Tile", "getThing(int index)", &Manager::lua_Tile_getThing);
+	registerMemberFunction("Tile", "getCreatures()", &Manager::lua_Tile_getCreatures);
+	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
+	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
+
 }
 
 void Manager::registerFunctions() {
@@ -126,6 +143,8 @@ void Manager::registerFunctions() {
 
 	registerGlobalFunction("registerGenericOnSayListener(string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerGenericEvent_OnSay);
 	registerGlobalFunction("registerSpecificOnSayListener(Creature who, string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerSpecificEvent_OnSay);
+
+	registerGlobalFunction("registerGenericOnUseItemListener(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
@@ -240,6 +259,41 @@ int LuaState::lua_registerSpecificEvent_OnSay() {
 }
 
 
+int LuaState::lua_registerGenericEvent_OnUseItem() {
+	// Store callback
+	insert(-3);
+
+	int id = popInteger();
+	std::string method = popString();
+
+	OnUseItem::ScriptInformation si_onuse;
+	if(method == "itemid") {
+		si_onuse.method = OnUseItem::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onuse.method = OnUseItem::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onuse.method = OnUseItem::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (2) 'method'");
+	}
+	si_onuse.id = id;
+
+	boost::any p(si_onuse);
+	Listener_ptr listener(new Listener(ONUSEITEM_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnUseItem.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
 int LuaState::lua_stopListener() {
 	std::string listener_id = popString();
 
@@ -290,18 +344,107 @@ int LuaState::lua_Event_propagate() {
 ///////////////////////////////////////////////////////////////////////////////
 // Class Thing
 
-int LuaState::lua_Thing_getPosition() {
+int LuaState::lua_Thing_getPosition() 
+{
 	Thing* thing = popThing();
 	pushPosition(thing->getPosition());
 	return 1;
 }
 
-int LuaState::lua_Thing_moveToPosition() {
+int LuaState::lua_Thing_getParentTile() 
+{
+	Thing* thing = popThing();
+	pushThing(thing->getTile());
+	return 1;
+}
+
+int LuaState::lua_Thing_moveToPosition() 
+{
 	Position pos = popPosition();
 	Thing* thing = popThing();
 
 	pushBoolean(g_game.internalTeleport(thing, pos) == RET_NOERROR);
 	
+	return 1;
+}
+
+int LuaState::lua_Tile_getThing()
+{
+	int index = popInteger() - 1; // lua indices start at 1
+	Tile* tile = popTile();
+	
+	// -1 is top item
+	if(index > tile->__getLastIndex()) {
+		index = tile->__getLastIndex() - index;
+	}
+	if(index < 0) {
+		throw Error("Tile:getThing : Index out of range!");
+	}
+
+	pushThing(tile->__getThing(index));
+	return 1;
+}
+
+int LuaState::lua_Tile_getCreatures() 
+{
+	Tile* tile = popTile();
+	
+	newTable();
+	int n = 1;
+	for(CreatureVector::iterator iter = tile->creatures.begin(),
+		end_iter = tile->creatures.end();
+		iter != end_iter; ++iter, ++n)
+	{
+		pushThing(*iter);
+		setField(-3, n);
+	}
+	return 1;
+}
+
+int LuaState::lua_Tile_getMoveableItems() 
+{
+	Tile* tile = popTile();
+	
+	newTable();
+	int n = 1;
+	for(ItemVector::iterator iter = tile->downItems.begin(),
+		end_iter = tile->downItems.end();
+		iter != end_iter; ++iter)
+	{
+		if((*iter)->isNotMoveable() == false) {
+			pushThing(*iter);
+			setField(-3, n++);
+		}
+	}
+	return 1;
+}
+
+int LuaState::lua_Tile_getItems() 
+{
+	Tile* tile = popTile();
+	
+	newTable();
+	int n = 1;
+	if(tile->ground) {
+		pushThing(tile->ground);
+		setField(-3, n++);
+	}
+
+	for(ItemVector::iterator iter = tile->topItems.begin(),
+		end_iter = tile->topItems.end();
+		iter != end_iter; ++iter, ++n)
+	{
+		pushThing(*iter);
+		setField(-3, n);
+	}
+
+	for(ItemVector::iterator iter = tile->downItems.begin(),
+		end_iter = tile->downItems.end();
+		iter != end_iter; ++iter, ++n)
+	{
+		pushThing(*iter);
+		setField(-3, n);
+	}
 	return 1;
 }
 
@@ -329,6 +472,30 @@ int LuaState::lua_Creature_getHealthMax() {
 int LuaState::lua_Creature_getOrientation() {
 	Creature* creature = popCreature();
 	pushInteger(creature->getDirection());
+	return 1;
+}
+
+int LuaState::lua_Creature_walk()
+{
+	int ndir = popInteger();
+	Creature* creature = popCreature();
+
+	switch(ndir){
+		case NORTH:
+		case SOUTH:
+		case WEST:
+		case EAST:
+		case SOUTHWEST:
+		case NORTHWEST:
+		case NORTHEAST:
+		case SOUTHEAST:
+			break;
+		default:
+			throw Error("Creature:walk : Invalid direction");
+	}
+
+	ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)ndir, FLAG_NOLIMIT);
+	pushBoolean(ret == RET_NOERROR);
 	return 1;
 }
 
@@ -487,6 +654,43 @@ int LuaState::lua_Player_getSkullType() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Class Item
+
+int LuaState::lua_Item_getItemID()
+{
+	Item* item = popItem();
+	pushInteger(item->getID());
+	return 1;
+}
+
+int LuaState::lua_Item_setItemID()
+{
+	int newcount = -1;
+	if(getStackTop() > 2) {
+		newcount = popInteger();
+	}
+
+	int newid = popInteger();
+	Item* item = popItem();
+	
+	if(newid < 0 || newid > 65535) {
+		throw Error("Item:setItemID : item ID provided");
+	}
+
+	const ItemType& it = Item::items[newid];
+	if(it.stackable && newcount > 100 || newcount < -1){
+		throw Error("Item:setItemID : Stack count cannot be higher than 100.");
+	}
+
+	Item* newItem = g_game.transformItem(item, newid, newcount);
+
+	pushBoolean(true);
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// (Class) Game
+
 int LuaState::lua_sendMagicEffect()
 {
 	//doSendMagicEffect(pos, type)
@@ -501,7 +705,11 @@ int LuaState::lua_sendMagicEffect()
 int LuaState::lua_getTile()
 {
 	//getTile(x, y, z)
+	int z = popInteger();
+	int y = popInteger();
+	int x = popInteger();
 	pushTile(g_game.getTile(x, y, z));
+	return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -793,42 +1001,6 @@ int LuaScriptInterface::luaDoTeleportThing()
 	return 1;
 }
 
-int LuaScriptInterface::luaDoTransformItem()
-{
-	//doTransformItem(uid, toitemid, <optional> count/subtype)
-	int32_t parameters = lua_gettop(m_luaState);
-
-	int32_t count = -1;
-	if(parameters > 2){
-		count = popInteger();
-	}
-
-	uint16_t toId = (uint16_t)popUnsignedInteger();
-	uint32_t uid;
-	Item* item = popItem(&uid);
-
-	const ItemType& it = Item::items[toId];
-	if(it.stackable && count > 100){
-		reportErrorFunc("Stack count cannot be higher than 100.");
-		count = 100;
-	}
-
-	Item* newItem = g_game.transformItem(item, toId, count);
-
-	ScriptEnviroment* env = getScriptEnv();
-
-	if(item->isRemoved()){
-		env->removeItemByUID(uid);
-	}
-
-	if(newItem && newItem != item){
-		env->insertThing(uid, newItem);
-	}
-
-	pushBoolean(true);
-	return 1;
-}
-
 int LuaScriptInterface::luaDoCreatureSay()
 {
 	//doPlayerSay(cid, text, type)
@@ -837,28 +1009,6 @@ int LuaScriptInterface::luaDoCreatureSay()
 	Player* player = popPlayer();
 
 	g_game.internalCreatureSay(player,(SpeakClasses)type, text);
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoChangeTypeItem()
-{
-	//doChangeTypeItem(uid, newtype)
-	int32_t subtype = popInteger();
-	uint32_t uid;
-	Item* item = popItem(&uid);
-
-	Item* newItem = g_game.transformItem(item, item->getID(), subtype);
-
-	ScriptEnviroment* env = getScriptEnv();
-	if(item->isRemoved()){
-		env->removeItemByUID(uid);
-	}
-
-	if(newItem && newItem != item){
-		env->insertThing(uid, newItem);
-	}
-
 	pushBoolean(true);
 	return 1;
 }
@@ -3281,31 +3431,6 @@ int LuaScriptInterface::luaGetGuildId()
 	else{
 		pushUnsignedInteger(0);
 	}
-	return 1;
-}
-
-int LuaScriptInterface::luaDoMoveCreature()
-{
-	//doMoveCreature(cid, direction)
-	uint32_t direction = popNumber();
-	Creature* creature = popCreature();
-
-	switch(direction){
-		case NORTH:
-		case SOUTH:
-		case WEST:
-		case EAST:
-		case SOUTHWEST:
-		case NORTHWEST:
-		case NORTHEAST:
-		case SOUTHEAST:
-			break;
-		default:
-			throwLuaException("Invalid direction");
-	}
-
-	ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)direction, FLAG_NOLIMIT);
-	pushUnsignedInteger(ret);
 	return 1;
 }
 
