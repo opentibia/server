@@ -44,7 +44,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `players`.`id` AS `id`, `players`.`name` AS `name`, `account_id`, `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, `healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, `posz`, `cap`, `lastlogin`, `lastip`, `save`, `conditions`, `redskulltime`, `redskull`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, `loss_items`, `rank_id`, `town_id`, `balance`, `premend` FROM `players` LEFT JOIN `account` ON `id_account` = `accounts`.`id` WHERE `players`.`name` = " + db->escapeString(name);
+	query << "SELECT `players`.`id` AS `id`, `players`.`name` AS `name`, `account_id`, `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, `healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, `posz`, `cap`, `lastlogin`, `lastip`, `save`, `conditions`, `redskulltime`, `redskull`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, `loss_items`, `rank_id`, `town_id`, `balance`, `premend` FROM `players` LEFT JOIN `account` ON `account_id` = `accounts`.`id` WHERE `players`.`name` = " + db->escapeString(name);
 	if(!(result = db->storeQuery(query.str())))
 	{
 	  	return false;
