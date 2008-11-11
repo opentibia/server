@@ -399,46 +399,12 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos,
 		return RET_NOERROR;
 	}
 
-	int32_t stack = item->getParent()->__getIndexOfThing(item);
-	PositionEx posEx(pos, stack);
-
-	Script::OnUseItem::Event evt(player, item, NULL);
+	ReturnValue retval = RET_NOERROR;
+	Script::OnUseItem::Event evt(player, item, NULL, retval);
 	if(evt.dispatch(*script_system, *script_enviroment)) {
-		return RET_NOERROR;
-	}
-/*
-	Action* action = getAction(item, ACTION_UNIQUEID);
-	if(action){
-		//only continue with next action in the list if the previous returns false
-		if(executeUse(action, player, item, posEx, creatureId)){
-			return RET_NOERROR;
-		}
+		return retval;
 	}
 
-	action = getAction(item, ACTION_ACTIONID);
-	if(action){
-		//only continue with next action in the list if the previous returns false
-		if(executeUse(action, player, item, posEx, creatureId)){
-			return RET_NOERROR;
-		}
-	}
-
-	action = getAction(item, ACTION_ITEMID);
-	if(action){
-		//only continue with next action in the list if the previous returns false
-		if(executeUse(action, player, item, posEx, creatureId)){
-			return RET_NOERROR;
-		}
-	}
-
-	action = getAction(item, ACTION_RUNEID);
-	if(action){
-		//only continue with next action in the list if the previous returns false
-		if(executeUse(action, player, item, posEx, creatureId)){
-			return RET_NOERROR;
-		}
-	}
-*/
 	if(item->isReadable()){
 		if(item->canWriteText()){
 			player->setWriteItem(item, item->getMaxWriteLength());
@@ -529,6 +495,12 @@ ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx,
 	Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess)
 {
 	isSuccess = false;
+
+	ReturnValue retval = RET_NOERROR;
+	Script::OnUseItem::Event evt(player, item, &toPosEx, retval);
+	if(evt.dispatch(*script_system, *script_enviroment)) {
+		return retval;
+	}
 /*
 	Action* action = getAction(item, ACTION_UNIQUEID);
 	if(action){

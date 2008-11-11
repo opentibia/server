@@ -190,14 +190,21 @@ public:
 
 	int lua_stopListener();
 
+
 	// - Event
 	int lua_Event_skip();
 	int lua_Event_propagate();
 
+
 	// - Thing
 	int lua_Thing_getPosition();
 	int lua_Thing_getParentTile();
+
+	int lua_Thing_isMoveable();
+
 	int lua_Thing_moveToPosition();
+
+
 	// - - Creature
 	int lua_Creature_getOrientation();
 	int lua_Creature_getHealth();
@@ -205,6 +212,7 @@ public:
 	int lua_Creature_getName();
 
 	int lua_Creature_walk();
+
 
 	// - - - Player
 	int lua_Player_getFood();
@@ -233,12 +241,16 @@ public:
 
 	int lua_Player_addItem();
 
+
 	// - - Item
 	int lua_createItem();
-	int lua_Item_getItemID();
-	int lua_Item_setItemID();
-	
 	int lua_getItemIDByName();
+
+	int lua_Item_getItemID();
+
+	int lua_Item_setItemID();
+	int lua_Item_startDecaying();
+	
 
 	// - Tile
 	int lua_Tile_getThing();
@@ -246,6 +258,7 @@ public:
 	int lua_Tile_getMoveableItems();
 	int lua_Tile_getItems();
 	int lua_Tile_addItem();
+
 
 	// - Game
 	int lua_sendMagicEffect();

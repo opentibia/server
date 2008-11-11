@@ -92,6 +92,7 @@ void Manager::registerClasses() {
 	// Game classes
 	registerMemberFunction("Thing", "getPosition()", &Manager::lua_Thing_getPosition);
 	registerMemberFunction("Thing", "getParentTile()", &Manager::lua_Thing_getParentTile);
+	registerMemberFunction("Thing", "isMoveable()", &Manager::lua_Thing_isMoveable);
 	registerMemberFunction("Thing", "moveTo(table pos)", &Manager::lua_Thing_moveToPosition);
 
 	// Creature
@@ -132,6 +133,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Item", "getItemID()", &Manager::lua_Item_getItemID);
 
 	registerMemberFunction("Item", "setItemID(int newid)", &Manager::lua_Item_setItemID);
+	registerMemberFunction("Item", "startDecaying()", &Manager::lua_Item_startDecaying);
 
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
 
@@ -337,13 +339,13 @@ int LuaState::lua_stopListener() {
 
 int LuaState::lua_Event_skip() {
 	// Event table is ontop of stack
-	setField(-2, "skipped", true);
+	setField(-1, "skipped", true);
 	return 1;
 }
 
 int LuaState::lua_Event_propagate() {
 	// Event table is ontop of stack
-	setField(-2, "skipped", false);
+	setField(-1, "skipped", false);
 	return 1;
 }
 
@@ -374,16 +376,26 @@ int LuaState::lua_Thing_moveToPosition()
 	return 1;
 }
 
+int LuaState::lua_Thing_isMoveable()
+{
+	Thing* thing = popThing();
+	pushBoolean(thing->isPushable());
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Class Tile
+
 int LuaState::lua_Tile_getThing()
 {
-	int index = popInteger() - 1; // lua indices start at 1
+	int index = popInteger(); // lua indices start at 1, but we don't give a crap!
 	Tile* tile = popTile();
 	
 	// -1 is top item
-	if(index > tile->__getLastIndex()) {
-		index = tile->__getLastIndex() - index;
-	}
 	if(index < 0) {
+		index = tile->__getLastIndex() + index;
+	}
+	if(index > tile->__getLastIndex()) {
 		throw Error("Tile:getThing : Index out of range!");
 	}
 
@@ -752,6 +764,14 @@ int LuaState::lua_Item_setItemID()
 
 	Item* newItem = g_game.transformItem(item, newid, newcount);
 
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Item_startDecaying()
+{
+	Item* item = popItem();
+	g_game.startDecay(item);
 	pushBoolean(true);
 	return 1;
 }
@@ -1330,16 +1350,6 @@ int LuaScriptInterface::luaGetItemRWInfo()
 	}
 
 	pushUnsignedInteger(rwflags);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoDecayItem()
-{
-	//doDecayItem(uid)
-	//Note: to stop decay set decayTo = 0 in items.otb
-	Item* item = popItem();
-	g_game.startDecay(item);
-	pushBoolean(true);
 	return 1;
 }
 
@@ -3456,14 +3466,6 @@ int LuaScriptInterface::luaGetGuildId()
 	else{
 		pushUnsignedInteger(0);
 	}
-	return 1;
-}
-
-int LuaScriptInterface::luaIsMoveable()
-{
-	//isMoveable(uid)
-	Thing* thing = popThing();
-	pushBoolean(thing->isPushable());
 	return 1;
 }
 

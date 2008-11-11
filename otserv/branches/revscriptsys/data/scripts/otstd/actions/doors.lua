@@ -1,5 +1,6 @@
 
-otstd.doors = {
+otstd.doors = {}
+otstd.doorlist = {
 		[1209] = {newid=1211, horizontal=false, closed=true, level=false},
 		[1210] = {newid=1211, horizontal=false, closed=true, level=false},
 		[1211] = {newid=1210, horizontal=false, closed=false, level=false},
@@ -220,7 +221,7 @@ otstd.doors = {
 	}
 	
 function Item:switchDoor(movecreatures)
-	local doordata = otstd.doors[self:getItemID()] 
+	local doordata = otstd.doorlist[self:getItemID()] 
 	
 	if self:isDoor() then
 		if movecreatures ~= nil and movecreatures then
@@ -270,7 +271,7 @@ function Item:switchDoor(movecreatures)
 end
 
 function Item:isDoorClosed()
-	local doordata = otstd.doors[self:getItemID()]
+	local doordata = otstd.doorlist[self:getItemID()]
 	if doordata ~= nil then
 		return doordata.closed
 	end
@@ -278,7 +279,7 @@ function Item:isDoorClosed()
 end
 
 function Item:isDoorOpen()
-	local doordata = otstd.doors[self:getItemID()]
+	local doordata = otstd.doorlist[self:getItemID()]
 	if doordata ~= nil then
 		return not doordata.closed
 	end
@@ -298,11 +299,11 @@ function Item:closeDoor(movecreatures)
 end
 
 function Item:isDoor()
-	return otstd.doors[self:getItemID()] ~= nil
+	return otstd.doorlist[self:getItemID()] ~= nil
 end
 
 -- Generic door switch function
-function otstd.doorCallback(evt)
+function otstd.doors.callback(evt)
 	local door = evt.item
 	if door:isDoor() then
 		door:switchDoor(true)
@@ -310,11 +311,17 @@ function otstd.doorCallback(evt)
 end
 
 -- Register listeners!
-do
-	for doorid, doortype in pairs(otstd.doors) do
+function otstd.doors.registerHandlers()
+	for doorid, doortype in pairs(otstd.doorlist) do
+		if doortype.listener ~= nil then
+			stopListener(doortype.listener)
+		end
 		doortype.listener = 
-			registerGenericOnUseItemListener("itemid", doorid, otstd.doorCallback)
+			registerGenericOnUseItemListener("itemid", doorid, otstd.doors.callback)
 	end
 end
+
+otstd.doors.registerHandlers()
+
 
 

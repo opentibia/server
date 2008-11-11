@@ -143,7 +143,7 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Player* user, Item* item, const PositionEx* toPos);
+			Event(Player* user, Item* item, const PositionEx* toPos, ReturnValue& retval);
 			~Event();
 
 			std::string getName() const {return "OnUseItem";}
@@ -162,6 +162,7 @@ namespace Script {
 			Player* user;
 			Item* item;
 			const PositionEx* targetPos;
+			ReturnValue& retval;
 		};
 	}
 	

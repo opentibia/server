@@ -192,10 +192,11 @@ void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaTh
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature speaks
 
-OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos) :
+OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos, ReturnValue& retval) :
 	user(user),
 	item(item),
-	targetPos(toPos)
+	targetPos(toPos),
+	retval(retval)
 {
 }
 
@@ -228,6 +229,7 @@ void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.setField(-2, "user");
 	state.pushThing(item);
 	state.setField(-2, "item");
+	state.setField(-1, "retval", retval);
 	if(targetPos) {
 		state.pushPosition(*targetPos);
 	} else {
@@ -238,5 +240,13 @@ void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 
 void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
 	// Nothing can change...
+	thread->getField(-1, "retval");
+	if(thread->isNumber()) {
+		retval = (ReturnValue)thread->popInteger();
+	} 
+	else {
+		thread->HandleError("Event 'OnUseItem' invalid value of 'retval'");
+		thread->pop();
+	}
 }
 
