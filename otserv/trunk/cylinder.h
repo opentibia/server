@@ -36,6 +36,7 @@ enum cylinderflags_t {
 	FLAG_CHILDISOWNER = 8,			//Used by containers to query capacity of the carrier (player)
 	FLAG_PATHFINDING = 16,			//An additional check is done for floor changing/teleport items
 	FLAG_IGNOREFIELDDAMAGE = 32,	//Bypass field damage checks
+	FLAG_IGNORENOTMOVEABLE = 64		//Bypass check for movability
 };
 
 enum cylinderlink_t{
@@ -77,9 +78,10 @@ public:
 	  * Query if the cylinder can remove an object
 	  * \param item the object to move/remove
 	  * \param count is the amount that we want to remove
+	  * \param flags optional flags to modifiy the default behaviour
 	  * \return ReturnValue holds the return value
 	  */
-	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const = 0;
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const = 0;
 
 	/**
 	  * Query the destination cylinder
@@ -206,7 +208,7 @@ public:
 		uint32_t flags) const {return RET_NOTPOSSIBLE;}
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount, uint32_t flags) const {return RET_NOTPOSSIBLE;}
-	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const {return RET_NOTPOSSIBLE;}
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const {return RET_NOTPOSSIBLE;}
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 		uint32_t& flags) {return NULL;}
 

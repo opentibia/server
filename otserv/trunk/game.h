@@ -272,7 +272,7 @@ public:
 
 	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
 		uint32_t flags = 0, bool test = false);
-	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
+	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false, uint32_t flags = 0);
 
 	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true);
 
@@ -336,9 +336,10 @@ public:
 	  * Teleports an object to another position
 	  * \param thing is the object to teleport
 	  * \param newPos is the new position
+	  * \param flags optional flags to modify default behavior
 	  * \return true if the teleportation was successful
 	  */
-	ReturnValue internalTeleport(Thing* thing, const Position& newPos);
+	ReturnValue internalTeleport(Thing* thing, const Position& newPos, uint32_t flags = 0);
 
 	/**
 		* Turn a creature to a different direction.

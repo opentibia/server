@@ -2792,8 +2792,8 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 			if(thing){
 				if(Item* item = thing->getItem()){
 					const ItemType& it = Item::items[item->getID()];
-					if(it.moveable || it.isContainer()){
-						g_game.internalTeleport(item, toPos);
+					if(!it.isGroundTile() && !it.alwaysOnTop && !it.isMagicField()){
+						g_game.internalTeleport(item, toPos, FLAG_IGNORENOTMOVEABLE);
 					}
 				}
 				else if(Creature* creature = thing->getCreature()){

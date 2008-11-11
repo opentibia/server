@@ -132,7 +132,7 @@ ReturnValue Teleport::__queryMaxCount(int32_t index, const Thing* thing, uint32_
 	return RET_NOTPOSSIBLE;
 }
 
-ReturnValue Teleport::__queryRemove(const Thing* thing, uint32_t count) const
+ReturnValue Teleport::__queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const
 {
 	return RET_NOERROR;
 }

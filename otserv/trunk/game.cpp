@@ -1102,7 +1102,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 				return retExchangeMaxCount;
 			}
 
-			if((toCylinder->__queryRemove(toItem, toItem->getItemCount()) == RET_NOERROR) && ret == RET_NOERROR){
+			if((toCylinder->__queryRemove(toItem, toItem->getItemCount(), flags) == RET_NOERROR) && ret == RET_NOERROR){
 				int32_t oldToItemIndex = toCylinder->__getIndexOfThing(toItem);
 				toCylinder->__removeThing(toItem, toItem->getItemCount());
 				fromCylinder->__addThing(toItem);
@@ -1146,7 +1146,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	Item* moveItem = item;
 
 	//check if we can remove this item
-	ret = fromCylinder->__queryRemove(item, m);
+	ret = fromCylinder->__queryRemove(item, m, flags);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
@@ -1291,7 +1291,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 	return RET_NOERROR;
 }
 
-ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool test /*= false*/)
+ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool test /*= false*/, uint32_t flags /*= 0*/)
 {
 	Cylinder* cylinder = item->getParent();
 	if(cylinder == NULL){
@@ -1303,7 +1303,7 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 	}
 
 	//check if we can remove this item
-	ReturnValue ret = cylinder->__queryRemove(item, count);
+	ReturnValue ret = cylinder->__queryRemove(item, count, flags);
 	if(ret != RET_NOERROR && ret != RET_NOTMOVEABLE){
 		return ret;
 	}
@@ -1778,7 +1778,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 	return NULL;
 }
 
-ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
+ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_t flags /*= 0*/)
 {
 	if(newPos == thing->getPosition())
 		return RET_NOERROR;
@@ -1792,7 +1792,7 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
 			return RET_NOERROR;
 		}
 		else if(Item* item = thing->getItem()){
-			return internalMoveItem(item->getParent(), toTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
+			return internalMoveItem(item->getParent(), toTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL, flags);
 		}
 	}
 

@@ -59,7 +59,7 @@ ReturnValue Mailbox::__queryMaxCount(int32_t index, const Thing* thing, uint32_t
 	return RET_NOERROR;
 }
 
-ReturnValue Mailbox::__queryRemove(const Thing* thing, uint32_t count) const
+ReturnValue Mailbox::__queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const
 {
 	return RET_NOTPOSSIBLE;
 }

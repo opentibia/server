@@ -47,7 +47,7 @@ ReturnValue TrashHolder::__queryMaxCount(int32_t index, const Thing* thing, uint
 	return RET_NOERROR;
 }
 
-ReturnValue TrashHolder::__queryRemove(const Thing* thing, uint32_t count) const
+ReturnValue TrashHolder::__queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const
 {
 	return RET_NOTPOSSIBLE;
 }
