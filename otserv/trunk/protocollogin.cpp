@@ -133,7 +133,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	Account account = IOAccount::instance()->loadAccount(accname);
-	if(!(account.name == accname &&
+	if(!(asLowerCaseString(account.name) == asLowerCaseString(accname) &&
 			passwordTest(password, account.password))){
 
 		g_bans.addLoginAttempt(clientip, false);
