@@ -212,320 +212,301 @@
 	<!-- Doors -->
 	<action itemid="1209" script="doors/door_locked.lua"/>
 	<action itemid="1210" script="increment.lua"/>
-	<action itemid="1211" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1211" script="doors/door_open_vertical.lua"/>
 	<action itemid="1212" script="doors/door_locked.lua"/>
 	<action itemid="1213" script="increment.lua"/>
-	<action itemid="1214" script="doors/door_open_vertical.lua"/>
+	<action itemid="1214" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1219" script="increment.lua"/>
-	<action itemid="1220" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="1220" script="doors/door_open_vertical.lua"/> 
 	<action itemid="1221" script="increment.lua"/>
-	<action itemid="1222" script="doors/door_open_vertical.lua"/>
+	<action itemid="1222" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1223" script="doors/questdoor_closed.lua"/>
-	<action itemid="1224" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1224" script="doors/door_open_vertical.lua"/>
 	<action itemid="1225" script="doors/questdoor_closed.lua"/>
-	<action itemid="1226" script="doors/door_open_vertical.lua"/>
+	<action itemid="1226" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1227" script="doors/gateofexp_closed.lua"/>
-	<action itemid="1228" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1228" script="doors/door_open_vertical.lua"/>
 	<action itemid="1229" script="doors/gateofexp_closed.lua"/>
-	<action itemid="1230" script="doors/door_open_vertical.lua"/>
+	<action itemid="1230" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1231" script="doors/door_locked.lua"/>
 	<action itemid="1232" script="increment.lua"/>
-	<action itemid="1233" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1233" script="doors/door_open_vertical.lua"/>
 	<action itemid="1234" script="doors/door_locked.lua"/>
 	<action itemid="1235" script="increment.lua"/>
-	<action itemid="1236" script="doors/door_open_vertical.lua"/>
+	<action itemid="1236" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1237" script="increment.lua"/>
-	<action itemid="1238" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="1238" script="doors/door_open_vertical.lua"/> 
 	<action itemid="1239" script="increment.lua"/>
-	<action itemid="1240" script="doors/door_open_vertical.lua"/>
+	<action itemid="1240" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1241" script="doors/questdoor_closed.lua"/>
-	<action itemid="1242" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1242" script="doors/door_open_vertical.lua"/>
 	<action itemid="1243" script="doors/questdoor_closed.lua"/>
-	<action itemid="1244" script="doors/door_open_vertical.lua"/>
+	<action itemid="1244" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1245" script="doors/gateofexp_closed.lua"/>
-	<action itemid="1246" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1246" script="doors/door_open_vertical.lua"/>
 	<action itemid="1247" script="doors/gateofexp_closed.lua"/>
-	<action itemid="1248" script="doors/door_open_vertical.lua"/>	
+	<action itemid="1248" script="doors/door_open_horizontal.lua"/>	
 
 	<action itemid="1249" script="doors/door_locked.lua"/>
 	<action itemid="1250" script="increment.lua"/>
-	<action itemid="1251" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1251" script="doors/door_open_vertical.lua"/>
 	<action itemid="1252" script="doors/door_locked.lua"/>
 	<action itemid="1253" script="increment.lua"/>
-	<action itemid="1254" script="doors/door_open_vertical.lua"/>
+	<action itemid="1254" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1255" script="doors/questdoor_closed.lua"/>
-	<action itemid="1256" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1256" script="doors/door_open_vertical.lua"/>
 	<action itemid="1257" script="doors/questdoor_closed.lua"/>
-	<action itemid="1258" script="doors/door_open_vertical.lua"/>
+	<action itemid="1258" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1259" script="doors/gateofexp_closed.lua"/>
-	<action itemid="1260" script="doors/door_open_horizontal.lua"/>
+	<action itemid="1260" script="doors/door_open_vertical.lua"/>
 	<action itemid="1261" script="doors/gateofexp_closed.lua"/>
-	<action itemid="1262" script="doors/door_open_vertical.lua"/>
+	<action itemid="1262" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1539" script="increment.lua"/>
-	<action itemid="1540" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="1540" script="doors/door_open_vertical.lua"/> 
 	<action itemid="1541" script="increment.lua"/>
-	<action itemid="1542" script="doors/door_open_vertical.lua"/>
+	<action itemid="1542" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="1634" script="increment.lua"/>
-	<action itemid="1635" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="1635" script="doors/door_open_vertical.lua"/> 
 	<action itemid="1636" script="increment.lua"/>
-	<action itemid="1637" script="doors/door_open_vertical.lua"/>
+	<action itemid="1637" script="doors/door_open_horizontal.lua"/>
 	<action itemid="1638" script="increment.lua"/>
-	<action itemid="1639" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="1639" script="doors/door_open_vertical.lua"/> 
 	<action itemid="1640" script="increment.lua"/>
-	<action itemid="1641" script="doors/door_open_vertical.lua"/>
+	<action itemid="1641" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="3535" script="doors/door_locked.lua"/>
 	<action itemid="3536" script="increment.lua"/>
-	<action itemid="3537" script="doors/door_open_vertical.lua"/>
+	<action itemid="3537" script="doors/door_open_horizontal.lua"/>
 	<action itemid="3538" script="increment.lua"/>
-	<action itemid="3539" script="doors/door_open_vertical.lua"/>
+	<action itemid="3539" script="doors/door_open_horizontal.lua"/>
 	<action itemid="3540" script="doors/gateofexp_closed.lua"/>
-	<action itemid="3541" script="doors/door_open_vertical.lua"/>
+	<action itemid="3541" script="doors/door_open_horizontal.lua"/>
 	<action itemid="3542" script="doors/questdoor_closed.lua"/>
-	<action itemid="3543" script="doors/door_open_vertical.lua"/>
+	<action itemid="3543" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="3544" script="doors/door_locked.lua"/>
 	<action itemid="3545" script="increment.lua"/>
-	<action itemid="3546" script="doors/door_open_horizontal.lua"/>
+	<action itemid="3546" script="doors/door_open_vertical.lua"/>
 	<action itemid="3547" script="increment.lua"/>
-	<action itemid="3548" script="doors/door_open_horizontal.lua"/>
+	<action itemid="3548" script="doors/door_open_vertical.lua"/>
 	<action itemid="3549" script="doors/gateofexp_closed.lua"/>
-	<action itemid="3550" script="doors/door_open_horizontal.lua"/>
+	<action itemid="3550" script="doors/door_open_vertical.lua"/>
 	<action itemid="3551" script="doors/questdoor_closed.lua"/>
-	<action itemid="3552" script="doors/door_open_horizontal.lua"/>
+	<action itemid="3552" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="4913" script="doors/door_locked.lua"/>
 	<action itemid="4914" script="increment.lua"/>
-	<action itemid="4915" script="doors/door_open_horizontal.lua"/>
+	<action itemid="4915" script="doors/door_open_vertical.lua"/>
 	<action itemid="4916" script="doors/door_locked.lua"/>
 	<action itemid="4917" script="increment.lua"/>
-	<action itemid="4918" script="doors/door_open_vertical.lua"/>
+	<action itemid="4918" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5082" script="increment.lua"/>
-	<action itemid="5083" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="5083" script="doors/door_open_vertical.lua"/> 
 	<action itemid="5084" script="increment.lua"/>
-	<action itemid="5085" script="doors/door_open_vertical.lua"/>
+	<action itemid="5085" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5098" script="doors/door_locked.lua"/>
 	<action itemid="5099" script="increment.lua"/>
-	<action itemid="5100" script="doors/door_open_vertical.lua"/>
+	<action itemid="5100" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5101" script="increment.lua"/>
-	<action itemid="5102" script="doors/door_open_vertical.lua"/>
+	<action itemid="5102" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5103" script="doors/gateofexp_closed.lua"/>
-	<action itemid="5104" script="doors/door_open_vertical.lua"/>
+	<action itemid="5104" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5105" script="doors/questdoor_closed.lua"/>
-	<action itemid="5106" script="doors/door_open_vertical.lua"/>
+	<action itemid="5106" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5107" script="doors/door_locked.lua"/>
 	<action itemid="5108" script="increment.lua"/>
-	<action itemid="5109" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5109" script="doors/door_open_vertical.lua"/>
 	<action itemid="5110" script="increment.lua"/>
-	<action itemid="5111" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5111" script="doors/door_open_vertical.lua"/>
 	<action itemid="5112" script="doors/gateofexp_closed.lua"/>
-	<action itemid="5113" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5113" script="doors/door_open_vertical.lua"/>
 	<action itemid="5114" script="doors/questdoor_closed.lua"/>
-	<action itemid="5115" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5115" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="5116" script="doors/door_locked.lua"/>
 	<action itemid="5117" script="increment.lua"/>
-	<action itemid="5118" script="doors/door_open_vertical.lua"/>
+	<action itemid="5118" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5119" script="increment.lua"/>
-	<action itemid="5120" script="doors/door_open_vertical.lua"/>
+	<action itemid="5120" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5121" script="doors/gateofexp_closed.lua"/>
-	<action itemid="5122" script="doors/door_open_vertical.lua"/>
+	<action itemid="5122" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5123" script="doors/questdoor_closed.lua"/>
-	<action itemid="5124" script="doors/door_open_vertical.lua"/>
+	<action itemid="5124" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5125" script="doors/door_locked.lua"/>
 	<action itemid="5126" script="increment.lua"/>
-	<action itemid="5127" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5127" script="doors/door_open_vertical.lua"/>
 	<action itemid="5128" script="increment.lua"/>
-	<action itemid="5129" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5129" script="doors/door_open_vertical.lua"/>
 	<action itemid="5130" script="doors/gateofexp_closed.lua"/>
-	<action itemid="5131" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5131" script="doors/door_open_vertical.lua"/>
 	<action itemid="5132" script="doors/questdoor_closed.lua"/>
-	<action itemid="5133" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5133" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="5134" script="doors/door_locked.lua"/>
 	<action itemid="5135" script="increment.lua"/>
-	<action itemid="5136" script="doors/door_open_vertical.lua"/>
+	<action itemid="5136" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5137" script="doors/door_locked.lua"/>
 	<action itemid="5138" script="increment.lua"/>
-	<action itemid="5139" script="doors/door_open_vertical.lua"/>
+	<action itemid="5139" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5140" script="doors/door_locked.lua"/>
 	<action itemid="5141" script="increment.lua"/>
-	<action itemid="5142" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5142" script="doors/door_open_vertical.lua"/>
 	<action itemid="5143" script="doors/door_locked.lua"/>
 	<action itemid="5144" script="increment.lua"/>
-	<action itemid="5145" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5145" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="5278" script="doors/door_locked.lua"/>
 	<action itemid="5279" script="increment.lua"/>
-	<action itemid="5280" script="doors/door_open_vertical.lua"/>
+	<action itemid="5280" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5281" script="doors/door_locked.lua"/>
 	<action itemid="5282" script="increment.lua"/>
-	<action itemid="5283" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5283" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="5284" script="increment.lua"/>
-	<action itemid="5285" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="5285" script="doors/door_open_vertical.lua"/> 
 	<action itemid="5286" script="increment.lua"/>
-	<action itemid="5287" script="doors/door_open_vertical.lua"/>
+	<action itemid="5287" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5288" script="doors/questdoor_closed.lua"/>
-	<action itemid="5289" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5289" script="doors/door_open_vertical.lua"/>
 	<action itemid="5290" script="doors/questdoor_closed.lua"/>
-	<action itemid="5291" script="doors/door_open_vertical.lua"/>
+	<action itemid="5291" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5292" script="doors/gateofexp_closed.lua"/>
-	<action itemid="5293" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5293" script="doors/door_open_vertical.lua"/>
 	<action itemid="5294" script="doors/gateofexp_closed.lua"/>
-	<action itemid="5295" script="doors/door_open_vertical.lua"/>
+	<action itemid="5295" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5515" script="increment.lua"/>
-	<action itemid="5516" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="5516" script="doors/door_open_vertical.lua"/> 
 	<action itemid="5517" script="increment.lua"/>
-	<action itemid="5518" script="doors/door_open_vertical.lua"/>
+	<action itemid="5518" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="5732" script="doors/door_locked.lua"/>
 	<action itemid="5733" script="increment.lua"/>
-	<action itemid="5734" script="doors/door_open_vertical.lua"/>
+	<action itemid="5734" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5735" script="doors/door_locked.lua"/>
 	<action itemid="5736" script="increment.lua"/>
-	<action itemid="5737" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5737" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="5745" script="doors/questdoor_closed.lua"/>
-	<action itemid="5746" script="doors/door_open_vertical.lua"/>
+	<action itemid="5746" script="doors/door_open_horizontal.lua"/>
 	<action itemid="5748" script="doors/questdoor_closed.lua"/>
-	<action itemid="5749" script="doors/door_open_horizontal.lua"/>
+	<action itemid="5749" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="6192" script="doors/door_locked.lua"/>
 	<action itemid="6193" script="increment.lua"/>
-	<action itemid="6194" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6194" script="doors/door_open_vertical.lua"/>
 	<action itemid="6195" script="doors/door_locked.lua"/>
 	<action itemid="6196" script="increment.lua"/>
-	<action itemid="6197" script="doors/door_open_vertical.lua"/>
+	<action itemid="6197" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6198" script="increment.lua"/>
-	<action itemid="6199" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="6199" script="doors/door_open_vertical.lua"/> 
 	<action itemid="6200" script="increment.lua"/>
-	<action itemid="6201" script="doors/door_open_vertical.lua"/>
+	<action itemid="6201" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6202" script="doors/questdoor_closed.lua"/>
-	<action itemid="6203" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6203" script="doors/door_open_vertical.lua"/>
 	<action itemid="6204" script="doors/questdoor_closed.lua"/>
-	<action itemid="6205" script="doors/door_open_vertical.lua"/>
+	<action itemid="6205" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6206" script="doors/gateofexp_closed.lua"/>
-	<action itemid="6207" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6207" script="doors/door_open_vertical.lua"/>
 	<action itemid="6208" script="doors/gateofexp_closed.lua"/>
-	<action itemid="6209" script="doors/door_open_vertical.lua"/>
+	<action itemid="6209" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6249" script="doors/door_locked.lua"/>
 	<action itemid="6250" script="increment.lua"/>
-	<action itemid="6251" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6251" script="doors/door_open_vertical.lua"/>
 	<action itemid="6252" script="doors/door_locked.lua"/>
 	<action itemid="6253" script="increment.lua"/>
-	<action itemid="6254" script="doors/door_open_vertical.lua"/>
+	<action itemid="6254" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6255" script="increment.lua"/>
-	<action itemid="6256" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="6256" script="doors/door_open_vertical.lua"/> 
 	<action itemid="6257" script="increment.lua"/>
-	<action itemid="6258" script="doors/door_open_vertical.lua"/>
+	<action itemid="6258" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6259" script="doors/questdoor_closed.lua"/>
-	<action itemid="6260" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6260" script="doors/door_open_vertical.lua"/>
 	<action itemid="6261" script="doors/questdoor_closed.lua"/>
-	<action itemid="6262" script="doors/door_open_vertical.lua"/>
+	<action itemid="6262" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6263" script="doors/gateofexp_closed.lua"/>
-	<action itemid="6264" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6264" script="doors/door_open_vertical.lua"/>
 	<action itemid="6265" script="doors/gateofexp_closed.lua"/>
-	<action itemid="6266" script="doors/door_open_vertical.lua"/>
+	<action itemid="6266" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6795" script="increment.lua"/>
-	<action itemid="6796" script="doors/door_open_vertical.lua"/> 
+	<action itemid="6796" script="doors/door_open_horizontal.lua"/> 
 	<action itemid="6797" script="increment.lua"/>
-	<action itemid="6798" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6798" script="doors/door_open_vertical.lua"/>
 	<action itemid="6799" script="increment.lua"/>
-	<action itemid="6800" script="doors/door_open_vertical.lua"/> 
+	<action itemid="6800" script="doors/door_open_horizontal.lua"/> 
 	<action itemid="6801" script="increment.lua"/>
-	<action itemid="6802" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6802" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="6891" script="doors/door_locked.lua"/>
 	<action itemid="6892" script="increment.lua"/>
-	<action itemid="6893" script="doors/door_open_vertical.lua"/>
+	<action itemid="6893" script="doors/door_open_horizontal.lua"/>
 	<action itemid="6894" script="increment.lua"/>
-	<action itemid="6895" script="doors/door_open_vertical.lua"/>
+	<action itemid="6895" script="doors/door_open_horizontal.lua"/>
 	<action itemid="6896" script="doors/gateofexp_closed.lua"/>
-	<action itemid="6897" script="doors/door_open_vertical.lua"/>
+	<action itemid="6897" script="doors/door_open_horizontal.lua"/>
 	<action itemid="6898" script="doors/questdoor_closed.lua"/>
-	<action itemid="6899" script="doors/door_open_vertical.lua"/>
+	<action itemid="6899" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="6900" script="doors/door_locked.lua"/>
 	<action itemid="6901" script="increment.lua"/>
-	<action itemid="6902" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6902" script="doors/door_open_vertical.lua"/>
 	<action itemid="6903" script="increment.lua"/>
-	<action itemid="6904" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6904" script="doors/door_open_vertical.lua"/>
 	<action itemid="6905" script="doors/gateofexp_closed.lua"/>
-	<action itemid="6906" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6906" script="doors/door_open_vertical.lua"/>
 	<action itemid="6907" script="doors/questdoor_closed.lua"/>
-	<action itemid="6908" script="doors/door_open_horizontal.lua"/>
+	<action itemid="6908" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="7033" script="doors/door_locked.lua"/>
 	<action itemid="7034" script="increment.lua"/>
-	<action itemid="7035" script="doors/door_open_vertical.lua"/>
+	<action itemid="7035" script="doors/door_open_horizontal.lua"/>
 	<action itemid="7036" script="increment.lua"/>
-	<action itemid="7037" script="doors/door_open_vertical.lua"/>
+	<action itemid="7037" script="doors/door_open_horizontal.lua"/>
 	<action itemid="7038" script="doors/gateofexp_closed.lua"/>
-	<action itemid="7039" script="doors/door_open_vertical.lua"/>
+	<action itemid="7039" script="doors/door_open_horizontal.lua"/>
 	<action itemid="7040" script="doors/questdoor_closed.lua"/>
-	<action itemid="7041" script="doors/door_open_vertical.lua"/>
+	<action itemid="7041" script="doors/door_open_horizontal.lua"/>
 
 	<action itemid="7042" script="doors/door_locked.lua"/>
 	<action itemid="7043" script="increment.lua"/>
-	<action itemid="7044" script="doors/door_open_horizontal.lua"/>
+	<action itemid="7044" script="doors/door_open_vertical.lua"/>
 	<action itemid="7045" script="increment.lua"/>
-	<action itemid="7046" script="doors/door_open_horizontal.lua"/>
+	<action itemid="7046" script="doors/door_open_vertical.lua"/>
 	<action itemid="7047" script="doors/gateofexp_closed.lua"/>
-	<action itemid="7048" script="doors/door_open_horizontal.lua"/>
+	<action itemid="7048" script="doors/door_open_vertical.lua"/>
 	<action itemid="7049" script="doors/questdoor_closed.lua"/>
-	<action itemid="7050" script="doors/door_open_horizontal.lua"/>
+	<action itemid="7050" script="doors/door_open_vertical.lua"/>
 
 	<action itemid="7054" script="increment.lua"/>
-	<action itemid="7055" script="doors/door_open_horizontal.lua"/> 
+	<action itemid="7055" script="doors/door_open_vertical.lua"/> 
 	<action itemid="7056" script="increment.lua"/>
-	<action itemid="7057" script="doors/door_open_vertical.lua"/>
-
-	<action itemid="8445" script="doors/door_locked.lua"/>
-	<action itemid="8446" script="increment.lua"/>
-	<action itemid="8447" script="doors/door_open_horizontal.lua"/>
-	<action itemid="8448" script="doors/door_locked.lua"/>
-	<action itemid="8449" script="increment.lua"/>
-	<action itemid="8450" script="doors/door_open_vertical.lua"/>
-	<action itemid="8451" script="increment.lua"/>
-	<action itemid="8452" script="doors/door_open_horizontal.lua"/>
-	<action itemid="8453" script="increment.lua"/>
-	<action itemid="8454" script="doors/door_open_horizontal.lua"/>
-	<action itemid="8455" script="doors/questdoor_closed.lua"/>
-	<action itemid="8456" script="doors/door_open_horizontal.lua"/>
-	<action itemid="8457" script="doors/questdoor_closed.lua"/>
-	<action itemid="8458" script="doors/door_open_vertical.lua"/>
-	<action itemid="8459" script="doors/gateofexp_closed.lua"/>
-	<action itemid="8460" script="doors/door_open_horizontal.lua"/>
-	<action itemid="8461" script="doors/gateofexp_closed.lua"/>
-	<action itemid="8462" script="doors/door_open_vertical.lua"/>
+	<action itemid="7057" script="doors/door_open_horizontal.lua"/>
 
 	<!-- Windows -->
 	<action itemid="6436" script="doors/window_open.lua"/>
