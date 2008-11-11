@@ -33,8 +33,8 @@ extern Game g_game;
 Condition::Condition(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
 id(_id),
 ticks(_ticks),
-conditionType(_type),
-endTime(0)
+endTime(0),
+conditionType(_type)
 {
 	//
 }

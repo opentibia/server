@@ -119,7 +119,7 @@ public:
 	virtual Condition* clone() const = 0;
 
 	ConditionType_t getType() const { return conditionType;}
-	uint64_t getEndTime() const {return endTime;}
+	int64_t getEndTime() const {return endTime;}
 	int32_t getTicks() const { return ticks; }
 	void setTicks(int32_t newTicks);
 
@@ -141,7 +141,7 @@ public:
 protected:
 	ConditionId_t id;
 	int32_t ticks;
-	uint64_t endTime;
+	int64_t endTime;
 	ConditionType_t conditionType;
 
 	virtual bool updateCondition(const Condition* addCondition);
