@@ -2785,21 +2785,24 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 		return 1;
 	}
 
-	int32_t thingCount = fromTile->getThingCount();
-	for(int32_t i = thingCount - 1; i >= 0; --i){
-		Thing* thing = fromTile->__getThing(i);
-		if(thing){
-			if(Item* item = thing->getItem()){
-				if(item->isPushable()){
-					g_game.internalTeleport(item, toPos);
+	if(fromTile != toTile){
+		int32_t thingCount = fromTile->getThingCount();
+		for(int32_t i = thingCount - 1; i >= 0; --i){
+			Thing* thing = fromTile->__getThing(i);
+			if(thing){
+				if(Item* item = thing->getItem()){
+					const ItemType& it = Item::items[item->getID()];
+					if(it.moveable || it.isContainer()){
+						g_game.internalTeleport(item, toPos);
+					}
 				}
-			}
-			else if(Creature* creature = thing->getCreature()){
-				if(Position::areInRange<1,1>(fromPos, toPos)){
-					g_game.internalMoveCreature(creature, fromTile, toTile, FLAG_NOLIMIT);
-				}
-				else{
-					g_game.internalTeleport(creature, toPos);
+				else if(Creature* creature = thing->getCreature()){
+					if(Position::areInRange<1,1>(fromPos, toPos)){
+						g_game.internalMoveCreature(creature, fromTile, toTile, FLAG_NOLIMIT);
+					}
+					else{
+						g_game.internalTeleport(creature, toPos);
+					}
 				}
 			}
 		}

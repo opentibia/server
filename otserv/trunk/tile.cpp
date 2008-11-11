@@ -208,6 +208,22 @@ Item* Tile::getTopDownItem()
 	return NULL;
 }
 
+Item* Tile::getItemByTopOrder(uint32_t topOrder)
+{
+	//topOrder:
+	//1: borders
+	//2: ladders, signs, splashes
+	//3: doors etc
+	//4: creatures
+	for(ItemVector::reverse_iterator it = topItems.rbegin(); it != topItems.rend(); ++it){
+		if(Item::items[(*it)->getID()].alwaysOnTopOrder == topOrder){
+			return (*it);
+		}
+	}
+
+	return NULL;
+}
+
 Item* Tile::getTopTopItem()
 {
 	if(!topItems.empty()){

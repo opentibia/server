@@ -122,6 +122,7 @@ public:
 	Item* getTopDownItem();
 	bool isMoveableBlocking() const;
 	Thing* getTopThing();
+	Item* getItemByTopOrder(uint32_t topOrder);
 
 	uint32_t getThingCount() const {return thingCount;}
 

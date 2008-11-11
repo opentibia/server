@@ -47,6 +47,7 @@ enum stackPosType_t{
 	STACKPOS_MOVE,
 	STACKPOS_LOOK,
 	STACKPOS_USE,
+	STACKPOS_USEITEM,
 };
 
 enum WorldType_t {

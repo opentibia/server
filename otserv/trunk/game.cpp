@@ -282,6 +282,15 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			else if(type == STACKPOS_USE){
 				thing = tile->getTopDownItem();
 			}
+			else if(type == STACKPOS_USEITEM){
+				thing = tile->getItemByTopOrder(2);
+				if(thing == NULL){
+					thing = tile->getTopDownItem();
+				}
+				if(thing == NULL){
+					thing = tile->getTopTopItem();
+				}
+			}
 			else{
 				thing = tile->__getThing(index);
 			}
@@ -2082,14 +2091,14 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return false;
 	}
 
-	Thing* thing = internalGetThing(player, fromPos, fromStackPos, fromSpriteId);
+	Thing* thing = internalGetThing(player, fromPos, fromStackPos, fromSpriteId, STACKPOS_USEITEM);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
 	Item* item = thing->getItem();
-	if(!item || item->getClientID() != fromSpriteId || !item->isUseable()){
+	if(!item || !item->isUseable()){
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
@@ -2166,14 +2175,14 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-	Thing* thing = internalGetThing(player, pos, stackPos, spriteId);
+	Thing* thing = internalGetThing(player, pos, stackPos, spriteId, STACKPOS_USEITEM);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
 	Item* item = thing->getItem();
-	if(!item || item->getClientID() != spriteId){
+	if(!item){
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
