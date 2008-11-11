@@ -231,15 +231,21 @@ public:
 	int lua_Player_getGuildRank();
 	int lua_Player_getGuildNick();
 
+	int lua_Player_addItem();
+
 	// - - Item
+	int lua_createItem();
 	int lua_Item_getItemID();
 	int lua_Item_setItemID();
+	
+	int lua_getItemIDByName();
 
 	// - Tile
 	int lua_Tile_getThing();
 	int lua_Tile_getCreatures();
 	int lua_Tile_getMoveableItems();
 	int lua_Tile_getItems();
+	int lua_Tile_addItem();
 
 	// - Game
 	int lua_sendMagicEffect();

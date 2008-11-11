@@ -12,7 +12,7 @@ end
 
 function Command:register()
 	if self.listener ~= nil then
-		error("Can not register the same listener twice!")
+		stopListener(self.listener)
 	end
 	if self.words == nil then
 		error("Can not register command without words!")
@@ -40,3 +40,5 @@ end
 
 require("otstd/commands/move")
 require("otstd/commands/test")
+require("otstd/commands/floorchange")
+require("otstd/commands/makeitem")

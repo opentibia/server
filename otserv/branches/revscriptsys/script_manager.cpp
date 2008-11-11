@@ -90,15 +90,22 @@ int Manager::luaFunctionCallback(lua_State* L) {
 				last_optional_level = ctd.optional_level; 
 			}
 		}
+		
+		int passed_argument_count = parsed_argument_count;
 
 		parsed_argument_count = 0;
+		int n = 0;
 		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
 				ctditer != cc->parameters.end();
 				++ctditer)
 		{
 			const ComposedTypeDeclaration& ctd = *ctditer;
+			
+			if(parsed_argument_count < passed_argument_count) {
+				break;
+			}
 			parsed_argument_count += 1;
-
+			
 			std::string expected_type = "";
 
 			for(std::vector<std::string>::const_iterator type_iter = ctd.types.begin();
@@ -228,13 +235,20 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 				parseWhitespace(s);
 				assert(s.size() > 0);
 				assert(s[0]  == ',');
+				s.erase(s.begin());
+				parseWhitespace(s);
 				optional_level += 1;
 			}
 			else if(s[0] == ']') {
+				s.erase(s.begin());
+				parseWhitespace(s);
 				assert(optional_level > 0);
-				while(optional_level > 0) {
+				optional_level -= 1;
+
+				while(optional_level > 1) {
 					// After a ']' only another ']' can follow
 					assert(s[0] == ']');
+					s.erase(s.begin());
 					parseWhitespace(s);
 					optional_level -= 1;
 				}

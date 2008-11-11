@@ -8,7 +8,7 @@ otstd.Commands.MoveForward.handler = function(event)
 	local dir = event.speaker:getOrientation()
 	local pos = event.speaker:getPosition()
 	
-	local param = event.text:sub(6)
+	local param = event.text:sub(3)
 	
 	if #param == 0 or tonumber(param) == nil then
 		return

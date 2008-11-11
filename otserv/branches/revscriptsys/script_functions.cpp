@@ -124,17 +124,23 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getGuildName()", &Manager::lua_Player_getGuildName);
 	registerMemberFunction("Player", "getGuildRank()", &Manager::lua_Player_getGuildRank);
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
+	
+	registerMemberFunction("Player", "addItem(Item item)", &Manager::lua_Player_addItem);
 
 	// Item
+	registerGlobalFunction("createItem(int newid[, int count])", &Manager::lua_createItem);
 	registerMemberFunction("Item", "getItemID()", &Manager::lua_Item_getItemID);
 
 	registerMemberFunction("Item", "setItemID(int newid)", &Manager::lua_Item_setItemID);
+
+	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
 
 	// Tile
 	registerMemberFunction("Tile", "getThing(int index)", &Manager::lua_Tile_getThing);
 	registerMemberFunction("Tile", "getCreatures()", &Manager::lua_Tile_getCreatures);
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
+	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
 
 }
 
@@ -448,6 +454,25 @@ int LuaState::lua_Tile_getItems()
 	return 1;
 }
 
+int LuaState::lua_Tile_addItem()
+{
+	Item* item = popItem(Script::ERROR_PASS);
+	if(item == NULL) {
+		pushNil();
+		return 1;
+	}
+	Tile* tile = popTile();
+
+	if(item->getParent() != VirtualCylinder::virtualCylinder){
+		// Must remove from previous parent...
+		g_game.internalRemoveItem(item);
+	}
+
+	ReturnValue ret = g_game.internalAddItem(tile, item);
+	pushBoolean(ret == RET_NOERROR);
+	return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Class Creature
 
@@ -653,8 +678,51 @@ int LuaState::lua_Player_getSkullType() {
 	return 1;
 }
 
+int LuaState::lua_Player_addItem()
+{
+	bool canDropOnMap = true;
+
+	Item* item = popItem(ERROR_PASS);
+	if(item == NULL) {
+		pushNil();
+		return 1;
+	}
+	Player* player = popPlayer();
+
+	if(item->getParent() != VirtualCylinder::virtualCylinder){
+		// Must remove from previous parent...
+		g_game.internalRemoveItem(item);
+	}
+
+	ReturnValue ret = RET_NOERROR;
+	if(canDropOnMap){
+		ret = g_game.internalPlayerAddItem(player, item);
+	}
+	else{
+		ret = g_game.internalAddItem(player, item);
+	}
+	pushBoolean(ret == RET_NOERROR);
+	return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Class Item
+
+int LuaState::lua_createItem()
+{
+	int count = -1;
+	if(getStackTop() > 1) {
+		count = popInteger();
+	}
+	int id = popUnsignedInteger();
+
+	Item* item = Item::CreateItem((uint16_t)id, (count < 0? 0 : count));
+	item->useThing2();
+	pushThing(item);
+	// It will be freed if not assigned to any parent
+	g_game.FreeThing(item);
+	return 1;
+}
 
 int LuaState::lua_Item_getItemID()
 {
@@ -693,7 +761,6 @@ int LuaState::lua_Item_setItemID()
 
 int LuaState::lua_sendMagicEffect()
 {
-	//doSendMagicEffect(pos, type)
 	uint32_t type = popUnsignedInteger();
 	Position pos = popPosition();
 	
@@ -704,11 +771,23 @@ int LuaState::lua_sendMagicEffect()
 
 int LuaState::lua_getTile()
 {
-	//getTile(x, y, z)
 	int z = popInteger();
 	int y = popInteger();
 	int x = popInteger();
 	pushTile(g_game.getTile(x, y, z));
+	return 1;
+}
+
+int LuaState::lua_getItemIDByName()
+{
+	std::string name = popString();
+
+	int32_t itemid = Item::items.getItemIdByName(name);
+	if(itemid == -1){
+		pushNil();
+	} else {
+		pushUnsignedInteger(itemid);
+	}
 	return 1;
 }
 
@@ -1097,60 +1176,6 @@ int LuaScriptInterface::luaDoPlayerAddItem()
 
 	return 1;
 }
-
-int LuaScriptInterface::luaDoPlayerAddItemEx()
-{
-	//doPlayerAddItemEx(cid, uid, <optional: default: 0> canDropOnMap)
-	int32_t parameters = lua_gettop(m_luaState);
-
-	bool canDropOnMap = false;
-	if(parameters > 2){
-		canDropOnMap = popNumber() == 1;
-	}
-
-	Item* item = popItem();
-	Player* player = popPlayer();
-
-	if(item->getParent() != VirtualCylinder::virtualCylinder){
-		reportLuaError("Item already has a parent");
-		pushBoolean(false);
-		return 1;
-	}
-
-	ReturnValue ret = RET_NOERROR;
-	if(canDropOnMap){
-		ret = g_game.internalPlayerAddItem(player, item);
-	}
-	else{
-		ret = g_game.internalAddItem(player, item);
-	}
-
-	pushBoolean(ret == RET_NOERROR);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoTileAddItemEx()
-{
-	//doTileAddItemEx(pos, uid)
-	Item* item = popItem();
-	PositionEx pos = popPositionEx();
-
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-	if(!tile){
-		throwLuaException(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
-	}
-
-	if(item->getParent() != VirtualCylinder::virtualCylinder){
-		reportLuaError("Item already has a parent");
-		pushBoolean(false);
-		return 1;
-	}
-
-	ReturnValue ret = g_game.internalAddItem(tile, item);
-	pushNumber(ret);
-	return 1;
-}
-
 
 int LuaScriptInterface::luaDoRelocate()
 {
@@ -3799,21 +3824,6 @@ int LuaScriptInterface::luaGetCreatureSummons()
 		lua_settable(L, -3);
 	}
 
-	return 1;
-}
-
-int LuaScriptInterface::luaGetItemIdByName()
-{
-	//getItemIDByName(name)
-	std::string name = popString();
-
-	int32_t itemid = Item::items.getItemIdByName(name);
-	if(itemid == -1){
-		displayWarning("Item with this ID not found");
-		pushUnsignedInteger(0);
-		return 1;
-	}
-	pushUnsignedInteger(itemid)
 	return 1;
 }
 
