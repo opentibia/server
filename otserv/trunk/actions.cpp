@@ -142,6 +142,14 @@ ReturnValue Actions::canUse(const Player* player, const Position& pos)
 	return RET_NOERROR;
 }
 
+bool Actions::hasAction(const Item* item) const
+{
+	return	(getAction(item, ACTION_UNIQUEID) != NULL) ||
+			(getAction(item, ACTION_ACTIONID) != NULL) || 
+			(getAction(item, ACTION_ITEMID) != NULL) || 
+			(getAction(item, ACTION_RUNEID) != NULL);
+}
+
 ReturnValue Actions::canUse(const Player* player, const Position& pos, const Item* item)
 {
 	Action* action = getAction(item, ACTION_UNIQUEID);
@@ -212,23 +220,23 @@ ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, 
 	return RET_NOERROR;
 }
 
-Action* Actions::getAction(const Item* item, ActionType_t type /* = ACTION_ANY*/)
+Action* Actions::getAction(const Item* item, ActionType_t type /* = ACTION_ANY*/) const
 {
 	if(item->getUniqueId() != 0 && (type == ACTION_ANY || type == ACTION_UNIQUEID) ){
-		ActionUseMap::iterator it = uniqueItemMap.find(item->getUniqueId());
+		ActionUseMap::const_iterator it = uniqueItemMap.find(item->getUniqueId());
 		if(it != uniqueItemMap.end()){
 			return it->second;
 		}
 	}
 	if(item->getActionId() != 0 && (type == ACTION_ANY || type == ACTION_ACTIONID)){
-		ActionUseMap::iterator it = actionItemMap.find(item->getActionId());
+		ActionUseMap::const_iterator it = actionItemMap.find(item->getActionId());
 		if (it != actionItemMap.end()){
 			return it->second;
 		}
 	}
 
 	if(type == ACTION_ANY || type == ACTION_ITEMID){
-		ActionUseMap::iterator it = useItemMap.find(item->getID());
+		ActionUseMap::const_iterator it = useItemMap.find(item->getID());
 		if(it != useItemMap.end()){
 	   		return it->second;
 		}
