@@ -148,6 +148,8 @@ void Game::setGameState(GameState_t newState)
 
 				Dispatcher::getDispatcher().addTask(createTask(
 					boost::bind(&Game::shutdown, this)));
+				Scheduler::getScheduler().stop();
+				Dispatcher::getDispatcher().stop();
 				break;
 			}
 
@@ -4359,8 +4361,10 @@ void Game::resetCommandTag()
 
 void Game::shutdown()
 {
-	Scheduler::getScheduler().stop();
-	Dispatcher::getDispatcher().stop();
+	std::cout << "Shutting down server...";
+
+	Scheduler::getScheduler().shutdown();
+	Dispatcher::getDispatcher().shutdown();
 	Spawns::getInstance()->clear();
 	g_bans.clearTemporaryBans();
 
@@ -4368,6 +4372,7 @@ void Game::shutdown()
 		g_server->stop();
 	}
 
+	std::cout << "[done]" << std::endl;
 	cleanup();
 }
 

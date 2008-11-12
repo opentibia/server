@@ -48,6 +48,12 @@ inline Task* createTask(boost::function<void (void)> f){
 	return new Task(f);
 }
 
+enum DispatcherState{
+	STATE_RUNNING,
+	STATE_CLOSING,
+	STATE_TERMINATED,
+};
+
 class Dispatcher{
 public:
 	~Dispatcher() {}
@@ -60,10 +66,18 @@ public:
 
 	void addTask(Task* task);
 	void stop();
+	void shutdown();
 
 	static void dispatcherThread(void* p);
 
+	enum DispatcherState{
+		STATE_RUNNING,
+		STATE_CLOSING,
+		STATE_TERMINATED,
+	};
+
 protected:
+
 	Dispatcher();
 	void flush();
 
@@ -71,7 +85,7 @@ protected:
 	boost::condition_variable m_taskSignal;
 
 	std::list<Task*> m_taskList;
-	static bool m_shutdown;
+	static DispatcherState m_threadState;
 };
 
 

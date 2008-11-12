@@ -95,6 +95,12 @@ public:
 
 	static void schedulerThread(void* p);
 
+	enum SchedulerState{
+		STATE_RUNNING,
+		STATE_CLOSING,
+		STATE_TERMINATED,
+	};
+
 protected:
 	Scheduler();
 
@@ -105,7 +111,7 @@ protected:
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > m_eventList;
 	typedef std::set<uint32_t> EventIdSet;
 	EventIdSet m_eventIds;
-	static bool m_shutdown;
+	static SchedulerState m_threadState;
 };
 
 

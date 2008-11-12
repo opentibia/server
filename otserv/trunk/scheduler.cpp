@@ -26,11 +26,12 @@
 #include "exception.h"
 #endif
 
-bool Scheduler::m_shutdown = false;
+Scheduler::SchedulerState Scheduler::m_threadState = Scheduler::STATE_TERMINATED;
 
 Scheduler::Scheduler()
 {
 	m_lastEventId = 0;
+	Scheduler::m_threadState = STATE_RUNNING;
 	boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)NULL));
 }
 
@@ -48,7 +49,7 @@ void Scheduler::schedulerThread(void* p)
 	// NOTE: second argument defer_lock is to prevent from immediate locking
 	boost::unique_lock<boost::mutex> eventLockUnique(getScheduler().m_eventLock, boost::defer_lock);
 
-	while(!Scheduler::m_shutdown){
+	while(Scheduler::m_threadState != Scheduler::STATE_TERMINATED){
 		SchedulerTask* task = NULL;
 		bool runTask = false;
 		bool ret = true;
@@ -74,7 +75,7 @@ void Scheduler::schedulerThread(void* p)
 		#endif
 
 		// the mutex is locked again now...
-		if(ret == false && !Scheduler::m_shutdown){
+		if(ret == false && (Scheduler::m_threadState != Scheduler::STATE_TERMINATED)){
 			// ok we had a timeout, so there has to be an event we have to execute...
 			task = getScheduler().m_eventList.top();
 			getScheduler().m_eventList.pop();
@@ -112,10 +113,10 @@ void Scheduler::schedulerThread(void* p)
 
 uint32_t Scheduler::addEvent(SchedulerTask* task)
 {
-	m_eventLock.lock();
-
 	bool do_signal = false;
-	if(!Scheduler::m_shutdown){
+	if(Scheduler::m_threadState == Scheduler::STATE_RUNNING){
+		m_eventLock.lock();
+
 		// check if the event has a valid id
 		if(task->getEventId() == 0){
 			// if not generate one
@@ -135,17 +136,17 @@ uint32_t Scheduler::addEvent(SchedulerTask* task)
 		// we have to signal it
 		do_signal = (task == m_eventList.top());
 
-		#ifdef __DEBUG_SCHEDULER__
+#ifdef __DEBUG_SCHEDULER__
 		std::cout << "Scheduler: Added event " << task->getEventId() << std::endl;
-		#endif
+#endif
+
+		m_eventLock.unlock();
 	}
-#ifdef _DEBUG
+#ifdef __DEBUG_SCHEDULER__
 	else{
 		std::cout << "Error: [Scheduler::addTask] Scheduler thread is terminated." << std::endl;
 	}
 #endif
-
-	m_eventLock.unlock();
 
 	if(do_signal){
 		m_eventSignal.notify_one();
@@ -187,7 +188,17 @@ void Scheduler::stop()
 	std::cout << "Stopping Scheduler" << std::endl;
 	#endif
 	m_eventLock.lock();
-	m_shutdown = true;
+	m_threadState = Scheduler::STATE_CLOSING;
+	m_eventLock.unlock();
+}
+
+void Scheduler::shutdown()
+{
+	#ifdef __DEBUG_SCHEDULER__
+	std::cout << "Shutdown Scheduler" << std::endl;
+	#endif
+	m_eventLock.lock();
+	m_threadState = Scheduler::STATE_TERMINATED;
 
 	//this list should already be empty
 	while(!m_eventList.empty()){
