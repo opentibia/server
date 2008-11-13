@@ -60,7 +60,7 @@ __cdecl _SEHHandler(
 );
 void printPointer(std::ostream* output,unsigned long p);
 #else
-void _SigHandler(int signum);
+void _SigHandler(int signum, siginfo_t *info, void* secret);
 #endif
 
 #ifndef COMPILER_STRING
@@ -105,9 +105,14 @@ bool ExceptionHandler::InstallHandler(){
 	__asm__("movl %0,%%eax;movl %%eax,%%fs:0;": : "g" (&chain):"%eax");
 	#endif//__GNUC__
 	#else //Unix/Linux
-	signal(SIGILL, &_SigHandler);	// illegal instruction
-	signal(SIGSEGV, &_SigHandler);	// segmentation fault
-	signal(SIGFPE, &_SigHandler);	// floating-point exception
+	struct sigaction sa;
+	sa.sa_sigaction = &_SigHandler;
+	sigemptyset (&sa.sa_mask);
+	sa.sa_flags = SA_RESTART | SA_SIGINFO;
+
+	sigaction(SIGILL, &sa);		// illegal instruction
+	sigaction(SIGSEGV, &sa);	// segmentation fault
+	sigaction(SIGFPE, &sa);		// floating-point exception
 	#endif//WIN32 || defined __WINDOWS__
 	installed = true;
 	return true;
@@ -330,13 +335,13 @@ void printPointer(std::ostream* output,unsigned long p){
 }
 #else //Unix/Linux
 #define BACKTRACE_DEPTH 128
-void _SigHandler(int signum)
+void _SigHandler(int signum, siginfo_t *info, void* secret)
 {
 	// TODO
 	int addrs;
 	void* buffer[BACKTRACE_DEPTH];
 	char** symbols;
-	ucontext_t context;
+	ucontext_t context = *(ucontext_t*)secret;
 	greg_t esp = 0;
 	bool file;
 
@@ -359,17 +364,16 @@ void _SigHandler(int signum)
 	*outdriver << "Compiler info - " << COMPILER_STRING << std::endl;
 	*outdriver << "Compilation Date - " << COMPILATION_DATE << std::endl << std::endl;
 
-	// There doesn't appear to be a portable way to get the information displayed
-	//	here by the windows exception tracer, so consider that a "TODO" at best
+	// TODO: Memory status
+	// TODO: Server start time
+	// TODO: Crash time
+	// TODO: Process thread count (is it really needed anymore?)
 	*outdriver << std::endl;
 
 
 	outdriver->flags(std::ios::hex | std::ios::showbase);
 	*outdriver << "Signal: " << signum;
 
-	// register information - how do we get the information of the thread causing the signal
-	// rather than this one? Or are they the same?
-	/*if(getcontext(&context) == 0)
 	{
 	#if __WORDSIZE == 32
 		*outdriver << " at eip = " << context.uc_mcontext.gregs[REG_EIP] << std::endl;
@@ -383,7 +387,7 @@ void _SigHandler(int signum)
 		*outdriver << "esp = " << context.uc_mcontext.gregs[REG_ESP] << std::endl;
 		*outdriver << "efl = " << context.uc_mcontext.gregs[REG_EFL] << std::endl;
 		esp = context.uc_mcontext.gregs[REG_ESP];
-	#else // assumably 64-bit
+	#else // 64-bit
 		*outdriver << " at rip = " << context.uc_mcontext.gregs[REG_RIP] << std::endl;
 		*outdriver << "rax = " << context.uc_mcontext.gregs[REG_RAX] << std::endl;
 		*outdriver << "rbx = " << context.uc_mcontext.gregs[REG_RBX] << std::endl;
@@ -396,7 +400,7 @@ void _SigHandler(int signum)
 		*outdriver << "efl = " << context.uc_mcontext.gregs[REG_EFL] << std::endl;
 		esp = gregs[REG_RSP];
 	#endif
-	}*/
+	}
 	outdriver->flush();
 	*outdriver << std::endl;
 
