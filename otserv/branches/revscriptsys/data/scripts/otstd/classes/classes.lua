@@ -17,6 +17,8 @@ function isOfType(val, t)
 	return type(val) == t
 end
 
+typeof = isOfType
+
 require("otstd/classes/thing")
 require("otstd/classes/item")
 require("otstd/classes/teleport")
