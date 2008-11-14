@@ -87,6 +87,10 @@ extern AdminProtocolConfig* g_adminConfig;
 #endif
 #include "networkmessage.h"
 
+#if !defined(__WINDOWS__)
+extern time_t start_time;
+#endif
+
 void ErrorMessage(const char* message) {
 	std::cout << std::endl << std::endl << "Error: " << message;
 
@@ -98,6 +102,10 @@ void mainLoader(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
+#if !defined(__WINDOWS__)
+	// TODO: find something better than this hack. :|
+	time(&start_time);
+#endif
 #ifdef __OTSERV_ALLOCATOR_STATS__
 	boost::thread(boost::bind(&allocatorStatsThread, NULL));
 #endif

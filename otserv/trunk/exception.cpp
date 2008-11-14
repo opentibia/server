@@ -42,6 +42,9 @@ typedef std::map<unsigned long, char*> FunctionMap;
 #include <execinfo.h>
 #include <signal.h>
 #include <ucontext.h>
+
+#include <sys/time.h>
+#include <sys/resource.h> /* POSIX.1-2001 */
 #endif
 
 unsigned long max_off;
@@ -49,6 +52,10 @@ unsigned long min_off;
 FunctionMap functionMap;
 bool maploaded = false;
 boost::recursive_mutex maploadlock;
+
+#if !defined(__WINDOWS__)
+time_t start_time;
+#endif
 
 #if defined WIN32 || defined __WINDOWS__
 EXCEPTION_DISPOSITION
@@ -337,13 +344,18 @@ void printPointer(std::ostream* output,unsigned long p){
 #define BACKTRACE_DEPTH 128
 void _SigHandler(int signum, siginfo_t *info, void* secret)
 {
-	// TODO
+	bool file;
+
 	int addrs;
 	void* buffer[BACKTRACE_DEPTH];
 	char** symbols;
+
 	ucontext_t context = *(ucontext_t*)secret;
+	rusage resources;
+	rlimit resourcelimit;
 	greg_t esp = 0;
-	bool file;
+	tm *ts;
+	char date_buff[80];
 
 	std::ostream *outdriver;
 	std::cout << "Error: generating report file..." <<std::endl;
@@ -364,9 +376,37 @@ void _SigHandler(int signum, siginfo_t *info, void* secret)
 	*outdriver << "Compiler info - " << COMPILER_STRING << std::endl;
 	*outdriver << "Compilation Date - " << COMPILATION_DATE << std::endl << std::endl;
 
-	// TODO: Memory status
-	// TODO: Server start time
-	// TODO: Crash time
+	if(getrusage(RUSAGE_SELF, &resources) != -1)
+	{
+		//- global memory information
+		if(getrlimit(RLIMIT_AS, &resourcelimit) != -1)
+		{
+			// note: This is not POSIX standard, but it is available in Unix System V release 4, Linux, and 4.3 BSD
+			long memusage = resources.ru_ixrss + resources.ru_idrss + resources.ru_isrss;
+			long memtotal = resourcelimit.rlim_max;
+			long memavail = memtotal - memusage;
+			long memload = long(float(memusage / memtotal) * 100.f);
+			*outdriver << "Memory load: " << memload << "K " << std::endl
+				<< "Total memory: " << memtotal << "K "
+				<< "available: " << memavail << "K" << std::endl;
+		}
+		//-process info
+		// creation time
+		ts = localtime(&start_time);
+		strftime(date_buff, 80, "%d-%m-%Y %H:%M:%S", ts);
+		// kernel time
+		*outdriver << "Kernel time: " << (resources.ru_stime.tv_sec / 3600)
+			<< ":" << ((resources.ru_stime.tv_sec % 3600) / 60)
+			<< ":" << ((resources.ru_stime.tv_sec % 3600) % 60)
+			<< "." << (resources.ru_stime.tv_usec / 1000)
+			<< std::endl;
+		// user time
+		*outdriver << "User time: " << (resources.ru_utime.tv_sec / 3600)
+			<< ":" << ((resources.ru_utime.tv_sec % 3600) / 60)
+			<< ":" << ((resources.ru_utime.tv_sec % 3600) % 60)
+			<< "." << (resources.ru_utime.tv_usec / 1000)
+			<< std::endl;
+	}
 	// TODO: Process thread count (is it really needed anymore?)
 	*outdriver << std::endl;
 
