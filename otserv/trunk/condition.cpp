@@ -44,7 +44,7 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 	switch(param){
 		case CONDITIONPARAM_TICKS:
 		{
-			ticks = value;
+			setTicks(value);
 			return true;
 		}
 
@@ -129,7 +129,7 @@ bool Condition::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 				return false;
 			}
 
-			ticks = value;
+			setTicks(value);
 			return true;
 			break;
 		}
