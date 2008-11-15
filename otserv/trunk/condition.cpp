@@ -32,11 +32,10 @@ extern Game g_game;
 
 Condition::Condition(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
 id(_id),
-ticks(_ticks),
 endTime(0),
 conditionType(_type)
 {
-	//
+	setTicks(_ticks);
 }
 
 bool Condition::setParam(ConditionParam_t param, int32_t value)
@@ -330,6 +329,11 @@ Condition(_id, _type, _ticks)
 	//
 }
 
+Condition* ConditionGeneric::clone() const
+{
+	return new ConditionGeneric(id, conditionType, ticks);
+}
+
 bool ConditionGeneric::startCondition(Creature* creature)
 {
 	if(getTicks() > 0){
@@ -398,6 +402,17 @@ ConditionAttributes::ConditionAttributes(ConditionId_t _id, ConditionType_t _typ
 	memset(skills, 0, sizeof(skills));
 	memset(stats, 0, sizeof(stats));
 	memset(statsPercent, 0, sizeof(statsPercent));
+}
+
+Condition* ConditionAttributes::clone() const
+{
+	ConditionAttributes* ca = new ConditionAttributes(id, conditionType, ticks);
+	ca->currentSkill = currentSkill;
+	ca->currentStat = currentStat;
+	memcpy(ca->skills, skills, sizeof(skills));
+	memcpy(ca->stats, stats, sizeof(stats));
+	memcpy(ca->statsPercent, statsPercent, sizeof(statsPercent));
+	return ca;
 }
 
 void ConditionAttributes::addCondition(Creature* creature, const Condition* addCondition)
@@ -787,6 +802,18 @@ ConditionRegeneration::ConditionRegeneration(ConditionId_t _id, ConditionType_t 
 	manaGain = 0;
 }
 
+Condition* ConditionRegeneration::clone() const
+{
+	ConditionRegeneration* cr = new ConditionRegeneration(id, conditionType, ticks);
+	cr->internalHealthTicks = internalHealthTicks;
+	cr->internalManaTicks = internalManaTicks;
+	cr->healthTicks = healthTicks;
+	cr->manaTicks = manaTicks;
+	cr->healthGain = healthGain;
+	cr->manaGain = manaGain;
+	return cr;
+}
+
 void ConditionRegeneration::addCondition(Creature* creature, const Condition* addCondition)
 {
 	if(updateCondition(addCondition)){
@@ -985,6 +1012,15 @@ ConditionSoul::ConditionSoul(ConditionId_t _id, ConditionType_t _type, int32_t _
 	soulGain = 0;
 }
 
+Condition* ConditionSoul::clone() const
+{
+	ConditionSoul* cs = new ConditionSoul(id, conditionType, ticks);
+	cs->internalSoulTicks = internalSoulTicks;
+	cs->soulTicks = soulTicks;
+	cs->soulGain = soulGain;
+	return cs;
+}
+
 void ConditionSoul::addCondition(Creature* creature, const Condition* addCondition)
 {
 	if(updateCondition(addCondition)){
@@ -1128,6 +1164,22 @@ Condition(_id, _type, 0)
 	periodDamage = 0;
 	periodDamageTick = 0;
 	tickInterval = 2000;
+}
+
+Condition* ConditionDamage::clone() const
+{
+	ConditionDamage* cd = new ConditionDamage(id, conditionType);
+	cd->delayed = delayed;
+	cd->forceUpdate = forceUpdate;
+	cd->owner = owner;
+	cd->minDamage = minDamage;
+	cd->maxDamage = maxDamage;
+	cd->startDamage = startDamage;
+	cd->periodDamage = periodDamage;
+	cd->periodDamageTick = periodDamageTick;
+	cd->tickInterval = tickInterval;
+	cd->damageList.insert(cd->damageList.begin(), damageList.begin(), damageList.end());
+	return cd;
 }
 
 bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
@@ -1667,6 +1719,16 @@ Condition(_id, _type, _ticks)
 	maxb = 0.0f;
 }
 
+Condition* ConditionSpeed::clone() const
+{
+	ConditionSpeed* cs = new ConditionSpeed(id, conditionType, ticks, speedDelta);
+	cs->mina = mina;
+	cs->minb = minb;
+	cs->maxa = maxa;
+	cs->maxb = maxb;
+	return cs;
+}
+
 void ConditionSpeed::setFormulaVars(float _mina, float _minb, float _maxa, float _maxb)
 {
 	mina = _mina;
@@ -1918,6 +1980,12 @@ ConditionGeneric(_id, _type, _ticks)
 	//
 }
 
+Condition* ConditionInvisible::clone() const
+{
+	ConditionInvisible* ci = new ConditionInvisible(id, conditionType, ticks);
+	return ci;
+}
+
 bool ConditionInvisible::startCondition(Creature* creature)
 {
 	g_game.internalCreatureChangeVisible(creature, false);
@@ -1935,6 +2003,13 @@ ConditionOutfit::ConditionOutfit(ConditionId_t _id, ConditionType_t _type, int32
 Condition(_id, _type, _ticks)
 {
 	//
+}
+
+Condition* ConditionOutfit::clone() const
+{
+	ConditionOutfit* co = new ConditionOutfit(id, conditionType, ticks);
+	co->outfits.insert(co->outfits.begin(), outfits.begin(), outfits.end());
+	return co;
 }
 
 void ConditionOutfit::addOutfit(Outfit_t outfit)
@@ -2108,6 +2183,14 @@ Condition(_id, _type, _ticks)
 	lightInfo.color = _lightcolor;
 	internalLightTicks = 0;
 	lightChangeInterval = 0;
+}
+
+Condition* ConditionLight::clone() const
+{
+	ConditionLight* cl = new ConditionLight(id, conditionType, ticks, lightInfo.level, lightInfo.color);
+	cl->internalLightTicks = internalLightTicks;
+	cl->lightChangeInterval = lightChangeInterval;
+	return cl;
 }
 
 bool ConditionLight::startCondition(Creature* creature)
