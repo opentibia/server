@@ -1520,8 +1520,10 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 			interval = 0;
 		}
 	}
-
-	return Condition::executeCondition(creature, interval);
+	
+	if(damageList.empty())
+		return false;
+	return true;
 }
 
 bool ConditionDamage::getNextDamage(int32_t& damage)
