@@ -26,8 +26,10 @@
 
 #include "game.h"
 #include "creature.h"
+#include "town.h"
 
 extern Game g_game;
+extern Vocations g_vocations;
 
 using namespace Script;
 
@@ -84,6 +86,8 @@ void Manager::registerClasses() {
 	registerClass("Container", "Item");
 
 	registerClass("Tile");
+	
+	registerClass("Town");
 
 	// Event classes
 	registerMemberFunction("Event", "skip()", &Manager::lua_Event_skip);
@@ -92,8 +96,11 @@ void Manager::registerClasses() {
 	// Game classes
 	registerMemberFunction("Thing", "getPosition()", &Manager::lua_Thing_getPosition);
 	registerMemberFunction("Thing", "getParentTile()", &Manager::lua_Thing_getParentTile);
+	registerMemberFunction("Thing", "getParent()", &Manager::lua_Thing_getParent);
 	registerMemberFunction("Thing", "isMoveable()", &Manager::lua_Thing_isMoveable);
-	registerMemberFunction("Thing", "moveTo(table pos)", &Manager::lua_Thing_moveToPosition);
+	registerMemberFunction("Thing", "getPosition()", &Manager::lua_Thing_getPosition);
+	registerMemberFunction("Thing", "getDescription([int lookdistance])", &Manager::lua_Thing_getDescription);
+	registerMemberFunction("Thing", "destroy()", &Manager::lua_Thing_destroy);
 
 	// Creature
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
@@ -108,6 +115,7 @@ void Manager::registerClasses() {
 	// Player
 	registerMemberFunction("Player", "setStorageValue(string key, string value)", &Manager::lua_Player_setStorageValue);
 	registerMemberFunction("Player", "getStorageValue(string key)", &Manager::lua_Player_getStorageValue);
+
 	registerMemberFunction("Player", "getFood()", &Manager::lua_Player_getFood);
 	registerMemberFunction("Player", "getMana()", &Manager::lua_Player_getMana);
 	registerMemberFunction("Player", "getManaMax()", &Manager::lua_Player_getManaMax);
@@ -127,13 +135,32 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
 	
 	registerMemberFunction("Player", "addItem(Item item)", &Manager::lua_Player_addItem);
+	registerMemberFunction("Player", "getInventoryItem(int slot)", &Manager::lua_Player_getInventoryItem);
+	registerMemberFunction("Player", "addExperience(int experience)", &Manager::lua_Player_addExperience);
+	registerMemberFunction("Player", "setTown(int townid)", &Manager::lua_Player_setTown);
+	registerMemberFunction("Player", "setVocation(int vocationid)", &Manager::lua_Player_setVocation);
+
+	registerMemberFunction("Player", "getMoney()", &Manager::lua_Player_getMoney);
+	registerMemberFunction("Player", "removeMoney(int amount)", &Manager::lua_Player_removeMoney);
+	registerMemberFunction("Player", "addMoney(int amount)", &Manager::lua_Player_addMoney);
+
 
 	// Item
 	registerGlobalFunction("createItem(int newid[, int count])", &Manager::lua_createItem);
 	registerMemberFunction("Item", "getItemID()", &Manager::lua_Item_getItemID);
+	registerMemberFunction("Item", "getActionID()", &Manager::lua_Item_getActionID);
+	registerMemberFunction("Item", "getUniqueID()", &Manager::lua_Item_getUniqueID);
+	registerMemberFunction("Item", "getCount()", &Manager::lua_Item_getCount);
+	registerMemberFunction("Item", "getWeight()", &Manager::lua_Item_getWeight);
+	registerMemberFunction("Item", "getText()", &Manager::lua_Item_getText);
+	registerMemberFunction("Item", "getSpecialDescription()", &Manager::lua_Item_getSpecialDescription);
 
 	registerMemberFunction("Item", "setItemID(int newid)", &Manager::lua_Item_setItemID);
+	registerMemberFunction("Item", "setActionID(int id)", &Manager::lua_Item_setActionID);
+	registerMemberFunction("Item", "setCount(int newcount)", &Manager::lua_Item_setCount);
 	registerMemberFunction("Item", "startDecaying()", &Manager::lua_Item_startDecaying);
+	registerMemberFunction("Item", "setText(string text)", &Manager::lua_Item_setText);
+	registerMemberFunction("Item", "setSpecialDescription(string text)", &Manager::lua_Item_setSpecialDescription);
 
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
 
@@ -142,7 +169,20 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "getCreatures()", &Manager::lua_Tile_getCreatures);
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
+	registerMemberFunction("Tile", "queryAdd()", &Manager::lua_Tile_queryAdd);
+
+	registerMemberFunction("Tile", "isPZ()", &Manager::lua_Tile_isPZ);
+	registerMemberFunction("Tile", "isPVP()", &Manager::lua_Tile_isPVP);
+	registerMemberFunction("Tile", "isNoPVP()", &Manager::lua_Tile_isNoPVP);
+	registerMemberFunction("Tile", "isNoLogout()", &Manager::lua_Tile_isNoLogout);
+	registerMemberFunction("Tile", "doesRefresh()", &Manager::lua_Tile_doesRefresh);
+	
+	registerMemberFunction("Tile", "getItemTypeCount(int itemid)", &Manager::lua_Tile_getItemTypeCount);
+
 	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
+
+	// Town
+
 
 }
 
@@ -366,6 +406,20 @@ int LuaState::lua_Thing_getParentTile()
 	return 1;
 }
 
+int LuaState::lua_Thing_getParent() 
+{
+	Thing* thing = popThing();
+	Cylinder* parent = thing->getParent();
+	if(parent->getTile()) {
+		pushTile(static_cast<Tile*>(parent));
+	} else if(parent->getItem() || parent->getCreature()) {
+		pushThing(parent);
+	} else {
+		pushNil();
+	}
+	return 1;
+}
+
 int LuaState::lua_Thing_moveToPosition() 
 {
 	Position pos = popPosition();
@@ -380,6 +434,35 @@ int LuaState::lua_Thing_isMoveable()
 {
 	Thing* thing = popThing();
 	pushBoolean(thing->isPushable());
+	return 1;
+}
+
+int LuaState::lua_Thing_getDescription()
+{
+	int lookdistance = 0;
+	if(getStackTop() > 1) {
+		lookdistance = popInteger();
+	}
+	Thing* thing = popThing();
+	pushString(thing->getDescription(lookdistance));
+	return 1;
+}
+
+int LuaState::lua_Thing_destroy() 
+{
+	Thing* thing = popThing();
+	if(Item* item = thing->getItem()) {
+		pushBoolean(g_game.internalRemoveItem(item) == RET_NOERROR);
+	} else if(Creature* creature = thing->getCreature()) {
+		if(Player* player = creature->getPlayer()) {
+			player->kickPlayer();
+			pushBoolean(true);
+		} else {
+			pushBoolean(g_game.removeCreature(creature));
+		}
+	} else {
+		pushBoolean(false);
+	}
 	return 1;
 }
 
@@ -463,6 +546,61 @@ int LuaState::lua_Tile_getItems()
 		pushThing(*iter);
 		setField(-3, n);
 	}
+	return 1;
+}
+
+int LuaState::lua_Tile_getItemTypeCount() {
+	int type = popInteger();
+	Tile* tile = popTile();
+	push(((Cylinder*)tile)->__getItemTypeCount(type));
+	return 1;
+}
+
+int LuaState::lua_Tile_queryAdd()
+{
+	int flags = 0;
+	if(getStackTop() > 2) {
+		flags = popInteger();
+	}
+	Thing* thing = popThing();
+	Tile* tile = popTile();
+
+	pushInteger(tile->__queryAdd(0, thing, 1, flags));
+	return 1;
+}
+
+int LuaState::lua_Tile_isPZ()
+{
+	Tile* tile = popTile();
+	pushBoolean(tile->hasFlag(TILESTATE_PROTECTIONZONE));
+	return 1;
+}
+
+int LuaState::lua_Tile_isNoPVP()
+{
+	Tile* tile = popTile();
+	pushBoolean(tile->hasFlag(TILESTATE_NOPVPZONE));
+	return 1;
+}
+
+int LuaState::lua_Tile_isPVP()
+{
+	Tile* tile = popTile();
+	pushBoolean(tile->hasFlag(TILESTATE_PVPZONE));
+	return 1;
+}
+
+int LuaState::lua_Tile_isNoLogout()
+{
+	Tile* tile = popTile();
+	pushBoolean(tile->hasFlag(TILESTATE_NOLOGOUT));
+	return 1;
+}
+
+int LuaState::lua_Tile_doesRefresh()
+{
+	Tile* tile = popTile();
+	pushBoolean(tile->hasFlag(TILESTATE_REFRESH));
 	return 1;
 }
 
@@ -690,6 +828,89 @@ int LuaState::lua_Player_getSkullType() {
 	return 1;
 }
 
+int LuaState::lua_Player_addExperience() {
+	int64_t exp = (int64_t)popFloat();
+	Player* p = popPlayer();
+	p->addExperience(exp);
+	return 1;
+}
+
+int LuaState::lua_Player_getInventoryItem()
+{
+	int slot = popInteger();
+	Player* player = popPlayer();
+
+	if(slot < SLOT_FIRST || slot > SLOT_LAST)
+	{
+		throw Error("Player.getInventoryItem: slot out of range!");
+	}
+
+	Item* i = player->getInventoryItem((slots_t)slot);
+	if(i)
+		pushThing(i);
+	else
+		pushNil();
+
+	return 1;
+}
+
+int LuaState::lua_Player_getItemTypeCount() {
+	int type = popInteger();
+	Player* p = popPlayer();
+	push(((Cylinder*)p)->__getItemTypeCount(type));
+	return 1;
+}
+
+
+int LuaState::lua_Player_getMoney()
+{
+	Player* player = popPlayer();
+	pushInteger(g_game.getMoney(player));
+	return 1;
+}
+
+int LuaState::lua_Player_removeMoney()
+{
+	int amount = popInteger();
+	Player* player = popPlayer();
+	pushBoolean(g_game.removeMoney(player, amount));
+	return 1;
+}
+
+int LuaState::lua_Player_addMoney()
+{
+	int amount = popInteger();
+	Player* player = popPlayer();
+	pushBoolean(g_game.addMoney(player, amount));
+	return 1;
+}
+
+int LuaState::lua_Player_setVocation()
+{
+	int vocationID = popInteger();
+	Player* player = popPlayer();
+
+	if(g_vocations.getVocation(vocationID)) {
+		player->setVocation(vocationID);
+		pushBoolean(true);
+	} else {
+		pushBoolean(false);
+	}
+	return 1;
+}
+
+int LuaState::lua_Player_setTown()
+{
+	Town* town = popTown();
+	Player* player = popPlayer();
+	
+	player->setMasterPos(town->getTemplePosition());
+	player->setTown(town->getTownID());
+	pushBoolean(true);
+
+	return 1;
+}
+
 int LuaState::lua_Player_addItem()
 {
 	bool canDropOnMap = true;
@@ -743,6 +964,52 @@ int LuaState::lua_Item_getItemID()
 	return 1;
 }
 
+int LuaState::lua_Item_getActionID()
+{
+	Item* item = popItem();
+	pushInteger(item->getActionId());
+	return 1;
+}
+
+int LuaState::lua_Item_getUniqueID()
+{
+	Item* item = popItem();
+	pushInteger(item->getUniqueId());
+	return 1;
+}
+
+int LuaState::lua_Item_getCount()
+{
+	Item* item = popItem();
+	if(item->isStackable()) {
+		pushInteger(item->getItemCount());
+	} else {
+		pushInteger(1);
+	}
+	return 1;
+}
+
+int LuaState::lua_Item_getWeight()
+{
+	Item* item = popItem();
+	pushFloat(item->getWeight());
+	return 1;
+}
+
+int LuaState::lua_Item_getText()
+{
+	Item* item = popItem();
+	pushString(item->getText());
+	return 1;
+}
+
+int LuaState::lua_Item_getSpecialDescription()
+{
+	Item* item = popItem();
+	pushInteger(item->getID());
+	return 1;
+}
+
 int LuaState::lua_Item_setItemID()
 {
 	int newcount = -1;
@@ -776,6 +1043,61 @@ int LuaState::lua_Item_startDecaying()
 	return 1;
 }
 
+int LuaState::lua_Item_setCount()
+{
+	int newcount = popInteger();
+	Item* item = popItem();
+	if(!item->isStackable()) {
+		throw Error("Item.setCount: Item is not stackable!");
+	}
+	if(newcount < 1) {
+		throw Error("Item.setCount: New count out of range!");
+	}
+	
+	pushBoolean(g_game.transformItem(item, item->getID(), newcount) != NULL);
+	return 1;
+}
+
+int LuaState::lua_Item_setText()
+{
+	std::string text = popString();
+	Item* item = popItem();
+	item->setText(text);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Item_setSpecialDescription()
+{
+	std::string text = popString();
+	Item* item = popItem();
+	item->setSpecialDescription(text);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Item_setActionID()
+{
+	int actionid = popInteger();
+	Item* item = popItem();
+	item->setActionId(actionid);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_getItemIDByName()
+{
+	std::string name = popString();
+
+	int32_t itemid = Item::items.getItemIdByName(name);
+	if(itemid == -1){
+		pushNil();
+	} else {
+		pushUnsignedInteger(itemid);
+	}
+	return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // (Class) Game
 
@@ -795,19 +1117,6 @@ int LuaState::lua_getTile()
 	int y = popInteger();
 	int x = popInteger();
 	pushTile(g_game.getTile(x, y, z));
-	return 1;
-}
-
-int LuaState::lua_getItemIDByName()
-{
-	std::string name = popString();
-
-	int32_t itemid = Item::items.getItemIdByName(name);
-	if(itemid == -1){
-		pushNil();
-	} else {
-		pushUnsignedInteger(itemid);
-	}
 	return 1;
 }
 
@@ -1813,17 +2122,6 @@ int LuaScriptInterface::luaDoPlayerAddSoul()
 	return 1;
 }
 
-int LuaScriptInterface::luaGetPlayerItemCount()
-{
-	//getPlayerItemCount(cid, itemid)
-	uint32_t itemId = popUnsignedInteger();
-	Player* player = popPlayer();
-
-	uint32_t n = player->__getItemTypeCount(itemId);
-	pushNumber(n);
-	return 1;
-}
-
 int LuaScriptInterface::luaGetHouseOwner()
 {
 	//getHouseOwner(house)
@@ -2034,38 +2332,6 @@ int LuaScriptInterface::luaGetCreatureLight()
 	return 2;
 }
 
-int LuaScriptInterface::luaDoPlayerAddExp()
-{
-	//doPlayerAddExp(player, exp)
-	int32_t exp = popInteger();
-	Player* player = popPlayer();
-
-	if(exp >= 0){
-		player->addExperience(exp);
-		pushBoolean(true);
-	}
-	else{
-		pushBoolean(false);
-	}
-	return 1;
-}
-
-int LuaScriptInterface::luaGetPlayerSlotItem()
-{
-	//getPlayerSlotItem(player, slot)
-	uint32_t slot = popUnsignedInteger();
-	Player* player = popPlayer();
-
-	Thing* thing = player->__getThing(slot);
-	if(thing){
-		pushThing(thing);
-	}
-	else{
-		pushThing(NULL);
-	}
-	return 1;
-}
-
 int LuaScriptInterface::luaGetPlayerItemById()
 {
 	//getPlayerItemByID(cid, deepSearch, itemID [, subType])
@@ -2082,65 +2348,6 @@ int LuaScriptInterface::luaGetPlayerItemById()
 
 	Item* item = g_game.findItemOfType(player, itemId, deepSearch, subType);
 	pushThing(item);
-	return 1;
-}
-
-int LuaScriptInterface::luaGetThing()
-{
-	//getThing(uid)
-	uint32_t uid = popUnsignedInteger();
-
-	ScriptEnviroment* env = getScriptEnv();
-	Thing* thing = env->getThingByUID(uid);
-	if(thing) throwLuaException("Could not find thing");
-
-	pushThing(thing);
-	return 1;
-}
-
-int LuaScriptInterface::luaQueryTileAddThing()
-{
-	//queryTileAddThing(uid, pos, <optional> flags)
-	int32_t parameters = lua_gettop(m_luaState);
-
-	uint32_t flags = 0;
-	if(parameters > 2){
-		flags = popUnsignedInteger();
-	}
-
-	PositionEx pos = popPositionEx();
-	Thing* thing = popThing();
-
-	ScriptEnviroment* env = getScriptEnv();
-
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-	if(!tile){
-		pushUnsignedInteger(RET_NOTPOSSIBLE);
-		return 1;
-	}
-
-	Thing* thing = env->getThingByUID(uid);
-	if(!thing){
-		pushUnsignedInteger(RET_NOTPOSSIBLE);
-		return 1;
-	}
-
-	ReturnValue ret = tile->__queryAdd(0, thing, 1, flags);
-	pushUnsignedInteger(ret);
-	return 1;
-}
-
-int LuaScriptInterface::luaGetThingPos()
-{
-	//getThingPos(uid)
-	Thing* thing = popThing();
-
-	PositionEx pos(0, 0, 0, 0);
-	pos = thing->getPosition();
-	if(thing->getParent()){
-		pos.stackpos = thing->getParent()->__getIndexOfThing(thing);
-	}
-	pushPosition(pos);
 	return 1;
 }
 

@@ -30,6 +30,7 @@
 #include "tile.h"
 #include "container.h"
 #include "player.h"
+#include "town.h"
 
 extern Game g_game;
 extern ConfigManager g_config;
@@ -314,6 +315,15 @@ void LuaState::pushTile(Tile* tile) {
 	}
 }
 
+void LuaState::pushTown(Town* town) {
+	if(town) {
+		Script::ObjectID* objid = pushClassInstance("Town");
+		*objid = town->getTownID();
+	} else {
+		pushNil();
+	}
+}
+
 Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	Position pos(0, 0, 0);
 	if(!isTable(-1)) {
@@ -332,7 +342,7 @@ Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW *
 
 Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	if(!isTable(-1)) {
-		HandleError(mode, std::string("Couldn't pop thing, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		HandleError(mode, std::string("Couldn't pop tile, top object is not of valid type (") + luaL_typename(state, -1) + ")");
 		return NULL;
 	}
 
@@ -346,6 +356,18 @@ Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	Tile* tile = g_game.getTile(x, y, z);
 	if(!tile) HandleError(mode, "Tile position is invalid.");
 	return tile;
+}
+
+Town* LuaState::popTown(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	if(!isUserdata(-1)) {
+		HandleError(mode, std::string("Couldn't pop town, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		return NULL;
+	}
+
+	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
+	pop();
+
+	return Towns::getInstance().getTown((uint32_t)*objid);
 }
 
 Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */) {

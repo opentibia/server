@@ -185,6 +185,7 @@ public:
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	int64_t getExperience() const {return experience;}
+	void addExperience(uint64_t exp);
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
 	const Position& getLoginPosition() const {return loginPosition;}
@@ -605,7 +606,6 @@ protected:
 
 	std::string getSkillName(int skillid);
 	void gainExperience(uint64_t exp);
-	void addExperience(uint64_t exp);
 
 	void updateInventoryWeigth();
 

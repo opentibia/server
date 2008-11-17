@@ -34,6 +34,7 @@ class Player;
 class Creature;
 class Thing;
 class Position;
+class Town;
 
 namespace Script {
 	typedef uint64_t ObjectID;
@@ -150,10 +151,12 @@ public:
 	Player* popPlayer(Script::ErrorMode mode = Script::ERROR_THROW);
 	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
+	Town* popTown(Script::ErrorMode mode = Script::ERROR_THROW);
 
 	// Push
 	void pushThing(Thing* thing);
 	void pushTile(Tile* tile);
+	void pushTown(Town* town);
 	
 
 	// Generic
@@ -198,11 +201,14 @@ public:
 
 	// - Thing
 	int lua_Thing_getPosition();
+	int lua_Thing_getParent();
 	int lua_Thing_getParentTile();
 
 	int lua_Thing_isMoveable();
+	int lua_Thing_getDescription();
 
 	int lua_Thing_moveToPosition();
+	int lua_Thing_destroy();
 
 
 	// - - Creature
@@ -239,16 +245,35 @@ public:
 	int lua_Player_getGuildRank();
 	int lua_Player_getGuildNick();
 
+	int lua_Player_getInventoryItem();
 	int lua_Player_addItem();
+	int lua_Player_getItemTypeCount();
+	
+	int lua_Player_setVocation();
+	int lua_Player_setTown();
+	int lua_Player_addExperience();
 
+	int lua_Player_getMoney();
+	int lua_Player_addMoney();
+	int lua_Player_removeMoney();
 
 	// - - Item
 	int lua_createItem();
 	int lua_getItemIDByName();
 
 	int lua_Item_getItemID();
+	int lua_Item_getActionID();
+	int lua_Item_getUniqueID();
+	int lua_Item_getCount();
+	int lua_Item_getWeight();
+	int lua_Item_getSpecialDescription();
+	int lua_Item_getText();
 
 	int lua_Item_setItemID();
+	int lua_Item_setActionID();
+	int lua_Item_setCount();
+	int lua_Item_setSpecialDescription();
+	int lua_Item_setText();
 	int lua_Item_startDecaying();
 	
 
@@ -258,7 +283,15 @@ public:
 	int lua_Tile_getMoveableItems();
 	int lua_Tile_getItems();
 	int lua_Tile_addItem();
+	int lua_Tile_getItemTypeCount();
 
+	int lua_Tile_isPZ();
+	int lua_Tile_isPVP();
+	int lua_Tile_isNoPVP();
+	int lua_Tile_isNoLogout();
+	int lua_Tile_doesRefresh();
+
+	int lua_Tile_queryAdd();
 
 	// - Game
 	int lua_sendMagicEffect();
