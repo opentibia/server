@@ -321,7 +321,7 @@ bool ProtocolGame::login(const std::string& name)
 		}
 
 		if(!g_game.placeCreature(player, player->getLoginPosition())){
-			if(!g_game.placeCreature(player, player->getTemplePosition(), true)){
+			if(!g_game.placeCreature(player, player->getTemplePosition(), false, true)){
 				disconnectClient(0x14, "Temple position is wrong. Contact the administrator.");
 				return false;
 			}

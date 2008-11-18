@@ -205,7 +205,7 @@ void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 	}
 }
 
-bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forceLogin /*=false*/)
+bool Map::placeCreature(const Position& centerPos, Creature* creature, bool extendedPos /*=false*/, bool forceLogin /*=false*/)
 {
 	Tile* tile = getTile(centerPos);
 
@@ -223,6 +223,20 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 
 	typedef std::pair<int32_t, int32_t> relPair;
 	std::vector<relPair> relList;
+	// Extended pos is used when summoning.
+	// X is player, 1 is first choice, 2 is second choice
+	// --1--
+	// -222-
+	// 12X21
+	// -222-
+	// --1--
+	if(extendedPos) {
+		relList.push_back(relPair(0, -2));
+		relList.push_back(relPair(-2, 0));
+		relList.push_back(relPair(0, 2));
+		relList.push_back(relPair(2, 0));
+		std::random_shuffle(relList.begin(), relList.end());
+	}
 	relList.push_back(relPair(-1, -1));
 	relList.push_back(relPair(-1, 0));
 	relList.push_back(relPair(-1, 1));
@@ -232,7 +246,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 	relList.push_back(relPair(1, 0));
 	relList.push_back(relPair(1, 1));
 
-	std::random_shuffle(relList.begin(), relList.end());
+	std::random_shuffle(relList.begin() + (extendedPos? 4 : 0), relList.end());
 	uint32_t radius = 1;
 
 	Position tryPos;
@@ -250,8 +264,15 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool forc
 				continue;
 
 			if(tile->__queryAdd(0, creature, 1, 0) == RET_NOERROR){
-				foundTile = true;
-				break;
+				if(extendedPos) {
+					if(isSightClear(centerPos, tryPos, false)) {
+						foundTile = true;
+						break;
+					}
+				} else {
+					foundTile = true;
+					break;
+				}
 			}
 		}
 	}

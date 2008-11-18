@@ -207,9 +207,10 @@ public:
 	* Place a creature on the map
 	* \param pos The position to place the creature
 	* \param creature Creature to place on the map
+	* \param extendedPos If true, the creature will in first-hand be placed 2 tiles away
 	* \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	*/
-	bool placeCreature(const Position& centerPos, Creature* creature, bool forceLogin = false);
+	bool placeCreature(const Position& centerPos, Creature* creature, bool extendedPos = false, bool forceLogin = false);
 
 	/**
 	* Remove a creature from the map.

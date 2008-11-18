@@ -541,13 +541,13 @@ PlayerVector Game::getPlayersByIP(uint32_t ipadress, uint32_t mask)
 	return players;
 }
 
-bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
+bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool extendedPos /*=false*/, bool forced /*= false*/)
 {
 	if(creature->getParent() != NULL){
 		return false;
 	}
 
-	if(!map->placeCreature(pos, creature, forced)){
+	if(!map->placeCreature(pos, creature, extendedPos, forced)){
 		return false;
 	}
 
@@ -560,9 +560,9 @@ bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool f
 	return true;
 }
 
-bool Game::placeCreature(Creature* creature, const Position& pos, bool forced /*= false*/)
+bool Game::placeCreature(Creature* creature, const Position& pos, bool extendedPos /*=false*/, bool forced /*= false*/)
 {
-	if(!internalPlaceCreature(creature, pos, forced)){
+	if(!internalPlaceCreature(creature, pos, extendedPos, forced)){
 		return false;
 	}
 

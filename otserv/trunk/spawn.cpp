@@ -238,7 +238,7 @@ void Spawns::startup()
 		return;
 
 	for(NpcList::iterator it = npcList.begin(); it != npcList.end(); ++it){
-		g_game.placeCreature((*it), (*it)->getMasterPos(), true);
+		g_game.placeCreature((*it), (*it)->getMasterPos(), false, true);
 	}
 	npcList.clear();
 
@@ -336,13 +336,13 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 
 	if(startup){
 		//No need to send out events to the surrounding since there is no one out there to listen!
-		if(!g_game.internalPlaceCreature(monster, pos, true)){
+		if(!g_game.internalPlaceCreature(monster, pos, false, true)){
 			delete monster;
 			return false;
 		}
 	}
 	else{
-		if(!g_game.placeCreature(monster, pos, true)){
+		if(!g_game.placeCreature(monster, pos, false, true)){
 			delete monster;
 			return false;
 		}

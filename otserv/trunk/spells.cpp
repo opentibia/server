@@ -1583,7 +1583,18 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 		}
 	}
 
-	ReturnValue ret = Commands::placeSummon(creature, param);
+	ReturnValue ret = RET_NOERROR;
+	Monster* monster = Monster::createMonster(param);
+	if(!monster){
+		ret = RET_NOTPOSSIBLE;
+	} else{
+		// Place the monster
+		creature->addSummon(monster);
+		if(!g_game.placeCreature(monster, creature->getPosition(), true)){
+			creature->removeSummon(monster);
+			ret = RET_NOTENOUGHROOM;
+		}
+	}
 
 	if(ret == RET_NOERROR){
 		spell->postCastSpell(player, (uint32_t)manaCost, (uint32_t)spell->getSoulCost(player));
