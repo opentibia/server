@@ -105,6 +105,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[FIGHTEXHAUSTED] = getGlobalNumber(L, "fightexhausted", 2000);
 	m_confInteger[HEALEXHAUSTED] = getGlobalNumber(L, "healexhausted", 1000);
 	m_confInteger[PZ_LOCKED] = getGlobalNumber(L, "pzlocked", 60 * 1000);
+	m_confInteger[FIELD_OWNERSHIP_DURATION] = getGlobalNumber(L, "field_ownership_duration", 5 * 1000);
 	m_confInteger[MIN_ACTIONTIME] = getGlobalNumber(L, "minactioninterval", 200);
 	m_confInteger[MIN_ACTIONEXTIME] = getGlobalNumber(L, "minactionexinterval", 1000);
 	m_confInteger[DEFAULT_DESPAWNRANGE] = getGlobalNumber(L, "despawnrange", 2);

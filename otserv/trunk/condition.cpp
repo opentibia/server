@@ -1521,6 +1521,8 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 		}
 	}
 	
+	Condition::executeCondition(creature, interval);
+
 	if(damageList.empty())
 		return false;
 	return true;

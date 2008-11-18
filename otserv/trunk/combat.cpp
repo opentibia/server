@@ -21,6 +21,7 @@
 
 #include "combat.h"
 
+#include "configmanager.h"
 #include "game.h"
 #include "creature.h"
 #include "player.h"
@@ -31,6 +32,7 @@
 #include <sstream>
 
 extern Game g_game;
+extern ConfigManager g_config;
 extern Weapons* g_weapons;
 
 Combat::Combat()
@@ -644,7 +646,15 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 {
 	if(params.itemId != 0){
 		uint32_t itemId = params.itemId;
-		if(caster && (caster->getPlayer() || (caster->isSummon() && caster->getMaster()->getPlayer())) ){
+		Player* p_caster = NULL;
+		if(caster){
+			if(caster->getPlayer()){
+				p_caster = caster->getPlayer();
+			} else if(caster->isSummon()){
+				p_caster = caster->getMaster()->getPlayer();
+			}
+		}
+		if(p_caster){
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD_PVP){
 					itemId = ITEM_FIREFIELD_NOPVP;
@@ -655,6 +665,8 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 				else if(itemId == ITEM_ENERGYFIELD_PVP){
 					itemId = ITEM_ENERGYFIELD_NOPVP;
 				}
+			} else if(params.isAggressive){
+				p_caster->addInFightTicks(true);
 			}
 		}
 		Item* item = Item::CreateItem(itemId);
@@ -1448,7 +1460,10 @@ void MagicField::onStepInField(Creature* creature)
 						}
 					}
 				}
-				if(!harmfulField || (OTSYS_TIME() - createTime <= 5000) || creature->hasBeenAttacked(owner)){
+				if(   !harmfulField || 
+				      (OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
+				      creature->hasBeenAttacked(owner))
+				{
 					conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);
 				}
 			}
