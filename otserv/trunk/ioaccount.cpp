@@ -41,7 +41,7 @@ Account IOAccount::loadAccount(const std::string& name)
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `id`, `name`, `password`, `premend` FROM `accounts` WHERE `name` = " << db->escapeString(name);;
+	query << "SELECT `id`, `name`, `password`, `premend` FROM `accounts` WHERE `name` = " << db->escapeString(name);
 	if((result = db->storeQuery(query.str()))){
 		acc.accnumber = result->getDataInt("id");
 		acc.password = result->getDataString("password");

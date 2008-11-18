@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,14 +52,14 @@ class MoveEvents : public BaseEvents
 public:
 	MoveEvents();
 	virtual ~MoveEvents();
-	
+
 	uint32_t onCreatureMove(Creature* creature, Tile* tile, bool isIn);
 	uint32_t onPlayerEquip(Player* player, Item* item, slots_t slot);
 	uint32_t onPlayerDeEquip(Player* player, Item* item, slots_t slot, bool isRemoval);
 	uint32_t onItemMove(Item* item, Tile* tile, bool isAdd);
 
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
-	
+
 protected:
 	typedef std::map<int32_t, MoveEventList> MoveListMap;
 	typedef std::map<Position, MoveEventList> MovePosListMap;
@@ -68,24 +68,24 @@ protected:
 	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
-	
+
 	void addEvent(MoveEvent* moveEvent, int32_t id, MoveListMap& map);
 	void addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& map);
 	MoveEvent* getEvent(Tile* tile, MoveEvent_t eventType);
 
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType, slots_t slot);
-		
+
 	MoveListMap m_uniqueIdMap;
 	MoveListMap m_actionIdMap;
 	MoveListMap m_itemIdMap;
 	MovePosListMap m_positionMap;
-	
+
 	LuaScriptInterface m_scriptInterface;
 };
 
 typedef uint32_t (StepFunction)(Creature* creature, Item* item, const Position& pos);
 typedef uint32_t (MoveFunction)(Item* item, Item* tileItem, const Position& pos);
-typedef uint32_t (EquipFunction)(Player* player, Item* item, slots_t slot, bool isRemoval);
+typedef uint32_t (EquipFunction)(MoveEvent* moveEvent, Player* player, Item* item, slots_t slot, bool isRemoval);
 
 class MoveEvent : public Event
 {
@@ -95,7 +95,7 @@ public:
 
 	MoveEvent_t getEventType() const;
 	void setEventType(MoveEvent_t type);
-	
+
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 
@@ -103,7 +103,7 @@ public:
 	uint32_t fireAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	uint32_t fireEquip(Player* player, Item* item, slots_t slot, bool isRemoval);
 
-	slots_t getSlot() const {return slot;}
+	uint32_t getSlot() const {return slot;}
 
 	//scripting
 	uint32_t executeStep(Creature* creature, Item* item, const Position& pos);
@@ -121,7 +121,7 @@ public:
 
 protected:
 	virtual std::string getScriptEventName();
-	
+
 	static StepFunction StepInField;
 	static StepFunction StepOutField;
 
@@ -134,7 +134,7 @@ protected:
 	StepFunction* stepFunction;
 	MoveFunction* moveFunction;
 	EquipFunction* equipFunction;
-	slots_t slot;
+	uint32_t slot;
 
 	//onEquip information
 	int32_t reqLevel;
