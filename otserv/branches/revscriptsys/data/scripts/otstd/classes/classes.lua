@@ -28,3 +28,7 @@ require("otstd/classes/player")
 
 require("otstd/classes/tile")
 require("otstd/classes/map")
+require("otstd/classes/town")
+require("otstd/classes/house")
+
+require("otstd/classes/chat")

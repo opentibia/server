@@ -45,6 +45,7 @@ class Monster;
 class Npc;
 class CombatInfo;
 class Commands;
+class ChatChannel;
 
 enum stackPosType_t{
 	STACKPOS_NORMAL,
@@ -101,6 +102,11 @@ typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 #define EVENT_DECAYINTERVAL  1000
 #define EVENT_DECAY_BUCKETS  16
 #define EVENT_SCRIPT_CLEANUP_INTERVAL  90000
+
+// These are here to avoid expensive includes (extern is much cheaper! :))
+void g_gameOnLeaveChannel(Player* player, ChatChannel* channel);
+void g_gameUnscript(void* v);
+void g_gameUnscriptThing(Thing* thing);
 
 /**
   * Main Game class.
@@ -447,6 +453,7 @@ public:
 	void shutdown();
 	void FreeThing(Thing* thing);
 	void unscriptThing(Thing* thing);
+	void unscript(void* v);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map_maxClientViewportX, int32_t rangey = Map_maxClientViewportY);
@@ -601,6 +608,8 @@ protected:
 	Map* map;
 
 	std::vector<std::string> commandTags;
+
+	friend void g_gameOnLeaveChannel(Player* player, ChatChannel* channel);
 };
 
 #endif

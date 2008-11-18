@@ -36,7 +36,7 @@ class ChatChannel
 {
 public:
 	ChatChannel(uint16_t channelId, std::string channelName);
-	virtual ~ChatChannel(){}
+	virtual ~ChatChannel();
 
 	bool addUser(Player* player);
 	bool removeUser(Player* player);

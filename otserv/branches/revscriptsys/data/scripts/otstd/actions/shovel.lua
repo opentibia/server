@@ -27,7 +27,7 @@ function otstd.shovel.registerHandlers()
 			stopListener(data.listener)
 		end
 		data.listener =
-			registerGenericOnUseItemListener("itemid", id, otstd.shovel.callback)
+			registerOnUseItem("itemid", id, otstd.shovel.callback)
 	end
 end
 

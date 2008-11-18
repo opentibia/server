@@ -27,6 +27,7 @@
 #include "game.h"
 #include "creature.h"
 #include "town.h"
+#include "chat.h"
 
 extern Game g_game;
 extern Vocations g_vocations;
@@ -74,8 +75,10 @@ const luaL_Reg lua_BitReg[] =
 void Manager::registerClasses() {
 	// Classes...
 	registerClass("Event");
-	registerClass("OnSayEvent");
-	registerClass("OnUseItemEvent");
+	registerClass("OnSayEvent", "Event");
+	registerClass("OnUseItemEvent", "Event");
+	registerClass("OnJoinChannelEvent", "Event");
+	registerClass("OnLeaveChannelEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -88,6 +91,9 @@ void Manager::registerClasses() {
 	registerClass("Tile");
 	
 	registerClass("Town");
+	registerClass("House");
+
+	registerClass("Channel");
 
 	// Event classes
 	registerMemberFunction("Event", "skip()", &Manager::lua_Event_skip);
@@ -100,6 +106,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Thing", "isMoveable()", &Manager::lua_Thing_isMoveable);
 	registerMemberFunction("Thing", "getPosition()", &Manager::lua_Thing_getPosition);
 	registerMemberFunction("Thing", "getDescription([int lookdistance])", &Manager::lua_Thing_getDescription);
+	registerMemberFunction("Thing", "moveTo(table pos)", &Manager::lua_Thing_moveToPosition);
 	registerMemberFunction("Thing", "destroy()", &Manager::lua_Thing_destroy);
 
 	// Creature
@@ -144,6 +151,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "removeMoney(int amount)", &Manager::lua_Player_removeMoney);
 	registerMemberFunction("Player", "addMoney(int amount)", &Manager::lua_Player_addMoney);
 
+	registerMemberFunction("Player", "sendMessage(int type, string msg)", &Manager::lua_Player_sendMessage);
+
 
 	// Item
 	registerGlobalFunction("createItem(int newid[, int count])", &Manager::lua_createItem);
@@ -183,16 +192,29 @@ void Manager::registerClasses() {
 
 	// Town
 
+	// House
 
+	// Channel
+	registerMemberFunction("Channel", "getID()", &Manager::lua_Channel_getID);
+	registerMemberFunction("Channel", "getName()", &Manager::lua_Channel_getName);
+	registerMemberFunction("Channel", "getUsers()", &Manager::lua_Channel_getUsers);
+	registerMemberFunction("Channel", "addUser(Player player)", &Manager::lua_Channel_addUser);
+	registerMemberFunction("Channel", "removeUser(Player player)", &Manager::lua_Channel_removeUser);
+	registerMemberFunction("Channel", "talk(Player speaker, int type, string msg)", &Manager::lua_Channel_talk);
 }
 
 void Manager::registerFunctions() {
 	registerGlobalFunction("wait(int delay)", &Manager::lua_wait);
 
-	registerGlobalFunction("registerGenericOnSayListener(string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerGenericEvent_OnSay);
-	registerGlobalFunction("registerSpecificOnSayListener(Creature who, string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerSpecificEvent_OnSay);
+	registerGlobalFunction("registerOnSay(string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerGenericEvent_OnSay);
+	registerGlobalFunction("registerCreatureOnSay(Creature who, string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerSpecificEvent_OnSay);
 
-	registerGlobalFunction("registerGenericOnUseItemListener(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
+	registerGlobalFunction("registerOnUseItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
+
+	registerGlobalFunction("registerOnJoinChannel(function callback)", &Manager::lua_registerGenericEvent_OnJoinChannel);
+	registerGlobalFunction("registerCreatureOnJoinChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnJoinChannel);
+	registerGlobalFunction("registerOnLeaveChannel(function callback)", &Manager::lua_registerGenericEvent_OnLeaveChannel);
+	registerGlobalFunction("registerCreatureOnLeaveChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLeaveChannel);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
@@ -245,7 +267,7 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 	si_onsay.case_sensitive = case_sensitive;
 
 	boost::any p(si_onsay);
-	Listener_ptr listener(new Listener(ONSAY_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_SAY_LISTENER, p, *this->getManager()));
 
 	enviroment.Generic.OnSay.push_back(listener);
 
@@ -292,7 +314,7 @@ int LuaState::lua_registerSpecificEvent_OnSay() {
 	// to it is removed. :)
 	boost::any p(si_onsay);
 	Listener_ptr listener(
-		new Listener(ONSAY_LISTENER, p, *this->getManager()),
+		new Listener(ON_SAY_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
 	enviroment.registerSpecificListener(listener);
@@ -330,9 +352,81 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 	si_onuse.id = id;
 
 	boost::any p(si_onuse);
-	Listener_ptr listener(new Listener(ONUSEITEM_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_USE_ITEM_LISTENER, p, *this->getManager()));
 
 	enviroment.Generic.OnUseItem.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnJoinChannel() {
+	boost::any p(0);
+	Listener_ptr listener(new Listener(ON_OPEN_CHANNEL_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnJoinChannel.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnJoinChannel() {
+	// Store callback
+	insert(-2);
+
+	Player* who = popPlayer();
+
+	boost::any p(0);
+	Listener_ptr listener(
+		new Listener(ON_OPEN_CHANNEL_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	enviroment.registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnLeaveChannel() {
+	boost::any p(0);
+	Listener_ptr listener(new Listener(ON_CLOSE_CHANNEL_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnLeaveChannel.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnLeaveChannel() {
+	// Store callback
+	insert(-2);
+
+	Player* who = popPlayer();
+
+	boost::any p(0);
+	Listener_ptr listener(
+		new Listener(ON_CLOSE_CHANNEL_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	enviroment.registerSpecificListener(listener);
+	who->addListener(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -379,13 +473,13 @@ int LuaState::lua_stopListener() {
 
 int LuaState::lua_Event_skip() {
 	// Event table is ontop of stack
-	setField(-1, "skipped", true);
+	setField(-1, "skipped", false);
 	return 1;
 }
 
 int LuaState::lua_Event_propagate() {
 	// Event table is ontop of stack
-	setField(-1, "skipped", false);
+	setField(-1, "skipped", true);
 	return 1;
 }
 
@@ -497,7 +591,7 @@ int LuaState::lua_Tile_getCreatures()
 		iter != end_iter; ++iter, ++n)
 	{
 		pushThing(*iter);
-		setField(-3, n);
+		setField(-2, n);
 	}
 	return 1;
 }
@@ -514,7 +608,7 @@ int LuaState::lua_Tile_getMoveableItems()
 	{
 		if((*iter)->isNotMoveable() == false) {
 			pushThing(*iter);
-			setField(-3, n++);
+			setField(-2, n++);
 		}
 	}
 	return 1;
@@ -528,7 +622,7 @@ int LuaState::lua_Tile_getItems()
 	int n = 1;
 	if(tile->ground) {
 		pushThing(tile->ground);
-		setField(-3, n++);
+		setField(-2, n++);
 	}
 
 	for(ItemVector::iterator iter = tile->topItems.begin(),
@@ -536,7 +630,7 @@ int LuaState::lua_Tile_getItems()
 		iter != end_iter; ++iter, ++n)
 	{
 		pushThing(*iter);
-		setField(-3, n);
+		setField(-2, n);
 	}
 
 	for(ItemVector::iterator iter = tile->downItems.begin(),
@@ -544,7 +638,7 @@ int LuaState::lua_Tile_getItems()
 		iter != end_iter; ++iter, ++n)
 	{
 		pushThing(*iter);
-		setField(-3, n);
+		setField(-2, n);
 	}
 	return 1;
 }
@@ -911,6 +1005,17 @@ int LuaState::lua_Player_setTown()
 	return 1;
 }
 
+int LuaState::lua_Player_sendMessage()
+{
+	std::string text = popString();
+	uint32_t messageClass = popUnsignedInteger();
+	Player* player = popPlayer();
+
+	player->sendTextMessage((MessageClasses)messageClass, text);
+	pushBoolean(true);
+	return 1;
+}
+
 int LuaState::lua_Player_addItem()
 {
 	bool canDropOnMap = true;
@@ -1095,6 +1200,64 @@ int LuaState::lua_getItemIDByName()
 	} else {
 		pushUnsignedInteger(itemid);
 	}
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Channel
+
+int LuaState::lua_Channel_getID()
+{
+	ChatChannel* channel = popChannel();
+	push(channel->getId());
+	return 1;
+}
+
+int LuaState::lua_Channel_getName()
+{
+	ChatChannel* channel = popChannel();
+	push(channel->getName());
+	return 1;
+}
+
+int LuaState::lua_Channel_getUsers()
+{
+	ChatChannel* channel = popChannel();
+	newTable();
+	int n = 1;
+	for(UsersMap::const_iterator iter = channel->getUsers().begin(); iter != channel->getUsers().end(); ++iter)
+	{
+		pushThing(iter->second);
+		setField(-2, n++);
+	}
+	return 1;
+}
+
+int LuaState::lua_Channel_addUser()
+{
+	Player* user = popPlayer();
+	ChatChannel* channel = popChannel();
+	g_game.playerOpenChannel(user->getID(), channel->getId());
+	return 1;
+}
+
+int LuaState::lua_Channel_removeUser()
+{
+	Player* user = popPlayer();
+	ChatChannel* channel = popChannel();
+	g_game.playerCloseChannel(user->getID(), channel->getId());
+	user->sendClosePrivate(channel->getId());
+	return 1;
+}
+
+int LuaState::lua_Channel_talk()
+{
+	std::string text = popString();
+	int t = popInteger();
+	Player* user = popPlayer(ERROR_PASS);
+	ChatChannel* channel = popChannel();
+	channel->talk(NULL, (SpeakClass)t, text);
+	pushBoolean(true);
 	return 1;
 }
 

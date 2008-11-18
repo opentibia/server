@@ -59,7 +59,7 @@ function otstd.rope.registerHandlers()
 		end
 		
 		data.listener =
-			registerGenericOnUseItemListener("itemid", id, otstd.rope.callback)
+			registerOnUseItem("itemid", id, otstd.rope.callback)
 	end
 end
 

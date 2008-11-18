@@ -46,10 +46,13 @@ namespace Script {
 
 
 template<class T, class ScriptInformation>
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list);
+	bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list);
+template<class T>
+	bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list);
 
 
 namespace Script {
+
 	///////////////////////////////////////////////////////////////////////////////
 	// Event template
 
@@ -73,8 +76,15 @@ namespace Script {
 		uint32_t eventID;
 		static uint32_t eventID_counter;
 		std::string lua_tag;
+		bool propagate_by_default;
 		
 		template<class T, class ScriptInformation> friend
+			bool ::dispatchEvent(T* e, 
+				Script::Manager& state, 
+				Script::Enviroment& enviroment, 
+				Script::ListenerList& specific_list);
+		
+		template<class T> friend
 			bool ::dispatchEvent(T* e, 
 				Script::Manager& state, 
 				Script::Enviroment& enviroment, 
@@ -102,7 +112,7 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* speaker, SpeakClass& speak_class, std::string& receiver, std::string& text);
+			Event(Creature* speaker, SpeakClass& speak_class, ChatChannel* channel, std::string& receiver, std::string& text);
 			~Event();
 
 			std::string getName() const {return "OnSay";}
@@ -120,12 +130,14 @@ namespace Script {
 		protected:
 			Creature* speaker;
 			SpeakClass& speak_class;
+			ChatChannel* channel;
 			std::string& text;
 			std::string& receiver;
 		};
 	}
 
-	///////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////
 	// Use event
 	// Triggered when a player uses an item
 
@@ -165,6 +177,56 @@ namespace Script {
 			ReturnValue& retval;
 		};
 	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnJoinChannel event
+	// Triggered when a player opens a new chat channel
+
+	namespace OnJoinChannel {
+		class Event : public Script::Event {
+		public:
+			Event(Player* chatter, ChatChannel* chat);
+			~Event();
+
+			std::string getName() const {return "OnJoinChannel";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Player* chatter;
+			ChatChannel* channel;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnLeaveChannel event
+	// Triggered when a player closes an existing chat channel
+
+	namespace OnLeaveChannel {
+		class Event : public Script::Event {
+		public:
+			Event(Player* chatter, ChatChannel* chat);
+			~Event();
+
+			std::string getName() const {return "OnLeaveChannel";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Player* chatter;
+			ChatChannel* channel;
+		};
+	}
 	
 	/* To add a new event
 	 * 1. Create the event class
@@ -173,7 +235,6 @@ namespace Script {
 	 * 4. Add callback from an arbitrary location in otserv source
 	 */
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Implementation details
@@ -197,6 +258,27 @@ bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment,
 				// Handled
 				return true;
 			}
+		}
+	}
+	return false;
+}
+
+template<class T> // No script information!
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+
+		// Call handler
+		if(e->call(state, enviroment, listener) == true) {
+			// Handled
+			return true;
 		}
 	}
 	return false;

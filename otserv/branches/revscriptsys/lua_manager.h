@@ -35,6 +35,8 @@ class Creature;
 class Thing;
 class Position;
 class Town;
+class House;
+class ChatChannel;
 
 namespace Script {
 	typedef uint64_t ObjectID;
@@ -152,11 +154,15 @@ public:
 	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
 	Town* popTown(Script::ErrorMode mode = Script::ERROR_THROW);
+	House* popHouse(Script::ErrorMode mode = Script::ERROR_THROW);
+	ChatChannel* popChannel(Script::ErrorMode mode = Script::ERROR_THROW);
 
 	// Push
 	void pushThing(Thing* thing);
 	void pushTile(Tile* tile);
 	void pushTown(Town* town);
+	void pushHouse(House* house);
+	void pushChannel(ChatChannel* channel);
 	
 
 	// Generic
@@ -190,6 +196,10 @@ public:
 	int lua_registerGenericEvent_OnSay();
 	int lua_registerSpecificEvent_OnSay();
 	int lua_registerGenericEvent_OnUseItem();
+	int lua_registerGenericEvent_OnJoinChannel();
+	int lua_registerSpecificEvent_OnJoinChannel();
+	int lua_registerGenericEvent_OnLeaveChannel();
+	int lua_registerSpecificEvent_OnLeaveChannel();
 
 	int lua_stopListener();
 
@@ -257,6 +267,8 @@ public:
 	int lua_Player_addMoney();
 	int lua_Player_removeMoney();
 
+	int lua_Player_sendMessage();
+
 	// - - Item
 	int lua_createItem();
 	int lua_getItemIDByName();
@@ -292,6 +304,14 @@ public:
 	int lua_Tile_doesRefresh();
 
 	int lua_Tile_queryAdd();
+
+	// - Channel
+	int lua_Channel_getID();
+	int lua_Channel_getName();
+	int lua_Channel_getUsers();
+	int lua_Channel_addUser();
+	int lua_Channel_removeUser();
+	int lua_Channel_talk();
 
 	// - Game
 	int lua_sendMagicEffect();

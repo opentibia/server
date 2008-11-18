@@ -28,7 +28,7 @@ function otstd.floorchange.registerHandlers()
 			otstd.floorchange.callback(event)
 		end
 		data.listener =
-			registerGenericOnUseItemListener("itemid", id, lamba_callback)
+			registerOnUseItem("itemid", id, lamba_callback)
 	end
 end
 

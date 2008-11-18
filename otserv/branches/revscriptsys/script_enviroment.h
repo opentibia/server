@@ -49,14 +49,16 @@ namespace Script {
 		typedef boost::bimap<ObjectID, void*> ObjectMap;
 
 		// Make sure to use a pointer to the superclass of the object
-		ObjectID addObject(Thing* thing);
-		ObjectID addObject(Combat* combat);
+		ObjectID addThing(Thing* thing);
+		ObjectID addObject(void* obj);
 		bool reassignObject(Thing* oldthing, Thing* newthing);
 		// Returns NULL if there is no object with that ID
+		void* getObject(ObjectID obj);
 		Thing* getThing(ObjectID id);
 
 		// Removes an object from the scripted object list
 		// called when a Thing is destroyed, for example
+		bool removeObject(void* obj);
 		bool removeObject(ObjectID id);
 		bool removeThing(Thing* thing);
 
@@ -76,6 +78,8 @@ namespace Script {
 		struct {
 			ListenerList OnSay;
 			ListenerList OnUseItem;
+			ListenerList OnJoinChannel;
+			ListenerList OnLeaveChannel;
 		} Generic;
 		ListenerMap specific_listeners;
 
@@ -93,14 +97,28 @@ namespace Script {
 		}
 	};
 
-	inline ObjectID Enviroment::addObject(Thing* thing) {
+	inline ObjectID Enviroment::addObject(void* obj) {
+		ObjectMap::right_iterator thing_iter = object_map.right.find(obj);
+		if(thing_iter == object_map.right.end()) {
+			ObjectID id = getFreeID();
+			object_map.left.insert(std::make_pair(id, obj));
+#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+			std::cout << "Added object " << obj << " with id " << id << std::endl;
+			debugOutput();
+#endif
+			return id;
+		}
+		return thing_iter->second;
+	}
+
+	inline ObjectID Enviroment::addThing(Thing* thing) {
 		ObjectMap::right_iterator thing_iter = object_map.right.find(thing);
 		if(thing_iter == object_map.right.end()) {
 			ObjectID id = getFreeID();
 			object_map.left.insert(std::make_pair(id, reinterpret_cast<void*>(thing)));
 #ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
-		std::cout << "Added thing " << thing << " with id " << id << std::endl;
-		debugOutput();
+			std::cout << "Added thing " << thing << " with id " << id << std::endl;
+			debugOutput();
 #endif
 			return id;
 		}
@@ -127,6 +145,14 @@ namespace Script {
 		return true;
 	}
 
+	inline void* Enviroment::getObject(ObjectID id) {
+		ObjectMap::left_iterator id_iter = object_map.left.find(id);
+		if(id_iter == object_map.left.end()) {
+			return NULL;
+		}
+		return id_iter->second;
+	}
+
 	inline Thing* Enviroment::getThing(ObjectID id) {
 		ObjectMap::left_iterator id_iter = object_map.left.find(id);
 		if(id_iter == object_map.left.end()) {
@@ -143,6 +169,19 @@ namespace Script {
 		object_map.left.erase(id_iter);
 #ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
 		std::cout << "Removed object with ID " << id << std::endl;
+		debugOutput();
+#endif
+		return true;
+	}
+
+	inline bool Enviroment::removeObject(void* obj) {
+		ObjectMap::right_iterator obj_iter = object_map.right.find(obj);
+		if(obj_iter == object_map.right.end()) {
+			return false;
+		}
+		object_map.right.erase(obj_iter);
+#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+		std::cout << "Removed Object " << obj << std::endl;
 		debugOutput();
 #endif
 		return true;

@@ -70,8 +70,22 @@ bool Enviroment::stopListener(ListenerList& list, uint32_t id) {
 }
 
 bool Enviroment::stopListener(ListenerType type, uint32_t id) {
-	if(type == ONSAY_LISTENER) {
-		if(stopListener(Generic.OnSay, id)) return true;
+	switch(type)
+	{
+		case ON_SAY_LISTENER:
+			if(stopListener(Generic.OnSay, id))
+				return true;
+			break;
+		case ON_OPEN_CHANNEL_LISTENER:
+			if(stopListener(Generic.OnJoinChannel, id))
+				return true;
+			break;
+		case ON_CLOSE_CHANNEL_LISTENER:
+			if(stopListener(Generic.OnLeaveChannel, id))
+				return true;
+			break;
+		default:
+			break;
 	}
 
 	// Try specific

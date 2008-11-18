@@ -21,6 +21,11 @@
 
 #include "chat.h"
 #include "player.h"
+#include "game.h"
+
+// Avoid unnecessary includes!
+extern void g_gameUnscript(void* v);
+extern void g_gameOnLeaveChannel(Player* player, ChatChannel* channel);
 
 PrivateChatChannel::PrivateChatChannel(uint16_t channelId, std::string channelName) :
 ChatChannel(channelId, channelName)
@@ -111,6 +116,11 @@ ChatChannel::ChatChannel(uint16_t channelId, std::string channelName)
 	m_name = channelName;
 }
 
+ChatChannel::~ChatChannel()
+{
+	g_gameUnscript(this);
+}
+
 bool ChatChannel::addUser(Player* player)
 {
 	UsersMap::iterator it = m_users.find(player->getID());
@@ -154,32 +164,13 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& t
 Chat::Chat()
 {
 	// Create the default channels
-	ChatChannel *newChannel;
+	m_normalChannels[0x03] = new ChatChannel(0x03, "Rule Violations");
+	m_normalChannels[0x04] = new ChatChannel(0x04, "Game-Chat");
+	m_normalChannels[0x05] = new ChatChannel(0x05, "Trade");
+	m_normalChannels[0x06] = new ChatChannel(0x06, "RL-Chat");
+	m_normalChannels[0x08] = new ChatChannel(0x08, "Help");
 
-	newChannel = new ChatChannel(0x03, "Rule Violations");
-	if(newChannel)
-		m_normalChannels[0x03] = newChannel;
-
-	newChannel = new ChatChannel(0x04, "Game-Chat");
-	if(newChannel)
-		m_normalChannels[0x04] = newChannel;
-
-	newChannel = new ChatChannel(0x05, "Trade");
-	if(newChannel)
-		m_normalChannels[0x05] = newChannel;
-
-	newChannel = new ChatChannel(0x06, "RL-Chat");
-	if(newChannel)
-		m_normalChannels[0x06] = newChannel;
-
-	newChannel = new ChatChannel(0x08, "Help");
-	if(newChannel)
-		m_normalChannels[0x08] = newChannel;
-
-	newChannel = new PrivateChatChannel(0xFFFF, "Private Chat Channel");
-	if(newChannel)
-		dummyPrivate = newChannel;
-
+	dummyPrivate = new PrivateChatChannel(0xFFFF, "Private Chat Channel");
 }
 
 Chat::~Chat()
@@ -209,8 +200,6 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 
 	if(channelId == 0x00){
 		ChatChannel *newChannel = new ChatChannel(channelId, player->getGuildName());
-		if(!newChannel)
-			return NULL;
 
 		m_guildChannels[player->getGuildId()] = newChannel;
 		return newChannel;
@@ -225,8 +214,6 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 		for(uint16_t i = 100; i < 10000; ++i){
 			if(m_privateChannels.find(i) == m_privateChannels.end()){
 				PrivateChatChannel* newChannel = new PrivateChatChannel(i, player->getName() + "'s Channel");
-				if(!newChannel)
-					return NULL;
 
 				newChannel->setOwner(player->getGUID());
 
@@ -301,6 +288,8 @@ void Chat::removeUserFromAllChannels(Player* player)
 		list.pop_front();
 
 		channel->removeUser(player);
+
+		g_gameOnLeaveChannel(player, channel);
 
 		if(channel->getOwner() == player->getGUID())
 			deleteChannel(player, channel->getId());

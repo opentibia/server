@@ -33,7 +33,7 @@ uint32_t Script::Event::eventID_counter = 0;
 
 using namespace Script;
 
-Event::Event() : eventID(++eventID_counter) {
+Event::Event() : eventID(++eventID_counter), propagate_by_default(false) {
 	std::ostringstream os;
 	os << "EI_" << eventID; // Event instance tag
 	lua_tag = os.str();
@@ -77,7 +77,7 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 	update_instance(state, enviroment, thread);
 
 	// Find out if the event should propagate
-	bool propagate = false;
+	bool propagate = propagate_by_default;
 	thread->getField(-1, "skipped");
 	if(thread->isNil(-1)) {
 		thread->pop();
@@ -103,9 +103,10 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature speaks
 
-OnSay::Event::Event(Creature* _speaker, SpeakClass& _class, std::string& _receiver, std::string& _text) :
+OnSay::Event::Event(Creature* _speaker, SpeakClass& _class, ChatChannel* channel, std::string& _receiver, std::string& _text) :
 	speaker(_speaker),
 	speak_class(_class),
+	channel(channel),
 	receiver(_receiver),
 	text(_text)
 {
@@ -136,7 +137,7 @@ bool OnSay::Event::check_match(const ScriptInformation& info) {
 
 bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment) {
 	if(dispatchEvent<OnSay::Event, ScriptInformation>
-			(this, state, enviroment, speaker->getListeners(ONSAY_LISTENER))
+			(this, state, enviroment, speaker->getListeners(ON_SAY_LISTENER))
 		)
 		return true;
 
@@ -149,6 +150,8 @@ void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnSayEvent");
 	state.pushThing(speaker);
 	state.setField(-2, "speaker");
+	state.pushChannel(channel);
+	state.setField(-2, "channel");
 	state.setField(-1, "class", int32_t(speak_class));
 	state.setField(-1, "receiver", receiver);
 	state.setField(-1, "text", text);
@@ -239,7 +242,6 @@ void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 }
 
 void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
-	// Nothing can change...
 	thread->getField(-1, "retval");
 	if(thread->isNumber()) {
 		retval = (ReturnValue)thread->popInteger();
@@ -248,5 +250,79 @@ void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, L
 		thread->HandleError("Event 'OnUseItem' invalid value of 'retval'");
 		thread->pop();
 	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnJoinChannel Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player opens a new chat channel
+
+OnJoinChannel::Event::Event(Player* chatter, ChatChannel* channel) :
+	chatter(chatter),
+	channel(channel)
+{
+	propagate_by_default = true;
+}
+
+OnJoinChannel::Event::~Event() {
+}
+
+bool OnJoinChannel::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	if(dispatchEvent<OnJoinChannel::Event>
+			(this, state, enviroment, chatter->getListeners(ON_OPEN_CHANNEL_LISTENER))
+		)
+		return true;
+	return dispatchEvent<OnJoinChannel::Event>
+		(this, state, enviroment, enviroment.Generic.OnJoinChannel);
+}
+
+void OnJoinChannel::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnJoinChannelEvent");
+	state.pushThing(chatter);
+	state.setField(-2, "user");
+	state.pushChannel(channel);
+	state.setField(-2, "channel");
+}
+
+void OnJoinChannel::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	// Nothing can change...
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnLeaveChannel Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player closes an existing chat channel
+
+OnLeaveChannel::Event::Event(Player* chatter, ChatChannel* channel) :
+	chatter(chatter),
+	channel(channel)
+{
+	propagate_by_default = true;
+}
+
+OnLeaveChannel::Event::~Event() {
+}
+
+bool OnLeaveChannel::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	if(dispatchEvent<OnLeaveChannel::Event>
+			(this, state, enviroment, chatter->getListeners(ON_CLOSE_CHANNEL_LISTENER))
+		)
+		return true;
+	return dispatchEvent<OnLeaveChannel::Event>
+		(this, state, enviroment, enviroment.Generic.OnLeaveChannel);
+}
+
+void OnLeaveChannel::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnLeaveChannelEvent");
+	state.pushThing(chatter);
+	state.setField(-2, "user");
+	state.pushChannel(channel);
+	state.setField(-2, "channel");
+}
+
+void OnLeaveChannel::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	// Nothing can change...
 }
 

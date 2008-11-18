@@ -317,7 +317,7 @@ function otstd.doors.registerHandlers()
 			stopListener(doortype.listener)
 		end
 		doortype.listener = 
-			registerGenericOnUseItemListener("itemid", doorid, otstd.doors.callback)
+			registerOnUseItem("itemid", doorid, otstd.doors.callback)
 	end
 end
 

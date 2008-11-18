@@ -229,8 +229,10 @@ struct LightInfo{
 
 namespace Script {
 	enum ListenerType {
-		ONSAY_LISTENER,
-		ONUSEITEM_LISTENER,
+		ON_SAY_LISTENER,
+		ON_USE_ITEM_LISTENER,
+		ON_OPEN_CHANNEL_LISTENER,
+		ON_CLOSE_CHANNEL_LISTENER,
 	};
 }
 

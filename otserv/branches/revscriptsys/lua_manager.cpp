@@ -31,9 +31,11 @@
 #include "container.h"
 #include "player.h"
 #include "town.h"
+#include "chat.h"
 
 extern Game g_game;
 extern ConfigManager g_config;
+extern Chat g_chat;
 
 LuaState::LuaState(Script::Enviroment& env) : enviroment(env) {
 	;
@@ -89,7 +91,13 @@ void LuaState::setField(int index, const std::string& field_name) {
 void LuaState::setField(int index, int field_index) {
 	push(field_index);
 	lua_insert(state, -2);
-	lua_settable(state, index);
+	if(index <= -10000)
+		lua_settable(state, index);
+	else
+		if(index < 0)
+			lua_settable(state, index-1);
+		else
+			lua_settable(state, index);
 }
 
 void LuaState::clearStack() {
@@ -277,7 +285,7 @@ void LuaState::pushThing(Thing* thing) {
 		else {
 			objid = pushClassInstance("Item");
 		}
-		*objid = enviroment.addObject(item);
+		*objid = enviroment.addThing(item);
 	}
 	else if(thing && thing->getCreature()) {
 		Creature* creature = thing->getCreature();
@@ -292,13 +300,13 @@ void LuaState::pushThing(Thing* thing) {
 		else if(creature->getNpc()) {
 			objid = pushClassInstance("NPC");
 		}
-		*objid = enviroment.addObject(creature);
+		*objid = enviroment.addThing(creature);
 	} else if(thing && thing->getTile()) {
 		pushTile(thing->getTile());
 	} else if(thing) {
 		Script::ObjectID* objid;
 		objid = pushClassInstance("Thing");
-		*objid = enviroment.addObject(thing);
+		*objid = enviroment.addThing(thing);
 	} else {
 		pushNil();
 	}
@@ -324,10 +332,20 @@ void LuaState::pushTown(Town* town) {
 	}
 }
 
+void LuaState::pushChannel(ChatChannel* channel) {
+	if(channel) {
+		Script::ObjectID* objid = pushClassInstance("Channel");
+		*objid = enviroment.addObject(channel);
+	} else {
+		pushNil();
+	}
+}
+
 Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	Position pos(0, 0, 0);
 	if(!isTable(-1)) {
 		HandleError(mode, "Attempt to treat non-table value as a position.");
+		pop();
 		return pos;
 	}
 	getField(-1, "x");
@@ -343,6 +361,7 @@ Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW *
 Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	if(!isTable(-1)) {
 		HandleError(mode, std::string("Couldn't pop tile, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		pop();
 		return NULL;
 	}
 
@@ -361,6 +380,7 @@ Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 Town* LuaState::popTown(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	if(!isUserdata(-1)) {
 		HandleError(mode, std::string("Couldn't pop town, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		pop();
 		return NULL;
 	}
 
@@ -370,9 +390,23 @@ Town* LuaState::popTown(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	return Towns::getInstance().getTown((uint32_t)*objid);
 }
 
+ChatChannel* LuaState::popChannel(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	if(!isUserdata(-1)) {
+		HandleError(mode, std::string("Couldn't pop channel, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		pop();
+		return NULL;
+	}
+
+	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
+	pop();
+
+	return (ChatChannel*)enviroment.getObject(*objid);
+}
+
 Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	if(!isUserdata(-1)) {
 		HandleError(mode, std::string("Couldn't pop thing, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		pop();
 		return NULL;
 	}
 

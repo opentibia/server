@@ -2350,6 +2350,13 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 		return false;
 	}
 
+	Script::OnJoinChannel::Event evt(player, channel);
+	if(evt.dispatch(*script_system, *script_enviroment)) {
+		// If the event was not propagated, stop the action!
+		g_chat.removeUserFromChannel(player, channelId);
+		return false;
+	}
+
 	if(channel->getId() != 0x03){
 		player->sendChannel(channel->getId(), channel->getName());
 	}
@@ -2361,13 +2368,29 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 	return true;
 }
 
+// Called from removeFromAllChannels
+void g_gameOnLeaveChannel(Player* player, ChatChannel* channel)
+{
+	Script::OnLeaveChannel::Event evt(player, channel);
+	evt.dispatch(*g_game.script_system, *g_game.script_enviroment);
+}
+
 bool Game::playerCloseChannel(uint32_t playerId, uint16_t channelId)
 {
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
 		return false;
 
+	ChatChannel* channel = g_chat.getChannel(player, channelId);
+	if(!channel)
+		return false;
+
 	g_chat.removeUserFromChannel(player, channelId);
+
+	Script::OnLeaveChannel::Event evt(player, channel);
+	// We can't abort this action, no need to check return
+	evt.dispatch(*script_system, *script_enviroment);
+
 	return true;
 }
 
@@ -3674,7 +3697,7 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 		return false;
 	}
 
-	Script::OnSay::Event evt(player, type, receiver, text);
+	Script::OnSay::Event evt(player, type, g_chat.getChannel(player, channelId), receiver, text);
 	script_system->dispatchEvent(evt);
 
 	if(text.empty()) return false;
@@ -4783,10 +4806,22 @@ void Game::unscriptThing(Thing* thing)
 	script_enviroment->removeThing(thing);
 }
 
+void Game::unscript(void* v)
+{
+	script_enviroment->removeObject(v);
+}
+
 // Shortens compilation time as it can be called without including game.h
 void g_gameUnscriptThing(Thing* thing)
 {
 	g_game.unscriptThing(thing);
+}
+
+
+// Shortens compilation time as it can be called without including game.h
+void g_gameUnscript(void* v)
+{
+	g_game.unscript(v);
 }
 
 /*

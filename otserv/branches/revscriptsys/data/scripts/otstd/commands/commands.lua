@@ -35,10 +35,9 @@ function Command:register()
 		end
 	end
 	
-	self.Listener = registerGenericOnSayListener("beginning", true, self.words, internalHandler)
+	self.Listener = registerOnSay("beginning", true, self.words, internalHandler)
 end
 
 require("otstd/commands/move")
-require("otstd/commands/test")
 require("otstd/commands/floorchange")
 require("otstd/commands/makeitem")
