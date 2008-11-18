@@ -45,7 +45,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	DBResult* result;
 
 	query << "SELECT `players`.`id` AS `id`, `players`.`name` AS `name`, `account_id`, \
-		`group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
+		`players`.`group_id` as `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastip`, `save`, `conditions`, `redskulltime`, \

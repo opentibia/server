@@ -216,7 +216,7 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	//3: doors etc
 	//4: creatures
 	for(ItemVector::reverse_iterator it = topItems.rbegin(); it != topItems.rend(); ++it){
-		if(Item::items[(*it)->getID()].alwaysOnTopOrder == topOrder){
+		if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
 			return (*it);
 		}
 	}
@@ -360,7 +360,7 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		qt_node->removeCreature(creature);
 		toTile->qt_node->addCreature(creature);
 	}
-	
+
 	//add the creature
 	toTile->__addThing(creature);
 	int32_t newStackPos = toTile->__getIndexOfThing(creature);
@@ -566,7 +566,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				if(iiType.isHorizontal || iiType.isVertical){
 					supportHangable = true;
 				}
-				
+
 				if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
 					//
 				}

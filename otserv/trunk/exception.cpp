@@ -117,9 +117,9 @@ bool ExceptionHandler::InstallHandler(){
 	sigemptyset (&sa.sa_mask);
 	sa.sa_flags = SA_RESTART | SA_SIGINFO;
 
-	sigaction(SIGILL, &sa);		// illegal instruction
-	sigaction(SIGSEGV, &sa);	// segmentation fault
-	sigaction(SIGFPE, &sa);		// floating-point exception
+	sigaction(SIGILL, &sa, NULL);		// illegal instruction
+	sigaction(SIGSEGV, &sa, NULL);	// segmentation fault
+	sigaction(SIGFPE, &sa, NULL);		// floating-point exception
 	#endif//WIN32 || defined __WINDOWS__
 	installed = true;
 	return true;
@@ -438,7 +438,7 @@ void _SigHandler(int signum, siginfo_t *info, void* secret)
 		*outdriver << "rbp = " << context.uc_mcontext.gregs[REG_RBP] << std::endl;
 		*outdriver << "rsp = " << context.uc_mcontext.gregs[REG_RSP] << std::endl;
 		*outdriver << "efl = " << context.uc_mcontext.gregs[REG_EFL] << std::endl;
-		esp = gregs[REG_RSP];
+		esp = context.uc_mcontext.gregs[REG_RSP];
 	#endif
 	}
 	outdriver->flush();
@@ -629,7 +629,13 @@ void ExceptionHandler::dumpStack()
 	}
 	output << "*****************************************************" << std::endl;
 	output.close();
+
 }
-#endif //WIN32
+#else //Unix/Linux
+void ExceptionHandler::dumpStack()
+{
+	return;
+}
+#endif
 
 #endif
