@@ -1,3 +1,3 @@
 require("otstd/otstd")
 
-require("examples/guild_chat")
+require("examples/chat_example")

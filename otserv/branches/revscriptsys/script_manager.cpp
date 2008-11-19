@@ -18,6 +18,8 @@
 
 #include "otpch.h"
 
+#include <sstream>
+
 #include "script_manager.h"
 #include "script_event.h"
 #include "script_enviroment.h"
@@ -32,8 +34,8 @@ Manager::Manager(Script::Enviroment& e) : LuaStateManager(e), function_id_counte
 Manager::~Manager() {
 }
 
-void Manager::dispatchEvent(Script::Event& event) {
-	event.dispatch(*this, enviroment);
+bool Manager::dispatchEvent(Script::Event& event) {
+	return event.dispatch(*this, enviroment);
 }
 
 Manager* Manager::getManager() {
@@ -61,7 +63,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
 		
 		int argument_count = interface->getStackTop();
-		if(argument_count > cc->parameters.size()) {
+		if((unsigned int)argument_count > cc->parameters.size()) {
 			throw Script::Error("Too many arguments passed to function " + cc->name);
 		}
 		int parsed_argument_count = 0;
@@ -94,7 +96,6 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		int passed_argument_count = parsed_argument_count;
 
 		parsed_argument_count = 0;
-		int n = 0;
 		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
 				ctditer != cc->parameters.end();
 				++ctditer)

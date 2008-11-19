@@ -29,6 +29,7 @@
 #include "condition.h"
 #include "const.h"
 #include "enums.h"
+#include "thing.h"
 
 #include <list>
 

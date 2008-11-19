@@ -21,6 +21,7 @@
 
 #include <boost/bimap.hpp>
 #include <string>
+#include <map>
 #include "boost_common.h"
 #include "enums.h"
 
@@ -80,6 +81,8 @@ namespace Script {
 			ListenerList OnUseItem;
 			ListenerList OnJoinChannel;
 			ListenerList OnLeaveChannel;
+			ListenerList OnLogin;
+			ListenerList OnLogout;
 		} Generic;
 		ListenerMap specific_listeners;
 

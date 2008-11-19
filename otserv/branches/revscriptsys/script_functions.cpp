@@ -79,6 +79,8 @@ void Manager::registerClasses() {
 	registerClass("OnUseItemEvent", "Event");
 	registerClass("OnJoinChannelEvent", "Event");
 	registerClass("OnLeaveChannelEvent", "Event");
+	registerClass("OnLoginEvent", "Event");
+	registerClass("OnLogoutEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -105,6 +107,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Thing", "getParent()", &Manager::lua_Thing_getParent);
 	registerMemberFunction("Thing", "isMoveable()", &Manager::lua_Thing_isMoveable);
 	registerMemberFunction("Thing", "getPosition()", &Manager::lua_Thing_getPosition);
+	registerMemberFunction("Thing", "getName()", &Manager::lua_Thing_getName);
 	registerMemberFunction("Thing", "getDescription([int lookdistance])", &Manager::lua_Thing_getDescription);
 	registerMemberFunction("Thing", "moveTo(table pos)", &Manager::lua_Thing_moveToPosition);
 	registerMemberFunction("Thing", "destroy()", &Manager::lua_Thing_destroy);
@@ -115,7 +118,6 @@ void Manager::registerClasses() {
 
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
-	registerMemberFunction("Creature", "getName()", &Manager::lua_Creature_getName);
 	
 	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
 
@@ -136,6 +138,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getAccessGroup()", &Manager::lua_Player_getGroup);
 	registerMemberFunction("Player", "getPremiumDays()", &Manager::lua_Player_getPremiumDays);
 	registerMemberFunction("Player", "getSkull()", &Manager::lua_Player_getSkullType);
+	registerMemberFunction("Player", "getLastLogin()", &Manager::lua_Player_getLastLogin);
 	registerMemberFunction("Player", "getGuildID()", &Manager::lua_Player_getGuildID);
 	registerMemberFunction("Player", "getGuildName()", &Manager::lua_Player_getGuildName);
 	registerMemberFunction("Player", "getGuildRank()", &Manager::lua_Player_getGuildRank);
@@ -216,8 +219,11 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnLeaveChannel(function callback)", &Manager::lua_registerGenericEvent_OnLeaveChannel);
 	registerGlobalFunction("registerCreatureOnLeaveChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLeaveChannel);
 
-	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
+	registerGlobalFunction("registerOnLogin(function callback)", &Manager::lua_registerGenericEvent_OnLogout);
+	registerGlobalFunction("registerOnLogout(function callback)", &Manager::lua_registerGenericEvent_OnLogout);
+	registerGlobalFunction("registerCreatureOnLogout(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLogout);
 
+	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
 	registerGlobalFunction("wait(int delay)", &Manager::lua_wait);
 
@@ -436,6 +442,56 @@ int LuaState::lua_registerSpecificEvent_OnLeaveChannel() {
 	return 1;
 }
 
+int LuaState::lua_registerGenericEvent_OnLogin() {
+	boost::any p(0);
+	Listener_ptr listener(new Listener(ON_LOGIN_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnLogin.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnLogout() {
+	boost::any p(0);
+	Listener_ptr listener(new Listener(ON_LOGOUT_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnLogout.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnLogout() {
+	// Store callback
+	insert(-2);
+
+	Player* who = popPlayer();
+
+	boost::any p(0);
+	Listener_ptr listener(
+		new Listener(ON_LOGOUT_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	enviroment.registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
 int LuaState::lua_stopListener() {
 	std::string listener_id = popString();
 
@@ -528,6 +584,18 @@ int LuaState::lua_Thing_isMoveable()
 {
 	Thing* thing = popThing();
 	pushBoolean(thing->isPushable());
+	return 1;
+}
+
+int LuaState::lua_Thing_getName() {
+	Thing* t = popThing();
+	if(Creature* c = t->getCreature()) {
+		pushString(c->getName());
+	} else if(Item* i = t->getItem()) {
+		pushString(i->getName());
+	} else {
+		pushString("");
+	}
 	return 1;
 }
 
@@ -720,12 +788,6 @@ int LuaState::lua_Tile_addItem()
 ///////////////////////////////////////////////////////////////////////////////
 // Class Creature
 
-int LuaState::lua_Creature_getName() {
-	Player* p = popPlayer();
-	pushString(p->getName());
-	return 1;
-}
-
 int LuaState::lua_Creature_getHealth() {
 	Creature* creature = popCreature();
 	pushInteger(creature->getHealth());
@@ -909,6 +971,12 @@ int LuaState::lua_Player_getGroup() {
 int LuaState::lua_Player_getPremiumDays() {
 	Player* p = popPlayer();
 	push(p->getPremiumDays());
+	return 1;
+}
+
+int LuaState::lua_Player_getLastLogin() {
+	Player* p = popPlayer();
+	pushUnsignedInteger(p->getLastLoginSaved());
 	return 1;
 }
 

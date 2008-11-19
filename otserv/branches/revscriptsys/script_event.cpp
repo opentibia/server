@@ -186,8 +186,9 @@ bool OnSay::Event::check_match(const ScriptInformation& info) {
 }
 
 bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	ListenerList list = speaker->getListeners(ON_SAY_LISTENER);
 	if(dispatchEvent<OnSay::Event, ScriptInformation>
-			(this, state, enviroment, speaker->getListeners(ON_SAY_LISTENER))
+			(this, state, enviroment, list)
 		)
 		return true;
 
@@ -309,8 +310,9 @@ OnJoinChannel::Event::~Event() {
 }
 
 bool OnJoinChannel::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	ListenerList list = chatter->getListeners(ON_OPEN_CHANNEL_LISTENER);
 	if(dispatchEvent<OnJoinChannel::Event>
-			(this, state, enviroment, chatter->getListeners(ON_OPEN_CHANNEL_LISTENER))
+			(this, state, enviroment, list)
 		)
 		return true;
 	return dispatchEvent<OnJoinChannel::Event>
@@ -346,8 +348,9 @@ OnLeaveChannel::Event::~Event() {
 }
 
 bool OnLeaveChannel::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	ListenerList list = chatter->getListeners(ON_CLOSE_CHANNEL_LISTENER);
 	if(dispatchEvent<OnLeaveChannel::Event>
-			(this, state, enviroment, chatter->getListeners(ON_CLOSE_CHANNEL_LISTENER))
+			(this, state, enviroment, list)
 		)
 		return true;
 	return dispatchEvent<OnLeaveChannel::Event>
@@ -363,6 +366,68 @@ void OnLeaveChannel::Event::push_instance(LuaState& state, Enviroment& enviromen
 }
 
 void OnLeaveChannel::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	// Nothing can change...
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// OnLogin Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player enters the server
+
+OnLogin::Event::Event(Player* player) :
+	player(player)
+{
+	propagate_by_default = true;
+}
+
+OnLogin::Event::~Event() {
+}
+
+bool OnLogin::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	return dispatchEvent<OnLogin::Event>
+		(this, state, enviroment, enviroment.Generic.OnLogin);
+}
+
+void OnLogin::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnLogin");
+	state.pushThing(player);
+	state.setField(-2, "who");
+}
+
+void OnLogin::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	// Nothing can change...
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// OnLogout Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player enters the server
+
+OnLogout::Event::Event(Player* player, bool forced, bool timeout) :
+	player(player),
+	forced(forced),
+	timeout(timeout)
+{
+	propagate_by_default = true;
+}
+
+OnLogout::Event::~Event() {
+}
+
+bool OnLogout::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	return dispatchEvent<OnLogout::Event>
+		(this, state, enviroment, enviroment.Generic.OnLogout);
+}
+
+void OnLogout::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnLogout");
+	state.pushThing(player);
+	state.setField(-2, "who");
+	state.setField(-1, "forced", forced);
+	state.setField(-1, "timeout", timeout);
+}
+
+void OnLogout::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
 	// Nothing can change...
 }
 

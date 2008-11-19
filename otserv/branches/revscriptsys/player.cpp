@@ -1182,10 +1182,11 @@ void Player::sendPing(uint32_t interval)
 	if(canLogout()){
 		if(!client){
 			//Occurs when the player closes the game without logging out (x-logging).
-			// REVSCRIPT TODO
 			// Logout event
-			//g_creatureEvents->playerLogOut(this);
-			g_game.removeCreature(this, true);
+			if(!g_game.playerLogout(this, false, true)) {
+				// Only leave if the script allows us!
+				g_game.removeCreature(this, true);
+			}
 		}
 		else if(npings > 24){
 			client->logout(true);
@@ -3529,19 +3530,14 @@ void Player::onIdleStatus()
 
 void Player::onPlacedCreature()
 {
-	// REVSCRIPT TODO Event callback (onLogIn)
-	//if(!g_creatureEvents->playerLogIn(this)){
-	//	kickPlayer(); //The script won't let the player be online for now.
-	//}
+	if(g_game.playerLogin(this)){
+		kickPlayer(); //The script won't let the player be online for now.
+	}
 }
 
 void Player::onRemovedCreature()
 {
-	/*
-	if(client){
-		client->sendReLoginWindow();
-	}
-	*/
+	//
 }
 
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)

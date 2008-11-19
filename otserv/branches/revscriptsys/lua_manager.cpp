@@ -478,7 +478,7 @@ bool LuaStateManager::loadFile(std::string file) {
 	int ret = luaL_loadfile(state, file.c_str());
 
 	if(ret != 0){
-		std::cout << "Lua Error: " << popString() << "\n";
+		std::cout << "Lua Error: " << popString() << std::endl;
 		return false;
 	}
 	//check that it is loaded as a function
@@ -489,7 +489,7 @@ bool LuaStateManager::loadFile(std::string file) {
 	//execute it
 	ret = lua_pcall(state, 0, 0, 0);
 	if(ret != 0) {
-		std::cout << "Lua Error: Failed to load file - " << popString();
+		std::cout << "Lua Error: Failed to load file - " << popString() << std::endl;
 		return false;
 	}
 	return true;

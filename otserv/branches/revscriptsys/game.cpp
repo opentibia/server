@@ -401,7 +401,7 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos,
 
 	ReturnValue retval = RET_NOERROR;
 	Script::OnUseItem::Event evt(player, item, NULL, retval);
-	if(evt.dispatch(*script_system, *script_enviroment)) {
+	if(script_system->dispatchEvent(evt)) {
 		return retval;
 	}
 
@@ -498,7 +498,7 @@ ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx,
 
 	ReturnValue retval = RET_NOERROR;
 	Script::OnUseItem::Event evt(player, item, &toPosEx, retval);
-	if(evt.dispatch(*script_system, *script_enviroment)) {
+	if(script_system->dispatchEvent(evt)) {
 		return retval;
 	}
 /*
@@ -1175,6 +1175,18 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	}
 
 	return true;
+}
+
+bool Game::playerLogin(Player* player)
+{
+	Script::OnLogin::Event evt(player);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::playerLogout(Player* player, bool forced, bool timeout)
+{
+	Script::OnLogout::Event evt(player, forced, timeout);
+	return script_system->dispatchEvent(evt);
 }
 
 ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, uint32_t flags /*= 0*/)
@@ -2351,7 +2363,7 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 	}
 
 	Script::OnJoinChannel::Event evt(player, channel);
-	if(evt.dispatch(*script_system, *script_enviroment)) {
+	if(script_system->dispatchEvent(evt)) {
 		// If the event was not propagated, stop the action!
 		g_chat.removeUserFromChannel(player, channelId);
 		return false;
@@ -2372,7 +2384,7 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 void g_gameOnLeaveChannel(Player* player, ChatChannel* channel)
 {
 	Script::OnLeaveChannel::Event evt(player, channel);
-	evt.dispatch(*g_game.script_system, *g_game.script_enviroment);
+	g_game.script_system->dispatchEvent(evt);
 }
 
 bool Game::playerCloseChannel(uint32_t playerId, uint16_t channelId)
@@ -2389,7 +2401,7 @@ bool Game::playerCloseChannel(uint32_t playerId, uint16_t channelId)
 
 	Script::OnLeaveChannel::Event evt(player, channel);
 	// We can't abort this action, no need to check return
-	evt.dispatch(*script_system, *script_enviroment);
+	script_system->dispatchEvent(evt);
 
 	return true;
 }

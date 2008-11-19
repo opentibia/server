@@ -27,7 +27,9 @@ function Command:register()
 	function internalHandler(event)
 		local speaker = event.speaker
 		if isOfType(speaker, "Player") then
-			if table.contains(self.groups, speaker:getAccessGroup()) then
+			if (type(self.groups) == "string" and self.groups == "All") or table.contains(self.groups, speaker:getAccessGroup()) then
+				event.cmd = self.words
+				event.param = event.text:sub(self.words:len()+1)
 				self.handler(event)
 			end
 		else
@@ -41,3 +43,4 @@ end
 require("otstd/commands/move")
 require("otstd/commands/floorchange")
 require("otstd/commands/makeitem")
+require("otstd/commands/age")

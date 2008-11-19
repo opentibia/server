@@ -448,6 +448,8 @@ public:
 	bool playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown);
 	bool playerShowQuestLog(uint32_t playerId);
 	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
+	bool playerLogout(Player* player, bool forced, bool timeout);
+	bool playerLogin(Player* player);
 
 	void cleanup();
 	void shutdown();

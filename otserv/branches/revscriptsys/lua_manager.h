@@ -203,6 +203,9 @@ public:
 	int lua_registerSpecificEvent_OnJoinChannel();
 	int lua_registerGenericEvent_OnLeaveChannel();
 	int lua_registerSpecificEvent_OnLeaveChannel();
+	int lua_registerGenericEvent_OnLogin();
+	int lua_registerGenericEvent_OnLogout();
+	int lua_registerSpecificEvent_OnLogout();
 
 	int lua_stopListener();
 
@@ -218,6 +221,7 @@ public:
 	int lua_Thing_getParentTile();
 
 	int lua_Thing_isMoveable();
+	int lua_Thing_getName();
 	int lua_Thing_getDescription();
 
 	int lua_Thing_moveToPosition();
@@ -249,6 +253,7 @@ public:
 	int lua_Player_getGUID();
 	int lua_Player_getPremiumDays();
 	int lua_Player_getSkullType();
+	int lua_Player_getLastLogin();
 
 	int lua_Player_setStorageValue();
 	int lua_Player_getStorageValue();

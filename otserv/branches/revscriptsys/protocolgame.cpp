@@ -391,16 +391,14 @@ bool ProtocolGame::logout(bool forced)
 				return false;
 			}
 
-			// REVSCRIPT TODO Event callback onLogOut
-			//if(!g_creatureEvents->playerLogOut(player)){
+			if(g_game.playerLogout(player, false, false)) {
 				//Let the script handle the error message
-			//	return false;
-			//}
+				return false;
+			}
 		}
 		else{
-			//execute the script even when we log out
-			// REVSCRIPT TODO Event callback onLogOut
-			//g_creatureEvents->playerLogOut(player);
+			// execute the script even when we log out
+			g_game.playerLogout(player, true, false);
 		}
 	}
 

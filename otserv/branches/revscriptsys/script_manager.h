@@ -35,7 +35,7 @@ namespace Script {
 		~Manager();
 
 		// Event handling
-		void dispatchEvent(Event& event);
+		bool dispatchEvent(Event& event);
 	protected:
 		// This actually registers functions!
 		// Defined in script functions.cpp

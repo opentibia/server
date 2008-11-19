@@ -133,7 +133,6 @@ namespace Script {
 			SpeakClass& speak_class;
 			ChatChannel* channel;
 			std::string& text;
-			std::string& receiver;
 		};
 	}
 
@@ -226,6 +225,56 @@ namespace Script {
 		protected:
 			Player* chatter;
 			ChatChannel* channel;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnLogin event
+	// Triggered when a player enters the server
+
+	namespace OnLogin {
+		class Event : public Script::Event {
+		public:
+			Event(Player* player);
+			~Event();
+
+			std::string getName() const {return "OnLogin";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnLogout event
+	// Triggered when a player leaves the server
+
+	namespace OnLogout {
+		class Event : public Script::Event {
+		public:
+			Event(Player* player, bool forced, bool timeout);
+			~Event();
+
+			std::string getName() const {return "OnLogout";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
+			bool forced;
+			bool timeout;
 		};
 	}
 	

@@ -28,6 +28,55 @@ function string.strip_whitespace(str)
 	return str
 end
 
+function formatDHMS(n)
+	local ss = ""
+	local days = 0
+	if n >= 60*60*24 then
+		days = math.floor(n / (60*60*24))
+		if days == 1 then
+			ss = ss .. "one day"
+		else
+			ss = ss .. days .. " days"
+		end
+		n = n % (60*60*24)
+	end
+	local hours = 0
+	if n >= 60*60 then
+		hours = math.floor(n / (60*60))
+		if days > 0 then
+			ss = ss .. ", "
+		end
+		if hours == 1 then
+			ss = ss .. "one hour"
+		else
+			ss = ss .. hours .. " hours"
+		end
+		n = n % (60*60)
+	end
+	local minutes = 0
+	if n >= 60 then
+		minutes = math.floor(n / 60)
+		if days > 0 or hours > 0 then
+			ss = ss .. ", "
+		end
+		if minutes == 1 then
+			ss = ss .. "one minute"
+		else
+			ss = ss .. minutes .. " minutes"
+		end
+		n = n % (60)
+	end
+	local seconds = n
+	if days > 0 or hours > 0 or minutes > 0 then
+		ss = ss .. " and "
+	end
+	if seconds == 1 then
+		ss = ss .. "one second"
+	elseif seconds > 1 then
+		ss = ss .. seconds .. " seconds"
+	end
+	return ss
+end
 
 -- TABLE
 

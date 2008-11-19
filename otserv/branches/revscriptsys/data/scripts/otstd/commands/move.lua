@@ -1,7 +1,7 @@
 
 otstd.Commands.MoveForward = Command:new()
 
-otstd.Commands.MoveForward.words = "/a"
+otstd.Commands.MoveForward.words = "/a "
 otstd.Commands.MoveForward.groups = {"GM"}
 
 otstd.Commands.MoveForward.handler = function(event)

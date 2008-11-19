@@ -84,6 +84,14 @@ bool Enviroment::stopListener(ListenerType type, uint32_t id) {
 			if(stopListener(Generic.OnLeaveChannel, id))
 				return true;
 			break;
+		case ON_LOGIN_LISTENER:
+			if(stopListener(Generic.OnLogin, id))
+				return true;
+			return false; // No specific listeners
+		case ON_LOGOUT_LISTENER:
+			if(stopListener(Generic.OnLogout, id))
+				return true;
+			break;
 		default:
 			break;
 	}
