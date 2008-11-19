@@ -3696,9 +3696,18 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 		return false;
 	}
-
-	Script::OnSay::Event evt(player, type, g_chat.getChannel(player, channelId), receiver, text);
-	script_system->dispatchEvent(evt);
+	switch(type) {
+		case SPEAK_PRIVATE:
+		case SPEAK_PRIVATE_RED:
+		case SPEAK_RVR_ANSWER:
+		case SPEAK_RVR_CONTINUE:
+		case SPEAK_RVR_CHANNEL:
+			break;
+		default:
+			Script::OnSay::Event evt(player, type, g_chat.getChannel(player, channelId), text);
+			script_system->dispatchEvent(evt);
+			break;
+	}
 
 	if(text.empty()) return false;
 

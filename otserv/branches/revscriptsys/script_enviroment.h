@@ -201,12 +201,14 @@ namespace Script {
 	}
 
 	inline void Enviroment::debugOutput() const {
+#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
 		ObjectMap::left_const_iterator debug_iter = object_map.left.begin();
 		std::cout << "Object map, counter is at " << objectID_counter << " :" << std::endl;
 		while(debug_iter != object_map.left.end()) {
 			std::cout << "\tID: " << debug_iter->first << " ptr: " << debug_iter->second << std::endl;
 			++debug_iter;
 		}
+#endif
 	}
 }
 

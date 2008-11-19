@@ -154,11 +154,10 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature speaks
 
-OnSay::Event::Event(Creature* _speaker, SpeakClass& _class, ChatChannel* channel, std::string& _receiver, std::string& _text) :
+OnSay::Event::Event(Creature* _speaker, SpeakClass& _class, ChatChannel* channel, std::string& _text) :
 	speaker(_speaker),
 	speak_class(_class),
 	channel(channel),
-	receiver(_receiver),
 	text(_text)
 {
 }
@@ -204,7 +203,6 @@ void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushChannel(channel);
 	state.setField(-2, "channel");
 	state.setField(-1, "class", int32_t(speak_class));
-	state.setField(-1, "receiver", receiver);
 	state.setField(-1, "text", text);
 	//std::cout << state.typeOf() << ":" << state.getStackTop() << std::endl;
 	//std::cout << "endof" << std::endl;
@@ -217,15 +215,6 @@ void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaTh
 	}
 	else {
 		thread->HandleError("Event 'OnSay' invalid value of 'class'");
-		thread->pop();
-	}
-
-	thread->getField(-1, "receiver");
-	if(thread->isString()) {
-		receiver = thread->popString();
-	}
-	else {
-		thread->HandleError("Event 'OnSay' invalid value of 'receiver'");
 		thread->pop();
 	}
 

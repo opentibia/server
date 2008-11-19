@@ -454,7 +454,7 @@ Item* LuaState::popItem(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 LuaStateManager::LuaStateManager(Script::Enviroment& enviroment) : LuaState(enviroment) {
 	state = luaL_newstate();
 	if(!state){
-		throw std::exception("Could not create lua context, fatal error");
+		throw std::runtime_error("Could not create lua context, fatal error");
 	}
 
 	// Load all standard libraries
@@ -511,7 +511,7 @@ void LuaStateManager::scheduleThread(int32_t schedule, LuaThread_ptr thread) {
 void LuaStateManager::runScheduledThreads() {
 	int64_t current_time = OTSYS_TIME();
 	while(queued_threads.empty() == false) {
-		ThreadSchedule& scheduled = queued_threads.top();
+		const ThreadSchedule& scheduled = queued_threads.top();
 		if(scheduled.scheduled_time < current_time) {
 			int32_t t = scheduled.thread->run(0);
 			if(t > 0) {

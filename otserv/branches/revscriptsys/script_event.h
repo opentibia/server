@@ -26,9 +26,11 @@
 #include "script_enviroment.h"
 
 #include "const.h"
+#include "thing.h"
 
 // Forward declarations
 class Creature;
+class PositionEx;
 
 class LuaState;
 class LuaThread;
@@ -111,7 +113,7 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* speaker, SpeakClass& speak_class, ChatChannel* channel, std::string& receiver, std::string& text);
+			Event(Creature* speaker, SpeakClass& speak_class, ChatChannel* channel, std::string& text);
 			~Event();
 
 			std::string getName() const {return "OnSay";}

@@ -21,6 +21,8 @@
 
 #include <string>
 #include <queue>
+#include <stdexcept>
+#include <map>
 #include "boost_common.h"
 
 extern "C"
@@ -35,6 +37,8 @@ class Creature;
 class Thing;
 class Position;
 class Town;
+class Item;
+class Tile;
 class House;
 class ChatChannel;
 
