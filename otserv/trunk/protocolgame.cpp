@@ -336,7 +336,7 @@ bool ProtocolGame::login(const std::string& name)
 	else{
 		if(eventConnect != 0){
 			//Already trying to connect
-			disconnectClient(0x14, "Your already logged in.");
+			disconnectClient(0x14, "You are already logged in.");
 			return false;
 		}
 
@@ -363,7 +363,7 @@ bool ProtocolGame::connect(uint32_t playerId)
 	eventConnect = 0;
 	Player* _player = g_game.getPlayerByID(playerId);
 	if(!_player || _player->isRemoved() || _player->client){
-		disconnectClient(0x14, "Your already logged in.");
+		disconnectClient(0x14, "You are already logged in.");
 		return false;
 	}
 

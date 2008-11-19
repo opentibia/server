@@ -137,7 +137,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			passwordTest(password, account.password))){
 
 		g_bans.addLoginAttempt(clientip, false);
-		disconnectClient(0x0A, "Please enter a valid account number and password.");
+		disconnectClient(0x0A, "Please enter a valid account name and password.");
 		return false;
 	}
 
