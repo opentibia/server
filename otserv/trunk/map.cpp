@@ -156,6 +156,11 @@ Tile* Map::getTile(const Position& pos)
 
 void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
 {
+	if(z >= MAP_MAX_LAYERS) {
+		std::cout << "ERROR: Attempt to set tile on invalid Z coordinate " << int(z) << "!" << std::endl;
+		return;
+	}
+
 	QTreeLeafNode::newLeaf = false;
 	QTreeLeafNode* leaf = root.createLeaf(x, y, 15);
 	if(QTreeLeafNode::newLeaf){
