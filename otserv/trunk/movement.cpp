@@ -394,8 +394,7 @@ Event(_interface)
 	stepFunction = NULL;
 	moveFunction = NULL;
 	equipFunction = NULL;
-	slot = SLOT_WHEREEVER;
-	//slot = 0xFFFFFFFF;
+	slot = 0xFFFFFFFF;
 	reqLevel = 0;
 	reqMagLevel = 0;
 	premium = false;
