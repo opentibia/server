@@ -33,6 +33,57 @@ uint32_t Script::Event::eventID_counter = 0;
 
 using namespace Script;
 
+///////////////////////////////////////////////////////////////////////////////
+// Implementation details
+
+template<class T, class ScriptInformation>
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
+
+		// Call handler
+		if(e->check_match(info)) {
+			if(e->call(state, enviroment, listener) == true) {
+				// Handled
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+template<class T> // No script information!
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+
+		// Call handler
+		if(e->call(state, enviroment, listener) == true) {
+			// Handled
+			return true;
+		}
+	}
+	return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// General Event class
+
 Event::Event() : eventID(++eventID_counter), propagate_by_default(false) {
 	std::ostringstream os;
 	os << "EI_" << eventID; // Event instance tag

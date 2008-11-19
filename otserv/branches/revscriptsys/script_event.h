@@ -50,7 +50,6 @@ template<class T, class ScriptInformation>
 template<class T>
 	bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list);
 
-
 namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -234,54 +233,6 @@ namespace Script {
 	 * 3. Add the class to Enviroment::stopListener
 	 * 4. Add callback from an arbitrary location in otserv source
 	 */
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Implementation details
-
-template<class T, class ScriptInformation>
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
-		return false;
-	}
-	for(Script::ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
-
-		// Call handler
-		if(e->check_match(info)) {
-			if(e->call(state, enviroment, listener) == true) {
-				// Handled
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-template<class T> // No script information!
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
-		return false;
-	}
-	for(Script::ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-
-		// Call handler
-		if(e->call(state, enviroment, listener) == true) {
-			// Handled
-			return true;
-		}
-	}
-	return false;
 }
 
 #endif // __OTSERV_SCRIPT_EVENT__

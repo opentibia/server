@@ -168,7 +168,6 @@ public:
 	// Generic
 	void push(bool b) {pushBoolean(b);}
 	void push(int i) {pushInteger(i);}
-	void push(int32_t i) {pushInteger(i);}
 	void push(uint32_t ui) {pushUnsignedInteger(ui);}
 	void push(double d) {pushFloat(d);}
 	void push(const std::string& str) {pushString(str);}
@@ -372,8 +371,6 @@ protected:
 	typedef std::map<lua_State*, LuaThread_ptr> ThreadMap;
 	ThreadMap threads;
 	std::priority_queue<ThreadSchedule> queued_threads;
-
-	friend class LuaStateManager;
 };
 
 #endif
