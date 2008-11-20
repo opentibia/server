@@ -150,6 +150,9 @@ void Game::setGameState(GameState_t newState)
 					boost::bind(&Game::shutdown, this)));
 				Scheduler::getScheduler().stop();
 				Dispatcher::getDispatcher().stop();
+				if(g_server){
+					g_server->stop();
+				}
 				break;
 			}
 
@@ -4367,10 +4370,6 @@ void Game::shutdown()
 	Dispatcher::getDispatcher().shutdown();
 	Spawns::getInstance()->clear();
 	g_bans.clearTemporaryBans();
-
-	if(g_server){
-		g_server->stop();
-	}
 
 	std::cout << "[done]" << std::endl;
 	cleanup();

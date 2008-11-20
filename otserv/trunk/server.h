@@ -55,6 +55,7 @@ private:
 
 	uint32_t m_serverIp;
 	uint16_t m_serverPort;
+	bool m_isOpen;
 };
 
 #endif
