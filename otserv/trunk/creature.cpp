@@ -1382,7 +1382,7 @@ bool Creature::hasCondition(ConditionType_t type) const
 	}
 
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type && (*it)->getEndTime() >= OTSYS_TIME()){
+		if((*it)->getType() == type && ((*it)->getEndTime() == 0 ||(*it)->getEndTime() >= OTSYS_TIME() )){
 			return true;
 		}
 	}
