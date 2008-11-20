@@ -54,7 +54,7 @@ bool maploaded = false;
 boost::recursive_mutex maploadlock;
 
 #if !defined(__WINDOWS__)
-time_t start_time;
+extern time_t start_time;
 #endif
 
 #if defined WIN32 || defined __WINDOWS__

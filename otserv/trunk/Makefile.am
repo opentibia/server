@@ -43,4 +43,5 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	condition.cpp condition.h weapons.cpp weapons.h talkaction.cpp talkaction.h \
 	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h server.cpp connection.cpp \
 	outputmessage.cpp tasks.cpp scheduler.cpp protocollogin.cpp protocol.cpp creatureevent.cpp \
-	creatureevent.h sha1.cpp sha1.h beds.cpp beds.h party.cpp party.h quests.cpp quests.h
+	creatureevent.h sha1.cpp sha1.h beds.cpp beds.h party.cpp party.h quests.cpp quests.h \
+	protocolold.h protocolold.cpp exception.cpp exception.h

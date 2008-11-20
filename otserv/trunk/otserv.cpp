@@ -88,7 +88,7 @@ extern AdminProtocolConfig* g_adminConfig;
 #include "networkmessage.h"
 
 #if !defined(__WINDOWS__)
-extern time_t start_time;
+time_t start_time;
 #endif
 
 void ErrorMessage(const char* message) {
@@ -114,9 +114,10 @@ int main(int argc, char *argv[])
 	ExceptionHandler mainExceptionHandler;
 	mainExceptionHandler.InstallHandler();
 #endif
-
-	std::cout << ":: OTServ Development-Version 0.6.0 - Avesta branch" << std::endl;
-	std::cout << ":: ==============================================" << std::endl;
+	//std::cout << ":: OTServ Development-Version 0.6.0 - SVN Preview" << std::endl;
+	//std::cout << ":: ==============================================" << std::endl;
+	std::cout << ":: OTServ Version 0.6.0" << std::endl;
+	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ \
