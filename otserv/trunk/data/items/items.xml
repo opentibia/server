@@ -11958,118 +11958,72 @@
 	</item>
 	<item id="4644" name="shallow water">
 		<attribute key="fluidSource" value="water"/>
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4645" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4646" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4647" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4648" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4649" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4650" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4651" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4652" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4653" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4654" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4655" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4656" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4657" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4658" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4659" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4660" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4661" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4662" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4663" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4664" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4665" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4666" name="shallow water">
-		<attribute key="type" value="trashholder"/>
-		<attribute key="effect" value="bluebubble"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4667" name="dirt">
@@ -14063,21 +14017,21 @@
 	</item>
 	<item id="5504" article="a" name="wooden pillar">
 	</item>
-	<item id="5505" article="a" name="torture machine">
+	<item id="5505" article="a" name="pulley">
 	</item>
-	<item id="5506" article="a" name="torture machine">
+	<item id="5506" article="a" name="pulley">
 	</item>
-	<item id="5507" article="a" name="torture machine">
+	<item id="5507" article="a" name="pulley">
 	</item>
-	<item id="5508" article="a" name="torture machine">
+	<item id="5508" article="a" name="pulley">
 	</item>
-	<item id="5509" article="a" name="torture machine">
+	<item id="5509" article="a" name="pulley">
 	</item>
-	<item id="5510" article="a" name="torture machine">
+	<item id="5510" article="a" name="pulley">
 	</item>
-	<item id="5511" article="a" name="torture machine">
+	<item id="5511" article="a" name="pulley">
 	</item>
-	<item id="5512" article="a" name="torture machine">
+	<item id="5512" article="a" name="pulley">
 	</item>
 	<item id="5513" article="a" name="distillery">
 		<attribute key="decayTo" value="5469"/>
