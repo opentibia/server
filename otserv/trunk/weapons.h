@@ -49,7 +49,7 @@ public:
 	static int32_t weaponInFightTime;
 
 	static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue);
-	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue, float attackFactor);
+	static int32_t getMaxWeaponDamage(int32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor);
 
 protected:
 	virtual void clear();
@@ -73,7 +73,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 	virtual bool configureWeapon(const ItemType& it);
-	virtual bool interuptSwing() const {return false;}
+	virtual bool interruptSwing() const {return false;}
 
 	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
@@ -155,7 +155,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
 	// Distance weapons don't interrupt swings either.
-	//virtual bool interuptSwing() const {return true;}
+	//virtual bool interruptSwing() const {return true;}
 
 	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
