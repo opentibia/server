@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <items>
 	<item id="100" name="void">
 	</item>
@@ -4831,6 +4831,7 @@
 		<attribute key="weight" value="2300"/>
 		<attribute key="defense" value="20"/>
 		<attribute key="attack" value="35"/>
+		<attribute key="elementFire" value="11"/>
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 	</item>
@@ -4950,6 +4951,7 @@
 		<attribute key="attack" value="26"/>
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
+		<attribute key="elementEarth" value="8"/>
 	</item>
 	<item id="2410" article="a" name="throwing knife" plural="throwing knives">
 		<attribute key="weight" value="500"/>
@@ -4964,6 +4966,7 @@
 		<attribute key="weight" value="880"/>
 		<attribute key="defense" value="8"/>
 		<attribute key="attack" value="18"/>
+		<attribute key="elementEarth" value="2"/>
 		<attribute key="weaponType" value="sword"/>
 	</item>
 	<item id="2412" article="a" name="katana">
@@ -5107,6 +5110,7 @@
 		<attribute key="weight" value="4000"/>
 		<attribute key="defense" value="16"/>
 		<attribute key="attack" value="38"/>
+		<attribute key="elementFire" value="11"/>
 		<attribute key="weaponType" value="axe"/>
 		<attribute key="extradef" value="1"/>
 	</item>
@@ -6519,7 +6523,7 @@
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2810"/>
-		<attribute key="duration" value="10"/>
+		<attribute key="duration" value="600"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
@@ -6527,14 +6531,14 @@
 		<attribute key="weight" value="4600"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3068"/>
-		<attribute key="duration" value="10"/>	
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="venom"/>
 		<attribute key="fluidSource" value="slime"/>
 	</item>
 	<item id="2808" article="a" name="dead cyclops">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3117"/>
-		<attribute key="duration" value="10"/>
+		<attribute key="duration" value="600"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
@@ -6547,14 +6551,14 @@
 	</item>
 	<item id="2810" article="a" name="dead troll">
 		<attribute key="weight" value="50000"/>
-		<attribute key="containerSize" value="10"/>	
+		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2811"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="2811" article="a" name="dead troll">
 		<attribute key="weight" value="30000"/>
-		<attribute key="containerSize" value="10"/>	
+		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="blood"/>
@@ -6563,13 +6567,13 @@
 		<attribute key="weight" value="6300"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2814"/>
-		<attribute key="duration" value="10"/>
+		<attribute key="duration" value="600"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
 	<item id="2814" article="a" name="dead rat">
 		<attribute key="weight" value="4400"/>
-		<attribute key="containerSize" value="5"/>	
+		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2815"/>
 		<attribute key="duration" value="600"/>
 		<attribute key="corpseType" value="blood"/>
@@ -8132,8 +8136,8 @@
 	<item id="3073" article="a" name="dead rat">
 		<attribute key="weight" value="6800"/>
 		<attribute key="containerSize" value="5"/>
-		<attribute key="decayTo" value="3074"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="decayTo" value="2813"/>
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
@@ -8384,7 +8388,7 @@
 	</item>
 	<item id="3117" article="a" name="dead cyclops">
 		<attribute key="decayTo" value="3118"/>
-		<attribute key="duration" value="20"/>
+		<attribute key="duration" value="600"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="3118" article="a" name="dead cyclops">
@@ -9654,6 +9658,7 @@
 	<item id="3684" article="a" name="ramp">
 	</item>
 	<item id="3685" article="a" name="ramp">
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="3686" article="a" name="ramp">
 	</item>
@@ -17481,9 +17486,9 @@
 	</item>
 	<item id="6513" article="a" name="christmas wreath">
 	</item>
-	<item id="6514" article="a" name="christmas garland ">
+	<item id="6514" article="a" name="christmas garland">
 	</item>
-	<item id="6515" article="a" name="christmas garland ">
+	<item id="6515" article="a" name="christmas garland">
 	</item>
 	<item id="6516" name="plaguesmith remains">
 		<attribute key="containerSize" value="10"/>
@@ -20283,10 +20288,10 @@
 	<item id="7496" article="a" name="blue bottle">
 		<attribute key="weight" value="250"/>
 	</item>
-	<item id="7497" article="a" name="mining helmet">	    
+	<item id="7497" article="a" name="mining helmet">
 		<attribute key="weight" value="700"/>
 		<attribute key="armor" value="1"/>
-		<attribute key="slotType" value="head"/>		
+		<attribute key="slotType" value="head"/>
 	</item>
 	<item id="7498" article="a" name="parcel">
 		<attribute key="weight" value="1800"/>
@@ -21910,7 +21915,7 @@
 		<attribute key="absorbPercentFire" value="-10"/>
 	</item>
 	<item id="7888" article="a" name="glacier amulet">
-		<attribute key="description" value="It has 20% ice protection, but increases damage taken from energy by 10%."/>
+		<attribute key="description" value="It has 20% ice protection, but also increases damage taken from energy by 10%."/>
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="absorbPercentIce" value="20"/>
@@ -21937,7 +21942,7 @@
 		<attribute key="absorbPercentFire" value="5"/>
 		<attribute key="absorbPercentIce" value="-5"/>
 		<attribute key="slotType" value="feet"/>
-	</item>		
+	</item>
 	<item id="7892" name="glacier shoes">
 	    <attribute key="description" value="It has 5% ice protection, but also increases damage taken from energy by 5%."/>
 		<attribute key="weight" value="750"/>
@@ -21945,7 +21950,7 @@
 		<attribute key="slotType" value="feet"/>
 		<attribute key="absorbPercentIce" value="5"/>
 		<attribute key="absorbPercentEnergy" value="-5"/>
-	</item>	
+	</item>
 	<item id="7893" name="lightning boots">
 	    <attribute key="description" value="It has 5% energy protection, but also increases damage taken from earth by 5%."/>
 		<attribute key="weight" value="750"/>
@@ -21953,7 +21958,7 @@
 		<attribute key="absorbPercentEnergy" value="5"/>
 		<attribute key="absorbPercentEarth" value="-5"/>
 		<attribute key="slotType" value="feet"/>
-	</item>	
+	</item>
 	<item id="7894" name="magma legs">
 	    <attribute key="description" value="It has 6% fire protection, but also increases damage taken from ice by 6%."/>
 		<attribute key="weight" value="1900"/>
@@ -22003,36 +22008,36 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="7900" article="a" name="magma monocle">
-        <attribute key="description" value="It has 4% fire protection, but also increases damage taken from ice by 4%."/>	
+        <attribute key="description" value="It has 4% fire protection, but also increases damage taken from ice by 4%."/>
 		<attribute key="weight" value="1000"/>
 		<attribute key="armor" value="5"/>
 		<attribute key="slotType" value="head"/>
 		<attribute key="absorbPercentFire" value="4"/>
-		<attribute key="absorbPercentIce" value="-4"/>		
+		<attribute key="absorbPercentIce" value="-4"/>
 	</item>
 	<item id="7901" article="a" name="lightning headband">
 	    <attribute key="description" value="It has 4% energy protection, but also increases damage taken from earth by 4%."/>
 		<attribute key="weight" value="100"/>
 		<attribute key="armor" value="5"/>
-		<attribute key="slotType" value="head"/>	
+		<attribute key="slotType" value="head"/>
 		<attribute key="absorbPercentEnergy" value="4"/>
-		<attribute key="absorbPercentEarth" value="-4"/>	
+		<attribute key="absorbPercentEarth" value="-4"/>
 	</item>
 	<item id="7902" article="a" name="glacier mask">
 	    <attribute key="description" value="It has 4% ice protection, but also increases damage taken from energy by 4%."/>
 		<attribute key="weight" value="1000"/>
 		<attribute key="armor" value="5"/>
-		<attribute key="slotType" value="head"/>	
+		<attribute key="slotType" value="head"/>
 		<attribute key="absorbPercentIce" value="4"/>
-		<attribute key="absorbPercentEnergy" value="-4"/>	
+		<attribute key="absorbPercentEnergy" value="-4"/>
 	</item>
 	<item id="7903" article="a" name="terra hood">
 	    <attribute key="description" value="It has 4% earth protection, but also increases damage taken from fire by 4%."/>
 		<attribute key="weight" value="1000"/>
 		<attribute key="armor" value="5"/>
-		<attribute key="slotType" value="head"/>	
+		<attribute key="slotType" value="head"/>
 		<attribute key="absorbPercentFire" value="-4"/>
-		<attribute key="absorbPercentEarth" value="4"/>	
+		<attribute key="absorbPercentEarth" value="4"/>
 	</item>
 	<item id="7904" article="a" name="furniture package">
 		<attribute key="description" value="It contains a modification kit for a green bed."/>
@@ -22141,10 +22146,10 @@
 	</item>
 	<item id="7938" article="a" name="weaved hole">
 	</item>
-	<item id="7939" article="a" name="mining helmet">	    
+	<item id="7939" article="a" name="mining helmet">
 		<attribute key="weight" value="700"/>
 		<attribute key="armor" value="1"/>
-		<attribute key="slotType" value="head"/>		
+		<attribute key="slotType" value="head"/>
 	</item>
 	<item id="7940" name="cave entrance">
 	</item>
@@ -22176,10 +22181,10 @@
 	</item>
 	<item id="7956" article="a" name="waterpolo ball">
 	</item>
-	<item id="7957" article="a" name="jester hat">	    
+	<item id="7957" article="a" name="jester hat">
 		<attribute key="weight" value="1000"/>
 		<attribute key="armor" value="1"/>
-		<attribute key="slotType" value="head"/>		
+		<attribute key="slotType" value="head"/>
 	</item>
 	<item id="7958" article="a" name="jester staff">
 		<attribute key="weight" value="725"/>
@@ -22188,6 +22193,15 @@
 	<item id="7959" article="the" name="fireflanz">
 		<attribute key="weight" value="1000"/>
 		<attribute key="weaponType" value="sword"/>
+	</item>
+	<item id="7960" article="a" name="furniture package">
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="7961" article="a" name="furniture package">
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="7962" article="a" name="furniture package">
+		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="7963" article="a" name="shark fish">
 	</item>
@@ -22295,6 +22309,56 @@
 	<item id="8018" name="earth">
 	</item>
 	<item id="8019" name="earth">
+	</item>
+	<item id="8020" name="earth">
+	</item>
+	<item id="8021" name="">
+	</item>
+	<item id="8022" name="earth">
+	</item>
+	<item id="8023" name="earth">
+	</item>
+	<item id="8024" name="earth">
+	</item>
+	<item id="8025" name="earth">
+	</item>
+	<item id="8026" name="earth">
+	</item>
+	<item id="8027" name="earth">
+	</item>
+	<item id="8028" name="earth">
+	</item>
+	<item id="8030" name="earth">
+	</item>
+	<item id="8031" name="earth">
+	</item>
+	<item id="8032" name="earth">
+	</item>
+	<item id="8033" name="sand">
+	</item>
+	<item id="8034" name="sand">
+	</item>
+	<item id="8035" name="sand">
+	</item>
+	<item id="8036" name="sand">
+	</item>
+	<item id="8037" name="sand">
+	</item>
+	<item id="8038" name="sand">
+	</item>
+	<item id="8039" name="sand">
+	</item>
+	<item id="8040" name="sand">
+	</item>
+	<item id="8041" name="sand">
+	</item>
+	<item id="8042" name="sand">
+	</item>
+	<item id="8043" name="sand">
+	</item>
+	<item id="8044" name="sand">
+	</item>
+	<item id="8045" name="sand">
 	</item>
 	<item id="8048" name="earth">
 	</item>
@@ -22437,7 +22501,7 @@
 	</item>
 	<item id="8208" article="an" name="ice cream cone">
 		<attribute key="weight" value="100"/>
-		<attribute key="decayTo" value="0"/> 
+		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="120"/>
 	</item>
 	<item id="8210" name="cave entrance">
@@ -22467,6 +22531,38 @@
 	<item id="8243" article="an" name="archway">
 	</item>
 	<item id="8244" article="an" name="archway">
+	</item>
+	<item id="8245" article="an" name="archway">
+	</item>
+	<item id="8246" article="an" name="archway">
+	</item>
+	<item id="8247" article="an" name="archway">
+	</item>
+	<item id="8248" article="an" name="archway">
+	</item>
+	<item id="8249" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8250" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8251" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8252" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8253" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8254" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8255" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
+	<item id="8256" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="8257" name="grass">
 	</item>
@@ -22518,7 +22614,7 @@
 		<attribute key="decayTo" value="8274"/>
 		<attribute key="duration" value="600"/>
 		<attribute key="corpseType" value="blood"/>
-	</item>	
+	</item>
 	<item id="8274" article="a" name="slain lich">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="corpseType" value="blood"/>
@@ -22582,7 +22678,7 @@
 	<item id="8300" article="a" name="flawless ice crystal">
 		<attribute key="weight" value="250"/>
 	</item>
-	<item id="8301" name="fine sulphur"> 
+	<item id="8301" name="fine sulphur">
 		<attribute key="description" value="It has been extracted from an inactive lava hole."/>
 		<attribute key="weight" value="50"/>
 	</item>
@@ -22593,7 +22689,7 @@
 		<attribute key="weight" value="250"/>
 	</item>
 	<item id="8304" name="eternal flames">
-		<attribute key="weight" value="250"/> 
+		<attribute key="weight" value="250"/>
 	</item>
 	<item id="8305" name="mother soil">
 		<attribute key="weight" value="250"/>
@@ -22620,7 +22716,7 @@
 	<item id="8309" article="a" name="nail" plural="nails">
 		<attribute key="weight" value="1"/>
 	</item>
-	<item id="8310" name="neutral matter"> 
+	<item id="8310" name="neutral matter">
 		<attribute key="weight" value="250"/>
 	</item>
 	<item id="8311" name="slain sea serpent">
@@ -22656,27 +22752,31 @@
 	</item>
 	<item id="8323" article="a" name="hole">
 		<attribute key="floorchange" value="down"/>
-	</item>	
+	</item>
 	<item id="8323" article="a" name="hole">
 		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="8326" name="melting earth">
+	<item id="8324" article="a" name="sand dune">
 	</item>
-	<item id="8327" name="melting earth">
+	<item id="8325" article="a" name="sand dune">
 	</item>
-	<item id="8328" name="melting earth">
+	<item id="8326" name="dry grass">
 	</item>
-	<item id="8329" name="melting earth">
+	<item id="8327" name="dry grass">
 	</item>
-	<item id="8330" name="melting earth">
+	<item id="8328" name="dry grass">
 	</item>
-	<item id="8331" name="melting earth">
+	<item id="8329" name="dry grass">
 	</item>
-	<item id="8332" name="melting earth">
+	<item id="8330" name="dry grass">
 	</item>
-	<item id="8333" name="melting earth">
+	<item id="8331" name="dry grass">
 	</item>
-	<item id="8334" name="melting earth">
+	<item id="8332" name="dry grass">
+	</item>
+	<item id="8333" name="dry grass">
+	</item>
+	<item id="8334" name="dry grass">
 	</item>
 	<item id="8335" name="sand">
 	</item>
@@ -22702,33 +22802,33 @@
 	</item>
 	<item id="8346" name="sand">
 	</item>
-	<item id="8347" name="melting earth">
+	<item id="8347" name="dry grass">
 	</item>
-	<item id="8348" name="melting earth">
+	<item id="8348" name="dry grass">
 	</item>
-	<item id="8349" name="melting earth">
+	<item id="8349" name="dry grass">
 	</item>
-	<item id="8350" name="melting earth">
+	<item id="8350" name="dry grass">
 	</item>
-	<item id="8351" name="melting earth">
+	<item id="8351" name="dry grass">
 	</item>
-	<item id="8352" name="melting earth">
+	<item id="8352" name="dry grass">
 	</item>
-	<item id="8353" name="melting earth">
+	<item id="8353" name="dry grass">
 	</item>
-	<item id="8354" name="melting earth">
+	<item id="8354" name="dry grass">
 	</item>
-	<item id="8355" name="melting earth">
+	<item id="8355" name="dry grass">
 	</item>
-	<item id="8356" name="melting earth">
+	<item id="8356" name="dry grass">
 	</item>
-	<item id="8357" name="melting earth">
+	<item id="8357" name="dry grass">
 	</item>
-	<item id="8358" name="melting earth">
+	<item id="8358" name="dry grass">
 	</item>
-	<item id="8359" name="melting earth">
+	<item id="8359" name="dry grass">
 	</item>
-	<item id="8360" name="melting earth">
+	<item id="8360" name="dry grass">
 	</item>
 	<item id="8362" name="earth">
 	</item>
@@ -22773,7 +22873,17 @@
 	</item>
 	<item id="8380" article="a" name="tunnel entrance">
 		<attribute key="floorchange" value="down"/>
-	</item>	
+	</item>
+	<item id="8381" article="a" name="tunnel entrance">
+	</item>
+	<item id="8382" article="a" name="tunnel entrance">
+	</item>
+	<item id="8383" article="a" name="tunnel entrance">
+	</item>
+	<item id="8384" article="a" name="tunnel entrance">
+	</item>
+	<item id="8385" article="a" name="tunnel entrance">
+	</item>
 	<item id="8386" name="skeletal remains">
 	</item>
 	<item id="8387" name="skeletal remains">
@@ -23082,7 +23192,7 @@
 	<item id="8536" article="a" name="buttress">
 	</item>
 	<item id="8537" article="a" name="buttress">
-	</item>	
+	</item>
 	<item id="8538" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
@@ -23200,9 +23310,9 @@
 	</item>
 	<item id="8574" article="an" name="ice sculpture">
 	</item>
-	<item id="8575" article="a" name="magma hole"> 
+	<item id="8575" article="a" name="magma hole">
 	</item>
-	<item id="8577" name=""> 
+	<item id="8577" name="">
 	</item>
 	<item id="8578" name="grass">
 	</item>
@@ -23274,6 +23384,10 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 	</item>
+	<item id="8603" article="a" name="mill">
+	</item>
+	<item id="8604" article="a" name="mill">
+	</item>
 	<item id="8605" article="a" name="brick wall">
 	</item>
 	<item id="8606" article="a" name="brick wall">
@@ -23303,7 +23417,7 @@
 	<item id="8625" article="a" name="dwarven statue">
 	</item>
 	<item id="8626" article="a" name="dwarven statue">
-	</item>	
+	</item>
 	<item id="8631" article="a" name="burning wall">
 	</item>
 	<item id="8632" article="a" name="whirlpool">
@@ -23445,14 +23559,18 @@
 	<item id="8699" article="the" name="mona lisa picture">
 		<attribute key="weight" value="2500"/>
 	</item>
+	<item id="8700" article="a" name="bounty poster">
+	</item>
 	<item id="8701" article="an" name="ancient parchment">
 	</item>
 	<item id="8702" article="a" name="the witches' grimoire">
 		<attribute key="weight" value="1300"/>
 	</item>
+	<item id="8703" article="a" name="coffin">
+	</item>
 	<item id="8704" article="a" name="small health potion">
 		<attribute key="weight" value="175"/>
-	</item>	
+	</item>
 	<item id="8707" article="your" name="student book">
 		<attribute key="description" value="Write down important notes in here."/>
 		<attribute key="weight" value="900"/>
@@ -23470,7 +23588,7 @@
 	<item id="8712" article="a" name="glowing rope">
 		<attribute key="weight" value="1800"/>
 	</item>
-	<item id="8713" article="a" name="glowing fish" plural="glowing fish"> 
+	<item id="8713" article="a" name="glowing fish" plural="glowing fish">
 		<attribute key="weight" value="520"/>
 	</item>
 	<item id="8715" name="stairs">
@@ -23561,6 +23679,9 @@
 		<attribute key="decayTo" value="8757"/>
 		<attribute key="duration" value="45"/>
 	</item>
+	<item id="8760" article="a" name="blue vase">
+		<attribute key="weight" value="1800"/>
+	</item>
 	<item id="8761" article="an" name="invitation">
 		<attribute key="weight" value="10"/>
 		<attribute key="description" value="It is the invitation to the king's ball."/>
@@ -23599,73 +23720,73 @@
 	</item>
 	<item id="8784" article="a" name="caged wagon">
 	</item>
-	<item id="8785">
+	<item id="8785" article="a" name="damaged tree">
 	</item>
-	<item id="8786">
+	<item id="8786" article="a" name="damaged tree">
 	</item>
-	<item id="8787">
+	<item id="8787" article="a" name="damaged tree">
 	</item>
-	<item id="8788">
+	<item id="8788" article="a" name="damaged tree">
 	</item>
-	<item id="8789">
+	<item id="8789" article="a" name="damaged tree">
 	</item>
-	<item id="8790">
+	<item id="8790" article="a" name="damaged tree">
 	</item>
-	<item id="8791">
+	<item id="8791" article="a" name="damaged tree">
 	</item>
-	<item id="8792">
+	<item id="8792" article="a" name="damaged palm tree">
 	</item>
-	<item id="8793">
+	<item id="8793" article="a" name="damaged palm tree">
 	</item>
-	<item id="8794">
+	<item id="8794" article="a" name="damaged palm tree">
 	</item>
-	<item id="8795">
+	<item id="8795" article="a" name="damaged palm tree">
 	</item>
-	<item id="8796">
+	<item id="8796" article="a" name="damaged palm tree">
 	</item>
-	<item id="8797">
+	<item id="8797" article="a" name="palm tree stump">
 	</item>
-	<item id="8798">
+	<item id="8798" article="a" name="dead tree">
 	</item>
-	<item id="8799">
+	<item id="8799" article="a" name="dead tree">
 	</item>
-	<item id="8800">
+	<item id="8800" article="a" name="dead tree">
 	</item>
-	<item id="8801">
+	<item id="8801" article="a" name="dead tree">
 	</item>
-	<item id="8802">
+	<item id="8802" article="a" name="dead tree">
 	</item>
-	<item id="8803">
+	<item id="8803" article="a" name="dead tree">
 	</item>
-	<item id="8804">
+	<item id="8804" article="a" name="dead tree">
 	</item>
-	<item id="8805">
+	<item id="8805" article="a" name="dead tree">
 	</item>
-	<item id="8806">
+	<item id="8806" article="a" name="dead tree">
 	</item>
-	<item id="8807">
+	<item id="8807" article="a" name="dead tree">
 	</item>
-	<item id="8808">
+	<item id="8808" article="a" name="dead tree">
 	</item>
-	<item id="8809">
+	<item id="8809" article="a" name="dead tree">
 	</item>
-	<item id="8810">
+	<item id="8810" article="a" name="dead tree">
 	</item>
-	<item id="8811">
+	<item id="8811" article="a" name="dead tree">
 	</item>
-	<item id="8812">
+	<item id="8812" article="a" name="dead tree">
 	</item>
-	<item id="8813">
+	<item id="8813" article="a" name="dead tree">
 	</item>
-	<item id="8814">
+	<item id="8814" article="a" name="dead tree">
 	</item>
-	<item id="8815">
+	<item id="8815" article="a" name="dead tree">
 	</item>
-	<item id="8816">
+	<item id="8816" article="a" name="dead tree">
 	</item>
-	<item id="8817">
+	<item id="8817" article="a" name="dead tree">
 	</item>
-	<item id="8818">
+	<item id="8818" article="a" name="dead tree">
 	</item>
 	<item id="8819" article="a" name="magician's robe">
 		<attribute key="armor" value="6"/>
@@ -23866,7 +23987,13 @@
 		<attribute key="absorbPercentHoly" value="-8"/>
 		<attribute key="slotType" value="body"/>
 	</item>
-	<item id="8866">
+	<item id="8866" article="a" name="serpent coat">
+		<attribute key="description" value="It has 12% ice protection, but also increases damage taken from energy by 12%."/>
+		<attribute key="weight" value="2850"/>
+		<attribute key="armor" value="12"/>
+		<attribute key="absorbPercentIce" value="12"/>
+		<attribute key="absorbPercentEnergy" value="-12"/>
+		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8867" article="a" name="dragon robe">
 		<attribute key="description" value="It has 12% fire protection, but also increases damage taken from ice by 12%."/>
@@ -24093,41 +24220,42 @@
 		<attribute key="weight" value="6900"/>
 		<attribute key="defense" value="36"/>
 		<attribute key="weaponType" value="shield"/>
+		<attribute key="duration" value="1200"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="decayTo" value="8905"/>
 		<attribute key="skillShield" value="2"/>
-		<attribute key="charges" value="1000"/>
-		<attribute key="decayTo" value="8811"/>
-		<attribute key="showcharges" value="1"/>
 	</item>
 	<item id="8907" article="an" name="icy rainbow shield">
 		<attribute key="description" value="It has been temporarily imbued with ice magic and has a greatly increased shielding value."/>
 		<attribute key="weight" value="6900"/>
 		<attribute key="defense" value="39"/>
 		<attribute key="weaponType" value="shield"/>
-		<attribute key="charges" value="1000"/>
-		<attribute key="decayTo" value="8811"/>
-		<attribute key="showcharges" value="1"/>
+		<attribute key="duration" value="1200"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="decayTo" value="8905"/>
 	</item>
 	<item id="8908" article="a" name="sparking rainbow shield">
 		<attribute key="description" value="It has been temporarily imbued with energy magic and increases your speed."/>
 		<attribute key="weight" value="6900"/>
 		<attribute key="defense" value="36"/>
 		<attribute key="weaponType" value="shield"/>
-		<attribute key="speed" value="10"/>
-		<attribute key="charges" value="1000"/>
-		<attribute key="decayTo" value="8811"/>
-		<attribute key="showcharges" value="1"/>
+		<attribute key="duration" value="1200"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="decayTo" value="8905"/>
+		<attribute key="speed" value="20"/>
 	</item>
 	<item id="8909" article="a" name="terran rainbow shield">
 		<attribute key="description" value="It has been temporarily imbued with earth magic and boosts your regeneration."/>
 		<attribute key="weight" value="6900"/>
 		<attribute key="defense" value="37"/>
 		<attribute key="weaponType" value="shield"/>
-		<attribute key="duration" value="2400"/>
+		<attribute key="duration" value="1200"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="decayTo" value="8905"/>
 		<attribute key="healthGain" value="1"/>
 		<attribute key="healthTicks" value="3000"/>
 		<attribute key="manaGain" value="4"/>
 		<attribute key="manaTicks" value="3000"/>
-		<attribute key="decayTo" value="8811"/>
 	</item>
 	<item id="8910" article="an" name="underworld rod">
 		<attribute key="weight" value="2900"/>
@@ -24241,22 +24369,22 @@
 	</item>
 	<item id="8933" article="a" name="slain earth elemental">
 		<attribute key="weight" value="50000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8840"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8934"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="venom"/>
 	</item>
 	<item id="8934" article="a" name="slain earth elemental">
 		<attribute key="weight" value="40000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8841"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8935"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="venom"/>
 	</item>
 	<item id="8935" article="a" name="slain earth elemental">
 		<attribute key="weight" value="30000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8842"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8936"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="venom"/>
 	</item>
@@ -24268,22 +24396,22 @@
 	</item>
 	<item id="8937" article="a" name="slain count">
 		<attribute key="weight" value="50000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8844"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8938"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
 	<item id="8938" article="a" name="slain count">
 		<attribute key="weight" value="35000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8845"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8939"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
 	<item id="8939" article="a" name="slain count">
 		<attribute key="weight" value="20000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8846"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8940"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
@@ -24295,14 +24423,14 @@
 	</item>
 	<item id="8941" article="a" name="slain wyrm">
 		<attribute key="weight" value="50000"/>
-		<attribute key="containerSize" value="8"/>	
+		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="8942"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="8942" article="a" name="slain wyrm">
 		<attribute key="weight" value="35000"/>
-		<attribute key="containerSize" value="8"/>	
+		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="8943"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="blood"/>
@@ -24326,22 +24454,22 @@
 	</item>
 	<item id="8947" article="a" name="slain rotworm queen">
 		<attribute key="weight" value="50000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8854"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8948"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="8948" article="a" name="slain rotworm queen">
 		<attribute key="weight" value="40000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8855"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8949"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="8949" article="a" name="slain rotworm queen">
 		<attribute key="weight" value="30000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8856"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8950"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
@@ -24353,22 +24481,22 @@
 	</item>
 	<item id="8951" article="a" name="slain bog raider">
 		<attribute key="weight" value="50000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8858"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8952"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="venom"/>
 	</item>
 	<item id="8952" article="a" name="slain bog raider">
 		<attribute key="weight" value="35000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8859"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8953"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="venom"/>
 	</item>
 	<item id="8953" article="a" name="slain bog raider">
 		<attribute key="weight" value="20000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8860"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8954"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="venom"/>
 	</item>
@@ -24380,22 +24508,22 @@
 	</item>
 	<item id="8955" article="a" name="slain reaper">
 		<attribute key="weight" value="50000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8862"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8956"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
 	<item id="8956" article="a" name="slain reaper">
 		<attribute key="weight" value="40000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8863"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8957"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
 	<item id="8957" article="a" name="slain reaper">
 		<attribute key="weight" value="30000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8864"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8958"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
@@ -24409,22 +24537,22 @@
 	</item>
 	<item id="8960" article="a" name="slain halloween pumpkin">
 		<attribute key="weight" value="40000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8867"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8961"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
 	<item id="8961" article="a" name="slain halloween pumpkin">
 		<attribute key="weight" value="30000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8868"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8962"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
 	<item id="8962" article="a" name="slain halloween pumpkin">
 		<attribute key="weight" value="30000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8869"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8963"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
@@ -24436,38 +24564,38 @@
 	</item>
 	<item id="8964" article="a" name="slain fire elemental">
 		<attribute key="weight" value="25000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8875"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8969"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="fire"/>
 	</item>
 	<item id="8965" article="a" name="slain ice elemental">
 		<attribute key="weight" value="25000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8874"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8968"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="8966" article="a" name="slain energy elemental">
 		<attribute key="weight" value="25000"/>
-		<attribute key="containerSize" value="8"/>	
-		<attribute key="decayTo" value="8873"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="8967"/>
 		<attribute key="duration" value="900"/>
 	</item>
 	<item id="8967" article="a" name="slain energy elemental">
 		<attribute key="weight" value="10000"/>
-		<attribute key="containerSize" value="8"/>	
+		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="500"/>
 	</item>
 	<item id="8968" article="a" name="slain ice elemental">
 		<attribute key="weight" value="10000"/>
-		<attribute key="containerSize" value="8"/>	
+		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="500"/>
 	</item>
 	<item id="8969" article="a" name="slain fire elemental">
 		<attribute key="weight" value="10000"/>
-		<attribute key="containerSize" value="8"/>	
+		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="500"/>
 		<attribute key="corpseType" value="fire"/>
@@ -24540,21 +24668,21 @@
 	</item>
 	<item id="8993">
 	</item>
-	<item id="8994">
+	<item id="8994" article="a" name="dwarven contraption">
 	</item>
-	<item id="8995">
+	<item id="8995" article="a" name="dwarven contraption">
 	</item>
-	<item id="8996">
+	<item id="8996" article="a" name="dwarven contraption">
 	</item>
-	<item id="8997">
+	<item id="8997" article="a" name="dwarven contraption">
 	</item>
-	<item id="8998">
+	<item id="8998" article="a" name="large blackboard">
 	</item>
-	<item id="8999">
+	<item id="8999" article="a" name="large blackboard">
 	</item>
-	<item id="9000">
+	<item id="9000" article="a" name="dead tree">
 	</item>
-	<item id="9001">
+	<item id="9001" article="a" name="dead tree">
 	</item>
 	<item id="9002" article="a" name="tibiacity encyclopedia">
 		<attribute key="description" value="It contains all the knowledge of Tibia."/>
