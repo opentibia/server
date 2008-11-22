@@ -154,9 +154,9 @@ CREATE TABLE "bans" (
 
 CREATE TABLE "tiles" (
     "id" SERIAL,
-    "x" INT NOT NULL,
-    "y" INT NOT NULL,
-    "z" INT NOT NULL,
+    "x" INT(6) NOT NULL,
+    "y" INT(6) NOT NULL,
+    "z" INT(3) NOT NULL,
     PRIMARY KEY("id")
 );
 

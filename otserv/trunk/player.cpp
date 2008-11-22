@@ -3302,7 +3302,8 @@ void Player::onAttacking(uint32_t interval)
 void Player::doAttacking(uint32_t interval)
 {
 	if(lastAttack == 0){
-		lastAttack = OTSYS_TIME() - interval;
+		// - 1 to compensate for timer resolution etc.
+		lastAttack = OTSYS_TIME() - getAttackSpeed() - 1;
 	}
 
 	if((OTSYS_TIME() - lastAttack) >= getAttackSpeed() ){

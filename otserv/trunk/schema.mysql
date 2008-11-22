@@ -158,10 +158,11 @@ CREATE TABLE `bans` (
 
 CREATE TABLE `tiles` (
     `id` INT UNSIGNED NOT NULL,
-    `x` INT NOT NULL,
-    `y` INT NOT NULL,
-    `z` INT NOT NULL,
-    PRIMARY KEY(`id`)
+    `x` INT(5) UNSIGNED NOT NULL,
+    `y` INT(5) UNSIGNED NOT NULL,
+    `z` INT(2) UNSIGNED NOT NULL,
+    PRIMARY KEY(`id`),
+	KEY(`x`, `y`, `z`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tile_items` (

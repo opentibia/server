@@ -136,7 +136,7 @@ std::string DatabasePgSQL::escapeString(const std::string &s)
 	char* output = new char[ s.length() * 2 + 1];
 
 	// quotes escaped string and frees temporary buffer
-	PQescapeStringConn(m_handle, output, s.c_str(), s.length(), &error);
+	PQescapeStringConn(m_handle, output, s.c_str(), s.length(), reinterpret_cast<int*>(&error));
 	std::string r = std::string("'");
 	r += output;
 	r += "'";
