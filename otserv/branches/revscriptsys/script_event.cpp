@@ -230,7 +230,6 @@ void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaTh
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // OnUseItem Event
 ///////////////////////////////////////////////////////////////////////////////
@@ -369,6 +368,7 @@ void OnLeaveChannel::Event::update_instance(Manager& state, Enviroment& envirome
 	// Nothing can change...
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // OnLogin Event
 ///////////////////////////////////////////////////////////////////////////////
@@ -398,6 +398,7 @@ void OnLogin::Event::update_instance(Manager& state, Enviroment& enviroment, Lua
 	// Nothing can change...
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // OnLogout Event
 ///////////////////////////////////////////////////////////////////////////////
@@ -415,6 +416,11 @@ OnLogout::Event::~Event() {
 }
 
 bool OnLogout::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	ListenerList list = player->getListeners(ON_LOGOUT_LISTENER);
+	if(dispatchEvent<OnLogout::Event>
+			(this, state, enviroment, list)
+		)
+		return true;
 	return dispatchEvent<OnLogout::Event>
 		(this, state, enviroment, enviroment.Generic.OnLogout);
 }
@@ -429,5 +435,78 @@ void OnLogout::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 
 void OnLogout::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
 	// Nothing can change...
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnUseItem Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature speaks
+
+OnLook::Event::Event(Player* player, std::string& desc, Thing* object) :
+	player(player),
+	desc(desc),
+	object(object)
+{
+	propagate_by_default = true;
+}
+
+OnLook::Event::~Event() {
+}
+
+bool OnLook::Event::check_match(const ScriptInformation& info) {
+	if(info.method == FILTER_NONE)
+		return true;
+
+	if(object) {
+		Item* item = object->getItem();
+		Creature* creature = object->getCreature();
+
+		switch(info.method) {
+			case FILTER_ITEMID: 
+				return item && item->getID() == info.id;
+			case FILTER_ACTIONID:
+				return item && item->getActionId() == info.id;
+			case FILTER_UNIQUEID:
+				return item && item->getUniqueId() == info.id;
+			case FILTER_CREATUREID:
+				return creature && creature->getID() == info.id;
+			default: break;
+		}
+	}
+	return false;
+}
+
+bool OnLook::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	ListenerList list = player->getListeners(ON_LOOK_LISTENER);
+	if(dispatchEvent<OnLook::Event>
+			(this, state, enviroment, list)
+		)
+		return true;
+
+	// Extremely naive solution
+	// Should be a map with id:callback instead.
+	return dispatchEvent<OnLook::Event, ScriptInformation>
+		(this, state, enviroment, enviroment.Generic.OnLook);
+}
+
+void OnLook::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnLookEvent");
+	state.pushThing(player);
+	state.setField(-2, "player");
+	state.setField(-1, "description", desc);
+	state.pushThing(object);
+	state.setField(-2, "object");
+}
+
+void OnLook::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	thread->getField(-1, "description");
+	if(thread->isString()) {
+		desc = thread->popString();
+	} 
+	else {
+		thread->HandleError("Event 'OnLook' invalid value of 'description'");
+		thread->pop();
+	}
 }
 

@@ -10,7 +10,7 @@ otstd.Commands.MoveDown.words = "/down"
 otstd.Commands.MoveDown.groups = {"GM"}
 
 -- Handlers
-otstd.Commands.MoveUp.handler = function(event)
+function otstd.Commands.MoveUp.handler(event)
 	local param = event.text:sub(4)
 	local n = 1
 	
@@ -21,7 +21,7 @@ otstd.Commands.MoveUp.handler = function(event)
 	otstd.Commands.moveVerticalHandler(event, -n)
 end
 
-otstd.Commands.MoveDown.handler = function(event)
+function otstd.Commands.MoveDown.handler(event)
 	local param = event.text:sub(6)
 	local n = 1
 	
@@ -33,7 +33,7 @@ otstd.Commands.MoveDown.handler = function(event)
 end
 
 -- General handler
-otstd.Commands.moveVerticalHandler = function(event, dir)
+function otstd.Commands.moveVerticalHandler(event, dir)
 	local pos = event.speaker:getPosition()
 	
 	

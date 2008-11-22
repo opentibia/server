@@ -5,7 +5,7 @@ otstd.Commands.ShowAge.words = "/age"
 otstd.Commands.ShowAge.groups = "All"
 
 -- Handlers
-otstd.Commands.ShowAge.handler = function(event)
+function otstd.Commands.ShowAge.handler(event)
 	event.speaker:sendNote("You have been online for " .. formatDHMS(event.speaker:getPlayTime()) .. " in total.")
 	event.text = ""
 end

@@ -29,6 +29,8 @@
 #include "combat.h"
 #include "configmanager.h"
 
+#include "script_listener.h"
+
 #include <string>
 #include <sstream>
 #include <vector>
@@ -1546,7 +1548,8 @@ void Creature::addListener(Script::Listener_ptr listener) {
 Script::ListenerList Creature::getListeners(Script::ListenerType type) {
 	Script::ListenerList li;
 	for(Script::ListenerList::iterator i = registered_listeners.begin(), end = registered_listeners.end(); i != end; ++i) {
-		li.push_back(*i);
+		if((*i)->type() == type)
+			li.push_back(*i);
 	}
 	return li;
 }

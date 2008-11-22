@@ -206,6 +206,9 @@ public:
 	int lua_registerGenericEvent_OnLogin();
 	int lua_registerGenericEvent_OnLogout();
 	int lua_registerSpecificEvent_OnLogout();
+	int lua_registerGenericEvent_OnLookAtItem();
+	int lua_registerGenericEvent_OnLookAtCreature();
+	int lua_registerSpecificEvent_OnLook();
 
 	int lua_stopListener();
 

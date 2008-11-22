@@ -277,6 +277,48 @@ namespace Script {
 			bool timeout;
 		};
 	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnLook event
+	// Triggered when a looks at an object
+
+	namespace OnLook {
+		enum FilterType {
+			FILTER_NONE,
+			FILTER_ITEMID,
+			FILTER_UNIQUEID,
+			FILTER_ACTIONID,
+			FILTER_CREATUREID,
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			uint32_t id;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* player, std::string& desc, Thing* object);
+			~Event();
+
+			std::string getName() const {return "OnLook";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+			
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
+			std::string& desc;
+			Thing* object;
+		};
+	}
 	
 	/* To add a new event
 	 * 1. Create the event class

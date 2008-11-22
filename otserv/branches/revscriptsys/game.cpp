@@ -3408,9 +3408,16 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 			lookDistance = lookDistance + 9 + 6;
 	}
 
-	std::stringstream ss;
-	ss << "You see " << thing->getDescription(lookDistance);
-	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	std::string desc = thing->getDescription(lookDistance);
+
+	Script::OnLook::Event evt(player, desc, thing);
+	if(script_system->dispatchEvent(evt))
+		return false;
+
+	if(desc.length() == 0) 
+		return false;
+
+	player->sendTextMessage(MSG_INFO_DESCR, "You see " + desc);
 
 	return true;
 }

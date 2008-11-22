@@ -113,7 +113,11 @@ int Manager::luaFunctionCallback(lua_State* L) {
 					type_iter != ctd.types.end();
 					++type_iter)
 			{
-				if(*type_iter == "boolean") {
+				if(*type_iter == "mixed") {
+						expected_type = "";
+					break;
+				}
+				else if(*type_iter == "boolean") {
 					if(interface->isBoolean(parsed_argument_count)) {
 						expected_type = "";
 						break;
@@ -179,7 +183,6 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		return (interface->*(cc->func))();
 	} catch(Script::Error& err) {
 		// We can't use lua_error in the C++ function as it doesn't call destructors properly.
-		std::cout << "top:" << interface->getStackTop() << "\n";
 		interface->clearStack();
 		interface->pushString(err.what());
 		return lua_error(interface->state);
@@ -314,6 +317,7 @@ Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 
 		// Checked on server start
 		assert(
+			type == "mixed" ||
 			type == "boolean" ||
 			type == "number" ||
 			type == "string" ||

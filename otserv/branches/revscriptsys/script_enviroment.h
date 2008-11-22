@@ -83,6 +83,7 @@ namespace Script {
 			ListenerList OnLeaveChannel;
 			ListenerList OnLogin;
 			ListenerList OnLogout;
+			ListenerList OnLook;
 		} Generic;
 		ListenerMap specific_listeners;
 

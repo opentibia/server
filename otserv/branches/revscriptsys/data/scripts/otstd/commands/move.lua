@@ -4,7 +4,7 @@ otstd.Commands.MoveForward = Command:new()
 otstd.Commands.MoveForward.words = "/a "
 otstd.Commands.MoveForward.groups = {"GM"}
 
-otstd.Commands.MoveForward.handler = function(event)
+function otstd.Commands.MoveForward.handler(event)
 	local dir = event.speaker:getOrientation()
 	local pos = event.speaker:getPosition()
 	

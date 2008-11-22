@@ -4,7 +4,7 @@ otstd.Commands.MakeItem = Command:new()
 otstd.Commands.MakeItem.words = "/n"
 otstd.Commands.MakeItem.groups = {"GM"}
 
-otstd.Commands.MakeItem.handler = function(event)
+function otstd.Commands.MakeItem.handler(event)
 	if event.speaker:type() ~= "Player" then
 		return
 	end

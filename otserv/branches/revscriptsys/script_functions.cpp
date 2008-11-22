@@ -81,6 +81,7 @@ void Manager::registerClasses() {
 	registerClass("OnLeaveChannelEvent", "Event");
 	registerClass("OnLoginEvent", "Event");
 	registerClass("OnLogoutEvent", "Event");
+	registerClass("OnLookEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -219,9 +220,13 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnLeaveChannel(function callback)", &Manager::lua_registerGenericEvent_OnLeaveChannel);
 	registerGlobalFunction("registerCreatureOnLeaveChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLeaveChannel);
 
-	registerGlobalFunction("registerOnLogin(function callback)", &Manager::lua_registerGenericEvent_OnLogout);
+	registerGlobalFunction("registerOnLogin(function callback)", &Manager::lua_registerGenericEvent_OnLogin);
 	registerGlobalFunction("registerOnLogout(function callback)", &Manager::lua_registerGenericEvent_OnLogout);
 	registerGlobalFunction("registerCreatureOnLogout(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLogout);
+
+	registerGlobalFunction("registerOnLookAtItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtItem);
+	registerGlobalFunction("registerOnLookAtCreature(Creature filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
+	registerGlobalFunction("registerCreatureOnLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
@@ -334,7 +339,6 @@ int LuaState::lua_registerSpecificEvent_OnSay() {
 	return 1;
 }
 
-
 int LuaState::lua_registerGenericEvent_OnUseItem() {
 	// Store callback
 	insert(-3);
@@ -353,7 +357,7 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 		si_onuse.method = OnUseItem::FILTER_UNIQUEID;
 	}
 	else {
-		throw Error("Invalid argument (2) 'method'");
+		throw Error("Invalid argument (1) 'method'");
 	}
 	si_onuse.id = id;
 
@@ -479,6 +483,93 @@ int LuaState::lua_registerSpecificEvent_OnLogout() {
 	boost::any p(0);
 	Listener_ptr listener(
 		new Listener(ON_LOGOUT_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	enviroment.registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnLookAtItem() {
+	// Store callback
+	insert(-3);
+
+	uint32_t id = popInteger();	
+	std::string method = popString();
+
+	OnLook::ScriptInformation si_onlook;
+	if(method == "itemid") {
+		si_onlook.method = OnLook::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onlook.method = OnLook::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onlook.method = OnLook::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_onlook.id = id;
+
+	boost::any p(si_onlook);
+	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnLook.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnLookAtCreature() {
+	// Store callback
+	insert(-3);
+
+	Creature* at = popCreature();	
+
+	OnLook::ScriptInformation si_onlook;
+	si_onlook.method = OnLook::FILTER_CREATUREID;
+	si_onlook.id = at->getID();
+
+	boost::any p(si_onlook);
+	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnLook.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnLook() {
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	OnLook::ScriptInformation si_onlook;
+	si_onlook.method = OnLook::FILTER_NONE;
+	si_onlook.id = 0;
+
+	// This here explains why boost is so awesome, thanks to our custom
+	// delete function, the listener is cleanly stopped when all references
+	// to it is removed. :)
+	boost::any p(si_onlook);
+	Listener_ptr listener(
+		new Listener(ON_LOOK_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
 	enviroment.registerSpecificListener(listener);
