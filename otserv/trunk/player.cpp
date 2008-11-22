@@ -3310,7 +3310,7 @@ void Player::doAttacking(uint32_t interval)
 		bool result = false;
 		const Weapon* weapon = g_weapons->getWeapon(tool);
 		if(weapon){
-			if(!weapon->interuptSwing()){
+			if(!weapon->interruptSwing()){
 				result = weapon->useWeapon(this, tool, attackedCreature);
 			}
 			else if(!canDoAction()){
