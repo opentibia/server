@@ -3665,8 +3665,8 @@ void Game::addCreatureCheck(Creature* creature)
 		// Already in a vector
 		return;
 	}
-	checkCreatureVectors[(checkCreatureLastIndex + 1) % EVENT_CREATURECOUNT].push_back(creature);
-	creature->checkCreatureVectorIndex = checkCreatureLastIndex + 1;
+	checkCreatureVectors[checkCreatureLastIndex % EVENT_CREATURECOUNT].push_back(creature);
+	creature->checkCreatureVectorIndex = checkCreatureLastIndex;
 }
 
 void Game::removeCreatureCheck(Creature* creature)
