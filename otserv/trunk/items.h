@@ -240,6 +240,7 @@ public:
 	bool blockPickupable;
 	bool blockProjectile;
 	bool blockPathFind;
+	bool allowPickupable;
 
 	unsigned short transformEquipTo;
 	unsigned short transformDeEquipTo;

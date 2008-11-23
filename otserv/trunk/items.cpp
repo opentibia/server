@@ -60,6 +60,7 @@ ItemType::ItemType()
 	blockSolid = false;
 	blockProjectile = false;
 	blockPathFind = false;
+	allowPickupable = false;
 
 	wieldInfo        = 0;
 	minReqLevel      = 0;
@@ -527,6 +528,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.blockProjectile = (intValue == 1);
 								}
 							}
+							else if(asLowerCaseString(strValue) == "allowpickupable"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.allowPickupable = (intValue == 1);
+								}
+							}							
 							else if(asLowerCaseString(strValue) == "floorchange"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "down"){
