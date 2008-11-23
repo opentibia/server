@@ -3665,8 +3665,9 @@ void Game::addCreatureCheck(Creature* creature)
 		// Already in a vector
 		return;
 	}
-	checkCreatureVectors[checkCreatureLastIndex % EVENT_CREATURECOUNT].push_back(creature);
-	creature->checkCreatureVectorIndex = checkCreatureLastIndex + 1;
+	int next_vector = (checkCreatureLastIndex + 1) % EVENT_CREATURECOUNT;
+	checkCreatureVectors[next_vector].push_back(creature);
+	creature->checkCreatureVectorIndex = next_vector + 1;
 }
 
 void Game::removeCreatureCheck(Creature* creature)
@@ -3683,10 +3684,6 @@ void Game::removeCreatureCheck(Creature* creature)
 		// Swap & pop is more effective than erase
 		std::swap(*cit, checkCreatureVector.back());
 		checkCreatureVector.pop_back();
-		/*
-		if(cit != checkCreatureVector.end()){
-		checkCreatureVector.erase(cit);
-		}*/
 	}
 	creature->checkCreatureVectorIndex = 0;
 }
@@ -3696,12 +3693,12 @@ void Game::checkCreatures()
 	Scheduler::getScheduler().addEvent(createSchedulerTask(
 		EVENT_CHECK_CREATURE_INTERVAL, boost::bind(&Game::checkCreatures, this)));
 
+	checkCreatureLastIndex++;
 	if(checkCreatureLastIndex == EVENT_CREATURECOUNT) {
 		checkCreatureLastIndex = 0;
 	}
 
 	std::vector<Creature*>& checkCreatureVector = checkCreatureVectors[checkCreatureLastIndex];
-	checkCreatureLastIndex++;
 
 	Creature* creature;
 	for(uint32_t i = 0; i < checkCreatureVector.size(); ++i){
