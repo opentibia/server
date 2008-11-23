@@ -34,7 +34,7 @@ end
 
 -- General handler
 function otstd.Commands.moveVerticalHandler(event, dir)
-	local pos = event.speaker:getPosition()
+	local pos = event.creature:getPosition()
 	
 	
 	pos.z = pos.z + dir
@@ -42,7 +42,7 @@ function otstd.Commands.moveVerticalHandler(event, dir)
 	if pos.z > 15 then pos.z = 15 end
 	
 	while true do
-		if event.speaker:moveTo(pos) then
+		if event.creature:moveTo(pos) then
 			--sendMagicEffect(old_pos, CONST_ME_TELEPORT)
 			sendMagicEffect(pos, CONST_ME_TELEPORT)
 			break

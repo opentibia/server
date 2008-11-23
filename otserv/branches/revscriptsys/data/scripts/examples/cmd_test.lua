@@ -11,7 +11,7 @@ function otstd.Commands.TestCommand.StorageTestSetHandler(event)
 		if eq then
 			local key = param:sub(1, eq-1)
 			local value = param:sub(eq+1)
-			event.speaker:setStorageValue(key, value)
+			event.player:setStorageValue(key, value)
 		end
 	end
 end
@@ -19,14 +19,14 @@ end
 function otstd.Commands.TestCommand.StorageTestGetHandler(event)
 	local key = event.text:sub(5)
 	if #key > 0 then
-		event.text = event.speaker:getStorageValue(key) or "nothing"
+		event.text = event.player:getStorageValue(key) or "nothing"
 	end
 end
 
 goof_listener = ""
 
 function otstd.Commands.TestCommand.TestSpecific(event)
-	goof_listener = registerSpecificOnSayListener(event.speaker, "substring", false, "remere", otstd.Commands.TestCommand.GoofHandler)
+	goof_listener = registerOnCreatureSay(event.player, "substring", false, "remere", otstd.Commands.TestCommand.GoofHandler)
 end
 
 function otstd.Commands.TestCommand.TestSpecificStop(event)
@@ -34,8 +34,8 @@ function otstd.Commands.TestCommand.TestSpecificStop(event)
 end
 
 --registerGenericOnSayListener("substring", false, "remere", otstd.Commands.TestCommand.GoofHandler)
-registerGenericOnSayListener("beginning", false, "/set", otstd.Commands.TestCommand.StorageTestSetHandler)
-registerGenericOnSayListener("beginning", false, "/get", otstd.Commands.TestCommand.StorageTestGetHandler)
+registerOnSay("beginning", false, "/set", otstd.Commands.TestCommand.StorageTestSetHandler)
+registerOnSay("beginning", false, "/get", otstd.Commands.TestCommand.StorageTestGetHandler)
 
-registerGenericOnSayListener("beginning", false, "/tie",   otstd.Commands.TestCommand.TestSpecific)
-registerGenericOnSayListener("beginning", false, "/untie", otstd.Commands.TestCommand.TestSpecificStop)
+registerOnSay("beginning", false, "/tie",   otstd.Commands.TestCommand.TestSpecific)
+registerOnSay("beginning", false, "/untie", otstd.Commands.TestCommand.TestSpecificStop)

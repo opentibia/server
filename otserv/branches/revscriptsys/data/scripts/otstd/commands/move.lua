@@ -5,8 +5,8 @@ otstd.Commands.MoveForward.words = "/a "
 otstd.Commands.MoveForward.groups = {"GM"}
 
 function otstd.Commands.MoveForward.handler(event)
-	local dir = event.speaker:getOrientation()
-	local pos = event.speaker:getPosition()
+	local dir = event.creature:getOrientation()
+	local pos = event.creature:getPosition()
 	
 	local param = event.text:sub(3)
 	
@@ -26,7 +26,7 @@ function otstd.Commands.MoveForward.handler(event)
 		error("Player facing invalid direction when invoking /a command!")
 	end
 	
-	if event.speaker:moveTo(pos) then
+	if event.creature:moveTo(pos) then
 		--sendMagicEffect(old_pos, CONST_ME_TELEPORT)
 		sendMagicEffect(pos, CONST_ME_TELEPORT)
 	end

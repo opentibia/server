@@ -207,25 +207,25 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	
 	if(param == "commands"){
 		this->reload();
-		std::cout << "===============================================================================";
+		std::cout << "================================================================================";
 		std::cout << ":: Reloaded Commands " << std::endl;
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded commands.");
 	}
 	else if(param == "monsters" || param == "monster"){
 		g_monsters.reload();
-		std::cout << "===============================================================================";
+		std::cout << "================================================================================";
 		std::cout << ":: Reloaded Monsters " << std::endl;
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded monsters.");
 	}
 	else if(param == "config"){
 		g_config.reload();
-		std::cout << "===============================================================================";
+		std::cout << "================================================================================";
 		std::cout << ":: Reloaded config " << std::endl;
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
 	}
 	else if(param == "scripts"){
 		g_game.loadScripts();
-		std::cout << "===============================================================================";
+		std::cout << "================================================================================";
 		std::cout << ":: Reloaded Scripts " << std::endl;
 		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded scripts.");
 	}

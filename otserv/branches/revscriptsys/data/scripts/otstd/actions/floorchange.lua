@@ -17,7 +17,7 @@ function otstd.floorchange.callback(event)
 		pos.y = pos.y + 1
 		pos.z = pos.z - 1
 	end
-	event.user:moveTo(pos)
+	event.player:moveTo(pos)
 end
 
 function otstd.floorchange.registerHandlers()

@@ -3724,7 +3724,10 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 			break;
 		default:
 			Script::OnSay::Event evt(player, type, g_chat.getChannel(player, channelId), text);
-			script_system->dispatchEvent(evt);
+			if(script_system->dispatchEvent(evt)) {
+				// Handled
+				return false;
+			}
 			break;
 	}
 

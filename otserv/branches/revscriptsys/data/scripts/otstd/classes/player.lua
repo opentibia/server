@@ -27,12 +27,12 @@ function Player:getPlayTime()
 end
 
 function otstd.Player.LoginHandler(event)
-	local player = event.who
+	local player = event.player
 	-- Nothing yet
 end
 
 function otstd.Player.LogoutHandler(event)
-	local player = event.who
+	local player = event.player
 	-- This will fook up if a listener aborts the logout! :(
 	player:setStorageValue("__lastlogout", os.time())
 	

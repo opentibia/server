@@ -25,7 +25,7 @@ function otstd.rope.callback(event)
 			local npos = hole:getPosition()
 			npos.y = npos.y + 1
 			npos.z = npos.z - 1
-			event.user:moveTo(npos)
+			event.player:moveTo(npos)
 			return
 		end
 	end

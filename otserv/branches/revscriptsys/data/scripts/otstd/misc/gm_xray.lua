@@ -26,12 +26,12 @@ function otstd.GM_XRay_Vision.look_handler(evt)
 end
 
 function otstd.GM_XRay_Vision.login_handler(evt)
-	local player = evt.who
+	local player = evt.player
 	if (type(otstd.GM_XRay_Vision.groups) == "string" and
 			otstd.GM_XRay_Vision.groups == "All") or
 			table.contains(otstd.GM_XRay_Vision.groups, player:getAccessGroup())
 			then
-		registerCreatureOnLookAt(player, otstd.GM_XRay_Vision.look_handler)
+		registerOnPlayerLookAt(player, otstd.GM_XRay_Vision.look_handler)
 	end
 end
 

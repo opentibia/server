@@ -25,7 +25,7 @@ function Command:register()
 	end
 
 	function internalHandler(event)
-		local speaker = event.speaker
+		local speaker = event.creature
 		if isOfType(speaker, "Player") then
 			if (type(self.groups) == "string" and self.groups == "All") or table.contains(self.groups, speaker:getAccessGroup()) then
 				event.cmd = self.words

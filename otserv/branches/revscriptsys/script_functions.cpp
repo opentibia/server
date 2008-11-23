@@ -211,22 +211,22 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("wait(int delay)", &Manager::lua_wait);
 
 	registerGlobalFunction("registerOnSay(string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerGenericEvent_OnSay);
-	registerGlobalFunction("registerCreatureOnSay(Creature who, string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerSpecificEvent_OnSay);
+	registerGlobalFunction("registerOnCreatureSay(Creature who, string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerSpecificEvent_OnSay);
 
 	registerGlobalFunction("registerOnUseItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
 
 	registerGlobalFunction("registerOnJoinChannel(function callback)", &Manager::lua_registerGenericEvent_OnJoinChannel);
-	registerGlobalFunction("registerCreatureOnJoinChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnJoinChannel);
+	registerGlobalFunction("registerOnPlayerJoinChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnJoinChannel);
 	registerGlobalFunction("registerOnLeaveChannel(function callback)", &Manager::lua_registerGenericEvent_OnLeaveChannel);
-	registerGlobalFunction("registerCreatureOnLeaveChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLeaveChannel);
+	registerGlobalFunction("registerOnPlayerLeaveChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLeaveChannel);
 
 	registerGlobalFunction("registerOnLogin(function callback)", &Manager::lua_registerGenericEvent_OnLogin);
 	registerGlobalFunction("registerOnLogout(function callback)", &Manager::lua_registerGenericEvent_OnLogout);
-	registerGlobalFunction("registerCreatureOnLogout(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLogout);
+	registerGlobalFunction("registerOnPlayerLogout(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLogout);
 
 	registerGlobalFunction("registerOnLookAtItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtItem);
 	registerGlobalFunction("registerOnLookAtCreature(Creature filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
-	registerGlobalFunction("registerCreatureOnLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
+	registerGlobalFunction("registerOnPlayerLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 

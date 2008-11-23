@@ -34,54 +34,6 @@ uint32_t Script::Event::eventID_counter = 0;
 using namespace Script;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Implementation details
-
-template<class T, class ScriptInformation>
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
-		return false;
-	}
-	for(Script::ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
-
-		// Call handler
-		if(e->check_match(info)) {
-			if(e->call(state, enviroment, listener) == true) {
-				// Handled
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-template<class T> // No script information!
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
-		return false;
-	}
-	for(Script::ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-
-		// Call handler
-		if(e->call(state, enviroment, listener) == true) {
-			// Handled
-			return true;
-		}
-	}
-	return false;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // General Event class
 
 Event::Event() : eventID(++eventID_counter), propagate_by_default(false) {
@@ -200,7 +152,7 @@ void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	//std::cout << "pushing instance" << std::endl;
 	state.pushClassTableInstance("OnSayEvent");
 	state.pushThing(speaker);
-	state.setField(-2, "speaker");
+	state.setField(-2, "creature");
 	state.pushChannel(channel);
 	state.setField(-2, "channel");
 	state.setField(-1, "class", int32_t(speak_class));
@@ -269,7 +221,7 @@ bool OnUseItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
 void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnUseItemEvent");
 	state.pushThing(user);
-	state.setField(-2, "user");
+	state.setField(-2, "player");
 	state.pushThing(item);
 	state.setField(-2, "item");
 	state.setField(-1, "retval", retval);
@@ -321,7 +273,7 @@ bool OnJoinChannel::Event::dispatch(Manager& state, Enviroment& enviroment) {
 void OnJoinChannel::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnJoinChannelEvent");
 	state.pushThing(chatter);
-	state.setField(-2, "user");
+	state.setField(-2, "player");
 	state.pushChannel(channel);
 	state.setField(-2, "channel");
 }
@@ -359,7 +311,7 @@ bool OnLeaveChannel::Event::dispatch(Manager& state, Enviroment& enviroment) {
 void OnLeaveChannel::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnLeaveChannelEvent");
 	state.pushThing(chatter);
-	state.setField(-2, "user");
+	state.setField(-2, "player");
 	state.pushChannel(channel);
 	state.setField(-2, "channel");
 }
@@ -391,7 +343,7 @@ bool OnLogin::Event::dispatch(Manager& state, Enviroment& enviroment) {
 void OnLogin::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnLogin");
 	state.pushThing(player);
-	state.setField(-2, "who");
+	state.setField(-2, "player");
 }
 
 void OnLogin::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
@@ -428,7 +380,7 @@ bool OnLogout::Event::dispatch(Manager& state, Enviroment& enviroment) {
 void OnLogout::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnLogout");
 	state.pushThing(player);
-	state.setField(-2, "who");
+	state.setField(-2, "player");
 	state.setField(-1, "forced", forced);
 	state.setField(-1, "timeout", timeout);
 }

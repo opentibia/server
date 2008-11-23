@@ -24,6 +24,7 @@
 #include "boost_common.h"
 
 #include "script_enviroment.h"
+#include "script_listener.h"
 
 #include "const.h"
 #include "thing.h"
@@ -37,13 +38,8 @@ class LuaThread;
 typedef boost::shared_ptr<LuaThread> LuaThread_ptr;
 
 namespace Script {
-
 	class Manager;
 	class Enviroment;
-	class Listener;
-	typedef boost::shared_ptr<Listener> Listener_ptr;
-	typedef boost::weak_ptr<Listener> Listener_wptr;
-	typedef std::vector<Listener_ptr> ListenerList;
 }
 
 
@@ -326,6 +322,54 @@ namespace Script {
 	 * 3. Add the class to Enviroment::stopListener
 	 * 4. Add callback from an arbitrary location in otserv source
 	 */
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation details
+
+template<class T, class ScriptInformation>
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
+
+		// Call handler
+		if(e->check_match(info)) {
+			if(e->call(state, enviroment, listener) == true) {
+				// Handled
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+template<class T> // No script information!
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+
+		// Call handler
+		if(e->call(state, enviroment, listener) == true) {
+			// Handled
+			return true;
+		}
+	}
+	return false;
 }
 
 #endif // __OTSERV_SCRIPT_EVENT__
