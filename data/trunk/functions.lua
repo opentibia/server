@@ -257,80 +257,213 @@ exhaustion =
 }
 
 
-	table.find = function (table, value)
-		for i,v in pairs(table) do
-			if (v == value) then
-				return i
+table.find = function (table, value)
+	for i,v in pairs(table) do
+		if (v == value) then
+			return i
+		end
+	end
+	return nil
+end
+table.getPos = table.find
+
+table.isStrIn = function (txt, str)
+	local result = false
+	for i, v in pairs(str) do          
+		result = (string.find(txt, v) and not string.find(txt, '(%w+)' .. v) and not string.find(txt, v .. '(%w+)'))
+		if (result) then
+			break
+		end
+	end
+	return result
+end
+
+table.countElements = function (table, item)
+	local count = 0
+	for i, n in pairs(table) do
+		if (item == n) then count = count + 1 end
+	end
+	return count
+end
+
+table.getCombinations = function (table, num)
+	local a, number, select, newlist = {}, #table, num, {}
+	for i = 1, select do
+		a[#a + 1] = i
+	end
+	local newthing = {}
+	while (1) do
+		local newrow = {}
+		for i = 1, select do
+			newrow[#newrow + 1] = table[a[i]]
+		end
+		newlist[#newlist + 1] = newrow
+		i = select
+		while (a[i] == (number - select + i)) do
+			i = i - 1
+		end
+		if (i < 1) then break end
+			a[i] = a[i] + 1
+			for j = i, select do
+				a[j] = a[i] + j - i
 			end
 		end
-		return nil
-	end
-	table.getPos = table.find
+	return newlist
+end
 
-	table.isStrIn = function (txt, str)
-		local result = false
-		for i, v in pairs(str) do          
-			result = (string.find(txt, v) and not string.find(txt, '(%w+)' .. v) and not string.find(txt, v .. '(%w+)'))
-			if (result) then
+
+string.split = function (str)
+	local t = {}
+	local function helper(word) table.insert(t, word) return "" end
+	if (not str:gsub("%w+", helper):find"%S") then return t end
+end
+
+string.separate = function(separator, string)
+	local a, b = {}, 0
+	if (#string == 1) then return string end
+	while (true) do
+		local nextSeparator = string.find(string, separator, b + 1, true)
+		if (nextSeparator ~= nil) then
+			table.insert(a, string.sub(string,b,nextSeparator-1)) 
+			b = nextSeparator + 1 
+		else
+			table.insert(a, string.sub(string, b))
+			break 
+		end
+	end
+	return a
+end
+
+function string.explode(str, delimiter)
+	if str == nil then
+		return {}
+	end
+	t = {}
+	for v in string.gmatch(str, "([^,]*)" .. delimiter .. "?") do
+		table.insert(t, v)
+	end
+	table.remove(t) -- Removes last element (Always "")
+	return t
+end
+
+function string.strip_whitespace(str)
+	if str == nil then return str end
+	local start = string.find(str, "[^%s]") -- First non-whitespace character
+	local _end = #str + 1 - string.find(str:reverse(), "[^%s]") -- Last non-whitespace character
+	
+	if start ~= nil and _end ~= nil then
+		return string.sub(str, start, _end)
+	elseif start ~= nil then
+		return string.sub(str, start)
+	elseif _end ~= nil then
+		return string.sub(str, 1, _end)
+	end
+	return str
+end
+
+function getPlayerByAccountNumber(acc)
+	players = getPlayersByAccountNumber(acc)
+	if #players == 0 then
+		return 0
+	end
+	return players[1]
+end
+
+function convertIntToIP(int, mask)
+	local b4 = bit.urshift(bit.uband(int,  4278190080), 24)
+	local b3 = bit.urshift(bit.uband(int,  16711680), 16)
+	local b2 = bit.urshift(bit.uband(int,  65280), 8)
+	local b1 = bit.urshift(bit.uband(int,  255), 0)
+	if mask ~= nil then
+		local m4 = bit.urshift(bit.uband(mask,  4278190080), 24)
+		local m3 = bit.urshift(bit.uband(mask,  16711680), 16)
+		local m2 = bit.urshift(bit.uband(mask,  65280), 8)
+		local m1 = bit.urshift(bit.uband(mask,  255), 0)
+		if (m1 == 255 or m1 == 0) and (m2 == 255 or m2 == 0) and (m3 == 255 or m3 == 0) and (m4 == 255 or m4 == 0) then
+			if m1 == 0 then b1 = "x" end
+			if m2 == 0 then b2 = "x" end
+			if m3 == 0 then b3 = "x" end
+			if m4 == 0 then b4 = "x" end
+		else
+			if m1 ~= 255 or m2 ~= 255 or m3 ~= 255 or m4 ~= 255 then
+				return b1 .. "." .. b2 .. "." .. b3 .. "." .. b4 .. " : " .. m1 .. "." .. m2 .. "." .. m3 .. "." .. m4
+			end
+		end
+	end
+	
+	return b1 .. "." .. b2 .. "." .. b3 .. "." .. b4
+end
+
+function convertIPToInt(str)
+	local maskindex = str:find(":")
+	if maskindex ~= nil then
+		-- IP:Mask style
+		if maskindex <= 1 then
+			return 0, 0
+		else
+			ipstring = str:sub(1, maskindex - 1)
+			maskstring = str:sub(maskindex)
+			
+			local ipint = 0
+			local maskint = 0
+			
+			local index = 0
+			for b in ipstring:gmatch("(%d+).?") do
+				if tonumber(b) > 255 or tonumber(b) < 0 then
+					return 0, 0
+				end
+				ipint = bit.ubor(ipint, bit.ulshift(b, index))
+				index = index + 8
+				if index > 24 then
+					break
+				end
+			end
+			if index ~= 32 then -- Invalid
+				return 0, 0
+			end
+			
+			index = 0
+			for b in maskstring:gmatch("(%d+)%.?") do
+				if tonumber(b) > 255 or tonumber(b) < 0 then
+					return 0, 0
+				end
+				maskint = bit.ubor(maskint, bit.ulshift(b, index))
+				index = index + 8
+				if index > 24 then
+					break
+				end
+			end
+			if index ~= 32 then
+				return 0, 0
+			end
+			
+			return ipint, maskint
+		end
+	else
+		local ipint = 0
+		local maskint = 0
+		local index = 24
+		
+		for b in str:gmatch("([x%d]+)%.?") do
+			if b ~= "x" then
+				if b:find("x") ~= nil then
+					return 0, 0
+				end
+				if tonumber(b) > 255 or tonumber(b) < 0 then
+					return 0, 0
+				end
+				maskint = bit.ubor(maskint, bit.ulshift(255, index))
+				ipint = bit.ubor(ipint, bit.ulshift(b, index))
+			end
+			index = index - 8
+			if index < 0 then
 				break
 			end
 		end
-		return result
-	end
-
-	table.countElements = function (table, item)
-		local count = 0
-		for i, n in pairs(table) do
-			if (item == n) then count = count + 1 end
+		if index ~= -8 then -- Invalid
+			return 0, 0
 		end
-		return count
+		return ipint, maskint
 	end
-	
-	table.getCombinations = function (table, num)
-		local a, number, select, newlist = {}, #table, num, {}
-		for i = 1, select do
-			a[#a + 1] = i
-		end
-		local newthing = {}
-		while (1) do
-			local newrow = {}
-			for i = 1, select do
-				newrow[#newrow + 1] = table[a[i]]
-			end
-			newlist[#newlist + 1] = newrow
-			i = select
-			while (a[i] == (number - select + i)) do
-				i = i - 1
-			end
-			if (i < 1) then break end
-				a[i] = a[i] + 1
-				for j = i, select do
-					a[j] = a[i] + j - i
-				end
-			end
-		return newlist
-	end
-
-
-	string.split = function (str)
-		local t = {}
-		local function helper(word) table.insert(t, word) return "" end
-		if (not str:gsub("%w+", helper):find"%S") then return t end
-	end
-	
-	string.separate = function(separator, string)
-		local a, b = {}, 0
-		if (#string == 1) then return string end
-	    while (true) do
-			local nextSeparator = string.find(string, separator, b + 1, true)
-			if (nextSeparator ~= nil) then
-				table.insert(a, string.sub(string,b,nextSeparator-1)) 
-				b = nextSeparator + 1 
-			else
-				table.insert(a, string.sub(string, b))
-				break 
-			end
-	    end
-		return a
-	end
+end
 

@@ -3,7 +3,6 @@
 <commands>
 
 	<!-- Gods -->
-	<command cmd="/b" access="3" />				<!-- BAN a player by IP -->
 	<command cmd="/i" access="3" />				<!-- Create a item by ID -->
 	<command cmd="/n" access="3" />				<!-- Create a item by name -->
 	<command cmd="/reload" access="3" />		<!-- Reload configurations -->
@@ -19,13 +18,13 @@
 	<command cmd="/c" access="2" />				<!-- Teleport a player to you -->
 	<command cmd="/m" access="2" />				<!-- Summon a "wild" monster -->
 	<command cmd="/summon" access="2" />		<!-- Summon a monster -->
-	<command cmd="/bans" access="2" />			<!-- Bans manager -->
 	<command cmd="/kick" access="2" />			<!-- Kick a player -->
 
 	<!-- Tutors -->
 	<command cmd="/B" access="1" />				<!-- Red broadcast message -->
 	<command cmd="/q" access="1" />				<!-- Check your money -->
 	<command cmd="/z" access="1" />				<!-- Check effects -->
+	<command cmd="/zt" access="1" />			<!-- Check tutorials (?) -->
 	<command cmd="/info" access="1" />			<!-- Info about a player -->
 	<command cmd="/getonline" access="1" />		<!-- Info about how many players are online -->
 	<command cmd="/gethouse" access="1" />		<!-- Info about house of a player -->
