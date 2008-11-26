@@ -305,6 +305,7 @@
 	<movevent event="DeEquip" itemid="8824" slot="right-hand" function="onDeEquipItem"/>
 
 	<!-- Doors -->
+	<!--
 	<movevent event="StepOut" itemid="1224" script="doors/door_close_vertical.lua"/>
 	<movevent event="StepOut" itemid="1226" script="doors/door_close_horizontal.lua"/>
 	<movevent event="StepOut" itemid="1228" script="doors/door_close_vertical.lua"/>
@@ -351,8 +352,9 @@
 	<movevent event="StepOut" itemid="7041" script="doors/door_close_horizontal.lua"/>
 	<movevent event="StepOut" itemid="7048" script="doors/door_close_vertical.lua"/>
 	<movevent event="StepOut" itemid="7050" script="doors/door_close_vertical.lua"/>
-
+	-->
 	<!-- Adding Doors to the map -->
+	<!--
 	<movevent event="AddItem" itemid="1227" script="doors/onadd_gateofexp.lua"/>
 	<movevent event="AddItem" itemid="1229" script="doors/onadd_gateofexp.lua"/>
 	<movevent event="AddItem" itemid="1245" script="doors/onadd_gateofexp.lua"/>
@@ -377,8 +379,9 @@
 	<movevent event="AddItem" itemid="7047" script="doors/onadd_gateofexp.lua"/>
 	<movevent event="AddItem" itemid="8459" script="doors/onadd_gateofexp.lua"/>
 	<movevent event="AddItem" itemid="8461" script="doors/onadd_gateofexp.lua"/>
-
+	-->
 	<!-- Adding quest doors to the map -->
+	<!--
 	<movevent event="AddItem" itemid="1223" script="doors/onadd_questdoor.lua"/>
 	<movevent event="AddItem" itemid="1225" script="doors/onadd_questdoor.lua"/>
 	<movevent event="AddItem" itemid="1241" script="doors/onadd_questdoor.lua"/>
@@ -405,8 +408,9 @@
 	<movevent event="AddItem" itemid="7049" script="doors/onadd_questdoor.lua"/>
 	<movevent event="AddItem" itemid="8455" script="doors/onadd_questdoor.lua"/>
 	<movevent event="AddItem" itemid="8457" script="doors/onadd_questdoor.lua"/>
-
+	-->
 	<!-- Adding locked doors to the map -->
+	<!--
 	<movevent event="AddItem" itemid="1209" script="doors/onadd_lockeddoor.lua"/>
 	<movevent event="AddItem" itemid="1212" script="doors/onadd_lockeddoor.lua"/>
 	<movevent event="AddItem" itemid="1231" script="doors/onadd_lockeddoor.lua"/>
@@ -439,7 +443,7 @@
 	<movevent event="AddItem" itemid="7042" script="doors/onadd_lockeddoor.lua"/>
 	<movevent event="AddItem" itemid="8445" script="doors/onadd_lockeddoor.lua"/>
 	<movevent event="AddItem" itemid="8448" script="doors/onadd_lockeddoor.lua"/>
-
+	-->
 	<!-- Switch Tiles -->
 	<movevent event="StepIn" itemid="416" script="switch_tile.lua" />
 	<movevent event="StepOut" itemid="417" script="switch_tile.lua" />
