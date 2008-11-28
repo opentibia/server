@@ -68,8 +68,6 @@ Position NetworkMessage::GetPosition()
 	pos.x = GetU16();
 	pos.y = GetU16();
 	pos.z = GetByte();
-	//we only want valid z values
-	if(pos.z < 0 || pos.z >= MAP_MAX_LAYERS) pos.z = 0;
 	return pos;
 }
 /******************************************************************************/
