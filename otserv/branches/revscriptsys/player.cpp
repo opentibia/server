@@ -39,6 +39,10 @@
 #include "beds.h"
 #include "weapons.h"
 
+#include "script_enviroment.h"
+#include "script_manager.h"
+#include "script_event.h"
+
 extern ConfigManager g_config;
 extern Game g_game;
 extern Chat g_chat;
@@ -1329,8 +1333,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
 			if((item = getInventoryItem((slots_t)slot))){
 				g_game.startDecay(item);
-				// REVSCRIPT TODO Event callback
-				//g_moveEvents->onPlayerEquip(this, item, (slots_t)slot);
+				g_game.playerEquipItem(this, item, (slots_t)slot, true);
 			}
 		}
 
@@ -3100,8 +3103,7 @@ Thing* Player::__getThing(uint32_t index) const
 void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
-		// REVSCRIPT TODO Event callback
-		//g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index);
+		g_game.playerEquipItem(this, thing->getItem(), (slots_t)index, true);
 	}
 
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
@@ -3135,8 +3137,7 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 void Player::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
-		// REVSCRIPT TODO Event callback
-		//g_moveEvents->onPlayerDeEquip(this, thing->getItem(), (slots_t)index, isCompleteRemoval);
+		g_game.playerEquipItem(this, thing->getItem(), (slots_t)index, false /*,isCompleteRemoval*/);
 	}
 
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){

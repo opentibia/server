@@ -209,6 +209,12 @@ public:
 	int lua_registerGenericEvent_OnLookAtItem();
 	int lua_registerGenericEvent_OnLookAtCreature();
 	int lua_registerSpecificEvent_OnLook();
+	int lua_registerGenericEvent_OnEquipItem();
+	int lua_registerGenericEvent_OnDeEquipItem();
+	int lua_registerGenericEvent_OnStepInCreature();
+	int lua_registerGenericEvent_OnStepOutCreature();
+	int lua_registerGenericEvent_OnAddItemToTile();
+	int lua_registerGenericEvent_OnRemoveItemToTile();
 
 	int lua_stopListener();
 
@@ -236,6 +242,7 @@ public:
 	int lua_Creature_getHealth();
 	int lua_Creature_getHealthMax();
 	int lua_Creature_getName();
+	int lua_Creature_say();
 
 	int lua_Creature_walk();
 

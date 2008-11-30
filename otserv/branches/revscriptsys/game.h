@@ -450,6 +450,9 @@ public:
 	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
 	bool playerLogout(Player* player, bool forced, bool timeout);
 	bool playerLogin(Player* player);
+	bool playerEquipItem(Player* player, Item* item, slots_t slot, bool equip);
+	bool onCreatureMove(Creature* creature, Tile* tile, bool stepIn);
+	bool onItemMove(Item* item, Tile* tile, bool addItem);
 
 	void cleanup();
 	void shutdown();

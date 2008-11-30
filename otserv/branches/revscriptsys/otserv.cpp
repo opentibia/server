@@ -314,6 +314,12 @@ void mainLoader(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 
+	// Setup scripts
+	std::cout << "::" << std::endl;
+	std::cout << ":: Loading Scripts ..." << std::endl;
+	g_game.loadScripts();
+	std::cout << std::endl << "::" << std::endl;
+
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 
 	if(asLowerCaseString(worldType) == "pvp")
@@ -355,12 +361,6 @@ void mainLoader(int argc, char *argv[])
 		g_config.getString(ConfigManager::MAP_KIND))){
 		exit(-1);
 	}
-
-	// Setup scripts
-	std::cout << "::" << std::endl;
-	std::cout << ":: Loading Scripts ..." << std::endl;
-	g_game.loadScripts();
-	std::cout << std::endl << "::" << std::endl;
 
 	g_game.setGameState(GAME_STATE_INIT);
 

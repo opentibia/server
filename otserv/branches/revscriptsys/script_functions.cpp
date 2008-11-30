@@ -121,6 +121,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
 	
 	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
+	registerMemberFunction("Creature", "say(string msg)", &Manager::lua_Creature_say);
 
 	// Player
 	registerMemberFunction("Player", "setStorageValue(string key, string value)", &Manager::lua_Player_setStorageValue);
@@ -214,6 +215,15 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnCreatureSay(Creature who, string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerSpecificEvent_OnSay);
 
 	registerGlobalFunction("registerOnUseItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
+
+	registerGlobalFunction("registerOnStepInCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnStepInCreature);
+	registerGlobalFunction("registerOnStepOutCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnStepOutCreature);
+
+	registerGlobalFunction("registerOnEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
+	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
+
+	registerGlobalFunction("registerOnAddTileItem(string method, int filter, boolean isitemontile, function callback)", &Manager::lua_registerGenericEvent_OnAddItemToTile);
+	registerGlobalFunction("registerOnRemoveTileItem(string method, int filter, boolean isitemontile, function callback)", &Manager::lua_registerGenericEvent_OnRemoveItemToTile);
 
 	registerGlobalFunction("registerOnJoinChannel(function callback)", &Manager::lua_registerGenericEvent_OnJoinChannel);
 	registerGlobalFunction("registerOnPlayerJoinChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnJoinChannel);
@@ -583,6 +593,314 @@ int LuaState::lua_registerSpecificEvent_OnLook() {
 	return 1;
 }
 
+int LuaState::lua_registerGenericEvent_OnEquipItem() {
+	// Store callback
+	insert(-4);
+
+	std::string slot = popString();
+	int id = popInteger();
+	std::string method = popString();
+
+	OnEquipItem::ScriptInformation si_onequip;
+
+	if(slot == "head") {
+		si_onequip.slot = SLOTP_HEAD;
+	}
+	else if(slot == "neck") {
+		si_onequip.slot = SLOTP_NECKLACE;
+	}
+	else if(slot == "backpack") {
+		si_onequip.slot = SLOTP_BACKPACK;
+	}
+	else if(slot == "armor") {
+		si_onequip.slot = SLOTP_ARMOR;
+	}
+	else if(slot == "right-hand") {
+		si_onequip.slot = SLOTP_RIGHT;
+	}
+	else if(slot == "left-hand") {
+		si_onequip.slot = SLOTP_LEFT;
+	}
+	else if(slot == "legs") {
+		si_onequip.slot = SLOTP_LEGS;
+	}
+	else if(slot == "feet") {
+		si_onequip.slot = SLOTP_FEET;
+	}
+	else if(slot == "ring") {
+		si_onequip.slot = SLOTP_RING;
+	}
+	else if(slot == "ammo") {
+		si_onequip.slot = SLOTP_AMMO;
+	}
+	else if(slot == "hand") {
+		si_onequip.slot = (SLOTP_LEFT | SLOTP_RIGHT);
+	}
+	else if(slot == "any") {
+		si_onequip.slot = (SLOTP_HEAD | SLOTP_NECKLACE | SLOTP_BACKPACK |
+			SLOTP_ARMOR | SLOTP_RIGHT | SLOTP_LEFT | SLOTP_LEGS |
+			SLOTP_FEET | SLOTP_RING | SLOTP_AMMO);
+	}
+	else{
+		throw Error("Invalid argument (3) 'slot'");
+	}
+
+	if(method == "itemid") {
+		si_onequip.method = OnEquipItem::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onequip.method = OnEquipItem::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onequip.method = OnEquipItem::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_onequip.id = id;
+	si_onequip.equip = true;
+
+	boost::any p(si_onequip);
+	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnEquipItem.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
+	// Store callback
+	insert(-4);
+
+	std::string slot = popString();
+	int id = popInteger();
+	std::string method = popString();
+
+	OnEquipItem::ScriptInformation si_ondeequip;
+
+	if(slot == "head") {
+		si_ondeequip.slot = SLOTP_HEAD;
+	}
+	else if(slot == "neck") {
+		si_ondeequip.slot = SLOTP_NECKLACE;
+	}
+	else if(slot == "backpack") {
+		si_ondeequip.slot = SLOTP_BACKPACK;
+	}
+	else if(slot == "armor") {
+		si_ondeequip.slot = SLOTP_ARMOR;
+	}
+	else if(slot == "right-hand") {
+		si_ondeequip.slot = SLOTP_RIGHT;
+	}
+	else if(slot == "left-hand") {
+		si_ondeequip.slot = SLOTP_LEFT;
+	}
+	else if(slot == "legs") {
+		si_ondeequip.slot = SLOTP_LEGS;
+	}
+	else if(slot == "feet") {
+		si_ondeequip.slot = SLOTP_FEET;
+	}
+	else if(slot == "ring") {
+		si_ondeequip.slot = SLOTP_RING;
+	}
+	else if(slot == "ammo") {
+		si_ondeequip.slot = SLOTP_AMMO;
+	}
+	else if(slot == "hand") {
+		si_ondeequip.slot = (SLOTP_LEFT | SLOTP_RIGHT);
+	}
+	else if(slot == "any") {
+		si_ondeequip.slot = (SLOTP_HEAD | SLOTP_NECKLACE | SLOTP_BACKPACK |
+			SLOTP_ARMOR | SLOTP_RIGHT | SLOTP_LEFT | SLOTP_LEGS |
+			SLOTP_FEET | SLOTP_RING | SLOTP_AMMO);
+	}
+	else{
+		throw Error("Invalid argument (3) 'slot'");
+	}
+
+	if(method == "itemid") {
+		si_ondeequip.method = OnEquipItem::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_ondeequip.method = OnEquipItem::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_ondeequip.method = OnEquipItem::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_ondeequip.id = id;
+	si_ondeequip.equip = false;
+
+	boost::any p(si_ondeequip);
+	Listener_ptr listener(new Listener(ON_DEEQUIP_ITEM_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnEquipItem.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnStepInCreature() {
+	// Store callback
+	insert(-3);
+
+	int id = popInteger();
+	std::string method = popString();
+
+	OnMoveCreature::ScriptInformation si_onmovecreature;
+	if(method == "itemid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_onmovecreature.id = id;
+	si_onmovecreature.stepIn = true;
+
+	boost::any p(si_onmovecreature);
+	Listener_ptr listener(new Listener(ON_STEPIN_CREATURE_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnMoveCreature.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnStepOutCreature() {
+	// Store callback
+	insert(-3);
+
+	int id = popInteger();
+	std::string method = popString();
+
+	OnMoveCreature::ScriptInformation si_oncreaturemove;
+	if(method == "itemid") {
+		si_oncreaturemove.method = OnMoveCreature::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_oncreaturemove.method = OnMoveCreature::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_oncreaturemove.method = OnMoveCreature::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_oncreaturemove.id = id;
+	si_oncreaturemove.stepIn = false;
+
+	boost::any p(si_oncreaturemove);
+	Listener_ptr listener(new Listener(ON_STEPOUT_CREATURE_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnMoveCreature.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnAddItemToTile() {
+	// Store callback
+	insert(-4);
+
+	bool isItemOnTile = popBoolean();
+	int id = popInteger();
+	std::string method = popString();
+
+	OnMoveItem::ScriptInformation si_onmoveitem;
+	if(method == "itemid") {
+		si_onmoveitem.method = OnMoveItem::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onmoveitem.method = OnMoveItem::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onmoveitem.method = OnMoveItem::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_onmoveitem.id = id;
+	si_onmoveitem.addItem = true;
+	si_onmoveitem.isItemOnTile = isItemOnTile;
+
+	boost::any p(si_onmoveitem);
+	Listener_ptr listener(new Listener(ON_ADD_ITEM_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnMoveItem.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnRemoveItemToTile() {
+	// Store callback
+	insert(-4);
+
+	bool isItemOnTile = popBoolean();
+	int id = popInteger();
+	std::string method = popString();
+
+	OnMoveItem::ScriptInformation si_onmoveitem;
+	if(method == "itemid") {
+		si_onmoveitem.method = OnMoveItem::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onmoveitem.method = OnMoveItem::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onmoveitem.method = OnMoveItem::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_onmoveitem.id = id;
+	si_onmoveitem.addItem = false;
+	si_onmoveitem.isItemOnTile = isItemOnTile;
+
+	boost::any p(si_onmoveitem);
+	Listener_ptr listener(new Listener(ON_REMOVE_ITEM_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnMoveItem.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
 int LuaState::lua_stopListener() {
 	std::string listener_id = popString();
 
@@ -918,6 +1236,16 @@ int LuaState::lua_Creature_walk()
 
 	ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)ndir, FLAG_NOLIMIT);
 	pushBoolean(ret == RET_NOERROR);
+	return 1;
+}
+
+int LuaState::lua_Creature_say()
+{
+	std::string msg = popString();
+	Creature* creature = popCreature();
+
+	bool ret = g_game.internalCreatureSay(creature, SPEAK_SAY, msg);
+	pushBoolean(ret);
 	return 1;
 }
 

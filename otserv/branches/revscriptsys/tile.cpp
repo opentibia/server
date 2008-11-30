@@ -1089,14 +1089,12 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 		//calling movement scripts
 		Creature* creature = thing->getCreature();
 		if(creature){
-			// REVSCRIPT TODO Event callback
-			//g_moveEvents->onCreatureMove(creature, this, true);
+			g_game.onCreatureMove(creature, this, true);
 		}
 		else{
 			Item* item = thing->getItem();
 			if(item){
-				// REVSCRIPT TODO Event callback
-				//g_moveEvents->onItemMove(item, this, true);
+				g_game.onItemMove(item, this, true);
 			}
 		}
 
@@ -1143,14 +1141,12 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 	//calling movement scripts
 	Creature* creature = thing->getCreature();
 	if(creature){
-		// REVSCRIPT TODO Event callback
-		//g_moveEvents->onCreatureMove(creature, this, false);
+		g_game.onCreatureMove(creature, this, false);
 	}
 	else{
 		Item* item = thing->getItem();
 		if(item){
-			// REVSCRIPT TODO Event callback
-			//g_moveEvents->onItemMove(item, this, false);
+			g_game.onItemMove(item, this, false);
 		}
 	}
 

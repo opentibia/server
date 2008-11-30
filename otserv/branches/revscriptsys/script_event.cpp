@@ -25,6 +25,7 @@
 #include "script_manager.h"
 #include "tools.h"
 
+#include "tile.h"
 #include "player.h"
 #include "creature.h"
 #include "item.h"
@@ -185,7 +186,7 @@ void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaTh
 ///////////////////////////////////////////////////////////////////////////////
 // OnUseItem Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when a creature speaks
+// Triggered when a player use an item
 
 OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos, ReturnValue& retval) :
 	user(user),
@@ -242,6 +243,210 @@ void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, L
 		thread->HandleError("Event 'OnUseItem' invalid value of 'retval'");
 		thread->pop();
 	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnEquipItem Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player equip/dequip an item
+
+OnEquipItem::Event::Event(Player* user, Item* item, slots_t slot, bool equip) :
+	user(user),
+	item(item),
+	equip(equip)
+{
+	switch(slot){
+		case SLOT_HEAD: equipslot = SLOTP_HEAD;
+		case SLOT_NECKLACE: equipslot = SLOTP_NECKLACE;
+		case SLOT_BACKPACK: equipslot = SLOTP_BACKPACK; break;
+		case SLOT_ARMOR: equipslot = SLOTP_ARMOR; break;
+		case SLOT_RIGHT: equipslot = SLOTP_RIGHT; break;
+		case SLOT_LEFT: equipslot = SLOTP_LEFT; break;
+		case SLOT_LEGS: equipslot = SLOTP_LEGS; break;
+		case SLOT_FEET: equipslot = SLOTP_FEET; break;
+		case SLOT_RING: equipslot = SLOTP_RING; break; 
+		case SLOT_AMMO: equipslot = SLOTP_AMMO; break;
+
+		default:
+			equipslot = 0;
+			break;
+	}
+}
+
+OnEquipItem::Event::~Event() {
+}
+
+bool OnEquipItem::Event::check_match(const ScriptInformation& info) {
+
+	if(((info.slot & equipslot) != equipslot) ||  info.equip != equip){
+		return false;
+	}
+
+	switch(info.method) {
+		case FILTER_ITEMID: 
+			return item->getID() == info.id;
+		case FILTER_ACTIONID:
+			return item->getActionId() == info.id;
+		case FILTER_UNIQUEID:
+			return item->getUniqueId() == info.id;
+		default: break;
+	}
+	return false;
+}
+
+bool OnEquipItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	// Extremely naive solution
+	// Should be a map with id:callback instead.
+	return dispatchEvent<OnEquipItem::Event, ScriptInformation>
+		(this, state, enviroment, enviroment.Generic.OnEquipItem);
+}
+
+void OnEquipItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnEquipItemEvent");
+	state.pushThing(user);
+	state.setField(-2, "player");
+	state.pushThing(item);
+	state.setField(-2, "item");
+}
+
+void OnEquipItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// OnMoveCreature Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature move
+
+OnMoveCreature::Event::Event(Creature* creature, Tile* tile, bool stepIn) :
+	creature(creature),
+	tile(tile),
+	stepIn(stepIn)
+{
+}
+
+OnMoveCreature::Event::~Event() {
+}
+
+bool OnMoveCreature::Event::check_match(const ScriptInformation& info) {
+
+	if(info.stepIn != stepIn){
+		return false;
+	}
+
+	int32_t j = tile->__getLastIndex();
+	Item* item = NULL;
+	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
+		Thing* thing = tile->__getThing(i);
+		if(thing && (item = thing->getItem())){
+			switch(info.method) {
+				case FILTER_ITEMID: 
+					return item->getID() == info.id;
+				case FILTER_ACTIONID:
+					return item->getActionId() == info.id;
+				case FILTER_UNIQUEID:
+					return item->getUniqueId() == info.id;
+				default: break;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool OnMoveCreature::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	// Extremely naive solution
+	// Should be a map with id:callback instead.
+	return dispatchEvent<OnMoveCreature::Event, ScriptInformation>
+		(this, state, enviroment, enviroment.Generic.OnMoveCreature);
+}
+
+void OnMoveCreature::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnMoveCreatureEvent");
+	state.pushThing(tile);
+	state.setField(-2, "tile");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	//state.pushThing(item);
+	//state.setField(-2, "item");
+}
+
+void OnMoveCreature::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// OnMoveCreature Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when an item is moved
+
+OnMoveItem::Event::Event(Item* item, Tile* tile, bool addItem) :
+	item(item),
+	tile(tile),
+	addItem(addItem)
+{
+}
+
+OnMoveItem::Event::~Event() {
+}
+
+bool OnMoveItem::Event::check_match(const ScriptInformation& info) {
+
+	if(info.addItem != addItem){
+		return false;
+	}
+
+	if(info.isItemOnTile){
+		int32_t j = tile->__getLastIndex();
+		Item* itemOnTile = NULL;
+		for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
+			Thing* thing = tile->__getThing(i);
+			if(thing && (itemOnTile = thing->getItem()) && itemOnTile != item){
+				switch(info.method) {
+					case FILTER_ITEMID: 
+						return itemOnTile->getID() == info.id;
+					case FILTER_ACTIONID:
+						return itemOnTile->getActionId() == info.id;
+					case FILTER_UNIQUEID:
+						return itemOnTile->getUniqueId() == info.id;
+					default: break;
+				}
+			}
+		}
+	}
+	else{
+		switch(info.method) {
+			case FILTER_ITEMID: 
+				return item->getID() == info.id;
+			case FILTER_ACTIONID:
+				return item->getActionId() == info.id;
+			case FILTER_UNIQUEID:
+				return item->getUniqueId() == info.id;
+			default: break;
+		}
+	}
+
+
+	return false;
+}
+
+bool OnMoveItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	// Extremely naive solution
+	// Should be a map with id:callback instead.
+	return dispatchEvent<OnMoveItem::Event, ScriptInformation>
+		(this, state, enviroment, enviroment.Generic.OnMoveItem);
+}
+
+void OnMoveItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnMoveItemEvent");
+	state.pushThing(tile);
+	state.setField(-2, "tile");
+	state.pushThing(item);
+	state.setField(-2, "moveitem");
+	//state.pushThing(tileitem);
+	//state.setField(-2, "tileitem");
+}
+
+void OnMoveItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
 }
 
 

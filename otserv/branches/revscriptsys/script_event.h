@@ -28,6 +28,7 @@
 
 #include "const.h"
 #include "thing.h"
+#include "creature.h"
 
 // Forward declarations
 class Creature;
@@ -134,7 +135,7 @@ namespace Script {
 
 
 	////////////////////////////////////////////////////////////////
-	// Use event
+	// OnUseItem event
 	// Triggered when a player uses an item
 
 	namespace OnUseItem {
@@ -173,6 +174,133 @@ namespace Script {
 			ReturnValue& retval;
 		};
 	}
+
+	////////////////////////////////////////////////////////////////
+	// OnEquipItem event
+	// Triggered when a player equip an item
+
+	namespace OnEquipItem {
+		enum FilterType {
+			FILTER_ITEMID,
+			FILTER_UNIQUEID,
+			FILTER_ACTIONID,
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			uint16_t id;
+			uint32_t slot;
+			bool equip;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* user, Item* item, slots_t slot, bool equip);
+			~Event();
+
+			std::string getName() const {return "OnEquipItem";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+			
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Player* user;
+			Item* item;
+			uint32_t equipslot;
+			bool equip;
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	// OnMoveCreature event
+	// Triggered when a creature moves
+
+	namespace OnMoveCreature {
+		enum FilterType {
+			FILTER_ITEMID,
+			FILTER_UNIQUEID,
+			FILTER_ACTIONID,
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			uint16_t id;
+			bool stepIn;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, Tile* tile, bool stepIn);
+			~Event();
+
+			std::string getName() const {return "OnMoveCreature";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+			
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			Tile* tile;
+			bool stepIn;
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	// OnMoveItem event
+	// Triggered when an item is moved
+
+	namespace OnMoveItem {
+		enum FilterType {
+			FILTER_ITEMID,
+			FILTER_UNIQUEID,
+			FILTER_ACTIONID,
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			uint16_t id;
+			bool addItem;
+			bool isItemOnTile;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Item* item, Tile* tile, bool addItem);
+			~Event();
+
+			std::string getName() const {return "OnMoveItem";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+			
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Item* item;
+			Tile* tile;
+			bool addItem;
+		};
+	}
+
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnJoinChannel event

@@ -1189,6 +1189,24 @@ bool Game::playerLogout(Player* player, bool forced, bool timeout)
 	return script_system->dispatchEvent(evt);
 }
 
+bool Game::playerEquipItem(Player* player, Item* item, slots_t slot, bool equip)
+{
+	Script::OnEquipItem::Event evt(player, item, slot, equip);
+	return Game::script_system->dispatchEvent(evt);
+}
+
+bool Game::onCreatureMove(Creature* creature, Tile* tile, bool stepIn)
+{
+	Script::OnMoveCreature::Event evt(creature, tile, stepIn);
+	return Game::script_system->dispatchEvent(evt);
+}
+
+bool Game::onItemMove(Item* item, Tile* tile, bool addItem)
+{
+	Script::OnMoveItem::Event evt(item, tile, addItem);
+	return Game::script_system->dispatchEvent(evt);
+}
+
 ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, uint32_t flags /*= 0*/)
 {
 	Cylinder* fromTile = creature->getTile();
