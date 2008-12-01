@@ -64,9 +64,11 @@ Commands::Commands()
 	//table of commands
 	s_defcommands defined_commands[] = {
 		{"/reload",&Commands::reloadInfo},
+		/*
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		{"/serverdiag",&Commands::serverDiag},
 #endif
+		*/
 	};
 
 	//setup command map

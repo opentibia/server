@@ -516,12 +516,12 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 	return this;
 }
 
-void Container::__addThing(Thing* thing)
+void Container::__addThing(Creature* actor, Thing* thing)
 {
-	return __addThing(0, thing);
+	return __addThing(actor, 0, thing);
 }
 
-void Container::__addThing(int32_t index, Thing* thing)
+void Container::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
 	if(index >= (int32_t)capacity()){
 #ifdef __DEBUG__MOVESYS__
@@ -563,7 +563,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void Container::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
+void Container::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
@@ -603,7 +603,7 @@ void Container::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	}
 }
 
-void Container::__replaceThing(uint32_t index, Thing* thing)
+void Container::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 {
 	Item* item = thing->getItem();
 	if(item == NULL){
@@ -652,7 +652,7 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 	itemlist.erase(cit);
 }
 
-void Container::__removeThing(Thing* thing, uint32_t count)
+void Container::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
 	Item* item = thing->getItem();
 	if(item == NULL){
@@ -778,42 +778,42 @@ Thing* Container::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Container::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Container::postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postAddNotification(thing, index, LINK_TOPPARENT);
+		topParent->postAddNotification(actor, thing, index, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
 			if(topParent->getParent()){
-				topParent->getParent()->postAddNotification(thing, index, LINK_NEAR);
+				topParent->getParent()->postAddNotification(actor, thing, index, LINK_NEAR);
 			}
 		}
 		else{
-			topParent->postAddNotification(thing, index, LINK_PARENT);
+			topParent->postAddNotification(actor, thing, index, LINK_PARENT);
 		}
 	}
 }
 
-void Container::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Container::postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_TOPPARENT);
+		topParent->postRemoveNotification(actor, thing, index, isCompleteRemoval, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
 			if(topParent->getParent()){
-				topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
+				topParent->getParent()->postRemoveNotification(actor, thing, index, isCompleteRemoval, LINK_NEAR);
 			}
 		}
 		else{
-			topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
+			topParent->postRemoveNotification(actor, thing, index, isCompleteRemoval, LINK_PARENT);
 		}
 	}
 }

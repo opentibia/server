@@ -236,7 +236,7 @@ void Creature::onWalk()
 	if(getSleepTicks() <= 0){
 		Direction dir;
 		if(getNextStep(dir)){
-			if(g_game.internalMoveCreature(this, dir, FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
+			if(g_game.internalMoveCreature(this, this, dir, FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
 				forceUpdateFollowPath = true;
 			}
 		}
@@ -769,13 +769,13 @@ void Creature::dropCorpse()
 
 	Tile* tile = getTile();
 	if(splash){
-		g_game.internalAddItem(tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		g_game.internalAddItem(NULL, tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		g_game.startDecay(splash);
 	}
 
 	Item* corpse = getCorpse();
 	if(corpse){
-		g_game.internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		g_game.internalAddItem(NULL, tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		dropLoot(corpse->getContainer());
 		g_game.startDecay(corpse);
 	}

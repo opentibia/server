@@ -155,7 +155,7 @@ public:
 
 	virtual std::string getDescription(int32_t lookDistance) const;
 
-	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
+	void moveCreature(Creature* actor, Creature* creature, Cylinder* toCylinder, bool teleport = false);
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -166,13 +166,11 @@ public:
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 		uint32_t& flags);
 
-	virtual void __addThing(Thing* thing);
-	virtual void __addThing(int32_t index, Thing* thing);
-
-	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
-	virtual void __replaceThing(uint32_t index, Thing* thing);
-
-	virtual void __removeThing(Thing* thing, uint32_t count);
+	virtual void __addThing(Creature* actor, Thing* thing);
+	virtual void __addThing(Creature* actor, int32_t index, Thing* thing);
+	virtual void __updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count);
+	virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing);
+	virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual int32_t __getFirstIndex() const;
@@ -180,8 +178,8 @@ public:
 	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
-	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);

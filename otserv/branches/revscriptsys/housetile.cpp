@@ -37,9 +37,9 @@ HouseTile::~HouseTile()
 	//
 }
 
-void HouseTile::__addThing(int32_t index, Thing* thing)
+void HouseTile::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
-	Tile::__addThing(index, thing);
+	Tile::__addThing(actor, index, thing);
 
 	if(Item* item = thing->getItem()){
 		updateHouse(item);

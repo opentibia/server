@@ -984,7 +984,7 @@ int LuaState::lua_Thing_moveToPosition()
 	Position pos = popPosition();
 	Thing* thing = popThing();
 
-	pushBoolean(g_game.internalTeleport(thing, pos) == RET_NOERROR);
+	pushBoolean(g_game.internalTeleport(NULL, thing, pos) == RET_NOERROR);
 	
 	return 1;
 }
@@ -1023,7 +1023,7 @@ int LuaState::lua_Thing_destroy()
 {
 	Thing* thing = popThing();
 	if(Item* item = thing->getItem()) {
-		pushBoolean(g_game.internalRemoveItem(item) == RET_NOERROR);
+		pushBoolean(g_game.internalRemoveItem(NULL, item) == RET_NOERROR);
 	} else if(Creature* creature = thing->getCreature()) {
 		if(Player* player = creature->getPlayer()) {
 			player->kickPlayer();
@@ -1186,10 +1186,10 @@ int LuaState::lua_Tile_addItem()
 
 	if(item->getParent() != VirtualCylinder::virtualCylinder){
 		// Must remove from previous parent...
-		g_game.internalRemoveItem(item);
+		g_game.internalRemoveItem(NULL, item);
 	}
 
-	ReturnValue ret = g_game.internalAddItem(tile, item);
+	ReturnValue ret = g_game.internalAddItem(NULL, tile, item);
 	pushBoolean(ret == RET_NOERROR);
 	return 1;
 }
@@ -1234,7 +1234,7 @@ int LuaState::lua_Creature_walk()
 			throw Error("Creature:walk : Invalid direction");
 	}
 
-	ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)ndir, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalMoveCreature(NULL, creature, (Direction)ndir, FLAG_NOLIMIT);
 	pushBoolean(ret == RET_NOERROR);
 	return 1;
 }
@@ -1454,7 +1454,7 @@ int LuaState::lua_Player_removeMoney()
 {
 	int amount = popInteger();
 	Player* player = popPlayer();
-	pushBoolean(g_game.removeMoney(player, amount));
+	pushBoolean(g_game.removeMoney(NULL, player, amount));
 	return 1;
 }
 
@@ -1462,7 +1462,7 @@ int LuaState::lua_Player_addMoney()
 {
 	int amount = popInteger();
 	Player* player = popPlayer();
-	pushBoolean(g_game.addMoney(player, amount));
+	pushBoolean(g_game.addMoney(NULL, player, amount));
 	return 1;
 }
 
@@ -1516,7 +1516,7 @@ int LuaState::lua_Player_addItem()
 
 	if(item->getParent() != VirtualCylinder::virtualCylinder){
 		// Must remove from previous parent...
-		g_game.internalRemoveItem(item);
+		g_game.internalRemoveItem(NULL, item);
 	}
 
 	ReturnValue ret = RET_NOERROR;
@@ -1524,7 +1524,7 @@ int LuaState::lua_Player_addItem()
 		ret = g_game.internalPlayerAddItem(player, item);
 	}
 	else{
-		ret = g_game.internalAddItem(player, item);
+		ret = g_game.internalAddItem(NULL, player, item);
 	}
 	pushBoolean(ret == RET_NOERROR);
 	return 1;
@@ -1621,7 +1621,7 @@ int LuaState::lua_Item_setItemID()
 		throw Error("Item:setItemID : Stack count cannot be higher than 100.");
 	}
 
-	Item* newItem = g_game.transformItem(item, newid, newcount);
+	Item* newItem = g_game.transformItem(NULL, item, newid, newcount);
 
 	pushBoolean(true);
 	return 1;
@@ -1646,7 +1646,7 @@ int LuaState::lua_Item_setCount()
 		throw Error("Item.setCount: New count out of range!");
 	}
 	
-	pushBoolean(g_game.transformItem(item, item->getID(), newcount) != NULL);
+	pushBoolean(g_game.transformItem(NULL, item, item->getID(), newcount) != NULL);
 	return 1;
 }
 
@@ -2940,7 +2940,7 @@ int LuaScriptInterface::luaDoRemoveItem()
 	uint32_t uid;
 	Item* item = popItem(&uid);
 
-	ReturnValue ret = g_game.internalRemoveItem(item, count);
+	ReturnValue ret = g_game.internalRemoveItem(NULL, item, count);
 	if(ret != RET_NOERROR){
 		pushBoolean(false);
 		return 1;
@@ -2967,7 +2967,7 @@ int LuaScriptInterface::luaDoPlayerRemoveItem()
 	uint16_t itemId = (uint16_t)popUnsignedInteger();
 	Player* player = popPlayer();
 
-	pushBoolean(g_game.removeItemOfType(player, itemId, count, subType));
+	pushBoolean(g_game.removeItemOfType(NULL, player, itemId, count, subType));
 
 	return 1;
 }
@@ -3136,11 +3136,11 @@ int LuaScriptInterface::luaDoRelocate()
 		if(thing){
 			if(Item* item = thing->getItem()){
 				if(item->isPushable()){
-					g_game.internalTeleport(item, toPos);
+					g_game.internalTeleport(NULL, item, toPos);
 				}
 			}
 			else if(Creature* creature = thing->getCreature()){
-				g_game.internalTeleport(creature, toPos);
+				g_game.internalTeleport(NULL, creature, toPos);
 			}
 		}
 	}
@@ -3419,7 +3419,7 @@ int LuaScriptInterface::luaDoCreateItem()
 
 	Item* newItem = Item::CreateItem(itemId, count);
 
-	ReturnValue ret = g_game.internalAddItem(tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalAddItem(NULL, tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	if(ret != RET_NOERROR){
 		delete newItem;
 		pushThing(NULL);
@@ -3492,7 +3492,7 @@ int LuaScriptInterface::luaDoCreateTeleport()
 
 	newTp->setDestPos(toPos);
 
-	ReturnValue ret = g_game.internalAddItem(tile, newTp, INDEX_WHEREEVER, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalAddItem(NULL, tile, newTp, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	if(ret != RET_NOERROR){
 		delete newItem;
 		pushThing(NULL);
@@ -4241,7 +4241,7 @@ int LuaScriptInterface::luaDoAddContainerItem()
 	
 	Cylinder* old_parent = item->getParent();
 	if(old_parent != container) {
-		ReturnValue ret = g_game.internalMoveItem(old_parent, container, INDEX_WHEREEVER, item, item->getItemCount());
+		ReturnValue ret = g_game.internalMoveItem(NULL, old_parent, container, INDEX_WHEREEVER, item, item->getItemCount());
 		if(ret != RET_NOERROR) {
 			pushBoolean(false);
 		}

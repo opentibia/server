@@ -85,7 +85,7 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 						max = (int32_t)(weapon->getWeaponDamage(player, target, tool, true) * maxa + maxb);
 						if(params.useCharges && tool->hasCharges()){
 							int32_t newCharge = std::max((int32_t)0, ((int32_t)tool->getCharges()) - 1);
-							g_game.transformItem(tool, tool->getID(), newCharge);
+							g_game.transformItem(player, tool, tool->getID(), newCharge);
 						}
 					}
 					else{
@@ -649,7 +649,7 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 			item->setOwner(caster->getID());
 		}
 
-		ReturnValue ret = g_game.internalAddItem(tile, item);
+		ReturnValue ret = g_game.internalAddItem(caster, tile, item);
 		if(ret == RET_NOERROR){
 			g_game.startDecay(item);
 		}
@@ -1274,7 +1274,7 @@ void MagicField::onStepInField(Creature* creature)
 {
 	//remove magic walls/wild growth
 	if(isBlocking()){
-		g_game.internalRemoveItem(this, 1);
+		g_game.internalRemoveItem(NULL, this, 1);
 	}
 	else{
 		const ItemType& it = items[getID()];

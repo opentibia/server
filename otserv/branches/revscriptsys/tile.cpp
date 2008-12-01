@@ -329,13 +329,13 @@ void Tile::onUpdateTile()
 	}
 }
 
-void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
+void Tile::moveCreature(Creature* actor, Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
 {
 	Tile* toTile = toCylinder->getTile();
 	int32_t oldStackPos = __getIndexOfThing(creature);
 
 	//remove the creature
-	__removeThing(creature, 0);
+	__removeThing(actor, creature, 0);
 
 	// Switch the node ownership
 	if(qt_node != toTile->qt_node) {
@@ -344,7 +344,7 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 	}
 	
 	//add the creature
-	toTile->__addThing(creature);
+	toTile->__addThing(actor, creature);
 	int32_t newStackPos = toTile->__getIndexOfThing(creature);
 
 	Position fromPos = getPosition();
@@ -379,8 +379,8 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		(*it)->onCreatureMove(creature, toTile, toPos, this, fromPos, oldStackPos, teleport);
 	}
 
-	postRemoveNotification(creature, oldStackPos, true);
-	toTile->postAddNotification(creature, newStackPos);
+	postRemoveNotification(actor, creature, oldStackPos, true);
+	toTile->postAddNotification(actor, creature, newStackPos);
 }
 
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -666,12 +666,12 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 	return destTile;
 }
 
-void Tile::__addThing(Thing* thing)
+void Tile::__addThing(Creature* actor, Thing* thing)
 {
-	__addThing(0, thing);
+	__addThing(actor, 0, thing);
 }
 
-void Tile::__addThing(int32_t index, Thing* thing)
+void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
 	Creature* creature = thing->getCreature();
 	if(creature){
@@ -717,7 +717,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 					if((*iit)->isSplash()){
 						Item* oldSplash = *iit;
-						__removeThing(oldSplash, 1);
+						__removeThing(actor, oldSplash, 1);
 						oldSplash->setParent(NULL);
 						g_game.FreeThing(oldSplash);
 						break;
@@ -752,7 +752,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				for(iit = downItems.begin(); iit != downItems.end(); ++iit){
 					if((oldField = (*iit)->getMagicField())){
 						if(oldField->isReplaceable()){
-							__removeThing(oldField, 1);
+							__removeThing(actor, oldField, 1);
 
 							oldField->setParent(NULL);
 							g_game.FreeThing(oldField);
@@ -775,7 +775,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
+void Tile::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
@@ -803,7 +803,7 @@ void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	onUpdateTileItem(index, item, oldType, item, newType);
 }
 
-void Tile::__replaceThing(uint32_t index, Thing* thing)
+void Tile::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 {
 	int32_t pos = index;
 
@@ -880,7 +880,7 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 #endif
 }
 
-void Tile::__removeThing(Thing* thing, uint32_t count)
+void Tile::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
 	Creature* creature = thing->getCreature();
 	if(creature){
@@ -1066,7 +1066,7 @@ Thing* Tile::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Tile::postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1076,7 +1076,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->postAddNotification(thing, index, LINK_NEAR);
+			tmpPlayer->postAddNotification(actor, thing, index, LINK_NEAR);
 		}
 	}
 
@@ -1089,24 +1089,24 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 		//calling movement scripts
 		Creature* creature = thing->getCreature();
 		if(creature){
-			g_game.onCreatureMove(creature, this, true);
+			g_game.onCreatureMove(actor, creature, this, true);
 		}
 		else{
 			Item* item = thing->getItem();
 			if(item){
-				g_game.onItemMove(item, this, true);
+				g_game.onItemMove(actor, item, this, true);
 			}
 		}
 
 		if(Teleport* teleport = getTeleportItem()){
-			teleport->__addThing(thing);
+			teleport->__addThing(actor, thing);
 		}
 		else if(TrashHolder* trashHolder = getTrashHolder()){
-			trashHolder->__addThing(thing);
+			trashHolder->__addThing(actor, thing);
 			removal = thing != trashHolder;
 		}
 		else if(Mailbox* mailbox = getMailbox()){
-			mailbox->__addThing(thing);
+			mailbox->__addThing(actor, thing);
 		}
 	}
 
@@ -1120,7 +1120,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	g_game.FreeThing(thing);
 }
 
-void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Tile::postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1134,19 +1134,19 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
+			tmpPlayer->postRemoveNotification(actor, thing, index, isCompleteRemoval, LINK_NEAR);
 		}
 	}
 
 	//calling movement scripts
 	Creature* creature = thing->getCreature();
 	if(creature){
-		g_game.onCreatureMove(creature, this, false);
+		g_game.onCreatureMove(actor, creature, this, false);
 	}
 	else{
 		Item* item = thing->getItem();
 		if(item){
-			g_game.onItemMove(item, this, false);
+			g_game.onItemMove(actor, item, this, false);
 		}
 	}
 

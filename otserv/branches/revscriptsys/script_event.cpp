@@ -318,7 +318,8 @@ void OnEquipItem::Event::update_instance(Manager& state, Enviroment& enviroment,
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature moves
 
-OnMoveCreature::Event::Event(Creature* creature, Tile* tile, bool stepIn) :
+OnMoveCreature::Event::Event(Creature* actor, Creature* creature, Tile* tile, bool stepIn) :
+	actor(actor),
 	creature(creature),
 	tile(tile),
 	stepIn(stepIn)
@@ -363,12 +364,12 @@ bool OnMoveCreature::Event::dispatch(Manager& state, Enviroment& enviroment) {
 
 void OnMoveCreature::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnMoveCreatureEvent");
+	state.pushThing(actor);
+	state.setField(-2, "actor");
 	state.pushThing(tile);
 	state.setField(-2, "tile");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
-	//state.pushThing(item);
-	//state.setField(-2, "item");
 }
 
 void OnMoveCreature::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
@@ -379,7 +380,8 @@ void OnMoveCreature::Event::update_instance(Manager& state, Enviroment& envirome
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when an item is moved
 
-OnMoveItem::Event::Event(Item* item, Tile* tile, bool addItem) :
+OnMoveItem::Event::Event(Creature* actor, Item* item, Tile* tile, bool addItem) :
+	actor(actor),
 	item(item),
 	tile(tile),
 	addItem(addItem)
@@ -438,12 +440,12 @@ bool OnMoveItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
 
 void OnMoveItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnMoveItemEvent");
+	state.pushThing(actor);
+	state.setField(-2, "actor");
 	state.pushThing(tile);
 	state.setField(-2, "tile");
 	state.pushThing(item);
 	state.setField(-2, "item");
-	//state.pushThing(tileitem);
-	//state.setField(-2, "tileitem");
 }
 
 void OnMoveItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {

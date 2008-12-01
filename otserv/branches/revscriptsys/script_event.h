@@ -247,7 +247,7 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* creature, Tile* tile, bool stepIn);
+			Event(Creature* actor, Creature* creature, Tile* tile, bool stepIn);
 			~Event();
 
 			std::string getName() const {return "OnMoveCreature";}
@@ -263,6 +263,7 @@ namespace Script {
 			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
 
 		protected:
+			Creature* actor;
 			Creature* creature;
 			Tile* tile;
 			bool stepIn;
@@ -289,7 +290,7 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Item* item, Tile* tile, bool addItem);
+			Event(Creature* actor, Item* item, Tile* tile, bool addItem);
 			~Event();
 
 			std::string getName() const {return "OnMoveItem";}
@@ -305,6 +306,7 @@ namespace Script {
 			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
 
 		protected:
+			Creature* actor;
 			Item* item;
 			Tile* tile;
 			bool addItem;

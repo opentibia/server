@@ -824,7 +824,7 @@ void Player::dropLoot(Container* corpse)
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
 			if(item && ((item->getContainer()) || ((uint32_t)random_range(1, 100)) <= itemLoss)){
-				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), 0);
+				g_game.internalMoveItem(NULL, this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), 0);
 			}
 		}
 	}
@@ -2095,7 +2095,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			{ 
 				int32_t charges = item->getCharges(); 
 				if(charges != 0) 
-					g_game.transformItem(item, item->getID(), charges - 1); 
+					g_game.transformItem(this, item, item->getID(), charges - 1); 
 			} 
 		} 
 
@@ -2320,7 +2320,7 @@ void Player::dropCorpse()
 		setDropLoot(true);
 		setLossSkill(true);
 		sendStats();
-		g_game.internalTeleport(this, getTemplePosition());
+		g_game.internalTeleport(NULL, this, getTemplePosition());
 		g_game.addCreatureHealth(this);
 		onThink(EVENT_CREATURE_THINK_INTERVAL);
 	}
@@ -2848,12 +2848,12 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		return this;
 }
 
-void Player::__addThing(Thing* thing)
+void Player::__addThing(Creature* actor, Thing* thing)
 {
-	__addThing(0, thing);
+	__addThing(actor, 0, thing);
 }
 
-void Player::__addThing(int32_t index, Thing* thing)
+void Player::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
 	if(index < 0 || index > 11){
 #ifdef __DEBUG__MOVESYS__
@@ -2890,7 +2890,7 @@ void Player::__addThing(int32_t index, Thing* thing)
 	onAddInventoryItem((slots_t)index, item);
 }
 
-void Player::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
+void Player::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
@@ -2923,7 +2923,7 @@ void Player::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	onUpdateInventoryItem((slots_t)index, item, oldType, item, newType);
 }
 
-void Player::__replaceThing(uint32_t index, Thing* thing)
+void Player::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 {
 	if(index < 0 || index > 11){
 #ifdef __DEBUG__MOVESYS__
@@ -2964,7 +2964,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 	inventory[index] = item;
 }
 
-void Player::__removeThing(Thing* thing, uint32_t count)
+void Player::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
 	Item* item = thing->getItem();
 	if(item == NULL){
@@ -3096,7 +3096,7 @@ Thing* Player::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Player::postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
 		g_game.playerEquipItem(this, thing->getItem(), (slots_t)index, true);
@@ -3130,7 +3130,7 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 	}
 }
 
-void Player::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Player::postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
 		g_game.playerEquipItem(this, thing->getItem(), (slots_t)index, false /*,isCompleteRemoval*/);
@@ -3454,7 +3454,7 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 			if(item){
 				//25% chance to destroy the item
 				if(25 >= random_range(1, 100)){
-					g_game.internalRemoveItem(item);
+					g_game.internalRemoveItem(NULL, item);
 				}
 			}
 		}
@@ -4006,7 +4006,7 @@ bool Player::withdrawMoney(uint32_t amount)
 		return false;
 	}
 
-	bool ret = g_game.addMoney(this, amount);
+	bool ret = g_game.addMoney(NULL, this, amount);
 	if(ret){
 		balance -= amount;
 	}
@@ -4019,7 +4019,7 @@ bool Player::depositMoney(uint32_t amount)
 		return false;
 	}
 
-	bool ret = g_game.removeMoney(this, amount);
+	bool ret = g_game.removeMoney(NULL, this, amount);
 	if(ret){
 		balance += amount;
 	}

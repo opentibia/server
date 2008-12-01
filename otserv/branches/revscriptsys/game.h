@@ -285,15 +285,16 @@ public:
 		}
 	}
 
-	ReturnValue internalMoveCreature(Creature* creature, Direction direction, uint32_t flags = 0);
-	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);
+	ReturnValue internalMoveCreature(Creature* actor, Creature* creature, Direction direction, uint32_t flags = 0);
+	ReturnValue internalMoveCreature(Creature* actor, Creature* creature,
+		Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);
 
-	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
+	ReturnValue internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count, Item** _moveItem, uint32_t flags = 0);
 
-	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
+	ReturnValue internalAddItem(Creature* actor, Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
 		uint32_t flags = 0, bool test = false);
-	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
+	ReturnValue internalRemoveItem(Creature* actor, Item* item, int32_t count = -1,  bool test = false);
 
 	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true);
 
@@ -311,6 +312,7 @@ public:
 
 	/**
 	  * Remove item(s) of a certain type
+	  * \param actor is the creature that is responsible (can be NULL)
 	  * \param cylinder to remove the item(s) from
 	  * \param itemId is the item to remove
 	  * \param count is the amount to remove
@@ -318,7 +320,7 @@ public:
 		* meaning it's not used
 	  * \return true if the removal was successful
 	  */
-	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, int32_t subType = -1);
+	bool removeItemOfType(Creature* actor, Cylinder* cylinder, uint16_t itemId, int32_t count, int32_t subType = -1);
 
 	/**
 	  * Get the amount of money in a a cylinder
@@ -328,38 +330,42 @@ public:
 
 	/**
 	  * Remove item(s) with a monetary value
+	  * \param actor is the creature that is responsible (can be NULL)
 	  * \param cylinder to remove the money from
 	  * \param money is the amount to remove
 	  * \param flags optional flags to modifiy the default behaviour
 	  * \return true if the removal was successful
 	  */
-	bool removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags = 0);
+	bool removeMoney(Creature* actor, Cylinder* cylinder, int32_t money, uint32_t flags = 0);
 
 	/**
 	  * Add item(s) with monetary value
+	  * \param actor is the creature that is responsible (can be NULL)
 	  * \param cylinder which will receive money
 	  * \param money the amount to give
 	  * \param flags optional flags to modify default behavior
 	  * \return true
 	  */
-	bool addMoney(Cylinder* cylinder, int32_t money, uint32_t flags = 0);
+	bool addMoney(Creature* actor, Cylinder* cylinder, int32_t money, uint32_t flags = 0);
 
 	/**
 	  * Transform one item to another type/count
+	  * \param actor is the creature that is responsible (can be NULL)
 	  * \param item is the item to transform
 	  * \param newtype is the new type
 	  * \param newCount is the new count value, use default value (-1) to not change it
 	  * \return true if the tranformation was successful
 	  */
-	Item* transformItem(Item* item, uint16_t newId, int32_t newCount = -1);
+	Item* transformItem(Creature* actor, Item* item, uint16_t newId, int32_t newCount = -1);
 
 	/**
 	  * Teleports an object to another position
+	  * \param actor is the creature that is responsible (can be NULL)
 	  * \param thing is the object to teleport
 	  * \param newPos is the new position
 	  * \return true if the teleportation was successful
 	  */
-	ReturnValue internalTeleport(Thing* thing, const Position& newPos);
+	ReturnValue internalTeleport(Creature* actor, Thing* thing, const Position& newPos);
 
 	/**
 		* Turn a creature to a different direction.
@@ -451,8 +457,8 @@ public:
 	bool playerLogout(Player* player, bool forced, bool timeout);
 	bool playerLogin(Player* player);
 	bool playerEquipItem(Player* player, Item* item, slots_t slot, bool equip);
-	bool onCreatureMove(Creature* creature, Tile* tile, bool stepIn);
-	bool onItemMove(Item* item, Tile* tile, bool addItem);
+	bool onCreatureMove(Creature* actor, Creature* creature, Tile* tile, bool stepIn);
+	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
 
 	void cleanup();
 	void shutdown();

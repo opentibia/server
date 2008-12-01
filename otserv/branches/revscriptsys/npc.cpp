@@ -1049,7 +1049,7 @@ void Npc::doSay(std::string msg)
 
 void Npc::doMove(Direction dir)
 {
-	g_game.internalMoveCreature(this, dir);
+	g_game.internalMoveCreature(this, this, dir);
 }
 
 void Npc::doTurn(Direction dir)

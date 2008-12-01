@@ -51,16 +51,14 @@ public:
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 		uint32_t& flags);
 
-	virtual void __addThing(Thing* thing);
-	virtual void __addThing(int32_t index, Thing* thing);
+	virtual void __addThing(Creature* actor, Thing* thing);
+	virtual void __addThing(Creature* actor, int32_t index, Thing* thing);
+	virtual void __updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count);
+	virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing);
+	virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count);
 
-	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
-	virtual void __replaceThing(uint32_t index, Thing* thing);
-
-	virtual void __removeThing(Thing* thing, uint32_t count);
-
-	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
-	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 private:
 	Position destPos;

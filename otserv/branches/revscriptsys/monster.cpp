@@ -849,7 +849,7 @@ bool Monster::pushItem(Item* item, int32_t radius)
 
 			Tile* tile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
 			if(tile && g_game.canThrowObjectTo(centerPos, tryPos)){
-				if(g_game.internalMoveItem(item->getParent(), tile,
+				if(g_game.internalMoveItem(this, item->getParent(), tile,
 					INDEX_WHEREEVER, item, item->getItemCount(), NULL) == RET_NOERROR){
 					return true;
 				}
@@ -877,7 +877,7 @@ void Monster::pushItems(Tile* tile)
 				if(moveCount < 20 && pushItem(item, 1)){
 					moveCount++;
 				}
-				else if(g_game.internalRemoveItem(item) == RET_NOERROR){
+				else if(g_game.internalRemoveItem(this, item) == RET_NOERROR){
 					++removeCount;
 				}
 		}
@@ -905,7 +905,7 @@ bool Monster::pushCreature(Creature* creature)
 		Tile* toTile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
 
 		if(toTile && !toTile->hasProperty(BLOCKPATH)){
-			if(g_game.internalMoveCreature(creature, *it) == RET_NOERROR){
+			if(g_game.internalMoveCreature(this, creature, *it) == RET_NOERROR){
 				return true;
 			}
 		}

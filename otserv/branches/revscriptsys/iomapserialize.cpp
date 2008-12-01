@@ -257,7 +257,7 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 					std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
 				}
 
-				item = g_game.transformItem(item, type);
+				item = g_game.transformItem(NULL, item, type);
 
 				std::pair<Item*, int> myPair(item, pid);
 				itemMap[sid] = myPair;

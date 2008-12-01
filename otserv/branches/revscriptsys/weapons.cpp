@@ -404,21 +404,21 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 {
 	if(ammoAction == AMMOACTION_REMOVECOUNT){
 		int32_t newCount = std::max(0, item->getItemCount() - 1);
-		g_game.transformItem(item, item->getID(), newCount);
+		g_game.transformItem(player, item, item->getID(), newCount);
 	}
 	else if(ammoAction == AMMOACTION_REMOVECHARGE){
 		int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
-		g_game.transformItem(item, item->getID(), newCharge);
+		g_game.transformItem(player, item, item->getID(), newCharge);
 	}
 	else if(ammoAction == AMMOACTION_MOVE){
-		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, NULL, FLAG_NOLIMIT);
+		g_game.internalMoveItem(player, item->getParent(), destTile, INDEX_WHEREEVER, item, 1, NULL, FLAG_NOLIMIT);
 	}
 	else if(ammoAction == AMMOACTION_MOVEBACK){
 		//do nothing
 	}
 	else if(item->hasCharges()){
 		int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
-		g_game.transformItem(item, item->getID(), newCharge);
+		g_game.transformItem(player, item, item->getID(), newCharge);
 	}
 }
 
@@ -816,7 +816,7 @@ void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) cons
 	if((ammoAction == AMMOACTION_MOVE || ammoAction == AMMOACTION_MOVEBACK) &&
 			breakChance > 0 && random_range(1, 100) < breakChance){
 		int32_t newCount = std::max(0, item->getItemCount() - 1);
-		g_game.transformItem(item, item->getID(), newCount);
+		g_game.transformItem(player, item, item->getID(), newCount);
 	}
 	else{
 		Weapon::onUsedAmmo(player, item, destTile);

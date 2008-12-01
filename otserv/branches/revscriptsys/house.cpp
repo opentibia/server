@@ -168,7 +168,7 @@ bool House::kickPlayer(Player* player, const std::string& name)
 
 		if(houseTile && houseTile->getHouse() == this){
 			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && !kickingPlayer->hasFlag(PlayerFlag_CanEditHouses)){
-				if(g_game.internalTeleport(kickingPlayer, getEntryPosition()) == RET_NOERROR){
+				if(g_game.internalTeleport(player, kickingPlayer, getEntryPosition()) == RET_NOERROR){
 					g_game.addMagicEffect(getEntryPosition(), NM_ME_TELEPORT);
 				}
 				return true;
@@ -219,7 +219,7 @@ void House::setAccessList(uint32_t listId, const std::string& textlist)
 
 	KickPlayerList::iterator itkick;
 	for(itkick = kickList.begin(); itkick != kickList.end(); ++itkick){
-		if(g_game.internalTeleport(*itkick, getEntryPosition()) == RET_NOERROR){
+		if(g_game.internalTeleport(NULL, *itkick, getEntryPosition()) == RET_NOERROR){
 			g_game.addMagicEffect(getEntryPosition(), NM_ME_TELEPORT);
 		}
 	}
@@ -277,10 +277,10 @@ bool House::transferToDepot()
 
 	for(std::list<Item*>::iterator it = moveItemList.begin(); it != moveItemList.end(); ++it){
 		if(depot) {
-			g_game.internalMoveItem((*it)->getParent(), depot, INDEX_WHEREEVER,
+			g_game.internalMoveItem(NULL, (*it)->getParent(), depot, INDEX_WHEREEVER,
 				(*it), (*it)->getItemCount(), NULL, FLAG_NOLIMIT);
 		} else {
-			g_game.internalRemoveItem(*it);
+			g_game.internalRemoveItem(NULL, *it);
 		}
 	}
 
@@ -439,7 +439,7 @@ HouseTransferItem* House::getTransferItem()
 
 	transfer_container.setParent(NULL);
 	transferItem =  HouseTransferItem::createHouseTransferItem(this);
-	transfer_container.__addThing(transferItem);
+	transfer_container.__addThing(NULL, transferItem);
 	return transferItem;
 }
 
@@ -450,7 +450,7 @@ void House::resetTransferItem()
 		transferItem = NULL;
 		transfer_container.setParent(NULL);
 
-		transfer_container.__removeThing(tmpItem, tmpItem->getItemCount());
+		transfer_container.__removeThing(NULL, tmpItem, tmpItem->getItemCount());
 		g_game.FreeThing(tmpItem);
 	}
 }
@@ -478,7 +478,7 @@ bool HouseTransferItem::onTradeEvent(TradeEvents_t event, Player* owner)
 				house->executeTransfer(this, owner);
 			}
 
-			g_game.internalRemoveItem(this, 1);
+			g_game.internalRemoveItem(NULL, this, 1);
 			break;
 		}
 
@@ -979,7 +979,7 @@ bool Houses::payHouses()
 					hasEnoughMoney = true;
 				}
 				else{
-					hasEnoughMoney = g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT);
+					hasEnoughMoney = g_game.removeMoney(NULL, depot, house->getRent(), FLAG_NOLIMIT);
 				}
 
 				//get money from depot
@@ -1042,7 +1042,7 @@ bool Houses::payHouses()
 							" days, or you will lose this house.";
 
 						letter->setText(warningText.str());
-						g_game.internalAddItem(depot, letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
+						g_game.internalAddItem(NULL, depot, letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 						house->setPayRentWarnings(house->getPayRentWarnings() + 1);
 						house->setLastWarning(currentTime);
