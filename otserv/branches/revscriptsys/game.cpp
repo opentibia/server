@@ -1195,9 +1195,9 @@ bool Game::playerEquipItem(Player* player, Item* item, slots_t slot, bool equip)
 	return Game::script_system->dispatchEvent(evt);
 }
 
-bool Game::onCreatureMove(Creature* actor, Creature* creature, Tile* tile, bool stepIn)
+bool Game::onCreatureMove(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile)
 {
-	Script::OnMoveCreature::Event evt(actor, creature, tile, stepIn);
+	Script::OnMoveCreature::Event evt(actor, creature, fromTile, toTile);
 	return Game::script_system->dispatchEvent(evt);
 }
 

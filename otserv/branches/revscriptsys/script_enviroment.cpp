@@ -92,7 +92,7 @@ bool Enviroment::stopListener(ListenerType type, uint32_t id) {
 			if(stopListener(Generic.OnEquipItem, id))
 				return true;
 			break;
-		case ON_STEP_CREATURE_LISTENER:
+		case ON_MOVE_CREATURE_LISTENER:
 			if(stopListener(Generic.OnMoveCreature, id))
 				return true;
 			break;

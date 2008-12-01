@@ -457,7 +457,7 @@ public:
 	bool playerLogout(Player* player, bool forced, bool timeout);
 	bool playerLogin(Player* player);
 	bool playerEquipItem(Player* player, Item* item, slots_t slot, bool equip);
-	bool onCreatureMove(Creature* actor, Creature* creature, Tile* tile, bool stepIn);
+	bool onCreatureMove(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile);
 	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
 
 	void cleanup();

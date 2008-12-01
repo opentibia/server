@@ -318,12 +318,22 @@ void OnEquipItem::Event::update_instance(Manager& state, Enviroment& enviroment,
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature moves
 
-OnMoveCreature::Event::Event(Creature* actor, Creature* creature, Tile* tile, bool stepIn) :
+OnMoveCreature::Event::Event(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile) :
 	actor(actor),
 	creature(creature),
-	tile(tile),
-	stepIn(stepIn)
+	fromTile(fromTile),
+	toTile(toTile),
+	moveType(TYPE_NONE)
 {
+	if(fromTile && toTile){
+		moveType = TYPE_MOVE;
+	}
+	else if(fromTile){
+		moveType = TYPE_STEPIN;
+	}
+	else if(toTile){
+		moveType = TYPE_STEPOUT;
+	}
 }
 
 OnMoveCreature::Event::~Event() {
@@ -331,23 +341,33 @@ OnMoveCreature::Event::~Event() {
 
 bool OnMoveCreature::Event::check_match(const ScriptInformation& info) {
 
-	if(info.stepIn != stepIn){
+	if(moveType != info.moveType){
 		return false;
 	}
 
-	int32_t j = tile->__getLastIndex();
-	Item* item = NULL;
-	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
-		Thing* thing = tile->__getThing(i);
-		if(thing && (item = thing->getItem())){
-			switch(info.method) {
-				case FILTER_ITEMID: 
-					return item->getID() == info.id;
-				case FILTER_ACTIONID:
-					return item->getActionId() == info.id;
-				case FILTER_UNIQUEID:
-					return item->getUniqueId() == info.id;
-				default: break;
+	if(info.method == FILTER_NONE){
+		return true;
+	}
+
+	return (isMatch(info, fromTile) || isMatch(info, toTile));
+}
+
+bool OnMoveCreature::Event::isMatch(const ScriptInformation& info, Tile* tile) {
+	if(tile){
+		int32_t j = tile->__getLastIndex();
+		Item* item = NULL;
+		for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
+			Thing* thing = tile->__getThing(i);
+			if(thing && (item = thing->getItem())){
+				switch(info.method) {
+					case FILTER_ITEMID: 
+						return item->getID() == info.id;
+					case FILTER_ACTIONID:
+						return item->getActionId() == info.id;
+					case FILTER_UNIQUEID:
+						return item->getUniqueId() == info.id;
+					default: break;
+				}
 			}
 		}
 	}
@@ -356,6 +376,12 @@ bool OnMoveCreature::Event::check_match(const ScriptInformation& info) {
 }
 
 bool OnMoveCreature::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	ListenerList list = creature->getListeners(ON_MOVE_CREATURE_LISTENER);
+	if(dispatchEvent<OnMoveCreature::Event, ScriptInformation>
+			(this, state, enviroment, list)
+		)
+		return true;
+
 	// Extremely naive solution
 	// Should be a map with id:callback instead.
 	return dispatchEvent<OnMoveCreature::Event, ScriptInformation>
@@ -366,8 +392,22 @@ void OnMoveCreature::Event::push_instance(LuaState& state, Enviroment& enviromen
 	state.pushClassTableInstance("OnMoveCreatureEvent");
 	state.pushThing(actor);
 	state.setField(-2, "actor");
-	state.pushThing(tile);
-	state.setField(-2, "tile");
+
+	if(moveType == TYPE_MOVE){
+		state.pushThing(fromTile);
+		state.setField(-2, "fromTile");
+		state.pushThing(toTile);
+		state.setField(-2, "toTile");
+	}
+	else if(moveType == TYPE_STEPIN){
+		state.pushThing(fromTile);
+		state.setField(-2, "tile");
+	}
+	else if(moveType == TYPE_STEPOUT){
+		state.pushThing(toTile);
+		state.setField(-2, "tile");
+	}
+
 	state.pushThing(creature);
 	state.setField(-2, "creature");
 }

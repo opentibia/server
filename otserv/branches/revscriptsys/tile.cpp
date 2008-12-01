@@ -381,6 +381,7 @@ void Tile::moveCreature(Creature* actor, Creature* creature, Cylinder* toCylinde
 
 	postRemoveNotification(actor, creature, oldStackPos, true);
 	toTile->postAddNotification(actor, creature, newStackPos);
+	g_game.onCreatureMove(actor, creature, this, toTile);
 }
 
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -1089,7 +1090,7 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, int32_t index, cyl
 		//calling movement scripts
 		Creature* creature = thing->getCreature();
 		if(creature){
-			g_game.onCreatureMove(actor, creature, this, true);
+			g_game.onCreatureMove(actor, creature, this, NULL);
 		}
 		else{
 			Item* item = thing->getItem();
@@ -1141,7 +1142,7 @@ void Tile::postRemoveNotification(Creature* actor, Thing* thing, int32_t index, 
 	//calling movement scripts
 	Creature* creature = thing->getCreature();
 	if(creature){
-		g_game.onCreatureMove(actor, creature, this, false);
+		g_game.onCreatureMove(actor, creature, NULL, this);
 	}
 	else{
 		Item* item = thing->getItem();

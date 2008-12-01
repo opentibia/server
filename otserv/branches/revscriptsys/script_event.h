@@ -237,17 +237,26 @@ namespace Script {
 			FILTER_ITEMID,
 			FILTER_UNIQUEID,
 			FILTER_ACTIONID,
+			FILTER_NONE,
+		};
+
+		enum MoveType {
+			TYPE_NONE,
+			TYPE_MOVE,
+			TYPE_STEPIN,
+			TYPE_STEPOUT,
 		};
 
 		struct ScriptInformation {
 			FilterType method;
 			uint16_t id;
-			bool stepIn;
+			uint32_t slot;
+			MoveType moveType;
 		};
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* actor, Creature* creature, Tile* tile, bool stepIn);
+			Event(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile);
 			~Event();
 
 			std::string getName() const {return "OnMoveCreature";}
@@ -263,10 +272,13 @@ namespace Script {
 			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
 
 		protected:
+			bool isMatch(const ScriptInformation& info, Tile* tile);
+
 			Creature* actor;
 			Creature* creature;
-			Tile* tile;
-			bool stepIn;
+			Tile* fromTile;
+			Tile* toTile;
+			MoveType moveType;
 		};
 	}
 

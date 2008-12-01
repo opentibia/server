@@ -218,6 +218,8 @@ void Manager::registerFunctions() {
 
 	registerGlobalFunction("registerOnStepInCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnStepInCreature);
 	registerGlobalFunction("registerOnStepOutCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnStepOutCreature);
+	//registerGlobalFunction("registerOnMoveCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnMoveCreature);
+	registerGlobalFunction("registerOnMoveCreature(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnMoveCreature);
 
 	registerGlobalFunction("registerOnEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
 	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
@@ -235,7 +237,7 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnPlayerLogout(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLogout);
 
 	registerGlobalFunction("registerOnLookAtItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtItem);
-	registerGlobalFunction("registerOnLookAtCreature(Creature filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
+	registerGlobalFunction("registerOnLookAtCreature(Creature creature, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
 	registerGlobalFunction("registerOnPlayerLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
@@ -774,10 +776,10 @@ int LuaState::lua_registerGenericEvent_OnStepInCreature() {
 		throw Error("Invalid argument (1) 'method'");
 	}
 	si_onmovecreature.id = id;
-	si_onmovecreature.stepIn = true;
+	si_onmovecreature.moveType = OnMoveCreature::TYPE_STEPIN;
 
 	boost::any p(si_onmovecreature);
-	Listener_ptr listener(new Listener(ON_STEP_CREATURE_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
 
 	enviroment.Generic.OnMoveCreature.push_back(listener);
 
@@ -796,26 +798,91 @@ int LuaState::lua_registerGenericEvent_OnStepOutCreature() {
 	int id = popInteger();
 	std::string method = popString();
 
-	OnMoveCreature::ScriptInformation si_oncreaturemove;
+	OnMoveCreature::ScriptInformation si_onmovecreature;
 	if(method == "itemid") {
-		si_oncreaturemove.method = OnMoveCreature::FILTER_ITEMID;
+		si_onmovecreature.method = OnMoveCreature::FILTER_ITEMID;
 	}
 	else if(method == "actionid") {
-		si_oncreaturemove.method = OnMoveCreature::FILTER_ACTIONID;
+		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
 	}
 	else if(method == "uniqueid") {
-		si_oncreaturemove.method = OnMoveCreature::FILTER_UNIQUEID;
+		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
 	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
-	si_oncreaturemove.id = id;
-	si_oncreaturemove.stepIn = false;
+	si_onmovecreature.id = id;
+	si_onmovecreature.moveType = OnMoveCreature::TYPE_STEPOUT;
 
-	boost::any p(si_oncreaturemove);
-	Listener_ptr listener(new Listener(ON_STEP_CREATURE_LISTENER, p, *this->getManager()));
+	boost::any p(si_onmovecreature);
+	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
 
 	enviroment.Generic.OnMoveCreature.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+/*
+int LuaState::lua_registerGenericEvent_OnMoveCreature() {
+	// Store callback
+	insert(-3);
+
+	int id = popInteger();
+	std::string method = popString();
+
+	OnMoveCreature::ScriptInformation si_onmovecreature;
+	if(method == "itemid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_onmovecreature.id = id;
+	si_onmovecreature.moveType = OnMoveCreature::TYPE_MOVE;
+
+	boost::any p(si_onmovecreature);
+	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnMoveCreature.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+*/
+
+int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	OnMoveCreature::ScriptInformation si_onmovecreature;
+	si_onmovecreature.method = OnMoveCreature::FILTER_NONE;
+	si_onmovecreature.id = 0;
+	si_onmovecreature.moveType = OnMoveCreature::TYPE_MOVE;
+
+	boost::any p(si_onmovecreature);
+	Listener_ptr listener(
+		new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	enviroment.registerSpecificListener(listener);
+	who->addListener(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());

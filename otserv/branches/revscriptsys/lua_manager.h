@@ -213,6 +213,8 @@ public:
 	int lua_registerGenericEvent_OnDeEquipItem();
 	int lua_registerGenericEvent_OnStepInCreature();
 	int lua_registerGenericEvent_OnStepOutCreature();
+	//int lua_registerGenericEvent_OnMoveCreature();
+	int lua_registerSpecificEvent_OnMoveCreature();
 	int lua_registerGenericEvent_OnAddItemToTile();
 	int lua_registerGenericEvent_OnRemoveItemToTile();
 
