@@ -304,7 +304,7 @@ bool OnEquipItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
 
 void OnEquipItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnEquipItemEvent");
-	state.pushThing(user);
+	state.pushThing(user); 
 	state.setField(-2, "player");
 	state.pushThing(item);
 	state.setField(-2, "item");
@@ -316,7 +316,7 @@ void OnEquipItem::Event::update_instance(Manager& state, Enviroment& enviroment,
 ///////////////////////////////////////////////////////////////////////////////
 // OnMoveCreature Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when a creature move
+// Triggered when a creature moves
 
 OnMoveCreature::Event::Event(Creature* creature, Tile* tile, bool stepIn) :
 	creature(creature),
@@ -441,7 +441,7 @@ void OnMoveItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushThing(tile);
 	state.setField(-2, "tile");
 	state.pushThing(item);
-	state.setField(-2, "moveitem");
+	state.setField(-2, "item");
 	//state.pushThing(tileitem);
 	//state.setField(-2, "tileitem");
 }

@@ -39,10 +39,6 @@
 #include "beds.h"
 #include "weapons.h"
 
-#include "script_enviroment.h"
-#include "script_manager.h"
-#include "script_event.h"
-
 extern ConfigManager g_config;
 extern Game g_game;
 extern Chat g_chat;

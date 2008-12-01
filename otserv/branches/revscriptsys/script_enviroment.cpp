@@ -72,6 +72,10 @@ bool Enviroment::stopListener(ListenerList& list, uint32_t id) {
 bool Enviroment::stopListener(ListenerType type, uint32_t id) {
 	switch(type)
 	{
+		case ON_USE_ITEM_LISTENER:
+			if(stopListener(Generic.OnUseItem, id))
+				return true;
+			break;
 		case ON_SAY_LISTENER:
 			if(stopListener(Generic.OnSay, id))
 				return true;
@@ -82,6 +86,18 @@ bool Enviroment::stopListener(ListenerType type, uint32_t id) {
 			break;
 		case ON_CLOSE_CHANNEL_LISTENER:
 			if(stopListener(Generic.OnLeaveChannel, id))
+				return true;
+			break;
+		case ON_EQUIP_ITEM_LISTENER:
+			if(stopListener(Generic.OnEquipItem, id))
+				return true;
+			break;
+		case ON_STEP_CREATURE_LISTENER:
+			if(stopListener(Generic.OnMoveCreature, id))
+				return true;
+			break;
+		case ON_MOVE_ITEM_LISTENER:
+			if(stopListener(Generic.OnMoveItem, id))
 				return true;
 			break;
 		case ON_LOGIN_LISTENER:

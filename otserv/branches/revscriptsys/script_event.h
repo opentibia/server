@@ -51,6 +51,16 @@ template<class T>
 
 namespace Script {
 
+	/****************** GUIDE READ THIS TO ADD AN EVENT! *****************&*/
+	/* To add a new event
+	 * 1. Create the event class, with all it's members 
+	 *    easiest is to copy an existing event that's similar.
+	 * 2. Add the listener type to enums.h
+	 * 3. Expose a registerListener function to lua (or many)
+	 * 4. Add the class to Enviroment::stopListener
+	 * 5. Add callback from an arbitrary location in otserv source
+	 */
+
 	///////////////////////////////////////////////////////////////////////////////
 	// Event template
 
@@ -443,13 +453,6 @@ namespace Script {
 			Thing* object;
 		};
 	}
-	
-	/* To add a new event
-	 * 1. Create the event class
-	 * 2. Expose a registerListener function to lua
-	 * 3. Add the class to Enviroment::stopListener
-	 * 4. Add callback from an arbitrary location in otserv source
-	 */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
