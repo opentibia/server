@@ -977,6 +977,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You may only use one weapon.");
 		break;
 
+	case RET_CANONLYUSEONESHIELD:
+		sendCancel("You may only use one shield.");
+		break;
+
 	case RET_TOOFARAWAY:
 		sendCancel("Too far away.");
 		break;
@@ -2664,15 +2668,14 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 							if(item == leftItem && count == item->getItemCount()){
 								ret = RET_NOERROR;
 							}
-							else if(!item->isWeapon() ||
-								item->getWeaponType() == WEAPON_SHIELD ||
-								item->getWeaponType() == WEAPON_AMMO){
-									ret = RET_NOERROR;
-							}
-							else if(!leftItem->isWeapon() ||
-								leftItem->getWeaponType() == WEAPON_AMMO ||
-								leftItem->getWeaponType() == WEAPON_SHIELD){
+							else if(!item->isWeapon() || item->getWeaponType() == WEAPON_AMMO){
 								ret = RET_NOERROR;
+							}
+							else if(!leftItem->isWeapon() || leftItem->getWeaponType() == WEAPON_AMMO){
+								ret = RET_NOERROR;
+							}
+							else if(item->getWeaponType() == WEAPON_SHIELD){
+								ret = RET_CANONLYUSEONESHIELD;
 							}
 							else{
 								ret = RET_CANONLYUSEONEWEAPON;
@@ -2706,15 +2709,14 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 							if(item == rightItem && count == item->getItemCount()){
 								ret = RET_NOERROR;
 							}
-							else if(!item->isWeapon() ||
-								item->getWeaponType() == WEAPON_SHIELD ||
-								item->getWeaponType() == WEAPON_AMMO){
+							else if(!item->isWeapon() || item->getWeaponType() == WEAPON_AMMO){
 									ret = RET_NOERROR;
 							}
-							else if(!rightItem->isWeapon() ||
-								rightItem->getWeaponType() == WEAPON_AMMO ||
-								rightItem->getWeaponType() == WEAPON_SHIELD){
+							else if(!rightItem->isWeapon() || rightItem->getWeaponType() == WEAPON_AMMO){
 								ret = RET_NOERROR;
+							}
+							else if(item->getWeaponType() == WEAPON_SHIELD){
+								ret = RET_CANONLYUSEONESHIELD;
 							}
 							else{
 								ret = RET_CANONLYUSEONEWEAPON;
