@@ -64,6 +64,8 @@ enum OTBM_NodeTypes_t{
 	OTBM_TOWNS = 12,
 	OTBM_TOWN = 13,
 	OTBM_HOUSETILE = 14,
+	OTBM_WAYPOINTS = 15,
+	OTBM_WAYPOINT = 16,
 };
 
 #pragma pack(1)

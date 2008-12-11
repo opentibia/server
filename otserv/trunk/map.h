@@ -30,12 +30,12 @@ using boost::shared_ptr;
 
 #include "position.h"
 #include "item.h"
-//#include "creature.h"
 #include "iomapserialize.h"
 #include "fileloader.h"
 
 #include "tools.h"
 #include "tile.h"
+#include "waypoints.h"
 
 class Creature;
 class Player;
@@ -257,6 +257,10 @@ public:
 	bool getPathMatching(const Creature* creature, std::list<Direction>& dirList,
 		const FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp);
 
+	
+	// Waypoints on the map
+	Waypoints waypoints;
+
 protected:
 	uint32_t mapWidth, mapHeight;
 	std::string spawnfile;
@@ -282,6 +286,7 @@ protected:
 
 	void clearSpectatorCache();
 
+	// Root node of the quad tree
 	QTreeNode root;
 
 	struct RefreshBlock_t{

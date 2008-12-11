@@ -423,6 +423,44 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 				nodeTown = f.getNextNode(nodeTown, type);
 			}
 		}
+		else if(type == OTBM_WAYPOINTS){
+			NODE nodeTown = f.getChildNode(nodeMapData, type);
+			while(nodeTown != NO_NODE){
+				if(type == OTBM_WAYPOINT){
+					if(!f.getProps(nodeTown, propStream)){
+						setLastErrorString("Could not read town data.");
+						return false;
+					}
+
+					std::string name;
+					Position pos;
+
+					if(!propStream.GET_STRING(name)){
+						setLastErrorString("Could not read waypoint name.");
+						return false;
+					}
+
+					OTBM_TownTemple_coords* wp_coords;
+					if(!propStream.GET_STRUCT(wp_coords)){
+						setLastErrorString("Could not read waypoint coordinates.");
+						return false;
+					}
+
+					pos.x = wp_coords->_x;
+					pos.y = wp_coords->_y;
+					pos.z = wp_coords->_z;
+					
+					Waypoint_ptr wp(new Waypoint(name, pos));
+					map->waypoints.addWaypoint(wp);
+				}
+				else{
+					setLastErrorString("Unknown town node.");
+					return false;
+				}
+
+				nodeTown = f.getNextNode(nodeTown, type);
+			}
+		}
 		else{
 			setLastErrorString("Unknown map node.");
 			return false;
