@@ -98,8 +98,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		return false;
 	}
 
-	if(root_header->version != 1){
-		setLastErrorString("Unknown OTBM version detected.");
+	if(root_header->version > 2){
+		setLastErrorString("Unknown OTBM version detected, please update your server.");
 		return false;
 	}
 
@@ -423,7 +423,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 				nodeTown = f.getNextNode(nodeTown, type);
 			}
 		}
-		else if(type == OTBM_WAYPOINTS){
+		else if(type == OTBM_WAYPOINTS && root_header->version >= 2){
 			NODE nodeTown = f.getChildNode(nodeMapData, type);
 			while(nodeTown != NO_NODE){
 				if(type == OTBM_WAYPOINT){
