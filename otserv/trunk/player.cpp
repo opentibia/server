@@ -2665,7 +2665,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 							ret = RET_DROPTWOHANDEDITEM;
 						}
 						else if(!(item == leftItem && count == item->getItemCount())){
-							if(item->getWeaponType() != WEAPON_AMMO){
+							if(item->getWeaponType() != WEAPON_NONE && item->getWeaponType() != WEAPON_AMMO){
 								//check so we only equip one shield
 								if(item->getWeaponType() == WEAPON_SHIELD){
 									if(leftItem->getWeaponType() == WEAPON_SHIELD){
@@ -2674,8 +2674,8 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 								}
 								else{
 									//check so we can only equip one weapon
-									if(leftItem->getWeaponType() != WEAPON_SHIELD &&
-									   leftItem->getWeaponType() != WEAPON_AMMO){
+									if(	leftItem->getWeaponType() != WEAPON_SHIELD &&
+										leftItem->getWeaponType() != WEAPON_AMMO){
 										ret = RET_CANONLYUSEONEWEAPON;
 									}
 								}
@@ -2704,7 +2704,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 							ret = RET_DROPTWOHANDEDITEM;
 						}
 						else if(!(item == rightItem && count == item->getItemCount())){
-							if(item->getWeaponType() != WEAPON_AMMO){
+							if(item->getWeaponType() != WEAPON_NONE && item->getWeaponType() != WEAPON_AMMO){
 								if(item->getWeaponType() == WEAPON_SHIELD){
 									//check so we only equip one shield
 									if(rightItem->getWeaponType() == WEAPON_SHIELD){
@@ -2713,8 +2713,8 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 								}
 								else{
 									//check so we can only equip one weapon
-									if(rightItem->getWeaponType() != WEAPON_SHIELD &&
-									   rightItem->getWeaponType() != WEAPON_AMMO){
+									if(	rightItem->getWeaponType() != WEAPON_SHIELD &&
+										rightItem->getWeaponType() != WEAPON_AMMO){
 										ret = RET_CANONLYUSEONEWEAPON;
 									}
 								}

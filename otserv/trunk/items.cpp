@@ -770,6 +770,9 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "duration"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									if(intValue < 0){
+										intValue = 0;
+									}
 									it.decayTime = intValue;
 								}
 							}

@@ -150,9 +150,6 @@ void Game::setGameState(GameState_t newState)
 					boost::bind(&Game::shutdown, this)));
 				Scheduler::getScheduler().stop();
 				Dispatcher::getDispatcher().stop();
-				if(g_server){
-					g_server->stop();
-				}
 				break;
 			}
 
@@ -4180,7 +4177,11 @@ void Game::checkDecay()
 
 	for(DecayList::iterator it = decayItems[bucket].begin(); it != decayItems[bucket].end();){
 		Item* item = *it;
-		item->decreaseDuration(EVENT_DECAYINTERVAL*EVENT_DECAY_BUCKETS);
+		int32_t decreaseTime = EVENT_DECAYINTERVAL*EVENT_DECAY_BUCKETS;
+		if(item->getDuration() - decreaseTime < 0){
+			decreaseTime = item->getDuration();
+		}
+		item->decreaseDuration(decreaseTime);
 		//std::cout << "checkDecay: " << item << ", id:" << item->getID() << ", name: " << item->getName() << ", duration: " << item->getDuration() << std::endl;
 
 		if(!item->canDecay()){
@@ -4357,8 +4358,13 @@ void Game::shutdown()
 	Spawns::getInstance()->clear();
 	g_bans.clearTemporaryBans();
 
-	std::cout << "[done]" << std::endl;
 	cleanup();
+
+	if(g_server){
+		g_server->stop();
+	}
+
+	std::cout << "[done]" << std::endl;
 }
 
 void Game::cleanup()

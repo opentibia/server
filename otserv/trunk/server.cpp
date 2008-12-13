@@ -25,6 +25,7 @@
 
 #include "server.h"
 #include "connection.h"
+#include "outputmessage.h"
 
 Server::Server(uint32_t serverip, uint16_t port)
 : m_io_service()
@@ -117,11 +118,12 @@ void Server::onAccept(Connection* connection, const boost::system::error_code& e
 void Server::stop()
 {
 	m_isOpen = false;
+	OutputMessagePool::getInstance()->stop();
 	m_io_service.post(boost::bind(&Server::onStopServer, this));
 }
 
 void Server::onStopServer()
 {
 	closeListenSocket();
-	ConnectionManager::getInstance()->closeAll();
+	//ConnectionManager::getInstance()->closeAll();
 }
