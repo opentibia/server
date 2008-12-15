@@ -38,9 +38,8 @@
 extern ConfigManager g_config;
 extern Game g_game;
 
-#define STATUS_SERVER_VERSION "0.6.0_SVN"
-//#define STATUS_SERVER_VERSION "0.6.0"
-#define STATUS_SERVER_NAME "otserv"
+#define STATUS_SERVER_VERSION "0.6.0"
+#define STATUS_SERVER_NAME "OTServ SVN"
 #define STATUS_CLIENT_VERISON "8.31"
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -306,6 +305,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 
 	if(requestedInfo & REQUEST_SERVER_SOFTWARE_INFORMATION){
 		output->AddByte(0x23) // server software info
+		output->AddString(STATUS_SERVER_NAME);
 		output->AddString(STATUS_SERVER_VERSION);
 		output->AddString(STATUS_CLIENT_VERSION);
 	}
