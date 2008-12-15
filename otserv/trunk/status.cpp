@@ -41,7 +41,7 @@ extern Game g_game;
 #define STATUS_SERVER_VERSION "0.6.0_SVN"
 //#define STATUS_SERVER_VERSION "0.6.0"
 #define STATUS_SERVER_NAME "otserv"
-#define STATUS_CLIENT_VERISON "8.0"
+#define STATUS_CLIENT_VERISON "8.31"
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 uint32_t ProtocolStatus::protocolStatusCount = 0;
@@ -55,6 +55,7 @@ enum RequestedInfo_t{
 	REQUEST_MAP_INFO           = 0x10,
 	REQUEST_EXT_PLAYERS_INFO   = 0x20,
 	REQUEST_PLAYER_STATUS_INFO = 0x40,
+	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80,
 };
 
 std::map<uint32_t, int64_t> ProtocolStatus::ipConnectMap;
@@ -301,6 +302,12 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 		else{
 			output->AddByte(0x00);
 		}
+	}
+
+	if(requestedInfo & REQUEST_SERVER_SOFTWARE_INFORMATION){
+		output->AddByte(0x23) // server software info
+		output->AddString(STATUS_SERVER_VERSION);
+		output->AddString(STATUS_CLIENT_VERSION);
 	}
 
 	return;
