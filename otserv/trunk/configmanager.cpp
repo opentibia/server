@@ -126,7 +126,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
 	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
-	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 5 * 60 * 1000);
+	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
 	m_isLoaded = true;
 
 	lua_close(L);

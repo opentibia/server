@@ -126,7 +126,7 @@ saveclientdebug = 0
 -- Set the max query interval for retrieving status information
 -- default: 5 minutes / IP
 -- set to 0 to disable
-statustimeout = 5 * 60 * 1000
+statustimeout = 30 * 1000
 
 -- accounts password type
 -- options: plain, md5, sha1
