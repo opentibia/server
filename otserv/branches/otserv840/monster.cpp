@@ -31,6 +31,7 @@
 #include "combat.h"
 #include "spawn.h"
 #include "configmanager.h"
+#include "party.h"
 
 extern Game g_game;
 extern ConfigManager g_config;
@@ -1158,16 +1159,16 @@ Item* Monster::getCorpse()
 		Creature* mostDamageCreature = NULL;
 
 		if(getKillers(&lastHitCreature, &mostDamageCreature) && mostDamageCreature){
-			uint32_t corpseOwner = 0;
+			Player* corpseOwner = NULL;
 			if(mostDamageCreature->getPlayer()){
-				corpseOwner = mostDamageCreature->getID();
+				corpseOwner = mostDamageCreature->getPlayer();
 			}
 			else if(mostDamageCreature->getMaster() && mostDamageCreature->getMaster()->getPlayer()){
-				corpseOwner = mostDamageCreature->getMaster()->getID();
+				corpseOwner = mostDamageCreature->getMaster()->getPlayer();
 			}
 
-			if(corpseOwner != 0){
-				corpse->setCorpseOwner(corpseOwner);
+			if(corpseOwner != NULL){
+				corpse->setCorpseOwner(corpseOwner->getID());
 			}
 		}
 	}
@@ -1287,6 +1288,10 @@ void Monster::dropLoot(Container* corpse)
 {
 	if(corpse && lootDrop){
 		mType->createLoot(corpse);
+		Player* killer = g_game.getPlayerByID(corpse->getCorpseOwner());
+		if(killer && killer->getParty()){
+			killer->getParty()->broadcastLoot(this, corpse->getContainer());
+		}
 	}
 }
 

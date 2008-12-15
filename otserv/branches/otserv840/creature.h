@@ -446,7 +446,7 @@ protected:
 	virtual uint16_t getLookCorpse() const { return 0; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 	virtual void die() {};
-	virtual void dropCorpse();
+	virtual Item* dropCorpse();
 	virtual Item* getCorpse();
 
 	friend class Game;

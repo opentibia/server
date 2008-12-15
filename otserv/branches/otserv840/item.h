@@ -274,6 +274,8 @@ public:
 
 	static std::string getDescription(const ItemType& it, int32_t lookDistance,
 		const Item* item = NULL, int32_t subType = -1, bool addArticle = true);
+	static std::string getLongName(const ItemType& it, int32_t lookDistance,
+		const Item* item = NULL, int32_t subType = -1, bool addArticle = true);
 	static std::string getWeightDescription(const ItemType& it, double weight, uint32_t count = 1);
 
 	//serialization
@@ -343,6 +345,7 @@ public:
 
 	const std::string& getName() const {return items[id].name;}
 	const std::string& getPluralName() const {return items[id].pluralName;}
+	std::string getLongName() const;
 
 	// get the number of items
 	uint16_t getItemCount() const {return count;}

@@ -28,6 +28,7 @@
 #include "condition.h"
 #include "combat.h"
 #include "configmanager.h"
+#include "party.h"
 
 #include <string>
 #include <sstream>
@@ -745,7 +746,7 @@ void Creature::onDie()
 	}
 }
 
-void Creature::dropCorpse()
+Item* Creature::dropCorpse()
 {
 	Item* splash = NULL;
 	switch(getRace()){
@@ -787,6 +788,8 @@ void Creature::dropCorpse()
 	}
 
 	g_game.removeCreature(this, false);
+
+	return corpse;
 }
 
 bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCreature)

@@ -59,6 +59,7 @@ public:
 
 	uint32_t getItemHoldingCount() const;
 	virtual double getWeight() const;
+	std::string getContentDescription() const;
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -101,6 +102,8 @@ private:
 
 
 protected:
+	std::ostringstream& getContentDescription(std::ostringstream& os) const;
+
 	uint32_t maxSize;
 	double total_weight;
 	ItemList itemlist;

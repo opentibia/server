@@ -144,31 +144,33 @@ enum SpeakClasses {
 	SPEAK_PRIVATE_PN		= 0x04, //Player-to-NPC speaking(NPCs channel)
 	SPEAK_PRIVATE_NP		= 0x05, //NPC-to-Player speaking
 	SPEAK_PRIVATE			= 0x06, //Players speaking privately to players
-	SPEAK_CHANNEL_Y     	= 0x07,	//Yellow message on chat
-	SPEAK_RVR_CHANNEL		= 0x08, //Reporting rule violation - Ctrl+R
-	SPEAK_RVR_ANSWER		= 0x09, //Answering report
-	SPEAK_RVR_CONTINUE		= 0x0A, //Answering the answer of the report
-	SPEAK_BROADCAST     	= 0x0B,	//Broadcast a message - #b
-	SPEAK_CHANNEL_R1    	= 0x0C,	//Talk red on chat - #c
-	SPEAK_PRIVATE_RED   	= 0x0D,	//Red private - @name@ text
-	SPEAK_CHANNEL_O     	= 0x0E,	//Talk orange on text
-	//SPEAK_                = 0x0F, //?
-	SPEAK_CHANNEL_R2    	= 0x10,	//Talk red anonymously on chat - #d
-	//SPEAK_                = 0x11, //?
-	SPEAK_MONSTER_SAY   	= 0x12,	//Talk orange
-	SPEAK_MONSTER_YELL  	= 0x13,	//Yell orange
+	SPEAK_CHANNEL_Y     	= 0x07,	//Yellow message in chat
+	SPEAK_CHANNEL_W         = 0x08, //White message in chat
+	SPEAK_RVR_CHANNEL		= 0x09, //Reporting rule violation - Ctrl+R
+	SPEAK_RVR_ANSWER		= 0x0A, //Answering report
+	SPEAK_RVR_CONTINUE		= 0x0B, //Answering the answer of the report
+	SPEAK_BROADCAST     	= 0x0C,	//Broadcast a message - #b
+	SPEAK_CHANNEL_R1    	= 0x0D,	//Talk red on chat - #c
+	SPEAK_PRIVATE_RED   	= 0x0E,	//Red private - @name@ text
+	SPEAK_CHANNEL_O     	= 0x0F,	//Talk orange on text
+	//SPEAK_                = 0x10, //?
+	SPEAK_CHANNEL_R2    	= 0x11,	//Talk red anonymously on chat - #d
+	//SPEAK_                = 0x12, //?
+	SPEAK_MONSTER_SAY   	= 0x13,	//Talk orange
+	SPEAK_MONSTER_YELL  	= 0x14,	//Yell orange
 };
 
 enum MessageClasses {
 	MSG_STATUS_CONSOLE_RED		= 0x11, //Red message in the console
-	MSG_STATUS_CONSOLE_ORANGE	= 0x13, //Orange message in the console
-	MSG_STATUS_WARNING			= 0x14, //Red message in game window and in the console
-	MSG_EVENT_ADVANCE			= 0x15, //White message in game window and in the console
-	MSG_EVENT_DEFAULT			= 0x16, //White message at the bottom of the game window and in the console
-	MSG_STATUS_DEFAULT			= 0x17, //White message at the bottom of the game window and in the console
-	MSG_INFO_DESCR				= 0x18, //Green message in game window and in the console
-	MSG_STATUS_SMALL			= 0x19, //White message at the bottom of the game window"
-	MSG_STATUS_CONSOLE_BLUE		= 0x1A, //Blue message in the console
+	MSG_STATUS_CONSOLE_ORANGE2	= 0x13, //Orange message in the console
+	MSG_STATUS_CONSOLE_ORANGE	= 0x14, //Orange message in the console
+	MSG_STATUS_WARNING			= 0x15, //Red message in game window and in the console
+	MSG_EVENT_ADVANCE			= 0x16, //White message in game window and in the console
+	MSG_EVENT_DEFAULT			= 0x17, //White message at the bottom of the game window and in the console
+	MSG_STATUS_DEFAULT			= 0x18, //White message at the bottom of the game window and in the console
+	MSG_INFO_DESCR				= 0x19, //Green message in game window and in the console
+	MSG_STATUS_SMALL			= 0x1A, //White message at the bottom of the game window"
+	MSG_STATUS_CONSOLE_BLUE		= 0x1B, //Blue message in the console
 };
 
 enum FluidColors_t {
@@ -273,7 +275,8 @@ enum Icons_t{
 	ICON_DROWNING   = 256,
 	ICON_FREEZING   = 512,
 	ICON_DAZZLED    = 1024,
-	ICON_CURSED     = 2048
+	ICON_CURSED     = 2048,
+	ICON_PARTY_BUFF = 4096,
 };
 
 enum WeaponType_t {

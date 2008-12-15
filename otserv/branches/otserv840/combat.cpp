@@ -28,6 +28,7 @@
 #include "const.h"
 #include "tools.h"
 #include "weapons.h"
+#include "party.h"
 
 #include <sstream>
 

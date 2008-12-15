@@ -40,6 +40,7 @@
 #include "creatureevent.h"
 #include "status.h"
 #include "beds.h"
+#include "party.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -2350,7 +2351,7 @@ void Player::die()
 	}
 }
 
-void Player::dropCorpse()
+Item* Player::dropCorpse()
 {
 	if(getZone() == ZONE_PVP){
 		preSave();
@@ -2360,9 +2361,10 @@ void Player::dropCorpse()
 		g_game.internalTeleport(this, getTemplePosition());
 		g_game.addCreatureHealth(this);
 		onThink(EVENT_CREATURE_THINK_INTERVAL);
+		return NULL;
 	}
 	else{
-		Creature::dropCorpse();
+		return Creature::dropCorpse();
 	}
 }
 

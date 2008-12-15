@@ -213,6 +213,48 @@ double Container::getWeight() const
 	*/
 }
 
+std::string Container::getContentDescription() const
+{
+	std::ostringstream os;
+	return getContentDescription(os).str();
+}
+
+std::ostringstream& Container::getContentDescription(std::ostringstream& os) const
+{
+	std::list<const Container*> listContainer;
+	ItemList::const_iterator cit;
+	const Container* tmpContainer = NULL;
+
+	listContainer.push_back(this);
+	
+	bool firstitem = true;
+
+	while(listContainer.size() > 0){
+		const Container* container = listContainer.front();
+		listContainer.pop_front();
+
+		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
+			Item* i = *cit;
+				
+			if(firstitem)
+				firstitem = false;
+			else
+				os << ", ";
+
+			os << i->getLongName();
+
+			if(tmpContainer = (*cit)->getContainer()){
+				listContainer.push_back(tmpContainer);
+			}
+		}
+	}
+
+	if(firstitem)
+		os << "nothing";
+
+	return os;
+}
+
 Item* Container::getItem(uint32_t index)
 {
 	size_t n = 0;			

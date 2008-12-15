@@ -23,10 +23,12 @@
 #include "party.h"
 #include "player.h"
 #include "game.h"
+#include "chat.h"
 
 #include <sstream>
 
 extern Game g_game;
+extern Chat g_chat;
 
 Party::Party(Player* _leader)
 {
@@ -46,6 +48,8 @@ Party::~Party()
 
 void Party::disband()
 {
+	g_chat.deleteChannel(this);
+
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, "Your party has been disbanded.");
 	getLeader()->setParty(NULL);
 	getLeader()->sendPlayerPartyIcons(getLeader());
@@ -88,7 +92,12 @@ bool Party::invitePlayer(Player* player)
 	player->addPartyInvitation(this);
 
 	std::stringstream ss;
-	ss << player->getName() << " has been invited.";
+	
+	if(inviteList.empty() && memberList.empty()) {
+		ss << player->getName() << " has been invited.";
+	} else {
+		ss << player->getName() << " has been invited. Open the party channel to communicate with other members.";
+	}
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
 	ss.str("");
@@ -202,6 +211,10 @@ bool Party::leaveParty(Player* player)
 	if(!isPlayerMember(player) && getLeader() != player){
 		return false;
 	}
+
+	// Remove from chat
+	g_chat.removeUserFromChannel(player, CHANNEL_PARTY);
+
 
 	bool hasNoLeader = false;
 	if(getLeader() == player){
@@ -321,6 +334,17 @@ void Party::broadcastPartyMessage(MessageClasses msgClass, const std::string& ms
 	}
 }
 
+void Party::broadcastLoot(Creature* creature, Container* corpse)
+{
+	std::ostringstream os;
+
+	os << "Loot of " << creature->getName() << ": " << corpse->getContentDescription();
+
+	ChatChannel* channel = g_chat.getChannel(this);
+	if(channel)
+		channel->sendInfo(SPEAK_CHANNEL_W, os.str(), std::time(NULL));
+}
+
 void Party::updateSharedExperience()
 {
 	if(sharedExpActive){
@@ -364,7 +388,7 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 
 void Party::shareExperience(uint64_t experience)
 {
-	uint32_t shareExperience = (uint64_t)std::ceil(((double)experience / (memberList.size() + 1)));
+	uint32_t shareExperience = (uint64_t)std::ceil(((double)experience * (1. + memberList.size() * 0.05)) / (memberList.size() + 1));
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
 		(*it)->onGainSharedExperience(shareExperience);
 	}
