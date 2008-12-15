@@ -85,10 +85,12 @@ void PrivateChatChannel::excludePlayer(Player* player, Player* excludePlayer)
 	if(player != excludePlayer && removeInvited(excludePlayer)){
 		removeUser(excludePlayer);
 
-		std::string msg;
-		msg = excludePlayer->getName();
-		msg += " has been excluded.";
-		player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		if(player) {
+			std::string msg;
+			msg = excludePlayer->getName();
+			msg += " has been excluded.";
+			player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		}
 
 		excludePlayer->sendClosePrivate(getId());
 	}
@@ -256,7 +258,7 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 		if(player->getParty() == NULL)
 			return NULL;
 
-		ChatChannel *newChannel = new ChatChannel(channelId, "Party Channel");
+		PrivateChatChannel *newChannel = new PrivateChatChannel(channelId, "Party");
 		m_partyChannels[player->getParty()] = newChannel;
 		return newChannel;
 	}
@@ -300,7 +302,7 @@ bool Chat::deleteChannel(Player* player, uint16_t channelId)
 		PartyChannelMap::iterator it = m_partyChannels.find(player->getParty());
 		if(it == m_partyChannels.end())
 			return false;
-
+		it->second->closeChannel();
 		delete it->second;
 		m_partyChannels.erase(it);
 		return true;
@@ -326,7 +328,8 @@ bool Chat::deleteChannel(Party* party)
 	if(it == m_partyChannels.end())
 		return false;
 
-	ChatChannel* cc = it->second;
+	PrivateChatChannel* cc = it->second;
+	cc->closeChannel();
 	m_partyChannels.erase(it);
 	delete cc;
 	return true;
@@ -378,17 +381,13 @@ bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& t
 {
 	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel) {
-		if(channelId == CHANNEL_PARTY){
-			// Party channel
-			player->sendToChannel(player, SPEAK_CHANNEL_R1, "The channel has been closed. You need to re-join the channel if you get invited.", channelId);
-		}
 		return false;
 	}
 
 	switch(channelId){
-		case 0x08:
+		case CHANNEL_HELP:
 		{
-			//0x08 is the channelId of Help channel
+			// Help channel
 			if(type == SPEAK_CHANNEL_Y && player->hasFlag(PlayerFlag_TalkOrangeHelpChannel)){
 				type = SPEAK_CHANNEL_O;
 			}
@@ -432,6 +431,7 @@ ChannelList Chat::getChannelList(Player* player)
 		else if((channel = createChannel(player, CHANNEL_GUILD)))
 			list.push_back(channel);
 	}
+
 	if(player->getParty()){
 		ChatChannel *channel = getChannel(player, CHANNEL_PARTY);
 

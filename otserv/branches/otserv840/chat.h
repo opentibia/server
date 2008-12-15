@@ -126,7 +126,7 @@ private:
 
 	typedef std::map<uint16_t, ChatChannel*> NormalChannelMap;
 	typedef std::map<uint32_t, ChatChannel*> GuildChannelMap;
-	typedef std::map<Party*, ChatChannel*> PartyChannelMap;
+	typedef std::map<Party*, PrivateChatChannel*> PartyChannelMap;
 	NormalChannelMap m_normalChannels;
 	GuildChannelMap m_guildChannels;
 	PartyChannelMap m_partyChannels;

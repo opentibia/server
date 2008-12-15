@@ -19,16 +19,17 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "items.h"
 #include "party.h"
 #include "player.h"
 #include "game.h"
 #include "chat.h"
+#include "configmanager.h"
 
 #include <sstream>
 
 extern Game g_game;
 extern Chat g_chat;
+extern ConfigManager g_config;
 
 Party::Party(Player* _leader)
 {
@@ -213,7 +214,8 @@ bool Party::leaveParty(Player* player)
 	}
 
 	// Remove from chat
-	g_chat.removeUserFromChannel(player, CHANNEL_PARTY);
+	PrivateChatChannel* pcc = static_cast<PrivateChatChannel*>(g_chat.getChannel(this));
+	pcc->excludePlayer(NULL, player);
 
 
 	bool hasNoLeader = false;
@@ -388,12 +390,18 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 
 void Party::shareExperience(uint64_t experience)
 {
-	uint32_t shareExperience = (uint64_t)std::ceil(((double)experience * (1. + memberList.size() * 0.05)) / (memberList.size() + 1));
+	double member_factor = g_config.getNumber(ConfigManager::PARTY_MEMBER_EXP_BONUS);
+	double xpgained = experience / (memberList.size() + 1) + experience * member_factor;
+
+	if(xpgained < 0)
+		return;
+	uint64_t shareExp = (uint64_t)std::ceil(xpgained);
+	
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
-		(*it)->onGainSharedExperience(shareExperience);
+		(*it)->onGainSharedExperience(shareExp);
 	}
 
-	getLeader()->onGainSharedExperience(shareExperience);
+	getLeader()->onGainSharedExperience(shareExp);
 }
 
 bool Party::canUseSharedExperience(const Player* player) const
