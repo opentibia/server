@@ -984,7 +984,7 @@ bool Houses::payHouses()
 
 				//get money from depot
 				if(hasEnoughMoney){
-					uint32_t paidUntil;
+					uint32_t paidUntil = currentTime;
 					switch(rentPeriod){
 					case RENTPERIOD_DAILY:
 						paidUntil += 24 * 60 * 60;
@@ -1000,7 +1000,6 @@ bool Houses::payHouses()
 						break;
 					case RENTPERIOD_NEVER:
 					default:
-						paidUntil = currentTime;
 						break;
 					}
 

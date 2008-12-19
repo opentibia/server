@@ -597,7 +597,7 @@ bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std:
 
 	Creature* paramCreature = g_game.getCreatureByName(param);
 	if(paramCreature){
-		destPos = creature->getPosition();
+		destPos = paramCreature->getPosition();
 	}
 
 	Waypoint_ptr waypoint = g_game.getMap()->waypoints.getWaypointByName(param);
@@ -606,7 +606,7 @@ bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std:
 	}
 
 	if(destPos != Position(0, 0, 0)) {
-		if(g_game.internalTeleport(creature, paramCreature->getPosition()) == RET_NOERROR){
+		if(g_game.internalTeleport(creature, destPos) == RET_NOERROR){
 			g_game.addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 			return true;
 		}

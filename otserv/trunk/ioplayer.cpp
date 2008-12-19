@@ -627,11 +627,14 @@ bool IOPlayer::savePlayer(Player* player)
 	//save vip list
 	stmt.setQuery("INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES ");
 
+	std::string vipName;
 	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
-		query << player->getGUID() << ", " << *it;
+		if(IOPlayer::instance()->getNameByGuid(*it, vipName)){
+			query << player->getGUID() << ", " << *it;
 
-		if(!stmt.addRow(query)){
-			return false;
+			if(!stmt.addRow(query)){
+				return false;
+			}
 		}
 	}
 

@@ -40,7 +40,7 @@ extern Game g_game;
 
 #define STATUS_SERVER_VERSION "0.6.0"
 #define STATUS_SERVER_NAME "OTServ SVN"
-#define STATUS_CLIENT_VERISON "8.31"
+#define STATUS_CLIENT_VERSION "8.31"
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 uint32_t ProtocolStatus::protocolStatusCount = 0;
@@ -167,7 +167,7 @@ std::string Status::getStatusString() const
 	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getString(ConfigManager::URL).c_str());
 	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)STATUS_SERVER_NAME);
 	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)STATUS_SERVER_VERSION);
-	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)STATUS_CLIENT_VERISON);
+	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)STATUS_CLIENT_VERSION);
 	xmlAddChild(root, p);
 
 	p = xmlNewNode(NULL,(const xmlChar*)"owner");
@@ -304,7 +304,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 	}
 
 	if(requestedInfo & REQUEST_SERVER_SOFTWARE_INFORMATION){
-		output->AddByte(0x23) // server software info
+		output->AddByte(0x23); // server software info
 		output->AddString(STATUS_SERVER_NAME);
 		output->AddString(STATUS_SERVER_VERSION);
 		output->AddString(STATUS_CLIENT_VERSION);

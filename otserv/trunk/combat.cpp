@@ -668,7 +668,13 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 					itemId = ITEM_ENERGYFIELD_NOPVP;
 				}
 			} else if(params.isAggressive){
-				p_caster->addInFightTicks(true);
+				const ItemType& it = Item::items[itemId];
+				if(!it.blockSolid){
+					p_caster->addInFightTicks(true);
+				}
+				else{
+					p_caster->addInFightTicks();
+				}
 			}
 		}
 		Item* item = Item::CreateItem(itemId);

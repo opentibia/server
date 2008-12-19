@@ -52,7 +52,7 @@ inline void Waypoints::addWaypoint(Waypoint_ptr wp)
 inline Waypoint_ptr Waypoints::getWaypointByName(const std::string& name) const
 {
 	WaypointMap::const_iterator f = waypoints.find(name);
-	if(f != waypoints.end()) {
+	if(f == waypoints.end()) {
 		return Waypoint_ptr();
 	}
 	return f->second;
