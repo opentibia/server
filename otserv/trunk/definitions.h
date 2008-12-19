@@ -24,6 +24,11 @@
 
 #include "exception.h"
 
+
+#define OTSERV_VERSION "0.6.1_SVN"
+#define OTSERV_NAME "OTServ"
+#define OTSERV_CLIENT_VERSION "8.31"
+
 #if defined(WIN32) && !defined(__WINDOWS__)
 #define __WINDOWS__
 #endif

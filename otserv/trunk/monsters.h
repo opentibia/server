@@ -39,6 +39,8 @@ struct LootBlock{
 
 	typedef std::list<LootBlock> LootItems;
 	LootItems childLoot;
+	bool dropEmpty;
+
 	LootBlock(){
 		id = 0;
 		countmax = 0;
@@ -47,6 +49,7 @@ struct LootBlock{
 		subType = -1;
 		actionId = -1;
 		text = "";
+		dropEmpty = false;
 	}
 };
 

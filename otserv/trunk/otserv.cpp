@@ -114,9 +114,7 @@ int main(int argc, char *argv[])
 	ExceptionHandler mainExceptionHandler;
 	mainExceptionHandler.InstallHandler();
 #endif
-	//std::cout << ":: OTServ Development-Version 0.6.0 - SVN Preview" << std::endl;
-	//std::cout << ":: ==============================================" << std::endl;
-	std::cout << ":: OTServ Version 0.6.0" << std::endl;
+	std::cout << ":: " OTSERV_NAME " Version " OTSERV_VERSION << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 

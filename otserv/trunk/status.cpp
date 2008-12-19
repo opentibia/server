@@ -38,10 +38,6 @@
 extern ConfigManager g_config;
 extern Game g_game;
 
-#define STATUS_SERVER_VERSION "0.6.0"
-#define STATUS_SERVER_NAME "OTServ SVN"
-#define STATUS_CLIENT_VERSION "8.31"
-
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 uint32_t ProtocolStatus::protocolStatusCount = 0;
 #endif
@@ -165,9 +161,9 @@ std::string Status::getStatusString() const
 
 	xmlSetProp(p, (const xmlChar*) "location", (const xmlChar*)g_config.getString(ConfigManager::LOCATION).c_str());
 	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getString(ConfigManager::URL).c_str());
-	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)STATUS_SERVER_NAME);
-	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)STATUS_SERVER_VERSION);
-	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)STATUS_CLIENT_VERSION);
+	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)OTSERV_NAME);
+	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)OTSERV_VERSION);
+	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)OTSERV_CLIENT_VERSION);
 	xmlAddChild(root, p);
 
 	p = xmlNewNode(NULL,(const xmlChar*)"owner");
@@ -262,7 +258,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 		output->AddString(g_config.getString(ConfigManager::URL).c_str());
 		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
 		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
-		output->AddString(STATUS_SERVER_VERSION);
+		output->AddString(OTSERV_VERSION);
 	}
 
 	if(requestedInfo & REQUEST_PLAYERS_INFO){
@@ -305,9 +301,9 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 
 	if(requestedInfo & REQUEST_SERVER_SOFTWARE_INFORMATION){
 		output->AddByte(0x23); // server software info
-		output->AddString(STATUS_SERVER_NAME);
-		output->AddString(STATUS_SERVER_VERSION);
-		output->AddString(STATUS_CLIENT_VERSION);
+		output->AddString(OTSERV_NAME);
+		output->AddString(OTSERV_VERSION);
+		output->AddString(OTSERV_CLIENT_VERSION);
 	}
 
 	return;

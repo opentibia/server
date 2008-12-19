@@ -191,7 +191,7 @@ void MonsterType::createLootContainer(Container* parent, const LootBlock& lootbl
 			if(tmpItem){
 				if(Container* container = tmpItem->getContainer()){
 					createLootContainer(container, *it);
-					if(container->size() == 0){
+					if(container->size() == 0 && it->dropEmpty == false){
 						delete container;
 					}
 					else{
@@ -1367,6 +1367,10 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 
 	if(readXMLString(node, "text", strValue)){
 		lootBlock.text = strValue;
+	}
+
+	if(readXMLString(node, "dropEmpty", strValue)){
+		lootBlock.dropEmpty = (asLowerCaseString(strValue) == "true");
 	}
 
 	return true;
