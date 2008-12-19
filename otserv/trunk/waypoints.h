@@ -36,7 +36,7 @@ public:
 	// Does not require either constructor nor destructor
 
 	void addWaypoint(Waypoint_ptr wp);
-	Waypoint_ptr Waypoints::getWaypointByName(const std::string& name) const;
+	Waypoint_ptr getWaypointByName(const std::string& name) const;
 
 protected:
 	typedef std::map<std::string, Waypoint_ptr> WaypointMap;

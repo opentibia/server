@@ -593,23 +593,20 @@ bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const 
 
 bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Position destPos(0, 0, 0);
-
-	Creature* paramCreature = g_game.getCreatureByName(param);
-	if(paramCreature){
-		destPos = paramCreature->getPosition();
-	}
-
-	Waypoint_ptr waypoint = g_game.getMap()->waypoints.getWaypointByName(param);
-	if(waypoint) {
+	Position destPos;
+	if(Waypoint_ptr waypoint = g_game.getMap()->waypoints.getWaypointByName(param)){
 		destPos = waypoint->pos;
 	}
+	else if(Creature* paramCreature = g_game.getCreatureByName(param)){
+		destPos = paramCreature->getPosition();
+	}
+	else{
+		return false;
+	}
 
-	if(destPos != Position(0, 0, 0)) {
-		if(g_game.internalTeleport(creature, destPos) == RET_NOERROR){
-			g_game.addMagicEffect(destPos, NM_ME_ENERGY_AREA);
-			return true;
-		}
+	if(g_game.internalTeleport(creature, destPos) == RET_NOERROR){
+		g_game.addMagicEffect(destPos, NM_ME_ENERGY_AREA);
+		return true;
 	}
 
 	return false;

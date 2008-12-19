@@ -125,8 +125,7 @@ CREATE TABLE "player_storage" (
 CREATE TABLE "player_viplist" (
     "player_id" INTEGER NOT NULL,
     "vip_id" INTEGER NOT NULL,
-    FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
-    FOREIGN KEY ("vip_id") REFERENCES "players" ("id")
+    FOREIGN KEY ("player_id") REFERENCES "players" ("id")
 );
 
 CREATE TABLE "tiles" (

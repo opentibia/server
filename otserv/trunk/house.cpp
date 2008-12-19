@@ -999,7 +999,6 @@ bool Houses::payHouses()
 						paidUntil += 24 * 60 * 60 * 365;
 						break;
 					case RENTPERIOD_NEVER:
-					default:
 						break;
 					}
 
