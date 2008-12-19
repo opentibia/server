@@ -276,10 +276,10 @@ void LuaState::pushThing(Thing* thing) {
 		Item* item = thing->getItem();
 		Script::ObjectID* objid;
 
-		if(const Container* container = item->getContainer()) {
+		if(item->getContainer()) {
 			objid = pushClassInstance("Container");
 		}
-		else if(const Teleport* teleport = item->getTeleport()) {
+		else if(item->getTeleport()) {
 			objid = pushClassInstance("Teleport");
 		}
 		else {
@@ -567,7 +567,7 @@ int32_t LuaThread::run(int args) {
 		std::cout << "Line\tFunction\t\tSource\n";
 
 		lua_Debug ar;
-		
+
 		int level = 0;
 		while(lua_getstack(state, ++level, &ar) != 0) {
 			lua_getinfo(state, "nSl", &ar);
@@ -576,7 +576,7 @@ int32_t LuaThread::run(int args) {
 				std::cout << ar.currentline;
 			}
 			std::cout << "\t";
-			
+
 			int tabcount = 16;
 			if(ar.name) {
 				std::cout << ar.name;

@@ -22,6 +22,9 @@
 #include "boost_common.h"
 #include <boost/any.hpp>
 
+#include <vector>
+#include <string>
+
 #include "enums.h"
 
 namespace Script {
@@ -42,10 +45,10 @@ namespace Script {
 
 		std::string getLuaTag() const;
 		const boost::any& getData() const;
-		
+
 		bool isActive() const {return active;}
 		void deactivate();
-		
+
 		ListenerType type() const {return type_;}
 		static std::string type2name();
 		static ListenerType name2type();

@@ -74,7 +74,7 @@ void House::setHouseOwner(uint32_t guid)
 	if(houseOwner){
 		//send items to depot
 		transferToDepot();
-		
+
 		PlayerVector to_kick;
 		for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
 			for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
@@ -292,9 +292,9 @@ bool House::transferToDepot()
 	return true;
 }
 
-void House::cleanHouse() {	
+void House::cleanHouse() {
 	transferToDepot();
-	
+
 	PlayerVector to_kick;
 	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
 		for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
@@ -751,7 +751,7 @@ void Door::setHouse(House* _house)
 		return;
 	}
 	house = _house;
-	
+
 	if(!accessList){
 		accessList = new AccessList();
 	}
@@ -998,6 +998,8 @@ bool Houses::payHouses()
 					case RENTPERIOD_YEARLY:
 						paidUntil += 24 * 60 * 60 * 365;
 						break;
+					case RENTPERIOD_NEVER:
+						break;
 					}
 
 					house->setPaidUntil(paidUntil);
@@ -1032,6 +1034,10 @@ bool Houses::payHouses()
 
 							case RENTPERIOD_YEARLY:
 								period = "annual";
+							break;
+
+							case RENTPERIOD_NEVER:
+								period = "never";
 							break;
 						}
 

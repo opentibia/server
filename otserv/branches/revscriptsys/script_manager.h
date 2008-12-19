@@ -32,7 +32,7 @@ namespace Script {
 	class Manager : public LuaStateManager {
 	public:
 		Manager(Enviroment& e);
-		~Manager();
+		virtual ~Manager();
 
 		// Event handling
 		bool dispatchEvent(Event& event);
@@ -62,7 +62,7 @@ namespace Script {
 		};
 
 		typedef shared_ptr<ComposedCallback> ComposedCallback_ptr;
-		typedef std::map<uint32_t, ComposedCallback_ptr> FunctionMap; 
+		typedef std::map<uint32_t, ComposedCallback_ptr> FunctionMap;
 
 		std::map<std::string, LuaClassType_ptr> class_list;
 		FunctionMap function_map;
@@ -71,7 +71,7 @@ namespace Script {
 		// Expose functions/classes to lua
 		void registerClass(const std::string& cname);
 		void registerClass(const std::string& cname, const std::string& parent_class);
-		
+
 		void registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc);
 		void registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc);
 
@@ -86,12 +86,12 @@ namespace Script {
 
 		friend class LuaClassType;
 	};
-	
+
 
 	class LuaClassType {
 	public:
 		LuaClassType(Manager& manager, std::string name, std::string parent_name = "");
-		
+
 		bool isType(const std::string& type) const;
 	protected:
 		Manager& manager;

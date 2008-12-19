@@ -336,7 +336,7 @@ void _SigHandler(int signum)
 	int addrs;
 	void* buffer[BACKTRACE_DEPTH];
 	char** symbols;
-	ucontext_t context;
+	//ucontext_t context;
 	greg_t esp = 0;
 	bool file;
 

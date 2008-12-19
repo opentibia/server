@@ -21,6 +21,7 @@
 
 #include <boost/bimap.hpp>
 #include <string>
+#include <vector>
 #include <map>
 #include "boost_common.h"
 #include "enums.h"

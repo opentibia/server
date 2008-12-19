@@ -92,7 +92,7 @@ void Manager::registerClasses() {
 	registerClass("Container", "Item");
 
 	registerClass("Tile");
-	
+
 	registerClass("Town");
 	registerClass("House");
 
@@ -119,7 +119,7 @@ void Manager::registerClasses() {
 
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
-	
+
 	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
 	registerMemberFunction("Creature", "say(string msg)", &Manager::lua_Creature_say);
 
@@ -145,7 +145,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getGuildName()", &Manager::lua_Player_getGuildName);
 	registerMemberFunction("Player", "getGuildRank()", &Manager::lua_Player_getGuildRank);
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
-	
+
 	registerMemberFunction("Player", "addItem(Item item)", &Manager::lua_Player_addItem);
 	registerMemberFunction("Player", "getInventoryItem(int slot)", &Manager::lua_Player_getInventoryItem);
 	registerMemberFunction("Player", "addExperience(int experience)", &Manager::lua_Player_addExperience);
@@ -190,7 +190,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "isNoPVP()", &Manager::lua_Tile_isNoPVP);
 	registerMemberFunction("Tile", "isNoLogout()", &Manager::lua_Tile_isNoLogout);
 	registerMemberFunction("Tile", "doesRefresh()", &Manager::lua_Tile_doesRefresh);
-	
+
 	registerMemberFunction("Tile", "getItemTypeCount(int itemid)", &Manager::lua_Tile_getItemTypeCount);
 
 	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
@@ -512,7 +512,7 @@ int LuaState::lua_registerGenericEvent_OnLookAtItem() {
 	// Store callback
 	insert(-3);
 
-	uint32_t id = popInteger();	
+	uint32_t id = popInteger();
 	std::string method = popString();
 
 	OnLook::ScriptInformation si_onlook;
@@ -547,7 +547,7 @@ int LuaState::lua_registerGenericEvent_OnLookAtCreature() {
 	// Store callback
 	insert(-3);
 
-	Creature* at = popCreature();	
+	Creature* at = popCreature();
 
 	OnLook::ScriptInformation si_onlook;
 	si_onlook.method = OnLook::FILTER_CREATUREID;
@@ -1018,21 +1018,21 @@ int LuaState::lua_Event_propagate() {
 ///////////////////////////////////////////////////////////////////////////////
 // Class Thing
 
-int LuaState::lua_Thing_getPosition() 
+int LuaState::lua_Thing_getPosition()
 {
 	Thing* thing = popThing();
 	pushPosition(thing->getPosition());
 	return 1;
 }
 
-int LuaState::lua_Thing_getParentTile() 
+int LuaState::lua_Thing_getParentTile()
 {
 	Thing* thing = popThing();
 	pushThing(thing->getTile());
 	return 1;
 }
 
-int LuaState::lua_Thing_getParent() 
+int LuaState::lua_Thing_getParent()
 {
 	Thing* thing = popThing();
 	Cylinder* parent = thing->getParent();
@@ -1046,13 +1046,13 @@ int LuaState::lua_Thing_getParent()
 	return 1;
 }
 
-int LuaState::lua_Thing_moveToPosition() 
+int LuaState::lua_Thing_moveToPosition()
 {
 	Position pos = popPosition();
 	Thing* thing = popThing();
 
 	pushBoolean(g_game.internalTeleport(NULL, thing, pos) == RET_NOERROR);
-	
+
 	return 1;
 }
 
@@ -1086,7 +1086,7 @@ int LuaState::lua_Thing_getDescription()
 	return 1;
 }
 
-int LuaState::lua_Thing_destroy() 
+int LuaState::lua_Thing_destroy()
 {
 	Thing* thing = popThing();
 	if(Item* item = thing->getItem()) {
@@ -1111,7 +1111,7 @@ int LuaState::lua_Tile_getThing()
 {
 	int index = popInteger(); // lua indices start at 1, but we don't give a crap!
 	Tile* tile = popTile();
-	
+
 	// -1 is top item
 	if(index < 0) {
 		index = tile->__getLastIndex() + index;
@@ -1124,10 +1124,10 @@ int LuaState::lua_Tile_getThing()
 	return 1;
 }
 
-int LuaState::lua_Tile_getCreatures() 
+int LuaState::lua_Tile_getCreatures()
 {
 	Tile* tile = popTile();
-	
+
 	newTable();
 	int n = 1;
 	for(CreatureVector::iterator iter = tile->creatures.begin(),
@@ -1140,10 +1140,10 @@ int LuaState::lua_Tile_getCreatures()
 	return 1;
 }
 
-int LuaState::lua_Tile_getMoveableItems() 
+int LuaState::lua_Tile_getMoveableItems()
 {
 	Tile* tile = popTile();
-	
+
 	newTable();
 	int n = 1;
 	for(ItemVector::iterator iter = tile->downItems.begin(),
@@ -1158,10 +1158,10 @@ int LuaState::lua_Tile_getMoveableItems()
 	return 1;
 }
 
-int LuaState::lua_Tile_getItems() 
+int LuaState::lua_Tile_getItems()
 {
 	Tile* tile = popTile();
-	
+
 	newTable();
 	int n = 1;
 	if(tile->ground) {
@@ -1330,7 +1330,7 @@ int LuaState::lua_Player_setStorageValue() {
 	}
 	std::string key = popString();
 	Player* player = popPlayer();
-	
+
 	if(remove)
 		player->eraseStorageValue(key);
 	else
@@ -1551,7 +1551,7 @@ int LuaState::lua_Player_setTown()
 {
 	Town* town = popTown();
 	Player* player = popPlayer();
-	
+
 	player->setMasterPos(town->getTemplePosition());
 	player->setTown(town->getTownID());
 	pushBoolean(true);
@@ -1678,7 +1678,7 @@ int LuaState::lua_Item_setItemID()
 
 	int newid = popInteger();
 	Item* item = popItem();
-	
+
 	if(newid < 0 || newid > 65535) {
 		throw Error("Item:setItemID : item ID provided");
 	}
@@ -1688,7 +1688,7 @@ int LuaState::lua_Item_setItemID()
 		throw Error("Item:setItemID : Stack count cannot be higher than 100.");
 	}
 
-	Item* newItem = g_game.transformItem(NULL, item, newid, newcount);
+	g_game.transformItem(NULL, item, newid, newcount);
 
 	pushBoolean(true);
 	return 1;
@@ -1712,7 +1712,7 @@ int LuaState::lua_Item_setCount()
 	if(newcount < 1) {
 		throw Error("Item.setCount: New count out of range!");
 	}
-	
+
 	pushBoolean(g_game.transformItem(NULL, item, item->getID(), newcount) != NULL);
 	return 1;
 }
@@ -1858,7 +1858,7 @@ int LuaState::lua_Combat_setParameter()
 	uint32_t value = popUnsignedInteger();
 	CombatParam_t key = (CombatParam_t)popInteger();
 	Combat* combat = popCombat();
-	
+
 	combat->setParam(key, value);
 	pushBoolean(true);
 	return 1;
@@ -2651,7 +2651,7 @@ int LuaState::luaDoMonsterChangeTarget(lua_State *L)
 	if(!monster->isSummon()){
 		monster->searchTarget(true);
 	}
-	
+
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
@@ -2690,7 +2690,7 @@ int LuaState::luaDoRemoveCondition(lua_State *L)
 
 	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
 	uint32_t cid = popNumber(L);
-	
+
 	ScriptEnviroment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
@@ -2764,7 +2764,7 @@ int LuaState::lua_Channel_talk()
 {
 	std::string text = popString();
 	int t = popInteger();
-	Player* user = popPlayer(ERROR_PASS);
+	/*Player* user = */popPlayer(ERROR_PASS);
 	ChatChannel* channel = popChannel();
 	channel->talk(NULL, (SpeakClass)t, text);
 	pushBoolean(true);
@@ -2778,7 +2778,7 @@ int LuaState::lua_sendMagicEffect()
 {
 	uint32_t type = popUnsignedInteger();
 	Position pos = popPosition();
-	
+
 	g_game.addMagicEffect(pos, type);
 	pushBoolean(true);
 	return 1;
@@ -2814,8 +2814,8 @@ int lua_BitUNot(lua_State *L)
 
 #define MULTIOP(type, name, op) \
 	int lua_Bit##name(lua_State *L) { \
-	int n = lua_gettop(L); \
-	type i, w = (type)lua_tonumber(L, -1); \
+	int i, n = lua_gettop(L); \
+	type w = (type)lua_tonumber(L, -1); \
 	lua_pop(L, 1); \
 	for(i = 2; i <= n; ++i){ \
 	w op (type)lua_tonumber(L, -1); \
@@ -3322,7 +3322,7 @@ int LuaScriptInterface::luaGetItemRWInfo()
 {
 	//getItemRWInfo(uid)
 	const Item* item = popItem();
-	
+
 	uint32_t rwflags = 0;
 	if(item->isReadable())
 		rwflags |= 1;
@@ -3581,7 +3581,7 @@ int LuaScriptInterface::luaGetPlayerStorageValue()
 	//getPlayerStorageValue(cid, valueid)
 	uint32_t key = popUnsignedInteger();
 	Player* player = popPlayer();
-	
+
 	ScriptEnviroment* env = getScriptEnv();
 	int32_t value;
 	if(player->getStorageValue(key, value)){
@@ -4134,7 +4134,7 @@ int LuaScriptInterface::luaSetCreatureOutfit()
 	pop(); // outfit table
 	Creature* creature = popCreature();
 
-	creature->setDefaultOutfit(outfit);	
+	creature->setDefaultOutfit(outfit);
 	g_game.internalCreatureChangeOutfit(creature, outfit);
 	pushBoolean(true);
 	return 1;
@@ -4145,7 +4145,7 @@ int LuaScriptInterface::luaGetCreatureOutfit()
 	//getCreatureOutfit(creature)
 	Creature* creature = popCreature();
 	const Outfit_t outfit = creature->getCurrentOutfit();
-	
+
 	lua_newtable(m_luaState);
 	setField("type", outfit.lookType);
 	setField("extra", outfit.lookTypeEx);
@@ -4305,7 +4305,7 @@ int LuaScriptInterface::luaDoAddContainerItem()
 	//doAddContainerItem(container, item)
 	Item* item = popItem();
 	Container* container = popContainer();
-	
+
 	Cylinder* old_parent = item->getParent();
 	if(old_parent != container) {
 		ReturnValue ret = g_game.internalMoveItem(NULL, old_parent, container, INDEX_WHEREEVER, item, item->getItemCount());

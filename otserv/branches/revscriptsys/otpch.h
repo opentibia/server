@@ -1,4 +1,4 @@
-#ifdef __OTSERV_OTCP_H__
+/*#ifdef __OTSERV_OTCP_H__
 #error "Precompiled header should only be included once"
 #endif
 #define __OTSERV_OTCP_H__
@@ -44,3 +44,4 @@ extern "C"
 #include "thing.h"
 
 #endif
+*/

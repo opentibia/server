@@ -53,7 +53,7 @@ namespace Script {
 
 	/****************** GUIDE READ THIS TO ADD AN EVENT! *****************&*/
 	/* To add a new event
-	 * 1. Create the event class, with all it's members 
+	 * 1. Create the event class, with all it's members
 	 *    easiest is to copy an existing event that's similar.
 	 * 2. Add the listener type to enums.h
 	 * 3. Expose a registerListener function to lua (or many)
@@ -73,7 +73,7 @@ namespace Script {
 
 		// Runs the event (ie. triggers all concerned listeners)
 		virtual bool dispatch(Manager& state, Script::Enviroment& enviroment) = 0;
-		
+
 		// Lua stack manipulation, push
 		virtual void push_instance(LuaState& state, Script::Enviroment& enviroment) = 0;
 		// update, peek at top table and fill this event with values from it)
@@ -85,17 +85,17 @@ namespace Script {
 		static uint32_t eventID_counter;
 		std::string lua_tag;
 		bool propagate_by_default;
-		
+
 		template<class T, class ScriptInformation> friend
-			bool ::dispatchEvent(T* e, 
-				Script::Manager& state, 
-				Script::Enviroment& enviroment, 
+			bool ::dispatchEvent(T* e,
+				Script::Manager& state,
+				Script::Enviroment& enviroment,
 				Script::ListenerList& specific_list);
-		
+
 		template<class T> friend
-			bool ::dispatchEvent(T* e, 
-				Script::Manager& state, 
-				Script::Enviroment& enviroment, 
+			bool ::dispatchEvent(T* e,
+				Script::Manager& state,
+				Script::Enviroment& enviroment,
 				Script::ListenerList& specific_list);
 
 	};
@@ -124,10 +124,10 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnSay";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
-			
+
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
@@ -166,10 +166,10 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnUseItem";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
-			
+
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
@@ -209,10 +209,10 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnEquipItem";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
-			
+
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
@@ -260,10 +260,10 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnMoveCreature";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
-			
+
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
@@ -306,10 +306,10 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnMoveItem";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
-			
+
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
@@ -337,7 +337,7 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnJoinChannel";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
 
@@ -362,7 +362,7 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnLeaveChannel";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
 
@@ -387,7 +387,7 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnLogin";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
 
@@ -411,7 +411,7 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnLogout";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
 
@@ -450,10 +450,10 @@ namespace Script {
 			~Event();
 
 			std::string getName() const {return "OnLook";}
-			
+
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
-			
+
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
@@ -467,54 +467,6 @@ namespace Script {
 			Thing* object;
 		};
 	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Implementation details
-
-template<class T, class ScriptInformation>
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
-		return false;
-	}
-	for(Script::ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
-
-		// Call handler
-		if(e->check_match(info)) {
-			if(e->call(state, enviroment, listener) == true) {
-				// Handled
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-template<class T> // No script information!
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
-		return false;
-	}
-	for(Script::ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-
-		// Call handler
-		if(e->call(state, enviroment, listener) == true) {
-			// Handled
-			return true;
-		}
-	}
-	return false;
 }
 
 #endif // __OTSERV_SCRIPT_EVENT__

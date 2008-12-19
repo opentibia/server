@@ -69,14 +69,14 @@ class LuaThread;
 class LuaState /*abstract*/ {
 public:
 	LuaState(Script::Enviroment& enviroment);
-	~LuaState();
+	virtual ~LuaState();
 
 	// Stack manipulation
 	// Returns the size of the stack
 	int getStackTop();
 	// Checks if the size of the stack is between low and high
 	bool checkStackSize(int low, int high = -1);
-	
+
 	// Removes all elements from the stack
 	void clearStack();
 
@@ -149,7 +149,7 @@ public:
 	// Events
 	void pushEvent(Script::Event& event);
 	void pushCallback(Script::Listener_ptr listener);
-	
+
 	// Advanced types
 	// Pop
 	Thing* popThing(Script::ErrorMode mode = Script::ERROR_THROW);
@@ -167,7 +167,7 @@ public:
 	void pushTown(Town* town);
 	void pushHouse(House* house);
 	void pushChannel(ChatChannel* channel);
-	
+
 
 	// Generic
 	void push(bool b) {pushBoolean(b);}
@@ -278,7 +278,7 @@ public:
 	int lua_Player_getInventoryItem();
 	int lua_Player_addItem();
 	int lua_Player_getItemTypeCount();
-	
+
 	int lua_Player_setVocation();
 	int lua_Player_setTown();
 	int lua_Player_addExperience();
@@ -307,7 +307,7 @@ public:
 	int lua_Item_setSpecialDescription();
 	int lua_Item_setText();
 	int lua_Item_startDecaying();
-	
+
 
 	// - Tile
 	int lua_Tile_getThing();
@@ -352,7 +352,7 @@ protected:
 class LuaThread : public LuaState {
 public:
 	LuaThread(LuaStateManager& manager, const std::string& name);
-	~LuaThread();
+	virtual ~LuaThread();
 
 	// Returns time to sleep, 0 if execution ended
 	int32_t run(int args);
@@ -372,7 +372,7 @@ typedef weak_ptr<LuaThread> LuaThread_wptr;
 class LuaStateManager : public LuaState {
 public:
 	LuaStateManager(Script::Enviroment& enviroment);
-	~LuaStateManager();
+	virtual ~LuaStateManager();
 
 	bool loadFile(std::string file);
 

@@ -24,6 +24,7 @@
 #include "fileloader.h"
 #include "enums.h"
 
+#include <vector>
 #include <list>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>

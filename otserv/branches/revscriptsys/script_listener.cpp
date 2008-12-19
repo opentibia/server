@@ -20,6 +20,7 @@
 
 #include "script_listener.h"
 #include "script_manager.h"
+#include <sstream>
 
 uint32_t Script::Listener::ID_counter = 0;
 

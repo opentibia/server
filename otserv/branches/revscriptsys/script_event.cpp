@@ -52,7 +52,7 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 	// Stack is empty
 	// Push callback
 	thread->pushCallback(listener);
-	
+
 	if(thread->isNil()) {
 		thread->HandleError("Attempt to call destroyed '" + getName() + "' listener.");
 		thread->pop();
@@ -63,7 +63,7 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 	thread->pushEvent(*this);
 	thread->duplicate();
 	thread->setRegistryItem(lua_tag);
-	
+
 
 	// Run thread
 	thread->run(1);
@@ -76,7 +76,7 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 
 	// Retrieve event info
 	thread->getRegistryItem(lua_tag);
-	
+
 	// Update this instance with values from lua
 	update_instance(state, enviroment, thread);
 
@@ -125,7 +125,7 @@ bool OnSay::Event::check_match(const ScriptInformation& info) {
 	}
 
 	switch(info.method) {
-		case FILTER_ALL: 
+		case FILTER_ALL:
 			return true;
 		case FILTER_SUBSTRING:
 			return match_text.find(info.filter) != std::string::npos;
@@ -175,7 +175,7 @@ void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaTh
 	thread->getField(-1, "text");
 	if(thread->isString()) {
 		text = thread->popString();
-	} 
+	}
 	else {
 		thread->HandleError("Event 'OnSay' invalid value of 'text'");
 		thread->pop();
@@ -201,7 +201,7 @@ OnUseItem::Event::~Event() {
 
 bool OnUseItem::Event::check_match(const ScriptInformation& info) {
 	switch(info.method) {
-		case FILTER_ITEMID: 
+		case FILTER_ITEMID:
 			return item->getID() == info.id;
 		case FILTER_ACTIONID:
 			return item->getActionId() == info.id;
@@ -238,7 +238,7 @@ void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, L
 	thread->getField(-1, "retval");
 	if(thread->isNumber()) {
 		retval = (ReturnValue)thread->popInteger();
-	} 
+	}
 	else {
 		thread->HandleError("Event 'OnUseItem' invalid value of 'retval'");
 		thread->pop();
@@ -265,7 +265,7 @@ OnEquipItem::Event::Event(Player* user, Item* item, slots_t slot, bool equip) :
 		case SLOT_LEFT: equipslot = SLOTP_LEFT; break;
 		case SLOT_LEGS: equipslot = SLOTP_LEGS; break;
 		case SLOT_FEET: equipslot = SLOTP_FEET; break;
-		case SLOT_RING: equipslot = SLOTP_RING; break; 
+		case SLOT_RING: equipslot = SLOTP_RING; break;
 		case SLOT_AMMO: equipslot = SLOTP_AMMO; break;
 
 		default:
@@ -284,7 +284,7 @@ bool OnEquipItem::Event::check_match(const ScriptInformation& info) {
 	}
 
 	switch(info.method) {
-		case FILTER_ITEMID: 
+		case FILTER_ITEMID:
 			return item->getID() == info.id;
 		case FILTER_ACTIONID:
 			return item->getActionId() == info.id;
@@ -304,7 +304,7 @@ bool OnEquipItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
 
 void OnEquipItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.pushClassTableInstance("OnEquipItemEvent");
-	state.pushThing(user); 
+	state.pushThing(user);
 	state.setField(-2, "player");
 	state.pushThing(item);
 	state.setField(-2, "item");
@@ -360,7 +360,7 @@ bool OnMoveCreature::Event::isMatch(const ScriptInformation& info, Tile* tile) {
 			Thing* thing = tile->__getThing(i);
 			if(thing && (item = thing->getItem())){
 				switch(info.method) {
-					case FILTER_ITEMID: 
+					case FILTER_ITEMID:
 						return item->getID() == info.id;
 					case FILTER_ACTIONID:
 						return item->getActionId() == info.id;
@@ -444,7 +444,7 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info) {
 			Thing* thing = tile->__getThing(i);
 			if(thing && (itemOnTile = thing->getItem()) && itemOnTile != item){
 				switch(info.method) {
-					case FILTER_ITEMID: 
+					case FILTER_ITEMID:
 						return itemOnTile->getID() == info.id;
 					case FILTER_ACTIONID:
 						return itemOnTile->getActionId() == info.id;
@@ -457,7 +457,7 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info) {
 	}
 	else{
 		switch(info.method) {
-			case FILTER_ITEMID: 
+			case FILTER_ITEMID:
 				return item->getID() == info.id;
 			case FILTER_ACTIONID:
 				return item->getActionId() == info.id;
@@ -662,7 +662,7 @@ bool OnLook::Event::check_match(const ScriptInformation& info) {
 		Creature* creature = object->getCreature();
 
 		switch(info.method) {
-			case FILTER_ITEMID: 
+			case FILTER_ITEMID:
 				return item && item->getID() == info.id;
 			case FILTER_ACTIONID:
 				return item && item->getActionId() == info.id;
@@ -702,10 +702,57 @@ void OnLook::Event::update_instance(Manager& state, Enviroment& enviroment, LuaT
 	thread->getField(-1, "description");
 	if(thread->isString()) {
 		desc = thread->popString();
-	} 
+	}
 	else {
 		thread->HandleError("Event 'OnLook' invalid value of 'description'");
 		thread->pop();
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Implementation details
+
+template<class T, class ScriptInformation>
+bool Script::dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Script::Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
+
+		// Call handler
+		if(e->check_match(info)) {
+			if(e->call(state, enviroment, listener) == true) {
+				// Handled
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+template<class T> // No script information!
+bool Script::dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Script::Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+
+		// Call handler
+		if(e->call(state, enviroment, listener) == true) {
+			// Handled
+			return true;
+		}
+	}
+	return false;
+}

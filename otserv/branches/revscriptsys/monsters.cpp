@@ -80,7 +80,7 @@ void MonsterType::reset()
 	summonList.clear();
 	lootItems.clear();
 	elementMap.clear();
-	
+
 	//spellAttackList.clear();
 	//spellDefenseList.clear();
 
@@ -1180,8 +1180,8 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"element") == 0){
-						CombatType_t type = COMBAT_NONE;
-						int32_t percent = 0;
+						//CombatType_t type = COMBAT_NONE;
+						//int32_t percent = 0;
 
 						if(readXMLInteger(tmpNode, "physicalPercent", intValue)){
 							mType->elementMap[COMBAT_PHYSICALDAMAGE] = intValue;

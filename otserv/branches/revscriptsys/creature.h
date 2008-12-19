@@ -105,7 +105,7 @@ class FrozenPathingConditionCall {
 public:
 	FrozenPathingConditionCall(const Position& _targetPos);
 	virtual ~FrozenPathingConditionCall() {}
-	
+
 	virtual bool operator()(const Position& startPos, const Position& testPos,
 		const FindPathParams& fpp, int32_t& bestMatchDist) const;
 
@@ -135,7 +135,7 @@ public:
 	virtual const Npc* getNpc() const {return NULL;};
 	virtual Monster* getMonster() {return NULL;};
 	virtual const Monster* getMonster() const {return NULL;};
-	
+
 	void getPathToFollowCreature();
 
 	virtual const std::string& getName() const = 0;
@@ -338,7 +338,7 @@ public:
 	virtual const Tile* getTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;
 
-	static bool canSee(const Position& myPos, const Position& pos, uint32_t viewRangeX, uint32_t viewRangeY);
+	static bool canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY);
 
 	void addListener(Script::Listener_ptr listener);
 	Script::ListenerList getListeners(Script::ListenerType type);
