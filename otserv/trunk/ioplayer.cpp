@@ -556,14 +556,12 @@ bool IOPlayer::savePlayer(Player* player)
 	}
 	query.str("");
 
-	if(player->VIPList.empty()){
-		query << "DELETE FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
+	query << "DELETE FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
 
-		if(!db->executeQuery(query.str())){
-			return false;
-		}
-		query.str("");
+	if(!db->executeQuery(query.str())){
+		return false;
 	}
+	query.str("");
 
 	DBInsert stmt(db);
 
