@@ -88,7 +88,8 @@ CREATE TABLE `guild_ranks` (
 CREATE TABLE `player_viplist` (
     `player_id` INT UNSIGNED NOT NULL COMMENT 'id of player whose viplist entry it is',
     `vip_id` INT UNSIGNED NOT NULL COMMENT 'id of target player of viplist entry',
-    FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+    FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`vip_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_spells` (

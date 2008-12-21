@@ -87,7 +87,8 @@ CREATE TABLE "guild_ranks" (
 CREATE TABLE "player_viplist" (
     "player_id" INT NOT NULL,
     "vip_id" INT NOT NULL,
-    FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
+    FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
+    FOREIGN KEY ("vip_id") REFERENCES "players" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "player_spells" (
