@@ -556,12 +556,14 @@ bool IOPlayer::savePlayer(Player* player)
 	}
 	query.str("");
 
-	query << "DELETE FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
+	if(player->VIPList.empty()){
+		query << "DELETE FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
 
-	if(!db->executeQuery(query.str())){
-		return false;
+		if(!db->executeQuery(query.str())){
+			return false;
+		}
+		query.str("");
 	}
-	query.str("");
 
 	DBInsert stmt(db);
 
@@ -624,19 +626,30 @@ bool IOPlayer::savePlayer(Player* player)
 		return false;
 	}
 
+	
 	//save vip list
-	stmt.setQuery("INSERT INTO `player_viplist` (`player_id`, `vip_id`) VALUES ");
+	if(!player->VIPList.empty()){
+		std::stringstream ss;
+		ss << "INSERT INTO `player_viplist` (`player_id`, `vip_id`) SELECT " << player->getGUID()
+			<< ", `id` FROM `players` WHERE `id` IN";
 
-	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
-		query << player->getGUID() << ", " << *it;
+		stmt.setQuery(ss.str());
+		ss.str("");
 
-		if(!stmt.addRow(query)){
+		for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end();){
+			ss << (*it);
+			++it;
+			
+			if(it != player->VIPList.end()){
+				ss << ",";
+			}
+		}
+
+		stmt.addRow(ss);
+
+		if(!stmt.execute()){
 			return false;
 		}
-	}
-
-	if(!stmt.execute()){
-		return false;
 	}
 
 	//End the transaction
