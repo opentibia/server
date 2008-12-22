@@ -624,12 +624,11 @@ bool IOPlayer::savePlayer(Player* player)
 		return false;
 	}
 
-	
 	//save vip list
 	if(!player->VIPList.empty()){
 		std::stringstream ss;
 		ss << "INSERT INTO `player_viplist` (`player_id`, `vip_id`) SELECT " << player->getGUID()
-			<< ", `id` FROM `players` WHERE `id` IN (";
+			<< ", `id` FROM `players` WHERE `id` IN";
 
 		stmt.setQuery(ss.str());
 		ss.str("");
@@ -642,8 +641,6 @@ bool IOPlayer::savePlayer(Player* player)
 				ss << ",";
 			}
 		}
-
-		ss << ")"
 
 		stmt.addRow(ss);
 
