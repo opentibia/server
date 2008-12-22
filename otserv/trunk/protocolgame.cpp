@@ -232,6 +232,19 @@ void ProtocolGame::setPlayer(Player* p)
 	player = p;
 }
 
+void ProtocolGame::releaseProtocol()
+{
+	//dispatcher thread
+	if(player){
+		if(player->client == this){
+			player->client = NULL;
+			disconnect();
+		}
+	}
+
+	Protocol::releaseProtocol();
+}
+
 void ProtocolGame::deleteProtocolTask()
 {
 	//dispatcher thread
@@ -239,8 +252,6 @@ void ProtocolGame::deleteProtocolTask()
 		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Deleting ProtocolGame - Protocol:" << this << ", Player: " << player << std::endl;
 		#endif
-
-		player->client = NULL;
 
 		g_game.FreeThing(player);
 		player = NULL;
