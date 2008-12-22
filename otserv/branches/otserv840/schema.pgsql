@@ -209,7 +209,6 @@ RETURNS TRIGGER
 AS $$
 BEGIN
     UPDATE "players" SET "guildnick" = '', "rank_id" = 0 WHERE "rank_id" IN (SELECT "id" FROM "guild_ranks" WHERE "guild_id" = OLD."id");
-	DELETE FROM "guild_ranks" WHERE "guild_id" = OLD."id";
 
     RETURN OLD;
 END;
