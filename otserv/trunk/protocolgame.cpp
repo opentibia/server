@@ -238,7 +238,6 @@ void ProtocolGame::releaseProtocol()
 	if(player){
 		if(player->client == this){
 			player->client = NULL;
-			disconnect();
 		}
 	}
 
