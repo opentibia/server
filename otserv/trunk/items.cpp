@@ -952,58 +952,58 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentall"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentAll = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_NONE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentenergy"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentEnergy = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ENERGYDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentfire"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentFire = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_FIREDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentpoison" ||
 									asLowerCaseString(strValue) == "absorbpercentearth"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentEarth = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_EARTHDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentice"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentIce = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ICEDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentholy"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentHoly = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_HOLYDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentdeath"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentDeath = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DEATHDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentlifedrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentLifeDrain = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_LIFEDRAIN)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentmanadrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentManaDrain = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_MANADRAIN)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentdrown"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentDrown = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DROWNDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentphysical"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentPhysical = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressdrunk"){
@@ -1348,6 +1348,81 @@ const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
 
 	static ItemType dummyItemType; // use this for invalid ids
 	return dummyItemType;
+}
+
+Abilities::Abilities()
+{
+	memset(&absorb, 0, sizeof(absorb));
+
+	elementType = COMBAT_NONE;
+	elementDamage = 0;
+	memset(skills, 0, sizeof(skills));
+
+	memset(stats, 0 , sizeof(stats));
+	memset(statsPercent, 0, sizeof(statsPercent));
+
+	speed = 0;
+	manaShield = false;
+	invisible = false;
+	conditionImmunities = 0;
+	conditionSuppressions = 0;
+
+	regeneration = false;
+	healthGain = 0;
+	healthTicks = 0;
+
+	manaGain = 0;
+	manaTicks = 0;
+};
+
+bool Abilities::Absorb::any() const
+{
+	for(int c = 0; c != COMBAT_COUNT; ++c){
+		if(resistances[c] != 0)
+			return true;
+	}
+	return false;
+}
+
+std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, unsigned int type) const
+{
+	if(resistances[type] == 0)
+		return os;
+	os << (first? ", " : " ") << CombatTypeName(type == 0? COMBAT_NONE: (CombatType_t)(1 << (type-1))) << " " << std::noshowpos << resistances[type] << "%";
+	first = false;
+	return os;
+}
+
+std::ostream& Abilities::Absorb::getDescription(std::ostream& os) const
+{
+	bool first = true;
+	for(int c = 0; c != COMBAT_COUNT; ++c){
+		getDescription(os, first, c);
+	}
+	return os;
+}
+
+bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
+{
+	bool r = false;
+	int32_t blocked = 0;
+	if(resistances[0] > 0) {
+		r = true;
+		dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[0]) / 100.);
+	}
+
+	if(ctype == COMBAT_NONE)
+		return r;
+
+	for(int c = 0;  c < COMBAT_COUNT; ++c) {
+		if(ctype & (1 << c)) {
+			// Correct type!
+			if(resistances[c+1] > 0)
+				r = true;
+			dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[c+1]) / 100.);
+		}
+	}
+	return r;
 }
 
 int32_t Items::getItemIdByName(const std::string& name)

@@ -356,4 +356,37 @@ private:
 	int64_t createTime;
 };
 
+inline std::string CombatTypeName(CombatType_t combat) {
+	switch(combat){
+		case COMBAT_NONE: return "all";
+		case COMBAT_PHYSICALDAMAGE: return "physical";
+		case COMBAT_ENERGYDAMAGE: return "energy";
+		case COMBAT_EARTHDAMAGE: return "earth";
+		case COMBAT_FIREDAMAGE: return "fire";
+		case COMBAT_UNDEFINEDDAMAGE: return "undefined";
+		case COMBAT_LIFEDRAIN: return "life drain";
+		case COMBAT_MANADRAIN: return "mana drain";
+		case COMBAT_HEALING: return "healing";
+		case COMBAT_DROWNDAMAGE: return "drown";
+		case COMBAT_ICEDAMAGE: return "ice";
+		case COMBAT_HOLYDAMAGE: return "holy";
+		case COMBAT_DEATHDAMAGE: return "death";
+	}
+	return "none";
+}
+
+inline int CombatTypeToIndex(CombatType_t combat) {
+	if(combat == COMBAT_NONE) return 0;
+	for(int c = 0; c < COMBAT_COUNT; ++c){
+		if(combat & (1 << c))
+			return c+1;
+	}
+	return 0;
+};
+
+inline CombatType_t CombatIndexToType(int combatindex) {
+	if(combatindex == 0) return COMBAT_NONE;
+	return (CombatType_t)(1 << (combatindex-1));
+};
+
 #endif

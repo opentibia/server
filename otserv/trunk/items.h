@@ -61,53 +61,18 @@ enum ItemTypes_t {
 };
 
 struct Abilities{
-	Abilities()
-	{
-		absorbPercentAll = 0;
-		absorbPercentPhysical = 0;
-		absorbPercentFire = 0;
-		absorbPercentEnergy = 0;
-		absorbPercentEarth = 0;
-		absorbPercentLifeDrain = 0;
-		absorbPercentManaDrain = 0;
-		absorbPercentDrown = 0;
-		absorbPercentIce = 0;
-		absorbPercentHoly = 0;
-		absorbPercentDeath = 0;
+	Abilities();
+	
+	struct Absorb {
+			int16_t resistances[COMBAT_COUNT];
 
-		elementType = COMBAT_NONE;
-		elementDamage = 0;
-		memset(skills, 0, sizeof(skills));
+			bool any() const;
+			bool reduce(CombatType_t type, int32_t& dmg) const;
+			std::ostream& getDescription(std::ostream& os) const;
+	protected:
+			std::ostream& getDescription(std::ostream& os, bool& first, unsigned int combat_type) const;
+	} absorb;
 
-		memset(stats, 0 , sizeof(stats));
-		memset(statsPercent, 0, sizeof(statsPercent));
-
-		speed = 0;
-		manaShield = false;
-		invisible = false;
-		conditionImmunities = 0;
-		conditionSuppressions = 0;
-
-		regeneration = false;
-		healthGain = 0;
-		healthTicks = 0;
-
-		manaGain = 0;
-		manaTicks = 0;
-	};
-
-	//damage abilities modifiers
-	int16_t absorbPercentAll;
-	int16_t absorbPercentPhysical;
-	int16_t absorbPercentFire;
-	int16_t absorbPercentEnergy;
-	int16_t absorbPercentEarth;
-	int16_t absorbPercentLifeDrain;
-	int16_t absorbPercentManaDrain;
-	int16_t absorbPercentDrown;
-	int16_t absorbPercentIce;
-	int16_t absorbPercentHoly;
-	int16_t absorbPercentDeath;
 
 	//elemental damage
 	CombatType_t elementType;

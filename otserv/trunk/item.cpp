@@ -788,92 +788,21 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		s << ".";
 	}
-	else if(it.armor != 0){
+	else if(it.armor != 0 || it.abilities.absorb.any()){
+		if(it.showCharges){
+			if(subType > 1){
+				s << " that has " << (int32_t)subType << " charges left";
+			}
+			else{
+				s << " that has 1 charge left";
+			}
+		}
+
 		s << " (Arm:" << it.armor;
 
-		if(it.abilities.absorbPercentAll != 0 || it.abilities.absorbPercentDeath != 0 ||
-			it.abilities.absorbPercentDrown != 0 || it.abilities.absorbPercentEarth != 0 ||
-			it.abilities.absorbPercentEnergy != 0 || it.abilities.absorbPercentFire != 0 ||
-			it.abilities.absorbPercentHoly != 0 || it.abilities.absorbPercentIce != 0 ||
-			it.abilities.absorbPercentLifeDrain != 0 || it.abilities.absorbPercentManaDrain != 0 ||
-			it.abilities.absorbPercentPhysical != 0)
-		{
-			bool isBegin = true;
+		if(it.abilities.absorb.any()){
 			s << ", protection";
-			if(it.abilities.absorbPercentAll != 0){
-				s << " all " << std::showpos << it.abilities.absorbPercentAll << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentDeath != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " death " << std::showpos << it.abilities.absorbPercentDeath << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentDrown != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " drown " << std::showpos << it.abilities.absorbPercentDrown << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentEarth != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " earth " << std::showpos << it.abilities.absorbPercentEarth << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentEnergy != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " energy " << std::showpos << it.abilities.absorbPercentEnergy << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentFire != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " fire " << std::showpos << it.abilities.absorbPercentFire << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentHoly != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " holy " << std::showpos << it.abilities.absorbPercentHoly << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentIce != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " ice " << std::showpos << it.abilities.absorbPercentIce << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentLifeDrain != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " life drain " << std::showpos << it.abilities.absorbPercentLifeDrain << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentManaDrain != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " mana drain " << std::showpos << it.abilities.absorbPercentManaDrain << std::noshowpos << "%";
-				isBegin = false;
-			}
-			if(it.abilities.absorbPercentPhysical != 0){
-				if(!isBegin){
-					s << ",";
-				}
-				s << " physical " << std::showpos << it.abilities.absorbPercentPhysical << std::noshowpos << "%";
-				isBegin = false;
-			}
+			it.abilities.absorb.getDescription(s);
 		}
 		s << ").";
 	}

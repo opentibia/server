@@ -30,7 +30,8 @@ enum RaceType_t {
 };
 
 enum CombatType_t {
-	COMBAT_NONE				= 0,
+	COMBAT_NONE             = 0,
+	COMBAT_FIRST            = COMBAT_NONE,
 	COMBAT_PHYSICALDAMAGE	= 1,
 	COMBAT_ENERGYDAMAGE		= 2,
 	COMBAT_EARTHDAMAGE		= 4,
@@ -42,7 +43,9 @@ enum CombatType_t {
 	COMBAT_DROWNDAMAGE      = 256,
 	COMBAT_ICEDAMAGE        = 512,
 	COMBAT_HOLYDAMAGE       = 1024,
-	COMBAT_DEATHDAMAGE      = 2048
+	COMBAT_DEATHDAMAGE      = 2048,
+	COMBAT_LAST             = COMBAT_DEATHDAMAGE,
+	COMBAT_COUNT            = 13
 };
 
 enum CombatParam_t{
