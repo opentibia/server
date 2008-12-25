@@ -3530,6 +3530,16 @@ bool Game::playerContinueReport(Player* player, const std::string& text)
 	return true;
 }
 
+bool Game::kickPlayer(uint32_t playerId)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	player->kickPlayer();
+	return true;
+}
+
 //--
 bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight /*= true*/,
 	int32_t rangex /*= Map::maxClientViewportX*/, int32_t rangey /*= Map::maxClientViewportY*/)
