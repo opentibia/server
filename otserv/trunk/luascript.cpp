@@ -3033,6 +3033,7 @@ int LuaScriptInterface::luaDoAddMark(lua_State *L)
 	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
 
 	player->sendAddMarker(pos, type, description);

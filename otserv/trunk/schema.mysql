@@ -195,6 +195,13 @@ CREATE TABLE `global_storage` (
     PRIMARY KEY(`key`)
 ) ENGINE = InnoDB;
 
+CREATE TABLE `schema_info` (
+    `version` INT UNSIGNED NOT NULL
+) ENGINE = InnoDB;
+
+INSERT INTO `schema_info` (`version`) VALUES (1);
+
+
 DELIMITER |
 
 CREATE TRIGGER `ondelete_accounts`

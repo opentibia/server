@@ -226,6 +226,21 @@ void mainLoader(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 
+	std::cout << ":: Checking Schema version... ";
+	DBResult* result;
+	if(!(result = db->storeQuery("SELECT * FROM `schema_info`;"))){
+		ErrorMessage("Can't get schema version! Does `schema_info` exist?");
+		exit(-1);
+	}
+	int schema_version = result->getDataInt("version");
+	if(schema_version != CURRENT_SCHEMA_VERSION){
+		ErrorMessage("Not valid database schema version!");
+		exit(-1);
+	}
+	std::cout << "Version = " << schema_version << " ";
+	std::cout << "[done]" << std::endl;
+
+
 	//load RSA key
 	std::cout << ":: Loading RSA key..." << std::flush;
 	const char* p("14299623962416399520070177382898895550795403345466153217470516082934737582776038882967213386204600674145392845853859217990626450972452084065728686565928113");

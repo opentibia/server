@@ -61,11 +61,6 @@ public:
 		SQL_PASS,
 		SQL_DB,
 		SQL_TYPE,
-		MAP_HOST,
-		MAP_USER,
-		MAP_PASS,
-		MAP_DB,
-		OTSERV_DB_HOST,
 		USE_ACCBALANCE,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
@@ -95,7 +90,6 @@ public:
 		RATE_SPAWN,
 		HOTKEYS,
 		MAX_MESSAGEBUFFER,
-		OTSERV_DB_ENABLED,
 		SAVE_CLIENT_DEBUG_ASSERTIONS,
 		CHECK_ACCOUNTS,
 		PASSWORD_TYPE,
@@ -116,7 +110,6 @@ public:
 private:
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
 	int getGlobalNumber(lua_State* _L, const std::string& _identifier, const int _default=0);
-	std::string getGlobalStringField(lua_State* _L, const std::string& _identifier, const int _key, const std::string& _default="");
 
 	bool m_isLoaded;
 	std::string m_confString[LAST_STRING_CONFIG];

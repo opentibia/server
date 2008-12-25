@@ -22,12 +22,12 @@
 #ifndef __OTSERV_DEFINITIONS_H__
 #define __OTSERV_DEFINITIONS_H__
 
-#include "exception.h"
-
 
 #define OTSERV_VERSION "0.6.1_SVN"
 #define OTSERV_NAME "OTServ"
 #define OTSERV_CLIENT_VERSION "8.31"
+#define CURRENT_SCHEMA_VERSION 1
+
 
 #if defined(WIN32) && !defined(__WINDOWS__)
 #define __WINDOWS__
@@ -43,6 +43,7 @@
 	#define DEBUG_REPORT int *a = NULL; *a = 1;
 #else
 	#ifdef __EXCEPTION_TRACER__
+		#include "exception.h"
 		#define DEBUG_REPORT ExceptionHandler::dumpStack();
 	#else
 		#define DEBUG_REPORT

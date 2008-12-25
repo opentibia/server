@@ -180,6 +180,12 @@ CREATE TABLE "global_storage" (
     "value" INTEGER NOT NULL
 );
 
+CREATE TABLE `schema_info` (
+    `version` INT UNSIGNED NOT NULL
+);
+
+INSERT INTO `schema_info` (`version`) VALUES (1);
+
 CREATE TRIGGER "oncreate_guilds"
 AFTER INSERT ON "guilds"
 BEGIN

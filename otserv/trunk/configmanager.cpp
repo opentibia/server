@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-#include "otpch.h"
+//#include "otpch.h"
 
 #include "definitions.h"
 #include "configmanager.h"
@@ -80,10 +80,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[SQL_PASS] = getGlobalString(L, "sql_pass");
 		m_confString[SQL_DB] = getGlobalString(L, "sql_db");
 		m_confString[SQL_TYPE] = getGlobalString(L, "sql_type");
-		m_confString[MAP_HOST] = getGlobalString(L, "map_host");
-		m_confString[MAP_USER] = getGlobalString(L, "map_user");
-		m_confString[MAP_PASS] = getGlobalString(L, "map_pass");
-		m_confString[MAP_DB] = getGlobalString(L, "map_db");
 		m_confInteger[SQL_PORT] = getGlobalNumber(L, "sql_port");
 	}
 
@@ -123,8 +119,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confString[USE_ACCBALANCE] = getGlobalString(L, "useaccbalance", "no");
 	m_confInteger[PREMIUM_ONLY_BEDS] = (getGlobalString(L, "premonlybeds", "yes") == "yes");
 
-	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
-	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
 	m_isLoaded = true;
@@ -180,8 +174,10 @@ std::string ConfigManager::getGlobalString(lua_State* _L, const std::string& _id
 {
 	lua_getglobal(_L, _identifier.c_str());
 
-	if(!lua_isstring(_L, -1))
+	if(!lua_isstring(_L, -1)){
+		lua_pop(_L, 1);
 		return _default;
+	}
 
 	int len = (int)lua_strlen(_L, -1);
 	std::string ret(lua_tostring(_L, -1), len);
@@ -194,23 +190,13 @@ int ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier
 {
 	lua_getglobal(_L, _identifier.c_str());
 
-	if(!lua_isnumber(_L, -1))
+	if(!lua_isnumber(_L, -1)){
+		lua_pop(_L, 1);
 		return _default;
+	}
 
 	int val = (int)lua_tonumber(_L, -1);
 	lua_pop(_L,1);
 
 	return val;
-}
-
-std::string ConfigManager::getGlobalStringField (lua_State* _L, const std::string& _identifier, const int _key, const std::string& _default) {
-	lua_getglobal(_L, _identifier.c_str());
-
-	lua_pushnumber(_L, _key);
-	lua_gettable(_L, -2);  /* get table[key] */
-	if(!lua_isstring(_L, -1))
-		return _default;
-	std::string result = lua_tostring(_L, -1);
-	lua_pop(_L, 2);  /* remove number and key*/
-	return result;
 }

@@ -188,6 +188,12 @@ CREATE TABLE "global_storage" (
     PRIMARY KEY("key")
 );
 
+CREATE TABLE `schema_info` (
+    `version` INT UNSIGNED NOT NULL
+);
+
+INSERT INTO `schema_info` (`version`) VALUES (1);
+
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
 AS $$
