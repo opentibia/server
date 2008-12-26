@@ -21,7 +21,6 @@
 
 #ifdef __USE_MYSQL__
 
-#include "definitions.h"
 #include <iostream>
 
 #if defined __WINDOWS__ || defined WIN32

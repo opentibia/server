@@ -1,4 +1,22 @@
-
+//////////////////////////////////////////////////////////////////////
+// OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
 
 #include "../../configmanager.h"
 #include "../../database.h"
@@ -29,19 +47,17 @@ SimpleUpdateQuery updateQueries[] = {
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
 {
-	//Execute queris first
+	//Execute queries first
 	Database* db = Database::instance();
-	int i = 0;
-	while(updateQuery.query[i]){
+	for(int i = 0; updateQuery.query[i]; ++i){
 		std::cout << "Executing query : " << updateQuery.query[i] << std::endl;
 		if(!db->executeQuery(updateQuery.query[i])){
 			return false;
 		}
-		++i;
 	}
+
 	//update schema version
 	DBQuery query;
-
 	if(!db->executeQuery("DELETE FROM `schema_info`;")){
 		return false;
 	}
@@ -85,14 +101,12 @@ int main(){
 	}
 	std::cout << "[done]" << std::endl;
 
-
 	std::cout << ":: Checking Schema version... ";
 	DBQuery query;
 	DBResult* result;
-
 	query << "SELECT * FROM `schema_info`;";
 	if(!(result = db->storeQuery(query.str()))){
-		ErrorMessage("Can't get schema version! Does `schema_info` exist?");
+		ErrorMessage("Can't get schema version! Does `schema_info` exist in your database?");
 		return -1;
 	}
 	int schema_version = result->getDataInt("version");
@@ -108,8 +122,8 @@ int main(){
 		return 0;
 	}
 
-	std::string yesno;
 	std::cout << "Your database is not updated. Do you want to update it? (y/n)";
+	std::string yesno;
 	std::cin >> yesno;
 	if(yesno != "y" && yesno != "yes"){
 		return 0;
@@ -123,7 +137,6 @@ int main(){
 				sprintf(errorMessage, "Error while updating to schema version %d!", updateQueries[i].version);
 				ErrorMessage(errorMessage);
 				return -1;
-				break;
 			}
 		}
 	}

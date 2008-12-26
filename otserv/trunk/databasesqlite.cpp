@@ -22,11 +22,10 @@
 #ifdef __USE_SQLITE__
 
 #include <iostream>
+#include <fstream>
 
 #include "database.h"
 #include "databasesqlite.h"
-
-#include "tools.h"
 
 #include "configmanager.h"
 extern ConfigManager g_config;
@@ -45,9 +44,13 @@ DatabaseSQLite::DatabaseSQLite()
 
 	// test for existence of database file;
 	// sqlite3_open will create a new one if it isn't there (which we don't want)
-	if(!fileExists(g_config.getString(ConfigManager::SQL_DB).c_str())){
+	std::fstream fin(g_config.getString(ConfigManager::SQL_DB).c_str(), std::ios::in | std::ios::binary);
+	if(fin.fail()){
+		std::cout << "Failed to initialize SQLite connection. File " << g_config.getString(ConfigManager::SQL_DB) <<
+				" does not exist." << std::endl;
 		return;
 	}
+	fin.close();
 
 	// Initialize sqlite
 	if( sqlite3_open(g_config.getString(ConfigManager::SQL_DB).c_str(), &m_handle) != SQLITE_OK){
