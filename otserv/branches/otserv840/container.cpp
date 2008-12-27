@@ -865,8 +865,10 @@ void Container::__startDecaying()
 ContainerIterator Container::begin()
 {
 	ContainerIterator cit(this);
-	cit.over.push(this);
-	cit.cur = itemlist.begin();
+	if(!itemlist.empty()){
+		cit.over.push(this);
+		cit.cur = itemlist.begin();
+	}
 	return cit;
 }
 
@@ -958,7 +960,7 @@ ContainerIterator& ContainerIterator::operator++()
 	
 	Item* i = *cur;
 	Container* c = i->getContainer();
-	if(c)
+	if(c && !c->itemlist.empty())
 		over.push(c);
 	
 	++cur;
