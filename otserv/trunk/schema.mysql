@@ -254,3 +254,8 @@ BEGIN
 END|
 
 DELIMITER ;
+
+# uncomment to add a single player
+#INSERT INTO `groups` VALUES (1, 'Group 1', 0, 3, 10, 10);
+#INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0, 0);
+#INSERT INTO `players` VALUES (2, 'OTSCMS', 1, 1, 0, 1, 2252770, 53, 8, 11970, 11970, 11820, 11820, 1847, 100, 2, 10, 10, 10, 10, 128, 0, 116, 106, 7, 9980, 1221452439, 102017216, 1, '', 0, 0, '', 10, 10, 10, 10, 0, 1, 10000000);
