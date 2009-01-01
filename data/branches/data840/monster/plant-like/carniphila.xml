@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="carniphila" nameDescription="a carniphila" race="VENOM" experience="250" speed="240" manacost="0">
+  <health now="255" max="255"/>
+  <look type="120" head="20" body="30" legs="40" feet="50" corpse="6047"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="1"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="40" attack="40" poison="95"/>
+    <attack name="poison" interval="1000" chance="25" range="7" min="-60" max="-90">
+      <attribute key="shootEffect" value="poison"/>
+      <attribute key="areaEffect" value="greenspark"/>
+    </attack>
+    <attack name="speed" interval="1000" chance="34" range="7" speedchange="-850" duration="30000">
+      <attribute key="shootEffect" value="poison"/>
+      <attribute key="areaEffect" value="greenspark"/>
+    </attack>
+    <attack name="poison" interval="1000" chance="12" radius="3" target="0" min="-40" max="-130">
+      <attribute key="areaEffect" value="poison"/>
+    </attack>
+  </attacks>
+  <defenses armor="26" defense="10"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="1"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="1"/>
+    <immunity drunk="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <loot>
+    <item id="2148" countmax="100" chance1="100000" chancemax="0"/>
+    <item id="2666" countmax="5" chance1="33333" chancemax="0"/>
+    <item id="2671" countmax="4" chance1="20000" chancemax="0"/>
+    <item id="2465" chance="5000"/>
+    <item id="2459" chance="4000"/>
+    <item id="2655" chance="500"/>
+    <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
+  </loot>
+</monster>
