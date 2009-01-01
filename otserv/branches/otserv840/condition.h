@@ -95,6 +95,7 @@ enum ConditionAttr_t{
 	CONDITIONATTR_OUTFIT = 24,
 	CONDITIONATTR_PERIODDAMAGE = 25,
 	CONDITIONATTR_SKILLSPERCENT = 26,
+	CONDITIONATTR_ISBUFF = 27,
 
 	//reserved for serialization
 	CONDITIONATTR_END      = 254
@@ -115,7 +116,7 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason) = 0;
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
-	virtual uint32_t getIcons() const = 0;
+	virtual uint32_t getIcons() const;
 	virtual ConditionId_t getId() const {return id;}
 
 	virtual Condition* clone() const = 0;
@@ -145,6 +146,7 @@ protected:
 	int32_t ticks;
 	int64_t endTime;
 	ConditionType_t conditionType;
+	bool isBuff;
 
 	virtual bool updateCondition(const Condition* addCondition);
 };
@@ -372,7 +374,6 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
-	virtual uint32_t getIcons() const;
 
 	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
 
@@ -401,7 +402,6 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* addCondition);
-	virtual uint32_t getIcons() const;
 
 	virtual ConditionLight* clone()  const { return new ConditionLight(*this); }
 

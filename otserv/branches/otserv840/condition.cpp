@@ -34,7 +34,8 @@ Condition::Condition(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
 id(_id),
 ticks(_ticks),
 endTime(0),
-conditionType(_type)
+conditionType(_type),
+isBuff(false)
 {
 	//
 }
@@ -45,6 +46,12 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 		case CONDITIONPARAM_TICKS:
 		{
 			ticks = value;
+			return true;
+		}
+
+		case CONDITIONPARAM_BUFF_SPELL:
+		{
+			isBuff = value > 0;
 			return true;
 		}
 
@@ -79,6 +86,11 @@ xmlNodePtr Condition::serialize()
 	ss.str("");
 	ss << ticks;
 	xmlSetProp(nodeCondition, (const xmlChar*)"ticks", (const xmlChar*)ss.str().c_str());
+
+	ss.str("");
+	ss << isBuff;
+	xmlSetProp(nodeCondition, (const xmlChar*)"isbuff", (const xmlChar*)ss.str().c_str());
+
 	return nodeCondition;
 }
 
@@ -134,6 +146,19 @@ bool Condition::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 			break;
 		}
 
+
+		case CONDITIONATTR_ISBUFF:
+		{
+			int8_t value = 0;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			isBuff = value != 0;
+			return true;
+			break;
+		}
+
 		case CONDITIONATTR_END:
 		{
 			return true;
@@ -155,6 +180,9 @@ bool Condition::serialize(PropWriteStream& propWriteStream)
 
 	propWriteStream.ADD_UCHAR(CONDITIONATTR_TICKS);
 	propWriteStream.ADD_VALUE((int32_t)ticks);
+
+	propWriteStream.ADD_UCHAR(CONDITIONATTR_ISBUFF);
+	propWriteStream.ADD_VALUE((int8_t)isBuff);
 	return true;
 }
 
@@ -317,6 +345,11 @@ bool Condition::isPersistent() const
 	return true;
 }
 
+uint32_t Condition::getIcons() const
+{
+	return isBuff? ICON_PARTY_BUFF : 0;
+}
+
 bool Condition::updateCondition(const Condition* addCondition)
 {
 	if(conditionType != addCondition->getType()){
@@ -368,27 +401,26 @@ void ConditionGeneric::addCondition(Creature* creature, const Condition* addCond
 
 uint32_t ConditionGeneric::getIcons() const
 {
+	uint32_t icons = Condition::getIcons();
+
 	switch(conditionType){
 		case CONDITION_MANASHIELD:
-			return ICON_MANASHIELD;
+			icons |= ICON_MANASHIELD;
 			break;
 
 		case CONDITION_INFIGHT:
-			return ICON_SWORDS;
+			icons |= ICON_SWORDS;
 			break;
 
 		case CONDITION_DRUNK:
-			return ICON_DRUNK;
-			break;
-
-		case CONDITION_EXHAUSTED:
+			icons |= ICON_DRUNK;
 			break;
 
 		default:
 			break;
 	}
 
-	return 0;
+	return icons;
 }
 
 ConditionAttributes::ConditionAttributes(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
@@ -618,6 +650,8 @@ void ConditionAttributes::updateSkills(Player* player)
 			const int new_skill = int(normal_skill * (1. + skillsPercent[i] / 100.) - normal_skill) + skills[i];
 
 			player->setVarSkill((skills_t)i, new_skill);
+			// 'skills' is now used to remember how much was added
+			skills[i] += new_skill;
 		}
 	}
 
@@ -656,9 +690,7 @@ void ConditionAttributes::endCondition(Creature* creature, ConditionEnd_t reason
 			if(skills[i] || skillsPercent[i]){
 				needUpdateSkills = true;
 
-				const int normal_skill = player->getSkill((skills_t)i, SKILL_LEVEL) - player->getVarSkill((skills_t)i);
-
-				const int new_skill = int(normal_skill * (1. + skillsPercent[i] / 100.) - normal_skill) + skills[i];
+				const int new_skill = skills[i];
 
 				player->setVarSkill((skills_t)i, -new_skill);
 
@@ -1689,40 +1721,42 @@ int32_t ConditionDamage::getTotalDamage() const
 
 uint32_t ConditionDamage::getIcons() const
 {
+	uint32_t icons = Condition::getIcons();
+
 	switch(conditionType){
 		case CONDITION_FIRE:
-			return ICON_BURN;
+			icons |= ICON_BURN;
 			break;
 
 		case CONDITION_ENERGY:
-			return ICON_ENERGY;
+			icons |= ICON_ENERGY;
 			break;
 
 		case CONDITION_DROWN:
-			return ICON_DROWNING;
+			icons |= ICON_DROWNING;
 			break;
 
 		case CONDITION_POISON:
-			return ICON_POISON;
+			icons |= ICON_POISON;
 			break;
 
 		case CONDITION_FREEZING:
-			return ICON_FREEZING;
+			icons |= ICON_FREEZING;
 			break;
 
 		case CONDITION_DAZZLED:
-			return ICON_DAZZLED;
+			icons |= ICON_DAZZLED;
 			break;
 
 		case CONDITION_CURSED:
-			return ICON_CURSED;
+			icons |= ICON_CURSED;
 			break;
 
 		default:
 			break;
 	}
 
-	return 0;
+	return icons;
 }
 
 void ConditionDamage::generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list)
@@ -1990,20 +2024,22 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 
 uint32_t ConditionSpeed::getIcons() const
 {
+	uint32_t icons = Condition::getIcons();
+
 	switch(conditionType){
 		case CONDITION_HASTE:
-			return ICON_HASTE;
+			icons |= ICON_HASTE;
 			break;
 
 		case CONDITION_PARALYZE:
-			return ICON_PARALYZE;
+			icons |= ICON_PARALYZE;
 			break;
 
 		default:
 			break;
 	}
 
-	return 0;
+	return icons;
 }
 
 ConditionInvisible::ConditionInvisible(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
@@ -2196,11 +2232,6 @@ void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondi
 
 		changeOutfit(creature);
 	}
-}
-
-uint32_t ConditionOutfit::getIcons() const
-{
-	return 0;
 }
 
 ConditionLight::ConditionLight(ConditionId_t _id, ConditionType_t _type, int32_t _ticks, int32_t _lightlevel, int32_t _lightcolor) :
@@ -2399,7 +2430,3 @@ bool ConditionLight::serialize(PropWriteStream& propWriteStream)
 	return true;
 }
 
-uint32_t ConditionLight::getIcons() const
-{
-	return 0;
-}
