@@ -194,7 +194,9 @@ void mainLoader(int argc, char *argv[])
 	srand((unsigned int)OTSYS_TIME());
 	std::cout << "[done]" << std::endl;
 
-#if defined __LUA_NAME_ALTER__
+#if defined LUA_CONFIGFILE
+	const char* configname = LUA_CONFIGFILE;
+#elif defined __LUA_NAME_ALTER__
 	const char* configname = "otserv.lua";
 #else
 	const char* configname = "config.lua";

@@ -246,6 +246,7 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_EXHAUST_COMBAT:
 		case CONDITION_EXHAUST_HEAL:
 		case CONDITION_MUTED:
+		case CONDITION_PACIFIED:
 		{
 			return new ConditionGeneric(_id, _type,_ticks);
 			break;
@@ -396,6 +397,7 @@ ConditionAttributes::ConditionAttributes(ConditionId_t _id, ConditionType_t _typ
 	currentSkill = 0;
 	currentStat = 0;
 	memset(skills, 0, sizeof(skills));
+	memset(skillsPercent, 0, sizeof(skillsPercent));
 	memset(stats, 0, sizeof(stats));
 	memset(statsPercent, 0, sizeof(statsPercent));
 }
@@ -411,6 +413,7 @@ void ConditionAttributes::addCondition(Creature* creature, const Condition* addC
 
 		//Apply the new one
 		memcpy(skills, conditionAttrs.skills, sizeof(skills));
+		memcpy(skillsPercent, conditionAttrs.skillsPercent, sizeof(skillsPercent));
 		memcpy(stats, conditionAttrs.stats, sizeof(stats));
 		memcpy(statsPercent, conditionAttrs.statsPercent, sizeof(statsPercent));
 
@@ -433,6 +436,15 @@ xmlNodePtr ConditionAttributes::serialize()
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
 		ss.str("");
 		ss << skills[i];
+		ss2.str("");
+		ss2 << str << i;
+		xmlSetProp(nodeCondition, (const xmlChar*)ss2.str().c_str(), (const xmlChar*)ss.str().c_str());
+	}
+
+	str = "skillPercent";
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		ss.str("");
+		ss << skillsPercent[i];
 		ss2.str("");
 		ss2 << str << i;
 		xmlSetProp(nodeCondition, (const xmlChar*)ss2.str().c_str(), (const xmlChar*)ss.str().c_str());
@@ -469,6 +481,15 @@ bool ConditionAttributes::unserialize(xmlNodePtr p)
 	}
 
 	str = "stat";
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		ss.str("");
+		ss << str << i;
+		if(readXMLInteger(p, ss.str().c_str(), intValue)){
+			skillsPercent[i] = intValue;
+		}
+	}
+
+	str = "stat";
 	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
 		ss.str("");
 		ss << str << i;
@@ -483,6 +504,16 @@ bool ConditionAttributes::unserialize(xmlNodePtr p)
 bool ConditionAttributes::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 {
 	if(attr == CONDITIONATTR_SKILLS){
+		int32_t value = 0;
+		if(!propStream.GET_VALUE(value)){
+			return false;
+		}
+
+		skills[currentSkill] = value;
+		++currentSkill;
+		return true;
+	}
+	else if(attr == CONDITIONATTR_SKILLSPERCENT){
 		int32_t value = 0;
 		if(!propStream.GET_VALUE(value)){
 			return false;
@@ -516,6 +547,11 @@ bool ConditionAttributes::serialize(PropWriteStream& propWriteStream)
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
 		propWriteStream.ADD_UCHAR(CONDITIONATTR_SKILLS);
 		propWriteStream.ADD_VALUE(skills[i]);
+	}
+
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		propWriteStream.ADD_UCHAR(CONDITIONATTR_SKILLSPERCENT);
+		propWriteStream.ADD_VALUE(skillsPercent[i]);
 	}
 
 	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
@@ -574,9 +610,14 @@ void ConditionAttributes::updateSkills(Player* player)
 	bool needUpdateSkills = false;
 
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		if(skills[i]){
+		if(skills[i] || skillsPercent[i]){
 			needUpdateSkills = true;
-			player->setVarSkill((skills_t)i, skills[i]);
+
+			const int normal_skill = player->getSkill((skills_t)i, SKILL_LEVEL) - player->getVarSkill((skills_t)i);
+
+			const int new_skill = int(normal_skill * (1. + skillsPercent[i] / 100.) - normal_skill) + skills[i];
+
+			player->setVarSkill((skills_t)i, new_skill);
 		}
 	}
 
@@ -612,9 +653,15 @@ void ConditionAttributes::endCondition(Creature* creature, ConditionEnd_t reason
 	if(player){
 		bool needUpdateSkills = false;
 		for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-			if(skills[i]){
+			if(skills[i] || skillsPercent[i]){
 				needUpdateSkills = true;
-				player->setVarSkill((skills_t)i, -skills[i]);
+
+				const int normal_skill = player->getSkill((skills_t)i, SKILL_LEVEL) - player->getVarSkill((skills_t)i);
+
+				const int new_skill = int(normal_skill * (1. + skillsPercent[i] / 100.) - normal_skill) + skills[i];
+
+				player->setVarSkill((skills_t)i, -new_skill);
+
 			}
 		}
 		if(needUpdateSkills){
@@ -645,84 +692,122 @@ bool ConditionAttributes::setParam(ConditionParam_t param, int32_t value)
 			skills[SKILL_AXE] = value;
 			skills[SKILL_SWORD] = value;
 			return true;
-			break;
+		}
+
+		case CONDITIONPARAM_SKILL_MELEEPERCENT:
+		{
+			skillsPercent[SKILL_CLUB] = value;
+			skillsPercent[SKILL_AXE] = value;
+			skillsPercent[SKILL_SWORD] = value;
+			return true;
 		}
 
 		case CONDITIONPARAM_SKILL_FIST:
 		{
 			skills[SKILL_FIST] = value;
 			return true;
-			break;
+		}
+
+		case CONDITIONPARAM_SKILL_FISTPERCENT:
+		{
+			skillsPercent[SKILL_FIST] = value;
+			return true;
 		}
 
 		case CONDITIONPARAM_SKILL_CLUB:
 		{
 			skills[SKILL_CLUB] = value;
 			return true;
-			break;
+		}
+
+		case CONDITIONPARAM_SKILL_CLUBPERCENT:
+		{
+			skillsPercent[SKILL_CLUB] = value;
+			return true;
 		}
 
 		case CONDITIONPARAM_SKILL_SWORD:
 		{
 			skills[SKILL_SWORD] = value;
 			return true;
-			break;
+		}
+
+		case CONDITIONPARAM_SKILL_SWORDPERCENT:
+		{
+			skillsPercent[SKILL_SWORD] = value;
+			return true;
 		}
 
 		case CONDITIONPARAM_SKILL_AXE:
 		{
 			skills[SKILL_AXE] = value;
 			return true;
-			break;
+		}
+
+		case CONDITIONPARAM_SKILL_AXEPERCENT:
+		{
+			skillsPercent[SKILL_AXE] = value;
+			return true;
 		}
 
 		case CONDITIONPARAM_SKILL_DISTANCE:
 		{
 			skills[SKILL_DIST] = value;
 			return true;
-			break;
+		}
+
+		case CONDITIONPARAM_SKILL_DISTANCEPERCENT:
+		{
+			skillsPercent[SKILL_DIST] = value;
+			return true;
 		}
 
 		case CONDITIONPARAM_SKILL_SHIELD:
 		{
 			skills[SKILL_SHIELD] = value;
 			return true;
-			break;
+		}
+
+		case CONDITIONPARAM_SKILL_SHIELDPERCENT:
+		{
+			skillsPercent[SKILL_SHIELD] = value;
+			return true;
 		}
 
 		case CONDITIONPARAM_SKILL_FISHING:
 		{
 			skills[SKILL_FISH] = value;
 			return true;
-			break;
+		}
+
+		case CONDITIONPARAM_SKILL_FISHINGPERCENT:
+		{
+			skillsPercent[SKILL_FISH] = value;
+			return true;
 		}
 
 		case CONDITIONPARAM_STAT_MAXHITPOINTS:
 		{
 			stats[STAT_MAXHITPOINTS] = value;
 			return true;
-			break;
 		}
 
 		case CONDITIONPARAM_STAT_MAXMANAPOINTS:
 		{
 			stats[STAT_MAXMANAPOINTS] = value;
 			return true;
-			break;
 		}
 
 		case CONDITIONPARAM_STAT_SOULPOINTS:
 		{
 			stats[STAT_SOULPOINTS] = value;
 			return true;
-			break;
 		}
 
 		case CONDITIONPARAM_STAT_MAGICPOINTS:
 		{
 			stats[STAT_MAGICPOINTS] = value;
 			return true;
-			break;
 		}
 
 		case CONDITIONPARAM_STAT_MAXHITPOINTSPERCENT:
@@ -733,7 +818,6 @@ bool ConditionAttributes::setParam(ConditionParam_t param, int32_t value)
 
 			statsPercent[STAT_MAXHITPOINTS] = value;
 			return true;
-			break;
 		}
 
 		case CONDITIONPARAM_STAT_MAXMANAPOINTSPERCENT:
@@ -744,7 +828,6 @@ bool ConditionAttributes::setParam(ConditionParam_t param, int32_t value)
 
 			statsPercent[STAT_MAXMANAPOINTS] = value;
 			return true;
-			break;
 		}
 
 		case CONDITIONPARAM_STAT_SOULPOINTSPERCENT:
@@ -755,7 +838,6 @@ bool ConditionAttributes::setParam(ConditionParam_t param, int32_t value)
 
 			statsPercent[STAT_SOULPOINTS] = value;
 			return true;
-			break;
 		}
 
 		case CONDITIONPARAM_STAT_MAGICPOINTSPERCENT:
@@ -766,7 +848,6 @@ bool ConditionAttributes::setParam(ConditionParam_t param, int32_t value)
 
 			statsPercent[STAT_MAGICPOINTS] = value;
 			return true;
-			break;
 		}
 
 		default:

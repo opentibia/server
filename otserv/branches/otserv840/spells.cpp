@@ -20,6 +20,7 @@
 #include "otpch.h"
 
 #include "definitions.h"
+#include "game.h"
 #include "tools.h"
 #include "house.h"
 #include "housetile.h"
@@ -627,7 +628,8 @@ bool Spell::playerSpellCheck(Player* player) const
 		}
 
 		if((isAggressive && player->hasCondition(CONDITION_EXHAUST_COMBAT)) ||
-			player->hasCondition(CONDITION_EXHAUST_HEAL)){
+			player->hasCondition(CONDITION_EXHAUST_HEAL))
+		{
 			player->sendCancelMessage(RET_YOUAREEXHAUSTED);
 
 			if(isInstant()){

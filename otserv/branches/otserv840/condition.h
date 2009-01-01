@@ -57,7 +57,8 @@ enum ConditionType_t {
 	CONDITION_DAZZLED        = 524288,
 	CONDITION_CURSED         = 1048576,
 	CONDITION_EXHAUST_COMBAT = 2097152,
-	CONDITION_EXHAUST_HEAL   = 4194304
+	CONDITION_EXHAUST_HEAL   = 4194304,
+	CONDITION_PACIFIED       = 8388608,
 };
 
 enum ConditionEnd_t{
@@ -93,6 +94,7 @@ enum ConditionAttr_t{
 	CONDITIONATTR_STATS = 23,
 	CONDITIONATTR_OUTFIT = 24,
 	CONDITIONATTR_PERIODDAMAGE = 25,
+	CONDITIONATTR_SKILLSPERCENT = 26,
 
 	//reserved for serialization
 	CONDITIONATTR_END      = 254
@@ -195,6 +197,7 @@ public:
 
 protected:
 	int32_t skills[SKILL_LAST + 1];
+	int32_t skillsPercent[SKILL_LAST + 1];
 	int32_t stats[STAT_LAST + 1];
 	int32_t statsPercent[STAT_LAST + 1];
 	int32_t currentSkill;
