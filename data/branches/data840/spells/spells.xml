@@ -10,6 +10,9 @@
 	</rune>
 	<rune name="adori min vis" id="2287" lvl="15" maglv="0" needtarget="1" charges="10" script="attack/light_magic_missile.lua">
 	</rune>
+	<rune name="adori san" id="2295" lvl="27" maglv="4" needtarget="1" charges="3" script="attack/holy_missile.lua">
+		<vocation name="Paladin"/>   <vocation name="Royal Paladin"/>
+	</rune>
 	<rune name="adevo grav flam" id="2301" lvl="15" maglv="1" blocktype="solid" charges="3" script="attack/fire_field.lua">
 	</rune>
 	<rune name="adeta sio" id="2290" lvl="16" maglv="5" needtarget="1" charges="1" function="convince">
@@ -62,7 +65,7 @@
 	</rune>
 	<rune name="adori gran mort" id="2268" lvl="45" maglv="15" needtarget="1" charges="3" script="attack/sudden_death.lua">
 	</rune>
-	<rune name="adana ani" id="2278" lvl="54" maglv="18" mana="1400" needtarget="1" charges="1" script="support/paralyze_rune.lua">
+	<rune name="adana ani" id="2278" lvl="54" maglv="18" mana="1400" needtarget="1" charges="5" script="support/paralyze_rune.lua">
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 	</rune>
 
@@ -355,4 +358,22 @@
 	<instant name="Fierce Berserk" words="exori gran" lvl="70" mana="340" prem="1" selftarget="1" script="attack/fierce_berserk.lua">
 		<vocation name="Knight"/>   <vocation name="Elite Knight"/>
 	</instant>
+	<instant name="Protector" words="utamo tempo" lvl="55" mana="200" prem="1" selftarget="1" script="support/protector.lua">
+		<vocation name="Knight"/>   <vocation name="Elite Knight"/>
+	</instant>
+	<instant name="Blood Rage" words="utito tempo" lvl="60" mana="290" prem="1" selftarget="1" script="support/blood_rage.lua">
+		<vocation name="Knight"/>   <vocation name="Elite Knight"/>
+	</instant>
+	<instant name="Charge" words="utani tempo hur" lvl="25" mana="100" selftarget="1" aggressive="0" script="support/charge.lua">
+		<vocation name="Knight"/>   <vocation name="Elite Knight"/>
+	</instant>
+	<instant name="Swift Foot" words="utamo tempo san" lvl="55" mana="400" selftarget="1" aggressive="0" script="support/swift_foot.lua">
+		<vocation name="Paladin"/>   <vocation name="Royal Paladin"/>
+	</instant>
+	<instant name="Sharpshooter" words="utito tempo san" lvl="60" mana="450" selftarget="1" aggressive="0" script="support/sharpshooter.lua">
+		<vocation name="Paladin"/>   <vocation name="Royal Paladin"/>
+	</instant>
+	<conjure name="Holy Missile" words="adori san" lvl="27" mana="350" soul="3" reagentId="2260" conjureId="2295" conjureCount="5" function="conjureRune">
+		<vocation name="Paladin"/>   <vocation name="Royal Paladin"/>
+	</conjure>
 </spells>
