@@ -72,7 +72,6 @@ struct CombatParams{
 		itemId = 0;
 		impactEffect = NM_ME_NONE;
 		distanceEffect = NM_ME_NONE;
-		condition = NULL;
 		dispelType = CONDITION_NONE;
 		useCharges = false;
 
@@ -81,7 +80,7 @@ struct CombatParams{
 		targetCallback = NULL;
 	}
 
-	const Condition* condition;
+	std::list<const Condition*> conditionList;
 	ConditionType_t dispelType;
 	CombatType_t combatType;
 	bool blockedByArmor;
@@ -305,7 +304,7 @@ public:
 		area = _area;
 	}
 	bool hasArea() const {return area != NULL;}
-	void setCondition(const Condition* _condition) {params.condition = _condition;}
+	void setCondition(const Condition* _condition) {params.conditionList.push_back(_condition);}
 	void setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb);
 	void postCombatEffects(Creature* caster, const Position& pos) const {Combat::postCombatEffects(caster, pos, params);}
 
