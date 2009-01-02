@@ -25,6 +25,7 @@
 
 #include "luascript.h"
 #include "player.h"
+#include "party.h"
 #include "item.h"
 #include "game.h"
 #include "house.h"
@@ -1635,6 +1636,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//getSpectators(centerPos, rangex, rangey, multifloor)
 	lua_register(m_luaState, "getSpectators", LuaScriptInterface::luaGetSpectators);
+
+	//getPartyMembers(cid)
+	lua_register(m_luaState, "getPartyMembers", LuaScriptInterface::luaGetPartyMembers);
 
 	//hasCondition(cid, conditionid)
 	lua_register(m_luaState, "hasCondition", LuaScriptInterface::luaHasCondition);
@@ -7027,6 +7031,48 @@ int LuaScriptInterface::luaGetSpectators(lua_State *L)
 
 	lua_newtable(L);
 	SpectatorVec::const_iterator it = list.begin();
+	for(uint32_t i = 1; it != list.end(); ++it, ++i){
+		lua_pushnumber(L, i);
+		lua_pushnumber(L, (*it)->getID());
+		lua_settable(L, -3);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPartyMembers(lua_State *L)
+{
+	//getPartyMembers(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Player* player = creature->getPlayer();
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	if(!player->getParty()){
+		lua_pushnil(L);
+		return 1;
+	}
+
+	PlayerVector list = player->getParty()->getMemberList();
+	if(player->getParty()->getLeader() == player){
+		list.push_back(player);
+	}
+
+	lua_newtable(L);
+	PlayerVector::const_iterator it = list.begin();
 	for(uint32_t i = 1; it != list.end(); ++it, ++i){
 		lua_pushnumber(L, i);
 		lua_pushnumber(L, (*it)->getID());

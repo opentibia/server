@@ -268,6 +268,20 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 			break;
 		}
 
+		case CONDITION_PARTY_KNIGHT:
+		case CONDITION_PARTY_PALADIN:
+		case CONDITION_PARTY_SORCERER:
+		{
+			return new ConditionPartyBuff(_id, _type,_ticks);
+			break;
+		}
+
+		case CONDITION_PARTY_DRUID:
+		{
+			return new ConditionPartyBuff_Druid(_id, _type,_ticks);
+			break;
+		}
+
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:

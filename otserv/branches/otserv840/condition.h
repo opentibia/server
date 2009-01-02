@@ -59,6 +59,10 @@ enum ConditionType_t {
 	CONDITION_EXHAUST_COMBAT = 2097152,
 	CONDITION_EXHAUST_HEAL   = 4194304,
 	CONDITION_PACIFIED       = 8388608,
+	CONDITION_PARTY_KNIGHT    = 16777216,
+	CONDITION_PARTY_PALADIN   = 33554432,
+	CONDITION_PARTY_SORCERER  = 67108864,
+	CONDITION_PARTY_DRUID     = 134217728,
 };
 
 enum ConditionEnd_t{
@@ -237,6 +241,26 @@ protected:
 	uint32_t manaTicks;
 	uint32_t healthGain;
 	uint32_t manaGain;
+};
+
+class ConditionPartyBuff : public ConditionAttributes
+{
+public:
+	ConditionPartyBuff(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
+		ConditionAttributes(_id, _type, _ticks) {isBuff = true;};
+	virtual ~ConditionPartyBuff(){};
+
+	virtual ConditionPartyBuff* clone()  const { return new ConditionPartyBuff(*this); }
+};
+
+class ConditionPartyBuff_Druid : public ConditionRegeneration
+{
+public:
+	ConditionPartyBuff_Druid(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
+		ConditionRegeneration(_id, _type, _ticks) {isBuff = true;};
+	virtual ~ConditionPartyBuff_Druid(){};
+
+	virtual ConditionPartyBuff_Druid* clone()  const { return new ConditionPartyBuff_Druid(*this); }
 };
 
 class ConditionSoul : public ConditionGeneric
