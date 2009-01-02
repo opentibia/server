@@ -135,14 +135,14 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 	sqlite3_stmt* stmt;
 	// prepares statement
 	if( OTS_SQLITE3_PREPARE(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
-		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
+		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << " (" << buf << ")" << std::endl;
 		return false;
 	}
 
 	// executes it once
 	int ret = sqlite3_step(stmt);
 	if(ret != SQLITE_OK && ret != SQLITE_DONE && ret != SQLITE_ROW){
-		std::cout << "sqlite3_step(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
+		std::cout << "sqlite3_step(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << " (" << buf << ")" << std::endl;
 		return false;
 	}
 
@@ -186,7 +186,7 @@ std::string DatabaseSQLite::escapeString(const std::string &s)
 	char* output = new char[s.length() * 2 + 3];
 
 	// quotes escaped string and frees temporary buffer
-	sqlite3_snprintf(s.length() * 2 + 1, output, "%Q", s.c_str() );
+	sqlite3_snprintf(s.length() * 2 + 3, output, "%Q", s.c_str() );
 	std::string r(output);
 	delete[] output;
 	return r;
