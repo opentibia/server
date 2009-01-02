@@ -1628,13 +1628,14 @@ bool Game::addMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
 	money -= plat * 100;
 	int gold = money;
 
-	if(crys != 0){
-		Item* remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, crys);
+	while(crys > 0){
+		Item* remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, std::min(100, crys));
 
 		ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
 		if(ret != RET_NOERROR){
 			internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		}
+		crys -= std::min(100, crys);
 	}
 
 	if(plat != 0){
