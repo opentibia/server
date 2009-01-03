@@ -21,6 +21,7 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
+#include <stdio.h>
 #include <boost/utility.hpp>
 
 class NetworkMessage;
@@ -70,7 +71,7 @@ protected:
 	void enableXTEAEncryption() { m_encryptionEnabled = true; }
 	void disableXTEAEncryption() { m_encryptionEnabled = false; }
 	void setXTEAKey(const uint32_t* key){
-		memcpy(m_key, key, sizeof(uint32_t)*4);
+		memcpy(&m_key, key, sizeof(uint32_t)*4);
 	}
 	void enableChecksum() { m_checksumEnabled = true; }
 	void disableChecksum() { m_checksumEnabled = false; }

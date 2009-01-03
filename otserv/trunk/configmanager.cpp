@@ -19,6 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 //#include "otpch.h"
 
+#include "otpch.h"
+
 #include "definitions.h"
 #include "configmanager.h"
 #include <iostream>
@@ -106,18 +108,18 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[MIN_ACTIONEXTIME] = getGlobalNumber(L, "minactionexinterval", 1000);
 	m_confInteger[DEFAULT_DESPAWNRANGE] = getGlobalNumber(L, "despawnrange", 2);
 	m_confInteger[DEFAULT_DESPAWNRADIUS] = getGlobalNumber(L, "despawnradius", 50);
-	m_confInteger[ALLOW_CLONES] = getGlobalNumber(L, "allowclones", 0);
+	m_confInteger[ALLOW_CLONES] = getGlobalBoolean(L, "allowclones", false);
 	m_confInteger[RATE_EXPERIENCE] = getGlobalNumber(L, "rate_exp", 1);
 	m_confInteger[RATE_SKILL] = getGlobalNumber(L, "rate_skill", 1);
 	m_confInteger[RATE_LOOT] = getGlobalNumber(L, "rate_loot", 1);
 	m_confInteger[RATE_MAGIC] = getGlobalNumber(L, "rate_mag", 1);
 	m_confInteger[RATE_SPAWN] = getGlobalNumber(L, "rate_spawn", 1);
-	m_confInteger[HOTKEYS] = getGlobalNumber(L, "enablehotkeys", 0);
+	m_confInteger[HOTKEYS] = getGlobalBoolean(L, "enablehotkeys", false);
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);
-	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalNumber(L, "saveclientdebug", 0);
-	m_confInteger[CHECK_ACCOUNTS] = getGlobalNumber(L, "checkaccounts", 0);
-	m_confString[USE_ACCBALANCE] = getGlobalString(L, "useaccbalance", "no");
-	m_confInteger[PREMIUM_ONLY_BEDS] = (getGlobalString(L, "premonlybeds", "yes") == "yes");
+	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalBoolean(L, "saveclientdebug", false);
+	m_confInteger[CHECK_ACCOUNTS] = getGlobalBoolean(L, "checkaccounts", false);
+	m_confString[USE_ACCBALANCE] = getGlobalBoolean(L, "useaccbalance", false);
+	m_confInteger[PREMIUM_ONLY_BEDS] = getGlobalBoolean(L, "premonlybeds", true);
 
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
@@ -186,7 +188,7 @@ std::string ConfigManager::getGlobalString(lua_State* _L, const std::string& _id
 	return ret;
 }
 
-int ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier, const int _default)
+int ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier, int _default)
 {
 	lua_getglobal(_L, _identifier.c_str());
 
@@ -200,3 +202,25 @@ int ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier
 
 	return val;
 }
+
+bool ConfigManager::getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default)
+{
+	lua_getglobal(_L, _identifier.c_str());
+
+	if(lua_isnumber(_L, -1)){
+		int val = (int)lua_tonumber(_L, -1);
+		lua_pop(_L, 1);
+		return val != 0;
+	} else if(lua_isstring(_L, -1)){
+		std::string val = lua_tostring(_L, -1);
+		lua_pop(_L, 1);
+		return val == "yes";
+	} else if(lua_isboolean(_L, -1)){
+		bool v = lua_toboolean(_L, -1) != 0;
+		lua_pop(_L, 1);
+		return v;
+	}
+
+	return _default;
+}
+

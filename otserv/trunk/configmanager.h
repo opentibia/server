@@ -109,7 +109,8 @@ public:
 
 private:
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
-	int getGlobalNumber(lua_State* _L, const std::string& _identifier, const int _default=0);
+	int getGlobalNumber(lua_State* _L, const std::string& _identifier, int _default=0);
+	bool getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default=false);
 
 	bool m_isLoaded;
 	std::string m_confString[LAST_STRING_CONFIG];

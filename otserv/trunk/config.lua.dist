@@ -55,8 +55,8 @@ pzlocked = 60000
 -- how long a field belongs to a player before it no longer causes PZ lock for the owner
 field_ownership_duration = 5000
 
--- set to 0 = disabled (default), 1 = enabled
-enablehotkeys = 0
+-- enable (advanced, item based) hotkeys?
+enablehotkeys = false
 
 -- minimum amount of time between actions ('Use') (1000 = 1 second)
 minactioninterval = 200
@@ -69,10 +69,10 @@ minactionexinterval = 1000
 houserentperiod = "monthly"
 
 -- whether or not to check for premium accounts when using beds
-premonlybeds = "no"
+premonlybeds = false
 
 -- Should the server use account balance system or depot system for paying houses?
-useaccbalance = "no"
+useaccbalance = false
 
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
@@ -109,19 +109,16 @@ retrytimeout = 5000
 logintimeout = 60 * 1000
 
 -- allow clones (multiple logins of the same char)
--- options: 0 (no), 1 (yes)
-allowclones = 0
+allowclones = false
 
 -- only one player online per account
--- options: 0 (no), 1 (yes)
-checkaccounts = 0
+checkaccounts = false
 
 -- max number of players allowed
 maxplayers = "900"
 
 -- save client debug assertion reports
--- options: 0 (no), 1 (yes)
-saveclientdebug = 0
+saveclientdebug = false
 
 -- Set the max query interval for retrieving status information
 -- default: 5 minutes / IP

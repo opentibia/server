@@ -42,9 +42,6 @@
 <vocation name="Paladin"/>
 </instant>
 
-	<instant name="Energy Strike" words="exori vis" lvl="12" mana="20" prem="0" casterTargetOrDirection="1" script="energy_strike.lua">
-	</instant>
-
 <instant name="Light" words="utevo lux" aggressive="0" lvl="2" maglv="0" mana="20" soul="0" exhaustion="1" prem="0" enabled="1" script="light.lua"></instant>
 <instant name="Challenge" words="exeta res" lvl="10" maglv="20" manapercent="10" soul="0" exhaustion="1" prem="0" enabled="1" script="challenge.lua"></instant>
 <instant name="Ultimate Explosion" words="exevo gran mas vis" lvl="40" maglv="40" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" script="ultimate explosion.lua"></instant>
