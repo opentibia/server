@@ -24,6 +24,7 @@ function onCastSpell(cid, var)
 		return 0
 	end
 	
+	doPlayerAddMana(cid, -manaCost)
 	doPlayerAddManaSpent(cid, manaCost)
 	doCombat(cid, combat, var)
 
