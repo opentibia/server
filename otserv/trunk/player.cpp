@@ -3713,8 +3713,14 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
-	redSkullTicks = redSkullTicks + 12 * 3600 * 1000;
-	if(redSkullTicks > 2*12*3600*1000){
+	redSkullTicks = redSkullTicks + g_config.getNumber(ConfigManager::SKULL_TIME);
+	// We subtract one from kills as if you kill three people, you'll gain 3*time ticks,
+	// however some will probably decay in that time so we only check if the ticks are
+	// greater than 2*time (must be >= N kills then)
+	if(redSkullTicks > 
+			(g_config.getNumber(ConfigManager::KILLS_FOR_RED_SKULL) - 1) *
+			 g_config.getNumber(ConfigManager::SKULL_TIME))
+	{
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
 	}

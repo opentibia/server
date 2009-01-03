@@ -74,6 +74,13 @@ premonlybeds = false
 -- Should the server use account balance system or depot system for paying houses?
 useaccbalance = false
 
+-- Skull duration, how long one kill adds to your red skull time
+skullduration = 12*60*60*1000
+
+-- How many players you need to kill to gain a red skull
+killsforredskull = 3
+
+
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
 rate_skill = 1

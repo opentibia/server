@@ -96,6 +96,8 @@ public:
 		SQL_PORT,
 		STATUSQUERY_TIMEOUT,
 		PREMIUM_ONLY_BEDS,
+		SKULL_TIME,
+		KILLS_FOR_RED_SKULL,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

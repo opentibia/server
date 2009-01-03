@@ -120,6 +120,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[CHECK_ACCOUNTS] = getGlobalBoolean(L, "checkaccounts", false);
 	m_confString[USE_ACCBALANCE] = getGlobalBoolean(L, "useaccbalance", false);
 	m_confInteger[PREMIUM_ONLY_BEDS] = getGlobalBoolean(L, "premonlybeds", true);
+	m_confInteger[SKULL_TIME] = getGlobalNumber(L, "skullduration", 12*60*60*1000);
+	m_confInteger[KILLS_FOR_RED_SKULL] = getGlobalNumber(L, "killsforredskull", 3);
 
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
