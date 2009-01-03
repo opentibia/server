@@ -266,7 +266,7 @@ void mainLoader(int argc, char *argv[])
 
 	// load item data
 	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items84.otb";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.otb";
 	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(Item::items.loadFromOtb(filename.str())){
 		std::stringstream errormsg;
