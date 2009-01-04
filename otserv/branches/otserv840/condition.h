@@ -58,11 +58,7 @@ enum ConditionType_t {
 	CONDITION_CURSED         = 1048576,
 	CONDITION_EXHAUST_COMBAT = 2097152,
 	CONDITION_EXHAUST_HEAL   = 4194304,
-	CONDITION_PACIFIED       = 8388608,
-	CONDITION_PARTY_KNIGHT    = 16777216,
-	CONDITION_PARTY_PALADIN   = 33554432,
-	CONDITION_PARTY_SORCERER  = 67108864,
-	CONDITION_PARTY_DRUID     = 134217728,
+	CONDITION_PACIFIED       = 8388608
 };
 
 enum ConditionEnd_t{
@@ -121,7 +117,8 @@ public:
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason) = 0;
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
 	virtual uint32_t getIcons() const;
-	virtual ConditionId_t getId() const {return id;}
+	ConditionId_t getId() const {return id;}
+	uint32_t getSubId() const {return subId;}
 
 	virtual Condition* clone() const = 0;
 
@@ -147,6 +144,7 @@ public:
 
 protected:
 	ConditionId_t id;
+	uint32_t subId;
 	int32_t ticks;
 	int64_t endTime;
 	ConditionType_t conditionType;
@@ -210,8 +208,9 @@ protected:
 	int32_t currentStat;
 
 	void updatePercentStats(Player* player);
-	void updateSkills(Player* player);
 	void updateStats(Player* player);
+	void updatePercentSkills(Player* player);
+	void updateSkills(Player* player);
 };
 
 class ConditionRegeneration : public ConditionGeneric
@@ -241,26 +240,6 @@ protected:
 	uint32_t manaTicks;
 	uint32_t healthGain;
 	uint32_t manaGain;
-};
-
-class ConditionPartyBuff : public ConditionAttributes
-{
-public:
-	ConditionPartyBuff(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
-		ConditionAttributes(_id, _type, _ticks) {isBuff = true;};
-	virtual ~ConditionPartyBuff(){};
-
-	virtual ConditionPartyBuff* clone()  const { return new ConditionPartyBuff(*this); }
-};
-
-class ConditionPartyBuff_Druid : public ConditionRegeneration
-{
-public:
-	ConditionPartyBuff_Druid(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
-		ConditionRegeneration(_id, _type, _ticks) {isBuff = true;};
-	virtual ~ConditionPartyBuff_Druid(){};
-
-	virtual ConditionPartyBuff_Druid* clone()  const { return new ConditionPartyBuff_Druid(*this); }
 };
 
 class ConditionSoul : public ConditionGeneric

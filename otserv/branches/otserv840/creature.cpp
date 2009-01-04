@@ -1241,7 +1241,7 @@ bool Creature::addCondition(Condition* condition)
 		return false;
 	}
 
-	Condition* prevCond = getCondition(condition->getType(), condition->getId());
+	Condition* prevCond = getCondition(condition->getType(), condition->getId(), condition->getSubId());
 
 	if(prevCond){
 		prevCond->addCondition(this, condition);
@@ -1332,22 +1332,10 @@ void Creature::removeCondition(Condition* condition)
 	}
 }
 
-Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id) const
+Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id, uint32_t subId) const
 {
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type && (*it)->getId() == id){
-			return *it;
-		}
-	}
-
-	return NULL;
-}
-
-Condition* Creature::getCondition(ConditionType_t type) const
-{
-	//This one just returns the first one found.
-	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type){
+		if((*it)->getType() == type && (*it)->getId() == id && (*it)->getSubId() == subId){
 			return *it;
 		}
 	}

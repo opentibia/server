@@ -32,6 +32,7 @@ extern Game g_game;
 
 Condition::Condition(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
 id(_id),
+subId(0),
 ticks(_ticks),
 endTime(0),
 conditionType(_type),
@@ -52,6 +53,12 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 		case CONDITIONPARAM_BUFF_SPELL:
 		{
 			isBuff = value > 0;
+			return true;
+		}
+
+		case CONDITIONPARAM_SUBID:
+		{
+			subId = value;
 			return true;
 		}
 
@@ -268,20 +275,6 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 			break;
 		}
 
-		case CONDITION_PARTY_KNIGHT:
-		case CONDITION_PARTY_PALADIN:
-		case CONDITION_PARTY_SORCERER:
-		{
-			return new ConditionPartyBuff(_id, _type,_ticks);
-			break;
-		}
-
-		case CONDITION_PARTY_DRUID:
-		{
-			return new ConditionPartyBuff_Druid(_id, _type,_ticks);
-			break;
-		}
-
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
@@ -464,6 +457,7 @@ void ConditionAttributes::addCondition(Creature* creature, const Condition* addC
 		memcpy(statsPercent, conditionAttrs.statsPercent, sizeof(statsPercent));
 
 		if(Player* player = creature->getPlayer()){
+			updatePercentSkills(player);
 			updateSkills(player);
 			updatePercentStats(player);
 			updateStats(player);
@@ -616,6 +610,7 @@ bool ConditionAttributes::startCondition(Creature* creature)
 	}
 
 	if(Player* player = creature->getPlayer()){
+		updatePercentSkills(player);
 		updateSkills(player);
 		updatePercentStats(player);
 		updateStats(player);
@@ -651,29 +646,6 @@ void ConditionAttributes::updatePercentStats(Player* player)
 	}
 }
 
-void ConditionAttributes::updateSkills(Player* player)
-{
-	bool needUpdateSkills = false;
-
-	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		if(skills[i] || skillsPercent[i]){
-			needUpdateSkills = true;
-
-			const int normal_skill = player->getSkill((skills_t)i, SKILL_LEVEL) - player->getVarSkill((skills_t)i);
-
-			const int new_skill = int(normal_skill * (1. + skillsPercent[i] / 100.) - normal_skill) + skills[i];
-
-			player->setVarSkill((skills_t)i, new_skill);
-			// 'skills' is now used to remember how much was added
-			skills[i] += new_skill;
-		}
-	}
-
-	if(needUpdateSkills){
-		player->sendSkills();
-	}
-}
-
 void ConditionAttributes::updateStats(Player* player)
 {
 	bool needUpdateStats = false;
@@ -687,6 +659,34 @@ void ConditionAttributes::updateStats(Player* player)
 
 	if(needUpdateStats){
 		player->sendStats();
+	}
+}
+
+void ConditionAttributes::updatePercentSkills(Player* player)
+{
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		if(skillsPercent[i] == 0){
+			continue;
+		}
+
+		int32_t currSkill = player->getSkill((skills_t)i, SKILL_LEVEL);
+		skills[i] = (int32_t)(currSkill * ((skillsPercent[i] - 100) / 100.f));
+	}
+}
+
+void ConditionAttributes::updateSkills(Player* player)
+{
+	bool needUpdateSkills = false;
+
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		if(skills[i]){
+			needUpdateSkills = true;
+			player->setVarSkill((skills_t)i, skills[i]);
+		}
+	}
+
+	if(needUpdateSkills){
+		player->sendSkills();
 	}
 }
 

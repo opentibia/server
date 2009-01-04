@@ -1799,7 +1799,7 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		{
 			value = 0;
 
-			Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
+			Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 			if(condition){
 				value = condition->getTicks() / 1000;
 			}
@@ -5569,9 +5569,9 @@ int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
 		return 1;
 	}
 
-	Condition* condition = creature->getCondition(conditionType, CONDITIONID_COMBAT);
+	Condition* condition = creature->getCondition(conditionType, CONDITIONID_COMBAT, 0);
 	if(!condition){
-		condition = creature->getCondition(conditionType, CONDITIONID_DEFAULT);
+		condition = creature->getCondition(conditionType, CONDITIONID_DEFAULT, 0);
 	}
 
 	if(condition){

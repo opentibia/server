@@ -205,7 +205,7 @@ void Player::setVocation(uint32_t vocId)
 	vocation = g_vocations.getVocation(vocId);
 
 	//Update health/mana gain condition
-	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
+	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 	if(condition){
 		condition->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
 		condition->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
@@ -2433,7 +2433,7 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 
 void Player::addDefaultRegeneration(uint32_t addTicks)
 {
-	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
+	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 
 	if(condition){
 		condition->setTicks(condition->getTicks() + addTicks);
