@@ -428,7 +428,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 			while(nodeTown != NO_NODE){
 				if(type == OTBM_WAYPOINT){
 					if(!f.getProps(nodeTown, propStream)){
-						setLastErrorString("Could not read town data.");
+						setLastErrorString("Could not read waypoint data.");
 						return false;
 					}
 
