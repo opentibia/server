@@ -454,7 +454,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					map->waypoints.addWaypoint(wp);
 				}
 				else{
-					setLastErrorString("Unknown town node.");
+					setLastErrorString("Unknown waypoint node.");
 					return false;
 				}
 
