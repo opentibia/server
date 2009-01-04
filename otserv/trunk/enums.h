@@ -44,9 +44,10 @@ enum CombatType_t {
 	COMBAT_ICEDAMAGE        = 512,
 	COMBAT_HOLYDAMAGE       = 1024,
 	COMBAT_DEATHDAMAGE      = 2048,
-	COMBAT_LAST             = COMBAT_DEATHDAMAGE,
-	COMBAT_COUNT            = 13
+	COMBAT_LAST             = COMBAT_DEATHDAMAGE
 };
+
+const int COMBAT_COUNT = 13;
 
 enum CombatParam_t{
 	COMBATPARAM_COMBATTYPE				= 1,
@@ -236,7 +237,7 @@ struct ShopInfo{
 	uint32_t buyPrice;
 	uint32_t sellPrice;
 	// Name can be found using Item::items[itemId].
-	
+
 	ShopInfo(){
 		itemId = 0;
 		subType = 1;

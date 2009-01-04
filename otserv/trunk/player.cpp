@@ -980,7 +980,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_CANONLYUSEONESHIELD:
 		sendCancel("You may only use one shield.");
 		break;
- 
+
 	case RET_TOOFARAWAY:
 		sendCancel("Too far away.");
 		break;
@@ -1997,7 +1997,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 	if(blockType != BLOCK_NONE)
 		return blockType;
 
-	int32_t blocked_damage = 0;
+	//int32_t blocked_damage = 0;
 
 	if(damage != 0)
 	{
@@ -2007,9 +2007,9 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		{
 			if(!(item = getInventoryItem((slots_t)slot)))
 				continue;
-			
+
 			const ItemType& it = Item::items[item->getID()];
-			
+
 			if(it.abilities.absorb.reduce(combatType, damage))
 			{
 				int32_t charges = item->getCharges();
@@ -2450,7 +2450,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 								}
 								else{
 									//check so we can only equip one weapon
-									if(	leftItem->getWeaponType() != WEAPON_NONE && 
+									if(	leftItem->getWeaponType() != WEAPON_NONE &&
 										leftItem->getWeaponType() != WEAPON_SHIELD &&
 										leftItem->getWeaponType() != WEAPON_AMMO){
 										ret = RET_CANONLYUSEONEWEAPON;
@@ -3728,7 +3728,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	// We subtract one from kills as if you kill three people, you'll gain 3*time ticks,
 	// however some will probably decay in that time so we only check if the ticks are
 	// greater than 2*time (must be >= N kills then)
-	if(redSkullTicks > 
+	if(redSkullTicks >
 			(g_config.getNumber(ConfigManager::KILLS_FOR_RED_SKULL) - 1) *
 			 g_config.getNumber(ConfigManager::SKULL_TIME))
 	{

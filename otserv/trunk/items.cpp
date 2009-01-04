@@ -532,7 +532,7 @@ bool Items::loadFromXml(const std::string& datadir)
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.allowPickupable = (intValue == 1);
 								}
-							}							
+							}
 							else if(asLowerCaseString(strValue) == "floorchange"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "down"){
@@ -1405,7 +1405,7 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os) const
 bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 {
 	bool r = false;
-	int32_t blocked = 0;
+	//int32_t blocked = 0;
 	if(resistances[0] > 0) {
 		r = true;
 		dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[0]) / 100.);
