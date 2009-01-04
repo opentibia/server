@@ -398,7 +398,6 @@ public:
 	void addOutfit(uint32_t _looktype, uint32_t _addons);
 	bool remOutfit(uint32_t _looktype, uint32_t _addons);
 	bool canLogout();
-	void updateSaleShopList(uint32_t itemId);
 
 	//tile
 	//send methods
@@ -596,6 +595,8 @@ public:
 	void stopWalk();
 	void openShopWindow(const std::list<ShopInfo>& shop);
 	void closeShopWindow();
+	void updateSaleShopList(uint32_t itemId);
+	bool hasShopItemForSale(uint32_t itemId);
 
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;

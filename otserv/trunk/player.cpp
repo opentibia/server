@@ -1211,6 +1211,17 @@ void Player::sendPing(uint32_t interval)
 	}
 }
 
+bool Player::hasShopItemForSale(uint32_t itemId)
+{
+	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
+		if((*it).itemId == itemId && (*it).buyPrice > 0){
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void Player::updateSaleShopList(uint32_t itemId)
 {
 	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
