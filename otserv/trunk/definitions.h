@@ -184,13 +184,20 @@ enum passwordType_t{
 #else
 	#include <stdint.h>
 	#include <string.h>
-	#include <ext/hash_map>
-	#include <ext/hash_set>
 	#include <assert.h>
 
-	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
-	#define OTSERV_HASH_SET __gnu_cxx::hash_set
-
+	#if __GNUC__ < 4 || !defined(__GXX_EXPERIMENTAL_CXX0X__)
+		#include <ext/hash_map>
+		#include <ext/hash_set>
+		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
+		#define OTSERV_HASH_SET __gnu_cxx::hash_set
+	#else
+		// these only work, for some reason, with c++0x standard enabled
+		#include <unordered_map>
+		#include <unordered_set>
+		#define OTSERV_HASH_MAP std::tr1::unordered_map;
+		#define OTSERV_HASH_SET std::tr1::unordered_set;
+	#endif
 	#define ATOI64 atoll
 
 #endif
