@@ -232,7 +232,7 @@ void BedItem::regeneratePlayer(Player* player) const
 	// Note: time_t is in seconds
 	int32_t sleptTime = int32_t(std::time(NULL) - sleepStart);
 
-	Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
+	Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 	if(condition){
 	    // regenerate 1 health and 1 mana every 30 seconds that the player had food for
 		int32_t regen;

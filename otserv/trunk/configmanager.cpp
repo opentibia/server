@@ -18,6 +18,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "otpch.h"
 
 #include "definitions.h"
 #include "configmanager.h"
@@ -107,6 +108,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[DEFAULT_DESPAWNRANGE] = getGlobalNumber(L, "despawnrange", 2);
 	m_confInteger[DEFAULT_DESPAWNRADIUS] = getGlobalNumber(L, "despawnradius", 50);
 	m_confInteger[ALLOW_CLONES] = getGlobalBoolean(L, "allowclones", false);
+	m_confInteger[PARTY_MEMBER_EXP_BONUS] = getGlobalNumber(L, "party_exp_mul", 5);
 	m_confInteger[RATE_EXPERIENCE] = getGlobalNumber(L, "rate_exp", 1);
 	m_confInteger[RATE_SKILL] = getGlobalNumber(L, "rate_skill", 1);
 	m_confInteger[RATE_LOOT] = getGlobalNumber(L, "rate_loot", 1);

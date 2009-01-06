@@ -29,8 +29,21 @@
 #include "definitions.h"
 
 class Player;
+class Party;
 
 typedef std::map<uint32_t, Player*> UsersMap;
+
+enum ChannelID {
+	CHANNEL_GUILD      = 0x00,
+	CHANNEL_RULE_REP   = 0x03,
+	CHANNEL_GAME_CHAT  = 0x04,
+	CHANNEL_TRADE      = 0x05,
+	CHANNEL_TRADE_ROOK = 0x06,
+	CHANNEL_RL_CHAT    = 0x07,
+	CHANNEL_PARTY      = 0x08,
+	CHANNEL_HELP       = 0x09,
+	CHANNEL_PRIVATE    = 0xFFFF,
+};
 
 class ChatChannel
 {
@@ -42,6 +55,7 @@ public:
 	bool removeUser(Player* player);
 
 	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time = 0);
+	bool sendInfo(SpeakClasses type, const std::string& text, uint32_t time = 0);
 
 	const std::string& getName(){ return m_name; }
 	const uint16_t getId(){ return m_id; }
@@ -90,16 +104,20 @@ public:
 	~Chat();
 	ChatChannel* createChannel(Player* player, uint16_t channelId);
 	bool deleteChannel(Player* player, uint16_t channelId);
+	bool deleteChannel(Party* party);
 
 	bool addUserToChannel(Player* player, uint16_t channelId);
 	bool removeUserFromChannel(Player* player, uint16_t channelId);
 	void removeUserFromAllChannels(Player* player);
+
+	uint16_t getFreePrivateChannelId();
 
 	bool talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 
 	std::string getChannelName(Player* player, uint16_t channelId);
 	ChannelList getChannelList(Player* player);
 
+	ChatChannel* getChannel(Party* party);
 	ChatChannel* getChannel(Player* player, uint16_t channelId);
 	ChatChannel* getChannelById(uint16_t channelId);
 	PrivateChatChannel* getPrivateChannel(Player* player);
@@ -108,8 +126,10 @@ private:
 
 	typedef std::map<uint16_t, ChatChannel*> NormalChannelMap;
 	typedef std::map<uint32_t, ChatChannel*> GuildChannelMap;
+	typedef std::map<Party*, PrivateChatChannel*> PartyChannelMap;
 	NormalChannelMap m_normalChannels;
 	GuildChannelMap m_guildChannels;
+	PartyChannelMap m_partyChannels;
 
 	typedef std::map<uint16_t, PrivateChatChannel*> PrivateChannelMap;
 	PrivateChannelMap m_privateChannels;

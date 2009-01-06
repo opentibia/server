@@ -424,10 +424,10 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 			}
 		}
 		else if(type == OTBM_WAYPOINTS && root_header->version >= 2){
-			NODE nodeTown = f.getChildNode(nodeMapData, type);
-			while(nodeTown != NO_NODE){
+			NODE nodeWaypoint = f.getChildNode(nodeMapData, type);
+			while(nodeWaypoint != NO_NODE){
 				if(type == OTBM_WAYPOINT){
-					if(!f.getProps(nodeTown, propStream)){
+					if(!f.getProps(nodeWaypoint, propStream)){
 						setLastErrorString("Could not read waypoint data.");
 						return false;
 					}
@@ -458,7 +458,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					return false;
 				}
 
-				nodeTown = f.getNextNode(nodeTown, type);
+				nodeWaypoint = f.getNextNode(nodeWaypoint, type);
 			}
 		}
 		else{

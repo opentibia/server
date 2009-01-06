@@ -57,7 +57,8 @@ enum ConditionType_t {
 	CONDITION_DAZZLED        = 524288,
 	CONDITION_CURSED         = 1048576,
 	CONDITION_EXHAUST_COMBAT = 2097152,
-	CONDITION_EXHAUST_HEAL   = 4194304
+	CONDITION_EXHAUST_HEAL   = 4194304,
+	CONDITION_PACIFIED       = 8388608
 };
 
 enum ConditionEnd_t{
@@ -93,6 +94,8 @@ enum ConditionAttr_t{
 	CONDITIONATTR_STATS = 23,
 	CONDITIONATTR_OUTFIT = 24,
 	CONDITIONATTR_PERIODDAMAGE = 25,
+	CONDITIONATTR_SKILLSPERCENT = 26,
+	CONDITIONATTR_ISBUFF = 27,
 
 	//reserved for serialization
 	CONDITIONATTR_END      = 254
@@ -113,8 +116,9 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason) = 0;
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
-	virtual uint32_t getIcons() const = 0;
-	virtual ConditionId_t getId() const {return id;}
+	virtual uint32_t getIcons() const;
+	ConditionId_t getId() const {return id;}
+	uint32_t getSubId() const {return subId;}
 
 	virtual Condition* clone() const = 0;
 
@@ -140,9 +144,11 @@ public:
 
 protected:
 	ConditionId_t id;
+	uint32_t subId;
 	int32_t ticks;
 	int64_t endTime;
 	ConditionType_t conditionType;
+	bool isBuff;
 
 	virtual bool updateCondition(const Condition* addCondition);
 };
@@ -195,14 +201,16 @@ public:
 
 protected:
 	int32_t skills[SKILL_LAST + 1];
+	int32_t skillsPercent[SKILL_LAST + 1];
 	int32_t stats[STAT_LAST + 1];
 	int32_t statsPercent[STAT_LAST + 1];
 	int32_t currentSkill;
 	int32_t currentStat;
 
 	void updatePercentStats(Player* player);
-	void updateSkills(Player* player);
 	void updateStats(Player* player);
+	void updatePercentSkills(Player* player);
+	void updateSkills(Player* player);
 };
 
 class ConditionRegeneration : public ConditionGeneric
@@ -369,7 +377,6 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
-	virtual uint32_t getIcons() const;
 
 	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
 
@@ -398,7 +405,6 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* addCondition);
-	virtual uint32_t getIcons() const;
 
 	virtual ConditionLight* clone()  const { return new ConditionLight(*this); }
 

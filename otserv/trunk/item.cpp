@@ -697,11 +697,11 @@ double Item::getWeight() const
 	return items[id].weight;
 }
 
-std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
+std::string Item::getLongName(const ItemType& it, int32_t lookDistance,
 	const Item* item /*= NULL*/, int32_t subType /*= -1*/, bool addArticle /*= true*/)
 {
-	std::stringstream s;
-
+	std::ostringstream s;
+	
 	if(item){
 		subType = item->getSubType();
 	}
@@ -724,6 +724,26 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 	else{
 		s << "an item of type " << it.id;
 	}
+
+	return s.str();
+}
+
+std::string Item::getLongName() const
+{
+	const ItemType& it = items[id];
+	return getLongName(it, 0, this);
+}
+
+std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
+	const Item* item /*= NULL*/, int32_t subType /*= -1*/, bool addArticle /*= true*/)
+{
+	std::stringstream s;
+
+	if(item){
+		subType = item->getSubType();
+	}
+
+	s << getLongName(it, lookDistance, item, subType, addArticle);
 
 	if(it.isRune()){
 		s << "(\"" << it.runeSpellName << "\", Charges:" << subType <<").";

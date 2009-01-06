@@ -3303,7 +3303,13 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		case SPEAK_CHANNEL_Y:
 		case SPEAK_CHANNEL_R1:
 		case SPEAK_CHANNEL_R2:
-			return playerTalkToChannel(player, type, text, channelId);
+			if(playerTalkToChannel(player, type, text, channelId)){
+				return true;
+			}
+			else{
+				// Resend in default channel
+				return playerSay(playerId, 0, SPEAK_SAY, receiver, text);
+			}
 			break;
 		case SPEAK_PRIVATE_PN:
 			return playerSpeakToNpc(player, text);
@@ -3435,8 +3441,7 @@ bool Game::playerTalkToChannel(Player* player, SpeakClasses type, const std::str
 		type = SPEAK_CHANNEL_Y;
 	}
 
-	g_chat.talkToChannel(player, type, text, channelId);
-	return true;
+	return g_chat.talkToChannel(player, type, text, channelId);
 }
 
 bool Game::playerSpeakToNpc(Player* player, const std::string& text)

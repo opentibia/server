@@ -30,7 +30,6 @@
 #include "enums.h"
 #include "vocation.h"
 #include "protocolgame.h"
-#include "party.h"
 
 #include <vector>
 #include <ctime>
@@ -624,7 +623,7 @@ protected:
 	void setNextActionTask(SchedulerTask* task);
 
 	void die();
-	virtual void dropCorpse();
+	virtual Item* dropCorpse();
 	virtual Item* getCorpse();
 
 	//cylinder implementations

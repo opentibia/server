@@ -2682,7 +2682,11 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creatur
 	msg->AddU32(0x00000000);
 
 	//Do not add name for anonymous channel talk
-	if(type != SPEAK_CHANNEL_R2){
+	if(creature == NULL)
+	{
+		msg->AddString("");
+	}
+	else if(type != SPEAK_CHANNEL_R2){
 		if(type != SPEAK_RVR_ANSWER){
 			msg->AddString(creature->getName());
 		}
@@ -2695,7 +2699,8 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creatur
 	}
 
 	//Add level only for players
-	if(const Player* speaker = creature->getPlayer()){
+	const Player* speaker = creature? creature->getPlayer() : NULL;
+	if(speaker){
 		if(type != SPEAK_RVR_ANSWER){
 			msg->AddU16(speaker->getPlayerInfo(PLAYERINFO_LEVEL));
 		}
@@ -2715,9 +2720,11 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creatur
 		case SPEAK_MONSTER_SAY:
 		case SPEAK_MONSTER_YELL:
 		case SPEAK_PRIVATE_NP:
+			assert(creature);
 			msg->AddPosition(creature->getPosition());
 			break;
 		case SPEAK_CHANNEL_Y:
+		case SPEAK_CHANNEL_W:
 		case SPEAK_CHANNEL_R1:
 		case SPEAK_CHANNEL_R2:
 		case SPEAK_CHANNEL_O:

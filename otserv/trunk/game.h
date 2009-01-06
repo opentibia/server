@@ -36,6 +36,7 @@
 #include "templates.h"
 #include "scheduler.h"
 
+class Player;
 class Creature;
 class Monster;
 class Npc;
@@ -93,6 +94,7 @@ private:
 };
 
 typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
+typedef std::vector<Player*> PlayerVector;
 
 #define EVENT_LIGHTINTERVAL  10000
 #define EVENT_DECAYINTERVAL  1000

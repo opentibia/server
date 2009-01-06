@@ -40,6 +40,7 @@
 #include "creatureevent.h"
 #include "status.h"
 #include "beds.h"
+#include "party.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -204,7 +205,7 @@ void Player::setVocation(uint32_t vocId)
 	vocation = g_vocations.getVocation(vocId);
 
 	//Update health/mana gain condition
-	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
+	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 	if(condition){
 		condition->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
 		condition->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
@@ -476,6 +477,9 @@ int32_t Player::getDefense() const
 	}
 
 	defenseValue += baseDefense;
+
+	if(defenseSkill == 0)
+		return 0;
 
 	return ((int32_t)std::ceil(((float)(defenseSkill * (defenseValue * 0.015)) + (defenseValue * 0.1)) * defenseFactor));
 }
@@ -2126,7 +2130,7 @@ void Player::die()
 	}
 }
 
-void Player::dropCorpse()
+Item* Player::dropCorpse()
 {
 	if(getZone() == ZONE_PVP){
 		preSave();
@@ -2136,9 +2140,10 @@ void Player::dropCorpse()
 		g_game.internalTeleport(this, getTemplePosition());
 		g_game.addCreatureHealth(this);
 		onThink(EVENT_CREATURE_THINK_INTERVAL);
+		return NULL;
 	}
 	else{
-		Creature::dropCorpse();
+		return Creature::dropCorpse();
 	}
 }
 
@@ -2204,7 +2209,7 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 
 void Player::addDefaultRegeneration(uint32_t addTicks)
 {
-	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
+	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 
 	if(condition){
 		condition->setTicks(condition->getTicks() + addTicks);
@@ -3080,6 +3085,12 @@ void Player::doAttacking(uint32_t interval)
 	if(lastAttack == 0){
 		// - 1 to compensate for timer resolution etc.
 		lastAttack = OTSYS_TIME() - getAttackSpeed() - 1;
+	}
+
+	// Can't attack while pacified
+	if(hasCondition(CONDITION_PACIFIED))
+	{
+		return;
 	}
 
 	if((OTSYS_TIME() - lastAttack) >= getAttackSpeed() ){

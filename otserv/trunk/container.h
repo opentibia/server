@@ -21,13 +21,41 @@
 #ifndef __OTSERV_CONTAINER_H__
 #define __OTSERV_CONTAINER_H__
 
+#include <queue>
+
 #include "definitions.h"
 #include "cylinder.h"
 #include "item.h"
 
 typedef std::list<Item *> ItemList;
 
+class Container;
 class Depot;
+
+class ContainerIterator
+{
+public:
+	ContainerIterator();
+	ContainerIterator(const ContainerIterator& rhs);
+	~ContainerIterator();
+	
+	ContainerIterator& operator=(const ContainerIterator& rhs);
+	bool operator==(const ContainerIterator& rhs);
+	bool operator!=(const ContainerIterator& rhs);
+	ContainerIterator& operator++();
+	ContainerIterator operator++(int);
+	Item* operator*();
+	Item* operator->();
+	
+protected:
+	ContainerIterator(Container* super);
+	
+	Container* super;
+	std::queue<Container*> over;
+	ItemList::iterator cur;
+
+	friend class Container;
+};
 
 class Container : public Item, public Cylinder
 {
@@ -50,6 +78,11 @@ public:
 	uint32_t size() const {return (uint32_t)itemlist.size();};
 	uint32_t capacity() const {return maxSize;};
 
+	ContainerIterator begin();
+	ContainerIterator end();
+	ContainerIterator begin() const;
+	ContainerIterator end() const;
+
 	ItemList::const_iterator getItems() const {return itemlist.begin();}
 	ItemList::const_iterator getEnd() const {return itemlist.end();}
 
@@ -59,6 +92,7 @@ public:
 
 	uint32_t getItemHoldingCount() const;
 	virtual double getWeight() const;
+	std::string getContentDescription() const;
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -101,9 +135,13 @@ private:
 
 
 protected:
+	std::ostringstream& getContentDescription(std::ostringstream& os) const;
+
 	uint32_t maxSize;
 	double total_weight;
 	ItemList itemlist;
+
+	friend class ContainerIterator;
 };
 
 #endif

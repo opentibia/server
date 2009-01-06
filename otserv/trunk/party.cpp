@@ -19,14 +19,17 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "items.h"
 #include "party.h"
 #include "player.h"
 #include "game.h"
+#include "chat.h"
+#include "configmanager.h"
 
 #include <sstream>
 
 extern Game g_game;
+extern Chat g_chat;
+extern ConfigManager g_config;
 
 Party::Party(Player* _leader)
 {
@@ -46,6 +49,8 @@ Party::~Party()
 
 void Party::disband()
 {
+	g_chat.deleteChannel(this);
+
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, "Your party has been disbanded.");
 	getLeader()->setParty(NULL);
 	getLeader()->sendPlayerPartyIcons(getLeader());
@@ -88,7 +93,12 @@ bool Party::invitePlayer(Player* player)
 	player->addPartyInvitation(this);
 
 	std::stringstream ss;
-	ss << player->getName() << " has been invited.";
+	
+	if(inviteList.empty() && memberList.empty()) {
+		ss << player->getName() << " has been invited.";
+	} else {
+		ss << player->getName() << " has been invited. Open the party channel to communicate with other members.";
+	}
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
 	ss.str("");
@@ -202,6 +212,13 @@ bool Party::leaveParty(Player* player)
 	if(!isPlayerMember(player) && getLeader() != player){
 		return false;
 	}
+
+	// Remove from chat
+	PrivateChatChannel* pcc = static_cast<PrivateChatChannel*>(g_chat.getChannel(this));
+	if(pcc){
+		pcc->excludePlayer(NULL, player);
+	}
+
 
 	bool hasNoLeader = false;
 	if(getLeader() == player){
@@ -321,6 +338,17 @@ void Party::broadcastPartyMessage(MessageClasses msgClass, const std::string& ms
 	}
 }
 
+void Party::broadcastLoot(Creature* creature, Container* corpse)
+{
+	std::ostringstream os;
+
+	os << "Loot of " << creature->getName() << ": " << corpse->getContentDescription();
+
+	ChatChannel* channel = g_chat.getChannel(this);
+	if(channel)
+		channel->sendInfo(SPEAK_CHANNEL_W, os.str(), std::time(NULL));
+}
+
 void Party::updateSharedExperience()
 {
 	if(sharedExpActive){
@@ -364,12 +392,18 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 
 void Party::shareExperience(uint64_t experience)
 {
-	uint32_t shareExperience = (uint64_t)std::ceil(((double)experience / (memberList.size() + 1)));
+	double member_factor = g_config.getNumber(ConfigManager::PARTY_MEMBER_EXP_BONUS);
+	double xpgained = experience / (memberList.size() + 1) + experience * (member_factor / 100.);
+
+	if(xpgained < 0)
+		return;
+	uint64_t shareExp = (uint64_t)std::ceil(xpgained);
+	
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
-		(*it)->onGainSharedExperience(shareExperience);
+		(*it)->onGainSharedExperience(shareExp);
 	}
 
-	getLeader()->onGainSharedExperience(shareExperience);
+	getLeader()->onGainSharedExperience(shareExp);
 }
 
 bool Party::canUseSharedExperience(const Player* player) const

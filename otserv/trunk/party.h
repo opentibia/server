@@ -27,6 +27,7 @@
 #include <list>
 
 class Player;
+class Container;
 class Party;
 
 typedef std::vector<Player*> PlayerVector;
@@ -54,6 +55,7 @@ public:
 	void updateAllPartyIcons();
 	void updatePartyIcons(Player* player);
 	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
+	void broadcastLoot(Creature* creature, Container* corpse);
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 	bool canOpenCorpse(uint32_t ownerId);
 
@@ -67,6 +69,8 @@ public:
 	void addPlayerHealedMember(Player* player, uint32_t points);
 	void addPlayerDamageMonster(Player* player, uint32_t points);
 	void clearPlayerPoints(Player* player);
+
+	const PlayerVector& getMemberList() {return memberList;}
 
 protected:
 	bool sharedExpActive;
