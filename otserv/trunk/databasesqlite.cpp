@@ -136,6 +136,7 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 	sqlite3_stmt* stmt;
 	// prepares statement
 	if( OTS_SQLITE3_PREPARE(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
+		sqlite3_finalize(stmt);
 		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << " (" << buf << ")" << std::endl;
 		return false;
 	}
@@ -143,6 +144,7 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 	// executes it once
 	int ret = sqlite3_step(stmt);
 	if(ret != SQLITE_OK && ret != SQLITE_DONE && ret != SQLITE_ROW){
+		sqlite3_finalize(stmt);
 		std::cout << "sqlite3_step(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << " (" << buf << ")" << std::endl;
 		return false;
 	}
@@ -169,6 +171,7 @@ DBResult* DatabaseSQLite::storeQuery(const std::string &query)
 	sqlite3_stmt* stmt;
 	// prepares statement
 	if( OTS_SQLITE3_PREPARE(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
+		sqlite3_finalize(stmt);
 		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
 		return NULL;
 	}

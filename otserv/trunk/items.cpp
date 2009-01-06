@@ -1409,7 +1409,6 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os) const
 bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 {
 	bool r = false;
-	//int32_t blocked = 0;
 	if(resistances[0] > 0) {
 		r = true;
 		dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[0]) / 100.);

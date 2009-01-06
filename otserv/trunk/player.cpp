@@ -2001,29 +2001,23 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 	if(blockType != BLOCK_NONE)
 		return blockType;
 
-	//int32_t blocked_damage = 0;
-
-	if(damage != 0)
-	{
+	if(damage != 0){
 		//reduce damage against inventory items
 		Item* item = NULL;
-		for(int32_t slot = SLOT_FIRST; slot < SLOT_LAST; ++slot)
-		{
+		for(int32_t slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
 			if(!(item = getInventoryItem((slots_t)slot)))
 				continue;
 
 			const ItemType& it = Item::items[item->getID()];
 
-			if(it.abilities.absorb.reduce(combatType, damage))
-			{
+			if(it.abilities.absorb.reduce(combatType, damage)){
 				int32_t charges = item->getCharges();
 				if(charges != 0)
 					g_game.transformItem(item, item->getID(), charges - 1);
 			}
 		}
 
-		if(damage <= 0)
-		{
+		if(damage <= 0){
 			damage = 0;
 			blockType = BLOCK_DEFENSE;
 		}
