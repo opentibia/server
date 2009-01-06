@@ -235,6 +235,7 @@ void mainLoader(int argc, char *argv[])
 		exit(-1);
 	}
 	int schema_version = result->getDataInt("version");
+	db->freeResult(result);
 	if(schema_version != CURRENT_SCHEMA_VERSION){
 		ErrorMessage("Not valid database schema version!");
 		exit(-1);
