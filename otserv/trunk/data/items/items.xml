@@ -21972,7 +21972,6 @@
 		<attribute key="showcharges" value="1"/>
 	</item>
 	<item id="7884" article="a" name="terra mantle">
-		<attribute key="description" value="It has 8% earth protection, but also increases damage taken from fire by 8%."/>
 		<attribute key="weight" value="2250"/>
 		<attribute key="armor" value="11"/>
 		<attribute key="slotType" value="body"/>
@@ -21980,7 +21979,6 @@
 		<attribute key="absorbPercentFire" value="-8"/>
 	</item>
 	<item id="7885" name="terra legs">
-	    <attribute key="description" value="It has 6% earth protection, but also increases damage taken from fire by 6%."/>
 		<attribute key="weight" value="1900"/>
 		<attribute key="armor" value="8"/>
 		<attribute key="slotType" value="legs"/>
@@ -21988,7 +21986,6 @@
 		<attribute key="absorbPercentFire" value="-6"/>
 	</item>
 	<item id="7886" name="terra boots">
-	    <attribute key="description" value="It has 5% earth protection, but also increases damage taken from fire by 5%."/>
 		<attribute key="weight" value="750"/>
 		<attribute key="armor" value="2"/>
 		<attribute key="slotType" value="feet"/>
@@ -21996,35 +21993,30 @@
 		<attribute key="absorbPercentFire" value="-5"/>
 	</item>
 	<item id="7887" article="a" name="terra amulet">
-		<attribute key="description" value="It has 20% earth protection, but also increases damage taken from fire by 10%."/>
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="absorbPercentEarth" value="20"/>
 		<attribute key="absorbPercentFire" value="-10"/>
 	</item>
 	<item id="7888" article="a" name="glacier amulet">
-		<attribute key="description" value="It has 20% ice protection, but also increases damage taken from energy by 10%."/>
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="absorbPercentIce" value="20"/>
 		<attribute key="absorbPercentEnergy" value="-10"/>
 	</item>
 	<item id="7889" article="a" name="lightning amulet">
-		<attribute key="description" value="It has 20% energy protection, but also increases damage taken from earth by 10%."/>
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="absorbPercentEnergy" value="20"/>
 		<attribute key="absorbPercentEarth" value="-10"/>
 	</item>
 	<item id="7890" article="a" name="magma amulet">
-		<attribute key="description" value="It has 20% fire protection, but also increases damage taken from ice by 10%."/>
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="absorbPercentFire" value="20"/>
 		<attribute key="absorbPercentIce" value="-10"/>
 	</item>
 	<item id="7891" name="magma boots">
-	    <attribute key="description" value="It has 5% fire protection, but also increases damage taken from ice by 5%."/>
 		<attribute key="weight" value="750"/>
 		<attribute key="armor" value="2"/>
 		<attribute key="absorbPercentFire" value="5"/>
@@ -22032,7 +22024,6 @@
 		<attribute key="slotType" value="feet"/>
 	</item>
 	<item id="7892" name="glacier shoes">
-	    <attribute key="description" value="It has 5% ice protection, but also increases damage taken from energy by 5%."/>
 		<attribute key="weight" value="750"/>
 		<attribute key="armor" value="2"/>
 		<attribute key="slotType" value="feet"/>
@@ -22040,7 +22031,6 @@
 		<attribute key="absorbPercentEnergy" value="-5"/>
 	</item>
 	<item id="7893" name="lightning boots">
-	    <attribute key="description" value="It has 5% energy protection, but also increases damage taken from earth by 5%."/>
 		<attribute key="weight" value="750"/>
 		<attribute key="armor" value="2"/>
 		<attribute key="absorbPercentEnergy" value="5"/>
@@ -22048,7 +22038,6 @@
 		<attribute key="slotType" value="feet"/>
 	</item>
 	<item id="7894" name="magma legs">
-	    <attribute key="description" value="It has 6% fire protection, but also increases damage taken from ice by 6%."/>
 		<attribute key="weight" value="1900"/>
 		<attribute key="armor" value="8"/>
 		<attribute key="absorbPercentFire" value="6"/>
@@ -22056,7 +22045,6 @@
 		<attribute key="slotType" value="legs"/>
 	</item>
 	<item id="7895" name="lightning legs">
-	    <attribute key="description" value="It has 6% energy protection, but also increases damage taken from earth by 6%."/>
 		<attribute key="weight" value="1900"/>
 		<attribute key="armor" value="8"/>
 		<attribute key="absorbPercentEnergy" value="6"/>
@@ -22064,7 +22052,6 @@
 		<attribute key="slotType" value="legs"/>
 	</item>
 	<item id="7896" name="glacier kilt">
-	    <attribute key="description" value="It has 6% ice protection, but also increases damage taken from energy by 6%."/>
 		<attribute key="weight" value="1900"/>
 		<attribute key="armor" value="8"/>
 		<attribute key="slotType" value="legs"/>
@@ -22072,7 +22059,6 @@
 		<attribute key="absorbPercentEnergy" value="-6"/>
 	</item>
 	<item id="7897" article="a" name="glacier robe">
-		<attribute key="description" value="It has 8% ice protection, but also increases damage taken from energy by 8%."/>
 		<attribute key="weight" value="2250"/>
 		<attribute key="armor" value="11"/>
 		<attribute key="slotType" value="body"/>
@@ -22080,7 +22066,6 @@
 		<attribute key="absorbPercentEnergy" value="-8"/>
 	</item>
 	<item id="7898" article="a" name="lightning robe">
-		<attribute key="description" value="It has 8% energy protection, but also increases damage taken from earth by 8%."/>
 		<attribute key="weight" value="2250"/>
 		<attribute key="armor" value="11"/>
 		<attribute key="absorbPercentEnergy" value="8"/>
@@ -22088,7 +22073,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="7899" article="a" name="magma coat">
-		<attribute key="description" value="It has 8% fire protection, but also increases damage taken from ice by 8%."/>
 		<attribute key="weight" value="2250"/>
 		<attribute key="armor" value="11"/>
 		<attribute key="absorbPercentFire" value="8"/>
@@ -22096,7 +22080,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="7900" article="a" name="magma monocle">
-        <attribute key="description" value="It has 4% fire protection, but also increases damage taken from ice by 4%."/>
 		<attribute key="weight" value="1000"/>
 		<attribute key="armor" value="5"/>
 		<attribute key="slotType" value="head"/>
@@ -22104,7 +22087,6 @@
 		<attribute key="absorbPercentIce" value="-4"/>
 	</item>
 	<item id="7901" article="a" name="lightning headband">
-	    <attribute key="description" value="It has 4% energy protection, but also increases damage taken from earth by 4%."/>
 		<attribute key="weight" value="100"/>
 		<attribute key="armor" value="5"/>
 		<attribute key="slotType" value="head"/>
@@ -22112,7 +22094,6 @@
 		<attribute key="absorbPercentEarth" value="-4"/>
 	</item>
 	<item id="7902" article="a" name="glacier mask">
-	    <attribute key="description" value="It has 4% ice protection, but also increases damage taken from energy by 4%."/>
 		<attribute key="weight" value="1000"/>
 		<attribute key="armor" value="5"/>
 		<attribute key="slotType" value="head"/>
@@ -22120,7 +22101,6 @@
 		<attribute key="absorbPercentEnergy" value="-4"/>
 	</item>
 	<item id="7903" article="a" name="terra hood">
-	    <attribute key="description" value="It has 4% earth protection, but also increases damage taken from fire by 4%."/>
 		<attribute key="weight" value="1000"/>
 		<attribute key="armor" value="5"/>
 		<attribute key="slotType" value="head"/>
@@ -23888,7 +23868,6 @@
 		<attribute key="slotType" value="head"/>
 	</item>
 	<item id="8821" article="a" name="witchhunter's cloak">
-		<attribute key="description" value="It has 2% death protection, but also increases damage taken from holy by 2%."/>
 		<attribute key="weight" value="2500"/>
 		<attribute key="armor" value="11"/>
 		<attribute key="absorbPercentDeath" value="2"/>
@@ -24068,7 +24047,6 @@
 	<item id="8864">
 	</item>
 	<item id="8865" article="a" name="dark lord's cape">
-		<attribute key="description" value="It has 8% death protection, but also increases damage taken from holy by 8%."/>
 		<attribute key="weight" value="2900"/>
 		<attribute key="armor" value="11"/>
 		<attribute key="absorbPercentDeath" value="8"/>
@@ -24076,7 +24054,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8866" article="a" name="serpent coat">
-		<attribute key="description" value="It has 12% ice protection, but also increases damage taken from energy by 12%."/>
 		<attribute key="weight" value="2850"/>
 		<attribute key="armor" value="12"/>
 		<attribute key="absorbPercentIce" value="12"/>
@@ -24084,7 +24061,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8867" article="a" name="dragon robe">
-		<attribute key="description" value="It has 12% fire protection, but also increases damage taken from ice by 12%."/>
 		<attribute key="weight" value="2850"/>
 		<attribute key="armor" value="12"/>
 		<attribute key="absorbPercentFire" value="12"/>
@@ -24094,7 +24070,6 @@
 	<item id="8868">
 	</item>
 	<item id="8869" article="a" name="greenwood coat">
-		<attribute key="description" value="It has 12% earth protection, but also increases damage taken from energy by 12%."/>
 		<attribute key="weight" value="2850"/>
 		<attribute key="armor" value="12"/>
 		<attribute key="absorbPercentEarth" value="12"/>
@@ -24142,7 +24117,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8877" article="a" name="lavos armor">
-		<attribute key="description" value="It has 3% fire protection, but also increases damage taken from ice by 3%."/>
 		<attribute key="weight" value="8500"/>
 		<attribute key="armor" value="13"/>
 		<attribute key="absorbPercentFire" value="3"/>
@@ -24150,7 +24124,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8878" article="a" name="crystalline armor">
-		<attribute key="description" value="It has 3% ice protection, but also increases damage taken from energy by 3%."/>
 		<attribute key="weight" value="8450"/>
 		<attribute key="armor" value="13"/>
 		<attribute key="absorbPercentIce" value="3"/>
@@ -24158,7 +24131,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8879" article="a" name="voltage armor">
-		<attribute key="description" value="It has 3% energy protection, but also increases damage taken from earth by 3%."/>
 		<attribute key="weight" value="8450"/>
 		<attribute key="armor" value="13"/>
 		<attribute key="absorbPercentEnergy" value="3"/>
@@ -24168,7 +24140,6 @@
 	<item id="8880">
 	</item>
 	<item id="8881" article="a" name="fireborn giant armor">
-		<attribute key="description" value="It has 5% fire protection, but also increases damage taken from ice by 5%."/>
 		<attribute key="weight" value="12000"/>
 		<attribute key="armor" value="15"/>
 		<attribute key="absorbPercentFire" value="5"/>
@@ -24176,7 +24147,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8882" article="an" name="earthborn titan armor">
-		<attribute key="description" value="It has 5% earth protection, but also increases damage taken from fire by 5%."/>
 		<attribute key="weight" value="12000"/>
 		<attribute key="armor" value="15"/>
 		<attribute key="absorbPercentEarth" value="5"/>
@@ -24184,7 +24154,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8883" article="a" name="windborn colossus armor">
-		<attribute key="description" value="It has 5% energy protection, but also increases damage taken from earth by 5%."/>
 		<attribute key="weight" value="12000"/>
 		<attribute key="armor" value="15"/>
 		<attribute key="absorbPercentEnergy" value="5"/>
@@ -24192,7 +24161,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8884" article="an" name="oceanborn leviathan armor">
-		<attribute key="description" value="It has 5% ice protection, but also increases damage taken from energy by 5%."/>
 		<attribute key="weight" value="10000"/>
 		<attribute key="armor" value="15"/>
 		<attribute key="absorbPercentIce" value="5"/>
@@ -24219,7 +24187,6 @@
 		<attribute key="skillDist" value="3"/>
 	</item>
 	<item id="8889" article="a" name="skullcracker armor">
-		<attribute key="description" value="It has 5% death protection, but also increases damage taken from holy by 5%."/>
 		<attribute key="weight" value="11000"/>
 		<attribute key="armor" value="14"/>
 		<attribute key="absorbPercentDeath" value="5"/>
@@ -24227,7 +24194,6 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8890" article="a" name="robe of the underworld">
-		<attribute key="description" value="It has 12% death protection, but also increases damage taken from holy by 12%."/>
 		<attribute key="armor" value="12"/>
 		<attribute key="slotType" value="body"/>
 		<attribute key="weight" value="1900"/>

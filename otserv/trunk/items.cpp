@@ -1392,7 +1392,7 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, u
 {
 	if(resistances[type] == 0)
 		return os;
-	os << (first? ", " : " ") << CombatTypeName(type == 0? COMBAT_NONE: (CombatType_t)(1 << (type-1))) << " " << std::noshowpos << resistances[type] << "%";
+	os << (first? " " : ", ") << CombatTypeName(type == 0? COMBAT_NONE: (CombatType_t)(1 << (type-1))) << " " << std::noshowpos << resistances[type] << "%";
 	first = false;
 	return os;
 }
