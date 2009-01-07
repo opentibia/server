@@ -25,7 +25,7 @@
 #include "const.h"
 
 #include <list>
-
+#include <map>
 class Player;
 class Creature;
 class Container;

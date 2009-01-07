@@ -172,7 +172,7 @@ DBResult* DatabaseSQLite::storeQuery(const std::string &query)
 	// prepares statement
 	if( OTS_SQLITE3_PREPARE(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
 		sqlite3_finalize(stmt);
-		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle) << std::endl;
+		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle)  << " (" << buf << ")" << std::endl;
 		return NULL;
 	}
 
