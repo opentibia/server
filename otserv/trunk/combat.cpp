@@ -1182,7 +1182,7 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 				if(tmpPos.x >= 0 && tmpPos.y >= 0 && tmpPos.z >= 0 &&
 					tmpPos.x <= 0xFFFF && tmpPos.y <= 0xFFFF && tmpPos.z < MAP_MAX_LAYERS)
 				{
-					if(g_game.isSightClear(centerPos, tmpPos, true)){
+					if(g_game.isSightClear(targetPos, tmpPos, true)){
 						tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
 						if(!tile){
 							tile = new Tile(tmpPos.x, tmpPos.y, tmpPos.z);

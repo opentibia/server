@@ -27,6 +27,7 @@
 #include <list>
 
 class Player;
+class Creature;
 class Container;
 class Party;
 
