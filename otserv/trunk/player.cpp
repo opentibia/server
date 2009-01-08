@@ -2629,27 +2629,40 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		}
 
 		//try containers
+		std::list<Container*> containerList;
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			if(inventory[i] == tradeItem){
 				continue;
 			}
 
 			if(Container* subContainer = dynamic_cast<Container*>(inventory[i])){
-				for(ContainerIterator it = subContainer->begin(); it != subContainer->end(); ++it){
-					if((*it) == tradeItem){
-						continue;
-					}
-
-					Container* tmpContainer = dynamic_cast<Container*>(*it);
-					if(tmpContainer && tmpContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
-						index = INDEX_WHEREEVER;
-						*destItem = NULL;
-						return tmpContainer;
-					}
+				if(subContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
+					index = INDEX_WHEREEVER;
+					*destItem = NULL;
+					return subContainer;
+				}
+				else{
+					containerList.push_back(subContainer);
 				}
 			}
 		}
 
+		//check deeper in the containers
+		for(std::list<Container*>::iterator it = containerList.begin(); it != containerList.end(); ++it){
+			for(ContainerIterator iit = (*it)->begin(); iit != (*it)->end(); ++iit){
+				if((*iit) == tradeItem){
+					continue;
+				}
+
+				if(Container* subContainer = dynamic_cast<Container*>(*iit)){
+					if(subContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
+						index = INDEX_WHEREEVER;
+						*destItem = NULL;
+						return subContainer;
+					}
+				}
+			}
+		}
 		return this;
 	}
 

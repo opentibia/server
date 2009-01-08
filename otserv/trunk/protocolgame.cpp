@@ -345,7 +345,7 @@ bool ProtocolGame::login(const std::string& name)
 	}
 	else{
 		if(eventConnect != 0){
-			//Already trying to connect
+			//A task has already been scheduled just bail out (should not be overriden)
 			disconnectClient(0x14, "You are already logged in.");
 			return false;
 		}
@@ -1850,7 +1850,7 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 		uint32_t i = 0;
 		for(std::map<uint32_t, uint32_t>::const_iterator it = saleMap.begin(); it != saleMap.end() && i < 255; ++it, ++i){
 			msg->AddItemId(it->first);
-			msg->AddByte(it->second);
+			msg->AddByte(std::min((uint32_t)255, it->second));
 		}
 	}
 }
