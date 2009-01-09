@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 	time(&start_time);
 #endif
 #ifdef __OTSERV_ALLOCATOR_STATS__
-	boost::thread(boost::bind(&allocatorStatsThread, NULL));
+	boost::thread(boost::bind(&allocatorStatsThread, (void*)NULL));
 #endif
 
 #if defined __EXCEPTION_TRACER__
