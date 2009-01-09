@@ -71,36 +71,6 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 	return false;
 }
 
-bool Condition::unserialize(xmlNodePtr p)
-{
-	return true;
-}
-
-xmlNodePtr Condition::serialize()
-{
-	xmlNodePtr nodeCondition = xmlNewNode(NULL,(const xmlChar*)"condition");
-
-	std::stringstream ss;
-
-	ss.str("");
-	ss << (int32_t)conditionType;
-	xmlSetProp(nodeCondition, (const xmlChar*)"type", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << (int32_t)id;
-	xmlSetProp(nodeCondition, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << ticks;
-	xmlSetProp(nodeCondition, (const xmlChar*)"ticks", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << isBuff;
-	xmlSetProp(nodeCondition, (const xmlChar*)"isbuff", (const xmlChar*)ss.str().c_str());
-
-	return nodeCondition;
-}
-
 bool Condition::unserialize(PropStream& propStream)
 {
 	uint8_t attr_type;
@@ -166,6 +136,18 @@ bool Condition::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 			break;
 		}
 
+		case CONDITIONATTR_SUBID:
+		{
+			int32_t value = 0;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			subId = value;
+			return true;
+			break;
+		}
+
 		case CONDITIONATTR_END:
 		{
 			return true;
@@ -190,6 +172,9 @@ bool Condition::serialize(PropWriteStream& propWriteStream)
 
 	propWriteStream.ADD_UCHAR(CONDITIONATTR_ISBUFF);
 	propWriteStream.ADD_VALUE((int8_t)isBuff);
+
+	propWriteStream.ADD_UCHAR(CONDITIONATTR_SUBID);
+	propWriteStream.ADD_VALUE((int32_t)subId);
 	return true;
 }
 
@@ -463,82 +448,6 @@ void ConditionAttributes::addCondition(Creature* creature, const Condition* addC
 			updateStats(player);
 		}
 	}
-}
-
-xmlNodePtr ConditionAttributes::serialize()
-{
-	xmlNodePtr nodeCondition = Condition::serialize();
-
-	std::stringstream ss;
-	std::stringstream ss2;
-
-	std::string str = "skill";
-	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		ss.str("");
-		ss << skills[i];
-		ss2.str("");
-		ss2 << str << i;
-		xmlSetProp(nodeCondition, (const xmlChar*)ss2.str().c_str(), (const xmlChar*)ss.str().c_str());
-	}
-
-	str = "skillPercent";
-	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		ss.str("");
-		ss << skillsPercent[i];
-		ss2.str("");
-		ss2 << str << i;
-		xmlSetProp(nodeCondition, (const xmlChar*)ss2.str().c_str(), (const xmlChar*)ss.str().c_str());
-	}
-
-	str = "stat";
-	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
-		ss.str("");
-		ss << stats[i];
-		ss2.str("");
-		ss2 << str << i;
-		xmlSetProp(nodeCondition, (const xmlChar*)ss2.str().c_str(), (const xmlChar*)ss.str().c_str());
-	}
-
-	return nodeCondition;
-}
-
-bool ConditionAttributes::unserialize(xmlNodePtr p)
-{
-	if(!Condition::unserialize(p)){
-		return false;
-	}
-
-	std::string str = "skill";
-	std::stringstream ss;
-	int intValue;
-
-	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		ss.str("");
-		ss << str << i;
-		if(readXMLInteger(p, ss.str().c_str(), intValue)){
-			skills[i] = intValue;
-		}
-	}
-
-	str = "stat";
-	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		ss.str("");
-		ss << str << i;
-		if(readXMLInteger(p, ss.str().c_str(), intValue)){
-			skillsPercent[i] = intValue;
-		}
-	}
-
-	str = "stat";
-	for(int32_t i = STAT_FIRST; i <= STAT_LAST; ++i){
-		ss.str("");
-		ss << str << i;
-		if(readXMLInteger(p, ss.str().c_str(), intValue)){
-			stats[i] = intValue;
-		}
-	}
-
-	return true;
 }
 
 bool ConditionAttributes::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
@@ -933,57 +842,6 @@ void ConditionRegeneration::addCondition(Creature* creature, const Condition* ad
 	}
 }
 
-xmlNodePtr ConditionRegeneration::serialize()
-{
-	xmlNodePtr nodeCondition = Condition::serialize();
-
-	std::stringstream ss;
-
-	ss.str("");
-	ss << healthTicks;
-	xmlSetProp(nodeCondition, (const xmlChar*)"healthticks", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << healthGain;
-	xmlSetProp(nodeCondition, (const xmlChar*)"healthgain", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << manaTicks;
-	xmlSetProp(nodeCondition, (const xmlChar*)"manaticks", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << manaGain;
-	xmlSetProp(nodeCondition, (const xmlChar*)"managain", (const xmlChar*)ss.str().c_str());
-	return nodeCondition;
-}
-
-bool ConditionRegeneration::unserialize(xmlNodePtr p)
-{
-	if(!Condition::unserialize(p)){
-		return false;
-	}
-
-	int intValue;
-
-	if(readXMLInteger(p, "healthticks", intValue)){
-		healthTicks = intValue;
-	}
-
-	if(readXMLInteger(p, "healthgain", intValue)){
-		healthGain = intValue;
-	}
-
-	if(readXMLInteger(p, "manaticks", intValue)){
-		manaTicks = intValue;
-	}
-
-	if(readXMLInteger(p, "managain", intValue)){
-		manaGain = intValue;
-	}
-
-	return true;
-}
-
 bool ConditionRegeneration::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 {
 	if(attr == CONDITIONATTR_HEALTHTICKS){
@@ -1126,42 +984,6 @@ void ConditionSoul::addCondition(Creature* creature, const Condition* addConditi
 		soulTicks = conditionSoul.soulTicks;
 		soulGain = conditionSoul.soulGain;
 	}
-}
-
-xmlNodePtr ConditionSoul::serialize()
-{
-	xmlNodePtr nodeCondition = Condition::serialize();
-
-	std::stringstream ss;
-
-	ss.str("");
-	ss << soulGain;
-	xmlSetProp(nodeCondition, (const xmlChar*)"soulgain", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << soulTicks;
-	xmlSetProp(nodeCondition, (const xmlChar*)"soulticks", (const xmlChar*)ss.str().c_str());
-
-	return nodeCondition;
-}
-
-bool ConditionSoul::unserialize(xmlNodePtr p)
-{
-	if(!Condition::unserialize(p)){
-		return false;
-	}
-
-	int intValue;
-
-	if(readXMLInteger(p, "soulgain", intValue)){
-		soulGain = intValue;
-	}
-
-	if(readXMLInteger(p, "soulticks", intValue)){
-		soulTicks = intValue;
-	}
-
-	return true;
 }
 
 bool ConditionSoul::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
@@ -1325,100 +1147,6 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 	}
 
 	return ret;
-}
-
-xmlNodePtr ConditionDamage::serialize()
-{
-	xmlNodePtr nodeCondition = Condition::serialize();
-
-	std::stringstream ss;
-
-	ss.str("");
-	ss << delayed;
-	xmlSetProp(nodeCondition, (const xmlChar*)"delayed", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << periodDamage;
-	xmlSetProp(nodeCondition, (const xmlChar*)"perioddamage", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << owner;
-	xmlSetProp(nodeCondition, (const xmlChar*)"owner", (const xmlChar*)ss.str().c_str());
-
-	for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); ++it){
-		xmlNodePtr nodeValueListNode = xmlNewNode(NULL, (const xmlChar*)"damage");
-
-		ss.str("");
-		ss << (*it).timeLeft;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"duration", (const xmlChar*)ss.str().c_str());
-
-		ss.str("");
-		ss << (*it).value;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"value", (const xmlChar*)ss.str().c_str());
-
-		ss.str("");
-		ss << (*it).interval;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"interval", (const xmlChar*)ss.str().c_str());
-
-		xmlAddChild(nodeCondition, nodeValueListNode);
-	}
-
-	return nodeCondition;
-}
-
-bool ConditionDamage::unserialize(xmlNodePtr p)
-{
-	if(!Condition::unserialize(p)){
-		return false;
-	}
-
-	setTicks(0);
-
-	int intValue;
-
-	if(readXMLInteger(p, "delayed", intValue)){
-		delayed = (intValue == 1);
-	}
-
-	if(readXMLInteger(p, "perioddamage", intValue)){
-		periodDamage = intValue;
-	}
-
-	if(readXMLInteger(p, "owner", intValue)){
-		owner = intValue;
-	}
-
-	xmlNodePtr nodeList = p->children;
-	while(nodeList){
-		if(xmlStrcmp(nodeList->name, (const xmlChar*)"damage") == 0){
-
-			IntervalInfo damageInfo;
-			damageInfo.interval = 0;
-			damageInfo.timeLeft = 0;
-			damageInfo.value = 0;
-
-			if(readXMLInteger(nodeList, "duration", intValue)){
-				damageInfo.timeLeft = intValue;
-			}
-
-			if(readXMLInteger(nodeList, "value", intValue)){
-				damageInfo.value = intValue;
-			}
-
-			if(readXMLInteger(nodeList, "interval", intValue)){
-				damageInfo.interval = intValue;
-			}
-
-			damageList.push_back(damageInfo);
-			if(getTicks() != -1){
-				setTicks(getTicks() + damageInfo.interval);
-			}
-		}
-
-		nodeList = nodeList->next;
-	}
-
-	return true;
 }
 
 bool ConditionDamage::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
@@ -1845,68 +1573,6 @@ bool ConditionSpeed::setParam(ConditionParam_t param, int32_t value)
 	return ret;
 }
 
-xmlNodePtr ConditionSpeed::serialize()
-{
-	xmlNodePtr nodeCondition = Condition::serialize();
-
-	std::stringstream ss;
-
-	ss.str("");
-	ss << speedDelta;
-	xmlSetProp(nodeCondition, (const xmlChar*)"delta", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << mina;
-	xmlSetProp(nodeCondition, (const xmlChar*)"mina", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << minb;
-	xmlSetProp(nodeCondition, (const xmlChar*)"minb", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << maxa;
-	xmlSetProp(nodeCondition, (const xmlChar*)"maxa", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << maxb;
-	xmlSetProp(nodeCondition, (const xmlChar*)"maxb", (const xmlChar*)ss.str().c_str());
-
-	return nodeCondition;
-}
-
-bool ConditionSpeed::unserialize(xmlNodePtr p)
-{
-	if(!Condition::unserialize(p)){
-		return false;
-	}
-
-	int intValue;
-
-	if(readXMLInteger(p, "delta", intValue)){
-		speedDelta = intValue;
-	}
-
-	float floatValue;
-
-	if(readXMLFloat(p, "mina", floatValue)){
-		mina = floatValue;
-	}
-
-	if(readXMLFloat(p, "minb", floatValue)){
-		minb = floatValue;
-	}
-
-	if(readXMLFloat(p, "maxa", floatValue)){
-		maxa = floatValue;
-	}
-
-	if(readXMLFloat(p, "maxb", floatValue)){
-		maxb = floatValue;
-	}
-
-	return true;
-}
-
 bool ConditionSpeed::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 {
 	if(attr == CONDITIONATTR_SPEEDDELTA){
@@ -2090,91 +1756,6 @@ void ConditionOutfit::addOutfit(Outfit_t outfit)
 	outfits.push_back(outfit);
 }
 
-xmlNodePtr ConditionOutfit::serialize()
-{
-	xmlNodePtr nodeCondition = Condition::serialize();
-
-	std::stringstream ss;
-
-	for(std::vector<Outfit_t>::const_iterator it = outfits.begin(); it != outfits.end(); ++it){
-		xmlNodePtr nodeValueListNode = xmlNewNode(NULL, (const xmlChar*)"outfit");
-
-		ss.str("");
-		ss << (*it).lookType;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"looktype", (const xmlChar*)ss.str().c_str());
-
-		ss.str("");
-		ss << (*it).lookHead;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"lookhead", (const xmlChar*)ss.str().c_str());
-
-		ss.str("");
-		ss << (*it).lookBody;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"lookbody", (const xmlChar*)ss.str().c_str());
-
-		ss.str("");
-		ss << (*it).lookLegs;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"looklegs", (const xmlChar*)ss.str().c_str());
-
-		ss.str("");
-		ss << (*it).lookFeet;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"lookfeet", (const xmlChar*)ss.str().c_str());
-
-		ss.str("");
-		ss << (*it).lookAddons;
-		xmlSetProp(nodeValueListNode, (const xmlChar*)"lookaddons", (const xmlChar*)ss.str().c_str());
-
-		xmlAddChild(nodeCondition, nodeValueListNode);
-	}
-
-	return nodeCondition;
-}
-
-bool ConditionOutfit::unserialize(xmlNodePtr p)
-{
-	if(!Condition::unserialize(p)){
-		return false;
-	}
-
-	xmlNodePtr nodeList = p->children;
-	while(nodeList){
-		if(xmlStrcmp(nodeList->name, (const xmlChar*)"outfit") == 0){
-
-			Outfit_t outfit;
-			int intValue;
-
-			if(readXMLInteger(nodeList, "looktype", intValue)){
-				outfit.lookType = intValue;
-			}
-
-			if(readXMLInteger(nodeList, "lookhead", intValue)){
-				outfit.lookHead = intValue;
-			}
-
-			if(readXMLInteger(nodeList, "lookbody", intValue)){
-				outfit.lookBody = intValue;
-			}
-
-			if(readXMLInteger(nodeList, "looklegs", intValue)){
-				outfit.lookLegs = intValue;
-			}
-
-			if(readXMLInteger(nodeList, "lookfeet", intValue)){
-				outfit.lookFeet = intValue;
-			}
-
-			if(readXMLInteger(nodeList, "lookaddons", intValue)){
-				outfit.lookAddons = intValue;
-			}
-
-			outfits.push_back(outfit);
-		}
-
-		nodeList = nodeList->next;
-	}
-
-	return true;
-}
-
 bool ConditionOutfit::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 {
 	if(attr == CONDITIONATTR_OUTFIT){
@@ -2327,58 +1908,6 @@ bool ConditionLight::setParam(ConditionParam_t param, int32_t value)
 		}
 	}
 	return false;
-}
-
-xmlNodePtr ConditionLight::serialize()
-{
-	xmlNodePtr nodeCondition = Condition::serialize();
-
-	std::stringstream ss;
-
-	ss.str("");
-	ss << lightInfo.color;
-	xmlSetProp(nodeCondition, (const xmlChar*)"lightcolor", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << lightInfo.level;
-	xmlSetProp(nodeCondition, (const xmlChar*)"lightlevel", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << internalLightTicks;
-	xmlSetProp(nodeCondition, (const xmlChar*)"lightticks", (const xmlChar*)ss.str().c_str());
-
-	ss.str("");
-	ss << lightChangeInterval;
-	xmlSetProp(nodeCondition, (const xmlChar*)"lightinterval", (const xmlChar*)ss.str().c_str());
-
-	return nodeCondition;
-}
-
-bool ConditionLight::unserialize(xmlNodePtr p)
-{
-	if(!Condition::unserialize(p)){
-		return false;
-	}
-
-	int intValue;
-
-	if(readXMLInteger(p, "lightcolor", intValue)){
-		lightInfo.color = intValue;
-	}
-
-	if(readXMLInteger(p, "lightlevel", intValue)){
-		lightInfo.level = intValue;
-	}
-
-	if(readXMLInteger(p, "lightticks", intValue)){
-		internalLightTicks = intValue;
-	}
-
-	if(readXMLInteger(p, "lightinterval", intValue)){
-		lightChangeInterval = intValue;
-	}
-
-	return true;
 }
 
 bool ConditionLight::unserializeProp(ConditionAttr_t attr, PropStream& propStream)

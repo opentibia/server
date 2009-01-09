@@ -681,37 +681,6 @@ Door::~Door()
 		delete accessList;
 }
 
-bool Door::unserialize(xmlNodePtr nodeItem)
-{
-	bool ret = Item::unserialize(nodeItem);
-
-	int intValue;
-	if(readXMLInteger(nodeItem, "doorId", intValue)){
-		setDoorId(intValue);
-	}
-
-	return ret;
-}
-
-xmlNodePtr Door::serialize()
-{
-	//dont call Item::serialize()
-	xmlNodePtr xmlptr = xmlNewNode(NULL,(const xmlChar*)"item");
-
-	std::stringstream ss;
-	ss.str(""); //empty the stringstream
-	ss << getID();
-	xmlSetProp(xmlptr, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
-
-	/*
-	ss.str("");
-	ss << (int) doorId;
-	xmlSetProp(xmlptr, (const xmlChar*)"doorId", (const xmlChar*)ss.str().c_str());
-	*/
-
-	return xmlptr;
-}
-
 bool Door::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_HOUSEDOORID == attr){
@@ -999,6 +968,7 @@ bool Houses::payHouses()
 						paidUntil += 24 * 60 * 60 * 365;
 						break;
 					case RENTPERIOD_NEVER:
+					default:
 						break;
 					}
 

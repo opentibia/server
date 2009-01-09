@@ -37,45 +37,6 @@ Depot::~Depot()
 	//
 }
 
-bool Depot::unserialize(xmlNodePtr nodeItem)
-{
-	bool ret = Container::unserialize(nodeItem);
-
-	/*
-	int intValue;
-	std::string strValue;
-
-	if(readXMLInteger(nodeItem, "id", intValue)){
-		setDepotId(intValue);
-	}
-	*/
-
-	/*
-	char* nodeValue;
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "depot");
-	if(nodeValue){
-		setDepotId(atoi(nodeValue));
-		xmlFreeOTSERV(nodeValue);
-	}
-	*/
-	
-	return ret;
-}
-
-xmlNodePtr Depot::serialize()
-{
-	xmlNodePtr xmlptr = Container::serialize();
-
-	/*
-	std::stringstream ss;
-	ss.str("");
-	ss << (int) depotId;
-	xmlSetProp(xmlptr, (const xmlChar*)"depot", (const xmlChar*)ss.str().c_str());
-	*/
-
-	return xmlptr;
-}
-
 bool Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_DEPOT_ID == attr){

@@ -42,11 +42,6 @@ public:
 	virtual const BedItem* getBed() const { return this; }
 
 	//serialization
-	// leave blank -- it's not needed, xml serialization is for containers
-	virtual bool unserialize(xmlNodePtr p){ return true; }
-	// same as above.
-	virtual xmlNodePtr serialize(){ return xmlNewNode(NULL,(const xmlChar*)"item"); }
-
     virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream);
 

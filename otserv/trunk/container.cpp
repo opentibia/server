@@ -68,79 +68,6 @@ void Container::addItem(Item* item)
 	item->setParent(this);
 }
 
-bool Container::unserialize(xmlNodePtr nodeItem)
-{
-	bool ret = Item::unserialize(nodeItem);
-
-	if(ret) {
-		xmlNodePtr nodeContainer = nodeItem->children;
-		if(nodeContainer == NULL){
-			return true; //container is empty
-		}
-	  
-		int intValue;
-
-		while(nodeContainer){
-			//load container items
-			if(xmlStrcmp(nodeContainer->name, (const xmlChar*)"inside") == 0){
-				xmlNodePtr nodeContainerItem = nodeContainer->children;
-				while(nodeContainerItem){
-					if(xmlStrcmp(nodeContainerItem->name, (const xmlChar*)"item") == 0){
-						int32_t id = 0;
-
-						if(readXMLInteger(nodeContainerItem, "id", intValue)){
-							id = intValue;
-						}
-						else{
-							return false;
-						}
-
-						Item* item = Item::CreateItem(id);
-						if(!item){
-							return false;
-						}
-
-						if(!item->unserialize(nodeContainerItem)){
-							return false;
-						}
-						
-						addItem(item);
-					}
-
-					nodeContainerItem = nodeContainerItem->next;
-				}
-			}
-
-			nodeContainer = nodeContainer->next;
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-xmlNodePtr Container::serialize()
-{
-	xmlNodePtr nodeItem = Item::serialize();
-
-	xmlNodePtr newContainerNode;
-
-	if(size() > 0){
-		newContainerNode = xmlNewNode(NULL, (const xmlChar*)"inside");
-		for(int i = size() - 1; i >= 0; --i){
-			Item* item = getItem(i);
-
-			xmlNodePtr newItemNode = item->serialize();
-			xmlAddChild(newContainerNode, newItemNode);
-		}
-
-		xmlAddChild(nodeItem, newContainerNode);
-	}
-
-	return nodeItem;
-}
-
 bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
 {
 	bool ret = Item::unserializeItemNode(f, node, propStream);
@@ -177,7 +104,8 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 	return false;
 }
 
-void Container::updateItemWeight(double diff) {
+void Container::updateItemWeight(double diff)
+{
 	total_weight += diff;
 	if(Container* parent_container = getParentContainer()) {
 		parent_container->updateItemWeight(diff);
@@ -187,30 +115,6 @@ void Container::updateItemWeight(double diff) {
 double Container::getWeight() const
 {
 	return Item::getWeight() + total_weight;
-	/*
-	double weight = items[id].weight;
-	std::list<const Container*> listContainer;
-	ItemList::const_iterator cit;
-	Container* tmpContainer = NULL;
-
-	listContainer.push_back(this);
-	
-	while(listContainer.size() > 0) {
-		const Container* container = listContainer.front();
-		listContainer.pop_front();
-
-		for(cit = container->getItems(); cit != container->getEnd(); ++cit) {
-			if((tmpContainer = (*cit)->getContainer())){
-				listContainer.push_back(tmpContainer);
-				weight += items[tmpContainer->getID()].weight;
-			}
-			else
-				weight += (*cit)->getWeight();
-		}
-	}
-
-	return weight;
-	*/
 }
 
 std::string Container::getContentDescription() const

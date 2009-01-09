@@ -70,9 +70,6 @@ public:
 	virtual const Depot* getDepot() const {return NULL;};
 
 	//serialization
-	virtual bool unserialize(xmlNodePtr p);
-	virtual xmlNodePtr serialize();
-	
 	bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 
 	uint32_t size() const {return (uint32_t)itemlist.size();};

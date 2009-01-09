@@ -26,8 +26,6 @@
 
 #include <list>
 #include <vector>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
 
 class Creature;
 class Player;
@@ -96,6 +94,7 @@ enum ConditionAttr_t{
 	CONDITIONATTR_PERIODDAMAGE = 25,
 	CONDITIONATTR_SKILLSPERCENT = 26,
 	CONDITIONATTR_ISBUFF = 27,
+	CONDITIONATTR_SUBID = 28,
 
 	//reserved for serialization
 	CONDITIONATTR_END      = 254
@@ -133,9 +132,6 @@ public:
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
-	virtual xmlNodePtr serialize();
-	virtual bool unserialize(xmlNodePtr p);
-
 	bool unserialize(PropStream& propStream);
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
@@ -193,9 +189,6 @@ public:
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
-	virtual xmlNodePtr serialize();
-	virtual bool unserialize(xmlNodePtr p);
-
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
@@ -226,9 +219,6 @@ public:
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
-	virtual xmlNodePtr serialize();
-	virtual bool unserialize(xmlNodePtr p);
-
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
@@ -255,9 +245,6 @@ public:
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
-	virtual xmlNodePtr serialize();
-	virtual bool unserialize(xmlNodePtr p);
-
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
@@ -302,9 +289,6 @@ public:
 	int32_t getTotalDamage() const;
 
 	//serialization
-	virtual xmlNodePtr serialize();
-	virtual bool unserialize(xmlNodePtr p);
-
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
@@ -349,9 +333,6 @@ public:
 	void setFormulaVars(float _mina, float _minb, float _maxa, float _maxb);
 
 	//serialization
-	virtual xmlNodePtr serialize();
-	virtual bool unserialize(xmlNodePtr p);
-
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
@@ -383,9 +364,6 @@ public:
 	void addOutfit(Outfit_t outfit);
 
 	//serialization
-	virtual xmlNodePtr serialize();
-	virtual bool unserialize(xmlNodePtr p);
-
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
@@ -411,9 +389,6 @@ public:
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
-	virtual xmlNodePtr serialize();
-	virtual bool unserialize(xmlNodePtr p);
-
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
