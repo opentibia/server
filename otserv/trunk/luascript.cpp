@@ -2588,7 +2588,6 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 
 			if(ret != RET_NOERROR){
 				delete newItem;
-				reportErrorFunc("Could not add item");
 				lua_pushnumber(L, LUA_ERROR);
 				return 1;
 			}
@@ -2622,7 +2621,6 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 
 		if(ret != RET_NOERROR){
 			delete newItem;
-			reportErrorFunc("Could not add item");
 			lua_pushnumber(L, LUA_ERROR);
 			return 1;
 		}
