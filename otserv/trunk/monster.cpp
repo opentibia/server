@@ -328,8 +328,10 @@ bool Monster::isFriend(const Creature* creature)
 
 bool Monster::isOpponent(const Creature* creature)
 {
-	if(isSummon() && getMaster()->getPlayer() && creature != getMaster()){
-		return true;
+	if(isSummon() && getMaster()->getPlayer()){
+		if(creature != getMaster()){
+			return true;
+		}
 	}
 	else{
 		if( (creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
