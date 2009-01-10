@@ -328,7 +328,7 @@ bool Monster::isFriend(const Creature* creature)
 
 bool Monster::isOpponent(const Creature* creature)
 {
-	if(isSummon() && getMaster()->getPlayer()){
+	if(isSummon() && getMaster()->getPlayer() && creature != getMaster()){
 		return true;
 	}
 	else{
@@ -442,6 +442,10 @@ void Monster::onFollowCreatureComplete(const Creature* creature)
 			else if(!isSummon()){
 				//push target we have not found a path to the back
 				targetList.push_back(target);
+			}
+			else{
+				//Since we removed the creature from the targetList (and not put it back) we have to release it too
+				target->releaseThing2();
 			}
 		}
 	}

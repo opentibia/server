@@ -171,7 +171,7 @@ public:
 				" unused: " << (int)(it->second->unused);
 			if(it->second->allocations != 0 && it->first != 0){
 				output << " avg: " << (int)((it->first) - (it->second->unused)/(it->second->allocations)) <<
-				" %unused: " << (int)((it->second->unused)*100/(it->second->allocations)/(it->first));
+				"% unused: " << (int)((it->second->unused)*100/(it->second->allocations)/(it->first));
 			}
 			output << " N: " << ((int)(it->second->allocations) - (int)(it->second->deallocations)) <<
 				std::endl;
