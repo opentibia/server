@@ -1,4 +1,4 @@
-﻿ <?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Nightmare Scion" nameDescription="a nightmare scion" race="blood" experience="1350" speed="340" manacost="0">
 	<health now="1400" max="1400"/>
 	<look type="321" corpse="9919"/>

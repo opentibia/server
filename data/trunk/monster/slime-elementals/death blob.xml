@@ -1,4 +1,4 @@
- <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Death Blob" nameDescription="a death blob" race="undead" experience="300" speed="230" manacost="0">
   <health now="320" max="320"/>
   <look type="315" corpse="9963"/>
