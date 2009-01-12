@@ -2825,7 +2825,7 @@ bool Game::internalCloseTrade(Player* player)
 }
 
 bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
-	uint8_t amount)
+	uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
 	Player* player = getPlayerByID(playerId);
 	if(player == NULL || player->isRemoved())
@@ -2858,7 +2858,7 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 		subType = count;
 	}
 
-	merchant->onPlayerTrade(player, SHOPEVENT_BUY, onBuy, it.id, subType, amount);
+	merchant->onPlayerTrade(player, SHOPEVENT_BUY, onBuy, it.id, subType, amount, ignoreCapacity, buyWithBackpack);
 	return true;
 }
 
@@ -2892,7 +2892,7 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		subType = count;
 	}
 
-	merchant->onPlayerTrade(player, SHOPEVENT_SELL, onSell, it.id, subType, amount);
+	merchant->onPlayerTrade(player, SHOPEVENT_SELL, onSell, it.id, subType, amount, false, false);
 	return true;
 }
 

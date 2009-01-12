@@ -93,7 +93,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos){};
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
-	    uint8_t count, uint8_t amount){};
+	    uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack){};
 	virtual void onPlayerCloseChannel(const Player* player){};
 	virtual void onPlayerEndTrade(const Player* player){};
 	virtual void onThink(){};
@@ -116,7 +116,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
-	    uint8_t count, uint8_t amount);
+	    uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack);
 	virtual void onPlayerCloseChannel(const Player* player);
 	virtual void onPlayerEndTrade(const Player* player);
 	virtual void onThink();
@@ -450,9 +450,8 @@ public:
 
 	void onPlayerCloseChannel(const Player* player);
 	void onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
-	    uint8_t count, uint8_t amount);
-	void onPlayerEndTrade(Player* player, int32_t buyCallback,
-		int32_t sellCallback);
+	    uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack);
+	void onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCallback);
 
 	void setCreatureFocus(Creature* creature);
 

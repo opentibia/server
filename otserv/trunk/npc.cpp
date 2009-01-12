@@ -1738,7 +1738,7 @@ uint32_t Npc::getListItemPrice(uint16_t itemId, ShopEvent_t type)
 }
 
 void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
-	    uint8_t count, uint8_t amount)
+	    uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
 	if(type == SHOPEVENT_BUY){
 		NpcState* npcState = getState(player, true);
@@ -1764,14 +1764,13 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 	}
 
 	if(m_npcEventHandler){
-		m_npcEventHandler->onPlayerTrade(player, callback, itemId, count, amount);
+		m_npcEventHandler->onPlayerTrade(player, callback, itemId, count, amount, ignoreCapacity, buyWithBackpack);
 	}
 
 	player->sendSaleItemList();
 }
 
-void Npc::onPlayerEndTrade(Player* player, int32_t buyCallback,
-		int32_t sellCallback)
+void Npc::onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCallback)
 {
     lua_State* L = getScriptInterface()->getLuaState();
     if(buyCallback != -1)
@@ -3130,7 +3129,7 @@ void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const
 }
 
 void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
-	uint8_t count, uint8_t amount)
+	uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
 	if(callback == -1){
 		return;

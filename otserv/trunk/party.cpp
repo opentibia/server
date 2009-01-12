@@ -216,7 +216,7 @@ bool Party::leaveParty(Player* player)
 	// Remove from chat
 	PrivateChatChannel* pcc = static_cast<PrivateChatChannel*>(g_chat.getChannel(this));
 	if(pcc){
-		pcc->excludePlayer(NULL, player);
+		pcc->removeUser(player);
 	}
 
 

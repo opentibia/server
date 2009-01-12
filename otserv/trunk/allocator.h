@@ -166,14 +166,14 @@ public:
 		output << "Otserv Allocator Stats: " << std::ctime(&rawtime);
 		PoolsStats::iterator it;
 		for(it = poolsStats.begin(); it != poolsStats.end(); ++it) {
-			output << (int)(it->first) << " alloc: " << (int)(it->second->allocations) <<
-				" dealloc: " << (int)(it->second->deallocations) <<
-				" unused: " << (int)(it->second->unused);
+			output << (int)(it->first) << " alloc: " << (int64_t)(it->second->allocations) <<
+				" dealloc: " << (int64_t)(it->second->deallocations) <<
+				" unused: " << (int64_t)(it->second->unused);
 			if(it->second->allocations != 0 && it->first != 0){
-				output << " avg: " << (int)((it->first) - (it->second->unused)/(it->second->allocations)) <<
-				" unused: " << (int)((it->second->unused)*100/(it->second->allocations)/(it->first));
+				output << " avg: " << (int64_t)((it->first) - (it->second->unused)/(it->second->allocations)) <<
+				" unused: " << (int64_t)((it->second->unused)*100/(it->second->allocations)/(it->first));
 			}
-			output << "% N: " << ((int)(it->second->allocations) - (int)(it->second->deallocations)) <<
+			output << "% N: " << ((int64_t)(it->second->allocations) - (int64_t)(it->second->deallocations)) <<
 				std::endl;
 		}
 		output << std::endl;
@@ -235,9 +235,9 @@ private:
 	Pools pools;
 	#ifdef __OTSERV_ALLOCATOR_STATS__
 	struct t_PoolStats{
-		int allocations;
-		int deallocations;
-		int unused;
+		int64_t allocations;
+		int64_t deallocations;
+		int64_t unused;
 	};
 	typedef std::map<size_t, t_PoolStats*, std::less<size_t >,
 		dummyallocator<std::pair<const size_t, t_PoolStats* > > > PoolsStats;
