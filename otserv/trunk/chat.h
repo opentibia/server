@@ -52,7 +52,7 @@ public:
 	virtual ~ChatChannel(){}
 
 	bool addUser(Player* player);
-	bool removeUser(Player* player);
+	bool removeUser(Player* player, bool sendCloseChannel = false);
 
 	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time = 0);
 	bool sendInfo(SpeakClasses type, const std::string& text, uint32_t time = 0);

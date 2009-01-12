@@ -83,7 +83,6 @@ void PrivateChatChannel::invitePlayer(Player* player, Player* invitePlayer)
 void PrivateChatChannel::excludePlayer(Player* player, Player* excludePlayer)
 {
 	if(player != excludePlayer && removeInvited(excludePlayer)){
-		removeUser(excludePlayer);
 
 		if(player) {
 			std::string msg;
@@ -92,7 +91,7 @@ void PrivateChatChannel::excludePlayer(Player* player, Player* excludePlayer)
 			player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
 		}
 
-		excludePlayer->sendClosePrivate(getId());
+		removeUser(excludePlayer, true);
 	}
 }
 
@@ -125,13 +124,18 @@ bool ChatChannel::addUser(Player* player)
 	return true;
 }
 
-bool ChatChannel::removeUser(Player* player)
+bool ChatChannel::removeUser(Player* player, bool sendCloseChannel /*= false*/)
 {
 	UsersMap::iterator it = m_users.find(player->getID());
 	if(it == m_users.end())
 		return false;
 
 	m_users.erase(it);
+
+	if(sendCloseChannel){
+		player->sendClosePrivate(getId());
+	}
+
 	return true;
 }
 
