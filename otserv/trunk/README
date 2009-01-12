@@ -1,5 +1,5 @@
 ============================================
-========== OpenTibia Server 0.6.0 ==========
+========== OpenTibia Server 0.6.2 ==========
 ============================================
 ===== www.otserv.org	www.otfans.net =====
 ============================================
@@ -29,44 +29,9 @@ How does it work?
 	not connecting to the CIP servers.
 	Then you are logged in.
 
-Whats New in 0.6.0?
-	- 8.11 Protocol
-	- Complete redesign of the database system, now it is a lot more efficient, including new PostgreSQL and ODBC support
-	- Removal of XML as a database driver, since it is slow, inefficient and only messes up more and more
-	- Complete redesign of battle and Lua systems, including new scripting events like onAddItem, onLogin, onSay, etc...
-	- Complete redesign of networking system, now it is a lot more efficient, including the use of ASIO
-	- Support for account balance systems(so you can have "bank" systems like on real Tibia)
-	- New format for items.otb - now items attributes are saved again on items.xml, while OTB has the "client" information
-	- OTAdmin protocol - a new protocol for private information of your server, which you can handle by programs or by PHP(with POT, for example)
-	- A lot new Lua functions
-	- A completely new data folder - now it has useful scripts for servers, and useful scripts for developers also
-	- Maany bugfixes and optimizations
-	- And much, much more(so much that it's not possible to remember)!	
-
+	Whats New in 0.6.2?
 Features?
-	- Full rearranged protocol and game system
-	- Actions (when using a tile or item)
-	- SQL databases (for accounts and players), including SQLite, MySQL, PostgreSQL and ODBC support
-	- Crash tracking
-	- Monsters
-	- OTB (You now dont have to convert your map, change any ID, new ID's are just stacked on top of older ID's!)
-	- VIP List
-	- Guild support
-	- Spawns (and Respawn)
-	- Commands
-	- Autowalk
-	- Rotatable items
-	- Runes with charges
-	- Depots
-	- Houses
-	- New binary map format OTBM
-	- Private channels
-	- New movement system (full inventory movements, stacktable items and more)
-	- Parcels, letters
-	- Follow and chase opponent
-	- Waiting list
-	- Day-Night cycles
-	- And more!
+	- Not much
 
 How do I use this new stuff?
 	I'm just going over what might not be familiar to you here.
@@ -89,12 +54,8 @@ How do I compile OTServ?
 	OTServ stores accounts, players and some other tabelar info within relational database. It is very reliable
 	way which also provides huge possibilities of easy data management and manipulation. By default SQLite is
 	selected as database engine. It doesn't require any configuration from you, OTServ is configured for it by default and all what you need is to provide SQLite library for it.
-
-		Instructions to compile OTServ:
-			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
-			2. Compile your OTServ against SQLite:
-				a) On Windows use -lsqlite3
-				b) On POSIX systems use ./configure && make
+	
+		Instructions to compile OTServ: http://otfans.net/wiki/index.php/Compiling_OTServ
 
 MySQL Server
 	By default OTServ uses SQLite database which doesn't require any configuration from you. However it is
@@ -199,6 +160,7 @@ Credits?
 	Snack - Developer
 	Primer - Developer
 	Spin - Developer
+	Remere - Developer
 	Anstice - Developer
 	Pedro B. - Developer, Scripting
 	Wrzasq - Developer
@@ -235,10 +197,7 @@ Credits?
 Help?
 	We always need help. Post on the forum:
 	OTFans - http://otfans.net
-		English community, the official site of OpenTibia.
-
-	OTserv Wiki - http://www.otserv.org
-		OTServ Wiki, documentation resources, essential informtion.
+		English community, the official site of OpenTibia. Also containing the OTWiki
 
 	OTServNews - http://otservnews.org/
 		Always latest news from OpenTibia world.
