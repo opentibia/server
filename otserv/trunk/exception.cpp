@@ -202,6 +202,7 @@ __cdecl _SEHHandler(
 	//system and process info
 	//- global memory information
 	MEMORYSTATUSEX mstate;
+	mstate.dwLength = sizeof(mstate);
 	if(GlobalMemoryStatusEx(&mstate)){
 		*outdriver << "Memory load: " << mstate.dwMemoryLoad << std::endl <<
 			"Total phys: " << mstate.ullTotalPhys/1024 << " K available phys: " <<

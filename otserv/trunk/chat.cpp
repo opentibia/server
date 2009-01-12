@@ -100,10 +100,7 @@ void PrivateChatChannel::closeChannel()
 {
 	UsersMap::iterator cit;
 	for(cit = m_users.begin(); cit != m_users.end(); ++cit){
-		Player* toPlayer = cit->second->getPlayer();
-		if(toPlayer){
-			toPlayer->sendClosePrivate(getId());
-		}
+		cit->second->sendClosePrivate(getId());
 	}
 }
 
@@ -149,11 +146,8 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string&
 		return false;
 
 	for(it = m_users.begin(); it != m_users.end(); ++it){
-		Player* toPlayer = it->second->getPlayer();
-		if(toPlayer){
-			toPlayer->sendToChannel(fromPlayer, type, text, getId(), time);
-			success = true;
-		}
+		it->second->sendToChannel(fromPlayer, type, text, getId(), time);
+		success = true;
 	}
 	return success;
 }
@@ -164,11 +158,8 @@ bool ChatChannel::sendInfo(SpeakClasses type, const std::string& text, uint32_t 
 	UsersMap::iterator it;
 
 	for(it = m_users.begin(); it != m_users.end(); ++it){
-		Player* toPlayer = it->second->getPlayer();
-		if(toPlayer){
-			toPlayer->sendToChannel(NULL, type, text, getId(), time);
-			success = true;
-		}
+		it->second->sendToChannel(NULL, type, text, getId(), time);
+		success = true;
 	}
 	return success;
 }
@@ -253,7 +244,7 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 		ChatChannel *newChannel = new ChatChannel(channelId, player->getGuildName());
 		m_guildChannels[player->getGuildId()] = newChannel;
 		return newChannel;
-	} 
+	}
 	else if(channelId == CHANNEL_PARTY){
 		if(player->getParty() == NULL)
 			return NULL;
