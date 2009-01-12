@@ -87,19 +87,19 @@ bool Party::invitePlayer(Player* player)
 		return false;
 	}
 
-	inviteList.push_back(player);
-	getLeader()->sendPlayerPartyIcons(player);
-	player->sendPlayerPartyIcons(getLeader());
-	player->addPartyInvitation(this);
-
 	std::stringstream ss;
 	
-	if(inviteList.empty() && memberList.empty()) {
+	if(!(inviteList.empty() && memberList.empty())) {
 		ss << player->getName() << " has been invited.";
 	} else {
 		ss << player->getName() << " has been invited. Open the party channel to communicate with other members.";
 	}
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, ss.str());
+
+	inviteList.push_back(player);
+	getLeader()->sendPlayerPartyIcons(player);
+	player->sendPlayerPartyIcons(getLeader());
+	player->addPartyInvitation(this);
 
 	ss.str("");
 	ss << getLeader()->getName() << " has invited you to " <<
