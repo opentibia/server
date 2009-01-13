@@ -616,7 +616,12 @@ uint32_t MoveEvent::StepInField(Creature* creature, Item* item, const Position& 
 	MagicField* field = item->getMagicField();
 
 	if(field){
-		field->onStepInField(creature);
+		bool purposeful = true;
+		if(creature->getPlayer())
+            purposeful = false;
+            
+        field->onStepInField(creature, purposeful);
+        
 		return 1;
 	}
 

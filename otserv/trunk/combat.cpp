@@ -1458,7 +1458,7 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 
 //**********************************************************
 
-void MagicField::onStepInField(Creature* creature)
+void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 {
 	//remove magic walls/wild growth
 	if(isBlocking()){
@@ -1469,7 +1469,7 @@ void MagicField::onStepInField(Creature* creature)
 		if(it.condition){
 			Condition* conditionCopy = it.condition->clone();
 			uint32_t owner = getOwner();
-			if(owner != 0){
+			if(owner != 0 && purposeful){
 				bool harmfulField = true;
 				if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE) ){
 					Creature* creature = g_game.getCreatureByID(owner);
