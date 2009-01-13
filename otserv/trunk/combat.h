@@ -349,7 +349,7 @@ public:
 		const ItemType& it = items[getID()];
 		return it.combatType;
 	}
-	void onStepInField(Creature* creature);
+	void onStepInField(Creature* creature, bool purposeful = true);
 
 private:
 	int64_t createTime;
