@@ -214,7 +214,7 @@ void mainLoader(int argc, char *argv[])
 	{
 		char errorMessage[26];
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
-		sprintf(errorMessage, "Unable to load %s!", configpath);
+		sprintf(errorMessage, "Unable to load %s!", configpath.c_str());
 #else
 		sprintf(errorMessage, "Unable to load %s!", configname);
 #endif
