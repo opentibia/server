@@ -207,13 +207,17 @@ void mainLoader(int argc, char *argv[])
 	configpath = getenv("HOME");
 	configpath += "/.otserv/";
 	configpath += configname;
-	if (!g_config.loadFile(configpath))
+	if (!g_config.loadFile(configpath) && !g_config.loadFile(configname))
 #else
 	if (!g_config.loadFile(configname))
 #endif
 	{
 		char errorMessage[26];
+#if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
+		sprintf(errorMessage, "Unable to load %s!", configpath);
+#else
 		sprintf(errorMessage, "Unable to load %s!", configname);
+#endif
 		ErrorMessage(errorMessage);
 		exit(-1);
 	}
