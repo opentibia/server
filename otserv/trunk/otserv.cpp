@@ -25,6 +25,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
 
 #include "otsystem.h"
 #include "server.h"
@@ -91,17 +92,54 @@ extern AdminProtocolConfig* g_adminConfig;
 time_t start_time;
 #endif
 
+
 void ErrorMessage(const char* message) {
-	std::cout << std::endl << std::endl << "Error: " << message;
+	std::cout << std::endl << std::endl << "Error: " << message << std::endl;
 
 	std::string s;
 	std::cin >> s;
 }
 
-void mainLoader(int argc, char *argv[]);
+struct CommandLineOptions{
+	std::string ip;
+	int port;
+	std::string configfile;
+	bool truncate_log;
+	std::string logfile;
+	std::string errfile;
+};
+
+bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args);
+void mainLoader(const CommandLineOptions& command_opts);
 
 int main(int argc, char *argv[])
 {
+	CommandLineOptions command_opts;
+	if(parseCommandLine(command_opts, std::vector<std::string>(argv, argv + argc)) == false){
+		return 0;
+	}
+
+	boost::shared_ptr<std::ofstream> logfile;
+	boost::shared_ptr<std::ofstream> errfile;
+	if(command_opts.logfile != ""){
+		logfile.reset(new std::ofstream(command_opts.logfile.c_str(), 
+			(command_opts.truncate_log? std::ios::trunc : std::ios::app) | std::ios::out)
+		);
+		if(!logfile->is_open()){
+			ErrorMessage("Could not open standard log file for writing!");
+		}
+		std::cout.rdbuf(logfile->rdbuf());
+	}
+	if(command_opts.errfile != ""){
+		errfile.reset(new std::ofstream(command_opts.errfile.c_str(), 
+			(command_opts.truncate_log? std::ios::trunc : std::ios::app) | std::ios::out)
+		);
+		if(!errfile->is_open()){
+			ErrorMessage("Could not open error log file for writing!");
+		}
+		std::cerr.rdbuf(errfile->rdbuf());
+	}
+
 #if !defined(__WINDOWS__)
 	// TODO: find something better than this hack. :|
 	time(&start_time);
@@ -115,7 +153,7 @@ int main(int argc, char *argv[])
 	mainExceptionHandler.InstallHandler();
 #endif
 	std::cout << ":: " OTSERV_NAME " Version " OTSERV_VERSION << std::endl;
-	std::cout << ":: ====================" << std::endl;
+	std::cout << ":: ============================================================================" << std::endl;
 	std::cout << "::" << std::endl;
 
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ \
@@ -166,11 +204,17 @@ int main(int argc, char *argv[])
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 
-	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, argc, argv)));
+	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, command_opts)));
 
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
-	Server server(INADDR_ANY, g_config.getNumber(ConfigManager::PORT));
+	int port;
+	if(command_opts.ip != "")
+		port = command_opts.port;
+	else
+		port = g_config.getNumber(ConfigManager::PORT);
+
+	Server server(INADDR_ANY, port);
 	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
 	g_server = &server;
 	server.run();
@@ -180,10 +224,82 @@ int main(int argc, char *argv[])
 #endif
 }
 
-void mainLoader(int argc, char *argv[])
+bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 {
-	//	LOG_MESSAGE("main", EVENT, 1, "Starting server");
+	std::vector<std::string>::iterator argi = args.begin();
+	opts.port = 0;
+	opts.truncate_log = false;
 
+	if(argi != args.end()){
+		++argi;
+	}
+
+
+	while(argi != args.end()){
+		std::string arg = *argi;
+		if(arg == "-p" || arg == "--port"){
+			if(++argi == args.end()){
+				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
+				return false;
+			}
+			opts.port = atoi(argi->c_str());
+		}
+		else if(arg == "-i" || arg == "--ip"){
+			if(++argi == args.end()){
+				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
+				return false;
+			}
+			opts.ip = atoi(argi->c_str());
+		}
+		else if(arg == "-c" || arg == "--config"){
+			if(++argi == args.end()){
+				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
+				return false;
+			}
+			opts.configfile = *argi;
+		}
+		else if(arg == "--trunc-log"){
+			opts.truncate_log = true;
+		}
+		else if(arg == "-l" || arg == "--log-file"){
+			if(++argi == args.end()){
+				std::cout << "Missing parameter 1 for '" << arg << "'" << std::endl;
+				return false;
+			}
+			opts.logfile = *argi;
+			if(++argi == args.end()){
+				std::cout << "Missing parameter 2 for '" << arg << "'" << std::endl;
+				return false;
+			}
+			opts.errfile = *argi;
+		}
+		else if(arg == "--help"){
+			std::cout <<
+"Usage: otserv {-i|-p|-c|-l}\n"
+"\n"
+"\t-i, --ip $1\t\tIP of gameworld server. Should be equal to the \n"
+"\t\t\t\tglobal IP.\n"
+"\t-p, --port $1\t\tPort for server to listen on.\n"
+"\t-c, --config $1\t\tAlternate config file path.\n"
+"\t-l, --log-file $1 $2\tAll standard output will be logged to the\n"
+"\t\t\t\t$1 file, all errors will be logged to $2.\n";
+"\t-l, --truncate-log\tReset log file each time the server is \n"
+"\t\t\t\tstarted.\n";
+			return false;
+		}
+		else
+		{
+			std::cout << "Unrecognized command line argument '" << arg << "'\n"
+			"Usage: otserv {-i|-p|-c|-l}" << "\n";
+			return false;
+		}
+		++argi;
+	}
+	return true;
+}
+
+void mainLoader(const CommandLineOptions& command_opts)
+{
 	//dispatcher thread
 	g_game.setGameState(GAME_STATE_STARTUP);
 
@@ -199,6 +315,9 @@ void mainLoader(int argc, char *argv[])
 #else
 	const char* configname = "config.lua";
 #endif
+	if(command_opts.configfile != ""){
+		configname = command_opts.configfile.c_str();
+	}
 
 	// read global config
 	std::cout << ":: Loading lua script " << configname << "... " << std::flush;
@@ -424,13 +543,18 @@ void mainLoader(int argc, char *argv[])
 		}
 	}
 
-	std::cout << ":: Local port:            " << g_config.getNumber(ConfigManager::PORT) << std::endl;
+	std::cout << ":: Local port:            ";
+	int port;
+	if(command_opts.ip != "")
+		port = command_opts.port;
+	else
+		port = g_config.getNumber(ConfigManager::PORT);
+	std::cout << port << std::endl;
 
 	std::cout << ":: Global IP address:     ";
 	std::string ip;
-
-	if(argc > 1)
-		ip = argv[1];
+	if(command_opts.ip != "")
+		ip = command_opts.ip;
 	else
 		ip = g_config.getString(ConfigManager::IP);
 
