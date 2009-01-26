@@ -47,7 +47,7 @@ Event::~Event() {
 }
 
 bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) {
-	LuaThread_ptr thread = state.newThread("OnSay");
+	LuaThread_ptr thread = state.newThread(this->getName());
 
 	// Stack is empty
 	// Push callback
@@ -713,7 +713,7 @@ void OnLook::Event::update_instance(Manager& state, Enviroment& enviroment, LuaT
 // Implementation details
 
 template<class T, class ScriptInformation>
-bool Script::dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
 	if(specific_list.size() == 0) {
 		return false;
 	}
@@ -737,7 +737,7 @@ bool Script::dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& env
 }
 
 template<class T> // No script information!
-bool Script::dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
 	if(specific_list.size() == 0) {
 		return false;
 	}

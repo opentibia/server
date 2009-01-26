@@ -220,11 +220,11 @@ otstd.doorlist = {
 		[7057] = {newid=7056, horizontal=true, closed=false, level=false}
 	}
 	
-function Item:switchDoor(movecreatures)
+function Item:switchDoor(moveobjects)
 	local doordata = otstd.doorlist[self:getItemID()] 
 	
 	if self:isDoor() then
-		if movecreatures ~= nil and movecreatures then
+		if moveobjects ~= nil and moveobjects then
 			local tile = self:getParentTile()
 			if doordata.closed == false then
 				creatures = tile:getCreatures()
@@ -286,16 +286,18 @@ function Item:isDoorOpen()
 	return false
 end
 
-function Item:openDoor(movecreatures)
+function Item:openDoor()
 	if self:isDoorClosed() then
-		self:switchDoor(movecreatures)
+		return self:switchDoor()
 	end
+	return false
 end
 
-function Item:closeDoor(movecreatures)
+function Item:closeDoor(moveobjects)
 	if self:isDoorOpen() then
-		self:swtichDoor(movecreatures)
+		return self:switchDoor(moveobjects)
 	end
+	return false
 end
 
 function Item:isDoor()

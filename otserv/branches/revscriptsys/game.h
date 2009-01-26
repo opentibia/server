@@ -505,8 +505,8 @@ public:
 	bool combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
 		int32_t& healthChange, bool checkDefense, bool checkArmor);
 
-	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange);
-	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
+	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange, bool showeffect = true);
+	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange, bool showeffect = true);
 
 	// Action helper function
 public:
@@ -515,10 +515,18 @@ public:
 	ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
 
 	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey);
-	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
-		uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
+	bool useItemEx(Player* player, const Position& fromPos, uint16_t fromSpriteId, const Position& toPos,
+		uint8_t toStackPos, uint16_t toSpriteId, Item* item, bool isHotkey, uint32_t creatureId = 0);
 
+	bool useItemFarEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
+		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey)
+	{return internalUseItemFarEx(playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey, 0);}
+	bool useItemFarEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
+		const Position& toPos, uint8_t toStackPos, bool isHotkey, uint32_t creatureId = 0)
+	{return internalUseItemFarEx(playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, 0, isHotkey, creatureId);}
 protected:
+	bool internalUseItemFarEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
+		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey, uint32_t creatureId);
 	ReturnValue internalUseItem(Player* player, const Position& pos,
 		uint8_t index, Item* item, uint32_t creatureId);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
@@ -562,6 +570,8 @@ protected:
 	bool playerSpeakToNpc(Player* player, const std::string& text);
 	bool playerReportRuleViolation(Player* player, const std::string& text);
 	bool playerContinueReport(Player* player, const std::string& text);
+
+	bool checkReload(Player* player, const std::string& text);
 
 	std::vector<Thing*> ToReleaseThings;
 

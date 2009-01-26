@@ -28,9 +28,9 @@ end
 function otstd.GM_XRay_Vision.login_handler(evt)
 	local player = evt.player
 	if (type(otstd.GM_XRay_Vision.groups) == "string" and
-			otstd.GM_XRay_Vision.groups == "All") or
-			table.contains(otstd.GM_XRay_Vision.groups, player:getAccessGroup())
-			then
+		otstd.GM_XRay_Vision.groups == "All") or
+		table.find(otstd.GM_XRay_Vision.groups, player:getAccessGroup())
+	then
 		registerOnPlayerLookAt(player, otstd.GM_XRay_Vision.look_handler)
 	end
 end

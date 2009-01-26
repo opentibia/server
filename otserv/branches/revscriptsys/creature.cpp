@@ -863,7 +863,7 @@ void Creature::gainHealth(Creature* caster, int32_t healthGain)
 	}
 }
 
-void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
+void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext)
 {
 	changeHealth(-damage);
 
@@ -872,7 +872,7 @@ void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t 
 	}
 }
 
-void Creature::drainMana(Creature* attacker, int32_t manaLoss)
+void Creature::drainMana(Creature* attacker, int32_t manaLoss, bool showtext)
 {
 	onAttacked();
 	changeMana(-manaLoss);

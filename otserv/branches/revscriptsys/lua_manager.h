@@ -243,6 +243,7 @@ public:
 	int lua_Creature_getOrientation();
 	int lua_Creature_getHealth();
 	int lua_Creature_getHealthMax();
+	int lua_Creature_setHealth();
 	int lua_Creature_getName();
 	int lua_Creature_say();
 
@@ -253,9 +254,14 @@ public:
 	int lua_Player_getFood();
 	int lua_Player_getMana();
 	int lua_Player_getManaMax();
+	int lua_Player_setMana();
+	int lua_Player_addManaSpent();
 	int lua_Player_getSoulPoints();
+	int lua_Player_setSoulPoints();
 	int lua_Player_getFreeCap();
 	int lua_Player_getMaximumCap();
+	int lua_Player_getLevel();
+	int lua_Player_getMagicLevel();
 
 	int lua_Player_getSex();
 	int lua_Player_getAccess();
@@ -266,6 +272,7 @@ public:
 	int lua_Player_getPremiumDays();
 	int lua_Player_getSkullType();
 	int lua_Player_getLastLogin();
+	int lua_Player_hasGroupFlag();
 
 	int lua_Player_setStorageValue();
 	int lua_Player_getStorageValue();
@@ -316,6 +323,7 @@ public:
 	int lua_Tile_getItems();
 	int lua_Tile_addItem();
 	int lua_Tile_getItemTypeCount();
+	int lua_Tile_hasProperty();
 
 	int lua_Tile_isPZ();
 	int lua_Tile_isPVP();

@@ -1,10 +1,10 @@
 
-otstd.Commands.MoveForward = Command:new()
+local MoveForward = Command:new("MoveForward")
 
-otstd.Commands.MoveForward.words = "/a "
-otstd.Commands.MoveForward.groups = {"GM"}
+MoveForward.words = "/a"
+MoveForward.groups = {"GM"}
 
-function otstd.Commands.MoveForward.handler(event)
+function MoveForward.handler(event)
 	local dir = event.creature:getOrientation()
 	local pos = event.creature:getPosition()
 	
@@ -34,4 +34,4 @@ function otstd.Commands.MoveForward.handler(event)
 	event.text = "" -- Don't display a message
 end
 
-otstd.Commands.MoveForward:register()
+MoveForward:register()

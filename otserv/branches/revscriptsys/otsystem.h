@@ -34,7 +34,7 @@ typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
 #ifdef __WIN_LOW_FRAG_HEAP__
 #define _WIN32_WINNT 0x0501
 #endif
-#include <winsock2.h>
+//#include <winsock2.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <sys/timeb.h>

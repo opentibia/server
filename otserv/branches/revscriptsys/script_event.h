@@ -142,7 +142,7 @@ namespace Script {
 			std::string& text;
 		};
 	}
-
+	
 
 	////////////////////////////////////////////////////////////////
 	// OnUseItem event
@@ -425,6 +425,33 @@ namespace Script {
 			bool timeout;
 		};
 	}
+
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnCombatDamage event
+	// Triggered when a creature is damaged b
+
+	namespace OnCombatDamage {
+		class Event : public Script::Event {
+		public:
+			Event(Creature* castor, int32_t& min, int32_t& max, bool useCharges);
+			~Event();
+
+			std::string getName() const {return "OnCombatDamage";}
+			
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Player* chatter;
+			ChatChannel* channel;
+		};
+	}
+
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnLook event

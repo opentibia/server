@@ -1,3 +1,6 @@
+MALE = 0
+FEMALE = 1
+
 NORTH = 0
 EAST = 1
 SOUTH = 2
@@ -333,3 +336,44 @@ RETURNVALUE_PLAYERISPZLOCKEDENTERPVPZONE = 54
 RETURNVALUE_ACTIONNOTPERMITTEDINANOPVPZONE = 55
 RETURNVALUE_YOUCANNOTLOGOUTHERE = 56
 
+
+PlayerFlag_CannotUseCombat = 0
+PlayerFlag_CannotAttackPlayer = 1
+PlayerFlag_CannotAttackMonster = 2
+PlayerFlag_CannotBeAttacked = 3
+PlayerFlag_CanConvinceAll = 4
+PlayerFlag_CanSummonAll = 5
+PlayerFlag_CanIllusionAll = 6
+PlayerFlag_CanSenseInvisibility = 7
+PlayerFlag_IgnoredByMonsters = 8
+PlayerFlag_NotGainInFight = 9
+PlayerFlag_HasInfiniteMana = 10
+PlayerFlag_HasInfiniteSoul = 11
+PlayerFlag_HasNoExhaustion = 12
+PlayerFlag_CannotUseSpells = 13
+PlayerFlag_CannotPickupItem = 14
+PlayerFlag_CanAlwaysLogin = 15
+PlayerFlag_CanBroadcast = 16
+PlayerFlag_CanEditHouses = 17
+PlayerFlag_CannotBeBanned = 18
+PlayerFlag_CannotBePushed = 19
+PlayerFlag_HasInfiniteCapacity = 20
+PlayerFlag_CanPushAllCreatures = 21
+PlayerFlag_CanTalkRedPrivate = 22
+PlayerFlag_CanTalkRedChannel = 23
+PlayerFlag_TalkOrangeHelpChannel = 24
+PlayerFlag_NotGainExperience = 25
+PlayerFlag_NotGainMana = 26
+PlayerFlag_NotGainHealth = 27
+PlayerFlag_NotGainSkill = 28
+PlayerFlag_SetMaxSpeed = 29
+PlayerFlag_SpecialVIP = 30
+PlayerFlag_NotGenerateLoot = 31
+PlayerFlag_CanTalkRedChannelAnonymous = 32
+PlayerFlag_IgnoreProtectionZone = 33
+PlayerFlag_IgnoreSpellCheck = 34
+PlayerFlag_IgnoreWeaponCheck = 35
+PlayerFlag_CannotBeMuted = 36
+PlayerFlag_IsAlwaysPremium = 37
+PlayerFlag_CanAnswerRuleViolations = 38
+	

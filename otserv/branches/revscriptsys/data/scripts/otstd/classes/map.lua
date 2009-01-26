@@ -23,6 +23,7 @@ function Map:getTile(x, y, z)
 		return internalGetTile(x, y, z)
 	end
 end
+
 -- Can also be called as map(x,y,z)
 Map_meta.__call = Map.getTile
 

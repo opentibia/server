@@ -116,6 +116,7 @@ void Manager::registerClasses() {
 	// Creature
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
+	registerMemberFunction("Creature", "setHealth(integer newval)", &Manager::lua_Creature_setHealth);
 
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
@@ -129,8 +130,13 @@ void Manager::registerClasses() {
 
 	registerMemberFunction("Player", "getFood()", &Manager::lua_Player_getFood);
 	registerMemberFunction("Player", "getMana()", &Manager::lua_Player_getMana);
+	registerMemberFunction("Player", "getLevel()", &Manager::lua_Player_getLevel);
+	registerMemberFunction("Player", "getMagicLevel()", &Manager::lua_Player_getMagicLevel);
 	registerMemberFunction("Player", "getManaMax()", &Manager::lua_Player_getManaMax);
+	registerMemberFunction("Player", "setMana(integer newval)", &Manager::lua_Player_setMana);
+	registerMemberFunction("Player", "addManaSpent(integer howmuch)", &Manager::lua_Player_addManaSpent);
 	registerMemberFunction("Player", "getSoulPoints()", &Manager::lua_Player_getSoulPoints);
+	registerMemberFunction("Player", "setSoulPoints()", &Manager::lua_Player_setSoulPoints);
 	registerMemberFunction("Player", "getFreeCap()", &Manager::lua_Player_getFreeCap);
 	registerMemberFunction("Player", "getMaximumCap()", &Manager::lua_Player_getMaximumCap);
 	registerMemberFunction("Player", "getSex()", &Manager::lua_Player_getSex);
@@ -151,6 +157,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "addExperience(int experience)", &Manager::lua_Player_addExperience);
 	registerMemberFunction("Player", "setTown(int townid)", &Manager::lua_Player_setTown);
 	registerMemberFunction("Player", "setVocation(int vocationid)", &Manager::lua_Player_setVocation);
+	registerMemberFunction("Player", "hasGroupFlag(integer flag)", &Manager::lua_Player_hasGroupFlag);
 
 	registerMemberFunction("Player", "getMoney()", &Manager::lua_Player_getMoney);
 	registerMemberFunction("Player", "removeMoney(int amount)", &Manager::lua_Player_removeMoney);
@@ -184,6 +191,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
 	registerMemberFunction("Tile", "queryAdd()", &Manager::lua_Tile_queryAdd);
+	registerMemberFunction("Tile", "hasProperty(integer prop)", &Manager::lua_Tile_hasProperty);
 
 	registerMemberFunction("Tile", "isPZ()", &Manager::lua_Tile_isPZ);
 	registerMemberFunction("Tile", "isPVP()", &Manager::lua_Tile_isPVP);
@@ -218,7 +226,7 @@ void Manager::registerFunctions() {
 
 	registerGlobalFunction("registerOnStepInCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnStepInCreature);
 	registerGlobalFunction("registerOnStepOutCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnStepOutCreature);
-	//registerGlobalFunction("registerOnMoveCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnMoveCreature);
+	registerGlobalFunction("registerOnCreatureMove(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnMoveCreature);
 	registerGlobalFunction("registerOnMoveCreature(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnMoveCreature);
 
 	registerGlobalFunction("registerOnEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
@@ -1261,6 +1269,14 @@ int LuaState::lua_Tile_addItem()
 	return 1;
 }
 
+int LuaState::lua_Tile_hasProperty()
+{
+	int prop = popInteger();
+	Tile* tile = popTile();
+	pushBoolean(tile && tile->hasProperty((ITEMPROPERTY)prop));
+	return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Class Creature
 
@@ -1273,6 +1289,21 @@ int LuaState::lua_Creature_getHealth() {
 int LuaState::lua_Creature_getHealthMax() {
 	Creature* creature = popCreature();
 	pushInteger(creature->getMaxHealth());
+	return 1;
+}
+
+int LuaState::lua_Creature_setHealth() {
+	int newval = popInteger();
+	Creature* c = popCreature();
+
+	if(newval >= c->getHealth()){
+		g_game.combatChangeHealth(COMBAT_HEALING, NULL, c, newval - c->getHealth(), false);
+	}
+	else{
+		g_game.combatChangeHealth(COMBAT_UNDEFINEDDAMAGE, NULL, c, newval - c->getHealth(), false);
+	}
+
+	push(true);
 	return 1;
 }
 
@@ -1364,6 +1395,18 @@ int LuaState::lua_Player_getFood() {
 	return 1;
 }
 
+int LuaState::lua_Player_getLevel() {
+	Player* p = popPlayer();
+	push(p->getLevel());
+	return 1;
+}
+
+int LuaState::lua_Player_getMagicLevel() {
+	Player* p = popPlayer();
+	push(p->getMagicLevel());
+	return 1;
+}
+
 int LuaState::lua_Player_getAccess() {
 	Player* p = popPlayer();
 	push(p->getAccessLevel());
@@ -1382,6 +1425,22 @@ int LuaState::lua_Player_getManaMax() {
 	return 1;
 }
 
+int LuaState::lua_Player_setMana() {
+	int newval = popInteger();
+	Player* p = popPlayer();
+	g_game.combatChangeMana(NULL, p, newval - p->getMana(), false);
+	push(true);
+	return 1;
+}
+
+int LuaState::lua_Player_addManaSpent() {
+	int mana = popInteger();
+	Player* p = popPlayer();
+	p->addManaSpent(mana);
+	push(true);
+	return 1;
+}
+
 int LuaState::lua_Player_getVocationID() {
 	Player* p = popPlayer();
 	push(p->getVocationId());
@@ -1391,6 +1450,14 @@ int LuaState::lua_Player_getVocationID() {
 int LuaState::lua_Player_getSoulPoints() {
 	Player* p = popPlayer();
 	push(p->getPlayerInfo(PLAYERINFO_SOUL));
+	return 1;
+}
+
+int LuaState::lua_Player_setSoulPoints() {
+	int soul = popInteger();
+	Player* p = popPlayer();
+	p->changeSoul(soul - p->getPlayerInfo(PLAYERINFO_SOUL));
+	push(true);
 	return 1;
 }
 
@@ -1475,6 +1542,15 @@ int LuaState::lua_Player_getSkullType() {
 #endif
 	return 1;
 }
+int LuaState::lua_Player_hasGroupFlag()
+{
+	int f = popInteger();
+	Player* player = popPlayer();
+	if(f < 0 || f >= PlayerFlag_LastFlag)
+		throw Error("Invalid player flag passed to function Player.hasGroupFlag!");
+	pushBoolean(player->hasFlag((PlayerFlags)f));
+	return 1;
+}
 
 int LuaState::lua_Player_addExperience() {
 	int64_t exp = (int64_t)popFloat();
@@ -1508,7 +1584,6 @@ int LuaState::lua_Player_getItemTypeCount() {
 	push(((Cylinder*)p)->__getItemTypeCount(type));
 	return 1;
 }
-
 
 int LuaState::lua_Player_getMoney()
 {
@@ -1759,7 +1834,9 @@ int LuaState::lua_getItemIDByName()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Combat functions
+
 #if 0
+
 int LuaState::lua_Combat_create()
 {
 	pushCombat(new Combat);
@@ -1893,14 +1970,7 @@ int LuaState::lua_Condition_addDamage()
 
 int LuaState::lua_Condition_addOutfit()
 {
-	//addOutfitCondition(condition, lookTypeEx, lookType, lookHead, lookBody, lookLegs, lookFeet)
-	Outfit_t outfit;
-	outfit.lookFeet = popInteger();
-	outfit.lookLegs = popInteger();
-	outfit.lookBody = popInteger();
-	outfit.lookHead = popInteger();
-	outfit.lookType = popInteger();
-	outfit.lookTypeEx = popInteger();
+	Outfit_t outfit = popOutfit();
 	ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(popCondition());
 
 	if(!condition)
@@ -1910,8 +1980,14 @@ int LuaState::lua_Condition_addOutfit()
 	return 1;
 }
 
-int LuaState::luaSetCombatCallBack(lua_State *L)
+int LuaState::lua_Combat_setCallback()
 {
+	//setCombatCallBack(combat, key, function)
+	std::string function = putAwayFunction(function_str); // Save function
+	CallBackParam_t key = (CallBackParam_t)popNumber();
+	Combat* combat = popCombat();
+	
+	combat->setCallback(
 	//setCombatCallBack(combat, key, function_name)
 	const char* function = popString(L);
 	std::string function_str(function);
@@ -2778,7 +2854,7 @@ int LuaState::lua_sendMagicEffect()
 {
 	uint32_t type = popUnsignedInteger();
 	Position pos = popPosition();
-
+	
 	g_game.addMagicEffect(pos, type);
 	pushBoolean(true);
 	return 1;
@@ -2867,159 +2943,6 @@ int LuaScriptInterface::luaGetPlayerFlagValue()
 	return 1;
 }
 
-int LuaScriptInterface::luaPlayerLearnInstantSpell()
-{
-	//playerLearnInstantSpell(cid, name)
-	std::string spellName = popString();
-	Player* player = popPlayer();
-
-	InstantSpell* spell = g_spells->getInstantSpellByName(spellName);
-	if(!spell){
-		std::string error_str = (std::string)"Spell \"" + spellName +  (std::string)"\" not found";
-		throwLuaException(error_str);
-	}
-
-	player->learnInstantSpell(spell->getName());
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaScriptInterface::luaCanPlayerLearnInstantSpell()
-{
-	//canPlayerLearnInstantSpell(who, name)
-	std::string spellName = popString();
-	Player* player = popPlayer();
-
-	InstantSpell* spell = g_spells->getInstantSpellByName(spellName);
-	if(!spell){
-		std::string error_str = (std::string)"Spell \"" + spellName +  (std::string)"\" not found";
-		throwLuaException(error_str);
-	}
-
-	if(!player->hasFlag(PlayerFlag_IgnoreSpellCheck)){
-		if(player->getLevel() < spell->getLevel()){
-			pushBoolean(false);
-			return 1;
-		}
-
-		if(player->getMagicLevel() < spell->getMagicLevel()){
-			pushBoolean(false);
-			return 1;
-		}
-	}
-
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaScriptInterface::luaGetPlayerLearnedInstantSpell()
-{
-	//getPlayerLearnedInstantSpell(who, name)
-	std::string spellName = popString();
-	Player* player = popPlayer();
-
-	InstantSpell* spell = g_spells->getInstantSpellByName(spellName);
-	if(!spell) {
-		std::string error_str = (std::string)"Spell \"" + spellName +  (std::string)"\" not found";
-		throwLuaException(error_str);
-	}
-
-	pushBoolean(player->hasLearnedInstantSpell(spellName));
-	return 1;
-}
-
-int LuaScriptInterface::luaGetPlayerInstantSpellCount()
-{
-	//getPlayerInstantSpellCount(cid)
-	Player* player = popPlayer();
-
-	pushInteger(g_spells->getInstantSpellCount(player));
-	return 1;
-}
-
-int LuaScriptInterface::luaGetPlayerInstantSpellInfo()
-{
-	//getPlayerInstantSpellInfo(cid, index)
-	uint32_t index = popUnsignedInteger();
-	Player* player = popPlayer();
-
-	InstantSpell* spell = g_spells->getInstantSpellByIndex(player, index);
-	if(!spell){
-		reportLuaError(LUA_ERROR_SPELL_NOT_FOUND);
-	}
-
-	lua_newtable(m_luaState);
-	setField("name", spell? spell->getName(): "");
-	setField("words", spell? spell->getWords(): "");
-	setField("level", spell? spell->getLevel(): 0);
-	setField("mlevel", spell? spell->getMagicLevel(): 0);
-	setField("mana", spell? spell->getManaCost(player): 0);
-	setField("manapercent", spell? spell->getManaPercent(): 0);
-	return 1;
-}
-
-int LuaScriptInterface::luaGetInstantSpellInfoByName()
-{
-	//getInstantSpellInfoByName(cid, name)
-	std::string spellName = popString();
-	Player* player = popPlayer();
-
-	InstantSpell* spell = g_spells->getInstantSpellByName(spellName);
-	if(!spell){
-		reportLuaError(LUA_ERROR_SPELL_NOT_FOUND);
-	}
-
-	lua_newtable(m_luaState);
-	setField("name", spell? spell->getName(): "");
-	setField("words", spell? spell->getWords(): "");
-	setField("level", spell? spell->getLevel(): 0);
-	setField("mlevel", spell? spell->getMagicLevel(): 0);
-	setField("mana", spell? spell->getManaCost(player): 0);
-	setField("manapercent", spell? spell->getManaPercent(): 0);
-	return 1;
-}
-
-int LuaScriptInterface::luaGetInstantSpellWords()
-{
-	//getInstantSpellWords(name)
-	std::string spellName = popString();
-	InstantSpell* spell = g_spells->getInstantSpellByName(spellName);
-	if(!spell){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_SPELL_NOT_FOUND));
-		reportLuaError(LUA_ERROR_SPELL_NOT_FOUND);
-	}
-
-	pushString(spell? spell->getWords(): "");
-	return 1;
-}
-
-
-int LuaScriptInterface::luaDoRemoveItem()
-{
-	//doRemoveItem(uid, <optional> count)
-	int32_t parameters = lua_gettop(m_luaState);
-
-	int32_t count = -1;
-	if(parameters > 1){
-		count = popInteger();
-	}
-
-	uint32_t uid;
-	Item* item = popItem(&uid);
-
-	ReturnValue ret = g_game.internalRemoveItem(NULL, item, count);
-	if(ret != RET_NOERROR){
-		pushBoolean(false);
-		return 1;
-	}
-
-	ScriptEnviroment* env = getScriptEnv();
-	env->removeItemByUID(uid);
-
-	pushBoolean(true);
-	return 1;
-}
-
 int LuaScriptInterface::luaDoPlayerRemoveItem()
 {
 	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype)
@@ -3046,28 +2969,6 @@ int LuaScriptInterface::luaDoFeedPlayer()
 	Player* player = popPlayer();
 
 	player->addDefaultRegeneration(food * 1000);
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoSendCancel()
-{
-	//doSendCancel(uid, text)
-	std::string text = popString();
-	Player* player = popPlayer();
-
-	player->sendCancel(text.c_str());
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoSendDefaultCancel()
-{
-	//doPlayerSendDefaultCancel(cid, ReturnValue)
-	ReturnValue ret = (ReturnValue)popInteger();
-	Player* player = popPlayer();
-
-	player->sendCancelMessage(ret);
 	pushBoolean(true);
 	return 1;
 }
@@ -3106,76 +3007,6 @@ int LuaScriptInterface::luaDoPlayerAddSkillTry()
 	}
 	player->addSkillAdvance((skills_t)skillid, n);
 	pushBoolean(true);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoPlayerAddManaSpent()
-{
-	//doPlayerAddManaSpent(cid, mana)
-	int32_t mana = popInteger();
-	Player* player = popPlayer();
-
-	if(mana < 0) {
-		reportLuaError("Can not add less than 0 mana to a player.");
-		pushBoolean(false);
-		return 1;
-	}
-
-	player->addManaSpent(mana);
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoPlayerAddMana()
-{
-	//doPlayerAddMana(cid, mana)
-	int32_t manaChange = popInteger();
-	Player* player = popPlayer();
-
-	g_game.combatChangeMana(NULL, player, manaChange);
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoPlayerAddItem()
-{
-	//doPlayerAddItem(cid, itemid, <optional> count/subtype)
-	int32_t parameters = lua_gettop(m_luaState);
-
-	uint32_t count = 0;
-	if(parameters > 2){
-		count = popUnsignedInteger();
-	}
-
-	uint32_t itemId = popUnsignedInteger();
-	Player* player = popPlayer();
-
-	const ItemType& it = Item::items[itemId];
-	if(it.stackable && count > 100){
-		reportErrorFunc("Stack count cannot be higher than 100.");
-		count = 100;
-	}
-
-	Item* newItem = Item::CreateItem(itemId, count);
-
-	if(!newItem){
-		throwLuaException("Couldn't create item of the specified ID.");
-	}
-
-	ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
-
-	if(ret != RET_NOERROR){
-		delete newItem;
-		reportErrorFunc("Could not add item");
-		pushBoolean(false);
-	} else if(newItem->getParent()){
-		pushThing(newItem);
-	}
-	else{
-		//stackable item stacked with existing object, newItem will be released
-		pushThing(NULL);
-	}
-
 	return 1;
 }
 
@@ -4517,22 +4348,6 @@ int LuaScriptInterface::luaGetCreatureTarget(lua_State *L)
 	//getCreatureTarget(creature)
 	Creature* creature = popCreature();
 	pushThing(creature->getAttackedCreature());
-	return 1;
-}
-
-int LuaScriptInterface::luaGetCreatureHealth(lua_State *L)
-{
-	//getCreatureHealth(creature)
-	Creature* creature = popCreature();
-	pushInteger(creature->getHealth());
-	return 1;
-}
-
-int LuaScriptInterface::luaGetCreatureMaxHealth(lua_State *L)
-{
-	//getCreatureMaxHealth(creature)
-	Creature* creature = popCreature();
-	pushInteger(creature->getMaxHealth());
 	return 1;
 }
 

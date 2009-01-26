@@ -1,10 +1,10 @@
 
-otstd.Commands.MakeItem = Command:new()
+local MakeItem = Command:new("MakeItem")
 
-otstd.Commands.MakeItem.words = "/n"
-otstd.Commands.MakeItem.groups = {"GM"}
+MakeItem.words = "/n"
+MakeItem.groups = {"GM"}
 
-function otstd.Commands.MakeItem.handler(event)
+function MakeItem.handler(event)
 	local name = event.param
 	local count = name:match("(%d+)")
 	
@@ -42,4 +42,4 @@ function otstd.Commands.MakeItem.handler(event)
 	event.text = "" -- Don't display a message
 end
 
-otstd.Commands.MakeItem:register()
+MakeItem:register()

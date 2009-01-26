@@ -1,4 +1,4 @@
-/*#ifdef __OTSERV_OTCP_H__
+#ifdef __OTSERV_OTCP_H__
 #error "Precompiled header should only be included once"
 #endif
 #define __OTSERV_OTCP_H__
@@ -29,6 +29,7 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 //std
+#include <algorithm>
 #include <list>
 #include <vector>
 #include <map>
@@ -44,4 +45,3 @@ extern "C"
 #include "thing.h"
 
 #endif
-*/

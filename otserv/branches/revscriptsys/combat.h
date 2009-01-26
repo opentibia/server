@@ -43,11 +43,12 @@ public:
 	CombatDamageCalculationCallback(const CombatDamageCalculationCallback& c) : type(c.type) {}
 	CombatDamageCalculationCallback& operator=(const CombatDamageCalculationCallback& rhs) {type = rhs.type; return *this;}
 
-	void operator()(Player* player, int32_t& min, int32_t& max, bool useCharges) const;
+	void operator()(Creature* creature, int32_t& min, int32_t& max, bool useCharges) const;
 	operator bool() const {return type != FORMULA_UNDEFINED;}
 protected:
 	formulaType_t type;
 };
+
 /*
 class TileCallback : public CallBack{
 public:

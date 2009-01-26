@@ -39,7 +39,6 @@
 #include "status.h"
 #include "monsters.h"
 #include "npc.h"
-#include "commands.h"
 #include "outfit.h"
 #include "vocation.h"
 #include "configmanager.h"
@@ -66,7 +65,6 @@ IPList serverIPs;
 ConfigManager g_config;
 
 Game g_game;
-Commands commands;
 Monsters g_monsters;
 BanManager g_bans;
 Vocations g_vocations;
@@ -237,18 +235,6 @@ void mainLoader(int argc, char *argv[])
 	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(!g_vocations.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		ErrorMessage("Unable to load vocations!");
-		exit(-1);
-	}
-	std::cout << "[done]" << std::endl;
-
-	//load commands
-	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "commands.xml";
-	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
-	if(!commands.loadXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
 		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;

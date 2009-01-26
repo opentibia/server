@@ -327,8 +327,8 @@ public:
 	int32_t getWeaponSkill(const Item* item) const;
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
 
-	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext = true);
+	virtual void drainMana(Creature* attacker, int32_t manaLoss, bool showtext = true);
 	void addManaSpent(uint32_t amount);
 	void addSkillAdvance(skills_t skill, uint32_t count);
 

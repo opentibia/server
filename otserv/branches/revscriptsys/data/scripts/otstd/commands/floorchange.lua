@@ -1,16 +1,16 @@
 
-otstd.Commands.MoveUp = Command:new()
+local MoveUp = Command:new("MoveUp")
 
-otstd.Commands.MoveUp.words = "/up"
-otstd.Commands.MoveUp.groups = {"GM"}
+MoveUp.words = "/up"
+MoveUp.groups = {"GM"}
 
-otstd.Commands.MoveDown = Command:new()
+MoveDown = Command:new("MoveDown")
 
-otstd.Commands.MoveDown.words = "/down"
-otstd.Commands.MoveDown.groups = {"GM"}
+MoveDown.words = "/down"
+MoveDown.groups = {"GM"}
 
 -- Handlers
-function otstd.Commands.MoveUp.handler(event)
+function MoveUp.handler(event)
 	local param = event.text:sub(4)
 	local n = 1
 	
@@ -21,7 +21,7 @@ function otstd.Commands.MoveUp.handler(event)
 	otstd.Commands.moveVerticalHandler(event, -n)
 end
 
-function otstd.Commands.MoveDown.handler(event)
+function MoveDown.handler(event)
 	local param = event.text:sub(6)
 	local n = 1
 	
@@ -59,5 +59,5 @@ function otstd.Commands.moveVerticalHandler(event, dir)
 	event.text = "" -- Don't display a message
 end
 
-otstd.Commands.MoveUp:register()
-otstd.Commands.MoveDown:register()
+MoveUp:register()
+MoveDown:register()

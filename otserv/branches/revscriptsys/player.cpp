@@ -1743,43 +1743,47 @@ void Player::removeMessageBuffer()
 	}
 }
 
-void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
+void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext /*= true*/)
 {
-	Creature::drainHealth(attacker, combatType, damage);
+	Creature::drainHealth(attacker, combatType, damage, showtext);
 
 	sendStats();
 
-	std::stringstream ss;
-	if(damage == 1) {
-		ss << "You lose 1 hitpoint";
+	if(showtext){
+		std::stringstream ss;
+		if(damage == 1) {
+			ss << "You lose 1 hitpoint";
+		}
+		else
+			ss << "You lose " << damage << " hitpoints";
+
+		if(attacker){
+			ss << " due to an attack by " << attacker->getNameDescription();
+		}
+
+		ss << ".";
+
+		sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 	}
-	else
-		ss << "You lose " << damage << " hitpoints";
-
-	if(attacker){
-		ss << " due to an attack by " << attacker->getNameDescription();
-	}
-
-	ss << ".";
-
-	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
-void Player::drainMana(Creature* attacker, int32_t manaLoss)
+void Player::drainMana(Creature* attacker, int32_t manaLoss, bool showtext /*= true*/)
 {
-	Creature::drainMana(attacker, manaLoss);
+	Creature::drainMana(attacker, manaLoss, showtext);
 
 	sendStats();
 
-	std::stringstream ss;
-	if(attacker){
-		ss << "You lose " << manaLoss << " mana blocking an attack by " << attacker->getNameDescription() << ".";
-	}
-	else{
-		ss << "You lose " << manaLoss << " mana.";
-	}
+	if(showtext){
+		std::stringstream ss;
+		if(attacker){
+			ss << "You lose " << manaLoss << " mana blocking an attack by " << attacker->getNameDescription() << ".";
+		}
+		else{
+			ss << "You lose " << manaLoss << " mana.";
+		}
 
-	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+		sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+	}
 }
 
 void Player::addManaSpent(uint32_t amount)

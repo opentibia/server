@@ -259,8 +259,8 @@ public:
 	virtual void changeMana(int32_t manaChange);
 
 	virtual void gainHealth(Creature* caster, int32_t healthGain);
-	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext);
+	virtual void drainMana(Creature* attacker, int32_t manaLoss, bool showtext);
 
 	virtual bool challengeCreature(Creature* creature) {return false;};
 	virtual bool convinceCreature(Creature* creature) {return false;};
@@ -432,7 +432,6 @@ protected:
 
 	friend class Game;
 	friend class Map;
-	friend class Commands;
 	friend class LuaScriptInterface;
 };
 

@@ -19,6 +19,8 @@ end
 
 typeof = isOfType
 
+require("otstd/classes/events")
+
 require("otstd/classes/thing")
 require("otstd/classes/item")
 require("otstd/classes/teleport")
@@ -32,3 +34,4 @@ require("otstd/classes/town")
 require("otstd/classes/house")
 
 require("otstd/classes/chat")
+require("otstd/classes/spell")

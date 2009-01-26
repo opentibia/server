@@ -9,8 +9,12 @@ function otstd.shovel.callback(event)
 	local tile = map:getTile(event.target)
 	if tile then
 		local hole = tile:getThing(event.target.stackpos)
+		if not hole then
+			return
+		end
+		
 		for holeid, openid in pairs(otstd.holes) do
-			if hole:getItemID() == holeid then
+			if openid.open and hole:getItemID() == holeid then
 				hole:setItemID(openid.open)
 				hole:startDecaying()
 				return
@@ -27,7 +31,7 @@ function otstd.shovel.registerHandlers()
 			stopListener(data.listener)
 		end
 		data.listener =
-			registerOnUseItem("itemid", id, otstd.shovel.callback)
+			registerOnUseItemNearby("itemid", id, otstd.shovel.callback)
 	end
 end
 

@@ -59,7 +59,7 @@ function otstd.rope.registerHandlers()
 		end
 		
 		data.listener =
-			registerOnUseItem("itemid", id, otstd.rope.callback)
+			registerOnUseItemNearby("itemid", id, otstd.rope.callback)
 	end
 end
 

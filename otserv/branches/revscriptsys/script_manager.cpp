@@ -308,7 +308,7 @@ Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 		// Argument must be a valid lua type
 
 		// Adjust custom types
-		if(type == "int" || type == "float") {
+		if(type == "int" || type == "integer" || type == "float") {
 			type = "number";
 		}
 		if(type == "position") {

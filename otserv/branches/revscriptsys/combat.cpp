@@ -944,13 +944,155 @@ void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatPar
 		}
 	}
 }
-
-//**********************************************************
-
-void CombatDamageCalculationCallback::operator()(Player* player, int32_t& min, int32_t& max, bool useCharges) const {
-	// REVSCRIPT TODO Event callback??
+ 
+//**********************************************************	 
+#if 0
+void TileCallback::onTileCombat(Creature* creature, Tile* tile) const	 
+{	 
+     //"onTileCombat"(cid, pos)	 
+     if(m_scriptInterface->reserveScriptEnv()){	 
+             ScriptEnviroment* env = m_scriptInterface->getScriptEnv();	 
+             lua_State* L = m_scriptInterface->getLuaState();	 
+ 
+             if(!env->setCallbackId(m_scriptId, m_scriptInterface))	 
+                     return;	 
+ 
+             uint32_t cid = 0;	 
+ 
+             if(creature){	 
+                     cid = env->addThing(creature);	 
+             }	 
+ 
+             m_scriptInterface->pushFunction(m_scriptId);	 
+             lua_pushnumber(L, cid);	 
+             m_scriptInterface->pushPosition(L, tile->getPosition(), 0);	 
+ 
+             m_scriptInterface->callFunction(2);	 
+ 
+             env->resetCallback();	 
+             m_scriptInterface->releaseScriptEnv();	 
+     }	 
+     else{	 
+             std::cout << "[Error] Call stack overflow. TileCallback::onTileCombat" << std::endl;	 
+             return;	 
+     }	 
+}	 
+ 
+//**********************************************************	 
+ 
+void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const	 
+{	 
+     //"onTargetCombat"(cid, target)	 
+     if(m_scriptInterface->reserveScriptEnv()){	 
+             ScriptEnviroment* env = m_scriptInterface->getScriptEnv();	 
+             lua_State* L = m_scriptInterface->getLuaState();	 
+ 
+             if(!env->setCallbackId(m_scriptId, m_scriptInterface))	 
+                     return;	 
+ 
+             uint32_t cid = 0;	 
+ 
+             if(creature){	 
+                     cid = env->addThing(creature);	 
+             }	 
+ 
+             uint32_t targetCid = env->addThing(target);	 
+ 
+             m_scriptInterface->pushFunction(m_scriptId);	 
+             lua_pushnumber(L, cid);	 
+             lua_pushnumber(L, targetCid);	 
+ 
+             int size0 = lua_gettop(L);	 
+             if(lua_pcall(L, 2, 0 /*nReturnValues*/, 0) != 0){	 
+                     LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));	 
+             }	 
+ 
+             if((lua_gettop(L) + 2 /*nParams*/  + 1) != size0){	 
+                     LuaScriptInterface::reportError(NULL, "Stack size changed!");	 
+             }	 
+ 
+             env->resetCallback();	 
+             m_scriptInterface->releaseScriptEnv();	 
+     }	 
+     else{	 
+             std::cout << "[Error] Call stack overflow. TargetCallback::onTargetCombat" << std::endl;	 
+             return;	 
+     }
+#endif
+void CombatDamageCalculationCallback::operator()(Creature* creature, int32_t& min, int32_t& max, bool useCharges) const {
 }
+#if 0
+	OnCombat::Event evt(creature, type, min, max, useCharges);
+	evt.dispatchEvent();
+	;pushFunction(
 
+	if(!env->setCallbackId(m_scriptId, m_scriptInterface))	 
+         return;	 
+
+ uint32_t cid = env->addThing(player);	 
+
+ m_scriptInterface->pushFunction(m_scriptId);	 
+ lua_pushnumber(L, cid);	 
+
+ int32_t parameters = 1;	 
+
+ switch(type){	 
+         case FORMULA_LEVELMAGIC:	 
+         {	 
+                 //"onGetPlayerMinMaxValues"(cid, level, maglevel)	 
+                 lua_pushnumber(L, player->getLevel());	 
+                 lua_pushnumber(L, player->getMagicLevel());	 
+                 parameters += 2;	 
+                 break;	 
+         }	 
+
+         case FORMULA_SKILL:	 
+         {	 
+                 //"onGetPlayerMinMaxValues"(cid, attackSkill, attackValue, attackFactor)	 
+                 Item* tool = player->getWeapon();	 
+                 int32_t attackSkill = player->getWeaponSkill(tool);	 
+                 int32_t attackValue = 7;	 
+                 if(tool){	 
+                         attackValue = tool->getAttack();	 
+
+                         if(useCharges && tool->hasCharges()){	 
+                                 int32_t newCharge = std::max(0, tool->getCharges() - 1);	 
+                                 g_game.transformItem(tool, tool->getID(), newCharge);	 
+                         }	 
+ }	 
+                 float attackFactor = player->getAttackFactor();	 
+
+                 lua_pushnumber(L, attackSkill);	 
+                 lua_pushnumber(L, attackValue);	 
+                 lua_pushnumber(L, attackFactor);	 
+                 parameters += 3;	 
+                 break;	 
+         }	 
+
+         default:	 
+                 std::cout << "ValueCallback::getMinMaxValues - unknown callback type" << std::endl;	 
+                 return;	 
+                 break;	 
+ }	 
+
+ int size0 = lua_gettop(L);	 
+ if(lua_pcall(L, parameters, 2 /*nReturnValues*/, 0) != 0){	 
+         LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));	 
+ }	 
+ else{	 
+         max = LuaScriptInterface::popNumber(L);	 
+         min = LuaScriptInterface::popNumber(L);	 
+ }	 
+
+ if((lua_gettop(L) + parameters /*nParams*/  + 1) != size0){	 
+         LuaScriptInterface::reportError(NULL, "Stack size changed!");	 
+ }	 
+
+ env->resetCallback();	 
+ m_scriptInterface->releaseScriptEnv();	 
+}	 
+}
+#endif
 //**********************************************************
 
 void AreaCombat::clear()

@@ -569,7 +569,7 @@ int32_t LuaThread::run(int args) {
 		lua_Debug ar;
 
 		int level = 0;
-		while(lua_getstack(state, ++level, &ar) != 0) {
+		while(lua_getstack(state, level++, &ar) != 0) {
 			lua_getinfo(state, "nSl", &ar);
 
 			if(ar.currentline != -1) {

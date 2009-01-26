@@ -31,3 +31,8 @@ function Tile:getTopMoveableThing()
 	end
 	return t
 end
+
+function Tile:isBlocking()
+	return self:hasProperty(CONST_PROP_BLOCKSOLID)
+end
+

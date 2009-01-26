@@ -69,7 +69,7 @@ protected:
 	void enableXTEAEncryption() { m_encryptionEnabled = true; }
 	void disableXTEAEncryption() { m_encryptionEnabled = false; }
 	void setXTEAKey(const uint32_t* key){
-		memcpy(m_key, key, sizeof(uint32_t)*4);
+		memcpy(&m_key, key, sizeof(uint32_t)*4);
 	}
 
 	void XTEA_encrypt(OutputMessage& msg);
