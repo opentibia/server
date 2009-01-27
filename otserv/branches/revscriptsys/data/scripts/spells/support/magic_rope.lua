@@ -11,12 +11,13 @@ function magic_rope:onBeginCast(event)
 	local caster = event.caster
 	local tile = map:getTile(caster:getPosition())
 	
-	for spotid, _ in ipairs(otstd.ropespots) do
-		if tile:getGround():getID() == spotid then
+	for spotid, _ in pairs(otstd.ropespots) do
+		print(spotid .. " == " .. tile:getGround():getItemID())
+		if tile:getGround():getItemID() == spotid then
 			return true
 		end
 	end
-	caster:sendCancel("Not possible.")
+	caster:sendCancel("Sorry not possible.")
 	return false
 end
 

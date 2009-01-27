@@ -26,18 +26,18 @@ function levitate:onBeginCast(event)
 	
 	if event.param == "up" then
 		if pos.z == 8 then
-			caster:sendCancel("Not possible.")
+			caster:sendCancel("Sorry not possible.")
 			return false
 		end
 		pos.z = pos.z + 1
 	elseif event.param == "down" then
 		if pos.z == 7 then
-			caster:sendCancel("Not possible.")
+			caster:sendCancel("Sorry not possible.")
 			return false
 		end
 		pos.z = pos.z + 1
 	else
-		caster:sendCancel("Not possible")
+		caster:sendCancel("Sorry not possible")
 	end
 	
 	local up_tile = map:getTile(pos)

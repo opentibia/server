@@ -93,11 +93,11 @@ function otstd.onCastSpell(event)
 	end
 	
 	if spell.internalFinishCast then
-		spell.internalFinishCast(event)
+		spell:internalFinishCast(event)
 	end
 	
 	if spell.onFinishCast then
-		spell.onFinishCast(event)
+		spell:onFinishCast(event)
 	end
 	
 	sendMagicEffect(caster:getPosition(), spell.effect)
@@ -105,12 +105,12 @@ end
 
 function otstd.onSaySpell(event)
 	event.caster = event.creature
-	
 	local spell = event.spell
+	
 	if otstd.onSpellCheck(event) then
-		if not spell.onBeginCast or spell.onBeginCast(event) then
+		if not spell.onBeginCast or spell:onBeginCast(event) then
 			if spell.onCast then
-				spell.onCast(event)
+				spell:onCast(event)
 			else
 				otstd.onCastSpell(event)
 			end
@@ -124,8 +124,7 @@ function otstd.onSaySpell(event)
 	end
 end
 
-function otstd.onCastConjureSpell(event)
-	local spell = event.spell
+function otstd.onCastConjureSpell(spell, event)
 	local caster = event.caster
 	
 	if spell.reagent ~= 0 then -- Reagents! => Rune spell
@@ -133,7 +132,6 @@ function otstd.onCastConjureSpell(event)
 	else -- Conjure item simply
 		local count = spell.product.count
 		repeat
-			caster:sendNote("adding!")
 			caster:addItem(createItem(spell.product.id, math.min(100, count)))
 			count = count - math.min(100, count)
 		until count <= 0
@@ -176,7 +174,7 @@ function Spell:register()
 			event.param = param
 			
 			if self.onSay then
-				self.onSay(event)
+				self:onSay(event)
 			else
 				otstd.onSaySpell(event)
 			end
