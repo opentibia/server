@@ -7066,9 +7066,7 @@ int LuaScriptInterface::luaGetPartyMembers(lua_State *L)
 	}
 
 	PlayerVector list = player->getParty()->getMemberList();
-	if(player->getParty()->getLeader() == player){
-		list.push_back(player);
-	}
+	list.push_back(player->getParty()->getLeader());
 
 	lua_newtable(L);
 	PlayerVector::const_iterator it = list.begin();

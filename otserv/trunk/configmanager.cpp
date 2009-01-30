@@ -160,6 +160,7 @@ int ConfigManager::getNumber(uint32_t _what) const
 		return 0;
 	}
 }
+
 bool ConfigManager::setNumber(uint32_t _what, int _value)
 {
 	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
@@ -170,6 +171,20 @@ bool ConfigManager::setNumber(uint32_t _what, int _value)
 	else
 	{
 		std::cout << "Warning: [ConfigManager::setNumber] " << _what << std::endl;
+		return false;
+	}
+}
+
+bool ConfigManager::setString(uint32_t _what, const std::string& _value)
+{
+	if(m_isLoaded && _what < LAST_STRING_CONFIG)
+	{
+		m_confString[_what] = _value;
+		return true;
+	}
+	else
+	{
+		std::cout << "Warning: [ConfigManager::setString] " << _what << std::endl;
 		return false;
 	}
 }

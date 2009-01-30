@@ -109,6 +109,7 @@ public:
 	const std::string& getString(uint32_t _what) const;
 	int getNumber(uint32_t _what) const;
 	bool setNumber(uint32_t _what, int _value);
+	bool setString(uint32_t _what, const std::string& _value);
 
 private:
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");

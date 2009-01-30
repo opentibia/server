@@ -101,8 +101,6 @@ void ErrorMessage(const char* message) {
 }
 
 struct CommandLineOptions{
-	std::string ip;
-	int port;
 	std::string configfile;
 	bool truncate_log;
 	std::string logfile;
@@ -208,11 +206,7 @@ int main(int argc, char *argv[])
 
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
-	int port;
-	if(command_opts.ip != "")
-		port = command_opts.port;
-	else
-		port = g_config.getNumber(ConfigManager::PORT);
+	int port = g_config.getNumber(ConfigManager::PORT);
 
 	Server server(INADDR_ANY, port);
 	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
@@ -227,7 +221,6 @@ int main(int argc, char *argv[])
 bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 {
 	std::vector<std::string>::iterator argi = args.begin();
-	opts.port = 0;
 	opts.truncate_log = false;
 
 	if(argi != args.end()){
@@ -242,14 +235,14 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
 				return false;
 			}
-			opts.port = atoi(argi->c_str());
+			g_config.setNumber(ConfigManager::PORT, atoi(argi->c_str()));
 		}
 		else if(arg == "-i" || arg == "--ip"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
 				return false;
 			}
-			opts.ip = atoi(argi->c_str());
+			g_config.setString(ConfigManager::IP, arg);
 		}
 		else if(arg == "-c" || arg == "--config"){
 			if(++argi == args.end()){
@@ -544,19 +537,11 @@ void mainLoader(const CommandLineOptions& command_opts)
 	}
 
 	std::cout << ":: Local port:            ";
-	int port;
-	if(command_opts.ip != "")
-		port = command_opts.port;
-	else
-		port = g_config.getNumber(ConfigManager::PORT);
+	int port = g_config.getNumber(ConfigManager::PORT);
 	std::cout << port << std::endl;
 
 	std::cout << ":: Global IP address:     ";
-	std::string ip;
-	if(command_opts.ip != "")
-		ip = command_opts.ip;
-	else
-		ip = g_config.getString(ConfigManager::IP);
+	std::string ip = g_config.getString(ConfigManager::IP);
 
 	uint32_t resolvedIp = inet_addr(ip.c_str());
 	if(resolvedIp == INADDR_NONE){

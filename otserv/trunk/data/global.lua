@@ -488,3 +488,15 @@ function convertIPToInt(str)
 		return ipint, maskint
 	end
 end
+
+function getPartyLeader(cid)
+	local party = getPartyMembers(cid)
+	if party then
+		return party[1] -- First player is the leader
+	end
+	return 0
+end
+
+function isInParty(cid)
+	return getPartyMembers(cid) ~= nil
+end
