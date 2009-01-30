@@ -81,7 +81,7 @@
 	<monster name="Parrot" file="birds/parrot.xml"/>
 	<monster name="Penguin" file="birds/penguin.xml"/>
 	<monster name="Seagull" file="birds/seagull.xml"/>
-	<monster name="Terror Bird" file="birds/Terror Bird.xml"/>
+	<monster name="Terror Bird" file="birds/terror bird.xml"/>
 	
 	<!-- Bosses -->
 	<monster name="Apocalypse" file="bosses/apocalypse.xml"/>
@@ -293,8 +293,8 @@
 	<monster name="Pirate Marauder" file="pirates/pirate marauder.xml"/>
 	
 	<!-- Plant-Like -->
-	<monster name="Carniphila" file="plant-Like/carniphila.xml"/>
-	<monster name="Spit Nettle" file="plant-Like/spit nettle.xml"/>
+	<monster name="Carniphila" file="plant-like/carniphila.xml"/>
+	<monster name="Spit Nettle" file="plant-like/spit nettle.xml"/>
 	
 	<!-- Pyro-elementals -->
 	<monster name="Fire Elemental" file="pyro-elementals/fire elemental.xml"/>
