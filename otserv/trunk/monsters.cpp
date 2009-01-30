@@ -76,6 +76,7 @@ void MonsterType::reset()
 	isConvinceable = false;
 	isAttackable = true;
 	isHostile = true;
+	isLureable = false;
 
 	lightLevel = 0;
 	lightColor = 0;
@@ -874,6 +875,10 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 
 						if(readXMLInteger(tmpNode, "runonhealth", intValue)){
 							mType->runAwayHealth = intValue;
+						}
+						
+						if(readXMLInteger(tmpNode, "lureable", intValue)){
+							mType->isLureable = (intValue != 0);
 						}
 					}
 

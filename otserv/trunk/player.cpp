@@ -1218,7 +1218,7 @@ void Player::sendPing(uint32_t interval)
 bool Player::hasShopItemForSale(uint32_t itemId)
 {
 	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
-		if((*it).itemId == itemId && (*it).buyPrice > 0){
+		if(it->itemId == itemId && (*it).buyPrice > 0){
 			return true;
 		}
 	}
@@ -1229,7 +1229,7 @@ bool Player::hasShopItemForSale(uint32_t itemId)
 void Player::updateSaleShopList(uint32_t itemId)
 {
 	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
-		if((*it).itemId == itemId){
+		if(it->itemId == itemId || itemId == ITEM_COINS_GOLD || itemId == ITEM_COINS_PLATINUM || itemId == ITEM_COINS_CRYSTAL){
 			if(client){
 				client->sendSaleItemList(shopItemList);
 			}

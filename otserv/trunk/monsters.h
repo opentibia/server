@@ -119,6 +119,7 @@ public:
 	bool isConvinceable;
 	bool isAttackable;
 	bool isHostile;
+	bool isLureable;
 
 	int lightLevel;
 	int lightColor;

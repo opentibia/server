@@ -1184,7 +1184,7 @@ Item* Monster::getCorpse()
 
 bool Monster::inDespawnRange(const Position& pos)
 {
-	if(spawn){
+	if(spawn && !mType->isLureable){
 		if(Monster::despawnRadius == 0){
 			return false;
 		}
