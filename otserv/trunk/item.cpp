@@ -419,7 +419,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 bool Item::unserializeAttr(PropStream& propStream)
 {
 	uint8_t attr_type;
-	while(propStream.GET_UCHAR(attr_type)){
+	while(propStream.GET_UCHAR(attr_type) && attr_type != 0){
 		if(!readAttr((AttrTypes_t)attr_type, propStream)){
 			return false;
 			break;

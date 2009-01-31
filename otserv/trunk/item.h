@@ -78,6 +78,7 @@ struct TeleportDest{
 #pragma pack()
 
 enum AttrTypes_t{
+	// attr 0 means end of attribute list
 	//ATTR_DESCRIPTION = 1,
 	//ATTR_EXT_FILE = 2,
 	ATTR_TILE_FLAGS = 3,
