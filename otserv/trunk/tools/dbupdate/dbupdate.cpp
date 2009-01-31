@@ -82,7 +82,7 @@ SimpleUpdateQuery updateQueries[] = {
 			"CREATE TABLE \"map_store\" ( "
 				"\"house_id\" INTEGER NOT NULL,"
 				"\"data\" BLOB NOT NULL,"
-				"KEY(\"house_id\")"
+				"UNIQUE(\"house_id\")"
 			");",
 			NULL
 		}

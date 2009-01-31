@@ -44,7 +44,7 @@ bool IOMapSerialize::loadMap(Map* map)
 	std::cout << "Notice: Map load (" << g_config.getString(ConfigManager::MAP_STORAGE_TYPE) << ") took : " <<
 		(OTSYS_TIME() - start)/(1000.) << " s" << std::endl;
 
-	return false;
+	return s;
 }
 
 bool IOMapSerialize::saveMap(Map* map)
@@ -482,7 +482,8 @@ bool IOMapSerialize::saveTile(PropWriteStream& stream, const Tile* tile)
 		if(!item)
 			continue;
 
-		if(!(!	item->isNotMoveable() ||
+		// Note that these are NEGATED, ie. these are the items that will be saved.
+		if(!(	!item->isNotMoveable() || // is Moveable
 				item->getDoor() ||
 				(item->getContainer() && item->getContainer()->size() != 0) ||
 				item->canWriteText() ||
