@@ -68,6 +68,10 @@
 	<rune name="adana ani" id="2278" lvl="54" maglv="18" mana="1400" needtarget="1" charges="5" script="support/paralyze_rune.lua">
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 	</rune>
+	<rune name="Wild Growth" id="2269" allowfaruse="1" charges="2" lvl="27" maglv="8" exhaustion="2000" blocktype="all" script="support/wild growth.lua">
+		<vocation name="Druid" showInDescription="0"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</rune>
 
 	<!-- Instant Spells -->
 	<instant name="Light" words="utevo lux" lvl="8" mana="20" selftarget="1" aggressive="0" script="support/light.lua">
@@ -243,9 +247,9 @@
 	<conjure name="Fireball" words="adori flam" lvl="27" mana="460" soul="2" prem="1" reagentId="2260" conjureId="2302" conjureCount="5" function="conjureRune">
 		<vocation name="Sorcerer"/> <vocation name="Master Sorcerer"/>
 	</conjure>
-	<instant name="Wild Growth" words="exevo grav vita" lvl="27" mana="220" prem="1" direction="1" blocktype="all" script="support/wild_growth.lua">
+	<conjure name="Wild Growth" words="adevo grav vita" lvl="27" mana="600" soul="5" prem="1" reagentId="2260" conjureId="2269" conjureCount="2" needlearn="0" function="conjureRune">
 		<vocation name="Elder Druid"/>
-	</instant>
+	</conjure>
 	<conjure name="Animate Dead" words="adana mort" lvl="27" mana="600" soul="5" prem="1" reagentId="2260" conjureId="2316" conjureCount="1" function="conjureRune">
 		<vocation name="Sorcerer"/> <vocation name="Master Sorcerer"/>
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
