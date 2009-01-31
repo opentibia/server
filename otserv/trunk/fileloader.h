@@ -184,6 +184,8 @@ public:
 		end = a + size;
 	}
 
+	long size(){return end-p;}
+
 	template <typename T>
 	inline bool GET_STRUCT(T* &ret){
 		if(size() < (long)sizeof(T)){
@@ -230,7 +232,26 @@ public:
 		str = new char[str_len+1];
 		memcpy(str, p, str_len);
 		str[str_len] = 0;
-		ret = str;
+		ret.assign(str, str_len);
+		delete[] str;
+		p = p + str_len;
+		return true;
+	}
+
+	inline bool GET_LSTRING(std::string& ret){
+		char* str;
+		uint32_t str_len;
+
+		if(!GET_ULONG(str_len)){
+			return false;
+		}
+		if(size() < str_len){
+			return false;
+		}
+		str = new char[str_len+1];
+		memcpy(str, p, str_len);
+		str[str_len] = 0;
+		ret.assign(str, str_len);
 		delete[] str;
 		p = p + str_len;
 		return true;
@@ -245,11 +266,12 @@ public:
 		str = new char[str_len+1];
 		memcpy(str, p, str_len);
 		str[str_len] = 0;
-		ret = str;
+		ret.assign(str, str_len); // String can contain 0s
 		delete[] str;
 		p = p + str_len;
 		return true;
 	}
+
 
 	inline bool SKIP_N(unsigned short n){
 		if(size() < n){
@@ -261,7 +283,6 @@ public:
 
 
 protected:
-	long size(){return end - p;};
 	const char* p;
 	const char* end;
 };
@@ -325,6 +346,19 @@ public:
 		size = size + str_len;
 	}
 
+	inline void ADD_LSTRING(const std::string& add){
+		uint32_t str_len = add.size();
+ 
+		ADD_ULONG(str_len);
+
+		if((buffer_size - size) < str_len){
+			buffer_size = buffer_size + ((str_len + 0x1F) & 0xFFFFFFE0);
+			buffer = (char*)realloc(buffer, buffer_size);
+		}
+
+		memcpy(&buffer[size], add.c_str(), str_len);
+		size = size + str_len;
+	}
 
 protected:
 	char* buffer;

@@ -8,6 +8,13 @@ datadir = "data/"
 -- map location
 map = "data/world/map.otbm"
 
+-- Type of map storage, 
+-- 'relational' - Slower, but possible to run database queries to change all items to another id for example.
+-- 'binary' - Faster, but you cannot run DB queries.
+-- To switch, load server with the current type, change the type in config.lua 
+-- type /reload config and the save the server with /closeserver serversave
+map_store_type = "binary"
+
 -- mapkind
 -- options: OTBM for binary map, XML for OTX map
 mapkind = "OTBM"

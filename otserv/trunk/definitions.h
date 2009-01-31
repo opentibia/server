@@ -26,7 +26,7 @@
 #define OTSERV_VERSION "0.6.2_SVN"
 #define OTSERV_NAME "OTServ"
 #define OTSERV_CLIENT_VERSION "8.40"
-#define CURRENT_SCHEMA_VERSION 1
+#define CURRENT_SCHEMA_VERSION 2
 
 
 #if defined(WIN32) && !defined(__WINDOWS__)

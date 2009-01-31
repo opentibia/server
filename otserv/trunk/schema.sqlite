@@ -146,6 +146,12 @@ CREATE TABLE "tile_items" (
     FOREIGN KEY ("tile_id") REFERENCES "tiles" ("id")
 );
 
+CREATE TABLE "map_store" (
+	"house_id" INTEGER NOT NULL,
+	"data" BLOB NOT NULL,
+	KEY("house_id")
+);
+
 CREATE TABLE "player_items" (
     "player_id" INT NOT NULL,
     "sid" INT NOT NULL,
@@ -184,7 +190,7 @@ CREATE TABLE `schema_info` (
     `version` INT UNSIGNED NOT NULL
 );
 
-INSERT INTO `schema_info` (`version`) VALUES (1);
+INSERT INTO `schema_info` (`version`) VALUES (2);
 
 CREATE TRIGGER "oncreate_guilds"
 AFTER INSERT ON "guilds"

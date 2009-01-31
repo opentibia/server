@@ -62,6 +62,7 @@ public:
 		SQL_DB,
 		SQL_TYPE,
 		USE_ACCBALANCE,
+		MAP_STORAGE_TYPE,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 

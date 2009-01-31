@@ -170,6 +170,12 @@ CREATE TABLE "tile_items" (
     FOREIGN KEY ("tile_id") REFERENCES "tiles" ("id") ON DELETE CASCADE
 );
 
+CREATE TABLE "map_store" (
+    "house_id" INT NOT NULL,
+	"data" BYTEA NOT NULL,
+    KEY("house_id")
+);
+
 CREATE TABLE "player_depotitems" (
     "player_id" INT NOT NULL,
     "depot_id" INT NOT NULL DEFAULT 0,
@@ -192,7 +198,7 @@ CREATE TABLE `schema_info` (
     `version` INT UNSIGNED NOT NULL
 );
 
-INSERT INTO `schema_info` (`version`) VALUES (1);
+INSERT INTO `schema_info` (`version`) VALUES (2);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
