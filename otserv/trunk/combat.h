@@ -70,6 +70,8 @@ struct CombatParams{
 		targetCasterOrTopMost = false;
 		isAggressive = true;
 		itemId = 0;
+		hitEffect = NM_ME_UNK;
+		hitTextColor = TEXTCOLOR_UNK;
 		impactEffect = NM_ME_NONE;
 		distanceEffect = NM_ME_NONE;
 		dispelType = CONDITION_NONE;
@@ -88,6 +90,8 @@ struct CombatParams{
 	bool targetCasterOrTopMost;
 	bool isAggressive;
 	uint32_t itemId;
+	MagicEffectClasses hitEffect;
+	TextColor_t hitTextColor;
 	uint8_t impactEffect;
 	uint8_t distanceEffect;
 	bool useCharges;

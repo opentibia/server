@@ -476,6 +476,7 @@ public:
 		int32_t& healthChange, bool checkDefense, bool checkArmor);
 
 	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange);
+	bool combatChangeHealth(CombatType_t combatType, MagicEffectClasses hitEffect, TextColor_t customTextColor, Creature* attacker, Creature* target, int32_t healthChange);
 	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
 
 	//animation help functions

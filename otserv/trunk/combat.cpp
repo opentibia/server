@@ -421,70 +421,72 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 		{
 			params.combatType = (CombatType_t)value;
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_EFFECT:
 		{
 			params.impactEffect = value;
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_DISTANCEEFFECT:
 		{
 			params.distanceEffect = value;
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_BLOCKEDBYARMOR:
 		{
 			params.blockedByArmor = (value != 0);
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_BLOCKEDBYSHIELD:
 		{
 			params.blockedByShield = (value != 0);
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_TARGETCASTERORTOPMOST:
 		{
 			params.targetCasterOrTopMost = (value != 0);
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_CREATEITEM:
 		{
 			params.itemId = value;
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_AGGRESSIVE:
 		{
 			params.isAggressive = (value != 0);
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_DISPEL:
 		{
 			params.dispelType = (ConditionType_t)value;
 			return true;
-			break;
 		}
 
 		case COMBATPARAM_USECHARGES:
 		{
 			params.useCharges = (value != 0);
 			return true;
-			break;
+		}
+
+		case COMBATPARAM_HITEFFECT:
+		{
+			params.hitEffect = (MagicEffectClasses)value;
+			return true;
+		}
+
+		case COMBATPARAM_HITTEXTCOLOR:
+		{
+			params.hitTextColor = (TextColor_t)value;
+			return true;
 		}
 
 		default:
@@ -504,7 +506,6 @@ bool Combat::setCallback(CallBackParam_t key)
 			delete params.valueCallback;
 			params.valueCallback = new ValueCallback(FORMULA_LEVELMAGIC);
 			return true;
-			break;
 		}
 
 		case CALLBACKPARAM_SKILLVALUE:
@@ -512,7 +513,6 @@ bool Combat::setCallback(CallBackParam_t key)
 			delete params.valueCallback;
 			params.valueCallback = new ValueCallback(FORMULA_SKILL);
 			return true;
-			break;
 		}
 
 		case CALLBACKPARAM_TARGETTILECALLBACK:
@@ -546,19 +546,16 @@ CallBack* Combat::getCallback(CallBackParam_t key)
 		case CALLBACKPARAM_SKILLVALUE:
 		{
 			return params.valueCallback;
-			break;
 		}
 
 		case CALLBACKPARAM_TARGETTILECALLBACK:
 		{
 			return params.tileCallback;
-			break;
 		}
 
 		case CALLBACKPARAM_TARGETCREATURECALLBACK:
 		{
 			return params.targetCallback;
-			break;
 		}
 	}
 
@@ -580,7 +577,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 		}
 	}
 
-	bool result = g_game.combatChangeHealth(params.combatType, caster, target, healthChange);
+	bool result = g_game.combatChangeHealth(params.combatType, params.hitEffect, params.hitTextColor, caster, target, healthChange);
 
 	if(result){
 		CombatConditionFunc(caster, target, params, NULL);

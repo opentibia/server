@@ -260,7 +260,8 @@ enum TextColor_t {
 	TEXTCOLOR_ORANGE      = 198,
 	TEXTCOLOR_YELLOW      = 210,
 	TEXTCOLOR_WHITE_EXP   = 215,
-	TEXTCOLOR_NONE        = 255
+	TEXTCOLOR_NONE        = 255,
+	TEXTCOLOR_UNK         = 256,
 };
 
 enum Icons_t{

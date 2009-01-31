@@ -3879,6 +3879,11 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 
 bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange)
 {
+	return combatChangeHealth(combatType, NM_ME_UNK, TEXTCOLOR_UNK, attacker, target, healthChange);
+}
+
+bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses customHitEffect, TextColor_t customTextColor, Creature* attacker, Creature* target, int32_t healthChange)
+{
 	const Position& targetPos = target->getPosition();
 
 	if(healthChange > 0){
@@ -3919,7 +3924,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 
 				TextColor_t textColor = TEXTCOLOR_NONE;
 				uint8_t hitEffect = 0;
-
+				
 				switch(combatType){
 					case COMBAT_PHYSICALDAMAGE:
 					{
@@ -4018,6 +4023,12 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 					default:
 						break;
 				}
+
+				if(customHitEffect != NM_ME_UNK)
+					hitEffect = customHitEffect;
+
+				if(customTextColor != TEXTCOLOR_UNK)
+					textColor = customTextColor;
 
 				if(textColor != TEXTCOLOR_NONE){
 					std::stringstream ss;
