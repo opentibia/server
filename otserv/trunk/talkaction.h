@@ -73,6 +73,7 @@ public:
 	
 	std::string getWords() const {return commandString;}
 	TalkActionFilterType getFilterType() const {return filterType;}
+	bool isCaseSensitive() const {return caseSensitive;}
 	//scripting
 	uint32_t executeSay(Creature* creature, const std::string& words, const std::string& param);
 	//
@@ -82,6 +83,7 @@ protected:
 	
 	std::string commandString;
 	TalkActionFilterType filterType;
+	bool caseSensitive;
 };
 
 #endif

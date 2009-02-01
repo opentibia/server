@@ -133,7 +133,7 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 		} else {
 			continue;
 		}
-		if(cmdstring == it->first) {
+		if(cmdstring == it->first || !it->second->isCaseSensitive() && strcasecmp(it->first.c_str(), cmdstring.c_str()) == 0){
 			TalkAction* talkAction = it->second;
 			uint32_t ret =  talkAction->executeSay(player, cmdstring, paramstring);
 			if(ret == 1){
@@ -150,7 +150,8 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 
 TalkAction::TalkAction(LuaScriptInterface* _interface) :
 Event(_interface),
-filterType(TALKACTION_MATCH_QUOTATION)
+filterType(TALKACTION_MATCH_QUOTATION),
+caseSensitive(false)
 {
 	//
 }
@@ -163,6 +164,7 @@ TalkAction::~TalkAction()
 bool TalkAction::configureEvent(xmlNodePtr p)
 {
 	std::string str;
+	int intValue;
 	if(readXMLString(p, "words", str)){
 		commandString = str;
 	}
@@ -178,6 +180,10 @@ bool TalkAction::configureEvent(xmlNodePtr p)
 			filterType = TALKACTION_MATCH_FIRST_WORD;
 		}
 	}
+	
+	if(readXMLInteger(p, "case-sensitive", intValue) || readXMLInteger(p, "sensitive", intValue)){
+		caseSensitive = (intValue != 0);
+    }
 
 	return true;
 }
