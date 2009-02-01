@@ -943,15 +943,16 @@ bool Houses::payHouses()
 				bool useAccBalance = (g_config.getString(ConfigManager::USE_ACCBALANCE) == "yes");
 				bool hasEnoughMoney = false;
 
-				if(useAccBalance && player->balance >= house->getRent()){
-					player->balance -= house->getRent();
-					hasEnoughMoney = true;
+				if(useAccBalance){
+                    if(player->balance >= house->getRent()){
+                        player->balance -= house->getRent();
+                        hasEnoughMoney = true;
+                    }
 				}
 				else{
 					hasEnoughMoney = g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT);
 				}
 
-				//get money from depot
 				if(hasEnoughMoney){
 					uint32_t paidUntil = currentTime;
 					switch(rentPeriod){
