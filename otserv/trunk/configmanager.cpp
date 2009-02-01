@@ -36,7 +36,10 @@ ConfigManager::~ConfigManager()
 
 bool ConfigManager::loadFile(const std::string& _filename)
 {
-	lua_State* L = lua_open();
+	if(L)
+		lua_close(L);
+
+	L = lua_open();
 
 	if(!L) return false;
 
@@ -130,8 +133,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
 	m_isLoaded = true;
-
-	lua_close(L);
 	return true;
 }
 
@@ -245,3 +246,52 @@ bool ConfigManager::getGlobalBoolean(lua_State* _L, const std::string& _identifi
 	return _default;
 }
 
+void ConfigManager::getConfigValue(const std::string& key, lua_State* toL)
+{
+	lua_getglobal(L, key.c_str());
+	moveValue(L, toL);
+}
+
+void ConfigManager::moveValue(lua_State* from, lua_State* to)
+{
+	switch(lua_type(from, -1)){
+		case LUA_TNIL:
+			lua_pushnil(to);
+			break;
+		case LUA_TBOOLEAN:
+			lua_pushboolean(to, lua_toboolean(from, -1));
+			break;
+		case LUA_TNUMBER:
+			lua_pushnumber(to, lua_tonumber(from, -1));
+			break;
+		case LUA_TSTRING:
+		{
+			size_t len;
+			const char* str = lua_tolstring(from, -1, &len);
+			lua_pushlstring(to, str, len);
+		}
+			break;
+		case LUA_TTABLE:
+			lua_newtable(to);
+			
+			lua_pushnil(from); // First key
+			while(lua_next(from, -2)){
+				// Move value to the other state
+				moveValue(from, to);
+				// Value is popped, key is left
+
+				// Move key to the other state
+				lua_pushvalue(from, -1); // Make a copy of the key to use for the next iteration
+				moveValue(from, to);
+				// Key is in other state.
+				// We still have the key in the 'from' state ontop of the stack
+
+				lua_insert(to, -2); // Move key above value
+				lua_settable(to, -3); // Set the key
+			}
+		default:
+			break;
+	}
+	// Pop the value we just read
+	lua_pop(from, 1);
+}

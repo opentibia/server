@@ -323,6 +323,7 @@ protected:
 	static bool getArea(lua_State *L, std::list<uint32_t>& list, uint32_t& rows);
 
 	//lua functions
+	static int luaGetConfigValue(lua_State *L);
 	static int luaDoRemoveItem(lua_State *L);
 	static int luaDoFeedPlayer(lua_State *L);
 	static int luaDoSendCancel(lua_State *L);

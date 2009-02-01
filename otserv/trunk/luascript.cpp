@@ -1030,6 +1030,10 @@ void LuaScriptInterface::registerFunctions()
 {
 	//lua_register(L, "name", C_function);
 
+
+	//getConfigValue(key)
+	lua_register(m_luaState, "getConfigValue", LuaScriptInterface::luaGetConfigValue);
+
 	//getPlayerFood(cid)
 	lua_register(m_luaState, "getPlayerFood", LuaScriptInterface::luaGetPlayerFood);
 
@@ -7289,6 +7293,13 @@ int LuaScriptInterface::luaGetIPBanList(lua_State *L)
 		setField(L, "comment", ban.comment);
 		lua_settable(L, -3);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetConfigValue(lua_State *L)
+{
+	//getConfigValue(key)
+	g_config.getConfigValue(popString(L), L);
 	return 1;
 }
 
