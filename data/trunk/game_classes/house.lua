@@ -14,9 +14,9 @@ LIST_LAST = CONST_SUBOWNER_LIST
 
 local HOUSE_CONFIG =
 {
-	tilePrice = getConfigValue('houseTilePrice'),
-	needPremium = getConfigValue('houseOnlyForPremium'),
-	levelToBuyHouse = getConfigValue('levelToBuyHouse')
+	tilePrice = getConfigValue('house_tile_price'),
+	needPremium = getConfigValue('house_only_premium'),
+	levelToBuyHouse = getConfigValue('house_level')
 }
 	
 House = {

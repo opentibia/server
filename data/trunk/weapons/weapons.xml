@@ -371,7 +371,7 @@
 
  	<!-- Ammunition -->
 	<distance id="2545" script="poison_arrow.lua"/>
-	<distance id="2546" script="burst_arrow.lua"/>
+	<distance id="2546" script="explosive_arrow.lua"/>
 	<distance id="7366" script="viper_star.lua"/>
 	<distance id="3965" level="20" function="default"/>	<!-- Hunting Spear -->
 	<distance id="7378" level="25" function="default"/>	<!-- Royal Spear -->
