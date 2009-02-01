@@ -2,7 +2,7 @@ local maleOutfits = {132, 133, 134, 143, 144, 145, 146}
 local femaleOutfits = {140, 141, 142, 147, 148, 149, 150}
 local freeMaleOutfits = {128, 129, 130, 131}
 local freeFemOutfits = {136, 137, 138, 139}
-local questOutfits = {151, 152, 153, 154, 155, 156, 157, 158, 251, 252, 268, 269, 270, 273, 278, 279}
+local questOutfits = {151, 152, 153, 154, 155, 156, 157, 158, 251, 252, 268, 269, 270, 273, 278, 279, 288, 289, 324, 325}
 
 local function canPlayerWearPremiumOutfits(cid)
 	local list = {}

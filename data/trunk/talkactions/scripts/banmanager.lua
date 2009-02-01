@@ -158,7 +158,8 @@ end
 
 function doBanPlayer(gm, creature)
 	local access = getPlayerAccess(creature)
-	if access ~= LUA_ERROR and access < 3 then
+	local gmaccess = getPlayerAccess(gm)
+	if access ~= LUA_ERROR and gmaccess ~= LUA_ERROR and gmaccess <= access then
 		return
 	end
 	doPlayerSendTextMessage(creature, MESSAGE_EVENT_ADVANCE, "You have been banned.")
@@ -167,7 +168,7 @@ end
 
 function onSay(creature, words, param)
 	local access = getPlayerAccess(creature)
-	if access ~= LUA_ERROR and access < 3 then
+	if access ~= LUA_ERROR and access < 2 then
 		return TRUE
 	end
 	local params = string.explode(param, ",")
@@ -315,37 +316,3 @@ function onSay(creature, words, param)
 	end
 	return TRUE
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

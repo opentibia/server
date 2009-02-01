@@ -20370,6 +20370,7 @@
 		<attribute key="armor" value="9"/>
 		<attribute key="slotType" value="legs"/>
 		<attribute key="absorbPercentDeath" value="5"/>
+		<attribute key="skillDist" value="2"/>
 	</item>
 	<item id="9778" article="a" name="yalahari mask">
 		<attribute key="weight" value="3500"/>

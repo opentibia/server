@@ -12,8 +12,8 @@
 	<action itemid="5942" script="blessed_wooden_stake.lua"/>
 	<action itemid="5908" script="obsidian_knife.lua"/>
 	<action itemid="2120" script="rope.lua"/>
+	<action itemid="7731" script="rope.lua"/>
 	<action itemid="2554" script="shovel.lua"/>
-
 	<action itemid="5710" script="shovel.lua"/>
 	<action itemid="2420" script="machete.lua"/>
 	<action itemid="2442" script="machete.lua"/>

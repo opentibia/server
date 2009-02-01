@@ -14,8 +14,9 @@ LIST_LAST = CONST_SUBOWNER_LIST
 
 local HOUSE_CONFIG =
 {
-	tilePrice	= 100, -- in GPs
-	needPremium = true -- need premium to buy houses? true/false
+	tilePrice = getConfigValue('houseTilePrice'),
+	needPremium = getConfigValue('houseOnlyForPremium'),
+	levelToBuyHouse = getConfigValue('levelToBuyHouse')
 }
 	
 House = {
@@ -185,14 +186,27 @@ end
 		local housePrice = self:getPrice()
 		local guid = getPlayerGUID(cid)
 		local playerOwnHouse = (House.getHouseByOwnerGUID(guid) ~= nil)
+		local hasOwner = (self:getOwner() ~= 0)
+		local needPremiumToBuyHouse = (HOUSE_CONFIG.needPremium == "yes")
+		local levelToBuy = HOUSE_CONFIG.levelToBuyHouse
+
+		if(hasOwner) then
+			doPlayerSendCancel(cid, 'Someone already owns this house.')
+			return false		
+		end
 
 		if(playerOwnHouse) then
 			doPlayerSendCancel(cid, 'You already own a house.')
 			return false
 		end
 
-		if(HOUSE_CONFIG.needPremium and isPremium(cid) == FALSE) then
+		if(needPremiumToBuyHouse and isPremium(cid) == FALSE) then
 			doPlayerSendCancel(cid, 'Only premium players are able to buy a house.')
+			return false
+		end
+
+		if(levelToBuy > getPlayerLevel(cid)) then
+			doPlayerSendCancel(cid, 'You need at least level ' .. levelToBuy .. ' to buy a house.')
 			return false
 		end
 

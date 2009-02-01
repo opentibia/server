@@ -201,13 +201,6 @@ function playerExists(name)
 	return (getPlayerGUIDByName(name) ~= 0)
 end
 
-function getConfigInfo(info)
-	if (type(info) ~= 'string') then return nil end
-
-	dofile('config.lua')
-	return _G[info]
-end
-
 function getTibiaTime()
 	local worldTime = getWorldTime()
 	local hours = 0

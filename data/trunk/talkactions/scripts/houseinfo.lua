@@ -1,5 +1,4 @@
 function onSay(cid, words, param)
-
 	local lookPos = getPlayerLookPos(cid)
 	local house = House.getHouseByPos(lookPos)
 	if(house == nil) then
