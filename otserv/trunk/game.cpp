@@ -1967,12 +1967,12 @@ bool Game::playerOpenPrivateChannel(uint32_t playerId, const std::string& receiv
 	if(!player || player->isRemoved())
 		return false;
 
-	Player* playerPriv = getPlayerByName(receiver);
-	if(!playerPriv){
-		return false;
-	}
+    uint32_t guid;
+    if(IOPlayer::instance()->getGuidByName(guid, receiver))
+        player->sendOpenPrivateChannel(receiver);
+    else
+        player->sendCancel("A player with this name does not exist.");
 
-	player->sendOpenPrivateChannel(playerPriv->getName());
 	return true;
 }
 

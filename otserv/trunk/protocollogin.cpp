@@ -95,7 +95,9 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	std::string password = msg.GetString();
 
 	if(!accname.length()){
-		disconnectClient(0x0A, "You must enter your account name.");
+        //Tibia sends this message if the account name length is < 5
+        //We will send it only if account name is BLANK
+        disconnectClient(0x0A, "Invalid Account Name.");
 		return false;
 	}
 
@@ -137,7 +139,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			passwordTest(password, account.password))){
 
 		g_bans.addLoginAttempt(clientip, false);
-		disconnectClient(0x0A, "Please enter a valid account name and password.");
+        disconnectClient(0x0A, "Account name or password is not correct.");
 		return false;
 	}
 
