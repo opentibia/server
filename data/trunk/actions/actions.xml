@@ -90,8 +90,8 @@
 	<action itemid="7591" script="liquids/great_health.lua" allowfaruse="1"/>
 	<action itemid="7618" script="liquids/health_potion.lua" allowfaruse="1"/>
 	<action itemid="7620" script="liquids/mana_potion.lua" allowfaruse="1"/>
-	<action itemid="8376" script="liquids/great_spirit.lua" allowfaruse="1"/>
-	<action itemid="8377" script="liquids/ultimate_health.lua" allowfaruse="1"/>
+	<action itemid="8472" script="liquids/great_spirit.lua" allowfaruse="1"/>
+	<action itemid="8473" script="liquids/ultimate_health.lua" allowfaruse="1"/>
 	
 	<!-- Make Bread -->
 	<action itemid="2692" script="flour.lua"/>
