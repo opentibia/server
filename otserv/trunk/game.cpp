@@ -1437,6 +1437,8 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 					--count;
 					internalRemoveItem(item);
 				}
+				else //Item has subtype but not the required one.
+					++i;
 			}
 			else{
 				++i;
@@ -1472,6 +1474,8 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 					--count;
 					internalRemoveItem(item);
 				}
+				else //Item has subtype but not the required one.
+					++i;
 			}
 			else{
 				++i;
