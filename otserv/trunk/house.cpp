@@ -696,7 +696,7 @@ bool Door::readAttr(AttrTypes_t attr, PropStream& propStream)
 		return Item::readAttr(attr, propStream);
 }
 
-bool Door::serializeAttr(PropWriteStream& propWriteStream)
+bool Door::serializeAttr(PropWriteStream& propWriteStream) const
 {
 	//dont call Item::serializeAttr(propWriteStream);
 

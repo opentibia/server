@@ -100,7 +100,8 @@ enum AttrTypes_t{
 	ATTR_WRITTENBY = 19,
 	ATTR_SLEEPERGUID = 20,
 	ATTR_SLEEPSTART = 21,
-	ATTR_CHARGES = 22
+	ATTR_CHARGES = 22,
+	ATTR_CONTAINER_ITEMS = 23,
 };
 
 class ItemAttributes{
@@ -280,7 +281,7 @@ public:
 	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool unserializeAttr(PropStream& propStream);
 	virtual bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
-	virtual bool serializeAttr(PropWriteStream& propWriteStream);
+	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	virtual bool isPushable() const {return !isNotMoveable();};
 	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
@@ -377,5 +378,7 @@ protected:
 
 	//Don't add variables here, use the ItemAttribute class.
 };
+
+typedef std::list<Item *> ItemList;
 
 #endif

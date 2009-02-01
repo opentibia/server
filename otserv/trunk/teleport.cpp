@@ -52,7 +52,7 @@ bool Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
 		return Item::readAttr(attr, propStream);
 }
 
-bool Teleport::serializeAttr(PropWriteStream& propWriteStream)
+bool Teleport::serializeAttr(PropWriteStream& propWriteStream) const
 {
 	bool ret = Item::serializeAttr(propWriteStream);
 

@@ -34,10 +34,10 @@ public:
 	
 	//serialization
 	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
-	virtual bool serializeAttr(PropWriteStream& propWriteStream);
+	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	void setDestPos(const Position& pos) {destPos = pos;};
-	const Position& getDestPos() const {return destPos;};
+	void setDestPos(const Position& pos) {destPos = pos;}
+	const Position& getDestPos() const {return destPos;}
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,

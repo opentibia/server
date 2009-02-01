@@ -434,7 +434,7 @@ bool Item::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
 	return unserializeAttr(propStream);
 }
 
-bool Item::serializeAttr(PropWriteStream& propWriteStream)
+bool Item::serializeAttr(PropWriteStream& propWriteStream) const
 {
 	if(isStackable() || isFluidContainer() || isSplash()){
 		uint8_t _count = getSubType();

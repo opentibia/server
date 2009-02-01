@@ -43,7 +43,7 @@ public:
 
 	//serialization
     virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
-	virtual bool serializeAttr(PropWriteStream& propWriteStream);
+	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	//override
 	virtual bool canRemove() const {return (house == NULL); }

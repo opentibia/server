@@ -354,74 +354,128 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 			}
  
 			propStream.GET_ULONG(item_count);
-			while(item_count--) {
-				Item* item = NULL;
-				
-				uint16_t id;
-				propStream.GET_USHORT(id);
- 
-				const ItemType& iType = Item::items[id];
-				if(iType.moveable){
-					//create a new item
-					item = Item::CreateItem(id);
- 
-					if(item){
-						if(!item->unserializeAttr(propStream)){
-							std::cout << "WARNING:a Unserialization error in IOMapSerialize::loadTile()" << std::endl;
-						}
-
- 						tile->__internalAddThing(item);
- 						item->__startDecaying();
- 					}
- 				}
- 				else
-				{
-					// A static item (bed)
-					// find this type in the tile
-					for(uint32_t i = 0; i < tile->getThingCount(); ++i)
-					{
-						Item* findItem = tile->__getThing(i)->getItem();
- 
-						if(!findItem)
-							continue;
- 
-						if(findItem->getID() == id){
-							item = findItem;
-							break;
-						}
-						else if(iType.isDoor() && findItem->getDoor()){
-							item = findItem;
-							break;
-						}
-						else if(iType.isBed() && findItem->getBed()) {
-							item = findItem;
-							break;
-						}
- 					}
-
-					if(item)
-					{
-						if(!item->unserializeAttr(propStream)) {
-							std::cout << "WARNING: Unserialization error in IOMapSerialize::loadTile()" << id << std::endl;
-						}
-
-						item = g_game.transformItem(item, id);
- 					}
-					else
-					{
-						// Problems! We need to unserialize the attributes, but we have no item to do it on.
-						// Use a dummy item to unserialize.
-						Item dummy(0);
-						dummy.unserializeAttr(propStream);
- 					}
- 				}
- 			}
+			while(item_count--){
+				loadItem(propStream, tile);
+			}
  		}
 	} while(result->next());
  
 	db->freeResult(result);
 
  	return true;
+}
+
+bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
+	Item* item = NULL;
+	
+	uint16_t id;
+	propStream.GET_USHORT(id);
+
+	const ItemType& iType = Item::items[id];
+	if(iType.moveable){
+		//create a new item
+		item = Item::CreateItem(id);
+
+		if(item){
+			bool ret = item->unserializeAttr(propStream);
+
+			item = g_game.transformItem(item, id);
+
+			if(!ret) {
+				// Somewhat ugly hack to inject a custom attribute for container items
+				propStream.SKIP_N(-1);
+				uint8_t prop;
+				propStream.GET_UCHAR(prop);
+				if(prop == ATTR_CONTAINER_ITEMS){
+					Container* container = item->getContainer();
+					uint32_t nitems;
+					propStream.GET_ULONG(nitems);
+					while(nitems > 0){
+						loadItem(propStream, container);
+						--nitems;
+					}
+					ret = item->unserializeAttr(propStream);
+				}
+			}
+			if(!ret){
+				std::cout << "WARNING: Unserialization error in IOMapSerialize::loadItem()" << id << std::endl;
+			}
+
+			if(parent){
+				parent->__internalAddThing(item);
+				item->__startDecaying();
+			}
+			else{
+				delete item;
+			}
+		}
+	}
+	else
+	{
+		// A static item (bed)
+		// find this type in the tile
+		Tile* tile = parent->getTile();
+		if(!tile){
+			std::cout << "WARNING: Unserialization error in IOMapSerialize::loadItem()" << std::endl;
+			return false;
+		}
+		for(uint32_t i = 0; i < tile->getThingCount(); ++i)
+		{
+			Item* findItem = tile->__getThing(i)->getItem();
+
+			if(!findItem)
+				continue;
+
+			if(findItem->getID() == id){
+				item = findItem;
+				break;
+			}
+			else if(iType.isDoor() && findItem->getDoor()){
+				item = findItem;
+				break;
+			}
+			else if(iType.isBed() && findItem->getBed()) {
+				item = findItem;
+				break;
+			}
+		}
+
+		if(item)
+		{
+			bool ret = item->unserializeAttr(propStream);
+
+			item = g_game.transformItem(item, id);
+
+			if(!ret) {
+				// Somewhat ugly hack to inject a custom attribute for container items
+				propStream.SKIP_N(-1);
+				uint8_t prop;
+				propStream.GET_UCHAR(prop);
+				if(prop == ATTR_CONTAINER_ITEMS){
+					Container* container = item->getContainer();
+					uint32_t nitems;
+					propStream.GET_ULONG(nitems);
+					while(nitems > 0){
+						loadItem(propStream, container);
+						--nitems;
+					}
+					ret = item->unserializeAttr(propStream);
+				}
+			}
+			if(!ret){
+				std::cout << "WARNING: Unserialization error in IOMapSerialize::loadItem()" << id << std::endl;
+			}
+		}
+		else
+		{
+			// Problems! We need to unserialize the attributes, but we have no item to do it on.
+			// Use a dummy item to unserialize.
+			Item dummy(0);
+			dummy.unserializeAttr(propStream);
+		}
+	}
+
+	return true;
 }
 
 bool IOMapSerialize::saveMapBinary(Map* map)
@@ -473,12 +527,34 @@ bool IOMapSerialize::saveMapBinary(Map* map)
  	return transaction.commit();
 }
 
+bool IOMapSerialize::saveItem(PropWriteStream& stream, const Item* item)
+{
+	const Container* container = item->getContainer();
+	
+	// Write ID & props
+	stream.ADD_USHORT(item->getID());
+	item->serializeAttr(stream);
+
+	if(container){
+		// Hack our way into the attributes
+		stream.ADD_UCHAR(ATTR_CONTAINER_ITEMS);
+		stream.ADD_ULONG(container->size());
+		for(ItemList::const_reverse_iterator i = container->getReversedItems(); i != container->getReversedEnd(); ++i){
+			saveItem(stream, *i);
+		}
+	}
+
+	stream.ADD_UCHAR(0x00); // attr end
+
+	return true;
+}
+
 bool IOMapSerialize::saveTile(PropWriteStream& stream, const Tile* tile)
 {
 	std::vector<Item*> items;
-	for(uint32_t i = 0; i < tile->getThingCount(); ++i)
+	for(int32_t i = tile->getThingCount(); i > 0; --i)
 	{
-		Item* item = tile->__getThing(i)->getItem();
+		Item* item = tile->__getThing(i - 1)->getItem();
 		if(!item)
 			continue;
 
@@ -503,12 +579,7 @@ bool IOMapSerialize::saveTile(PropWriteStream& stream, const Tile* tile)
 			iter != items.end();
 			++iter)
 		{
-			Item* item = *iter;
-
-			// Write ID & props
-			stream.ADD_USHORT(item->getID());
-			item->serializeAttr(stream);
-			stream.ADD_UCHAR(0x00); // attr end
+			saveItem(stream, *iter);
 		}
 	}
 

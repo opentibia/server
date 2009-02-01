@@ -272,8 +272,7 @@ public:
 		return true;
 	}
 
-
-	inline bool SKIP_N(unsigned short n){
+	inline bool SKIP_N(int32_t n){
 		if(size() < n){
 			return false;
 		}

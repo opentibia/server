@@ -27,8 +27,6 @@
 #include "cylinder.h"
 #include "item.h"
 
-typedef std::list<Item *> ItemList;
-
 class Container;
 class Depot;
 
@@ -82,6 +80,8 @@ public:
 
 	ItemList::const_iterator getItems() const {return itemlist.begin();}
 	ItemList::const_iterator getEnd() const {return itemlist.end();}
+	ItemList::const_reverse_iterator getReversedItems() const {return itemlist.rbegin();}
+	ItemList::const_reverse_iterator getReversedEnd() const {return itemlist.rend();}
 
 	void addItem(Item* item);
 	Item* getItem(uint32_t index);
