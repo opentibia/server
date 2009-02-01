@@ -391,7 +391,10 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 					uint32_t nitems;
 					propStream.GET_ULONG(nitems);
 					while(nitems > 0){
-						loadItem(propStream, container);
+						if(!loadItem(propStream, container)){
+							std::cout << "WARNING: Unserialization error for containing item in IOMapSerialize::loadItem()" << id << std::endl;
+							return false;
+						}
 						--nitems;
 					}
 					ret = item->unserializeAttr(propStream);
@@ -446,6 +449,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 
 			item = g_game.transformItem(item, id);
 
+			// Code duplication is bad, fix?
 			if(!ret) {
 				// Somewhat ugly hack to inject a custom attribute for container items
 				propStream.SKIP_N(-1);
@@ -456,7 +460,10 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 					uint32_t nitems;
 					propStream.GET_ULONG(nitems);
 					while(nitems > 0){
-						loadItem(propStream, container);
+						if(!loadItem(propStream, container)){
+							std::cout << "WARNING: Unserialization error for containing item in IOMapSerialize::loadItem()" << id << std::endl;
+							return false;
+						}
 						--nitems;
 					}
 					ret = item->unserializeAttr(propStream);
@@ -559,10 +566,10 @@ bool IOMapSerialize::saveTile(PropWriteStream& stream, const Tile* tile)
 			continue;
 
 		// Note that these are NEGATED, ie. these are the items that will be saved.
-		if(!(	!item->isNotMoveable() || // is Moveable
+		if(!(	item->isMoveable() || // is Moveable
 				item->getDoor() ||
-				(item->getContainer() && item->getContainer()->size() != 0) ||
-				item->canWriteText() ||
+				(item->getContainer() && item->getContainer()->size() != 0) || // Static containers that can't be moved
+				item->canWriteText() || // Blackboards needs to be saved too
 				item->getBed()))
 			continue;
 		

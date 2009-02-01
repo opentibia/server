@@ -95,6 +95,20 @@ rate_mag = 1
 rate_loot = 1
 rate_spawn = 1
 
+-- Remove ammunition
+-- If false, ammunition will not be removed when using distance weapons
+-- (or other weapons that use ammunition)
+remove_ammunition = true
+
+-- Remove rune charges
+-- This only applies to runes done using the default functions. 
+-- Custom runes made using actions will not be affected.
+remove_rune_charges = true
+
+-- Remove weapon charges
+-- Set to false to disable charges disappearing from weapons on use
+remove_rune_charges = true
+
 -- despawn configs
 -- how many floors can a monster go from his spawn before despawning
 despawnrange = 2

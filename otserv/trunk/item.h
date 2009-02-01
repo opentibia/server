@@ -101,7 +101,9 @@ enum AttrTypes_t{
 	ATTR_SLEEPERGUID = 20,
 	ATTR_SLEEPSTART = 21,
 	ATTR_CHARGES = 22,
-	ATTR_CONTAINER_ITEMS = 23,
+	// This is NOT stored in serializeAttr, but rather used by IOMapSerialize
+	// look at that code for the ugly hack that makes this work. :)
+	ATTR_CONTAINER_ITEMS = 23, 
 };
 
 class ItemAttributes{
@@ -322,6 +324,7 @@ public:
 	bool isSplash() const {return items[id].isSplash();}
 	bool isMagicField() const {return items[id].isMagicField();}
 	bool isNotMoveable() const {return !items[id].moveable;}
+	bool isMoveable() const {return items[id].moveable;}
 	bool isPickupable() const {return items[id].pickupable;}
 	bool isWeapon() const {return (items[id].weaponType != WEAPON_NONE);}
 	bool isUseable() const {return items[id].useable;}

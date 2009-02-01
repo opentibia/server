@@ -287,6 +287,13 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								tile->setFlag(TILESTATE_NOLOGOUT);
 							}
 
+							if((flags & TILESTATE_REFRESH) == TILESTATE_REFRESH){
+								if(house){
+									std::cout << "Warning [x:" << px << ", y:" << py << ", z:" << pz << "] " << " House tile flagged as refreshing!";
+								}
+								tile->setFlag(TILESTATE_REFRESH);
+							}
+
 							break;
 						}
 

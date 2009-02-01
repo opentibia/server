@@ -463,7 +463,9 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 		Combat::doCombatHealth(player, target, damage, damage, params);
 	}
 
-	onUsedAmmo(player, item, target->getTile());
+	if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION) != 0){
+		onUsedAmmo(player, item, target->getTile());
+	}
 	onUsedWeapon(player, item, target->getTile());
 	return true;
 }
@@ -481,7 +483,9 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 	}
 
-	onUsedAmmo(player, item, tile);
+	if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION) != 0){
+		onUsedAmmo(player, item, tile);
+	}
 	onUsedWeapon(player, item, tile);
 	return true;
 }
