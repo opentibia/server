@@ -940,7 +940,7 @@ bool Houses::payHouses()
 			// when items are transferred to his depot
 			bool savePlayerHere = true;
 			if(depot){
-				bool useAccBalance = (g_config.getString(ConfigManager::USE_ACCBALANCE) == "yes");
+				bool useAccBalance = g_config.getNumber(ConfigManager::USE_ACCBALANCE);
 				bool hasEnoughMoney = false;
 
 				if(useAccBalance){

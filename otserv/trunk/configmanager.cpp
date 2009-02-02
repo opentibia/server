@@ -122,7 +122,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);
 	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalBoolean(L, "saveclientdebug", false);
 	m_confInteger[CHECK_ACCOUNTS] = getGlobalBoolean(L, "checkaccounts", false);
-	m_confString[USE_ACCBALANCE] = getGlobalBoolean(L, "useaccbalance", false);
+	m_confInteger[USE_ACCBALANCE] = getGlobalBoolean(L, "useaccbalance", false);
 	m_confInteger[PREMIUM_ONLY_BEDS] = getGlobalBoolean(L, "premonlybeds", true);
 	m_confInteger[SKULL_TIME] = getGlobalNumber(L, "skullduration", 12*60*60*1000);
 	m_confInteger[KILLS_FOR_RED_SKULL] = getGlobalNumber(L, "killsforredskull", 3);

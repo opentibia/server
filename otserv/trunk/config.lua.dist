@@ -87,6 +87,8 @@ skullduration = 12*60*60*1000
 -- How many players you need to kill to gain a red skull
 killsforredskull = 3
 
+-- Extra experience % per player when sharing experience
+party_exp_mul = 5
 
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
@@ -156,6 +158,14 @@ statustimeout = 30 * 1000
 -- accounts password type
 -- options: plain, md5, sha1
 passwordtype = "plain"
+
+-- House configuration (game_class)
+-- House tile price
+house_tile_price = 100
+-- Only premium players can buy houses?
+house_only_premium = "yes"
+-- Level to buy houses
+house_level = 1
 
 -- SQL type
 -- options: mysql, sqlite, odbc or pgsql

@@ -1860,7 +1860,7 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			break;
 		case PlayerInfoBalance:
 		{
-			if(g_config.getString(ConfigManager::USE_ACCBALANCE) == "no"){
+			if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE)){
 				value = 0;
 			}
 			else{

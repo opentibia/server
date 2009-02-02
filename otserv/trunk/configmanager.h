@@ -61,7 +61,6 @@ public:
 		SQL_PASS,
 		SQL_DB,
 		SQL_TYPE,
-		USE_ACCBALANCE,
 		MAP_STORAGE_TYPE,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
@@ -103,6 +102,7 @@ public:
 		REMOVE_AMMUNITION,
 		REMOVE_RUNE_CHARGES,
 		REMOVE_WEAPON_CHARGES,
+		USE_ACCBALANCE,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

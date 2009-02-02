@@ -2128,7 +2128,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	if(!player || player->isRemoved())
 		return false;
 
-	if(isHotkey && g_config.getNumber(ConfigManager::HOTKEYS) == 0){
+	if(isHotkey && !g_config.getNumber(ConfigManager::HOTKEYS)){
 		return false;
 	}
 
@@ -2212,7 +2212,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	if(!player || player->isRemoved())
 		return false;
 
-	if(isHotkey && g_config.getNumber(ConfigManager::HOTKEYS) == 0){
+	if(isHotkey && !g_config.getNumber(ConfigManager::HOTKEYS)){
 		return false;
 	}
 
@@ -2279,7 +2279,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		return false;
 	}
 
-	if(g_config.getNumber(ConfigManager::HOTKEYS) == 0){
+	if(!g_config.getNumber(ConfigManager::HOTKEYS)){
 		if(creature->getPlayer() || isHotkey){
 			player->sendCancelMessage(RET_DIRECTPLAYERSHOOT);
 			return false;
