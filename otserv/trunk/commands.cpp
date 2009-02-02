@@ -300,7 +300,7 @@ bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std
 {
 	ReturnValue ret = RET_NOERROR;
 
-	Monster* monster = Monster::createMonster(name);
+	Monster* monster = Monster::createMonster(param);
 	if(monster){
 		// Place the monster
 		creature->addSummon(monster);
