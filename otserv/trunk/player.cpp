@@ -1178,6 +1178,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("Name is too ambigious.");
 		break;
 
+	case RET_YOUARENOTTHEOWNER:
+		sendCancel("You are not the owner.");
+		break;
+
 	case RET_NOTPOSSIBLE:
 	default:
 		sendCancel("Sorry, not possible.");

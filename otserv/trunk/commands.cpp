@@ -295,26 +295,22 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 	return false;
 }
 
-ReturnValue Commands::placeSummon(Creature* creature, const std::string& name)
-{
-	Monster* monster = Monster::createMonster(name);
-	if(!monster){
-		return RET_NOTPOSSIBLE;
-	}
-
-	// Place the monster
-	creature->addSummon(monster);
-	if(!g_game.placeCreature(monster, creature->getPosition())){
-		creature->removeSummon(monster);
-		return RET_NOTENOUGHROOM;
-	}
-
-	return RET_NOERROR;
-}
-
 bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	ReturnValue ret = placeSummon(creature, param);
+	ReturnValue ret = RET_NOERROR;
+
+	Monster* monster = Monster::createMonster(name);
+	if(monster){
+		// Place the monster
+		creature->addSummon(monster);
+		if(!g_game.placeCreature(monster, creature->getPosition())){
+			creature->removeSummon(monster);
+			ret = RET_NOTENOUGHROOM;
+		}
+	}
+	else{
+		ret = RET_NOTPOSSIBLE;
+	}
 
 	if(ret != RET_NOERROR){
 		if(Player* player = creature->getPlayer()){

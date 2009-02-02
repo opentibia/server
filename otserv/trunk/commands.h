@@ -39,8 +39,6 @@ public:
 	bool reload();
 
 	bool exeCommand(Creature* creature, const std::string& cmd);
-
-	static ReturnValue placeSummon(Creature* creature, const std::string& name);
 	
 protected:
 	bool loaded;

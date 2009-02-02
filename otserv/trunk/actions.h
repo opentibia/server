@@ -51,8 +51,6 @@ public:
 	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 		uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
 
-	bool openContainer(Player* player, Container* container, const uint8_t index);
-
 	ReturnValue canUse(const Player* player, const Position& pos);
 	ReturnValue canUse(const Player* player, const Position& pos, const Item* item);
 	ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);

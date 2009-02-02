@@ -127,8 +127,15 @@ enum passwordType_t{
 		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 		#define OTSERV_HASH_SET __gnu_cxx::hash_set
 	#else
-		#include <unordered_map>
-		#include <unordered_set>
+		#ifndef __GXX_EXPERIMENTAL_CXX0X__
+			#include <tr1/unordered_map>
+			#include <tr1/unordered_set>
+		#else
+			// these only work, for some reason, with c++0x standard enabled
+			#include <unordered_map>
+			#include <unordered_set>
+		#endif
+
 		#define OTSERV_HASH_MAP std::tr1::unordered_map;
 		#define OTSERV_HASH_SET std::tr1::unordered_set;
 	#endif
@@ -186,15 +193,21 @@ enum passwordType_t{
 	#include <string.h>
 	#include <assert.h>
 
-	#if __GNUC__ < 4 || !defined(__GXX_EXPERIMENTAL_CXX0X__)
+	#if __GNUC__ < 4
 		#include <ext/hash_map>
 		#include <ext/hash_set>
 		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 		#define OTSERV_HASH_SET __gnu_cxx::hash_set
 	#else
-		// these only work, for some reason, with c++0x standard enabled
-		#include <unordered_map>
-		#include <unordered_set>
+		#ifndef __GXX_EXPERIMENTAL_CXX0X__
+			#include <tr1/unordered_map>
+			#include <tr1/unordered_set>
+		#else
+			// these only work, for some reason, with c++0x standard enabled
+			#include <unordered_map>
+			#include <unordered_set>
+		#endif
+
 		#define OTSERV_HASH_MAP std::tr1::unordered_map;
 		#define OTSERV_HASH_SET std::tr1::unordered_set;
 	#endif

@@ -226,7 +226,7 @@ public:
 		if(!GET_USHORT(str_len)){
 			return false;
 		}
-		if(size() < str_len){
+		if(size() < (int32_t)str_len){
 			return false;
 		}
 		str = new char[str_len+1];
@@ -245,7 +245,7 @@ public:
 		if(!GET_ULONG(str_len)){
 			return false;
 		}
-		if(size() < str_len){
+		if(size() < (int32_t)str_len){
 			return false;
 		}
 		str = new char[str_len+1];
@@ -260,7 +260,7 @@ public:
 	inline bool GET_NSTRING(unsigned short str_len, std::string& ret){
 		char* str;
 
-		if(size() < str_len){
+		if(size() < (int32_t)str_len){
 			return false;
 		}
 		str = new char[str_len+1];
