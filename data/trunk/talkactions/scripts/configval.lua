@@ -1,5 +1,5 @@
 function onSay(cid, words, param)
-	if getPlayerAccessLevel(cid) < 2 then
+	if getPlayerAccess(cid) < 2 then
 		return TRUE
 	end
 	local v = getConfigValue(param)
