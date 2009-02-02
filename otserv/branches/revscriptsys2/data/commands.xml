@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<commands>
+
+-- Gods
+<command cmd="/serverdiag" access="3" />
+<command cmd="/i" access="3" />				-- Create a item by ID
+<command cmd="/n" access="3" />				-- Create a item by name
+<command cmd="/reload" access="3" />		-- Reload configurations
+<command cmd="/s" access="3" />				-- Summon a NPC
+<command cmd="/openserver" access="3" />    -- Open the server
+<command cmd="/closeserver" access="3" />	-- Close the server
+<command cmd="/owner" access="3" />			-- Set a player to house owner
+<command cmd="/goto" access="3" />			-- Teleport to players, creatures or NPCs
+<command cmd="/a" access="3" />				-- Teleport by SQMs
+<command cmd="/raid" access="3" />			-- Start raid
+
+-- Gamemasters
+<command cmd="/c" access="2" />				-- Teleport a player to you
+<command cmd="/m" access="2" />				-- Summon a "wild" monster
+<command cmd="/summon" access="2" />		-- Summon a monster
+<command cmd="/kick" access="2" />			-- Kick a player
+
+-- Tutors
+<command cmd="/B" access="1" />				-- Red broadcast message
+<command cmd="/q" access="1" />				-- Check your money
+<command cmd="/z" access="1" />				-- Check effects (0-26)
+<command cmd="/zt" access="1" />			-- Check tutorials (?)
+<command cmd="/info" access="1" />			-- Info about a player
+<command cmd="/getonline" access="1" />		-- Info about how many players are online
+<command cmd="/gethouse" access="1" />		-- Info about house of a player
+<command cmd="/serverinfo" access="1" />    -- Info about the server
+<command cmd="/t" access="1" />				-- Go to your temple
+<command cmd="/town" access="1" />			-- Go to your town
+
+-- Players
+<command cmd="/sellhouse" access="0" />		-- Sell your house to a player
+
+</commands>

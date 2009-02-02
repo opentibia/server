@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<otadmin enabled="1">
+<security onlylocalhost="1" maxconnections="2" loginrequired="1" loginpassword="test" />
+<encryption required="0" >
+<!--
+Use this line to use RSA key from custom fiel
+<key type="RSA1024XTEA" file="rsakey.private" />
+ -->
+</encryption>
+</otadmin>
