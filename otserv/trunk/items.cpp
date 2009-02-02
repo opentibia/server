@@ -570,6 +570,9 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(asLowerCaseString(strValue) == "fire"){
 										it.corpseType = RACE_FIRE;
 									}
+									else if(asLowerCaseString(strValue) == "energy"){
+										it.corpseType = RACE_ENERGY;
+									}
 								}
 							}
 							else if(asLowerCaseString(strValue) == "containersize"){

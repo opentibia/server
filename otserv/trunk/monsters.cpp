@@ -766,6 +766,9 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 			else if((asLowerCaseString(strValue) == "fire") || (atoi(strValue.c_str()) == 4)){
 				mType->race = RACE_FIRE;
 			}
+			else if((asLowerCaseString(strValue) == "energy") || (atoi(strValue.c_str()) == 5)){
+				mType->race = RACE_ENERGY;
+			}
 			else{
 				SHOW_XML_WARNING("Unknown race type " << strValue);
 			}

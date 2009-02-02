@@ -259,7 +259,7 @@ void Game::proceduralRefresh(Map::TileMap::iterator* begin)
 		return;
 	}
 
-	// Refresh some items every 500 ms until all tiles has been checked
+	// Refresh some items every 100 ms until all tiles has been checked
 	// For 100k tiles, this would take 100000/2500 = 40s = half a minute
 	Scheduler::getScheduler().addEvent(createSchedulerTask(100,
 		boost::bind(&Game::proceduralRefresh, this, begin)));
@@ -3982,6 +3982,11 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 							case RACE_FIRE:
 								textColor = TEXTCOLOR_ORANGE;
 								hitEffect = NM_ME_DRAW_BLOOD;
+								break;
+
+							case RACE_ENERGY:
+								textColor = TEXTCOLOR_PURPLE;
+								hitEffect = NM_ME_ENERGY_DAMAGE;
 								break;
 
 							default:
