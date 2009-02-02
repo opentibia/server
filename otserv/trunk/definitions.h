@@ -136,8 +136,8 @@ enum passwordType_t{
 			#include <unordered_set>
 		#endif
 
-		#define OTSERV_HASH_MAP std::tr1::unordered_map;
-		#define OTSERV_HASH_SET std::tr1::unordered_set;
+		#define OTSERV_HASH_MAP std::tr1::unordered_map
+		#define OTSERV_HASH_SET std::tr1::unordered_set
 	#endif
 	#include <assert.h>
 	#define ATOI64 atoll
@@ -208,8 +208,8 @@ enum passwordType_t{
 			#include <unordered_set>
 		#endif
 
-		#define OTSERV_HASH_MAP std::tr1::unordered_map;
-		#define OTSERV_HASH_SET std::tr1::unordered_set;
+		#define OTSERV_HASH_MAP std::tr1::unordered_map
+		#define OTSERV_HASH_SET std::tr1::unordered_set
 	#endif
 	#define ATOI64 atoll
 

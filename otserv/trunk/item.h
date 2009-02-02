@@ -103,7 +103,7 @@ enum AttrTypes_t{
 	ATTR_CHARGES = 22,
 	// This is NOT stored in serializeAttr, but rather used by IOMapSerialize
 	// look at that code for the ugly hack that makes this work. :)
-	ATTR_CONTAINER_ITEMS = 23, 
+	ATTR_CONTAINER_ITEMS = 23,
 };
 
 class ItemAttributes{
@@ -123,7 +123,7 @@ public:
 			m_firstAttr = new Attribute(*i.m_firstAttr);
 		}
 	}
-	
+
 	void setSpecialDescription(const std::string& desc) {setStrAttr(ATTR_ITEM_DESC, desc);}
 	void resetSpecialDescription() {removeAttribute(ATTR_ITEM_DESC);}
 	const std::string& getSpecialDescription() const {return getStrAttr(ATTR_ITEM_DESC);}
@@ -167,19 +167,19 @@ public:
 
 protected:
 	enum itemAttrTypes{
-		ATTR_ITEM_ACTIONID = 1,
-		ATTR_ITEM_UNIQUEID = 2,
-		ATTR_ITEM_DESC = 4,
-		ATTR_ITEM_TEXT = 8,
-		ATTR_ITEM_WRITTENDATE = 16,
-		ATTR_ITEM_WRITTENBY = 32,
-		ATTR_ITEM_OWNER = 65536,
-		ATTR_ITEM_DURATION = 131072,
-		ATTR_ITEM_DECAYING = 262144,
-		ATTR_ITEM_CORPSEOWNER = 524288,
-		ATTR_ITEM_CHARGES = 1048576,
-		ATTR_ITEM_FLUIDTYPE = 2097152,
-		ATTR_ITEM_DOORID = 4194304
+		ATTR_ITEM_ACTIONID = 1 << 0,
+		ATTR_ITEM_UNIQUEID = 1 << 1,
+		ATTR_ITEM_DESC = 1 << 2,
+		ATTR_ITEM_TEXT = 1 << 3,
+		ATTR_ITEM_WRITTENDATE = 1 << 4,
+		ATTR_ITEM_WRITTENBY = 1 << 5,
+		ATTR_ITEM_OWNER = 1 << 6,
+		ATTR_ITEM_DURATION = 1 << 7,
+		ATTR_ITEM_DECAYING = 1 << 8,
+		ATTR_ITEM_CORPSEOWNER = 1 << 9,
+		ATTR_ITEM_CHARGES = 1 << 10,
+		ATTR_ITEM_FLUIDTYPE = 1 << 11,
+		ATTR_ITEM_DOORID = 1 << 12
 	};
 
 	bool hasAttribute(itemAttrTypes type) const;

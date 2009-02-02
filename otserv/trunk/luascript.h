@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <vector>
 
 extern "C"
 {
@@ -507,7 +508,7 @@ protected:
 	static int luaGetPlayerBanList(lua_State *L);
 	static int luaGetAccountBanList(lua_State *L);
 	static int luaGetIPBanList(lua_State *L);
-	
+
 	//
 	static int luaCreateCombatObject(lua_State *L);
 	static int luaCreateCombatArea(lua_State *L);

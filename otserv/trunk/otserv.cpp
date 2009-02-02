@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 	boost::shared_ptr<std::ofstream> logfile;
 	boost::shared_ptr<std::ofstream> errfile;
 	if(command_opts.logfile != ""){
-		logfile.reset(new std::ofstream(command_opts.logfile.c_str(), 
+		logfile.reset(new std::ofstream(command_opts.logfile.c_str(),
 			(command_opts.truncate_log? std::ios::trunc : std::ios::app) | std::ios::out)
 		);
 		if(!logfile->is_open()){
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 		std::cout.rdbuf(logfile->rdbuf());
 	}
 	if(command_opts.errfile != ""){
-		errfile.reset(new std::ofstream(command_opts.errfile.c_str(), 
+		errfile.reset(new std::ofstream(command_opts.errfile.c_str(),
 			(command_opts.truncate_log? std::ios::trunc : std::ios::app) | std::ios::out)
 		);
 		if(!errfile->is_open()){
@@ -251,7 +251,7 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			}
 			opts.configfile = *argi;
 		}
-		else if(arg == "--trunc-log"){
+		else if(arg == "--truncate-log"){
 			opts.truncate_log = true;
 		}
 		else if(arg == "-l" || arg == "--log-file"){
@@ -268,16 +268,16 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		}
 		else if(arg == "--help"){
 			std::cout <<
-"Usage: otserv {-i|-p|-c|-l}\n"
-"\n"
-"\t-i, --ip $1\t\tIP of gameworld server. Should be equal to the \n"
-"\t\t\t\tglobal IP.\n"
-"\t-p, --port $1\t\tPort for server to listen on.\n"
-"\t-c, --config $1\t\tAlternate config file path.\n"
-"\t-l, --log-file $1 $2\tAll standard output will be logged to the\n"
-"\t\t\t\t$1 file, all errors will be logged to $2.\n";
-"\t-l, --truncate-log\tReset log file each time the server is \n"
-"\t\t\t\tstarted.\n";
+			"Usage: otserv {-i|-p|-c|-l}\n"
+			"\n"
+			"\t-i, --ip $1\t\tIP of gameworld server. Should be equal to the \n"
+			"\t\t\t\tglobal IP.\n"
+			"\t-p, --port $1\t\tPort for server to listen on.\n"
+			"\t-c, --config $1\t\tAlternate config file path.\n"
+			"\t-l, --log-file $1 $2\tAll standard output will be logged to the\n"
+			"\t\t\t\t$1 file, all errors will be logged to $2.\n"
+			"\t--truncate-log\tReset log file each time the server is \n"
+			"\t\t\t\tstarted.\n";
 			return false;
 		}
 		else

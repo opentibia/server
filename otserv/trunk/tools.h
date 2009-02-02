@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
+#include <vector>
 
 #include <libxml/parser.h>
 
