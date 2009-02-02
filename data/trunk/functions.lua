@@ -1,3 +1,5 @@
+getConfigInfo = getConfigValue
+
 function isSorcerer(cid)
 	if(isPlayer(cid) == FALSE) then
 		debugPrint("isSorcerer: Player not found.")
