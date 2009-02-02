@@ -314,7 +314,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 							}
 							else{
 								tile->__internalAddThing(item);
-								item->__startDecaying();
+								g_game.startDecay(item);
 							}
 
 							break;
@@ -351,7 +351,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								}
 								else{
 									tile->__internalAddThing(item);
-									item->__startDecaying();
+									g_game.startDecay(item);
 								}
 							}
 							else{

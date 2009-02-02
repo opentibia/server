@@ -28,6 +28,7 @@
 
 #include "tasks.h"
 #include "otsystem.h"
+#include "otsystem.h"
 
 #define SCHEDULER_MINTICKS 50
 

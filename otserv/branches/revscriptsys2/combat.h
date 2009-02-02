@@ -24,7 +24,7 @@
 #include "thing.h"
 #include "condition.h"
 #include "map.h"
-#include "baseevents.h"
+#include "otsystem.h"
 #include "otsystem.h"
 
 #include <vector>
@@ -33,17 +33,24 @@ class Condition;
 class Creature;
 class Position;
 class Item;
+class Combat;
+
 
 //for luascript callback
-class ValueCallback : public CallBack{
+class CombatDamageCalculationCallback {
 public:
-	ValueCallback(formulaType_t _type) {type = _type;}
-	void getMinMaxValues(Player* player, int32_t& min, int32_t& max, bool useCharges) const;
+	CombatDamageCalculationCallback() : type(FORMULA_UNDEFINED) {}
+	CombatDamageCalculationCallback(formulaType_t type) : type(type) {}
+	CombatDamageCalculationCallback(const CombatDamageCalculationCallback& c) : type(c.type) {}
+	CombatDamageCalculationCallback& operator=(const CombatDamageCalculationCallback& rhs) {type = rhs.type; return *this;}
 
+	void operator()(Creature* creature, int32_t& min, int32_t& max, bool useCharges) const;
+	operator bool() const {return type != FORMULA_UNDEFINED;}
 protected:
 	formulaType_t type;
 };
 
+/*
 class TileCallback : public CallBack{
 public:
 	TileCallback() {};
@@ -61,7 +68,7 @@ public:
 protected:
 	formulaType_t type;
 };
-
+*/
 struct CombatParams{
 	CombatParams() {
 		combatType = COMBAT_NONE;
@@ -76,10 +83,6 @@ struct CombatParams{
 		distanceEffect = NM_ME_NONE;
 		dispelType = CONDITION_NONE;
 		useCharges = false;
-
-		valueCallback = NULL;
-		tileCallback = NULL;
-		targetCallback = NULL;
 	}
 
 	std::list<const Condition*> conditionList;
@@ -96,9 +99,7 @@ struct CombatParams{
 	uint8_t distanceEffect;
 	bool useCharges;
 
-	ValueCallback* valueCallback;
-	TileCallback* tileCallback;
-	TargetCallback* targetCallback;
+	CombatDamageCalculationCallback damageCallback;
 };
 
 typedef bool (*COMBATFUNC)(Creature*, Creature*, const CombatParams&, void*);
@@ -252,7 +253,7 @@ protected:
 	bool hasExtArea;
 };
 
-class Combat{
+class Combat {
 public:
 	Combat();
 	~Combat();
@@ -280,6 +281,7 @@ public:
 	static void getCombatArea(const Position& centerPos, const Position& targetPos,
 		const AreaCombat* area, std::list<Tile*>& list);
 
+	static Position getCasterPosition(const Creature* creature, Direction dir);
 	static bool isInPvpZone(const Creature* attacker, const Creature* target);
 	static bool isPlayerCombat(const Creature* target);
 	static CombatType_t ConditionToDamageType(ConditionType_t type);
@@ -294,9 +296,6 @@ public:
 
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;
-
-	bool setCallback(CallBackParam_t key);
-	CallBack* getCallback(CallBackParam_t key);
 
 	bool setParam(CombatParam_t param, uint32_t value);
 	void setArea(AreaCombat* _area)

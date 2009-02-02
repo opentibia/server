@@ -21,28 +21,22 @@
 
 #include "definitions.h"
 #include "item.h"
+#include "tools.h"
+
+// Item subtypes
+#include "beds.h"
 #include "container.h"
 #include "depot.h"
+#include "mailbox.h"
 #include "teleport.h"
 #include "trashholder.h"
-#include "mailbox.h"
-#include "house.h"
-#include "game.h"
-#include "luascript.h"
-
-#include "actions.h"
-#include "combat.h"
+#include "house.h" // Door item
+#include "combat.h" // Magic Field item
 #include "weapons.h"
-//[ added for beds system
-#include "beds.h"
-//]
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-
-extern Game g_game;
-extern Weapons* g_weapons;
 
 Items Item::items;
 
@@ -168,10 +162,11 @@ void Item::copyAttributes(Item* item)
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
-
+/* REVSCRIPT TODO Remember to remove things from the script enviroment!
 	if(getUniqueId() != 0){
 		ScriptEnviroment::removeUniqueThing(this);
 	}
+*/
 }
 
 void Item::setDefaultSubtype()
@@ -240,6 +235,112 @@ void Item::setSubType(uint16_t n)
 	else{
 		count = n;
 	}
+
+	if(readXMLInteger(nodeItem, "count", intValue)){
+		setSubType(intValue);
+	}
+
+	if(readXMLString(nodeItem, "special_description", strValue)){
+		setSpecialDescription(strValue);
+	}
+
+	if(readXMLString(nodeItem, "text", strValue)){
+		setText(strValue);
+	}
+
+	if(readXMLInteger(nodeItem, "written_date", intValue)){
+		setWrittenDate(intValue);
+	}
+
+	if(readXMLString(nodeItem, "writer", strValue)){
+		setWriter(strValue);
+	}
+
+	if(readXMLInteger(nodeItem, "actionId", intValue)){
+		setActionId(intValue);
+	}
+
+	if(readXMLInteger(nodeItem, "uniqueId", intValue)){
+		setUniqueId(intValue);
+	}
+
+	if(readXMLInteger(nodeItem, "duration", intValue)){
+		setDuration(intValue);
+	}
+
+	if(readXMLInteger(nodeItem, "decayState", intValue)){
+		ItemDecayState_t decayState = (ItemDecayState_t)intValue;
+		if(decayState != DECAYING_FALSE){
+			setDecaying(DECAYING_PENDING);
+		}
+	}
+
+	return true;
+}
+
+xmlNodePtr Item::serialize()
+{
+	xmlNodePtr nodeItem = xmlNewNode(NULL,(const xmlChar*)"item");
+
+	std::stringstream ss;
+	ss.str("");
+	ss << getID();
+	xmlSetProp(nodeItem, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
+
+	if(hasSubType()){
+		ss.str("");
+		ss << (int32_t)getSubType();
+		xmlSetProp(nodeItem, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
+	}
+
+	if(getSpecialDescription() != ""){
+		ss.str("");
+		ss << getSpecialDescription();
+		xmlSetProp(nodeItem, (const xmlChar*)"special_description", (const xmlChar*)ss.str().c_str());
+	}
+
+
+	if(getText() != ""){
+		ss.str("");
+		ss << getText();
+		xmlSetProp(nodeItem, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
+	}
+
+	if(getWrittenDate() != 0){
+		ss.str("");
+		ss << getWrittenDate();
+		xmlSetProp(nodeItem, (const xmlChar*)"written_date", (const xmlChar*)ss.str().c_str());
+	}
+
+	if(getWriter() != ""){
+		ss.str("");
+		ss << getWriter();
+		xmlSetProp(nodeItem, (const xmlChar*)"writer", (const xmlChar*)ss.str().c_str());
+	}
+
+	if(!isNotMoveable() /*moveable*/){
+		if(getActionId() != 0){
+			ss.str("");
+			ss << getActionId();
+			xmlSetProp(nodeItem, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
+		}
+	}
+
+	if(hasAttribute(ATTR_ITEM_DURATION)){
+		uint32_t duration = getDuration();
+		ss.str("");
+		ss << duration;
+		xmlSetProp(nodeItem, (const xmlChar*)"duration", (const xmlChar*)ss.str().c_str());
+	}
+
+	uint32_t decayState = getDecaying();
+	if(decayState == DECAYING_TRUE || decayState == DECAYING_PENDING){
+		ss.str("");
+		ss << decayState;
+		xmlSetProp(nodeItem, (const xmlChar*)"decayState", (const xmlChar*)ss.str().c_str());
+	}
+
+	return nodeItem;
 }
 
 bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
@@ -584,6 +685,10 @@ std::string Item::getLongName(const ItemType& it, int32_t lookDistance,
 		subType = item->getSubType();
 	}
 
+	if(item){
+		subType = item->getSubType();
+	}
+
 	if(it.name.length()){
 		if(it.stackable && subType > 1){
 			if(it.showCount){
@@ -900,7 +1005,8 @@ void Item::setUniqueId(uint16_t n)
 		return;
 
 	ItemAttributes::setUniqueId(n);
-	ScriptEnviroment::addUniqueThing(this);
+	// REVSCRIPT TODO Make sure they are added to the enviroment
+	//ScriptEnviroment::addUniqueThing(this);
 }
 
 bool Item::canDecay()
@@ -1184,9 +1290,4 @@ void ItemAttributes::deleteAttrs(Attribute* attr)
 		}
 		delete attr;
 	}
-}
-
-void Item::__startDecaying()
-{
-	g_game.startDecay(this);
 }

@@ -19,11 +19,12 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "weapons.h"
+#include "definitions.h"
 #include "combat.h"
 #include "tools.h"
 #include "configmanager.h"
+#include "vocation.h"
 
 #include <sstream>
 
@@ -35,143 +36,9 @@ extern Vocations g_vocations;
 extern ConfigManager g_config;
 extern Weapons* g_weapons;
 
-Weapons::Weapons():
-m_scriptInterface("Weapon Interface")
+Weapon::Weapon()
 {
-	m_scriptInterface.initState();
-}
-
-Weapons::~Weapons()
-{
-	clear();
-}
-
-const Weapon* Weapons::getWeapon(const Item* item) const
-{
-	if(!item){
-		return NULL;
-	}
-
-	WeaponMap::const_iterator it = weapons.find(item->getID());
-
-	if(it != weapons.end()){
-		return it->second;
-	}
-
-	return NULL;
-}
-
-void Weapons::clear()
-{
-	WeaponMap::iterator it;
-	for(it = weapons.begin(); it != weapons.end(); ++it){
-		delete it->second;
-	}
-
-	weapons.clear();
-}
-
-LuaScriptInterface& Weapons::getScriptInterface()
-{
-	return m_scriptInterface;
-}
-
-std::string Weapons::getScriptBaseName()
-{
-	return "weapons";
-}
-
-bool Weapons::loadDefaults()
-{
-	for(uint32_t i = 0; i < Item::items.size(); ++i){
-		const ItemType* it = Item::items.getElement(i);
-
-		if(!it || weapons.find(it->id) != weapons.end()){
-			continue;
-		}
-
-		if(it->weaponType != WEAPON_NONE){
-			switch(it->weaponType){
-				case WEAPON_AXE:
-				case WEAPON_SWORD:
-				case WEAPON_CLUB:
-				{
-					WeaponMelee* weapon = new WeaponMelee(&m_scriptInterface);
-					weapon->configureWeapon(*it);
-					weapons[it->id] = weapon;
-					break;
-				}
-
-				case WEAPON_AMMO:
-				case WEAPON_DIST:
-				{
-					if(it->weaponType == WEAPON_DIST && it->amuType != AMMO_NONE){
-						//distance weapons with ammunitions are configured seperatly
-						continue;
-					}
-
-					WeaponDistance* weapon = new WeaponDistance(&m_scriptInterface);
-					weapon->configureWeapon(*it);
-					weapons[it->id] = weapon;
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}
-		}
-	}
-
-	return true;
-}
-
-Event* Weapons::getEvent(const std::string& nodeName)
-{
-	if(nodeName == "melee"){
-		return new WeaponMelee(&m_scriptInterface);
-	}
-	else if(nodeName == "distance"){
-		return new WeaponDistance(&m_scriptInterface);
-	}
-	else if(nodeName == "wand"){
-		return new WeaponWand(&m_scriptInterface);
-	}
-	else{
-		return NULL;
-	}
-}
-
-bool Weapons::registerEvent(Event* event, xmlNodePtr p)
-{
-	Weapon* weapon = dynamic_cast<Weapon*>(event);
-	if(weapon){
-		weapons[weapon->getID()] = weapon;
-	}
-	else{
-		return false;
-	}
-
-	return true;
-}
-
-//monsters
-int32_t Weapons::getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
-{
-	return ((int32_t)std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5)));
-}
-
-//players
-int32_t Weapons::getMaxWeaponDamage(int32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor)
-{
-	// Updated to include level in formula!
-	return (int32_t)std::ceil(2 * ((float)(attackValue * (attackSkill + 5.8) / 25. + level       / 10. - 0.1) / attackFactor) );
-}
-
-Weapon::Weapon(LuaScriptInterface* _interface) :
-	Event(_interface)
-{
-	m_scripted = true;
+	scripted = true;
 	id = 0;
 	level = 0;
 	magLevel = 0;
@@ -192,12 +59,24 @@ Weapon::~Weapon()
 	//
 }
 
-void Weapon::setCombatParam(const CombatParams& _params)
+//monsters
+int32_t Weapon::getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
 {
-	m_scripted = false;
-	params = _params;
+	return ((int32_t)std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5)));
 }
 
+//players
+int32_t Weapon::getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue, float attackFactor)
+{
+	return ((int32_t)std::ceil(((float)(attackSkill * (attackValue * 0.0425) + (attackValue * 0.2)) / attackFactor)) * 2);
+}
+
+void Weapon::setCombatParam(const CombatParams& _params)
+{
+	scripted = false;
+	params = _params;
+}
+/*
 bool Weapon::configureEvent(xmlNodePtr p)
 {
 	int intValue;
@@ -335,16 +214,11 @@ bool Weapon::loadFunction(const std::string& functionName)
 	}
 	return false;
 }
-
+*/
 bool Weapon::configureWeapon(const ItemType& it)
 {
 	id = it.id;
 	return true;
-}
-
-std::string Weapon::getScriptEventName()
-{
-	return "onUseWeapon";
 }
 
 int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
@@ -452,11 +326,14 @@ bool Weapon::useFist(Player* player, Creature* target)
 
 bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int32_t damageModifier) const
 {
-	if(m_scripted){
+	if(scripted){
+		// REVSCRIPT TODO Event callback
+		/*
 		LuaVariant var;
 		var.type = VARIANT_NUMBER;
 		var.number = target->getID();
 		executeUseWeapon(player, var);
+		*/
 	}
 	else{
 		int32_t damage = (getWeaponDamage(player, target, item) * damageModifier) / 100;
@@ -472,11 +349,14 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 
 bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 {
-	if(m_scripted){
+	if(scripted){
+		// REVSCRIPT TODO Event callback
+		/*
 		LuaVariant var;
 		var.type = VARIANT_TARGETPOSITION;
 		var.pos = tile->getPosition();
 		executeUseWeapon(player, var);
+		*/
 	}
 	else{
 		Combat::postCombatEffects(player, tile->getPosition(), params);
@@ -529,21 +409,21 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 {
 	if(ammoAction == AMMOACTION_REMOVECOUNT){
 		int32_t newCount = std::max(0, item->getItemCount() - 1);
-		g_game.transformItem(item, item->getID(), newCount);
+		g_game.transformItem(player, item, item->getID(), newCount);
 	}
 	else if(ammoAction == AMMOACTION_REMOVECHARGE){
 		int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
-		g_game.transformItem(item, item->getID(), newCharge);
+		g_game.transformItem(player, item, item->getID(), newCharge);
 	}
 	else if(ammoAction == AMMOACTION_MOVE){
-		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, NULL, FLAG_NOLIMIT);
+		g_game.internalMoveItem(player, item->getParent(), destTile, INDEX_WHEREEVER, item, 1, NULL, FLAG_NOLIMIT);
 	}
 	else if(ammoAction == AMMOACTION_MOVEBACK){
 		//do nothing
 	}
 	else if(item->hasCharges()){
 		int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
-		g_game.transformItem(item, item->getID(), newCharge);
+		g_game.transformItem(player, item, item->getID(), newCharge);
 	}
 }
 
@@ -562,9 +442,11 @@ int32_t Weapon::getManaCost(const Player* player) const
 	return 0;
 }
 
-bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
+bool Weapon::executeUseWeapon(Player* player) const
 {
+	// REVSCRIPT TODO EVENT CALL
 	//onUseWeapon(cid, var)
+	/*
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 
@@ -594,10 +476,11 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 		std::cout << "[Error] Call stack overflow. Weapon::executeUseWeapon" << std::endl;
 		return false;
 	}
+	*/
+	return true;
 }
 
-WeaponMelee::WeaponMelee(LuaScriptInterface* _interface) :
-	Weapon(_interface)
+WeaponMelee::WeaponMelee()
 {
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
@@ -606,18 +489,9 @@ WeaponMelee::WeaponMelee(LuaScriptInterface* _interface) :
 	elementDamage = 0;
 }
 
-bool WeaponMelee::configureEvent(xmlNodePtr p)
-{
-	if(!Weapon::configureEvent(p)){
-		return false;
-	}
-
-	return true;
-}
-
 bool WeaponMelee::configureWeapon(const ItemType& it)
 {
-	m_scripted = false;
+	scripted = false;
 	elementType = it.abilities.elementType;
 	elementDamage = it.abilities.elementDamage;
 	return Weapon::configureWeapon(it);
@@ -727,8 +601,7 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* targe
 	return -random_range(0, maxValue, DISTRO_NORMAL);
 }
 
-WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
-	Weapon(_interface)
+WeaponDistance::WeaponDistance()
 {
 	hitChance = -1;
 	maxHitChance = 0;
@@ -738,7 +611,7 @@ WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
 	params.blockedByArmor = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
 }
-
+/*
 bool WeaponDistance::configureEvent(xmlNodePtr p)
 {
 	if(!Weapon::configureEvent(p)){
@@ -782,11 +655,11 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 	}
 
 	return true;
-}
+}*/
 
 bool WeaponDistance::configureWeapon(const ItemType& it)
 {
-	m_scripted = false;
+	scripted = false;
 
 	//default values
 	if(it.amuType != AMMO_NONE){
@@ -820,10 +693,11 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 
 	return Weapon::configureWeapon(it);
 }
-
+/*
+// REVSCRIPT TODO ?
 int32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
 {
-	//const ItemType& it = Item::items[id];
+	const ItemType& it = Item::items[id];
 	Item* bow = player->getWeapon(true);
 	if(bow && bow->getWeaponType() == WEAPON_DIST && bow->getID() != id){ //Be sure we are using a bow
 		const Weapon* weap = g_weapons->getWeapon(bow);
@@ -834,7 +708,7 @@ int32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) cons
 
 	return Weapon::playerWeaponCheck(player, target);
 }
-
+*/
 bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) const
 {
 	int32_t damageModifier = playerWeaponCheck(player, target);
@@ -947,7 +821,7 @@ void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) cons
 	if((ammoAction == AMMOACTION_MOVE || ammoAction == AMMOACTION_MOVEBACK) &&
 			breakChance > 0 && random_range(1, 100) < breakChance){
 		int32_t newCount = std::max(0, item->getItemCount() - 1);
-		g_game.transformItem(item, item->getID(), newCount);
+		g_game.transformItem(player, item, item->getID(), newCount);
 	}
 	else{
 		Weapon::onUsedAmmo(player, item, destTile);
@@ -1016,13 +890,12 @@ bool WeaponDistance::getSkillType(const Player* player, const Item* item,
 	return true;
 }
 
-WeaponWand::WeaponWand(LuaScriptInterface* _interface) :
-	Weapon(_interface)
+WeaponWand::WeaponWand()
 {
 	minChange = 0;
 	maxChange = 0;
 }
-
+/*
 bool WeaponWand::configureEvent(xmlNodePtr p)
 {
 	if(!Weapon::configureEvent(p)){
@@ -1064,10 +937,10 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 
 	return true;
 }
-
+*/
 bool WeaponWand::configureWeapon(const ItemType& it)
 {
-	m_scripted = false;
+	scripted = false;
 	range = it.shootRange;
 	params.distanceEffect = it.shootType;
 

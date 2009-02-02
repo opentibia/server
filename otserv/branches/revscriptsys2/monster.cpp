@@ -27,7 +27,6 @@
 #include "monster.h"
 #include "monsters.h"
 #include "game.h"
-#include "spells.h"
 #include "combat.h"
 #include "spawn.h"
 #include "configmanager.h"
@@ -90,15 +89,6 @@ Creature()
 
 	strDescription = mType->nameDescription;
 	toLowerCaseString(strDescription);
-
-	// register creature events
-	MonsterScriptList::iterator it;
-	for(it = mType->scriptList.begin(); it != mType->scriptList.end(); ++it){
-		if(!registerCreatureEvent(*it)){
-			std::cout << "Warning: [Monster::Monster]. Unknown event name - " << *it << std::endl;
-		}
-	}
-
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	monsterCount++;
@@ -645,7 +635,8 @@ void Monster::doAttacking(uint32_t interval)
 
 				minCombatValue = it->minCombatValue;
 				maxCombatValue = it->maxCombatValue;
-				it->spell->castSpell(this, attackedCreature);
+				// REVSCRIPT TODO Monsters should cast spells
+				//it->spell->castSpell(this, attackedCreature);
 				if(it->isMelee){
 					extraMeleeAttack = false;
 				}
@@ -768,7 +759,8 @@ void Monster::onThinkDefense(uint32_t interval)
 		if((it->chance >= (uint32_t)random_range(1, 100))){
 			minCombatValue = it->minCombatValue;
 			maxCombatValue = it->maxCombatValue;
-			it->spell->castSpell(this, this);
+			// REVSCRIPT TODO Monsters should cast spells
+			// it->spell->castSpell(this, this);
 		}
 	}
 
@@ -864,7 +856,7 @@ bool Monster::pushItem(Item* item, int32_t radius)
 
 			Tile* tile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
 			if(tile && g_game.canThrowObjectTo(centerPos, tryPos)){
-				if(g_game.internalMoveItem(item->getParent(), tile,
+				if(g_game.internalMoveItem(this, item->getParent(), tile,
 					INDEX_WHEREEVER, item, item->getItemCount(), NULL) == RET_NOERROR){
 					return true;
 				}
@@ -892,7 +884,7 @@ void Monster::pushItems(Tile* tile)
 				if(moveCount < 20 && pushItem(item, 1)){
 					moveCount++;
 				}
-				else if(g_game.internalRemoveItem(item) == RET_NOERROR){
+				else if(g_game.internalRemoveItem(this, item) == RET_NOERROR){
 					++removeCount;
 				}
 		}
@@ -916,11 +908,11 @@ bool Monster::pushCreature(Creature* creature)
 	std::random_shuffle(dirList.begin(), dirList.end());
 
 	for(std::vector<Direction>::iterator it = dirList.begin(); it != dirList.end(); ++it){
-		const Position& tryPos = Spells::getCasterPosition(creature, *it);
+		const Position& tryPos = Combat::getCasterPosition(creature, *it);
 		Tile* toTile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
 
 		if(toTile && !toTile->hasProperty(BLOCKPATH)){
-			if(g_game.internalMoveCreature(creature, *it) == RET_NOERROR){
+			if(g_game.internalMoveCreature(this, creature, *it) == RET_NOERROR){
 				return true;
 			}
 		}
@@ -992,7 +984,7 @@ bool Monster::getNextStep(Direction& dir)
 	}
 
 	if(result && (canPushItems() || canPushCreatures()) ){
-		const Position& pos = Spells::getCasterPosition(this, dir);
+		const Position& pos = Combat::getCasterPosition(this, dir);
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 		if(tile){
 			if(canPushItems()){
@@ -1307,9 +1299,9 @@ void Monster::setNormalCreatureLight()
 	internalLight.color = mType->lightColor;
 }
 
-void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
+void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext)
 {
-	Creature::drainHealth(attacker, combatType, damage);
+	Creature::drainHealth(attacker, combatType, damage, showtext);
 
 	if(isInvisible()){
 		removeCondition(CONDITION_INVISIBLE);
@@ -1455,8 +1447,8 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 	}
 	else{
 		if(isFleeing()){
-			//Distance should be higher than the client view range (Map::maxClientViewportX/Map::maxClientViewportY)
-			fpp.maxTargetDist = Map::maxViewportX;
+			//Distance should be higher than the client view range (Map_maxClientViewportX/Map_maxClientViewportY)
+			fpp.maxTargetDist = Map_maxViewportX;
 			fpp.clearSight = false;
 			fpp.keepDistance = true;
 			fpp.fullPathSearch = false;

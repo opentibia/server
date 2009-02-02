@@ -58,16 +58,16 @@ Cylinder* TrashHolder::__queryDestination(int32_t& index, const Thing* thing, It
 	return this;
 }
 
-void TrashHolder::__addThing(Thing* thing)
+void TrashHolder::__addThing(Creature* actor, Thing* thing)
 {
-	return __addThing(0, thing);
+	return __addThing(actor, 0, thing);
 }
 
-void TrashHolder::__addThing(int32_t index, Thing* thing)
+void TrashHolder::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
 	if(Item* item = thing->getItem()){
 		if(item != this){
-			g_game.internalRemoveItem(item);
+			g_game.internalRemoveItem(actor, item);
 			if(effect != NM_ME_NONE){
 				g_game.addMagicEffect(getPosition(), effect);
 			}
@@ -75,27 +75,27 @@ void TrashHolder::__addThing(int32_t index, Thing* thing)
 	}
 }
 
-void TrashHolder::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
+void TrashHolder::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count)
 {
 	//
 }
 
-void TrashHolder::__replaceThing(uint32_t index, Thing* thing)
+void TrashHolder::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 {
 	//
 }
 
-void TrashHolder::__removeThing(Thing* thing, uint32_t count)
+void TrashHolder::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
 	//
 }
 
-void TrashHolder::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void TrashHolder::postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postAddNotification(thing, index, LINK_PARENT);
+	getParent()->postAddNotification(actor, thing, index, LINK_PARENT);
 }
 
-void TrashHolder::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void TrashHolder::postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
+	getParent()->postRemoveNotification(actor, thing, index, isCompleteRemoval, LINK_PARENT);
 }

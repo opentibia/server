@@ -22,6 +22,7 @@
 #define __OTSERV_DATABASE_H__
 
 #include "definitions.h"
+#include <boost/thread.hpp>
 
 #include <boost/thread.hpp>
 

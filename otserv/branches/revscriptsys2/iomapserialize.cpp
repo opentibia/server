@@ -406,7 +406,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 
 			if(parent){
 				parent->__internalAddThing(item);
-				item->__startDecaying();
+				g_game.startDecay(item);
 			}
 			else{
 				delete item;

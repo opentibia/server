@@ -40,10 +40,8 @@
 #include "status.h"
 #include "monsters.h"
 #include "npc.h"
-#include "commands.h"
 #include "outfit.h"
 #include "vocation.h"
-#include "scriptmanager.h"
 #include "configmanager.h"
 
 #include "tools.h"
@@ -68,8 +66,6 @@ IPList serverIPs;
 ConfigManager g_config;
 
 Game g_game;
-Commands commands;
-Npcs g_npcs;
 Monsters g_monsters;
 BanManager g_bans;
 Vocations g_vocations;
@@ -382,18 +378,6 @@ void mainLoader(const CommandLineOptions& command_opts)
 	}
 	std::cout << "[done]" << std::endl;
 
-	//load commands
-	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "commands.xml";
-	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
-	if(!commands.loadXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
-	}
-	std::cout << "[done]" << std::endl;
-
 	// load item data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.otb";
@@ -416,11 +400,6 @@ void mainLoader(const CommandLineOptions& command_opts)
 		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
-
-	//load scripts
-	if(ScriptingManager::getInstance()->loadScriptSystems() == false){
-		exit(-1);
-	}
 
 	// load monster data
 	filename.str("");
@@ -459,6 +438,12 @@ void mainLoader(const CommandLineOptions& command_opts)
 		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
+
+	// Setup scripts
+	std::cout << "::" << std::endl;
+	std::cout << ":: Loading Scripts ..." << std::endl;
+	g_game.loadScripts();
+	std::cout << std::endl << "::" << std::endl;
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 

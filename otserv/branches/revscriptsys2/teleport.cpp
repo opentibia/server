@@ -92,46 +92,46 @@ Cylinder* Teleport::__queryDestination(int32_t& index, const Thing* thing, Item*
 	return this;
 }
 
-void Teleport::__addThing(Thing* thing)
+void Teleport::__addThing(Creature* actor, Thing* thing)
 {
-	return __addThing(0, thing);
+	return __addThing(actor, 0, thing);
 }
 
-void Teleport::__addThing(int32_t index, Thing* thing)
+void Teleport::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
 	Tile* destTile = g_game.getTile(getDestPos().x, getDestPos().y, getDestPos().z);
 	if(destTile){
 		if(Creature* creature = thing->getCreature()){
-			getTile()->moveCreature(creature, destTile, true);
+			getTile()->moveCreature(actor, creature, destTile, true);
 			g_game.addMagicEffect(destTile->getPosition(), NM_ME_TELEPORT);
 		}
 		else if(Item* item = thing->getItem()){
-			g_game.internalMoveItem(getTile(), destTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
+			g_game.internalMoveItem(actor, getTile(), destTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 		}
 	}
 }
 
-void Teleport::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
+void Teleport::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count)
 {
 	//
 }
 
-void Teleport::__replaceThing(uint32_t index, Thing* thing)
+void Teleport::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 {
 	//
 }
 
-void Teleport::__removeThing(Thing* thing, uint32_t count)
+void Teleport::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
 	//
 }
 
-void Teleport::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Teleport::postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postAddNotification(thing, index, LINK_PARENT);
+	getParent()->postAddNotification(actor, thing, index, LINK_PARENT);
 }
 
-void Teleport::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Teleport::postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
+	getParent()->postRemoveNotification(actor, thing, index, isCompleteRemoval, LINK_PARENT);
 }

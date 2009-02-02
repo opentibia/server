@@ -172,7 +172,7 @@ void BedItem::sleep(Player* player)
 		Beds::instance().setBedSleeper(this, player->getGUID());
 
 		// make the player walk onto the bed and kick him
-		player->getTile()->moveCreature(player, getTile());
+		player->getTile()->moveCreature(NULL, player, getTile());
 		Scheduler::getScheduler().addEvent(createSchedulerTask(SCHEDULER_MINTICKS, boost::bind(&Game::kickPlayer, &g_game, player->getID())));
 
 		// change self and partner's appearance
@@ -269,7 +269,7 @@ void BedItem::updateAppearance(const Player* player)
 			if(it.noSleeperID != 0){
 				const ItemType& newType = Item::items[it.noSleeperID];
 				if(newType.type == ITEM_TYPE_BED){
-					g_game.transformItem(this, it.noSleeperID);
+					g_game.transformItem(NULL, this, it.noSleeperID);
 				}
 			}
 		}
@@ -277,7 +277,7 @@ void BedItem::updateAppearance(const Player* player)
 			if(it.femaleSleeperID != 0){
 				const ItemType& newType = Item::items[it.femaleSleeperID];
 				if(newType.type == ITEM_TYPE_BED){
-					g_game.transformItem(this, it.femaleSleeperID);
+					g_game.transformItem(NULL, this, it.femaleSleeperID);
 				}
 			}
 		}
@@ -285,7 +285,7 @@ void BedItem::updateAppearance(const Player* player)
 			if(it.maleSleeperID != 0){
 				const ItemType& newType = Item::items[it.maleSleeperID];
 				if(newType.type == ITEM_TYPE_BED){
-					g_game.transformItem(this, it.maleSleeperID);
+					g_game.transformItem(NULL, this, it.maleSleeperID);
 				}
 			}
 		}

@@ -243,13 +243,30 @@ struct LightInfo{
 	};
 };
 
+namespace Script {
+	enum ListenerType {
+		ON_SAY_LISTENER,
+		ON_USE_ITEM_LISTENER,
+		ON_EQUIP_ITEM_LISTENER,
+		ON_MOVE_CREATURE_LISTENER,
+		ON_MOVE_ITEM_LISTENER,
+		ON_OPEN_CHANNEL_LISTENER,
+		ON_CLOSE_CHANNEL_LISTENER,
+		ON_LOGIN_LISTENER,
+		ON_LOGOUT_LISTENER,
+		ON_LOOK_LISTENER,
+		ON_KILL_LISTENER,
+		ON_DIE_LISTENER,
+	};
+}
+
 struct ShopInfo{
 	uint32_t itemId;
 	int32_t subType;
 	uint32_t buyPrice;
 	uint32_t sellPrice;
 	// Name can be found using Item::items[itemId].
-
+	
 	ShopInfo(){
 		itemId = 0;
 		subType = 1;

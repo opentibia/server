@@ -27,7 +27,6 @@
 #include "player.h"
 #include "chat.h"
 #include "configmanager.h"
-#include "actions.h"
 #include "game.h"
 #include "ioplayer.h"
 #include "house.h"
@@ -35,8 +34,6 @@
 #include "ban.h"
 #include "ioaccount.h"
 #include "connection.h"
-#include "creatureevent.h"
-#include "quests.h"
 #include "definitions.h"
 
 #include <string>
@@ -49,10 +46,8 @@
 
 extern Game g_game;
 extern ConfigManager g_config;
-extern Actions actions;
 extern RSA* g_otservRSA;
 extern BanManager g_bans;
-extern CreatureEvents* g_creatureEvents;
 Chat g_chat;
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -407,15 +402,14 @@ bool ProtocolGame::logout(bool forced)
 				return false;
 			}
 
-			//scripting event - onLogOut
-			if(!g_creatureEvents->playerLogOut(player)){
+			if(g_game.playerLogout(player, false, false)) {
 				//Let the script handle the error message
 				return false;
 			}
 		}
 		else{
-			//execute the script even when we log out
-			g_creatureEvents->playerLogOut(player);
+			// execute the script even when we log out
+			g_game.playerLogout(player, true, false);
 		}
 	}
 
@@ -810,10 +804,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	default:
-#ifdef __DEBUG__
+//#ifdef __DEBUG__
 		printf("unknown packet header: %x \n", recvbyte);
 		parseDebug(msg);
-#endif
+//#endif
 		break;
 	}
 }
@@ -1300,7 +1294,7 @@ void ProtocolGame::parseLookAt(NetworkMessage& msg)
 
 void ProtocolGame::parseSay(NetworkMessage& msg)
 {
-	SpeakClasses type = (SpeakClasses)msg.GetByte();
+	SpeakClass type = (SpeakClass)msg.GetByte();
 
 	std::string receiver;
 	uint16_t channelId = 0;
@@ -1945,7 +1939,7 @@ void ProtocolGame::sendCreatureTurn(const Creature* creature, uint8_t stackPos)
 	}
 }
 
-void ProtocolGame::sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+void ProtocolGame::sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text)
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
@@ -1954,7 +1948,7 @@ void ProtocolGame::sendCreatureSay(const Creature* creature, SpeakClasses type, 
 	}
 }
 
-void ProtocolGame::sendToChannel(const Creature * creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time /*= 0*/)
+void ProtocolGame::sendToChannel(const Creature * creature, SpeakClass type, const std::string& text, uint16_t channelId, uint32_t time /*= 0*/)
 {
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
@@ -2069,7 +2063,8 @@ void ProtocolGame::sendQuestLog()
 		TRACK_MESSAGE(msg);
 
 		msg->AddByte(0xF0);
-		msg->AddU16(Quests::getInstance()->getQuestsCount(player));
+		msg->AddU16(0 /*quest count*/);
+		/*
 		for(QuestsList::const_iterator it = Quests::getInstance()->getFirstQuest();
 			it != Quests::getInstance()->getEndQuest(); ++it){
 			if((*it)->isStarted(player)){
@@ -2078,11 +2073,13 @@ void ProtocolGame::sendQuestLog()
 				msg->AddByte((*it)->isCompleted(player));
 			}
 		}
+		*/
 	}
 }
 
 void ProtocolGame::sendQuestLine(const Quest* quest)
 {
+	/*
 	NetworkMessage* msg = getOutputBuffer();
 	if(msg){
 		TRACK_MESSAGE(msg);
@@ -2097,6 +2094,7 @@ void ProtocolGame::sendQuestLine(const Quest* quest)
 			}
 		}
 	}
+	*/
 }
 
 //tile
@@ -2678,31 +2676,32 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage* msg)
 }
 
 void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creature,
-	SpeakClasses type, std::string text, uint16_t channelId, uint32_t time /*= 0*/)
+	SpeakClass type, std::string text, uint16_t channelId, uint32_t time /*= 0*/)
 {
 	msg->AddByte(0xAA);
 	msg->AddU32(0x00000000);
 
 	//Do not add name for anonymous channel talk
-	if(creature == NULL)
-	{
+	if(creature == NULL) {
 		msg->AddString("");
-	}
-	else if(type != SPEAK_CHANNEL_R2){
-		if(type != SPEAK_RVR_ANSWER){
-			msg->AddString(creature->getName());
-		}
-		else{
-			msg->AddString("Gamemaster");
-		}
 	}
 	else{
-		msg->AddString("");
+		if(type != SPEAK_CHANNEL_R2){
+			if(type != SPEAK_RVR_ANSWER){
+				msg->AddString(creature->getName());
+			}
+			else{
+				msg->AddString("Gamemaster");
+			}
+		}
+		else{
+			msg->AddString("");
+		}
 	}
 
 	//Add level only for players
-	const Player* speaker = creature? creature->getPlayer() : NULL;
-	if(speaker){
+	if(creature && creature->getPlayer()){
+		const Player* speaker = creature->getPlayer();
 		if(type != SPEAK_RVR_ANSWER){
 			msg->AddU16(speaker->getPlayerInfo(PLAYERINFO_LEVEL));
 		}
@@ -2722,8 +2721,10 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage* msg, const Creature* creatur
 		case SPEAK_MONSTER_SAY:
 		case SPEAK_MONSTER_YELL:
 		case SPEAK_PRIVATE_NP:
-			assert(creature);
-			msg->AddPosition(creature->getPosition());
+			if(creature)
+				msg->AddPosition(creature->getPosition());
+			else
+				msg->AddPosition(player->getPosition());
 			break;
 		case SPEAK_CHANNEL_Y:
 		case SPEAK_CHANNEL_W:

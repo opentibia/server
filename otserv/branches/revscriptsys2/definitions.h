@@ -90,13 +90,19 @@ enum passwordType_t{
 	PASSWORD_TYPE_SHA1,
 };
 
-#ifdef _WIN32
+#if defined _WIN32 || defined __WINDOWS__ || defined WIN32
 #  ifndef WIN32
 #    define WIN32
 #  endif
+#  ifndef __WINDOWS__
+#    define __WINDOWS__
+#  endif
+#  ifndef _WIN32
+#    define _WIN32
+#  endif
 #endif
 
-#if defined __WINDOWS__ || defined WIN32
+#if defined WIN32
 
 #if defined _MSC_VER && defined NDEBUG
 #define _SECURE_SCL 0

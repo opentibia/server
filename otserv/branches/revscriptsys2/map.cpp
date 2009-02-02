@@ -305,7 +305,7 @@ bool Map::removeCreature(Creature* creature)
 	Tile* tile = creature->getTile();
 	if(tile){
 		tile->qt_node->removeCreature(creature);
-		tile->__removeThing(creature, 0);
+		tile->__removeThing(NULL, creature, 0);
 		return true;
 	}
 
@@ -471,10 +471,10 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos,
 	}
 
 	if(!foundCache){
-		minRangeX = (minRangeX == 0 ? -maxViewportX : -minRangeX);
-		maxRangeX = (maxRangeX == 0 ? maxViewportX : maxRangeX);
-		minRangeY = (minRangeY == 0 ? -maxViewportY : -minRangeY);
-		maxRangeY = (maxRangeY == 0 ? maxViewportY : maxRangeY);
+		minRangeX = (minRangeX == 0 ? -Map_maxViewportX : -minRangeX);
+		maxRangeX = (maxRangeX == 0 ? Map_maxViewportX : maxRangeX);
+		minRangeY = (minRangeY == 0 ? -Map_maxViewportY : -minRangeY);
+		maxRangeY = (maxRangeY == 0 ? Map_maxViewportY : maxRangeY);
 
 		int32_t minRangeZ;
 		int32_t maxRangeZ;
@@ -527,10 +527,10 @@ const SpectatorVec& Map::getSpectators(const Position& centerPos)
 		spectatorCache[centerPos] = p;
 		SpectatorVec& list = *p;
 
-		int32_t minRangeX = -maxViewportX;
-		int32_t maxRangeX = maxViewportX;
-		int32_t minRangeY = -maxViewportY;
-		int32_t maxRangeY = maxViewportY;
+		int32_t minRangeX = -Map_maxViewportX;
+		int32_t maxRangeX = Map_maxViewportX;
+		int32_t minRangeY = -Map_maxViewportY;
+		int32_t maxRangeY = Map_maxViewportY;
 
 		int32_t minRangeZ;
 		int32_t maxRangeZ;
@@ -571,7 +571,7 @@ void Map::clearSpectatorCache()
 }
 
 bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight /*= true*/,
-	int32_t rangex /*= Map::maxClientViewportX*/, int32_t rangey /*= Map::maxClientViewportY*/)
+	int32_t rangex /*= Map_maxClientViewportX*/, int32_t rangey /*= Map_maxClientViewportY*/)
 {
 	//z checks
 	//underground 8->15

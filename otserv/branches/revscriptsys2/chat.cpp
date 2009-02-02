@@ -21,6 +21,11 @@
 
 #include "chat.h"
 #include "player.h"
+#include "game.h"
+
+// Avoid unnecessary includes!
+extern void g_gameUnscript(void* v);
+extern void g_gameOnLeaveChannel(Player* player, ChatChannel* channel);
 
 PrivateChatChannel::PrivateChatChannel(uint16_t channelId, std::string channelName) :
 ChatChannel(channelId, channelName)
@@ -109,6 +114,11 @@ ChatChannel::ChatChannel(uint16_t channelId, std::string channelName)
 	m_name = channelName;
 }
 
+ChatChannel::~ChatChannel()
+{
+	g_gameUnscript(this);
+}
+
 bool ChatChannel::addUser(Player* player)
 {
 	UsersMap::iterator it = m_users.find(player->getID());
@@ -139,7 +149,7 @@ bool ChatChannel::removeUser(Player* player, bool sendCloseChannel /*= false*/)
 	return true;
 }
 
-bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time /*= 0*/)
+bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time /*= 0*/)
 {
 	bool success = false;
 	UsersMap::iterator it;
@@ -171,38 +181,13 @@ bool ChatChannel::sendInfo(SpeakClasses type, const std::string& text, uint32_t 
 Chat::Chat()
 {
 	// Create the default channels
-	ChatChannel *newChannel;
+	m_normalChannels[0x03] = new ChatChannel(0x03, "Rule Violations");
+	m_normalChannels[0x04] = new ChatChannel(0x04, "Game-Chat");
+	m_normalChannels[0x05] = new ChatChannel(0x05, "Trade");
+	m_normalChannels[0x06] = new ChatChannel(0x06, "RL-Chat");
+	m_normalChannels[0x08] = new ChatChannel(0x08, "Help");
 
-	// These should be defined somewhere else (except the hard-coded one's)
-
-	newChannel = new ChatChannel(CHANNEL_RULE_REP, "Rule Violations");
-	if(newChannel)
-		m_normalChannels[CHANNEL_RULE_REP] = newChannel;
-
-	newChannel = new ChatChannel(CHANNEL_GAME_CHAT, "Game-Chat");
-	if(newChannel)
-		m_normalChannels[CHANNEL_GAME_CHAT] = newChannel;
-
-	newChannel = new ChatChannel(CHANNEL_TRADE, "Trade");
-	if(newChannel)
-		m_normalChannels[CHANNEL_TRADE] = newChannel;
-
-	newChannel = new ChatChannel(CHANNEL_TRADE_ROOK, "Trade-Rookgaard");
-	if(newChannel)
-		m_normalChannels[CHANNEL_TRADE_ROOK] = newChannel;
-
-	newChannel = new ChatChannel(CHANNEL_RL_CHAT, "RL-Chat");
-	if(newChannel)
-		m_normalChannels[CHANNEL_RL_CHAT] = newChannel;
-
-	newChannel = new ChatChannel(CHANNEL_HELP, "Help");
-	if(newChannel)
-		m_normalChannels[CHANNEL_HELP] = newChannel;
-
-	newChannel = new PrivateChatChannel(CHANNEL_PRIVATE, "Private Chat Channel");
-	if(newChannel)
-		dummyPrivate = newChannel;
-
+	dummyPrivate = new PrivateChatChannel(0xFFFF, "Private Chat Channel");
 }
 
 Chat::~Chat()
@@ -269,8 +254,6 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 		uint32_t i = getFreePrivateChannelId();
 		if(i != 0) {
 			PrivateChatChannel* newChannel = new PrivateChatChannel(i, player->getName() + "'s Channel");
-			if(!newChannel)
-				return NULL;
 
 			newChannel->setOwner(player->getGUID());
 
@@ -367,12 +350,14 @@ void Chat::removeUserFromAllChannels(Player* player)
 
 		channel->removeUser(player);
 
+		g_gameOnLeaveChannel(player, channel);
+
 		if(channel->getOwner() == player->getGUID())
 			deleteChannel(player, channel->getId());
 	}
 }
 
-bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& text, uint16_t channelId)
+bool Chat::talkToChannel(Player* player, SpeakClass type, const std::string& text, uint16_t channelId)
 {
 	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel) {

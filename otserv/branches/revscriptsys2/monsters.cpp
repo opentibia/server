@@ -23,16 +23,12 @@
 #include "monster.h"
 #include "container.h"
 #include "tools.h"
-#include "spells.h"
 #include "combat.h"
-#include "luascript.h"
-#include "weapons.h"
 #include "configmanager.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-extern Spells* g_spells;
 extern Monsters g_monsters;
 extern ConfigManager g_config;
 
@@ -86,23 +82,8 @@ void MonsterType::reset()
 	lootItems.clear();
 	elementMap.clear();
 
-	for(SpellList::iterator it = spellAttackList.begin(); it != spellAttackList.end(); ++it){
-		if(it->combatSpell){
-			delete it->spell;
-			it->spell = NULL;
-		}
-	}
-
-	spellAttackList.clear();
-
-	for(SpellList::iterator it = spellDefenseList.begin(); it != spellDefenseList.end(); ++it){
-		if(it->combatSpell){
-			delete it->spell;
-			it->spell = NULL;
-		}
-	}
-
-	spellDefenseList.clear();
+	//spellAttackList.clear();
+	//spellDefenseList.clear();
 
 	yellSpeedTicks = 0;
 	yellChance = 0;
@@ -144,8 +125,6 @@ void MonsterType::createLoot(Container* corpse)
 			}
 		}
 	}
-
-	corpse->__startDecaying();
 }
 
 Item* MonsterType::createLootItem(const LootBlock& lootBlock)
@@ -276,7 +255,7 @@ ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType,
 
 	return condition;
 }
-
+/*
 bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description)
 {
 	sb.chance = 100;
@@ -699,7 +678,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	sb.spell = combatSpell;
 	return true;
 }
-
+*/
 #define SHOW_XML_WARNING(desc) std::cout << "Warning: [Monsters::loadMonster]. " << desc << ". " << file << std::endl;
 #define SHOW_XML_ERROR(desc) std::cout << "Error: [Monsters::loadMonster]. " << desc << ". " << file << std::endl;
 
@@ -955,6 +934,8 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 			else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
+					// REVSCRIPT TODO Add monster spells
+					/*
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
 
 						spellBlock_t sb;
@@ -965,7 +946,7 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 							SHOW_XML_WARNING("Cant load spell");
 						}
 					}
-
+					*/
 					tmpNode = tmpNode->next;
 				}
 			}
@@ -980,6 +961,8 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
+					// REVSCRIPT TODO Add monster spells
+					/*
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"defense") == 0){
 
 						spellBlock_t sb;
@@ -990,7 +973,7 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 							SHOW_XML_WARNING("Cant load spell");
 						}
 					}
-
+					*/
 					tmpNode = tmpNode->next;
 				}
 			}

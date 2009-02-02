@@ -30,6 +30,8 @@
 #include "configmanager.h"
 #include "party.h"
 
+#include "script_listener.h"
+
 #include <string>
 #include <sstream>
 #include <vector>
@@ -45,7 +47,6 @@ AutoID::list_type AutoID::list;
 
 extern Game g_game;
 extern ConfigManager g_config;
-extern CreatureEvents* g_creatureEvents;
 
 Creature::Creature() :
   isInternalRemoved(false)
@@ -88,7 +89,6 @@ Creature::Creature() :
 	blockTicks = 0;
 	walkUpdateTicks = 0;
 	checkCreatureVectorIndex = 0;
-	scriptEventsBitField = 0;
 	onIdleStatus();
 }
 
@@ -115,7 +115,7 @@ Creature::~Creature()
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
 }
 
-bool Creature::canSee(const Position& myPos, const Position& pos, uint32_t viewRangeX, uint32_t viewRangeY)
+bool Creature::canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY)
 {
 	if(myPos.z <= 7){
 		//we are on ground level or above (7 -> 0)
@@ -143,7 +143,7 @@ bool Creature::canSee(const Position& myPos, const Position& pos, uint32_t viewR
 
 bool Creature::canSee(const Position& pos) const
 {
-	return canSee(getPosition(), pos, Map::maxViewportX, Map::maxViewportY);
+	return canSee(getPosition(), pos, Map_maxViewportX, Map_maxViewportY);
 }
 
 bool Creature::canSeeCreature(const Creature* creature) const
@@ -237,7 +237,7 @@ void Creature::onWalk()
 	if(getSleepTicks() <= 0){
 		Direction dir;
 		if(getNextStep(dir)){
-			if(g_game.internalMoveCreature(this, dir, FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
+			if(g_game.internalMoveCreature(this, this, dir, FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
 				forceUpdateFollowPath = true;
 			}
 		}
@@ -770,22 +770,23 @@ Item* Creature::dropCorpse()
 
 	Tile* tile = getTile();
 	if(splash){
-		g_game.internalAddItem(tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		g_game.internalAddItem(NULL, tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		g_game.startDecay(splash);
 	}
 
 	Item* corpse = getCorpse();
 	if(corpse){
-		g_game.internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		g_game.internalAddItem(NULL, tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		dropLoot(corpse->getContainer());
 		g_game.startDecay(corpse);
 	}
 
 	//scripting event - onDie
-	CreatureEvent* eventDie = getCreatureEvent(CREATURE_EVENT_DIE);
-	if(eventDie){
-		eventDie->executeOnDie(this, corpse);
-	}
+	// REVSCRIPT TODO EVENT CALL
+	//CreatureEvent* eventDie = getCreatureEvent(CREATURE_EVENT_DIE);
+	//if(eventDie){
+	//	eventDie->executeOnDie(this, corpse);
+	//}
 
 	g_game.removeCreature(this, false);
 
@@ -865,7 +866,7 @@ void Creature::gainHealth(Creature* caster, int32_t healthGain)
 	}
 }
 
-void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
+void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext)
 {
 	changeHealth(-damage);
 
@@ -874,10 +875,19 @@ void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t 
 	}
 }
 
-void Creature::drainMana(Creature* attacker, int32_t manaLoss)
+void Creature::drainMana(Creature* attacker, int32_t manaLoss, bool showtext)
 {
 	onAttacked();
 	changeMana(-manaLoss);
+}
+
+void Creature::setParent(Cylinder* cylinder){
+	_tile = dynamic_cast<Tile*>(cylinder);
+	Thing::setParent(cylinder);
+}
+
+const Position& Creature::getPosition() const {
+	return _tile->getTilePosition();
 }
 
 BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
@@ -965,6 +975,22 @@ bool Creature::setAttackedCreature(Creature* creature)
 	}
 
 	return true;
+}
+
+ZoneType_t Creature::getZone() const {
+	const Tile* tile = getTile();
+	if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
+		return ZONE_PROTECTION;
+	}
+	else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
+		return ZONE_NOPVP;
+	}
+	else if(tile->hasFlag(TILESTATE_PVPZONE)){
+		return ZONE_PVP;
+	}
+	else{
+		return ZONE_NORMAL;
+	}
 }
 
 void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const
@@ -1172,11 +1198,11 @@ void Creature::onKilledCreature(Creature* target)
 		getMaster()->onKilledCreature(target);
 	}
 
-	//scripting event - onKill
-	CreatureEvent* eventKill = getCreatureEvent(CREATURE_EVENT_KILL);
-	if(eventKill){
-		eventKill->executeOnKill(this, target);
-	}
+	// REVSCRIPT TODO EVENT CALL
+	//CreatureEvent* eventKill = getCreatureEvent(CREATURE_EVENT_KILL);
+	//if(eventKill){
+	//	eventKill->executeOnKill(this, target);
+	//}
 }
 
 void Creature::onGainExperience(uint64_t gainExp)
@@ -1343,6 +1369,18 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id, uint32
 	return NULL;
 }
 
+Condition* Creature::getCondition(ConditionType_t type) const
+{
+	//This one just returns the first one found.
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type){
+			return *it;
+		}
+	}
+
+	return NULL;
+}
+
 void Creature::executeConditions(uint32_t interval)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
@@ -1444,49 +1482,6 @@ void Creature::setNormalCreatureLight()
 	internalLight.color = 0;
 }
 
-bool Creature::registerCreatureEvent(const std::string& name)
-{
-	CreatureEvent* event = g_creatureEvents->getEventByName(name);
-	if(event){
-		CreatureEventType_t type = event->getEventType();
-		if(!hasEventRegistered(type)){
-			// not was added, so set the bit in the bitfield
-			scriptEventsBitField = scriptEventsBitField | ((uint32_t)1 << type);
-		}
-		else{
-			//had a previous event handler for this type
-			// and have to be removed
-			CreatureEventList::iterator it = findEvent(type);
-			eventsList.erase(it);
-		}
-		eventsList.push_back(event);
-		return true;
-	}
-	return false;
-}
-
-std::list<CreatureEvent*>::iterator Creature::findEvent(CreatureEventType_t type)
-{
-	CreatureEventList::iterator it;
-	for(it = eventsList.begin(); it != eventsList.end(); ++it){
-		if((*it)->getEventType() == type){
-			return it;
-		}
-	}
-	return eventsList.end();
-}
-
-CreatureEvent* Creature::getCreatureEvent(CreatureEventType_t type)
-{
-	if(hasEventRegistered(type)){
-		CreatureEventList::iterator it = findEvent(type);
-		if(it != eventsList.end()){
-			return *it;
-		}
-	}
-	return NULL;
-}
-
 FrozenPathingConditionCall::FrozenPathingConditionCall(const Position& _targetPos)
 {
 	targetPos = _targetPos;
@@ -1549,3 +1544,19 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 	return false;
 }
 
+void Creature::addListener(Script::Listener_ptr listener) {
+	registered_listeners.push_back(listener);
+}
+
+Script::ListenerList Creature::getListeners(Script::ListenerType type) {
+	Script::ListenerList li;
+	for(Script::ListenerList::iterator i = registered_listeners.begin(), end = registered_listeners.end(); i != end; ++i) {
+		if((*i)->type() == type)
+			li.push_back(*i);
+	}
+	return li;
+}
+
+void Creature::clearListeners() {
+	registered_listeners.clear();
+}

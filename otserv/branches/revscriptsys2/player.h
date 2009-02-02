@@ -35,6 +35,7 @@
 #include <ctime>
 #include <algorithm>
 
+class Quest;
 class House;
 class Weapon;
 class ProtocolGame;
@@ -88,7 +89,7 @@ enum tradestate_t {
 typedef std::pair<uint32_t, Container*> containervector_pair;
 typedef std::vector<containervector_pair> ContainerVector;
 typedef std::map<uint32_t, Depot*> DepotMap;
-typedef std::map<uint32_t, int32_t> StorageMap;
+typedef std::map<std::string, std::string> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
 typedef std::list<std::string> LearnedInstantSpellList;
@@ -158,9 +159,9 @@ public:
 	Container* getContainer(uint32_t cid);
 	bool canOpenCorpse(uint32_t ownerId);
 
-	void addStorageValue(const uint32_t key, const int32_t value);
-	bool getStorageValue(const uint32_t key, int32_t& value) const;
-	void genReservedStorageRange();
+	void addStorageValue(const std::string& key, const std::string& value);
+	bool eraseStorageValue(const std::string& key);
+	bool getStorageValue(const std::string& key, std::string& value) const;
 
 	bool withdrawMoney(uint32_t amount);
 	bool depositMoney(uint32_t amount);
@@ -175,6 +176,7 @@ public:
 	uint32_t getLevel() const {return level;}
 	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
 	int32_t getAccessLevel() const {return accessLevel;}
+	const std::string& getAccessGroup() const {return groupName;}
 
 	void setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
@@ -183,6 +185,7 @@ public:
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	int64_t getExperience() const {return experience;}
+	void addExperience(uint64_t exp);
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
 	const Position& getLoginPosition() const {return loginPosition;}
@@ -332,8 +335,8 @@ public:
 	int32_t getWeaponSkill(const Item* item) const;
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
 
-	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext = true);
+	virtual void drainMana(Creature* attacker, int32_t manaLoss, bool showtext = true);
 	void addManaSpent(uint32_t amount);
 	void addSkillAdvance(skills_t skill, uint32_t count);
 
@@ -420,7 +423,7 @@ public:
 
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos)
 		{if(client) client->sendCreatureTurn(creature, stackpos);}
-	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+	void sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text)
 		{if(client) client->sendCreatureSay(creature, type, text);}
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color)
 		{if(client) client->sendCreatureSquare(creature, color);}
@@ -528,7 +531,7 @@ public:
 		{if(client) client->sendTextWindow(windowTextId, item, maxlen, canWrite);}
 	void sendTextWindow(uint32_t itemId, const std::string& text) const
 		{if(client) client->sendTextWindow(windowTextId, itemId, text);}
-	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time = 0) const
+	void sendToChannel(Creature* creature, SpeakClass type, const std::string& text, uint16_t channelId, uint32_t time = 0) const
 		{if(client) client->sendToChannel(creature, type, text, channelId, time);}
 	// new: shop window
 	void sendShop()
@@ -576,8 +579,8 @@ public:
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t interval);
 
-	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
-	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	Item* getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen);
 	void setWriteItem(Item* item, uint16_t _maxWriteLen = 0);
@@ -614,7 +617,6 @@ protected:
 
 	std::string getSkillName(int skillid);
 	void gainExperience(uint64_t exp);
-	void addExperience(uint64_t exp);
 
 	void updateInventoryWeigth();
 
@@ -635,13 +637,11 @@ protected:
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 		uint32_t& flags);
 
-	virtual void __addThing(Thing* thing);
-	virtual void __addThing(int32_t index, Thing* thing);
-
-	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
-	virtual void __replaceThing(uint32_t index, Thing* thing);
-
-	virtual void __removeThing(Thing* thing, uint32_t count);
+	virtual void __addThing(Creature* actor, Thing* thing);
+	virtual void __addThing(Creature* actor, int32_t index, Thing* thing);
+	virtual void __updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count);
+	virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing);
+	virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual int32_t __getFirstIndex() const;
@@ -660,6 +660,7 @@ protected:
 	uint32_t magLevel;
 	uint32_t magLevelPercent;
 	int32_t accessLevel;
+	std::string groupName;
 	uint64_t experience;
 	uint32_t damageImmunities;
 	uint32_t conditionImmunities;
@@ -737,6 +738,7 @@ protected:
 	int32_t saleCallback;
 	std::list<ShopInfo> shopItemList;
 
+
 	//party variables
 	Party* party;
 	PartyList invitePartyList;
@@ -810,10 +812,8 @@ protected:
 
 	friend class Game;
 	friend class Npc;
-	friend class LuaScriptInterface;
 	friend class Commands;
 	friend class Map;
-	friend class Actions;
 	friend class IOPlayer;
 	friend class ProtocolGame;
 };

@@ -38,7 +38,7 @@ public:
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 		uint32_t& flags);
 	
-	virtual void __addThing(int32_t index, Thing* thing);
+	virtual void __addThing(Creature* actor, int32_t index, Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
 	House* getHouse() {return house;};

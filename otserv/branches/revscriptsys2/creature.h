@@ -25,13 +25,11 @@
 #include "definitions.h"
 
 #include "templates.h"
-#include "map.h"
 #include "position.h"
 #include "condition.h"
 #include "const.h"
-#include "tile.h"
 #include "enums.h"
-#include "creatureevent.h"
+#include "thing.h"
 
 #include <list>
 
@@ -89,8 +87,15 @@ class Container;
 class Player;
 class Monster;
 class Npc;
+class ItemType;
 class Item;
 class Tile;
+namespace Script {
+	class Listener;
+	typedef boost::shared_ptr<Listener> Listener_ptr;
+	typedef boost::weak_ptr<Listener> Listener_wptr;
+	typedef std::vector<Listener_ptr> ListenerList;
+}
 
 #define EVENT_CREATURECOUNT 10
 #define EVENT_CREATURE_THINK_INTERVAL 1000
@@ -100,7 +105,7 @@ class FrozenPathingConditionCall {
 public:
 	FrozenPathingConditionCall(const Position& _targetPos);
 	virtual ~FrozenPathingConditionCall() {}
-	
+
 	virtual bool operator()(const Position& startPos, const Position& testPos,
 		const FindPathParams& fpp, int32_t& bestMatchDist) const;
 
@@ -130,7 +135,7 @@ public:
 	virtual const Npc* getNpc() const {return NULL;};
 	virtual Monster* getMonster() {return NULL;};
 	virtual const Monster* getMonster() const {return NULL;};
-	
+
 	void getPathToFollowCreature();
 
 	virtual const std::string& getName() const = 0;
@@ -192,21 +197,7 @@ public:
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
-	ZoneType_t getZone() const {
-		const Tile* tile = getTile();
-		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
-			return ZONE_PROTECTION;
-		}
-		else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
-			return ZONE_NOPVP;
-		}
-		else if(tile->hasFlag(TILESTATE_PVPZONE)){
-			return ZONE_PVP;
-		}
-		else{
-			return ZONE_NORMAL;
-		}
-	}
+	ZoneType_t getZone() const;
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -253,6 +244,7 @@ public:
 	void removeCondition(Condition* condition);
 	void removeCondition(const Creature* attacker, ConditionType_t type);
 	Condition* getCondition(ConditionType_t type, ConditionId_t id, uint32_t subId) const;
+	Condition* getCondition(ConditionType_t type) const;
 	void executeConditions(uint32_t interval);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
@@ -267,8 +259,8 @@ public:
 	virtual void changeMana(int32_t manaChange);
 
 	virtual void gainHealth(Creature* caster, int32_t healthGain);
-	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext);
+	virtual void drainMana(Creature* attacker, int32_t manaLoss, bool showtext);
 
 	virtual bool challengeCreature(Creature* creature) {return false;};
 	virtual bool convinceCreature(Creature* creature) {return false;};
@@ -324,7 +316,7 @@ public:
 	virtual void onFollowCreatureDissapear(bool isLogout) {};
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
+	virtual void onCreatureSay(const Creature* creature, SpeakClass type, const std::string& text) { };
 
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature) {};
@@ -339,24 +331,22 @@ public:
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
 	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
-	//creature script events
-	bool registerCreatureEvent(const std::string& name);
+	virtual void setParent(Cylinder* cylinder);
 
-	virtual void setParent(Cylinder* cylinder){
-		_tile = dynamic_cast<Tile*>(cylinder);
-		Thing::setParent(cylinder);
-	}
-
-	virtual const Position& getPosition() const {return _tile->getTilePosition();}
+	virtual const Position& getPosition() const;
 	virtual Tile* getTile(){return _tile;}
 	virtual const Tile* getTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;
 
-	static bool canSee(const Position& myPos, const Position& pos, uint32_t viewRangeX, uint32_t viewRangeY);
+	static bool canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY);
+
+	void addListener(Script::Listener_ptr listener);
+	Script::ListenerList getListeners(Script::ListenerType type);
+	void clearListeners();
 
 protected:
-	static const int32_t mapWalkWidth = Map::maxViewportX * 2 + 1;
-	static const int32_t mapWalkHeight = Map::maxViewportY * 2 + 1;
+	static const int32_t mapWalkWidth = Map_maxViewportX * 2 + 1;
+	static const int32_t mapWalkHeight = Map_maxViewportY * 2 + 1;
 	bool localMapCache[mapWalkHeight][mapWalkWidth];
 
 	virtual bool useCacheMap() const {return false;}
@@ -371,6 +361,8 @@ protected:
 	// this is to allow 0 to represent the special value of not
 	// being stored in any onThink vector
 	size_t checkCreatureVectorIndex;
+
+	Script::ListenerList registered_listeners;
 
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
@@ -418,16 +410,6 @@ protected:
 	uint32_t blockCount;
 	uint32_t blockTicks;
 
-	//creature script events
-	uint32_t scriptEventsBitField;
-	bool hasEventRegistered(CreatureEventType_t event){
-		return (0 != (scriptEventsBitField & ((uint32_t)1 << event)));
-	}
-	typedef std::list<CreatureEvent*> CreatureEventList;
-	CreatureEventList eventsList;
-	CreatureEventList::iterator findEvent(CreatureEventType_t type);
-	CreatureEvent* getCreatureEvent(CreatureEventType_t type);
-
 	void updateMapCache();
 #ifdef __DEBUG__
 	void validateMapCache();
@@ -450,7 +432,6 @@ protected:
 
 	friend class Game;
 	friend class Map;
-	friend class Commands;
 	friend class LuaScriptInterface;
 };
 

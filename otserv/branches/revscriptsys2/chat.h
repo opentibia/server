@@ -49,12 +49,12 @@ class ChatChannel
 {
 public:
 	ChatChannel(uint16_t channelId, std::string channelName);
-	virtual ~ChatChannel(){}
+	virtual ~ChatChannel();
 
 	bool addUser(Player* player);
 	bool removeUser(Player* player, bool sendCloseChannel = false);
 
-	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time = 0);
+	bool talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time = 0);
 	bool sendInfo(SpeakClasses type, const std::string& text, uint32_t time = 0);
 
 	const std::string& getName(){ return m_name; }

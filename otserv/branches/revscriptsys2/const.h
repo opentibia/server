@@ -25,6 +25,12 @@
 
 #define NETWORKMESSAGE_MAXSIZE 15360
 
+
+const int32_t Map_maxViewportX = 11;		//min value: maxClientViewportX + 1
+const int32_t Map_maxViewportY = 11;		//min value: maxClientViewportY + 1
+const int32_t Map_maxClientViewportX = 8;
+const int32_t Map_maxClientViewportY = 6;
+
 enum MagicEffectClasses {
 	NM_ME_DRAW_BLOOD       = 0x00,
 	NM_ME_LOSE_ENERGY      = 0x01,
@@ -423,15 +429,5 @@ enum PlayerFlags{
 	//add new flags here
 	PlayerFlag_LastFlag
 };
-
-//Reserved player storage key ranges
-//[10000000 - 20000000]
-#define PSTRG_RESERVED_RANGE_START  10000000
-#define PSTRG_RESERVED_RANGE_SIZE   10000000
-//[1000 - 1500]
-#define PSTRG_OUTFITS_RANGE_START   (PSTRG_RESERVED_RANGE_START + 1000)
-#define PSTRG_OUTFITS_RANGE_SIZE    500
-
-#define IS_IN_KEYRANGE(key, range) (key >= PSTRG_##range##_START && ((key - PSTRG_##range##_START) < PSTRG_##range##_SIZE))
 
 #endif

@@ -70,46 +70,46 @@ Cylinder* Mailbox::__queryDestination(int32_t& index, const Thing* thing, Item**
 	return this;
 }
 
-void Mailbox::__addThing(Thing* thing)
+void Mailbox::__addThing(Creature* actor, Thing* thing)
 {
-	return __addThing(0, thing);
+	return __addThing(actor, 0, thing);
 }
 
-void Mailbox::__addThing(int32_t index, Thing* thing)
+void Mailbox::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
 	if(Item* item = thing->getItem()){
 		if(canSend(item)){
-			sendItem(item);
+			sendItem(actor, item);
 		}
 	}
 }
 
-void Mailbox::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
+void Mailbox::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count)
 {
 	//
 }
 
-void Mailbox::__replaceThing(uint32_t index, Thing* thing)
+void Mailbox::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 {
 	//
 }
 
-void Mailbox::__removeThing(Thing* thing, uint32_t count)
+void Mailbox::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
 	//
 }
 
-void Mailbox::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Mailbox::postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postAddNotification(thing, index, LINK_PARENT);
+	getParent()->postAddNotification(actor, thing, index, LINK_PARENT);
 }
 
-void Mailbox::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Mailbox::postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
+	getParent()->postRemoveNotification(actor, thing, index, isCompleteRemoval, LINK_PARENT);
 }
 
-bool Mailbox::sendItem(Item* item)
+bool Mailbox::sendItem(Creature* actor, Item* item)
 {
 	std::string receiver = std::string("");
 	uint32_t dp = 0;
@@ -131,9 +131,9 @@ bool Mailbox::sendItem(Item* item)
 		Depot* depot = player->getDepot(dp, true);
 
 		if(depot){
-			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
+			if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
 				item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR){
-				g_game.transformItem(item, item->getID() + 1); /**Change it to stamped!**/	
+				g_game.transformItem(actor, item, item->getID() + 1); /**Change it to stamped!**/	
 			}
 			return true;
 		}
@@ -160,9 +160,9 @@ bool Mailbox::sendItem(Item* item)
 
 		Depot* depot = player->getDepot(dp, true);
 		if(depot){
-			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
+			if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
 				item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR){
-				g_game.transformItem(item, item->getID() + 1);
+				g_game.transformItem(actor, item, item->getID() + 1);
 			}
 
 			IOPlayer::instance()->savePlayer(player); 
