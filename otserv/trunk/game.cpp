@@ -192,13 +192,20 @@ int Game::loadMap(std::string filename, std::string filekind)
 	return map->loadMap(filename, filekind);
 }
 
-void Game::refreshMap()
+void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 {
 	Tile* tile;
 	Item* item;
 
-	for(Map::TileMap::iterator it = map->refreshTileMap.begin(); it != map->refreshTileMap.end(); ++it){
-		tile = it->first;
+
+	Map::TileMap::iterator begin_here = map->refreshTileMap.begin();
+	if(!map_iter)
+		map_iter = &begin_here;
+	Map::TileMap::iterator end_here = map->refreshTileMap.end();
+
+	int cleaned = 0;
+	for(; *map_iter != end_here && (clean_max == 0? true : (cleaned < clean_max)); ++*map_iter, ++cleaned){
+		tile = (*map_iter)->first;
 
 		//remove garbage
 		int32_t downItemSize = tile->downItems.size();
@@ -220,7 +227,7 @@ void Game::refreshMap()
 		cleanup();
 
 		//restore to original state
-		ItemVector list = it->second.list;
+		ItemVector list = (*map_iter)->second.list;
 		for(ItemVector::reverse_iterator it = list.rbegin(); it != list.rend(); ++it){
 			Item* item = (*it)->clone();
 			ReturnValue ret = internalAddItem(tile, item , INDEX_WHEREEVER, FLAG_NOLIMIT);
@@ -236,6 +243,26 @@ void Game::refreshMap()
 			}
 		}
 	}
+}
+
+void Game::proceduralRefresh(Map::TileMap::iterator* begin)
+{
+	if(!begin){
+		begin = new Map::TileMap::iterator(map->refreshTileMap.begin());
+	}
+
+	// Refresh 250 tiles each cycle
+	refreshMap(begin, 250);
+	
+	if(*begin == map->refreshTileMap.end()){
+		delete begin;
+		return;
+	}
+
+	// Refresh some items every 500 ms until all tiles has been checked
+	// For 100k tiles, this would take 100000/2500 = 40s = half a minute
+	Scheduler::getScheduler().addEvent(createSchedulerTask(100,
+		boost::bind(&Game::proceduralRefresh, this, begin)));
 }
 
 /*****************************************************************************/

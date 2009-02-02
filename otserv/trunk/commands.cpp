@@ -103,7 +103,8 @@ s_defcommands Commands::defined_commands[] = {
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	{"/serverdiag",&Commands::serverDiag},
 #endif
-	{"/raid",&Commands::forceRaid}
+	{"/raid",&Commands::forceRaid},
+	{"/refreshmap",&Commands::refreshMap}
 };
 
 
@@ -1053,5 +1054,18 @@ bool Commands::forceRaid(Creature* creature, const std::string& cmd, const std::
 	}
 
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
+	return true;
+}
+
+bool Commands::refreshMap(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(!player){
+		return false;
+	}
+
+	g_game.proceduralRefresh();
+
+	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Refreshed map.");
 	return true;
 }

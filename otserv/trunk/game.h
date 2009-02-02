@@ -462,7 +462,8 @@ public:
 	void setGameState(GameState_t newState);
 	void saveGameState();
 	void loadGameState();
-	void refreshMap();
+	void refreshMap(Map::TileMap::iterator* begin = NULL, int clean_max = 0);
+	void proceduralRefresh(Map::TileMap::iterator* begin = NULL);
 
 	//Events
 	void checkCreatureWalk(uint32_t creatureId);
