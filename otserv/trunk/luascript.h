@@ -597,6 +597,10 @@ protected:
 	static int luaRegisterCreatureEvent(lua_State *L);
 
 	static int luaGetDataDirectory(lua_State *L);
+	
+	static int luaSetExperienceRate(lua_State *L);
+	static int luaSetMagicRate(lua_State *L);
+	static int luaSetSkillRate(lua_State *L);
 	//
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);

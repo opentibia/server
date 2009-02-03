@@ -334,8 +334,8 @@ public:
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);
-	void addManaSpent(uint32_t amount);
-	void addSkillAdvance(skills_t skill, uint32_t count);
+	void addManaSpent(uint32_t amount, bool useMultiplier = true);
+	void addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier = true);
 
 	virtual int32_t getArmor() const;
 	virtual int32_t getDefense() const;
@@ -347,7 +347,7 @@ public:
 	void addInFightTicks(bool pzlock = false);
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual uint64_t getGainedExperience(Creature* attacker) const;
+	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);
@@ -397,6 +397,11 @@ public:
 	void addOutfit(uint32_t _looktype, uint32_t _addons);
 	bool remOutfit(uint32_t _looktype, uint32_t _addons);
 	bool canLogout();
+
+    //rate variables
+    float skill_multiplier[SKILL_LAST];
+    float magic_multiplier;
+    float exp_multiplier;
 
 	//tile
 	//send methods

@@ -78,6 +78,10 @@ Creature()
 	guildId    = 0;
 	guildLevel = 0;
 
+    skill_multiplier[SKILL_LAST] = 1.0f;
+    magic_multiplier = 1.0f;
+    exp_multiplier = 1.0f;
+
 	level      = 1;
 	levelPercent = 0;
 	magLevelPercent = 0;
@@ -635,8 +639,11 @@ std::string Player::getSkillName(int skillid)
 	return skillname;
 }
 
-void Player::addSkillAdvance(skills_t skill, uint32_t count)
+void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier /*= true*/)
 {
+    if(useMultiplier){
+        count = uint32_t(count * double(skill_multiplier[skill]));
+    }
 	skills[skill][SKILL_TRIES] += count * g_config.getNumber(ConfigManager::RATE_SKILL);
 
 #if __DEBUG__
@@ -1838,9 +1845,12 @@ void Player::drainMana(Creature* attacker, int32_t manaLoss)
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
-void Player::addManaSpent(uint32_t amount)
+void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 {
 	if(amount != 0 && !hasFlag(PlayerFlag_NotGainMana)){
+        if(useMultiplier){
+            amount = uint32_t(amount * double(magic_multiplier));
+        }
 		manaSpent += amount * g_config.getNumber(ConfigManager::RATE_MAGIC);
 		uint32_t reqMana = vocation->getReqMana(magLevel + 1);
 
@@ -3150,7 +3160,7 @@ void Player::doAttacking(uint32_t interval)
 	}
 }
 
-uint64_t Player::getGainedExperience(Creature* attacker) const
+uint64_t Player::getGainedExperience(Creature* attacker, bool useMultiplier /*= true*/) const
 {
 	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
 		Player* attackerPlayer = attacker->getPlayer();
@@ -3168,7 +3178,10 @@ uint64_t Player::getGainedExperience(Creature* attacker) const
 				uint64_t c = getExperience();
 
 				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor( getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ) );
-				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
+				if(useMultiplier)
+                    return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
+                else
+                    return uint64_t((result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE)) * double(attackerPlayer->exp_multiplier));
 		}
 	}
 
