@@ -56,7 +56,8 @@ enum ConditionType_t {
 	CONDITION_CURSED         = 1 << 20,
 	CONDITION_EXHAUST_COMBAT = 1 << 21,
 	CONDITION_EXHAUST_HEAL   = 1 << 22,
-	CONDITION_PACIFIED       = 1 << 23
+	CONDITION_PACIFIED       = 1 << 23,
+	CONDITION_HUNTING        = 1 << 24, // Killing monsters
 };
 
 enum ConditionEnd_t{

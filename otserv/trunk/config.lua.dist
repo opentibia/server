@@ -59,6 +59,9 @@ exhaustedadd = 200
 -- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1 second)
 pzlocked = 60000
 
+-- For how many minutes after killing a monster stamina will be removed
+hunting_kill_duration = pzlocked
+
 -- how long a field belongs to a player before it no longer causes PZ lock for the owner
 field_ownership_duration = 5000
 

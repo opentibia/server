@@ -235,6 +235,7 @@ public:
 	void setMaster(Creature* creature) {master = creature;}
 	Creature* getMaster() {return master;}
 	bool isSummon() const {return master != NULL;}
+	bool isPlayerSummon() const {return master != NULL && master->getPlayer();}
 	const Creature* getMaster() const {return master;}
 
 	virtual void addSummon(Creature* creature);

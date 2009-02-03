@@ -3477,6 +3477,11 @@ void Player::onKilledCreature(Creature* target)
 			}
 		}
 	}
+	
+	if(target->getMonster() && !target->isPlayerSummon()){
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_HUNTING, g_config.getNumber(ConfigManager::HUNTING_KILL_DURATION), 0);
+		addCondition(condition);
+	}
 }
 
 void Player::gainExperience(uint64_t gainExp)
