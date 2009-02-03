@@ -1349,7 +1349,7 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype)
 	lua_register(m_luaState, "doPlayerRemoveItem", LuaScriptInterface::luaDoPlayerRemoveItem);
 
-	//doPlayerAddExp(cid, exp, <optional: default: 0> useMultiplier)
+	//doPlayerAddExp(cid, exp, <optional: default: 0> useRate, <optional: default: 0> useMultiplier)
 	lua_register(m_luaState, "doPlayerAddExp", LuaScriptInterface::luaDoPlayerAddExp);
 
 	//doPlayerSetGuildId(cid, id)
@@ -4344,24 +4344,26 @@ int LuaScriptInterface::luaGetPlayerLight(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddExp(lua_State *L)
 {
-	//doPlayerAddExp(cid, exp, <optional: default: 0> useMultiplier)
+	//doPlayerAddExp(cid, exp, <optional: default: 0> useRate, <optional: default: 0> useMultiplier)
 	int32_t parameters = lua_gettop(L);
 
-	bool useMultiplier = false;
+    bool useMultiplier = false;
+    bool useRate = false;
+	if(parameters > 3){
+        useMultiplier = (popNumber(L) >= 1);
+    }
 	if(parameters > 2){
-		useMultiplier = (popNumber(L) >= 1);
+		useRate = (popNumber(L) >= 1);
 	}
 	
-	int32_t exp = (int32_t)popNumber(L);
+	int64_t exp = (int64_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
 		if(exp > 0){
-            if(useMultiplier){
-                exp = int32_t(exp * double(player->exp_multiplier));
-            }
+            exp = int64_t(exp * (useMultiplier? double(player->exp_multiplier) : 1.0) * (useRate? g_config.getNumber(ConfigManager::RATE_EXPERIENCE) : 1.0));
 			player->addExperience(exp);
 			lua_pushnumber(L, LUA_TRUE);
 		}

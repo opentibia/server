@@ -3178,7 +3178,7 @@ uint64_t Player::getGainedExperience(Creature* attacker, bool useMultiplier /*= 
 				uint64_t c = getExperience();
 
 				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor( getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ) );
-				if(useMultiplier)
+				if(!useMultiplier)
                     return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
                 else
                     return uint64_t((result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE)) * double(attackerPlayer->exp_multiplier));
