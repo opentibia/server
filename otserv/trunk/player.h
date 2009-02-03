@@ -344,7 +344,8 @@ public:
 
 	void addCombatExhaust(uint32_t ticks);
 	void addHealExhaust(uint32_t ticks);
-	void addInFightTicks(bool pzlock = false);
+	// Source can be either attacker or attacked creature
+	void addInFightTicks(bool pzlock = false, Creature* source = NULL);
 	void addDefaultRegeneration(uint32_t addTicks);
 
 	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
@@ -355,7 +356,7 @@ public:
 	virtual void onEndCondition(ConditionType_t type);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onAttackedCreature(Creature* target);
-	virtual void onAttacked();
+	virtual void onAttacked(Creature* source);
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target);

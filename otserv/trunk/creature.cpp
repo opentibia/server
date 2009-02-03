@@ -223,8 +223,8 @@ void Creature::onThink(uint32_t interval)
 void Creature::onAttacking(uint32_t interval)
 {
 	if(attackedCreature){
-		onAttacked();
-		attackedCreature->onAttacked();
+		onAttacked(attackedCreature);
+		attackedCreature->onAttacked(this);
 
 		if(g_game.isSightClear(getPosition(), attackedCreature->getPosition(), true)){
 			doAttacking(interval);
@@ -870,7 +870,7 @@ void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t 
 
 void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 {
-	onAttacked();
+	onAttacked(attacker);
 	changeMana(-manaLoss);
 }
 
@@ -931,7 +931,7 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 		attacker->onAttackedCreatureBlockHit(this, blockType);
 	}
 
-	onAttacked();
+	onAttacked(attacker);
 
 	return blockType;
 }
@@ -950,7 +950,7 @@ bool Creature::setAttackedCreature(Creature* creature)
 
 	if(attackedCreature){
 		onAttackedCreature(attackedCreature);
-		attackedCreature->onAttacked();
+		attackedCreature->onAttacked(this);
 	}
 
 	std::list<Creature*>::iterator cit;
@@ -1135,7 +1135,7 @@ void Creature::onAttackedCreature(Creature* target)
 	//
 }
 
-void Creature::onAttacked()
+void Creature::onAttacked(Creature* source)
 {
 	//
 }

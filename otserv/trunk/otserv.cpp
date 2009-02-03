@@ -242,7 +242,7 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
 				return false;
 			}
-			g_config.setString(ConfigManager::IP, arg);
+			g_config.setString(ConfigManager::IP, *argi);
 		}
 		else if(arg == "-c" || arg == "--config"){
 			if(++argi == args.end()){

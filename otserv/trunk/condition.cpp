@@ -261,6 +261,7 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		}
 
 		case CONDITION_INFIGHT:
+		case CONDITION_IN_MONSTER_FIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
 		case CONDITION_EXHAUST_COMBAT:

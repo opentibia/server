@@ -2207,12 +2207,17 @@ void Player::addHealExhaust(uint32_t ticks)
 	addCondition(condition);
 }
 
-void Player::addInFightTicks(bool pzlock /*= false*/)
+void Player::addInFightTicks(bool pzlock /*= false*/, Creature* source /*= NULL*/)
 {
 	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, g_game.getInFightTicks(), 0);
 	addCondition(condition);
-	if(pzlock)
+	if(pzlock){
 		pzLocked = true;
+	}
+	else if(source && source->getMonster() && (!source->getMaster() || !source->getMaster()->getPlayer()) ) {
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_IN_MONSTER_FIGHT, g_game.getInFightTicks(), 0);
+		addCondition(condition);
+	}
 }
 
 void Player::addDefaultRegeneration(uint32_t addTicks)
@@ -3381,12 +3386,12 @@ void Player::onAttackedCreature(Creature* target)
 	}
 }
 
-void Player::onAttacked()
+void Player::onAttacked(Creature* source)
 {
-	Creature::onAttacked();
+	Creature::onAttacked(source);
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
-		addInFightTicks();
+		addInFightTicks(false, source);
 	}
 }
 

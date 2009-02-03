@@ -286,7 +286,7 @@ public:
 	virtual void onTickCondition(ConditionType_t type, bool& bRemove);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onAttackedCreature(Creature* target);
-	virtual void onAttacked();
+	virtual void onAttacked(Creature* source);
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);

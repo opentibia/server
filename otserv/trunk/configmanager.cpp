@@ -27,6 +27,9 @@
 ConfigManager::ConfigManager()
 {
 	m_isLoaded = false;
+
+	m_confString[IP] = "";
+	m_confInteger[PORT] = 0;
 }
 
 ConfigManager::~ConfigManager()
@@ -53,8 +56,11 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	if(!m_isLoaded) // info that must be loaded one time (unless we reset the modules involved)
 	{
 		m_confString[CONFIG_FILE] = _filename;
-		m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
-		m_confInteger[PORT] = getGlobalNumber(L, "port");
+
+		if(m_confString[IP] == "")
+			m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
+		if(m_confInteger[PORT] == 0)
+			m_confInteger[PORT] = getGlobalNumber(L, "port");
 
 #if defined __CONFIG_V2__
 		unsigned int pos = _filename.rfind("/");
@@ -168,7 +174,7 @@ int ConfigManager::getNumber(uint32_t _what) const
 
 bool ConfigManager::setNumber(uint32_t _what, int _value)
 {
-	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
+	if(_what < LAST_INTEGER_CONFIG)
 	{
 		m_confInteger[_what] = _value;
 		return true;
@@ -182,7 +188,7 @@ bool ConfigManager::setNumber(uint32_t _what, int _value)
 
 bool ConfigManager::setString(uint32_t _what, const std::string& _value)
 {
-	if(m_isLoaded && _what < LAST_STRING_CONFIG)
+	if(_what < LAST_STRING_CONFIG)
 	{
 		m_confString[_what] = _value;
 		return true;
