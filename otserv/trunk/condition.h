@@ -42,7 +42,7 @@ enum ConditionType_t {
 	CONDITION_OUTFIT         = 1 << 6,
 	CONDITION_INVISIBLE      = 1 << 7,
 	CONDITION_LIGHT          = 1 << 8,
-	CONDITION_MANASHIELD     = 1 >> 9,
+	CONDITION_MANASHIELD     = 1 << 9,
 	CONDITION_INFIGHT        = 1 << 10,
 	CONDITION_DRUNK          = 1 << 11,
 	CONDITION_EXHAUSTED      = 1 << 12,
