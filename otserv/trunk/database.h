@@ -167,7 +167,7 @@ public:
 	DATABASE_VIRTUAL void freeResult(DBResult *res) {};
 
 protected:
-	_Database() {};
+	_Database() : m_connected(false) {};
 	DATABASE_VIRTUAL ~_Database() {};
 
 	DBResult* verifyResult(DBResult* result);
