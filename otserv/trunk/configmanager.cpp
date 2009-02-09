@@ -26,6 +26,8 @@
 
 ConfigManager::ConfigManager()
 {
+	L = NULL;
+
 	m_isLoaded = false;
 
 	m_confString[IP] = "";
