@@ -176,6 +176,7 @@ int main(int argn, const char* argv[]){
 	}
 	std::cout << "Version = " << schema_version << " ";
 	std::cout << "[done]" << std::endl;
+	db->freeResult(result);
 
 	if(schema_version == CURRENT_SCHEMA_VERSION){
 		std::cout << ":: Your database schema is updated." << std::endl;
@@ -188,8 +189,13 @@ int main(int argn, const char* argv[]){
 
 	std::cout << "Your database is not updated. Do you want to update it? (y/n)";
 	std::string yesno;
-	std::cin >> yesno;
-	if(!always_update || (yesno != "y" && yesno != "yes")){
+	if(wait_for_input){
+		std::cin >> yesno;
+		if((yesno != "y" && yesno != "yes")){
+			return 0;
+		}
+	}
+	else if(!always_update){
 		return 0;
 	}
 
