@@ -51,8 +51,10 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	if(luaL_dofile(L, _filename.c_str()))
 	{
 		lua_close(L);
+		L = NULL;
 		return false;
 	}
+
 
 	// parse config
 	if(!m_isLoaded) // info that must be loaded one time (unless we reset the modules involved)

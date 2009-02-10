@@ -105,32 +105,54 @@ struct CommandLineOptions{
 	bool truncate_log;
 	std::string logfile;
 	std::string errfile;
+	std::string runfile;
 };
+
+CommandLineOptions g_command_opts;
 
 bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args);
 void mainLoader(const CommandLineOptions& command_opts);
 
+#if !defined(__WINDOWS__)
+// Runfile, for running OT as daemon in the background. If the server is shutdown by internal
+// means, we need to clear the file to notify the daemon manager of our change in status.
+// Note that if the server crashes, this will not happend. :|
+void closeRunfile(void)
+{
+	std::ofstream runfile(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out); 
+	runfile.close(); // Truncate file
+}
+#endif
+
 int main(int argc, char *argv[])
 {
-	CommandLineOptions command_opts;
-	if(parseCommandLine(command_opts, std::vector<std::string>(argv, argv + argc)) == false){
+	if(parseCommandLine(g_command_opts, std::vector<std::string>(argv, argv + argc)) == false){
 		return 0;
 	}
+	
+#if !defined(__WINDOWS__)
+	if(g_command_opts.runfile != ""){
+		std::ofstream f(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out);
+		f << getpid();
+		f.close();
+		atexit(closeRunfile);
+	}
+#endif
 
 	boost::shared_ptr<std::ofstream> logfile;
 	boost::shared_ptr<std::ofstream> errfile;
-	if(command_opts.logfile != ""){
-		logfile.reset(new std::ofstream(command_opts.logfile.c_str(),
-			(command_opts.truncate_log? std::ios::trunc : std::ios::app) | std::ios::out)
+	if(g_command_opts.logfile != ""){
+		logfile.reset(new std::ofstream(g_command_opts.logfile.c_str(),
+			(g_command_opts.truncate_log? std::ios::trunc : std::ios::app) | std::ios::out)
 		);
 		if(!logfile->is_open()){
 			ErrorMessage("Could not open standard log file for writing!");
 		}
 		std::cout.rdbuf(logfile->rdbuf());
 	}
-	if(command_opts.errfile != ""){
-		errfile.reset(new std::ofstream(command_opts.errfile.c_str(),
-			(command_opts.truncate_log? std::ios::trunc : std::ios::app) | std::ios::out)
+	if(g_command_opts.errfile != ""){
+		errfile.reset(new std::ofstream(g_command_opts.errfile.c_str(),
+			(g_command_opts.truncate_log? std::ios::trunc : std::ios::app) | std::ios::out)
 		);
 		if(!errfile->is_open()){
 			ErrorMessage("Could not open error log file for writing!");
@@ -202,7 +224,7 @@ int main(int argc, char *argv[])
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 
-	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, command_opts)));
+	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, g_command_opts)));
 
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
@@ -237,6 +259,14 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			}
 			g_config.setNumber(ConfigManager::PORT, atoi(argi->c_str()));
 		}
+		else if(arg == "-r" || arg == "--runfile"){
+			if(++argi == args.end()){
+				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
+				return false;
+			}
+			std::cout << "USING RUNEFILE\n";
+			opts.runfile = *argi;
+		}
 		else if(arg == "-i" || arg == "--ip"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
@@ -268,22 +298,24 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		}
 		else if(arg == "--help"){
 			std::cout <<
-			"Usage: otserv {-i|-p|-c|-l}\n"
+			"Usage: otserv {-i|-p|-c|-r|-l}\n"
 			"\n"
 			"\t-i, --ip $1\t\tIP of gameworld server. Should be equal to the \n"
 			"\t\t\t\tglobal IP.\n"
 			"\t-p, --port $1\t\tPort for server to listen on.\n"
 			"\t-c, --config $1\t\tAlternate config file path.\n"
 			"\t-l, --log-file $1 $2\tAll standard output will be logged to the\n"
+			"\t-r, --run-file $1\t\tSpecifies a runfile. Will contain the pid\n"
+			"\t\t\t\tof the server process as long as it is running (UNIX).\n"
 			"\t\t\t\t$1 file, all errors will be logged to $2.\n"
-			"\t--truncate-log\tReset log file each time the server is \n"
+			"\t--truncate-log\t\tReset log file each time the server is \n"
 			"\t\t\t\tstarted.\n";
 			return false;
 		}
 		else
 		{
 			std::cout << "Unrecognized command line argument '" << arg << "'\n"
-			"Usage: otserv {-i|-p|-c|-l}" << "\n";
+			"Usage: otserv {-i|-p|-c|-r|-l}" << "\n";
 			return false;
 		}
 		++argi;
@@ -319,14 +351,15 @@ void mainLoader(const CommandLineOptions& command_opts)
 	configpath = getenv("HOME");
 	configpath += "/.otserv/";
 	configpath += configname;
-	if (!g_config.loadFile(configpath) && !g_config.loadFile(configname))
+        
+	if (!g_config.loadFile(configname) && !g_config.loadFile(configpath))
 #else
 	if (!g_config.loadFile(configname))
 #endif
 	{
 		char errorMessage[26];
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
-		sprintf(errorMessage, "Unable to load %s!", configpath.c_str());
+		sprintf(errorMessage, "Unable to load %s or %s!", configname, configpath.c_str());
 #else
 		sprintf(errorMessage, "Unable to load %s!", configname);
 #endif
