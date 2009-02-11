@@ -93,6 +93,10 @@ killsforredskull = 3
 -- Extra experience % per player when sharing experience
 party_exp_mul = 5
 
+-- Anti-MageBomb system
+-- This system works as in Tibia, time in milliseconds
+login_attack_delay = 10*1000
+
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
 rate_skill = 1

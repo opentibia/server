@@ -278,7 +278,7 @@ public:
 	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
 	void addHealPoints(Creature* caster, int32_t healthPoints);
-	bool hasBeenAttacked(uint32_t attackerId);
+	bool hasBeenAttacked(uint32_t attackerId) const;
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);

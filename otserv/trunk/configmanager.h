@@ -104,6 +104,7 @@ public:
 		REMOVE_RUNE_CHARGES,
 		REMOVE_WEAPON_CHARGES,
 		USE_ACCBALANCE,
+		LOGIN_ATTACK_DELAY,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

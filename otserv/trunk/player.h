@@ -190,6 +190,8 @@ public:
 	uint32_t getTown() const {return town;}
 	void setTown(uint32_t _town) {town = _town;}
 
+    bool checkLoginAttackDelay(uint32_t attackerId) const;
+
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
 	virtual bool canSeeInvisibility() const;
@@ -709,6 +711,7 @@ protected:
 	//std::string accountName;
 	std::string password;
 	time_t lastLoginSaved;
+	uint64_t lastLoginMs;
 	Position loginPosition;
 	uint32_t lastip;
 

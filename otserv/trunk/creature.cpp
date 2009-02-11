@@ -805,9 +805,9 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 	return (*_lastHitCreature || *_mostDamageCreature);
 }
 
-bool Creature::hasBeenAttacked(uint32_t attackerId)
+bool Creature::hasBeenAttacked(uint32_t attackerId) const
 {
-	CountMap::iterator it = damageMap.find(attackerId);
+	CountMap::const_iterator it = damageMap.find(attackerId);
 	if(it != damageMap.end()){
 		return (OTSYS_TIME() - it->second.ticks <= g_game.getInFightTicks());
 	}

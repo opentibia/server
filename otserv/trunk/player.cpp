@@ -93,6 +93,7 @@ Creature()
 	accessLevel = 0;
 	lastip = 0;
 	lastLoginSaved = 0;
+	lastLoginMs = 0;
 	npings = 0;
 	internal_ping = 0;
 	MessageBufferTicks = 0;
@@ -3722,10 +3723,8 @@ Skulls_t Player::getSkullClient(const Player* player) const
 		}
 	}
 
-	if(player->getSkull() == SKULL_NONE){
-		if(isPartner(player)){
-			return SKULL_GREEN;
-		}
+	if(player->getSkull() == SKULL_NONE && isPartner(player) && g_game.getWorldType() != WORLD_TYPE_NO_PVP){
+		return SKULL_GREEN;
 	}
 
 	return player->getSkull();
@@ -3973,4 +3972,18 @@ bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 	}
 
 	return true;
+}
+
+bool Player::checkLoginAttackDelay(uint32_t attackerId) const
+{
+    bool wasAttacked = false;
+    if(hasBeenAttacked(attackerId)){
+        wasAttacked = true;
+    }
+    
+    if(OTSYS_TIME() - g_config.getNumber(ConfigManager::LOGIN_ATTACK_DELAY) <= lastLoginMs && !wasAttacked){
+        return false;
+    }
+    
+    return true;
 }
