@@ -171,8 +171,6 @@ void Game::saveGameState()
 
 void Game::saveServer()
 {
-	saveGameState();
-	
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 		it != Player::listPlayer.list.end();
 		++it)
