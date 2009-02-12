@@ -61,6 +61,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	{
 		m_confString[CONFIG_FILE] = _filename;
 
+		// These settings might have been set from command line
 		if(m_confString[IP] == "")
 			m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
 		if(m_confInteger[PORT] == 0)

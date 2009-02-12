@@ -89,6 +89,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/zt",&Commands::testTutorialCommand},
 	{"/goto",&Commands::teleportTo},
 	{"/info",&Commands::getInfo},
+	{"/save",&Commands::saveServer},
 	{"/closeserver",&Commands::closeServer},
 	{"/openserver",&Commands::openServer},
 	{"/getonline",&Commands::onlineList},
@@ -643,7 +644,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 bool Commands::closeServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	g_game.setGameState(GAME_STATE_CLOSED);
-	//kick players with access = 0
+	//kick players with unauthorized players
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end())
 	{
@@ -655,24 +656,36 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 			++it;
 		}
 	}
+	// Save the rest of everything (including players that stayed online)
+	g_game.saveServer();
 
 	Player* player = creature->getPlayer();
 
+	// Is it a real serversave?
 	if(param == "serversave"){
+		// Pay houses & clear bans
 		Houses::getInstance().payHouses();
 		g_bans.clearTemporaryBans();
 	}
 
-	if(!g_game.getMap()->saveMap()){
-		if(player)
-			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving map.");
-	}
-
-	g_game.saveGameState();
-
+	// Notify player (If he's still online)
 	if(player){
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now closed.");
 	}
+
+	return true;
+}
+
+bool Commands::saveServer(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	// Save most everything
+	g_game.saveServer();
+
+	// Notify player
+	if(Player* player = creature->getPlayer()){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server has been saved.");
+	}
+
 	return true;
 }
 

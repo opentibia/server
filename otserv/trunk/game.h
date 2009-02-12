@@ -461,6 +461,7 @@ public:
 
 	GameState_t getGameState();
 	void setGameState(GameState_t newState);
+	void saveServer();
 	void saveGameState();
 	void loadGameState();
 	void refreshMap(Map::TileMap::iterator* begin = NULL, int clean_max = 0);

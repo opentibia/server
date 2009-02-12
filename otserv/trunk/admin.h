@@ -109,7 +109,7 @@ enum{
 	CMD_BROADCAST = 1,
 	CMD_CLOSE_SERVER = 2,
 	CMD_PAY_HOUSES = 3,
-	//CMD_OPEN_SERVER = 4,
+	CMD_OPEN_SERVER = 4,
 	CMD_SHUTDOWN_SERVER = 5,
 	//CMD_RELOAD_SCRIPTS = 6,
 	//CMD_PLAYER_INFO = 7,
@@ -118,6 +118,7 @@ enum{
 	//CMD_BAN_MANAGER = 10,
 	//CMD_SERVER_INFO = 11,
 	//CMD_GETHOUSE = 12,
+	CMD_SAVE_SERVER = 13,
 };
 
 
@@ -189,6 +190,8 @@ protected:
 
 	virtual void deleteProtocolTask();
 
+	void adminCommandOpenServer();
+	void adminCommandSaveServer();
 	void adminCommandCloseServer();
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();

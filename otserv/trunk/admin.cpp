@@ -322,6 +322,13 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 				output->AddByte(AP_MSG_COMMAND_OK);
 				break;
 			}
+			case CMD_OPEN_SERVER:
+			{
+				Dispatcher::getDispatcher().addTask(
+					createTask(boost::bind(&ProtocolAdmin::adminCommandOpenServer, this)));
+
+				break;
+			}
 			case CMD_CLOSE_SERVER:
 			{
 				Dispatcher::getDispatcher().addTask(
@@ -352,6 +359,13 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 					createTask(boost::bind(&ProtocolAdmin::adminCommandKickPlayer, this, name)));
 				break;
 			}
+			case CMD_SAVE_SERVER:
+			{
+				Dispatcher::getDispatcher().addTask(
+					createTask(boost::bind(&ProtocolAdmin::adminCommandSaveServer, this)));
+
+				break;
+			}
 			default:
 			{
 				output->AddByte(AP_MSG_COMMAND_FAILED);
@@ -376,6 +390,21 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		else{
 			outputPool->releaseMessage(output);
 		}
+	}
+}
+
+void ProtocolAdmin::adminCommandOpenServer()
+{
+	g_game.setGameState(GAME_STATE_NORMAL);
+
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+
+		addLogLine(this, LOGTYPE_EVENT, 1, "open server ok");
+
+		output->AddByte(AP_MSG_COMMAND_OK);
+		OutputMessagePool::getInstance()->send(output);
 	}
 }
 
@@ -469,6 +498,21 @@ void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 			output->AddByte(AP_MSG_COMMAND_FAILED);
 			output->AddString("player is not online");
 		}
+		OutputMessagePool::getInstance()->send(output);
+	}
+}
+
+void ProtocolAdmin::adminCommandSaveServer()
+{
+	g_game.saveServer();
+
+	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+
+		addLogLine(this, LOGTYPE_EVENT, 1, "save server ok");
+
+		output->AddByte(AP_MSG_COMMAND_OK);
 		OutputMessagePool::getInstance()->send(output);
 	}
 }

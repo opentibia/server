@@ -341,8 +341,10 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 		propStream.init(attr, attrSize);
  
 		while(propStream.size()) {
-			uint32_t item_count;
-			uint16_t x, y; uint8_t z;
+			uint32_t item_count = 0;
+			uint16_t x = 0, y = 0;
+			uint8_t z = 0;
+
 			propStream.GET_USHORT(x);
 			propStream.GET_USHORT(y);
 			propStream.GET_UCHAR(z);
@@ -368,7 +370,7 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 	Item* item = NULL;
 	
-	uint16_t id;
+	uint16_t id = 0;
 	propStream.GET_USHORT(id);
 
 	const ItemType& iType = Item::items[id];
@@ -384,11 +386,11 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 			if(!ret) {
 				// Somewhat ugly hack to inject a custom attribute for container items
 				propStream.SKIP_N(-1);
-				uint8_t prop;
+				uint8_t prop = 0;
 				propStream.GET_UCHAR(prop);
 				if(prop == ATTR_CONTAINER_ITEMS){
 					Container* container = item->getContainer();
-					uint32_t nitems;
+					uint32_t nitems = 0;
 					propStream.GET_ULONG(nitems);
 					while(nitems > 0){
 						if(!loadItem(propStream, container)){
