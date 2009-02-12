@@ -711,7 +711,7 @@ protected:
 	//std::string accountName;
 	std::string password;
 	time_t lastLoginSaved;
-	uint64_t lastLoginMs;
+	int64_t lastLoginMs;
 	Position loginPosition;
 	uint32_t lastip;
 

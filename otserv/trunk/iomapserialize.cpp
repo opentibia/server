@@ -455,11 +455,11 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 			if(!ret) {
 				// Somewhat ugly hack to inject a custom attribute for container items
 				propStream.SKIP_N(-1);
-				uint8_t prop;
+				uint8_t prop = 0;
 				propStream.GET_UCHAR(prop);
 				if(prop == ATTR_CONTAINER_ITEMS){
 					Container* container = item->getContainer();
-					uint32_t nitems;
+					uint32_t nitems = 0;
 					propStream.GET_ULONG(nitems);
 					while(nitems > 0){
 						if(!loadItem(propStream, container)){
