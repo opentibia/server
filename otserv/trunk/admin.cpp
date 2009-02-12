@@ -421,16 +421,17 @@ void ProtocolAdmin::adminCommandCloseServer()
 			++it;
 		}
 	}
+	bool success = g_game.saveServer();
 
 	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
-		if(!g_game.getMap()->saveMap()){
-			addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Map");
+		if(!success){
+			addLogLine(this, LOGTYPE_WARNING, 1, "close server fail");
 
 			output->AddByte(AP_MSG_COMMAND_FAILED);
-			output->AddString("Map");
+			output->AddString("Save");
 			OutputMessagePool::getInstance()->send(output);
 			return;
 		}

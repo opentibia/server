@@ -116,7 +116,7 @@ remove_rune_charges = true
 
 -- Remove weapon charges
 -- Set to false to disable charges disappearing from weapons on use
-remove_rune_charges = true
+remove_weapon_charges = true
 
 -- despawn configs
 -- how many floors can a monster go from his spawn before despawning
