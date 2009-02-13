@@ -359,12 +359,10 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 			}
 
 			if(const Player* attackerPlayer = attacker->getPlayer()){
-				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
+				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer) ||
+					attackerPlayer->checkLoginAttackDelay(targetPlayer->getID())){
 					return RET_YOUMAYNOTATTACKTHISPLAYER;
 				}
-				if(!attackerPlayer->checkLoginAttackDelay(targetPlayer->getID())){
-                    return RET_YOUMAYNOTATTACKTHISPLAYER;
-                }
 			}
 
 			if(attacker->isSummon()){

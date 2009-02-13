@@ -104,7 +104,9 @@ struct CommandLineOptions{
 	std::string configfile;
 	bool truncate_log;
 	std::string logfile;
+#if !defined(__WINDOWS__)
 	std::string errfile;
+#endif
 	std::string runfile;
 };
 
@@ -259,6 +261,7 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			}
 			g_config.setNumber(ConfigManager::PORT, atoi(argi->c_str()));
 		}
+#if !defined(__WINDOWS__)
 		else if(arg == "-r" || arg == "--runfile"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
@@ -266,6 +269,7 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			}
 			opts.runfile = *argi;
 		}
+#endif
 		else if(arg == "-i" || arg == "--ip"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
@@ -303,10 +307,12 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			"\t\t\t\tglobal IP.\n"
 			"\t-p, --port $1\t\tPort for server to listen on.\n"
 			"\t-c, --config $1\t\tAlternate config file path.\n"
-			"\t-l, --log-file $1 $2\tAll standard output will be logged to the\n"
-			"\t-r, --run-file $1\t\tSpecifies a runfile. Will contain the pid\n"
-			"\t\t\t\tof the server process as long as it is running (UNIX).\n"
-			"\t\t\t\t$1 file, all errors will be logged to $2.\n"
+			"\t-l, --log-file $1 $2\tAll standard output will be logged to the\n";
+#if !defined(__WINDOWS__)
+			std::cout << "\t-r, --run-file $1\t\tSpecifies a runfile. Will contain the pid\n"
+			"\t\t\t\tof the server process as long as it is running (UNIX).\n";
+#endif
+			std::cout << "\t\t\t\t$1 file, all errors will be logged to $2.\n"
 			"\t--truncate-log\t\tReset log file each time the server is \n"
 			"\t\t\t\tstarted.\n";
 			return false;
@@ -358,7 +364,7 @@ void mainLoader(const CommandLineOptions& command_opts)
 	{
 		char errorMessage[26];
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
-		sprintf(errorMessage, "Unable to load %s or %s!", configname, configpath.c_str());
+		sprintf(errorMessage, "Unable to load %s and %s!", configname, configpath.c_str());
 #else
 		sprintf(errorMessage, "Unable to load %s!", configname);
 #endif
