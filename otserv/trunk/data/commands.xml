@@ -10,7 +10,7 @@
 <command cmd="/s" access="3" />				-- Summon a NPC
 <command cmd="/openserver" access="3" />    -- Open the server
 <command cmd="/closeserver" access="3" />	-- Close the server
-<command cmd="/rfreshmap" access="3" />	    -- Refreshes all refreshable (...) tiles
+<command cmd="/refreshmap" access="3" />	-- Refreshes all refreshable (...) tiles
 <command cmd="/save" access="3" />	        -- Save the server (players remain online)
 <command cmd="/owner" access="3" />			-- Set a player to house owner
 <command cmd="/goto" access="3" />			-- Teleport to players, creatures or NPCs
