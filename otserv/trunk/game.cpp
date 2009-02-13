@@ -169,8 +169,10 @@ void Game::saveGameState()
 	ScriptEnviroment::saveGameState();
 }
 
-void Game::saveServer()
+bool Game::saveServer()
 {
+	saveGameState();
+
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 		it != Player::listPlayer.list.end();
 		++it)
@@ -179,9 +181,8 @@ void Game::saveServer()
 		IOPlayer::instance()->savePlayer(it->second);
 	}
 
-	map->saveMap();
+	return map->saveMap();
 
-	saveGameState();
 }
 
 void Game::loadGameState()
