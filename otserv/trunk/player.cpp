@@ -3976,5 +3976,5 @@ bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 
 bool Player::checkLoginAttackDelay(uint32_t attackerId) const
 {
-	return (OTSYS_TIME() <= (lastLoginMs + g_config.getNumber(ConfigManager::LOGIN_PROTECTION)) && !hasBeenAttacked(playerId));
+	return (OTSYS_TIME() <= (lastLoginMs + g_config.getNumber(ConfigManager::LOGIN_ATTACK_DELAY)) && !hasBeenAttacked(attackerId));
 }

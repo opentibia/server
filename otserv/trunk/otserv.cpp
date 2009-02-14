@@ -104,10 +104,10 @@ struct CommandLineOptions{
 	std::string configfile;
 	bool truncate_log;
 	std::string logfile;
-#if !defined(__WINDOWS__)
 	std::string errfile;
-#endif
+#if !defined(__WINDOWS__)
 	std::string runfile;
+#endif
 };
 
 CommandLineOptions g_command_opts;
