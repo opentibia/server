@@ -24,6 +24,8 @@
 #include <string>
 #include "creature.h"
 
+#include <libxml/parser.h>
+
 #define MAX_LOOTCHANCE 100000
 #define MAX_STATICWALK 100
 

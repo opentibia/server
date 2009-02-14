@@ -4,7 +4,7 @@
 AC_PREREQ([2.50])
 AC_INIT([otserv], [0.6.2_SVN])
 AM_INIT_AUTOMAKE([1.10 foreign])
-AC_CONFIG_SRCDIR([raids.h])
+AC_CONFIG_SRCDIR([player.h])
 AC_CONFIG_HEADER([config.h])
 
 # Checks for programs.

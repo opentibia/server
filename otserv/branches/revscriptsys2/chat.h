@@ -55,7 +55,7 @@ public:
 	bool removeUser(Player* player, bool sendCloseChannel = false);
 
 	bool talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time = 0);
-	bool sendInfo(SpeakClasses type, const std::string& text, uint32_t time = 0);
+	bool sendInfo(SpeakClass type, const std::string& text, uint32_t time = 0);
 
 	const std::string& getName(){ return m_name; }
 	const uint16_t getId(){ return m_id; }
@@ -112,7 +112,7 @@ public:
 
 	uint16_t getFreePrivateChannelId();
 
-	bool talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+	bool talkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId);
 
 	std::string getChannelName(Player* player, uint16_t channelId);
 	ChannelList getChannelList(Player* player);

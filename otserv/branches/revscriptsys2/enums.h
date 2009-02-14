@@ -283,3 +283,4 @@ struct ShopInfo{
 };
 
 #endif
+

@@ -89,7 +89,7 @@ protected:
 	void addShopPlayer(Player* player);
 	void removeShopPlayer(const Player* player);
 	void closeAllShopWindows();
-	uint32_t getListItemPrice(uint16_t itemId, ShopEvent_t type);
+	//uint32_t getListItemPrice(uint16_t itemId, ShopEvent_t type);
 
 	std::string name;
 	std::string m_scriptdir;

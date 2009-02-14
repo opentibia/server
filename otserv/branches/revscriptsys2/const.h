@@ -143,7 +143,7 @@ enum ShootType_t {
 	NM_SHOOT_UNK            = 0xFFFF
 };
 
-enum SpeakClasses {
+enum SpeakClass {
 	SPEAK_SAY				= 0x01,	//normal talk
 	SPEAK_WHISPER			= 0x02,	//whispering - #w text
 	SPEAK_YELL				= 0x03,	//yelling - #y text
@@ -431,3 +431,4 @@ enum PlayerFlags{
 };
 
 #endif
+

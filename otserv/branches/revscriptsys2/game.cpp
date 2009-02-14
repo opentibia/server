@@ -232,7 +232,7 @@ void Game::scriptCleanup() {
 		boost::bind(&Game::scriptCleanup, this)));
 }
 
-void Game::refreshMap()
+void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 {
 	Tile* tile;
 	Item* item;
@@ -292,7 +292,6 @@ void Game::proceduralRefresh(Map::TileMap::iterator* begin)
 {
 	if(!begin)
 		begin = new Map::TileMap::iterator(map->refreshTileMap.begin());
-	}
 
 	// Refresh 250 tiles each cycle
 	refreshMap(begin, 250);
@@ -4582,6 +4581,13 @@ void Game::updateCreatureSkull(Player* player)
 
 void Game::startDecay(Item* item)
 {
+	Container* container = item->getContainer();
+	if(container){
+		for(ItemList::iterator it = container.begin(); it != container.end(); ++it){
+			startDecay(*it);
+		}
+	}
+
 	if(item && item->canDecay()){
 		uint32_t decayState = item->getDecaying();
 		if(decayState == DECAYING_TRUE){

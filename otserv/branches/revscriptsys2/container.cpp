@@ -68,25 +68,6 @@ void Container::addItem(Item* item)
 	item->setParent(this);
 }
 
-bool Container::unserialize(xmlNodePtr nodeItem)
-{
-	bool ret = Item::unserialize(nodeItem);
-
-	if(ret) {
-		xmlNodePtr nodeContainer = nodeItem->children;
-		if(nodeContainer == NULL){
-			return true; //container is empty
-		}
-	}
-	return NULL;
-}
-
-void Container::addItem(Item* item)
-{
-	itemlist.push_back(item);
-	item->setParent(this);
-}
-
 bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
 {
 	bool ret = Item::unserializeItemNode(f, node, propStream);
@@ -165,7 +146,6 @@ std::ostringstream& Container::getContentDescription(std::ostringstream& os) con
 		os << "nothing";
 
 	return os;
-	*/
 }
 
 Item* Container::getItem(uint32_t index)
@@ -777,14 +757,6 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 	itemlist.push_front(item);
 	item->setParent(this);
 }
-
-void Container::__startDecaying()
-{
-	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
-		(*it)->__startDecaying();
-	}
-}
-
 
 ContainerIterator Container::begin()
 {

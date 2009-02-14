@@ -127,7 +127,7 @@ enum passwordType_t{
 #define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
-	#if __GNUC__ < 4
+	#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 3)
 		#include <ext/hash_map>
 		#include <ext/hash_set>
 		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
@@ -137,7 +137,7 @@ enum passwordType_t{
 			#include <tr1/unordered_map>
 			#include <tr1/unordered_set>
 		#else
-			// these only work, for some reason, with c++0x standard enabled
+			// We can use C++0x features here
 			#include <unordered_map>
 			#include <unordered_set>
 		#endif
@@ -199,7 +199,7 @@ enum passwordType_t{
 	#include <string.h>
 	#include <assert.h>
 
-	#if __GNUC__ < 4
+	#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 3)
 		#include <ext/hash_map>
 		#include <ext/hash_set>
 		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
