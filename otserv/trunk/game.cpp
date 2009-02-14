@@ -4187,8 +4187,8 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 	uint8_t effect)
 {
 	SpectatorVec list;
-	getSpectators(list, fromPos, false, true);
-	getSpectators(list, toPos, true, true);
+	getSpectators(list, fromPos, false, false);
+	getSpectators(list, toPos, true, false);
 
 	//send to client
 	Player* tmpPlayer = NULL;
