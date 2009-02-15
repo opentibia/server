@@ -1,22 +1,19 @@
 
 local BringPlayer = Command:new("BringPlayer")
 
-BringPlayer.words = "/send"
+BringPlayer.words = "/c"
 BringPlayer.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager", "Server Administrator"}
 
 function BringPlayer.handler(event)
-	local name_, N = event.param:strip_whitespace():match("(.-)#(%d+)")
+	local name = event.param:strip_whitespace()
+	local name_, N = name:match("(.-)#(%d+)")
 	
-	if not name_ then
-		name_ = name
-	else
+	if name_ then
 		name = name_
-	end
-	
-	if not N then
-		N = 1
+		N = tonumber(N) or 1
 	else
-		N = tonumber(N)
+		name_ = name
+		N = 1
 	end
 	
 	local bplayer = nil

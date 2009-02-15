@@ -41,12 +41,11 @@ function SendPlayer.handler(event)
 		event.player:sendNote("No player by that name '" .. name .. "'.")
 		return
 	else
-		pos = players[N]:getPosition()
+		if players[N]:moveTo(dest) then
+			sendMagicEffect(dest, CONST_ME_TELEPORT)
+		end
 	end
 	
-	if event.player:moveTo(dest) then
-		sendMagicEffect(dest, CONST_ME_TELEPORT)
-	end
 end
 
 SendPlayer:register()

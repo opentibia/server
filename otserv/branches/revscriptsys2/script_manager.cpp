@@ -45,6 +45,25 @@ Manager* Manager::getManager() {
 ///////////////////////////////////////////////////////////////////////////////
 // Register functions
 
+int Manager::luaCompareClassInstances(lua_State* L)
+{
+	Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
+	Enviroment& e = manager->enviroment;
+	
+	// 2 class instances are ontop of the stack
+	Script::ObjectID* objid1 = (Script::ObjectID*)lua_touserdata(L, -1);
+	Script::ObjectID* objid2 = (Script::ObjectID*)lua_touserdata(L, -2);
+
+	lua_pop(L, 2);
+
+	if(objid1 == objid2)
+		lua_pushboolean(L, 1);
+	else
+		lua_pushboolean(L, 0);
+
+	return 1;
+}
+
 int Manager::luaFunctionCallback(lua_State* L) {
 	uint32_t callbackID = uint32_t(lua_tonumber(L, lua_upvalueindex(2)));
 	Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
@@ -383,6 +402,12 @@ void Manager::registerClass(const std::string& cname) {
 	
 	// Set the index metamethod for the class metatable to the class table
 	lua_setfield(state, -2, "__index"); 
+
+	// Push this manager (pointer cast is important!)
+	lua_pushlightuserdata(state, (Manager*)this);
+	// Create the function, with the manager stored in the closure
+	lua_pushcclosure(state, &Manager::luaCompareClassInstances, 1);
+	lua_setfield(state, -2, "__eq");
 
 	// Pop the class metatable
 	lua_pop(state, 1); 

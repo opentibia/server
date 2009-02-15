@@ -28,6 +28,7 @@
 #include "creature.h"
 #include "town.h"
 #include "chat.h"
+#include "house.h"
 
 extern Game g_game;
 extern Vocations g_vocations;
@@ -212,6 +213,11 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
 
 	// Town
+	registerMemberFunction("Town", "getTemplePosition()", &Manager::lua_Town_getTemplePosition);
+	registerMemberFunction("Town", "getName()", &Manager::lua_Town_getName);
+	registerMemberFunction("Town", "getID()", &Manager::lua_Town_getID);
+	
+	registerGlobalFunction("getAllTowns()", &Manager::lua_getTowns);
 
 	// Waypoint
 	registerMemberFunction("Waypoint", "getPosition()", &Manager::lua_Waypoint_getPosition);
@@ -328,21 +334,24 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 			enviroment.Generic.OnSay.push_back(listener);
 		}
 		else{
+			bool registered = false;
 			for(ListenerList::iterator listener_iter = enviroment.Generic.OnSay.begin(),
 				end = enviroment.Generic.OnSay.end();
 				listener_iter != end; ++listener_iter)
 			{
-				OnSay::ScriptInformation& info = boost::any_cast<OnSay::ScriptInformation>((*listener_iter)->getData());
+				OnSay::ScriptInformation info = boost::any_cast<OnSay::ScriptInformation>((*listener_iter)->getData());
 
 				if(si_onsay.method == OnSay::FILTER_MATCH_BEGINNING){
 					// We should be inserted before substrings...
 					if(info.method == OnSay::FILTER_SUBSTRING || info.method == OnSay::FILTER_ALL){
 						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						registered = true; 
 						break;
 					}
 
 					if(info.filter.length() < si_onsay.filter.length()){
 						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						registered = true; 
 						break;
 					}
 				}
@@ -351,15 +360,19 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 					// We should be inserted before generic...
 					if(info.method == OnSay::FILTER_ALL){
 						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						registered = true; 
 						break;
 					}
 
 					if(info.filter.length() < si_onsay.filter.length()){
 						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						registered = true; 
 						break;
 					}
 				}
 			}
+			if(!registered)
+				enviroment.Generic.OnSay.push_back(listener);
 		}
 	}
 	// Register event
@@ -2917,6 +2930,82 @@ int LuaState::luaDoRemoveCondition(lua_State *L)
 	return 1;
 }
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Town
+
+int LuaState::lua_Town_getTemplePosition()
+{
+	Town* town = popTown();
+	pushPosition(town->getTemplePosition());
+	return 1;
+}
+
+int LuaState::lua_Town_getID()
+{
+	Town* town = popTown();
+	pushInteger(town->getTownID());
+	return 1;
+}
+
+int LuaState::lua_Town_getName()
+{
+	Town* town = popTown();
+	pushString(town->getName());
+	return 1;
+}
+
+int LuaState::lua_Town_getHouse()
+{
+	Houses& houses = Houses::getInstance();
+
+	uint32_t houseid = 0;
+	std::string name;
+
+	if(isNumber()){
+		houseid = popInteger();
+		std::ostringstream os;
+		os << houseid;
+		name = os.str();
+	}
+	else{
+		name = popString();
+
+		for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
+			if(it->second->getName() == name)
+				houseid = it->second->getHouseId();
+		}
+		if(houseid == 0)
+			throw Script::Error("Town.getHouse : No house by the name '" + name + "' exists.");
+	}
+	Town* town = popTown();
+
+	House* house = houses.getHouse(houseid);
+
+	if(!house)
+		throw Script::Error("Town.getHouse : No house by the name '" + name + "' exists.");
+	if(house->getTownId() != town->getTownID())
+		throw Script::Error("Town.getHouse : No house by the name '" + name + "' exists belongs to the town " + town->getName());
+
+	pushHouse(house);
+	return 1;
+}
+
+int LuaState::lua_Town_getHouses()
+{
+	Town* town = popTown();
+
+	Houses& houses = Houses::getInstance();
+
+	newTable();
+	int n = 1;
+	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
+		pushHouse(it->second);
+		setField(-2, n++);
+	}
+	return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Channel
 
@@ -3027,6 +3116,19 @@ int LuaState::lua_getTile()
 	int y = popInteger();
 	int x = popInteger();
 	pushTile(g_game.getTile(x, y, z));
+	return 1;
+}
+
+int LuaState::lua_getTowns()
+{
+	Towns& towns = Towns::getInstance();
+
+	newTable();
+	int n = 1;
+	for(TownMap::const_iterator i = towns.getTownBegin(); i != towns.getTownEnd(); ++i){
+		pushTown(const_cast<Town*>((*i).second));
+		setField(-2, n++);
+	}
 	return 1;
 }
 

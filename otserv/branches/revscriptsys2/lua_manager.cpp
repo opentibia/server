@@ -335,6 +335,15 @@ void LuaState::pushTown(Town* town) {
 	}
 }
 
+void LuaState::pushHouse(House* house) {
+	if(house) {
+		Script::ObjectID* objid = pushClassInstance("House");
+		*objid = enviroment.addObject(house);
+	} else {
+		pushNil();
+	}
+}
+
 void LuaState::pushChannel(ChatChannel* channel) {
 	if(channel) {
 		Script::ObjectID* objid = pushClassInstance("Channel");
@@ -413,6 +422,19 @@ ChatChannel* LuaState::popChannel(Script::ErrorMode mode /* = Script::ERROR_THRO
 	pop();
 
 	return (ChatChannel*)enviroment.getObject(*objid);
+}
+
+House* LuaState::popHouse(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	if(!isUserdata(-1)) {
+		HandleError(mode, std::string("Couldn't pop house, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		pop();
+		return NULL;
+	}
+
+	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
+	pop();
+
+	return (House*)enviroment.getObject(*objid);
 }
 
 Waypoint_ptr LuaState::popWaypoint(Script::ErrorMode mode /* = Script::ERROR_THROW */) {

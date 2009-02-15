@@ -2,7 +2,7 @@
 local setstat = Command:new("SetStat")
 
 setstat.words = {"/ss", "/setstat"}
-setstat.groups = {"Community Manager"}
+setstat.groups = {"Community Manager", "Server Administrator"}
 
 -- Handlers
 function setstat.handler(event)

@@ -2,12 +2,12 @@
 local MoveUp = Command:new("MoveUp")
 
 MoveUp.words = "/up"
-MoveUp.groups = {"GM"}
+MoveUp.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager", "Server Administrator"}
 
-MoveDown = Command:new("MoveDown")
+local MoveDown = Command:new("MoveDown")
 
 MoveDown.words = "/down"
-MoveDown.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager"}
+MoveDown.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager", "Server Administrator"}
 
 -- Handlers
 function MoveUp.handler(event)

@@ -344,6 +344,13 @@ public:
 
 	int lua_Tile_queryAdd();
 
+	// - Town
+	int lua_Town_getTemplePosition();
+	int lua_Town_getID();
+	int lua_Town_getName();
+	int lua_Town_getHouse();
+	int lua_Town_getHouses();
+
 	// - Channel
 	int lua_Channel_getID();
 	int lua_Channel_getName();
@@ -360,6 +367,7 @@ public:
 	// - Game
 	int lua_sendMagicEffect();
 	int lua_getTile();
+	int lua_getTowns();
 
 protected:
 	virtual Script::Manager* getManager() = 0;

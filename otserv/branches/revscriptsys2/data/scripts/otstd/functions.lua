@@ -245,11 +245,18 @@ function getDestination(param)
 			pos = players[N]:getPosition()
 		end
 	elseif kind == "waypoint" or kind == "wp" then
-		local waypoint = getWaypointByName(name)
+		local waypoint = map:getWaypoint(name)
 		if waypoint then
 			pos = waypoint:getPosition()
 		else
 			return "No waypoint by that name."
+		end
+	elseif (kind == "town" or kind == "t") and tonumber(name) == nil then
+		local town = map:getTownWildcard(name)
+		if town then
+			pos = town:getTemplePosition()
+		else
+			return "No town by that name."
 		end
 	else
 		-- Deduce type
@@ -267,9 +274,19 @@ function getDestination(param)
 				local creatures = getCreaturesByName(name)
 				if N >= 1 and N <= #creatures then
 					pos = creatures[N]:getPosition()
+				else
+					-- Try town
+					local town = map:getTownWildcard(name)
+					if town then
+						pos = town:getTemplePosition()
+					end
 				end
 			end
 		end
+	end
+	
+	if not pos then
+		return "Can not find player/waypoint, enter on the form 'kind:name#N'"
 	end
 	
 	return pos

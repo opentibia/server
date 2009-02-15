@@ -2,7 +2,7 @@
 local MakeItem = Command:new("MakeItem")
 
 MakeItem.words = "/n"
-MakeItem.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager"}
+MakeItem.groups = {"Community Manager", "Server Administrator"}
 
 function MakeItem.handler(event)
 	local name = event.param

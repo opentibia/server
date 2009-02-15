@@ -39,6 +39,7 @@ require("otstd/classes/tile")
 require("otstd/classes/map")
 require("otstd/classes/town")
 require("otstd/classes/house")
+require("otstd/classes/waypoint")
 
 require("otstd/classes/chat")
 require("otstd/classes/spell")

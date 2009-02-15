@@ -77,6 +77,7 @@ namespace Script {
 
 		// Callback from lua
 		static int luaFunctionCallback(lua_State* L);
+		static int luaCompareClassInstances(lua_State* L);
 
 		// Parse arguments
 		ComposedCallback_ptr parseFunctionDeclaration(std::string s);
