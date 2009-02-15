@@ -2,7 +2,7 @@
 local setstat = Command:new("SetStat")
 
 setstat.words = {"/ss", "/setstat"}
-setstat.groups = "All"
+MoveDown.groups = {"Community Manager"}
 
 -- Handlers
 function setstat.handler(event)

@@ -200,6 +200,23 @@ CREATE TABLE `schema_info` (
 
 INSERT INTO `schema_info` (`version`) VALUES (2);
 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('1', 'Player', 0, 0, 1000, 50);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('2', 'Premium Player', 0, 0, 2000, 100);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('3', 'Tutor', 16777216, 0, 1000, 50);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('4', 'Premium Tutor', 16777216, 0, 2000, 100);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('5', 'Gamemaster', 217768239050, 1, 2000, 300);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('6', 'Senior Gamemaster', 269307846602, 2, 2000, 300);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('7', 'Community Manager', 272227082232, 3, 2000, 300);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('8', 'Server Administrator', 272227082232, 3, 2000, 300);
+
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
 AS $$

@@ -27,6 +27,7 @@
 ConfigManager::ConfigManager()
 {
 	m_isLoaded = false;
+	L = NULL;
 }
 
 ConfigManager::~ConfigManager()
@@ -46,6 +47,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	if(luaL_dofile(L, _filename.c_str()))
 	{
 		lua_close(L);
+		L = NULL;
 		return false;
 	}
 

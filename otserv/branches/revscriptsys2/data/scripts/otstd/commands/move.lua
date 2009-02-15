@@ -2,7 +2,7 @@
 local MoveForward = Command:new("MoveForward")
 
 MoveForward.words = "/a"
-MoveForward.groups = {"GM"}
+MoveDown.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager"}
 
 function MoveForward.handler(event)
 	local dir = event.creature:getOrientation()

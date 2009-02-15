@@ -7,7 +7,7 @@ MoveUp.groups = {"GM"}
 MoveDown = Command:new("MoveDown")
 
 MoveDown.words = "/down"
-MoveDown.groups = {"GM"}
+MoveDown.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager"}
 
 -- Handlers
 function MoveUp.handler(event)
