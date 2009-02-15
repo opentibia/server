@@ -2,7 +2,8 @@ moveitem_example = {}
 
 function moveitem_example.addItem_callback(event)
 	if(event.actor) then
-		event.actor:say("I moved the item " .. event.item:getItemID())
+		local pos = event.tile:getPosition()
+		event.actor:say("I moved the " .. event.item:getName() .. " to " .. pos.x .. ":" .. pos.y .. ":" .. pos.z)
 	end
 end
 
@@ -10,7 +11,9 @@ moveitem_example.addtileitem_listener = registerOnAddTileItem("itemid", 1988, fa
 
 function moveitem_example.removeItem_callback(event)
 	if(event.actor) then
-		event.actor:say("I moved the item " .. event.item:getItemID())
+		local pos = event.tile:getPosition()
+		wait(2000)
+		event.actor:say("I moved the " .. event.item:getName() .. " from " .. pos.x .. ":" .. pos.y .. ":" .. pos.z)
 	end
 end
 

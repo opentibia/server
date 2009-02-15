@@ -33,6 +33,7 @@
 #include <sstream>
 
 extern Game g_game;
+extern ConfigManager g_config;
 
 Combat::Combat()
 {

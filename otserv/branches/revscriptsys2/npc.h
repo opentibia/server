@@ -31,6 +31,7 @@ struct NpcState;
 class Npc : public Creature
 {
 public:
+	Npc(const std::string& _name);
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t npcCount;
 #endif
@@ -60,8 +61,6 @@ public:
 	void doMoveTo(Position pos);
 
 protected:
-	Npc(const std::string& _name);
-
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
 		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);

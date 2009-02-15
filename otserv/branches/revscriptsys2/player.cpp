@@ -38,6 +38,7 @@
 #include "status.h"
 #include "beds.h"
 #include "party.h"
+#include "weapons.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -1987,8 +1988,6 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 	if(blockType != BLOCK_NONE) 
 		return blockType; 
 
-	}
-
 	if(damage != 0){
 		//reduce damage against inventory items
 		Item* item = NULL;
@@ -2001,7 +2000,8 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			if(it.abilities.absorb.reduce(combatType, damage)){
 				int32_t charges = item->getCharges();
 				if(charges != 0)
-					g_game.transformItem(item, item->getID(), charges - 1);
+					// Are the person hit responsible for the action...?
+					g_game.transformItem(NULL, item, item->getID(), charges - 1);
 			}
 		}
 
@@ -2009,62 +2009,6 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			damage = 0;
 			blockType = BLOCK_DEFENSE;
 		}
-	}
-		case COMBAT_MANADRAIN: 
-			{ 
-				if(absorbPercentManaDrain != 0) 
-				{ 
-					blocked_damage += damage * absorbPercentManaDrain / 100;
-				} 
-				break; 
-			} 
-
-		case COMBAT_DROWNDAMAGE: 
-			{ 
-				if(absorbPercentDrown != 0) 
-				{ 
-					blocked_damage += damage * absorbPercentDrown / 100;
-				} 
-				break; 
-			} 
-
-		case COMBAT_ICEDAMAGE: 
-			{ 
-				if(absorbPercentIce != 0) 
-				{ 
-					blocked_damage += damage * absorbPercentIce / 100;
-				} 
-				break; 
-			} 
-
-		case COMBAT_HOLYDAMAGE: 
-			{ 
-				if(absorbPercentHoly != 0) 
-				{ 
-					blocked_damage += damage * absorbPercentHoly / 100;
-				} 
-				break; 
-			} 
-
-		case COMBAT_DEATHDAMAGE: 
-			{ 
-				if(absorbPercentDeath != 0) 
-				{ 
-					blocked_damage += damage * absorbPercentDeath / 100;
-				} 
-				break; 
-			} 
-
-		default: 
-			break; 
-		} 
-
-		damage -= blocked_damage; 
-		if(damage <= 0) 
-		{ 
-			damage = 0; 
-			blockType = BLOCK_DEFENSE; 
-		} 
 	} 
 	return blockType; 
 }
@@ -2500,7 +2444,6 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 									}
 								}
 							}
-							}
 						}
 					}
 				}
@@ -2540,7 +2483,6 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 										ret = RET_CANONLYUSEONEWEAPON;
 									}
 								}
-							}
 							}
 						}
 					}

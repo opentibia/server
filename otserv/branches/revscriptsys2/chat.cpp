@@ -155,9 +155,11 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& t
 	UsersMap::iterator it;
 
 	// Can't speak to a channel you're not connected to
-	UsersMap::const_iterator iter = m_users.find(fromPlayer->getID());
-	if(iter == m_users.end())
-		return false;
+	if(fromPlayer){
+		UsersMap::const_iterator iter = m_users.find(fromPlayer->getID());
+		if(iter == m_users.end())
+			return false;
+	}
 
 	for(it = m_users.begin(); it != m_users.end(); ++it){
 		it->second->sendToChannel(fromPlayer, type, text, getId(), time);
@@ -166,7 +168,7 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& t
 	return success;
 }
 
-bool ChatChannel::sendInfo(SpeakClasses type, const std::string& text, uint32_t time)
+bool ChatChannel::sendInfo(SpeakClass type, const std::string& text, uint32_t time)
 {
 	bool success = false;
 	UsersMap::iterator it;

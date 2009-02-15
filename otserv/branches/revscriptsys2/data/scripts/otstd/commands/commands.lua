@@ -37,7 +37,7 @@ function Command:register()
 					self.handler(event)
 				end
 			else
-				print "Not a player :("
+				error("A non-player creature attempted to use a command.")
 			end
 		end
 		

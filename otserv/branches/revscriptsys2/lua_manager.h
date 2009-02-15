@@ -367,6 +367,9 @@ public:
 
 	bool ok() const;
 protected:
+	// Prints a stack trace
+	void report();
+
 	virtual Script::Manager* getManager();
 
 	LuaStateManager& manager;
@@ -397,6 +400,7 @@ public:
 		}
 	};
 protected:
+
 	typedef std::map<lua_State*, LuaThread_ptr> ThreadMap;
 	ThreadMap threads;
 	std::priority_queue<ThreadSchedule> queued_threads;

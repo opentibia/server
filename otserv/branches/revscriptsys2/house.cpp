@@ -940,7 +940,7 @@ bool Houses::payHouses()
 			// when items are transferred to his depot
 			bool savePlayerHere = true;
 			if(depot){
-				bool useAccBalance = g_config.getNumber(ConfigManager::USE_ACCBALANCE);
+				bool useAccBalance = g_config.getNumber(ConfigManager::USE_ACCBALANCE) != 0;
 				bool hasEnoughMoney = false;
 
 				if(useAccBalance){
@@ -950,7 +950,7 @@ bool Houses::payHouses()
                     }
 				}
 				else{
-					hasEnoughMoney = g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT);
+					hasEnoughMoney = g_game.removeMoney(NULL, depot, house->getRent(), FLAG_NOLIMIT);
 				}
 
 				//get money from depot

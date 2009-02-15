@@ -104,6 +104,7 @@ typedef std::vector<Player*> PlayerVector;
 #define EVENT_DECAYINTERVAL  1000
 #define EVENT_DECAY_BUCKETS  16
 #define EVENT_SCRIPT_CLEANUP_INTERVAL  90000
+#define EVENT_SCRIPT_TIMER_INTERVAL 50
 
 // These are here to avoid expensive includes (extern is much cheaper! :))
 void g_gameOnLeaveChannel(Player* player, ChatChannel* channel);
@@ -139,6 +140,11 @@ public:
 	* Cleans up script handles etc.
 	*/
 	void scriptCleanup();
+
+	/**
+	 * Runs waiting scripts, reschedules itself every 50 ms
+	 */
+	void runWaitingScripts();
 
 	/**
 	  * Get the map size - info purpose only
@@ -434,7 +440,7 @@ public:
 	bool playerCloseTrade(uint32_t playerId);
 
 	bool playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
-		uint8_t amount);
+		uint8_t amount, bool ignoreCapacity, bool buyWithBackpack);
 	bool playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		uint8_t amount);
 	bool playerCloseShop(uint32_t playerId);

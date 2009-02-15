@@ -41,7 +41,7 @@ public:
 	virtual bool configureWeapon(const ItemType& it);
 	virtual bool interruptSwing() const {return false;}
 
-	static int32_t getMaxWeaponDamage(int32_t attackSkill, int32_t attackValue, float attackFactor);
+	static int32_t getMaxWeaponDamage(int32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor);
 	static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue);
 
 	virtual int32_t playerWeaponCheck(Player* player, Creature* target) const;

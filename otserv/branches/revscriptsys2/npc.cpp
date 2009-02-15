@@ -1042,11 +1042,6 @@ void Npc::onThink(uint32_t interval)
 	// REVSCRIPT TODO Event callback
 }
 
-void Npc::doSay(std::string msg)
-{
-	g_game.internalCreatureSay(this, SPEAK_SAY, msg);
-}
-
 void Npc::doMove(Direction dir)
 {
 	g_game.internalMoveCreature(this, this, dir);

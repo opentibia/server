@@ -66,7 +66,9 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 
 
 	// Run thread
-	thread->run(1);
+	int ms = thread->run(1);
+	if(ms > 0)
+		state.scheduleThread(ms, thread);
 
 	if(thread->ok() == false) {
 		state.pushNil();

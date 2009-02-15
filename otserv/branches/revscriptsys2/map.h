@@ -164,6 +164,11 @@ public:
 	Map();
 	~Map();
 
+	static const int32_t maxViewportX = 11;		//min value: maxClientViewportX + 1
+	static const int32_t maxViewportY = 11;		//min value: maxClientViewportY + 1
+	static const int32_t maxClientViewportX = 8;
+	static const int32_t maxClientViewportY = 6;
+
 	/**
 	* Load a map.
 	* \param identifier file/database to load

@@ -1385,7 +1385,7 @@ int LuaState::lua_Player_getStorageValue() {
 
 int LuaState::lua_Player_getFood() {
 	Player* p = popPlayer();
-	Condition* condition = p->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
+	Condition* condition = p->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 	if(condition){
 		push(condition->getTicks() / 1000);
 	}

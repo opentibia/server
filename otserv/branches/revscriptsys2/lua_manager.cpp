@@ -551,43 +551,50 @@ Script::Manager* LuaThread::getManager() {
 	return static_cast<Script::Manager*>(&manager);
 }
 
+void LuaThread::report(){
+	std::string errmsg = popString();
+	std::cout << "Lua Error: " << errmsg << "\n";
+	std::cout << "Stack trace:\n";
+	std::cout << "Line\tFunction\t\tSource\n";
+
+	lua_Debug ar;
+
+	int level = 0;
+	while(lua_getstack(state, level++, &ar) != 0) {
+		lua_getinfo(state, "nSl", &ar);
+
+		if(ar.currentline != -1) {
+			std::cout << ar.currentline;
+		}
+		std::cout << "\t";
+
+		int tabcount = 16;
+		if(ar.name) {
+			std::cout << ar.name;
+			tabcount -= 16 - strlen(ar.name);
+		}
+		while(tabcount-- > 0) std::cout << " ";
+
+		std::cout << ar.short_src;
+		std::cout << "\n";
+	}
+}
+
 int32_t LuaThread::run(int args) {
 	int ret = lua_resume(state, args);
 	thread_state = ret;
 	if(ret == LUA_YIELD) {
 		// Thread yielded, add us to the manager
+		if(!isNumber()){
+			report();
+			return 0;
+		}
 		int32_t schedule = popInteger();
 		return schedule;
 	} else if(ret == 0) {
 		// Thread exited normally, do nothing, it will be garbage collected
 	} else if(ret == LUA_ERRRUN) {
-		std::string errmsg = popString();
-		std::cout << "Lua Error: " << errmsg << "\n";
-		std::cout << "Stack trace:\n";
-		std::cout << "Line\tFunction\t\tSource\n";
-
-		lua_Debug ar;
-
-		int level = 0;
-		while(lua_getstack(state, level++, &ar) != 0) {
-			lua_getinfo(state, "nSl", &ar);
-
-			if(ar.currentline != -1) {
-				std::cout << ar.currentline;
-			}
-			std::cout << "\t";
-
-			int tabcount = 16;
-			if(ar.name) {
-				std::cout << ar.name;
-				tabcount -= 16 - strlen(ar.name);
-			}
-			while(tabcount-- > 0) std::cout << " ";
-
-			std::cout << ar.short_src;
-			std::cout << "\n";
-		}
-
+		report();
 	} else if(ret == LUA_ERRERR) {
 		// Can't handle, just print error message
 		std::cout << "Lua Error when recovering from error (thread " << name << ")\n";

@@ -93,6 +93,9 @@ Game::Game()
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_CLEANUP_INTERVAL,
 		boost::bind(&Game::scriptCleanup, this)));
+	
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_TIMER_INTERVAL,
+		boost::bind(&Game::runWaitingScripts, this)));
 }
 
 Game::~Game()
@@ -189,7 +192,17 @@ int Game::loadMap(std::string filename, std::string filekind)
 	return map->loadMap(filename, filekind);
 }
 
-bool Game::loadScripts() {
+void Game::runWaitingScripts()
+{
+	if(script_system){
+		script_system->runScheduledThreads();
+	}
+	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_TIMER_INTERVAL,
+		boost::bind(&Game::runWaitingScripts, this)));
+}
+
+bool Game::loadScripts() 
+{
 	// Unload any old
 	if(script_enviroment || script_system) {
 		for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
@@ -225,7 +238,8 @@ bool Game::loadScripts() {
 	return true;
 }
 
-void Game::scriptCleanup() {
+void Game::scriptCleanup()
+{
 	script_enviroment->cleanupUnusedListeners();
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_CLEANUP_INTERVAL,
@@ -658,7 +672,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			else if(type == STACKPOS_USEITEM){
 				//First check items with topOrder 2 (ladders, signs, splashes)
 				Item* item =  tile->getItemByTopOrder(2);
-				if(item && g_actions->hasAction(item)){
+				if(item){// && g_actions->hasAction(item)){
 					thing = item;
 				}
 				else{
@@ -3218,7 +3232,7 @@ bool Game::internalCloseTrade(Player* player)
 }
 
 bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
-	uint8_t amount)
+	uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
 	Player* player = getPlayerByID(playerId);
 	if(player == NULL || player->isRemoved())
@@ -4278,12 +4292,17 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 	return false;
 }
 
-bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange, bool showeffect /*= true*/)
+bool Game::combatChangeHealth(CombatType_t combatType, 
+	Creature* attacker, Creature* target, int32_t healthChange, 
+	bool showeffect /*= true*/)
 {
 	return combatChangeHealth(combatType, NM_ME_UNK, TEXTCOLOR_UNK, attacker, target, healthChange);
 }
 
-bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses customHitEffect, TextColor_t customTextColor, Creature* attacker, Creature* target, int32_t healthChange)
+bool Game::combatChangeHealth(CombatType_t combatType, 
+	MagicEffectClasses customHitEffect, TextColor_t customTextColor, 
+	Creature* attacker, Creature* target, int32_t healthChange, 
+	bool showeffect)
 {
 	const Position& targetPos = target->getPosition();
 
@@ -4436,19 +4455,19 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 						addMagicEffect(list, targetPos, hitEffect);
 						addAnimatedText(list, targetPos, textColor, ss.str());
 					}
-				}
 
-				if(customHitEffect != NM_ME_UNK)
-					hitEffect = customHitEffect;
+					if(customHitEffect != NM_ME_UNK)
+						hitEffect = customHitEffect;
 
-				if(customTextColor != TEXTCOLOR_UNK)
-					textColor = customTextColor;
+					if(customTextColor != TEXTCOLOR_UNK)
+						textColor = customTextColor;
 
-				if(textColor != TEXTCOLOR_NONE){
-					std::stringstream ss;
-					ss << damage;
-					addMagicEffect(list, targetPos, hitEffect);
-					addAnimatedText(list, targetPos, textColor, ss.str());
+					if(textColor != TEXTCOLOR_NONE){
+						std::stringstream ss;
+						ss << damage;
+						addMagicEffect(list, targetPos, hitEffect);
+						addAnimatedText(list, targetPos, textColor, ss.str());
+					}
 				}
 			}
 		}
@@ -4583,8 +4602,8 @@ void Game::startDecay(Item* item)
 {
 	Container* container = item->getContainer();
 	if(container){
-		for(ItemList::iterator it = container.begin(); it != container.end(); ++it){
-			startDecay(*it);
+		for(ItemList::const_iterator it = container->getItems(); it != container->getEnd(); ++it){
+			startDecay(const_cast<Item*>(*it));
 		}
 	}
 
@@ -4629,8 +4648,6 @@ void Game::checkDecay()
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
 		boost::bind(&Game::checkDecay, this)));
 	
-	size_t bucket = (last_bucket + 1) % EVENT_DECAY_BUCKETS;
-
 	size_t bucket = (last_bucket + 1) % EVENT_DECAY_BUCKETS;
 
 	for(DecayList::iterator it = decayItems[bucket].begin(); it != decayItems[bucket].end();){

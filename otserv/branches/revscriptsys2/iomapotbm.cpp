@@ -90,6 +90,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		return false;
 	}
 
+	int header_version = root_header->version;
+
 	if(root_header->version <= 0){
 		//In otbm version 1 the count variable after splashes/fluidcontainers and stackables
 		//are saved as attributes instead, this solves alot of problems with items
@@ -430,7 +432,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 				nodeTown = f.getNextNode(nodeTown, type);
 			}
 		}
-		else if(type == OTBM_WAYPOINTS && root_header->version >= 2){
+		else if(type == OTBM_WAYPOINTS && header_version >= 2){
 			NODE nodeWaypoint = f.getChildNode(nodeMapData, type);
 			while(nodeWaypoint != NO_NODE){
 				if(type == OTBM_WAYPOINT){

@@ -132,7 +132,7 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 
 					if(pid == 0){
 						tile->__internalAddThing(item);
-						item->__startDecaying();
+						g_game.startDecay(item);
 					}
 				}
 				else
@@ -168,7 +168,7 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 					std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
 				}
 
-				item = g_game.transformItem(item, type);
+				item = g_game.transformItem(NULL, item, type);
 
 				std::pair<Item*, int> myPair(item, pid);
 				itemMap[sid] = myPair;
@@ -379,7 +379,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 		if(item){
 			bool ret = item->unserializeAttr(propStream);
 
-			item = g_game.transformItem(item, id);
+			item = g_game.transformItem(NULL, item, id);
 
 			if(!ret) {
 				// Somewhat ugly hack to inject a custom attribute for container items
@@ -447,7 +447,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent){
 		{
 			bool ret = item->unserializeAttr(propStream);
 
-			item = g_game.transformItem(item, id);
+			item = g_game.transformItem(NULL, item, id);
 
 			// Code duplication is bad, fix?
 			if(!ret) {
