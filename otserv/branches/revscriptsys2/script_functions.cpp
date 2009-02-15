@@ -125,6 +125,9 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
 	registerMemberFunction("Creature", "say(string msg)", &Manager::lua_Creature_say);
 
+	registerGlobalFunction("getCreatureByName(string name)", &Manager::lua_getCreatureByName);
+	registerGlobalFunction("getCreaturesByName(string name)", &Manager::lua_getCreaturesByName);
+
 	// Player
 	registerMemberFunction("Player", "setStorageValue(string key, string value)", &Manager::lua_Player_setStorageValue);
 	registerMemberFunction("Player", "getStorageValue(string key)", &Manager::lua_Player_getStorageValue);
@@ -166,6 +169,10 @@ void Manager::registerClasses() {
 
 	registerMemberFunction("Player", "sendMessage(int type, string msg)", &Manager::lua_Player_sendMessage);
 
+	registerGlobalFunction("getPlayerByName(string name)", &Manager::lua_getPlayerByName);
+	registerGlobalFunction("getPlayerByNameWildcard(string wild)", &Manager::lua_getPlayerByNameWildcard);
+	registerGlobalFunction("getPlayersByName(string name)", &Manager::lua_getPlayersByName);
+	registerGlobalFunction("getPlayersByNameWildcard(string wild)", &Manager::lua_getPlayersByNameWildcard);
 
 	// Item
 	registerGlobalFunction("createItem(int newid[, int count])", &Manager::lua_createItem);
@@ -205,6 +212,12 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
 
 	// Town
+
+	// Waypoint
+	registerMemberFunction("Waypoint", "getPosition()", &Manager::lua_Waypoint_getPosition);
+	registerMemberFunction("Waypoint", "getName()", &Manager::lua_Waypoint_getName);
+
+	registerGlobalFunction("getWaypointByName(string name)", &Manager::lua_getWaypointByName);
 
 	// House
 
@@ -301,8 +314,54 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 	boost::any p(si_onsay);
 	Listener_ptr listener(new Listener(ON_SAY_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnSay.push_back(listener);
+	// OnSay event list is sorted by length, from longest to shortest
+	if(si_onsay.method == OnSay::FILTER_EXACT){
+		// Insert at beginning
+		enviroment.Generic.OnSay.insert(enviroment.Generic.OnSay.begin(), listener);
+	}
+	else if(si_onsay.method == OnSay::FILTER_ALL){
+		// All comes very last
+		enviroment.Generic.OnSay.push_back(listener);
+	}
+	else{
+		if(enviroment.Generic.OnSay.empty()){
+			enviroment.Generic.OnSay.push_back(listener);
+		}
+		else{
+			for(ListenerList::iterator listener_iter = enviroment.Generic.OnSay.begin(),
+				end = enviroment.Generic.OnSay.end();
+				listener_iter != end; ++listener_iter)
+			{
+				OnSay::ScriptInformation& info = boost::any_cast<OnSay::ScriptInformation>((*listener_iter)->getData());
 
+				if(si_onsay.method == OnSay::FILTER_MATCH_BEGINNING){
+					// We should be inserted before substrings...
+					if(info.method == OnSay::FILTER_SUBSTRING || info.method == OnSay::FILTER_ALL){
+						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						break;
+					}
+
+					if(info.filter.length() < si_onsay.filter.length()){
+						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						break;
+					}
+				}
+				else{
+					assert(si_onsay.method == OnSay::FILTER_SUBSTRING);
+					// We should be inserted before generic...
+					if(info.method == OnSay::FILTER_ALL){
+						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						break;
+					}
+
+					if(info.filter.length() < si_onsay.filter.length()){
+						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						break;
+					}
+				}
+			}
+		}
+	}
 	// Register event
 	setRegistryItem(listener->getLuaTag());
 
@@ -1348,6 +1407,27 @@ int LuaState::lua_Creature_say()
 	return 1;
 }
 
+int LuaState::lua_getCreatureByName()
+{
+	std::string name = popString();
+	pushThing(g_game.getCreatureByName(name));
+	return 1 ;
+}
+
+int LuaState::lua_getCreaturesByName()
+{
+	std::string name = popString();
+	std::vector<Creature*> creatures = g_game.getCreaturesByName(name);
+
+	int n = 1;
+	newTable();
+	for(std::vector<Creature*>::iterator i = creatures.begin(); i != creatures.end(); ++i){
+		pushThing(*i);
+		setField(-2, n++);
+	}
+	return 1 ;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Class Player
 
@@ -1671,6 +1751,53 @@ int LuaState::lua_Player_addItem()
 	}
 	pushBoolean(ret == RET_NOERROR);
 	return 1;
+}
+
+int LuaState::lua_getPlayerByName()
+{
+	std::string name = popString();
+	pushThing(g_game.getPlayerByName(name));
+	return 1 ;
+}
+
+int LuaState::lua_getPlayersByName()
+{
+	std::string name = popString();
+	std::vector<Player*> players = g_game.getPlayersByName(name);
+
+	int n = 1;
+	newTable();
+	for(std::vector<Player*>::iterator i = players.begin(); i != players.end(); ++i){
+		pushThing(*i);
+		setField(-2, n++);
+	}
+	return 1 ;
+}
+
+int LuaState::lua_getPlayerByNameWildcard()
+{
+	std::string name = popString();
+
+	Player* p = NULL;
+	ReturnValue ret = g_game.getPlayerByNameWildcard(name, p);
+
+	pushInteger(ret);
+	pushThing(p);
+	return 2;
+}
+
+int LuaState::lua_getPlayersByNameWildcard()
+{
+	std::string name = popString();
+	std::vector<Player*> players = g_game.getPlayersByNameWildcard(name);
+
+	int n = 1;
+	newTable();
+	for(std::vector<Player*>::iterator i = players.begin(); i != players.end(); ++i){
+		pushThing(*i);
+		setField(-2, n++);
+	}
+	return 1 ;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2862,6 +2989,22 @@ int LuaState::lua_getWaypointByName()
 	else{
 		pushNil();
 	}
+	return 1;
+}
+
+int LuaState::lua_Waypoint_getPosition()
+{
+	Waypoint_ptr wp = popWaypoint();
+
+	pushPosition(wp->pos);
+	return 1;
+}
+
+int LuaState::lua_Waypoint_getName()
+{
+	Waypoint_ptr wp = popWaypoint();
+
+	pushString(wp->name);
 	return 1;
 }
 

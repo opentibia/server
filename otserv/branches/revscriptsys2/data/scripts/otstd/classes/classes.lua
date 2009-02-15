@@ -1,6 +1,13 @@
 
 
 function isOfType(val, t)
+	if val == nil then
+		if t == nil or t == "nil" then
+			return true
+		end
+		return false
+	end
+	
 	if val["type"] ~= nil then
 		repeat
 			if val["type"] ~= nil and val:type() == t then

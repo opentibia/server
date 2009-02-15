@@ -41,7 +41,7 @@ function Command:register()
 			end
 		end
 		
-		table.insert(self.Listeners, registerOnSay("beginning", true, words.." ", internalHandler))
+		table.insert(self.Listeners, registerOnSay("beginning", true, words, internalHandler))
 	end
 	
 	self.Listeners = {}
@@ -61,3 +61,6 @@ require("otstd/commands/floorchange")
 require("otstd/commands/makeitem")
 require("otstd/commands/age")
 require("otstd/commands/statset")
+require("otstd/commands/goto")
+require("otstd/commands/send")
+require("otstd/commands/bring")

@@ -253,6 +253,8 @@ public:
 
 	int lua_Creature_walk();
 
+	int lua_getCreatureByName();
+	int lua_getCreaturesByName();
 
 	// - - - Player
 	int lua_Player_getFood();
@@ -299,6 +301,11 @@ public:
 	int lua_Player_removeMoney();
 
 	int lua_Player_sendMessage();
+
+	int lua_getPlayerByName();
+	int lua_getPlayersByName();
+	int lua_getPlayerByNameWildcard();
+	int lua_getPlayersByNameWildcard();
 
 	// - - Item
 	int lua_createItem();
@@ -347,6 +354,8 @@ public:
 
 	// - Waypoints
 	int lua_getWaypointByName();
+	int lua_Waypoint_getName();
+	int lua_Waypoint_getPosition();
 
 	// - Game
 	int lua_sendMagicEffect();

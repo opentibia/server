@@ -47,12 +47,13 @@ protected:
 
 inline void Waypoints::addWaypoint(Waypoint_ptr wp)
 {
-	waypoints.insert(std::make_pair(wp->name, wp));
+	waypoints.insert(std::make_pair(asUpperCaseString(wp->name), wp));
 }
 
 inline Waypoint_ptr Waypoints::getWaypointByName(const std::string& name) const
 {
-	WaypointMap::const_iterator f = waypoints.find(name);
+	std::string s = asUpperCaseString(name);
+	WaypointMap::const_iterator f = waypoints.find(s);
 	if(f == waypoints.end()) {
 		return Waypoint_ptr();
 	}

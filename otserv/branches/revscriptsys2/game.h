@@ -208,11 +208,26 @@ public:
 	Creature* getCreatureByName(const std::string& s);
 
 	/**
+	  * Returns a list of creatures based on a string name identifier
+	  * \param s is the name identifier
+	  * \return A vector of the creatures
+	  */
+	std::vector<Creature*> getCreaturesByName(const std::string& s);
+
+	/**
 	  * Returns a player based on a string name identifier
 	  * \param s is the name identifier
 	  * \return A Pointer to the player
 	  */
 	Player* getPlayerByName(const std::string& s);
+
+
+	/**
+	  * Returns a list of players based on a string name identifier
+	  * \param s is the name identifier
+	  * \return A vector of all the players
+	  */
+	std::vector<Player*> getPlayersByName(const std::string& s);
 
 	/**
 	  * Returns a player based on a string name identifier, with support for the "~" wildcard.
@@ -221,6 +236,13 @@ public:
 	  * \return "RET_PLAYERWITHTHISNAMEISNOTONLINE" or "RET_NAMEISTOOAMBIGIOUS"
 	  */
 	ReturnValue getPlayerByNameWildcard(const std::string& s, Player* &player);
+
+	/**
+	  * Returns a list of players based on a string name identifier, with support for the "~" wildcard.
+	  * \param s is the name identifier, with or without wildcard
+	  * \return A list of all matching players, or none if none matched.
+	  */
+	std::vector<Player*> getPlayersByNameWildcard(const std::string& s);
 
 	/**
 	  * Returns a player based on an account number identifier

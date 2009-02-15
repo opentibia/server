@@ -797,8 +797,8 @@ Creature* Game::getCreatureByID(uint32_t id)
 
 	AutoList<Creature>::listiterator it = listCreature.list.find(id);
 	if(it != listCreature.list.end()){
-		if(!(*it).second->isRemoved())
-			return (*it).second;
+		if(!it->second->isRemoved())
+			return it->second;
 	}
 
 	return NULL; //just in case the player doesnt exist
@@ -811,8 +811,8 @@ Player* Game::getPlayerByID(uint32_t id)
 
 	AutoList<Player>::listiterator it = Player::listPlayer.list.find(id);
 	if(it != Player::listPlayer.list.end()) {
-		if(!(*it).second->isRemoved())
-			return (*it).second;
+		if(!it->second->isRemoved())
+			return it->second;
 	}
 
 	return NULL; //just in case the player doesnt exist
@@ -822,8 +822,8 @@ Creature* Game::getCreatureByName(const std::string& s)
 {
 	std::string txt1 = asUpperCaseString(s);
 	for(AutoList<Creature>::listiterator it = listCreature.list.begin(); it != listCreature.list.end(); ++it){
-		if(!(*it).second->isRemoved()){
-			std::string txt2 = asUpperCaseString((*it).second->getName());
+		if(!it->second->isRemoved()){
+			std::string txt2 = asUpperCaseString(it->second->getName());
 			if(txt1 == txt2)
 				return it->second;
 		}
@@ -832,18 +832,48 @@ Creature* Game::getCreatureByName(const std::string& s)
 	return NULL; //just in case the creature doesnt exist
 }
 
+std::vector<Creature*> Game::getCreaturesByName(const std::string& s)
+{
+	std::vector<Creature*> creaturesFound;
+	std::string txt1 = asUpperCaseString(s);
+	for(AutoList<Creature>::listiterator it = listCreature.list.begin(); it != listCreature.list.end(); ++it){
+		if(!it->second->isRemoved()){
+			std::string txt2 = asUpperCaseString(it->second->getName());
+			if(txt1 == txt2)
+				creaturesFound.push_back(it->second);
+		}
+	}
+
+	return creaturesFound;
+}
+
 Player* Game::getPlayerByName(const std::string& s)
 {
 	std::string txt1 = asUpperCaseString(s);
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		if(!(*it).second->isRemoved()){
-			std::string txt2 = asUpperCaseString((*it).second->getName());
+		if(!it->second->isRemoved()){
+			std::string txt2 = asUpperCaseString(it->second->getName());
 			if(txt1 == txt2)
 				return it->second;
 		}
 	}
 
 	return NULL; //just in case the player doesnt exist
+}
+
+std::vector<Player*> Game::getPlayersByName(const std::string& s)
+{
+	std::vector<Player*> playersFound;
+	std::string txt1 = asUpperCaseString(s);
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(!it->second->isRemoved()){
+			std::string txt2 = asUpperCaseString(it->second->getName());
+			if(txt1 == txt2)
+				playersFound.push_back(it->second);
+		}
+	}
+
+	return playersFound;
 }
 
 ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player* &player)
@@ -866,11 +896,11 @@ ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player* &player)
 	std::string txt1 = asUpperCaseString(s.substr(0, s.length()-1));
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		if(!(*it).second->isRemoved()){
-			std::string txt2 = asUpperCaseString((*it).second->getName());
+		if(!it->second->isRemoved()){
+			std::string txt2 = asUpperCaseString(it->second->getName());
 			if(txt2.substr(0, txt1.length()) == txt1){
 				if(lastFound == NULL)
-					lastFound = (*it).second;
+					lastFound = it->second;
 				else
 					return RET_NAMEISTOOAMBIGIOUS;
 			}
@@ -883,6 +913,29 @@ ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player* &player)
 	}
 
 	return RET_PLAYERWITHTHISNAMEISNOTONLINE;
+}
+
+std::vector<Player*> Game::getPlayersByNameWildcard(const std::string& s)
+{
+	if(s.empty())
+		return std::vector<Player*>();
+
+	if((*s.rbegin()) != '~')
+		return getPlayersByName(s);
+
+	std::vector<Player*> playersFound;
+	std::string txt1 = asUpperCaseString(s.substr(0, s.length()-1));
+
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(!it->second->isRemoved()){
+			std::string txt2 = asUpperCaseString(it->second->getName());
+			if(txt2.substr(0, txt1.length()) == txt1){
+				playersFound.push_back(it->second);
+			}
+		}
+	}
+
+	return playersFound;
 }
 
 Player* Game::getPlayerByAccount(uint32_t acc)
@@ -3668,19 +3721,19 @@ bool Game::checkReload(Player* player, const std::string& text)
 		std::string param = text.substr(8);
 
 		if(param == "monsters" || param == "monster"){
-			std::cout << "================================================================================";
+			std::cout << "================================================================================\n";
 			g_monsters.reload();
 			std::cout << ":: Reloaded Monsters " << std::endl;
 			if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded monsters.");
 		}
 		else if(param == "config"){
-			std::cout << "================================================================================";
+			std::cout << "================================================================================\n";
 			g_config.reload();
 			std::cout << ":: Reloaded config " << std::endl;
 			if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
 		}
 		else if(param == "scripts"){
-			std::cout << "================================================================================";
+			std::cout << "================================================================================\n";
 			g_game.loadScripts();
 			std::cout << ":: Reloaded Scripts " << std::endl;
 			if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded scripts.");

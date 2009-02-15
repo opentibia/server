@@ -193,3 +193,84 @@ function convertIPToInt(str)
 		return ipint, maskint
 	end
 end
+
+--
+
+function getDestination(param)
+	param = param:strip_whitespace()
+	local N = 1
+	local name = ""
+	local kind = nil
+	
+	kind, name, N = param:match "(%w+):(.-)#(%d+)"
+	if kind and name and N then
+		-- Match
+	else
+		kind, name = param:match "(%w+):(.+)"
+		if kind and name then -- Matched!
+			N = 1
+		else
+			name, N = param:match "(.-)#(%d+)"
+			if name and N then
+				-- Match
+				kind = nil
+			else
+				name = param:match "(.+)"
+				if name then
+					kind = nil
+					N = 1
+				else
+					return "Invalid parameters, enter on the form 'kind:name#N'"
+				end
+			end
+		end
+	end
+	
+	N = tonumber(N)
+	
+	local pos = nil
+	
+	if kind == "creature" or kind == "c" then
+		local creatures = getCreaturesByName(name)
+		if N > #creatures or N < 1 then
+			return "No creatures by that name."
+		else
+			pos = creatures[N]:getPosition()
+		end
+	elseif kind == "player" or kind == "p" then
+		local players = getPlayersByNameWildcard(name)
+		if N > #players or N < 1 then
+			return "No player by that name."
+		else
+			pos = players[N]:getPosition()
+		end
+	elseif kind == "waypoint" or kind == "wp" then
+		local waypoint = getWaypointByName(name)
+		if waypoint then
+			pos = waypoint:getPosition()
+		else
+			return "No waypoint by that name."
+		end
+	else
+		-- Deduce type
+		-- Try player first
+		local players = getPlayersByNameWildcard(name)
+		if N >= 1 and N <= #players then
+			pos = players[N]:getPosition()
+		else
+			-- Try waypoint
+			local waypoint = getWaypointByName(name)
+			if waypoint then
+				pos = waypoint:getPosition()
+			else
+				-- Try creature
+				local creatures = getCreaturesByName(name)
+				if N >= 1 and N <= #creatures then
+					pos = creatures[N]:getPosition()
+				end
+			end
+		end
+	end
+	
+	return pos
+end
