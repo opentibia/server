@@ -41,6 +41,8 @@ class Item;
 class Tile;
 class House;
 class ChatChannel;
+class Waypoint;
+typedef shared_ptr<Waypoint> Waypoint_ptr;
 
 namespace Script {
 	typedef uint64_t ObjectID;
@@ -160,6 +162,7 @@ public:
 	Town* popTown(Script::ErrorMode mode = Script::ERROR_THROW);
 	House* popHouse(Script::ErrorMode mode = Script::ERROR_THROW);
 	ChatChannel* popChannel(Script::ErrorMode mode = Script::ERROR_THROW);
+	Waypoint_ptr popWaypoint(Script::ErrorMode mode = Script::ERROR_THROW);
 
 	// Push
 	void pushThing(Thing* thing);
@@ -167,6 +170,7 @@ public:
 	void pushTown(Town* town);
 	void pushHouse(House* house);
 	void pushChannel(ChatChannel* channel);
+	void pushWaypoint(Waypoint_ptr pos);
 
 
 	// Generic
@@ -340,6 +344,9 @@ public:
 	int lua_Channel_addUser();
 	int lua_Channel_removeUser();
 	int lua_Channel_talk();
+
+	// - Waypoints
+	int lua_getWaypointByName();
 
 	// - Game
 	int lua_sendMagicEffect();

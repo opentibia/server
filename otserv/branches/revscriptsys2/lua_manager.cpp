@@ -274,7 +274,7 @@ void LuaState::pushPosition(const Position& pos) {
 void LuaState::pushThing(Thing* thing) {
 	if(thing && thing->getItem()){
 		Item* item = thing->getItem();
-		Script::ObjectID* objid;
+		Script::ObjectID* objid = NULL;
 
 		if(item->getContainer()) {
 			objid = pushClassInstance("Container");
@@ -299,6 +299,9 @@ void LuaState::pushThing(Thing* thing) {
 		}
 		else if(creature->getNpc()) {
 			objid = pushClassInstance("NPC");
+		} else {
+			pushNil();
+			return;
 		}
 		*objid = enviroment.addThing(creature);
 	} else if(thing && thing->getTile()) {
@@ -336,6 +339,15 @@ void LuaState::pushChannel(ChatChannel* channel) {
 	if(channel) {
 		Script::ObjectID* objid = pushClassInstance("Channel");
 		*objid = enviroment.addObject(channel);
+	} else {
+		pushNil();
+	}
+}
+
+void LuaState::pushWaypoint(Waypoint_ptr wp) {
+	if(wp) {
+		Script::ObjectID* objid = pushClassInstance("Waypoint");
+		*objid = enviroment.addObject(wp.get());
 	} else {
 		pushNil();
 	}
@@ -401,6 +413,19 @@ ChatChannel* LuaState::popChannel(Script::ErrorMode mode /* = Script::ERROR_THRO
 	pop();
 
 	return (ChatChannel*)enviroment.getObject(*objid);
+}
+
+Waypoint_ptr LuaState::popWaypoint(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	if(!isUserdata(-1)) {
+		HandleError(mode, std::string("Couldn't pop waypoint, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		pop();
+		return Waypoint_ptr();
+	}
+
+	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
+	pop();
+
+	return ((Waypoint*)enviroment.getObject(*objid))->shared_from_this();
 }
 
 Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */) {

@@ -95,6 +95,7 @@ void Manager::registerClasses() {
 
 	registerClass("Town");
 	registerClass("House");
+	registerClass("Waypoint");
 
 	registerClass("Channel");
 
@@ -2844,6 +2845,23 @@ int LuaState::lua_Channel_talk()
 	ChatChannel* channel = popChannel();
 	channel->talk(NULL, (SpeakClass)t, text);
 	pushBoolean(true);
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// (Class) Waypoint
+
+int LuaState::lua_getWaypointByName()
+{
+	std::string name = popString();
+
+	Waypoint_ptr wp = g_game.getMap()->waypoints.getWaypointByName(name);
+	if(wp){
+		pushWaypoint(wp);
+	}
+	else{
+		pushNil();
+	}
 	return 1;
 }
 

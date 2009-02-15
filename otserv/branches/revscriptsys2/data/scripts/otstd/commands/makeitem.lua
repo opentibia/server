@@ -5,7 +5,6 @@ MakeItem.words = "/n"
 MakeItem.groups = {"GM"}
 
 function MakeItem.handler(event)
-print "YO"
 	local name = event.param
 	local count = name:match("(%d+)")
 	

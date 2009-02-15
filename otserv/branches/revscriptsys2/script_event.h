@@ -43,7 +43,7 @@ namespace Script {
 	class Enviroment;
 }
 
-
+// These are actually defined in the .cpp file, so you CAN ONLY USE THEM IN script_event.cpp
 template<class T, class ScriptInformation>
 	bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list);
 template<class T>
@@ -78,25 +78,16 @@ namespace Script {
 		virtual void push_instance(LuaState& state, Script::Enviroment& enviroment) = 0;
 		// update, peek at top table and fill this event with values from it)
 		virtual void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread) = 0;
-	protected:
+
+		// Should not be called directly (calling functions 
+		// can't be made fiend due to compiler limitations)
 		bool call(Manager& stae, Enviroment& enviroment, Listener_ptr listener);
+	protected:
 
 		uint32_t eventID;
 		static uint32_t eventID_counter;
 		std::string lua_tag;
 		bool propagate_by_default;
-
-		template<class T, class ScriptInformation> friend
-			bool ::dispatchEvent(T* e,
-				Script::Manager& state,
-				Script::Enviroment& enviroment,
-				Script::ListenerList& specific_list);
-
-		template<class T> friend
-			bool ::dispatchEvent(T* e,
-				Script::Manager& state,
-				Script::Enviroment& enviroment,
-				Script::ListenerList& specific_list);
 
 	};
 
@@ -494,6 +485,54 @@ namespace Script {
 			Thing* object;
 		};
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation details
+
+template<class T, class ScriptInformation>
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Script::Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
+
+		// Call handler
+		if(e->check_match(info)) {
+			if(e->call(state, enviroment, listener) == true) {
+				// Handled
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+template<class T> // No script information!
+bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
+	if(specific_list.size() == 0) {
+		return false;
+	}
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		Script::Listener_ptr listener = *event_iter;
+		if(listener->isActive() == false) continue;
+
+		// Call handler
+		if(e->call(state, enviroment, listener) == true) {
+			// Handled
+			return true;
+		}
+	}
+	return false;
 }
 
 #endif // __OTSERV_SCRIPT_EVENT__

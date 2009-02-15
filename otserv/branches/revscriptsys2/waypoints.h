@@ -19,8 +19,9 @@
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
-class Waypoint {
+class Waypoint : public boost::enable_shared_from_this<Waypoint> {
 public:
 	Waypoint(const std::string& name, const Position& pos) :
 		name(name), pos(pos) {}
