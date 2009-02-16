@@ -80,7 +80,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 
 	try {
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
-		
+
 		int argument_count = interface->getStackTop();
 		if((unsigned int)argument_count > cc->parameters.size()) {
 			throw Script::Error("Too many arguments passed to function " + cc->name);
@@ -121,7 +121,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		{
 			const ComposedTypeDeclaration& ctd = *ctditer;
 			
-			if(parsed_argument_count < passed_argument_count) {
+			if(parsed_argument_count >= passed_argument_count) {
 				break;
 			}
 			parsed_argument_count += 1;

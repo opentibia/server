@@ -4,6 +4,8 @@ function Event:type()
 end
 
 
+-------------------------------------------------------------------------------
+-- Wrapper for OnUseItem that will return toofaraway when the item is out of reach
 
 function registerOnUseItemNearby(method, filter, callback)
 	function onUseItemNearby(evt)
@@ -21,6 +23,28 @@ function registerOnUseItemNearby(method, filter, callback)
 	registerOnUseItem(method, filter, onUseItemNearby)
 end
 
+-------------------------------------------------------------------------------
+-- OnMoveItem wrappers for easier binding (boolean arguments are confusing)
+
+function registerOnMoveItemToTile(method, filter, callback)
+	return registerOnMoveItem(method, filter, false, true, callback)
+end
+
+function registerOnMoveItemFromTile(method, filter, callback)
+	return registerOnMoveItem(method, filter, false, false, callback)
+end
+
+function registerOnMoveItemToItem(method, filter, callback)
+	return registerOnMoveItem(method, filter, true, true, callback)
+end
+
+function registerOnMoveItemFromItem(method, filter, callback)
+	return registerOnMoveItem(method, filter, true, false, callback)
+end
+
+
+-------------------------------------------------------------------------------
+-- stopListener function that accepts a table argument
 
 internalStopListener = stopListener
 

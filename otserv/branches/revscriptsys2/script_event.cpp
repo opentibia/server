@@ -447,11 +447,17 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info) {
 			if(thing && (itemOnTile = thing->getItem()) && itemOnTile != item){
 				switch(info.method) {
 					case FILTER_ITEMID:
-						return itemOnTile->getID() == info.id;
+						if(itemOnTile->getID() == info.id)
+							return true;
+						break;
 					case FILTER_ACTIONID:
-						return itemOnTile->getActionId() == info.id;
+						if(itemOnTile->getActionId() == info.id)
+							return true;
+						break;
 					case FILTER_UNIQUEID:
-						return itemOnTile->getUniqueId() == info.id;
+						if(itemOnTile->getUniqueId() == info.id)
+							return true;
+						break;
 					default: break;
 				}
 			}

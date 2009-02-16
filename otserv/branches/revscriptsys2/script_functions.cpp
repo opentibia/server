@@ -252,8 +252,8 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
 	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
 
-	registerGlobalFunction("registerOnAddTileItem(string method, int filter, boolean isitemontile, function callback)", &Manager::lua_registerGenericEvent_OnAddItemToTile);
-	registerGlobalFunction("registerOnRemoveTileItem(string method, int filter, boolean isitemontile, function callback)", &Manager::lua_registerGenericEvent_OnRemoveItemToTile);
+	// Others are bound in lua
+	registerGlobalFunction("registerOnMoveItem(string method, int filter, boolean isadd, boolean isontile, function callback)", &Manager::lua_registerGenericEvent_OnMoveItem);
 
 	registerGlobalFunction("registerOnJoinChannel(function callback)", &Manager::lua_registerGenericEvent_OnJoinChannel);
 	registerGlobalFunction("registerOnPlayerJoinChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnJoinChannel);
@@ -973,10 +973,11 @@ int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_OnAddItemToTile() {
+int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	// Store callback
-	insert(-4);
+	insert(-5);
 
+	bool isAddItem = popBoolean();
 	bool isItemOnTile = popBoolean();
 	int id = popInteger();
 	std::string method = popString();
@@ -995,45 +996,7 @@ int LuaState::lua_registerGenericEvent_OnAddItemToTile() {
 		throw Error("Invalid argument (1) 'method'");
 	}
 	si_onmoveitem.id = id;
-	si_onmoveitem.addItem = true;
-	si_onmoveitem.isItemOnTile = isItemOnTile;
-
-	boost::any p(si_onmoveitem);
-	Listener_ptr listener(new Listener(ON_MOVE_ITEM_LISTENER, p, *this->getManager()));
-
-	enviroment.Generic.OnMoveItem.push_back(listener);
-
-	// Register event
-	setRegistryItem(listener->getLuaTag());
-
-	// Return listener
-	pushString(listener->getLuaTag());
-	return 1;
-}
-
-int LuaState::lua_registerGenericEvent_OnRemoveItemToTile() {
-	// Store callback
-	insert(-4);
-
-	bool isItemOnTile = popBoolean();
-	int id = popInteger();
-	std::string method = popString();
-
-	OnMoveItem::ScriptInformation si_onmoveitem;
-	if(method == "itemid") {
-		si_onmoveitem.method = OnMoveItem::FILTER_ITEMID;
-	}
-	else if(method == "actionid") {
-		si_onmoveitem.method = OnMoveItem::FILTER_ACTIONID;
-	}
-	else if(method == "uniqueid") {
-		si_onmoveitem.method = OnMoveItem::FILTER_UNIQUEID;
-	}
-	else {
-		throw Error("Invalid argument (1) 'method'");
-	}
-	si_onmoveitem.id = id;
-	si_onmoveitem.addItem = false;
+	si_onmoveitem.addItem = isAddItem;
 	si_onmoveitem.isItemOnTile = isItemOnTile;
 
 	boost::any p(si_onmoveitem);
