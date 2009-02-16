@@ -7,21 +7,19 @@ MoveForward.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager"}
 function MoveForward.handler(event)
 	local dir = event.creature:getOrientation()
 	local pos = event.creature:getPosition()
-	
-	local param = event.text:sub(3)
-	
-	if #param == 0 or tonumber(param) == nil then
+	local len = tonumber(event.param)
+	if len == nil then
 		return
 	end
 	
 	if dir == NORTH then
-		pos.y = pos.y - tonumber(param)
+		pos.y = pos.y - tonumber(len)
 	elseif dir == SOUTH then
-		pos.y = pos.y + tonumber(param)
+		pos.y = pos.y + tonumber(len)
 	elseif dir == WEST then
-		pos.x = pos.x - tonumber(param)
+		pos.x = pos.x - tonumber(len)
 	elseif dir == EAST then
-		pos.x = pos.x + tonumber(param)
+		pos.x = pos.x + tonumber(len)
 	else
 		error("Player facing invalid direction when invoking /a command!")
 	end
@@ -30,8 +28,6 @@ function MoveForward.handler(event)
 		--sendMagicEffect(old_pos, CONST_ME_TELEPORT)
 		sendMagicEffect(pos, CONST_ME_TELEPORT)
 	end
-	
-	event.text = "" -- Don't display a message
 end
 
 MoveForward:register()
