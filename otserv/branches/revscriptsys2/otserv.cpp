@@ -96,6 +96,10 @@ void ErrorMessage(const char* message) {
 	std::cin >> s;
 }
 
+void ErrorMessage(std::string m){
+	ErrorMessage(m.c_str());
+}
+
 struct CommandLineOptions{
 	std::string configfile;
 	bool truncate_log;
@@ -351,13 +355,13 @@ void mainLoader(const CommandLineOptions& command_opts)
 	if (!g_config.loadFile(configname))
 #endif
 	{
-		char errorMessage[26];
+		std::ostringstream os;
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
-		sprintf(errorMessage, "Unable to load %s!", configpath.c_str());
+		os << "Unable to load " << configpath;
 #else
-		sprintf(errorMessage, "Unable to load %s!", configname);
+		os << "Unable to load " << confiname;
 #endif
-		ErrorMessage(errorMessage);
+		ErrorMessage(os.str());
 		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;

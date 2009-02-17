@@ -1,7 +1,7 @@
 
 otstd.GM_XRay_Vision = {}
 
-otstd.GM_XRay_Vision.groups = {"GM"}
+otstd.GM_XRay_Vision.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager", "Server Administrator"}
 
 function otstd.GM_XRay_Vision.look_handler(evt)
 	local desc = evt.description

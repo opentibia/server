@@ -32,6 +32,12 @@ end
 
 --
 
+function Player:getTown()
+	return map:getTown(self:getTownID())
+end
+
+--
+
 function Player:addMana(howmuch)
 	r = true
 	if howmuch < 0 then

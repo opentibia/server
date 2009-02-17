@@ -12,15 +12,15 @@ function Map:type() return "Map" end
 
 
 -- Remove normal get tile, encourage using map:getTile !
-internalGetTile = getTile
+__internal_getTile = getTile
 getTile = nil
 
 -- Get a tile on the map!
 function Map:getTile(x, y, z)
 	if y == nil and z == nil then
-		return internalGetTile(x["x"], x["y"], x["z"])
+		return __internal_getTile(x["x"], x["y"], x["z"])
 	else
-		return internalGetTile(x, y, z)
+		return __internal_getTile(x, y, z)
 	end
 end
 

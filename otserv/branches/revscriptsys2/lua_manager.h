@@ -343,6 +343,25 @@ public:
 
 	int lua_Tile_queryAdd();
 
+	// - House
+	int lua_House_cleanHouse();
+	int lua_House_getDoors();
+	int lua_House_getExitPosition();
+	int lua_House_getID();
+	int lua_House_getInvitedList();
+	int lua_House_getName();
+	int lua_House_getPaidUntil();
+	int lua_House_getRent();
+	int lua_House_getSubownerList();
+	int lua_House_getTiles();
+	int lua_House_getTown();
+	int lua_House_kickPlayer();
+	int lua_House_isInvited();
+	int lua_House_setInviteList();
+	int lua_House_setOwner();
+	int lua_House_setSubownerList();
+	int lua_House_setPaidUntil();
+
 	// - Town
 	int lua_Town_getTemplePosition();
 	int lua_Town_getID();

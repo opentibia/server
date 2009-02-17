@@ -226,6 +226,23 @@ void Manager::registerClasses() {
 	registerGlobalFunction("getWaypointByName(string name)", &Manager::lua_getWaypointByName);
 
 	// House
+	registerMemberFunction("House", "cleanHouse()", &Manager::lua_House_cleanHouse);
+	registerMemberFunction("House", "getDoors()", &Manager::lua_House_getDoors);
+	registerMemberFunction("House", "getExitPosition()", &Manager::lua_House_getExitPosition);
+	registerMemberFunction("House", "getID()", &Manager::lua_House_getID);
+	registerMemberFunction("House", "getInvitedList()", &Manager::lua_House_getInvitedList);
+	registerMemberFunction("House", "getName()", &Manager::lua_House_getName);
+	registerMemberFunction("House", "getPaidUntil()", &Manager::lua_House_getPaidUntil);
+	registerMemberFunction("House", "getRent()", &Manager::lua_House_getRent);
+	registerMemberFunction("House", "getSubownerList()", &Manager::lua_House_getSubownerList);
+	registerMemberFunction("House", "getTiles()", &Manager::lua_House_getTiles);
+	registerMemberFunction("House", "getTown()", &Manager::lua_House_getTown);
+	registerMemberFunction("House", "kickPlayer(Player who)", &Manager::lua_House_kickPlayer);
+	registerMemberFunction("House", "isInvited(Player who)", &Manager::lua_House_isInvited);
+	registerMemberFunction("House", "setInviteList(table list)", &Manager::lua_House_setInviteList);
+	registerMemberFunction("House", "setOwner(int guid)", &Manager::lua_House_setOwner);
+	registerMemberFunction("House", "setSubownerList(table list)", &Manager::lua_House_setSubownerList);
+	registerMemberFunction("House", "setPaidUntil(int until)", &Manager::lua_House_setPaidUntil);
 
 	// Channel
 	registerMemberFunction("Channel", "getID()", &Manager::lua_Channel_getID);
@@ -856,6 +873,7 @@ int LuaState::lua_registerGenericEvent_OnStepInCreature() {
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
+	si_onmovecreature.slot = 0;
 	si_onmovecreature.id = id;
 	si_onmovecreature.moveType = OnMoveCreature::TYPE_STEPIN;
 
@@ -892,6 +910,7 @@ int LuaState::lua_registerGenericEvent_OnStepOutCreature() {
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
+	si_onmovecreature.slot = 0;
 	si_onmovecreature.id = id;
 	si_onmovecreature.moveType = OnMoveCreature::TYPE_STEPOUT;
 
@@ -955,6 +974,7 @@ int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
 	OnMoveCreature::ScriptInformation si_onmovecreature;
 	si_onmovecreature.method = OnMoveCreature::FILTER_NONE;
 	si_onmovecreature.id = 0;
+	si_onmovecreature.slot = 0;
 	si_onmovecreature.moveType = OnMoveCreature::TYPE_MOVE;
 
 	boost::any p(si_onmovecreature);
@@ -2968,6 +2988,181 @@ int LuaState::lua_Town_getHouses()
 	}
 	return 1;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// House
+
+int LuaState::lua_House_cleanHouse()
+{
+	House* house = popHouse();
+	house->cleanHouse();
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_House_getDoors()
+{
+	House* house = popHouse();
+
+	newTable();
+	int n = 1;
+	for(HouseDoorList::iterator hit = house->getHouseDoorBegin(), end = house->getHouseDoorEnd();
+		hit != end; ++hit)
+	{
+		pushThing(*hit);
+		setField(-2, n++);
+	}
+
+	return 1;
+}
+
+int LuaState::lua_House_getExitPosition()
+{
+	House* house = popHouse();
+	pushPosition(house->getEntryPosition());
+	return 1;
+}
+
+int LuaState::lua_House_getID()
+{
+	House* house = popHouse();
+	pushUnsignedInteger(house->getHouseId());
+	return 1;
+}
+
+int LuaState::lua_House_getInvitedList()
+{
+	House* house = popHouse();
+	std::string list;
+	if(!house->getAccessList(GUEST_LIST, list))
+		pushNil();
+	// Function is overloaded in lua to return table
+	pushString(list);
+	return 1;
+}
+
+int LuaState::lua_House_getName()
+{
+	House* house = popHouse();
+	pushString(house->getName());
+	return 1;
+}
+
+int LuaState::lua_House_getPaidUntil()
+{
+	House* house = popHouse();
+	pushUnsignedInteger(house->getPaidUntil());
+	return 1;
+}
+
+int LuaState::lua_House_getRent()
+{
+	House* house = popHouse();
+	pushInteger(house->getRent());
+	return 1;
+}
+
+int LuaState::lua_House_getSubownerList()
+{
+	House* house = popHouse();
+	std::string list;
+	if(!house->getAccessList(SUBOWNER_LIST, list))
+		pushNil();
+	// Function is overloaded in lua to return table
+	pushString(list);
+	return 1;
+}
+
+int LuaState::lua_House_getTiles()
+{
+	House* house = popHouse();
+	
+	newTable();
+	int n = 1;
+	for(HouseTileList::iterator hit = house->getHouseTileBegin(), end = house->getHouseTileEnd();
+		hit != end; ++hit)
+	{
+		pushTile(*hit);
+		setField(-2, n++);
+	}
+
+	return 1;
+}
+
+int LuaState::lua_House_getTown()
+{
+	House* house = popHouse();
+	
+	pushTown(Towns::getInstance().getTown(house->getTownId()));
+	return 1;
+}
+int LuaState::lua_House_kickPlayer()
+{
+	Player* who = popPlayer();
+	House* house = popHouse();
+	pushBoolean(house->kickPlayer(NULL, who->getName()));
+	return 1;
+}
+
+int LuaState::lua_House_isInvited()
+{
+	Player* player = popPlayer();
+	House* house = popHouse();
+	pushBoolean(house->isInvited(player));
+	return 1;
+}
+
+int LuaState::lua_House_setOwner()
+{
+	uint32_t guid = popUnsignedInteger();
+	House* house = popHouse();
+
+	house->setHouseOwner(guid);
+
+	return 1;
+}
+
+int LuaState::lua_House_setInviteList()
+{
+	std::ostringstream list;
+
+	// Flatten list
+	pushNil();
+	while(lua_next(state, -2) != 0) {
+		list << popString() << "\n";
+	}
+	House* house = popHouse();
+
+	house->setAccessList(GUEST_LIST, list.str());
+
+	return 1;
+}
+
+int LuaState::lua_House_setSubownerList()
+{
+	std::ostringstream list;
+
+	// Flatten list
+	pushNil();
+	while(lua_next(state, -2) != 0) {
+		list << popString() << "\n";
+	}
+	House* house = popHouse();
+
+	house->setAccessList(SUBOWNER_LIST, list.str());
+
+	return 1;
+}
+
+int LuaState::lua_House_setPaidUntil()
+{
+	uint32_t until = popUnsignedInteger();
+	House* house = popHouse();
+	house->setPaidUntil(until);
+	pushBoolean(true);
+	return 1;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Channel

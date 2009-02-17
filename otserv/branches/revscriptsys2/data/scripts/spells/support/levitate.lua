@@ -50,7 +50,7 @@ function levitate:onBeginCast(event)
 		end
 	end
 	
-	caster:sendCancel("Not possible")
+	caster:sendCancel("Sorry not possible")
 	return false
 end
 
