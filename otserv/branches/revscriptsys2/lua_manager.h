@@ -36,6 +36,7 @@ class Player;
 class Creature;
 class Thing;
 class Position;
+class PositionEx;
 class Town;
 class Item;
 class Tile;

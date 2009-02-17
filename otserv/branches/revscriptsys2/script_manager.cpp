@@ -47,7 +47,7 @@ Manager* Manager::getManager() {
 
 int Manager::luaCompareClassInstances(lua_State* L)
 {
-	Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
+	//Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
 	//Enviroment& e = manager->enviroment;
 	
 	// 2 class instances are ontop of the stack
