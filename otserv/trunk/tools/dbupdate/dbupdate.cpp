@@ -204,7 +204,7 @@ int main(int argn, const char* argv[]){
 		if(updateQueries[i].version > schema_version){
 			if(!applyUpdateQuery(updateQueries[i])){
 				char errorMessage[64];
-				sprintf(errorMessage, "Error while updating to schema version %d!", updateQueries[i].version);
+				sprintf(errorMessage, "Error while updating to schema version %d!\n", updateQueries[i].version);
 				ErrorMessage(errorMessage);
 				return -1;
 			}
