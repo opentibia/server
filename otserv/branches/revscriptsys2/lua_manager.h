@@ -147,6 +147,7 @@ public:
 	void pushString(const std::string& str);
 	void pushUserdata(void* ptr);
 	void pushPosition(const Position& pos);
+	void pushPosition(const PositionEx& pos);
 
 	// Events
 	void pushEvent(Script::Event& event);
@@ -243,6 +244,7 @@ public:
 
 
 	// - - Creature
+	int lua_Creature_getID();
 	int lua_Creature_getOrientation();
 	int lua_Creature_getHealth();
 	int lua_Creature_getHealthMax();
@@ -309,12 +311,14 @@ public:
 	// - - Item
 	int lua_createItem();
 	int lua_getItemIDByName();
+	int lua_isValidItemID();
 
 	int lua_Item_getItemID();
 	int lua_Item_getActionID();
 	int lua_Item_getUniqueID();
 	int lua_Item_getCount();
 	int lua_Item_getWeight();
+	int lua_Item_isPickupable();
 	int lua_Item_getSpecialDescription();
 	int lua_Item_getText();
 

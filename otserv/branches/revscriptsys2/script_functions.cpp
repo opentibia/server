@@ -116,6 +116,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Thing", "destroy()", &Manager::lua_Thing_destroy);
 
 	// Creature
+	registerMemberFunction("Creature", "getID()", &Manager::lua_Creature_getID);
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
 	registerMemberFunction("Creature", "setHealth(integer newval)", &Manager::lua_Creature_setHealth);
@@ -182,6 +183,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Item", "getUniqueID()", &Manager::lua_Item_getUniqueID);
 	registerMemberFunction("Item", "getCount()", &Manager::lua_Item_getCount);
 	registerMemberFunction("Item", "getWeight()", &Manager::lua_Item_getWeight);
+	registerMemberFunction("Item", "isPickupable()", &Manager::lua_Item_isPickupable);
 	registerMemberFunction("Item", "getText()", &Manager::lua_Item_getText);
 	registerMemberFunction("Item", "getSpecialDescription()", &Manager::lua_Item_getSpecialDescription);
 
@@ -193,6 +195,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Item", "setSpecialDescription(string text)", &Manager::lua_Item_setSpecialDescription);
 
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
+	registerGlobalFunction("isValidItemID(int id)", &Manager::lua_isValidItemID);
 
 	// Tile
 	registerMemberFunction("Tile", "getThing(int index)", &Manager::lua_Tile_getThing);
@@ -1336,6 +1339,12 @@ int LuaState::lua_Tile_hasProperty()
 ///////////////////////////////////////////////////////////////////////////////
 // Class Creature
 
+int LuaState::lua_Creature_getID() {
+	Creature* creature = popCreature();
+	pushUnsignedInteger(creature->getID());
+	return 1;
+}
+
 int LuaState::lua_Creature_getHealth() {
 	Creature* creature = popCreature();
 	pushInteger(creature->getHealth());
@@ -1854,6 +1863,13 @@ int LuaState::lua_Item_getWeight()
 	return 1;
 }
 
+int LuaState::lua_Item_isPickupable()
+{
+	Item* item = popItem();
+	pushBoolean(item->isPickupable());
+	return 1;
+}
+
 int LuaState::lua_Item_getText()
 {
 	Item* item = popItem();
@@ -1953,6 +1969,15 @@ int LuaState::lua_getItemIDByName()
 	} else {
 		pushUnsignedInteger(itemid);
 	}
+	return 1;
+}
+
+int LuaState::lua_isValidItemID()
+{
+	int32_t id = popInteger();
+
+	const ItemType& it = Item::items[(uint16_t)id];
+	pushBoolean(id >= 100 && it.id != 0);
 	return 1;
 }
 

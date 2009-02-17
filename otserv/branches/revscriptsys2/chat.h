@@ -63,8 +63,16 @@ public:
 
 	virtual const uint32_t getOwner(){ return 0; }
 
+	// Block a player from hearing messages, required for the lua events to work properly
+	// this is to prevent the player from hearing a message before he has been sent the
+	// channel contents. ONLY ONE PLAYER CAN BE DEAF AT A TIME
+	// Call with NULL to make everyone hear again.
+	void makePlayerDeaf(Player* p)
+		{m_deaf_user = p;}
+
 protected:
 	UsersMap m_users;
+	Player* m_deaf_user;
 	std::string m_name;
 	uint16_t m_id;
 };

@@ -1,6 +1,4 @@
 
-
-
 -- Can be used as rope-up-spots
 -- Those with open= can be used as shovel holes
 otstd.holes = {

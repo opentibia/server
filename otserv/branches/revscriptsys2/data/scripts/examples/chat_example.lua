@@ -11,5 +11,5 @@ function chat_example.leave_callback(event)
 	event.channel:message(event.player:getName() .. " has left the channel.")
 end
 
-chat_example.leave_listener =
-	registerOnLeaveChannel(chat_example.leave_callback)
+--chat_example.leave_listener =
+--	registerOnLeaveChannel(chat_example.leave_callback)

@@ -106,6 +106,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 				if(argument_count < parsed_argument_count) {
 					// Optional argument!
 					// Perhaps a default argument should be pushed?
+					parsed_argument_count -= 1;
 					break; // We don't need to parse more
 				}
 				last_optional_level = ctd.optional_level; 

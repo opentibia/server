@@ -112,6 +112,7 @@ ChatChannel::ChatChannel(uint16_t channelId, std::string channelName)
 {
 	m_id = channelId;
 	m_name = channelName;
+	m_deaf_user = NULL;
 }
 
 ChatChannel::~ChatChannel()
@@ -162,7 +163,8 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& t
 	}
 
 	for(it = m_users.begin(); it != m_users.end(); ++it){
-		it->second->sendToChannel(fromPlayer, type, text, getId(), time);
+		if(m_deaf_user != it->second)
+			it->second->sendToChannel(fromPlayer, type, text, getId(), time);
 		success = true;
 	}
 	return success;
@@ -183,11 +185,12 @@ bool ChatChannel::sendInfo(SpeakClass type, const std::string& text, uint32_t ti
 Chat::Chat()
 {
 	// Create the default channels
-	m_normalChannels[0x03] = new ChatChannel(0x03, "Rule Violations");
-	m_normalChannels[0x04] = new ChatChannel(0x04, "Game-Chat");
-	m_normalChannels[0x05] = new ChatChannel(0x05, "Trade");
-	m_normalChannels[0x06] = new ChatChannel(0x06, "RL-Chat");
-	m_normalChannels[0x08] = new ChatChannel(0x08, "Help");
+	m_normalChannels[CHANNEL_RULE_REP] = new ChatChannel(CHANNEL_RULE_REP, "Rule Violations");
+	m_normalChannels[CHANNEL_GAME_CHAT] = new ChatChannel(CHANNEL_GAME_CHAT, "Game-Chat");
+	m_normalChannels[CHANNEL_TRADE] = new ChatChannel(CHANNEL_TRADE, "Trade");
+	m_normalChannels[CHANNEL_TRADE_ROOK] = new ChatChannel(CHANNEL_TRADE_ROOK, "Trade-Rookgard");
+	m_normalChannels[CHANNEL_RL_CHAT] = new ChatChannel(CHANNEL_RL_CHAT, "RL-Chat");
+	m_normalChannels[CHANNEL_HELP] = new ChatChannel(CHANNEL_HELP, "Help");
 
 	dummyPrivate = new PrivateChatChannel(0xFFFF, "Private Chat Channel");
 }

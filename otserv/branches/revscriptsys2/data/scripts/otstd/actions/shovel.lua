@@ -11,7 +11,7 @@ function otstd.shovel.callback(event)
 		local hole = tile:getThing(event.target.stackpos)
 		if not hole then
 			return
-		end
+		end 
 		
 		for holeid, openid in pairs(otstd.holes) do
 			if openid.open and hole:getItemID() == holeid then

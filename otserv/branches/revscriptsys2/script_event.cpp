@@ -403,11 +403,11 @@ void OnMoveCreature::Event::push_instance(LuaState& state, Enviroment& enviromen
 	}
 	else if(moveType == TYPE_STEPIN){
 		state.pushThing(fromTile);
-		state.setField(-2, "tile");
+		state.setField(-2, "toTile");
 	}
 	else if(moveType == TYPE_STEPOUT){
 		state.pushThing(toTile);
-		state.setField(-2, "tile");
+		state.setField(-2, "fromTile");
 	}
 
 	state.pushThing(creature);

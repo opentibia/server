@@ -271,6 +271,18 @@ void LuaState::pushPosition(const Position& pos) {
 	setField(-2, "z");
 }
 
+void LuaState::pushPosition(const PositionEx& pos) {
+	newTable();
+	pushInteger(pos.x);
+	setField(-2, "x");
+	pushInteger(pos.y);
+	setField(-2, "y");
+	pushInteger(pos.z);
+	setField(-2, "z");
+	pushInteger(pos.stackpos);
+	setField(-2, "stackpos");
+}
+
 void LuaState::pushThing(Thing* thing) {
 	if(thing && thing->getItem()){
 		Item* item = thing->getItem();

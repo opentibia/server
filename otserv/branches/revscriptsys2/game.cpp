@@ -2421,8 +2421,18 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 		return false;
 	}
 
+	// The event handler will probably want to send messages to the 
+	// channel. To prevent debugs, we make the player unable to hear 
+	// messages in the channel, since we haven't actually sent the 
+	// channel to him yet.
+	channel->makePlayerDeaf(player);
+
 	Script::OnJoinChannel::Event evt(player, channel);
-	if(script_system->dispatchEvent(evt)) {
+	bool interrupted = script_system->dispatchEvent(evt);
+
+	channel->makePlayerDeaf(NULL);
+
+	if(interrupted) {
 		// If the event was not propagated, stop the action!
 		g_chat.removeUserFromChannel(player, channelId);
 		return false;

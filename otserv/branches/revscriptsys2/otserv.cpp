@@ -359,7 +359,7 @@ void mainLoader(const CommandLineOptions& command_opts)
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
 		os << "Unable to load " << configpath;
 #else
-		os << "Unable to load " << confiname;
+		os << "Unable to load " << configname;
 #endif
 		ErrorMessage(os.str());
 		exit(-1);
