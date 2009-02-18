@@ -90,7 +90,7 @@ void ProtocolAdmin::onRecvFirstMessage(NetworkMessage& msg)
 
 	addLogLine(this, LOGTYPE_EVENT, 1, "sending HELLO");
 	//send hello
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 		output->AddByte(AP_MSG_HELLO);
@@ -118,7 +118,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 
 	OutputMessagePool* outputPool = OutputMessagePool::getInstance();
 
-	OutputMessage* output = outputPool->getOutputMessage(this, false);
+	OutputMessage_ptr output = outputPool->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
@@ -127,7 +127,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		{
 			if(g_adminConfig->requireEncryption()){
 				if((time(NULL) - m_startTime) > 30000){
-					outputPool->releaseMessage(output);
 					getConnection()->closeConnection();
 					addLogLine(this, LOGTYPE_WARNING, 1, "encryption timeout");
 					return;
@@ -152,7 +151,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			if(g_adminConfig->requireLogin()){
 				if((time(NULL) - m_startTime) > 30000){
 					//login timeout
-					outputPool->releaseMessage(output);
 					getConnection()->closeConnection();
 					addLogLine(this, LOGTYPE_WARNING, 1, "login timeout");
 					return;
@@ -188,7 +186,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		}
 		default:
 			addLogLine(this, LOGTYPE_ERROR, 1, "no valid connection state!!!");
-			outputPool->releaseMessage(output);
 			getConnection()->closeConnection();
 			return;
 		}
@@ -347,7 +344,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			{
 				Dispatcher::getDispatcher().addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandShutdownServer, this)));
-				outputPool->releaseMessage(output);
 				getConnection()->closeConnection();
 				return;
 				break;
@@ -387,9 +383,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		if(output->getMessageLength() > 0){
 			outputPool->send(output);
 		}
-		else{
-			outputPool->releaseMessage(output);
-		}
 	}
 }
 
@@ -397,7 +390,7 @@ void ProtocolAdmin::adminCommandOpenServer()
 {
 	g_game.setGameState(GAME_STATE_NORMAL);
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
@@ -423,7 +416,7 @@ void ProtocolAdmin::adminCommandCloseServer()
 	}
 	bool success = g_game.saveServer();
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
@@ -449,7 +442,7 @@ void ProtocolAdmin::adminCommandShutdownServer()
 
 	addLogLine(this, LOGTYPE_EVENT, 1, "start server shutdown");
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 		output->AddByte(AP_MSG_COMMAND_OK);
@@ -459,7 +452,7 @@ void ProtocolAdmin::adminCommandShutdownServer()
 
 void ProtocolAdmin::adminCommandPayHouses()
 {
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
@@ -482,7 +475,7 @@ void ProtocolAdmin::adminCommandPayHouses()
 
 void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 {
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
@@ -507,7 +500,7 @@ void ProtocolAdmin::adminCommandSaveServer()
 {
 	g_game.saveServer();
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 

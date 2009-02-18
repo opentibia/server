@@ -43,7 +43,7 @@ void ProtocolOld::deleteProtocolTask()
 
 void ProtocolOld::disconnectClient(uint8_t error, const char* message)
 {
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 		output->AddByte(error);

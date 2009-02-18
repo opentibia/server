@@ -72,7 +72,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	case 0xFF:
 	{
 		if(msg.GetRaw() == "info"){
-			OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+			OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 			if(output){
 				TRACK_MESSAGE(output);
 				Status* status = Status::instance();
@@ -89,7 +89,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	{
 		uint32_t requestedInfo = msg.GetU16(); //Only a Byte is necessary, though we could add new infos here
 
-		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+		OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		if(output){
 			TRACK_MESSAGE(output);
 			Status* status = Status::instance();
@@ -224,7 +224,7 @@ std::string Status::getStatusString() const
 	return xml;
 }
 
-void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessage& msg) const
+void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const
 {
 	// the client selects which information may be
 	// sent back, so we'll save some bandwidth and

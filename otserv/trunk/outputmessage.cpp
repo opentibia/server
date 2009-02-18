@@ -51,14 +51,14 @@ void OutputMessagePool::startExecutionFrame()
 
 OutputMessagePool::~OutputMessagePool()
 {
-	OutputMessageVector::iterator it;
+	InternalOutputMessageList::iterator it;
 	for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
 		delete *it;
 	}
 	m_outputMessages.clear();
 }
 
-void OutputMessagePool::send(OutputMessage* msg)
+void OutputMessagePool::send(OutputMessage_ptr msg)
 {
 	m_outputPoolLock.lock();
 	OutputMessage::OutputMessageState state = msg->getState();
@@ -80,7 +80,6 @@ void OutputMessagePool::send(OutputMessage* msg)
 			}
 			else{
 				msg->getProtocol()->onSendMessage(msg);
-				internalReleaseMessage(msg);
 			}
 		}
 		else{
@@ -98,31 +97,32 @@ void OutputMessagePool::send(OutputMessage* msg)
 
 void OutputMessagePool::sendAll()
 {
-	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
-	OutputMessageVector::iterator it;
+	boost::recursive
+		_mutex::scoped_lock lockClass(m_outputPoolLock);
+	OutputMessageMessageList::iterator it;
 	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
+		OutputMessage_ptr omsg = *it;
 		#ifdef __NO_PLAYER_SENDBUFFER__
 		//use this define only for debugging
 		bool v = 1;
 		#else
 		//It will send only messages bigger then 1 kb or with a lifetime greater than 10 ms
-		bool v = (*it)->getMessageLength() > 1024 || (m_frameTime - (*it)->getFrame() > 10);
+		bool v = omsg->getMessageLength() > 1024 || (m_frameTime - omsg->getFrame() > 10);
 		#endif
 		if(v){
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Sending message - ALL" << std::endl;
 			#endif
 
-			if((*it)->getConnection()){
-				if((*it)->getConnection()->send(*it)){
+			if(omsg->getConnection()){
+				if(omsg->getConnection()->send(omsg)){
 					// Note: if we ever decide to change how the pool works this will have to change
-					if((*it)->getState() != OutputMessage::STATE_FREE) {
-						(*it)->setState(OutputMessage::STATE_WAITING);
+					if(omsg->getState() != OutputMessage::STATE_FREE) {
+						omsg->setState(OutputMessage::STATE_WAITING);
 					}
 				}
 				else{
-					(*it)->getProtocol()->onSendMessage((*it));
-					internalReleaseMessage(*it);
+					omsg->getProtocol()->onSendMessage(omsg);
 				}
 			}
 			else{
@@ -131,7 +131,7 @@ void OutputMessagePool::sendAll()
 				#endif
 			}
 
-			m_autoSendOutputMessages.erase(it++);
+			it = m_autoSendOutputMessages.erase(it);
 		}
 		else{
 			++it;
@@ -165,57 +165,23 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 	m_outputMessages.push_back(msg);
 }
 
-void OutputMessagePool::releaseMessage(OutputMessage* msg, bool sent /*= false*/)
-{
-	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
-	switch(msg->getState()){
-	case OutputMessage::STATE_ALLOCATED:
-	{
-		OutputMessageVector::iterator it =
-			std::find(m_autoSendOutputMessages.begin(), m_autoSendOutputMessages.end(), msg);
-		if(it != m_autoSendOutputMessages.end()){
-			m_autoSendOutputMessages.erase(it);
-		}
-		internalReleaseMessage(msg);
-		break;
-	}
-	case OutputMessage::STATE_ALLOCATED_NO_AUTOSEND:
-		internalReleaseMessage(msg);
-		break;
-	case OutputMessage::STATE_WAITING:
-		if(!sent){
-			std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_WAITING OutputMessage." << std::endl;
-		}
-		else{
-			internalReleaseMessage(msg);
-		}
-		break;
-	case OutputMessage::STATE_FREE:
-		std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_FREE OutputMessage." << std::endl;
-		break;
-	default:
-		std::cout << "Error: [OutputMessagePool::releaseMessage] Releasing STATE_?(" << msg->getState() <<") OutputMessage." << std::endl;
-		break;
-	}
-}
-
-OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool autosend /*= true*/)
+OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool autosend /*= true*/)
 {
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "request output message - auto = " << autosend << std::endl;
 	#endif
 
 	if(!m_isOpen){
-		return NULL;
+		return OutputMessage_ptr();
 	}
 
 	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
 
 	if(protocol->getConnection() == NULL){
-		return NULL;
+		return OutputMessage_ptr();
 	}
 
-	OutputMessage* outputmessage;
+	OutputMessage_ptr outputmessage;
 	if(m_outputMessages.empty()) {
 #ifdef __TRACK_NETWORK__
 		if(m_allOutputMessages.size() >= 5000){
@@ -223,13 +189,15 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 			m_allOutputMessages.back()->PrintTrace();
 		}
 #endif
-		outputmessage = new OutputMessage;
+		outputmessage.reset(new OutputMessage,
+			boost::bind(&OutputMessagePool::internalReleaseMessage, this, _1));
 
 #ifdef __TRACK_NETWORK__
-		m_allOutputMessages.push_back(outputmessage);
+		m_allOutputMessages.push_back(outputmessage..get());
 #endif
 	} else {
-		outputmessage = m_outputMessages.back();
+		outputmessage.reset(m_outputMessages.back(),
+			boost::bind(&OutputMessagePool::internalReleaseMessage, this, _1));
 #ifdef __TRACK_NETWORK__
 		// Print message trace
 		if(outputmessage->getState() != OutputMessage::STATE_FREE) {
@@ -246,7 +214,7 @@ OutputMessage* OutputMessagePool::getOutputMessage(Protocol* protocol, bool auto
 	return outputmessage;
 }
 
-void OutputMessagePool::configureOutputMessage(OutputMessage* msg, Protocol* protocol, bool autosend)
+void OutputMessagePool::configureOutputMessage(OutputMessage_ptr msg, Protocol* protocol, bool autosend)
 {
 	msg->Reset();
 	if(autosend){

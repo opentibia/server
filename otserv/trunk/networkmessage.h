@@ -134,5 +134,6 @@ protected:
 	uint8_t m_MsgBuf[NETWORKMESSAGE_MAXSIZE];
 };
 
+typedef boost::shared_ptr<NetworkMessage> NetworkMessage_ptr;
 
 #endif // #ifndef __NETWORK_MESSAGE_H__

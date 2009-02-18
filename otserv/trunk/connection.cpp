@@ -194,11 +194,6 @@ void Connection::deleteConnectionTask()
 	//dispather thread
 	assert(m_refCount == 0);
 
-	while(!m_outputQueue.empty()){
-		OutputMessagePool::getInstance()->releaseMessage(m_outputQueue.back(), true);
-		m_outputQueue.pop_back();
-	}
-
 	delete this;
 }
 
@@ -344,7 +339,7 @@ void Connection::handleReadError(const boost::system::error_code& error)
 	m_readError = true;
 }
 
-bool Connection::send(OutputMessage* msg)
+bool Connection::send(OutputMessage_ptr msg)
 {
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Connection::send init" << std::endl;
@@ -374,7 +369,7 @@ bool Connection::send(OutputMessage* msg)
 	return true;
 }
 
-void Connection::internalSend(OutputMessage* msg)
+void Connection::internalSend(OutputMessage_ptr msg)
 {
 	m_pendingWrite++;
 	boost::asio::async_write(m_socket,
@@ -396,20 +391,20 @@ uint32_t Connection::getIP() const
 	}
 }
 
-void Connection::onWriteOperation(OutputMessage* msg, const boost::system::error_code& error)
+void Connection::onWriteOperation(OutputMessage_ptr msg, const boost::system::error_code& error)
 {
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "onWriteOperation" << std::endl;
 	#endif
 
-	OutputMessagePool::getInstance()->releaseMessage(msg, true);
+	msg.reset();
 
 	m_connectionLock.lock();
 
 	if(!error){
 		if(m_pendingWrite > 0){
 			if(!m_outputQueue.empty()){
-				OutputMessage* msg = m_outputQueue.front();
+				OutputMessage_ptr msg = m_outputQueue.front();
 				m_outputQueue.pop_front();
 				internalSend(msg);
 				#ifdef __DEBUG_NET_DETAIL__
