@@ -435,3 +435,4 @@ enum PlayerFlags{
 #define IS_IN_KEYRANGE(key, range) (key >= PSTRG_##range##_START && ((key - PSTRG_##range##_START) < PSTRG_##range##_SIZE))
 
 #endif
+
