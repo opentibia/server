@@ -97,8 +97,7 @@ void OutputMessagePool::send(OutputMessage_ptr msg)
 
 void OutputMessagePool::sendAll()
 {
-	boost::recursive
-		_mutex::scoped_lock lockClass(m_outputPoolLock);
+	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
 	OutputMessageMessageList::iterator it;
 	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
 		OutputMessage_ptr omsg = *it;
