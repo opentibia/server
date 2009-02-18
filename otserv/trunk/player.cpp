@@ -78,7 +78,10 @@ Creature()
 	guildId    = 0;
 	guildLevel = 0;
 
-    skill_multiplier[SKILL_LAST] = 1.0f;
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+	    skill_multiplier[i] = 1.0f;
+	}
+
     magic_multiplier = 1.0f;
     exp_multiplier = 1.0f;
 
