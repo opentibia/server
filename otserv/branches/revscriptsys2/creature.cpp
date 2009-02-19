@@ -479,6 +479,10 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 			updateTileCache(creature->getTile(), creature->getPosition());
 		}
 	}
+
+	if(creature != this){
+		g_game.onSpotCreature(this, const_cast<Creature*>(creature));
+	}
 }
 
 void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
@@ -508,6 +512,9 @@ void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 		setFollowCreature(NULL);
 		onFollowCreatureDissapear(isLogout);
 	}
+
+	g_game.onLoseCreature(this, const_cast<Creature*>(creature));
+
 }
 
 void Creature::onChangeZone(ZoneType_t zone)

@@ -67,25 +67,6 @@ enum freeslot_t {
 	SLOT_TYPE_CONTAINER
 };
 
-enum chaseMode_t {
-	CHASEMODE_STANDSTILL,
-	CHASEMODE_FOLLOW,
-};
-
-enum fightMode_t {
-	FIGHTMODE_ATTACK,
-	FIGHTMODE_BALANCED,
-	FIGHTMODE_DEFENSE
-};
-
-enum tradestate_t {
-	TRADE_NONE,
-	TRADE_INITIATED,
-	TRADE_ACCEPT,
-	TRADE_ACKNOWLEDGE,
-	TRADE_TRANSFER
-};
-
 typedef std::pair<uint32_t, Container*> containervector_pair;
 typedef std::vector<containervector_pair> ContainerVector;
 typedef std::map<uint32_t, Depot*> DepotMap;

@@ -24,6 +24,7 @@
 
 #include "waitlist.h"
 #include "status.h"
+#include "player.h"
 
 WaitingList::WaitingList()
 {

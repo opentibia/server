@@ -34,6 +34,7 @@
 #include "trashholder.h"
 #include "mailbox.h"
 #include "combat.h"
+#include "monster.h"
 
 extern Game g_game;
 

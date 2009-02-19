@@ -84,7 +84,9 @@ void Manager::registerClasses() {
 	registerClass("OnLogoutEvent", "Event");
 	registerClass("OnLookEvent", "Event");
 	registerClass("OnTurnEvent", "Event");
-	registerClass("OnServerLoad", "Event");
+	registerClass("OnServerLoadEvent", "Event");
+	registerClass("OnSpotCreatureEvent", "Event");
+	registerClass("OnLoseCreatureEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -284,6 +286,10 @@ void Manager::registerFunctions() {
 
 	// Others are bound in lua
 	registerGlobalFunction("registerOnMoveItem(string method, int filter, boolean isadd, boolean isontile, function callback)", &Manager::lua_registerGenericEvent_OnMoveItem);
+
+	registerGlobalFunction("registerOnSpotCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnSpotCreature);
+	registerGlobalFunction("registerOnLoseCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLoseCreature);
+	
 
 	registerGlobalFunction("registerOnJoinChannel(function callback)", &Manager::lua_registerGenericEvent_OnJoinChannel);
 	registerGlobalFunction("registerOnPlayerJoinChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnJoinChannel);
@@ -1085,6 +1091,48 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	Listener_ptr listener(new Listener(ON_MOVE_ITEM_LISTENER, p, *this->getManager()));
 
 	enviroment.Generic.OnMoveItem.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnSpotCreature() {
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	Listener_ptr listener(
+		new Listener(ON_SPOT_CREATURE_LISTENER, boost::any(), *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	enviroment.registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnLoseCreature() {
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	Listener_ptr listener(
+		new Listener(ON_LOSE_CREATURE_LISTENER, boost::any(), *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	enviroment.registerSpecificListener(listener);
+	who->addListener(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());

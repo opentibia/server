@@ -29,6 +29,7 @@
 #include "networkmessage.h"
 #include "outputmessage.h"
 #include "tools.h"
+#include "player.h"
 
 #ifndef WIN32
 	#define SOCKET_ERROR -1

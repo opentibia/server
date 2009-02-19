@@ -27,12 +27,8 @@
 #include <set>
 
 #include "map.h"
+#include "enums.h"
 #include "position.h"
-#include "item.h"
-#include "container.h"
-#include "player.h"
-#include "npc.h"
-#include "spawn.h"
 #include "templates.h"
 #include "scheduler.h"
 
@@ -105,6 +101,10 @@ typedef std::vector<Player*> PlayerVector;
 #define EVENT_DECAY_BUCKETS  16
 #define EVENT_SCRIPT_CLEANUP_INTERVAL  90000
 #define EVENT_SCRIPT_TIMER_INTERVAL 50
+
+#define EVENT_CREATURECOUNT 10
+#define EVENT_CREATURE_THINK_INTERVAL 1000
+#define EVENT_CHECK_CREATURE_INTERVAL (EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT)
 
 // These are here to avoid expensive includes (extern is much cheaper! :))
 void g_gameOnLeaveChannel(Player* player, ChatChannel* channel);
@@ -291,10 +291,10 @@ public:
 	void addCreatureCheck(Creature* creature);
 	void removeCreatureCheck(Creature* creature);
 
-	uint32_t getPlayersOnline() {return (uint32_t)Player::listPlayer.list.size();}
-	uint32_t getMonstersOnline() {return (uint32_t)Monster::listMonster.list.size();}
-	uint32_t getNpcsOnline() {return (uint32_t)Npc::listNpc.list.size();}
-	uint32_t getCreaturesOnline() {return (uint32_t)listCreature.list.size();}
+	uint32_t getPlayersOnline();
+	uint32_t getMonstersOnline();
+	uint32_t getNpcsOnline();
+	uint32_t getCreaturesOnline();
 
 	void getWorldLightInfo(LightInfo& lightInfo);
 
@@ -488,11 +488,15 @@ public:
 	bool playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown);
 	bool playerShowQuestLog(uint32_t playerId);
 	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
+
+	// Script event callbacks, all are in the game class so we don't have to include the script files
 	bool playerLogout(Player* player, bool forced, bool timeout);
 	bool playerLogin(Player* player);
 	bool playerEquipItem(Player* player, Item* item, slots_t slot, bool equip);
 	bool onCreatureMove(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile);
 	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
+	void onSpotCreature(Creature* creature, Creature* spotted);
+	void onLoseCreature(Creature* creature, Creature* lost);
 
 	void cleanup();
 	void shutdown();

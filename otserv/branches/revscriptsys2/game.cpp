@@ -46,6 +46,7 @@
 #include "ban.h"
 #include "spawn.h"
 #include "beds.h"
+#include "npc.h"
 
 #include "script_enviroment.h"
 #include "script_manager.h"
@@ -1250,6 +1251,18 @@ bool Game::onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem)
 {
 	Script::OnMoveItem::Event evt(actor, item, tile, addItem);
 	return Game::script_system->dispatchEvent(evt);
+}
+
+void Game::onSpotCreature(Creature* creature, Creature* spotted)
+{
+	Script::OnSpotCreature::Event evt(creature, spotted);
+	Game::script_system->dispatchEvent(evt);
+}
+
+void Game::onLoseCreature(Creature* creature, Creature* lost)
+{
+	Script::OnLoseCreature::Event evt(creature, lost);
+	Game::script_system->dispatchEvent(evt);
 }
 
 ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Direction direction, uint32_t flags /*= 0*/)
@@ -4197,6 +4210,26 @@ void Game::removeCreatureCheck(Creature* creature)
 		checkCreatureVector.pop_back();
 	}
 	creature->checkCreatureVectorIndex = 0;
+}
+
+uint32_t Game::getPlayersOnline() 
+{
+	return (uint32_t)Player::listPlayer.list.size();
+}
+
+uint32_t Game::getMonstersOnline() 
+{
+	return (uint32_t)Monster::listMonster.list.size();
+}
+
+uint32_t Game::getNpcsOnline() 
+{
+	return (uint32_t)Npc::listNpc.list.size();
+}
+
+uint32_t Game::getCreaturesOnline() 
+{
+	return (uint32_t)listCreature.list.size();
 }
 
 void Game::checkCreatures()

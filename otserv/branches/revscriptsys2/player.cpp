@@ -35,6 +35,7 @@
 #include "chat.h"
 #include "house.h"
 #include "combat.h"
+#include "monster.h"
 #include "status.h"
 #include "beds.h"
 #include "party.h"

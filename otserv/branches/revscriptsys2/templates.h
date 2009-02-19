@@ -24,8 +24,6 @@
 #include <set>
 #include <map>
 
-
-#include "creature.h"
 #include <boost/thread.hpp>
 
 template<class T> class AutoList

@@ -86,7 +86,6 @@ namespace Script {
 
 		uint32_t eventID;
 		static uint32_t eventID_counter;
-		std::string lua_tag;
 		bool propagate_by_default;
 
 	};
@@ -532,6 +531,56 @@ namespace Script {
 			Player* player;
 			std::string& desc;
 			Thing* object;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnSpotCreature event
+	// Triggered when a creature spots another creature (OnCreatureAppear)
+
+	namespace OnSpotCreature {
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, Creature* spotted_creature);
+			~Event();
+
+			std::string getName() const {return "OnSpotCreature";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			Creature* spotted_creature;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnLoseCreature event
+	// Triggered when a creature loses a creature (OnCreatureDisappear)
+
+	namespace OnLoseCreature {
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, Creature* lose_creature);
+			~Event();
+
+			std::string getName() const {return "OnLoseCreature";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			Creature* lose_creature;
 		};
 	}
 }

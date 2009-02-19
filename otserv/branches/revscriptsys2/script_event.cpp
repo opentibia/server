@@ -37,16 +37,15 @@ using namespace Script;
 ///////////////////////////////////////////////////////////////////////////////
 // General Event class
 
-Event::Event() : eventID(++eventID_counter), propagate_by_default(false) {
-	std::ostringstream os;
-	os << "EI_" << eventID; // Event instance tag
-	lua_tag = os.str();
+Event::Event() : eventID(++eventID_counter), propagate_by_default(false)
+{
 }
 
 Event::~Event() {
 }
 
-bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) {
+bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener)
+{
 	LuaThread_ptr thread = state.newThread(this->getName());
 
 	// Stack is empty
@@ -58,6 +57,10 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 		thread->pop();
 		return false;
 	}
+
+	std::ostringstream lua_tag_stream;
+	lua_tag_stream << "EI_" << eventID; // Event instance tag
+	std::string lua_tag = lua_tag_stream.str();
 
 	// Push event
 	thread->pushEvent(*this);
@@ -781,4 +784,82 @@ void OnLook::Event::update_instance(Manager& state, Enviroment& enviroment, LuaT
 		thread->HandleError("Event 'OnLook' invalid value of 'description'");
 		thread->pop();
 	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnSpot Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when one creature spots another
+
+OnSpotCreature::Event::Event(Creature* creature, Creature* spotted_creature) :
+	creature(creature),
+	spotted_creature(spotted_creature)
+{
+}
+
+OnSpotCreature::Event::~Event()
+{
+}
+
+bool OnSpotCreature::Event::dispatch(Manager& state, Enviroment& enviroment) 
+{
+	ListenerList list = creature->getListeners(ON_SPOT_CREATURE_LISTENER);
+	if(dispatchEvent<OnSpotCreature::Event>
+			(this, state, enviroment, list))
+		return true;
+	return true;
+}
+
+void OnSpotCreature::Event::push_instance(LuaState& state, Enviroment& enviroment) 
+{
+	state.pushClassTableInstance("OnSpotCreatureEvent");
+	state.pushThing(creature);
+	state.setField(-2, "player");
+	state.pushThing(spotted_creature);
+	state.setField(-2, "spotted_creature");
+}
+
+void OnSpotCreature::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread)
+{
+	;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnLose Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when one creature spots another
+
+OnLoseCreature::Event::Event(Creature* creature, Creature* lose_creature) :
+	creature(creature),
+	lose_creature(lose_creature)
+{
+}
+
+OnLoseCreature::Event::~Event()
+{
+}
+
+bool OnLoseCreature::Event::dispatch(Manager& state, Enviroment& enviroment) 
+{
+	ListenerList list = creature->getListeners(ON_LOSE_CREATURE_LISTENER);
+	if(dispatchEvent<OnLoseCreature::Event>
+			(this, state, enviroment, list))
+		return true;
+	return true;
+}
+
+void OnLoseCreature::Event::push_instance(LuaState& state, Enviroment& enviroment) 
+{
+	state.pushClassTableInstance("OnLoseCreatureEvent");
+	state.pushThing(creature);
+	state.setField(-2, "player");
+	state.pushThing(lose_creature);
+	state.setField(-2, "lose_creature");
+}
+
+void OnLoseCreature::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread)
+{
+	;
 }

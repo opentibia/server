@@ -225,6 +225,8 @@ public:
 	int lua_registerSpecificEvent_OnMoveCreature();
 	int lua_registerGenericEvent_OnMoveItem();
 	int lua_registerSpecificEvent_OnCreatureTurn();
+	int lua_registerSpecificEvent_OnSpotCreature();
+	int lua_registerSpecificEvent_OnLoseCreature();
 	int lua_registerGenericEvent_OnCreatureTurn();
 	int lua_registerGenericEvent_OnServerLoad();
 

@@ -24,6 +24,7 @@
 #include "creature.h"
 #include "tools.h"
 #include "combat.h"
+#include "player.h"
 
 #include <utility>
 #include <sstream>

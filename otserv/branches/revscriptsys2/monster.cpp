@@ -26,6 +26,7 @@
 
 #include "monster.h"
 #include "monsters.h"
+#include "player.h"
 #include "game.h"
 #include "combat.h"
 #include "spawn.h"
