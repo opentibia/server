@@ -625,6 +625,7 @@ protected:
 	// Script handling
 	Script::Enviroment* script_enviroment;
 	Script::Manager* script_system;
+	uint32_t waiting_script_task;
 
 #ifdef __DEBUG_CRITICALSECTION__
 	static OTSYS_THREAD_RETURN monitorThread(void *p);

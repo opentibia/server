@@ -83,6 +83,8 @@ void Manager::registerClasses() {
 	registerClass("OnLoginEvent", "Event");
 	registerClass("OnLogoutEvent", "Event");
 	registerClass("OnLookEvent", "Event");
+	registerClass("OnTurnEvent", "Event");
+	registerClass("OnServerLoad", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -171,6 +173,7 @@ void Manager::registerClasses() {
 
 	registerMemberFunction("Player", "sendMessage(int type, string msg)", &Manager::lua_Player_sendMessage);
 
+	registerGlobalFunction("getOnlinePlayers()", &Manager::lua_getOnlinePlayers);
 	registerGlobalFunction("getPlayerByName(string name)", &Manager::lua_getPlayerByName);
 	registerGlobalFunction("getPlayerByNameWildcard(string wild)", &Manager::lua_getPlayerByNameWildcard);
 	registerGlobalFunction("getPlayersByName(string name)", &Manager::lua_getPlayersByName);
@@ -246,6 +249,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("House", "setOwner(int guid)", &Manager::lua_House_setOwner);
 	registerMemberFunction("House", "setSubownerList(table list)", &Manager::lua_House_setSubownerList);
 	registerMemberFunction("House", "setPaidUntil(int until)", &Manager::lua_House_setPaidUntil);
+	
+	registerGlobalFunction("getAllHouses()", &Manager::lua_getHouses);
 
 	// Channel
 	registerMemberFunction("Channel", "getID()", &Manager::lua_Channel_getID);
@@ -269,8 +274,13 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnCreatureMove(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnMoveCreature);
 	registerGlobalFunction("registerOnMoveCreature(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnMoveCreature);
 
+	registerGlobalFunction("registerOnAnyCreatureTurn(function callback)", &Manager::lua_registerGenericEvent_OnCreatureTurn);
+	registerGlobalFunction("registerOnCreatureTurn(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnCreatureTurn);
+
 	registerGlobalFunction("registerOnEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
 	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
+	
+	registerGlobalFunction("registerOnServerLoad(function callback)", &Manager::lua_registerGenericEvent_OnServerLoad);
 
 	// Others are bound in lua
 	registerGlobalFunction("registerOnMoveItem(string method, int filter, boolean isadd, boolean isontile, function callback)", &Manager::lua_registerGenericEvent_OnMoveItem);
@@ -309,6 +319,22 @@ int LuaState::lua_wait() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register Events
+
+int LuaState::lua_registerGenericEvent_OnServerLoad()
+{
+	OnServerLoad::ScriptInformation si_onload;
+	boost::any p(si_onload);
+	Listener_ptr listener(new Listener(ON_LOAD_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnLoad.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
 
 int LuaState::lua_registerGenericEvent_OnSay() {
 	// Store callback
@@ -983,6 +1009,46 @@ int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
 	boost::any p(si_onmovecreature);
 	Listener_ptr listener(
 		new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	enviroment.registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnCreatureTurn()
+{
+	OnTurn::ScriptInformation si_onturn;
+	boost::any p(si_onturn);
+	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *this->getManager()));
+
+	enviroment.Generic.OnTurn.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnCreatureTurn() {
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	OnTurn::ScriptInformation si_onturn;
+
+	boost::any p(si_onturn);
+	Listener_ptr listener(
+		new Listener(ON_TURN_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
 	enviroment.registerSpecificListener(listener);
@@ -1756,6 +1822,19 @@ int LuaState::lua_Player_addItem()
 	}
 	pushBoolean(ret == RET_NOERROR);
 	return 1;
+}
+
+int LuaState::lua_getOnlinePlayers()
+{
+	newTable();
+	int n = 1;
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(!it->second->isRemoved()){
+			pushThing(it->second);
+			setField(-2, n++);
+		}
+	}
+	return 1 ;
 }
 
 int LuaState::lua_getPlayerByName()
@@ -3008,8 +3087,10 @@ int LuaState::lua_Town_getHouses()
 	newTable();
 	int n = 1;
 	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
-		pushHouse(it->second);
-		setField(-2, n++);
+		if(it->second->getTownId() == town->getTownID()){
+			pushHouse(it->second);
+			setField(-2, n++);
+		}
 	}
 	return 1;
 }
@@ -3312,6 +3393,20 @@ int LuaState::lua_getTowns()
 		pushTown(const_cast<Town*>((*i).second));
 		setField(-2, n++);
 	}
+	return 1;
+}
+
+int LuaState::lua_getHouses()
+{
+	Houses& houses = Houses::getInstance();
+
+	newTable();
+	int n = 1;
+	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
+		pushHouse(it->second);
+		setField(-2, n++);
+	}
+
 	return 1;
 }
 

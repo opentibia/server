@@ -88,6 +88,8 @@ namespace Script {
 			ListenerList OnLogin;
 			ListenerList OnLogout;
 			ListenerList OnLook;
+			ListenerList OnTurn;
+			ListenerList OnLoad;
 		} Generic;
 		ListenerMap specific_listeners;
 

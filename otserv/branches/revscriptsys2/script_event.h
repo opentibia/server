@@ -91,6 +91,37 @@ namespace Script {
 
 	};
 
+	////////////////////////////////////////////////////////////////
+	// OnServerLoad event
+	// Triggered when a creature turns
+
+	namespace OnServerLoad {
+		struct ScriptInformation {
+			//Empty, but we need a dummy class for the boost::any type
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(bool reload);
+			~Event();
+
+			std::string getName() const {return "OnServerLoad";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			bool is_reload;
+		};
+	}
+
 	///////////////////////////////////////////////////////////////////////////////
 	// OnSay event
 	// Triggered when a creature talks
@@ -270,6 +301,38 @@ namespace Script {
 			Tile* fromTile;
 			Tile* toTile;
 			MoveType moveType;
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	// OnTurn event
+	// Triggered when a creature turns
+
+	namespace OnTurn {
+		struct ScriptInformation {
+			//Empty, but we need a dummy class for the boost::any type
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, Direction direction);
+			~Event();
+
+			std::string getName() const {return "OnTurn";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			Direction direction;
 		};
 	}
 

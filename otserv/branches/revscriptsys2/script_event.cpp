@@ -104,6 +104,38 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 	return !propagate;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// OnServerLoad Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered just after the server loads
+
+OnServerLoad::Event::Event(bool is_reload) :
+	is_reload(is_reload)
+{
+}
+
+OnServerLoad::Event::~Event() {
+}
+
+bool OnServerLoad::Event::check_match(const ScriptInformation& info) {
+	return true;
+}
+
+bool OnServerLoad::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	return dispatchEvent<OnServerLoad::Event, ScriptInformation>
+		(this, state, enviroment, enviroment.Generic.OnLoad);
+}
+
+void OnServerLoad::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnServerLoad");
+	state.setField(-1, "reload", true);
+}
+
+void OnServerLoad::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	// ...
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // OnSay Event
 ///////////////////////////////////////////////////////////////////////////////
@@ -418,6 +450,48 @@ void OnMoveCreature::Event::update_instance(Manager& state, Enviroment& envirome
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// OnTurn Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature turns
+
+OnTurn::Event::Event(Creature* creature, Direction dir) :
+	creature(creature),
+	direction(dir)
+{
+	propagate_by_default = true;
+}
+
+OnTurn::Event::~Event() {
+}
+
+bool OnTurn::Event::check_match(const ScriptInformation& info) {
+	return true;
+}
+
+bool OnTurn::Event::dispatch(Manager& state, Enviroment& enviroment) {
+	ListenerList list = creature->getListeners(ON_TURN_LISTENER);
+	if(dispatchEvent<OnTurn::Event>
+			(this, state, enviroment, list)
+		)
+		return true;
+
+	return dispatchEvent<OnTurn::Event, ScriptInformation>
+		(this, state, enviroment, enviroment.Generic.OnTurn);
+}
+
+void OnTurn::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+	state.pushClassTableInstance("OnTurnEvent");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	state.pushInteger(direction);
+	state.setField(-2, "direction");
+}
+
+void OnTurn::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+	// ...
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // OnMoveCreature Event
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when an item is moved
@@ -609,7 +683,7 @@ void OnLogin::Event::update_instance(Manager& state, Enviroment& enviroment, Lua
 ///////////////////////////////////////////////////////////////////////////////
 // OnLogout Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when a player enters the server
+// Triggered when a player leaves the server
 
 OnLogout::Event::Event(Player* player, bool forced, bool timeout) :
 	player(player),
@@ -646,9 +720,9 @@ void OnLogout::Event::update_instance(Manager& state, Enviroment& enviroment, Lu
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// OnUseItem Event
+// OnLook Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when a creature speaks
+// Triggered when a player looks at something
 
 OnLook::Event::Event(Player* player, std::string& desc, Thing* object) :
 	player(player),

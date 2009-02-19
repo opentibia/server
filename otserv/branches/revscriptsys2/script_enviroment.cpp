@@ -96,6 +96,10 @@ bool Enviroment::stopListener(ListenerType type, uint32_t id) {
 			if(stopListener(Generic.OnMoveCreature, id))
 				return true;
 			break;
+		case ON_TURN_LISTENER:
+			if(stopListener(Generic.OnTurn, id))
+				return true;
+			break;
 		case ON_MOVE_ITEM_LISTENER:
 			if(stopListener(Generic.OnMoveItem, id))
 				return true;

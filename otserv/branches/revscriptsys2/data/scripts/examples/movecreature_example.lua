@@ -4,8 +4,8 @@ local count_steps = {}
 
 function movecreature_example.stepIn_callback(event)
 	local c = count_steps[event.creature:getID()]
-	if c then
-		c.steps = 100
+	if c and c.steps > 0 then
+		c.steps = 0
 		return
 	end
 	

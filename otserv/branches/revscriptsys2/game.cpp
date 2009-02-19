@@ -81,6 +81,11 @@ Game::Game()
 	lightlevel = LIGHT_LEVEL_DAY;
 	light_state = LIGHT_STATE_DAY;
 
+	script_system = NULL;
+	script_enviroment = NULL;
+
+	waiting_script_task = 0;
+
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL,
 		boost::bind(&Game::checkLight, this)));
 	checkCreatureLastIndex = 0;
@@ -93,9 +98,6 @@ Game::Game()
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_CLEANUP_INTERVAL,
 		boost::bind(&Game::scriptCleanup, this)));
-	
-	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_TIMER_INTERVAL,
-		boost::bind(&Game::runWaitingScripts, this)));
 }
 
 Game::~Game()
@@ -197,12 +199,13 @@ void Game::runWaitingScripts()
 	if(script_system){
 		script_system->runScheduledThreads();
 	}
-	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_TIMER_INTERVAL,
+	waiting_script_task = Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_TIMER_INTERVAL,
 		boost::bind(&Game::runWaitingScripts, this)));
 }
 
 bool Game::loadScripts() 
 {
+	bool is_reload = false;
 	// Unload any old
 	if(script_enviroment || script_system) {
 		for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
@@ -215,6 +218,9 @@ bool Game::loadScripts()
 		delete script_system;
 		script_enviroment = NULL;
 		script_system = NULL;
+
+		Scheduler::getScheduler().stopEvent(waiting_script_task);
+		is_reload = true;
 	}
 
 	// Load fresh!
@@ -222,6 +228,12 @@ bool Game::loadScripts()
 		script_enviroment = new Script::Enviroment();
 		script_system = new Script::Manager(*script_enviroment);
 		script_system->loadFile(g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/main.lua");
+		
+		Script::OnServerLoad::Event evt(is_reload);
+		script_system->dispatchEvent(evt);
+
+		waiting_script_task = Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_TIMER_INTERVAL,
+			boost::bind(&Game::runWaitingScripts, this)));
 	} catch(Script::Error&) {
 		for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
 			it != Game::listCreature.list.end();
@@ -3727,22 +3739,22 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 
 bool Game::checkReload(Player* player, const std::string& text)
 {
-	if(text.length() > 8 && text.substr(0, 8) == "/reload "){
-		std::string param = text.substr(8);
+	if(text.length() > 7 && text.substr(0, 7) == "/reload" && player->hasFlag(PlayerFlag_CanReloadContent)){
+		std::string param = text.substr(7);
 
-		if(param == "monsters" || param == "monster"){
+		if(param == " monsters" || param == " monster" || param == "m"){
 			std::cout << "================================================================================\n";
 			g_monsters.reload();
 			std::cout << ":: Reloaded Monsters " << std::endl;
 			if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded monsters.");
 		}
-		else if(param == "config"){
+		else if(param == " config" || param == "c"){
 			std::cout << "================================================================================\n";
 			g_config.reload();
 			std::cout << ":: Reloaded config " << std::endl;
 			if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
 		}
-		else if(param == "scripts"){
+		else if(param == " scripts" || param == "s"){
 			std::cout << "================================================================================\n";
 			g_game.loadScripts();
 			std::cout << ":: Reloaded Scripts " << std::endl;
@@ -4062,6 +4074,9 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 		for(it = list.begin(); it != list.end(); ++it) {
 			(*it)->onCreatureTurn(creature, stackpos);
 		}
+
+		Script::OnTurn::Event evt(creature, dir);
+		script_system->dispatchEvent(evt);
 
 		return true;
 	}

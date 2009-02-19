@@ -1544,11 +1544,19 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 	return false;
 }
 
-void Creature::addListener(Script::Listener_ptr listener) {
+void Creature::addListener(Script::Listener_ptr listener)
+{
+	for(Script::ListenerList::iterator i = registered_listeners.begin(); i != registered_listeners.end();) {
+		if((*i)->isActive() == false)
+			i = registered_listeners.erase(i);
+		else
+			++i;
+	}
 	registered_listeners.push_back(listener);
 }
 
-Script::ListenerList Creature::getListeners(Script::ListenerType type) {
+Script::ListenerList Creature::getListeners(Script::ListenerType type)
+{
 	Script::ListenerList li;
 	for(Script::ListenerList::iterator i = registered_listeners.begin(), end = registered_listeners.end(); i != end; ++i) {
 		if((*i)->type() == type)

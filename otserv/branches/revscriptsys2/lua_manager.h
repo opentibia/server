@@ -222,6 +222,9 @@ public:
 	//int lua_registerGenericEvent_OnMoveCreature();
 	int lua_registerSpecificEvent_OnMoveCreature();
 	int lua_registerGenericEvent_OnMoveItem();
+	int lua_registerSpecificEvent_OnCreatureTurn();
+	int lua_registerGenericEvent_OnCreatureTurn();
+	int lua_registerGenericEvent_OnServerLoad();
 
 	int lua_stopListener();
 
@@ -304,6 +307,7 @@ public:
 
 	int lua_Player_sendMessage();
 
+	int lua_getOnlinePlayers();
 	int lua_getPlayerByName();
 	int lua_getPlayersByName();
 	int lua_getPlayerByNameWildcard();
@@ -391,6 +395,7 @@ public:
 	int lua_sendMagicEffect();
 	int lua_getTile();
 	int lua_getTowns();
+	int lua_getHouses();
 
 protected:
 	virtual Script::Manager* getManager() = 0;

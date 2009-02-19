@@ -215,7 +215,7 @@ INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxvipl
 INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
 	VALUES ('7', 'Community Manager', 272227082232, 3, 2000, 300);
 INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
-	VALUES ('8', 'Server Administrator', 272227082232, 3, 2000, 300);
+	VALUES ('8', 'Server Administrator', 821982896120, 3, 2000, 300);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER

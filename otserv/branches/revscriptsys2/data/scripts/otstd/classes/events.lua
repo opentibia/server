@@ -53,10 +53,11 @@ function stopListener(li)
 		for k, l in ipairs(li) do
 			internalStopListener(l)
 		end
+		
+		while #li > 0 do
+			table.remove(li)
+		end
 	else
 		internalStopListener(li)
-	end
-	while #li > 0 do
-		table.remove(li)
 	end
 end
