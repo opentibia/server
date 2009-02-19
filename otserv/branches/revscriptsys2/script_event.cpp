@@ -85,15 +85,15 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener) 
 	// Find out if the event should propagate
 	bool propagate = propagate_by_default;
 	thread->getField(-1, "skipped");
-	if(thread->isNil(-1)) {
+	
+	if(thread->rawtypeOf() == LUA_TNIL){
+		// use default
 		thread->pop();
+	} else if(thread->isBoolean(-1)) {
+		propagate = thread->popBoolean();
 	} else {
-		if(thread->isBoolean(-1)) {
-			propagate = thread->popBoolean();
-		} else {
-			thread->HandleError("Invalid type of value 'skipped' of event table from '" + getName() + "' listener.");
-			thread->pop();
-		}
+		thread->HandleError("Invalid type of value 'skipped' of event table from '" + getName() + "' listener.");
+		thread->pop();
 	}
 
 	// clean up
@@ -118,12 +118,8 @@ OnServerLoad::Event::Event(bool is_reload) :
 OnServerLoad::Event::~Event() {
 }
 
-bool OnServerLoad::Event::check_match(const ScriptInformation& info) {
-	return true;
-}
-
 bool OnServerLoad::Event::dispatch(Manager& state, Enviroment& enviroment) {
-	return dispatchEvent<OnServerLoad::Event, ScriptInformation>
+	return dispatchEvent<OnServerLoad::Event>
 		(this, state, enviroment, enviroment.Generic.OnLoad);
 }
 
@@ -464,10 +460,6 @@ OnTurn::Event::Event(Creature* creature, Direction dir) :
 OnTurn::Event::~Event() {
 }
 
-bool OnTurn::Event::check_match(const ScriptInformation& info) {
-	return true;
-}
-
 bool OnTurn::Event::dispatch(Manager& state, Enviroment& enviroment) {
 	ListenerList list = creature->getListeners(ON_TURN_LISTENER);
 	if(dispatchEvent<OnTurn::Event>
@@ -475,7 +467,7 @@ bool OnTurn::Event::dispatch(Manager& state, Enviroment& enviroment) {
 		)
 		return true;
 
-	return dispatchEvent<OnTurn::Event, ScriptInformation>
+	return dispatchEvent<OnTurn::Event>
 		(this, state, enviroment, enviroment.Generic.OnTurn);
 }
 

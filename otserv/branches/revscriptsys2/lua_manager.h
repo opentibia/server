@@ -89,6 +89,8 @@ public:
 	void swap(int idx);
 	// Get the type of the value as a string
 	std::string typeOf(int idx = -1);
+	// Get the type as a lua string
+	int rawtypeOf(int idx = -1);
 	// Duplicates the top value at index
 	void duplicate(int idx = -1);
 

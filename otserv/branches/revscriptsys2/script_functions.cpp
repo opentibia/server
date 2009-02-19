@@ -322,9 +322,7 @@ int LuaState::lua_wait() {
 
 int LuaState::lua_registerGenericEvent_OnServerLoad()
 {
-	OnServerLoad::ScriptInformation si_onload;
-	boost::any p(si_onload);
-	Listener_ptr listener(new Listener(ON_LOAD_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_LOAD_LISTENER, boost::any(), *this->getManager()));
 
 	enviroment.Generic.OnLoad.push_back(listener);
 
@@ -1024,9 +1022,7 @@ int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
 
 int LuaState::lua_registerGenericEvent_OnCreatureTurn()
 {
-	OnTurn::ScriptInformation si_onturn;
-	boost::any p(si_onturn);
-	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, boost::any(), *this->getManager()));
 
 	enviroment.Generic.OnTurn.push_back(listener);
 
@@ -1044,11 +1040,8 @@ int LuaState::lua_registerSpecificEvent_OnCreatureTurn() {
 
 	Creature* who = popCreature();
 
-	OnTurn::ScriptInformation si_onturn;
-
-	boost::any p(si_onturn);
 	Listener_ptr listener(
-		new Listener(ON_TURN_LISTENER, p, *this->getManager()),
+		new Listener(ON_TURN_LISTENER, boost::any(), *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
 	enviroment.registerSpecificListener(listener);

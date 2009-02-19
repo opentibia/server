@@ -4054,31 +4054,32 @@ bool Game::isSightClear(const Position& fromPos, const Position& toPos, bool flo
 
 bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 {
-	if(creature->getDirection() != dir){
-		creature->setDirection(dir);
+	Script::OnTurn::Event evt(creature, dir);
+	
+	if(!script_system->dispatchEvent(evt)){
+		if(creature->getDirection() != dir){
+			creature->setDirection(dir);
 
-		int32_t stackpos = creature->getParent()->__getIndexOfThing(creature);
+			int32_t stackpos = creature->getParent()->__getIndexOfThing(creature);
 
-		const SpectatorVec& list = getSpectators(creature->getPosition());
-		SpectatorVec::const_iterator it;
+			const SpectatorVec& list = getSpectators(creature->getPosition());
+			SpectatorVec::const_iterator it;
 
-		//send to client
-		Player* tmpPlayer = NULL;
-		for(it = list.begin(); it != list.end(); ++it) {
-			if((tmpPlayer = (*it)->getPlayer())){
-				tmpPlayer->sendCreatureTurn(creature, stackpos);
+			//send to client
+			Player* tmpPlayer = NULL;
+			for(it = list.begin(); it != list.end(); ++it) {
+				if((tmpPlayer = (*it)->getPlayer())){
+					tmpPlayer->sendCreatureTurn(creature, stackpos);
+				}
 			}
+
+			//event method
+			for(it = list.begin(); it != list.end(); ++it) {
+				(*it)->onCreatureTurn(creature, stackpos);
+			}
+
+			return true;
 		}
-
-		//event method
-		for(it = list.begin(); it != list.end(); ++it) {
-			(*it)->onCreatureTurn(creature, stackpos);
-		}
-
-		Script::OnTurn::Event evt(creature, dir);
-		script_system->dispatchEvent(evt);
-
-		return true;
 	}
 
 	return false;

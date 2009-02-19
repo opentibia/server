@@ -96,10 +96,6 @@ namespace Script {
 	// Triggered when a creature turns
 
 	namespace OnServerLoad {
-		struct ScriptInformation {
-			//Empty, but we need a dummy class for the boost::any type
-		};
-
 		class Event : public Script::Event {
 		public:
 			Event(bool reload);
@@ -109,9 +105,6 @@ namespace Script {
 
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
-
-			// This checks if the script information matches this events prerequiste (data members)
-			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
 			void push_instance(LuaState& state, Enviroment& enviroment);
@@ -309,10 +302,6 @@ namespace Script {
 	// Triggered when a creature turns
 
 	namespace OnTurn {
-		struct ScriptInformation {
-			//Empty, but we need a dummy class for the boost::any type
-		};
-
 		class Event : public Script::Event {
 		public:
 			Event(Creature* creature, Direction direction);
@@ -322,9 +311,6 @@ namespace Script {
 
 			// Runs the event
 			bool dispatch(Manager& state, Enviroment& enviroment);
-
-			// This checks if the script information matches this events prerequiste (data members)
-			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
 			void push_instance(LuaState& state, Enviroment& enviroment);

@@ -29,14 +29,36 @@ function bind(f, ...)
 				pp[n] = v
 			end
 		end
-		[[--
-		for i = 1, (#prp + lp) do
-			if not pp[i] then
-				pp[i] = lp[i]
-			end
-		end
-		--]]
-		
 		f(unpack(pp))
 	end
 end
+
+--
+
+function fmap(f, list)
+    rlist = {}
+    for i, v in ipairs(list) do
+        rlist[i] = f(v)
+    end
+    return rlist
+end
+
+--
+
+function foldl(f, list)
+    local r = nil
+    if #list == 1 then
+        return r
+    end
+    for i, v in ipairs(list) do
+        if r then
+            r = f(r, v)
+        else
+            r = v
+        end
+    end
+    return r
+end
+
+--
+

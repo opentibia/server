@@ -118,6 +118,10 @@ std::string LuaState::typeOf(int idx) {
 	return lua_typename(state, lua_type(state, idx));
 }
 
+int LuaState::rawtypeOf(int idx) {
+	return lua_type(state, idx);
+}
+
 // Check
 bool LuaState::isNil(int index) {
 	return lua_isnil(state, index);
