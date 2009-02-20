@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
 class NetworkMessage;
 class OutputMessage;
