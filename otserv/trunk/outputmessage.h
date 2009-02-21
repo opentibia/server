@@ -24,6 +24,7 @@
 #include "networkmessage.h"
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
 #include "tools.h"
 #include <list>
 
