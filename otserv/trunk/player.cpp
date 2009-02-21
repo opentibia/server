@@ -249,7 +249,9 @@ std::string Player::getDescription(int32_t lookDistance) const
 	if(lookDistance == -1){
 		s << "yourself.";
 
-		if(getVocationId() != VOCATION_NONE)
+		if(hasFlag(PlayerFlag_ShowGroupInsteadVocation))
+            s << " You are " << getGroupName() << ".";
+		else if(getVocationId() != VOCATION_NONE)
 			s << " You are " << vocation->getVocDescription() << ".";
 		else
 			s << " You have no vocation.";
@@ -262,8 +264,10 @@ std::string Player::getDescription(int32_t lookDistance) const
 		else
 			s << " He";
 
-		if(getVocationId() != VOCATION_NONE)
-			s << " is "<< vocation->getVocDescription() << ".";
+        if(hasFlag(PlayerFlag_ShowGroupInsteadVocation))
+            s << " is " << getGroupName() << ".";
+		else if(getVocationId() != VOCATION_NONE)
+			s << " is " << vocation->getVocDescription() << ".";
 		else
 			s << " has no vocation.";
 	}

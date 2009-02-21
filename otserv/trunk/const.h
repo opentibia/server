@@ -421,6 +421,7 @@ enum PlayerFlags{
 	PlayerFlag_IsAlwaysPremium,             //2^37 = 137438953472
 	PlayerFlag_CanAnswerRuleViolations,     //2^38 = 274877906944
 	PlayerFlag_CanReloadContent,            //2^39 = 549755813888
+	PlayerFlag_ShowGroupInsteadVocation,    //2^40 = 1099511627776
 	//add new flags here
 	PlayerFlag_LastFlag
 };

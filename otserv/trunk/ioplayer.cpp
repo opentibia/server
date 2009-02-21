@@ -64,6 +64,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
 	if(group){
+        player->groupName = group->m_name;
 		player->accessLevel = group->m_access;
 		player->maxDepotLimit = group->m_maxDepotItems;
 		player->maxVipLimit = group->m_maxVip;
