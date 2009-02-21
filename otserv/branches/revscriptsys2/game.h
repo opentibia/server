@@ -497,6 +497,7 @@ public:
 	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
 	void onSpotCreature(Creature* creature, Creature* spotted);
 	void onLoseCreature(Creature* creature, Creature* lost);
+	void onCreatureHear(Creature* listener, Creature* speaker, const SpeakClass& sclass, const std::string& text);
 
 	void cleanup();
 	void shutdown();

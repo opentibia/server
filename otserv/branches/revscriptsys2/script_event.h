@@ -156,6 +156,34 @@ namespace Script {
 			std::string& text;
 		};
 	}
+
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnHear event
+	// Triggered when a creature hears another creature speak
+
+	namespace OnHear {
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, Creature* talking_creature, const std::string& message, const SpeakClass& speak_class);
+			~Event();
+
+			std::string getName() const {return "OnHear";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Enviroment& enviroment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Enviroment& enviroment);
+			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			Creature* talking_creature;
+			const std::string& message;
+			const SpeakClass& speak_class;
+		};
+	}
 	
 
 	////////////////////////////////////////////////////////////////

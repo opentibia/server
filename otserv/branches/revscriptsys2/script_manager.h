@@ -67,6 +67,7 @@ namespace Script {
 		std::map<std::string, LuaClassType_ptr> class_list;
 		FunctionMap function_map;
 		uint32_t function_id_counter;
+		int event_nested_level;
 
 		// Expose functions/classes to lua
 		void registerClass(const std::string& cname);

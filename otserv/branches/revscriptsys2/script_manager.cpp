@@ -24,9 +24,16 @@
 #include "script_event.h"
 #include "script_enviroment.h"
 
+#include "configmanager.h"
+
+extern ConfigManager g_config;
+
 using namespace Script;
 
-Manager::Manager(Script::Enviroment& e) : LuaStateManager(e), function_id_counter(1) {
+Manager::Manager(Script::Enviroment& e) : LuaStateManager(e),
+	function_id_counter(1),
+	event_nested_level(0)
+{
 	registerClasses();
 	registerFunctions();
 }
@@ -35,7 +42,14 @@ Manager::~Manager() {
 }
 
 bool Manager::dispatchEvent(Script::Event& event) {
-	return event.dispatch(*this, enviroment);
+	if(event_nested_level > g_config.getNumber(ConfigManager::MAXIMUM_SCRIPT_RECURSION_DEPTH))
+		// Event not handled
+		return false;
+
+	event_nested_level++;
+	bool s = event.dispatch(*this, enviroment);
+	event_nested_level--;
+	return s;
 }
 
 Manager* Manager::getManager() {

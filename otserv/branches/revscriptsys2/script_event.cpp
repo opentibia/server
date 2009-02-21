@@ -217,6 +217,49 @@ void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaTh
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// OnHear Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature hears another creature speak
+
+OnHear::Event::Event(Creature* creature, Creature* talking_creature, const std::string& message, const SpeakClass& speak_class) :
+	creature(creature),
+	talking_creature(talking_creature),
+	speak_class(speak_class),
+	message(message)
+{
+}
+
+OnHear::Event::~Event() {
+}
+
+bool OnHear::Event::dispatch(Manager& state, Enviroment& enviroment)
+{
+	ListenerList list = creature->getListeners(ON_HEAR_LISTENER);
+	if(dispatchEvent<OnHear::Event>(this, state, enviroment, list))
+		return true;
+	return false;
+}
+
+void OnHear::Event::push_instance(LuaState& state, Enviroment& enviroment) 
+{
+	//std::cout << "pushing instance" << std::endl;
+	state.pushClassTableInstance("OnHearEvent");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	state.pushThing(talking_creature);
+	state.setField(-2, "talking_creature");
+	state.setField(-1, "class", int32_t(speak_class));
+	state.setField(-1, "text", message);
+	//std::cout << state.typeOf() << ":" << state.getStackTop() << std::endl;
+	//std::cout << "endof" << std::endl;
+}
+
+void OnHear::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread)
+{
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // OnUseItem Event
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a player use an item
@@ -229,10 +272,12 @@ OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos, Retur
 {
 }
 
-OnUseItem::Event::~Event() {
+OnUseItem::Event::~Event()
+{
 }
 
-bool OnUseItem::Event::check_match(const ScriptInformation& info) {
+bool OnUseItem::Event::check_match(const ScriptInformation& info)
+{
 	switch(info.method) {
 		case FILTER_ITEMID:
 			return item->getID() == info.id;
@@ -245,14 +290,16 @@ bool OnUseItem::Event::check_match(const ScriptInformation& info) {
 	return false;
 }
 
-bool OnUseItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnUseItem::Event::dispatch(Manager& state, Enviroment& enviroment) 
+{
 	// Extremely naive solution
 	// Should be a map with id:callback instead.
 	return dispatchEvent<OnUseItem::Event, ScriptInformation>
 		(this, state, enviroment, enviroment.Generic.OnUseItem);
 }
 
-void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) 
+{
 	state.pushClassTableInstance("OnUseItemEvent");
 	state.pushThing(user);
 	state.setField(-2, "player");
@@ -267,7 +314,8 @@ void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.setField(-2, "target");
 }
 
-void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) 
+{
 	thread->getField(-1, "retval");
 	if(thread->isNumber()) {
 		retval = (ReturnValue)thread->popInteger();

@@ -1265,6 +1265,12 @@ void Game::onLoseCreature(Creature* creature, Creature* lost)
 	Game::script_system->dispatchEvent(evt);
 }
 
+void Game::onCreatureHear(Creature* listener, Creature* speaker, const SpeakClass& sclass, const std::string& text)
+{
+	Script::OnHear::Event evt(listener, speaker, text, sclass);
+	Game::script_system->dispatchEvent(evt);
+}
+
 ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Direction direction, uint32_t flags /*= 0*/)
 {
 	Cylinder* fromTile = creature->getTile();

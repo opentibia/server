@@ -708,6 +708,11 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 	}
 }
 
+void Creature::onCreatureSay(const Creature* creature, SpeakClass type, const std::string& text)
+{
+	g_game.onCreatureHear(this, const_cast<Creature*>(creature), type, text);
+}
+
 void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 {
 	//
