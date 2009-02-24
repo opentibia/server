@@ -105,6 +105,7 @@ public:
 		REMOVE_WEAPON_CHARGES,
 		USE_ACCBALANCE,
 		LOGIN_ATTACK_DELAY,
+		SHOW_CRASH_WINDOW,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

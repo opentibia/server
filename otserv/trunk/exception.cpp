@@ -31,7 +31,9 @@
 
 #include <boost/thread.hpp>
 #include "exception.h"
+#include "configmanager.h"
 
+extern ConfigManager g_config;
 typedef std::map<unsigned long, char*> FunctionMap;
 
 
@@ -333,7 +335,8 @@ __cdecl _SEHHandler(
 	*outdriver << "*****************************************************" << std::endl;
 	if(file)
 		((std::ofstream*)outdriver)->close();
-	MessageBoxA(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);
+	if(g_config.getNumber(ConfigManager::SHOW_CRASH_WINDOW))
+        MessageBoxA(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);
 	std::cout << "Error report generated. Killing server." <<std::endl;
 	exit(1); //force exit
 	return ExceptionContinueSearch;

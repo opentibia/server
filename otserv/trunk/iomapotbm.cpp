@@ -95,7 +95,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		//In otbm version 1 the count variable after splashes/fluidcontainers and stackables
 		//are saved as attributes instead, this solves alot of problems with items
 		//that is changed (stackable/charges/fluidcontainer/splash) during an update.
-		setLastErrorString("This map need to be upgraded by using the latest map editor version to be able to load correctly.");
+		setLastErrorString("This map needs to be upgraded by using the latest map editor version to be able to load correctly.");
 		return false;
 	}
 
@@ -105,7 +105,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	}
 
 	if(root_header->majorVersionItems < 3){
-		setLastErrorString("This map need to be upgraded by using the latest map editor version to be able to load correctly.");
+		setLastErrorString("This map needs to be upgraded by using the latest map editor version to be able to load correctly.");
 		return false;
 	}
 
