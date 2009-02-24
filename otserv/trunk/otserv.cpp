@@ -388,11 +388,11 @@ void mainLoader(const CommandLineOptions& command_opts)
 
 	std::cout << ":: Checking Schema version... ";
 	DBResult* result;
-	if(!(result = db->storeQuery("SELECT * FROM `schema_info`;"))){
+	if(!(result = db->storeQuery("SELECT `value` FROM `schema_info` WHERE `name` = 'version';"))){
 		ErrorMessage("Can't get schema version! Does `schema_info` exist?");
 		exit(-1);
 	}
-	int schema_version = result->getDataInt("version");
+	int schema_version = result->getDataInt("value");
 	db->freeResult(result);
 	if(schema_version != CURRENT_SCHEMA_VERSION){
 		ErrorMessage("Your database is outdated. Run the dbupdate utility to update it to the latest schema version.");

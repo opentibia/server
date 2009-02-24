@@ -63,10 +63,10 @@ SimpleUpdateQuery updateQueries[] = {
 	*/
 	{ 2,
 		{ // PgSql
-			"CREATE TABLE \"map_store\" ( "
-				"\"house_id\" INT NOT NULL,"
-				"\"data\" BYTEA NOT NULL,"
-				"KEY(\"house_id\")"
+			"CREATE TABLE `map_store` ( "
+				"`house_id` INT NOT NULL,"
+				"`data` BYTEA NOT NULL,"
+				"KEY(`house_id`)"
 			");",
 			NULL
 		},
@@ -79,14 +79,46 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		},
 		{ // Sqlite
-			"CREATE TABLE \"map_store\" ( "
-				"\"house_id\" INTEGER NOT NULL,"
-				"\"data\" BLOB NOT NULL,"
-				"UNIQUE(\"house_id\")"
+			"CREATE TABLE `map_store` ( "
+				"`house_id` INTEGER NOT NULL,"
+				"`data` BLOB NOT NULL,"
+				"UNIQUE(`house_id`)"
 			");",
 			NULL
 		}
 	}
+    { 3,
+        { // PgSql
+            "DROP TABLE `schema_info`;",
+            "CREATE TABLE `schema_info` (
+                "`name` VARCHAR(255) NOT NULL,"
+                "`value` VARCHAR(255) NOT NULL,"
+                "PRIMARY KEY (`name`)"
+            ");",
+            "INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
+            NULL
+        },
+        { // MySql
+            "DROP TABLE `schema_info`;",
+            "CREATE TABLE `schema_info` ("
+                "`name` VARCHAR(255) NOT NULL,"
+                "`value` VARCHAR(255) NOT NULL,"
+                "PRIMARY KEY (`name`)"
+            ");",
+            "INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
+            NULL
+        },
+        { // Sqlite
+            "DROP TABLE `schema_info`;",
+            "CREATE TABLE `schema_info` (
+                "`name` VARCHAR(255) NOT NULL,"
+                "`value` VARCHAR(255) NOT NULL,"
+                "UNIQUE (`name`)"
+            ");",
+            "INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
+            NULL
+        }
+    }
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
@@ -109,15 +141,6 @@ bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
 		}
 	}
 
-	//update schema version
-	DBQuery query;
-	if(!db->executeQuery("DELETE FROM `schema_info`;")){
-		return false;
-	}
-	query << "INSERT INTO `schema_info` (`version`) VALUES (" <<  updateQuery.version << ");";
-	if(!db->executeQuery(query.str().c_str())){
-		return false;
-	}
 	std::cout << "Schema update to version " << updateQuery.version << std::endl;
 	return true;
 }
@@ -161,18 +184,36 @@ int main(int argn, const char* argv[]){
 	}
 	std::cout << "[done]" << std::endl;
 
+    // indicates version 1 or 2 schema
+    int schema_version;
+
 	std::cout << ":: Checking Schema version... ";
 	DBQuery query;
 	DBResult* result;
-	query << "SELECT * FROM `schema_info`;";
+	query << "SELECT `value` FROM `schema_info` WHERE `name` = 'version';";
 	if(!(result = db->storeQuery(query.str()))){
-		ErrorMessage("Can't get schema version! Does `schema_info` exist in your database?");
-		return -1;
+        // this is for old (version 1 and 2 only) schema
+        query.str("");
+        query << "SELECT * FROM `schema_info`;";
+        if(!(result = db->storeQuery(query.str()))){
+    		ErrorMessage("Can't get schema version! Does `schema_info` exist in your database?");
+    		return -1;
+        }
+
+        schema_version = result->getDataInt("version");
+
+        if(schema_version == 0 || schema_version > 2){
+            ErrorMessage("Not valid schema version!");
+            return -1;
+        }
 	}
-	int schema_version = result->getDataInt("version");
-	if(schema_version == 0 || schema_version > CURRENT_SCHEMA_VERSION){
-		ErrorMessage("Not valid schema version!");
-		return -1;
+	else{
+        schema_version = result->getDataInt("value");
+
+        if(schema_version == 0 || schema_version > CURRENT_SCHEMA_VERSION){
+            ErrorMessage("Not valid schema version!");
+            return -1;
+        }
 	}
 	std::cout << "Version = " << schema_version << " ";
 	std::cout << "[done]" << std::endl;
@@ -210,6 +251,17 @@ int main(int argn, const char* argv[]){
 			}
 		}
 	}
+
+    //update schema version
+    // previously version number was updated after each step
+    // but this could break compatibility with version 1
+    // so if you think it is realy important then try to fuck around with version 1 struct ;)
+    query.str("");
+    query << "UPDATE `schema_info` SET `value` = '" << CURRENT_SCHEMA_VERSION << "' WHERE `name` = 'version';";
+    if(!db->executeQuery(query.str().c_str())){
+        ErrorMessage("Your database has been correctly updated to most recent version, but error occured during saving new version number.");
+        return -1;
+    }
 
 	std::cout << std::endl << "Your database has been updated to the most recent version!" << std::endl;
 	std::cout << "Press any key to close ...";

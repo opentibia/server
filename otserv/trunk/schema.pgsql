@@ -194,11 +194,13 @@ CREATE TABLE "global_storage" (
     PRIMARY KEY("key")
 );
 
-CREATE TABLE `schema_info` (
-    `version` INT UNSIGNED NOT NULL
+CREATE TABLE "schema_info" (
+    "name" VARCHAR(255) NOT NULL,
+    "value" VARCHAR(255) NOT NULL,
+    PRIMARY KEY ("name")
 );
 
-INSERT INTO `schema_info` (`version`) VALUES (2);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 3);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
