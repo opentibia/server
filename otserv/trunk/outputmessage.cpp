@@ -161,7 +161,10 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 	}
 
 	msg->freeMessage();
+	
+	m_outputPoolLock.lock();
 	m_outputMessages.push_back(msg);
+	m_outputPoolLock.unlock()
 }
 
 OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool autosend /*= true*/)
@@ -192,7 +195,7 @@ OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool a
 			boost::bind(&OutputMessagePool::internalReleaseMessage, this, _1));
 
 #ifdef __TRACK_NETWORK__
-		m_allOutputMessages.push_back(outputmessage..get());
+		m_allOutputMessages.push_back(outputmessage.get());
 #endif
 	} else {
 		outputmessage.reset(m_outputMessages.back(),
