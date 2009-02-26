@@ -164,7 +164,7 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 	
 	m_outputPoolLock.lock();
 	m_outputMessages.push_back(msg);
-	m_outputPoolLock.unlock()
+	m_outputPoolLock.unlock();
 }
 
 OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool autosend /*= true*/)
