@@ -39,7 +39,6 @@
 
 #include "status.h"
 #include "monsters.h"
-#include "npc.h"
 #include "outfit.h"
 #include "vocation.h"
 #include "configmanager.h"

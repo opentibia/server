@@ -39,7 +39,6 @@ class Quest;
 class House;
 class Weapon;
 class ProtocolGame;
-class Npc;
 class Party;
 class SchedulerTask;
 
@@ -244,28 +243,6 @@ public:
 	void setTradeState(tradestate_t state) {tradeState = state;};
 	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
-
-	//shop functions
-	void setShopOwner(Npc* owner, int32_t onBuy, int32_t onSell)
-	{
-		shopOwner = owner;
-		purchaseCallback = onBuy;
-		saleCallback = onSell;
-	}
-
-	Npc* getShopOwner(int32_t& onBuy, int32_t& onSell)
-	{
-		onBuy = purchaseCallback;
-		onSell = saleCallback;
-		return shopOwner;
-	}
-
-	const Npc* getShopOwner(int32_t& onBuy, int32_t& onSell) const
-	{
-		onBuy = purchaseCallback;
-		onSell = saleCallback;
-		return shopOwner;
-	}
 
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
@@ -514,17 +491,20 @@ public:
 		{if(client) client->sendTextWindow(windowTextId, itemId, text);}
 	void sendToChannel(Creature* creature, SpeakClass type, const std::string& text, uint16_t channelId, uint32_t time = 0) const
 		{if(client) client->sendToChannel(creature, type, text, channelId, time);}
+	
 	// new: shop window
+	// REVSCRIPTSYS TODO: Add shop support
 	void sendShop()
-		{if(client){client->sendShop(shopItemList);}}
+		{}//if(client){client->sendShop(shopItemList);}}
 	void sendSaleItemList() const
-		{if(client) client->sendSaleItemList(shopItemList);}
+		{}//if(client) client->sendSaleItemList(shopItemList);}
 	void sendCloseShop() const
-	    {if(client) client->sendCloseShop();}
+	    {}//if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
-		{if(client) client->sendTradeItemRequest(player, item, ack);}
+		{}//if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const
-		{if(client) client->sendCloseTrade();}
+		{}//if(client) client->sendCloseTrade();}
+
 	void sendWorldLight(LightInfo& lightInfo)
 		{if(client) client->sendWorldLight(lightInfo);}
 	void sendChannelsDialog()
@@ -576,11 +556,15 @@ public:
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
+
+	// REVSCRIPTSYS TODO
+	// Shop window utility functions
+	/*
 	void openShopWindow(const std::list<ShopInfo>& shop);
 	void closeShopWindow();
 	void updateSaleShopList(uint32_t itemId);
 	bool hasShopItemForSale(uint32_t itemId);
-
+	*/
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;
 
@@ -713,12 +697,6 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
-	//shop variables
-	Npc* shopOwner;
-	int32_t purchaseCallback;
-	int32_t saleCallback;
-	std::list<ShopInfo> shopItemList;
-
 
 	//party variables
 	Party* party;
@@ -727,7 +705,6 @@ protected:
 	std::string name;
 	std::string nameDescription;
 	uint32_t guid;
-
 	uint32_t town;
 
 	//guild variables
@@ -792,7 +769,6 @@ protected:
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;
-	friend class Npc;
 	friend class Commands;
 	friend class Map;
 	friend class IOPlayer;

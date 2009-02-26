@@ -153,10 +153,6 @@ Creature()
 	editHouse = NULL;
 	editListId = 0;
 
-	shopOwner = NULL;
-	purchaseCallback = -1;
-	saleCallback = -1;
-
 	setParty(NULL);
 
 #ifdef __SKULLSYSTEM__
@@ -1207,6 +1203,7 @@ void Player::sendPing(uint32_t interval)
 	}
 }
 
+/*
 bool Player::hasShopItemForSale(uint32_t itemId)
 {
 	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
@@ -1230,7 +1227,7 @@ void Player::updateSaleShopList(uint32_t itemId)
 		}
 	}
 }
-
+*/
 Item* Player::getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen)
 {
 	_windowTextId = windowTextId;
@@ -1475,8 +1472,10 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		if(tradePartner){
 			g_game.internalCloseTrade(this);
 		}
-
-		closeShopWindow();
+	
+		// REVSCRIPTSYS
+		// Close shop window when player logs out
+		//closeShopWindow();
 
 		g_game.cancelRuleViolation(this);
 
@@ -1512,6 +1511,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	}
 }
 
+/*
 void Player::closeShopWindow()
 {
 	//unreference callbacks
@@ -1526,6 +1526,7 @@ void Player::closeShopWindow()
 		sendCloseShop();
 	}
 }
+*/
 
 void Player::onWalk(Direction& dir)
 {
@@ -2936,9 +2937,13 @@ void Player::postAddNotification(Creature* actor, Thing* thing, int32_t index, c
 			onSendContainer(container);
 		}
 
+		// REVSCRIPTSYS TODO
+		// Shop..
+		/*
 		if(shopOwner){
 			updateSaleShopList(item->getID());
 		}
+		*/
 	}
 	else if(const Creature* creature = thing->getCreature()){
 		if(creature == this){
@@ -2980,10 +2985,14 @@ void Player::postRemoveNotification(Creature* actor, Thing* thing, int32_t index
 				autoCloseContainers(container);
 			}
 		}
-
+		
+		// REVSCRIPTSYS TODO
+		// 
+		/*
 		if(shopOwner){
 			updateSaleShopList(item->getID());
 		}
+		*/
 	}
 }
 

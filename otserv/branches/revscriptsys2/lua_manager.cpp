@@ -313,9 +313,7 @@ void LuaState::pushThing(Thing* thing) {
 		else if(creature->getMonster()) {
 			objid = pushClassInstance("Monster");
 		}
-		else if(creature->getNpc()) {
-			objid = pushClassInstance("NPC");
-		} else {
+		else {
 			pushNil();
 			return;
 		}

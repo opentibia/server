@@ -22,7 +22,6 @@
 #include "spawn.h"
 #include "game.h"
 #include "player.h"
-#include "npc.h"
 #include "tools.h"
 #include "configmanager.h"
 
@@ -206,11 +205,15 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							continue;
 						}
 
+						// REVSCRIPTSYS TODO
+						// Load NPCs
+						/*
 						Npc* npc = new Npc(name);
 
 						npc->setDirection(direction);
 						npc->setMasterPos(placePos, radius);
 						npcList.push_back(npc);
+						*/
 					}
 
 					tmpNode = tmpNode->next;
@@ -232,11 +235,6 @@ void Spawns::startup()
 {
 	if(!isLoaded() || isStarted())
 		return;
-
-	for(NpcList::iterator it = npcList.begin(); it != npcList.end(); ++it){
-		g_game.placeCreature((*it), (*it)->getMasterPos(), false, true);
-	}
-	npcList.clear();
 
 	for(SpawnList::iterator it = spawnList.begin(); it != spawnList.end(); ++it){
 		(*it)->startup();

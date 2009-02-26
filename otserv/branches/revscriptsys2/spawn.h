@@ -55,8 +55,6 @@ public:
 	bool isStarted() { return started; }
 	
 private:
-	typedef std::list<Npc*> NpcList;
-	NpcList npcList;
 	SpawnList spawnList;
 	bool loaded, started;
 	std::string filename;

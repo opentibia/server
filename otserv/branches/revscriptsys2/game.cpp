@@ -2595,13 +2595,12 @@ bool Game::playerCloseNpcChannel(uint32_t playerId)
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 	getSpectators(list, player->getPosition());
-	Npc* npc;
-
+	
 	for(it = list.begin(); it != list.end(); ++it){
-		if((npc = (*it)->getNpc())){
+		//if((npc = (*it)->getNpc())){
 			// REVSCRIPT TODO
 			//npc->onPlayerCloseChannel(player);
-		}
+		//}
 	}
 	return true;
 }
@@ -3332,10 +3331,10 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 	if(player == NULL || player->isRemoved())
 		return false;
 
-	int32_t onBuy;
-	int32_t onSell;
-
-	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	// REVSCRIPT TODO
+	// shop buy item
+	/*
+	Creature* merchant = player->getShopOwner(onBuy, onSell);
 	if(merchant == NULL)
 		return false;
 
@@ -3354,6 +3353,7 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 	else{
 		subType = count;
 	}
+	*/
 
 	// REVSCRIPT TODO
 	//merchant->onPlayerTrade(player, SHOPEVENT_BUY, onBuy, it.id, subType, amount);
@@ -3367,10 +3367,10 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 	if(player == NULL || player->isRemoved())
 		return false;
 
-	int32_t onBuy;
-	int32_t onSell;
-
-	Npc* merchant = player->getShopOwner(onBuy, onSell);
+	// REVSCRIPT TODO
+	// shop sell item
+	/*
+	Creature* merchant = player->getShopOwner(onBuy, onSell);
 	if(merchant == NULL)
 		return false;
 
@@ -3389,7 +3389,7 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 	else{
 		subType = count;
 	}
-
+	*/
 	// REVSCRIPT TODO
 	//merchant->onPlayerTrade(player, SHOPEVENT_SELL, onSell, it.id, subType, amount);
 	return true;
@@ -3401,7 +3401,9 @@ bool Game::playerCloseShop(uint32_t playerId)
 	if(player == NULL || player->isRemoved())
 		return false;
 
-	player->closeShopWindow();
+	// REVSCRIPTSYS TODO
+	// Close shop
+	//player->closeShopWindow();
 	return true;
 }
 
@@ -3960,17 +3962,21 @@ bool Game::playerSpeakToNpc(Player* player, const std::string& text)
 	getSpectators(list, player->getPosition());
 
 	//send to npcs only
-	Npc* tmpNpc = NULL;
+	// REVSCRIPTSYS TODO
+	// Player speak to NPC (is this necessary?)
+	/*
+	Creature* tmpNpc = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpNpc = (*it)->getNpc())){
 			(*it)->onCreatureSay(player, SPEAK_PRIVATE_PN, text);
 		}
 	}
+	*/
 
 	return true;
 }
 
-bool Game::npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize)
+bool Game::npcSpeakToPlayer(Creature* npc, Player* player, const std::string& text, bool publicize)
 {
 	if(player != NULL)
 	{

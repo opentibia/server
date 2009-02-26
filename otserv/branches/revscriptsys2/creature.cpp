@@ -22,7 +22,6 @@
 #include "creature.h"
 #include "game.h"
 #include "player.h"
-#include "npc.h"
 #include "monster.h"
 #include "container.h"
 #include "condition.h"

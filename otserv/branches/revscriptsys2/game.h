@@ -38,7 +38,6 @@ namespace Script {
 }
 class Creature;
 class Monster;
-class Npc;
 class CombatInfo;
 class Commands;
 class ChatChannel;
@@ -100,7 +99,7 @@ typedef std::vector<Player*> PlayerVector;
 #define EVENT_DECAYINTERVAL  1000
 #define EVENT_DECAY_BUCKETS  16
 #define EVENT_SCRIPT_CLEANUP_INTERVAL  90000
-#define EVENT_SCRIPT_TIMER_INTERVAL 50
+#define EVENT_SCRIPT_TIMER_INTERVAL 20
 
 #define EVENT_CREATURECOUNT 10
 #define EVENT_CREATURE_THINK_INTERVAL 1000
@@ -293,7 +292,6 @@ public:
 
 	uint32_t getPlayersOnline();
 	uint32_t getMonstersOnline();
-	uint32_t getNpcsOnline();
 	uint32_t getCreaturesOnline();
 
 	void getWorldLightInfo(LightInfo& lightInfo);
@@ -598,7 +596,7 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
-	bool npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize);
+	bool npcSpeakToPlayer(Creature* npc, Player* player, const std::string& text, bool publicize);
 	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
 	bool closeRuleViolation(Player* player);
