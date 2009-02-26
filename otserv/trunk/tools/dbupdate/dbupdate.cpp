@@ -86,11 +86,11 @@ SimpleUpdateQuery updateQueries[] = {
 			");",
 			NULL
 		}
-	}
+	},
     { 3,
         { // PgSql
             "DROP TABLE `schema_info`;",
-            "CREATE TABLE `schema_info` (
+            "CREATE TABLE `schema_info` ("
                 "`name` VARCHAR(255) NOT NULL,"
                 "`value` VARCHAR(255) NOT NULL,"
                 "PRIMARY KEY (`name`)"
@@ -110,7 +110,7 @@ SimpleUpdateQuery updateQueries[] = {
         },
         { // Sqlite
             "DROP TABLE `schema_info`;",
-            "CREATE TABLE `schema_info` (
+            "CREATE TABLE `schema_info` ("
                 "`name` VARCHAR(255) NOT NULL,"
                 "`value` VARCHAR(255) NOT NULL,"
                 "UNIQUE (`name`)"
