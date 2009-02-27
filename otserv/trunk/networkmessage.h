@@ -52,6 +52,7 @@ protected:
 		m_ReadPos = 8;
 	}
 public:
+
 	// simply read functions for incoming message
 	uint8_t  GetByte(){return m_MsgBuf[m_ReadPos++];}
 	uint16_t GetU16(){
@@ -121,6 +122,10 @@ public:
 
 	char* getBuffer() { return (char*)&m_MsgBuf[0]; }
 	char* getBodyBuffer() { m_ReadPos = 2; return (char*)&m_MsgBuf[header_length]; }
+
+#ifdef __TRACK_NETWORK__
+	virtual void Track(std::string file, long line, std::string func) {};
+#endif
 
 
 protected:

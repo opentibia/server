@@ -1301,6 +1301,19 @@ void Monster::dropLoot(Container* corpse)
 	}
 }
 
+bool Monster::isImmune(CombatType_t type) const
+{
+    MonsterType* mType = g_monsters.getMonsterType(g_monsters.getIdByName(getName()));
+    ElementMap::iterator it = mType->elementMap.find(type);
+    if(it != mType->elementMap.end()){
+		if(it->second >=100){
+			return true;
+		}
+    }
+
+	return Creature::isImmune(type);
+}
+
 void Monster::setNormalCreatureLight()
 {
 	internalLight.level = mType->lightLevel;

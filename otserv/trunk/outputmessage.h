@@ -72,7 +72,7 @@ public:
 	//uint32_t getOutputBufferStart() const {return m_outputBufferStart;}
 
 #ifdef __TRACK_NETWORK__
-	void Track(std::string file, long line, std::string func)
+	virtual void Track(std::string file, long line, std::string func)
 	{
 		if(last_uses.size() >= 25) {
 			last_uses.pop_front();
@@ -186,7 +186,7 @@ protected:
 };
 
 #ifdef __TRACK_NETWORK__
-#define TRACK_MESSAGE(omsg) if(dynamic_cast<OutputMessage*>(omsg)) dynamic_cast<OutputMessage*>(omsg)->Track(__FILE__, __LINE__, __FUNCTION__)
+#define TRACK_MESSAGE(omsg) (omsg)->Track(__FILE__, __LINE__, __FUNCTION__)
 #else
 #define TRACK_MESSAGE(omsg)
 #endif
