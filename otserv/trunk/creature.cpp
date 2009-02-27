@@ -29,6 +29,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "party.h"
+#include "monsters.h"
 
 #include <string>
 #include <sstream>
@@ -46,6 +47,7 @@ AutoID::list_type AutoID::list;
 extern Game g_game;
 extern ConfigManager g_config;
 extern CreatureEvents* g_creatureEvents;
+extern Monsters g_monsters;
 
 Creature::Creature() :
   isInternalRemoved(false)
@@ -1382,7 +1384,15 @@ bool Creature::hasCondition(ConditionType_t type) const
 
 bool Creature::isImmune(CombatType_t type) const
 {
-	return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type);
+    int32_t elementPercent = 0;
+    if(getMonster()){
+        MonsterType* mType = g_monsters.getMonsterType(g_monsters.getIdByName(getName()));
+        ElementMap::iterator it = mType->elementMap.find(type);
+        if(it != mType->elementMap.end()){
+            elementPercent = it->second;
+        }
+    }
+	return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type || elementPercent >= 100);
 }
 
 bool Creature::isImmune(ConditionType_t type) const
