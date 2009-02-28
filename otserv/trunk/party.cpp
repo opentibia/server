@@ -92,7 +92,7 @@ bool Party::invitePlayer(Player* player)
 	if(!(inviteList.empty() && memberList.empty())) {
 		ss << player->getName() << " has been invited.";
 	} else {
-		ss << player->getName() << " has been invited. Open the party channel to communicate with other members.";
+		ss << player->getName() << " has been invited. Open the party channel to communicate with your members.";
 	}
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
@@ -131,7 +131,7 @@ bool Party::joinParty(Player* player)
 	updatePartyIcons(player);
 
 	ss.str("");
-	ss << "You have joined " << getLeader()->getName() << "'s party.";
+	ss << "You have joined " << getLeader()->getName() << "'s party. Open the party channel to communicate with your companions.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 	return true;
 }
