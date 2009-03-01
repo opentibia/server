@@ -386,6 +386,14 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 	return ret;
 }
 
+ReturnValue MoveEvents::canPlayerWearEquip(Player* player, Item* item, slots_t slot)
+{
+    MoveEvent* moveEvent = getEvent(item, MOVE_EVENT_EQUIP, slot);
+    if(moveEvent){
+        return moveEvent->canPlayerWearEquip(player, item, slot);
+    }
+    return RET_NOERROR;
+}
 
 MoveEvent::MoveEvent(LuaScriptInterface* _interface) :
 Event(_interface)
@@ -962,4 +970,29 @@ uint32_t MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position
 		std::cout << "[Error] Call stack overflow. MoveEvent::executeAddRemItem" << std::endl;
 		return 0;
 	}
+}
+
+ReturnValue MoveEvent::canPlayerWearEquip(Player* player, Item* item, slots_t slot)
+{
+    //check if we need to continue
+    if(player->isItemAbilityEnabled(slot) || player->hasFlag(PlayerFlag_IgnoreWeaponCheck) || getWieldInfo() == 0){
+		return RET_NOERROR;
+	}
+	
+    //check all required values
+    const VocEquipMap vocMap = getVocEquipMap();
+    if(vocMap.find(player->getVocationId()) == vocMap.end()){
+        return RET_NOTREQUIREDPROFESSION;
+    }
+	if((int32_t)player->getLevel() < getReqLevel()){
+        return RET_NOTREQUIREDLEVEL;
+    }
+    if((int32_t)player->getMagicLevel() < getReqMagLv()){
+        return RET_NOTENOUGHMAGICLEVEL;
+    }
+    if(!player->isPremium() && isPremium()){
+		return RET_NEEDPREMIUMTOEQUIPITEM;
+	}
+		
+    return RET_NOERROR;
 }

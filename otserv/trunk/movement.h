@@ -57,6 +57,7 @@ public:
 	uint32_t onPlayerEquip(Player* player, Item* item, slots_t slot);
 	uint32_t onPlayerDeEquip(Player* player, Item* item, slots_t slot, bool isRemoval);
 	uint32_t onItemMove(Item* item, Tile* tile, bool isAdd);
+	ReturnValue canPlayerWearEquip(Player* player, Item* item, slots_t slot);
 
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
 
@@ -110,6 +111,8 @@ public:
 	uint32_t executeEquip(Player* player, Item* item, slots_t slot);
 	uint32_t executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	//
+	
+	ReturnValue canPlayerWearEquip(Player* player, Item* item, slots_t slot);
 
 	//onEquip information
 	int32_t getReqLevel() const {return reqLevel;}
