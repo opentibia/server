@@ -1122,7 +1122,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		break;
 
 	case RET_YOUMAYNOTATTACKTHISPLAYER:
-		sendCancel("You may not attack this player.");
+		sendCancel("You may not attack this person.");
 		break;
 
 	case RET_YOUMAYNOTATTACKTHISCREATURE:
