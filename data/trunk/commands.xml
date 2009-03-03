@@ -11,6 +11,8 @@
 	<command cmd="/goto" access="3" />				<!-- Teleport to players, creatures or NPCs -->
 	<command cmd="/a" access="3" />				<!-- Teleport by SQMs -->
 	<command cmd="/raid" access="3" />				<!-- Start raid -->
+	<command cmd="/save" access="3" />				<!-- Start raid -->
+	<command cmd="/refreshmap" access="3" />				<!-- Start raid -->
 
 	<!-- Gamemasters -->
 	<command cmd="/c" access="2" />				<!-- Teleport a player to you -->

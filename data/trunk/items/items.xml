@@ -4779,6 +4779,7 @@
 	</item>
 	<item id="2543" article="a" name="bolt" plural="bolts">
 		<attribute key="weight" value="80"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="30"/>
 		<attribute key="hitChance" value="80"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -4788,6 +4789,7 @@
 	</item>
 	<item id="2544" article="an" name="arrow" plural="arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="25"/>
 		<attribute key="hitChance" value="90"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -4797,6 +4799,7 @@
 	</item>
 	<item id="2545" article="a" name="poison arrow" plural="poison arrows">
 		<attribute key="weight" value="80"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="22"/>
 		<attribute key="hitChance" value="80"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -4806,6 +4809,7 @@
 	</item>
 	<item id="2546" article="a" name="burst arrow" plural="burst arrows">
 		<attribute key="weight" value="90"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="28"/>
 		<attribute key="hitChance" value="80"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -4815,6 +4819,7 @@
 	</item>
 	<item id="2547" article="a" name="power bolt" plural="power bolts">
 		<attribute key="weight" value="80"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="40"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
@@ -14250,6 +14255,7 @@
 	</item>
 	<item id="6529" article="an" name="infernal bolt" plural="infernal bolts">
 		<attribute key="weight" value="90"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="43"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
@@ -15720,6 +15726,7 @@
 	<item id="7362" article="a" name="sarcophagus"/>
 	<item id="7363" article="a" name="piercing bolt" plural="piercing bolts">
 		<attribute key="weight" value="80"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="33"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
@@ -15728,6 +15735,7 @@
 	</item>
 	<item id="7364" article="a" name="sniper arrow" plural="sniper arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
@@ -15737,6 +15745,7 @@
 	</item>
 	<item id="7365" article="an" name="onyx arrow" plural="onyx arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="38"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
