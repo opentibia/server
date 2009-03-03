@@ -51,7 +51,13 @@ enum slots_t {
 	SLOT_RING = 9,
 	SLOT_AMMO = 10,
 	SLOT_DEPOT = 11,
-	SLOT_LAST = SLOT_DEPOT
+
+	// Special slot, covers two, not a real slot
+	SLOT_HAND = 12,
+	SLOT_TWO_HAND = SLOT_HAND, // alias
+
+	// Last real slot is depot
+	SLOT_LAST = SLOT_DEPOT,
 };
 
 struct FindPathParams{

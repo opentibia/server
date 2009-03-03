@@ -305,6 +305,7 @@ public:
 	int getDefense() const {return items[id].defence;}
 	int getExtraDef() const {return items[id].extraDef;}
 	int getSlotPosition() const {return items[id].slot_position;}
+	int getWieldPosition() const {return items[id].wield_position;}
 	int getHitChance() const {return items[id].hitChance;}
 
 	bool isReadable() const {return items[id].canReadText;}

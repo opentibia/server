@@ -303,8 +303,26 @@ std::string Player::getDescription(int32_t lookDistance) const
 
 Item* Player::getInventoryItem(slots_t slot) const
 {
-	if(slot > 0 && slot < 11)
+	if(slot > 0 && slot < SLOT_LAST)
 		return inventory[slot];
+	if(slot == SLOT_HAND)
+		return inventory[SLOT_LEFT]? inventory[SLOT_LEFT] : inventory[SLOT_RIGHT];
+
+	return NULL;
+}
+
+Item* Player::getEquippedItem(slots_t slot) const
+{
+	Item* item = getInventoryItem(slot);
+	if(item){
+		switch(slot){
+			case SLOT_RIGHT:
+			case SLOT_LEFT:
+				return (item->getWieldPosition() == SLOT_HAND) ? item : NULL;
+			default:
+				return (slot == item->getWieldPosition()) ? item : NULL;
+		}
+	}
 
 	return NULL;
 }
@@ -2039,7 +2057,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 		//reduce damage against inventory items
 		Item* item = NULL;
 		for(int32_t slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
-			if(!(item = getInventoryItem((slots_t)slot)))
+			if(!(item = getEquippedItem((slots_t)slot)))
 				continue;
 
 			const ItemType& it = Item::items[item->getID()];

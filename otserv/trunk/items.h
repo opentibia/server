@@ -157,6 +157,7 @@ public:
 	int32_t        extraDef;
 	int32_t        armor;
 	uint16_t       slot_position;
+	uint16_t       wield_position;
 	bool           isVertical;
 	bool           isHorizontal;
 	bool           isHangable;

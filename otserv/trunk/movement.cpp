@@ -115,7 +115,7 @@ std::string MoveEvents::getScriptBaseName()
 
 Event* MoveEvents::getEvent(const std::string& nodeName)
 {
-	if(asLowerCaseString(nodeName) == "movevent"){
+	if(asLowerCaseString(nodeName) == "movevent" || asLowerCaseString(nodeName) == "moveevent"){
 		return new MoveEvent(&m_scriptInterface);
 	}
 	else{
@@ -208,17 +208,17 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType, slots_t slot)
 {
 	uint32_t slotp = 0;
 	switch(slot){
-	case SLOT_HEAD: slotp = SLOTP_HEAD; break;
-	case SLOT_NECKLACE: slotp = SLOTP_NECKLACE; break;
-	case SLOT_BACKPACK: slotp = SLOTP_BACKPACK; break;
-	case SLOT_ARMOR: slotp = SLOTP_ARMOR; break;
-	case SLOT_RIGHT: slotp = SLOTP_RIGHT; break;
-	case SLOT_LEFT: slotp = SLOTP_LEFT; break;
-	case SLOT_LEGS: slotp = SLOTP_LEGS; break;
-	case SLOT_FEET: slotp = SLOTP_FEET; break;
-	case SLOT_AMMO: slotp = SLOTP_AMMO; break;
-	case SLOT_RING: slotp = SLOTP_RING; break;
-	default: slotp = 0; break;
+		case SLOT_HEAD: slotp = SLOTP_HEAD; break;
+		case SLOT_NECKLACE: slotp = SLOTP_NECKLACE; break;
+		case SLOT_BACKPACK: slotp = SLOTP_BACKPACK; break;
+		case SLOT_ARMOR: slotp = SLOTP_ARMOR; break;
+		case SLOT_RIGHT: slotp = SLOTP_RIGHT; break;
+		case SLOT_LEFT: slotp = SLOTP_LEFT; break;
+		case SLOT_LEGS: slotp = SLOTP_LEGS; break;
+		case SLOT_FEET: slotp = SLOTP_FEET; break;
+		case SLOT_AMMO: slotp = SLOTP_AMMO; break;
+		case SLOT_RING: slotp = SLOTP_RING; break;
+		default: slotp = 0; break;
 	}
 	MoveListMap::iterator it = m_itemIdMap.find(item->getID());
 	if(it != m_itemIdMap.end()){

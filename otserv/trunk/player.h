@@ -227,7 +227,10 @@ public:
 	virtual int32_t getMaxHealth() const {return getPlayerInfo(PLAYERINFO_MAXHEALTH);}
 	virtual int32_t getMaxMana() const {return getPlayerInfo(PLAYERINFO_MAXMANA);}
 
+	// Returns the inventory item in the slot position
 	Item* getInventoryItem(slots_t slot) const;
+	// As above, but returns NULL if the item can not be weared in that slot (armor in hand for example)
+	Item* getEquippedItem(slots_t slot) const;
 
 	bool isItemAbilityEnabled(slots_t slot) const {return inventoryAbilities[slot];}
 	void setItemAbility(slots_t slot, bool enabled) {inventoryAbilities[slot] = enabled;}
