@@ -2913,6 +2913,8 @@
 	<item id="2173" article="an" name="amulet of loss">
 		<attribute key="weight" value="420"/>
 		<attribute key="slotType" value="necklace"/>
+		<attribute key="preventitemloss" value="1"/>
+		<attribute key="charges" value="1"/>
 	</item>
 	<item id="2174" article="a" name="strange symbol">
 		<attribute key="weight" value="200"/>
