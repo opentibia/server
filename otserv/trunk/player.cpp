@@ -2085,6 +2085,41 @@ uint32_t Player::getIP() const
 	return 0;
 }
 
+void Player::onDie()
+{
+    if(getZone() != ZONE_PVP){
+        bool isLootPrevented = false;
+        bool isSkillPrevented = false;
+    
+        Item* item = NULL;
+        for(int32_t slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
+            if(!(item = getEquippedItem((slots_t)slot))){
+                continue;
+            }
+            const ItemType& it = Item::items[item->getID()];
+            if((it.abilities.preventItemLoss && !isLootPrevented) || (it.abilities.preventSkillLoss && !isSkillPrevented)){
+                if(it.abilities.preventItemLoss){
+                    isLootPrevented = true;
+                }
+                if(it.abilities.preventSkillLoss){
+                    isSkillPrevented = true;
+                }    
+                int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
+                g_game.transformItem(item, item->getID(), newCharge);
+            }
+        }
+    
+        if(isLootPrevented && getSkull() != SKULL_RED){
+            setDropLoot(false);
+        }
+        if(isSkillPrevented){
+            setLossSkill(false);
+        }
+    }
+    
+    Creature::onDie();
+}
+
 void Player::die()
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
@@ -2101,7 +2136,6 @@ void Player::die()
 		}
 	}
 
-	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
 	loginPosition = masterPos;
 
 	if(skillLoss){
@@ -2173,7 +2207,15 @@ void Player::die()
 			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
 			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 		}
+		
+		//Send that death window
+		sendReLoginWindow();
 	}
+	else if(getZone() != ZONE_PVP){
+        //Send death window if skillLoss = false
+        //and if player died out of a pvp zone
+        sendReLoginWindow();
+    }
 }
 
 Item* Player::dropCorpse()
@@ -3450,13 +3492,11 @@ void Player::onPlacedCreature()
 	}
 }
 
-void Player::onRemovedCreature()
+void Player::sendReLoginWindow()
 {
-	/*
 	if(client){
 		client->sendReLoginWindow();
 	}
-	*/
 }
 
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)

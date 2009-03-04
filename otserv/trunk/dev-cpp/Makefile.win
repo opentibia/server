@@ -1,30 +1,30 @@
 # Project: otserv
 # Makefile created by Dev-C++ 4.9.9.2
 
-CPP  = mingw32-g++.exe
-CC   = mingw32-gcc.exe
+CPP  = g++.exe
+CC   = gcc.exe
 WINDRES = windres.exe
 RES  = obj//otserv_private.res
-OBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.o obj//baseevents.o obj//chat.o obj//combat.o obj//commands.o obj//condition.o obj//configmanager.o obj//connection.o obj//container.o obj//creature.o obj//creatureevent.o obj//cylinder.o obj//database.o obj//databasesqlite.o obj//depot.o obj//exception.o obj//fileloader.o obj//game.o obj//house.o obj//housetile.o obj//ioaccount.o obj//iomapotbm.o obj//iomapserialize.o obj//iomapxml.o obj//ioplayer.o obj//item.o obj//items.o obj//logger.o obj//luascript.o obj//mailbox.o obj//map.o obj//md5.o obj//monster.o obj//monsters.o obj//movement.o obj//networkmessage.o obj//npc.o obj//otserv.o obj//outfit.o obj//outputmessage.o obj//player.o obj//position.o obj//protocol.o obj//protocolgame.o obj//protocollogin.o obj//raids.o obj//rsa.o obj//scheduler.o obj//scriptmanager.o obj//server.o obj//sha1.o obj//spawn.o obj//spells.o obj//status.o obj//talkaction.o obj//tasks.o obj//teleport.o obj//thing.o obj//tile.o obj//tools.o obj//trashholder.o obj//vocation.o obj//waitlist.o obj//weapons.o obj//databasemysql.o obj//party.o obj//beds.o $(RES)
-LINKOBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.o obj//baseevents.o obj//chat.o obj//combat.o obj//commands.o obj//condition.o obj//configmanager.o obj//connection.o obj//container.o obj//creature.o obj//creatureevent.o obj//cylinder.o obj//database.o obj//databasesqlite.o obj//depot.o obj//exception.o obj//fileloader.o obj//game.o obj//house.o obj//housetile.o obj//ioaccount.o obj//iomapotbm.o obj//iomapserialize.o obj//iomapxml.o obj//ioplayer.o obj//item.o obj//items.o obj//logger.o obj//luascript.o obj//mailbox.o obj//map.o obj//md5.o obj//monster.o obj//monsters.o obj//movement.o obj//networkmessage.o obj//npc.o obj//otserv.o obj//outfit.o obj//outputmessage.o obj//player.o obj//position.o obj//protocol.o obj//protocolgame.o obj//protocollogin.o obj//raids.o obj//rsa.o obj//scheduler.o obj//scriptmanager.o obj//server.o obj//sha1.o obj//spawn.o obj//spells.o obj//status.o obj//talkaction.o obj//tasks.o obj//teleport.o obj//thing.o obj//tile.o obj//tools.o obj//trashholder.o obj//vocation.o obj//waitlist.o obj//weapons.o obj//databasemysql.o obj//party.o obj//beds.o $(RES)
-LIBS =  -L"C:/MinGW/lib" -llibxml2 -lgmp -llua5.1 -lboost_system -lwsock32 -lws2_32 -lboost_regex -lsqlite3 -lmysql  -s 
-INCS =  -I"C:/MinGW/include" 
-CXXINCS =  -I"C:/MinGW/include"  -I"C:/MinGW/include/c++/3.4.5"  -I"C:/MinGW/include/c++/3.4.5/backward" 
-BIN  = ../../../../../../../../otserv/otserv.exe
-CXXFLAGS = $(CXXINCS) -D__USE_SQLITE__ -D__USE_MYSQL__ -D__SKULL_SYSTEM__  -D__USE_OTPCH__   -O1
+OBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.o obj//baseevents.o obj//chat.o obj//combat.o obj//commands.o obj//condition.o obj//configmanager.o obj//connection.o obj//container.o obj//creature.o obj//creatureevent.o obj//cylinder.o obj//database.o obj//databasesqlite.o obj//depot.o obj//exception.o obj//fileloader.o obj//game.o obj//house.o obj//housetile.o obj//ioaccount.o obj//iomapotbm.o obj//iomapserialize.o obj//iomapxml.o obj//ioplayer.o obj//item.o obj//items.o obj//logger.o obj//luascript.o obj//mailbox.o obj//map.o obj//md5.o obj//monster.o obj//monsters.o obj//movement.o obj//networkmessage.o obj//npc.o obj//otserv.o obj//outfit.o obj//outputmessage.o obj//player.o obj//position.o obj//protocol.o obj//protocolgame.o obj//protocollogin.o obj//raids.o obj//rsa.o obj//scheduler.o obj//scriptmanager.o obj//server.o obj//sha1.o obj//spawn.o obj//spells.o obj//status.o obj//talkaction.o obj//tasks.o obj//teleport.o obj//thing.o obj//tile.o obj//tools.o obj//trashholder.o obj//vocation.o obj//waitlist.o obj//weapons.o obj//databasemysql.o obj//party.o obj//beds.o obj//quests.o obj//protocolold.o $(RES)
+LINKOBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.o obj//baseevents.o obj//chat.o obj//combat.o obj//commands.o obj//condition.o obj//configmanager.o obj//connection.o obj//container.o obj//creature.o obj//creatureevent.o obj//cylinder.o obj//database.o obj//databasesqlite.o obj//depot.o obj//exception.o obj//fileloader.o obj//game.o obj//house.o obj//housetile.o obj//ioaccount.o obj//iomapotbm.o obj//iomapserialize.o obj//iomapxml.o obj//ioplayer.o obj//item.o obj//items.o obj//logger.o obj//luascript.o obj//mailbox.o obj//map.o obj//md5.o obj//monster.o obj//monsters.o obj//movement.o obj//networkmessage.o obj//npc.o obj//otserv.o obj//outfit.o obj//outputmessage.o obj//player.o obj//position.o obj//protocol.o obj//protocolgame.o obj//protocollogin.o obj//raids.o obj//rsa.o obj//scheduler.o obj//scriptmanager.o obj//server.o obj//sha1.o obj//spawn.o obj//spells.o obj//status.o obj//talkaction.o obj//tasks.o obj//teleport.o obj//thing.o obj//tile.o obj//tools.o obj//trashholder.o obj//vocation.o obj//waitlist.o obj//weapons.o obj//databasemysql.o obj//party.o obj//beds.o obj//quests.o obj//protocolold.o $(RES)
+LIBS =  -L"C:/Arquivos de programas/Dev-Cpp/lib" -llibxml2 -lgmp -llua5.1 -lboost_system -lwsock32 -lws2_32 -lboost_regex -lsqlite3 -lmysql -lboost_thread -Wl,-Map=otserv.map  -s 
+INCS =  -I"C:/Arquivos de programas/Dev-Cpp/include" 
+CXXINCS =  -I"C:/Arquivos de programas/Dev-Cpp/include" 
+BIN  = ../../../otserv/otserv.exe
+CXXFLAGS = $(CXXINCS) -D__USE_SQLITE__ -D__USE_MYSQL__ -D__EXCEPTION_TRACER__   -O1
 CFLAGS = $(INCS)   -O1
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom
 
-all: all-before ../../../../../../../../otserv/otserv.exe all-after
+all: all-before ../../../otserv/otserv.exe all-after
 
 
 clean: clean-custom
 	${RM} $(OBJ) $(BIN)
 
 $(BIN): $(OBJ)
-	$(CPP) $(LINKOBJ) -o "..\..\..\..\..\..\..\..\otserv\otserv.exe" $(LIBS)
+	$(CPP) $(LINKOBJ) -o "..\..\..\otserv\otserv.exe" $(LIBS)
 
 obj//account.o: ../account.cpp
 	$(CPP) -c ../account.cpp -o obj//account.o $(CXXFLAGS)
@@ -238,6 +238,12 @@ obj//party.o: ../party.cpp
 
 obj//beds.o: ../beds.cpp
 	$(CPP) -c ../beds.cpp -o obj//beds.o $(CXXFLAGS)
+
+obj//quests.o: ../quests.cpp
+	$(CPP) -c ../quests.cpp -o obj//quests.o $(CXXFLAGS)
+
+obj//protocolold.o: ../protocolold.cpp
+	$(CPP) -c ../protocolold.cpp -o obj//protocolold.o $(CXXFLAGS)
 
 obj//otserv_private.res: otserv_private.rc 
 	$(WINDRES) -i otserv_private.rc --input-format=rc -o obj//otserv_private.res -O coff 

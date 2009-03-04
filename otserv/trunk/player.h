@@ -373,7 +373,7 @@ public:
 	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 	virtual void onIdleStatus();
 	virtual void onPlacedCreature();
-	virtual void onRemovedCreature();
+	virtual void sendReLoginWindow();
 	virtual void getCreatureLight(LightInfo& light) const;
 
 	void setParty(Party* _party) {party = _party;}
@@ -633,6 +633,7 @@ protected:
 	void setNextWalkTask(SchedulerTask* task);
 	void setNextActionTask(SchedulerTask* task);
 
+    void onDie();
 	void die();
 	virtual Item* dropCorpse();
 	virtual Item* getCorpse();

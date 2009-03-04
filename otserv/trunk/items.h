@@ -98,6 +98,9 @@ struct Abilities{
 
 	uint32_t conditionImmunities;
 	uint32_t conditionSuppressions;
+	
+	bool preventItemLoss;
+	bool preventSkillLoss;
 };
 
 class Condition;
