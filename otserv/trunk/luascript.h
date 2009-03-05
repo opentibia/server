@@ -373,6 +373,7 @@ protected:
 	static int luaDoPlayerSetGuildNick(lua_State *L);
 	static int luaDoSetCreatureLight(lua_State *L);
 	static int luaDoPlayerSetLossPercent(lua_State *L);
+	static int luaGetPlayerLossPercent(lua_State *L);
 	static int luaDoSetCreatureDropLoot(lua_State *L);
 	static int luaGetPlayerSkullType(lua_State *L);
 	static int luaDoSendTutorial(lua_State *L);
