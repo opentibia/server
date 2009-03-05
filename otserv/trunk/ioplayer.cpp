@@ -44,8 +44,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `players`.`id` AS `id`, `players`.`name` AS `name`, `account_id`, \
-		`players`.`group_id` as `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
+	query << "SELECT `players`.`id` AS `id`, `players`.`name` AS `name`, `accounts`.`name` AS `accname`, \
+		`account_id`, `players`.`group_id` as `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastip`, `save`, `conditions`, `redskulltime`, \
@@ -61,6 +61,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	player->setGUID(result->getDataInt("id"));
 	player->accountId = result->getDataInt("account_id");
+	player->accountName = result->getDataString("accname");
 
 	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
 	if(group){
@@ -171,7 +172,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	uint32_t rankid = result->getDataInt("rank_id");
 
 	// place it here and now we can drop all additional query instances as all data were loaded
-	player->premiumEnd = result->getDataInt("premend");
+	Account account = IOAccount::instance()->loadAccount(player->accountName);
+	player->premiumDays = account.getPremiumDaysLeft();
 	player->balance = result->getDataInt("balance");
 
 	player->guildNick = result->getDataString("guildnick");

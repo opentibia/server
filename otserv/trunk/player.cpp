@@ -150,7 +150,7 @@ Creature()
 	maxDepotLimit = 1000;
 	maxVipLimit = 50;
 	groupFlags = 0;
-	premiumEnd = 0;
+	premiumDays = 0;
 	balance = 0;
 
  	vocation_id = (Vocation_t)0;
@@ -754,18 +754,6 @@ int32_t Player::getDefaultStats(stats_t stat)
 			return 0;
 			break;
 	}
-}
-
-int Player::getPremiumDays() const {
-	time_t t = std::time(NULL);
-	if(premiumEnd < t) {
-		return 0;
-	}
-	return int((t - premiumEnd) / 86400);
-}
-
-bool Player::isPremium() const {
-	return (premiumEnd > std::time(NULL) || hasFlag(PlayerFlag_IsAlwaysPremium));
 }
 
 Container* Player::getContainer(uint32_t cid)

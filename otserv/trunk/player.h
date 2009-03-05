@@ -145,8 +145,8 @@ public:
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
-	int getPremiumDays() const;
-	bool isPremium() const;
+	uint16_t getPremiumDays() const {return premiumDays;}
+	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
 
 	bool isOffline() const {return (getID() == 0);}
 	void disconnect() {if(client) client->disconnect();}
@@ -170,7 +170,7 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
-	//uint32_t getAccountName() const {return accountName;}
+	std::string getAccountName() const {return accountName;}
 	uint32_t getAccountId() const {return accountId;}
 	uint32_t getLevel() const {return level;}
 	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
@@ -684,7 +684,7 @@ protected:
 	playersex_t sex;
 	int32_t soul, soulMax;
 	uint64_t groupFlags;
-	int32_t premiumEnd;
+	uint16_t premiumDays;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 	uint32_t actionTaskEvent;
@@ -714,7 +714,7 @@ protected:
 
 	//account variables
 	uint32_t accountId;
-	//std::string accountName;
+	std::string accountName;
 	std::string password;
 	time_t lastLoginSaved;
 	int64_t lastLoginMs;
