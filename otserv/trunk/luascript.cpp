@@ -1375,9 +1375,6 @@ void LuaScriptInterface::registerFunctions()
 
 	//doPlayerSetLossPercent(cid, lossType, newPercent)
 	lua_register(m_luaState, "doPlayerSetLossPercent", LuaScriptInterface::luaDoPlayerSetLossPercent);
-	
-	//getPlayerLossPercent(cid, lossType)
-	lua_register(m_luaState, "getPlayerLossPercent", LuaScriptInterface::luaGetPlayerLossPercent);
 
 	//doSetCreatureDropLoot(cid, doDrop)
 	lua_register(m_luaState, "doSetCreatureDropLoot", LuaScriptInterface::luaDoSetCreatureDropLoot);
@@ -2958,31 +2955,6 @@ int LuaScriptInterface::luaDoPlayerSetLossPercent(lua_State *L)
 				reportErrorFunc("lossPercent value higher than 100");
 				lua_pushnumber(L, LUA_ERROR);
 			}
-		}
-		else{
-			reportErrorFunc("No valid lossType");
-			lua_pushnumber(L, LUA_ERROR);
-		}
-	}
-	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-	}
-	return 1;
-}
-
-int LuaScriptInterface::luaGetPlayerLossPercent(lua_State *L)
-{
-	//getPlayerLossPercent(cid, lossType)
-	uint8_t lossType = (uint8_t)popNumber(L);
-	uint32_t cid = popNumber(L);
-
-	ScriptEnviroment* env = getScriptEnv();
-
-	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		if(lossType <= LOSS_LAST){
-			lua_pushnumber(L, player->getLossPercent((lossTypes_t)lossType));
 		}
 		else{
 			reportErrorFunc("No valid lossType");
