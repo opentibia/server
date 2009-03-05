@@ -2741,9 +2741,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 					*destItem = NULL;
 					return subContainer;
 				}
-				else{
-					containerList.push_back(subContainer);
-				}
+				containerList.push_back(subContainer);
 			}
 		}
 
@@ -2754,12 +2752,12 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 					continue;
 				}
 
-				if(Container* subContainer = dynamic_cast<Container*>(*iit)){
-					if(subContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
-						index = INDEX_WHEREEVER;
-						*destItem = NULL;
-						return subContainer;
-					}
+				Container* subContainer = dynamic_cast<Container*>(*iit);
+				if(subContainer && !subContainer->full() && subContainer->__queryAdd(
+					-1, item, item->getItemCount(), 0) == RET_NOERROR){
+					index = INDEX_WHEREEVER;
+					*destItem = NULL;
+					return subContainer;
 				}
 			}
 		}

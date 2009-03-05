@@ -844,7 +844,6 @@ ContainerIterator& ContainerIterator::operator=(const ContainerIterator& rhs)
 Item* ContainerIterator::operator*()
 {
 	assert(super);
-
 	return *cur;
 }
 
@@ -856,11 +855,9 @@ Item* ContainerIterator::operator->()
 ContainerIterator& ContainerIterator::operator++()
 {
 	assert(super);
-
-	Item* i = *cur;
-	if(Container* c = i->getContainer()){
-		uint32_t count = c->size();
-		if(count > 0 && count < c->capacity()){
+	if(Item* i = *cur){
+		Container* c = i->getContainer();
+		if(c && !c->empty()){
 			over.push(c);
 		}
 	}

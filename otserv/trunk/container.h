@@ -67,11 +67,12 @@ public:
 	virtual Depot* getDepot() {return NULL;};
 	virtual const Depot* getDepot() const {return NULL;};
 
-	//serialization
 	bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
+	std::string getContentDescription() const;
 
-	uint32_t size() const {return (uint32_t)itemlist.size();};
-	uint32_t capacity() const {return maxSize;};
+	uint32_t size() const {return (uint32_t)itemlist.size();}
+	bool full() const {return itemlist.size() >= maxSize;}
+	bool empty() const {return itemlist.empty();}
 
 	ContainerIterator begin();
 	ContainerIterator end();
@@ -87,9 +88,9 @@ public:
 	Item* getItem(uint32_t index);
 	bool isHoldingItem(const Item* item) const;
 
+	uint32_t capacity() const {return maxSize;}
 	uint32_t getItemHoldingCount() const;
 	virtual double getWeight() const;
-	std::string getContentDescription() const;
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
