@@ -2657,7 +2657,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)
 	msg->AddByte(player->getMagicLevel());
 	msg->AddByte(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT));
 	msg->AddByte(player->getPlayerInfo(PLAYERINFO_SOUL));
-	msg->AddU16(1440); //stamina(minutes)
+	msg->AddU16(player->getStaminaMinutes()); //stamina(minutes)
 }
 
 void ProtocolGame::AddPlayerSkills(NetworkMessage_ptr msg)

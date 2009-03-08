@@ -48,9 +48,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`account_id`, `players`.`group_id` as `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
-		`posz`, `cap`, `lastlogin`, `lastip`, `save`, `conditions`, `redskulltime`, \
+		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `save`, `conditions`, `redskulltime`, \
 		`redskull`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
-		`loss_items`, `rank_id`, `town_id`, `balance`, `premend` \
+		`loss_items`, `rank_id`, `town_id`, `balance`, `premend`, `stamina` \
 		FROM `players` LEFT JOIN `accounts` ON `account_id` = `accounts`.`id` \
 		WHERE `players`.`name` = " + db->escapeString(name);
 
@@ -94,6 +94,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->soul = result->getDataInt("soul");
 	player->capacity = result->getDataInt("cap");
 	player->lastLoginSaved = result->getDataInt("lastlogin");
+	player->lastLogout = result->getDataInt("lastlogout");
 
 	player->health = result->getDataInt("health");
 	player->healthMax = result->getDataInt("healthmax");
@@ -175,6 +176,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	Account account = IOAccount::instance()->loadAccount(player->accountName);
 	player->premiumDays = account.getPremiumDaysLeft();
 	player->balance = result->getDataInt("balance");
+	player->stamina = result->getDataInt("stamina");
 
 	player->guildNick = result->getDataString("guildnick");
 	db->freeResult(result);
@@ -484,13 +486,15 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `cap` = " << player->getCapacity()
 	<< ", `sex` = " << player->sex
 	<< ", `lastlogin` = " << player->lastLoginSaved
+	<< ", `lastlogout` = " << player->lastLogout
 	<< ", `lastip` = " << player->lastip
 	<< ", `conditions` = " << db->escapeBlob(conditions, conditionsSize)
 	<< ", `loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE)
 	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
 	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES)
 	<< ", `loss_items` = " << (int)player->getLossPercent(LOSS_ITEMS)
-	<< ", `balance` = " << player->balance;
+	<< ", `balance` = " << player->balance
+	<< ", `stamina` = " << player->stamina;
 
 #ifdef __SKULLSYSTEM__
 	int32_t redSkullTime = 0;

@@ -1041,15 +1041,51 @@ double Creature::getDamageRatio(Creature* attacker) const
 	return ((double)attackerDamage / totalDamage);
 }
 
+uint32_t Creature::getStaminaRatio(Creature* attacker) const
+{
+	uint32_t cHits = 0;
+	
+	for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it)
+	{
+		if(it->first == attacker->getID()){
+			cHits += it->second.hits;
+        }
+	}
+	for(CountMap::const_iterator it = healMap.begin(); it != healMap.end(); ++it)
+	{
+		if(it->first == attacker->getID()){
+			cHits += it->second.hits;
+        }
+	}
+
+	return cHits;
+}
+
 uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*= true*/) const
 {
-	uint64_t lostExperience = getLostExperience();
+	uint64_t retValue = (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 	if(Player* player = attacker->getPlayer()){
         if(useMultiplier){
-            return (uint64_t)std::floor(getDamageRatio(attacker) * lostExperience * g_config.getNumber(ConfigManager::RATE_EXPERIENCE) * player->exp_multiplier);
+            retValue = (uint64_t)std::floor(retValue * player->exp_multiplier);
         }
+        //[check & remove stamina
+        if(player->getStaminaMinutes() <= 840 && player->getStaminaMinutes() > 0){
+            retValue = (uint64_t)std::floor(retValue / 2);
+        }
+        else if(player->getStaminaMinutes() <= 0){
+            return 0;
+        }
+        if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
+            int32_t timeToRemove;
+            if(getStaminaRatio(attacker) * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA) > 201660000)
+                timeToRemove = 201660000;
+            else
+                timeToRemove = int32_t(getStaminaRatio(attacker) * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA));
+            player->addStamina(-timeToRemove);
+        }
+        //]
     }
-    return (uint64_t)std::floor(getDamageRatio(attacker) * lostExperience * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
+    return retValue;
 }
 
 void Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
@@ -1062,11 +1098,13 @@ void Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
 			CountBlock_t cb;
 			cb.ticks = OTSYS_TIME();
 			cb.total = damagePoints;
+			cb.hits = 1;
 			damageMap[attackerId] = cb;
 		}
 		else{
 			it->second.total += damagePoints;
 			it->second.ticks = OTSYS_TIME();
+			it->second.hits++;
 		}
 
 		lastHitCreature = attackerId;
@@ -1083,11 +1121,13 @@ void Creature::addHealPoints(Creature* caster, int32_t healthPoints)
 			CountBlock_t cb;
 			cb.ticks = OTSYS_TIME();
 			cb.total = healthPoints;
+			cb.hits = 0;
 			healMap[casterId] = cb;
 		}
 		else{
 			it->second.total += healthPoints;
 			it->second.ticks = OTSYS_TIME();
+			it->second.hits++;
 		}
 	}
 }

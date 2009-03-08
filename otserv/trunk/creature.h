@@ -281,6 +281,8 @@ public:
 	virtual bool convinceCreature(Creature* creature) {return false;};
 
 	virtual void onDie();
+	
+	uint32_t getStaminaRatio(Creature* attacker) const;
 	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
 	void addHealPoints(Creature* caster, int32_t healthPoints);
@@ -416,6 +418,7 @@ protected:
 	struct CountBlock_t{
 		int32_t total;
 		int64_t ticks;
+		uint32_t hits;
 	};
 
 	typedef std::map<uint32_t, CountBlock_t> CountMap;

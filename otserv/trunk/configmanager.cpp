@@ -130,6 +130,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATE_LOOT] = getGlobalNumber(L, "rate_loot", 1);
 	m_confInteger[RATE_MAGIC] = getGlobalNumber(L, "rate_mag", 1);
 	m_confInteger[RATE_SPAWN] = getGlobalNumber(L, "rate_spawn", 1);
+	m_confInteger[RATE_STAMINA] = getGlobalNumber(L, "rate_stamina", 1);
 	m_confInteger[HOTKEYS] = getGlobalBoolean(L, "enablehotkeys", false);
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);
 	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalBoolean(L, "saveclientdebug", false);

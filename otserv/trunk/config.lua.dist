@@ -106,6 +106,7 @@ rate_skill = 1
 rate_mag = 1
 rate_loot = 1
 rate_spawn = 1
+rate_stamina = 1
 
 -- Remove ammunition
 -- If false, ammunition will not be removed when using distance weapons

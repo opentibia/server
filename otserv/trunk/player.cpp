@@ -96,12 +96,14 @@ Creature()
 	accessLevel = 0;
 	lastip = 0;
 	lastLoginSaved = 0;
+	lastLogout = 0;
 	lastLoginMs = 0;
 	npings = 0;
 	internal_ping = 0;
 	MessageBufferTicks = 0;
 	MessageBufferCount = 0;
 	nextAction = 0;
+	stamina = 201660000;
 
 	pzLocked = false;
 	bloodHitCount = 0;
@@ -1432,6 +1434,19 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 			#endif
 		}
 		//]
+		
+		if(lastLogout > 0)
+		{
+			int32_t timeOff = (time(NULL) - lastLogout) - 600;
+			int32_t timeToAdd;
+			if(timeOff > 0){
+                if(timeOff * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA) > 201660000)
+                    timeToAdd = 201660000;
+                else
+                    timeToAdd = int32_t(timeOff * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA));
+				addStamina(timeToAdd);
+            }
+		}
 	}
 }
 
@@ -1506,6 +1521,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	if(creature == this){
 		if(isLogout){
 			loginPosition = getPosition();
+			lastLogout = time(NULL);
 		}
 
 		if(eventWalk != 0){
@@ -4046,4 +4062,21 @@ bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 bool Player::checkLoginAttackDelay(uint32_t attackerId) const
 {
 	return (OTSYS_TIME() <= (lastLoginMs + g_config.getNumber(ConfigManager::LOGIN_ATTACK_DELAY)) && !hasBeenAttacked(attackerId));
+}
+
+void Player::addStamina(int32_t value)
+{     
+    stamina = std::min((int32_t)201660000, (int32_t)stamina + value);
+    if(stamina < 0){
+        stamina = 0;
+    }
+}
+
+uint32_t Player::getStaminaMinutes()
+{
+    if(hasFlag(PlayerFlag_HasInfiniteStamina)){
+        return 3360;
+    }
+    
+    return std::min((uint32_t)3360, (uint32_t)std::floor(stamina / 60000));
 }

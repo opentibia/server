@@ -599,6 +599,7 @@ public:
 	void setNextAction(int64_t time) {if(time > nextAction) {nextAction = time;}}
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 	uint32_t getNextActionTime() const;
+	virtual uint32_t getAttackSpeed() const;
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
@@ -614,6 +615,10 @@ public:
 	//items
 	ContainerVector containerVec;
 	void preSave();
+	
+	//stamina
+	void addStamina(int32_t value);
+	uint32_t getStaminaMinutes();
 
 	//depots
 	DepotMap depots;
@@ -678,6 +683,7 @@ protected:
 	uint32_t conditionImmunities;
 	uint32_t conditionSuppressions;
 	uint32_t condition;
+	int32_t stamina;
 	uint32_t manaSpent;
 	Vocation_t vocation_id;
 	Vocation* vocation;
@@ -717,6 +723,7 @@ protected:
 	std::string accountName;
 	std::string password;
 	time_t lastLoginSaved;
+	time_t lastLogout;
 	int64_t lastLoginMs;
 	Position loginPosition;
 	uint32_t lastip;
@@ -819,7 +826,6 @@ protected:
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
 	virtual uint32_t getConditionSuppressions() const { return conditionSuppressions; }
 	virtual uint16_t getLookCorpse() const;
-	virtual uint32_t getAttackSpeed() const;
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;

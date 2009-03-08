@@ -422,6 +422,7 @@ enum PlayerFlags{
 	PlayerFlag_CanAnswerRuleViolations,     //2^38 = 274877906944
 	PlayerFlag_CanReloadContent,            //2^39 = 549755813888
 	PlayerFlag_ShowGroupInsteadOfVocation,  //2^40 = 1099511627776
+	PlayerFlag_HasInfiniteStamina,          //2^41 = 2199023255552
 	//add new flags here
 	PlayerFlag_LastFlag
 };

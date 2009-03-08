@@ -47,6 +47,7 @@ CREATE TABLE "players" (
     "posz" INTEGER NOT NULL DEFAULT 0,
     "cap" INTEGER NOT NULL DEFAULT 0,
     "lastlogin" INTEGER NOT NULL DEFAULT 0,
+    "lastlogout" INTEGER NOT NULL DEFAULT 0,
     "lastip" INTEGER NOT NULL DEFAULT 0,
     "save" INTEGER NOT NULL DEFAULT 1,
     "conditions" BLOB NOT NULL,
@@ -60,6 +61,7 @@ CREATE TABLE "players" (
     "rank_id" INTEGER NOT NULL,
     "town_id" INTEGER NOT NULL,
     "balance" INTEGER NOT NULL DEFAULT 0,
+    "stamina" INTEGER NOT NULL DEFAULT 201660000,
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
