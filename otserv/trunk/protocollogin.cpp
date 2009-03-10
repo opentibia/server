@@ -166,7 +166,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			output->AddU16(g_config.getNumber(ConfigManager::PORT));
 		}
 		//Add premium days
-		output->AddU16(account.getPremiumDaysLeft());//output->AddU16(0);
+		output->AddU16(Account::getPremiumDaysLeft(account.premEnd));//output->AddU16(0);
 
 		OutputMessagePool::getInstance()->send(output);
 	}

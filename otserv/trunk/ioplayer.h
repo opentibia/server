@@ -82,14 +82,12 @@ protected:
 
 	const PlayerGroup* getPlayerGroup(uint32_t groupid);
 
-	struct StringCompareCase{
-		bool operator()(const std::string& l, const std::string& r) const{
-			if(strcasecmp(l.c_str(), r.c_str()) < 0){
+	struct StringCompareCase
+	{
+		bool operator()(const std::string& l, const std::string& r) const
+		{
+			return strcasecmp(l.c_str(), r.c_str()) < 0;
 				return true;
-			}
-			else{
-				return false;
-			}
 		}
 	};
 

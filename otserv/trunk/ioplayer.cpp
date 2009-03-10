@@ -48,9 +48,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`account_id`, `players`.`group_id` as `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
-		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `save`, `conditions`, `redskulltime`, \
+		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `redskulltime`, \
 		`redskull`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
-		`loss_items`, `rank_id`, `town_id`, `balance`, `premend`, `stamina` \
+		`loss_items`, `rank_id`, `town_id`, `balance`, `stamina` \
 		FROM `players` LEFT JOIN `accounts` ON `account_id` = `accounts`.`id` \
 		WHERE `players`.`name` = " + db->escapeString(name);
 
@@ -173,8 +173,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	uint32_t rankid = result->getDataInt("rank_id");
 
 	// place it here and now we can drop all additional query instances as all data were loaded
-	Account account = IOAccount::instance()->loadAccount(player->accountName);
-	player->premiumDays = account.getPremiumDaysLeft();
 	player->balance = result->getDataInt("balance");
 	player->stamina = result->getDataInt("stamina");
 
@@ -195,12 +193,13 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 
 	//get password
-	query << "SELECT `password` FROM `accounts` WHERE `id` = " << player->accountId;
+	query << "SELECT `password`, `premend` FROM `accounts` WHERE `id` = " << player->accountId;
 	if(!(result = db->storeQuery(query.str()))){
 		return false;
 	}
 
 	player->password = result->getDataString("password");
+	player->premiumDays = Account::getPremiumDaysLeft(result->getDataInt("premend"));
 	db->freeResult(result);
 
 	// we need to find out our skills
@@ -226,7 +225,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 				player->skills[skillid][SKILL_PERCENT] = Player::getPercentLevel(skillCount, nextSkillCount);
 			}
 		}while(result->next());
-
 		db->freeResult(result);
 	}
 
@@ -237,7 +235,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 			std::string spellName = result->getDataString("name");
 			player->learnedInstantSpellList.push_back(spellName);
 		}while(result->next());
-
 		db->freeResult(result);
 	}
 
@@ -417,14 +414,13 @@ bool IOPlayer::savePlayer(Player* player)
 
 	//check if the player have to be saved or not
 	query << "SELECT `save` FROM `players` WHERE `id` = " << player->getGUID();
-
 	if(!(result = db->storeQuery(query.str()))){
 		return false;
 	}
 
-	if(result->getDataInt("save") == 0){
-		db->freeResult(result);
-
+	const uint32_t save = result->getDataInt("save")
+	db->freeResult(result);
+	if(save == 0){
 		query.str("");
 		query << "UPDATE `players` SET `lastlogin` = " << player->lastLoginSaved
 			<< ", `lastip` = " << player->lastip
@@ -438,15 +434,11 @@ bool IOPlayer::savePlayer(Player* player)
 			return false;
 		}
 
-		transaction.commit();
-
-		return true;
+		return transaction.commit();
 	}
-	db->freeResult(result);
 
 	//serialize conditions
 	PropWriteStream propWriteStream;
-
 	for(ConditionList::const_iterator it = player->conditions.begin(); it != player->conditions.end(); ++it){
 		if((*it)->isPersistent()){
 			if(!(*it)->serialize(propWriteStream)){
@@ -503,13 +495,7 @@ bool IOPlayer::savePlayer(Player* player)
 	}
 
 	query << ", `redskulltime` = " << redSkullTime;
-
-	int32_t redSkull = 0;
-	if(player->skull == SKULL_RED){
-		redSkull = 1;
-	}
-
-	query << ", `redskull` = " << redSkull;
+	query << ", `redskull` = " << (player->skull == SKULL_RED ? 1 : 0);
 #endif
 
 	query << " WHERE `id` = " << player->getGUID();
@@ -571,14 +557,11 @@ bool IOPlayer::savePlayer(Player* player)
 	query.str("");
 
 	DBInsert stmt(db);
-
 	//learned spells
 	stmt.setQuery("INSERT INTO `player_spells` (`player_id`, `name`) VALUES ");
-
 	for(LearnedInstantSpellList::const_iterator it = player->learnedInstantSpellList.begin();
 			it != player->learnedInstantSpellList.end(); ++it){
 		query << player->getGUID() << ", " << db->escapeString(*it);
-
 		if(!stmt.addRow(query)){
 			return false;
 		}
@@ -589,7 +572,6 @@ bool IOPlayer::savePlayer(Player* player)
 	}
 
 	ItemBlockList itemList;
-
 	Item* item;
 	for(int32_t slotId = 1; slotId <= 10; ++slotId){
 		if((item = player->inventory[slotId])){
@@ -599,7 +581,6 @@ bool IOPlayer::savePlayer(Player* player)
 
 	//item saving
 	stmt.setQuery("INSERT INTO `player_items` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES ");
-
 	if(!(saveItems(player, itemList, stmt) && stmt.execute())){
 		return false;
 	}
@@ -611,17 +592,14 @@ bool IOPlayer::savePlayer(Player* player)
 
 	//save depot items
 	stmt.setQuery("INSERT INTO `player_depotitems` (`player_id` , `pid` , `sid` , `itemtype` , `count` , `attributes` ) VALUES ");
-
 	if(!(saveItems(player, itemList, stmt) && stmt.execute())){
 		return false;
 	}
 
 	stmt.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
-
 	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
 		query << player->getGUID() << ", " << cit->first << ", " << cit->second;
-
 		if(!stmt.addRow(query)){
 			return false;
 		}
@@ -633,27 +611,23 @@ bool IOPlayer::savePlayer(Player* player)
 
 	//save vip list
 	if(!player->VIPList.empty()){
-		std::stringstream ss;
-		ss << "INSERT INTO `player_viplist` (`player_id`, `vip_id`) SELECT " << player->getGUID()
-			<< ", `id` FROM `players` WHERE `id` IN";
-
-		stmt.setQuery(ss.str());
-		ss.str("");
-
-		for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end();){
-			ss << (*it);
+		query << "INSERT INTO `player_viplist` (`player_id`, `vip_id`) SELECT " << player->getGUID()
+			<< ", `id` FROM `players` WHERE `id` IN (";
+		for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); ){
+			query << (*it);
 			++it;
-			
 			if(it != player->VIPList.end()){
-				ss << ",";
+				query << ",";
+			}
+			else{
+				query << ")";
 			}
 		}
 
-		stmt.addRow(ss);
-
-		if(!stmt.execute()){
+		if(!db->executeQuery(query.str())){
 			return false;
 		}
+		query.str("");
 	}
 
 	//End the transaction

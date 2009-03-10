@@ -39,7 +39,7 @@ public:
 	// < current time is none, (time_t)(-1) is infinite.
 	time_t premEnd;
 
-	uint16_t getPremiumDaysLeft() const;
+	static uint16_t getPremiumDaysLeft(uint32_t _premEnd) const;
 
 	std::string password;
 

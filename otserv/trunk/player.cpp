@@ -2757,8 +2757,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 				}
 
 				Container* subContainer = dynamic_cast<Container*>(*iit);
-				if(subContainer && !subContainer->full() && subContainer->__queryAdd(
-					-1, item, item->getItemCount(), 0) == RET_NOERROR){
+				if(subContainer && subContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
 					index = INDEX_WHEREEVER;
 					*destItem = NULL;
 					return subContainer;
@@ -2769,7 +2768,6 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 	}
 
 	Thing* destThing = __getThing(index);
-
 	if(destThing)
 		*destItem = destThing->getItem();
 
