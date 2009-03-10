@@ -1259,7 +1259,7 @@ void LuaScriptInterface::registerFunctions()
 	//doCreatureAddHealth(cid, health)
 	lua_register(m_luaState, "doCreatureAddHealth", LuaScriptInterface::luaDoPlayerAddHealth);
 
-	//doPlayerAddMana(cid, mana)
+	//doPlayerAddMana(cid, mana, <optional: default: 1> filter)
 	lua_register(m_luaState, "doPlayerAddMana", LuaScriptInterface::luaDoPlayerAddMana);
 
 	//doPlayerAddSoul(cid, soul)
@@ -2554,15 +2554,19 @@ int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 {
-	//doPlayerAddMana(cid, mana)
+	//doPlayerAddMana(cid, mana, <optional: default: 1> filter)
+	bool filter = true;
+	if(lua_gettop(L) >= 3)
+		filter = popNumber(L) == LUA_TRUE;
+
 	int32_t manaChange = (int32_t)popNumber(L);
-	uint32_t cid = popNumber(L);
-
 	ScriptEnviroment* env = getScriptEnv();
-
-	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		g_game.combatChangeMana(NULL, player, manaChange);
+	if(Player* player = env->getPlayerByUID(popNumber(L))){
+		if(filter){
+			g_game.combatChangeMana(NULL, player, manaChange);
+		else{
+			player->drainMana(NULL, manaChange);
+		}
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{

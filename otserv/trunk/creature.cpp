@@ -864,7 +864,6 @@ void Creature::gainHealth(Creature* caster, int32_t healthGain)
 void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
 {
 	changeHealth(-damage);
-
 	if(attacker){
 		attacker->onAttackedCreatureDrainHealth(this, damage);
 	}
