@@ -1438,13 +1438,11 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		if(lastLogout > 0)
 		{
 			int32_t timeOff = (time(NULL) - lastLogout) - 600;
-			int32_t timeToAdd;
 			if(timeOff > 0){
-                if(timeOff * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA) > 201660000)
-                    timeToAdd = 201660000;
+                if(timeOff * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA) >= getSpentStamina())
+                    addStamina(getSpentStamina());
                 else
-                    timeToAdd = int32_t(timeOff * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA));
-				addStamina(timeToAdd);
+                    addStamina(int32_t(timeOff * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA)));
             }
 		}
 	}
@@ -4063,11 +4061,9 @@ bool Player::checkLoginAttackDelay(uint32_t attackerId) const
 }
 
 void Player::addStamina(int32_t value)
-{     
-    stamina = std::min((int32_t)201660000, (int32_t)stamina + value);
-    if(stamina < 0){
-        stamina = 0;
-    }
+{
+    //stamina may not be bigger than 201660000, and not smaller than 0
+    stamina = std::min((int32_t)201660000, std::max((int32_t)0, (int32_t)stamina + value));
 }
 
 uint32_t Player::getStaminaMinutes()

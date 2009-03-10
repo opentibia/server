@@ -418,7 +418,7 @@ bool IOPlayer::savePlayer(Player* player)
 		return false;
 	}
 
-	const uint32_t save = result->getDataInt("save")
+	const uint32_t save = result->getDataInt("save");
 	db->freeResult(result);
 	if(save == 0){
 		query.str("");

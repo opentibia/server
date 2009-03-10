@@ -1043,7 +1043,6 @@ double Creature::getDamageRatio(Creature* attacker) const
 uint32_t Creature::getStaminaRatio(Creature* attacker) const
 {
 	uint32_t cHits = 0;
-	
 	for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it)
 	{
 		if(it->first == attacker->getID()){
@@ -1055,8 +1054,7 @@ uint32_t Creature::getStaminaRatio(Creature* attacker) const
 		if(it->first == attacker->getID()){
 			cHits += it->second.hits;
         }
-	}
-
+    }
 	return cHits;
 }
 
@@ -1075,12 +1073,10 @@ uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*
             return 0;
         }
         if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
-            int32_t timeToRemove;
-            if(getStaminaRatio(attacker) * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA) > 201660000)
-                timeToRemove = 201660000;
+            if(getStaminaRatio(attacker) * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA) >= player->getStamina())
+                player->addStamina(-int32_t(player->getStamina()));
             else
-                timeToRemove = int32_t(getStaminaRatio(attacker) * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA));
-            player->addStamina(-timeToRemove);
+                player->addStamina(-int32_t(getStaminaRatio(attacker) * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA)));
         }
         //]
     }

@@ -38,7 +38,7 @@ Account::~Account()
 	charList.clear();
 }
 
-uint16_t Account::getPremiumDaysLeft(uint32_t _premEnd) const
+uint16_t Account::getPremiumDaysLeft(uint32_t _premEnd)
 {
 	uint32_t today = (uint32_t)time(NULL) / 86400;
 	if((time_t)_premEnd == time_t(-1))
