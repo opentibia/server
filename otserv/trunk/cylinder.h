@@ -137,7 +137,7 @@ public:
 	  * \param index is the objects new index value
 	  * \param link holds the relation the object has to the cylinder
 	  */
-	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER) = 0;
+	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER) = 0;
 
 	/**
 	  * Is sent after an operation (move/remove) to update internal values
@@ -146,7 +146,7 @@ public:
 	  * \param isCompleteRemoval indicates if the item was completely removed or just partially (stackables)
 	  * \param link holds the relation the object has to the cylinder
 	  */
-	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER) = 0;
+	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER) = 0;
 
 	/**
 	  * Gets the index of an object
@@ -181,6 +181,14 @@ public:
 	  * \param returns the amount of items of the asked item type
 	  */
 	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
+
+	/**
+	  * Get the amount of items of a all types
+	  * \param countMap a map to put the itemID:count mapping in
+	  * \param itemCount if set to true it will only count items and not other subtypes like charges
+	  * \param returns a map mapping item id to count (same as first argument)
+	  */
+	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap, bool itemCount = true) const;
 
 	/**
 	  * Adds an object to the cylinder without sending to the client(s)
@@ -218,8 +226,8 @@ public:
 	virtual void __replaceThing(uint32_t index, Thing* thing) {}
 	virtual void __removeThing(Thing* thing, uint32_t count) {}
 
-	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER) {}
-	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval,
+	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER) {}
+	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval,
 		cylinderlink_t link = LINK_OWNER) {}
 
 	virtual bool isPushable() const {return false;}

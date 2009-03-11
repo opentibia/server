@@ -397,8 +397,8 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		(*it)->onCreatureMove(creature, toTile, toPos, this, fromPos, oldStackPos, teleport);
 	}
 
-	postRemoveNotification(creature, oldStackPos, true);
-	toTile->postAddNotification(creature, newStackPos);
+	postRemoveNotification(creature, toCylinder, oldStackPos, true);
+	toTile->postAddNotification(creature, this, newStackPos);
 }
 
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -1084,7 +1084,7 @@ Thing* Tile::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Tile::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1094,7 +1094,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->postAddNotification(thing, index, LINK_NEAR);
+			tmpPlayer->postAddNotification(thing, oldParent, index, LINK_NEAR);
 		}
 	}
 
@@ -1138,7 +1138,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link 
 	g_game.FreeThing(thing);
 }
 
-void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Tile::postRemoveNotification(Thing* thing,  const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1152,7 +1152,7 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
+			tmpPlayer->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_NEAR);
 		}
 	}
 

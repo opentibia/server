@@ -118,7 +118,7 @@ SimpleUpdateQuery updateQueries[] = {
             "INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
             NULL
         }
-    }
+    },
     { 4,
         { // PgSql
             "ALTER TABLE `players` ADD `lastlogout` BIGINT NOT NULL DEFAULT 0;",
@@ -276,7 +276,7 @@ int main(int argn, const char* argv[]){
     query.str("");
     query << "UPDATE `schema_info` SET `value` = '" << CURRENT_SCHEMA_VERSION << "' WHERE `name` = 'version';";
     if(!db->executeQuery(query.str().c_str())){
-        ErrorMessage("Your database has been correctly updated to most recent version, but error occured during saving new version number.");
+        ErrorMessage("Your database has been correctly updated to most recent version, but an error occured when updating the schema version.");
         return -1;
     }
 

@@ -227,6 +227,23 @@ uint16_t Item::getSubType() const
 	return count;
 }
 
+Player* Item::getHoldingPlayer()
+{
+	Cylinder* p = getParent();
+	while(p){
+		if(p->getCreature())
+			// Must be a player, creatures are not cylinders
+			return p->getCreature()->getPlayer();
+		p = p->getParent();
+	}
+	return NULL;
+}
+
+const Player* Item::getHoldingPlayer() const
+{
+	return const_cast<Item*>(this)->getHoldingPlayer();
+}
+
 void Item::setSubType(uint16_t n)
 {
 	const ItemType& it = items[id];

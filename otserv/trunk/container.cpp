@@ -666,6 +666,30 @@ uint32_t Container::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/
 	return count;
 }
 
+std::map<uint32_t, uint32_t>& Container::__getAllItemTypeCount(
+	std::map<uint32_t, uint32_t>& countMap, bool itemCount /*= true*/) const
+{
+	Item* item = NULL;
+
+	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
+		item = (*it);
+
+		if(itemCount){
+			countMap[item->getID()] += item->getItemCount();
+		}
+		else{
+			if(item->isRune()){
+				countMap[item->getID()] += item->getCharges();
+			}
+			else{
+				countMap[item->getID()] += item->getItemCount();
+			}
+		}
+	}
+
+	return countMap;
+}
+
 Thing* Container::__getThing(uint32_t index) const
 {
 	if(index < 0 || index > size())
@@ -682,42 +706,42 @@ Thing* Container::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Container::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Container::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postAddNotification(thing, index, LINK_TOPPARENT);
+		topParent->postAddNotification(thing, oldParent, index, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
 			if(topParent->getParent()){
-				topParent->getParent()->postAddNotification(thing, index, LINK_NEAR);
+				topParent->getParent()->postAddNotification(thing, oldParent, index, LINK_NEAR);
 			}
 		}
 		else{
-			topParent->postAddNotification(thing, index, LINK_PARENT);
+			topParent->postAddNotification(thing, oldParent, index, LINK_PARENT);
 		}
 	}
 }
 
-void Container::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Container::postRemoveNotification(Thing* thing,  const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_TOPPARENT);
+		topParent->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
 			if(topParent->getParent()){
-				topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
+				topParent->getParent()->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_NEAR);
 			}
 		}
 		else{
-			topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
+			topParent->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 		}
 	}
 }

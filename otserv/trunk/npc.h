@@ -270,7 +270,7 @@ struct ListItem{
 	ListItem()
 	{
 		itemId = 0;
-		subType = 1;
+		subType = 0;
 		sellPrice = 0;
 		buyPrice = 0;
 		keywords = "";

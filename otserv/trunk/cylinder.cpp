@@ -43,6 +43,12 @@ uint32_t Cylinder::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/,
 	return 0;
 }
 
+std::map<uint32_t, uint32_t>& Cylinder::__getAllItemTypeCount(
+	std::map<uint32_t, uint32_t>& countMap, bool itemCount/*= true*/) const
+{
+	return countMap;
+}
+
 Thing* Cylinder::__getThing(uint32_t index) const
 {
 	return NULL;

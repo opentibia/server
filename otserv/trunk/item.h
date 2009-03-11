@@ -295,6 +295,10 @@ public:
 	uint16_t getClientID() const {return items[id].clientId;}
 	void setID(uint16_t newid);
 
+	// Returns the player that is holding this item in his inventory
+	Player* getHoldingPlayer();
+	const Player* getHoldingPlayer() const;
+
 	WeaponType_t getWeaponType() const {return items[id].weaponType;}
 	Ammo_t	getAmuType() const {return items[id].amuType;}
 	int32_t	getShootRange() const {return items[id].shootRange;}
@@ -349,6 +353,8 @@ public:
 	uint16_t getItemCount() const {return count;}
 	void setItemCount(uint16_t n) {count = n;}
 
+	static uint32_t countByType(const Item* i, int checkType, bool multiCount);
+
 	void setDefaultSubtype();
 	bool hasSubType() const;
 	uint16_t getSubType() const;
@@ -384,5 +390,19 @@ protected:
 };
 
 typedef std::list<Item *> ItemList;
+
+inline uint32_t Item::countByType(const Item* i, int checkType, bool multiCount){
+	if(checkType == -1 || checkType == i->getSubType()){
+
+		if(multiCount)
+			return i->getItemCount();
+
+		if(i->isRune())
+			return i->getCharges();
+
+		return i->getItemCount();
+	}
+	return 0;
+}
 
 #endif

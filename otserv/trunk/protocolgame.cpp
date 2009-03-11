@@ -1840,12 +1840,47 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 		msg->AddU32(g_game.getMoney(player));
 
 		std::map<uint32_t, uint32_t> saleMap;
-		for(std::list<ShopInfo>::const_iterator it = shop.begin(); it != shop.end(); ++it){
-			if((*it).sellPrice > 0){
-				int8_t subtype = ((*it).subType == 0) ? (-1) :((*it).subType);
-				uint32_t count = player->__getItemTypeCount((*it).itemId, subtype);
-				if(count > 0){
-					saleMap[(*it).itemId] =  count;
+
+		if(shop.size() <= 5){
+			// For very small shops it's not worth it to create the complete map
+			for(std::list<ShopInfo>::const_iterator it = shop.begin(); it != shop.end(); ++it){
+				const ShopInfo& sInfo = *it;
+				if(sInfo.sellPrice > 0){
+					int8_t subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
+					uint32_t count = player->__getItemTypeCount(sInfo.itemId, subtype);
+					if(count > 0){
+						saleMap[sInfo.itemId] = count;
+					}
+				}
+			}
+		}
+		else{
+			// Large shop, it's better to get a cached map of all item counts and use it
+			// We need a temporary map since the finished map should only contain items 
+			// available in the shop
+			std::map<uint32_t, uint32_t> tempSaleMap;
+			player->__getAllItemTypeCount(tempSaleMap);
+
+			// We must still check manually for the special items that require subtype matches
+			// (That is, fluids such as potions etc., actually these items are very few since
+			// health potions now use their own ID)
+			for(std::list<ShopInfo>::const_iterator it = shop.begin(); it != shop.end(); ++it){
+				const ShopInfo& sInfo = *it;
+				if(sInfo.sellPrice > 0){
+					int8_t subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
+					if(subtype != -1){
+						// This shop item requires extra checks
+						uint32_t count = player->__getItemTypeCount(sInfo.itemId, subtype);
+
+						if(count > 0)
+							saleMap[sInfo.itemId] = count;
+						else
+							// No count if you include subtypes in the calculations
+							saleMap[sInfo.itemId] = 0;
+					}
+					else{
+						saleMap[sInfo.itemId] = tempSaleMap[sInfo.itemId];
+					}
 				}
 			}
 		}

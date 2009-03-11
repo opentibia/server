@@ -420,6 +420,7 @@ bool IOPlayer::savePlayer(Player* player)
 
 	const uint32_t save = result->getDataInt("save");
 	db->freeResult(result);
+
 	if(save == 0){
 		query.str("");
 		query << "UPDATE `players` SET `lastlogin` = " << player->lastLoginSaved

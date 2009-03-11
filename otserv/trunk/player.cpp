@@ -2973,48 +2973,42 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 {
 	uint32_t count = 0;
 
-	std::list<const Container*> listContainer;
-	ItemList::const_iterator cit;
-	Container* tmpContainer = NULL;
-	Item* item = NULL;
-
 	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
-		if((item = inventory[i])){
-			if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
+		Item* item = inventory[i];
+		
+		if(item){
+			if(item->getID() == itemId)
+				count += Item::countByType(item, subType, itemCount);
 
-				if(itemCount){
-					count+= item->getItemCount();
-				}
-				else{
-					if(item->isRune()){
-						count+= item->getCharges();
-					}
-					else{
-						count+= item->getItemCount();
-					}
-				}
-			}
-
-			if((tmpContainer = item->getContainer())){
-				listContainer.push_back(tmpContainer);
-			}
-		}
-	}
-
-	while(listContainer.size() > 0){
-		const Container* container = listContainer.front();
-		listContainer.pop_front();
-
-		count+= container->__getItemTypeCount(itemId, subType, itemCount);
-
-		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
-			if((tmpContainer = (*cit)->getContainer())){
-				listContainer.push_back(tmpContainer);
-			}
+			Container* container = item->getContainer();
+			if(container)
+				for(ContainerIterator iter = container->begin(), end = container->end(); iter != end; ++iter)
+					if((*iter)->getID() == itemId)
+						count += Item::countByType(*iter, subType, itemCount);
 		}
 	}
 
 	return count;
+}
+
+std::map<uint32_t, uint32_t>& Player::__getAllItemTypeCount(
+	std::map<uint32_t, uint32_t>& countMap, bool itemCount /*= true*/) const
+{
+	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
+		Item* item = inventory[i];
+		
+		if(item){
+			countMap[item->getID()] += Item::countByType(item, -1, itemCount);
+
+			Container* container = item->getContainer();
+
+			if(container)
+				for(ContainerIterator iter = container->begin(), end = container->end(); iter != end; ++iter)
+					countMap[(*iter)->getID()] += Item::countByType(*iter, -1, itemCount);
+		}
+	}
+
+	return countMap;
 }
 
 Thing* Player::__getThing(uint32_t index) const
@@ -3025,17 +3019,31 @@ Thing* Player::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
 		//calling movement scripts
 		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index);
 	}
 
+	bool requireListUpdate = true;
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
-		updateItemsLight();
-		updateInventoryWeigth();
-		sendStats();
+		const Item* i = (oldParent? oldParent->getItem() : NULL);
+		
+		// Check if we owned the old container too, so we don't need to do anything, 
+		// as the list was updated in postRemoveNotification
+		assert(i? i->getContainer() != NULL : true);
+
+		if(i)
+			requireListUpdate = (i && i->getContainer()->getHoldingPlayer() != this);
+		else
+			requireListUpdate = oldParent != this;
+
+		if(requireListUpdate){
+			updateItemsLight();
+			updateInventoryWeigth();
+			sendStats();
+		}
 	}
 
 	if(const Item* item = thing->getItem()){
@@ -3043,7 +3051,7 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 			onSendContainer(container);
 		}
 
-		if(shopOwner){
+		if(shopOwner && requireListUpdate){
 			updateSaleShopList(item->getID());
 		}
 	}
@@ -3064,18 +3072,32 @@ void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t lin
 	}
 }
 
-void Player::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
 		//calling movement scripts
 		g_moveEvents->onPlayerDeEquip(this, thing->getItem(), (slots_t)index, isCompleteRemoval);
 	}
 
+	bool requireListUpdate = true;
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
-		updateItemsLight();
-		updateInventoryWeigth();
-		sendStats();
+		const Item* i = (newParent? newParent->getItem() : NULL);
+		
+		// Check if we owned the old container too, so we don't need to do anything, 
+		// as the list was updated in postRemoveNotification
+		assert(i? i->getContainer() != NULL : true);
+		if(i)
+			requireListUpdate = (i && i->getContainer()->getHoldingPlayer() != this);
+		else
+			requireListUpdate = newParent != this;
+
+		if(requireListUpdate){
+			updateItemsLight();
+			updateInventoryWeigth();
+			sendStats();
+		}
 	}
+
 
 	if(const Item* item = thing->getItem()){
 		if(const Container* container = item->getContainer()){
@@ -3089,7 +3111,7 @@ void Player::postRemoveNotification(Thing* thing, int32_t index, bool isComplete
 			}
 		}
 
-		if(shopOwner){
+		if(shopOwner && requireListUpdate){
 			updateSaleShopList(item->getID());
 		}
 	}
@@ -4069,5 +4091,5 @@ uint32_t Player::getStaminaMinutes()
         return 3360;
     }
     
-    return std::min((uint32_t)3360, (uint32_t)std::floor(stamina / 60000));
+    return std::min((uint32_t)3360, (uint32_t)(stamina / 60000));
 }
