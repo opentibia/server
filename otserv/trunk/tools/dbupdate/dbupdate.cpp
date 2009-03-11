@@ -119,6 +119,23 @@ SimpleUpdateQuery updateQueries[] = {
             NULL
         }
     }
+    { 4,
+        { // PgSql
+            "ALTER TABLE `players` ADD `lastlogout` BIGINT NOT NULL DEFAULT 0;",
+            "ALTER TABLE `players` ADD `stamina` INT NOT NULL DEFAULT 201660000;",
+            NULL
+        },
+        { // MySql
+            "ALTER TABLE `players` ADD `lastlogout` INT UNSIGNED NOT NULL DEFAULT 0;",
+            "ALTER TABLE `players` ADD `stamina` INT NOT NULL DEFAULT 201660000 COMMENT 'player stamina in milliseconds';",
+            NULL
+        },
+        { // Sqlite
+            "ALTER TABLE `players` ADD `lastlogout` INTEGER NOT NULL DEFAULT 0;",
+            "ALTER TABLE `players` ADD `stamina` INTEGER NOT NULL DEFAULT 201660000;",
+            NULL
+        }
+    }
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)

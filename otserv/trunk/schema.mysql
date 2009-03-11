@@ -209,7 +209,7 @@ CREATE TABLE `schema_info` (
     PRIMARY KEY (`name`)
 );
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 3);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 4);
 
 DELIMITER |
 

@@ -10,14 +10,15 @@ CREATE TABLE "groups" (
 
 CREATE TABLE "accounts" (
     "id" SERIAL,
-	"name" VARCHAR(32) NOT NULL,
+    "name" VARCHAR(32) NOT NULL,
     "password" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255) NOT NULL DEFAULT '',
     "premend" BIGINT NOT NULL DEFAULT 0,
     "blocked" SMALLINT NOT NULL DEFAULT 0,
     "deleted" SMALLINT NOT NULL DEFAULT 0,
     "warned" SMALLINT NOT NULL DEFAULT 0,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    UNIQUE ("name")
 );
 
 CREATE TABLE "players" (
@@ -48,6 +49,7 @@ CREATE TABLE "players" (
     "posz" INT NOT NULL DEFAULT 0,
     "cap" INT NOT NULL DEFAULT 0,
     "lastlogin" BIGINT NOT NULL DEFAULT 0,
+    "lastlogout" BIGINT NOT NULL DEFAULT 0,
     "lastip" BIGINT NOT NULL DEFAULT 0,
     "save" SMALLINT NOT NULL DEFAULT 1,
     "conditions" BYTEA NOT NULL,
@@ -61,6 +63,7 @@ CREATE TABLE "players" (
     "rank_id" INT NOT NULL,
     "town_id" INT NOT NULL,
     "balance" INT NOT NULL DEFAULT 0,
+    "stamina" INT NOT NULL DEFAULT 201660000,
     PRIMARY KEY ("id"),
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE,
@@ -200,7 +203,7 @@ CREATE TABLE "schema_info" (
     PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 3);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 4);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
