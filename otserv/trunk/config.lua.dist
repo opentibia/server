@@ -106,7 +106,12 @@ rate_skill = 1
 rate_mag = 1
 rate_loot = 1
 rate_spawn = 1
-rate_stamina = 1
+
+-- stamina rates
+-- gain stamina rate - 1 minute offline = X milliseconds of stamina
+rate_stamina_gain = 500
+-- loss stamina rate - works as other rates
+rate_stamina_loss = 1
 
 -- Remove ammunition
 -- If false, ammunition will not be removed when using distance weapons

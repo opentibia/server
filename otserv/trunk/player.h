@@ -619,8 +619,8 @@ public:
 	//stamina
 	void addStamina(int32_t value);
 	uint32_t getStaminaMinutes();
-	uint32_t getStamina() {return stamina;}
-	uint32_t getSpentStamina() {return uint32_t(201660000 - stamina);}
+    uint32_t getStamina() {return stamina;}
+    uint32_t getSpentStamina() {return uint32_t(201660000 - stamina);}
 
 	//depots
 	DepotMap depots;

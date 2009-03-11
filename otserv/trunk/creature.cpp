@@ -1066,17 +1066,14 @@ uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*
             retValue = (uint64_t)std::floor(retValue * player->exp_multiplier);
         }
         //[check & remove stamina
-        if(player->getStaminaMinutes() <= 840 && player->getStaminaMinutes() > 0){
-            retValue = (uint64_t)std::floor(retValue / 2);
-        }
-        else if(player->getStaminaMinutes() <= 0){
-            return 0;
-        }
         if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
-            if(getStaminaRatio(attacker) * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA) >= player->getStamina())
-                player->addStamina(-int32_t(player->getStamina()));
-            else
-                player->addStamina(-int32_t(getStaminaRatio(attacker) * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA)));
+            if(player->getStaminaMinutes() <= 840 && player->getStaminaMinutes() > 0){
+                retValue = (uint64_t)std::floor(retValue / 2);
+            }
+            else if(player->getStaminaMinutes() <= 0){
+                return 0;
+            }
+            player->addStamina(-(std::min((uint64_t)player->getStamina(), uint64_t(getStaminaRatio(attacker) * player->getAttackSpeed() * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS)))));
         }
         //]
     }

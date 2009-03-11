@@ -1437,14 +1437,11 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		
 		if(lastLogout > 0)
 		{
-			int32_t timeOff = (time(NULL) - lastLogout) - 600;
+			int64_t timeOff = (time(NULL) - lastLogout) - 600;
 			if(timeOff > 0){
-                if(timeOff * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA) >= getSpentStamina())
-                    addStamina(getSpentStamina());
-                else
-                    addStamina(int32_t(timeOff * 500 * g_config.getNumber(ConfigManager::RATE_STAMINA)));
+                addStamina(std::min((uint64_t)getSpentStamina(), uint64_t(timeOff * g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN))));
             }
-		}
+        }
 	}
 }
 
