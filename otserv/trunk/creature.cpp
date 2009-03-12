@@ -1068,7 +1068,7 @@ uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*
         //[check & remove stamina
         if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
             if(player->getStaminaMinutes() <= 840 && player->getStaminaMinutes() > 0){
-                retValue = (uint64_t)std::floor(retValue / 2);
+                retValue = retValue / 2;
             }
             else if(player->getStaminaMinutes() <= 0){
                 return 0;

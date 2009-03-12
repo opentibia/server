@@ -22,6 +22,8 @@
 
 #include "fileloader.h"
 
+#include <cmath>
+
 FileLoader::FileLoader()
 {
 	m_file = NULL;

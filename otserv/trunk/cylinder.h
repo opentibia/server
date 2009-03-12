@@ -23,6 +23,7 @@
 
 #include "definitions.h"
 #include "thing.h"
+#include <map>
 
 class Item;
 class Creature;

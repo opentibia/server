@@ -3035,7 +3035,7 @@ void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_
 		assert(i? i->getContainer() != NULL : true);
 
 		if(i)
-			requireListUpdate = (i && i->getContainer()->getHoldingPlayer() != this);
+			requireListUpdate = i->getContainer()->getHoldingPlayer() != this;
 		else
 			requireListUpdate = oldParent != this;
 
@@ -3087,7 +3087,7 @@ void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int
 		// as the list was updated in postRemoveNotification
 		assert(i? i->getContainer() != NULL : true);
 		if(i)
-			requireListUpdate = (i && i->getContainer()->getHoldingPlayer() != this);
+			requireListUpdate = i->getContainer()->getHoldingPlayer() != this;
 		else
 			requireListUpdate = newParent != this;
 
