@@ -259,7 +259,7 @@ void ProtocolGame::deleteProtocolTask()
 	Protocol::deleteProtocolTask();
 }
 
-bool ProtocolGame::login(const std::string& name)
+bool ProtocolGame::login(const std::string& name, bool isSetGM)
 {
 	//dispatcher thread
 	Player* _player = g_game.getPlayerByName(name);
@@ -285,6 +285,11 @@ bool ProtocolGame::login(const std::string& name)
 			disconnectClient(0x14, "Your account is banished!");
 			return false;
 		}
+
+        if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+            disconnectClient(0x14, "You may only login with a Gamemaster account.");
+            return false;
+        }
 
 		if(g_game.getGameState() == GAME_STATE_CLOSING && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
 			disconnectClient(0x14, "The game is just going down.\nPlease try again later.");
@@ -451,7 +456,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(key);
 
-	/*uint8_t isSetGM =*/ msg.GetByte();
+	bool isSetGM = (msg.GetByte() == 1);
 	std::string accname = msg.GetString();
 	const std::string name = msg.GetString();
 	const std::string password = msg.GetString();
@@ -491,7 +496,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	g_bans.addLoginAttempt(getIP(), true);
 
 	Dispatcher::getDispatcher().addTask(
-		createTask(boost::bind(&ProtocolGame::login, this, name)));
+		createTask(boost::bind(&ProtocolGame::login, this, name, isSetGM)));
 
 	return true;
 }

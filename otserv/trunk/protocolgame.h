@@ -54,7 +54,7 @@ public:
 	ProtocolGame(Connection* connection);
 	virtual ~ProtocolGame();
 
-	bool login(const std::string& name);
+	bool login(const std::string& name, bool isSetGM);
 	bool logout(bool forced);
 
 	void setPlayer(Player* p);
