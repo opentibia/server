@@ -80,8 +80,8 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 			switch(formulaType){
 				case FORMULA_LEVELMAGIC:
 				{
-					max = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * mina + minb);
-					min = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * maxa + maxb);
+					max = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * mina + minb);
+					min = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * maxa + maxb);
 					return true;
 					break;
 				}
