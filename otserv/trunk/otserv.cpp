@@ -343,32 +343,6 @@ void mainLoader(const CommandLineOptions& command_opts)
 
 #if defined LUA_CONFIGFILE
 	const char* configname = LUA_CONFIGFILE;
-#elif defined SYSCONFDIR
-    // this checks whether or not a file can be opened
-    // i'm sure it's a bad way to do it, but the other
-    // method i can currently think of -- stat() -- only
-    // checks for file, not if it can be opened...
-    const char* configname;
-    {
-        static std::stringstream path;
-        #if defined __LUA_NAME_ALTER__
-        path << SYSCONFDIR << "/otserv/otserv.lua";
-        #else
-        path << SYSCONFDIR << "/otserv/config.lua";
-        #endif
-        FILE*f = fopen(path.str().c_str(), "r");
-        if(f){
-            configname = path.str().c_str();
-            fclose(f);
-        } else {
-            printf("Could not find %s\n", path.str().c_str());
-            #if defined __LUA_NAME_ALTER__
-            configname = "otserv.lua";
-            #else
-            configname = "config.lua";
-            #endif
-        }
-    }
 #elif defined __LUA_NAME_ALTER__
 	const char* configname = "otserv.lua";
 #else
@@ -380,15 +354,33 @@ void mainLoader(const CommandLineOptions& command_opts)
 
 	// read global config
 	std::cout << ":: Loading lua script " << configname << "... " << std::flush;
+
+
+#ifdef SYSCONFDIR
+    std::string sysconfpath;
+    sysconfpath = SYSCONFDIR;
+    sysconfpath += "/otserv/";
+    sysconfpath += configname;
+#endif
+
+
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
 	std::string configpath;
 	configpath = getenv("HOME");
 	configpath += "/.otserv/";
 	configpath += configname;
 
-	if (!g_config.loadFile(configname) && !g_config.loadFile(configpath))
+    #ifdef SYSCONFDIR
+        if (!g_config.loadFile(configname) && !g_config.loadFile(configpath) && !g_config.loadFile(sysconfpath))
+    #else
+        if (!g_config.loadFile(configname) && !g_config.loadFile(configpath))
+    #endif
 #else
-	if (!g_config.loadFile(configname))
+    #ifdef SYSCONFDIR
+        if (!g_config.loadFile(configname) && !g_config.loadFile(sysconfpath))
+    #else
+        if (!g_config.loadFile(configname))
+    #endif
 #endif
 	{
 		std::ostringstream os;
