@@ -3,7 +3,8 @@ noinst_PROGRAMS = otserv
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA_CFLAGS) $(DEBUG_FLAGS)\
 	$(MYSQL_FLAGS) $(SQLITE_FLAGS) $(ODBC_FLAGS) $(PGSQL_FLAGS)\
-	$(PROFILER_FLAGS) $(OPTIONAL_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Wall
+	$(PROFILER_FLAGS) $(OPTIONAL_FLAGS) -DSYSCONFDIR=$(sysconfdir)\
+	-D_THREAD_SAFE -D_REENTRANT -Wall
 
 otserv_LDADD = $(LUA_LIBS)
 
@@ -45,3 +46,4 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	outputmessage.cpp tasks.cpp scheduler.cpp protocollogin.cpp protocol.cpp creatureevent.cpp \
 	creatureevent.h sha1.cpp sha1.h beds.cpp beds.h party.cpp party.h quests.cpp quests.h \
 	protocolold.h protocolold.cpp exception.cpp exception.h
+

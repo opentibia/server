@@ -508,7 +508,7 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 	}
 	if(loading_cache == -1){
 		for(i = 0; i < CACHE_BLOCKS; i++){
-			if((long)(std::abs((long)m_cached_data[i].base - base_pos)) > (long)(2*m_cache_size)){
+			if((long)(labs((long)m_cached_data[i].base - base_pos)) > (long)(2*m_cache_size)){
 				loading_cache = i;
 				break;
 			}
