@@ -37,6 +37,17 @@
 #include "game.h"
 
 
+#if !defined(__WINDOWS__)
+    #include <unistd.h> // for access()
+#endif
+
+#if !defined(__WINDOWS__)
+    #define OTSERV_ACCESS(file,mode) access(file,mode)
+#else
+    #define OTSERV_ACCESS(file,mode) _access(file,mode)
+#endif
+
+
 #include "status.h"
 #include "monsters.h"
 #include "npc.h"
@@ -353,8 +364,7 @@ void mainLoader(const CommandLineOptions& command_opts)
 	}
 
 	// read global config
-	std::cout << ":: Loading lua script " << configname << "... " << std::flush;
-
+    std::cout << ":: Loading lua script " << configname << "... " << std::flush;
 
 #ifdef SYSCONFDIR
     std::string sysconfpath;
@@ -393,6 +403,28 @@ void mainLoader(const CommandLineOptions& command_opts)
 		exit(-1);
 	}
 	std::cout << "[done]" << std::endl;
+
+
+
+#if defined(PKGDATADIR) && !defined(__WINDOWS__) // i dont care enough to port this to win32, prolly not needed
+    // let's fix the datadir, if necessary...
+    if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
+        // if not then try replacing it with "global" datadir
+        std::cout << ":: No datadir '" << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "', using a system-wide one" << std::endl;
+
+        std::string dd = PKGDATADIR;
+        dd += "/";
+        dd += g_config.getString(ConfigManager::DATA_DIRECTORY);
+        g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
+
+    }
+#endif
+    std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;
+    if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
+        ErrorMessage("Data directory does not exist!");
+        exit(-1);
+    }
+    std::cout << "[done]" << std::endl;
 
 	std::cout << ":: Checking Database Connection... ";
 	Database* db = Database::instance();
@@ -556,9 +588,21 @@ void mainLoader(const CommandLineOptions& command_opts)
 		exit(-1);
 	}
 
-	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE),
-		g_config.getString(ConfigManager::MAP_KIND))){
-		exit(-1);
+
+    if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE),
+    	g_config.getString(ConfigManager::MAP_KIND))){
+        // ok ... so we didn't succeed in laoding the map.
+        // perhaps the path to map didn't include path to data directory?
+        // let's try to prepend path to datadir before bailing out miserably.
+    	filename.str("");
+        filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << g_config.getString(ConfigManager::MAP_FILE);
+
+        if(!g_game.loadMap(filename.str(),
+            g_config.getString(ConfigManager::MAP_KIND))){
+                exit(-1);
+            }
+
+
 	}
 
 	g_game.setGameState(GAME_STATE_INIT);

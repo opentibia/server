@@ -1,9 +1,10 @@
 
-noinst_PROGRAMS = otserv
+bin_PROGRAMS = otserv
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA_CFLAGS) $(DEBUG_FLAGS)\
 	$(MYSQL_FLAGS) $(SQLITE_FLAGS) $(ODBC_FLAGS) $(PGSQL_FLAGS)\
-	$(PROFILER_FLAGS) $(OPTIONAL_FLAGS) -DSYSCONFDIR=\"$(sysconfdir)\" \
+	$(PROFILER_FLAGS) $(OPTIONAL_FLAGS) \
+	-DSYSCONFDIR=\"$(sysconfdir)\" -DPKGDATADIR=\"$(pkgdatadir)\" \
 	-D_THREAD_SAFE -D_REENTRANT -Wall
 
 otserv_LDADD = $(LUA_LIBS)
@@ -26,12 +27,12 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	iomapxml.cpp ioplayer.cpp database.cpp database.h \
 	item.cpp items.cpp luascript.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp \
 	otserv.cpp player.cpp position.cpp protocolgame.cpp spells.cpp \
-	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const.h \
+	status.cpp thing.cpp tile.cpp tools.cpp account.h autogen.sh config.h const.h \
 	container.h creature.h definitions.h game.h ioaccount.h \
 	iomap.h iomapxml.h ioplayer.h item.h items.h \
 	luascript.h map.h monster.h networkmessage.h npc.h otsystem.h player.h \
 	position.h protocolgame.h scheduler.h spells.h stamp-h status.h \
-	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
+	tasks.h templates.h thing.h tile.h tools.h spawn.cpp spawn.h \
 	actions.h actions.cpp commands.cpp commands.h depot.cpp depot.h \
 	md5.cpp md5.h fileloader.cpp fileloader.h chat.cpp chat.h logger.cpp logger.h \
 	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp teleport.cpp teleport.h \
@@ -45,5 +46,12 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	vocation.cpp vocation.h scriptmanager.cpp scriptmanager.h server.cpp connection.cpp \
 	outputmessage.cpp tasks.cpp scheduler.cpp protocollogin.cpp protocol.cpp creatureevent.cpp \
 	creatureevent.h sha1.cpp sha1.h beds.cpp beds.h party.cpp party.h quests.cpp quests.h \
-	protocolold.h protocolold.cpp exception.cpp exception.h
+	protocolold.h protocolold.cpp exception.cpp exception.h 
+
+sysconf_DATA = config.lua
+
+SUBDIRS = data
+
+config.lua:
+	cp config.lua.dist config.lua
 

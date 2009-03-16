@@ -55,6 +55,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		return false;
 	}
 
+	// output which file we're actually loading
+	std::cout << _filename << std::flush;
 
 	// parse config
 	if(!m_isLoaded) // info that must be loaded one time (unless we reset the modules involved)
@@ -289,7 +291,7 @@ void ConfigManager::moveValue(lua_State* from, lua_State* to)
 			break;
 		case LUA_TTABLE:
 			lua_newtable(to);
-			
+
 			lua_pushnil(from); // First key
 			while(lua_next(from, -2)){
 				// Move value to the other state
