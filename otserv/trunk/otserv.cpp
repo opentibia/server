@@ -125,7 +125,7 @@ void mainLoader(const CommandLineOptions& command_opts);
 // Note that if the server crashes, this will not happend. :|
 void closeRunfile(void)
 {
-	std::ofstream runfile(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out); 
+	std::ofstream runfile(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out);
 	runfile.close(); // Truncate file
 }
 #endif
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 	if(parseCommandLine(g_command_opts, std::vector<std::string>(argv, argv + argc)) == false){
 		return 0;
 	}
-	
+
 #if !defined(__WINDOWS__)
 	if(g_command_opts.runfile != ""){
 		std::ofstream f(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out);
@@ -303,23 +303,23 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			}
 			opts.errfile = *argi;
 		}
-		else if(arg == "--help"){ 
-			std::cout << 
-			"Usage: otserv {-i|-p|-c|-r|-l}\n" 
-			"\n" 
-			"\t-i, --ip $1\t\tIP of gameworld server. Should be equal to the \n" 
-			"\t\t\t\tglobal IP.\n" 
-			"\t-p, --port $1\t\tPort for server to listen on.\n" 
-			"\t-c, --config $1\t\tAlternate config file path.\n" 
+		else if(arg == "--help"){
+			std::cout <<
+			"Usage: otserv {-i|-p|-c|-r|-l}\n"
+			"\n"
+			"\t-i, --ip $1\t\tIP of gameworld server. Should be equal to the \n"
+			"\t\t\t\tglobal IP.\n"
+			"\t-p, --port $1\t\tPort for server to listen on.\n"
+			"\t-c, --config $1\t\tAlternate config file path.\n"
 			"\t-l, --log-file $1 $2\tAll standard output will be logged to the $1\n"
-			"\t\t\t\tfile, all errors will be logged to $2.\n"; 
-			#if !defined(__WINDOWS__) 
-			std::cout << "\t-r, --run-file $1\tSpecifies a runfile. Will contain the pid\n" 
-			"\t\t\t\tof the server process as long as it is running \n\t\t\t\t(UNIX).\n"; 
-			#endif 
-			"\t--truncate-log\t\tReset log file each time the server is \n" 
-			"\t\t\t\tstarted.\n"; 
-			return false; 
+			"\t\t\t\tfile, all errors will be logged to $2.\n";
+			#if !defined(__WINDOWS__)
+			std::cout << "\t-r, --run-file $1\tSpecifies a runfile. Will contain the pid\n"
+			"\t\t\t\tof the server process as long as it is running \n\t\t\t\t(UNIX).\n";
+			#endif
+			"\t--truncate-log\t\tReset log file each time the server is \n"
+			"\t\t\t\tstarted.\n";
+			return false;
 		}
 		else{
 			std::cout << "Unrecognized command line argument '" << arg << "'\n"
@@ -343,6 +343,31 @@ void mainLoader(const CommandLineOptions& command_opts)
 
 #if defined LUA_CONFIGFILE
 	const char* configname = LUA_CONFIGFILE;
+#elif defined SYSCONFDIR
+    // this checks whether or not a file can be opened
+    // i'm sure it's a bad way to do it, but the other
+    // method i can currently think of -- stat() -- only
+    // checks for file, not if it can be opened...
+    const char* configname;
+    {
+        static std::stringstream path;
+        #if defined __LUA_NAME_ALTER__
+        path << SYSCONFDIR << "/otserv/otserv.lua";
+        #else
+        path << SYSCONFDIR << "/otserv/config.lua";
+        #endif
+        FILE*f = fopen(path.str().c_str(), "r");
+        if(f){
+            configname = path.str().c_str();
+            fclose(f);
+        } else {
+            #if defined __LUA_NAME_ALTER__
+            configname = "otserv.lua";
+            #else
+            configname = "config.lua";
+            #endif
+        }
+    }
 #elif defined __LUA_NAME_ALTER__
 	const char* configname = "otserv.lua";
 #else
@@ -359,7 +384,7 @@ void mainLoader(const CommandLineOptions& command_opts)
 	configpath = getenv("HOME");
 	configpath += "/.otserv/";
 	configpath += configname;
-        
+
 	if (!g_config.loadFile(configname) && !g_config.loadFile(configpath))
 #else
 	if (!g_config.loadFile(configname))
