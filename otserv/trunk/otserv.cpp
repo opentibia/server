@@ -312,10 +312,10 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			"\t-p, --port $1\t\tPort for server to listen on.\n"
 			"\t-c, --config $1\t\tAlternate config file path.\n"
 			"\t-l, --log-file $1 $2\tAll standard output will be logged to the $1\n"
-			"\t\t\t\tfile, all errors will be logged to $2.\n";
+			"\t\t\t\tfile, all errors will be logged to $2.\n"
 			#if !defined(__WINDOWS__)
-			std::cout << "\t-r, --run-file $1\tSpecifies a runfile. Will contain the pid\n"
-			"\t\t\t\tof the server process as long as it is running \n\t\t\t\t(UNIX).\n";
+			"\t-r, --run-file $1\tSpecifies a runfile. Will contain the pid\n"
+			"\t\t\t\tof the server process as long as it is running \n\t\t\t\t(UNIX).\n"
 			#endif
 			"\t--truncate-log\t\tReset log file each time the server is \n"
 			"\t\t\t\tstarted.\n";
@@ -361,6 +361,7 @@ void mainLoader(const CommandLineOptions& command_opts)
             configname = path.str().c_str();
             fclose(f);
         } else {
+            printf("Could not find %s\n", path.str().c_str());
             #if defined __LUA_NAME_ALTER__
             configname = "otserv.lua";
             #else
