@@ -417,6 +417,15 @@ void mainLoader(const CommandLineOptions& command_opts)
         dd += g_config.getString(ConfigManager::DATA_DIRECTORY);
         g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
 
+	if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if this new one exists
+		// if not lets try using the "raw" datadir
+		// (without configmanager's datadir var)
+
+		dd = PKGDATADIR;
+		dd += "/";
+		g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
+	}
+
     }
 #endif
     std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;

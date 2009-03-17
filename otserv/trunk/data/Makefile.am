@@ -1,7 +1,7 @@
 #please update this file ONLY by using update_makefileam.sh
 #afterwards, if you're an official otserv developer, please
 #commit your updated  into the repo
-pkgdata_DATA = \
+ots_data = \
 	npc/lib/merchant.xml \
 	npc/lib/bankman.xml \
 	npc/lib/postman.xml \
@@ -129,4 +129,32 @@ pkgdata_DATA = \
 	weapons/scripts/explosive_arrow.lua \
 	weapons/weapons.xml \
 	#and that's it folks
-EXTRA_DIST = Makefile.am Makefile.in  $(pkgdata_DATA)
+EXTRA_DIST = Makefile.am Makefile.in  $(ots_data)
+
+install-data-local:
+	@echo Installing data...
+	@for f in $(ots_data); do \
+## Compute the install directory at runtime.
+	  d=`echo $$f | sed -e s,/[^/]*$$,,`; \
+## Make the install directory.
+	  if [ \! $$d == $$f ]; then \
+	    $(mkinstalldirs) $(DESTDIR)$(pkgdatadir)/$$d; \
+	  fi; \
+## Find the header file -- in our case it might be in srcdir or
+## it might be in the build directory.  "p" is the variable that
+## names the actual file we will install.
+	  if test -f $(srcdir)/$$f; then p=$(srcdir)/$$f; else p=$$f; fi; \
+##p=$$f ;
+## Actually install the file.
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(pkgdatadir)/$$f; \
+	done
+	@echo Data installed
+
+
+uninstall-local:
+	@echo Uninstalling data...
+	@for f in $(ots_data); do \
+	  rm -f $(DESTDIR)$(pkgdatadir)/$$f; \
+	done
+	@echo Data uninstalled
+
