@@ -608,6 +608,7 @@ void mainLoader(const CommandLineOptions& command_opts)
 
         if(!g_game.loadMap(filename.str(),
             g_config.getString(ConfigManager::MAP_KIND))){
+		ErrorMessage("Couldn't load map");
                 exit(-1);
             }
 

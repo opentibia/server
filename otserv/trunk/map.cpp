@@ -72,7 +72,6 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	}
 	else{
 		std::cout << "FATAL: Could not determine the map format!" << std::endl;
-		std::cin.get();
 		return false;
 	}
 
@@ -80,7 +79,6 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 
 	if(!loader->loadMap(this, identifier)){
 		std::cout << "FATAL: [OTBM loader] " << loader->getLastErrorString() << std::endl;
-		std::cin.get();
 		return false;
 	}
 

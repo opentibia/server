@@ -75,7 +75,9 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	database.cpp	   luascript.cpp       quests.cpp	   weapons.cpp \
 	mailbox.cpp	   raids.cpp
 
-sysconf_DATA = config.lua
+pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
+
+pkgsysconf_DATA = config.lua
 
 SUBDIRS = data
 
