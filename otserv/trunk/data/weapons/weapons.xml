@@ -20,11 +20,11 @@
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
 
-	<wand id="2181" level="26" enabled="1" exhaustion="1" script="quagmire rod.lua"/>
-	<wand id="2183" level="33" enabled="1" exhaustion="1" script="tempest rod.lua"/>
+	<wand id="2181" level="26" enabled="1" exhaustion="1" script="quagmire_rod.lua"/>
+	<wand id="2183" level="33" enabled="1" exhaustion="1" script="tempest_rod.lua"/>
 
-	<distance id="2389" enabled="1" script="poison spear.lua"/>
+	<distance id="2389" enabled="1" script="poison_spear.lua"/>
 	<distance id="2544" enabled="1" function="internalLoadWeapon"></distance>
-	<distance id="2545" enabled="1" exhaustion="1" script="poison arrow.lua"/>
-	<distance id="2546" enabled="1" exhaustion="1" script="explosive arrow.lua"/>
+	<distance id="2545" enabled="1" exhaustion="1" script="poison_arrow.lua"/>
+	<distance id="2546" enabled="1" exhaustion="1" script="explosive_arrow.lua"/>
 </weapons>

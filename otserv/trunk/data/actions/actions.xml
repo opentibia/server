@@ -6,7 +6,7 @@
 
 -- Tools
 <action itemid="2580" script="fishing.lua" allowfaruse="1" />
-<action itemid="2120" script="rope.lua"	 />
+<action itemid="2120" script="rope.lua" />
 <action itemid="2554" script="shovel.lua"  />
 
 -- Others
@@ -48,13 +48,13 @@
 
 
 -- Keys
-<action itemid="2086" script="key.lua"	/>
-<action itemid="2087" script="key.lua"	/>
-<action itemid="2088" script="key.lua"	/>
-<action itemid="2089" script="key.lua"	/>
-<action itemid="2090" script="key.lua"	/>
-<action itemid="2091" script="key.lua"	/>
-<action itemid="2092" script="key.lua"	/>
+<action itemid="2086" script="key.lua" />
+<action itemid="2087" script="key.lua" />
+<action itemid="2088" script="key.lua" />
+<action itemid="2089" script="key.lua" />
+<action itemid="2090" script="key.lua" />
+<action itemid="2091" script="key.lua" />
+<action itemid="2092" script="key.lua" />
 
 --Doors
 <action itemid="1539" script="door_open1.lua" /> --free fence door--
@@ -156,7 +156,7 @@
 
 <action itemid="6120" script="spellbook.lua" />
 <action itemid="6576" script="fireworks.lua" />
-<action itemid="4852" script="rage trinket.lua"/>
+<action itemid="4852" script="rage_trinket.lua"/>
 
 -- Example creature event
 <action itemid="2392" script="setevent.lua" allowfaruse="1" />

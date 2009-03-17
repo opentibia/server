@@ -6,16 +6,16 @@ pkgdata_DATA = \
 	npc/lib/bankman.xml \
 	npc/lib/postman.xml \
 	npc/oracle.xml \
+	npc/bankman_billy.xml \
 	npc/scripts/lib/npc.lua \
 	npc/scripts/82test.lua \
 	npc/scripts/ruby.lua \
 	npc/scripts/cityguard.lua \
-	npc/merchant\ glut.xml \
-	npc/bankman\ billy.xml \
 	npc/ruby.xml \
 	npc/cityguard.xml \
+	npc/merchant_glut.xml \
 	npc/test82.xml \
-	npc/mailman\ maily.xml \
+	npc/mailman_maily.xml \
 	npc/helmut.xml \
 	commands.xml \
 	movements/lib/movements.lua \
@@ -44,13 +44,13 @@ pkgdata_DATA = \
 	admin.xml \
 	monster/stalker.xml \
 	monster/dog.xml \
-	monster/giant\ spider.xml \
 	monster/magicthrower.xml \
+	monster/giant_spider.xml \
 	monster/monsters.xml \
 	monster/warlock.xml \
 	monster/demon.xml \
-	monster/poison\ spider.xml \
-	monster/minotaur\ archer.xml \
+	monster/poison_spider.xml \
+	monster/minotaur_archer.xml \
 	creaturescripts/lib/creaturescripts.lua \
 	creaturescripts/scripts/die1.lua \
 	creaturescripts/scripts/die2.lua \
@@ -72,6 +72,7 @@ pkgdata_DATA = \
 	actions/scripts/music.lua \
 	actions/scripts/shovel.lua \
 	actions/scripts/fireworks.lua \
+	actions/scripts/rage_trinket.lua \
 	actions/scripts/rope.lua \
 	actions/scripts/spellbook.lua \
 	actions/scripts/fishing.lua \
@@ -86,18 +87,19 @@ pkgdata_DATA = \
 	actions/scripts/door_open1.lua \
 	actions/scripts/door_open2.lua \
 	actions/scripts/trans_inc.lua \
-	actions/scripts/rage\ trinket.lua \
 	actions/actions.xml \
 	global.lua \
 	spells/lib/spells.lua \
-	spells/scripts/wild\ growth.lua \
-	spells/scripts/magic\ wall.lua \
-	spells/scripts/magic\ rope.lua \
-	spells/scripts/energy\ wall.lua \
+	spells/scripts/magic_prison.lua \
+	spells/scripts/wild_growth.lua \
+	spells/scripts/magic_wall.lua \
+	spells/scripts/magic_rope.lua \
 	spells/scripts/combustion.lua \
-	spells/scripts/ultimate\ explosion.lua \
-	spells/scripts/energy\ wave.lua \
-	spells/scripts/strong\ haste.lua \
+	spells/scripts/strong_haste.lua \
+	spells/scripts/energy_wall.lua \
+	spells/scripts/ultimate_explosion.lua \
+	spells/scripts/energy_wave.lua \
+	spells/scripts/mass_healing.lua \
 	spells/scripts/monsters/imitate.lua \
 	spells/scripts/monsters/teleport.lua \
 	spells/scripts/whirlwind.lua \
@@ -109,24 +111,22 @@ pkgdata_DATA = \
 	spells/scripts/uh.lua \
 	spells/scripts/hmm.lua \
 	spells/scripts/light.lua \
+	spells/scripts/destroy_field.lua \
+	spells/scripts/fire_field.lua \
 	spells/scripts/apocalypse.lua \
 	spells/scripts/drunk.lua \
 	spells/scripts/healfriend.lua \
-	spells/scripts/destroy\ field.lua \
-	spells/scripts/magic\ shield.lua \
-	spells/scripts/fire\ field.lua \
 	spells/scripts/challenge.lua \
-	spells/scripts/mass\ healing.lua \
+	spells/scripts/magic_shield.lua \
 	spells/scripts/teleportrune.lua \
-	spells/scripts/magic\ prison.lua \
 	spells/spells.xml \
 	outfits.xml \
 	weapons/lib/weapons.lua \
-	weapons/scripts/poison\ arrow.lua \
-	weapons/scripts/poison\ spear.lua \
-	weapons/scripts/quagmire\ rod.lua \
-	weapons/scripts/tempest\ rod.lua \
-	weapons/scripts/explosive\ arrow.lua \
+	weapons/scripts/poison_arrow.lua \
+	weapons/scripts/poison_spear.lua \
+	weapons/scripts/quagmire_rod.lua \
+	weapons/scripts/tempest_rod.lua \
+	weapons/scripts/explosive_arrow.lua \
 	weapons/weapons.xml \
 	#and that's it folks
 EXTRA_DIST = Makefile.am Makefile.in  $(pkgdata_DATA)
