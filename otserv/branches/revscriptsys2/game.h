@@ -37,7 +37,7 @@ namespace Script {
 	class Enviroment;
 }
 class Creature;
-class Monster;
+class Actor;
 class CombatInfo;
 class Commands;
 class ChatChannel;

@@ -38,10 +38,11 @@
 
 
 #include "status.h"
-#include "monsters.h"
+#include "actor.h"
 #include "outfit.h"
 #include "vocation.h"
 #include "configmanager.h"
+#include "creature_manager.h"
 
 #include "tools.h"
 #include "ban.h"
@@ -65,7 +66,7 @@ IPList serverIPs;
 ConfigManager g_config;
 
 Game g_game;
-Monsters g_monsters;
+CreatureManager g_creature_types;
 BanManager g_bans;
 Vocations g_vocations;
 
@@ -439,7 +440,7 @@ void mainLoader(const CommandLineOptions& command_opts)
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "monsters/monsters.xml";
 	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
-	if(!g_monsters.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
+	if(!g_creature_types.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());

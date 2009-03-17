@@ -79,6 +79,8 @@ int Manager::luaCompareClassInstances(lua_State* L)
 }
 
 int Manager::luaFunctionCallback(lua_State* L) {
+	// Do NOT allocate complex types here, lua_error is called, which causes a longjump,
+	// so complex destructors won't be called.
 	uint32_t callbackID = uint32_t(lua_tonumber(L, lua_upvalueindex(2)));
 	Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
 	LuaState* interface = NULL;
@@ -91,6 +93,8 @@ int Manager::luaFunctionCallback(lua_State* L) {
 	}
 	
 	assert(interface);
+
+	// If the script failed
 
 	try {
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
@@ -219,8 +223,12 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		// We can't use lua_error in the C++ function as it doesn't call destructors properly.
 		interface->clearStack();
 		interface->pushString(err.what());
-		return lua_error(interface->state);
 	}
+
+	// Can't be done in handler, since then the destructor of Script::Error
+	// won't be called, which in turn won't call the destructor of the 
+	// std::string object it owns
+	return lua_error(interface->state);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

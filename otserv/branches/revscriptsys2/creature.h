@@ -68,7 +68,7 @@ class Map;
 class Thing;
 class Container;
 class Player;
-class Monster;
+class Actor;
 class ItemType;
 class Item;
 class Tile;
@@ -109,8 +109,8 @@ public:
 	virtual const Creature* getCreature()const {return this;};
 	virtual Player* getPlayer() {return NULL;};
 	virtual const Player* getPlayer() const {return NULL;};
-	virtual Monster* getMonster() {return NULL;};
-	virtual const Monster* getMonster() const {return NULL;};
+	virtual Actor* getActor() {return NULL;};
+	virtual const Actor* getActor() const {return NULL;};
 
 	void getPathToFollowCreature();
 

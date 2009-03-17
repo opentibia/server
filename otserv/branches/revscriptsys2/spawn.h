@@ -23,13 +23,13 @@
 #define __OTSERV_SPAWN_H__
 
 #include "tile.h"
-#include "position.h"
-#include "monster.h"
 #include "templates.h"
 
 #include <vector>
 #include <map>
 
+class Actor;
+class CreatureType;
 class Spawn;
 typedef std::list<Spawn*> SpawnList;
 
@@ -61,7 +61,7 @@ private:
 };
 
 struct spawnBlock_t{
-	MonsterType* mType;
+	CreatureType* mType;
 	Direction direction;
 	Position pos;
 	uint32_t interval;
@@ -74,7 +74,7 @@ public:
 	~Spawn();
 	
 	bool addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval);
-	void removeMonster(Monster* monster);
+	void removeMonster(Actor* monster);
 
 	uint32_t getInterval() {return interval;}
 	void startup();
@@ -95,7 +95,7 @@ private:
 	SpawnMap spawnMap;
 
 	//map of the spawned creatures
-	typedef std::multimap<uint32_t, Monster*, std::less<uint32_t> > SpawnedMap;
+	typedef std::multimap<uint32_t, Actor*, std::less<uint32_t> > SpawnedMap;
 	typedef SpawnedMap::value_type spawned_pair;
 	SpawnedMap spawnedMap;
 
@@ -103,7 +103,7 @@ private:
 	uint32_t checkSpawnEvent;
 
 	bool findPlayer(const Position& pos);
-	bool spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup = false);
+	bool spawnMonster(uint32_t spawnId, CreatureType* mType, const Position& pos, Direction dir, bool startup = false);
 	void checkSpawn();
 };
 

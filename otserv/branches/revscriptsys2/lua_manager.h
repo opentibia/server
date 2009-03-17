@@ -34,6 +34,7 @@ extern "C"
 
 class Player;
 class Creature;
+class Actor;
 class Thing;
 class Position;
 class PositionEx;
@@ -141,6 +142,14 @@ public:
 	std::string popString();
 	Position popPosition(Script::ErrorMode mode = Script::ERROR_THROW);
 	void* getUserdata();
+
+	template <typename T> T popValue();
+	template <> bool popValue<bool>() {return popBoolean();}
+	template <> int popValue<int>() {return popInteger();}
+	template <> uint32_t popValue<uint32_t>() {return popUnsignedInteger();}
+	template <> double popValue<double>() {return popFloat();}
+	template <> std::string popValue<std::string>() {return popString();}
+
 	// Push
 	void pushNil();
 	void pushBoolean(bool b);
@@ -161,6 +170,7 @@ public:
 	Thing* popThing(Script::ErrorMode mode = Script::ERROR_THROW);
 	Creature* popCreature(Script::ErrorMode mode = Script::ERROR_THROW);
 	Player* popPlayer(Script::ErrorMode mode = Script::ERROR_THROW);
+	Actor* popActor(Script::ErrorMode mode = Script::ERROR_THROW);
 	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
 	Town* popTown(Script::ErrorMode mode = Script::ERROR_THROW);
@@ -264,6 +274,11 @@ public:
 
 	int lua_getCreatureByName();
 	int lua_getCreaturesByName();
+
+	// - - - Actor
+	int lua_Actor_create();
+	int lua_Actor_setArmor();
+	int lua_Actor_setDefense();
 
 	// - - - Player
 	int lua_Player_getFood();

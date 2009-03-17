@@ -310,8 +310,8 @@ void LuaState::pushThing(Thing* thing) {
 		if(creature->getPlayer()) {
 			objid = pushClassInstance("Player");
 		}
-		else if(creature->getMonster()) {
-			objid = pushClassInstance("Monster");
+		else if(creature->getActor()) {
+			objid = pushClassInstance("Actor");
 		}
 		else {
 			pushNil();
@@ -495,6 +495,16 @@ Player* LuaState::popPlayer(Script::ErrorMode mode /* = Script::ERROR_THROW */) 
 		Player* p = c->getPlayer();
 		if(!p) HandleError(mode, "Object is not a player.");
 		return p;
+	}
+	return NULL;
+}
+
+Actor* LuaState::popActor(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+	Creature* c = popCreature(mode);
+	if(c) {
+		Actor* a = c->getActor();
+		if(!a) HandleError(mode, "Object is not a player.");
+		return a;
 	}
 	return NULL;
 }

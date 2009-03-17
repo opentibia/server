@@ -34,7 +34,7 @@
 #include "trashholder.h"
 #include "mailbox.h"
 #include "combat.h"
-#include "monster.h"
+#include "actor.h"
 
 extern Game g_game;
 
@@ -420,7 +420,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		if(ground == NULL)
 			return RET_NOTPOSSIBLE;
 
-		if(const Monster* monster = creature->getMonster()){
+		if(const Actor* monster = creature->getActor()){
 			if(hasFlag(TILESTATE_PROTECTIONZONE))
 				return RET_NOTPOSSIBLE;
 
@@ -432,9 +432,9 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				Creature* creature;
 				for(uint32_t i = 0; i < creatures.size(); ++i){
 					creature = creatures[i];
-					if( !creature->getMonster() ||
+					if( !creature->getActor() ||
 						!creature->isPushable() ||
-						(creature->getMonster()->isSummon() && creature->getMonster()->getMaster()->getPlayer()))
+						(creature->getActor()->isSummon() && creature->getActor()->getMaster()->getPlayer()))
 					{
 						return RET_NOTPOSSIBLE;
 					}
@@ -463,10 +463,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				if(!field->isBlocking()){
 					CombatType_t combatType = field->getCombatType();
 					//There is 3 options for a monster to enter a magic field
-					//1) Monster is immune
+					//1) Actor is immune
 					if(!monster->isImmune(combatType)){
-						//1) Monster is "strong" enough to handle the damage
-						//2) Monster is already afflicated by this type of condition
+						//1) Actor is "strong" enough to handle the damage
+						//2) Actor is already afflicated by this type of condition
 						if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
 							if( !(monster->canPushItems() ||
 								monster->hasCondition(Combat::DamageToConditionType(combatType))) ){

@@ -22,7 +22,7 @@
 #include "creature.h"
 #include "game.h"
 #include "player.h"
-#include "monster.h"
+#include "actor.h"
 #include "container.h"
 #include "condition.h"
 #include "combat.h"

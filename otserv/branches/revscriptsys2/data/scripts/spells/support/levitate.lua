@@ -29,7 +29,7 @@ function levitate:onBeginCast(event)
 			caster:sendCancel("Sorry not possible.")
 			return false
 		end
-		pos.z = pos.z + 1
+		pos.z = pos.z - 1
 	elseif event.param == "down" then
 		if pos.z == 7 then
 			caster:sendCancel("Sorry not possible.")

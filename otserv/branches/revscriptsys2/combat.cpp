@@ -365,7 +365,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 				}
 			}
 		}
-		else if(target->getMonster()){
+		else if(target->getActor()){
 			if(const Player* attackerPlayer = attacker->getPlayer()){
 				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackMonster)){
 					return RET_YOUMAYNOTATTACKTHISCREATURE;

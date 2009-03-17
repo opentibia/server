@@ -25,7 +25,7 @@
 #include "script_listener.h"
 
 #include "game.h"
-#include "creature.h"
+#include "actor.h"
 #include "town.h"
 #include "chat.h"
 #include "house.h"
@@ -90,7 +90,7 @@ void Manager::registerClasses() {
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
-	registerClass("Monster", "Creature");
+	registerClass("Actor", "Creature");
 	registerClass("Player", "Creature");
 	registerClass("Item", "Thing");
 	registerClass("Teleport", "Item");
@@ -133,6 +133,12 @@ void Manager::registerClasses() {
 
 	registerGlobalFunction("getCreatureByName(string name)", &Manager::lua_getCreatureByName);
 	registerGlobalFunction("getCreaturesByName(string name)", &Manager::lua_getCreaturesByName);
+
+	// Actor
+	registerMemberFunction("Actor", "setArmor(int newarmor)", &Manager::lua_Actor_setArmor);
+	registerMemberFunction("Actor", "setDefense(int newdefense)", &Manager::lua_Actor_setDefense);
+
+	registerGlobalFunction("createActor([string monstertype])", &Manager::lua_Actor_create);
 
 	// Player
 	registerMemberFunction("Player", "setStorageValue(string key, string value)", &Manager::lua_Player_setStorageValue);
@@ -1541,9 +1547,43 @@ int LuaState::lua_getCreaturesByName()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Class Actor
+
+int LuaState::lua_Actor_create()
+{
+	if(getStackTop() > 0)
+		// Create a monster from a monster type
+		pushThing(Actor::create(popString()));
+	else{
+		pushThing(Actor::create());
+	}
+	return 1;
+}
+
+template <class T>
+int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
+	T value = l->popValue<T>();
+	Actor* actor = l->popActor();
+	((actor->getType()).*(mfp))(value);
+	l->pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_setArmor()
+{
+	return Actor_modAttribute(this, &CreatureType::armor);
+}
+
+int LuaState::lua_Actor_setDefense()
+{
+	return Actor_modAttribute(this, &CreatureType::defense);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Class Player
 
-int LuaState::lua_Player_setStorageValue() {
+int LuaState::lua_Player_setStorageValue()
+{
 	bool remove = false;
 	std::string value;
 	if(isNil(-1)) {
@@ -1564,7 +1604,8 @@ int LuaState::lua_Player_setStorageValue() {
 	return 1;
 }
 
-int LuaState::lua_Player_getStorageValue() {
+int LuaState::lua_Player_getStorageValue()
+{
 	std::string key = popString();
 	Player* player = popPlayer();
 	std::string value;
@@ -1576,7 +1617,8 @@ int LuaState::lua_Player_getStorageValue() {
 	return 1;
 }
 
-int LuaState::lua_Player_getFood() {
+int LuaState::lua_Player_getFood()
+{
 	Player* p = popPlayer();
 	Condition* condition = p->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 	if(condition){
@@ -1588,37 +1630,43 @@ int LuaState::lua_Player_getFood() {
 	return 1;
 }
 
-int LuaState::lua_Player_getLevel() {
+int LuaState::lua_Player_getLevel()
+{
 	Player* p = popPlayer();
 	push(p->getLevel());
 	return 1;
 }
 
-int LuaState::lua_Player_getMagicLevel() {
+int LuaState::lua_Player_getMagicLevel()
+{
 	Player* p = popPlayer();
 	push(p->getMagicLevel());
 	return 1;
 }
 
-int LuaState::lua_Player_getAccess() {
+int LuaState::lua_Player_getAccess()
+{
 	Player* p = popPlayer();
 	push(p->getAccessLevel());
 	return 1;
 }
 
-int LuaState::lua_Player_getMana() {
+int LuaState::lua_Player_getMana()
+{
 	Player* p = popPlayer();
 	push(p->getMana());
 	return 1;
 }
 
-int LuaState::lua_Player_getManaMax() {
+int LuaState::lua_Player_getManaMax()
+{
 	Player* p = popPlayer();
 	push(p->getMaxMana());
 	return 1;
 }
 
-int LuaState::lua_Player_setMana() {
+int LuaState::lua_Player_setMana()
+{
 	int newval = popInteger();
 	Player* p = popPlayer();
 	g_game.combatChangeMana(NULL, p, newval - p->getMana(), false);
@@ -1626,7 +1674,8 @@ int LuaState::lua_Player_setMana() {
 	return 1;
 }
 
-int LuaState::lua_Player_addManaSpent() {
+int LuaState::lua_Player_addManaSpent()
+{
 	int mana = popInteger();
 	Player* p = popPlayer();
 	p->addManaSpent(mana);
@@ -1634,19 +1683,22 @@ int LuaState::lua_Player_addManaSpent() {
 	return 1;
 }
 
-int LuaState::lua_Player_getVocationID() {
+int LuaState::lua_Player_getVocationID()
+{
 	Player* p = popPlayer();
 	push(p->getVocationId());
 	return 1;
 }
 
-int LuaState::lua_Player_getSoulPoints() {
+int LuaState::lua_Player_getSoulPoints()
+{
 	Player* p = popPlayer();
 	push(p->getPlayerInfo(PLAYERINFO_SOUL));
 	return 1;
 }
 
-int LuaState::lua_Player_setSoulPoints() {
+int LuaState::lua_Player_setSoulPoints()
+{
 	int soul = popInteger();
 	Player* p = popPlayer();
 	p->changeSoul(soul - p->getPlayerInfo(PLAYERINFO_SOUL));
@@ -1654,79 +1706,92 @@ int LuaState::lua_Player_setSoulPoints() {
 	return 1;
 }
 
-int LuaState::lua_Player_getFreeCap() {
+int LuaState::lua_Player_getFreeCap()
+{
 	Player* p = popPlayer();
 	push(p->getFreeCapacity());
 	return 1;
 }
 
-int LuaState::lua_Player_getMaximumCap() {
+int LuaState::lua_Player_getMaximumCap()
+{
 	Player* p = popPlayer();
 	push(p->getCapacity());
 	return 1;
 }
 
-int LuaState::lua_Player_getGuildID() {
+int LuaState::lua_Player_getGuildID()
+{
 	Player* p = popPlayer();
 	push(p->getGuildId());
 	return 1;
 }
 
-int LuaState::lua_Player_getGuildName() {
+int LuaState::lua_Player_getGuildName()
+{
 	Player* p = popPlayer();
 	push(p->getGuildName());
 	return 1;
 }
 
-int LuaState::lua_Player_getGuildRank() {
+int LuaState::lua_Player_getGuildRank()
+{
 	Player* p = popPlayer();
 	push(p->getGuildRank());
 	return 1;
 }
 
-int LuaState::lua_Player_getGuildNick() {
+int LuaState::lua_Player_getGuildNick()
+{
 	Player* p = popPlayer();
 	push(p->getGuildNick());
 	return 1;
 }
 
-int LuaState::lua_Player_getSex() {
+int LuaState::lua_Player_getSex()
+{
 	Player* p = popPlayer();
 	push(p->getSex() == PLAYERSEX_MALE);
 	return 1;
 }
 
-int LuaState::lua_Player_getTownID() {
+int LuaState::lua_Player_getTownID()
+{
 	Player* p = popPlayer();
 	push(p->getTown());
 	return 1;
 }
 
-int LuaState::lua_Player_getGUID() {
+int LuaState::lua_Player_getGUID()
+{
 	Player* p = popPlayer();
 	push(p->getGUID());
 	return 1;
 }
 
-int LuaState::lua_Player_getGroup() {
+int LuaState::lua_Player_getGroup()
+{
 	Player* p = popPlayer();
 	push(p->getAccessGroup());
 	return 1;
 }
 
-int LuaState::lua_Player_getPremiumDays() {
+int LuaState::lua_Player_getPremiumDays()
+{
 	Player* p = popPlayer();
 	push(p->getPremiumDays());
 	return 1;
 }
 
-int LuaState::lua_Player_getLastLogin() {
+int LuaState::lua_Player_getLastLogin()
+{
 	Player* p = popPlayer();
 	pushUnsignedInteger(p->getLastLoginSaved());
 	return 1;
 }
 
-int LuaState::lua_Player_getSkullType() {
+int LuaState::lua_Player_getSkullType()
+{
 	Player* p = popPlayer();
 #ifdef __SKULLSYSTEM__
 	push(p->getSkull());
@@ -1745,7 +1810,8 @@ int LuaState::lua_Player_hasGroupFlag()
 	return 1;
 }
 
-int LuaState::lua_Player_addExperience() {
+int LuaState::lua_Player_addExperience()
+{
 	int64_t exp = (int64_t)popFloat();
 	Player* p = popPlayer();
 	p->addExperience(exp);
@@ -1771,7 +1837,8 @@ int LuaState::lua_Player_getInventoryItem()
 	return 1;
 }
 
-int LuaState::lua_Player_getItemTypeCount() {
+int LuaState::lua_Player_getItemTypeCount()
+{
 	int type = popInteger();
 	Player* p = popPlayer();
 	push(((Cylinder*)p)->__getItemTypeCount(type));
@@ -2872,7 +2939,7 @@ int LuaState::luaGetMonsterTargetList(lua_State *L)
 		return 1;
 	}
 
-	Monster* monster = creature->getMonster();
+	Actor* monster = creature->getActor();
 	if(!monster){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -2910,7 +2977,7 @@ int LuaState::luaGetMonsterFriendList(lua_State *L)
 		return 1;
 	}
 
-	Monster* monster = creature->getMonster();
+	Actor* monster = creature->getActor();
 	if(!monster){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -2950,7 +3017,7 @@ int LuaState::luaDoSetMonsterTarget(lua_State *L)
 		return 1;
 	}
 
-	Monster* monster = creature->getMonster();
+	Actor* monster = creature->getActor();
 	if(!monster){
 		throwLuaException(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -2986,7 +3053,7 @@ int LuaState::luaDoMonsterChangeTarget(lua_State *L)
 		return 1;
 	}
 
-	Monster* monster = creature->getMonster();
+	Actor* monster = creature->getActor();
 	if(!monster){
 		throwLuaException(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -4100,10 +4167,10 @@ int LuaScriptInterface::luaDoCreateMonster()
 	PositionEx pos = popPosition();
 	std::string name = popString();
 
-	Monster* monster = Monster::createMonster(name);
+	Actor* monster = Actor::createMonster(name);
 
 	if(!monster){
-		std::string error_str = "Monster name(" + name + ") not found";
+		std::string error_str = "Actor name(" + name + ") not found";
 		throwLuaException(error_str);
 	}
 
@@ -4124,9 +4191,9 @@ int LuaScriptInterface::luaDoSummonCreature()
 	std::string name = popString();
 	Creature* creature = popCreature();
 
-	Monster* monster = Monster::createMonster(name);
+	Actor* monster = Actor::createMonster(name);
 	if(!monster){
-		std::string error_str = (std::string)"Monster name(" + name + (std::string)") not found";
+		std::string error_str = (std::string)"Actor name(" + name + (std::string)") not found";
 		throwLuaException(error_str);
 	}
 

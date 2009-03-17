@@ -33,7 +33,7 @@
 #include "items.h"
 #include "creature.h"
 #include "player.h"
-#include "monster.h"
+#include "actor.h"
 #include "game.h"
 #include "tile.h"
 #include "house.h"
@@ -46,7 +46,7 @@
 #include "ban.h"
 #include "spawn.h"
 #include "beds.h"
-#include "npc.h"
+#include "creature_manager.h"
 
 #include "script_enviroment.h"
 #include "script_manager.h"
@@ -61,7 +61,7 @@ extern ConfigManager g_config;
 extern Server* g_server;
 extern Commands commands;
 extern BanManager g_bans;
-extern Monsters g_monsters;
+extern CreatureManager g_creature_types;
 extern Chat g_chat;
 extern Game g_game;
 
@@ -189,8 +189,8 @@ int Game::loadMap(std::string filename, std::string filekind)
 	fightExhaustionTicks = g_config.getNumber(ConfigManager::FIGHTEXHAUSTED);
 	healExhaustionTicks = g_config.getNumber(ConfigManager::HEALEXHAUSTED);
 	Player::maxMessageBuffer = g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER);
-	Monster::despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
-	Monster::despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
+	Actor::despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
+	Actor::despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
 
 	return map->loadMap(filename, filekind);
 }
@@ -3765,7 +3765,7 @@ bool Game::checkReload(Player* player, const std::string& text)
 
 		if(param == " monsters" || param == " monster" || param == "m"){
 			std::cout << "================================================================================\n";
-			g_monsters.reload();
+			g_creature_types.reload();
 			std::cout << ":: Reloaded Monsters " << std::endl;
 			if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded monsters.");
 		}
@@ -4231,12 +4231,7 @@ uint32_t Game::getPlayersOnline()
 
 uint32_t Game::getMonstersOnline() 
 {
-	return (uint32_t)Monster::listMonster.list.size();
-}
-
-uint32_t Game::getNpcsOnline() 
-{
-	return (uint32_t)Npc::listNpc.list.size();
+	return (uint32_t)Actor::listMonster.list.size();
 }
 
 uint32_t Game::getCreaturesOnline() 

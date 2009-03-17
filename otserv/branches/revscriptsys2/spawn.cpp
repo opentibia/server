@@ -21,16 +21,20 @@
 
 #include "spawn.h"
 #include "game.h"
+#include "actor.h"
 #include "player.h"
 #include "tools.h"
 #include "configmanager.h"
+#include "creature_manager.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
 extern ConfigManager g_config;
-extern Monsters g_monsters;
+extern CreatureManager g_creature_types;
 extern Game g_game;
+
+class CreatureType;
 
 #define MINSPAWN_INTERVAL 10000
 #define DEFAULTSPAWN_INTERVAL 60000
@@ -283,7 +287,7 @@ Spawn::Spawn(const Position& _pos, int32_t _radius)
 
 Spawn::~Spawn()
 {
-	Monster* monster;
+	Actor* monster;
 	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end(); ++it){
 		monster = it->second;
 		it->second = NULL;
@@ -321,9 +325,9 @@ bool Spawn::isInSpawnZone(const Position& pos)
 	return Spawns::getInstance()->isInZone(centerPos, radius, pos);
 }
 
-bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup /*= false*/)
+bool Spawn::spawnMonster(uint32_t spawnId, CreatureType* mType, const Position& pos, Direction dir, bool startup /*= false*/)
 {
-	Monster* monster = Monster::createMonster(mType);
+	Actor* monster = Actor::create(*mType);
 	if(!monster){
 		return false;
 	}
@@ -369,7 +373,7 @@ void Spawn::checkSpawn()
 #endif
 	checkSpawnEvent = 0;
 
-	Monster* monster;
+	Actor* monster;
 	uint32_t spawnId;
 
 	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end();){
@@ -428,7 +432,7 @@ void Spawn::checkSpawn()
 
 bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval)
 {
-	MonsterType* mType = g_monsters.getMonsterType(_name);
+	CreatureType* mType = g_creature_types.getMonsterType(_name);
 	if(!mType){
 		// REVSCRIPT TODO Enable again
 		//std::cout << "[Spawn::addMonster] Can not find " << _name << std::endl;
@@ -452,7 +456,7 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 	return true;
 }
 
-void Spawn::removeMonster(Monster* monster)
+void Spawn::removeMonster(Actor* monster)
 {
 	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end(); ++it){
 		if(it->second == monster){
