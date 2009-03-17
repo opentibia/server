@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<interaction>
+
+  <interact keywords="depot">
+    <response text="The depots are very easy to use. Just step in front of them and you will find your items in them. They are free for all tibian citizens."/>
+  </interact>
+
+  <interact keywords="sell;offer">
+    <response text="I'm selling letters and parcels."/>
+  </interact>
+
+  <interact keywords="mail">
+    <response text="Our mail system is unique! And everyone can use it. Do you want to know more about it?">
+
+      <interact keywords="yes">
+        <response text="Our Mail System enables you to send and receive letters and parcels. You can buy them here if you want."/>
+      </interact>
+
+      <interact keywords="|*|">
+        <response text="Is there anything else I can do for you?"/>
+      </interact>
+      
+    </response>
+  </interact>
+
+  <interact keywords="parcel">
+    <response text="Do you want to buy a parcel for |PRICE| gold?">
+      <action name="price" value="15"/>
+
+      <interact keywords="yes">
+        <response param="lowmoney" text="Oh, you have not enough gold to buy a parcel."/>
+        <response text="Here you are. Don't forget to write the name and the address of the receiver on the label. The label has to be in the parcel before you put the parcel in a mailbox.">
+          <action name="takemoney" value="|PRICE|"/>
+          <action name="amount" value="1"/>
+          <action name="giveitem" value="2595"/>
+          <action name="amount" value="1"/>
+          <action name="giveitem" value="2599"/>
+        </response>
+      </interact>
+
+      <interact keywords="|*|">
+        <response text="Ok."/>
+      </interact>
+
+    </response>
+  </interact>
+
+  <interact keywords="letter">
+    <response text="Do you want to buy a letter for |PRICE| gold?">
+      <action name="price" value="8"/>
+
+      <interact keywords="yes">
+        <response param="lowmoney" text="Oh, you have not enough gold to buy a letter."/>
+        <response text="Here it is. Don't forget to write the name of the receiver in the first line and the address in the second one before you put the letter in a mailbox.">
+          <action name="takemoney" value="|PRICE|"/>
+          <action name="amount" value="1"/>
+          <action name="giveitem" value="2597"/>
+        </response>
+      </interact>
+
+      <interact keywords="|*|">
+        <response text="Ok."/>
+      </interact>
+      
+    </response>
+  </interact>
+  
+</interaction>

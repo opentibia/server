@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<monsters>
+
+<monster name="demon" file="demon.xml"/>
+<monster name="minotaur archer" file="minotaur_archer.xml"/>
+<monster name="poison spider" file="poison_spider.xml"/>
+<monster name="stalker" file="stalker.xml"/>
+<monster name="magicthrower" file="magicthrower.xml"/>
+<monster name="warlock" file="warlock.xml"/>
+<monster name="giant spider" file="giant_spider.xml"/>
+<monster name="dog" file="dog.xml"/>
+</monsters>
