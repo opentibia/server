@@ -621,6 +621,10 @@ public:
 	uint32_t getStaminaMinutes();
     uint32_t getStamina() {return stamina;}
     uint32_t getSpentStamina() {return uint32_t(201660000 - stamina);}
+    
+    //outfits
+    void hasRequestedOutfitWindow(bool newValue) {requestedOutfitWindow = newValue;}
+    bool hasRequestedOutfitWindow() {return requestedOutfitWindow;}
 
 	//depots
 	DepotMap depots;
@@ -782,6 +786,7 @@ protected:
 	LightInfo itemsLight;
 
 	OutfitList m_playerOutfits;
+	bool requestedOutfitWindow;
 
 	//read/write storage data
 	uint32_t windowTextId;
