@@ -618,9 +618,10 @@ public:
 	
 	//stamina
 	void addStamina(int32_t value);
-	uint32_t getStaminaMinutes();
-    uint32_t getStamina() {return stamina;}
-    uint32_t getSpentStamina() {return uint32_t(201660000 - stamina);}
+	void removeStamina(int32_t value) {addStamina(-value);}
+	int32_t getStaminaMinutes();
+    int32_t getStamina() {return stamina;}
+    int32_t getSpentStamina() {return 201660000 - stamina;}
     
     //outfits
     void hasRequestedOutfitWindow(bool newValue) {requestedOutfitWindow = newValue;}

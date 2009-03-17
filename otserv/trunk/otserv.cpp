@@ -429,10 +429,12 @@ void mainLoader(const CommandLineOptions& command_opts)
     }
 #endif
     std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;
+	/* Won't compile! access is not standard
     if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
         ErrorMessage("Data directory does not exist!");
         exit(-1);
     }
+	*/
     std::cout << "[done]" << std::endl;
 
 	std::cout << ":: Checking Database Connection... ";
