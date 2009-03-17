@@ -1060,24 +1060,27 @@ uint32_t Creature::getStaminaRatio(Creature* attacker) const
 
 uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*= true*/) const
 {
-	uint64_t retValue = (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
+	int64_t retValue = (int64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 	if(Player* player = attacker->getPlayer()){
-        if(useMultiplier){
-            retValue = (uint64_t)std::floor(retValue * player->exp_multiplier);
-        }
-        //[check & remove stamina
-        if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
-            if(player->getStaminaMinutes() <= 840 && player->getStaminaMinutes() > 0){
-                retValue = retValue / 2;
-            }
-            else if(player->getStaminaMinutes() <= 0){
-                return 0;
-            }
-            player->addStamina(-(std::min((uint64_t)player->getStamina(), uint64_t(getStaminaRatio(attacker) * player->getAttackSpeed() * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS)))));
-        }
-        //]
-    }
-    return retValue;
+		if(useMultiplier)
+			retValue = (uint64_t)std::floor(retValue * player->exp_multiplier);
+		
+		//[check & remove stamina
+		if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
+			if(player->getStaminaMinutes() <= 840 && player->getStaminaMinutes() > 0)
+				retValue = retValue / 2;
+			else if(player->getStaminaMinutes() <= 0)
+				return 0;
+
+			player->removeStamina(
+				std::min(
+					int64_t(player->getStamina()),
+					int64_t(getStaminaRatio(attacker)) * player->getAttackSpeed() * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS)
+			));
+		}
+		//]
+	}
+	return retValue;
 }
 
 void Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)

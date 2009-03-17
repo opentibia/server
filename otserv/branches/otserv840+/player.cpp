@@ -4081,15 +4081,20 @@ bool Player::checkLoginAttackDelay(uint32_t attackerId) const
 
 void Player::addStamina(int32_t value)
 {
+	stamina += value;
+
     //stamina may not be bigger than 201660000, and not smaller than 0
-    stamina = std::min((int32_t)201660000, std::max((int32_t)0, (int32_t)stamina + value));
+	if(stamina > 201660000)
+		stamina = 201660000;
+	if(stamina < 0)
+		stamina = 0;
 }
 
-uint32_t Player::getStaminaMinutes()
+int32_t Player::getStaminaMinutes()
 {
     if(hasFlag(PlayerFlag_HasInfiniteStamina)){
         return 3360;
     }
     
-    return std::min((uint32_t)3360, (uint32_t)(stamina / 60000));
+    return std::min(3360, int(stamina) / 60000);
 }
