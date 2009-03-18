@@ -96,6 +96,7 @@ typedef std::list<Party*> PartyList;
 
 #define PLAYER_MAX_SPEED 1500
 #define PLAYER_MIN_SPEED 10
+const int MAX_STAMINA = 42 * 7 * 60 * 60 * 1000;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -184,6 +185,8 @@ public:
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	int64_t getExperience() const {return experience;}
+	// -1 is per config default, argument can't be greater than the value in config.lua
+	int64_t getExperienceGainedRecently(int minutes = -1) const;
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
 	const Position& getLoginPosition() const {return loginPosition;}
@@ -191,7 +194,7 @@ public:
 	uint32_t getTown() const {return town;}
 	void setTown(uint32_t _town) {town = _town;}
 
-    bool checkLoginAttackDelay(uint32_t attackerId) const;
+    bool isLoginAttackLocked(uint32_t attackerId) const;
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
@@ -398,6 +401,8 @@ public:
 		{if(client) client->sendCreatureSkull(creature);}
 	void checkRedSkullTicks(int32_t ticks);
 #endif
+	
+	void checkRecentlyGainedExperience(uint32_t interval);
 	const OutfitListType& getPlayerOutfits();
 	bool canWear(uint32_t _looktype, uint32_t _addons);
 	void addOutfit(uint32_t _looktype, uint32_t _addons);
@@ -617,11 +622,11 @@ public:
 	void preSave();
 	
 	//stamina
-	void addStamina(int32_t value);
-	void removeStamina(int32_t value) {addStamina(-value);}
+	void addStamina(int64_t value);
+	void removeStamina(int64_t value) {addStamina(-value);}
 	int32_t getStaminaMinutes();
     int32_t getStamina() {return stamina;}
-    int32_t getSpentStamina() {return 201660000 - stamina;}
+    int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
     
     //outfits
     void hasRequestedOutfitWindow(bool newValue) {requestedOutfitWindow = newValue;}
@@ -735,6 +740,12 @@ protected:
 	int64_t lastLoginMs;
 	Position loginPosition;
 	uint32_t lastip;
+
+	// Experince tracking
+	// size N, where N is number of minutes to track, 
+	// [0] will be most recente minute, [14] will be 15 minutes ago
+	std::deque<int64_t> experienceGainedRecently;
+	int32_t minuteCounter;
 
 	//inventory variables
 	Item* inventory[11];

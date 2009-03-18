@@ -103,7 +103,11 @@ Creature()
 	MessageBufferTicks = 0;
 	MessageBufferCount = 0;
 	nextAction = 0;
-	stamina = 201660000;
+	stamina = MAX_STAMINA;
+
+	experienceGainedRecently.resize(1);
+	experienceGainedRecently[0] = 0;
+	minuteCounter = 0;
 
 	pzLocked = false;
 	bloodHitCount = 0;
@@ -622,6 +626,22 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 	}
 
 	return 0;
+}
+
+int64_t Player::getExperienceGainedRecently(int minutes) const
+{
+	int maxtrack = g_config.getNumber(ConfigManager::EXPERIENCE_TRACK_MINUTES);
+	if(minutes < 0 || minutes > maxtrack)
+		minutes = maxtrack;
+	if(minutes == 0)
+		return 0;
+
+	int64_t sumexp = 0;
+	for(size_t m = 0; m < minutes; ++m)
+		if(m < experienceGainedRecently.size())
+			sumexp += experienceGainedRecently[m];
+
+	return sumexp;
 }
 
 int32_t Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
@@ -1437,11 +1457,36 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		
 		if(lastLogout > 0)
 		{
-			int64_t timeOff = (time(NULL) - lastLogout) - 600;
-			if(timeOff > 0){
-                addStamina(std::min((uint64_t)getSpentStamina(), uint64_t(timeOff * g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN))));
-            }
-        }
+			int64_t timeOff = time(NULL) - lastLogout;
+			if(timeOff - 600 > 0){
+				// Quick stamina is gained before the last half hour
+				// Slow stamina is gained after that
+
+				int stamina_rate = g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN);
+				int quick_stamina_max = MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION);
+				
+
+				// If current stamina is less than quick cap, we should add quick stamina
+				if(getStamina() < quick_stamina_max){
+					int64_t gain = timeOff * stamina_rate;
+					
+					if(stamina + gain > quick_stamina_max){
+						// We gained full slow stamina
+						// Remove all the time spent getting stamina this way
+						timeOff -= (quick_stamina_max - getStamina()) / stamina_rate;
+						// We gain atleast up to the slow max
+						addStamina(quick_stamina_max - getStamina());
+					}
+				}
+
+				// Time left should now only be fast stamina
+				if(getStamina() < MAX_STAMINA){
+					int64_t gain = timeOff * stamina_rate / 4;
+
+					addStamina(gain);
+				}
+			}
+		}
 	}
 }
 
@@ -1621,6 +1666,15 @@ void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const
 		if(getParty()){
 			getParty()->updateSharedExperience();
 		}
+
+		if(teleport || (oldPos.z != newPos.z)){
+			addCondition(
+				Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, 
+				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
+			addCondition(
+				Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, 
+				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
+		}
 	}
 }
 
@@ -1793,6 +1847,26 @@ void Player::onThink(uint32_t interval)
 #ifdef __SKULLSYSTEM__
 	checkRedSkullTicks(interval);
 #endif
+	checkRecentlyGainedExperience(interval);
+}
+
+void Player::checkRecentlyGainedExperience(uint32_t interval)
+{
+	minuteCounter += interval;
+	if(minuteCounter >= 60*1000){
+		// New minute!
+		minuteCounter -= 60*1000;
+
+		// Remove least recent minute, and push a new, fresh minute onto stack
+		
+		// Fix size of config has been reloaded (or we just logged in)
+		experienceGainedRecently.resize(g_config.getNumber(ConfigManager::EXPERIENCE_TRACK_MINUTES));
+		
+		experienceGainedRecently.pop_back();
+		experienceGainedRecently.push_front(0);
+
+		sendStats();
+	}
 }
 
 uint32_t Player::isMuted()
@@ -3598,7 +3672,12 @@ void Player::gainExperience(uint64_t gainExp)
 				condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
 				addCondition(condition);
 			}
-
+			
+			if(isPremium() && g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM) &&
+					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION))
+				stamina += uint64_t(stamina * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
+			
+			experienceGainedRecently.front() += gainExp;
 			addExperience(gainExp);
 		}
 	}
@@ -4074,27 +4153,30 @@ bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 	return true;
 }
 
-bool Player::checkLoginAttackDelay(uint32_t attackerId) const
+bool Player::isLoginAttackLocked(uint32_t attackerId) const
 {
-	return (OTSYS_TIME() <= (lastLoginMs + g_config.getNumber(ConfigManager::LOGIN_ATTACK_DELAY)) && !hasBeenAttacked(attackerId));
+	if(OTSYS_TIME() <= lastLoginMs + g_config.getNumber(ConfigManager::LOGIN_ATTACK_DELAY))
+		return !hasBeenAttacked(attackerId);
+	return false;
 }
 
-void Player::addStamina(int32_t value)
+void Player::addStamina(int64_t value)
 {
-	stamina += value;
+	int64_t newstamina = stamina + value;
 
-    //stamina may not be bigger than 201660000, and not smaller than 0
-	if(stamina > 201660000)
-		stamina = 201660000;
-	if(stamina < 0)
-		stamina = 0;
+    //stamina may not be bigger than 42 hours, and not smaller than 0
+	if(newstamina > MAX_STAMINA)
+		newstamina = MAX_STAMINA;
+	if(newstamina < 0)
+		newstamina = 0;
+	stamina = newstamina;
 }
 
 int32_t Player::getStaminaMinutes()
 {
     if(hasFlag(PlayerFlag_HasInfiniteStamina)){
-        return 3360;
+        return 60 * 60 * 1000;
     }
     
-    return std::min(3360, int(stamina) / 60000);
+    return std::min(60 * 60 * 1000, int(stamina) / 60 * 1000);
 }

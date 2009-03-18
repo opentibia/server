@@ -360,7 +360,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 
 			if(const Player* attackerPlayer = attacker->getPlayer()){
 				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer) ||
-					attackerPlayer->checkLoginAttackDelay(targetPlayer->getID())){
+					attackerPlayer->isLoginAttackLocked(targetPlayer->getID())){
 					return RET_YOUMAYNOTATTACKTHISPLAYER;
 				}
 			}
