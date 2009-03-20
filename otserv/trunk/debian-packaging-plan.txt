@@ -23,4 +23,12 @@ Debian and Ubuntu users...
   - check out /var/lib/dpkg/info/mysql-server-5.0.preinst
   - don't forget to remove the user upon uninstallation of the program
 
+* optional: database configuration using debconf
+  - many debian packages (e.g. roundcube) use debconf scripts for prompting
+    user to input configuration data through a gui
+  - using this allows both terminal users and gui users to get configuration
+    ui in their environment-specific "friendly" manner
+  - roundcube mentions db-config, someone should study this -- help and
+    suggestions welcome
+
 
