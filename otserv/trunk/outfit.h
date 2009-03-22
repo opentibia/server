@@ -28,6 +28,7 @@
 #include "enums.h"
 
 struct Outfit{
+    Outfit() : looktype(0), addons(0) {}
 	uint32_t looktype;
 	uint32_t addons;
 };
