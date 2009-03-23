@@ -21,15 +21,11 @@
 
 #include "protocol.h"
 #include "outputmessage.h"
-#include "protocolgame.h"
-#include "protocollogin.h"
-#include "protocolold.h"
-#include "admin.h"
-#include "status.h"
 #include "tasks.h"
 #include "scheduler.h"
 #include "connection.h"
 #include "tools.h"
+#include "server.h"
 
 #include <boost/bind.hpp>
 
@@ -37,14 +33,14 @@
 uint32_t Connection::connectionCount = 0;
 #endif
 
-Connection* ConnectionManager::createConnection(boost::asio::io_service& io_service)
+Connection* ConnectionManager::createConnection(boost::asio::io_service& io_service, ServicePort_ptr servicer)
 {
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Create new Connection" << std::endl;
 	#endif
 
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
-	Connection* connection = new Connection(io_service);
+	Connection* connection = new Connection(io_service, servicer);
 	m_connections.push_back(connection);
 	return connection;
 }
@@ -197,9 +193,18 @@ void Connection::deleteConnectionTask()
 	delete this;
 }
 
+void Connection::acceptConnection(Protocol* protocol)
+{
+	m_protocol = protocol;
+
+	m_protocol->onConnect();
+
+	acceptConnection();
+}
+
 void Connection::acceptConnection()
 {
-	// Read size of te first packet
+	// Read size of the first packet
 	m_pendingRead++;
 	boost::asio::async_read(m_socket,
 		boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
@@ -251,53 +256,30 @@ void Connection::parsePacket(const boost::system::error_code& error)
 			checksum = adlerChecksum((uint8_t*)(m_msg.getBuffer() + m_msg.getReadPos() + 4), len);
 		}
 
-		if(!m_protocol){
+		if(recvChecksum == checksum)
+			// remove the checksum
+			m_msg.GetU32();
 
-			if(recvChecksum == checksum){
-				// remove the checksum
-				m_msg.GetU32();
-				// Protocol depends on the first byte of the packet
-				uint8_t protocolId = m_msg.GetByte();
-				switch(protocolId){
-				case 0x01: // Login server protocol
-					m_protocol = new ProtocolLogin(this);
-					break;
-				case 0x0A: // World server protocol
-					m_protocol = new ProtocolGame(this);
-					break;
-				default:
-					// No valid protocol
+		if(!m_receivedFirst){
+			m_receivedFirst = true;
+			// First message received
+			if(!m_protocol){ // Game protocol has already been created at this point
+				m_protocol = m_service_port->make_protocol(recvChecksum == checksum, m_msg);
+				m_protocol->setConnection(this);
+
+				if(!m_protocol){
 					closeConnection();
 					m_connectionLock.unlock();
 					return;
 				}
-				m_protocol->onRecvFirstMessage(m_msg);
 			}
 			else{
-				//Protocols without checksum
-				uint8_t protocolId = m_msg.GetByte();
-				switch(protocolId){
-				case 0x01: // Old Login server protocol
-				case 0x0A: // Old World server protocol
-					//This occurs if you try login with an old client version ( < 8.3)
-					m_protocol = new ProtocolOld(this);
-					break;
-				case 0xFE: // Admin protocol
-					m_protocol = new ProtocolAdmin(this);
-					break;
-				case 0xFF: // Status protocol
-					m_protocol = new ProtocolStatus(this);
-					break;
-				default:
-					closeConnection();
-					m_connectionLock.unlock();
-					return;
-				}
-				m_protocol->onRecvFirstMessage(m_msg);
+				// Skip protocol ID
+				m_msg.GetByte();
 			}
+			m_protocol->onRecvFirstMessage(m_msg);
 		}
 		else{
-			if(recvChecksum == checksum) m_msg.GetU32();
 			// Send the packet to the current protocol
 			m_protocol->onRecvMessage(m_msg);
 		}
@@ -372,6 +354,7 @@ bool Connection::send(OutputMessage_ptr msg)
 void Connection::internalSend(OutputMessage_ptr msg)
 {
 	m_pendingWrite++;
+
 	boost::asio::async_write(m_socket,
 		boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
 		boost::bind(&Connection::onWriteOperation, this, msg, boost::asio::placeholders::error));
@@ -453,7 +436,7 @@ void Connection::handleWriteError(const boost::system::error_code& error)
 		closeConnection();
 	}
 	else{
-		PRINT_ASIO_ERROR("Writting");
+		PRINT_ASIO_ERROR("Writing");
 		closeConnection();
 	}
 	m_writeError = true;

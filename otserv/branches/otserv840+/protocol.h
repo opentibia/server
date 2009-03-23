@@ -31,10 +31,10 @@ typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 class Connection;
 class RSA;
 
-#define CLIENT_VERSION_MIN 840
-#define CLIENT_VERSION_MAX 840
+#define CLIENT_VERSION_MIN 841
+#define CLIENT_VERSION_MAX 841
 
-#define STRING_CLIENT_VERSION "This server requires client version 8.40."
+#define STRING_CLIENT_VERSION "This server requires client version " OTSERV_CLIENT_VERSION "."
 
 class Protocol : boost::noncopyable
 {
@@ -56,6 +56,7 @@ public:
 	void onSendMessage(OutputMessage_ptr msg);
 	void onRecvMessage(NetworkMessage& msg);
 	virtual void onRecvFirstMessage(NetworkMessage& msg) = 0;
+	virtual void onConnect() {} // Used by new gameworld to send first packet to client
 
 	Connection* getConnection() { return m_connection;}
 	const Connection* getConnection() const { return m_connection;}

@@ -286,10 +286,10 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 			return false;
 		}
 
-        if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
-            disconnectClient(0x14, "You may only login with a Gamemaster account.");
-            return false;
-        }
+		if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+			disconnectClient(0x14, "You may only login with a Gamemaster account.");
+			return false;
+		}
 
 		if(g_game.getGameState() == GAME_STATE_CLOSING && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
 			disconnectClient(0x14, "The game is just going down.\nPlease try again later.");
@@ -440,6 +440,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 		return false;
 	}
 
+
 	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
@@ -460,6 +461,8 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	std::string accname = msg.GetString();
 	const std::string name = msg.GetString();
 	const std::string password = msg.GetString();
+
+	msg.SkipBytes(3);
 
 	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
@@ -504,6 +507,39 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 {
 	parseFirstPacket(msg);
+}
+
+void ProtocolGame::onConnect()
+{
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+
+		// Adler checksum, we can add it here since the connection
+		// is not checksummed yet
+		output->AddByte(0xEF); // 239
+		output->AddByte(0x00); // 0
+		output->AddByte(0x82); // 130
+		output->AddByte(0x02); // 2
+
+		// Unknown function, but these values are expected
+		output->AddByte(0x06); // 6
+		output->AddByte(0x00); // 0
+		output->AddByte(0x1f); // 31
+
+		// Irrelevant, used as password padding
+		output->AddByte(0x01); // 1
+		output->AddByte(0x41); // 65
+
+		// Two zeroes follow
+		output->AddByte(0x00); // 0
+		output->AddByte(0x00); // 0
+
+		// Finally another padding byte
+		output->AddByte(0x87); // 135
+
+		OutputMessagePool::getInstance()->send(output);
+	}
 }
 
 void ProtocolGame::disconnectClient(uint8_t error, const char* message)
@@ -2840,6 +2876,11 @@ void ProtocolGame::AddTileItem(NetworkMessage_ptr msg, const Position& pos, cons
 {
 	msg->AddByte(0x6A);
 	msg->AddPosition(pos);
+	
+	// Expensive!
+	const Tile* tile = item->getTile();
+	msg->AddByte(tile->__getIndexOfThing(item));
+
 	msg->AddItem(item);
 }
 

@@ -163,7 +163,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			output->AddString((*it));
 			output->AddString(g_config.getString(ConfigManager::WORLD_NAME));
 			output->AddU32(serverip);
-			output->AddU16(g_config.getNumber(ConfigManager::PORT));
+			output->AddU16(g_config.getNumber(ConfigManager::GAME_PORT));
 		}
 		//Add premium days
 		output->AddU16(Account::getPremiumDaysLeft(account.premEnd));//output->AddU16(0);

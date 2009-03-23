@@ -58,7 +58,6 @@ extern boost::recursive_mutex maploadlock;
 #endif
 
 extern ConfigManager g_config;
-extern Server* g_server;
 extern Actions* g_actions;
 extern Commands commands;
 extern BanManager g_bans;
@@ -82,6 +81,18 @@ Game::Game()
 	light_hour = SUNRISE + (SUNSET - SUNRISE)/2;
 	lightlevel = LIGHT_LEVEL_DAY;
 	light_state = LIGHT_STATE_DAY;
+}
+
+Game::~Game()
+{
+	if(map){
+		delete map;
+	}
+}
+
+void Game::start(ServiceManager* servicer)
+{
+	service_manager = servicer;
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL,
 		boost::bind(&Game::checkLight, this)));
@@ -92,13 +103,6 @@ Game::Game()
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
 		boost::bind(&Game::checkDecay, this)));
-}
-
-Game::~Game()
-{
-	if(map){
-		delete map;
-	}
 }
 
 void Game::setWorldType(WorldType_t type)
@@ -4445,8 +4449,8 @@ void Game::shutdown()
 
 	cleanup();
 
-	if(g_server){
-		g_server->stop();
+	if(service_manager){
+		service_manager->stop();
 	}
 
 	std::cout << "[done]" << std::endl;

@@ -67,9 +67,12 @@ public:
 
 	enum integer_config_t {
 		LOGIN_TRIES = 0,
+		GAME_PORT,
+		ADMIN_PORT,
+		LOGIN_PORT,
+		STATUS_PORT,
 		RETRY_TIMEOUT,
 		LOGIN_TIMEOUT,
-		PORT,
 		MOTD_NUM,
 		MAX_PLAYERS,
 		EXHAUSTED,

@@ -32,8 +32,12 @@
 
 class Protocol;
 class OutputMessage;
-typedef boost::shared_ptr<OutputMessage>OutputMessage_ptr;
+typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 class Connection;
+class ServiceBase;
+typedef boost::shared_ptr<ServiceBase> Service_ptr;
+class ServicePort;
+typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
 
 #ifdef __DEBUG_NET__
 #define PRINT_ASIO_ERROR(desc) \
@@ -55,7 +59,7 @@ public:
 		return &instance;
 	}
 
-	Connection* createConnection(boost::asio::io_service& io_service);
+	Connection* createConnection(boost::asio::io_service& io_service, ServicePort_ptr servicers);
 	void releaseConnection(Connection* connection);
 	void closeAll();
 
@@ -83,13 +87,15 @@ public:
 	};
 
 private:
-	Connection(boost::asio::io_service& io_service) : m_socket(io_service)
+	Connection(boost::asio::io_service& io_service, ServicePort_ptr service_port) : 
+	   m_socket(io_service), m_service_port(service_port)
 	{
 		m_refCount = 0;
 		m_protocol = NULL;
 		m_pendingWrite = 0;
 		m_pendingRead = 0;
 		m_closeState = CLOSE_STATE_NONE;
+		m_receivedFirst = false;
 		m_socketClosed = false;
 		m_writeError = false;
 		m_readError = false;
@@ -113,6 +119,8 @@ public:
 	boost::asio::ip::tcp::socket& getHandle() { return m_socket; }
 
 	void closeConnection();
+	// Used by protocols that require server to send first
+	void acceptConnection(Protocol* protocol);
 	void acceptConnection();
 
 	bool send(OutputMessage_ptr msg);
@@ -140,7 +148,9 @@ private:
 
 	NetworkMessage m_msg;
 	boost::asio::ip::tcp::socket m_socket;
+	ServicePort_ptr m_service_port;
 	bool m_socketClosed;
+	bool m_receivedFirst;
 
 	bool m_writeError;
 	bool m_readError;

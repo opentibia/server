@@ -48,7 +48,6 @@
 #endif
 
 
-#include "status.h"
 #include "monsters.h"
 #include "npc.h"
 #include "commands.h"
@@ -60,6 +59,11 @@
 #include "tools.h"
 #include "ban.h"
 #include "rsa.h"
+
+#include "protocolgame.h"
+#include "protocolold.h"
+#include "protocollogin.h"
+#include "status.h"
 #include "admin.h"
 
 #ifdef __OTSERV_ALLOCATOR__
@@ -86,7 +90,6 @@ BanManager g_bans;
 Vocations g_vocations;
 
 RSA* g_otservRSA = NULL;
-Server* g_server = NULL;
 
 boost::mutex g_loaderLock;
 boost::condition_variable g_loaderSignal;
@@ -128,7 +131,7 @@ struct CommandLineOptions{
 CommandLineOptions g_command_opts;
 
 bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args);
-void mainLoader(const CommandLineOptions& command_opts);
+void mainLoader(const CommandLineOptions& command_opts, ServiceManager* servicer);
 
 #if !defined(__WINDOWS__)
 // Runfile, for running OT as daemon in the background. If the server is shutdown by internal
@@ -241,16 +244,14 @@ int main(int argc, char *argv[])
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 
-	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, g_command_opts)));
+	ServiceManager servicer;
+
+	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, g_command_opts, &servicer)));
 
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
-	int port = g_config.getNumber(ConfigManager::PORT);
-
-	Server server(INADDR_ANY, port);
 	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-	g_server = &server;
-	server.run();
+	servicer.run();
 
 #if defined __EXCEPTION_TRACER__
 	mainExceptionHandler.RemoveHandler();
@@ -271,10 +272,24 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		std::string arg = *argi;
 		if(arg == "-p" || arg == "--port"){
 			if(++argi == args.end()){
-				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
+				std::cout << "Missing parameter 1 for '" << arg << "'" << std::endl;
 				return false;
 			}
-			g_config.setNumber(ConfigManager::PORT, atoi(argi->c_str()));
+			std::string type = *argi;
+
+			if(++argi == args.end()){
+				std::cout << "Missing parameter 2 for '" << arg << "'" << std::endl;
+				return false;
+			}
+
+			if(type == "g" || type == "game")
+				g_config.setNumber(ConfigManager::GAME_PORT, atoi(argi->c_str()));
+			if(type == "l" || type == "login")
+				g_config.setNumber(ConfigManager::LOGIN_PORT, atoi(argi->c_str()));
+			if(type == "a" || type == "admin")
+				g_config.setNumber(ConfigManager::ADMIN_PORT, atoi(argi->c_str()));
+			if(type == "s" || type == "status")
+				g_config.setNumber(ConfigManager::STATUS_PORT, atoi(argi->c_str()));
 		}
 #if !defined(__WINDOWS__)
 		else if(arg == "-r" || arg == "--runfile"){
@@ -342,7 +357,7 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 	return true;
 }
 
-void mainLoader(const CommandLineOptions& command_opts)
+void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_manager)
 {
 	//dispatcher thread
 	g_game.setGameState(GAME_STATE_STARTUP);
@@ -619,6 +634,24 @@ void mainLoader(const CommandLineOptions& command_opts)
 
 	g_game.setGameState(GAME_STATE_INIT);
 
+	// Tie ports and register services
+	
+	// Tibia protocols
+	service_manager->add<ProtocolGame>(g_config.getNumber(ConfigManager::GAME_PORT));
+	service_manager->add<ProtocolLogin>(g_config.getNumber(ConfigManager::LOGIN_PORT));
+
+	// OT protocols
+	service_manager->add<ProtocolAdmin>(g_config.getNumber(ConfigManager::ADMIN_PORT));
+	service_manager->add<ProtocolStatus>(g_config.getNumber(ConfigManager::STATUS_PORT));
+
+	// Legacy protocols (they need to listen on login port as all old server only used one port
+	// which was the login port.)
+	service_manager->add<ProtocolOldLogin>(g_config.getNumber(ConfigManager::LOGIN_PORT));
+	service_manager->add<ProtocolOldGame>(g_config.getNumber(ConfigManager::LOGIN_PORT));
+
+
+	// Print ports/ip addresses that we listen too
+
 	std::pair<uint32_t, uint32_t> IpNetMask;
 	IpNetMask.first  = inet_addr("127.0.0.1");
 	IpNetMask.second = 0xFFFFFFFF;
@@ -651,9 +684,13 @@ void mainLoader(const CommandLineOptions& command_opts)
 		}
 	}
 
-	std::cout << ":: Local port:            ";
-	int port = g_config.getNumber(ConfigManager::PORT);
-	std::cout << port << std::endl;
+	std::cout << ":: Local ports:           ";
+	std::list<uint16_t> ports = service_manager->get_ports();
+	while(ports.size()){
+		std::cout << ports.front() << "\t";
+		ports.pop_front();
+	}
+	std::cout << std::endl;
 
 	std::cout << ":: Global IP address:     ";
 	std::string ip = g_config.getString(ConfigManager::IP);
@@ -684,5 +721,6 @@ void mainLoader(const CommandLineOptions& command_opts)
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
 	g_game.setGameState(GAME_STATE_NORMAL);
+	g_game.start(service_manager);
 	g_loaderSignal.notify_all();
 }

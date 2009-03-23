@@ -47,6 +47,11 @@ class Quest;
 class ProtocolGame : public Protocol
 {
 public:
+	// static protocol information
+	enum {server_sends_first = true};
+	enum {protocol_identifier = 0}; // Not required as we send first
+	enum {use_checksum = true};
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolGameCount;
 #endif
@@ -78,6 +83,7 @@ private:
 	// we have all the parse methods
 	virtual void parsePacket(NetworkMessage& msg);
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
+	virtual void onConnect();
 	bool parseFirstPacket(NetworkMessage& msg);
 
 	//Parse methods

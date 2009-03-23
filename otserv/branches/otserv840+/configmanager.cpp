@@ -31,7 +31,10 @@ ConfigManager::ConfigManager()
 	m_isLoaded = false;
 
 	m_confString[IP] = "";
-	m_confInteger[PORT] = 0;
+	m_confInteger[ADMIN_PORT] = 0;
+	m_confInteger[GAME_PORT] = 0;
+	m_confInteger[LOGIN_PORT] = 0;
+	m_confInteger[STATUS_PORT] = 0;
 }
 
 ConfigManager::~ConfigManager()
@@ -66,8 +69,14 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		// These settings might have been set from command line
 		if(m_confString[IP] == "")
 			m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
-		if(m_confInteger[PORT] == 0)
-			m_confInteger[PORT] = getGlobalNumber(L, "port");
+		if(m_confInteger[GAME_PORT] == 0)
+			m_confInteger[GAME_PORT] = getGlobalNumber(L, "game_port");
+		if(m_confInteger[ADMIN_PORT] == 0)
+			m_confInteger[ADMIN_PORT] = getGlobalNumber(L, "admin_port");
+		if(m_confInteger[LOGIN_PORT] == 0)
+			m_confInteger[LOGIN_PORT] = getGlobalNumber(L, "login_port");
+		if(m_confInteger[STATUS_PORT] == 0)
+			m_confInteger[STATUS_PORT] = getGlobalNumber(L, "status_port");
 
 #if defined __CONFIG_V2__
 		unsigned int pos = _filename.rfind("/");
