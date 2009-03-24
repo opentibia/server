@@ -108,6 +108,8 @@ public:
 		USE_ACCBALANCE,
 		LOGIN_ATTACK_DELAY,
 		SHOW_CRASH_WINDOW,
+		IDLE_TIME,
+		IDLE_TIME_WARNING,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

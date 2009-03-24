@@ -1881,6 +1881,7 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 		return false;
 	}
 
+    player->resetIdleTime();
 	player->setFollowCreature(NULL);
 	player->onWalk(direction);
 	return (internalMoveCreature(player, direction) == RET_NOERROR);
@@ -2123,6 +2124,7 @@ bool Game::playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir)
 	if(!player || player->isRemoved())
 		return false;
 
+    player->resetIdleTime();
 	player->setNextWalkTask(NULL);
 	return player->startAutoWalk(listDir);
 }
@@ -3268,7 +3270,8 @@ bool Game::playerTurn(uint32_t playerId, Direction dir)
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
 		return false;
-
+		
+    player->resetIdleTime();
 	return internalCreatureTurn(player, dir);
 }
 

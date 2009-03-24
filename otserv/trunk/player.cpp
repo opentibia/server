@@ -125,6 +125,7 @@ Creature()
 	walkTaskEvent = 0;
 	actionTaskEvent = 0;
 	nextStepEvent = 0;
+	idleTime = 0;
 
 	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;
@@ -1790,9 +1791,11 @@ void Player::onThink(uint32_t interval)
 		addMessageBuffer();
 	}
 
+    checkIdleTime(interval);
 #ifdef __SKULLSYSTEM__
 	checkRedSkullTicks(interval);
 #endif
+   
 }
 
 uint32_t Player::isMuted()
@@ -4097,4 +4100,20 @@ int32_t Player::getStaminaMinutes()
     }
     
     return std::min(3360, int(stamina) / 60000);
+}
+
+void Player::checkIdleTime(int32_t ticks)
+{
+	if(!getTile()->hasFlag(TILESTATE_NOLOGOUT) && !isPzLocked() && !hasFlag(PlayerFlag_CanAlwaysLogin))	{
+		idleTime += ticks;
+		if(idleTime > (g_config.getNumber(ConfigManager::IDLE_TIME) * 60000)){
+			kickPlayer();
+        }
+		else if(client && idleTime == (g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) * 60000)){
+            uint32_t remainingTime = (g_config.getNumber(ConfigManager::IDLE_TIME) * 60000) / idleTime;
+            std::stringstream ss;
+			ss << "You have been idle for " << (uint32_t)(idleTime / 60000) << " minutes. You will be disconnected in "<< remainingTime <<" minutes if you are still idle then.";
+			sendTextMessage(MSG_STATUS_WARNING, ss.str());
+      	}
+	}
 }

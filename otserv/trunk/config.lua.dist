@@ -100,6 +100,11 @@ login_attack_delay = 10*1000
 -- Show error window when server crashes?
 show_crash_window = true
 
+-- Afk configuration
+-- Maximum time the player can stay away from keyboard (1 = 1 minute)
+max_idle_time = 15
+max_idle_time_warning = 14
+
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
 rate_skill = 1
