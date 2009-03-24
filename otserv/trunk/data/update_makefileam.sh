@@ -15,7 +15,7 @@ sed 's/Makefile\.in//g' Makefile.am | \
 	sed 's/Makefile//g' > Makefile.am.new
 mv Makefile.am.new Makefile.am
 
-echo "EXTRA_DIST = Makefile.am Makefile.in " '$(ots_data)' >> Makefile.am
+echo "EXTRA_DIST = Makefile.am Makefile.in " '$(ots_data) update_makefileam.sh' >> Makefile.am
 
 # example grabbed from autobook chapter 14.3
 # this should properly preserve directory structure of files
