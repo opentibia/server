@@ -198,6 +198,9 @@ bool CreatureEvent::configureEvent(xmlNodePtr p)
 		else if(asLowerCaseString(str) == "kill"){
 			m_type = CREATURE_EVENT_KILL;
 		}
+		else if(asLowerCaseString(str) == "advance"){
+			m_type = CREATURE_EVENT_ADVANCE;
+		}
 		else{
 			std::cout << "Error: [CreatureEvent::configureEvent] No valid type for creature event." << str << std::endl;
 			return false;
@@ -226,6 +229,9 @@ std::string CreatureEvent::getScriptEventName()
 		break;
 	case CREATURE_EVENT_KILL:
 		return "onKill";
+		break;
+	case CREATURE_EVENT_ADVANCE:
+		return "onAdvance";
 		break;
 
 	case CREATURE_EVENT_NONE:
@@ -383,6 +389,42 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target)
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnKill" << std::endl;
+		return 0;
+	}
+}
+
+uint32_t CreatureEvent::executeOnAdvance(Player* player, uint32_t oldLevel, uint32_t newLevel, levelTypes_t type)
+{
+	//onAdvance(cid, type, oldlevel, newlevel)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << player->getName();
+		env->setEventDesc(desc.str());
+		#endif
+
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(player->getPosition());
+
+		uint32_t cid = env->addThing(player);
+
+		lua_State* L = m_scriptInterface->getLuaState();
+
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		lua_pushnumber(L, oldLevel);
+		lua_pushnumber(L, newLevel);
+		lua_pushnumber(L, (uint32_t)type);
+
+		int32_t result = m_scriptInterface->callFunction(4);
+		m_scriptInterface->releaseScriptEnv();
+
+		return (result != LUA_FALSE);
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnAdvance" << std::endl;
 		return 0;
 	}
 }

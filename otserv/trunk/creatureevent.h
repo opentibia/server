@@ -21,6 +21,7 @@
 #ifndef __OTSERV_CREATUREEVENT_H__
 #define __OTSERV_CREATUREEVENT_H__
 
+#include "enums.h"
 #include "luascript.h"
 #include "baseevents.h"
 
@@ -29,7 +30,8 @@ enum CreatureEventType_t{
 	CREATURE_EVENT_LOGIN,
 	CREATURE_EVENT_LOGOUT,
 	CREATURE_EVENT_DIE,
-	CREATURE_EVENT_KILL
+	CREATURE_EVENT_KILL,
+	CREATURE_EVENT_ADVANCE
 };
 
 class CreatureEvent;
@@ -85,6 +87,7 @@ public:
 	uint32_t executeOnLogout(Player* player);
 	uint32_t executeOnDie(Creature* creature, Item* corpse);
 	uint32_t executeOnKill(Creature* creature, Creature* target);
+	uint32_t executeOnAdvance(Player* player, uint32_t oldLevel, uint32_t newLevel, levelTypes_t type);
 	//
 
 protected:

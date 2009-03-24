@@ -306,8 +306,8 @@ public:
 	virtual void onWalkAborted();
 	virtual void onWalkComplete();
 	
-	void checkIdleTime(int32_t ticks);
-	void resetIdleTime() {idleTime = 0;}
+	void checkIdleTime(uint32_t ticks);
+	void resetIdleTime(){idleTime = 0; idleWarned = false;}
 
 	void setChaseMode(chaseMode_t mode);
 	void setFightMode(fightMode_t mode);
@@ -709,7 +709,8 @@ protected:
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 	
-	int32_t idleTime;
+	uint32_t idleTime;
+	bool idleWarned;
 
 	double inventoryWeight;
 	double capacity;

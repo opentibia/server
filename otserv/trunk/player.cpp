@@ -125,7 +125,9 @@ Creature()
 	walkTaskEvent = 0;
 	actionTaskEvent = 0;
 	nextStepEvent = 0;
+	
 	idleTime = 0;
+	idleWarned = false;
 
 	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;
@@ -688,6 +690,13 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 		std::stringstream advMsg;
 		advMsg << "You advanced in " << getSkillName(skill) << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
+		
+		//scripting event - onAdvance
+        CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
+        if(eventAdvance){
+            eventAdvance->executeOnAdvance(this, (skills[skill][SKILL_LEVEL] - 1), skills[skill][SKILL_LEVEL], (levelTypes_t)skill);
+        }
+		
 		sendSkills();
 	}
 	else{
@@ -1901,6 +1910,13 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 			std::stringstream MaglvMsg;
 			MaglvMsg << "You advanced to magic level " << magLevel << ".";
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
+			
+			//scripting event - onAdvance
+            CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
+            if(eventAdvance){
+                eventAdvance->executeOnAdvance(this, (magLevel - 1), magLevel, LEVEL_EXPERIENCE);
+            }
+			
 			sendStats();
 		}
 
@@ -1948,6 +1964,12 @@ void Player::addExperience(uint64_t exp)
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
+		
+		//scripting event - onAdvance
+        CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
+        if(eventAdvance){
+            eventAdvance->executeOnAdvance(this, prevLevel, newLevel, LEVEL_MAGIC);
+        }
 	}
 
 	currLevelExp = Player::getExpForLevel(level);
@@ -4102,35 +4124,20 @@ int32_t Player::getStaminaMinutes()
     return std::min(3360, int(stamina) / 60000);
 }
 
-void Player::checkIdleTime(int32_t ticks)
+void Player::checkIdleTime(uint32_t ticks)
 {
-	if(!getTile()->hasFlag(TILESTATE_NOLOGOUT) && !isPzLocked() && !hasFlag(PlayerFlag_CanAlwaysLogin)){
+	if(!getTile()->hasFlag(TILESTATE_NOLOGOUT) && !hasFlag(PlayerFlag_CanAlwaysLogin)){
 		idleTime += ticks;
-		if(idleTime > (g_config.getNumber(ConfigManager::IDLE_TIME) * 60000)){
+		if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME)){
 			kickPlayer();
         }
-		else if(client && idleTime == (g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) * 60000)){
-            uint32_t remainingTime = g_config.getNumber(ConfigManager::IDLE_TIME) - idleTime / 60000;
-            uint32_t alreadyIdleTime = idleTime / 60000;
-            std::stringstream ss;
-			ss << "You have been idle for " << alreadyIdleTime;
-			
-			if(alreadyIdleTime > 1){
-               ss << " minutes. ";
-            }
-            else{
-               ss << " minute. ";
-            }
-			
-			ss << "You will be disconnected in "<< remainingTime;
-			
-			if(remainingTime > 1){
-               ss <<" minutes if you are still idle then.";
-            }
-            else{
-               ss <<" minute if you are still idle then.";  
-            }
-			sendTextMessage(MSG_STATUS_CONSOLE_RED, ss.str());
+		else if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) && !idleWarned){
+            int32_t alreadyIdleTime = g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) / 60000;
+            int32_t remainingTime = (g_config.getNumber(ConfigManager::IDLE_TIME) - g_config.getNumber(ConfigManager::IDLE_TIME_WARNING)) / 60000;
+            std::stringstream message;
+            message << "You have been idle for " << alreadyIdleTime << " " << (alreadyIdleTime > 1 ? "minutes" : "minute") << ", you will be disconnected in " << remainingTime << " " << (remainingTime > 1 ? "minutes" : "minute") << " if you are still idle then.";
+            client->sendTextMessage(MSG_STATUS_WARNING, message.str());
+            idleWarned = true;
       	}
 	}
 }
