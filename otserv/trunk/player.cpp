@@ -4104,16 +4104,33 @@ int32_t Player::getStaminaMinutes()
 
 void Player::checkIdleTime(int32_t ticks)
 {
-	if(!getTile()->hasFlag(TILESTATE_NOLOGOUT) && !isPzLocked() && !hasFlag(PlayerFlag_CanAlwaysLogin))	{
+	if(!getTile()->hasFlag(TILESTATE_NOLOGOUT) && !isPzLocked() && !hasFlag(PlayerFlag_CanAlwaysLogin)){
 		idleTime += ticks;
 		if(idleTime > (g_config.getNumber(ConfigManager::IDLE_TIME) * 60000)){
 			kickPlayer();
         }
 		else if(client && idleTime == (g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) * 60000)){
-            uint32_t remainingTime = (g_config.getNumber(ConfigManager::IDLE_TIME) * 60000) / idleTime;
+            uint32_t remainingTime = g_config.getNumber(ConfigManager::IDLE_TIME) - idleTime / 60000;
+            uint32_t alreadyIdleTime = idleTime / 60000;
             std::stringstream ss;
-			ss << "You have been idle for " << (uint32_t)(idleTime / 60000) << " minutes. You will be disconnected in "<< remainingTime <<" minutes if you are still idle then.";
-			sendTextMessage(MSG_STATUS_WARNING, ss.str());
+			ss << "You have been idle for " << alreadyIdleTime;
+			
+			if(alreadyIdleTime > 1){
+               ss << " minutes. ";
+            }
+            else{
+               ss << " minute. ";
+            }
+			
+			ss << "You will be disconnected in "<< remainingTime;
+			
+			if(remainingTime > 1){
+               ss <<" minutes if you are still idle then.";
+            }
+            else{
+               ss <<" minute if you are still idle then.";  
+            }
+			sendTextMessage(MSG_STATUS_CONSOLE_RED, ss.str());
       	}
 	}
 }
