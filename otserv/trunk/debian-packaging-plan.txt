@@ -17,11 +17,13 @@ Debian and Ubuntu users...
   - use /etc/init.d/skeleton as basis for an init.d script
   - use dh_installinit to install the symlinks to the script into proper 
     places in rcX.d
-
-* when installing create 'otserv' user and make init.d script setuid 'otserv'
+  
+* when installing create user 'otserv'; from init.d, run server under that user
   - should be done in preinst script
   - check out /var/lib/dpkg/info/mysql-server-5.0.preinst
   - don't forget to remove the user upon uninstallation of the program
+  - Evgeni from debian-devel-games: "setuid wont work on scripts. better use 
+    su or start-stop-servers --chuid or --user ;)"
 
 * optional: database configuration using debconf
   - many debian packages (e.g. roundcube) use debconf scripts for prompting
