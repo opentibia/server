@@ -82,6 +82,9 @@ pkgsysconf_DATA = config.lua
 SUBDIRS = data
 
 config.lua:
-	cp config.lua.dist config.lua
+	cp $(srcdir)/config.lua.dist config.lua
 
+
+distclean-local:
+	-rm -f config.lua.dist config.lua
 
