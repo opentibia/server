@@ -2330,7 +2330,7 @@ int LuaScriptInterface::luaDoPlayerResetIdleTime(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 
-	const Player* player = env->getPlayerByUID(cid);
+	Player* player = env->getPlayerByUID(cid);
 	if(player){
 		player->resetIdleTime();
 		lua_pushnumber(L, LUA_NO_ERROR);
