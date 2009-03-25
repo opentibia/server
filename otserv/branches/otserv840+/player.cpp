@@ -105,10 +105,6 @@ Creature()
 	nextAction = 0;
 	stamina = MAX_STAMINA;
 
-	experienceGainedRecently.resize(1);
-	experienceGainedRecently[0] = 0;
-	minuteCounter = 0;
-
 	pzLocked = false;
 	bloodHitCount = 0;
 	shieldBlockCount = 0;
@@ -626,22 +622,6 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 	}
 
 	return 0;
-}
-
-int64_t Player::getExperienceGainedRecently(int minutes) const
-{
-	int maxtrack = g_config.getNumber(ConfigManager::EXPERIENCE_TRACK_MINUTES);
-	if(minutes < 0 || minutes > maxtrack)
-		minutes = maxtrack;
-	if(minutes == 0)
-		return 0;
-
-	int64_t sumexp = 0;
-	for(size_t m = 0; m < minutes; ++m)
-		if(m < experienceGainedRecently.size())
-			sumexp += experienceGainedRecently[m];
-
-	return sumexp;
 }
 
 int32_t Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
@@ -1847,26 +1827,6 @@ void Player::onThink(uint32_t interval)
 #ifdef __SKULLSYSTEM__
 	checkRedSkullTicks(interval);
 #endif
-	checkRecentlyGainedExperience(interval);
-}
-
-void Player::checkRecentlyGainedExperience(uint32_t interval)
-{
-	minuteCounter += interval;
-	if(minuteCounter >= 60*1000){
-		// New minute!
-		minuteCounter -= 60*1000;
-
-		// Remove least recent minute, and push a new, fresh minute onto stack
-		
-		// Fix size of config has been reloaded (or we just logged in)
-		experienceGainedRecently.resize(g_config.getNumber(ConfigManager::EXPERIENCE_TRACK_MINUTES));
-		
-		experienceGainedRecently.pop_back();
-		experienceGainedRecently.push_front(0);
-
-		sendStats();
-	}
 }
 
 uint32_t Player::isMuted()
@@ -2212,6 +2172,25 @@ void Player::die()
 	loginPosition = masterPos;
 
 	if(skillLoss){
+		uint64_t expLost = getLostExperience();
+		//Level loss
+		uint32_t newLevel = level;
+		while((uint64_t)(experience - expLost) < Player::getExpForLevel(newLevel)){
+			if(newLevel > 1)
+				newLevel--;
+			else
+				break;
+		}
+
+		double lostPercent = 1. - (experience - expLost) / double(experience); // 0.1 if 10% was lost
+
+		if(newLevel != level){
+			std::stringstream lvMsg;
+			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
+			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
+		}
+
+
 		//Magic level loss
 		uint32_t sumMana = 0;
 		int32_t lostMana = 0;
@@ -2223,7 +2202,8 @@ void Player::die()
 
 		sumMana += manaSpent;
 
-		lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
+		double lostPercentMana = lostPercent * lossPercent[LOSS_MANASPENT] / 100;
+		lostMana = (int32_t)std::ceil(sumMana * lostPercentMana);
 
 		while((uint32_t)lostMana > manaSpent && magLevel > 0){
 			lostMana -= manaSpent;
@@ -2246,7 +2226,8 @@ void Player::die()
 			}
 
 			sumSkillTries += skills[i][SKILL_TRIES];
-			lostSkillTries = (uint32_t)std::ceil(sumSkillTries * ((double)lossPercent[LOSS_SKILLTRIES]/100));
+			double lossPercentSkill = lostPercent * lossPercent[LOSS_SKILLTRIES] / 100;
+			lostSkillTries = (uint32_t)std::ceil(sumSkillTries * lossPercentSkill);
 
 			while(lostSkillTries > skills[i][SKILL_TRIES]){
 				lostSkillTries -= skills[i][SKILL_TRIES];
@@ -2263,22 +2244,6 @@ void Player::die()
 			}
 
 			skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
-		}
-		//
-
-		//Level loss
-		uint32_t newLevel = level;
-		while((uint64_t)(experience - getLostExperience()) < Player::getExpForLevel(newLevel)){
-			if(newLevel > 1)
-				newLevel--;
-			else
-				break;
-		}
-
-		if(newLevel != level){
-			std::stringstream lvMsg;
-			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 		}
 		
 		//Send that death window
@@ -3677,7 +3642,6 @@ void Player::gainExperience(uint64_t gainExp)
 					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION))
 				stamina += uint64_t(stamina * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
 			
-			experienceGainedRecently.front() += gainExp;
 			addExperience(gainExp);
 		}
 	}

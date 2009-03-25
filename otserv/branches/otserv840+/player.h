@@ -250,10 +250,6 @@ public:
 	uint32_t getLossPercent(lossTypes_t lossType) const {return lossPercent[lossType];}
 	void setLossPercent(lossTypes_t lossType, uint32_t newPercent)
 	{
-		if(newPercent > 100){
-			newPercent = 100;
-		}
-
 		lossPercent[lossType] = newPercent;
 	}
 
@@ -740,12 +736,6 @@ protected:
 	int64_t lastLoginMs;
 	Position loginPosition;
 	uint32_t lastip;
-
-	// Experince tracking
-	// size N, where N is number of minutes to track, 
-	// [0] will be most recente minute, [14] will be 15 minutes ago
-	std::deque<int64_t> experienceGainedRecently;
-	int32_t minuteCounter;
 
 	//inventory variables
 	Item* inventory[11];
