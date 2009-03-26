@@ -511,7 +511,7 @@ public:
 	bool cancelRuleViolation(Player* player);
 	bool closeRuleViolation(Player* player);
 	
-	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);
+	void showUseHotkeyMessage(Player* player, Item* item);
 
 protected:
 

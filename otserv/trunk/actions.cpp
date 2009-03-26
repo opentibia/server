@@ -382,12 +382,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	player->setNextActionTask(NULL);
 	player->stopWalk();
 
-    ReturnValue ret = RET_NOERROR;
-	if(isHotkey)
-		ret = internalUseItem(player, pos, index, item, 0);
-	else
-		ret = internalUseItem(player, pos, index, item, 0);
-	
+    ReturnValue ret = internalUseItem(player, pos, index, item, 0);;
     if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;

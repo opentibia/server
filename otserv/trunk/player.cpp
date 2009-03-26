@@ -3280,7 +3280,7 @@ void Player::doAttacking(uint32_t interval)
 			result = Weapon::useFist(this, attackedCreature);
 		}
 
-		if(result && weapon->hasExhaustion()){
+		if(result){
 			lastAttack = OTSYS_TIME();
 		}
 	}

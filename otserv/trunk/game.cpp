@@ -2211,13 +2211,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	}
 
     if(isHotkey){
-        int32_t subType = -1;
-		if(item->hasSubType() && !item->hasCharges()){
-			subType = item->getSubType();
-		}
-		const ItemType& it = Item::items[item->getID()];
-		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		showUseHotkeyMessage(player, it, itemCount);
+		showUseHotkeyMessage(player, item);
     }
 
 	if(!player->canDoAction()){
@@ -2278,13 +2272,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	}
 
     if(isHotkey){
-        int32_t subType = -1;
-		if(item->hasSubType() && !item->hasCharges()){
-			subType = item->getSubType();
-		}
-		const ItemType& it = Item::items[item->getID()];
-		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		showUseHotkeyMessage(player, it, itemCount);
+		showUseHotkeyMessage(player, item);
     }
 
 	if(!player->canDoAction()){
@@ -2358,13 +2346,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 	}
 
     if(isHotkey){
-        int32_t subType = -1;
-		if(item->hasSubType() && !item->hasCharges()){
-			subType = item->getSubType();
-		}
-		const ItemType& it = Item::items[item->getID()];
-		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		showUseHotkeyMessage(player, it, itemCount);
+		showUseHotkeyMessage(player, item);
     }
 
 	if(!player->canDoAction()){
@@ -4512,8 +4494,15 @@ void Game::FreeThing(Thing* thing)
 	ToReleaseThings.push_back(thing);
 }
 
-void Game::showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount)
+void Game::showUseHotkeyMessage(Player* player, Item* item)
 {
+    int32_t subType = -1;
+	if(item->hasSubType() && !item->hasCharges()){
+		subType = item->getSubType();
+	}
+	const ItemType& it = Item::items[item->getID()];
+	uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+	
 	std::stringstream ss;
 	if(itemCount == 1){
 		ss << "Using the last " << it.name << "...";
