@@ -178,11 +178,10 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
-	exhaustion = false;
+	exhaustion = true;
 	premium = false;
 	enabled = true;
 	wieldUnproperly = false;
-	exhaustion = 0;
 	range = 1;
 	ammoAction = AMMOACTION_NONE;
 }
@@ -499,13 +498,6 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 			player->addSkillAdvance(skillType, skillPoint);
 		}
 	}
-
-	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
-		if(exhaustion){
-			player->addCombatExhaust(g_game.getFightExhaustionTicks());
-		}
-	}
-
 
 	int32_t manaCost = getManaCost(player);
 

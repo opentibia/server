@@ -47,11 +47,14 @@ worldname = "OpenTibia"
 -- options: pvp, no-pvp, pvp-enforced
 worldtype = "pvp"
 
--- exhausted time in ms (1000 = 1 second) for none-aggressive spells/weapons
+-- exhausted time in ms (1000 = 1 second) for none-aggressive spells
 exhausted = 1000
 
 -- exhausted time in ms (1000 = 1 second) for aggressive spells/weapons
 fightexhausted = 2000
+
+-- attack speed using melee (1000 = 1 second) 
+attackspeed = 2000
 
 -- how many ms to add if the player is already exhausted and tries to cast a spell (1000 = 1 second)
 exhaustedadd = 200

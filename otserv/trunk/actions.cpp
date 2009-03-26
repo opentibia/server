@@ -382,28 +382,15 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	player->setNextActionTask(NULL);
 	player->stopWalk();
 
-	if(isHotkey){
-		int32_t subType = -1;
-		if(item->hasSubType() && !item->hasCharges()){
-			subType = item->getSubType();
-		}
-
-		const ItemType& it = Item::items[item->getID()];
-		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-
-		showUseHotkeyMessage(player, it, itemCount);
-	}
-	else{
-		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
+    ReturnValue ret = RET_NOERROR;
+	if(isHotkey)
+		ret = internalUseItem(player, pos, index, item, 0);
+	else
+		ret = internalUseItem(player, pos, index, item, 0);
+	
+    if(ret != RET_NOERROR){
+		player->sendCancelMessage(ret);
+		return false;
 	}
 
 	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
@@ -519,23 +506,10 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	ReturnValue ret = RET_NOERROR;
 	bool isSuccess = false;
 
-	if(isHotkey){
-		int32_t subType = -1;
-		if(item->hasSubType() && !item->hasCharges()){
-			subType = item->getSubType();
-		}
-
-		const ItemType& it = Item::items[item->getID()];
-		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+	if(isHotkey)
 		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
-
-		if(isSuccess){
-			showUseHotkeyMessage(player, it, itemCount);
-		}
-	}
-	else{
+	else
 		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
-	}
 
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
@@ -544,19 +518,6 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 
 	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
 	return true;
-}
-
-void Actions::showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount)
-{
-	std::stringstream ss;
-	if(itemCount == 1){
-		ss << "Using the last " << it.name << "...";
-	}
-	else{
-		ss << "Using one of " << itemCount << " " << it.pluralName << "...";
-	}
-
-	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 }
 
 Action::Action(LuaScriptInterface* _interface) :

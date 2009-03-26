@@ -3232,7 +3232,7 @@ void Player::getPathSearchParams(const Creature* creature, FindPathParams& fpp) 
 
 uint32_t Player::getAttackSpeed() const
 {
-	return 2000;
+	return g_config.getNumber(ConfigManager::ATTACK_SPEED);
 }
 
 void Player::onAttacking(uint32_t interval)
@@ -3270,8 +3270,7 @@ void Player::doAttacking(uint32_t interval)
 			else {
 				// If the player is not exhausted OR if the player's weapon
 				// does not have hasExhaust, use the weapon.
-				if(!hasCondition(CONDITION_EXHAUST_COMBAT) ||
-					 weapon->hasExhaustion())
+				if(!hasCondition(CONDITION_EXHAUST_COMBAT) || !weapon->hasExhaustion())
 				{
 					result = weapon->useWeapon(this, tool, attackedCreature);
 				}
@@ -3281,7 +3280,7 @@ void Player::doAttacking(uint32_t interval)
 			result = Weapon::useFist(this, attackedCreature);
 		}
 
-		if(result){
+		if(result && weapon->hasExhaustion()){
 			lastAttack = OTSYS_TIME();
 		}
 	}

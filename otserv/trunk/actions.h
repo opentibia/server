@@ -66,8 +66,6 @@ protected:
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
 		Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
 
-	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);
-
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
 	virtual std::string getScriptBaseName();

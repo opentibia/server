@@ -2210,6 +2210,16 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return false;
 	}
 
+    if(isHotkey){
+        int32_t subType = -1;
+		if(item->hasSubType() && !item->hasCharges()){
+			subType = item->getSubType();
+		}
+		const ItemType& it = Item::items[item->getID()];
+		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+		showUseHotkeyMessage(player, it, itemCount);
+    }
+
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
 		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseItemEx, this,
@@ -2266,6 +2276,16 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		player->sendCancelMessage(ret);
 		return false;
 	}
+
+    if(isHotkey){
+        int32_t subType = -1;
+		if(item->hasSubType() && !item->hasCharges()){
+			subType = item->getSubType();
+		}
+		const ItemType& it = Item::items[item->getID()];
+		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+		showUseHotkeyMessage(player, it, itemCount);
+    }
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -2336,6 +2356,16 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		player->sendCancelMessage(ret);
 		return false;
 	}
+
+    if(isHotkey){
+        int32_t subType = -1;
+		if(item->hasSubType() && !item->hasCharges()){
+			subType = item->getSubType();
+		}
+		const ItemType& it = Item::items[item->getID()];
+		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+		showUseHotkeyMessage(player, it, itemCount);
+    }
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -3451,7 +3481,7 @@ bool Game::playerYell(Player* player, const std::string& text)
 	else{
 		isExhausted = true;
 		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED_ADD);
-		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.");
+		player->sendCancelMessage(RET_YOUAREEXHAUSTED);
 	}
 
 	if(addExhaustion > 0){
@@ -4480,4 +4510,17 @@ void Game::FreeThing(Thing* thing)
 {
 	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);
+}
+
+void Game::showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount)
+{
+	std::stringstream ss;
+	if(itemCount == 1){
+		ss << "Using the last " << it.name << "...";
+	}
+	else{
+		ss << "Using one of " << itemCount << " " << it.pluralName << "...";
+	}
+
+	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 }

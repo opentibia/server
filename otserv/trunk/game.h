@@ -510,6 +510,8 @@ public:
 	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
 	bool closeRuleViolation(Player* player);
+	
+	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);
 
 protected:
 

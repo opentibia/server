@@ -110,6 +110,7 @@ public:
 		SHOW_CRASH_WINDOW,
 		IDLE_TIME,
 		IDLE_TIME_WARNING,
+		ATTACK_SPEED,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
