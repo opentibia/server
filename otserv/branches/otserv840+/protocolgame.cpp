@@ -514,29 +514,12 @@ void ProtocolGame::onConnect()
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
-
-		// Adler checksum, we can add it here since the connection
-		// is not checksummed yet
-		output->AddByte(0xEF); // 239
-		output->AddByte(0x00); // 0
-		output->AddByte(0x82); // 130
-		output->AddByte(0x02); // 2
-
-		// Unknown function, but these values are expected
-		output->AddByte(0x06); // 6
-		output->AddByte(0x00); // 0
-		output->AddByte(0x1f); // 31
-
-		// Irrelevant, used as password padding
-		output->AddByte(0x01); // 1
-		output->AddByte(0x41); // 65
-
-		// Two zeroes follow
-		output->AddByte(0x00); // 0
-		output->AddByte(0x00); // 0
-
-		// Finally another padding byte
-		output->AddByte(0x87); // 135
+		output->AddU16(0x06); //packet size
+		output->AddByte(0x1F); //packet type
+		output->AddU16(random_range(0, 65535)); //some random number
+		output->AddU16(0x00); //?
+		output->AddByte(random_range(0, 255)); //another random number
+		output->addCryptoHeader(true); //adler checksum + total length
 
 		OutputMessagePool::getInstance()->send(output);
 	}
@@ -2888,6 +2871,7 @@ void ProtocolGame::AddTileCreature(NetworkMessage_ptr msg, const Position& pos, 
 {
 	msg->AddByte(0x6A);
 	msg->AddPosition(pos);
+	msg->AddByte(creature->getParent()->__getIndexOfThing(creature)); //841 specific
 
 	bool known;
 	uint32_t removedKnown;

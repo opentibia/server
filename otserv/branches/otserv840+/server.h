@@ -91,6 +91,7 @@ protected:
 
 	uint32_t m_listenErrors;
 	uint16_t m_serverPort;
+	bool m_pendingStart;
 };
 
 typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
@@ -106,8 +107,6 @@ public:
 	// Run and start all servers
 	void run() { m_io_service.run(); }
 	void stop();
-
-	bool okay();
 
 	// Adds a new service to be managed
 	template <typename ProtocolType>

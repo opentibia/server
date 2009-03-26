@@ -24,6 +24,8 @@
 #endif
 
 #include "server.h"
+#include "scheduler.h"
+
 #include "connection.h"
 #include "outputmessage.h"
 
@@ -70,7 +72,8 @@ ServicePort::ServicePort(boost::asio::io_service& io_service) :
 	m_io_service(io_service),
 	m_acceptor(NULL),
 	m_listenErrors(0),
-	m_serverPort(0)
+	m_serverPort(0),
+	m_pendingStart(false)
 {
 }
 
@@ -120,11 +123,18 @@ void ServicePort::onAccept(Connection* connection, const boost::system::error_co
 	}
 	else{
 		if(error != boost::asio::error::operation_aborted){
-			m_listenErrors++;
 			close();
+			if(m_listenErrors > 99){
+				std::cout << "Error: [Server::handle] More than 100 listen errors." << std::endl;
+				return;
+			}
 
-			std::cout << "Warning: [ServerPort::onAccept] Listener error occured (total " << m_listenErrors << ")." << std::endl;
-			open(m_serverPort);
+			m_listenErrors++;
+			if(!m_pendingStart){
+				m_pendingStart = true;
+				Scheduler::getScheduler().addEvent(createSchedulerTask(5000,
+					boost::bind(&ServicePort::open, this, m_serverPort)));
+			}
 		}
 		else{
 			#ifdef __DEBUG_NET__
@@ -166,19 +176,18 @@ void ServicePort::onStopServer()
 
 void ServicePort::open(uint16_t port)
 {
-
 	m_serverPort = port;
+	if(m_pendingStart)
+		m_pendingStart = false;
 
 	try {
-		m_acceptor = new boost::asio::ip::tcp::acceptor(m_io_service,
-						boost::asio::ip::tcp::endpoint(
-						boost::asio::ip::address(boost::asio::ip::address_v4(INADDR_ANY)),
-						m_serverPort), false);
-	}
-	catch(boost::system::system_error& e){
+		m_acceptor = new boost::asio::ip::tcp::acceptor(m_io_service, boost::asio::ip::tcp::endpoint(
+			boost::asio::ip::address(boost::asio::ip::address_v4(INADDR_ANY)), m_serverPort), false);
+	} catch(boost::system::system_error& e) {
 		std::cout << "ERROR: Can only bind one socket to a specific port (" << m_serverPort << ")" << std::endl;
 		std::cout << "The exact error was : " << e.what() << std::endl;
 	}
+
 	accept();
 }
 
