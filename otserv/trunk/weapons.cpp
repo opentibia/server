@@ -178,7 +178,7 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
-	exhaustion = true;
+	exhaustion = false;
 	premium = false;
 	enabled = true;
 	wieldUnproperly = false;
@@ -499,8 +499,11 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		}
 	}
 
-	int32_t manaCost = getManaCost(player);
+    if(!player->hasFlag(PlayerFlag_HasNoExhaustion) && hasExhaustion()){
+        player->addCombatExhaust(g_game.getFightExhaustionTicks());
+    }
 
+	int32_t manaCost = getManaCost(player);
 	if(manaCost > 0){
 		player->addManaSpent(manaCost);
 		if(!player->hasFlag(PlayerFlag_HasInfiniteMana)){
