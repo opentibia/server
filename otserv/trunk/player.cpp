@@ -3270,8 +3270,7 @@ void Player::doAttacking(uint32_t interval)
 			else {
 				// If the player is not exhausted OR if the player's weapon
 				// does not have hasExhaust, use the weapon.
-				if(!(hasCondition(CONDITION_EXHAUST_COMBAT) ||
-					 hasCondition(CONDITION_EXHAUST_HEAL)) ||
+				if(!hasCondition(CONDITION_EXHAUST_COMBAT) ||
 					 weapon->hasExhaustion())
 				{
 					result = weapon->useWeapon(this, tool, attackedCreature);
