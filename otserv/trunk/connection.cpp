@@ -404,7 +404,7 @@ void Connection::onWriteOperation(OutputMessage_ptr msg, const boost::system::er
 	if(!error){
 		if(m_pendingWrite > 0){
 			if(!m_outputQueue.empty()){
-				OutputMessage_ptr msg = m_outputQueue.front();
+				msg = m_outputQueue.front();
 				m_outputQueue.pop_front();
 				internalSend(msg);
 				#ifdef __DEBUG_NET_DETAIL__

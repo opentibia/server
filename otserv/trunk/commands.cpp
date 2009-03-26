@@ -796,23 +796,20 @@ bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const s
 {
 	Player* player = creature->getPlayer();
 	if(player){
-		if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
-			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-			if(houseTile){
-
-				std::string real_name = param;
-				uint32_t guid;
-				if(param == "none"){
-					houseTile->getHouse()->setHouseOwner(0);
-				}
-				else if(IOPlayer::instance()->getGuidByName(guid, real_name)){
-					houseTile->getHouse()->setHouseOwner(guid);
-				}
-				else{
-					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Player not found.");
-				}
-				return true;
+		HouseTile* houseTile = player->getTile()->getHouseTile();
+		if(houseTile){
+			std::string real_name = param;
+			uint32_t guid;
+			if(param == "none"){
+				houseTile->getHouse()->setHouseOwner(0);
 			}
+			else if(IOPlayer::instance()->getGuidByName(guid, real_name)){
+				houseTile->getHouse()->setHouseOwner(guid);
+			}
+			else{
+				player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Player not found.");
+			}
+			return true;
 		}
 	}
 	return false;

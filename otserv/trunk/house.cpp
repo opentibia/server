@@ -164,7 +164,7 @@ bool House::kickPlayer(Player* player, const std::string& name)
 {
 	Player* kickingPlayer = g_game.getPlayerByName(name);
 	if(kickingPlayer){
-		HouseTile* houseTile = dynamic_cast<HouseTile*>(kickingPlayer->getTile());
+		HouseTile* houseTile = kickingPlayer->getTile()->getHouseTile();
 
 		if(houseTile && houseTile->getHouse() == this){
 			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && !kickingPlayer->hasFlag(PlayerFlag_CanEditHouses)){

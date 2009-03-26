@@ -70,15 +70,9 @@ void OutputMessagePool::send(OutputMessage_ptr msg)
 		#endif
 
 		if(msg->getConnection()){
-			if(msg->getConnection()->send(msg)){
-				// Note: if we ever decide to change how the pool works this will have to change
-				m_outputPoolLock.lock();
-				if(msg->getState() != OutputMessage::STATE_FREE) {
-					msg->setState(OutputMessage::STATE_WAITING);
-				}
-				m_outputPoolLock.unlock();
-			}
-			else{
+			if(!msg->getConnection()->send(msg)){
+				// Send only fails when connection is closing (or in error state)
+				// This call will free the message
 				msg->getProtocol()->onSendMessage(msg);
 			}
 		}
@@ -114,13 +108,9 @@ void OutputMessagePool::sendAll()
 			#endif
 
 			if(omsg->getConnection()){
-				if(omsg->getConnection()->send(omsg)){
-					// Note: if we ever decide to change how the pool works this will have to change
-					if(omsg->getState() != OutputMessage::STATE_FREE) {
-						omsg->setState(OutputMessage::STATE_WAITING);
-					}
-				}
-				else{
+				if(!omsg->getConnection()->send(omsg)){
+					// Send only fails when connection is closing (or in error state)
+					// This call will free the message
 					omsg->getProtocol()->onSendMessage(omsg);
 				}
 			}

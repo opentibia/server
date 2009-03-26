@@ -1244,7 +1244,7 @@ House* InstantSpell::getHouseFromPos(Creature* creature)
 	if(creature){
 		Player* player = creature->getPlayer();
 		if(player){
-			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
+			HouseTile* houseTile = player->getTile()->getHouseTile();
 			if(houseTile){
 				House* house = houseTile->getHouse();
 				if(house){

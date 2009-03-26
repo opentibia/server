@@ -32,9 +32,7 @@ class TrashHolder;
 class Mailbox;
 class MagicField;
 class QTreeLeafNode;
-//[ added for beds system
 class BedItem;
-//]
 
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
@@ -65,6 +63,8 @@ enum tileflags_t{
 	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 524288,
 	TILESTATE_NOFIELDBLOCKPATH = 1048576
 };
+
+class HouseTile;
 
 class Tile : public Cylinder
 {
@@ -100,6 +100,11 @@ public:
 #endif // _DEBUG
 	}
 
+	HouseTile* getHouseTile();
+	const HouseTile* getHouseTile() const;
+	bool isHouseTile() const;
+
+
 	virtual int getThrowRange() const {return 0;};
 	virtual bool isPushable() const {return false;};
 
@@ -113,9 +118,7 @@ public:
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
 	Mailbox* getMailbox() const;
-	//[ added for beds system
 	BedItem* getBedItem() const;
-	//]
 
 	Creature* getTopCreature();
 	Item* getTopTopItem();

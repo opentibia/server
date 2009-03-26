@@ -3664,7 +3664,8 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 
 	Tile *tile = g_game.getMap()->getTile(pos);
 	if(tile){
-		if(HouseTile* houseTile = dynamic_cast<HouseTile*>(tile)){
+		HouseTile* houseTile = tile->getHouseTile();
+		if(houseTile){
 			House* house = houseTile->getHouse();
 			if(house){
 				lua_pushnumber(L, house->getHouseId());
