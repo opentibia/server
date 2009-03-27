@@ -382,7 +382,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 	player->setNextActionTask(NULL);
 	player->stopWalk();
 
-    ReturnValue ret = internalUseItem(player, pos, index, item, 0);;
+    ReturnValue ret = internalUseItem(player, pos, index, item, 0);
     if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
@@ -501,10 +501,7 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 	ReturnValue ret = RET_NOERROR;
 	bool isSuccess = false;
 
-	if(isHotkey)
-		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
-	else
-		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
+	ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
 
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
