@@ -462,7 +462,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	const std::string name = msg.GetString();
 	const std::string password = msg.GetString();
 
-	msg.SkipBytes(3);
+	msg.SkipBytes(6); //841 specific
 
 	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
@@ -511,18 +511,14 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 
 void ProtocolGame::onConnect()
 {
-	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-	if(output){
-		TRACK_MESSAGE(output);
-		output->AddU16(0x06); //packet size
-		output->AddByte(0x1F); //packet type
-		output->AddU16(random_range(0, 65535)); //some random number
-		output->AddU16(0x00); //?
-		output->AddByte(random_range(0, 255)); //another random number
-		output->addCryptoHeader(true); //adler checksum + total length
-
-		OutputMessagePool::getInstance()->send(output);
-	}
+	OutputMessage_ptr output(new OutputMessage);
+	output->AddU16(0x06); //length (6)
+	output->AddByte(0x1F); //packet type (31)
+	output->AddU16(random_range(0, 65535)); //2 random bytes
+	output->AddU16(0x00); //2 static bytes (0)
+	output->AddByte(random_range(0, 255)); //1 random byte
+	output->addCryptoHeader(true); //adler -> total length + adler + above
+	getConnection()->send(output);
 }
 
 void ProtocolGame::disconnectClient(uint8_t error, const char* message)
