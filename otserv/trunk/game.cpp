@@ -1844,14 +1844,14 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_
 	Tile* toTile = getTile(newPos.x, newPos.y, newPos.z);
 	if(toTile){
 		if(Creature* creature = thing->getCreature()){
-            //checks if player is being teleported to a house: if yes and if he doesn't have
-            //the necessary flag and is not the owner of the house returns error
             if(Player* player = creature->getPlayer()){
-                HouseTile* houseTile = player->getTile()->getHouseTile();
-                if(houseTile){
-                    House* house = houseTile->getHouse();
-                    if(house && house->getHouseOwner() != player->getGUID()){
-                        return RET_NOTPOSSIBLE;
+                if(!player->hasFlag(PlayerFlag_CanEditHouses)){
+                    HouseTile* houseTile = toTile->getHouseTile();
+                    if(houseTile){
+                        House* house = houseTile->getHouse();
+                        if(house && house->getHouseOwner() != player->getGUID()){
+                            return RET_NOTPOSSIBLE;
+                        }
                     }
                 }
             }
@@ -1892,7 +1892,7 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 		return false;
 	}
 
-    player->resetIdleTime();
+    player->setIdleTime(0, false);
 	player->setFollowCreature(NULL);
 	player->onWalk(direction);
 	return (internalMoveCreature(player, direction) == RET_NOERROR);
@@ -2135,7 +2135,7 @@ bool Game::playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir)
 	if(!player || player->isRemoved())
 		return false;
 
-    player->resetIdleTime();
+    player->setIdleTime(0, false);
 	player->setNextWalkTask(NULL);
 	return player->startAutoWalk(listDir);
 }
@@ -3294,7 +3294,7 @@ bool Game::playerTurn(uint32_t playerId, Direction dir)
 	if(!player || player->isRemoved())
 		return false;
 		
-    player->resetIdleTime();
+    player->setIdleTime(0, false);
 	return internalCreatureTurn(player, dir);
 }
 

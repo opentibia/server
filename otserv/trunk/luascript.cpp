@@ -1216,8 +1216,8 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerSendDefaultCancel(cid, ReturnValue)
 	lua_register(m_luaState, "doPlayerSendDefaultCancel", LuaScriptInterface::luaDoSendDefaultCancel);
 	
-	//doPlayerResetIdleTime(cid)
-	lua_register(m_luaState, "doPlayerResetIdleTime", LuaScriptInterface::luaDoPlayerResetIdleTime);
+	//doPlayerSetIdleTime(cid, time, warned)
+	lua_register(m_luaState, "doPlayerSetIdleTime", LuaScriptInterface::luaDoPlayerSetIdleTime);
 
 	//doTeleportThing(uid, newpos)
 	lua_register(m_luaState, "doTeleportThing", LuaScriptInterface::luaDoTeleportThing);
@@ -2323,16 +2323,18 @@ int LuaScriptInterface::luaDoSendDefaultCancel(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaDoPlayerResetIdleTime(lua_State *L)
+int LuaScriptInterface::luaDoPlayerSetIdleTime(lua_State *L)
 {
-	//doPlayerResetIdleTime(cid)
+	//doPlayerSetIdleTime(cid, time, warned)
+	bool warned = (popNumber(L) > 0);
+	uint32_t time = popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		player->resetIdleTime();
+		player->setIdleTime(time, warned);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{

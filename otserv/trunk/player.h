@@ -307,7 +307,7 @@ public:
 	virtual void onWalkComplete();
 	
 	void checkIdleTime(uint32_t ticks);
-	void resetIdleTime(){idleTime = 0; idleWarned = false;}
+	void setIdleTime(uint32_t value, bool warned){idleTime = value; idleWarned = warned;}
 
 	void setChaseMode(chaseMode_t mode);
 	void setFightMode(fightMode_t mode);
