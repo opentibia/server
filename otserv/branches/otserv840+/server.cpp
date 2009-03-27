@@ -146,23 +146,16 @@ void ServicePort::onAccept(Connection* connection, const boost::system::error_co
 
 Protocol* ServicePort::make_protocol(bool checksummed, NetworkMessage& msg) const
 {
-	uint8_t protocolID = msg.GetByte();
-
-	for(std::vector<Service_ptr>::const_iterator service_iter = m_services.begin(); service_iter != m_services.end(); ++service_iter)
+	uint8_t protocolId = msg.GetByte();
+	for(std::vector<Service_ptr>::const_iterator it = m_services.begin(); it != m_services.end(); ++it)
 	{
-		Service_ptr service = *service_iter;
-		if(checksummed){
-			if(service->is_checksummed()){
-				if(protocolID == service->get_protocol_identifier()){
-					// Correct service! Create protocol and get on with it
-					return service->make_protocol(NULL);
-				}
-			}
-		}
-		else if(!service->is_checksummed()){
-			// Not checksum based protocol
+		Service_ptr service = *it;
+		if(service->get_protocol_identifier() == protocolId && ((checksummed &&
+			service->is_checksummed()) || !service->is_checksummed())){
+			// Correct service! Create protocol and get on with it
 			return service->make_protocol(NULL);
 		}
+
 		// We can ignore the other cases, they will most likely end up in return NULL anyways.
 	}
 

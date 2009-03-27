@@ -39,14 +39,15 @@ extern ConfigManager g_config;
 extern Game g_game;
 
 enum RequestedInfo_t{
-	REQUEST_BASIC_SERVER_INFO 	= 0x01,
-	REQUEST_SERVER_SOFTWARE_INFO	= 0x02,
-	REQUEST_SERVER_MAP_INFO		= 0x04,
-	REQUEST_SERVER_OWNER_INFO	= 0x08,
-	REQUEST_MISC_SERVER_INFO	= 0x10,
-	REQUEST_PLAYERS_INFO		= 0x20,
-	REQUEST_EXT_PLAYERS_INFO	= 0x40,
-	REQUEST_PLAYER_STATUS_INFO	= 0x80
+	REQUEST_BASIC_SERVER_INFO  = 0x01,
+	REQUEST_OWNER_SERVER_INFO  = 0x02,
+	REQUEST_MISC_SERVER_INFO   = 0x04,
+	REQUEST_PLAYERS_INFO       = 0x08,
+	REQUEST_MAP_INFO           = 0x10,
+	REQUEST_EXT_PLAYERS_INFO   = 0x20,
+	REQUEST_PLAYER_STATUS_INFO = 0x40,
+	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80,
+};
 };
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -236,23 +237,38 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 	// properties of the server, such serverinfo, playersinfo and so
 
 	if(requestedInfo & REQUEST_BASIC_SERVER_INFO){
-		output->AddByte(0x10); // basic server info
+		output->AddByte(0x10); // server info
 		output->AddString(g_config.getString(ConfigManager::SERVER_NAME).c_str());
 		output->AddString(g_config.getString(ConfigManager::IP).c_str());
-		ss << g_config.getNumber(ConfigManager::PORT);
+		ss << g_config.getNumber(ConfigManager::LOGIN_PORT);
 		output->AddString(ss.str().c_str());
 		ss.str("");
 	}
 
-	if(requestedInfo & REQUEST_SERVER_SOFTWARE_INFO){
-		output->AddByte(0x11); // server software info
-		output->AddString(OTSERV_NAME);
-		output->AddString(OTSERV_VERSION);
-		output->AddString(OTSERV_CLIENT_VERSION);
+	if(requestedInfo & REQUEST_OWNER_SERVER_INFO){
+		output->AddByte(0x11); // server info - owner info
+		output->AddString(g_config.getString(ConfigManager::OWNER_NAME).c_str());
+		output->AddString(g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
 	}
 
-	if(requestedInfo & REQUEST_SERVER_MAP_INFO){
-		output->AddByte(0x12); // server map info
+	if(requestedInfo & REQUEST_MISC_SERVER_INFO){
+		output->AddByte(0x12); // server info - misc
+		output->AddString(g_config.getString(ConfigManager::MOTD).c_str());
+		output->AddString(g_config.getString(ConfigManager::LOCATION).c_str());
+		output->AddString(g_config.getString(ConfigManager::URL).c_str());
+		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
+		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
+	}
+
+	if(requestedInfo & REQUEST_PLAYERS_INFO){
+		output->AddByte(0x20); // players info
+		output->AddU32(m_playersonline);
+		output->AddU32(m_playersmax);
+		output->AddU32(m_playerspeak);
+	}
+
+	if(requestedInfo & REQUEST_MAP_INFO){
+		output->AddByte(0x30); // map info
 		output->AddString(m_mapname.c_str());
 		output->AddString(m_mapauthor.c_str());
 		uint32_t mapWidth, mapHeight;
@@ -261,30 +277,8 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddU16(mapHeight);
 	}
 
-	if(requestedInfo & REQUEST_SERVER_OWNER_INFO){
-		output->AddByte(0x13); // server owner info
-		output->AddString(g_config.getString(ConfigManager::OWNER_NAME).c_str());
-		output->AddString(g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
-	}
-
-	if(requestedInfo & REQUEST_MISC_SERVER_INFO){
-		output->AddByte(0x14); // misc server info
-		output->AddString(g_config.getString(ConfigManager::MOTD).c_str());
-		output->AddString(g_config.getString(ConfigManager::LOCATION).c_str());
-		output->AddString(g_config.getString(ConfigManager::URL).c_str());
-		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
-		output->AddU32((uint32_t)(running)); // since servers can be online for months ;)
-	}
-
-	if(requestedInfo & REQUEST_PLAYERS_INFO){
-		output->AddByte(0x20); // players
-		output->AddU32(m_playersonline);
-		output->AddU32(m_playersmax);
-		output->AddU32(m_playerspeak);
-	}
-
 	if(requestedInfo & REQUEST_EXT_PLAYERS_INFO){
-		output->AddByte(0x21); // extend~ players
+		output->AddByte(0x21); // players info - online players list
 		output->AddU32(m_playersonline);
 		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 			//Send the most common info
@@ -294,7 +288,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 	}
 
 	if(requestedInfo & REQUEST_PLAYER_STATUS_INFO){
-		output->AddByte(0x30); // player - status
+		output->AddByte(0x22); // players info - online status info of a player
 		const std::string name = msg.GetString();
 		if(g_game.getPlayerByName(name) != NULL){
 			output->AddByte(0x01);
@@ -302,6 +296,13 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		else{
 			output->AddByte(0x00);
 		}
+	}
+
+	if(requestedInfo & REQUEST_SERVER_SOFTWARE_INFORMATION){
+		output->AddByte(0x23); // server software info
+		output->AddString(OTSERV_NAME);
+		output->AddString(OTSERV_VERSION);
+		output->AddString(OTSERV_CLIENT_VERSION);
 	}
 
 	return;

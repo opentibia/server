@@ -258,7 +258,6 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddString(g_config.getString(ConfigManager::URL).c_str());
 		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
 		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
-		output->AddString(OTSERV_VERSION);
 	}
 
 	if(requestedInfo & REQUEST_PLAYERS_INFO){
