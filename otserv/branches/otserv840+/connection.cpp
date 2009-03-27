@@ -265,13 +265,12 @@ void Connection::parsePacket(const boost::system::error_code& error)
 			// First message received
 			if(!m_protocol){ // Game protocol has already been created at this point
 				m_protocol = m_service_port->make_protocol(recvChecksum == checksum, m_msg);
-				m_protocol->setConnection(this);
-
 				if(!m_protocol){
 					closeConnection();
 					m_connectionLock.unlock();
 					return;
 				}
+				m_protocol->setConnection(this);
 			}
 			else{
 				// Skip protocol ID
