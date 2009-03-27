@@ -136,9 +136,23 @@ void Manager::registerClasses() {
 
 	// Actor
 	registerMemberFunction("Actor", "setArmor(int newarmor)", &Manager::lua_Actor_setArmor);
+	registerMemberFunction("Actor", "getArmor()", &Manager::lua_Actor_getArmor);
 	registerMemberFunction("Actor", "setDefense(int newdefense)", &Manager::lua_Actor_setDefense);
+	registerMemberFunction("Actor", "getDefense()", &Manager::lua_Actor_getDefense);
+	registerMemberFunction("Actor", "setExperienceWorth(int newexp)", &Manager::lua_Actor_setExperienceWorth);
+	registerMemberFunction("Actor", "getExperienceWorth()", &Manager::lua_Actor_getExperienceWorth);
+	registerMemberFunction("Actor", "setCanPushItems(int newvalue)", &Manager::lua_Actor_setCanPushItems);
+	registerMemberFunction("Actor", "getCanPushItems()", &Manager::lua_Actor_getCanPushItems);
+	registerMemberFunction("Actor", "setCanPushCreatures(int newvalue)", &Manager::lua_Actor_setCanPushCreatures);
+	registerMemberFunction("Actor", "getCanPushCreatures()", &Manager::lua_Actor_getCanPushCreatures);
+	registerMemberFunction("Actor", "setSpeed(int newspeed)", &Manager::lua_Actor_setSpeed);
+	registerMemberFunction("Actor", "getSpeed()", &Manager::lua_Actor_getSpeed);
+	registerMemberFunction("Actor", "setTargetDistance(int newtargetdistance)", &Manager::lua_Actor_setTargetDistance);
+	registerMemberFunction("Actor", "getTargetDistance()", &Manager::lua_Actor_getTargetDistance);
+	registerMemberFunction("Actor", "setMaxSummons(int newsummons)", &Manager::lua_Actor_setMaxSummons);
+	registerMemberFunction("Actor", "getMaxSummons()", &Manager::lua_Actor_getMaxSummons);
 
-	registerGlobalFunction("createActor([string monstertype])", &Manager::lua_Actor_create);
+	registerGlobalFunction("createActor(table pos [, string monstertype])", &Manager::lua_Actor_create);
 
 	// Player
 	registerMemberFunction("Player", "setStorageValue(string key, string value)", &Manager::lua_Player_setStorageValue);
@@ -1551,12 +1565,17 @@ int LuaState::lua_getCreaturesByName()
 
 int LuaState::lua_Actor_create()
 {
-	if(getStackTop() > 0)
+	Actor* a = 0;
+	if(getStackTop() > 1)
 		// Create a monster from a monster type
-		pushThing(Actor::create(popString()));
+		a = Actor::create(popString());
 	else{
-		pushThing(Actor::create());
+		a = Actor::create();
 	}
+	Position p = popPosition();
+	if(a)
+		g_game.placeCreature(a, p);
+	pushThing(a);
 	return 1;
 }
 
@@ -1569,14 +1588,94 @@ int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
 	return 1;
 }
 
+#define Actor_getAttribute(T, mfp) \
+	push(popActor()->getType().mfp()), 1
+
+int LuaState::lua_Actor_getArmor()
+{
+	return Actor_getAttribute(int, armor);
+}
+
 int LuaState::lua_Actor_setArmor()
 {
 	return Actor_modAttribute(this, &CreatureType::armor);
 }
 
+int LuaState::lua_Actor_getDefense()
+{
+	return Actor_getAttribute(int, defense);
+}
+
 int LuaState::lua_Actor_setDefense()
 {
 	return Actor_modAttribute(this, &CreatureType::defense);
+}
+
+int LuaState::lua_Actor_getExperienceWorth()
+{
+	return Actor_getAttribute(uint64_t, experience);
+}
+
+int LuaState::lua_Actor_setExperienceWorth()
+{
+	return Actor_modAttribute(this, &CreatureType::experience);
+}
+
+int LuaState::lua_Actor_getCanPushItems()
+{
+	return Actor_getAttribute(bool, canPushItems);
+}
+
+int LuaState::lua_Actor_setCanPushItems()
+{
+	return Actor_modAttribute(this, &CreatureType::canPushItems);
+}
+
+int LuaState::lua_Actor_getCanPushCreatures()
+{
+	return Actor_getAttribute(bool, canPushCreatures);
+}
+
+int LuaState::lua_Actor_setCanPushCreatures()
+{
+	return Actor_modAttribute(this, &CreatureType::canPushCreatures);
+}
+
+int LuaState::lua_Actor_getSpeed()
+{
+	Actor* actor = popActor();
+	pushInteger(actor->getSpeed());
+	return 1;
+}
+
+int LuaState::lua_Actor_setSpeed()
+{
+	int value = popInteger();
+	Actor* actor = popActor();
+	g_game.changeSpeed(actor, value - actor->getSpeed());
+
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_getTargetDistance()
+{
+	return Actor_getAttribute(int, targetDistance);
+}
+
+int LuaState::lua_Actor_setTargetDistance()
+{
+	return Actor_modAttribute(this, &CreatureType::targetDistance);
+}
+
+int LuaState::lua_Actor_getMaxSummons()
+{
+	return Actor_getAttribute(int, maxSummons);
+}
+
+int LuaState::lua_Actor_setMaxSummons()
+{
+	return Actor_modAttribute(this, &CreatureType::maxSummons);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

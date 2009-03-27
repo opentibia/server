@@ -149,6 +149,7 @@ public:
 	template <> uint32_t popValue<uint32_t>() {return popUnsignedInteger();}
 	template <> double popValue<double>() {return popFloat();}
 	template <> std::string popValue<std::string>() {return popString();}
+	template <> uint64_t popValue<uint64_t>() {return (uint64_t)popFloat();}
 
 	// Push
 	void pushNil();
@@ -191,6 +192,7 @@ public:
 	void push(bool b) {pushBoolean(b);}
 	void push(int i) {pushInteger(i);}
 	void push(uint32_t ui) {pushUnsignedInteger(ui);}
+	void push(uint64_t ui) {pushFloat((double)ui);}
 	void push(double d) {pushFloat(d);}
 	void push(const std::string& str) {pushString(str);}
 	void push(Thing* thing) {pushThing(thing);}
@@ -278,7 +280,21 @@ public:
 	// - - - Actor
 	int lua_Actor_create();
 	int lua_Actor_setArmor();
+	int lua_Actor_getArmor();
 	int lua_Actor_setDefense();
+	int lua_Actor_getDefense();
+	int lua_Actor_setExperienceWorth();
+	int lua_Actor_getExperienceWorth();
+	int lua_Actor_setCanPushItems();
+	int lua_Actor_getCanPushItems();
+	int lua_Actor_setCanPushCreatures();
+	int lua_Actor_getCanPushCreatures();
+	int lua_Actor_setSpeed();
+	int lua_Actor_getSpeed();
+	int lua_Actor_setTargetDistance();
+	int lua_Actor_getTargetDistance();
+	int lua_Actor_setMaxSummons();
+	int lua_Actor_getMaxSummons();
 
 	// - - - Player
 	int lua_Player_getFood();

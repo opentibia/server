@@ -3109,9 +3109,9 @@ void Player::doAttacking(uint32_t interval)
 
 	if((OTSYS_TIME() - lastAttack) >= getAttackSpeed() ){
 		Item* tool = getWeapon();
+		const Weapon* weapon = NULL;
 		bool result = false;
-		const Weapon* weapon = tool->getWeapon();
-		if(weapon){
+		if(tool && (weapon = tool->getWeapon())){
 			if(!weapon->interruptSwing()){
 				result = weapon->useWeapon(this, tool, attackedCreature);
 			}
