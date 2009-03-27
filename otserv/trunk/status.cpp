@@ -240,7 +240,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddByte(0x10); // server info
 		output->AddString(g_config.getString(ConfigManager::SERVER_NAME).c_str());
 		output->AddString(g_config.getString(ConfigManager::IP).c_str());
-		ss << g_config.getNumber(ConfigManager::LOGIN_PORT);
+		ss << g_config.getNumber(ConfigManager::PORT);
 		output->AddString(ss.str().c_str());
 		ss.str("");
 	}
