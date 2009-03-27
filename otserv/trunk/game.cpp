@@ -1847,13 +1847,11 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_
             //checks if player is being teleported to a house: if yes and if he doesn't have
             //the necessary flag and is not the owner of the house returns error
             if(Player* player = creature->getPlayer()){
-                if(toTile->hasFlag(TILESTATE_HOUSE) && !player->hasFlag(PlayerFlag_CanEditHouses)){
-                    if(HouseTile* houseTile = static_cast<HouseTile*>(toTile)){
-                        if(House* house = houseTile->getHouse()){
-                            if(house->getHouseOwner() != player->getGUID()){
-                                return RET_NOTPOSSIBLE;
-                            }
-                        }
+                HouseTile* houseTile = player->getTile()->getHouseTile();
+                if(houseTile){
+                    House* house = houseTile->getHouse();
+                    if(house && house->getHouseOwner() != player->getGUID()){
+                        return RET_NOTPOSSIBLE;
                     }
                 }
             }

@@ -1914,7 +1914,7 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 			//scripting event - onAdvance
             CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
             if(eventAdvance){
-                eventAdvance->executeOnAdvance(this, (magLevel - 1), magLevel, LEVEL_EXPERIENCE);
+                eventAdvance->executeOnAdvance(this, (magLevel - 1), magLevel, LEVEL_MAGIC);
             }
 			
 			sendStats();
@@ -1968,7 +1968,7 @@ void Player::addExperience(uint64_t exp)
 		//scripting event - onAdvance
         CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
         if(eventAdvance){
-            eventAdvance->executeOnAdvance(this, prevLevel, newLevel, LEVEL_MAGIC);
+            eventAdvance->executeOnAdvance(this, prevLevel, newLevel, LEVEL_EXPERIENCE);
         }
 	}
 
