@@ -1844,6 +1844,19 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_
 	Tile* toTile = getTile(newPos.x, newPos.y, newPos.z);
 	if(toTile){
 		if(Creature* creature = thing->getCreature()){
+            //checks if player is being teleported to a house: if yes and if he doesn't have
+            //the necessary flag and is not the owner of the house returns error
+            if(Player* player = creature->getPlayer()){
+                if(toTile->hasFlag(TILESTATE_HOUSE) && !player->hasFlag(PlayerFlag_CanEditHouses)){
+                    if(HouseTile* houseTile = static_cast<HouseTile*>(toTile)){
+                        if(House* house = houseTile->getHouse()){
+                            if(house->getHouseOwner() != player->getGUID()){
+                                return RET_NOTPOSSIBLE;
+                            }
+                        }
+                    }
+                }
+            }
 			creature->getTile()->moveCreature(creature, toTile, true);
 			return RET_NOERROR;
 		}
