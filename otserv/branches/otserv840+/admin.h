@@ -176,7 +176,7 @@ class ProtocolAdmin : public Protocol
 public:
 	// static protocol information
 	enum {server_sends_first = false};
-	enum {protocol_identifier = 0xFF}; // Not required as we send first
+	enum {protocol_identifier = 0xFE}; // Not required as we send first
 	enum {use_checksum = false};
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
