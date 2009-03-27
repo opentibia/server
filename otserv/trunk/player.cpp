@@ -78,13 +78,6 @@ Creature()
 	guildId    = 0;
 	guildLevel = 0;
 
-	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-	    skill_multiplier[i] = 1.0f;
-	}
-
-    magic_multiplier = 1.0f;
-    exp_multiplier = 1.0f;
-
 	level      = 1;
 	levelPercent = 0;
 	magLevelPercent = 0;
@@ -150,6 +143,10 @@ Creature()
 
 	for(int32_t i = LOSS_FIRST; i <= LOSS_LAST; ++i){
 		lossPercent[i] = 10;
+	}
+	
+	for(int32_t i = LEVEL_FIRST; i <= LEVEL_LAST; ++i){
+		rateValue[i] = 1.0f;
 	}
 
 	maxDepotLimit = 1000;
@@ -673,7 +670,7 @@ std::string Player::getSkillName(int skillid)
 void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier /*= true*/)
 {
     if(useMultiplier){
-        count = uint32_t(count * double(skill_multiplier[skill]));
+        count = uint32_t(count * getRateValue((levelTypes_t)skill));
     }
 	skills[skill][SKILL_TRIES] += count * g_config.getNumber(ConfigManager::RATE_SKILL);
 
@@ -1898,7 +1895,7 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 {
 	if(amount != 0 && !hasFlag(PlayerFlag_NotGainMana)){
         if(useMultiplier){
-            amount = uint32_t(amount * double(magic_multiplier));
+            amount = uint32_t(amount * getRateValue(LEVEL_MAGIC));
         }
 		manaSpent += amount * g_config.getNumber(ConfigManager::RATE_MAGIC);
 		uint32_t reqMana = vocation->getReqMana(magLevel + 1);
@@ -3307,7 +3304,7 @@ uint64_t Player::getGainedExperience(Creature* attacker, bool useMultiplier /*= 
 				if(!useMultiplier)
                     return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
                 else
-                    return uint64_t((result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE)) * double(attackerPlayer->exp_multiplier));
+                    return uint64_t((result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE)) * attackerPlayer->getRateValue(LEVEL_EXPERIENCE));
 		}
 	}
 

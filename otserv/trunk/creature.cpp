@@ -1063,7 +1063,7 @@ uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*
 	int64_t retValue = (int64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 	if(Player* player = attacker->getPlayer()){
 		if(useMultiplier)
-			retValue = (uint64_t)std::floor(retValue * player->exp_multiplier);
+			retValue = (uint64_t)std::floor(retValue * player->getRateValue(LEVEL_EXPERIENCE));
 		
 		//[check & remove stamina
 		if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){

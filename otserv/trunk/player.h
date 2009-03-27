@@ -244,6 +244,9 @@ public:
 
 	void setConditionSuppressions(uint32_t conditions, bool remove);
 
+	double getRateValue(levelTypes_t rateType) const {return rateValue[rateType];}
+	void setRateValue(levelTypes_t rateType, double value){rateValue[rateType] = value;}
+
 	uint32_t getLossPercent(lossTypes_t lossType) const {return lossPercent[lossType];}
 	void setLossPercent(lossTypes_t lossType, uint32_t newPercent)
 	{
@@ -406,11 +409,6 @@ public:
 	void addOutfit(uint32_t _looktype, uint32_t _addons);
 	bool remOutfit(uint32_t _looktype, uint32_t _addons);
 	bool canLogout();
-
-    //rate variables
-    float skill_multiplier[SKILL_LAST];
-    float magic_multiplier;
-    float exp_multiplier;
 
 	//tile
 	//send methods
@@ -757,6 +755,9 @@ protected:
 
 	//loss percent variables
 	uint32_t lossPercent[LOSS_LAST + 1];
+	
+	//rate value variables
+	float rateValue[LEVEL_LAST + 1];
 
 	LearnedInstantSpellList learnedInstantSpellList;
 
