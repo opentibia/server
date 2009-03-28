@@ -1743,6 +1743,9 @@ void LuaScriptInterface::registerFunctions()
     //doPlayerSetRate(cid, type, value)
     lua_register(m_luaState, "doPlayerSetRate", LuaScriptInterface::luaDoPlayerSetRate);
 
+    //isPzLocked(cid)
+    lua_register(m_luaState, "isPzLocked", LuaScriptInterface::luaIsPzLocked);
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 
@@ -1874,6 +1877,12 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			}
 			break;
 		}
+		case PlayerInfoPzLock:
+			value = player->isPzLocked();
+			break;
+		case PlayerInfoPremium:
+			value = player->isPremium();
+			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -1966,8 +1975,15 @@ int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L){
 
 int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoSkullType);}
+	
 int LuaScriptInterface::luaGetPlayerBalance(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoBalance);}
+	
+int LuaScriptInterface::luaIsPzLocked(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoPzLock);}
+	
+int LuaScriptInterface::luaIsPremium(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoPremium);}
 //
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
@@ -6944,29 +6960,6 @@ int LuaScriptInterface::luaGetCreatureMaxHealth(lua_State *L)
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-	}
-
-	return 1;
-}
-
-int LuaScriptInterface::luaIsPremium(lua_State *L)
-{
-	//isPremium(cid)
-	uint32_t cid = popNumber(L);
-
-	ScriptEnviroment* env = getScriptEnv();
-	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		if(player->isPremium()){
-			lua_pushnumber(L, LUA_TRUE);
-		}
-		else{
-			lua_pushnumber(L, LUA_FALSE);
-		}
-	}
-	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
 

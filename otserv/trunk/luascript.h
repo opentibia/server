@@ -219,7 +219,9 @@ enum PlayerInfo_t{
 	PlayerInfoGUID,
 	PlayerInfoPremiumDays,
 	PlayerInfoSkullType,
-	PlayerInfoBalance
+	PlayerInfoBalance,
+	PlayerInfoPzLock,
+	PlayerInfoPremium
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -596,10 +598,9 @@ protected:
 	static int luaAddEvent(lua_State *L);
 	static int luaStopEvent(lua_State *L);
 	static int luaRegisterCreatureEvent(lua_State *L);
-
 	static int luaGetDataDirectory(lua_State *L);
-	
 	static int luaDoPlayerSetRate(lua_State *L);
+	static int luaIsPzLocked(lua_State *L);
 	//
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
