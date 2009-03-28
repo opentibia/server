@@ -140,7 +140,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[CHECK_ACCOUNTS] = getGlobalBoolean(L, "checkaccounts", false);
 	m_confInteger[USE_ACCBALANCE] = getGlobalBoolean(L, "useaccbalance", false);
 	m_confInteger[PREMIUM_ONLY_BEDS] = getGlobalBoolean(L, "premonlybeds", true);
-	m_confInteger[SKULL_TIME] = getGlobalNumber(L, "skullduration", 12*60*60*1000);
+	m_confInteger[SKULL_TIME] = getGlobalNumber(L, "skullduration", 15*60*1000);
+	m_confInteger[FRAG_TIME] = getGlobalNumber(L, "fragduration", 12*60*60*1000);
 	m_confInteger[KILLS_FOR_RED_SKULL] = getGlobalNumber(L, "killsforredskull", 3);
 	m_confInteger[REMOVE_AMMUNITION] = getGlobalBoolean(L, "remove_ammunition", true);
 	m_confInteger[REMOVE_RUNE_CHARGES] = getGlobalBoolean(L, "remove_rune_charges", true);

@@ -602,6 +602,7 @@ protected:
 	static int luaDoPlayerSetRate(lua_State *L);
 	static int luaIsPzLocked(lua_State *L);
 	static int luaDoSaveServer(lua_State *L);
+	static int luaGetPlayerFrags(lua_State *L);
 	//
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);

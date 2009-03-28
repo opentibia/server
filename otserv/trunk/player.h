@@ -403,6 +403,7 @@ public:
 	void sendCreatureSkull(const Creature* creature) const
 		{if(client) client->sendCreatureSkull(creature);}
 	void checkRedSkullTicks(int32_t ticks);
+	uint32_t getFrags();
 #endif
 	const OutfitListType& getPlayerOutfits();
 	bool canWear(uint32_t _looktype, uint32_t _addons);

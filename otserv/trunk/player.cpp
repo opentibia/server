@@ -3574,8 +3574,6 @@ void Player::onKilledCreature(Creature* target)
 		target->setDropLoot(false);
 	}
 
-	Creature::onKilledCreature(target);
-
 	if(Player* targetPlayer = target->getPlayer()){
 		if(targetPlayer->getZone() == ZONE_PVP){
 			targetPlayer->setDropLoot(false);
@@ -3593,7 +3591,7 @@ void Player::onKilledCreature(Creature* target)
 
 			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
 				pzLocked = true;
-				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
+				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, g_config.getNumber(ConfigManager::SKULL_TIME), 0);
 				addCondition(condition);
 			}
 		}
@@ -3603,6 +3601,8 @@ void Player::onKilledCreature(Creature* target)
 		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_HUNTING, g_config.getNumber(ConfigManager::HUNTING_KILL_DURATION), 0);
 		addCondition(condition);
 	}
+	
+	Creature::onKilledCreature(target);
 }
 
 void Player::gainExperience(uint64_t gainExp)
@@ -3894,13 +3894,13 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
-	redSkullTicks = redSkullTicks + g_config.getNumber(ConfigManager::SKULL_TIME);
+	redSkullTicks += g_config.getNumber(ConfigManager::FRAG_TIME);
 	// We subtract one from kills as if you kill three people, you'll gain 3*time ticks,
 	// however some will probably decay in that time so we only check if the ticks are
 	// greater than 2*time (must be >= N kills then)
 	if(redSkullTicks >
 			(g_config.getNumber(ConfigManager::KILLS_FOR_RED_SKULL) - 1) *
-			 g_config.getNumber(ConfigManager::SKULL_TIME))
+			 g_config.getNumber(ConfigManager::FRAG_TIME))
 	{
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
@@ -4135,4 +4135,15 @@ void Player::checkIdleTime(uint32_t ticks)
             idleWarned = true;
       	}
 	}
+}
+
+uint32_t Player::getFrags()
+{
+    uint32_t frags;
+    if(redSkullTicks <= 0)
+        frags = 0;
+    else
+        frags = (uint32_t)std::ceil(redSkullTicks / g_config.getNumber(ConfigManager::FRAG_TIME));
+    
+    return frags;
 }
