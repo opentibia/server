@@ -169,8 +169,10 @@ void Game::saveGameState()
 	ScriptEnviroment::saveGameState();
 }
 
-bool Game::saveServer()
+bool Game::saveServer(bool globalSave)
 {
+    g_bans.clearUnactiveBans();
+    
 	saveGameState();
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
@@ -180,6 +182,11 @@ bool Game::saveServer()
 		it->second->loginPosition = it->second->getPosition();
 		IOPlayer::instance()->savePlayer(it->second);
 	}
+
+    if(globalSave){
+        Houses::getInstance().payHouses();
+		g_bans.clearTemporaryBans();
+    }
 
 	return map->saveMap();
 

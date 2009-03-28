@@ -414,7 +414,7 @@ void ProtocolAdmin::adminCommandCloseServer()
 			++it;
 		}
 	}
-	bool success = g_game.saveServer();
+	bool success = g_game.saveServer(false);
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
@@ -498,7 +498,7 @@ void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 
 void ProtocolAdmin::adminCommandSaveServer()
 {
-	g_game.saveServer();
+	g_game.saveServer(false);
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){

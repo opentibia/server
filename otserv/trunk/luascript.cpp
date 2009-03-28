@@ -1746,6 +1746,9 @@ void LuaScriptInterface::registerFunctions()
     //isPzLocked(cid)
     lua_register(m_luaState, "isPzLocked", LuaScriptInterface::luaIsPzLocked);
 
+    //doSaveServer(globalsave)
+    lua_register(m_luaState, "doSaveServer", LuaScriptInterface::luaDoSaveServer);
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 
@@ -6864,6 +6867,15 @@ int LuaScriptInterface::luaDoPlayerSetRate(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
     }
 	
+	return 1;
+}
+
+int LuaScriptInterface::luaDoSaveServer(lua_State *L)
+{
+	//doSaveServer(globalSave)
+	bool globalSave = (popNumber(L) > 0);
+	bool b = g_game.saveServer(globalSave);
+    lua_pushnumber(L, b? LUA_TRUE : LUA_FALSE);
 	return 1;
 }
 

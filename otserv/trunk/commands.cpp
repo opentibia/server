@@ -644,7 +644,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 bool Commands::closeServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	g_game.setGameState(GAME_STATE_CLOSED);
-	//kick players with unauthorized players
+
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end())
 	{
@@ -656,19 +656,14 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 			++it;
 		}
 	}
-	// Save the rest of everything (including players that stayed online)
-	g_game.saveServer();
-
-	Player* player = creature->getPlayer();
-
+	
 	// Is it a real serversave?
-	if(param == "serversave"){
-		// Pay houses & clear bans
-		Houses::getInstance().payHouses();
-		g_bans.clearTemporaryBans();
-	}
+	if(param == "serversave")
+        g_game.saveServer(true);
+	else
+        g_game.saveServer(false);
 
-	// Notify player (If he's still online)
+    Player* player = creature->getPlayer();
 	if(player){
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now closed.");
 	}
@@ -679,7 +674,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 bool Commands::saveServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	// Save most everything
-	g_game.saveServer();
+	g_game.saveServer(false);
 
 	// Notify player
 	if(Player* player = creature->getPlayer()){

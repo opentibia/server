@@ -48,7 +48,6 @@ enum RequestedInfo_t{
 	REQUEST_PLAYER_STATUS_INFO = 0x40,
 	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80,
 };
-};
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 uint32_t ProtocolStatus::protocolStatusCount = 0;
