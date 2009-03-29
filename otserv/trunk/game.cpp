@@ -1849,17 +1849,17 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_
 	Tile* toTile = getTile(newPos.x, newPos.y, newPos.z);
 	if(toTile){
 		if(Creature* creature = thing->getCreature()){
-            if(Player* player = creature->getPlayer()){
-                if(!player->hasFlag(PlayerFlag_CanEditHouses)){
-                    HouseTile* houseTile = toTile->getHouseTile();
-                    if(houseTile){
-                        House* house = houseTile->getHouse();
-                        if(house && house->getHouseOwner() != player->getGUID()){
-                            return RET_NOTPOSSIBLE;
-                        }
-                    }
-                }
-            }
+			if(Player* player = creature->getPlayer()){
+				if(!player->hasFlag(PlayerFlag_CanEditHouses)){
+					HouseTile* houseTile = toTile->getHouseTile();
+					if(houseTile){
+						House* house = houseTile->getHouse();
+						if(house && house->getHouseOwner() != player->getGUID()){
+							return RET_NOTPOSSIBLE;
+						}
+					}
+				}
+			}
 			creature->getTile()->moveCreature(creature, toTile, true);
 			return RET_NOERROR;
 		}
@@ -1897,7 +1897,7 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 		return false;
 	}
 
-    player->setIdleTime(0, false);
+	player->setIdleTime(0, false);
 	player->setFollowCreature(NULL);
 	player->onWalk(direction);
 	return (internalMoveCreature(player, direction) == RET_NOERROR);
@@ -2031,12 +2031,12 @@ bool Game::playerOpenPrivateChannel(uint32_t playerId, const std::string& receiv
 	if(!player || player->isRemoved())
 		return false;
 
-    uint32_t guid;
-    std::string receiverName = receiver;
-    if(IOPlayer::instance()->getGuidByName(guid, receiverName))
-        player->sendOpenPrivateChannel(receiverName);
-    else
-        player->sendCancel("A player with this name does not exist.");
+	uint32_t guid;
+	std::string receiverName = receiver;
+	if(IOPlayer::instance()->getGuidByName(guid, receiverName))
+		player->sendOpenPrivateChannel(receiverName);
+	else
+		player->sendCancel("A player with this name does not exist.");
 
 	return true;
 }
@@ -2140,7 +2140,7 @@ bool Game::playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir)
 	if(!player || player->isRemoved())
 		return false;
 
-    player->setIdleTime(0, false);
+	player->setIdleTime(0, false);
 	player->setNextWalkTask(NULL);
 	return player->startAutoWalk(listDir);
 }
@@ -2226,9 +2226,9 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return false;
 	}
 
-    if(isHotkey){
+	if(isHotkey){
 		showUseHotkeyMessage(player, item);
-    }
+	}
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -2287,9 +2287,9 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-    if(isHotkey){
+	if(isHotkey){
 		showUseHotkeyMessage(player, item);
-    }
+	}
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -2361,9 +2361,9 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		return false;
 	}
 
-    if(isHotkey){
+	if(isHotkey){
 		showUseHotkeyMessage(player, item);
-    }
+	}
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -2990,7 +2990,7 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 	if(player == NULL || player->isRemoved())
 		return false;
 
-    const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
 	if(it.id == 0){
 		return false;
 	}
@@ -3299,7 +3299,7 @@ bool Game::playerTurn(uint32_t playerId, Direction dir)
 	if(!player || player->isRemoved())
 		return false;
 		
-    player->setIdleTime(0, false);
+	player->setIdleTime(0, false);
 	return internalCreatureTurn(player, dir);
 }
 
@@ -3320,7 +3320,7 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 		return false;
 
 	if(player->canWear(outfit.lookType, outfit.lookAddons) && player->hasRequestedOutfitWindow()){
-        player->hasRequestedOutfitWindow(false);
+		player->hasRequestedOutfitWindow(false);
 		player->defaultOutfit = outfit;
 		
 		if(player->hasCondition(CONDITION_OUTFIT)){
@@ -3545,7 +3545,7 @@ bool Game::npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, b
 {
 	if(player != NULL)
 	{
-        player->sendCreatureSay(npc, SPEAK_PRIVATE_NP, text);
+		player->sendCreatureSay(npc, SPEAK_PRIVATE_NP, text);
 		player->onCreatureSay(npc, SPEAK_PRIVATE_NP, text);
 	}
 	if(publicize)
@@ -3554,7 +3554,7 @@ bool Game::npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, b
 		SpectatorVec::iterator it;
 		getSpectators(list, npc->getPosition());
 
-        //send to client
+		//send to client
 		Player* tmpPlayer = NULL;
 		for(it = list.begin(); it != list.end(); ++it){
 			tmpPlayer = (*it)->getPlayer();
@@ -4512,7 +4512,7 @@ void Game::FreeThing(Thing* thing)
 
 void Game::showUseHotkeyMessage(Player* player, Item* item)
 {
-    int32_t subType = -1;
+	int32_t subType = -1;
 	if(item->hasSubType() && !item->hasCharges()){
 		subType = item->getSubType();
 	}

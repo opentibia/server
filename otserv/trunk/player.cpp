@@ -252,7 +252,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		s << "yourself.";
 
 		if(hasFlag(PlayerFlag_ShowGroupInsteadOfVocation))
-            s << " You are " << getGroupName() << ".";
+			s << " You are " << getGroupName() << ".";
 		else if(getVocationId() != VOCATION_NONE)
 			s << " You are " << vocation->getVocDescription() << ".";
 		else
@@ -266,8 +266,8 @@ std::string Player::getDescription(int32_t lookDistance) const
 		else
 			s << " He";
 
-        if(hasFlag(PlayerFlag_ShowGroupInsteadOfVocation))
-            s << " is " << getGroupName() << ".";
+		if(hasFlag(PlayerFlag_ShowGroupInsteadOfVocation))
+			s << " is " << getGroupName() << ".";
 		else if(getVocationId() != VOCATION_NONE)
 			s << " is " << vocation->getVocDescription() << ".";
 		else
@@ -669,9 +669,9 @@ std::string Player::getSkillName(int skillid)
 
 void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier /*= true*/)
 {
-    if(useMultiplier){
-        count = uint32_t(count * getRateValue((levelTypes_t)skill));
-    }
+	if(useMultiplier){
+		count = uint32_t(count * getRateValue((levelTypes_t)skill));
+	}
 	skills[skill][SKILL_TRIES] += count * g_config.getNumber(ConfigManager::RATE_SKILL);
 
 #if __DEBUG__
@@ -689,10 +689,10 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 		sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
 		
 		//scripting event - onAdvance
-        CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
-        if(eventAdvance){
-            eventAdvance->executeOnAdvance(this, (skills[skill][SKILL_LEVEL] - 1), skills[skill][SKILL_LEVEL], (levelTypes_t)skill);
-        }
+		CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
+		if(eventAdvance){
+			eventAdvance->executeOnAdvance(this, (skills[skill][SKILL_LEVEL] - 1), skills[skill][SKILL_LEVEL], (levelTypes_t)skill);
+	}
 		
 		sendSkills();
 	}
@@ -1213,16 +1213,16 @@ void Player::sendCancelMessage(ReturnValue message) const
 		break;
 		
 	case RET_NOTREQUIREDPROFESSION:
-        sendCancel("You don't have the required profession.");
-        break;
-        
-	case RET_NOTREQUIREDLEVEL:
-        sendCancel("You don't have the required level.");
-        break;
+		sendCancel("You don't have the required profession.");
+		break;
 
-    case RET_NEEDPREMIUMTOEQUIPITEM:
-        sendCancel("You need a premium account to equip this item.");
-        break;
+	case RET_NOTREQUIREDLEVEL:
+		sendCancel("You don't have the required level.");
+		break;
+
+	case RET_NEEDPREMIUMTOEQUIPITEM:
+		sendCancel("You need a premium account to equip this item.");
+		break;
 
 	case RET_NOTPOSSIBLE:
 	default:
@@ -1446,9 +1446,9 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		{
 			int64_t timeOff = (time(NULL) - lastLogout) - 600;
 			if(timeOff > 0){
-                addStamina(std::min((uint64_t)getSpentStamina(), uint64_t(timeOff * g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN))));
-            }
-        }
+				addStamina(std::min((uint64_t)getSpentStamina(), uint64_t(timeOff * g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN))));
+			}
+		}
 	}
 }
 
@@ -1797,11 +1797,10 @@ void Player::onThink(uint32_t interval)
 		addMessageBuffer();
 	}
 
-    checkIdleTime(interval);
+	checkIdleTime(interval);
 #ifdef __SKULLSYSTEM__
 	checkRedSkullTicks(interval);
 #endif
-   
 }
 
 uint32_t Player::isMuted()
@@ -1894,9 +1893,9 @@ void Player::drainMana(Creature* attacker, int32_t manaLoss)
 void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 {
 	if(amount != 0 && !hasFlag(PlayerFlag_NotGainMana)){
-        if(useMultiplier){
-            amount = uint32_t(amount * getRateValue(LEVEL_MAGIC));
-        }
+		if(useMultiplier){
+			amount = uint32_t(amount * getRateValue(LEVEL_MAGIC));
+		}
 		manaSpent += amount * g_config.getNumber(ConfigManager::RATE_MAGIC);
 		uint32_t reqMana = vocation->getReqMana(magLevel + 1);
 
@@ -1909,10 +1908,10 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
 			
 			//scripting event - onAdvance
-            CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
-            if(eventAdvance){
-                eventAdvance->executeOnAdvance(this, (magLevel - 1), magLevel, LEVEL_MAGIC);
-            }
+			CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
+			if(eventAdvance){
+				eventAdvance->executeOnAdvance(this, (magLevel - 1), magLevel, LEVEL_MAGIC);
+			}
 			
 			sendStats();
 		}
@@ -1963,10 +1962,10 @@ void Player::addExperience(uint64_t exp)
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 		
 		//scripting event - onAdvance
-        CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
-        if(eventAdvance){
-            eventAdvance->executeOnAdvance(this, prevLevel, newLevel, LEVEL_EXPERIENCE);
-        }
+		CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
+		if(eventAdvance){
+			eventAdvance->executeOnAdvance(this, prevLevel, newLevel, LEVEL_EXPERIENCE);
+		}
 	}
 
 	currLevelExp = Player::getExpForLevel(level);
@@ -2108,37 +2107,37 @@ uint32_t Player::getIP() const
 
 void Player::onDie()
 {
-    if(getZone() != ZONE_PVP){
-        bool isLootPrevented = false;
-        bool isSkillPrevented = false;
-    
-        Item* item = NULL;
-        for(int32_t slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
-            if(!(item = getEquippedItem((slots_t)slot))){
-                continue;
-            }
-            const ItemType& it = Item::items[item->getID()];
-            if((it.abilities.preventItemLoss && !isLootPrevented) || (it.abilities.preventSkillLoss && !isSkillPrevented)){
-                if(it.abilities.preventItemLoss){
-                    isLootPrevented = true;
-                }
-                if(it.abilities.preventSkillLoss){
-                    isSkillPrevented = true;
-                }    
-                int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
-                g_game.transformItem(item, item->getID(), newCharge);
-            }
-        }
-    
-        if(isLootPrevented && getSkull() != SKULL_RED){
-            setDropLoot(false);
-        }
-        if(isSkillPrevented){
-            setLossSkill(false);
-        }
-    }
-    
-    Creature::onDie();
+	if(getZone() != ZONE_PVP){
+		bool isLootPrevented = false;
+		bool isSkillPrevented = false;
+
+		Item* item = NULL;
+		for(int32_t slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
+			if(!(item = getEquippedItem((slots_t)slot))){
+				continue;
+			}
+			const ItemType& it = Item::items[item->getID()];
+			if((it.abilities.preventItemLoss && !isLootPrevented) || (it.abilities.preventSkillLoss && !isSkillPrevented)){
+				if(it.abilities.preventItemLoss){
+					isLootPrevented = true;
+				}
+				if(it.abilities.preventSkillLoss){
+					isSkillPrevented = true;
+				}
+				int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
+				g_game.transformItem(item, item->getID(), newCharge);
+			}
+		}
+
+		if(isLootPrevented && getSkull() != SKULL_RED){
+			setDropLoot(false);
+		}
+		if(isSkillPrevented){
+			setLossSkill(false);
+		}
+	}
+
+	Creature::onDie();
 }
 
 void Player::die()
@@ -2233,10 +2232,10 @@ void Player::die()
 		sendReLoginWindow();
 	}
 	else if(getZone() != ZONE_PVP){
-        //Send death window if skillLoss = false
-        //and if player died out of a pvp zone
-        sendReLoginWindow();
-    }
+		//Send death window if skillLoss = false
+		//and if player died out of a pvp zone
+		sendReLoginWindow();
+	}
 }
 
 Item* Player::dropCorpse()
@@ -2651,13 +2650,13 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				return RET_NEEDEXCHANGE;
 			}
 		}
-        
-        //check moveEvent
-        ReturnValue _ret = g_moveEvents->canPlayerWearEquip(const_cast<Player*>(this), const_cast<Item*>(item), (slots_t)index);
-        if(_ret != RET_NOERROR){
-            return _ret;
-        }
-        
+
+		//check moveEvent
+		ReturnValue _ret = g_moveEvents->canPlayerWearEquip(const_cast<Player*>(this), const_cast<Item*>(item), (slots_t)index);
+		if(_ret != RET_NOERROR){
+			return _ret;
+		}
+
 		//check if enough capacity
 		if(hasCapacity(item, count))
 			return ret;
@@ -3178,7 +3177,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 
 		inventory[index] = item;
 		item->setParent(this);
-  }
+	}
 }
 
 bool Player::setFollowCreature(Creature* creature, bool fullPathSearch /*= false*/)
@@ -3302,9 +3301,9 @@ uint64_t Player::getGainedExperience(Creature* attacker, bool useMultiplier /*= 
 
 				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor( getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ) );
 				if(!useMultiplier)
-                    return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
-                else
-                    return uint64_t((result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE)) * attackerPlayer->getRateValue(LEVEL_EXPERIENCE));
+					return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
+				else
+					return uint64_t((result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE)) * attackerPlayer->getRateValue(LEVEL_EXPERIENCE));
 		}
 	}
 
@@ -4103,7 +4102,7 @@ void Player::addStamina(int32_t value)
 {
 	stamina += value;
 
-    //stamina may not be bigger than 201660000, and not smaller than 0
+	//stamina may not be bigger than 201660000, and not smaller than 0
 	if(stamina > 201660000)
 		stamina = 201660000;
 	if(stamina < 0)
@@ -4112,11 +4111,11 @@ void Player::addStamina(int32_t value)
 
 int32_t Player::getStaminaMinutes()
 {
-    if(hasFlag(PlayerFlag_HasInfiniteStamina)){
-        return 3360;
-    }
-    
-    return std::min(3360, int(stamina) / 60000);
+	if(hasFlag(PlayerFlag_HasInfiniteStamina)){
+		return 3360;
+	}
+
+	return std::min(3360, int(stamina) / 60000);
 }
 
 void Player::checkIdleTime(uint32_t ticks)
@@ -4125,25 +4124,25 @@ void Player::checkIdleTime(uint32_t ticks)
 		idleTime += ticks;
 		if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME)){
 			kickPlayer();
-        }
+		}
 		else if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) && !idleWarned){
-            int32_t alreadyIdleTime = g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) / 60000;
-            int32_t remainingTime = (g_config.getNumber(ConfigManager::IDLE_TIME) - g_config.getNumber(ConfigManager::IDLE_TIME_WARNING)) / 60000;
-            std::stringstream message;
-            message << "You have been idle for " << alreadyIdleTime << " " << (alreadyIdleTime > 1 ? "minutes" : "minute") << ", you will be disconnected in " << remainingTime << " " << (remainingTime > 1 ? "minutes" : "minute") << " if you are still idle then.";
-            client->sendTextMessage(MSG_STATUS_WARNING, message.str());
-            idleWarned = true;
-      	}
+			int32_t alreadyIdleTime = g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) / 60000;
+			int32_t remainingTime = (g_config.getNumber(ConfigManager::IDLE_TIME) - g_config.getNumber(ConfigManager::IDLE_TIME_WARNING)) / 60000;
+			std::stringstream message;
+			message << "You have been idle for " << alreadyIdleTime << " " << (alreadyIdleTime > 1 ? "minutes" : "minute") << ", you will be disconnected in " << remainingTime << " " << (remainingTime > 1 ? "minutes" : "minute") << " if you are still idle then.";
+			client->sendTextMessage(MSG_STATUS_WARNING, message.str());
+			idleWarned = true;
+		}
 	}
 }
 
 uint32_t Player::getFrags()
 {
-    uint32_t frags;
-    if(redSkullTicks <= 0)
-        frags = 0;
-    else
-        frags = (uint32_t)std::ceil(redSkullTicks / g_config.getNumber(ConfigManager::FRAG_TIME));
-    
-    return frags;
+	uint32_t frags;
+	if(redSkullTicks <= 0)
+		frags = 0;
+	else
+		frags = redSkullTicks / g_config.getNumber(ConfigManager::FRAG_TIME);
+
+	return frags;
 }

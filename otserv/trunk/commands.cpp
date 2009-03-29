@@ -659,11 +659,11 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 	
 	// Is it a real serversave?
 	if(param == "serversave")
-        g_game.saveServer(true);
+		g_game.saveServer(true);
 	else
-        g_game.saveServer(false);
+		g_game.saveServer(false);
 
-    Player* player = creature->getPlayer();
+	Player* player = creature->getPlayer();
 	if(player){
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now closed.");
 	}

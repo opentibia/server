@@ -681,7 +681,7 @@ bool LuaScriptInterface::initState()
 
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 
-    registerFunctions();
+	registerFunctions();
 
 	if(loadFile(std::string(datadir + "global.lua")) == -1){
 		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << datadir << "global.lua." << std::endl;
@@ -874,7 +874,7 @@ void LuaScriptInterface::pushPosition(lua_State *L, const Position& position, ui
 
 void LuaScriptInterface::pushCallback(lua_State *L, int32_t callback)
 {
-    lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
+	lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
 }
 
 LuaVariant LuaScriptInterface::popVariant(lua_State *L)
@@ -1319,7 +1319,7 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doTileAddItemEx", LuaScriptInterface::luaDoTileAddItemEx);
 
 	//doAddContainerItemEx(uid, virtuid)
-    lua_register(m_luaState, "doAddContainerItemEx", LuaScriptInterface::luaAddContainerItemEx);
+	lua_register(m_luaState, "doAddContainerItemEx", LuaScriptInterface::luaAddContainerItemEx);
 
 	//doRelocate(pos, posTo)
 	//Moves all moveable objects from pos to posTo
@@ -1740,17 +1740,17 @@ void LuaScriptInterface::registerFunctions()
 	//getDataDir()
 	lua_register(m_luaState, "getDataDir", LuaScriptInterface::luaGetDataDirectory);
 
-    //doPlayerSetRate(cid, type, value)
-    lua_register(m_luaState, "doPlayerSetRate", LuaScriptInterface::luaDoPlayerSetRate);
+	//doPlayerSetRate(cid, type, value)
+	lua_register(m_luaState, "doPlayerSetRate", LuaScriptInterface::luaDoPlayerSetRate);
 
-    //isPzLocked(cid)
-    lua_register(m_luaState, "isPzLocked", LuaScriptInterface::luaIsPzLocked);
+	//isPzLocked(cid)
+	lua_register(m_luaState, "isPzLocked", LuaScriptInterface::luaIsPzLocked);
 
-    //doSaveServer(globalsave)
-    lua_register(m_luaState, "doSaveServer", LuaScriptInterface::luaDoSaveServer);
+	//doSaveServer(globalsave)
+	lua_register(m_luaState, "doSaveServer", LuaScriptInterface::luaDoSaveServer);
 
-    //getPlayerFrags(cid)
-    lua_register(m_luaState, "getPlayerFrags", LuaScriptInterface::luaGetPlayerFrags);
+	//getPlayerFrags(cid)
+	lua_register(m_luaState, "getPlayerFrags", LuaScriptInterface::luaGetPlayerFrags);
 
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -2795,20 +2795,20 @@ int LuaScriptInterface::luaDoTileAddItemEx(lua_State *L)
 
 int LuaScriptInterface::luaAddContainerItemEx(lua_State *L)
 {
-    //doAddContainerItemEx(uid, virtuid)
-   	uint32_t virtuid = (uint32_t)popNumber(L);
+	//doAddContainerItemEx(uid, virtuid)
+	uint32_t virtuid = (uint32_t)popNumber(L);
 	uint32_t uid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 	Container* container = env->getContainerByUID(uid);
 	if(container){
-       	Item* item = env->getItemByUID(virtuid);
+	   	Item* item = env->getItemByUID(virtuid);
 
-	    if(!item){
-            reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
-    	    lua_pushnumber(L, LUA_ERROR);
-		    return 1;
-        }
+		if(!item){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
 
 		if(item->getParent() != VirtualCylinder::virtualCylinder){
 			reportErrorFunc("Item already has a parent");
@@ -2816,16 +2816,16 @@ int LuaScriptInterface::luaAddContainerItemEx(lua_State *L)
 			return 1;
 		}
 
-        ReturnValue ret = RET_NOERROR;
-        ret = g_game.internalAddItem(container, item);
+		ReturnValue ret = RET_NOERROR;
+		ret = g_game.internalAddItem(container, item);
 
 		if(ret == RET_NOERROR){
 			env->removeTempItem(item);
 		}
 
-	    lua_pushnumber(L, ret);
-	    return 1;
-    }
+		lua_pushnumber(L, ret);
+		return 1;
+	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -4392,11 +4392,11 @@ int LuaScriptInterface::luaDoPlayerAddExp(lua_State *L)
 	//doPlayerAddExp(cid, exp, <optional: default: 0> useRate, <optional: default: 0> useMultiplier)
 	int32_t parameters = lua_gettop(L);
 
-    bool useMultiplier = false;
-    bool useRate = false;
+	bool useMultiplier = false;
+	bool useRate = false;
 	if(parameters > 3){
-        useMultiplier = (popNumber(L) >= 1);
-    }
+		useMultiplier = (popNumber(L) >= 1);
+	}
 	if(parameters > 2){
 		useRate = (popNumber(L) >= 1);
 	}
@@ -4408,7 +4408,7 @@ int LuaScriptInterface::luaDoPlayerAddExp(lua_State *L)
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
 		if(exp > 0){
-            exp = int64_t(exp * (useMultiplier? player->getRateValue(LEVEL_EXPERIENCE) : 1.0) * (useRate? g_config.getNumber(ConfigManager::RATE_EXPERIENCE) : 1.0));
+			exp = int64_t(exp * (useMultiplier? player->getRateValue(LEVEL_EXPERIENCE) : 1.0) * (useRate? g_config.getNumber(ConfigManager::RATE_EXPERIENCE) : 1.0));
 			player->addExperience(exp);
 			lua_pushnumber(L, LUA_TRUE);
 		}
@@ -6864,11 +6864,11 @@ int LuaScriptInterface::luaDoPlayerSetRate(lua_State *L)
 			reportErrorFunc("No valid rate type.");
 			lua_pushnumber(L, LUA_ERROR);
 		}
-    }
-    else{
-   	    reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-    }
+	}
 	
 	return 1;
 }
@@ -6878,7 +6878,7 @@ int LuaScriptInterface::luaDoSaveServer(lua_State *L)
 	//doSaveServer(globalSave)
 	bool globalSave = (popNumber(L) > 0);
 	bool b = g_game.saveServer(globalSave);
-    lua_pushnumber(L, b? LUA_TRUE : LUA_FALSE);
+	lua_pushnumber(L, b? LUA_TRUE : LUA_FALSE);
 	return 1;
 }
 
@@ -6889,15 +6889,15 @@ int LuaScriptInterface::luaGetPlayerFrags(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 	
-    Player* player = env->getPlayerByUID(cid);
+	Player* player = env->getPlayerByUID(cid);
 	if(player){
-        lua_pushnumber(L, player->getFrags());
-    }
+		lua_pushnumber(L, player->getFrags());
+	}
 	else 
-    {		
-        reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+	{		
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-    }
+	}
 
 	return 1;
 }
@@ -7036,7 +7036,7 @@ int LuaScriptInterface::luaHasProperty(lua_State *L)
 
 	Item* item = env->getItemByUID(uid);
 	if(!item){
-        reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -7084,7 +7084,7 @@ int LuaScriptInterface::luaGetCreatureMaster(lua_State *L)
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(!creature){
-        reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
