@@ -61,7 +61,6 @@ public:
 
 	void loadSettings();
 	bool clearTemporaryBans();
-	bool clearUnactiveBans();
 
 	bool isIpBanished(uint32_t clientip, uint32_t mask = 0xFFFFFFFF) const;
 	bool isPlayerBanished(const std::string& name) const;

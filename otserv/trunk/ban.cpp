@@ -53,14 +53,6 @@ bool BanManager::clearTemporaryBans() {
 	return db->executeQuery(query.str());
 }
 
-bool BanManager::clearUnactiveBans()
-{
-    Database* db = Database::instance();
-    DBQuery query;
-    query << "UPDATE `bans` SET `active` = 0 WHERE `expires` > 0 AND `expires` <= " << std::time(NULL);
-    return db->executeQuery(query.str());
-}
-
 bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/) const
 {
 	if(clientip != 0){
