@@ -185,22 +185,19 @@ end
 
 		local housePrice = self:getPrice()
 		local guid = getPlayerGUID(cid)
-		local playerOwnHouse = (House.getHouseByOwnerGUID(guid) ~= nil)
-		local hasOwner = (self:getOwner() ~= 0)
-		local needPremiumToBuyHouse = (HOUSE_CONFIG.needPremium == "yes")
 		local levelToBuy = HOUSE_CONFIG.levelToBuyHouse
 
-		if(hasOwner) then
+		if self:getOwner() ~= 0 then
 			doPlayerSendCancel(cid, 'Someone already owns this house.')
 			return false		
 		end
 
-		if(playerOwnHouse) then
+		if House.getHouseByOwnerGUID(guid) ~= nil then
 			doPlayerSendCancel(cid, 'You already own a house.')
 			return false
 		end
 
-		if(needPremiumToBuyHouse and isPremium(cid) == FALSE) then
+		if(HOUSE_CONFIG.needPremium == "yes" and isPremium(cid) == FALSE) then
 			doPlayerSendCancel(cid, 'Only premium players are able to buy a house.')
 			return false
 		end

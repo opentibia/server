@@ -65,6 +65,9 @@ local function doPlayerRemPremOutfits(cid)
 end
 
 function onLogin(cid)
+	--Register the kill event
+	registerCreatureEvent(cid, "AutoBan")
+
 	if(isPremium(cid) == TRUE) then
 		if not(canPlayerWearPremiumOutfits(cid)) then
 			doPlayerAddPremOutfits(cid)

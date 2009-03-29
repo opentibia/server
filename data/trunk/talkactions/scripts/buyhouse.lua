@@ -6,12 +6,6 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_RED, words)
 		return FALSE
 	end
-	
-	if house:getOwner() ~= 0 then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "This house has already been bought.")
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_RED, words)
-		return FALSE
-	end
 
 	if(house:buy(cid)) then
 		doSendMagicEffect(getThingPos(cid), CONST_ME_MAGIC_BLUE)
