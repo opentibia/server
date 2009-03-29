@@ -96,6 +96,12 @@ skullduration = 15*60*1000
 -- How many players you need to kill to gain a red skull
 killsforredskull = 3
 
+-- How many players you need to kill to get banished
+frags_to_banishment = 6
+
+-- Time in seconds a player will be banished for excessive killing
+kill_ban_time = 24*60*60*30
+
 -- Extra experience % per player when sharing experience
 party_exp_mul = 5
 
