@@ -511,14 +511,27 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 
 void ProtocolGame::onConnect()
 {
-	OutputMessage_ptr output(new OutputMessage);
-	output->AddU16(0x06); //length (6)
-	output->AddByte(0x1F); //packet type (31)
-	output->AddU16(random_range(0, 65535)); //2 random bytes
-	output->AddU16(0x00); //2 static bytes (0)
-	output->AddByte(random_range(0, 255)); //1 random byte
-	output->addCryptoHeader(true); //adler -> total length + adler + above
-	getConnection()->send(output);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+
+	// Packet length
+	//output->AddU16(0x06); //length (6)
+	
+	// Packet type
+	output->AddByte(0x1F);
+
+	// Seems arbitrary, probably isn't
+	output->AddByte(random_range(0, 0xFF));
+	output->AddByte(random_range(0, 0xFF));
+
+	output->AddU16(0x00);
+
+	// Arbitrary too (?)
+	output->AddByte(random_range(0, 0xFF));
+
+	// Enable checksum
+	enableChecksum();
+
+	OutputMessagePool::getInstance()->send(output);
 }
 
 void ProtocolGame::disconnectClient(uint8_t error, const char* message)

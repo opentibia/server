@@ -57,13 +57,13 @@ CREATE TABLE "players" (
     "redskull" SMALLINT NOT NULL DEFAULT 0,
     "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
     "loss_experience" INT NOT NULL DEFAULT 10,
-    "loss_mana" INT NOT NULL DEFAULT 10,
-    "loss_skills" INT NOT NULL DEFAULT 10,
-    "loss_items" INT NOT NULL DEFAULT 10,
+    "loss_mana" INT NOT NULL DEFAULT 100,
+    "loss_skills" INT NOT NULL DEFAULT 100,
+    "loss_items" INT NOT NULL DEFAULT 100,
     "rank_id" INT NOT NULL,
     "town_id" INT NOT NULL,
     "balance" INT NOT NULL DEFAULT 0,
-    "stamina" INT NOT NULL DEFAULT 201660000,
+    "stamina" INT NOT NULL DEFAULT 151200000,
     PRIMARY KEY ("id"),
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE,
@@ -203,7 +203,7 @@ CREATE TABLE "schema_info" (
     PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 4);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 5);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER

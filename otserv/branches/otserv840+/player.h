@@ -805,31 +805,11 @@ protected:
 #endif
 
 	void updateItemsLight(bool internal = false);
-	virtual int32_t getStepSpeed() const
-	{
-		if(getSpeed() > PLAYER_MAX_SPEED){
-			return PLAYER_MAX_SPEED;
-		}
-		else if(getSpeed() < PLAYER_MIN_SPEED){
-			return PLAYER_MIN_SPEED;
-		}
-
-		return getSpeed();
-	}
-	void updateBaseSpeed()
-	{
-		if(!hasFlag(PlayerFlag_SetMaxSpeed)){
-			baseSpeed = 220 + (2* (level - 1));
-		}
-		else{
-			baseSpeed = 900;
-		};
-	}
+	virtual int32_t getStepSpeed() const;
+	void updateBaseSpeed();
 
 	static uint32_t getPercentLevel(uint64_t count, uint32_t nextLevelCount);
-	virtual uint64_t getLostExperience() const {
-		return (skillLoss ? (experience * lossPercent[LOSS_EXPERIENCE]/100) : 0);
-	}
+	virtual uint64_t getLostExperience() const;
 
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }

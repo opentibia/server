@@ -624,6 +624,30 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 	return 0;
 }
 
+uint64_t Player::getLostExperience() const
+{
+	if(skillLoss)
+		return 0;
+
+	if(level < 25)
+		// 100 loss is "normal" (10%), so dividing by 1000 gives correct value
+		return experience * lossPercent[LOSS_EXPERIENCE] / 1000;
+
+	double levels_to_lose = (getLevel() + 50) / 100.;
+	uint64_t xp_to_lose = 0.0;
+	int clevel = getLevel();
+
+	while(levels_to_lose > 1.0){
+		xp_to_lose += getExpForLevel(clevel);
+		clevel--;
+		levels_to_lose -= 1.0;
+	}
+	if(levels_to_lose > 0.0)
+		xp_to_lose += uint64_t(getExpForLevel(clevel) * levels_to_lose);
+
+	return xp_to_lose * lossPercent[LOSS_EXPERIENCE] / 1000; // 1 for level 100 etc.
+}
+
 int32_t Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
 {
 	int32_t n = skills[skilltype][skillinfo];
@@ -756,6 +780,29 @@ int32_t Player::getDefaultStats(stats_t stat)
 			return 0;
 			break;
 	}
+}
+
+
+int32_t Player::getStepSpeed() const
+{
+	if(getSpeed() > PLAYER_MAX_SPEED){
+		return PLAYER_MAX_SPEED;
+	}
+	else if(getSpeed() < PLAYER_MIN_SPEED){
+		return PLAYER_MIN_SPEED;
+	}
+
+	return getSpeed();
+}
+
+void Player::updateBaseSpeed()
+{
+	if(!hasFlag(PlayerFlag_SetMaxSpeed)){
+		baseSpeed = 220 + (2* (level - 1));
+	}
+	else{
+		baseSpeed = 900;
+	};
 }
 
 Container* Player::getContainer(uint32_t cid)

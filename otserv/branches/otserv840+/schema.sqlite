@@ -55,13 +55,13 @@ CREATE TABLE "players" (
     "redskull" BOOLEAN NOT NULL DEFAULT 0,
     "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
     "loss_experience" INTEGER NOT NULL DEFAULT 10,
-    "loss_mana" INTEGER NOT NULL DEFAULT 10,
-    "loss_skills" INTEGER NOT NULL DEFAULT 10,
-    "loss_items" INTEGER NOT NULL DEFAULT 10,
+    "loss_mana" INTEGER NOT NULL DEFAULT 100,
+    "loss_skills" INTEGER NOT NULL DEFAULT 100,
+    "loss_items" INTEGER NOT NULL DEFAULT 100,
     "rank_id" INTEGER NOT NULL,
     "town_id" INTEGER NOT NULL,
     "balance" INTEGER NOT NULL DEFAULT 0,
-    "stamina" INTEGER NOT NULL DEFAULT 201660000,
+    "stamina" INTEGER NOT NULL DEFAULT 151200000,
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
@@ -194,7 +194,7 @@ CREATE TABLE "schema_info" (
     UNIQUE ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 4);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 5);
 
 CREATE TRIGGER "oncreate_guilds"
 AFTER INSERT ON "guilds"
