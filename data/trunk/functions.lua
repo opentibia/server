@@ -1,5 +1,17 @@
 getConfigInfo = getConfigValue
 
+function setExperienceRate(cid, value)
+	return doPlayerSetRate(cid, LEVEL_EXPERIENCE, value)
+end
+
+function setMagicRate(cid, value)
+	return doPlayerSetRate(cid, LEVEL_MAGIC, value)
+end
+
+function setSkillRate(cid, skillid, value)
+	return doPlayerSetRate(cid, skillid, value)
+end
+
 function isSorcerer(cid)
 	if(isPlayer(cid) == FALSE) then
 		debugPrint("isSorcerer: Player not found.")
@@ -461,4 +473,3 @@ function convertIPToInt(str)
 		return ipint, maskint
 	end
 end
-
