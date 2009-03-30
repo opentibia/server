@@ -165,7 +165,7 @@ int32_t Weapons::getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
 int32_t Weapons::getMaxWeaponDamage(int32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor)
 {
 	// Updated to include level in formula!
-	return (int32_t)std::ceil(2 * ((float)(attackValue * (attackSkill + 5.8) / 25. + level       / 10. - 0.1) / attackFactor) );
+	return (int32_t)std::ceil(2 * ((float)(attackValue * (attackSkill + 5.8) / 25. + level / 10. - 0.1) / attackFactor) );
 }
 
 Weapon::Weapon(LuaScriptInterface* _interface) :
@@ -499,9 +499,9 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		}
 	}
 
-    if(!player->hasFlag(PlayerFlag_HasNoExhaustion) && hasExhaustion()){
-        player->addCombatExhaust(g_game.getFightExhaustionTicks());
-    }
+	if(!player->hasFlag(PlayerFlag_HasNoExhaustion) && hasExhaustion()){
+		player->addCombatExhaust(g_game.getFightExhaustionTicks());
+	}
 
 	int32_t manaCost = getManaCost(player);
 	if(manaCost > 0){

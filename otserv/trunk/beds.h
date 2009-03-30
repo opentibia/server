@@ -42,7 +42,7 @@ public:
 	virtual const BedItem* getBed() const { return this; }
 
 	//serialization
-    virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	//override

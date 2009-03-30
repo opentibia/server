@@ -255,8 +255,8 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddString(g_config.getString(ConfigManager::MOTD).c_str());
 		output->AddString(g_config.getString(ConfigManager::LOCATION).c_str());
 		output->AddString(g_config.getString(ConfigManager::URL).c_str());
-		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
-		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
+		output->AddU32((uint32_t)(running >> 32));	// this method prevents a big number parsing
+		output->AddU32((uint32_t)(running));		// since servers can be online for months ;)
 	}
 
 	if(requestedInfo & REQUEST_PLAYERS_INFO){

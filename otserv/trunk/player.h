@@ -191,7 +191,7 @@ public:
 	uint32_t getTown() const {return town;}
 	void setTown(uint32_t _town) {town = _town;}
 
-    bool checkLoginAttackDelay(uint32_t attackerId) const;
+	bool checkLoginAttackDelay(uint32_t attackerId) const;
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
@@ -453,7 +453,7 @@ public:
 	void sendCreatureLight(const Creature* creature)
 		{if(client) client->sendCreatureLight(creature);}
 	void sendCreatureShield(const Creature* creature)
-	    {if(client) client->sendCreatureShield(creature);}
+		{if(client) client->sendCreatureShield(creature);}
 
 	//container
 	void sendAddContainerItem(const Container* container, const Item* item);
@@ -549,7 +549,7 @@ public:
 	void sendSaleItemList() const
 		{if(client) client->sendSaleItemList(shopItemList);}
 	void sendCloseShop() const
-	    {if(client) client->sendCloseShop();}
+		{if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const
@@ -622,12 +622,12 @@ public:
 	void addStamina(int32_t value);
 	void removeStamina(int32_t value) {addStamina(-value);}
 	int32_t getStaminaMinutes();
-    int32_t getStamina() {return stamina;}
-    int32_t getSpentStamina() {return 201660000 - stamina;}
-    
-    //outfits
-    void hasRequestedOutfitWindow(bool newValue) {requestedOutfitWindow = newValue;}
-    bool hasRequestedOutfitWindow() {return requestedOutfitWindow;}
+	int32_t getStamina() {return stamina;}
+	int32_t getSpentStamina() {return 201660000 - stamina;}
+
+	//outfits
+	void hasRequestedOutfitWindow(bool newValue) {requestedOutfitWindow = newValue;}
+	bool hasRequestedOutfitWindow() {return requestedOutfitWindow;}
 
 	//depots
 	DepotMap depots;
@@ -647,7 +647,7 @@ protected:
 	void setNextWalkTask(SchedulerTask* task);
 	void setNextActionTask(SchedulerTask* task);
 
-    void onDie();
+	void onDie();
 	void die();
 	virtual Item* dropCorpse();
 	virtual Item* getCorpse();

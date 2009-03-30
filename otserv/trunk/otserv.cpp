@@ -38,13 +38,13 @@
 
 
 #if !defined(__WINDOWS__)
-    #include <unistd.h> // for access()
+	#include <unistd.h> // for access()
 #endif
 
 #if !defined(__WINDOWS__)
-    #define OTSERV_ACCESS(file,mode) access(file,mode)
+	#define OTSERV_ACCESS(file,mode) access(file,mode)
 #else
-    #define OTSERV_ACCESS(file,mode) _access(file,mode)
+	#define OTSERV_ACCESS(file,mode) _access(file,mode)
 #endif
 
 
@@ -364,13 +364,13 @@ void mainLoader(const CommandLineOptions& command_opts)
 	}
 
 	// read global config
-    std::cout << ":: Loading lua script " << configname << "... " << std::flush;
+	std::cout << ":: Loading lua script " << configname << "... " << std::flush;
 
 #ifdef SYSCONFDIR
-    std::string sysconfpath;
-    sysconfpath = SYSCONFDIR;
-    sysconfpath += "/otserv/";
-    sysconfpath += configname;
+	std::string sysconfpath;
+	sysconfpath = SYSCONFDIR;
+	sysconfpath += "/otserv/";
+	sysconfpath += configname;
 #endif
 
 
@@ -380,17 +380,17 @@ void mainLoader(const CommandLineOptions& command_opts)
 	configpath += "/.otserv/";
 	configpath += configname;
 
-    #ifdef SYSCONFDIR
-        if (!g_config.loadFile(configname) && !g_config.loadFile(configpath) && !g_config.loadFile(sysconfpath))
-    #else
-        if (!g_config.loadFile(configname) && !g_config.loadFile(configpath))
-    #endif
+	#ifdef SYSCONFDIR
+		if (!g_config.loadFile(configname) && !g_config.loadFile(configpath) && !g_config.loadFile(sysconfpath))
+	#else
+		if (!g_config.loadFile(configname) && !g_config.loadFile(configpath))
+	#endif
 #else
-    #ifdef SYSCONFDIR
-        if (!g_config.loadFile(configname) && !g_config.loadFile(sysconfpath))
-    #else
-        if (!g_config.loadFile(configname))
-    #endif
+	#ifdef SYSCONFDIR
+		if (!g_config.loadFile(configname) && !g_config.loadFile(sysconfpath))
+	#else
+		if (!g_config.loadFile(configname))
+	#endif
 #endif
 	{
 		std::ostringstream os;
@@ -406,16 +406,16 @@ void mainLoader(const CommandLineOptions& command_opts)
 
 
 
-#if defined(PKGDATADIR) && !defined(__WINDOWS__) // i dont care enough to port this to win32, prolly not needed
-    // let's fix the datadir, if necessary...
-    if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
-        // if not then try replacing it with "global" datadir
-        std::cout << ":: No datadir '" << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "', using a system-wide one" << std::endl;
+#if defined(PKGDATADIR) && !defined(__WINDOWS__) // I dont care enough to port this to win32, prolly not needed
+	// let's fix the datadir, if necessary...
+	if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
+		// if not then try replacing it with "global" datadir
+		std::cout << ":: No datadir '" << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "', using a system-wide one" << std::endl;
 
-        std::string dd = PKGDATADIR;
-        dd += "/";
-        dd += g_config.getString(ConfigManager::DATA_DIRECTORY);
-        g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
+		std::string dd = PKGDATADIR;
+		dd += "/";
+		dd += g_config.getString(ConfigManager::DATA_DIRECTORY);
+		g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
 
 	if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if this new one exists
 		// if not lets try using the "raw" datadir
@@ -426,16 +426,16 @@ void mainLoader(const CommandLineOptions& command_opts)
 		g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
 	}
 
-    }
+	}
 #endif
-    std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;
+	std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;
 	/* Won't compile! access is not standard
-    if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
-        ErrorMessage("Data directory does not exist!");
-        exit(-1);
-    }
+	if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
+		ErrorMessage("Data directory does not exist!");
+		exit(-1);
+	}
 	*/
-    std::cout << "[done]" << std::endl;
+	std::cout << "[done]" << std::endl;
 
 	std::cout << ":: Checking Database Connection... ";
 	Database* db = Database::instance();
@@ -600,19 +600,19 @@ void mainLoader(const CommandLineOptions& command_opts)
 	}
 
 
-    if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE),
-    	g_config.getString(ConfigManager::MAP_KIND))){
-        // ok ... so we didn't succeed in laoding the map.
-        // perhaps the path to map didn't include path to data directory?
-        // let's try to prepend path to datadir before bailing out miserably.
-    	filename.str("");
-        filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << g_config.getString(ConfigManager::MAP_FILE);
+	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE),
+		g_config.getString(ConfigManager::MAP_KIND))){
+		// ok ... so we didn't succeed in laoding the map.
+		// perhaps the path to map didn't include path to data directory?
+		// let's try to prepend path to datadir before bailing out miserably.
+		filename.str("");
+		filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << g_config.getString(ConfigManager::MAP_FILE);
 
-        if(!g_game.loadMap(filename.str(),
-            g_config.getString(ConfigManager::MAP_KIND))){
+		if(!g_game.loadMap(filename.str(),
+			g_config.getString(ConfigManager::MAP_KIND))){
 		ErrorMessage("Couldn't load map");
-                exit(-1);
-            }
+				exit(-1);
+			}
 
 
 	}

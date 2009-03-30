@@ -112,7 +112,7 @@ public:
 	uint32_t executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	//
 	
-	ReturnValue canPlayerWearEquip(Player* player, Item* item, slots_t slot);
+	ReturnValue canPlayerWearEquip(Player* player, slots_t slot);
 
 	//onEquip information
 	int32_t getReqLevel() const {return reqLevel;}

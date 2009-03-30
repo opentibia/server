@@ -183,7 +183,7 @@ bool TalkAction::configureEvent(xmlNodePtr p)
 	
 	if(readXMLInteger(p, "case-sensitive", intValue) || readXMLInteger(p, "sensitive", intValue)){
 		caseSensitive = (intValue != 0);
-    }
+	}
 
 	return true;
 }

@@ -286,10 +286,10 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 			return false;
 		}
 
-        if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
-            disconnectClient(0x14, "You may only login with a Gamemaster account.");
-            return false;
-        }
+		if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+			disconnectClient(0x14, "You may only login with a Gamemaster account.");
+			return false;
+		}
 
 		if(g_game.getGameState() == GAME_STATE_CLOSING && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
 			disconnectClient(0x14, "The game is just going down.\nPlease try again later.");
@@ -629,15 +629,15 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0x7A: // player bought from shop
-	    parsePlayerPurchase(msg);
-	    break;
+		parsePlayerPurchase(msg);
+		break;
 
 	case 0x7B: // player sold to shop
-	    parsePlayerSale(msg);
-	    break;
+		parsePlayerSale(msg);
+		break;
 
 	case 0x7C: // player closed shop window
-	    parseCloseShop(msg);
+		parseCloseShop(msg);
 		break;
 
 	case 0x7D: // Request trade
@@ -1830,7 +1830,7 @@ void ProtocolGame::sendShop(const std::list<ShopInfo>& shop)
 
 void ProtocolGame::sendCloseShop()
 {
-    NetworkMessage_ptr msg = getOutputBuffer();
+	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7C);

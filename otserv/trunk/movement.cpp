@@ -388,11 +388,11 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 
 ReturnValue MoveEvents::canPlayerWearEquip(Player* player, Item* item, slots_t slot)
 {
-    MoveEvent* moveEvent = getEvent(item, MOVE_EVENT_EQUIP, slot);
-    if(moveEvent){
-        return moveEvent->canPlayerWearEquip(player, item, slot);
-    }
-    return RET_NOERROR;
+	MoveEvent* moveEvent = getEvent(item, MOVE_EVENT_EQUIP, slot);
+	if(moveEvent){
+		return moveEvent->canPlayerWearEquip(player, slot);
+	}
+	return RET_NOERROR;
 }
 
 MoveEvent::MoveEvent(LuaScriptInterface* _interface) :
@@ -972,27 +972,27 @@ uint32_t MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position
 	}
 }
 
-ReturnValue MoveEvent::canPlayerWearEquip(Player* player, Item* item, slots_t slot)
+ReturnValue MoveEvent::canPlayerWearEquip(Player* player, slots_t slot)
 {
-    //check if we need to continue
-    if(player->isItemAbilityEnabled(slot) || player->hasFlag(PlayerFlag_IgnoreWeaponCheck) || getWieldInfo() == 0){
+	//check if we need to continue
+	if(player->isItemAbilityEnabled(slot) || player->hasFlag(PlayerFlag_IgnoreWeaponCheck) || getWieldInfo() == 0){
 		return RET_NOERROR;
 	}
 	
-    //check all required values
-    const VocEquipMap vocMap = getVocEquipMap();
-    if(vocMap.find(player->getVocationId()) == vocMap.end()){
-        return RET_NOTREQUIREDPROFESSION;
-    }
+	//check all required values
+	const VocEquipMap vocMap = getVocEquipMap();
+	if(vocMap.find(player->getVocationId()) == vocMap.end()){
+		return RET_NOTREQUIREDPROFESSION;
+	}
 	if((int32_t)player->getLevel() < getReqLevel()){
-        return RET_NOTREQUIREDLEVEL;
-    }
-    if((int32_t)player->getMagicLevel() < getReqMagLv()){
-        return RET_NOTENOUGHMAGICLEVEL;
-    }
-    if(!player->isPremium() && isPremium()){
+		return RET_NOTREQUIREDLEVEL;
+	}
+	if((int32_t)player->getMagicLevel() < getReqMagLv()){
+		return RET_NOTENOUGHMAGICLEVEL;
+	}
+	if(!player->isPremium() && isPremium()){
 		return RET_NEEDPREMIUMTOEQUIPITEM;
 	}
 		
-    return RET_NOERROR;
+	return RET_NOERROR;
 }

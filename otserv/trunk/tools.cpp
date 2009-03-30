@@ -199,18 +199,17 @@ bool readXMLContentString(xmlNodePtr node, std::string& value)
 
 std::vector<std::string> explodeString(const std::string& inString, const std::string& separator)
 {
-   std::vector<std::string> returnVector;
-   std::string::size_type start = 0;
-   std::string::size_type end = 0;
+	std::vector<std::string> returnVector;
+	std::string::size_type start = 0;
+	std::string::size_type end = 0;
 
-   while((end=inString.find (separator, start)) != std::string::npos){
-      returnVector.push_back (inString.substr (start, end-start));
-      start = end+separator.size();
-   }
+	while((end=inString.find (separator, start)) != std::string::npos){
+		returnVector.push_back (inString.substr (start, end-start));
+		start = end+separator.size();
+	}
 
-   returnVector.push_back (inString.substr (start));
-   return returnVector;
-
+	returnVector.push_back (inString.substr (start));
+	return returnVector;
 }
 
 bool hasBitSet(uint32_t flag, uint32_t flags)
@@ -233,7 +232,7 @@ float box_muller(float m, float s)
 	static float y2;
 	static int use_last = 0;
 
-	if (use_last)		        // use value from previous call
+	if(use_last)			// use value from previous call
 	{
 		y1 = y2;
 		use_last = 0;
@@ -637,20 +636,20 @@ uint32_t adlerChecksum(uint8_t *data, int32_t len)
 		return 0;
 	}
 
-    uint32_t a = 1, b = 0;
-    while (len > 0)
-    {
-        size_t tlen = len > 5552 ? 5552 : len;
-        len -= tlen;
-        do
-        {
-            a += *data++;
-            b += a;
-        } while (--tlen);
+	uint32_t a = 1, b = 0;
+	while (len > 0)
+	{
+		size_t tlen = len > 5552 ? 5552 : len;
+		len -= tlen;
+		do
+		{
+			a += *data++;
+			b += a;
+		} while (--tlen);
 
-        a %= MOD_ADLER;
-        b %= MOD_ADLER;
-    }
+		a %= MOD_ADLER;
+		b %= MOD_ADLER;
+		}
 
-    return (b << 16) | a;
+	return (b << 16) | a;
 }

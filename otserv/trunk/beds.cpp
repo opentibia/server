@@ -234,7 +234,7 @@ void BedItem::regeneratePlayer(Player* player) const
 
 	Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 	if(condition){
-	    // regenerate 1 health and 1 mana every 30 seconds that the player had food for
+		// regenerate 1 health and 1 mana every 30 seconds that the player had food for
 		int32_t regen;
 
 		if(condition->getTicks() != -1){
@@ -318,7 +318,7 @@ BedItem* Beds::getBedBySleeper(uint32_t guid)
 {
 	std::map<uint32_t, BedItem*>::iterator it = BedSleepersMap.find(guid);
 	if(it != BedSleepersMap.end()){
-    	return it->second;
+		return it->second;
 	}
 	return NULL;
 }

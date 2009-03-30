@@ -2184,8 +2184,8 @@ void Player::die()
 		//Skill loss
 		uint32_t lostSkillTries;
 		uint32_t sumSkillTries;
-		for(uint32_t i = 0; i <= 6; ++i){  //for each skill
-			lostSkillTries = 0;         //reset to 0
+		for(uint32_t i = 0; i <= 6; ++i){	//for each skill
+			lostSkillTries = 0;				//reset to 0
 			sumSkillTries = 0;
 
 			for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels

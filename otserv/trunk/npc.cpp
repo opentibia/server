@@ -1740,7 +1740,7 @@ uint32_t Npc::getListItemPrice(uint16_t itemId, ShopEvent_t type)
 }
 
 void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
-	    uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
+		uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
 	if(type == SHOPEVENT_BUY){
 		NpcState* npcState = getState(player, true);
@@ -1776,8 +1776,8 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 
 void Npc::onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCallback)
 {
-    lua_State* L = getScriptInterface()->getLuaState();
-    if(buyCallback != -1)
+	lua_State* L = getScriptInterface()->getLuaState();
+	if(buyCallback != -1)
 		luaL_unref(L, LUA_REGISTRYINDEX, buyCallback);
 	if(sellCallback != -1)
 		luaL_unref(L, LUA_REGISTRYINDEX, sellCallback);
@@ -2521,7 +2521,7 @@ int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 int NpcScriptInterface::luaActionSay(lua_State* L)
 {
 	//selfSay(words [[, target], send_to_all])
-	    // send_to_all defaults to true if there is no target, false otherwise
+		// send_to_all defaults to true if there is no target, false otherwise
 	uint32_t parameters = lua_gettop(L);
 	uint32_t target = 0;
 	bool send_to_all = true;
@@ -2861,7 +2861,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 	Npc* npc = env->getNpc();
 
 	if(lua_isfunction(L, -1) == 0){
-        lua_pop(L, 1); // skip it - use default value
+		lua_pop(L, 1); // skip it - use default value
 	}
 	else{
 		sellCallback = popCallback(L);
@@ -2875,7 +2875,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 	}
 
 	if(lua_istable(L, -1) == 0){
-        reportError(__FUNCTION__, "item list is not a table.");
+		reportError(__FUNCTION__, "item list is not a table.");
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -2883,9 +2883,9 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 	// first key
 	lua_pushnil(L);
 	while(lua_next(L, -2) != 0){
-        ShopInfo item;
-        item.itemId = getField(L, "id");
-        item.subType = getField(L, "subtype");
+		ShopInfo item;
+		item.itemId = getField(L, "id");
+		item.subType = getField(L, "subtype");
 		item.buyPrice = getField(L, "buy");
 		item.sellPrice = getField(L, "sell");
 		items.push_back(item);
