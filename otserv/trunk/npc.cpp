@@ -944,6 +944,8 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->amount = 1;
 	state->itemId = 0;
 	state->subType = -1;
+	state->ignoreCapacity = false;
+	state->buyWithBackpack = false;
 	state->spellName = "";
 	state->listName = "";
 	state->listPluralName = "";
@@ -1747,6 +1749,8 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->subType = count;
 			npcState->itemId = itemId;
 			npcState->buyPrice = getListItemPrice(itemId, SHOPEVENT_BUY);
+			npcState->ignoreCapacity = ignoreCapacity;
+			npcState->buyWithBackpack = buyWithBackpack;
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPBUY);
 			executeResponse(player, npcState, response);
 		}
@@ -2795,6 +2799,8 @@ void NpcScriptInterface::pushState(lua_State *L, NpcState* state)
 	setField(L, "amount", state->amount);
 	setField(L, "itemid", state->itemId);
 	setField(L, "subtype", state->subType);
+	setFieldBool(L, "ignorecapacity", state->ignoreCapacity);
+	setFieldBool(L, "buyWithBackpack", state->buyWithBackpack);
 	setField(L, "topic", state->topic);
 	setField(L, "level", state->level);
 	setField(L, "spellname", state->spellName);
@@ -2821,6 +2827,8 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->amount = getField(L, "amount");
 	state->itemId = getField(L, "itemid");
 	state->subType = getField(L, "subtype");
+	state->ignoreCapacity = getFieldBool(L, "ignorecapacity");
+	state->buyWithBackpack = getFieldBool(L, "buywithbackpack");
 	state->topic = getField(L, "topic");
 	state->level = getField(L, "level");
 	state->spellName = getFieldString(L, "spellname");
@@ -3134,7 +3142,7 @@ void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t i
 	if(callback == -1){
 		return;
 	}
-	//"onBuy"(cid, itemid, count, amount)
+	//"onBuy"(cid, itemid, count, amount, ignorecapacity, buywithbackpack)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		env->setScriptId(-1, m_scriptInterface);
@@ -3148,7 +3156,9 @@ void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t i
 		lua_pushnumber(L, itemid);
 		lua_pushnumber(L, count);
 		lua_pushnumber(L, amount);
-		m_scriptInterface->callFunction(4);
+		lua_pushboolean(L, ignoreCapacity);
+		lua_pushboolean(L, buyWithBackpack);
+		m_scriptInterface->callFunction(6);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{

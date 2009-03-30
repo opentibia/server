@@ -406,7 +406,7 @@ public:
 	bool playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(uint32_t playerId);
 	bool playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
-		uint8_t amount, bool ignoreCapacity, bool buyWithBackpack);
+		uint8_t amount, bool ignoreCapacity = false, bool buyWithBackpack = false);
 	bool playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		uint8_t amount);
 	bool playerCloseShop(uint32_t playerId);
