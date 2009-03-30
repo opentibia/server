@@ -1,6 +1,7 @@
 function onKill(cid, target)
+	local frags_to_banishment = getConfigValue('frags_to_banishment')
 	if(isPlayer(cid) == TRUE and isPlayer(target) == TRUE) then
-		if(getPlayerFrags(cid) >= getConfigValue('frags_to_banishment')) then
+		if(getPlayerFrags(cid) >= frags_to_banishment and frags_to_banishment > 0) then
 			local playername = getPlayerName(cid)
 			local accno = getAccountNumberByPlayerName(playername)
 			addAccountBan(accno, getConfigValue('kill_ban_time'), 0, "Excessive player killing.")
