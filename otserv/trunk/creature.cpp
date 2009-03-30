@@ -1047,14 +1047,14 @@ uint32_t Creature::getStaminaRatio(Creature* attacker) const
 	{
 		if(it->first == attacker->getID()){
 			cHits += it->second.hits;
-        }
+		}
 	}
 	for(CountMap::const_iterator it = healMap.begin(); it != healMap.end(); ++it)
 	{
 		if(it->first == attacker->getID()){
 			cHits += it->second.hits;
-        }
-    }
+		}
+	}
 	return cHits;
 }
 
@@ -1419,7 +1419,7 @@ bool Creature::hasCondition(ConditionType_t type) const
 
 bool Creature::isImmune(CombatType_t type) const
 {
-    return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type);
+	return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type);
 }
 
 bool Creature::isImmune(ConditionType_t type) const

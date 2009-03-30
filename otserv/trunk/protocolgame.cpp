@@ -2534,7 +2534,6 @@ void ProtocolGame::sendOutfitWindow()
 			msg->AddString(Outfits::getInstance()->getOutfitName((*it)->looktype));
 			msg->AddByte((*it)->addons);
 		}
-		player->hasRequestedOutfitWindow(true);
 	}
 }
 

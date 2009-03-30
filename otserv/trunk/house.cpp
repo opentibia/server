@@ -944,10 +944,10 @@ bool Houses::payHouses()
 				bool hasEnoughMoney = false;
 
 				if(useAccBalance){
-                    if(player->balance >= house->getRent()){
-                        player->balance -= house->getRent();
-                        hasEnoughMoney = true;
-                    }
+					if(player->balance >= house->getRent()){
+						player->balance -= house->getRent();
+						hasEnoughMoney = true;
+					}
 				}
 				else{
 					hasEnoughMoney = g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT);

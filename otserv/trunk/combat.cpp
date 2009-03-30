@@ -1020,7 +1020,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 						int32_t newCharge = std::max(0, tool->getCharges() - 1);
 						g_game.transformItem(tool, tool->getID(), newCharge);
 					}
-                }
+				}
 				float attackFactor = player->getAttackFactor();
 
 				lua_pushnumber(L, attackSkill);
@@ -1478,8 +1478,8 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 					}
 				}
 				if(   !harmfulField || 
-				      (OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
-				      creature->hasBeenAttacked(owner))
+					  (OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
+						creature->hasBeenAttacked(owner))
 				{
 					conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);
 				}

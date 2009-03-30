@@ -625,10 +625,6 @@ public:
 	int32_t getStamina() {return stamina;}
 	int32_t getSpentStamina() {return 201660000 - stamina;}
 
-	//outfits
-	void hasRequestedOutfitWindow(bool newValue) {requestedOutfitWindow = newValue;}
-	bool hasRequestedOutfitWindow() {return requestedOutfitWindow;}
-
 	//depots
 	DepotMap depots;
 	uint32_t maxDepotLimit;

@@ -1303,12 +1303,12 @@ void Monster::dropLoot(Container* corpse)
 
 bool Monster::isImmune(CombatType_t type) const
 {
-    ElementMap::iterator it = mType->elementMap.find(type);
-    if(it != mType->elementMap.end()){
+	ElementMap::iterator it = mType->elementMap.find(type);
+	if(it != mType->elementMap.end()){
 		if(it->second >= 100){
 			return true;
 		}
-    }
+	}
 
 	return Creature::isImmune(type);
 }

@@ -336,7 +336,7 @@ __cdecl _SEHHandler(
 	if(file)
 		((std::ofstream*)outdriver)->close();
 	if(g_config.getNumber(ConfigManager::SHOW_CRASH_WINDOW))
-        MessageBoxA(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);
+		MessageBoxA(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);
 	std::cout << "Error report generated. Killing server." <<std::endl;
 	exit(1); //force exit
 	return ExceptionContinueSearch;

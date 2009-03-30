@@ -626,10 +626,10 @@ uint32_t MoveEvent::StepInField(Creature* creature, Item* item, const Position& 
 	if(field){
 		bool purposeful = true;
 		if(creature->getPlayer())
-            purposeful = false;
-            
-        field->onStepInField(creature, purposeful);
-        
+			purposeful = false;
+
+		field->onStepInField(creature, purposeful);
+
 		return 1;
 	}
 
