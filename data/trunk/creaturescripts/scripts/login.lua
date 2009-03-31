@@ -65,8 +65,9 @@ local function doPlayerRemPremOutfits(cid)
 end
 
 function onLogin(cid)
-	--Register the kill event
+	--Register the kill/die event
 	registerCreatureEvent(cid, "AutoBan")
+	registerCreatureEvent(cid, "RemoveBlesses")
 
 	if(isPremium(cid) == TRUE) then
 		if not(canPlayerWearPremiumOutfits(cid)) then
@@ -75,9 +76,10 @@ function onLogin(cid)
 			--Remember that you need to set an storage value for the quest outfits/addons
 		end
 
-		if(getPlayerStorageValue(cid, 15000) == 1 and getPlayerVocation(cid) <= 4) then
+		if(getPlayerStorageValue(cid, STORAGE_PROMOTION) == 1 and getPlayerVocation(cid) <= 4) then
 			doPlayerSetVocation(cid, getPlayerVocation(cid)+4)
-			setPlayerStorageValue(cid, 15000, -1)
+			doPlayerRemoveLossPercent(cid, 3)
+			setPlayerStorageValue(cid, STORAGE_PROMOTION, -1)
 		end
 		return TRUE
 	end
@@ -111,7 +113,8 @@ function onLogin(cid)
 	local isPromo = (getPlayerVocation(cid) > 4)
 	if(isPromo) then
 		doPlayerSetVocation(cid, getPlayerVocation(cid)-4)
-		setPlayerStorageValue(cid, 15000, 1)
+		doPlayerRemoveLossPercent(cid, -3)
+		setPlayerStorageValue(cid, STORAGE_PROMOTION, 1)
 	end
 
 	return TRUE

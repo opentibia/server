@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <spells>
 
-  <!-- House Spells -->
-  <instant name="House Guest List" words="aleta sio" enabled="1" function="editHouseGuest"></instant>
-  <instant name="House Subowner List" words="aleta som" enabled="1" function="editHouseSubOwner"></instant>
-  <instant name="House Door List" words="aleta grav" enabled="1" function="editHouseDoor"></instant>
-  <instant name="House Kick" words="alana sio" params="1" enabled="1" function="houseKick"></instant>
+	<!-- House Spells -->
+	<instant name="House Guest List" words="aleta sio" enabled="1" function="editHouseGuest"></instant>
+	<instant name="House Subowner List" words="aleta som" enabled="1" function="editHouseSubOwner"></instant>
+	<instant name="House Door List" words="aleta grav" enabled="1" function="editHouseDoor"></instant>
+	<instant name="House Kick" words="alana sio" params="1" enabled="1" function="houseKick"></instant>
   
 	<!-- Rune Spells -->
 	<rune name="adevo grav pox" id="2285" lvl="14" maglv="0" blocktype="solid" charges="3" script="attack/poison_field.lua">

@@ -6,6 +6,9 @@ dofile(getDataDir() .. 'game_classes/house.lua')
 
 -- Storages consts
 STORAGE_RUM_MACHINE = 100000
+STORAGE_PROMOTION = 15000
+-- Storage for blesses - 50000 + blessID
+STORAGE_BLESSES = 50000
 
 -- Booleans consts
 TRUE = 1

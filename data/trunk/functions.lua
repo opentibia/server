@@ -473,3 +473,34 @@ function convertIPToInt(str)
 		return ipint, maskint
 	end
 end
+
+function doPlayerRemoveLossPercent(cid, amount)
+	local lossvalue = 0
+	local newvalue = 0
+	local i = 0
+	while i < 4 do
+		lossvalue = getPlayerLossPercent(cid, i)
+		newvalue = lossvalue - amount
+		if newvalue < 0 then
+			newvalue = 0
+		end
+		doPlayerSetLossPercent(cid, i, newvalue)
+		i = i + 1
+	end
+end
+
+function doPlayerAddBless(cid, blessid)
+	local storageid = STORAGE_BLESSES + blessid
+	if getPlayerStorageValue(cid, storageid) <= 0 then
+		doPlayerRemoveLossPercent(cid, 1)
+		setPlayerStorageValue(cid, storageid, 1)
+	end
+end
+
+function doPlayerRemoveBless(cid, blessid)
+	local storageid = STORAGE_BLESSES + blessid
+	if getPlayerStorageValue(cid, storageid) >= 1 then
+		doPlayerRemoveLossPercent(cid, -1)
+		setPlayerStorageValue(cid, storageid, -1)
+	end
+end
