@@ -743,7 +743,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	const Position& movingCreatureOrigPos, const Position& toPos)
 {
 	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
+	if(!player || player->isRemoved() || player->hasFlag(PlayerFlag_CannotMoveCreatures))
 		return false;
 
 	if(!player->canDoAction()){
@@ -946,7 +946,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	uint16_t spriteId, uint8_t fromStackPos, const Position& toPos, uint8_t count)
 {
 	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
+	if(!player || player->isRemoved() || player->hasFlag(PlayerFlag_CannotMoveItems))
 		return false;
 
 	if(!player->canDoAction()){
