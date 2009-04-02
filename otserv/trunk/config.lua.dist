@@ -145,6 +145,15 @@ rate_stamina_gain = 500
 -- loss stamina rate - works as other rates
 rate_stamina_loss = 1
 
+-- For how many millisecond (from 42 hours) you get extra experience from monsters
+stamina_extra_experience_duration = 30 * 60 * 1000
+
+-- How much extra XP you get 0.5 is 50% extra
+stamina_extra_experience_rate = 0.5
+
+-- If true, only premium players gain extra experience
+stamina_extra_experience_onlyprem = true
+
 -- Remove ammunition
 -- If false, ammunition will not be removed when using distance weapons
 -- (or other weapons that use ammunition)
