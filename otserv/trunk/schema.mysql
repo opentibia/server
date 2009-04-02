@@ -57,13 +57,13 @@ CREATE TABLE `players` (
     `redskull` TINYINT(1) NOT NULL DEFAULT FALSE,
     `guildnick` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'additional nick in guild - mostly for web interfaces i think',
     `loss_experience` INT NOT NULL DEFAULT 10,
-    `loss_mana` INT NOT NULL DEFAULT 10,
-    `loss_skills` INT NOT NULL DEFAULT 10,
-    `loss_items` INT NOT NULL DEFAULT 10,
+    `loss_mana` INT NOT NULL DEFAULT 100,
+    `loss_skills` INT NOT NULL DEFAULT 100,
+    `loss_items` INT NOT NULL DEFAULT 100,
     `rank_id` INT UNSIGNED NOT NULL COMMENT 'by this field everything with guilds is done - player has a rank which belongs to certain guild',
     `town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
     `balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
-    `stamina` INT NOT NULL DEFAULT 201660000 COMMENT 'player stamina in milliseconds',
+    `stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds',
     PRIMARY KEY (`id`),
     UNIQUE (`name`),
     FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
@@ -209,7 +209,7 @@ CREATE TABLE `schema_info` (
     PRIMARY KEY (`name`)
 );
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 4);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 5);
 
 DELIMITER |
 

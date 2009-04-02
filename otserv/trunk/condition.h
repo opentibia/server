@@ -56,7 +56,7 @@ enum ConditionType_t {
 	CONDITION_CURSED         = 1 << 20,
 	CONDITION_EXHAUST_COMBAT = 1 << 21,
 	CONDITION_EXHAUST_HEAL   = 1 << 22,
-	CONDITION_PACIFIED       = 1 << 23,
+	CONDITION_PACIFIED       = 1 << 23, // Cannot attack anything
 	CONDITION_HUNTING        = 1 << 24, // Killing monsters
 };
 
@@ -127,7 +127,7 @@ public:
 	int32_t getTicks() const { return ticks; }
 	void setTicks(int32_t newTicks);
 
-	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param);
+	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param = 0);
 	static Condition* createCondition(PropStream& propStream);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);

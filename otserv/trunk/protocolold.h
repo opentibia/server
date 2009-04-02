@@ -29,6 +29,12 @@ class OutputMessage;
 class ProtocolOld : public Protocol
 {
 public:
+	// static protocol information
+	enum {server_sends_first = false};
+	// Ident is added in subclass
+	enum {use_checksum = false};
+
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolOldCount;
 #endif
@@ -57,6 +63,22 @@ protected:
 	#ifdef __DEBUG_NET_DETAIL__
 	virtual void deleteProtocolTask();
 	#endif
+};
+
+class ProtocolOldLogin : public ProtocolOld
+{
+public:
+	enum {protocol_identifier = 0x01};
+	
+	ProtocolOldLogin(Connection* connection) : ProtocolOld(connection) {}
+};
+
+class ProtocolOldGame : public ProtocolOld
+{
+public:
+	enum {protocol_identifier = 0x0A};
+	
+	ProtocolOldGame(Connection* connection) : ProtocolOld(connection) {}
 };
 
 #endif

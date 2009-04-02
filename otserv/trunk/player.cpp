@@ -96,7 +96,7 @@ Creature()
 	MessageBufferTicks = 0;
 	MessageBufferCount = 0;
 	nextAction = 0;
-	stamina = 201660000;
+	stamina = MAX_STAMINA;
 
 	pzLocked = false;
 	bloodHitCount = 0;
@@ -624,6 +624,30 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 	return 0;
 }
 
+uint64_t Player::getLostExperience() const
+{
+	if(skillLoss)
+		return 0;
+
+	if(level < 25)
+		// 100 loss is "normal" (10%), so dividing by 1000 gives correct value
+		return experience * lossPercent[LOSS_EXPERIENCE] / 1000;
+
+	double levels_to_lose = (getLevel() + 50) / 100.;
+	uint64_t xp_to_lose = 0.0;
+	int clevel = getLevel();
+
+	while(levels_to_lose > 1.0){
+		xp_to_lose += getExpForLevel(clevel);
+		clevel--;
+		levels_to_lose -= 1.0;
+	}
+	if(levels_to_lose > 0.0)
+		xp_to_lose += uint64_t(getExpForLevel(clevel) * levels_to_lose);
+
+	return xp_to_lose * lossPercent[LOSS_EXPERIENCE] / 1000; // 1 for level 100 etc.
+}
+
 int32_t Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
 {
 	int32_t n = skills[skilltype][skillinfo];
@@ -763,6 +787,29 @@ int32_t Player::getDefaultStats(stats_t stat)
 			return 0;
 			break;
 	}
+}
+
+
+int32_t Player::getStepSpeed() const
+{
+	if(getSpeed() > PLAYER_MAX_SPEED){
+		return PLAYER_MAX_SPEED;
+	}
+	else if(getSpeed() < PLAYER_MIN_SPEED){
+		return PLAYER_MIN_SPEED;
+	}
+
+	return getSpeed();
+}
+
+void Player::updateBaseSpeed()
+{
+	if(!hasFlag(PlayerFlag_SetMaxSpeed)){
+		baseSpeed = 220 + (2* (level - 1));
+	}
+	else{
+		baseSpeed = 900;
+	};
 }
 
 Container* Player::getContainer(uint32_t cid)
@@ -1444,9 +1491,34 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		
 		if(lastLogout > 0)
 		{
-			int64_t timeOff = (time(NULL) - lastLogout) - 600;
-			if(timeOff > 0){
-				addStamina(std::min((uint64_t)getSpentStamina(), uint64_t(timeOff * g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN))));
+			int64_t timeOff = time(NULL) - lastLogout;
+			if(timeOff - 600 > 0){
+				// Quick stamina is gained before the last half hour
+				// Slow stamina is gained after that
+
+				int stamina_rate = g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN);
+				int quick_stamina_max = MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION);
+				
+
+				// If current stamina is less than quick cap, we should add quick stamina
+				if(getStamina() < quick_stamina_max){
+					int64_t gain = timeOff * stamina_rate;
+					
+					if(stamina + gain > quick_stamina_max){
+						// We gained full slow stamina
+						// Remove all the time spent getting stamina this way
+						timeOff -= (quick_stamina_max - getStamina()) / stamina_rate;
+						// We gain atleast up to the slow max
+						addStamina(quick_stamina_max - getStamina());
+					}
+				}
+
+				// Time left should now only be fast stamina
+				if(getStamina() < MAX_STAMINA){
+					int64_t gain = timeOff * stamina_rate / 4;
+
+					addStamina(gain);
+				}
 			}
 		}
 	}
@@ -1627,6 +1699,15 @@ void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const
 
 		if(getParty()){
 			getParty()->updateSharedExperience();
+		}
+
+		if(teleport || (oldPos.z != newPos.z)){
+			addCondition(
+				Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, 
+				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
+			addCondition(
+				Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, 
+				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
 		}
 	}
 }
@@ -2159,6 +2240,25 @@ void Player::die()
 	loginPosition = masterPos;
 
 	if(skillLoss){
+		uint64_t expLost = getLostExperience();
+		//Level loss
+		uint32_t newLevel = level;
+		while((uint64_t)(experience - expLost) < Player::getExpForLevel(newLevel)){
+			if(newLevel > 1)
+				newLevel--;
+			else
+				break;
+		}
+
+		double lostPercent = 1. - (experience - expLost) / double(experience); // 0.1 if 10% was lost
+
+		if(newLevel != level){
+			std::stringstream lvMsg;
+			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
+			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
+		}
+
+
 		//Magic level loss
 		uint32_t sumMana = 0;
 		int32_t lostMana = 0;
@@ -2170,7 +2270,8 @@ void Player::die()
 
 		sumMana += manaSpent;
 
-		lostMana = (int32_t)std::ceil(sumMana * ((double)lossPercent[LOSS_MANASPENT]/100));
+		double lostPercentMana = lostPercent * lossPercent[LOSS_MANASPENT] / 100;
+		lostMana = (int32_t)std::ceil(sumMana * lostPercentMana);
 
 		while((uint32_t)lostMana > manaSpent && magLevel > 0){
 			lostMana -= manaSpent;
@@ -2193,7 +2294,8 @@ void Player::die()
 			}
 
 			sumSkillTries += skills[i][SKILL_TRIES];
-			lostSkillTries = (uint32_t)std::ceil(sumSkillTries * ((double)lossPercent[LOSS_SKILLTRIES]/100));
+			double lossPercentSkill = lostPercent * lossPercent[LOSS_SKILLTRIES] / 100;
+			lostSkillTries = (uint32_t)std::ceil(sumSkillTries * lossPercentSkill);
 
 			while(lostSkillTries > skills[i][SKILL_TRIES]){
 				lostSkillTries -= skills[i][SKILL_TRIES];
@@ -2210,22 +2312,6 @@ void Player::die()
 			}
 
 			skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
-		}
-		//
-
-		//Level loss
-		uint32_t newLevel = level;
-		while((uint64_t)(experience - getLostExperience()) < Player::getExpForLevel(newLevel)){
-			if(newLevel > 1)
-				newLevel--;
-			else
-				break;
-		}
-
-		if(newLevel != level){
-			std::stringstream lvMsg;
-			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 		}
 		
 		//Send that death window
@@ -3617,7 +3703,11 @@ void Player::gainExperience(uint64_t gainExp)
 				condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
 				addCondition(condition);
 			}
-
+			
+			if(isPremium() && g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM) &&
+					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION))
+				stamina += uint64_t(stamina * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
+			
 			addExperience(gainExp);
 		}
 	}
@@ -4093,29 +4183,32 @@ bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 	return true;
 }
 
-bool Player::checkLoginAttackDelay(uint32_t attackerId) const
+bool Player::isLoginAttackLocked(uint32_t attackerId) const
 {
-	return (OTSYS_TIME() <= (lastLoginMs + g_config.getNumber(ConfigManager::LOGIN_ATTACK_DELAY)) && !hasBeenAttacked(attackerId));
+	if(OTSYS_TIME() <= lastLoginMs + g_config.getNumber(ConfigManager::LOGIN_ATTACK_DELAY))
+		return !hasBeenAttacked(attackerId);
+	return false;
 }
 
-void Player::addStamina(int32_t value)
+void Player::addStamina(int64_t value)
 {
-	stamina += value;
+	int64_t newstamina = stamina + value;
 
-	//stamina may not be bigger than 201660000, and not smaller than 0
-	if(stamina > 201660000)
-		stamina = 201660000;
-	if(stamina < 0)
-		stamina = 0;
+    //stamina may not be bigger than 42 hours, and not smaller than 0
+	if(newstamina > MAX_STAMINA)
+		newstamina = MAX_STAMINA;
+	if(newstamina < 0)
+		newstamina = 0;
+	stamina = newstamina;
 }
 
 int32_t Player::getStaminaMinutes()
 {
-	if(hasFlag(PlayerFlag_HasInfiniteStamina)){
-		return 3360;
-	}
-
-	return std::min(3360, int(stamina) / 60000);
+    if(hasFlag(PlayerFlag_HasInfiniteStamina)){
+        return 60 * 60 * 1000;
+    }
+    
+    return std::min(60 * 60 * 1000, int(stamina) / 60 * 1000);
 }
 
 void Player::checkIdleTime(uint32_t ticks)

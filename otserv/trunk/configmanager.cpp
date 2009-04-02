@@ -31,7 +31,10 @@ ConfigManager::ConfigManager()
 	m_isLoaded = false;
 
 	m_confString[IP] = "";
-	m_confInteger[PORT] = 0;
+	m_confInteger[ADMIN_PORT] = 0;
+	m_confInteger[GAME_PORT] = 0;
+	m_confInteger[LOGIN_PORT] = 0;
+	m_confInteger[STATUS_PORT] = 0;
 }
 
 ConfigManager::~ConfigManager()
@@ -66,8 +69,14 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		// These settings might have been set from command line
 		if(m_confString[IP] == "")
 			m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
-		if(m_confInteger[PORT] == 0)
-			m_confInteger[PORT] = getGlobalNumber(L, "port");
+		if(m_confInteger[GAME_PORT] == 0)
+			m_confInteger[GAME_PORT] = getGlobalNumber(L, "game_port");
+		if(m_confInteger[ADMIN_PORT] == 0)
+			m_confInteger[ADMIN_PORT] = getGlobalNumber(L, "admin_port");
+		if(m_confInteger[LOGIN_PORT] == 0)
+			m_confInteger[LOGIN_PORT] = getGlobalNumber(L, "login_port");
+		if(m_confInteger[STATUS_PORT] == 0)
+			m_confInteger[STATUS_PORT] = getGlobalNumber(L, "status_port");
 
 #if defined __CONFIG_V2__
 		unsigned int pos = _filename.rfind("/");
@@ -118,6 +127,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[EXHAUSTED_ADD] = getGlobalNumber(L, "exhaustedadd", 0);
 	m_confInteger[FIGHTEXHAUSTED] = getGlobalNumber(L, "fightexhausted", 2000);
 	m_confInteger[HEALEXHAUSTED] = getGlobalNumber(L, "healexhausted", 1000);
+	m_confInteger[STAIRHOP_EXHAUSTED] = getGlobalNumber(L, "stairhop_exhausted", 2*1000);
 	m_confInteger[PZ_LOCKED] = getGlobalNumber(L, "pzlocked", 60 * 1000);
 	m_confInteger[HUNTING_KILL_DURATION] = getGlobalNumber(L, "hunting_kill_duration", 60 * 1000);
 	m_confInteger[FIELD_OWNERSHIP_DURATION] = getGlobalNumber(L, "field_ownership_duration", 5 * 1000);
@@ -134,6 +144,10 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATE_SPAWN] = getGlobalNumber(L, "rate_spawn", 1);
 	m_confInteger[RATE_STAMINA_LOSS] = getGlobalNumber(L, "rate_stamina_loss", 1);
 	m_confInteger[RATE_STAMINA_GAIN] = getGlobalNumber(L, "rate_stamina_gain", 500);
+	m_confInteger[EXPERIENCE_TRACK_MINUTES] = getGlobalNumber(L, "experience_track_minutes", 15);
+	m_confInteger[STAMINA_EXTRA_EXPERIENCE_DURATION] = getGlobalNumber(L, "stamina_extra_experience_duration", 30 * 60 * 1000);
+	m_confInteger[STAMINA_EXTRA_EXPERIENCE_ONLYPREM] = getGlobalBoolean(L, "stamina_extra_experience_onlyprem", true);
+	m_confInteger[STAMINA_EXTRA_EXPERIENCE_RATE] = getGlobalFloat(L, "stamina_extra_experience_rate", 0.5);
 	m_confInteger[HOTKEYS] = getGlobalBoolean(L, "enablehotkeys", false);
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);
 	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalBoolean(L, "saveclientdebug", false);
@@ -184,6 +198,17 @@ int ConfigManager::getNumber(uint32_t _what) const
 	else
 	{
 		std::cout << "Warning: [ConfigManager::getNumber] " << _what << std::endl;
+		return 0;
+	}
+}
+
+double ConfigManager::getFloat(uint32_t _what) const
+{
+	if(m_isLoaded && _what < LAST_FLOAT_CONFIG)
+		return m_confFloat[_what];
+	else
+	{
+		std::cout << "Warning: [ConfigManager::getFloat] " << _what << std::endl;
 		return 0;
 	}
 }
@@ -242,6 +267,21 @@ int ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier
 	}
 
 	int val = (int)lua_tonumber(_L, -1);
+	lua_pop(_L,1);
+
+	return val;
+}
+
+double ConfigManager::getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default)
+{
+	lua_getglobal(_L, _identifier.c_str());
+
+	if(!lua_isnumber(_L, -1)){
+		lua_pop(_L, 1);
+		return _default;
+	}
+
+	double val = lua_tonumber(_L, -1);
 	lua_pop(_L,1);
 
 	return val;

@@ -67,9 +67,12 @@ public:
 
 	enum integer_config_t {
 		LOGIN_TRIES = 0,
+		GAME_PORT,
+		ADMIN_PORT,
+		LOGIN_PORT,
+		STATUS_PORT,
 		RETRY_TIMEOUT,
 		LOGIN_TIMEOUT,
-		PORT,
 		MOTD_NUM,
 		MAX_PLAYERS,
 		EXHAUSTED,
@@ -109,10 +112,19 @@ public:
 		USE_ACCBALANCE,
 		LOGIN_ATTACK_DELAY,
 		SHOW_CRASH_WINDOW,
+		STAMINA_EXTRA_EXPERIENCE_DURATION,
+		STAMINA_EXTRA_EXPERIENCE_ONLYPREM,
+		STAIRHOP_EXHAUSTED,
+		EXPERIENCE_TRACK_MINUTES,
 		IDLE_TIME,
 		IDLE_TIME_WARNING,
 		ATTACK_SPEED,
 		LAST_INTEGER_CONFIG /* this must be the last one */
+	};
+
+	enum float_config_t {
+		STAMINA_EXTRA_EXPERIENCE_RATE,
+		LAST_FLOAT_CONFIG /* this must be the last one */
 	};
 
 
@@ -121,6 +133,7 @@ public:
 
 	void getConfigValue(const std::string& key, lua_State* _L);
 	const std::string& getString(uint32_t _what) const;
+	double getFloat(uint32_t _what) const;
 	int getNumber(uint32_t _what) const;
 	bool setNumber(uint32_t _what, int _value);
 	bool setString(uint32_t _what, const std::string& _value);
@@ -129,12 +142,14 @@ private:
 	static void moveValue(lua_State* fromL, lua_State* toL);
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
 	int getGlobalNumber(lua_State* _L, const std::string& _identifier, int _default=0);
+	double getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default=0.0);
 	bool getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default=false);
 
 	lua_State* L;
 	bool m_isLoaded;
 	std::string m_confString[LAST_STRING_CONFIG];
 	int m_confInteger[LAST_INTEGER_CONFIG];
+	double m_confFloat[LAST_FLOAT_CONFIG];
 };
 
 

@@ -28,7 +28,21 @@ location = "Germany"
 -- server ip (the ip that server listens on)
 ip = "127.0.0.1"
 
--- server port (the port that server listens on)
+-- login server port
+-- This should be the port used for connecting with IP changers etc.
+login_port = "7171"
+
+-- game server port
+-- game server must be on it's own port (due to limits of the protocol)
+game_port = "7172"
+
+-- status port
+-- Used by status protocol connections, should be same as login
+-- to work correctly with server lists etc.
+port = "7171"
+
+-- admin port
+-- Port used by the OTAdmin protocol
 port = "7171"
 
 -- server url

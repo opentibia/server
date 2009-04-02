@@ -154,7 +154,7 @@ std::string Status::getStatusString() const
 	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getString(ConfigManager::IP).c_str());
 	xmlSetProp(p, (const xmlChar*) "servername", (const xmlChar*)g_config.getString(ConfigManager::SERVER_NAME).c_str());
 
-	ss << g_config.getNumber(ConfigManager::PORT);
+	ss << g_config.getNumber(ConfigManager::LOGIN_PORT);
 	xmlSetProp(p, (const xmlChar*) "port", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 
@@ -239,7 +239,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddByte(0x10); // server info
 		output->AddString(g_config.getString(ConfigManager::SERVER_NAME).c_str());
 		output->AddString(g_config.getString(ConfigManager::IP).c_str());
-		ss << g_config.getNumber(ConfigManager::PORT);
+		ss << g_config.getNumber(ConfigManager::LOGIN_PORT);
 		output->AddString(ss.str().c_str());
 		ss.str("");
 	}
@@ -255,8 +255,8 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddString(g_config.getString(ConfigManager::MOTD).c_str());
 		output->AddString(g_config.getString(ConfigManager::LOCATION).c_str());
 		output->AddString(g_config.getString(ConfigManager::URL).c_str());
-		output->AddU32((uint32_t)(running >> 32));	// this method prevents a big number parsing
-		output->AddU32((uint32_t)(running));		// since servers can be online for months ;)
+		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
+		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
 	}
 
 	if(requestedInfo & REQUEST_PLAYERS_INFO){

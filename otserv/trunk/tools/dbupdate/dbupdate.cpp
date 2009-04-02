@@ -135,7 +135,39 @@ SimpleUpdateQuery updateQueries[] = {
             "ALTER TABLE `players` ADD `stamina` INTEGER NOT NULL DEFAULT 201660000;",
             NULL
         }
-    }
+    },
+	{ 5,
+        { // PgSql
+            "ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000;",
+            "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
+            "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
+            "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+            NULL
+        },
+        { // MySql
+            "ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds';",
+            "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
+            "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
+            "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+            NULL
+        },
+        { // Sqlite
+            "ALTER TABLE `players` CHANGE `stamina` `stamina` INTEGER NOT NULL DEFAULT 151200000;",
+            "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INTEGER NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
+            "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INTEGER NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
+            "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INTEGER NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+            NULL
+        }
+	}
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
@@ -209,28 +241,28 @@ int main(int argn, const char* argv[]){
 	DBResult* result;
 	query << "SELECT `value` FROM `schema_info` WHERE `name` = 'version';";
 	if(!(result = db->storeQuery(query.str()))){
-        // this is for old (version 1 and 2 only) schema
-        query.str("");
-        query << "SELECT * FROM `schema_info`;";
-        if(!(result = db->storeQuery(query.str()))){
-    		ErrorMessage("Can't get schema version! Does `schema_info` exist in your database?");
-    		return -1;
-        }
+		// this is for old (version 1 and 2 only) schema
+		query.str("");
+		query << "SELECT * FROM `schema_info`;";
+		if(!(result = db->storeQuery(query.str()))){
+			ErrorMessage("Can't get schema version! Does `schema_info` exist in your database?");
+			return -1;
+		}
 
-        schema_version = result->getDataInt("version");
+		schema_version = result->getDataInt("version");
 
-        if(schema_version == 0 || schema_version > 2){
-            ErrorMessage("Not valid schema version!");
-            return -1;
-        }
+		if(schema_version == 0 || schema_version > 2){
+			ErrorMessage("Not valid schema version!");
+			return -1;
+		}
 	}
 	else{
-        schema_version = result->getDataInt("value");
+		schema_version = result->getDataInt("value");
 
-        if(schema_version == 0 || schema_version > CURRENT_SCHEMA_VERSION){
-            ErrorMessage("Not valid schema version!");
-            return -1;
-        }
+		if(schema_version == 0 || schema_version > CURRENT_SCHEMA_VERSION){
+			ErrorMessage("Not valid schema version!");
+			return -1;
+		}
 	}
 	std::cout << "Version = " << schema_version << " ";
 	std::cout << "[done]" << std::endl;
@@ -269,16 +301,16 @@ int main(int argn, const char* argv[]){
 		}
 	}
 
-    //update schema version
-    // previously version number was updated after each step
-    // but this could break compatibility with version 1
-    // so if you think it is realy important then try to fuck around with version 1 struct ;)
-    query.str("");
-    query << "UPDATE `schema_info` SET `value` = '" << CURRENT_SCHEMA_VERSION << "' WHERE `name` = 'version';";
-    if(!db->executeQuery(query.str().c_str())){
-        ErrorMessage("Your database has been correctly updated to most recent version, but an error occured when updating the schema version.");
-        return -1;
-    }
+	//update schema version
+	// previously version number was updated after each step
+	// but this could break compatibility with version 1
+	// so if you think it is realy important then try to fuck around with version 1 struct ;)
+	query.str("");
+	query << "UPDATE `schema_info` SET `value` = '" << CURRENT_SCHEMA_VERSION << "' WHERE `name` = 'version';";
+	if(!db->executeQuery(query.str().c_str())){
+		ErrorMessage("Your database has been correctly updated to most recent version, but an error occured when updating the schema version.");
+		return -1;
+	}
 
 	std::cout << std::endl << "Your database has been updated to the most recent version!" << std::endl;
 	std::cout << "Press any key to close ...";

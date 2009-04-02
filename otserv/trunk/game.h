@@ -36,6 +36,7 @@
 #include "templates.h"
 #include "scheduler.h"
 
+class ServiceManager;
 class Player;
 class Creature;
 class Monster;
@@ -110,6 +111,8 @@ class Game
 public:
   Game();
 	~Game();
+
+	void start(ServiceManager* servicer);
 
 	/**
 	  * Load a map.
@@ -570,6 +573,7 @@ protected:
 	GameState_t gameState;
 	WorldType_t worldType;
 
+	ServiceManager* service_manager;
 	Map* map;
 
 	std::vector<std::string> commandTags;

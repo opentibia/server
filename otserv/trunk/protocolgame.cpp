@@ -440,6 +440,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 		return false;
 	}
 
+
 	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
@@ -460,6 +461,8 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	std::string accname = msg.GetString();
 	const std::string name = msg.GetString();
 	const std::string password = msg.GetString();
+
+	msg.SkipBytes(6); //841 specific
 
 	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
@@ -504,6 +507,31 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 {
 	parseFirstPacket(msg);
+}
+
+void ProtocolGame::onConnect()
+{
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+
+	// Packet length
+	//output->AddU16(0x06); //length (6)
+	
+	// Packet type
+	output->AddByte(0x1F);
+
+	// Seems arbitrary, probably isn't
+	output->AddByte(random_range(0, 0xFF));
+	output->AddByte(random_range(0, 0xFF));
+
+	output->AddU16(0x00);
+
+	// Arbitrary too (?)
+	output->AddByte(random_range(0, 0xFF));
+
+	// Enable checksum
+	enableChecksum();
+
+	OutputMessagePool::getInstance()->send(output);
 }
 
 void ProtocolGame::disconnectClient(uint8_t error, const char* message)
@@ -2839,6 +2867,11 @@ void ProtocolGame::AddTileItem(NetworkMessage_ptr msg, const Position& pos, cons
 {
 	msg->AddByte(0x6A);
 	msg->AddPosition(pos);
+	
+	// Expensive!
+	const Tile* tile = item->getTile();
+	msg->AddByte(tile->__getIndexOfThing(item));
+
 	msg->AddItem(item);
 }
 
@@ -2846,6 +2879,7 @@ void ProtocolGame::AddTileCreature(NetworkMessage_ptr msg, const Position& pos, 
 {
 	msg->AddByte(0x6A);
 	msg->AddPosition(pos);
+	msg->AddByte(creature->getParent()->__getIndexOfThing(creature)); //841 specific
 
 	bool known;
 	uint32_t removedKnown;
