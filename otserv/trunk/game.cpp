@@ -1858,7 +1858,7 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_
 					HouseTile* houseTile = toTile->getHouseTile();
 					if(houseTile){
 						House* house = houseTile->getHouse();
-						if(house && house->isInvited(player)){
+						if(house && !house->isInvited(player)){
 							return RET_NOTPOSSIBLE;
 						}
 					}

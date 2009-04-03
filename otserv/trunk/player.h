@@ -185,8 +185,6 @@ public:
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	int64_t getExperience() const {return experience;}
-	// -1 is per config default, argument can't be greater than the value in config.lua
-	int64_t getExperienceGainedRecently(int minutes = -1) const;
 
 	time_t getLastLoginSaved() const {return lastLoginSaved;}
 	const Position& getLoginPosition() const {return loginPosition;}

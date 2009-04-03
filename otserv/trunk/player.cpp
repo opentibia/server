@@ -3706,7 +3706,7 @@ void Player::gainExperience(uint64_t gainExp)
 			
 			if(isPremium() && g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM) &&
 					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION))
-				gainExp += uint64_t(stamina * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
+				gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
 			
 			addExperience(gainExp);
 		}
