@@ -143,6 +143,8 @@ SimpleUpdateQuery updateQueries[] = {
 			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
             "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
+            "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
             "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
             NULL
@@ -153,6 +155,8 @@ SimpleUpdateQuery updateQueries[] = {
 			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
             "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
+            "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
             "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
             NULL
@@ -163,7 +167,9 @@ SimpleUpdateQuery updateQueries[] = {
 			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
             "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INTEGER NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
-            "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INTEGER NOT NULL DEFAULT 100;",
+            "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INTEGER NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
+            "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
             NULL
         }

@@ -56,7 +56,7 @@ CREATE TABLE "players" (
     "redskulltime" BIGINT NOT NULL DEFAULT 0,
     "redskull" SMALLINT NOT NULL DEFAULT 0,
     "guildnick" VARCHAR(255) NOT NULL DEFAULT '',
-    "loss_experience" INT NOT NULL DEFAULT 10,
+    "loss_experience" INT NOT NULL DEFAULT 100,
     "loss_mana" INT NOT NULL DEFAULT 100,
     "loss_skills" INT NOT NULL DEFAULT 100,
     "loss_items" INT NOT NULL DEFAULT 100,

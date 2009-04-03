@@ -56,7 +56,7 @@ CREATE TABLE `players` (
     `redskulltime` INT UNSIGNED NOT NULL DEFAULT 0,
     `redskull` TINYINT(1) NOT NULL DEFAULT FALSE,
     `guildnick` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'additional nick in guild - mostly for web interfaces i think',
-    `loss_experience` INT NOT NULL DEFAULT 10,
+    `loss_experience` INT NOT NULL DEFAULT 100,
     `loss_mana` INT NOT NULL DEFAULT 100,
     `loss_skills` INT NOT NULL DEFAULT 100,
     `loss_items` INT NOT NULL DEFAULT 100,
