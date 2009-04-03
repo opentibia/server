@@ -474,33 +474,65 @@ function convertIPToInt(str)
 	end
 end
 
-function doPlayerRemoveLossPercent(cid, amount)
-	local lossvalue = 0
-	local newvalue = 0
+function getPlayerBless(cid, blessid)
+	if getPlayerStorageValue(cid, storageid) >= 1 then
+		return TRUE
+	else
+		return FALSE
+	end
+end
+
+function doPlayerRemoveSkillLossPercent(cid, amount)
+	local lossvalue = getPlayerLossPercent(cid, PLAYERLOSS_EXPERIENCE)
+	local newvalue = lossvalue - amount
+	if newvalue < 0 then
+		newvalue = 0
+	end
+	-- Setting experience is enough (all other types follow it)
+	doPlayerSetLossPercent(cid, PLAYERLOSS_EXPERIENCE, newvalue)
+end
+
+function doPlayerUpdateItemLossPercent(cid)
+	-- check quantity of bless
 	local i = 0
-	while i < 4 do
-		lossvalue = getPlayerLossPercent(cid, i)
-		newvalue = lossvalue - amount
-		if newvalue < 0 then
-			newvalue = 0
+	local blesses = 0
+	while i < 5 do
+		if getPlayerBless(cid, i) == TRUE then
+			blesses = blesses + 1
 		end
-		doPlayerSetLossPercent(cid, i, newvalue)
 		i = i + 1
+	end
+
+	-- update %
+	if blesses >= 5 then
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 0)
+	elseif bless >= 4 then
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 10)
+	elseif bless >= 3 then
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 25)
+	elseif bless >= 2 then
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 45)
+	elseif bless >= 1 then
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 70)
+	else
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 100)
 	end
 end
 
 function doPlayerAddBless(cid, blessid)
-	local storageid = STORAGE_BLESSES + blessid
-	if getPlayerStorageValue(cid, storageid) <= 0 then
-		doPlayerRemoveLossPercent(cid, 1)
+	if getPlayerBless(cid, blessid) == FALSE then
+		doPlayerRemoveSkillLossPercent(cid, 8)
+		local storageid = STORAGE_BLESSES + blessid
 		setPlayerStorageValue(cid, storageid, 1)
+		doPlayerUpdateItemLossPercent(cid)
 	end
 end
 
 function doPlayerRemoveBless(cid, blessid)
-	local storageid = STORAGE_BLESSES + blessid
-	if getPlayerStorageValue(cid, storageid) >= 1 then
-		doPlayerRemoveLossPercent(cid, -1)
+	if getPlayerBless(cid, blessid) == TRUE then
+		doPlayerRemoveSkillLossPercent(cid, -8)
+		local storageid = STORAGE_BLESSES + blessid
 		setPlayerStorageValue(cid, storageid, -1)
+		doPlayerUpdateItemLossPercent(cid)
 	end
 end

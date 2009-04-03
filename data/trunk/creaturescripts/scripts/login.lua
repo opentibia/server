@@ -78,7 +78,7 @@ function onLogin(cid)
 
 		if(getPlayerStorageValue(cid, STORAGE_PROMOTION) == 1 and getPlayerVocation(cid) <= 4) then
 			doPlayerSetVocation(cid, getPlayerVocation(cid)+4)
-			doPlayerRemoveLossPercent(cid, 3)
+			doPlayerRemoveSkillLossPercent(cid, 30)
 			setPlayerStorageValue(cid, STORAGE_PROMOTION, -1)
 		end
 		return TRUE
@@ -113,7 +113,7 @@ function onLogin(cid)
 	local isPromo = (getPlayerVocation(cid) > 4)
 	if(isPromo) then
 		doPlayerSetVocation(cid, getPlayerVocation(cid)-4)
-		doPlayerRemoveLossPercent(cid, -3)
+		doPlayerRemoveSkillLossPercent(cid, -30)
 		setPlayerStorageValue(cid, STORAGE_PROMOTION, 1)
 	end
 

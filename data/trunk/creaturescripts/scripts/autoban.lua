@@ -8,6 +8,7 @@ function onKill(cid, target)
 			-- Kick all players that belong to the banished account
 			local players = getPlayersByAccountNumber(accno)
 			for _, pid in pairs(players) do
+				doSendMagicEffect(getPlayerPosition(pid), CONST_ME_MAGIC_GREEN)
 				addEvent(doRemoveCreature, 1000, pid)
 			end
 		end

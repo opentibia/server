@@ -162,7 +162,7 @@ function doBanPlayer(gm, creature)
 	if access ~= LUA_ERROR and gmaccess ~= LUA_ERROR and gmaccess <= access then
 		return
 	end
-	doPlayerSendTextMessage(creature, MESSAGE_EVENT_ADVANCE, "You have been banned.")
+	doSendMagicEffect(getPlayerPosition(creature), CONST_ME_MAGIC_GREEN)
 	addEvent(doBanPlayerChild, 1000, creature)
 end
 
