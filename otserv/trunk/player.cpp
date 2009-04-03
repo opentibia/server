@@ -626,7 +626,7 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 
 uint64_t Player::getLostExperience() const
 {
-	if(skillLoss)
+	if(!skillLoss)
 		return 0;
 
 	if(level < 25)

@@ -97,7 +97,7 @@ typedef std::list<Party*> PartyList;
 #define PLAYER_MAX_SPEED 1500
 #define PLAYER_MIN_SPEED 10
 const int32_t MAX_STAMINA = 42 * 60 * 60 * 1000;
-const int32_t MAX_STAMINA_MINUTES = 42 * 60;
+const int32_t MAX_STAMINA_MINUTES = MAX_STAMINA / 60000;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
