@@ -83,7 +83,7 @@ hunting_kill_duration = pzlocked
 field_ownership_duration = 5000
 
 -- enable (advanced, item based) hotkeys?
-enablehotkeys = false
+enablehotkeys = true
 
 -- minimum amount of time between actions ('Use') (1000 = 1 second)
 minactioninterval = 200
@@ -139,18 +139,15 @@ rate_mag = 1
 rate_loot = 1
 rate_spawn = 1
 
--- stamina rates
--- gain stamina rate - 1 minute offline = X milliseconds of stamina
-rate_stamina_gain = 500
--- loss stamina rate - works as other rates
+-- Stamina Configuration
+-- Gain stamina rate - 1 minute offline = X milliseconds of stamina
+rate_stamina_gain = 334
+-- Loss stamina rate - works as other rates
 rate_stamina_loss = 1
-
 -- For how many millisecond (from 42 hours) you get extra experience from monsters
-stamina_extra_experience_duration = 30 * 60 * 1000
-
+stamina_extra_experience_duration = 60 * 60 * 1000
 -- How much extra XP you get 0.5 is 50% extra
 stamina_extra_experience_rate = 0.5
-
 -- If true, only premium players gain extra experience
 stamina_extra_experience_onlyprem = true
 

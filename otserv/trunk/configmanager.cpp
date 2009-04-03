@@ -143,10 +143,10 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATE_MAGIC] = getGlobalNumber(L, "rate_mag", 1);
 	m_confInteger[RATE_SPAWN] = getGlobalNumber(L, "rate_spawn", 1);
 	m_confInteger[RATE_STAMINA_LOSS] = getGlobalNumber(L, "rate_stamina_loss", 1);
-	m_confInteger[RATE_STAMINA_GAIN] = getGlobalNumber(L, "rate_stamina_gain", 500);
-	m_confInteger[STAMINA_EXTRA_EXPERIENCE_DURATION] = getGlobalNumber(L, "stamina_extra_experience_duration", 30 * 60 * 1000);
+	m_confInteger[RATE_STAMINA_GAIN] = getGlobalNumber(L, "rate_stamina_gain", 334); //3 minutes offline = 1 minute of stamina - quick gain
+	m_confInteger[STAMINA_EXTRA_EXPERIENCE_DURATION] = getGlobalNumber(L, "stamina_extra_experience_duration", 60 * 60 * 1000);
 	m_confInteger[STAMINA_EXTRA_EXPERIENCE_ONLYPREM] = getGlobalBoolean(L, "stamina_extra_experience_onlyprem", true);
-	m_confInteger[STAMINA_EXTRA_EXPERIENCE_RATE] = getGlobalFloat(L, "stamina_extra_experience_rate", 0.5);
+	m_confFloat[STAMINA_EXTRA_EXPERIENCE_RATE] = getGlobalFloat(L, "stamina_extra_experience_rate", 0.5);
 	m_confInteger[HOTKEYS] = getGlobalBoolean(L, "enablehotkeys", false);
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);
 	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalBoolean(L, "saveclientdebug", false);

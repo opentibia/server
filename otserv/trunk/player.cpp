@@ -634,7 +634,7 @@ uint64_t Player::getLostExperience() const
 		return experience * lossPercent[LOSS_EXPERIENCE] / 1000;
 
 	double levels_to_lose = (getLevel() + 50) / 100.;
-	uint64_t xp_to_lose = 0.0;
+	uint64_t xp_to_lose = 0;
 	int clevel = getLevel();
 
 	while(levels_to_lose > 1.0){
@@ -896,7 +896,8 @@ void Player::dropLoot(Container* corpse)
 		return;
 	}
 
-	uint32_t itemLoss = lossPercent[LOSS_ITEMS];
+	uint32_t itemLoss = (lossPercent[LOSS_ITEMS] + 5) / 10;
+	uint32_t backpackLoss = lossPercent[LOSS_ITEMS];
 #ifdef __SKULLSYSTEM__
 	if(getSkull() == SKULL_RED){
 		itemLoss = 100;
@@ -909,8 +910,10 @@ void Player::dropLoot(Container* corpse)
 	if(itemLoss > 0){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
-			if(item && ((item->getContainer()) || ((uint32_t)random_range(1, 100)) <= itemLoss)){
-				g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), 0);
+			if(item){
+				if((item->getContainer() && (uint32_t)random_range(1, 100) <= backpackLoss) || (!item->getContainer() && (uint32_t)random_range(1, 100) <= itemLoss)){
+					g_game.internalMoveItem(this, corpse, INDEX_WHEREEVER, item, item->getItemCount(), 0);
+				}
 			}
 		}
 	}
@@ -1495,11 +1498,9 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 			if(timeOff - 600 > 0){
 				// Quick stamina is gained before the last half hour
 				// Slow stamina is gained after that
-
-				int stamina_rate = g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN);
-				int quick_stamina_max = MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION);
+				int32_t stamina_rate = g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN);
+				int32_t quick_stamina_max = MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION);
 				
-
 				// If current stamina is less than quick cap, we should add quick stamina
 				if(getStamina() < quick_stamina_max){
 					int64_t gain = timeOff * stamina_rate;
@@ -1516,7 +1517,6 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 				// Time left should now only be fast stamina
 				if(getStamina() < MAX_STAMINA){
 					int64_t gain = timeOff * stamina_rate / 4;
-
 					addStamina(gain);
 				}
 			}
@@ -4199,16 +4199,17 @@ void Player::addStamina(int64_t value)
 		newstamina = MAX_STAMINA;
 	if(newstamina < 0)
 		newstamina = 0;
+		
 	stamina = newstamina;
 }
 
 int32_t Player::getStaminaMinutes()
 {
     if(hasFlag(PlayerFlag_HasInfiniteStamina)){
-        return 60 * 60 * 1000;
+        return MAX_STAMINA_MINUTES;
     }
     
-    return std::min(60 * 60 * 1000, int(stamina) / 60 * 1000);
+    return std::min(MAX_STAMINA_MINUTES, int32_t(stamina / 60 * 1000));
 }
 
 void Player::checkIdleTime(uint32_t ticks)

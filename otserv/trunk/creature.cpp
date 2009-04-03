@@ -1060,7 +1060,7 @@ uint32_t Creature::getStaminaRatio(Creature* attacker) const
 
 uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*= true*/) const
 {
-	int64_t retValue = (int64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
+	uint64_t retValue = (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 	if(Player* player = attacker->getPlayer()){
 		if(useMultiplier)
 			retValue = (uint64_t)std::floor(retValue * player->getRateValue(LEVEL_EXPERIENCE));
@@ -1072,11 +1072,7 @@ uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*
 			else if(player->getStaminaMinutes() <= 0)
 				return 0;
 
-			player->removeStamina(
-				std::min(
-					int64_t(player->getStamina()),
-					int64_t(getStaminaRatio(attacker)) * player->getAttackSpeed() * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS)
-			));
+			player->removeStamina(getStaminaRatio(attacker) * player->getAttackSpeed() * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS));
 		}
 		//]
 	}
