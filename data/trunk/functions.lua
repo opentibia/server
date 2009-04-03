@@ -475,6 +475,7 @@ function convertIPToInt(str)
 end
 
 function getPlayerBless(cid, blessid)
+	local storageid = STORAGE_BLESSES + blessid
 	if getPlayerStorageValue(cid, storageid) >= 1 then
 		return TRUE
 	else
