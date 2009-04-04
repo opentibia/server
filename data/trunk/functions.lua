@@ -507,16 +507,22 @@ function doPlayerUpdateItemLossPercent(cid)
 	-- update %
 	if blesses >= 5 then
 		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 0)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 0)
 	elseif bless >= 4 then
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 10)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 1)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 10)
 	elseif bless >= 3 then
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 25)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 3)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 25)
 	elseif bless >= 2 then
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 45)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 5)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 45)
 	elseif bless >= 1 then
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 70)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 7)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 70)
 	else
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 100)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 10)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 100)
 	end
 end
 
@@ -536,4 +542,14 @@ function doPlayerRemoveBless(cid, blessid)
 		setPlayerStorageValue(cid, storageid, -1)
 		doPlayerUpdateItemLossPercent(cid)
 	end
+end
+
+function getBlessPrice(level)
+	local price = 2000
+	level = math.min(120, level)
+	if(level > 30) then
+		price = (price + ((level - 30) * 200))
+	end
+
+	return price
 end
