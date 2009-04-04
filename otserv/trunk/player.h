@@ -634,7 +634,7 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	std::string getSkillName(int skillid);
-	void gainExperience(uint64_t exp);
+	void gainExperience(uint64_t& exp);
 	void addExperience(uint64_t exp);
 
 	void updateInventoryWeigth();

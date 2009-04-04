@@ -629,24 +629,22 @@ uint64_t Player::getLostExperience() const
 	if(!skillLoss)
 		return 0;
 
-	if(level < 25){
-		// 100 loss is "normal" (10%), so dividing by 1000 gives correct value
+	if(level < 25)
 		return experience * lossPercent[LOSS_EXPERIENCE] / 1000;
-	}
 
 	double levels_to_lose = (getLevel() + 50) / 100.;
 	uint64_t xp_to_lose = 0;
-	int clevel = getLevel();
+	uint32_t clevel = getLevel();
 
-	while(levels_to_lose > 1.0){
-		xp_to_lose += getExpForLevel(clevel);
+	while(levels_to_lose >= 1.0){
+		xp_to_lose += (getExpForLevel(clevel) - getExpForLevel(clevel - 1));
 		clevel--;
 		levels_to_lose -= 1.0;
 	}
 	if(levels_to_lose > 0.0)
-		xp_to_lose += uint64_t(getExpForLevel(clevel) * levels_to_lose);
+		xp_to_lose += uint64_t((getExpForLevel(clevel) - getExpForLevel(clevel - 1)) * levels_to_lose);
 
-	return xp_to_lose * lossPercent[LOSS_EXPERIENCE] / 1000; // 1 for level 100 etc.
+	return xp_to_lose * lossPercent[LOSS_EXPERIENCE] / 100;
 }
 
 int32_t Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
@@ -1507,15 +1505,15 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 					int64_t gain = timeOff * stamina_rate;
 					
 					if(stamina + gain > quick_stamina_max){
-						// We gained full slow stamina
+						// We gained full quick stamina
 						// Remove all the time spent getting stamina this way
 						timeOff -= (quick_stamina_max - getStamina()) / stamina_rate;
-						// We gain atleast up to the slow max
+						// We gain atleast up to the quick max
 						addStamina(quick_stamina_max - getStamina());
 					}
 				}
 
-				// Time left should now only be fast stamina
+				// Time left should now only be slow stamina
 				if(getStamina() < MAX_STAMINA){
 					int64_t gain = timeOff * stamina_rate / 4;
 					addStamina(gain);
@@ -2251,7 +2249,7 @@ void Player::die()
 				break;
 		}
 
-		double lostPercent = 1. - ((experience - expLost) / double(experience)); // 0.1 if 10% was lost
+		double lostPercent = 1. - (double(experience - expLost) / double(experience)); // 0.1 if 10% was lost
 
 		if(newLevel != level){
 			std::stringstream lvMsg;
@@ -3691,7 +3689,7 @@ void Player::onKilledCreature(Creature* target)
 	Creature::onKilledCreature(target);
 }
 
-void Player::gainExperience(uint64_t gainExp)
+void Player::gainExperience(uint64_t& gainExp)
 {
 	if(!hasFlag(PlayerFlag_NotGainExperience)){
 		if(gainExp > 0){
@@ -3705,7 +3703,7 @@ void Player::gainExperience(uint64_t gainExp)
 				addCondition(condition);
 			}
 			
-			if(isPremium() && g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM) &&
+			if((isPremium() || !g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM)) &&
 					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION))
 				gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
 			
@@ -3727,14 +3725,14 @@ void Player::onGainExperience(uint64_t gainExp)
 		gainExp = 0;
 	}
 
-	Creature::onGainExperience(gainExp);
 	gainExperience(gainExp);
+	Creature::onGainExperience(gainExp);
 }
 
 void Player::onGainSharedExperience(uint64_t gainExp)
 {
-	Creature::onGainSharedExperience(gainExp);
 	gainExperience(gainExp);
+	Creature::onGainSharedExperience(gainExp);
 }
 
 bool Player::isImmune(CombatType_t type) const
