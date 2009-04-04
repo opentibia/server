@@ -50,7 +50,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `redskulltime`, \
 		`redskull`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
-		`loss_items`, `rank_id`, `town_id`, `balance`, `stamina` \
+		`loss_items`, `loss_containers`, `rank_id`, `town_id`, `balance`, `stamina` \
 		FROM `players` LEFT JOIN `accounts` ON `account_id` = `accounts`.`id` \
 		WHERE `players`.`name` = " + db->escapeString(name);
 
@@ -152,6 +152,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->setLossPercent(LOSS_MANASPENT, result->getDataInt("loss_mana"));
 	player->setLossPercent(LOSS_SKILLTRIES, result->getDataInt("loss_skills"));
 	player->setLossPercent(LOSS_ITEMS, result->getDataInt("loss_items"));
+	player->setLossPercent(LOSS_CONTAINERS, result->getDataInt("loss_containers"));
 
 	player->loginPosition.x = result->getDataInt("posx");
 	player->loginPosition.y = result->getDataInt("posy");
@@ -486,6 +487,7 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
 	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES)
 	<< ", `loss_items` = " << (int)player->getLossPercent(LOSS_ITEMS)
+	<< ", `loss_containers` = " << (int)player->getLossPercent(LOSS_CONTAINERS)
 	<< ", `balance` = " << player->balance
 	<< ", `stamina` = " << player->stamina;
 

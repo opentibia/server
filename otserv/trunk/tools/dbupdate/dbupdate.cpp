@@ -139,38 +139,35 @@ SimpleUpdateQuery updateQueries[] = {
 	{ 5,
         { // PgSql
             "ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000;",
+		"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
             "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
             "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
             "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
-            "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
             NULL
         },
         { // MySql
             "ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds';",
+		"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
             "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
             "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
             "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
-            "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
             NULL
         },
         { // Sqlite
             "ALTER TABLE `players` CHANGE `stamina` `stamina` INTEGER NOT NULL DEFAULT 151200000;",
+		"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
             "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INTEGER NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
             "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INTEGER NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
             "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INTEGER NOT NULL DEFAULT 100;",
 			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
-            "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
             NULL
         }
 	}

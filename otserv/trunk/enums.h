@@ -177,7 +177,8 @@ enum lossTypes_t {
 	LOSS_MANASPENT = 1,
 	LOSS_SKILLTRIES = 2,
 	LOSS_ITEMS = 3,
-	LOSS_LAST = LOSS_ITEMS
+	LOSS_CONTAINERS = 4,
+	LOSS_LAST = LOSS_CONTAINERS
 };
 
 enum formulaType_t{

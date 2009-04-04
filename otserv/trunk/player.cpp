@@ -629,9 +629,10 @@ uint64_t Player::getLostExperience() const
 	if(!skillLoss)
 		return 0;
 
-	if(level < 25)
+	if(level < 25){
 		// 100 loss is "normal" (10%), so dividing by 1000 gives correct value
 		return experience * lossPercent[LOSS_EXPERIENCE] / 1000;
+	}
 
 	double levels_to_lose = (getLevel() + 50) / 100.;
 	uint64_t xp_to_lose = 0;
@@ -896,8 +897,8 @@ void Player::dropLoot(Container* corpse)
 		return;
 	}
 
-	uint32_t itemLoss = (lossPercent[LOSS_ITEMS] + 5) / 10;
-	uint32_t backpackLoss = lossPercent[LOSS_ITEMS];
+	uint32_t itemLoss = lossPercent[LOSS_ITEMS];
+	uint32_t backpackLoss = lossPercent[LOSS_CONTAINERS];
 #ifdef __SKULLSYSTEM__
 	if(getSkull() == SKULL_RED){
 		itemLoss = 100;
@@ -2250,7 +2251,7 @@ void Player::die()
 				break;
 		}
 
-		double lostPercent = 1. - (experience - expLost) / double(experience); // 0.1 if 10% was lost
+		double lostPercent = 1. - ((experience - expLost) / double(experience)); // 0.1 if 10% was lost
 
 		if(newLevel != level){
 			std::stringstream lvMsg;
@@ -4209,7 +4210,7 @@ int32_t Player::getStaminaMinutes()
         return MAX_STAMINA_MINUTES;
     }
     
-    return std::min(MAX_STAMINA_MINUTES, int32_t(stamina / 60 * 1000));
+    return std::min(MAX_STAMINA_MINUTES, int32_t(stamina / 60000));
 }
 
 void Player::checkIdleTime(uint32_t ticks)
