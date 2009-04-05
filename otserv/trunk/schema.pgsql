@@ -59,7 +59,7 @@ CREATE TABLE "players" (
     "loss_experience" INT NOT NULL DEFAULT 100,
     "loss_mana" INT NOT NULL DEFAULT 100,
     "loss_skills" INT NOT NULL DEFAULT 100,
-    "loss_items" INT NOT NULL DEFAULT 10,
+    "loss_items" INT NOT NULL DEFAULT 100,
     "loss_containers" INT NOT NULL DEFAULT 100,
     "rank_id" INT NOT NULL,
     "town_id" INT NOT NULL,
@@ -204,7 +204,7 @@ CREATE TABLE "schema_info" (
     PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 5);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 6);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER

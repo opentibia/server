@@ -59,7 +59,7 @@ CREATE TABLE `players` (
     `loss_experience` INT NOT NULL DEFAULT 100,
     `loss_mana` INT NOT NULL DEFAULT 100,
     `loss_skills` INT NOT NULL DEFAULT 100,
-    `loss_items` INT NOT NULL DEFAULT 10,
+    `loss_items` INT NOT NULL DEFAULT 100,
     `loss_containers` INT NOT NULL DEFAULT 100,
     `rank_id` INT UNSIGNED NOT NULL COMMENT 'by this field everything with guilds is done - player has a rank which belongs to certain guild',
     `town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
@@ -210,7 +210,7 @@ CREATE TABLE `schema_info` (
     PRIMARY KEY (`name`)
 );
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 5);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 6);
 
 DELIMITER |
 
