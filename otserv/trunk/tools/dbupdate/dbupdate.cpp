@@ -136,7 +136,7 @@ SimpleUpdateQuery updateQueries[] = {
             NULL
         }
     },
-	{ 5,
+    { 5,
         { // PgSql
             "ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000;",
             "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
@@ -167,37 +167,37 @@ SimpleUpdateQuery updateQueries[] = {
 			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
             NULL
         }
-	},
+    },
     { 6,
-        { // PgSql
-            "ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
-            NULL
+	{ // PgSql
+	    "ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
+	    NULL
         },
-        { // MySql
-            "ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
-            NULL
-        },
-        { // Sqlite
-            "ALTER TABLE `players` ADD `loss_containers` INTEGER NOT NULL DEFAULT 100;",
-            NULL
-        }
-    }
+	{ // MySql
+	    "ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
+	    NULL
+	},
+	{ // Sqlite
+	    "ALTER TABLE `players` ADD `loss_containers` INTEGER NOT NULL DEFAULT 100;",
+	    NULL
+	}
+    },
     { 7,
-        { // PgSql
-           "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
-                      "UPDATE `players` SET `loss_items`=`loss_items`*10;",
-           NULL
+	{ // PgSql
+	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+	    NULL
         },
-        { // MySql
-           "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
-                      "UPDATE `players` SET `loss_items`=`loss_items`*10;",
-            NULL
-        },
-        { // Sqlite
-           "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INTEGER NOT NULL DEFAULT 100;", 	 
-                      "UPDATE `players` SET `loss_items`=`loss_items`*10;",
-            NULL
-        }
+	{ // MySql
+	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+	    NULL
+	},
+	{ // Sqlite
+	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INTEGER NOT NULL DEFAULT 100;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+	    NULL
+	}
     }
 };
 
