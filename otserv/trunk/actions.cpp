@@ -39,7 +39,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-//#include <boost/bind.hpp>
+
 #include <sstream>
 
 #include "actions.h"
@@ -400,15 +400,10 @@ bool Actions::executeUseEx(Action* action, Player* player, Item* item, const Pos
 		if(item->hasSubType() && !item->hasCharges()){
 			subType = item->getSubType();
 		}
-
-		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			return false;
-		}
 	}
-	else{
-		if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
-			return false;
-		}
+
+	if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
+		return false;
 	}
 
 	return true;

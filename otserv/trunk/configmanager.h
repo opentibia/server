@@ -118,6 +118,8 @@ public:
 		IDLE_TIME,
 		IDLE_TIME_WARNING,
 		ATTACK_SPEED,
+		HOUSE_ONLY_PREMIUM,
+		HOUSE_LEVEL,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

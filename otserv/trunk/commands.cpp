@@ -826,7 +826,12 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 			return false;
 		}
 
-		if(tradePartner->getPlayerInfo(PLAYERINFO_LEVEL) < 1){
+        if(!tradePartner->isPremium() && g_config.getNumber(ConfigManager::HOUSE_ONLY_PREMIUM)){
+			player->sendCancel("Trade player doesn't have a premium account.");
+			return false;
+		}
+
+		if(tradePartner->getPlayerInfo(PLAYERINFO_LEVEL) < g_config.getNumber(ConfigManager::HOUSE_LEVEL)){
 			player->sendCancel("Trade player level is too low.");
 			return false;
 		}
