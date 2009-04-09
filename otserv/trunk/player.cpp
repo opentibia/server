@@ -1493,29 +1493,27 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		
 		if(lastLogout > 0)
 		{
-			int64_t timeOff = time(NULL) - lastLogout;
-			if(timeOff - 600 > 0){
-				// Quick stamina is gained before the last half hour
-				// Slow stamina is gained after that
+			int64_t timeOff = time(NULL) - lastLogout - 600;
+			if(timeOff > 0){
 				int32_t stamina_rate = g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN);
 				int32_t quick_stamina_max = MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION);
+				int64_t gain;
+				bool checkSlowStamina = true;
 				
-				// If current stamina is less than quick cap, we should add quick stamina
 				if(getStamina() < quick_stamina_max){
-					int64_t gain = timeOff * stamina_rate;
-					
-					if(stamina + gain > quick_stamina_max){
-						// We gained full quick stamina
-						// Remove all the time spent getting stamina this way
+					gain = timeOff * stamina_rate;
+					if(getStamina() + gain > quick_stamina_max){
 						timeOff -= (quick_stamina_max - getStamina()) / stamina_rate;
-						// We gain atleast up to the quick max
 						addStamina(quick_stamina_max - getStamina());
+					}
+					else{
+						addStamina(gain);
+						checkSlowStamina = false;
 					}
 				}
 
-				// Time left should now only be slow stamina
-				if(getStamina() < MAX_STAMINA){
-					int64_t gain = timeOff * stamina_rate / 4;
+				if(getStamina() < MAX_STAMINA && checkSlowStamina){
+					gain = timeOff * stamina_rate / 4;
 					addStamina(gain);
 				}
 			}
