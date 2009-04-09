@@ -220,7 +220,7 @@ bool hasBitSet(uint32_t flag, uint32_t flags)
 #define RAND_MAX24 16777216
 uint32_t rand24b()
 {
-	return (rand() << 12) ^ (rand()) & (0xFFFFFF);
+	return ((rand() << 12) ^ (rand()) & (0xFFFFFF));
 }
 
 float box_muller(float m, float s)

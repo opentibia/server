@@ -217,7 +217,7 @@ bool Quests::loadFromXml(const std::string& _filename)
 							while(tmpNode2){
 								if(xmlStrcmp(tmpNode2->name, (const xmlChar*)"missionstate") == 0){
 									std::string description;
-									uint32_t missionID;
+									uint32_t missionID = 0;
 									if(readXMLInteger(tmpNode2, "id", intValue))
 										missionID = intValue;
 									if(readXMLString(tmpNode2, "description", strValue))

@@ -704,7 +704,7 @@ protected:
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 	
-	uint32_t idleTime;
+	int32_t idleTime;
 	bool idleWarned;
 
 	double inventoryWeight;

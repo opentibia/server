@@ -106,9 +106,9 @@ class Quests
 		uint16_t getQuestsCount(Player* player);
 		bool reload();
 
-private:
-	std::string filename;
-	QuestsList quests;
+	private:
+		std::string filename;
+		QuestsList quests;
 };
 
 #endif
