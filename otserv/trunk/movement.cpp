@@ -840,8 +840,8 @@ uint32_t MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position
 
 uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 {
-	//onStepIn(cid, item, pos)
-	//onStepOut(cid, item, pos)
+	//onStepIn(cid, item, topos, frompos)
+	//onStepOut(cid, item, topos, frompos)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 
@@ -863,8 +863,9 @@ uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& 
 		lua_pushnumber(L, cid);
 		LuaScriptInterface::pushThing(L, item, itemid);
 		LuaScriptInterface::pushPosition(L, pos, 0);
+		LuaScriptInterface::pushPosition(L, creature->getLastPos(), 0);
 
-		int32_t result = m_scriptInterface->callFunction(3);
+		int32_t result = m_scriptInterface->callFunction(4);
 		m_scriptInterface->releaseScriptEnv();
 
 		return (result != LUA_FALSE);

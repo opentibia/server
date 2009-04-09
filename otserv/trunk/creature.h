@@ -158,8 +158,11 @@ public:
 	Direction getDirection() const { return direction;}
 	void setDirection(Direction dir) { direction = dir;}
 
-	const Position& getMasterPos() const { return masterPos;}
+	const Position& getMasterPos() const { return masterPos; }
 	void setMasterPos(const Position& pos, uint32_t radius = 1) { masterPos = pos; masterRadius = radius;}
+	
+	const Position& getLastPos() const { return lastPos; }
+	void setLastPos(const Position& pos){ lastPos = pos; }
 
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return (getSleepTicks() <= 0);};
@@ -388,6 +391,7 @@ protected:
 	Outfit_t defaultOutfit;
 
 	Position masterPos;
+	Position lastPos;
 	int32_t masterRadius;
 	uint64_t lastStep;
 	uint32_t lastStepCost;
