@@ -4223,7 +4223,7 @@ void Player::checkIdleTime(uint32_t ticks)
 			int32_t remainingTime = (g_config.getNumber(ConfigManager::IDLE_TIME) - g_config.getNumber(ConfigManager::IDLE_TIME_WARNING)) / 60000;
 			std::stringstream message;
 			message << "You have been idle for " << alreadyIdleTime << " " << (alreadyIdleTime > 1 ? "minutes" : "minute") << ", you will be disconnected in " << remainingTime << " " << (remainingTime > 1 ? "minutes" : "minute") << " if you are still idle then.";
-			client->sendTextMessage(MSG_STATUS_WARNING, message.str());
+			sendTextMessage(MSG_STATUS_WARNING, message.str());
 			idleWarned = true;
 		}
 	}
