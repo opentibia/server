@@ -475,9 +475,6 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 			isMapLoaded = true;
 			updateMapCache();
 		}
-		if(isLogin){
-			setLastPos(getPosition());
-		}
 	}
 	else if(isMapLoaded){
 		if(creature->getPosition().z == getPosition().z){
@@ -535,7 +532,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	if(creature == this){
-		setLastPos(newPos);
+		setLastPos(oldPos);
 		lastStep = OTSYS_TIME();
 		extraStepDuration = 0;
 		lastStepCost = 1;
