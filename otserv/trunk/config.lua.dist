@@ -39,11 +39,11 @@ game_port = "7172"
 -- status port
 -- Used by status protocol connections, should be same as login
 -- to work correctly with server lists etc.
-port = "7171"
+status_port = "7171"
 
 -- admin port
 -- Port used by the OTAdmin protocol
-port = "7171"
+admin_port = "7171"
 
 -- server url
 url = "http://otserv.org"
