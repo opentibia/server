@@ -41,6 +41,8 @@ public:
 
 	ProtocolOld(Connection* connection) : Protocol(connection)
 	{
+		enableChecksum();
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		protocolOldCount++;
 #endif

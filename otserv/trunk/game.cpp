@@ -4475,6 +4475,7 @@ void Game::shutdown()
 	Scheduler::getScheduler().shutdown();
 	Dispatcher::getDispatcher().shutdown();
 	Spawns::getInstance()->clear();
+	Raids::getInstance()->clear();
 	g_bans.clearTemporaryBans();
 
 	cleanup();

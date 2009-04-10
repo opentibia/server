@@ -212,6 +212,7 @@ ProtocolGame::ProtocolGame(Connection* connection) :
 	m_debugAssertSent = false;
 	m_acceptPackets = false;
 	eventConnect = 0;
+	enableChecksum();
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	protocolGameCount++;

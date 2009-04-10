@@ -43,7 +43,7 @@ public:
 	{
 		m_connection = connection;
 		m_encryptionEnabled = false;
-		m_checksumEnabled = true;
+		m_checksumEnabled = false;
 		m_rawMessages = false;
 		m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
 		m_refCount = 0;

@@ -4233,7 +4233,7 @@ uint32_t Player::getFrags()
 	if(redSkullTicks <= 0)
 		frags = 0;
 	else
-		frags = (uint32_t)std::ceil(redSkullTicks / g_config.getNumber(ConfigManager::FRAG_TIME));
+		frags = (uint32_t)std::ceil(((double)redSkullTicks / g_config.getNumber(ConfigManager::FRAG_TIME)));
 
 	return frags;
 }
