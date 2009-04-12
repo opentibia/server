@@ -895,7 +895,7 @@ void Player::dropLoot(Container* corpse)
 		return;
 	}
 
-	uint32_t itemLoss = lossPercent[LOSS_ITEMS] / 10;
+	uint32_t itemLoss = lossPercent[LOSS_ITEMS];
 	uint32_t backpackLoss = lossPercent[LOSS_CONTAINERS];
 #ifdef __SKULLSYSTEM__
 	if(getSkull() == SKULL_RED){

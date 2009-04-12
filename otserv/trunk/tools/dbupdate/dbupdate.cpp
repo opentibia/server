@@ -198,6 +198,23 @@ SimpleUpdateQuery updateQueries[] = {
 			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
 	    NULL
 	}
+    },
+    { 8,
+	{ // PgSql
+	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
+	    NULL
+        },
+	{ // MySql
+	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
+	    NULL
+	},
+	{ // Sqlite
+	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INTEGER NOT NULL DEFAULT 10;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
+	    NULL
+	}
     }
 };
 
