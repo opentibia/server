@@ -509,19 +509,19 @@ function doPlayerUpdateItemLossPercent(cid)
 		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 0)
 		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 0)
 	elseif blesses >= 4 then
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 10)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 1)
 		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 10)
 	elseif blesses >= 3 then
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 30)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 3)
 		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 25)
 	elseif blesses >= 2 then
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 50)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 5)
 		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 45)
 	elseif blesses >= 1 then
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 70)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 7)
 		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 70)
 	else
-		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 100)
+		doPlayerSetLossPercent(cid, PLAYERLOSS_ITEMS, 10)
 		doPlayerSetLossPercent(cid, PLAYERLOSS_CONTAINERS, 100)
 	end
 end
