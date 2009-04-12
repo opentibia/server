@@ -58,6 +58,7 @@ enum ConditionType_t {
 	CONDITION_EXHAUST_HEAL   = 1 << 22,
 	CONDITION_PACIFIED       = 1 << 23, // Cannot attack anything
 	CONDITION_HUNTING        = 1 << 24, // Killing monsters
+	CONDITION_TRADE_MUTED    = 1 << 25, // Cannot talk on trade channels
 };
 
 enum ConditionEnd_t{

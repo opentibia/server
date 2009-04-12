@@ -149,6 +149,12 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string&
 	if(iter == m_users.end())
 		return false;
 
+	// Add trade muted condition
+	if(getId() == CHANNEL_TRADE || getId() == CHANNEL_TRADE_ROOK){
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_TRADE_MUTED, 120000, 0);
+		fromPlayer->addCondition(condition);
+	}
+
 	for(it = m_users.begin(); it != m_users.end(); ++it){
 		it->second->sendToChannel(fromPlayer, type, text, getId(), time);
 		success = true;
@@ -388,6 +394,26 @@ bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& t
 			}
 			break;
 		}
+		// Players can't speak in these channels while they're level 1
+		// Also, there is a delay of 2 minutes for trade and trade rook
+		case CHANNEL_TRADE:
+		case CHANNEL_TRADE_ROOK:
+		case CHANNEL_RL_CHAT:
+		case CHANNEL_GAME_CHAT:
+		{
+			if(!player->hasFlag(PlayerFlag_CannotBeMuted)){
+				if(player->getLevel() < 2){
+					player->sendCancel("You may not speak into channels as long as you are on level 1.");
+					return true;
+					break;
+				}
+				else if((channelId == CHANNEL_TRADE || channelId == CHANNEL_TRADE_ROOK) && player->hasCondition(CONDITION_TRADE_MUTED)){
+					player->sendCancel("You may only place one offer in two minutes.");
+					return true;
+					break;
+				}
+			}
+		}
 		default:
 		{
 			break;
@@ -439,6 +465,12 @@ ChannelList Chat::getChannelList(Player* player)
 	for(itn = m_normalChannels.begin(); itn != m_normalChannels.end(); ++itn){
 		if(itn->first == CHANNEL_RULE_REP && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule violations channel
 			continue;
+		}
+		if(!player->hasFlag(PlayerFlag_CannotBeMuted)){
+			if(itn->first == CHANNEL_TRADE && player->getVocationId() == 0)
+				continue;
+			if(itn->first == CHANNEL_TRADE_ROOK && player->getVocationId() != 0)
+				continue;
 		}
 
 		ChatChannel *channel = itn->second;
