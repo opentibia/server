@@ -158,13 +158,7 @@ SimpleUpdateQuery updateQueries[] = {
             NULL
         },
         { // Sqlite
-            "ALTER TABLE `players` CHANGE `stamina` `stamina` INTEGER NOT NULL DEFAULT 151200000;",
-            "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INTEGER NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
-            "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INTEGER NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
-            "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INTEGER NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
+			// Can't be done, SQLite does not support changing tables
             NULL
         }
     },
@@ -178,7 +172,7 @@ SimpleUpdateQuery updateQueries[] = {
 	    NULL
 	},
 	{ // Sqlite
-	    "ALTER TABLE `players` ADD `loss_containers` INTEGER NOT NULL DEFAULT 100;",
+		// No support
 	    NULL
 	}
     },
@@ -194,8 +188,7 @@ SimpleUpdateQuery updateQueries[] = {
 	    NULL
 	},
 	{ // Sqlite
-	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INTEGER NOT NULL DEFAULT 100;", 	 
-			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+	    // No support
 	    NULL
 	}
     },
@@ -211,8 +204,7 @@ SimpleUpdateQuery updateQueries[] = {
 	    NULL
 	},
 	{ // Sqlite
-	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INTEGER NOT NULL DEFAULT 10;", 	 
-			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
+	    // No support
 	    NULL
 	}
     }
@@ -231,6 +223,20 @@ bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
 	else if(sqltype == "sqlite") queries = &updateQuery.lite_query;
 	else return false;
 
+	// This is quite a stupid check for "not supported"
+	// as some database updates may not require changes for
+	// all database drivers, if this situation occurs feel free
+	// to improve on the code.
+	if((*queries)[0] == NULL){
+		std::cout << 
+			std::endl <<
+			"ERROR: Database update " << updateQuery.version << 
+			" is not supported for " << sqltype << ". You need to " <<
+			"recreate your database manually" <<
+			std::endl;
+		return false;
+	}
+
 	for(int i = 0; (*queries)[i]; ++i){
 		std::cout << "Executing query : " << (*queries)[i] << std::endl;
 		if(!db->executeQuery((*queries)[i])){
@@ -244,8 +250,10 @@ bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
 
 void ErrorMessage(const char* message) {
 	std::cout << std::endl << std::endl << "Error: " << message;
-	if(wait_for_input)
+	if(wait_for_input){
+		std::cin.ignore();
 		std::cin.get();
+	}
 }
 
 int main(int argn, const char* argv[]){
@@ -315,7 +323,7 @@ int main(int argn, const char* argv[]){
 	std::cout << "Version = " << schema_version << " ";
 	std::cout << "[done]" << std::endl;
 	db->freeResult(result);
-
+	schema_version = 4;
 	if(schema_version == CURRENT_SCHEMA_VERSION){
 		std::cout << ":: Your database schema is updated." << std::endl;
 		std::cout << "Press any key to close ...";
