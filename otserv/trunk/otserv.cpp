@@ -249,8 +249,14 @@ int main(int argc, char *argv[])
 
 	ServiceManager servicer;
 
+	// Start scheduler and dispatcher threads
+	g_dispatcher.start();
+	g_scheduler.start();
+
+	// Add load task
 	g_dispatcher.addTask(createTask(boost::bind(mainLoader, g_command_opts, &servicer)));
 
+	// Wait for loading to finish
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
 	if(servicer.is_running()){

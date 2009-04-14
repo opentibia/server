@@ -29,6 +29,11 @@
 Scheduler::Scheduler()
 {
 	m_lastEventId = 0;
+	m_threadState = STATE_TERMINATED;
+}
+
+void Scheduler::start()
+{
 	m_threadState = STATE_RUNNING;
 	boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)this));
 }

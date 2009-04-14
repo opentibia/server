@@ -32,7 +32,12 @@ extern Game g_game;
 Dispatcher::Dispatcher()
 {
 	m_taskList.clear();
-	m_threadState = Dispatcher::STATE_RUNNING;
+	m_threadState = STATE_TERMINATED;
+}
+
+void Dispatcher::start()
+{
+	m_threadState = STATE_RUNNING;
 	boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)this));
 }
 
@@ -51,7 +56,7 @@ void Dispatcher::dispatcherThread(void* p)
 	// NOTE: second argument defer_lock is to prevent from immediate locking
 	boost::unique_lock<boost::mutex> taskLockUnique(dispatcher->m_taskLock, boost::defer_lock);
 
-	while(dispatcher->m_threadState != dispatcher->STATE_TERMINATED){
+	while(dispatcher->m_threadState != STATE_TERMINATED){
 		Task* task = NULL;
 
 		// check if there are tasks waiting

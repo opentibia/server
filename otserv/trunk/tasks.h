@@ -60,6 +60,8 @@ public:
 	~Dispatcher() {}
 
 	void addTask(Task* task);
+
+	void start();
 	void stop();
 	void shutdown();
 
