@@ -178,6 +178,7 @@ public:
 	enum {server_sends_first = false};
 	enum {protocol_identifier = 0xFE}; // Not required as we send first
 	enum {use_checksum = false};
+	static const char* protocol_name() {return "admin protocol";}
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolAdminCount;

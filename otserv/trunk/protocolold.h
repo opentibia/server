@@ -71,6 +71,7 @@ class ProtocolOldLogin : public ProtocolOld
 {
 public:
 	enum {protocol_identifier = 0x01};
+	static const char* protocol_name() {return "old login protocol";}
 	
 	ProtocolOldLogin(Connection* connection) : ProtocolOld(connection) {}
 };
@@ -79,6 +80,7 @@ class ProtocolOldGame : public ProtocolOld
 {
 public:
 	enum {protocol_identifier = 0x0A};
+	static const char* protocol_name() {return "old gameworld protocol";}
 	
 	ProtocolOldGame(Connection* connection) : ProtocolOld(connection) {}
 };

@@ -48,6 +48,7 @@ public:
 	virtual bool is_single_socket() const = 0;
 	virtual bool is_checksummed() const = 0;
 	virtual uint8_t get_protocol_identifier() const = 0;
+	virtual const char* get_protocol_name() const = 0;
 
 	virtual Protocol* make_protocol(Connection* c) const = 0;
 };
@@ -59,6 +60,7 @@ public:
 	bool is_single_socket() const {return ProtocolType::server_sends_first;}
 	bool is_checksummed() const {return ProtocolType::use_checksum;}
 	uint8_t get_protocol_identifier() const {return ProtocolType::protocol_identifier;}
+	const char* get_protocol_name() const {return ProtocolType::protocol_name();}
 
 	Protocol* make_protocol(Connection* c) const {return new ProtocolType(c);}
 };
@@ -75,6 +77,8 @@ public:
 
 	void open(uint16_t port);
 	void close();
+	bool is_single_socket() const;
+	std::string get_protocol_names() const;
 
 	bool add_service(Service_ptr);
 	Protocol* make_protocol(bool checksummed, NetworkMessage& msg) const;
@@ -112,6 +116,7 @@ public:
 	template <typename ProtocolType>
 	bool add(uint16_t port);
 
+	bool is_running() const {return m_acceptors.empty() == false;}
 	std::list<uint16_t> get_ports() const;
 protected:
 	std::map<uint16_t, ServicePort_ptr> m_acceptors;
@@ -122,6 +127,10 @@ protected:
 template <typename ProtocolType>
 bool ServiceManager::add(uint16_t port)
 {
+	if(port == 0){
+		std::cout << "ERROR: No port provided for service " << ProtocolType::protocol_name() << ". Service disabled." << std::endl;
+		return false;
+	}
 	ServicePort_ptr service_port;
 
 	std::map<uint16_t, ServicePort_ptr>::iterator finder = 
@@ -134,6 +143,12 @@ bool ServiceManager::add(uint16_t port)
 	}
 	else{
 		service_port = finder->second;
+		if(service_port->is_single_socket() || ProtocolType::server_sends_first){
+			std::cout << "ERROR: " << ProtocolType::protocol_name() << 
+				" and " << service_port->get_protocol_names() << 
+				" cannot use the same port " << port << "." << std::endl;
+			return false;
+		}
 	}
 
 	return service_port->add_service(Service_ptr(new Service<ProtocolType>()));

@@ -99,7 +99,7 @@ void Connection::closeConnection()
 
 	m_closeState = CLOSE_STATE_REQUESTED;
 
-	Dispatcher::getDispatcher().addTask(
+	g_dispatcher.addTask(
 		createTask(boost::bind(&Connection::closeConnectionTask, this)));
 }
 
@@ -120,7 +120,7 @@ void Connection::closeConnectionTask()
 	m_closeState = CLOSE_STATE_CLOSING;
 
 	if(m_protocol){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(&Protocol::releaseProtocol, m_protocol)));
 		m_protocol->setConnection(NULL);
 		m_protocol = NULL;
@@ -168,7 +168,7 @@ bool Connection::closingConnection()
 
 			m_connectionLock.unlock();
 
-			Dispatcher::getDispatcher().addTask(
+			g_dispatcher.addTask(
 				createTask(boost::bind(&Connection::releaseConnection, this)));
 
 			return true;
@@ -181,7 +181,7 @@ void Connection::releaseConnection()
 {
 	if(m_refCount > 0){
 		//Reschedule it and try again.
-		Scheduler::getScheduler().addEvent( createSchedulerTask(SCHEDULER_MINTICKS,
+		g_scheduler.addEvent( createSchedulerTask(SCHEDULER_MINTICKS,
 			boost::bind(&Connection::releaseConnection, this)));
 	}
 	else{

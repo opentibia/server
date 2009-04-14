@@ -56,19 +56,12 @@ enum DispatcherState{
 
 class Dispatcher{
 public:
+	Dispatcher();
 	~Dispatcher() {}
-
-	static Dispatcher& getDispatcher()
-	{
-		static Dispatcher dispatcher;
-		return dispatcher;
-	}
 
 	void addTask(Task* task);
 	void stop();
 	void shutdown();
-
-	static void dispatcherThread(void* p);
 
 	enum DispatcherState{
 		STATE_RUNNING,
@@ -78,15 +71,17 @@ public:
 
 protected:
 
-	Dispatcher();
+	static void dispatcherThread(void* p);
+
 	void flush();
 
 	boost::mutex m_taskLock;
 	boost::condition_variable m_taskSignal;
 
 	std::list<Task*> m_taskList;
-	static DispatcherState m_threadState;
+	DispatcherState m_threadState;
 };
 
+extern Dispatcher g_dispatcher;
 
 #endif

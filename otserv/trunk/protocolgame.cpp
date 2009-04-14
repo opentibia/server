@@ -72,7 +72,7 @@ template<class T1, class f1, class r>
 void ProtocolGame::addGameTask(r (Game::*f)(f1), T1 p1)
 {
 	if(m_now > m_nextTask || m_messageCount < 5){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(f, &g_game, p1)));
 
 		m_nextTask = m_now + ADD_TASK_INTERVAL;
@@ -87,7 +87,7 @@ template<class T1, class T2, class f1, class f2, class r>
 void ProtocolGame::addGameTask(r (Game::*f)(f1, f2), T1 p1, T2 p2)
 {
 	if(m_now > m_nextTask || m_messageCount < 5){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(f, &g_game, p1, p2)));
 
 		m_nextTask = m_now + ADD_TASK_INTERVAL;
@@ -104,7 +104,7 @@ class r>
 void ProtocolGame::addGameTask(r (Game::*f)(f1, f2, f3), T1 p1, T2 p2, T3 p3)
 {
 	if(m_now > m_nextTask || m_messageCount < 5){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(f, &g_game, p1, p2, p3)));
 
 		m_nextTask = m_now + ADD_TASK_INTERVAL;
@@ -121,7 +121,7 @@ class r>
 void ProtocolGame::addGameTask(r (Game::*f)(f1, f2, f3, f4), T1 p1, T2 p2, T3 p3, T4 p4)
 {
 	if(m_now > m_nextTask || m_messageCount < 5){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(f, &g_game, p1, p2, p3, p4)));
 
 		m_nextTask = m_now + ADD_TASK_INTERVAL;
@@ -138,7 +138,7 @@ class r>
 void ProtocolGame::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5)
 {
 	if(m_now > m_nextTask || m_messageCount < 5){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5)));
 
 		m_nextTask = m_now + ADD_TASK_INTERVAL;
@@ -155,7 +155,7 @@ class r>
 void ProtocolGame::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6)
 {
 	if(m_now > m_nextTask || m_messageCount < 5){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6)));
 
 		m_nextTask = m_now + ADD_TASK_INTERVAL;
@@ -172,7 +172,7 @@ class r>
 void ProtocolGame::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7)
 {
 	if(m_now > m_nextTask || m_messageCount < 5){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6, p7)));
 
 		m_nextTask = m_now + ADD_TASK_INTERVAL;
@@ -189,7 +189,7 @@ class r>
 void ProtocolGame::addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8)
 {
 	if(m_now > m_nextTask || m_messageCount < 5){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(f, &g_game, p1, p2, p3, p4, p5, p6, p7, p8)));
 
 		m_nextTask = m_now + ADD_TASK_INTERVAL;
@@ -362,7 +362,7 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 			_player->disconnect();
 			_player->isConnecting = true;
 			addRef();
-			eventConnect = Scheduler::getScheduler().addEvent(
+			eventConnect = g_scheduler.addEvent(
 				createSchedulerTask(1000, boost::bind(&ProtocolGame::connect, this, _player->getID())));
 			return true;
 		}
@@ -499,7 +499,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 
 	g_bans.addLoginAttempt(getIP(), true);
 
-	Dispatcher::getDispatcher().addTask(
+	g_dispatcher.addTask(
 		createTask(boost::bind(&ProtocolGame::login, this, name, isSetGM)));
 
 	return true;
@@ -1050,7 +1050,7 @@ bool ProtocolGame::canSee(int x, int y, int z) const
 //********************** Parse methods *******************************
 void ProtocolGame::parseLogout(NetworkMessage& msg)
 {
-	Dispatcher::getDispatcher().addTask(
+	g_dispatcher.addTask(
 		createTask(boost::bind(&ProtocolGame::logout, this, false)));
 }
 
@@ -1146,7 +1146,7 @@ void ProtocolGame::parseDebug(NetworkMessage& msg)
 void ProtocolGame::parseRecievePing(NetworkMessage& msg)
 {
 	if(m_now > m_nextPing){
-		Dispatcher::getDispatcher().addTask(
+		g_dispatcher.addTask(
 			createTask(boost::bind(&Game::playerReceivePing, &g_game, player->getID())));
 
 		m_nextPing = m_now + 2000;

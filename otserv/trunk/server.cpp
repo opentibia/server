@@ -82,6 +82,23 @@ ServicePort::~ServicePort()
 	close();
 }
 
+bool ServicePort::is_single_socket() const
+{
+	return m_services.size() && m_services.front()->is_single_socket();
+}
+
+std::string ServicePort::get_protocol_names() const
+{
+	if(m_services.empty())
+		return "";
+	std::string str = m_services.front()->get_protocol_name();
+	for(int i = 1; i < m_services.size(); ++i){
+		str += ", ";
+		str += m_services[i]->get_protocol_name();
+	}
+	return str;
+}
+
 void ServicePort::accept()
 {
 	if(!m_acceptor){
@@ -132,7 +149,7 @@ void ServicePort::onAccept(Connection* connection, const boost::system::error_co
 			m_listenErrors++;
 			if(!m_pendingStart){
 				m_pendingStart = true;
-				Scheduler::getScheduler().addEvent(createSchedulerTask(5000,
+				g_scheduler.addEvent(createSchedulerTask(5000,
 					boost::bind(&ServicePort::open, this, m_serverPort)));
 			}
 		}
@@ -173,13 +190,17 @@ void ServicePort::open(uint16_t port)
 	if(m_pendingStart)
 		m_pendingStart = false;
 
-	try {
+	// We can't have any error handling here, so we must
+	// "steal" the bound socket. This is because UNIX is very
+	// slow when it comes to releasing sockets owned by dead processses
+
+	//try {
 		m_acceptor = new boost::asio::ip::tcp::acceptor(m_io_service, boost::asio::ip::tcp::endpoint(
-			boost::asio::ip::address(boost::asio::ip::address_v4(INADDR_ANY)), m_serverPort), false);
-	} catch(boost::system::system_error& e) {
-		std::cout << "ERROR: Can only bind one socket to a specific port (" << m_serverPort << ")" << std::endl;
-		std::cout << "The exact error was : " << e.what() << std::endl;
-	}
+			boost::asio::ip::address(boost::asio::ip::address_v4(INADDR_ANY)), m_serverPort));
+	//} catch(boost::system::system_error& e) {
+	//	std::cout << "ERROR: Can only bind one socket to a specific port (" << m_serverPort << ")" << std::endl;
+	//	std::cout << "The exact error was : " << e.what() << std::endl;
+	//}
 
 	accept();
 }

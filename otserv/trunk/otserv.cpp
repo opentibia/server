@@ -78,6 +78,9 @@
 	}
 #endif
 
+Dispatcher g_dispatcher;
+Scheduler g_scheduler;
+
 IPList serverIPs;
 
 ConfigManager g_config;
@@ -246,12 +249,17 @@ int main(int argc, char *argv[])
 
 	ServiceManager servicer;
 
-	Dispatcher::getDispatcher().addTask(createTask(boost::bind(mainLoader, g_command_opts, &servicer)));
+	g_dispatcher.addTask(createTask(boost::bind(mainLoader, g_command_opts, &servicer)));
 
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
-	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-	servicer.run();
+	if(servicer.is_running()){
+		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
+		servicer.run();
+	}
+	else{
+		ErrorMessage("No services running. Server is not online.");
+	}
 
 #if defined __EXCEPTION_TRACER__
 	mainExceptionHandler.RemoveHandler();
@@ -431,16 +439,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		dd += "/";
 		dd += g_config.getString(ConfigManager::DATA_DIRECTORY);
 		g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
-
-	if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if this new one exists
-		// if not lets try using the "raw" datadir
-		// (without configmanager's datadir var)
-
-		dd = PKGDATADIR;
-		dd += "/";
-		g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
-	}
-
 	}
 #endif
     std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;

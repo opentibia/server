@@ -26,17 +26,16 @@
 #include "exception.h"
 #endif
 
-Scheduler::SchedulerState Scheduler::m_threadState = Scheduler::STATE_TERMINATED;
-
 Scheduler::Scheduler()
 {
 	m_lastEventId = 0;
-	Scheduler::m_threadState = STATE_RUNNING;
-	boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)NULL));
+	m_threadState = STATE_RUNNING;
+	boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)this));
 }
 
 void Scheduler::schedulerThread(void* p)
 {
+	Scheduler* scheduler = (Scheduler*)p;
 	#if defined __EXCEPTION_TRACER__
 	ExceptionHandler schedulerExceptionHandler;
 	schedulerExceptionHandler.InstallHandler();
@@ -47,9 +46,9 @@ void Scheduler::schedulerThread(void* p)
 	#endif
 
 	// NOTE: second argument defer_lock is to prevent from immediate locking
-	boost::unique_lock<boost::mutex> eventLockUnique(getScheduler().m_eventLock, boost::defer_lock);
+	boost::unique_lock<boost::mutex> eventLockUnique(scheduler->m_eventLock, boost::defer_lock);
 
-	while(Scheduler::m_threadState != Scheduler::STATE_TERMINATED){
+	while(scheduler->m_threadState != STATE_TERMINATED){
 		SchedulerTask* task = NULL;
 		bool runTask = false;
 		bool ret = true;
@@ -57,17 +56,17 @@ void Scheduler::schedulerThread(void* p)
 		// check if there are events waiting...
 		eventLockUnique.lock();
 
-		if(getScheduler().m_eventList.empty()){
+		if(scheduler->m_eventList.empty()){
 			#ifdef __DEBUG_SCHEDULER__
 			std::cout << "Scheduler: No events" << std::endl;
 			#endif
-			getScheduler().m_eventSignal.wait(eventLockUnique);
+			scheduler->m_eventSignal.wait(eventLockUnique);
 		}
 		else{
 			#ifdef __DEBUG_SCHEDULER__
 			std::cout << "Scheduler: Waiting for event" << std::endl;
 			#endif
-			ret = getScheduler().m_eventSignal.timed_wait(eventLockUnique, getScheduler().m_eventList.top()->getCycle());
+			ret = scheduler->m_eventSignal.timed_wait(eventLockUnique, scheduler->m_eventList.top()->getCycle());
 		}
 
 		#ifdef __DEBUG_SCHEDULER__
@@ -75,17 +74,17 @@ void Scheduler::schedulerThread(void* p)
 		#endif
 
 		// the mutex is locked again now...
-		if(ret == false && (Scheduler::m_threadState != Scheduler::STATE_TERMINATED)){
+		if(ret == false && (scheduler->m_threadState != STATE_TERMINATED)){
 			// ok we had a timeout, so there has to be an event we have to execute...
-			task = getScheduler().m_eventList.top();
-			getScheduler().m_eventList.pop();
+			task = scheduler->m_eventList.top();
+			scheduler->m_eventList.pop();
 
 			// check if the event was stopped
-			EventIdSet::iterator it = getScheduler().m_eventIds.find(task->getEventId());
-			if(it != getScheduler().m_eventIds.end()){
+			EventIdSet::iterator it = scheduler->m_eventIds.find(task->getEventId());
+			if(it != scheduler->m_eventIds.end()){
 				// was not stopped so we should run it
 				runTask = true;
-				getScheduler().m_eventIds.erase(it);
+				scheduler->m_eventIds.erase(it);
 			}
 		}
 
@@ -98,7 +97,7 @@ void Scheduler::schedulerThread(void* p)
 				#ifdef __DEBUG_SCHEDULER__
 				std::cout << "Scheduler: Executing event " << task->getEventId() << std::endl;
 				#endif
-				Dispatcher::getDispatcher().addTask(task);
+				g_dispatcher.addTask(task);
 			}
 			else{
 				// was stopped, have to be deleted here

@@ -90,6 +90,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/goto",&Commands::teleportTo},
 	{"/info",&Commands::getInfo},
 	{"/save",&Commands::saveServer},
+	{"/shutdown",&Commands::shutdownServer},
 	{"/closeserver",&Commands::closeServer},
 	{"/openserver",&Commands::openServer},
 	{"/getonline",&Commands::onlineList},
@@ -684,6 +685,14 @@ bool Commands::saveServer(Creature* creature, const std::string& cmd, const std:
 	return true;
 }
 
+bool Commands::shutdownServer(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	// Save most everything
+	g_game.setGameState(GAME_STATE_SHUTDOWN);
+
+	return true;
+}
+
 bool Commands::openServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	g_game.setGameState(GAME_STATE_NORMAL);
@@ -1054,11 +1063,11 @@ bool Commands::forceRaid(Creature* creature, const std::string& cmd, const std::
 	raid->setState(RAIDSTATE_EXECUTING);
 	uint32_t ticks = event->getDelay();
 	if(ticks > 0){
-		Scheduler::getScheduler().addEvent(createSchedulerTask(ticks,
+		g_scheduler.addEvent(createSchedulerTask(ticks,
 			boost::bind(&Raid::executeRaidEvent, raid, event)));
 	}
 	else{
-		Dispatcher::getDispatcher().addTask(createTask(
+		g_dispatcher.addTask(createTask(
 		boost::bind(&Raid::executeRaidEvent, raid, event)));
 
 	}

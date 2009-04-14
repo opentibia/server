@@ -530,6 +530,10 @@ protected:
 
 	std::vector<Thing*> ToReleaseThings;
 
+	uint32_t checkLightEvent;
+	uint32_t checkCreatureEvent;
+	uint32_t checkDecayEvent;
+
 	//list of items that are in trading state, mapped to the player
 	std::map<Item*, uint32_t> tradeItems;
 

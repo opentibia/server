@@ -1822,7 +1822,7 @@ void Player::checkTradeState(const Item* item)
 void Player::setNextWalkActionTask(SchedulerTask* task)
 {
 	if(walkTaskEvent != 0){
-		Scheduler::getScheduler().stopEvent(walkTaskEvent);
+		g_scheduler.stopEvent(walkTaskEvent);
 		walkTaskEvent = 0;
 	}
 	delete walkTask;
@@ -1832,24 +1832,24 @@ void Player::setNextWalkActionTask(SchedulerTask* task)
 void Player::setNextWalkTask(SchedulerTask* task)
 {
 	if(nextStepEvent != 0){
-		Scheduler::getScheduler().stopEvent(nextStepEvent);
+		g_scheduler.stopEvent(nextStepEvent);
 		nextStepEvent = 0;
 	}
 
 	if(task){
-		nextStepEvent = Scheduler::getScheduler().addEvent(task);
+		nextStepEvent = g_scheduler.addEvent(task);
 	}
 }
 
 void Player::setNextActionTask(SchedulerTask* task)
 {
 	if(actionTaskEvent != 0){
-		Scheduler::getScheduler().stopEvent(actionTaskEvent);
+		g_scheduler.stopEvent(actionTaskEvent);
 		actionTaskEvent = 0;
 	}
 
 	if(task){
-		actionTaskEvent = Scheduler::getScheduler().addEvent(task);
+		actionTaskEvent = g_scheduler.addEvent(task);
 	}
 }
 
@@ -3296,7 +3296,7 @@ bool Player::setAttackedCreature(Creature* creature)
 	}
 
 	if(creature){
-		Dispatcher::getDispatcher().addTask(createTask(
+		g_dispatcher.addTask(createTask(
 			boost::bind(&Game::checkCreatureAttack, &g_game, getID())));
 	}
 
@@ -3433,7 +3433,7 @@ void Player::onWalkAborted()
 void Player::onWalkComplete()
 {
 	if(walkTask){
-		walkTaskEvent = Scheduler::getScheduler().addEvent(walkTask);
+		walkTaskEvent = g_scheduler.addEvent(walkTask);
 		walkTask = NULL;
 	}
 }

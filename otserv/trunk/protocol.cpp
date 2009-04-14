@@ -92,7 +92,7 @@ void Protocol::releaseProtocol()
 {
 	if(m_refCount > 0){
 		//Reschedule it and try again.
-		Scheduler::getScheduler().addEvent( createSchedulerTask(SCHEDULER_MINTICKS,
+		g_scheduler.addEvent( createSchedulerTask(SCHEDULER_MINTICKS,
 			boost::bind(&Protocol::releaseProtocol, this)));
 	}
 	else{

@@ -513,7 +513,7 @@ bool Monster::selectTarget(Creature* creature)
 
 	if(isHostile() || isSummon()){
 		if(setAttackedCreature(creature) && !isSummon()){
-			Dispatcher::getDispatcher().addTask(createTask(
+			g_dispatcher.addTask(createTask(
 				boost::bind(&Game::checkCreatureAttack, &g_game, getID())));
 		}
 	}

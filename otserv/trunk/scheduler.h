@@ -80,20 +80,13 @@ public:
 class Scheduler
 {
 public:
+	Scheduler();
 	~Scheduler() {}
-
-	static Scheduler& getScheduler()
-	{
-		static Scheduler scheduler;
-		return scheduler;
-	}
 
 	uint32_t addEvent(SchedulerTask* task);
 	bool stopEvent(uint32_t eventId);
 	void stop();
 	void shutdown();
-
-	static void schedulerThread(void* p);
 
 	enum SchedulerState{
 		STATE_RUNNING,
@@ -102,7 +95,7 @@ public:
 	};
 
 protected:
-	Scheduler();
+	static void schedulerThread(void* p);
 
 	boost::mutex m_eventLock;
 	boost::condition_variable m_eventSignal;
@@ -111,8 +104,9 @@ protected:
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > m_eventList;
 	typedef std::set<uint32_t> EventIdSet;
 	EventIdSet m_eventIds;
-	static SchedulerState m_threadState;
+	SchedulerState m_threadState;
 };
 
+extern Scheduler g_scheduler;
 
 #endif

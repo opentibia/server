@@ -6801,7 +6801,7 @@ int LuaScriptInterface::luaAddEvent(lua_State *L)
 	script_interface->m_lastEventTimerId++;
 	script_interface->m_timerEvents[script_interface->m_lastEventTimerId] = eventDesc;
 
-	Scheduler::getScheduler().addEvent(createSchedulerTask(delay, boost::bind(&LuaScriptInterface::executeTimerEvent, script_interface, script_interface->m_lastEventTimerId)));
+	g_scheduler.addEvent(createSchedulerTask(delay, boost::bind(&LuaScriptInterface::executeTimerEvent, script_interface, script_interface->m_lastEventTimerId)));
 
 	lua_pushnumber(L, script_interface->m_lastEventTimerId);
 	return 1;

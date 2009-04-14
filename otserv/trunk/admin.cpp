@@ -313,7 +313,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			{
 				const std::string message = msg.GetString();
 				addLogLine(this, LOGTYPE_EVENT, 1, "broadcast: " + message);
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&Game::anonymousBroadcastMessage, &g_game, MSG_STATUS_WARNING, message)));
 
 				output->AddByte(AP_MSG_COMMAND_OK);
@@ -321,28 +321,28 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			}
 			case CMD_OPEN_SERVER:
 			{
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandOpenServer, this)));
 
 				break;
 			}
 			case CMD_CLOSE_SERVER:
 			{
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandCloseServer, this)));
 
 				break;
 			}
 			case CMD_PAY_HOUSES:
 			{
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandPayHouses, this)));
 
 				break;
 			}
 			case CMD_SHUTDOWN_SERVER:
 			{
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandShutdownServer, this)));
 				getConnection()->closeConnection();
 				return;
@@ -351,13 +351,13 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			case CMD_KICK:
 			{
 				const std::string name = msg.GetString();
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandKickPlayer, this, name)));
 				break;
 			}
 			case CMD_SAVE_SERVER:
 			{
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandSaveServer, this)));
 
 				break;
