@@ -79,7 +79,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/summon",&Commands::placeSummon},
 	{"/B",&Commands::broadcastMessage},
 	//{"/b",&Commands::banPlayer},
-	{"/t",&Commands::teleportMasterPos},
+	//{"/t",&Commands::teleportMasterPos},
 	{"/c",&Commands::teleportHere},
 	{"/i",&Commands::createItemById},
 	{"/n",&Commands::createItemByName},
@@ -333,17 +333,6 @@ bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, cons
 
 	g_game.internalBroadcastMessage(player, param);
 	return true;
-}
-
-bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Position destPos = creature->getPosition();
-	if(g_game.internalTeleport(creature, creature->masterPos) == RET_NOERROR){
-		g_game.addMagicEffect(destPos, NM_ME_TELEPORT);
-		return true;
-	}
-
-	return false;
 }
 
 bool Commands::teleportHere(Creature* creature, const std::string& cmd, const std::string& param)
