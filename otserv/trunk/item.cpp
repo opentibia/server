@@ -703,25 +703,6 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		s << ".";
 	}
-	else if(it.showDuration){
-		if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
-			int32_t duration = item->getDuration() / 1000;
-			s << " that has energy for ";
-
-			if(duration >= 120){
-				s << duration / 60 << " minutes left.";
-			}
-			else if(duration > 60){
-				s << "1 minute left.";
-			}
-			else{
-				s << " less than a minute left.";
-			}
-		}
-		else{
-			s << " that is brand-new.";
-		}
-	}
 	else if(it.armor != 0 || it.abilities.absorb.any()){
 		if(it.showCharges){
 			if(subType > 1){
@@ -804,6 +785,25 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 		else{
 			s << " that has 1 charge left.";
+		}
+	}
+	else if(it.showDuration){
+		if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
+			int32_t duration = item->getDuration() / 1000;
+			s << " that has energy for ";
+
+			if(duration >= 120){
+				s << duration / 60 << " minutes left.";
+			}
+			else if(duration > 60){
+				s << "1 minute left.";
+			}
+			else{
+				s << " less than a minute left.";
+			}
+		}
+		else{
+			s << " that is brand-new.";
 		}
 	}
 	else{
