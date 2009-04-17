@@ -900,13 +900,15 @@ void Player::dropLoot(Container* corpse)
 #ifdef __SKULLSYSTEM__
 	if(getSkull() == SKULL_RED){
 		itemLoss = 100;
+		backpackLoss = 100;
 	}
 #endif
 	if(!lootDrop){
 		itemLoss = 0;
+		backpackLoss = 0; 
 	}
 
-	if(itemLoss > 0){
+	if(itemLoss > 0 || backpackLoss > 0){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
 			if(item){
