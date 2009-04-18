@@ -100,7 +100,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/sellhouse",&Commands::sellHouse},
 	{"/gethouse",&Commands::getHouse},
 	//{"/bans",&Commands::bansManager},
-	{"/town",&Commands::teleportToTown},
+	//{"/town",&Commands::teleportToTown},
 	{"/serverinfo",&Commands::serverInfo},
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	{"/serverdiag",&Commands::serverDiag},
@@ -556,28 +556,6 @@ bool Commands::testTutorialCommand(Creature* creature, const std::string& cmd, c
 	return true;
 }
 
-
-bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	std::string tmp = param;
-	Player* player = creature->getPlayer();
-
-	if(!player){
-		return false;
-	}
-
-	Town* town = Towns::getInstance().getTown(tmp);
-	if(town){
-		if(g_game.internalTeleport(creature, town->getTemplePosition()) == RET_NOERROR) {
-			g_game.addMagicEffect(town->getTemplePosition(), NM_ME_ENERGY_AREA);
-			return true;
-		}
-	}
-
-	player->sendCancel("Could not find the town.");
-
-	return false;
-}
 
 bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std::string& param)
 {

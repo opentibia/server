@@ -1305,6 +1305,15 @@ void LuaScriptInterface::registerFunctions()
 	//doAddMapMark(cid, pos, type, <optional> description)
 	lua_register(m_luaState, "doAddMapMark", LuaScriptInterface::luaDoAddMark);
 
+	//getTownIDByName(townName)
+	lua_register(m_luaState, "getTownIDByName", LuaScriptInterface::luaGetTownIDByName);
+
+	//getTownNameByID(townID)
+	lua_register(m_luaState, "getTownNameByID", LuaScriptInterface::luaGetTownNameByID);
+
+	//getTownTemplePosition(townID)
+	lua_register(m_luaState, "getTownTemplePosition", LuaScriptInterface::luaGetTownTemplePosition);
+
 	//doDecayItem(uid)
 	lua_register(m_luaState, "doDecayItem", LuaScriptInterface::luaDoDecayItem);
 
@@ -1873,6 +1882,13 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			value = 0;
 			#endif
 			break;
+		case PlayerInfoRedSkullTicks:
+			#ifdef __SKULLSYSTEM__
+			value = player->getRedSkullTicks();
+			#else
+			value = 0;
+			#endif
+			break;
 		case PlayerInfoBalance:
 		{
 			if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE)){
@@ -1981,6 +1997,9 @@ int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L){
 
 int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoSkullType);}
+
+int LuaScriptInterface::luaGetPlayerRedSkullTicks(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoRedSkullTicks);}
 	
 int LuaScriptInterface::luaGetPlayerBalance(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoBalance);}
@@ -3111,6 +3130,56 @@ int LuaScriptInterface::luaDoAddMark(lua_State *L)
 
 	player->sendAddMarker(pos, type, description);
 	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetTownIDByName(lua_State *L)
+{
+	//getTownIDByName(townname)
+	std::string townName = popString(L);
+
+	Town* town = Towns::getInstance().getTown(townName);
+	if(town){
+		lua_pushnumber(L, town->getTownID());
+	}
+	else{
+		reportErrorFunc("Could not find the town.");
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetTownNameByID(lua_State *L)
+{
+	//getTownNameByID(townid)
+	uint32_t townID = popNumber(L);
+
+	Town* town = Towns::getInstance().getTown(townID);
+	if(town){
+		std::stringstream ss;
+		ss << town->getName();
+		lua_pushstring(L, ss.str().c_str());
+	}
+	else{
+		reportErrorFunc("Could not find the town.");
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetTownTemplePosition(lua_State *L)
+{
+	//getTownTemplePosition(townid)
+	uint32_t townID = popNumber(L);
+
+	Town* town = Towns::getInstance().getTown(townID);
+	if(town){
+		pushPosition(L, town->getTemplePosition());
+	}
+	else{
+		reportErrorFunc("Could not find the town.");
+		lua_pushnumber(L, LUA_ERROR);
+	}
 	return 1;
 }
 

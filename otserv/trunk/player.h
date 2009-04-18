@@ -402,6 +402,7 @@ public:
 		{if(client) client->sendCreatureSkull(creature);}
 	void checkRedSkullTicks(int32_t ticks);
 	uint32_t getFrags();
+	int64_t getRedSkullTicks() const {return redSkullTicks;}
 #endif
 	
 	void checkRecentlyGainedExperience(uint32_t interval);
