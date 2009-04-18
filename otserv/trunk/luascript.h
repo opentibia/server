@@ -382,8 +382,8 @@ protected:
 	static int luaGetPlayerRedSkullTicks(lua_State *L);
 	static int luaDoSendTutorial(lua_State *L);
 	static int luaDoAddMark(lua_State *L);
-	static int luaGetTownIDByName(lua_State *L);
-	static int luaGetTownNameByID(lua_State *L);
+	static int luaGetTownIdByName(lua_State *L);
+	static int luaGetTownNameById(lua_State *L);
 	static int luaGetTownTemplePosition(lua_State *L);
 
 	//queries

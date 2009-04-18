@@ -1129,6 +1129,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//getPlayerSkullType(cid)
 	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
+	
+	//getPlayerRedSkullTicks(cid)
+	lua_register(m_luaState, "getPlayerRedSkullTicks", LuaScriptInterface::luaGetPlayerRedSkullTicks);
 
 	//getPlayerAccountBalance(cid)
 	lua_register(m_luaState, "getPlayerBalance", LuaScriptInterface::luaGetPlayerBalance);
@@ -1305,13 +1308,13 @@ void LuaScriptInterface::registerFunctions()
 	//doAddMapMark(cid, pos, type, <optional> description)
 	lua_register(m_luaState, "doAddMapMark", LuaScriptInterface::luaDoAddMark);
 
-	//getTownIDByName(townName)
-	lua_register(m_luaState, "getTownIDByName", LuaScriptInterface::luaGetTownIDByName);
+	//getTownIdByName(townName)
+	lua_register(m_luaState, "getTownIdByName", LuaScriptInterface::luaGetTownIdByName);
 
-	//getTownNameByID(townID)
-	lua_register(m_luaState, "getTownNameByID", LuaScriptInterface::luaGetTownNameByID);
+	//getTownNameById(townId)
+	lua_register(m_luaState, "getTownNameById", LuaScriptInterface::luaGetTownNameById);
 
-	//getTownTemplePosition(townID)
+	//getTownTemplePosition(townId)
 	lua_register(m_luaState, "getTownTemplePosition", LuaScriptInterface::luaGetTownTemplePosition);
 
 	//doDecayItem(uid)
@@ -3133,9 +3136,9 @@ int LuaScriptInterface::luaDoAddMark(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaGetTownIDByName(lua_State *L)
+int LuaScriptInterface::luaGetTownIdByName(lua_State *L)
 {
-	//getTownIDByName(townname)
+	//getTownIdByName(townName)
 	std::string townName = popString(L);
 
 	Town* town = Towns::getInstance().getTown(townName);
@@ -3149,16 +3152,15 @@ int LuaScriptInterface::luaGetTownIDByName(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaGetTownNameByID(lua_State *L)
+int LuaScriptInterface::luaGetTownNameById(lua_State *L)
 {
-	//getTownNameByID(townid)
-	uint32_t townID = popNumber(L);
+	//getTownNameById(townId)
+	uint32_t townId = popNumber(L);
 
-	Town* town = Towns::getInstance().getTown(townID);
+	Town* town = Towns::getInstance().getTown(townId);
 	if(town){
-		std::stringstream ss;
-		ss << town->getName();
-		lua_pushstring(L, ss.str().c_str());
+		std::string townName = town->getName();
+		lua_pushstring(L, townName.c_str());
 	}
 	else{
 		reportErrorFunc("Could not find the town.");
@@ -3169,10 +3171,10 @@ int LuaScriptInterface::luaGetTownNameByID(lua_State *L)
 
 int LuaScriptInterface::luaGetTownTemplePosition(lua_State *L)
 {
-	//getTownTemplePosition(townid)
-	uint32_t townID = popNumber(L);
+	//getTownTemplePosition(townId)
+	uint32_t townId = popNumber(L);
 
-	Town* town = Towns::getInstance().getTown(townID);
+	Town* town = Towns::getInstance().getTown(townId);
 	if(town){
 		pushPosition(L, town->getTemplePosition());
 	}
