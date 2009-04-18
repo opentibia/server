@@ -5,12 +5,13 @@ function onSay(cid, words, param)
 	end
 
 	local town_pos = getPlayerMasterPos(cid)
+	local old_pos = getPlayerPosition(cid)
 	if(doTeleportThing(cid, town_pos) ~= LUA_ERROR) then
-		local position = getCreaturePosition(cid)
-		doSendMagicEffect(position, CONST_ME_TELEPORT)
+		doSendMagicEffect(old_pos, CONST_ME_POFF)
+		doSendMagicEffect(town_pos, CONST_ME_TELEPORT)
 	else
 		doPlayerSendCancel(cid, "Can not teleport to this position. Check your master position.")
 	end
 
-	return TRUE
+	return FALSE
 end

@@ -10,5 +10,7 @@
 	<talkaction words="/checkconfig" filter="first word" script="configval.lua"/>
 	<talkaction words="/up" filter="first word" script="floorchange.lua"/>
 	<talkaction words="/down" filter="first word" script="floorchange.lua"/>
-	<talkaction words="/t" filter="first word" script="teleportmasterpos.lua"/>
+	<talkaction words="/t" script="teleportmasterpos.lua"/>
+	<talkaction words="/town" filter="first word" script="teleporttotown.lua"/>
+	<talkaction words="!frags" script="frags_status.lua"/>
 </talkactions>
