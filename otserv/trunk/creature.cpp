@@ -779,11 +779,12 @@ Item* Creature::dropCorpse()
 	}
 
 	//scripting event - onDie
-	CreatureEvent* eventDie = getCreatureEvent(CREATURE_EVENT_DIE);
-	if(eventDie){
-		eventDie->executeOnDie(this, corpse);
+	CreatureEventList dieEvents = getCreatureEvents(CREATURE_EVENT_DIE);
+	for(CreatureEventList::iterator it = dieEvents.begin(); it != dieEvents.end(); ++it)
+	{
+		(*it)->executeOnDie(this, corpse);
 	}
-
+	
 	g_game.removeCreature(this, false);
 
 	return corpse;
@@ -1206,9 +1207,10 @@ void Creature::onKilledCreature(Creature* target)
 	}
 
 	//scripting event - onKill
-	CreatureEvent* eventKill = getCreatureEvent(CREATURE_EVENT_KILL);
-	if(eventKill){
-		eventKill->executeOnKill(this, target);
+	CreatureEventList killEvents = getCreatureEvents(CREATURE_EVENT_KILL);
+	for(CreatureEventList::iterator it = killEvents.begin(); it != killEvents.end(); ++it)
+	{
+		(*it)->executeOnKill(this, target);
 	}
 }
 
@@ -1483,41 +1485,30 @@ bool Creature::registerCreatureEvent(const std::string& name)
 	if(event){
 		CreatureEventType_t type = event->getEventType();
 		if(!hasEventRegistered(type)){
-			// not was added, so set the bit in the bitfield
+			// was not added, so set the bit in the bitfield
 			scriptEventsBitField = scriptEventsBitField | ((uint32_t)1 << type);
 		}
-		else{
-			//had a previous event handler for this type
-			// and have to be removed
-			CreatureEventList::iterator it = findEvent(type);
-			eventsList.erase(it);
-		}
+
 		eventsList.push_back(event);
 		return true;
 	}
+	
 	return false;
 }
 
-std::list<CreatureEvent*>::iterator Creature::findEvent(CreatureEventType_t type)
+CreatureEventList Creature::getCreatureEvents(CreatureEventType_t type)
 {
-	CreatureEventList::iterator it;
-	for(it = eventsList.begin(); it != eventsList.end(); ++it){
-		if((*it)->getEventType() == type){
-			return it;
-		}
-	}
-	return eventsList.end();
-}
-
-CreatureEvent* Creature::getCreatureEvent(CreatureEventType_t type)
-{
+	CreatureEventList typeList;
 	if(hasEventRegistered(type)){
-		CreatureEventList::iterator it = findEvent(type);
-		if(it != eventsList.end()){
-			return *it;
+		CreatureEventList::iterator it;
+		for(it = eventsList.begin(); it != eventsList.end(); ++it){
+			if((*it)->getEventType() == type){
+				typeList.push_back(*it);
+			}
 		}
 	}
-	return NULL;
+	
+	return typeList;
 }
 
 FrozenPathingConditionCall::FrozenPathingConditionCall(const Position& _targetPos)

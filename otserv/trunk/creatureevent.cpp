@@ -28,15 +28,10 @@ CreatureEvents::CreatureEvents() :
 m_scriptInterface("CreatureScript Interface")
 {
 	m_scriptInterface.initState();
-	m_logInEvent = NULL;
-	m_logOutEvent = NULL;
 }
 
 CreatureEvents::~CreatureEvents()
 {
-	delete m_logInEvent;
-	delete m_logOutEvent;
-
 	CreatureEventList::iterator it;
 	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
 		delete it->second;
@@ -45,22 +40,12 @@ CreatureEvents::~CreatureEvents()
 
 void CreatureEvents::clear()
 {
-	//clear global events
-	if(m_logInEvent){
-		m_logInEvent->clearEvent();
-		delete m_logInEvent;
-		m_logInEvent = NULL;
-	}
-	if(m_logOutEvent){
-		m_logOutEvent->clearEvent();
-		delete m_logOutEvent;
-		m_logOutEvent = NULL;
-	}
-	//clear creature events
+	//clear all events
 	CreatureEventList::iterator it;
 	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
 		it->second->clearEvent();
 	}
+	
 	//clear lua state
 	m_scriptInterface.reInitState();
 }
@@ -95,17 +80,7 @@ bool CreatureEvents::registerEvent(Event* event, xmlNodePtr p)
 		std::cout << "Error: [CreatureEvents::registerEvent] Trying to register event without type!." << std::endl;
 		return false;
 		break;
-	// global events are stored in
-	// member variables and their name is ignored!
-	case CREATURE_EVENT_LOGIN:
-		delete m_logInEvent;
-		m_logInEvent = creatureEvent;
-		return true;
-	case CREATURE_EVENT_LOGOUT:
-		delete m_logOutEvent;
-		m_logOutEvent = creatureEvent;
-		return true;
-	// other events are stored in a std::map
+	// events are stored in a std::map
 	default:
 		{
 			CreatureEvent* oldEvent = getEventByName(creatureEvent->getName(), false);
@@ -143,8 +118,12 @@ CreatureEvent* CreatureEvents::getEventByName(const std::string& name, bool forc
 uint32_t CreatureEvents::playerLogIn(Player* player)
 {
 	// fire global event if is registered
-	if(m_logInEvent){
-		return m_logInEvent->executeOnLogin(player);
+	for(CreatureEventList::iterator it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it)
+	{
+		if(it->second->getEventType() == CREATURE_EVENT_LOGIN){
+			if(!it->second->executeOnLogin(player))
+				return 0;
+		}
 	}
 	return 1;
 }
@@ -152,8 +131,11 @@ uint32_t CreatureEvents::playerLogIn(Player* player)
 uint32_t CreatureEvents::playerLogOut(Player* player)
 {
 	// fire global event if is registered
-	if(m_logOutEvent){
-		return m_logOutEvent->executeOnLogout(player);
+	for(CreatureEventList::iterator it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it)
+	{
+		if(it->second->getEventType() == CREATURE_EVENT_LOGOUT)
+			if(!it->second->executeOnLogout(player))
+				return 0;
 	}
 	return 1;
 }

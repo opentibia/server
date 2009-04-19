@@ -712,10 +712,11 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 		sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
 		
 		//scripting event - onAdvance
-		CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
-		if(eventAdvance){
-			eventAdvance->executeOnAdvance(this, (skills[skill][SKILL_LEVEL] - 1), skills[skill][SKILL_LEVEL], (levelTypes_t)skill);
-	}
+		CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
+		for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
+		{
+			(*it)->executeOnAdvance(this, (skills[skill][SKILL_LEVEL] - 1), skills[skill][SKILL_LEVEL], (levelTypes_t)skill);
+		}
 		
 		sendSkills();
 	}
@@ -1988,9 +1989,10 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
 			
 			//scripting event - onAdvance
-			CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
-			if(eventAdvance){
-				eventAdvance->executeOnAdvance(this, (magLevel - 1), magLevel, LEVEL_MAGIC);
+			CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
+			for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
+			{
+				(*it)->executeOnAdvance(this, (magLevel - 1), magLevel, LEVEL_MAGIC);
 			}
 			
 			sendStats();
@@ -2042,9 +2044,10 @@ void Player::addExperience(uint64_t exp)
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 		
 		//scripting event - onAdvance
-		CreatureEvent* eventAdvance = getCreatureEvent(CREATURE_EVENT_ADVANCE);
-		if(eventAdvance){
-			eventAdvance->executeOnAdvance(this, prevLevel, newLevel, LEVEL_EXPERIENCE);
+		CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
+		for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
+		{
+			(*it)->executeOnAdvance(this, prevLevel, newLevel, LEVEL_EXPERIENCE);
 		}
 	}
 

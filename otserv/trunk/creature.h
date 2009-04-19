@@ -36,6 +36,7 @@
 #include <list>
 
 typedef std::list<Condition*> ConditionList;
+typedef std::list<CreatureEvent*> CreatureEventList;
 
 enum slots_t {
 	SLOT_WHEREEVER = 0,
@@ -439,8 +440,7 @@ protected:
 	}
 	typedef std::list<CreatureEvent*> CreatureEventList;
 	CreatureEventList eventsList;
-	CreatureEventList::iterator findEvent(CreatureEventType_t type);
-	CreatureEvent* getCreatureEvent(CreatureEventType_t type);
+	CreatureEventList getCreatureEvents(CreatureEventType_t type);
 
 	void updateMapCache();
 #ifdef __DEBUG__

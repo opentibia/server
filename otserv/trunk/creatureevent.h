@@ -56,11 +56,7 @@ protected:
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	virtual void clear();
 
-	//global events
-	CreatureEvent* m_logInEvent;
-	CreatureEvent* m_logOutEvent;
-
-	//creature events
+	//events
 	typedef std::map<std::string, CreatureEvent*> CreatureEventList;
 	CreatureEventList m_creatureEvents;
 
