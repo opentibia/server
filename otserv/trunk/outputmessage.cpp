@@ -22,6 +22,9 @@
 #include "outputmessage.h"
 #include "connection.h"
 #include "protocol.h"
+#include "scheduler.h"
+
+extern Dispatcher g_dispatcher;
 
 OutputMessage::OutputMessage()
 {
@@ -128,6 +131,12 @@ void OutputMessagePool::sendAll()
 	}
 }
 
+void OutputMessagePool::releaseMessage(OutputMessage* msg)
+{
+	g_dispatcher.addTask(
+		createTask(boost::bind(&OutputMessagePool::internalReleaseMessage, this, msg)));
+}
+
 void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 {
 	if(msg->getProtocol()){
@@ -182,14 +191,14 @@ OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool a
 		}
 #endif
 		outputmessage.reset(new OutputMessage,
-			boost::bind(&OutputMessagePool::internalReleaseMessage, this, _1));
+			boost::bind(&OutputMessagePool::releaseMessage, this, _1));
 
 #ifdef __TRACK_NETWORK__
 		m_allOutputMessages.push_back(outputmessage.get());
 #endif
 	} else {
 		outputmessage.reset(m_outputMessages.back(),
-			boost::bind(&OutputMessagePool::internalReleaseMessage, this, _1));
+			boost::bind(&OutputMessagePool::releaseMessage, this, _1));
 #ifdef __TRACK_NETWORK__
 		// Print message trace
 		if(outputmessage->getState() != OutputMessage::STATE_FREE) {

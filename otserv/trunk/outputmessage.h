@@ -172,6 +172,7 @@ public:
 protected:
 
 	void configureOutputMessage(OutputMessage_ptr msg, Protocol* protocol, bool autosend);
+	void releaseMessage(OutputMessage* msg);
 	void internalReleaseMessage(OutputMessage* msg);
 
 	typedef std::list<OutputMessage*> InternalOutputMessageList;
