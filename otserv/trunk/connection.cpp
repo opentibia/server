@@ -37,14 +37,14 @@
 uint32_t Connection::connectionCount = 0;
 #endif
 
-Connection* ConnectionManager::createConnection(boost::asio::io_service& io_service, ServicePort_ptr servicer)
+Connection* ConnectionManager::createConnection(boost::asio::ip::tcp::socket* socket, ServicePort_ptr servicer)
 {
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Create new Connection" << std::endl;
 	#endif
 
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
-	Connection* connection = new Connection(io_service, servicer);
+	Connection* connection = new Connection(socket, servicer);
 	m_connections.push_back(connection);
 	return connection;
 }
@@ -76,8 +76,8 @@ void ConnectionManager::closeAll()
 	std::list<Connection*>::iterator it = m_connections.begin();
 	while(it != m_connections.end()){
 		boost::system::error_code error;
-		(*it)->m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
-		(*it)->m_socket.close(error);
+		(*it)->m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+		(*it)->m_socket->close(error);
 		++it;
 	}
 	m_connections.clear();
@@ -145,7 +145,7 @@ bool Connection::closingConnection()
 			#endif
 
 			boost::system::error_code error;
-			m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 			if(error){
 				if(error == boost::asio::error::not_connected){
 					//Transport endpoint is not connected.
@@ -154,7 +154,7 @@ bool Connection::closingConnection()
 					PRINT_ASIO_ERROR("Shutdown");
 				}
 			}
-			m_socket.close(error);
+			m_socket->close(error);
 			m_socketClosed = true;
 			if(error){
 				PRINT_ASIO_ERROR("Close");
@@ -210,7 +210,7 @@ void Connection::acceptConnection()
 {
 	// Read size of the first packet
 	m_pendingRead++;
-	boost::asio::async_read(m_socket,
+	boost::asio::async_read(getHandle(),
 		boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
 		boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
 }
@@ -231,7 +231,7 @@ void Connection::parseHeader(const boost::system::error_code& error)
 		// Read packet content
 		m_pendingRead++;
 		m_msg.setMessageLength(size + NetworkMessage::header_length);
-		boost::asio::async_read(m_socket, boost::asio::buffer(m_msg.getBodyBuffer(), size),
+		boost::asio::async_read(getHandle(), boost::asio::buffer(m_msg.getBodyBuffer(), size),
 			boost::bind(&Connection::parsePacket, this, boost::asio::placeholders::error));
 	}
 	else{
@@ -289,7 +289,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 
 		// Wait to the next packet
 		m_pendingRead++;
-		boost::asio::async_read(m_socket,
+		boost::asio::async_read(getHandle(),
 			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
 			boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
 	}
@@ -358,7 +358,7 @@ void Connection::internalSend(OutputMessage_ptr msg)
 {
 	m_pendingWrite++;
 
-	boost::asio::async_write(m_socket,
+	boost::asio::async_write(getHandle(),
 		boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
 		boost::bind(&Connection::onWriteOperation, this, msg, boost::asio::placeholders::error));
 }
@@ -367,7 +367,7 @@ uint32_t Connection::getIP() const
 {
 	//Ip is expressed in network byte order
 	boost::system::error_code error;
-	const boost::asio::ip::tcp::endpoint endpoint = m_socket.remote_endpoint(error);
+	const boost::asio::ip::tcp::endpoint endpoint = m_socket->remote_endpoint(error);
 	if(!error){
 		return htonl(endpoint.address().to_v4().to_ulong());
 	}

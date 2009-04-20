@@ -120,20 +120,34 @@ bool BanManager::acceptConnection(uint32_t clientip)
 	IpConnectMap::iterator it = ipConnectMap.find(clientip);
 	if(it == ipConnectMap.end()){
 		ConnectBlock cb;
-		cb.lastConnection = currentTime;
-
+		cb.startTime = currentTime;
+		cb.blockTime = 0;
+		cb.count = 1;
 		ipConnectMap[clientip] = cb;
 
 		banLock.unlock();
 		return true;
 	}
 
-	if(currentTime - it->second.lastConnection < 1000){
+	it->second.count++;
+
+	if(it->second.blockTime > currentTime){
 		banLock.unlock();
 		return false;
 	}
 
-	it->second.lastConnection = currentTime;
+	if(currentTime - it->second.startTime > 1000){
+		uint32_t connectionPerSec = it->second.count;
+		it->second.startTime = currentTime;
+		it->second.count = 0;
+		it->second.blockTime = 0;
+
+		if(connectionPerSec > 10){
+			it->second.blockTime = currentTime + 10000;
+			banLock.unlock();
+			return false;
+		}
+	}
 
 	banLock.unlock();
 	return true;

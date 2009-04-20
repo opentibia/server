@@ -59,7 +59,7 @@ public:
 		return &instance;
 	}
 
-	Connection* createConnection(boost::asio::io_service& io_service, ServicePort_ptr servicers);
+	Connection* createConnection(boost::asio::ip::tcp::socket* socket, ServicePort_ptr servicers);
 	void releaseConnection(Connection* connection);
 	void closeAll();
 
@@ -87,8 +87,8 @@ public:
 	};
 
 private:
-	Connection(boost::asio::io_service& io_service, ServicePort_ptr service_port) : 
-	   m_socket(io_service), m_service_port(service_port)
+	Connection(boost::asio::ip::tcp::socket* socket, ServicePort_ptr service_port) : 
+	   m_socket(socket), m_service_port(service_port)
 	{
 		m_refCount = 0;
 		m_protocol = NULL;
@@ -110,13 +110,14 @@ public:
 	~Connection()
 	{
 		ConnectionManager::getInstance()->releaseConnection(this);
+		delete m_socket;
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		connectionCount--;
 #endif
 	}
 
-	boost::asio::ip::tcp::socket& getHandle() { return m_socket; }
+	boost::asio::ip::tcp::socket& getHandle() { return *m_socket; }
 
 	void closeConnection();
 	// Used by protocols that require server to send first
@@ -147,7 +148,7 @@ private:
 	void internalSend(OutputMessage_ptr msg);
 
 	NetworkMessage m_msg;
-	boost::asio::ip::tcp::socket m_socket;
+	boost::asio::ip::tcp::socket* m_socket;
 	ServicePort_ptr m_service_port;
 	bool m_socketClosed;
 	bool m_receivedFirst;

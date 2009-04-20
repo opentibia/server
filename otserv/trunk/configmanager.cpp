@@ -117,7 +117,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confString[URL] = getGlobalString(L, "url");
 	m_confString[LOCATION] = getGlobalString(L, "location");
 	m_confString[MAP_STORAGE_TYPE] = getGlobalString(L, "map_store_type", "relational");
-	m_confInteger[LOGIN_TRIES] = getGlobalNumber(L, "logintries", 3);
+	m_confInteger[LOGIN_TRIES] = getGlobalNumber(L, "logintries", 5);
 	m_confInteger[RETRY_TIMEOUT] = getGlobalNumber(L, "retrytimeout", 30 * 1000);
 	m_confInteger[LOGIN_TIMEOUT] = getGlobalNumber(L, "logintimeout", 5 * 1000);
 	m_confString[MOTD] = getGlobalString(L, "motd");

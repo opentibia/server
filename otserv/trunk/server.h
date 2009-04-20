@@ -84,7 +84,7 @@ public:
 	Protocol* make_protocol(bool checksummed, NetworkMessage& msg) const;
 
 	void onStopServer();
-	void onAccept(Connection* connection, const boost::system::error_code& error);
+	void onAccept(boost::asio::ip::tcp::socket* socket, const boost::system::error_code& error);
 
 protected:
 	void accept();

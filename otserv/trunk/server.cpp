@@ -28,6 +28,9 @@
 
 #include "connection.h"
 #include "outputmessage.h"
+#include "ban.h"
+
+extern BanManager g_bans;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,14 +111,14 @@ void ServicePort::accept()
 		return;
 	}
 
-	Connection* connection = ConnectionManager::getInstance()->createConnection(m_io_service, shared_from_this());
+	boost::asio::ip::tcp::socket* socket = new boost::asio::ip::tcp::socket(m_io_service);
 
-	m_acceptor->async_accept(connection->getHandle(),
-		boost::bind(&ServicePort::onAccept, this, connection,
+	m_acceptor->async_accept(*socket,
+		boost::bind(&ServicePort::onAccept, this, socket,
 		boost::asio::placeholders::error));
 }
 
-void ServicePort::onAccept(Connection* connection, const boost::system::error_code& error)
+void ServicePort::onAccept(boost::asio::ip::tcp::socket* socket, const boost::system::error_code& error)
 {
 	if(!error){
 		if(m_services.empty()){
@@ -125,12 +128,33 @@ void ServicePort::onAccept(Connection* connection, const boost::system::error_co
 			return;
 		}
 
-		if(m_services.front()->is_single_socket()){
-			// Only one handler, and it will send first
-			connection->acceptConnection(m_services.front()->make_protocol(connection));
+		boost::system::error_code error;
+		const boost::asio::ip::tcp::endpoint endpoint = socket->remote_endpoint(error);
+		uint32_t remote_ip = 0;
+		if(!error){
+			remote_ip = htonl(endpoint.address().to_v4().to_ulong());
+		}
+
+		if(remote_ip != 0 && g_bans.acceptConnection(remote_ip)){
+
+			Connection* connection = ConnectionManager::getInstance()->createConnection(socket, shared_from_this());
+
+			if(m_services.front()->is_single_socket()){
+				// Only one handler, and it will send first
+				connection->acceptConnection(m_services.front()->make_protocol(connection));
+			}
+			else{
+				connection->acceptConnection();
+			}
 		}
 		else{
-			connection->acceptConnection();
+			//close the socket
+			if(socket->is_open()){
+				boost::system::error_code error;
+				socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+				socket->close(error);
+				delete socket;
+			}
 		}
 
 #ifdef __DEBUG_NET_DETAIL__

@@ -30,7 +30,9 @@ struct LoginBlock{
 };
 
 struct ConnectBlock{
-	uint64_t lastConnection;
+	uint64_t startTime;
+	uint64_t blockTime;
+	uint32_t count;
 };
 
 typedef std::map<uint32_t, LoginBlock > IpLoginMap;
