@@ -1566,7 +1566,7 @@ void ProtocolGame::parseViolationWindow(NetworkMessage& msg)
 {
 	std::string target = msg.GetString();
 	uint8_t reason = msg.GetByte();
-	violationActions_t action = (violationActions_t)msg.GetByte();
+	violationAction_t action = (violationAction_t)msg.GetByte();
 	std::string comment = msg.GetString();
 	std::string statement = msg.GetString();
 	uint16_t channelId = msg.GetU16();

@@ -149,7 +149,7 @@ enum levelTypes_t {
 	LEVEL_LAST = LEVEL_EXPERIENCE
 };
 
-enum violationActions_t
+enum violationAction_t
 {
 	ACTION_NOTATION = 0,
 	ACTION_NAMEREPORT,

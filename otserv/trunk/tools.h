@@ -76,7 +76,7 @@ Ammo_t getAmmoType(const std::string& strValue);
 AmmoAction_t getAmmoAction(const std::string& strValue);
 
 std::string getReason(int32_t reasonId);
-std::string getAction(violationActions_t actionId, bool ipBanishment);
+std::string getAction(violationAction_t actionId, bool ipBanishment);
 
 uint32_t adlerChecksum(uint8_t *data, int32_t len);
 
