@@ -19,16 +19,14 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "otpch.h"
-
-#include "definitions.h"
-#include "otsystem.h"
 #include "boost/asio.hpp"
 
-#include "math.h"
 #include "tools.h"
 #include "configmanager.h"
 #include "md5.h"
 #include "sha1.h"
+
+#include "math.h"
 #include <sstream>
 #include <iomanip>
 
@@ -626,6 +624,99 @@ AmmoAction_t getAmmoAction(const std::string& strValue)
 		}
 	}
 	return AMMOACTION_NONE;
+}
+
+std::string getReason(int32_t reasonId)
+{
+	switch(reasonId)
+	{
+		case 0:
+			return "Offensive Name";
+		case 1:
+			return "Invalid Name Format";
+		case 2:
+			return "Unsuitable Name";
+		case 3:
+			return "Name Inciting Rule Violation";
+		case 4:
+			return "Offensive Statement";
+		case 5:
+			return "Spamming";
+		case 6:
+			return "Illegal Advertising";
+		case 7:
+			return "Off-Topic Public Statement";
+		case 8:
+			return "Non-English Public Statement";
+		case 9:
+			return "Inciting Rule Violation";
+		case 10:
+			return "Bug Abuse";
+		case 11:
+			return "Game Weakness Abuse";
+		case 12:
+			return "Using Unofficial Software to Play";
+		case 13:
+			return "Hacking";
+		case 14:
+			return "Multi-Clienting";
+		case 15:
+			return "Account Trading or Sharing";
+		case 16:
+			return "Threatening Gamemaster";
+		case 17:
+			return "Pretending to Have Influence on Rule Enforcement";
+		case 18:
+			return "False Report to Gamemaster";
+		case 19:
+			return "Destructive Behaviour";
+		case 20:
+			return "Excessive Unjustified Player Killing";
+		case 21:
+			return "Invalid Payment";
+		case 22:
+			return "Spoiling Auction";
+	}
+
+	return "Unknown Reason";
+}
+
+std::string getAction(violationActions_t actionId, bool ipBanishment)
+{
+	std::string action;
+	switch(actionId)
+	{
+		case ACTION_NOTATION:
+			action = "Notation";
+			break;
+		case ACTION_NAMEREPORT:
+			action = "Name Report";
+			break;
+		case ACTION_BANREPORT:
+			action = "Name Report + Banishment";
+			break;
+		case ACTION_BANFINAL:
+			action = "Banishment + Final Warning";
+			break;
+		case ACTION_BANREPORTFINAL:
+			action = "Name Report + Banishment + Final Warning";
+			break;
+		case ACTION_STATEMENT:
+			action = "Statement Report";
+			break;
+		case ACTION_DELETION:
+			action = "Deletion";
+			break;
+		case ACTION_BANISHMENT:
+		default:
+			action = "Banishment";
+			break;
+	}
+
+	if(ipBanishment)
+		action += " + IP Banishment";
+
+	return action;
 }
 
 #define MOD_ADLER 65521

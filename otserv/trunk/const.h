@@ -429,6 +429,46 @@ enum PlayerFlags{
 	PlayerFlag_LastFlag
 };
 
+enum ViolationActions_t
+{
+	Action_None			= 0,
+	Action_Notation			= 1 << 0,
+	Action_Namelock			= 1 << 1,
+	Action_Banishment		= 1 << 2,
+	Action_NamelockBan		= 1 << 3,
+	Action_BanFinalWarning		= 1 << 4,
+	Action_NamelockBanFinalWarning	= 1 << 5,
+	Action_StatementReport		= 1 << 6,
+	Action_IpBan			= 1 << 7
+};
+
+const int32_t violationReasons[5] =
+{
+	0,	//ignore this
+	3,	//all name reasons
+	9,	//all name & statement reasons
+	18,	//all name, statement & cheating reasons
+	22	//all reasons
+};
+
+const int32_t violationNames[5] =
+{
+	Action_None,
+	Action_Namelock,
+	Action_Namelock,
+	Action_Namelock | Action_NamelockBan,
+	Action_Namelock | Action_NamelockBan | Action_NamelockBanFinalWarning | Action_IpBan
+};
+
+const int32_t violationStatements[5] =
+{
+	Action_None,
+	Action_None,
+	Action_StatementReport,
+	Action_StatementReport | Action_Notation | Action_Banishment,
+	Action_StatementReport | Action_Notation | Action_Banishment | Action_BanFinalWarning | Action_IpBan
+};
+
 //Reserved player storage key ranges
 //[10000000 - 20000000]
 #define PSTRG_RESERVED_RANGE_START  10000000

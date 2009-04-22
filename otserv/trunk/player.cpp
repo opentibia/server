@@ -87,6 +87,7 @@ Creature()
 	conditionImmunities = 0;
 	conditionSuppressions = 0;
 	accessLevel = 0;
+	violationLevel = 0;
 	lastip = 0;
 	lastLoginSaved = 0;
 	lastLogout = 0;

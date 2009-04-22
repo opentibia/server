@@ -33,7 +33,7 @@
 
 extern ConfigManager g_config;
 
-Account IOAccount::loadAccount(const std::string& name)
+Account IOAccount::loadAccount(const std::string& name, bool preLoad/* = false*/)
 {
 	Account acc;
 
@@ -42,28 +42,42 @@ Account IOAccount::loadAccount(const std::string& name)
 	DBResult* result;
 
 	query << "SELECT `id`, `name`, `password`, `premend` FROM `accounts` WHERE `name` = " << db->escapeString(name);
-	if((result = db->storeQuery(query.str()))){
-		acc.accnumber = result->getDataInt("id");
-		acc.password = result->getDataString("password");
-		acc.premEnd = result->getDataInt("premend");
-		acc.name = result->getDataString("name");
-		db->freeResult(result);
-
-		query.str("");
-		query << "SELECT `name` FROM `players` WHERE `account_id` = " << acc.accnumber;
-
-		if((result = db->storeQuery(query.str()))){
-			do {
-				std::string ss = result->getDataString("name");
-				acc.charList.push_back(ss.c_str());
-			} while(result->next());
-
-			acc.charList.sort();
-			db->freeResult(result);
-		}
+	if(!(result = db->storeQuery(query.str()))){
+		return acc;
 	}
 
+	acc.number = result->getDataInt("id");
+	acc.password = result->getDataString("password");
+	acc.premEnd = result->getDataInt("premend");
+	acc.name = result->getDataString("name");
+	acc.warnings = result->getDataInt("warnings");
+	db->freeResult(result);
+
+	if(preLoad)
+		return acc;
+
+	query.str("");
+	query << "SELECT `name` FROM `players` WHERE `account_id` = " << acc.number;
+	if(!(result = db->storeQuery(query.str()))){
+		return acc;
+	}
+
+	do {
+		acc.charList.push_back(result->getDataString("name"));
+	} while(result->next());
+
+	acc.charList.sort();
+	db->freeResult(result);
 	return acc;
+}
+
+bool IOAccount::saveAccount(Account acc)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+
+	query << "UPDATE `accounts` SET `premend` = " << acc.premEnd << ", `warnings` = " << acc.warnings << " WHERE `id` = " << acc.number;
+	return db->executeQuery(query.str());
 }
 
 bool IOAccount::getPassword(const std::string& accountname, const std::string &name, std::string &password)

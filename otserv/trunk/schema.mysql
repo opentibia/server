@@ -2,7 +2,8 @@ CREATE TABLE `groups` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL COMMENT 'group name',
     `flags` BIGINT UNSIGNED NOT NULL DEFAULT 0,
-    `access` INT NOT NULL,
+    `access` INT NOT NULL DEFAULT 0,
+    `violation` INT NOT NULL DEFAULT 0,
     `maxdepotitems` INT NOT NULL,
     `maxviplist` INT NOT NULL,
     PRIMARY KEY (`id`)
@@ -15,8 +16,7 @@ CREATE TABLE `accounts` (
     `email` VARCHAR(255) NOT NULL DEFAULT '',
     `premend` INT UNSIGNED NOT NULL DEFAULT 0,
     `blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
-    `deleted` TINYINT(1) NOT NULL DEFAULT FALSE,
-    `warned` TINYINT(1) NOT NULL DEFAULT FALSE,
+    `warnings` INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE (`name`)
 ) ENGINE = InnoDB;
@@ -152,8 +152,10 @@ CREATE TABLE `bans` (
     `expires` INT UNSIGNED NOT NULL,
     `added` INT UNSIGNED NOT NULL,
     `admin_id` INT UNSIGNED NOT NULL DEFAULT 0,
-    `comment` VARCHAR(255) NOT NULL DEFAULT '',
+    `comment` TEXT NOT NULL DEFAULT '',
     `reason` INT UNSIGNED NOT NULL DEFAULT 0,
+    `action` INT UNSIGNED NOT NULL DEFAULT 0,
+    `statement` VARCHAR(255) NOT NULL DEFAULT '',
     PRIMARY KEY  (`id`),
     KEY (`type`, `value`),
     KEY (`expires`)
@@ -210,7 +212,7 @@ CREATE TABLE `schema_info` (
     PRIMARY KEY (`name`)
 );
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 8);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 9);
 
 DELIMITER |
 

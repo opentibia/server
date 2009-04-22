@@ -278,7 +278,7 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 		}
 
 		if(g_bans.isPlayerBanished(name) && !player->hasFlag(PlayerFlag_CannotBeBanned)){
-			disconnectClient(0x14, "Your character is banished!");
+			disconnectClient(0x14, "Your character is locked!");
 			return false;
 		}
 
@@ -472,11 +472,6 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 
 	if(g_game.getGameState() == GAME_STATE_STARTUP){
 		disconnectClient(0x14, "Gameworld is starting up. Please wait.");
-		return false;
-	}
-
-	if(g_bans.isAccountDeleted(accname)){
-		disconnectClient(0x14, "Your account has been deleted!");
 		return false;
 	}
 
@@ -831,6 +826,14 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 
 	case 0xDD:
 		parseRemoveVip(msg);
+		break;
+
+	case 0xE6:
+		parseBugReport(msg);
+		break;
+
+	case 0xE7:
+		parseViolationWindow(msg);
 		break;
 
 	case 0xE8:
@@ -1559,6 +1562,24 @@ void ProtocolGame::parseRotateItem(NetworkMessage& msg)
 	addGameTask(&Game::playerRotateItem, player->getID(), pos, stackpos, spriteId);
 }
 
+void ProtocolGame::parseViolationWindow(NetworkMessage& msg)
+{
+	std::string target = msg.GetString();
+	uint8_t reason = msg.GetByte();
+	violationActions_t action = (violationActions_t)msg.GetByte();
+	std::string comment = msg.GetString();
+	std::string statement = msg.GetString();
+	uint16_t channelId = msg.GetU16();
+	bool ipBanishment = msg.GetByte();
+	addGameTask(&Game::violationWindow, player->getID(), target, reason, action, comment, statement, channelId, ipBanishment);
+}
+
+void ProtocolGame::parseBugReport(NetworkMessage& msg)
+{
+	msg.GetString();
+	//TODO
+}
+
 void ProtocolGame::parseDebugAssert(NetworkMessage& msg)
 {
 	if(!g_config.getNumber(ConfigManager::SAVE_CLIENT_DEBUG_ASSERTIONS)){
@@ -2237,20 +2258,24 @@ void ProtocolGame::sendAddCreature(const Creature* creature, bool isLogin)
 				msg->AddU32(player->getID());
 				msg->AddByte(0x32);
 				msg->AddByte(0x00);
-				msg->AddByte(0x00); //can report bugs 0,1
+				msg->AddByte(0x00); //TODO (can report bugs 0,1)
 
-				//msg->AddByte(0x0B);//TODO?. GM actions
-				//msg->AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg->AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg->AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg->AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg->AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg->AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg->AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg->AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				uint16_t violation = player->getViolationLevel();
+				if(violationReasons[violation] > 0)
+				{
+					msg->AddByte(0x0B);
+					for(int32_t i = 0; i <= 22; i++)
+					{
+						if(i <= violationReasons[1])
+							msg->AddByte(violationNames[violation]);
+						else if(i <= violationReasons[violation])
+							msg->AddByte(violationStatements[violation]);
+						else
+							msg->AddByte(Action_None);
+					}
+				}
 
 				AddMapDescription(msg, player->getPosition());
-
 				if(isLogin){
 					AddMagicEffect(msg, player->getPosition(), NM_ME_TELEPORT);
 				}
@@ -2276,7 +2301,6 @@ void ProtocolGame::sendAddCreature(const Creature* creature, bool isLogin)
 
 				//player light level
 				AddCreatureLight(msg, creature);
-
 				if(isLogin){
 					std::string tempstring = g_config.getString(ConfigManager::LOGIN_MSG);
 					if(tempstring.size() > 0){
@@ -2310,7 +2334,6 @@ void ProtocolGame::sendAddCreature(const Creature* creature, bool isLogin)
 			}
 			else{
 				AddTileCreature(msg, creature->getPosition(), creature);
-
 				if(isLogin){
 					AddMagicEffect(msg, creature->getPosition(), NM_ME_TELEPORT);
 				}

@@ -2,7 +2,8 @@ CREATE TABLE "groups" (
     "id" SERIAL,
     "name" VARCHAR(255) NOT NULL,
     "flags" BIGINT NOT NULL DEFAULT 0,
-    "access" INT NOT NULL,
+    "access" INT NOT NULL DEFAULT 0,
+    "violation" INT NOT NULL DEFAULT 0,
     "maxdepotitems" INT NOT NULL,
     "maxviplist" INT NOT NULL,
     PRIMARY KEY ("id")
@@ -15,8 +16,7 @@ CREATE TABLE "accounts" (
     "email" VARCHAR(255) NOT NULL DEFAULT '',
     "premend" BIGINT NOT NULL DEFAULT 0,
     "blocked" SMALLINT NOT NULL DEFAULT 0,
-    "deleted" SMALLINT NOT NULL DEFAULT 0,
-    "warned" SMALLINT NOT NULL DEFAULT 0,
+    "warnings" SMALLINT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id"),
     UNIQUE ("name")
 );
@@ -151,8 +151,10 @@ CREATE TABLE "bans" (
     "expires" BIGINT NOT NULL,
     "added" BIGINT NOT NULL,
     "admin_id" INT DEFAULT 0,
-    "comment" VARCHAR(255) NOT NULL DEFAULT '',
+    "comment" TEXT NOT NULL DEFAULT '',
     "reason" INT DEFAULT 0,
+    "action" INT DEFAULT 0,
+    "statement" VARCHAR(255) NOT NULL DEFAULT '',
     PRIMARY KEY ("id")
 );
 
@@ -204,7 +206,7 @@ CREATE TABLE "schema_info" (
     PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 8);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 9);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER

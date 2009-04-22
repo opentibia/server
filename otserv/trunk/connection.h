@@ -92,9 +92,9 @@ private:
 		boost::asio::io_service& io_service,
 		ServicePort_ptr service_port) : 
 			m_socket(socket),
+			m_timer(io_service),
 			m_io_service(io_service),
-			m_service_port(service_port),
-			m_timer(io_service)
+			m_service_port(service_port)
 	{
 		m_refCount = 0;
 		m_protocol = NULL;

@@ -111,11 +111,6 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		return false;
 	}
 
-	if(g_bans.isAccountDeleted(accname)){
-		disconnectClient(0x0A, "Your account has been deleted!");
-		return false;
-	}
-
 	if(g_bans.isIpDisabled(clientip)){
 		disconnectClient(0x0A, "Too many connections attempts from this IP. Try again later.");
 		return false;

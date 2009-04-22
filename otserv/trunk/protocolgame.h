@@ -158,8 +158,10 @@ private:
 	void parseCloseRuleViolation(NetworkMessage& msg);
 	void parseCancelRuleViolation(NetworkMessage& msg);
 
+	//etc
+	void parseViolationWindow(NetworkMessage& msg);
+	void parseBugReport(NetworkMessage& msg);
 	void parseDebugAssert(NetworkMessage& msg);
-
 	void parseDebug(NetworkMessage& msg);
 
 	//Send functions

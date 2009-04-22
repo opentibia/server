@@ -116,6 +116,18 @@ frags_to_banishment = 6
 -- Time in seconds a player will be banished for excessive killing
 kill_ban_time = 24*60*60*30
 
+-- Broadcast violation window banishments
+broadcast_banishments = "no"
+
+-- Violation window config
+max_violation_comment_size = 255
+notations_to_banishment = 3
+warnings_to_final_banishment = 4
+warnings_to_deletion = 5
+banishment_length = 7*86400 --seconds
+final_banishment_length = 30*86400 --seconds
+ip_banishment_length = 86400 --seconds
+
 -- Extra experience % per player when sharing experience
 party_exp_mul = 5
 

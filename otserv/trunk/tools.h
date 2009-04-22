@@ -20,20 +20,14 @@
 
 #ifndef __OTSERV_TOOLS_H__
 #define __OTSERV_TOOLS_H__
-
-#include "const.h"
-
-#include <string>
-#include <algorithm>
-#include <stdio.h>
-#include <stdlib.h>
-#include <cmath>
-#include <vector>
-
+#include "otsystem.h"
 #include <libxml/parser.h>
 
+#include "enums.h"
+#include "const.h"
 
-enum DistributionType_t{
+
+enum DistributionType_t {
 	DISTRO_UNIFORM,
 	DISTRO_SQUARE,
 	DISTRO_NORMAL
@@ -80,6 +74,9 @@ MagicEffectClasses getMagicEffect(const std::string& strValue);
 ShootType_t getShootType(const std::string& strValue);
 Ammo_t getAmmoType(const std::string& strValue);
 AmmoAction_t getAmmoAction(const std::string& strValue);
+
+std::string getReason(int32_t reasonId);
+std::string getAction(violationActions_t actionId, bool ipBanishment);
 
 uint32_t adlerChecksum(uint8_t *data, int32_t len);
 

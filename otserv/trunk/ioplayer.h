@@ -26,17 +26,12 @@
 #include "player.h"
 #include "database.h"
 
-class PlayerGroup
+struct PlayerGroup
 {
-public:
-	PlayerGroup(){};
-	~PlayerGroup(){};
-
-	std::string m_name;
-	uint64_t m_flags;
-	uint32_t m_access;
-	uint32_t m_maxDepotItems;
-	uint32_t m_maxVip;
+	std::string name;
+	uint64_t flags;
+	uint16_t access, violation;
+	uint32_t maxDepotItems, maxVip;
 };
 
 typedef std::pair<int32_t, Item*> itemBlock;
@@ -68,19 +63,20 @@ public:
 	  */
 	bool savePlayer(Player* player);
 
-	//bool loadDepot(Player* player, unsigned long depotId);
-
 	bool getGuidByName(uint32_t& guid, std::string& name);
 	bool getAccountByName(uint32_t& acc, std::string& name);
+	bool getAccountByName(std::string& acc, std::string& name);
 	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
 	bool getNameByGuid(uint32_t guid, std::string& name);
 	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 	bool playerExists(std::string name);
+	bool getLastIP(uint32_t& ip, uint32_t guid);
+	bool hasFlag(PlayerFlags flag, uint32_t guid);
 
 protected:
 	bool storeNameByGuid(Database &mysql, uint32_t guid);
 
-	const PlayerGroup* getPlayerGroup(uint32_t groupid);
+	const PlayerGroup getPlayerGroup(uint32_t groupid);
 
 	struct StringCompareCase
 	{
@@ -98,7 +94,7 @@ protected:
 
 	typedef std::map<uint32_t, std::string> NameCacheMap;
 	typedef std::map<std::string, uint32_t, StringCompareCase> GuidCacheMap;
-	typedef std::map<uint32_t, PlayerGroup*> PlayerGroupMap;
+	typedef std::map<uint32_t, PlayerGroup> PlayerGroupMap;
 
 	PlayerGroupMap playerGroupMap;
 	NameCacheMap nameCacheMap;

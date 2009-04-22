@@ -63,14 +63,13 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->accountId = result->getDataInt("account_id");
 	player->accountName = result->getDataString("accname");
 
-	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
-	if(group){
-		player->groupName = group->m_name;
-		player->accessLevel = group->m_access;
-		player->maxDepotLimit = group->m_maxDepotItems;
-		player->maxVipLimit = group->m_maxVip;
-		player->setFlags(group->m_flags);
-	}
+	PlayerGroup group = getPlayerGroup(result->getDataInt("group_id"));
+	player->groupName = group.name;
+	player->accessLevel = group.access;
+	player->violationLevel = group.violation;
+	player->maxDepotLimit = group.maxDepotItems;
+	player->maxVipLimit = group.maxVip;
+	player->setFlags(group.flags);
 
 	if(preload){
 		//only loading basic info
@@ -707,13 +706,26 @@ bool IOPlayer::getAccountByName(uint32_t& account, std::string& name)
 {
 	Database* db = Database::instance();
 	DBResult* result;
-	DBQuery query;
-
 	if(!(result = db->storeQuery("SELECT `account_id` FROM `players` WHERE `name` = " + db->escapeString(name))))
 		return false;
 
 	account = result->getDataInt("account_id");
+	db->freeResult(result);
+	return true;
+}
 
+
+bool IOPlayer::getAccountByName(std::string& account, std::string& name)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	query << "SELECT `a`.`name` FROM `players` p LEFT JOIN `accounts` a ON `p`.`account_id` = `a`.`id` WHERE `p`.`name` = " << db->escapeString(name);
+
+	DBResult* result;
+	if(!(result = db->storeQuery(query.str())))
+		return false;
+
+	account = result->getDataString("name");
 	db->freeResult(result);
 	return true;
 }
@@ -730,14 +742,8 @@ bool IOPlayer::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string& na
 
 	name = result->getDataString("name");
 	guid = result->getDataInt("id");
-	const PlayerGroup* group = getPlayerGroup(result->getDataInt("group_id"));
-
-	if(group){
-		specialVip = (0 != (group->m_flags & ((uint64_t)1 << PlayerFlag_SpecialVIP)));
-	}
-	else{
-		specialVip = false;
-	}
+	specialVip = (0 != (getPlayerGroup(result->getDataInt("group_id")).flags & (
+		(uint64_t)1 << PlayerFlag_SpecialVIP)));
 
 	db->freeResult(result);
 	return true;
@@ -770,36 +776,34 @@ bool IOPlayer::playerExists(std::string name)
 	return true;
 }
 
-const PlayerGroup* IOPlayer::getPlayerGroup(uint32_t groupid)
+const PlayerGroup IOPlayer::getPlayerGroup(uint32_t groupid)
 {
 	PlayerGroupMap::const_iterator it = playerGroupMap.find(groupid);
-
 	if(it != playerGroupMap.end()){
 		return it->second;
 	}
-	else{
-		Database* db = Database::instance();
-		DBQuery query;
-		DBResult* result;
 
-		query << "SELECT * FROM `groups` WHERE `id`= " << groupid;
+	Database* db = Database::instance();
+	DBResult* result;
 
-		if((result = db->storeQuery(query.str()))){
-			PlayerGroup* group = new PlayerGroup;
+	DBQuery query;
+	PlayerGroup group;
 
-			group->m_name = result->getDataString("name");
-			group->m_flags = result->getDataLong("flags");
-			group->m_access = result->getDataInt("access");
-			group->m_maxDepotItems = result->getDataInt("maxdepotitems");
-			group->m_maxVip = result->getDataInt("maxviplist");
-
-			playerGroupMap[groupid] = group;
-
-			db->freeResult(result);
-			return group;
-		}
+	query << "SELECT * FROM `groups` WHERE `id`= " << groupid;
+	if(!(result = db->storeQuery(query.str()))){
+		return group;
 	}
-	return NULL;
+
+	group.name = result->getDataString("name");
+	group.flags = result->getDataLong("flags");
+	group.access = result->getDataInt("access");
+	group.violation = result->getDataInt("access");
+	group.maxDepotItems = result->getDataInt("maxdepotitems");
+	group.maxVip = result->getDataInt("maxviplist");
+
+	playerGroupMap[groupid] = group;
+	db->freeResult(result);
+	return group;
 }
 
 void IOPlayer::loadItems(ItemMap& itemMap, DBResult* result)
@@ -826,4 +830,34 @@ void IOPlayer::loadItems(ItemMap& itemMap, DBResult* result)
 			itemMap[sid] = pair;
 		}
 	}while(result->next());
+}
+
+bool IOPlayer::hasFlag(PlayerFlags flag, uint32_t guid)
+{
+	Database* db = Database::instance();
+	DBResult* result;
+
+	DBQuery query;
+	query << "SELECT `group_id` FROM `players` WHERE `id` = " << guid;
+	if(!(result = db->storeQuery(query.str())))
+		return false;
+
+	PlayerGroup group = getPlayerGroup(result->getDataInt("group_id"));
+	db->freeResult(result);
+	return (0 != (group.flags & ((uint64_t)1 << flag)));
+}
+
+bool IOPlayer::getLastIP(uint32_t& ip, uint32_t guid)
+{
+	Database* db = Database::instance();
+	DBResult* result;
+
+	DBQuery query;
+	query << "SELECT `lastip` FROM `players` WHERE `id` = " << guid << " AND `deleted` = 0;";
+	if(!(result = db->storeQuery(query.str())))
+		return false;
+
+	ip = result->getDataInt("lastip");
+	db->freeResult(result);
+	return true;
 }

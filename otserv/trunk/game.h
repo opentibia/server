@@ -17,8 +17,6 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
-
 #ifndef __OTSERV_GAME_H__
 #define __OTSERV_GAME_H__
 
@@ -34,6 +32,7 @@
 #include "npc.h"
 #include "spawn.h"
 #include "templates.h"
+#include "enums.h"
 #include "scheduler.h"
 
 class ServiceManager;
@@ -438,6 +437,8 @@ public:
 	void cleanup();
 	void shutdown();
 	void FreeThing(Thing* thing);
+	bool violationWindow(uint32_t playerId, std::string targetName, uint8_t reason, violationActions_t action,
+		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
