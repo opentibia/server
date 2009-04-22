@@ -59,7 +59,8 @@ public:
 		return &instance;
 	}
 
-	Connection* createConnection(boost::asio::ip::tcp::socket* socket, ServicePort_ptr servicers);
+	Connection* createConnection(boost::asio::ip::tcp::socket* socket,
+		boost::asio::io_service& io_service, ServicePort_ptr servicers);
 	void releaseConnection(Connection* connection);
 	void closeAll();
 
@@ -87,8 +88,13 @@ public:
 	};
 
 private:
-	Connection(boost::asio::ip::tcp::socket* socket, ServicePort_ptr service_port) : 
-	   m_socket(socket), m_service_port(service_port)
+	Connection(boost::asio::ip::tcp::socket* socket,
+		boost::asio::io_service& io_service,
+		ServicePort_ptr service_port) : 
+			m_socket(socket),
+			m_io_service(io_service),
+			m_service_port(service_port),
+			m_timer(io_service)
 	{
 		m_refCount = 0;
 		m_protocol = NULL;
@@ -109,9 +115,6 @@ private:
 public:
 	~Connection()
 	{
-		ConnectionManager::getInstance()->releaseConnection(this);
-		delete m_socket;
-
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		connectionCount--;
 #endif
@@ -136,7 +139,9 @@ private:
 	void parsePacket(const boost::system::error_code& error);
 
 	void onWriteOperation(OutputMessage_ptr msg, const boost::system::error_code& error);
+	void onStopOperation();
 
+	void handleTimeout(const boost::system::error_code& error);
 	void handleReadError(const boost::system::error_code& error);
 	void handleWriteError(const boost::system::error_code& error);
 
@@ -149,6 +154,8 @@ private:
 
 	NetworkMessage m_msg;
 	boost::asio::ip::tcp::socket* m_socket;
+	boost::asio::deadline_timer m_timer;
+	boost::asio::io_service& m_io_service;
 	ServicePort_ptr m_service_port;
 	bool m_socketClosed;
 	bool m_receivedFirst;

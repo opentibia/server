@@ -137,7 +137,7 @@ void ServicePort::onAccept(boost::asio::ip::tcp::socket* socket, const boost::sy
 
 		if(remote_ip != 0 && g_bans.acceptConnection(remote_ip)){
 
-			Connection* connection = ConnectionManager::getInstance()->createConnection(socket, shared_from_this());
+			Connection* connection = ConnectionManager::getInstance()->createConnection(socket, m_io_service, shared_from_this());
 
 			if(m_services.front()->is_single_socket()){
 				// Only one handler, and it will send first

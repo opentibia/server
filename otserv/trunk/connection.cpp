@@ -37,14 +37,15 @@
 uint32_t Connection::connectionCount = 0;
 #endif
 
-Connection* ConnectionManager::createConnection(boost::asio::ip::tcp::socket* socket, ServicePort_ptr servicer)
+Connection* ConnectionManager::createConnection(boost::asio::ip::tcp::socket* socket,
+	boost::asio::io_service& io_service, ServicePort_ptr servicer)
 {
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Create new Connection" << std::endl;
 	#endif
 
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
-	Connection* connection = new Connection(socket, servicer);
+	Connection* connection = new Connection(socket, io_service, servicer);
 	m_connections.push_back(connection);
 	return connection;
 }
@@ -189,18 +190,34 @@ void Connection::releaseConnection()
 	}
 }
 
+void Connection::onStopOperation()
+{
+	//io_service thread
+	m_connectionLock.lock();
+	m_timer.cancel();
+	ConnectionManager::getInstance()->releaseConnection(this);
+
+	if(m_socket->is_open()){
+		m_socket->cancel();
+		m_socket->close();
+	}
+
+	delete m_socket;
+
+	m_connectionLock.unlock();
+	delete this;
+}
+
 void Connection::deleteConnectionTask()
 {
 	//dispather thread
 	assert(m_refCount == 0);
-
-	delete this;
+	m_io_service.dispatch(boost::bind(&Connection::onStopOperation, this));
 }
 
 void Connection::acceptConnection(Protocol* protocol)
 {
 	m_protocol = protocol;
-
 	m_protocol->onConnect();
 
 	acceptConnection();
@@ -210,6 +227,10 @@ void Connection::acceptConnection()
 {
 	// Read size of the first packet
 	m_pendingRead++;
+	
+    m_timer.expires_from_now(boost::posix_time::seconds(10));
+	m_timer.async_wait( boost::bind(&Connection::handleTimeout, this, boost::asio::placeholders::error));
+
 	boost::asio::async_read(getHandle(),
 		boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
 		boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
@@ -218,6 +239,7 @@ void Connection::acceptConnection()
 void Connection::parseHeader(const boost::system::error_code& error)
 {
 	m_connectionLock.lock();
+	m_timer.cancel();
 	m_pendingRead--;
 	if(m_closeState == CLOSE_STATE_CLOSING){
 		if(!closingConnection()){
@@ -297,6 +319,18 @@ void Connection::parsePacket(const boost::system::error_code& error)
 		handleReadError(error);
 	}
 	m_connectionLock.unlock();
+}
+
+void Connection::handleTimeout(const boost::system::error_code& error)
+{
+	if(!error){
+		m_connectionLock.lock();
+		if(m_pendingRead > 0){
+			//cancel all asynchronous operations associated with the socket
+			getHandle().cancel();
+		}
+		m_connectionLock.unlock();
+	}
 }
 
 void Connection::handleReadError(const boost::system::error_code& error)
@@ -383,9 +417,8 @@ void Connection::onWriteOperation(OutputMessage_ptr msg, const boost::system::er
 	std::cout << "onWriteOperation" << std::endl;
 	#endif
 
-	msg.reset();
-
 	m_connectionLock.lock();
+	msg.reset();
 
 	if(!error){
 		if(m_pendingWrite > 0){
