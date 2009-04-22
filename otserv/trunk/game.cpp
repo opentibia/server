@@ -4541,7 +4541,7 @@ void Game::showUseHotkeyMessage(Player* player, Item* item)
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 }
 
-bool Game::violationWindow(uint32_t playerId, std::string targetName, uint8_t reason, violationAction_t action,
+bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reason, violationAction_t action,
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment)
 {
 	Player* player = getPlayerByID(playerId);

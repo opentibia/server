@@ -98,9 +98,10 @@ bool RSA::setKey(const std::string& file)
 	char p[512];
 	char q[512];
 	char d[512];
-	fgets(p, 512, f);
-	fgets(q, 512, f);
-	fgets(d, 512, f);
+	delete fgets(p, 512, f);
+	delete fgets(q, 512, f);
+	delete fgets(d, 512, f);
+
 	setKey(p, q, d);
 	return true;
 }

@@ -74,8 +74,7 @@ bool FileLoader::openFile(const char* filename, bool write, bool caching /*= fal
 		m_file = fopen(filename, "rb");
 		if(m_file){
 			uint32_t version;
-			fread(&version, sizeof(version), 1, m_file);
-			if(version > 0){
+			if(fread(&version, sizeof(version), 1, m_file) && version > 0){
 				fclose(m_file);
 				m_file = NULL;
 				m_lastError = ERROR_INVALID_FILE_VERSION;
