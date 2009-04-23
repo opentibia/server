@@ -5024,10 +5024,10 @@ int LuaScriptInterface::luaSetConditionFormula(lua_State *L)
 		return 1;
 	}
 
-	double maxb = popFloatNumber(L);
-	double maxa = popFloatNumber(L);
-	double minb = popFloatNumber(L);
-	double mina = popFloatNumber(L);
+	float maxb = (float)popFloatNumber(L);
+	float maxa = (float)popFloatNumber(L);
+	float minb = (float)popFloatNumber(L);
+	float mina = (float)popFloatNumber(L);
 
 	uint32_t conditionId = popNumber(L);
 

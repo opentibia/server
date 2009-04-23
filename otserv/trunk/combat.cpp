@@ -426,13 +426,13 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 
 		case COMBATPARAM_EFFECT:
 		{
-			params.impactEffect = value;
+			params.impactEffect = (uint8_t)value;
 			return true;
 		}
 
 		case COMBATPARAM_DISTANCEEFFECT:
 		{
-			params.distanceEffect = value;
+			params.distanceEffect = (uint8_t)value;
 			return true;
 		}
 

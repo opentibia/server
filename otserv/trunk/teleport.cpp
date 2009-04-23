@@ -62,7 +62,7 @@ bool Teleport::serializeAttr(PropWriteStream& propWriteStream) const
 
 	tele_dest._x = destPos.x;
 	tele_dest._y = destPos.y;
-	tele_dest._z = destPos.z;
+	tele_dest._z = (uint8_t)destPos.z;
 
 	propWriteStream.ADD_VALUE(tele_dest);
 

@@ -379,7 +379,7 @@ inline bool FileLoader::readBytes(unsigned char* buffer, int size, long pos)
 			m_lastError = ERROR_SEEK_ERROR;
 			return false;
 		}
-		int value = fread(buffer, 1, size, m_file);
+		size_t value = fread(buffer, 1, size, m_file);
 		if(value != size){
 			m_lastError = ERROR_EOF;
 			return false;

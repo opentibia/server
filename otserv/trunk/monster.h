@@ -186,11 +186,11 @@ private:
 	bool isOpponent(const Creature* creature);
 
 	virtual uint64_t getLostExperience() const { return ((skillLoss ? mType->experience : 0)); }
-	virtual int getLookCorpse() { return mType->lookcorpse; }
+	virtual uint16_t getLookCorpse() { return mType->lookCorpse; }
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return mType->damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return mType->conditionImmunities; }
-	virtual uint16_t getLookCorpse() const { return mType->lookcorpse; }
+	virtual uint16_t getLookCorpse() const { return mType->lookCorpse; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 	virtual bool useCacheMap() const {return true;}
 };

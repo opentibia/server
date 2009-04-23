@@ -113,7 +113,7 @@ bool DBInsert::addRow(const std::string& row)
 {
 	if(m_multiLine){
 		m_rows++;
-		int32_t size = m_buf.length();
+		size_t size = m_buf.length();
 
 		// adds new row to buffer
 		if(size == 0){

@@ -133,7 +133,7 @@ public:
 	virtual ~QTreeLeafNode();
 
 	Floor* createFloor(uint32_t z);
-	Floor* getFloor(uint32_t z){return m_array[z];}
+	Floor* getFloor(uint16_t z){return m_array[z];}
 
 	QTreeLeafNode* stepSouth(){return m_leafS;}
 	QTreeLeafNode* stepEast(){return m_leafE;}
@@ -189,7 +189,7 @@ public:
 	* Get a single tile.
 	* \return A pointer to that tile.
 	*/
-	Tile* getTile(uint16_t x, uint16_t y, uint8_t z);
+	Tile* getTile(uint16_t x, uint16_t y, uint16_t z);
 	Tile* getTile(const Position& pos);
 
 	QTreeLeafNode* getLeaf(uint16_t x, uint16_t y){ return root.getLeaf(x, y);}
@@ -198,7 +198,7 @@ public:
 	* Set a single tile.
 	* \param a tile to set for the position
 	*/
-	void setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile);
+	void setTile(uint16_t _x, uint16_t _y, uint16_t _z, Tile* newtile);
 	void setTile(const Position& pos, Tile* newtile) {
 		setTile(pos.x, pos.y, pos.z, newtile);
 	}

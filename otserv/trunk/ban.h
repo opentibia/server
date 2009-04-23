@@ -47,7 +47,7 @@ struct Ban {
 };
 
 struct LoginBlock {
-	uint32_t lastLoginTime;
+	time_t lastLoginTime;
 	uint32_t numberOfLogins;
 };
 

@@ -172,8 +172,8 @@ public:
 	void setRent(uint32_t _rent){rent = _rent;}
 	uint32_t getRent() const {return rent;}
 
-	void setLastWarning(uint32_t _lastWarning) {lastWarning = _lastWarning;}
-	uint32_t getLastWarning() {return lastWarning;}
+	void setLastWarning(time_t _lastWarning) {lastWarning = _lastWarning;}
+	time_t getLastWarning() {return lastWarning;}
 
 	void setPayRentWarnings(uint32_t warnings) {rentWarnings = warnings;}
 	uint32_t getPayRentWarnings() const {return rentWarnings;}
@@ -195,7 +195,7 @@ public:
 
 	HouseTileList::iterator getHouseTileBegin() {return houseTiles.begin();}
 	HouseTileList::iterator getHouseTileEnd() {return houseTiles.end();}
-	uint32_t getHouseTileSize() {return houseTiles.size();}
+	size_t getHouseTileSize() {return houseTiles.size();}
 
 	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
 	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
@@ -226,7 +226,7 @@ private:
 	Position posEntry;
 	uint32_t paidUntil;
 	uint32_t rentWarnings;
-	uint32_t lastWarning;
+	time_t lastWarning;
 	uint32_t rent;
 	uint32_t townid;
 

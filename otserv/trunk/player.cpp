@@ -3035,7 +3035,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			inventory[index] = NULL;
 		}
 		else{
-			int newCount = std::max(0, (int)(item->getItemCount() - count));
+			uint8_t newCount = (uint8_t)std::max((int32_t)0, (int32_t)(item->getItemCount() - count));
 			item->setItemCount(newCount);
 
 			const ItemType& it = Item::items[item->getID()];

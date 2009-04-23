@@ -161,8 +161,8 @@ protected:
 	struct _cache{
 		unsigned long loaded;
 		unsigned long base;
-		unsigned long size;
 		unsigned char* data;
+		size_t size;
 	};
 	#define CACHE_BLOCKS 3
 	unsigned long m_cache_size;
@@ -184,7 +184,7 @@ public:
 		end = a + size;
 	}
 
-	long size(){return end-p;}
+	int64_t size(){return end-p;}
 
 	template <typename T>
 	inline bool GET_STRUCT(T* &ret){
@@ -332,7 +332,7 @@ public:
 	}
 
 	inline void ADD_STRING(const std::string& add){
-		uint16_t str_len = add.size();
+		uint16_t str_len = (uint16_t)add.size();
 
 		ADD_USHORT(str_len);
 
@@ -346,7 +346,7 @@ public:
 	}
 
 	inline void ADD_LSTRING(const std::string& add){
-		uint32_t str_len = add.size();
+		uint32_t str_len = (uint32_t)add.size();
  
 		ADD_ULONG(str_len);
 

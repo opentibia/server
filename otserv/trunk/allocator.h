@@ -217,6 +217,9 @@ private:
 		addPool(1024, 128);
 		addPool(8192, 128);
 		addPool(16384, 128);
+		addPool(14, 10000); //Tile class
+		addPool(4, 10000); //Item class
+
 		#ifdef __OTSERV_ALLOCATOR_STATS__
 		t_PoolStats * tmp = new(0) t_PoolStats;
 		tmp->unused = 0;

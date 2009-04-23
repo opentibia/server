@@ -434,7 +434,7 @@ public:
 		{if(client) client->sendMoveCreature(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);}
 
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos)
-		{if(client) client->sendCreatureTurn(creature, stackpos);}
+		{if(client) client->sendCreatureTurn(creature, (uint8_t)stackpos);}
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
 		{if(client) client->sendCreatureSay(creature, type, text);}
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color)
@@ -757,7 +757,7 @@ protected:
 	uint32_t lossPercent[LOSS_LAST + 1];
 	
 	//rate value variables
-	float rateValue[LEVEL_LAST + 1];
+	double rateValue[LEVEL_LAST + 1];
 
 	LearnedInstantSpellList learnedInstantSpellList;
 

@@ -216,8 +216,8 @@ private:
 
 	int32_t m_loginTries;
 	ConnectionState_t m_state;
-	uint32_t m_lastCommand;
-	uint32_t m_startTime;
+	time_t m_lastCommand;
+	time_t m_startTime;
 };
 
 #endif

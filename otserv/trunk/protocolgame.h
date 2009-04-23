@@ -184,7 +184,7 @@ private:
 	void sendCreatureHealth(const Creature* creature);
 	void sendSkills();
 	void sendPing();
-	void sendCreatureTurn(const Creature* creature, unsigned char stackpos);
+	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 
 	void sendCancel(const std::string& message);

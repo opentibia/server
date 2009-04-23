@@ -110,7 +110,7 @@ public:
 	int health_max;
 
 	Outfit_t outfit;
-	int32_t lookcorpse;
+	uint16_t lookCorpse;
 	int conditionImmunities;
 	int damageImmunities;
 	RaceType_t race;

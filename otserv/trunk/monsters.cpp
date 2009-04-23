@@ -66,7 +66,7 @@ void MonsterType::reset()
 	outfit.lookType   = 0;
 	outfit.lookTypeEx = 0;
 	outfit.lookAddons = 0;
-	lookcorpse = 0;
+	lookCorpse = 0;
 
 	conditionImmunities = 0;
 	damageImmunities = 0;
@@ -154,7 +154,7 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 	if(Item::items[lootBlock.id].stackable){
 		uint32_t randvalue = Monsters::getLootRandom();
 		if(randvalue < lootBlock.chance){
-			uint32_t n = randvalue % lootBlock.countmax + 1;
+			uint16_t n = randvalue % lootBlock.countmax + 1;
 			tmpItem = Item::CreateItem(lootBlock.id, n);
 		}
 	}
@@ -952,7 +952,7 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 				}
 
 				if(readXMLInteger(p, "corpse", intValue)){
-					mType->lookcorpse = intValue;
+					mType->lookCorpse = (uint16_t)intValue;
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){

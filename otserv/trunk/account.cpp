@@ -29,7 +29,8 @@
 
 Account::Account()
 {
-	number = warnings = premEnd = 0;
+	number = warnings = 0;
+	premEnd = 0;
 }
 
 Account::~Account()

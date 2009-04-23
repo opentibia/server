@@ -348,7 +348,7 @@ public:
 	virtual WeaponType_t getWeaponType() {return WEAPON_NONE;}
 	virtual bool getCombatValues(int32_t& min, int32_t& max) {return false;}
 
-	uint32_t getSummonCount() const {return summons.size();}
+	size_t getSummonCount() const {return summons.size();}
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
 	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 

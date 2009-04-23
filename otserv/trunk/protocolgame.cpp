@@ -1480,7 +1480,7 @@ void ProtocolGame::parseHouseWindow(NetworkMessage &msg)
 void ProtocolGame::parseLookInShop(NetworkMessage &msg)
 {
 	uint16_t id = msg.GetU16();
-	uint16_t count = msg.GetByte();
+	uint8_t count = msg.GetByte();
 
 	addGameTask(&Game::playerLookInShop, player->getID(), id, count);
 }
@@ -1488,8 +1488,8 @@ void ProtocolGame::parseLookInShop(NetworkMessage &msg)
 void ProtocolGame::parsePlayerPurchase(NetworkMessage &msg)
 {
 	uint16_t id = msg.GetU16();
-	uint16_t count = msg.GetByte();
-	uint16_t amount = msg.GetByte();
+	uint8_t count = msg.GetByte();
+	uint8_t amount = msg.GetByte();
 	bool ignoreCapacity = (msg.GetByte() == 0x01);
 	bool buyWithBackpack = (msg.GetByte() == 0x01);
 	addGameTask(&Game::playerPurchaseItem, player->getID(), id, count, amount, ignoreCapacity, buyWithBackpack);
@@ -1498,8 +1498,8 @@ void ProtocolGame::parsePlayerPurchase(NetworkMessage &msg)
 void ProtocolGame::parsePlayerSale(NetworkMessage &msg)
 {
 	uint16_t id = msg.GetU16();
-	uint16_t count = msg.GetByte();
-	uint16_t amount = msg.GetByte();
+	uint8_t count = msg.GetByte();
+	uint8_t amount = msg.GetByte();
 
 	addGameTask(&Game::playerSellItem, player->getID(), id, count, amount);
 }
@@ -2019,16 +2019,16 @@ void ProtocolGame::sendCloseContainer(uint32_t cid)
 	}
 }
 
-void ProtocolGame::sendCreatureTurn(const Creature* creature, uint8_t stackPos)
+void ProtocolGame::sendCreatureTurn(const Creature* creature, uint32_t stackpos)
 {
-	if(stackPos < 10){
+	if(stackpos < 10){
 		if(canSee(creature)){
 			NetworkMessage_ptr msg = getOutputBuffer();
 			if(msg){
 				TRACK_MESSAGE(msg);
 				msg->AddByte(0x6B);
 				msg->AddPosition(creature->getPosition());
-				msg->AddByte(stackPos);
+				msg->AddByte(stackpos);
 				msg->AddU16(0x63); /*99*/
 				msg->AddU32(creature->getID());
 				msg->AddByte(creature->getDirection());

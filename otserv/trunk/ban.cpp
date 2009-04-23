@@ -91,7 +91,7 @@ bool BanManager::isIpDisabled(uint32_t clientip)
 	if(maxLoginTries == 0 || clientip == 0) return false;
 	banLock.lock();
 
-	uint32_t currentTime = std::time(NULL);
+	time_t currentTime = std::time(NULL);
 	IpLoginMap::iterator it = ipLoginMap.find(clientip);
 	if(it != ipLoginMap.end())
 	{
@@ -196,7 +196,7 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 	if(clientip == 0) return;
 	banLock.lock();
 
-	uint32_t currentTime = std::time(NULL);
+	time_t currentTime = std::time(NULL);
 	IpLoginMap::iterator it = ipLoginMap.find(clientip);
 	if(it == ipLoginMap.end())
 	{

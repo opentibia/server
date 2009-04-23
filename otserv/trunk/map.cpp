@@ -124,7 +124,7 @@ bool Map::saveMap()
 	return saved;
 }
 
-Tile* Map::getTile(uint16_t x, uint16_t y, uint8_t z)
+Tile* Map::getTile(uint16_t x, uint16_t y, uint16_t z)
 {
 	if(z < MAP_MAX_LAYERS){
 		//QTreeLeafNode* leaf = getLeaf(x, y);
@@ -152,7 +152,7 @@ Tile* Map::getTile(const Position& pos)
 	return getTile(pos.x, pos.y, pos.z);
 }
 
-void Map::setTile(uint16_t x, uint16_t y, uint8_t z, Tile* newtile)
+void Map::setTile(uint16_t x, uint16_t y, uint16_t z, Tile* newtile)
 {
 	if(z >= MAP_MAX_LAYERS) {
 		std::cout << "ERROR: Attempt to set tile on invalid Z coordinate " << int(z) << "!" << std::endl;
@@ -334,64 +334,6 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 
 	startLeaf = getLeaf(startx1, starty1);
 	leafS = startLeaf;
-
-	/*
-	SpectatorVec oldList;
-	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
-		leafE = leafS;
-		for(int32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE){
-			if(leafE){
-
-				Floor* floor;
-				int32_t offsetZ;
-				for(int32_t nz = minRangeZ; nz <= maxRangeZ; ++nz){
-
-					if((floor = leafE->getFloor(nz))){
-						//get current floor limits
-						offsetZ = centerPos.z - nz;
-
-						int32_t floorx1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + minRangeX + offsetZ)));
-						int32_t floory1 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + minRangeY + offsetZ)));
-						int32_t floorx2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.x + maxRangeX + offsetZ)));
-						int32_t floory2 = std::min((int32_t)0xFFFF, std::max((int32_t)0, (centerPos.y + maxRangeY + offsetZ)));
-
-						for(int ly = 0; ly < FLOOR_SIZE; ++ly){
-							for(int lx = 0; lx < FLOOR_SIZE; ++lx){
-								if((nx + lx >= floorx1 && nx + lx <= floorx2) && (ny + ly >= floory1 && ny + ly <= floory2)){
-									Tile* tile;
-									if((tile = floor->tiles[(nx + lx) & FLOOR_MASK][(ny + ly) & FLOOR_MASK])){
-										for(uint32_t i = 0; i < tile->creatures.size(); ++i){
-											Creature* creature = tile->creatures[i];
-											if(checkforduplicate) {
-												if(std::find(oldList.begin(), oldList.end(), creature) == oldList.end()){
-													oldList.push_back(creature);
-												}
-											} else {
-												oldList.push_back(creature);
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-
-				leafE = leafE->stepEast();
-			}
-			else{
-				leafE = getLeaf(nx + FLOOR_SIZE, ny);
-			}
-		}
-
-		if(leafS){
-			leafS = leafS->stepSouth();
-		}
-		else{
-			leafS = getLeaf(startx1, ny + FLOOR_SIZE);
-		}
-	}
-	*/
 
 	for(int32_t ny = starty1; ny <= endy2; ny += FLOOR_SIZE){
 		leafE = leafS;
