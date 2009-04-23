@@ -34,7 +34,7 @@ public:
 	//serialization
 	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 
-	uint32_t getDepotId() {return depotId;};
+	uint32_t getDepotId() const {return depotId;};
 	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
 	void setDepotId(uint32_t id) {depotId = id;};
 

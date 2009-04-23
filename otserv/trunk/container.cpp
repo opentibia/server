@@ -774,12 +774,13 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 	}
 	*/
 
+	item->setParent(this);
+	itemlist.push_front(item);
+
 	total_weight += item->getWeight();
 	if(Container* parent_container = getParentContainer()) {
 		parent_container->updateItemWeight(item->getWeight());
 	}
-	itemlist.push_front(item);
-	item->setParent(this);
 }
 
 void Container::__startDecaying()

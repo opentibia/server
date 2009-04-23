@@ -3211,10 +3211,35 @@ void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int
 
 	if(const Item* item = thing->getItem()){
 		if(const Container* container = item->getContainer()){
-			if(!container->isRemoved() &&
-					(container->getTopParent() == this || (dynamic_cast<const Container*>(container->getTopParent()))) &&
-					Position::areInRange<1,1,0>(getPosition(), container->getPosition())){
+
+			if(container->isRemoved() || !Position::areInRange<1,1,0>(getPosition(), container->getPosition())){
+				//removed or out of range
+				autoCloseContainers(container);
+			}
+			else if(container->getTopParent() == this){
+				//the player equipped it
 				onSendContainer(container);
+			}
+			else if(const Container* topContainer = dynamic_cast<const Container*>(container->getTopParent())){
+				//moved the backpack
+				if(const Depot* depot = dynamic_cast<const Depot*>(topContainer)){
+					//moved into a depot
+					bool isOwner = false;
+					for(DepotMap::iterator it = depots.begin(); it != depots.end(); ++it){
+						if(it->second == depot){
+							//the player is the owner of the depot
+							isOwner = true;
+							onSendContainer(container);
+						}
+					}
+
+					if(!isOwner){
+						autoCloseContainers(container);
+					}
+				}
+				else{
+					onSendContainer(container);
+				}
 			}
 			else{
 				autoCloseContainers(container);
