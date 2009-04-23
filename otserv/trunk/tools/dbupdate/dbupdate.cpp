@@ -158,55 +158,83 @@ SimpleUpdateQuery updateQueries[] = {
             NULL
         },
         { // Sqlite
-			// Can't be done, SQLite does not support changing tables
+			// No support
             NULL
         }
     },
     { 6,
-	{ // PgSql
-	    "ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
-	    NULL
+		{ // PgSql
+	    	"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
+	    	NULL
         },
-	{ // MySql
-	    "ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
-	    NULL
-	},
-	{ // Sqlite
-		// No support
-	    NULL
-	}
+		{ // MySql
+	    	"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
+	    	NULL
+		},
+		{ // Sqlite
+			// No support
+	    	NULL
+		}
     },
     { 7,
-	{ // PgSql
-	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
+		{ // PgSql
+	    	"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
 			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
-	    NULL
+	    	NULL
         },
-	{ // MySql
-	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
+		{ // MySql
+	    	"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
 			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
-	    NULL
-	},
-	{ // Sqlite
-	    // No support
-	    NULL
-	}
+	    	NULL
+		},
+		{ // Sqlite
+	    	// No support
+	    	NULL
+		}
     },
     { 8,
-	{ // PgSql
-	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
+		{ // PgSql
+	    	"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
 			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
-	    NULL
+	    	NULL
         },
-	{ // MySql
-	    "ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
+		{ // MySql
+	    	"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
 			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
-	    NULL
-	},
-	{ // Sqlite
-	    // No support
-	    NULL
-	}
+	    	NULL
+		},
+		{ // Sqlite
+	    	// No support
+	    	NULL
+		}
+    },
+    { 9,
+		{ // PgSql
+	    	"ALTER TABLE `groups` CHANGE `access` INT NOT NULL DEFAULT 0;", 
+			"ALTER TABLE `groups` ADD `violation` INT NOT NULL DEFAULT 0;",
+			"ALTER TABLE `accounts` DROP `deleted`;",
+			"ALTER TABLE `accounts` DROP `warned`;",
+			"ALTER TABLE `accounts` ADD `warnings` INT NOT NULL DEFAULT 0;",
+			"ALTER TABLE `bans` CHANGE `comment` TEXT NOT NULL DEFAULT '';",
+			"ALTER TABLE `bans` ADD `action` INT UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';",
+	    	NULL
+        },
+		{ // MySql
+	    	"ALTER TABLE `groups` CHANGE `access` INT NOT NULL DEFAULT 0;", 
+			"ALTER TABLE `groups` ADD `violation` INT NOT NULL DEFAULT 0;",
+			"ALTER TABLE `accounts` DROP `deleted`;",
+			"ALTER TABLE `accounts` DROP `warned`;",
+			"ALTER TABLE `accounts` ADD `warnings` INT NOT NULL DEFAULT 0;",
+			"ALTER TABLE `bans` CHANGE `comment` TEXT NOT NULL DEFAULT '';",
+			"ALTER TABLE `bans` ADD `action` INT UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';", 
+	    	NULL
+		},
+		{ // Sqlite
+	    	// No support
+	    	NULL
+		}
     }
 };
 
