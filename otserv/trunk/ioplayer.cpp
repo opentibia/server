@@ -797,7 +797,7 @@ const PlayerGroup IOPlayer::getPlayerGroup(uint32_t groupid)
 	group.name = result->getDataString("name");
 	group.flags = result->getDataLong("flags");
 	group.access = result->getDataInt("access");
-	group.violation = result->getDataInt("access");
+	group.violation = result->getDataInt("violation");
 	group.maxDepotItems = result->getDataInt("maxdepotitems");
 	group.maxVip = result->getDataInt("maxviplist");
 
