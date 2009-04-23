@@ -384,12 +384,6 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 			leafS = getLeaf(startx1, ny + FLOOR_SIZE);
 		}
 	}
-
-	/*
-	if(list.size() != oldList.size()){
-		std::cout << "missmatch size" << std::endl;
-	}
-	*/
 }
 
 void Map::getSpectators(SpectatorVec& list, const Position& centerPos,
