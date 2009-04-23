@@ -437,7 +437,7 @@ public:
 	void cleanup();
 	void shutdown();
 	void FreeThing(Thing* thing);
-	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reason, violationAction_t action,
+	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,

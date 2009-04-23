@@ -626,7 +626,7 @@ AmmoAction_t getAmmoAction(const std::string& strValue)
 	return AMMOACTION_NONE;
 }
 
-std::string getReason(int32_t reasonId)
+std::string getViolationReasonString(int32_t reasonId)
 {
 	switch(reasonId)
 	{
@@ -681,7 +681,7 @@ std::string getReason(int32_t reasonId)
 	return "Unknown Reason";
 }
 
-std::string getAction(violationAction_t actionId, bool ipBanishment)
+std::string getViolationActionString(violationAction_t actionId, bool ipBanishment)
 {
 	std::string action;
 	switch(actionId)

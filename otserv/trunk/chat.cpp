@@ -376,6 +376,10 @@ void Chat::removeUserFromAllChannels(Player* player)
 		if(channel->getOwner() == player->getGUID())
 			deleteChannel(player, channel->getId());
 	}
+
+	for(NormalChannelMap::iterator it = m_normalChannels.begin(); it != m_normalChannels.end(); ++it){
+		it->second->removeUser(player);
+	}
 }
 
 bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& text, uint16_t channelId)

@@ -4541,7 +4541,7 @@ void Game::showUseHotkeyMessage(Player* player, Item* item)
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 }
 
-bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reason, violationAction_t action,
+bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment)
 {
 	Player* player = getPlayerByID(playerId);
@@ -4550,25 +4550,23 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 	uint32_t access = player->getViolationLevel();
 	if((ipBanishment && ((violationNames[access] & Action_IpBan) != Action_IpBan || (violationStatements[access] & Action_IpBan) != Action_IpBan)) ||
-		!(violationNames[access] & (1 << action) || violationStatements[access] & (1 << action)) || reason > violationReasons[access])
+		!(violationNames[access] & (1 << actionType) || violationStatements[access] & (1 << actionType)) || reasonId > violationReasons[access])
 	{
 		player->sendCancel("You do not have authorization for this action.");
 		return false;
 	}
 
 	uint32_t commentSize = g_config.getNumber(ConfigManager::MAX_VIOLATIONCOMMENT_SIZE);
-	if(comment.size() > commentSize)
-	{
-		char buffer[90];
-		sprintf(buffer, "The comment may not exceed limit of %d characters.", commentSize);
-		player->sendCancel(buffer);
+	if(comment.size() > commentSize){
+		std::stringstream ss;
+		ss << "The comment may not exceed limit of " << commentSize << " characters.";
+		player->sendCancel(ss.str().c_str());
 		return false;
 	}
 
 	toLowerCaseString(targetName);
 	uint32_t guid = 0;
-	if(!IOPlayer::instance()->getGuidByName(guid, targetName))
-	{
+	if(!IOPlayer::instance()->getGuidByName(guid, targetName)){
 		player->sendCancel("A player with this name does not exist.");
 		return false;
 	}
@@ -4577,10 +4575,8 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	std::string acc;
 
 	Player* targetPlayer = getPlayerByName(targetName);
-	if(targetPlayer)
-	{
-		if(targetPlayer->hasFlag(PlayerFlag_CannotBeBanned))
-		{
+	if(targetPlayer){
+		if(targetPlayer->hasFlag(PlayerFlag_CannotBeBanned)){
 			player->sendCancel("You do not have authorization for this action.");
 			return false;
 		}
@@ -4588,10 +4584,8 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 		acc = targetPlayer->getAccountName();
 		ip = targetPlayer->getIP();
 	}
-	else
-	{
-		if(IOPlayer::instance()->hasFlag(PlayerFlag_CannotBeBanned, guid))
-		{
+	else{
+		if(IOPlayer::instance()->hasFlag(PlayerFlag_CannotBeBanned, guid)){
 			player->sendCancel("You do not have authorization for this action.");
 			return false;
 		}
@@ -4602,29 +4596,25 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 	Account account =  IOAccount::instance()->loadAccount(acc, true);
 	int16_t removeNotations = 2; //2 - remove notations & kick, 1 - kick, 0 - nothing
-	switch(action)
+	switch(actionType)
 	{
 		case ACTION_NOTATION:
 		{
-			g_bans.addAccountNotation(account.number, player->getGUID(), comment, statement, reason, action);
-			if(g_bans.getNotationsCount(account.number) >= (uint32_t)g_config.getNumber(ConfigManager::NOTATIONS_TO_BAN))
-			{
+			g_bans.addAccountNotation(account.number, player->getGUID(), comment, statement, reasonId, actionType);
+			if(g_bans.getNotationsCount(account.number) >= (uint32_t)g_config.getNumber(ConfigManager::NOTATIONS_TO_BAN)){
 				account.warnings++;
-				if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION))
-				{
-					action = ACTION_DELETION;
-					g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reason, action);
+				if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+					actionType = ACTION_DELETION;
+					g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType);
 				}
-				else if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN))
-				{
+				else if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN)){
 					if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-						ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reason, action))
+						ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 						account.warnings--;
 				}
-				else
-				{
+				else{
 					if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-						ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reason, action))
+						ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 						account.warnings--;
 				}
 			}
@@ -4636,35 +4626,32 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 		case ACTION_NAMEREPORT:
 		{
-			g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reason, action);
+			g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
 			removeNotations = 1;
 			break;
 		}
 
 		case ACTION_BANREPORT:
 		{
-			if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION))
-			{
-				action = ACTION_DELETION;
-				g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reason, action);
+			if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+				actionType = ACTION_DELETION;
+				g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType);
 			}
 			else
 			{
 				account.warnings++;
-				if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN))
-				{
+				if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN)){
 					if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-						ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reason, action))
+						ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 						account.warnings--;
 				}
-				else
-				{
+				else{
 					if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-						ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reason, action))
+						ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 						account.warnings--;
 				}
 
-				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reason, action);
+				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
 			}
 
 			break;
@@ -4672,34 +4659,30 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 		case ACTION_BANFINAL:
 		{
-			if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION))
-			{
-				action = ACTION_DELETION;
-				if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reason, action))
+			if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+				actionType = ACTION_DELETION;
+				if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings--;
 			}
 			else if(g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-				ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reason, action))
+				ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 				account.warnings = g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION) - 1;
 
 			break;
 		}
 
-		case ACTION_BANREPORTFINAL:
-		{
-			if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION))
-			{
-				action = ACTION_DELETION;
-				if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reason, action))
+		case ACTION_BANREPORTFINAL:{
+			if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+				actionType = ACTION_DELETION;
+				if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings--;
 			}
-			else
-			{
+			else{
 				if(g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reason, action))
+					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings = g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION);
 
-				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reason, action);
+				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
 			}
 
 			break;
@@ -4713,19 +4696,17 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 		default:
 		{
 			account.warnings++;
-			if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION))
-			{
-				action = ACTION_DELETION;
-				g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reason, action);
+			if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+				actionType = ACTION_DELETION;
+				g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType);
 			}
-			else if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN))
-			{
+			else if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN)){
 				if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reason, action))
+					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings--;
 			}
 			else if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-				ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reason, action))
+				ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 				account.warnings--;
 
 			break;
@@ -4739,36 +4720,44 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	if(removeNotations > 1)
 		g_bans.removeNotations(account.number);
 
-	char buffer[800 + comment.length()];
-	if(g_config.getString(ConfigManager::BROADCAST_BANISHMENTS) == "yes")
-	{
-		if(action == ACTION_STATEMENT)
-			sprintf(buffer, "%s has taken the action \"%s\" for the statement: \"%s\" against: %s (Warnings: %d), with reason: \"%s\", and comment: \"%s\".",
-				player->getName().c_str(), getAction(action, ipBanishment).c_str(), statement.c_str(), targetName.c_str(),
-				account.warnings, getReason(reason).c_str(), comment.c_str());
-		else
-			sprintf(buffer, "%s has taken the action \"%s\" against: %s (Warnings: %d), with reason: \"%s\", and comment: \"%s\".",
-				player->getName().c_str(), getAction(action, ipBanishment).c_str(), targetName.c_str(),
-				account.warnings, getReason(reason).c_str(), comment.c_str());
+	std::stringstream ss;
+	std::string actionDescription = getViolationActionString(actionType, ipBanishment);
+	std::string reasonDescription = getViolationReasonString(reasonId);
+	bool announceViolation = (g_config.getString(ConfigManager::BROADCAST_BANISHMENTS) == "yes");
 
-		anonymousBroadcastMessage(MSG_STATUS_WARNING, buffer);
+	if(actionType == ACTION_STATEMENT){
+		if(announceViolation){
+			ss << ss << player->getName() << " has taken the action";
+		}
+		else{
+			ss << "You have taken the action";
+		}
+
+		ss << "  \"" << actionDescription << "\" " <<
+			"for the statement: \"" << statement << "\" against: " << targetName << " " <<
+			"(Warnings: " << account.warnings << "), with reason: \""<< reasonDescription <<
+			"\", and comment: \"" << comment << "\".";
 	}
-	else
-	{
-		if(action == ACTION_STATEMENT)
-			sprintf(buffer, "You have taken the action \"%s\" for the statement: \"%s\" against: %s (Warnings: %d), with reason: \"%s\", and comment: \"%s\".",
-				getAction(action, ipBanishment).c_str(), statement.c_str(), targetName.c_str(), account.warnings,
-				getReason(reason).c_str(), comment.c_str());
-		else
-			sprintf(buffer, "You have taken the action \"%s\" against: %s (Warnings: %d), with reason: \"%s\", and comment: \"%s\".",
-				getAction(action, ipBanishment).c_str(), targetName.c_str(), account.warnings,
-				getReason(reason).c_str(), comment.c_str());
+	else{
+		if(announceViolation){
+			ss << player->getName() << " has taken the action";
+		}
+		else{
+			ss << "You have taken the action";
+		}
 
-		player->sendTextMessage(MSG_STATUS_CONSOLE_RED, buffer);
+		ss << " \"" << actionDescription << "\" against: " << targetName <<
+			" (Warnings: " << account.warnings << "), with reason: \"" << reasonDescription << "\", and comment: \"" << comment << "\".";
 	}
 
-	if(targetPlayer && removeNotations > 0)
-	{
+	if(announceViolation){
+		anonymousBroadcastMessage(MSG_STATUS_WARNING, ss.str().c_str());
+	}
+	else{
+		player->sendTextMessage(MSG_STATUS_CONSOLE_RED, ss.str().c_str());
+	}
+
+	if(targetPlayer && removeNotations > 0){
 		targetPlayer->sendTextMessage(MSG_INFO_DESCR, "You have been banished.");
 		addMagicEffect(targetPlayer->getPosition(), NM_ME_MAGIC_POISON);
 

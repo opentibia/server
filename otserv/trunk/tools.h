@@ -75,8 +75,8 @@ ShootType_t getShootType(const std::string& strValue);
 Ammo_t getAmmoType(const std::string& strValue);
 AmmoAction_t getAmmoAction(const std::string& strValue);
 
-std::string getReason(int32_t reasonId);
-std::string getAction(violationAction_t actionId, bool ipBanishment);
+std::string getViolationReasonString(int32_t reasonId);
+std::string getViolationActionString(violationAction_t actionId, bool ipBanishment);
 
 uint32_t adlerChecksum(uint8_t *data, int32_t len);
 
