@@ -62,7 +62,7 @@ typedef std::map<uint32_t, ConnectBlock > IpConnectMap;
 
 class BanManager {
 public:
-	BanManager();
+	BanManager() {}
 	~BanManager() {}
 
 	bool clearTemporaryBans() const;
@@ -98,8 +98,6 @@ protected:
 
 	IpLoginMap ipLoginMap;
 	IpConnectMap ipConnectMap;
-
-	uint32_t loginTimeout, maxLoginTries, retryTimeout;
 };
 
 #endif

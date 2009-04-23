@@ -28,13 +28,6 @@
 
 extern ConfigManager g_config;
 
-BanManager::BanManager()
-{
-	maxLoginTries = g_config.getNumber(ConfigManager::LOGIN_TRIES);
-	retryTimeout = (uint32_t)g_config.getNumber(ConfigManager::RETRY_TIMEOUT) / 1000;
-	loginTimeout = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TIMEOUT) / 1000;
-}
-
 bool BanManager::clearTemporaryBans() const
 {
 	Database* db = Database::instance();
@@ -88,14 +81,15 @@ bool BanManager::acceptConnection(uint32_t clientip)
 
 bool BanManager::isIpDisabled(uint32_t clientip)
 {
-	if(maxLoginTries == 0 || clientip == 0) return false;
+	if(g_config.getNumber(ConfigManager::LOGIN_TRIES) == 0 || clientip == 0) return false;
 	banLock.lock();
 
 	time_t currentTime = std::time(NULL);
 	IpLoginMap::iterator it = ipLoginMap.find(clientip);
 	if(it != ipLoginMap.end())
 	{
-		if( (it->second.numberOfLogins >= maxLoginTries) &&
+		uint32_t loginTimeout = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TIMEOUT) / 1000;
+		if( (it->second.numberOfLogins >= g_config.getNumber(ConfigManager::LOGIN_TRIES)) &&
 			(currentTime < it->second.lastLoginTime + loginTimeout) )
 		{
 			banLock.unlock();
@@ -208,9 +202,10 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 		it = ipLoginMap.find(clientip);
 	}
 
-	if(it->second.numberOfLogins >= maxLoginTries)
+	if(it->second.numberOfLogins >= g_config.getNumber(ConfigManager::LOGIN_TRIES))
 		it->second.numberOfLogins = 0;
 
+	uint32_t retryTimeout = (uint32_t)g_config.getNumber(ConfigManager::RETRY_TIMEOUT) / 1000;
 	if(!isSuccess || (currentTime < it->second.lastLoginTime + retryTimeout))
 		++it->second.numberOfLogins;
 	else
