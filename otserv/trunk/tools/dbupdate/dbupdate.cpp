@@ -87,130 +87,129 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		}
 	},
-    { 3,
-        { // PgSql
-            "DROP TABLE `schema_info`;",
-            "CREATE TABLE `schema_info` ("
-                "`name` VARCHAR(255) NOT NULL,"
-                "`value` VARCHAR(255) NOT NULL,"
-                "PRIMARY KEY (`name`)"
-            ");",
-            "INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
-            NULL
-        },
-        { // MySql
-            "DROP TABLE `schema_info`;",
-            "CREATE TABLE `schema_info` ("
-                "`name` VARCHAR(255) NOT NULL,"
-                "`value` VARCHAR(255) NOT NULL,"
-                "PRIMARY KEY (`name`)"
-            ");",
-            "INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
-            NULL
-        },
-        { // Sqlite
-            "DROP TABLE `schema_info`;",
-            "CREATE TABLE `schema_info` ("
-                "`name` VARCHAR(255) NOT NULL,"
-                "`value` VARCHAR(255) NOT NULL,"
-                "UNIQUE (`name`)"
-            ");",
-            "INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
-            NULL
-        }
-    },
-    { 4,
-        { // PgSql
-            "ALTER TABLE `players` ADD `lastlogout` BIGINT NOT NULL DEFAULT 0;",
-            "ALTER TABLE `players` ADD `stamina` INT NOT NULL DEFAULT 201660000;",
-            NULL
-        },
-        { // MySql
-            "ALTER TABLE `players` ADD `lastlogout` INT UNSIGNED NOT NULL DEFAULT 0;",
-            "ALTER TABLE `players` ADD `stamina` INT NOT NULL DEFAULT 201660000 COMMENT 'player stamina in milliseconds';",
-            NULL
-        },
-        { // Sqlite
-            "ALTER TABLE `players` ADD `lastlogout` INTEGER NOT NULL DEFAULT 0;",
-            "ALTER TABLE `players` ADD `stamina` INTEGER NOT NULL DEFAULT 201660000;",
-            NULL
-        }
-    },
-    { 5,
-        { // PgSql
-            "ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000;",
-            "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
-            "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
-            "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
-            NULL
-        },
-        { // MySql
-            "ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds';",
-            "ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
-            "ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
-            "ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
-            NULL
-        },
-        { // Sqlite
-			// No support
-            NULL
-        }
-    },
-    { 6,
+	{ 3,
 		{ // PgSql
-	    	"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
-	    	NULL
-        },
+			"DROP TABLE `schema_info`;",
+			"CREATE TABLE `schema_info` ("
+				"`name` VARCHAR(255) NOT NULL,"
+				"`value` VARCHAR(255) NOT NULL,"
+				"PRIMARY KEY (`name`)"
+			");",
+			"INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
+			NULL
+		},
 		{ // MySql
-	    	"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
-	    	NULL
+			"DROP TABLE `schema_info`;",
+			"CREATE TABLE `schema_info` ("
+				"`name` VARCHAR(255) NOT NULL,"
+				"`value` VARCHAR(255) NOT NULL,"
+				"PRIMARY KEY (`name`)"
+			");",
+			"INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
+			NULL
+		{ // Sqlite
+			"DROP TABLE `schema_info`;",
+			"CREATE TABLE `schema_info` ("
+				"`name` VARCHAR(255) NOT NULL,"
+				"`value` VARCHAR(255) NOT NULL,"
+				"UNIQUE (`name`)"
+			");",
+			"INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
+			NULL
+		}
+	},
+	{ 4,
+		{ // PgSql
+			"ALTER TABLE `players` ADD `lastlogout` BIGINT NOT NULL DEFAULT 0;",
+			"ALTER TABLE `players` ADD `stamina` INT NOT NULL DEFAULT 201660000;",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `players` ADD `lastlogout` INT UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `players` ADD `stamina` INT NOT NULL DEFAULT 201660000 COMMENT 'player stamina in milliseconds';",
+			NULL
+		},
+		{ // Sqlite
+			"ALTER TABLE `players` ADD `lastlogout` INTEGER NOT NULL DEFAULT 0;",
+			"ALTER TABLE `players` ADD `stamina` INTEGER NOT NULL DEFAULT 201660000;",
+			NULL
+		}
+	},
+	{ 5,
+		{ // PgSql
+			"ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000;",
+			"ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
+			"ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
+			"ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds';",
+			"ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
+			"ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
+			"ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
+			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
+			NULL
 		},
 		{ // Sqlite
 			// No support
-	    	NULL
+			NULL
 		}
-    },
-    { 7,
+	},
+	{ 6,
 		{ // PgSql
-	    	"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
-			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
-	    	NULL
-        },
+			"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
+			NULL
+		},
 		{ // MySql
-	    	"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
-			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
-	    	NULL
+			"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
+			NULL
 		},
 		{ // Sqlite
-	    	// No support
-	    	NULL
+			// No support
+			NULL
 		}
-    },
-    { 8,
+	},
+	{ 7,
 		{ // PgSql
-	    	"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
-			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
-	    	NULL
-        },
+			"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+			NULL
+		},
 		{ // MySql
-	    	"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
-			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
-	    	NULL
+			"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+			NULL
 		},
 		{ // Sqlite
-	    	// No support
-	    	NULL
+			// No support
+			NULL
 		}
-    },
-    { 9,
+	},
+	{ 8,
 		{ // PgSql
-	    	"ALTER TABLE `groups` CHANGE `access` INT NOT NULL DEFAULT 0;", 
+			"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
+			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
+			NULL
+		},
+		{ // Sqlite
+			// No support
+			NULL
+		}
+	},
+	{ 9,
+		{ // PgSql
+			"ALTER TABLE `groups` CHANGE `access` INT NOT NULL DEFAULT 0;", 
 			"ALTER TABLE `groups` ADD `violation` INT NOT NULL DEFAULT 0;",
 			"ALTER TABLE `accounts` DROP `deleted`;",
 			"ALTER TABLE `accounts` DROP `warned`;",
@@ -218,24 +217,24 @@ SimpleUpdateQuery updateQueries[] = {
 			"ALTER TABLE `bans` CHANGE `comment` TEXT NOT NULL DEFAULT '';",
 			"ALTER TABLE `bans` ADD `action` INT UNSIGNED NOT NULL DEFAULT 0;",
 			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';",
-	    	NULL
-        },
+			NULL
+		},
 		{ // MySql
-	    	"ALTER TABLE `groups` CHANGE `access` INT NOT NULL DEFAULT 0;", 
+			"ALTER TABLE `groups` CHANGE `access` INT NOT NULL DEFAULT 0;", 
 			"ALTER TABLE `groups` ADD `violation` INT NOT NULL DEFAULT 0;",
 			"ALTER TABLE `accounts` DROP `deleted`;",
 			"ALTER TABLE `accounts` DROP `warned`;",
 			"ALTER TABLE `accounts` ADD `warnings` INT NOT NULL DEFAULT 0;",
 			"ALTER TABLE `bans` CHANGE `comment` TEXT NOT NULL DEFAULT '';",
 			"ALTER TABLE `bans` ADD `action` INT UNSIGNED NOT NULL DEFAULT 0;",
-			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';", 
-	    	NULL
+			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';",
+			NULL
 		},
 		{ // Sqlite
-	    	// No support
-	    	NULL
+			// No support
+			NULL
 		}
-    }
+	}
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
@@ -317,8 +316,8 @@ int main(int argn, const char* argv[]){
 	}
 	std::cout << "[done]" << std::endl;
 
-    // indicates version 1 or 2 schema
-    int schema_version;
+	// indicates version 1 or 2 schema
+	int schema_version;
 
 	std::cout << ":: Checking Schema version... ";
 	DBQuery query;
