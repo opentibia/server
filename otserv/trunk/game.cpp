@@ -4722,7 +4722,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	std::stringstream ss;
 	std::string actionDescription = getViolationActionString(actionType, ipBanishment);
 	std::string reasonDescription = getViolationReasonString(reasonId);
-	bool announceViolation = (g_config.getString(ConfigManager::BROADCAST_BANISHMENTS) == "yes");
+	bool announceViolation = g_config.getNumber(ConfigManager::BROADCAST_BANISHMENTS);
 
 	if(actionType == ACTION_STATEMENT){
 		if(announceViolation){

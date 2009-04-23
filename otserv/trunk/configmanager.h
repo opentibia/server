@@ -62,7 +62,6 @@ public:
 		SQL_DB,
 		SQL_TYPE,
 		MAP_STORAGE_TYPE,
-		BROADCAST_BANISHMENTS,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 
@@ -128,6 +127,7 @@ public:
 		BAN_LENGTH,
 		FINALBAN_LENGTH,
 		IPBANISHMENT_LENGTH,
+		BROADCAST_BANISHMENTS,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
