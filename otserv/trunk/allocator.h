@@ -106,8 +106,8 @@ public:
 				#ifdef __OTSERV_ALLOCATOR_STATS__
 				if(!tag){
 					dumpStats();
-				#endif
 				}
+				#endif
 				tag->poolbytes = it->first;
 				#ifdef __OTSERV_ALLOCATOR_STATS__
 				poolsStats[it->first]->allocations++;
