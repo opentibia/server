@@ -1577,7 +1577,7 @@ void ProtocolGame::parseViolationWindow(NetworkMessage& msg)
 void ProtocolGame::parseBugReport(NetworkMessage& msg)
 {
 	std::string comment = msg.GetString();
-	addGameTask(&Game::playerBugReport, player->getID(), comment);
+	addGameTask(&Game::playerReportBug, player->getID(), comment);
 }
 
 void ProtocolGame::parseDebugAssert(NetworkMessage& msg)

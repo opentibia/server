@@ -4792,7 +4792,7 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 	formatDate(tmp, bufferDate);
 
 	fprintf(f, "------------------------------\nPlayer %s at %s\nFrom IP: %s [Position X: %d Y: %d Z: %d]\nReported a bug with comment: %s\n",
-		player->getName().c_str(), bufferDate, bufferIp, p.x, p.y, p.z, comment.c_str());
+		player->getName().c_str(), bufferDate, bufferIp, pos.x, pos.y, pos.z, comment.c_str());
 	fclose(f);
 
 	player->sendTextMessage(MSG_EVENT_DEFAULT, "Your report has been sent to " + g_config.getString(
