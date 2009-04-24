@@ -395,10 +395,11 @@ bool passwordTest(const std::string &plain, std::string &hash)
 	return false;
 }
 
-//buffer should have at least 17 bytes
-void formatIP(uint32_t ip, char* buffer)
+std::string convertIPToString(uint32_t ip)
 {
+	char buffer[20];
 	sprintf(buffer, "%d.%d.%d.%d", ip & 0xFF, (ip >> 8) & 0xFF, (ip >> 16) & 0xFF, (ip >> 24));
+	return buffer;
 }
 
 //buffer should have at least 21 bytes
@@ -415,7 +416,7 @@ void formatDate(time_t time, char* buffer)
 }
 
 //buffer should have at least 16 bytes
-void formatDate2(time_t time, char* buffer)
+void formatDateShort(time_t time, char* buffer)
 {
 	const tm* tms = localtime(&time);
 	if(tms){

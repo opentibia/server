@@ -44,6 +44,7 @@
 #include <sstream>
 #include <time.h>
 #include <list>
+#include <fstream>
 
 #include <boost/function.hpp>
 
@@ -1576,7 +1577,7 @@ void ProtocolGame::parseViolationWindow(NetworkMessage& msg)
 	std::string comment = msg.GetString();
 	std::string statement = msg.GetString();
 	uint16_t channelId = msg.GetU16();
-	bool ipBanishment = msg.GetByte();
+	bool ipBanishment = msg.GetByte() != 0;
 	addGameTask(&Game::playerViolationWindow, player->getID(), target, reason, action, comment, statement, channelId, ipBanishment);
 }
 
@@ -1599,21 +1600,22 @@ void ProtocolGame::parseDebugAssert(NetworkMessage& msg)
 	m_debugAssertSent = true;
 
 	std::string assertLine = msg.GetString();
-	std::string date = msg.GetString();
+	std::string report_date = msg.GetString();
 	std::string description = msg.GetString();
 	std::string comment = msg.GetString();
 
 	//write it in the assertions file
-	FILE* f = fopen("client_assertions.txt", "a");
-	if(f){
-		char bufferDate[32], bufferIp[32];
-		time_t tmp = time(NULL);
-		formatIP(getIP(), bufferIp);
-		formatDate(tmp, bufferDate);
-
-		fprintf(f, "----- %s - %s (%s) -----\n", bufferDate, player->getName().c_str(), bufferIp);
-		fprintf(f, "%s\n%s\n%s\n%s\n", assertLine.c_str(), date.c_str(), description.c_str(), comment.c_str());
-		fclose(f);
+	std::ofstream of("client_assertions.txt", std::ios_base::app);
+	if(of){
+		char today[32];
+		formatDate(time(NULL), today);
+		
+		of << 
+			"-----" << today << " - " << player->getName() << " (" << convertIPToString(player->getIP()) <<
+			assertLine << std::endl <<
+			report_date << std::endl <<
+			description << std::endl <<
+			comment << std::endl;
 	}
 }
 
@@ -2525,7 +2527,7 @@ void ProtocolGame::sendTextWindow(uint32_t windowTextId, Item* item, uint16_t ma
 		time_t writtenDate = item->getWrittenDate();
 		if(writtenDate > 0){
 			char date[16];
-			formatDate2(writtenDate, date);
+			formatDateShort(writtenDate, date);
 			msg->AddString(date);
 		}
 		else{

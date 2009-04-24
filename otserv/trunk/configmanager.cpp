@@ -167,7 +167,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[HOUSE_ONLY_PREMIUM] = getGlobalBoolean(L, "house_only_premium", true);
 	m_confInteger[HOUSE_LEVEL] = getGlobalNumber(L, "house_level", 1);
 	m_confInteger[BROADCAST_BANISHMENTS] = getGlobalBoolean(L, "broadcast_banishments", false);
-	m_confInteger[MAX_VIOLATIONCOMMENT_SIZE] = getGlobalNumber(L, "max_violation_comment_size", 255);
 	m_confInteger[NOTATIONS_TO_BAN] = getGlobalNumber(L, "notations_to_banishment", 3);
 	m_confInteger[WARNINGS_TO_FINALBAN] = getGlobalNumber(L, "warnings_to_final_banishment", 4);
 	m_confInteger[WARNINGS_TO_DELETION] = getGlobalNumber(L, "warnings_to_deletion", 5);

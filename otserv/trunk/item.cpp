@@ -760,7 +760,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 					time_t wDate = item->getWrittenDate();
 					if(wDate > 0){
 						char date[16];
-						formatDate2(wDate, date);
+						formatDateShort(wDate, date);
 						s << " on " << date;
 					}
 					s << ": ";

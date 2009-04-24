@@ -63,12 +63,11 @@ std::string urlEncode(const std::string& str);
 
 bool passwordTest(const std::string &plain, std::string &hash);
 
-//buffer should be at least 17 bytes
-void formatIP(uint32_t ip, char* buffer);
+std::string convertIPToString(uint32_t ip);
 //buffer should have at least 21 bytes. dd/mm/yyyy  hh:mm:ss
 void formatDate(time_t time, char* buffer);
 //buffer should have at least 16 bytes
-void formatDate2(time_t time, char* buffer);
+void formatDateShort(time_t time, char* buffer);
 
 MagicEffectClasses getMagicEffect(const std::string& strValue);
 ShootType_t getShootType(const std::string& strValue);

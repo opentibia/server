@@ -681,9 +681,7 @@ bool AdminProtocolConfig::allowIP(uint32_t ip)
 			return true;
 		}
 		else{
-			char str_ip[32];
-			formatIP(ip, str_ip);
-			addLogLine(NULL, LOGTYPE_WARNING, 1, std::string("forbidden connection try from ") + str_ip);
+			addLogLine(NULL, LOGTYPE_WARNING, 1, std::string("forbidden connection try from ") + convertIPToString(ip));
 			return false;
 		}
 	}
@@ -748,10 +746,7 @@ static void addLogLine(ProtocolAdmin* conn, eLogType type, int level, std::strin
 	std::string logMsg;
 	if(conn){
 		uint32_t ip = conn->getIP();
-		char buffer[32];
-		formatIP(ip, buffer);
-		logMsg = buffer;
-		logMsg = "[" + logMsg + "] - ";
+		logMsg = convertIPToString(ip) +  "[" + logMsg + "] - ";
 	}
 	logMsg = logMsg + message;
 	LOG_MESSAGE("OTADMIN", type, level, logMsg);

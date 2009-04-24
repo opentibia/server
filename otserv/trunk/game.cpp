@@ -1891,7 +1891,7 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_
 bool Game::anonymousBroadcastMessage(MessageClasses type, const std::string& text)
 {
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		(*it).second->sendTextMessage(type, text.c_str());
+		(*it).second->sendTextMessage(type, text);
 	}
 
 	return true;
@@ -2788,7 +2788,7 @@ std::string Game::getTradeErrorDescription(ReturnValue ret, Item* item)
 	else{
 		ss << "Trade could not be completed.";
 	}
-	return ss.str().c_str();
+	return ss.str();
 }
 
 bool Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int index)
@@ -4557,11 +4557,10 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 		return false;
 	}
 
-	uint32_t commentSize = g_config.getNumber(ConfigManager::MAX_VIOLATIONCOMMENT_SIZE);
-	if(comment.size() > commentSize){
+	if(comment.size() > 1000){
 		std::stringstream ss;
-		ss << "The comment may not exceed limit of " << commentSize << " characters.";
-		player->sendCancel(ss.str().c_str());
+		ss << "The comment may not exceed 1000 characters.";
+		player->sendCancel(ss.str());
 		return false;
 	}
 
@@ -4721,11 +4720,11 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	if(removeNotations > 1)
 		g_bans.removeNotations(account.number);
 
-	bool announceViolation = g_config.getNumber(ConfigManager::BROADCAST_BANISHMENTS);
-	std::stringstream ss;
+	bool announceViolation = g_config.getNumber(ConfigManager::BROADCAST_BANISHMENTS) != 0;
+	std::ostringstream ss;
 	if(actionType == ACTION_STATEMENT){
 		if(announceViolation){
-			ss << ss << player->getName() << " has taken the action";
+			ss << player->getName() << " has taken the action";
 		}
 		else{
 			ss << "You have taken the action";
@@ -4750,10 +4749,10 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	}
 
 	if(announceViolation){
-		anonymousBroadcastMessage(MSG_STATUS_WARNING, ss.str().c_str());
+		anonymousBroadcastMessage(MSG_STATUS_WARNING, ss.str());
 	}
 	else{
-		player->sendTextMessage(MSG_STATUS_CONSOLE_RED, ss.str().c_str());
+		player->sendTextMessage(MSG_STATUS_CONSOLE_RED, ss.str());
 	}
 
 	if(targetPlayer && removeNotations > 0){
@@ -4779,25 +4778,22 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 		return false;
 	}
 
-	FILE* f = fopen("player_reports.txt", "a");
-	if(!f){ //no disk space?
-		player->sendTextMessage(MSG_EVENT_DEFAULT, g_config.getString(
-			ConfigManager::SERVER_NAME) + (std::string)" couldn't store your report, please contact with gamemaster.");
-		return false;
+	std::ofstream of("player reports.txt", std::ios_base::out | std::ios_base::app);
+
+	if(of){
+		const Position& pos = player->getPosition();
+
+		char today[32];
+		formatDate(time(NULL), today);
+
+		of <<
+			"-------------------------------------------------------------------------------" << std::endl <<
+			today << " - " << player->getName() << 
+			"[x:" << pos.x << " y:" << pos.y << " z:" << pos.z << "]" << std::endl <<
+			"\tComment: " << comment << std::endl;
+
+		player->sendTextMessage(MSG_EVENT_DEFAULT, "Your report has been sent.");
+		return true;
 	}
-
-	const Position& pos = player->getPosition();
-	char bufferDate[32], bufferIp[32];
-	time_t tmp = time(NULL);
-
-	formatIP(player->getIP(), bufferIp);
-	formatDate(tmp, bufferDate);
-
-	fprintf(f, "------------------------------\nPlayer %s at %s\nFrom IP: %s [Position X: %d Y: %d Z: %d]\nReported a bug with comment: %s\n",
-		player->getName().c_str(), bufferDate, bufferIp, pos.x, pos.y, pos.z, comment.c_str());
-	fclose(f);
-
-	player->sendTextMessage(MSG_EVENT_DEFAULT, "Your report has been sent to " + g_config.getString(
-		ConfigManager::SERVER_NAME) + (std::string)".");
-	return true;
+	return false;
 }

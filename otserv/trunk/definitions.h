@@ -96,6 +96,9 @@ enum passwordType_t{
 #  endif
 #endif
 
+// Boost won't complain about non-working function
+#define BOOST_ASIO_ENABLE_CANCELIO 1
+
 #if defined __WINDOWS__ || defined WIN32
 
 #if defined _MSC_VER && defined NDEBUG
@@ -108,7 +111,7 @@ enum passwordType_t{
 #endif
 
 #ifndef EWOULDBLOCK
-#define EWOULDBLOCK WSAEWOULDBLOCK
+#	define EWOULDBLOCK WSAEWOULDBLOCK
 #endif
 
 #ifdef _WIN32_WINNT

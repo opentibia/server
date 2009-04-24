@@ -221,12 +221,13 @@ bool BanManager::addIpBan(uint32_t ip, uint32_t mask, int32_t time,
 	if(ip == 0 || mask == 0) return false;
 	Database* db = Database::instance();
 
+	DBInsert stmt(db);
+	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `param`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
+
 	DBQuery query;
 	query << BAN_IPADDRESS << ", " << ip << ", " << mask << ", " << time << ", ";
 	query << std::time(NULL) << ", " << adminid << ", " << db->escapeString(comment);
 
-	DBInsert stmt(db);
-	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `param`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
 
 	if(!stmt.addRow(query.str())) return false;
 	return stmt.execute();
@@ -238,12 +239,12 @@ bool BanManager::addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid,
 	if(playerId == 0) return false;
 	Database* db = Database::instance();
 
+	DBInsert stmt(db);
+	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
+
 	DBQuery query;
 	query << BAN_PLAYER << ", " << playerId << ", " << time << ", " << std::time(NULL) << ", " << adminid << ", ";
 	query << db->escapeString(comment) << ", " << db->escapeString(statement) << ", " << reason << ", " << action;
-
-	DBInsert stmt(db);
-	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
 
 	if(!stmt.addRow(query.str())) return false;
 	return stmt.execute();
@@ -264,12 +265,12 @@ bool BanManager::addAccountBan(uint32_t account, int32_t time, uint32_t adminid,
 	if(account == 0) return false;
 	Database* db = Database::instance();
 
+	DBInsert stmt(db);
+	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
+
 	DBQuery query;
 	query << BAN_ACCOUNT << ", " << account << ", " << time << ", " << std::time(NULL) << ", " << adminid << ", ";
 	query << db->escapeString(comment) << ", " << db->escapeString(statement) << ", " << reason << ", " << action;
-
-	DBInsert stmt(db);
-	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
 
 	if(!stmt.addRow(query.str())) return false;
 	return stmt.execute();
@@ -281,12 +282,12 @@ bool BanManager::addAccountNotation(uint32_t account, uint32_t adminid, std::str
 	if(account == 0) return false;
 	Database* db = Database::instance();
 
+	DBInsert stmt(db);
+	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
+
 	DBQuery query;
 	query << BAN_NOTATION << ", " << account << ", -1, " << std::time(NULL) << ", " << adminid << ", ";
 	query << db->escapeString(comment) << ", " << db->escapeString(statement) << ", " << reason << ", " << action;
-
-	DBInsert stmt(db);
-	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
 
 	if(!stmt.addRow(query.str())) return false;
 	return stmt.execute();

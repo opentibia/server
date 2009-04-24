@@ -1184,6 +1184,9 @@ void LuaScriptInterface::registerFunctions()
 	//getItemRWInfo(uid)
 	lua_register(m_luaState, "getItemRWInfo", LuaScriptInterface::luaGetItemRWInfo);
 
+	//getItemSpecialDescription(uid)
+	lua_register(m_luaState, "getItemSpecialDescription", LuaScriptInterface::luaGetItemSpecialDescription);
+
 	//getThingfromPos(pos)
 	lua_register(m_luaState, "getThingfromPos", LuaScriptInterface::luaGetThingfromPos);
 
@@ -3204,6 +3207,24 @@ int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)
 		}
 
 		lua_pushnumber(L, rwflags);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemSpecialDescription(lua_State *L)
+{
+	//getItemSpecialDescription(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	const Item* item = env->getItemByUID(uid);
+	if(item){
+		lua_pushstring(L, item->getSpecialDescription().c_str());
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));

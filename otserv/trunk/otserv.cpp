@@ -716,9 +716,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		}
 	}
 
-	char resolvedIpstr[32];
-	formatIP(resolvedIp, resolvedIpstr);
-	std::cout << resolvedIpstr << std::endl << "::" << std::endl;
+	std::cout << convertIPToString(resolvedIp) << std::endl << "::" << std::endl;
 
 	IpNetMask.first  = resolvedIp;
 	IpNetMask.second = 0;

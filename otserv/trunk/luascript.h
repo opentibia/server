@@ -403,6 +403,7 @@ protected:
 	static int luaGetTileItemByType(lua_State *L);
 	static int luaGetTileThingByPos(lua_State *L);
 	static int luaGetTopCreature(lua_State *L);
+	static int luaGetItemSpecialDescription(lua_State *L);
 
 	//set item
 	static int luaDoSetItemActionId(lua_State *L);

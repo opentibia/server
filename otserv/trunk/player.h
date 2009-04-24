@@ -511,7 +511,7 @@ public:
 	//other send messages
 	void sendAnimatedText(const Position& pos, unsigned char color, std::string text) const
 		{if(client) client->sendAnimatedText(pos,color,text);}
-	void sendCancel(const char* msg) const
+	void sendCancel(const std::string& msg) const
 		{if(client) client->sendCancel(msg);}
 	void sendCancelMessage(ReturnValue message) const;
 	void sendCancelTarget() const
