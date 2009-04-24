@@ -151,7 +151,7 @@ CREATE TABLE "bans" (
     "expires" BIGINT NOT NULL,
     "added" BIGINT NOT NULL,
     "admin_id" INT DEFAULT 0,
-    "comment" TEXT NOT NULL,
+    "comment" VARCHAR(1024) NOT NULL DEFAULT '',
     "reason" INT DEFAULT 0,
     "action" INT DEFAULT 0,
     "statement" VARCHAR(255) NOT NULL DEFAULT '',

@@ -180,7 +180,7 @@ CREATE TABLE "bans" (
     "expires" INTEGER NOT NULL DEFAULT 0,
     "added" INTEGER NOT NULL DEFAULT 0,
     "admin_id" INTEGER NOT NULL DEFAULT 0,
-    "comment" TEXT NOT NULL,
+    "comment" VARCHAR(1024) NOT NULL DEFAULT '',
     "reason" INTEGER NOT NULL DEFAULT 0,
     "action" INTEGER NOT NULL DEFAULT 0,
     "statement" VARCHAR(255) NOT NULL DEFAULT ''

@@ -107,6 +107,7 @@ SimpleUpdateQuery updateQueries[] = {
 			");",
 			"INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
 			NULL
+		},
 		{ // Sqlite
 			"DROP TABLE `schema_info`;",
 			"CREATE TABLE `schema_info` ("
@@ -120,8 +121,13 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 4,
 		{ // PgSql
-			"ALTER TABLE `players` ADD `lastlogout` BIGINT NOT NULL DEFAULT 0;",
-			"ALTER TABLE `players` ADD `stamina` INT NOT NULL DEFAULT 201660000;",
+			"ALTER TABLE `players` ADD `lastlogout` BIGINT;",
+			"ALTER TABLE `players` ALTER COLUMN `lastlogout` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `lastlogout` SET DEFAULT 0;",
+
+			"ALTER TABLE `players` ADD `stamina` INT;",
+			"ALTER TABLE `players` ALTER COLUMN `stamina` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `stamina` SET DEFAULT 201660000;",
 			NULL
 		},
 		{ // MySql
@@ -137,13 +143,33 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 5,
 		{ // PgSql
-			"ALTER TABLE `players` CHANGE `stamina` `stamina` INT NOT NULL DEFAULT 151200000;",
-			"ALTER TABLE `players` CHANGE `loss_mana` `loss_mana` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_mana`=`loss_mana`*10;",
-			"ALTER TABLE `players` CHANGE `loss_skills` `loss_skills` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_skills`=`loss_skills`*10;",
-			"ALTER TABLE `players` CHANGE `loss_experience` `loss_experience` INT NOT NULL DEFAULT 100;",
-			"UPDATE `players` SET `loss_experience`=`loss_experience`*10;",
+			"ALTER TABLE `players` ADD COLUMN `stamina_tmp` INT;",
+			"UPDATE      `players` SET `stamina_tmp` = `stamina`;",
+			"ALTER TABLE `players` DROP COLUMN `stamina`;",
+			"ALTER TABLE `players` ALTER COLUMN `stamina_tmp` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `stamina_tmp` SET DEFAULT 151200000;",
+			"ALTER TABLE `players` RENAME COLUMN `stamina_tmp` TO `stamina`;",
+
+			"ALTER TABLE `players` ADD COLUMN `loss_mana_tmp` INT;",
+			"UPDATE      `players` SET `loss_mana_tmp` = `loss_mana` * 10;",
+			"ALTER TABLE `players` DROP COLUMN `loss_mana`;",
+			"ALTER TABLE `players` ALTER COLUMN `loss_mana_tmp` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `loss_mana_tmp` SET DEFAULT 100;",
+			"ALTER TABLE `players` RENAME COLUMN `loss_mana_tmp` TO `loss_mana`;",
+
+			"ALTER TABLE `players` ADD COLUMN `loss_skills_tmp` INT;",
+			"UPDATE      `players` SET `loss_skills_tmp` = `loss_skills` * 10;",
+			"ALTER TABLE `players` DROP COLUMN `loss_skills`;",
+			"ALTER TABLE `players` ALTER COLUMN `loss_skills_tmp` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `loss_skills_tmp` SET DEFAULT 100;",
+			"ALTER TABLE `players` RENAME COLUMN `loss_skills_tmp` TO `loss_skills`;",
+
+			"ALTER TABLE `players` ADD COLUMN `loss_experience_tmp` INT;",
+			"UPDATE      `players` SET `loss_experience_tmp` = `loss_experience` * 10;",
+			"ALTER TABLE `players` DROP COLUMN `loss_experience`;",
+			"ALTER TABLE `players` ALTER COLUMN `loss_experience_tmp` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `loss_experience_tmp` SET DEFAULT 100;",
+			"ALTER TABLE `players` RENAME COLUMN `loss_experience_tmp` TO `loss_experience`;",
 			NULL
 		},
 		{ // MySql
@@ -163,7 +189,9 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 6,
 		{ // PgSql
-			"ALTER TABLE `players` ADD `loss_containers` INT NOT NULL DEFAULT 100;",
+			"ALTER TABLE `players` ADD `loss_containers` INT;",
+			"ALTER TABLE `players` ALTER COLUMN `loss_containers` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `loss_containers` SET DEFAULT 100;",
 			NULL
 		},
 		{ // MySql
@@ -177,8 +205,12 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 7,
 		{ // PgSql
-			"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 100;", 	 
-			"UPDATE `players` SET `loss_items`=`loss_items`*10;",
+			"ALTER TABLE `players` ADD COLUMN `loss_items_tmp` INT;",
+			"UPDATE      `players` SET `loss_items_tmp` = `loss_items` * 10;",
+			"ALTER TABLE `players` DROP COLUMN `loss_items`;",
+			"ALTER TABLE `players` ALTER COLUMN `loss_items_tmp` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `loss_items_tmp` SET DEFAULT 100;",
+			"ALTER TABLE `players` RENAME COLUMN `loss_items_tmp` TO `loss_items`;",
 			NULL
 		},
 		{ // MySql
@@ -193,8 +225,12 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 8,
 		{ // PgSql
-			"ALTER TABLE `players` CHANGE `loss_items` `loss_items` INT NOT NULL DEFAULT 10;", 	 
-			"UPDATE `players` SET `loss_items`=`loss_items`/10;",
+			"ALTER TABLE `players` ADD COLUMN `loss_items_tmp` INT;",
+			"UPDATE      `players` SET `loss_items_tmp` = `loss_items` / 10;",
+			"ALTER TABLE `players` DROP COLUMN `loss_items`;",
+			"ALTER TABLE `players` ALTER COLUMN `loss_items_tmp` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `loss_items_tmp` SET DEFAULT 10;",
+			"ALTER TABLE `players` RENAME COLUMN `loss_items_tmp` TO `loss_items`;",
 			NULL
 		},
 		{ // MySql
@@ -209,23 +245,56 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 9,
 		{ // PgSql
-			"ALTER TABLE `groups` CHANGE `access` INT NOT NULL DEFAULT 0;", 
-			"ALTER TABLE `groups` ADD `violation` INT NOT NULL DEFAULT 0;",
+			// Groups table
+			// pgsql does not support ALTER ADD with NULL / DEFAULT values
+			"ALTER TABLE `groups` ADD COLUMN `access_tmp` INT;",
+			"UPDATE      `groups` SET `access_tmp` = CAST(`access` AS INT);",
+			"ALTER TABLE `groups` DROP COLUMN `access`;",
+			"ALTER TABLE `groups` ALTER COLUMN `access_tmp` SET NOT NULL;", 
+			"ALTER TABLE `groups` ALTER COLUMN `access_tmp` SET DEFAULT 0;",
+			"ALTER TABLE `groups` RENAME COLUMN `access_tmp` TO `access`;",
+
+			"ALTER TABLE `groups` ADD `violation` INT;",
+			"ALTER TABLE `groups` ALTER COLUMN `violation` SET NOT NULL;",
+			"ALTER TABLE `groups` ALTER COLUMN `violation` SET DEFAULT 0;",
+			
+			// Accounts table
 			"ALTER TABLE `accounts` DROP `deleted`;",
 			"ALTER TABLE `accounts` DROP `warned`;",
-			"ALTER TABLE `accounts` ADD `warnings` INT NOT NULL DEFAULT 0;",
-			"ALTER TABLE `bans` CHANGE `comment` TEXT NOT NULL;",
-			"ALTER TABLE `bans` ADD `action` INT UNSIGNED NOT NULL DEFAULT 0;",
-			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';",
+
+			"ALTER TABLE `accounts` ADD `warnings` INT;",
+			"ALTER TABLE `accounts` ALTER COLUMN `warnings` SET NOT NULL;",
+			"ALTER TABLE `accounts` ALTER COLUMN `warnings` SET DEFAULT 0;",
+
+			// Bans table
+			"ALTER TABLE `bans` ADD COLUMN `comment_tmp` VARCHAR(1024);",
+			"UPDATE      `bans` SET `comment_tmp` = `comment`;",
+			"ALTER TABLE `bans` DROP COLUMN `comment`;",
+			"ALTER TABLE `bans` ALTER COLUMN `comment_tmp` SET NOT NULL;", 
+			"ALTER TABLE `bans` ALTER COLUMN `comment_tmp` SET DEFAULT '';",
+			"ALTER TABLE `bans` RENAME COLUMN `comment_tmp` TO `comment`;",
+
+			"ALTER TABLE `bans` ADD `action` INT UNSIGNED;",
+			"ALTER TABLE `bans` ALTER COLUMN `action` SET NOT NULL;",
+			"ALTER TABLE `bans` ALTER COLUMN `action` SET DEFAULT 0;",
+
+			"ALTER TABLE `bans` ADD `statement` VARCHAR(255);",
+			"ALTER TABLE `bans` ALTER COLUMN `statement` SET NOT NULL;",
+			"ALTER TABLE `bans` ALTER COLUMN `statement` SET DEFAULT '';",
 			NULL
 		},
 		{ // MySql
-			"ALTER TABLE `groups` CHANGE `access` INT NOT NULL DEFAULT 0;", 
+			// Groups table
+			"ALTER TABLE `groups` CHANGE `access` `access` INT NOT NULL DEFAULT 0;", 
 			"ALTER TABLE `groups` ADD `violation` INT NOT NULL DEFAULT 0;",
+
+			// Accounts table
 			"ALTER TABLE `accounts` DROP `deleted`;",
 			"ALTER TABLE `accounts` DROP `warned`;",
 			"ALTER TABLE `accounts` ADD `warnings` INT NOT NULL DEFAULT 0;",
-			"ALTER TABLE `bans` MODIFY COLUMN `comment` TEXT NOT NULL DEFAULT '';",
+
+			// Bans table
+			"ALTER TABLE `bans` CHANGE `comment` `comment` VARCHAR(1024) NOT NULL DEFAULT '';",
 			"ALTER TABLE `bans` ADD `action` INT UNSIGNED NOT NULL DEFAULT 0;",
 			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';",
 			NULL
@@ -243,6 +312,14 @@ bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
 	
 	//Execute queries first
 	Database* db = Database::instance();
+
+	DBTransaction transaction(db);
+
+	if(!transaction.begin()){
+		std::cout << std::endl << "ERROR: Could not start transaction!" << std::endl;
+		return false;
+	}
+
 	const char* const (*queries)[32];
 
 	if(sqltype == "pgsql") queries = &updateQuery.pg_query;
@@ -272,7 +349,7 @@ bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
 	}
 
 	std::cout << "Schema update to version " << updateQuery.version << std::endl;
-	return true;
+	return transaction.commit();
 }
 
 void ErrorMessage(const char* message) {
@@ -350,7 +427,6 @@ int main(int argn, const char* argv[]){
 	std::cout << "Version = " << schema_version << " ";
 	std::cout << "[done]" << std::endl;
 	db->freeResult(result);
-	schema_version = 4;
 	if(schema_version == CURRENT_SCHEMA_VERSION){
 		std::cout << ":: Your database schema is updated." << std::endl;
 		std::cout << "Press any key to close ...";
@@ -381,18 +457,18 @@ int main(int argn, const char* argv[]){
 				ErrorMessage(errorMessage);
 				return -1;
 			}
-		}
-	}
 
-	//update schema version
-	// previously version number was updated after each step
-	// but this could break compatibility with version 1
-	// so if you think it is realy important then try to fuck around with version 1 struct ;)
-	query.str("");
-	query << "UPDATE `schema_info` SET `value` = '" << CURRENT_SCHEMA_VERSION << "' WHERE `name` = 'version';";
-	if(!db->executeQuery(query.str().c_str())){
-		ErrorMessage("Your database has been correctly updated to most recent version, but an error occured when updating the schema version.");
-		return -1;
+			//update schema version
+			// previously version number was updated after each step
+			// but this could break compatibility with version 1
+			// so if you think it is realy important then try to fuck around with version 1 struct ;)
+			query.str("");
+			query << "UPDATE `schema_info` SET `value` = '" << updateQueries[i].version << "' WHERE `name` = 'version';";
+			if(!db->executeQuery(query.str().c_str())){
+				ErrorMessage("Your database has been correctly updated to most recent version, but an error occured when updating the schema version.");
+				return -1;
+			}
+		}
 	}
 
 	std::cout << std::endl << "Your database has been updated to the most recent version!" << std::endl;
