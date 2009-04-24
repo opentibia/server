@@ -70,7 +70,7 @@ class Tile : public Cylinder
 {
 public:
 	static Tile& null_tile;
-	Tile(int x, int y, int z);
+	Tile(uint16_t x, uint16_t y, uint16_t z);
 	~Tile();
 
 	// Get the different content vectors
@@ -188,8 +188,7 @@ private:
 
 	void updateTileFlags(Item* item, bool removing);
 
-public:
-	
+public:	
 	Item*			ground;
 	QTreeLeafNode*	qt_node;
 
@@ -209,7 +208,7 @@ class DynamicTile : public Tile
 	CreatureVector	creatures;
 	ItemVector		downItems;
 public:
-	DynamicTile(int x, int y, int z);
+	DynamicTile(uint16_t x, uint16_t y, uint16_t z);
 	~DynamicTile();
 	
 	virtual ItemVector* getTopItems() {return &topItems;}
@@ -243,7 +242,7 @@ class StaticTile : public Tile
 	CreatureVector*	creatures;
 	ItemVector*		downItems;
 public:
-	StaticTile(int x, int y, int z);
+	StaticTile(uint16_t x, uint16_t y, uint16_t z);
 	~StaticTile();
 	
 	virtual ItemVector* getTopItems() {return topItems;}
@@ -269,12 +268,12 @@ public:
 	}
 };
 
-inline Tile::Tile(int x, int y, int z) :
-	tilePos(x, y, z),
+inline Tile::Tile(uint16_t x, uint16_t y, uint16_t z) :
+	ground(NULL),
 	qt_node(NULL),
 	thingCount(0),
-	m_flags(0),
-	ground(NULL)
+	tilePos(x, y, z),
+	m_flags(0)
 {
 }
 
@@ -287,7 +286,7 @@ inline Tile::~Tile()
 #endif // _DEBUG
 }
 
-inline StaticTile::StaticTile(int x, int y, int z) :
+inline StaticTile::StaticTile(uint16_t x, uint16_t y, uint16_t z) :
 	Tile(x, y, z),
 	topItems(NULL),
 	creatures(NULL),
@@ -300,7 +299,7 @@ inline StaticTile::~StaticTile()
 #endif
 }
 
-inline DynamicTile::DynamicTile(int x, int y, int z) :
+inline DynamicTile::DynamicTile(uint16_t x, uint16_t y, uint16_t z) :
 	Tile(x, y, z)
 {}
 

@@ -22,6 +22,7 @@
 #define __OTSERV_TOOLS_H__
 #include "definitions.h"
 #include <libxml/parser.h>
+#include <vector>
 
 #include "enums.h"
 #include "const.h"
