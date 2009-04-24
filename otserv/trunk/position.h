@@ -123,16 +123,19 @@ public:
 	PositionEx(){ };
 	~PositionEx(){};
 
-	PositionEx(int16_t _x, int16_t _y, int16_t _z, int32_t _stackpos)
+	PositionEx(uint16_t _x, uint16_t _y, uint16_t _z, int32_t _stackpos)
 	: Position(_x,_y,_z), stackpos(_stackpos) {};
 	
-	PositionEx(int16_t _x, int16_t _y, int16_t _z)
+	PositionEx(uint16_t _x, uint16_t _y, uint16_t _z)
 	: Position(_x,_y,_z), stackpos(0) {};
 
-	PositionEx(Position p)
+	PositionEx(const Position& p)
 	: Position(p.x,p.y,p.z), stackpos(0) {};
+
+	PositionEx(const PositionEx& p)
+	: Position(p.x,p.y,p.z), stackpos(p.stackpos) {};
 	
-	PositionEx(Position p, int32_t _stackpos)
+	PositionEx(const Position& p, int32_t _stackpos)
 	: Position(p.x,p.y,p.z), stackpos(_stackpos) {};
 
 	int32_t stackpos;
