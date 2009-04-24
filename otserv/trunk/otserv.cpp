@@ -433,7 +433,11 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::cout << "[done]" << std::endl;
 
-
+#ifdef WIN32
+	CreateMutex(NULL, true, "otserv_" + g_config.getNumber(ConfigManager::LOGIN_PORT));
+	if(GetLastError() == ERROR_ALREADY_EXISTS)
+		ErrorMessage("There's an another instance of the OTServ running with the same login port, please shut it down first or change ports for this one.");
+#endif
 
 #if defined(PKGDATADIR) && !defined(__WINDOWS__) // I dont care enough to port this to win32, prolly not needed
 	// let's fix the datadir, if necessary...
