@@ -139,7 +139,7 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	std::list<Tile*>& list)
 {
 	int8_t s_min_t = 0;
-	int8_t s_max_t = 65535;
+	int16_t s_max_t = 65535;
 
 	if(area){
 		area->getList(centerPos, targetPos, list);
@@ -1171,7 +1171,7 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 	size_t rows = area->getRows();
 
 	int8_t s_min_t = 0;
-	int8_t s_max_t = 65535;
+	int16_t s_max_t = 65535;
 
 	uint32_t centerY, centerX;
 	area->getCenter(centerY, centerX);
