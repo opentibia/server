@@ -138,14 +138,11 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 void Combat::getCombatArea(const Position& centerPos, const Position& targetPos, const AreaCombat* area,
 	std::list<Tile*>& list)
 {
-	int8_t s_min_t = 0;
-	int16_t s_max_t = 65535;
-
 	if(area){
 		area->getList(centerPos, targetPos, list);
 	}
-	else if(targetPos.x >= s_min_t && targetPos.y >= s_min_t && targetPos.z >= s_min_t &&
-			targetPos.x <= s_max_t && targetPos.y <= s_max_t && targetPos.z < MAP_MAX_LAYERS)
+	else if(targetPos.x >= ((uint16_t)0) && targetPos.y >= ((uint16_t)0) && targetPos.z >= ((uint16_t)0) &&
+			targetPos.x <= ((uint16_t)0xFFFF) && targetPos.y <= ((uint16_t)0xFFFF) && targetPos.z < MAP_MAX_LAYERS)
 	{
 		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 		if(!tile) {
@@ -1170,9 +1167,6 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 	size_t cols = area->getCols();
 	size_t rows = area->getRows();
 
-	int8_t s_min_t = 0;
-	int16_t s_max_t = 65535;
-
 	uint32_t centerY, centerX;
 	area->getCenter(centerY, centerX);
 
@@ -1183,8 +1177,8 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 		for(size_t x = 0; x < cols; ++x){
 
 			if(area->getValue(y, x) != 0){
-				if(tmpPos.x >= s_min_t && tmpPos.y >= s_min_t && tmpPos.z >= s_min_t &&
-					tmpPos.x <= s_max_t && tmpPos.y <= s_max_t && tmpPos.z < MAP_MAX_LAYERS)
+				if(tmpPos.x >= ((uint16_t)0) && tmpPos.y >= ((uint16_t)0) && tmpPos.z >= ((uint16_t)0) &&
+					tmpPos.x <= ((uint16_t)0xFFFF) && tmpPos.y <= ((uint16_t)0xFFFF) && tmpPos.z < MAP_MAX_LAYERS)
 				{
 					if(g_game.isSightClear(targetPos, tmpPos, true)){
 						tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
