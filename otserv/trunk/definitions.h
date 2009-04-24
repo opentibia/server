@@ -107,6 +107,8 @@ enum passwordType_t{
 	#define	__FUNCTION__ __func__
 #endif
 
+#define WSAEWOULDBLOCK 10035
+
 #ifndef EWOULDBLOCK
 #define EWOULDBLOCK WSAEWOULDBLOCK
 #endif
