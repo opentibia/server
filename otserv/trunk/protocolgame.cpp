@@ -1576,8 +1576,8 @@ void ProtocolGame::parseViolationWindow(NetworkMessage& msg)
 
 void ProtocolGame::parseBugReport(NetworkMessage& msg)
 {
-	msg.GetString();
-	//TODO
+	std::string comment = msg.GetString();
+	addGameTask(&Game::playerBugReport, player->getID(), comment);
 }
 
 void ProtocolGame::parseDebugAssert(NetworkMessage& msg)
@@ -1599,13 +1599,16 @@ void ProtocolGame::parseDebugAssert(NetworkMessage& msg)
 
 	//write it in the assertions file
 	FILE* f = fopen("client_assertions.txt", "a");
-	char bufferDate[32], bufferIp[32];
-	time_t tmp = time(NULL);
-	formatIP(getIP(), bufferIp);
-	formatDate(tmp, bufferDate);
-	fprintf(f, "----- %s - %s (%s) -----\n", bufferDate, player->getName().c_str(), bufferIp);
-	fprintf(f, "%s\n%s\n%s\n%s\n", assertLine.c_str(), date.c_str(), description.c_str(), comment.c_str());
-	fclose(f);
+	if(f){
+		char bufferDate[32], bufferIp[32];
+		time_t tmp = time(NULL);
+		formatIP(getIP(), bufferIp);
+		formatDate(tmp, bufferDate);
+
+		fprintf(f, "----- %s - %s (%s) -----\n", bufferDate, player->getName().c_str(), bufferIp);
+		fprintf(f, "%s\n%s\n%s\n%s\n", assertLine.c_str(), date.c_str(), description.c_str(), comment.c_str());
+		fclose(f);
+	}
 }
 
 //********************** Send methods  *******************************
@@ -2258,7 +2261,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, bool isLogin)
 				msg->AddU32(player->getID());
 				msg->AddByte(0x32);
 				msg->AddByte(0x00);
-				msg->AddByte(0x00); //TODO (can report bugs 0,1)
+				msg->AddByte(player->hasFlag(PlayerFlag_CanReportBugs));
 
 				uint16_t violation = player->getViolationLevel();
 				if(violationReasons[violation] > 0)

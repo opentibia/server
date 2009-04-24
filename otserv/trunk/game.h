@@ -433,12 +433,13 @@ public:
 	bool playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown);
 	bool playerShowQuestLog(uint32_t playerId);
 	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
+	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
+		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
+	bool playerReportBug(uint32_t playerId, std::string comment);
 
 	void cleanup();
 	void shutdown();
 	void FreeThing(Thing* thing);
-	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
-		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);

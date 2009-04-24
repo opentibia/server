@@ -4719,11 +4719,8 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	if(removeNotations > 1)
 		g_bans.removeNotations(account.number);
 
-	std::stringstream ss;
-	std::string actionDescription = getViolationActionString(actionType, ipBanishment);
-	std::string reasonDescription = getViolationReasonString(reasonId);
 	bool announceViolation = g_config.getNumber(ConfigManager::BROADCAST_BANISHMENTS);
-
+	std::stringstream ss;
 	if(actionType == ACTION_STATEMENT){
 		if(announceViolation){
 			ss << ss << player->getName() << " has taken the action";
@@ -4732,9 +4729,9 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 			ss << "You have taken the action";
 		}
 
-		ss << "  \"" << actionDescription << "\" " <<
+		ss << "  \"" << getViolationActionString(actionType, ipBanishment) << "\" " <<
 			"for the statement: \"" << statement << "\" against: " << targetName << " " <<
-			"(Warnings: " << account.warnings << "), with reason: \""<< reasonDescription <<
+			"(Warnings: " << account.warnings << "), with reason: \"" << getViolationReasonString(reasonId) <<
 			"\", and comment: \"" << comment << "\".";
 	}
 	else{
@@ -4745,8 +4742,9 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 			ss << "You have taken the action";
 		}
 
-		ss << " \"" << actionDescription << "\" against: " << targetName <<
-			" (Warnings: " << account.warnings << "), with reason: \"" << reasonDescription << "\", and comment: \"" << comment << "\".";
+		ss << " \"" << getViolationActionString(actionType, ipBanishment) << "\" against: " << targetName <<
+			" (Warnings: " << account.warnings << "), with reason: \"" << getViolationReasonString(reasonId) <<
+			"\", and comment: \"" << comment << "\".";
 	}
 
 	if(announceViolation){
@@ -4766,5 +4764,38 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	}
 
 	IOAccount::instance()->saveAccount(account);
+	return true;
+}
+
+bool Game::playerReportBug(uint32_t playerId, std::string comment)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	if(!player->hasFlag(PlayerFlag_CanReportBugs)){ //avoid saving unwanted stuff
+		return false;
+	}
+
+	FILE* f = fopen("player_reports.txt", "a");
+	if(!f){ //no disk space?
+		player->sendTextMessage(MSG_EVENT_DEFAULT, g_config.getString(
+			ConfigManager::SERVER_NAME) + (std::string)" couldn't store your report, please contact with gamemaster.");
+		return false;
+	}
+
+	const Position& pos = player->getPosition();
+	char bufferDate[32], bufferIp[32];
+	time_t tmp = time(NULL);
+
+	formatIP(player->getIP(), bufferIp);
+	formatDate(tmp, bufferDate);
+
+	fprintf(f, "------------------------------\nPlayer %s at %s\nFrom IP: %s [Position X: %d Y: %d Z: %d]\nReported a bug with comment: %s\n",
+		player->getName().c_str(), bufferDate, bufferIp, p.x, p.y, p.z, comment.c_str());
+	fclose(f);
+
+	player->sendTextMessage(MSG_EVENT_DEFAULT, "Your report has been sent to " + g_config.getString(
+		ConfigManager::SERVER_NAME) + (std::string)".");
 	return true;
 }
