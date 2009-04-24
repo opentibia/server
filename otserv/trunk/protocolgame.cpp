@@ -867,17 +867,23 @@ void ProtocolGame::GetTileDescription(const Tile* tile, NetworkMessage_ptr msg)
 			count++;
 		}
 
+		const ItemVector*		topItems;
+		const CreatureVector*	creatures;
+		const ItemVector*		downItems;
+		tile->getThings(topItems, creatures, downItems);
+
+
 		ItemVector::const_iterator it;
-		if(tile->topItems){
-			for(it = tile->topItems->begin(); ((it != tile->topItems->end()) && (count < 10)); ++it){
+		if(topItems){
+			for(it = topItems->begin(); ((it != topItems->end()) && (count < 10)); ++it){
 				msg->AddItem(*it);
 				count++;
 			}
 		}
 
-		if(tile->creatures){
+		if(creatures){
 			CreatureVector::const_iterator cit;
-			for(cit = tile->creatures->begin(); ((cit != tile->creatures->end()) && (count < 10)); ++cit){
+			for(cit = creatures->begin(); ((cit != creatures->end()) && (count < 10)); ++cit){
 				bool known;
 				uint32_t removedKnown;
 				checkCreatureAsKnown((*cit)->getID(), known, removedKnown);
@@ -886,8 +892,8 @@ void ProtocolGame::GetTileDescription(const Tile* tile, NetworkMessage_ptr msg)
 			}
 		}
 
-		if(tile->downItems){
-			for(it = tile->downItems->begin(); ((it != tile->downItems->end()) && (count < 10)); ++it){
+		if(downItems){
+			for(it = downItems->begin(); ((it != downItems->end()) && (count < 10)); ++it){
 				msg->AddItem(*it);
 				count++;
 			}

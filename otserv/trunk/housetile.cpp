@@ -26,7 +26,7 @@
 extern Game g_game;
 
 HouseTile::HouseTile(int x, int y, int z, House* _house) :
-	Tile(x, y, z)
+	DynamicTile(x, y, z)
 {
 	house = _house;
 	setFlag(TILESTATE_HOUSE);

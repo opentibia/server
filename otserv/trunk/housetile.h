@@ -25,7 +25,8 @@
 
 class House;
 
-class HouseTile : public Tile
+// House tiles are almost always dynamic
+class HouseTile : public DynamicTile
 {
 public:
 	HouseTile(int x, int y, int z, House* _house);

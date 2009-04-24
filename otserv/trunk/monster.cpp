@@ -880,14 +880,14 @@ void Monster::pushItems(Tile* tile)
 	//We can not use iterators here since we can push the item to another tile
 	//which will invalidate the iterator.
 	//start from the end to minimize the amount of traffic
-	if(tile->downItems){
+	if(ItemVector* downItems = tile->getDownItems()){
 		uint32_t moveCount = 0;
 		uint32_t removeCount = 0;
-		int32_t downItemSize = tile->downItems->size();
+		int32_t downItemSize = downItems->size();
 
 		for(int32_t i = downItemSize - 1; i >= 0; --i){
-			assert(i >= 0 && i < (int32_t)tile->downItems->size());
-			Item* item = tile->downItems->at(i);
+			assert(i >= 0 && i < (int32_t)downItems->size());
+			Item* item = downItems->at(i);
 			if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATH)
 				|| item->hasProperty(BLOCKSOLID))){
 					if(moveCount < 20 && pushItem(item, 1)){
@@ -935,11 +935,11 @@ void Monster::pushCreatures(Tile* tile)
 {
 	//We can not use iterators here since we can push a creature to another tile
 	//which will invalidate the iterator.
-	if(tile->creatures){
+	if(CreatureVector* creatures = tile->getCreatures()){
 		uint32_t removeCount = 0;
 
-		for(uint32_t i = 0; i < tile->creatures->size();){
-			Monster* monster = tile->creatures->at(i)->getMonster();
+		for(uint32_t i = 0; i < creatures->size();){
+			Monster* monster = creatures->at(i)->getMonster();
 
 			if(monster && monster->isPushable()){
 				if(pushCreature(monster)){
@@ -1138,7 +1138,7 @@ bool Monster::canWalkTo(Position pos, Direction dir)
 		}
 
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-		if(tile && !tile->creatures && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+		if(tile && tile->getCreatureCount() == 0 && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			return true;
 		}
 	}

@@ -24,6 +24,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <fstream>
 
 #include <boost/config.hpp>
 #include <boost/bind.hpp>
@@ -243,11 +244,11 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 	for(; *map_iter != end_here && (clean_max == 0? true : (cleaned < clean_max)); ++*map_iter, ++cleaned){
 		tile = (*map_iter)->first;
 
-		if(tile->downItems){
+		if(ItemVector* downItems = tile->getDownItems()){
 			//remove garbage
-			int32_t downItemSize = tile->downItems->size();
+			int32_t downItemSize = downItems->size();
 			for(int32_t i = downItemSize - 1; i >= 0; --i){
-				item = tile->downItems->at(i);
+				item = downItems->at(i);
 				if(item){
 #ifndef __DEBUG__
 					// So the compiler doesn't generates warnings

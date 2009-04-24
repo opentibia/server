@@ -69,56 +69,29 @@ class HouseTile;
 class Tile : public Cylinder
 {
 public:
-	static Tile null_tile;
-	Tile(int x, int y, int z)
-	{
-		tilePos.x = x;
-		tilePos.y = y;
-		tilePos.z = z;
-		qt_node = NULL;
+	static Tile& null_tile;
+	Tile(int x, int y, int z);
+	~Tile();
 
-		thingCount = 0;
-		m_flags = 0;
-		ground = NULL;
-		topItems = NULL;
-		downItems = NULL;
-		creatures = NULL;
-	}
-
-	~Tile()
-	{
-#ifdef _DEBUG
-		delete ground;
-
-		if(topItems){
-			for(ItemVector::iterator it = topItems->begin(); it != topItems->end(); ++it){
-				delete *it;
-			}
-			topItems->clear();
-		}
-
-		if(downItems){
-			for(ItemVector::iterator it = downItems->begin(); it != downItems->end(); ++it){
-				delete *it;
-			}
-			downItems->clear();
-		}
-#endif // _DEBUG
-	}
+	// Get the different content vectors
+	virtual ItemVector* getTopItems() = 0;
+	virtual CreatureVector* getCreatures() = 0;
+	virtual ItemVector* getDownItems() = 0;
+	virtual const ItemVector* getTopItems() const = 0;
+	virtual const CreatureVector* getCreatures() const = 0;
+	virtual const ItemVector* getDownItems() const = 0;
+	virtual ItemVector* makeTopItems() = 0;
+	virtual CreatureVector* makeCreatures() = 0;
+	virtual ItemVector* makeDownItems() = 0;
+	virtual void getThings(ItemVector*& topItems, CreatureVector*& creatures, ItemVector*& downItems) = 0;
+	virtual void getThings(const ItemVector*& topItems, const CreatureVector*& creatures, const ItemVector*& downItems) const = 0;
 
 	HouseTile* getHouseTile();
 	const HouseTile* getHouseTile() const;
 	bool isHouseTile() const;
 
-
 	virtual int getThrowRange() const {return 0;};
 	virtual bool isPushable() const {return false;};
-
-	Item*			ground;
-	ItemVector*		topItems;
-	CreatureVector*	creatures;
-	ItemVector*		downItems;
-	QTreeLeafNode*	qt_node;
 
 	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
@@ -134,6 +107,11 @@ public:
 	Item* getItemByTopOrder(uint32_t topOrder);
 
 	uint32_t getThingCount() const {return thingCount;}
+	// If these return != 0 the associated vectors are guaranteed to exists
+	uint32_t getCreatureCount() const;
+	uint32_t getItemCount() const;
+	uint32_t getTopItemCount() const;
+	uint32_t getDownItemCount() const;
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 	bool hasProperty(Item* exclude, enum ITEMPROPERTY prop) const;
@@ -210,10 +188,123 @@ private:
 
 	void updateTileFlags(Item* item, bool removing);
 
+public:
+	
+	Item*			ground;
+	QTreeLeafNode*	qt_node;
+
 protected:
 	uint32_t thingCount;
 	Position tilePos;
 	uint32_t m_flags;
 };
+
+
+// Used for walkable tiles, where there is high likeliness of
+// items being added/removed
+class DynamicTile : public Tile
+{
+	// By allocating the vectors in-house, we avoid some memory fragmentation
+	ItemVector		topItems;
+	CreatureVector	creatures;
+	ItemVector		downItems;
+public:
+	DynamicTile(int x, int y, int z);
+	~DynamicTile();
+	
+	virtual ItemVector* getTopItems() {return &topItems;}
+	virtual CreatureVector* getCreatures() {return &creatures;}
+	virtual ItemVector* getDownItems() {return &downItems;}
+	virtual const ItemVector* getTopItems() const {return &topItems;}
+	virtual const CreatureVector* getCreatures() const {return &creatures;}
+	virtual const ItemVector* getDownItems() const {return &downItems;}
+	virtual ItemVector* makeTopItems() {return &topItems;}
+	virtual CreatureVector* makeCreatures() {return &creatures;}
+	virtual ItemVector* makeDownItems() {return &downItems;}
+	
+	virtual void getThings(ItemVector*& topItems, CreatureVector*& creatures, ItemVector*& downItems){
+		topItems = &this->topItems;
+		creatures = &this->creatures;
+		downItems = &this->downItems;
+	}
+
+	virtual void getThings(const ItemVector*& topItems, const CreatureVector*& creatures, const ItemVector*& downItems) const{
+		topItems = &this->topItems;
+		creatures = &this->creatures;
+		downItems = &this->downItems;
+	}
+};
+
+// For blocking tiles, where we very rarely actually have items
+class StaticTile : public Tile
+{
+	// We very rarely even need the vectors, so don't keep them in memory
+	ItemVector*		topItems;
+	CreatureVector*	creatures;
+	ItemVector*		downItems;
+public:
+	StaticTile(int x, int y, int z);
+	~StaticTile();
+	
+	virtual ItemVector* getTopItems() {return topItems;}
+	virtual CreatureVector* getCreatures() {return creatures;}
+	virtual ItemVector* getDownItems() {return downItems;}
+	virtual const ItemVector* getTopItems() const {return topItems;}
+	virtual const CreatureVector* getCreatures() const {return creatures;}
+	virtual const ItemVector* getDownItems() const {return downItems;}
+	virtual ItemVector* makeTopItems() {return (topItems)? (topItems) : (topItems = new ItemVector);}
+	virtual CreatureVector* makeCreatures() {return (creatures)? (creatures) : (creatures = new CreatureVector);}
+	virtual ItemVector* makeDownItems() {return (downItems)? (downItems) : (downItems = new ItemVector);}
+	
+	virtual void getThings(ItemVector*& topItems, CreatureVector*& creatures, ItemVector*& downItems){
+		topItems = this->topItems;
+		creatures = this->creatures;
+		downItems = this->downItems;
+	}
+
+	virtual void getThings(const ItemVector*& topItems, const CreatureVector*& creatures, const ItemVector*& downItems) const{
+		topItems = this->topItems;
+		creatures = this->creatures;
+		downItems = this->downItems;
+	}
+};
+
+inline Tile::Tile(int x, int y, int z) :
+	tilePos(x, y, z),
+	qt_node(NULL),
+	thingCount(0),
+	m_flags(0),
+	ground(NULL)
+{
+}
+
+inline Tile::~Tile()
+{
+	// We don't need to free any memory as tiles are always deallocated
+	// and OS will free up anything left when the server is shutdown
+#ifdef _DEBUG
+	delete ground;
+#endif // _DEBUG
+}
+
+inline StaticTile::StaticTile(int x, int y, int z) :
+	Tile(x, y, z),
+	topItems(NULL),
+	creatures(NULL),
+	downItems(NULL)
+{}
+
+inline StaticTile::~StaticTile()
+{
+#ifdef _DEBUG
+#endif
+}
+
+inline DynamicTile::DynamicTile(int x, int y, int z) :
+	Tile(x, y, z)
+{}
+
+inline DynamicTile::~DynamicTile()
+{}
 
 #endif

@@ -146,7 +146,8 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	{
 		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 		if(!tile) {
-			tile = new Tile(targetPos.x, targetPos.y, targetPos.z);
+			// These tiles will never have anything on them
+			tile = new StaticTile(targetPos.x, targetPos.y, targetPos.z);
 			g_game.setTile(tile);
 		}
 		list.push_back(tile);
@@ -768,18 +769,22 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 		maxY + Map::maxViewportY, maxY + Map::maxViewportY);
 
 	for(std::list<Tile*>::iterator it = tileList.begin(); it != tileList.end(); ++it){
+		Tile* iter_tile = *it;
 		bool bContinue = true;
 
-		if(canDoCombat(caster, *it, params.isAggressive) == RET_NOERROR){
-			if((*it)->creatures){
-				for(CreatureVector::iterator cit = (*it)->creatures->begin(); bContinue && cit != (*it)->creatures->end(); ++cit){
+		if(canDoCombat(caster, iter_tile, params.isAggressive) == RET_NOERROR){
+			if(iter_tile->getCreatures()){
+				for(CreatureVector::iterator cit = iter_tile->getCreatures()->begin(), 
+					cend = iter_tile->getCreatures()->end();
+					bContinue && cit != cend; ++cit)
+				{
 					if(params.targetCasterOrTopMost){
-						if(caster && caster->getTile() == (*it)){
+						if(caster && caster->getTile() == iter_tile){
 							if(*cit == caster){
 								bContinue = false;
 							}
 						}
-						else if(*cit == (*it)->getTopCreature()){
+						else if(*cit == iter_tile->getTopCreature()){
 							bContinue = false;
 						}
 
@@ -798,7 +803,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 				}
 			}
 
-			combatTileEffects(list, caster, *it, params);
+			combatTileEffects(list, caster, iter_tile, params);
 		}
 	}
 
@@ -1185,7 +1190,8 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 					if(g_game.isSightClear(targetPos, tmpPos, true)){
 						tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
 						if(!tile){
-							tile = new Tile(tmpPos.x, tmpPos.y, tmpPos.z);
+							// This tile will never have anything on it
+							tile = new StaticTile(tmpPos.x, tmpPos.y, tmpPos.z);
 							g_game.setTile(tile);
 						}
 						list.push_back(tile);
