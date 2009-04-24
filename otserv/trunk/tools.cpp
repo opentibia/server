@@ -19,7 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "otpch.h"
-#include "boost/asio.hpp"
 
 #include "tools.h"
 #include "configmanager.h"

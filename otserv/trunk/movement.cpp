@@ -645,8 +645,10 @@ uint32_t MoveEvent::AddItemField(Item* item, Item* tileItem, const Position& pos
 {
 	if(MagicField* field = item->getMagicField()){
 		Tile* tile = item->getTile();
-		for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
-			field->onStepInField(*cit);
+		if(tile->creatures){
+			for(CreatureVector::iterator cit = tile->creatures->begin(); cit != tile->creatures->end(); ++cit){
+				field->onStepInField(*cit);
+			}
 		}
 
 		return 1;

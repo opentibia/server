@@ -877,29 +877,31 @@ bool Monster::pushItem(Item* item, int32_t radius)
 
 void Monster::pushItems(Tile* tile)
 {
-	uint32_t moveCount = 0;
-	uint32_t removeCount = 0;
-
 	//We can not use iterators here since we can push the item to another tile
 	//which will invalidate the iterator.
 	//start from the end to minimize the amount of traffic
-	int32_t downItemSize = tile->downItems.size();
-	for(int32_t i = downItemSize - 1; i >= 0; --i){
-		assert(i >= 0 && i < (int32_t)tile->downItems.size());
-		Item* item = tile->downItems[i];
-		if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATH)
-			|| item->hasProperty(BLOCKSOLID))){
-				if(moveCount < 20 && pushItem(item, 1)){
-					moveCount++;
-				}
-				else if(g_game.internalRemoveItem(item) == RET_NOERROR){
-					++removeCount;
-				}
-		}
-	}
+	if(tile->downItems){
+		uint32_t moveCount = 0;
+		uint32_t removeCount = 0;
+		int32_t downItemSize = tile->downItems->size();
 
-	if(removeCount > 0){
-		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
+		for(int32_t i = downItemSize - 1; i >= 0; --i){
+			assert(i >= 0 && i < (int32_t)tile->downItems->size());
+			Item* item = tile->downItems->at(i);
+			if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATH)
+				|| item->hasProperty(BLOCKSOLID))){
+					if(moveCount < 20 && pushItem(item, 1)){
+						moveCount++;
+					}
+					else if(g_game.internalRemoveItem(item) == RET_NOERROR){
+						++removeCount;
+					}
+			}
+		}
+
+		if(removeCount > 0){
+			g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
+		}
 	}
 }
 
@@ -931,28 +933,31 @@ bool Monster::pushCreature(Creature* creature)
 
 void Monster::pushCreatures(Tile* tile)
 {
-	uint32_t removeCount = 0;
 	//We can not use iterators here since we can push a creature to another tile
 	//which will invalidate the iterator.
-	for(uint32_t i = 0; i < tile->creatures.size();){
-		Monster* monster = tile->creatures[i]->getMonster();
+	if(tile->creatures){
+		uint32_t removeCount = 0;
 
-		if(monster && monster->isPushable()){
-			if(pushCreature(monster)){
-				continue;
+		for(uint32_t i = 0; i < tile->creatures->size();){
+			Monster* monster = tile->creatures->at(i)->getMonster();
+
+			if(monster && monster->isPushable()){
+				if(pushCreature(monster)){
+					continue;
+				}
+				else{
+					monster->changeHealth(-monster->getHealth());
+					monster->setDropLoot(false);
+					removeCount++;
+				}
 			}
-			else{
-				monster->changeHealth(-monster->getHealth());
-				monster->setDropLoot(false);
-				removeCount++;
-			}
+
+			++i;
 		}
 
-		++i;
-	}
-
-	if(removeCount > 0){
-		g_game.addMagicEffect(tile->getPosition(), NM_ME_BLOCKHIT);
+		if(removeCount > 0){
+			g_game.addMagicEffect(tile->getPosition(), NM_ME_BLOCKHIT);
+		}
 	}
 }
 
@@ -1133,7 +1138,7 @@ bool Monster::canWalkTo(Position pos, Direction dir)
 		}
 
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+		if(tile && !tile->creatures && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			return true;
 		}
 	}

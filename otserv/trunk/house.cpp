@@ -206,9 +206,9 @@ void House::setAccessList(uint32_t listId, const std::string& textlist)
 	HouseTileList::iterator it;
 	for(it = houseTiles.begin(); it != houseTiles.end(); ++it){
 		HouseTile* hTile = *it;
-		if(hTile->creatures.size() > 0){
+		if(hTile->creatures){
 			CreatureVector::iterator cit;
-			for(cit = hTile->creatures.begin(); cit != hTile->creatures.end(); ++cit){
+			for(cit = hTile->creatures->begin(); cit != hTile->creatures->end(); ++cit){
 				Player* player = (*cit)->getPlayer();
 				if(player && isInvited(player) == false){
 					kickList.push_back(player);

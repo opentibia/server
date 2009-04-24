@@ -80,6 +80,9 @@ public:
 		thingCount = 0;
 		m_flags = 0;
 		ground = NULL;
+		topItems = NULL;
+		downItems = NULL;
+		creatures = NULL;
 	}
 
 	~Tile()
@@ -87,16 +90,19 @@ public:
 #ifdef _DEBUG
 		delete ground;
 
-		ItemVector::iterator it;
-		for(it = topItems.begin(); it != topItems.end(); ++it){
-			delete *it;
+		if(topItems){
+			for(ItemVector::iterator it = topItems->begin(); it != topItems->end(); ++it){
+				delete *it;
+			}
+			topItems->clear();
 		}
-		topItems.clear();
 
-		for(it = downItems.begin(); it != downItems.end(); ++it){
-			delete *it;
+		if(downItems){
+			for(ItemVector::iterator it = downItems->begin(); it != downItems->end(); ++it){
+				delete *it;
+			}
+			downItems->clear();
 		}
-		downItems.clear();
 #endif // _DEBUG
 	}
 
@@ -108,11 +114,11 @@ public:
 	virtual int getThrowRange() const {return 0;};
 	virtual bool isPushable() const {return false;};
 
-	Item*          ground;
-	ItemVector     topItems;
-	CreatureVector creatures;
-	ItemVector     downItems;
-	QTreeLeafNode* qt_node;
+	Item*			ground;
+	ItemVector*		topItems;
+	CreatureVector*	creatures;
+	ItemVector*		downItems;
+	QTreeLeafNode*	qt_node;
 
 	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;

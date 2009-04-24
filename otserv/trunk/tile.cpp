@@ -48,15 +48,18 @@ bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 		return true;
 	}
 
-	ItemVector::const_iterator iit;
-	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-		if((*iit)->hasProperty(prop))
-			return true;
+	if(topItems){
+		for(ItemVector::const_iterator it = topItems->begin(); it != topItems->end(); ++it){
+			if((*it)->hasProperty(prop))
+				return true;
+		}
 	}
 
-	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-		if((*iit)->hasProperty(prop))
-			return true;
+	if(downItems){
+		for(ItemVector::const_iterator it = downItems->begin(); it != downItems->end(); ++it){
+			if((*it)->hasProperty(prop))
+				return true;
+		}
 	}
 
 	return false;
@@ -69,17 +72,20 @@ bool Tile::hasProperty(Item* exclude, enum ITEMPROPERTY prop) const
 		return true;
 	}
 
-	ItemVector::const_iterator iit;
-	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-		Item* item = *iit;
-		if(item != exclude && item->hasProperty(prop))
-			return true;
+	if(topItems){
+		for(ItemVector::const_iterator it = topItems->begin(); it != topItems->end(); ++it){
+			Item* item = *it;
+			if(item != exclude && item->hasProperty(prop))
+				return true;
+		}
 	}
 
-	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-		Item* item = *iit;
-		if(item != exclude && item->hasProperty(prop))
-			return true;
+	if(downItems){
+		for(ItemVector::const_iterator it = downItems->begin(); it != downItems->end(); ++it){
+			Item* item = *it;
+			if(item != exclude && item->hasProperty(prop))
+				return true;
+		}
 	}
 
 	return false;
@@ -144,11 +150,11 @@ std::string Tile::getDescription(int32_t lookDistance) const
 
 Teleport* Tile::getTeleportItem() const
 {
-	Teleport* teleport = NULL;
-	for(ItemVector::const_iterator iit = topItems.begin(); iit != topItems.end(); ++iit){
-		teleport = (*iit)->getTeleport();
-		if(teleport)
-			return teleport;
+	if(topItems){
+		for(ItemVector::const_iterator it = topItems->begin(); it != topItems->end(); ++it){
+			if((*it)->getTeleport())
+				return (*it)->getTeleport();
+		}
 	}
 
 	return NULL;
@@ -160,11 +166,11 @@ MagicField* Tile::getFieldItem() const
 		return NULL;
 	}
 
-	MagicField* field = NULL;
-	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
-		field = (*iit)->getMagicField();
-		if(field)
-			return field;
+	if(downItems){
+		for(ItemVector::const_iterator it = downItems->begin(); it != downItems->end(); ++it){
+			if((*it)->getMagicField())
+				return (*it)->getMagicField();
+		}
 	}
 
 	return NULL;
@@ -212,8 +218,8 @@ BedItem* Tile::getBedItem() const
 
 Creature* Tile::getTopCreature()
 {
-	if(!creatures.empty()){
-		return *(creatures.begin());
+	if(creatures && !creatures->empty()){
+		return *(creatures->begin());
 	}
 
 	return NULL;
@@ -221,8 +227,8 @@ Creature* Tile::getTopCreature()
 
 Item* Tile::getTopDownItem()
 {
-	if(!downItems.empty()){
-		return *(downItems.begin());
+	if(downItems && !downItems->empty()){
+		return *(downItems->begin());
 	}
 
 	return NULL;
@@ -235,9 +241,11 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	//2: ladders, signs, splashes
 	//3: doors etc
 	//4: creatures
-	for(ItemVector::reverse_iterator it = topItems.rbegin(); it != topItems.rend(); ++it){
-		if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
-			return (*it);
+	if(topItems){
+		for(ItemVector::reverse_iterator it = topItems->rbegin(); it != topItems->rend(); ++it){
+			if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
+				return (*it);
+			}
 		}
 	}
 
@@ -246,8 +254,8 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 
 Item* Tile::getTopTopItem()
 {
-	if(!topItems.empty()){
-		return topItems.back();
+	if(topItems && !topItems->empty()){
+		return topItems->back();
 	}
 
 	return NULL;
@@ -449,18 +457,20 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 
 			if(monster->canPushCreatures() && !monster->isSummon()){
-				Creature* creature;
-				for(uint32_t i = 0; i < creatures.size(); ++i){
-					creature = creatures[i];
-					if( !creature->getMonster() ||
-						!creature->isPushable() ||
-						(creature->getMonster()->isSummon() && creature->getMonster()->getMaster()->getPlayer()))
-					{
-						return RET_NOTPOSSIBLE;
+				if(creatures){
+					Creature* creature;
+					for(uint32_t i = 0; i < creatures->size(); ++i){
+						creature = (*creatures)[i];
+						if( !creature->getMonster() ||
+							!creature->isPushable() ||
+							(creature->getMonster()->isSummon() && creature->getMonster()->getMaster()->getPlayer()))
+						{
+							return RET_NOTPOSSIBLE;
+						}
 					}
 				}
 			}
-			else if(!creatures.empty()){
+			else if(creatures && !creatures->empty()){
 				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 
@@ -503,7 +513,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
-			if(!creatures.empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+			if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 				return RET_NOTENOUGHROOM;
 			}
 
@@ -531,7 +541,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 		else{
-			if(!creatures.empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+			if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 			}
 		}
@@ -568,7 +578,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOTPOSSIBLE;
 		}
 
-		if(!creatures.empty() && item->isBlocking() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+		if(creatures && !creatures->empty() && item->isBlocking() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 			return RET_NOTENOUGHROOM;
 		}
 
@@ -715,7 +725,10 @@ void Tile::__addThing(int32_t index, Thing* thing)
 	if(creature){
 		g_game.clearSpectatorCache();
 		creature->setParent(this);
-		creatures.insert(creatures.begin(), creature);
+		if(!creatures){
+			creatures = new CreatureVector;
+		}
+		creatures->insert(creatures->begin(), creature);
 		++thingCount;
 	}
 	else{
@@ -751,32 +764,40 @@ void Tile::__addThing(int32_t index, Thing* thing)
 		else if(item->isAlwaysOnTop()){
 			if(item->isSplash()){
 				//remove old splash if exists
-				ItemVector::iterator iit;
-				for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-					if((*iit)->isSplash()){
-						Item* oldSplash = *iit;
-						__removeThing(oldSplash, 1);
-						oldSplash->setParent(NULL);
-						g_game.FreeThing(oldSplash);
-						break;
+				if(topItems){
+					for(ItemVector::iterator it = topItems->begin(); it != topItems->end(); ++it){
+						if((*it)->isSplash()){
+							Item* oldSplash = *it;
+							__removeThing(oldSplash, 1);
+							oldSplash->setParent(NULL);
+							g_game.FreeThing(oldSplash);
+							break;
+						}
 					}
 				}
 			}
 
 			bool isInserted = false;
-			ItemVector::iterator iit;
-			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-				//Note: this is different from internalAddThing
-				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
-					topItems.insert(iit, item);
-					++thingCount;
-					isInserted = true;
-					break;
+			if(topItems){
+				for(ItemVector::iterator it = topItems->begin(); it != topItems->end(); ++it){
+					//Note: this is different from internalAddThing
+					if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*it)->getID()].alwaysOnTopOrder){
+						if(!topItems){
+							topItems = new ItemVector;
+						}
+						topItems->insert(it, item);
+						++thingCount;
+						isInserted = true;
+						break;
+					}
 				}
 			}
 
 			if(!isInserted){
-				topItems.push_back(item);
+				if(!topItems){
+					topItems = new ItemVector;
+				}
+				topItems->push_back(item);
 				++thingCount;
 			}
 
@@ -786,27 +807,31 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			if(item->isMagicField()){
 				//remove old field item if exists
 				MagicField* oldField = NULL;
-				ItemVector::iterator iit;
-				for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-					if((oldField = (*iit)->getMagicField())){
-						if(oldField->isReplaceable()){
-							__removeThing(oldField, 1);
+				if(downItems){
+					for(ItemVector::iterator it = downItems->begin(); it != downItems->end(); ++it){
+						if((oldField = (*it)->getMagicField())){
+							if(oldField->isReplaceable()){
+								__removeThing(oldField, 1);
 
-							oldField->setParent(NULL);
-							g_game.FreeThing(oldField);
-							break;
-						}
-						else{
-							//This magic field cannot be replaced.
-							item->setParent(NULL);
-							g_game.FreeThing(item);
-							return;
+								oldField->setParent(NULL);
+								g_game.FreeThing(oldField);
+								break;
+							}
+							else{
+								//This magic field cannot be replaced.
+								item->setParent(NULL);
+								g_game.FreeThing(item);
+								return;
+							}
 						}
 					}
 				}
 			}
 
-			downItems.insert(downItems.begin(), item);
+			if(!downItems){
+				downItems = new ItemVector;
+			}
+			downItems->insert(downItems->begin(), item);
 			++thingCount;
 			onAddTileItem(item);
 		}
@@ -867,20 +892,22 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 		--pos;
 	}
 
-	if(!isInserted && pos < (int32_t)topItems.size()){
-		ItemVector::iterator it = topItems.begin();
+	if(!isInserted && topItems && pos < (int32_t)topItems->size()){
+		ItemVector::iterator it = topItems->begin();
 		it += pos;
 		pos = 0;
 
 		oldItem = (*it);
-		it = topItems.erase(it);
-		topItems.insert(it, item);
+		it = topItems->erase(it);
+		topItems->insert(it, item);
 		isInserted = true;
 	}
 
-	pos -= (uint32_t)topItems.size();
+	if(topItems){
+		pos -= (uint32_t)topItems->size();
+	}
 
-	if(!isInserted && pos < (int32_t)creatures.size()){
+	if(!isInserted && creatures && pos < (int32_t)creatures->size()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
 		DEBUG_REPORT
@@ -888,16 +915,16 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
-	pos -= (uint32_t)creatures.size();
+	pos -= (uint32_t)creatures->size();
 
-	if(!isInserted && pos < (int32_t)downItems.size()){
-		ItemVector::iterator it = downItems.begin();
+	if(!isInserted && downItems && pos < (int32_t)downItems->size()){
+		ItemVector::iterator it = downItems->begin();
 		it += pos;
 		pos = 0;
 
 		oldItem = (*it);
-		it = downItems.erase(it);
-		downItems.insert(it, item);
+		it = downItems->erase(it);
+		downItems->insert(it, item);
 		isInserted = true;
 	}
 
@@ -922,20 +949,33 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 {
 	Creature* creature = thing->getCreature();
 	if(creature){
-		CreatureVector::iterator it = std::find(creatures.begin(), creatures.end(), thing);
+		if(creatures){
+			CreatureVector::iterator it = std::find(creatures->begin(), creatures->end(), thing);
 
-		if(it == creatures.end()){
+			if(it == creatures->end()){
 #ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Tile::__removeThing] creature not found" << std::endl;
-		DEBUG_REPORT
+				std::cout << "Failure: [Tile::__removeThing] creature not found" << std::endl;
+				DEBUG_REPORT
 #endif
-		return; //RET_NOTPOSSIBLE;
-		}
+				return; //RET_NOTPOSSIBLE;
+			}
 
-		g_game.clearSpectatorCache();
-		creatures.erase(it);
-		--thingCount;
-		return;
+			g_game.clearSpectatorCache();
+			creatures->erase(it);
+			if(creatures->empty()){
+				delete creatures;
+				creatures = NULL;
+			}
+			--thingCount;
+			return;
+		}
+		else{
+#ifdef __DEBUG__MOVESYS__
+			std::cout << "Failure: [Tile::__removeThing] creature not found" << std::endl;
+			DEBUG_REPORT
+#endif
+			return; //RET_NOTPOSSIBLE;
+		}
 	}
 	else{
 		Item* item = thing->getItem();
@@ -965,36 +1005,47 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 			return /*RET_NOERROR*/;
 		}
 
-		ItemVector::iterator iit;
 		if(item->isAlwaysOnTop()){
-			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-				if(*iit == item){
-					(*iit)->setParent(NULL);
-					topItems.erase(iit);
-					--thingCount;
-					onRemoveTileItem(index, item);
-					return /*RET_NOERROR*/;
+			if(topItems){
+				for(ItemVector::iterator it = topItems->begin(); it != topItems->end(); ++it){
+					if(*it == item){
+						(*it)->setParent(NULL);
+						topItems->erase(it);
+						if(topItems->empty()){
+							delete topItems;
+							topItems = NULL;
+						}
+						--thingCount;
+						onRemoveTileItem(index, item);
+						return /*RET_NOERROR*/;
+					}
 				}
 			}
 		}
 		else{
-			for (iit = downItems.begin(); iit != downItems.end(); ++iit){
-				if(*iit == item){
-					if(item->isStackable() && count != item->getItemCount()){
-						uint8_t newCount = (uint8_t)std::max((int32_t)0, (int32_t)(item->getItemCount() - count));
-						item->setItemCount(newCount);
+			if(downItems){
+				for (ItemVector::iterator it = downItems->begin(); it != downItems->end(); ++it){
+					if((*it) == item){
+						if(item->isStackable() && count != item->getItemCount()){
+							uint8_t newCount = (uint8_t)std::max((int32_t)0, (int32_t)(item->getItemCount() - count));
+							item->setItemCount(newCount);
 
-						const ItemType& it = Item::items[item->getID()];
-						onUpdateTileItem(index, item, it, item, it);
-					}
-					else{
-						(*iit)->setParent(NULL);
-						downItems.erase(iit);
-						--thingCount;
-						onRemoveTileItem(index, item);
-					}
+							const ItemType& it = Item::items[item->getID()];
+							onUpdateTileItem(index, item, it, item, it);
+						}
+						else{
+							(*it)->setParent(NULL);
+							downItems->erase(it);
+							if(downItems->empty()){
+								delete downItems;
+								downItems = NULL;
+							}
+							--thingCount;
+							onRemoveTileItem(index, item);
+						}
 
-					return /*RET_NOERROR*/;
+						return /*RET_NOERROR*/;
+					}
 				}
 			}
 		}
@@ -1017,24 +1068,28 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 		++n;
 	}
 
-	ItemVector::const_iterator iit;
-	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-		++n;
-		if((*iit) == thing)
-			return n;
+	if(topItems){
+		for(ItemVector::const_iterator it = topItems->begin(); it != topItems->end(); ++it){
+			++n;
+			if((*it) == thing)
+				return n;
+		}
 	}
 
-	CreatureVector::const_iterator cit;
-	for(cit = creatures.begin(); cit != creatures.end(); ++cit){
-		++n;
-		if((*cit) == thing)
-			return n;
+	if(creatures){
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			++n;
+			if((*cit) == thing)
+				return n;
+		}
 	}
 
-	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-		++n;
-		if((*iit) == thing)
-			return n;
+	if(downItems){
+		for(ItemVector::const_iterator it = downItems->begin(); it != downItems->end(); ++it){
+			++n;
+			if((*it) == thing)
+				return n;
+		}
 	}
 
 	return -1;
@@ -1088,18 +1143,27 @@ Thing* Tile::__getThing(uint32_t index) const
 		--index;
 	}
 
-	if((unsigned) index < topItems.size())
-		return topItems[index];
+	if(topItems){
+		if(index < (uint32_t)topItems->size())
+			return topItems->at(index);
+			//return (*topItems)[index];
 
-	index -= (uint32_t)topItems.size();
+		index -= (uint32_t)topItems->size();
+	}
 
-	if((unsigned) index < creatures.size())
-		return creatures[index];
+	if(creatures){
+		if(index < (uint32_t)creatures->size())
+			return creatures->at(index);
+			//return creatures[index];
 
-	index -= (uint32_t)creatures.size();
+		index -= (uint32_t)creatures->size();
+	}
 
-	if((unsigned) index < downItems.size())
-		return downItems[index];
+	if(downItems){
+		if(index < (uint32_t)downItems->size())
+			return downItems->at(index);
+			//return downItems[index];
+	}
 
 	return NULL;
 }
@@ -1207,7 +1271,10 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 	Creature* creature = thing->getCreature();
 	if(creature){
 		g_game.clearSpectatorCache();
-		creatures.insert(creatures.begin(), creature);
+		if(!creatures){
+			creatures = new CreatureVector;
+		}
+		creatures->insert(creatures->begin(), creature);
 		++thingCount;
 	}
 	else{
@@ -1224,27 +1291,36 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 		}
 		else if(item->isAlwaysOnTop()){
 			bool isInserted = false;
-			ItemVector::iterator iit;
-			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-				if(Item::items[(*iit)->getID()].alwaysOnTopOrder > Item::items[item->getID()].alwaysOnTopOrder){
-					topItems.insert(iit, item);
-					++thingCount;
-					isInserted = true;
-					break;
+			if(topItems){
+				for(ItemVector::iterator it = topItems->begin(); it != topItems->end(); ++it){
+					if(Item::items[(*it)->getID()].alwaysOnTopOrder > Item::items[item->getID()].alwaysOnTopOrder){
+						topItems->insert(it, item);
+						++thingCount;
+						isInserted = true;
+						break;
+					}
 				}
 			}
 
 			if(!isInserted){
-				topItems.push_back(item);
+				if(!topItems){
+					topItems = new ItemVector;
+				}
+
+				topItems->push_back(item);
 				++thingCount;
 			}
 		}
 		else{
-			if(!downItems.empty()){
-				downItems.insert(downItems.begin(), item);
+			if(downItems && !downItems->empty()){
+				downItems->insert(downItems->begin(), item);
 			}
 			else{
-				downItems.push_back(item);
+				if(!downItems){
+					downItems = new ItemVector;
+				}
+
+				downItems->push_back(item);
 			}
 			++thingCount;
 		}

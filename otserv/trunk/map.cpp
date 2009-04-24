@@ -201,8 +201,10 @@ void Map::setTile(uint16_t x, uint16_t y, uint16_t z, Tile* newtile)
 	if(newtile->hasFlag(TILESTATE_REFRESH)){
 		RefreshBlock_t rb;
 		rb.lastRefresh = OTSYS_TIME();
-		for(ItemVector::iterator it = newtile->downItems.begin(); it != newtile->downItems.end(); ++it){
-			rb.list.push_back((*it)->clone());
+		if(newtile->downItems){
+			for(ItemVector::iterator it = newtile->downItems->begin(); it != newtile->downItems->end(); ++it){
+				rb.list.push_back((*it)->clone());
+			}
 		}
 		refreshTileMap[newtile] = rb;
 	}
@@ -1127,7 +1129,7 @@ int32_t AStarNodes::getMapWalkCost(const Creature* creature, AStarNode* node,
 int32_t AStarNodes::getTileWalkCost(const Creature* creature, const Tile* tile)
 {
 	int cost = 0;
-	if(!tile->creatures.empty()){
+	if(tile->creatures){
 		//destroy creature cost
 		cost += MAP_NORMALWALKCOST * 3;
 	}

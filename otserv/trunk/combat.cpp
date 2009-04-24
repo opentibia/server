@@ -141,8 +141,8 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	if(area){
 		area->getList(centerPos, targetPos, list);
 	}
-	else if(targetPos.x >= ((uint16_t)0) && targetPos.y >= ((uint16_t)0) && targetPos.z >= ((uint16_t)0) &&
-			targetPos.x <= ((uint16_t)0xFFFF) && targetPos.y <= ((uint16_t)0xFFFF) && targetPos.z < MAP_MAX_LAYERS)
+	else if(((uint32_t)targetPos.x) >= 0 && ((uint32_t)targetPos.y) >= 0 && ((uint32_t)targetPos.z) >= 0 &&
+			((uint32_t)targetPos.x) <= 0xFFFF && ((uint32_t)targetPos.y) <= 0xFFFF && ((uint32_t)targetPos.z) < MAP_MAX_LAYERS)
 	{
 		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 		if(!tile) {
@@ -771,27 +771,29 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 		bool bContinue = true;
 
 		if(canDoCombat(caster, *it, params.isAggressive) == RET_NOERROR){
-			for(CreatureVector::iterator cit = (*it)->creatures.begin(); bContinue && cit != (*it)->creatures.end(); ++cit){
-				if(params.targetCasterOrTopMost){
-					if(caster && caster->getTile() == (*it)){
-						if(*cit == caster){
+			if((*it)->creatures){
+				for(CreatureVector::iterator cit = (*it)->creatures->begin(); bContinue && cit != (*it)->creatures->end(); ++cit){
+					if(params.targetCasterOrTopMost){
+						if(caster && caster->getTile() == (*it)){
+							if(*cit == caster){
+								bContinue = false;
+							}
+						}
+						else if(*cit == (*it)->getTopCreature()){
 							bContinue = false;
 						}
-					}
-					else if(*cit == (*it)->getTopCreature()){
-						bContinue = false;
+
+						if(bContinue){
+							continue;
+						}
 					}
 
-					if(bContinue){
-						continue;
-					}
-				}
+					if(!params.isAggressive || (caster != *cit && Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
+						func(caster, *cit, params, data);
 
-				if(!params.isAggressive || (caster != *cit && Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
-					func(caster, *cit, params, data);
-
-					if(params.targetCallback){
-						params.targetCallback->onTargetCombat(caster, *cit);
+						if(params.targetCallback){
+							params.targetCallback->onTargetCombat(caster, *cit);
+						}
 					}
 				}
 			}

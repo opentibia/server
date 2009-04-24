@@ -243,20 +243,22 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 	for(; *map_iter != end_here && (clean_max == 0? true : (cleaned < clean_max)); ++*map_iter, ++cleaned){
 		tile = (*map_iter)->first;
 
-		//remove garbage
-		int32_t downItemSize = tile->downItems.size();
-		for(int32_t i = downItemSize - 1; i >= 0; --i){
-			item = tile->downItems[i];
-			if(item){
+		if(tile->downItems){
+			//remove garbage
+			int32_t downItemSize = tile->downItems->size();
+			for(int32_t i = downItemSize - 1; i >= 0; --i){
+				item = tile->downItems->at(i);
+				if(item){
 #ifndef __DEBUG__
-				// So the compiler doesn't generates warnings
-				internalRemoveItem(item);
+					// So the compiler doesn't generates warnings
+					internalRemoveItem(item);
 #else
-				ReturnValue ret = internalRemoveItem(item);
-				if(ret != RET_NOERROR){
-					std::cout << "Could not refresh item: " << item->getID() << "pos: " << tile->getPosition() << std::endl;
-				}
+					ReturnValue ret = internalRemoveItem(item);
+					if(ret != RET_NOERROR){
+						std::cout << "Could not refresh item: " << item->getID() << "pos: " << tile->getPosition() << std::endl;
+					}
 #endif
+				}
 			}
 		}
 
