@@ -152,7 +152,7 @@ CREATE TABLE `bans` (
     `expires` INT UNSIGNED NOT NULL,
     `added` INT UNSIGNED NOT NULL,
     `admin_id` INT UNSIGNED NOT NULL DEFAULT 0,
-    `comment` TEXT NOT NULL DEFAULT '',
+    `comment` TEXT NOT NULL,
     `reason` INT UNSIGNED NOT NULL DEFAULT 0,
     `action` INT UNSIGNED NOT NULL DEFAULT 0,
     `statement` VARCHAR(255) NOT NULL DEFAULT '',

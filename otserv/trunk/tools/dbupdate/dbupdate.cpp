@@ -214,7 +214,7 @@ SimpleUpdateQuery updateQueries[] = {
 			"ALTER TABLE `accounts` DROP `deleted`;",
 			"ALTER TABLE `accounts` DROP `warned`;",
 			"ALTER TABLE `accounts` ADD `warnings` INT NOT NULL DEFAULT 0;",
-			"ALTER TABLE `bans` CHANGE `comment` TEXT NOT NULL DEFAULT '';",
+			"ALTER TABLE `bans` CHANGE `comment` TEXT NOT NULL;",
 			"ALTER TABLE `bans` ADD `action` INT UNSIGNED NOT NULL DEFAULT 0;",
 			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';",
 			NULL
@@ -225,7 +225,7 @@ SimpleUpdateQuery updateQueries[] = {
 			"ALTER TABLE `accounts` DROP `deleted`;",
 			"ALTER TABLE `accounts` DROP `warned`;",
 			"ALTER TABLE `accounts` ADD `warnings` INT NOT NULL DEFAULT 0;",
-			"ALTER TABLE `bans` CHANGE `comment` TEXT NOT NULL DEFAULT '';",
+			"ALTER TABLE `bans` MODIFY COLUMN `comment` TEXT NOT NULL DEFAULT '';",
 			"ALTER TABLE `bans` ADD `action` INT UNSIGNED NOT NULL DEFAULT 0;",
 			"ALTER TABLE `bans` ADD `statement` VARCHAR(255) NOT NULL DEFAULT '';",
 			NULL
