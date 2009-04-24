@@ -109,7 +109,7 @@ public:
 	~ServiceManager();
 
 	// Run and start all servers
-	void run() { m_io_service.run(); }
+	void run();
 	void stop();
 
 	// Adds a new service to be managed
@@ -119,9 +119,13 @@ public:
 	bool is_running() const {return m_acceptors.empty() == false;}
 	std::list<uint16_t> get_ports() const;
 protected:
+	void die();
+
 	std::map<uint16_t, ServicePort_ptr> m_acceptors;
 
 	boost::asio::io_service m_io_service;
+	boost::asio::deadline_timer death_timer;
+	bool running;
 };
 
 template <typename ProtocolType>

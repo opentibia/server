@@ -270,6 +270,8 @@ int main(int argc, char *argv[])
 #if defined __EXCEPTION_TRACER__
 	mainExceptionHandler.RemoveHandler();
 #endif
+	// Don't run destructors, may hang!
+	exit(0);
 }
 
 bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)

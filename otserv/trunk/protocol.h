@@ -32,7 +32,7 @@ class Connection;
 class RSA;
 
 #define CLIENT_VERSION_MIN 841
-#define CLIENT_VERSION_MAX 841
+#define CLIENT_VERSION_MAX 842
 
 #define STRING_CLIENT_VERSION "This server requires client version " OTSERV_CLIENT_VERSION "."
 
