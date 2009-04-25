@@ -28,9 +28,10 @@
 #include "enums.h"
 
 struct Outfit{
-	Outfit() : looktype(0), addons(0) {}
+	Outfit() : looktype(0), addons(0), premium(false) {}
 	uint32_t looktype;
 	uint32_t addons;
+	bool premium;
 };
 
 typedef std::list<Outfit*> OutfitListType;
@@ -44,7 +45,7 @@ public:
 	void addOutfit(const Outfit& outfit);
 	bool remOutfit(const Outfit& outfit);
 	const OutfitListType& getOutfits() const {return m_list;}
-	bool isInList(uint32_t looktype, uint32_t addons) const;
+	bool isInList(uint32_t playerId, uint32_t looktype, uint32_t addons) const;
 	
 private:
 	OutfitListType m_list;

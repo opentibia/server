@@ -26,7 +26,9 @@
 #include "creature.h"
 #include "player.h"
 #include "tools.h"
+#include "game.h"
 
+extern Game g_game;
 
 OutfitList::OutfitList()
 {
@@ -55,6 +57,7 @@ void OutfitList::addOutfit(const Outfit& outfit)
 	Outfit* new_outfit = new Outfit;
 	new_outfit->looktype = outfit.looktype;
 	new_outfit->addons = outfit.addons;
+	new_outfit->premium = outfit.premium;
 	m_list.push_back(new_outfit);
 }
 
@@ -76,17 +79,29 @@ bool OutfitList::remOutfit(const Outfit& outfit)
 	return false;
 }
 
-bool OutfitList::isInList(uint32_t looktype, uint32_t addons) const
+bool OutfitList::isInList(uint32_t playerId, uint32_t looktype, uint32_t addons) const
 {
-	OutfitListType::const_iterator it;
-	for(it = m_list.begin(); it != m_list.end(); ++it){
-		if((*it)->looktype == looktype){
-			if(((*it)->addons & addons) == addons){
-				return true;
-			}
-			else{
+	Player* player = g_game.getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+		
+	OutfitListType::const_iterator it, pit;
+	const OutfitListType& sex_outfits = Outfits::getInstance()->getOutfits(player->getSex());
+	for(it = sex_outfits.begin(); it != sex_outfits.end(); ++it){
+		if((*it)->looktype != looktype)
+			continue;
+			
+		if((*it)->premium && !player->isPremium())
+			return false;
+			
+		for(pit = m_list.begin(); pit != m_list.end(); ++pit){
+			if((*pit)->looktype != looktype)
+				continue;
+				
+			if(((*pit)->addons & addons) != addons)
 				return false;
-			}
+			else
+				return true;
 		}
 	}
 	return false;
@@ -97,6 +112,7 @@ Outfits::Outfits()
 	Outfit outfit;
 	//build default outfit lists
 	outfit.addons = 0;
+	outfit.premium = false;
 	for(int i = PLAYER_FEMALE_1; i <= PLAYER_FEMALE_7; i++){
 		outfit.looktype = i;
 		m_female_list.addOutfit(outfit);
@@ -168,6 +184,10 @@ bool Outfits::loadFromXml(const std::string& datadir)
 
 						if(readXMLInteger(p, "addons", intVal)){
 							outfit.addons = intVal;
+						}
+
+						if(readXMLInteger(p, "premium", intVal)){
+							outfit.premium = (intVal != 0);
 						}
 
 						if(readXMLInteger(p, "enabled", intVal)){

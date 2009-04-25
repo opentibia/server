@@ -4043,7 +4043,7 @@ const OutfitListType& Player::getPlayerOutfits()
 
 bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 {
-	return m_playerOutfits.isInList(_looktype, _addons);
+	return m_playerOutfits.isInList(getID(), _looktype, _addons);
 }
 
 bool Player::canLogout()
@@ -4077,7 +4077,7 @@ void Player::genReservedStorageRange()
 	for(it = outfits.begin(); it != outfits.end(); ++it){
 		uint32_t looktype = (*it)->looktype;
 		uint32_t addons = (*it)->addons;
-		if(!global_outfits.isInList(looktype, addons)){
+		if(!global_outfits.isInList(getID(), looktype, addons)){
 			int32_t value = (looktype << 16) | (addons & 0xFF);
 			storageMap[base_key] = value;
 			base_key++;
