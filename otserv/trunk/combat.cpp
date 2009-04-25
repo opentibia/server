@@ -141,9 +141,7 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	if(area){
 		area->getList(centerPos, targetPos, list);
 	}
-	else if(((uint32_t)targetPos.x) >= 0 && ((uint32_t)targetPos.y) >= 0 && ((uint32_t)targetPos.z) >= 0 &&
-			((uint32_t)targetPos.x) <= 0xFFFF && ((uint32_t)targetPos.y) <= 0xFFFF && ((uint32_t)targetPos.z) < MAP_MAX_LAYERS)
-	{
+	else{
 		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 		if(!tile) {
 			// These tiles will never have anything on them

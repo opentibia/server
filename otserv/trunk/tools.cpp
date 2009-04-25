@@ -27,7 +27,9 @@
 
 #include "math.h"
 #include <sstream>
+#include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 extern ConfigManager g_config;
 
