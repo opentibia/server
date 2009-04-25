@@ -923,42 +923,46 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 	}
 	
 	ItemVector* topItems = getTopItems();
-	if(!isInserted && topItems && pos < (int32_t)topItems->size()){
-		ItemVector::iterator it = topItems->begin();
-		it += pos;
-		pos = 0;
-
-		oldItem = (*it);
-		it = topItems->erase(it);
-		topItems->insert(it, item);
-		isInserted = true;
-	}
-
 	if(topItems){
+		if(!isInserted && pos < (int32_t)topItems->size()){
+			ItemVector::iterator it = topItems->begin();
+			it += pos;
+			pos = 0;
+
+			oldItem = (*it);
+			it = topItems->erase(it);
+			topItems->insert(it, item);
+			isInserted = true;
+		}
+
 		pos -= (uint32_t)topItems->size();
 	}
 	
 	CreatureVector* creatures = getCreatures();
-	if(!isInserted && creatures && pos < (int32_t)creatures->size()){
-#ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
-		DEBUG_REPORT
-#endif
-		return /*RET_NOTPOSSIBLE*/;
+	if(creatures){
+		if(!isInserted && pos < (int32_t)creatures->size()){
+	#ifdef __DEBUG__MOVESYS__
+			std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
+			DEBUG_REPORT
+	#endif
+			return /*RET_NOTPOSSIBLE*/;
+		}
+
+		pos -= (uint32_t)creatures->size();
 	}
 
-	pos -= (uint32_t)creatures->size();
-
 	ItemVector* downItems = getDownItems();
-	if(!isInserted && downItems && pos < (int32_t)downItems->size()){
-		ItemVector::iterator it = downItems->begin();
-		it += pos;
-		pos = 0;
+	if(downItems){
+		if(!isInserted && pos < (int32_t)downItems->size()){
+			ItemVector::iterator it = downItems->begin();
+			it += pos;
+			pos = 0;
 
-		oldItem = (*it);
-		it = downItems->erase(it);
-		downItems->insert(it, item);
-		isInserted = true;
+			oldItem = (*it);
+			it = downItems->erase(it);
+			downItems->insert(it, item);
+			isInserted = true;
+		}
 	}
 
 	if(isInserted){
