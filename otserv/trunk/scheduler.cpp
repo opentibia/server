@@ -118,8 +118,8 @@ void Scheduler::schedulerThread(void* p)
 uint32_t Scheduler::addEvent(SchedulerTask* task)
 {
 	bool do_signal = false;
+	m_eventLock.lock();
 	if(Scheduler::m_threadState == Scheduler::STATE_RUNNING){
-		m_eventLock.lock();
 
 		// check if the event has a valid id
 		if(task->getEventId() == 0){
@@ -143,14 +143,14 @@ uint32_t Scheduler::addEvent(SchedulerTask* task)
 #ifdef __DEBUG_SCHEDULER__
 		std::cout << "Scheduler: Added event " << task->getEventId() << std::endl;
 #endif
-
-		m_eventLock.unlock();
 	}
 #ifdef __DEBUG_SCHEDULER__
 	else{
 		std::cout << "Error: [Scheduler::addTask] Scheduler thread is terminated." << std::endl;
 	}
 #endif
+
+	m_eventLock.unlock();
 
 	if(do_signal){
 		m_eventSignal.notify_one();

@@ -53,6 +53,8 @@ void Dispatcher::dispatcherThread(void* p)
 	std::cout << "Starting Dispatcher" << std::endl;
 	#endif
 
+	OutputMessagePool* outputPool;
+
 	// NOTE: second argument defer_lock is to prevent from immediate locking
 	boost::unique_lock<boost::mutex> taskLockUnique(dispatcher->m_taskLock, boost::defer_lock);
 
@@ -87,7 +89,11 @@ void Dispatcher::dispatcherThread(void* p)
 			OutputMessagePool::getInstance()->startExecutionFrame();
 			(*task)();
 			delete task;
-			OutputMessagePool::getInstance()->sendAll();
+
+			outputPool = OutputMessagePool::getInstance();
+			if(outputPool){
+				outputPool->sendAll();
+			}
 			g_game.clearSpectatorCache();
 			#ifdef __DEBUG_SCHEDULER__
 			std::cout << "Dispatcher: Executing task" << std::endl;
@@ -102,8 +108,8 @@ void Dispatcher::dispatcherThread(void* p)
 void Dispatcher::addTask(Task* task)
 {
 	bool do_signal = false;
+	m_taskLock.lock();
 	if(m_threadState == STATE_RUNNING){
-		m_taskLock.lock();
 
 		do_signal = m_taskList.empty();
 		m_taskList.push_back(task);
@@ -111,14 +117,14 @@ void Dispatcher::addTask(Task* task)
 		#ifdef __DEBUG_SCHEDULER__
 		std::cout << "Dispatcher: Added task" << std::endl;
 		#endif
-
-		m_taskLock.unlock();
 	}
 #ifdef __DEBUG_SCHEDULER__
 	else{
 		std::cout << "Error: [Dispatcher::addTask] Dispatcher thread is terminated." << std::endl;
 	}
 #endif
+
+	m_taskLock.unlock();
 
 	// send a signal if the list was empty
 	if(do_signal){
