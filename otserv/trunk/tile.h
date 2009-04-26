@@ -62,6 +62,7 @@ enum tileflags_t{
 	TILESTATE_IMMOVABLEBLOCKPATH		= 1 << 18,
 	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 1 << 19,
 	TILESTATE_NOFIELDBLOCKPATH			= 1 << 20,
+	TILESTATE_DYNAMIC_TILE				= 1 << 21,
 };
 
 class HouseTile;
@@ -74,17 +75,15 @@ public:
 	~Tile();
 
 	// Get the different content vectors
-	virtual ItemVector* getTopItems() = 0;
-	virtual CreatureVector* getCreatures() = 0;
-	virtual ItemVector* getDownItems() = 0;
-	virtual const ItemVector* getTopItems() const = 0;
-	virtual const CreatureVector* getCreatures() const = 0;
-	virtual const ItemVector* getDownItems() const = 0;
-	virtual ItemVector* makeTopItems() = 0;
-	virtual CreatureVector* makeCreatures() = 0;
-	virtual ItemVector* makeDownItems() = 0;
-	virtual void getThings(ItemVector*& topItems, CreatureVector*& creatures, ItemVector*& downItems) = 0;
-	virtual void getThings(const ItemVector*& topItems, const CreatureVector*& creatures, const ItemVector*& downItems) const = 0;
+	ItemVector* getTopItems();
+	CreatureVector* getCreatures();
+	ItemVector* getDownItems();
+	const ItemVector* getTopItems() const;
+	const CreatureVector* getCreatures() const;
+	const ItemVector* getDownItems() const;
+	ItemVector* makeTopItems();
+	CreatureVector* makeCreatures();
+	ItemVector* makeDownItems();
 
 	HouseTile* getHouseTile();
 	const HouseTile* getHouseTile() const;
@@ -188,6 +187,10 @@ private:
 
 	void updateTileFlags(Item* item, bool removing);
 
+protected:
+	// Put this first for cache-coherency
+	bool is_dynamic() const {return (m_flags & TILESTATE_DYNAMIC_TILE) != 0;}
+
 public:	
 	Item*			ground;
 	QTreeLeafNode*	qt_node;
@@ -211,27 +214,15 @@ public:
 	DynamicTile(uint16_t x, uint16_t y, uint16_t z);
 	~DynamicTile();
 	
-	virtual ItemVector* getTopItems() {return &topItems;}
-	virtual CreatureVector* getCreatures() {return &creatures;}
-	virtual ItemVector* getDownItems() {return &downItems;}
-	virtual const ItemVector* getTopItems() const {return &topItems;}
-	virtual const CreatureVector* getCreatures() const {return &creatures;}
-	virtual const ItemVector* getDownItems() const {return &downItems;}
-	virtual ItemVector* makeTopItems() {return &topItems;}
-	virtual CreatureVector* makeCreatures() {return &creatures;}
-	virtual ItemVector* makeDownItems() {return &downItems;}
-	
-	virtual void getThings(ItemVector*& topItems, CreatureVector*& creatures, ItemVector*& downItems){
-		topItems = &this->topItems;
-		creatures = &this->creatures;
-		downItems = &this->downItems;
-	}
-
-	virtual void getThings(const ItemVector*& topItems, const CreatureVector*& creatures, const ItemVector*& downItems) const{
-		topItems = &this->topItems;
-		creatures = &this->creatures;
-		downItems = &this->downItems;
-	}
+	ItemVector* getTopItems() {return &topItems;}
+	CreatureVector* getCreatures() {return &creatures;}
+	ItemVector* getDownItems() {return &downItems;}
+	const ItemVector* getTopItems() const {return &topItems;}
+	const CreatureVector* getCreatures() const {return &creatures;}
+	const ItemVector* getDownItems() const {return &downItems;}
+	ItemVector* makeTopItems() {return &topItems;}
+	CreatureVector* makeCreatures() {return &creatures;}
+	ItemVector* makeDownItems() {return &downItems;}
 };
 
 // For blocking tiles, where we very rarely actually have items
@@ -245,27 +236,15 @@ public:
 	StaticTile(uint16_t x, uint16_t y, uint16_t z);
 	~StaticTile();
 	
-	virtual ItemVector* getTopItems() {return topItems;}
-	virtual CreatureVector* getCreatures() {return creatures;}
-	virtual ItemVector* getDownItems() {return downItems;}
-	virtual const ItemVector* getTopItems() const {return topItems;}
-	virtual const CreatureVector* getCreatures() const {return creatures;}
-	virtual const ItemVector* getDownItems() const {return downItems;}
-	virtual ItemVector* makeTopItems() {return (topItems)? (topItems) : (topItems = new ItemVector);}
-	virtual CreatureVector* makeCreatures() {return (creatures)? (creatures) : (creatures = new CreatureVector);}
-	virtual ItemVector* makeDownItems() {return (downItems)? (downItems) : (downItems = new ItemVector);}
-	
-	virtual void getThings(ItemVector*& topItems, CreatureVector*& creatures, ItemVector*& downItems){
-		topItems = this->topItems;
-		creatures = this->creatures;
-		downItems = this->downItems;
-	}
-
-	virtual void getThings(const ItemVector*& topItems, const CreatureVector*& creatures, const ItemVector*& downItems) const{
-		topItems = this->topItems;
-		creatures = this->creatures;
-		downItems = this->downItems;
-	}
+	ItemVector* getTopItems() {return topItems;}
+	CreatureVector* getCreatures() {return creatures;}
+	ItemVector* getDownItems() {return downItems;}
+	const ItemVector* getTopItems() const {return topItems;}
+	const CreatureVector* getCreatures() const {return creatures;}
+	const ItemVector* getDownItems() const {return downItems;}
+	ItemVector* makeTopItems() {return (topItems)? (topItems) : (topItems = new ItemVector);}
+	CreatureVector* makeCreatures() {return (creatures)? (creatures) : (creatures = new CreatureVector);}
+	ItemVector* makeDownItems() {return (downItems)? (downItems) : (downItems = new ItemVector);}
 };
 
 inline Tile::Tile(uint16_t x, uint16_t y, uint16_t z) :
@@ -294,16 +273,71 @@ inline StaticTile::StaticTile(uint16_t x, uint16_t y, uint16_t z) :
 {}
 
 inline StaticTile::~StaticTile()
-{
-#ifdef _DEBUG
-#endif
-}
+{}
 
 inline DynamicTile::DynamicTile(uint16_t x, uint16_t y, uint16_t z) :
 	Tile(x, y, z)
-{}
+{
+	m_flags |= TILESTATE_DYNAMIC_TILE;
+}
 
 inline DynamicTile::~DynamicTile()
 {}
+
+
+// All these functions will hopefully be inlined, eliminating call overhead
+inline ItemVector* Tile::getTopItems(){
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::getTopItems();
+	return static_cast<StaticTile*>(this)->StaticTile::getTopItems();
+}
+
+inline CreatureVector* Tile::getCreatures(){
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::getCreatures();
+	return static_cast<StaticTile*>(this)->StaticTile::getCreatures();
+}
+
+inline ItemVector* Tile::getDownItems(){
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::getDownItems();
+	return static_cast<StaticTile*>(this)->StaticTile::getDownItems();
+}
+
+inline const ItemVector* Tile::getTopItems() const{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::getTopItems();
+	return static_cast<const StaticTile*>(this)->StaticTile::getTopItems();
+}
+
+inline const CreatureVector* Tile::getCreatures() const{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::getCreatures();
+	return static_cast<const StaticTile*>(this)->StaticTile::getCreatures();
+}
+
+inline const ItemVector* Tile::getDownItems() const{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::getDownItems();
+	return static_cast<const StaticTile*>(this)->StaticTile::getDownItems();
+}
+
+inline ItemVector* Tile::makeTopItems(){
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::makeTopItems();
+	return static_cast<StaticTile*>(this)->StaticTile::makeTopItems();
+}
+
+inline CreatureVector* Tile::makeCreatures(){
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::makeCreatures();
+	return static_cast<StaticTile*>(this)->StaticTile::makeCreatures();
+}
+
+inline ItemVector* Tile::makeDownItems(){
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::makeDownItems();
+	return static_cast<StaticTile*>(this)->StaticTile::makeDownItems();
+}
 
 #endif

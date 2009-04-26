@@ -1096,12 +1096,7 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 		++n;
 	}
 
-	const ItemVector*		topItems;
-	const CreatureVector*	creatures;
-	const ItemVector*		downItems;
-	getThings(topItems, creatures, downItems);
-
-	if(topItems){
+	if(const ItemVector* topItems = getTopItems()){
 		for(ItemVector::const_iterator it = topItems->begin(); it != topItems->end(); ++it){
 			++n;
 			if((*it) == thing)
@@ -1109,7 +1104,7 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 		}
 	}
 
-	if(creatures){
+	if(const CreatureVector* creatures = getCreatures()){
 		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
 			++n;
 			if((*cit) == thing)
@@ -1117,7 +1112,7 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 		}
 	}
 
-	if(downItems){
+	if(const ItemVector* downItems = getDownItems()){
 		for(ItemVector::const_iterator it = downItems->begin(); it != downItems->end(); ++it){
 			++n;
 			if((*it) == thing)
@@ -1176,12 +1171,7 @@ Thing* Tile::__getThing(uint32_t index) const
 		--index;
 	}
 
-	const ItemVector*		topItems;
-	const CreatureVector*	creatures;
-	const ItemVector*		downItems;
-	getThings(topItems, creatures, downItems);
-
-	if(topItems){
+	if(const ItemVector* topItems = getTopItems()){
 		if(index < (uint32_t)topItems->size())
 			return topItems->at(index);
 			//return (*topItems)[index];
@@ -1189,7 +1179,7 @@ Thing* Tile::__getThing(uint32_t index) const
 		index -= (uint32_t)topItems->size();
 	}
 
-	if(creatures){
+	if(const CreatureVector* creatures = getCreatures()){
 		if(index < (uint32_t)creatures->size())
 			return creatures->at(index);
 			//return creatures[index];
@@ -1197,7 +1187,7 @@ Thing* Tile::__getThing(uint32_t index) const
 		index -= (uint32_t)creatures->size();
 	}
 
-	if(downItems){
+	if(const ItemVector* downItems = getDownItems()){
 		if(index < (uint32_t)downItems->size())
 			return downItems->at(index);
 			//return downItems[index];
