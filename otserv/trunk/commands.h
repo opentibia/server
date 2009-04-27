@@ -51,7 +51,7 @@ protected:
 	bool broadcastMessage(Creature* creature, const std::string& cmd, const std::string& param);
 	bool banPlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param);
-	bool teleportHere(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool teleportHere(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool teleportToTown(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportTo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool createItemById(Creature* creature, const std::string& cmd, const std::string& param);
@@ -61,13 +61,13 @@ protected:
 	bool testCommand(Creature* creature, const std::string& cmd, const std::string& param);
 	bool testTutorialCommand(Creature* creature, const std::string& cmd, const std::string& param);
 	bool getInfo(Creature* creature, const std::string& cmd, const std::string& param);
-	bool saveServer(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool saveServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool shutdownServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool closeServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool openServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool onlineList(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param);
-	bool kickPlayer(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool kickPlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool exivaPlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param);
 	bool sellHouse(Creature* creature, const std::string& cmd, const std::string& param);

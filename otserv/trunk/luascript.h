@@ -579,6 +579,7 @@ protected:
 	static int luaGetCreatureTarget(lua_State *L);
 	static int luaGetCreatureHealth(lua_State *L);
 	static int luaGetCreatureMaxHealth(lua_State *L);
+	static int luaGetCreatureByName(lua_State *L);
 	static int luaGetCreatureMaster(lua_State *L);
 	static int luaGetCreatureSummons(lua_State *L);
 	static int luaGetSpectators(lua_State *L);

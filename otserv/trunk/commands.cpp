@@ -80,7 +80,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/B",&Commands::broadcastMessage},
 	//{"/b",&Commands::banPlayer},
 	//{"/t",&Commands::teleportMasterPos},
-	{"/c",&Commands::teleportHere},
+	//{"/c",&Commands::teleportHere},
 	{"/i",&Commands::createItemById},
 	{"/n",&Commands::createItemByName},
 	{"/q",&Commands::subtractMoney},
@@ -89,13 +89,13 @@ s_defcommands Commands::defined_commands[] = {
 	{"/zt",&Commands::testTutorialCommand},
 	{"/goto",&Commands::teleportTo},
 	{"/info",&Commands::getInfo},
-	{"/save",&Commands::saveServer},
+	//{"/save",&Commands::saveServer},
 	{"/shutdown",&Commands::shutdownServer},
 	{"/closeserver",&Commands::closeServer},
 	{"/openserver",&Commands::openServer},
 	{"/getonline",&Commands::onlineList},
 	{"/a",&Commands::teleportNTiles},
-	{"/kick",&Commands::kickPlayer},
+	//{"/kick",&Commands::kickPlayer},
 	{"/owner",&Commands::setHouseOwner},
 	{"/sellhouse",&Commands::sellHouse},
 	{"/gethouse",&Commands::getHouse},
@@ -333,20 +333,6 @@ bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, cons
 
 	g_game.internalBroadcastMessage(player, param);
 	return true;
-}
-
-bool Commands::teleportHere(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Creature* paramCreature = g_game.getCreatureByName(param);
-	if(paramCreature){
-		Position destPos = paramCreature->getPosition();
-		if(g_game.internalTeleport(paramCreature, creature->getPosition()) == RET_NOERROR){
-			g_game.addMagicEffect(destPos, NM_ME_ENERGY_AREA);
-			return true;
-		}
-	}
-
-	return false;
 }
 
 bool Commands::createItemById(Creature* creature, const std::string& cmd, const std::string& param)
@@ -639,19 +625,6 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 	return true;
 }
 
-bool Commands::saveServer(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	// Save most everything
-	g_game.saveServer(false);
-
-	// Notify player
-	if(Player* player = creature->getPlayer()){
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server has been saved.");
-	}
-
-	return true;
-}
-
 bool Commands::shutdownServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	// Save most everything
@@ -745,22 +718,6 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 	}
 
 	return true;
-}
-
-bool Commands::kickPlayer(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Player* playerKick = g_game.getPlayerByName(param);
-	if(playerKick){
-		Player* player = creature->getPlayer();
-		if(player && player->getAccessLevel() <= playerKick->getAccessLevel()){
-			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot kick this player.");
-			return true;
-		}
-
-		playerKick->kickPlayer();
-		return true;
-	}
-	return false;
 }
 
 bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param)

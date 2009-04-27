@@ -1649,6 +1649,9 @@ void LuaScriptInterface::registerFunctions()
 	//getCreatureMaxHealth(cid)
 	lua_register(m_luaState, "getCreatureMaxHealth", LuaScriptInterface::luaGetCreatureMaxHealth);
 
+	//getCreatureByName(name)
+	lua_register(m_luaState, "getCreatureByName", LuaScriptInterface::luaGetCreatureByName);
+
 	//getCreatureMaster(cid)
 	//returns the creature's master or itself if the creature isn't a summon
 	lua_register(m_luaState, "getCreatureMaster", LuaScriptInterface::luaGetCreatureMaster);
@@ -7091,6 +7094,24 @@ int LuaScriptInterface::luaGetCreatureMaxHealth(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 	}
 
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureByName(lua_State *L)
+{
+	//getCreatureByName(name)
+	std::string name = popString(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = g_game.getCreatureByName(name);
+	if(creature){
+		uint32_t cid = env->addThing(creature);
+		lua_pushnumber(L, cid);
+	}
+	else{
+		lua_pushnumber(L, LUA_NULL);
+	}
 	return 1;
 }
 

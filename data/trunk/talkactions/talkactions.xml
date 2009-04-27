@@ -13,4 +13,7 @@
 	<talkaction words="/t" script="teleportmasterpos.lua"/>
 	<talkaction words="/town" filter="first word" script="teleporttotown.lua"/>
 	<talkaction words="!frags" script="frags_status.lua"/>
+	<talkaction words="/save" script="saveserver.lua"/>
+	<talkaction words="/kick" filter="first word" script="kickplayer.lua"/>
+	<talkaction words="/c" filter="first word" script="teleporthere.lua"/>
 </talkactions>
