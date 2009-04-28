@@ -578,15 +578,18 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 
 		if(items){
-			for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-				const ItemType& iiType = Item::items[(*it)->getID()];
-				if(iiType.blockSolid){
-					if(hasBitSet(FLAG_IGNOREBLOCKITEM, flags)){
-						if(!iiType.moveable || (*it)->getUniqueId() != 0)
-							return RET_NOTPOSSIBLE;
+			for(uint32_t i = 0; i < getThingCount(); ++i){
+				iithing = __getThing(i);
+				if(const Item* iitem = iithing->getItem()){
+					const ItemType& iiType = Item::items[iitem->getID()];
+					if(iiType.blockSolid){
+						if(hasBitSet(FLAG_IGNOREBLOCKITEM, flags)){
+							if(!iiType.moveable || iitem->getUniqueId() != 0)
+								return RET_NOTPOSSIBLE;
+						}
+						else
+							return RET_NOTENOUGHROOM;
 					}
-					else
-						return RET_NOTENOUGHROOM;
 				}
 			}
 		}
@@ -620,32 +623,35 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		bool supportHangable = false;
 
 		if(items){
-			for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-				const ItemType& iiType = Item::items[(*it)->getID()];
+			for(uint32_t i = 0; i < getThingCount(); ++i){
+				iithing = __getThing(i);
+				if(const Item* iitem = iithing->getItem()){
+					const ItemType& iiType = Item::items[iitem->getID()];
 
-				if(iiType.isHangable){
-					hasHangable = true;
-				}
+					if(iiType.isHangable){
+						hasHangable = true;
+					}
 
-				if(iiType.isHorizontal || iiType.isVertical){
-					supportHangable = true;
-				}
+					if(iiType.isHorizontal || iiType.isVertical){
+						supportHangable = true;
+					}
 
-				if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
-					//
-				}
-				else if(iiType.blockSolid){
-					if(item->isPickupable()){
-						if(iiType.allowPickupable){
-							continue;
+					if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
+						//
+					}
+					else if(iiType.blockSolid){
+						if(item->isPickupable()){
+							if(iiType.allowPickupable){
+								continue;
+							}
+
+							if(!iiType.hasHeight || iiType.pickupable || iiType.isBed()){
+								return RET_NOTENOUGHROOM;
+							}
 						}
-
-						if(!iiType.hasHeight || iiType.pickupable || iiType.isBed()){
+						else{
 							return RET_NOTENOUGHROOM;
 						}
-					}
-					else{
-						return RET_NOTENOUGHROOM;
 					}
 				}
 			}
