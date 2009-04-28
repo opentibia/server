@@ -3164,7 +3164,7 @@ int LuaScriptInterface::luaGetTownNameById(lua_State *L)
 	uint32_t townId = popNumber(L);
 
 	Town* town = Towns::getInstance().getTown(townId);
-	if(town){0
+	if(town){
 		std::string townName = town->getName();
 		lua_pushstring(L, townName.c_str());
 	}
