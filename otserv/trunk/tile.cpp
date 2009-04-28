@@ -1054,7 +1054,6 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 					if(*it == item){
 						(*it)->setParent(NULL);
 						items->erase(it);
-						--items->downItemCount;
 						--thingCount;
 						onRemoveTileItem(index, item);
 						return /*RET_NOERROR*/;
