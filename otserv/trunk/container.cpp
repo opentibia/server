@@ -53,12 +53,14 @@ Item* Container::clone() const
 	return _item;
 }
 
-Container* Container::getParentContainer() {
+Container* Container::getParentContainer()
+{
 	if(Thing* thing = getParent()) {
 		if(Item* item = thing->getItem()) {
 			return item->getContainer();
 		}
 	}
+
 	return NULL;
 }
 
@@ -91,6 +93,10 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 				}
 				
 				addItem(item);
+				total_weight += item->getWeight();
+				if(Container* parent_container = getParentContainer()) {
+					parent_container->updateItemWeight(item->getWeight());
+				}
 			}
 			else /*unknown type*/
 				return false;
@@ -107,7 +113,7 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 void Container::updateItemWeight(double diff)
 {
 	total_weight += diff;
-	if(Container* parent_container = getParentContainer()) {
+	if(Container* parent_container = getParentContainer()){
 		parent_container->updateItemWeight(diff);
 	}
 }

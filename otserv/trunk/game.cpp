@@ -244,11 +244,11 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 	for(; *map_iter != end_here && (clean_max == 0? true : (cleaned < clean_max)); ++*map_iter, ++cleaned){
 		tile = (*map_iter)->first;
 
-		if(ItemVector* downItems = tile->getDownItems()){
+		if(TileItemVector* items = tile->getItemList()){
 			//remove garbage
-			int32_t downItemSize = downItems->size();
+			int32_t downItemSize = tile->getDownItemCount();
 			for(int32_t i = downItemSize - 1; i >= 0; --i){
-				item = downItems->at(i);
+				item = items->at(i);
 				if(item){
 #ifndef __DEBUG__
 					// So the compiler doesn't generates warnings
@@ -266,7 +266,7 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 		cleanup();
 
 		//restore to original state
-		ItemVector list = (*map_iter)->second.list;
+		TileItemVector list = (*map_iter)->second.list;
 		for(ItemVector::reverse_iterator it = list.rbegin(); it != list.rend(); ++it){
 			Item* item = (*it)->clone();
 			ReturnValue ret = internalAddItem(tile, item , INDEX_WHEREEVER, FLAG_NOLIMIT);
@@ -636,11 +636,13 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool extendedP
 	SpectatorVec::iterator it;
 	getSpectators(list, creature->getPosition(), false, true);
 
+	int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
+
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendCreatureAppear(creature, true);
+			tmpPlayer->sendCreatureAppear(creature, creature->getPosition(), newStackPos, true);
 		}
 	}
 
@@ -649,7 +651,6 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool extendedP
 		(*it)->onCreatureAppear(creature, true);
 	}
 
-	int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
 	creature->getParent()->postAddNotification(creature, NULL, newStackPos);
 
 	addCreatureCheck(creature);

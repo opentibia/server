@@ -732,10 +732,10 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 	else if(it.isSplash()){
 		s << " of ";
 		if(subType > 0){
-			s << items[subType].name;
+			s << items[subType].name << ".";
 		}
 		else{
-			s << items[1].name;
+			s << items[1].name << ".";
 		}
 	}
 	else if(it.isContainer()){

@@ -141,7 +141,7 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	if(area){
 		area->getList(centerPos, targetPos, list);
 	}
-	else{
+	else if(targetPos.z < MAP_MAX_LAYERS){
 		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 		if(!tile) {
 			// These tiles will never have anything on them
@@ -1167,7 +1167,9 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 		return false;
 	}
 
-	Position tmpPos = targetPos;
+	int32_t tmpPosX = targetPos.x;
+	int32_t tmpPosY = targetPos.y;
+	int32_t tmpPosZ = targetPos.z;
 
 	size_t cols = area->getCols();
 	size_t rows = area->getRows();
@@ -1175,21 +1177,21 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 	uint32_t centerY, centerX;
 	area->getCenter(centerY, centerX);
 
-	tmpPos.x -= centerX;
-	tmpPos.y -= centerY;
+	tmpPosX -= centerX;
+	tmpPosY -= centerY;
 
 	for(size_t y = 0; y < rows; ++y){
 		for(size_t x = 0; x < cols; ++x){
 
 			if(area->getValue(y, x) != 0){
-				if(tmpPos.x >= ((uint16_t)0) && tmpPos.y >= ((uint16_t)0) && tmpPos.z >= ((uint16_t)0) &&
-					tmpPos.x <= ((uint16_t)0xFFFF) && tmpPos.y <= ((uint16_t)0xFFFF) && tmpPos.z < MAP_MAX_LAYERS)
+				if(tmpPosX >= 0 && tmpPosY >= 0 && tmpPosZ >= 0 &&
+					tmpPosX <= 0xFFFF && tmpPosY <= 0xFFFF && tmpPosZ < MAP_MAX_LAYERS)
 				{
-					if(g_game.isSightClear(targetPos, tmpPos, true)){
-						tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
+					if(g_game.isSightClear(targetPos, Position(tmpPosX, tmpPosY, tmpPosZ), true)){
+						tile = g_game.getTile(tmpPosX, tmpPosY, tmpPosZ);
 						if(!tile){
 							// This tile will never have anything on it
-							tile = new StaticTile(tmpPos.x, tmpPos.y, tmpPos.z);
+							tile = new StaticTile(tmpPosX, tmpPosY, tmpPosZ);
 							g_game.setTile(tile);
 						}
 						list.push_back(tile);
@@ -1197,11 +1199,11 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 				}
 			}
 
-			tmpPos.x += 1;
+			tmpPosX += 1;
 		}
 
-		tmpPos.x -= cols;
-		tmpPos.y += 1;
+		tmpPosX -= cols;
+		tmpPosY += 1;
 	}
 
 	return true;

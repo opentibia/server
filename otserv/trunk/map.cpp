@@ -201,8 +201,8 @@ void Map::setTile(uint16_t x, uint16_t y, uint16_t z, Tile* newtile)
 	if(newtile->hasFlag(TILESTATE_REFRESH)){
 		RefreshBlock_t rb;
 		rb.lastRefresh = OTSYS_TIME();
-		if(ItemVector* downItems = newtile->getDownItems()){
-			for(ItemVector::iterator it = downItems->begin(); it != downItems->end(); ++it){
+		if(TileItemVector* newtileItems = newtile->getItemList()){
+			for(ItemVector::iterator it = newtileItems->getBeginDownItem(); it != newtileItems->getEndDownItem(); ++it){
 				rb.list.push_back((*it)->clone());
 			}
 		}

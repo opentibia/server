@@ -880,14 +880,14 @@ void Monster::pushItems(Tile* tile)
 	//We can not use iterators here since we can push the item to another tile
 	//which will invalidate the iterator.
 	//start from the end to minimize the amount of traffic
-	if(ItemVector* downItems = tile->getDownItems()){
+	if(TileItemVector* items = tile->getItemList()){
 		uint32_t moveCount = 0;
 		uint32_t removeCount = 0;
-		int32_t downItemSize = downItems->size();
+		int32_t downItemSize = tile->getDownItemCount();
 
 		for(int32_t i = downItemSize - 1; i >= 0; --i){
-			assert(i >= 0 && i < (int32_t)downItems->size());
-			Item* item = downItems->at(i);
+			assert(i >= 0 && i < downItemSize);
+			Item* item = items->at(i);
 			if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATH)
 				|| item->hasProperty(BLOCKSOLID))){
 					if(moveCount < 20 && pushItem(item, 1)){

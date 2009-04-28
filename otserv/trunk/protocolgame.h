@@ -227,14 +227,14 @@ private:
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 
 	//tiles
-	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item);
+	void sendAddTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
 	void sendUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
 	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos);
 	void sendUpdateTile(const Tile* tile, const Position& pos);
 
-	void sendAddCreature(const Creature* creature, bool isLogin);
+	void sendAddCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogin);
 	void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
-	void sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos,
+	void sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos, uint32_t newStackPos,
 		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	//containers
@@ -279,8 +279,8 @@ private:
 	void AddCreatureLight(NetworkMessage_ptr msg, const Creature* creature);
 
 	//tiles
-	void AddTileItem(NetworkMessage_ptr msg, const Position& pos, const Item* item);
-	void AddTileCreature(NetworkMessage_ptr msg, const Position& pos, const Creature* creature);
+	void AddTileItem(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos, const Item* item);
+	void AddTileCreature(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos, const Creature* creature);
 	void UpdateTileItem(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos, const Item* item);
 	void RemoveTileItem(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos);
 
