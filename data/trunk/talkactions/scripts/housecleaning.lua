@@ -1,6 +1,6 @@
 function onSay(cid, words, param)
 	local access = getPlayerAccess(cid)
-	if access ~= LUA_ERROR and access < 3 then
+	if access < 3 then
 		return TRUE
 	end
 	

@@ -3153,8 +3153,7 @@ int LuaScriptInterface::luaGetTownIdByName(lua_State *L)
 		lua_pushnumber(L, town->getTownID());
 	}
 	else{
-		reportErrorFunc("Could not find the town.");
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushnumber(L, LUA_NULL);
 	}
 	return 1;
 }
@@ -3165,13 +3164,12 @@ int LuaScriptInterface::luaGetTownNameById(lua_State *L)
 	uint32_t townId = popNumber(L);
 
 	Town* town = Towns::getInstance().getTown(townId);
-	if(town){
+	if(town){0
 		std::string townName = town->getName();
 		lua_pushstring(L, townName.c_str());
 	}
 	else{
-		reportErrorFunc("Could not find the town.");
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushnumber(L, LUA_NULL);
 	}
 	return 1;
 }
@@ -6974,7 +6972,7 @@ int LuaScriptInterface::luaDoSaveServer(lua_State *L)
 	//doSaveServer(globalSave)
 	bool globalSave = (popNumber(L) > 0);
 	bool b = g_game.saveServer(globalSave);
-	lua_pushnumber(L, b? LUA_TRUE : LUA_FALSE);
+	lua_pushnumber(L, b? LUA_NO_ERROR : LUA_ERROR);
 	return 1;
 }
 

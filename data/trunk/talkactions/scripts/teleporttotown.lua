@@ -1,14 +1,14 @@
 function onSay(cid, words, param)
 	local access = getPlayerAccess(cid)
-	if access ~= LUA_ERROR and access < 2 then
+	if access < 2 then
 		return TRUE
 	end
 
 	local townid = getTownIdByName(param)
-	local old_pos = getPlayerPosition(cid)
-	if(townid ~= LUA_ERROR) then
+	if(townid ~= LUA_NULL) then
 		local new_pos = getTownTemplePosition(townid)
 		if(doTeleportThing(cid, new_pos) ~= LUA_ERROR) then
+			local old_pos = getPlayerPosition(cid)
 			doSendMagicEffect(old_pos, CONST_ME_POFF)
 			doSendMagicEffect(new_pos, CONST_ME_TELEPORT)
 		else

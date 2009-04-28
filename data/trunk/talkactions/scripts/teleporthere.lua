@@ -1,26 +1,32 @@
 function onSay(cid, words, param)
 	local access = getPlayerAccess(cid)
-	if access ~= LUA_ERROR and access < 2 then
+	if access < 2 then
 		return TRUE
 	end
+
+	local creature = getCreatureByName(param)
+	if creature == cid or creature == LUA_NULL then
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature or player not found.")
+		return FALSE
+	end
 	
-	local paramCreature = getPlayerByName(param)
-	if(isPlayer(paramCreature) ~= LUA_TRUE) then
-		paramCreature = getCreatureByName(param)
-		if(paramCreature == 0) then
-			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature not found.")
-			return TRUE
-		end
+	local creatureAccess = 0
+	if(isPlayer(creature) == LUA_TRUE) then
+		creatureAccess = getPlayerAccess(creature)
 	end
 
-	local playerPos = getPlayerPosition(cid)
-	local oldCreaturePos = getCreaturePosition(paramCreature)
-	if(doTeleportThing(paramCreature, playerPos) ~= LUA_ERROR) then
-		local newCreaturePos = getCreaturePosition(paramCreature)
-		doSendMagicEffect(oldCreaturePos, CONST_ME_POFF)
-		doSendMagicEffect(newCreaturePos, CONST_ME_TELEPORT)
+	if creatureAccess < access then
+		local playerPos = getPlayerPosition(cid)
+		if(doTeleportThing(creature, playerPos) ~= LUA_ERROR) then
+			local oldCreaturePos = getCreaturePosition(paramCreature)
+			local newCreaturePos = getCreaturePosition(paramCreature)
+			doSendMagicEffect(oldCreaturePos, CONST_ME_POFF)
+			doSendMagicEffect(newCreaturePos, CONST_ME_TELEPORT)		
+		else
+			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Could not teleport creature to your position.")
+		end
 	else
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Cannot teleport creature.")
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You do not have access to do that.")
 	end
 
 	return FALSE
