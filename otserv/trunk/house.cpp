@@ -894,11 +894,15 @@ bool Houses::loadHousesXML(std::string filename)
 
 bool Houses::payRent(Player* player, House* house, time_t time /*= 0*/)
 {
+	if(rentPeriod == RENTPERIOD_NEVER){
+		return true;
+	}
+
 	if(time == 0){
 		time = std::time(NULL);
 	}
 
-	if(house->getPaidUntil() > time){
+	if(house->getRent() == 0 || house->getPaidUntil() > time){
 		return true;
 	}
 
