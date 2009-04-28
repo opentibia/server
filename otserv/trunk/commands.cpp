@@ -748,8 +748,14 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 	Player* player = creature->getPlayer();
 	if(player){
 		House* house = Houses::getInstance().getHouseByPlayerId(player->getGUID());
+
 		if(!house){
 			player->sendCancel("You do not own any house.");
+			return false;
+		}
+
+		if(!Houses::getInstance().payRent(player, house)){
+			player->sendCancel("You have to pay the rent first.");
 			return false;
 		}
 
@@ -759,7 +765,7 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 			return false;
 		}
 
-        if(!tradePartner->isPremium() && g_config.getNumber(ConfigManager::HOUSE_ONLY_PREMIUM)){
+		if(!tradePartner->isPremium() && g_config.getNumber(ConfigManager::HOUSE_ONLY_PREMIUM)){
 			player->sendCancel("Trade player doesn't have a premium account.");
 			return false;
 		}

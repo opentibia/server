@@ -276,7 +276,7 @@ public:
 	House* getHouseByPlayerId(uint32_t playerId);
 
 	bool loadHousesXML(std::string filename);
-
+	bool payRent(Player* player, House* house, time_t time = 0);
 	bool payHouses();
 
 	HouseMap::iterator getHouseBegin() {return houseMap.begin();}
@@ -285,6 +285,8 @@ public:
 private:
 	RentPeriod_t rentPeriod;
 	HouseMap houseMap;
+
+	bool payHouse(House* house, time_t time);
 };
 
 #endif
