@@ -941,7 +941,6 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 		if(pos < topItemSize){
 			ItemVector::iterator it = items->getBeginTopItem();
 			it += pos;
-			pos = 0;
 
 			oldItem = (*it);
 			it = items->erase(it);

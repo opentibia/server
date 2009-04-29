@@ -133,16 +133,6 @@ public:
 	const CreatureVector* getCreatures() const;
 	CreatureVector* makeCreatures();
 
-	/*
-	virtual TileItemVector* getItemList() = 0;
-	virtual const TileItemVector* getItemList() const = 0;
-	virtual TileItemVector* makeItemList() = 0;
-
-	virtual CreatureVector* getCreatures() = 0;
-	virtual const CreatureVector* getCreatures() const = 0;
-	virtual CreatureVector* makeCreatures() = 0;
-	*/
-
 	HouseTile* getHouseTile();
 	const HouseTile* getHouseTile() const;
 	bool isHouseTile() const;
@@ -159,8 +149,6 @@ public:
 	Creature* getTopCreature();
 	Item* getTopTopItem();
 	Item* getTopDownItem();
-	//Item* getGroundItem();
-	//Item* getGroundItem() const;
 	bool isMoveableBlocking() const;
 	Thing* getTopThing();
 	Item* getItemByTopOrder(uint32_t topOrder);
@@ -246,10 +234,8 @@ private:
 	void onUpdateTile();
 
 	void updateTileFlags(Item* item, bool removing);
-	//void setGroundItem(Item* item);
 
  protected:
-	// Put this first for cache-coherency
 	bool is_dynamic() const {return (m_flags & TILESTATE_DYNAMIC_TILE) != 0;}
 
 public:

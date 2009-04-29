@@ -288,7 +288,9 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 			return false;
 		}
 
-		if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+		if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin) && 
+			!g_config.getNumber(ConfigManager::ALLOW_GAMEMASTER_MULTICLIENT))
+		{
 			disconnectClient(0x14, "You may only login with a Gamemaster account.");
 			return false;
 		}
