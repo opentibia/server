@@ -564,11 +564,21 @@ bool Monster::deactivate(bool forced /*= false*/)
 
 void Monster::onAddCondition(ConditionType_t type)
 {
+	//the walkCache need to be updated if the monster becomes "resistent" to the damage, see Tile::__queryAdd()
+	if(type == CONDITION_FIRE || type == CONDITION_ENERGY || type == CONDITION_POISON){
+		updateMapCache();
+	}
+
 	activate();
 }
 
 void Monster::onEndCondition(ConditionType_t type)
 {
+	//the walkCache need to be updated if the monster loose the "resistent" to the damage, see Tile::__queryAdd()
+	if(type == CONDITION_FIRE || type == CONDITION_ENERGY || type == CONDITION_POISON){
+		updateMapCache();
+	}
+
 	deactivate();
 }
 

@@ -457,7 +457,7 @@ void Creature::onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t 
 	const ItemType& iType, const Item* item)
 {
 	if(isMapLoaded){
-		if(iType.blockSolid || iType.blockPathFind){
+		if(iType.blockSolid || iType.blockPathFind || iType.isGroundTile()){
 			if(pos.z == getPosition().z){
 				updateTileCache(tile, pos);
 			}
@@ -1403,14 +1403,14 @@ void Creature::executeConditions(uint32_t interval)
 	}
 }
 
-bool Creature::hasCondition(ConditionType_t type) const
+bool Creature::hasCondition(ConditionType_t type, bool checkTime /*= true*/) const
 {
 	if(isSuppress(type)){
 		return false;
 	}
 
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type && ((*it)->getEndTime() == 0 ||(*it)->getEndTime() >= OTSYS_TIME() )){
+		if((*it)->getType() == type && (!checkTime || ((*it)->getEndTime() == 0 || (*it)->getEndTime() >= OTSYS_TIME())) ){
 			return true;
 		}
 	}

@@ -113,8 +113,6 @@ public:
 private:
 	ItemVector items;
 	uint16_t downItemCount;
-	//uint16_t topStartIndex;
-
 	friend class Tile;
 };
 
