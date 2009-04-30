@@ -232,7 +232,7 @@ passwordtype = "plain"
 -- House tile price
 house_tile_price = 100
 -- Only premium players can buy houses?
-house_only_premium = "yes"
+house_only_premium = true
 -- Level to buy houses
 house_level = 1
 -- Show house price and its rent price when looking at its door?

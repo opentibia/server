@@ -3075,7 +3075,7 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 			if(uniqueId > 0)
 				ss << "Unique ID: " << uniqueId << std::endl;
 		}
-		else if(Creature* creature = thing->getCreature();){
+		else if(Creature* creature = thing->getCreature()){
 			ss << "Health: [" << creature->getHealth() << "/" << creature->getMaxHealth() << "]" << std::endl;
 			ss << "Mana: [" << creature->getMana() << "/" << creature->getMaxMana() << "]" << std::endl;
 		}

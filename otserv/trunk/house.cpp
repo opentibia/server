@@ -135,7 +135,7 @@ void House::updateDoorDescription()
 			uint32_t price = getHouseTileSize() * g_config.getNumber(ConfigManager::HOUSE_TILE_PRICE);
 			houseDescription << std::endl << "It costs " << price << " gold coins.";
 			std::string strPeriod;
-			Houses::getRentPeriodString(strPeriod);
+			Houses::getInstance().getRentPeriodString(strPeriod);
 			if(strPeriod != "never"){
 				houseDescription << " Its rent costs " << getRent() << " gold coins and it's paid " << strPeriod << ".";
 			}
