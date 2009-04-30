@@ -278,6 +278,7 @@ public:
 	bool loadHousesXML(std::string filename);
 	bool payRent(Player* player, House* house, time_t time = 0);
 	bool payHouses();
+	void getRentPeriodString(std::string& strPeriod);
 
 	HouseMap::iterator getHouseBegin() {return houseMap.begin();}
 	HouseMap::iterator getHouseEnd() {return houseMap.end();}

@@ -177,6 +177,9 @@ remove_rune_charges = true
 -- Set to false to disable charges disappearing from weapons on use
 remove_weapon_charges = true
 
+-- Allow gamemaster multiclient login to everybody?
+allow_gamemaster_multiclient = false
+
 -- despawn configs
 -- how many floors can a monster go from his spawn before despawning
 despawnrange = 2
@@ -232,6 +235,9 @@ house_tile_price = 100
 house_only_premium = "yes"
 -- Level to buy houses
 house_level = 1
+-- Show house price and its rent price when looking at its door?
+-- PS: This info is going to be shown just if house has no owner
+show_house_prices = false
 
 -- SQL type
 -- options: mysql, sqlite, odbc or pgsql

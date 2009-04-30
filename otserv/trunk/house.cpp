@@ -127,12 +127,20 @@ void House::updateDoorDescription()
 	houseDescription << "It belongs to house '" << houseName << "'. " << std::endl;
 
 	if(houseOwner != 0){
-		houseDescription << houseOwnerName;
+		houseDescription << houseOwnerName << " owns this house." << std::endl;
 	}
 	else{
-		houseDescription << "Nobody";
+		houseDescription << "Nobody owns this house.";
+		if(g_config.getNumber(ConfigManager::SHOW_HOUSE_PRICES)){
+			uint32_t price = getHouseTileSize() * g_config.getNumber(ConfigManager::HOUSE_TILE_PRICE);
+			houseDescription << std::endl << "It costs " << price << " gold coins.";
+			std::string strPeriod;
+			Houses::getRentPeriodString(strPeriod);
+			if(strPeriod != "never"){
+				houseDescription << " Its rent costs " << getRent() << " gold coins and it's paid " << strPeriod << ".";
+			}
+		}
 	}
-	houseDescription << " owns this house." << std::endl;
 
 	HouseDoorList::iterator it;
 	for(it = doorList.begin(); it != doorList.end(); ++it){
@@ -1077,4 +1085,26 @@ bool Houses::payHouses()
 	}
 
 	return true;
+}
+
+void Houses::getRentPeriodString(std::string& strPeriod)
+{
+	switch(rentPeriod){
+	case RENTPERIOD_DAILY:
+		strPeriod = "daily";
+		break;
+	case RENTPERIOD_WEEKLY:
+		strPeriod = "weekly";
+		break;
+	case RENTPERIOD_MONTHLY:
+		strPeriod = "monthly";
+		break;
+	case RENTPERIOD_YEARLY:
+		strPeriod = "yearly";
+		break;
+	case RENTPERIOD_NEVER:
+	default:
+		strPeriod = "never";
+		break;
+	}
 }

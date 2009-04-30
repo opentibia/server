@@ -1189,7 +1189,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("This action is not permitted in a protection zone.");
 		break;
 
-	case RET_YOUMAYNOTATTACKTHISPLAYER:
+	case RET_YOUMAYNOTATTACKTHISPERSON:
 		sendCancel("You may not attack this person.");
 		break;
 

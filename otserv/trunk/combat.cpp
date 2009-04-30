@@ -244,7 +244,7 @@ bool Combat::isPlayerCombat(const Creature* target)
 ReturnValue Combat::canTargetCreature(const Player* player, const Creature* target)
 {
 	if(player == target){
-		return RET_YOUMAYNOTATTACKTHISPLAYER;
+		return RET_YOUMAYNOTATTACKTHISPERSON;
 	}
 
 	if(!player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
@@ -269,7 +269,7 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 
 	if(player->hasFlag(PlayerFlag_CannotUseCombat) || !target->isAttackable()){
 		if(target->getPlayer()){
-			return RET_YOUMAYNOTATTACKTHISPLAYER;
+			return RET_YOUMAYNOTATTACKTHISPERSON;
 		}
 		else{
 			return RET_YOUMAYNOTATTACKTHISCREATURE;
@@ -354,20 +354,20 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 	if(attacker){
 		if(const Player* targetPlayer = target->getPlayer()){
 			if(targetPlayer->hasFlag(PlayerFlag_CannotBeAttacked)){
-				return RET_YOUMAYNOTATTACKTHISPLAYER;
+				return RET_YOUMAYNOTATTACKTHISPERSON;
 			}
 
 			if(const Player* attackerPlayer = attacker->getPlayer()){
 				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer) ||
 					attackerPlayer->isLoginAttackLocked(targetPlayer->getID())){
-					return RET_YOUMAYNOTATTACKTHISPLAYER;
+					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
 			}
 
 			if(attacker->isSummon()){
 				if(const Player* masterAttackerPlayer = attacker->getMaster()->getPlayer()){
 					if(masterAttackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
-						return RET_YOUMAYNOTATTACKTHISPLAYER;
+						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
 				}
 			}
@@ -389,7 +389,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
 				if(target->getPlayer()){
 					if(!isInPvpZone(attacker, target)){
-						return RET_YOUMAYNOTATTACKTHISPLAYER;
+						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
 				}
 
