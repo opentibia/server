@@ -197,7 +197,7 @@ end
 			return false
 		end
 
-		if(HOUSE_CONFIG.needPremium == "yes" and isPremium(cid) == FALSE) then
+		if(HOUSE_CONFIG.needPremium == TRUE and isPremium(cid) == FALSE) then
 			doPlayerSendCancel(cid, 'Only premium players are able to buy a house.')
 			return false
 		end
