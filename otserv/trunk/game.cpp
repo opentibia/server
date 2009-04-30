@@ -3079,7 +3079,7 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 			ss << "Health: [" << creature->getHealth() << "/" << creature->getMaxHealth() << "]" << std::endl;
 			ss << "Mana: [" << creature->getMana() << "/" << creature->getMaxMana() << "]" << std::endl;
 		}
-		ss << "Position: [" << thing->getPosition().x << ", " << thing->getPosition().y << ", " << thing->getPosition().z << "]" << std::endl;
+		ss << "Position: [" << thing->getPosition().x << ", " << thing->getPosition().y << ", " << thing->getPosition().z << "]";
 	}
 	
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
