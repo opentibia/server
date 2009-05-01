@@ -1351,8 +1351,7 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 
 	enum distance_t{
 		DISTANCE_BESIDE,
-		DISTANCE_CLOSE_1,
-		DISTANCE_CLOSE_2,
+		DISTANCE_CLOSE,
 		DISTANCE_FAR,
 		DISTANCE_VERYFAR,
 	};
@@ -1399,18 +1398,15 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 			level = LEVEL_SAME;
 		}
 		//getting distance
-		if(std::abs(dx) < 4 && std::abs(dy) <4){
+		if(std::abs(dx) <= 4 && std::abs(dy) <= 4){
 			distance = DISTANCE_BESIDE;
 		}
 		else{
 			int32_t distance2 = dx*dx + dy*dy;
-			if(distance2 < 625){
-				distance = DISTANCE_CLOSE_1;
+			if(distance2 <= 10000){
+				distance = DISTANCE_CLOSE;
 			}
-			else if(distance2 < 10000){
-				distance = DISTANCE_CLOSE_2;
-			}
-			else if(distance2 < 75076){
+			else if(distance2 <= 75076){
 				distance = DISTANCE_FAR;
 			}
 			else{
@@ -1473,7 +1469,7 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 			}
 		else{
 			switch(distance){
-			case DISTANCE_CLOSE_1:
+			case DISTANCE_CLOSE:
 				if(level == LEVEL_SAME){
 					ss << "is to the";
 				}
@@ -1483,10 +1479,6 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 				else if(level == LEVEL_LOWER){
 					ss << "is on a lower level to the";
 				}
-				break;
-
-			case DISTANCE_CLOSE_2:
-				ss << "is to the";
 				break;
 
 			case DISTANCE_FAR:
