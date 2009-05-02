@@ -1,4 +1,14 @@
 function onUse(cid, item, frompos, item2, topos)
+	if(topos.x == 0 and topos.y == 0 and topos.z == 0) then
+		doPlayerSendCancel(cid, "Sorry, not possible.")
+		return TRUE
+	end
+	
+	if(topos.x == CONTAINER_POSITION) then
+		doPlayerSendCancel(cid, "Sorry, not possible.")
+		return TRUE
+	end
+	
 	newPos = {x = topos.x, y = topos.y, z = topos.z, stackpos = 0}
 	groundItem = getThingfromPos(newPos)
 	if (isInArray(ROPE_SPOT, groundItem.itemid) == TRUE) then
