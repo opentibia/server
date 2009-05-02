@@ -28,10 +28,11 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 	end
 
-	if not(canEnter or getPlayerAccess(cid) == 0) then
+	if(not canEnter and getPlayerAccess(cid) == 0) then
 		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Only the worthy may pass.")
 		return TRUE
 	end
+
 
 	doTransformItem(item.uid, item.itemid+1)
 	local canGo = (queryTileAddThing(cid, frompos, bit.bor(2, 4)) == RETURNVALUE_NOERROR) --Veryfies if the player can go, ignoring blocking things

@@ -4,8 +4,12 @@ function onUse(cid, item, frompos, item2, topos)
 
 	-- Move all moveable things to the next tile
 	doRelocate(frompos, nextTile)
-
+	
 	-- Transform the door
-	doTransformItem(item.uid, item.itemid-1)
+	-- doRelocate can trigger other scripts (stepOut) so the uid might be invalid
+	if(isValidUID(item.uid)) then
+		doTransformItem(item.uid, item.itemid-1)
+	end
+	
 	return TRUE
 end
