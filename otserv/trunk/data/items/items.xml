@@ -3035,14 +3035,15 @@
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="5"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentAll" value="80"/>
+		<attribute key="absorbPercentDeath" value="80"/>
+		<attribute key="absorbPercentPhysical" value="80"/>
 	</item>
 	<item id="2198" article="an" name="elven amulet">
 		<attribute key="weight" value="270"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="50"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentPhysical" value="10"/>
+		<attribute key="absorbPercentAll" value="5"/>
 	</item>
 	<item id="2199" article="a" name="garlic necklace">
 		<attribute key="weight" value="380"/>
@@ -3056,14 +3057,14 @@
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="250"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentPhysical" value="10"/>
+		<attribute key="absorbPercentPhysical" value="6"/>
 	</item>
 	<item id="2201" article="a" name="dragon necklace">
 		<attribute key="weight" value="630"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="200"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentFire" value="10"/>
+		<attribute key="absorbPercentFire" value="8"/>
 	</item>
 	<item id="2202" article="a" name="stealth ring">
 		<attribute key="weight" value="100"/>
@@ -3137,6 +3138,8 @@
 		<attribute key="weight" value="90"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
+		<attribute key="transformDeEquipTo" value="2207"/>
+		<attribute key="skillSword" value="4"/>
 		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
@@ -3144,6 +3147,8 @@
 		<attribute key="weight" value="90"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
+		<attribute key="transformDeEquipTo" value="2208"/>
+		<attribute key="skillAxe" value="4"/>
 		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
@@ -4557,6 +4562,7 @@
 	<item id="2500" article="an" name="amazon armor">
 		<attribute key="weight" value="9900"/>
 		<attribute key="armor" value="13"/>
+		<attribute key="skillDist" value="3"/>
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="2501" article="a" name="ceremonial mask">
@@ -4781,6 +4787,7 @@
 	</item>
 	<item id="2543" article="a" name="bolt" plural="bolts">
 		<attribute key="weight" value="80"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="30"/>
 		<attribute key="hitChance" value="80"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -4790,6 +4797,7 @@
 	</item>
 	<item id="2544" article="an" name="arrow" plural="arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="25"/>
 		<attribute key="hitChance" value="90"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -4799,6 +4807,7 @@
 	</item>
 	<item id="2545" article="a" name="poison arrow" plural="poison arrows">
 		<attribute key="weight" value="80"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="22"/>
 		<attribute key="hitChance" value="80"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -4808,6 +4817,7 @@
 	</item>
 	<item id="2546" article="a" name="burst arrow" plural="burst arrows">
 		<attribute key="weight" value="90"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="28"/>
 		<attribute key="hitChance" value="80"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -4817,6 +4827,7 @@
 	</item>
 	<item id="2547" article="a" name="power bolt" plural="power bolts">
 		<attribute key="weight" value="80"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="40"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
@@ -4971,6 +4982,7 @@
 		<attribute key="containerSize" value="30"/>
 	</item>
 	<item id="2595" article="a" name="parcel">
+		<attribute key="type" value="container"/>
 		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="10"/>
 	</item>
@@ -4984,6 +4996,7 @@
 		<attribute key="maxTextLen" value="512"/>
 	</item>
 	<item id="2598" article="a" name="stamped letter">
+		<attribute key="readable" value="1"/>
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2599" article="a" name="label">
@@ -13505,15 +13518,16 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="transformEquipTo" value="6301"/>
 		<attribute key="stopduration" value="1"/>
-		<attribute key="showduration" value="1"/>
+		<attribute key="showduration" value="0"/>
 	</item>
 	<item id="6301" article="a" name="death ring">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
+		<attribute key="armor" value="1"/>
 		<attribute key="transformDeEquipTo" value="6300"/>
 		<attribute key="duration" value="480"/>
-		<attribute key="skillShield" value="-11"/>
+		<attribute key="skillShield" value="-10"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="6302" article="a" name="dead wyvern">
@@ -14252,6 +14266,7 @@
 	</item>
 	<item id="6529" article="an" name="infernal bolt" plural="infernal bolts">
 		<attribute key="weight" value="90"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="43"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
@@ -15722,6 +15737,7 @@
 	<item id="7362" article="a" name="sarcophagus"/>
 	<item id="7363" article="a" name="piercing bolt" plural="piercing bolts">
 		<attribute key="weight" value="80"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="33"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
@@ -15730,6 +15746,7 @@
 	</item>
 	<item id="7364" article="a" name="sniper arrow" plural="sniper arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
@@ -15739,6 +15756,7 @@
 	</item>
 	<item id="7365" article="an" name="onyx arrow" plural="onyx arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="38"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
@@ -16270,6 +16288,7 @@
 		<attribute key="weight" value="500"/>
 		<attribute key="armor" value="0"/>
 		<attribute key="slotType" value="head"/>
+		<attribute key="absorbPercentIce" value="2"/>
 	</item>
 	<item id="7460" article="a" name="norse shield">
 		<attribute key="weight" value="4100"/>
@@ -16302,63 +16321,63 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7466" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7467" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7468" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7469" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7470" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7471" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7472" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7473" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="300"/>
+		<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7474" article="a" name="sarcophagus"/>
@@ -17905,8 +17924,10 @@
 	<item id="7888" article="a" name="glacier amulet">
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
+		<attribute key="charges" value="200"/>		
 		<attribute key="absorbPercentIce" value="20"/>
 		<attribute key="absorbPercentEnergy" value="-10"/>
+		<attribute key="showcharges" value="1"/>
 	</item>
 	<item id="7889" article="a" name="lightning pendant">
 		<attribute key="weight" value="500"/>
@@ -17917,8 +17938,10 @@
 	<item id="7890" article="a" name="magma amulet">
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
+		<attribute key="charges" value="200"/>	
 		<attribute key="absorbPercentFire" value="20"/>
 		<attribute key="absorbPercentIce" value="-10"/>
+		<attribute key="showcharges" value="1"/>
 	</item>
 	<item id="7891" name="magma boots">
 		<attribute key="weight" value="750"/>
@@ -19497,6 +19520,7 @@
 	<item id="8881" article="a" name="fireborn giant armor">
 		<attribute key="weight" value="12000"/>
 		<attribute key="armor" value="15"/>
+		<attribute key="skillSword" value="2"/>
 		<attribute key="absorbPercentFire" value="5"/>
 		<attribute key="absorbPercentIce" value="-5"/>
 		<attribute key="slotType" value="body"/>
@@ -19504,6 +19528,7 @@
 	<item id="8882" article="an" name="earthborn titan armor">
 		<attribute key="weight" value="12000"/>
 		<attribute key="armor" value="15"/>
+		<attribute key="skillAxe" value="2"/>
 		<attribute key="absorbPercentEarth" value="5"/>
 		<attribute key="absorbPercentFire" value="-5"/>
 		<attribute key="slotType" value="body"/>
@@ -19513,11 +19538,13 @@
 		<attribute key="armor" value="15"/>
 		<attribute key="absorbPercentEnergy" value="5"/>
 		<attribute key="absorbPercentEarth" value="-5"/>
+		<attribute key="skillClub" value="2"/>
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="8884" article="an" name="oceanborn leviathan armor">
 		<attribute key="weight" value="10000"/>
 		<attribute key="armor" value="15"/>
+		<attribute key="skillShield" value="1"/>
 		<attribute key="absorbPercentIce" value="5"/>
 		<attribute key="absorbPercentEnergy" value="-5"/>
 		<attribute key="slotType" value="body"/>
@@ -19624,7 +19651,7 @@
 		<attribute key="weaponType" value="shield"/>
 		<attribute key="duration" value="1200"/>
 		<attribute key="decayTo" value="8905"/>
-		<attribute key="skillShield" value="2"/>
+		<attribute key="skillShield" value="3"/>
 	</item>
 	<item id="8907" article="an" name="icy rainbow shield">
 		<attribute key="description" value="It has been temporarily imbued with ice magic and has a greatly increased shielding value."/>
@@ -19641,7 +19668,7 @@
 		<attribute key="weaponType" value="shield"/>
 		<attribute key="duration" value="1200"/>
 		<attribute key="decayTo" value="8905"/>
-		<attribute key="speed" value="20"/>
+		<attribute key="speed" value="10"/>
 	</item>
 	<item id="8909" article="a" name="terran rainbow shield">
 		<attribute key="description" value="It has been temporarily imbued with earth magic and boosts your regeneration."/>
@@ -20365,13 +20392,14 @@
 		<attribute key="weight" value="7000"/>
 		<attribute key="armor" value="17"/>
 		<attribute key="slotType" value="body"/>
-		<attribute key="absorbPercentDeath" value="5"/>
+		<attribute key="absorbPercentDeath" value="3"/>
 	</item>
 	<item id="9777" article="a" name="yalahari leg piece">
 		<attribute key="weight" value="6500"/>
 		<attribute key="armor" value="9"/>
 		<attribute key="slotType" value="legs"/>
 		<attribute key="absorbPercentDeath" value="5"/>
+		<attribute key="skillDist" value="2"/>
 	</item>
 	<item id="9778" article="a" name="yalahari mask">
 		<attribute key="weight" value="3500"/>
