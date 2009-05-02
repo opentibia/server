@@ -4982,6 +4982,7 @@
 		<attribute key="containerSize" value="30"/>
 	</item>
 	<item id="2595" article="a" name="parcel">
+		<attribute key="type" value="container"/>
 		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="10"/>
 	</item>
@@ -4995,6 +4996,7 @@
 		<attribute key="maxTextLen" value="512"/>
 	</item>
 	<item id="2598" article="a" name="stamped letter">
+		<attribute key="readable" value="1"/>
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2599" article="a" name="label">
