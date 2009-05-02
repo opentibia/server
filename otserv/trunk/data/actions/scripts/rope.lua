@@ -1,207 +1,37 @@
---rope sistem--
+ROPE_SPOT = {384, 418, 8278, 8592}
+OPENED_HOLE = {294, 383, 469, 470, 482, 482, 485, 489}
+DOWN_LADDER = {369, 370, 408, 409, 427, 428, 3135, 3136, 5545, 5763}
+OPENED_TRAP = {462}
+CONTAINER_POSITION = 65535
 
 function onUse(cid, item, frompos, item2, topos)
-
-	
-	if item2.itemid == 0 then
-		return 0
-	end 
-
-	npos = {x=topos.x, y=topos.y, z=topos.z, stackpos=0}
-
-	grounditem = getThingfromPos(npos)
-	
-	if grounditem.itemid == 384 then
-		npos.y = npos.y + 1
-		npos.z = npos.z - 1
-		doTeleportThing(cid,npos)
-
-	elseif grounditem.itemid == 418 then
-		npos.y = npos.y + 1
-		npos.z = npos.z - 1
-		doTeleportThing(cid,npos)
-
---hole or stair to rope items--
-
-	elseif item2.itemid == 469 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 470 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 475 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 476 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 479 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 480 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 482 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 484 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 485 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 489 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 392 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 383 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 385 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 484 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 408 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 409 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 410 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 427 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 428 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 429 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 430 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
-
-	elseif item2.itemid == 433 then
-		npos.y = npos.y + 1
-		downpos = {x=topos.x, y=topos.y, z=topos.z+1, stackpos=255}
-		downitem = getThingfromPos(downpos)
-		if downitem.itemid > 0 then
-			doTeleportThing(downitem.uid,npos)
-		end
---END hole or stair to rope items--
-	else
-		return 0
+	if(topos.x == 0 and topos.y == 0 and topos.z == 0) then
+		doPlayerSendCancel(cid, "Sorry, not possible.")
+		return TRUE
 	end
 	
-	return 1
+	if(topos.x == CONTAINER_POSITION) then
+		doPlayerSendCancel(cid, "Sorry, not possible.")
+		return TRUE
+	end
+	
+	newPos = {x = topos.x, y = topos.y, z = topos.z, stackpos = 0}
+	groundItem = getThingfromPos(newPos)
+	if (isInArray(ROPE_SPOT, groundItem.itemid) == TRUE) then
+		newPos.y = newPos.y + 1
+		newPos.z = newPos.z - 1
+		doTeleportThing(cid, newPos)
+	elseif (isInArray(OPENED_HOLE, groundItem.itemid) == TRUE or isInArray(OPENED_TRAP, groundItem.itemid) == TRUE or isInArray(DOWN_LADDER, groundItem.itemid) == TRUE) then
+		newPos.y = newPos.y + 1
+		downPos = {x = topos.x, y = topos.y, z = topos.z + 1, stackpos = 255}
+		downItem = getThingfromPos(downPos)
+		if (downItem.itemid > 0) then
+			doTeleportThing(downItem.uid, newPos)
+		else
+			doPlayerSendCancel(cid, "Sorry, not possible.")
+		end
+	else
+		return FALSE
+	end
+	return TRUE
 end

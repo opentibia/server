@@ -57,29 +57,29 @@
 <action itemid="2092" script="key.lua" />
 
 --Doors
-<action itemid="1539" script="door_open1.lua" /> --free fence door--
-<action itemid="1540" script="door_close1e.lua" /> --free fence door--
-<action itemid="1541" script="door_open1.lua" /> --free fence door--
-<action itemid="1542" script="door_close1n.lua" /> --free fence door--
+<action itemid="1539" script="door_open1.lua" />
+<action itemid="1540" script="door_close1e.lua" />
+<action itemid="1541" script="door_open1.lua" />
+<action itemid="1542" script="door_close1n.lua" />
 
-<action itemid="1634" script="door_open1.lua" /> --table closed--
-<action itemid="1635" script="door_close1.lua" /> --table open--
+<action itemid="1634" script="door_open1.lua" />
+<action itemid="1635" script="door_close1.lua" />
 
-<action itemid="1636" script="door_open1.lua" /> --table closed--
-<action itemid="1637" script="door_close1.lua" /> --table open--
+<action itemid="1636" script="door_open1.lua" />
+<action itemid="1637" script="door_close1.lua" />
 
-<action itemid="1638" script="door_open1.lua" /> --table closed--
-<action itemid="1639" script="door_close1.lua" /> --table open--
+<action itemid="1638" script="door_open1.lua" />
+<action itemid="1639" script="door_close1.lua" />
 
-<action itemid="1640" script="door_open1.lua" /> --table closed--
-<action itemid="1641" script="door_close1.lua" /> --table open--
+<action itemid="1640" script="door_open1.lua" />
+<action itemid="1641" script="door_close1.lua" />
 
 ---------------
 
-<action itemid="1209" script="door_open2.lua" /> --free normal door--
-<action itemid="1211" script="door_close2e.lua" /> --free normal door--
-<action itemid="1212" script="door_open2.lua" /> --free normal door--
-<action itemid="1214" script="door_close2n.lua" /> --free normal door--
+<action itemid="1209" script="door_open2.lua" />
+<action itemid="1211" script="door_close2e.lua" />
+<action itemid="1212" script="door_open2.lua" />
+<action itemid="1214" script="door_close2n.lua" />
 
 <action itemid="1219" script="door_open1.lua" />
 <action itemid="1220" script="door_close1e.lua" />
@@ -96,15 +96,15 @@
 <action itemid="1229" script="door_open1.lua" />
 <action itemid="1230" script="door_close1n.lua" />
 
-<action itemid="1231" script="door_open2.lua" /> --free egipcian door--
-<action itemid="1233" script="door_close2e.lua" /> --free egipcian door--
-<action itemid="1234" script="door_open2.lua" /> --free egipcian door--
-<action itemid="1236" script="door_close2n.lua" /> --free egipcian door--
+<action itemid="1231" script="door_open2.lua" />
+<action itemid="1233" script="door_close2e.lua" />
+<action itemid="1234" script="door_open2.lua" />
+<action itemid="1236" script="door_close2n.lua" />
 
-<action itemid="1237" script="door_open1.lua" /> --free egipcian door--
-<action itemid="1238" script="door_close1e.lua" /> --free egipcian door--
-<action itemid="1239" script="door_open1.lua" /> --free egipcian door--
-<action itemid="1240" script="door_close1n.lua" /> --free egipcian door--
+<action itemid="1237" script="door_open1.lua" />
+<action itemid="1238" script="door_close1e.lua" />
+<action itemid="1239" script="door_open1.lua" />
+<action itemid="1240" script="door_close1n.lua" />
 
 <action itemid="1241" script="door_open1.lua" />
 <action itemid="1242" script="door_close1e.lua" />
@@ -116,10 +116,10 @@
 <action itemid="1247" script="door_open1.lua" />
 <action itemid="1248" script="door_close1n.lua" />
 
-<action itemid="1249" script="door_open2.lua" /> --free egipcian door--
-<action itemid="1251" script="door_close2e.lua" /> --free egipcian door--
-<action itemid="1252" script="door_open2.lua" /> --free egipcian door--
-<action itemid="1254" script="door_close2n.lua" /> --free egipcian door--
+<action itemid="1249" script="door_open2.lua" />
+<action itemid="1251" script="door_close2e.lua" />
+<action itemid="1252" script="door_open2.lua" />
+<action itemid="1254" script="door_close2n.lua" />
 
 <action itemid="1255" script="door_open1.lua" />
 <action itemid="1256" script="door_close1e.lua" />
