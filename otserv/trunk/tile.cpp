@@ -907,6 +907,9 @@ void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	const ItemType& oldType = Item::items[item->getID()];
 	const ItemType& newType = Item::items[itemId];
 
+	//Need to update it here too since the old and new item is the same
+	updateTileFlags(item, true);
+
 	item->setID(itemId);
 	item->setSubType(count);
 	onUpdateTileItem(index, item, oldType, item, newType);

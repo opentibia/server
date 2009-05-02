@@ -1398,6 +1398,9 @@ void LuaScriptInterface::registerFunctions()
 	//doSetCreatureDropLoot(cid, doDrop)
 	lua_register(m_luaState, "doSetCreatureDropLoot", LuaScriptInterface::luaDoSetCreatureDropLoot);
 
+	//isValidUID(uid)
+	lua_register(m_luaState, "isValidUID", LuaScriptInterface::luaIsValidUID);
+
 	//isPlayer(cid)
 	lua_register(m_luaState, "isPlayer", LuaScriptInterface::luaIsPlayer);
 
@@ -2798,7 +2801,9 @@ int LuaScriptInterface::luaDoTileAddItemEx(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(!tile){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		std::stringstream ss;
+		ss << pos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -2882,7 +2887,9 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 
 	Tile* toTile = g_game.getTile(toPos.x, toPos.y, toPos.z);
 	if(!toTile){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		std::stringstream ss;
+		ss << toPos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -3303,7 +3310,9 @@ int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
 
 	}
 	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		std::stringstream ss;
+		ss << pos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
 		pushThing(L, NULL, 0);
 		return 1;
 	}
@@ -3466,7 +3475,9 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(!tile){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		std::stringstream ss;
+		ss << pos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -3589,7 +3600,9 @@ int LuaScriptInterface::luaDoCreateTeleport(lua_State *L)
 
 	Tile* tile = g_game.getMap()->getTile(createPos);
 	if(!tile){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		std::stringstream ss;
+		ss << createPos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -3762,7 +3775,9 @@ int LuaScriptInterface::luaGetTilePzInfo(lua_State *L)
 		}
 	}
 	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		std::stringstream ss;
+		ss << pos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
 		lua_pushnumber(L, LUA_ERROR);
 	}
 	return 1;
@@ -3791,7 +3806,9 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 		}
 	}
 	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		std::stringstream ss;
+		ss << pos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
 		lua_pushnumber(L, LUA_ERROR);
 	}
 	return 1;
@@ -4612,7 +4629,9 @@ int LuaScriptInterface::luaQueryTileAddThing(lua_State *L)
 
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(!tile){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		std::stringstream ss;
+		ss << pos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
 		lua_pushnumber(L, (uint32_t)RET_NOTPOSSIBLE);
 		return 1;
 	}
@@ -6124,6 +6143,22 @@ int LuaScriptInterface::luaDoMoveCreature(lua_State *L)
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsValidUID(lua_State *L)
+{
+	//isValidUID(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	if(env->getThingByUID(uid)){
+		lua_pushboolean(L, true);
+	}
+	else{
+		lua_pushboolean(L, false);
 	}
 	return 1;
 }

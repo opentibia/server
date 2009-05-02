@@ -499,6 +499,7 @@ protected:
 	static int luaIsContainer(lua_State *L);
 	static int luaIsCorpse(lua_State *L);
 	static int luaIsMoveable(lua_State *L);
+	static int luaIsValidUID(lua_State *L);
 
 	//container
 	static int luaGetContainerSize(lua_State *L);
