@@ -1371,7 +1371,7 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 	ReturnValue ret = g_game.getPlayerByNameWildcard(param, playerExiva);
 
 	if(playerExiva && ret == RET_NOERROR){
-		if(playerExiva->getAccessLevel() > player->getAccessLevel()){
+		if(!player->hasFlag(PlayerFlag_SpecialVIP) && playerExiva->hasFlag(PlayerFlag_SpecialVIP)){
 			player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
