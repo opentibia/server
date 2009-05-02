@@ -213,7 +213,7 @@ int Items::loadFromOtb(std::string file)
 		std::cout << "New version of items.otb detected, a newer version of the server is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
-	else if(Items::dwMinorVersion != CLIENT_VERSION_840){
+	else if(Items::dwMinorVersion != CLIENT_VERSION_842){
 		std::cout << "Another (client) version of items.otb is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -438,6 +438,9 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(asLowerCaseString(strValue) == "magicfield"){
 										it.type = ITEM_TYPE_MAGICFIELD;
 									}
+									else if(asLowerCaseString(strValue) == "container"){
+										it.type = ITEM_TYPE_CONTAINER;
+									}
 									else if(asLowerCaseString(strValue) == "depot"){
 										it.type = ITEM_TYPE_DEPOT;
 									}
@@ -639,13 +642,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							/*
 							else if(asLowerCaseString(strValue) == "readable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.canReadText = true;
 								}
 							}
-							*/
 							else if(asLowerCaseString(strValue) == "writeable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.canWriteText = (intValue != 0);
