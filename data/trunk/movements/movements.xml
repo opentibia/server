@@ -652,7 +652,6 @@
 	<moveevent event="DeEquip" itemid="8918" slot="hand" function="onDeEquipItem"/>
 
 	<!-- Doors -->
-	<!--
 	<moveevent event="StepOut" itemid="1224" script="doors/door_close_vertical.lua"/>
 	<moveevent event="StepOut" itemid="1226" script="doors/door_close_horizontal.lua"/>
 	<moveevent event="StepOut" itemid="1228" script="doors/door_close_vertical.lua"/>
@@ -699,7 +698,6 @@
 	<moveevent event="StepOut" itemid="7041" script="doors/door_close_horizontal.lua"/>
 	<moveevent event="StepOut" itemid="7048" script="doors/door_close_vertical.lua"/>
 	<moveevent event="StepOut" itemid="7050" script="doors/door_close_vertical.lua"/>
-	-->
 
 	<!-- Adding level doors to the map -->
 	<moveevent event="AddItem" itemid="1227" script="doors/onadd_gateofexp.lua"/>
