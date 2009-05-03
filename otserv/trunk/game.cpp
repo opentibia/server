@@ -3814,10 +3814,8 @@ void Game::removeCreatureCheck(Creature* creature)
 
 	std::vector<Creature*>::iterator cit = std::find(checkCreatureVector.begin(),
 	checkCreatureVector.end(), creature);
-	if(cit != checkCreatureVector.end()) {
-		// Swap & pop is more effective than erase
-		std::swap(*cit, checkCreatureVector.back());
-		checkCreatureVector.pop_back();
+	if(cit != checkCreatureVector.end()){
+		checkCreatureVector.erase(cit);
 	}
 	creature->checkCreatureVectorIndex = 0;
 }
@@ -3828,7 +3826,7 @@ void Game::checkCreatures()
 		EVENT_CHECK_CREATURE_INTERVAL, boost::bind(&Game::checkCreatures, this)));
 
 	checkCreatureLastIndex++;
-	if(checkCreatureLastIndex == EVENT_CREATURECOUNT) {
+	if(checkCreatureLastIndex == EVENT_CREATURECOUNT){
 		checkCreatureLastIndex = 0;
 	}
 
@@ -3836,10 +3834,13 @@ void Game::checkCreatures()
 
 	Creature* creature;
 	for(uint32_t i = 0; i < checkCreatureVector.size(); ++i){
-		if((creature = checkCreatureVector[i]) && creature->getHealth() > 0)
+		creature = checkCreatureVector[i];
+		if(creature && creature->getHealth() > 0){
 			creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
-		else
+		}
+		else{
 			creature->onDie();
+		}
 	}
 
 	cleanup();
