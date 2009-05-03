@@ -39,7 +39,7 @@ public:
 	void setEventId(uint32_t eventid) {m_eventid = eventid;}
 	uint32_t getEventId() const {return m_eventid;}
 
-	boost::system_time getCycle() const {return m_cycle;}
+	boost::system_time getCycle() const {return m_expiration;}
 
 	bool operator<(const SchedulerTask& other) const
 	{
@@ -48,18 +48,16 @@ public:
 
 protected:
 
-	SchedulerTask(uint32_t delay, boost::function<void (void)> f) : Task(f) {
-		m_cycle = boost::get_system_time() + boost::posix_time::milliseconds(delay);
+	SchedulerTask(uint32_t delay, const boost::function<void (void)>& f) : Task(delay, f) {
 		m_eventid = 0;
 	}
 
-	boost::system_time m_cycle;
 	uint32_t m_eventid;
 
-	friend SchedulerTask* createSchedulerTask(uint32_t, boost::function<void (void)>);
+	friend SchedulerTask* createSchedulerTask(uint32_t, const boost::function<void (void)>&);
 };
 
-inline SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f)
+inline SchedulerTask* createSchedulerTask(uint32_t delay, const boost::function<void (void)>& f)
 {
 	assert(delay != 0);
 	if(delay < SCHEDULER_MINTICKS){

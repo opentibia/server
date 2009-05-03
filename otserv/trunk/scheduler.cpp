@@ -99,6 +99,8 @@ void Scheduler::schedulerThread(void* p)
 		if(task){
 			// if it was not stopped
 			if(runTask){
+				// Expiration has another meaning for dispatcher tasks, reset it
+				task->setDontExpire();
 				#ifdef __DEBUG_SCHEDULER__
 				std::cout << "Scheduler: Executing event " << task->getEventId() << std::endl;
 				#endif

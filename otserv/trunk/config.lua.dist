@@ -191,11 +191,11 @@ despawnradius = 50
 maxmessagebuffer = 4
 
 -- motd (the message box that you sometimes get before you choose characters)
-motd = "Welcome to OTServ!"
+motd = "Welcome to OTServ 0.6.3!"
 motdnum = "1"
 
 -- login message
-loginmsg = "Welcome to OTServ. For help visit http://otserv.org"
+loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otserv.org"
 
 -- how many logins attempts until ip is temporary disabled 
 -- set to 0 to disable

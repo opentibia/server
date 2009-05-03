@@ -86,15 +86,19 @@ void Dispatcher::dispatcherThread(void* p)
 
 		// finally execute the task...
 		if(task){
-			OutputMessagePool::getInstance()->startExecutionFrame();
-			(*task)();
+			if(!task->hasExpired()){
+				OutputMessagePool::getInstance()->startExecutionFrame();
+				(*task)();
+
+				outputPool = OutputMessagePool::getInstance();
+				if(outputPool)
+					outputPool->sendAll();
+				
+				g_game.clearSpectatorCache();
+			}
+
 			delete task;
 
-			outputPool = OutputMessagePool::getInstance();
-			if(outputPool){
-				outputPool->sendAll();
-			}
-			g_game.clearSpectatorCache();
 			#ifdef __DEBUG_SCHEDULER__
 			std::cout << "Dispatcher: Executing task" << std::endl;
 			#endif

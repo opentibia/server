@@ -304,37 +304,12 @@ private:
 
 	friend class Player;
 
-	template<class T1, class f1, class r>
-	void addGameTask(r (Game::*f)(f1), T1 p1);
+	// Helper so we don't need to bind every time
+#define addGameTask(f, ...) addGameTaskInternal(false, 0, boost::bind(f, &g_game, __VA_ARGS__))
+#define addGameTaskTimed(delay, f, ...) addGameTaskInternal(true, delay, boost::bind(f, &g_game, __VA_ARGS__))
 
-	template<class T1, class T2, class f1, class f2, class r>
-	void addGameTask(r (Game::*f)(f1, f2), T1 p1, T2 p2);
-
-	template<class T1, class T2, class T3, class f1, class f2, class f3,
-	class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3), T1 p1, T2 p2, T3 p3);
-
-	template<class T1, class T2, class T3, class T4, class f1, class f2,
-	class f3, class f4, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4), T1 p1, T2 p2, T3 p3, T4 p4);
-
-	template<class T1, class T2, class T3, class T4, class T5, class f1,
-	class f2, class f3, class f4, class f5, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5);
-
-	template<class T1, class T2, class T3, class T4, class T5, class T6,
-	class f1, class f2, class f3, class f4, class f5, class f6, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6);
-
-	template<class T1, class T2, class T3, class T4, class T5, class T6,
-	class T7, class f1, class f2, class f3, class f4, class f5, class f6,
-	class f7, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7);
-
-	template<class T1, class T2, class T3, class T4, class T5, class T6,
-	class T7, class T8, class f1, class f2, class f3, class f4, class f5,
-	class f6, class f7, class f8, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8);
+	template<class FunctionType>
+	void addGameTaskInternal(bool droppable, uint32_t delay, const FunctionType&);
 
 	Player* player;
 
