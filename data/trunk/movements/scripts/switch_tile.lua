@@ -16,26 +16,30 @@ function onStepIn(cid, item, pos)
 	end
 
 	doTransformTile(item)
-	local depot = {}
-	for x = -1, 1 do
-		for y = -1, 1 do
-			pos.x = pos.x + x
-			pos.y = pos.y + y
-			depot = getTileItemByType(pos, ITEM_TYPE_DEPOT)
-			if(depot.uid > 0) then
-				local depotItems = getPlayerDepotItems(cid, getDepotId(depot.uid))
-				local depotStr = "Your depot contains " .. depotItems .. " items."
-				if(depotItems == 1) then
-					depotStr = "Your depot contains 1 item."
+	
+	if(isPlayer(cid) == TRUE) then
+		local depot = {}
+		for x = -1, 1 do
+			for y = -1, 1 do
+				pos.x = pos.x + x
+				pos.y = pos.y + y
+				depot = getTileItemByType(pos, ITEM_TYPE_DEPOT)
+				if(depot.uid > 0) then
+					local depotItems = getPlayerDepotItems(cid, getDepotId(depot.uid))
+					local depotStr = "Your depot contains " .. depotItems .. " items."
+					if(depotItems == 1) then
+						depotStr = "Your depot contains 1 item."
+					end
+					doPlayerSendTextMessage(cid, MESSAGE_EVENT_DEFAULT, depotStr)
+					return TRUE
 				end
-				doPlayerSendTextMessage(cid, MESSAGE_EVENT_DEFAULT, depotStr)
-				return TRUE
+				-- The pos has changed, change it back
+				pos.x = pos.x - x
+				pos.y = pos.y - y
 			end
-			-- The pos has changed, change it back
-			pos.x = pos.x - x
-			pos.y = pos.y - y
 		end
 	end
+	
 	return TRUE
 end
 
