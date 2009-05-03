@@ -16,10 +16,6 @@ local TYPE_SWAMP = 28
 
 local oilLamps = {[2046] = 2044}
 
-local casks = { [1771] = TYPE_WATER,
-				[1772] = TYPE_BEER, 
-				[1773] = TYPE_WINE }
-
 local alcoholDrinks = {TYPE_BEER, TYPE_WINE, TYPE_RUM}
 local poisonDrinks = {TYPE_SLIME, TYPE_SWAMP}
 
@@ -38,7 +34,7 @@ local exhaust = createConditionObject(CONDITION_EXHAUSTED)
 setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))
 
 function onUse(cid, item, frompos, item2, topos)
-	if(topos.x == 31 and topos.y == 31 and topos.z == 7) then
+	if(topos.x == 0 and topos.y == 0 and topos.z == 0) then
 		item2 = item
 		topos = getThingPos(item.uid)
 	end
@@ -102,30 +98,12 @@ function onUse(cid, item, frompos, item2, topos)
 				return TRUE
 			end
 
-			if(casks[item2.itemid] ~= nil) then
-				doChangeTypeItem(item.uid, casks[item2.itemid])
+			local fluidSource = getFluidSourceType(item2.itemid)
+			if(fluidSource ~= -1) then
+				doChangeTypeItem(item.uid, fluidSource)
 				return TRUE
 			end
 
-			if(isInArray(NORMAL_CORPSE_STAGE_I, item2.itemid) == TRUE) then
-				doChangeTypeItem(item.uid, TYPE_BLOOD)
-				return TRUE
-			end
-
-			if(isInArray(MUD, item2.itemid) == TRUE) then
-				doChangeTypeItem(item.uid, TYPE_MUD)
-				return TRUE
-			end
-
-			if(isInArray(SWAMP_CORPSE_STAGE_I, item2.itemid) == TRUE or isInArray(SWAMP, item2.itemid) == TRUE) then
-				doChangeTypeItem(item.uid, TYPE_SLIME)
-				return TRUE
-			end
-
-			if(isInArray(WATER, item2.itemid) == TRUE) then
-				doChangeTypeItem(item.uid, TYPE_WATER)
-				return TRUE
-			end
 
 			doPlayerSendCancel(cid, "It is empty.")
 			return TRUE
