@@ -545,6 +545,7 @@ protected:
 	AutoList<Creature> listCreature;
 	size_t checkCreatureLastIndex;
 	std::vector<Creature*> checkCreatureVectors[EVENT_CREATURECOUNT];
+	std::vector<Creature*> toAddCheckCreatureVector;
 
 	struct GameEvent
 	{

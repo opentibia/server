@@ -380,10 +380,9 @@ protected:
 	bool isMapLoaded;
 	bool isUpdatingPath;
 	// The creature onThink event vector this creature belongs to
-	// The value stored here is actually 1 larger than the index,
-	// this is to allow 0 to represent the special value of not
-	// being stored in any onThink vector
-	size_t checkCreatureVectorIndex;
+	// -1 represents that the creature isn't in any vector
+	// 0 represents it's going to be added in the next checkCreature call
+	int32_t checkCreatureVectorIndex;
 
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
