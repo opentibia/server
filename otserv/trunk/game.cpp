@@ -3815,7 +3815,8 @@ void Game::removeCreatureCheck(Creature* creature)
 	std::vector<Creature*>::iterator cit = std::find(checkCreatureVector.begin(),
 	checkCreatureVector.end(), creature);
 	if(cit != checkCreatureVector.end()){
-		checkCreatureVector.erase(cit);
+		std::swap(*cit, checkCreatureVector.back());
+		checkCreatureVector.pop_back();
 	}
 	creature->checkCreatureVectorIndex = 0;
 }
