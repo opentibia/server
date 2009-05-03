@@ -432,14 +432,15 @@ bool Items::loadFromXml(const std::string& datadir)
 						if(readXMLString(itemAttributesNode, "key", strValue)){
 							if(asLowerCaseString(strValue) == "type"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(asLowerCaseString(strValue) == "key"){
+									if(asLowerCaseString(strValue) == "container"){
+										it.group = ITEM_GROUP_CONTAINER;
+										it.type = ITEM_TYPE_CONTAINER;
+									}
+									else if(asLowerCaseString(strValue) == "key"){
 										it.type = ITEM_TYPE_KEY;
 									}
 									else if(asLowerCaseString(strValue) == "magicfield"){
 										it.type = ITEM_TYPE_MAGICFIELD;
-									}
-									else if(asLowerCaseString(strValue) == "container"){
-										it.type = ITEM_TYPE_CONTAINER;
 									}
 									else if(asLowerCaseString(strValue) == "depot"){
 										it.type = ITEM_TYPE_DEPOT;

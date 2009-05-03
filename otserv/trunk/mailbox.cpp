@@ -185,15 +185,16 @@ bool Mailbox::getReceiver(Item* item, std::string& name, uint32_t& dp)
 
 	if(item->getID() == ITEM_PARCEL){ /**We need to get the text from the label incase its a parcel**/
 		Container* parcel = item->getContainer();
-
-		for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); cit++){
-			if((*cit)->getID() == ITEM_LABEL){
-				item = (*cit);
-				
-				if(item->getText() != ""){
-					break;	
-				}  
-			} 
+		if(parcel){
+			for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); cit++){
+				if((*cit)->getID() == ITEM_LABEL){
+					item = (*cit);
+					
+					if(item->getText() != ""){
+						break;	
+					}  
+				} 
+			}
 		}
 	}
 	else if(item->getID() != ITEM_LETTER){/**The item is somehow not a parcel or letter**/
