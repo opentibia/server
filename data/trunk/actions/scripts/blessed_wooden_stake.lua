@@ -11,9 +11,13 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 	
+	if(item2.uid == cid) then
+		topos = getThingPos(cid)
+	end
+	
 	if (math.random(1, 15) == 1) then
 		doPlayerAddItem(cid, stake[item2.itemid], 1)
-		doSendMagicEffect(cid, CONST_ME_STUN)
+		doSendMagicEffect(topos, CONST_ME_STUN)
 	else
 		doSendMagicEffect(topos, CONST_ME_BLOCKHIT)
 	end

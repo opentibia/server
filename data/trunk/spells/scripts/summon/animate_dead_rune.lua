@@ -16,6 +16,11 @@ end
 
 function onCastSpell(cid, var)
 	local pos = variantToPosition(var)
+
+	if(pos.x == 65535) then
+		pos = getThingPos(cid)
+	end
+
 	if(pos.x ~= 0 and pos.y ~= 0 and pos.z ~= 0) then
 		return doTargetCorpse(cid, pos)
 	end
