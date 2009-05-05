@@ -1,30 +1,29 @@
-local REAGENT_FIRE   = 7760
-local REAGENT_ICE    = 7759
-local REAGENT_ENERGY = 7762
-local REAGENT_EARTH  = 7761
-
 function onUse(cid, item, frompos, item2, topos)
 
-	local count = ENCHANTABLE_THINGS[item2.itemid][5]
-
-	if ENCHANTABLE_THINGS[item2.itemid] == nil then
+	if ENCHANTABLE_WEAPONS[item2.itemid] == nil then
 		return FALSE
 	end
 
-	if (item.itemid == REAGENT_FIRE) then
-		doTransformItem(item2.uid, ENCHANTABLE_THINGS[item2.itemid][1], count)
+	local count = ENCHANTABLE_WEAPONS[item2.itemid][5]
+
+	-- Ice weapons
+	if (item.itemid == ENCHANTED_SMALL_SAPPHIRE) then
+		doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][2], count)
 		doRemoveItem(item.uid, 1)
 
-	elseif (item.itemid == REAGENT_ICE) then
-		doTransformItem(item2.uid, ENCHANTABLE_THINGS[item2.itemid][2], count)
+	-- Fire weapons
+	elseif (item.itemid == ENCHANTED_SMALL_RUBY) then
+		doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][1], count)
 		doRemoveItem(item.uid, 1)
 
-	elseif (item.itemid == REAGENT_ENERGY) then
-		doTransformItem(item2.uid, ENCHANTABLE_THINGS[item2.itemid][3], count)
+	-- Earth weapons
+	elseif (item.itemid == ENCHANTED_SMALL_EMERALD) then
+		doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][4], count)
 		doRemoveItem(item.uid, 1)
 
-	elseif (item.itemid == REAGENT_EARTH) then
-		doTransformItem(item2.uid, ENCHANTABLE_THINGS[item2.itemid][4], count)
+	-- Energy weapons
+	elseif (item.itemid == ENCHANTED_SMALL_AMETHYST) then
+		doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][3], count)
 		doRemoveItem(item.uid, 1)
 	else
 		return FALSE

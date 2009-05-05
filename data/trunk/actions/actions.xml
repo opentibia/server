@@ -27,6 +27,10 @@
 	<action itemid="7760" script="enchant.lua" />
 	<action itemid="7761" script="enchant.lua" />
 	<action itemid="7762" script="enchant.lua" />
+	<action itemid="2146" script="shrines.lua" />
+	<action itemid="2147" script="shrines.lua" />
+	<action itemid="2149" script="shrines.lua" />
+	<action itemid="2150" script="shrines.lua" />
 
 	<!-- Spellbooks -->
 	<action itemid="2175" script="spellbook.lua"/>
@@ -772,6 +776,5 @@
 	
 	<!-- Others -->
 	<action itemid="2785" script="blueberry_bush.lua"/>
-	<action itemid="2147" script="gems.lua"/>
-	
+
 </actions>
