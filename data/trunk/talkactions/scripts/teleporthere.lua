@@ -17,8 +17,8 @@ function onSay(cid, words, param)
 
 	if creatureAccess < access then
 		local playerPos = getPlayerPosition(cid)
+		local oldCreaturePos = getCreaturePosition(paramCreature)
 		if(doTeleportThing(creature, playerPos) ~= LUA_ERROR) then
-			local oldCreaturePos = getCreaturePosition(paramCreature)
 			local newCreaturePos = getCreaturePosition(paramCreature)
 			doSendMagicEffect(oldCreaturePos, CONST_ME_POFF)
 			doSendMagicEffect(newCreaturePos, CONST_ME_TELEPORT)		

@@ -1,5 +1,6 @@
 function onSay(cid, words, param)
-	if getPlayerAccess(cid) < 2 then
+	-- Disabled for security reasons
+	if true then --getPlayerAccess(cid) < 10 then
 		return TRUE
 	end
 	local v = getConfigValue(param)
