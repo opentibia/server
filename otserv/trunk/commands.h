@@ -73,7 +73,7 @@ protected:
 	bool sellHouse(Creature* creature, const std::string& cmd, const std::string& param);
 	bool getHouse(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool bansManager(Creature* creature, const std::string& cmd, const std::string& param);
-	bool serverInfo(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool serverInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool forceRaid(Creature* creature, const std::string& cmd, const std::string& param);
 	bool refreshMap(Creature* creature, const std::string& cmd, const std::string& param);
 

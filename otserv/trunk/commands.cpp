@@ -101,7 +101,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/gethouse",&Commands::getHouse},
 	//{"/bans",&Commands::bansManager},
 	//{"/town",&Commands::teleportToTown},
-	{"/serverinfo",&Commands::serverInfo},
+	//{"/serverinfo",&Commands::serverInfo},
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	{"/serverdiag",&Commands::serverDiag},
 #endif
@@ -824,24 +824,6 @@ bool Commands::getHouse(Creature* creature, const std::string& cmd, const std::s
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
 	}
 	return false;
-}
-
-bool Commands::serverInfo(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Player* player = creature->getPlayer();
-	if(!player)
-		return false;
-
-	std::stringstream text;
-	text << "SERVER INFO:";
-	text << "\nExp Rate: " << g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
-	text << "\nSkill Rate: " << g_config.getNumber(ConfigManager::RATE_SKILL);
-	text << "\nMagic Rate: " << g_config.getNumber(ConfigManager::RATE_MAGIC);
-	text << "\nLoot Rate: " << g_config.getNumber(ConfigManager::RATE_LOOT);
-
-	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, text.str().c_str());
-
-	return true;
 }
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
