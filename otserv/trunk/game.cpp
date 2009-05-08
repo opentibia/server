@@ -943,19 +943,21 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 
 	fromCylinder->getTile()->moveCreature(creature, toCylinder);
 
-	int32_t index = 0;
-	Item* toItem = NULL;
-	Cylinder* subCylinder = NULL;
+	if(creature->getParent() == toCylinder){
+		int32_t index = 0;
+		Item* toItem = NULL;
+		Cylinder* subCylinder = NULL;
 
-	uint32_t n = 0;
-	while((subCylinder = toCylinder->__queryDestination(index, creature, &toItem, flags)) != toCylinder){
-		toCylinder->getTile()->moveCreature(creature, subCylinder);
-		toCylinder = subCylinder;
-		flags = 0;
+		uint32_t n = 0;
+		while((subCylinder = toCylinder->__queryDestination(index, creature, &toItem, flags)) != toCylinder){
+			toCylinder->getTile()->moveCreature(creature, subCylinder);
+			toCylinder = subCylinder;
+			flags = 0;
 
-		//to prevent infinite loop
-		if(++n >= MAP_MAX_LAYERS)
-			break;
+			//to prevent infinite loop
+			if(++n >= MAP_MAX_LAYERS)
+				break;
+		}
 	}
 
 	return RET_NOERROR;
