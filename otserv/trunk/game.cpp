@@ -408,7 +408,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 
 			int32_t subType = -1;
 			if(it.isFluidContainer()){
-				int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+				int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
 				if(index < maxFluidType){
 					subType = reverseFluidMap[index];
 				}
@@ -2948,7 +2948,7 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 
 	uint8_t subType = 0;
 	if(it.isFluidContainer()){
-		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
 		if(count < maxFluidType){
 			subType = (uint8_t)reverseFluidMap[count];
 		}
@@ -2981,7 +2981,7 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count, u
 
 	uint8_t subType = 0;
 	if(it.isFluidContainer()){
-		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
 		if(count < maxFluidType){
 			subType = (uint8_t)reverseFluidMap[count];
 		}
@@ -3017,7 +3017,7 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 
 	int32_t subType = 0;
 	if(it.isFluidContainer()){
-		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint32_t);
+		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
 		if(count < maxFluidType){
 			subType = reverseFluidMap[count];
 		}
