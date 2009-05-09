@@ -171,11 +171,11 @@ public:
 	virtual bool canSeeInvisibility() const { return false;}
 
 	int64_t getSleepTicks() const;
-	int32_t getWalkDelay(Direction dir) const;
+	int32_t getWalkDelay(Direction dir, uint32_t resolution) const;
 	int64_t getTimeSinceLastMove() const;
 
-	virtual int64_t getEventStepTicks() const;
-	int32_t getStepDuration() const;
+	int64_t getEventStepTicks() const;
+	int32_t getStepDuration(bool addLastStepCost = true) const;
 	virtual int32_t getStepSpeed() const {return getSpeed();}
 	int32_t getSpeed() const {return baseSpeed + varSpeed;}
 	void setSpeed(int32_t varSpeedDelta)

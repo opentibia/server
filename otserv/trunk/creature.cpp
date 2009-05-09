@@ -166,7 +166,8 @@ int64_t Creature::getTimeSinceLastMove() const
 	return 0x7FFFFFFFFFFFFFFFLL;
 }
 
-int64_t Creature::getSleepTicks() const{
+int64_t Creature::getSleepTicks() const
+{
 	if(lastStep != 0){
 		int64_t ct = OTSYS_TIME();
 		int64_t stepDuration = getStepDuration();
@@ -177,12 +178,21 @@ int64_t Creature::getSleepTicks() const{
 	return 0;
 }
 
-int32_t Creature::getWalkDelay(Direction dir) const{
+int32_t Creature::getWalkDelay(Direction dir, uint32_t resolution) const
+{
 	float mul = 1.0f;
 	if(dir == NORTHWEST || dir == NORTHEAST || dir == SOUTHWEST || dir == SOUTHEAST) {
-		mul = 1.5f;
+		mul = 3.0f;
 	}
-	return int32_t(getSleepTicks() * mul);
+
+	int64_t res = 0;
+	if(lastStep != 0){
+		int64_t ct = OTSYS_TIME();
+		int64_t stepDuration = std::ceil(((double)getStepDuration(false))/resolution) * resolution;
+		res = stepDuration - (ct - lastStep) + extraStepDuration;
+	}
+
+	return int32_t(res * mul);
 }
 
 void Creature::onThink(uint32_t interval)
@@ -549,7 +559,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 			}
 			else if(std::abs(newPos.x - oldPos.x) >=1 && std::abs(newPos.y - oldPos.y) >= 1){
 				//diagonal extra cost
-				lastStepCost = 2;
+				lastStepCost = 3;
 			}
 		}
 
@@ -1439,7 +1449,7 @@ std::string Creature::getDescription(int32_t lookDistance) const
 	return str;
 }
 
-int32_t Creature::getStepDuration() const
+int32_t Creature::getStepDuration(bool addLastStepCost /*= true*/) const
 {
 	if(isRemoved()){
 		return 0;
@@ -1456,7 +1466,7 @@ int32_t Creature::getStepDuration() const
 		}
 	}
 
-	return duration * lastStepCost;
+	return duration * (addLastStepCost ? lastStepCost : 1);
 };
 
 int64_t Creature::getEventStepTicks() const

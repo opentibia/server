@@ -1909,7 +1909,9 @@ bool Game::playerMove(uint32_t playerId, Direction direction)
 		return false;
 
 	player->stopWalk();
-	int32_t delay = player->getWalkDelay(direction);
+	//client works with 50 ms resolution
+	int32_t delay = player->getWalkDelay(direction, 50);
+
 	if(delay > 0){
 		player->setNextAction(OTSYS_TIME() + player->getStepDuration());
 		SchedulerTask* task = createSchedulerTask( ((uint32_t)delay), boost::bind(&Game::playerMove, this,
