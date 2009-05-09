@@ -78,7 +78,7 @@ public:
 	Dispatcher();
 	~Dispatcher() {}
 
-	void addTask(Task* task);
+	void addTask(Task* task, bool push_front = false);
 
 	void start();
 	void stop();

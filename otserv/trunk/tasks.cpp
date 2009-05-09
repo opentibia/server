@@ -109,14 +109,19 @@ void Dispatcher::dispatcherThread(void* p)
 #endif
 }
 
-void Dispatcher::addTask(Task* task)
+void Dispatcher::addTask(Task* task, bool push_front /*= false*/)
 {
 	bool do_signal = false;
 	m_taskLock.lock();
 	if(m_threadState == STATE_RUNNING){
 
 		do_signal = m_taskList.empty();
-		m_taskList.push_back(task);
+		if(push_front){
+			m_taskList.push_front(task);
+		}
+		else{
+			m_taskList.push_back(task);
+		}
 
 		#ifdef __DEBUG_SCHEDULER__
 		std::cout << "Dispatcher: Added task" << std::endl;
