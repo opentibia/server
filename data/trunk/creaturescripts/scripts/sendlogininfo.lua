@@ -1,5 +1,5 @@
 function onLogin(cid)
-	--Sends the login message and also the teleport effect
+	--Sends the login messages and also the teleport effect
 	local loginMsg = getConfigValue('loginmsg')
 	local lastLogin = getPlayerLastLogin(cid)
 	local playerPos = getPlayerPosition(cid)
@@ -17,13 +17,14 @@ function onLogin(cid)
 		str = str .. os.date("%d. %b %Y %X", lastLogin)
 		str = str .. "."
 	else
-		str = "Welcome to "
+		str = "This is your first visit in "
 		str = str .. serverName
 		str = str .. ". Please choose an outfit."
 		doPlayerSendOutfitWindow(cid)
 	end
-	doSendMagicEffect(playerPos, CONST_ME_TELEPORT)
+
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_DEFAULT, str)
+	doSendMagicEffect(playerPos, CONST_ME_TELEPORT)
 
 	return TRUE
 end
