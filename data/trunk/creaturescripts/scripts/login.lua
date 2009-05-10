@@ -13,6 +13,7 @@ function onLogin(cid)
 		setPlayerStorageValue(cid, STORAGE_REMOVE_BLESSES, -1)
 	end
 
+	--Promotes player if necessary
 	if(isPremium(cid) == TRUE) then
 		if(getPlayerStorageValue(cid, STORAGE_PROMOTION) == 1 and getPlayerVocation(cid) <= 4) then
 			doPlayerSetVocation(cid, getPlayerVocation(cid)+4)
@@ -22,7 +23,7 @@ function onLogin(cid)
 		return TRUE
 	end
 
-	--Remove premium privileges
+	--Player is not premium - remove premium privileges
 	--Change outfit
 	local lookType = 128
 	if(getPlayerSex(cid) == 0) then
@@ -43,6 +44,7 @@ function onLogin(cid)
 	doTeleportThing(cid, masterFreePos)
 	]]-- Hoster's premium towns changes according to the map
 
+	--Remove promotion
 	local isPromo = (getPlayerVocation(cid) > 4)
 	if(isPromo) then
 		doPlayerSetVocation(cid, getPlayerVocation(cid)-4)

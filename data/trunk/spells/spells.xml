@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <spells>
-
 	<!-- House Spells -->
 	<instant name="House Guest List" words="aleta sio" enabled="1" function="editHouseGuest"></instant>
 	<instant name="House Subowner List" words="aleta som" enabled="1" function="editHouseSubOwner"></instant>
@@ -72,11 +71,10 @@
 	<rune name="adori gran mort" id="2268" lvl="45" maglv="15" needtarget="1" charges="3" script="attack/sudden_death.lua">
 	</rune>
 	<rune name="adana ani" id="2278" lvl="54" maglv="18" mana="1400" needtarget="1" charges="5" script="support/paralyze_rune.lua">
-		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
+		<vocation name="Druid"/>   <vocation name="Elder Druid"/>
 	</rune>
 	<rune name="Wild Growth" id="2269" allowfaruse="1" charges="2" lvl="27" maglv="8" exhaustion="2000" blocktype="all" script="support/wild_growth.lua">
-		<vocation name="Druid" showInDescription="0"/>
-		<vocation name="Elder Druid" showInDescription="0"/>
+		<vocation name="Druid"/>   <vocation name="Elder Druid"/>
 	</rune>
 
 	<!-- Conjure Spells -->

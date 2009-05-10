@@ -13,6 +13,4 @@ function onKill(cid, target)
 			end
 		end
 	end	
-
-	return 1
 end

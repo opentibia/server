@@ -26,7 +26,6 @@
 	<command cmd="/info" access="1" />			<!-- Info about a player -->
 	<command cmd="/getonline" access="1" />			<!-- Info about how many players are online -->
 	<command cmd="/gethouse" access="1" />			<!-- Info about house of a player -->
-	<command cmd="/serverinfo" access="1" />    		<!-- Info about the server -->
 
 	<!-- Players -->
 	<command cmd="/sellhouse" access="0" />			<!-- Sell your house to a player -->

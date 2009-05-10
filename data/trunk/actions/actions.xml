@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
-
 <actions>
-	
 	<!-- Quest Rewards (only for example) -->
 	<action uniqueid="1000" script="quest_reward.lua"/>
 	<action uniqueid="1001" script="quest_reward.lua"/>
@@ -776,5 +774,4 @@
 	
 	<!-- Others -->
 	<action itemid="2785" script="blueberry_bush.lua"/>
-
 </actions>
