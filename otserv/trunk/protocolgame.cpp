@@ -2211,9 +2211,6 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 			}
 			else{
 				AddTileCreature(msg, pos, stackpos, creature);
-				if(isLogin){
-					AddMagicEffect(msg, pos, NM_ME_TELEPORT);
-				}
 			}
 		}
 	}

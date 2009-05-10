@@ -223,7 +223,7 @@ enum PlayerInfo_t{
 	PlayerInfoBalance,
 	PlayerInfoPzLock,
 	PlayerInfoPremium,
-    PlayerInfoLastLogin
+	PlayerInfoLastLogin
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <creaturescripts>
 	<event name="PlayerLogin" type="login" script="login.lua"/>
+	<event name="SendLoginInfo" type="login" script="sendlogininfo.lua"/>
+	<event name="CheckPremium" type="login" script="checkpremium.lua"/>
 	<event name="AutoBan" type="kill" script="autoban.lua"/>
 	<event name="RemoveBlesses" type="die" script="removeblesses.lua"/>
 </creaturescripts>

@@ -22,7 +22,7 @@
 	<monster name="Tarantula" file="aracnids/tarantula.xml"/>
 
 	<!-- Arena -->
-		<!-- Greenhorn -->
+	<!-- Greenhorn -->
 	<monster name="Achad" file="arena/greenhorn/achad.xml"/>
 	<monster name="Axeitus Headbanger" file="arena/greenhorn/axeitus headbanger.xml"/>
 	<monster name="Bloodpaw" file="arena/greenhorn/bloodpaw.xml"/>
