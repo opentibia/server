@@ -1816,8 +1816,8 @@
 	</item>
 	<item id="1758" article="a" name="cot">
 		<attribute key="type" value="bed"/>
-	</item>
-	<item id="1759" article="a" name="cot">
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="1766" />	</item>	<item id="1759" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
 		<attribute key="maleSleeper" value="1767" />
@@ -1838,35 +1838,35 @@
 	<item id="1762" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-	</item>
+		<attribute key="maleSleeper" value="1754" />	</item>
 	<item id="1763" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-	</item>
+		<attribute key="maleSleeper" value="1755" />	</item>
 	<item id="1764" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-	</item>
+		<attribute key="maleSleeper" value="1760" />	</item>
 	<item id="1765" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-	</item>
+		<attribute key="maleSleeper" value="1761" />	</item>
 	<item id="1766" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-	</item>
+		<attribute key="maleSleeper" value="1758" />	</item>
 	<item id="1767" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-	</item>
+		<attribute key="maleSleeper" value="1759" />	</item>
 	<item id="1768" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-	</item>
+		<attribute key="maleSleeper" value="1756" />	</item>
 	<item id="1769" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-	</item>
+		<attribute key="maleSleeper" value="1757" />	</item>
 	<item id="1770" article="a" name="barrel">
 		<attribute key="containerSize" value="25"/>
 	</item>
@@ -2853,7 +2853,7 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="charges" value="20"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentAll" value="25"/>
+		<attribute key="absorbPercentAll" value="20"/>
 	</item>
 	<item id="2165" article="a" name="stealth ring">
 		<attribute key="weight" value="100"/>
@@ -2913,7 +2913,7 @@
 	<item id="2173" article="an" name="amulet of loss">
 		<attribute key="weight" value="420"/>
 		<attribute key="slotType" value="necklace"/>
-		<attribute key="preventitemloss" value="1"/>
+		<attribute key="preventItemloss" value="1"/>
 		<attribute key="charges" value="1"/>
 	</item>
 	<item id="2174" article="a" name="strange symbol">
@@ -3035,8 +3035,7 @@
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="5"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentDeath" value="80"/>
-		<attribute key="absorbPercentPhysical" value="80"/>
+		<attribute key="absorbPercentPhysical" value="80"/>		<attribute key="absorbPercentDeath" value="80"/>
 	</item>
 	<item id="2198" article="an" name="elven amulet">
 		<attribute key="weight" value="270"/>
@@ -3080,6 +3079,7 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2166"/>
+		<attribute key="skillFist" value="5"/>
 		<attribute key="duration" value="300"/>
 		<attribute key="showduration" value="1"/>
 	</item>
@@ -3465,8 +3465,10 @@
 	<item id="2294" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="2295" article="a" name="spell rune">
+	<item id="2295" article="a" name="holy missile rune">
+		<attribute key="runeSpellName" value="adori san"/>
 		<attribute key="weight" value="120"/>
+		<attribute key="charges" value="5"/>
 	</item>
 	<item id="2296" article="a" name="spell rune">
 		<attribute key="weight" value="120"/>
@@ -3924,6 +3926,7 @@
 		<attribute key="attack" value="60"/>
 		<attribute key="defense" value="1"/>
 		<attribute key="weaponType" value="sword"/>
+		<attribute key="elementIce" value="18"/>
 		<attribute key="charges" value="1"/>
 	</item>
 	<item id="2397" article="a" name="longsword">
@@ -7059,8 +7062,8 @@
 	<item id="3067" article="a" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3070"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="decayTo" value="2806"/>
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
@@ -7074,7 +7077,7 @@
 	<item id="3069" article="a" name="dead cyclops">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2808"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
@@ -8319,19 +8322,19 @@
 	<item id="3840" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-	</item>
+		<attribute key="maleSleeper" value="3836" />	</item>
 	<item id="3841" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-	</item>
+		<attribute key="maleSleeper" value="3837" />	</item>
 	<item id="3842" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-	</item>
+		<attribute key="maleSleeper" value="3838" />	</item>
 	<item id="3843" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-	</item>
+		<attribute key="maleSleeper" value="3839" />	</item>
 	<item id="3844" name="grass"/>
 	<item id="3845" name="grass"/>
 	<item id="3846" name="grass"/>
@@ -9850,6 +9853,7 @@
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4666" name="shallow water">
+		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
@@ -10591,13 +10595,15 @@
 		<attribute key="type" value="door"/>
 	</item>
 	<item id="5086" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a box."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5087" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a box."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5088" article="a" name="furniture package">
-		<attribute key="description" value="It is a kit for a water-pipe."/>
+		<attribute key="description" value="It is a kit for a barrel."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="5089" article="a" name="butterfly conservation kit">
@@ -11224,14 +11230,50 @@
 	<item id="5493" article="a" name="straw mat"/>
 	<item id="5494" article="a" name="straw mat"/>
 	<item id="5495" article="a" name="straw mat"/>
-	<item id="5496" article="a" name="straw mat"/>
-	<item id="5497" article="a" name="straw mat"/>
-	<item id="5498" article="a" name="straw mat"/>
-	<item id="5499" article="a" name="straw mat"/>
-	<item id="5500" article="a" name="straw mat"/>
-	<item id="5501" article="a" name="straw mat"/>
-	<item id="5502" article="a" name="straw mat"/>
-	<item id="5503" article="a" name="straw mat"/>
+	<item id="5496" article="a" name="straw mat">
+		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="5502"/>
+	</item>
+	<item id="5497" article="a" name="straw mat">
+		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="5503"/>
+	</item>
+	<item id="5498" article="a" name="straw mat">
+		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="5500"/>
+	</item>
+	<item id="5499" article="a" name="straw mat">
+		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="5501"/>
+	</item>
+	<item id="5500" article="a" name="straw mat">
+		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="5498"/>
+		<attribute key="femaleSleeper" value="7843"/>
+	</item>
+	<item id="5501" article="a" name="straw mat">
+		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="5499"/>
+		<attribute key="femaleSleeper" value="5499"/>
+	</item>
+	<item id="5502" article="a" name="straw mat">
+		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="5496"/>
+		<attribute key="femaleSleeper" value="7841"/>
+	</item>
+	<item id="5503" article="a" name="straw mat">
+		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="5497"/>
+		<attribute key="femaleSleeper" value="7842"/>
+	</item>
 	<item id="5504" article="a" name="wooden pillar"/>
 	<item id="5505" article="a" name="pulley"/>
 	<item id="5506" article="a" name="pulley"/>
@@ -13187,9 +13229,11 @@
 		<attribute key="weight" value="50"/>
 	</item>
 	<item id="6114" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a big flowerpot."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="6115" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a large amphora."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="6116" name="electric sparks"/>
@@ -13916,6 +13960,7 @@
 		<attribute key="containerSize" value="10"/>
 	</item>
 	<item id="6372" article="a" name="furniture package">
+		<attribute key="description" value="It is a kit for a tree stump."/>
 		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="6373" article="a" name="furniture package">
@@ -15973,12 +16018,12 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="-2"/>
 	</item>
-	<item id="7405" article="a" name="shenlong sword">
-		<attribute key="weight" value="8000"/>
-		<attribute key="defense" value="31"/>
-		<attribute key="attack" value="48"/>
+	<item id="7405" article="a" name="havoc blade">
+		<attribute key="weight" value="7200"/>
+		<attribute key="defense" value="34"/>
+		<attribute key="attack" value="49"/>
 		<attribute key="weaponType" value="sword"/>
-		<attribute key="extradef" value="-2"/>
+		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="7406" article="a" name="blacksteel sword">
 		<attribute key="weight" value="5900"/>
@@ -16157,8 +16202,12 @@
 		<attribute key="weaponType" value="club"/>
 		<attribute key="extradef" value="1"/>
 	</item>
-	<item id="7433" article="a" name="cursed axe">  <!-- This isn't a real item -->
-		<attribute key="weight" value="2500"/>
+	<item id="7433" article="a" name="ravenwing">
+		<attribute key="weight" value="5500"/>
+		<attribute key="defense" value="22"/>
+		<attribute key="attack" value="45"/>
+		<attribute key="weaponType" value="axe"/>
+		<attribute key="extradef" value="1"/>
 	</item>
 	<item id="7434" article="a" name="royal axe">
 		<attribute key="weight" value="9200"/>
@@ -16484,8 +16533,12 @@
 	<item id="7521" article="a" name="coffin"/>
 	<item id="7522" article="a" name="coffin"/>
 	<item id="7523" article="a" name="coffin"/>
-	<item id="7524" article="a" name="coffin"/>
-	<item id="7525" article="a" name="coffin"/>
+	<item id="7524" article="a" name="coffin">
+		<attribute key="floorchange" value="west"/>
+	</item>
+	<item id="7525" article="a" name="coffin">
+		<attribute key="floorchange" value="north"/>
+	</item>
 	<item id="7526" article="a" name="dwarven beard">
 		<attribute key="weight" value="1100"/>
 	</item>
@@ -17310,102 +17363,168 @@
 	</item>
 	<item id="7778" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="1754"/>
 	</item>
 	<item id="7779" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="1760"/>
 	</item>
 	<item id="7780" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="1761"/>
 	</item>
-	<item id="7781" article="a" name="cot">
+	<item id="7781" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="1758"/>
 	</item>
-	<item id="7782" article="a" name="cot">
+	<item id="7782" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="1759"/>
 	</item>
-	<item id="7783" article="a" name="cot">
+	<item id="7783" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="1756"/>
 	</item>
-	<item id="7784" article="a" name="cot">
+	<item id="7784" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="1757"/>
 	</item>
-	<item id="7785" article="a" name="hammock">
+	<item id="7785" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="3836"/>
 	</item>
 	<item id="7786" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="3838"/>
 	</item>
 	<item id="7787" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="7811"/>
 	</item>
 	<item id="7788" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="7812"/>
 	</item>
 	<item id="7789" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="7813"/>
 	</item>
 	<item id="7790" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="7814"/>
 	</item>
 	<item id="7791" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="7815"/>
 	</item>
 	<item id="7792" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="7816"/>
 	</item>
 	<item id="7793" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="7817"/>
 	</item>
 	<item id="7794" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="7818"/>
 	</item>
 	<item id="7795" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="7819"/>
 	</item>
 	<item id="7796" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="7820"/>
 	</item>
 	<item id="7797" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="7821"/>
 	</item>
 	<item id="7798" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="7822"/>
 	</item>
 	<item id="7799" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="7811"/>
 	</item>
 	<item id="7800" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="7812"/>
 	</item>
 	<item id="7801" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="7813"/>
 	</item>
 	<item id="7802" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="7814"/>
 	</item>
 	<item id="7803" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="7815"/>
 	</item>
 	<item id="7804" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="7816"/>
 	</item>
 	<item id="7805" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="7817"/>
 	</item>
 	<item id="7806" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="7818"/>
 	</item>
 	<item id="7807" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="7819"/>
 	</item>
 	<item id="7808" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="7820"/>
 	</item>
 	<item id="7809" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="7821"/>
 	</item>
 	<item id="7810" article="a" name="bed">
 		<attribute key="type" value="bed"/>
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="7822"/>
 	</item>
 	<item id="7811" article="a" name="bed">
 		<attribute key="type" value="bed"/>
@@ -17496,6 +17615,7 @@
 	<item id="7837" article="a" name="ground"/>
 	<item id="7838" article="a" name="flash arrow" plural="flash arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="25"/>
 		<attribute key="hitChance" value="90"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -17505,6 +17625,7 @@
 	</item>
 	<item id="7839" article="a" name="shiver arrow" plural="shiver arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="25"/>
 		<attribute key="hitChance" value="90"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -17514,6 +17635,7 @@
 	</item>
 	<item id="7840" article="a" name="flaming arrow" plural="flaming arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="25"/>
 		<attribute key="hitChance" value="90"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -17523,15 +17645,18 @@
 	</item>
 	<item id="7841" article="a" name="straw mat">
 		<attribute key="type" value="bed"/>
-		<attribute key="partnerDirection" value="2"/>
+		<attribute key="partnerDirection" value="south"/>
+		<attribute key="maleSleeper" value="5502"/>
 	</item>
 	<item id="7842" article="a" name="straw mat">
 		<attribute key="type" value="bed"/>
-		<attribute key="partnerDirection" value="0"/>
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="5503"/>
 	</item>
 	<item id="7843" article="a" name="straw mat">
 		<attribute key="type" value="bed"/>
-		<attribute key="partnerDirection" value="1"/>
+		<attribute key="partnerDirection" value="east"/>
+		<attribute key="maleSleeper" value="5500"/>
 	</item>
 	<item id="7844" article="a" name="paper">
 		<attribute key="weight" value="100"/>
@@ -17556,8 +17681,9 @@
 		<attribute key="decayTo" value="7743"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="7850" article="an" name="earth arrow" plural="earth arrow">
+	<item id="7850" article="an" name="earth arrow" plural="earth arrows">
 		<attribute key="weight" value="70"/>
+		<attribute key="slotType" value="ammo"/>
 		<attribute key="attack" value="25"/>
 		<attribute key="hitChance" value="90"/>
 		<attribute key="weaponType" value="ammunition"/>
@@ -17934,6 +18060,7 @@
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="absorbPercentEnergy" value="20"/>
 		<attribute key="absorbPercentEarth" value="-10"/>
+		<attribute key="showcharges" value="1"/>
 	</item>
 	<item id="7890" article="a" name="magma amulet">
 		<attribute key="weight" value="500"/>
@@ -18121,15 +18248,23 @@
 		<attribute key="fluidSource" value="blood"/>
 	</item>
 	<item id="7932" article="a" name="burried hole"/>
-	<item id="7933" article="a" name="hole"/>
+	<item id="7933" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+		<attribute key="decayTo" value="7932"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="7936" article="a" name="coal basin"/>
-	<item id="7938" article="a" name="weaved hole"/>
+	<item id="7938" article="a" name="weaved hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
 	<item id="7939" article="a" name="mining helmet">
 		<attribute key="weight" value="700"/>
 		<attribute key="armor" value="1"/>
 		<attribute key="slotType" value="head"/>
 	</item>
-	<item id="7940" name="cave entrance"/>
+	<item id="7940" name="cave entrance">
+		<attribute key="floorchange" value="west"/>
+	</item>
 	<item id="7943" name="shallow water">
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
@@ -18313,14 +18448,17 @@
 	<item id="8076" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
+		<attribute key="maleSleeper" value="1761"/>
 	</item>
 	<item id="8077" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
-		<attribute key="partnerDirection" value="north" />
+		<attribute key="partnerDirection" value="north"/>
+		<attribute key="maleSleeper" value="3837"/>
 	</item>
 	<item id="8078" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
-		<attribute key="partnerDirection" value="west" />
+		<attribute key="partnerDirection" value="west"/>
+		<attribute key="maleSleeper" value="3839"/>
 	</item>
 	<item id="8109" name="some special leaves">
 		<attribute key="weight" value="80"/>
@@ -18380,8 +18518,12 @@
 	</item>
 	<item id="8190" article="a" name="spellbook"/>
 	<item id="8194" article="a" name="birthday cake"/>
-	<item id="8202" name="cave entrance"/>
-	<item id="8203" name="cave entrance"/>
+	<item id="8202" name="cave entrance">
+		<attribute key="floorchange" value="north"/>
+	</item>
+	<item id="8203" name="cave entrance">
+		<attribute key="floorchange" value="north"/>
+	</item>
 	<item id="8204" name="easily inflammable sulphur">
 		<attribute key="weight" value="50"/>
 	</item>
@@ -18393,10 +18535,18 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="120"/>
 	</item>
-	<item id="8210" name="cave entrance"/>
-	<item id="8211" name="cave entrance"/>
-	<item id="8212" name="cave entrance"/>
-	<item id="8213" name="cave entrance"/>
+	<item id="8210" name="cave entrance">
+		<attribute key="floorchange" value="north"/>
+	</item>
+	<item id="8211" name="cave entrance">
+		<attribute key="floorchange" value="west"/>
+	</item>
+	<item id="8212" name="cave entrance">
+		<attribute key="floorchange" value="west"/>
+	</item>
+	<item id="8213" name="cave entrance">
+		<attribute key="floorchange" value="west"/>
+	</item>
 	<item id="8233" name="dragon head"/>
 	<item id="8234" name="dragon head"/>
 	<item id="8235" name="dragon head"/>
@@ -18956,6 +19106,8 @@
 	</item>
 	<item id="8585" article="a" name="hole">
 		<attribute key="floorchange" value="down"/>
+		<attribute key="decayTo" value="8579"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<item id="8586" name="dirt"/>
 	<item id="8587" article="a" name="chest">
@@ -19088,7 +19240,12 @@
 		<attribute key="rotateTo" value="8689"/>
 	</item>
 	<item id="8692" article="a" name="heavy package">
+		<attribute key="description" value="It is a kit for a furnace."/>
 		<attribute key="weight" value="60000"/>
+	</item>
+	<item id="8693" article="a" name="furniture package">
+		<attribute key="description" value="It is empty."/>
+		<attribute key="weight" value="2500"/>
 	</item>
 	<item id="8696" article="a" name="closed door">
 		<attribute key="type" value="door"/>
@@ -19556,7 +19713,13 @@
 		<attribute key="absorbPercentDeath" value="10"/>
 		<attribute key="absorbPercentHoly" value="-10"/>
 	</item>
-	<item id="8886"/>
+	<item id="8886" article="a" name="molten plate">
+		<attribute key="armor" value="13"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="weight" value="7500"/>
+		<attribute key="absorbPercentFire" value="7"/>
+		<attribute key="absorbPercentIce" value="-7"/>
+	</item>
 	<item id="8887" article="a" name="frozen plate">
 		<attribute key="armor" value="13"/>
 		<attribute key="slotType" value="body"/>
@@ -19668,7 +19831,7 @@
 		<attribute key="weaponType" value="shield"/>
 		<attribute key="duration" value="1200"/>
 		<attribute key="decayTo" value="8905"/>
-		<attribute key="speed" value="10"/>
+		<attribute key="speed" value="20"/>
 	</item>
 	<item id="8909" article="a" name="terran rainbow shield">
 		<attribute key="description" value="It has been temporarily imbued with earth magic and boosts your regeneration."/>
@@ -20022,9 +20185,11 @@
 	<item id="8970" article="a" name="piano"/>
 	<item id="8971" article="a" name="gland" plural="gland">
 		<attribute key="description" value="It is the pheromone gland of a rotworm queen."/>
-		<attribute key="weight" value="050"/>
+		<attribute key="weight" value="50"/>
 	</item>
-	<item id="8972"/>
+	<item id="8972" article="a" name="hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
 	<item id="8973" name="buttress"/>
 	<item id="8974" article="a" name="oracle figurine">
 	<attribute key="weight" value="800"/>
@@ -20323,7 +20488,7 @@
 	<item id="9564" article="a" name="large gem"/>
 	<item id="9565" article="a" name="large gem"/>
 	<item id="9573" name="corkscrew stairs">
-		<attribute key="floorchange" value="east"/>
+		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="9574" name="corkscrew stairs">
 		<attribute key="floorchange" value="down"/>
@@ -20339,12 +20504,17 @@
 	<item id="9606" name="stairs">
 		<attribute key="floorchange" value="down"/>
 	</item>
+	<item id="9624" name="closed trapdoor"/>
+	<item id="9625" name="open trapdoor">
+		<attribute key="floorchange" value="down"/>
+	</item>
 	<item id="9654" article="a" name="slain vampire bride">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="9658"/>
 		<attribute key="duration" value="900"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
+	<item id="9655" article="a" name="wooden pole"/>
 	<item id="9658" article="a" name="slain vampire bride">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="9659"/>
@@ -20369,6 +20539,9 @@
 	<item id="9690" article="a" name="gear wheel">
 		<attribute key="weight" value="5"/>
 	</item>
+	<item id="9746" article="a" name="box ramp">
+		<attribute key="floorchange" value="west"/>
+	</item>
 	<item id="9747" article="a" name="golden wall lamp"/>
 	<item id="9748" article="a" name="golden wall lamp"/>
 	<item id="9749" article="a" name="golden wall lamp"/>
@@ -20390,13 +20563,13 @@
 	</item>
 	<item id="9776" article="a" name="yalahari armor">
 		<attribute key="weight" value="7000"/>
-		<attribute key="armor" value="17"/>
+		<attribute key="armor" value="16"/>
 		<attribute key="slotType" value="body"/>
 		<attribute key="absorbPercentDeath" value="3"/>
 	</item>
 	<item id="9777" article="a" name="yalahari leg piece">
 		<attribute key="weight" value="6500"/>
-		<attribute key="armor" value="9"/>
+		<attribute key="armor" value="8"/>
 		<attribute key="slotType" value="legs"/>
 		<attribute key="absorbPercentDeath" value="5"/>
 		<attribute key="skillDist" value="2"/>
@@ -20407,6 +20580,7 @@
 		<attribute key="slotType" value="head"/>
 		<attribute key="magicpoints" value="2"/>
 	</item>
+	<item id="9779" article="an" name="energy pillar"/>
 	<item id="9801" article="a" name="dead worker golem">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="9802"/>

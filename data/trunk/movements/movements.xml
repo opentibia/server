@@ -698,6 +698,18 @@
 	<moveevent event="StepOut" itemid="7041" script="doors/door_close_horizontal.lua"/>
 	<moveevent event="StepOut" itemid="7048" script="doors/door_close_vertical.lua"/>
 	<moveevent event="StepOut" itemid="7050" script="doors/door_close_vertical.lua"/>
+	<moveevent event="StepOut" itemid="8552" script="doors/door_close_vertical.lua"/>
+	<moveevent event="StepOut" itemid="8554" script="doors/door_close_horizontal.lua"/>
+	<moveevent event="StepOut" itemid="8556" script="doors/door_close_vertical.lua"/>
+	<moveevent event="StepOut" itemid="8558" script="doors/door_close_horizontal.lua"/>
+	<moveevent event="StepOut" itemid="9176" script="doors/door_close_vertical.lua"/>
+	<moveevent event="StepOut" itemid="9178" script="doors/door_close_horizontal.lua"/>
+	<moveevent event="StepOut" itemid="9180" script="doors/door_close_vertical.lua"/>
+	<moveevent event="StepOut" itemid="9182" script="doors/door_close_horizontal.lua"/>
+	<moveevent event="StepOut" itemid="9278" script="doors/door_close_vertical.lua"/>
+	<moveevent event="StepOut" itemid="9280" script="doors/door_close_horizontal.lua"/>
+	<moveevent event="StepOut" itemid="9282" script="doors/door_close_vertical.lua"/>
+	<moveevent event="StepOut" itemid="9284" script="doors/door_close_horizontal.lua"/>
 
 	<!-- Adding level doors to the map -->
 	<moveevent event="AddItem" itemid="1227" script="doors/onadd_gateofexp.lua"/>
