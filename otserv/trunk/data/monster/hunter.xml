@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="hunter" nameDescription="a hunter" race="blood" experience="150" speed="215" manacost="0">
+  <health now="150" max="150"/>
+  <look type="129" head="95" body="116" legs="121" feet="115" corpse="6080"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+   <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="4"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="10"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" min="-0" max="-50"/>
+    <attack name="physical" interval="2000" chance="50" range="7" min="-50" max="-100">
+      <attribute key="shootEffect" value="arrow"/>
+    </attack>
+  </attacks>
+  <defenses armor="8" defense="10"/>
+  <immunities>
+    <immunity physical="0"/>
+    <immunity energy="0"/>
+    <immunity fire="0"/>
+    <immunity poison="1"/>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="0"/>
+    <immunity drunk="0"/>
+    <immunity invisible="0"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Guess who we're hunting, haha!"/>
+  </voices>
+  <loot>
+    <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+    <item id="2465" chance="10000"/>
+    <item id="2461" chance="10000"/>
+    <item id="2649" chance="10000"/>
+    <item id="2671" countmax="2" chance1="20000" chancemax="0"/>
+    <item id="5875" chance="5000"/>
+    <item id="1987" chance="100000">
+      <inside>
+        <item id="2456" chance="6666"/>
+        <item id="2544" countmax="15" chance1="10000" chancemax="0"/>
+        <item id="2546" countmax="5" chance1="10000" chancemax="0"/>
+        <item id="2147" countmax="2" chance1="3333" chancemax="0"/>
+        <item id="2675" countmax="4" chance1="6666" chancemax="0"/>
+        <item id="2690" countmax="4" chance1="6666" chancemax="0"/>
+        <item id="2050" chance="20000"/>
+        <item id="2478" chance="3333"/>
+        <item id="2652" chance="2222"/>
+        <item id="2201" chance="2500"/>
+      </inside>
+    </item>
+  </loot>
+</monster>
