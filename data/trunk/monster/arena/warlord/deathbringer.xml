@@ -38,21 +38,18 @@
   </attacks>
   <defenses armor="15" defense="15">
   </defenses>
+  <elements>
+	<element deathPercent="100"/>
+	<element firePercent="65"/>
+	<element energyPercent="-20"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
-    <voice sentence="YOU FOOLS WILL PAY!"/>
-    <voice sentence="YOU ALL WILL DIE!!"/>
-    <voice sentence="DEATH, DESTRUCTION!"/>
+    <voice sentence="YOU FOOLS WILL PAY!" yell="1"/>
+    <voice sentence="YOU ALL WILL DIE!!" yell="1"/>
+    <voice sentence="DEATH, DESTRUCTION!" yell="1"/>
     <voice sentence="I will eat your soul!"/>
 
   </voices>

@@ -28,16 +28,14 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element earthPercent="100"/>
+	<element physicalPercent="22"/>
+	<element deathPercent="20"/>
+	<element firePercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
     <immunity lifedrain="1"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
   </immunities>
   <voices interval="5000" chance="10">
     <voice sentence="Harrrr Harrrr!"/>

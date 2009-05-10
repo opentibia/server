@@ -21,19 +21,12 @@
     <attack name="melee" interval="2000" skill="3" attack="9"/>
 </attacks>
   <defenses armor="8" defense="8"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element icePercent="22"/>
+	<element firePercent="-10"/>
+  </elements>
   <voices interval="5000" chance="10">
-    <voice sentence="ribbit!ribbit!"/>
+    <voice sentence="Ribbit, ribbit!"/>
   </voices>
   <loot>
     <item id="2148" countmax="9" chance1="60000" chancemax="1321"/>

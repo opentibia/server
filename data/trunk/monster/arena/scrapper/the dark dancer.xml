@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Dark Dancer" species="undead" tp="1" nameDescription="the dark dancer" race="blood" experience="435" speed="170">
-	<health now="805" max="805"/>
+	<health now="855" max="855"/>
 	<look type="58" corpse="7349"/>
 	<targetchange interval="60000" chance="0"/>
 	<strategy attack="100" defense="0"/>
@@ -35,14 +35,17 @@
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
+	<elements>
+		<element firePercent="40"/>
+		<element deathPercent="22"/>
+	</elements>
 	<immunities>
-		<immunity name="energy"/>
-		<immunity name="fire"/>
-		<immunity name="poison"/>
-		<immunity name="paralyze"/>
-		<immunity name="invisible"/>
+		<immunity invisible="1"/>
 	</immunities>
 	<summons maxSummons="3">
 		<summon name="Ghoul" interval="2000" chance="20"/>
 	</summons>
+	<voices interval="5000" chance="5">
+		<voice sentence="I hope you like my voice!"/>
+	</voices>
 </monster>

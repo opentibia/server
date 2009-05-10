@@ -24,17 +24,21 @@
     </attack>
 </attacks>
   <defenses armor="25" defense="23"/>
+  <elements>
+	<element earthPercent="18"/>
+	<element holyPercent="17"/>
+	<element deathPercent="-7"/>
+	<element firePercent="-9"/>
+	<element icePercent="-11"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
+    <immunity invisible="1"/>
   </immunities>
+  <voices interval="5000" chance="10">
+	<voice sentence="Give up!"/>
+	<voice sentence="Hiyaa!"/>
+	<voice sentence="Plundeeeeer!"/>
+  </voices>
   <loot>
     <item id="2148" countmax="53" chance1="50000" chancemax="0"/>
     <item id="2483" chance="10000"/>

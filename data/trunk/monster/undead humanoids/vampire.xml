@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="vampire" nameDescription="a vampire" race="blood" experience="290" speed="220" manacost="100">
+<monster name="vampire" nameDescription="a vampire" race="blood" experience="305" speed="220" manacost="0">
   <health now="450" max="450"/>
   <look type="68" head="20" body="30" legs="40" feet="50" corpse="6006"/>
   <targetchange interval="5000" chance="8"/>
@@ -26,7 +26,6 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </attack>
   </attacks>
-
   <defenses armor="17" defense="23">
     <defense name="outfit" interval="1500" chance="60" monster="bat" duration="6000">
       <attribute key="areaEffect" value="blueshimmer"/>
@@ -34,23 +33,23 @@
     <defense name="outfit" interval="1500" chance="50" monster="vampire" duration="6000">
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
-
      <defense name="speed" interval="1500" chance="120" range="7" speedchange="300" duration="30000">
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element deathPercent="100"/>
+	<element earthPercent="100"/>
+	<element physicalPercent="15"/>
+	<element firePercent="-10"/>
+	<element holyPercent="-25"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
     <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
-  <voices interval="5000" chance="100"> 
+  <voices interval="5000" chance="100">
     <voice sentence="BLOOD!" yell="1"/>
     <voice sentence="Let me kiss your neck."/>
     <voice sentence="I smell warm blood."/>
@@ -58,7 +57,7 @@
   </voices>
   <loot>
     <item id="2148" countmax="9" chance1="100000" chancemax="0"/>
-    <item id="2649" chance="8000"/> 
+    <item id="2649" chance="8000"/>
     <item id="2383" chance="1666"/>
     <item id="5905" countmax="1" chance1="2000" chancemax="0"/>
     <item id="2172" chance="200"/> --bronze amulet

@@ -15,24 +15,20 @@
     <flag staticattack="50"/>
     <flag lightlevel="0"/>
     <flag lightcolor="0"/>
-    <flag targetdistance="7"/>
+    <flag targetdistance="8"/>
     <flag runonhealth="0"/>
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-14" max="-100"/>
   </attacks>
   <defenses armor="22" defense="23"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element icePercent="100"/>
+	<element firePercent="20"/>
+	<element holyPercent="10"/>
+	<element energyPercent="-10"/>
+	<element deathPercent="-5"/>
+  </elements>
   <voices interval="2000" chance="5">
     <voice sentence="Ymirs Mjalle!"/>
     <voice sentence="No run so much, must stay fat!"/>

@@ -26,20 +26,15 @@
 </attacks>
   <defenses armor="12" defense="10"/>
 
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element earthPercent="40"/>
+	<element icePercent="25"/>
+	<element firePercent="-10"/>
+  </elements>
 
-  <voices interval="5000" chance="30"> 
-    <voice sentence="Ribbit!Ribbit!"/>
+  <voices interval="5000" chance="30">
+    <voice sentence="Ribbit, ribbit!"/>
+	<voice sentence="Ribbit!"/>
   </voices>
   <loot>
     <item id="2148" countmax="12" chance1="60000" chancemax="1321"/>

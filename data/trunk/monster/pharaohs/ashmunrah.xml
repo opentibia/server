@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="Ashmunrah" nameDescription="a ashmunrah" race="UNDEAD" experience="5000" speed="320" manacost="0">
-  <health now="3100" max="3100"/>
+<monster name="Ashmunrah" nameDescription="a ashmunrah" race="UNDEAD" experience="3100" speed="320" manacost="0">
+  <health now="5000" max="5000"/>
   <look type="87" head="20" body="30" legs="40" feet="50" corpse="6031"/>
   <targetchange interval="5000" chance="8"/>
   <strategy attack="100" defense="0"/>
@@ -49,15 +49,14 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element earthPercent="100"/>
+	<element deathPercent="100"/>
+	<element holyPercent="-17"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
     <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="4">
@@ -65,13 +64,8 @@
     <summon name="green djinn" interval="1000" chance="1000" max="2"/>
   </summons>
   <voices interval="5000" chance="10">
-    <voice sentence="I might be trapped but not without power."/>
+    <voice sentence="No mortal or undead will steal my secrets!"/>
     <voice sentence="Ahhhh all those long years."/>
-    <voice sentence="Ages come, ages go. Asmumrah remains."/>
-    <voice sentence="My traitorous son has sent thee."/>
-    <voice sentence="No mortal or undead will steal my secrets."/>
-    <voice sentence="You will be history soon."/>
-    <voice sentence="Come to me, my allys and underlings."/>
   </voices>
   <loot>
     <item id="2148" countmax="100" chance1="100000" chancemax="0"/>

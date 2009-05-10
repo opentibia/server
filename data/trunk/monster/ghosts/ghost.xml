@@ -22,16 +22,14 @@
     <attack name="lifedrain" interval="1000" chance="15" range="1" min="-25" max="-45"/>
   </attacks>
   <defenses armor="10" defense="10"/>
+  <elements>
+	<element physicalPercent="100"/>
+	<element earthPercent="100"/>
+	<element deathPercent="100"/>
+  </elements>
   <immunities>
-    <immunity physical="1"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
     <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
-    <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
     <voice sentence="Huh!"/>
@@ -48,7 +46,7 @@
         <item id="2394" chance="6666"/>
         <item id="2804" countmax="2" chance1="20000" chancemax="0"/>
         <item id="2532" chance="1666"/>
-        <item id="2182" chance="1333" /> -- snakebite rod
+        <item id="2182" chance="1333"/> -- snakebite rod
         <item id="2165" chance="1538"/>
         <item id="2423" chance="10000"/>
         <item id="1962" chance="5000"/>

@@ -33,17 +33,18 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element energyPercent="50"/>
+	<element holyPercent="25"/>
+	<element earthPercent="-5"/>
+	<element deathPercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Huumans stinkk!"/>
+  </voices>
   <summons maxSummons="4">
     <summon name="snake" interval="1000" chance="25" max="4"/>
   </summons>
@@ -57,7 +58,7 @@
         <item id="2389" countmax="1" chance1="4000" chancemax="0"/>
         <item id="2079" chance="3333"/>
         <item id="2190" chance="1538"/>
-        <item id="2188" chance="1000" /> -- wand of plague
+        <item id="2188" chance="1000"/> -- wand of plague
       </inside>
     </item>
   </loot>

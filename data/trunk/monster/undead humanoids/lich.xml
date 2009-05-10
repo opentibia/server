@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="Lich" nameDescription="a lich" race="UNDEAD" experience="1400" speed="320" manacost="0">
+<monster name="Lich" nameDescription="a lich" race="UNDEAD" experience="900" speed="320" manacost="0">
   <health now="880" max="880"/>
   <look type="99" head="95" body="116" legs="119" feet="115" corpse="6028"/>
   <targetchange interval="5000" chance="8"/>
@@ -40,15 +40,14 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element deathPercent="100"/>
+	<element earthPercent="100"/>
+	<element energyPercent="80"/>
+	<element holyPercent="-35"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="4">

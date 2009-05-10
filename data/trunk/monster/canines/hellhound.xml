@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="hellhound" nameDescription="a hellhound" race="blood" experience="4350" speed="310" manacost="0">
+<monster name="hellhound" nameDescription="a hellhound" race="blood" experience="6800" speed="310" manacost="0">
   <health now="7500" max="7500"/>
   <look type="240" corpse="6332"/>
   <targetchange interval="5000" chance="8"/>
@@ -41,12 +41,14 @@
 
   <defenses armor="25" defense="35">
   </defenses>
+  <elements>
+  <element firePercent="100"/>
+  <element earthPercent="40"/>
+  <element energyPercent="40"/>
+  <element icePercent="-20"/>
+  <element holyPercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
     <immunity outfit="1"/>
     <immunity drunk="1"/>

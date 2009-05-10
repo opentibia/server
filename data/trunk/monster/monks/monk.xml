@@ -28,19 +28,18 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element holyPercent="50"/>
+	<element deathPercent="50"/>
+	<element physicalPercent="-15"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
-    <immunity invisible="1"/>
+	<immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
-    <voice sentence="'Repent heretic!, Feel my kick!. A prayer for Zathroth"/>
+  <voice sentence="Repent Heretic!"/>
+  <voice sentence="A prayer to the almighty one!"/>
+  <voice sentence="I will punish the sinners!"/>
   </voices>
   <loot>
     <item id="2148" countmax="20" chance1="100000" chancemax="0"/>

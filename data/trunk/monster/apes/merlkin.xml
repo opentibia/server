@@ -36,11 +36,14 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element firePercent="20"/>
+	<element earthPercent="10"/>
+	<element holyPercent="3"/>
+	<element icePercent="-15"/>
+	<element deathPercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
     <immunity lifedrain="0"/>
     <immunity paralyze="0"/>
     <immunity outfit="1"/>
@@ -52,14 +55,13 @@
     <voice sentence="Holy banana!"/>
     <voice sentence="Chakka! Chakka!"/>
   </voices>
-<loot>
-<item id="2148" chance="100000" countmax="50" /> -- gold coin
-<item id="2188" chance="1538" /> -- wand of plague
-<item id="2675" chance="10000" countmax="5" /> -- orange
-<item id="2162" chance="2222" /> -- magic lightwand
-<item id="5883" chance="1000" countmax="2" /> -- ape fur
-<item id="3966" chance="1333" /> -- banana staff
-<item id="2150" chance="1538" countmax="3" /> -- small amethyst
-</loot>
-
+  <loot>
+	<item id="2148" chance="100000" countmax="50"/>
+	<item id="2188" chance="1538"/>
+	<item id="2675" chance="10000" countmax="5"/>
+	<item id="2162" chance="2222"/>
+	<item id="5883" chance="1000" countmax="2"/>
+	<item id="3966" chance="1333"/>
+	<item id="2150" chance="1538" countmax="3"/>
+  </loot>
 </monster>

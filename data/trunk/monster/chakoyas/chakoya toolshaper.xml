@@ -26,20 +26,18 @@
     </attacks>
     <defenses armor="30" defense="30">
     </defenses>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element icePercent="100"/>
+	<element firePercent="40"/>
+	<element holyPercent="10"/>
+	<element energyPercent="-15"/>
+	<element deathPercent="-5"/>
+  </elements>
     <voices interval="2000" chance="5">
       <voice sentence="Chikuva!!"/>
       <voice sentence="Jinuma jamjam!"/>
+	  <voice sentence="Suvituka siq chuqua!"/>
+	  <voice sentence="Kiyosa sipaju!"/>
     </voices>
     <loot>
       <item id="2667" countmax="2" chance1="20000" chancemax="0"/>

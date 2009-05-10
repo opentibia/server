@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<monster name="grorlam" nameDescription="Grorlam" race="blood" experience="290" speed="240" manacost="0">
-  <health now="310" max="310"/>
+<monster name="grorlam" nameDescription="Grorlam" race="blood" experience="2400" speed="240" manacost="0">
+  <health now="3000" max="3000"/>
   <look type="205" head="20" body="30" legs="40" feet="50" corpse="6005"/>
-  <targetchange interval="5000" chance="8"/>
+  <targetchange interval="5000" chance="3"/>
   <strategy attack="100" defense="0"/>
   <flags>
     <flag summonable="0"/>
@@ -31,16 +31,17 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element earthPercent="100"/>
+	<element physicalPercent="30"/>
+	<element holyPercent="20"/>
+	<element energyPercent="20"/>
+	<element deathPercent="-5"/>
+	<element firePercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
     <immunity paralyze="1"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
+    <immunity invisible="1"/>
   </immunities>
   <loot>
     <item id="2148" countmax="20" chance1="100000" chancemax="0"/>

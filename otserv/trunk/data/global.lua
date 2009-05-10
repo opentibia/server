@@ -1,9 +1,25 @@
+-- Load Lua-made functions
+dofile(getDataDir() .. 'functions.lua')
+
+-- Storages consts
+STORAGE_RUM_MACHINE = 100000
+STORAGE_PROMOTION = 15000
+-- Storage for blesses - 500000 + blessID
+STORAGE_BLESSES = 500000
+-- Storage will be set to know we will remove blesses in onLogin
+STORAGE_REMOVE_BLESSES = 1000000
+
+-- Booleans consts
 TRUE = 1
 FALSE = 0
 
+-- Error consts
 LUA_ERROR = -1
 LUA_NO_ERROR = 0
 
+CONTAINER_POSITION = 65535
+
+-- Directions consts
 NORTH = 0
 EAST = 1
 SOUTH = 2
@@ -13,10 +29,14 @@ SOUTHEAST = 5
 NORTHWEST = 6
 NORTHEAST = 7
 
+-- World Types consts
+WORLD_TYPE_NO_PVP = 1
+WORLD_TYPE_PVP = 2
+WORLD_TYPE_PVP_ENFORCED = 3
+
 COMBAT_FORMULA_UNDEFINED = 0
 COMBAT_FORMULA_LEVELMAGIC = 1
 COMBAT_FORMULA_SKILL = 2
-COMBAT_FORMULA_VALUE = 3
 COMBAT_FORMULA_DAMAGE = 3
 
 CONDITION_PARAM_OWNER = 1
@@ -75,8 +95,6 @@ COMBAT_PARAM_CREATEITEM = 7
 COMBAT_PARAM_AGGRESSIVE = 8
 COMBAT_PARAM_DISPEL = 9
 COMBAT_PARAM_USECHARGES = 10
-COMBAT_PARAM_HITEFFECT = 11
-COMBAT_PARAM_HITTEXTCOLOR = 12
 
 CALLBACK_PARAM_LEVELMAGICVALUE = 1
 CALLBACK_PARAM_SKILLVALUE = 2
@@ -124,10 +142,32 @@ CONDITION_CURSED = 1048576
 CONDITION_EXHAUST_COMBAT = 2097152
 CONDITION_EXHAUST_HEAL   = 4194304
 CONDITION_PACIFIED = 8388608
+CONDITION_HUNTING = 16777216
+CONDITION_TRADE_MUTED = 33554432
 
 PLAYERLOSS_EXPERIENCE = 0
 PLAYERLOSS_MANA = 1
 PLAYERLOSS_SKILL = 2
+PLAYERLOSS_ITEMS = 3
+PLAYERLOSS_CONTAINERS = 4
+
+LEVEL_SKILL_FIST = 0
+LEVEL_SKILL_CLUB = 1
+LEVEL_SKILL_SWORD = 2
+LEVEL_SKILL_AXE = 3
+LEVEL_SKILL_DISTANCE = 4
+LEVEL_SKILL_SHIELDING = 5
+LEVEL_SKILL_FISHING = 6
+LEVEL_MAGIC = 7
+LEVEL_EXPERIENCE = 8
+
+CONST_SKILL_FIST = 0
+CONST_SKILL_CLUB = 1
+CONST_SKILL_SWORD = 2
+CONST_SKILL_AXE = 3
+CONST_SKILL_DISTANCE = 4
+CONST_SKILL_SHIELDING = 5
+CONST_SKILL_FISHING = 6
 
 CONST_SLOT_HEAD = 1
 CONST_SLOT_NECKLACE = 2
@@ -158,7 +198,7 @@ CONST_ME_MAGIC_GREEN = 14
 CONST_ME_HITBYFIRE = 15
 CONST_ME_HITBYPOISON = 16
 CONST_ME_MORTAREA = 17
-CONST_ME_SOUND_BLUE = 18
+CONST_ME_SOUND_GREEN = 18
 CONST_ME_SOUND_RED = 19
 CONST_ME_POISONAREA = 20
 CONST_ME_SOUND_YELLOW = 21
@@ -339,7 +379,7 @@ RETURNVALUE_YOUAREEXHAUSTED = 38
 RETURNVALUE_PLAYERISNOTREACHABLE = 39
 RETURNVALUE_CANONLYUSETHISRUNEONCREATURES = 40
 RETURNVALUE_ACTIONNOTPERMITTEDINPROTECTIONZONE = 41
-RETURNVALUE_YOUMAYNOTATTACKTHISPLAYER = 42
+RETURNVALUE_YOUMAYNOTATTACKTHISPERSON = 42
 RETURNVALUE_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE = 43
 RETURNVALUE_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE = 44
 RETURNVALUE_YOUMAYNOTATTACKTHISCREATURE = 45
@@ -354,6 +394,7 @@ RETURNVALUE_PLAYERISPZLOCKEDLEAVEPVPZONE = 53
 RETURNVALUE_PLAYERISPZLOCKEDENTERPVPZONE = 54
 RETURNVALUE_ACTIONNOTPERMITTEDINANOPVPZONE = 55
 RETURNVALUE_YOUCANNOTLOGOUTHERE = 56
+RETURNVALUE_YOUCANNOTLOGOUTHERE = 56
 RETURNVALUE_YOUNEEDAMAGICITEMTOCASTSPELL = 57
 RETURNVALUE_CANNOTCONJUREITEMHERE = 58
 RETURNVALUE_YOUNEEDTOSPLITYOURSPEARS = 59
@@ -364,147 +405,6 @@ RETURNVALUE_NOTREQUIREDPROFESSION = 63
 RETURNVALUE_NOTREQUIREDLEVEL = 64
 RETURNVALUE_NEEDPREMIUMTOEQUIPITEM = 65
 
-function string.explode(str, delimiter)
-	if str == nil then
-		return {}
-	end
-	t = {}
-	for v in string.gmatch(str, "([^,]*)" .. delimiter .. "?") do
-		table.insert(t, v)
-	end
-	table.remove(t) -- Removes last element (Always "")
-	return t
-end
-
-function string.strip_whitespace(str)
-	if str == nil then return str end
-	local start = string.find(str, "[^%s]") -- First non-whitespace character
-	local _end = #str + 1 - string.find(str:reverse(), "[^%s]") -- Last non-whitespace character
-	
-	if start ~= nil and _end ~= nil then
-		return string.sub(str, start, _end)
-	elseif start ~= nil then
-		return string.sub(str, start)
-	elseif _end ~= nil then
-		return string.sub(str, 1, _end)
-	end
-	return str
-end
-
-function getPlayerByAccountNumber(acc)
-	players = getPlayersByAccountNumber(acc)
-	if #players == 0 then
-		return 0
-	end
-	return players[1]
-end
-
-function convertIntToIP(int, mask)
-	local b4 = bit.urshift(bit.uband(int,  4278190080), 24)
-	local b3 = bit.urshift(bit.uband(int,  16711680), 16)
-	local b2 = bit.urshift(bit.uband(int,  65280), 8)
-	local b1 = bit.urshift(bit.uband(int,  255), 0)
-	if mask ~= nil then
-		local m4 = bit.urshift(bit.uband(mask,  4278190080), 24)
-		local m3 = bit.urshift(bit.uband(mask,  16711680), 16)
-		local m2 = bit.urshift(bit.uband(mask,  65280), 8)
-		local m1 = bit.urshift(bit.uband(mask,  255), 0)
-		if (m1 == 255 or m1 == 0) and (m2 == 255 or m2 == 0) and (m3 == 255 or m3 == 0) and (m4 == 255 or m4 == 0) then
-			if m1 == 0 then b1 = "x" end
-			if m2 == 0 then b2 = "x" end
-			if m3 == 0 then b3 = "x" end
-			if m4 == 0 then b4 = "x" end
-		else
-			if m1 ~= 255 or m2 ~= 255 or m3 ~= 255 or m4 ~= 255 then
-				return b1 .. "." .. b2 .. "." .. b3 .. "." .. b4 .. " : " .. m1 .. "." .. m2 .. "." .. m3 .. "." .. m4
-			end
-		end
-	end
-	
-	return b1 .. "." .. b2 .. "." .. b3 .. "." .. b4
-end
-
-function convertIPToInt(str)
-	local maskindex = str:find(":")
-	if maskindex ~= nil then
-		-- IP:Mask style
-		if maskindex <= 1 then
-			return 0, 0
-		else
-			ipstring = str:sub(1, maskindex - 1)
-			maskstring = str:sub(maskindex)
-			
-			local ipint = 0
-			local maskint = 0
-			
-			local index = 0
-			for b in ipstring:gmatch("(%d+).?") do
-				if tonumber(b) > 255 or tonumber(b) < 0 then
-					return 0, 0
-				end
-				ipint = bit.ubor(ipint, bit.ulshift(b, index))
-				index = index + 8
-				if index > 24 then
-					break
-				end
-			end
-			if index ~= 32 then -- Invalid
-				return 0, 0
-			end
-			
-			index = 0
-			for b in maskstring:gmatch("(%d+)%.?") do
-				if tonumber(b) > 255 or tonumber(b) < 0 then
-					return 0, 0
-				end
-				maskint = bit.ubor(maskint, bit.ulshift(b, index))
-				index = index + 8
-				if index > 24 then
-					break
-				end
-			end
-			if index ~= 32 then
-				return 0, 0
-			end
-			
-			return ipint, maskint
-		end
-	else
-		local ipint = 0
-		local maskint = 0
-		local index = 24
-		
-		for b in str:gmatch("([x%d]+)%.?") do
-			if b ~= "x" then
-				if b:find("x") ~= nil then
-					return 0, 0
-				end
-				if tonumber(b) > 255 or tonumber(b) < 0 then
-					return 0, 0
-				end
-				maskint = bit.ubor(maskint, bit.ulshift(255, index))
-				ipint = bit.ubor(ipint, bit.ulshift(b, index))
-			end
-			index = index - 8
-			if index < 0 then
-				break
-			end
-		end
-		if index ~= -8 then -- Invalid
-			return 0, 0
-		end
-		return ipint, maskint
-	end
-end
-
-function getPartyLeader(cid)
-	local party = getPartyMembers(cid)
-	if party then
-		return party[1] -- First player is the leader
-	end
-	return 0
-end
-
-function isInParty(cid)
-	return getPartyMembers(cid) ~= nil
-end
+ITEM_GOLD_COIN       = 2148
+ITEM_PLATINUM_COIN   = 2152
+ITEM_CRYSTAL_COIN    = 2160

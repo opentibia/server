@@ -34,11 +34,19 @@
   </immunities>
   <voices interval="5000" chance="10">
     <voice sentence="BR? PL? SWE?"/>
-    <voice sentence="Screeeeeeech!"/>
+    <voice sentence="Screeech!"/>
     <voice sentence="Neeeewbiiieee!"/>
     <voice sentence="You advanshed, you advanshed!"/>
     <voice sentence="Hope you die and loooosh it!"/>
     <voice sentence="Hunterrr ish PK!"/>
+	<voice sentence="Shhtop whining! Rrah"/>
+	<voice sentence="I'm heeerrre! Screeeech!"/>
+	<voice sentence="Leeave orrr hunted!!"/>
+	<voice sentence="Blesshhh my stake! Screeech!"/>
+	<voice sentence="Tarrrrp?"/>
+	<voice sentence="You are corrrrupt! Corrrrupt!"/>
+	<voice sentence="You powerrrrrrabuserrrrr!"/>
+	<voice sentence="You advanshed, you advanshed!"/>
   </voices>
   <loot>
     <item id="3976" countmax="10" chance1="50000" chancemax="0"/>

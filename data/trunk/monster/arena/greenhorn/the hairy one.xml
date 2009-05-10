@@ -12,7 +12,12 @@
 		<attack name="melee" interval="2000" min="-1" max="-60"/>
 	</attacks>
 	<defenses armor="3" defense="5"/>
+	<elements>
+		<element energyPercent="5"/>
+		<element firePercent="-20"/>
+	</elements>
 	<voices interval="2000" chance="5">
 		<voice sentence="Hugah!"/>
+		<voice sentence="Ungh! Ungh!"/>
 	</voices>
 </monster>

@@ -33,15 +33,14 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element earthPercent="100"/>
+	<element energyPercent="20"/>
+	<element icePercent="10"/>
+	<element physicalPercent="-16"/>
+	<element firePercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="2">
@@ -57,12 +56,12 @@
     <item id="2148" countmax="25" chance1="100000" chancemax="0"/>
     <item id="2154" chance="555"/>
     <item id="2191" chance="400"/>
-    <item id="2182" chance="1333" /> -- snakebite rod
+    <item id="2182" chance="1333"/> -- snakebite rod
     <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
     <item id="5876" countmax="1" chance1="5000" chancemax="0"/>
     <item id="1987" chance="100000">
       <inside>
-        <item id="2181" chance="1333" /> -- quagmire rod
+        <item id="2181" chance="1333"/> -- quagmire rod
         <item id="2148" countmax="50" chance1="100000" chancemax="0"/>
         <item id="2150" countmax="4" chance1="4000" chancemax="0"/>
         <item id="2654" chance="20000"/>

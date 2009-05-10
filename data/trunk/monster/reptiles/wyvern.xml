@@ -36,33 +36,30 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element energyPercent="20"/>
+	<element icePercent="10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
     <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
-    <voice sentence="Shiiiiiek" yell="1"/>
+    <voice sentence="Shriiiek" yell="1"/>
   </voices>
 
 <loot>
-<item id="2148" chance="100000" countmax="67" /> -- gold coin
-<item id="2672" chance="20000" countmax="3" /> -- dragon ham
-<item id="1976" chance="3333" /> -- book
-<item id="2547" chance="1667" countmax="3" /> -- power bolt
-<item id="2647" chance="2000" /> -- plate legs
-<item id="7408" chance="2000" /> wydern fang
+<item id="2148" chance="100000" countmax="67"/> -- gold coin
+<item id="2672" chance="20000" countmax="3"/> -- dragon ham
+<item id="1976" chance="3333"/> -- book
+<item id="2547" chance="1667" countmax="3"/> -- power bolt
+<item id="2647" chance="2000"/> -- plate legs
+<item id="7408" chance="2000"/> wydern fang
 <item id="1987" chance="100000"> -- bag
 <inside>
-	<item id="2127" chance="1818" /> -- emerald bangle
-	<item id="2187" chance="1111" /> -- wand of Inferno
-	<item id="2146" chance="1000" countmax="1" /> -- small sapphire
+	<item id="2127" chance="1818"/> -- emerald bangle
+	<item id="2187" chance="1111"/> -- wand of Inferno
+	<item id="2146" chance="1000" countmax="1"/> -- small sapphire
 </inside>
 </item>
 </loot>

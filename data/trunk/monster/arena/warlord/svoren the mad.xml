@@ -23,21 +23,18 @@
     <attack name="speed" interval="3500" chance="35" radius="1" target="1" range="1" duration="40" speedchange="-250">
 		<attribute key="areaEffect" value="redshimmer"/>
 	</attack>
-    <!--<attack name="dark music" interval="4300" chance="40" min="-20" max="-100" /> -->
+    <!--<attack name="dark music" interval="4300" chance="40" min="-20" max="-100"/> -->
   </attacks>
   <defenses armor="25" defense="27"/>
+  <elements>
+	<element firePercent="100"/>
+	<element energyPercent="100"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
-    <immunity invisible="0"/>
+    <immunity invisible="1"/>
   </immunities>
   <voices interval="2000" chance="5">
     <voice sentence="NO mommy NO. Leave me alone!"/>
+	<voice sentence="Not that tower again!"/>
   </voices>
 </monster>

@@ -31,15 +31,14 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element firePercent="40"/>
+	<element earthPercent="20"/>
+	<element deathPercent="20"/>
+	<element physicalPercent="-13"/>
+	<element holyPercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="2">
@@ -53,7 +52,7 @@
   <loot>
     <item id="2674" countmax="2" chance="7500"/>
     <item id="2148" countmax="10" chance1="100000" chancemax="0"/>
-    <item id="2183" chance="1000" /> -- tempest rod
+    <item id="2183" chance="1000"/> -- tempest rod
     <item id="1977" chance="7000"/>
     <item id="2032" chance="10000"/>
     <item id="2070" chance="3333"/>

@@ -26,15 +26,16 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element deathPercent="100"/>
+	<element energyPercent="20"/>
+	<element earthPercent="20"/>
+	<element icePercent="10"/>
+	<element holyPercent="-25"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
     <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <loot>

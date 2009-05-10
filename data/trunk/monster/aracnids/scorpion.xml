@@ -21,11 +21,12 @@
     <attack name="melee" interval="2000" skill="35" attack="21" poison="150"/>
   </attacks>
   <defenses armor="10" defense="5"/>
+  <elements>
+	<element earthPercent="100"/>
+	<element firePercent="-10"/>
+	<element icePercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
     <immunity lifedrain="0"/>
     <immunity paralyze="0"/>
     <immunity outfit="0"/>

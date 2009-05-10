@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Hag" nameDescription="the hag" race="blood" experience="510" speed="205">
-	<health now="715" max="715"/>
+	<health now="935" max="935"/>
 	<look type="264" head="78" body="97" legs="95" feet="95" corpse="7349"/>
 	<targetchange interval="2000" chance="5"/>
 	<strategy attack="100" defense="0"/>
@@ -25,8 +25,13 @@
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
+	<elements>
+		<element firePercent="30"/>
+		<element icePercent="17"/>
+		<element energyPercent="10"/>
+	</elements>
 	<immunities>
-		<immunity name="invisible"/>
+		<immunity invisible="1"/>
 	</immunities>
 	<summons maxSummons="2">
 		<summon name="Ghost" interval="2000" chance="26"/>

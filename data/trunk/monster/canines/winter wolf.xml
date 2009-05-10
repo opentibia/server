@@ -21,17 +21,13 @@
     <attack name="melee" interval="2000" skill="21" attack="13"/>
   </attacks>
   <defenses armor="2" defense="6"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element icePercent="20"/>
+	<element firePercent="10"/>
+	<element holyPercent="10"/>
+	<element energyPercent="-5"/>
+	<element deathPercent="-5"/>
+  </elements>
   <loot>
     <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
     <item id="2666" countmax="4" chance1="33333" chancemax="0"/>

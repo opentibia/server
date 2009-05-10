@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="The Evil Eye" nameDescription="the Evil Eye" race="blood" experience="1500" speed="240" manacost="0">
+<monster name="The Evil Eye" nameDescription="the Evil Eye" race="blood" experience="500" speed="240" manacost="0">
   <health now="1200" max="1200"/>
   <look type="210" head="20" body="30" legs="40" feet="50" corpse="6037"/>
   <targetchange interval="5000" chance="8"/>
@@ -53,26 +53,19 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element earthPercent="100"/>
+	<element holyPercent="-20"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
-  <summons maxSummons="6">
-    <summon name="demon skeleton" interval="1000" chance="13" max="4"/>
-    <summon name="ghost" interval="1000" chance="12" max="2"/>
+  <summons maxSummons="5">
+    <summon name="demon skeleton" interval="1000" chance="13" max="5"/>
+    <summon name="ghost" interval="1000" chance="12" max="4"/>
   </summons>
   <voices interval="5000" chance="10">
-    <voice sentence="653768764!"/>
-    <voice sentence="Let me take a look at you!"/>
     <voice sentence="Inferior creatures, bow before my power!"/>
-    <voice sentence="659978 54764!"/>
   </voices>
   <loot>
     <item id="2148" countmax="45" chance1="100000" chancemax="0"/>

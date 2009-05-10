@@ -21,17 +21,12 @@
     <attack name="melee" interval="2000" skill="45" attack="41"/>
   </attacks>
   <defenses armor="20" defense="16"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element physicalPercent="15"/>
+	<element icePercent="20"/>
+	<element firePercent="20"/>
+	<element energyPercent="-10"/>
+  </elements>
   <voices interval="5000" chance="10">
     <voice sentence="Hooooot-Toooooot!"/>
     <voice sentence="Tooooot."/>

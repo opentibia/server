@@ -40,15 +40,12 @@
     </attack>
   </attacks>
   <defenses armor="15" defense="10"/>
+  <elements>
+    <element earthPercent="100"/>
+	<element icePercent="20"/>
+	<element firePercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="6">
@@ -64,7 +61,7 @@
     <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
     <item id="2148" countmax="52" chance1="100000" chancemax="0"/>
     <item id="2175" chance="4000"/>
-    <item id="2181" chance="1333" /> -- quagmire rod
+    <item id="2181" chance="1333"/>
     <item id="2509" chance="3333"/>
     <item id="2377" chance="2000"/>
     <item id="3972" chance="100"/>
@@ -75,7 +72,7 @@
         <item id="2148" countmax="12" chance1="100000" chancemax="0"/>
         <item id="2518" chance="1000"/>
         <item id="2397" chance="6666"/>
-        <item id="5898" chance="556" countmax="1" /> -- beholder eye
+        <item id="5898" chance="556" countmax="1"/>
       </inside>
     </item>
   </loot>

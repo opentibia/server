@@ -39,17 +39,15 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
-
+  <elements>
+	<element holyPercent="20"/>
+	<element icePercent="10"/>
+	<element physicalPercent="-10"/>
+	<element energyPercent="-7"/>
+	<element deathPercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
-    <immunity invisible="1"/>
   </immunities>
 
   <summons maxSummons="2">
@@ -60,7 +58,7 @@
   <loot>
     <item id="2148" countmax="82" chance1="47831" chancemax="1032"/>
     <item id="2654" chance="5000"/>
-    <item id="2187" chance="1111" /> -- wand of Inferno
+    <item id="2187" chance="1111"/> -- wand of Inferno
     <item id="5801" chance="909"/>
     <item id="2167" chance="1000"/>
     <item id="2171" chance="909"/>

@@ -25,17 +25,25 @@
     </attack>
   </attacks>
   <defenses armor="14" defense="20"/>
+  <elements>
+	<element earthPercent="100"/>
+	<element deathPercent="100"/>
+	<element icePercent="22"/>
+	<element holyPercent="-25"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
     <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
+  <voices interval="5000" chance="10">
+	<voice sentence="I will ssswallow your sssoul!"/>
+	<voice sentence="Mort ulhegh dakh visss."/>
+	<voice sentence="Flesssh to dussst!"/>
+	<voice sentence="I will tassste life again!"/>
+	<voice sentence="Ahkahra exura belil mort!"/>
+	<voice sentence="Yohag Sssetham!"/>
+  </voices>
   <loot>
     <item id="2148" countmax="80" chance1="100000" chancemax="0"/>
     <item id="2161" chance="3333"/>

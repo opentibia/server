@@ -30,15 +30,18 @@
 			<attribute key="areaEffect" value="greenshimmer"/>
 		</attack>
 	</attacks>
-	<defenses armor="30" defense="40"/> 
-	<immunities>  
-		<immunity name="energy"/>
-		<immunity name="fire"/>
-		<immunity name="poison"/>
-		<immunity name="paralyze"/>
-		<immunity name="invisible"/>
+	<defenses armor="30" defense="40"/>
+	<elements>
+		<element energyPercent="55"/>
+		<element deathPercent="-11"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
 	</immunities>
 	<summons maxSummons="2">
 		<summon name="Green Djinn" interval="5000" chance="20"/>
 	</summons>
+	<voices interval="5000" chance="5">
+		<voice sentence="I bet you wish you weren't here."/>
+	</voices>
 </monster>

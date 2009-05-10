@@ -20,7 +20,7 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-100" max="-210"/>
-    <attack name="physical" interval="1000" chance="100" min="-72" max="-130"> 
+    <attack name="physical" interval="1000" chance="100" min="-72" max="-130">
 	    <attribute key="shootEffect" value="spear"/>
     </attack>
   </attacks>
@@ -29,21 +29,16 @@
 		<attribute key="areaEffect" value="blueshimmer"/>
 	</defense>
   </defenses>
-
+  <elements>
+	<element icePercent="33"/>
+	<element firePercent="-11"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
+    <immunity invisible="1"/>
   </immunities>
   <voices interval="2000" chance="5">
-    <voice sentence="FIGHT LIKE A BARBARIAN!"/>
-    <voice sentence="VICTORY IS MINE!"/>
+    <voice sentence="FIGHT LIKE A BARBARIAN!" yell="1"/>
+    <voice sentence="VICTORY IS MINE!" yell="1"/>
     <voice sentence="I AM your father!"/>
     <voice sentence="To be the man you have to beat the man!"/>
   </voices>

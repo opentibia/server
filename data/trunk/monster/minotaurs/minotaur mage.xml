@@ -32,19 +32,18 @@
     </attack>
   </attacks>
   <defenses armor="18" defense="20"/>
+  <elements>
+	<element energyPercent="20"/>
+	<element earthPercent="15"/>
+	<element holyPercent="10"/>
+	<element icePercent="-5"/>
+	<element deathPercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
-    <voice sentence="#W Learrn tha secrret uf deathhh!"/>
+    <voice sentence="Learrn tha secrret uf deathhh!"/>
     <voice sentence="Kaplar!"/>
   </voices>
   <loot>
@@ -56,7 +55,7 @@
     <item id="5878" countmax="1" chance1="5000" chancemax="0"/>
     <item id="1987" chance="100000">
       <inside>
-        <item id="2189" chance="1333" /> -- wand of cosmic energy
+        <item id="2189" chance="1333"/> -- wand of cosmic energy
         <item id="2404" chance="10000"/>
         <item id="2362" countmax="5" chance1="20000" chancemax="0"/>
         <item id="2817" chance="10000"/>

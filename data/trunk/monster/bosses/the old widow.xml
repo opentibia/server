@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="The Old Widow" nameDescription="the Old Widow" race="blood" experience="1900" speed="240" manacost="0">
-  <health now="2000" max="2000"/>
+<monster name="The Old Widow" nameDescription="the Old Widow" race="blood" experience="2800" speed="240" manacost="0">
+  <health now="3200" max="3200"/>
   <look type="208" head="20" body="30" legs="40" feet="50" corpse="5977"/>
   <targetchange interval="5000" chance="8"/>
   <strategy attack="100" defense="0"/>

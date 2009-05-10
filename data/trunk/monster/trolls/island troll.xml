@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="Island troll" nameDescription="a island troll" race="blood" experience="20" speed="190" manacost="290">
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="island troll" nameDescription="an island troll" race="blood" experience="20" speed="190" manacost="290">
   <health now="50" max="50"/>
-  <look type="15" head="20" body="30" legs="40" feet="50" corpse="5960"/>
+  <look type="282" head="20" body="30" legs="40" feet="50" corpse="7930"/>
   <targetchange interval="5000" chance="20"/>
   <strategy attack="100" defense="0"/>
   <flags>
@@ -21,20 +21,10 @@
     <attack name="melee" interval="2000" skill="19" attack="12"/>
 </attacks>
   <defenses armor="7" defense="9"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
   <voices interval="5000" chance="10">
     <voice sentence="Hmmm, turtles"/>
-    <voice sentence="HHmmm, dogs"/>
+    <voice sentence="Hmmm, dogs"/>
+	<voice sentence="Hmmm, wormds"/>
     <voice sentence="Groar"/>
     <voice sentence="Gruntz!"/>
   </voices>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<monster name="dharalion" nameDescription="Dharalion" race="blood" experience="1200" speed="240" manacost="0">
-  <health now="1200" max="1200"/>
+<monster name="dharalion" nameDescription="Dharalion" race="blood" experience="380" speed="240" manacost="0">
+  <health now="380" max="380"/>
   <look type="203" head="20" body="30" legs="40" feet="50" corpse="6011"/>
   <targetchange interval="5000" chance="8"/>
   <strategy attack="100" defense="0"/>
@@ -24,7 +24,7 @@
       <attribute key="shootEffect" value="energy"/>
       <attribute key="areaEffect" value="energy"/>
     </attack>
-    <attack name="physical" interval="1000" chance="10" range="7" min="-130" max="-150">
+    <attack name="physical" interval="1000" chance="10" range="7" min="-80" max="-151">
       <attribute key="shootEffect" value="suddendeath"/>
     </attack>
     <attack name="strength" interval="1000" chance="13" range="7">
@@ -55,10 +55,9 @@
     <summon name="demon skeleton" interval="1000" chance="6" max="2"/>
   </summons>
   <voices interval="5000" chance="10">
-    <voice sentence="You desecrated this temple!"/>
+    <voice sentence="Feel my wrath!"/>
     <voice sentence="Noone will stop my ascension!"/>
     <voice sentence="My powers are divine!"/>
-    <voice sentence="Muahahaha!"/>
   </voices>
   <loot>
     <item id="2148" countmax="20" chance1="100000" chancemax="0"/>

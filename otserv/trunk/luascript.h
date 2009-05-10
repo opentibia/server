@@ -222,7 +222,8 @@ enum PlayerInfo_t{
 	PlayerInfoRedSkullTicks,
 	PlayerInfoBalance,
 	PlayerInfoPzLock,
-	PlayerInfoPremium
+	PlayerInfoPremium,
+    PlayerInfoLastLogin
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -385,6 +386,7 @@ protected:
 	static int luaGetTownIdByName(lua_State *L);
 	static int luaGetTownNameById(lua_State *L);
 	static int luaGetTownTemplePosition(lua_State *L);
+	static int luaDoPlayerSendOutfitWindow(lua_State *L);
 
 	//queries
 	static int luaGetPlayerByName(lua_State *L);
@@ -463,6 +465,7 @@ protected:
 	static int luaGetPlayerLossPercent(lua_State *L);
 	static int luaGetPlayerPremiumDays(lua_State *L);
 	static int luaGetPlayerBalance(lua_State *L);
+	static int luaGetPlayerLastLogin(lua_State *L);
 
 	static int luaPlayerLearnInstantSpell(lua_State *L);
 	static int luaCanPlayerLearnInstantSpell(lua_State *L);

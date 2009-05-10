@@ -28,19 +28,23 @@
     </attack>
     </attacks>
     <defenses armor="51" defense="52"/>
+	<elements>
+		<element firePercent="100"/>
+		<element icePercent="100"/>
+		<element earthPercent="100"/>
+		<element holyPercent="23"/>
+		<element deathPercent="-11"/>
+		<element physicalPercent="-17"/>
+	</elements>
     <immunities>
-      <immunity physical="0"/>
-      <immunity energy="1"/>
-      <immunity fire="1"/>
-      <immunity poison="1"/>
-      <immunity lifedrain="0"/>
       <immunity paralyze="1"/>
-      <immunity outfit="0"/>
-      <immunity drunk="1"/>
       <immunity invisible="1"/>
     </immunities>
     <summons maxSummons="0">
     </summons>
     <voices interval="2000" chance="5">
+		<voice sentence="I am like the merciless northwind."/>
+		<voice sentence="Snow will be your death shroud."/>
+		<voice sentence="Feel the wrath of father chyll!"/>
     </voices>
   </monster>

@@ -19,7 +19,7 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" skill="18" attack="18"/>
-    <attack name="fire" interval="1000" chance="20" range="7" min="-25" max="-55">
+    <attack name="fire" interval="1000" chance="20" range="7" min="-30" max="-75">
       <attribute key="shootEffect" value="fire"/>
     </attack>
     <attack name="firefield" interval="1000" chance="13" range="7" radius="1" target="1">
@@ -27,26 +27,23 @@
     </attack>
   </attacks>
   <defenses armor="8" defense="12"/>
+  <elements>
+	<element energyPercent="100"/>
+	<element earthPercent="30"/>
+	<element deathPercent="-5"/>
+	<element physicalPercent="-14"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
-    <voice sentence="Horax pokti!"/>
-    <voice sentence="Hihihihi!"/>
+    <voice sentence="Horax pokti! Hihihihi!"/>
     <voice sentence="Herba budinia ex!"/>
   </voices>
   <loot>
     <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
     <item id="2129" chance="10000"/>
-    <item id="2185" chance="833" /> -- volcanic rod
+    <item id="2185" chance="833"/> -- volcanic rod
     <item id="2643" chance="10000"/>
     <item id="2651" chance="5000"/>
     <item id="2696" chance="33333"/>

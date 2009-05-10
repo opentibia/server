@@ -21,17 +21,11 @@
     <attack name="melee" interval="2000" skill="23" attack="14"/>
   </attacks>
   <defenses armor="8" defense="10"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element earthPercent="70"/>
+	<element firePercent="-5"/>
+	<element deathPercent="-3"/>
+  </elements>
   <voices interval="5000" chance="10">
     <voice sentence="Hail Durin!"/>
   </voices>
@@ -43,7 +37,7 @@
     <item id="2484" chance="20000"/>
     <item id="2530" chance="6666"/>
     <item id="2649" chance="10000"/>
-    <item id="5880" chance="2500" countmax="2" /> -- iron ore
+    <item id="5880" chance="2500" countmax="2"/>
     <item id="1987" chance="100000">
       <inside>
         <item id="2787" countmax="2" chance1="20000" chancemax="0"/>

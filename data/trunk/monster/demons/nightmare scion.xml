@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Nightmare Scion" nameDescription="a nightmare scion" race="blood" experience="1350" speed="340" manacost="0">
 	<health now="1400" max="1400"/>
 	<look type="321" corpse="9919"/>
@@ -51,21 +51,21 @@
 		<voice sentence="Weeeheeheee!"/>	
 	</voices>
 	<loot>
-		<item id="2148" countmax="70" chance1="100000"/> -- gold coin
-		<item id="2148" countmax="70" chance1="100000"/> --Gold Coin
-		<item id="2152" chance1="25000" countmax="3" /> -- platinum coin
-		<item id="2666" chance1="20000" countmax="4" /> -- meat
-		<item id="6300" chance="7300" /> -- death ring	
-		<item id="2671" chance1="40000" countmax="2" /> -- ham
-		<item id="2230" chance="37500" /> -- bone
-		<item id="6574" chance="1300" /> -- bar of chocolate
-		<item id="6500" chance1="6500" countmax="1" /> -- demonic essence
-		<item id="1987" chance="100000" > -- bag
+		<item id="2148" countmax="70" chance1="100000"/> <!-- gps -->
+		<item id="2148" countmax="70" chance1="100000"/> <!-- gps -->
+		<item id="2152" chance1="25000" countmax="3"/> <!-- platinum coin -->
+		<item id="2666" chance1="20000" countmax="4"/> <!-- meat -->
+		<item id="6300" chance="7300"/> <!-- death ring -->	
+		<item id="2671" chance1="40000" countmax="2"/> <!-- ham -->
+		<item id="2230" chance="37500"/> <!-- bone -->
+		<item id="6574" chance="1300"/> <!-- bar of chocolate -->
+		<item id="6500" chance1="6500" countmax="1"/> <!-- demonic essence -->
+		<item id="1987" chance="100000">
 			<inside>
-				<item id="2387" chance="8800" /> -- double axe
-				<item id="2491" chance="3000" /> -- Crown Helmet
-				<item id="8871" chance="3400" /> -- focus cape
-				<item id="7451" chance="1100" /> -- Shadow Sceptre
+				<item id="2387" chance="8800"/> <!-- double axe -->
+				<item id="2491" chance="3000"/> <!-- crown helmet -->
+				<item id="8871" chance="3400"/> <!-- focus cape -->
+				<item id="7451" chance="1100"/> <!-- shadow sceptre -->
 			</inside>
 		</item>
 	</loot>

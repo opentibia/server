@@ -18,8 +18,8 @@
     <flag runonhealth="0"/>
   </flags>
   <attacks>
-     <attack name="melee" interval="2000" min="-150" max="-430" /> 
-     <attack name="physical" interval="2000" chance="40" min="-38" max="-150"> 
+     <attack name="melee" interval="2000" min="-150" max="-430"/>
+     <attack name="physical" interval="2000" chance="40" min="-38" max="-150">
 		<attribute key="shootEffect" value="throwingknife"/>
 	 </attack>
   </attacks>
@@ -29,14 +29,6 @@
     </defense>
   </defenses>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">

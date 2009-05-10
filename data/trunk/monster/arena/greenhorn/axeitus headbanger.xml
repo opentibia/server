@@ -15,4 +15,12 @@
 		</attack>
 	</attacks>
 	<defenses armor="15" defense="17"/>
+	<elements>
+		<element firePercent="-5"/>
+	</elements>
+	<voices interval="2000" chance="5">
+		<voice sentence="Hicks!"/>
+		<voice sentence="Stand still! Both of you! hicks"/>
+		<voice sentence="This victory will earn me a casket of beer."/>
+	</voices>
 </monster>

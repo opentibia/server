@@ -19,21 +19,16 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-150" max="-900" poison="65"/>
-
     <attack name="lifedrain" interval="3000" chance="7" range="1" min="-55" max="-550"/>
-
     <attack name="speed" interval="1000" chance="25" range="7" speedchange="-650" duration="50000">
       <attribute key="areaEffect" value="redshimmer"/>
     </attack>
-
     <attack name="physical" interval="1000" chance="20" radius="3" target="0" min="-40" max="-400">
       <attribute key="areaEffect" value="blackspark"/>
     </attack>
-
     <attack name="physical" interval="3000" chance="7" radius="3" target="0" min="-50" max="-500">
       <attribute key="areaEffect" value="mortarea"/>
     </attack>
-
   </attacks>
   <defenses armor="35" defense="25">
     <defense name="healing" interval="1000" chance="13" min="200" max="300">
@@ -46,15 +41,16 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element deathPercent="100"/>
+	<element icePercent="62"/>
+	<element firePercent="60"/>
+	<element energyPercent="52"/>
+	<element earthPercent="-15"/>
+	<element holyPercent="-22"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="3">

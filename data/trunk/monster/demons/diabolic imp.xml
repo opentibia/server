@@ -39,40 +39,39 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element firePercent="100"/>
+	<element earthPercent="30"/>
+	<element deathPercent="25"/>
+	<element icePercent="-25"/>
+	<element holyPercent="-12"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
-    <voice sentence="Muahaha!"/>
+	<voice sentence="Muahaha!"/>
     <voice sentence="He he he!"/>
   </voices>
   <loot>
-   <item id="2148" countmax="79" chance1="100000" chancemax="0"/> --Gold Coins
-   <item id="2050" chance="15000"/> --Torch
-   <item id="6558" chance="2222"/> --Concentrated Demonic Blood
-   <item id="2260" chance="18000"/> --Blank Rune
-   <item id="6300" chance="999"/> --Death Ring
-   <item id="2465" chance="6577"/> --Brass Armor
-   <item id="1987" chance="100000"> --Bag
-         <inside>
-         <item id="2548" chance="20000"/> --Pitchfork
-         <item id="2465" chance="6577"/> --Brass Armor
-         <item id="2185" chance="833" /> -- volcanic rod
-         <item id="2464" chance="7887"/> --Chain Armor
-         <item id="5944" chance="5666"/> --Soul Orb
-         <item id="6500" countmax="1" chance1="7777" chancemax="0"/> --Demonic Essence
-         <item id="2150" countmax="1" chance1="8888" chancemax="0"/> --Small Amethyst
-         <item id="2165" chance="4555"/> --Stealth Ring
-         </inside>
-       </item>
-
- </loot>
+   <item id="2148" countmax="79" chance1="100000" chancemax="0"/>
+   <item id="2050" chance="15000"/>
+   <item id="6558" chance="2222"/>
+   <item id="2260" chance="18000"/>
+   <item id="6300" chance="999"/>
+   <item id="2465" chance="6577"/>
+   <item id="1987" chance="100000">
+		<inside>
+			<item id="2548" chance="20000"/>
+			<item id="2465" chance="6577"/>
+			<item id="2185" chance="833"/>
+			<item id="2464" chance="7887"/>
+			<item id="5944" chance="5666"/>
+			<item id="6500" countmax="1" chance1="7777" chancemax="0"/>
+			<item id="2150" countmax="1" chance1="8888" chancemax="0"/>
+			<item id="2165" chance="4555"/>
+		</inside>
+	</item>
+  </loot>
 </monster>

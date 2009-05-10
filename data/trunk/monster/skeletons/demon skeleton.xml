@@ -22,16 +22,15 @@
     <attack name="lifedrain" interval="2000" chance="10" range="1" min="-30" max="-50"/>
   </attacks>
   <defenses armor="25" defense="25"/>
+  <elements>
+	<element firePercent="100"/>
+	<element deathPercent="100"/>
+	<element earthPercent="100"/>
+	<element holyPercent="-25"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="0"/>
     <immunity drunk="0"/>
-    <immunity invisible="0"/>
   </immunities>
   <loot>
     <item id="2148" countmax="40" chance1="100000" chancemax="0"/>

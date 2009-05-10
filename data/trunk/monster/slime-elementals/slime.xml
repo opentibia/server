@@ -19,23 +19,15 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" skill="22" attack="42" poison="90"/>
-    <attack name="poisonfield" interval="1000" chance="17" range="7" radius="1" target="1">
-      <attribute key="shootEffect" value="poison"/>
-    </attack>
   </attacks>
   <defenses armor="3" defense="10"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element earthPercent="100"/>
+	<element icePercent="20"/>
+	<element firePercent="-10"/>
+	<element energyPercent="-10"/>
+  </elements>
   <summons maxSummons="3">
-    <summon name="slime2" interval="1000" chance="10" max="3"/>
+    <summon name="slime summon" interval="1000" chance="10" max="3"/>
   </summons>
 </monster>

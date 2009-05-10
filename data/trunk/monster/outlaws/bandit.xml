@@ -21,17 +21,10 @@
     <attack name="melee" interval="2000" skill="47" attack="40"/>
   </attacks>
   <defenses armor="11" defense="15"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element physicalPercent="-12"/>
+	<element deathPercent="-5"/>
+  </elements>
   <voices interval="5000" chance="10">
     <voice sentence="Your money or your life!"/>
     <voice sentence="Hand me your purse!"/>

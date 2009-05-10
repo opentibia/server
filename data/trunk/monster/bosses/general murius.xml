@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<monster name="general murius" nameDescription="the general Murius" race="blood" experience="1300" speed="240" manacost="0">
-  <health now="1200" max="1200"/>
+<monster name="general murius" nameDescription="the general Murius" race="blood" experience="300" speed="240" manacost="0">
+  <health now="550" max="550"/>
   <look type="202" head="20" body="30" legs="40" feet="50" corpse="5983"/>
   <targetchange interval="5000" chance="8"/>
   <strategy attack="100" defense="0"/>
@@ -32,14 +32,6 @@
     </defense>
   </defenses>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="4">
@@ -50,7 +42,6 @@
     <voice sentence="Feel the power of the Mooh'Tah!"/>
     <voice sentence="You will get what you deserve!"/>
     <voice sentence="For the king!"/>
-    <voice sentence="Guards!"/>
   </voices>
   <loot>
     <item id="2148" countmax="30" chance1="100000" chancemax="0"/>

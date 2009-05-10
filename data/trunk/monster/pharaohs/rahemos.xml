@@ -19,32 +19,25 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-0" max="-750" poison="65"/>
-
     <attack name="lifedrain" interval="3000" chance="7" range="1" min="-75" max="-750"/>
-
     <attack name="energy" interval="2000" chance="20" range="7" min="-60" max="-600">
       <attribute key="shootEffect" value="energy"/>
       <attribute key="areaEffect" value="energy"/>
     </attack>
-
     <attack name="physical" interval="3000" chance="20" range="7" min="-60" max="-600">
       <attribute key="shootEffect" value="suddendeath"/>
       <attribute key="areaEffect" value="mortarea"/>
     </attack>
-
     <attack name="speed" interval="1000" chance="12" radius="6" target="0" speedchange="-650" duration="60000">
       <attribute key="areaEffect" value="poison"/>
     </attack>
-
     <attack name="drunk" interval="1000" chance="8" range="7">
       <attribute key="shootEffect" value="energy"/>
       <attribute key="areaEffect" value="energyarea"/>
     </attack>
-
     <attack name="outfit" interval="1000" chance="15" range="7" monster="pig" duration="12000">
       <attribute key="areaEffect" value="blueshimmer"/>
     </attack>
-
   </attacks>
   <defenses armor="30" defense="35">
     <defense name="healing" interval="1000" chance="20" min="200" max="500">
@@ -54,15 +47,16 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element icePercent="100"/>
+	<element earthPercent="100"/>
+	<element deathPercent="100"/>
+	<element firePercent="94"/>
+	<element energyPercent="92"/>
+	<element holyPercent="-25"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="1">
@@ -71,14 +65,14 @@
   <voices interval="5000" chance="10">
     <voice sentence="It's a kind of magic."/>
     <voice sentence="Abrah Kadabrah!"/>
-    <voice sentence="Nothing hidden in my warpings."/>
+    <voice sentence="Nothing hidden in my wrappings."/>
     <voice sentence="It's not a trick, it's Rahemos."/>
-    <voice sentence="Meet my dear friend from hell."/>
+    <voice sentence="Meet my friend from hell."/>
     <voice sentence="I will make you believe in magic."/>
   </voices>
   <loot>
     <item id="2148" countmax="100" chance1="100000" chancemax="0"/>
-    <item id="2185" chance="833" /> -- volcanic rod
+    <item id="2185" chance="833"/> -- volcanic rod
     <item id="2176" chance="2000"/>
     <item id="2439" chance="1200"/>
     <item id="2148" countmax="100" chance1="100000" chancemax="0"/>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="serpent spawn" nameDescription="a serpent spawn" race="VENOM" experience="2000" speed="240" manacost="0">
+<monster name="serpent spawn" nameDescription="a serpent spawn" race="VENOM" experience="2350" speed="240" manacost="0">
   <health now="3000" max="3000"/>
   <look type="220" head="20" body="30" legs="40" feet="50" corpse="4323"/>
   <targetchange interval="5000" chance="8"/>
@@ -48,25 +48,24 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element earthPercent="100"/>
+	<element icePercent="30"/>
+	<element firePercent="-6"/>
+	<element energyPercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
-    <voice sentence="Ssssolus for the one"/>
+    <voice sentence="Sssssouls for the one"/>
     <voice sentence="HISSSS" yell="1"/>
     <voice sentence="Tsssse one will risssse again"/>
-    <voice sentence="I bring you deathhhh, mortalssss"/>
+    <voice sentence="I bring your deathhh, mortalssss"/>
   </voices>
   <loot>
-    <item id="2182" chance="1333" /> -- snakebite rod
+    <item id="2182" chance="1333"/> -- snakebite rod
     <item id="2195" chance="800"/>
     <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
     <item id="2148" countmax="50" chance1="100000" chancemax="0"/>

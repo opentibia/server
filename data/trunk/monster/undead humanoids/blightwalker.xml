@@ -32,20 +32,21 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element earthPercent="100"/>
+	<element deathPercent="100"/>
+	<element firePercent="60"/>
+	<element energyPercent="40"/>
+	<element icePercent="33"/>
+	<element physicalPercent="-5"/>
+	<element holyPercent="-30"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
-    <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
     <voice sentence="I can see you decaying!"/>
-
+	<voice sentence="Let me taste your mortality!"/>
   </voices>
   <loot>
     <item id="2148" countmax="20" chance="100000"/>
@@ -59,9 +60,9 @@
     <item id="2386" chance="2000"/>
     <item id="2649" chance="2500"/>
     <item id="6500" countmax="2" chance="2222"/> --Demonic Essence
-    <item id="5944" chance="1667" countmax="1" /> -- soul orb
-    <item id="2436" chance="909" /> -- skull staff
-    <item id="2550" chance="5000" /> -- scythe
+    <item id="5944" chance="1667" countmax="1"/> -- soul orb
+    <item id="2436" chance="909"/> -- skull staff
+    <item id="2550" chance="5000"/> -- scythe
  	</inside>
  	</item>
  </loot>

@@ -20,23 +20,21 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-100" max="-230"/>
-    <!--<attack name="Smokewave" interval="1000" chance="35" /> -->
+    <!--<attack name="Smokewave" interval="1000" chance="35"/> -->
   </attacks>
   <defenses armor="25" defense="27"/>
+  <elements>
+	<element icePercent="100"/>
+	<element deathPercent="-9"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="2000" chance="5">
     <voice sentence="I'll extinguish you warmbloods."/>
     <voice sentence="REVENGE!"/>
     <voice sentence="Far too hot."/>
+	<voice sentence="DISGUSTING WARMBLOODS!"/>
+	<voice sentence="Revenge is sweetest when served cold."/>
   </voices>
 </monster>

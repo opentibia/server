@@ -28,18 +28,15 @@
 		</attack>
 	</attacks>
   <defenses armor="36" defense="38"/>
+  <elements>
+	<element deathPercent="100"/>
+	<element firePercent="-10"/>
+	<element holyPercent="-6"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
+    <immunity invisible="1"/>
   </immunities>
   <voices interval="2000" chance="5">
-    <voice sentence="Knooorrr!"/>
+    <voice sentence="Zhroozzzzs."/>
   </voices>
 </monster>

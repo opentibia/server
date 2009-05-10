@@ -18,19 +18,17 @@
     <flag runonhealth="0"/>
   </flags>
   <attacks>
-    <attack name="melee" interval="2000" min="-10" max="-40"/> poison="15"/>
+    <attack name="melee" interval="2000" min="-10" max="-40" poison="15"/>
   </attacks>
   <defenses armor="5" defense="11"/>
+  <elements>
+	<element earthPercent="100"/>
+	<element energyPercent="20"/>
+	<element firePercent="-10"/>
+	<element icePercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
     <immunity paralyze="1"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
   </immunities>
   <loot>
     <item id="3976" countmax="10" chance1="50000" chancemax="0"/>

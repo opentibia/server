@@ -21,15 +21,13 @@
     <attack name="melee" interval="2000" min="-60" max="-200"/>
   </attacks>
   <defenses armor="15" defense="22"/>
+  <elements>
+	<element earthPercent="90"/>
+	<element physicalPercent="20"/>
+	<element firePercent="-5"/>
+	<element deathPercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
@@ -44,7 +42,7 @@
     <item id="2787" countmax="3" chance1="33333" chancemax="0"/>
     <item id="1987" chance="100000">
       <inside>
-        <item id="5880" chance="2500" countmax="2" /> -- iron ore
+        <item id="5880" chance="2500" countmax="2"/>
         <item id="2148" countmax="15" chance1="90000" chancemax="0"/>
         <item id="2459" chance="10000"/>
         <item id="2513" chance="6666"/>

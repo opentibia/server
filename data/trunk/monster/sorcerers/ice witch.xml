@@ -38,15 +38,16 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element icePercent="100"/>
+	<element firePercent="50"/>
+	<element earthPercent="40"/>
+	<element holyPercent="26"/>
+	<element energyPercent="-10"/>
+	<element deathPercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="2000" chance="5">
@@ -56,16 +57,13 @@
   </voices>
   <loot>
     <item id="2148" countmax="80" chance1="100000" chancemax="0"/> --Gold Coins
-    <item id="2436" chance="1222"/> --Skull Staff
     <item id="7449" chance="1222"/> --Crystal Sword
     <item id="7441" chance="5555"/> --Ice Cube
     <item id="7387" chance="1444"/> --Diamond Sceptre
     <item id="1987" chance="100000"> --Bag
       <inside>
-        <item id="2195" chance="1444"/> --Boots of Haste
-        <item id="2445" chance="1333"/> --Crystal Mace
         <item id="2423" chance="3333"/> --Clerical Mace
-        <item id="2796" countmax="3" chance1="9999" chancemax="0"/> --Green Mushrooms
+        <item id="2796" countmax="1" chance1="9999" chancemax="0"/> --Green Mushrooms
         <item id="2663" chance="1111"/> --Mystic Turban
         <item id="7459" chance="1000"/> --Ear Muffs
       </inside>

@@ -25,11 +25,14 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element firePercent="20"/>
+	<element earthPercent="10"/>
+	<element energyPercent="3"/>
+	<element icePercent="-15"/>
+	<element deathPercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
     <immunity lifedrain="0"/>
     <immunity paralyze="0"/>
     <immunity outfit="0"/>
@@ -41,19 +44,19 @@
     <voice sentence="Ungh! Ungh!"/>
     <voice sentence="Huaauaauaauaa!"/>
   </voices>
-<loot>
-<item id="3976" chance="20000" countmax="10" /> -- worm
-<item id="2148" chance="100000" countmax="65" /> -- gold coin
-<item id="1294" chance="2500" countmax="3" /> -- small stone
-<item id="5883" chance="1000" countmax="2" /> -- ape fur
-<item id="1987" chance="100000" > -- bag
-<inside>
-	<item id="2676" chance="5000" countmax="11" /> -- banana
-	<item id="2200" chance="2000" /> -- protection amulet
-	<item id="2209" chance="2857" /> -- club ring
-	<item id="2166" chance="1429" /> -- power ring
-	<item id="2463" chance="1667" /> -- plate armor
-</inside>
-</item>
-</loot>
+	<loot>
+	  <item id="3976" chance="20000" countmax="10"/>
+	  <item id="2148" chance="100000" countmax="65"/>
+	  <item id="1294" chance="2500" countmax="3"/>
+	  <item id="5883" chance="1000" countmax="2"/>
+	  <item id="1987" chance="100000">
+		<inside>
+		  <item id="2676" chance="5000" countmax="11"/>
+		  <item id="2200" chance="2000"/>
+		  <item id="2209" chance="2857"/>
+		  <item id="2166" chance="1429"/>
+		  <item id="2463" chance="1667"/>
+		</inside>
+	  </item>
+	</loot>
 </monster>

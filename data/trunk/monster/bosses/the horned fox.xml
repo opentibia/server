@@ -35,19 +35,12 @@
     </defense>
   </defenses>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
-  <summons maxSummons="4">
+  <summons maxSummons="6">
     <summon name="minotaur archer" interval="1000" chance="13" max="2"/>
     <summon name="minotaur guard" interval="1000" chance="13" max="2"/>
+	<summon name="minotaur mage" interval="1000" chance="13" max="2"/>
   </summons>
   <voices interval="5000" chance="10">
     <voice sentence="You will never get me!"/>
@@ -67,7 +60,7 @@
     <item id="5804" chance="5000"/>
     <item id="1987" chance="100000">
       <inside>
-        <item id="2189" chance="1333" /> -- wand of cosmic energy
+        <item id="2189" chance="1333"/>
         <item id="2207" chance="2000"/>
         <item id="2666" countmax="2" chance1="33333" chancemax="0"/>
         <item id="2379" chance="6666"/>

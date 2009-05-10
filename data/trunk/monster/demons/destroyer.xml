@@ -28,15 +28,17 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element energyPercent="100"/>
+	<element firePercent="45"/>
+	<element physicalPercent="20"/>
+	<element earthPercent="20"/>
+	<element deathPercent="20"/>
+	<element icePercent="-15"/>
+	<element holyPercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
@@ -44,20 +46,19 @@
     <voice sentence="It's a good day to destroy!"/>
   </voices>
   <loot>
-   <item id="2148" countmax="82" chance1="100000" chancemax="0"/> --Gold Coins
-   <item id="2645" chance="2222"/> --Steel Boots
-   <item id="2152" countmax="3" chance1="200000" chancemax="0"/> --Platinum Coins
-   <item id="2393" chance="660"/> --Giant Sword
-   <item id="5741" chance="1000"/> --Skull Helmet
-   <item id="2666" countmax="5" chance1="30000" chancemax="0"/> --Meat
-   <item id="1987" chance="100000"> --Bag
-      <inside>
-         <item id="2463" chance="6666"/> --Plate Armor
-         <item id="2416" chance="9999"/> --Crowbar
-         <item id="2489" chance="2500"/> --Dark Armor
-         <item id="2150" countmax="2" chance1="7500" chancemax="0"/> --Small Amethyst
-     </inside>
-   </item>
-
- </loot>
+	<item id="2148" countmax="82" chance1="100000" chancemax="0"/>
+	<item id="2645" chance="2222"/>
+	<item id="2152" countmax="3" chance1="200000" chancemax="0"/>
+	<item id="2393" chance="660"/>
+	<item id="5741" chance="1000"/>
+	<item id="2666" countmax="5" chance1="30000" chancemax="0"/>
+	<item id="1987" chance="100000">
+		<inside>
+			<item id="2463" chance="6666"/>
+			<item id="2416" chance="9999"/>
+			<item id="2489" chance="2500"/>
+			<item id="2150" countmax="2" chance1="7500" chancemax="0"/>
+		</inside>
+	</item>
+  </loot>
 </monster>

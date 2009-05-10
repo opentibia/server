@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="carniphila" nameDescription="a carniphila" race="VENOM" experience="250" speed="240" manacost="0">
+<monster name="carniphila" nameDescription="a carniphila" race="VENOM" experience="150" speed="240" manacost="0">
   <health now="255" max="255"/>
   <look type="120" head="20" body="30" legs="40" feet="50" corpse="6047"/>
   <targetchange interval="5000" chance="8"/>
@@ -32,15 +32,13 @@
     </attack>
   </attacks>
   <defenses armor="26" defense="10"/>
+  <elements>
+	<element earthPercent="100"/>
+	<element energyPercent="10"/>
+	<element icePercent="7"/>
+	<element firePercent="-20"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <loot>

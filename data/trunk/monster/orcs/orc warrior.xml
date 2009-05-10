@@ -21,17 +21,12 @@
     <attack name="melee" interval="2000" min="-20" max="-60"/>
   </attacks>
   <defenses armor="8" defense="14"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element energyPercent="30"/>
+	<element holyPercent="20"/>
+	<element earthPercent="-10"/>
+	<element deathPercent="-5"/>
+  </elements>
   <voices interval="5000" chance="10">
     <voice sentence="Grow truk grrrr."/>
     <voice sentence="Trak grrrr brik."/>

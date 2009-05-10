@@ -22,25 +22,27 @@
     <attack name="physical" interval="2000" chance="20" range="7" min="-65" max="-145">
       <attribute key="shootEffect" value="spear"/>
     </attack>
-<attack name="melee" interval="3000" chance="15" range="7" radius="3" target="0" min="-80" max="-155">
-  <attribute key="areaEffect" value="blackspark"/>
-</attack>
+    <attack name="melee" interval="3000" chance="15" range="7" radius="3" target="0" min="-80" max="-155">
+      <attribute key="areaEffect" value="blackspark"/>
+    </attack>
   </attacks>
   <defenses armor="25" defense="30"/>
+  <elements>
+	<element earthPercent="100"/>
+	<element icePercent="100"/>
+	<element firePercent="95"/>
+	<element energyPercent="80"/>
+	<element physicalPercent="22"/>
+	<element deathPercent="20"/>
+	<element holyPercent="-16"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
     <voice sentence="MINE!" yell="1"/>
-    <voice sentence="NO PRISONERS!" yell="1"/>
+    <voice sentence="No prisoners!" yell="1"/>
     <voice sentence="NO MERCY!" yell="1"/>
     <voice sentence="By Bolg's Blood!"/>
     <voice sentence="You're no match for me!"/>

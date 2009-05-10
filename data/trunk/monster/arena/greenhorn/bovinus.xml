@@ -9,5 +9,8 @@
 	<attacks>
 		<attack name="melee" interval="2000" min="-1" max="-40"/>
 	</attacks>
+	<elements>
+		<element firePercent="20"/>
+	</elements>
 	<defenses armor="9" defense="11"/>
 </monster>

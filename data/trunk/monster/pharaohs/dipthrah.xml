@@ -19,40 +19,31 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-0" max="-800" poison="65"/>
-
     <attack name="lifedrain" interval="4000" chance="20" range="1" min="-100" max="-800"/>
-
     <attack name="manadrain" interval="2000" chance="15" range="7" min="-100" max="-500">
       <attribute key="areaEffect" value="redshimmer"/>
     </attack>
-
     <attack name="speed" interval="1000" chance="15" range="7" speedchange="-650" duration="50000">
       <attribute key="areaEffect" value="redshimmer"/>
     </attack>
-
     <attack name="drunk" interval="1000" chance="12" radius="7" target="0">
       <attribute key="areaEffect" value="bluebubble"/>
     </attack>
-
     <attack name="melee" interval="3000" chance="34" radius="3" target="0" min="-50" max="-600">
       <attribute key="areaEffect" value="bluebubble"/>
     </attack>
-
   </attacks>
   <defenses armor="25" defense="25">
     <defense name="healing" interval="1000" chance="25" min="100" max="200">
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element physicalPercent="100"/>
+	<element deathPercent="100"/>
+	<element icePercent="30"/>
+  </elements>
   <immunities>
-    <immunity physical="1"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="4">
@@ -60,12 +51,7 @@
   </summons>
   <voices interval="5000" chance="10">
     <voice sentence="Come closer to learn the final lesson."/>
-    <voice sentence="I sense the weakness of your akh."/>
-    <voice sentence="Mortality and fear are your fate and your doom."/>
-    <voice sentence="Undeath will shatter my shackles."/>
     <voice sentence="You can't escape death forever."/>
-    <voice sentence="You don't need this magic anymore."/>
-    <voice sentence="Feel the powers of my mind."/>
   </voices>
   <loot>
     <item id="2148" countmax="100" chance1="100000" chancemax="0"/>

@@ -15,7 +15,7 @@
     <flag staticattack="50"/>
     <flag lightlevel="0"/>
     <flag lightcolor="0"/>
-    <flag targetdistance="8"/>
+    <flag targetdistance="6"/>
     <flag runonhealth="0"/>
   </flags>
   <attacks>

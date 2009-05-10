@@ -19,62 +19,58 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-100" max="-500"/>
-
     <attack name="physical" interval="2000" chance="17" range="7" min="-140" max="-200">
-      <attribute key="shootEffect" value="throwingstar"/>
+		<attribute key="shootEffect" value="throwingstar"/>
     </attack>
-
-   <attack name="melee" interval="1000" chance="15" range="7" radius="3" target="0" min="-115" max="-155">
-  <attribute key="areaEffect" value="blackspark"/>
- </attack>
-
-    <attack name="melee" interval="3000" chance="30" length="8" spread="0" min="-300" max="-420">
-      <attribute key="areaEffect" value="redspark"/>
+	<attack name="melee" interval="1000" chance="15" range="7" radius="3" target="0" min="-115" max="-155">
+		<attribute key="areaEffect" value="blackspark"/>
+	</attack>
+	<attack name="melee" interval="3000" chance="30" length="8" spread="0" min="-300" max="-420">
+		<attribute key="areaEffect" value="redspark"/>
     </attack>
-
     <attack name="physical" interval="1000" chance="25" range="7" min="-170" max="-200">
-      <attribute key="shootEffect" value="snowball"/>
-      <attribute key="areaEffect" value="poff"/>
+		<attribute key="shootEffect" value="snowball"/>
+		<attribute key="areaEffect" value="poff"/>
     </attack>
-
   </attacks>
   <defenses armor="25" defense="30">
     <defense name="healing" interval="1000" chance="25" min="180" max="290">
-      <attribute key="areaEffect" value="blueshimmer"/>
+		<attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element firePercent="100"/>
+	<element icePercent="40"/>
+	<element holyPercent="40"/>
+	<element deathPercent="-20"/>
+	<element energyPercent="-20"/>
+	<element earthPercent="-15"/>
+	<element physicalPercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
-    <immunity invisible="1"/>
+	<immunity invisible="1"/>
   </immunities>
   <voices interval="3000" chance="30">
     <voice sentence="Ahhhhrrrr!"/>
     <voice sentence="Waaaaah!"/>
-    <voice sentence="Carnage!"/>
+	<voice sentence="Carnage!"/>
   </voices>
   <loot>
-   <item id="2148" countmax="83" chance1="100000" chancemax="0"/> --Gold Coin
-   <item id="2645" chance="400"/> --Steel Boots
-   <item id="6558" countmax="3" chance1="5555" chancemax="0"/> --Concentrated Demonic Blood
-   <item id="2666" countmax="1" chance1="25000" chancemax="0"/> --Meat
-   <item id="6500" countmax="1" chance1="2500" chancemax="0"/> --Demonic Essence
-   <item id="5944" chance="8888"/> --Soul Orb
-   <item id="1987" chance="100000"> --Bag
+	<item id="2148" countmax="83" chance1="100000" chancemax="0"/>
+	<item id="2645" chance="400"/>
+	<item id="6558" countmax="3" chance1="5555" chancemax="0"/>
+	<item id="2666" countmax="1" chance1="25000" chancemax="0"/>
+	<item id="6500" countmax="1" chance1="2500" chancemax="0"/>
+	<item id="5944" chance="8888"/>
+	<item id="1987" chance="100000">
        <inside>
-           <item id="2487" chance="600"/> --Crown Armor
-           <item id="2181" chance="1333" /> -- quagmire rod
-           <item id="2143" countmax="1" chance1="12000" chancemax="0"/> --White Pearl
-           <item id="2156" chance="1900"/> --Red Gem
-           <item id="5911" chance="1800"/> --Red Piece of Cloth
+           <item id="2487" chance="600"/>
+           <item id="2181" chance="1333"/>
+           <item id="2143" countmax="1" chance1="12000" chancemax="0"/>
+           <item id="2156" chance="1900"/>
+           <item id="5911" chance="1800"/>
        </inside>
-   </item>
-
- </loot>
+	</item>
+  </loot>
 </monster>

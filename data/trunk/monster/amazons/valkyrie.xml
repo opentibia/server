@@ -24,11 +24,14 @@
     </attack>
   </attacks>
   <defenses armor="12" defense="14"/>
+  <elements>
+	<element icePercent="10"/>
+	<element firePercent="10"/>
+	<element holyPercent="7"/>
+	<element deathPercent="-7"/>
+	<element physicalPercent="-6"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="0"/>
-    <immunity poison="0"/>
     <immunity lifedrain="0"/>
     <immunity paralyze="0"/>
     <immunity outfit="0"/>

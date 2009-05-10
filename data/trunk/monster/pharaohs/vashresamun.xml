@@ -19,7 +19,6 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" min="-80" max="-300" poison="65"/>
-
     <attack name="lifedrain" interval="2000" chance="30" radius="5" target="0" min="-200" max="-750">
       <attribute key="areaEffect" value="purplenote"/>
     </attack>
@@ -32,27 +31,22 @@
       <attribute key="areaEffect" value="redshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element deathPercent="100"/>
+	<element icePercent="20"/>
+	<element firePercent="20"/>
+	<element energyPercent="20"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
-  <summons maxSummons="3">
-    <summon name="banshee" interval="2000" chance="20" max="3"/>
+  <summons maxSummons="2">
+    <summon name="banshee" interval="2000" chance="20" max="2"/>
   </summons>
   <voices interval="5000" chance="10">
-    <voice sentence="Heheheheee!"/>
-    <voice sentence="Come my maidens, we have visitors!"/>
+	<voice sentence="Come my maidens, we have visitors!"/>
     <voice sentence="Are you enjoying my music?"/>
-    <voice sentence="Dance a dance of death for me!"/>
     <voice sentence="If music is the food of death, drop dead."/>
-    <voice sentence="Chakka Chakka!"/>
   </voices>
   <loot>
     <item id="2148" countmax="100" chance1="100000" chancemax="0"/>

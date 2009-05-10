@@ -28,17 +28,16 @@
     </attack>
   </attacks>
   <defenses armor="25" defense="25">
-
   </defenses>
+  <elements>
+	<element firePercent="100"/>
+	<element energyPercent="20"/>
+	<element icePercent="-13"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
+  <voices interval="5000" chance="6">
+	<voice sentence="Feel the heat."/>
+  </voices>
 </monster>

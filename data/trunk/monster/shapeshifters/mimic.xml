@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="Mimic" nameDescription="a mimic" race="blood" experience="70" speed="170" manacost="0">
-  <health now="50" max="50"/>
+<monster name="Mimic" nameDescription="a mimic" race="blood" experience="0" speed="170" manacost="0">
+  <health now="30" max="30"/>
   <look type="92" head="20" body="30" legs="40" feet="50" corpse="1740"/>
   <targetchange interval="5000" chance="8"/>
-  <strategy attack="100" defense="0"/>
+  <strategy attack="0" defense="0"/>
   <flags>
     <flag summonable="0"/>
     <flag attackable="1"/>
@@ -13,12 +13,11 @@
     <flag pushable="1"/>
     <flag canpushitems="0"/>
     <flag canpushcreatures="0"/>
-    <flag targetdistance="1"/>
-    <flag staticattack="90"/>
+    <flag targetdistance="5"/>
+    <flag staticattack="0"/>
     <flag runonhealth="0"/>
   </flags>
   <attacks>
-    <attack name="melee" interval="2000" skill="23" attack="9"/>
   </attacks>
   <defenses armor="2" defense="3"/>
   <immunities>
@@ -33,6 +32,5 @@
     <immunity invisible="0"/>
   </immunities>
   <loot>
-    <item id="2148" countmax="3" chance1="100000" chancemax="0"/>
   </loot>
 </monster>

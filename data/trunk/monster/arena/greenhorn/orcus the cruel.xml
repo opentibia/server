@@ -16,8 +16,12 @@
 		</attack>
 	</attacks>
 	<defenses armor="39" defense="40"/>
+	<elements>
+		<element firePercent="100"/>
+		<element energyPercent="20"/>
+		<element earthPercent="-20"/>
+	</elements>
 	<immunities>
-		<immunity name="fire"/>
-		<immunity name="invisible"/>
+		<immunity invisible="1"/>
 	</immunities>
 </monster>

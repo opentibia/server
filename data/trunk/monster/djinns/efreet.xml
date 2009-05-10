@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="efreet" nameDescription="a efreet" race="blood" experience="300" speed="270" manacost="0">
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="efreet" nameDescription="an efreet" race="blood" experience="325" speed="270" manacost="0">
   <health now="550" max="550"/>
   <look type="103" head="20" body="30" legs="40" feet="50" corpse="6032"/>
   <targetchange interval="5000" chance="8"/>
@@ -47,15 +47,16 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element firePercent="90"/>
+	<element energyPercent="60"/>
+	<element earthPercent="40"/>
+	<element deathPercent="30"/>
+	<element icePercent="-10"/>
+	<element holyPercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="2">
@@ -63,9 +64,6 @@
   </summons>
   <voices interval="5000" chance="10">
     <voice sentence="I grant you a deathwish!"/>
-    <voice sentence="Muhahahaha!"/>
-    <voice sentence="I wish you a merry trip to hell!"/>
-    <voice sentence="Tell me your last wish!"/>
     <voice sentence="Good wishes are for fairytales"/>
   </voices>
   <loot>
@@ -78,11 +76,13 @@
     <item id="2063" chance="20000"/>
       <inside>
         <item id="2149" countmax="2" chance="7000"/>
+		<item id="5910" countmax="2" chance1="5000" chancemax="0"/>
+  	    <item id="7900" chance="500"/> --magma monocle
         <item id="2663" chance="200"/>
         <item id="1860" countmax="1" chance="2500"/>
         <item id="2148" countmax="15" chance1="80000" chancemax="0"/>
         <item id="2442" chance="2000"/>
-        <item id="2187" chance="1111" /> -- wand of Inferno
+        <item id="2187" chance="1111"/> -- wand of Inferno
       </inside>
     </item>
   </loot>

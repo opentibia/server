@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Acid Blob" nameDescription="an acid blob" race="venom" experience="250" speed="210" manacost="0">
 	<health now="250" max="250"/>
-	<look type="314" corpse="9965"/>
+	<look type="314" corpse="9962"/>
 	<targetchange interval="5000" chance="0"/>
 	<strategy attack="100" defense="0"/>
-	
 	<flags>
 		<flag summonable="0"/>
 		<flag attackable="1"/>
@@ -18,9 +17,8 @@
 		<flag staticattack="85"/>
 		<flag runonhealth="0"/>
 	</flags>
-	
 	<attacks>
-		<attack name="melee" interval="2000" skill="35" attack="38"/>
+		<attack name="melee" interval="2000" min="-0" max="-80"/>
 		<attack name="earth" interval="3000" chance="25" radius="4" min="-10" max="-22">
 			<attribute key="areaEffect" value="greenspark"/>
 		</attack>
@@ -28,27 +26,21 @@
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
 	</attacks>
-	
 	<defenses armor="10" defense="10"/>
-	
 	<immunities>
 		<immunity death="1"/>
 		<immunity earth="1"/>
 	</immunities>
-	
 	<elements>
 		<element firePercent="-5"/>
 		<element icePercent="8"/>
 		<element energyPercent="-10"/>
 	</elements>
-	
 	<summons maxSummons="2">
 		<summon name="Acid Blob" interval="4000" chance="8"/>
 	</summons>
-	
 	<voices interval="5000" chance="10"/>
-		
 	<loot>
-		<item id="9967" countmax="1" chance1="28000" chancemax="0"/> --Glob of acid
+		<item id="9967" countmax="1" chance1="28000" chancemax="0"/> <!-- glob of acid -->
 	</loot>
 </monster>

@@ -34,16 +34,16 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element holyPercent="20"/>
+	<element earthPercent="10"/>
+	<element icePercent="10"/>
+	<element physicalPercent="-10"/>
+	<element energyPercent="-10"/>
+	<element deathPercent="-5"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
+    <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="2">
     <summon name="Skeleton" interval="2000" chance="10000"/>
@@ -60,7 +60,7 @@
     <item id="2169" chance="1000"/>
     <item id="1987" chance="100000">
       <inside>
-        <item id="2181" chance="1333" /> -- quagmire rod
+        <item id="2181" chance="1333"/> -- quagmire rod
         <item id="2168" chance="1428"/>
         <item id="5810" chance="555"/>
         <item id="2652" chance="1666"/>

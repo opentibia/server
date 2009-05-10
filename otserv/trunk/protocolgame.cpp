@@ -2177,9 +2177,6 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 				}
 
 				AddMapDescription(msg, pos);
-				if(isLogin){
-					AddMagicEffect(msg, pos, NM_ME_TELEPORT);
-				}
 
 				AddInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
 				AddInventoryItem(msg, SLOT_NECKLACE, player->getInventoryItem(SLOT_NECKLACE));
@@ -2202,27 +2199,6 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 
 				//player light level
 				AddCreatureLight(msg, creature);
-				if(isLogin){
-					std::string tempstring = g_config.getString(ConfigManager::LOGIN_MSG);
-					if(tempstring.size() > 0){
-						AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
-					}
-
-					if(player->getLastLoginSaved() != 0){
-						tempstring = "Your last visit was on ";
-						time_t lastLogin = player->getLastLoginSaved();
-						tempstring += ctime(&lastLogin);
-						tempstring.erase(tempstring.length() -1);
-						tempstring += ".";
-						AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
-					}
-					else{
-						tempstring = "Welcome to ";
-						tempstring += g_config.getString(ConfigManager::SERVER_NAME);
-						tempstring += ". Please choose an outfit.";
-						sendOutfitWindow();
-					}
-				}
 
 				for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
 					bool online;

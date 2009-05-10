@@ -15,9 +15,12 @@
 		</attack>
 	</attacks>
 	<defenses armor="25" defense="26"/>
+	<elements>
+		<element earthPercent="20"/>
+		<element firePercent="-5"/>
+	</elements>
 	<immunities>
-		<immunity name="poison"/>
-		<immunity name="invisible"/>
+		<immunity invisible="1"/>
 	</immunities>
 	<voices interval="2000" chance="5">
 		<voice sentence="Death where are you?"/>

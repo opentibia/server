@@ -15,7 +15,13 @@
 		</attack>
 	</attacks>
 	<defenses armor="19" defense="20"/>
+	<elements>
+		<element energyPercent="20"/>
+		<element earthPercent="-20"/>
+	</elements>
 	<voices interval="2000" chance="5">
 		<voice sentence="Flee, coward!"/>
+		<voice sentence="You will lose!"/>
+		<voice sentence="Yeehaawh"/>
 	</voices>
 </monster>

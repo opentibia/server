@@ -1167,6 +1167,9 @@ void LuaScriptInterface::registerFunctions()
 	//isPremium(cid)
 	lua_register(m_luaState, "isPremium", LuaScriptInterface::luaIsPremium);
 
+	//getPlayerLastLogin(cid)
+	lua_register(m_luaState, "getPlayerLastLogin", LuaScriptInterface::luaGetPlayerLastLogin);
+
 	//getGlobalStorageValue(valueid)
 	lua_register(m_luaState, "getGlobalStorageValue", LuaScriptInterface::luaGetGlobalStorageValue);
 
@@ -1308,6 +1311,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//doSendTutorial(cid, tutorialid)
 	lua_register(m_luaState, "doSendTutorial", LuaScriptInterface::luaDoSendTutorial);
+
+	//doPlayerSendOutfitWindow(cid)
+	lua_register(m_luaState, "doPlayerSendOutfitWindow", LuaScriptInterface::luaDoPlayerSendOutfitWindow);
 
 	//doAddMapMark(cid, pos, type, <optional> description)
 	lua_register(m_luaState, "doAddMapMark", LuaScriptInterface::luaDoAddMark);
@@ -1918,6 +1924,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoPremium:
 			value = player->isPremium();
 			break;
+		case PlayerInfoLastLogin:
+			value = player->getLastLoginSaved();
+			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -2022,6 +2031,9 @@ int LuaScriptInterface::luaIsPzLocked(lua_State *L){
 	
 int LuaScriptInterface::luaIsPremium(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoPremium);}
+
+int LuaScriptInterface::luaGetPlayerLastLogin(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoLastLogin);}
 //
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
@@ -3118,6 +3130,26 @@ int LuaScriptInterface::luaDoSendTutorial(lua_State *L)
 
 	player->sendTutorial(tutorial);
 	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSendOutfitWindow(lua_State *L)
+{
+	//doPlayerSendOutfitWindow(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+
+	if(player){
+		player->sendOutfitWindow();
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
 	return 1;
 }
 

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="Demodras" nameDescription="Demodras" race="blood" experience="3100" speed="230" manacost="0">
-  <health now="2200" max="2200"/>
+<monster name="Demodras" nameDescription="Demodras" race="blood" experience="4000" speed="230" manacost="0">
+  <health now="4500" max="4500"/>
   <look type="204" head="20" body="30" legs="40" feet="50" corpse="5984"/>
   <targetchange interval="5000" chance="8"/>
   <strategy attack="100" defense="0"/>
@@ -8,7 +8,7 @@
     <flag summonable="0"/>
     <flag attackable="1"/>
     <flag hostile="1"/>
-    <flag illusionable="1"/>
+    <flag illusionable="0"/>
     <flag convinceable="0"/>
     <flag pushable="0"/>
     <flag canpushitems="1"/>
@@ -35,22 +35,18 @@
       <attribute key="areaEffect" value="blueshimmer"/>
     </defense>
   </defenses>
+  <elements>
+	<element firePercent="100"/>
+	<element earthPercent="100"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="2">
     <summon name="dragon" interval="1000" chance="17" max="2"/>
   </summons>
   <voices interval="5000" chance="10">
-    <voice sentence="ZCHHHHH" yell="1"/>
     <voice sentence="I WILL SET THE WORLD IN FIRE!" yell="1"/>
     <voice sentence="I WILL PROTECT MY BROOD!" yell="1"/>
   </voices>

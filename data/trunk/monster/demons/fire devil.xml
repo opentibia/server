@@ -29,38 +29,36 @@
     </attack>
   </attacks>
   <defenses armor="13" defense="15"/>
-  <immunities>
-    <immunity physical="0"/>
-    <immunity energy="0"/>
-    <immunity fire="1"/>
-    <immunity poison="0"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="0"/>
-    <immunity outfit="0"/>
-    <immunity drunk="0"/>
-    <immunity invisible="0"/>
-  </immunities>
+  <elements>
+	<element firePercent="100"/>
+	<element energyPercent="30"/>
+	<element earthPercent="25"/>
+	<element deathPercent="15"/>
+	<element physicalPercent="10"/>
+	<element icePercent="-20"/>
+	<element holyPercent="-10"/>
+  </elements>
   <voices interval="5000" chance="10">
     <voice sentence="Hot, eh?"/>
     <voice sentence="Hell, oh hell!"/>
   </voices>
   <loot>
-    <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+	<item id="2148" countmax="20" chance1="100000" chancemax="0"/>
     <item id="2666" countmax="3" chance1="33333" chancemax="0"/>
-    <item id="2185" chance="833" /> -- volcanic rod
+    <item id="2185" chance="833"/>
     <item id="2050" chance="20000"/>
     <item id="2419" chance="10000"/>
     <item id="2387" chance="5000"/>
     <item id="2568" chance="15000"/>
     <item id="1987" chance="100000">
-      <inside>
-        <item id="2187" chance="1000" /> -- wand of Inferno
-        <item id="2515" chance="2857"/>
-        <item id="2260" chance="6666"/>
-        <item id="2691" countmax="2" chance1="20000" chancemax="0"/>
-        <item id="2150" countmax="2" chance1="1666" chancemax="0"/>
-        <item id="2191" chance="833"/>
-      </inside>
-    </item>
+		<inside>
+			<item id="2187" chance="1000"/>
+			<item id="2515" chance="2857"/>
+			<item id="2260" chance="6666"/>
+			<item id="2691" countmax="2" chance1="20000" chancemax="0"/>
+			<item id="2150" countmax="2" chance1="1666" chancemax="0"/>
+			<item id="2191" chance="833"/>
+		</inside>
+	</item>
   </loot>
 </monster>

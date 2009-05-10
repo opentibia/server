@@ -34,16 +34,14 @@
 		<attribute key="areaEffect" value="blueshimmer"/>
 	</defense>
   </defenses>
+  <elements>
+	<element firePercent="100"/>
+	<element energyPercent="50"/>
+	<element deathPercent="34"/>
+	<element holyPercent="-14"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="0"/>
-    <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
-    <immunity invisible="0"/>
+    <immunity invisible="1"/>
   </immunities>
   <summons maxSummons="3">
     <summon name="fire elemental" interval="2000" chance="50"/>

@@ -21,20 +21,17 @@
 <attack name="melee" interval="2000" min="-30" max="-80"/>
 </attacks>
 <defenses armor="10" defense="13"/>
-<immunities>
-<immunity physical="0"/>
-<immunity energy="0"/>
-<immunity fire="0"/>
-<immunity poison="0"/>
-<immunity lifedrain="0"/>
-<immunity paralyze="0"/>
-<immunity outfit="0"/>
-<immunity drunk="0"/>
-<immunity invisible="0"/>
-</immunities>
+<elements>
+	<element firePercent="20"/>
+	<element holyPercent="10"/>
+	<element physicalPercent="-12"/>
+	<element icePercent="-10"/>
+	<element deathPercent="-5"/>
+  </elements>
 <voices interval="5000" chance="10">
-<voice sentence="We are the nomad!"/>
-<voice sentence="I like to move it, move it!"/>
+<voice sentence="We are the true sons of the desert!"/>
+<voice sentence="I will leave your remains to the vultures!"/>
+<voice sentence="We are swift as the wind of the desert!"/>
 </voices>
 <loot>
 <item id="2148" countmax="20" chance1="100000" chancemax="0"/>

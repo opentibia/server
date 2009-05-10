@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<monster name="blue djinn" nameDescription="a blue djinn" race="blood" experience="190" speed="200" manacost="0">
+<monster name="blue djinn" nameDescription="a blue djinn" race="blood" experience="215" speed="200" manacost="0">
   <health now="330" max="330"/>
   <look type="80" head="20" body="30" legs="40" feet="50" corpse="6020"/>
   <targetchange interval="5000" chance="8"/>
@@ -28,7 +28,7 @@
     <attack name="lifedrain" interval="3000" chance="25" range="7" min="-55" max="-105">
       <attribute key="shootEffect" value="suddendeath"/>
     </attack>
-    <attack name="drunk" interval="1000" chance="20" range="7">
+    <attack name="drunk" interval="1000" chance="15" range="7">
       <attribute key="shootEffect" value="energy"/>
       <attribute key="areaEffect" value="energyarea"/>
     </attack>
@@ -37,15 +37,15 @@
     </attack>
   </attacks>
   <defenses armor="20" defense="10"/>
+  <elements>
+	<element firePercent="80"/>
+	<element energyPercent="50"/>
+	<element holyPercent="20"/>
+	<element icePercent="-10"/>
+	<element deathPercent="-10"/>
+  </elements>
   <immunities>
-    <immunity physical="0"/>
-    <immunity energy="1"/>
-    <immunity fire="1"/>
-    <immunity poison="1"/>
-    <immunity lifedrain="1"/>
     <immunity paralyze="1"/>
-    <immunity outfit="1"/>
-    <immunity drunk="1"/>
     <immunity invisible="1"/>
   </immunities>
   <voices interval="5000" chance="10">
@@ -55,17 +55,19 @@
     <voice sentence="Wishes can come true."/>
   </voices>
   <loot>
-    <item id="1978" countmax="1" chance="2500"/>
-    <item id="2745" countmax="1" chance="1000"/>
-    <item id="7378" countmax="2" chance1="2000" chancemax="0"/>
-    <item id="2146" countmax="4" chance="2500"/>
     <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
-    <item id="2684" countmax="5" chance1="50000" chancemax="0"/>
+    <item id="7378" countmax="2" chance1="2000" chancemax="0"/>
     <item id="2146" countmax="4" chance1="6666" chancemax="0"/>
-    <item id="2663" countmax="1" chance="100"/>
-    <item id="1971" chance="10000"/>
-    <item id="2044" chance="20000"/>
-    <item id="2063" countmax="1" chance="7500"/>
-    <item id="5912" countmax="1" chance1="5000" chancemax="0"/>
+	<item id="2663" countmax="1" chance="1111"/> -- mystic turban
+    <item id="2745" countmax="1" chance="1000"/>
+    <item id="2684" countmax="5" chance1="50000" chancemax="0"/>
+	<item id="1987" chance="100000">
+	  <inside>
+		<item id="1971" chance="10000"/>
+		<item id="2044" chance="20000"/>
+		<item id="2063" countmax="1" chance="7500"/>
+		<item id="5912" countmax="1" chance1="5000" chancemax="0"/>
+      </inside>
+    </item>
   </loot>
 </monster>
