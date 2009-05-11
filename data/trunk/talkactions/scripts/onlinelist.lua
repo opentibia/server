@@ -8,7 +8,7 @@ function onSay(cid, words, param)
 	local k = 0
 	for i, uid in ipairs(onlineList) do
 		--Player is not shown in list if he has SpecialVip flag
-		if getPlayerFlagValue(uid, math.pow(2, 30)) == FALSE then
+		if getPlayerFlagValue(uid, PLAYERFLAG_SPECIALVIP) == FALSE then
 			local name = getPlayerName(uid)
 			if string.len(name) + string.len(str) > 255 then
 				doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, str)
