@@ -706,6 +706,8 @@ bool IOPlayer::getAccountByName(uint32_t& account, std::string& name)
 {
 	Database* db = Database::instance();
 	DBResult* result;
+	DBQuery query;
+
 	if(!(result = db->storeQuery("SELECT `account_id` FROM `players` WHERE `name` = " + db->escapeString(name))))
 		return false;
 

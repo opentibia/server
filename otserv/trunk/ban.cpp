@@ -31,6 +31,7 @@ extern ConfigManager g_config;
 bool BanManager::clearTemporaryBans() const
 {
 	Database* db = Database::instance();
+	DBQuery query;
 	return db->executeQuery("UPDATE `bans` SET `active` = 0 WHERE `expires` = 0");
 }
 

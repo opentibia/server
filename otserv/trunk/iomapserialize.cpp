@@ -69,6 +69,7 @@ bool IOMapSerialize::saveMap(Map* map)
 bool IOMapSerialize::loadMapRelational(Map* map)
 {
 	Database* db = Database::instance();
+	DBQuery query;
 
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		//load tile
@@ -329,6 +330,7 @@ bool IOMapSerialize::saveTile(Database* db, uint32_t tileId, const Tile* tile)
 bool IOMapSerialize::loadMapBinary(Map* map)
 {
 	Database* db = Database::instance();
+	DBQuery query;
  
 	DBResult* result = db->storeQuery("SELECT `data` FROM `map_store`;");
  	if(!result)
