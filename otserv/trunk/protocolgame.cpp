@@ -1109,12 +1109,12 @@ void ProtocolGame::parseRequestOutfit(NetworkMessage& msg)
 
 void ProtocolGame::parseSetOutfit(NetworkMessage& msg)
 {
-	int looktype = msg.GetU16();
-	int lookhead = msg.GetByte();
-	int lookbody = msg.GetByte();
-	int looklegs = msg.GetByte();
-	int lookfeet = msg.GetByte();
-	int lookaddons = msg.GetByte();
+	uint16_t looktype = msg.GetU16();
+	uint8_t lookhead = msg.GetByte();
+	uint8_t lookbody = msg.GetByte();
+	uint8_t looklegs = msg.GetByte();
+	uint8_t lookfeet = msg.GetByte();
+	uint8_t lookaddons = msg.GetByte();
 
 	Outfit_t newOutfit;
 	newOutfit.lookType = looktype;
@@ -1134,12 +1134,6 @@ void ProtocolGame::parseUseItem(NetworkMessage& msg)
 	uint8_t stackpos = msg.GetByte();
 	uint8_t index = msg.GetByte();
 	bool isHotkey = (pos.x == 0xFFFF && pos.y == 0 && pos.z == 0);
-
-/*
-#ifdef __DEBUG__
-	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
-#endif
-*/
 
 	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, &Game::playerUseItem, player->getID(), pos, stackpos, index, spriteId, isHotkey);
 }
@@ -1424,7 +1418,7 @@ void ProtocolGame::parseAcceptTrade(NetworkMessage& msg)
 void ProtocolGame::parseLookInTrade(NetworkMessage& msg)
 {
 	bool counterOffer = (msg.GetByte() == 0x01);
-	int index = msg.GetByte();
+	uint8_t index = msg.GetByte();
 
 	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, &Game::playerLookInTrade, player->getID(), counterOffer, index);
 }
