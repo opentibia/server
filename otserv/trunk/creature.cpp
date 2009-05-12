@@ -66,7 +66,6 @@ Creature::Creature() :
 
 	lastStep = 0;
 	lastStepCost = 1;
-	extraStepDuration = 0;
 	baseSpeed = 220;
 	varSpeed = 0;
 
@@ -171,7 +170,7 @@ int64_t Creature::getSleepTicks() const
 	if(lastStep != 0){
 		int64_t ct = OTSYS_TIME();
 		int64_t stepDuration = getStepDuration();
-		int64_t delay = stepDuration - (ct - lastStep) + extraStepDuration;
+		int64_t delay = stepDuration - (ct - lastStep);
 		return delay;
 	}
 
@@ -188,7 +187,7 @@ int32_t Creature::getWalkDelay(Direction dir, uint32_t resolution) const
 
 		int64_t ct = OTSYS_TIME();
 		int64_t stepDuration = std::ceil(((double)getStepDuration(false) * mul)/resolution) * resolution;
-		return stepDuration - (ct - lastStep) + extraStepDuration;
+		return stepDuration - (ct - lastStep);
 	}
 
 	return 0;
@@ -545,7 +544,6 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 	if(creature == this){
 		setLastPos(oldPos);
 		lastStep = OTSYS_TIME();
-		extraStepDuration = 0;
 		lastStepCost = 1;
 
 		if(teleport){
@@ -1053,42 +1051,24 @@ double Creature::getDamageRatio(Creature* attacker) const
 	return ((double)attackerDamage / totalDamage);
 }
 
-uint32_t Creature::getStaminaRatio(Creature* attacker) const
-{
-	uint32_t cHits = 0;
-	for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it)
-	{
-		if(it->first == attacker->getID()){
-			cHits += it->second.hits;
-		}
-	}
-	for(CountMap::const_iterator it = healMap.begin(); it != healMap.end(); ++it)
-	{
-		if(it->first == attacker->getID()){
-			cHits += it->second.hits;
-		}
-	}
-	return cHits;
-}
-
 uint64_t Creature::getGainedExperience(Creature* attacker, bool useMultiplier /*= true*/) const
 {
 	uint64_t retValue = (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 	if(Player* player = attacker->getPlayer()){
+
 		if(useMultiplier)
 			retValue = (uint64_t)std::floor(retValue * player->getRateValue(LEVEL_EXPERIENCE));
-		
-		//[check & remove stamina
-		if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
-			if(player->getStaminaMinutes() <= 840 && player->getStaminaMinutes() > 0)
-				retValue = retValue / 2;
-			else if(player->getStaminaMinutes() <= 0)
-				return 0;
 
-			player->removeStamina(getStaminaRatio(attacker) * player->getAttackSpeed() * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS));
+		if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
+			if(player->getStaminaMinutes() <= 0){
+				return 0;
+			}
+			else if(player->getStaminaMinutes() <= 840){
+				retValue = retValue / 2;
+			}
 		}
-		//]
 	}
+
 	return retValue;
 }
 
@@ -1156,7 +1136,7 @@ void Creature::onEndCondition(ConditionType_t type)
 	//
 }
 
-void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
+void Creature::onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove)
 {
 	if(const MagicField* field = getTile()->getFieldItem()){
 		switch(type){

@@ -186,6 +186,11 @@ void Condition::setTicks(int32_t newTicks)
 
 bool Condition::executeCondition(Creature* creature, int32_t interval)
 {
+	if(interval > 0){
+		bool bRemove = false;
+		creature->onTickCondition(getType(), interval, bRemove);
+	}
+
 	if(ticks != -1){
 		int32_t newTicks = std::max(((int32_t)0), ((int32_t)getTicks() - interval));
 		//Not using set ticks here since it would reset endTime
@@ -1313,7 +1318,7 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 		IntervalInfo& damageInfo = damageList.front();
 
 		bool bRemove = (getTicks() != -1);
-		creature->onTickCondition(getType(), bRemove);
+		creature->onTickCondition(getType(), interval, bRemove);
 		damageInfo.timeLeft -= interval;
 
 		if(damageInfo.timeLeft <= 0){

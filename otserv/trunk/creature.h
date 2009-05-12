@@ -286,7 +286,6 @@ public:
 
 	virtual void onDie();
 	
-	uint32_t getStaminaRatio(Creature* attacker) const;
 	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
 	void addHealPoints(Creature* caster, int32_t healthPoints);
@@ -296,7 +295,7 @@ public:
 	virtual void onAddCondition(ConditionType_t type);
 	virtual void onAddCombatCondition(ConditionType_t type);
 	virtual void onEndCondition(ConditionType_t type);
-	virtual void onTickCondition(ConditionType_t type, bool& bRemove);
+	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttacked();
@@ -395,7 +394,6 @@ protected:
 	int32_t masterRadius;
 	uint64_t lastStep;
 	uint32_t lastStepCost;
-	uint32_t extraStepDuration;
 	uint32_t baseSpeed;
 	int32_t varSpeed;
 	bool skillLoss;

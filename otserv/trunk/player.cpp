@@ -790,7 +790,6 @@ int32_t Player::getDefaultStats(stats_t stat)
 	}
 }
 
-
 int32_t Player::getStepSpeed() const
 {
 	if(getSpeed() > PLAYER_MAX_SPEED){
@@ -3472,7 +3471,6 @@ void Player::onWalkComplete()
 void Player::stopWalk()
 {
 	if(!listWalkDir.empty()){
-		extraStepDuration = getStepDuration();
 		stopEventWalk();
 	}
 }
@@ -3579,6 +3577,15 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 			removeCondition(condition);
 		}
 	}
+}
+
+void Player::onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove)
+{
+	if(type == CONDITION_HUNTING){
+		removeStamina(interval * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS) );
+	}
+
+	Creature::onTickCondition(type, interval, bRemove);
 }
 
 void Player::onAttackedCreature(Creature* target)
