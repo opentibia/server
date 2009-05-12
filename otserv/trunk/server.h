@@ -93,7 +93,6 @@ protected:
 	boost::asio::ip::tcp::acceptor* m_acceptor;
 	std::vector<Service_ptr> m_services;
 
-	uint32_t m_listenErrors;
 	uint16_t m_serverPort;
 	bool m_pendingStart;
 };

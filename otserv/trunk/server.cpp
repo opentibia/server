@@ -97,7 +97,6 @@ void ServiceManager::stop()
 ServicePort::ServicePort(boost::asio::io_service& io_service) :
 	m_io_service(io_service),
 	m_acceptor(NULL),
-	m_listenErrors(0),
 	m_serverPort(0),
 	m_pendingStart(false)
 {
@@ -188,12 +187,7 @@ void ServicePort::onAccept(boost::asio::ip::tcp::socket* socket, const boost::sy
 	else{
 		if(error != boost::asio::error::operation_aborted){
 			close();
-			if(m_listenErrors > 99){
-				std::cout << "Error: [Server::handle] More than 100 listen errors." << std::endl;
-				return;
-			}
 
-			m_listenErrors++;
 			if(!m_pendingStart){
 				m_pendingStart = true;
 				g_scheduler.addEvent(createSchedulerTask(5000,
