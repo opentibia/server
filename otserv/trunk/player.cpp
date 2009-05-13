@@ -3149,10 +3149,10 @@ void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_
 			requireListUpdate = oldParent != this;
 
 		if(requireListUpdate){
-			updateItemsLight();
 			updateInventoryWeigth();
 			sendStats();
 		}
+		updateItemsLight();
 	}
 
 	if(const Item* item = thing->getItem()){
@@ -3201,10 +3201,10 @@ void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int
 			requireListUpdate = newParent != this;
 
 		if(requireListUpdate){
-			updateItemsLight();
 			updateInventoryWeigth();
 			sendStats();
 		}
+		updateItemsLight();
 	}
 
 

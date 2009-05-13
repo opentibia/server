@@ -900,29 +900,33 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		Weapon::internalUseWeapon(player, item, target, damageModifier);
 	}
 	else{
-		//miss target
-		typedef std::pair<int32_t, int32_t> dPair;
-		std::vector<dPair> destList;
-		destList.push_back(dPair(-1, -1));
-		destList.push_back(dPair(-1, 0));
-		destList.push_back(dPair(-1, 1));
-		destList.push_back(dPair(0, -1));
-		destList.push_back(dPair(0, 1));
-		destList.push_back(dPair(1, -1));
-		destList.push_back(dPair(1, 0));
-		destList.push_back(dPair(1, 1));
-
-		std::random_shuffle(destList.begin(), destList.end());
-
-		Position destPos = target->getPosition();
+		// We failed attack, miss!
 		Tile* destTile = target->getTile();
-		Tile* tmpTile = NULL;
+		if(!Position::areInRange<1,1,0>(player->getPosition(), target->getPosition())){lse{
+			typedef std::pair<int32_t, int32_t> dPair;
+			std::vector<dPair> destList;
+			destList.push_back(dPair(-1, -1));
+			destList.push_back(dPair(-1, 0));
+			destList.push_back(dPair(-1, 1));
+			destList.push_back(dPair(0, -1));
+			destList.push_back(dPair(0, 0));
+			destList.push_back(dPair(0, 1));
+			destList.push_back(dPair(1, -1));
+			destList.push_back(dPair(1, 0));
+			destList.push_back(dPair(1, 1));
 
-		for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
-			tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
-			if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID)){
-				destTile = tmpTile;
-				break;
+			std::random_shuffle(destList.begin(), destList.end());
+
+			Position destPos = target->getPosition();
+			Tile* tmpTile = NULL;
+
+			for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
+				tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
+				// Blocking tiles or tiles without ground ain't valid targets for spears
+				if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID) && tmpTile->ground != NULL){
+					destTile = tmpTile;
+					break;
+				}
 			}
 		}
 
