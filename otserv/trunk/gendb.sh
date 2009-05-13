@@ -28,20 +28,21 @@ INSERT INTO \`accounts\` (\`id\`, \`name\`, \`password\`)
 VALUES ('1', '1', '1');
 INSERT INTO \`accounts\` (\`id\`, \`name\`, \`password\`) 
 VALUES ('111111', '111111', 'tibia');
-INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`) 
-VALUES ('3', 'Player', '1', '1', '0', '0', '1', '0');
-INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`) 
-VALUES ('0', 'Hurz', '111111', '1', '0', '0', '1', '0');
-INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`) 
-VALUES ('1', 'Hurzine','111111', '1', '1', '0', '1', '0');
-INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`) 
-VALUES ('2', 'Hurzel','111111', '1', '0', '0', '1', '0');
-INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`) 
-VALUES ('4', 'Senior Gamemaster', '1', '5', '0', '1', '0', '0');
-INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`) 
-VALUES ('5', 'GM Hurz', '111111', '5', '0', '0', '1', '0');
+INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`, \`cap\`) 
+VALUES ('3', 'Player', '1', '1', '0', '0', '1', '0', '100');
+INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`, \`cap\`) 
+VALUES ('0', 'Hurz', '111111', '1', '0', '0', '1', '0', '100');
+INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`, \`cap\`) 
+VALUES ('1', 'Hurzine','111111', '1', '1', '0', '1', '0', '100');
+INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`, \`cap\`) 
+VALUES ('2', 'Hurzel','111111', '1', '0', '0', '1', '0', '100');
+INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`, \`cap\`) 
+VALUES ('4', 'Senior Gamemaster', '1', '6', '0', '1', '0', '0', '800');
+INSERT INTO \`players\` (\`id\`, \`name\`, \`account_id\`, \`group_id\`, \`sex\`, \`rank_id\`, \`town_id\`, \`conditions\`, \`cap\`) 
+VALUES ('5', 'Godly One', '1', '7', '0', '0', '1', '0', '800');
 INSERT INTO \`player_items\` (\`player_id\`, \`sid\`, \`pid\`, \`itemtype\`, \`count\`, \`attributes\`)
 VALUES ('5', '101', '4', '2638', '2', '0');
+
 _EOF
 
 
