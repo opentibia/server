@@ -902,7 +902,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 	else{
 		// We failed attack, miss!
 		Tile* destTile = target->getTile();
-		if(!Position::areInRange<1,1,0>(player->getPosition(), target->getPosition())){lse{
+		if(!Position::areInRange<1,1,0>(player->getPosition(), target->getPosition())){
 			typedef std::pair<int32_t, int32_t> dPair;
 			std::vector<dPair> destList;
 			destList.push_back(dPair(-1, -1));
