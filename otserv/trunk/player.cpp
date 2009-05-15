@@ -594,7 +594,6 @@ void Player::sendIcons() const
 
 void Player::updateInventoryWeight()
 {
-	std::cout << "Updated weight " << inventoryWeight << " -> ";
 	inventoryWeight = 0.00;
 
 	if(!hasFlag(PlayerFlag_HasInfiniteCapacity)){
@@ -605,7 +604,6 @@ void Player::updateInventoryWeight()
 			}
 		}
 	}
-	std::cout << inventoryWeight << std::endl;
 }
 
 int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
