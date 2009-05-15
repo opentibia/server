@@ -1499,6 +1499,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 			int64_t timeOff = time(NULL) - lastLogout - 600;
 			if(timeOff > 0){
 				int32_t stamina_rate = g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN);
+				int32_t slow_stamina_rate = g_config.getNumber(ConfigManager::SLOW_RATE_STAMINA_GAIN);
 				int32_t quick_stamina_max = MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION);
 				int64_t gain;
 				bool checkSlowStamina = true;
@@ -1516,7 +1517,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 				}
 
 				if(getStamina() < MAX_STAMINA && checkSlowStamina){
-					gain = timeOff * stamina_rate / 4;
+					gain = timeOff * slow_stamina_rate;
 					addStamina(gain);
 				}
 			}
@@ -3578,7 +3579,7 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 void Player::onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove)
 {
 	if(type == CONDITION_HUNTING){
-		removeStamina(interval * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS) );
+		removeStamina(interval * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS));
 	}
 
 	Creature::onTickCondition(type, interval, bRemove);
