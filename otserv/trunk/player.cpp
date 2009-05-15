@@ -592,8 +592,9 @@ void Player::sendIcons() const
 	}
 }
 
-void Player::updateInventoryWeigth()
+void Player::updateInventoryWeight()
 {
+	std::cout << "Updated weight " << inventoryWeight << " -> ";
 	inventoryWeight = 0.00;
 
 	if(!hasFlag(PlayerFlag_HasInfiniteCapacity)){
@@ -604,6 +605,7 @@ void Player::updateInventoryWeigth()
 			}
 		}
 	}
+	std::cout << inventoryWeight << std::endl;
 }
 
 int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
@@ -3148,11 +3150,9 @@ void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_
 		else
 			requireListUpdate = oldParent != this;
 
-		if(requireListUpdate){
-			updateInventoryWeigth();
-			sendStats();
-		}
+		updateInventoryWeight();
 		updateItemsLight();
+		sendStats();
 	}
 
 	if(const Item* item = thing->getItem()){
@@ -3200,11 +3200,9 @@ void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int
 		else
 			requireListUpdate = newParent != this;
 
-		if(requireListUpdate){
-			updateInventoryWeigth();
-			sendStats();
-		}
+		updateInventoryWeight();
 		updateItemsLight();
+		sendStats();
 	}
 
 

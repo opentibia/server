@@ -640,7 +640,7 @@ protected:
 	void gainExperience(uint64_t& exp);
 	void addExperience(uint64_t exp);
 
-	void updateInventoryWeigth();
+	void updateInventoryWeight();
 
 	void setNextWalkActionTask(SchedulerTask* task);
 	void setNextWalkTask(SchedulerTask* task);

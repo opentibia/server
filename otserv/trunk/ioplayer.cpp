@@ -332,7 +332,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 
 	player->updateBaseSpeed();
-	player->updateInventoryWeigth();
+	player->updateInventoryWeight();
 	player->updateItemsLight(true);
 
 	return true;
