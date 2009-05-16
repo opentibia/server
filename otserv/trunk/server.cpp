@@ -99,7 +99,7 @@ ServicePort::ServicePort(boost::asio::io_service& io_service) :
 	m_acceptor(NULL),
 	m_serverPort(0),
 	m_pendingStart(false),
-	m_logError(false)
+	m_logError(true)
 {
 }
 
