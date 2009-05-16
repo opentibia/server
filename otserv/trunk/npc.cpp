@@ -869,10 +869,6 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 								action.intValue = (*it).subType;
 								listItemProp.actionList.push_front(action);
 
-								action.actionType = ACTION_SETSUBTYPE;
-								action.intValue = (*it).subType;
-								listItemProp.actionList.push_front(action);
-
 								action.actionType = ACTION_SETLISTNAME;
 								if(!(*it).name.empty()){
 									action.strValue = (*it).name;
@@ -1454,14 +1450,32 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 						if(it.hasSubType()){
 							subType = npcState->subType;
 						}
+						
+						if(g_game.getMoney(player) >= moneyCount){
+							if(it.stackable){
+								int32_t amount = npcState->amount;
+								while(amount > 0){
+									int32_t stackCount = std::min((int32_t)100, (int32_t)amount);
+									Item* item = Item::CreateItem(it.id, stackCount);
+									if(g_game.internalPlayerAddItem(player, item) != RET_NOERROR){
+										delete item;
+										break;
+									}
 
-						if(g_game.removeMoney(player, moneyCount)){
-							for(int32_t i = 0; i < npcState->amount; ++i){
-								Item* item = Item::CreateItem(it.id, subType);
-								if(g_game.internalPlayerAddItem(player, item) != RET_NOERROR){
-									delete item;
+									amount = amount - stackCount;
 								}
 							}
+							else{
+								for(int32_t i = 0; i < npcState->amount; ++i){
+									Item* item = Item::CreateItem(it.id, subType);
+									if(g_game.internalPlayerAddItem(player, item) != RET_NOERROR){
+										delete item;
+										break;
+									}
+								}
+							}
+
+							g_game.removeMoney(player, moneyCount);
 						}
 						else{
 							std::cout << "Error [Npc::executeResponse] Not enough money: " << player->getName()  << "\tNpc: " << getName() << std::endl;
@@ -2024,7 +2038,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 			if(hasBitSet(RESPOND_LOWMONEY, params)){
 				int32_t moneyCount = g_game.getMoney(player);
-				if(moneyCount >= npcState->price){
+				if(moneyCount >= (npcState->price * npcState->amount)){
 					continue;
 				}
 				++matchCount;
