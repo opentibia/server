@@ -239,7 +239,7 @@ void ServicePort::open(uint16_t port)
 	}
 	catch(boost::system::system_error& e){
 		if(m_logError){
-			LOG_MESSAGE(LOGFILE_ADMIN, "NETWORK", LOGTYPE_ERROR, 1, e.what());
+			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
 			m_logError = false;
 		}
 
