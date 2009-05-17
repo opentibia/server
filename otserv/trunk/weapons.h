@@ -45,9 +45,6 @@ public:
 	bool loadDefaults();
 	const Weapon* getWeapon(const Item* item) const;
 
-	static int32_t weaponExhaustionTime;
-	static int32_t weaponInFightTime;
-
 	static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue);
 	static int32_t getMaxWeaponDamage(int32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor);
 
@@ -88,7 +85,7 @@ public:
 
 	const uint32_t getReqLevel() const {return level;}
 	const uint32_t getReqMagLv() const {return magLevel;}
-	const bool hasExhaustion() const {return exhaustion;}
+	const bool hasExhaustion() const {return (exhaustion != 0);}
 	const bool isWieldedUnproperly() const {return wieldUnproperly;}
 	const bool isPremium() const {return premium;}
 
@@ -108,7 +105,7 @@ protected:
 	uint16_t id;
 	bool enabled;
 	bool premium;
-	bool exhaustion;
+	int32_t exhaustion;
 	bool wieldUnproperly;
 	int32_t level;
 	int32_t magLevel;

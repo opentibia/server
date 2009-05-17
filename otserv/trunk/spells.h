@@ -54,9 +54,6 @@ public:
 
 	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
 
-	static int32_t spellExhaustionTime;
-	static int32_t spellInFightTime;
-
 	static Position getCasterPosition(Creature* creature, Direction dir);
 	virtual std::string getScriptBaseName();
 
@@ -150,7 +147,7 @@ protected:
 	int32_t manaPercent;
 	int32_t soul;
 	int32_t range;
-	bool exhaustion;
+	int32_t exhaustion;
 	bool needTarget;
 	bool needWeapon;
 	bool selfTarget;

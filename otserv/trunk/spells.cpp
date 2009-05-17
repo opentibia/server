@@ -459,7 +459,7 @@ Spell::Spell()
 	manaPercent = 0;
 	soul = 0;
 	range = -1;
-	exhaustion = true;
+	exhaustion = -1;
 	needTarget = false;
 	needWeapon = false;
 	selfTarget = false;
@@ -535,7 +535,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 	}
 
 	if(readXMLInteger(p, "exhaustion", intValue)){
-		exhaustion = (intValue == 1);
+		exhaustion = intValue;
 	}
 
 	if(readXMLInteger(p, "prem", intValue)){
@@ -834,12 +834,18 @@ void Spell::postCastSpell(Player* player, bool finishedCast /*= true*/, bool pay
 {
 	if(finishedCast){
 		if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
-			if(exhaustion){
+			if(exhaustion != 0){
 				if(isAggressive){
-					player->addCombatExhaust(g_game.getFightExhaustionTicks());
+					if(exhaustion == -1)
+						player->addCombatExhaust(g_game.getFightExhaustionTicks());
+					else
+						player->addCombatExhaust(exhaustion);
 				}
 				else{
-					player->addHealExhaust(g_game.getHealExhaustionTicks());
+					if(exhaustion == -1)
+						player->addHealExhaust(g_game.getHealExhaustionTicks());
+					else
+						player->addHealExhaust(exhaustion);
 				}
 			}
 		}

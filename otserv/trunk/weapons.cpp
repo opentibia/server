@@ -178,7 +178,7 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
-	exhaustion = false;
+	exhaustion = 0;
 	premium = false;
 	enabled = true;
 	wieldUnproperly = false;
@@ -231,7 +231,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	if(readXMLInteger(p, "exhaustion", intValue)){
-		exhaustion = (intValue == 1);
+		exhaustion = intValue;
 	}
 
 	if(readXMLInteger(p, "prem", intValue)){
@@ -500,7 +500,10 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 	}
 
 	if(!player->hasFlag(PlayerFlag_HasNoExhaustion) && hasExhaustion()){
-		player->addCombatExhaust(g_game.getFightExhaustionTicks());
+		if(exhaustion == -1)
+			player->addCombatExhaust(g_game.getFightExhaustionTicks());
+		else
+			player->addCombatExhaust(exhaustion);
 	}
 
 	int32_t manaCost = getManaCost(player);
