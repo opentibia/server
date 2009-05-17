@@ -186,7 +186,7 @@ int32_t Creature::getWalkDelay(Direction dir, uint32_t resolution) const
 		}
 
 		int64_t ct = OTSYS_TIME();
-		int64_t stepDuration = std::ceil(((double)getStepDuration(false) * mul)/resolution) * resolution;
+		int64_t stepDuration = (int64_t)(std::ceil(((double)getStepDuration(false) * mul)/resolution) * resolution);
 		return stepDuration - (ct - lastStep);
 	}
 
