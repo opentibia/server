@@ -87,14 +87,14 @@ s_defcommands Commands::defined_commands[] = {
 	{"/reload",&Commands::reloadInfo},
 	{"/z",&Commands::testCommand},
 	{"/zt",&Commands::testTutorialCommand},
-	{"/goto",&Commands::teleportTo},
+	//{"/goto",&Commands::teleportTo},
 	{"/info",&Commands::getInfo},
 	//{"/save",&Commands::saveServer},
 	{"/shutdown",&Commands::shutdownServer},
 	{"/closeserver",&Commands::closeServer},
 	{"/openserver",&Commands::openServer},
 	{"/getonline",&Commands::onlineList},
-	{"/a",&Commands::teleportNTiles},
+	//{"/a",&Commands::teleportNTiles},
 	//{"/kick",&Commands::kickPlayer},
 	{"/owner",&Commands::setHouseOwner},
 	{"/sellhouse",&Commands::sellHouse},
@@ -542,28 +542,6 @@ bool Commands::testTutorialCommand(Creature* creature, const std::string& cmd, c
 	return true;
 }
 
-
-bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Position destPos;
-	if(Waypoint_ptr waypoint = g_game.getMap()->waypoints.getWaypointByName(param)){
-		destPos = waypoint->pos;
-	}
-	else if(Creature* paramCreature = g_game.getCreatureByName(param)){
-		destPos = paramCreature->getPosition();
-	}
-	else{
-		return false;
-	}
-
-	if(g_game.internalTeleport(creature, destPos) == RET_NOERROR){
-		g_game.addMagicEffect(destPos, NM_ME_ENERGY_AREA);
-		return true;
-	}
-
-	return false;
-}
-
 bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Player* player = creature->getPlayer();
@@ -610,7 +588,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 			++it;
 		}
 	}
-	
+
 	// Is it a real serversave?
 	if(param == "serversave")
 		g_game.saveServer(true);
@@ -686,37 +664,6 @@ bool Commands::onlineList(Creature* creature, const std::string& cmd, const std:
 	players.str("");
 	players << "Total: " << n << " player(s)" << std::endl;
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, players.str().c_str());
-	return true;
-}
-
-bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	int ntiles = atoi(param.c_str());
-	if(ntiles != 0)
-	{
-		Position newPos = creature->getPosition();
-		switch(creature->getDirection()){
-		case NORTH:
-			newPos.y = newPos.y - ntiles;
-			break;
-		case SOUTH:
-			newPos.y = newPos.y + ntiles;
-			break;
-		case EAST:
-			newPos.x = newPos.x + ntiles;
-			break;
-		case WEST:
-			newPos.x = newPos.x - ntiles;
-			break;
-		default:
-			break;
-		}
-
-		if(g_game.internalTeleport(creature, newPos) == RET_NOERROR){
-			g_game.addMagicEffect(newPos, NM_ME_TELEPORT);
-		}
-	}
-
 	return true;
 }
 

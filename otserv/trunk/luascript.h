@@ -387,6 +387,7 @@ protected:
 	static int luaGetTownNameById(lua_State *L);
 	static int luaGetTownTemplePosition(lua_State *L);
 	static int luaDoPlayerSendOutfitWindow(lua_State *L);
+	static int luaGetWaypointPositionByName(lua_State *L);
 
 	//queries
 	static int luaGetPlayerByName(lua_State *L);

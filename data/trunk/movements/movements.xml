@@ -12,6 +12,9 @@
 	<moveevent event="StepIn" itemid="6594" script="footprint.lua" />
 	<moveevent event="StepIn" itemid="670" script="footprint.lua" />
 
+	<!-- Pitfalls -->
+	<moveevent event="StepIn" itemid="293" script="increment.lua" />
+
 	<!-- Fields -->
 	<moveevent event="StepIn" itemid="1487" function="onStepInField" />
 	<moveevent event="AddItem" itemid="1487" function="onAddField" />

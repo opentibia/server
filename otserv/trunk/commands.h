@@ -53,7 +53,7 @@ protected:
 	//bool teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool teleportHere(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool teleportToTown(Creature* creature, const std::string& cmd, const std::string& param);
-	bool teleportTo(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool teleportTo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool createItemById(Creature* creature, const std::string& cmd, const std::string& param);
 	bool createItemByName(Creature* creature, const std::string& cmd, const std::string& param);
 	bool subtractMoney(Creature* creature, const std::string& cmd, const std::string& param);
@@ -66,7 +66,7 @@ protected:
 	bool closeServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool openServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool onlineList(Creature* creature, const std::string& cmd, const std::string& param);
-	bool teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool kickPlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool exivaPlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param);

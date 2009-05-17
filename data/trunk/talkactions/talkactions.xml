@@ -17,4 +17,6 @@
 	<talkaction words="/kick" filter="first word" script="kickplayer.lua"/>
 	<talkaction words="/c" filter="first word" script="teleporthere.lua"/>
 	<talkaction words="/serverinfo" script="serverinfo.lua"/>
+	<talkaction words="/a" filter="first word" script="teleportntiles.lua"/>
+	<talkaction words="/goto" filter="first word" script="teleportto.lua"/>
 </talkactions>
