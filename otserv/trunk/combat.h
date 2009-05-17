@@ -361,7 +361,7 @@ private:
 
 inline std::string CombatTypeName(CombatType_t combat) {
 	switch(combat){
-		case COMBAT_NONE: return "all";
+		case COMBAT_NONE: return "unknown";
 		case COMBAT_PHYSICALDAMAGE: return "physical";
 		case COMBAT_ENERGYDAMAGE: return "energy";
 		case COMBAT_EARTHDAMAGE: return "earth";

@@ -63,6 +63,8 @@ public:
 	  */
 	bool savePlayer(Player* player);
 
+	bool addPlayerDeath(Player* dying_player, const DeathList& dl);
+
 	bool getGuidByName(uint32_t& guid, std::string& name);
 	bool getAccountByName(uint32_t& acc, std::string& name);
 	bool getAccountByName(std::string& acc, std::string& name);

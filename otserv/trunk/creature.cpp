@@ -83,6 +83,7 @@ Creature::Creature() :
 	memset(localMapCache, false, sizeof(localMapCache));
 
 	attackedCreature = NULL;
+	lastDamageSource = COMBAT_NONE;
 	lastHitCreature = 0;
 
 	blockCount = 0;
@@ -780,7 +781,7 @@ Item* Creature::dropCorpse()
 		g_game.startDecay(splash);
 	}
 
-	Item* corpse = getCorpse();
+	Item* corpse = createCorpse();
 	if(corpse){
 		g_game.internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		dropLoot(corpse->getContainer());
@@ -804,18 +805,116 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 	*_lastHitCreature = g_game.getCreatureByID(lastHitCreature);
 
 	int32_t mostDamage = 0;
-	CountBlock_t cb;
-	for(CountMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		cb = it->second;
+	for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+		const CountBlock_t& cb = it->second;
 
 		if((cb.total > mostDamage && (OTSYS_TIME() - cb.ticks <= g_game.getInFightTicks()))){
-			if((*_mostDamageCreature = g_game.getCreatureByID((*it).first))){
+			if((*_mostDamageCreature = g_game.getCreatureByID(it->first))){
 				mostDamage = cb.total;
 			}
 		}
 	}
 
 	return (*_lastHitCreature || *_mostDamageCreature);
+}
+
+DeathList Creature::getKillers(int assist_count)
+{
+	DeathList list;
+	Creature* lhc = g_game.getCreatureByID(lastHitCreature);
+	if(lhc)
+		list.push_back(DeathEntry(lhc, 0)); // Final Hit killer
+	else
+		list.push_back(DeathEntry(CombatTypeName(lastDamageSource), 0));
+
+	if(assist_count == 0){
+		return list;
+	}
+	else if(assist_count == 1){
+		// Optimized case for last hit + one killer
+		Creature* mdc = NULL;
+		int32_t mostDamage = 0;
+		int64_t now = OTSYS_TIME();
+
+		for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+			const CountBlock_t& cb = it->second;
+
+			if(cb.total > mostDamage && (now - cb.ticks <= g_game.getInFightTicks())){
+				Creature* tmpDamageCreature = g_game.getCreatureByID(it->first);
+				if(tmpDamageCreature){
+					// Player who made last hit is not included in assist list
+					if(tmpDamageCreature != lhc){
+						// Don't count summons as assist
+						if(lhc && (lhc->getMaster() == tmpDamageCreature || tmpDamageCreature->getMaster() == lhc))
+							continue;
+						mdc = tmpDamageCreature;
+						mostDamage = cb.total;
+					}
+				}
+			}
+		}
+
+		if(mdc)
+			list.push_back(DeathEntry(mdc, mostDamage));
+	}
+	else{
+		int64_t now = OTSYS_TIME();
+
+		// Add all (recent) damagers to the list
+
+		for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+			const CountBlock_t& cb = it->second;
+
+			if(now - cb.ticks <= g_game.getInFightTicks()){
+				Creature* mdc = g_game.getCreatureByID(it->first);
+				// Player who made last hit is not included in assist list
+				if(mdc && mdc != lhc){
+					// Check if master is last hit creature, or if our summon is last hit creature
+					if(lhc && (mdc->getMaster() == lhc || lhc->getMaster() == mdc))
+						continue;
+					
+					// Check if master has already been added to the list
+					if(mdc->getMaster()){
+						bool cont = false;
+						for(DeathList::iterator finder = list.begin(); finder != list.end(); ++finder){
+							Creature* c = finder->getKillerCreature();
+							if(mdc->getMaster() == c || mdc->getMaster() == c->getMaster()){
+								cont = true;
+								break;
+							}
+						}
+						if(cont)
+							continue;
+					}
+
+					// Check if our summon has already been added to the list
+					if(mdc->getSummonCount() > 0){
+						bool cont = false;
+						for(DeathList::iterator finder = list.begin(); finder != list.end(); ++finder){
+							Creature* c = finder->getKillerCreature();
+							if(c->getMaster() == mdc){
+								cont = true;
+								break;
+							}
+						}
+						if(cont)
+							continue;
+					}
+
+					list.push_back(DeathEntry(mdc, cb.total));
+				}
+			}
+		}
+		// Sort them by damage, first is always final hit killer
+		if(list.size() > 1)
+			std::sort(list.begin() + 1, list.end(), DeathLessThan());
+	}
+
+	if(list.size() > assist_count + 1)
+		// Shrink list to assist_count
+		list.resize(assist_count + 1, DeathEntry(NULL, -1));
+
+	return list;
 }
 
 bool Creature::hasBeenAttacked(uint32_t attackerId) const
@@ -828,7 +927,7 @@ bool Creature::hasBeenAttacked(uint32_t attackerId) const
 	return false;
 }
 
-Item* Creature::getCorpse()
+Item* Creature::createCorpse()
 {
 	Item* corpse = Item::CreateItem(getLookCorpse());
 	return corpse;
@@ -874,6 +973,7 @@ void Creature::gainHealth(Creature* caster, int32_t healthGain)
 
 void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
 {
+	lastDamageSource = combatType;
 	changeHealth(-damage);
 	if(attacker){
 		attacker->onAttackedCreatureDrainHealth(this, damage);

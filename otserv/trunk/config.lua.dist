@@ -79,6 +79,9 @@ pzlocked = 60000
 -- how long a field belongs to a player before it no longer causes PZ lock for the owner
 field_ownership_duration = 5000
 
+-- When a player dies, how many of the assisting players (ie. how many of those who made damage) should be stored in database?
+death_assist_count = 1
+
 -- enable (advanced, item based) hotkeys?
 enablehotkeys = true
 

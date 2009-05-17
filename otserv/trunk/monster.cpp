@@ -1172,9 +1172,9 @@ void Monster::die()
 	deactivate(true);
 }
 
-Item* Monster::getCorpse()
+Item* Monster::createCorpse()
 {
-	Item* corpse = Creature::getCorpse();
+	Item* corpse = Creature::createCorpse();
 	if(corpse){
 		Creature* lastHitCreature = NULL;
 		Creature* mostDamageCreature = NULL;

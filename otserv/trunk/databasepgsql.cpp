@@ -125,6 +125,26 @@ DBResult* DatabasePgSQL::storeQuery(const std::string &query)
 	return verifyResult(results);
 }
 
+uint64_t DatabasePgSQL::getLastInsertedRowID()
+{
+	if(!m_connected)
+		return 0;
+
+	PGresult* res = PQexec(m_handle, "SELECT LASTVAL() as last;");
+	ExecStatusType stat = PQresultStatus(res);
+
+	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK){
+		std::cout << "PQexec(): " << query << ": " << PQresultErrorMessage(res) << std::endl;
+		PQclear(res);
+		return 0;
+	}
+
+	// everything went fine
+	uint64_t id = ATOI64( PQgetvalue(res, 0, PQfnumber(res, "last" )));
+	PGClear(res);
+	return id;
+}
+
 std::string DatabasePgSQL::escapeString(const std::string &s)
 {
 	// remember to quote even empty string!

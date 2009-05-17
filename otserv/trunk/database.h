@@ -130,6 +130,13 @@ public:
 	DATABASE_VIRTUAL bool executeQuery(const std::string &query) { return 0; }
 
 	/**
+	 * Returns ID of last inserted row
+	 *
+	 * @return id of last inserted row, 0 if last query did not result in any rows with auto_increment keys
+	 */
+	DATABASE_VIRTUAL uint64_t getLastInsertedRowID() {return 0;}
+
+	/**
 	* Queries database.
 	*
 	* Executes query which generates results (mostly SELECT).
@@ -274,6 +281,11 @@ public:
 	* Executes current buffer.
 	*/
 	bool execute();
+
+	/**
+	 * Returns ID of the inserted column if it had a AUTO_INCREMENT key
+	 */
+	uint64_t getInsertID();
 
 protected:
 	Database* m_db;

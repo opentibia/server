@@ -153,7 +153,7 @@ private:
 	void clearFriendList();
 
 	void die();
-	Item* getCorpse();
+	Item* createCorpse();
 	bool despawn();
 	bool inDespawnRange(const Position& pos);
 

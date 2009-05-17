@@ -187,6 +187,37 @@ CREATE TABLE `map_store` (
 	KEY(`house_id`)
 ) ENGINE = InnoDB;
 
+CREATE TABLE `player_deaths` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`player_id` INT UNSIGNED NOT NULL,
+	`date` INT UNSIGNED NOT NULL,
+	`level` INT NOT NULL,
+    FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
+	PRIMARY KEY(`id`),
+	INDEX(`date`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `killers` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`death_id` INT UNSIGNED NOT NULL,
+	`final_hit` TINYINT(1) NOT NULL DEFAULT 1,
+	PRIMARY KEY(`id`),
+    FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `enviroment_killers` (
+	`kill_id` INT UNSIGNED NOT NULL,
+	`name` VARCHAR(255) NOT NULL,
+    FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `player_killers` (
+	`kill_id` INT UNSIGNED NOT NULL,
+	`player_id` INT UNSIGNED NOT NULL
+    FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
 CREATE TABLE `player_depotitems` (
     `player_id` INT UNSIGNED NOT NULL,
     `depot_id` INT NOT NULL DEFAULT 0,

@@ -649,7 +649,7 @@ protected:
 	void onDie();
 	void die();
 	virtual Item* dropCorpse();
-	virtual Item* getCorpse();
+	virtual Item* createCorpse();
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,

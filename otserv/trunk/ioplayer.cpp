@@ -655,6 +655,93 @@ bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
 	return true;
 }
 
+bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
+{
+	Database* db = Database::instance();
+	
+	DBQuery q;
+	DBTransaction transaction(db);
+	transaction.begin();
+	std::ostringstream query;
+	
+	
+	// First insert the actual death
+	{
+		DBInsert death_stmt(db);
+		death_stmt.setQuery("INSERT INTO `player_deaths` (`player_id`, `date`, `level`) VALUES ");
+
+		query << dying_player->getGUID() << ", " << std::time(NULL) << " , " << dying_player->getLevel();
+		if(!death_stmt.addRow(query.str()))
+			return false;
+		if(!death_stmt.execute())
+			return false;
+	}
+	
+	uint64_t death_id = db->getLastInsertedRowID();
+
+	// Then insert the killers...
+	for(DeathList::const_iterator dli = dlist.begin(); dli != dlist.end(); ++dli){
+		DBInsert killer_stmt(db);
+		killer_stmt.setQuery("INSERT INTO `killers` (`death_id`, `final_hit`) VALUES ");
+
+		query.str("");
+		query << death_id << ", " << (dli == dlist.begin()? 1 : 0);
+		if(!killer_stmt.addRow(query.str()))
+			return false;
+		if(!killer_stmt.execute())
+			return false;
+
+		uint64_t kill_id = db->getLastInsertedRowID();
+
+		const DeathEntry& de = *dli;
+		
+		std::string name;
+		if(de.isCreatureKill()){
+			Creature* c = de.getKillerCreature();
+			Player* player = c->getPlayer();
+
+			if(c->isSummon() && c->getMaster()->getPlayer()){
+				// Set player, next if will insert GUID
+				player = c->getMaster()->getPlayer();
+				// Set name, so the enviroment insert happenends
+				name = c->getNameDescription();
+			}
+
+			if(player){
+				DBInsert player_killers_stmt(db);
+				player_killers_stmt.setQuery("INSERT INTO `player_killers` (`kill_id`, `player_id`) VALUES ");
+
+				query.str("");
+				query << kill_id << ", " << player->getGUID();
+				if(!player_killers_stmt.addRow(query.str()))
+					return false;
+				if(!player_killers_stmt.execute())
+					return false;
+			}
+			else{ // Kill wasn't player, store name so next insert catches it
+				name = c->getNameDescription();
+			}
+		}
+		else{ // Not a creature kill
+			name = de.getKillerName();
+		}
+
+		if(name.size() > 0){
+			DBInsert env_killers_stmt(db);
+			env_killers_stmt.setQuery("INSERT INTO `enviroment_killers` (`kill_id`, `name`) VALUES ");
+
+			query.str("");
+			query << kill_id << ", " << db->escapeString(name);
+			if(!env_killers_stmt.addRow(query.str()))
+				return false;
+			if(!env_killers_stmt.execute())
+				return false;
+		}
+	}
+
+	return transaction.commit();
+}
+
 bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)
 {
 	NameCacheMap::iterator it = nameCacheMap.find(guid);

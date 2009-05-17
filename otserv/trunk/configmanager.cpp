@@ -177,6 +177,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[FINALBAN_LENGTH] = getGlobalNumber(L, "final_banishment_length", 30 * 86400);
 	m_confInteger[IPBANISHMENT_LENGTH] = getGlobalNumber(L, "ip_banishment_length", 86400);
 	m_confInteger[ALLOW_GAMEMASTER_MULTICLIENT] = getGlobalBoolean(L, "allow_gamemaster_multiclient", false);
+	m_confInteger[DEATH_ASSIST_COUNT] = getGlobalNumber(L, "death_assist_count", 1);
 
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);

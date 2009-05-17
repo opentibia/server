@@ -2219,6 +2219,9 @@ void Player::onDie()
 		if(isSkillPrevented){
 			setLossSkill(false);
 		}
+
+		DeathList killers = getKillers(g_config.getNumber(ConfigManager::DEATH_ASSIST_COUNT));
+		IOPlayer::instance()->addPlayerDeath(this, killers);
 	}
 
 	Creature::onDie();
@@ -2344,9 +2347,9 @@ Item* Player::dropCorpse()
 	}
 }
 
-Item* Player::getCorpse()
+Item* Player::createCorpse()
 {
-	Item* corpse = Creature::getCorpse();
+	Item* corpse = Creature::createCorpse();
 	if(corpse && corpse->getContainer()){
 		std::stringstream ss;
 
