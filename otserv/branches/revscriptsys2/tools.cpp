@@ -31,6 +31,7 @@
 #include "sha1.h"
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 extern ConfigManager g_config;
 

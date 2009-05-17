@@ -144,12 +144,14 @@ public:
 	void* getUserdata();
 
 	template <typename T> T popValue();
+	#ifndef __GNUC__
 	template <> bool popValue<bool>() {return popBoolean();}
 	template <> int popValue<int>() {return popInteger();}
 	template <> uint32_t popValue<uint32_t>() {return popUnsignedInteger();}
 	template <> double popValue<double>() {return popFloat();}
 	template <> std::string popValue<std::string>() {return popString();}
 	template <> uint64_t popValue<uint64_t>() {return (uint64_t)popFloat();}
+	#endif
 
 	// Push
 	void pushNil();
@@ -443,6 +445,14 @@ protected:
 	friend class LuaStateManager;
 	friend class Script::Manager;
 };
+#ifdef __GNUC__
+template <> bool LuaState::popValue<bool>();
+template <> int LuaState::popValue<int>();
+template <> uint32_t LuaState::popValue<uint32_t>();
+template <> double LuaState::popValue<double>();
+template <> std::string LuaState::popValue<std::string>();
+template <> uint64_t LuaState::popValue<uint64_t>();
+#endif
 
 class LuaThread : public LuaState {
 public:
