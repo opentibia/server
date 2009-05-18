@@ -728,7 +728,7 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 
 		if(name.size() > 0){
 			DBInsert env_killers_stmt(db);
-			env_killers_stmt.setQuery("INSERT INTO `enviroment_killers` (`kill_id`, `name`) VALUES ");
+			env_killers_stmt.setQuery("INSERT INTO `environment_killers` (`kill_id`, `name`) VALUES ");
 
 			query.str("");
 			query << kill_id << ", " << db->escapeString(name);
