@@ -233,7 +233,7 @@ public:
 	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
-	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
+	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
 	ZoneType_t getZone() const {
 		const Tile* tile = getTile();
 		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
@@ -324,9 +324,9 @@ public:
 	bool hasBeenAttacked(uint32_t attackerId) const;
 
 	//combat event functions
-	virtual void onAddCondition(ConditionType_t type);
-	virtual void onAddCombatCondition(ConditionType_t type);
-	virtual void onEndCondition(ConditionType_t type);
+	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
+	virtual void onAddCombatCondition(ConditionType_t type, bool hadCondition);
+	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
 	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onAttackedCreature(Creature* target);

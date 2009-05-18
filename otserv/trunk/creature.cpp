@@ -1216,9 +1216,12 @@ void Creature::addHealPoints(Creature* caster, int32_t healthPoints)
 	}
 }
 
-void Creature::onAddCondition(ConditionType_t type)
+void Creature::onAddCondition(ConditionType_t type, bool hadCondition)
 {
-	if(type == CONDITION_PARALYZE && hasCondition(CONDITION_HASTE)){
+	if(type == CONDITION_INVISIBLE && !hadCondition){
+		g_game.internalCreatureChangeVisible(this, false);
+	}
+	else if(type == CONDITION_PARALYZE && hasCondition(CONDITION_HASTE)){
 		removeCondition(CONDITION_HASTE);
 	}
 	else if(type == CONDITION_HASTE && hasCondition(CONDITION_PARALYZE)){
@@ -1226,14 +1229,16 @@ void Creature::onAddCondition(ConditionType_t type)
 	}
 }
 
-void Creature::onAddCombatCondition(ConditionType_t type)
+void Creature::onAddCombatCondition(ConditionType_t type, bool hadCondition)
 {
 	//
 }
 
-void Creature::onEndCondition(ConditionType_t type)
+void Creature::onEndCondition(ConditionType_t type, bool lastCondition)
 {
-	//
+	if(type == CONDITION_INVISIBLE && lastCondition){
+		g_game.internalCreatureChangeVisible(this, true);
+	}
 }
 
 void Creature::onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove)
@@ -1367,6 +1372,7 @@ bool Creature::addCondition(Condition* condition)
 		return false;
 	}
 
+	bool hadCondition = hasCondition(condition->getType(), false);
 	Condition* prevCond = getCondition(condition->getType(), condition->getId(), condition->getSubId());
 
 	if(prevCond){
@@ -1377,7 +1383,7 @@ bool Creature::addCondition(Condition* condition)
 
 	if(condition->startCondition(this)){
 		conditions.push_back(condition);
-		onAddCondition(condition->getType());
+		onAddCondition(condition->getType(), hadCondition);
 		return true;
 	}
 
@@ -1387,13 +1393,15 @@ bool Creature::addCondition(Condition* condition)
 
 bool Creature::addCombatCondition(Condition* condition)
 {
+	bool hadCondition = hasCondition(condition->getType(), false);
+
 	//Caution: condition variable could be deleted after the call to addCondition
 	ConditionType_t type = condition->getType();
 	if(!addCondition(condition)){
 		return false;
 	}
 
-	onAddCombatCondition(type);
+	onAddCombatCondition(type, hadCondition);
 	return true;
 }
 
@@ -1405,9 +1413,10 @@ void Creature::removeCondition(ConditionType_t type)
 			it = conditions.erase(it);
 
 			condition->endCondition(this, CONDITIONEND_ABORT);
-			delete condition;
+			bool lastCondition = !hasCondition(condition->getType(), false);
+			onEndCondition(type, lastCondition);
 
-			onEndCondition(type);
+			delete condition;
 		}
 		else{
 			++it;
@@ -1423,9 +1432,10 @@ void Creature::removeCondition(ConditionType_t type, ConditionId_t id)
 			it = conditions.erase(it);
 
 			condition->endCondition(this, CONDITIONEND_ABORT);
-			delete condition;
+			bool lastCondition = !hasCondition(condition->getType(), false);
+			onEndCondition(type, lastCondition);
 
-			onEndCondition(type);
+			delete condition;
 		}
 		else{
 			++it;
@@ -1453,7 +1463,9 @@ void Creature::removeCondition(Condition* condition)
 		it = conditions.erase(it);
 
 		condition->endCondition(this, CONDITIONEND_ABORT);
-		onEndCondition(condition->getType());
+		bool lastCondition = !hasCondition(condition->getType(), false);
+		onEndCondition(condition->getType(), lastCondition);
+
 		delete condition;
 	}
 }
@@ -1476,15 +1488,14 @@ void Creature::executeConditions(uint32_t interval)
 		//if((*it)->getTicks() <= 0){
 
 		if(!(*it)->executeCondition(this, interval)){
-			ConditionType_t type = (*it)->getType();
-
 			Condition* condition = *it;
 			it = conditions.erase(it);
 
 			condition->endCondition(this, CONDITIONEND_TICKS);
-			delete condition;
+			bool lastCondition = !hasCondition(condition->getType(), false);
+			onEndCondition(condition->getType(), lastCondition);
 
-			onEndCondition(type);
+			delete condition;
 		}
 		else{
 			++it;

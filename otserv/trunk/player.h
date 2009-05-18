@@ -361,9 +361,9 @@ public:
 	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
 
 	//combat event functions
-	virtual void onAddCondition(ConditionType_t type);
-	virtual void onAddCombatCondition(ConditionType_t type);
-	virtual void onEndCondition(ConditionType_t type);
+	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
+	virtual void onAddCombatCondition(ConditionType_t type, bool hadCondition);
+	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
 	virtual void onAttackedCreature(Creature* target);
@@ -445,11 +445,27 @@ public:
 	void sendCreatureChangeVisible(const Creature* creature, bool visible)
 		{
 			if(client){
-				if(visible){
-					client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
+				if(creature->getPlayer()){
+					if(visible){
+						client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
+					}
+					else{
+						static Outfit_t outfit;
+						client->sendCreatureOutfit(creature, outfit);
+					}
 				}
 				else{
-					client->sendCreatureInvisible(creature);
+					if(canSeeInvisibility()){
+						client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
+					}
+					else{
+						if(visible){
+							client->sendAddCreature(creature, creature->getPosition(), creature->getTile()->__getIndexOfThing(creature), false);
+						}
+						else{
+							client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->__getIndexOfThing(creature), false);
+						}
+					}
 				}
 			}
 		}

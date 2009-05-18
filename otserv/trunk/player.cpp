@@ -968,7 +968,8 @@ bool Player::canSee(const Position& pos) const
 	return false;
 }
 
-bool Player::canSeeInvisibility() const {
+bool Player::canSeeInvisibility() const
+{
 	return hasFlag(PlayerFlag_CanSenseInvisibility);
 }
 
@@ -976,7 +977,6 @@ bool Player::canSeeCreature(const Creature* creature) const
 {
 	if(creature->isInvisible() &&
 		!creature->getPlayer() &&
-		!hasFlag(PlayerFlag_CanSenseInvisibility) &&
 		!canSeeInvisibility())
 	{
 		return false;
@@ -1703,11 +1703,9 @@ void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const
 		}
 
 		if(teleport || (oldPos.z != newPos.z)){
-			addCondition(
-				Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, 
+			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, 
 				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
-			addCondition(
-				Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, 
+			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, 
 				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
 		}
 	}
@@ -2235,7 +2233,9 @@ void Player::die()
 			it = conditions.erase(it);
 
 			condition->endCondition(this, CONDITIONEND_DIE);
-			onEndCondition(condition->getType());
+
+			bool lastCondition = !hasCondition(condition->getType(), false);
+			onEndCondition(condition->getType(), lastCondition);
 			delete condition;
 		}
 		else{
@@ -3506,13 +3506,13 @@ void Player::updateItemsLight(bool internal /*=false*/)
 	}
 }
 
-void Player::onAddCondition(ConditionType_t type)
+void Player::onAddCondition(ConditionType_t type, bool hadCondition)
 {
-	Creature::onAddCondition(type);
+	Creature::onAddCondition(type, hadCondition);
 	sendIcons();
 }
 
-void Player::onAddCombatCondition(ConditionType_t type)
+void Player::onAddCombatCondition(ConditionType_t type, bool hadCondition)
 {
 	if(type == CONDITION_POISON){
 		sendTextMessage(MSG_STATUS_DEFAULT, "You are poisoned.");
@@ -3528,9 +3528,9 @@ void Player::onAddCombatCondition(ConditionType_t type)
 	}
 }
 
-void Player::onEndCondition(ConditionType_t type)
+void Player::onEndCondition(ConditionType_t type, bool lastCondition)
 {
-	Creature::onEndCondition(type);
+	Creature::onEndCondition(type, lastCondition);
 	sendIcons();
 
 	if(type == CONDITION_INFIGHT){

@@ -333,7 +333,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 		if(tile){
 			/*look at*/
 			if(type == STACKPOS_LOOK){
-				return tile->getTopThing();
+				return tile->getTopVisibleThing(player);
 			}
 
 			Thing* thing = NULL;
@@ -685,7 +685,9 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((player = (*it)->getPlayer())){
-			player->sendCreatureDisappear(creature, index, isLogout);
+			if(player->canSeeCreature(creature)){
+				player->sendCreatureDisappear(creature, index, isLogout);
+			}
 		}
 	}
 

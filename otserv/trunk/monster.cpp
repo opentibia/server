@@ -562,8 +562,10 @@ bool Monster::deactivate(bool forced /*= false*/)
 	return !isActivated;
 }
 
-void Monster::onAddCondition(ConditionType_t type)
+void Monster::onAddCondition(ConditionType_t type, bool hadCondition)
 {
+	Creature::onAddCondition(type, hadCondition);
+
 	//the walkCache need to be updated if the monster becomes "resistent" to the damage, see Tile::__queryAdd()
 	if(type == CONDITION_FIRE || type == CONDITION_ENERGY || type == CONDITION_POISON){
 		updateMapCache();
@@ -572,8 +574,10 @@ void Monster::onAddCondition(ConditionType_t type)
 	activate();
 }
 
-void Monster::onEndCondition(ConditionType_t type)
+void Monster::onEndCondition(ConditionType_t type, bool lastCondition)
 {
+	Creature::onEndCondition(type, lastCondition);
+
 	//the walkCache need to be updated if the monster loose the "resistent" to the damage, see Tile::__queryAdd()
 	if(type == CONDITION_FIRE || type == CONDITION_ENERGY || type == CONDITION_POISON){
 		updateMapCache();
