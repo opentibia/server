@@ -344,7 +344,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 				if(item && !item->isNotMoveable())
 					thing = item;
 				else
-					thing = tile->getTopCreature();
+					thing = tile->getTopVisibleCreature(player);
 			}
 			/*use item*/
 			else if(type == STACKPOS_USE){

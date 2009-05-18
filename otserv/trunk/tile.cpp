@@ -316,6 +316,19 @@ Thing* Tile::getTopVisibleThing(const Player* player)
 	return NULL;
 }
 
+Creature* Tile::getTopVisibleCreature(const Player* player)
+{
+	if(CreatureVector* creatures = getCreatures()){
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			if(player->canSeeCreature(*cit)){
+				return (*cit);
+			}
+		}
+	}
+
+	return NULL;
+}
+
 void Tile::onAddTileItem(Item* item)
 {
 	updateTileFlags(item, false);
@@ -504,7 +517,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				if(creatures){
 					Creature* creature;
 					for(uint32_t i = 0; i < creatures->size(); ++i){
-						creature = (*creatures)[i];
+						creature = creatures->at(i);
+						if(creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+							continue;
+
 						if( !creature->getMonster() ||
 							!creature->isPushable() ||
 							(creature->getMonster()->isSummon() && creature->getMonster()->getMaster()->getPlayer()))
@@ -515,7 +531,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 			else if(creatures && !creatures->empty()){
-				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
+				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+						return RET_NOTENOUGHROOM;
+					}
+				}
 			}
 
 			if(hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)){
@@ -558,7 +578,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 		else if(const Player* player = creature->getPlayer()){
 			if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
-				return RET_NOTENOUGHROOM;
+				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+						return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
+					}
+				}
 			}
 
 			if(player->getParent() == NULL && hasFlag(TILESTATE_NOLOGOUT)){
@@ -586,7 +610,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 		else{
 			if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
-				return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
+				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+						return RET_NOTENOUGHROOM;
+					}
+				}
 			}
 		}
 
@@ -628,8 +656,12 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOTPOSSIBLE;
 		}
 
-		if(getCreatureCount() > 0 && item->isBlocking() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
-			return RET_NOTENOUGHROOM;
+		if(creatures && !creatures->empty() && item->isBlocking() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+				if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+					return RET_NOTENOUGHROOM;
+				}
+			}
 		}
 
 		bool hasHangable = false;
