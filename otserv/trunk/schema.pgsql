@@ -133,6 +133,8 @@ CREATE TABLE "houses" (
     "paid" BIGINT NOT NULL DEFAULT 0,
     "warnings" INT NOT NULL DEFAULT 0,
     "lastwarning" BIGINT NOT NULL DEFAULT 0,
+    "doors" INT NOT NULL DEFAULT 0,
+    "beds" INT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id")
 );
 

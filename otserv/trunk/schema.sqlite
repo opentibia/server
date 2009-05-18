@@ -89,7 +89,9 @@ CREATE TABLE "houses" (
     "owner" INTEGER NOT NULL,
     "paid" INTEGER NOT NULL DEFAULT 0,
     "warnings" INTEGER NOT NULL DEFAULT 0,
-    "lastwarning" INTEGER NOT NULL DEFAULT 0
+    "lastwarning" INTEGER NOT NULL DEFAULT 0,
+    "doors" INTEGER NOT NULL DEFAULT 0,
+    "beds" INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "house_lists" (

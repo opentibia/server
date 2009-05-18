@@ -1473,6 +1473,15 @@ void LuaScriptInterface::registerFunctions()
 	//getHouseTilesSize(houseid)
 	lua_register(m_luaState, "getHouseTilesSize", LuaScriptInterface::luaGetHouseTilesSize);
 
+	//getHouseDoorCount(houseid)
+	lua_register(m_luaState, "getHouseDoorCount", LuaScriptInterface::luaGetHouseDoorCount);
+
+	//getHouseBedCount(houseid)
+	lua_register(m_luaState, "getHouseBedCount", LuaScriptInterface::luaGetHouseBedCount);
+
+	//isHouseGuildHall(houseid)
+	lua_register(m_luaState, "isHouseGuildHall", LuaScriptInterface::luaIsHouseGuildHall);
+
 	//setHouseAccessList(houseid, listid, listtext)
 	lua_register(m_luaState, "setHouseAccessList", LuaScriptInterface::luaSetHouseAccessList);
 
@@ -4319,6 +4328,54 @@ int LuaScriptInterface::luaGetHouseTilesSize(lua_State *L)
 	House* house = Houses::getInstance().getHouse(houseid);
 	if(house){
 		lua_pushnumber(L, house->getHouseTileSize());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetHouseDoorCount(lua_State *L)
+{
+	//getHouseDoorCount(houseid)
+	uint32_t houseid = popNumber(L);
+
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		lua_pushnumber(L, house->getHouseDoorCount());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetHouseBedCount(lua_State *L)
+{
+	//getHouseBedCount(houseid)
+	uint32_t houseid = popNumber(L);
+
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		lua_pushnumber(L, house->getHouseBedCount());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsHouseGuildHall(lua_State *L)
+{
+	//isHouseGuildHall(houseid)
+	uint32_t houseid = popNumber(L);
+
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		lua_pushnumber(L, (house->isGuildHall() ? LUA_TRUE : LUA_FALSE));
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));

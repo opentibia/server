@@ -51,6 +51,7 @@ transfer_container(ITEM_LOCKER1)
 	rent = 0;
 	townid = 0;
 	transferItem = NULL;
+	guildHall = false;
 }
 
 House::~House()
@@ -871,7 +872,7 @@ bool Houses::loadHousesXML(std::string filename)
 					entryPos.z = intValue;
 				}
 
-				if(entryPos.x == 0 && entryPos.y == 0 && entryPos.z == 0){
+				if(entryPos.x == 0 || entryPos.y == 0){
 					std::cout << "Warning: [Houses::loadHousesXML] House entry not set"
 						<< " - Name: " << house->getName()
 						<< " - House id: " << _houseid << std::endl;
@@ -885,6 +886,10 @@ bool Houses::loadHousesXML(std::string filename)
 
 				if(readXMLInteger(houseNode, "townid", intValue)){
 					house->setTownId(intValue);
+				}
+
+				if(readXMLInteger(houseNode, "guildhall", intValue)){
+					house->setGuildHall(intValue == 1);
 				}
 
 				house->setHouseOwner(0);

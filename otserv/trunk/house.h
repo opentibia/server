@@ -181,10 +181,15 @@ public:
 	void setTownId(uint32_t _town){townid = _town;}
 	uint32_t getTownId() const {return townid;}
 
+	void setGuildHall(bool _guildHall) {guildHall = _guildHall;}
+	bool isGuildHall() const {return guildHall;}
+
 	uint32_t getHouseId() const {return houseid;}
 
 	void addDoor(Door* door);
 	void removeDoor(Door* door);
+	void addBed(BedItem* bed);
+
 	Door* getDoorByNumber(uint32_t doorId);
 	Door* getDoorByNumber(uint32_t doorId) const;
 	Door* getDoorByPosition(const Position& pos);
@@ -199,10 +204,11 @@ public:
 
 	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
 	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
+	size_t getHouseDoorCount() {return doorList.size();}
 
-	void addBed(BedItem* bed);
 	HouseBedItemList::iterator getHouseBedsBegin() {return bedsList.begin();}
 	HouseBedItemList::iterator getHouseBedsEnd() {return bedsList.end();}
+	size_t getHouseBedCount() {return bedsList.size();}
 
 	// Transfers all items to depot and clicks all players (useful for map updates, for example)
 	void cleanHouse();
@@ -229,6 +235,7 @@ private:
 	time_t lastWarning;
 	uint32_t rent;
 	uint32_t townid;
+	bool guildHall;
 
 	HouseTransferItem* transferItem;
 	Container transfer_container;
