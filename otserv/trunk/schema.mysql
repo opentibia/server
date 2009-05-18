@@ -207,7 +207,7 @@ CREATE TABLE `killers` (
     FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE `enviroment_killers` (
+CREATE TABLE `environment_killers` (
 	`kill_id` INT UNSIGNED NOT NULL,
 	`name` VARCHAR(255) NOT NULL,
     FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE
@@ -245,7 +245,7 @@ CREATE TABLE `schema_info` (
     PRIMARY KEY (`name`)
 );
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 9);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 10);
 
 DELIMITER |
 
