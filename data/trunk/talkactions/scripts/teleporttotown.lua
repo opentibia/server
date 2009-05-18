@@ -7,9 +7,9 @@ function onSay(cid, words, param)
 	local townid = getTownIdByName(param)
 	if(townid ~= LUA_NULL) then
 		local new_pos = getTownTemplePosition(townid)
+		local old_pos = getPlayerPosition(cid)
 		if(doTeleportThing(cid, new_pos) ~= LUA_ERROR) then
 			if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == 0) then
-				local old_pos = getPlayerPosition(cid)
 				doSendMagicEffect(old_pos, CONST_ME_POFF)
 				doSendMagicEffect(new_pos, CONST_ME_TELEPORT)
 			end

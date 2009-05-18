@@ -12,7 +12,7 @@ function onSay(cid, words, param)
 			doSendMagicEffect(town_pos, CONST_ME_TELEPORT)
 		end
 	else
-		doPlayerSendCancel(cid, "Can not teleport to this position. Check your master position.")
+		doPlayerSendCancel(cid, "Can not teleport to that position. Check your master position.")
 	end
 
 	return FALSE

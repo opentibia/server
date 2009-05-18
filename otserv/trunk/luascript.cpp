@@ -3504,13 +3504,11 @@ int LuaScriptInterface::luaGetWaypointPositionByName(lua_State *L)
 
 	std::string name = popString(L);
 
-	Waypoint_ptr waypoint = g_game.getMap()->waypoints.getWaypointByName(name);
-	if(waypoint){
+	if(Waypoint_ptr waypoint = g_game.getMap()->waypoints.getWaypointByName(name))
 		pushPosition(L, waypoint->pos);
-	}
-	else{
+	else
 		lua_pushnumber(L, LUA_ERROR);
-	}
+
 	return 1;
 }
 

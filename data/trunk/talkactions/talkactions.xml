@@ -6,8 +6,6 @@
 	<talkaction words="!online" script="onlinelist.lua"/>
 	<talkaction words="!frags" script="frags.lua"/>
 	<talkaction words="/cleanhouses" filter="first word" script="housecleaning.lua"/>
-	<talkaction words="/b" filter="first word" sensitive="1" script="banmanager.lua"/>
-	<talkaction words="/bans" filter="first word" script="banmanager.lua"/>
 	<talkaction words="/checkconfig" filter="first word" script="configval.lua"/>
 	<talkaction words="/up" filter="first word" script="floorchange.lua"/>
 	<talkaction words="/down" filter="first word" script="floorchange.lua"/>

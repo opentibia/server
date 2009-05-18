@@ -6,7 +6,7 @@ function onSay(cid, words, param)
 
 	local playerKick = getPlayerByName(param)
 	if playerKick == cid or playerKick == LUA_NULL then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You cannot kick this player.")
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "This player does not exist.")
 		return FALSE
 	end
 	
@@ -18,7 +18,7 @@ function onSay(cid, words, param)
 			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Could not kick player.")
 		end
 	else
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You cannot kick this player.")
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You can not kick this player.")
 	end
 
 	return FALSE

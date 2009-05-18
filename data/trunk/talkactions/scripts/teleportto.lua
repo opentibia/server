@@ -4,15 +4,15 @@ function onSay(cid, words, param)
 		return TRUE
 	end
 
-	local creature = getCreatureByName(param)
-	local destPos
-	if (getWaypointPositionByName(param) ~= LUA_ERROR) then
-		destPos = getWaypointPositionByName(param)
-	elseif creature == cid or creature == LUA_NULL then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature, player or waypoint not found.")
-		return FALSE
-	else
-		destPos = getCreaturePosition(creature)
+	local destPos = getWaypointPositionByName(param)
+	if(destPos == LUA_ERROR) then
+		local creature = getCreatureByName(param)
+		if creature == cid or creature == LUA_NULL then
+			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature, player and waypoint not found.")
+			return FALSE
+		else
+			destPos = getCreaturePosition(creature)
+		end
 	end
 	
 	local creatureAccess = 0
@@ -24,12 +24,11 @@ function onSay(cid, words, param)
 		local oldPlayerPos = getPlayerPosition(cid)
 		if(doTeleportThing(cid, destPos) ~= LUA_ERROR) then
 			if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == 0) then
-				local newPlayerPos = getPlayerPosition(cid)
 				doSendMagicEffect(oldPlayerPos, CONST_ME_POFF)
-				doSendMagicEffect(newPlayerPos, CONST_ME_TELEPORT)		
+				doSendMagicEffect(destPos, CONST_ME_TELEPORT)		
 			end
 		else
-			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Could not teleport to the position.")
+			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Can not teleport to that position.")
 		end
 	else
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You do not have access to do that.")

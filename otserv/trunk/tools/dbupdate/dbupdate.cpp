@@ -491,6 +491,28 @@ SimpleUpdateQuery updateQueries[] = {
 			"END;",
 			NULL
 		}
+	},
+	{ 11,
+		{ // PgSql
+			"ALTER TABLE `houses` ADD `doors` INT;",
+			"ALTER TABLE `houses` ALTER COLUMN `doors` SET NOT NULL;", 
+			"ALTER TABLE `houses` ALTER COLUMN `doors` SET DEFAULT 0;",
+
+			"ALTER TABLE `houses` ADD `beds` INT;",
+			"ALTER TABLE `houses` ALTER COLUMN `beds` SET NOT NULL;", 
+			"ALTER TABLE `houses` ALTER COLUMN `beds` SET DEFAULT 0;",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `houses` ADD `doors` INT NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD `beds` INT NOT NULL DEFAULT 0;",
+			NULL
+		},
+		{ // Sqlite
+			"ALTER TABLE `houses` ADD `doors` INTEGER NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD `beds` INTEGER NOT NULL DEFAULT 0;",
+			NULL
+		}
 	}
 };
 

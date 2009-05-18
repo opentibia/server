@@ -22,6 +22,6 @@ function onSay(cid, words, param)
         	end
     	end
 
-	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "" .. s .. " houses cleaned (" .. f .. " failed)")
+	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "" .. s .. " house" .. (s > 1 and "s" or "") .. " cleaned (" .. f .. " failed)")
 	return TRUE
 end

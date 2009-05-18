@@ -21,11 +21,10 @@ function onSay(cid, words, param)
 
 	if(doTeleportThing(cid, switchPos[getPlayerLookDir(cid)](oldPos)) ~= LUA_ERROR) then
 		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == 0) then
-			local newPos = getPlayerPosition(cid)
-			doSendMagicEffect(newPos, CONST_ME_TELEPORT)
+			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_TELEPORT)
 		end
 	else
-		doPlayerSendCancel(cid, "Destination not reachable.")		
+		doPlayerSendCancel(cid, "Destination is not reachable.")		
 	end
 		
 	return FALSE
