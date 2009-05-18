@@ -99,8 +99,8 @@ struct DeathEntry{
 	std::string getKillerName() const {return boost::any_cast<std::string>(data);}
 
 protected:
-	int damage;
 	boost::any data;
+	int damage;
 
 	friend struct DeathLessThan;
 };

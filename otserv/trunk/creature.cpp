@@ -150,6 +150,10 @@ bool Creature::canSee(const Position& pos) const
 
 bool Creature::canSeeCreature(const Creature* creature) const
 {
+	if(creature == this){
+		return true;
+	}
+
 	if(creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 		return false;
 	}

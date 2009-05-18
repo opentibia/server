@@ -446,13 +446,15 @@ public:
 	void sendCreatureChangeVisible(const Creature* creature, bool visible)
 		{
 			if(client){
-				if(creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
-					if(visible){
-						client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
-					}
-					else{
-						static Outfit_t outfit;
-						client->sendCreatureOutfit(creature, outfit);
+				if(creature->getPlayer()){
+					if(creature == this || !creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+						if(visible){
+							client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
+						}
+						else{
+							static Outfit_t outfit;
+							client->sendCreatureOutfit(creature, outfit);
+						}
 					}
 				}
 				else{

@@ -975,12 +975,16 @@ bool Player::canSeeInvisibility() const
 
 bool Player::canSeeCreature(const Creature* creature) const
 {
-	if(canSeeInvisibility()){
+	if(canSeeInvisibility() || creature == this){
 		return true;
 	}
 
-	if(creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
-		return false;
+	if(creature->getPlayer()){
+		if(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+			return false;
+		}
+
+		return true;
 	}
 	else if(creature->isInvisible()){
 		return false;
