@@ -353,21 +353,21 @@ public:
 	virtual bool getNextStep(Direction& dir);
 
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+	virtual void onUpdateTileItem(const Tile* tile, const Position& pos,
 		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
-	virtual void onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+	virtual void onRemoveTileItem(const Tile* tile, const Position& pos,
 		const ItemType& iType, const Item* item);
 	virtual void onUpdateTile(const Tile* tile, const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
-	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+		const Tile* oldTile, const Position& oldPos, bool teleport);
 
 	virtual void onAttackedCreatureDissapear(bool isLogout) {};
 	virtual void onFollowCreatureDissapear(bool isLogout) {};
 
-	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
+	virtual void onCreatureTurn(const Creature* creature) { };
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
 
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
@@ -478,7 +478,7 @@ protected:
 #endif
 	void updateTileCache(const Tile* tile, int32_t dx, int32_t dy);
 	void updateTileCache(const Tile* tile, const Position& pos);
-	void onCreatureDisappear(const Creature* creature, bool isLogout);
+	void internalCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void doAttacking(uint32_t interval) {};
 	virtual bool hasExtraSwing() {return false;}
 

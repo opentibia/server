@@ -202,11 +202,11 @@ void Creature::onThink(uint32_t interval)
 	}
 
 	if(followCreature && getMaster() != followCreature && !canSeeCreature(followCreature)){
-		onCreatureDisappear(followCreature, false);
+		internalCreatureDisappear(followCreature, false);
 	}
 
 	if(attackedCreature && getMaster() != attackedCreature && !canSeeCreature(attackedCreature)){
-		onCreatureDisappear(attackedCreature, false);
+		internalCreatureDisappear(attackedCreature, false);
 	}
 
 	blockTicks += interval;
@@ -333,6 +333,22 @@ void Creature::stopEventWalk()
 	}
 }
 
+void Creature::internalCreatureDisappear(const Creature* creature, bool isLogout)
+{
+	onCreatureDisappear(creature, true);
+
+	if(creature == this){
+		if(getMaster() && !getMaster()->isRemoved()){
+			getMaster()->removeSummon(this);
+		}
+	}
+	else if(isMapLoaded){
+		if(creature->getPosition().z == getPosition().z){
+			updateTileCache(creature->getTile(), creature->getPosition());
+		}
+	}
+}
+
 void Creature::updateMapCache()
 {
 	Tile* tile;
@@ -450,7 +466,7 @@ void Creature::onAddTileItem(const Tile* tile, const Position& pos, const Item* 
 	}
 }
 
-void Creature::onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+void Creature::onUpdateTileItem(const Tile* tile, const Position& pos,
 	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
 	if(isMapLoaded){
@@ -462,7 +478,7 @@ void Creature::onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t 
 	}
 }
 
-void Creature::onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+void Creature::onRemoveTileItem(const Tile* tile, const Position& pos,
 	const ItemType& iType, const Item* item)
 {
 	if(isMapLoaded){
@@ -494,22 +510,6 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 	}
 }
 
-void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
-{
-	onCreatureDisappear(creature, true);
-
-	if(creature == this){
-		if(getMaster() && !getMaster()->isRemoved()){
-			getMaster()->removeSummon(this);
-		}
-	}
-	else if(isMapLoaded){
-		if(creature->getPosition().z == getPosition().z){
-			updateTileCache(creature->getTile(), creature->getPosition());
-		}
-	}
-}
-
 void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 {
 	if(attackedCreature == creature){
@@ -527,7 +527,7 @@ void Creature::onChangeZone(ZoneType_t zone)
 {
 	if(attackedCreature){
 		if(zone == ZONE_PROTECTION){
-			onCreatureDisappear(attackedCreature, false);
+			internalCreatureDisappear(attackedCreature, false);
 		}
 	}
 }
@@ -535,12 +535,12 @@ void Creature::onChangeZone(ZoneType_t zone)
 void Creature::onAttackedCreatureChangeZone(ZoneType_t zone)
 {
 	if(zone == ZONE_PROTECTION){
-		onCreatureDisappear(attackedCreature, false);
+		internalCreatureDisappear(attackedCreature, false);
 	}
 }
 
 void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+	const Tile* oldTile, const Position& oldPos, bool teleport)
 {
 	if(creature == this){
 		setLastPos(oldPos);
@@ -694,13 +694,13 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 		}
 
 		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
-			onCreatureDisappear(followCreature, false);
+			internalCreatureDisappear(followCreature, false);
 		}
 	}
 
 	if(creature == attackedCreature || (creature == this && attackedCreature)){
 		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
-			onCreatureDisappear(attackedCreature, false);
+			internalCreatureDisappear(attackedCreature, false);
 		}
 		else{
 			if(hasExtraSwing()){

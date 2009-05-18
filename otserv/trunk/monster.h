@@ -85,9 +85,9 @@ public:
 	virtual void onFollowCreatureDissapear(bool isLogout);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
-	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+		const Tile* oldTile, const Position& oldPos, bool teleport);
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void changeHealth(int32_t healthChange);

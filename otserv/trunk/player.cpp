@@ -1425,13 +1425,13 @@ void Player::onAddTileItem(const Tile* tile, const Position& pos, const Item* it
 	Creature::onAddTileItem(tile, pos, item);
 }
 
-void Player::onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+void Player::onUpdateTileItem(const Tile* tile, const Position& pos,
 	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
-	Creature::onUpdateTileItem(tile, pos, stackpos, oldItem, oldType, newItem, newType);
+	Creature::onUpdateTileItem(tile, pos, oldItem, oldType, newItem, newType);
 
 	if(oldItem != newItem){
-		onRemoveTileItem(tile, pos, stackpos, oldType, oldItem);
+		onRemoveTileItem(tile, pos, oldType, oldItem);
 	}
 
 	if(tradeState != TRADE_TRANSFER){
@@ -1441,10 +1441,10 @@ void Player::onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t st
 	}
 }
 
-void Player::onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+void Player::onRemoveTileItem(const Tile* tile, const Position& pos,
 	const ItemType& iType, const Item* item)
 {
-	Creature::onRemoveTileItem(tile, pos, stackpos, iType, item);
+	Creature::onRemoveTileItem(tile, pos, iType, item);
 
 	if(tradeState != TRADE_TRANSFER){
 		checkTradeState(item);
@@ -1588,10 +1588,9 @@ void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
 	}
 }
 
-
-void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 {
-	Creature::onCreatureDisappear(creature, stackpos, isLogout);
+	Creature::onCreatureDisappear(creature, isLogout);
 
 	if(creature == this){
 		if(isLogout){
@@ -1678,9 +1677,9 @@ void Player::onWalk(Direction& dir)
 }
 
 void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+	const Tile* oldTile, const Position& oldPos, bool teleport)
 {
-	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);
+	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
 
 	if(creature == this){
 		if(tradeState != TRADE_TRANSFER){

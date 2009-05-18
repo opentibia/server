@@ -93,10 +93,6 @@ public:
 	}
 };
 
-typedef std::list<Creature*> SpectatorVec;
-typedef std::list<Player*> PlayerList;
-typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
-
 #define FLOOR_BITS 3
 #define FLOOR_SIZE (1 << FLOOR_BITS)
 #define FLOOR_MASK (FLOOR_SIZE - 1)

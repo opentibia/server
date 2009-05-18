@@ -636,13 +636,11 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool extendedP
 	SpectatorVec::iterator it;
 	getSpectators(list, creature->getPosition(), false, true);
 
-	int32_t newStackPos = creature->getParent()->__getIndexOfThing(creature);
-
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
 		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendCreatureAppear(creature, creature->getPosition(), newStackPos, true);
+			tmpPlayer->sendCreatureAppear(creature, creature->getPosition(), true);
 		}
 	}
 
@@ -651,7 +649,8 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool extendedP
 		(*it)->onCreatureAppear(creature, true);
 	}
 
-	creature->getParent()->postAddNotification(creature, NULL, newStackPos);
+	int32_t newIndex = creature->getParent()->__getIndexOfThing(creature);
+	creature->getParent()->postAddNotification(creature, NULL, newIndex);
 
 	addCreatureCheck(creature);
 
@@ -676,27 +675,24 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	SpectatorVec::iterator it;
 	getSpectators(list, cylinder->getPosition(), false, true);
 
-	int32_t index = cylinder->__getIndexOfThing(creature);
-	if(!map->removeCreature(creature)){
-		return false;
-	}
-
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((player = (*it)->getPlayer())){
 			if(player->canSeeCreature(creature)){
-				player->sendCreatureDisappear(creature, index, isLogout);
+				player->sendCreatureDisappear(creature, isLogout);
 			}
 		}
 	}
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onCreatureDisappear(creature, index, isLogout);
+		(*it)->onCreatureDisappear(creature, isLogout);
 	}
 
-	creature->getParent()->postRemoveNotification(creature, NULL, index, true);
+	int32_t oldIndex = cylinder->__getIndexOfThing(creature);
+	map->removeCreature(creature);
+	creature->getParent()->postRemoveNotification(creature, NULL, oldIndex, true);
 
 	listCreature.removeList(creature->getID());
 	creature->removeList();
@@ -3690,8 +3686,6 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 	if(creature->getDirection() != dir){
 		creature->setDirection(dir);
 
-		int32_t stackpos = creature->getParent()->__getIndexOfThing(creature);
-
 		const SpectatorVec& list = getSpectators(creature->getPosition());
 		SpectatorVec::const_iterator it;
 
@@ -3699,13 +3693,13 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 		Player* tmpPlayer = NULL;
 		for(it = list.begin(); it != list.end(); ++it) {
 			if((tmpPlayer = (*it)->getPlayer())){
-				tmpPlayer->sendCreatureTurn(creature, stackpos);
+				tmpPlayer->sendCreatureTurn(creature);
 			}
 		}
 
 		//event method
 		for(it = list.begin(); it != list.end(); ++it) {
-			(*it)->onCreatureTurn(creature, stackpos);
+			(*it)->onCreatureTurn(creature);
 		}
 
 		return true;

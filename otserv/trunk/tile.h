@@ -35,6 +35,10 @@ class QTreeLeafNode;
 class BedItem;
 
 typedef std::vector<Creature*> CreatureVector;
+typedef std::list<Creature*> SpectatorVec;
+typedef std::list<Player*> PlayerList;
+typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
+typedef std::vector<Item*> ItemVector;
 
 enum tileflags_t{
 	TILESTATE_NONE						= 0,
@@ -65,8 +69,6 @@ enum tileflags_t{
 };
 
 class HouseTile;
-
-typedef std::vector<Item*> ItemVector;
 
 class TileItemVector
 {
@@ -189,6 +191,7 @@ public:
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
+	int32_t getClientIndexOfThing(const Player* player, const Thing* thing) const;
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -226,9 +229,8 @@ public:
 
 private:
 	void onAddTileItem(Item* item);
-	void onUpdateTileItem(uint32_t index, Item* oldItem,
-		const ItemType& oldType, Item* newItem, const ItemType& newType);
-	void onRemoveTileItem(uint32_t index, Item* item);
+	void onUpdateTileItem(Item* oldItem, const ItemType& oldType, Item* newItem, const ItemType& newType);
+	void onRemoveTileItem(const SpectatorVec& list, std::vector<uint32_t>& oldStackPosVector, Item* item);
 	void onUpdateTile();
 
 	void updateTileFlags(Item* item, bool removing);

@@ -149,9 +149,9 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 	}
 }
 
-void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+void Monster::onCreatureDisappear(const Creature* creature, bool isLogout)
 {
-	Creature::onCreatureDisappear(creature, stackpos, isLogout);
+	Creature::onCreatureDisappear(creature, isLogout);
 
 	if(creature == this){
 		if(spawn){
@@ -166,9 +166,9 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 }
 
 void Monster::onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+	const Tile* oldTile, const Position& oldPos, bool teleport)
 {
-	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);
+	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
 
 	if(creature == this){
 		if(isSummon()){
