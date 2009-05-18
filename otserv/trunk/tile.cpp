@@ -319,17 +319,11 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 Creature* Tile::getTopVisibleCreature(const Creature* creature)
 {
 	if(CreatureVector* creatures = getCreatures()){
-		if(!creatures->empty()){
-			if(creature->getPlayer()){
-				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-					if(creature->canSeeCreature(*cit)){
-						return (*cit);
-					}
-				}
-			}
-			else{
-				return *creatures->begin();
-			}
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			if((*cit)->getPlayer() && (*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+				continue;
+
+			return (*cit);
 		}
 	}
 
@@ -339,17 +333,11 @@ Creature* Tile::getTopVisibleCreature(const Creature* creature)
 const Creature* Tile::getTopVisibleCreature(const Creature* creature) const
 {
 	if(const CreatureVector* creatures = getCreatures()){
-		if(!creatures->empty()){
-			if(creature->getPlayer()){
-				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-					if(creature->canSeeCreature(*cit)){
-						return (*cit);
-					}
-				}
-			}
-			else{
-				return *creatures->begin();
-			}
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			if((*cit)->getPlayer() && (*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+				continue;
+
+			return (*cit);
 		}
 	}
 
