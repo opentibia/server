@@ -25,6 +25,7 @@
 
 #include "cylinder.h"
 #include "item.h"
+#include <boost/shared_ptr.hpp>
 
 class Creature;
 class Teleport;
@@ -75,7 +76,7 @@ class TileItemVector
 public:
 	TileItemVector() : downItemCount(0) {};
 	~TileItemVector() {};
-	
+
 	ItemVector::iterator begin() {return items.begin();}
 	ItemVector::const_iterator begin() const {return items.begin();}
 	ItemVector::reverse_iterator rbegin() {return items.rbegin();}
@@ -261,7 +262,7 @@ class DynamicTile : public Tile
 public:
 	DynamicTile(uint16_t x, uint16_t y, uint16_t z);
 	~DynamicTile();
-	
+
 	TileItemVector* getItemList() {return &items;}
 	const TileItemVector* getItemList() const {return &items;}
 	TileItemVector* makeItemList() {return &items;}
@@ -341,7 +342,7 @@ inline CreatureVector* Tile::makeCreatures()
 {
 	if(is_dynamic())
 		return static_cast<DynamicTile*>(this)->DynamicTile::makeCreatures();
-	
+
 	return static_cast<StaticTile*>(this)->StaticTile::makeCreatures();
 }
 
