@@ -213,7 +213,7 @@ CREATE TABLE `enviroment_killers` (
 
 CREATE TABLE `player_killers` (
 	`kill_id` INT UNSIGNED NOT NULL,
-	`player_id` INT UNSIGNED NOT NULL
+	`player_id` INT UNSIGNED NOT NULL,
     FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
