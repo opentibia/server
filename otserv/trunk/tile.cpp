@@ -291,11 +291,11 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	return NULL;
 }
 
-Thing* Tile::getTopVisibleThing(const Player* player)
+Thing* Tile::getTopVisibleThing(const Creature* creature)
 {
 	if(const CreatureVector* creatures = getCreatures()){
 		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-			if(player->canSeeCreature(*cit)){
+			if(creature->canSeeCreature(*cit)){
 				return (*cit);
 			}
 		}
@@ -316,11 +316,24 @@ Thing* Tile::getTopVisibleThing(const Player* player)
 	return NULL;
 }
 
-Creature* Tile::getTopVisibleCreature(const Player* player)
+Creature* Tile::getTopVisibleCreature(const Creature* creature)
 {
 	if(CreatureVector* creatures = getCreatures()){
 		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-			if(player->canSeeCreature(*cit)){
+			if(creature->canSeeCreature(*cit)){
+				return (*cit);
+			}
+		}
+	}
+
+	return NULL;
+}
+
+const Creature* Tile::getTopVisibleCreature(const Creature* creature) const
+{
+	if(const CreatureVector* creatures = getCreatures()){
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			if(creature->canSeeCreature(*cit)){
 				return (*cit);
 			}
 		}

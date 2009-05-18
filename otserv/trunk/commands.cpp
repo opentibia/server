@@ -78,35 +78,24 @@ s_defcommands Commands::defined_commands[] = {
 	{"/m",&Commands::placeMonster},
 	{"/summon",&Commands::placeSummon},
 	{"/B",&Commands::broadcastMessage},
-	//{"/b",&Commands::banPlayer},
-	//{"/t",&Commands::teleportMasterPos},
-	//{"/c",&Commands::teleportHere},
 	{"/i",&Commands::createItemById},
 	{"/n",&Commands::createItemByName},
-	{"/q",&Commands::subtractMoney},
 	{"/reload",&Commands::reloadInfo},
 	{"/z",&Commands::testCommand},
 	{"/zt",&Commands::testTutorialCommand},
-	//{"/goto",&Commands::teleportTo},
 	{"/info",&Commands::getInfo},
-	//{"/save",&Commands::saveServer},
 	{"/shutdown",&Commands::shutdownServer},
 	{"/closeserver",&Commands::closeServer},
 	{"/openserver",&Commands::openServer},
 	{"/getonline",&Commands::onlineList},
-	//{"/a",&Commands::teleportNTiles},
-	//{"/kick",&Commands::kickPlayer},
 	{"/owner",&Commands::setHouseOwner},
 	{"/sellhouse",&Commands::sellHouse},
 	{"/gethouse",&Commands::getHouse},
-	//{"/bans",&Commands::bansManager},
-	//{"/town",&Commands::teleportToTown},
-	//{"/serverinfo",&Commands::serverInfo},
+	{"/raid",&Commands::forceRaid},
+	{"/refreshmap",&Commands::refreshMap},
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	{"/serverdiag",&Commands::serverDiag},
 #endif
-	{"/raid",&Commands::forceRaid},
-	{"/refreshmap",&Commands::refreshMap}
 };
 
 
@@ -426,36 +415,6 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 	}
 
 	g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
-	return true;
-}
-
-bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Player* player = creature->getPlayer();
-	if(!player)
-		return false;
-
-	int count = atoi(param.c_str());
-	uint32_t money = g_game.getMoney(player);
-	if(!count){
-		std::stringstream info;
-		info << "You have " << money << " gold.";
-		player->sendCancel(info.str().c_str());
-		return true;
-	}
-	else if(count > (int)money){
-		std::stringstream info;
-		info << "You have " << money << " gold and is not sufficient.";
-		player->sendCancel(info.str().c_str());
-		return true;
-	}
-
-	if(!g_game.removeMoney(player, count)){
-		std::stringstream info;
-		info << "Can not subtract money!";
-		player->sendCancel(info.str().c_str());
-	}
-
 	return true;
 }
 

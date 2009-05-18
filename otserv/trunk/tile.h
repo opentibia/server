@@ -150,8 +150,9 @@ public:
 	Item* getTopTopItem();
 	Item* getTopDownItem();
 	bool isMoveableBlocking() const;
-	Thing* getTopVisibleThing(const Player* player);
-	Creature* getTopVisibleCreature(const Player* player);
+	Thing* getTopVisibleThing(const Creature* creature);
+	Creature* getTopVisibleCreature(const Creature* creature);
+	const Creature* getTopVisibleCreature(const Creature* creature) const;
 	Item* getItemByTopOrder(uint32_t topOrder);
 
 	uint32_t getThingCount() const {return thingCount;}

@@ -738,7 +738,7 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
-			if(blockingCreature && tile->getCreatureCount() != 0){
+			if(blockingCreature && tile->getTopVisibleCreature(player) != NULL){
 				player->sendCancelMessage(RET_NOTENOUGHROOM);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
@@ -797,7 +797,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
-			if(blockingCreature && tile->getCreatureCount() != 0){
+			if(blockingCreature && tile->getTopVisibleCreature(player) != NULL){
 				player->sendCancelMessage(RET_NOTENOUGHROOM);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
@@ -808,15 +808,15 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
-			if(needTarget && tile->getCreatureCount() == 0){
+			if(needTarget && tile->getTopVisibleCreature(player) == NULL){
 				player->sendCancelMessage(RET_CANONLYUSETHISRUNEONCREATURES);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
 
 #ifdef __SKULLSYSTEM__
-			if(isAggressive && needTarget && player->hasSafeMode() && tile->getCreatureCount() > 0){
-				Player* targetPlayer = tile->getTopCreature()->getPlayer();
+			if(isAggressive && needTarget && player->hasSafeMode() && tile->getTopVisibleCreature(player)){
+				Player* targetPlayer = tile->getTopVisibleCreature(player)->getPlayer();
 				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE){
 					player->sendCancelMessage(RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
