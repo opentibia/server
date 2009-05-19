@@ -3695,7 +3695,7 @@ void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
 	}
 }
 
-void Player::onKilledCreature(Creature* target)
+void Player::onKilledCreature(Creature* target, bool lastHit)
 {
 	if(hasFlag(PlayerFlag_NotGenerateLoot)){
 		target->setDropLoot(false);
@@ -3716,7 +3716,7 @@ void Player::onKilledCreature(Creature* target)
 			}
 #endif
 
-			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
+			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT) && lastHit){
 				pzLocked = true;
 				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, g_config.getNumber(ConfigManager::SKULL_TIME), 0);
 				addCondition(condition);
@@ -3729,7 +3729,7 @@ void Player::onKilledCreature(Creature* target)
 		addCondition(condition);
 	}
 	
-	Creature::onKilledCreature(target);
+	Creature::onKilledCreature(target, lastHit);
 }
 
 void Player::gainExperience(uint64_t& gainExp)

@@ -736,7 +736,7 @@ void Creature::onDie()
 
 	if(getKillers(&lastHitCreature, &mostDamageCreature)){
 		if(lastHitCreature){
-			lastHitCreature->onKilledCreature(this);
+			lastHitCreature->onKilledCreature(this, true);
 			lastHitCreatureMaster = lastHitCreature->getMaster();
 		}
 
@@ -748,7 +748,7 @@ void Creature::onDie()
 
 			if(mostDamageCreature != lastHitCreature && isNotLastHitMaster &&
 				isNotMostDamageMaster && isNotSameMaster){
-				mostDamageCreature->onKilledCreature(this);
+				mostDamageCreature->onKilledCreature(this, false);
 			}
 		}
 	}
@@ -1304,10 +1304,10 @@ void Creature::onAttackedCreatureKilled(Creature* target)
 	}
 }
 
-void Creature::onKilledCreature(Creature* target)
+void Creature::onKilledCreature(Creature* target, bool lastHit)
 {
 	if(getMaster()){
-		getMaster()->onKilledCreature(target);
+		getMaster()->onKilledCreature(target, lastHit);
 	}
 
 	//scripting event - onKill
