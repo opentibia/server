@@ -8,24 +8,22 @@
 	<command cmd="/openserver" access="3" />    		<!-- Open the server -->
 	<command cmd="/closeserver" access="3" />		<!-- Close the server -->
 	<command cmd="/owner" access="3" />			<!-- Set a player to house owner -->
-	<command cmd="/goto" access="3" />			<!-- Teleport to players, creatures or NPCs -->
-	<command cmd="/a" access="3" />				<!-- Teleport by SQMs -->
 	<command cmd="/raid" access="3" />			<!-- Start raid -->
 	<command cmd="/refreshmap" access="3" />		<!-- Refresh map -->
 	<command cmd="/shutdown" access="3" />			<!-- Shutdown the server -->
+	<command cmd="/m" access="3" />				<!-- Summon a "wild" monster -->
+	<command cmd="/summon" access="3" />			<!-- Summon a monster -->
+	<command cmd="/z" access="3" />				<!-- Check effects -->
+	<command cmd="/zt" access="3" />			<!-- Check tutorials -->
 
 	<!-- Gamemasters -->
-	<command cmd="/m" access="2" />				<!-- Summon a "wild" monster -->
-	<command cmd="/summon" access="2" />			<!-- Summon a monster -->
+	<command cmd="/B" access="2" />				<!-- Red broadcast message -->
+	<command cmd="/info" access="2" />			<!-- Info about a player -->
+	<command cmd="/serverinfo" access="2" />    		<!-- Info about the server -->
+	<command cmd="/gethouse" access="2" />			<!-- Info about house of a player -->
+	<command cmd="/getonline" access="2" />			<!-- Info about how many players are online -->
 
 	<!-- Tutors -->
-	<command cmd="/B" access="1" />				<!-- Red broadcast message -->
-	<command cmd="/q" access="1" />				<!-- Check your money -->
-	<command cmd="/z" access="1" />				<!-- Check effects -->
-	<command cmd="/zt" access="1" />			<!-- Check tutorials -->
-	<command cmd="/info" access="1" />			<!-- Info about a player -->
-	<command cmd="/getonline" access="1" />			<!-- Info about how many players are online -->
-	<command cmd="/gethouse" access="1" />			<!-- Info about house of a player -->
 
 	<!-- Players -->
 	<command cmd="/sellhouse" access="0" />			<!-- Sell your house to a player -->

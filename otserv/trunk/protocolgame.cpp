@@ -2610,7 +2610,13 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 
 	msg->AddByte((int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1)));
 	msg->AddByte((uint8_t)creature->getDirection());
-	AddCreatureOutfit(msg, creature, creature->getCurrentOutfit());
+	if(creature->isInvisible()){
+		static Outfit_t outfit;
+		AddCreatureOutfit(msg, creature, outfit);
+	}
+	else{
+		AddCreatureOutfit(msg, creature, creature->getCurrentOutfit());
+	}
 
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);
@@ -2743,25 +2749,19 @@ void ProtocolGame::AddCreatureHealth(NetworkMessage_ptr msg,const Creature* crea
 
 void ProtocolGame::AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const Outfit_t& outfit)
 {
-	if(player->canSeeCreature(creature)){
-		msg->AddU16(outfit.lookType);
-		if(outfit.lookType != 0){
-			msg->AddByte(outfit.lookHead);
-			msg->AddByte(outfit.lookBody);
-			msg->AddByte(outfit.lookLegs);
-			msg->AddByte(outfit.lookFeet);
-			msg->AddByte(outfit.lookAddons);
-		}
-		else if(outfit.lookTypeEx != 0){
-			msg->AddItemId(outfit.lookTypeEx);
-		}
-		else{
-			msg->AddU16(outfit.lookTypeEx);
-		}
+	msg->AddU16(outfit.lookType);
+	if(outfit.lookType != 0){
+		msg->AddByte(outfit.lookHead);
+		msg->AddByte(outfit.lookBody);
+		msg->AddByte(outfit.lookLegs);
+		msg->AddByte(outfit.lookFeet);
+		msg->AddByte(outfit.lookAddons);
+	}
+	else if(outfit.lookTypeEx != 0){
+		msg->AddItemId(outfit.lookTypeEx);
 	}
 	else{
-		msg->AddU16(0);
-		msg->AddU16(0);
+		msg->AddU16(outfit.lookTypeEx);
 	}
 }
 
