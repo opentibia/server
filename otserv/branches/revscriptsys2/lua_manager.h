@@ -24,6 +24,7 @@
 #include <stdexcept>
 #include <map>
 #include "boost_common.h"
+#include "enums.h"
 
 extern "C"
 {
@@ -48,7 +49,7 @@ typedef shared_ptr<Waypoint> Waypoint_ptr;
 
 namespace Script {
 	typedef uint64_t ObjectID;
-	class Enviroment;
+	class Environment;
 	class Manager;
 	class Listener;
 	typedef shared_ptr<Listener> Listener_ptr;
@@ -72,12 +73,12 @@ class LuaThread;
 
 class LuaState /*abstract*/ {
 public:
-	LuaState(Script::Enviroment& enviroment);
+	LuaState(Script::Environment& environment);
 	virtual ~LuaState();
 
 	// Stack manipulation
 	// Returns the size of the stack
-	int getStackTop();
+	int getStackSize();
 	// Checks if the size of the stack is between low and high
 	bool checkStackSize(int low, int high = -1);
 
@@ -180,6 +181,7 @@ public:
 	House* popHouse(Script::ErrorMode mode = Script::ERROR_THROW);
 	ChatChannel* popChannel(Script::ErrorMode mode = Script::ERROR_THROW);
 	Waypoint_ptr popWaypoint(Script::ErrorMode mode = Script::ERROR_THROW);
+	Outfit_t popOutfit(Script::ErrorMode mode = Script::ERROR_THROW);
 
 	// Push
 	void pushThing(Thing* thing);
@@ -188,6 +190,7 @@ public:
 	void pushHouse(House* house);
 	void pushChannel(ChatChannel* channel);
 	void pushWaypoint(Waypoint_ptr pos);
+	void pushOutfit(const Outfit_t& outfit);
 
 
 	// Generic
@@ -198,10 +201,15 @@ public:
 	void push(double d) {pushFloat(d);}
 	void push(const std::string& str) {pushString(str);}
 	void push(Thing* thing) {pushThing(thing);}
+	void push(const Position& pos) {pushPosition(pos);}
 
 	// Don't use pushTable on a userdata class and vice-versa (events are table classes, everything else userdata)
 	Script::ObjectID* pushClassInstance(const std::string& classname);
 	void pushClassTableInstance(const std::string& classname);
+
+	// This fixes the __object metamethod
+	// If top object is table, and has __object member, pop table and push the __object member
+	void getMetaObject();
 
 	// Might throw depending on the first parameter, second is equivalent to WARN
 	void HandleError(Script::ErrorMode mode, const std::string& error);
@@ -217,9 +225,11 @@ public:
 
 	// - Utility
 	int lua_wait();
+	int lua_getConfigValue();
 	// - Register Events
 	int lua_registerGenericEvent_OnSay();
 	int lua_registerSpecificEvent_OnSay();
+	int lua_registerSpecificEvent_OnHear();
 	int lua_registerGenericEvent_OnUseItem();
 	int lua_registerGenericEvent_OnJoinChannel();
 	int lua_registerSpecificEvent_OnJoinChannel();
@@ -235,12 +245,13 @@ public:
 	int lua_registerGenericEvent_OnDeEquipItem();
 	int lua_registerGenericEvent_OnStepInCreature();
 	int lua_registerGenericEvent_OnStepOutCreature();
-	//int lua_registerGenericEvent_OnMoveCreature();
 	int lua_registerSpecificEvent_OnMoveCreature();
 	int lua_registerGenericEvent_OnMoveItem();
+	int lua_registerGenericEvent_OnSpawn();
 	int lua_registerSpecificEvent_OnCreatureTurn();
 	int lua_registerSpecificEvent_OnSpotCreature();
 	int lua_registerSpecificEvent_OnLoseCreature();
+	int lua_registerSpecificEvent_OnCreatureThink();
 	int lua_registerGenericEvent_OnCreatureTurn();
 	int lua_registerGenericEvent_OnServerLoad();
 
@@ -254,6 +265,9 @@ public:
 
 	// - Thing
 	int lua_Thing_getPosition();
+	int lua_Thing_getX();
+	int lua_Thing_getY();
+	int lua_Thing_getZ();
 	int lua_Thing_getParent();
 	int lua_Thing_getParentTile();
 
@@ -264,6 +278,7 @@ public:
 	int lua_Thing_moveToPosition();
 	int lua_Thing_destroy();
 
+	int lua_getThingByID();
 
 	// - - Creature
 	int lua_Creature_getID();
@@ -272,15 +287,25 @@ public:
 	int lua_Creature_getHealthMax();
 	int lua_Creature_setHealth();
 	int lua_Creature_getName();
+	int lua_Creature_getNameDescription();
+	int lua_Creature_getOutfit();
 	int lua_Creature_say();
-
+	int lua_Creature_setOutfit();
 	int lua_Creature_walk();
 
 	int lua_getCreatureByName();
 	int lua_getCreaturesByName();
 
 	// - - - Actor
-	int lua_Actor_create();
+	int lua_createMonster();
+	int lua_createActor();
+
+	int lua_Actor_setShouldReload();
+	int lua_Actor_setAlwaysThink();
+	int lua_Actor_getShouldReload();
+	int lua_Actor_getAlwaysThink();
+
+	// Creature type changes
 	int lua_Actor_setArmor();
 	int lua_Actor_getArmor();
 	int lua_Actor_setDefense();
@@ -297,6 +322,8 @@ public:
 	int lua_Actor_getTargetDistance();
 	int lua_Actor_setMaxSummons();
 	int lua_Actor_getMaxSummons();
+	int lua_Actor_setName();
+	int lua_Actor_setNameDescription();
 
 	// - - - Player
 	int lua_Player_getFood();
@@ -338,7 +365,7 @@ public:
 	int lua_Player_setTown();
 	int lua_Player_addExperience();
 
-	int lua_Player_getMoney();
+	int lua_Player_countMoney();
 	int lua_Player_addMoney();
 	int lua_Player_removeMoney();
 
@@ -439,7 +466,7 @@ protected:
 
 	// Members
 	lua_State* state;
-	Script::Enviroment& enviroment;
+	Script::Environment& environment;
 
 	friend class LuaThread;
 	friend class LuaStateManager;
@@ -479,7 +506,7 @@ typedef weak_ptr<LuaThread> LuaThread_wptr;
 
 class LuaStateManager : public LuaState {
 public:
-	LuaStateManager(Script::Enviroment& enviroment);
+	LuaStateManager(Script::Environment& environment);
 	virtual ~LuaStateManager();
 
 	bool loadFile(std::string file);

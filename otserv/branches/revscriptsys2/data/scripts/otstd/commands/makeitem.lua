@@ -1,7 +1,7 @@
 
 local MakeItem = Command:new("MakeItem")
 
-MakeItem.words = "/n"
+MakeItem.words = "/i"
 MakeItem.groups = {"Community Manager", "Server Administrator"}
 
 function MakeItem.handler(event)

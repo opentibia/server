@@ -217,6 +217,8 @@ void Creature::onThink(uint32_t interval)
 		isUpdatingPath = false;
 		getPathToFollowCreature();
 	}
+
+	g_game.onCreatureThink(this, interval);
 }
 
 void Creature::onAttacking(uint32_t interval)
@@ -897,7 +899,7 @@ void Creature::setParent(Cylinder* cylinder){
 	Thing::setParent(cylinder);
 }
 
-const Position& Creature::getPosition() const {
+Position Creature::getPosition() const {
 	return _tile->getTilePosition();
 }
 
@@ -1557,6 +1559,7 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 
 void Creature::addListener(Script::Listener_ptr listener)
 {
+	// We clean up any old, deactivated listeners while adding new ones
 	for(Script::ListenerList::iterator i = registered_listeners.begin(); i != registered_listeners.end();) {
 		if((*i)->isActive() == false)
 			i = registered_listeners.erase(i);

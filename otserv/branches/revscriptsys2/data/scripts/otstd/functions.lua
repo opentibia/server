@@ -85,13 +85,26 @@ end
 
 -- TABLE
 
-function table.find(t, val)
+function table.find(t, val, comparator)
 	for k, v in pairs(t) do
 		if v == val then
 			return k
 		end
 	end
 	return nil
+end
+
+function table.findf(t, comparator)
+	for k, v in pairs(t) do
+		if f(val) then
+			return k
+		end
+	end
+	return nil
+end
+
+function table.contains(t, val)
+	return table.find(t, val) ~= nil
 end
 
 -- IP
@@ -290,4 +303,20 @@ function getDestination(param)
 	end
 	
 	return pos
+end
+
+function areInRange(p1, p2, dx, dy, dz)
+	if dy == nil then
+		dy = dx
+	end
+	if dz == nil then
+		dz = dy
+	end
+	
+	if math.abs(p1.x - p2.x) > dx or
+	   math.abs(p1.y - p2.y) > dy or
+	   math.abs(p1.z - p2.z) > dz then
+		return false
+	end
+	return true
 end

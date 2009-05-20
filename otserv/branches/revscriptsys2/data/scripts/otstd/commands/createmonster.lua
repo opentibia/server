@@ -6,7 +6,7 @@ CreateMonster.groups = {"Gamemaster", "Senior Gamemaster", "Community Manager", 
 
 function CreateMonster.handler(event)
 	local name = event.param:strip_whitespace()
-	local monster = createActor(event.creature:getPosition(), name)
+	local monster = createMonster(name, event.creature:getPosition())
 	
 	if monster then
 		monster:setDefense(1000)

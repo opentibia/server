@@ -33,7 +33,7 @@ function Command:register()
 			if isOfType(speaker, "Player") then
 				if (type(self.groups) == "string" and self.groups == "All") or table.find(self.groups, speaker:getAccessGroup()) then
 					event.cmd = words
-					event.param = event.text:sub(words:len()+1)
+					event.param = event.text:sub(words:len()+1) or ""
 					self.handler(event)
 				end
 			else
@@ -66,3 +66,4 @@ require("otstd/commands/send")
 require("otstd/commands/bring")
 require("otstd/commands/remove_items")
 require("otstd/commands/createmonster")
+require("otstd/commands/createnpc")

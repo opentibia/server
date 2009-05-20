@@ -48,7 +48,7 @@
 #include "beds.h"
 #include "creature_manager.h"
 
-#include "script_enviroment.h"
+#include "script_environment.h"
 #include "script_manager.h"
 #include "script_event.h"
 
@@ -83,7 +83,7 @@ Game::Game()
 	light_state = LIGHT_STATE_DAY;
 
 	script_system = NULL;
-	script_enviroment = NULL;
+	script_environment = NULL;
 
 	waiting_script_task = 0;
 
@@ -103,8 +103,8 @@ Game::Game()
 
 Game::~Game()
 {
-	script_enviroment->cleanup();
-	delete script_enviroment;
+	script_environment->cleanup();
+	delete script_environment;
 	delete script_system;
 	if(map){
 		delete map;
@@ -146,6 +146,8 @@ void Game::setGameState(GameState_t newState)
 					(*it).second->kickPlayer();
 					it = Player::listPlayer.list.begin();
 				}
+
+				runShutdownScripts(true);
 
 				saveGameState();
 
@@ -208,16 +210,16 @@ bool Game::loadScripts()
 {
 	bool is_reload = false;
 	// Unload any old
-	if(script_enviroment || script_system) {
+	if(script_environment || script_system) {
 		for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
 			it != Game::listCreature.list.end();
 			++it)
 		{
 			it->second->clearListeners();
 		}
-		delete script_enviroment;
+		delete script_environment;
 		delete script_system;
-		script_enviroment = NULL;
+		script_environment = NULL;
 		script_system = NULL;
 
 		Scheduler::getScheduler().stopEvent(waiting_script_task);
@@ -226,12 +228,9 @@ bool Game::loadScripts()
 
 	// Load fresh!
 	try {
-		script_enviroment = new Script::Enviroment();
-		script_system = new Script::Manager(*script_enviroment);
+		script_environment = new Script::Environment();
+		script_system = new Script::Manager(*script_environment);
 		script_system->loadFile(g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/main.lua");
-		
-		Script::OnServerLoad::Event evt(is_reload);
-		script_system->dispatchEvent(evt);
 
 		waiting_script_task = Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_TIMER_INTERVAL,
 			boost::bind(&Game::runWaitingScripts, this)));
@@ -242,18 +241,36 @@ bool Game::loadScripts()
 		{
 			it->second->clearListeners();
 		}
-		delete script_enviroment;
+		delete script_environment;
 		delete script_system;
-		script_enviroment = NULL;
+		script_environment = NULL;
 		script_system = NULL;
 		return false;
 	}
 	return true;
 }
 
+void Game::runStartupScripts(bool real_startup)
+{
+	if(!script_system)
+		return;
+	// This is run after the map is loaded.
+	Script::OnServerLoad::Event evt(real_startup);
+	script_system->dispatchEvent(evt);
+}
+
+void Game::runShutdownScripts(bool real_shutdown)
+{
+	if(!script_system)
+		return;
+	// This is run after the the scripts are /reloaded or when server shuts down
+	Script::OnServerUnload::Event evt(real_shutdown);
+	script_system->dispatchEvent(evt);
+}
+
 void Game::scriptCleanup()
 {
-	script_enviroment->cleanupUnusedListeners();
+	script_environment->cleanupUnusedListeners();
 
 	Scheduler::getScheduler().addEvent(createSchedulerTask(EVENT_SCRIPT_CLEANUP_INTERVAL,
 		boost::bind(&Game::scriptCleanup, this)));
@@ -301,7 +318,7 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 			if(ret == RET_NOERROR){
 				// REVSCRIPT TODO Add unique items
 				//if(item->getUniqueId() != 0){
-				//	ScriptEnviroment::addUniqueThing(item);
+				//	ScriptEnvironment::addUniqueThing(item);
 				//}
 				startDecay(item);
 			}
@@ -398,9 +415,11 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos,
 	}
 
 	ReturnValue retval = RET_NOERROR;
-	Script::OnUseItem::Event evt(player, item, NULL, retval);
-	if(script_system->dispatchEvent(evt)) {
-		return retval;
+	if(script_system){
+		Script::OnUseItem::Event evt(player, item, NULL, retval);
+		if(script_system->dispatchEvent(evt)) {
+			return retval;
+		}
 	}
 
 	if(item->isReadable()){
@@ -473,9 +492,11 @@ ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx,
 	isSuccess = false;
 
 	ReturnValue retval = RET_NOERROR;
-	Script::OnUseItem::Event evt(player, item, &toPosEx, retval);
-	if(script_system->dispatchEvent(evt)) {
-		return retval;
+	if(script_system){
+		Script::OnUseItem::Event evt(player, item, &toPosEx, retval);
+		if(script_system->dispatchEvent(evt)) {
+			return retval;
+		}
 	}
 
 	return RET_CANNOTUSETHISOBJECT;
@@ -1225,50 +1246,84 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 
 bool Game::playerLogin(Player* player)
 {
+	if(!script_system)
+		return false; // Not handled
 	Script::OnLogin::Event evt(player);
 	return script_system->dispatchEvent(evt);
 }
 
 bool Game::playerLogout(Player* player, bool forced, bool timeout)
 {
+	if(!script_system)
+		return false; // Not handled
 	Script::OnLogout::Event evt(player, forced, timeout);
 	return script_system->dispatchEvent(evt);
 }
 
 bool Game::playerEquipItem(Player* player, Item* item, slots_t slot, bool equip)
 {
+	if(!script_system)
+		return false; // Not handled
 	Script::OnEquipItem::Event evt(player, item, slot, equip);
-	return Game::script_system->dispatchEvent(evt);
+	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onCreatureMove(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile)
+bool Game::onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile)
 {
-	Script::OnMoveCreature::Event evt(actor, creature, fromTile, toTile);
-	return Game::script_system->dispatchEvent(evt);
+	if(!script_system)
+		return false; // Not handled
+	Script::OnMoveCreature::Event evt(actor, moving_creature, fromTile, toTile);
+	return script_system->dispatchEvent(evt);
 }
 
 bool Game::onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem)
 {
+	if(!script_system)
+		return false; // Not handled
 	Script::OnMoveItem::Event evt(actor, item, tile, addItem);
-	return Game::script_system->dispatchEvent(evt);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onSpawn(Actor* actor)
+{
+	if(!script_system)
+		return true; // Not handled
+	Script::OnSpawn::Event evt(actor);
+	return script_system->dispatchEvent(evt); // If handled, we don't spawn
 }
 
 void Game::onSpotCreature(Creature* creature, Creature* spotted)
 {
+	if(!script_system)
+		return; // Not handled
 	Script::OnSpotCreature::Event evt(creature, spotted);
-	Game::script_system->dispatchEvent(evt);
+	script_system->dispatchEvent(evt);
 }
 
 void Game::onLoseCreature(Creature* creature, Creature* lost)
 {
+	if(!script_system)
+		return; // Not handled
 	Script::OnLoseCreature::Event evt(creature, lost);
-	Game::script_system->dispatchEvent(evt);
+	script_system->dispatchEvent(evt);
+}
+
+void Game::onCreatureThink(Creature* creature, int interval)
+{
+	if(!script_system)
+		return; // Not handled
+	Script::OnThink::Event evt(creature, interval);
+	script_system->dispatchEvent(evt);
 }
 
 void Game::onCreatureHear(Creature* listener, Creature* speaker, const SpeakClass& sclass, const std::string& text)
 {
-	Script::OnHear::Event evt(listener, speaker, text, sclass);
-	Game::script_system->dispatchEvent(evt);
+	if(!script_system)
+		return; // Not handled
+	if(listener != speaker){
+		Script::OnHear::Event evt(listener, speaker, text, sclass);
+		script_system->dispatchEvent(evt);
+	}
 }
 
 ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Direction direction, uint32_t flags /*= 0*/)
@@ -2215,8 +2270,8 @@ Item* Game::transformItem(Creature* actor, Item* item, uint16_t newId, int32_t n
 			return NULL;
 		}
 
-		// Update script enviroment
-		script_enviroment->reassignObject(item, newItem);
+		// Update script environment
+		script_environment->reassignThing(item, newItem);
 
 		return newItem;
 	}
@@ -2290,8 +2345,8 @@ Item* Game::transformItem(Creature* actor, Item* item, uint16_t newId, int32_t n
 		cylinder->postRemoveNotification(actor, item, itemIndex, true);
 		FreeThing(item);
 
-		// Update script enviroment
-		script_enviroment->reassignObject(item, newItem);
+		// Update script environment
+		script_environment->reassignThing(item, newItem);
 
 		return newItem;
 	}
@@ -2458,8 +2513,11 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 	// channel to him yet.
 	channel->makePlayerDeaf(player);
 
-	Script::OnJoinChannel::Event evt(player, channel);
-	bool interrupted = script_system->dispatchEvent(evt);
+	bool interrupted = false;
+	if(script_system){
+		Script::OnJoinChannel::Event evt(player, channel);
+		 interrupted = script_system->dispatchEvent(evt);
+	}
 
 	channel->makePlayerDeaf(NULL);
 
@@ -2483,6 +2541,8 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 // Called from removeFromAllChannels
 void g_gameOnLeaveChannel(Player* player, ChatChannel* channel)
 {
+	if(!g_game.script_system)
+		return;
 	Script::OnLeaveChannel::Event evt(player, channel);
 	g_game.script_system->dispatchEvent(evt);
 }
@@ -2499,9 +2559,11 @@ bool Game::playerCloseChannel(uint32_t playerId, uint16_t channelId)
 
 	g_chat.removeUserFromChannel(player, channelId);
 
-	Script::OnLeaveChannel::Event evt(player, channel);
-	// We can't abort this action, no need to check return
-	script_system->dispatchEvent(evt);
+	if(script_system){
+		Script::OnLeaveChannel::Event evt(player, channel);
+		// We can't abort this action, no need to check return
+		script_system->dispatchEvent(evt);
+	}
 
 	return true;
 }
@@ -3467,9 +3529,11 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 
 	std::string desc = thing->getDescription(lookDistance);
 
-	Script::OnLook::Event evt(player, desc, thing);
-	if(script_system->dispatchEvent(evt))
-		return false;
+	if(script_system){
+		Script::OnLook::Event evt(player, desc, thing);
+		if(script_system->dispatchEvent(evt))
+			return false;
+	}
 
 	if(desc.length() == 0) 
 		return false;
@@ -3777,8 +3841,23 @@ bool Game::checkReload(Player* player, const std::string& text)
 		}
 		else if(param == " scripts" || param == "s"){
 			std::cout << "================================================================================\n";
+			
+			runShutdownScripts(false);
 			g_game.loadScripts();
-			std::cout << ":: Reloaded Scripts " << std::endl;
+			runStartupScripts(false);
+			
+			for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
+				it != Game::listCreature.list.end();
+				++it)
+			{
+				Actor* a = it->second->getActor();
+				if(a && a->shouldReload()){
+					Script::OnSpawn::Event e(a, true);
+					script_system->dispatchEvent(e);
+				}
+			}
+
+			std::cout << ":: Reloaded Scripts " << (script_system == NULL? "[ Failed ]" : "") << std::endl;
 			if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded scripts.");
 		}
 		return true;
@@ -3812,6 +3891,8 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 		case SPEAK_RVR_CHANNEL:
 			break;
 		default:
+			if(!script_system)
+				break;
 			Script::OnSay::Event evt(player, type, g_chat.getChannel(player, channelId), text);
 			if(script_system->dispatchEvent(evt)) {
 				// Handled
@@ -4081,7 +4162,7 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 {
 	Script::OnTurn::Event evt(creature, dir);
 	
-	if(!script_system->dispatchEvent(evt)){
+	if(!script_system || !script_system->dispatchEvent(evt)){
 		if(creature->getDirection() != dir){
 			creature->setDirection(dir);
 
@@ -4990,12 +5071,12 @@ void Game::FreeThing(Thing* thing)
 
 void Game::unscriptThing(Thing* thing)
 {
-	script_enviroment->removeThing(thing);
+	script_environment->removeThing(thing);
 }
 
 void Game::unscript(void* v)
 {
-	script_enviroment->removeObject(v);
+	script_environment->removeObject(v);
 }
 
 // Shortens compilation time as it can be called without including game.h
@@ -5012,11 +5093,11 @@ void g_gameUnscript(void* v)
 }
 
 /*
-script_enviroment->removeThing(*it);
+script_environment->removeThing(*it);
 Creature* c = (*it)->getCreature();
 if(c) {
 for(ListenerList::iterator iter = c->registered_events.begin(), end = c->registered_events.end(); iter != end; ++iter) {
-script_enviroment->stopListener(*iter);
+script_environment->stopListener(*iter);
 }
 }
 */

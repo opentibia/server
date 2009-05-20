@@ -60,10 +60,8 @@ Actor* Actor::create(CreatureType cType)
 Actor* Actor::create(const std::string& name)
 {
 	CreatureType* cType = g_creature_types.getMonsterType(name);
-	if(!cType){
+	if(!cType)
 		return NULL;
-	}
-
 	return create(*cType);
 }
 
@@ -73,6 +71,9 @@ Actor::Actor(CreatureType _cType) : Creature(), cType(_cType)
 	isMasterInRange = false;
 
 	spawn = NULL;
+	shouldReload_ = false;
+	alwaysThink_ = false;
+
 	defaultOutfit = cType.outfit();
 	currentOutfit = cType.outfit();
 
@@ -93,8 +94,7 @@ Actor::Actor(CreatureType _cType) : Creature(), cType(_cType)
 	yellTicks = 0;
 	extraMeleeAttack = false;
 
-	strDescription = cType.nameDescription();
-	toLowerCaseString(strDescription);
+	updateNameDescription();
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	monsterCount++;
@@ -111,8 +111,15 @@ Actor::~Actor()
 #endif
 }
 
-CreatureType& Actor::getType(){
+CreatureType& Actor::getType()
+{
 	return cType;
+}
+
+void Actor::updateNameDescription()
+{
+	strDescription = cType.nameDescription();
+	toLowerCaseString(strDescription);
 }
 
 void Actor::onAttackedCreatureDissapear(bool isLogout)
@@ -521,8 +528,20 @@ bool Actor::selectTarget(Creature* creature)
 	return setFollowCreature(creature, true);
 }
 
+void Actor::alwaysThink(bool b)
+{
+	alwaysThink_ = b;
+	if(alwaysThink())
+		activate();
+	else
+		deactivate();
+}
+
 bool Actor::activate(bool forced /*= false*/)
 {
+	if(alwaysThink())
+		isActivated = true;
+
 	if(isSummon()){
 		if(isMasterInRange || forced){
 			isActivated = true;
@@ -543,6 +562,9 @@ bool Actor::activate(bool forced /*= false*/)
 
 bool Actor::deactivate(bool forced /*= false*/)
 {
+	if(alwaysThink())
+		return false;
+
 	if(isSummon()){
 		if(!isMasterInRange || getMaster()->isIdle() || forced){
 			isActivated = false;

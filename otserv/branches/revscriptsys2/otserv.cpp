@@ -523,6 +523,7 @@ void mainLoader(const CommandLineOptions& command_opts)
 	}
 
 	g_game.setGameState(GAME_STATE_INIT);
+	g_game.runStartupScripts(true);
 
 	std::pair<uint32_t, uint32_t> IpNetMask;
 	IpNetMask.first  = inet_addr("127.0.0.1");

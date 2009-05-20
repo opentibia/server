@@ -34,7 +34,7 @@
 
 namespace Script {
 	class Manager;
-	class Enviroment;
+	class Environment;
 }
 class Creature;
 class Actor;
@@ -144,6 +144,9 @@ public:
 	 * Runs waiting scripts, reschedules itself every 50 ms
 	 */
 	void runWaitingScripts();
+
+	void runStartupScripts(bool real_startup);
+	void runShutdownScripts(bool real_shutdown);
 
 	/**
 	  * Get the map size - info purpose only
@@ -491,11 +494,13 @@ public:
 	bool playerLogout(Player* player, bool forced, bool timeout);
 	bool playerLogin(Player* player);
 	bool playerEquipItem(Player* player, Item* item, slots_t slot, bool equip);
-	bool onCreatureMove(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile);
+	bool onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
 	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
+	bool onSpawn(Actor* actor);
 	void onSpotCreature(Creature* creature, Creature* spotted);
 	void onLoseCreature(Creature* creature, Creature* lost);
 	void onCreatureHear(Creature* listener, Creature* speaker, const SpeakClass& sclass, const std::string& text);
+	void onCreatureThink(Creature* creature, int interval);
 
 	void cleanup();
 	void shutdown();
@@ -626,7 +631,7 @@ protected:
 	std::vector<Creature*> checkCreatureVectors[EVENT_CREATURECOUNT];
 
 	// Script handling
-	Script::Enviroment* script_enviroment;
+	Script::Environment* script_environment;
 	Script::Manager* script_system;
 	uint32_t waiting_script_task;
 

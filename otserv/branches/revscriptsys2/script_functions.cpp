@@ -24,12 +24,15 @@
 #include "script_event.h"
 #include "script_listener.h"
 
+#include "configmanager.h"
 #include "game.h"
 #include "actor.h"
 #include "town.h"
 #include "chat.h"
 #include "house.h"
+#include "spawn.h"
 
+extern ConfigManager g_config;
 extern Game g_game;
 extern Vocations g_vocations;
 
@@ -85,8 +88,11 @@ void Manager::registerClasses() {
 	registerClass("OnLookEvent", "Event");
 	registerClass("OnTurnEvent", "Event");
 	registerClass("OnServerLoadEvent", "Event");
+	registerClass("OnServerUnloadEvent", "Event");
 	registerClass("OnSpotCreatureEvent", "Event");
 	registerClass("OnLoseCreatureEvent", "Event");
+	registerClass("OnSpawnEvent", "Event");
+	registerClass("OnThinkEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -110,6 +116,9 @@ void Manager::registerClasses() {
 
 	// Game classes
 	registerMemberFunction("Thing", "getPosition()", &Manager::lua_Thing_getPosition);
+	registerMemberFunction("Thing", "getX()", &Manager::lua_Thing_getX);
+	registerMemberFunction("Thing", "getY()", &Manager::lua_Thing_getY);
+	registerMemberFunction("Thing", "getZ()", &Manager::lua_Thing_getZ);
 	registerMemberFunction("Thing", "getParentTile()", &Manager::lua_Thing_getParentTile);
 	registerMemberFunction("Thing", "getParent()", &Manager::lua_Thing_getParent);
 	registerMemberFunction("Thing", "isMoveable()", &Manager::lua_Thing_isMoveable);
@@ -118,23 +127,31 @@ void Manager::registerClasses() {
 	registerMemberFunction("Thing", "getDescription([int lookdistance])", &Manager::lua_Thing_getDescription);
 	registerMemberFunction("Thing", "moveTo(table pos)", &Manager::lua_Thing_moveToPosition);
 	registerMemberFunction("Thing", "destroy()", &Manager::lua_Thing_destroy);
+	
+	registerGlobalFunction("getThingByID(int id)", &Manager::lua_getThingByID);
 
 	// Creature
-	registerMemberFunction("Creature", "getID()", &Manager::lua_Creature_getID);
+	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
 	registerMemberFunction("Creature", "setHealth(integer newval)", &Manager::lua_Creature_setHealth);
-
+	registerMemberFunction("Creature", "getID()", &Manager::lua_Creature_getID);
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
-	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
-
-	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
+	registerMemberFunction("Creature", "getOutfit()", &Manager::lua_Creature_getOutfit);
 	registerMemberFunction("Creature", "say(string msg)", &Manager::lua_Creature_say);
+	registerMemberFunction("Creature", "setOutfit(table outfit)", &Manager::lua_Creature_setOutfit);
+	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
 
 	registerGlobalFunction("getCreatureByName(string name)", &Manager::lua_getCreatureByName);
 	registerGlobalFunction("getCreaturesByName(string name)", &Manager::lua_getCreaturesByName);
 
 	// Actor
+	registerMemberFunction("Actor", "setShouldReload(boolean shouldreload)", &Manager::lua_Actor_setShouldReload);
+	registerMemberFunction("Actor", "getShouldReload()", &Manager::lua_Actor_getShouldReload);
+	registerMemberFunction("Actor", "setAlwaysThink(boolean shouldreload)", &Manager::lua_Actor_setAlwaysThink);
+	registerMemberFunction("Actor", "getAlwaysThink()", &Manager::lua_Actor_getAlwaysThink);
+
+	// Creature type
 	registerMemberFunction("Actor", "setArmor(int newarmor)", &Manager::lua_Actor_setArmor);
 	registerMemberFunction("Actor", "getArmor()", &Manager::lua_Actor_getArmor);
 	registerMemberFunction("Actor", "setDefense(int newdefense)", &Manager::lua_Actor_setDefense);
@@ -151,8 +168,11 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "getTargetDistance()", &Manager::lua_Actor_getTargetDistance);
 	registerMemberFunction("Actor", "setMaxSummons(int newsummons)", &Manager::lua_Actor_setMaxSummons);
 	registerMemberFunction("Actor", "getMaxSummons()", &Manager::lua_Actor_getMaxSummons);
+	registerMemberFunction("Actor", "setName(string newname)", &Manager::lua_Actor_setName);
+	registerMemberFunction("Actor", "setNameDescription(string newname)", &Manager::lua_Actor_setNameDescription);
 
-	registerGlobalFunction("createActor(table pos [, string monstertype])", &Manager::lua_Actor_create);
+	registerGlobalFunction("createMonster(string monstertypename, table pos)", &Manager::lua_createMonster);
+	registerGlobalFunction("createActor(string name, table pos)", &Manager::lua_createActor);
 
 	// Player
 	registerMemberFunction("Player", "setStorageValue(string key, string value)", &Manager::lua_Player_setStorageValue);
@@ -189,7 +209,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "setVocation(int vocationid)", &Manager::lua_Player_setVocation);
 	registerMemberFunction("Player", "hasGroupFlag(integer flag)", &Manager::lua_Player_hasGroupFlag);
 
-	registerMemberFunction("Player", "getMoney()", &Manager::lua_Player_getMoney);
+	registerMemberFunction("Player", "countMoney()", &Manager::lua_Player_countMoney);
 	registerMemberFunction("Player", "removeMoney(int amount)", &Manager::lua_Player_removeMoney);
 	registerMemberFunction("Player", "addMoney(int amount)", &Manager::lua_Player_addMoney);
 
@@ -284,10 +304,15 @@ void Manager::registerClasses() {
 }
 
 void Manager::registerFunctions() {
+	// General functions
 	registerGlobalFunction("wait(int delay)", &Manager::lua_wait);
 
+	registerGlobalFunction("getConfigValue(string key)", &Manager::lua_getConfigValue);
+
+	// Register different events
 	registerGlobalFunction("registerOnSay(string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerGenericEvent_OnSay);
 	registerGlobalFunction("registerOnCreatureSay(Creature who, string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerSpecificEvent_OnSay);
+	registerGlobalFunction("registerOnHear(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnHear);
 
 	registerGlobalFunction("registerOnUseItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
 
@@ -304,12 +329,15 @@ void Manager::registerFunctions() {
 	
 	registerGlobalFunction("registerOnServerLoad(function callback)", &Manager::lua_registerGenericEvent_OnServerLoad);
 
-	// Others are bound in lua
+	// Registering other OnMoveItem events are done through lua
 	registerGlobalFunction("registerOnMoveItem(string method, int filter, boolean isadd, boolean isontile, function callback)", &Manager::lua_registerGenericEvent_OnMoveItem);
 
 	registerGlobalFunction("registerOnSpotCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnSpotCreature);
 	registerGlobalFunction("registerOnLoseCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLoseCreature);
 	
+	registerGlobalFunction("registerOnCreatureThink(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnCreatureThink);
+	
+	registerGlobalFunction("registerOnSpawn(string cname, function callback)", &Manager::lua_registerGenericEvent_OnSpawn);
 
 	registerGlobalFunction("registerOnJoinChannel(function callback)", &Manager::lua_registerGenericEvent_OnJoinChannel);
 	registerGlobalFunction("registerOnPlayerJoinChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnJoinChannel);
@@ -326,8 +354,7 @@ void Manager::registerFunctions() {
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
-	registerGlobalFunction("wait(int delay)", &Manager::lua_wait);
-
+	// Map functions
 	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
 	registerGlobalFunction("sendMagicEffect(position where, int type)", &Manager::lua_sendMagicEffect);
 
@@ -343,6 +370,17 @@ int LuaState::lua_wait() {
 	return lua_yield(state, 1);
 }
 
+int LuaState::lua_getConfigValue() {
+	std::string key = popString();
+
+	if(key == "sql_user" || key == "sql_pass" || key == "_G"){
+		throw Script::Error("Read-protected config value " + key + " accessed.");
+	}
+
+	g_config.getConfigValue(key, state);
+	return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Register Events
 
@@ -350,7 +388,7 @@ int LuaState::lua_registerGenericEvent_OnServerLoad()
 {
 	Listener_ptr listener(new Listener(ON_LOAD_LISTENER, boost::any(), *this->getManager()));
 
-	enviroment.Generic.OnLoad.push_back(listener);
+	environment.Generic.OnLoad.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -393,20 +431,20 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 	// OnSay event list is sorted by length, from longest to shortest
 	if(si_onsay.method == OnSay::FILTER_EXACT){
 		// Insert at beginning
-		enviroment.Generic.OnSay.insert(enviroment.Generic.OnSay.begin(), listener);
+		environment.Generic.OnSay.insert(environment.Generic.OnSay.begin(), listener);
 	}
 	else if(si_onsay.method == OnSay::FILTER_ALL){
 		// All comes very last
-		enviroment.Generic.OnSay.push_back(listener);
+		environment.Generic.OnSay.push_back(listener);
 	}
 	else{
-		if(enviroment.Generic.OnSay.empty()){
-			enviroment.Generic.OnSay.push_back(listener);
+		if(environment.Generic.OnSay.empty()){
+			environment.Generic.OnSay.push_back(listener);
 		}
 		else{
 			bool registered = false;
-			for(ListenerList::iterator listener_iter = enviroment.Generic.OnSay.begin(),
-				end = enviroment.Generic.OnSay.end();
+			for(ListenerList::iterator listener_iter = environment.Generic.OnSay.begin(),
+				end = environment.Generic.OnSay.end();
 				listener_iter != end; ++listener_iter)
 			{
 				OnSay::ScriptInformation info = boost::any_cast<OnSay::ScriptInformation>((*listener_iter)->getData());
@@ -414,13 +452,13 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 				if(si_onsay.method == OnSay::FILTER_MATCH_BEGINNING){
 					// We should be inserted before substrings...
 					if(info.method == OnSay::FILTER_SUBSTRING || info.method == OnSay::FILTER_ALL){
-						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						environment.Generic.OnSay.insert(listener_iter, listener);
 						registered = true; 
 						break;
 					}
 
 					if(info.filter.length() < si_onsay.filter.length()){
-						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						environment.Generic.OnSay.insert(listener_iter, listener);
 						registered = true; 
 						break;
 					}
@@ -429,20 +467,20 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 					assert(si_onsay.method == OnSay::FILTER_SUBSTRING);
 					// We should be inserted before generic...
 					if(info.method == OnSay::FILTER_ALL){
-						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						environment.Generic.OnSay.insert(listener_iter, listener);
 						registered = true; 
 						break;
 					}
 
 					if(info.filter.length() < si_onsay.filter.length()){
-						enviroment.Generic.OnSay.insert(listener_iter, listener);
+						environment.Generic.OnSay.insert(listener_iter, listener);
 						registered = true; 
 						break;
 					}
 				}
 			}
 			if(!registered)
-				enviroment.Generic.OnSay.push_back(listener);
+				environment.Generic.OnSay.push_back(listener);
 		}
 	}
 	// Register event
@@ -491,7 +529,36 @@ int LuaState::lua_registerSpecificEvent_OnSay() {
 		new Listener(ON_SAY_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnHear() {
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	// Callback is no the top of the stack
+
+	OnHear::ScriptInformation si_onhear;
+
+	// This here explains why boost is so awesome, thanks to our custom
+	// delete function, the listener is cleanly stopped when all references
+	// to it is removed. :)
+	boost::any p(si_onhear);
+	Listener_ptr listener(
+		new Listener(ON_HEAR_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -527,7 +594,7 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 	boost::any p(si_onuse);
 	Listener_ptr listener(new Listener(ON_USE_ITEM_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnUseItem.push_back(listener);
+	environment.Generic.OnUseItem.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -541,7 +608,7 @@ int LuaState::lua_registerGenericEvent_OnJoinChannel() {
 	boost::any p(0);
 	Listener_ptr listener(new Listener(ON_OPEN_CHANNEL_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnJoinChannel.push_back(listener);
+	environment.Generic.OnJoinChannel.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -562,7 +629,7 @@ int LuaState::lua_registerSpecificEvent_OnJoinChannel() {
 		new Listener(ON_OPEN_CHANNEL_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -577,7 +644,7 @@ int LuaState::lua_registerGenericEvent_OnLeaveChannel() {
 	boost::any p(0);
 	Listener_ptr listener(new Listener(ON_CLOSE_CHANNEL_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnLeaveChannel.push_back(listener);
+	environment.Generic.OnLeaveChannel.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -598,7 +665,7 @@ int LuaState::lua_registerSpecificEvent_OnLeaveChannel() {
 		new Listener(ON_CLOSE_CHANNEL_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -613,7 +680,7 @@ int LuaState::lua_registerGenericEvent_OnLogin() {
 	boost::any p(0);
 	Listener_ptr listener(new Listener(ON_LOGIN_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnLogin.push_back(listener);
+	environment.Generic.OnLogin.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -627,7 +694,7 @@ int LuaState::lua_registerGenericEvent_OnLogout() {
 	boost::any p(0);
 	Listener_ptr listener(new Listener(ON_LOGOUT_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnLogout.push_back(listener);
+	environment.Generic.OnLogout.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -648,7 +715,7 @@ int LuaState::lua_registerSpecificEvent_OnLogout() {
 		new Listener(ON_LOGOUT_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -684,7 +751,7 @@ int LuaState::lua_registerGenericEvent_OnLookAtItem() {
 	boost::any p(si_onlook);
 	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnLook.push_back(listener);
+	environment.Generic.OnLook.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -707,7 +774,7 @@ int LuaState::lua_registerGenericEvent_OnLookAtCreature() {
 	boost::any p(si_onlook);
 	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnLook.push_back(listener);
+	environment.Generic.OnLook.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -735,7 +802,7 @@ int LuaState::lua_registerSpecificEvent_OnLook() {
 		new Listener(ON_LOOK_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -816,7 +883,7 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	boost::any p(si_onequip);
 	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnEquipItem.push_back(listener);
+	environment.Generic.OnEquipItem.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -896,7 +963,7 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	boost::any p(si_ondeequip);
 	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnEquipItem.push_back(listener);
+	environment.Generic.OnEquipItem.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -933,7 +1000,7 @@ int LuaState::lua_registerGenericEvent_OnStepInCreature() {
 	boost::any p(si_onmovecreature);
 	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnMoveCreature.push_back(listener);
+	environment.Generic.OnMoveCreature.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -970,7 +1037,7 @@ int LuaState::lua_registerGenericEvent_OnStepOutCreature() {
 	boost::any p(si_onmovecreature);
 	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnMoveCreature.push_back(listener);
+	environment.Generic.OnMoveCreature.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1007,7 +1074,7 @@ int LuaState::lua_registerGenericEvent_OnMoveCreature() {
 	boost::any p(si_onmovecreature);
 	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnMoveCreature.push_back(listener);
+	environment.Generic.OnMoveCreature.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1017,6 +1084,29 @@ int LuaState::lua_registerGenericEvent_OnMoveCreature() {
 	return 1;
 }
 */
+
+int LuaState::lua_registerGenericEvent_OnSpawn() {
+	// Store callback
+	insert(-2);
+
+	std::string cname = popString();
+	toLowerCaseString(cname);
+
+
+	boost::any p(0);
+	Listener_ptr listener(
+		new Listener(ON_SPAWN_LISTENER, p, *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment.Generic.OnSpawn[cname].push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
 
 int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
 	// Store callback
@@ -1035,7 +1125,7 @@ int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
 		new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1050,7 +1140,7 @@ int LuaState::lua_registerGenericEvent_OnCreatureTurn()
 {
 	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, boost::any(), *this->getManager()));
 
-	enviroment.Generic.OnTurn.push_back(listener);
+	environment.Generic.OnTurn.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1070,7 +1160,7 @@ int LuaState::lua_registerSpecificEvent_OnCreatureTurn() {
 		new Listener(ON_TURN_LISTENER, boost::any(), *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1110,7 +1200,7 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	boost::any p(si_onmoveitem);
 	Listener_ptr listener(new Listener(ON_MOVE_ITEM_LISTENER, p, *this->getManager()));
 
-	enviroment.Generic.OnMoveItem.push_back(listener);
+	environment.Generic.OnMoveItem.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1130,7 +1220,7 @@ int LuaState::lua_registerSpecificEvent_OnSpotCreature() {
 		new Listener(ON_SPOT_CREATURE_LISTENER, boost::any(), *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1151,7 +1241,28 @@ int LuaState::lua_registerSpecificEvent_OnLoseCreature() {
 		new Listener(ON_LOSE_CREATURE_LISTENER, boost::any(), *this->getManager()),
 		boost::bind(&Listener::deactivate, _1));
 
-	enviroment.registerSpecificListener(listener);
+	environment.registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnCreatureThink() {
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	Listener_ptr listener(
+		new Listener(ON_THINK_LISTENER, boost::any(), *this->getManager()),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment.registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1187,7 +1298,7 @@ int LuaState::lua_stopListener() {
 		pushBoolean(false);
 		return 1;
 	}
-	pushBoolean(enviroment.stopListener((ListenerType)type, id));
+	pushBoolean(environment.stopListener((ListenerType)type, id));
 	return 1;
 }
 
@@ -1216,6 +1327,27 @@ int LuaState::lua_Thing_getPosition()
 {
 	Thing* thing = popThing();
 	pushPosition(thing->getPosition());
+	return 1;
+}
+
+int LuaState::lua_Thing_getX()
+{
+	Thing* thing = popThing();
+	pushInteger(thing->getPosition().x);
+	return 1;
+}
+
+int LuaState::lua_Thing_getY()
+{
+	Thing* thing = popThing();
+	pushInteger(thing->getPosition().y);
+	return 1;
+}
+
+int LuaState::lua_Thing_getZ()
+{
+	Thing* thing = popThing();
+	pushInteger(thing->getPosition().z);
 	return 1;
 }
 
@@ -1272,7 +1404,7 @@ int LuaState::lua_Thing_getName() {
 int LuaState::lua_Thing_getDescription()
 {
 	int lookdistance = 0;
-	if(getStackTop() > 1) {
+	if(getStackSize() > 1) {
 		lookdistance = popInteger();
 	}
 	Thing* thing = popThing();
@@ -1295,6 +1427,14 @@ int LuaState::lua_Thing_destroy()
 	} else {
 		pushBoolean(false);
 	}
+	return 1;
+}
+
+int LuaState::lua_getThingByID()
+{
+	Script::ObjectID objid = (Script::ObjectID)popFloat();
+	Thing* thing = environment.getThing(objid);
+	pushThing(thing);
 	return 1;
 }
 
@@ -1391,7 +1531,7 @@ int LuaState::lua_Tile_getItemTypeCount() {
 int LuaState::lua_Tile_queryAdd()
 {
 	int flags = 0;
-	if(getStackTop() > 2) {
+	if(getStackSize() > 2) {
 		flags = popInteger();
 	}
 	Thing* thing = popThing();
@@ -1466,25 +1606,29 @@ int LuaState::lua_Tile_hasProperty()
 ///////////////////////////////////////////////////////////////////////////////
 // Class Creature
 
-int LuaState::lua_Creature_getID() {
+int LuaState::lua_Creature_getID()
+{
 	Creature* creature = popCreature();
 	pushUnsignedInteger(creature->getID());
 	return 1;
 }
 
-int LuaState::lua_Creature_getHealth() {
+int LuaState::lua_Creature_getHealth()
+{
 	Creature* creature = popCreature();
 	pushInteger(creature->getHealth());
 	return 1;
 }
 
-int LuaState::lua_Creature_getHealthMax() {
+int LuaState::lua_Creature_getHealthMax()
+{
 	Creature* creature = popCreature();
 	pushInteger(creature->getMaxHealth());
 	return 1;
 }
 
-int LuaState::lua_Creature_setHealth() {
+int LuaState::lua_Creature_setHealth()
+{
 	int newval = popInteger();
 	Creature* c = popCreature();
 
@@ -1499,9 +1643,17 @@ int LuaState::lua_Creature_setHealth() {
 	return 1;
 }
 
-int LuaState::lua_Creature_getOrientation() {
+int LuaState::lua_Creature_getOrientation()
+{
 	Creature* creature = popCreature();
 	pushInteger(creature->getDirection());
+	return 1;
+}
+
+int LuaState::lua_Creature_getNameDescription()
+{
+	Creature* creature = popCreature();
+	pushString(creature->getNameDescription());
 	return 1;
 }
 
@@ -1539,6 +1691,22 @@ int LuaState::lua_Creature_say()
 	return 1;
 }
 
+int LuaState::lua_Creature_getOutfit()
+{
+	Creature* creature = popCreature();
+	pushOutfit(creature->getCurrentOutfit());
+	return 1;
+}
+
+int LuaState::lua_Creature_setOutfit()
+{
+	Outfit_t outfit = popOutfit();
+	Creature* creature = popCreature();
+	g_game.internalCreatureChangeOutfit(creature, outfit);
+	pushBoolean(true);
+	return 1;
+}
+
 int LuaState::lua_getCreatureByName()
 {
 	std::string name = popString();
@@ -1563,21 +1731,67 @@ int LuaState::lua_getCreaturesByName()
 ///////////////////////////////////////////////////////////////////////////////
 // Class Actor
 
-int LuaState::lua_Actor_create()
+int LuaState::lua_createActor()
 {
-	Actor* a = 0;
-	if(getStackTop() > 1)
-		// Create a monster from a monster type
-		a = Actor::create(popString());
-	else{
-		a = Actor::create();
-	}
 	Position p = popPosition();
+	std::string name = popString();
+
+	// Create an empty actor, with some default values
+	CreatureType ct;
+	Outfit_t ot;
+	ot.lookType = 130;
+	ct.outfit(ot);
+
+	Actor* a = Actor::create(ct);
+
+	// Set some default attributes, so the actor can be spawned with issues
+	a->getType().name(name);
+
+	g_game.placeCreature(a, p);
+	pushThing(a);
+	return 1;
+}
+
+int LuaState::lua_createMonster()
+{
+	Position p = popPosition();
+
+	// Create a monster from a monster type
+	Actor* a = Actor::create(popString());
 	if(a)
 		g_game.placeCreature(a, p);
 	pushThing(a);
 	return 1;
 }
+
+int LuaState::lua_Actor_setShouldReload()
+{
+	bool b = popBoolean();
+	popActor()->shouldReload(b);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_getShouldReload()
+{
+	pushBoolean(popActor()->shouldReload());
+	return 1;
+}
+
+int LuaState::lua_Actor_setAlwaysThink()
+{
+	bool b = popBoolean();
+	popActor()->alwaysThink(b);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_getAlwaysThink()
+{
+	pushBoolean(popActor()->alwaysThink());
+	return 1;
+}
+
 
 template <class T>
 int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
@@ -1676,6 +1890,21 @@ int LuaState::lua_Actor_getMaxSummons()
 int LuaState::lua_Actor_setMaxSummons()
 {
 	return Actor_modAttribute(this, &CreatureType::maxSummons);
+}
+
+int LuaState::lua_Actor_setName()
+{
+	return Actor_modAttribute(this, &CreatureType::name);
+}
+
+int LuaState::lua_Actor_setNameDescription()
+{
+	std::string value = popString();
+	Actor* actor = popActor();
+	actor->getType().nameDescription(value);
+	actor->updateNameDescription();
+	pushBoolean(true);
+	return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1944,7 +2173,7 @@ int LuaState::lua_Player_getItemTypeCount()
 	return 1;
 }
 
-int LuaState::lua_Player_getMoney()
+int LuaState::lua_Player_countMoney()
 {
 	Player* player = popPlayer();
 	pushInteger(g_game.getMoney(player));
@@ -2097,7 +2326,7 @@ int LuaState::lua_getPlayersByNameWildcard()
 int LuaState::lua_createItem()
 {
 	int count = -1;
-	if(getStackTop() > 1) {
+	if(getStackSize() > 1) {
 		count = popInteger();
 	}
 	int id = popUnsignedInteger();
@@ -2173,7 +2402,7 @@ int LuaState::lua_Item_getSpecialDescription()
 int LuaState::lua_Item_setItemID()
 {
 	int newcount = -1;
-	if(getStackTop() > 2) {
+	if(getStackSize() > 2) {
 		newcount = popInteger();
 	}
 
@@ -2429,7 +2658,7 @@ int LuaState::lua_Combat_setCallback()
 	CallBackParam_t key = (CallBackParam_t)popNumber(L);
 	uint32_t combatId = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	if(env->getScriptId() != EVENT_ID_LOADING){
 		reportError(__FUNCTION__, "This function can only be used while loading the script.");
@@ -2470,7 +2699,7 @@ int LuaState::lua_Combat_setCallback()
 int LuaState::luaSetCombatFormula(lua_State *L)
 {
 	//setCombatFormula(combat, type, mina, minb, maxa, maxb)
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	if(env->getScriptId() != EVENT_ID_LOADING){
 		reportError(__FUNCTION__, "This function can only be used while loading the script.");
@@ -2503,7 +2732,7 @@ int LuaState::luaSetCombatFormula(lua_State *L)
 int LuaState::luaSetConditionFormula(lua_State *L)
 {
 	//setConditionFormula(condition, mina, minb, maxa, maxb)
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	if(env->getScriptId() != EVENT_ID_LOADING){
 		reportError(__FUNCTION__, "This function can only be used while loading the script.");
@@ -2535,7 +2764,7 @@ int LuaState::luaSetConditionFormula(lua_State *L)
 int LuaState::luaDoCombat(lua_State *L)
 {
 	//doCombat(cid, combat, param)
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	LuaVariant var = popVariant(L);
 	uint32_t combatId = (uint32_t)popNumber(L);
@@ -2644,7 +2873,7 @@ int LuaState::luaDoAreaCombatHealth(lua_State *L)
 	CombatType_t combatType = (CombatType_t)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = NULL;
 
@@ -2685,7 +2914,7 @@ int LuaState::luaDoTargetCombatHealth(lua_State *L)
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = NULL;
 
@@ -2728,7 +2957,7 @@ int LuaState::luaDoAreaCombatMana(lua_State *L)
 
 	uint32_t cid = (uint32_t)popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = NULL;
 
@@ -2766,7 +2995,7 @@ int LuaState::luaDoTargetCombatMana(lua_State *L)
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = NULL;
 
@@ -2805,7 +3034,7 @@ int LuaState::luaDoAreaCombatCondition(lua_State *L)
 	popPosition(L, pos);
 	uint32_t cid = (uint32_t)popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = NULL;
 
@@ -2851,7 +3080,7 @@ int LuaState::luaDoTargetCombatCondition(lua_State *L)
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = NULL;
 
@@ -2898,7 +3127,7 @@ int LuaState::luaDoAreaCombatDispel(lua_State *L)
 	popPosition(L, pos);
 	uint32_t cid = (uint32_t)popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = NULL;
 
@@ -2936,7 +3165,7 @@ int LuaStateLuaState::luaDoTargetCombatDispel(lua_State *L)
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = NULL;
 
@@ -2973,7 +3202,7 @@ int LuaState::luaDoChallengeCreature(lua_State *L)
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 
@@ -3001,7 +3230,7 @@ int LuaState::luaDoConvinceCreature(lua_State *L)
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 
@@ -3029,7 +3258,7 @@ int LuaState::luaGetMonsterTargetList(lua_State *L)
 
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(!creature){
@@ -3067,7 +3296,7 @@ int LuaState::luaGetMonsterFriendList(lua_State *L)
 
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(!creature){
@@ -3107,7 +3336,7 @@ int LuaState::luaDoSetMonsterTarget(lua_State *L)
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(!creature){
@@ -3143,7 +3372,7 @@ int LuaState::luaDoMonsterChangeTarget(lua_State *L)
 	//doMonsterChangeTarget(cid)
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(!creature){
@@ -3174,7 +3403,7 @@ int LuaState::luaDoAddCondition(lua_State *L)
 	uint32_t conditionId = popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(!creature){
@@ -3202,7 +3431,7 @@ int LuaState::luaDoRemoveCondition(lua_State *L)
 	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(!creature){
@@ -3444,6 +3673,8 @@ int LuaState::lua_House_setInviteList()
 	while(lua_next(state, -2) != 0) {
 		list << popString() << "\n";
 	}
+	pop();
+
 	House* house = popHouse();
 
 	house->setAccessList(GUEST_LIST, list.str());
@@ -3460,6 +3691,8 @@ int LuaState::lua_House_setSubownerList()
 	while(lua_next(state, -2) != 0) {
 		list << popString() << "\n";
 	}
+	pop();
+
 	House* house = popHouse();
 
 	house->setAccessList(SUBOWNER_LIST, list.str());
@@ -3814,7 +4047,7 @@ int LuaScriptInterface::luaDoSendAnimatedText()
 	std::string text = popString();
 	PositionEx pos = popPosition();
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -3984,7 +4217,7 @@ int LuaScriptInterface::luaGetTileThingByPos()
 
 	PositionEx pos = popPositionEx();
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(!tile){
@@ -4097,7 +4330,7 @@ int LuaScriptInterface::luaDoCreateItemEx()
 
 	uint32_t itemId = popUnsignedInteger();
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	const ItemType& it = Item::items[itemId];
 	if(it.stackable && count > 100){
@@ -4161,7 +4394,7 @@ int LuaScriptInterface::luaGetPlayerStorageValue()
 	uint32_t key = popUnsignedInteger();
 	Player* player = popPlayer();
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 	int32_t value;
 	if(player->getStorageValue(key, value)){
 		pushInteger(value);
@@ -4741,7 +4974,7 @@ int LuaScriptInterface::luaGetGlobalStorageValue()
 	//getGlobalStorageValue(valueid)
 	uint32_t key = popUnsignedInteger();
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	int32_t value;
 	if(env->getGlobalStorageValue(key, value)){
@@ -4759,7 +4992,7 @@ int LuaScriptInterface::luaSetGlobalStorageValue()
 	int32_t value = popInteger();
 	uint32_t key = popUnsignedInteger();
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 	env->addGlobalStorageValue(key, value);
 	pushBoolean(true)
 	return 1;
@@ -5124,7 +5357,7 @@ int LuaScriptInterface::luaDoSendDistanceShoot()
 	PositionEx toPos = popPosition();
 	PositionEx fromPos = popPosition();
 
-	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnvironment* env = getScriptEnv();
 
 	if(fromPos.x == 0xFFFF){
 		fromPos = env->getRealPos();

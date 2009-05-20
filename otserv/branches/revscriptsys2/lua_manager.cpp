@@ -22,7 +22,7 @@
 
 #include "lua_manager.h"
 #include "script_manager.h"
-#include "script_enviroment.h"
+#include "script_environment.h"
 #include "script_listener.h"
 #include "script_event.h"
 
@@ -37,15 +37,18 @@ extern Game g_game;
 extern ConfigManager g_config;
 extern Chat g_chat;
 
-LuaState::LuaState(Script::Enviroment& env) : enviroment(env) {
+LuaState::LuaState(Script::Environment& env) : environment(env)
+{
 	;
 }
 
-LuaState::~LuaState() {
+LuaState::~LuaState()
+{
 	;
 }
 
-void LuaState::HandleError(Script::ErrorMode mode, const std::string& error) {
+void LuaState::HandleError(Script::ErrorMode mode, const std::string& error)
+{
 	if(mode == Script::ERROR_THROW) {
 		throw Script::Error(error);
 	} else if(mode == Script::ERROR_WARN) {
@@ -54,41 +57,49 @@ void LuaState::HandleError(Script::ErrorMode mode, const std::string& error) {
 	// pass
 }
 
-void LuaState::HandleError(const std::string& error) {
+void LuaState::HandleError(const std::string& error)
+{
 	HandleError(Script::ERROR_WARN, error);
 }
 
 // Stack manipulation
-int LuaState::getStackTop() {
+int LuaState::getStackSize()
+{
 	return lua_gettop(state);
 }
 
-bool LuaState::checkStackSize(int low, int high) {
-	int t = getStackTop();
+bool LuaState::checkStackSize(int low, int high)
+{
+	int t = getStackSize();
 	if(t < low) return false;
 	if(high != -1 && t > high) return false;
 	return true;
 }
 
-void LuaState::duplicate(int idx /* = -1 */) {
+void LuaState::duplicate(int idx /* = -1 */)
+{
 	lua_pushvalue(state, idx);
 }
 
 // Table manipulation
 
-void LuaState::newTable() {
+void LuaState::newTable()
+{
 	lua_newtable(state);
 }
 
-void LuaState::getField(int index, const std::string& field_name) {
+void LuaState::getField(int index, const std::string& field_name)
+{
 	lua_getfield(state, index, field_name.c_str());
 }
 
-void LuaState::setField(int index, const std::string& field_name) {
+void LuaState::setField(int index, const std::string& field_name)
+{
 	lua_setfield(state, index, field_name.c_str());
 }
 
-void LuaState::setField(int index, int field_index) {
+void LuaState::setField(int index, int field_index)
+{
 	push(field_index);
 	lua_insert(state, -2);
 	if(index <= -10000)
@@ -100,99 +111,124 @@ void LuaState::setField(int index, int field_index) {
 			lua_settable(state, index);
 }
 
-void LuaState::clearStack() {
+void LuaState::clearStack()
+{
 	lua_settop(state, 0);
 }
 
-void LuaState::insert(int idx) {
+void LuaState::insert(int idx)
+{
+	if(idx < 0 && idx < -lua_gettop(state))
+		throw Script::Error("Insertion to position outside stack (under).");
+	if(idx > 0 && idx > lua_gettop(state))
+		throw Script::Error("Insertion to position outside stack (over).");
 	lua_insert(state, idx);
 }
 
-void LuaState::swap(int idx) {
+void LuaState::swap(int idx)
+{
 	lua_insert(state, idx);
 	lua_pushvalue(state, idx+1);
 	lua_remove(state, idx+1);
 }
 
-std::string LuaState::typeOf(int idx) {
+std::string LuaState::typeOf(int idx)
+{
 	return lua_typename(state, lua_type(state, idx));
 }
 
-int LuaState::rawtypeOf(int idx) {
+int LuaState::rawtypeOf(int idx)
+{
 	return lua_type(state, idx);
 }
 
 // Check
-bool LuaState::isNil(int index) {
+bool LuaState::isNil(int index)
+{
 	return lua_isnil(state, index);
 }
 
-bool LuaState::isBoolean(int index) {
+bool LuaState::isBoolean(int index)
+{
 	return lua_isboolean(state, index) || lua_isnil(state, index);
 }
 
-bool LuaState::isNumber(int index) {
+bool LuaState::isNumber(int index)
+{
 	return lua_isnumber(state, index) != 0;
 }
 
-bool LuaState::isString(int index) {
+bool LuaState::isString(int index)
+{
 	return lua_isstring(state, index) != 0;
 }
 
-bool LuaState::isUserdata(int index) {
+bool LuaState::isUserdata(int index)
+{
 	return lua_isuserdata(state, index) != 0;
 }
 
-bool LuaState::isLuaFunction(int index) {
+bool LuaState::isLuaFunction(int index)
+{
 	return lua_isfunction(state, index) != 0;
 }
 
-bool LuaState::isCFunction(int index) {
+bool LuaState::isCFunction(int index)
+{
 	return lua_iscfunction(state, index) != 0;
 }
 
-bool LuaState::isThread(int index) {
+bool LuaState::isThread(int index)
+{
 	return lua_isthread(state, index) != 0;
 }
 
-bool LuaState::isTable(int index) {
+bool LuaState::isTable(int index)
+{
 	return lua_istable(state, index) != 0;
 }
 
-bool LuaState::isFunction(int index) {
+bool LuaState::isFunction(int index)
+{
 	return lua_isfunction(state, index) != 0 || lua_iscfunction(state, index) != 0;
 }
 
 // Pop
-void LuaState::pop(int n) {
+void LuaState::pop(int n)
+{
 	lua_pop(state, n);
 }
 
-bool LuaState::popBoolean() {
+bool LuaState::popBoolean()
+{
 	bool b = (lua_toboolean(state, -1) != 0);
 	pop();
 	return b;
 }
 
-int32_t LuaState::popInteger() {
+int32_t LuaState::popInteger()
+{
 	int32_t i = lua_tointeger(state, -1);
 	pop();
 	return i;
 }
 
-uint32_t LuaState::popUnsignedInteger() {
+uint32_t LuaState::popUnsignedInteger()
+{
 	double d = lua_tonumber(state, -1);
 	pop();
 	return uint32_t(d);
 }
 
-double LuaState::popFloat() {
+double LuaState::popFloat()
+{
 	double d = lua_tonumber(state, -1);
 	pop();
 	return d;
 }
 
-std::string LuaState::popString() {
+std::string LuaState::popString()
+{
 	size_t len;
 	const char* cstr = lua_tolstring(state, -1, &len);
 	std::string str(cstr, len);
@@ -200,72 +236,102 @@ std::string LuaState::popString() {
 	return str;
 }
 
-void* LuaState::getUserdata() {
+void* LuaState::getUserdata()
+{
 	void* p = lua_touserdata(state, -1);
 	pop();
 	return p;
 }
 
 // Push
-void LuaState::pushNil() {
+void LuaState::pushNil()
+{
 	lua_pushnil(state);
 }
 
-void LuaState::pushBoolean(bool b) {
+void LuaState::pushBoolean(bool b)
+{
 	lua_pushboolean(state, b);
 }
 
-void LuaState::pushInteger(int32_t i) {
+void LuaState::pushInteger(int32_t i)
+{
 	lua_pushnumber(state, i);
 }
 
-void LuaState::pushUnsignedInteger(uint32_t ui) {
+void LuaState::pushUnsignedInteger(uint32_t ui)
+{
 	lua_pushnumber(state, ui);
 }
 
-void LuaState::pushFloat(double d) {
+void LuaState::pushFloat(double d)
+{
 	lua_pushnumber(state, d);
 }
 
-void LuaState::pushString(const std::string& str) {
+void LuaState::pushString(const std::string& str)
+{
 	lua_pushstring(state, str.c_str());
 }
 
-void LuaState::pushUserdata(void* ptr) {
+void LuaState::pushUserdata(void* ptr)
+{
 	lua_pushlightuserdata(state, ptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Push an empty instance of a class
 
-Script::ObjectID* LuaState::pushClassInstance(const std::string& cname) {
+Script::ObjectID* LuaState::pushClassInstance(const std::string& cname)
+{
 	Script::ObjectID* p = (Script::ObjectID*)lua_newuserdata(state, sizeof(Script::ObjectID));
 	lua_getfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
 	lua_setmetatable(state, -2);
 	return p;
 }
 
-void LuaState::pushClassTableInstance(const std::string& cname) {
+void LuaState::pushClassTableInstance(const std::string& cname)
+{
 	newTable();
 	lua_getfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
 	lua_setmetatable(state, -2);
 }
 
+void LuaState::getMetaObject()
+{
+	if(lua_getmetatable(state, -1)){
+		lua_getfield(state, -1, "__object"); // Get __object
+		if(lua_isnil(state, -1)){
+			// No __object member, use it directly
+			pop(2); // Pop the nil & metatable
+		}
+		else{
+			// It had a __object member, use it!
+
+			swap(-2); // Swap __object with metatable on stack
+			pop(); // Pop metatable, now __object is ontop of stack
+		}
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Event pushing/popping
 
-void LuaState::pushCallback(Script::Listener_ptr listener) {
+void LuaState::pushCallback(Script::Listener_ptr listener)
+{
 	lua_getfield(state, LUA_REGISTRYINDEX, listener->getLuaTag().c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Advanced type pushing/popping
 
-void LuaState::pushEvent(Script::Event& event) {
-	event.push_instance(*this, enviroment);
+void LuaState::pushEvent(Script::Event& event)
+{
+	event.push_instance(*this, environment);
 }
 
-void LuaState::pushPosition(const Position& pos) {
+void LuaState::pushPosition(const Position& pos)
+{
 	newTable();
 	pushInteger(pos.x);
 	setField(-2, "x");
@@ -275,7 +341,8 @@ void LuaState::pushPosition(const Position& pos) {
 	setField(-2, "z");
 }
 
-void LuaState::pushPosition(const PositionEx& pos) {
+void LuaState::pushPosition(const PositionEx& pos)
+{
 	newTable();
 	pushInteger(pos.x);
 	setField(-2, "x");
@@ -287,7 +354,27 @@ void LuaState::pushPosition(const PositionEx& pos) {
 	setField(-2, "stackpos");
 }
 
-void LuaState::pushThing(Thing* thing) {
+void LuaState::pushOutfit(const Outfit_t& outfit)
+{
+	newTable();
+	pushInteger(outfit.lookType);
+	setField(-2, "type");
+	pushInteger(outfit.lookHead);
+	setField(-2, "head");
+	pushInteger(outfit.lookBody);
+	setField(-2, "body");
+	pushInteger(outfit.lookLegs);
+	setField(-2, "legs");
+	pushInteger(outfit.lookFeet);
+	setField(-2, "feet");
+	pushInteger(outfit.lookTypeEx);
+	setField(-2, "item");
+	pushInteger(outfit.lookAddons);
+	setField(-2, "addons");
+}
+
+void LuaState::pushThing(Thing* thing)
+{
 	if(thing && thing->getItem()){
 		Item* item = thing->getItem();
 		Script::ObjectID* objid = NULL;
@@ -301,7 +388,7 @@ void LuaState::pushThing(Thing* thing) {
 		else {
 			objid = pushClassInstance("Item");
 		}
-		*objid = enviroment.addThing(item);
+		*objid = environment.addThing(item);
 	}
 	else if(thing && thing->getCreature()) {
 		Creature* creature = thing->getCreature();
@@ -317,19 +404,20 @@ void LuaState::pushThing(Thing* thing) {
 			pushNil();
 			return;
 		}
-		*objid = enviroment.addThing(creature);
+		*objid = environment.addThing(creature);
 	} else if(thing && thing->getTile()) {
 		pushTile(thing->getTile());
 	} else if(thing) {
 		Script::ObjectID* objid;
 		objid = pushClassInstance("Thing");
-		*objid = enviroment.addThing(thing);
+		*objid = environment.addThing(thing);
 	} else {
 		pushNil();
 	}
 }
 
-void LuaState::pushTile(Tile* tile) {
+void LuaState::pushTile(Tile* tile)
+{
 	if(tile) {
 		pushClassTableInstance("Tile");
 		setField(-1, "__x", tile->getPosition().x);
@@ -340,7 +428,8 @@ void LuaState::pushTile(Tile* tile) {
 	}
 }
 
-void LuaState::pushTown(Town* town) {
+void LuaState::pushTown(Town* town)
+{
 	if(town) {
 		Script::ObjectID* objid = pushClassInstance("Town");
 		*objid = town->getTownID();
@@ -349,34 +438,38 @@ void LuaState::pushTown(Town* town) {
 	}
 }
 
-void LuaState::pushHouse(House* house) {
+void LuaState::pushHouse(House* house)
+{
 	if(house) {
 		Script::ObjectID* objid = pushClassInstance("House");
-		*objid = enviroment.addObject(house);
+		*objid = environment.addObject(house);
 	} else {
 		pushNil();
 	}
 }
 
-void LuaState::pushChannel(ChatChannel* channel) {
+void LuaState::pushChannel(ChatChannel* channel)
+{
 	if(channel) {
 		Script::ObjectID* objid = pushClassInstance("Channel");
-		*objid = enviroment.addObject(channel);
+		*objid = environment.addObject(channel);
 	} else {
 		pushNil();
 	}
 }
 
-void LuaState::pushWaypoint(Waypoint_ptr wp) {
+void LuaState::pushWaypoint(Waypoint_ptr wp)
+{
 	if(wp) {
 		Script::ObjectID* objid = pushClassInstance("Waypoint");
-		*objid = enviroment.addObject(wp.get());
+		*objid = environment.addObject(wp.get());
 	} else {
 		pushNil();
 	}
 }
 
-Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
 	Position pos(0, 0, 0);
 	if(!isTable(-1)) {
 		HandleError(mode, "Attempt to treat non-table value as a position.");
@@ -393,7 +486,37 @@ Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW *
 	return pos;
 }
 
-Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Outfit_t LuaState::popOutfit(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	Outfit_t outfit;
+	if(!isTable(-1)) {
+		HandleError(mode, "Attempt to treat non-table value as an outfit.");
+		pop();
+		return outfit;
+	}
+	getField(-1, "type");
+	outfit.lookType = popInteger();
+	getField(-1, "head");
+	outfit.lookHead = popInteger();
+	getField(-1, "body");
+	outfit.lookBody = popInteger();
+	getField(-1, "legs");
+	outfit.lookLegs = popInteger();
+	getField(-1, "feet");
+	outfit.lookFeet = popInteger();
+	getField(-1, "item");
+	outfit.lookTypeEx = popInteger();
+	getField(-1, "addons");
+	outfit.lookAddons = popInteger();
+
+	pop();
+	return outfit;
+}
+
+Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	getMetaObject();
+
 	if(!isTable(-1)) {
 		HandleError(mode, std::string("Couldn't pop tile, top object is not of valid type (") + luaL_typename(state, -1) + ")");
 		pop();
@@ -412,7 +535,10 @@ Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	return tile;
 }
 
-Town* LuaState::popTown(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Town* LuaState::popTown(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	getMetaObject();
+
 	if(!isUserdata(-1)) {
 		HandleError(mode, std::string("Couldn't pop town, top object is not of valid type (") + luaL_typename(state, -1) + ")");
 		pop();
@@ -425,7 +551,10 @@ Town* LuaState::popTown(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	return Towns::getInstance().getTown((uint32_t)*objid);
 }
 
-ChatChannel* LuaState::popChannel(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+ChatChannel* LuaState::popChannel(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	getMetaObject();
+
 	if(!isUserdata(-1)) {
 		HandleError(mode, std::string("Couldn't pop channel, top object is not of valid type (") + luaL_typename(state, -1) + ")");
 		pop();
@@ -435,10 +564,13 @@ ChatChannel* LuaState::popChannel(Script::ErrorMode mode /* = Script::ERROR_THRO
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
 
-	return (ChatChannel*)enviroment.getObject(*objid);
+	return (ChatChannel*)environment.getObject(*objid);
 }
 
-House* LuaState::popHouse(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+House* LuaState::popHouse(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	getMetaObject();
+
 	if(!isUserdata(-1)) {
 		HandleError(mode, std::string("Couldn't pop house, top object is not of valid type (") + luaL_typename(state, -1) + ")");
 		pop();
@@ -448,10 +580,13 @@ House* LuaState::popHouse(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
 
-	return (House*)enviroment.getObject(*objid);
+	return (House*)environment.getObject(*objid);
 }
 
-Waypoint_ptr LuaState::popWaypoint(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Waypoint_ptr LuaState::popWaypoint(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	getMetaObject();
+
 	if(!isUserdata(-1)) {
 		HandleError(mode, std::string("Couldn't pop waypoint, top object is not of valid type (") + luaL_typename(state, -1) + ")");
 		pop();
@@ -461,10 +596,13 @@ Waypoint_ptr LuaState::popWaypoint(Script::ErrorMode mode /* = Script::ERROR_THR
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
 
-	return ((Waypoint*)enviroment.getObject(*objid))->shared_from_this();
+	return ((Waypoint*)environment.getObject(*objid))->shared_from_this();
 }
 
-Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	getMetaObject();
+
 	if(!isUserdata(-1)) {
 		HandleError(mode, std::string("Couldn't pop thing, top object is not of valid type (") + luaL_typename(state, -1) + ")");
 		pop();
@@ -473,13 +611,14 @@ Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
-	Thing* thing = enviroment.getThing(*objid);
+	Thing* thing = environment.getThing(*objid);
 	if(!thing) HandleError(mode, "Object does not exist in object list.");
 
 	return thing;
 }
 
-Creature* LuaState::popCreature(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Creature* LuaState::popCreature(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
 	Thing* t = popThing(mode);
 	if(t) {
 		Creature* c = t->getCreature();
@@ -489,7 +628,8 @@ Creature* LuaState::popCreature(Script::ErrorMode mode /* = Script::ERROR_THROW 
 	return NULL;
 }
 
-Player* LuaState::popPlayer(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Player* LuaState::popPlayer(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
 	Creature* c = popCreature(mode);
 	if(c) {
 		Player* p = c->getPlayer();
@@ -499,7 +639,8 @@ Player* LuaState::popPlayer(Script::ErrorMode mode /* = Script::ERROR_THROW */) 
 	return NULL;
 }
 
-Actor* LuaState::popActor(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Actor* LuaState::popActor(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
 	Creature* c = popCreature(mode);
 	if(c) {
 		Actor* a = c->getActor();
@@ -509,7 +650,8 @@ Actor* LuaState::popActor(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 	return NULL;
 }
 
-Item* LuaState::popItem(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
+Item* LuaState::popItem(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
 	Thing* t = popThing(mode);
 	if(t) {
 		Item* i = t->getItem();
@@ -522,7 +664,8 @@ Item* LuaState::popItem(Script::ErrorMode mode /* = Script::ERROR_THROW */) {
 ///////////////////////////////////////////////////////////////////////////////
 // Lua State Thread
 
-LuaStateManager::LuaStateManager(Script::Enviroment& enviroment) : LuaState(enviroment) {
+LuaStateManager::LuaStateManager(Script::Environment& environment) : LuaState(environment)
+{
 	state = luaL_newstate();
 	if(!state){
 		throw std::runtime_error("Could not create lua context, fatal error");
@@ -544,7 +687,8 @@ LuaStateManager::~LuaStateManager() {
 	lua_close(state);
 }
 
-bool LuaStateManager::loadFile(std::string file) {
+bool LuaStateManager::loadFile(std::string file)
+{
 	//loads file as a chunk at stack top
 	int ret = luaL_loadfile(state, file.c_str());
 
@@ -566,20 +710,23 @@ bool LuaStateManager::loadFile(std::string file) {
 	return true;
 }
 
-LuaThread_ptr LuaStateManager::newThread(const std::string& name) {
+LuaThread_ptr LuaStateManager::newThread(const std::string& name)
+{
 	LuaThread_ptr p(new LuaThread(*this, name));
 	threads[p->state] = p;
 	return p;
 }
 
-void LuaStateManager::scheduleThread(int32_t schedule, LuaThread_ptr thread) {
+void LuaStateManager::scheduleThread(int32_t schedule, LuaThread_ptr thread)
+{
 	ThreadSchedule s;
 	s.scheduled_time = OTSYS_TIME() + schedule;
 	s.thread = thread;
 	queued_threads.push(s);
 }
 
-void LuaStateManager::runScheduledThreads() {
+void LuaStateManager::runScheduledThreads()
+{
 	int64_t current_time = OTSYS_TIME();
 	while(queued_threads.empty() == false) {
 		const ThreadSchedule& scheduled = queued_threads.top();
@@ -602,7 +749,7 @@ void LuaStateManager::runScheduledThreads() {
 // Child Thread
 
 LuaThread::LuaThread(LuaStateManager& manager, const std::string& name) :
-	LuaState(manager.enviroment),
+	LuaState(manager.environment),
 	manager(manager),
 	name(name),
 	thread_state(0)
@@ -611,18 +758,22 @@ LuaThread::LuaThread(LuaStateManager& manager, const std::string& name) :
 	lua_pop(manager.state, 1); // Remove the thread from the main stack
 }
 
-LuaThread::~LuaThread() {
+LuaThread::~LuaThread()
+{
 }
 
-bool LuaThread::ok() const {
+bool LuaThread::ok() const
+{
 	return thread_state == 0 || thread_state == LUA_YIELD;
 }
 
-Script::Manager* LuaThread::getManager() {
+Script::Manager* LuaThread::getManager()
+{
 	return static_cast<Script::Manager*>(&manager);
 }
 
-void LuaThread::report(){
+void LuaThread::report()
+{
 	std::string errmsg = popString();
 	std::cout << "Lua Error: " << errmsg << "\n";
 	std::cout << "Stack trace:\n";
@@ -651,7 +802,8 @@ void LuaThread::report(){
 	}
 }
 
-int32_t LuaThread::run(int args) {
+int32_t LuaThread::run(int args)
+{
 	int ret = lua_resume(state, args);
 	thread_state = ret;
 	if(ret == LUA_YIELD) {

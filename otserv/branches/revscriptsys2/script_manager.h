@@ -25,13 +25,13 @@
 
 namespace Script {
 	class Event;
-	class Enviroment;
+	class Environment;
 	class LuaClassType;
 	typedef shared_ptr<LuaClassType> LuaClassType_ptr;
 
 	class Manager : public LuaStateManager {
 	public:
-		Manager(Enviroment& e);
+		Manager(Environment& e);
 		virtual ~Manager();
 
 		// Event handling
@@ -41,6 +41,7 @@ namespace Script {
 		// Defined in script functions.cpp
 		void registerFunctions();
 		void registerClasses();
+		void registerMetaMethods();
 
 	protected:
 		virtual Manager* getManager();
@@ -79,6 +80,7 @@ namespace Script {
 		// Callback from lua
 		static int luaFunctionCallback(lua_State* L);
 		static int luaCompareClassInstances(lua_State* L);
+		static int luaGetClassInstanceID(lua_State* L);
 
 		// Parse arguments
 		ComposedCallback_ptr parseFunctionDeclaration(std::string s);

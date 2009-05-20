@@ -20,7 +20,7 @@
 
 #include "lua_manager.h"
 #include "script_event.h"
-#include "script_enviroment.h"
+#include "script_environment.h"
 #include "script_listener.h"
 #include "script_manager.h"
 #include "tools.h"
@@ -28,6 +28,7 @@
 #include "tile.h"
 #include "player.h"
 #include "creature.h"
+#include "actor.h"
 #include "item.h"
 
 uint32_t Script::Event::eventID_counter = 0;
@@ -44,7 +45,7 @@ Event::Event() : eventID(++eventID_counter), propagate_by_default(false)
 Event::~Event() {
 }
 
-bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener)
+bool Event::call(Manager& state, Environment& environment, Listener_ptr listener)
 {
 	LuaThread_ptr thread = state.newThread(this->getName());
 
@@ -83,7 +84,7 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener)
 	thread->getRegistryItem(lua_tag);
 
 	// Update this instance with values from lua
-	update_instance(state, enviroment, thread);
+	update_instance(state, environment, thread);
 
 	// Find out if the event should propagate
 	bool propagate = propagate_by_default;
@@ -113,27 +114,60 @@ bool Event::call(Manager& state, Enviroment& enviroment, Listener_ptr listener)
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered just after the server loads
 
-OnServerLoad::Event::Event(bool is_reload) :
-	is_reload(is_reload)
+OnServerLoad::Event::Event(bool real_startup) :
+	real_startup(real_startup)
 {
+	propagate_by_default = true;
 }
 
 OnServerLoad::Event::~Event() {
 }
 
-bool OnServerLoad::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnServerLoad::Event::dispatch(Manager& state, Environment& environment) {
 	return dispatchEvent<OnServerLoad::Event>
-		(this, state, enviroment, enviroment.Generic.OnLoad);
+		(this, state, environment, environment.Generic.OnLoad);
 }
 
-void OnServerLoad::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnServerLoad::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnServerLoad");
-	state.setField(-1, "reload", true);
+	state.setField(-1, "reload", !real_startup);
+	state.setField(-1, "startup", real_startup);
 }
 
-void OnServerLoad::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnServerLoad::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 	// ...
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnServerUnload Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered just after the server loads
+
+OnServerUnload::Event::Event(bool real_shutdown) :
+	real_shutdown(real_shutdown)
+{
+	propagate_by_default = true;
+}
+
+OnServerUnload::Event::~Event() {
+}
+
+bool OnServerUnload::Event::dispatch(Manager& state, Environment& environment) {
+	return dispatchEvent<OnServerUnload::Event>
+		(this, state, environment, environment.Generic.OnUnload);
+}
+
+void OnServerUnload::Event::push_instance(LuaState& state, Environment& environment) {
+	state.pushClassTableInstance("OnServerUnload");
+	state.setField(-1, "reload", !real_shutdown);
+	state.setField(-1, "shutdown", real_shutdown);
+}
+
+void OnServerUnload::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
+	// ...
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnSay Event
@@ -171,18 +205,18 @@ bool OnSay::Event::check_match(const ScriptInformation& info) {
 	return false;
 }
 
-bool OnSay::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnSay::Event::dispatch(Manager& state, Environment& environment) {
 	ListenerList list = speaker->getListeners(ON_SAY_LISTENER);
 	if(dispatchEvent<OnSay::Event, ScriptInformation>
-			(this, state, enviroment, list)
+			(this, state, environment, list)
 		)
 		return true;
 
 	return dispatchEvent<OnSay::Event, ScriptInformation>
-		(this, state, enviroment, enviroment.Generic.OnSay);
+		(this, state, environment, environment.Generic.OnSay);
 }
 
-void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnSay::Event::push_instance(LuaState& state, Environment& environment) {
 	//std::cout << "pushing instance" << std::endl;
 	state.pushClassTableInstance("OnSayEvent");
 	state.pushThing(speaker);
@@ -191,11 +225,11 @@ void OnSay::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.setField(-2, "channel");
 	state.setField(-1, "class", int32_t(speak_class));
 	state.setField(-1, "text", text);
-	//std::cout << state.typeOf() << ":" << state.getStackTop() << std::endl;
+	//std::cout << state.typeOf() << ":" << state.getStackSize() << std::endl;
 	//std::cout << "endof" << std::endl;
 }
 
-void OnSay::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnSay::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 	thread->getField(-1, "class");
 	if(thread->isNumber()) {
 		speak_class = (SpeakClass)thread->popInteger();
@@ -232,17 +266,16 @@ OnHear::Event::Event(Creature* creature, Creature* talking_creature, const std::
 OnHear::Event::~Event() {
 }
 
-bool OnHear::Event::dispatch(Manager& state, Enviroment& enviroment)
+bool OnHear::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerList list = creature->getListeners(ON_HEAR_LISTENER);
-	if(dispatchEvent<OnHear::Event>(this, state, enviroment, list))
+	if(dispatchEvent<OnHear::Event>(this, state, environment, list))
 		return true;
 	return false;
 }
 
-void OnHear::Event::push_instance(LuaState& state, Enviroment& enviroment) 
+void OnHear::Event::push_instance(LuaState& state, Environment& environment) 
 {
-	//std::cout << "pushing instance" << std::endl;
 	state.pushClassTableInstance("OnHearEvent");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
@@ -250,11 +283,9 @@ void OnHear::Event::push_instance(LuaState& state, Enviroment& enviroment)
 	state.setField(-2, "talking_creature");
 	state.setField(-1, "class", int32_t(speak_class));
 	state.setField(-1, "text", message);
-	//std::cout << state.typeOf() << ":" << state.getStackTop() << std::endl;
-	//std::cout << "endof" << std::endl;
 }
 
-void OnHear::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread)
+void OnHear::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
 }
 
@@ -290,15 +321,15 @@ bool OnUseItem::Event::check_match(const ScriptInformation& info)
 	return false;
 }
 
-bool OnUseItem::Event::dispatch(Manager& state, Enviroment& enviroment) 
+bool OnUseItem::Event::dispatch(Manager& state, Environment& environment) 
 {
 	// Extremely naive solution
 	// Should be a map with id:callback instead.
 	return dispatchEvent<OnUseItem::Event, ScriptInformation>
-		(this, state, enviroment, enviroment.Generic.OnUseItem);
+		(this, state, environment, environment.Generic.OnUseItem);
 }
 
-void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment) 
+void OnUseItem::Event::push_instance(LuaState& state, Environment& environment) 
 {
 	state.pushClassTableInstance("OnUseItemEvent");
 	state.pushThing(user);
@@ -314,7 +345,7 @@ void OnUseItem::Event::push_instance(LuaState& state, Enviroment& enviroment)
 	state.setField(-2, "target");
 }
 
-void OnUseItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) 
+void OnUseItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) 
 {
 	thread->getField(-1, "retval");
 	if(thread->isNumber()) {
@@ -376,14 +407,14 @@ bool OnEquipItem::Event::check_match(const ScriptInformation& info) {
 	return false;
 }
 
-bool OnEquipItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnEquipItem::Event::dispatch(Manager& state, Environment& environment) {
 	// Extremely naive solution
 	// Should be a map with id:callback instead.
 	return dispatchEvent<OnEquipItem::Event, ScriptInformation>
-		(this, state, enviroment, enviroment.Generic.OnEquipItem);
+		(this, state, environment, environment.Generic.OnEquipItem);
 }
 
-void OnEquipItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnEquipItem::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnEquipItemEvent");
 	state.pushThing(user);
 	state.setField(-2, "player");
@@ -391,7 +422,7 @@ void OnEquipItem::Event::push_instance(LuaState& state, Enviroment& enviroment) 
 	state.setField(-2, "item");
 }
 
-void OnEquipItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnEquipItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -399,9 +430,9 @@ void OnEquipItem::Event::update_instance(Manager& state, Enviroment& enviroment,
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature moves
 
-OnMoveCreature::Event::Event(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile) :
+OnMoveCreature::Event::Event(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile) :
 	actor(actor),
-	creature(creature),
+	moving_creature(moving_creature),
 	fromTile(fromTile),
 	toTile(toTile),
 	moveType(TYPE_NONE)
@@ -456,23 +487,23 @@ bool OnMoveCreature::Event::isMatch(const ScriptInformation& info, Tile* tile) {
 	return false;
 }
 
-bool OnMoveCreature::Event::dispatch(Manager& state, Enviroment& enviroment) {
-	ListenerList list = creature->getListeners(ON_MOVE_CREATURE_LISTENER);
+bool OnMoveCreature::Event::dispatch(Manager& state, Environment& environment) {
+	ListenerList list = moving_creature->getListeners(ON_MOVE_CREATURE_LISTENER);
 	if(dispatchEvent<OnMoveCreature::Event, ScriptInformation>
-			(this, state, enviroment, list)
+			(this, state, environment, list)
 		)
 		return true;
 
 	// Extremely naive solution
 	// Should be a map with id:callback instead.
 	return dispatchEvent<OnMoveCreature::Event, ScriptInformation>
-		(this, state, enviroment, enviroment.Generic.OnMoveCreature);
+		(this, state, environment, environment.Generic.OnMoveCreature);
 }
 
-void OnMoveCreature::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnMoveCreature::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnMoveCreatureEvent");
 	state.pushThing(actor);
-	state.setField(-2, "actor");
+	state.setField(-2, "creature");
 
 	if(moveType == TYPE_MOVE){
 		state.pushThing(fromTile);
@@ -489,11 +520,11 @@ void OnMoveCreature::Event::push_instance(LuaState& state, Enviroment& enviromen
 		state.setField(-2, "fromTile");
 	}
 
-	state.pushThing(creature);
-	state.setField(-2, "creature");
+	state.pushThing(moving_creature);
+	state.setField(-2, "moving_creature");
 }
 
-void OnMoveCreature::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnMoveCreature::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -511,18 +542,18 @@ OnTurn::Event::Event(Creature* creature, Direction dir) :
 OnTurn::Event::~Event() {
 }
 
-bool OnTurn::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnTurn::Event::dispatch(Manager& state, Environment& environment) {
 	ListenerList list = creature->getListeners(ON_TURN_LISTENER);
 	if(dispatchEvent<OnTurn::Event>
-			(this, state, enviroment, list)
+			(this, state, environment, list)
 		)
 		return true;
 
 	return dispatchEvent<OnTurn::Event>
-		(this, state, enviroment, enviroment.Generic.OnTurn);
+		(this, state, environment, environment.Generic.OnTurn);
 }
 
-void OnTurn::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnTurn::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnTurnEvent");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
@@ -530,7 +561,7 @@ void OnTurn::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.setField(-2, "direction");
 }
 
-void OnTurn::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnTurn::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 	// ...
 }
 
@@ -596,24 +627,24 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info) {
 	return false;
 }
 
-bool OnMoveItem::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnMoveItem::Event::dispatch(Manager& state, Environment& environment) {
 	// Extremely naive solution
 	// Should be a map with id:callback instead.
 	return dispatchEvent<OnMoveItem::Event, ScriptInformation>
-		(this, state, enviroment, enviroment.Generic.OnMoveItem);
+		(this, state, environment, environment.Generic.OnMoveItem);
 }
 
-void OnMoveItem::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnMoveItem::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnMoveItemEvent");
 	state.pushThing(actor);
-	state.setField(-2, "actor");
+	state.setField(-2, "creature");
 	state.pushThing(tile);
 	state.setField(-2, "tile");
 	state.pushThing(item);
 	state.setField(-2, "item");
 }
 
-void OnMoveItem::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnMoveItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 }
 
 
@@ -632,17 +663,17 @@ OnJoinChannel::Event::Event(Player* chatter, ChatChannel* channel) :
 OnJoinChannel::Event::~Event() {
 }
 
-bool OnJoinChannel::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnJoinChannel::Event::dispatch(Manager& state, Environment& environment) {
 	ListenerList list = chatter->getListeners(ON_OPEN_CHANNEL_LISTENER);
 	if(dispatchEvent<OnJoinChannel::Event>
-			(this, state, enviroment, list)
+			(this, state, environment, list)
 		)
 		return true;
 	return dispatchEvent<OnJoinChannel::Event>
-		(this, state, enviroment, enviroment.Generic.OnJoinChannel);
+		(this, state, environment, environment.Generic.OnJoinChannel);
 }
 
-void OnJoinChannel::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnJoinChannel::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnJoinChannelEvent");
 	state.pushThing(chatter);
 	state.setField(-2, "player");
@@ -650,7 +681,7 @@ void OnJoinChannel::Event::push_instance(LuaState& state, Enviroment& enviroment
 	state.setField(-2, "channel");
 }
 
-void OnJoinChannel::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnJoinChannel::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 	// Nothing can change...
 }
 
@@ -670,17 +701,17 @@ OnLeaveChannel::Event::Event(Player* chatter, ChatChannel* channel) :
 OnLeaveChannel::Event::~Event() {
 }
 
-bool OnLeaveChannel::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnLeaveChannel::Event::dispatch(Manager& state, Environment& environment) {
 	ListenerList list = chatter->getListeners(ON_CLOSE_CHANNEL_LISTENER);
 	if(dispatchEvent<OnLeaveChannel::Event>
-			(this, state, enviroment, list)
+			(this, state, environment, list)
 		)
 		return true;
 	return dispatchEvent<OnLeaveChannel::Event>
-		(this, state, enviroment, enviroment.Generic.OnLeaveChannel);
+		(this, state, environment, environment.Generic.OnLeaveChannel);
 }
 
-void OnLeaveChannel::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnLeaveChannel::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnLeaveChannelEvent");
 	state.pushThing(chatter);
 	state.setField(-2, "player");
@@ -688,7 +719,7 @@ void OnLeaveChannel::Event::push_instance(LuaState& state, Enviroment& enviromen
 	state.setField(-2, "channel");
 }
 
-void OnLeaveChannel::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnLeaveChannel::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 	// Nothing can change...
 }
 
@@ -707,18 +738,18 @@ OnLogin::Event::Event(Player* player) :
 OnLogin::Event::~Event() {
 }
 
-bool OnLogin::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnLogin::Event::dispatch(Manager& state, Environment& environment) {
 	return dispatchEvent<OnLogin::Event>
-		(this, state, enviroment, enviroment.Generic.OnLogin);
+		(this, state, environment, environment.Generic.OnLogin);
 }
 
-void OnLogin::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnLogin::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnLogin");
 	state.pushThing(player);
 	state.setField(-2, "player");
 }
 
-void OnLogin::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnLogin::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 	// Nothing can change...
 }
 
@@ -739,17 +770,17 @@ OnLogout::Event::Event(Player* player, bool forced, bool timeout) :
 OnLogout::Event::~Event() {
 }
 
-bool OnLogout::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnLogout::Event::dispatch(Manager& state, Environment& environment) {
 	ListenerList list = player->getListeners(ON_LOGOUT_LISTENER);
 	if(dispatchEvent<OnLogout::Event>
-			(this, state, enviroment, list)
+			(this, state, environment, list)
 		)
 		return true;
 	return dispatchEvent<OnLogout::Event>
-		(this, state, enviroment, enviroment.Generic.OnLogout);
+		(this, state, environment, environment.Generic.OnLogout);
 }
 
-void OnLogout::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnLogout::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnLogout");
 	state.pushThing(player);
 	state.setField(-2, "player");
@@ -757,7 +788,7 @@ void OnLogout::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.setField(-1, "timeout", timeout);
 }
 
-void OnLogout::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnLogout::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 	// Nothing can change...
 }
 
@@ -801,20 +832,20 @@ bool OnLook::Event::check_match(const ScriptInformation& info) {
 	return false;
 }
 
-bool OnLook::Event::dispatch(Manager& state, Enviroment& enviroment) {
+bool OnLook::Event::dispatch(Manager& state, Environment& environment) {
 	ListenerList list = player->getListeners(ON_LOOK_LISTENER);
 	if(dispatchEvent<OnLook::Event>
-			(this, state, enviroment, list)
+			(this, state, environment, list)
 		)
 		return true;
 
 	// Extremely naive solution
 	// Should be a map with id:callback instead.
 	return dispatchEvent<OnLook::Event, ScriptInformation>
-		(this, state, enviroment, enviroment.Generic.OnLook);
+		(this, state, environment, environment.Generic.OnLook);
 }
 
-void OnLook::Event::push_instance(LuaState& state, Enviroment& enviroment) {
+void OnLook::Event::push_instance(LuaState& state, Environment& environment) {
 	state.pushClassTableInstance("OnLookEvent");
 	state.pushThing(player);
 	state.setField(-2, "player");
@@ -823,7 +854,7 @@ void OnLook::Event::push_instance(LuaState& state, Enviroment& enviroment) {
 	state.setField(-2, "object");
 }
 
-void OnLook::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread) {
+void OnLook::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) {
 	thread->getField(-1, "description");
 	if(thread->isString()) {
 		desc = thread->popString();
@@ -850,25 +881,25 @@ OnSpotCreature::Event::~Event()
 {
 }
 
-bool OnSpotCreature::Event::dispatch(Manager& state, Enviroment& enviroment) 
+bool OnSpotCreature::Event::dispatch(Manager& state, Environment& environment) 
 {
 	ListenerList list = creature->getListeners(ON_SPOT_CREATURE_LISTENER);
 	if(dispatchEvent<OnSpotCreature::Event>
-			(this, state, enviroment, list))
+			(this, state, environment, list))
 		return true;
 	return true;
 }
 
-void OnSpotCreature::Event::push_instance(LuaState& state, Enviroment& enviroment) 
+void OnSpotCreature::Event::push_instance(LuaState& state, Environment& environment) 
 {
 	state.pushClassTableInstance("OnSpotCreatureEvent");
 	state.pushThing(creature);
-	state.setField(-2, "player");
+	state.setField(-2, "creature");
 	state.pushThing(spotted_creature);
 	state.setField(-2, "spotted_creature");
 }
 
-void OnSpotCreature::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread)
+void OnSpotCreature::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
 	;
 }
@@ -889,25 +920,104 @@ OnLoseCreature::Event::~Event()
 {
 }
 
-bool OnLoseCreature::Event::dispatch(Manager& state, Enviroment& enviroment) 
+bool OnLoseCreature::Event::dispatch(Manager& state, Environment& environment) 
 {
 	ListenerList list = creature->getListeners(ON_LOSE_CREATURE_LISTENER);
 	if(dispatchEvent<OnLoseCreature::Event>
-			(this, state, enviroment, list))
+			(this, state, environment, list))
 		return true;
 	return true;
 }
 
-void OnLoseCreature::Event::push_instance(LuaState& state, Enviroment& enviroment) 
+void OnLoseCreature::Event::push_instance(LuaState& state, Environment& environment) 
 {
 	state.pushClassTableInstance("OnLoseCreatureEvent");
 	state.pushThing(creature);
-	state.setField(-2, "player");
+	state.setField(-2, "creature");
 	state.pushThing(lose_creature);
-	state.setField(-2, "lose_creature");
+	state.setField(-2, "lost_creature");
 }
 
-void OnLoseCreature::Event::update_instance(Manager& state, Enviroment& enviroment, LuaThread_ptr thread)
+void OnLoseCreature::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnSpawn Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature spawns on map
+
+OnSpawn::Event::Event(Actor* actor, bool reloading) :
+	actor(actor),
+	reloading(reloading)
+{
+	propagate_by_default = true;
+}
+
+OnSpawn::Event::~Event()
+{
+}
+
+bool OnSpawn::Event::dispatch(Manager& state, Environment& environment)
+{
+	Script::ListenerStringMap::iterator eiter = environment.Generic.OnSpawn.find(asLowerCaseString(actor->getName()));
+
+	if(eiter != environment.Generic.OnSpawn.end())
+		return dispatchEvent<OnSpawn::Event>
+			(this, state, environment, eiter->second);
+	return true;
+}
+
+void OnSpawn::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnSpawnEvent");
+	state.pushThing(actor);
+	state.setField(-2, "actor");
+	state.setField(-1, "reloading", reloading);
+}
+
+void OnSpawn::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnThink Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature thinks
+
+OnThink::Event::Event(Creature* creature, int interval) :
+	creature(creature),
+	interval(interval)
+{
+	propagate_by_default = true;
+}
+
+OnThink::Event::~Event()
+{
+}
+
+bool OnThink::Event::dispatch(Manager& state, Environment& environment)
+{
+	ListenerList list = creature->getListeners(ON_THINK_LISTENER);
+	if(dispatchEvent<OnThink::Event>
+			(this, state, environment, list))
+		return true;
+	return false;
+}
+
+void OnThink::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnThinkEvent");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	state.setField(-1, "interval", interval);
+}
+
+void OnThink::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
 	;
 }

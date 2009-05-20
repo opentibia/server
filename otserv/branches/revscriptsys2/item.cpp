@@ -162,9 +162,9 @@ void Item::copyAttributes(Item* item)
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
-/* REVSCRIPT TODO Remember to remove things from the script enviroment!
+/* REVSCRIPT TODO Remember to remove things from the script environment!
 	if(getUniqueId() != 0){
-		ScriptEnviroment::removeUniqueThing(this);
+		ScriptEnvironment::removeUniqueThing(this);
 	}
 */
 }
@@ -899,8 +899,8 @@ void Item::setUniqueId(uint16_t n)
 		return;
 
 	ItemAttributes::setUniqueId(n);
-	// REVSCRIPT TODO Make sure they are added to the enviroment
-	//ScriptEnviroment::addUniqueThing(this);
+	// REVSCRIPT TODO Make sure they are added to the environment
+	//ScriptEnvironment::addUniqueThing(this);
 }
 
 bool Item::canDecay()

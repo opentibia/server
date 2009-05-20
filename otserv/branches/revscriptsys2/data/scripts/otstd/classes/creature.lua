@@ -20,3 +20,33 @@ end
 function Creature:isCombatExhausted()
 	return false
 end
+
+function Creature:canSee(what, multifloor)
+	local myX = self:getX()
+	local myY = self:getY()
+	local myZ = self:getZ()
+	local px = what.x or what:getX()
+	local py = what.y or what:getY()
+	local pz = what.z or what:getZ()
+	
+	-- Kinda a copy of Creature::caneSee in C++
+	if myZ <= 7 then
+		if px > 7 then
+			return false
+		end
+	elseif myZ >= 8 then
+		if math.abs(myZ - ox) > 2 then
+			return false
+		end
+	end
+	
+	local offsetZ = myZ - oz
+	
+	
+	if(px >= myX - 8 + offsetZ) and (px <= myX + 8 + offsetZ) and
+	  (py >= myY - 6 + offsetZ) and (py <= myY + 6 + offsetZ) then
+		return true
+	end
+	
+	return false
+end

@@ -309,7 +309,7 @@ public:
 
 	virtual void setParent(Cylinder* cylinder);
 
-	virtual const Position& getPosition() const;
+	virtual Position getPosition() const;
 	virtual Tile* getTile(){return _tile;}
 	virtual const Tile* getTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;

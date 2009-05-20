@@ -33,6 +33,14 @@ class CreatureType;
 class Spawn;
 typedef std::list<Spawn*> SpawnList;
 
+struct spawnBlock_t{
+	CreatureType* mType;
+	Direction direction;
+	Position pos;
+	uint32_t interval;
+	int64_t lastSpawn;
+};
+
 class Spawns{
 private:
 	Spawns();
@@ -42,10 +50,9 @@ public:
 		static Spawns instance;
 		return &instance;
 	}
+	~Spawns();
 	
 	bool isInZone(const Position& centerPos, int32_t radius, const Position& pos);
-
-	~Spawns();
 	
 	bool loadFromXml(const std::string& datadir);
 	void startup();
@@ -56,26 +63,20 @@ public:
 	
 private:
 	SpawnList spawnList;
+
 	bool loaded, started;
 	std::string filename;
 };
 
-struct spawnBlock_t{
-	CreatureType* mType;
-	Direction direction;
-	Position pos;
-	uint32_t interval;
-	int64_t lastSpawn;
-};
-
 class Spawn{
 public:
-	Spawn(const Position& _pos, int32_t _radius);
+	Spawn(const Position& pos, int32_t radius);
 	~Spawn();
 	
-	bool addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval);
+	bool addMonster(const std::string& name, const Position& pos, Direction dir, uint32_t interval);
+	bool addNPC(const std::string& name, const Position& pos, Direction dir);
 	void removeMonster(Actor* monster);
-
+	
 	uint32_t getInterval() {return interval;}
 	void startup();
 

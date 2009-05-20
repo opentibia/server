@@ -22,7 +22,7 @@
 
 #include "script_manager.h"
 #include "script_event.h"
-#include "script_enviroment.h"
+#include "script_environment.h"
 
 #include "configmanager.h"
 
@@ -30,7 +30,7 @@ extern ConfigManager g_config;
 
 using namespace Script;
 
-Manager::Manager(Script::Enviroment& e) : LuaStateManager(e),
+Manager::Manager(Script::Environment& e) : LuaStateManager(e),
 	function_id_counter(1),
 	event_nested_level(0)
 {
@@ -47,7 +47,7 @@ bool Manager::dispatchEvent(Script::Event& event) {
 		return false;
 
 	event_nested_level++;
-	bool s = event.dispatch(*this, enviroment);
+	bool s = event.dispatch(*this, environment);
 	event_nested_level--;
 	return s;
 }
@@ -61,8 +61,15 @@ Manager* Manager::getManager() {
 
 int Manager::luaCompareClassInstances(lua_State* L)
 {
+	/*
+	std::cout << "Compare" << std::endl;
+	int n = lua_gettop(L);
+	while(--n >= 0)
+		std::cout << luaL_typename(L, -n-1) << std::endl;
+	*/
+
 	//Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
-	//Enviroment& e = manager->enviroment;
+	//Environment& e = manager->environment;
 	
 	// 2 class instances are ontop of the stack
 	Script::ObjectID* objid1 = (Script::ObjectID*)lua_touserdata(L, -1);
@@ -70,11 +77,35 @@ int Manager::luaCompareClassInstances(lua_State* L)
 
 	lua_pop(L, 2);
 
-	if(objid1 == objid2)
+	if(*objid1 == *objid2)
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);
 
+	return 1;
+}
+
+int Manager::luaGetClassInstanceID(lua_State* L)
+{
+	/*
+	std::cout << "GetID" << std::endl;
+	int n = lua_gettop(L);
+	while(--n >= 0)
+		std::cout << luaL_typename(L, -n-1) << std::endl;
+	*/
+
+	// Phantom instance (always NIL)
+	lua_pop(L, 1);
+
+	// A class instances are ontop of the stack
+	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(L, -1);
+	lua_pop(L, 1);
+
+	if(objid)
+		lua_pushnumber(L, (double)*objid);
+	else
+		lua_pushnil(L);
+	
 	return 1;
 }
 
@@ -99,7 +130,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 	try {
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
 
-		int argument_count = interface->getStackTop();
+		int argument_count = interface->getStackSize();
 		if((unsigned int)argument_count > cc->parameters.size()) {
 			throw Script::Error("Too many arguments passed to function " + cc->name);
 		}
@@ -291,7 +322,7 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 				assert(optional_level > 0);
 				optional_level -= 1;
 
-				while(optional_level > 1) {
+				while(optional_level >= 1) {
 					// After a ']' only another ']' can follow
 					assert(s[0] == ']');
 					s.erase(s.begin());
@@ -413,8 +444,27 @@ bool LuaClassType::isType(const std::string& typestring) const {
 ///////////////////////////////////////////////////////////////////////////////
 // Register Lua Classes
 
-void Manager::registerClass(const std::string& cname) {
+void Manager::registerMetaMethods()
+{
+	// Push this manager (pointer cast is important!)
+	lua_pushlightuserdata(state, (Manager*)this);
+	// Create the function, with the manager stored in the closure
+	lua_pushcclosure(state, &Manager::luaCompareClassInstances, 1);
+	lua_setfield(state, -2, "__eq");
+
+	// The # operator, which is "get ID", not length
+	// Push this manager (pointer cast is important!)
+	lua_pushlightuserdata(state, (Manager*)this);
+	// Create the function, with the manager stored in the closure
+	lua_pushcclosure(state, &Manager::luaGetClassInstanceID, 1);
+	lua_setfield(state, -2, "__len");
+}
+
+void Manager::registerClass(const std::string& cname)
+{
 	lua_newtable(state); // Metatable
+	registerMetaMethods();
+
 	lua_pushvalue(state, -1); // Another reference to the table
 	lua_setfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
 
@@ -425,13 +475,7 @@ void Manager::registerClass(const std::string& cname) {
 	
 	// Set the index metamethod for the class metatable to the class table
 	lua_setfield(state, -2, "__index"); 
-
-	// Push this manager (pointer cast is important!)
-	lua_pushlightuserdata(state, (Manager*)this);
-	// Create the function, with the manager stored in the closure
-	lua_pushcclosure(state, &Manager::luaCompareClassInstances, 1);
-	lua_setfield(state, -2, "__eq");
-
+	
 	// Pop the class metatable
 	lua_pop(state, 1); 
 
@@ -440,9 +484,13 @@ void Manager::registerClass(const std::string& cname) {
 }
 
 
-void Manager::registerClass(const std::string& cname, const std::string& parent_class) {
+void Manager::registerClass(const std::string& cname, const std::string& parent_class)
+{
 	lua_newtable(state); // Metatable
-	lua_pushvalue(state, -1); // Another reference to the table
+	registerMetaMethods();
+
+	// Another reference to the table
+	lua_pushvalue(state, -1);
 	lua_setfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
 	
 	lua_newtable(state); // Class table

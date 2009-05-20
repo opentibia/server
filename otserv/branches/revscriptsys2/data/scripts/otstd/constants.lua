@@ -385,3 +385,13 @@ PlayerFlag_CannotBeMuted = 36
 PlayerFlag_IsAlwaysPremium = 37
 PlayerFlag_CanAnswerRuleViolations = 38
 	
+
+SKILL_LEVEL = -2
+SKILL_MAGIC = -1
+SKILL_FIST = 0
+SKILL_CLUB = 1
+SKILL_SWORD = 2
+SKILL_AXE = 3
+SKILL_DIST = 4
+SKILL_SHIELD = 5
+SKILL_FISH = 6

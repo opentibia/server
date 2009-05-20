@@ -171,15 +171,11 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						}
 					}
 					else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"npc") == 0){
-
+						std::string name;
 						Direction direction = NORTH;
-						std::string name = "";
-						Position placePos = centerPos;
-
-						if(readXMLString(tmpNode, "name", strValue)){
-							name = strValue;
-						}
-						else{
+						Position pos = centerPos;
+						
+						if(!readXMLString(tmpNode, "name", name)){
 							tmpNode = tmpNode->next;
 							continue;
 						}
@@ -194,7 +190,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						}
 
 						if(readXMLInteger(tmpNode, "x", intValue)){
-							placePos.x += intValue;
+							pos.x += intValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
@@ -202,22 +198,14 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						}
 
 						if(readXMLInteger(tmpNode, "y", intValue)){
-							placePos.y += intValue;
+							pos.y += intValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
 							continue;
 						}
-
-						// REVSCRIPTSYS TODO
-						// Load NPCs
-						/*
-						Npc* npc = new Npc(name);
-
-						npc->setDirection(direction);
-						npc->setMasterPos(placePos, radius);
-						npcList.push_back(npc);
-						*/
+						
+						spawn->addNPC(name, pos, direction);
 					}
 
 					tmpNode = tmpNode->next;
@@ -316,7 +304,7 @@ bool Spawn::findPlayer(const Position& pos)
 			return true;
 		}
 	}
-
+	
 	return false;
 }
 
@@ -331,6 +319,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, CreatureType* mType, const Position& 
 	if(!monster){
 		return false;
 	}
+
 
 	if(startup){
 		//No need to send out events to the surrounding since there is no one out there to listen!
@@ -349,6 +338,11 @@ bool Spawn::spawnMonster(uint32_t spawnId, CreatureType* mType, const Position& 
 	monster->setDirection(dir);
 	monster->setSpawn(this);
 	monster->setMasterPos(pos, radius);
+
+	if(g_game.onSpawn(monster)){
+		g_game.removeCreature(monster);
+		return false;
+	}
 	monster->useThing2();
 
 	spawnedMap.insert(spawned_pair(spawnId, monster));
@@ -434,8 +428,7 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 {
 	CreatureType* mType = g_creature_types.getMonsterType(_name);
 	if(!mType){
-		// REVSCRIPT TODO Enable again
-		//std::cout << "[Spawn::addMonster] Can not find " << _name << std::endl;
+		std::cout << "[Spawn::addMonster] Can not find " << _name << std::endl;
 		return false;
 	}
 
@@ -452,6 +445,29 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 
 	uint32_t spawnId = (int)spawnMap.size() + 1;
 	spawnMap[spawnId] = sb;
+
+	return true;
+}
+
+bool Spawn::addNPC(const std::string& name, const Position& pos, Direction dir)
+{
+	CreatureType ct;
+	Outfit_t ot;
+	ot.lookType = 130;
+	ct.outfit(ot);
+
+	Actor* actor = Actor::create(ct);
+	actor->getType().name(name);
+
+	if(!g_game.placeCreature(actor, pos, false, true)){
+		delete actor;
+		return false;
+	}
+
+	if(g_game.onSpawn(actor)){
+		g_game.removeCreature(actor);
+		return false;
+	}
 
 	return true;
 }

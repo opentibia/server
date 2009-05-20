@@ -59,6 +59,11 @@ public:
 
 	CreatureType& getType();
 
+	bool shouldReload() const {return shouldReload_;}
+	void shouldReload(bool b) {shouldReload_ = b;}
+	bool alwaysThink() const {return alwaysThink_;}
+	void alwaysThink(bool b);
+
 	virtual uint32_t idRange(){ return 0x40000000;}
 	static AutoList<Actor> listMonster;
 	void removeList(){listMonster.removeList(getID());}
@@ -67,6 +72,7 @@ public:
 	virtual const std::string& getName() const {return cType.name();}
 	virtual const std::string& getNameDescription() const {return cType.nameDescription();}
 	virtual std::string getDescription(int32_t lookDistance) const {return strDescription + '.';}
+	virtual void updateNameDescription();
 
 	virtual RaceType_t getRace() const { return cType.race(); }
 	virtual int32_t getArmor() const { return cType.armor(); }
@@ -136,9 +142,12 @@ private:
 	bool resetTicks;
 	bool isActivated;
 	bool extraMeleeAttack;
+	bool isMasterInRange;
 
 	Spawn* spawn;
-	bool isMasterInRange;
+	bool shouldReload_;
+
+	bool alwaysThink_;
 
 	std::string strDescription;
 

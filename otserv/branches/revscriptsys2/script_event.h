@@ -23,7 +23,7 @@
 #include "boost/any.hpp"
 #include "boost_common.h"
 
-#include "script_enviroment.h"
+#include "script_environment.h"
 #include "script_listener.h"
 
 #include "const.h"
@@ -40,14 +40,14 @@ typedef boost::shared_ptr<LuaThread> LuaThread_ptr;
 
 namespace Script {
 	class Manager;
-	class Enviroment;
+	class Environment;
 }
 
 // These are actually defined in the .cpp file, so you CAN ONLY USE THEM IN script_event.cpp
 template<class T, class ScriptInformation>
-	bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list);
+	bool dispatchEvent(T* e, Script::Manager& state, Script::Environment& environment, Script::ListenerList& specific_list);
 template<class T>
-	bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list);
+	bool dispatchEvent(T* e, Script::Manager& state, Script::Environment& environment, Script::ListenerList& specific_list);
 
 namespace Script {
 
@@ -57,7 +57,7 @@ namespace Script {
 	 *    easiest is to copy an existing event that's similar.
 	 * 2. Add the listener type to enums.h
 	 * 3. Expose a registerListener function to lua (or many)
-	 * 4. Add the class to Enviroment::stopListener
+	 * 4. Add the class to Environment::stopListener
 	 * 5. Add callback from an arbitrary location in otserv source
 	 */
 
@@ -72,16 +72,16 @@ namespace Script {
 		virtual std::string getName() const = 0;
 
 		// Runs the event (ie. triggers all concerned listeners)
-		virtual bool dispatch(Manager& state, Script::Enviroment& enviroment) = 0;
+		virtual bool dispatch(Manager& state, Script::Environment& environment) = 0;
 
 		// Lua stack manipulation, push
-		virtual void push_instance(LuaState& state, Script::Enviroment& enviroment) = 0;
+		virtual void push_instance(LuaState& state, Script::Environment& environment) = 0;
 		// update, peek at top table and fill this event with values from it)
-		virtual void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread) = 0;
+		virtual void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread) = 0;
 
 		// Should not be called directly (calling functions 
 		// can't be made fiend due to compiler limitations)
-		bool call(Manager& stae, Enviroment& enviroment, Listener_ptr listener);
+		bool call(Manager& stae, Environment& environment, Listener_ptr listener);
 	protected:
 
 		uint32_t eventID;
@@ -92,25 +92,50 @@ namespace Script {
 
 	////////////////////////////////////////////////////////////////
 	// OnServerLoad event
-	// Triggered when a creature turns
+	// Triggered when the server has finished loading (after map),
+	// or when scripts are reloaded
 
 	namespace OnServerLoad {
 		class Event : public Script::Event {
 		public:
-			Event(bool reload);
+			Event(bool real_startup);
 			~Event();
 
 			std::string getName() const {return "OnServerLoad";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
-			bool is_reload;
+			bool real_startup;
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	// OnServerUnload event
+	// Triggered when server is shutdown, or right before a /reload
+
+	namespace OnServerUnload {
+		class Event : public Script::Event {
+		public:
+			Event(bool real_shutdown);
+			~Event();
+
+			std::string getName() const {return "OnServerUnload";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			bool real_shutdown;
 		};
 	}
 
@@ -140,14 +165,14 @@ namespace Script {
 			std::string getName() const {return "OnSay";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Creature* speaker;
@@ -163,6 +188,9 @@ namespace Script {
 	// Triggered when a creature hears another creature speak
 
 	namespace OnHear {
+		struct ScriptInformation {
+		};
+
 		class Event : public Script::Event {
 		public:
 			Event(Creature* creature, Creature* talking_creature, const std::string& message, const SpeakClass& speak_class);
@@ -171,11 +199,11 @@ namespace Script {
 			std::string getName() const {return "OnHear";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Creature* creature;
@@ -210,14 +238,14 @@ namespace Script {
 			std::string getName() const {return "OnUseItem";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Player* user;
@@ -253,14 +281,14 @@ namespace Script {
 			std::string getName() const {return "OnEquipItem";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Player* user;
@@ -298,26 +326,26 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* actor, Creature* creature, Tile* fromTile, Tile* toTile);
+			Event(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
 			~Event();
 
 			std::string getName() const {return "OnMoveCreature";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			bool isMatch(const ScriptInformation& info, Tile* tile);
 
 			Creature* actor;
-			Creature* creature;
+			Creature* moving_creature;
 			Tile* fromTile;
 			Tile* toTile;
 			MoveType moveType;
@@ -337,11 +365,11 @@ namespace Script {
 			std::string getName() const {return "OnTurn";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Creature* creature;
@@ -375,14 +403,14 @@ namespace Script {
 			std::string getName() const {return "OnMoveItem";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Creature* actor;
@@ -406,11 +434,11 @@ namespace Script {
 			std::string getName() const {return "OnJoinChannel";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Player* chatter;
@@ -431,11 +459,11 @@ namespace Script {
 			std::string getName() const {return "OnLeaveChannel";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Player* chatter;
@@ -456,11 +484,11 @@ namespace Script {
 			std::string getName() const {return "OnLogin";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Player* player;
@@ -480,11 +508,11 @@ namespace Script {
 			std::string getName() const {return "OnLogout";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Player* player;
@@ -507,11 +535,11 @@ namespace Script {
 			std::string getName() const {return "OnCombatDamage";}
 			
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Player* chatter;
@@ -546,14 +574,14 @@ namespace Script {
 			std::string getName() const {return "OnLook";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// This checks if the script information matches this events prerequiste (data members)
 			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Player* player;
@@ -575,11 +603,11 @@ namespace Script {
 			std::string getName() const {return "OnSpotCreature";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Creature* creature;
@@ -600,15 +628,65 @@ namespace Script {
 			std::string getName() const {return "OnLoseCreature";}
 
 			// Runs the event
-			bool dispatch(Manager& state, Enviroment& enviroment);
+			bool dispatch(Manager& state, Environment& environment);
 
 			// Lua stack manipulation
-			void push_instance(LuaState& state, Enviroment& enviroment);
-			void update_instance(Manager& state, Script::Enviroment& enviroment, LuaThread_ptr thread);
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
 			Creature* creature;
 			Creature* lose_creature;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnSpawn event
+	// Triggered when a creature is spawned
+
+	namespace OnSpawn {
+		class Event : public Script::Event {
+		public:
+			Event(Actor* actor, bool reloading = false);
+			~Event();
+
+			std::string getName() const {return "OnSpawn";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Actor* actor;
+			bool reloading;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnThink event
+	// Triggered when a creature thinks (ie. all the time)
+
+	namespace OnThink {
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, int interval);
+			~Event();
+
+			std::string getName() const {return "OnThink";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			int interval;
 		};
 	}
 }
@@ -617,46 +695,65 @@ namespace Script {
 // Implementation details
 
 template<class T, class ScriptInformation>
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
+bool dispatchEvent(T* e, Script::Manager& state, Script::Environment& environment, Script::Listener_ptr listener)
+{
+	if(listener->isActive() == false)
 		return false;
-	}
-	for(Script::ListenerList::iterator event_iter = specific_list.begin();
-		event_iter != specific_list.end();
-		++event_iter)
-	{
-		Script::Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-		const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
 
-		// Call handler
-		if(e->check_match(info)) {
-			if(e->call(state, enviroment, listener) == true) {
-				// Handled
-				return true;
-			}
+	const ScriptInformation& info = boost::any_cast<const ScriptInformation>(listener->getData());
+
+	// Call handler
+	if(e->check_match(info)) {
+		if(e->call(state, environment, listener) == true) {
+			// Handled
+			return true;
 		}
 	}
 	return false;
 }
 
-template<class T> // No script information!
-bool dispatchEvent(T* e, Script::Manager& state, Script::Enviroment& enviroment, Script::ListenerList& specific_list) {
-	if(specific_list.size() == 0) {
+template<class T>
+bool dispatchEvent(T* e, Script::Manager& state, Script::Environment& environment, Script::Listener_ptr listener)
+{
+	if(listener->isActive() == false)
 		return false;
+
+	// Call handler
+	if(e->call(state, environment, listener) == true) {
+		// Handled
+		return true;
 	}
+	return false;
+}
+
+template<class T, class ScriptInformation>
+bool dispatchEvent(T* e, Script::Manager& state, Script::Environment& environment, Script::ListenerList& specific_list)
+{
+	if(specific_list.size() == 0)
+		return false;
+	
 	for(Script::ListenerList::iterator event_iter = specific_list.begin();
 		event_iter != specific_list.end();
 		++event_iter)
 	{
-		Script::Listener_ptr listener = *event_iter;
-		if(listener->isActive() == false) continue;
-
-		// Call handler
-		if(e->call(state, enviroment, listener) == true) {
-			// Handled
+		if(dispatchEvent<T, ScriptInformation>(e, state, environment, *event_iter))
 			return true;
-		}
+	}
+	return false;
+}
+
+template<class T> // No script information!
+bool dispatchEvent(T* e, Script::Manager& state, Script::Environment& environment, Script::ListenerList& specific_list)
+{
+	if(specific_list.size() == 0)
+		return false;
+	
+	for(Script::ListenerList::iterator event_iter = specific_list.begin();
+		event_iter != specific_list.end();
+		++event_iter)
+	{
+		if(dispatchEvent<T>(e, state, environment, *event_iter))
+			return true;
 	}
 	return false;
 }
