@@ -2395,23 +2395,29 @@ void Player::preSave()
 
 void Player::addCombatExhaust(uint32_t ticks)
 {
-	// Add exhaust condition
-	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, ticks, 0);
-	addCondition(condition);
+	if(!hasFlag(PlayerFlag_HasNoExhaustion)){
+		// Add exhaust condition
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, ticks, 0);
+		addCondition(condition);
+	}
 }
 
 void Player::addHealExhaust(uint32_t ticks)
 {
-	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_HEAL, ticks, 0);
-	addCondition(condition);
+	if(!hasFlag(PlayerFlag_HasNoExhaustion)){
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_HEAL, ticks, 0);
+		addCondition(condition);
+	}
 }
 
 void Player::addInFightTicks(bool pzlock /*= false*/)
 {
-	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, g_game.getInFightTicks(), 0);
-	addCondition(condition);
-	if(pzlock)
-		pzLocked = true;
+	if(!hasFlag(PlayerFlag_NotGainInFight)){
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, g_game.getInFightTicks(), 0);
+		addCondition(condition);
+		if(pzlock)
+			pzLocked = true;
+	}
 }
 
 void Player::addDefaultRegeneration(uint32_t addTicks)
