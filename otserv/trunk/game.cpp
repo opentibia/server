@@ -2025,11 +2025,10 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 		return false;
 	}
 
-	if(channel->getId() != 0x03){
+	if(channel->getId() != CHANNEL_RULE_REP){
 		player->sendChannel(channel->getId(), channel->getName());
 	}
 	else{
-		// 0x03 is the Rule Violations channel, send it properly
 		player->sendRuleViolationsChannel(channel->getId());
 	}
 
@@ -2090,7 +2089,7 @@ bool Game::playerProcessRuleViolation(uint32_t playerId, const std::string& name
 	rvr.isOpen = false;
 	rvr.gamemaster = player;
 
-	ChatChannel* channel = g_chat.getChannelById(0x03);
+	ChatChannel* channel = g_chat.getChannelById(CHANNEL_RULE_REP);
 	if(channel){
 		for(UsersMap::const_iterator it = channel->getUsers().begin(); it != channel->getUsers().end(); ++it){
 			if(it->second){
@@ -3632,11 +3631,16 @@ bool Game::playerReportRuleViolation(Player* player, const std::string& text)
 
 	ruleViolations[player->getID()] = rvr;
 
-	ChatChannel* channel = g_chat.getChannelById(0x03); //Rule Violations channel
+	ChatChannel* channel = g_chat.getChannelById(CHANNEL_RULE_REP);
 	if(channel){
-		channel->talk(player, SPEAK_RVR_CHANNEL, text, rvr->time);
+		for(UsersMap::const_iterator it = channel->getUsers().begin(); it != channel->getUsers().end(); ++it){
+			if(it->second){
+				it->second->sendToChannel(player, SPEAK_RVR_CHANNEL, text, CHANNEL_RULE_REP, rvr->time);
+			}
+		}
 		return true;
 	}
+
 	return false;
 }
 
@@ -4466,7 +4470,7 @@ bool Game::cancelRuleViolation(Player* player)
 	}
 	else{
 		//Send to channel
-		ChatChannel* channel = g_chat.getChannelById(0x03);
+		ChatChannel* channel = g_chat.getChannelById(CHANNEL_RULE_REP);
 		if(channel){
 			for(UsersMap::const_iterator ut = channel->getUsers().begin(); ut != channel->getUsers().end(); ++ut){
 				if(ut->second){
@@ -4491,7 +4495,7 @@ bool Game::closeRuleViolation(Player* player)
 	ruleViolations.erase(it);
 	player->sendLockRuleViolation();
 
-	ChatChannel* channel = g_chat.getChannelById(0x03);
+	ChatChannel* channel = g_chat.getChannelById(CHANNEL_RULE_REP);
 	if(channel){
 		for(UsersMap::const_iterator ut = channel->getUsers().begin(); ut != channel->getUsers().end(); ++ut){
 			if(ut->second){

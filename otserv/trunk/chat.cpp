@@ -115,7 +115,7 @@ bool ChatChannel::addUser(Player* player)
 	if(it != m_users.end())
 		return false;
 
-	if(getId() == 0x03 && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule Violations channel
+	if(getId() == CHANNEL_RULE_REP && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule Violations channel
 		return false;
 	}
 
@@ -141,9 +141,6 @@ bool ChatChannel::removeUser(Player* player, bool sendCloseChannel /*= false*/)
 
 bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time /*= 0*/)
 {
-	bool success = false;
-	UsersMap::iterator it;
-
 	// Can't speak to a channel you're not connected to
 	UsersMap::const_iterator iter = m_users.find(fromPlayer->getID());
 	if(iter == m_users.end())
@@ -155,23 +152,22 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string&
 		fromPlayer->addCondition(condition);
 	}
 
+	UsersMap::iterator it;
 	for(it = m_users.begin(); it != m_users.end(); ++it){
 		it->second->sendToChannel(fromPlayer, type, text, getId(), time);
-		success = true;
 	}
-	return success;
+
+	return true;
 }
 
 bool ChatChannel::sendInfo(SpeakClasses type, const std::string& text, uint32_t time)
 {
-	bool success = false;
 	UsersMap::iterator it;
-
 	for(it = m_users.begin(); it != m_users.end(); ++it){
 		it->second->sendToChannel(NULL, type, text, getId(), time);
-		success = true;
 	}
-	return success;
+
+	return true;
 }
 
 Chat::Chat()
