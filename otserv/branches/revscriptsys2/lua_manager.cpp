@@ -37,9 +37,10 @@ extern Game g_game;
 extern ConfigManager g_config;
 extern Chat g_chat;
 
-LuaState::LuaState(Script::Environment& env) : environment(env)
+LuaState::LuaState(Script::Manager* man) : state(NULL), manager(man)
 {
-	;
+	if(manager)
+		environment = manager->environment;
 }
 
 LuaState::~LuaState()
@@ -327,7 +328,7 @@ void LuaState::pushCallback(Script::Listener_ptr listener)
 
 void LuaState::pushEvent(Script::Event& event)
 {
-	event.push_instance(*this, environment);
+	event.push_instance(*this, *environment);
 }
 
 void LuaState::pushPosition(const Position& pos)
@@ -388,7 +389,7 @@ void LuaState::pushThing(Thing* thing)
 		else {
 			objid = pushClassInstance("Item");
 		}
-		*objid = environment.addThing(item);
+		*objid = environment->addThing(item);
 	}
 	else if(thing && thing->getCreature()) {
 		Creature* creature = thing->getCreature();
@@ -404,13 +405,13 @@ void LuaState::pushThing(Thing* thing)
 			pushNil();
 			return;
 		}
-		*objid = environment.addThing(creature);
+		*objid = environment->addThing(creature);
 	} else if(thing && thing->getTile()) {
 		pushTile(thing->getTile());
 	} else if(thing) {
 		Script::ObjectID* objid;
 		objid = pushClassInstance("Thing");
-		*objid = environment.addThing(thing);
+		*objid = environment->addThing(thing);
 	} else {
 		pushNil();
 	}
@@ -442,7 +443,7 @@ void LuaState::pushHouse(House* house)
 {
 	if(house) {
 		Script::ObjectID* objid = pushClassInstance("House");
-		*objid = environment.addObject(house);
+		*objid = environment->addObject(house);
 	} else {
 		pushNil();
 	}
@@ -452,7 +453,7 @@ void LuaState::pushChannel(ChatChannel* channel)
 {
 	if(channel) {
 		Script::ObjectID* objid = pushClassInstance("Channel");
-		*objid = environment.addObject(channel);
+		*objid = environment->addObject(channel);
 	} else {
 		pushNil();
 	}
@@ -462,7 +463,7 @@ void LuaState::pushWaypoint(Waypoint_ptr wp)
 {
 	if(wp) {
 		Script::ObjectID* objid = pushClassInstance("Waypoint");
-		*objid = environment.addObject(wp.get());
+		*objid = environment->addObject(wp.get());
 	} else {
 		pushNil();
 	}
@@ -564,7 +565,7 @@ ChatChannel* LuaState::popChannel(Script::ErrorMode mode /* = Script::ERROR_THRO
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
 
-	return (ChatChannel*)environment.getObject(*objid);
+	return (ChatChannel*)environment->getObject(*objid);
 }
 
 House* LuaState::popHouse(Script::ErrorMode mode /* = Script::ERROR_THROW */)
@@ -580,7 +581,7 @@ House* LuaState::popHouse(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
 
-	return (House*)environment.getObject(*objid);
+	return (House*)environment->getObject(*objid);
 }
 
 Waypoint_ptr LuaState::popWaypoint(Script::ErrorMode mode /* = Script::ERROR_THROW */)
@@ -596,7 +597,7 @@ Waypoint_ptr LuaState::popWaypoint(Script::ErrorMode mode /* = Script::ERROR_THR
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
 
-	return ((Waypoint*)environment.getObject(*objid))->shared_from_this();
+	return ((Waypoint*)environment->getObject(*objid))->shared_from_this();
 }
 
 Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */)
@@ -611,7 +612,7 @@ Thing* LuaState::popThing(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
-	Thing* thing = environment.getThing(*objid);
+	Thing* thing = environment->getThing(*objid);
 	if(!thing) HandleError(mode, "Object does not exist in object list.");
 
 	return thing;
@@ -664,7 +665,7 @@ Item* LuaState::popItem(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 ///////////////////////////////////////////////////////////////////////////////
 // Lua State Thread
 
-LuaStateManager::LuaStateManager(Script::Environment& environment) : LuaState(environment)
+LuaStateManager::LuaStateManager(Script::Manager* man) : LuaState(man)
 {
 	state = luaL_newstate();
 	if(!state){
@@ -674,6 +675,14 @@ LuaStateManager::LuaStateManager(Script::Environment& environment) : LuaState(en
 	// Load all standard libraries
 	luaL_openlibs(state);
 
+	setupLuaStandardLibrary();
+}
+
+LuaStateManager::~LuaStateManager() {
+	lua_close(state);
+}
+
+void LuaStateManager::setupLuaStandardLibrary() {
 	//getGlobal("package");
 	lua_getfield(state, LUA_GLOBALSINDEX, "package");
 	assert(lua_istable(state, 1));
@@ -681,10 +690,6 @@ LuaStateManager::LuaStateManager(Script::Environment& environment) : LuaState(en
 	lua_pushstring(state, (g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/?.lua").c_str());
 	//setField(2, "path");
 	lua_setfield(state, -2, "path");
-}
-
-LuaStateManager::~LuaStateManager() {
-	lua_close(state);
 }
 
 bool LuaStateManager::loadFile(std::string file)
@@ -712,7 +717,7 @@ bool LuaStateManager::loadFile(std::string file)
 
 LuaThread_ptr LuaStateManager::newThread(const std::string& name)
 {
-	LuaThread_ptr p(new LuaThread(*this, name));
+	LuaThread_ptr p(new LuaThread(manager, name));
 	threads[p->state] = p;
 	return p;
 }
@@ -748,14 +753,21 @@ void LuaStateManager::runScheduledThreads()
 ///////////////////////////////////////////////////////////////////////////////
 // Child Thread
 
-LuaThread::LuaThread(LuaStateManager& manager, const std::string& name) :
-	LuaState(manager.environment),
-	manager(manager),
+LuaThread::LuaThread(Script::Manager* manager, const std::string& name) :
+	LuaState(manager),
 	name(name),
 	thread_state(0)
 {
-	state = lua_newthread(manager.state);
-	lua_pop(manager.state, 1); // Remove the thread from the main stack
+	state = lua_newthread(manager->state);
+	lua_pop(manager->state, 1); // Remove the thread from the main stack
+}
+
+LuaThread::LuaThread(Script::Manager* manager, lua_State* L) :
+	LuaState(manager),
+	name("Lua generated coroutine"),
+	thread_state(0)
+{
+	state = L;
 }
 
 LuaThread::~LuaThread()
@@ -765,11 +777,6 @@ LuaThread::~LuaThread()
 bool LuaThread::ok() const
 {
 	return thread_state == 0 || thread_state == LUA_YIELD;
-}
-
-Script::Manager* LuaThread::getManager()
-{
-	return static_cast<Script::Manager*>(&manager);
 }
 
 void LuaThread::report()
@@ -808,10 +815,16 @@ int32_t LuaThread::run(int args)
 	thread_state = ret;
 	if(ret == LUA_YIELD) {
 		// Thread yielded, add us to the manager
+		if(!isString() || !(popString() == "WAIT")){
+			report();
+			return 0;
+		}
+
 		if(!isNumber()){
 			report();
 			return 0;
 		}
+
 		int32_t schedule = popInteger();
 		return schedule;
 	} else if(ret == 0) {

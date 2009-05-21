@@ -29,9 +29,11 @@ Michael.dialog = {
 				local reply = self:listen()
 				if containsAgreement(reply) then
 					return loop(self)
+				else
+					self:say("Ok. Then let's talk about something else!")
 				end
 			end
-			loop()
+			loop(self)
 		else
 			self:say("You didn't continue, resume normal conversation flow.")
 		end

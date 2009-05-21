@@ -73,7 +73,7 @@ class LuaThread;
 
 class LuaState /*abstract*/ {
 public:
-	LuaState(Script::Environment& environment);
+	LuaState(Script::Manager* manager);
 	virtual ~LuaState();
 
 	// Stack manipulation
@@ -462,28 +462,29 @@ public:
 	int lua_getHouses();
 
 protected:
-	virtual Script::Manager* getManager() = 0;
-
 	// Members
 	lua_State* state;
-	Script::Environment& environment;
+	Script::Manager* manager;
+	Script::Environment* environment;
 
 	friend class LuaThread;
 	friend class LuaStateManager;
 	friend class Script::Manager;
 };
+
 #ifdef __GNUC__
-template <> bool LuaState::popValue<bool>();
-template <> int LuaState::popValue<int>();
-template <> uint32_t LuaState::popValue<uint32_t>();
-template <> double LuaState::popValue<double>();
-template <> std::string LuaState::popValue<std::string>();
-template <> uint64_t LuaState::popValue<uint64_t>();
+template <> bool LuaState::popValue<bool>() {return popBoolean();}
+template <> int LuaState::popValue<int>() {return popInteger();}
+template <> uint32_t LuaState::popValue<uint32_t>() {return popUnsignedInteger();}
+template <> double LuaState::popValue<double>() {return popFloat();}
+template <> std::string LuaState::popValue<std::string>() {return popString();}
+template <> uint64_t LuaState::popValue<uint64_t>() {return (uint64_t)popFloat();}
 #endif
 
 class LuaThread : public LuaState {
 public:
-	LuaThread(LuaStateManager& manager, const std::string& name);
+	LuaThread(Script::Manager* manager, const std::string& name);
+	LuaThread(Script::Manager* manager, lua_State* L);
 	virtual ~LuaThread();
 
 	// Returns time to sleep, 0 if execution ended
@@ -494,9 +495,6 @@ protected:
 	// Prints a stack trace
 	void report();
 
-	virtual Script::Manager* getManager();
-
-	LuaStateManager& manager;
 	std::string name;
 	int thread_state;
 };
@@ -506,10 +504,11 @@ typedef weak_ptr<LuaThread> LuaThread_wptr;
 
 class LuaStateManager : public LuaState {
 public:
-	LuaStateManager(Script::Environment& environment);
+	LuaStateManager(Script::Manager* man);
 	virtual ~LuaStateManager();
 
 	bool loadFile(std::string file);
+	void setupLuaStandardLibrary();
 
 	LuaThread_ptr newThread(const std::string& name);
 	void scheduleThread(int32_t schedule, LuaThread_ptr thread);

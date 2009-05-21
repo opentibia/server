@@ -367,7 +367,8 @@ void Manager::registerFunctions() {
 
 int LuaState::lua_wait() {
 	// integer delay is ontop of stack
-	return lua_yield(state, 1);
+	pushString("WAIT");
+	return lua_yield(state, 2);
 }
 
 int LuaState::lua_getConfigValue() {
@@ -386,9 +387,9 @@ int LuaState::lua_getConfigValue() {
 
 int LuaState::lua_registerGenericEvent_OnServerLoad()
 {
-	Listener_ptr listener(new Listener(ON_LOAD_LISTENER, boost::any(), *this->getManager()));
+	Listener_ptr listener(new Listener(ON_LOAD_LISTENER, boost::any(), *manager));
 
-	environment.Generic.OnLoad.push_back(listener);
+	environment->Generic.OnLoad.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -426,25 +427,25 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 	si_onsay.case_sensitive = case_sensitive;
 
 	boost::any p(si_onsay);
-	Listener_ptr listener(new Listener(ON_SAY_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_SAY_LISTENER, p, *manager));
 
 	// OnSay event list is sorted by length, from longest to shortest
 	if(si_onsay.method == OnSay::FILTER_EXACT){
 		// Insert at beginning
-		environment.Generic.OnSay.insert(environment.Generic.OnSay.begin(), listener);
+		environment->Generic.OnSay.insert(environment->Generic.OnSay.begin(), listener);
 	}
 	else if(si_onsay.method == OnSay::FILTER_ALL){
 		// All comes very last
-		environment.Generic.OnSay.push_back(listener);
+		environment->Generic.OnSay.push_back(listener);
 	}
 	else{
-		if(environment.Generic.OnSay.empty()){
-			environment.Generic.OnSay.push_back(listener);
+		if(environment->Generic.OnSay.empty()){
+			environment->Generic.OnSay.push_back(listener);
 		}
 		else{
 			bool registered = false;
-			for(ListenerList::iterator listener_iter = environment.Generic.OnSay.begin(),
-				end = environment.Generic.OnSay.end();
+			for(ListenerList::iterator listener_iter = environment->Generic.OnSay.begin(),
+				end = environment->Generic.OnSay.end();
 				listener_iter != end; ++listener_iter)
 			{
 				OnSay::ScriptInformation info = boost::any_cast<OnSay::ScriptInformation>((*listener_iter)->getData());
@@ -452,13 +453,13 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 				if(si_onsay.method == OnSay::FILTER_MATCH_BEGINNING){
 					// We should be inserted before substrings...
 					if(info.method == OnSay::FILTER_SUBSTRING || info.method == OnSay::FILTER_ALL){
-						environment.Generic.OnSay.insert(listener_iter, listener);
+						environment->Generic.OnSay.insert(listener_iter, listener);
 						registered = true; 
 						break;
 					}
 
 					if(info.filter.length() < si_onsay.filter.length()){
-						environment.Generic.OnSay.insert(listener_iter, listener);
+						environment->Generic.OnSay.insert(listener_iter, listener);
 						registered = true; 
 						break;
 					}
@@ -467,20 +468,20 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 					assert(si_onsay.method == OnSay::FILTER_SUBSTRING);
 					// We should be inserted before generic...
 					if(info.method == OnSay::FILTER_ALL){
-						environment.Generic.OnSay.insert(listener_iter, listener);
+						environment->Generic.OnSay.insert(listener_iter, listener);
 						registered = true; 
 						break;
 					}
 
 					if(info.filter.length() < si_onsay.filter.length()){
-						environment.Generic.OnSay.insert(listener_iter, listener);
+						environment->Generic.OnSay.insert(listener_iter, listener);
 						registered = true; 
 						break;
 					}
 				}
 			}
 			if(!registered)
-				environment.Generic.OnSay.push_back(listener);
+				environment->Generic.OnSay.push_back(listener);
 		}
 	}
 	// Register event
@@ -526,10 +527,10 @@ int LuaState::lua_registerSpecificEvent_OnSay() {
 	// to it is removed. :)
 	boost::any p(si_onsay);
 	Listener_ptr listener(
-		new Listener(ON_SAY_LISTENER, p, *this->getManager()),
+		new Listener(ON_SAY_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -555,10 +556,10 @@ int LuaState::lua_registerSpecificEvent_OnHear() {
 	// to it is removed. :)
 	boost::any p(si_onhear);
 	Listener_ptr listener(
-		new Listener(ON_HEAR_LISTENER, p, *this->getManager()),
+		new Listener(ON_HEAR_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -592,9 +593,9 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 	si_onuse.id = id;
 
 	boost::any p(si_onuse);
-	Listener_ptr listener(new Listener(ON_USE_ITEM_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_USE_ITEM_LISTENER, p, *manager));
 
-	environment.Generic.OnUseItem.push_back(listener);
+	environment->Generic.OnUseItem.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -606,9 +607,9 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 
 int LuaState::lua_registerGenericEvent_OnJoinChannel() {
 	boost::any p(0);
-	Listener_ptr listener(new Listener(ON_OPEN_CHANNEL_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_OPEN_CHANNEL_LISTENER, p, *manager));
 
-	environment.Generic.OnJoinChannel.push_back(listener);
+	environment->Generic.OnJoinChannel.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -626,10 +627,10 @@ int LuaState::lua_registerSpecificEvent_OnJoinChannel() {
 
 	boost::any p(0);
 	Listener_ptr listener(
-		new Listener(ON_OPEN_CHANNEL_LISTENER, p, *this->getManager()),
+		new Listener(ON_OPEN_CHANNEL_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -642,9 +643,9 @@ int LuaState::lua_registerSpecificEvent_OnJoinChannel() {
 
 int LuaState::lua_registerGenericEvent_OnLeaveChannel() {
 	boost::any p(0);
-	Listener_ptr listener(new Listener(ON_CLOSE_CHANNEL_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_CLOSE_CHANNEL_LISTENER, p, *manager));
 
-	environment.Generic.OnLeaveChannel.push_back(listener);
+	environment->Generic.OnLeaveChannel.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -662,10 +663,10 @@ int LuaState::lua_registerSpecificEvent_OnLeaveChannel() {
 
 	boost::any p(0);
 	Listener_ptr listener(
-		new Listener(ON_CLOSE_CHANNEL_LISTENER, p, *this->getManager()),
+		new Listener(ON_CLOSE_CHANNEL_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -678,9 +679,9 @@ int LuaState::lua_registerSpecificEvent_OnLeaveChannel() {
 
 int LuaState::lua_registerGenericEvent_OnLogin() {
 	boost::any p(0);
-	Listener_ptr listener(new Listener(ON_LOGIN_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_LOGIN_LISTENER, p, *manager));
 
-	environment.Generic.OnLogin.push_back(listener);
+	environment->Generic.OnLogin.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -692,9 +693,9 @@ int LuaState::lua_registerGenericEvent_OnLogin() {
 
 int LuaState::lua_registerGenericEvent_OnLogout() {
 	boost::any p(0);
-	Listener_ptr listener(new Listener(ON_LOGOUT_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_LOGOUT_LISTENER, p, *manager));
 
-	environment.Generic.OnLogout.push_back(listener);
+	environment->Generic.OnLogout.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -712,10 +713,10 @@ int LuaState::lua_registerSpecificEvent_OnLogout() {
 
 	boost::any p(0);
 	Listener_ptr listener(
-		new Listener(ON_LOGOUT_LISTENER, p, *this->getManager()),
+		new Listener(ON_LOGOUT_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -749,9 +750,9 @@ int LuaState::lua_registerGenericEvent_OnLookAtItem() {
 	si_onlook.id = id;
 
 	boost::any p(si_onlook);
-	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *manager));
 
-	environment.Generic.OnLook.push_back(listener);
+	environment->Generic.OnLook.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -772,9 +773,9 @@ int LuaState::lua_registerGenericEvent_OnLookAtCreature() {
 	si_onlook.id = at->getID();
 
 	boost::any p(si_onlook);
-	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *manager));
 
-	environment.Generic.OnLook.push_back(listener);
+	environment->Generic.OnLook.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -799,10 +800,10 @@ int LuaState::lua_registerSpecificEvent_OnLook() {
 	// to it is removed. :)
 	boost::any p(si_onlook);
 	Listener_ptr listener(
-		new Listener(ON_LOOK_LISTENER, p, *this->getManager()),
+		new Listener(ON_LOOK_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -881,9 +882,9 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	si_onequip.equip = true;
 
 	boost::any p(si_onequip);
-	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *manager));
 
-	environment.Generic.OnEquipItem.push_back(listener);
+	environment->Generic.OnEquipItem.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -961,9 +962,9 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	si_ondeequip.equip = false;
 
 	boost::any p(si_ondeequip);
-	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *manager));
 
-	environment.Generic.OnEquipItem.push_back(listener);
+	environment->Generic.OnEquipItem.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -998,9 +999,9 @@ int LuaState::lua_registerGenericEvent_OnStepInCreature() {
 	si_onmovecreature.moveType = OnMoveCreature::TYPE_STEPIN;
 
 	boost::any p(si_onmovecreature);
-	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager));
 
-	environment.Generic.OnMoveCreature.push_back(listener);
+	environment->Generic.OnMoveCreature.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1035,9 +1036,9 @@ int LuaState::lua_registerGenericEvent_OnStepOutCreature() {
 	si_onmovecreature.moveType = OnMoveCreature::TYPE_STEPOUT;
 
 	boost::any p(si_onmovecreature);
-	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager));
 
-	environment.Generic.OnMoveCreature.push_back(listener);
+	environment->Generic.OnMoveCreature.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1072,9 +1073,9 @@ int LuaState::lua_registerGenericEvent_OnMoveCreature() {
 	si_onmovecreature.moveType = OnMoveCreature::TYPE_MOVE;
 
 	boost::any p(si_onmovecreature);
-	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager));
 
-	environment.Generic.OnMoveCreature.push_back(listener);
+	environment->Generic.OnMoveCreature.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1095,10 +1096,10 @@ int LuaState::lua_registerGenericEvent_OnSpawn() {
 
 	boost::any p(0);
 	Listener_ptr listener(
-		new Listener(ON_SPAWN_LISTENER, p, *this->getManager()),
+		new Listener(ON_SPAWN_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.Generic.OnSpawn[cname].push_back(listener);
+	environment->Generic.OnSpawn[cname].push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1122,10 +1123,10 @@ int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
 
 	boost::any p(si_onmovecreature);
 	Listener_ptr listener(
-		new Listener(ON_MOVE_CREATURE_LISTENER, p, *this->getManager()),
+		new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1138,9 +1139,9 @@ int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
 
 int LuaState::lua_registerGenericEvent_OnCreatureTurn()
 {
-	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, boost::any(), *this->getManager()));
+	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, boost::any(), *manager));
 
-	environment.Generic.OnTurn.push_back(listener);
+	environment->Generic.OnTurn.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1157,10 +1158,10 @@ int LuaState::lua_registerSpecificEvent_OnCreatureTurn() {
 	Creature* who = popCreature();
 
 	Listener_ptr listener(
-		new Listener(ON_TURN_LISTENER, boost::any(), *this->getManager()),
+		new Listener(ON_TURN_LISTENER, boost::any(), *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1198,9 +1199,9 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	si_onmoveitem.isItemOnTile = isItemOnTile;
 
 	boost::any p(si_onmoveitem);
-	Listener_ptr listener(new Listener(ON_MOVE_ITEM_LISTENER, p, *this->getManager()));
+	Listener_ptr listener(new Listener(ON_MOVE_ITEM_LISTENER, p, *manager));
 
-	environment.Generic.OnMoveItem.push_back(listener);
+	environment->Generic.OnMoveItem.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1217,10 +1218,10 @@ int LuaState::lua_registerSpecificEvent_OnSpotCreature() {
 	Creature* who = popCreature();
 
 	Listener_ptr listener(
-		new Listener(ON_SPOT_CREATURE_LISTENER, boost::any(), *this->getManager()),
+		new Listener(ON_SPOT_CREATURE_LISTENER, boost::any(), *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1238,10 +1239,10 @@ int LuaState::lua_registerSpecificEvent_OnLoseCreature() {
 	Creature* who = popCreature();
 
 	Listener_ptr listener(
-		new Listener(ON_LOSE_CREATURE_LISTENER, boost::any(), *this->getManager()),
+		new Listener(ON_LOSE_CREATURE_LISTENER, boost::any(), *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1259,10 +1260,10 @@ int LuaState::lua_registerSpecificEvent_OnCreatureThink() {
 	Creature* who = popCreature();
 
 	Listener_ptr listener(
-		new Listener(ON_THINK_LISTENER, boost::any(), *this->getManager()),
+		new Listener(ON_THINK_LISTENER, boost::any(), *manager),
 		boost::bind(&Listener::deactivate, _1));
 
-	environment.registerSpecificListener(listener);
+	environment->registerSpecificListener(listener);
 	who->addListener(listener);
 
 	// Register event
@@ -1298,7 +1299,7 @@ int LuaState::lua_stopListener() {
 		pushBoolean(false);
 		return 1;
 	}
-	pushBoolean(environment.stopListener((ListenerType)type, id));
+	pushBoolean(environment->stopListener((ListenerType)type, id));
 	return 1;
 }
 
@@ -1433,7 +1434,7 @@ int LuaState::lua_Thing_destroy()
 int LuaState::lua_getThingByID()
 {
 	Script::ObjectID objid = (Script::ObjectID)popFloat();
-	Thing* thing = environment.getThing(objid);
+	Thing* thing = environment->getThing(objid);
 	pushThing(thing);
 	return 1;
 }

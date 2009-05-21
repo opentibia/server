@@ -1,6 +1,6 @@
 
 -- Default configuration (all these can be overloaded)
-NPC.idleTimeout = 5
+NPC.idleTimeout = 45
 NPC.listenRadius = 5
 NPC.walkRadius = 3
 

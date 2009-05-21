@@ -258,8 +258,8 @@ void OnSay::Event::update_instance(Manager& state, Environment& environment, Lua
 OnHear::Event::Event(Creature* creature, Creature* talking_creature, const std::string& message, const SpeakClass& speak_class) :
 	creature(creature),
 	talking_creature(talking_creature),
-	speak_class(speak_class),
-	message(message)
+	message(message),
+	speak_class(speak_class)
 {
 }
 

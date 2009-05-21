@@ -30,10 +30,13 @@ extern ConfigManager g_config;
 
 using namespace Script;
 
-Manager::Manager(Script::Environment& e) : LuaStateManager(e),
+Manager::Manager(Script::Environment& e) : LuaStateManager(NULL),
 	function_id_counter(1),
 	event_nested_level(0)
 {
+	manager = this;
+	environment = &e;
+
 	registerClasses();
 	registerFunctions();
 }
@@ -47,13 +50,9 @@ bool Manager::dispatchEvent(Script::Event& event) {
 		return false;
 
 	event_nested_level++;
-	bool s = event.dispatch(*this, environment);
+	bool s = event.dispatch(*this, *environment);
 	event_nested_level--;
 	return s;
-}
-
-Manager* Manager::getManager() {
-	return this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,18 +114,26 @@ int Manager::luaFunctionCallback(lua_State* L) {
 	uint32_t callbackID = uint32_t(lua_tonumber(L, lua_upvalueindex(2)));
 	Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
 	LuaState* interface = NULL;
+
+	// We must allocate manually, since lua_error is called no destructors will work
+	unsigned char threadmem[sizeof(LuaThread)];
+	LuaThread* private_thread = NULL;
+	// REMEMBER TO EXPLICITLY CALL private_thread->~LuaThread
+
 	if(L == manager->state) {
 		interface = manager;
 	}
 	else {
-		LuaThread_ptr p = manager->threads[L];
-		interface = p.get();
+		ThreadMap::iterator finder = manager->threads.find(L);
+		if(finder != manager->threads.end())
+			interface = (finder->second).get();
+		else{
+			private_thread = new(threadmem) LuaThread(manager, L);
+			interface = private_thread;
+		}
 	}
-	
-	assert(interface);
 
 	// If the script failed
-
 	try {
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
 
@@ -249,12 +256,18 @@ int Manager::luaFunctionCallback(lua_State* L) {
 			}
 		}
 		// All arguments checked out, call the function!
-		return (interface->*(cc->func))();
+		int ret = (interface->*(cc->func))(); 
+		if(private_thread)
+			private_thread->~LuaThread();
+		return ret;
 	} catch(Script::Error& err) {
 		// We can't use lua_error in the C++ function as it doesn't call destructors properly.
 		interface->clearStack();
 		interface->pushString(err.what());
 	}
+
+	if(private_thread)
+		private_thread->~LuaThread();
 
 	// Can't be done in handler, since then the destructor of Script::Error
 	// won't be called, which in turn won't call the destructor of the 

@@ -3,14 +3,14 @@ NPCs = {}
 
 require("otstd/npc/constants")
 
--- Create a new NPC
+-- Create a new NPC AI
 function NPC:new(name)
 	npc = {}
 	NPCs[name:lower()] = npc
 	npc.name = name
 	
+	-- All NPCs created will be instanced with this AI
 	registerOnSpawn(name, function(event)
-			event.actor:setShouldReload(true)
 			NPC:make(event.actor)
 		end)
 	
@@ -18,6 +18,45 @@ function NPC:new(name)
 end
 
 -- Event handlers
+
+function NPC:runSuspendedState(state, event)
+	local thread = state.thread
+	local success, yieldtype, param = coroutine.resume(state.thread, self, event)
+	
+	if not success then
+		local err = yieldtype
+		print (debug.traceback(state.thread, "Error in NPC '" .. self:getName() .. "' : " .. err))
+
+		-- Clear up state
+		self.focus = nil
+		self.state = nil
+	elseif coroutine.status(state.thread) == "dead" then
+		-- Thread finished, kill it
+		state.thread = nil
+	else
+		local focus = self.focus
+	
+		if yieldtype == "LISTEN" then
+			assert(self.focus ~= nil, "Must have focus when calling self:listen")
+			-- As we are state.thread, we don't have to do anything, it's handled in onHearHandler
+		elseif yieldtype == "WAIT" then
+			-- Clear up state
+			self.focus = nil
+			self.state = nil
+			state.thread = nil
+			
+			-- Wait the alloted time
+			wait(param)
+			
+			-- Resume state
+			self.focus = focus
+			self.state = state
+			state.thread = thread
+			
+			return runSuspendedState(state, event)
+		end
+	end
+end
 
 function NPC:onHearHandler(event)
 	local speaker = event.talking_creature
@@ -28,8 +67,10 @@ function NPC:onHearHandler(event)
 		self.focus = speaker
 		self.state = self.focus_list[#speaker]
 		
-		-- Call the real callback
-		self:onHearFocusInternal(event)
+		if not self.state.thread then
+			self.state.thread = coroutine.create(self.onHearFocusInternal)
+		end
+		self:runSuspendedState(self.state, event)
 		
 		-- If focus is nil now, we stopped talking to this player
 		if self.focus == nil then
@@ -115,7 +156,7 @@ function NPC:onHearFocusInternal(event)
 	
 	-- We have focus already
 	if containsFarewell(text) then
-		self:onFarewell(event.talking_creature, text, event.class)
+		self:onFarewellInternal(event.talking_creature, text, event.class)
 	else
 		-- Not a farewell, parse the message
 		self:onHearInternal(text, event.class)
@@ -143,11 +184,22 @@ function NPC:onHearStrangerInternal(event)
 	
 	-- We don't have focus
 	if containsGreeting(text) then
-		self:onGreet(event.talking_creature, text, event.class)
+		self:onGreetInternal(event.talking_creature, text, event.class)
 	else
-		-- Not a farewell, parse the message
+		-- Not a greeting, perhaps the NPC is interested anyways?
 		self:onHearStranger(event.talking_creature, text, event.class)
 	end
+end
+
+function NPC:onGreetInternal(creature, text, class)
+	self.focus = creature
+	self:onGreet(creature, text, class)
+end
+
+function NPC:onFarewellInternal(creature, text, class)
+	self:onFarewell(creature, text, class)
+	-- Drop focus
+	self.focus = nil
 end
 
 function NPC:onIdleInternal()
@@ -171,16 +223,11 @@ function NPC:onHear(text, class)
 end
 
 function NPC:onGreet(creature, text, class)
-	-- Must give focus first
-	self.focus = creature
-	-- Then say
 	self:say(self.greeting or self.standardReplies.greeting)
 end
 
 function NPC:onFarewell(creature, text, class)
 	self:say(self.farewell or self.standardReplies.farewell)
-	-- Drop focus
-	self.focus = nil
 end
 
 function NPC:onIdle()
@@ -193,6 +240,13 @@ function NPC:onRunoff()
 end
 
 -- Makes the NPC say some stuff
+
+-- listen() returns the next thing a player says, it suspends execution until the player actually says anything
+function NPC:listen()
+	local npc, event = coroutine.yield("LISTEN")
+	return event.text, event.class
+end
+
 function NPC:say(message, extra_params)
 	if not message then
 		error("Must supply a message string to NPC:say")
@@ -288,6 +342,8 @@ function NPC:make(name_or_actor, where)
 	local meta = {
 		-- We have quite alot of tables to check
 		__index = function(o, idx) return npc_type[idx] or NPC[idx] or Actor[idx] end;
+		-- We overload the ID function so it works correctly
+		__len = function(o) return #o.actor end;
 		-- When passed as an argument to a function, alias with the actor object
 		__object = actor;
 	}
@@ -301,8 +357,8 @@ function NPC:make(name_or_actor, where)
 	actor:setName(npc.name) -- Case may differ
 	actor:setNameDescription(npc.name) -- Case may differ
 	actor:setAlwaysThink(true)
+	actor:setShouldReload(true)
 	
-	npc.outfit.type = npc.outfit.type or 130 -- Default looktype
 	npc.actor:setOutfit(npc.outfit or NPC.defaultOutfit)
 	
 	-- All NPCs need to hear

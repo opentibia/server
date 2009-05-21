@@ -44,8 +44,6 @@ namespace Script {
 		void registerMetaMethods();
 
 	protected:
-		virtual Manager* getManager();
-
 		// Internal representation of functions
 		typedef int (LuaState::*CallbackFunctionType)();
 
