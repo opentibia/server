@@ -90,7 +90,7 @@ bool BanManager::isIpDisabled(uint32_t clientip)
 	if(it != ipLoginMap.end())
 	{
 		uint32_t loginTimeout = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TIMEOUT) / 1000;
-		if( (it->second.numberOfLogins >= g_config.getNumber(ConfigManager::LOGIN_TRIES)) &&
+		if( (it->second.numberOfLogins >= (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TRIES)) &&
 			(currentTime < it->second.lastLoginTime + loginTimeout) )
 		{
 			banLock.unlock();
@@ -193,8 +193,7 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 
 	time_t currentTime = std::time(NULL);
 	IpLoginMap::iterator it = ipLoginMap.find(clientip);
-	if(it == ipLoginMap.end())
-	{
+	if(it == ipLoginMap.end()){
 		LoginBlock lb;
 		lb.lastLoginTime = 0;
 		lb.numberOfLogins = 0;
@@ -203,7 +202,7 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 		it = ipLoginMap.find(clientip);
 	}
 
-	if(it->second.numberOfLogins >= g_config.getNumber(ConfigManager::LOGIN_TRIES))
+	if(it->second.numberOfLogins >= (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TRIES))
 		it->second.numberOfLogins = 0;
 
 	uint32_t retryTimeout = (uint32_t)g_config.getNumber(ConfigManager::RETRY_TIMEOUT) / 1000;

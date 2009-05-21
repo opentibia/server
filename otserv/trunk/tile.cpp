@@ -1328,7 +1328,7 @@ Thing* Tile::__getThing(uint32_t index) const
 
 	const TileItemVector* items = getItemList();
 	if(items){
-		int32_t topItemSize = items->getTopItemCount();
+		uint32_t topItemSize = items->getTopItemCount();
 		if(index < topItemSize)
 			return items->at(items->downItemCount + index);
 
