@@ -343,17 +343,14 @@ void Creature::stopEventWalk()
 
 void Creature::internalCreatureDisappear(const Creature* creature, bool isLogout)
 {
-	onCreatureDisappear(creature, true);
-
-	if(creature == this){
-		if(getMaster() && !getMaster()->isRemoved()){
-			getMaster()->removeSummon(this);
-		}
+	if(attackedCreature == creature){
+		setAttackedCreature(NULL);
+		onAttackedCreatureDissapear(isLogout);
 	}
-	else if(isMapLoaded){
-		if(creature->getPosition().z == getPosition().z){
-			updateTileCache(creature->getTile(), creature->getPosition());
-		}
+
+	if(followCreature == creature){
+		setFollowCreature(NULL);
+		onFollowCreatureDissapear(isLogout);
 	}
 }
 
@@ -520,14 +517,17 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 {
-	if(attackedCreature == creature){
-		setAttackedCreature(NULL);
-		onAttackedCreatureDissapear(isLogout);
-	}
+	internalCreatureDisappear(creature, true);
 
-	if(followCreature == creature){
-		setFollowCreature(NULL);
-		onFollowCreatureDissapear(isLogout);
+	if(creature == this){
+		if(getMaster() && !getMaster()->isRemoved()){
+			getMaster()->removeSummon(this);
+		}
+	}
+	else if(isMapLoaded){
+		if(creature->getPosition().z == getPosition().z){
+			updateTileCache(creature->getTile(), creature->getPosition());
+		}
 	}
 }
 
