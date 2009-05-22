@@ -256,8 +256,8 @@
 		<Unit filename="..\schema.mysql" />
 		<Unit filename="..\schema.pgsql" />
 		<Unit filename="..\schema.sqlite" />
-		<Unit filename="..\script_enviroment.cpp" />
-		<Unit filename="..\script_enviroment.h" />
+		<Unit filename="..\script_environment.cpp" />
+		<Unit filename="..\script_environment.h" />
 		<Unit filename="..\script_event.cpp" />
 		<Unit filename="..\script_event.h" />
 		<Unit filename="..\script_functions.cpp" />
