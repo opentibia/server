@@ -473,12 +473,12 @@ protected:
 };
 
 #ifdef __GNUC__
-template <> bool LuaState::popValue<bool>() {return popBoolean();}
-template <> int LuaState::popValue<int>() {return popInteger();}
-template <> uint32_t LuaState::popValue<uint32_t>() {return popUnsignedInteger();}
-template <> double LuaState::popValue<double>() {return popFloat();}
-template <> std::string LuaState::popValue<std::string>() {return popString();}
-template <> uint64_t LuaState::popValue<uint64_t>() {return (uint64_t)popFloat();}
+template <> bool LuaState::popValue<bool>();
+template <> int LuaState::popValue<int>();
+template <> uint32_t LuaState::popValue<uint32_t>();
+template <> double LuaState::popValue<double>();
+template <> std::string LuaState::popValue<std::string>();
+template <> uint64_t LuaState::popValue<uint64_t>();
 #endif
 
 class LuaThread : public LuaState {
