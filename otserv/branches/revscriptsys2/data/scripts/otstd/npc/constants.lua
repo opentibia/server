@@ -68,7 +68,7 @@ function containsMessage(msg, what)
 	msg = msg:lower()
 	
 	-- Should be replaced by a more complete parser
-	if string.find(msg, "|") ~= nil then
+	if type(what) == "string" and string.find(what, "|", 1, true) ~= nil then
 		what = what:explode("|")
 	end
 	
