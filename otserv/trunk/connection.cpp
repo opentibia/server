@@ -388,28 +388,35 @@ bool Connection::send(OutputMessage_ptr msg)
 		return false;
 	}
 
-	msg->getProtocol()->onSendMessage(msg);
-
 	if(m_pendingWrite == 0){
+		msg->getProtocol()->onSendMessage(msg);
+
+		TRACK_MESSAGE(msg);
+
 		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Connection::send " << msg->getMessageLength() << std::endl;
 		#endif
+
 		internalSend(msg);
 	}
 	else{
 		#ifdef __DEBUG_NET__
 		std::cout << "Connection::send Adding to queue " << msg->getMessageLength() << std::endl;
 		#endif
-		m_outputQueue.push_back(msg);
+
+		TRACK_MESSAGE(msg);
+		OutputMessagePool* outputPool = OutputMessagePool::getInstance();
+		outputPool->addToAutoSend(msg);
 	}
+	
 	m_connectionLock.unlock();
 	return true;
 }
 
 void Connection::internalSend(OutputMessage_ptr msg)
 {
+	TRACK_MESSAGE(msg);
 	m_pendingWrite++;
-
 	try{
 		boost::asio::async_write(getHandle(),
 			boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
@@ -444,28 +451,12 @@ void Connection::onWriteOperation(OutputMessage_ptr msg, const boost::system::er
 	#endif
 
 	m_connectionLock.lock();
+	m_pendingWrite--;
+
+	TRACK_MESSAGE(msg);
 	msg.reset();
 
-	if(!error){
-		if(m_pendingWrite > 0){
-			if(!m_outputQueue.empty()){
-				msg = m_outputQueue.front();
-				m_outputQueue.pop_front();
-				internalSend(msg);
-				#ifdef __DEBUG_NET_DETAIL__
-				std::cout << "Connection::onWriteOperation send " << msg->getMessageLength() << std::endl;
-				#endif
-			}
-			m_pendingWrite--;
-		}
-		else{
-			std::cout << "Error: [Connection::onWriteOperation] Getting unexpected notification!" << std::endl;
-			// Error. Pending operations counter is 0, but we are getting a
-			// notification!!
-		}
-	}
-	else{
-		m_pendingWrite--;
+	if(error){
 		handleWriteError(error);
 	}
 

@@ -67,6 +67,7 @@ public:
 
 	Protocol* getProtocol() { return m_protocol;}
 	Connection* getConnection() { return m_connection;}
+	uint64_t getFrame() const { return m_frame;}
 
 	//void setOutputBufferStart(uint32_t pos) {m_outputBufferStart = pos;}
 	//uint32_t getOutputBufferStart() const {return m_outputBufferStart;}
@@ -81,6 +82,12 @@ public:
 		os << /*file << ":"*/ "line " << line << " " << func;
 		last_uses.push_back(os.str());
 	}
+
+	virtual void clearTrack()
+	{
+		last_uses.clear();
+	}
+
 	void PrintTrace()
 	{
 		int n = 1;
@@ -89,7 +96,9 @@ public:
 		}
 	}
 #endif
+
 protected:
+
 #ifdef __TRACK_NETWORK__
 	std::list<std::string> last_uses;
 #endif
@@ -132,7 +141,6 @@ protected:
 	OutputMessageState getState() const { return m_state;}
 
 	void setFrame(uint64_t frame) { m_frame = frame;}
-	uint64_t getFrame() const { return m_frame;}
 
 	Protocol* m_protocol;
 	Connection* m_connection;
@@ -168,6 +176,7 @@ public:
 	size_t getTotalMessageCount() const {return m_allOutputMessages.size();}
 	size_t getAvailableMessageCount() const {return m_outputMessages.size();}
 	size_t getAutoMessageCount() const {return m_autoSendOutputMessages.size();}
+	void addToAutoSend(OutputMessage_ptr msg);
 
 protected:
 
@@ -181,6 +190,7 @@ protected:
 	InternalOutputMessageList m_outputMessages;
 	InternalOutputMessageList m_allOutputMessages;
 	OutputMessageMessageList m_autoSendOutputMessages;
+	OutputMessageMessageList m_toAddQueue;
 	boost::recursive_mutex m_outputPoolLock;
 	uint64_t m_frameTime;
 	bool m_isOpen;

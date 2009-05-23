@@ -96,6 +96,22 @@ void OutputMessagePool::sendAll()
 {
 	boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
 	OutputMessageMessageList::iterator it;
+
+	for(it = m_toAddQueue.begin(); it != m_toAddQueue.end();){
+		//drop messages that are older than 10 seconds
+		if(OTSYS_TIME() - (*it)->getFrame() > 10000){
+			(*it)->getProtocol()->onSendMessage(*it);
+			it = m_toAddQueue.erase(it);
+			continue;
+		}
+
+		(*it)->setState(OutputMessage::STATE_ALLOCATED);
+		m_autoSendOutputMessages.push_back(*it);
+		++it;
+	}
+
+	m_toAddQueue.clear();
+
 	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
 		OutputMessage_ptr omsg = *it;
 		#ifdef __NO_PLAYER_SENDBUFFER__
@@ -160,6 +176,10 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 	}
 
 	msg->freeMessage();
+
+#ifdef __TRACK_NETWORK__
+	msg->clearTrack();
+#endif
 	
 	m_outputPoolLock.lock();
 	m_outputMessages.push_back(msg);
@@ -182,34 +202,20 @@ OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool a
 		return OutputMessage_ptr();
 	}
 
-	OutputMessage_ptr outputmessage;
-	if(m_outputMessages.empty()) {
-#ifdef __TRACK_NETWORK__
-		if(m_allOutputMessages.size() >= 5000){
-			std::cout << "High usage of outputmessages: " << std::endl;
-			m_allOutputMessages.back()->PrintTrace();
-		}
-#endif
-		outputmessage.reset(new OutputMessage,
-			boost::bind(&OutputMessagePool::releaseMessage, this, _1));
+	if(m_outputMessages.empty()){
+		OutputMessage* msg = new OutputMessage();
+		m_outputMessages.push_back(msg);
 
 #ifdef __TRACK_NETWORK__
-		m_allOutputMessages.push_back(outputmessage.get());
+		m_allOutputMessages.push_back(msg);
 #endif
-	} else {
-		outputmessage.reset(m_outputMessages.back(),
-			boost::bind(&OutputMessagePool::releaseMessage, this, _1));
-#ifdef __TRACK_NETWORK__
-		// Print message trace
-		if(outputmessage->getState() != OutputMessage::STATE_FREE) {
-			std::cout << "Using allocated message, message trace:" << std::endl;
-			outputmessage->PrintTrace();
-		}
-#else
-		assert(outputmessage->getState() == OutputMessage::STATE_FREE);
-#endif
-		m_outputMessages.pop_back();
 	}
+
+	OutputMessage_ptr outputmessage;
+	outputmessage.reset(m_outputMessages.back(),
+		boost::bind(&OutputMessagePool::releaseMessage, this, _1));
+
+	m_outputMessages.pop_back();
 
 	configureOutputMessage(outputmessage, protocol, autosend);
 	return outputmessage;
@@ -217,6 +223,7 @@ OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool a
 
 void OutputMessagePool::configureOutputMessage(OutputMessage_ptr msg, Protocol* protocol, bool autosend)
 {
+	TRACK_MESSAGE(msg);
 	msg->Reset();
 	if(autosend){
 		msg->setState(OutputMessage::STATE_ALLOCATED);
@@ -240,4 +247,9 @@ void OutputMessagePool::configureOutputMessage(OutputMessage_ptr msg, Protocol* 
 	std::cout << "Adding reference to connection - " << connection << std::endl;
 #endif
 	msg->setFrame(m_frameTime);
+}
+
+void OutputMessagePool::addToAutoSend(OutputMessage_ptr msg)
+{
+	m_toAddQueue.push_back(msg);
 }

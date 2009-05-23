@@ -125,6 +125,7 @@ public:
 
 #ifdef __TRACK_NETWORK__
 	virtual void Track(std::string file, long line, std::string func) {};
+	virtual void clearTrack() {};
 #endif
 
 
