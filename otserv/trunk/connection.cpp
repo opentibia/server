@@ -33,6 +33,8 @@
 
 #include <boost/bind.hpp>
 
+bool Connection::m_logError = true;
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 uint32_t Connection::connectionCount = 0;
 #endif
@@ -212,7 +214,15 @@ void Connection::deleteConnectionTask()
 {
 	//dispather thread
 	assert(m_refCount == 0);
-	m_io_service.dispatch(boost::bind(&Connection::onStopOperation, this));
+	try{
+		m_io_service.dispatch(boost::bind(&Connection::onStopOperation, this));
+	}
+	catch(boost::system::system_error& e){
+		if(m_logError){
+			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+			m_logError = false;
+		}
+	}
 }
 
 void Connection::acceptConnection(Protocol* protocol)
@@ -227,13 +237,21 @@ void Connection::acceptConnection()
 {
 	// Read size of the first packet
 	m_pendingRead++;
-	
-    m_timer.expires_from_now(boost::posix_time::seconds(10));
-	m_timer.async_wait( boost::bind(&Connection::handleTimeout, this, boost::asio::placeholders::error));
 
-	boost::asio::async_read(getHandle(),
-		boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
-		boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
+	try{
+		m_timer.expires_from_now(boost::posix_time::seconds(10));
+		m_timer.async_wait( boost::bind(&Connection::handleTimeout, this, boost::asio::placeholders::error));
+
+		boost::asio::async_read(getHandle(),
+			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
+			boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
+	}
+	catch(boost::system::system_error& e){
+		if(m_logError){
+			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+			m_logError = false;
+		}
+	}
 }
 
 void Connection::parseHeader(const boost::system::error_code& error)
@@ -392,9 +410,17 @@ void Connection::internalSend(OutputMessage_ptr msg)
 {
 	m_pendingWrite++;
 
-	boost::asio::async_write(getHandle(),
-		boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
-		boost::bind(&Connection::onWriteOperation, this, msg, boost::asio::placeholders::error));
+	try{
+		boost::asio::async_write(getHandle(),
+			boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
+			boost::bind(&Connection::onWriteOperation, this, msg, boost::asio::placeholders::error));
+	}
+	catch(boost::system::system_error& e){
+		if(m_logError){
+			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+			m_logError = false;
+		}
+	}
 }
 
 uint32_t Connection::getIP() const

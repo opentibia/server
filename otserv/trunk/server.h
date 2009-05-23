@@ -95,7 +95,7 @@ protected:
 
 	uint16_t m_serverPort;
 	bool m_pendingStart;
-	bool m_logError;
+	static bool m_logError;
 };
 
 typedef boost::shared_ptr<ServicePort> ServicePort_ptr;

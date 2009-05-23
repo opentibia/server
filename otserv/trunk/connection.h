@@ -168,7 +168,7 @@ private:
 	int32_t m_pendingRead;
 	uint32_t m_closeState;
 	uint32_t m_refCount;
-
+	static bool m_logError;
 	boost::recursive_mutex m_connectionLock;
 
 	Protocol* m_protocol;

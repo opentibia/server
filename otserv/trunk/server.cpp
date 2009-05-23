@@ -33,6 +33,8 @@
 extern BanManager g_bans;
 
 
+bool ServicePort::m_logError = true;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Service
 
@@ -67,7 +69,12 @@ void ServiceManager::run()
 {
 	assert(!running);
 	running = true;
-	m_io_service.run();
+	try{
+		m_io_service.run();
+	}
+	catch(boost::system::system_error& e){
+		LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+	}
 }
 
 void ServiceManager::stop()
@@ -80,7 +87,12 @@ void ServiceManager::stop()
 	for(std::map<uint16_t, ServicePort_ptr>::iterator it = m_acceptors.begin();
 		it != m_acceptors.end(); ++it)
 	{
-		m_io_service.post(boost::bind(&ServicePort::onStopServer, it->second));
+		try{
+			m_io_service.post(boost::bind(&ServicePort::onStopServer, it->second));
+		}
+		catch(boost::system::system_error& e){
+			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+		}
 	}
 	m_acceptors.clear();
 
@@ -98,8 +110,7 @@ ServicePort::ServicePort(boost::asio::io_service& io_service) :
 	m_io_service(io_service),
 	m_acceptor(NULL),
 	m_serverPort(0),
-	m_pendingStart(false),
-	m_logError(true)
+	m_pendingStart(false)
 {
 }
 
@@ -134,11 +145,19 @@ void ServicePort::accept()
 		return;
 	}
 
-	boost::asio::ip::tcp::socket* socket = new boost::asio::ip::tcp::socket(m_io_service);
+	try{
+		boost::asio::ip::tcp::socket* socket = new boost::asio::ip::tcp::socket(m_io_service);
 
-	m_acceptor->async_accept(*socket,
-		boost::bind(&ServicePort::onAccept, this, socket,
-		boost::asio::placeholders::error));
+		m_acceptor->async_accept(*socket,
+			boost::bind(&ServicePort::onAccept, this, socket,
+			boost::asio::placeholders::error));
+	}
+	catch(boost::system::system_error& e){
+		if(m_logError){
+			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+			m_logError = false;
+		}
+	}
 }
 
 void ServicePort::onAccept(boost::asio::ip::tcp::socket* socket, const boost::system::error_code& error)
