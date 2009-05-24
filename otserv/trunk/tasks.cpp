@@ -149,7 +149,9 @@ void Dispatcher::flush()
 		m_taskList.pop_front();
 		(*task)();
 		delete task;
-		OutputMessagePool::getInstance()->sendAll();
+		outputPool = OutputMessagePool::getInstance();
+		if(outputPool)
+			outputPool->sendAll();
 		g_game.clearSpectatorCache();
 	}
 	#ifdef __DEBUG_SCHEDULER__
