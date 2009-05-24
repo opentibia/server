@@ -93,7 +93,7 @@ void Dispatcher::dispatcherThread(void* p)
 				outputPool = OutputMessagePool::getInstance();
 				if(outputPool)
 					outputPool->sendAll();
-				
+
 				g_game.clearSpectatorCache();
 			}
 
@@ -149,7 +149,7 @@ void Dispatcher::flush()
 		m_taskList.pop_front();
 		(*task)();
 		delete task;
-		outputPool = OutputMessagePool::getInstance();
+		OutputMessagePool* outputPool = OutputMessagePool::getInstance();
 		if(outputPool)
 			outputPool->sendAll();
 		g_game.clearSpectatorCache();
