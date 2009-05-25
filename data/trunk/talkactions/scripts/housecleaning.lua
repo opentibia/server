@@ -16,9 +16,9 @@ function onSay(cid, words, param)
     	local s = 0
     	for house in ipairs(houselist) do
         	if cleanHouse(house) == TRUE then
-            	s = s + 1
+            		s = s + 1
         	else
-            	f = f + 1
+            		f = f + 1
         	end
     	end
 

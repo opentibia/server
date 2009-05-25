@@ -4454,9 +4454,9 @@ int LuaScriptInterface::luaCleanHouse(lua_State *L)
 
 	if(house) {
 		house->cleanHouse();
-		lua_pushboolean(L, 1);
+		lua_pushnumber(L, LUA_TRUE);
 	} else {
-		lua_pushboolean(L, 0);
+		lua_pushnumber(L, LUA_FALSE);
 	}
 
 	return 1;
