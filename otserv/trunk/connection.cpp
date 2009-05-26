@@ -238,7 +238,7 @@ void Connection::acceptConnection()
 		// Read size of the first packet
 		boost::asio::async_read(getHandle(),
 			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
-			boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
+			boost::bind(&Connection::parseHeader, shared_from_this(), boost::asio::placeholders::error));
 	}
 	catch(boost::system::system_error& e){
 		if(m_logError){
@@ -276,7 +276,7 @@ void Connection::parseHeader(const boost::system::error_code& error)
 		// Read packet content
 		m_msg.setMessageLength(size + NetworkMessage::header_length);
 		boost::asio::async_read(getHandle(), boost::asio::buffer(m_msg.getBodyBuffer(), size),
-			boost::bind(&Connection::parsePacket, this, boost::asio::placeholders::error));
+			boost::bind(&Connection::parsePacket, shared_from_this(), boost::asio::placeholders::error));
 	}
 	catch(boost::system::system_error& e){
 		if(m_logError){
@@ -350,7 +350,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 		// Wait to the next packet
 		boost::asio::async_read(getHandle(),
 			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
-			boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
+			boost::bind(&Connection::parseHeader, shared_from_this(), boost::asio::placeholders::error));
 	}
 	catch(boost::system::system_error& e){
 		if(m_logError){
