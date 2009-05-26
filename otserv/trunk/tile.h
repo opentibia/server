@@ -225,7 +225,7 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
-	virtual const Position& getPosition() const {return tilePos;}
+	virtual Position getPosition() const {return tilePos;}
 	const Position& getTilePosition() const {return tilePos;}
 
 	virtual bool isRemoved() const {return false;};

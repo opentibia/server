@@ -391,7 +391,7 @@ public:
 		Thing::setParent(cylinder);
 	}
 
-	virtual const Position& getPosition() const {return _tile->getTilePosition();}
+	virtual Position getPosition() const {return _tile->getTilePosition();}
 	virtual Tile* getTile(){return _tile;}
 	virtual const Tile* getTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;

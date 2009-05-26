@@ -513,6 +513,20 @@ SimpleUpdateQuery updateQueries[] = {
 			"ALTER TABLE `houses` ADD `beds` INTEGER NOT NULL DEFAULT 0;",
 			NULL
 		}
+	},
+	{ 12,
+		{ // PgSql
+			"",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `map_store` CHANGE `data` `data` LONGBLOB NOT NULL",
+			NULL
+		},
+		{ // Sqlite
+			"",
+			NULL
+		}
 	}
 };
 

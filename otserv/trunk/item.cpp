@@ -81,11 +81,9 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 1*/)
 		else if(it.isMailbox()){
 			newItem = new Mailbox(_type);
 		}
-		//[ added for beds system
 		else if(it.isBed()){
 			newItem = new BedItem(_type);
 		}
-		//]
 		else{
 			newItem = new Item(_type, _count);
 		}

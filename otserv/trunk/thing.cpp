@@ -119,7 +119,7 @@ const Tile* Thing::getTile() const
 	return dynamic_cast<const Tile*>(cylinder);
 }
 
-const Position& Thing::getPosition() const
+Position Thing::getPosition() const
 {
 	const Tile* tile = getTile();
 	if(tile){

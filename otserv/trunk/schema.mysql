@@ -185,7 +185,7 @@ CREATE TABLE `tile_items` (
 
 CREATE TABLE `map_store` (
 	`house_id` INT UNSIGNED NOT NULL,
-	`data` BLOB NOT NULL,
+	`data` LONGBLOB NOT NULL,
 	KEY(`house_id`)
 ) ENGINE = InnoDB;
 
@@ -245,7 +245,7 @@ CREATE TABLE `schema_info` (
     PRIMARY KEY (`name`)
 );
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 11);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 12);
 
 DELIMITER |
 
