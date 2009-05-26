@@ -307,7 +307,7 @@ public:
 	virtual void onWalk(Direction& dir);
 	virtual void onWalkAborted();
 	virtual void onWalkComplete();
-	
+
 	void checkIdleTime(uint32_t ticks);
 	void setIdleTime(uint32_t value, bool warned){idleTime = value; idleWarned = warned;}
 
@@ -406,7 +406,7 @@ public:
 	uint32_t getFrags();
 	int64_t getRedSkullTicks() const {return redSkullTicks;}
 #endif
-	
+
 	void checkRecentlyGainedExperience(uint32_t interval);
 	const OutfitListType& getPlayerOutfits();
 	bool canWear(uint32_t _looktype, uint32_t _addons);
@@ -428,7 +428,7 @@ public:
 	void sendCreatureAppear(const Creature* creature, const Position& pos)
 		{if(client) client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfThing(this, creature));}
 	void sendCreatureDisappear(const Creature* creature, bool isLogout)
-		{if(client) client->sendRemoveCreature(creature, creature->getPosition(), 
+		{if(client) client->sendRemoveCreature(creature, creature->getPosition(),
 			creature->getTile()->getClientIndexOfThing(this, creature), isLogout);}
 	void sendCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
 		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
@@ -466,7 +466,7 @@ public:
 							client->sendAddCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature));
 						}
 						else{
-							client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->__getIndexOfThing(creature));
+							client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->__getIndexOfThing(creature), false);
 						}
 					}
 				}
@@ -639,7 +639,7 @@ public:
 	//items
 	ContainerVector containerVec;
 	void preSave();
-	
+
 	//stamina
 	void addStamina(int64_t value);
 	void removeStamina(int64_t value) {addStamina(-value);}
@@ -726,7 +726,7 @@ protected:
 	uint32_t nextStepEvent;
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
-	
+
 	int32_t idleTime;
 	bool idleWarned;
 
@@ -775,7 +775,7 @@ protected:
 
 	//loss percent variables
 	uint32_t lossPercent[LOSS_LAST + 1];
-	
+
 	//rate value variables
 	double rateValue[LEVEL_LAST + 1];
 
