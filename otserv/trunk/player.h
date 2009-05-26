@@ -425,8 +425,8 @@ public:
 	void sendUpdateTile(const Tile* tile, const Position& pos)
 		{if(client) client->sendUpdateTile(tile, pos);}
 
-	void sendCreatureAppear(const Creature* creature, const Position& pos, bool isLogin)
-		{if(client) client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfThing(this, creature), isLogin);}
+	void sendCreatureAppear(const Creature* creature, const Position& pos)
+		{if(client) client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfThing(this, creature));}
 	void sendCreatureDisappear(const Creature* creature, bool isLogout)
 		{if(client) client->sendRemoveCreature(creature, creature->getPosition(), 
 			creature->getTile()->getClientIndexOfThing(this, creature), isLogout);}
@@ -463,10 +463,10 @@ public:
 					}
 					else{
 						if(visible){
-							client->sendAddCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature), false);
+							client->sendAddCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature));
 						}
 						else{
-							client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->__getIndexOfThing(creature), false);
+							client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->__getIndexOfThing(creature));
 						}
 					}
 				}

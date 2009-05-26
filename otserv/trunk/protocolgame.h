@@ -231,7 +231,7 @@ private:
 	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos);
 	void sendUpdateTile(const Tile* tile, const Position& pos);
 
-	void sendAddCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogin);
+	void sendAddCreature(const Creature* creature, const Position& pos, uint32_t stackpos);
 	void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
 	void sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos, uint32_t newStackPos,
 		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);

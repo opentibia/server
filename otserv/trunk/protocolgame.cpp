@@ -277,7 +277,7 @@ bool ProtocolGame::connect(uint32_t playerId)
 	player->isConnecting = false;
 	player->client = this;
 	player->client->sendAddCreature(player, player->getPosition(),
-		player->getTile()->__getIndexOfThing(player), false);
+		player->getTile()->__getIndexOfThing(player));
 	player->sendIcons();
 	player->lastip = player->getIP();
 	player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
@@ -2133,7 +2133,7 @@ void ProtocolGame::sendUpdateTile(const Tile* tile, const Position& pos)
 	}
 }
 
-void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogin)
+void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos, uint32_t stackpos)
 {
 	if(canSee(creature)){
 		NetworkMessage_ptr msg = getOutputBuffer();
