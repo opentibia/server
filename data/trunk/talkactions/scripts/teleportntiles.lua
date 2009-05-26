@@ -20,7 +20,8 @@ function onSay(cid, words, param)
 
 
 	if(doTeleportThing(cid, switchPos[getPlayerLookDir(cid)](oldPos)) ~= LUA_ERROR) then
-		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == LUA_NULL) then
+		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == LUA_FALSE) then
+			doSendMagicEffect(oldPos, CONST_ME_POFF)
 			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_TELEPORT)
 		end
 	else

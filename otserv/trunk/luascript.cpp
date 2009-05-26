@@ -2059,7 +2059,7 @@ int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
 		if(flagindex < PlayerFlag_LastFlag){
-			lua_pushnumber(L, player->hasFlag((PlayerFlags)flagindex) ? 1 : 0);
+			lua_pushnumber(L, player->hasFlag((PlayerFlags)flagindex) ? LUA_TRUE : LUA_FALSE);
 		}
 		else{
 			reportErrorFunc("No valid flag index.");
