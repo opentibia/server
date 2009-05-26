@@ -76,6 +76,7 @@ public:
 	ServicePort(boost::asio::io_service& io_service);
 	~ServicePort();
 
+	static void openAcceptor(boost::weak_ptr<ServicePort> weak_service, uint16_t port);
 	void open(uint16_t port);
 	void close();
 	bool is_single_socket() const;
