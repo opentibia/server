@@ -22,6 +22,7 @@
 #define __OTSERV_OUTPUT_MESSAGE_H__
 
 #include "networkmessage.h"
+#include "connection.h"
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
@@ -31,7 +32,6 @@
 #include <boost/utility.hpp>
 
 class Protocol;
-class Connection;
 
 #define OUTPUT_POOL_SIZE 100
 
@@ -66,7 +66,7 @@ public:
 	};
 
 	Protocol* getProtocol() { return m_protocol;}
-	Connection* getConnection() { return m_connection;}
+	Connection_ptr getConnection() { return m_connection;}
 	uint64_t getFrame() const { return m_frame;}
 
 	//void setOutputBufferStart(uint32_t pos) {m_outputBufferStart = pos;}
@@ -119,7 +119,7 @@ protected:
 
 	void freeMessage()
 	{
-		setConnection(NULL);
+		setConnection(Connection_ptr());
 		setProtocol(NULL);
 		m_frame = 0;
 		//allocate enough size for headers
@@ -135,7 +135,7 @@ protected:
 	friend class OutputMessagePool;
 
 	void setProtocol(Protocol* protocol){ m_protocol = protocol;}
-	void setConnection(Connection* connection){ m_connection = connection;}
+	void setConnection(Connection_ptr connection){ m_connection = connection;}
 
 	void setState(OutputMessageState state) { m_state = state;}
 	OutputMessageState getState() const { return m_state;}
@@ -143,7 +143,7 @@ protected:
 	void setFrame(uint64_t frame) { m_frame = frame;}
 
 	Protocol* m_protocol;
-	Connection* m_connection;
+	Connection_ptr m_connection;
 
 	uint32_t m_outputBufferStart;
 	uint64_t m_frame;

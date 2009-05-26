@@ -39,7 +39,7 @@ bool Connection::m_logError = true;
 uint32_t Connection::connectionCount = 0;
 #endif
 
-Connection* ConnectionManager::createConnection(boost::asio::ip::tcp::socket* socket,
+Connection_ptr ConnectionManager::createConnection(boost::asio::ip::tcp::socket* socket,
 	boost::asio::io_service& io_service, ServicePort_ptr servicer)
 {
 	#ifdef __DEBUG_NET_DETAIL__
@@ -47,19 +47,19 @@ Connection* ConnectionManager::createConnection(boost::asio::ip::tcp::socket* so
 	#endif
 
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
-	Connection* connection = new Connection(socket, io_service, servicer);
+	Connection_ptr connection = boost::shared_ptr<Connection>(new Connection(socket, io_service, servicer));
 	m_connections.push_back(connection);
 	return connection;
 }
 
-void ConnectionManager::releaseConnection(Connection* connection)
+void ConnectionManager::releaseConnection(Connection_ptr connection)
 {
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Releasing connection" << std::endl;
 	#endif
 
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
-	std::list<Connection*>::iterator it =
+	std::list<Connection_ptr>::iterator it =
 		std::find(m_connections.begin(), m_connections.end(), connection);
 
 	if(it != m_connections.end()){
@@ -76,8 +76,8 @@ void ConnectionManager::closeAll()
 	std::cout << "Closing all connections" << std::endl;
 	#endif
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
-	std::list<Connection*>::iterator it = m_connections.begin();
-	while(it != m_connections.end()){
+	std::list<Connection_ptr>::iterator it;
+	for(it = m_connections.begin(); it != m_connections.end();){
 		boost::system::error_code error;
 		(*it)->m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 		(*it)->m_socket->close(error);
@@ -85,7 +85,6 @@ void ConnectionManager::closeAll()
 	}
 	m_connections.clear();
 }
-
 
 //*****************
 
@@ -97,10 +96,10 @@ void Connection::closeConnection()
 	#endif
 
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionLock);
-	if(m_closeState != CLOSE_STATE_NONE)
+	if(m_connectionState == CONNECTION_STATE_CLOSED || m_connectionState == CONNECTION_STATE_REQUEST_CLOSE)
 		return;
 
-	m_closeState = CLOSE_STATE_REQUESTED;
+	m_connectionState = CONNECTION_STATE_REQUEST_CLOSE;
 
 	g_dispatcher.addTask(
 		createTask(boost::bind(&Connection::closeConnectionTask, this)));
@@ -114,70 +113,65 @@ void Connection::closeConnectionTask()
 	#endif
 
 	m_connectionLock.lock();
-	if(m_closeState != CLOSE_STATE_REQUESTED){
-		std::cout << "Error: [Connection::closeConnectionTask] m_closeState = " << m_closeState << std::endl;
+	if(m_connectionState != CONNECTION_STATE_REQUEST_CLOSE){
+		std::cout << "Error: [Connection::closeConnectionTask] m_connectionState = " << m_connectionState << std::endl;
 		m_connectionLock.unlock();
 		return;
 	}
 
-	m_closeState = CLOSE_STATE_CLOSING;
-
 	if(m_protocol){
-		g_dispatcher.addTask(
-			createTask(boost::bind(&Protocol::releaseProtocol, m_protocol)));
-		m_protocol->setConnection(NULL);
+		m_protocol->setConnection(Connection_ptr());
+		m_protocol->releaseProtocol();
 		m_protocol = NULL;
 	}
 
-	if(!closingConnection()){
-		m_connectionLock.unlock();
+	m_connectionState = CONNECTION_STATE_CLOSING;
+
+	if(m_pendingWrite == 0 || m_writeError){
+		closeSocket();
+		releaseConnection();
+		m_connectionState = CONNECTION_STATE_CLOSED;
 	}
+	else{
+		//will be closed by onWriteOperation/handleWriteTimeout/handleReadTimeout instead
+	}
+
+	m_connectionLock.unlock();
 }
 
-bool Connection::closingConnection()
+void Connection::closeSocket()
 {
-	//any thread
 	#ifdef __DEBUG_NET_DETAIL__
-	std::cout << "Connection::closingConnection" << std::endl;
+	std::cout << "Connection::closeSocket" << std::endl;
 	#endif
 
-	if(m_pendingWrite == 0 || m_writeError == true){
-		if(!m_socketClosed){
-			#ifdef __DEBUG_NET_DETAIL__
-			std::cout << "Closing socket" << std::endl;
-			#endif
+	m_connectionLock.lock();
 
-			boost::system::error_code error;
-			m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
-			if(error){
-				if(error == boost::asio::error::not_connected){
-					//Transport endpoint is not connected.
-				}
-				else{
-					PRINT_ASIO_ERROR("Shutdown");
-				}
+	if(m_socket->is_open()){
+		#ifdef __DEBUG_NET_DETAIL__
+		std::cout << "Closing socket" << std::endl;
+		#endif
+
+		m_pendingRead = 0;
+		m_pendingWrite = 0;
+		m_socket->cancel();
+		boost::system::error_code error;
+		m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+		if(error){
+			if(error == boost::asio::error::not_connected){
+				//Transport endpoint is not connected.
 			}
-			m_socket->close(error);
-			m_socketClosed = true;
-			if(error){
-				PRINT_ASIO_ERROR("Close");
+			else{
+				PRINT_ASIO_ERROR("Shutdown");
 			}
 		}
-
-		if(m_pendingRead == 0){
-			#ifdef __DEBUG_NET_DETAIL__
-			std::cout << "Deleting Connection" << std::endl;
-			#endif
-
-			m_connectionLock.unlock();
-
-			g_dispatcher.addTask(
-				createTask(boost::bind(&Connection::releaseConnection, this)));
-
-			return true;
+		m_socket->close(error);
+		if(error){
+			PRINT_ASIO_ERROR("Close");
 		}
 	}
-	return false;
+
+	m_connectionLock.unlock();
 }
 
 void Connection::releaseConnection()
@@ -196,8 +190,8 @@ void Connection::onStopOperation()
 {
 	//io_service thread
 	m_connectionLock.lock();
-	m_timer.cancel();
-	ConnectionManager::getInstance()->releaseConnection(this);
+	m_readTimer.cancel();
+	m_writeTimer.cancel();
 
 	if(m_socket->is_open()){
 		m_socket->cancel();
@@ -205,9 +199,10 @@ void Connection::onStopOperation()
 	}
 
 	delete m_socket;
+	m_socket = NULL;
 
 	m_connectionLock.unlock();
-	delete this;
+	ConnectionManager::getInstance()->releaseConnection(shared_from_this());
 }
 
 void Connection::deleteConnectionTask()
@@ -235,13 +230,12 @@ void Connection::acceptConnection(Protocol* protocol)
 
 void Connection::acceptConnection()
 {
-	// Read size of the first packet
-	m_pendingRead++;
-
 	try{
-		m_timer.expires_from_now(boost::posix_time::seconds(10));
-		m_timer.async_wait( boost::bind(&Connection::handleTimeout, this, boost::asio::placeholders::error));
+		++m_pendingRead;
+		m_readTimer.expires_from_now(boost::posix_time::seconds(30));
+		m_readTimer.async_wait( boost::bind(&Connection::handleReadTimeout, boost::weak_ptr<Connection>(shared_from_this()), boost::asio::placeholders::error));
 
+		// Read size of the first packet
 		boost::asio::async_read(getHandle(),
 			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
 			boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
@@ -250,6 +244,7 @@ void Connection::acceptConnection()
 		if(m_logError){
 			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
 			m_logError = false;
+			closeConnection();
 		}
 	}
 }
@@ -257,123 +252,115 @@ void Connection::acceptConnection()
 void Connection::parseHeader(const boost::system::error_code& error)
 {
 	m_connectionLock.lock();
-	m_timer.cancel();
-	m_pendingRead--;
-	if(m_closeState == CLOSE_STATE_CLOSING){
-		if(!closingConnection()){
-			m_connectionLock.unlock();
-		}
+	m_readTimer.cancel();
+
+	int32_t size = m_msg.decodeHeader();
+	if(error || size <= 0 || size >= NETWORKMESSAGE_MAXSIZE - 16){
+		handleReadError(error);
+	}
+
+	if(m_connectionState != CONNECTION_STATE_OPEN || m_readError){
+		closeConnection();
+		m_connectionLock.unlock();
 		return;
 	}
 
-	int32_t size = m_msg.decodeHeader();
-	if(!error && size > 0 && size < NETWORKMESSAGE_MAXSIZE - 16){
+	--m_pendingRead;
+
+	try{
+		++m_pendingRead;
+		m_readTimer.expires_from_now(boost::posix_time::seconds(30));
+		m_readTimer.async_wait( boost::bind(&Connection::handleReadTimeout, boost::weak_ptr<Connection>(shared_from_this()),
+			boost::asio::placeholders::error));
+
 		// Read packet content
-		m_pendingRead++;
 		m_msg.setMessageLength(size + NetworkMessage::header_length);
 		boost::asio::async_read(getHandle(), boost::asio::buffer(m_msg.getBodyBuffer(), size),
 			boost::bind(&Connection::parsePacket, this, boost::asio::placeholders::error));
 	}
-	else{
-		handleReadError(error);
+	catch(boost::system::system_error& e){
+		if(m_logError){
+			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+			m_logError = false;
+			closeConnection();
+		}
 	}
+
 	m_connectionLock.unlock();
 }
 
 void Connection::parsePacket(const boost::system::error_code& error)
 {
 	m_connectionLock.lock();
-	m_pendingRead--;
-	if(m_closeState == CLOSE_STATE_CLOSING){
-		if(!closingConnection()){
-			m_connectionLock.unlock();
-		}
+	m_readTimer.cancel();
+
+	if(error){
+		handleReadError(error);
+	}
+
+	if(m_connectionState != CONNECTION_STATE_OPEN || m_readError){
+		closeConnection();
+		m_connectionLock.unlock();
 		return;
 	}
 
-	if(!error){
-		//Check packet checksum
-		uint32_t recvChecksum = m_msg.PeekU32();
-		uint32_t checksum = 0;
-		int32_t len = m_msg.getMessageLength() - m_msg.getReadPos() - 4;
-		if(len > 0){
-			checksum = adlerChecksum((uint8_t*)(m_msg.getBuffer() + m_msg.getReadPos() + 4), len);
-		}
+	--m_pendingRead;
 
-		if(recvChecksum == checksum)
-			// remove the checksum
-			m_msg.GetU32();
+	//Check packet checksum
+	uint32_t recvChecksum = m_msg.PeekU32();
+	uint32_t checksum = 0;
+	int32_t len = m_msg.getMessageLength() - m_msg.getReadPos() - 4;
+	if(len > 0){
+		checksum = adlerChecksum((uint8_t*)(m_msg.getBuffer() + m_msg.getReadPos() + 4), len);
+	}
 
-		if(!m_receivedFirst){
-			m_receivedFirst = true;
-			// First message received
-			if(!m_protocol){ // Game protocol has already been created at this point
-				m_protocol = m_service_port->make_protocol(recvChecksum == checksum, m_msg);
-				if(!m_protocol){
-					closeConnection();
-					m_connectionLock.unlock();
-					return;
-				}
-				m_protocol->setConnection(this);
+	if(recvChecksum == checksum)
+		// remove the checksum
+		m_msg.GetU32();
+
+	if(!m_receivedFirst){
+		m_receivedFirst = true;
+		// First message received
+		if(!m_protocol){ // Game protocol has already been created at this point
+			m_protocol = m_service_port->make_protocol(recvChecksum == checksum, m_msg);
+			if(!m_protocol){
+				closeConnection();
+				m_connectionLock.unlock();
+				return;
 			}
-			else{
-				// Skip protocol ID
-				m_msg.GetByte();
-			}
-			m_protocol->onRecvFirstMessage(m_msg);
+			m_protocol->setConnection(shared_from_this());
 		}
 		else{
-			// Send the packet to the current protocol
-			m_protocol->onRecvMessage(m_msg);
+			// Skip protocol ID
+			m_msg.GetByte();
 		}
+		m_protocol->onRecvFirstMessage(m_msg);
+	}
+	else{
+		// Send the packet to the current protocol
+		m_protocol->onRecvMessage(m_msg);
+	}
+
+	try{
+		++m_pendingRead;
+		m_readTimer.expires_from_now(boost::posix_time::seconds(30));
+		m_readTimer.async_wait( boost::bind(&Connection::handleReadTimeout, boost::weak_ptr<Connection>(shared_from_this()),
+			boost::asio::placeholders::error));
 
 		// Wait to the next packet
-		m_pendingRead++;
 		boost::asio::async_read(getHandle(),
 			boost::asio::buffer(m_msg.getBuffer(), NetworkMessage::header_length),
 			boost::bind(&Connection::parseHeader, this, boost::asio::placeholders::error));
 	}
-	else{
-		handleReadError(error);
-	}
-	m_connectionLock.unlock();
-}
-
-void Connection::handleTimeout(const boost::system::error_code& error)
-{
-	if(!error){
-		m_connectionLock.lock();
-		if(m_pendingRead > 0){
-			//cancel all asynchronous operations associated with the socket
-			getHandle().cancel();
+	catch(boost::system::system_error& e){
+		if(m_logError){
+			LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+			m_logError = false;
+			closeConnection();
 		}
-		m_connectionLock.unlock();
 	}
-}
 
-void Connection::handleReadError(const boost::system::error_code& error)
-{
-	#ifdef __DEBUG_NET_DETAIL__
-	PRINT_ASIO_ERROR("Reading - detail");
-	#endif
-	if(error == boost::asio::error::operation_aborted){
-		//Operation aborted because connection will be closed
-		//Do NOT call closeConnection() from here
-	}
-	else if(error == boost::asio::error::eof){
-		//No more to read
-		closeConnection();
-	}
-	else if(error == boost::asio::error::connection_reset ||
-			error == boost::asio::error::connection_aborted){
-		//Connection closed remotely
-		closeConnection();
-	}
-	else{
-		PRINT_ASIO_ERROR("Reading");
-		closeConnection();
-	}
-	m_readError = true;
+	m_connectionLock.unlock();
 }
 
 bool Connection::send(OutputMessage_ptr msg)
@@ -383,7 +370,7 @@ bool Connection::send(OutputMessage_ptr msg)
 	#endif
 
 	m_connectionLock.lock();
-	if(m_closeState == CLOSE_STATE_CLOSING || m_writeError){
+	if(m_connectionState != CONNECTION_STATE_OPEN || m_writeError){
 		m_connectionLock.unlock();
 		return false;
 	}
@@ -416,11 +403,16 @@ bool Connection::send(OutputMessage_ptr msg)
 void Connection::internalSend(OutputMessage_ptr msg)
 {
 	TRACK_MESSAGE(msg);
-	m_pendingWrite++;
+
 	try{
+		++m_pendingWrite;
+		m_writeTimer.expires_from_now(boost::posix_time::seconds(30));
+		m_writeTimer.async_wait( boost::bind(&Connection::handleWriteTimeout, boost::weak_ptr<Connection>(shared_from_this()),
+			boost::asio::placeholders::error));
+
 		boost::asio::async_write(getHandle(),
 			boost::asio::buffer(msg->getOutputBuffer(), msg->getMessageLength()),
-			boost::bind(&Connection::onWriteOperation, this, msg, boost::asio::placeholders::error));
+			boost::bind(&Connection::onWriteOperation, shared_from_this(), msg, boost::asio::placeholders::error));
 	}
 	catch(boost::system::system_error& e){
 		if(m_logError){
@@ -451,7 +443,7 @@ void Connection::onWriteOperation(OutputMessage_ptr msg, const boost::system::er
 	#endif
 
 	m_connectionLock.lock();
-	m_pendingWrite--;
+	m_writeTimer.cancel();
 
 	TRACK_MESSAGE(msg);
 	msg.reset();
@@ -460,14 +452,57 @@ void Connection::onWriteOperation(OutputMessage_ptr msg, const boost::system::er
 		handleWriteError(error);
 	}
 
-	if(m_closeState == CLOSE_STATE_CLOSING){
-		if(!closingConnection()){
-			m_connectionLock.unlock();
-		}
+	if(m_connectionState != CONNECTION_STATE_OPEN || m_writeError){
+		closeSocket();
+		closeConnection();
+		m_connectionLock.unlock();
 		return;
 	}
 
+	--m_pendingWrite;
 	m_connectionLock.unlock();
+}
+
+void Connection::handleReadError(const boost::system::error_code& error)
+{
+	#ifdef __DEBUG_NET_DETAIL__
+	PRINT_ASIO_ERROR("Reading - detail");
+	#endif
+	if(error == boost::asio::error::operation_aborted){
+		//Operation aborted because connection will be closed
+		//Do NOT call closeConnection() from here
+	}
+	else if(error == boost::asio::error::eof){
+		//No more to read
+		closeConnection();
+	}
+	else if(error == boost::asio::error::connection_reset ||
+			error == boost::asio::error::connection_aborted){
+		//Connection closed remotely
+		closeConnection();
+	}
+	else{
+		PRINT_ASIO_ERROR("Reading");
+		closeConnection();
+	}
+	m_readError = true;
+}
+
+void Connection::handleReadTimeout(boost::weak_ptr<Connection> weak_conn, const boost::system::error_code& error)
+{
+	if(!error){
+		if(weak_conn.expired()){
+			return;
+		}
+
+		if(shared_ptr<Connection> connection = weak_conn.lock()){		
+			#ifdef __DEBUG_NET_DETAIL__
+			std::cout << "Connection::handleReadTimeout" << std::endl;
+			#endif
+			connection->closeSocket();
+			connection->closeConnection();
+		}
+	}
 }
 
 void Connection::handleWriteError(const boost::system::error_code& error)
@@ -493,4 +528,21 @@ void Connection::handleWriteError(const boost::system::error_code& error)
 		closeConnection();
 	}
 	m_writeError = true;
+}
+
+void Connection::handleWriteTimeout(boost::weak_ptr<Connection> weak_conn, const boost::system::error_code& error)
+{
+	if(!error){
+		if(weak_conn.expired()){
+			return;
+		}
+
+		if(shared_ptr<Connection> connection = weak_conn.lock()){		
+			#ifdef __DEBUG_NET_DETAIL__
+			std::cout << "Connection::handleWriteTimeout" << std::endl;
+			#endif
+			connection->closeSocket();
+			connection->closeConnection();
+		}
+	}
 }

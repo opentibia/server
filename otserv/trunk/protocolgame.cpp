@@ -86,7 +86,7 @@ void ProtocolGame::addGameTaskInternal(bool droppable, uint32_t delay, const Fun
 	}
 }
 
-ProtocolGame::ProtocolGame(Connection* connection) :
+ProtocolGame::ProtocolGame(Connection_ptr connection) :
 	Protocol(connection)
 {
 	player = NULL;
@@ -316,7 +316,7 @@ bool ProtocolGame::logout(bool forced)
 		}
 	}
 
-	if(Connection* connection = getConnection()){
+	if(Connection_ptr connection = getConnection()){
 		connection->closeConnection();
 	}
 

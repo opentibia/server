@@ -57,7 +57,7 @@ public:
 	static uint32_t protocolGameCount;
 #endif
 
-	ProtocolGame(Connection* connection);
+	ProtocolGame(Connection_ptr connection);
 	virtual ~ProtocolGame();
 
 	bool login(const std::string& name, bool isSetGM);

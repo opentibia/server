@@ -40,7 +40,7 @@ public:
 	static uint32_t protocolStatusCount;
 #endif
 
-	ProtocolStatus(Connection* connection) : Protocol(connection)
+	ProtocolStatus(Connection_ptr connection) : Protocol(connection)
 	{
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		protocolStatusCount++;

@@ -39,7 +39,7 @@ public:
 	static uint32_t protocolLoginCount;
 #endif
 
-	ProtocolLogin(Connection* connection) : Protocol(connection)
+	ProtocolLogin(Connection_ptr connection) : Protocol(connection)
 	{
 		enableChecksum();
 

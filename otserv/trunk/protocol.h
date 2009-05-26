@@ -27,8 +27,9 @@
 
 class NetworkMessage;
 class OutputMessage;
-typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 class Connection;
+typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
+typedef boost::shared_ptr<Connection> Connection_ptr;
 class RSA;
 
 #define CLIENT_VERSION_MIN 841
@@ -39,7 +40,7 @@ class RSA;
 class Protocol : boost::noncopyable
 {
 public:
-	Protocol(Connection* connection)
+	Protocol(Connection_ptr connection)
 	{
 		m_connection = connection;
 		m_encryptionEnabled = false;
@@ -58,9 +59,9 @@ public:
 	virtual void onRecvFirstMessage(NetworkMessage& msg) = 0;
 	virtual void onConnect() {} // Used by new gameworld to send first packet to client
 
-	Connection* getConnection() { return m_connection;}
-	const Connection* getConnection() const { return m_connection;}
-	void setConnection(Connection* connection) { m_connection = connection; }
+	Connection_ptr getConnection() { return m_connection;}
+	const Connection_ptr getConnection() const { return m_connection;}
+	void setConnection(Connection_ptr connection) { m_connection = connection; }
 
 	uint32_t getIP() const;
 	int32_t addRef() {return ++m_refCount;}
@@ -87,11 +88,10 @@ protected:
 	virtual void releaseProtocol();
 	virtual void deleteProtocolTask();
 	friend class Connection;
-
 private:
 
 	OutputMessage_ptr m_outputBuffer;
-	Connection* m_connection;
+	Connection_ptr m_connection;
 	bool m_encryptionEnabled;
 	bool m_checksumEnabled;
 	bool m_rawMessages;

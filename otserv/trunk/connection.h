@@ -27,6 +27,7 @@
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 #include "networkmessage.h"
 
@@ -34,6 +35,7 @@ class Protocol;
 class OutputMessage;
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 class Connection;
+typedef boost::shared_ptr<Connection> Connection_ptr;
 class ServiceBase;
 typedef boost::shared_ptr<ServiceBase> Service_ptr;
 class ServicePort;
@@ -59,9 +61,9 @@ public:
 		return &instance;
 	}
 
-	Connection* createConnection(boost::asio::ip::tcp::socket* socket,
+	Connection_ptr createConnection(boost::asio::ip::tcp::socket* socket,
 		boost::asio::io_service& io_service, ServicePort_ptr servicers);
-	void releaseConnection(Connection* connection);
+	void releaseConnection(Connection_ptr connection);
 	void closeAll();
 
 protected:
@@ -70,21 +72,22 @@ protected:
 	{
 	}
 
-	std::list<Connection*> m_connections;
+	std::list<Connection_ptr> m_connections;
 	boost::recursive_mutex m_connectionManagerLock;
 };
 
-class Connection : boost::noncopyable
+class Connection : public boost::enable_shared_from_this<Connection>, boost::noncopyable
 {
 public:
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t connectionCount;
 #endif
 
-	enum {
-		CLOSE_STATE_NONE = 0,
-		CLOSE_STATE_REQUESTED = 1,
-		CLOSE_STATE_CLOSING = 2,
+	enum ConnectionState_t {
+		CONNECTION_STATE_OPEN = 0,
+		CONNECTION_STATE_REQUEST_CLOSE = 1,
+		CONNECTION_STATE_CLOSING = 2,
+		CONNECTION_STATE_CLOSED = 3,
 	};
 
 private:
@@ -92,7 +95,8 @@ private:
 		boost::asio::io_service& io_service,
 		ServicePort_ptr service_port) : 
 			m_socket(socket),
-			m_timer(io_service),
+			m_readTimer(io_service),
+			m_writeTimer(io_service),
 			m_io_service(io_service),
 			m_service_port(service_port)
 	{
@@ -100,9 +104,8 @@ private:
 		m_protocol = NULL;
 		m_pendingWrite = 0;
 		m_pendingRead = 0;
-		m_closeState = CLOSE_STATE_NONE;
+		m_connectionState = CONNECTION_STATE_OPEN;
 		m_receivedFirst = false;
-		m_socketClosed = false;
 		m_writeError = false;
 		m_readError = false;
 
@@ -139,33 +142,34 @@ private:
 	void parsePacket(const boost::system::error_code& error);
 
 	void onWriteOperation(OutputMessage_ptr msg, const boost::system::error_code& error);
-	void onStopOperation();
 
-	void handleTimeout(const boost::system::error_code& error);
+	void onStopOperation();
 	void handleReadError(const boost::system::error_code& error);
 	void handleWriteError(const boost::system::error_code& error);
 
+	static void handleReadTimeout(boost::weak_ptr<Connection> weak_conn, const boost::system::error_code& error);
+	static void handleWriteTimeout(boost::weak_ptr<Connection> weak_conn, const boost::system::error_code& error);
+
 	void closeConnectionTask();
-	bool closingConnection();
 	void deleteConnectionTask();
 	void releaseConnection();
+	void closeSocket();
 
 	void internalSend(OutputMessage_ptr msg);
 
 	NetworkMessage m_msg;
 	boost::asio::ip::tcp::socket* m_socket;
-	boost::asio::deadline_timer m_timer;
+	boost::asio::deadline_timer m_readTimer;
+	boost::asio::deadline_timer m_writeTimer;
 	boost::asio::io_service& m_io_service;
 	ServicePort_ptr m_service_port;
-	bool m_socketClosed;
 	bool m_receivedFirst;
-
 	bool m_writeError;
 	bool m_readError;
 
 	int32_t m_pendingWrite;
 	int32_t m_pendingRead;
-	uint32_t m_closeState;
+	ConnectionState_t m_connectionState;
 	uint32_t m_refCount;
 	static bool m_logError;
 	boost::recursive_mutex m_connectionLock;

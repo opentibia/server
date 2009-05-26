@@ -20,7 +20,6 @@
 #include "otpch.h"
 
 #include "outputmessage.h"
-#include "connection.h"
 #include "protocol.h"
 #include "scheduler.h"
 
@@ -233,7 +232,7 @@ void OutputMessagePool::configureOutputMessage(OutputMessage_ptr msg, Protocol* 
 		msg->setState(OutputMessage::STATE_ALLOCATED_NO_AUTOSEND);
 	}
 
-	Connection* connection = protocol->getConnection();
+	Connection_ptr connection = protocol->getConnection();
 	assert(connection != NULL);
 
 	msg->setProtocol(protocol);

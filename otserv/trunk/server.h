@@ -29,6 +29,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 class Connection;
+typedef boost::shared_ptr<Connection> Connection_ptr;
 class Protocol;
 class NetworkMessage;
 
@@ -50,7 +51,7 @@ public:
 	virtual uint8_t get_protocol_identifier() const = 0;
 	virtual const char* get_protocol_name() const = 0;
 
-	virtual Protocol* make_protocol(Connection* c) const = 0;
+	virtual Protocol* make_protocol(Connection_ptr c) const = 0;
 };
 
 template <typename ProtocolType>
@@ -62,7 +63,7 @@ public:
 	uint8_t get_protocol_identifier() const {return ProtocolType::protocol_identifier;}
 	const char* get_protocol_name() const {return ProtocolType::protocol_name();}
 
-	Protocol* make_protocol(Connection* c) const {return new ProtocolType(c);}
+	Protocol* make_protocol(Connection_ptr c) const {return new ProtocolType(c);}
 };
 
 // A Service Port represents a listener on a port.

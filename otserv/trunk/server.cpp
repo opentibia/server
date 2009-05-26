@@ -179,7 +179,7 @@ void ServicePort::onAccept(boost::asio::ip::tcp::socket* socket, const boost::sy
 
 		if(remote_ip != 0 && g_bans.acceptConnection(remote_ip)){
 
-			Connection* connection = ConnectionManager::getInstance()->createConnection(socket, m_io_service, shared_from_this());
+			Connection_ptr connection = ConnectionManager::getInstance()->createConnection(socket, m_io_service, shared_from_this());
 
 			if(m_services.front()->is_single_socket()){
 				// Only one handler, and it will send first
@@ -231,7 +231,7 @@ Protocol* ServicePort::make_protocol(bool checksummed, NetworkMessage& msg) cons
 		if(service->get_protocol_identifier() == protocolId && ((checksummed &&
 			service->is_checksummed()) || !service->is_checksummed())){
 			// Correct service! Create protocol and get on with it
-			return service->make_protocol(NULL);
+			return service->make_protocol(Connection_ptr());
 		}
 
 		// We can ignore the other cases, they will most likely end up in return NULL anyways.

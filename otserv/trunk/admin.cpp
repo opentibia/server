@@ -45,7 +45,7 @@ AdminProtocolConfig* g_adminConfig = NULL;
 uint32_t ProtocolAdmin::protocolAdminCount = 0;
 #endif
 
-ProtocolAdmin::ProtocolAdmin(Connection* connection) :
+ProtocolAdmin::ProtocolAdmin(Connection_ptr connection) :
 Protocol(connection)
 {
 	m_state = NO_CONNECTED;

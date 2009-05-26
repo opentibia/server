@@ -184,7 +184,7 @@ public:
 	static uint32_t protocolAdminCount;
 #endif
 
-	ProtocolAdmin(Connection* connection);
+	ProtocolAdmin(Connection_ptr connection);
 	virtual ~ProtocolAdmin();
 
 	virtual void parsePacket(NetworkMessage& msg);
