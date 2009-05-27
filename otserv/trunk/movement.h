@@ -21,7 +21,6 @@
 #ifndef __MOVEMENT_H__
 #define __MOVEMENT_H__
 
-
 #include "luascript.h"
 #include "baseevents.h"
 #include <map>
@@ -62,7 +61,7 @@ public:
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
 
 protected:
-	typedef std::map<int32_t, MoveEventList> MoveListMap;
+	typedef OTSERV_HASH_MAP<int32_t, MoveEventList> MoveListMap;
 	typedef std::map<Position, MoveEventList> MovePosListMap;
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();

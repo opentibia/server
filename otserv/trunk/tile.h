@@ -59,7 +59,7 @@ enum tileflags_t{
 	TILESTATE_FLOORCHANGE_EAST			= 1 << 11,
 	TILESTATE_FLOORCHANGE_WEST			= 1 << 12,
 	TILESTATE_POSITIONCHANGE			= 1 << 13,
-	TILESTATE_MAGICFIELD				= 1 << 14,
+	TILESTATE_HASSCRIPTITEM				= 1 << 14,
 	TILESTATE_BLOCKSOLID				= 1 << 15,
 	TILESTATE_BLOCKPATH					= 1 << 16,
 	TILESTATE_IMMOVABLEBLOCKSOLID		= 1 << 17,
@@ -89,6 +89,8 @@ public:
 
 	size_t size() {return items.size();}
 	size_t size() const {return items.size();}
+	bool empty() {return items.empty();}
+	bool empty() const {return items.empty();}
 
 	ItemVector::iterator insert(ItemVector::iterator _where, Item* item) {return items.insert(_where, item);}
 	ItemVector::iterator erase(ItemVector::iterator _pos) {return items.erase(_pos);}
@@ -129,6 +131,10 @@ public:
 	TileItemVector* getItemList();
 	const TileItemVector* getItemList() const;
 	TileItemVector* makeItemList();
+
+	TileItemVector* getScriptItemList();
+	const TileItemVector* getScriptItemList() const;
+	TileItemVector* makeScriptItemList();
 
 	CreatureVector* getCreatures();
 	const CreatureVector* getCreatures() const;
@@ -189,8 +195,6 @@ public:
 		}
 	}
 	bool hasHeight(uint32_t n) const;
-	uint32_t getHeight() const;
-
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
@@ -257,6 +261,7 @@ class DynamicTile : public Tile
 {
 	// By allocating the vectors in-house, we avoid some memory fragmentation
 	TileItemVector	items;
+	TileItemVector	scriptItems;
 	CreatureVector	creatures;
 
 public:
@@ -266,6 +271,10 @@ public:
 	TileItemVector* getItemList() {return &items;}
 	const TileItemVector* getItemList() const {return &items;}
 	TileItemVector* makeItemList() {return &items;}
+
+	TileItemVector* getScriptItemList() {return &scriptItems;}
+	const TileItemVector* getScriptItemList() const {return &scriptItems;}
+	TileItemVector* makeScriptItemList() {return &scriptItems;}
 
 	CreatureVector* getCreatures() {return &creatures;}
 	const CreatureVector* getCreatures() const {return &creatures;}
@@ -277,7 +286,9 @@ class StaticTile : public Tile
 {
 	// We very rarely even need the vectors, so don't keep them in memory
 	TileItemVector* items;
+	TileItemVector* scriptItems;
 	CreatureVector*	creatures;
+
 public:
 	StaticTile(uint16_t x, uint16_t y, uint16_t z);
 	~StaticTile();
@@ -285,6 +296,10 @@ public:
 	TileItemVector* getItemList() {return items;}
 	const TileItemVector* getItemList() const {return items;}
 	TileItemVector* makeItemList() {return (items)? (items) : (items = new TileItemVector);}
+
+	TileItemVector* getScriptItemList() {return scriptItems;}
+	const TileItemVector* getScriptItemList() const {return scriptItems;}
+	TileItemVector* makeScriptItemList() {return (scriptItems)? (scriptItems) : (scriptItems = new TileItemVector);}
 
 	CreatureVector* getCreatures() {return creatures;}
 	const CreatureVector* getCreatures() const {return creatures;}
@@ -322,6 +337,14 @@ inline const CreatureVector* Tile::getCreatures() const
 	return static_cast<const StaticTile*>(this)->StaticTile::getCreatures();
 }
 
+inline CreatureVector* Tile::makeCreatures()
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::makeCreatures();
+
+	return static_cast<StaticTile*>(this)->StaticTile::makeCreatures();
+}
+
 inline TileItemVector* Tile::getItemList()
 {
 	if(is_dynamic())
@@ -338,14 +361,6 @@ inline const TileItemVector* Tile::getItemList() const
 	return static_cast<const StaticTile*>(this)->StaticTile::getItemList();
 }
 
-inline CreatureVector* Tile::makeCreatures()
-{
-	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::makeCreatures();
-
-	return static_cast<StaticTile*>(this)->StaticTile::makeCreatures();
-}
-
 inline TileItemVector* Tile::makeItemList()
 {
 	if(is_dynamic())
@@ -354,9 +369,34 @@ inline TileItemVector* Tile::makeItemList()
 	return static_cast<StaticTile*>(this)->StaticTile::makeItemList();
 }
 
+inline TileItemVector* Tile::getScriptItemList()
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::getScriptItemList();
+
+	return static_cast<StaticTile*>(this)->StaticTile::getScriptItemList();
+}
+
+inline const TileItemVector* Tile::getScriptItemList() const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::getScriptItemList();
+
+	return static_cast<const StaticTile*>(this)->StaticTile::getScriptItemList();
+}
+
+inline TileItemVector* Tile::makeScriptItemList()
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::makeScriptItemList();
+
+	return static_cast<StaticTile*>(this)->StaticTile::makeScriptItemList();
+}
+
 inline StaticTile::StaticTile(uint16_t x, uint16_t y, uint16_t z) :
 	Tile(x, y, z),
 	items(NULL),
+	scriptItems(NULL),
 	creatures(NULL)
 {}
 

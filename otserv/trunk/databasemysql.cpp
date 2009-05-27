@@ -139,7 +139,7 @@ bool DatabaseMySQL::executeQuery(const std::string &query)
 
 	// executes the query
 	if(mysql_real_query(&m_handle, query.c_str(), query.length()) != 0){
-		std::cout << "mysql_real_query(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+		std::cout << "mysql_real_query(): " << query.substr(0, 256) << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
 
 		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
@@ -185,7 +185,7 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 
 	// error occured
 	if(!m_res){
-		std::cout << "mysql_store_result(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+		std::cout << "mysql_store_result(): " << query.substr(0, 256) << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
 
 		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
