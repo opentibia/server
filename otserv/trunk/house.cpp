@@ -78,10 +78,12 @@ void House::setHouseOwner(uint32_t guid)
 
 		PlayerVector to_kick;
 		for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-			for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
-				Creature* creature = (*it)->__getThing(i)->getCreature();
-				if(creature != NULL && creature->getPlayer())
-					to_kick.push_back(creature->getPlayer());
+			if(const CreatureVector* creatures = (*it)->getCreatures()){
+				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+					if((*cit)->getPlayer()){
+						to_kick.push_back((*cit)->getPlayer());
+					}
+				}
 			}
 		}
 		while(to_kick.empty() == false) {
@@ -267,18 +269,16 @@ bool House::transferToDepot()
 	Item* item = NULL;
 
 	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-		for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
-			item = (*it)->__getThing(i)->getItem();
-
-			if(!item)
-				continue;
-
-			if(item->isPickupable()){
-				moveItemList.push_back(item);
-			}
-			else if((tmpContainer = item->getContainer())){
-				for(ItemList::const_iterator it = tmpContainer->getItems(); it != tmpContainer->getEnd(); ++it){
-					moveItemList.push_back(*it);
+		if(const TileItemVector* items = (*it)->getItemList()){
+			for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
+				item = (*it);
+				if(item->isPickupable()){
+					moveItemList.push_back(item);
+				}
+				else if((tmpContainer = item->getContainer())){
+					for(ItemList::const_iterator it = tmpContainer->getItems(); it != tmpContainer->getEnd(); ++it){
+						moveItemList.push_back(*it);
+					}
 				}
 			}
 		}
@@ -301,15 +301,18 @@ bool House::transferToDepot()
 	return true;
 }
 
-void House::cleanHouse() {
+void House::cleanHouse()
+{
 	transferToDepot();
 
 	PlayerVector to_kick;
 	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-		for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
-			Creature* creature = (*it)->__getThing(i)->getCreature();
-			if(creature != NULL && creature->getPlayer())
-				to_kick.push_back(creature->getPlayer());
+		if(const CreatureVector* creatures = (*it)->getCreatures()){
+			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+				if((*cit)->getPlayer()){
+					to_kick.push_back((*cit)->getPlayer());
+				}
+			}	
 		}
 	}
 	while(to_kick.empty() == false) {
@@ -561,7 +564,7 @@ bool AccessList::parseList(const std::string& _list)
 
 		if(line.find("@") != std::string::npos){
 			std::string::size_type pos = line.find("@");
-			addGuild(line.substr(pos + 1), "");
+			addGuild(line.substr(pos + 1), line.substr(0, pos));
 		}
 		else if(line.find("!") != std::string::npos || line.find("*") != std::string::npos || line.find("?") != std::string::npos){
 			addExpression(line);
@@ -590,8 +593,14 @@ bool AccessList::addGuild(const std::string& guildName, const std::string& rank)
 {
 	uint32_t guildId;
 	if(IOPlayer::instance()->getGuildIdByName(guildId, guildName)){
-		if(guildId != 0 && guildList.find(guildId) == guildList.end()){
-			guildList.insert(guildId);
+		if(guildId != 0){
+			for(GuildList::iterator it = guildList.begin(); it != guildList.end(); ++it){
+				if(it->first == guildId && strcasecmp(rank.c_str(), it->second.c_str()) == 0){
+					return false;
+				}
+			}
+
+			guildList.push_back(std::pair<uint32_t, std::string>(guildId, rank));
 			return true;
 		}
 	}
@@ -665,9 +674,11 @@ bool AccessList::isInList(const Player* player)
 	if(playerIt != playerList.end())
 		return true;
 
-	GuildList::iterator guildIt = guildList.find(player->getGuildId());
-	if(guildIt != guildList.end())
-		return true;
+	for(GuildList::iterator it = guildList.begin(); it != guildList.end(); ++it){
+		if(it->first == player->getGuildId() && strcasecmp(player->getGuildRank().c_str(), it->second.c_str()) == 0){
+			return true;
+		}
+	}
 
 	return false;
 }

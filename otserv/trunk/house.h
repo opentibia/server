@@ -33,9 +33,7 @@
 #include "player.h"
 
 class House;
-//[ added for beds system
 class BedItem;
-//]
 
 class AccessList
 {
@@ -54,7 +52,7 @@ public:
 
 private:
 	typedef OTSERV_HASH_SET<uint32_t> PlayerList;
-	typedef OTSERV_HASH_SET<uint32_t> GuildList; //TODO: include ranks
+	typedef std::list< std::pair<uint32_t, std::string> > GuildList;
 
 	typedef std::list<std::string> ExpressionList;
 	typedef std::list<std::pair<boost::regex, bool> > RegExList;
@@ -115,10 +113,7 @@ enum AccessHouseLevel_t{
 
 typedef std::list<HouseTile*> HouseTileList;
 typedef std::list<Door*> HouseDoorList;
-//[ added for beds system
 typedef std::list<BedItem*> HouseBedItemList;
-//]
-
 
 class HouseTransferItem : public Item
 {
@@ -223,9 +218,7 @@ private:
 	std::string houseOwnerName;
 	HouseTileList houseTiles;
 	HouseDoorList doorList;
-	//[ added for beds system
 	HouseBedItemList bedsList;
-	//]
 	AccessList guestList;
 	AccessList subOwnerList;
 	std::string houseName;
