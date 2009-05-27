@@ -203,6 +203,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
 
 	registerMemberFunction("Player", "addItem(Item item)", &Manager::lua_Player_addItem);
+	registerMemberFunction("Player", "removeItem(int id [, int type [,int count]])", &Manager::lua_Player_removeItem);
 	registerMemberFunction("Player", "getInventoryItem(int slot)", &Manager::lua_Player_getInventoryItem);
 	registerMemberFunction("Player", "addExperience(int experience)", &Manager::lua_Player_addExperience);
 	registerMemberFunction("Player", "setTown(int townid)", &Manager::lua_Player_setTown);
@@ -231,14 +232,17 @@ void Manager::registerClasses() {
 	registerMemberFunction("Item", "isPickupable()", &Manager::lua_Item_isPickupable);
 	registerMemberFunction("Item", "getText()", &Manager::lua_Item_getText);
 	registerMemberFunction("Item", "getSpecialDescription()", &Manager::lua_Item_getSpecialDescription);
+	registerMemberFunction("Item", "getSubtype()", &Manager::lua_Item_getSubtype);
 
-	registerMemberFunction("Item", "setItemID(int newid)", &Manager::lua_Item_setItemID);
+	registerMemberFunction("Item", "setItemID(int newid [, int newtype])", &Manager::lua_Item_setItemID);
 	registerMemberFunction("Item", "setActionID(int id)", &Manager::lua_Item_setActionID);
 	registerMemberFunction("Item", "setCount(int newcount)", &Manager::lua_Item_setCount);
 	registerMemberFunction("Item", "startDecaying()", &Manager::lua_Item_startDecaying);
 	registerMemberFunction("Item", "setText(string text)", &Manager::lua_Item_setText);
 	registerMemberFunction("Item", "setSpecialDescription(string text)", &Manager::lua_Item_setSpecialDescription);
+	registerMemberFunction("Item", "setSubtype(int newtype)", &Manager::lua_Item_setSubtype);
 
+	registerGlobalFunction("getItemType(int itemid)", &Manager::lua_getItemType);
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
 	registerGlobalFunction("isValidItemID(int id)", &Manager::lua_isValidItemID);
 
@@ -306,6 +310,9 @@ void Manager::registerClasses() {
 void Manager::registerFunctions() {
 	// General functions
 	registerGlobalFunction("wait(int delay)", &Manager::lua_wait);
+	registerGlobalFunction("stacktrace(thread thread)", &Manager::lua_stacktrace);
+	registerGlobalFunction("require_directory(string path)", &Manager::lua_require_directory);
+	registerGlobalFunction("get_thread_id(thread t)", &Manager::lua_get_thread_id);
 
 	registerGlobalFunction("getConfigValue(string key)", &Manager::lua_getConfigValue);
 
@@ -358,20 +365,21 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
 	registerGlobalFunction("sendMagicEffect(position where, int type)", &Manager::lua_sendMagicEffect);
 
-
 	luaL_register(state, "bit", lua_BitReg);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Utility functions
 
-int LuaState::lua_wait() {
+int LuaState::lua_wait()
+{
 	// integer delay is ontop of stack
 	pushString("WAIT");
 	return lua_yield(state, 2);
 }
 
-int LuaState::lua_getConfigValue() {
+int LuaState::lua_getConfigValue()
+{
 	std::string key = popString();
 
 	if(key == "sql_user" || key == "sql_pass" || key == "_G"){
@@ -379,6 +387,42 @@ int LuaState::lua_getConfigValue() {
 	}
 
 	g_config.getConfigValue(key, state);
+	return 1;
+}
+
+int LuaState::lua_require_directory()
+{
+	std::string script_dir = g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/";
+	std::string dir = popString();
+	if(!manager->loadDirectory(script_dir + dir)){
+		throw Error("Failed to load directory " + dir + ".");
+	}
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_get_thread_id()
+{
+	lua_State* L = lua_tothread(state, -1);
+	lua_pop(state, 1);
+	std::ostringstream os;
+	os << L;
+	pushString(os.str());
+	return 1;
+}
+
+int LuaState::lua_stacktrace()
+{
+	lua_State* L = lua_tothread(state, -1);
+	lua_pop(state, 1);
+
+	std::string report;
+	{
+		// Local thread is OK here
+		LuaThread lt(manager, L);
+		report = lt.report();
+	}
+	pushString(report);
 	return 1;
 }
 
@@ -2261,6 +2305,30 @@ int LuaState::lua_Player_addItem()
 	return 1;
 }
 
+int LuaState::lua_Player_removeItem()
+{
+	int subtype = -1;
+	int count = 1;
+	int itemid = 0;
+	if(getStackSize() > 3)
+		count = popInteger();
+	if(getStackSize() > 2)
+		subtype = popInteger();
+	itemid = popInteger();
+	Player* player = popPlayer();
+	
+	const ItemType& it = Item::items[itemid];
+	if(it.id == 0){
+		pushBoolean(false);
+		return 1;
+	}
+	if(it.stackable && subtype != -1 && count == 1)
+		count = subtype;
+
+	pushBoolean(g_game.removeItemOfType(NULL, player, itemid, count, subtype));
+	return 1;
+}
+
 int LuaState::lua_getOnlinePlayers()
 {
 	newTable();
@@ -2364,11 +2432,22 @@ int LuaState::lua_Item_getUniqueID()
 int LuaState::lua_Item_getCount()
 {
 	Item* item = popItem();
-	if(item->isStackable()) {
+	if(item->isStackable())
 		pushInteger(item->getItemCount());
-	} else {
+	else if(item->isRune())
+		pushInteger(item->getCharges());
+	else
 		pushInteger(1);
-	}
+	return 1;
+}
+
+int LuaState::lua_Item_getSubtype()
+{
+	Item* item = popItem();
+	if(item->isRune() || item->isFluidContainer() || item->isSplash())
+		pushInteger(item->getSubType());
+	else
+		pushNil();
 	return 1;
 }
 
@@ -2411,12 +2490,12 @@ int LuaState::lua_Item_setItemID()
 	Item* item = popItem();
 
 	if(newid < 0 || newid > 65535) {
-		throw Error("Item:setItemID : item ID provided");
+		throw Error("Item.setItemID : item ID provided");
 	}
 
 	const ItemType& it = Item::items[newid];
 	if(it.stackable && newcount > 100 || newcount < -1){
-		throw Error("Item:setItemID : Stack count cannot be higher than 100.");
+		throw Error("Item.setItemID : Stack count is out of range.");
 	}
 
 	g_game.transformItem(NULL, item, newid, newcount);
@@ -2437,14 +2516,29 @@ int LuaState::lua_Item_setCount()
 {
 	int newcount = popInteger();
 	Item* item = popItem();
-	if(!item->isStackable()) {
+	if(!item->isStackable() && !item->isRune()) {
 		throw Error("Item.setCount: Item is not stackable!");
 	}
-	if(newcount < 1) {
+	if(newcount < 1 || newcount > 100) {
 		throw Error("Item.setCount: New count out of range!");
 	}
 
 	pushBoolean(g_game.transformItem(NULL, item, item->getID(), newcount) != NULL);
+	return 1;
+}
+
+int LuaState::lua_Item_setSubtype()
+{
+	int newtype = popInteger();
+	Item* item = popItem();
+	if(!item->isRune() && !item->isFluidContainer() && !item->isSplash()) {
+		throw Error("Item.setSubtype: Item does not have a subtype!");
+	}
+	if(newtype < 0 || newtype > 100) {
+		throw Error("Item.setSubtype: New subtype out of range!");
+	}
+
+	pushBoolean(g_game.transformItem(NULL, item, item->getID(), newtype) != NULL);
 	return 1;
 }
 
@@ -2485,6 +2579,123 @@ int LuaState::lua_getItemIDByName()
 	} else {
 		pushUnsignedInteger(itemid);
 	}
+	return 1;
+}
+
+int LuaState::lua_getItemType()
+{
+	int itemid = popInteger();
+
+	newTable();
+
+	const ItemType& it = Item::items[itemid];
+
+	if(it.id == 0){
+		pushNil();
+		return 1;
+	}
+
+	setField(-1, "id", it.id);
+	setField(-1, "clientID", it.clientId);
+
+	setField(-1, "isGround", it.isGroundTile());
+	setField(-1, "isContainer", it.isContainer());
+	setField(-1, "isSplash", it.isSplash());
+	setField(-1, "isFluidContainer", it.isFluidContainer());
+	setField(-1, "isDoor", it.isDoor());
+	setField(-1, "isMagicField", it.isMagicField());
+	setField(-1, "isTeleport", it.isTeleport());
+	setField(-1, "isKey", it.isKey());
+	setField(-1, "isDepot", it.isDepot());
+	setField(-1, "isMailbox", it.isMailbox());
+	setField(-1, "isTrashHolder", it.isTrashHolder());
+	setField(-1, "isRune", it.isRune());
+	setField(-1, "isBed", it.isBed());
+	setField(-1, "hasSpecialType", it.isRune() || it.isFluidContainer() || it.isSplash());
+
+	setField(-1, "name", it.name);
+	setField(-1, "article", it.article);
+	setField(-1, "pluralName", it.pluralName);
+	setField(-1, "description", it.description);
+	setField(-1, "maxItems", it.maxItems);
+	setField(-1, "weight", it.weight);
+	setField(-1, "showCount", it.showCount);
+	setField(-1, "weaponType", it.weaponType);
+	setField(-1, "ammoType", it.ammoType);
+	setField(-1, "shootType", it.shootType);
+	setField(-1, "magicEffect", it.magicEffect);
+	setField(-1, "attack", it.attack);
+	setField(-1, "defence", it.defence);
+	setField(-1, "extraDefense", it.extraDefense);
+	setField(-1, "armor", it.armor);
+	setField(-1, "slotPosition", it.slotPosition);
+	setField(-1, "isVertical", it.isVertical);
+	setField(-1, "isHorizontal", it.isHorizontal);
+	setField(-1, "isHangable", it.isHangable);
+	setField(-1, "allowDistRead", it.allowDistRead);
+	setField(-1, "clientCharges", it.clientCharges);
+	setField(-1, "speed", it.speed);
+	setField(-1, "decayTo", it.decayTo);
+	setField(-1, "decayTime", it.decayTime);
+	setField(-1, "stopTime", it.stopTime);
+	setField(-1, "corpseType", it.corpseType);
+
+	setField(-1, "canReadText", it.canReadText);
+	setField(-1, "canWriteText", it.canWriteText);
+	setField(-1, "maxTextLen", it.maxTextLen);
+	setField(-1, "writeOnceItemID", it.writeOnceItemId);
+
+	setField(-1, "stackable", it.stackable);
+	setField(-1, "useable", it.useable);
+	setField(-1, "moveable", it.moveable);
+	setField(-1, "alwaysOnTop", it.alwaysOnTop);
+	setField(-1, "alwaysOnTopOrder", it.alwaysOnTopOrder);
+	setField(-1, "pickupable", it.pickupable);
+	setField(-1, "rotateable", it.rotateable);
+	setField(-1, "rotateTo", it.rotateTo);
+
+	setField(-1, "runeMagicLevel", it.runeMagicLevel);
+	setField(-1, "runeLevel", it.runeLevel);
+	setField(-1, "runeSpellName", it.runeSpellName);
+
+	setField(-1, "wieldInfo", it.wieldInfo);
+	setField(-1, "vocationString", it.vocationString);
+	setField(-1, "minRequiredLevel", it.minRequiredLevel);
+	setField(-1, "minRequiredMagicLevel", it.minRequiredMagicLevel);
+
+	setField(-1, "lightLevel", it.lightLevel);
+	setField(-1, "lightColor", it.lightColor);
+
+	setField(-1, "floorChangeDown", it.floorChangeDown);
+	setField(-1, "floorChangeNorth", it.floorChangeNorth);
+	setField(-1, "floorChangeSouth", it.floorChangeSouth);
+	setField(-1, "floorChangeEast", it.floorChangeEast);
+	setField(-1, "floorChangeWest", it.floorChangeWest);
+	setField(-1, "hasHeight", it.hasHeight);
+
+	setField(-1, "blockSolid", it.blockSolid);
+	setField(-1, "blockPickupable", it.blockPickupable);
+	setField(-1, "blockProjectile", it.blockProjectile);
+	setField(-1, "blockPathFind", it.blockPathFind);
+	setField(-1, "allowPickupable", it.allowPickupable);
+
+	setField(-1, "bedPartnerDirection", it.bedPartnerDirection);
+	setField(-1, "maleSleeperID", it.maleSleeperID);
+	setField(-1, "femaleSleeperID", it.femaleSleeperID);
+	setField(-1, "noSleeperID", it.noSleeperID);
+
+	setField(-1, "transformEquipTo", it.transformEquipTo);
+	setField(-1, "transformDeEquipTo", it.transformDeEquipTo);
+	setField(-1, "showDuration", it.showDuration);
+	setField(-1, "showCharges", it.showCharges);
+	setField(-1, "charges", it.charges);
+	setField(-1, "breakChance", it.breakChance);
+	setField(-1, "hitChance", it.hitChance);
+	setField(-1, "maxHitChance", it.maxHitChance);
+	setField(-1, "shootRange", it.shootRange);
+	setField(-1, "ammoAction", it.ammoAction);
+	setField(-1, "fluidSource", it.fluidSource);
+
 	return 1;
 }
 

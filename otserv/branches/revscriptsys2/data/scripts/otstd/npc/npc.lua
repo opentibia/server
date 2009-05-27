@@ -19,20 +19,20 @@ end
 
 -- Event handlers
 
-function NPC:runSuspendedState(state, event)
-	local thread = state.thread
-	local success, yieldtype, param = coroutine.resume(state.thread, self, event)
+function NPC:runSuspendedState(event)
+	local thread = self.state.thread
+	local success, yieldtype, param = coroutine.resume(thread, self, event)
 	
 	if not success then
 		local err = yieldtype
-		print (debug.traceback(state.thread, "Error in NPC '" .. self:getName() .. "' : " .. err))
+		print (debug.traceback(thread))-- "Error in NPC '" .. self:getName() .. "' : " .. err))
 
 		-- Clear up state
 		self.focus = nil
 		self.state = nil
-	elseif coroutine.status(state.thread) == "dead" then
+	elseif coroutine.status(thread) == "dead" then
 		-- Thread finished, kill it
-		state.thread = nil
+		self.state.thread = nil
 	else
 		local focus = self.focus
 	
@@ -60,21 +60,26 @@ end
 
 function NPC:onHearHandler(event)
 	local speaker = event.talking_creature
-	local talking_to = (self.focus_list[#speaker] ~= nil)
+	
+	if not typeof(speaker, "Player") then
+		return nil
+	end
+	
+	local talking_to = (self.focusList[#speaker] ~= nil)
 	
 	if talking_to then
 		-- We're talking to this player, alhough he may be one of many
 		self.focus = speaker
-		self.state = self.focus_list[#speaker]
+		self.state = self.focusList[#speaker]
 		
 		if not self.state.thread then
 			self.state.thread = coroutine.create(self.onHearFocusInternal)
 		end
-		self:runSuspendedState(self.state, event)
+		self:runSuspendedState(event)
 		
 		-- If focus is nil now, we stopped talking to this player
 		if self.focus == nil then
-			self.focus_list[#speaker] = nil
+			self.focusList[#speaker] = nil
 		else
 			-- Else we did react, set idle time
 			self.state.lastSpoken = os.time()
@@ -94,7 +99,7 @@ function NPC:onHearHandler(event)
 		-- If focus is no longer nil, we started talking to this player
 		if self.focus ~= nil then
 			-- Acquire focus
-			self.focus_list[#speaker] = self.state
+			self.focusList[#speaker] = self.state
 			
 			-- Set idle time
 			self.state.lastSpoken = os.time();
@@ -107,7 +112,7 @@ function NPC:onHearHandler(event)
 end
 
 function NPC:onThinkHandler(event)
-	for creatureID, state in pairs(self.focus_list) do
+	for creatureID, state in pairs(self.focusList) do
 		local creature = getThingByID(creatureID)
 		if creature then
 			-- Check if player has walked away
@@ -118,7 +123,7 @@ function NPC:onThinkHandler(event)
 				self:onRunoffInternal()
 				
 				if self.focus == nil then
-					self.focus_list[creatureID] = nil
+					self.focusList[creatureID] = nil
 				end
 				self.focus = nil
 				self.state = nil
@@ -133,7 +138,7 @@ function NPC:onThinkHandler(event)
 				self:onIdleInternal()
 				
 				if self.focus == nil then
-					self.focus_list[creatureID] = nil
+					self.focusList[creatureID] = nil
 				end
 				self.focus = nil
 				self.state = nil
@@ -143,8 +148,45 @@ function NPC:onThinkHandler(event)
 			
 			self:onRunoffInternal()
 			
-			self.focus_list[creatureID] = nil
+			self.focusList[creatureID] = nil
 			self.state = nil
+		end
+	end
+	
+	local checked = {}
+	while #checked ~= #self.queue do
+		for i, creature in ipairs(self.queue) do
+			if not #creature or not areInRange(self:getPosition(), creature:getPosition(), self.listenRadius, self.listenRadius, 0) then
+				table.remove(self.queue, i)
+				break
+			elseif not table.find(checked, creature) then
+				table.insert(checked, creature)
+				
+				-- Do we have a focus
+				if #self.focusList == 0 then
+					-- We don't have any focus! Accept this player
+					table.remove(self.queue, i)
+					
+					self.focus = nil
+					self.state = {} -- New clean state
+					
+					self:onGreetInternal(creature, "", TALKTYPE_SAY)
+					
+					if self.focus ~= nil then
+						-- Acquire focus
+						self.focusList[#speaker] = self.state
+						
+						-- Set idle time
+						self.state.lastSpoken = os.time();
+						
+						-- Free up var, else next script might be confused
+						self.focus = nil
+					end
+					
+					-- No more handling after this
+					return
+				end
+			end
 		end
 	end
 end
@@ -165,39 +207,138 @@ end
 
 -- onHearInternal is responsible for the default keyword/trade handlers
 -- 
-function NPC:onHearInternal(text, class)
+function NPC:onHearInternal(message, class)
+	-- Trade logic
+	if self.trade then
+		if containsMessage(message, "sell") then
+			for _, exchange in ipairs(self.trade) do
+				if exchange.sell then
+					if containsMessage(message, exchange[1] or exchange.name) then
+						-- Ooo, the item we want to sell!
+						local count = string.match(message, "%d+") or 1
+						local params = {
+							itemname = getItemNameByID(exchange.id, count);
+							itemcount = count;
+							price = exchange.sell * count;
+							}
+						
+						self:say(self.exchangeSell or self.standardReplies.exchangeSell, params)
+						local reply = self:listen()
+						if containsAgreement(reply) then
+							if self.focus:removeItem(exchange.id, exchange.type or -1, count) then
+								self.focus:addMoney(exchange.sell * count)
+								self:say(self.exchangeSellComplete or self.standardReplies.exchangeSellComplete, params)
+							else
+								self:say(self.exchangeSellNoItem or self.standardReplies.exchangeSellNoItem, params)
+							end
+							return
+						end
+						self:say(self.exchangeSellAborted or self.standardReplies.exchangeSellAborted, params)
+						return
+					end
+				end
+			end
+		else
+			for _, exchange in ipairs(self.trade) do
+				if exchange.buy then
+					if containsMessage(message, exchange[1] or exchange.name) then
+						-- Ooo, the item we want to buy
+						local count = string.match(message, "%d+") or 1
+						local params = {
+							itemname = getItemNameByID(exchange.id, count, exchange.name);
+							itemcount = count;
+							price = exchange.buy*count;
+							}
+						
+						self:say(self.exchangeBuy or self.standardReplies.exchangeBuy, params)
+						local reply = self:listen()
+						if containsAgreement(reply) then
+							-- Check if we have the money first
+							if self.focus:hasMoney(exchange.buy * count) then
+								
+								-- Setup custom modfunc for extra attributes
+								local modfunc = exchange.modFunction
+								if exchange.actionID then
+									-- If more attributes are added, they must be add inside this function, as else multiple attributes won't work together
+									modfunc = function(item)
+										item:setActionID(exchange.actionID)
+										if exchange.modFunction then
+											exchange.modFunction(item)
+										end
+									end
+								end
+								
+								-- Add the item and remove the cash
+								self.focus:addItemOfType(exchange.id, exchange.type, count, modfunc)
+								self.focus:removeMoney(exchange.buy * count)
+								
+								-- Say that we completed the transaction
+								self:say(self.exchangeBuyComplete or self.standardReplies.exchangeBuyComplete, params)
+							else
+								self:say(self.exchangeBuyNoCash or self.standardReplies.exchangeBuyNoCash, params)
+							end
+							return
+						end
+						self:say(self.exchangeBuyAborted or self.standardReplies.exchangeBuyAborted, params)
+					end
+				end
+			end
+		end
+	end
+	
+	-- Wasn't trade, then it must be dialog!
 	if self.dialog then
 		for keyword, reply in pairs(self.dialog) do
-			--print (text .. " contains " .. keyword .. "?")
-			if containsMessage(text, keyword) then
+			--print (message .. " contains " .. keyword .. "?")
+			if containsMessage(message, keyword) then
 				self:say(reply)
 				return
 			end
 		end
 	end
 	
-	self:onHear(text, class)
+	-- Not dialog either? Well, pass the message to the event handler
+	self:onHear(message, class)
 end
 
 function NPC:onHearStrangerInternal(event)
 	local text = event.text
+	local has_focus = #self.focusList > 0
+	
+	if not areInRange(self:getPosition(), event.talking_creature:getPosition(), self.listenRadius, self.listenRadius, 0) then
+		return
+	end
 	
 	-- We don't have focus
 	if containsGreeting(text) then
-		self:onGreetInternal(event.talking_creature, text, event.class)
+		if has_focus then
+			self.focus = event.talking_creature
+			self:onBusyInternal(event.talking_creature, text, event.class)
+			self.focus = nil
+		else
+			self:onGreetInternal(event.talking_creature, text, event.class)
+		end
 	else
 		-- Not a greeting, perhaps the NPC is interested anyways?
 		self:onHearStranger(event.talking_creature, text, event.class)
 	end
 end
 
-function NPC:onGreetInternal(creature, text, class)
+function NPC:onGreetInternal(creature, message, class)
 	self.focus = creature
-	self:onGreet(creature, text, class)
+	self:onGreet(creature, message, class)
 end
 
-function NPC:onFarewellInternal(creature, text, class)
-	self:onFarewell(creature, text, class)
+function NPC:onBusyInternal(creature, message, class)
+	local in_queue = table.find(self.queue, creature) ~= nil
+	if not in_queue then
+		table.insert(self.queue, creature)
+		self:onBusy(creature, message, class)
+	end
+end
+
+function NPC:onFarewellInternal(creature, message, class)
+	self:onFarewell(creature, message, class)
 	-- Drop focus
 	self.focus = nil
 end
@@ -216,17 +357,21 @@ end
 
 -- Default handlers for messages
 
-function NPC:onHearStranger(creature, text, class)
+function NPC:onHearStranger(creature, message, class)
 end
 
-function NPC:onHear(text, class)
+function NPC:onHear(message, class)
 end
 
-function NPC:onGreet(creature, text, class)
+function NPC:onGreet(creature, message, class)
 	self:say(self.greeting or self.standardReplies.greeting)
 end
 
-function NPC:onFarewell(creature, text, class)
+function NPC:onBusy(creature, message, class)
+	self:say(self.busy or self.standardReplies.busy, {["customers"] = #self.queue})
+end
+
+function NPC:onFarewell(creature, message, class)
 	self:say(self.farewell or self.standardReplies.farewell)
 end
 
@@ -243,6 +388,10 @@ end
 
 -- listen() returns the next thing a player says, it suspends execution until the player actually says anything
 function NPC:listen()
+	if self.state.thread == nil then
+		error "Npc.listen: This function can only be called inside an onHear event"
+	end
+	
 	local npc, event = coroutine.yield("LISTEN")
 	return event.text, event.class
 end
@@ -282,7 +431,7 @@ function NPC:say(message, extra_params)
 	end
 	
 	if type(message) == "function" then
-		message = message(self)
+		message = message(self, extra_params)
 		
 		if message == nil then -- If message is nil, then it's a custom callback, and not simply a return msg function
 			return
@@ -298,7 +447,11 @@ function NPC:say(message, extra_params)
 		end
 		
 		if f then
-			return f(self, self.focus)
+			if type(f) == "function" then
+				return f(self, self.focus)
+			else
+				return f
+			end
 		end
 		return nil
 	end
@@ -351,7 +504,8 @@ function NPC:make(name_or_actor, where)
 	
 	-- State tables
 	npc.events = {}
-	npc.focus_list = {}
+	npc.focusList = {}
+	npc.queue = {}
 	
 	-- Setup apperance etc.
 	actor:setName(npc.name) -- Case may differ

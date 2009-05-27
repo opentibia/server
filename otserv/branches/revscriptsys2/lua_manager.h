@@ -225,6 +225,10 @@ public:
 
 	// - Utility
 	int lua_wait();
+	int lua_require_directory();
+	int lua_get_thread_id();
+	int lua_stacktrace();
+
 	int lua_getConfigValue();
 	// - Register Events
 	int lua_registerGenericEvent_OnSay();
@@ -359,6 +363,7 @@ public:
 
 	int lua_Player_getInventoryItem();
 	int lua_Player_addItem();
+	int lua_Player_removeItem();
 	int lua_Player_getItemTypeCount();
 
 	int lua_Player_setVocation();
@@ -380,6 +385,7 @@ public:
 	// - - Item
 	int lua_createItem();
 	int lua_getItemIDByName();
+	int lua_getItemType();
 	int lua_isValidItemID();
 
 	int lua_Item_getItemID();
@@ -389,12 +395,14 @@ public:
 	int lua_Item_getWeight();
 	int lua_Item_isPickupable();
 	int lua_Item_getSpecialDescription();
+	int lua_Item_getSubtype();
 	int lua_Item_getText();
 
 	int lua_Item_setItemID();
 	int lua_Item_setActionID();
 	int lua_Item_setCount();
 	int lua_Item_setSpecialDescription();
+	int lua_Item_setSubtype();
 	int lua_Item_setText();
 	int lua_Item_startDecaying();
 
@@ -491,10 +499,10 @@ public:
 	int32_t run(int args);
 
 	bool ok() const;
-protected:
-	// Prints a stack trace
-	void report();
 
+	// Returns a sweetly formatted stack trace
+	std::string report();
+protected:
 	std::string name;
 	int thread_state;
 };
@@ -508,6 +516,7 @@ public:
 	virtual ~LuaStateManager();
 
 	bool loadFile(std::string file);
+	bool loadDirectory(std::string dir);
 	void setupLuaStandardLibrary();
 
 	LuaThread_ptr newThread(const std::string& name);

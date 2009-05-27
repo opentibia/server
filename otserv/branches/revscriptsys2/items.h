@@ -129,15 +129,8 @@ public:
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
 	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
 	bool isRune() const {return clientCharges;}
-
-	//[ added for beds system
 	bool isBed() const {return type == ITEM_TYPE_BED;}
 
-	Direction bedPartnerDir;
-	uint16_t maleSleeperID;
-	uint16_t femaleSleeperID;
-	uint16_t noSleeperID;
-	//]
 
 	uint16_t id;
 	uint16_t clientId;
@@ -151,14 +144,14 @@ public:
 	bool           showCount;
 	WeaponType_t   weaponType;
 	Weapon*        weaponInstance;
-	Ammo_t         amuType;
+	Ammo_t         ammoType;
 	ShootType_t    shootType;
 	MagicEffectClasses magicEffect;
 	int32_t        attack;
 	int32_t        defence;
-	int32_t        extraDef;
+	int32_t        extraDefense;
 	int32_t        armor;
-	uint16_t       slot_position;
+	uint16_t       slotPosition;
 	bool           isVertical;
 	bool           isHorizontal;
 	bool           isHangable;
@@ -181,20 +174,25 @@ public:
 	bool           alwaysOnTop;
 	int32_t        alwaysOnTopOrder;
 	bool           pickupable;
-	bool           rotable;
+	bool           rotateable;
 	int32_t        rotateTo;
 
-	int32_t        runeMagLevel;
+	int32_t        runeMagicLevel;
 	int32_t        runeLevel;
 	std::string    runeSpellName;
 
 	uint32_t       wieldInfo;
 	std::string    vocationString;
-	uint32_t       minReqLevel;
-	uint32_t       minReqMagicLevel;
+	uint32_t       minRequiredLevel;
+	uint32_t       minRequiredMagicLevel;
 
 	int32_t lightLevel;
 	int32_t lightColor;
+	
+	Direction bedPartnerDirection;
+	uint16_t maleSleeperID;
+	uint16_t femaleSleeperID;
+	uint16_t noSleeperID;
 
 	bool floorChangeDown;
 	bool floorChangeNorth;

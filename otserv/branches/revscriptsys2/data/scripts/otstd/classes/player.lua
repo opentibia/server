@@ -53,6 +53,49 @@ function Player:spendMana(howmuch)
 	self:addManaSpent(howmuch)
 end
 
+--
+
+function Player:addItemOfType(itemid, subtype, count, itemModFunc)
+	local item_type = Items[itemid]
+	if not item_type then
+		error "Attempting to add item of invalid type!"
+	end
+	
+	if (not item_type.hasSpecialType) and subtype and not count then
+		count = subtype
+	end
+	
+	if not count then
+		count = 1
+	end
+	if not subtype then
+		subtype = 0
+	end
+	
+	if item_type.stackable then
+		while count > 0 do
+			local item = createItem(itemid, count)
+			if itemModFunc then
+				itemModFunc(item)
+			end
+			count = count - 100
+			self:addItem(item)
+		end
+	else
+		for i = 1, count do
+			local item = createItem(itemid, subtype)
+			if itemModFunc then
+				itemModFunc(item)
+			end
+			self:addItem(item)
+		end
+	end
+end
+
+function Player:hasMoney(howmuch)
+	return self:countMoney() >= howmuch
+end
+
 -- Flags
 
 function Player:hasInfiniteMana()

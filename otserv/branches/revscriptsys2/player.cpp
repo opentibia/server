@@ -325,10 +325,10 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 
 			case WEAPON_DIST:
 			{
-				if(!ignoreAmmu && item->getAmuType() != AMMO_NONE){
+				if(!ignoreAmmu && item->getAmmoType() != AMMO_NONE){
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
 
-					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
+					if(ammuItem && ammuItem->getAmmoType() == item->getAmmoType()){
 						const Weapon* weapon = ammuItem->getWeapon();
 						if(weapon){
 							shootRange = item->getShootRange();

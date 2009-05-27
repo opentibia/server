@@ -296,15 +296,15 @@ public:
 
 	WeaponType_t getWeaponType() const {return items[id].weaponType;}
 	Weapon* getWeapon() const {return items[id].weaponInstance;}
-	Ammo_t	getAmuType() const {return items[id].amuType;}
+	Ammo_t	getAmmoType() const {return items[id].ammoType;}
 	int32_t	getShootRange() const {return items[id].shootRange;}
 
 	virtual double getWeight() const;
 	int getAttack() const {return items[id].attack;}
 	int getArmor() const {return items[id].armor;}
 	int getDefense() const {return items[id].defence;}
-	int getExtraDef() const {return items[id].extraDef;}
-	int getSlotPosition() const {return items[id].slot_position;}
+	int getExtraDef() const {return items[id].extraDefense;}
+	int getSlotPosition() const {return items[id].slotPosition;}
 	int getHitChance() const {return items[id].hitChance;}
 
 	bool isReadable() const {return items[id].canReadText;}
@@ -329,7 +329,7 @@ public:
 	bool isWeapon() const {return (items[id].weaponType != WEAPON_NONE);}
 	bool isUseable() const {return items[id].useable;}
 	bool isHangable() const {return items[id].isHangable;}
-	bool isRoteable() const {const ItemType& it = items[id]; return it.rotable && it.rotateTo;}
+	bool isRotateable() const {const ItemType& it = items[id]; return it.rotateable && it.rotateTo;}
 	bool isDoor() const {return items[id].isDoor();}
 	bool isBed() const {return items[id].isBed();}
 	bool hasCharges() const {return items[id].charges != 0;}

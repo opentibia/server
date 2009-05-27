@@ -30,7 +30,7 @@ function Command:register()
 		function internalHandler(event)
 			local speaker = event.creature
 			event.player = speaker
-			if isOfType(speaker, "Player") then
+			if typeof(speaker, "Player") then
 				if (type(self.groups) == "string" and self.groups == "All") or table.find(self.groups, speaker:getAccessGroup()) then
 					event.cmd = words
 					event.param = event.text:sub(words:len()+1) or ""

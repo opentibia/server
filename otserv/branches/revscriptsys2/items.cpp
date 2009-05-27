@@ -46,8 +46,8 @@ ItemType::ItemType()
 	alwaysOnTop      = false;
 	alwaysOnTopOrder = 0;
 	pickupable       = false;
-	rotable          = false;
-	rotateTo		     = 0;
+	rotateable       = false;
+	rotateTo         = 0;
 	hasHeight        = false;
 
 	floorChangeDown = true;
@@ -62,10 +62,10 @@ ItemType::ItemType()
 	allowPickupable = false;
 
 	wieldInfo        = 0;
-	minReqLevel      = 0;
-	minReqMagicLevel = 0;
+	minRequiredLevel = 0;
+	minRequiredMagicLevel = 0;
 
-	runeMagLevel  = 0;
+	runeMagicLevel= 0;
 	runeLevel     = 0;
 
 	speed		  = 0;
@@ -76,14 +76,14 @@ ItemType::ItemType()
 	showCount     = true;
 	weaponType    = WEAPON_NONE;
 	weaponInstance= NULL;
-	slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
-	amuType       = AMMO_NONE;
+	slotPosition  = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
+	ammoType      = AMMO_NONE;
 	ammoAction    = AMMOACTION_NONE;
 	shootType     = (ShootType_t)0;
 	magicEffect   = NM_ME_NONE;
 	attack        = 0;
 	defence       = 0;
-	extraDef      = 0;
+	extraDefense  = 0;
 	armor         = 0;
 	decayTo       = -1;
 	decayTime     = 0;
@@ -119,12 +119,10 @@ ItemType::ItemType()
 	combatType = COMBAT_NONE;
 
 	replaceable = true;
-	//[ added for beds system
-	bedPartnerDir = NORTH;
+	bedPartnerDirection = NORTH;
 	maleSleeperID = 0;
 	femaleSleeperID = 0;
 	noSleeperID = 0;
-	//]
 }
 
 ItemType::~ItemType()
@@ -283,7 +281,7 @@ int Items::loadFromOtb(std::string file)
 		iType->isHorizontal = hasBitSet(FLAG_HORIZONTAL, flags);
 		iType->isHangable = hasBitSet(FLAG_HANGABLE, flags);
 		iType->allowDistRead = hasBitSet(FLAG_ALLOWDISTREAD, flags);
-		iType->rotable = hasBitSet(FLAG_ROTABLE, flags);
+		iType->rotateable = hasBitSet(FLAG_ROTABLE, flags);
 		iType->canReadText = hasBitSet(FLAG_READABLE, flags);
 		iType->clientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
 
@@ -509,7 +507,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "extradef"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.extraDef = intValue;
+									it.extraDefense = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "attack"){
@@ -689,28 +687,28 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(asLowerCaseString(strValue) == "slottype"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "head"){
-										it.slot_position |= SLOTP_HEAD;
+										it.slotPosition |= SLOTP_HEAD;
 									}
 									else if(asLowerCaseString(strValue) == "body"){
-										it.slot_position |= SLOTP_ARMOR;
+										it.slotPosition |= SLOTP_ARMOR;
 									}
 									else if(asLowerCaseString(strValue) == "legs"){
-										it.slot_position |= SLOTP_LEGS;
+										it.slotPosition |= SLOTP_LEGS;
 									}
 									else if(asLowerCaseString(strValue) == "feet"){
-										it.slot_position |= SLOTP_FEET;
+										it.slotPosition |= SLOTP_FEET;
 									}
 									else if(asLowerCaseString(strValue) == "backpack"){
-										it.slot_position |= SLOTP_BACKPACK;
+										it.slotPosition |= SLOTP_BACKPACK;
 									}
 									else if(strcasecmp(strValue.c_str(), "two-handed") == 0){
-										it.slot_position |= SLOTP_TWO_HAND;
+										it.slotPosition |= SLOTP_TWO_HAND;
 									}
 									else if(asLowerCaseString(strValue) == "necklace"){
-										it.slot_position |= SLOTP_NECKLACE;
+										it.slotPosition |= SLOTP_NECKLACE;
 									}
 									else if(asLowerCaseString(strValue) == "ring"){
-										it.slot_position |= SLOTP_RING;
+										it.slotPosition |= SLOTP_RING;
 									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown slotType " << strValue  << std::endl;
@@ -719,8 +717,8 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "ammotype"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									it.amuType = getAmmoType(strValue);
-									if(it.amuType == AMMO_NONE){
+									it.ammoType = getAmmoType(strValue);
+									if(it.ammoType == AMMO_NONE){
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown ammoType " << strValue  << std::endl;
 									}
 								}
@@ -1176,13 +1174,13 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(asLowerCaseString(strValue) == "partnerdirection"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "0" || asLowerCaseString(strValue) == "north" || asLowerCaseString(strValue) == "n") {
-										it.bedPartnerDir = NORTH;
+										it.bedPartnerDirection = NORTH;
 									} else if(asLowerCaseString(strValue) == "1" || asLowerCaseString(strValue) == "east" || asLowerCaseString(strValue) == "e") {
-										it.bedPartnerDir = EAST;
+										it.bedPartnerDirection = EAST;
 									} else if(asLowerCaseString(strValue) == "2" || asLowerCaseString(strValue) == "south" || asLowerCaseString(strValue) == "s") {
-										it.bedPartnerDir = SOUTH;
+										it.bedPartnerDirection = SOUTH;
 									} else if(asLowerCaseString(strValue) == "3" || asLowerCaseString(strValue) == "west" || asLowerCaseString(strValue) == "w") {
-										it.bedPartnerDir = WEST;
+										it.bedPartnerDirection = WEST;
 									}
 								}
 							}
@@ -1335,7 +1333,7 @@ void Items::loadWeaponDefaults() {
 				case WEAPON_AMMO:
 				case WEAPON_DIST:
 				{
-					if(it->weaponType == WEAPON_DIST && it->amuType != AMMO_NONE){
+					if(it->weaponType == WEAPON_DIST && it->ammoType != AMMO_NONE){
 						//distance weapons with ammunitions are configured seperatly
 						continue;
 					}

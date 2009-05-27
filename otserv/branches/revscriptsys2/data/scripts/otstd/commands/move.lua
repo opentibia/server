@@ -24,10 +24,7 @@ function MoveForward.handler(event)
 		error("Player facing invalid direction when invoking /a command!")
 	end
 	
-	if event.creature:moveTo(pos) then
-		--sendMagicEffect(old_pos, CONST_ME_TELEPORT)
-		sendMagicEffect(pos, CONST_ME_TELEPORT)
-	end
+	event.creature:teleportTo(pos)
 end
 
 MoveForward:register()

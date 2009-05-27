@@ -662,7 +662,7 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	scripted = false;
 
 	//default values
-	if(it.amuType != AMMO_NONE){
+	if(it.ammoType != AMMO_NONE){
 		//hit chance on two-handed weapons is limited to 90%
 		maxHitChance = 90;
 	}

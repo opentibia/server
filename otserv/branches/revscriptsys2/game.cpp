@@ -2939,7 +2939,7 @@ bool Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 	}
 
 	Item* item = thing->getItem();
-	if(!item || item->getClientID() != spriteId || !item->isRoteable() || item->getUniqueId() != 0){
+	if(!item || item->getClientID() != spriteId || !item->isRotateable() || item->getUniqueId() != 0){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}

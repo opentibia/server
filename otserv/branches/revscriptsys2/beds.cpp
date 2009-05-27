@@ -98,7 +98,7 @@ bool BedItem::serializeAttr(PropWriteStream& propWriteStream) const
 
 BedItem* BedItem::getNextBedItem()
 {
-	Direction dir = Item::items[getID()].bedPartnerDir;
+	Direction dir = Item::items[getID()].bedPartnerDirection;
 	Position targetPos = getPosition();
 	switch(dir){
 		case NORTH: targetPos.y--; break;

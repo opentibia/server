@@ -8,9 +8,7 @@ function Goto.handler(event)
 	local dest = getDestination(event.param)
 	
 	if typeof(dest, "table") then
-		if event.player:moveTo(dest) then
-			sendMagicEffect(dest, CONST_ME_TELEPORT)
-		end
+		event.player:teleportTo(dest)
 	else
 		event.player:sendNote(dest)
 	end

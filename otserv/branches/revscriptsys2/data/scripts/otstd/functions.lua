@@ -1,4 +1,6 @@
 
+debug.traceback = stacktrace
+
 -- STRING
 
 function string.explode(str, delimiter)

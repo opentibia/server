@@ -21,9 +21,7 @@ function BringPlayer.handler(event)
 	if N > #players or N < 1 then
 		event.player:sendNote("No player by that name '" .. name .. "'.")
 	else
-		if players[N]:moveTo(event.player:getPosition()) then
-			sendMagicEffect(event.player:getPosition(), CONST_ME_TELEPORT)
-		end
+		players[N]:teleportTo(event.player:getPosition())
 	end
 end
 

@@ -624,22 +624,22 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 	if(it.isRune()){
 		s << "(\"" << it.runeSpellName << "\", Charges:" << subType <<").";
-		if(it.runeLevel > 0 || it.runeMagLevel > 0){
+		if(it.runeLevel > 0 || it.runeMagicLevel > 0){
 			s << std::endl << "It can only be used with";
 			if(it.runeLevel > 0){
 				s << " level " << it.runeLevel;
 			}
-			if(it.runeMagLevel > 0){
+			if(it.runeMagicLevel > 0){
 				if(it.runeLevel > 0){
 					s << " and";
 				}
-				s << " magic level " << it.runeMagLevel;
+				s << " magic level " << it.runeMagicLevel;
 			}
 			s << " or higher.";
 		}
 	}
 	else if(it.weaponType != WEAPON_NONE){
-		if(it.weaponType == WEAPON_DIST && it.amuType != AMMO_NONE){
+		if(it.weaponType == WEAPON_DIST && it.ammoType != AMMO_NONE){
 			s << " (Range:" << it.shootRange;
 			if(it.attack != 0){
 				s << ", Atk" << std::showpos << it.attack << std::noshowpos;
@@ -655,18 +655,18 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 				s << "Atk:" << (int)it.attack;
 			}
 
-			if(it.defence != 0 || it.extraDef != 0){
+			if(it.defence != 0 || it.extraDefense != 0){
 				if(it.attack != 0)
 					s << " ";
 
 				s << "Def:" << (int)it.defence;
-				if(it.extraDef != 0){
-					s << " " << std::showpos << (int)it.extraDef << std::noshowpos;
+				if(it.extraDefense != 0){
+					s << " " << std::showpos << (int)it.extraDefense << std::noshowpos;
 				}
 			}
 
 			if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
-				if(it.attack != 0 || it.defence != 0 || it.extraDef != 0)
+				if(it.attack != 0 || it.defence != 0 || it.extraDefense != 0)
 					s << ", ";
 
 				s << "magic level " << std::showpos << (int)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
@@ -806,7 +806,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 
 		if(it.wieldInfo & WIELDINFO_LEVEL){
-			s << " of level " << (int)it.minReqLevel << " or higher";
+			s << " of level " << (int)it.minRequiredLevel << " or higher";
 		}
 
 		if(it.wieldInfo & WIELDINFO_MAGLV){
@@ -816,7 +816,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			else{
 				s << " of";
 			}
-			s << " magic level " << (int)it.minReqMagicLevel << " or higher";
+			s << " magic level " << (int)it.minRequiredMagicLevel << " or higher";
 		}
 
 		s << ".";

@@ -1,6 +1,6 @@
 
 
-function isOfType(val, t)
+function typeof(val, t)
 	if val == nil then
 		if t == nil or t == "nil" then
 			return true
@@ -24,12 +24,11 @@ function isOfType(val, t)
 	return type(val) == t
 end
 
-typeof = isOfType
-
 require("otstd/classes/events")
 
 require("otstd/classes/thing")
 require("otstd/classes/item")
+require("otstd/classes/items")
 require("otstd/classes/teleport")
 require("otstd/classes/container")
 require("otstd/classes/creature")

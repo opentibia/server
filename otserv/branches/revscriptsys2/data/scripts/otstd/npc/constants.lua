@@ -1,7 +1,7 @@
 
 -- Default configuration (all these can be overloaded)
 NPC.idleTimeout = 45
-NPC.listenRadius = 5
+NPC.listenRadius = 4
 NPC.walkRadius = 3
 
 NPC.defaultOutfit = {
@@ -44,6 +44,14 @@ NPC.standardReplies = {
 	["runoff"] = "What a rude one!";
 	["bored"] = "I don't have time for this.";
 	["busy"] = "Hello $name, there is $customers people in line before you.";
+	["exchangeSell"] = "Do you want to sell $itemname for $price gold?";
+	["exchangeBuy"] = "Do you want to buy $itemname for $price gold?";
+	["exchangeSellComplete"] = "Thank you for the goods.";
+	["exchangeBuyComplete"] = "Thank you for your purchase.";
+	["exchangeSellAborted"] = "Then no deal.";
+	["exchangeBuyAborted"] = "Then don't take it.";
+	["exchangeSellNoItem"] = "You don't have $itemname!";
+	["exchangeBuyNoCash"] = "You don't have enough gold!";
 }
 
 -- Default replacements, you can pass more as an optional argument to NPC:say

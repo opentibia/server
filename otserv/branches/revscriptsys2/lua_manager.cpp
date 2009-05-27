@@ -18,6 +18,8 @@
 
 #include "otpch.h"
 
+#include <boost/filesystem.hpp>
+
 #include "configmanager.h"
 
 #include "lua_manager.h"
@@ -694,6 +696,7 @@ void LuaStateManager::setupLuaStandardLibrary() {
 
 bool LuaStateManager::loadFile(std::string file)
 {
+	//std::cout << "Loaded file " << file << std::endl;
 	//loads file as a chunk at stack top
 	int ret = luaL_loadfile(state, file.c_str());
 
@@ -711,6 +714,22 @@ bool LuaStateManager::loadFile(std::string file)
 	if(ret != 0) {
 		std::cout << "Lua Error: Failed to load file - " << popString() << std::endl;
 		return false;
+	}
+	return true;
+}
+
+bool LuaStateManager::loadDirectory(std::string dir_path)
+{
+	using namespace boost::filesystem;
+	// default construction yields past-the-end
+	recursive_directory_iterator end_itr;
+
+	for(recursive_directory_iterator itr(dir_path); itr != end_itr; ++itr){
+		std::string s = itr->string();
+		s = (s.size() >= 4? s.substr(s.size() - 4) : "");
+		if(s == ".lua")
+			if(!loadFile(itr->string())) // default construction yields past-the-endath()))
+				return false;
 	}
 	return true;
 }
@@ -779,12 +798,13 @@ bool LuaThread::ok() const
 	return thread_state == 0 || thread_state == LUA_YIELD;
 }
 
-void LuaThread::report()
+std::string LuaThread::report()
 {
+	std::ostringstream os;
 	std::string errmsg = popString();
-	std::cout << "Lua Error: " << errmsg << "\n";
-	std::cout << "Stack trace:\n";
-	std::cout << "Line\tFunction\t\tSource\n";
+	os << "Lua Error: " << errmsg << "\n";
+	os << "Stack trace:\n";
+	os << "Line\tFunction\t\tSource\n";
 
 	lua_Debug ar;
 
@@ -792,21 +812,24 @@ void LuaThread::report()
 	while(lua_getstack(state, level++, &ar) != 0) {
 		lua_getinfo(state, "nSl", &ar);
 
-		if(ar.currentline != -1) {
-			std::cout << ar.currentline;
-		}
-		std::cout << "\t";
+		if(ar.currentline != -1)
+			os << ar.currentline;
+		
+		os << "\t";
 
 		int tabcount = 16;
 		if(ar.name) {
-			std::cout << ar.name;
+			os << ar.name;
 			tabcount -= 16 - strlen(ar.name);
 		}
-		while(tabcount-- > 0) std::cout << " ";
+		while(tabcount-- > 0)
+			os << " ";
 
-		std::cout << ar.short_src;
-		std::cout << "\n";
+		os << ar.short_src;
+		os << "\n";
 	}
+
+	return os.str();
 }
 
 int32_t LuaThread::run(int args)
@@ -816,7 +839,7 @@ int32_t LuaThread::run(int args)
 	if(ret == LUA_YIELD) {
 		// Thread yielded, add us to the manager
 		if(!isString() || !(popString() == "WAIT")){
-			report();
+			std::cout << report();
 			return 0;
 		}
 
@@ -830,7 +853,7 @@ int32_t LuaThread::run(int args)
 	} else if(ret == 0) {
 		// Thread exited normally, do nothing, it will be garbage collected
 	} else if(ret == LUA_ERRRUN) {
-		report();
+		std::cout << report();
 	} else if(ret == LUA_ERRERR) {
 		// Can't handle, just print error message
 		std::cout << "Lua Error when recovering from error (thread " << name << ")\n";
