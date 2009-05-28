@@ -461,7 +461,7 @@ int32_t Player::getArmor() const
 	if(getInventoryItem(SLOT_RING))
 		armor += getInventoryItem(SLOT_RING)->getArmor();
 
-	return (vocation->getArmorDefense() > 1.0 ? int32_t(armor * vocation->getArmorDefense()) : armor);
+	return (vocation->getArmorDefense() != 1.0 ? int32_t(armor * vocation->getArmorDefense()) : armor);
 }
 
 void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
@@ -2182,7 +2182,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			}
 		}
 
-		if(vocation->getMagicDefense() != 0 && (combatType != COMBAT_NONE && combatType != COMBAT_FIRST
+		if(vocation->getMagicDefense() != 1.0 && (combatType != COMBAT_NONE && combatType != COMBAT_FIRST
 			 && combatType != COMBAT_PHYSICALDAMAGE && combatType != COMBAT_UNDEFINEDDAMAGE && combatType != COMBAT_DROWNDAMAGE)){
 			damage -= (int32_t)std::ceil((float)damage * vocation->getMagicDefense() / 100);
 		}
