@@ -42,11 +42,13 @@
 #include "configmanager.h"
 #include "teleport.h"
 #include "ban.h"
+#include "movement.h"
 
 extern Game g_game;
 extern Monsters g_monsters;
 extern BanManager g_bans;
 extern ConfigManager g_config;
+extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
 
 enum{
@@ -3756,7 +3758,11 @@ int LuaScriptInterface::luaDoSetItemActionId(lua_State *L)
 
 	Item* item = env->getItemByUID(uid);
 	if(item){
+		if(item->getActionId() != 0){
+			g_moveEvents->onRemoveTileItem(item->getTile(), item);
+		}
 		item->setActionId(actionid);
+		g_moveEvents->onAddTileItem(item->getTile(), item);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{

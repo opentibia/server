@@ -22,10 +22,8 @@
 #include "tasks.h"
 #include "outputmessage.h"
 #include "game.h"
-#include "movement.h"
 
 extern Game g_game;
-extern MoveEvents* g_moveEvents;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -97,7 +95,6 @@ void Dispatcher::dispatcherThread(void* p)
 					outputPool->sendAll();
 
 				g_game.clearSpectatorCache();
-				g_moveEvents->clearScriptCache();
 			}
 
 			delete task;
@@ -156,7 +153,6 @@ void Dispatcher::flush()
 		if(outputPool)
 			outputPool->sendAll();
 		g_game.clearSpectatorCache();
-		g_moveEvents->clearScriptCache();
 	}
 	#ifdef __DEBUG_SCHEDULER__
 	std::cout << "Flushing Dispatcher" << std::endl;
