@@ -46,7 +46,7 @@ public:
 	uint16_t getSoulMax() const {return maxSoul;};
 	uint16_t getSoulGainTicks() const {return gainSoulTicks;};
 
-	float getMeeleBaseDamage() const {return meeleBaseDamage;};
+	float getMeleeBaseDamage() const {return meleeBaseDamage;};
 	float getMagicBaseDamage() const {return magicBaseDamage;};
 	float getDistanceBaseDamage() const {return distanceBaseDamage;};
 	float getWandBaseDamage() const {return wandBaseDamage;};
@@ -54,7 +54,7 @@ public:
 	float getBaseDefense() const {return baseDefense;};
 	float getArmorDefense() const {return armorDefense;};
 	float getMagicDefense() const {return magicDefense;};
-	float getHealingDefense() const {return healingDefense;};
+	float getHealingDamage() const {return healingDamage;};
 
 	void debugVocation();
 
@@ -81,15 +81,15 @@ protected:
 	float skillMultipliers[SKILL_LAST + 1];
 	float manaMultiplier;
 
-	float meeleBaseDamage;
+	float meleeBaseDamage;
 	float magicBaseDamage;
 	float distanceBaseDamage;
 	float wandBaseDamage;
+	float healingDamage;
 
 	float baseDefense;
 	float armorDefense;
 	float magicDefense;
-	float healingDefense;
 
 	typedef std::map<uint32_t, uint32_t> cacheMap;
 	cacheMap cacheMana;

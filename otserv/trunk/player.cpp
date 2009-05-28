@@ -2182,8 +2182,8 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 			}
 		}
 
-		if(vocation->getMagicDefense() != 1.0 && (combatType != COMBAT_NONE && combatType != COMBAT_FIRST
-			 && combatType != COMBAT_PHYSICALDAMAGE && combatType != COMBAT_UNDEFINEDDAMAGE && combatType != COMBAT_DROWNDAMAGE)){
+		if(vocation && vocation->getMagicDefense() != 1.0 && combatType != COMBAT_NONE && combatType != COMBAT_PHYSICALDAMAGE
+			 && combatType != COMBAT_UNDEFINEDDAMAGE && combatType != COMBAT_DROWNDAMAGE){
 			damage -= (int32_t)std::ceil((float)damage * vocation->getMagicDefense() / 100);
 		}
 

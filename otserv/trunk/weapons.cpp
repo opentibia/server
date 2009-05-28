@@ -716,8 +716,8 @@ int32_t WeaponMelee::getElementDamage(const Player* player, const Item* item) co
 	int32_t maxValue = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, elementDamage, attackFactor);
 
 	Vocation* vocation = player->getVocation();
-	if(vocation && vocation->getMeeleBaseDamage() != 1.0){
-		maxValue *= int32_t(vocation->getMeeleBaseDamage());
+	if(vocation && vocation->getMeleeBaseDamage() != 1.0){
+		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage());
 	}
 
 	return -random_range(0, maxValue, DISTRO_NORMAL);
@@ -731,8 +731,8 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* targe
 	int32_t maxValue = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 
 	Vocation* vocation = player->getVocation();
-	if(vocation && vocation->getMeeleBaseDamage() != 1.0){
-		maxValue *= int32_t(vocation->getMeeleBaseDamage());
+	if(vocation && vocation->getMeleeBaseDamage() != 1.0){
+		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage());
 	}
 
 	if(maxDamage){
@@ -990,8 +990,8 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 
 	Vocation* vocation = player->getVocation();
 	if(vocation && vocation->getDistanceBaseDamage() != 1.0){
-		maxValue *= int32_t(vocation->getDistanceBaseDamage());
-		minValue *= int32_t(vocation->getDistanceBaseDamage());
+		maxValue = int32_t(maxValue * vocation->getDistanceBaseDamage());
+		minValue = int32_t(minValue * vocation->getDistanceBaseDamage());
 	}
 
 	if(maxDamage){
@@ -1102,11 +1102,11 @@ int32_t WeaponWand::getWeaponDamage(const Player* player, const Creature* target
 {
 	int32_t minValue = minChange;
 	int32_t maxValue = maxChange;
+	
 	Vocation* vocation = player->getVocation();
-
 	if(vocation && vocation->getWandBaseDamage() != 1.0){
-		 minValue *= int32_t(vocation->getWandBaseDamage());
-		 maxValue *= int32_t(vocation->getWandBaseDamage());
+		 minValue = int32_t(minValue * vocation->getWandBaseDamage());
+		 maxValue = int32_t(maxValue * vocation->getWandBaseDamage());
 	}
 
 	if(maxDamage){
