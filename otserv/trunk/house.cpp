@@ -658,16 +658,21 @@ bool AccessList::isInList(const Player* player)
 	std::string name = player->getName();
 	boost::cmatch what;
 
-	std::transform(name.begin(), name.end(), name.begin(), tolower);
-	for(it = regExList.begin(); it != regExList.end(); ++it){
-		if(boost::regex_match(name.c_str(), what, it->first)){
-			if(it->second){
-				return true;
-			}
-			else{
-				return false;
+	try{
+		std::transform(name.begin(), name.end(), name.begin(), tolower);
+		for(it = regExList.begin(); it != regExList.end(); ++it){
+			if(boost::regex_match(name.c_str(), what, it->first)){
+				if(it->second){
+					return true;
+				}
+				else{
+					return false;
+				}
 			}
 		}
+	}
+	catch(...){
+		//
 	}
 
 	PlayerList::iterator playerIt = playerList.find(player->getGUID());
