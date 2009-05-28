@@ -22,7 +22,7 @@
 #define __OTSERV_ENUMS_H__
 
 enum RaceType_t {
-	RACE_NONE		= 0,
+	RACE_NONE	= 0,
 	RACE_VENOM  = 1,
 	RACE_BLOOD	= 2,
 	RACE_UNDEAD	= 3,

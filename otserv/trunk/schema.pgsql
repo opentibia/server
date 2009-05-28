@@ -245,7 +245,7 @@ RETURNS TRIGGER
 AS $$
 BEGIN
     DELETE FROM "bans" WHERE "type" = 3 AND "value" = OLD."id";
-
+    DELETE FROM "players" WHERE "account_id" = OLD."id";
     RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;

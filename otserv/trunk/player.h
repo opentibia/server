@@ -182,6 +182,7 @@ public:
 
 	void setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
+	Vocation* getVocation() const {return vocation;};
 
 	playersex_t getSex() const {return sex;}
 	void setSex(playersex_t);

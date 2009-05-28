@@ -119,7 +119,7 @@ Creature()
 	walkTaskEvent = 0;
 	actionTaskEvent = 0;
 	nextStepEvent = 0;
-	
+
 	idleTime = 0;
 	idleWarned = false;
 
@@ -145,7 +145,7 @@ Creature()
 	for(int32_t i = LOSS_FIRST; i <= LOSS_LAST; ++i){
 		lossPercent[i] = 10;
 	}
-	
+
 	for(int32_t i = LEVEL_FIRST; i <= LEVEL_LAST; ++i){
 		rateValue[i] = 1.0f;
 	}
@@ -461,7 +461,7 @@ int32_t Player::getArmor() const
 	if(getInventoryItem(SLOT_RING))
 		armor += getInventoryItem(SLOT_RING)->getArmor();
 
-	return armor;
+	return (vocation->getArmorDefense() > 1.0 ? int32_t(armor * vocation->getArmorDefense()) : armor);
 }
 
 void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
@@ -513,6 +513,10 @@ int32_t Player::getDefense() const
 
 	if(defenseSkill == 0)
 		return 0;
+
+	if(vocation->getBaseDefense() != 1.0){
+		defenseValue = int32_t(defenseValue * vocation->getBaseDefense());
+	}
 
 	return ((int32_t)std::ceil(((float)(defenseSkill * (defenseValue * 0.015)) + (defenseValue * 0.1)) * defenseFactor));
 }
@@ -711,14 +715,14 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 		std::stringstream advMsg;
 		advMsg << "You advanced in " << getSkillName(skill) << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
-		
+
 		//scripting event - onAdvance
 		CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
 		for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
 		{
 			(*it)->executeOnAdvance(this, (skills[skill][SKILL_LEVEL] - 1), skills[skill][SKILL_LEVEL], (levelTypes_t)skill);
 		}
-		
+
 		sendSkills();
 	}
 	else{
@@ -906,7 +910,7 @@ void Player::dropLoot(Container* corpse)
 #endif
 	if(!lootDrop){
 		itemLoss = 0;
-		backpackLoss = 0; 
+		backpackLoss = 0;
 	}
 
 	if(itemLoss > 0 || backpackLoss > 0){
@@ -1271,7 +1275,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_YOUARENOTTHEOWNER:
 		sendCancel("You are not the owner.");
 		break;
-		
+
 	case RET_NOTREQUIREDPROFESSION:
 		sendCancel("You don't have the required profession.");
 		break;
@@ -1501,7 +1505,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 			#endif
 		}
 		//]
-		
+
 		if(lastLogout > 0)
 		{
 			int64_t timeOff = time(NULL) - lastLogout - 600;
@@ -1511,7 +1515,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 				int32_t quick_stamina_max = MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION);
 				int64_t gain;
 				bool checkSlowStamina = true;
-				
+
 				if(getStamina() < quick_stamina_max){
 					gain = timeOff * stamina_rate;
 					if(getStamina() + gain > quick_stamina_max){
@@ -1710,9 +1714,9 @@ void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const
 		}
 
 		if(teleport || (oldPos.z != newPos.z)){
-			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, 
+			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED,
 				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
-			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, 
+			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT,
 				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
 		}
 	}
@@ -1993,14 +1997,14 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 			std::stringstream MaglvMsg;
 			MaglvMsg << "You advanced to magic level " << magLevel << ".";
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
-			
+
 			//scripting event - onAdvance
 			CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
 			for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
 			{
 				(*it)->executeOnAdvance(this, (magLevel - 1), magLevel, LEVEL_MAGIC);
 			}
-			
+
 			sendStats();
 		}
 
@@ -2048,7 +2052,7 @@ void Player::addExperience(uint64_t exp)
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
-		
+
 		//scripting event - onAdvance
 		CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
 		for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
@@ -2176,6 +2180,11 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 				if(charges != 0)
 					g_game.transformItem(item, item->getID(), charges - 1);
 			}
+		}
+
+		if(vocation->getMagicDefense() != 0 && (combatType != COMBAT_NONE && combatType != COMBAT_FIRST
+			 && combatType != COMBAT_PHYSICALDAMAGE && combatType != COMBAT_UNDEFINEDDAMAGE && combatType != COMBAT_DROWNDAMAGE)){
+			damage -= (int32_t)std::ceil((float)damage * vocation->getMagicDefense() / 100);
 		}
 
 		if(damage <= 0){
@@ -2326,7 +2335,7 @@ void Player::die()
 
 			skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
 		}
-		
+
 		//Send that death window
 		sendReLoginWindow();
 	}
@@ -3101,7 +3110,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 
 	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
 		Item* item = inventory[i];
-		
+
 		if(item){
 			if(item->getID() == itemId)
 				count += Item::countByType(item, subType, itemCount);
@@ -3122,7 +3131,7 @@ std::map<uint32_t, uint32_t>& Player::__getAllItemTypeCount(
 {
 	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
 		Item* item = inventory[i];
-		
+
 		if(item){
 			countMap[item->getID()] += Item::countByType(item, -1, itemCount);
 
@@ -3155,8 +3164,8 @@ void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_
 	bool requireListUpdate = true;
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		const Item* i = (oldParent? oldParent->getItem() : NULL);
-		
-		// Check if we owned the old container too, so we don't need to do anything, 
+
+		// Check if we owned the old container too, so we don't need to do anything,
 		// as the list was updated in postRemoveNotification
 		assert(i? i->getContainer() != NULL : true);
 
@@ -3206,8 +3215,8 @@ void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int
 	bool requireListUpdate = true;
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		const Item* i = (newParent? newParent->getItem() : NULL);
-		
-		// Check if we owned the old container too, so we don't need to do anything, 
+
+		// Check if we owned the old container too, so we don't need to do anything,
 		// as the list was updated in postRemoveNotification
 		assert(i? i->getContainer() != NULL : true);
 		if(i)
@@ -3729,12 +3738,12 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 			}
 		}
 	}
-	
+
 	if(target->getMonster() && !target->isPlayerSummon()){
 		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_HUNTING, g_config.getNumber(ConfigManager::HUNTING_KILL_DURATION), 0);
 		addCondition(condition);
 	}
-	
+
 	Creature::onKilledCreature(target, lastHit);
 }
 
@@ -3751,11 +3760,11 @@ void Player::gainExperience(uint64_t& gainExp)
 				condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
 				addCondition(condition);
 			}
-			
+
 			if((isPremium() || !g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM)) &&
 					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION))
 				gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
-			
+
 			addExperience(gainExp);
 		}
 	}
@@ -4247,7 +4256,7 @@ void Player::addStamina(int64_t value)
 		newstamina = MAX_STAMINA;
 	if(newstamina < 0)
 		newstamina = 0;
-		
+
 	stamina = newstamina;
 }
 
@@ -4256,7 +4265,7 @@ int32_t Player::getStaminaMinutes()
     if(hasFlag(PlayerFlag_HasInfiniteStamina)){
         return MAX_STAMINA_MINUTES;
     }
-    
+
     return std::min(MAX_STAMINA_MINUTES, int32_t(stamina / 60000));
 }
 

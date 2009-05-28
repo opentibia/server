@@ -123,6 +123,34 @@ bool Vocations::loadFromXml(const std::string& datadir)
 								std::cout << "Missing skill id." << std::endl;
 							}
 						}
+						else if(xmlStrcmp(skillNode->name, (const xmlChar*)"damage") == 0){
+							if(readXMLFloat(p, "meeleDamage", floatVal)){
+								voc->meeleBaseDamage = floatVal;
+							}
+							if(readXMLFloat(p, "magicDamage", floatVal)){
+								voc->magicBaseDamage = floatVal;
+							}
+							if(readXMLFloat(p, "distanceDamage", floatVal)){
+								voc->distanceBaseDamage = floatVal;
+							}
+							if(readXMLFloat(p, "wandDamage", floatVal)){
+								voc->wandBaseDamage = floatVal;
+							}
+						}
+						else if(xmlStrcmp(skillNode->name, (const xmlChar*)"defense") == 0){
+							if(readXMLFloat(p, "baseDefense", floatVal)){
+								voc->baseDefense = floatVal;
+							}
+							if(readXMLFloat(p, "armorDefense", floatVal)){
+								voc->armorDefense = floatVal;
+							}
+							if(readXMLFloat(p, "magicDefense", floatVal)){
+								voc->magicDefense = floatVal;
+							}
+							if(readXMLFloat(p, "healingDefense", floatVal)){
+								voc->healingDefense = floatVal;
+							}
+						}
 						skillNode = skillNode->next;
 					}
 

@@ -82,6 +82,20 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 				{
 					max = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * mina + minb);
 					min = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * maxa + maxb);
+
+					Vocation* vocation = player->getVocation();
+
+					if(vocation){
+						if(max > 0 && vocation->getHealingDefense() != 1.0){
+							min *= (int32_t)vocation->getHealingDefense();
+							max *= (int32_t)vocation->getHealingDefense();
+						}
+						else if(vocation->getMagicBaseDamage() != 1.0){
+							min *= (int32_t)vocation->getMagicBaseDamage();
+							max *= (int32_t)vocation->getMagicBaseDamage();
+						}
+					}
+
 					return true;
 					break;
 				}
@@ -772,7 +786,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 
 		if(canDoCombat(caster, iter_tile, params.isAggressive) == RET_NOERROR){
 			if(iter_tile->getCreatures()){
-				for(CreatureVector::iterator cit = iter_tile->getCreatures()->begin(), 
+				for(CreatureVector::iterator cit = iter_tile->getCreatures()->begin(),
 					cend = iter_tile->getCreatures()->end();
 					bContinue && cit != cend; ++cit)
 				{
@@ -1485,7 +1499,7 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 						}
 					}
 				}
-				if(   !harmfulField || 
+				if(   !harmfulField ||
 					  (OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
 						creature->hasBeenAttacked(owner))
 				{

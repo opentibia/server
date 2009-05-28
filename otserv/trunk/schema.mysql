@@ -255,6 +255,7 @@ ON `accounts`
 FOR EACH ROW
 BEGIN
     DELETE FROM `bans` WHERE `type` = 3 AND `value` = OLD.`id`;
+    DELETE FROM `players` WHERE `account_id` = OLD.`id`;
 END|
 
 CREATE TRIGGER `ondelete_guilds`

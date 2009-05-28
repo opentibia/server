@@ -99,7 +99,6 @@ bool Tile::isHouseTile() const
 bool Tile::hasHeight(uint32_t n) const
 {
 	uint32_t height = 0;
-	Item* iiItem = NULL;
 
 	if(ground){
 		if(ground->hasProperty(HASHEIGHT)){
@@ -1008,7 +1007,7 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 
 		--pos;
 	}
-	
+
 	TileItemVector* items = getItemList();
 	if(items && !isInserted){
 		int32_t topItemSize = getTopItemCount();
@@ -1024,7 +1023,7 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 
 		pos -= topItemSize;
 	}
-	
+
 	CreatureVector* creatures = getCreatures();
 	if(creatures){
 		if(!isInserted && pos < (int32_t)creatures->size()){
@@ -1637,9 +1636,9 @@ void Tile::updateTileFlags(Item* item, bool removed, bool isLoadingMap /*= false
 		}
 	}
 
-	if(!isLoadingMap && 
-	   (g_moveEvents->getEvent(item, MOVE_EVENT_STEP_IN) || 
-	   g_moveEvents->getEvent(item, MOVE_EVENT_STEP_OUT) || 
+	if(!isLoadingMap &&
+	   (g_moveEvents->getEvent(item, MOVE_EVENT_STEP_IN) ||
+	   g_moveEvents->getEvent(item, MOVE_EVENT_STEP_OUT) ||
 	   g_moveEvents->getEvent(item, MOVE_EVENT_ADD_ITEM_ITEMTILE) ||
 	   g_moveEvents->getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE)) )
 	{
