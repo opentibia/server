@@ -314,15 +314,47 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 		ret = ret & moveEvent->fireStepEvent(creature, NULL, tile->getPosition());
 	}
 
+	MoveScriptCache::iterator it = m_moveScriptCache.find(tile->getPosition());
+	if(it != m_moveScriptCache.end()){
+		if(*it->second.begin() == NULL){
+			return ret;
+		}
+
+		for(std::vector<Item*>::iterator iit = it->second.begin(); iit != it->second.end(); ++iit){
+			moveEvent = getEvent(*iit, eventType);
+			if(moveEvent){
+				ret = ret & moveEvent->fireStepEvent(creature, tile->ground, tile->getPosition());
+			}
+		}
+		return ret;
+	}
+
+	std::vector<Item*>& scriptCache = m_moveScriptCache[tile->getPosition()];
+	bool foundItem = false;
+	if(tile->ground){
+		moveEvent = getEvent(tile->ground, eventType);
+		if(moveEvent){
+			scriptCache.push_back(tile->ground);
+			foundItem = true;
+			ret = ret & moveEvent->fireStepEvent(creature, tile->ground, tile->getPosition());
+		}
+	}
+
 	Item* tileItem = NULL;
-	if(TileItemVector* scriptItems = tile->getScriptItemList()){
-		for(ItemVector::const_reverse_iterator it = scriptItems->rbegin(); it != scriptItems->rend(); ++it){
+	if(TileItemVector* items = tile->getItemList()){
+		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
 			tileItem = *it;
 			moveEvent = getEvent(tileItem, eventType);
 			if(moveEvent){
+				scriptCache.push_back(tileItem);
+				foundItem = true;
 				ret = ret & moveEvent->fireStepEvent(creature, tileItem, tile->getPosition());
 			}
 		}
+	}
+
+	if(!foundItem){
+		scriptCache.push_back(NULL);
 	}
 
 	return ret;
@@ -371,20 +403,77 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		ret = ret & moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
 	}
 
-	Item* tileItem = NULL;
-	if(TileItemVector* scriptItems = tile->getScriptItemList()){
-		for(ItemVector::const_iterator it = scriptItems->begin(); it != scriptItems->end(); ++it){
+	MoveScriptCache::iterator it = m_moveScriptCache.find(tile->getPosition());
+	if(it != m_moveScriptCache.end()){
+		if(*it->second.begin() == NULL){
+			return ret;
+		}
+
+		for(std::vector<Item*>::iterator iit = it->second.begin(); iit != it->second.end(); ++iit){
+			moveEvent = getEvent(*iit, eventType2);
+			if(moveEvent){
+				ret = ret & moveEvent->fireAddRemItem(item, *iit, tile->getPosition());
+			}
+		}
+
+		return ret;
+	}
+
+	std::vector<Item*>& scriptCache = m_moveScriptCache[tile->getPosition()];
+
+	bool foundItem = false;
+	if(tile->ground){
+		if(tile->ground != item){
+			moveEvent = getEvent(tile->ground, eventType2);
+			if(moveEvent){
+				scriptCache.push_back(tile->ground);
+				foundItem = true;
+				ret = ret & moveEvent->fireAddRemItem(item, tile->ground, tile->getPosition());
+			}
+		}
+	}
+
+	if(TileItemVector* items = tile->getItemList()){
+		Item* tileItem = NULL;
+		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
 			tileItem = *it;
 			if(tileItem != item){
 				moveEvent = getEvent(tileItem, eventType2);
 				if(moveEvent){
+					scriptCache.push_back(tileItem);
+					foundItem = true;
 					ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
 				}
 			}
 		}
 	}
 
+	if(!foundItem){
+		scriptCache.push_back(NULL);
+	}
+
 	return ret;
+}
+
+void MoveEvents::addCacheScriptTileItem(const Tile* tile, const Item* item)
+{
+	m_moveScriptCache[tile->getPosition()].push_back(tile->ground);
+}
+
+void MoveEvents::removeCacheScriptTileItem(const Tile* tile, const Item* item)
+{
+	MoveScriptCache::iterator it = m_moveScriptCache.find(tile->getPosition());
+	if(it != m_moveScriptCache.end()){
+		m_moveScriptCache.erase(it);
+	}
+	else{
+		assert(it == m_moveScriptCache.end());
+	}
+}
+
+void MoveEvents::clearScriptCache()
+{
+	m_moveScriptCache.clear();
 }
 
 ReturnValue MoveEvents::canPlayerWearEquip(Player* player, Item* item, slots_t slot)

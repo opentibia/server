@@ -3561,7 +3561,6 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 
 			if(ret != RET_NOERROR){
 				delete newItem;
-				reportErrorFunc("Could not add item");
 				lua_pushnumber(L, LUA_ERROR);
 				return 1;
 			}
@@ -3588,7 +3587,6 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 		ReturnValue ret = g_game.internalAddItem(tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		if(ret != RET_NOERROR){
 			delete newItem;
-			reportErrorFunc("Can not add Item");
 			lua_pushnumber(L, LUA_ERROR);
 			return 1;
 		}
@@ -3680,7 +3678,6 @@ int LuaScriptInterface::luaDoCreateTeleport(lua_State *L)
 	ReturnValue ret = g_game.internalAddItem(tile, newTp, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	if(ret != RET_NOERROR){
 		delete newItem;
-		reportErrorFunc("Can not add Item");
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -6597,7 +6594,6 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 
 				if(ret != RET_NOERROR){
 					delete newItem;
-					reportErrorFunc("Could not add item");
 					lua_pushnumber(L, LUA_ERROR);
 					return 1;
 				}
@@ -6624,7 +6620,6 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 			ReturnValue ret = g_game.internalAddItem(container, newItem);
 			if(ret != RET_NOERROR){
 				delete newItem;
-				reportErrorFunc("Could not add item");
 				lua_pushnumber(L, LUA_ERROR);
 				return 1;
 			}

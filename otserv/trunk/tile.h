@@ -59,14 +59,13 @@ enum tileflags_t{
 	TILESTATE_FLOORCHANGE_EAST			= 1 << 11,
 	TILESTATE_FLOORCHANGE_WEST			= 1 << 12,
 	TILESTATE_POSITIONCHANGE			= 1 << 13,
-	TILESTATE_HASSCRIPTITEM				= 1 << 14,
-	TILESTATE_BLOCKSOLID				= 1 << 15,
-	TILESTATE_BLOCKPATH					= 1 << 16,
-	TILESTATE_IMMOVABLEBLOCKSOLID		= 1 << 17,
-	TILESTATE_IMMOVABLEBLOCKPATH		= 1 << 18,
-	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 1 << 19,
-	TILESTATE_NOFIELDBLOCKPATH			= 1 << 20,
-	TILESTATE_DYNAMIC_TILE				= 1 << 21,
+	TILESTATE_BLOCKSOLID				= 1 << 14,
+	TILESTATE_BLOCKPATH					= 1 << 15,
+	TILESTATE_IMMOVABLEBLOCKSOLID		= 1 << 16,
+	TILESTATE_IMMOVABLEBLOCKPATH		= 1 << 17,
+	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 1 << 18,
+	TILESTATE_NOFIELDBLOCKPATH			= 1 << 19,
+	TILESTATE_DYNAMIC_TILE				= 1 << 20,
 };
 
 class HouseTile;
@@ -131,10 +130,6 @@ public:
 	TileItemVector* getItemList();
 	const TileItemVector* getItemList() const;
 	TileItemVector* makeItemList();
-
-	TileItemVector* getScriptItemList();
-	const TileItemVector* getScriptItemList() const;
-	TileItemVector* makeScriptItemList();
 
 	CreatureVector* getCreatures();
 	const CreatureVector* getCreatures() const;
@@ -240,7 +235,7 @@ private:
 	void onRemoveTileItem(const SpectatorVec& list, std::vector<uint32_t>& oldStackPosVector, Item* item);
 	void onUpdateTile();
 
-	void updateTileFlags(Item* item, bool removing);
+	void updateTileFlags(Item* item, bool removed, bool isLoadingMap = false);
 
  protected:
 	bool is_dynamic() const {return (m_flags & TILESTATE_DYNAMIC_TILE) != 0;}
@@ -261,7 +256,7 @@ class DynamicTile : public Tile
 {
 	// By allocating the vectors in-house, we avoid some memory fragmentation
 	TileItemVector	items;
-	TileItemVector	scriptItems;
+	//TileItemVector	scriptItems;
 	CreatureVector	creatures;
 
 public:
@@ -271,10 +266,6 @@ public:
 	TileItemVector* getItemList() {return &items;}
 	const TileItemVector* getItemList() const {return &items;}
 	TileItemVector* makeItemList() {return &items;}
-
-	TileItemVector* getScriptItemList() {return &scriptItems;}
-	const TileItemVector* getScriptItemList() const {return &scriptItems;}
-	TileItemVector* makeScriptItemList() {return &scriptItems;}
 
 	CreatureVector* getCreatures() {return &creatures;}
 	const CreatureVector* getCreatures() const {return &creatures;}
@@ -286,7 +277,6 @@ class StaticTile : public Tile
 {
 	// We very rarely even need the vectors, so don't keep them in memory
 	TileItemVector* items;
-	TileItemVector* scriptItems;
 	CreatureVector*	creatures;
 
 public:
@@ -296,10 +286,6 @@ public:
 	TileItemVector* getItemList() {return items;}
 	const TileItemVector* getItemList() const {return items;}
 	TileItemVector* makeItemList() {return (items)? (items) : (items = new TileItemVector);}
-
-	TileItemVector* getScriptItemList() {return scriptItems;}
-	const TileItemVector* getScriptItemList() const {return scriptItems;}
-	TileItemVector* makeScriptItemList() {return (scriptItems)? (scriptItems) : (scriptItems = new TileItemVector);}
 
 	CreatureVector* getCreatures() {return creatures;}
 	const CreatureVector* getCreatures() const {return creatures;}
@@ -369,34 +355,9 @@ inline TileItemVector* Tile::makeItemList()
 	return static_cast<StaticTile*>(this)->StaticTile::makeItemList();
 }
 
-inline TileItemVector* Tile::getScriptItemList()
-{
-	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::getScriptItemList();
-
-	return static_cast<StaticTile*>(this)->StaticTile::getScriptItemList();
-}
-
-inline const TileItemVector* Tile::getScriptItemList() const
-{
-	if(is_dynamic())
-		return static_cast<const DynamicTile*>(this)->DynamicTile::getScriptItemList();
-
-	return static_cast<const StaticTile*>(this)->StaticTile::getScriptItemList();
-}
-
-inline TileItemVector* Tile::makeScriptItemList()
-{
-	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::makeScriptItemList();
-
-	return static_cast<StaticTile*>(this)->StaticTile::makeScriptItemList();
-}
-
 inline StaticTile::StaticTile(uint16_t x, uint16_t y, uint16_t z) :
 	Tile(x, y, z),
 	items(NULL),
-	scriptItems(NULL),
 	creatures(NULL)
 {}
 

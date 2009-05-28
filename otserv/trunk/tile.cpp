@@ -168,12 +168,8 @@ std::string Tile::getDescription(int32_t lookDistance) const
 
 Teleport* Tile::getTeleportItem() const
 {
-	if(!hasFlag(TILESTATE_HASSCRIPTITEM)){
-		return NULL;
-	}
-
-	if(const TileItemVector* scriptItems = getScriptItemList()){
-		for(ItemVector::const_iterator it = scriptItems->getBeginTopItem(); it != scriptItems->getEndTopItem(); ++it){
+	if(const TileItemVector* items = getItemList()){
+		for(ItemVector::const_iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
 			if((*it)->getTeleport())
 				return (*it)->getTeleport();
 		}
@@ -184,12 +180,8 @@ Teleport* Tile::getTeleportItem() const
 
 MagicField* Tile::getFieldItem() const
 {
-	if(!hasFlag(TILESTATE_HASSCRIPTITEM)){
-		return NULL;
-	}
-
-	if(const TileItemVector* scriptItems = getScriptItemList()){
-		for(ItemVector::const_iterator it = scriptItems->getBeginDownItem(); it != scriptItems->getEndDownItem(); ++it){
+	if(const TileItemVector* items = getItemList()){
+		for(ItemVector::const_iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
 			if((*it)->getMagicField())
 				return (*it)->getMagicField();
 		}
@@ -200,16 +192,12 @@ MagicField* Tile::getFieldItem() const
 
 TrashHolder* Tile::getTrashHolder() const
 {
-	if(!hasFlag(TILESTATE_HASSCRIPTITEM)){
-		return NULL;
-	}
-
 	if(ground && ground->getTrashHolder()){
 		return ground->getTrashHolder();
 	}
 
-	if(const TileItemVector* scriptItems = getScriptItemList()){
-		for(ItemVector::const_iterator it = scriptItems->begin(); it != scriptItems->end(); ++it){
+	if(const TileItemVector* items = getItemList()){
+		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
 			if((*it)->getTrashHolder())
 				return (*it)->getTrashHolder();
 		}
@@ -220,12 +208,8 @@ TrashHolder* Tile::getTrashHolder() const
 
 Mailbox* Tile::getMailbox() const
 {
-	if(!hasFlag(TILESTATE_HASSCRIPTITEM)){
-		return NULL;
-	}
-
-	if(const TileItemVector* scriptItems = getScriptItemList()){
-		for(ItemVector::const_iterator it = scriptItems->begin(); it != scriptItems->end(); ++it){
+	if(const TileItemVector* items = getItemList()){
+		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
 			if((*it)->getMailbox())
 				return (*it)->getMailbox();
 		}
@@ -236,12 +220,8 @@ Mailbox* Tile::getMailbox() const
 
 BedItem* Tile::getBedItem() const
 {
-	if(!hasFlag(TILESTATE_HASSCRIPTITEM)){
-		return NULL;
-	}
-
-	if(const TileItemVector* scriptItems = getScriptItemList()){
-		for(ItemVector::const_iterator it = scriptItems->begin(); it != scriptItems->end(); ++it){
+	if(const TileItemVector* items = getItemList()){
+		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
 			if((*it)->getBed())
 				return (*it)->getBed();
 		}
@@ -1243,17 +1223,12 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 	}
 
 	if(const CreatureVector* creatures = getCreatures()){
-		if(thing->getCreature()){
-			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				if(player == (*cit) || player->canSeeCreature(*cit)){
-					++n;
-					if((*cit) == thing)
-						return n;
-				}
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			if(player == (*cit) || player->canSeeCreature(*cit)){
+				++n;
+				if((*cit) == thing)
+					return n;
 			}
-		}
-		else{
-			n += creatures->size();
 		}
 	}
 
@@ -1300,15 +1275,10 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 	}
 
 	if(const CreatureVector* creatures = getCreatures()){
-		if(thing->getCreature()){
-			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				++n;
-				if((*cit) == thing)
-					return n;
-			}
-		}
-		else{
-			n += creatures->size();
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			++n;
+			if((*cit) == thing)
+				return n;
 		}
 	}
 
@@ -1532,14 +1502,13 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 			++thingCount;
 		}
 
-		updateTileFlags(item, false);
+		updateTileFlags(item, false, true);
 	}
 }
 
-void Tile::updateTileFlags(Item* item, bool removing)
+void Tile::updateTileFlags(Item* item, bool removed, bool isLoadingMap /*= false*/)
 {
-	if(!removing){
-		//!removing is adding an item to the tile
+	if(!removed){
 		if(!hasFlag(TILESTATE_FLOORCHANGE)){
 			if(item->floorChangeDown()){
 				setFlag(TILESTATE_FLOORCHANGE);
@@ -1565,20 +1534,6 @@ void Tile::updateTileFlags(Item* item, bool removing)
 
 		if(item->getTeleport()){
 			setFlag(TILESTATE_POSITIONCHANGE);
-		}
-		if(item->getTeleport() ||
-		   item->getMagicField() ||
-		   item->getTrashHolder() ||
-		   item->getBed() ||
-		   item->getMailbox() ||
-		   g_moveEvents->getEvent(item, MOVE_EVENT_STEP_IN) || 
-		   g_moveEvents->getEvent(item, MOVE_EVENT_STEP_OUT) || 
-		   g_moveEvents->getEvent(item, MOVE_EVENT_ADD_ITEM_ITEMTILE) ||
-		   g_moveEvents->getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE))
-		{
-			TileItemVector* scriptItems = makeScriptItemList();
-			scriptItems->push_back(item);
-			setFlag(TILESTATE_HASSCRIPTITEM);
 		}
 
 		if(item->hasProperty(BLOCKSOLID)){
@@ -1621,30 +1576,6 @@ void Tile::updateTileFlags(Item* item, bool removing)
 		if(item->getTeleport()){
 			resetFlag(TILESTATE_POSITIONCHANGE);
 		}
-		if(item->getTeleport() ||
-		   item->getMagicField() ||
-		   item->getTrashHolder() ||
-		   item->getBed() ||
-		   item->getMailbox() ||
-		   g_moveEvents->getEvent(item, MOVE_EVENT_STEP_IN) || 
-		   g_moveEvents->getEvent(item, MOVE_EVENT_STEP_OUT) || 
-		   g_moveEvents->getEvent(item, MOVE_EVENT_ADD_ITEM_ITEMTILE) ||
-		   g_moveEvents->getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE))
-		{
-			if(TileItemVector* scriptItems = getScriptItemList()){
-				ItemVector::iterator it = std::find(scriptItems->begin(), scriptItems->end(), item);
-				if(it != scriptItems->end()){
-					scriptItems->erase(it);
-				}
-				else{
-					assert(it == scriptItems->end());
-				}
-
-				if(scriptItems->empty()){
-					resetFlag(TILESTATE_HASSCRIPTITEM);
-				}
-			}
-		}
 
 		if(item->hasProperty(BLOCKSOLID) && !hasProperty(item, BLOCKSOLID)){
 			resetFlag(TILESTATE_BLOCKSOLID);
@@ -1663,6 +1594,20 @@ void Tile::updateTileFlags(Item* item, bool removing)
 		}
 		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH) && !hasProperty(item, IMMOVABLENOFIELDBLOCKPATH)){
 			resetFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
+		}
+	}
+
+	if(!isLoadingMap && 
+	   (g_moveEvents->getEvent(item, MOVE_EVENT_STEP_IN) || 
+	   g_moveEvents->getEvent(item, MOVE_EVENT_STEP_OUT) || 
+	   g_moveEvents->getEvent(item, MOVE_EVENT_ADD_ITEM_ITEMTILE) ||
+	   g_moveEvents->getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE)) )
+	{
+		if(!removed){
+			g_moveEvents->addCacheScriptTileItem(this, item);
+		}
+		else{
+			g_moveEvents->removeCacheScriptTileItem(this, item);
 		}
 	}
 }

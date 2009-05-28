@@ -45,6 +45,7 @@ struct MoveEventList{
 };
 
 typedef std::map<int32_t, bool> VocEquipMap;
+typedef std::map<Position, std::vector<Item*> > MoveScriptCache;
 
 class MoveEvents : public BaseEvents
 {
@@ -59,6 +60,9 @@ public:
 	ReturnValue canPlayerWearEquip(Player* player, Item* item, slots_t slot);
 
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
+	void addCacheScriptTileItem(const Tile* tile, const Item* item);
+	void removeCacheScriptTileItem(const Tile* tile, const Item* item);
+	void clearScriptCache();
 
 protected:
 	typedef OTSERV_HASH_MAP<int32_t, MoveEventList> MoveListMap;
@@ -79,8 +83,8 @@ protected:
 	MoveListMap m_actionIdMap;
 	MoveListMap m_itemIdMap;
 	MovePosListMap m_positionMap;
-
 	LuaScriptInterface m_scriptInterface;
+	MoveScriptCache m_moveScriptCache;
 };
 
 typedef uint32_t (StepFunction)(Creature* creature, Item* item, const Position& pos);
