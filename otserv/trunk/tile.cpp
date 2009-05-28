@@ -168,6 +168,10 @@ std::string Tile::getDescription(int32_t lookDistance) const
 
 Teleport* Tile::getTeleportItem() const
 {
+	if(!hasFlag(TILESTATE_POSITIONCHANGE)){
+		return NULL;
+	}
+
 	if(const TileItemVector* items = getItemList()){
 		for(ItemVector::const_iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
 			if((*it)->getTeleport())
@@ -180,6 +184,10 @@ Teleport* Tile::getTeleportItem() const
 
 MagicField* Tile::getFieldItem() const
 {
+	if(!hasFlag(TILESTATE_MAGICFIELD)){
+		return NULL;
+	}
+
 	if(const TileItemVector* items = getItemList()){
 		for(ItemVector::const_iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
 			if((*it)->getMagicField())
@@ -1400,14 +1408,40 @@ void Tile::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t 
 			}
 		}
 
-		if(Teleport* teleport = getTeleportItem()){
-			teleport->__addThing(thing);
+		bool foundItem = false;
+		if(ground){
+			if(ground->getTeleport()){
+				ground->getTeleport()->__addThing(thing);
+				foundItem = true;
+			}
+			else if(ground->getTrashHolder()){
+				ground->getTrashHolder()->__addThing(thing);
+				foundItem = true;
+			}
+			else if(ground->getMailbox()){
+				ground->getMailbox()->__addThing(thing);
+				foundItem = true;
+			}
 		}
-		else if(TrashHolder* trashHolder = getTrashHolder()){
-			trashHolder->__addThing(thing);
-		}
-		else if(Mailbox* mailbox = getMailbox()){
-			mailbox->__addThing(thing);
+
+		if(!foundItem){
+			const TileItemVector* items = getItemList();
+			if(items){
+				for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
+					if((*it)->getTeleport()){
+						(*it)->getTeleport()->__addThing(thing);
+						break;
+					}
+					else if((*it)->getTrashHolder()){
+						(*it)->getTrashHolder()->__addThing(thing);
+						break;
+					}
+					else if((*it)->getMailbox()){
+						(*it)->getMailbox()->__addThing(thing);
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -1535,6 +1569,9 @@ void Tile::updateTileFlags(Item* item, bool removed, bool isLoadingMap /*= false
 		if(item->getTeleport()){
 			setFlag(TILESTATE_POSITIONCHANGE);
 		}
+		if(item->getMagicField()){
+			setFlag(TILESTATE_MAGICFIELD);
+		}
 
 		if(item->hasProperty(BLOCKSOLID)){
 			setFlag(TILESTATE_BLOCKSOLID);
@@ -1575,6 +1612,9 @@ void Tile::updateTileFlags(Item* item, bool removed, bool isLoadingMap /*= false
 		}
 		if(item->getTeleport()){
 			resetFlag(TILESTATE_POSITIONCHANGE);
+		}
+		if(item->getMagicField()){
+			resetFlag(TILESTATE_MAGICFIELD);
 		}
 
 		if(item->hasProperty(BLOCKSOLID) && !hasProperty(item, BLOCKSOLID)){
