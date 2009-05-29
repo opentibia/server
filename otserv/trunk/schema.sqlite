@@ -63,6 +63,7 @@ CREATE TABLE "players" (
     "town_id" INTEGER NOT NULL,
     "balance" INTEGER NOT NULL DEFAULT 0,
     "stamina" INTEGER NOT NULL DEFAULT 151200000,
+    "online" BOOLEAN NOT NULL DEFAULT 0,
     UNIQUE ("name"),
     FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
@@ -229,7 +230,7 @@ CREATE TABLE "schema_info" (
     UNIQUE ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 12);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 13);
 
 CREATE TRIGGER "oncreate_guilds"
 AFTER INSERT ON "guilds"

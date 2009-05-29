@@ -1608,6 +1608,7 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 		if(isLogout){
 			loginPosition = getPosition();
 			lastLogout = time(NULL);
+			IOPlayer::instance()->updateLogoutInfo(this);
 		}
 
 		if(eventWalk != 0){

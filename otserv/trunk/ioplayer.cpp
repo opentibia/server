@@ -412,7 +412,7 @@ bool IOPlayer::savePlayer(Player* player)
 	DBQuery query;
 	DBResult* result;
 
-	//check if the player have to be saved or not
+	//check if the player has to be saved or not
 	query << "SELECT `save` FROM `players` WHERE `id` = " << player->getGUID();
 	if(!(result = db->storeQuery(query.str()))){
 		return false;
@@ -421,22 +421,8 @@ bool IOPlayer::savePlayer(Player* player)
 	const uint32_t save = result->getDataInt("save");
 	db->freeResult(result);
 
-	if(save == 0){
-		query.str("");
-		query << "UPDATE `players` SET `lastlogin` = " << player->lastLoginSaved
-			<< ", `lastip` = " << player->lastip
-			<< " WHERE `id` = " << player->getGUID();
-
-		DBTransaction transaction(db);
-		if(!transaction.begin())
-			return false;
-
-		if(!db->executeQuery(query.str())){
-			return false;
-		}
-
-		return transaction.commit();
-	}
+	if(save == 0)
+		return false;
 
 	//serialize conditions
 	PropWriteStream propWriteStream;
@@ -478,9 +464,6 @@ bool IOPlayer::savePlayer(Player* player)
 	<< ", `posz` = " << player->getLoginPosition().z
 	<< ", `cap` = " << player->getCapacity()
 	<< ", `sex` = " << player->sex
-	<< ", `lastlogin` = " << player->lastLoginSaved
-	<< ", `lastlogout` = " << player->lastLogout
-	<< ", `lastip` = " << player->lastip
 	<< ", `conditions` = " << db->escapeBlob(conditions, conditionsSize)
 	<< ", `loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE)
 	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
@@ -949,4 +932,36 @@ bool IOPlayer::getLastIP(uint32_t& ip, uint32_t guid)
 	ip = result->getDataInt("lastip");
 	db->freeResult(result);
 	return true;
+}
+
+void IOPlayer::updateLoginInfo(Player* player)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	
+	query << "UPDATE `players` SET `lastlogin` = " << player->lastLoginSaved
+			<< ", `lastip` = " << player->lastip
+			<< ", `online` = 1"
+			<< " WHERE `id` = " << player->getGUID();
+			
+	db->executeQuery(query.str());
+}
+
+void IOPlayer::updateLogoutInfo(Player* player)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	
+	query << "UPDATE `players` SET `lastlogout` = " << player->lastLogout
+			<< ", `online` = 0"
+			<< " WHERE `id` = " << player->getGUID();
+			
+	db->executeQuery(query.str());
+}
+
+bool IOPlayer::cleanOnlineInfo()
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	return db->executeQuery("UPDATE `players` SET `online` = 0");
 }

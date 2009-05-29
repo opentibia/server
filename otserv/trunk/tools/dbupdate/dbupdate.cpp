@@ -527,6 +527,24 @@ SimpleUpdateQuery updateQueries[] = {
 			"",
 			NULL
 		}
+	},
+	{ 13,
+		{ // PgSql
+			"ALTER TABLE `players` ADD `online` SMALLINT;",
+			"ALTER TABLE `players` ALTER COLUMN `online` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `online` SET DEFAULT 0;",
+			"ALTER TABLE `players` ADD KEY `online`(`online`);",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `players` ADD `online` TINYINT(1) NOT NULL DEFAULT 0;",
+			"ALTER TABLE `players` ADD INDEX `online`(`online`);",
+			NULL
+		},
+		{ // Sqlite
+			"ALTER TABLE `players` ADD `online` BOOLEAN NOT NULL DEFAULT 0;",
+			NULL
+		}
 	}
 };
 

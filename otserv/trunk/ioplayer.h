@@ -74,6 +74,9 @@ public:
 	bool playerExists(std::string name);
 	bool getLastIP(uint32_t& ip, uint32_t guid);
 	bool hasFlag(PlayerFlags flag, uint32_t guid);
+	void updateLoginInfo(Player* player);
+	void updateLogoutInfo(Player* player);
+	bool cleanOnlineInfo();
 
 protected:
 	bool storeNameByGuid(Database &mysql, uint32_t guid);

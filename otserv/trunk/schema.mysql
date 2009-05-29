@@ -65,8 +65,10 @@ CREATE TABLE `players` (
     `town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
     `balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
     `stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds',
+    `online` TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE (`name`),
+    KEY (`online`),
     FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`)
 ) ENGINE = InnoDB;
@@ -245,7 +247,7 @@ CREATE TABLE `schema_info` (
     PRIMARY KEY (`name`)
 );
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 12);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 13);
 
 DELIMITER |
 

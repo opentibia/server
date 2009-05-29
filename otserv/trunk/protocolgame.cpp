@@ -234,6 +234,7 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 		player->lastip = player->getIP();
 		player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
 		player->lastLoginMs = OTSYS_TIME();
+		IOPlayer::instance()->updateLoginInfo(this);
 		m_acceptPackets = true;
 
 		return true;
@@ -280,9 +281,9 @@ bool ProtocolGame::connect(uint32_t playerId)
 		player->getTile()->__getIndexOfThing(player));
 	player->sendIcons();
 	player->lastip = player->getIP();
-	player->lastLoginSaved = std::max(time(NULL), player->lastLoginSaved + 1);
-	player->lastLoginMs = OTSYS_TIME();
+	IOPlayer::instance()->updateLoginInfo(this);
 	m_acceptPackets = true;
+	
 	return true;
 }
 

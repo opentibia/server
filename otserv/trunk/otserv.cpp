@@ -601,6 +601,15 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 
 	std::cout << ":: Worldtype: " << asUpperCaseString(worldType) << std::endl;
+	
+	std::cout << ":: Cleaning online players info... " << std::flush;
+	if(!IOPlayer::instance()->cleanOnlineInfo()){
+		std::stringstream errormsg;
+		errormsg << "Unable to execute query for cleaning online status!";
+		ErrorMessage(errormsg.str().c_str());
+		exit(-1);
+	}
+	std::cout << "[done]" << std::endl;
 
 	#ifdef __SKULLSYSTEM__
 	std::cout << ":: Skulls enabled" << std::endl;
