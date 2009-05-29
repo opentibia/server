@@ -167,7 +167,7 @@ std::string Tile::getDescription(int32_t lookDistance) const
 
 Teleport* Tile::getTeleportItem() const
 {
-	if(!hasFlag(TILESTATE_POSITIONCHANGE)){
+	if(!hasFlag(TILESTATE_TELEPORT)){
 		return NULL;
 	}
 
@@ -199,6 +199,10 @@ MagicField* Tile::getFieldItem() const
 
 TrashHolder* Tile::getTrashHolder() const
 {
+	if(!hasFlag(TILESTATE_TRASHHOLDER)){
+		return NULL;
+	}
+
 	if(ground && ground->getTrashHolder()){
 		return ground->getTrashHolder();
 	}
@@ -215,6 +219,10 @@ TrashHolder* Tile::getTrashHolder() const
 
 Mailbox* Tile::getMailbox() const
 {
+	if(!hasFlag(TILESTATE_MAILBOX)){
+		return NULL;
+	}
+
 	if(const TileItemVector* items = getItemList()){
 		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
 			if((*it)->getMailbox())
@@ -1408,39 +1416,22 @@ void Tile::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t 
 			}
 		}
 
-		bool foundItem = false;
-		if(ground){
-			if(ground->getTeleport()){
-				ground->getTeleport()->__addThing(thing);
-				foundItem = true;
-			}
-			else if(ground->getTrashHolder()){
-				ground->getTrashHolder()->__addThing(thing);
-				foundItem = true;
-			}
-			else if(ground->getMailbox()){
-				ground->getMailbox()->__addThing(thing);
-				foundItem = true;
+		if(hasFlag(TILESTATE_TELEPORT)){
+			Teleport* teleport = getTeleportItem();
+			if(teleport){
+				teleport->__addThing(thing);
 			}
 		}
-
-		if(!foundItem){
-			const TileItemVector* items = getItemList();
-			if(items){
-				for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-					if((*it)->getTeleport()){
-						(*it)->getTeleport()->__addThing(thing);
-						break;
-					}
-					else if((*it)->getTrashHolder()){
-						(*it)->getTrashHolder()->__addThing(thing);
-						break;
-					}
-					else if((*it)->getMailbox()){
-						(*it)->getMailbox()->__addThing(thing);
-						break;
-					}
-				}
+		else if(hasFlag(TILESTATE_TRASHHOLDER)){
+			TrashHolder* trashholder = getTrashHolder();
+			if(trashholder){
+				trashholder->__addThing(thing);
+			}
+		}
+		else if(hasFlag(TILESTATE_MAILBOX)){
+			Mailbox* mailbox = getMailbox();
+			if(mailbox){
+				mailbox->__addThing(thing);
 			}
 		}
 	}
@@ -1567,16 +1558,6 @@ void Tile::updateTileFlags(Item* item, bool removed)
 			}
 		}
 
-		if(item->getTeleport()){
-			setFlag(TILESTATE_POSITIONCHANGE);
-		}
-		if(item->getMagicField()){
-			setFlag(TILESTATE_MAGICFIELD);
-		}
-
-		if(item->hasProperty(BLOCKSOLID)){
-			setFlag(TILESTATE_BLOCKSOLID);
-		}
 		if(item->hasProperty(IMMOVABLEBLOCKSOLID)){
 			setFlag(TILESTATE_IMMOVABLEBLOCKSOLID);
 		}
@@ -1588,6 +1569,21 @@ void Tile::updateTileFlags(Item* item, bool removed)
 		}
 		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH)){
 			setFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
+		}
+		if(item->getTeleport()){
+			setFlag(TILESTATE_TELEPORT);
+		}
+		if(item->getMagicField()){
+			setFlag(TILESTATE_MAGICFIELD);
+		}
+		if(item->getMailbox()){
+			setFlag(TILESTATE_MAILBOX);
+		}
+		if(item->getTrashHolder()){
+			setFlag(TILESTATE_TRASHHOLDER);
+		}
+		if(item->hasProperty(BLOCKSOLID)){
+			setFlag(TILESTATE_BLOCKSOLID);
 		}
 	}
 	else{
@@ -1611,13 +1607,6 @@ void Tile::updateTileFlags(Item* item, bool removed)
 			resetFlag(TILESTATE_FLOORCHANGE);
 			resetFlag(TILESTATE_FLOORCHANGE_WEST);
 		}
-		if(item->getTeleport()){
-			resetFlag(TILESTATE_POSITIONCHANGE);
-		}
-		if(item->getMagicField()){
-			resetFlag(TILESTATE_MAGICFIELD);
-		}
-
 		if(item->hasProperty(BLOCKSOLID) && !hasProperty(item, BLOCKSOLID)){
 			resetFlag(TILESTATE_BLOCKSOLID);
 		}
@@ -1635,6 +1624,18 @@ void Tile::updateTileFlags(Item* item, bool removed)
 		}
 		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH) && !hasProperty(item, IMMOVABLENOFIELDBLOCKPATH)){
 			resetFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
+		}
+		if(item->getTeleport()){
+			resetFlag(TILESTATE_TELEPORT);
+		}
+		if(item->getMagicField()){
+			resetFlag(TILESTATE_MAGICFIELD);
+		}
+		if(item->getMailbox()){
+			resetFlag(TILESTATE_MAILBOX);
+		}
+		if(item->getTrashHolder()){
+			resetFlag(TILESTATE_TRASHHOLDER);
 		}
 	}
 }

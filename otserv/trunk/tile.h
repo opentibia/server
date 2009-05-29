@@ -58,15 +58,17 @@ enum tileflags_t{
 	TILESTATE_FLOORCHANGE_SOUTH			= 1 << 10,
 	TILESTATE_FLOORCHANGE_EAST			= 1 << 11,
 	TILESTATE_FLOORCHANGE_WEST			= 1 << 12,
-	TILESTATE_POSITIONCHANGE			= 1 << 13,
-	TILESTATE_MAGICFIELD				= 1 << 14,
-	TILESTATE_BLOCKSOLID				= 1 << 15,
-	TILESTATE_BLOCKPATH					= 1 << 16,
-	TILESTATE_IMMOVABLEBLOCKSOLID		= 1 << 17,
-	TILESTATE_IMMOVABLEBLOCKPATH		= 1 << 18,
-	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 1 << 19,
-	TILESTATE_NOFIELDBLOCKPATH			= 1 << 20,
-	TILESTATE_DYNAMIC_TILE				= 1 << 21,
+	TILESTATE_TELEPORT      			= 1 << 13,
+	TILESTATE_MAGICFIELD                = 1 << 14,
+	TILESTATE_MAILBOX                   = 1 << 15,
+	TILESTATE_TRASHHOLDER               = 1 << 16,
+	TILESTATE_BLOCKSOLID				= 1 << 17,
+	TILESTATE_BLOCKPATH					= 1 << 18,
+	TILESTATE_IMMOVABLEBLOCKSOLID		= 1 << 19,
+	TILESTATE_IMMOVABLEBLOCKPATH		= 1 << 20,
+	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 1 << 21,
+	TILESTATE_NOFIELDBLOCKPATH			= 1 << 22,
+	TILESTATE_DYNAMIC_TILE				= 1 << 23,
 };
 
 class HouseTile;
@@ -172,7 +174,7 @@ public:
 	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
 	void resetFlag(tileflags_t flag) {m_flags &= ~(uint32_t)flag;}
 
-	bool positionChange() const {return hasFlag(TILESTATE_POSITIONCHANGE);}
+	bool positionChange() const {return hasFlag(TILESTATE_TELEPORT);}
 	bool floorChange() const {return hasFlag(TILESTATE_FLOORCHANGE);}
 	bool floorChangeDown() const {return hasFlag(TILESTATE_FLOORCHANGE_DOWN);}
 	bool floorChange(Direction direction) const
