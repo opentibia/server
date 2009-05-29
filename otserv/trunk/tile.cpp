@@ -172,7 +172,7 @@ Teleport* Tile::getTeleportItem() const
 	}
 
 	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
+		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
 			if((*it)->getTeleport())
 				return (*it)->getTeleport();
 		}
@@ -187,8 +187,12 @@ MagicField* Tile::getFieldItem() const
 		return NULL;
 	}
 
+	if(ground && ground->getMagicField()){
+		return ground->getMagicField();
+	}
+
 	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
+		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
 			if((*it)->getMagicField())
 				return (*it)->getMagicField();
 		}
@@ -208,7 +212,7 @@ TrashHolder* Tile::getTrashHolder() const
 	}
 
 	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
+		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
 			if((*it)->getTrashHolder())
 				return (*it)->getTrashHolder();
 		}
@@ -223,8 +227,12 @@ Mailbox* Tile::getMailbox() const
 		return NULL;
 	}
 
+	if(ground && ground->getMailbox()){
+		return ground->getMailbox();
+	}
+
 	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
+		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
 			if((*it)->getMailbox())
 				return (*it)->getMailbox();
 		}
@@ -235,8 +243,16 @@ Mailbox* Tile::getMailbox() const
 
 BedItem* Tile::getBedItem() const
 {
+	if(!hasFlag(TILESTATE_BED)){
+		return NULL;
+	}
+
+	if(ground && ground->getBed()){
+		return ground->getBed();
+	}
+
 	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
+		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
 			if((*it)->getBed())
 				return (*it)->getBed();
 		}
@@ -1585,6 +1601,9 @@ void Tile::updateTileFlags(Item* item, bool removed)
 		if(item->hasProperty(BLOCKSOLID)){
 			setFlag(TILESTATE_BLOCKSOLID);
 		}
+		if(item->getBed()){
+			setFlag(TILESTATE_BED);
+		}
 	}
 	else{
 		if(item->floorChangeDown()){
@@ -1636,6 +1655,9 @@ void Tile::updateTileFlags(Item* item, bool removed)
 		}
 		if(item->getTrashHolder()){
 			resetFlag(TILESTATE_TRASHHOLDER);
+		}
+		if(item->getBed()){
+			resetFlag(TILESTATE_BED);
 		}
 	}
 }
