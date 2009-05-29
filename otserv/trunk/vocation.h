@@ -22,6 +22,7 @@
 #define __OTSERV_VOCATION_H__
 
 #include "enums.h"
+#include "const.h"
 #include <string>
 #include <map>
 
@@ -46,7 +47,7 @@ public:
 	uint16_t getSoulMax() const {return maxSoul;};
 	uint16_t getSoulGainTicks() const {return gainSoulTicks;};
 
-	float getMeleeBaseDamage(WeaponType_t weaponType) const 
+	float getMeleeBaseDamage(WeaponType_t weaponType) const
 	{
 		if(weaponType == WEAPON_SWORD)
 			return swordBaseDamage;
@@ -59,7 +60,7 @@ public:
 		else
 			return fistBaseDamage;
 	};
-	
+
 	float getMagicBaseDamage() const {return magicBaseDamage;};
 	float getWandBaseDamage() const {return wandBaseDamage;};
 	float getHealingDamage() const {return healingDamage;};
@@ -97,7 +98,7 @@ protected:
 	float clubBaseDamage;
 	float distBaseDamage;
 	float fistBaseDamage;
-	
+
 	float magicBaseDamage;
 	float wandBaseDamage;
 	float healingDamage;

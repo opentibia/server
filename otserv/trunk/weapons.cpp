@@ -989,9 +989,9 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 	int32_t minValue = 0;
 
 	Vocation* vocation = player->getVocation();
-	if(vocation && vocation->getDistanceBaseDamage() != 1.0){
-		maxValue = int32_t(maxValue * vocation->getDistanceBaseDamage());
-		minValue = int32_t(minValue * vocation->getDistanceBaseDamage());
+	if(vocation && vocation->getMeleeBaseDamage(WEAPON_DIST) != 1.0){
+		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage(WEAPON_DIST));
+		minValue = int32_t(minValue * vocation->getMeleeBaseDamage(WEAPON_DIST));
 	}
 
 	if(maxDamage){
@@ -1102,7 +1102,7 @@ int32_t WeaponWand::getWeaponDamage(const Player* player, const Creature* target
 {
 	int32_t minValue = minChange;
 	int32_t maxValue = maxChange;
-	
+
 	Vocation* vocation = player->getVocation();
 	if(vocation && vocation->getWandBaseDamage() != 1.0){
 		 minValue = int32_t(minValue * vocation->getWandBaseDamage());
