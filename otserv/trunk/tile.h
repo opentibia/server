@@ -236,7 +236,7 @@ private:
 	void onRemoveTileItem(const SpectatorVec& list, std::vector<uint32_t>& oldStackPosVector, Item* item);
 	void onUpdateTile();
 
-	void updateTileFlags(Item* item, bool removed, bool isLoadingMap = false);
+	void updateTileFlags(Item* item, bool removed);
 
  protected:
 	bool is_dynamic() const {return (m_flags & TILESTATE_DYNAMIC_TILE) != 0;}

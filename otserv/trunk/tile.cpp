@@ -1403,6 +1403,7 @@ void Tile::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t 
 		else{
 			Item* item = thing->getItem();
 			if(item){
+				g_moveEvents->onAddTileItem(this, item);
 				g_moveEvents->onItemMove(item, this, true);
 			}
 		}
@@ -1474,6 +1475,7 @@ void Tile::postRemoveNotification(Thing* thing,  const Cylinder* newParent, int3
 	else{
 		Item* item = thing->getItem();
 		if(item){
+			g_moveEvents->onRemoveTileItem(this, item);
 			g_moveEvents->onItemMove(item, this, false);
 		}
 	}
@@ -1535,11 +1537,11 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 			++thingCount;
 		}
 
-		updateTileFlags(item, false, true);
+		updateTileFlags(item, false);
 	}
 }
 
-void Tile::updateTileFlags(Item* item, bool removed, bool isLoadingMap /*= false*/)
+void Tile::updateTileFlags(Item* item, bool removed)
 {
 	if(!removed){
 		if(!hasFlag(TILESTATE_FLOORCHANGE)){
@@ -1633,20 +1635,6 @@ void Tile::updateTileFlags(Item* item, bool removed, bool isLoadingMap /*= false
 		}
 		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH) && !hasProperty(item, IMMOVABLENOFIELDBLOCKPATH)){
 			resetFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
-		}
-	}
-
-	if(!isLoadingMap &&
-	   (g_moveEvents->getEvent(item, MOVE_EVENT_STEP_IN) ||
-	   g_moveEvents->getEvent(item, MOVE_EVENT_STEP_OUT) ||
-	   g_moveEvents->getEvent(item, MOVE_EVENT_ADD_ITEM_ITEMTILE) ||
-	   g_moveEvents->getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE)) )
-	{
-		if(!removed){
-			g_moveEvents->addCacheScriptTileItem(this, item);
-		}
-		else{
-			g_moveEvents->removeCacheScriptTileItem(this, item);
 		}
 	}
 }

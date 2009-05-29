@@ -420,9 +420,11 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		int32_t j = m_lastCacheItemVector.size();
 		for(int32_t i = 0; i < j; ++i){
 			tileItem = m_lastCacheItemVector[i];
-			moveEvent = getEvent(tileItem, eventType2);
-			if(moveEvent){
-				ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
+			if(tileItem != item){
+				moveEvent = getEvent(tileItem, eventType2);
+				if(moveEvent){
+					ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
+				}
 			}
 		}
 
