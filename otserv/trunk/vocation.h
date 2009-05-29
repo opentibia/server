@@ -46,15 +46,26 @@ public:
 	uint16_t getSoulMax() const {return maxSoul;};
 	uint16_t getSoulGainTicks() const {return gainSoulTicks;};
 
-	float getMeleeBaseDamage() const {return meleeBaseDamage;};
+	float getMeleeBaseDamage(WeaponType_t weaponType) const 
+	{
+		if(weaponType == WEAPON_SWORD)
+			return swordBaseDamage;
+		else if(weaponType == WEAPON_AXE)
+			return axeBaseDamage;
+		else if(weaponType == WEAPON_CLUB)
+			return clubBaseDamage;
+		else if(weaponType == WEAPON_DIST)
+			return distBaseDamage;
+		else
+			return fistBaseDamage;
+	};
+	
 	float getMagicBaseDamage() const {return magicBaseDamage;};
-	float getDistanceBaseDamage() const {return distanceBaseDamage;};
 	float getWandBaseDamage() const {return wandBaseDamage;};
+	float getHealingDamage() const {return healingDamage;};
 
 	float getBaseDefense() const {return baseDefense;};
 	float getArmorDefense() const {return armorDefense;};
-	float getMagicDefense() const {return magicDefense;};
-	float getHealingDamage() const {return healingDamage;};
 
 	void debugVocation();
 
@@ -81,15 +92,18 @@ protected:
 	float skillMultipliers[SKILL_LAST + 1];
 	float manaMultiplier;
 
-	float meleeBaseDamage;
+	float swordBaseDamage;
+	float axeBaseDamage;
+	float clubBaseDamage;
+	float distBaseDamage;
+	float fistBaseDamage;
+	
 	float magicBaseDamage;
-	float distanceBaseDamage;
 	float wandBaseDamage;
 	float healingDamage;
 
 	float baseDefense;
 	float armorDefense;
-	float magicDefense;
 
 	typedef std::map<uint32_t, uint32_t> cacheMap;
 	cacheMap cacheMana;

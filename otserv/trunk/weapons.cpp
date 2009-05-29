@@ -431,8 +431,8 @@ bool Weapon::useFist(Player* player, Creature* target)
 		int32_t maxDamage = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 
 		Vocation* vocation = player->getVocation();
-		if(vocation && vocation->getMeeleBaseDamage() != 1.0){
-			maxDamage *= int32_t(vocation->getMeeleBaseDamage());
+		if(vocation && vocation->getMeleeBaseDamage(WEAPON_NONE) != 1.0){
+			maxDamage = int32_t(maxDamage * vocation->getMeleeBaseDamage(WEAPON_NONE));
 		}
 
 		int32_t damage = -random_range(0, maxDamage, DISTRO_NORMAL);
@@ -716,8 +716,8 @@ int32_t WeaponMelee::getElementDamage(const Player* player, const Item* item) co
 	int32_t maxValue = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, elementDamage, attackFactor);
 
 	Vocation* vocation = player->getVocation();
-	if(vocation && vocation->getMeleeBaseDamage() != 1.0){
-		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage());
+	if(vocation && vocation->getMeleeBaseDamage(item->getWeaponType()) != 1.0){
+		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage(item->getWeaponType()));
 	}
 
 	return -random_range(0, maxValue, DISTRO_NORMAL);
@@ -731,8 +731,8 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* targe
 	int32_t maxValue = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 
 	Vocation* vocation = player->getVocation();
-	if(vocation && vocation->getMeleeBaseDamage() != 1.0){
-		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage());
+	if(vocation && vocation->getMeleeBaseDamage(item->getWeaponType()) != 1.0){
+		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage(item->getWeaponType()));
 	}
 
 	if(maxDamage){

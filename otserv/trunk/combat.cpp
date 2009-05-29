@@ -90,8 +90,8 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 							max = int32_t(max * vocation->getHealingDamage());
 						}
 						else if(max < 0 && min < 0 && vocation->getMagicBaseDamage() != 1.0){
-							min *= int32_t(min * vocation->getMagicBaseDamage());
-							max *= int32_t(max * vocation->getMagicBaseDamage());
+							min = int32_t(min * vocation->getMagicBaseDamage());
+							max = int32_t(max * vocation->getMagicBaseDamage());
 						}
 					}
 

@@ -514,7 +514,7 @@ int32_t Player::getDefense() const
 	if(defenseSkill == 0)
 		return 0;
 
-	if(vocation->getBaseDefense() != 1.0){
+	if(vocation && vocation->getBaseDefense() != 1.0){
 		defenseValue = int32_t(defenseValue * vocation->getBaseDefense());
 	}
 
@@ -2181,12 +2181,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 					g_game.transformItem(item, item->getID(), charges - 1);
 			}
 		}
-
-		if(vocation && vocation->getMagicDefense() != 1.0 && combatType != COMBAT_NONE && combatType != COMBAT_PHYSICALDAMAGE
-			 && combatType != COMBAT_UNDEFINEDDAMAGE && combatType != COMBAT_DROWNDAMAGE){
-			damage -= (int32_t)std::ceil((float)damage * vocation->getMagicDefense() / 100);
-		}
-
+		
 		if(damage <= 0){
 			damage = 0;
 			blockType = BLOCK_DEFENSE;
