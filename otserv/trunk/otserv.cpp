@@ -29,6 +29,7 @@
 
 #include "otsystem.h"
 #include "server.h"
+#include "ioplayer.h"
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
