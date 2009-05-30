@@ -50,12 +50,14 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="..\libxml2.dll" />
 					<Add library="wsock32" />
 					<Add library="ws2_32" />
 					<Add library="mysql" />
 					<Add library="liblibxml2" />
 					<Add library="lua" />
+					<Add library="boost_system" />
+					<Add library="boost_filesystem" />
+					<Add library="boost_regex" />
 				</Linker>
 			</Target>
 			<Target title="Debug Unix">

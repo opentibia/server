@@ -18,6 +18,7 @@
 
 #include "otpch.h"
 
+#include <winsock2.h>
 #include <boost/filesystem.hpp>
 
 #include "configmanager.h"
@@ -814,7 +815,7 @@ std::string LuaThread::report()
 
 		if(ar.currentline != -1)
 			os << ar.currentline;
-		
+
 		os << "\t";
 
 		int tabcount = 16;
