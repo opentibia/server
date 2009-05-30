@@ -42,9 +42,11 @@
     </interact>
 
     <interact keywords="wares">
-      <list>armor</list>
+      <list>runes</list>
+      <list>tapestry</list>
+      <list>food</list>
       <list>vials</list>
-      <list>helmet</list>
+      <list>backpack</list>
       <response>
         <action name="script">
         <![CDATA[
@@ -76,19 +78,17 @@
         <action name="script">
         <![CDATA[
           if(getPlayerMoney(cid) >= _state.amount * _state.price) then
-            local count
-            for count=0, _state.amount-1 do
-              local result = doPlayerAddItem(cid, _state.itemid, _state.subtype, 0)
+            --doSellItem(cid, itemid, amount, <optional> subtype, <optional> actionid, <optional: default: 1> canDropOnMap)
+            local sellAmount = doSellItem(cid, _state.itemid, _state.amount, _state.subtype, 0, 0)
 
-              if(result == -1) then
-                if(count == 0) then
-                  selfSay("Sorry, but you don't have room to take it.", cid)
-                  return
-                else
-                  selfSay("I've sold some for you, but it seems you can't carry more than this. I won't take more money than necessary.", cid)
-                  doPlayerRemoveMoney(cid, count * _state.price)
-                  return
-                end
+            if(sellAmount ~= _state.amount) then
+              if(sellAmount == 0) then
+                selfSay("Sorry, but you don't have room to take it.", cid)
+                return
+              elseif(sellAmount > 0) then
+                selfSay("I've sold some for you, but it seems you can't carry more than this. I won't take more money than necessary.", cid)
+                doPlayerRemoveMoney(cid, sellAmount * _state.price)
+                return
               end
             end
 
@@ -108,9 +108,11 @@
     
     <interact keywords="sell;|AMOUNT|;|LIST|">
       <!-- See merchant.xml to add more items/lists-->
-      <list>armor</list>
-      <list>helmet</list>
+      <list>runes</list>
+      <list>tapestry</list>
+      <list>food</list>
       <list>vials</list>
+      <list>backpack</list>
 
       <response>
         <action name="amount" value="|AMOUNT|"/>
@@ -151,6 +153,11 @@
 
         <action name="script">
         <![CDATA[
+          if(_state.price == 0) then
+            selfSay("Sorry, I do not sell that.", cid)
+            return
+          end
+          
           if(_state.amount > 1) then
             selfSay("Do you want to buy " .. _state.amount .. " " .. _state.listpname .. " for " ..  _state.price * _state.amount .. " gold?", cid)
           else

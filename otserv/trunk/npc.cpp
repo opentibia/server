@@ -1284,7 +1284,13 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 		}
 
 		if(response->getAmount() != -1){
-			npcState->amount = response->getAmount();
+			const ItemType& it = Item::items[npcState->itemId];
+			if(it.stackable || npcState->amount <= g_config.getNumber(ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT)){
+				npcState->amount = response->getAmount();			
+			}
+			else{
+				npcState->amount = g_config.getNumber(ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT);
+			}
 		}
 
 		for(ActionList::const_iterator it = response->getFirstAction(); it != response->getEndAction(); ++it){
@@ -1369,6 +1375,13 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 					}
 					else{
 						amount = (*it).intValue;
+					}
+
+					if(npcState->itemId > 0){
+						const ItemType& it = Item::items[npcState->itemId];
+						if(!it.stackable && amount > g_config.getNumber(ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT)){
+							amount = g_config.getNumber(ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT);
+						}
 					}
 
 					npcState->amount = amount;
@@ -2482,6 +2495,7 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getNpcParameter", NpcScriptInterface::luaGetNpcParameter);
 	lua_register(m_luaState, "openShopWindow", NpcScriptInterface::luaOpenShopWindow);
 	lua_register(m_luaState, "closeShopWindow", NpcScriptInterface::luaCloseShopWindow);
+	lua_register(m_luaState, "doSellItem", NpcScriptInterface::luaDoSellItem);
 }
 
 
@@ -2970,6 +2984,77 @@ int NpcScriptInterface::luaCloseShopWindow(lua_State *L)
 		npc->removeShopPlayer(player);
 	}
 
+	return 1;
+}
+
+int NpcScriptInterface::luaDoSellItem(lua_State *L)
+{
+	//doSellItem(cid, itemid, amount, <optional> subtype, <optional> actionid, <optional: default: 1> canDropOnMap)
+	int32_t parameters = lua_gettop(L);
+
+	bool canDropOnMap = true;
+	if(parameters > 5){
+		canDropOnMap = (popNumber(L) == 1);
+	}
+
+	uint32_t actionId = 0;
+	if(parameters > 4){
+		actionId = popNumber(L);
+	}
+
+	uint32_t subType = 1;
+	if(parameters > 3){
+		subType = popNumber(L);
+	}
+
+	uint32_t amount = (uint32_t)popNumber(L);
+	uint32_t itemId = (uint32_t)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(popNumber(L));
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	uint32_t sellCount = 0;
+	const ItemType& it = Item::items[itemId];
+	if(it.stackable){
+		while(amount > 0){
+			int32_t stackCount = std::min((int32_t)100, (int32_t)amount);
+			Item* item = Item::CreateItem(it.id, stackCount);
+			if(item && actionId != 0){
+				item->setActionId(actionId);
+			}
+			if(g_game.internalPlayerAddItem(player, item, canDropOnMap) != RET_NOERROR){
+				delete item;
+				lua_pushnumber(L, sellCount);
+				return 1;
+			}
+
+			amount = amount - stackCount;
+			sellCount += stackCount;
+		}
+	}
+	else{
+		for(int32_t i = 0; i < amount; ++i){
+			Item* item = Item::CreateItem(it.id, subType);
+			if(item && actionId != 0){
+				item->setActionId(actionId);
+			}
+			if(g_game.internalPlayerAddItem(player, item, canDropOnMap) != RET_NOERROR){
+				delete item;
+				lua_pushnumber(L, sellCount);
+				return 1;
+			}
+
+			++sellCount;
+		}
+	}
+
+	lua_pushnumber(L, sellCount);
 	return 1;
 }
 

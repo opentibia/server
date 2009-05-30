@@ -195,6 +195,9 @@ despawnradius = 50
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
 maxmessagebuffer = 4
 
+-- max amount of none stackable items that a NPC will sell to a player at the same time
+npc_max_nonestackable_sell_amount = 100
+
 -- motd (the message box that you sometimes get before you choose characters)
 motd = "Welcome to OTServ 0.6.3!"
 motdnum = "1"

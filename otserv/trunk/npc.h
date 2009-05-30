@@ -74,6 +74,8 @@ protected:
 	static int luaGetNpcParameter(lua_State *L);
 	static int luaOpenShopWindow(lua_State *L);
 	static int luaCloseShopWindow(lua_State *L);
+	static int luaDoSellItem(lua_State *L);
+
 
 private:
 	virtual bool initState();
