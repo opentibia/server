@@ -422,7 +422,7 @@ bool IOPlayer::savePlayer(Player* player)
 	db->freeResult(result);
 
 	if(save == 0)
-		return false;
+		return true;
 
 	//serialize conditions
 	PropWriteStream propWriteStream;
