@@ -60,9 +60,9 @@
   <itemlist listid="runes">
     <!--If no name tag is used the default name from items.xml is used.-->
     <!--With runes it would be "rune spell", so we override that description here-->
-    <item keywords="sudden;death" id="2268" subtype="100" sellprice="600" name="a sudden death rune" pname="sudden death runes"/>
-    <item keywords="heavy;magic;missile" id="2311" sellprice="400" name="a heavy magic missile" pname="heavy magic missiles"/>
-    <item keywords="ultimate;healing;rune" id="2273" sellprice="400" name="an ultimate healing rune" pname="ultimate healing runes"/>
+    <item keywords="sudden;death" id="2268" subtype="100" sellprice="600" buyprice="600"  name="a sudden death rune" pname="sudden death runes"/>
+    <item keywords="heavy;magic;missile" id="2311" sellprice="400" buyprice="400"  name="a heavy magic missile" pname="heavy magic missiles"/>
+    <item keywords="ultimate;healing;rune" id="2273" sellprice="400" buyprice="400"  name="an ultimate healing rune" pname="ultimate healing runes"/>
   </itemlist>
 
 </interaction>

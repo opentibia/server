@@ -725,6 +725,10 @@ if(Modules == nil) then
 			error("[ShopModule.onSell]", "items[itemid] == nil")
 		end
 
+		if(not isItemStackable(itemid) and amount > MAX_NONESTACKABLE_SELL_AMOUNT) then
+			amount = MAX_NONESTACKABLE_SELL_AMOUNT
+		end
+		
 		local parseInfo = {
 			[TAG_PLAYERNAME] = getPlayerName(cid),
 			[TAG_ITEMCOUNT] = amount,

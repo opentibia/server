@@ -23,7 +23,8 @@ if(NpcHandler == nil) then
 	-- Currently applied conversation behavior. CONVERSATION_PRIVATE is default.
 	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_PRIVATE
 	
-	
+	-- max amount of none stackable items that a NPC will sell to a player at the same time
+	MAX_NONESTACKABLE_SELL_AMOUNT = 100
 	
 	-- Constant indexes for defining default messages.
 	MESSAGE_GREET 		= 1 -- When the player greets the npc.
