@@ -18,7 +18,6 @@
 
 #include "otpch.h"
 
-#include <winsock2.h>
 #include <boost/filesystem.hpp>
 
 #include "configmanager.h"
