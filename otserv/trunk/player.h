@@ -428,9 +428,9 @@ public:
 
 	void sendCreatureAppear(const Creature* creature, const Position& pos)
 		{if(client) client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfThing(this, creature));}
-	void sendCreatureDisappear(const Creature* creature, bool isLogout)
+	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 		{if(client) client->sendRemoveCreature(creature, creature->getPosition(),
-			creature->getTile()->getClientIndexOfThing(this, creature), isLogout);}
+			stackpos, isLogout);}
 	void sendCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
 		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 		{if(client) client->sendMoveCreature(creature, newTile, newPos, newTile->getClientIndexOfThing(this, creature),
