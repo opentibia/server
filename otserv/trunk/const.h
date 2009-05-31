@@ -23,7 +23,7 @@
 
 #include "definitions.h"
 
-#define NETWORKMESSAGE_MAXSIZE 15360
+#define NETWORKMESSAGE_MAXSIZE 15340
 
 enum MagicEffectClasses {
 	NM_ME_DRAW_BLOOD       = 0x00,

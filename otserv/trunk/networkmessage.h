@@ -37,7 +37,9 @@ class NetworkMessage
 {
 public:
 	enum { header_length = 2 };
-	enum { max_body_length = NETWORKMESSAGE_MAXSIZE - header_length };
+	enum { crypto_length = 4 };
+	enum { xtea_multiple = 8 };
+	enum { max_body_length = NETWORKMESSAGE_MAXSIZE - header_length - crypto_length - xtea_multiple };
 
 	// constructor/destructor
 	NetworkMessage(){
@@ -130,9 +132,9 @@ public:
 
 
 protected:
-	inline bool canAdd(int size)
+	inline bool canAdd(uint32_t size)
 	{
-		return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
+		return (size + m_ReadPos < max_body_length);
 	};
 
 	int32_t m_MsgSize;
