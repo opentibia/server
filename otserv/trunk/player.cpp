@@ -204,6 +204,7 @@ Player::~Player()
 
 	setWriteItem(NULL);
 	setEditHouse(NULL);
+	setNextWalkActionTask(NULL);
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	playerCount--;
@@ -1841,6 +1842,7 @@ void Player::setNextWalkActionTask(SchedulerTask* task)
 	}
 	delete walkTask;
 	walkTask = task;
+	setIdleTime(0, false);
 }
 
 void Player::setNextWalkTask(SchedulerTask* task)
@@ -1852,6 +1854,7 @@ void Player::setNextWalkTask(SchedulerTask* task)
 
 	if(task){
 		nextStepEvent = g_scheduler.addEvent(task);
+		setIdleTime(0, false);
 	}
 }
 
@@ -1864,6 +1867,7 @@ void Player::setNextActionTask(SchedulerTask* task)
 
 	if(task){
 		actionTaskEvent = g_scheduler.addEvent(task);
+		setIdleTime(0, false);
 	}
 }
 

@@ -2264,6 +2264,8 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		showUseHotkeyMessage(player, item);
 	}
 
+	player->setIdleTime(0, false);
+
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
 		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseItemEx, this,
@@ -2324,6 +2326,8 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	if(isHotkey){
 		showUseHotkeyMessage(player, item);
 	}
+
+	player->setIdleTime(0, false);
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -2398,6 +2402,8 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 	if(isHotkey){
 		showUseHotkeyMessage(player, item);
 	}
+
+	player->setIdleTime(0, false);
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
