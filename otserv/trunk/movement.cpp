@@ -51,6 +51,9 @@ MoveEvents::~MoveEvents()
 
 void MoveEvents::clear()
 {
+	m_lastCacheTile = NULL;
+	m_lastCacheItemVector.clear();
+
 	MoveListMap::iterator it = m_itemIdMap.begin();
 	while(it != m_itemIdMap.end()){
 		for(int i = 0; i < MOVE_EVENT_LAST; ++i){
@@ -102,7 +105,6 @@ void MoveEvents::clear()
 
 	m_scriptInterface.reInitState();
 }
-
 
 LuaScriptInterface& MoveEvents::getScriptInterface()
 {
