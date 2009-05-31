@@ -223,6 +223,19 @@ Vocation::Vocation()
 	skillMultipliers[4] = 2.0f;
 	skillMultipliers[5] = 1.5f;
 	skillMultipliers[6] = 1.1f;
+
+	swordBaseDamage = 1.;
+	axeBaseDamage = 1.;
+	clubBaseDamage = 1.;
+	distBaseDamage = 1.;
+	fistBaseDamage = 1.;
+
+	magicBaseDamage = 1.;
+	wandBaseDamage = 1.;
+	healingDamage = 1.;
+
+	baseDefense = 1.;
+	armorDefense = 1.;
 }
 
 Vocation::~Vocation()
