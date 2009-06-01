@@ -437,7 +437,9 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << "[done]" << std::endl;
 
 #ifdef WIN32
-	CreateMutex(NULL, true, "otserv_" + g_config.getNumber(ConfigManager::LOGIN_PORT));
+	std::stringstream mutexName;
+	mutexName << "otserv_" << g_config.getNumber(ConfigManager::LOGIN_PORT);
+	CreateMutex(NULL, FALSE, mutexName.str().c_str());
 	if(GetLastError() == ERROR_ALREADY_EXISTS)
 		ErrorMessage("There's an another instance of the OTServ running with the same login port, please shut it down first or change ports for this one.");
 #endif
@@ -634,7 +636,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		exit(-1);
 	}
 
-
 	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE),
 		g_config.getString(ConfigManager::MAP_KIND))){
 		// ok ... so we didn't succeed in laoding the map.
@@ -643,13 +644,10 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		filename.str("");
 		filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << g_config.getString(ConfigManager::MAP_FILE);
 
-		if(!g_game.loadMap(filename.str(),
-			g_config.getString(ConfigManager::MAP_KIND))){
-		ErrorMessage("Couldn't load map");
-				exit(-1);
-			}
-
-
+		if(!g_game.loadMap(filename.str(), g_config.getString(ConfigManager::MAP_KIND))){
+			ErrorMessage("Couldn't load map");
+			exit(-1);
+		}
 	}
 
 	g_game.setGameState(GAME_STATE_INIT);
