@@ -83,11 +83,7 @@ void ConnectionManager::closeAll()
 			(*it)->m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
 			(*it)->m_socket->close(error);
 		}
-		catch(boost::system::system_error& e){
-			if(m_logError){
-				LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
-				m_logError = false;
-			}
+		catch(boost::system::system_error&){
 		}
 		++it;
 	}
