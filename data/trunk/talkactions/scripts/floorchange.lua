@@ -19,7 +19,7 @@ function onSay(cid, words, param)
 		newPos.z = newPos.z + nfloors
 	end
 	if(doTeleportThing(cid, newPos) ~= LUA_ERROR and nfloors > 0) then
-		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == LUA_FALSE) then
+		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
 			doSendMagicEffect(oldPos, CONST_ME_POFF)
 			doSendMagicEffect(newPos, CONST_ME_TELEPORT)
 		end

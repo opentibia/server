@@ -14,7 +14,7 @@ function onLogin(cid)
 		str = "Your last visit in "
 		str = str .. serverName
 		str = str .. ": "
-		str = str .. os.date("%d. %b %Y %X", lastLogin)
+		str = str .. os.date("%d %b %Y %X", lastLogin)
 		str = str .. "."
 	else
 		str = "This is your first visit in "
@@ -25,7 +25,7 @@ function onLogin(cid)
 
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_DEFAULT, str)
 
-	if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == LUA_FALSE) then
+	if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
 		doSendMagicEffect(playerPos, CONST_ME_TELEPORT)
 	end
 

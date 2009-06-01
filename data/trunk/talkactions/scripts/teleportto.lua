@@ -23,7 +23,7 @@ function onSay(cid, words, param)
 	if creatureAccess < access then
 		local oldPlayerPos = getPlayerPosition(cid)
 		if(doTeleportThing(cid, destPos) ~= LUA_ERROR) then
-			if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == LUA_FALSE) then
+			if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
 				doSendMagicEffect(oldPlayerPos, CONST_ME_POFF)
 				doSendMagicEffect(destPos, CONST_ME_TELEPORT)		
 			end
