@@ -78,9 +78,17 @@ void ConnectionManager::closeAll()
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
 	std::list<Connection_ptr>::iterator it;
 	for(it = m_connections.begin(); it != m_connections.end();){
-		boost::system::error_code error;
-		(*it)->m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
-		(*it)->m_socket->close(error);
+		try{
+			boost::system::error_code error;
+			(*it)->m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			(*it)->m_socket->close(error);
+		}
+		catch(boost::system::system_error& e){
+			if(m_logError){
+				LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+				m_logError = false;
+			}
+		}
 		++it;
 	}
 	m_connections.clear();
@@ -154,20 +162,29 @@ void Connection::closeSocket()
 
 		m_pendingRead = 0;
 		m_pendingWrite = 0;
-		m_socket->cancel();
-		boost::system::error_code error;
-		m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
-		if(error){
-			if(error == boost::asio::error::not_connected){
-				//Transport endpoint is not connected.
+
+		try{
+			boost::system::error_code error;
+			m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			if(error){
+				if(error == boost::asio::error::not_connected){
+					//Transport endpoint is not connected.
+				}
+				else{
+					PRINT_ASIO_ERROR("Shutdown");
+				}
 			}
-			else{
-				PRINT_ASIO_ERROR("Shutdown");
+			m_socket->close(error);
+
+			if(error){
+				PRINT_ASIO_ERROR("Close");
 			}
 		}
-		m_socket->close(error);
-		if(error){
-			PRINT_ASIO_ERROR("Close");
+		catch(boost::system::system_error& e){
+			if(m_logError){
+				LOG_MESSAGE("NETWORK", LOGTYPE_ERROR, 1, e.what());
+				m_logError = false;
+			}
 		}
 	}
 
@@ -193,9 +210,15 @@ void Connection::onStopOperation()
 	m_readTimer.cancel();
 	m_writeTimer.cancel();
 
-	if(m_socket->is_open()){
-		m_socket->cancel();
-		m_socket->close();
+	try{
+		if(m_socket->is_open()){
+			boost::system::error_code error;
+			m_socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			m_socket->close();
+		}
+	}
+	catch(boost::system::system_error&){
+		//
 	}
 
 	delete m_socket;
