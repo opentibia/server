@@ -191,7 +191,7 @@ int32_t Creature::getWalkDelay(Direction dir, uint32_t resolution) const
 	if(lastStep != 0){
 		float mul = 1.0f;
 		if(dir == NORTHWEST || dir == NORTHEAST || dir == SOUTHWEST || dir == SOUTHEAST) {
-			mul = 3.0f;
+			mul = 2.0f;
 		}
 
 		int64_t ct = OTSYS_TIME();
@@ -565,7 +565,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 			}
 			else if(std::abs(newPos.x - oldPos.x) >=1 && std::abs(newPos.y - oldPos.y) >= 1){
 				//diagonal extra cost
-				lastStepCost = 3;
+				lastStepCost = 2;
 			}
 		}
 
