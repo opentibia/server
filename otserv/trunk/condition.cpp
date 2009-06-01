@@ -359,7 +359,7 @@ bool Condition::updateCondition(const Condition* addCondition)
 		return false;
 	}
 
-	if(addCondition->getTicks() > 0 && getEndTime() > (OTSYS_TIME() + addCondition->getTicks())){
+	if(addCondition->getTicks() >= 0 && getEndTime() > (OTSYS_TIME() + addCondition->getTicks())){
 		return false;
 	}
 

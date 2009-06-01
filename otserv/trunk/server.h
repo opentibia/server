@@ -46,6 +46,8 @@ typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
 class ServiceBase : boost::noncopyable
 {
 public:
+	virtual ServiceBase() {} // Redundant, but stifles compiler warnings
+
 	virtual bool is_single_socket() const = 0;
 	virtual bool is_checksummed() const = 0;
 	virtual uint8_t get_protocol_identifier() const = 0;
