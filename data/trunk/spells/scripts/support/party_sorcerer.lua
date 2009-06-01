@@ -49,7 +49,7 @@ function onCastSpell(cid, var)
 	end
 
 	doPlayerAddMana(cid, -(mana - baseMana), FALSE)
-	doPlayerAddSpentMana(cid, (mana - baseMana))
+	doPlayerAddManaSpent(cid, (mana - baseMana))
 	for _, pid in ipairs(affectedList) do
 		doAddCondition(pid, condition)
 	end
