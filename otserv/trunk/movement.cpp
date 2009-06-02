@@ -303,8 +303,8 @@ MoveEvent* MoveEvents::getEvent(Tile* tile, MoveEvent_t eventType)
 
 bool MoveEvents::hasTileEvent(Item* item)
 {
-   return (getEvent(item, MOVE_EVENT_STEP_IN) || 
-		   getEvent(item, MOVE_EVENT_STEP_OUT) || 
+   return (getEvent(item, MOVE_EVENT_STEP_IN) ||
+		   getEvent(item, MOVE_EVENT_STEP_OUT) ||
 		   getEvent(item, MOVE_EVENT_ADD_ITEM_ITEMTILE) ||
 		   getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE));
 }
@@ -351,13 +351,14 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 			m_lastCacheItemVector.push_back(tile->ground);
 			ret = ret & moveEvent->fireStepEvent(creature, tile->ground, tile->getPosition());
 		}
+
 	}
 
 	//We can not use iterators here since the scripts can invalidate the iterator
 	int32_t j = tile->__getLastIndex();
 	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
-		if(thing && (tileItem = thing->getItem())){
+		if(thing && (tileItem = thing->getItem()) && !tileItem->isGroundTile()){
 			moveEvent = getEvent(tileItem, eventType);
 			if(moveEvent){
 				m_lastCacheItemVector.push_back(tileItem);
@@ -1073,7 +1074,7 @@ ReturnValue MoveEvent::canPlayerWearEquip(Player* player, slots_t slot)
 	if(player->isItemAbilityEnabled(slot) || player->hasFlag(PlayerFlag_IgnoreWeaponCheck) || getWieldInfo() == 0){
 		return RET_NOERROR;
 	}
-	
+
 	//check all required values
 	const VocEquipMap vocMap = getVocEquipMap();
 	if(vocMap.find(player->getVocationId()) == vocMap.end()){
@@ -1088,6 +1089,6 @@ ReturnValue MoveEvent::canPlayerWearEquip(Player* player, slots_t slot)
 	if(!player->isPremium() && isPremium()){
 		return RET_NEEDPREMIUMTOEQUIPITEM;
 	}
-		
+
 	return RET_NOERROR;
 }

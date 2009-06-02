@@ -774,4 +774,7 @@
 	
 	<!-- Others -->
 	<action itemid="2785" script="blueberry_bush.lua"/>
+	<action itemid="5791" script="stuffed_dragon.lua"/>
+	<action itemid="6566" script="stuffed_dragon.lua"/>
+	<action itemid="2114" script="piggy_bank.lua"/>
 </actions>

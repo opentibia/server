@@ -10,6 +10,7 @@ function onSay(cid, words, param)
 	end
 
 	local oldPos = getPlayerPosition(cid)
+	local newPos = getPlayerPosition(cid)
 
 	local switchPos = {
 		[NORTH]	= function (changePos) changePos.y = changePos.y - ntiles return changePos end,
@@ -19,7 +20,7 @@ function onSay(cid, words, param)
 	}
 
 
-	if(doTeleportThing(cid, switchPos[getPlayerLookDir(cid)](oldPos)) ~= LUA_ERROR) then
+	if(doTeleportThing(cid, switchPos[getPlayerLookDir(cid)](newPos)) ~= LUA_ERROR) then
 		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
 			doSendMagicEffect(oldPos, CONST_ME_POFF)
 			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_TELEPORT)

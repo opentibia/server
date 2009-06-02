@@ -1,12 +1,16 @@
-local TILE_SAND 			= 	231
+local TILE_SAND 		= 	231
 local ITEM_SCARAB_COIN 		= 	2159
-local TUMB_ENTRANCE		 	= 	100
-local SCARAB_TILE			=	101
+local TUMB_ENTRANCE		= 	100
+local SCARAB_TILE		=	101
 local SCARAB_COIN_TILE		= 	102
 		
 function onUse(cid, item, frompos, item2, topos)
 	if (isInArray(CLOSED_HOLE, item2.itemid) == TRUE) then
-		doTransformItem(item2.uid, item2.itemid + 1)
+		if item2.itemid == 8579 then
+			doTransformItem(item2.uid, 8585)
+		else
+			doTransformItem(item2.uid, item2.itemid + 1)
+		end
 	elseif (item2.itemid == TILE_SAND) then
 		if (item2.actionid == TUMB_ENTRANCE) then
 			if (math.random(1, 5) == 1) then
