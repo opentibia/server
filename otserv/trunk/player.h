@@ -467,7 +467,7 @@ public:
 							client->sendAddCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature));
 						}
 						else{
-							client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->__getIndexOfThing(creature), false);
+							client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature), false);
 						}
 					}
 				}

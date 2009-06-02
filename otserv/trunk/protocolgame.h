@@ -191,7 +191,6 @@ private:
 	void sendCancelWalk();
 	void sendChangeSpeed(const Creature* creature, uint32_t speed);
 	void sendCancelTarget();
-	void sendCreatureVisible(const Creature* creature, bool visible);
 	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
