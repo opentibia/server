@@ -174,28 +174,23 @@ int64_t Creature::getTimeSinceLastMove() const
 	return 0x7FFFFFFFFFFFFFFFLL;
 }
 
-int64_t Creature::getSleepTicks() const
+int32_t Creature::getWalkDelay(Direction dir) const
 {
 	if(lastStep != 0){
 		int64_t ct = OTSYS_TIME();
-		int64_t stepDuration = getStepDuration();
-		int64_t delay = stepDuration - (ct - lastStep);
-		return delay;
+		int64_t stepDuration = getStepDuration(dir);
+		return stepDuration - (ct - lastStep);
 	}
 
 	return 0;
 }
 
-int32_t Creature::getWalkDelay(Direction dir, uint32_t resolution) const
+int32_t Creature::getWalkDelay() const
 {
+	//Used for auto-walking
 	if(lastStep != 0){
-		float mul = 1.0f;
-		if(dir == NORTHWEST || dir == NORTHEAST || dir == SOUTHWEST || dir == SOUTHEAST) {
-			mul = 2.0f;
-		}
-
 		int64_t ct = OTSYS_TIME();
-		int64_t stepDuration = (int64_t)(std::ceil(((double)getStepDuration(false) * mul)/resolution) * resolution);
+		int64_t stepDuration = getStepDuration() * lastStepCost;
 		return stepDuration - (ct - lastStep);
 	}
 
@@ -255,7 +250,7 @@ void Creature::onAttacking(uint32_t interval)
 
 void Creature::onWalk()
 {
-	if(getSleepTicks() <= 0){
+	if(getWalkDelay() <= 0){
 		Direction dir;
 		if(getNextStep(dir)){
 			if(g_game.internalMoveCreature(this, dir, FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
@@ -1547,7 +1542,18 @@ std::string Creature::getDescription(int32_t lookDistance) const
 	return str;
 }
 
-int32_t Creature::getStepDuration(bool addLastStepCost /*= true*/) const
+int32_t Creature::getStepDuration(Direction dir) const
+{
+	int32_t stepDuration = getStepDuration();
+
+	if(dir == NORTHWEST || dir == NORTHEAST || dir == SOUTHWEST || dir == SOUTHEAST){
+		stepDuration = stepDuration * 2;
+	}
+
+	return stepDuration;
+}
+
+int32_t Creature::getStepDuration() const
 {
 	if(isRemoved()){
 		return 0;
@@ -1564,15 +1570,15 @@ int32_t Creature::getStepDuration(bool addLastStepCost /*= true*/) const
 		}
 	}
 
-	return duration * (addLastStepCost ? lastStepCost : 1);
-};
+	return duration;
+}
 
 int64_t Creature::getEventStepTicks() const
 {
-	int64_t ret = getSleepTicks();
+	int64_t ret = getWalkDelay();
 
 	if(ret <= 0){
-		ret = getStepDuration();
+		ret = getStepDuration() * lastStepCost;
 	}
 
 	return ret;

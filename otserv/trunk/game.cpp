@@ -1914,28 +1914,27 @@ bool Game::anonymousBroadcastMessage(MessageClasses type, const std::string& tex
 }
 
 //Implementation of player invoked events
-bool Game::playerMove(uint32_t playerId, Direction direction)
+bool Game::playerMove(uint32_t playerId, Direction dir)
 {
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
 		return false;
 
 	player->stopWalk();
-	//client works with 50 ms resolution
-	int32_t delay = player->getWalkDelay(direction, 50);
+	int32_t delay = player->getWalkDelay(dir);
 
 	if(delay > 0){
-		player->setNextAction(OTSYS_TIME() + player->getStepDuration());
+		player->setNextAction(OTSYS_TIME() + player->getStepDuration(dir));
 		SchedulerTask* task = createSchedulerTask( ((uint32_t)delay), boost::bind(&Game::playerMove, this,
-			playerId, direction));
+			playerId, dir));
 		player->setNextWalkTask(task);
 		return false;
 	}
 
 	player->setIdleTime(0, false);
 	player->setFollowCreature(NULL);
-	player->onWalk(direction);
-	return (internalMoveCreature(player, direction) == RET_NOERROR);
+	player->onWalk(dir);
+	return (internalMoveCreature(player, dir) == RET_NOERROR);
 }
 
 bool Game::internalBroadcastMessage(Player* player, const std::string& text)

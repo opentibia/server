@@ -198,16 +198,17 @@ public:
 	void setLastPos(const Position& pos){ lastPos = pos; }
 
 	virtual int getThrowRange() const {return 1;};
-	virtual bool isPushable() const {return (getSleepTicks() <= 0);};
+	virtual bool isPushable() const {return (getWalkDelay() <= 0);};
 	virtual bool isRemoved() const {return isInternalRemoved;};
 	virtual bool canSeeInvisibility() const { return false;}
 
-	int64_t getSleepTicks() const;
-	int32_t getWalkDelay(Direction dir, uint32_t resolution) const;
+	int32_t getWalkDelay(Direction dir) const;
+	int32_t getWalkDelay() const;
 	int64_t getTimeSinceLastMove() const;
 
 	int64_t getEventStepTicks() const;
-	int32_t getStepDuration(bool addLastStepCost = true) const;
+	int32_t getStepDuration(Direction dir) const;
+	int32_t getStepDuration() const;
 	virtual int32_t getStepSpeed() const {return getSpeed();}
 	int32_t getSpeed() const {return baseSpeed + varSpeed;}
 	void setSpeed(int32_t varSpeedDelta)
