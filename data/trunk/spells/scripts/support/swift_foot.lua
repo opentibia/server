@@ -4,7 +4,6 @@ setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
 
 local conditionHaste = createConditionObject(CONDITION_HASTE)
 local conditionExhaustCombat = createConditionObject(CONDITION_EXHAUST_COMBAT)
-local conditionExhaustHeal = createConditionObject(CONDITION_EXHAUST_HEAL)
 local conditionPacified = createConditionObject(CONDITION_PACIFIED)
 
 setConditionParam(conditionHaste, CONDITION_PARAM_TICKS, 10000)
@@ -15,7 +14,6 @@ setConditionParam(conditionPacified, CONDITION_PARAM_TICKS, 10000)
 
 setCombatCondition(combat, conditionHaste)
 setCombatCondition(combat, conditionExhaustCombat)
-setCombatCondition(combat, conditionExhaustHeal)
 setCombatCondition(combat, conditionPacified)
 
 function onCastSpell(cid, var)
