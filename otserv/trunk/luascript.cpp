@@ -2434,7 +2434,6 @@ int LuaScriptInterface::luaDoTeleportThing(lua_State *L)
 			lua_pushnumber(L, LUA_NO_ERROR);
 		}
 		else{
-			reportErrorFunc("Can not teleport thing.");
 			lua_pushnumber(L, LUA_ERROR);
 		}
 	}
