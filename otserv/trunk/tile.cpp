@@ -1254,14 +1254,12 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 	}
 
 	if(const CreatureVector* creatures = getCreatures()){
-		if(thing->getCreature()){
-			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				if(thing == (*cit) || player->canSeeCreature(*cit)){
-					++n;
-				}
-				if((*cit) == thing)
-					return n;
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			if((*cit) == thing || player->canSeeCreature(*cit)){
+				++n;
 			}
+			if((*cit) == thing)
+				return n;
 		}
 	}
 
@@ -1308,12 +1306,10 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 	}
 
 	if(const CreatureVector* creatures = getCreatures()){
-		if(thing->getCreature()){
-			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				++n;
-				if((*cit) == thing)
-					return n;
-			}
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			++n;
+			if((*cit) == thing)
+				return n;
 		}
 	}
 
