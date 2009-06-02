@@ -328,8 +328,10 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			}
 			case CMD_CLOSE_SERVER:
 			{
+				const std::string param = msg.GetString();
+				
 				g_dispatcher.addTask(
-					createTask(boost::bind(&ProtocolAdmin::adminCommandCloseServer, this)));
+					createTask(boost::bind(&ProtocolAdmin::adminCommandCloseServer, this, param)));
 
 				break;
 			}
@@ -401,7 +403,7 @@ void ProtocolAdmin::adminCommandOpenServer()
 	}
 }
 
-void ProtocolAdmin::adminCommandCloseServer()
+void ProtocolAdmin::adminCommandCloseServer(const std::string& param)
 {
 	g_game.setGameState(GAME_STATE_CLOSED);
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
@@ -414,7 +416,12 @@ void ProtocolAdmin::adminCommandCloseServer()
 			++it;
 		}
 	}
-	bool success = g_game.saveServer(false);
+	
+	bool success;
+	if(param == "serversave")
+		success = g_game.saveServer(true);
+	else
+		success = g_game.saveServer(false);
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){

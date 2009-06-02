@@ -1608,8 +1608,6 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 	if(creature == this){
 		if(isLogout){
 			loginPosition = getPosition();
-			lastLogout = time(NULL);
-			IOPlayer::instance()->updateLogoutInfo(this);
 		}
 
 		if(eventWalk != 0){
@@ -1643,6 +1641,9 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 		}
 
 		g_chat.removeUserFromAllChannels(this);
+
+		lastLogout = time(NULL);
+		IOPlayer::instance()->updateLogoutInfo(this);
 
 		bool saved = false;
 		for(uint32_t tries = 0; tries < 3; ++tries){

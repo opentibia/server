@@ -197,7 +197,7 @@ protected:
 
 	void adminCommandOpenServer();
 	void adminCommandSaveServer();
-	void adminCommandCloseServer();
+	void adminCommandCloseServer(const std::string& param);
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();
 	void adminCommandKickPlayer(const std::string& name);

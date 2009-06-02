@@ -161,6 +161,7 @@ void Game::setGameState(GameState_t newState)
 				}
 
 				saveGameState();
+				g_bans.clearTemporaryBans();
 
 				g_dispatcher.addTask(createTask(
 					boost::bind(&Game::shutdown, this)));
@@ -203,7 +204,6 @@ bool Game::saveServer(bool globalSave)
 	}
 
 	return map->saveMap();
-
 }
 
 void Game::loadGameState()
@@ -4555,7 +4555,6 @@ void Game::shutdown()
 	g_dispatcher.shutdown();
 	Spawns::getInstance()->clear();
 	Raids::getInstance()->clear();
-	g_bans.clearTemporaryBans();
 
 	cleanup();
 
