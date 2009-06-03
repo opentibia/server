@@ -161,7 +161,6 @@ void Game::setGameState(GameState_t newState)
 				}
 
 				saveGameState();
-				g_bans.clearTemporaryBans();
 
 				g_dispatcher.addTask(createTask(
 					boost::bind(&Game::shutdown, this)));
@@ -170,8 +169,13 @@ void Game::setGameState(GameState_t newState)
 				break;
 			}
 
-			case GAME_STATE_STARTUP:
 			case GAME_STATE_CLOSED:
+			{
+				g_bans.clearTemporaryBans();
+				break;
+			}
+
+			case GAME_STATE_STARTUP:
 			case GAME_STATE_CLOSING:
 			case GAME_STATE_NORMAL:
 			default:
@@ -186,7 +190,7 @@ void Game::saveGameState()
 	ScriptEnviroment::saveGameState();
 }
 
-bool Game::saveServer(bool globalSave)
+bool Game::saveServer(bool payHouses)
 {
 	saveGameState();
 
@@ -198,9 +202,8 @@ bool Game::saveServer(bool globalSave)
 		IOPlayer::instance()->savePlayer(it->second);
 	}
 
-	if(globalSave){
+	if(payHouses){
 		Houses::getInstance().payHouses();
-		g_bans.clearTemporaryBans();
 	}
 
 	return map->saveMap();

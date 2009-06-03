@@ -466,7 +466,7 @@ public:
 
 	GameState_t getGameState();
 	void setGameState(GameState_t newState);
-	bool saveServer(bool globalSave);
+	bool saveServer(bool payHouses);
 	void saveGameState();
 	void loadGameState();
 	void refreshMap(Map::TileMap::iterator* begin = NULL, int clean_max = 0);

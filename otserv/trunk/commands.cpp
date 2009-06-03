@@ -548,11 +548,8 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		}
 	}
 
-	// Is it a real serversave?
-	if(param == "serversave")
-		g_game.saveServer(true);
-	else
-		g_game.saveServer(false);
+	bool payHouses = (param == "serversave");
+	g_game.saveServer(payHouses);
 
 	Player* player = creature->getPlayer();
 	if(player){

@@ -197,7 +197,7 @@ protected:
 
 	void adminCommandOpenServer();
 	void adminCommandSaveServer();
-	void adminCommandCloseServer(const std::string& param);
+	void adminCommandCloseServer();
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();
 	void adminCommandKickPlayer(const std::string& name);
@@ -210,10 +210,7 @@ protected:
 		LOGGED_IN,
 	};
 
-
-
 private:
-
 	int32_t m_loginTries;
 	ConnectionState_t m_state;
 	time_t m_lastCommand;

@@ -328,10 +328,8 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			}
 			case CMD_CLOSE_SERVER:
 			{
-				const std::string param = msg.GetString();
-				
 				g_dispatcher.addTask(
-					createTask(boost::bind(&ProtocolAdmin::adminCommandCloseServer, this, param)));
+					createTask(boost::bind(&ProtocolAdmin::adminCommandCloseServer, this)));
 
 				break;
 			}
@@ -346,7 +344,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			{
 				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandShutdownServer, this)));
-				getConnection()->closeConnection();
 				return;
 				break;
 			}
@@ -403,7 +400,7 @@ void ProtocolAdmin::adminCommandOpenServer()
 	}
 }
 
-void ProtocolAdmin::adminCommandCloseServer(const std::string& param)
+void ProtocolAdmin::adminCommandCloseServer()
 {
 	g_game.setGameState(GAME_STATE_CLOSED);
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
@@ -417,27 +414,10 @@ void ProtocolAdmin::adminCommandCloseServer(const std::string& param)
 		}
 	}
 	
-	bool success;
-	if(param == "serversave")
-		success = g_game.saveServer(true);
-	else
-		success = g_game.saveServer(false);
-
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
-
-		if(!success){
-			addLogLine(this, LOGTYPE_WARNING, 1, "close server fail");
-
-			output->AddByte(AP_MSG_COMMAND_FAILED);
-			output->AddString("Save");
-			OutputMessagePool::getInstance()->send(output);
-			return;
-		}
-
 		addLogLine(this, LOGTYPE_EVENT, 1, "close server ok");
-
 		output->AddByte(AP_MSG_COMMAND_OK);
 		OutputMessagePool::getInstance()->send(output);
 	}

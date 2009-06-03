@@ -1788,7 +1788,7 @@ void LuaScriptInterface::registerFunctions()
 	//isPzLocked(cid)
 	lua_register(m_luaState, "isPzLocked", LuaScriptInterface::luaIsPzLocked);
 
-	//doSaveServer(globalsave)
+	//doSaveServer(payHouses)
 	lua_register(m_luaState, "doSaveServer", LuaScriptInterface::luaDoSaveServer);
 
 	//getPlayerFrags(cid)
@@ -7110,10 +7110,14 @@ int LuaScriptInterface::luaDoPlayerSetRate(lua_State *L)
 
 int LuaScriptInterface::luaDoSaveServer(lua_State *L)
 {
-	//doSaveServer(globalSave)
-	bool globalSave = (popNumber(L) > 0);
-	bool b = g_game.saveServer(globalSave);
-	lua_pushnumber(L, b? LUA_NO_ERROR : LUA_ERROR);
+	//doSaveServer(payHouses)
+	bool payHouses = (popNumber(L) > 0);
+	if(!g_game.saveServer(payHouses)){
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
