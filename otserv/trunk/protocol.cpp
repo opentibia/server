@@ -198,7 +198,9 @@ bool Protocol::RSA_decrypt(RSA* rsa, NetworkMessage& msg)
 	}
 
 	if(msg.GetByte() != 0){
+#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Warning: [Protocol::RSA_decrypt]. First byte != 0" << std::endl;
+#endif
 		return false;
 	}
 
