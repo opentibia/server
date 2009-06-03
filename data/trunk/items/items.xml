@@ -10125,37 +10125,31 @@
 	<item id="4818" name="dirt"/>
 	<item id="4819" name="dirt"/>
 	<item id="4820" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4821" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4822" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4823" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4824" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4825" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
