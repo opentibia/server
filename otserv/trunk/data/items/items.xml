@@ -10,7 +10,9 @@
 	<item id="194" name="grass"/>
 	<item id="231" name="sand"/>
 	<item id="280" name="grass"/>
-	<item id="293" name="grass"/>
+	<item id="293" name="grass">
+		<attribute key="floorchange" value="down"/>
+	</item>
 	<item id="294" article="a" name="pitfall">
 		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="293"/>
@@ -10123,37 +10125,31 @@
 	<item id="4818" name="dirt"/>
 	<item id="4819" name="dirt"/>
 	<item id="4820" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4821" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4822" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4823" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4824" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4825" name="shallow water" editorsuffix=" (walkable)">
-		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
@@ -18247,7 +18243,9 @@
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
-	<item id="7932" article="a" name="burried hole"/>
+	<item id="7932" article="a" name="burried hole">
+		<attribute key="floorchange" value="down"/>
+	</item>
 	<item id="7933" article="a" name="hole">
 		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="7932"/>
@@ -20347,6 +20345,12 @@
 		<attribute key="description" value="It has the power to store magic energy."/>
 		<attribute key="weight" value="890"/>
 	</item>
+	<item id="9159" article="an" name="archway"/>
+	<item id="9160" article="an" name="archway"/>
+	<item id="9161" article="an" name="archway"/>
+	<item id="9162" article="an" name="archway"/>
+	<item id="9163" article="an" name="archway"/>
+	<item id="9164" article="an" name="archway"/>
 	<item id="9165" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
@@ -20417,6 +20421,20 @@
 	<item id="9236" article="a" name="sun clock"/>
 	<item id="9237" article="a" name="sun clock"/>
 	<item id="9238" article="a" name="sun clock"/>
+	<item id="9252" article="a" name="copper pipes"/>
+	<item id="9253" article="a" name="copper pipes"/>
+	<item id="9254" article="a" name="copper pipes"/>
+	<item id="9255" article="a" name="copper pipes"/>
+	<item id="9256" article="a" name="copper pipes"/>
+	<item id="9257" article="a" name="copper pipes"/>
+	<item id="9258" article="a" name="copper pipes"/>
+	<item id="9259" article="a" name="copper pipes"/>
+	<item id="9260" article="a" name="copper pipes"/>
+	<item id="9261" article="a" name="copper pipes"/>
+	<item id="9262" article="a" name="copper pipes"/>
+	<item id="9263" article="a" name="copper pipes"/>
+	<item id="9265" article="a" name="copper pipes"/>
+	<item id="9266" article="a" name="copper pipes"/>
 	<item id="9267" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
@@ -20483,6 +20501,15 @@
 	<item id="9284" article="a" name="gate of expertise">
 		<attribute key="type" value="door"/>
 	</item>
+	<item id="9320" article="an" name="archway"/>
+	<item id="9321" article="an" name="archway"/>
+	<item id="9322" article="an" name="archway"/>
+	<item id="9323" article="an" name="archway"/>
+	<item id="9324" article="an" name="archway"/>
+	<item id="9325" article="an" name="archway"/>
+	<item id="9326" article="an" name="archway"/>
+	<item id="9531" article="a" name="mechanism"/>
+	<item id="9534" article="a" name="mechanism"/>
 	<item id="9562" article="a" name="large gem"/>
 	<item id="9563" article="a" name="large gem"/>
 	<item id="9564" article="a" name="large gem"/>
@@ -20539,6 +20566,12 @@
 	<item id="9690" article="a" name="gear wheel">
 		<attribute key="weight" value="5"/>
 	</item>
+	<item id="9708" name="burnt wall"/>
+	<item id="9709" name="burnt wall"/>
+	<item id="9710" name="burnt wall"/>
+	<item id="9711" name="burnt wall"/>
+	<item id="9712" name="burnt wall"/>
+	<item id="9713" name="burnt wall"/>
 	<item id="9746" article="a" name="box ramp">
 		<attribute key="floorchange" value="west"/>
 	</item>
@@ -20857,7 +20890,6 @@
 		<attribute key="weight" value="950"/>
 		<attribute key="armor" value="2"/>
 		<attribute key="slotType" value="feet"/>
-		<attribute key="absorbPercentFire" value="90"/>
 		<attribute key="decayTo" value="9934"/>
 		<attribute key="transformDeEquipTo" value="9933"/>
 		<attribute key="duration" value="3600"/>
@@ -20868,7 +20900,6 @@
 		<attribute key="weight" value="950"/>
 		<attribute key="armor" value="2"/>
 		<attribute key="slotType" value="feet"/>
-		<attribute key="absorbPercentFire" value="90"/>
 		<attribute key="transformEquipTo" value="9932"/>
 		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
