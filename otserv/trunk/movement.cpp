@@ -464,8 +464,13 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 
 void MoveEvents::onAddTileItem(const Tile* tile, Item* item)
 {
-	if(m_lastCacheTile == tile && hasTileEvent(item)){
-		m_lastCacheItemVector.push_back(item);
+	if(m_lastCacheTile == tile){
+		std::vector<Item*>::iterator it = std::find(m_lastCacheItemVector.begin(), m_lastCacheItemVector.end(), item);
+		if(it == m_lastCacheItemVector.end()){
+			if(hasTileEvent(item)){
+				m_lastCacheItemVector.push_back(item);
+			}
+		}
 	}
 }
 
