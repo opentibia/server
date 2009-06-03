@@ -666,12 +666,6 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	if(creature->isRemoved())
 		return false;
 
-#ifdef __DEBUG__
-	std::cout << "removing creature "<< std::endl;
-#endif
-
-	//std::cout << "remove: " << creature << " " << creature->getID() << std::endl;
-
 	Tile* tile = creature->getTile();
 
 	SpectatorVec list;
@@ -2898,9 +2892,11 @@ bool Game::internalCloseTrade(Player* player)
 	Player* tradePartner = player->tradePartner;
 	if((tradePartner && tradePartner->getTradeState() == TRADE_TRANSFER) ||
 		  player->getTradeState() == TRADE_TRANSFER){
+#ifdef __DEBUG__
   		std::cout << "Warning: [Game::playerCloseTrade] TradeState == TRADE_TRANSFER. " <<
 		  	player->getName() << " " << player->getTradeState() << " , " <<
 		  	tradePartner->getName() << " " << tradePartner->getTradeState() << std::endl;
+#endif
 		return true;
 	}
 
@@ -4364,7 +4360,9 @@ void Game::internalDecayItem(Item* item)
 		ReturnValue ret = internalRemoveItem(item);
 
 		if(ret != RET_NOERROR){
+#ifdef __DEBUG__
 			std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
+#endif
 		}
 	}
 }
@@ -4383,7 +4381,9 @@ void Game::checkDecay()
 			decreaseTime = item->getDuration();
 		}
 		item->decreaseDuration(decreaseTime);
-		//std::cout << "checkDecay: " << item << ", id:" << item->getID() << ", name: " << item->getName() << ", duration: " << item->getDuration() << std::endl;
+#ifdef __DEBUG__
+		std::cout << "checkDecay: " << item << ", id:" << item->getID() << ", name: " << item->getName() << ", duration: " << item->getDuration() << std::endl;
+#endif
 
 		if(!item->canDecay()){
 			item->setDecaying(DECAYING_FALSE);
@@ -4591,7 +4591,6 @@ void Game::cleanup()
 
 void Game::FreeThing(Thing* thing)
 {
-	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);
 }
 
