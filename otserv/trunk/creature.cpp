@@ -190,7 +190,7 @@ int32_t Creature::getWalkDelay() const
 	//Used for auto-walking
 	if(lastStep != 0){
 		int64_t ct = OTSYS_TIME();
-		int64_t stepDuration = getStepDuration() * lastStepCost;
+		int64_t stepDuration = getStepDuration();
 		return stepDuration - (ct - lastStep);
 	}
 
@@ -1570,7 +1570,7 @@ int32_t Creature::getStepDuration() const
 		}
 	}
 
-	return duration;
+	return duration * lastStepCost;
 }
 
 int64_t Creature::getEventStepTicks() const
@@ -1578,7 +1578,7 @@ int64_t Creature::getEventStepTicks() const
 	int64_t ret = getWalkDelay();
 
 	if(ret <= 0){
-		ret = getStepDuration() * lastStepCost;
+		ret = getStepDuration();
 	}
 
 	return ret;
