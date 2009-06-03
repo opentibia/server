@@ -9,7 +9,6 @@ local conditionPacified = createConditionObject(CONDITION_PACIFIED)
 setConditionParam(conditionHaste, CONDITION_PARAM_TICKS, 10000)
 setConditionFormula(conditionHaste, 0.8, 0, 0.8, 0)
 setConditionParam(conditionExhaustCombat, CONDITION_PARAM_TICKS, 10000)
-setConditionParam(conditionExhaustHeal, CONDITION_PARAM_TICKS, 10000)
 setConditionParam(conditionPacified, CONDITION_PARAM_TICKS, 10000)
 
 setCombatCondition(combat, conditionHaste)
