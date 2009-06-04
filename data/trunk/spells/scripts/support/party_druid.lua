@@ -49,7 +49,7 @@ function onCastSpell(cid, var)
 		return LUA_ERROR
 	end
 
-	doPlayerAddMana(cid, -(mana - baseMana), FALSE)
+	doPlayerAddMana(cid, -(mana - baseMana))
 	doPlayerAddManaSpent(cid, (mana - baseMana))
 	for _, pid in ipairs(affectedList) do
 		doAddCondition(pid, condition)
