@@ -4,8 +4,8 @@ local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_HOLYDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_HOLYAREA)
 function onGetFormulaValues(cid, level, maglevel)
-	local min = -((level/5)+(maglevel*18.5))
-	local max = -((level/5)+(maglevel*25))
+	local min = -((level/5)+(maglevel*4)
+	local max = -((level/5)+(maglevel*6))
 	return min, max
 end
 
