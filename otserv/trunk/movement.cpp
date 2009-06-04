@@ -356,9 +356,9 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 
 	//We can not use iterators here since the scripts can invalidate the iterator
 	int32_t j = tile->__getLastIndex();
-	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
+	for(int32_t i = tile->__getFirstIndex() + 1; i < j; ++i){
 		Thing* thing = tile->__getThing(i);
-		if(thing && (tileItem = thing->getItem()) && !tileItem->isGroundTile()){
+		if(thing && (tileItem = thing->getItem())){
 			moveEvent = getEvent(tileItem, eventType);
 			if(moveEvent){
 				m_lastCacheItemVector.push_back(tileItem);
@@ -448,7 +448,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 
 	//We can not use iterators here since the scripts can invalidate the iterator
 	int32_t j = tile->__getLastIndex();
-	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
+	for(int32_t i = tile->__getFirstIndex() + 1; i < j; ++i){
 		Thing* thing = tile->__getThing(i);
 		if(thing && (tileItem = thing->getItem()) && (tileItem != item)){
 			moveEvent = getEvent(tileItem, eventType2);
