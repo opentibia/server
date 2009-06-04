@@ -1,7 +1,16 @@
+--Formulas based on formula page at http://tibia.wikia.com/wiki/Formula written at 4.06.2009 
+--This formulas was written by Pietia.
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_FIREDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_FIREAREA)
-setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, -1.0, 0, -1.6, 0)
+
+function onGetFormulaValues(cid, level, maglevel)
+	local min = -((level/5)+(maglevel*7))
+	local max = -((level/5)+(maglevel*14))
+	return min, max
+end
+
+setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 
 local area = createCombatArea(AREA_CROSS5X5)
 setCombatArea(combat, area)

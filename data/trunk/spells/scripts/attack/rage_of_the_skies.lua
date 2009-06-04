@@ -1,9 +1,17 @@
+--Formulas based on formula page at http://tibia.wikia.com/wiki/Formula written at 4.06.2009 
+--This formulas was written by Pietia.
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_ENERGYDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_BIGCLOUDS)
-setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, -0.8, 0, -1.4, 0)
+function onGetFormulaValues(cid, level, maglevel)
+	local min = -((level/5)+(maglevel*5))
+	local max = -((level/5)+(maglevel*12))
+	return min, max
+end
 
-local area = createCombatArea(AREA_CROSS6X6)
+setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
+
+local area = createCombatArea(AREA_CROSS5X5)
 setCombatArea(combat, area)
 
 function onCastSpell(cid, var)

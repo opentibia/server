@@ -1,3 +1,5 @@
+--Formulas based on formula page at http://tibia.wikia.com/wiki/Formula written at 4.06.2009 
+--This formulas was written by Pietia.
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_HEALING)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
@@ -5,8 +7,8 @@ setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
 setCombatParam(combat, COMBAT_PARAM_DISPEL, CONDITION_PARALYZE)
 
 function onGetFormulaValues(cid, level, maglevel)
-	local min = (level * 3 + maglevel * 3) * 2.08
-	local max = (level * 3 + maglevel * 3) * 2.7
+	local min = ((level/5)+(maglevel*18.5))
+	local max = ((level/5)+(maglevel*25.0))
 	return min, max
 end
 

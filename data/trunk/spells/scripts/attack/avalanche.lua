@@ -2,7 +2,20 @@ local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_ICEDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_ICEAREA)
 setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_ICE)
-setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, -0.366, 0, -0.641, 0)
+
+function onGetFormulaValues(cid, level, maglevel)
+	local min = -((level/5)+(maglevel*1.4))
+	if min <= 40 then
+	local min = 40
+	end
+	local max = -((level/5)+(maglevel*2.8))
+	if min <= 70 then
+	local min = 70
+	end
+	return min, max
+end
+
+setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 
 local area = createCombatArea(AREA_CIRCLE3X3)
 setCombatArea(combat, area)

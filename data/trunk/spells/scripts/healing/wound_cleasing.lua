@@ -1,25 +1,18 @@
+--Formulas based on formula page at http://tibia.wikia.com/wiki/Formula written at 4.06.2009 
+--This formulas was written by Pietia.
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_HEALING)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
 setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
 setCombatParam(combat, COMBAT_PARAM_DISPEL, CONDITION_PARALYZE)
 
-function getCombatFormulas(cid, lv, maglv)
-	-- Formulas completly NOT accurate, and I never testes this spell. Please, someone send me an accurate formula
-	-- Pedro B. at OTFans.net
-	local formula_min = ((lv*3 + maglv*2) * 0.55) + 15
-	local formula_max = ((lv*4 + maglv*1) * 0.95) + 20
-
-	if(formula_max < formula_min) then
-		--Normalize values
-		local tmp = formula_max
-		formula_max = formula_min
-		formula_min = tmp
-	end
-	return formula_min, formula_max
+function onGetFormulaValues(cid, level, maglevel)
+	local min = ((level/5)+(maglevel*11))
+	local max = ((level/5)+(maglevel*15))
+	return min, max
 end
 
-setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "getCombatFormulas")
+setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 
 function onCastSpell(cid, var)
 	return doCombat(cid, combat, var)
