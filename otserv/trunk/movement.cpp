@@ -335,9 +335,11 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 		int32_t j = m_lastCacheItemVector.size();
 		for(int32_t i = 0; i < j; ++i){
 			tileItem = m_lastCacheItemVector[i];
-			moveEvent = getEvent(tileItem, eventType);
-			if(moveEvent){
-				ret = ret & moveEvent->fireStepEvent(creature, tileItem, tile->getPosition());
+			if(tileItem){
+				moveEvent = getEvent(tileItem, eventType);
+				if(moveEvent){
+					ret = ret & moveEvent->fireStepEvent(creature, tileItem, tile->getPosition());
+				}
 			}
 		}
 		return ret;
@@ -415,7 +417,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		int32_t j = m_lastCacheItemVector.size();
 		for(int32_t i = 0; i < j; ++i){
 			tileItem = m_lastCacheItemVector[i];
-			if(tileItem != item){
+			if(tileItem && tileItem != item){
 				moveEvent = getEvent(tileItem, eventType2);
 				if(moveEvent){
 					ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
@@ -460,9 +462,11 @@ void MoveEvents::onAddTileItem(const Tile* tile, Item* item)
 void MoveEvents::onRemoveTileItem(const Tile* tile, Item* item)
 {
 	if(m_lastCacheTile == tile){
-		std::vector<Item*>::iterator it = std::find(m_lastCacheItemVector.begin(), m_lastCacheItemVector.end(), item);
-		if(it != m_lastCacheItemVector.end()){
-			m_lastCacheItemVector.erase(it);
+		for(uint32_t i = 0; i < m_lastCacheItemVector.size(); ++i){
+			if(m_lastCacheItemVector[i] == item){
+				m_lastCacheItemVector[i] = NULL;
+				break;
+			}
 		}
 	}
 }

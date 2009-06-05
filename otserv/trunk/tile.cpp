@@ -888,13 +888,16 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				const ItemType& oldType = Item::items[ground->getID()];
 				const ItemType& newType = Item::items[item->getID()];
 
+				int32_t oldGroundIndex = __getIndexOfThing(ground);
 				Item* oldGround = ground;
 				ground->setParent(NULL);
 				g_game.FreeThing(ground);
 				ground = item;
 				updateTileFlags(oldGround, true);
 				updateTileFlags(item, false);
+
 				onUpdateTileItem(oldGround, oldType, item, newType);
+				postRemoveNotification(oldGround, NULL, oldGroundIndex, true);
 			}
 		}
 		else if(item->isAlwaysOnTop()){
@@ -903,10 +906,12 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				if(items){
 					for(ItemVector::iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
 						if((*it)->isSplash()){
+							int32_t oldSplashIndex = __getIndexOfThing(*it);
 							Item* oldSplash = *it;
 							__removeThing(oldSplash, 1);
 							oldSplash->setParent(NULL);
 							g_game.FreeThing(oldSplash);
+							postRemoveNotification(oldSplash, NULL, oldSplashIndex, true);
 							break;
 						}
 					}
@@ -940,15 +945,17 @@ void Tile::__addThing(int32_t index, Thing* thing)
 		else{
 			if(item->isMagicField()){
 				//remove old field item if exists
-				MagicField* oldField = NULL;
 				if(items){
+					MagicField* oldField = NULL;
 					for(ItemVector::iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
 						if((oldField = (*it)->getMagicField())){
 							if(oldField->isReplaceable()){
+								int32_t oldFieldIndex = __getIndexOfThing(*it);
 								__removeThing(oldField, 1);
 
 								oldField->setParent(NULL);
 								g_game.FreeThing(oldField);
+								postRemoveNotification(oldField, NULL, oldFieldIndex, true);
 								break;
 							}
 							else{
@@ -995,7 +1002,6 @@ void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	const ItemType& oldType = Item::items[item->getID()];
 	const ItemType& newType = Item::items[itemId];
 
-	//Need to update it here too since the old and new item is the same
 	updateTileFlags(item, true);
 
 	item->setID(itemId);
