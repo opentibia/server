@@ -10,7 +10,7 @@ local outfit = {lookType = 267, lookHead = 0, lookBody = 0, lookLegs = 0, lookFe
 function checkSwim(cid, swimDir, backDir)
 	local posNow = getThingPos(cid)
 
-	if(getCreatureOutfit(cid).lookType == outfit.lookType) then
+	if(hasCondition(cid, CONDITION_OUTFIT) == TRUE and getCreatureOutfit(cid).lookType == outfit.lookType) then
 		doMoveCreature(cid, backDir)
 		doRemoveCondition(cid, CONDITION_OUTFIT)
 	else

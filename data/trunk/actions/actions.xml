@@ -667,7 +667,6 @@
 	<action itemid="2071" script="musical_instrument.lua"/>
 	<action itemid="2072" script="musical_instrument.lua"/>
 	<action itemid="2073" script="musical_instrument.lua"/>
-
 	<action itemid="2074" script="musical_instrument.lua"/>
 	<action itemid="2075" script="musical_instrument.lua"/>
 	<action itemid="2076" script="musical_instrument.lua"/>
@@ -677,14 +676,26 @@
 	<action itemid="2080" script="musical_instrument.lua"/>
 	<action itemid="2081" script="musical_instrument.lua"/>
 	<action itemid="2082" script="musical_instrument.lua"/>
-
 	<action itemid="2083" script="musical_instrument.lua"/>
 	<action itemid="2084" script="musical_instrument.lua"/>
 	<action itemid="2085" script="musical_instrument.lua"/>
 	<action itemid="2095" script="musical_instrument.lua"/>
+	<action itemid="2332" script="musical_instrument.lua"/>
+	<action itemid="2364" script="musical_instrument.lua"/>
+	<action itemid="2367" script="musical_instrument.lua"/>
+	<action itemid="2368" script="musical_instrument.lua"/>
+	<action itemid="2369" script="musical_instrument.lua"/>
+	<action itemid="2370" script="musical_instrument.lua"/>
+	<action itemid="2371" script="musical_instrument.lua"/>
+	<action itemid="2372" script="musical_instrument.lua"/>
+	<action itemid="2373" script="musical_instrument.lua"/>
+	<action itemid="2374" script="musical_instrument.lua"/>
 	<action itemid="3951" script="musical_instrument.lua"/>
 	<action itemid="3952" script="musical_instrument.lua"/>
 	<action itemid="3953" script="musical_instrument.lua"/>
+	<action itemid="3957" script="musical_instrument.lua"/>
+	<action itemid="5786" script="musical_instrument.lua"/>
+	<action itemid="6572" script="musical_instrument.lua"/>
 	
 	<!-- Decayto Items -->
 	<action itemid="2041" script="decayto_item.lua"/>

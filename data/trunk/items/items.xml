@@ -19108,7 +19108,7 @@
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="8586" name="dirt"/>
-	<item id="8587" article="a" name="chest">
+	<item id="8587" article="a" name="sturdy chest">
 		<attribute key="containerSize" value="8"/>
 	</item>
 	<item id="8588" name="skeletal remains"/>
