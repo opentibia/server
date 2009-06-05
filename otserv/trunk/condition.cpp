@@ -1336,6 +1336,9 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 		}
 
 		if(!bRemove){
+			if(getTicks() > 0){
+				endTime = endTime + interval;
+			}
 			interval = 0;
 		}
 	}
