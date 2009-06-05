@@ -1921,7 +1921,7 @@ bool Game::playerMove(uint32_t playerId, Direction dir)
 	int32_t delay = player->getWalkDelay(dir);
 
 	if(delay > 0){
-		player->setNextAction(OTSYS_TIME() + player->getStepDuration(dir));
+		player->setNextAction(OTSYS_TIME() + player->getStepDuration(dir) - 1);
 		SchedulerTask* task = createSchedulerTask( ((uint32_t)delay), boost::bind(&Game::playerMove, this,
 			playerId, dir));
 		player->setNextWalkTask(task);
