@@ -17,16 +17,18 @@ function removeHarmfulConditions(cid)
 end
 
 function onStepIn(cid, item, topos, frompos)
-	local fromGround = getTileItemById(frompos, 4820)
-	if(fromGround.itemid == 0) then
-		doSendMagicEffect(getThingPos(cid), CONST_ME_WATERSPLASH)
-	end
 
 	if(isPlayer(cid) == TRUE) then		
+		local fromGround = getTileItemById(frompos, 4820)
+		if(fromGround.itemid == 0) then
+			doSendMagicEffect(getThingPos(cid), CONST_ME_WATERSPLASH)
+		end
+
 		removeHarmfulConditions(cid)
 		doSetCreatureOutfit(cid, outfit, -1)
 	end
 end
+
 function onStepOut(cid, item, topos, frompos)
 	if(isPlayer(cid) == TRUE) then
 		doRemoveCondition(cid, CONDITION_OUTFIT)
