@@ -85,28 +85,10 @@
 	<moveevent event="StepIn" itemid="7360" function="onStepInField" />
 	<moveevent event="AddItem" itemid="7360" function="onAddField" />
 
-	<!-- Swimming -->
-	<moveevent event="StepIn" itemid="4830" script="swimming/shore_north.lua" />
-	<moveevent event="StepIn" itemid="7945" script="swimming/shore_north.lua" />
-	<moveevent event="StepIn" itemid="7947" script="swimming/shore_north.lua" />
-	<moveevent event="StepIn" itemid="7948" script="swimming/shore_north.lua" />
-	<moveevent event="StepIn" itemid="7951" script="swimming/shore_north.lua" />
-	<moveevent event="StepIn" itemid="7952" script="swimming/shore_north.lua" />
-	<moveevent event="StepIn" itemid="4828" script="swimming/shore_south.lua" />
-	<moveevent event="StepIn" itemid="7943" script="swimming/shore_south.lua" />
-	<moveevent event="StepIn" itemid="7949" script="swimming/shore_south.lua" />
-	<moveevent event="StepIn" itemid="7950" script="swimming/shore_south.lua" />
-	<moveevent event="StepIn" itemid="7953" script="swimming/shore_south.lua" />
-	<moveevent event="StepIn" itemid="7954" script="swimming/shore_south.lua" />
-	<moveevent event="StepIn" itemid="4829" script="swimming/shore_west.lua" />
-	<moveevent event="StepIn" itemid="7946" script="swimming/shore_west.lua" />
-	<moveevent event="StepIn" itemid="4831" script="swimming/shore_east.lua" />
-	<moveevent event="StepIn" itemid="7944" script="swimming/shore_east.lua" />
-
 	<!-- Walkable waters -->
-	<moveevent event="StepIn" itemid="4820" script="swimming/swim.lua" />
-	<moveevent event="StepOut" itemid="4820" script="swimming/swim.lua" />
-	<moveevent event="AddItem" itemid="4820" tileitem="1" script="swimming/water.lua" />
+	<moveevent event="StepIn" itemid="4820" script="swimmingpool_swim.lua" />
+	<moveevent event="StepOut" itemid="4820" script="swimmingpool_swim" />
+	<moveevent event="AddItem" itemid="4820" tileitem="1" script="swimmingpool_item.lua" />
 
 	<!-- Underwater -->
 	<moveevent event="StepIn" itemid="5405" script="underwater.lua" />
