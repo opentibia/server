@@ -87,7 +87,7 @@
 
 	<!-- Walkable waters -->
 	<moveevent event="StepIn" itemid="4820" script="swimmingpool_swim.lua" />
-	<moveevent event="StepOut" itemid="4820" script="swimmingpool_swim" />
+	<moveevent event="StepOut" itemid="4820" script="swimmingpool_swim.lua" />
 	<moveevent event="AddItem" itemid="4820" tileitem="1" script="swimmingpool_item.lua" />
 
 	<!-- Underwater -->
