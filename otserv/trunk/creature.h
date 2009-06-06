@@ -193,9 +193,6 @@ public:
 
 	const Position& getMasterPos() const { return masterPos; }
 	void setMasterPos(const Position& pos, uint32_t radius = 1) { masterPos = pos; masterRadius = radius;}
-	
-	const Position& getLastPos() const { return lastPos; }
-	void setLastPos(const Position& pos){ lastPos = pos; }
 
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return (getWalkDelay() <= 0);};

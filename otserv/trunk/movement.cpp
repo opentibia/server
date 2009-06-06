@@ -288,7 +288,7 @@ void MoveEvents::addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& ma
 	}
 }
 
-MoveEvent* MoveEvents::getEvent(Tile* tile, MoveEvent_t eventType)
+MoveEvent* MoveEvents::getEvent(const Tile* tile, MoveEvent_t eventType)
 {
 	MovePosListMap::iterator it = m_positionMap.find(tile->getPosition());
 	if(it != m_positionMap.end()){
@@ -309,20 +309,33 @@ bool MoveEvents::hasTileEvent(Item* item)
 		   getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE));
 }
 
-uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
+uint32_t MoveEvents::onCreatureMove(Creature* creature, const Tile* fromTile, const Tile* toTile, bool isIn)
 {
 	MoveEvent_t eventType;
+	const Tile* tile = NULL;
 	if(isIn){
+		tile = toTile;
 		eventType = MOVE_EVENT_STEP_IN;
 	}
 	else{
+		tile = fromTile;
 		eventType = MOVE_EVENT_STEP_OUT;
+	}
+
+	Position fromPos(0, 0, 0);
+	if(fromTile){
+		fromPos = fromTile->getPosition();
+	}
+
+	Position toPos(0, 0, 0);
+	if(toTile){
+		toPos = toTile->getPosition();
 	}
 
 	uint32_t ret = 1;
 	MoveEvent* moveEvent = getEvent(tile, eventType);
 	if(moveEvent){
-		ret = ret & moveEvent->fireStepEvent(creature, NULL, tile->getPosition());
+		ret = ret & moveEvent->fireStepEvent(creature, NULL, fromPos, toPos);
 	}
 
 	Item* tileItem = NULL;
@@ -338,7 +351,7 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 			if(tileItem){
 				moveEvent = getEvent(tileItem, eventType);
 				if(moveEvent){
-					ret = ret & moveEvent->fireStepEvent(creature, tileItem, tile->getPosition());
+					ret = ret & moveEvent->fireStepEvent(creature, tileItem, fromPos, toPos);
 				}
 			}
 		}
@@ -356,7 +369,7 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 			moveEvent = getEvent(tileItem, eventType);
 			if(moveEvent){
 				m_lastCacheItemVector.push_back(tileItem);
-				ret = ret & moveEvent->fireStepEvent(creature, tileItem, tile->getPosition());
+				ret = ret & moveEvent->fireStepEvent(creature, tileItem, fromPos, toPos);
 			}
 		}
 	}
@@ -704,7 +717,7 @@ void MoveEvent::setEventType(MoveEvent_t type)
 	m_eventType = type;
 }
 
-uint32_t MoveEvent::StepInField(Creature* creature, Item* item, const Position& pos)
+uint32_t MoveEvent::StepInField(Creature* creature, Item* item, const Position& fromPos, const Position& toPos)
 {
 	MagicField* field = item->getMagicField();
 
@@ -721,7 +734,7 @@ uint32_t MoveEvent::StepInField(Creature* creature, Item* item, const Position& 
 	return LUA_ERROR_ITEM_NOT_FOUND;
 }
 
-uint32_t MoveEvent::StepOutField(Creature* creature, Item* item, const Position& pos)
+uint32_t MoveEvent::StepOutField(Creature* creature, Item* item, const Position& fromPos, const Position& toPos)
 {
 	return 1;
 }
@@ -915,17 +928,17 @@ uint32_t MoveEvent::DeEquipItem(MoveEvent* moveEvent, Player* player, Item* item
 	return 1;
 }
 
-uint32_t MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& pos)
+uint32_t MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& fromPos, const Position& toPos)
 {
 	if(m_scripted){
-		return executeStep(creature, item, pos);
+		return executeStep(creature, item, fromPos, toPos);
 	}
 	else{
-		return stepFunction(creature, item, pos);
+		return stepFunction(creature, item, fromPos, toPos);
 	}
 }
 
-uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
+uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& fromPos, const Position& toPos)
 {
 	//onStepIn(cid, item, topos, frompos)
 	//onStepOut(cid, item, topos, frompos)
@@ -939,7 +952,7 @@ uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& 
 		#endif
 
 		env->setScriptId(m_scriptId, m_scriptInterface);
-		env->setRealPos(pos);
+		env->setRealPos(creature->getPosition());
 
 		uint32_t cid = env->addThing(creature);
 		uint32_t itemid = env->addThing(item);
@@ -949,8 +962,8 @@ uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& 
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 		LuaScriptInterface::pushThing(L, item, itemid);
-		LuaScriptInterface::pushPosition(L, pos, 0);
-		LuaScriptInterface::pushPosition(L, creature->getLastPos(), 0);
+		LuaScriptInterface::pushPosition(L, toPos, 0);
+		LuaScriptInterface::pushPosition(L, fromPos, 0);
 
 		int32_t result = m_scriptInterface->callFunction(4);
 		m_scriptInterface->releaseScriptEnv();

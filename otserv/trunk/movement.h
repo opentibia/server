@@ -52,7 +52,7 @@ public:
 	MoveEvents();
 	virtual ~MoveEvents();
 
-	uint32_t onCreatureMove(Creature* creature, Tile* tile, bool isIn);
+	uint32_t onCreatureMove(Creature* creature, const Tile* fromTile, const Tile* toTile, bool isIn);
 	uint32_t onPlayerEquip(Player* player, Item* item, slots_t slot);
 	uint32_t onPlayerDeEquip(Player* player, Item* item, slots_t slot, bool isRemoval);
 	uint32_t onItemMove(Item* item, Tile* tile, bool isAdd);
@@ -74,7 +74,7 @@ protected:
 
 	void addEvent(MoveEvent* moveEvent, int32_t id, MoveListMap& map);
 	void addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& map);
-	MoveEvent* getEvent(Tile* tile, MoveEvent_t eventType);
+	MoveEvent* getEvent(const Tile* tile, MoveEvent_t eventType);
 
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType, slots_t slot);
 
@@ -83,11 +83,11 @@ protected:
 	MoveListMap m_itemIdMap;
 	MovePosListMap m_positionMap;
 	LuaScriptInterface m_scriptInterface;
-	Tile* m_lastCacheTile;
+	const Tile* m_lastCacheTile;
 	std::vector<Item*> m_lastCacheItemVector;
 };
 
-typedef uint32_t (StepFunction)(Creature* creature, Item* item, const Position& pos);
+typedef uint32_t (StepFunction)(Creature* creature, Item* item, const Position& fromPos, const Position& toPos);
 typedef uint32_t (MoveFunction)(Item* item, Item* tileItem, const Position& pos);
 typedef uint32_t (EquipFunction)(MoveEvent* moveEvent, Player* player, Item* item, slots_t slot, bool isRemoval);
 
@@ -103,14 +103,14 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 
-	uint32_t fireStepEvent(Creature* creature, Item* item, const Position& pos);
+	uint32_t fireStepEvent(Creature* creature, Item* item, const Position& fromPos, const Position& toPos);
 	uint32_t fireAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	uint32_t fireEquip(Player* player, Item* item, slots_t slot, bool isRemoval);
 
 	uint32_t getSlot() const {return slot;}
 
 	//scripting
-	uint32_t executeStep(Creature* creature, Item* item, const Position& pos);
+	uint32_t executeStep(Creature* creature, Item* item, const Position& fromPos, const Position& toPos);
 	uint32_t executeEquip(Player* player, Item* item, slots_t slot);
 	uint32_t executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	//
