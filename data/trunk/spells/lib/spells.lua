@@ -1,3 +1,6 @@
+--Formulas based on formula page at http://tibia.wikia.com/wiki/Formula written at 4.06.2009 
+--All these spells were written/modified by Pietia with the right formulas
+
 --Pre-made areas
 
 --Waves

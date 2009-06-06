@@ -4,15 +4,17 @@ setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_ICEAREA)
 setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_ICE)
 
 function onGetFormulaValues(cid, level, maglevel)
-	local min = -((level/5)+(maglevel*1.4))
-	if min <= 40 then
-	local min = 40
+	local min = ((level/5)+(maglevel*1.4))
+	if min < 40 then
+		min = 40
 	end
-	local max = -((level/5)+(maglevel*2.8))
-	if min <= 70 then
-	local min = 70
+
+	local max = ((level/5)+(maglevel*2.8))
+	if min < 70 then
+		min = 70
 	end
-	return min, max
+
+	return -min, -max
 end
 
 setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")

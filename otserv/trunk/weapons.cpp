@@ -991,7 +991,6 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 	Vocation* vocation = player->getVocation();
 	if(vocation && vocation->getMeleeBaseDamage(WEAPON_DIST) != 1.0){
 		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage(WEAPON_DIST));
-		minValue = int32_t(minValue * vocation->getMeleeBaseDamage(WEAPON_DIST));
 	}
 
 	if(maxDamage){
@@ -1005,6 +1004,10 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 		else{
 			minValue = (int32_t)std::ceil(player->getLevel() * 0.2);
 		}
+	}
+	
+	if(vocation && vocation->getMeleeBaseDamage(WEAPON_DIST) != 1.0){
+		minValue = int32_t(minValue * vocation->getMeleeBaseDamage(WEAPON_DIST));
 	}
 
 	return -random_range(minValue, maxValue, DISTRO_NORMAL);

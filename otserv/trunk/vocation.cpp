@@ -131,7 +131,7 @@ bool Vocations::loadFromXml(const std::string& datadir)
 								voc->wandBaseDamage = floatVal;
 							}
 							if(readXMLFloat(skillNode, "healingDamage", floatVal)){
-								voc->healingDamage = floatVal;
+								voc->healingBaseDamage = floatVal;
 							}
 						}
 						else if(xmlStrcmp(skillNode->name, (const xmlChar*)"meleeDamage") == 0){
@@ -232,7 +232,7 @@ Vocation::Vocation()
 
 	magicBaseDamage = 1.;
 	wandBaseDamage = 1.;
-	healingDamage = 1.;
+	healingBaseDamage = 1.;
 
 	baseDefense = 1.;
 	armorDefense = 1.;

@@ -85,9 +85,9 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 
 					Vocation* vocation = player->getVocation();
 					if(vocation){
-						if(max > 0 && min > 0 && vocation->getHealingDamage() != 1.0){
-							min = int32_t(min * vocation->getHealingDamage());
-							max = int32_t(max * vocation->getHealingDamage());
+						if(max > 0 && min > 0 && vocation->getHealingBaseDamage() != 1.0){
+							min = int32_t(min * vocation->getHealingBaseDamage());
+							max = int32_t(max * vocation->getHealingBaseDamage());
 						}
 						else if(max < 0 && min < 0 && vocation->getMagicBaseDamage() != 1.0){
 							min = int32_t(min * vocation->getMagicBaseDamage());
@@ -1014,6 +1014,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 		lua_pushnumber(L, cid);
 
 		int32_t parameters = 1;
+		bool isMagicFormula = false;
 
 		switch(type){
 			case FORMULA_LEVELMAGIC:
@@ -1022,6 +1023,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 				lua_pushnumber(L, player->getLevel());
 				lua_pushnumber(L, player->getMagicLevel());
 				parameters += 2;
+				isMagicFormula = true;
 				break;
 			}
 
@@ -1061,6 +1063,18 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 		else{
 			max = LuaScriptInterface::popNumber(L);
 			min = LuaScriptInterface::popNumber(L);
+			
+			Vocation* vocation = player->getVocation();
+			if(isMagicFormula && vocation){
+				if(max > 0 && min > 0 && vocation->getHealingBaseDamage() != 1.0){
+					min = int32_t(min * vocation->getHealingBaseDamage());
+					max = int32_t(max * vocation->getHealingBaseDamage());
+				}
+				else if(max < 0 && min < 0 && vocation->getMagicBaseDamage() != 1.0){
+					min = int32_t(min * vocation->getMagicBaseDamage());
+					max = int32_t(max * vocation->getMagicBaseDamage());
+				}
+			}
 		}
 
 		if((lua_gettop(L) + parameters /*nParams*/  + 1) != size0){

@@ -1,5 +1,3 @@
---Formulas based on formula page at http://tibia.wikia.com/wiki/Formula written at 4.06.2009 
---This formulas was written by Pietia.
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_FIREDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_FIREATTACK)
@@ -7,15 +5,17 @@ setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_FIRE)
 setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
 
 function onGetFormulaValues(cid, level, maglevel)
-	local min = -(((level/5)+(maglevel*0.8))+10)
-	if min <= 20 then
-	local min = 20
+	local min = (((level/5)+(maglevel*0.8))+10)
+	if min < 20 then
+		min = 20
 	end
-	local max = -(((level/5)+(maglevel*1))+15)
-	if min <= 40 then
-	local min = 40
+
+	local max = (((level/5)+(maglevel*1))+15)
+	if max < 40 then
+		max = 40
 	end
-	return min, max
+
+	return -min, -max
 end
 setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 

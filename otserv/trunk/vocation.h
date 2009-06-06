@@ -63,7 +63,7 @@ public:
 
 	float getMagicBaseDamage() const {return magicBaseDamage;};
 	float getWandBaseDamage() const {return wandBaseDamage;};
-	float getHealingDamage() const {return healingDamage;};
+	float getHealingBaseDamage() const {return healingBaseDamage;};
 
 	float getBaseDefense() const {return baseDefense;};
 	float getArmorDefense() const {return armorDefense;};
@@ -101,7 +101,7 @@ protected:
 
 	float magicBaseDamage;
 	float wandBaseDamage;
-	float healingDamage;
+	float healingBaseDamage;
 
 	float baseDefense;
 	float armorDefense;

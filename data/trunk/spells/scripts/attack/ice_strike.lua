@@ -1,15 +1,6 @@
---Formulas based on formula page at http://tibia.wikia.com/wiki/Formula written at 4.06.2009 
---This formulas was written by Pietia.
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_ICEDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_ICEATTACK)
-function onGetFormulaValues(cid, level, maglevel)
-	local min = -(((level/5)+(maglevel*1.4))+10)
-	local max = -(((level/5)+(maglevel*2.1))+20)
-	return min, max
-end
-
-setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 
 local distanceCombat = createCombatObject()
 setCombatParam(distanceCombat, COMBAT_PARAM_TYPE, COMBAT_ICEDAMAGE)
@@ -17,11 +8,12 @@ setCombatParam(distanceCombat, COMBAT_PARAM_EFFECT, CONST_ME_ICEATTACK)
 setCombatParam(distanceCombat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_SMALLICE)
 
 function onGetFormulaValues(cid, level, maglevel)
-	local min = -(((level/5)+(maglevel*1.4))+10)
-	local max = -(((level/5)+(maglevel*2.1))+20)
-	return min, max
+	local min = (((level/5)+(maglevel*1.4))+10)
+	local max = (((level/5)+(maglevel*2.1))+20)
+	return -min, -max
 end
 
+setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 setCombatCallback(distanceCombat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 
 function onCastSpell(cid, var)

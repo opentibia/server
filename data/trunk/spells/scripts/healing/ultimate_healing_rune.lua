@@ -1,5 +1,3 @@
---Formulas based on formula page at http://tibia.wikia.com/wiki/Formula written at 4.06.2009 
---This formulas was written by Pietia.
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_HEALING)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
@@ -14,7 +12,6 @@ function onGetFormulaValues(cid, level, maglevel)
 end
 
 setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
-
 
 function onCastSpell(cid, var)
 	return doCombat(cid, combat, var)
