@@ -18,10 +18,13 @@ end
 
 function onStepIn(cid, item, topos, frompos)
 
-	if(isPlayer(cid) == TRUE) then		
-		local fromGround = getTileItemById(frompos, 4820)
-		if(fromGround.itemid == 0) then
-			doSendMagicEffect(getThingPos(cid), CONST_ME_WATERSPLASH)
+	if(isPlayer(cid) == TRUE) then
+		-- check if the player logged into the water
+		if(not(frompos.x == 0 and frompos.y == 0 and frompos.z == 0)) then
+			local fromGround = getTileItemById(frompos, 4820)
+			if(fromGround.itemid == 0) then
+				doSendMagicEffect(getThingPos(cid), CONST_ME_WATERSPLASH)
+			end
 		end
 
 		removeHarmfulConditions(cid)
@@ -31,6 +34,9 @@ end
 
 function onStepOut(cid, item, topos, frompos)
 	if(isPlayer(cid) == TRUE) then
-		doRemoveCondition(cid, CONDITION_OUTFIT)
+		local toGround = getTileItemById(topos, 4820)
+		if(toGround.itemid == 0) then
+			doRemoveCondition(cid, CONDITION_OUTFIT)
+		end
 	end
 end
