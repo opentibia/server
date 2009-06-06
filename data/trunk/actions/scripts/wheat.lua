@@ -1,4 +1,5 @@
 local ITEM_MILL = 1381
+local ITEM_FLOUR = 2692
 
 function onUse(cid, item, frompos, item2, topos)
 	if(item2.itemid == ITEM_MILL) then
