@@ -14,6 +14,13 @@ function onGetFormulaValues(cid, level, maglevel)
 end
 
 setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
+
+function onGetFormulaValues(cid, level, maglevel)
+	local min = (((level/5)+(maglevel*1.4))+10)
+	local max = (((level/5)+(maglevel*2.1))+20)
+	return -min, -max
+end
+
 setCombatCallback(distanceCombat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 
 function onCastSpell(cid, var)
