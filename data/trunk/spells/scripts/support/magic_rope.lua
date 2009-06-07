@@ -1,4 +1,4 @@
-local ROPE_SPOT = {384, 418}
+local ROPE_SPOT = {384, 418, 8278, 8592}
 
 function onCastSpell(cid, var)
 	local pos = getPlayerPosition(cid)

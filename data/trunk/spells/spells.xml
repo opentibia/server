@@ -341,7 +341,7 @@
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 		<vocation name="Paladin"/>  <vocation name="Royal Paladin"/>
 	</instant>
-	<instant name="Mass Healing" words="exura gran mas res" lvl="36" selftarget="1" aggressive="0" script="healing/mass_healing.lua">
+	<instant name="Mass Healing" words="exura gran mas res" lvl="36" mana="150" prem="1" selftarget="1" aggressive="0" script="healing/mass_healing.lua">
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 	</instant>
 	<instant name="Energy Wave" words="exevo vis hur" lvl="38" mana="170" direction="1" script="attack/energy_wave.lua">
@@ -372,16 +372,16 @@
 		<vocation name="Knight"/>   <vocation name="Elite Knight"/>
 	</instant>
   	<instant name="Train Party" words="utito mas sio" lvl="32" mana="60" aggressive="0" selftarget="1" script="support/party_knight.lua">
-    		<vocation name="Elite Knight" />
+    		<vocation name="Knight" /> <vocation name="Elite Knight" />
   	</instant>
 	<instant name="Protect Party" words="utamo mas sio" lvl="32" mana="90" aggressive="0" selftarget="1" script="support/party_paladin.lua">
-    		<vocation name="Royal Paladin" />
+    		<vocation name="Paladin" /> <vocation name="Royal Paladin" />
   	</instant>
 	<instant name="Heal Party" words="utura mas sio" lvl="32" mana="120" aggressive="0" selftarget="1" script="support/party_druid.lua">
-    		<vocation name="Elder Druid" />
+    		<vocation name="Druid" /> <vocation name="Elder Druid" />
   	</instant>
 	<instant name="Enchant Party" words="utori mas sio" lvl="32" mana="120" aggressive="0" selftarget="1" script="support/party_sorcerer.lua">
-    		<vocation name="Master Sorcerer" />
+    		<vocation name="Sorcerer" /> <vocation name="Master Sorcerer" />
   	</instant>
 	<instant name="Protector" words="utamo tempo" lvl="55" mana="200" prem="1" selftarget="1" script="support/protector.lua">
 		<vocation name="Knight"/>   <vocation name="Elite Knight"/>
