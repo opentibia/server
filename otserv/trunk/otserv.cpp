@@ -434,7 +434,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		ErrorMessage(os.str());
 		exit(-1);
 	}
-	std::cout << "[done]" << std::endl;
+	std::cout << " [done]" << std::endl;
 
 #ifdef WIN32
 	std::stringstream mutexName;
