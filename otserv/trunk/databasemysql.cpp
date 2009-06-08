@@ -47,7 +47,7 @@ DatabaseMySQL::DatabaseMySQL()
 
 	// connection handle initialization
 	if(!mysql_init(&m_handle)){
-		std::cout << "Failed to initialize MySQL connection handle." << std::endl;
+		std::cout << std::endl << "Failed to initialize MySQL connection handle." << std::endl;
 		return;
 	}
 
@@ -65,10 +65,26 @@ DatabaseMySQL::DatabaseMySQL()
 		//mySQL servers < 5.0.19 has a bug where MYSQL_OPT_RECONNECT is (incorrectly) reset by mysql_real_connect calls
 		//See http://dev.mysql.com/doc/refman/5.0/en/mysql-options.html for more information.
 		mysql_options(&m_handle, MYSQL_OPT_RECONNECT, &reconnect);
-		std::cout << "[Warning] Outdated mySQL server detected. Consider upgrading to a newer version." << std::endl;
+		std::cout << std::endl << "[Warning] Outdated mySQL server detected. Consider upgrading to a newer version." << std::endl;
 	}
 
 	m_connected = true;
+
+	if(g_config.getString(ConfigManager::MAP_STORAGE_TYPE) == "binary"){
+		DBQuery query;
+		query << "SHOW variables LIKE 'max_allowed_packet';";
+
+		DBResult* result;
+		if((result = storeQuery(query.str()))){
+			int32_t max_query = result->getDataInt("Value");
+			freeResult(result);
+
+			if(max_query < 16777216){
+				std::cout << std::endl << "[Warning] max_allowed_packet might be set to low for binary map storage." << std::endl;
+				executeQuery("SET GLOBAL max_allowed_packet = 16777216;");
+			}
+		}
+	}
 }
 
 DatabaseMySQL::~DatabaseMySQL()
