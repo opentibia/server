@@ -1046,7 +1046,6 @@
 	<item id="1422" article="a" name="campfire"/>
 	<item id="1423" article="a" name="campfire">
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="4000"/>
 			<attribute key="count" value="2"/>
 			<attribute key="damage" value="10"/>
@@ -1054,7 +1053,6 @@
 	</item>
 	<item id="1424" article="a" name="campfire">
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="4000"/>
 			<attribute key="count" value="2"/>
 			<attribute key="damage" value="10"/>
@@ -1062,7 +1060,6 @@
 	</item>
 	<item id="1425" article="a" name="campfire">
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="4000"/>
 			<attribute key="count" value="2"/>
 			<attribute key="damage" value="10"/>
@@ -1157,7 +1154,6 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1190,7 +1186,6 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="energy">
-			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1200,7 +1195,6 @@
 		<attribute key="decayTo" value="1493"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1227,7 +1221,6 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="field" value="energy">
-			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1260,7 +1253,6 @@
 		<attribute key="decayTo" value="1501"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1297,7 +1289,6 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="field" value="energy">
-			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -16366,63 +16357,63 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7466" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7467" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7468" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7469" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7470" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7471" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7472" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7473" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7474" article="a" name="sarcophagus"/>

@@ -15,6 +15,16 @@
 	<!-- Pitfalls -->
 	<moveevent event="StepIn" itemid="293" script="increment.lua" />
 
+	<!-- Campfires -->
+	<moveevent event="StepIn" itemid="1423" function="onStepInField" />
+	<moveevent event="AddItem" itemid="1423" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="1424" function="onStepInField" />
+	<moveevent event="AddItem" itemid="1424" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="1425" function="onStepInField" />
+	<moveevent event="AddItem" itemid="1425" function="onAddField" />
+
 	<!-- Fields -->
 	<moveevent event="StepIn" itemid="1487" function="onStepInField" />
 	<moveevent event="AddItem" itemid="1487" function="onAddField" />
@@ -45,9 +55,6 @@
 
 	<moveevent event="StepIn" itemid="1496" function="onStepInField" />
 	<moveevent event="AddItem" itemid="1496" function="onAddField" />
-
-	<moveevent event="StepIn" itemid="1497" function="onStepInField" />
-	<moveevent event="AddItem" itemid="1497" function="onAddField" />
 
 	<moveevent event="StepIn" itemid="1498" function="onStepInField" />
 	<moveevent event="AddItem" itemid="1498" function="onAddField" />
@@ -85,6 +92,33 @@
 	<moveevent event="StepIn" itemid="7360" function="onStepInField" />
 	<moveevent event="AddItem" itemid="7360" function="onAddField" />
 
+	<moveevent event="StepIn" itemid="7465" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7465" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="7466" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7466" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="7467" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7467" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="7468" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7468" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="7469" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7469" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="7470" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7470" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="7471" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7471" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="7472" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7472" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="7473" function="onStepInField" />
+	<moveevent event="AddItem" itemid="7473" function="onAddField" />
+
 	<!-- Walkable waters -->
 	<moveevent event="StepIn" itemid="4820" script="swimmingpool_swim.lua" />
 	<moveevent event="StepOut" itemid="4820" script="swimmingpool_swim.lua" />
@@ -109,16 +143,6 @@
 	<moveevent event="StepOut" itemid="5743" script="underwater.lua" />
 	<moveevent event="StepOut" itemid="5744" script="underwater.lua" />
 	<moveevent event="StepOut" itemid="5764" script="underwater.lua" />
-
-	<!-- Campfires -->
-	<moveevent event="StepIn" itemid="1423" function="onStepInField" />
-	<moveevent event="AddItem" itemid="1423" function="onAddField" />
-
-	<moveevent event="StepIn" itemid="1424" function="onStepInField" />
-	<moveevent event="AddItem" itemid="1424" function="onAddField" />
-
-	<moveevent event="StepIn" itemid="1425" function="onStepInField" />
-	<moveevent event="AddItem" itemid="1425" function="onAddField" />
 
 	<!-- Doors -->
 	<moveevent event="StepOut" itemid="1224" script="doors/door_close_vertical.lua"/>
