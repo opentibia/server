@@ -24,10 +24,6 @@
 
 #include <iostream>
 
-#if defined __WINDOWS__ || defined WIN32
-#include <winsock2.h>
-#endif
-
 #include "database.h"
 #include "databasemysql.h"
 #ifdef __MYSQL_ALT_INCLUDE__
@@ -81,7 +77,8 @@ DatabaseMySQL::DatabaseMySQL()
 
 			if(max_query < 16777216){
 				std::cout << std::endl << "[Warning] max_allowed_packet might be set to low for binary map storage." << std::endl;
-				executeQuery("SET GLOBAL max_allowed_packet = 16777216;");
+				std::cout << "Use the following query to raise max_allow_packet: ";
+				std::cout << "SET GLOBAL max_allowed_packet = 16777216;");
 			}
 		}
 	}
