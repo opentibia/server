@@ -2660,11 +2660,16 @@ int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 	int32_t manaChange = (int32_t)popNumber(L);
 	ScriptEnviroment* env = getScriptEnv();
 	if(Player* player = env->getPlayerByUID(popNumber(L))){
-		if(manaChange > 0 || !filter){
-			g_game.combatChangeMana(NULL, player, manaChange);
+		if(manaChange > 0){
+			player->changeMana(manaChange);
 		}
 		else{
-			player->drainMana(NULL, manaChange);
+			if(filter){
+				player->drainMana(NULL, manaChange);
+			}
+			else{
+				g_game.combatChangeMana(NULL, player, manaChange);
+			}
 		}
 			
 		lua_pushnumber(L, LUA_NO_ERROR);
