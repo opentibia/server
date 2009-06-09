@@ -2665,7 +2665,7 @@ int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 		}
 		else{
 			if(filter){
-				player->drainMana(NULL, manaChange);
+				player->drainMana(NULL, -manaChange);
 			}
 			else{
 				g_game.combatChangeMana(NULL, player, manaChange);
