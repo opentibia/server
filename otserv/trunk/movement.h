@@ -59,7 +59,6 @@ public:
 	ReturnValue canPlayerWearEquip(Player* player, Item* item, slots_t slot);
 
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
-	bool hasTileEvent(Item* item);
 	void onRemoveTileItem(const Tile* tile, Item* item);
 	void onAddTileItem(const Tile* tile, Item* item);
 
@@ -84,6 +83,7 @@ protected:
 	MovePosListMap m_positionMap;
 	LuaScriptInterface m_scriptInterface;
 	const Tile* m_lastCacheTile;
+	bool m_lastCacheItemEvent;
 	std::vector<Item*> m_lastCacheItemVector;
 };
 
