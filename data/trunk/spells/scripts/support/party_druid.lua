@@ -12,11 +12,12 @@ setConditionParam(condition, CONDITION_PARAM_HEALTHGAIN, 20)
 setConditionParam(condition, CONDITION_PARAM_HEALTHTICKS, 2000)
 
 local baseMana = 120
+
 function onCastSpell(cid, var)
 	local pos = getCreaturePosition(cid)
 
 	local membersList = getPartyMembers(cid)
-	if(membersList == nil or type(membersList) ~= 'table' or table.maxn(membersList) <= 1) then
+	if(membersList == nil or type(membersList) ~= 'table' or #membersList <= 1) then
 		doPlayerSendCancel(cid, "You have to be in a party to cast this spell.")
 		doSendMagicEffect(pos, CONST_ME_POFF)
 		return LUA_ERROR
@@ -29,14 +30,13 @@ function onCastSpell(cid, var)
 		end
 	end
 
-	local tmp = table.maxn(affectedList)
-	if(tmp <= 1) then
+	if(#affectedList <= 1) then
 		doPlayerSendCancel(cid, "No party members in range.")
 		doSendMagicEffect(pos, CONST_ME_POFF)
 		return LUA_ERROR
 	end
 
-	local mana = math.ceil((0.9 ^ (tmp - 1) * baseMana) * tmp)
+	local mana = math.ceil((0.9 ^ (#membersList - 1) * baseMana) * #affectedList)
 	if(getPlayerMana(cid) < mana) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHMANA)
 		doSendMagicEffect(pos, CONST_ME_POFF)
@@ -49,8 +49,8 @@ function onCastSpell(cid, var)
 		return LUA_ERROR
 	end
 
-	doPlayerAddMana(cid, -(mana - baseMana))
-	doPlayerAddManaSpent(cid, (mana - baseMana))
+	doPlayerAddMana(cid, -(mana))
+	doPlayerAddManaSpent(cid, mana)
 	for _, pid in ipairs(affectedList) do
 		doAddCondition(pid, condition)
 	end
