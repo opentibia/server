@@ -39,8 +39,7 @@ extern MoveEvents* g_moveEvents;
 
 MoveEvents::MoveEvents() :
 	m_scriptInterface("MoveEvents Interface"),
-	m_lastCacheTile(NULL),
-	m_lastCacheItemEvent(false)
+	m_lastCacheTile(NULL)
 {
 	m_scriptInterface.initState();
 }
@@ -52,7 +51,6 @@ MoveEvents::~MoveEvents()
 
 void MoveEvents::clear()
 {
-	m_lastCacheItemEvent = false;
 	m_lastCacheTile = NULL;
 	m_lastCacheItemVector.clear();
 
@@ -333,14 +331,13 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, const Tile* fromTile, co
 	}
 
 	Item* tileItem = NULL;
-	if(m_lastCacheTile == tile && !m_lastCacheItemEvent){
+	if(m_lastCacheTile == tile){
 		if(m_lastCacheItemVector.empty()){
 			return ret;
 		}
 
 		//We can not use iterators here since the scripts can invalidate the iterator
-		int32_t j = m_lastCacheItemVector.size();
-		for(int32_t i = 0; i < j; ++i){
+		for(int32_t i = 0; i < m_lastCacheItemVector.size(); ++i){
 			tileItem = m_lastCacheItemVector[i];
 			if(tileItem){
 				moveEvent = getEvent(tileItem, eventType);
@@ -352,7 +349,6 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, const Tile* fromTile, co
 		return ret;
 	}
 
-	m_lastCacheItemEvent = false;
 	m_lastCacheTile = tile;
 	m_lastCacheItemVector.clear();
 
@@ -366,15 +362,7 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, const Tile* fromTile, co
 				m_lastCacheItemVector.push_back(tileItem);
 				ret = ret & moveEvent->fireStepEvent(creature, tileItem, fromPos, toPos);
 			}
-
-			if(eventType == MOVE_EVENT_STEP_IN){
-				moveEvent = getEvent(tileItem, MOVE_EVENT_STEP_OUT);
-			}
-			else if(eventType == MOVE_EVENT_STEP_OUT){
-				moveEvent = getEvent(tileItem, MOVE_EVENT_STEP_IN);
-			}
-
-			if(moveEvent){
+			else if(hasTileEvent(tileItem)){
 				m_lastCacheItemVector.push_back(tileItem);
 			}
 		}
@@ -427,14 +415,13 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 	}
 
 	Item* tileItem = NULL;
-	if(m_lastCacheTile == tile && m_lastCacheItemEvent){
+	if(m_lastCacheTile == tile){
 		if(m_lastCacheItemVector.empty()){
 			return false;
 		}
 
 		//We can not use iterators here since the scripts can invalidate the iterator
-		int32_t j = m_lastCacheItemVector.size();
-		for(int32_t i = 0; i < j; ++i){
+		for(int32_t i = 0; i < m_lastCacheItemVector.size(); ++i){
 			tileItem = m_lastCacheItemVector[i];
 			if(tileItem && tileItem != item){
 				moveEvent = getEvent(tileItem, eventType2);
@@ -447,7 +434,6 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		return ret;
 	}
 
-	m_lastCacheItemEvent = true;
 	m_lastCacheTile = tile;
 	m_lastCacheItemVector.clear();
 
@@ -461,15 +447,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 				m_lastCacheItemVector.push_back(tileItem);
 				ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
 			}
-
-			if(eventType2 == MOVE_EVENT_ADD_ITEM_ITEMTILE){
-				moveEvent = getEvent(tileItem, MOVE_EVENT_REMOVE_ITEM_ITEMTILE);
-			}
-			else if(eventType2 == MOVE_EVENT_REMOVE_ITEM_ITEMTILE){
-				moveEvent = getEvent(tileItem, MOVE_EVENT_ADD_ITEM_ITEMTILE);
-			}
-
-			if(moveEvent){
+			else if(hasTileEvent(tileItem)){
 				m_lastCacheItemVector.push_back(tileItem);
 			}
 		}
@@ -478,21 +456,20 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 	return ret;
 }
 
+bool MoveEvents::hasTileEvent(Item* item)
+{
+	return( getEvent(item, MOVE_EVENT_ADD_ITEM_ITEMTILE) ||
+			getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE) ||
+			getEvent(item, MOVE_EVENT_STEP_IN) ||
+			getEvent(item, MOVE_EVENT_STEP_OUT));
+}
+
 void MoveEvents::onAddTileItem(const Tile* tile, Item* item)
 {
 	if(m_lastCacheTile == tile){
 		std::vector<Item*>::iterator it = std::find(m_lastCacheItemVector.begin(), m_lastCacheItemVector.end(), item);
 		if(it == m_lastCacheItemVector.end()){
-			bool hasEvent = false;
-
-			if(m_lastCacheItemEvent){
-			   hasEvent = (getEvent(item, MOVE_EVENT_ADD_ITEM_ITEMTILE) || getEvent(item, MOVE_EVENT_REMOVE_ITEM_ITEMTILE));
-			}
-			else{
-				hasEvent = (getEvent(item, MOVE_EVENT_STEP_IN) || getEvent(item, MOVE_EVENT_STEP_OUT));
-			}
-			
-			if(hasEvent){
+			if(hasTileEvent(item)){
 				m_lastCacheItemVector.push_back(item);
 			}
 		}

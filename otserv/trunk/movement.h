@@ -74,8 +74,8 @@ protected:
 	void addEvent(MoveEvent* moveEvent, int32_t id, MoveListMap& map);
 	void addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& map);
 	MoveEvent* getEvent(const Tile* tile, MoveEvent_t eventType);
-
 	MoveEvent* getEvent(Item* item, MoveEvent_t eventType, slots_t slot);
+	bool hasTileEvent(Item* item);
 
 	MoveListMap m_uniqueIdMap;
 	MoveListMap m_actionIdMap;
@@ -83,7 +83,6 @@ protected:
 	MovePosListMap m_positionMap;
 	LuaScriptInterface m_scriptInterface;
 	const Tile* m_lastCacheTile;
-	bool m_lastCacheItemEvent;
 	std::vector<Item*> m_lastCacheItemVector;
 };
 
