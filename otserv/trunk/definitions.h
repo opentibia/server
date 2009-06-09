@@ -39,6 +39,13 @@
 	#define xmlFreeOTSERV(s)	xmlFree(s)
 #endif
 
+#ifdef __USE_MINIDUMP__
+	#ifndef __EXCEPTION_TRACER__
+		#define __EXCEPTION_TRACER__
+	#endif
+	
+#endif
+
 #ifdef __DEBUG_EXCEPTION_REPORT__
 	#define DEBUG_REPORT int *a = NULL; *a = 1;
 #else
