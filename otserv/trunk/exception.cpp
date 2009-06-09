@@ -54,10 +54,10 @@ extern ConfigManager g_config;
 
 		unsigned long max_off;
 		unsigned long min_off;
+		typedef std::map<unsigned long, char*> FunctionMap;
 		FunctionMap functionMap;
 		bool ExceptionHandler::isMapLoaded = false;
 		boost::recursive_mutex maploadlock;
-		typedef std::map<unsigned long, char*> FunctionMap;
 
 		EXCEPTION_DISPOSITION
 		__cdecl _SEHHandler(
@@ -115,7 +115,7 @@ bool ExceptionHandler::InstallHandler()
 
 	#elif __GNUC__
 		boost::recursive_mutex::scoped_lock lockObj(maploadlock);
-		if(maploaded == false)
+		if(isMapLoaded == false)
 			LoadMap();
 		if(isInstalled == true)
 			return false;
@@ -456,7 +456,7 @@ bool ExceptionHandler::RemoveHandler()
 
 		bool ExceptionHandler::LoadMap()
 		{
-			if(maploaded == true){
+			if(isMapLoaded){
 				return false;
 			}
 
@@ -526,7 +526,7 @@ bool ExceptionHandler::RemoveHandler()
 			// close file
 			fclose(input);
 			//std::cout << "Loaded " << n << " stack symbols" <<std::endl;
-			maploaded = true;
+			isMapLoaded = true;
 			return true;
 		}
 
