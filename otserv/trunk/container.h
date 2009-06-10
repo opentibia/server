@@ -67,11 +67,11 @@ public:
 	virtual Depot* getDepot() {return NULL;};
 	virtual const Depot* getDepot() const {return NULL;};
 
+	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 	std::string getContentDescription() const;
 
 	uint32_t size() const {return (uint32_t)itemlist.size();}
-	bool full() const {return itemlist.size() >= maxSize;}
 	bool empty() const {return itemlist.empty();}
 
 	ContainerIterator begin();
@@ -139,8 +139,10 @@ protected:
 	uint32_t maxSize;
 	double total_weight;
 	ItemList itemlist;
+	uint32_t serializationCount;
 
 	friend class ContainerIterator;
+	friend class IOMapSerialize;
 };
 
 #endif

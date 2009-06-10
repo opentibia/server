@@ -37,16 +37,16 @@ Teleport::~Teleport()
 	//
 }
 
-bool Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_TELE_DEST == attr){
 		TeleportDest* tele_dest;
 		if(!propStream.GET_STRUCT(tele_dest)){
-			return false;
+			return ATTR_READ_ERROR;
 		}
 
 		setDestPos(Position(tele_dest->_x, tele_dest->_y, tele_dest->_z));
-		return true;
+		return ATTR_READ_CONTINUE;
 	}
 	else
 		return Item::readAttr(attr, propStream);

@@ -706,16 +706,16 @@ Door::~Door()
 		delete accessList;
 }
 
-bool Door::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue Door::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_HOUSEDOORID == attr){
 		unsigned char _doorId = 0;
 		if(!propStream.GET_UCHAR(_doorId)){
-			return false;
+			return ATTR_READ_ERROR;
 		}
 
 		setDoorId(_doorId);
-		return true;
+		return ATTR_READ_CONTINUE;
 	}
 	else
 		return Item::readAttr(attr, propStream);

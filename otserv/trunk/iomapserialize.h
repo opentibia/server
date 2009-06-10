@@ -77,6 +77,7 @@ protected:
 	bool saveItem(PropWriteStream& stream, const Item* item);
 	bool saveTile(PropWriteStream& stream, const Tile* tile);
 	bool loadItem(PropStream& propStream, Cylinder* parent);
+	bool loadContainer(PropStream& propStream, Container* container);
 	bool saveTile(Database* db, uint32_t tileId, const Tile* tile);
 	bool loadTile(Database& db, Tile* tile);
 };

@@ -257,14 +257,14 @@ void Item::setSubType(uint16_t n)
 	}
 }
 
-bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	switch(attr){
 		case ATTR_COUNT:
 		{
 			uint8_t _count = 0;
 			if(!propStream.GET_UCHAR(_count)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setSubType(_count);
@@ -275,7 +275,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint16_t _actionid = 0;
 			if(!propStream.GET_USHORT(_actionid)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setActionId(_actionid);
@@ -286,7 +286,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint16_t _uniqueid;
 			if(!propStream.GET_USHORT(_uniqueid)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setUniqueId(_uniqueid);
@@ -297,7 +297,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			std::string _text;
 			if(!propStream.GET_STRING(_text)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setText(_text);
@@ -308,7 +308,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint32_t _writtenDate;
 			if(!propStream.GET_ULONG(_writtenDate)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setWrittenDate(_writtenDate);
@@ -319,7 +319,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			std::string _writer;
 			if(!propStream.GET_STRING(_writer)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setWriter(_writer);
@@ -330,7 +330,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			std::string _text;
 			if(!propStream.GET_STRING(_text)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setSpecialDescription(_text);
@@ -341,7 +341,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint8_t _charges = 1;
 			if(!propStream.GET_UCHAR(_charges)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setSubType(_charges);
@@ -352,7 +352,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint16_t _charges = 1;
 			if(!propStream.GET_USHORT(_charges)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			setSubType(_charges);
@@ -363,7 +363,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint32_t duration = 0;
 			if(!propStream.GET_ULONG(duration)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			if(((int32_t)duration) < 0){
@@ -377,7 +377,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint8_t state = 0;
 			if(!propStream.GET_UCHAR(state)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
 			if(state != DECAYING_FALSE){
@@ -387,7 +387,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		}
 
 		//these should be handled through derived classes
-		//If these are called then something has changed in the items.otb since the map was saved
+		//If these are called then something has changed in the items.xml since the map was saved
 		//just read the values
 
 		//Depot class
@@ -395,10 +395,10 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint16_t _depotId;
 			if(!propStream.GET_USHORT(_depotId)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
-			return true;
+			return ATTR_READ_CONTINUE;
 		}
 
 		//Door class
@@ -406,10 +406,31 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			uint8_t _doorId;
 			if(!propStream.GET_UCHAR(_doorId)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
-			return true;
+			return ATTR_READ_CONTINUE;
+		}
+
+		//Bed class
+		case ATTR_SLEEPERGUID:
+		{
+			uint32_t _guid;
+			if(!propStream.GET_ULONG(_guid)){
+				return ATTR_READ_ERROR;
+			}
+
+			return ATTR_READ_CONTINUE;
+		}
+
+		case ATTR_SLEEPSTART:
+		{
+			uint32_t sleep_start;
+			if(!propStream.GET_ULONG(sleep_start)){
+				return ATTR_READ_ERROR;
+			}
+
+			return ATTR_READ_CONTINUE;
 		}
 
 		//Teleport class
@@ -417,27 +438,31 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		{
 			TeleportDest* tele_dest;
 			if(!propStream.GET_STRUCT(tele_dest)){
-				return false;
+				return ATTR_READ_ERROR;
 			}
 
-			return true;
+			return ATTR_READ_CONTINUE;
 		}
 
 		default:
-			return false;
+			return ATTR_READ_ERROR;
 		break;
 	}
 
-	return true;
+	return ATTR_READ_CONTINUE;
 }
 
 bool Item::unserializeAttr(PropStream& propStream)
 {
 	uint8_t attr_type;
 	while(propStream.GET_UCHAR(attr_type) && attr_type != 0){
-		if(!readAttr((AttrTypes_t)attr_type, propStream)){
+		Attr_ReadValue ret = readAttr((AttrTypes_t)attr_type, propStream);
+		if(ret == ATTR_READ_ERROR){
 			return false;
 			break;
+		}
+		else if(ret == ATTR_READ_END){
+			return true;
 		}
 	}
 

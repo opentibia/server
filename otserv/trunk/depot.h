@@ -32,7 +32,7 @@ public:
 	virtual const Depot* getDepot() const {return this;};
 
 	//serialization
-	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 
 	uint32_t getDepotId() const {return depotId;};
 	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
