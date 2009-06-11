@@ -444,6 +444,19 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			return ATTR_READ_CONTINUE;
 		}
 
+		//Container class
+		case ATTR_CONTAINER_ITEMS:
+		{
+			uint32_t count;
+			if(!propStream.GET_ULONG(count)){
+				return ATTR_READ_ERROR;
+			}
+
+			//We cant continue parse attributes since there is
+			//container data after this attribute.
+			return ATTR_READ_ERROR;
+		}
+
 		default:
 			return ATTR_READ_ERROR;
 		break;

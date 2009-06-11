@@ -398,22 +398,22 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 	propStream.GET_USHORT(id);
 
 	const ItemType& iType = Item::items[id];
-	if(iType.moveable){
+	Tile* tile = NULL;
+	if(parent->getParent() == NULL){
+		//a Cylinder with no parent is a Tile
+		tile = parent->getTile();
+	}
+
+	if(iType.moveable || /* or object in a container*/ !tile){
 		//create a new item
 		item = Item::CreateItem(id);
 
 		if(item){
-			bool ret = item->unserializeAttr(propStream);
-
-			item = g_game.transformItem(item, id);
-
-			if(ret){
-				if(item){
-					Container* container = item->getContainer();
-					if(container){
-						if(!loadContainer(propStream, container)){
-							return false;
-						}
+			if(item->unserializeAttr(propStream)){
+				Container* container = item->getContainer();
+				if(container){
+					if(!loadContainer(propStream, container)){
+						return false;
 					}
 				}
 			}
@@ -431,14 +431,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 		}
 	}
 	else{
-		// A static item (bed)
-		// find this type in the tile
-		Tile* tile = parent->getTile();
-		if(!tile){
-			std::cout << "WARNING: Unserialization error in IOMapSerialize::loadItem()" << std::endl;
-			return false;
-		}
-
+		// Stationary items like doors/beds/blackboards/bookcases
 		for(uint32_t i = 0; i < tile->getThingCount(); ++i){
 			Item* findItem = tile->__getThing(i)->getItem();
 
@@ -485,6 +478,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 				Container* container = dummy->getContainer();
 				if(container){
 					if(!loadContainer(propStream, container)){
+						delete dummy;
 						return false;
 					}
 				}
