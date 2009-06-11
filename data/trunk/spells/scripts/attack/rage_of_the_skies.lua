@@ -10,7 +10,7 @@ end
 
 setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 
-local area = createCombatArea(AREA_CROSS5X5)
+local area = createCombatArea(AREA_CROSS6X6)
 setCombatArea(combat, area)
 
 function onCastSpell(cid, var)
