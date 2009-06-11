@@ -127,13 +127,14 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 				item = Item::CreateItem(type, count);
 
 				if(item){
-					if(!item->unserializeAttr(propStream)){
-						std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
+					if(item->unserializeAttr(propStream)){
+						if(pid == 0){
+							tile->__internalAddThing(item);
+							item->__startDecaying();
+						}
 					}
-
-					if(pid == 0){
-						tile->__internalAddThing(item);
-						item->__startDecaying();
+					else{
+						std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
 					}
 				}
 				else
@@ -165,14 +166,16 @@ bool IOMapSerialize::loadTile(Database& db, Tile* tile)
 			}
 
 			if(item){
-				if(!item->unserializeAttr(propStream)){
+				if(item->unserializeAttr(propStream)){
+					item = g_game.transformItem(item, type);
+					if(item){
+						std::pair<Item*, int> myPair(item, pid);
+						itemMap[sid] = myPair;
+					}
+				}
+				else{
 					std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
 				}
-
-				item = g_game.transformItem(item, type);
-
-				std::pair<Item*, int> myPair(item, pid);
-				itemMap[sid] = myPair;
 			}
 			else{
 				std::cout << "WARNING: IOMapSerialize::loadTile(). NULL item at " << tile->getPosition() << ". type = " << type << ", sid = " << sid << ", pid = " << pid << std::endl;
@@ -413,20 +416,23 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 				Container* container = item->getContainer();
 				if(container){
 					if(!loadContainer(propStream, container)){
+						delete item;
 						return false;
 					}
+				}
+
+				if(parent){
+					parent->__internalAddThing(item);
+					item->__startDecaying();
+				}
+				else{
+					delete item;
 				}
 			}
 			else{
 				std::cout << "WARNING: Unserialization error in IOMapSerialize::loadItem()" << id << std::endl;
-			}
-
-			if(parent){
-				parent->__internalAddThing(item);
-				item->__startDecaying();
-			}
-			else{
 				delete item;
+				return false;
 			}
 		}
 	}
@@ -453,18 +459,15 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent)
 		}
 
 		if(item){
-			bool ret = item->unserializeAttr(propStream);
-			item = g_game.transformItem(item, id);
-
-			if(ret){
-				if(item){
-					Container* container = item->getContainer();
-					if(container){
-						if(!loadContainer(propStream, container)){
-							return false;
-						}
+			if(item->unserializeAttr(propStream)){
+				Container* container = item->getContainer();
+				if(container){
+					if(!loadContainer(propStream, container)){
+						return false;
 					}
 				}
+
+				item = g_game.transformItem(item, id);
 			}
 			else{
 				std::cout << "WARNING: Unserialization error in IOMapSerialize::loadItem()" << id << std::endl;
