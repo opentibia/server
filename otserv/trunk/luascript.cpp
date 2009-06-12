@@ -3303,14 +3303,13 @@ int LuaScriptInterface::luaDoDecayItem(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 
 	Item* item = env->getItemByUID(uid);
-	if(item){
-		g_game.startDecay(item);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+	if(!item){
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
+
+	g_game.startDecay(item);
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -3936,8 +3935,6 @@ int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
 		player->addSummon(monster);
 		if(!g_game.placeCreature(monster, pos)){
 			player->removeSummon(monster);
-			std::string error_str = (std::string)"Can not summon monster: " + name;
-			reportErrorFunc(error_str);
 			lua_pushnumber(L, LUA_ERROR);
 			return 1;
 		}
