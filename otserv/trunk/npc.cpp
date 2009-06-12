@@ -612,7 +612,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						prop.health = intValue;
 					}
 
-					if(readXMLString(tmpNode, "conditino", strValue)){
+					if(readXMLString(tmpNode, "condition", strValue)){
 						if(strValue == "poison"){
 							prop.condition = CONDITION_POISON;
 						}
@@ -2087,28 +2087,28 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 
 			if(hasBitSet(RESPOND_DRUID, params)){
-				if(player->getVocationId() != VOCATION_DRUID && player->getVocationId() != VOCATION_DRUID + 4){
+				if(player->getVocationId() != VOCATION_DRUID && player->getVocationId() != VOCATION_ELDERDRUID){
 					continue;
 				}
 				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_KNIGHT, params)){
-				if(player->getVocationId() != VOCATION_KNIGHT && player->getVocationId() != VOCATION_KNIGHT + 4){
+				if(player->getVocationId() != VOCATION_KNIGHT && player->getVocationId() != VOCATION_ELITEKNIGHT){
 					continue;
 				}
 				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_PALADIN, params)){
-				if(player->getVocationId() != VOCATION_PALADIN && player->getVocationId() != VOCATION_PALADIN + 4){
+				if(player->getVocationId() != VOCATION_PALADIN && player->getVocationId() != VOCATION_ROYALPALADIN){
 					continue;
 				}
 				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_SORCERER, params)){
-				if(player->getVocationId() != VOCATION_SORCERER && player->getVocationId() != VOCATION_SORCERER + 4){
+				if(player->getVocationId() != VOCATION_SORCERER && player->getVocationId() != VOCATION_MASTERSORCERER){
 					continue;
 				}
 				++matchCount;
