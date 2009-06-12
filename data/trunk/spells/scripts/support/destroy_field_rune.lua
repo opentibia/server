@@ -3,7 +3,7 @@ local function doRemoveField(cid, pos)
 	local field = getThingfromPos(pos)
 	local playerPos = getPlayerPosition(cid)
 
-	local field = getTileItemByType(frompos, ITEM_TYPE_MAGICFIELD)
+	local field = getTileItemByType(pos, ITEM_TYPE_MAGICFIELD)
 	if(field.itemid ~=0) then
 		doRemoveItem(field.uid)
 		doSendMagicEffect(pos, CONST_ME_POFF)
