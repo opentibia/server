@@ -1,5 +1,9 @@
 getConfigInfo = getConfigValue
 
+function getThingFromPos(pos)
+	return getThingfromPos(pos)
+end
+
 function setExperienceRate(cid, value)
 	return doPlayerSetRate(cid, LEVEL_EXPERIENCE, value)
 end

@@ -17,4 +17,5 @@
 	<talkaction words="/serverinfo" script="serverinfo.lua"/>
 	<talkaction words="/a" filter="first word" script="teleportntiles.lua"/>
 	<talkaction words="/goto" filter="first word" script="teleportto.lua"/>
+	<talkaction words="/r" filter="first word" script="removething.lua"/>
 </talkactions>
