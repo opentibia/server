@@ -346,6 +346,9 @@ uint32_t Npc::loadParams(xmlNodePtr node)
 			else if(asLowerCaseString(*it) == "lowmoney"){
 				params |= RESPOND_LOWMONEY;
 			}
+			else if(asLowerCaseString(*it) == "enoughmoney"){
+				params |= RESPOND_ENOUGHMONEY;
+			}
 			else if(asLowerCaseString(*it) == "noamount"){
 				params |= RESPOND_NOAMOUNT;
 			}
@@ -470,6 +473,22 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 				}
 			}
 		}
+		else if(xmlStrcmp(node->name, (const xmlChar*)"script") == 0){
+			xmlNodePtr scriptNode = node->children;
+			while(scriptNode){
+				if(xmlStrcmp(scriptNode->name, (const xmlChar*)"text") == 0 ||
+					scriptNode->type == XML_CDATA_SECTION_NODE){
+					if(readXMLContentString(scriptNode, strValue)){
+						trim_left(strValue, "\r");
+						trim_left(strValue, "\n");
+						trim_left(strValue, " ");
+						
+						m_scriptInterface->loadBuffer(strValue, this);
+					}
+				}
+				scriptNode = scriptNode->next;
+			}
+		}
 		else if(xmlStrcmp(node->name, (const xmlChar*)"interact") == 0){
 			NpcResponse::ResponseProperties prop;
 			prop.publicize = defaultPublic;
@@ -508,6 +527,9 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 			if(readXMLString(node, "storageComp", strValue)){
 				if(asLowerCaseString(strValue) == "equal"){
 					prop.storageComp = STORAGE_EQUAL;
+				}
+				if(asLowerCaseString(strValue) == "notequal"){
+					prop.storageComp = STORAGE_NOTEQUAL;
 				}
 				if(asLowerCaseString(strValue) == "greaterorequal"){
 					prop.storageComp = STORAGE_GREATEROREQUAL;
@@ -584,6 +606,58 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 
 					if(readXMLInteger(tmpNode, "public", intValue)){
 						prop.publicize = (intValue == 1);
+					}
+
+					if(readXMLInteger(tmpNode, "lowhealth", intValue)){
+						prop.health = intValue;
+					}
+
+					if(readXMLString(tmpNode, "conditino", strValue)){
+						if(strValue == "poison"){
+							prop.condition = CONDITION_POISON;
+						}
+						else if(strValue == "fire"){
+							prop.condition = CONDITION_FIRE;
+						}
+						else if(strValue == "energy"){
+							prop.condition = CONDITION_ENERGY;
+						}
+						else if(strValue == "haste"){
+							prop.condition = CONDITION_HASTE;
+						}
+						else if(strValue == "paralyze"){
+							prop.condition = CONDITION_PARALYZE;
+						}
+						else if(strValue == "outfit"){
+							prop.condition = CONDITION_OUTFIT;
+						}
+						else if(strValue == "invisible"){
+							prop.condition = CONDITION_INVISIBLE;
+						}
+						else if(strValue == "light"){
+							prop.condition = CONDITION_LIGHT;
+						}
+						else if(strValue == "manashield"){
+							prop.condition = CONDITION_MANASHIELD;
+						}
+						else if(strValue == "drunk"){
+							prop.condition = CONDITION_DRUNK;
+						}
+						else if(strValue == "exhausted"){
+							prop.condition = CONDITION_EXHAUSTED;
+						}
+						else if(strValue == "regeneration"){
+							prop.condition = CONDITION_REGENERATION;
+						}
+						else if(strValue == "soul"){
+							prop.condition = CONDITION_SOUL;
+						}
+						else if(strValue == "drown"){
+							prop.condition = CONDITION_DROWN;
+						}
+						else if(strValue == "muted"){
+							prop.condition = CONDITION_MUTED;
+						}
 					}
 
 					if(readXMLInteger(tmpNode, "b1", intValue)){
@@ -1579,8 +1653,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 				case ACTION_SCRIPT:
 				{
-					NpcScriptInterface scriptInterface;
-					if(scriptInterface.reserveScriptEnv()){
+					if(m_scriptInterface->reserveScriptEnv()){
 						ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 
 						std::stringstream scriptstream;
@@ -1635,12 +1708,12 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 						//std::cout << scriptstream.str() << std::endl;
 
-						if(scriptInterface.loadBuffer(scriptstream.str(), this) != -1){
-							lua_State* L = scriptInterface.getLuaState();
+						if(m_scriptInterface->loadBuffer(scriptstream.str(), this) != -1){
+							lua_State* L = m_scriptInterface->getLuaState();
 							lua_getglobal(L, "_state");
 							NpcScriptInterface::popState(L, npcState);
 						}
-						scriptInterface.releaseScriptEnv();
+						m_scriptInterface->releaseScriptEnv();
 					}
 
 					break;
@@ -2014,28 +2087,28 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 
 			if(hasBitSet(RESPOND_DRUID, params)){
-				if(player->getVocationId() != VOCATION_DRUID){
+				if(player->getVocationId() != VOCATION_DRUID && player->getVocationId() != VOCATION_DRUID + 4){
 					continue;
 				}
 				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_KNIGHT, params)){
-				if(player->getVocationId() != VOCATION_KNIGHT){
+				if(player->getVocationId() != VOCATION_KNIGHT && player->getVocationId() != VOCATION_KNIGHT + 4){
 					continue;
 				}
 				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_PALADIN, params)){
-				if(player->getVocationId() != VOCATION_PALADIN){
+				if(player->getVocationId() != VOCATION_PALADIN && player->getVocationId() != VOCATION_PALADIN + 4){
 					continue;
 				}
 				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_SORCERER, params)){
-				if(player->getVocationId() != VOCATION_SORCERER){
+				if(player->getVocationId() != VOCATION_SORCERER && player->getVocationId() != VOCATION_SORCERER + 4){
 					continue;
 				}
 				++matchCount;
@@ -2051,6 +2124,14 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			if(hasBitSet(RESPOND_LOWMONEY, params)){
 				int32_t moneyCount = g_game.getMoney(player);
 				if(moneyCount >= (npcState->price * npcState->amount)){
+					continue;
+				}
+				++matchCount;
+			}
+
+			if(hasBitSet(RESPOND_ENOUGHMONEY, params)){
+				int32_t moneyCount = g_game.getMoney(player);
+				if(moneyCount < (npcState->price * npcState->amount)){
 					continue;
 				}
 				++matchCount;
@@ -2077,6 +2158,18 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 					++matchCount;
 				}
 			}
+		}
+
+		if((*it)->getCondition() != CONDITION_NONE){
+			if(!player->hasCondition((*it)->getCondition()))
+				continue;
+			++matchCount;
+		}
+
+		if((*it)->getHealth() != -1){
+			if(player->getHealth() < (*it)->getHealth())
+				continue;
+			++matchCount;
 		}
 
 		if((*it)->getKnowSpell() != ""){
@@ -2138,6 +2231,13 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				case STORAGE_EQUAL:
 				{
 					if(playerStorageValue != storageValue){
+						continue;
+					}
+					break;
+				}
+				case STORAGE_NOTEQUAL:
+				{
+					if(playerStorageValue == storageValue){
 						continue;
 					}
 					break;
@@ -2535,17 +2635,13 @@ int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 	Npc* npc = env->getNpc();
 	if(npc){
 		Position pos = npc->getPosition();
-		lua_pushnumber(L, pos.x);
-		lua_pushnumber(L, pos.y);
-		lua_pushnumber(L, pos.z);
+		pushPosition(L, pos);
 	}
 	else{
 		lua_pushnil(L);
-		lua_pushnil(L);
-		lua_pushnil(L);
 	}
 
-	return 3;
+	return 1;
 }
 
 int NpcScriptInterface::luaActionSay(lua_State* L)

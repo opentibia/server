@@ -111,6 +111,7 @@ class NpcScript : public NpcEventsHandler
 {
 public:
 	NpcScript(std::string file, Npc* npc);
+	NpcScript(Npc* npc);
 	virtual ~NpcScript();
 
 	virtual void onCreatureAppear(const Creature* creature);
@@ -136,19 +137,20 @@ private:
 };
 
 enum RespondParam_t{
-	RESPOND_DEFAULT = 0,
-	RESPOND_MALE = 1,
-	RESPOND_FEMALE = 2,
-	RESPOND_PZBLOCK = 4,
-	RESPOND_LOWMONEY = 8,
-	RESPOND_NOAMOUNT = 16,
-	RESPOND_LOWAMOUNT = 32,
-	RESPOND_PREMIUM = 64,
-	RESPOND_DRUID = 128,
-	RESPOND_KNIGHT = 256,
-	RESPOND_PALADIN = 512,
-	RESPOND_SORCERER = 1024,
-	RESPOND_LOWLEVEL = 2048
+	RESPOND_DEFAULT      = 0x0000,
+	RESPOND_MALE         = 0x0001,
+	RESPOND_FEMALE       = 0x0002,
+	RESPOND_PZBLOCK      = 0x0004,
+	RESPOND_LOWMONEY     = 0x0008,
+	RESPOND_NOAMOUNT     = 0x0010,
+	RESPOND_LOWAMOUNT    = 0x0020,
+	RESPOND_PREMIUM      = 0x0040,
+	RESPOND_DRUID        = 0x0080,
+	RESPOND_KNIGHT       = 0x0100,
+	RESPOND_PALADIN      = 0x0200,
+	RESPOND_SORCERER     = 0x0400,
+	RESPOND_LOWLEVEL     = 0x0800,
+	RESPOND_ENOUGHMONEY  = 0x1000,
 };
 
 enum ResponseType_t{
@@ -194,6 +196,7 @@ enum StorageComparision_t{
 	STORAGE_LESS,
 	STORAGE_LESSOREQUAL,
 	STORAGE_EQUAL,
+	STORAGE_NOTEQUAL,
 	STORAGE_GREATEROREQUAL,
 	STORAGE_GREATER
 };
@@ -311,6 +314,8 @@ public:
 			storageValue = -1;
 			storageComp = STORAGE_EQUAL;
 			knowSpell = "";
+			health = -1;
+			condition = CONDITION_NONE;
 			publicize = true;
 		}
 
@@ -328,6 +333,8 @@ public:
 		std::string knowSpell;
 		ActionList actionList;
 		std::list<ListItem> itemList;
+		int32_t health;
+		ConditionType_t condition;
 		bool publicize;
 	};
 
@@ -365,6 +372,8 @@ public:
 	int32_t getFocusState() const {return prop.focusStatus;}
 	int32_t getStorageId() const {return prop.storageId;}
 	int32_t getStorageValue() const {return prop.storageValue;}
+	ConditionType_t getCondition() const {return prop.condition;}
+	int32_t getHealth() const {return prop.health;}
 	ResponseType_t getResponseType() const {return prop.responseType;}
 	InteractType_t getInteractType() const {return prop.interactType;}
 	StorageComparision_t getStorageComp() const {return prop.storageComp;}
