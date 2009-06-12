@@ -185,7 +185,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			break;
 		}
 		default:
-			addLogLine(this, LOGTYPE_ERROR, 1, "no valid connection state!!!");
 			getConnection()->closeConnection();
 			return;
 		}
@@ -426,7 +425,6 @@ void ProtocolAdmin::adminCommandCloseServer()
 void ProtocolAdmin::adminCommandShutdownServer()
 {
 	g_game.setGameState(GAME_STATE_SHUTDOWN);
-
 	addLogLine(this, LOGTYPE_EVENT, 1, "start server shutdown");
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);

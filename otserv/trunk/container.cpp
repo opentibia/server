@@ -489,7 +489,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 	}
 
 	//send change to client
-	if(getParent()){
+	if(getParent() && (getParent() != VirtualCylinder::virtualCylinder)){
 		onAddContainerItem(item);
 	}
 }

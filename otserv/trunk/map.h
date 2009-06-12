@@ -77,7 +77,7 @@ public:
 	int32_t getMapWalkCost(const Creature* creature, AStarNode* node,
 		const Tile* neighbourTile, const Position& neighbourPos);
 	static int32_t getTileWalkCost(const Creature* creature, const Tile* tile);
-	int getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal);
+	int32_t getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal);
 
 private:
 	AStarNode nodes[MAX_NODES];
