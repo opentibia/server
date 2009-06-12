@@ -2,7 +2,7 @@ local function doTargetCorpse(cid, pos)
 	local getPos = pos
 	getPos.stackpos = 255
 	corpse = getThingfromPos(getPos)
-	if(corpse.uid > 0 and isCreature(corpse.uid) == FALSE and isInArray(CORPSES, corpse.itemid) == TRUE) then
+	if(corpse.uid > 0 and isCorpse(corpse.uid) == TRUE and isMoveable(corpse.uid) == TRUE) then
 		doRemoveItem(corpse.uid)
 		doPlayerSummonCreature(cid, "Skeleton", pos)
 		doSendMagicEffect(pos, CONST_ME_MAGIC_BLUE)
