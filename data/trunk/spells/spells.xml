@@ -279,7 +279,7 @@
 	<instant name="Fire Wave" words="exevo flam hur" lvl="18" mana="25" direction="1" script="attack/fire_wave.lua">
 		<vocation name="Sorcerer"/> <vocation name="Master Sorcerer"/>
 	</instant>
-	<instant name="Heal Friend" words="exura sio" lvl="18" mana="140" prem="1" needtarget="1" params="1" aggressive="1" script="healing/heal_friend.lua">
+	<instant name="Heal Friend" words="exura sio" lvl="18" mana="140" prem="1" needtarget="1" params="1" aggressive="0" script="healing/heal_friend.lua">
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 	</instant>
 	<instant name="Ice Wave" words="exevo frigo hur" lvl="18" mana="25" direction="1" script="attack/ice_wave.lua">
@@ -304,7 +304,7 @@
 		<vocation name="Sorcerer"/> <vocation name="Master Sorcerer"/>
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 	</instant>
-	<instant name="Ethereal Spear" words="exori con" lvl="23" range="7" mana="25" prem="1" needtarget="1" aggressive="1" script="attack/ethereal_spear.lua">
+	<instant name="Ethereal Spear" words="exori con" lvl="23" range="7" mana="25" prem="1" needtarget="1" script="attack/ethereal_spear.lua">
 		<vocation name="Paladin"/>  <vocation name="Royal Paladin"/>
 	</instant>
 	<instant name="Summon Creature" words="utevo res" lvl="25" params="1" function="summonMonster">

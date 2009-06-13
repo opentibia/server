@@ -6744,7 +6744,7 @@ int LuaScriptInterface::luaIsInArray(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddOutfit(lua_State *L)
 {
-	//Consider using doPlayerAddOutfitId instead
+	//Consider using doPlayerAddOutfitEx instead
 	//doPlayerAddOutfit(cid, looktype, addon)
 	uint32_t addon = popNumber(L);
 	uint32_t lookType = popNumber(L);
@@ -6824,7 +6824,6 @@ int LuaScriptInterface::luaDoPlayerAddOutfitEx(lua_State *L)
 int LuaScriptInterface::luaDoPlayerRemoveOutfitEx(lua_State *L)
 {
 	//doPlayerRemoveOutfitEx(cid, outfitid, <optional> addon)
-
 	uint32_t parameters = lua_gettop(L);
 	uint32_t addon = 0xFF;
 	if(parameters > 2){
@@ -7233,13 +7232,13 @@ int LuaScriptInterface::luaGetPlayerNameByGUID(lua_State *L)
 	uint32_t guid = popNumber(L);
 	std::string playername;
 
-	if(IOPlayer::instance()->getNameByGuid(guid, playername)){
-		lua_pushstring(L, playername.c_str());
-	}
-	else{
+	if(!IOPlayer::instance()->getNameByGuid(guid, playername)){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
+
+	lua_pushstring(L, playername.c_str());
 	return 1;
 }
 
