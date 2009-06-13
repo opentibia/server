@@ -1096,7 +1096,7 @@ bool Houses::payHouse(House* house, time_t time)
 
 bool Houses::payHouses()
 {
-	if(rentPeriod != RENTPERIOD_NEVER){
+	if(rentPeriod == RENTPERIOD_NEVER){
 		return true;
 	}
 	
