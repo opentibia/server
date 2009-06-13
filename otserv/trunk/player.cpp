@@ -4097,14 +4097,14 @@ bool Player::addOutfit(uint32_t outfitId, uint32_t addons)
 {
 	OutfitMap::iterator& it = outfits.find(outfitId);
 	if(it != outfits.end()){
-		outfits[outfitId - 1].addons = it->second.addons | addons;
+		outfits[outfitId].addons = it->second.addons | addons;
 		return true;
 	}
 
 	Outfit outfit;
 	if(Outfits::getInstance()->getOutfit(outfitId, getSex(), outfit)){
 		outfit.addons |= addons;
-		outfits[outfitId - 1] = outfit;
+		outfits[outfitId] = outfit;
 		return true;
 	}
 	else{
@@ -4124,8 +4124,7 @@ bool Player::removeOutfit(uint32_t outfitId, uint32_t addons)
 		}
 		else{
 			//remove addons
-			//outfits[outfitId] &= ~addons;
-			outfits[outfitId - 1].addons = it->second.addons & (~addons);
+			outfits[outfitId].addons = it->second.addons & (~addons);
 		}
 
 		return true;
