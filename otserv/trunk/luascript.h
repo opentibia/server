@@ -608,6 +608,7 @@ protected:
 	static int luaGetItemWeight(lua_State *L);
 	static int luaGetItemIdByName(lua_State *L);
 	static int luaIsSightClear(lua_State *L);
+	static int luaGetPlayerNameByGUID(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);

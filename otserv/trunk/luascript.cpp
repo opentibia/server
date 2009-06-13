@@ -1121,6 +1121,9 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerGUID(cid)
 	lua_register(m_luaState, "getPlayerGUID", LuaScriptInterface::luaGetPlayerGUID);
 
+	//getPlayerNameByGUID(guid)
+	lua_register(m_luaState, "getPlayerNameByGUID", LuaScriptInterface::luaGetPlayerNameByGUID);
+
 	//getPlayerFlagValue(cid, flag)
 	lua_register(m_luaState, "getPlayerFlagValue", LuaScriptInterface::luaGetPlayerFlagValue);
 
@@ -2678,7 +2681,7 @@ int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 				g_game.combatChangeMana(NULL, player, manaChange);
 			}
 		}
-			
+
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -7221,6 +7224,22 @@ int LuaScriptInterface::luaGetPlayerFrags(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 	}
 
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerNameByGUID(lua_State *L)
+{
+	//getPlayerNameByGUID(guid)
+	uint32_t guid = popNumber(L);
+	std::string playername;
+
+	if(IOPlayer::instance()->getNameByGuid(guid, playername)){
+		lua_pushstring(L, playername.c_str());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
 	return 1;
 }
 

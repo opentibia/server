@@ -24,6 +24,7 @@
 #include "tools.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
+#include <iostream>
 
 Outfits::Outfits()
 {
@@ -69,7 +70,7 @@ bool Outfits::loadFromXml(const std::string& datadir)
 					if(readXMLInteger(p, "default", intValue)){
 						outfit.isDefault = (intValue == 1);
 					}
-			
+
 					xmlNodePtr pchild = p->children;
 					while(pchild){
 						if(xmlStrcmp(pchild->name, (const xmlChar*)"list") == 0){

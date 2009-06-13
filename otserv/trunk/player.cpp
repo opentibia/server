@@ -2198,7 +2198,7 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 					g_game.transformItem(item, item->getID(), charges - 1);
 			}
 		}
-		
+
 		if(damage <= 0){
 			damage = 0;
 			blockType = BLOCK_DEFENSE;
@@ -4095,7 +4095,7 @@ bool Player::canWearOutfit(uint32_t outfitId, uint32_t addons)
 
 bool Player::addOutfit(uint32_t outfitId, uint32_t addons)
 {
-	OutfitMap::iterator& it = outfits.find(outfitId);
+	OutfitMap::iterator it = outfits.find(outfitId);
 	if(it != outfits.end()){
 		outfits[outfitId].addons = it->second.addons | addons;
 		return true;
@@ -4116,7 +4116,7 @@ bool Player::addOutfit(uint32_t outfitId, uint32_t addons)
 
 bool Player::removeOutfit(uint32_t outfitId, uint32_t addons)
 {
-	OutfitMap::iterator& it = outfits.find(outfitId);
+	OutfitMap::iterator it = outfits.find(outfitId);
 	if(it != outfits.end()){
 		if(addons == 0xFF){
 			//remove outfit

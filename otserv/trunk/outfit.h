@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,6 +24,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <list>
 #include "enums.h"
 
 struct Outfit{
@@ -45,20 +46,20 @@ class Outfits
 {
 public:
 	~Outfits();
-	
+
 	static Outfits* getInstance()
 	{
 		static Outfits instance;
 		return &instance;
 	}
-	
+
 	bool loadFromXml(const std::string& datadir);
 
 	uint32_t Outfits::getOutfitId(uint32_t lookType);
 	bool getOutfit(uint32_t lookType, Outfit& outfit);
 	bool getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit);
 	const OutfitMap& getOutfits(playersex_t playersex);
-	
+
 private:
 	Outfits();
 	OutfitList allOutfits;
