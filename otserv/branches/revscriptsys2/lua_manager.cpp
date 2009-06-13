@@ -18,6 +18,10 @@
 
 #include "otpch.h"
 
+#ifdef WIN32
+#include <winsock2.h>
+#endif
+
 #include <boost/filesystem.hpp>
 
 #include "configmanager.h"

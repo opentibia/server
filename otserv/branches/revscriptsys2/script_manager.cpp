@@ -69,7 +69,7 @@ int Manager::luaCompareClassInstances(lua_State* L)
 
 	//Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
 	//Environment& e = manager->environment;
-	
+
 	// 2 class instances are ontop of the stack
 	Script::ObjectID* objid1 = (Script::ObjectID*)lua_touserdata(L, -1);
 	Script::ObjectID* objid2 = (Script::ObjectID*)lua_touserdata(L, -2);
@@ -104,7 +104,7 @@ int Manager::luaGetClassInstanceID(lua_State* L)
 		lua_pushnumber(L, (double)*objid);
 	else
 		lua_pushnil(L);
-	
+
 	return 1;
 }
 
@@ -113,7 +113,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 	// so complex destructors won't be called.
 	uint32_t callbackID = uint32_t(lua_tonumber(L, lua_upvalueindex(2)));
 	Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
-	LuaState* interface = NULL;
+	LuaState* state = NULL;
 
 	// We must allocate manually, since lua_error is called no destructors will work
 	unsigned char threadmem[sizeof(LuaThread)];
@@ -121,15 +121,15 @@ int Manager::luaFunctionCallback(lua_State* L) {
 	// REMEMBER TO EXPLICITLY CALL private_thread->~LuaThread
 
 	if(L == manager->state) {
-		interface = manager;
+		state = manager;
 	}
 	else {
 		ThreadMap::iterator finder = manager->threads.find(L);
 		if(finder != manager->threads.end())
-			interface = (finder->second).get();
+			state = (finder->second).get();
 		else{
 			private_thread = new(threadmem) LuaThread(manager, L);
-			interface = private_thread;
+			state = private_thread;
 		}
 	}
 
@@ -137,7 +137,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 	try {
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
 
-		int argument_count = interface->getStackSize();
+		int argument_count = state->getStackSize();
 		if((unsigned int)argument_count > cc->parameters.size()) {
 			throw Script::Error("Too many arguments passed to function " + cc->name);
 		}
@@ -165,10 +165,10 @@ int Manager::luaFunctionCallback(lua_State* L) {
 					parsed_argument_count -= 1;
 					break; // We don't need to parse more
 				}
-				last_optional_level = ctd.optional_level; 
+				last_optional_level = ctd.optional_level;
 			}
 		}
-		
+
 		int passed_argument_count = parsed_argument_count;
 
 		parsed_argument_count = 0;
@@ -177,12 +177,12 @@ int Manager::luaFunctionCallback(lua_State* L) {
 				++ctditer)
 		{
 			const ComposedTypeDeclaration& ctd = *ctditer;
-			
+
 			if(parsed_argument_count >= passed_argument_count) {
 				break;
 			}
 			parsed_argument_count += 1;
-			
+
 			std::string expected_type = "";
 
 			for(std::vector<std::string>::const_iterator type_iter = ctd.types.begin();
@@ -194,49 +194,49 @@ int Manager::luaFunctionCallback(lua_State* L) {
 					break;
 				}
 				else if(*type_iter == "boolean") {
-					if(interface->isBoolean(parsed_argument_count)) {
+					if(state->isBoolean(parsed_argument_count)) {
 						expected_type = "";
 						break;
 					}
 					expected_type = "boolean";
 				}
 				else if(*type_iter == "number") {
-					if(interface->isNumber(parsed_argument_count)) {
+					if(state->isNumber(parsed_argument_count)) {
 						expected_type = "";
 						break;
 					}
 					expected_type = "number";
 				}
 				else if(*type_iter == "string") {
-					if(interface->isString(parsed_argument_count)) {
+					if(state->isString(parsed_argument_count)) {
 						expected_type = "";
 						break;
 					}
 					expected_type = "string";
 				}
 				else if(*type_iter == "function") {
-					if(interface->isFunction(parsed_argument_count)) {
+					if(state->isFunction(parsed_argument_count)) {
 						expected_type = "";
 						break;
 					}
 					expected_type = "function";
 				}
 				else if(*type_iter == "userdata") {
-					if(interface->isUserdata(parsed_argument_count)) {
+					if(state->isUserdata(parsed_argument_count)) {
 						expected_type = "";
 						break;
 					}
 					expected_type = "userdata";
 				}
 				else if(*type_iter == "thread") {
-					if(interface->isThread(parsed_argument_count)) {
+					if(state->isThread(parsed_argument_count)) {
 						expected_type = "";
 						break;
 					}
 					expected_type = "thread";
 				}
 				else if(*type_iter == "table") {
-					if(interface->isTable(parsed_argument_count)) {
+					if(state->isTable(parsed_argument_count)) {
 						expected_type = "";
 						break;
 					}
@@ -249,30 +249,30 @@ int Manager::luaFunctionCallback(lua_State* L) {
 					"When calling function " <<
 					"'" << cc->name << "'" <<
 					" - Expected '" << expected_type << "' for argument " <<
-					"'" << ctd.name << "'" << 
-					" type was " << 
-					"'" << interface->typeOf(parsed_argument_count) << "'"; 
+					"'" << ctd.name << "'" <<
+					" type was " <<
+					"'" << state->typeOf(parsed_argument_count) << "'";
 				throw Error(os.str());
 			}
 		}
 		// All arguments checked out, call the function!
-		int ret = (interface->*(cc->func))(); 
+		int ret = (state->*(cc->func))();
 		if(private_thread)
 			private_thread->~LuaThread();
 		return ret;
 	} catch(Script::Error& err) {
 		// We can't use lua_error in the C++ function as it doesn't call destructors properly.
-		interface->clearStack();
-		interface->pushString(err.what());
+		state->clearStack();
+		state->pushString(err.what());
 	}
 
 	if(private_thread)
 		private_thread->~LuaThread();
 
 	// Can't be done in handler, since then the destructor of Script::Error
-	// won't be called, which in turn won't call the destructor of the 
+	// won't be called, which in turn won't call the destructor of the
 	// std::string object it owns
-	return lua_error(interface->state);
+	return lua_error(state->state);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -369,12 +369,12 @@ void Manager::parseWhitespace(std::string& s) {
 std::string Manager::parseIdentifier(std::string &s) {
 	std::string::iterator iter = s.begin();
 	assert(
-		(*iter >= 'a' && *iter <= 'z') || 
+		(*iter >= 'a' && *iter <= 'z') ||
 		(*iter >= 'A' && *iter <= 'Z') ||
 		(*iter == '_'));
 	++iter;
 	while(
-		(*iter >= 'a' && *iter <= 'z') || 
+		(*iter >= 'a' && *iter <= 'z') ||
 		(*iter >= 'A' && *iter <= 'Z') ||
 		(*iter == '_') ||
 		(*iter >= '0' && *iter <= '9'))
@@ -485,12 +485,12 @@ void Manager::registerClass(const std::string& cname)
 	lua_newtable(state); // Class table
 	lua_pushvalue(state, -1); // Another reference to the table
 	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
-	
+
 	// Set the index metamethod for the class metatable to the class table
-	lua_setfield(state, -2, "__index"); 
-	
+	lua_setfield(state, -2, "__index");
+
 	// Pop the class metatable
-	lua_pop(state, 1); 
+	lua_pop(state, 1);
 
 	// Insert into the C++ class list for future reference
 	class_list[cname] = LuaClassType_ptr(new LuaClassType(*this, cname));
@@ -505,26 +505,26 @@ void Manager::registerClass(const std::string& cname, const std::string& parent_
 	// Another reference to the table
 	lua_pushvalue(state, -1);
 	lua_setfield(state, LUA_REGISTRYINDEX, ("OTClass_" + cname).c_str());
-	
+
 	lua_newtable(state); // Class table
 	lua_pushvalue(state, -1); // Another reference to the table
 	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
 
 	// Set the index metamethod for the class metatable to the class table
-	lua_setfield(state, -2, "__index"); 
+	lua_setfield(state, -2, "__index");
 
 	lua_pop(state, 1); // Pop the class metatable
 
 	// Add the derived class table to the top of the stack
-	lua_getfield(state, LUA_GLOBALSINDEX, cname.c_str()); 
-	
+	lua_getfield(state, LUA_GLOBALSINDEX, cname.c_str());
+
 	// Create the meta-relations
 	lua_newtable(state); // Create a small redirect table
 	lua_getfield(state, LUA_GLOBALSINDEX, parent_class.c_str()); // Get the parent table
 	lua_setfield(state, -2, "__index"); // Set the index metamethod for the redirect table to the base class table
 
 	// Set the metatable of the derived class table to the redirect table
-	lua_setmetatable(state, -2); 
+	lua_setmetatable(state, -2);
 	// Pop the derived class table
 	lua_pop(state, 1);
 
@@ -540,7 +540,7 @@ void Manager::registerGlobalFunction(const std::string& fdecl, CallbackFunctionT
 	ComposedCallback_ptr func = parseFunctionDeclaration(fdecl);
 	// Store the C callback in the composed callback
 	func->func = cfunc;
-	
+
 	// Generate unique function ID, and associate it with the composed function
 	uint32_t function_id = ++function_id_counter;
 	function_map[function_id] = func;
@@ -560,7 +560,7 @@ void Manager::registerGlobalFunction(const std::string& fdecl, CallbackFunctionT
 void Manager::registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc) {
 	// Create the composed callback containing all type info etc.
 	ComposedCallback_ptr func = parseFunctionDeclaration(fdecl);
-	
+
 	// Add the hidden "self" parameter
 	ComposedTypeDeclaration ctd;
 	ctd.name = cname;
@@ -572,7 +572,7 @@ void Manager::registerMemberFunction(const std::string& cname, const std::string
 	std::string funcname = func->name;
 	func->name = cname + ":" + funcname;
 	func->func = cfunc;
-	
+
 	// Create a unique ID for the function, and associate it with the composed callback
 	uint32_t function_id = ++function_id_counter;
 	function_map[function_id] = func;
@@ -586,7 +586,7 @@ void Manager::registerMemberFunction(const std::string& cname, const std::string
 	// Create the function, with the manager & id stored in the closure
 	// the callback extracts the function and manager and calls it.
 	lua_pushcclosure(state, luaFunctionCallback, 2);
-	
+
 	// Store the function at the class field funcname
 	lua_setfield(state, -2, funcname.c_str());
 
