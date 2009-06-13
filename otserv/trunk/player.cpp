@@ -3586,7 +3586,7 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 	//Creature::onCombatRemoveCondition(attacker, condition);
 	bool remove = true;
 
-	if(condition->getId() != 0){
+	if(condition->getId() > 0){
 		remove = false;
 
 		//Means the condition is from an item, id == slot
