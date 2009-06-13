@@ -60,9 +60,14 @@ bool Outfits::loadFromXml(const std::string& datadir)
 				if(readXMLInteger(p, "id", intValue)){
 					Outfit outfit;
 					outfit.outfitId = intValue;
+					outfit.isDefault = true;
 
 					if(readXMLInteger(p, "premium", intValue)){
-						outfit.premium = (intValue == 1);
+						outfit.isPremium = (intValue == 1);
+					}
+
+					if(readXMLInteger(p, "default", intValue)){
+						outfit.isDefault = (intValue == 1);
 					}
 			
 					xmlNodePtr pchild = p->children;

@@ -4081,7 +4081,7 @@ bool Player::canWearOutfit(uint32_t outfitId, uint32_t addons)
 {
 	OutfitMap::iterator it = outfits.find(outfitId);
 	if(it != outfits.end()){
-		if(it->second.premium && !isPremium()){
+		if(it->second.isPremium && !isPremium()){
 			return false;
 		}
 
@@ -4141,7 +4141,11 @@ void Player::setSex(playersex_t player_sex)
 		//add default outfits to player outfits
 		const OutfitMap& default_outfits = Outfits::getInstance()->getOutfits(getSex());
 		for(OutfitMap::const_iterator it = default_outfits.begin(); it != default_outfits.end(); ++it){
-			if(it->second.premium && !isPremium()){
+			if(!it->second.isDefault){
+				continue;
+			}
+
+			if( (it->second.isPremium && !isPremium()) ){
 				continue;
 			}
 
@@ -4160,7 +4164,7 @@ void Player::genReservedStorageRange()
 	for(OutfitMap::const_iterator it = outfits.begin(); it != outfits.end(); ++it){
 		OutfitMap::const_iterator default_it = default_outfits.find(it->first);
 		if(default_it != default_outfits.end()){
-			if((default_it->second.addons & it->second.addons) == it->second.addons)
+			if(default_it->second.isDefault && ((default_it->second.addons & it->second.addons) == it->second.addons) )
 				continue;
 		}
 		else{

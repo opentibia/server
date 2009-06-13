@@ -1401,7 +1401,7 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerAddOutfitEx(cid, outfitid, addons)
 	lua_register(m_luaState, "doPlayerAddOutfitEx", LuaScriptInterface::luaDoPlayerAddOutfitEx);
 
-	//doPlayerRemoveOutfit(cid, outfitid, addons)
+	//doPlayerRemoveOutfitEx(cid, outfitid, <optional> addons)
 	lua_register(m_luaState, "doPlayerRemoveOutfitEx", LuaScriptInterface::luaDoPlayerRemoveOutfitEx);
 
 	//canPlayerWearOutfit(cid, looktype, addons)
@@ -6820,8 +6820,14 @@ int LuaScriptInterface::luaDoPlayerAddOutfitEx(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerRemoveOutfitEx(lua_State *L)
 {
-	//doPlayerRemoveOutfitEx(cid, outfitid, addon)
-	uint32_t addon = popNumber(L);
+	//doPlayerRemoveOutfitEx(cid, outfitid, <optional> addon)
+
+	uint32_t parameters = lua_gettop(L);
+	uint32_t addon = 0xFF;
+	if(parameters > 2){
+		addon = (uint32_t)popNumber(L);
+	}
+
 	uint32_t outfitId = popNumber(L);
 	uint32_t cid = popNumber(L);
 

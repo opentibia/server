@@ -27,11 +27,12 @@
 #include "enums.h"
 
 struct Outfit{
-	Outfit() : outfitId(0), lookType(0), addons(0), premium(false), name("") {}
+	Outfit() : outfitId(0), lookType(0), addons(0), isPremium(false), isDefault(false), name("") {}
 	uint32_t outfitId;
 	uint32_t lookType;
 	uint32_t addons;
-	bool premium;
+	bool isPremium;
+	bool isDefault;
 	std::string name;
 };
 
