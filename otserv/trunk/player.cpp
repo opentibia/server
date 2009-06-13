@@ -929,15 +929,26 @@ void Player::dropLoot(Container* corpse)
 void Player::addStorageValue(const uint32_t key, const int32_t value)
 {
 	if(IS_IN_KEYRANGE(key, RESERVED_RANGE)){
-		if(IS_IN_KEYRANGE(key, OUTFITS_RANGE)){
-			Outfit outfit;
-			outfit.looktype = value >> 16;
-			outfit.addons = value & 0xFF;
-			if(outfit.addons > 3){
-				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int)(value) << " player: " << getName() << std::endl;
+		if(IS_IN_KEYRANGE(key, OUTFITSID_RANGE)){
+			uint32_t outfitId = value >> 16;
+			uint32_t addons = value & 0xFF;
+			if(addons <= 3){
+				addOutfit(outfitId, addons);
 			}
 			else{
-				m_playerOutfits.addOutfit(outfit);
+				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int)(value) << " player: " << getName() << std::endl;
+			}
+		}
+		//for backward compatibility
+		else if(IS_IN_KEYRANGE(key, OUTFITS_RANGE)){
+			Outfit outfit;
+			uint32_t lookType = value >> 16;
+			uint32_t addons = value & 0xFF;
+			if(addons <= 3){
+				addOutfit(lookType, addons);
+			}
+			else{
+				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int)(value) << " player: " << getName() << std::endl;
 			}
 		}
 		else{
@@ -4066,14 +4077,106 @@ void Player::checkRedSkullTicks(int32_t ticks)
 }
 #endif
 
-const OutfitListType& Player::getPlayerOutfits()
+bool Player::canWearOutfit(uint32_t outfitId, uint32_t addons)
 {
-	return m_playerOutfits.getOutfits();
+	OutfitMap::iterator it = outfits.find(outfitId);
+	if(it != outfits.end()){
+		if(it->second.premium && !isPremium()){
+			return false;
+		}
+
+		if((it->second.addons & addons) == addons){
+			return true;
+		}
+	}
+
+	return false;
 }
 
-bool Player::canWear(uint32_t _looktype, uint32_t _addons)
+bool Player::addOutfit(uint32_t outfitId, uint32_t addons)
 {
-	return m_playerOutfits.isInList(getID(), _looktype, _addons);
+	OutfitMap::iterator& it = outfits.find(outfitId);
+	if(it != outfits.end()){
+		outfits[outfitId - 1].addons = it->second.addons | addons;
+		return true;
+	}
+
+	Outfit outfit;
+	if(Outfits::getInstance()->getOutfit(outfitId, getSex(), outfit)){
+		outfit.addons |= addons;
+		outfits[outfitId - 1] = outfit;
+		return true;
+	}
+	else{
+		//std::cout << getName() << " outfit " << outfitId << " does not exist, addons: " << addons << std::endl;
+	}
+
+	return false;
+}
+
+bool Player::removeOutfit(uint32_t outfitId, uint32_t addons)
+{
+	OutfitMap::iterator& it = outfits.find(outfitId);
+	if(it != outfits.end()){
+		if(addons == 0xFF){
+			//remove outfit
+			outfits.erase(it);
+		}
+		else{
+			//remove addons
+			//outfits[outfitId] &= ~addons;
+			outfits[outfitId - 1].addons = it->second.addons & (~addons);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+void Player::setSex(playersex_t player_sex)
+{
+	if(sex != player_sex){
+		sex = player_sex;
+
+		//add default outfits to player outfits
+		const OutfitMap& default_outfits = Outfits::getInstance()->getOutfits(getSex());
+		for(OutfitMap::const_iterator it = default_outfits.begin(); it != default_outfits.end(); ++it){
+			if(it->second.premium && !isPremium()){
+				continue;
+			}
+
+			addOutfit(it->first, it->second.addons);
+		}
+	}
+}
+
+void Player::genReservedStorageRange()
+{
+	uint32_t base_key;
+	//generate outfits range
+	base_key = PSTRG_OUTFITSID_RANGE_START + 1;
+
+	const OutfitMap& default_outfits = Outfits::getInstance()->getOutfits(getSex());
+	for(OutfitMap::const_iterator it = outfits.begin(); it != outfits.end(); ++it){
+		OutfitMap::const_iterator default_it = default_outfits.find(it->first);
+		if(default_it != default_outfits.end()){
+			if((default_it->second.addons & it->second.addons) == it->second.addons)
+				continue;
+		}
+		else{
+			//outfit does not exist
+			continue;
+		}
+
+		int32_t value = (it->first << 16) | (it->second.addons & 0xFF);
+		storageMap[base_key] = value;
+		base_key++;
+		if(base_key > PSTRG_OUTFITSID_RANGE_START + PSTRG_OUTFITSID_RANGE_SIZE){
+			std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 outfits!." << std::endl;
+			break;
+		}
+	}
 }
 
 bool Player::canLogout()
@@ -4091,63 +4194,6 @@ bool Player::canLogout()
 	}
 
 	return true;
-}
-
-
-void Player::genReservedStorageRange()
-{
-	uint32_t base_key;
-	//generate outfits range
-	base_key = PSTRG_OUTFITS_RANGE_START + 1;
-
-	const OutfitList& global_outfits = Outfits::getInstance()->getOutfitList(sex);
-
-	const OutfitListType& outfits = m_playerOutfits.getOutfits();
-	OutfitListType::const_iterator it;
-	for(it = outfits.begin(); it != outfits.end(); ++it){
-		uint32_t looktype = (*it)->looktype;
-		uint32_t addons = (*it)->addons;
-		if(!global_outfits.isInList(getID(), looktype, addons)){
-			int32_t value = (looktype << 16) | (addons & 0xFF);
-			storageMap[base_key] = value;
-			base_key++;
-			if(base_key > PSTRG_OUTFITS_RANGE_START + PSTRG_OUTFITS_RANGE_SIZE){
-				std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 outfits!." << std::endl;
-				break;
-			}
-		}
-	}
-}
-
-void Player::addOutfit(uint32_t _looktype, uint32_t _addons)
-{
-	Outfit outfit;
-	outfit.looktype = _looktype;
-	outfit.addons = _addons;
-	m_playerOutfits.addOutfit(outfit);
-}
-
-bool Player::remOutfit(uint32_t _looktype, uint32_t _addons)
-{
-	Outfit outfit;
-	outfit.looktype = _looktype;
-	outfit.addons = _addons;
-	return m_playerOutfits.remOutfit(outfit);
-}
-
-void Player::setSex(playersex_t player_sex)
-{
-	sex = player_sex;
-	//add default outfits to player outfits
-	Outfits* outfits = Outfits::getInstance();
-	const OutfitListType& global_outfits = outfits->getOutfits(sex);
-	OutfitListType::const_iterator it;
-	Outfit outfit;
-	for(it = global_outfits.begin(); it != global_outfits.end(); ++it){
-		outfit.looktype = (*it)->looktype;
-		outfit.addons = (*it)->addons;
-		m_playerOutfits.addOutfit(outfit);
-	}
 }
 
 void Player::learnInstantSpell(const std::string& name)

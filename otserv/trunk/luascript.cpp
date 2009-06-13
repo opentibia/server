@@ -1394,8 +1394,15 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerAddOutfit(cid, looktype, addons)
 	lua_register(m_luaState, "doPlayerAddOutfit", LuaScriptInterface::luaDoPlayerAddOutfit);
 
-	//doPlayerRemOutfit(cid, looktype, addons)
-	lua_register(m_luaState, "doPlayerRemOutfit", LuaScriptInterface::luaDoPlayerRemOutfit);
+	//doPlayerRemoveOutfit(cid, looktype, addons)
+	lua_register(m_luaState, "doPlayerRemoveOutfit", LuaScriptInterface::luaDoPlayerRemoveOutfit);
+	lua_register(m_luaState, "doPlayerRemOutfit", LuaScriptInterface::luaDoPlayerRemoveOutfit);  //For scripts compatibility
+
+	//doPlayerAddOutfitEx(cid, outfitid, addons)
+	lua_register(m_luaState, "doPlayerAddOutfitEx", LuaScriptInterface::luaDoPlayerAddOutfitEx);
+
+	//doPlayerRemoveOutfit(cid, outfitid, addons)
+	lua_register(m_luaState, "doPlayerRemoveOutfitEx", LuaScriptInterface::luaDoPlayerRemoveOutfitEx);
 
 	//canPlayerWearOutfit(cid, looktype, addons)
 	lua_register(m_luaState, "canPlayerWearOutfit", LuaScriptInterface::luaCanPlayerWearOutfit);
@@ -6734,41 +6741,100 @@ int LuaScriptInterface::luaIsInArray(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddOutfit(lua_State *L)
 {
+	//Consider using doPlayerAddOutfitId instead
 	//doPlayerAddOutfit(cid, looktype, addon)
 	uint32_t addon = popNumber(L);
-	uint32_t looktype = popNumber(L);
+	uint32_t lookType = popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
+
 	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		player->addOutfit(looktype, addon);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
+	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
+
+	Outfit outfit;
+	if(Outfits::getInstance()->getOutfit(lookType, outfit)){
+		player->addOutfit(outfit.outfitId, addon);
+		lua_pushnumber(L, LUA_NO_ERROR);
+		return 1;
+	}
+
+	lua_pushnumber(L, LUA_ERROR);
 	return 1;
 }
 
-int LuaScriptInterface::luaDoPlayerRemOutfit(lua_State *L)
+int LuaScriptInterface::luaDoPlayerRemoveOutfit(lua_State *L)
 {
+	//Consider using doPlayerRemoveOutfitEx instead
 	//doPlayerRemOutfit(cid, looktype, addon)
 	uint32_t addon = popNumber(L);
-	uint32_t looktype = popNumber(L);
+	uint32_t lookType = popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		player->remOutfit(looktype, addon);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
+	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		return 1;
 	}
+
+	Outfit outfit;
+	if(Outfits::getInstance()->getOutfit(lookType, outfit)){
+		player->removeOutfit(outfit.outfitId, addon);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+
+	lua_pushnumber(L, LUA_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerAddOutfitEx(lua_State *L)
+{
+	//doPlayerAddOutfitEx(cid, outfitid, addon)
+	uint32_t addon = popNumber(L);
+	uint32_t outfitId = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	if(!player->addOutfit(outfitId, addon)){
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerRemoveOutfitEx(lua_State *L)
+{
+	//doPlayerRemoveOutfitEx(cid, outfitid, addon)
+	uint32_t addon = popNumber(L);
+	uint32_t outfitId = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	player->removeOutfit(outfitId, addon);
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -6776,17 +6842,23 @@ int LuaScriptInterface::luaCanPlayerWearOutfit(lua_State *L)
 {
 	//canPlayerWearOutfit(cid, looktype, addon)
 	uint32_t addon = popNumber(L);
-	uint32_t looktype = popNumber(L);
+	uint32_t lookType = popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		lua_pushnumber(L, (player->canWear(looktype, addon)? LUA_TRUE : LUA_FALSE));
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
 
-	reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+	Outfit outfit;
+	if(Outfits::getInstance()->getOutfit(lookType, outfit)){
+		lua_pushnumber(L, (player->canWearOutfit(outfit.outfitId, addon)? LUA_TRUE : LUA_FALSE));
+		return 1;
+	}
+
 	lua_pushnumber(L, LUA_ERROR);
 	return 1;
 }

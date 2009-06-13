@@ -409,10 +409,9 @@ public:
 #endif
 
 	void checkRecentlyGainedExperience(uint32_t interval);
-	const OutfitListType& getPlayerOutfits();
-	bool canWear(uint32_t _looktype, uint32_t _addons);
-	void addOutfit(uint32_t _looktype, uint32_t _addons);
-	bool remOutfit(uint32_t _looktype, uint32_t _addons);
+	bool canWearOutfit(uint32_t outfitId, uint32_t addons);
+	bool addOutfit(uint32_t outfitId, uint32_t addons);
+	bool removeOutfit(uint32_t outfitId, uint32_t addons);
 	bool canLogout();
 
 	//tile
@@ -814,7 +813,7 @@ protected:
 	StorageMap storageMap;
 	LightInfo itemsLight;
 
-	OutfitList m_playerOutfits;
+	OutfitMap outfits;
 	bool requestedOutfitWindow;
 
 	//read/write storage data

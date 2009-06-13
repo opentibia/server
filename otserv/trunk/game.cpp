@@ -3376,7 +3376,8 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 	if(!player || player->isRemoved())
 		return false;
 
-	if(player->canWear(outfit.lookType, outfit.lookAddons)){
+	uint32_t outfitId = Outfits::getInstance()->getOutfitId(outfit.lookType);
+	if(player->canWearOutfit(outfitId, outfit.lookAddons)){
 		player->defaultOutfit = outfit;
 		
 		if(player->hasCondition(CONDITION_OUTFIT)){

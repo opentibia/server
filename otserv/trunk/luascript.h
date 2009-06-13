@@ -488,7 +488,9 @@ protected:
 	static int luaSetGlobalStorageValue(lua_State *L);
 
 	static int luaDoPlayerAddOutfit(lua_State *L);
-	static int luaDoPlayerRemOutfit(lua_State *L);
+	static int luaDoPlayerRemoveOutfit(lua_State *L);
+	static int luaDoPlayerAddOutfitEx(lua_State *L);
+	static int luaDoPlayerRemoveOutfitEx(lua_State *L);
 	static int luaCanPlayerWearOutfit(lua_State *L);
 
 	static int luaGetWorldType(lua_State *L);

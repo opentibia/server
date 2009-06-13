@@ -480,6 +480,10 @@ const int32_t violationStatements[5] =
 #define PSTRG_OUTFITS_RANGE_START   (PSTRG_RESERVED_RANGE_START + 1000)
 #define PSTRG_OUTFITS_RANGE_SIZE    500
 
+//[1500 - 2000]
+#define PSTRG_OUTFITSID_RANGE_START   (PSTRG_RESERVED_RANGE_START + 1500)
+#define PSTRG_OUTFITSID_RANGE_SIZE    500
+
 #define IS_IN_KEYRANGE(key, range) (key >= PSTRG_##range##_START && ((key - PSTRG_##range##_START) < PSTRG_##range##_SIZE))
 
 #endif

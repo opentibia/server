@@ -2430,68 +2430,44 @@ void ProtocolGame::sendHouseWindow(uint32_t windowTextId, House* _house,
 }
 
 void ProtocolGame::sendOutfitWindow()
-{
-	#define MAX_NUMBER_OF_OUTFITS 25
-	//client 8.0 outfits limit is 25
-
-	NetworkMessage_ptr msg = getOutputBuffer();
-	if(msg){
-		TRACK_MESSAGE(msg);
-		msg->AddByte(0xC8);
-		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
-
-		//get player's sex outfits and create iterators that will be used
-		const OutfitListType& sex_outfits = Outfits::getInstance()->getOutfits(player->getSex());
-		int32_t count_outfits = sex_outfits.size();
-		OutfitListType::const_iterator it, pit;
-		
-		//create a temporary list to remove outfits that should not be in the list
-		OTSERV_HASH_SET<uint32_t> removeList;
-		for(it = sex_outfits.begin(); it != sex_outfits.end(); ++it)
-		{
-			//Well, we could just check premium here
-			//But we would also show an outfit that might be removed from a lua function (m_list)
-			//So, we do need to check canWear
-			if(!player->canWear((*it)->looktype, 0))
-				removeList.insert((*it)->looktype);
-		}
-		
-		//we need to remove outfits that won't be in the list from count_outfits
-		count_outfits -= removeList.size();
-		if(count_outfits > MAX_NUMBER_OF_OUTFITS)
-			msg->AddByte(MAX_NUMBER_OF_OUTFITS);
-		else if(count_outfits <= 0)
-			return;
-		msg->AddByte(count_outfits);
-		
-		//create outfit list
-		for(it = sex_outfits.begin(); it != sex_outfits.end() && (count_outfits > 0); ++it){
-			if(removeList.find((*it)->looktype) != removeList.end())
-				continue;
-				
-			msg->AddU16((*it)->looktype);
-			msg->AddString(Outfits::getInstance()->getOutfitName((*it)->looktype));
-				
-			//Get addons
-			//TODO: Is this loop to get addons really necessary?
-			const OutfitListType& player_outfits = player->getPlayerOutfits();
-			bool removeAddon = true;
-			for(pit = player_outfits.begin(); pit != player_outfits.end(); ++pit){
-				if((*it)->looktype != (*pit)->looktype)
-					continue;
-					
-				msg->AddByte((*pit)->addons);
-				removeAddon = false;
-				break;
+ {
+ 	#define MAX_NUMBER_OF_OUTFITS 25
+ 	//client 8.0 outfits limit is 25
+ 
+ 	NetworkMessage_ptr msg = getOutputBuffer();
+ 	if(msg){
+ 		TRACK_MESSAGE(msg);
+ 		msg->AddByte(0xC8);
+ 		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
+ 
+		std::list<Outfit> outfitList;
+		for(OutfitMap::iterator it = player->outfits.begin(); it != player->outfits.end(); ++it){
+			if(player->canWearOutfit(it->first, it->second.addons)){
+				outfitList.push_back(it->second);
 			}
-				
-			if(removeAddon)
-				msg->AddByte(0x00);
-					
-			count_outfits--;
 		}
-	}
-}
+ 
+ 		if(outfitList.size() > 0){
+			if(outfitList.size() > MAX_NUMBER_OF_OUTFITS){
+ 				msg->AddByte(MAX_NUMBER_OF_OUTFITS);
+ 			}
+			else{
+	 			msg->AddByte(outfitList.size());
+			}
+
+ 			uint32_t counter = 0;
+			std::list<Outfit>::iterator it;
+ 			for(it = outfitList.begin(); it != outfitList.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
+ 				msg->AddU16(it->lookType);
+				msg->AddString(it->name);
+ 				msg->AddByte(it->addons);
+ 			}
+		}
+		else{
+			msg->AddByte(0);
+		}
+ 	}
+ }
 
 void ProtocolGame::sendVIPLogIn(uint32_t guid)
 {
