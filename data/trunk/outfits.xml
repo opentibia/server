@@ -1,62 +1,161 @@
 <?xml version="1.0"?>
 <outfits>
-	<!-- Female outfits -->
-	<outfit type="0" looktype="136" enabled="1" premium="0" name="Citizen"/>
-	<outfit type="0" looktype="137" enabled="1" premium="0" name="Hunter"/>
-	<outfit type="0" looktype="138" enabled="1" premium="0" name="Mage"/>
-	<outfit type="0" looktype="139" enabled="1" premium="0" name="Knight"/>
-	<outfit type="0" looktype="140" enabled="1" premium="1" name="Noblewoman"/>
-	<outfit type="0" looktype="141" enabled="1" premium="1" name="Summoner"/>
-	<outfit type="0" looktype="142" enabled="1" premium="1" name="Warrior"/>
-	<outfit type="0" looktype="147" enabled="1" premium="1" name="Barbarian"/>
-	<outfit type="0" looktype="148" enabled="1" premium="1" name="Druid"/>
-	<outfit type="0" looktype="149" enabled="1" premium="1" name="Wizard"/>
-	<outfit type="0" looktype="150" enabled="1" premium="1" name="Oriental"/>
-	<outfit type="0" looktype="155" enabled="1" premium="1" name="Pirate"/>
-	<outfit type="0" looktype="156" enabled="1" premium="1" name="Assassin"/>
-	<outfit type="0" looktype="157" enabled="1" premium="1" name="Beggar"/>
-	<outfit type="0" looktype="158" enabled="1" premium="1" name="Shaman"/>
-	<outfit type="0" looktype="252" enabled="1" premium="1" name="Norsewoman"/>
-	<outfit type="0" looktype="269" enabled="1" premium="1" name="Nightmare"/>
-	<outfit type="0" looktype="270" enabled="1" premium="1" name="Jester"/>
-	<outfit type="0" looktype="279" enabled="1" premium="1" name="Brotherhood"/>
-	<outfit type="0" looktype="288" enabled="1" premium="1" name="Demonhunter"/>
-	<outfit type="0" looktype="324" enabled="1" premium="1" name="Yalaharian"/>
+	<outfit id="1" premium="0">
+		<list type="0" looktype="136" name="Citizen"/>
+		<list type="1" looktype="128" name="Citizen"/>
+	</outfit>
 
-	<!-- Male outfits -->
-	<outfit type="1" looktype="128" enabled="1" premium="0" name="Citizen"/>
-	<outfit type="1" looktype="129" enabled="1" premium="0" name="Hunter"/>
-	<outfit type="1" looktype="130" enabled="1" premium="0" name="Mage"/>
-	<outfit type="1" looktype="131" enabled="1" premium="0" name="Knight"/>
-	<outfit type="1" looktype="132" enabled="1" premium="1" name="Nobleman"/>
-	<outfit type="1" looktype="133" enabled="1" premium="1" name="Summoner"/>
-	<outfit type="1" looktype="134" enabled="1" premium="1" name="Warrior"/>
-	<outfit type="1" looktype="143" enabled="1" premium="1" name="Barbarian"/>
-	<outfit type="1" looktype="144" enabled="1" premium="1" name="Druid"/>
-	<outfit type="1" looktype="145" enabled="1" premium="1" name="Wizard"/>
-	<outfit type="1" looktype="146" enabled="1" premium="1" name="Oriental"/>
-	<outfit type="1" looktype="151" enabled="1" premium="1" name="Pirate"/>
-	<outfit type="1" looktype="152" enabled="1" premium="1" name="Assassin"/>
-	<outfit type="1" looktype="153" enabled="1" premium="1" name="Beggar"/>
-	<outfit type="1" looktype="154" enabled="1" premium="1" name="Shaman"/>
-	<outfit type="1" looktype="251" enabled="1" premium="1" name="Norseman"/>
-	<outfit type="1" looktype="268" enabled="1" premium="1" name="Nightmare"/>
-	<outfit type="1" looktype="273" enabled="1" premium="1" name="Jester"/>
-	<outfit type="1" looktype="278" enabled="1" premium="1" name="Brotherhood"/>
-	<outfit type="1" looktype="289" enabled="1" premium="1" name="Demonhunter"/>
-	<outfit type="1" looktype="325" enabled="1" premium="1" name="Yalaharian"/>
+	<outfit id="2" premium="0">
+		<list type="0" looktype="137" name="Hunter"/>
+		<list type="1" looktype="129" name="Hunter"/>
+	</outfit>
+
+	<outfit id="3" premium="0">
+		<list type="0" looktype="138" name="Mage"/>
+		<list type="1" looktype="130" name="Mage"/>
+	</outfit>
+
+	<outfit id="4" premium="0">
+		<list type="0" looktype="139" name="Knight"/>
+		<list type="1" looktype="131" name="Knight"/>
+	</outfit>
+
+	<outfit id="5" premium="1">
+		<list type="0" looktype="140" name="Noblewoman"/>
+		<list type="1" looktype="132" name="Nobleman"/>
+	</outfit>
+
+	<outfit id="6" premium="1">
+		<list type="0" looktype="141" name="Summoner"/>
+		<list type="1" looktype="133" name="Summoner"/>
+	</outfit>
+
+	<outfit id="7" premium="1">
+		<list type="0" looktype="142" name="Warrior"/>
+		<list type="1" looktype="134" name="Warrior"/>
+	</outfit>
+
+	<outfit id="8" premium="1">
+		<list type="0" looktype="147" name="Barbarian"/>
+		<list type="1" looktype="143" name="Barbarian"/>
+	</outfit>
+
+	<outfit id="9" premium="1">
+		<list type="0" looktype="148" name="Druid"/>
+		<list type="1" looktype="144" name="Druid"/>
+	</outfit>
+
+	<outfit id="10" premium="1">
+		<list type="0" looktype="149" name="Wizard"/>
+		<list type="1" looktype="145" name="Wizard"/>
+	</outfit>
+
+	<outfit id="11" premium="1">
+		<list type="0" looktype="150" name="Oriental"/>
+		<list type="1" looktype="146" name="Oriental"/>
+	</outfit>
+
+	<outfit id="12" premium="1">
+		<list type="0" looktype="155" name="Pirate"/>
+		<list type="1" looktype="151" name="Pirate"/>
+	</outfit>
+
+	<outfit id="13" premium="1">
+		<list type="0" looktype="156" name="Assassin"/>
+		<list type="1" looktype="152" name="Assassin"/>
+	</outfit>
+
+	<outfit id="14" premium="1">
+		<list type="0" looktype="157" name="Beggar"/>
+		<list type="1" looktype="153" name="Beggar"/>
+	</outfit>
+
+	<outfit id="15" premium="1">
+		<list type="0" looktype="158" name="Shaman"/>
+		<list type="1" looktype="154" name="Shaman"/>
+	</outfit>
+
+	<outfit id="16" premium="1">
+		<list type="0" looktype="252" name="Norsewoman"/>
+		<list type="1" looktype="251" name="Norseman"/>
+	</outfit>
+
+	<outfit id="17" premium="1">
+		<list type="0" looktype="269" name="Nightmare"/>
+		<list type="1" looktype="268" name="Nightmare"/>
+	</outfit>
+
+	<outfit id="18" premium="1">
+		<list type="0" looktype="270" name="Jester"/>
+		<list type="1" looktype="273" name="Jester"/>
+	</outfit>
+
+	<outfit id="19" premium="1">
+		<list type="0" looktype="279" name="Brotherhood"/>
+		<list type="1" looktype="278" name="Brotherhood"/>
+	</outfit>
+
+	<outfit id="20" premium="1">
+		<list type="0" looktype="288" name="Demonhunter"/>
+		<list type="1" looktype="289" name="Demonhunter"/>
+	</outfit>
+
+	<outfit id="21" premium="1">
+		<list type="0" looktype="324" name="Yalaharian"/>
+		<list type="1" looktype="325" name="Yalaharian"/>
+	</outfit>
 
 	<!-- Oldmale outfits -->
-	<outfit type="2" looktype="12"	enabled="1" name="Archdemon"/>
-	<outfit type="2" looktype="159"	enabled="1" name="Elf"/>
-	<outfit type="2" looktype="160" enabled="1" name="Dwarf"/>
-	<outfit type="2" looktype="226" enabled="1" name="Frog"/>
-	<outfit type="2" looktype="194" enabled="1" name="Cult"/>
-	<outfit type="2" looktype="253" enabled="1" name="Headsplitter"/>
-	<outfit type="2" looktype="254" enabled="1" name="Skullhunter"/>
-	<outfit type="2" looktype="255" enabled="1" name="Bloodwalker"/>
-	<outfit type="2" looktype="264" enabled="1" name="Brutetamer"/>
-	<outfit type="2" looktype="75"	enabled="1" name="Gamemaster"/>
-	<outfit type="2" looktype="266" enabled="1" name="Old Com. Manager"/>
-	<outfit type="2" looktype="302" enabled="1" name="Com. Manager"/>
+
+<!--
+	<outfit id="22" name="Archdemon">
+		<list type="2" looktype="12"/>
+	</outfit>
+
+	<outfit id="23" name="Elf">
+		<list type="2" looktype="159"/>
+	</outfit>
+
+	<outfit id="24" name="Dwarf">
+		<list type="2" looktype="160"/>
+	</outfit>
+
+	<outfit id="25" name="Frog">
+		<list type="2" looktype="226"/>
+	</outfit>
+
+	<outfit id="26" name="Cult">
+		<list type="2" looktype="194"/>
+	</outfit>
+
+	<outfit id="27" name="Headsplitter">
+		<list type="2" looktype="253"/>
+	</outfit>
+
+	<outfit id="28" name="Skullhunter">
+		<list type="2" looktype="254"/>
+	</outfit>
+
+	<outfit id="29" name="Bloodwalker">
+		<list type="2" looktype="255"/>
+	</outfit>
+
+	<outfit id="30" name="Brutetamer">
+		<list type="2" looktype="264"/>
+	</outfit>
+
+	<outfit id="31" name="Gamemaster">
+		<list type="2" looktype="75"/>
+	</outfit>
+
+	<outfit id="32" name="Old Com. Manager">
+		<list type="2" looktype="266"/>
+	</outfit>
+
+	<outfit id="33" name="Com. Manager">
+		<list type="2" looktype="302"/>
+	</outfit>
+
+	-->
+
 </outfits>
