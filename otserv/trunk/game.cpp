@@ -1903,6 +1903,9 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_
 
 bool Game::anonymousBroadcastMessage(MessageClasses type, const std::string& text)
 {
+	if(type < MSG_CLASS_FIRST || type > MSG_CLASS_LAST)
+		return false;
+
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		(*it).second->sendTextMessage(type, text);
 	}

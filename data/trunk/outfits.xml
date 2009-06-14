@@ -106,54 +106,23 @@
 	</outfit>
 
 	<outfit id="22">
-		<list type="malegod" looktype="12" name="Archdemon"/>
-	</outfit>
-
-	<outfit id="23">
-		<list type="malegod" looktype="159" name="Elf"/>
-	</outfit>
-
-	<outfit id="24">
-		<list type="malegod" looktype="160" name="Dwarf"/>
-	</outfit>
-
-	<outfit id="25">
-		<list type="malegod" looktype="226" name="Frog"/>
-	</outfit>
-
-	<outfit id="26">
-		<list type="malegod" looktype="194" name="Cult"/>
-	</outfit>
-
-	<outfit id="27">
-		<list type="malegod" looktype="253" name="Headsplitter"/>
-	</outfit>
-
-	<outfit id="28">
-		<list type="malegod" looktype="254" name="Skullhunter"/>
-	</outfit>
-
-	<outfit id="29">
-		<list type="malegod" looktype="255" name="Bloodwalker"/>
-	</outfit>
-
-	<outfit id="30">
-		<list type="malegod" looktype="264" name="Brutetamer"/>
-	</outfit>
-
-	<outfit id="31">
+		<list type="femalegod" looktype="75" name="Gamemaster"/>
+		<list type="malegod" looktype="75" name="Gamemaster"/>
 		<list type="femalegm" looktype="75" name="Gamemaster"/>
 		<list type="malegm" looktype="75" name="Gamemaster"/>
 	</outfit>
 
-	<outfit id="32">
+	<outfit id="23">
+		<list type="femalegod" looktype="266" name="Old Com. Manager"/>
+		<list type="malegod" looktype="266" name="Old Com. Manager"/>
 		<list type="femalecm" looktype="266" name="Old Com. Manager"/>
 		<list type="malecm" looktype="266" name="Old Com. Manager"/>
 	</outfit>
 
-	<outfit id="33">
+	<outfit id="24">
+		<list type="femalegod" looktype="302" name="Com. Manager"/>
+		<list type="malegod" looktype="302" name="Com. Manager"/>
 		<list type="femalecm" looktype="302" name="Com. Manager"/>
 		<list type="malecm" looktype="302" name="Com. Manager"/>
 	</outfit>
-
 </outfits>

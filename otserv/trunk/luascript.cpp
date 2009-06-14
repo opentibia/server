@@ -1525,9 +1525,12 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayersOnlineList()
 	lua_register(m_luaState, "getPlayersOnlineList", LuaScriptInterface::luaGetPlayersOnlineList);
 
-	//broadcastMessage(<optional> messageClass, message)
+	//broadcastMessage(message, <optional> messageClass)
 	lua_register(m_luaState, "broadcastMessage", LuaScriptInterface::luaBroadcastMessage);
 	lua_register(m_luaState, "broadcastMessageEx", LuaScriptInterface::luaBroadcastMessage);
+
+	//doPlayerBroadcastMessage(cid, message)
+	lua_register(m_luaState, "doPlayerBroadcastMessage", LuaScriptInterface::luaDoPlayerBroadcastMessage);
 
 	//getGuildId(guild_name)
 	lua_register(m_luaState, "getGuildId", LuaScriptInterface::luaGetGuildId);
@@ -4580,21 +4583,44 @@ int LuaScriptInterface::luaGetPlayersOnlineList(lua_State *L)
 
 int LuaScriptInterface::luaBroadcastMessage(lua_State *L)
 {
-	//broadcastMessage(<optional> messageClass, message)
-	int32_t parameters = lua_gettop(L);
-
-	std::string message = popString(L);
-	uint32_t type = 0x12;
-	if(parameters >= 2){
+	//broadcastMessage(message, <optional> messageClass)
+	uint32_t type = MSG_STATUS_CONSOLE_RED;
+	if(lua_gettop(L) >= 2)
 		type = popNumber(L);
-	}
+	std::string message = popString(L);
 
-	if((type >= 0x11 && type <= 0x19) || type == 0x01 || type == 0x04){
-		g_game.anonymousBroadcastMessage((MessageClasses)type, message);
+	if(g_game.anonymousBroadcastMessage((MessageClasses)type, message)){
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
 		reportErrorFunc("Not valid messageClass.");
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerBroadcastMessage(lua_State* L)
+{
+	//doPlayerBroadcastMessage(cid, message)
+	std::string message = popString(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player)
+	{
+		if(g_game.internalBroadcastMessage(player, message))
+			lua_pushnumber(L, LUA_NO_ERROR);
+		else
+		{
+			reportErrorFunc("Player with no access trying to broadcast message.");
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else
+	{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
 	return 1;

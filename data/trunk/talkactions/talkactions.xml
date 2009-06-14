@@ -18,4 +18,5 @@
 	<talkaction words="/a" filter="first word" script="teleportntiles.lua"/>
 	<talkaction words="/goto" filter="first word" script="teleportto.lua"/>
 	<talkaction words="/r" filter="first word" script="removething.lua"/>
+	<talkaction words="/bc" filter="first word" script="broadcastclass.lua"/>
 </talkactions>

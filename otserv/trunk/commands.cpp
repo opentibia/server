@@ -77,7 +77,6 @@ s_defcommands Commands::defined_commands[] = {
 	{"/s",&Commands::placeNpc},
 	{"/m",&Commands::placeMonster},
 	{"/summon",&Commands::placeSummon},
-	{"/B",&Commands::broadcastMessage},
 	{"/i",&Commands::createItemById},
 	{"/n",&Commands::createItemByName},
 	{"/reload",&Commands::reloadInfo},
@@ -312,16 +311,6 @@ bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std
 	}
 
 	return (ret == RET_NOERROR);
-}
-
-bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Player* player = creature->getPlayer();
-	if(!player)
-		return false;
-
-	g_game.internalBroadcastMessage(player, param);
-	return true;
 }
 
 bool Commands::createItemById(Creature* creature, const std::string& cmd, const std::string& param)
