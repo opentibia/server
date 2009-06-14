@@ -4144,10 +4144,6 @@ void Player::setSex(playersex_t player_sex)
 				continue;
 			}
 
-			if( (it->second.isPremium && !isPremium()) ){
-				continue;
-			}
-
 			addOutfit(it->first, it->second.addons);
 		}
 	}
