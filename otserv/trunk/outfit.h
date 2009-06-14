@@ -63,8 +63,7 @@ public:
 private:
 	Outfits();
 	OutfitList allOutfits;
-	OutfitMap femaleMap;
-	OutfitMap maleMap;
+	std::map<playersex_t, OutfitMap > outfitMaps;
 };
 
 #endif

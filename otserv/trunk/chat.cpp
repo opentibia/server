@@ -21,6 +21,7 @@
 
 #include "chat.h"
 #include "player.h"
+#include "tools.h"
 
 PrivateChatChannel::PrivateChatChannel(uint16_t channelId, std::string channelName) :
 ChatChannel(channelId, channelName)
@@ -67,16 +68,15 @@ bool PrivateChatChannel::removeInvited(Player* player)
 void PrivateChatChannel::invitePlayer(Player* player, Player* invitePlayer)
 {
 	if(player != invitePlayer && addInvited(invitePlayer)){
-		std::string msg;
-		msg = player->getName();
-		msg += " invites you to ";
-		msg += (player->getSex() == PLAYERSEX_FEMALE ? "her" : "his");
-		msg += " private chat channel.";
-		invitePlayer->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		std::stringstream msg;
+		msg << player->getName() << " invites you to " << playerSexAdjectiveString(player->getSex())
+			<<  " private chat channel.";
+		
+		invitePlayer->sendTextMessage(MSG_INFO_DESCR, msg.str().c_str());
 
-		msg = invitePlayer->getName();
-		msg += " has been invited.";
-		player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		msg.str("");
+		msg << invitePlayer->getName() << " has been invited.";
+		player->sendTextMessage(MSG_INFO_DESCR, msg.str().c_str());
 	}
 }
 

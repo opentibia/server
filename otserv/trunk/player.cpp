@@ -263,10 +263,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 	else {
 		s << name << " (Level " << level <<").";
 
-		if(sex == PLAYERSEX_FEMALE)
-			s << " She";
-		else
-			s << " He";
+		s << " " << playerSexSubjectString(getSex());
 
 		if(hasFlag(PlayerFlag_ShowGroupInsteadOfVocation))
 			s << " is " << getGroupName() << ".";
@@ -278,14 +275,11 @@ std::string Player::getDescription(int32_t lookDistance) const
 
 	if(guildId)
 	{
-		if(lookDistance == -1)
+		if(lookDistance == -1){
 			s << " You are ";
-		else
-		{
-			if(sex == PLAYERSEX_FEMALE)
-				s << " She is ";
-			else
-				s << " He is ";
+		}
+		else{
+			s << " " << playerSexSubjectString(getSex()) << " is ";
 		}
 
 		if(guildRank.length())
@@ -2387,7 +2381,7 @@ Item* Player::createCorpse()
 		Creature* mostDamageCreature = NULL;
 
 		if(getKillers(&lastHitCreature, &mostDamageCreature) && lastHitCreature){
-			ss << " " << (getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by "
+			ss << " " << playerSexSubjectString(getSex()) << " was killed by "
 				<< lastHitCreature->getNameDescription() << ".";
 		}
 
@@ -3605,7 +3599,12 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 		if(!canDoAction()){
 			uint32_t delay = getNextActionTime();
 			delay -= (delay % EVENT_CREATURE_THINK_INTERVAL);
-			condition->setTicks(delay);
+			if(delay < 0){
+				removeCondition(condition);
+			}
+			else{
+				condition->setTicks(delay);
+			}
 		}
 		else{
 			removeCondition(condition);

@@ -268,7 +268,7 @@ void BedItem::updateAppearance(const Player* player)
 				}
 			}
 		}
-		else if(player->getSex() == PLAYERSEX_FEMALE) {
+		else if(player->isFemale()){
 			if(it.femaleSleeperID != 0){
 				const ItemType& newType = Item::items[it.femaleSleeperID];
 				if(newType.type == ITEM_TYPE_BED){

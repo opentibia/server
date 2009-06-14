@@ -103,6 +103,29 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->defaultOutfit.lookLegs = result->getDataInt("looklegs");
 	player->defaultOutfit.lookFeet = result->getDataInt("lookfeet");
 	player->defaultOutfit.lookAddons = result->getDataInt("lookaddons");
+
+	uint32_t outfitId = Outfits::getInstance()->getOutfitId(player->defaultOutfit.lookType);
+	bool canWearOutfit = true;
+	if(outfitId > 0){
+		//Check if the current outfit is right
+		Outfit outfit;
+		canWearOutfit = Outfits::getInstance()->getOutfit(outfitId, player->getSex(), outfit);
+		if(canWearOutfit){
+			if(player->defaultOutfit.lookType != outfit.lookType){
+				player->defaultOutfit.lookType = outfit.lookType;
+			}
+		}
+	}
+
+	if(!canWearOutfit){
+		//Just pick the first default outfit we can find
+		const OutfitMap& default_outfits = Outfits::getInstance()->getOutfits(player->getSex());
+		if(!default_outfits.empty()){
+			Outfit newOutfit = (*default_outfits.begin()).second;
+			player->defaultOutfit.lookType = newOutfit.lookType;
+		}
+	}
+
 	player->currentOutfit = player->defaultOutfit;
 
 #ifdef __SKULLSYSTEM__

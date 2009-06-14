@@ -2464,7 +2464,10 @@ void ProtocolGame::sendOutfitWindow()
  			}
 		}
 		else{
-			msg->AddByte(0);
+			msg->AddByte(1);
+			msg->AddU16(player->getDefaultOutfit().lookType);
+			msg->AddString("");
+			msg->AddByte(player->getDefaultOutfit().lookAddons);
 		}
  	}
  }

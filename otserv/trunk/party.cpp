@@ -23,6 +23,7 @@
 #include "player.h"
 #include "game.h"
 #include "chat.h"
+#include "tools.h"
 #include "configmanager.h"
 
 #include <sstream>
@@ -102,8 +103,7 @@ bool Party::invitePlayer(Player* player)
 	player->addPartyInvitation(this);
 
 	ss.str("");
-	ss << getLeader()->getName() << " has invited you to " <<
-		(getLeader()->getSex() == PLAYERSEX_FEMALE ? "her" : "his") << " party.";
+	ss << getLeader()->getName() << " has invited you to " << playerSexAdjectiveString(player->getSex()) << " party.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 	return true;
 }
@@ -161,8 +161,7 @@ bool Party::removeInvite(Player* player)
 bool Party::revokeInvitation(Player* player)
 {
 	std::stringstream ss;
-	ss << getLeader()->getName() << " has revoked " <<
-		(getLeader()->getSex() == PLAYERSEX_FEMALE ? "her" : "his") << " invitation.";
+	ss << getLeader()->getName() << " has revoked " << playerSexAdjectiveString(getLeader()->getSex()) << " invitation.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
 	ss.str("");

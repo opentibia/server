@@ -219,9 +219,18 @@ enum ConditionId_t{
 };
 
 enum playersex_t {
-	PLAYERSEX_FEMALE = 0,
+	PLAYERSEX_FIRST = 0,
+	PLAYERSEX_FEMALE = PLAYERSEX_FIRST,
 	PLAYERSEX_MALE = 1,
-	PLAYERSEX_OLDMALE = 2
+	PLAYERSEX_FEMALE_GAMEMASTER = 2,
+	PLAYERSEX_MALE_GAMEMASTER = 3,
+	PLAYERSEX_FEMALE_MANAGER = 4,
+	PLAYERSEX_MALE_MANAGER = 5,
+	PLAYERSEX_FEMALE_GOD = 6,
+	PLAYERSEX_MALE_GOD = 7,
+	PLAYERSEX_LAST
+
+	//When adding new types remember that females should be even and males odd
 };
 
 struct Outfit_t{

@@ -185,6 +185,9 @@ public:
 	Vocation* getVocation() const {return vocation;};
 
 	playersex_t getSex() const {return sex;}
+	bool isMale() const {return getSex() % 2 != 0;}
+	bool isFemale() const {return getSex() % 2 == 0;}
+
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	int64_t getExperience() const {return experience;}

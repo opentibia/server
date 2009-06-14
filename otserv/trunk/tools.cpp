@@ -721,6 +721,26 @@ std::string getViolationActionString(violationAction_t actionId, bool ipBanishme
 	return action;
 }
 
+std::string playerSexAdjectiveString(playersex_t sex)
+{
+	if(sex % 2 == 0){
+		return "her";
+	}
+	else{
+		return "his";
+	}
+}
+
+std::string playerSexSubjectString(playersex_t sex)
+{
+	if(sex % 2 == 0){
+		return "She";
+	}
+	else{
+		return "He";
+	}
+}
+
 #define MOD_ADLER 65521
 uint32_t adlerChecksum(uint8_t *data, int32_t len)
 {

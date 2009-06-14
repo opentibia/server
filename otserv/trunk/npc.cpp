@@ -2059,14 +2059,14 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			uint32_t params = (*it)->getParams();
 
 			if(hasBitSet(RESPOND_MALE, params)){
-				if(!player->getSex() == PLAYERSEX_MALE){
+				if(!player->isMale()){
 					continue;
 				}
 				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_FEMALE, params)){
-				if(!player->getSex() == PLAYERSEX_FEMALE){
+				if(!player->isFemale()){
 					continue;
 				}
 				++matchCount;

@@ -55,7 +55,7 @@ bool Outfits::loadFromXml(const std::string& datadir)
 
 		while(p){
 			int32_t intValue;
-			std::string strVal;
+			std::string strValue;
 
 			if(xmlStrcmp(p->name, (const xmlChar*)"outfit") == 0){
 				if(readXMLInteger(p, "id", intValue)){
@@ -87,33 +87,45 @@ bool Outfits::loadFromXml(const std::string& datadir)
 								outfit.addons = intValue;
 							}
 
-							if(readXMLString(pchild, "name", strVal)){
-								outfit.name = strVal;
+							if(readXMLString(pchild, "name", strValue)){
+								outfit.name = strValue;
 							}
 
-							if(readXMLInteger(pchild, "type", intValue)){
-								if(intValue >= PLAYERSEX_FEMALE || intValue <= PLAYERSEX_OLDMALE){
-									playersex_t playersex = (playersex_t)intValue;
+							if(readXMLString(pchild, "type", strValue)){
+								playersex_t playersex = PLAYERSEX_LAST;
 
-									allOutfits.push_back(outfit);
-
-									switch(playersex){
-										case PLAYERSEX_FEMALE:
-											femaleMap[outfit.outfitId] = outfit;
-											break;
-										case PLAYERSEX_MALE:
-											maleMap[outfit.outfitId] = outfit;
-											break;
-
-										default:
-											break;
-									}
+								if(asLowerCaseString(strValue) == "female"){
+									playersex = PLAYERSEX_FEMALE;
+								}
+								else if(asLowerCaseString(strValue) == "male"){
+									playersex = PLAYERSEX_MALE;
+								}
+								else if(asLowerCaseString(strValue) == "femalegm"){
+									playersex = PLAYERSEX_FEMALE_GAMEMASTER;
+								}
+								else if(asLowerCaseString(strValue) == "malegm"){
+									playersex = PLAYERSEX_MALE_GAMEMASTER;
+								}
+								else if(asLowerCaseString(strValue) == "femalecm"){
+									playersex = PLAYERSEX_FEMALE_MANAGER;
+								}
+								else if(asLowerCaseString(strValue) == "malecm"){
+									playersex = PLAYERSEX_MALE_MANAGER;
+								}
+								else if(asLowerCaseString(strValue) == "femalegod"){
+									playersex = PLAYERSEX_FEMALE_GOD;
+								}
+								else if(asLowerCaseString(strValue) == "malegod"){
+									playersex = PLAYERSEX_MALE_GOD;
 								}
 								else{
-									std::cout << "Invalid playersex for an outfit." << std::endl;
+									std::cout << "Invalid playersex " << strValue << " for an outfit." << std::endl;
 									pchild = pchild->next;
 									continue;
 								}
+
+								allOutfits.push_back(outfit);
+								outfitMaps[playersex][outfit.outfitId] = outfit;
 							}
 							else{
 								std::cout << "Missing playersex for an outfit." << std::endl;
@@ -173,15 +185,5 @@ bool Outfits::getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit)
 
 const OutfitMap& Outfits::getOutfits(playersex_t playersex)
 {
-	switch(playersex){
-		case PLAYERSEX_FEMALE:
-			return femaleMap;
-
-		case PLAYERSEX_MALE:
-			return maleMap;
-
-		default:
-			static OutfitMap emptyMap;
-			return emptyMap;
-	}
+	return outfitMaps[playersex];
 }
