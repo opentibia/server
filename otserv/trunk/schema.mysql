@@ -230,7 +230,6 @@ CREATE TABLE `player_depotitems` (
     `count` INT NOT NULL DEFAULT 0,
     `attributes` BLOB NOT NULL,
     FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
-    INDEX (`player_id`, `depot_id`),
     UNIQUE (`player_id`, `sid`)
 ) ENGINE = InnoDB;
 
