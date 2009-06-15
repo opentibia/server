@@ -546,6 +546,20 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		}
 	}
+	{ 14,
+		{ // PgSql
+			"ALTER TABLE `player_depotitems` DROP COLUMN `depotid`;",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `player_depotitems` DROP COLUMN `depotid`;",
+			NULL
+		},
+		{ // Sqlite
+			"",
+			NULL
+		}
+	},
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
