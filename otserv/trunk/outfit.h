@@ -55,7 +55,7 @@ public:
 
 	bool loadFromXml(const std::string& datadir);
 
-	uint32_t Outfits::getOutfitId(uint32_t lookType);
+	uint32_t getOutfitId(uint32_t lookType);
 	bool getOutfit(uint32_t lookType, Outfit& outfit);
 	bool getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit);
 	const OutfitMap& getOutfits(playersex_t playersex);
