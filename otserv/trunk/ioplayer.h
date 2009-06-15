@@ -69,6 +69,7 @@ public:
 	bool getAccountByName(uint32_t& acc, std::string& name);
 	bool getAccountByName(std::string& acc, std::string& name);
 	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
+	bool getDefaultTown(std::string& name, uint32_t& townId);
 	bool getNameByGuid(uint32_t guid, std::string& name);
 	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 	bool playerExists(std::string name);

@@ -103,6 +103,70 @@ Item* Item::CreateItem(PropStream& propStream)
 	return Item::CreateItem(_id, 0);
 }
 
+
+bool Item::loadItem(xmlNodePtr node, Container* parent)
+{
+	int32_t intValue;
+	std::string strValue;
+
+	if(xmlStrcmp(node->name, (const xmlChar*)"item") == 0){
+		Item* item = NULL;
+		if(readXMLInteger(node, "id", intValue)){
+			item = Item::CreateItem(intValue);
+		}
+
+		if(!item){
+			return false;
+		}
+
+		//optional
+		if(readXMLInteger(node, "subtype", intValue)){
+			item->setSubType(intValue);
+		}
+
+		if(readXMLInteger(node, "actionid", intValue)){
+			item->setActionId(intValue);
+		}
+
+		if(readXMLString(node, "text", strValue)){
+			item->setText(strValue);
+		}
+
+		if(item->getContainer()){
+			loadContainer(node, item->getContainer());
+		}
+
+		if(parent){
+			parent->addItem(item);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Item::loadContainer(xmlNodePtr parentNode, Container* parent)
+{
+	xmlNodePtr node = parentNode->children;
+	while(node){
+		if(node->type != XML_ELEMENT_NODE){
+			node = node->next;
+			continue;
+		}
+
+		if(xmlStrcmp(node->name, (const xmlChar*)"item") == 0){
+			if(!loadItem(node, parent)){
+				return false;
+			}
+		}
+
+		node = node->next;
+	}
+
+	return true;
+}
+
 Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 	ItemAttributes()
 {

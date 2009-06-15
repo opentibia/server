@@ -119,6 +119,7 @@ enum{
 	//CMD_SERVER_INFO = 11,
 	//CMD_GETHOUSE = 12,
 	CMD_SAVE_SERVER = 13,
+	CMD_SEND_MAIL = 14,
 };
 
 
@@ -200,7 +201,10 @@ protected:
 	void adminCommandCloseServer();
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();
+	void adminCommandSendMail(const std::string& xmlData);
 	void adminCommandKickPlayer(const std::string& name);
+
+	Item* createMail(const std::string xmlData, std::string& name, uint32_t& depotId);
 
 	enum ConnectionState_t{
 		NO_CONNECTED,

@@ -250,6 +250,9 @@ public:
 	//Factory member to create item of right type based on type
 	static Item* CreateItem(const uint16_t _type, uint16_t _count = 1);
 	static Item* CreateItem(PropStream& propStream);
+	static bool loadItem(xmlNodePtr node, Container* parent);
+	static bool loadContainer(xmlNodePtr node, Container* parent);
+
 	static Items items;
 
 	// Constructor for items

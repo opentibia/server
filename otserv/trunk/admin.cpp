@@ -22,6 +22,7 @@
 #include "admin.h"
 #include "game.h"
 #include "connection.h"
+#include "ioplayer.h"
 #include "outputmessage.h"
 #include "networkmessage.h"
 #include "configmanager.h"
@@ -29,6 +30,7 @@
 #include "ban.h"
 #include "tools.h"
 #include "rsa.h"
+#include "mailbox.h"
 
 #include "logger.h"
 
@@ -346,6 +348,13 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 				return;
 				break;
 			}
+			case CMD_SEND_MAIL:
+			{
+				const std::string xmlData = msg.GetString();
+				g_dispatcher.addTask(
+					createTask(boost::bind(&ProtocolAdmin::adminCommandSendMail, this, xmlData)));
+				break;
+			}
 			case CMD_KICK:
 			{
 				const std::string name = msg.GetString();
@@ -456,6 +465,95 @@ void ProtocolAdmin::adminCommandPayHouses()
 	}
 
 	return ;
+}
+
+Item* ProtocolAdmin::createMail(const std::string xmlData, std::string& name, uint32_t& depotId)
+{
+	xmlDocPtr doc = xmlParseMemory(xmlData.c_str(), strlen(xmlData.c_str()));
+	if(!doc){
+		return NULL;
+	}
+
+	xmlNodePtr root = xmlDocGetRootElement(doc);
+
+	if(xmlStrcmp(root->name,(const xmlChar*)"mail") != 0){
+		return NULL;
+	}
+
+	int32_t itemId = ITEM_PARCEL;
+
+	int32_t intValue;
+	std::string strValue;
+
+	if(readXMLString(root, "to", strValue)){
+		name = strValue;
+	}
+
+	if(readXMLString(root, "town", strValue)){
+		if(!Mailbox::getDepotId(strValue, depotId)){
+			return false;
+		}
+	}
+	else{
+		//use the players default town
+		if(!IOPlayer::instance()->getDefaultTown(name, depotId)){
+			return false;
+		}
+	}
+
+	if(readXMLInteger(root, "id", intValue)){
+		itemId = intValue;
+	}
+
+	Item* mailItem = Item::CreateItem(itemId);
+	mailItem->setParent(VirtualCylinder::virtualCylinder);
+
+	if(Container* mailContainer = mailItem->getContainer()){
+		xmlNodePtr node = root->children;
+		while(node){
+			if(node->type != XML_ELEMENT_NODE){
+				node = node->next;
+				continue;
+			}
+
+			if(!Item::loadItem(node, mailContainer)){
+				delete mailContainer;
+				return NULL;
+			}
+
+			node = node->next;
+		}
+	}
+
+	return mailItem;
+}
+
+void ProtocolAdmin::adminCommandSendMail(const std::string& xmlData)
+{
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+
+		std::string name;
+		uint32_t depotId;
+		Item* mailItem = createMail(xmlData, name, depotId);
+
+		if(mailItem){
+			if(Mailbox::sendItemTo(name, depotId, mailItem)){
+				output->AddByte(AP_MSG_COMMAND_OK);
+			}
+			else{
+				output->AddByte(AP_MSG_COMMAND_FAILED);
+				output->AddString("Could not mail item");
+			}
+		}
+		else{
+			output->AddByte(AP_MSG_COMMAND_FAILED);
+			output->AddString("Could not mail item");
+		}
+
+		OutputMessagePool::getInstance()->send(output);
+	}
 }
 
 void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)

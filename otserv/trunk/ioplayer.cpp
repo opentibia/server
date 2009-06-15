@@ -826,7 +826,7 @@ bool IOPlayer::getAccountByName(std::string& account, std::string& name)
 }
 
 
-bool IOPlayer::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string& name)
+bool IOPlayer::getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name)
 {
 	Database* db = Database::instance();
 	DBResult* result;
@@ -844,7 +844,21 @@ bool IOPlayer::getGuidByNameEx(uint32_t &guid, bool &specialVip, std::string& na
 	return true;
 }
 
-bool IOPlayer::getGuildIdByName(uint32_t &guildId, const std::string& guildName)
+bool IOPlayer::getDefaultTown(std::string& name, uint32_t& depotId)
+{
+	Database* db = Database::instance();
+	DBResult* result;
+	DBQuery query;
+
+	if(!(result = db->storeQuery("SELECT `town_id` FROM `players` WHERE `name`= " + db->escapeString(name))))
+		return false;
+
+	depotId = result->getDataInt("town_id");
+	db->freeResult(result);
+	return true;
+}
+
+bool IOPlayer::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 {
 	Database* db = Database::instance();
 	DBResult* result;

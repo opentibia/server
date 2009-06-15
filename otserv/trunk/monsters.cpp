@@ -1369,7 +1369,7 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 		lootBlock.subType = intValue;
 	}
 
-	if(readXMLInteger(node, "actionId", intValue)){
+	if(readXMLInteger(node, "actionid", intValue) || readXMLInteger(node, "actionId", intValue)){
 		lootBlock.actionId = intValue;
 	}
 
@@ -1377,7 +1377,7 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 		lootBlock.text = strValue;
 	}
 
-	if(readXMLString(node, "dropEmpty", strValue)){
+	if(readXMLString(node, "dropEmpty", strValue) || readXMLString(node, "dropempty", strValue)){
 		lootBlock.dropEmpty = (asLowerCaseString(strValue) == "true");
 	}
 
