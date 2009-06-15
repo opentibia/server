@@ -1,6 +1,4 @@
 local function doRemoveField(cid, pos)
-	pos.stackpos = 254
-	local field = getThingfromPos(pos)
 	local playerPos = getPlayerPosition(cid)
 
 	local field = getTileItemByType(pos, ITEM_TYPE_MAGICFIELD)
@@ -18,7 +16,7 @@ end
 function onCastSpell(cid, var)
 	local pos = variantToPosition(var)
 	
-	if(pos.x == 65535) then
+	if(pos.x == CONTAINER_POSITION) then
 		pos = getThingPos(cid)
 	end
 

@@ -6,8 +6,8 @@ setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_ETHEREALSPEAR)
 function getSpellDamage(cid, weaponSkill, weaponAttack, attackStrength)
 	local level = getPlayerLevel(cid)
 
-	local min = (((getPlayerSkill(cid,4)+25)/3)+(level/5))
-	local max = ((getPlayerSkill(cid,4)+25)+(level/5))
+	local min = (((getPlayerSkill(cid,LEVEL_SKILL_DISTANCE)+25)/3)+(level/5))
+	local max = ((getPlayerSkill(cid,LEVEL_SKILL_DISTANCE)+25)+(level/5))
 
 	return -min, -max
 end

@@ -17,7 +17,7 @@ end
 function onCastSpell(cid, var)
 	local pos = variantToPosition(var)
 
-	if(pos.x == 65535) then
+	if(pos.x == CONTAINER_POSITION) then
 		pos = getThingPos(cid)
 	end
 
