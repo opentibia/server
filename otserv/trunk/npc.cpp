@@ -501,6 +501,11 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 				if(strValue == "onbusy"){
 					hasBusyReply = true;
 				}
+				else if(strValue == "onidle"){
+					if(readXMLInteger(node, "time", intValue)){
+						prop.time = intValue;
+					}
+				}
 
 				prop.interactType = INTERACT_EVENT;
 				prop.inputList.push_back(strValue);
@@ -1027,6 +1032,7 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->respondToCreature = 0;
 	state->lastResponse = NULL;
 	state->prevRespondToText = "";
+	state->lastResponseTime = 0;
 	stateList.push_back(state);
 	return state;
 }
@@ -1156,7 +1162,7 @@ void Npc::onCreatureMove(const Creature* creature, const Tile* newTile, const Po
 			}
 			else if(canSeeNewPos && canSeeOldPos){
 				npcState->respondToCreature = player->getID();
-				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_MOVE);
+				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_MOVE, false);
 				executeResponse(player, npcState, response);
 			}
 		}
@@ -1212,7 +1218,7 @@ void Npc::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfi
 
 void Npc::onPlayerEnter(Player* player, NpcState* state)
 {
-	const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_ENTER);
+	const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_ENTER, false);
 	executeResponse(player, state, response);
 }
 
@@ -1220,7 +1226,7 @@ void Npc::onPlayerLeave(Player* player, NpcState* state)
 {
 	if(player){
 		player->closeShopWindow();
-		const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_LEAVE);
+		const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_LEAVE, false);
 		executeResponse(player, state, response);
 	}
 }
@@ -1233,12 +1239,6 @@ void Npc::onThink(uint32_t interval)
 	}
 
 	isIdle = true;
-	bool idleResponse = false;
-	#define MAX_RAND_RANGE 10000000
-	if(((uint32_t)MAX_RAND_RANGE * (EVENT_CREATURE_THINK_INTERVAL / 1000)) / idleInterval >= (uint32_t)random_range(0, MAX_RAND_RANGE)){
-		idleResponse = true;
-	}
-
 	for(StateList::iterator it = stateList.begin(); it != stateList.end();){
 		NpcState* npcState = *it;
 		const NpcResponse* response = NULL;
@@ -1260,8 +1260,9 @@ void Npc::onThink(uint32_t interval)
 			}
 		}
 
+		bool idleResponse = (npcState->lastResponseTime > 0 && (OTSYS_TIME() - npcState->lastResponseTime) > idleInterval);
 		if(idleResponse && player){
-			response = getResponse(player, EVENT_IDLE);
+			response = getResponse(player, npcState, EVENT_IDLE, true);
 			executeResponse(player, npcState, response);
 			idleResponse = false;
 		}
@@ -1299,22 +1300,13 @@ void Npc::onThink(uint32_t interval)
 		if(!npcState->respondToText.empty()){
 			if(hasBusyReply && !isIdle){
 				//Check if we have a busy reply
-				response = getResponse(player, npcState, EVENT_BUSY);
+				response = getResponse(player, npcState, EVENT_BUSY, false);
 				if(response){
 					executeResponse(player, npcState, response);
 				}
 			}
 			else{
-				if(npcState->lastResponse){
-					//Check previous response chain first
-					const ResponseList& list = npcState->lastResponse->getResponseList();
-					response = getResponse(list, player, npcState, npcState->respondToText);
-				}
-
-				if(!response){
-					response = getResponse(player, npcState, npcState->respondToText);
-				}
-
+				response = getResponse(player, npcState, npcState->respondToText, true);
 				if(response){
 					setCreatureFocus(player);
 					executeResponse(player, npcState, response);
@@ -1325,7 +1317,7 @@ void Npc::onThink(uint32_t interval)
 			npcState->respondToText = "";
 		}
 
-		response = getResponse(player, npcState, EVENT_THINK);
+		response = getResponse(player, npcState, EVENT_THINK, true);
 		executeResponse(player, npcState, response);
 
 		if(!npcState->isIdle){
@@ -1347,6 +1339,7 @@ void Npc::onThink(uint32_t interval)
 void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse* response)
 {
 	if(response){
+		npcState->lastResponseTime = OTSYS_TIME();
 		npcState->lastResponse = response;
 		bool resetTopic = true;
 
@@ -1853,7 +1846,7 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->buyPrice = getListItemPrice(itemId, SHOPEVENT_BUY);
 			npcState->ignoreCapacity = ignoreCapacity;
 			npcState->buyWithBackpack = buyWithBackpack;
-			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPBUY);
+			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPBUY, false);
 			executeResponse(player, npcState, response);
 		}
 	}
@@ -1864,7 +1857,7 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->subType = count;
 			npcState->itemId = itemId;
 			npcState->sellPrice = getListItemPrice(itemId, SHOPEVENT_SELL);
-			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPSELL);
+			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPSELL, false);
 			executeResponse(player, npcState, response);
 		}
 	}
@@ -1888,7 +1881,7 @@ void Npc::onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCall
 
 	NpcState* npcState = getState(player, true);
 	if(npcState){
-		const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPCLOSE);
+		const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPCLOSE, false);
 		executeResponse(player, npcState, response);
 	}
 
@@ -2287,7 +2280,10 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		if((*it)->getInteractType() == INTERACT_EVENT){
 			if((*it)->getInputText() == asLowerCaseString(text)){
-				++matchCount;
+				bool enoughTimeElapsed = (npcState->lastResponseTime != 0 && ( (OTSYS_TIME() - npcState->lastResponseTime) > (*it)->getTime() ));
+				if((*it)->getTime() == 0 || enoughTimeElapsed){
+					++matchCount;
+				}
 			}
 			else{
 				matchCount = 0;
@@ -2398,8 +2394,17 @@ uint32_t Npc::getMatchCount(NpcResponse* response, std::vector<std::string> word
 	return bestMatchCount;
 }
 
-const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, const std::string& text)
+const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, const std::string& text, bool checkLastResponse)
 {
+	if(checkLastResponse && npcState->lastResponse){
+		//Check previous response chain first
+		const ResponseList& list = npcState->lastResponse->getResponseList();
+		const NpcResponse* response = getResponse(list, player, npcState, npcState->respondToText);
+		if(response){
+			return response;
+		}
+	}
+
 	return getResponse(responseList, player, npcState, text);
 }
 
@@ -2426,11 +2431,20 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcEvent_t eventType)
 	return result[random_range(0, result.size() - 1)];
 }
 
-const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType)
+const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType, bool checkLastResponse)
 {
 	std::string eventName = getEventResponseName(eventType);
 	if(eventName.empty()){
 		return NULL;
+	}
+
+	if(checkLastResponse && npcState->lastResponse){
+		//Check previous response chain first
+		const ResponseList& list = npcState->lastResponse->getResponseList();
+		const NpcResponse* response = getResponse(list, player, npcState, eventName, true);
+		if(response){
+			return response;
+		}
 	}
 
 	return getResponse(responseList, player, npcState, eventName, true);

@@ -317,6 +317,7 @@ public:
 			health = -1;
 			condition = CONDITION_NONE;
 			publicize = true;
+			time = 0;
 		}
 
 		int32_t topic;
@@ -336,6 +337,7 @@ public:
 		int32_t health;
 		ConditionType_t condition;
 		bool publicize;
+		int32_t time;
 	};
 
 	NpcResponse(const ResponseProperties& _prop,
@@ -382,6 +384,7 @@ public:
 	int32_t getAmount() const {return prop.amount;}
 	void setAmount(int32_t _amount) { prop.amount = _amount;}
 	bool publicize() const {return prop.publicize;}
+	int32_t getTime() const {return prop.time;}
 
 	std::string formatResponseString(Creature* creature) const;
 	void addAction(ResponseAction action) {prop.actionList.push_back(action);}
@@ -419,6 +422,7 @@ struct NpcState{
 	uint32_t respondToCreature;
 	std::string prevRespondToText;
 	const NpcResponse* lastResponse;
+	uint64_t lastResponseTime;
 
 	//script variables
 	ScriptVars scriptVars;
@@ -504,9 +508,9 @@ protected:
 
 	const NpcResponse* getResponse(const ResponseList& list, const Player* player,
 		NpcState* npcState, const std::string& text, bool exactMatch = false);
-	const NpcResponse* getResponse(const Player* player, NpcState* npcState, const std::string& text);
+	const NpcResponse* getResponse(const Player* player, NpcState* npcState, const std::string& text, bool checkLastResponse);
 	const NpcResponse* getResponse(const Player* player, NpcEvent_t eventType);
-	const NpcResponse* getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType);
+	const NpcResponse* getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType, bool checkLastResponse);
 	std::string getEventResponseName(NpcEvent_t eventType);
 
 	uint32_t getMatchCount(NpcResponse* response, std::vector<std::string> wordList,
