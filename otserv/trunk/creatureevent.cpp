@@ -375,7 +375,7 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target)
 	}
 }
 
-uint32_t CreatureEvent::executeOnAdvance(Player* player, uint32_t oldLevel, uint32_t newLevel, levelTypes_t type)
+uint32_t CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
 {
 	//onAdvance(cid, type, oldlevel, newlevel)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -396,9 +396,9 @@ uint32_t CreatureEvent::executeOnAdvance(Player* player, uint32_t oldLevel, uint
 
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
+		lua_pushnumber(L, (uint32_t)type);
 		lua_pushnumber(L, oldLevel);
 		lua_pushnumber(L, newLevel);
-		lua_pushnumber(L, (uint32_t)type);
 
 		int32_t result = m_scriptInterface->callFunction(4);
 		m_scriptInterface->releaseScriptEnv();
