@@ -2280,8 +2280,12 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		if((*it)->getInteractType() == INTERACT_EVENT){
 			if((*it)->getInputText() == asLowerCaseString(text)){
-				bool enoughTimeElapsed = (npcState->lastResponseTime != 0 && ( (OTSYS_TIME() - npcState->lastResponseTime) > (*it)->getTime() ));
-				if((*it)->getTime() == 0 || enoughTimeElapsed){
+				uint32_t time = idleInterval * 1000;
+				if((*it)->getTime() != 0){
+					time = (*it)->getTime();
+				}
+				bool enoughTimeElapsed = (npcState->lastResponseTime != 0 && ( (OTSYS_TIME() - npcState->lastResponseTime) > time));
+				if(enoughTimeElapsed){
 					++matchCount;
 				}
 			}
