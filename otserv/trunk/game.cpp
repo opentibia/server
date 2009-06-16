@@ -550,7 +550,7 @@ Player* Game::getPlayerByNameEx(const std::string& s)
 		return NULL;
 	}
 
-	return NULL;
+	return player;
 }
 
 Player* Game::getPlayerByGuid(uint32_t guid)
