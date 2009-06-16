@@ -59,7 +59,7 @@ public:
 
 	bool canUse(Player* player);
 	void sleep(Player* player);
-	void wakeUp(Player* player);
+	void wakeUp();
 	BedItem* getNextBedItem();
 
 protected:

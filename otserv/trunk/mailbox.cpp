@@ -117,62 +117,31 @@ bool Mailbox::sendItemTo(const std::string name, uint32_t depotId, Item* item)
 		return false;
 	}
 	
-	if(Player* player = g_game.getPlayerByName(name)){ 
-		Depot* depot = player->getDepot(depotId, true);
-
-		if(depot){
-			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
-				item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
-			{
-				if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
-					g_game.transformItem(item, item->getID() + 1);
-				}
-				return true;
-			}
-		}
-
+	Player* player = g_game.getPlayerByNameEx(name);
+	if(!player){
 		return false;
 	}
-	else if(IOPlayer::instance()->playerExists(name)){
-		Player* player = new Player(name, NULL);
-		
-		if(!IOPlayer::instance()->loadPlayer(player, name)){
-			#ifdef __DEBUG_MAILBOX__
-			std::cout << "Failure: [Mailbox::sendItemTo], can not load player: " << name << std::endl;
-			#endif
-			delete player;
-			return false;
-		}
-		
-		#ifdef __DEBUG_MAILBOX__
-		std::string playerName = player->getName();
-		if(g_game.getPlayerByName(playerName)){
-			std::cout << "Failure: [Mailbox::sendItemTo], receiver is online: " << name << "," << playerName << std::endl;
-			delete player;
-			return false;
-		}
-		#endif
 
-		Depot* depot = player->getDepot(depotId, true);
-		if(depot){
-			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
-				item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
-			{
-				if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
-					g_game.transformItem(item, item->getID() + 1);
-				}
+	bool result = false;
+	Depot* depot = player->getDepot(depotId, true);
+	if(depot){
+		if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
+			item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
+		{
+			if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
+				g_game.transformItem(item, item->getID() + 1);
 			}
 
-			IOPlayer::instance()->savePlayer(player); 
-			
-			delete player;			
-			return true;
+			result = true;
 		}
+	}
 
+	if(player->isOffline()){
+		IOPlayer::instance()->savePlayer(player);
 		delete player;
 	}
-	
-	return false;
+
+	return result;
 }
 
 bool Mailbox::sendItem(Item* item)

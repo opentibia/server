@@ -1505,7 +1505,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		//[ added for beds system
 		BedItem* bed = Beds::instance().getBedBySleeper(getGUID());
 		if(bed){
-			bed->wakeUp(this);
+			bed->wakeUp();
 			#ifdef __DEBUG__
 			std::cout << "Player " << getName() << " waking up." << std::endl;
 			#endif
@@ -4258,31 +4258,24 @@ bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 		return false;
 	}
 
-	Player* target = g_game.getPlayerByName(name);
+	Player* target = g_game.getPlayerByNameEx(name);
 	if(!target){
-		target = new Player(name, NULL);
-		if(!IOPlayer::instance()->loadPlayer(target, name)){
-#ifdef __DEBUG__
-			std::cout << "Failure: [Player::transferMoneyTo], can not load player: " << name << std::endl;
-#endif
-			delete target;
-			return false;
-		}
-	}
-
-	if(balance < amount){
 		return false;
 	}
 
-	balance -= amount;
-	target->balance += amount;
+	bool result = false;
+	if(balance >= amount){
+		balance -= amount;
+		target->balance += amount;
+		result = true;
+	}
 
 	if(target->isOffline()){
 		IOPlayer::instance()->savePlayer(target);
 		delete target;
 	}
 
-	return true;
+	return result;
 }
 
 bool Player::isLoginAttackLocked(uint32_t attackerId) const

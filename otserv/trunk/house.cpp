@@ -52,6 +52,7 @@ transfer_container(ITEM_LOCKER1)
 	townid = 0;
 	transferItem = NULL;
 	guildHall = false;
+	pendingDepotTransfer = false;
 }
 
 House::~House()
@@ -86,17 +87,16 @@ void House::setHouseOwner(uint32_t guid)
 				}
 			}
 		}
-		while(to_kick.empty() == false) {
+		while(to_kick.empty() == false){
 			Player* c = to_kick.back();
 			to_kick.pop_back();
 			kickPlayer(NULL, c->getName());
 		}
 
 		// we need to remove players from beds
-		HouseBedItemList::iterator bit;
-		for(bit = bedsList.begin(); bit != bedsList.end(); ++bit) {
-			if((*bit)->getSleeper() != 0) {
-				(*bit)->wakeUp(NULL);
+		for(HouseBedItemList::iterator it = bedsList.begin(); it != bedsList.end(); ++it){
+			if((*it)->getSleeper() != 0){
+				(*it)->wakeUp();
 			}
 		}
 
@@ -242,27 +242,12 @@ bool House::transferToDepot()
 		return false;
 	}
 
-	Player* player = NULL;
-	// Empty house is just cleared.
-	if(houseOwner != 0) {
-		std::string ownerName;
-		if(IOPlayer::instance()->getNameByGuid(houseOwner, ownerName)){
-			player = g_game.getPlayerByName(ownerName);
-
-			if(!player){
-				player = new Player(ownerName, NULL);
-				if(!IOPlayer::instance()->loadPlayer(player, ownerName)){
-#ifdef __DEBUG__
-					std::cout << "Failure: [House::transferToDepot], can not load player: " << ownerName << std::endl;
-#endif
-					delete player;
-					player = NULL;
-				}
-			}
-		}
+	Player* player = player = g_game.getPlayerByGuidEx(houseOwner);
+	if(!player){
+		return false;
 	}
 
-	Depot* depot = player? player->getDepot(townid, true) : NULL;
+	Depot* depot = player->getDepot(townid, true);
 
 	std::list<Item*> moveItemList;
 	Container* tmpContainer = NULL;
@@ -315,17 +300,16 @@ void House::cleanHouse()
 			}	
 		}
 	}
-	while(to_kick.empty() == false) {
+	while(!to_kick.empty()){
 		Player* c = to_kick.back();
 		to_kick.pop_back();
 		kickPlayer(NULL, c->getName());
 	}
 
 	// we need to remove players from beds
-	HouseBedItemList::iterator bit;
-	for(bit = bedsList.begin(); bit != bedsList.end(); ++bit) {
-		if((*bit)->getSleeper() != 0) {
-			(*bit)->wakeUp(NULL);
+	for(HouseBedItemList::iterator it = bedsList.begin(); it != bedsList.end(); ++it){
+		if((*it)->getSleeper() != 0){
+			(*it)->wakeUp();
 		}
 	}
 }
@@ -1013,16 +997,9 @@ bool Houses::payHouse(House* house, time_t time)
 		return false;
 	}
 
-	Player* player = g_game.getPlayerByName(name);
+	Player* player = g_game.getPlayerByNameEx(name);
 	if(!player){
-		player = new Player(name, NULL);
-		if(!IOPlayer::instance()->loadPlayer(player, name)){
-#ifdef __DEBUG__
-			std::cout << "Failure: [Houses::payHouses], can not load player: " << name << std::endl;
-#endif
-			delete player;
-			return false;
-		}
+		return false;
 	}
 
 	// savePlayerHere is an ugly hack

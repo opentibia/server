@@ -131,12 +131,17 @@ CREATE TABLE "player_items" (
 
 CREATE TABLE "houses" (
     "id" SERIAL,
-    "owner" INT NOT NULL,
+    "townid" INT NOT NULL DEFAULT 0,
+    "name" VARCHAR(100) NOT NULL,
+    "rent" INT NOT NULL DEFAULT 0,
+    "guildhall" SMALLINT NOT NULL DEFAULT 0,
+    "doors" INT NOT NULL DEFAULT 0,
+    "beds" INT NOT NULL DEFAULT 0,
+    "owner" INT NOT NULL DEFAULT 0,
     "paid" BIGINT NOT NULL DEFAULT 0,
     "warnings" INT NOT NULL DEFAULT 0,
     "lastwarning" BIGINT NOT NULL DEFAULT 0,
-    "doors" INT NOT NULL DEFAULT 0,
-    "beds" INT NOT NULL DEFAULT 0,
+    "clear" SMALLINT NOT NULL DEFAULT 0,
     PRIMARY KEY ("id")
 );
 
@@ -164,6 +169,7 @@ CREATE TABLE "bans" (
 
 CREATE TABLE "tiles" (
     "id" SERIAL,
+	"house_id" INT NOT NULL,
     "x" INT(6) NOT NULL,
     "y" INT(6) NOT NULL,
     "z" INT(3) NOT NULL,

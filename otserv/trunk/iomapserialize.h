@@ -53,6 +53,11 @@ public:
 	*/
 	bool saveMap(Map* map);
 
+	/** Syncronize the house information from the map
+	  * \return Returns true if all houses where synced correctly
+	*/
+	bool syncronizeHouseInfo();
+
 	/** Load the house access list to a file/database
 	  * \param map pointer to the Map class
 	  * \return Returns true if the house access list was opened successfully
@@ -70,16 +75,17 @@ protected:
 	bool loadMapRelational(Map* map);
 	bool saveMapRelational(Map* map);
 	
+	bool saveItems(Database* db, uint32_t tileId, uint32_t houseId, const Tile* tile);
+	bool loadItems(Database* db, DBResult* result, Cylinder* parent, bool depotTransfer = false);
+
 	// Binary storage uses a giant BLOB field for storing everything
 	bool loadMapBinary(Map* map);
 	bool saveMapBinary(Map* map);
 
 	bool saveItem(PropWriteStream& stream, const Item* item);
 	bool saveTile(PropWriteStream& stream, const Tile* tile);
-	bool loadItem(PropStream& propStream, Cylinder* parent);
+	bool loadItem(PropStream& propStream, Cylinder* parent, bool depotTransfer = false);
 	bool loadContainer(PropStream& propStream, Container* container);
-	bool saveTile(Database* db, uint32_t tileId, const Tile* tile);
-	bool loadTile(Database& db, Tile* tile);
 };
 
 #endif

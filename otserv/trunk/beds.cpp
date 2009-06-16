@@ -119,26 +119,22 @@ bool BedItem::canUse(Player* player)
 	}
 	else if(sleeperGUID != 0){
 		if(house->getHouseAccessLevel(player) != HOUSE_OWNER){
-			std::string name;
 
-			if(IOPlayer::instance()->getNameByGuid(sleeperGUID, name)){
-				Player* sleeper = new Player(name, NULL);
+			Player* sleeper = g_game.getPlayerByGuidEx(sleeperGUID);
 
-				if(IOPlayer::instance()->loadPlayer(sleeper, name)){
-					// compares house access of the kicker (player) to the sleeper
-					// kicker can only kick if he has greater or equal access to the house
-					// IE: Guest cannot kick sub-owner, sub-owner can kick guest; sub-owner cannot kick owner, owner can kick sub-owner
-					if(house->getHouseAccessLevel(sleeper) <= house->getHouseAccessLevel(player)){
-						delete sleeper;
-						sleeper = NULL;
-						return isBed();
-					}
-				}
-
-				delete sleeper;
-				sleeper = NULL;
+			bool result = false;
+			// compares house access of the kicker (player) to the sleeper
+			// kicker can only kick if he has greater or equal access to the house
+			// IE: Guest cannot kick sub-owner, sub-owner can kick guest; sub-owner cannot kick owner, owner can kick sub-owner
+			if(house->getHouseAccessLevel(sleeper) <= house->getHouseAccessLevel(player)){
+				result = true;
 			}
-			return false;
+
+			if(sleeper->isOffline()){
+				delete sleeper;
+			}
+
+			return result;
 		}
 	}
 
@@ -153,7 +149,7 @@ void BedItem::sleep(Player* player)
 
 	if(sleeperGUID != 0){
 		g_game.addMagicEffect(this->getPosition(), NM_ME_PUFF);
-		wakeUp(g_game.getPlayerByID(sleeperGUID));
+		wakeUp();
 	}
 	else{
 		internalSetSleeper(player);
@@ -178,30 +174,26 @@ void BedItem::sleep(Player* player)
 	}
 }
 
-void BedItem::wakeUp(Player* player)
+void BedItem::wakeUp()
 {
 	if(house == NULL){
 		return;
 	}
 
 	if(sleeperGUID != 0){
-		if((player == NULL)){
-			std::string name;
-			if(IOPlayer::instance()->getNameByGuid(sleeperGUID, name)){
-				Player* _player = new Player(name, NULL);
+		Player* player = g_game.getPlayerByGuidEx(sleeperGUID);
 
-				if(IOPlayer::instance()->loadPlayer(_player, name)){
-					regeneratePlayer(_player);
-					IOPlayer::instance()->savePlayer(_player);
-				}
-
-				delete _player;
-				_player = NULL;
-			}
-		}
-		else{
+		if(player){
 			regeneratePlayer(player);
-			g_game.addCreatureHealth(player);
+
+			if(player->isOffline()){
+				IOPlayer::instance()->savePlayer(player);
+				delete player;
+				player = NULL;
+			}
+			else{
+				g_game.addCreatureHealth(player);
+			}
 		}
 	}
 

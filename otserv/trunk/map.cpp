@@ -93,9 +93,9 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	delete loader;
 
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
+	IOMapSerialize->syncronizeHouseInfo();
 	IOMapSerialize->loadHouseInfo(this);
 	IOMapSerialize->loadMap(this);
-
 	return true;
 }
 

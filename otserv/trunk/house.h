@@ -179,6 +179,9 @@ public:
 	void setGuildHall(bool _guildHall) {guildHall = _guildHall;}
 	bool isGuildHall() const {return guildHall;}
 
+	void setPendingDepotTransfer(bool _pendingDepotTransfer) {pendingDepotTransfer = _pendingDepotTransfer;}
+	bool getPendingDepotTransfer() const {return pendingDepotTransfer;}
+
 	uint32_t getHouseId() const {return houseid;}
 
 	void addDoor(Door* door);
@@ -229,6 +232,7 @@ private:
 	uint32_t rent;
 	uint32_t townid;
 	bool guildHall;
+	bool pendingDepotTransfer;
 
 	HouseTransferItem* transferItem;
 	Container transfer_container;

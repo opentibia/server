@@ -87,12 +87,17 @@ CREATE TABLE "guild_ranks" (
 
 CREATE TABLE "houses" (
     "id" INTEGER PRIMARY KEY,
-    "owner" INTEGER NOT NULL,
+    "townid" INTEGER NOT NULL DEFAULT 0,
+    "name" VARCHAR(100) NOT NULL,
+    "rent" INTEGER NOT NULL DEFAULT 0,
+    "guildhall" BOOLEAN NOT NULL DEFAULT 0,
+    "doors" INTEGER NOT NULL DEFAULT 0,
+    "beds" INTEGER NOT NULL DEFAULT 0,
+    "owner" INTEGER NOT NULL DEFAULT 0,
     "paid" INTEGER NOT NULL DEFAULT 0,
     "warnings" INTEGER NOT NULL DEFAULT 0,
     "lastwarning" INTEGER NOT NULL DEFAULT 0,
-    "doors" INTEGER NOT NULL DEFAULT 0,
-    "beds" INTEGER NOT NULL DEFAULT 0
+    "clear" BOOLEAN NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "house_lists" (
@@ -166,6 +171,7 @@ CREATE TABLE "player_viplist" (
 
 CREATE TABLE "tiles" (
     "id" INTEGER PRIMARY KEY,
+	"house_id" INTEGER NOT NULL
     "x" INTEGER NOT NULL,
     "y" INTEGER NOT NULL,
     "z" INTEGER NOT NULL

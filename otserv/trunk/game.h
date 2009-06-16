@@ -191,6 +191,35 @@ public:
 	Player* getPlayerByName(const std::string& s);
 
 	/**
+	  * Returns a player based on a string name identifier
+	  * this function returns a pointer even if the player is offline,
+	  * it is up to the caller of the function to delete the pointer - if the player is offline
+	  * use isOffline() to determine if the player was offline
+	  * \param s is the name identifier
+	  * \return A Pointer to the player
+	  */
+	Player* getPlayerByNameEx(const std::string& s);
+
+	/**
+	  * Returns a player based on a guid identifier
+	  * this function returns a pointer even if the player is offline,
+	  * it is up to the caller of the function to delete the pointer - if the player is offline
+	  * use isOffline() to determine if the player was offline
+	  * \param guid is the identifier
+	  * \return A Pointer to the player
+	  */
+	Player* getPlayerByGuid(uint32_t guid);
+
+	/**
+	  * Returns a player based on a guid identifier
+	  * this function returns a pointer even if the player is offline,
+	  * it is up to the caller of the function to delete the pointer - if the player is offline
+	  * use isOffline() to determine if the player was offline
+	  * \param guid is the identifier
+	  */
+	Player* getPlayerByGuidEx(uint32_t guid);
+
+	/**
 	  * Returns a player based on a string name identifier, with support for the "~" wildcard.
 	  * \param s is the name identifier, with or without wildcard
 	  * \param player will point to the found player (if any)

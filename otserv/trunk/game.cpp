@@ -530,6 +530,68 @@ Player* Game::getPlayerByName(const std::string& s)
 	return NULL; //just in case the player doesnt exist
 }
 
+Player* Game::getPlayerByNameEx(const std::string& s)
+{
+	Player* player = getPlayerByName(s);
+	if(player){
+		return player;
+	}
+
+	if(IOPlayer::instance()->playerExists(s)){
+		player = new Player(s, NULL);
+		if(!IOPlayer::instance()->loadPlayer(player, s)){
+#ifdef __DEBUG__
+			std::cout << "Failure: [Game::getPlayerByNameEx], can not load player: " << s << std::endl;
+#endif
+			delete player;
+			player = NULL;
+		}
+
+		return NULL;
+	}
+
+	return NULL;
+}
+
+Player* Game::getPlayerByGuid(uint32_t guid)
+{
+	if(guid == 0){
+		return NULL;
+	}
+
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(!(*it).second->isRemoved()){
+			if((*it).second->getGUID() == guid){
+				(*it).second;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+Player* Game::getPlayerByGuidEx(uint32_t guid)
+{
+	Player* player = getPlayerByGuid(guid);
+	if(player){
+		return player;
+	}
+
+	std::string name;
+	if(IOPlayer::instance()->getNameByGuid(guid, name)){
+		player = new Player(name, NULL);
+		if(!IOPlayer::instance()->loadPlayer(player, name)){
+#ifdef __DEBUG__
+			std::cout << "Failure: [Game::getPlayerByGuidEx], can not load player: " << name << std::endl;
+#endif
+			delete player;
+			player = NULL;
+		}
+	}
+
+	return player;
+}
+
 ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player* &player)
 {
 	player = NULL;

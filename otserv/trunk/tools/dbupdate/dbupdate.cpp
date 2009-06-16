@@ -545,7 +545,7 @@ SimpleUpdateQuery updateQueries[] = {
 			"ALTER TABLE `players` ADD `online` BOOLEAN NOT NULL DEFAULT 0;",
 			NULL
 		}
-	}
+	},
 	{ 14,
 		{ // PgSql
 			"ALTER TABLE `player_depotitems` DROP COLUMN `depotid`;",
@@ -560,6 +560,59 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		}
 	},
+	{ 15,
+		{ // PgSql
+			"ALTER TABLE `houses` ADD `name` VARCHAR(100);",
+			"ALTER TABLE `houses` ALTER COLUMN `name` SET NOT NULL;", 
+
+			"ALTER TABLE `houses` ADD `townid` INT;",
+			"ALTER TABLE `houses` ALTER COLUMN `townid` SET NOT NULL;", 
+			"ALTER TABLE `houses` ALTER COLUMN `townid` SET DEFAULT 0;",
+
+			"ALTER TABLE `houses` ADD `rent` INT;",
+			"ALTER TABLE `houses` ALTER COLUMN `rent` SET NOT NULL;", 
+			"ALTER TABLE `houses` ALTER COLUMN `rent` SET DEFAULT 0;",
+
+			"ALTER TABLE `houses` ADD `guildhall` SMALLINT;",
+			"ALTER TABLE `houses` ALTER COLUMN `guildhall` SET NOT NULL;", 
+			"ALTER TABLE `houses` ALTER COLUMN `guildhall` SET DEFAULT 0;",
+
+			"ALTER TABLE `houses` ADD `clear` SMALLINT;",
+			"ALTER TABLE `houses` ALTER COLUMN `clear` SET NOT NULL;", 
+			"ALTER TABLE `houses` ALTER COLUMN `clear` SET DEFAULT 0;",
+
+			"ALTER TABLE `houses` ALTER COLUMN `owner` SET DEFAULT 0;",
+
+			"ALTER TABLE `tiles` ADD `house_id` INT;",
+			"ALTER TABLE `tiles` ALTER COLUMN `house_id` SET NOT NULL;", 
+			"ALTER TABLE `tiles` ALTER COLUMN `house_id` SET DEFAULT 0;",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `houses` ADD COLUMN `name` VARCHAR(100) NOT NULL;",
+			"ALTER TABLE `houses` ADD COLUMN `townid` INTEGER UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD COLUMN `rent` INTEGER UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD COLUMN `guildhall` TINYINT UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD COLUMN `clear` TINYINT UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` MODIFY COLUMN `owner` INTEGER NOT NULL DEFAULT 0;",
+
+			"ALTER TABLE `tiles` ADD COLUMN `house_id` INTEGER UNSIGNED NOT NULL DEFAULT 0;",
+			NULL
+		},
+		{ // Sqlite
+			/*
+			sqlite not support the change of `owner` to default 0 so these changes would not matter anyway
+			"ALTER TABLE `houses` ADD COLUMN `name` VARCHAR(100) NOT NULL;",
+			"ALTER TABLE `houses` ADD `townid` INTEGER NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD `rent` INTEGER NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD `guildhall` BOOLEAN NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD `clear` BOOLEAN NOT NULL DEFAULT 0;",
+
+			"ALTER TABLE `tiles` ADD `house_id` INTEGER NOT NULL DEFAULT 0;",
+			*/
+			NULL
+		}
+	}
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
