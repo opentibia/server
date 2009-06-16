@@ -544,10 +544,8 @@ Player* Game::getPlayerByNameEx(const std::string& s)
 			std::cout << "Failure: [Game::getPlayerByNameEx], can not load player: " << s << std::endl;
 #endif
 			delete player;
-			player = NULL;
+			return NULL;
 		}
-
-		return NULL;
 	}
 
 	return player;
