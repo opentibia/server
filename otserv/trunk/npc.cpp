@@ -355,6 +355,9 @@ uint32_t Npc::loadParams(xmlNodePtr node)
 			else if(asLowerCaseString(*it) == "lowamount"){
 				params |= RESPOND_LOWAMOUNT;
 			}
+			else if(asLowerCaseString(*it) == "enoughamount"){
+				params |= RESPOND_ENOUGHAMOUNT;
+			}
 			else if(asLowerCaseString(*it) == "premium"){
 				params |= RESPOND_PREMIUM;
 			}
@@ -372,6 +375,15 @@ uint32_t Npc::loadParams(xmlNodePtr node)
 			}
 			else if(asLowerCaseString(*it) == "lowlevel"){
 				params |= RESPOND_LOWLEVEL;
+			}
+			else if(asLowerCaseString(*it) == "highlevel"){
+				params |= RESPOND_HIGHLEVEL;
+			}
+			else if(asLowerCaseString(*it) == "knowspell"){
+				params |= RESPOND_KNOWSPELL;
+			}
+			else if(asLowerCaseString(*it) == "canlearnspell"){
+				params |= RESPOND_CANLEARNSPELL;
 			}
 			else{
 				std::cout << "Warning: [Npc::loadParams] Unknown param " << (*it) << std::endl;
@@ -2114,6 +2126,38 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				++matchCount;
 			}
 
+			if(hasBitSet(RESPOND_HIGHLEVEL, params)){
+				if((int32_t)player->getLevel() < npcState->level){
+					continue;
+				}
+				++matchCount;
+			}
+
+			if(hasBitSet(RESPOND_KNOWSPELL, params)){
+				if(!player->hasLearnedInstantSpell(npcState->spellName))
+					continue;
+				++matchCount;
+			}
+
+			if(hasBitSet(RESPOND_CANLEARNSPELL, params)){
+				Spell* spell = g_spells->getInstantSpellByName(npcState->spellName);
+				
+				if(!spell)
+					continue;
+				
+				if(player->getLevel() < spell->getLevel())
+					continue;
+
+				if(player->getMagicLevel() < spell->getMagicLevel())
+					continue;
+				
+				if(spell->isPremium())
+					if(player->isPremium())
+						continue;
+
+				++matchCount;
+			}
+
 			if(hasBitSet(RESPOND_LOWMONEY, params)){
 				int32_t moneyCount = g_game.getMoney(player);
 				if(moneyCount >= (npcState->price * npcState->amount)){
@@ -2130,25 +2174,30 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				++matchCount;
 			}
 
-			if(hasBitSet(RESPOND_LOWAMOUNT, params) || hasBitSet(RESPOND_NOAMOUNT, params)){
+			if(hasBitSet(RESPOND_LOWAMOUNT, params) || hasBitSet(RESPOND_NOAMOUNT, params) || hasBitSet(RESPOND_ENOUGHAMOUNT, params)){
 				int32_t itemCount = player->__getItemTypeCount(npcState->itemId);
 
-				if(itemCount >= npcState->amount){
+				if(hasBitSet(RESPOND_ENOUGHAMOUNT, params)) {
+					if(itemCount < npcState->amount){
+						continue;
+					}
+				}
+				else if(itemCount >= npcState->amount) {
 					continue;
-				}
 
-				if(hasBitSet(RESPOND_LOWAMOUNT, params)){
-					if(npcState->amount == 1){
-						continue;
+					if(hasBitSet(RESPOND_LOWAMOUNT, params)){
+						if(npcState->amount == 1){
+							continue;
+						}
+						++matchCount;
 					}
-					++matchCount;
-				}
 
-				if(hasBitSet(RESPOND_NOAMOUNT, params)){
-					if(npcState->amount > 1){
-						continue;
+					if(hasBitSet(RESPOND_NOAMOUNT, params)){
+						if(npcState->amount > 1){
+							continue;
+						}
+						++matchCount;
 					}
-					++matchCount;
 				}
 			}
 		}
@@ -2503,6 +2552,22 @@ std::string Npc::formatResponse(Creature* creature, const NpcState* npcState, co
 	replaceString(responseString, "|S1|", npcState->scriptVars.s1);
 	replaceString(responseString, "|S2|", npcState->scriptVars.s2);
 	replaceString(responseString, "|S3|", npcState->scriptVars.s3);
+
+
+	replaceString(responseString, "|SPELLNAME|", npcState->spellName);
+	if(npcState->spellName != ""){
+		Spell* spell = g_spells->getInstantSpellByName(npcState->spellName);
+
+		if(spell){
+			ss.str("");
+			ss << spell->getMagicLevel();
+			replaceString(responseString, "|SPELLMAGLEVEL|", ss.str());
+
+			ss.str("");
+			ss << spell->getLevel();
+			replaceString(responseString, "|SPELLLEVEL|", ss.str());
+		}
+	}
 
 	ss.str("");
 	if(npcState->itemId != -1){
