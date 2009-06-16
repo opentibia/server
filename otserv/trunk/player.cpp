@@ -4094,14 +4094,17 @@ bool Player::canWearOutfit(uint32_t outfitId, uint32_t addons)
 
 bool Player::addOutfit(uint32_t outfitId, uint32_t addons)
 {
-	OutfitMap::iterator it = outfits.find(outfitId);
-	if(it != outfits.end()){
-		outfits[outfitId].addons = it->second.addons | addons;
-		return true;
-	}
-
 	Outfit outfit;
 	if(Outfits::getInstance()->getOutfit(outfitId, getSex(), outfit)){
+
+		OutfitMap::iterator it = outfits.find(outfitId);
+		if(it != outfits.end()){
+			outfit.addons |= it->second.addons;
+			outfit.addons |= addons;
+			outfits[outfitId] = outfit;
+			return true;
+		}
+
 		outfit.addons |= addons;
 		outfits[outfitId] = outfit;
 		return true;
