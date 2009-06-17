@@ -1939,17 +1939,11 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos, uint32_
 	Tile* toTile = getTile(newPos.x, newPos.y, newPos.z);
 	if(toTile){
 		if(Creature* creature = thing->getCreature()){
-			if(Player* player = creature->getPlayer()){
-				if(!player->hasFlag(PlayerFlag_CanEditHouses)){
-					HouseTile* houseTile = toTile->getHouseTile();
-					if(houseTile){
-						House* house = houseTile->getHouse();
-						if(house && !house->isInvited(player)){
-							return RET_NOTPOSSIBLE;
-						}
-					}
-				}
+			ReturnValue ret = toTile->__queryAdd(0, creature, 1, FLAG_NOLIMIT);
+			if(ret != RET_NOERROR){
+				return ret;
 			}
+
 			creature->getTile()->moveCreature(creature, toTile, true);
 			return RET_NOERROR;
 		}
