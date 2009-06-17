@@ -193,7 +193,6 @@ enum passwordType_t{
 	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
 	#pragma warning(disable:4244) //'argument' : conversion from 'type1' to 'type2', possible loss of data
 	#pragma warning(disable:4267) //'var' : conversion from 'size_t' to 'type', possible loss of data
-	#pragma warning(disable:4018) //'expression' : signed/unsigned mismatch
 
 #endif
 

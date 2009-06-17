@@ -4205,7 +4205,7 @@ int LuaScriptInterface::luaGetPlayerItemCount(lua_State *L)
 	int32_t subtype = -1;
 
 	if(lua_gettop(L) > 2)
-		subtype = popNumber();
+		subtype = popNumber(L);
 
 	uint32_t itemId = (uint32_t)popNumber(L);
 	uint32_t cid = popNumber(L);

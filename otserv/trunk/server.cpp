@@ -129,7 +129,7 @@ std::string ServicePort::get_protocol_names() const
 	if(m_services.empty())
 		return "";
 	std::string str = m_services.front()->get_protocol_name();
-	for(int i = 1; i < m_services.size(); ++i){
+	for(uint32_t i = 1; i < m_services.size(); ++i){
 		str += ", ";
 		str += m_services[i]->get_protocol_name();
 	}

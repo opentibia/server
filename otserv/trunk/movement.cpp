@@ -337,7 +337,7 @@ uint32_t MoveEvents::onCreatureMove(Creature* creature, const Tile* fromTile, co
 		}
 
 		//We can not use iterators here since the scripts can invalidate the iterator
-		for(int32_t i = 0; i < m_lastCacheItemVector.size(); ++i){
+		for(uint32_t i = 0; i < m_lastCacheItemVector.size(); ++i){
 			tileItem = m_lastCacheItemVector[i];
 			if(tileItem){
 				moveEvent = getEvent(tileItem, eventType);
@@ -421,7 +421,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		}
 
 		//We can not use iterators here since the scripts can invalidate the iterator
-		for(int32_t i = 0; i < m_lastCacheItemVector.size(); ++i){
+		for(uint32_t i = 0; i < m_lastCacheItemVector.size(); ++i){
 			tileItem = m_lastCacheItemVector[i];
 			if(tileItem && tileItem != item){
 				moveEvent = getEvent(tileItem, eventType2);

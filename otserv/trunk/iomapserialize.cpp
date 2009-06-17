@@ -488,7 +488,7 @@ bool IOMapSerialize::loadContainer(PropStream& propStream, Container* container)
 		container->serializationCount--;
 	}
 
-	uint8_t endAttr;
+	uint8_t endAttr = 0;
 	propStream.GET_UCHAR(endAttr);
 
 	if(endAttr != 0x00){
@@ -733,7 +733,7 @@ bool IOMapSerialize::syncronizeHouseInfo()
 		query.str("");
 		query << "SELECT * FROM `houses` WHERE `id` = " << house->getHouseId();
 		DBResult* result;
-		if(result = db->storeQuery(query.str())){
+		if((result = db->storeQuery(query.str()))){
 			db->freeResult(result);
 
 			query.str("");

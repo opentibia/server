@@ -3243,7 +3243,7 @@ int NpcScriptInterface::luaDoSellItem(lua_State *L)
 		}
 	}
 	else{
-		for(int32_t i = 0; i < amount; ++i){
+		for(uint32_t i = 0; i < amount; ++i){
 			Item* item = Item::CreateItem(it.id, subType);
 			if(item && actionId != 0){
 				item->setActionId(actionId);
