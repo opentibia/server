@@ -548,11 +548,11 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 14,
 		{ // PgSql
-			"ALTER TABLE `player_depotitems` DROP COLUMN `depotid`;",
+			"ALTER TABLE `player_depotitems` DROP COLUMN `depot_id`;",
 			NULL
 		},
 		{ // MySql
-			"ALTER TABLE `player_depotitems` DROP COLUMN `depotid`;",
+			"ALTER TABLE `player_depotitems` DROP COLUMN `depot_id`;",
 			NULL
 		},
 		{ // Sqlite
@@ -661,7 +661,7 @@ bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
 	return transaction.commit();
 }
 
-void ErrorMessage(const char* message) {
+void ErrorMessage(const std::string& message) {
 	std::cout << std::endl << std::endl << "Error: " << message;
 	if(wait_for_input){
 		std::cin.ignore();
@@ -721,7 +721,7 @@ int main(int argn, const char* argv[]){
 		schema_version = result->getDataInt("version");
 
 		if(schema_version == 0 || schema_version > 2){
-			ErrorMessage("Not valid schema version!");
+			ErrorMessage("Invalid schema version! (1)");
 			return -1;
 		}
 	}
@@ -729,7 +729,7 @@ int main(int argn, const char* argv[]){
 		schema_version = result->getDataInt("value");
 
 		if(schema_version == 0 || schema_version > CURRENT_SCHEMA_VERSION){
-			ErrorMessage("Not valid schema version!");
+			ErrorMessage("Invalid schema version! (2) - " + result->getDataString("value"));
 			return -1;
 		}
 	}
