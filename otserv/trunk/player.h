@@ -198,7 +198,7 @@ public:
 	uint32_t getTown() const {return town;}
 	void setTown(uint32_t _town) {town = _town;}
 
-    bool isLoginAttackLocked(uint32_t attackerId) const;
+	bool isLoginAttackLocked(uint32_t attackerId) const;
 
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};

@@ -525,10 +525,21 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 
 			if(readXMLInteger(node, "topic", intValue)){
 				prop.topic = intValue;
+			} else if(readXMLInteger(node, "nottopic", intValue)){
+				prop.topic = intValue;
+				prop.params |= RESPOND_NOTTOPIC;
 			}
 
 			if(readXMLInteger(node, "focus", intValue)){
 				prop.focusStatus = intValue;
+			}
+
+			if(readXMLInteger(node, "haveitem", intValue)){
+				prop.haveItemId = intValue;
+			}
+
+			if(readXMLInteger(node, "donthaveitem", intValue)){
+				prop.dontHaveItemId = intValue;
 			}
 
 			if(readXMLInteger(node, "storageId", intValue)){
@@ -2247,7 +2258,21 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			++matchCount;
 		}
 
-		if((*it)->getStorageId() != -1){
+		if((*it)->getHaveItemID() != 0){
+			int32_t itemCount = player->__getItemTypeCount((*it)->getHaveItemID());
+			if(itemCount == 0)
+				continue;
+			++matchCount;
+		}
+
+		if((*it)->getDontHaveItemID() != 0){
+			int32_t itemCount = player->__getItemTypeCount((*it)->getDontHaveItemID());
+			if(itemCount > 0)
+				continue;
+			++matchCount;
+		}
+
+		if((*it)->getStorageId() != -1){;
 			int32_t playerStorageValue = -1;
 			if(!player->getStorageValue((*it)->getStorageId(), playerStorageValue)){
 				playerStorageValue = -1;

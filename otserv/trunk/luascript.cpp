@@ -1079,7 +1079,7 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerVocation(cid)
 	lua_register(m_luaState, "getPlayerVocation", LuaScriptInterface::luaGetPlayerVocation);
 
-	//getPlayerItemCount(cid, itemid)
+	//getPlayerItemCount(cid, itemid, subtype)
 	lua_register(m_luaState, "getPlayerItemCount", LuaScriptInterface::luaGetPlayerItemCount);
 
 	//getPlayerSoul(cid)
@@ -4200,7 +4200,13 @@ int LuaScriptInterface::luaDoPlayerAddSoul(lua_State *L)
 
 int LuaScriptInterface::luaGetPlayerItemCount(lua_State *L)
 {
-	//getPlayerItemCount(cid, itemid)
+	//getPlayerItemCount(cid, itemid, subtype)
+	
+	int32_t subtype = -1;
+
+	if(lua_gettop(L) > 2)
+		subtype = popNumber();
+
 	uint32_t itemId = (uint32_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -4208,7 +4214,7 @@ int LuaScriptInterface::luaGetPlayerItemCount(lua_State *L)
 
 	const Player* player = env->getPlayerByUID(cid);
 	if(player){
-		uint32_t n = player->__getItemTypeCount(itemId);
+		uint32_t n = player->__getItemTypeCount(itemId, subtype);
 		lua_pushnumber(L, n);
 	}
 	else{

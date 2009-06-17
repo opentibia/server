@@ -155,6 +155,8 @@ enum RespondParam_t{
 	RESPOND_HIGHLEVEL    =  0x4000,
 	RESPOND_KNOWSPELL    =  0x8000,
 	RESPOND_CANLEARNSPELL= 0x10000,
+	RESPOND_PROMOTED     = 0x20000,
+	RESPOND_NOTTOPIC     = 0x40000,
 };
 
 enum ResponseType_t{
@@ -310,6 +312,8 @@ public:
 			topic = -1;
 			amount = -1;
 			focusStatus = -1;
+			haveItemId = 0;
+			dontHaveItemId = 0;
 			output = "";
 			interactType = INTERACT_TEXT;
 			responseType = RESPONSE_DEFAULT;
@@ -327,6 +331,8 @@ public:
 		int32_t topic;
 		int32_t amount;
 		int32_t focusStatus;
+		uint16_t haveItemId;
+		uint16_t dontHaveItemId;
 		std::list<std::string> inputList;
 		std::string output;
 		InteractType_t interactType;
@@ -376,6 +382,8 @@ public:
 	std::string getInputText() const {return (prop.inputList.empty() ? "" : *prop.inputList.begin());}
 	int32_t getTopic() const {return prop.topic;}
 	int32_t getFocusState() const {return prop.focusStatus;}
+	int32_t getHaveItemID() const {return prop.haveItemId;}
+	int32_t getDontHaveItemID() const {return prop.dontHaveItemId;}
 	int32_t getStorageId() const {return prop.storageId;}
 	int32_t getStorageValue() const {return prop.storageValue;}
 	ConditionType_t getCondition() const {return prop.condition;}
