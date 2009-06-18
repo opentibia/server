@@ -359,7 +359,7 @@ public:
 
 	void addCombatExhaust(uint32_t ticks);
 	void addHealExhaust(uint32_t ticks);
-	void addInFightTicks(bool pzlock = false);
+	void addInFightTicks(uint32_t ticks, bool pzlock = false);
 	void addDefaultRegeneration(uint32_t addTicks);
 
 	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;

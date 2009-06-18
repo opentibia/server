@@ -2425,10 +2425,10 @@ void Player::addHealExhaust(uint32_t ticks)
 	}
 }
 
-void Player::addInFightTicks(bool pzlock /*= false*/)
+void Player::addInFightTicks(uint32_t ticks, bool pzlock /*= false*/)
 {
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, g_game.getInFightTicks(), 0);
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, ticks, 0);
 		addCondition(condition);
 		if(pzlock)
 			pzLocked = true;
@@ -3653,7 +3653,7 @@ void Player::onAttackedCreature(Creature* target)
 			}
 		}
 
-		addInFightTicks();
+		addInFightTicks(g_game.getInFightTicks());
 	}
 }
 
@@ -3662,7 +3662,7 @@ void Player::onAttacked()
 	Creature::onAttacked();
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
-		addInFightTicks();
+		addInFightTicks(g_game.getInFightTicks());
 	}
 }
 
@@ -3743,9 +3743,7 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 #endif
 
 			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT) && lastHit){
-				pzLocked = true;
-				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, g_config.getNumber(ConfigManager::SKULL_TIME), 0);
-				addCondition(condition);
+				addInFightTicks(g_config.getNumber(ConfigManager::SKULL_TIME), true);
 			}
 		}
 	}
@@ -4096,7 +4094,6 @@ bool Player::addOutfit(uint32_t outfitId, uint32_t addons)
 {
 	Outfit outfit;
 	if(Outfits::getInstance()->getOutfit(outfitId, getSex(), outfit)){
-
 		OutfitMap::iterator it = outfits.find(outfitId);
 		if(it != outfits.end()){
 			outfit.addons |= it->second.addons;

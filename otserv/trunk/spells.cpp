@@ -852,7 +852,7 @@ void Spell::postCastSpell(Player* player, bool finishedCast /*= true*/, bool pay
 
 		if(!player->hasFlag(PlayerFlag_NotGainInFight)){
 			if(isAggressive){
-				player->addInFightTicks();
+				player->addInFightTicks(g_game.getInFightTicks());
 			}
 		}
 	}

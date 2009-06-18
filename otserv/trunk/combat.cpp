@@ -687,10 +687,10 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 			} else if(params.isAggressive){
 				const ItemType& it = Item::items[itemId];
 				if(!it.blockSolid){
-					p_caster->addInFightTicks(true);
+					p_caster->addInFightTicks(g_game.getInFightTicks(), true);
 				}
 				else{
-					p_caster->addInFightTicks();
+					p_caster->addInFightTicks(g_game.getInFightTicks());
 				}
 			}
 		}
