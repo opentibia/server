@@ -212,12 +212,14 @@ CREATE TABLE "killers" (
 CREATE TABLE "environment_killers" (
 	"kill_id" INT NOT NULL,
 	"name" VARCHAR(255) NOT NULL,
+    PRIMARY KEY ("kill_id", "name"),
     FOREIGN KEY ("kill_id") REFERENCES "killers" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "player_killers" (
 	"kill_id" INT NOT NULL,
 	"player_id" INT NOT NULL,
+    PRIMARY KEY ("kill_id", "player_id"),
     FOREIGN KEY ("kill_id") REFERENCES "killers" ("id") ON DELETE CASCADE,
     FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
 );
@@ -252,7 +254,6 @@ RETURNS TRIGGER
 AS $$
 BEGIN
     DELETE FROM "bans" WHERE "type" = 3 AND "value" = OLD."id";
-    DELETE FROM "players" WHERE "account_id" = OLD."id";
     RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
