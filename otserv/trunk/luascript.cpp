@@ -3441,13 +3441,44 @@ int LuaScriptInterface::luaGetTileItemByType(lua_State *L)
 		return 1;
 	}
 
-	for(uint32_t i = 0; i < tile->getThingCount(); ++i){
-		if(Item* item = tile->__getThing(i)->getItem()){
-			const ItemType& it = Item::items[item->getID()];
-			if(it.type == (ItemTypes_t) rType){
-				uint32_t uid = env->addThing(item);
-				pushThing(L, item, uid);
-				return 1;
+	bool notFound = false;
+	switch((ItemTypes_t) rType){
+		case ITEM_TYPE_TELEPORT:
+			if(!tile->hasFlag(TILESTATE_TELEPORT)){
+				notFound = true;
+			}
+			break;
+		case ITEM_TYPE_MAGICFIELD:
+			if(!tile->hasFlag(TILESTATE_MAGICFIELD)){
+				notFound = true;
+			}
+			break;
+		case ITEM_TYPE_MAILBOX:
+			if(!tile->hasFlag(TILESTATE_MAILBOX)){
+				notFound = false;
+			}
+			break;
+		case ITEM_TYPE_TRASHHOLDER:
+			if(!tile->hasFlag(TILESTATE_TRASHHOLDER)){
+				notFound = false;
+			}
+			break;
+		case ITEM_TYPE_BED:
+			if(!tile->hasFlag(TILESTATE_BED)){
+				notFound = true;
+			}
+			break;
+	}
+
+	if(!notFound){
+		for(uint32_t i = 0; i < tile->getThingCount(); ++i){
+			if(Item* item = tile->__getThing(i)->getItem()){
+				const ItemType& it = Item::items[item->getID()];
+				if(it.type == (ItemTypes_t) rType){
+					uint32_t uid = env->addThing(item);
+					pushThing(L, item, uid);
+					return 1;
+				}
 			}
 		}
 	}
