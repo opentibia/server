@@ -558,6 +558,7 @@ protected:
 	bool isIdle;
 	bool hasBusyReply;
 	bool hasScriptedFocus;
+	int32_t walkRadius;
 	int32_t talkRadius;
 	int32_t idleTime;
 	int32_t idleInterval;

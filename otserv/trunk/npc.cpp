@@ -126,6 +126,7 @@ void Npc::reset()
 {
 	loaded = false;
 	walkTicks = 1500;
+	walkRadius = -1;
 	floorChange = false;
 	attackable = false;
 	hasBusyReply = false;
@@ -214,6 +215,10 @@ bool Npc::loadFromXml(const std::string& filename)
 		if(readXMLInteger(root, "walkinterval", intValue)){
 			walkTicks = intValue;
 		}
+		if(readXMLInteger(root, "walkradius", intValue)){
+			walkRadius = intValue;
+		}
+
 		if(readXMLInteger(root, "autowalk", intValue)){
 			//Depricated attribute.
 			if(intValue == 0){
@@ -625,6 +630,11 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 
 					if(readXMLString(tmpNode, "text", strValue)){
 						prop.responseType = RESPONSE_DEFAULT;
+						replaceString(strValue, "&lt;", "<");
+						replaceString(strValue, "&gt;", ">");
+						replaceString(strValue, "&amp;", "&");
+						replaceString(strValue, "&apos;", "\\");
+						replaceString(strValue, "&quot;", "\"");
 						prop.output = strValue;
 					}
 					else if(readXMLString(tmpNode, "function", strValue)){
@@ -698,6 +708,19 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 
 					if(readXMLInteger(tmpNode, "b3", intValue)){
 						scriptVars.b3 = (intValue == 1);
+					}
+
+					if(readXMLInteger(tmpNode, "n1", intValue)){
+						scriptVars.n1 = intValue;
+					}
+
+					if(readXMLInteger(tmpNode, "n2", intValue)){
+						scriptVars.n2 = intValue;
+					}
+
+					if(readXMLInteger(tmpNode, "n3", intValue)){
+						scriptVars.n3 = intValue
+							;
 					}
 
 					ResponseList subResponseList;
@@ -1936,6 +1959,9 @@ bool Npc::getNextStep(Direction& dir)
 
 bool Npc::canWalkTo(const Position& fromPos, Direction dir)
 {
+	if(walkRadius == 0)
+		return false;
+
 	Position toPos = fromPos;
 
 	switch(dir){
@@ -1959,9 +1985,17 @@ bool Npc::canWalkTo(const Position& fromPos, Direction dir)
 			break;
 	}
 
-	bool result = Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos);
-	if(!result){
-		return false;
+	if(walkRadius != -1){
+		if ((toPos.x < getPosition().x - walkRadius) || (toPos.x > getPosition().x + walkRadius) &&
+			(toPos.y < getPosition().y - walkRadius) || (toPos.y > getPosition().y + walkRadius))
+		{
+			return false;
+		}
+	}
+	else{
+		if(!Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos)){
+			return false;
+		}
 	}
 
 	Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
@@ -2253,6 +2287,27 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		if((*it)->scriptVars.b3){
 			if(!npcState->scriptVars.b3){
+				continue;
+			}
+			++matchCount;
+		}
+
+		if((*it)->scriptVars.n1 != -1){
+			if(!npcState->scriptVars.n1){
+				continue;
+			}
+			++matchCount;
+		}
+
+		if((*it)->scriptVars.n2 != -1){
+			if(!npcState->scriptVars.n2){
+				continue;
+			}
+			++matchCount;
+		}
+
+		if((*it)->scriptVars.n3 != -1){
+			if(!npcState->scriptVars.n3){
 				continue;
 			}
 			++matchCount;
