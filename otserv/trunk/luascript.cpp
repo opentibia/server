@@ -4232,7 +4232,7 @@ int LuaScriptInterface::luaDoPlayerAddSoul(lua_State *L)
 int LuaScriptInterface::luaGetPlayerItemCount(lua_State *L)
 {
 	//getPlayerItemCount(cid, itemid, subtype)
-	
+
 	int32_t subtype = -1;
 
 	if(lua_gettop(L) > 2)

@@ -39,7 +39,7 @@ extern ConfigManager g_config;
 
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
 		#include "dbghelp.h"
-		
+
 		// based on dbghelp.h
 		typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
 			CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
@@ -49,8 +49,11 @@ extern ConfigManager g_config;
 		int ExceptionHandler::ref_counter = 0;
 
 	#elif __GNUC__
+		#define NOGDI
 		#include <excpt.h>
 		#include <tlhelp32.h>
+		#include <winbase.h>
+		#include <winuser.h>
 
 		unsigned long max_off;
 		unsigned long min_off;
@@ -218,7 +221,7 @@ bool ExceptionHandler::RemoveHandler()
 			GetLocalTime(&stLocalTime);
 
 			char dumpfile[250] = {'\0'};
-			sprintf(dumpfile, "%04d-%02d-%02d_%02d%02d%02d.dmp", 
+			sprintf(dumpfile, "%04d-%02d-%02d_%02d%02d%02d.dmp",
 				stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay,
 				stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond);
 
@@ -601,7 +604,7 @@ bool ExceptionHandler::RemoveHandler()
 	#endif
 
 //Unix/Linux
-#else 
+#else
 #define BACKTRACE_DEPTH 128
 void _SigHandler(int signum, siginfo_t *info, void* secret)
 {
