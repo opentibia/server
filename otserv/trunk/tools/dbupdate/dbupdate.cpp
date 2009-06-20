@@ -600,16 +600,21 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		},
 		{ // Sqlite
-			/*
-			sqlite not support the change of `owner` to default 0 so these changes would not matter anyway
-			"ALTER TABLE `houses` ADD COLUMN `name` VARCHAR(100) NOT NULL;",
-			"ALTER TABLE `houses` ADD `townid` INTEGER NOT NULL DEFAULT 0;",
-			"ALTER TABLE `houses` ADD `rent` INTEGER NOT NULL DEFAULT 0;",
-			"ALTER TABLE `houses` ADD `guildhall` BOOLEAN NOT NULL DEFAULT 0;",
-			"ALTER TABLE `houses` ADD `clear` BOOLEAN NOT NULL DEFAULT 0;",
-
-			"ALTER TABLE `tiles` ADD `house_id` INTEGER NOT NULL DEFAULT 0;",
-			*/
+			NULL
+		}
+	},
+	{ 16,
+		{ // PgSql
+			"ALTER TABLE `houses` ADD `price` INT;",
+			"ALTER TABLE `houses` ALTER COLUMN `price` SET NOT NULL;", 
+			"ALTER TABLE `houses` ALTER COLUMN `price` SET DEFAULT 0;",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `houses` ADD COLUMN `price` INTEGER UNSIGNED NOT NULL DEFAULT 0;",
+			NULL
+		},
+		{ // Sqlite
 			NULL
 		}
 	}

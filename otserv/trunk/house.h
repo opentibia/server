@@ -135,6 +135,14 @@ protected:
 class House
 {
 public:
+	enum syncflags_t{
+		HOUSE_SYNC_TOWNID		= 0,
+		HOUSE_SYNC_NAME			= 1 << 0,
+		HOUSE_SYNC_PRICE		= 1 << 1,
+		HOUSE_SYNC_RENT			= 1 << 2,
+		HOUSE_SYNC_GUILDHALL	= 1 << 3,
+	};
+
 	House(uint32_t _houseid);
 	~House();
 
@@ -166,6 +174,12 @@ public:
 
 	void setRent(uint32_t _rent){rent = _rent;}
 	uint32_t getRent() const {return rent;}
+
+	void setPrice(uint32_t _price){price = _price;}
+	uint32_t getPrice() const {return price;}
+
+	bool hasSyncFlag(syncflags_t flag) const {return ((syncFlags & (uint32_t)flag) == (uint32_t)flag);}
+	void resetSyncFlag(syncflags_t flag) {syncFlags &= ~(uint32_t)flag;}
 
 	void setLastWarning(time_t _lastWarning) {lastWarning = _lastWarning;}
 	time_t getLastWarning() {return lastWarning;}
@@ -229,9 +243,11 @@ private:
 	time_t paidUntil;
 	uint32_t rentWarnings;
 	time_t lastWarning;
+	uint32_t price;
 	uint32_t rent;
 	uint32_t townid;
 	bool guildHall;
+	uint32_t syncFlags;
 	bool pendingDepotTransfer;
 
 	HouseTransferItem* transferItem;

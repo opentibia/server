@@ -48,8 +48,10 @@ transfer_container(ITEM_LOCKER1)
 	houseid = _houseid;
 	rentWarnings = 0;
 	lastWarning = 0;
+	price = 0;
 	rent = 0;
 	townid = 0;
+	syncFlags = HOUSE_SYNC_TOWNID | HOUSE_SYNC_NAME | HOUSE_SYNC_PRICE | HOUSE_SYNC_RENT | HOUSE_SYNC_GUILDHALL;
 	transferItem = NULL;
 	guildHall = false;
 	pendingDepotTransfer = false;
@@ -856,10 +858,6 @@ bool Houses::loadHousesXML(std::string filename)
 					return false;
 				}
 
-				if(readXMLString(houseNode, "name", strValue)){
-					house->setName(strValue);
-				}
-
 				if(readXMLInteger(houseNode, "entryx", intValue)){
 					entryPos.x = intValue;
 				}
@@ -880,16 +878,39 @@ bool Houses::loadHousesXML(std::string filename)
 
 				house->setEntryPos(entryPos);
 
+				if(readXMLInteger(houseNode, "townid", intValue)){
+					house->setTownId(intValue);
+				}
+				else{
+					house->resetSyncFlag(House::HOUSE_SYNC_TOWNID);
+				}
+
+				if(readXMLString(houseNode, "name", strValue)){
+					house->setName(strValue);
+				}
+				else{
+					house->resetSyncFlag(House::HOUSE_SYNC_NAME);
+				}
+
+				if(readXMLInteger(houseNode, "price", intValue)){
+					house->setPrice(intValue);
+				}
+				else{
+					house->resetSyncFlag(House::HOUSE_SYNC_PRICE);
+				}
+
 				if(readXMLInteger(houseNode, "rent", intValue)){
 					house->setRent(intValue);
 				}
-
-				if(readXMLInteger(houseNode, "townid", intValue)){
-					house->setTownId(intValue);
+				else{
+					house->resetSyncFlag(House::HOUSE_SYNC_RENT);
 				}
 
 				if(readXMLInteger(houseNode, "guildhall", intValue)){
 					house->setGuildHall(intValue == 1);
+				}
+				else{
+					house->resetSyncFlag(House::HOUSE_SYNC_GUILDHALL);
 				}
 
 				house->setHouseOwner(0);

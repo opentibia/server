@@ -133,6 +133,7 @@ CREATE TABLE "houses" (
     "id" SERIAL,
     "townid" INT NOT NULL DEFAULT 0,
     "name" VARCHAR(100) NOT NULL,
+    "price" INT NOT NULL DEFAULT 0,
     "rent" INT NOT NULL DEFAULT 0,
     "guildhall" SMALLINT NOT NULL DEFAULT 0,
     "doors" INT NOT NULL DEFAULT 0,

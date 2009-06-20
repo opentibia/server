@@ -737,21 +737,42 @@ bool IOMapSerialize::syncronizeHouseInfo()
 			db->freeResult(result);
 
 			query.str("");
-			query << "UPDATE `houses` SET "
-				<< "`townid` = " << house->getTownId() << ", "
-				<< "`name` = " << db->escapeString(house->getName()) << ", "
-				<< "`rent` = " << house->getRent() << ", "
-				<< "`beds` = " << house->getHouseBedCount() << ", "
-				<< "`doors` = " << house->getHouseDoorCount()
-				<< " WHERE `id` = " << house->getHouseId();
+			query << "UPDATE `houses` SET ";
+
+			if(house->hasSyncFlag(House::HOUSE_SYNC_TOWNID)){
+				query << "`townid` = " << house->getTownId() << ", ";
+			}
+
+			if(house->hasSyncFlag(House::HOUSE_SYNC_NAME)){
+				query << "`name` = " << db->escapeString(house->getName()) << ", ";
+			}
+
+			if(house->hasSyncFlag(House::HOUSE_SYNC_PRICE)){
+				query << "`price` = " << house->getPrice() << ", ";
+			}
+
+			if(house->hasSyncFlag(House::HOUSE_SYNC_RENT)){
+				query << "`rent` = " << house->getRent() << ", ";
+			}
+
+			if(house->hasSyncFlag(House::HOUSE_SYNC_GUILDHALL)){
+				query << "`guildhall` = " << (house->isGuildHall() ? 1 : 0) << ", ";
+			}
+
+			query << "`beds` = " << house->getHouseBedCount() << ", ";
+			query << "`doors` = " << house->getHouseDoorCount();
+
+			query << " WHERE `id` = " << house->getHouseId();
 		}
 		else{
 			query.str("");
-			query << "INSERT INTO `houses` (`id`, `townid`, `name`, `rent`, `beds`, `doors`)" << "VALUES ("
+			query << "INSERT INTO `houses` (`id`, `townid`, `name`, `price`, `rent`, `guildhall`, `beds`, `doors`)" << "VALUES ("
 				<< house->getHouseId() << ", "
 				<< house->getTownId() << ", "
 				<< db->escapeString(house->getName()) << ", "
+				<< house->getPrice() << ", "
 				<< house->getRent() << ", "
+				<< (house->isGuildHall() ? 1 : 0) << ", "
 				<< house->getHouseBedCount() << ", "
 				<< house->getHouseDoorCount() << ")";
 		}
@@ -779,12 +800,14 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 		if(house){
 			int32_t ownerid = result->getDataInt("owner");
 			int32_t paid = result->getDataInt("paid");
+			uint32_t price = result->getDataInt("price");
 			int32_t payRentWarnings = result->getDataInt("warnings");
 			uint32_t lastWarning = result->getDataInt("lastwarning");
 			bool clear = (result->getDataInt("clear") != 0);
 
 			house->setHouseOwner(ownerid);
 			house->setPaidUntil(paid);
+			house->setPrice(price);
 			house->setPayRentWarnings(payRentWarnings);
 			house->setLastWarning(lastWarning);
 
