@@ -89,7 +89,7 @@ bool Event::call(Manager& state, Environment& environment, Listener_ptr listener
 	// Find out if the event should propagate
 	bool propagate = propagate_by_default;
 	thread->getField(-1, "skipped");
-	
+
 	if(thread->rawtypeOf() == LUA_TNIL){
 		// use default
 		thread->pop();
@@ -274,7 +274,7 @@ bool OnHear::Event::dispatch(Manager& state, Environment& environment)
 	return false;
 }
 
-void OnHear::Event::push_instance(LuaState& state, Environment& environment) 
+void OnHear::Event::push_instance(LuaState& state, Environment& environment)
 {
 	state.pushClassTableInstance("OnHearEvent");
 	state.pushThing(creature);
@@ -321,7 +321,7 @@ bool OnUseItem::Event::check_match(const ScriptInformation& info)
 	return false;
 }
 
-bool OnUseItem::Event::dispatch(Manager& state, Environment& environment) 
+bool OnUseItem::Event::dispatch(Manager& state, Environment& environment)
 {
 	// Extremely naive solution
 	// Should be a map with id:callback instead.
@@ -329,7 +329,7 @@ bool OnUseItem::Event::dispatch(Manager& state, Environment& environment)
 		(this, state, environment, environment.Generic.OnUseItem);
 }
 
-void OnUseItem::Event::push_instance(LuaState& state, Environment& environment) 
+void OnUseItem::Event::push_instance(LuaState& state, Environment& environment)
 {
 	state.pushClassTableInstance("OnUseItemEvent");
 	state.pushThing(user);
@@ -345,7 +345,7 @@ void OnUseItem::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "target");
 }
 
-void OnUseItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread) 
+void OnUseItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
 	thread->getField(-1, "retval");
 	if(thread->isNumber()) {
@@ -369,8 +369,8 @@ OnEquipItem::Event::Event(Player* user, Item* item, slots_t slot, bool equip) :
 	equip(equip)
 {
 	switch(slot){
-		case SLOT_HEAD: equipslot = SLOTP_HEAD;
-		case SLOT_NECKLACE: equipslot = SLOTP_NECKLACE;
+		case SLOT_HEAD: equipslot = SLOTP_HEAD; break;
+		case SLOT_NECKLACE: equipslot = SLOTP_NECKLACE; break;
 		case SLOT_BACKPACK: equipslot = SLOTP_BACKPACK; break;
 		case SLOT_ARMOR: equipslot = SLOTP_ARMOR; break;
 		case SLOT_RIGHT: equipslot = SLOTP_RIGHT; break;
@@ -881,7 +881,7 @@ OnSpotCreature::Event::~Event()
 {
 }
 
-bool OnSpotCreature::Event::dispatch(Manager& state, Environment& environment) 
+bool OnSpotCreature::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerList list = creature->getListeners(ON_SPOT_CREATURE_LISTENER);
 	if(dispatchEvent<OnSpotCreature::Event>
@@ -890,7 +890,7 @@ bool OnSpotCreature::Event::dispatch(Manager& state, Environment& environment)
 	return true;
 }
 
-void OnSpotCreature::Event::push_instance(LuaState& state, Environment& environment) 
+void OnSpotCreature::Event::push_instance(LuaState& state, Environment& environment)
 {
 	state.pushClassTableInstance("OnSpotCreatureEvent");
 	state.pushThing(creature);
@@ -920,7 +920,7 @@ OnLoseCreature::Event::~Event()
 {
 }
 
-bool OnLoseCreature::Event::dispatch(Manager& state, Environment& environment) 
+bool OnLoseCreature::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerList list = creature->getListeners(ON_LOSE_CREATURE_LISTENER);
 	if(dispatchEvent<OnLoseCreature::Event>
@@ -929,7 +929,7 @@ bool OnLoseCreature::Event::dispatch(Manager& state, Environment& environment)
 	return true;
 }
 
-void OnLoseCreature::Event::push_instance(LuaState& state, Environment& environment) 
+void OnLoseCreature::Event::push_instance(LuaState& state, Environment& environment)
 {
 	state.pushClassTableInstance("OnLoseCreatureEvent");
 	state.pushThing(creature);
