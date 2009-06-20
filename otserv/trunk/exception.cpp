@@ -49,12 +49,9 @@ extern ConfigManager g_config;
 		int ExceptionHandler::ref_counter = 0;
 
 	#elif __GNUC__
-		#define NOGDI
-        #include "otsystem.h"
+		#include "otsystem.h"
 		#include <excpt.h>
 		#include <tlhelp32.h>
-		#include <winbase.h>
-		#include <winuser.h>
 
 		unsigned long max_off;
 		unsigned long min_off;
