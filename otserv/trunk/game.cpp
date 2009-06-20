@@ -1985,7 +1985,7 @@ bool Game::playerMove(uint32_t playerId, Direction dir)
 		return false;
 	}
 
-	player->setIdleTime(0, false);
+	player->resetIdle();
 	player->setFollowCreature(NULL);
 	player->onWalk(dir);
 	return (internalMoveCreature(player, dir) == RET_NOERROR);
@@ -2227,7 +2227,7 @@ bool Game::playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir)
 	if(!player || player->isRemoved())
 		return false;
 
-	player->setIdleTime(0, false);
+	player->resetIdle();
 	player->setNextWalkTask(NULL);
 	return player->startAutoWalk(listDir);
 }
@@ -2317,7 +2317,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		showUseHotkeyMessage(player, item);
 	}
 
-	player->setIdleTime(0, false);
+	player->resetIdle();
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -2380,7 +2380,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		showUseHotkeyMessage(player, item);
 	}
 
-	player->setIdleTime(0, false);
+	player->resetIdle();
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -2456,7 +2456,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		showUseHotkeyMessage(player, item);
 	}
 
-	player->setIdleTime(0, false);
+	player->resetIdle();
 
 	if(!player->canDoAction()){
 		uint32_t delay = player->getNextActionTime();
@@ -3413,7 +3413,7 @@ bool Game::playerTurn(uint32_t playerId, Direction dir)
 	if(!player || player->isRemoved())
 		return false;
 		
-	player->setIdleTime(0, false);
+	player->resetIdle();
 	return internalCreatureTurn(player, dir);
 }
 
@@ -3461,7 +3461,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 		return false;
 	}
-
 
 	TalkActionResult_t result;
 	result = g_talkactions->onPlayerSpeak(player, type, text);
@@ -3652,39 +3651,6 @@ bool Game::playerSpeakToNpc(Player* player, const std::string& text)
 		}
 	}
 
-	return true;
-}
-
-bool Game::npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize)
-{
-	if(player != NULL)
-	{
-		player->sendCreatureSay(npc, SPEAK_PRIVATE_NP, text);
-		player->onCreatureSay(npc, SPEAK_PRIVATE_NP, text);
-	}
-	if(publicize)
-	{
-		SpectatorVec list;
-		SpectatorVec::iterator it;
-		getSpectators(list, npc->getPosition());
-
-		//send to client
-		Player* tmpPlayer = NULL;
-		for(it = list.begin(); it != list.end(); ++it){
-			tmpPlayer = (*it)->getPlayer();
-			if((tmpPlayer != NULL) && (tmpPlayer != player)){
-				tmpPlayer->sendCreatureSay(npc, SPEAK_SAY, text);
-			}
-		}
-
-		//event method
-		for(it = list.begin(); it != list.end(); ++it){
-			if((*it) != player)
-			{
-				(*it)->onCreatureSay(npc, SPEAK_SAY, text);
-			}
-		}
-	}
 	return true;
 }
 

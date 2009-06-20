@@ -540,7 +540,6 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
-	bool npcSpeakToPlayer(Npc* npc, Player* player, const std::string& text, bool publicize);
 	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
 	bool closeRuleViolation(Player* player);

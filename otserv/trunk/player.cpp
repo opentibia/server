@@ -1848,7 +1848,7 @@ void Player::setNextWalkActionTask(SchedulerTask* task)
 	}
 	delete walkTask;
 	walkTask = task;
-	setIdleTime(0, false);
+	resetIdle();
 }
 
 void Player::setNextWalkTask(SchedulerTask* task)
@@ -1860,7 +1860,7 @@ void Player::setNextWalkTask(SchedulerTask* task)
 
 	if(task){
 		nextStepEvent = g_scheduler.addEvent(task);
-		setIdleTime(0, false);
+		resetIdle();
 	}
 }
 
@@ -1873,7 +1873,7 @@ void Player::setNextActionTask(SchedulerTask* task)
 
 	if(task){
 		actionTaskEvent = g_scheduler.addEvent(task);
-		setIdleTime(0, false);
+		resetIdle();
 	}
 }
 

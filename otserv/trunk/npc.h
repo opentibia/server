@@ -471,7 +471,9 @@ public:
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};
 
-	void doSay(std::string msg, Player* focus = NULL, bool publicize = false);
+	void doSay(const std::string& text);
+	void doSayToPlayer(Player* player, const std::string& text);
+
 	void doMove(Direction dir);
 	void doTurn(Direction dir);
 	void doMoveTo(Position pos);

@@ -1773,10 +1773,10 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 			std::string responseString = formatResponse(player, npcState, response);
 			if(!responseString.empty()){
 				if(response->publicize()){
-					g_game.internalCreatureSay(this, SPEAK_SAY, responseString);
+					doSay(responseString);
 				}
 				else{
-					g_game.npcSpeakToPlayer(this, player, responseString, false);
+					doSayToPlayer(player, responseString);
 				}
 			}
 		}
@@ -1846,9 +1846,17 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 	}
 }
 
-void Npc::doSay(std::string msg, Player* focus /*= NULL*/, bool publicize /*= false*/)
+void Npc::doSay(const std::string& text)
 {
-	g_game.npcSpeakToPlayer(this, focus, msg, publicize);
+	g_game.internalCreatureSay(this, SPEAK_SAY, text);
+}
+
+void Npc::doSayToPlayer(Player* player, const std::string& text)
+{
+	if(player){
+		player->sendCreatureSay(this, SPEAK_PRIVATE_NP, text);
+		player->onCreatureSay(this, SPEAK_PRIVATE_NP, text);
+	}
 }
 
 void Npc::doMove(Direction dir)
@@ -2809,30 +2817,35 @@ int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 
 int NpcScriptInterface::luaActionSay(lua_State* L)
 {
-	//selfSay(words [[, target], send_to_all])
+	//selfSay(words [[, target], publicize])
 		// send_to_all defaults to true if there is no target, false otherwise
 	uint32_t parameters = lua_gettop(L);
 	uint32_t target = 0;
-	bool send_to_all = true;
+	bool publicize = true;
 
-	if(parameters == 3)
-	{
-		send_to_all = (popNumber(L) == LUA_TRUE);
+	if(parameters == 3){
+		publicize = (popNumber(L) == LUA_TRUE);
 		target = popNumber(L);
 	}
-	else if(parameters == 2)
-	{
+	else if(parameters == 2){
 		target = popNumber(L);
-		send_to_all = false;
+		publicize = false;
 	}
-	std::string msg(popString(L));
+
+	std::string text = popString(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 
 	Npc* npc = env->getNpc();
-	Player* focus = env->getPlayerByUID(target);
+	Player* player = env->getPlayerByUID(target);
+
 	if(npc){
-		npc->doSay(msg, focus, send_to_all);
+		if(publicize){
+			npc->doSay(text);
+		}
+		else{
+			npc->doSayToPlayer(player, text);
+		}
 	}
 
 	return 0;

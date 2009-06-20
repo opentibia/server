@@ -152,10 +152,7 @@ std::string Container::getContentDescription() const
 
 std::ostringstream& Container::getContentDescription(std::ostringstream& os) const
 {
-	std::list<const Container*> listContainer;
-	
 	bool firstitem = true;
-
 	Container* evil = const_cast<Container*>(this);
 	for(ContainerIterator cit = evil->begin(); cit != evil->end(); ++cit)
 	{
