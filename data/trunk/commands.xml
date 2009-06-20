@@ -17,12 +17,9 @@
 	<command cmd="/zt" access="3" />			<!-- Check tutorials -->
 
 	<!-- Gamemasters -->
-	<command cmd="/B" access="2" />				<!-- Red broadcast message -->
 	<command cmd="/info" access="2" />			<!-- Info about a player -->
 	<command cmd="/gethouse" access="2" />			<!-- Info about house of a player -->
 	<command cmd="/getonline" access="2" />			<!-- Info about how many players are online -->
-
-	<!-- Tutors -->
 
 	<!-- Players -->
 	<command cmd="/sellhouse" access="0" />			<!-- Sell your house to a player -->

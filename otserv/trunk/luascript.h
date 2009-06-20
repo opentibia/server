@@ -52,7 +52,7 @@ enum LUA_RET_CODE{
 	LUA_ERROR = -1,
 	LUA_TRUE = 1,
 	LUA_FALSE = 0,
-	LUA_NULL = 0,
+	LUA_NULL = NULL,
 };
 
 enum LuaVariantType_t{
@@ -201,10 +201,6 @@ enum PlayerInfo_t{
 	PlayerInfoMagLevel,
 	PlayerInfoMana,
 	PlayerInfoMaxMana,
-	PlayerInfoHealth,
-	PlayerInfoMaxHealth,
-	PlayerInfoName,
-	PlayerInfoPosition,
 	PlayerInfoVocation,
 	PlayerInfoMasterPos,
 	PlayerInfoSoul,
@@ -214,7 +210,6 @@ enum PlayerInfo_t{
 	PlayerInfoGuildRank,
 	PlayerInfoGuildNick,
 	PlayerInfoSex,
-	PlayerInfoLookDirection,
 	PlayerInfoTown,
 	PlayerInfoGUID,
 	PlayerInfoPremiumDays,
@@ -351,10 +346,12 @@ protected:
 	static int luaDoRemoveCreature(lua_State *L);
 	static int luaDoMoveCreature(lua_State *L);
 	static int luaDoCreatureSay(lua_State *L);
+	static int luaDoCreatureAddHealth(lua_State *L);
+	static int luaGetCreatureLight(lua_State *L);
+	static int luaGetCreatureLookDir(lua_State *L);
 
 	static int luaDoPlayerAddSkillTry(lua_State *L);
 	static int luaDoPlayerAddManaSpent(lua_State *L);
-	static int luaDoPlayerAddHealth(lua_State *L);
 	static int luaDoPlayerAddMana(lua_State *L);
 	static int luaDoPlayerAddItem(lua_State *L);
 	static int luaDoPlayerAddItemEx(lua_State *L);
@@ -373,7 +370,6 @@ protected:
 	static int luaDoPlayerRemoveItem(lua_State *L);
 	static int luaDoPlayerAddSoul(lua_State *L);
 	static int luaDoPlayerAddExp(lua_State *L);
-	//static int luaDoPlayerSetGuildId(lua_State *L);
 	static int luaDoPlayerSetGuildRank(lua_State *L);
 	static int luaDoPlayerSetGuildNick(lua_State *L);
 	static int luaDoSetCreatureLight(lua_State *L);
@@ -390,7 +386,6 @@ protected:
 	static int luaGetWaypointPositionByName(lua_State *L);
 
 	//queries
-	static int luaGetPlayerByName(lua_State *L);
 	static int luaGetPlayerGUIDByName(lua_State *L);
 	static int luaGetPlayersByAccountNumber(lua_State *L);
 	static int luaGetAccountNumberByPlayerName(lua_State *L);
@@ -442,10 +437,6 @@ protected:
 	static int luaGetPlayerMagLevel(lua_State *L);
 	static int luaGetPlayerMana(lua_State *L);
 	static int luaGetPlayerMaxMana(lua_State *L);
-	static int luaGetPlayerHealth(lua_State *L);
-	static int luaGetPlayerMaxHealth(lua_State *L);
-	static int luaGetPlayerName(lua_State *L);
-	static int luaGetPlayerPosition(lua_State *L);
 	static int luaGetPlayerSkill(lua_State *L);
 	static int luaGetPlayerVocation(lua_State *L);
 	static int luaGetPlayerMasterPos(lua_State *L);
@@ -453,17 +444,14 @@ protected:
 	static int luaGetPlayerItemCount(lua_State *L);
 	static int luaGetPlayerSoul(lua_State *L);
 	static int luaGetPlayerFreeCap(lua_State *L);
-	static int luaGetPlayerLight(lua_State *L);
 	static int luaGetPlayerSlotItem(lua_State *L);
 	static int luaGetPlayerItemById(lua_State *L);
-
 	static int luaGetPlayerDepotItems(lua_State *L);
 	static int luaGetPlayerGuildId(lua_State *L);
 	static int luaGetPlayerGuildName(lua_State *L);
 	static int luaGetPlayerGuildRank(lua_State *L);
 	static int luaGetPlayerGuildNick(lua_State *L);
 	static int luaGetPlayerSex(lua_State *L);
-	static int luaGetPlayerLookDir(lua_State *L);
 	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerFlagValue(lua_State *L);
 	static int luaGetPlayerLossPercent(lua_State *L);
@@ -504,7 +492,6 @@ protected:
 	static int luaGetGuildId(lua_State *L);
 
 	//type validation
-	static int luaIsPlayer(lua_State *L);
 	static int luaIsCreature(lua_State *L);
 	static int luaIsContainer(lua_State *L);
 	static int luaIsCorpse(lua_State *L);
