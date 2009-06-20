@@ -1,23 +1,10 @@
 getConfigInfo = getConfigValue
-
-function getThingFromPos(pos)
-	return getThingfromPos(pos)
-end
-
-function getCreaturePos(pos)
-	return getCreaturePosition(pos)
-end
-
-function doPlayerRemOutfit(cid, looktype, addons)
-	return doPlayerRemoveOutfit(cid, looktype, addons)
-end
-
-function broadcastMessageEx(message, messageClass)
-	return broadcastMessage(message, messageClass)
-end
+getThingFromPos = getThingfromPos
+doPlayerRemOutfit = doPlayerRemoveOutfit
+broadcastMessageEx = broadcastMessage
 
 function isPlayer(cid)
-	if (cid >= PLAYER_ID_RANGE and cid < MONSTER_ID_RANGE and isCreature(cid)) then
+	if (isCreature(cid) and cid >= PLAYER_ID_RANGE and cid < MONSTER_ID_RANGE) then
 		return TRUE
 	end
 
@@ -25,7 +12,7 @@ function isPlayer(cid)
 end
 
 function isMonster(cid)
-	if (cid >= MONSTER_ID_RANGE and cid < NPC_ID_RANGE and isCreature(cid)) then
+	if (isCreature(cid) and cid >= MONSTER_ID_RANGE and cid < NPC_ID_RANGE) then
 		return TRUE
 	end
 
@@ -33,7 +20,7 @@ function isMonster(cid)
 end
 
 function isNPC(cid)
-	if (cid >= NPC_ID_RANGE and isCreature(cid)) then
+	if (isCreature(cid) and cid >= NPC_ID_RANGE) then
 		return TRUE
 	end
 
@@ -651,7 +638,7 @@ function getPlayerName(cid)
 end
 
 function getPlayerByName(name)
-	local player = getCreatureByName(cid)
+	local player = getCreatureByName(name)
 	if player ~= LUA_NULL and isPlayer(player) == TRUE then
 		return player
 	end
