@@ -124,7 +124,7 @@ protected:
 	bool parseNode(NODE node);
 
 	inline bool readByte(int &value);
-	inline bool readBytes(unsigned char* buffer, int size, long pos);
+	inline bool readBytes(unsigned char* buffer, unsigned int size, long pos);
 	inline bool checks(const NODE node);
 	inline bool safeSeek(unsigned long pos);
 	inline bool safeTell(long &pos);
@@ -347,7 +347,7 @@ public:
 
 	inline void ADD_LSTRING(const std::string& add){
 		uint32_t str_len = (uint32_t)add.size();
- 
+
 		ADD_ULONG(str_len);
 
 		if((buffer_size - size) < str_len){

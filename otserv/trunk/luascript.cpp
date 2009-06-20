@@ -3468,6 +3468,9 @@ int LuaScriptInterface::luaGetTileItemByType(lua_State *L)
 				notFound = true;
 			}
 			break;
+
+		default:
+			break;
 	}
 
 	if(!notFound){

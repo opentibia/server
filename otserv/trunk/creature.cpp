@@ -371,7 +371,7 @@ void Creature::validateMapCache()
 	const Position& myPos = getPosition();
 	for(int32_t y = -((mapWalkHeight - 1) / 2); y <= ((mapWalkHeight - 1) / 2); ++y){
 		for(int32_t x = -((mapWalkWidth - 1) / 2); x <= ((mapWalkWidth - 1) / 2); ++x){
-			bool result = (getWalkCache(Position(myPos.x + x, myPos.y + y, myPos.z)) == 1);
+			getWalkCache(Position(myPos.x + x, myPos.y + y, myPos.z));
 		}
 	}
 }
@@ -796,7 +796,7 @@ Item* Creature::dropCorpse()
 	{
 		(*it)->executeOnDie(this, corpse);
 	}
-	
+
 	g_game.removeCreature(this, false);
 
 	return corpse;
@@ -874,7 +874,7 @@ DeathList Creature::getKillers(int assist_count)
 					// Check if master is last hit creature, or if our summon is last hit creature
 					if(lhc && (mdc->getMaster() == lhc || lhc->getMaster() == mdc))
 						continue;
-					
+
 					// Check if master has already been added to the list
 					if(mdc->getMaster()){
 						bool cont = false;
@@ -1607,7 +1607,7 @@ bool Creature::registerCreatureEvent(const std::string& name)
 		eventsList.push_back(event);
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -1622,7 +1622,7 @@ CreatureEventList Creature::getCreatureEvents(CreatureEventType_t type)
 			}
 		}
 	}
-	
+
 	return typeList;
 }
 

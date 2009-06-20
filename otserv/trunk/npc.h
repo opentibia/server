@@ -424,7 +424,7 @@ struct NpcState{
 	int32_t itemId;
 	int32_t subType;
 	bool ignoreCapacity;
-	bool buyWithBackpack; 
+	bool buyWithBackpack;
 	std::string spellName;
 	std::string listName;
 	std::string listPluralName;
@@ -560,8 +560,8 @@ protected:
 	bool hasScriptedFocus;
 	int32_t walkRadius;
 	int32_t talkRadius;
-	int32_t idleTime;
-	int32_t idleInterval;
+	uint32_t idleTime;
+	uint32_t idleInterval;
 	bool defaultPublic;
 	int32_t focusCreature;
 

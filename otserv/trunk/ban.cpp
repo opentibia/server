@@ -91,7 +91,7 @@ bool BanManager::isIpDisabled(uint32_t clientip)
 	{
 		uint32_t loginTimeout = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TIMEOUT) / 1000;
 		if( (it->second.numberOfLogins >= (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TRIES)) &&
-			(currentTime < it->second.lastLoginTime + loginTimeout) )
+			((uint32_t)currentTime < (uint32_t)it->second.lastLoginTime + loginTimeout) )
 		{
 			banLock.unlock();
 			return true;
@@ -206,7 +206,7 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 		it->second.numberOfLogins = 0;
 
 	uint32_t retryTimeout = (uint32_t)g_config.getNumber(ConfigManager::RETRY_TIMEOUT) / 1000;
-	if(!isSuccess || (currentTime < it->second.lastLoginTime + retryTimeout))
+	if(!isSuccess || ((uint32_t)currentTime < (uint32_t)it->second.lastLoginTime + retryTimeout))
 		++it->second.numberOfLogins;
 	else
 		it->second.numberOfLogins = 0;

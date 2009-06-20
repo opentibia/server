@@ -60,41 +60,21 @@ Chat g_chat;
 uint32_t ProtocolGame::protocolGameCount = 0;
 #endif
 
-#if defined __SERVER_PROTECTION__
-#error "You should not use __SERVER_PROTECTION__"
-#define ADD_TASK_INTERVAL 40
-#define CHECK_TASK_INTERVAL 5000
-#else
-#define ADD_TASK_INTERVAL -1
-#endif
-
 // Helping templates to add dispatcher tasks
 
 template<class FunctionType>
 void ProtocolGame::addGameTaskInternal(bool droppable, uint32_t delay, const FunctionType& func)
 {
-	if(m_now > m_nextTask || m_messageCount < 5){
-		if(droppable)
-			g_dispatcher.addTask(createTask(delay, func));
-		else
-			g_dispatcher.addTask(createTask(func));
-		m_nextTask = m_now + ADD_TASK_INTERVAL;
-	}
-	else{
-		m_rejectCount++;
-		//std::cout << "reject task" << std::endl;
-	}
+	if(droppable)
+		g_dispatcher.addTask(createTask(delay, func));
+	else
+		g_dispatcher.addTask(createTask(func));
 }
 
 ProtocolGame::ProtocolGame(Connection_ptr connection) :
 	Protocol(connection)
 {
 	player = NULL;
-	m_nextTask = 0;
-	m_nextPing = 0;
-	m_lastTaskCheck = 0;
-	m_messageCount = 0;
-	m_rejectCount = 0;
 	m_debugAssertSent = false;
 	m_acceptPackets = false;
 	eventConnect = 0;
@@ -443,25 +423,6 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 {
 	if(!m_acceptPackets || msg.getMessageLength() <= 0 || !player)
 		return;
-
-	m_now = OTSYS_TIME();
-
-	#ifdef __SERVER_PROTECTION__
-	int64_t interval = m_now - m_lastTaskCheck;
-	if(interval > CHECK_TASK_INTERVAL){
-		interval = 0;
-		m_lastTaskCheck = m_now;
-		m_messageCount = 1;
-		m_rejectCount = 0;
-	}
-	else{
-		m_messageCount++;
-		//std::cout << interval/m_messageCount << " " << m_rejectCount << "/" << m_messageCount << std::endl;
-		if(/*m_rejectCount > m_messageCount/2 ||*/ (interval > 800 && interval/m_messageCount < 25)){
-			getConnection()->closeConnection();
-		}
-	}
-	#endif
 
 	uint8_t recvbyte = msg.GetByte();
 	//a dead player can not performs actions

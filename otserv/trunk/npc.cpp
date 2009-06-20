@@ -220,7 +220,7 @@ bool Npc::loadFromXml(const std::string& filename)
 		}
 
 		if(readXMLInteger(root, "autowalk", intValue)){
-			//Depricated attribute.
+			//Deprecated attribute.
 			if(intValue == 0){
 				walkTicks = 2000;
 			}

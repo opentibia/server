@@ -32,17 +32,17 @@ enum itemgroup_t{
 	ITEM_GROUP_NONE = 0,
 	ITEM_GROUP_GROUND,
 	ITEM_GROUP_CONTAINER,
-	ITEM_GROUP_WEAPON,		//depricated
-	ITEM_GROUP_AMMUNITION,	//depricated
-	ITEM_GROUP_ARMOR,		//depricated
+	ITEM_GROUP_WEAPON,		/*deprecated*/
+	ITEM_GROUP_AMMUNITION,	/*deprecated*/
+	ITEM_GROUP_ARMOR,		/*deprecated*/
 	ITEM_GROUP_CHARGES,
-	ITEM_GROUP_TELEPORT,	//depricated
-	ITEM_GROUP_MAGICFIELD,	//depricated
-	ITEM_GROUP_WRITEABLE,	//depricated
-	ITEM_GROUP_KEY,			//depricated
+	ITEM_GROUP_TELEPORT,	/*deprecated*/
+	ITEM_GROUP_MAGICFIELD,	/*deprecated*/
+	ITEM_GROUP_WRITEABLE,	/*deprecated*/
+	ITEM_GROUP_KEY,			/*deprecated*/
 	ITEM_GROUP_SPLASH,
 	ITEM_GROUP_FLUID,
-	ITEM_GROUP_DOOR,		//depricated
+	ITEM_GROUP_DOOR,		/*deprecated*/
 	ITEM_GROUP_DEPRECATED,
 	ITEM_GROUP_LAST
 };
@@ -74,20 +74,20 @@ enum itemattrib_t {
 	ITEM_ATTR_FIRST = 0x10,
 	ITEM_ATTR_SERVERID = ITEM_ATTR_FIRST,
 	ITEM_ATTR_CLIENTID,
-	ITEM_ATTR_NAME,
-	ITEM_ATTR_DESCR,
+	ITEM_ATTR_NAME,				/*deprecated*/
+	ITEM_ATTR_DESCR,			/*deprecated*/
 	ITEM_ATTR_SPEED,
-	ITEM_ATTR_SLOT,
-	ITEM_ATTR_MAXITEMS,
-	ITEM_ATTR_WEIGHT,
-	ITEM_ATTR_WEAPON,
-	ITEM_ATTR_AMU,
-	ITEM_ATTR_ARMOR,
-	ITEM_ATTR_MAGLEVEL,
-	ITEM_ATTR_MAGFIELDTYPE,
-	ITEM_ATTR_WRITEABLE,
-	ITEM_ATTR_ROTATETO,
-	ITEM_ATTR_DECAY,
+	ITEM_ATTR_SLOT,				/*deprecated*/
+	ITEM_ATTR_MAXITEMS,			/*deprecated*/
+	ITEM_ATTR_WEIGHT,			/*deprecated*/
+	ITEM_ATTR_WEAPON,			/*deprecated*/
+	ITEM_ATTR_AMU,				/*deprecated*/
+	ITEM_ATTR_ARMOR,			/*deprecated*/
+	ITEM_ATTR_MAGLEVEL,			/*deprecated*/
+	ITEM_ATTR_MAGFIELDTYPE,		/*deprecated*/
+	ITEM_ATTR_WRITEABLE,		/*deprecated*/
+	ITEM_ATTR_ROTATETO,			/*deprecated*/
+	ITEM_ATTR_DECAY,			/*deprecated*/
 	ITEM_ATTR_SPRITEHASH,
 	ITEM_ATTR_MINIMAPCOLOR,
 	ITEM_ATTR_07,
@@ -95,17 +95,14 @@ enum itemattrib_t {
 	ITEM_ATTR_LIGHT,
 
 	//1-byte aligned
-	ITEM_ATTR_DECAY2,
-	ITEM_ATTR_WEAPON2,
-	ITEM_ATTR_AMU2,
-	ITEM_ATTR_ARMOR2,
-	ITEM_ATTR_WRITEABLE2,
+	ITEM_ATTR_DECAY2,			/*deprecated*/
+	ITEM_ATTR_WEAPON2,			/*deprecated*/
+	ITEM_ATTR_AMU2,				/*deprecated*/
+	ITEM_ATTR_ARMOR2,			/*deprecated*/
+	ITEM_ATTR_WRITEABLE2,		/*deprecated*/
 	ITEM_ATTR_LIGHT2,
-
 	ITEM_ATTR_TOPORDER,
-
-	ITEM_ATTR_WRITEABLE3,
-
+	ITEM_ATTR_WRITEABLE3,		/*deprecated*/
 	ITEM_ATTR_LAST
 };
 
@@ -134,41 +131,7 @@ enum itemflags_t {
 	FLAG_UNUSED = 2097152,
 	FLAG_CLIENTCHARGES = 4194304
 };
-/*
-enum slotsOTB_t{
-	OTB_SLOT_DEFAULT,
-	OTB_SLOT_HEAD,
-	OTB_SLOT_BODY,
-	OTB_SLOT_LEGS,
-	OTB_SLOT_BACKPACK,
-	OTB_SLOT_WEAPON,
-	OTB_SLOT_2HAND,
-	OTB_SLOT_FEET,
-	OTB_SLOT_AMULET,
-	OTB_SLOT_RING,
-	OTB_SLOT_HAND,
-};
 
-enum ShootTypeOtb_t {
-	OTB_SHOOT_NONE          = 0,
-	OTB_SHOOT_BOLT          = 1,
-	OTB_SHOOT_ARROW         = 2,
-	OTB_SHOOT_FIRE          = 3,
-	OTB_SHOOT_ENERGY        = 4,
-	OTB_SHOOT_POISONARROW   = 5,
-	OTB_SHOOT_BURSTARROW    = 6,
-	OTB_SHOOT_THROWINGSTAR  = 7,
-	OTB_SHOOT_THROWINGKNIFE = 8,
-	OTB_SHOOT_SMALLSTONE    = 9,
-	OTB_SHOOT_SUDDENDEATH   = 10,
-	OTB_SHOOT_LARGEROCK     = 11,
-	OTB_SHOOT_SNOWBALL      = 12,
-	OTB_SHOOT_POWERBOLT     = 13,
-	OTB_SHOOT_SPEAR         = 14,
-	OTB_SHOOT_POISONFIELD   = 15,
-	OTB_SHOOT_INFERNALBOLT  = 16
-};
-*/
 //1-byte aligned structs
 #pragma pack(1)
 
@@ -178,46 +141,12 @@ struct VERSIONINFO{
 	uint32_t dwBuildNumber;
 	uint8_t CSDVersion[128];
 };
-/*
-struct decayBlock2{
-	uint16_t decayTo;
-	uint16_t decayTime;
-};
 
-struct weaponBlock2{
-	uint8_t weaponType;
-	uint8_t amuType;
-	uint8_t shootType;
-	uint8_t attack;
-	uint8_t defence;
-};
-
-struct amuBlock2{
-	uint8_t amuType;
-	uint8_t shootType;
-	uint8_t attack;
-};
-
-struct armorBlock2{
-	uint16_t armor;
-	double weight;
-	uint16_t slot_position;
-};
-
-struct writeableBlock2{
-	uint16_t readOnlyId;
-};
-*/
 struct lightBlock2{
 	uint16_t lightLevel;
 	uint16_t lightColor;
 };
-/*
-struct writeableBlock3{
-	uint16_t readOnlyId;
-	uint16_t maxTextLen;
-};
-*/
+
 #pragma pack()
 /////////OTB specific//////////////
 #endif

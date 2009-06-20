@@ -297,7 +297,7 @@ void House::cleanHouse()
 				if((*cit)->getPlayer()){
 					to_kick.push_back((*cit)->getPlayer());
 				}
-			}	
+			}
 		}
 	}
 	while(!to_kick.empty()){
@@ -945,7 +945,7 @@ bool Houses::payRent(Player* player, House* house, time_t time /*= 0*/)
 	}
 
 	if(hasEnoughMoney){
-		uint32_t paidUntil = time;
+		time_t paidUntil = time;
 		switch(rentPeriod){
 		case RENTPERIOD_DAILY:
 			paidUntil += 24 * 60 * 60;
@@ -1076,7 +1076,7 @@ bool Houses::payHouses()
 	if(rentPeriod == RENTPERIOD_NEVER){
 		return true;
 	}
-	
+
 	time_t currentTime = std::time(NULL);
 	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
 		payHouse(it->second, currentTime);

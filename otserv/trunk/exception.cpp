@@ -50,6 +50,7 @@ extern ConfigManager g_config;
 
 	#elif __GNUC__
 		#define NOGDI
+        #include "otsystem.h"
 		#include <excpt.h>
 		#include <tlhelp32.h>
 		#include <winbase.h>
