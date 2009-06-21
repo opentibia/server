@@ -785,21 +785,21 @@ bool IOMapSerialize::processHouseAuctions()
 {
 	Database* db = Database::instance();
 	DBQuery query;
-	DBResult* result;
+	DBResult* result_set;
 
 	time_t currentTime = std::time(NULL);
 	query << "SELECT * FROM `house_auctions` WHERE `endtime` <" << currentTime;
-	if(!(result = db->storeQuery(query.str())))
+	if(!(result_set = db->storeQuery(query.str())))
 		return true;
 
-	bool result = true;
+	bool success = true;
 	do{
-		int32_t houseid = result->getDataInt("house_id");
-		int32_t playerid = result->getDataInt("player_id");
+		int32_t houseid = result_set->getDataInt("house_id");
+		int32_t playerid = result_set->getDataInt("player_id");
 
 		House* house = Houses::getInstance().getHouse(houseid);
 		if(!house){
-			result = false;
+			success = false;
 			continue;
 		}
 
@@ -808,13 +808,13 @@ bool IOMapSerialize::processHouseAuctions()
 		
 		query.str("");
 		query << "DELETE * FROM `house_auctions` WHERE `house_id` =" << houseid;
-		db->executeQuery(query);
+		db->executeQuery(query.str());
 		
-	}while(result->next());
+	}while(result_set->next());
 
-	db->freeResult(result);
+	db->freeResult(result_set);
 
-	return result;
+	return success;
 }
 
 bool IOMapSerialize::loadHouseInfo(Map* map)

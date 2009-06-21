@@ -52,6 +52,8 @@ void Logger::logMessage(std::string channel, eLogType type, int level,
 Logger::Logger()
 {
 	m_file = fopen("otlog.txt", "a");
+	if(!m_file)
+		m_file = stderr;
 }
 
 Logger::~Logger()

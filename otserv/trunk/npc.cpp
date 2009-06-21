@@ -126,7 +126,6 @@ void Npc::reset()
 {
 	loaded = false;
 	walkTicks = 1500;
-	walkRadius = -1;
 	floorChange = false;
 	attackable = false;
 	hasBusyReply = false;
@@ -216,7 +215,7 @@ bool Npc::loadFromXml(const std::string& filename)
 			walkTicks = intValue;
 		}
 		if(readXMLInteger(root, "walkradius", intValue)){
-			walkRadius = intValue;
+			masterRadius = intValue;
 		}
 
 		if(readXMLInteger(root, "autowalk", intValue)){
@@ -331,6 +330,41 @@ bool Npc::loadFromXml(const std::string& filename)
 	return false;
 }
 
+StorageCondition Npc::loadStorageCondition(xmlNodePtr node)
+{
+	StorageCondition cond = {-1, 1, STORAGE_EQUAL};
+
+	std::string strValue;
+
+	readXMLInteger(node, "storageId", cond.id) || readXMLInteger(node, "id", cond.id);
+
+	readXMLInteger(node, "value", cond.value) || readXMLInteger(node, "storageValue", cond.value);
+
+	uint32_t interactParams = loadParams(node);
+
+	if(readXMLString(node, "storageComp", strValue) || readXMLString(node, "comparator", strValue)){
+		if(asLowerCaseString(strValue) == "equal"){
+			cond.op = STORAGE_EQUAL;
+		}
+		if(asLowerCaseString(strValue) == "notequal"){
+			cond.op = STORAGE_NOTEQUAL;
+		}
+		if(asLowerCaseString(strValue) == "greaterorequal"){
+			cond.op = STORAGE_GREATEROREQUAL;
+		}
+		if(asLowerCaseString(strValue) == "greater"){
+			cond.op = STORAGE_GREATER;
+		}
+		if(asLowerCaseString(strValue) == "less"){
+			cond.op = STORAGE_LESS;
+		}
+		if(asLowerCaseString(strValue) == "lessorequal"){
+			cond.op = STORAGE_LESSOREQUAL;
+		}
+	}
+	return cond;
+}
+
 uint32_t Npc::loadParams(xmlNodePtr node)
 {
 	uint32_t params = RESPOND_DEFAULT;
@@ -365,6 +399,9 @@ uint32_t Npc::loadParams(xmlNodePtr node)
 			}
 			else if(asLowerCaseString(*it) == "premium"){
 				params |= RESPOND_PREMIUM;
+			}
+			else if(asLowerCaseString(*it) == "promoted"){
+				params |= RESPOND_PROMOTED;
 			}
 			else if(asLowerCaseString(*it) == "druid"){
 				params |= RESPOND_DRUID;
@@ -547,36 +584,11 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 				prop.dontHaveItemId = intValue;
 			}
 
-			if(readXMLInteger(node, "storageId", intValue)){
-				prop.storageId = intValue;
-			}
-
-			if(readXMLInteger(node, "storageValue", intValue)){
-				prop.storageValue = intValue;
-			}
-
 			uint32_t interactParams = loadParams(node);
-
-			if(readXMLString(node, "storageComp", strValue)){
-				if(asLowerCaseString(strValue) == "equal"){
-					prop.storageComp = STORAGE_EQUAL;
-				}
-				if(asLowerCaseString(strValue) == "notequal"){
-					prop.storageComp = STORAGE_NOTEQUAL;
-				}
-				if(asLowerCaseString(strValue) == "greaterorequal"){
-					prop.storageComp = STORAGE_GREATEROREQUAL;
-				}
-				if(asLowerCaseString(strValue) == "greater"){
-					prop.storageComp = STORAGE_GREATER;
-				}
-				if(asLowerCaseString(strValue) == "less"){
-					prop.storageComp = STORAGE_LESS;
-				}
-				if(asLowerCaseString(strValue) == "lessorequal"){
-					prop.storageComp = STORAGE_LESSOREQUAL;
-				}
-			}
+			
+			StorageCondition sc = loadStorageCondition(node);
+			if(sc.id != -1)
+				prop.storageConditions.push_back(sc);
 
 			xmlNodePtr tmpNode = node->children;
 			while(tmpNode){
@@ -592,6 +604,11 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 
 						altKeyNode = altKeyNode->next;
 					}
+				}
+				else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"storage") == 0){
+					StorageCondition sc = loadStorageCondition(tmpNode);
+					if(sc.id != -1)
+						prop.storageConditions.push_back(sc);
 				}
 				else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"list") == 0){
 					xmlNodePtr listNode = tmpNode->children;
@@ -1197,12 +1214,16 @@ void Npc::onCreatureMove(const Creature* creature, const Tile* newTile, const Po
 		if(npcState){
 			bool canSeeNewPos = canSee(newPos);
 			bool canSeeOldPos = canSee(oldPos);
+			Position myPos = getPosition();
 
 			if(canSeeNewPos && !canSeeOldPos){
 				npcState->respondToCreature = player->getID();
 				onPlayerEnter(player, npcState);
 			}
-			else if(!canSeeNewPos && canSeeOldPos){
+			else if((!canSeeNewPos ||
+					(newPos.x < myPos.x - talkRadius) || (newPos.x > myPos.x + talkRadius) ||
+					(newPos.y < myPos.y - talkRadius) || (newPos.y > myPos.y + talkRadius))
+					&& canSeeOldPos){
 				npcState->respondToCreature = player->getID();
 				onPlayerLeave(player, npcState);
 			}
@@ -1967,7 +1988,7 @@ bool Npc::getNextStep(Direction& dir)
 
 bool Npc::canWalkTo(const Position& fromPos, Direction dir)
 {
-	if(walkRadius == 0)
+	if(masterRadius == 0)
 		return false;
 
 	Position toPos = fromPos;
@@ -1993,17 +2014,8 @@ bool Npc::canWalkTo(const Position& fromPos, Direction dir)
 			break;
 	}
 
-	if(walkRadius != -1){
-		if ((toPos.x < getPosition().x - walkRadius) || (toPos.x > getPosition().x + walkRadius) &&
-			(toPos.y < getPosition().y - walkRadius) || (toPos.y > getPosition().y + walkRadius))
-		{
-			return false;
-		}
-	}
-	else{
-		if(!Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos)){
-			return false;
-		}
+	if(!Spawns::getInstance()->isInZone(masterPos, masterRadius, toPos)){
+		return false;
 	}
 
 	Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
@@ -2111,10 +2123,11 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 	int32_t totalMatchCount = 0;
 
 	for(ResponseList::const_iterator it = list.begin(); it != list.end(); ++it){
+		NpcResponse* iresponse = *it;
 		int32_t matchCount = 0;
 
-		if((*it)->getParams() != RESPOND_DEFAULT){
-			uint32_t params = (*it)->getParams();
+		if(iresponse->getParams() != RESPOND_DEFAULT){
+			uint32_t params = iresponse->getParams();
 
 			if(hasBitSet(RESPOND_MALE, params)){
 				if(!player->isMale()){
@@ -2144,6 +2157,8 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				++matchCount;
 			}
 
+			// This is an ugly, restrictive hack
+			// vocations shouldn't be hardcoded
 			if(hasBitSet(RESPOND_DRUID, params)){
 				if(player->getVocationId() != VOCATION_DRUID && player->getVocationId() != VOCATION_ELDERDRUID){
 					continue;
@@ -2167,6 +2182,17 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 			if(hasBitSet(RESPOND_SORCERER, params)){
 				if(player->getVocationId() != VOCATION_SORCERER && player->getVocationId() != VOCATION_MASTERSORCERER){
+					continue;
+				}
+				++matchCount;
+			}
+
+			if(hasBitSet(RESPOND_PROMOTED, params)){
+				if(player->getVocationId() == VOCATION_NONE ||
+					player->getVocationId() == VOCATION_SORCERER ||
+					player->getVocationId() == VOCATION_DRUID ||
+					player->getVocationId() == VOCATION_KNIGHT ||
+					player->getVocationId() == VOCATION_PALADIN){
 					continue;
 				}
 				++matchCount;
@@ -2255,20 +2281,20 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 		}
 
-		if((*it)->getCondition() != CONDITION_NONE){
-			if(!player->hasCondition((*it)->getCondition()))
+		if(iresponse->getCondition() != CONDITION_NONE){
+			if(!player->hasCondition(iresponse->getCondition()))
 				continue;
 			++matchCount;
 		}
 
-		if((*it)->getHealth() != -1){
-			if(player->getHealth() < (*it)->getHealth())
+		if(iresponse->getHealth() != -1){
+			if(player->getHealth() < iresponse->getHealth())
 				continue;
 			++matchCount;
 		}
 
-		if((*it)->getKnowSpell() != ""){
-			std::string spellName = (*it)->getKnowSpell();
+		if(iresponse->getKnowSpell() != ""){
+			std::string spellName = iresponse->getKnowSpell();
 			if(spellName == "|SPELL|"){
 				spellName = npcState->spellName;
 			}
@@ -2279,110 +2305,117 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			++matchCount;
 		}
 
-		if((*it)->scriptVars.b1){
+		if(iresponse->scriptVars.b1){
 			if(!npcState->scriptVars.b1){
 				continue;
 			}
 			++matchCount;
 		}
 
-		if((*it)->scriptVars.b2){
+		if(iresponse->scriptVars.b2){
 			if(!npcState->scriptVars.b2){
 				continue;
 			}
 			++matchCount;
 		}
 
-		if((*it)->scriptVars.b3){
+		if(iresponse->scriptVars.b3){
 			if(!npcState->scriptVars.b3){
 				continue;
 			}
 			++matchCount;
 		}
 
-		if((*it)->scriptVars.n1 != -1){
+		if(iresponse->scriptVars.n1 != -1){
 			if(!npcState->scriptVars.n1){
 				continue;
 			}
 			++matchCount;
 		}
 
-		if((*it)->scriptVars.n2 != -1){
+		if(iresponse->scriptVars.n2 != -1){
 			if(!npcState->scriptVars.n2){
 				continue;
 			}
 			++matchCount;
 		}
 
-		if((*it)->scriptVars.n3 != -1){
+		if(iresponse->scriptVars.n3 != -1){
 			if(!npcState->scriptVars.n3){
 				continue;
 			}
 			++matchCount;
 		}
 
-		if((*it)->getHaveItemID() != 0){
-			int32_t itemCount = player->__getItemTypeCount((*it)->getHaveItemID());
+		if(iresponse->getHaveItemID() != 0){
+			int32_t itemCount = player->__getItemTypeCount(iresponse->getHaveItemID());
 			if(itemCount == 0)
 				continue;
 			++matchCount;
 		}
 
-		if((*it)->getDontHaveItemID() != 0){
-			int32_t itemCount = player->__getItemTypeCount((*it)->getDontHaveItemID());
+		if(iresponse->getDontHaveItemID() != 0){
+			int32_t itemCount = player->__getItemTypeCount(iresponse->getDontHaveItemID());
 			if(itemCount > 0)
 				continue;
 			++matchCount;
 		}
 
-		if((*it)->getStorageId() != -1){;
+		bool storageMatch = false;
+		for(StorageConditions::const_iterator iter = iresponse->prop.storageConditions.begin(); iter != iresponse->prop.storageConditions.begin(); ++iter){
+			const StorageCondition& cs = *iter;
+
 			int32_t playerStorageValue = -1;
-			if(!player->getStorageValue((*it)->getStorageId(), playerStorageValue)){
+			if(!player->getStorageValue(cs.id, playerStorageValue)){
 				playerStorageValue = -1;
 			}
 
-			int32_t storageValue = (*it)->getStorageValue();
-			StorageComparision_t comp = (*it)->getStorageComp();
-			switch(comp){
+			switch(cs.op){
 				case STORAGE_LESS:
 				{
-					if(playerStorageValue >= storageValue){
-						continue;
+					if(playerStorageValue >= cs.value){
+						storageMatch = true;
+						break;
 					}
 					break;
 				}
 				case STORAGE_LESSOREQUAL:
 				{
-					if(playerStorageValue > storageValue){
-						continue;
+					if(playerStorageValue > cs.value){
+						storageMatch = true;
+						break;
 					}
 					break;
 				}
 				case STORAGE_EQUAL:
 				{
-					if(playerStorageValue != storageValue){
-						continue;
+					if(playerStorageValue != cs.value){
+						storageMatch = true;
+						break;
 					}
 					break;
 				}
 				case STORAGE_NOTEQUAL:
 				{
-					if(playerStorageValue == storageValue){
-						continue;
+					if(playerStorageValue == cs.value){
+						storageMatch = true;
+						break;
 					}
 					break;
 				}
 				case STORAGE_GREATEROREQUAL:
 				{
-					if(playerStorageValue < storageValue){
-						continue;
+					if(playerStorageValue < cs.value){
+						storageMatch = true;
+						break;
 					}
 					break;
 				}
 				case STORAGE_GREATER:
 				{
-					if(playerStorageValue <= storageValue){
-						continue;
+					if(playerStorageValue <= cs.value){
+						storageMatch = true;
+						break;
 					}
 					break;
 				}
@@ -2392,43 +2425,52 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 			++matchCount;
 		}
+		if(storageMatch)
+			continue;
 
-		if((*it)->getInteractType() == INTERACT_TEXT || (*it)->getFocusState() != -1){
-			if(npcState->isIdle && (*it)->getFocusState() != 1){
-				//We are idle, and this response does not activate the npc.
+		if(iresponse->getInteractType() == INTERACT_TEXT || iresponse->getFocusState() != -1){
+			if(npcState->isIdle && iresponse->getFocusState() != 1){
+				//We are idle, and this iresponse does not activate the npc.
 				continue;
 			}
 
-			if(!npcState->isIdle && (*it)->getFocusState() == 1){
-				//We are not idle, and this response would activate us again.
+			if(!npcState->isIdle && iresponse->getFocusState() == 1){
+				//We are not idle, and this iresponse would activate us again.
 				continue;
 			}
 		}
 
-		if(npcState->topic == -1 && (*it)->getTopic() != -1){
+		if(npcState->topic == -1 && iresponse->getTopic() != -1){
 			//Not the right topic
 			continue;
 		}
 
-		if(npcState->topic != -1 && npcState->topic == (*it)->getTopic()){
+		if(npcState->topic != -1 && npcState->topic == iresponse->getTopic()){
 			//Topic is right
 			matchCount += 1000;
 		}
 
-		if((*it)->getInteractType() == INTERACT_EVENT){
-			if((*it)->getInputText() == asLowerCaseString(text)){
-				uint32_t time = idleInterval * 1000;
-				if((*it)->getTime() != 0){
-					time = (*it)->getTime();
-				}
-				bool enoughTimeElapsed = (npcState->lastResponseTime != 0 && ( (OTSYS_TIME() - npcState->lastResponseTime) > time));
-				if(enoughTimeElapsed){
+		if(iresponse->getInteractType() == INTERACT_EVENT){
+			std::string evt = asLowerCaseString(text);
+			if(iresponse->getInputText() == evt){
+				if(evt == "onidle"){
+					uint32_t time = idleInterval * 1000;
+					if((*it)->getTime() != 0){
+						time = (*it)->getTime();
+					}
+					bool enoughTimeElapsed = (npcState->lastResponseTime != 0 && ( (OTSYS_TIME() - npcState->lastResponseTime) > time));
+					if(enoughTimeElapsed){
+						++matchCount;
+					}
+				} else if(evt == "onplayerleave"){
 					++matchCount;
 				}
+				else
+					matchCount = 0;
 			}
-			else{
+			else
 				matchCount = 0;
-			}
+
 		}
 		else if((*it)->getInteractType() == INTERACT_TEXT){
 			int32_t matchAllCount = 0;  //Contains the number of keywords that where matched
@@ -2452,7 +2494,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		if(matchCount > bestMatchCount){
 			totalMatchCount = 0;
-			response = (*it);
+			response = iresponse;
 			bestMatchCount = matchCount;
 			//std::cout << "Found response string: " << response->getText() << ", keyword: " << response->getInputText() << std::endl;
 		}

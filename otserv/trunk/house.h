@@ -299,11 +299,11 @@ public:
 	HouseMap::iterator getHouseBegin() {return houseMap.begin();}
 	HouseMap::iterator getHouseEnd() {return houseMap.end();}
 
+	bool payHouse(House* house, time_t time);
+
 private:
 	RentPeriod_t rentPeriod;
 	HouseMap houseMap;
-
-	bool payHouse(House* house, time_t time);
 };
 
 #endif

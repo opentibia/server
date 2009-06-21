@@ -2,7 +2,7 @@
 
 <interaction>
 
-  <interact keywords="bank">
+  <interact keywords="depot">
     <response text="The depots are very easy to use. Just step in front of them and you will find your items in them. They are free for all tibian citizens."/>
   </interact>
 

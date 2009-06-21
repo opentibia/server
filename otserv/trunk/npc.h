@@ -207,6 +207,14 @@ enum StorageComparision_t{
 	STORAGE_GREATER
 };
 
+struct StorageCondition {
+	int32_t id;
+	int32_t value;
+	StorageComparision_t op;
+};
+
+typedef std::vector<StorageCondition> StorageConditions;
+
 enum NpcEvent_t{
 	EVENT_NONE,
 	EVENT_BUSY,
@@ -318,9 +326,6 @@ public:
 			interactType = INTERACT_TEXT;
 			responseType = RESPONSE_DEFAULT;
 			params = 0;
-			storageId = -1;
-			storageValue = -1;
-			storageComp = STORAGE_EQUAL;
 			knowSpell = "";
 			health = -1;
 			condition = CONDITION_NONE;
@@ -338,9 +343,7 @@ public:
 		InteractType_t interactType;
 		ResponseType_t responseType;
 		uint32_t params;
-		int32_t storageId;
-		int32_t storageValue;
-		StorageComparision_t storageComp;
+		StorageConditions storageConditions;
 		std::string knowSpell;
 		ActionList actionList;
 		std::list<ListItem> itemList;
@@ -384,13 +387,10 @@ public:
 	int32_t getFocusState() const {return prop.focusStatus;}
 	int32_t getHaveItemID() const {return prop.haveItemId;}
 	int32_t getDontHaveItemID() const {return prop.dontHaveItemId;}
-	int32_t getStorageId() const {return prop.storageId;}
-	int32_t getStorageValue() const {return prop.storageValue;}
 	ConditionType_t getCondition() const {return prop.condition;}
 	int32_t getHealth() const {return prop.health;}
 	ResponseType_t getResponseType() const {return prop.responseType;}
 	InteractType_t getInteractType() const {return prop.interactType;}
-	StorageComparision_t getStorageComp() const {return prop.storageComp;}
 	const std::string& getKnowSpell() const {return prop.knowSpell;}
 	const std::string& getText() const {return prop.output;}
 	int32_t getAmount() const {return prop.amount;}
@@ -478,6 +478,11 @@ public:
 	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
+	virtual void setMasterPos(const Position& pos, uint32_t radius = 1) {
+		masterPos = pos; 
+		if(masterRadius == -1)
+			masterRadius = radius;
+	}
 
 	void onPlayerCloseChannel(const Player* player);
 	void onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
@@ -541,6 +546,7 @@ protected:
 	ParametersMap m_parameters;
 
 	uint32_t loadParams(xmlNodePtr node);
+	StorageCondition loadStorageCondition(xmlNodePtr node);
 	ResponseList loadInteraction(xmlNodePtr node);
 
 	NpcState* getState(const Player* player, bool makeNew = true);
@@ -560,7 +566,6 @@ protected:
 	bool isIdle;
 	bool hasBusyReply;
 	bool hasScriptedFocus;
-	int32_t walkRadius;
 	int32_t talkRadius;
 	uint32_t idleTime;
 	uint32_t idleInterval;

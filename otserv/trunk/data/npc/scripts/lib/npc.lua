@@ -1,32 +1,4 @@
 
-do
-	doPlayerAddStackable = doPlayerAddItem
-	--Returns table with UIDs of added items
-	doPlayerAddItem = function(cid, itemid, subType, amount)
-		local amount = amount or 1
-		local subAmount = 0
-		local subType = subType or 0
-
-		if(isItemStackable(itemid) == TRUE) then
-			return doPlayerAddStackable(cid, itemid, amount), amount
-		end
-
-		local items = {}
-		local ret = 0
-		local a = 0
-		for i = 1, amount do
-			items[i] = doCreateItemEx(itemid, subType)
-			ret = doPlayerAddItemEx(cid, items[i])
-			if(ret ~= RETURNVALUE_NOERROR) then
-				break
-			end
-			a = a + 1
-		end
-
-		return items, a
-	end
-end
-
 -- get the distance to a creature
 function getDistanceToCreature(id)
 	if id == 0 or id == nil then
@@ -63,4 +35,50 @@ function selfGotoIdle()
 		attacking = false
 		selfAttackCreature(0)
 		target = 0
+end
+
+function doCIPRemoveItem(cid, _state)
+        if _state.subtype ~= -1 then
+                local subtype = _state.subtype
+                if isItemFluidContainer(_state.itemid) == TRUE then
+                        subtype = FluidMap[subtype]
+                end
+                doPlayerRemoveItem(cid, _state.itemid, _state.amount, subtype)
+        else
+                doPlayerRemoveItem(cid, _state.itemid, _state.amount)
+        end
+end
+
+FluidMap = {
+        [11] = 10,
+        [10] = 7,
+}
+
+function doCIPCreateItem(cid, _state)
+        local item = 0
+
+        local amount = _state.amount
+
+        while amount > 0 do
+                local subtype = -1
+                local ramount = 1
+
+                if isItemStackable(_state.itemid) == TRUE then
+                        subtype = math.min(100, amount)
+                        ramount = subtype
+                elseif isItemFluidContainer(_state.itemid) == TRUE then
+                        subtype = FluidMap[_state.subtype]
+                end
+
+                if subtype ~= -1 then
+                        item = doPlayerAddItem(cid, _state.itemid, subtype)
+                else
+                        item = doPlayerAddItem(cid, _state.itemid)
+                        if _state.subtype ~= -1 then
+                                doSetItemActionId(item, _state.subtype)
+                        end
+                end
+
+                amount = amount - ramount
+        end
 end

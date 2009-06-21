@@ -242,6 +242,7 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 	// Place the npc
 	if(g_game.placeCreature(npc, creature->getPosition())){
 		g_game.addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
+		npc->setMasterPos(npc->getPosition());
 		return true;
 	}
 	else{
