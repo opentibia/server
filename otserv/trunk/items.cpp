@@ -126,6 +126,8 @@ ItemType::ItemType()
 	femaleSleeperID = 0;
 	noSleeperID = 0;
 	//]
+
+	currency = 0;
 }
 
 ItemType::~ItemType()
@@ -137,6 +139,7 @@ Items::Items() :
 items(8000)
 {
 	//
+	currencyMap.clear();
 }
 
 Items::~Items()
@@ -146,6 +149,7 @@ Items::~Items()
 
 void Items::clear()
 {
+	currencyMap.clear();
 	//TODO. clear items?
 }
 
@@ -1267,6 +1271,12 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.elementType = COMBAT_ENERGYDAMAGE;
 								}
 							}
+							else if(asLowerCaseString(strValue) == "currency"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.currency = intValue;
+									currencyMap[it.currency] = &it;
+								}
+							}
 							else{
 								std::cout << "Warning: [Items::loadFromXml] Unknown key value " << strValue  << std::endl;
 							}
@@ -1405,7 +1415,7 @@ Abilities::Abilities()
 
 	manaGain = 0;
 	manaTicks = 0;
-	
+
 	preventItemLoss = false;
 	preventSkillLoss = false;
 };

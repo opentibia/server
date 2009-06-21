@@ -1344,8 +1344,9 @@ bool Player::hasShopItemForSale(uint32_t itemId)
 
 void Player::updateSaleShopList(uint32_t itemId)
 {
+	const ItemType& itemtype = Item::items[itemId];
 	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
-		if(it->itemId == itemId || itemId == ITEM_COINS_GOLD || itemId == ITEM_COINS_PLATINUM || itemId == ITEM_COINS_CRYSTAL){
+		if(it->itemId == itemId || itemtype.currency != 0){
 			if(client){
 				client->sendSaleItemList(shopItemList);
 			}

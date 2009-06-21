@@ -62,7 +62,7 @@ enum ItemTypes_t {
 
 struct Abilities{
 	Abilities();
-	
+
 	struct Absorb {
 			int16_t resistances[COMBAT_COUNT];
 
@@ -98,7 +98,7 @@ struct Abilities{
 
 	uint32_t conditionImmunities;
 	uint32_t conditionSuppressions;
-	
+
 	bool preventItemLoss;
 	bool preventSkillLoss;
 };
@@ -223,6 +223,8 @@ public:
 	AmmoAction_t ammoAction;
 	int32_t fluidSource;
 
+	uint32_t currency;
+
 	Abilities abilities;
 
 	Condition* condition;
@@ -276,6 +278,9 @@ public:
 
 	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
 	uint32_t size() {return items.size();}
+
+
+	std::map<uint32_t, ItemType*> currencyMap;
 
 protected:
 	typedef std::map<int32_t, int32_t> ReverseItemMap;

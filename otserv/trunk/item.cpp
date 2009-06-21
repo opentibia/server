@@ -696,7 +696,7 @@ std::string Item::getLongName(const ItemType& it, int32_t lookDistance,
 	const Item* item /*= NULL*/, int32_t subType /*= -1*/, bool addArticle /*= true*/)
 {
 	std::ostringstream s;
-	
+
 	if(item){
 		subType = item->getSubType();
 	}
@@ -1040,7 +1040,7 @@ bool Item::canDecay()
 
 int Item::getWorth() const
 {
-	switch(getID()){
+	/*switch(getID()){
 	case ITEM_COINS_GOLD:
 		return getItemCount();
 	case ITEM_COINS_PLATINUM:
@@ -1049,7 +1049,9 @@ int Item::getWorth() const
 		return getItemCount() * 10000;
 	default:
 		return 0;
-	}
+	}*/
+	const ItemType& it = Item::items[id];
+	return it.currency;
 }
 
 void Item::getLight(LightInfo& lightInfo)

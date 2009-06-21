@@ -103,12 +103,12 @@ void Game::start(ServiceManager* servicer)
 {
 	service_manager = servicer;
 
-	checkLightEvent = 
+	checkLightEvent =
 		g_scheduler.addEvent(createSchedulerTask(EVENT_LIGHTINTERVAL,
 		boost::bind(&Game::checkLight, this)));
 	checkCreatureLastIndex = 0;
 
-	checkCreatureEvent = 
+	checkCreatureEvent =
 		g_scheduler.addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL,
 		boost::bind(&Game::checkCreatures, this)));
 
@@ -295,7 +295,7 @@ void Game::proceduralRefresh(Map::TileMap::iterator* begin)
 
 	// Refresh 250 tiles each cycle
 	refreshMap(begin, 250);
-	
+
 	if(*begin == map->refreshTileMap.end()){
 		delete begin;
 		return;
@@ -740,13 +740,13 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 				oldStackPosVector.push_back(tile->getClientIndexOfThing(player, creature));
 			}
 		}
-	}	
+	}
 
 	int32_t oldIndex = tile->__getIndexOfThing(creature);
 	if(!map->removeCreature(creature)){
 		return false;
 	}
-	
+
 	//send to client
 	uint32_t i = 0;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -1764,7 +1764,7 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 
 bool Game::addMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
 {
-	int crys = money / 10000;
+	/*int crys = money / 10000;
 	money -= crys * 10000;
 	int plat = money / 100;
 	money -= plat * 100;
@@ -1795,6 +1795,21 @@ bool Game::addMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
 		ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
 		if(ret != RET_NOERROR){
 			internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		}
+	}*/
+	for(std::map<uint32_t, ItemType*>::reverse_iterator it = Item::items.currencyMap.rbegin();
+		it != Item::items.currencyMap.rend(); ++it)
+	{
+		if(money >= it->first){
+			uint32_t count = money / it->first;
+			money -= count * it->first;
+
+			Item* moneyItem = Item::CreateItem(it->second->id, count);
+
+			ReturnValue ret = internalAddItem(cylinder, moneyItem, INDEX_WHEREEVER, flags);
+			if(ret != RET_NOERROR){
+				internalAddItem(cylinder->getTile(), moneyItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+			}
 		}
 	}
 	return true;
@@ -3138,14 +3153,14 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 
 	std::stringstream ss;
 	ss << "You see " << thing->getDescription(lookDistance);
-	
+
 	//x-ray (special description)
 	if(player->hasFlag(PlayerFlag_CanSeeSpecialDescription)){
 		ss << std::endl;
 		if(Item* item = thing->getItem()){
 			ss << "ID: " << item->getID() << std::endl;
 			uint16_t actionId = item->getActionId();
-			uint16_t uniqueId = item->getUniqueId();            
+			uint16_t uniqueId = item->getUniqueId();
 			if(actionId > 0)
 				ss << "Action ID: " << actionId << std::endl;
 			if(uniqueId > 0)
@@ -3157,7 +3172,7 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 		}
 		ss << "Position: [" << thing->getPosition().x << ", " << thing->getPosition().y << ", " << thing->getPosition().z << "]";
 	}
-	
+
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
 	return true;
@@ -3412,7 +3427,7 @@ bool Game::playerTurn(uint32_t playerId, Direction dir)
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
 		return false;
-		
+
 	player->resetIdle();
 	return internalCreatureTurn(player, dir);
 }
@@ -3436,11 +3451,11 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 	uint32_t outfitId = Outfits::getInstance()->getOutfitId(outfit.lookType);
 	if(player->canWearOutfit(outfitId, outfit.lookAddons)){
 		player->defaultOutfit = outfit;
-		
+
 		if(player->hasCondition(CONDITION_OUTFIT)){
 			return false;
 		}
-		
+
 		internalCreatureChangeOutfit(player, outfit);
 	}
 
@@ -4109,7 +4124,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 
 				TextColor_t textColor = TEXTCOLOR_NONE;
 				uint8_t hitEffect = 0;
-				
+
 				switch(combatType){
 					case COMBAT_PHYSICALDAMAGE:
 					{
@@ -4626,7 +4641,7 @@ void Game::showUseHotkeyMessage(Player* player, Item* item)
 	}
 	const ItemType& it = Item::items[item->getID()];
 	uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-	
+
 	std::stringstream ss;
 	if(itemCount == 1){
 		ss << "Using the last " << it.name << "...";
@@ -4884,7 +4899,7 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 
 		of <<
 			"-------------------------------------------------------------------------------" << std::endl <<
-			today << " - " << player->getName() << 
+			today << " - " << player->getName() <<
 			"[x:" << pos.x << " y:" << pos.y << " z:" << pos.z << "]" << std::endl <<
 			"\tComment: " << comment << std::endl;
 

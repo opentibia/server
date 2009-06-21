@@ -304,6 +304,7 @@ public:
 private:
 	RentPeriod_t rentPeriod;
 	HouseMap houseMap;
+	friend class IOMapSerialize;
 };
 
 #endif
