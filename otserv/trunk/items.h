@@ -279,7 +279,6 @@ public:
 	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
 	uint32_t size() {return items.size();}
 
-
 	std::map<uint32_t, ItemType*> currencyMap;
 
 protected:

@@ -1764,39 +1764,6 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 
 bool Game::addMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
 {
-	/*int crys = money / 10000;
-	money -= crys * 10000;
-	int plat = money / 100;
-	money -= plat * 100;
-	int gold = money;
-
-	while(crys > 0){
-		Item* remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, std::min(100, crys));
-
-		ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
-		if(ret != RET_NOERROR){
-			internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
-		}
-		crys -= std::min(100, crys);
-	}
-
-	if(plat != 0){
-		Item* remaindItem = Item::CreateItem(ITEM_COINS_PLATINUM, plat);
-
-		ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
-		if(ret != RET_NOERROR){
-			internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
-		}
-	}
-
-	if(gold != 0){
-		Item* remaindItem = Item::CreateItem(ITEM_COINS_GOLD, gold);
-
-		ReturnValue ret = internalAddItem(cylinder, remaindItem, INDEX_WHEREEVER, flags);
-		if(ret != RET_NOERROR){
-			internalAddItem(cylinder->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
-		}
-	}*/
 	for(std::map<uint32_t, ItemType*>::reverse_iterator it = Item::items.currencyMap.rbegin();
 		it != Item::items.currencyMap.rend(); ++it)
 	{

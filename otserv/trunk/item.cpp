@@ -1040,16 +1040,6 @@ bool Item::canDecay()
 
 int Item::getWorth() const
 {
-	/*switch(getID()){
-	case ITEM_COINS_GOLD:
-		return getItemCount();
-	case ITEM_COINS_PLATINUM:
-		return getItemCount() * 100;
-	case ITEM_COINS_CRYSTAL:
-		return getItemCount() * 10000;
-	default:
-		return 0;
-	}*/
 	const ItemType& it = Item::items[id];
 	return it.currency;
 }

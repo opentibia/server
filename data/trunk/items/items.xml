@@ -2795,6 +2795,7 @@
 	</item>
 	<item id="2148" article="a" name="gold coin" plural="gold coins">
 		<attribute key="weight" value="10"/>
+		<attribute key="currency" value="1"/>
 	</item>
 	<item id="2149" article="a" name="small emerald" plural="small emeralds">
 		<attribute key="weight" value="10"/>
@@ -2808,6 +2809,7 @@
 	</item>
 	<item id="2152" article="a" name="platinum coin" plural="platinum coins">
 		<attribute key="weight" value="10"/>
+		<attribute key="currency" value="100"/>
 	</item>
 	<item id="2153" article="a" name="violet gem">
 		<attribute key="weight" value="30"/>
@@ -2832,6 +2834,7 @@
 	</item>
 	<item id="2160" article="a" name="crystal coin" plural="crystal coins">
 		<attribute key="weight" value="10"/>
+		<attribute key="currency" value="10000"/>
 	</item>
 	<item id="2161" article="a" name="strange talisman">
 		<attribute key="weight" value="290"/>
