@@ -1697,7 +1697,7 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 	Thing* thing = NULL;
 	Item* item = NULL;
 
-	int32_t moneyCount = 0;
+	uint32_t moneyCount = 0;
 
 	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex() && money > 0; ++i){
 		if(!(thing = cylinder->__getThing(i)))
