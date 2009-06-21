@@ -2,7 +2,6 @@ local HOTA_WEAK = 2342
 local HOTA_FULL = 2343
 
 local SHRINES = {
-
 	-- Fire Shrine
 	[SMALL_RUBY]	= {7504, 7505, 7506, 7507},
 
@@ -24,7 +23,6 @@ local ENCHANTED_GEMS = {
 }
 
 function onUse(cid, item, frompos, item2, topos)
-
 	if(item2.itemid == HOTA_WEAK) then
 		doRemoveItem(item.uid, 1)
 		doTransformItem(item2.uid, HOTA_FULL)
@@ -71,5 +69,4 @@ function onUse(cid, item, frompos, item2, topos)
 	doTransformItem(item.uid, ENCHANTED_GEMS[item.itemid], count)
 
 	return TRUE
-
 end
