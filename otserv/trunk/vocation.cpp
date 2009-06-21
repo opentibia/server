@@ -114,6 +114,9 @@ bool Vocations::loadFromXml(const std::string& datadir)
 
 								}
 								else{
+									if(readXMLInteger(skillNode, "base", intVal)){
+										voc->skillBases[skill_id] = intVal;
+									}
 									if(readXMLFloat(skillNode, "multiplier", floatVal)){
 										voc->skillMultipliers[skill_id] = floatVal;
 									}
@@ -201,8 +204,6 @@ int32_t Vocations::getVocationId(const std::string& name)
 	return -1;
 }
 
-uint32_t Vocation::skillBase[SKILL_LAST + 1] = { 50, 50, 50, 50, 30, 100, 20 };
-
 Vocation::Vocation()
 {
 	name = "none";
@@ -223,6 +224,14 @@ Vocation::Vocation()
 	skillMultipliers[4] = 2.0f;
 	skillMultipliers[5] = 1.5f;
 	skillMultipliers[6] = 1.1f;
+
+	skillBases[0] = 50;
+	skillBases[1] = 50;
+	skillBases[2] = 50;
+	skillBases[3] = 50;
+	skillBases[4] = 30;
+	skillBases[5] = 100;
+	skillBases[6] = 20;
 
 	swordBaseDamage = 1.;
 	axeBaseDamage = 1.;
@@ -256,7 +265,7 @@ uint32_t Vocation::getReqSkillTries(int skill, int level)
 	if(it != cacheSkill[skill].end()){
 		return it->second;
 	}
-	uint32_t tries = (unsigned int)(skillBase[skill] * pow((float)skillMultipliers[skill], (float)(level - 11)));
+	uint32_t tries = (unsigned int)(skillBases[skill] * pow((float)skillMultipliers[skill], (float)(level - 11)));
 	skillMap[level] = tries;
 	return tries;
 }

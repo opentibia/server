@@ -89,7 +89,7 @@ protected:
 	uint16_t maxSoul;
 	uint16_t gainSoulTicks;
 
-	static uint32_t skillBase[SKILL_LAST + 1];
+	uint32_t skillBases[SKILL_LAST + 1];
 	float skillMultipliers[SKILL_LAST + 1];
 	float manaMultiplier;
 
