@@ -617,6 +617,43 @@ SimpleUpdateQuery updateQueries[] = {
 		{ // Sqlite
 			NULL
 		}
+	},
+	{ 17,
+		{ // PgSql
+			"ALTER TABLE `houses` DROP COLUMN `price`;",
+
+			"ALTER TABLE `houses` ADD `tiles` INT;",
+			"ALTER TABLE `houses` ALTER COLUMN `tiles` SET NOT NULL;", 
+			"ALTER TABLE `houses` ALTER COLUMN `tiles` SET DEFAULT 0;",
+
+			"CREATE TABLE `house_auctions` ("
+				"`house_id` INT NOT NULL,"
+				"`player_id` INT NOT NULL,"
+				"`bid` INT NOT NULL DEFAULT 0,"
+				"`limit` INT NOT NULL DEFAULT 0,"
+				"`endtime` BIGINT NOT NULL DEFAULT 0,"
+				"FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE",
+			);
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `houses` DROP `price`;",
+
+			"ALTER TABLE `houses` ADD `tiles` INT NOT NULL DEFAULT 0;",
+
+			"CREATE TABLE `house_auctions` ("
+				"`house_id` INT UNSIGNED NOT NULL,"
+				"`player_id` INT UNSIGNED NOT NULL,"
+				"`bid` INT UNSIGNED NOT NULL DEFAULT 0,"
+				"`limit` INT UNSIGNED NOT NULL DEFAULT 0,"
+				"`endtime` INT UNSIGNED NOT NULL DEFAULT 0,"
+				"FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE"
+			") ENGINE = InnoDB;",
+			NULL
+		},
+		{ // Sqlite
+			NULL
+		}
 	}
 };
 

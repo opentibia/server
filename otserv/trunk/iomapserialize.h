@@ -41,30 +41,35 @@ public:
 	IOMapSerialize() {}
 	~IOMapSerialize() {}
 
-	/** Load the map from a file/database
+	/** Load the map from a data storage
 	  * \param map pointer to the Map class
 	  * \return Returns true if the map was loaded successfully
 	*/
 	bool loadMap(Map* map);
 
-	/** Save the map to a file/database
+	/** Save the map to a data storage
 	  * \param map pointer to the Map class
 	  * \return Returns true if the map was saved successfully
 	*/
 	bool saveMap(Map* map);
 
-	/** Syncronize the house information from the map
-	  * \return Returns true if all houses where synced correctly
+	/** Synchronize the house information from the map
+	  * \return Returns true if all houses where updated correctly
 	*/
-	bool syncronizeHouseInfo();
+	bool updateHouseInfo();
 
-	/** Load the house access list to a file/database
+	/** Checks if any house auctions has ended and update to the new owner
+	  * \return Returns true if all houses where updated successfully
+	*/
+	bool processHouseAuctions();
+
+	/** Load the house access list from a data storage
 	  * \param map pointer to the Map class
 	  * \return Returns true if the house access list was opened successfully
 	*/
 	bool loadHouseInfo(Map* map);
 
-	/** Save the house access list to a file/database
+	/** Save the house access list to a data storage
 	  * \param map pointer to the Map class
 	  * \return Returns true if the house access list was saved successfully
 	*/

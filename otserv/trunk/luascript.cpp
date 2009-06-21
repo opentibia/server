@@ -1793,9 +1793,6 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 
 	const Player* player = env->getPlayerByUID(cid);
 	if(player){
-		const Tile *tile;
-		Position pos;
-		uint32_t stackpos;
 		switch(info){
 		case PlayerInfoAccess:
 			value = player->getAccessLevel();
@@ -1813,10 +1810,13 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			value = player->getMaxMana();
 			break;
 		case PlayerInfoMasterPos:
+		{
+			Position pos;
 			pos = player->masterPos;
 			pushPosition(L, pos, 0);
 			return 1;
 			break;
+		}
 		case PlayerInfoFood:
 		{
 			value = 0;
@@ -4314,7 +4314,7 @@ int LuaScriptInterface::luaGetHouseTilesSize(lua_State *L)
 
 	House* house = Houses::getInstance().getHouse(houseid);
 	if(house){
-		lua_pushnumber(L, house->getHouseTileSize());
+		lua_pushnumber(L, house->getTileCount());
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
@@ -4330,7 +4330,7 @@ int LuaScriptInterface::luaGetHouseDoorCount(lua_State *L)
 
 	House* house = Houses::getInstance().getHouse(houseid);
 	if(house){
-		lua_pushnumber(L, house->getHouseDoorCount());
+		lua_pushnumber(L, house->getDoorCount());
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
@@ -4346,7 +4346,7 @@ int LuaScriptInterface::luaGetHouseBedCount(lua_State *L)
 
 	House* house = Houses::getInstance().getHouse(houseid);
 	if(house){
-		lua_pushnumber(L, house->getHouseBedCount());
+		lua_pushnumber(L, house->getBedCount());
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));

@@ -175,9 +175,6 @@ public:
 	void setRent(uint32_t _rent){rent = _rent;}
 	uint32_t getRent() const {return rent;}
 
-	void setPrice(uint32_t _price){price = _price;}
-	uint32_t getPrice() const {return price;}
-
 	bool hasSyncFlag(syncflags_t flag) const {return ((syncFlags & (uint32_t)flag) == (uint32_t)flag);}
 	void resetSyncFlag(syncflags_t flag) {syncFlags &= ~(uint32_t)flag;}
 
@@ -210,17 +207,17 @@ public:
 	void resetTransferItem();
 	bool executeTransfer(HouseTransferItem* item, Player* player);
 
-	HouseTileList::iterator getHouseTileBegin() {return houseTiles.begin();}
-	HouseTileList::iterator getHouseTileEnd() {return houseTiles.end();}
-	size_t getHouseTileSize() {return houseTiles.size();}
+	HouseTileList::iterator getTileBegin() {return houseTiles.begin();}
+	HouseTileList::iterator getTileEnd() {return houseTiles.end();}
+	size_t getTileCount() {return houseTiles.size();}
 
-	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
-	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
-	size_t getHouseDoorCount() {return doorList.size();}
+	HouseDoorList::iterator getDoorBegin() {return doorList.begin();}
+	HouseDoorList::iterator getDoorEnd() {return doorList.end();}
+	size_t getDoorCount() {return doorList.size();}
 
-	HouseBedItemList::iterator getHouseBedsBegin() {return bedsList.begin();}
-	HouseBedItemList::iterator getHouseBedsEnd() {return bedsList.end();}
-	size_t getHouseBedCount() {return bedsList.size();}
+	HouseBedItemList::iterator getBedsBegin() {return bedsList.begin();}
+	HouseBedItemList::iterator getBedsEnd() {return bedsList.end();}
+	size_t getBedCount() {return bedsList.size();}
 
 	// Transfers all items to depot and clicks all players (useful for map updates, for example)
 	void cleanHouse();
@@ -243,7 +240,6 @@ private:
 	time_t paidUntil;
 	uint32_t rentWarnings;
 	time_t lastWarning;
-	uint32_t price;
 	uint32_t rent;
 	uint32_t townid;
 	bool guildHall;

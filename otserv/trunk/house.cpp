@@ -48,10 +48,9 @@ transfer_container(ITEM_LOCKER1)
 	houseid = _houseid;
 	rentWarnings = 0;
 	lastWarning = 0;
-	price = 0;
 	rent = 0;
 	townid = 0;
-	syncFlags = HOUSE_SYNC_TOWNID | HOUSE_SYNC_NAME | HOUSE_SYNC_PRICE | HOUSE_SYNC_RENT | HOUSE_SYNC_GUILDHALL;
+	syncFlags = HOUSE_SYNC_TOWNID | HOUSE_SYNC_NAME | HOUSE_SYNC_RENT | HOUSE_SYNC_GUILDHALL;
 	transferItem = NULL;
 	guildHall = false;
 	pendingDepotTransfer = false;
@@ -76,31 +75,7 @@ void House::setHouseOwner(uint32_t guid)
 	isLoaded = true;
 
 	if(houseOwner){
-		//send items to depot
-		transferToDepot();
-
-		PlayerVector to_kick;
-		for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-			if(const CreatureVector* creatures = (*it)->getCreatures()){
-				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-					if((*cit)->getPlayer()){
-						to_kick.push_back((*cit)->getPlayer());
-					}
-				}
-			}
-		}
-		while(to_kick.empty() == false){
-			Player* c = to_kick.back();
-			to_kick.pop_back();
-			kickPlayer(NULL, c->getName());
-		}
-
-		// we need to remove players from beds
-		for(HouseBedItemList::iterator it = bedsList.begin(); it != bedsList.end(); ++it){
-			if((*it)->getSleeper() != 0){
-				(*it)->wakeUp();
-			}
-		}
+		cleanHouse();
 
 		//clean access lists
 		houseOwner = 0;
@@ -137,7 +112,7 @@ void House::updateDoorDescription()
 	else{
 		houseDescription << "Nobody owns this house.";
 		if(g_config.getNumber(ConfigManager::SHOW_HOUSE_PRICES)){
-			uint32_t price = getHouseTileSize() * g_config.getNumber(ConfigManager::HOUSE_TILE_PRICE);
+			uint32_t price = getTileCount() * g_config.getNumber(ConfigManager::HOUSE_TILE_PRICE);
 			houseDescription << std::endl << "It costs " << price << " gold coins.";
 			std::string strPeriod;
 			Houses::getInstance().getRentPeriodString(strPeriod);
@@ -890,13 +865,6 @@ bool Houses::loadHousesXML(std::string filename)
 				}
 				else{
 					house->resetSyncFlag(House::HOUSE_SYNC_NAME);
-				}
-
-				if(readXMLInteger(houseNode, "price", intValue)){
-					house->setPrice(intValue);
-				}
-				else{
-					house->resetSyncFlag(House::HOUSE_SYNC_PRICE);
 				}
 
 				if(readXMLInteger(houseNode, "rent", intValue)){

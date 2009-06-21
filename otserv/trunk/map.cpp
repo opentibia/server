@@ -30,8 +30,6 @@
 #include <boost/bind.hpp>
 
 #include "iomap.h"
-
-#include "iomapxml.h"
 #include "iomapotbm.h"
 #include "iomapserialize.h"
 
@@ -64,14 +62,11 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 {
 	IOMap* loader;
 
-	if(type == "XML"){
-		loader = new IOMapXML();
-	}
-	else if(type == "OTBM"){
+	if(type == "OTBM"){
 		loader = new IOMapOTBM();
 	}
 	else{
-		std::cout << "FATAL: Could not determine the map format!" << std::endl;
+		std::cout << "FATAL: Could not determine the map format." << std::endl;
 		return false;
 	}
 
@@ -93,7 +88,8 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	delete loader;
 
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
-	IOMapSerialize->syncronizeHouseInfo();
+	IOMapSerialize->updateHouseInfo();
+	IOMapSerialize->processHouseAuctions();
 	IOMapSerialize->loadHouseInfo(this);
 	IOMapSerialize->loadMap(this);
 	return true;

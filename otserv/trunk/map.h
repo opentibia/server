@@ -296,7 +296,6 @@ protected:
 	friend class Game;
 
 	friend class IOMapOTBM;
-	friend class IOMapXML;
 	friend class IOMap;
 	friend class IOMapSerialize;
 };
