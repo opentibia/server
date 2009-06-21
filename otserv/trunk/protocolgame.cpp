@@ -75,6 +75,7 @@ ProtocolGame::ProtocolGame(Connection_ptr connection) :
 	Protocol(connection)
 {
 	player = NULL;
+	m_nextPing = 0;
 	m_debugAssertSent = false;
 	m_acceptPackets = false;
 	eventConnect = 0;
@@ -1006,11 +1007,12 @@ void ProtocolGame::parseDebug(NetworkMessage& msg)
 
 void ProtocolGame::parseRecievePing(NetworkMessage& msg)
 {
-	if(m_now > m_nextPing){
+	int64_t now = OTSYS_TIME();
+	if(now > m_nextPing){
 		g_dispatcher.addTask(
 			createTask(boost::bind(&Game::playerReceivePing, &g_game, player->getID())));
 
-		m_nextPing = m_now + 2000;
+		m_nextPing = now + 2000;
 	}
 }
 

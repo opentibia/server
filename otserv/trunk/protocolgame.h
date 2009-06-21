@@ -311,7 +311,6 @@ private:
 
 	Player* player;
 
-	int64_t m_now;
 	int64_t m_nextTask;
 	int64_t m_nextPing;
 
