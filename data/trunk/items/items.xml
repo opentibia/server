@@ -1810,7 +1810,9 @@
 	<item id="1758" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south"/>
-		<attribute key="maleSleeper" value="1766" />	</item>	<item id="1759" article="a" name="cot">
+		<attribute key="maleSleeper" value="1766" />
+	</item>
+	<item id="1759" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
 		<attribute key="maleSleeper" value="1767" />
@@ -1831,35 +1833,43 @@
 	<item id="1762" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-		<attribute key="maleSleeper" value="1754" />	</item>
+		<attribute key="maleSleeper" value="1754" />
+	</item>
 	<item id="1763" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-		<attribute key="maleSleeper" value="1755" />	</item>
+		<attribute key="maleSleeper" value="1755" />
+	</item>
 	<item id="1764" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-		<attribute key="maleSleeper" value="1760" />	</item>
+		<attribute key="maleSleeper" value="1760" />
+	</item>
 	<item id="1765" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-		<attribute key="maleSleeper" value="1761" />	</item>
+		<attribute key="maleSleeper" value="1761" />
+	</item>
 	<item id="1766" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-		<attribute key="maleSleeper" value="1758" />	</item>
+		<attribute key="maleSleeper" value="1758" />
+	</item>
 	<item id="1767" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-		<attribute key="maleSleeper" value="1759" />	</item>
+		<attribute key="maleSleeper" value="1759" />
+	</item>
 	<item id="1768" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-		<attribute key="maleSleeper" value="1756" />	</item>
+		<attribute key="maleSleeper" value="1756" />
+	</item>
 	<item id="1769" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-		<attribute key="maleSleeper" value="1757" />	</item>
+		<attribute key="maleSleeper" value="1757" />
+	</item>
 	<item id="1770" article="a" name="barrel">
 		<attribute key="containerSize" value="25"/>
 	</item>
@@ -8315,19 +8325,23 @@
 	<item id="3840" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-		<attribute key="maleSleeper" value="3836" />	</item>
+		<attribute key="maleSleeper" value="3836" />
+	</item>
 	<item id="3841" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-		<attribute key="maleSleeper" value="3837" />	</item>
+		<attribute key="maleSleeper" value="3837" />
+	</item>
 	<item id="3842" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-		<attribute key="maleSleeper" value="3838" />	</item>
+		<attribute key="maleSleeper" value="3838" />
+	</item>
 	<item id="3843" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-		<attribute key="maleSleeper" value="3839" />	</item>
+		<attribute key="maleSleeper" value="3839" />
+	</item>
 	<item id="3844" name="grass"/>
 	<item id="3845" name="grass"/>
 	<item id="3846" name="grass"/>

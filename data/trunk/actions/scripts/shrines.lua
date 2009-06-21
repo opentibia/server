@@ -37,35 +37,39 @@ function onUse(cid, item, frompos, item2, topos)
 	end
 
 	local count = item.type
-	
+
 	if (count == 0) then
 		count = 1
 	end
 
 	local manaCost = 300 * count
 	local soulCost = 2 * count
-
 	local requiredLevel = 30
 
 	if (getPlayerLevel(cid) < requiredLevel) then
-		doPlayerSendCancel(cid, "You don't have the required level.")
+		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHLEVEL)
 		return TRUE
 	end
 
 	if (isPremium(cid) == FALSE) then
-		doPlayerSendCancel(cid, "You need a premium account to do it.")
+		doPlayerSendDefaultCancel(cid, RETURNVALUE_YOUNEEDPREMIUMACCOUNT)
 		return TRUE
 	end
 
-	if (getPlayerMana(cid) >= manaCost and getPlayerSoul(cid) >= soulCost) then
-		doPlayerAddMana(cid, -manaCost)
-		doPlayerAddSoul(cid, -soulCost)
-		doTransformItem(item.uid, ENCHANTED_GEMS[item.itemid], count)
+	if (getPlayerMana(cid) >= manaCost) then
+		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHMANA)
 		return TRUE
-	else
-		doPlayerSendCancel(cid, "You don't have mana or soul points.")
 	end
-	
+
+	if (getPlayerSoul(cid) >= soulCost) then
+		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHSOUL)
+		return TRUE
+	end
+
+	doPlayerAddMana(cid, -manaCost)
+	doPlayerAddSoul(cid, -soulCost)
+	doTransformItem(item.uid, ENCHANTED_GEMS[item.itemid], count)
+
 	return TRUE
 
 end

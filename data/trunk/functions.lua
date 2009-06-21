@@ -617,6 +617,27 @@ function getBlessPrice(level)
 	return price
 end
 
+function getPlayerRequiredExperience(cid, level)
+    if isPlayer(cid) == TRUE and level >= 1 then
+		local playerLevel = getPlayerLevel(cid)
+		local levelExp = Calculator:getLevelExp(playerLevel+level)
+		local experienceLeft = levelExp - getPlayerExperience(cid)
+		return experienceLeft
+    end
+
+	return LUA_ERROR
+end
+
+function doPlayerAddLevel(cid, level)
+    if isPlayer(cid) == TRUE and level >= 1 then
+		local experience = getPlayerRequiredExperience(cid, level)
+		doPlayerAddExp(cid, experience)
+		return LUA_NO_ERROR
+    end
+
+	return LUA_ERROR
+end
+
 -- Functions made by Jiddo
 function doPlayerGiveItem(cid, itemid, count, charges)
 	local hasCharges = (isItemRune(itemid) == TRUE or isItemFluidContainer(itemid) == TRUE)

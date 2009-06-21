@@ -458,6 +458,7 @@ protected:
 	static int luaGetPlayerPremiumDays(lua_State *L);
 	static int luaGetPlayerBalance(lua_State *L);
 	static int luaGetPlayerLastLogin(lua_State *L);
+	static int luaGetPlayerExperience(lua_State *L);
 
 	static int luaPlayerLearnInstantSpell(lua_State *L);
 	static int luaCanPlayerLearnInstantSpell(lua_State *L);

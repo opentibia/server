@@ -19,6 +19,7 @@
 	<action itemid="2550" script="scythe.lua"/>
 	<action itemid="2580" script="fishing_rod.lua" allowfaruse="1"/>
 	<action itemid="5865" script="juice_squeezer.lua"/>
+	<action itemid="9930" script="rusty_remover.lua" />
 
 	<!-- Enchanting -->
 	<action itemid="7759" script="enchant.lua" />
@@ -32,6 +33,7 @@
 
 	<!-- Spellbooks -->
 	<action itemid="2175" script="spellbook.lua"/>
+	<action itemid="6120" script="spellbook.lua"/>
 	<action itemid="8900" script="spellbook.lua"/>
 	<action itemid="8901" script="spellbook.lua"/>
 	<action itemid="8902" script="spellbook.lua"/>	
@@ -42,7 +44,6 @@
 	<!-- Watches and Clocks -->
 	<action itemid="1728" script="watch_clock.lua"/>
 	<action itemid="1729" script="watch_clock.lua"/>
-
 	<action itemid="1730" script="watch_clock.lua"/>
 	<action itemid="1731" script="watch_clock.lua"/>
 	<action itemid="1732" script="watch_clock.lua"/>
@@ -52,7 +53,6 @@
 	<action itemid="1873" script="watch_clock.lua"/>
 	<action itemid="1874" script="watch_clock.lua"/>
 	<action itemid="1875" script="watch_clock.lua"/>
-
 	<action itemid="1876" script="watch_clock.lua"/>
 	<action itemid="1877" script="watch_clock.lua"/>
 	<action itemid="1881" script="watch_clock.lua"/>
@@ -218,6 +218,11 @@
 	<action itemid="3936" script="furniture_package.lua"/>
 	<action itemid="3937" script="furniture_package.lua"/>
 	<action itemid="3938" script="furniture_package.lua"/>
+
+	<action itemid="7904" script="furniture_beds.lua"/>
+	<action itemid="7905" script="furniture_beds.lua"/>
+	<action itemid="7906" script="furniture_beds.lua"/>
+	<action itemid="7907" script="furniture_beds.lua"/>
 	
 	<!-- Doors -->
 	<action itemid="1209" script="doors/door_locked.lua"/>
@@ -788,4 +793,9 @@
 	<action itemid="5791" script="stuffed_dragon.lua"/>
 	<action itemid="6566" script="stuffed_dragon.lua"/>
 	<action itemid="2114" script="piggy_bank.lua"/>
+	<action itemid="6567" script="santa_doll.lua"/>
+	<action itemid="6388" script="christmas_card.lua"/>
+	<action itemid="2566" script="pumpkinhead.lua" />
+	<action itemid="2096" script="pumpkinhead.lua" />
+	<action itemid="5080" script="panda_teddy.lua" />
 </actions>

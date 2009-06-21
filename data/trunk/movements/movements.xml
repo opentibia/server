@@ -322,6 +322,7 @@
 	<moveevent event="StepIn" itemid="2579" script="trap.lua" />
 	<moveevent event="RemoveItem" itemid="2579" script="trap.lua" />
 	<moveevent event="AddItem" tileitem="1" itemid="2579" script="trap.lua" />
+	<moveevent event="StepIn" itemid="8072" script="yellow_pillow.lua" />
 
 	<!-- Items -->
 	<!-- Boots -->
