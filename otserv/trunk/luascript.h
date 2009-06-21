@@ -394,7 +394,7 @@ protected:
 
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
-	static int luaGetThingfromPos(lua_State *L);
+	static int luaGetThingFromPos(lua_State *L);
 	static int luaGetThing(lua_State *L);
 	static int luaGetThingPos(lua_State *L);
 	static int luaGetTileItemById(lua_State *L);

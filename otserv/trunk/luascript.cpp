@@ -1183,8 +1183,8 @@ void LuaScriptInterface::registerFunctions()
 	//getItemSpecialDescription(uid)
 	lua_register(m_luaState, "getItemSpecialDescription", LuaScriptInterface::luaGetItemSpecialDescription);
 
-	//getThingfromPos(pos)
-	lua_register(m_luaState, "getThingfromPos", LuaScriptInterface::luaGetThingfromPos);
+	//getThingFromPos(pos)
+	lua_register(m_luaState, "getThingFromPos", LuaScriptInterface::luaGetThingFromPos);
 
 	//getThing(uid)
 	lua_register(m_luaState, "getThing", LuaScriptInterface::luaGetThing);
@@ -3255,11 +3255,11 @@ int LuaScriptInterface::luaDoDecayItem(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaGetThingfromPos(lua_State *L)
+int LuaScriptInterface::luaGetThingFromPos(lua_State *L)
 {
 	//Consider using getTileItemById/getTileItemByType/getTileThingByPos/getTopCreature instead.
 
-	//getThingfromPos(pos)
+	//getThingFromPos(pos)
 	//Note:
 	//	stackpos = 255. Get the top thing(item moveable or creature)
 	//	stackpos = 254. Get MagicFieldtItem
