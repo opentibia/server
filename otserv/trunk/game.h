@@ -346,7 +346,7 @@ public:
 	  * \param flags optional flags to modifiy the default behaviour
 	  * \return true if the removal was successful
 	  */
-	bool removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags = 0);
+	bool removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags = 0);
 
 	/**
 	  * Add item(s) with monetary value
@@ -355,7 +355,7 @@ public:
 	  * \param flags optional flags to modify default behavior
 	  * \return true
 	  */
-	bool addMoney(Cylinder* cylinder, int32_t money, uint32_t flags = 0);
+	bool addMoney(Cylinder* cylinder, uint32_t money, uint32_t flags = 0);
 
 	/**
 	  * Transform one item to another type/count

@@ -1038,7 +1038,7 @@ bool Item::canDecay()
 	return true;
 }
 
-int Item::getWorth() const
+uint32_t Item::getWorth() const
 {
 	const ItemType& it = Item::items[id];
 	return it.currency;

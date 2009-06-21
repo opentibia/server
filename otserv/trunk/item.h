@@ -328,7 +328,7 @@ public:
 	bool canWriteText() const {return items[id].canWriteText;}
 	uint16_t getMaxWriteLength() const {return items[id].maxTextLen;}
 
-	int getWorth() const;
+	uint32_t getWorth() const;
 	void getLight(LightInfo& lightInfo);
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;

@@ -2114,7 +2114,8 @@ void Npc::setCreatureFocus(Creature* creature)
 }
 
 const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* player,
-	NpcState* npcState, const std::string& text, bool exactMatch /*= false*/)
+	NpcState* npcState, const std::string& text,
+	bool exactMatch /*= false*/, InteractType_t interactType /*= INTERACT_NONE*/)
 {
 	std::string textString = asLowerCaseString(text);
 	std::vector<std::string> wordList = explodeString(textString, " ");
@@ -2123,7 +2124,13 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 	int32_t totalMatchCount = 0;
 
 	for(ResponseList::const_iterator it = list.begin(); it != list.end(); ++it){
+
 		NpcResponse* iresponse = *it;
+
+		if(interactType != INTERACT_NONE && iresponse->getInteractType() != interactType){
+			continue;
+		}
+
 		int32_t matchCount = 0;
 
 		if(iresponse->getParams() != RESPOND_DEFAULT){
@@ -2430,12 +2437,12 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		if(iresponse->getInteractType() == INTERACT_TEXT || iresponse->getFocusState() != -1){
 			if(npcState->isIdle && iresponse->getFocusState() != 1){
-				//We are idle, and this iresponse does not activate the npc.
+				//We are idle, and this response does not activate the npc.
 				continue;
 			}
 
 			if(!npcState->isIdle && iresponse->getFocusState() == 1){
-				//We are not idle, and this iresponse would activate us again.
+				//We are not idle, and this response would activate us again.
 				continue;
 			}
 		}
@@ -2630,7 +2637,7 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, Np
 		}
 	}
 
-	return getResponse(responseList, player, npcState, eventName, true);
+	return getResponse(responseList, player, npcState, eventName, true, INTERACT_EVENT);
 }
 
 std::string Npc::getEventResponseName(NpcEvent_t eventType)

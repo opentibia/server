@@ -165,6 +165,7 @@ enum ResponseType_t{
 };
 
 enum InteractType_t{
+	INTERACT_NONE,
 	INTERACT_TEXT,
 	INTERACT_EVENT
 };
@@ -526,7 +527,8 @@ protected:
 	bool loadFromXml(const std::string& name);
 
 	const NpcResponse* getResponse(const ResponseList& list, const Player* player,
-		NpcState* npcState, const std::string& text, bool exactMatch = false);
+		NpcState* npcState, const std::string& text,
+		bool exactMatch = false, InteractType_t interactType = INTERACT_NONE);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState, const std::string& text, bool checkLastResponse);
 	const NpcResponse* getResponse(const Player* player, NpcEvent_t eventType);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType, bool checkLastResponse);

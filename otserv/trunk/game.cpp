@@ -1679,7 +1679,7 @@ uint32_t Game::getMoney(const Cylinder* cylinder)
 	return moneyCount;
 }
 
-bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
+bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*/)
 {
 	if(cylinder == NULL){
 		return false;
@@ -1691,7 +1691,7 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 	std::list<Container*> listContainer;
 	Container* tmpContainer = NULL;
 
-	typedef std::multimap<int, Item*, std::less<int> > MoneyMap;
+	typedef std::multimap<uint32_t, Item*, std::less<uint32_t> > MoneyMap;
 	typedef MoneyMap::value_type moneymap_pair;
 	MoneyMap moneyMap;
 	Thing* thing = NULL;
@@ -1762,7 +1762,7 @@ bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/
 	return (money == 0);
 }
 
-bool Game::addMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
+bool Game::addMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*/)
 {
 	for(std::map<uint32_t, ItemType*>::reverse_iterator it = Item::items.currencyMap.rbegin();
 		it != Item::items.currencyMap.rend(); ++it)
@@ -1771,11 +1771,16 @@ bool Game::addMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
 			uint32_t count = money / it->first;
 			money -= count * it->first;
 
-			Item* moneyItem = Item::CreateItem(it->second->id, count);
+			while(count > 0){
+				uint32_t moneyCount = std::min(count, (uint32_t)100);
+				Item* moneyItem = Item::CreateItem(it->second->id, moneyCount);
 
-			ReturnValue ret = internalAddItem(cylinder, moneyItem, INDEX_WHEREEVER, flags);
-			if(ret != RET_NOERROR){
-				internalAddItem(cylinder->getTile(), moneyItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+				ReturnValue ret = internalAddItem(cylinder, moneyItem, INDEX_WHEREEVER, flags);
+				if(ret != RET_NOERROR){
+					internalAddItem(cylinder->getTile(), moneyItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+				}
+
+				count -= moneyCount;
 			}
 		}
 	}
