@@ -566,6 +566,10 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 			}
 
 			if(readXMLInteger(node, "topic", intValue)){
+				if(intValue <= 0){
+					std::cout << "Warning: [Npc::loadInteraction] Invalid topic value -" << intValue << std::endl;
+				}
+
 				prop.topic = intValue;
 			} else if(readXMLInteger(node, "nottopic", intValue)){
 				prop.topic = intValue;
@@ -1088,7 +1092,7 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->listName = "";
 	state->listPluralName = "";
 	state->level = -1;
-	state->topic = -1;
+	state->topic = 0;
 	state->isIdle = true;
 	state->isQueued = false;
 	state->respondToText = "";
@@ -1429,7 +1433,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 		for(ActionList::const_iterator it = response->getFirstAction(); it != response->getEndAction(); ++it){
 			switch((*it).actionType){
-				case ACTION_SETTOPIC: npcState->topic = (*it).intValue; resetTopic = false; break;
+				case ACTION_SETTOPIC: npcState->topic = std::max((*it).intValue, 0); resetTopic = false; break;
 				case ACTION_SETSELLPRICE: npcState->sellPrice = (*it).intValue; break;
 				case ACTION_SETBUYPRICE: npcState->buyPrice = (*it).intValue; break;
 				case ACTION_SETITEM: npcState->itemId = (*it).intValue; break;
@@ -1861,7 +1865,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 		}
 
 		if(resetTopic && response->getTopic() == npcState->topic){
-			npcState->topic = -1;
+			npcState->topic = 0;
 		}
 		npcState->prevInteraction = OTSYS_TIME();
 	}
@@ -2447,12 +2451,12 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 		}
 
-		if(npcState->topic == -1 && iresponse->getTopic() != -1){
+		if(npcState->topic == 0 && iresponse->getTopic() != -1){
 			//Not the right topic
 			continue;
 		}
 
-		if(npcState->topic != -1 && npcState->topic == iresponse->getTopic()){
+		if(npcState->topic != 0 && npcState->topic == iresponse->getTopic()){
 			//Topic is right
 			matchCount += 1000;
 		}
@@ -3180,7 +3184,7 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->subType = getField(L, "subtype");
 	state->ignoreCapacity = getFieldBool(L, "ignorecapacity");
 	state->buyWithBackpack = getFieldBool(L, "buywithbackpack");
-	state->topic = getField(L, "topic");
+	state->topic = std::max(getField(L, "topic"), (int32_t)0);
 	state->level = getField(L, "level");
 	state->spellName = getFieldString(L, "spellname");
 	state->listName = getFieldString(L, "listname");
