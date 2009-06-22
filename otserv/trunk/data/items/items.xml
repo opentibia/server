@@ -1046,7 +1046,6 @@
 	<item id="1422" article="a" name="campfire"/>
 	<item id="1423" article="a" name="campfire">
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="4000"/>
 			<attribute key="count" value="2"/>
 			<attribute key="damage" value="10"/>
@@ -1054,7 +1053,6 @@
 	</item>
 	<item id="1424" article="a" name="campfire">
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="4000"/>
 			<attribute key="count" value="2"/>
 			<attribute key="damage" value="10"/>
@@ -1062,7 +1060,6 @@
 	</item>
 	<item id="1425" article="a" name="campfire">
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="4000"/>
 			<attribute key="count" value="2"/>
 			<attribute key="damage" value="10"/>
@@ -1157,7 +1154,6 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1190,7 +1186,6 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="energy">
-			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1200,7 +1195,6 @@
 		<attribute key="decayTo" value="1493"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1227,7 +1221,6 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="field" value="energy">
-			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1260,7 +1253,6 @@
 		<attribute key="decayTo" value="1501"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="field" value="fire">
-			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1297,7 +1289,6 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="field" value="energy">
-			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1819,7 +1810,9 @@
 	<item id="1758" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south"/>
-		<attribute key="maleSleeper" value="1766" />	</item>	<item id="1759" article="a" name="cot">
+		<attribute key="maleSleeper" value="1766" />
+	</item>
+	<item id="1759" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
 		<attribute key="maleSleeper" value="1767" />
@@ -1840,35 +1833,43 @@
 	<item id="1762" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-		<attribute key="maleSleeper" value="1754" />	</item>
+		<attribute key="maleSleeper" value="1754" />
+	</item>
 	<item id="1763" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-		<attribute key="maleSleeper" value="1755" />	</item>
+		<attribute key="maleSleeper" value="1755" />
+	</item>
 	<item id="1764" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-		<attribute key="maleSleeper" value="1760" />	</item>
+		<attribute key="maleSleeper" value="1760" />
+	</item>
 	<item id="1765" article="a" name="bed">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-		<attribute key="maleSleeper" value="1761" />	</item>
+		<attribute key="maleSleeper" value="1761" />
+	</item>
 	<item id="1766" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-		<attribute key="maleSleeper" value="1758" />	</item>
+		<attribute key="maleSleeper" value="1758" />
+	</item>
 	<item id="1767" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-		<attribute key="maleSleeper" value="1759" />	</item>
+		<attribute key="maleSleeper" value="1759" />
+	</item>
 	<item id="1768" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-		<attribute key="maleSleeper" value="1756" />	</item>
+		<attribute key="maleSleeper" value="1756" />
+	</item>
 	<item id="1769" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-		<attribute key="maleSleeper" value="1757" />	</item>
+		<attribute key="maleSleeper" value="1757" />
+	</item>
 	<item id="1770" article="a" name="barrel">
 		<attribute key="containerSize" value="25"/>
 	</item>
@@ -2833,7 +2834,7 @@
 	</item>
 	<item id="2160" article="a" name="crystal coin" plural="crystal coins">
 		<attribute key="weight" value="10"/>
-		<attribute key="currency" value="100000"/>
+		<attribute key="currency" value="10000"/>
 	</item>
 	<item id="2161" article="a" name="strange talisman">
 		<attribute key="weight" value="290"/>
@@ -8327,19 +8328,23 @@
 	<item id="3840" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-		<attribute key="maleSleeper" value="3836" />	</item>
+		<attribute key="maleSleeper" value="3836" />
+	</item>
 	<item id="3841" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-		<attribute key="maleSleeper" value="3837" />	</item>
+		<attribute key="maleSleeper" value="3837" />
+	</item>
 	<item id="3842" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-		<attribute key="maleSleeper" value="3838" />	</item>
+		<attribute key="maleSleeper" value="3838" />
+	</item>
 	<item id="3843" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-		<attribute key="maleSleeper" value="3839" />	</item>
+		<attribute key="maleSleeper" value="3839" />
+	</item>
 	<item id="3844" name="grass"/>
 	<item id="3845" name="grass"/>
 	<item id="3846" name="grass"/>
@@ -16369,63 +16374,63 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7466" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7467" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7468" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7469" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7470" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7471" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7472" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7473" article="a" name="searing fire">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
-		<attribute key="damage" value="300"/>
+			<attribute key="damage" value="300"/>
 		</attribute>
 	</item>
 	<item id="7474" article="a" name="sarcophagus"/>
@@ -19111,7 +19116,7 @@
 		<attribute key="duration" value="600"/>
 	</item>
 	<item id="8586" name="dirt"/>
-	<item id="8587" article="a" name="chest">
+	<item id="8587" article="a" name="sturdy chest">
 		<attribute key="containerSize" value="8"/>
 	</item>
 	<item id="8588" name="skeletal remains"/>
