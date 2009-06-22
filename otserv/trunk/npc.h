@@ -324,7 +324,7 @@ public:
 			haveItemId = 0;
 			dontHaveItemId = 0;
 			output = "";
-			interactType = INTERACT_TEXT;
+			eventType = EVENT_NONE;
 			responseType = RESPONSE_DEFAULT;
 			params = 0;
 			knowSpell = "";
@@ -341,7 +341,7 @@ public:
 		uint16_t dontHaveItemId;
 		std::list<std::string> inputList;
 		std::string output;
-		InteractType_t interactType;
+		NpcEvent_t eventType;
 		ResponseType_t responseType;
 		uint32_t params;
 		StorageConditions storageConditions;
@@ -391,7 +391,7 @@ public:
 	ConditionType_t getCondition() const {return prop.condition;}
 	int32_t getHealth() const {return prop.health;}
 	ResponseType_t getResponseType() const {return prop.responseType;}
-	InteractType_t getInteractType() const {return prop.interactType;}
+	NpcEvent_t getEventType() const {return prop.eventType;}
 	const std::string& getKnowSpell() const {return prop.knowSpell;}
 	const std::string& getText() const {return prop.output;}
 	int32_t getAmount() const {return prop.amount;}
@@ -415,6 +415,7 @@ public:
 };
 
 struct NpcState{
+	uint32_t playerId;
 	int32_t topic;
 	bool isIdle;
 	bool isQueued;
@@ -432,8 +433,7 @@ struct NpcState{
 	int32_t level;
 	int64_t prevInteraction;
 	std::string respondToText;
-	uint32_t respondToCreature;
-	std::string prevRespondToText;
+	std::string respondText;
 	const NpcResponse* lastResponse;
 	uint64_t lastResponseTime;
 
@@ -490,6 +490,7 @@ public:
 		uint8_t count, uint8_t amount, bool ignoreCapacity = false, bool buyWithBackpack = false);
 	void onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCallback);
 
+	void turnToCreature(Creature* creature);
 	void setCreatureFocus(Creature* creature);
 
 	NpcScriptInterface* getScriptInterface();
@@ -528,15 +529,18 @@ protected:
 
 	const NpcResponse* getResponse(const ResponseList& list, const Player* player,
 		NpcState* npcState, const std::string& text,
-		bool exactMatch = false, InteractType_t interactType = INTERACT_NONE);
+		bool exactMatch = false, NpcEvent_t eventType = EVENT_NONE);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState, const std::string& text, bool checkLastResponse);
 	const NpcResponse* getResponse(const Player* player, NpcEvent_t eventType);
-	const NpcResponse* getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType, bool checkLastResponse);
-	std::string getEventResponseName(NpcEvent_t eventType);
+	const NpcResponse* getResponse(const Player* player, NpcState* npcState,
+		NpcEvent_t eventType, const std::string& text, bool checkLastResponse);
+	const NpcResponse* getResponse(const Player* player, NpcState* npcState,
+		NpcEvent_t eventType, bool checkLastResponse);
 
 	uint32_t getMatchCount(NpcResponse* response, std::vector<std::string> wordList,
 		bool exactMatch, int32_t& matchAllCount, int32_t& totalKeywordCount);
 
+	void processResponse(Player* player, NpcState* npcState, const NpcResponse* response);
 	void executeResponse(Player* player, NpcState* npcState, const NpcResponse* response);
 
 	std::string formatResponse(Creature* creature, const NpcState* npcState, const NpcResponse* response) const;

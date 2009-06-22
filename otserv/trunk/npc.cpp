@@ -550,19 +550,46 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 			if(readXMLString(node, "keywords", strValue)){
 				prop.inputList.push_back(asLowerCaseString(strValue));
 			}
-			else if(readXMLString(node, "event", strValue)){
+			
+			prop.eventType = EVENT_NONE;
+
+			if(readXMLString(node, "event", strValue)){
 				strValue = asLowerCaseString(strValue);
 				if(strValue == "onbusy"){
 					hasBusyReply = true;
+					prop.eventType = EVENT_BUSY;
+				}
+				else if(strValue == "onthink"){
+					prop.eventType = EVENT_THINK;
 				}
 				else if(strValue == "onidle"){
 					if(readXMLInteger(node, "time", intValue)){
 						prop.time = intValue;
 					}
-				}
 
-				prop.interactType = INTERACT_EVENT;
-				prop.inputList.push_back(strValue);
+					prop.eventType = EVENT_IDLE;
+				}
+				else if(strValue == "onplayerenter"){
+					prop.eventType = EVENT_PLAYER_ENTER;
+				}
+				else if(strValue == "onplayermove"){
+					prop.eventType = EVENT_PLAYER_MOVE;
+				}
+				else if(strValue == "onplayerleave"){
+					prop.eventType = EVENT_PLAYER_LEAVE;
+				}
+				else if(strValue == "onplayershopsell"){
+					prop.eventType = EVENT_PLAYER_SHOPSELL;
+				}
+				else if(strValue == "onplayershopbuy"){
+					prop.eventType = EVENT_PLAYER_SHOPBUY;
+				}
+				else if(strValue == "onplayershopclose"){
+					prop.eventType = EVENT_PLAYER_SHOPCLOSE;
+				}
+				else{
+					std::cout << "Warning: [Npc::loadInteraction] Invalid event type -" << strValue << std::endl;
+				}
 			}
 
 			if(readXMLInteger(node, "topic", intValue)){
@@ -571,7 +598,8 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 				}
 
 				prop.topic = intValue;
-			} else if(readXMLInteger(node, "nottopic", intValue)){
+			}
+			else if(readXMLInteger(node, "nottopic", intValue)){
 				prop.topic = intValue;
 				prop.params |= RESPOND_NOTTOPIC;
 			}
@@ -740,8 +768,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 					}
 
 					if(readXMLInteger(tmpNode, "n3", intValue)){
-						scriptVars.n3 = intValue
-							;
+						scriptVars.n3 = intValue;
 					}
 
 					ResponseList subResponseList;
@@ -757,12 +784,18 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.actionType = ACTION_SETTOPIC;
 										action.intValue = intValue;
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'name'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "price"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_SETPRICE;
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'price'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "amount"){
@@ -771,17 +804,26 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'amount'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "item"){
 									if(readXMLInteger(subNode, "value", intValue)){
 										action.actionType = ACTION_SETITEM;
 										action.intValue = intValue;
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'item'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "subtype"){
 									if(readXMLInteger(subNode, "value", intValue)){
 										action.actionType = ACTION_SETSUBTYPE;
 										action.intValue = intValue;
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'subtype'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "spell"){
@@ -796,17 +838,26 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 											}
 										}
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'spell'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "listname"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_SETLISTNAME;
 										action.strValue = strValue;
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'listname'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "listpname"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_SETLISTPNAME;
 										action.strValue = strValue;
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'listpname'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "teachspell"){
@@ -821,12 +872,18 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 											}
 										}
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'teachspell'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "sell"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_SELLITEM;
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'sell'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "buy"){
@@ -835,12 +892,18 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'buy'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "takemoney"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_TAKEMONEY;
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'takemoney'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "givemoney"){
@@ -849,12 +912,18 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'givemoney'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "level"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_SETLEVEL;
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'level'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "giveitem"){
@@ -863,6 +932,9 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'giveitem'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "takeitem"){
 									if(readXMLString(subNode, "value", strValue)){
@@ -870,11 +942,17 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'takeitem'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "effect"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_SETEFFECT;
 										action.intValue = getMagicEffect(strValue);
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'effect'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "idle"){
@@ -882,13 +960,16 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.actionType = ACTION_SETIDLE;
 										action.intValue = intValue;
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'idle'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "script"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_SCRIPT;
 										action.strValue = strValue;
 									}
-									else{
+									else if(subNode->children){
 										xmlNodePtr scriptNode = subNode->children;
 										while(scriptNode){
 											if(xmlStrcmp(scriptNode->name, (const xmlChar*)"text") == 0 ||
@@ -906,11 +987,17 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 											scriptNode = scriptNode->next;
 										}
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'script'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "scriptparam"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_SCRIPTPARAM;
 										action.strValue = strValue;
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'scriptparam'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "storage"){
@@ -918,12 +1005,18 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 										action.actionType = ACTION_SETSTORAGE;
 										action.intValue = intValue;
 									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'storage'] Could not find attribute 'value' " << std::endl;
+									}
 								}
 								else if(asLowerCaseString(strValue) == "addqueue"){
 									if(readXMLString(subNode, "value", strValue)){
 										action.actionType = ACTION_ADDQUEUE;
 										action.strValue = strValue;
 										action.intValue = atoi(strValue.c_str());
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'addqueue'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else if(asLowerCaseString(strValue) == "teleport"){
@@ -940,6 +1033,9 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 											action.pos.y = atoi(posList[1].c_str());
 											action.pos.z = atoi(posList[2].c_str());
 										}
+									}
+									else{
+										std::cout << "Warning: [Npc::loadInteraction] [Action 'teleport'] Could not find attribute 'value' " << std::endl;
 									}
 								}
 								else{
@@ -1069,7 +1165,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 {
 	for(StateList::iterator it = stateList.begin(); it != stateList.end(); ++it){
-		if((*it)->respondToCreature == player->getID()){
+		if((*it)->playerId == player->getID()){
 			return *it;
 		}
 	}
@@ -1079,6 +1175,7 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	}
 
 	NpcState* state = new NpcState;
+	state->playerId = player->getID();
 	state->prevInteraction = 0;
 	state->price = 0;
 	state->sellPrice = 0;
@@ -1096,9 +1193,8 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->isIdle = true;
 	state->isQueued = false;
 	state->respondToText = "";
-	state->respondToCreature = 0;
+	state->respondText = "";
 	state->lastResponse = NULL;
-	state->prevRespondToText = "";
 	state->lastResponseTime = 0;
 	stateList.push_back(state);
 	return state;
@@ -1163,7 +1259,6 @@ void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 		NpcState* npcState = getState(player);
 		if(npcState){
 			if(canSee(player->getPosition())){
-				npcState->respondToCreature = player->getID();
 				onPlayerEnter(player, npcState);
 			}
 		}
@@ -1193,7 +1288,6 @@ void Npc::onCreatureDisappear(const Creature* creature, bool isLogout)
 
 		NpcState* npcState = getState(player);
 		if(npcState){
-			npcState->respondToCreature = player->getID();
 			onPlayerLeave(player, npcState);
 		}
 	}
@@ -1221,20 +1315,17 @@ void Npc::onCreatureMove(const Creature* creature, const Tile* newTile, const Po
 			Position myPos = getPosition();
 
 			if(canSeeNewPos && !canSeeOldPos){
-				npcState->respondToCreature = player->getID();
 				onPlayerEnter(player, npcState);
 			}
 			else if((!canSeeNewPos ||
 					(newPos.x < myPos.x - talkRadius) || (newPos.x > myPos.x + talkRadius) ||
 					(newPos.y < myPos.y - talkRadius) || (newPos.y > myPos.y + talkRadius))
 					&& canSeeOldPos){
-				npcState->respondToCreature = player->getID();
 				onPlayerLeave(player, npcState);
 			}
 			else if(canSeeNewPos && canSeeOldPos){
-				npcState->respondToCreature = player->getID();
 				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_MOVE, false);
-				executeResponse(player, npcState, response);
+				processResponse(player, npcState, response);
 			}
 		}
 	}
@@ -1251,7 +1342,7 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 		return;
 
 	//only players for script events
-	if(const Player* player = creature->getPlayer()){
+	if(Player* player = const_cast<Player*>(creature->getPlayer())){
 
 		if(m_npcEventHandler){
 			m_npcEventHandler->onCreatureSay(player, type, text);
@@ -1265,8 +1356,26 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 					(pos.y >= myPos.y - talkRadius) && (pos.y <= myPos.y + talkRadius)){
 
 					NpcState* npcState = getState(player);
+
+					if(!text.empty()){
+						if(hasBusyReply && focusCreature != 0 && focusCreature != player->getID()){
+							//Check if we have a busy reply
+							const NpcResponse* response = getResponse(player, npcState, EVENT_BUSY, text, false);
+							if(response){
+								turnToCreature(player);
+								processResponse(player, npcState, response);
+							}
+						}
+						else{
+							const NpcResponse* response = getResponse(player, npcState, text, true);
+							if(response){
+								setCreatureFocus(player);
+								processResponse(player, npcState, response);
+							}
+						}
+					}
+
 					npcState->respondToText = text;
-					npcState->respondToCreature = player->getID();
 				}
 			}
 		}
@@ -1290,7 +1399,7 @@ void Npc::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfi
 void Npc::onPlayerEnter(Player* player, NpcState* state)
 {
 	const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_ENTER, false);
-	executeResponse(player, state, response);
+	processResponse(player, state, response);
 }
 
 void Npc::onPlayerLeave(Player* player, NpcState* state)
@@ -1298,7 +1407,7 @@ void Npc::onPlayerLeave(Player* player, NpcState* state)
 	if(player){
 		player->closeShopWindow();
 		const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_LEAVE, false);
-		executeResponse(player, state, response);
+		processResponse(player, state, response);
 	}
 }
 
@@ -1312,17 +1421,17 @@ void Npc::onThink(uint32_t interval)
 	isIdle = true;
 	for(StateList::iterator it = stateList.begin(); it != stateList.end();){
 		NpcState* npcState = *it;
-		const NpcResponse* response = NULL;
 
-		Player* player = g_game.getPlayerByID(npcState->respondToCreature);
-		bool closeConversation = false;
+		const NpcResponse* response = NULL;
+		Player* player = g_game.getPlayerByID(npcState->playerId);
+		bool closeConversation = (player == NULL);
 		bool idleTimeout = false;
 		if(!npcState->isQueued){
 			if(npcState->prevInteraction == 0){
 				npcState->prevInteraction = OTSYS_TIME();
 			}
 
-			if(!queueList.empty() && npcState->isIdle && npcState->respondToText.empty()){
+			if(!queueList.empty() && npcState->isIdle){
 				closeConversation = true;
 			}
 			else if(idleTime > 0 && (OTSYS_TIME() - npcState->prevInteraction) > idleTime * 1000){
@@ -1331,14 +1440,7 @@ void Npc::onThink(uint32_t interval)
 			}
 		}
 
-		bool idleResponse = (npcState->lastResponseTime > 0 && (OTSYS_TIME() - npcState->lastResponseTime) > idleInterval);
-		if(idleResponse && player){
-			response = getResponse(player, npcState, EVENT_IDLE, true);
-			executeResponse(player, npcState, response);
-			idleResponse = false;
-		}
-
-		if(!player || closeConversation){
+		if(closeConversation){
 			if(queueList.empty()){
 				if(idleTimeout){
 					onPlayerLeave(player, npcState);
@@ -1348,16 +1450,20 @@ void Npc::onThink(uint32_t interval)
 				Player* nextPlayer = NULL;
 				while(!queueList.empty()){
 					nextPlayer = g_game.getPlayerByID(*queueList.begin());
+					queueList.erase(queueList.begin());
+
 					if(nextPlayer){
 						NpcState* nextPlayerState = getState(nextPlayer, false);
 						if(nextPlayerState){
-							nextPlayerState->respondToText = nextPlayerState->prevRespondToText;
+							response = getResponse(nextPlayer, nextPlayerState, nextPlayerState->respondToText, true);
+							if(response){
+								setCreatureFocus(nextPlayer);
+								processResponse(nextPlayer, nextPlayerState, response);
+							}
 							nextPlayerState->isQueued = false;
 							break;
 						}
 					}
-
-					queueList.erase(queueList.begin());
 				}
 			}
 
@@ -1368,35 +1474,35 @@ void Npc::onThink(uint32_t interval)
 			continue;
 		}
 
-		if(!npcState->respondToText.empty()){
-			if(hasBusyReply && !isIdle){
-				//Check if we have a busy reply
-				response = getResponse(player, npcState, EVENT_BUSY, false);
-				if(response){
-					executeResponse(player, npcState, response);
-				}
-			}
-			else{
-				response = getResponse(player, npcState, npcState->respondToText, true);
-				if(response){
-					setCreatureFocus(player);
-					executeResponse(player, npcState, response);
-				}
-			}
-
-			npcState->prevRespondToText = npcState->respondToText;
-			npcState->respondToText = "";
+		//execute our latest response
+		if(npcState->lastResponse){
+			turnToCreature(player);
+			executeResponse(player, npcState, npcState->lastResponse);
+			npcState->lastResponse = NULL;
 		}
 
-		response = getResponse(player, npcState, EVENT_THINK, true);
-		executeResponse(player, npcState, response);
+		//idle response
+		bool idleResponse = (npcState->lastResponseTime > 0 && (OTSYS_TIME() - npcState->lastResponseTime) > idleInterval);
+		if(idleResponse){
+			response = getResponse(player, npcState, EVENT_IDLE, true);
+			processResponse(player, npcState, response);
+			idleResponse = false;
+		}
+
+		//think response
+		if(!response){
+			response = getResponse(player, npcState, EVENT_THINK, true);
+			processResponse(player, npcState, response);
+		}
 
 		if(!npcState->isIdle){
 			isIdle = false;
 
+			/*
 			if(hasBusyReply){
 				setCreatureFocus(player);
 			}
+			*/
 		}
 
 		++it;
@@ -1407,7 +1513,7 @@ void Npc::onThink(uint32_t interval)
 	}
 }
 
-void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse* response)
+void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse* response)
 {
 	if(response){
 		npcState->lastResponseTime = OTSYS_TIME();
@@ -1628,7 +1734,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 							g_game.removeMoney(player, moneyCount);
 						}
 						else{
-							std::cout << "Error [Npc::executeResponse] Not enough money: " << player->getName()  << "\tNpc: " << getName() << std::endl;
+							std::cout << "Error [Npc::processResponse] Not enough money: " << player->getName()  << "\tNpc: " << getName() << std::endl;
 						}
 					}
 
@@ -1794,82 +1900,86 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 		}
 		*/
 
-		if(response->getResponseType() == RESPONSE_DEFAULT){
-			std::string responseString = formatResponse(player, npcState, response);
-			if(!responseString.empty()){
-				if(response->publicize()){
-					doSay(responseString);
-				}
-				else{
-					doSayToPlayer(player, responseString);
-				}
-			}
-		}
-		else{
-			int32_t functionId = -1;
-			ResponseScriptMap::iterator it = responseScriptMap.find(response->getText());
-			if(it != responseScriptMap.end()){
-				functionId = it->second;
-			}
-			else{
-				functionId = m_scriptInterface->getEvent(response->getText());
-				responseScriptMap[response->getText()] = functionId;
-			}
-
-			if(functionId != -1){
-				if(m_scriptInterface->reserveScriptEnv()){
-					ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-
-					lua_State* L = m_scriptInterface->getLuaState();
-
-					env->setScriptId(functionId, m_scriptInterface);
-					Npc* prevNpc = env->getNpc();
-					env->setRealPos(getPosition());
-					env->setNpc(this);
-
-					m_scriptInterface->pushFunction(functionId);
-					int32_t paramCount = 0;
-					for(ActionList::const_iterator it = response->getFirstAction(); it != response->getEndAction(); ++it){
-						if((*it).actionType == ACTION_SCRIPTPARAM){
-							if((*it).strValue == "|PLAYER|"){
-								uint32_t cid = env->addThing(player);
-								lua_pushnumber(L, cid);
-							}
-							else if((*it).strValue == "|TEXT|"){
-								lua_pushstring(L, npcState->respondToText.c_str());
-							}
-							else{
-								std::cout << "Warning [Npc::executeResponse] Unknown script param: " << (*it).strValue << std::endl;
-								break;
-							}
-
-							++paramCount;
-						}
-					}
-
-					NpcScriptInterface::pushState(L, npcState);
-					lua_setglobal(L, "_state");
-					m_scriptInterface->callFunction(paramCount);
-					lua_getglobal(L, "_state");
-					NpcScriptInterface::popState(L, npcState);
-					if(prevNpc){
-						env->setRealPos(prevNpc->getPosition());
-						env->setNpc(prevNpc);
-					}
-					m_scriptInterface->releaseScriptEnv();
-				}
-				else{
-					std::cout << "[Error] Call stack overflow." << std::endl;
-				}
-			}
-		}
-
 		if(resetTopic && response->getTopic() == npcState->topic){
 			npcState->topic = 0;
 		}
 		npcState->prevInteraction = OTSYS_TIME();
 	}
 }
+
+void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse* response)
+{
+	if(response->getResponseType() == RESPONSE_DEFAULT){
+		std::string responseString = formatResponse(player, npcState, response);
+		if(!responseString.empty()){
+			if(response->publicize()){
+				doSay(responseString);
+			}
+			else{
+				doSayToPlayer(player, responseString);
+			}
+		}
+	}
+	else{
+		int32_t functionId = -1;
+		ResponseScriptMap::iterator it = responseScriptMap.find(response->getText());
+		if(it != responseScriptMap.end()){
+			functionId = it->second;
+		}
+		else{
+			functionId = m_scriptInterface->getEvent(response->getText());
+			responseScriptMap[response->getText()] = functionId;
+		}
+
+		if(functionId != -1){
+			if(m_scriptInterface->reserveScriptEnv()){
+				ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+
+				lua_State* L = m_scriptInterface->getLuaState();
+
+				env->setScriptId(functionId, m_scriptInterface);
+				Npc* prevNpc = env->getNpc();
+				env->setRealPos(getPosition());
+				env->setNpc(this);
+
+				m_scriptInterface->pushFunction(functionId);
+				int32_t paramCount = 0;
+				for(ActionList::const_iterator it = response->getFirstAction(); it != response->getEndAction(); ++it){
+					if((*it).actionType == ACTION_SCRIPTPARAM){
+						if((*it).strValue == "|PLAYER|"){
+							uint32_t cid = env->addThing(player);
+							lua_pushnumber(L, cid);
+						}
+						else if((*it).strValue == "|TEXT|"){
+							lua_pushstring(L, npcState->respondToText.c_str());
+						}
+						else{
+							std::cout << "Warning [Npc::processResponse] Unknown script param: " << (*it).strValue << std::endl;
+							break;
+						}
+
+						++paramCount;
+					}
+				}
+
+				NpcScriptInterface::pushState(L, npcState);
+				lua_setglobal(L, "_state");
+				m_scriptInterface->callFunction(paramCount);
+				lua_getglobal(L, "_state");
+				NpcScriptInterface::popState(L, npcState);
+				if(prevNpc){
+					env->setRealPos(prevNpc->getPosition());
+					env->setNpc(prevNpc);
+				}
+				m_scriptInterface->releaseScriptEnv();
+			}
+			else{
+				std::cout << "[Error] Call stack overflow." << std::endl;
+			}
+		}
+	}
+}
+
 
 void Npc::doSay(const std::string& text)
 {
@@ -1926,7 +2036,7 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->ignoreCapacity = ignoreCapacity;
 			npcState->buyWithBackpack = buyWithBackpack;
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPBUY, false);
-			executeResponse(player, npcState, response);
+			processResponse(player, npcState, response);
 		}
 	}
 	else if(type == SHOPEVENT_SELL){
@@ -1937,7 +2047,7 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->itemId = itemId;
 			npcState->sellPrice = getListItemPrice(itemId, SHOPEVENT_SELL);
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPSELL, false);
-			executeResponse(player, npcState, response);
+			processResponse(player, npcState, response);
 		}
 	}
 
@@ -1961,7 +2071,7 @@ void Npc::onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCall
 	NpcState* npcState = getState(player, true);
 	if(npcState){
 		const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPCLOSE, false);
-		executeResponse(player, npcState, response);
+		processResponse(player, npcState, response);
 	}
 
 	if(m_npcEventHandler){
@@ -2074,43 +2184,48 @@ void Npc::doMoveTo(Position target)
 	startAutoWalk(listDir);
 }
 
+void Npc::turnToCreature(Creature* creature)
+{
+	const Position& creaturePos = creature->getPosition();
+	const Position& myPos = getPosition();
+	int32_t dx = myPos.x - creaturePos.x;
+	int32_t dy = myPos.y - creaturePos.y;
+
+	Direction dir = SOUTH;
+	float tan = 0;
+
+	if(dx != 0){
+		tan = dy/dx;
+	}
+	else{
+		tan = 10;
+	}
+
+	if(std::abs(tan) < 1){
+		if(dx > 0){
+			dir = WEST;
+		}
+		else{
+			dir = EAST;
+		}
+	}
+	else{
+		if(dy > 0){
+			dir = NORTH;
+		}
+		else{
+			dir = SOUTH;
+		}
+	}
+
+	g_game.internalCreatureTurn(this, dir);
+}
+
 void Npc::setCreatureFocus(Creature* creature)
 {
 	if(creature){
 		focusCreature = creature->getID();
-		const Position& creaturePos = creature->getPosition();
-		const Position& myPos = getPosition();
-		int32_t dx = myPos.x - creaturePos.x;
-		int32_t dy = myPos.y - creaturePos.y;
-
-		Direction dir = SOUTH;
-		float tan = 0;
-
-		if(dx != 0){
-			tan = dy/dx;
-		}
-		else{
-			tan = 10;
-		}
-
-		if(std::abs(tan) < 1){
-			if(dx > 0){
-				dir = WEST;
-			}
-			else{
-				dir = EAST;
-			}
-		}
-		else{
-			if(dy > 0){
-				dir = NORTH;
-			}
-			else{
-				dir = SOUTH;
-			}
-		}
-
-		g_game.internalCreatureTurn(this, dir);
+		turnToCreature(creature);
 	}
 	else{
 		focusCreature = 0;
@@ -2118,8 +2233,7 @@ void Npc::setCreatureFocus(Creature* creature)
 }
 
 const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* player,
-	NpcState* npcState, const std::string& text,
-	bool exactMatch /*= false*/, InteractType_t interactType /*= INTERACT_NONE*/)
+	NpcState* npcState, const std::string& text, bool exactMatch /*= false*/, NpcEvent_t eventType /*=EVENT_NONE*/)
 {
 	std::string textString = asLowerCaseString(text);
 	std::vector<std::string> wordList = explodeString(textString, " ");
@@ -2131,7 +2245,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		NpcResponse* iresponse = *it;
 
-		if(interactType != INTERACT_NONE && iresponse->getInteractType() != interactType){
+		if(eventType != EVENT_NONE && iresponse->getEventType() != eventType){
 			continue;
 		}
 
@@ -2439,7 +2553,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 		if(storageMatch)
 			continue;
 
-		if(iresponse->getInteractType() == INTERACT_TEXT || iresponse->getFocusState() != -1){
+		if(iresponse->getEventType() == EVENT_NONE || iresponse->getFocusState() != -1){
 			if(npcState->isIdle && iresponse->getFocusState() != 1){
 				//We are idle, and this response does not activate the npc.
 				continue;
@@ -2461,10 +2575,10 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			matchCount += 1000;
 		}
 
-		if(iresponse->getInteractType() == INTERACT_EVENT){
-			std::string evt = asLowerCaseString(text);
-			if(iresponse->getInputText() == evt){
-				if(evt == "onidle"){
+		if(iresponse->getEventType() != EVENT_NONE){
+			switch(iresponse->getEventType()){
+				case EVENT_IDLE:
+				{
 					uint32_t time = idleInterval * 1000;
 					if((*it)->getTime() != 0){
 						time = (*it)->getTime();
@@ -2473,17 +2587,21 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 					if(enoughTimeElapsed){
 						++matchCount;
 					}
-				} else if(evt == "onplayerleave"){
-					++matchCount;
-				}
-				else
-					matchCount = 0;
-			}
-			else
-				matchCount = 0;
 
+					break;
+				}
+
+				case EVENT_PLAYER_LEAVE:
+					++matchCount;
+					break;
+
+				default:
+					matchCount = 0;
+					break;
+			}
 		}
-		else if((*it)->getInteractType() == INTERACT_TEXT){
+		
+		if(!text.empty()){
 			int32_t matchAllCount = 0;  //Contains the number of keywords that where matched
 			int32_t totalKeywordCount = 0; //Contains the total number of keywords that where being compared
 			int32_t matchWordCount = getMatchCount(*it, wordList, exactMatch, matchAllCount, totalKeywordCount);
@@ -2588,12 +2706,13 @@ uint32_t Npc::getMatchCount(NpcResponse* response, std::vector<std::string> word
 	return bestMatchCount;
 }
 
-const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, const std::string& text, bool checkLastResponse)
+const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
+	const std::string& text, bool checkLastResponse)
 {
 	if(checkLastResponse && npcState->lastResponse){
 		//Check previous response chain first
 		const ResponseList& list = npcState->lastResponse->getResponseList();
-		const NpcResponse* response = getResponse(list, player, npcState, npcState->respondToText);
+		const NpcResponse* response = getResponse(list, player, npcState, text);
 		if(response){
 			return response;
 		}
@@ -2604,17 +2723,10 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, co
 
 const NpcResponse* Npc::getResponse(const Player* player, NpcEvent_t eventType)
 {
-	std::string eventName = getEventResponseName(eventType);
-	if(eventName.empty()){
-		return NULL;
-	}
-
 	std::vector<NpcResponse*> result;
 	for(ResponseList::const_iterator it = responseList.begin(); it != responseList.end(); ++it){
-		if((*it)->getInteractType() == INTERACT_EVENT){
-			if((*it)->getInputText() == asLowerCaseString(eventName)){
-				result.push_back(*it);
-			}
+		if((*it)->getEventType() == eventType){
+			result.push_back(*it);
 		}
 	}
 
@@ -2625,41 +2737,42 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcEvent_t eventType)
 	return result[random_range(0, result.size() - 1)];
 }
 
-const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState, NpcEvent_t eventType, bool checkLastResponse)
+const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
+	NpcEvent_t eventType, const std::string& text, bool checkLastResponse)
 {
-	std::string eventName = getEventResponseName(eventType);
-	if(eventName.empty()){
+	if(eventType == EVENT_NONE){
 		return NULL;
 	}
 
 	if(checkLastResponse && npcState->lastResponse){
 		//Check previous response chain first
 		const ResponseList& list = npcState->lastResponse->getResponseList();
-		const NpcResponse* response = getResponse(list, player, npcState, eventName, true);
+		const NpcResponse* response = getResponse(list, player, npcState, text, true);
 		if(response){
 			return response;
 		}
 	}
 
-	return getResponse(responseList, player, npcState, eventName, true, INTERACT_EVENT);
+	return getResponse(responseList, player, npcState, text, true, eventType);
 }
 
-std::string Npc::getEventResponseName(NpcEvent_t eventType)
+const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
+	NpcEvent_t eventType, bool checkLastResponse)
 {
-	switch(eventType){
-		case EVENT_BUSY: return "onBusy"; break;
-		case EVENT_THINK: return "onThink"; break;
-		case EVENT_IDLE: return "onIdle"; break;
-		case EVENT_PLAYER_ENTER: return "onPlayerEnter"; break;
-		case EVENT_PLAYER_MOVE: return "onPlayerMove"; break;
-		case EVENT_PLAYER_LEAVE: return "onPlayerLeave"; break;
-		case EVENT_PLAYER_SHOPSELL: return "onPlayerShopSell"; break;
-		case EVENT_PLAYER_SHOPBUY: return "onPlayerShopBuy"; break;
-		case EVENT_PLAYER_SHOPCLOSE: return "onPlayerShopClose"; break;
-		default: return ""; break;
+	if(eventType == EVENT_NONE){
+		return NULL;
 	}
 
-	return "";
+	if(checkLastResponse && npcState->lastResponse){
+		//Check previous response chain first
+		const ResponseList& list = npcState->lastResponse->getResponseList();
+		const NpcResponse* response = getResponse(list, player, npcState, "", true);
+		if(response){
+			return response;
+		}
+	}
+
+	return getResponse(responseList, player, npcState, "", true, eventType);
 }
 
 std::string Npc::formatResponse(Creature* creature, const NpcState* npcState, const NpcResponse* response) const
