@@ -1041,7 +1041,7 @@ bool Item::canDecay()
 uint32_t Item::getWorth() const
 {
 	const ItemType& it = Item::items[id];
-	return it.currency;
+	return getItemCount() * it.currency;
 }
 
 void Item::getLight(LightInfo& lightInfo)
