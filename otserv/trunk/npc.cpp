@@ -2413,7 +2413,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 		}
 
 		if(iresponse->getHealth() != -1){
-			if(player->getHealth() < iresponse->getHealth())
+			if(player->getHealth() >= iresponse->getHealth())
 				continue;
 			++matchCount;
 		}

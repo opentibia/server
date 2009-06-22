@@ -3958,13 +3958,15 @@ int LuaScriptInterface::luaDoRemoveCreature(lua_State *L)
 int LuaScriptInterface::luaDoPlayerRemoveMoney(lua_State *L)
 {
 	//doPlayerRemoveMoney(cid, money)
-	uint32_t money = popNumber(L);
+	int32_t money = popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 
 	Player* player = env->getPlayerByUID(cid);
-	if(player){
+	if(money < 0)
+		lua_pushnumber(L, LUA_TRUE);
+	else if(player){
 		if(g_game.removeMoney(player, money)){
 			lua_pushnumber(L, LUA_TRUE);
 		}
