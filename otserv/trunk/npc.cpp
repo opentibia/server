@@ -1433,7 +1433,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 		for(ActionList::const_iterator it = response->getFirstAction(); it != response->getEndAction(); ++it){
 			switch((*it).actionType){
-				case ACTION_SETTOPIC: npcState->topic = std::max((*it).intValue, 0); resetTopic = false; break;
+				case ACTION_SETTOPIC: npcState->topic = std::max((*it).intValue, (int32_t)0); resetTopic = false; break;
 				case ACTION_SETSELLPRICE: npcState->sellPrice = (*it).intValue; break;
 				case ACTION_SETBUYPRICE: npcState->buyPrice = (*it).intValue; break;
 				case ACTION_SETITEM: npcState->itemId = (*it).intValue; break;
