@@ -930,7 +930,7 @@ void Player::addStorageValue(const uint32_t key, const int32_t value)
 				addOutfit(outfitId, addons);
 			}
 			else{
-				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int)(value) << " player: " << getName() << std::endl;
+				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int32_t)(value) << " player: " << getName() << std::endl;
 			}
 		}
 		//for backward compatibility
@@ -939,10 +939,13 @@ void Player::addStorageValue(const uint32_t key, const int32_t value)
 			uint32_t lookType = value >> 16;
 			uint32_t addons = value & 0xFF;
 			if(addons <= 3){
-				addOutfit(lookType, addons);
+				Outfit outfit;
+				if(Outfits::getInstance()->getOutfit(lookType, outfit)){
+					addOutfit(outfit.outfitId, addons);
+				}
 			}
 			else{
-				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int)(value) << " player: " << getName() << std::endl;
+				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int32_t)(value) << " player: " << getName() << std::endl;
 			}
 		}
 		else{
