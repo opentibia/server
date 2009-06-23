@@ -424,8 +424,8 @@ uint32_t Npc::loadParams(xmlNodePtr node)
 			else if(asLowerCaseString(*it) == "knowspell"){
 				params |= RESPOND_KNOWSPELL;
 			}
-			else if(asLowerCaseString(*it) == "canlearnspell"){
-				params |= RESPOND_CANLEARNSPELL;
+			else if(asLowerCaseString(*it) == "cannotlearnspell"){
+				params |= RESPOND_CANNOTLEARNSPELL;
 			}
 			else{
 				std::cout << "Warning: [Npc::loadParams] Unknown param " << (*it) << std::endl;
@@ -2289,6 +2289,8 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 			if(eventType != EVENT_NONE && iresponse->getEventType() != eventType)
 				continue;
+			if(eventType == EVENT_NONE && iresponse->getEventType() != EVENT_NONE)
+				continue;
 
 			if(iresponse->getEventType() == EVENT_NONE || iresponse->getFocusState() != -1){
 				if(npcState->isIdle && iresponse->getFocusState() != 1)
@@ -2376,21 +2378,18 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 					continue;
 			}
 
-			if(hasBitSet(RESPOND_CANLEARNSPELL, params)){
+			if(hasBitSet(RESPOND_CANNOTLEARNSPELL, params)){
 				Spell* spell = g_spells->getInstantSpellByName(npcState->spellName);
 				
-				if(!spell)
-					continue;
-				
-				if(player->getLevel() < spell->getLevel())
-					continue;
-
-				if(player->getMagicLevel() < spell->getMagicLevel())
-					continue;
-				
-				if(spell->isPremium())
-					if(player->isPremium())
+				if(!spell){
+					std::cout << "[WARNING]: Non-existant spell in cannotlearnspell tag" << std::endl;
+				}
+				else{
+					if(player->getLevel() >= spell->getLevel() && 
+						player->getMagicLevel() >= spell->getMagicLevel() && 
+						spell->isPremium() && player->isPremium())
 						continue;
+				}
 			}
 
 			if(iresponse->getCondition() != CONDITION_NONE){
@@ -2603,15 +2602,22 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				}
 			}
 			
-			if(!text.empty() && !iresponse->getInputList() .empty()){
-				int32_t matches = matchKeywords(*it, wordList, exactMatch);
-				if(matches > bestKeywordCount) {
-					bestKeywordCount = matches;
-					bestMatch = iresponse;
+			if(eventType == EVENT_NONE){
+				// Check keywords
+				if(!text.empty() && !iresponse->getInputList() .empty()){
+					int32_t matches = matchKeywords(*it, wordList, exactMatch);
+					if(matches > bestKeywordCount) {
+						bestKeywordCount = matches;
+						bestMatch = iresponse;
+					}
 				}
+				else if(bestKeywordCount == 0)
+					bestMatch = iresponse;
 			}
-			else if(bestKeywordCount == 0)
-				bestMatch = iresponse;
+			else{
+				// First match is always the bestmi
+				return iresponse;
+			}
 		}
 		if(bestMatch)
 			return bestMatch;
@@ -2650,12 +2656,14 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 			else{
 				std::vector<std::string>::iterator wordIter = wordList.end();
 				for(wordIter = lastWordMatchIter; wordIter != wordList.end(); ++wordIter){
-					size_t pos = (*wordIter).find_first_of("!\"#�%&/()=?`{[]}\\^*><,.-_~");
-					if(pos == std::string::npos){
+					/*
+					size_t pos = wordIter->find_first_of("!\"#?%&/()=?{[]}\\^*><,.-_~");
+					if(pos == std::string::npos || pos - keyIter->size() < wordIter->size()){
 						pos = 0;
 					}
+					*/
 
-					if((*wordIter).find((*keyIter), pos) == pos){
+					if(wordIter->find(*keyIter, 0) == 0){
 						break;
 					}
 				}
@@ -2718,7 +2726,7 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
 	if(checkSubResponse && npcState->subResponse){
 		//Check previous response chain first
 		const ResponseList& list = npcState->subResponse->getResponseList();
-		const NpcResponse* response = getResponse(list, player, npcState, text, true);
+		const NpcResponse* response = getResponse(list, player, npcState, text, true, eventType);
 		if(response){
 			return response;
 		}
@@ -2737,7 +2745,7 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
 	if(checkSubResponse && npcState->subResponse){
 		//Check previous response chain first
 		const ResponseList& list = npcState->subResponse->getResponseList();
-		const NpcResponse* response = getResponse(list, player, npcState, "", true);
+		const NpcResponse* response = getResponse(list, player, npcState, "", true, eventType);
 		if(response){
 			return response;
 		}
