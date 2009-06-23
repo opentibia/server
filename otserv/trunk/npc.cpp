@@ -1191,10 +1191,11 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->level = -1;
 	state->topic = 0;
 	state->isIdle = true;
+	state->focusState = -1;
 	state->isQueued = false;
 	state->respondToText = "";
-	state->respondText = "";
 	state->lastResponse = NULL;
+	state->subResponse = NULL;
 	state->lastResponseTime = 0;
 	stateList.push_back(state);
 	return state;
@@ -1431,7 +1432,10 @@ void Npc::onThink(uint32_t interval)
 				npcState->prevInteraction = OTSYS_TIME();
 			}
 
-			if(!queueList.empty() && npcState->isIdle){
+			if(npcState->focusState == 0){
+				closeConversation = true;
+			}
+			else if(!queueList.empty() && npcState->isIdle){
 				closeConversation = true;
 			}
 			else if(idleTime > 0 && (OTSYS_TIME() - npcState->prevInteraction) > idleTime * 1000){
@@ -1441,6 +1445,10 @@ void Npc::onThink(uint32_t interval)
 		}
 
 		if(closeConversation){
+			if(focusCreature == npcState->playerId){
+				setCreatureFocus(NULL);
+			}
+
 			if(queueList.empty()){
 				if(idleTimeout){
 					onPlayerLeave(player, npcState);
@@ -1478,6 +1486,7 @@ void Npc::onThink(uint32_t interval)
 		if(npcState->lastResponse){
 			turnToCreature(player);
 			executeResponse(player, npcState, npcState->lastResponse);
+			npcState->subResponse = npcState->lastResponse;
 			npcState->lastResponse = NULL;
 		}
 
@@ -1519,12 +1528,16 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 		npcState->lastResponseTime = OTSYS_TIME();
 		npcState->lastResponse = response;
 		bool resetTopic = true;
+		bool sayNow = false;
 
 		if(response->getFocusState() == 0){
 			npcState->isIdle = true;
+			npcState->focusState = 0;
+			sayNow = true;
 		}
 		else if(response->getFocusState() == 1){
 			npcState->isIdle = false;
+			npcState->focusState = 1;
 		}
 
 		if(response->getAmount() != -1){
@@ -1899,6 +1912,8 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 			npcState.amount = player->__getItemTypeCount(npcState.itemId);
 		}
 		*/
+		if(sayNow)
+			executeResponse(player, npcState, response);
 
 		if(resetTopic && response->getTopic() == npcState->topic){
 			npcState->topic = 0;
@@ -2237,79 +2252,104 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 {
 	std::string textString = asLowerCaseString(text);
 	std::vector<std::string> wordList = explodeString(textString, " ");
-	NpcResponse* response = NULL;
-	int32_t bestMatchCount = 0;
-	int32_t totalMatchCount = 0;
+	
 
-	for(ResponseList::const_iterator it = list.begin(); it != list.end(); ++it){
+	// We choose the match that matches the most keywords
+	// _and_ matches all of it's conditions.
+	// If we only have a patial keyword match, we ignore it (all keywords must be matched)
 
-		NpcResponse* iresponse = *it;
+	const NpcResponse* bestMatch = NULL;
+	int32_t bestKeywordCount = 0;
 
-		if(eventType != EVENT_NONE && iresponse->getEventType() != eventType){
-			continue;
+
+	// Cache some info
+	int32_t money = -1;
+
+
+	// First loop we try with current topic
+	int32_t currentTopic = npcState->topic;
+	// If we get no matches, we (hypothetically) change it to 0 and see if we get any matches
+	int loopCount = 1;
+	while(loopCount <= 2) {
+		if(loopCount == 2) {
+			// If it didn't work with 0 before, it won't work now
+			if(currentTopic == 0)
+				break;
+			else
+				// Change to 0 and try again
+				currentTopic = 0;
 		}
+		loopCount++;
 
-		int32_t matchCount = 0;
+		for(ResponseList::const_iterator it = list.begin(); it != list.end(); ++it){
 
-		if(iresponse->getParams() != RESPOND_DEFAULT){
+			NpcResponse* iresponse = *it;
 			uint32_t params = iresponse->getParams();
 
-			if(hasBitSet(RESPOND_MALE, params)){
-				if(!player->isMale()){
+
+			if(eventType != EVENT_NONE && iresponse->getEventType() != eventType)
+				continue;
+
+			if(iresponse->getEventType() == EVENT_NONE || iresponse->getFocusState() != -1){
+				if(npcState->isIdle && iresponse->getFocusState() != 1)
+					//We are idle, and this response does not activate the npc.
 					continue;
-				}
-				++matchCount;
+
+				if(!npcState->isIdle && iresponse->getFocusState() == 1)
+					//We are not idle, and this response would activate us again.
+					continue;
+			}
+
+			if(iresponse->getTopic() != -1){
+				if(currentTopic != iresponse->getTopic())
+					//Not right topic
+					continue;
+			}
+			if(currentTopic != 0)
+				// We got a topic already, we must have response with the same topic
+				if(iresponse->getTopic() != currentTopic)
+					continue;
+
+			if(hasBitSet(RESPOND_MALE, params)){
+				if(!player->isMale())
+					continue;
 			}
 
 			if(hasBitSet(RESPOND_FEMALE, params)){
-				if(!player->isFemale()){
+				if(!player->isFemale())
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_PZBLOCK, params)){
-				if(!player->isPzLocked()){
+				if(!player->isPzLocked())
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_PREMIUM, params)){
-				if(!player->isPremium()){
+				if(!player->isPremium())
 					continue;
-				}
-				++matchCount;
 			}
 
 			// This is an ugly, restrictive hack
 			// vocations shouldn't be hardcoded
 			if(hasBitSet(RESPOND_DRUID, params)){
-				if(player->getVocationId() != VOCATION_DRUID && player->getVocationId() != VOCATION_ELDERDRUID){
+				if(player->getVocationId() != VOCATION_DRUID && player->getVocationId() != VOCATION_ELDERDRUID)
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_KNIGHT, params)){
-				if(player->getVocationId() != VOCATION_KNIGHT && player->getVocationId() != VOCATION_ELITEKNIGHT){
+				if(player->getVocationId() != VOCATION_KNIGHT && player->getVocationId() != VOCATION_ELITEKNIGHT)
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_PALADIN, params)){
-				if(player->getVocationId() != VOCATION_PALADIN && player->getVocationId() != VOCATION_ROYALPALADIN){
+				if(player->getVocationId() != VOCATION_PALADIN && player->getVocationId() != VOCATION_ROYALPALADIN)
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_SORCERER, params)){
-				if(player->getVocationId() != VOCATION_SORCERER && player->getVocationId() != VOCATION_MASTERSORCERER){
+				if(player->getVocationId() != VOCATION_SORCERER && player->getVocationId() != VOCATION_MASTERSORCERER)
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_PROMOTED, params)){
@@ -2317,30 +2357,23 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 					player->getVocationId() == VOCATION_SORCERER ||
 					player->getVocationId() == VOCATION_DRUID ||
 					player->getVocationId() == VOCATION_KNIGHT ||
-					player->getVocationId() == VOCATION_PALADIN){
+					player->getVocationId() == VOCATION_PALADIN)
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_LOWLEVEL, params)){
-				if((int32_t)player->getLevel() >= npcState->level){
+				if((int32_t)player->getLevel() >= npcState->level)
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_HIGHLEVEL, params)){
-				if((int32_t)player->getLevel() < npcState->level){
+				if((int32_t)player->getLevel() < npcState->level)
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_KNOWSPELL, params)){
 				if(!player->hasLearnedInstantSpell(npcState->spellName))
 					continue;
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_CANLEARNSPELL, params)){
@@ -2358,28 +2391,157 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				if(spell->isPremium())
 					if(player->isPremium())
 						continue;
-
-				++matchCount;
 			}
 
-			if(hasBitSet(RESPOND_LOWMONEY, params)){
-				int32_t moneyCount = g_game.getMoney(player);
-				if(moneyCount >= (npcState->price * npcState->amount)){
+			if(iresponse->getCondition() != CONDITION_NONE){
+				if(!player->hasCondition(iresponse->getCondition()))
+					continue;
+				//++matchCount;
+			}
+
+			if(iresponse->getHealth() != -1){
+				if(player->getHealth() >= iresponse->getHealth())
+					continue;
+				//++matchCount;
+			}
+
+			if(iresponse->getKnowSpell() != ""){
+				std::string spellName = iresponse->getKnowSpell();
+				if(spellName == "|SPELL|"){
+					spellName = npcState->spellName;
+				}
+
+				if(!player->hasLearnedInstantSpell(spellName)){
 					continue;
 				}
-				++matchCount;
+				//++matchCount;
+			}
+
+			if(iresponse->scriptVars.b1){
+				if(!npcState->scriptVars.b1){
+					continue;
+				}
+				//++matchCount;
+			}
+
+			if(iresponse->scriptVars.b2){
+				if(!npcState->scriptVars.b2){
+					continue;
+				}
+				//++matchCount;
+			}
+
+			if(iresponse->scriptVars.b3){
+				if(!npcState->scriptVars.b3){
+					continue;
+				}
+				//++matchCount;
+			}
+
+			if(iresponse->scriptVars.n1 != -1){
+				if(!npcState->scriptVars.n1){
+					continue;
+				}
+				//++matchCount;
+			}
+
+			if(iresponse->scriptVars.n2 != -1){
+				if(!npcState->scriptVars.n2){
+					continue;
+				}
+				//++matchCount;
+			}
+
+			if(iresponse->scriptVars.n3 != -1){
+				if(!npcState->scriptVars.n3){
+					continue;
+				}
+				//++matchCount;
+			}
+
+			bool storageMatch = false;
+			for(StorageConditions::const_iterator iter = iresponse->prop.storageConditions.begin(); iter != iresponse->prop.storageConditions.begin(); ++iter){
+				const StorageCondition& cs = *iter;
+
+				int32_t playerStorageValue = -1;
+				if(!player->getStorageValue(cs.id, playerStorageValue)){
+					playerStorageValue = -1;
+				}
+
+				switch(cs.op){
+					case STORAGE_LESS:
+					{
+						if(playerStorageValue >= cs.value){
+							storageMatch = true;
+							break;
+						}
+						break;
+					}
+					case STORAGE_LESSOREQUAL:
+					{
+						if(playerStorageValue > cs.value){
+							storageMatch = true;
+							break;
+						}
+						break;
+					}
+					case STORAGE_EQUAL:
+					{
+						if(playerStorageValue != cs.value){
+							storageMatch = true;
+							break;
+						}
+						break;
+					}
+					case STORAGE_NOTEQUAL:
+					{
+						if(playerStorageValue == cs.value){
+							storageMatch = true;
+							break;
+						}
+						break;
+					}
+					case STORAGE_GREATEROREQUAL:
+					{
+						if(playerStorageValue < cs.value){
+							storageMatch = true;
+							break;
+						}
+						break;
+					}
+					case STORAGE_GREATER:
+					{
+						if(playerStorageValue <= cs.value){
+							storageMatch = true;
+							break;
+						}
+						break;
+					}
+
+					default: break;
+				}
+
+				//++matchCount;
+			}
+			if(storageMatch)
+				continue;
+
+			if(hasBitSet(RESPOND_LOWMONEY, params)){
+				if(money == -1)
+					money = g_game.getMoney(player);
+				if(money >= (npcState->price * npcState->amount))
+					continue;
 			}
 
 			if(hasBitSet(RESPOND_ENOUGHMONEY, params)){
-				int32_t moneyCount = g_game.getMoney(player);
-				if(moneyCount < (npcState->price * npcState->amount)){
+				if(money == -1)
+					money = g_game.getMoney(player);
+				if(money < (npcState->price * npcState->amount))
 					continue;
-				}
-				++matchCount;
 			}
 
 			if(hasBitSet(RESPOND_LOWAMOUNT, params) || hasBitSet(RESPOND_NOAMOUNT, params) || hasBitSet(RESPOND_ENOUGHAMOUNT, params)){
-				int32_t itemCount = player->__getItemTypeCount(npcState->itemId);
+				int32_t itemCount = player->__getItemTypeCount(npcState->itemId, npcState->subType);
 
 				if(hasBitSet(RESPOND_ENOUGHAMOUNT, params)) {
 					if(itemCount < npcState->amount){
@@ -2390,260 +2552,77 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 					continue;
 
 					if(hasBitSet(RESPOND_LOWAMOUNT, params)){
-						if(npcState->amount == 1){
+						if(npcState->amount == 1)
 							continue;
-						}
-						++matchCount;
 					}
 
 					if(hasBitSet(RESPOND_NOAMOUNT, params)){
-						if(npcState->amount > 1){
+						if(npcState->amount > 1)
+							continue;
+					}
+				}
+			}
+
+			if(iresponse->getHaveItemID() != 0){
+				int32_t itemCount = player->__getItemTypeCount(iresponse->getHaveItemID());
+				if(itemCount == 0)
+					continue;
+			}
+
+			if(iresponse->getDontHaveItemID() != 0){
+				int32_t itemCount = player->__getItemTypeCount(iresponse->getDontHaveItemID());
+				if(itemCount > 0)
+					continue;
+			}
+
+			if(iresponse->getEventType() != EVENT_NONE){
+				switch(iresponse->getEventType()){
+					case EVENT_IDLE:
+					{
+						uint32_t time = idleInterval * 1000;
+						if((*it)->getTime() != 0){
+							time = (*it)->getTime();
+						}
+						bool enoughTimeElapsed = (npcState->lastResponseTime != 0 && ( (OTSYS_TIME() - npcState->lastResponseTime) > time));
+						if(!enoughTimeElapsed){
 							continue;
 						}
-						++matchCount;
-					}
-				}
-			}
-		}
 
-		if(iresponse->getCondition() != CONDITION_NONE){
-			if(!player->hasCondition(iresponse->getCondition()))
-				continue;
-			++matchCount;
-		}
-
-		if(iresponse->getHealth() != -1){
-			if(player->getHealth() >= iresponse->getHealth())
-				continue;
-			++matchCount;
-		}
-
-		if(iresponse->getKnowSpell() != ""){
-			std::string spellName = iresponse->getKnowSpell();
-			if(spellName == "|SPELL|"){
-				spellName = npcState->spellName;
-			}
-
-			if(!player->hasLearnedInstantSpell(spellName)){
-				continue;
-			}
-			++matchCount;
-		}
-
-		if(iresponse->scriptVars.b1){
-			if(!npcState->scriptVars.b1){
-				continue;
-			}
-			++matchCount;
-		}
-
-		if(iresponse->scriptVars.b2){
-			if(!npcState->scriptVars.b2){
-				continue;
-			}
-			++matchCount;
-		}
-
-		if(iresponse->scriptVars.b3){
-			if(!npcState->scriptVars.b3){
-				continue;
-			}
-			++matchCount;
-		}
-
-		if(iresponse->scriptVars.n1 != -1){
-			if(!npcState->scriptVars.n1){
-				continue;
-			}
-			++matchCount;
-		}
-
-		if(iresponse->scriptVars.n2 != -1){
-			if(!npcState->scriptVars.n2){
-				continue;
-			}
-			++matchCount;
-		}
-
-		if(iresponse->scriptVars.n3 != -1){
-			if(!npcState->scriptVars.n3){
-				continue;
-			}
-			++matchCount;
-		}
-
-		if(iresponse->getHaveItemID() != 0){
-			int32_t itemCount = player->__getItemTypeCount(iresponse->getHaveItemID());
-			if(itemCount == 0)
-				continue;
-			++matchCount;
-		}
-
-		if(iresponse->getDontHaveItemID() != 0){
-			int32_t itemCount = player->__getItemTypeCount(iresponse->getDontHaveItemID());
-			if(itemCount > 0)
-				continue;
-			++matchCount;
-		}
-
-		bool storageMatch = false;
-		for(StorageConditions::const_iterator iter = iresponse->prop.storageConditions.begin(); iter != iresponse->prop.storageConditions.begin(); ++iter){
-			const StorageCondition& cs = *iter;
-
-			int32_t playerStorageValue = -1;
-			if(!player->getStorageValue(cs.id, playerStorageValue)){
-				playerStorageValue = -1;
-			}
-
-			switch(cs.op){
-				case STORAGE_LESS:
-				{
-					if(playerStorageValue >= cs.value){
-						storageMatch = true;
 						break;
 					}
-					break;
-				}
-				case STORAGE_LESSOREQUAL:
-				{
-					if(playerStorageValue > cs.value){
-						storageMatch = true;
+
+					/*
+					case EVENT_PLAYER_LEAVE:
+						//++matchCount;
 						break;
-					}
-					break;
-				}
-				case STORAGE_EQUAL:
-				{
-					if(playerStorageValue != cs.value){
-						storageMatch = true;
+					*/
+
+					default:
+						//matchCount = 0;
 						break;
-					}
-					break;
 				}
-				case STORAGE_NOTEQUAL:
-				{
-					if(playerStorageValue == cs.value){
-						storageMatch = true;
-						break;
-					}
-					break;
+			}
+			
+			if(!text.empty() && !iresponse->getInputList() .empty()){
+				int32_t matches = matchKeywords(*it, wordList, exactMatch);
+				if(matches > bestKeywordCount) {
+					bestKeywordCount = matches;
+					bestMatch = iresponse;
 				}
-				case STORAGE_GREATEROREQUAL:
-				{
-					if(playerStorageValue < cs.value){
-						storageMatch = true;
-						break;
-					}
-					break;
-				}
-				case STORAGE_GREATER:
-				{
-					if(playerStorageValue <= cs.value){
-						storageMatch = true;
-						break;
-					}
-					break;
-				}
-
-				default: break;
 			}
-
-			++matchCount;
+			else if(bestKeywordCount == 0)
+				bestMatch = iresponse;
 		}
-		if(storageMatch)
-			continue;
+		if(bestMatch)
+			return bestMatch;
 
-		if(iresponse->getEventType() == EVENT_NONE || iresponse->getFocusState() != -1){
-			if(npcState->isIdle && iresponse->getFocusState() != 1){
-				//We are idle, and this response does not activate the npc.
-				continue;
-			}
-
-			if(!npcState->isIdle && iresponse->getFocusState() == 1){
-				//We are not idle, and this response would activate us again.
-				continue;
-			}
-		}
-
-		if(npcState->topic == 0 && iresponse->getTopic() != -1){
-			//Not the right topic
-			continue;
-		}
-
-		if(npcState->topic != 0 && npcState->topic == iresponse->getTopic()){
-			//Topic is right
-			matchCount += 1000;
-		}
-
-		if(iresponse->getEventType() != EVENT_NONE){
-			switch(iresponse->getEventType()){
-				case EVENT_IDLE:
-				{
-					uint32_t time = idleInterval * 1000;
-					if((*it)->getTime() != 0){
-						time = (*it)->getTime();
-					}
-					bool enoughTimeElapsed = (npcState->lastResponseTime != 0 && ( (OTSYS_TIME() - npcState->lastResponseTime) > time));
-					if(enoughTimeElapsed){
-						++matchCount;
-					}
-
-					break;
-				}
-
-				case EVENT_PLAYER_LEAVE:
-					++matchCount;
-					break;
-
-				default:
-					matchCount = 0;
-					break;
-			}
-		}
-		
-		if(!text.empty()){
-			int32_t matchAllCount = 0;  //Contains the number of keywords that where matched
-			int32_t totalKeywordCount = 0; //Contains the total number of keywords that where being compared
-			int32_t matchWordCount = getMatchCount(*it, wordList, exactMatch, matchAllCount, totalKeywordCount);
-
-			if(matchWordCount> 0){
-				//Remove points for |*| matches
-				matchWordCount -= matchAllCount;
-
-				//Remove points for not full match
-				matchWordCount -= (totalKeywordCount - matchAllCount - matchWordCount);
-
-				//Total "points" for this response, word matches are worth more
-				matchCount += matchWordCount * 100000;
-			}
-			else{
-				matchCount = 0;
-			}
-		}
-
-		if(matchCount > bestMatchCount){
-			totalMatchCount = 0;
-			response = iresponse;
-			bestMatchCount = matchCount;
-			//std::cout << "Found response string: " << response->getText() << ", keyword: " << response->getInputText() << std::endl;
-		}
-		else if(bestMatchCount > 0 && matchCount == bestMatchCount){
-			++totalMatchCount;
-		}
+		// If we got no match yet, try again with other topic
 	}
-
-	if(totalMatchCount > 1){
-		return NULL;
-	}
-
-	return response;
+	return NULL;
 }
 
-uint32_t Npc::getMatchCount(NpcResponse* response, std::vector<std::string> wordList,
-	bool exactMatch, int32_t& matchAllCount, int32_t& totalKeywordCount)
+int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordList, bool exactMatch)
 {
-	matchAllCount = 0;
-	totalKeywordCount = 0;
 	int32_t bestMatchCount = 0;
 
 	const std::list<std::string>& inputList = response->getInputList();
@@ -2654,10 +2633,8 @@ uint32_t Npc::getMatchCount(NpcResponse* response, std::vector<std::string> word
 		std::vector<std::string> keywordList = explodeString(keywords, ";");
 
 		for(std::vector<std::string>::iterator keyIter = keywordList.begin(); keyIter != keywordList.end(); ++keyIter){
-
 			if(!exactMatch && (*keyIter) == "|*|"){
 				//Match anything.
-				matchAllCount++;
 			}
 			else if((*keyIter) == "|amount|"){
 				//TODO: Should iterate through each word until a number or a new keyword is found.
@@ -2691,27 +2668,21 @@ uint32_t Npc::getMatchCount(NpcResponse* response, std::vector<std::string> word
 			}
 
 			++matchCount;
-
-			if(matchCount > bestMatchCount){
-				bestMatchCount = matchCount;
-				totalKeywordCount = keywordList.size();
-			}
-
-			if(lastWordMatchIter == wordList.end()){
-				break;
-			}
 		}
+		
+		if(matchCount == keywordList.size() && matchCount > bestMatchCount)
+			bestMatchCount = matchCount;
 	}
 
 	return bestMatchCount;
 }
 
 const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
-	const std::string& text, bool checkLastResponse)
+	const std::string& text, bool checkSubResponse)
 {
-	if(checkLastResponse && npcState->lastResponse){
+	if(checkSubResponse && npcState->subResponse){
 		//Check previous response chain first
-		const ResponseList& list = npcState->lastResponse->getResponseList();
+		const ResponseList& list = npcState->subResponse->getResponseList();
 		const NpcResponse* response = getResponse(list, player, npcState, text);
 		if(response){
 			return response;
@@ -2738,15 +2709,15 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcEvent_t eventType)
 }
 
 const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
-	NpcEvent_t eventType, const std::string& text, bool checkLastResponse)
+	NpcEvent_t eventType, const std::string& text, bool checkSubResponse)
 {
 	if(eventType == EVENT_NONE){
 		return NULL;
 	}
 
-	if(checkLastResponse && npcState->lastResponse){
+	if(checkSubResponse && npcState->subResponse){
 		//Check previous response chain first
-		const ResponseList& list = npcState->lastResponse->getResponseList();
+		const ResponseList& list = npcState->subResponse->getResponseList();
 		const NpcResponse* response = getResponse(list, player, npcState, text, true);
 		if(response){
 			return response;
@@ -2757,15 +2728,15 @@ const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
 }
 
 const NpcResponse* Npc::getResponse(const Player* player, NpcState* npcState,
-	NpcEvent_t eventType, bool checkLastResponse)
+	NpcEvent_t eventType, bool checkSubResponse)
 {
 	if(eventType == EVENT_NONE){
 		return NULL;
 	}
 
-	if(checkLastResponse && npcState->lastResponse){
+	if(checkSubResponse && npcState->subResponse){
 		//Check previous response chain first
-		const ResponseList& list = npcState->lastResponse->getResponseList();
+		const ResponseList& list = npcState->subResponse->getResponseList();
 		const NpcResponse* response = getResponse(list, player, npcState, "", true);
 		if(response){
 			return response;

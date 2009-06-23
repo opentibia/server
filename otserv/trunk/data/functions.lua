@@ -1,4 +1,9 @@
+-- Backward compatibility
 getConfigInfo = getConfigValue
+doPlayerRemOutfit = doPlayerRemoveOutfit
+doPlayerRemOutfitEx = doPlayerRemoveOutfitEx
+broadcastMessageEx = broadcastMessage
+getThingfromPos = getThingFromPos
 
 function setExperienceRate(cid, value)
 	return doPlayerSetRate(cid, LEVEL_EXPERIENCE, value)
@@ -10,6 +15,144 @@ end
 
 function setSkillRate(cid, skillid, value)
 	return doPlayerSetRate(cid, skillid, value)
+end
+
+function doPlayerAddHealth(cid, health)
+	if isPlayer(cid) == TRUE then
+		if doCreatureAddHealth(cid, health) ~= LUA_ERROR then
+			return LUA_NO_ERROR
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function getPlayerPosition(cid)
+	if isPlayer(cid) == TRUE then
+		local position = getCreaturePosition(cid)
+		if position ~= LUA_ERROR then
+			return position
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function getPlayerHealth(cid)
+	if isPlayer(cid) == TRUE then
+		local health = getCreatureHealth(cid)
+		if health ~= LUA_ERROR then
+			return health
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function getPlayerMaxHealth(cid)
+	if isPlayer(cid) == TRUE then
+		local maxHealth = getCreatureMaxHealth(cid)
+		if maxHealth ~= LUA_ERROR then
+			return maxHealth
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function getPlayerName(cid)
+	if isPlayer(cid) == TRUE then
+		local name = getCreatureName(cid)
+		if name ~= LUA_ERROR then
+			return name
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function getPlayerByName(name)
+	local player = getCreatureByName(name)
+	if player ~= LUA_NULL and isPlayer(player) == TRUE then
+		return player
+	end
+
+	return LUA_NULL
+end
+
+function doPlayerSay(cid, text, textType)
+	if isPlayer(cid) == TRUE then
+		if doCreatureSay(cid, text, textType) ~= LUA_ERROR then
+			return LUA_NO_ERROR
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function getPlayerLight(cid)
+	if isPlayer(cid) == TRUE then
+		local light = getCreatureLight(cid)
+		if light ~= LUA_ERROR then
+			return light
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function getPlayerLookDir(cid)
+	if isPlayer(cid) == TRUE then
+		local lookDir = getCreatureLookDir(cid)
+		if lookDir ~= LUA_ERROR then
+			return lookDir
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function doSetPlayerLight(cid, lightLevel, lightColor, lightTime)
+	if isPlayer(cid) == TRUE then
+		if doSetCreatureLight(cid, lightLevel, lightColor, lightTime) ~= LUA_ERROR then
+			return LUA_NO_ERROR
+		end
+	end
+
+	return LUA_ERROR
+end
+
+function getCreaturePos(pos)
+	return getCreaturePosition(pos)
+end
+
+function getPlayerPos(pos)
+	return getPlayerPosition(pos)
+end
+
+-- Other functions
+function isPlayer(cid)
+	if (isCreature(cid) and cid >= PLAYER_ID_RANGE and cid < MONSTER_ID_RANGE) then
+		return TRUE
+	end
+
+	return FALSE
+end
+
+function isMonster(cid)
+	if (isCreature(cid) and cid >= MONSTER_ID_RANGE and cid < NPC_ID_RANGE) then
+		return TRUE
+	end
+
+	return FALSE
+end
+
+function isNPC(cid)
+	if (isCreature(cid) and cid >= NPC_ID_RANGE) then
+		return TRUE
+	end
+
+	return FALSE
 end
 
 function isSorcerer(cid)
@@ -115,86 +258,6 @@ function getPosByDir(basePos, dir)
 	return pos
 end
 
--- Functions made by Jiddo
-function doPlayerGiveItem(cid, itemid, count, charges)
-	local hasCharges = (isItemRune(itemid) == TRUE or isItemFluidContainer(itemid) == TRUE)
-	if(hasCharges and charges == nil) then
-		charges = 1
-	end
-	
-	while count > 0 do
-    	local tempcount = 1
-    	
-    	if(hasCharges) then
-    		tempcount = charges
-    	end
-    	if(isItemStackable(itemid) == TRUE) then
-    		tempcount = math.min (100, count)
-   		end
-    	
-       	local ret = doPlayerAddItem(cid, itemid, tempcount)
-       	if(ret == LUA_ERROR) then
-        	ret = doCreateItem(itemid, tempcount, getPlayerPosition(cid))
-        end
-        
-        if(ret ~= LUA_ERROR) then
-        	if(hasCharges) then
-        		count = count-1
-        	else
-        		count = count-tempcount
-        	end
-        else
-        	return LUA_ERROR
-        end
-	end
-    return LUA_NO_ERROR
-end
-
-function doPlayerTakeItem(cid, itemid, count)
-	if(getPlayerItemCount(cid,itemid) >= count) then
-		
-		while count > 0 do
-			local tempcount = 0
-    		if(isItemStackable(itemid) == TRUE) then
-    			tempcount = math.min (100, count)
-    		else
-    			tempcount = 1
-    		end
-        	local ret = doPlayerRemoveItem(cid, itemid, tempcount)
-        	
-            if(ret ~= LUA_ERROR) then
-            	count = count-tempcount
-            else
-            	return LUA_ERROR
-            end
-		end
-		
-		if(count == 0) then
-			return LUA_NO_ERROR
-		end
-	end
-	return LUA_ERROR
-end
-
-function doPlayerBuyItem(cid, itemid, count, cost, charges)
-    if(doPlayerRemoveMoney(cid, cost) == TRUE) then
-    	return doPlayerGiveItem(cid, itemid, count, charges)
-    end
-	return LUA_ERROR
-end
-
-function doPlayerSellItem(cid, itemid, count, cost)
-	if(doPlayerTakeItem(cid, itemid, count) == LUA_NO_ERROR) then
-		if(doPlayerAddMoney(cid, cost) ~= LUA_NO_ERROR) then
-			error('Could not add money to ' .. getPlayerName(cid) .. '(' .. cost .. 'gp)')
-		end
-		return LUA_NO_ERROR
-	end
-	return LUA_ERROR
-	
-end
--- End of functions made by Jiddo
-
 function getPlayerMoney(cid)
 	return ((getPlayerItemCount(cid, ITEM_CRYSTAL_COIN) * 10000) + (getPlayerItemCount(cid, ITEM_PLATINUM_COIN) * 100) + getPlayerItemCount(cid, ITEM_GOLD_COIN))
 end
@@ -226,11 +289,11 @@ function getTibiaTime()
 	return {hours = hours, minutes = worldTime}
 end
 
-exhaustion = 
+exhaustion =
 {
 
 	check = function (cid, storage)
-		local exhaust = getPlayerStorageValue(cid, storage)  
+		local exhaust = getPlayerStorageValue(cid, storage)
 		if (os.time() >= exhaust) then
 			return FALSE
 		else
@@ -239,7 +302,7 @@ exhaustion =
 	end,
 
 	get = function (cid, storage)
-		local exhaust = getPlayerStorageValue(cid, storage) 
+		local exhaust = getPlayerStorageValue(cid, storage)
 		local left = exhaust - os.time()
 		if (left >= 0) then
 			return left
@@ -247,9 +310,9 @@ exhaustion =
 			return FALSE
 		end
 	end,
-	
+
 	set = function (cid, storage, time)
-		setPlayerStorageValue(cid, storage, os.time()+time)  
+		setPlayerStorageValue(cid, storage, os.time()+time)
 	end,
 
 	make = function (cid, storage, time)
@@ -276,7 +339,7 @@ table.getPos = table.find
 
 table.isStrIn = function (txt, str)
 	local result = false
-	for i, v in pairs(str) do          
+	for i, v in pairs(str) do
 		result = (string.find(txt, v) and not string.find(txt, '(%w+)' .. v) and not string.find(txt, v .. '(%w+)'))
 		if (result) then
 			break
@@ -331,11 +394,11 @@ string.separate = function(separator, string)
 	while (true) do
 		local nextSeparator = string.find(string, separator, b + 1, true)
 		if (nextSeparator ~= nil) then
-			table.insert(a, string.sub(string,b,nextSeparator-1)) 
-			b = nextSeparator + 1 
+			table.insert(a, string.sub(string,b,nextSeparator-1))
+			b = nextSeparator + 1
 		else
 			table.insert(a, string.sub(string, b))
-			break 
+			break
 		end
 	end
 	return a
@@ -357,7 +420,7 @@ function string.strip_whitespace(str)
 	if str == nil then return str end
 	local start = string.find(str, "[^%s]") -- First non-whitespace character
 	local _end = #str + 1 - string.find(str:reverse(), "[^%s]") -- Last non-whitespace character
-	
+
 	if start ~= nil and _end ~= nil then
 		return string.sub(str, start, _end)
 	elseif start ~= nil then
@@ -397,7 +460,7 @@ function convertIntToIP(int, mask)
 			end
 		end
 	end
-	
+
 	return b1 .. "." .. b2 .. "." .. b3 .. "." .. b4
 end
 
@@ -410,10 +473,10 @@ function convertIPToInt(str)
 		else
 			ipstring = str:sub(1, maskindex - 1)
 			maskstring = str:sub(maskindex)
-			
+
 			local ipint = 0
 			local maskint = 0
-			
+
 			local index = 0
 			for b in ipstring:gmatch("(%d+).?") do
 				if tonumber(b) > 255 or tonumber(b) < 0 then
@@ -428,7 +491,7 @@ function convertIPToInt(str)
 			if index ~= 32 then -- Invalid
 				return 0, 0
 			end
-			
+
 			index = 0
 			for b in maskstring:gmatch("(%d+)%.?") do
 				if tonumber(b) > 255 or tonumber(b) < 0 then
@@ -443,14 +506,14 @@ function convertIPToInt(str)
 			if index ~= 32 then
 				return 0, 0
 			end
-			
+
 			return ipint, maskint
 		end
 	else
 		local ipint = 0
 		local maskint = 0
 		local index = 24
-		
+
 		for b in str:gmatch("([x%d]+)%.?") do
 			if b ~= "x" then
 				if b:find("x") ~= nil then
@@ -552,4 +615,104 @@ function getBlessPrice(level)
 	end
 
 	return price
+end
+
+function getPlayerRequiredExperience(cid, level)
+    if isPlayer(cid) == TRUE and level >= 1 then
+		local playerLevel = getPlayerLevel(cid)
+		local levelExp = Calculator:getLevelExp(playerLevel+level)
+		local experienceLeft = levelExp - getPlayerExperience(cid)
+		return experienceLeft
+    end
+
+	return LUA_ERROR
+end
+
+function doPlayerAddLevel(cid, level)
+    if isPlayer(cid) == TRUE and level >= 1 then
+		local experience = getPlayerRequiredExperience(cid, level)
+		doPlayerAddExp(cid, experience)
+		return LUA_NO_ERROR
+    end
+
+	return LUA_ERROR
+end
+
+-- Functions made by Jiddo
+function doPlayerGiveItem(cid, itemid, count, charges)
+	local hasCharges = (isItemRune(itemid) == TRUE or isItemFluidContainer(itemid) == TRUE)
+	if(hasCharges and charges == nil) then
+		charges = 1
+	end
+
+	while count > 0 do
+    	local tempcount = 1
+
+    	if(hasCharges) then
+    		tempcount = charges
+    	end
+    	if(isItemStackable(itemid) == TRUE) then
+    		tempcount = math.min (100, count)
+   		end
+
+       	local ret = doPlayerAddItem(cid, itemid, tempcount)
+       	if(ret == LUA_ERROR) then
+        	ret = doCreateItem(itemid, tempcount, getPlayerPosition(cid))
+        end
+
+        if(ret ~= LUA_ERROR) then
+        	if(hasCharges) then
+        		count = count-1
+        	else
+        		count = count-tempcount
+        	end
+        else
+        	return LUA_ERROR
+        end
+	end
+    return LUA_NO_ERROR
+end
+
+function doPlayerTakeItem(cid, itemid, count)
+	if(getPlayerItemCount(cid,itemid) >= count) then
+
+		while count > 0 do
+			local tempcount = 0
+    		if(isItemStackable(itemid) == TRUE) then
+    			tempcount = math.min (100, count)
+    		else
+    			tempcount = 1
+    		end
+        	local ret = doPlayerRemoveItem(cid, itemid, tempcount)
+
+            if(ret ~= LUA_ERROR) then
+            	count = count-tempcount
+            else
+            	return LUA_ERROR
+            end
+		end
+
+		if(count == 0) then
+			return LUA_NO_ERROR
+		end
+	end
+	return LUA_ERROR
+end
+
+function doPlayerBuyItem(cid, itemid, count, cost, charges)
+    if(doPlayerRemoveMoney(cid, cost) == TRUE) then
+    	return doPlayerGiveItem(cid, itemid, count, charges)
+    end
+	return LUA_ERROR
+end
+
+function doPlayerSellItem(cid, itemid, count, cost)
+	if(doPlayerTakeItem(cid, itemid, count) == LUA_NO_ERROR) then
+		if(doPlayerAddMoney(cid, cost) ~= LUA_NO_ERROR) then
+			error('Could not add money to ' .. getPlayerName(cid) .. '(' .. cost .. 'gp)')
+		end
+		return LUA_NO_ERROR
+	end
+	return LUA_ERROR
+
 end

@@ -418,6 +418,7 @@ struct NpcState{
 	uint32_t playerId;
 	int32_t topic;
 	bool isIdle;
+	int32_t focusState;
 	bool isQueued;
 	int32_t price;
 	int32_t sellPrice;
@@ -433,8 +434,8 @@ struct NpcState{
 	int32_t level;
 	int64_t prevInteraction;
 	std::string respondToText;
-	std::string respondText;
 	const NpcResponse* lastResponse;
+	const NpcResponse* subResponse;
 	uint64_t lastResponseTime;
 
 	//script variables
@@ -537,8 +538,7 @@ protected:
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState,
 		NpcEvent_t eventType, bool checkLastResponse);
 
-	uint32_t getMatchCount(NpcResponse* response, std::vector<std::string> wordList,
-		bool exactMatch, int32_t& matchAllCount, int32_t& totalKeywordCount);
+	int32_t matchKeywords(NpcResponse* response, std::vector<std::string> wordList, bool exactMatch);
 
 	void processResponse(Player* player, NpcState* npcState, const NpcResponse* response);
 	void executeResponse(Player* player, NpcState* npcState, const NpcResponse* response);
