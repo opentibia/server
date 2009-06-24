@@ -332,6 +332,7 @@ public:
 			condition = CONDITION_NONE;
 			publicize = true;
 			time = 0;
+			idleInterval = 0;
 		}
 
 		int32_t topic;
@@ -351,7 +352,8 @@ public:
 		int32_t health;
 		ConditionType_t condition;
 		bool publicize;
-		int32_t time;
+		uint32_t time;
+		uint32_t idleInterval;
 	};
 
 	NpcResponse(const ResponseProperties& _prop,
@@ -397,7 +399,8 @@ public:
 	int32_t getAmount() const {return prop.amount;}
 	void setAmount(int32_t _amount) { prop.amount = _amount;}
 	bool publicize() const {return prop.publicize;}
-	int32_t getTime() const {return prop.time;}
+	uint32_t getTime() const {return prop.time;}
+	uint32_t getIdleInterval() const {return prop.idleInterval;}
 
 	std::string formatResponseString(Creature* creature) const;
 	void addAction(ResponseAction action) {prop.actionList.push_back(action);}
@@ -417,7 +420,6 @@ public:
 struct NpcState{
 	uint32_t playerId;
 	int32_t topic;
-	bool isIdle;
 	int32_t focusState;
 	bool isQueued;
 	int32_t price;
@@ -432,7 +434,6 @@ struct NpcState{
 	std::string listName;
 	std::string listPluralName;
 	int32_t level;
-	int64_t prevInteraction;
 	std::string respondToText;
 	const NpcResponse* lastResponse;
 	const NpcResponse* subResponse;
@@ -540,7 +541,7 @@ protected:
 
 	int32_t matchKeywords(NpcResponse* response, std::vector<std::string> wordList, bool exactMatch);
 
-	void processResponse(Player* player, NpcState* npcState, const NpcResponse* response);
+	void processResponse(Player* player, NpcState* npcState, const NpcResponse* response, bool delayResponse = false);
 	void executeResponse(Player* player, NpcState* npcState, const NpcResponse* response);
 
 	std::string formatResponse(Creature* creature, const NpcState* npcState, const NpcResponse* response) const;
@@ -573,8 +574,9 @@ protected:
 	bool hasBusyReply;
 	bool hasScriptedFocus;
 	int32_t talkRadius;
-	uint32_t idleTime;
+	uint32_t idleTimeout;
 	uint32_t idleInterval;
+	uint64_t lastResponseTime;
 	bool defaultPublic;
 	int32_t focusCreature;
 

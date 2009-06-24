@@ -132,9 +132,10 @@ void Npc::reset()
 	hasScriptedFocus = false;
 	focusCreature = 0;
 	isIdle = true;
-	talkRadius = 2;
-	idleTime = 0;
+	talkRadius = 4;
+	idleTimeout = 0;
 	idleInterval = 5 * 60;
+	lastResponseTime = OTSYS_TIME();
 	defaultPublic = true;
 
 	delete m_npcEventHandler;
@@ -297,8 +298,8 @@ bool Npc::loadFromXml(const std::string& filename)
 					talkRadius = intValue;
 				}
 
-				if(readXMLInteger(p, "idletime", intValue)){
-					idleTime = intValue;
+				if(readXMLInteger(p, "idletime", intValue) || readXMLInteger(p, "idletimeout", intValue)){
+					idleTimeout = intValue;
 				}
 
 				if(readXMLInteger(p, "idleinterval", intValue)){
@@ -565,6 +566,9 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 				else if(strValue == "onidle"){
 					if(readXMLInteger(node, "time", intValue)){
 						prop.time = intValue;
+					}
+					else if(readXMLInteger(node, "idleinterval", intValue)){
+						prop.idleInterval = intValue;
 					}
 
 					prop.eventType = EVENT_IDLE;
@@ -1176,7 +1180,6 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 
 	NpcState* state = new NpcState;
 	state->playerId = player->getID();
-	state->prevInteraction = 0;
 	state->price = 0;
 	state->sellPrice = 0;
 	state->buyPrice = 0;
@@ -1190,13 +1193,12 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->listPluralName = "";
 	state->level = -1;
 	state->topic = 0;
-	state->isIdle = true;
 	state->focusState = -1;
 	state->isQueued = false;
 	state->respondToText = "";
 	state->lastResponse = NULL;
 	state->subResponse = NULL;
-	state->lastResponseTime = 0;
+	state->lastResponseTime = OTSYS_TIME();
 	stateList.push_back(state);
 	return state;
 }
@@ -1207,7 +1209,7 @@ bool Npc::canSee(const Position& pos) const
 		return false;
 	}
 
-	return Creature::canSee(getPosition(), pos, Map::maxClientViewportX, Map::maxClientViewportY);
+	return Creature::canSee(getPosition(), pos, talkRadius, talkRadius);
 }
 
 std::string Npc::getDescription(int32_t lookDistance) const
@@ -1309,22 +1311,25 @@ void Npc::onCreatureMove(const Creature* creature, const Tile* newTile, const Po
 			m_npcEventHandler->onCreatureMove(creature, oldPos, newPos);
 		}
 
-		NpcState* npcState = getState(player);
-		if(npcState){
-			bool canSeeNewPos = canSee(newPos);
-			bool canSeeOldPos = canSee(oldPos);
-			Position myPos = getPosition();
+		const Position& myPos = getPosition();
+		bool canSeeNewPos = canSee(newPos);
+		bool canSeeOldPos = canSee(oldPos);
 
-			if(canSeeNewPos && !canSeeOldPos){
+		if(canSeeNewPos && !canSeeOldPos){
+			NpcState* npcState = getState(player);
+			if(npcState){
 				onPlayerEnter(player, npcState);
 			}
-			else if((!canSeeNewPos ||
-					(newPos.x < myPos.x - talkRadius) || (newPos.x > myPos.x + talkRadius) ||
-					(newPos.y < myPos.y - talkRadius) || (newPos.y > myPos.y + talkRadius))
-					&& canSeeOldPos){
+		}
+		else if(!canSeeNewPos && canSeeOldPos){
+			NpcState* npcState = getState(player);
+			if(npcState){
 				onPlayerLeave(player, npcState);
 			}
-			else if(canSeeNewPos && canSeeOldPos){
+		}
+		else if(canSeeNewPos && canSeeOldPos){
+			NpcState* npcState = getState(player);
+			if(npcState){
 				const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_MOVE, false);
 				processResponse(player, npcState, response);
 			}
@@ -1353,31 +1358,27 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 			const Position& myPos = getPosition();
 			const Position& pos = creature->getPosition();
 			if(canSee(myPos)){
-				if ((pos.x >= myPos.x - talkRadius) && (pos.x <= myPos.x + talkRadius) &&
-					(pos.y >= myPos.y - talkRadius) && (pos.y <= myPos.y + talkRadius)){
+				NpcState* npcState = getState(player);
 
-					NpcState* npcState = getState(player);
-
-					if(!text.empty()){
-						if(hasBusyReply && focusCreature != 0 && focusCreature != player->getID()){
-							//Check if we have a busy reply
-							const NpcResponse* response = getResponse(player, npcState, EVENT_BUSY, text, false);
-							if(response){
-								turnToCreature(player);
-								processResponse(player, npcState, response);
-							}
-						}
-						else{
-							const NpcResponse* response = getResponse(player, npcState, text, true);
-							if(response){
-								setCreatureFocus(player);
-								processResponse(player, npcState, response);
-							}
+				if(!text.empty()){
+					if(hasBusyReply && focusCreature != 0 && focusCreature != player->getID()){
+						//Check if we have a busy reply
+						const NpcResponse* response = getResponse(player, npcState, EVENT_BUSY, text, false);
+						if(response){
+							turnToCreature(player);
+							processResponse(player, npcState, response, true);
 						}
 					}
-
-					npcState->respondToText = text;
+					else{
+						const NpcResponse* response = getResponse(player, npcState, text, true);
+						if(response){
+							setCreatureFocus(player);
+							processResponse(player, npcState, response, true);
+						}
+					}
 				}
+
+				npcState->respondToText = text;
 			}
 		}
 	}
@@ -1409,6 +1410,11 @@ void Npc::onPlayerLeave(Player* player, NpcState* state)
 		player->closeShopWindow();
 		const NpcResponse* response = getResponse(player, state, EVENT_PLAYER_LEAVE, false);
 		processResponse(player, state, response);
+
+		if(state->focusState == -1){
+			//has not started a conversation yet
+			state->focusState = 0;
+		}
 	}
 }
 
@@ -1426,22 +1432,28 @@ void Npc::onThink(uint32_t interval)
 		const NpcResponse* response = NULL;
 		Player* player = g_game.getPlayerByID(npcState->playerId);
 		bool closeConversation = (player == NULL);
-		bool idleTimeout = false;
+		bool closeDueToTimeout = false;
 		if(!npcState->isQueued){
-			if(npcState->prevInteraction == 0){
-				npcState->prevInteraction = OTSYS_TIME();
+			if(npcState->focusState == -1){
+				//has not started a conversation yet
 			}
+			else if(npcState->focusState == 0){
+				//closing conversation because focus is set to 0 or isidle set to true
+				closeConversation = true;
+			}
+			else if(idleTimeout > 0 && (OTSYS_TIME() - npcState->lastResponseTime) > idleTimeout * 1000){
+				//closing conversation due to idle
+				closeDueToTimeout = true;
+				closeConversation = true;
+			}
+		}
 
-			if(npcState->focusState == 0){
-				closeConversation = true;
-			}
-			else if(!queueList.empty() && npcState->isIdle){
-				closeConversation = true;
-			}
-			else if(idleTime > 0 && (OTSYS_TIME() - npcState->prevInteraction) > idleTime * 1000){
-				idleTimeout = true;
-				closeConversation = true;
-			}
+		//execute our latest response
+		if(player && npcState->lastResponse){
+			turnToCreature(player);
+			executeResponse(player, npcState, npcState->lastResponse);
+			npcState->subResponse = npcState->lastResponse;
+			npcState->lastResponse = NULL;
 		}
 
 		if(closeConversation){
@@ -1450,7 +1462,7 @@ void Npc::onThink(uint32_t interval)
 			}
 
 			if(queueList.empty()){
-				if(idleTimeout){
+				if(closeDueToTimeout){
 					onPlayerLeave(player, npcState);
 				}
 			}
@@ -1466,7 +1478,7 @@ void Npc::onThink(uint32_t interval)
 							response = getResponse(nextPlayer, nextPlayerState, nextPlayerState->respondToText, true);
 							if(response){
 								setCreatureFocus(nextPlayer);
-								processResponse(nextPlayer, nextPlayerState, response);
+								processResponse(nextPlayer, nextPlayerState, response, true);
 							}
 							nextPlayerState->isQueued = false;
 							break;
@@ -1482,36 +1494,16 @@ void Npc::onThink(uint32_t interval)
 			continue;
 		}
 
-		//execute our latest response
-		if(npcState->lastResponse){
-			turnToCreature(player);
-			executeResponse(player, npcState, npcState->lastResponse);
-			npcState->subResponse = npcState->lastResponse;
-			npcState->lastResponse = NULL;
-		}
-
 		//idle response
-		bool idleResponse = (npcState->lastResponseTime > 0 && (OTSYS_TIME() - npcState->lastResponseTime) > idleInterval);
-		if(idleResponse){
-			response = getResponse(player, npcState, EVENT_IDLE, true);
-			processResponse(player, npcState, response);
-			idleResponse = false;
-		}
+		response = getResponse(player, npcState, EVENT_IDLE, true);
+		processResponse(player, npcState, response);
 
 		//think response
-		if(!response){
-			response = getResponse(player, npcState, EVENT_THINK, true);
-			processResponse(player, npcState, response);
-		}
+		response = getResponse(player, npcState, EVENT_THINK, true);
+		processResponse(player, npcState, response);
 
-		if(!npcState->isIdle){
+		if(npcState->focusState == 1 || !queueList.empty()){
 			isIdle = false;
-
-			/*
-			if(hasBusyReply){
-				setCreatureFocus(player);
-			}
-			*/
 		}
 
 		++it;
@@ -1522,21 +1514,15 @@ void Npc::onThink(uint32_t interval)
 	}
 }
 
-void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse* response)
+void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse* response, bool delayResponse /*= false*/)
 {
 	if(response){
-		npcState->lastResponseTime = OTSYS_TIME();
-		npcState->lastResponse = response;
 		bool resetTopic = true;
-		bool sayNow = false;
 
 		if(response->getFocusState() == 0){
-			npcState->isIdle = true;
 			npcState->focusState = 0;
-			sayNow = true;
 		}
 		else if(response->getFocusState() == 1){
-			npcState->isIdle = false;
 			npcState->focusState = 1;
 		}
 
@@ -1583,7 +1569,7 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 				case ACTION_SETIDLE:
 				{
-					npcState->isIdle = ((*it).intValue == 1);
+					npcState->focusState = 0;
 					break;
 				}
 
@@ -1844,8 +1830,13 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "cid = " << env->addThing(player) << std::endl;
 						scriptstream << "text = \"" << npcState->respondToText << "\"" << std::endl;
 						scriptstream << "name = \"" << player->getName() << "\"" << std::endl;
-						scriptstream << "idletime = " << idleTime << std::endl;
-						scriptstream << "idleinterval = " << idleInterval << std::endl;
+						scriptstream << "idletime = " << idleTimeout << std::endl;
+						if(response->getIdleInterval() != 0){
+							scriptstream << "idleinterval = " << response->getIdleInterval() << std::endl;
+						}
+						else{
+							scriptstream << "idleinterval = " << idleInterval << std::endl;
+						}
 
 						scriptstream << "itemlist = {" << std::endl;
 						uint32_t n = 0;
@@ -1912,13 +1903,23 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 			npcState.amount = player->__getItemTypeCount(npcState.itemId);
 		}
 		*/
-		if(sayNow)
-			executeResponse(player, npcState, response);
 
 		if(resetTopic && response->getTopic() == npcState->topic){
 			npcState->topic = 0;
 		}
-		npcState->prevInteraction = OTSYS_TIME();
+
+		npcState->lastResponseTime = OTSYS_TIME();
+		lastResponseTime = OTSYS_TIME();
+
+		if(delayResponse){
+			npcState->lastResponse = response;
+		}
+		else{
+			turnToCreature(player);
+			executeResponse(player, npcState, response);
+			npcState->subResponse = response;
+			npcState->lastResponse = NULL;
+		}
 	}
 }
 
@@ -2083,7 +2084,7 @@ void Npc::onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCall
 
 	removeShopPlayer(player);
 
-	NpcState* npcState = getState(player, true);
+	NpcState* npcState = getState(player);
 	if(npcState){
 		const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPCLOSE, false);
 		processResponse(player, npcState, response);
@@ -2252,7 +2253,6 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 {
 	std::string textString = asLowerCaseString(text);
 	std::vector<std::string> wordList = explodeString(textString, " ");
-	
 
 	// We choose the match that matches the most keywords
 	// _and_ matches all of it's conditions.
@@ -2261,10 +2261,8 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 	const NpcResponse* bestMatch = NULL;
 	int32_t bestKeywordCount = 0;
 
-
 	// Cache some info
 	int32_t money = -1;
-
 
 	// First loop we try with current topic
 	int32_t currentTopic = npcState->topic;
@@ -2293,11 +2291,11 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				continue;
 
 			if(iresponse->getEventType() == EVENT_NONE || iresponse->getFocusState() != -1){
-				if(npcState->isIdle && iresponse->getFocusState() != 1)
+				if(npcState->focusState != 1 && iresponse->getFocusState() != 1)
 					//We are idle, and this response does not activate the npc.
 					continue;
 
-				if(!npcState->isIdle && iresponse->getFocusState() == 1)
+				if(npcState->focusState == 1 && iresponse->getFocusState() == 1)
 					//We are not idle, and this response would activate us again.
 					continue;
 			}
@@ -2395,13 +2393,11 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			if(iresponse->getCondition() != CONDITION_NONE){
 				if(!player->hasCondition(iresponse->getCondition()))
 					continue;
-				//++matchCount;
 			}
 
 			if(iresponse->getHealth() != -1){
 				if(player->getHealth() >= iresponse->getHealth())
 					continue;
-				//++matchCount;
 			}
 
 			if(iresponse->getKnowSpell() != ""){
@@ -2413,49 +2409,42 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				if(!player->hasLearnedInstantSpell(spellName)){
 					continue;
 				}
-				//++matchCount;
 			}
 
 			if(iresponse->scriptVars.b1){
 				if(!npcState->scriptVars.b1){
 					continue;
 				}
-				//++matchCount;
 			}
 
 			if(iresponse->scriptVars.b2){
 				if(!npcState->scriptVars.b2){
 					continue;
 				}
-				//++matchCount;
 			}
 
 			if(iresponse->scriptVars.b3){
 				if(!npcState->scriptVars.b3){
 					continue;
 				}
-				//++matchCount;
 			}
 
 			if(iresponse->scriptVars.n1 != -1){
 				if(!npcState->scriptVars.n1){
 					continue;
 				}
-				//++matchCount;
 			}
 
 			if(iresponse->scriptVars.n2 != -1){
 				if(!npcState->scriptVars.n2){
 					continue;
 				}
-				//++matchCount;
 			}
 
 			if(iresponse->scriptVars.n3 != -1){
 				if(!npcState->scriptVars.n3){
 					continue;
 				}
-				//++matchCount;
 			}
 
 			bool storageMatch = false;
@@ -2519,8 +2508,6 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 					default: break;
 				}
-
-				//++matchCount;
 			}
 			if(storageMatch)
 				continue;
@@ -2578,26 +2565,32 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				switch(iresponse->getEventType()){
 					case EVENT_IDLE:
 					{
-						uint32_t time = idleInterval * 1000;
 						if((*it)->getTime() != 0){
-							time = (*it)->getTime();
+							//state idle (each state has its own idle)
+							uint32_t time = (*it)->getTime() * 1000;
+
+							if((OTSYS_TIME() - npcState->lastResponseTime) < time){
+								//not enough time elapsed
+								continue;
+							}
 						}
-						bool enoughTimeElapsed = (npcState->lastResponseTime != 0 && ( (OTSYS_TIME() - npcState->lastResponseTime) > time));
-						if(!enoughTimeElapsed){
-							continue;
+						else{
+							//global idle
+							uint32_t time = idleInterval;
+							if((*it)->getIdleInterval() != 0){
+								time = (*it)->getIdleInterval() * 1000;
+							}
+
+							if((OTSYS_TIME() - lastResponseTime) < time){
+								//not enough time elapsed
+								continue;
+							}
 						}
 
 						break;
 					}
 
-					/*
-					case EVENT_PLAYER_LEAVE:
-						//++matchCount;
-						break;
-					*/
-
 					default:
-						//matchCount = 0;
 						break;
 				}
 			}
@@ -2624,6 +2617,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 		// If we got no match yet, try again with other topic
 	}
+
 	return NULL;
 }
 
@@ -3253,7 +3247,7 @@ void NpcScriptInterface::pushState(lua_State *L, NpcState* state)
 	setField(L, "spellname", state->spellName);
 	setField(L, "listname", state->listName);
 	setField(L, "listpname", state->listPluralName);
-	setFieldBool(L, "isidle", state->isIdle);
+	setFieldBool(L, "isidle", state->focusState != 1);
 
 	setField(L, "n1", state->scriptVars.n1);
 	setField(L, "n2", state->scriptVars.n2);
@@ -3281,7 +3275,10 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->spellName = getFieldString(L, "spellname");
 	state->listName = getFieldString(L, "listname");
 	state->listPluralName = getFieldString(L, "listpname");
-	state->isIdle = getFieldBool(L, "isidle");
+	bool isIdle = getFieldBool(L, "isidle");
+	if(isIdle){
+		state->focusState = 0;
+	}
 
 	state->scriptVars.n1 = getField(L, "n1");
 	state->scriptVars.n2 = getField(L, "n2");

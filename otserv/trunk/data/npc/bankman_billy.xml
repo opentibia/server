@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<npc name="Bankman Billy" floorchange="0" walkinterval="4000">
+<npc name="Bankman Billy" floorchange="0" walkinterval="4000" walkradius="10">
 	<health now="150" max="150"/>
 	<look type="133" head="10" body="122" legs="19" feet="10"/>
 
@@ -29,62 +29,23 @@
     </interact>
     -->
 
-    <interact event="onIdle">
-      <response text="Beatiful day is it not |NAME|?" public="1">
-        <action name="idle" value="1"/>
-      </response>
+    <!-- A global idle which is called once every 120 seconds if no interaction is going on-->
+    <interact event="onIdle" idleinterval="120">
+      <response text="Beatiful day is it not |NAME|?" public="1"/>
+    </interact>
 
-      <response>
-        <action name="script">
-        <![CDATA[
-          -- The npc will just say this on average once every 4 hours (240 minutes)
-          local interval = 240 * 60
-
-          local p = math.random(0, 10000000)
-          local r = (10000000 * idleinterval) / interval
-          --selfSay("r: " .. r .. ", p: " .. p)
-          
-          if(r >= p) then
-            selfSay("Hey " .. name .. " can you help me?")
-            _state.topic = 999
-          end
-        ]]>  
-        </action>
-
-        <interact keywords="yes" topic="999">
-          <response text="Ah great, would you mind holding this for me while I use the bathroom?">
-            <action name="topic" value="-1"/>
-
-            <interact keywords="yes">
-              <response>
-                <action name="script">
-                <![CDATA[
-                  local result = doPlayerAddItem(cid, 2157, 3, 0)
-                  if(result == -1) then
-                    selfSay("Never mind, I'll have to hold it in until I quit work.")
-                  else
-                    selfSay("Thanks alot! I'll be right back.")
-                    _state.b1 = true
-                  end
-                ]]>
-                </action>
-              </response>
-            </interact>
-            
+    <!-- Example of a story telling response with a timer defined for onidle event -->
+    <interact focus="1" keywords="story">
+      <response text="Once upon a time...">
+        <interact event="onidle" time="4">
+          <response text="there was a king named named Tibianus">
           </response>
-
-          <interact keywords="|*|">
-            <response text="Hmpf."/>
-          </interact>
-          
         </interact>
-        
       </response>
     </interact>
 
     <interact event="onPlayerLeave" focus="0">
       <response text="It was a pleasure to help you |NAME|."/>
-      <response b1="1" text="Hey hey give back my gold nuggets! POLICE HELP!"/>
     </interact>
     
     <interact keywords="name">

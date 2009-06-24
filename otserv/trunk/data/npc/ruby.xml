@@ -80,7 +80,7 @@
         <action name="scriptparam" value="|TEXT|"/>
       </response>
     </interact>
-    
+
     <interact keywords="edron">
       <response text="Do you want a passage to Edron for |PRICE| gold?">
         <action name="topic" value="1"/>
@@ -88,7 +88,7 @@
       </response>
     </interact>
     
-    <interact keywords="yes" topic="1">
+    <interact topic="1" keywords="yes">
       <response param="pzblock" text="First get rid of those blood stains! You are not going to ruin my vehicle!"/>
       <response param="lowmoney" text="You don't have enough money."/>
       <response text="Have a nice trip!">
@@ -167,7 +167,7 @@
       </response>
     </interact>
 
-    <interact keywords="yes" topic="2">
+    <interact topic="2" keywords="yes">
       <response param="noamount" text="Sorry you do not have one."/>
       <response param="lowamount" text="Sorry, you do not have so many."/>
       <response text="Ok. Here is your money.">
@@ -188,7 +188,7 @@
       </response>
     </interact>
 
-    <interact keywords="yes" topic="3">
+    <interact topic="3" keywords="yes">
       <response param="lowmoney" text="Come back when you have the money!"/>
       <response text="Here you are.">
         <action name="buy" value="|PRICE|"/>

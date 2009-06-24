@@ -33,7 +33,7 @@
       
       </interact>
 
-    <interact keywords="yes" topic="1">
+    <interact topic="1" keywords="yes">
       <!--Premium account, b1 is set in above-->
       <response b1="1" text="IN WHICH TOWN DO YOU WANT TO LIVE: CARLIN, EDRON, THAIS, OR VENORE?">
         <action name="topic" value="2"/>
@@ -45,7 +45,7 @@
       </response>
     </interact>
 
-    <interact keywords="carlin" topic="2">
+    <interact topic="2" keywords="carlin">
       <response text="IN CARLIN! AND WHAT PROFESSION HAVE YOU CHOSEN: KNIGHT, PALADIN, SORCERER, OR DRUID?">
         <!--n1: 1 = carlin, 2 = edron, 3 = thais, 4 = venore-->
         <action name="script">
@@ -55,7 +55,7 @@
       </response>
     </interact>
 
-    <interact keywords="thais" topic="2">
+    <interact topic="2" keywords="thais">
       <response text="IN THAIS! AND WHAT PROFESSION HAVE YOU CHOSEN: KNIGHT, PALADIN, SORCERER, OR DRUID?">
         <!--n1: 1 = carlin, 2 = edron, 3 = thais, 4 = venore-->
         <action name="script">
@@ -65,7 +65,7 @@
       </response>
     </interact>
 
-    <interact keywords="venore" topic="2">
+    <interact topic="2" keywords="venore">
       <response text="IN VENORE! AND WHAT PROFESSION HAVE YOU CHOSEN: KNIGHT, PALADIN, SORCERER, OR DRUID?">
         <!--n1: 1 = carlin, 2 = edron, 3 = thais, 4 = venore-->
         <action name="script">
@@ -75,7 +75,7 @@
       </response>
     </interact>
 
-    <interact keywords="edron" topic="2">
+    <interact topic="2" keywords="edron">
       <response text="YOU NEED A PREMIUM ACCOUNT IN ORDER TO GO THERE!">
         <!--Set the topic back to 2, ie. choose a new town.-->
         <action name="topic" value="2"/>
@@ -91,12 +91,16 @@
     </interact>
     
     <!--If the player does not say any city, repeat our question-->
-    <interact keywords="|*|" topic="2">
-      <response b1="1" text="CARLIN, EDRON, THAIS, OR VENORE?"/>
-      <response text="CARLIN, EDRON, THAIS, OR VENORE?"/>
+    <interact topic="2" keywords="|*|">
+      <response b1="1" text="CARLIN, EDRON, THAIS, OR VENORE?">
+        <action name="topic" value="2"/>
+      </response>
+      <response text="CARLIN, EDRON, THAIS, OR VENORE?">
+        <action name="topic" value="2"/>
+      </response>
     </interact>
 
-    <interact keywords="sorcerer" topic="3">
+    <interact topic="3" keywords="sorcerer">
       <response text="A SORCERER! ARE YOU SURE? THIS DECISION IS IRREVERSIBLE!">
         <!--n2: 1 = sorcerer, 2 = druid, 3 = paladin, 4 = knight-->
         <action name="script">
@@ -106,7 +110,7 @@
       </response>
     </interact>
 
-    <interact keywords="druid" topic="3">
+    <interact topic="3" keywords="druid">
       <response text="A DRUID! ARE YOU SURE? THIS DECISION IS IRREVERSIBLE!">
         <!--n2: 1 = sorcerer, 2 = druid, 3 = paladin, 4 = knight-->
         <action name="script">
@@ -116,7 +120,7 @@
       </response>
     </interact>
 
-    <interact keywords="paladin" topic="3">
+    <interact topic="3" keywords="paladin">
       <response text="A PALADIN! ARE YOU SURE? THIS DECISION IS IRREVERSIBLE!">
         <!--n2: 1 = sorcerer, 2 = druid, 3 = paladin, 4 = knight-->
         <action name="script">
@@ -126,7 +130,7 @@
       </response>
     </interact>
     
-    <interact keywords="knight" topic="3">
+    <interact topic="3" keywords="knight">
       <response text="A KNIGHT! ARE YOU SURE? THIS DECISION IS IRREVERSIBLE!">
         <!--n2: 1 = sorcerer, 2 = druid, 3 = paladin, 4 = knight-->
       <action name="script">
@@ -137,11 +141,13 @@
     </interact>
 
     <!--If the player does not say any profession, repeat our question-->
-    <interact keywords="|*|" topic="3">
-      <response text="KNIGHT, PALADIN, SORCERER, OR DRUID?"/>
+    <interact topic="3" keywords="|*|">
+      <response text="KNIGHT, PALADIN, SORCERER, OR DRUID?">
+        <action name="topic" value="3"/>
+      </response>
     </interact>
     
-    <interact keywords="yes" topic="4">
+    <interact topic="4" keywords="yes">
       <response>
         <!--n1: 1 = carlin, 2 = edron, 3 = thais, 4 = venore-->
         <!--n2: 1 = knight, 2 = paladin, 3 = sorcerer, 4 = druid-->

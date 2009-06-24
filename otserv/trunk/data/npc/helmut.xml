@@ -54,93 +54,93 @@
       <response text="Sorry, I only sell spells to Sorcerers."/>
     </interact>
 
-    <interact keywords="level" topic="1">
+    <interact topic="1" keywords="level">
       <response text="For which level would you like to learn a spell?">
         <action name="topic" value="2"/>
       </response>
     </interact>
 
-    <interact keywords="instant;rune" topic="1">
+    <interact topic="1" keywords="instant;rune" >
       <response text="I sell attack spells, healing spells, support spells and summon spells. Which of these interests you most?"/>
     </interact>
 
-    <interact keywords="attack;rune" topic="1">
+    <interact topic="1" keywords="attack;rune">
       <response text="I sell missile rune spells, explosive rune spells, field rune spells, wall rune spells and bomb rune spells."/>
     </interact>
 
-    <interact keywords="support;rune" topic="1">
+    <interact topic="1" keywords="support;rune">
       <response text="In this category I have 'Destroy Field'."/>
     </interact>
 
-    <interact keywords="missile;rune;spell" topic="1">
+    <interact topic="1" keywords="missile;rune;spell">
       <response text="In this category I have 'Light Magic Missile', 'Heavy Magic Missile' and 'Sudden Death'."/>
     </interact>
 
-    <interact keywords="explosive;rune;spell" topic="1">
+    <interact topic="1" keywords=";rune;spell">
       <response text="In this category I have 'Fireball', 'Great Fireball' and 'Explosion'."/>
     </interact>
 
-    <interact keywords="field;rune;spell" topic="1">
+    <interact topic="1" keywords="field;rune;spell">
       <response text="In this category I have 'Poison Field', 'Fire Field' and 'Energy Field'."/>
     </interact>
 
-    <interact keywords="wall;rune;spell" topic="1">
+    <interact topic="1" keywords="wall;rune;spell">
       <response text="In this category I have 'Fire Wall', 'Poison Wall' and 'Energy Wall'."/>
     </interact>
 
-    <interact keywords="attack;spell" topic="1">
+    <interact topic="1" keywords="attack;spell">
       <response text="In this category I have 'Fire Wave', 'Energy Wave', 'Energy Beam' and 'Great Energy Beam'."/>
     </interact>
 
-    <interact keywords="healing;spell" topic="1">
+    <interact topic="1" keywords="healing;spell">
       <response text="In this category I have 'Light Healing', 'Intense Healing', 'Ultimate Healing' and 'Antidote'."/>
     </interact>
 
-    <interact keywords="support;spell" topic="1">
+    <interact topic="1" keywords="support;spell">
       <response text="In this category I have 'Find Person', 'Light', 'Great Light', 'Magic Shield', 'Creature Illusion' and 'Invisible'."/>
     </interact>
 
-    <interact keywords="summon;spell" topic="1">
+    <interact topic="1" keywords="summon;spell">
       <response text="In this category I have 'Summon Creature'."/>
     </interact>
 
-    <interact keywords="8" topic="2">
+    <interact topic="2" keywords="8">
       <response text="For level 8 I have 'Find Person' and 'Light'.">
         <action name="topic" value="2"/>
       </response>
     </interact>
 
-    <interact keywords="9" topic="2">
+    <interact topic="2" keywords="9">
       <response text="For level 9 I have 'Light Healing'.">
         <action name="topic" value="2"/>
       </response>
     </interact>
 
-    <interact keywords="10" topic="2">
+    <interact topic="2" keywords="10">
       <response text="For level 10 I have 'Antidote'.">
         <action name="topic" value="2"/>
       </response>
     </interact>
 
-    <interact keywords="11" topic="2">
+    <interact topic="2" keywords="11">
       <response text="For level 11 I have 'Intense Healing'.">
         <action name="topic" value="2"/>
       </response>
     </interact>
 
-    <interact keywords="13" topic="2">
+    <interact topic="2" keywords="13">
       <response text="For level 13 I have 'Great Light'.">
         <action name="topic" value="2"/>
       </response>
     </interact>
 
-    <interact keywords="14" topic="2">
+    <interact topic="2" keywords="14">
       <response text="For level 14 I have 'Poison Field' and 'Magic Shield'.">
         <action name="topic" value="2"/>
       </response>
     </interact>
 
-    <interact keywords="|*|" topic="2">
+    <interact topic="2" keywords="|*|">
       <response text="Hmm, I have no spells for this level, but for many levels from 8 to 14.">
         <action name="topic" value="2"/>
       </response>
@@ -219,7 +219,7 @@
     </interact>
 
     <!-- This is he actual selling of the spell -->
-    <interact keywords="yes" topic="3">
+    <interact topic="3" keywords="yes">
       <response param="lowlevel" text="You need to be atleast level |LEVEL| to learn this spell!"/>
       <response knowspell="|SPELL|" text="You already know this spell."/>
       <response param="lowmoney" text="Come back when you have the money!"/>
@@ -231,12 +231,12 @@
     </interact>
 
     <!-- Player is saying something else than expected-->
-    <interact keywords="|*|" topic="2">
+    <interact topic="2" keywords="|*|">
       <response text="Maybe some other time."/>
     </interact>
 
     <!-- Player is saying something else than expected-->
-    <interact keywords="|*|" topic="3">
+    <interact topic="3" keywords="|*|">
       <response text="Maybe some other time."/>
     </interact>
 
