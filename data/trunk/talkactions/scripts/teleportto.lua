@@ -5,9 +5,9 @@ function onSay(cid, words, param)
 	end
 
 	local destPos = getWaypointPositionByName(param)
+	local creature = getCreatureByName(param)
 	if(destPos == LUA_ERROR) then
-		local creature = getCreatureByName(param)
-		if creature == cid or creature == LUA_NULL then
+		if creature == cid or creature == 0 then
 			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature, player and waypoint not found.")
 			return FALSE
 		else

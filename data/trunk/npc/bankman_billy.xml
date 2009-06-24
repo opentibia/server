@@ -29,62 +29,14 @@
     </interact>
     -->
 
-    <interact event="onIdle">
+    <interact event="onIdle" time="60">
       <response text="Beatiful day is it not |NAME|?" public="1">
         <action name="idle" value="1"/>
-      </response>
-
-      <response>
-        <action name="script">
-        <![CDATA[
-          -- The npc will just say this on average once every 4 hours (240 minutes)
-          local interval = 240 * 60
-
-          local p = math.random(0, 10000000)
-          local r = (10000000 * idleinterval) / interval
-          --selfSay("r: " .. r .. ", p: " .. p)
-          
-          if(r >= p) then
-            selfSay("Hey " .. name .. " can you help me?")
-            _state.topic = 999
-          end
-        ]]>  
-        </action>
-
-        <interact keywords="yes" topic="999">
-          <response text="Ah great, would you mind holding this for me while I use the bathroom?">
-            <action name="topic" value="-1"/>
-
-            <interact keywords="yes">
-              <response>
-                <action name="script">
-                <![CDATA[
-                  local result = doPlayerAddItem(cid, 2157, 3, 0)
-                  if(result == -1) then
-                    selfSay("Never mind, I'll have to hold it in until I quit work.")
-                  else
-                    selfSay("Thanks alot! I'll be right back.")
-                    _state.b1 = true
-                  end
-                ]]>
-                </action>
-              </response>
-            </interact>
-            
-          </response>
-
-          <interact keywords="|*|">
-            <response text="Hmpf."/>
-          </interact>
-          
-        </interact>
-        
       </response>
     </interact>
 
     <interact event="onPlayerLeave" focus="0">
       <response text="It was a pleasure to help you |NAME|."/>
-      <response b1="1" text="Hey hey give back my gold nuggets! POLICE HELP!"/>
     </interact>
     
     <interact keywords="name">
