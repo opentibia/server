@@ -333,7 +333,7 @@ public:
 			condition = CONDITION_NONE;
 			publicize = true;
 			time = 0;
-			idleInterval = 0;
+			singleEvent = false;
 		}
 
 		int32_t topic;
@@ -355,7 +355,7 @@ public:
 		ConditionType_t condition;
 		bool publicize;
 		uint32_t time;
-		uint32_t idleInterval;
+		bool singleEvent;
 	};
 
 	NpcResponse(const ResponseProperties& _prop,
@@ -403,7 +403,7 @@ public:
 	void setAmount(int32_t _amount) { prop.amount = _amount;}
 	bool publicize() const {return prop.publicize;}
 	uint32_t getTime() const {return prop.time;}
-	uint32_t getIdleInterval() const {return prop.idleInterval;}
+	uint32_t isSingleEvent() const {return prop.singleEvent;}
 
 	std::string formatResponseString(Creature* creature) const;
 	void addAction(ResponseAction action) {prop.actionList.push_back(action);}
@@ -574,11 +574,11 @@ protected:
 	bool floorChange;
 	bool attackable;
 	bool isIdle;
+	bool hasUsedIdleReply;
 	bool hasBusyReply;
 	bool hasScriptedFocus;
 	int32_t talkRadius;
 	uint32_t idleTimeout;
-	uint32_t idleInterval;
 	uint64_t lastResponseTime;
 	bool defaultPublic;
 	int32_t focusCreature;

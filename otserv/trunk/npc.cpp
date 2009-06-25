@@ -132,9 +132,9 @@ void Npc::reset()
 	hasScriptedFocus = false;
 	focusCreature = 0;
 	isIdle = true;
+	hasUsedIdleReply = false;
 	talkRadius = 4;
 	idleTimeout = 0;
-	idleInterval = 5 * 60;
 	lastResponseTime = OTSYS_TIME();
 	defaultPublic = true;
 
@@ -300,10 +300,6 @@ bool Npc::loadFromXml(const std::string& filename)
 
 				if(readXMLInteger(p, "idletime", intValue) || readXMLInteger(p, "idletimeout", intValue)){
 					idleTimeout = intValue;
-				}
-
-				if(readXMLInteger(p, "idleinterval", intValue)){
-					idleInterval = intValue;
 				}
 
 				if(readXMLInteger(p, "defaultpublic", intValue)){
@@ -561,8 +557,12 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 					if(readXMLInteger(node, "time", intValue)){
 						prop.time = intValue;
 					}
-					else if(readXMLInteger(node, "idleinterval", intValue)){
-						prop.idleInterval = intValue;
+					else{
+						std::cout << "Warning: [Npc::loadInteraction] Missing time attribute for onidle event" << std::endl;
+					}
+
+					if(readXMLInteger(node, "singleevent", intValue)){
+						prop.singleEvent = (intValue == 1);
 					}
 
 					prop.eventType = EVENT_IDLE;
@@ -1429,6 +1429,8 @@ void Npc::onThink(uint32_t interval)
 	}
 
 	isIdle = true;
+	hasUsedIdleReply = false;
+
 	for(StateList::iterator it = stateList.begin(); it != stateList.end();){
 		NpcState* npcState = *it;
 
@@ -1499,11 +1501,16 @@ void Npc::onThink(uint32_t interval)
 
 		//idle response
 		response = getResponse(player, npcState, EVENT_IDLE, true);
-		processResponse(player, npcState, response);
+		if(response){
+			hasUsedIdleReply = true;
+			processResponse(player, npcState, response);
+		}
 
 		//think response
 		response = getResponse(player, npcState, EVENT_THINK, true);
-		processResponse(player, npcState, response);
+		if(response){
+			processResponse(player, npcState, response);
+		}
 
 		if(npcState->focusState == 1 || !queueList.empty()){
 			isIdle = false;
@@ -1833,13 +1840,7 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "cid = " << env->addThing(player) << std::endl;
 						scriptstream << "text = \"" << npcState->respondToText << "\"" << std::endl;
 						scriptstream << "name = \"" << player->getName() << "\"" << std::endl;
-						scriptstream << "idletime = " << idleTimeout << std::endl;
-						if(response->getIdleInterval() != 0){
-							scriptstream << "idleinterval = " << response->getIdleInterval() << std::endl;
-						}
-						else{
-							scriptstream << "idleinterval = " << idleInterval << std::endl;
-						}
+						scriptstream << "idleTimeout = " << idleTimeout << std::endl;
 
 						scriptstream << "itemlist = {" << std::endl;
 						uint32_t n = 0;
@@ -2568,6 +2569,10 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				switch(iresponse->getEventType()){
 					case EVENT_IDLE:
 					{
+						if((*it)->isSingleEvent() && hasUsedIdleReply){
+							continue;
+						}
+
 						if((*it)->getTime() != 0){
 							//state idle (each state has its own idle)
 							uint32_t time = (*it)->getTime() * 1000;
@@ -2578,16 +2583,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 							}
 						}
 						else{
-							//global idle
-							uint32_t time = idleInterval;
-							if((*it)->getIdleInterval() != 0){
-								time = (*it)->getIdleInterval() * 1000;
-							}
-
-							if((OTSYS_TIME() - lastResponseTime) < time){
-								//not enough time elapsed
-								continue;
-							}
+							continue;
 						}
 
 						break;
