@@ -394,6 +394,7 @@ public:
 	int32_t getDontHaveItemID() const {return prop.dontHaveItemId;}
 	ConditionType_t getCondition() const {return prop.condition;}
 	int32_t getHealth() const {return prop.health;}
+	int32_t getLevel() const {return prop.level;}
 	ResponseType_t getResponseType() const {return prop.responseType;}
 	NpcEvent_t getEventType() const {return prop.eventType;}
 	const std::string& getKnowSpell() const {return prop.knowSpell;}

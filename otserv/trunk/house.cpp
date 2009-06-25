@@ -219,7 +219,7 @@ bool House::transferToDepot()
 		return false;
 	}
 
-	Player* player = player = g_game.getPlayerByGuidEx(houseOwner);
+	Player* player = g_game.getPlayerByGuidEx(houseOwner);
 	if(!player){
 		return false;
 	}

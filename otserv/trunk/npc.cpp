@@ -2365,12 +2365,12 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 
 			if(hasBitSet(RESPOND_LOWLEVEL, params)){
-				if((int32_t)player->getLevel() >= iresponse->level)
+				if((int32_t)player->getLevel() >= iresponse->getLevel())
 					continue;
 			}
 
 			if(hasBitSet(RESPOND_HIGHLEVEL, params)){
-				if((int32_t)player->getLevel() < iresponse->level)
+				if((int32_t)player->getLevel() < iresponse->getLevel())
 					continue;
 			}
 
