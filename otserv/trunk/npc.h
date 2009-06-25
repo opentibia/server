@@ -327,6 +327,7 @@ public:
 			eventType = EVENT_NONE;
 			responseType = RESPONSE_DEFAULT;
 			params = 0;
+			level = 0;
 			knowSpell = "";
 			health = -1;
 			condition = CONDITION_NONE;
@@ -345,6 +346,7 @@ public:
 		NpcEvent_t eventType;
 		ResponseType_t responseType;
 		uint32_t params;
+		uint32_t level;
 		StorageConditions storageConditions;
 		std::string knowSpell;
 		ActionList actionList;

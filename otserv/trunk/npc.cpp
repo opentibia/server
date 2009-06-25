@@ -416,12 +416,6 @@ uint32_t Npc::loadParams(xmlNodePtr node)
 			else if(asLowerCaseString(*it) == "sorcerer"){
 				params |= RESPOND_SORCERER;
 			}
-			else if(asLowerCaseString(*it) == "lowlevel"){
-				params |= RESPOND_LOWLEVEL;
-			}
-			else if(asLowerCaseString(*it) == "highlevel"){
-				params |= RESPOND_HIGHLEVEL;
-			}
 			else if(asLowerCaseString(*it) == "knowspell"){
 				params |= RESPOND_KNOWSPELL;
 			}
@@ -618,6 +612,15 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 
 			if(readXMLInteger(node, "donthaveitem", intValue)){
 				prop.dontHaveItemId = intValue;
+			}
+
+			if(readXMLInteger(node, "lowlevel", intValue)){
+				prop.params |= RESPOND_LOWLEVEL;
+				prop.level = intValue;
+			}
+			else if(readXMLInteger(node, "highlevel", intValue)){
+				prop.params |= RESPOND_HIGHLEVEL;
+				prop.level = intValue;
 			}
 
 			uint32_t interactParams = loadParams(node);
@@ -2362,12 +2365,12 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 
 			if(hasBitSet(RESPOND_LOWLEVEL, params)){
-				if((int32_t)player->getLevel() >= npcState->level)
+				if((int32_t)player->getLevel() >= iresponse->level)
 					continue;
 			}
 
 			if(hasBitSet(RESPOND_HIGHLEVEL, params)){
-				if((int32_t)player->getLevel() < npcState->level)
+				if((int32_t)player->getLevel() < iresponse->level)
 					continue;
 			}
 
@@ -2385,7 +2388,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				else{
 					if(player->getLevel() >= spell->getLevel() && 
 						player->getMagicLevel() >= spell->getMagicLevel() && 
-						spell->isPremium() && player->isPremium())
+						(spell->isPremium()? player->isPremium() : true))
 						continue;
 				}
 			}
