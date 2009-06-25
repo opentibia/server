@@ -2598,7 +2598,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 				}
 			}
 			
-			if(!iresponse->getInputList().empty()){
+			if(iresponse->getEventType() == EVENT_NONE || iresponse->getEventType() == EVENT_BUSY){
 				// Check keywords
 				if(!text.empty() && !iresponse->getInputList() .empty()){
 					int32_t matches = matchKeywords(*it, wordList, exactMatch);
