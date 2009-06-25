@@ -67,7 +67,7 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	commands.cpp	   ioaccount.cpp       outputmessage.cpp   tasks.cpp \
 	condition.cpp	   iomapotbm.cpp       party.cpp	   teleport.cpp \
 	configmanager.cpp  iomapserialize.cpp  player.cpp	   thing.cpp \
-	connection.cpp	   iomapxml.cpp        position.cpp	   tile.cpp \
+	connection.cpp	   position.cpp	   tile.cpp \
 	container.cpp	   ioplayer.cpp        protocol.cpp	   tools.cpp \
 	creature.cpp	   item.cpp	       protocolgame.cpp    trashholder.cpp \
 	creatureevent.cpp  items.cpp	       protocollogin.cpp   vocation.cpp \
