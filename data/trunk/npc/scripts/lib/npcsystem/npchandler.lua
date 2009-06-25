@@ -20,8 +20,8 @@ if(NpcHandler == nil) then
 	CONVERSATION_PRIVATE = 1 -- Conversation through NPCs chat window, as of 8.2 update. (Default)
 		--Small Note: Private conversations also means the NPC will use multi-focus system.
 
-	-- Currently applied conversation behavior. CONVERSATION_PRIVATE is default.
-	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_PRIVATE
+	-- Currently applied conversation behavior. CONVERSATION_DEFAULT is default.
+	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_DEFAULT
 	
 	-- max amount of none stackable items that a NPC will sell to a player at the same time
 	MAX_NONESTACKABLE_SELL_AMOUNT = 100
