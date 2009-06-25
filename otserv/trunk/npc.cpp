@@ -1360,7 +1360,7 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 		if(type == SPEAK_SAY || type == SPEAK_PRIVATE_PN){
 			const Position& myPos = getPosition();
 			const Position& pos = creature->getPosition();
-			if(canSee(myPos)){
+			if(canSee(pos)){
 				NpcState* npcState = getState(player);
 
 				if(!text.empty()){
