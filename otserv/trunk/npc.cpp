@@ -1462,7 +1462,7 @@ void Npc::onThink(uint32_t interval)
 		}
 
 		if(closeConversation){
-			if(focusCreature == npcState->playerId){
+			if(focusCreature == npcState->playerId && !hasScriptedFocus){
 				setCreatureFocus(NULL);
 			}
 
@@ -1999,7 +1999,6 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 		}
 	}
 }
-
 
 void Npc::doSay(const std::string& text)
 {
@@ -2976,6 +2975,9 @@ int NpcScriptInterface::luaActionSay(lua_State* L)
 
 	Npc* npc = env->getNpc();
 	Player* player = env->getPlayerByUID(target);
+	if(!player){
+		publicize = true;
+	}
 
 	if(npc){
 		if(publicize){
