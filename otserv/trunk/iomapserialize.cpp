@@ -900,6 +900,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map)
 
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		House* house = it->second;
+		query.str("");
 
 		std::string listText;
 		if(house->getAccessList(GUEST_LIST, listText) && listText != ""){
