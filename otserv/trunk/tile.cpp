@@ -324,14 +324,24 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 		}
 	}
 
-	Item* item = NULL;
-	item = getTopDownItem();
-	if(item != NULL)
-		return item;
+	TileItemVector* items = getItemList();
 
-	item = getTopTopItem();
-	if(item != NULL)
-		return item;
+	if(items){
+		for(ItemVector::iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
+			const ItemType& iit = Item::items[(*it)->getID()];
+			if(!iit.lookThrough){
+				return (*it);
+			}
+		}
+
+		ItemVector::reverse_iterator itEnd = ItemVector::reverse_iterator(items->getBeginTopItem());
+		for(ItemVector::reverse_iterator it = ItemVector::reverse_iterator(items->getEndTopItem()); it != itEnd; ++it){
+			const ItemType& iit = Item::items[(*it)->getID()];
+			if(!iit.lookThrough){
+				return (*it);
+			}
+		}
+	}
 
 	if(ground)
 		return ground;
@@ -1155,7 +1165,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 			Player* tmpPlayer = NULL;
 			for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
 				if((tmpPlayer = (*it)->getPlayer())){
-					oldStackPosVector.push_back(getClientIndexOfThing(tmpPlayer, creature));
+					oldStackPosVector.push_back(getClientIndexOfThing(tmpPlayer, ground));
 				}
 			}
 			ground->setParent(NULL);
