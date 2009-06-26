@@ -73,6 +73,10 @@ bool BaseEvents::loadFromXml(const std::string& datadir)
 						bool success = true;
 						std::string scriptfile;
 						if(readXMLString(p, "script", scriptfile)){
+							if(!event->checkScript(m_datadir, scriptsName, "/scripts/" + scriptfile)){
+								success = false;
+							}
+							else
 							if(!event->loadScript(m_datadir + scriptsName + "/scripts/" + scriptfile)){
 								success = false;
 							}
@@ -135,6 +139,36 @@ Event::~Event()
 	//
 }
 	
+bool Event::checkScript(const std::string& datadir, const std::string& scriptsName, const std::string& scriptFile)
+{
+	LuaScriptInterface testInterface("Test Interface");
+	testInterface.initState();
+	
+	if(testInterface.loadFile(std::string(datadir + scriptsName + "/lib/" + scriptsName + ".lua")) == -1){
+		std::cout << "Warning: [Event::checkScript] Can not load " << scriptsName << " lib/" << scriptsName << ".lua" << std::endl;
+	}
+
+	if(m_scriptId != 0){
+		std::cout << "Failure: [Event::checkScript] scriptid = " << m_scriptId << std::endl;
+		return false;
+	}
+	
+	if(testInterface.loadFile(datadir + scriptsName + scriptFile) == -1){
+		std::cout << "Warning: [Event::checkScript] Can not load script. " << scriptFile << std::endl;
+		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
+		return false;
+	}
+
+	int32_t id = testInterface.getEvent(getScriptEventName());
+	if(id == -1){
+		std::cout << "Warning: [Event::checkScript] Event " << getScriptEventName() << " not found. " << scriptFile << std::endl;
+		return false;
+		
+	}
+
+	return true;
+}
+
 bool Event::loadScript(const std::string& scriptFile)
 {
 	if(!m_scriptInterface || m_scriptId != 0){

@@ -56,6 +56,7 @@ public:
 	
 	virtual bool configureEvent(xmlNodePtr p) = 0;
 	
+	bool checkScript(const std::string& datadir, const std::string& scriptsName, const std::string& scriptFile);
 	bool loadScript(const std::string& scriptFile);
 	virtual bool loadFunction(const std::string& functionName);
 		
