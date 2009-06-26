@@ -324,24 +324,14 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 		}
 	}
 
-	TileItemVector* items = getItemList();
+	Item* item = NULL;
+	item = getTopDownItem();
+	if(item != NULL)
+		return item;
 
-	if(items){
-		for(ItemVector::iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
-			const ItemType& iit = Item::items[(*it)->getID()];
-			if(!iit.lookThrough){
-				return (*it);
-			}
-		}
-
-		ItemVector::reverse_iterator itEnd = ItemVector::reverse_iterator(items->getBeginTopItem());
-		for(ItemVector::reverse_iterator it = ItemVector::reverse_iterator(items->getEndTopItem()); it != itEnd; ++it){
-			const ItemType& iit = Item::items[(*it)->getID()];
-			if(!iit.lookThrough){
-				return (*it);
-			}
-		}
-	}
+	item = getTopTopItem();
+	if(item != NULL)
+		return item;
 
 	if(ground)
 		return ground;
