@@ -2955,18 +2955,20 @@ int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 int NpcScriptInterface::luaActionSay(lua_State* L)
 {
 	//selfSay(words [[, target], publicize])
-		// send_to_all defaults to true if there is no target, false otherwise
+		// publicize defaults to true if there is no target, false otherwise
 	uint32_t parameters = lua_gettop(L);
 	uint32_t target = 0;
 	bool publicize = true;
 
-	if(parameters == 3){
+	if(parameters >= 3){
 		publicize = (popNumber(L) == LUA_TRUE);
-		target = popNumber(L);
 	}
-	else if(parameters == 2){
+
+	if(parameters >= 2){
 		target = popNumber(L);
-		publicize = false;
+		if(target != 0){
+			publicize = false;
+		}
 	}
 
 	std::string text = popString(L);
@@ -2975,9 +2977,6 @@ int NpcScriptInterface::luaActionSay(lua_State* L)
 
 	Npc* npc = env->getNpc();
 	Player* player = env->getPlayerByUID(target);
-	if(!player){
-		publicize = true;
-	}
 
 	if(npc){
 		if(publicize){
