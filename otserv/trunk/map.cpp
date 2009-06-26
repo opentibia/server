@@ -120,19 +120,18 @@ bool Map::saveMap()
 	return saved;
 }
 
-Tile* Map::getTile(uint16_t x, uint16_t y, uint16_t z)
+Tile* Map::getTile(int32_t x, int32_t y, int32_t z)
 {
-	if(z < MAP_MAX_LAYERS){
-		//QTreeLeafNode* leaf = getLeaf(x, y);
-		QTreeLeafNode* leaf = QTreeNode::getLeafStatic(&root, x, y);
-		if(leaf){
-			Floor* floor = leaf->getFloor(z);
-			if(floor){
-				return floor->tiles[x & FLOOR_MASK][y & FLOOR_MASK];
-			}
-			else{
-				return NULL;
-			}
+	if(x < 0 || x > 0xFFFF || y < 0 || y > 0xFFFF || z  < 0 || z > MAP_MAX_LAYERS){
+		return NULL;
+	}
+
+	//QTreeLeafNode* leaf = getLeaf(x, y);
+	QTreeLeafNode* leaf = QTreeNode::getLeafStatic(&root, x, y);
+	if(leaf){
+		Floor* floor = leaf->getFloor(z);
+		if(floor){
+			return floor->tiles[x & FLOOR_MASK][y & FLOOR_MASK];
 		}
 		else{
 			return NULL;
@@ -1162,8 +1161,8 @@ int32_t AStarNodes::getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, in
 
 Floor::Floor()
 {
-	for(unsigned int i = 0; i < FLOOR_SIZE; ++i){
-		for(unsigned int j = 0; j < FLOOR_SIZE; ++j){
+	for(uint32_t i = 0; i < FLOOR_SIZE; ++i){
+		for(uint32_t j = 0; j < FLOOR_SIZE; ++j){
 			tiles[i][j] = 0;
 		}
 	}
@@ -1251,7 +1250,7 @@ QTreeLeafNode* QTreeNode::createLeaf(uint32_t x, uint32_t y, uint32_t level)
 bool QTreeLeafNode::newLeaf = false;
 QTreeLeafNode::QTreeLeafNode()
 {
-	for(unsigned int i = 0; i < MAP_MAX_LAYERS; ++i){
+	for(uint32_t i = 0; i < MAP_MAX_LAYERS; ++i){
 		m_array[i] = NULL;
 	}
 	m_isLeaf = true;
@@ -1261,7 +1260,7 @@ QTreeLeafNode::QTreeLeafNode()
 
 QTreeLeafNode::~QTreeLeafNode()
 {
-	for(unsigned int i = 0; i < MAP_MAX_LAYERS; ++i){
+	for(uint32_t i = 0; i < MAP_MAX_LAYERS; ++i){
 		delete m_array[i];
 	}
 }

@@ -751,25 +751,25 @@ void ProtocolGame::GetTileDescription(const Tile* tile, NetworkMessage_ptr msg)
 	}
 }
 
-void ProtocolGame::GetMapDescription(uint16_t x, uint16_t y, unsigned char z,
-	uint16_t width, uint16_t height, NetworkMessage_ptr msg)
+void ProtocolGame::GetMapDescription(int32_t x, int32_t y, int32_t z,
+	int32_t width, int32_t height, NetworkMessage_ptr msg)
 {
-	int skip = -1;
-	int startz, endz, zstep = 0;
+	int32_t skip = -1;
+	int32_t startz, endz, zstep = 0;
 
-	if (z > 7) {
+	if(z > 7){
 		startz = z - 2;
-		endz = std::min(MAP_MAX_LAYERS - 1, z + 2);
+		endz = std::min((int32_t)MAP_MAX_LAYERS - 1, (int32_t)z + 2);
 		zstep = 1;
 	}
-	else {
+	else{
 		startz = 7;
 		endz = 0;
 
 		zstep = -1;
 	}
 
-	for(int nz = startz; nz != endz + zstep; nz += zstep){
+	for(int32_t nz = startz; nz != endz + zstep; nz += zstep){
 		GetFloorDescription(msg, x, y, nz, width, height, z - nz, skip);
 	}
 
@@ -783,14 +783,15 @@ void ProtocolGame::GetMapDescription(uint16_t x, uint16_t y, unsigned char z,
 #endif
 }
 
-void ProtocolGame::GetFloorDescription(NetworkMessage_ptr msg, int x, int y, int z,
-	int width, int height, int offset, int& skip)
+void ProtocolGame::GetFloorDescription(NetworkMessage_ptr msg, int32_t x, int32_t y, int32_t z,
+	int32_t width, int32_t height, int32_t offset, int32_t& skip)
 {
 	Tile* tile;
 
-	for(int nx = 0; nx < width; nx++){
-		for(int ny = 0; ny < height; ny++){
+	for(int32_t nx = 0; nx < width; nx++){
+		for(int32_t ny = 0; ny < height; ny++){
 			tile = g_game.getTile(x + nx + offset, y + ny + offset, z);
+
 			if(tile){
 				if(skip >= 0){
 					msg->AddByte(skip);
@@ -2779,7 +2780,7 @@ void ProtocolGame::MoveUpCreature(NetworkMessage_ptr msg, const Creature* creatu
 
 		//going to surface
 		if(newPos.z == 7){
-			int skip = -1;
+			int32_t skip = -1;
 			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 5, 18, 14, 3, skip); //(floor 7 and 6 already set)
 			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 4, 18, 14, 4, skip);
 			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 3, 18, 14, 5, skip);
@@ -2794,7 +2795,7 @@ void ProtocolGame::MoveUpCreature(NetworkMessage_ptr msg, const Creature* creatu
 		}
 		//underground, going one floor up (still underground)
 		else if(newPos.z > 7){
-			int skip = -1;
+			int32_t skip = -1;
 			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, oldPos.z - 3, 18, 14, 3, skip);
 
 			if(skip >= 0){
@@ -2823,8 +2824,7 @@ void ProtocolGame::MoveDownCreature(NetworkMessage_ptr msg, const Creature* crea
 
 		//going from surface to underground
 		if(newPos.z == 8){
-			int skip = -1;
-
+			int32_t skip = -1;
 			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, newPos.z, 18, 14, -1, skip);
 			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, newPos.z + 1, 18, 14, -2, skip);
 			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, newPos.z + 2, 18, 14, -3, skip);
@@ -2836,7 +2836,7 @@ void ProtocolGame::MoveDownCreature(NetworkMessage_ptr msg, const Creature* crea
 		}
 		//going further down
 		else if(newPos.z > oldPos.z && newPos.z > 8 && newPos.z < 14){
-			int skip = -1;
+			int32_t skip = -1;
 			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, newPos.z + 2, 18, 14, -3, skip);
 
 			if(skip >= 0){

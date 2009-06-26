@@ -149,7 +149,8 @@ public:
 	  * Get a single tile of the map.
 	  * \return A pointer to the tile
 		*/
-	Tile* getTile(uint32_t x, uint32_t y, uint32_t z);
+	Tile* getTile(int32_t x, int32_t y, int32_t z);
+	Tile* getTile(const Position& pos);
 
 	/**
 	  * Set a single tile of the map, position is read from this tile

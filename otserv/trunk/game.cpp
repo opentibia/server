@@ -464,9 +464,14 @@ void Game::setTile(Tile* newtile)
 	return map->setTile(newtile->getPosition(), newtile);
 }
 
-Tile* Game::getTile(uint32_t x, uint32_t y, uint32_t z)
+Tile* Game::getTile(int32_t x, int32_t y, int32_t z)
 {
 	return map->getTile(x, y, z);
+}
+
+Tile* Game::getTile(const Position& pos)
+{
+	return map->getTile(pos);
 }
 
 QTreeLeafNode* Game::getLeaf(uint32_t x, uint32_t y)
@@ -867,7 +872,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 		}
 	}
 
-	Tile* toTile = map->getTile(toPos);
+	Tile* toTile = getTile(toPos);
 	const Position& movingCreaturePos = movingCreature->getPosition();
 
 	if(!toTile){
@@ -962,9 +967,9 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 	if(creature->getPlayer() && canChangeFloor){
 		//try go up
 		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
-			Tile* tmpTile = map->getTile(currentPos.x, currentPos.y, currentPos.z - 1);
+			Tile* tmpTile = getTile(currentPos.x, currentPos.y, currentPos.z - 1);
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
-				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z - 1);
+				tmpTile = getTile(destPos.x, destPos.y, destPos.z - 1);
 				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)){
 					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 					destPos.z -= 1;
@@ -973,9 +978,9 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 		}
 		else{
 			//try go down
-			Tile* tmpTile = map->getTile(destPos);
+			Tile* tmpTile = getTile(destPos);
 			if(currentPos.z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID)))){
-				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z + 1);
+				tmpTile = getTile(destPos.x, destPos.y, destPos.z + 1);
 
 				if(tmpTile && tmpTile->hasHeight(3)){
 					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
@@ -985,7 +990,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 		}
 	}
 
-	toTile = map->getTile(destPos);
+	toTile = getTile(destPos);
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
 	if(toTile != NULL){

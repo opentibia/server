@@ -254,12 +254,12 @@ private:
 	void GetTileDescription(const Tile* tile, NetworkMessage_ptr msg);
 
 	// translate a floor to clientreadable format
-	void GetFloorDescription(NetworkMessage_ptr msg, int x, int y, int z,
-		int width, int height, int offset, int& skip);
+	void GetFloorDescription(NetworkMessage_ptr msg, int32_t x, int32_t y, int32_t z,
+		int32_t width, int32_t height, int32_t offset, int32_t& skip);
 
 	// translate a map area to clientreadable format
-	void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
-		unsigned short width, unsigned short height, NetworkMessage_ptr msg);
+	void GetMapDescription(int32_t x, int32_t y, int32_t z,
+		int32_t width, int32_t height, NetworkMessage_ptr msg);
 
 	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
 	void AddTextMessage(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message);
