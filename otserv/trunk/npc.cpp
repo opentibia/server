@@ -337,8 +337,6 @@ StorageCondition Npc::loadStorageCondition(xmlNodePtr node)
 
 	readXMLInteger(node, "value", cond.value) || readXMLInteger(node, "storageValue", cond.value);
 
-	uint32_t interactParams = loadParams(node);
-
 	if(readXMLString(node, "storageComp", strValue) || readXMLString(node, "comparator", strValue)){
 		if(asLowerCaseString(strValue) == "equal"){
 			cond.op = STORAGE_EQUAL;
@@ -527,7 +525,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						trim_left(strValue, "\r");
 						trim_left(strValue, "\n");
 						trim_left(strValue, " ");
-						
+
 						m_scriptInterface->loadBuffer(strValue, this);
 					}
 				}
@@ -541,7 +539,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 			if(readXMLString(node, "keywords", strValue)){
 				prop.inputList.push_back(asLowerCaseString(strValue));
 			}
-			
+
 			prop.eventType = EVENT_NONE;
 
 			if(readXMLString(node, "event", strValue)){
@@ -624,7 +622,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 			}
 
 			uint32_t interactParams = loadParams(node);
-			
+
 			StorageCondition sc = loadStorageCondition(node);
 			if(sc.id != -1)
 				prop.storageConditions.push_back(sc);
@@ -1314,7 +1312,6 @@ void Npc::onCreatureMove(const Creature* creature, const Tile* newTile, const Po
 			m_npcEventHandler->onCreatureMove(creature, oldPos, newPos);
 		}
 
-		const Position& myPos = getPosition();
 		bool canSeeNewPos = canSee(newPos);
 		bool canSeeOldPos = canSee(oldPos);
 
@@ -1358,7 +1355,6 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 		}
 
 		if(type == SPEAK_SAY || type == SPEAK_PRIVATE_PN){
-			const Position& myPos = getPosition();
 			const Position& pos = creature->getPosition();
 			if(canSee(pos)){
 				NpcState* npcState = getState(player);
@@ -1539,7 +1535,7 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 		if(response->getAmount() != -1){
 			const ItemType& it = Item::items[npcState->itemId];
 			if(it.stackable || npcState->amount <= g_config.getNumber(ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT)){
-				npcState->amount = response->getAmount();			
+				npcState->amount = response->getAmount();
 			}
 			else{
 				npcState->amount = g_config.getNumber(ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT);
@@ -1715,7 +1711,7 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						if(it.hasSubType()){
 							subType = npcState->subType;
 						}
-						
+
 						if(g_game.getMoney(player) >= moneyCount){
 							if(it.stackable){
 								int32_t amount = npcState->amount;
@@ -2381,13 +2377,13 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 
 			if(hasBitSet(RESPOND_CANNOTLEARNSPELL, params)){
 				Spell* spell = g_spells->getInstantSpellByName(npcState->spellName);
-				
+
 				if(!spell){
 					std::cout << "[WARNING]: Non-existant spell in cannotlearnspell tag" << std::endl;
 				}
 				else{
-					if(player->getLevel() >= spell->getLevel() && 
-						player->getMagicLevel() >= spell->getMagicLevel() && 
+					if(player->getLevel() >= spell->getLevel() &&
+						player->getMagicLevel() >= spell->getMagicLevel() &&
 						(spell->isPremium()? player->isPremium() : true))
 						continue;
 				}
@@ -2592,7 +2588,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 						break;
 				}
 			}
-			
+
 			if(iresponse->getEventType() == EVENT_NONE || iresponse->getEventType() == EVENT_BUSY){
 				// Check keywords
 				if(!text.empty() && !iresponse->getInputList() .empty()){
@@ -2669,7 +2665,7 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 
 			++matchCount;
 		}
-		
+
 		if(matchCount == keywordList.size() && matchCount > bestMatchCount)
 			bestMatchCount = matchCount;
 	}

@@ -7595,7 +7595,7 @@ int LuaScriptInterface::luaAddPlayerBan(lua_State *L)
 	int32_t parameters = lua_gettop(L);
 
 	uint32_t reason = 0;
-	violationAction_t action;
+	violationAction_t action = ACTION_NOTATION;
 	std::string statement;
 	std::string comment = "No comment";
 	uint32_t admin = 0;
@@ -7653,7 +7653,7 @@ int LuaScriptInterface::luaAddAccountBan(lua_State *L)
 	int32_t parameters = lua_gettop(L);
 
 	uint32_t reason = 0;
-	violationAction_t action;
+	violationAction_t action = ACTION_NOTATION;
 	std::string statement;
 	std::string comment = "No comment";
 	uint32_t admin = 0;
