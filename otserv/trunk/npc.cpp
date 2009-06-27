@@ -1360,7 +1360,7 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 				NpcState* npcState = getState(player);
 
 				if(!text.empty()){
-					if(hasBusyReply && focusCreature != 0 && focusCreature != player->getID()){
+					if(hasBusyReply && focusCreature != 0 && (uint32_t)focusCreature != player->getID()){
 						//Check if we have a busy reply
 						const NpcResponse* response = getResponse(player, npcState, EVENT_BUSY, text, false);
 						if(response){
@@ -1458,7 +1458,7 @@ void Npc::onThink(uint32_t interval)
 		}
 
 		if(closeConversation){
-			if(focusCreature == npcState->playerId && !hasScriptedFocus){
+			if((uint32_t)focusCreature == npcState->playerId && !hasScriptedFocus){
 				setCreatureFocus(NULL);
 			}
 
@@ -2619,6 +2619,9 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 {
 	int32_t bestMatchCount = 0;
 
+	if(wordList.empty())
+		return 0;
+
 	const std::list<std::string>& inputList = response->getInputList();
 	for(std::list<std::string>::const_iterator it = inputList.begin(); it != inputList.end(); ++it){
 		int32_t matchCount = 0;
@@ -2632,7 +2635,7 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 			}
 			else if((*keyIter) == "|amount|"){
 				//TODO: Should iterate through each word until a number or a new keyword is found.
-				int32_t amount = atoi((*lastWordMatchIter).c_str());
+				int32_t amount = atoi(lastWordMatchIter->c_str());
 				if(amount > 0){
 					response->setAmount(amount);
 				}
@@ -2666,7 +2669,7 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 			++matchCount;
 		}
 
-		if(matchCount == keywordList.size() && matchCount > bestMatchCount)
+		if((size_t)matchCount == keywordList.size() && matchCount > bestMatchCount)
 			bestMatchCount = matchCount;
 	}
 
