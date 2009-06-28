@@ -3833,7 +3833,7 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 
 void Game::addCreatureCheck(Creature* creature)
 {
-	if(creature->checkCreatureVectorIndex > 0){
+	if(creature->checkCreatureVectorIndex >= 0){
 		// Already in a vector, or about to be added
 		return;
 	}
