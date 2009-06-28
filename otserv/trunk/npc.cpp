@@ -2634,6 +2634,10 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 				//Match anything.
 			}
 			else if((*keyIter) == "|amount|"){
+				if(lastWordMatchIter == wordList.end()){
+					continue;
+				}
+
 				//TODO: Should iterate through each word until a number or a new keyword is found.
 				int32_t amount = atoi(lastWordMatchIter->c_str());
 				if(amount > 0){
