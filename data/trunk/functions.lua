@@ -132,7 +132,7 @@ end
 
 -- Other functions
 function isPlayer(cid)
-	if (isCreature(cid) and cid >= PLAYER_ID_RANGE and cid < MONSTER_ID_RANGE) then
+	if (isCreature(cid) == TRUE and cid >= PLAYER_ID_RANGE and cid < MONSTER_ID_RANGE) then
 		return TRUE
 	end
 
@@ -140,7 +140,7 @@ function isPlayer(cid)
 end
 
 function isMonster(cid)
-	if (isCreature(cid) and cid >= MONSTER_ID_RANGE and cid < NPC_ID_RANGE) then
+	if (isCreature(cid) == TRUE and cid >= MONSTER_ID_RANGE and cid < NPC_ID_RANGE) then
 		return TRUE
 	end
 
@@ -148,7 +148,7 @@ function isMonster(cid)
 end
 
 function isNPC(cid)
-	if (isCreature(cid) and cid >= NPC_ID_RANGE) then
+	if (isCreature(cid) == TRUE and cid >= NPC_ID_RANGE) then
 		return TRUE
 	end
 
