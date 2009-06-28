@@ -1485,7 +1485,12 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 			fpp.fullPathSearch = true;
 		}
 		else{
-			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
+			if(mType->targetDistance <= 1){
+				fpp.fullPathSearch = true;
+			}
+			else{
+				fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
+			}
 		}
 	}
 	else{
@@ -1497,7 +1502,12 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 			fpp.fullPathSearch = false;
 		}
 		else{
-			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
+			if(mType->targetDistance <= 1){
+				fpp.fullPathSearch = true;
+			}
+			else{
+				fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
+			}
 		}
 	}
 }
