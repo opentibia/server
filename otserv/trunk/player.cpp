@@ -156,6 +156,7 @@ Creature()
 	premiumDays = 0;
 	balance = 0;
 
+	sex = PLAYERSEX_LAST;
  	vocation_id = (Vocation_t)0;
 
  	town = 0;
