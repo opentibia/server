@@ -413,7 +413,8 @@ protected:
 	bool isUpdatingPath;
 	// The creature onThink event vector this creature belongs to
 	// -1 represents that the creature isn't in any vector
-	// 0 represents it's going to be added in the next checkCreature call
+	//  0 represents it's going to be removed in the next checkCreatures
+	//  1 represents it's going to be added in the next checkCreatures
 	int32_t checkCreatureVectorIndex;
 
 	int32_t health, healthMax;

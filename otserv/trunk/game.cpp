@@ -3833,24 +3833,24 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 
 void Game::addCreatureCheck(Creature* creature)
 {
-	if(creature->checkCreatureVectorIndex >= 0) {
+	if(creature->checkCreatureVectorIndex > 0){
 		// Already in a vector, or about to be added
 		return;
 	}
 
 	toAddCheckCreatureVector.push_back(creature);
-	creature->checkCreatureVectorIndex = 0;
+	creature->checkCreatureVectorIndex = 1;
 	creature->useThing2();
 }
 
 void Game::removeCreatureCheck(Creature* creature)
 {
-	if(creature->checkCreatureVectorIndex == -1) {
+	if(creature->checkCreatureVectorIndex == -1){
 		// Not in any vector
 		return;
 	}
 
-	creature->checkCreatureVectorIndex = -1;
+	creature->checkCreatureVectorIndex = 0;
 }
 
 void Game::checkCreatures()
@@ -3864,14 +3864,15 @@ void Game::checkCreatures()
 	//add any new creatures
 	for(it = toAddCheckCreatureVector.begin(); it != toAddCheckCreatureVector.end();){
 		creature = (*it);
-		if(creature->checkCreatureVectorIndex != -1){
+		if(creature->checkCreatureVectorIndex == 1){
 			int next_vector = (checkCreatureLastIndex + 1) % EVENT_CREATURECOUNT;
 			checkCreatureVectors[next_vector].push_back(creature);
-			creature->checkCreatureVectorIndex = next_vector + 1;
+			creature->checkCreatureVectorIndex = next_vector + 2;
 			++it;
 		}
 		else{
 			FreeThing(creature);
+			creature->checkCreatureVectorIndex = -1;
 			it = toAddCheckCreatureVector.erase(it);
 		}
 	}
@@ -3886,7 +3887,7 @@ void Game::checkCreatures()
 
 	for(it = checkCreatureVector.begin(); it != checkCreatureVector.end();){
 		creature = (*it);
-		if(creature->checkCreatureVectorIndex != -1){
+		if(creature->checkCreatureVectorIndex != 0){
 			if(creature->getHealth() > 0){
 				creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
 			}
@@ -3898,6 +3899,7 @@ void Game::checkCreatures()
 		}
 		else{
 			FreeThing(creature);
+			creature->checkCreatureVectorIndex = -1;
 			it = checkCreatureVector.erase(it);
 		}
 	}
