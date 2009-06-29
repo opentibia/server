@@ -87,13 +87,13 @@ public:
 		CONNECTION_STATE_OPEN = 0,
 		CONNECTION_STATE_REQUEST_CLOSE = 1,
 		CONNECTION_STATE_CLOSING = 2,
-		CONNECTION_STATE_CLOSED = 3,
+		CONNECTION_STATE_CLOSED = 3
 	};
 
 private:
 	Connection(boost::asio::ip::tcp::socket* socket,
 		boost::asio::io_service& io_service,
-		ServicePort_ptr service_port) : 
+		ServicePort_ptr service_port) :
 			m_socket(socket),
 			m_readTimer(io_service),
 			m_writeTimer(io_service),

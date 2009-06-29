@@ -203,7 +203,7 @@ protected:
 		MATRIXOPERATION_FLIP,
 		MATRIXOPERATION_ROTATE90,
 		MATRIXOPERATION_ROTATE180,
-		MATRIXOPERATION_ROTATE270,
+		MATRIXOPERATION_ROTATE270
 	};
 
 	MatrixArea* createArea(const std::list<uint32_t>& list, uint32_t rows);
@@ -385,11 +385,11 @@ inline int CombatTypeToIndex(CombatType_t combat) {
 			return c+1;
 	}
 	return 0;
-};
+}
 
 inline CombatType_t CombatIndexToType(int combatindex) {
 	if(combatindex == 0) return COMBAT_NONE;
 	return (CombatType_t)(1 << (combatindex-1));
-};
+}
 
 #endif

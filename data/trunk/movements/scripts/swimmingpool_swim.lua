@@ -1,8 +1,8 @@
 local outfit = {lookType = 267, lookHead = 0, lookBody = 0, lookLegs = 0, lookFeet = 0, lookTypeEx = 0, lookAddons = 0}
 
-local conditions = 
+local conditions =
 {
-	CONDITION_POISON, CONDITION_FIRE, CONDITION_ENERGY, 
+	CONDITION_POISON, CONDITION_FIRE, CONDITION_ENERGY,
 	CONDITION_PARALYZE, CONDITION_DRUNK, CONDITION_DROWN,
 	CONDITION_FREEZING, CONDITION_DAZZLED, CONDITION_CURSED
 }
@@ -13,7 +13,7 @@ function removeHarmfulConditions(cid)
 		if(hasCondition(cid, v) == TRUE) then
 			doRemoveCondition(cid, v)
 		end
-	end	
+	end
 end
 
 function onStepIn(cid, item, topos, frompos)
@@ -22,7 +22,7 @@ function onStepIn(cid, item, topos, frompos)
 		-- check if the player logged into the water
 		if(not(frompos.x == 0 and frompos.y == 0 and frompos.z == 0)) then
 			local fromGround = getTileItemById(frompos, 4820)
-			if(fromGround.itemid == 0) then
+			if(fromGround.itemid == 0 and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
 				doSendMagicEffect(getThingPos(cid), CONST_ME_WATERSPLASH)
 			end
 		end

@@ -101,14 +101,14 @@ private:
 
 enum AccessList_t{
 	GUEST_LIST = 0x100,
-	SUBOWNER_LIST = 0x101,
+	SUBOWNER_LIST = 0x101
 };
 
 enum AccessHouseLevel_t{
 	HOUSE_NO_INVITED = 0,
 	HOUSE_GUEST = 1,
 	HOUSE_SUBOWNER = 2,
-	HOUSE_OWNER = 3,
+	HOUSE_OWNER = 3
 };
 
 typedef std::list<HouseTile*> HouseTileList;
@@ -140,7 +140,7 @@ public:
 		HOUSE_SYNC_NAME			= 1 << 0,
 		HOUSE_SYNC_PRICE		= 1 << 1,
 		HOUSE_SYNC_RENT			= 1 << 2,
-		HOUSE_SYNC_GUILDHALL	= 1 << 3,
+		HOUSE_SYNC_GUILDHALL	= 1 << 3
 	};
 
 	House(uint32_t _houseid);
@@ -257,7 +257,7 @@ enum RentPeriod_t{
 	RENTPERIOD_WEEKLY,
 	RENTPERIOD_MONTHLY,
 	RENTPERIOD_YEARLY,
-	RENTPERIOD_NEVER,
+	RENTPERIOD_NEVER
 };
 
 class Houses

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,7 +36,7 @@ enum Direction {
 	SOUTHWEST = 4,
 	SOUTHEAST = 5,
 	NORTHWEST = 6,
-	NORTHEAST = 7,
+	NORTHEAST = 7
 };
 
 class Position{
@@ -55,7 +55,7 @@ public:
 		}
 		return true;
 	}
-	
+
 	template<int deltax, int deltay>
 	inline static bool areInRange(const Position& p1, const Position& p2){
 		if(std::abs(float(p1.x - p2.x)) > deltax ||
@@ -64,7 +64,7 @@ public:
 		}
 		return true;
 	}
-	
+
 	Position(uint16_t _x, uint16_t _y, uint16_t _z)
 	: x(_x), y(_y), z(_z) {};
 
@@ -119,13 +119,13 @@ std::ostream& operator<<(std::ostream&, const Direction&);
 
 
 class PositionEx : public Position{
-public:  
+public:
 	PositionEx(){ };
 	~PositionEx(){};
 
 	PositionEx(uint16_t _x, uint16_t _y, uint16_t _z, int32_t _stackpos)
 	: Position(_x,_y,_z), stackpos(_stackpos) {};
-	
+
 	PositionEx(uint16_t _x, uint16_t _y, uint16_t _z)
 	: Position(_x,_y,_z), stackpos(0) {};
 
@@ -134,7 +134,7 @@ public:
 
 	PositionEx(const PositionEx& p)
 	: Position(p.x,p.y,p.z), stackpos(p.stackpos) {};
-	
+
 	PositionEx(const Position& p, int32_t _stackpos)
 	: Position(p.x,p.y,p.z), stackpos(_stackpos) {};
 

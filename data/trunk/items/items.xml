@@ -17562,7 +17562,7 @@
 	</item>
 	<item id="7816" article="a" name="bed">
 		<attribute key="type" value="bed"/>
-		<attribute key="partnerDirection" value="south" />
+		<attribute key="partnerDirection" value="north" />
 		<attribute key="maleSleeper" value="7792" />
 		<attribute key="femaleSleeper" value="7804" />
 	</item>

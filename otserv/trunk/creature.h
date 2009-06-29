@@ -60,7 +60,7 @@ enum slots_t {
 	SLOT_TWO_HAND = SLOT_HAND, // alias
 
 	// Last real slot is depot
-	SLOT_LAST = SLOT_DEPOT,
+	SLOT_LAST = SLOT_DEPOT
 };
 
 struct FindPathParams{
@@ -91,7 +91,7 @@ struct DeathEntry{
 	// Fields are only counted if they are the final hit killer
 	DeathEntry(std::string name, int dmg) : data(name), damage(dmg) {}
 	DeathEntry(Creature* killer, int dmg) : data(killer), damage(dmg) {}
-	
+
 	bool isCreatureKill() const {return data.type() == typeid(Creature*);}
 	bool isNameKill() const {return !isCreatureKill();}
 
@@ -139,7 +139,7 @@ class FrozenPathingConditionCall {
 public:
 	FrozenPathingConditionCall(const Position& _targetPos);
 	virtual ~FrozenPathingConditionCall() {}
-	
+
 	virtual bool operator()(const Position& startPos, const Position& testPos,
 		const FindPathParams& fpp, int32_t& bestMatchDist) const;
 
@@ -169,7 +169,7 @@ public:
 	virtual const Npc* getNpc() const {return NULL;};
 	virtual Monster* getMonster() {return NULL;};
 	virtual const Monster* getMonster() const {return NULL;};
-	
+
 	void getPathToFollowCreature();
 
 	virtual const std::string& getName() const = 0;
@@ -193,7 +193,7 @@ public:
 
 	const Position& getMasterPos() const { return masterPos; }
 	virtual void setMasterPos(const Position& pos, uint32_t radius = 1) {
-		masterPos = pos; 
+		masterPos = pos;
 		masterRadius = radius;
 	}
 
@@ -318,7 +318,7 @@ public:
 	virtual bool convinceCreature(Creature* creature) {return false;};
 
 	virtual void onDie();
-	
+
 	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
 	void addHealPoints(Creature* caster, int32_t healthPoints);

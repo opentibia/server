@@ -774,7 +774,7 @@ uint32_t MoveEvent::EquipItem(MoveEvent* moveEvent, Player* player, Item* item, 
 	if(!player->hasFlag(PlayerFlag_IgnoreWeaponCheck) && moveEvent->getWieldInfo() != 0){
 		if((int32_t)player->getLevel() < moveEvent->getReqLevel()
 			|| (int32_t)player->getMagicLevel() < moveEvent->getReqMagLv() ||
-			!player->isPremium() && moveEvent->isPremium()){
+			(!player->isPremium() && moveEvent->isPremium())){
 			return 1;
 		}
 		const VocEquipMap vocMap = moveEvent->getVocEquipMap();

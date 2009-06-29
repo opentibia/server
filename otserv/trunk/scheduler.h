@@ -91,7 +91,7 @@ public:
 	enum SchedulerState{
 		STATE_RUNNING,
 		STATE_CLOSING,
-		STATE_TERMINATED,
+		STATE_TERMINATED
 	};
 
 protected:

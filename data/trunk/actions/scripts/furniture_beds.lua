@@ -36,10 +36,14 @@ function onUse(cid, item, frompos, item2, topos)
 	local changeBed = MODIFICATION_BEDS[item.itemid]
 	if (isInArray(CHANGEABLE_BEDS, item2.itemid) == FALSE) then
 		return FALSE
-	elseif (frompos.x == CONTAINER_POSITION) then
-		doPlayerSendCancel(cid, "You must put the construction kit on the floor first.")
-	elseif not(House.getHouseByPos(frompos)) then
-		doPlayerSendCancel(cid, "You must open the construction kit in your house.")
+	end
+
+	if frompos.x == CONTAINER_POSITION then
+		frompos = getPlayerPosition(cid)
+	end
+
+	if not(House.getHouseByPos(frompos)) then
+		doPlayerSendCancel(cid, "You must open the bed furniture in your house.")
 	else
 		local dir = getBedPartnerDirection(item2.itemid)
 		local basePos = {x=topos.x, y=topos.y, z=topos.z, stackpos=topos.stackpos}

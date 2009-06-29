@@ -157,7 +157,7 @@ enum SpeakClasses {
 	SPEAK_CHANNEL_R2    	= 0x11,	//Talk red anonymously on chat - #d
 	//SPEAK_                = 0x12, //?
 	SPEAK_MONSTER_SAY   	= 0x13,	//Talk orange
-	SPEAK_MONSTER_YELL  	= 0x14,	//Yell orange
+	SPEAK_MONSTER_YELL  	= 0x14	//Yell orange
 };
 
 enum MessageClasses {
@@ -172,7 +172,7 @@ enum MessageClasses {
 	MSG_INFO_DESCR				= 0x19, //Green message in game window and in the console
 	MSG_STATUS_SMALL			= 0x1A, //White message at the bottom of the game window"
 	MSG_STATUS_CONSOLE_BLUE		= 0x1B, //Blue message in the console
-	MSG_CLASS_LAST				= MSG_STATUS_CONSOLE_BLUE,
+	MSG_CLASS_LAST				= MSG_STATUS_CONSOLE_BLUE
 };
 
 enum FluidColors_t {
@@ -206,7 +206,7 @@ enum FluidTypes_t {
 
 	FLUID_LAVA        = FLUID_RED + 24,
 	FLUID_RUM         = FLUID_BROWN + 24,
-	FLUID_SWAMP       = FLUID_GREEN + 24,
+	FLUID_SWAMP       = FLUID_GREEN + 24
 };
 
 const uint8_t reverseFluidMap[] = {
@@ -232,7 +232,7 @@ enum ClientFluidTypes_t {
 	CLIENTFLUID_GREEN   = 0x06,
 	CLIENTFLUID_BROWN   = 0x07,
 	CLIENTFLUID_YELLOW  = 0x08,
-	CLIENTFLUID_WHITE   = 0x09,
+	CLIENTFLUID_WHITE   = 0x09
 };
 
 const uint8_t fluidMap[] = {
@@ -248,7 +248,7 @@ const uint8_t fluidMap[] = {
 
 enum SquareColor_t {
 	SQ_COLOR_NONE   = 256,
-	SQ_COLOR_BLACK  = 0,
+	SQ_COLOR_BLACK  = 0
 };
 
 enum TextColor_t {
@@ -263,7 +263,7 @@ enum TextColor_t {
 	TEXTCOLOR_YELLOW      = 210,
 	TEXTCOLOR_WHITE_EXP   = 215,
 	TEXTCOLOR_NONE        = 255,
-	TEXTCOLOR_UNK         = 256,
+	TEXTCOLOR_UNK         = 256
 };
 
 enum Icons_t{
@@ -279,7 +279,7 @@ enum Icons_t{
 	ICON_FREEZING   = 512,
 	ICON_DAZZLED    = 1024,
 	ICON_CURSED     = 2048,
-	ICON_PARTY_BUFF = 4096,
+	ICON_PARTY_BUFF = 4096
 };
 
 enum WeaponType_t {
@@ -324,7 +324,7 @@ enum Skulls_t{
 	SKULL_YELLOW    = 1,
 	SKULL_GREEN     = 2,
 	SKULL_WHITE     = 3,
-	SKULL_RED       = 4,
+	SKULL_RED       = 4
 };
 
 enum PartyShields_t{
@@ -378,7 +378,7 @@ enum item_t {
 	ITEM_LETTER_STAMPED   = 2598,
 	ITEM_LABEL            = 2599,
 
-	ITEM_DOCUMENT_RO      = 1968, //read-only
+	ITEM_DOCUMENT_RO      = 1968 //read-only
 };
 
 enum PlayerFlags{

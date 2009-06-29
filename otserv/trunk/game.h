@@ -48,7 +48,7 @@ enum stackPosType_t{
 	STACKPOS_MOVE,
 	STACKPOS_LOOK,
 	STACKPOS_USE,
-	STACKPOS_USEITEM,
+	STACKPOS_USEITEM
 };
 
 enum WorldType_t {
@@ -70,7 +70,7 @@ enum LightState_t {
 	LIGHT_STATE_DAY,
 	LIGHT_STATE_NIGHT,
 	LIGHT_STATE_SUNSET,
-	LIGHT_STATE_SUNRISE,
+	LIGHT_STATE_SUNRISE
 };
 
 struct RuleViolation {
@@ -544,7 +544,7 @@ public:
 	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
 	bool closeRuleViolation(Player* player);
-	
+
 	void showUseHotkeyMessage(Player* player, Item* item);
 
 protected:

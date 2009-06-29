@@ -5,7 +5,7 @@ function onSay(cid, words, param)
 	end
 
 	local ntiles = tonumber(param)
-	if(ntiles == nil or ntiles <= 0) then
+	if(ntiles == LUA_NULL or ntiles <= 0) then
 		return FALSE
 	end
 
@@ -26,8 +26,8 @@ function onSay(cid, words, param)
 			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_TELEPORT)
 		end
 	else
-		doPlayerSendCancel(cid, "Destination is not reachable.")		
+		doPlayerSendCancel(cid, "Destination is not reachable.")
 	end
-		
+
 	return FALSE
 end

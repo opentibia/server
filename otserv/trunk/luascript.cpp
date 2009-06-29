@@ -53,7 +53,7 @@ extern Spells* g_spells;
 
 enum{
 	EVENT_ID_LOADING = 1,
-	EVENT_ID_USER = 1000,
+	EVENT_ID_USER = 1000
 };
 
 ScriptEnviroment::ThingMap ScriptEnviroment::m_globalMap;

@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,7 +25,7 @@
 #include <sstream>
 
 #include <libxml/xmlmemory.h>
-#include <libxml/parser.h> 
+#include <libxml/parser.h>
 
 #include "talkaction.h"
 
@@ -50,18 +50,18 @@ void TalkActions::clear()
 		wordsMap.erase(it);
 		it = wordsMap.begin();
 	}
-	
+
 	m_scriptInterface.reInitState();
 }
 
 LuaScriptInterface& TalkActions::getScriptInterface()
 {
-	return m_scriptInterface;	
+	return m_scriptInterface;
 }
 
 std::string TalkActions::getScriptBaseName()
 {
-	return "talkactions";	
+	return "talkactions";
 }
 
 Event* TalkActions::getEvent(const std::string& nodeName)
@@ -79,7 +79,7 @@ bool TalkActions::registerEvent(Event* event, xmlNodePtr p)
 	TalkAction* talkAction = dynamic_cast<TalkAction*>(event);
 	if(!talkAction)
 		return false;
-	
+
 	wordsMap.push_back(std::make_pair(talkAction->getWords(), talkAction));
 	return true;
 }
@@ -94,7 +94,7 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 	std::string str_param_quote;
 	std::string str_words_first_word;
 	std::string str_param_first_word;
-	
+
 	// With quotation filtering
 	size_t loc = words.find( '"', 0 );
 	if(loc != std::string::npos && loc >= 0){
@@ -103,12 +103,12 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 	}
 	else {
 		str_words_quote = words;
-		str_param_quote = std::string(""); 
+		str_param_quote = std::string("");
 	}
-	
+
 	trim_left(str_words_quote, " ");
 	trim_right(str_param_quote, " ");
-	
+
 	// With whitespace filtering
 	loc = words.find( ' ', 0 );
 	if(loc != std::string::npos && loc >= 0){
@@ -117,7 +117,7 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 	}
 	else {
 		str_words_first_word = words;
-		str_param_first_word = std::string(""); 
+		str_param_first_word = std::string("");
 	}
 
 	TalkActionList::iterator it;
@@ -133,7 +133,7 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 		} else {
 			continue;
 		}
-		if(cmdstring == it->first || !it->second->isCaseSensitive() && strcasecmp(it->first.c_str(), cmdstring.c_str()) == 0){
+		if(cmdstring == it->first || (!it->second->isCaseSensitive() && strcasecmp(it->first.c_str(), cmdstring.c_str()) == 0)){
 			TalkAction* talkAction = it->second;
 			uint32_t ret =  talkAction->executeSay(player, cmdstring, paramstring);
 			if(ret == 1){
@@ -180,7 +180,7 @@ bool TalkAction::configureEvent(xmlNodePtr p)
 			filterType = TALKACTION_MATCH_FIRST_WORD;
 		}
 	}
-	
+
 	if(readXMLInteger(p, "case-sensitive", intValue) || readXMLInteger(p, "sensitive", intValue)){
 		caseSensitive = (intValue != 0);
 	}
@@ -198,28 +198,28 @@ uint32_t TalkAction::executeSay(Creature* creature, const std::string& words, co
 	//onSay(cid, words, param)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-	
+
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
 		desc << creature->getName() << " - " << words << " " << param;
 		env->setEventDesc(desc.str());
 		#endif
-	
+
 		env->setScriptId(m_scriptId, m_scriptInterface);
 		env->setRealPos(creature->getPosition());
-	
+
 		uint32_t cid = env->addThing(creature);
-	
+
 		lua_State* L = m_scriptInterface->getLuaState();
-	
+
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 		lua_pushstring(L, words.c_str());
 		lua_pushstring(L, param.c_str());
-	
+
 		int32_t result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
-		
+
 		return (result != LUA_FALSE);
 	}
 	else{

@@ -57,7 +57,7 @@ enum playerinfo_t {
 	PLAYERINFO_MAXMANA,
 	PLAYERINFO_MAGICLEVEL,
 	PLAYERINFO_MAGICLEVELPERCENT,
-	PLAYERINFO_SOUL,
+	PLAYERINFO_SOUL
 };
 
 enum freeslot_t {
@@ -68,7 +68,7 @@ enum freeslot_t {
 
 enum chaseMode_t {
 	CHASEMODE_STANDSTILL,
-	CHASEMODE_FOLLOW,
+	CHASEMODE_FOLLOW
 };
 
 enum fightMode_t {

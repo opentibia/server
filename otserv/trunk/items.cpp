@@ -1418,7 +1418,7 @@ Abilities::Abilities()
 
 	preventItemLoss = false;
 	preventSkillLoss = false;
-};
+}
 
 bool Abilities::Absorb::any() const
 {

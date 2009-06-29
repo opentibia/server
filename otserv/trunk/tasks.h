@@ -34,7 +34,7 @@ public:
 	{
 		m_expiration = boost::get_system_time() + boost::posix_time::milliseconds(ms);
 	}
-	Task(const boost::function<void (void)>& f) 
+	Task(const boost::function<void (void)>& f)
 		: m_expiration(boost::date_time::not_a_date_time), m_f(f) {}
 
 	~Task() {}
@@ -70,7 +70,7 @@ inline Task* createTask(uint32_t expiration, boost::function<void (void)> f){
 enum DispatcherState{
 	STATE_RUNNING,
 	STATE_CLOSING,
-	STATE_TERMINATED,
+	STATE_TERMINATED
 };
 
 class Dispatcher{
@@ -87,7 +87,7 @@ public:
 	enum DispatcherState{
 		STATE_RUNNING,
 		STATE_CLOSING,
-		STATE_TERMINATED,
+		STATE_TERMINATED
 	};
 
 protected:

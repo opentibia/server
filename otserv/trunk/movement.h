@@ -35,7 +35,7 @@ enum MoveEvent_t{
 	MOVE_EVENT_ADD_ITEM_ITEMTILE,
 	MOVE_EVENT_REMOVE_ITEM_ITEMTILE,
 	MOVE_EVENT_LAST,
-	MOVE_EVENT_NONE,
+	MOVE_EVENT_NONE
 };
 
 class MoveEvent;
@@ -113,7 +113,7 @@ public:
 	uint32_t executeEquip(Player* player, Item* item, slots_t slot);
 	uint32_t executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	//
-	
+
 	ReturnValue canPlayerWearEquip(Player* player, slots_t slot);
 
 	//onEquip information

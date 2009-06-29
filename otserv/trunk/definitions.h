@@ -43,7 +43,7 @@
 	#ifndef __EXCEPTION_TRACER__
 		#define __EXCEPTION_TRACER__
 	#endif
-	
+
 #endif
 
 #ifdef __DEBUG_EXCEPTION_REPORT__
@@ -94,7 +94,7 @@
 enum passwordType_t{
 	PASSWORD_TYPE_PLAIN = 0,
 	PASSWORD_TYPE_MD5,
-	PASSWORD_TYPE_SHA1,
+	PASSWORD_TYPE_SHA1
 };
 
 #ifdef _WIN32

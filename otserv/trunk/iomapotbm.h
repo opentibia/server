@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -65,7 +65,7 @@ enum OTBM_NodeTypes_t{
 	OTBM_TOWN = 13,
 	OTBM_HOUSETILE = 14,
 	OTBM_WAYPOINTS = 15,
-	OTBM_WAYPOINT = 16,
+	OTBM_WAYPOINT = 16
 };
 
 #pragma pack(1)

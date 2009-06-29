@@ -42,7 +42,7 @@ enum ChannelID {
 	CHANNEL_RL_CHAT    = 0x07,
 	CHANNEL_PARTY      = 0x08,
 	CHANNEL_HELP       = 0x09,
-	CHANNEL_PRIVATE    = 0xFFFF,
+	CHANNEL_PRIVATE    = 0xFFFF
 };
 
 class ChatChannel

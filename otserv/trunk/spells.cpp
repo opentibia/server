@@ -1360,18 +1360,18 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 		DISTANCE_BESIDE,
 		DISTANCE_CLOSE,
 		DISTANCE_FAR,
-		DISTANCE_VERYFAR,
+		DISTANCE_VERYFAR
 	};
 
 	enum direction_t{
 		DIR_N, DIR_S, DIR_E, DIR_W,
-		DIR_NE, DIR_NW, DIR_SE, DIR_SW,
+		DIR_NE, DIR_NW, DIR_SE, DIR_SW
 	};
 
 	enum level_t{
 		LEVEL_HIGHER,
 		LEVEL_LOWER,
-		LEVEL_SAME,
+		LEVEL_SAME
 	};
 
 	Player* playerExiva = NULL;

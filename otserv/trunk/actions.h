@@ -38,7 +38,7 @@ enum ActionType_t{
 	ACTION_UNIQUEID,
 	ACTION_ACTIONID,
 	ACTION_ITEMID,
-	ACTION_RUNEID,
+	ACTION_RUNEID
 };
 
 class Actions : public BaseEvents
