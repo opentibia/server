@@ -313,6 +313,7 @@ public:
 	static std::string getFieldString(lua_State *L, const char *key);
 	static void setFieldBool(lua_State *L, const char* index, bool val);
 	static bool getFieldBool(lua_State *L, const char *key);
+	static std::string escapeString(const std::string& string);
 
 protected:
 	virtual bool closeState();

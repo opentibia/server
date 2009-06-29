@@ -1359,6 +1359,7 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 			if(canSee(pos)){
 				NpcState* npcState = getState(player);
 
+				npcState->respondToText = text;
 				if(!text.empty()){
 					if(hasBusyReply && focusCreature != 0 && (uint32_t)focusCreature != player->getID()){
 						//Check if we have a busy reply
@@ -1376,8 +1377,6 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 						}
 					}
 				}
-
-				npcState->respondToText = text;
 			}
 		}
 	}
@@ -1834,8 +1833,8 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						std::stringstream scriptstream;
 						//attach various variables that could be interesting
 						scriptstream << "cid = " << env->addThing(player) << std::endl;
-						scriptstream << "text = \"" << npcState->respondToText << "\"" << std::endl;
-						scriptstream << "name = \"" << player->getName() << "\"" << std::endl;
+						scriptstream << "text = \"" << LuaScriptInterface::escapeString(npcState->respondToText) << "\"" << std::endl;
+						scriptstream << "name = \"" << LuaScriptInterface::escapeString(player->getName()) << "\"" << std::endl;
 						scriptstream << "idleTimeout = " << idleTimeout << std::endl;
 
 						scriptstream << "itemlist = {" << std::endl;
@@ -1861,9 +1860,9 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "amount = " << npcState->amount << ',' << std::endl;
 						scriptstream << "price = " << npcState->price << ',' << std::endl;
 						scriptstream << "level = " << npcState->level << ',' << std::endl;
-						scriptstream << "spellname = \"" << npcState->spellName << "\"" << ',' << std::endl;
-						scriptstream << "listname = \"" << npcState->listName << "\"" << ',' << std::endl;
-						scriptstream << "listpname = \"" << npcState->listPluralName << "\"" << ',' << std::endl;
+						scriptstream << "spellname = \"" << LuaScriptInterface::escapeString(npcState->spellName) << "\"" << ',' << std::endl;
+						scriptstream << "listname = \"" << LuaScriptInterface::escapeString(npcState->listName) << "\"" << ',' << std::endl;
+						scriptstream << "listpname = \"" << LuaScriptInterface::escapeString(npcState->listPluralName) << "\"" << ',' << std::endl;
 
 						scriptstream << "n1 = " << npcState->scriptVars.n1 << ',' << std::endl;
 						scriptstream << "n2 = " << npcState->scriptVars.n2 << ',' << std::endl;
@@ -1873,9 +1872,9 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "b2 = " << (npcState->scriptVars.b2 ? "true" : "false" ) << ',' << std::endl;
 						scriptstream << "b3 = " << (npcState->scriptVars.b3 ? "true" : "false" ) << ',' << std::endl;
 
-						scriptstream << "s1 = \"" << npcState->scriptVars.s1 << "\"" << ',' << std::endl;
-						scriptstream << "s2 = \"" << npcState->scriptVars.s2 << "\"" << ',' << std::endl;
-						scriptstream << "s3 = \"" << npcState->scriptVars.s3 << "\"" << std::endl;
+						scriptstream << "s1 = \"" << LuaScriptInterface::escapeString(npcState->scriptVars.s1) << "\"" << ',' << std::endl;
+						scriptstream << "s2 = \"" << LuaScriptInterface::escapeString(npcState->scriptVars.s2) << "\"" << ',' << std::endl;
+						scriptstream << "s3 = \"" << LuaScriptInterface::escapeString(npcState->scriptVars.s3) << "\"" << std::endl;
 						scriptstream << "}" << std::endl;
 
 						scriptstream << (*it).strValue;

@@ -43,6 +43,7 @@
 #include "teleport.h"
 #include "ban.h"
 #include "movement.h"
+#include "tools.h"
 
 extern Game g_game;
 extern Monsters g_monsters;
@@ -7802,6 +7803,16 @@ int LuaScriptInterface::luaGetConfigValue(lua_State *L)
 	//getConfigValue(key)
 	g_config.getConfigValue(popString(L), L);
 	return 1;
+}
+
+std::string LuaScriptInterface::escapeString(const std::string& string)
+{
+	std::string s = string;
+	replaceString(s, "\\", "\\\\");
+	replaceString(s, "\"", "\\\"");
+	replaceString(s, "'", "\\'");
+	replaceString(s, "[[", "\\[[");
+	return s;
 }
 
 // Bit lib
