@@ -2428,19 +2428,19 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 
 			if(iresponse->scriptVars.n1 != -1){
-				if(!npcState->scriptVars.n1){
+				if(npcState->scriptVars.n1 != iresponse->scriptVars.n1){
 					continue;
 				}
 			}
 
 			if(iresponse->scriptVars.n2 != -1){
-				if(!npcState->scriptVars.n2){
+				if(npcState->scriptVars.n2 != iresponse->scriptVars.n2){
 					continue;
 				}
 			}
 
 			if(iresponse->scriptVars.n3 != -1){
-				if(!npcState->scriptVars.n3){
+				if(npcState->scriptVars.n3 != iresponse->scriptVars.n3){
 					continue;
 				}
 			}
@@ -2650,13 +2650,6 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 			else{
 				std::vector<std::string>::iterator wordIter = wordList.end();
 				for(wordIter = lastWordMatchIter; wordIter != wordList.end(); ++wordIter){
-					/*
-					size_t pos = wordIter->find_first_of("!\"#?%&/()=?{[]}\\^*><,.-_~");
-					if(pos == std::string::npos || pos - keyIter->size() < wordIter->size()){
-						pos = 0;
-					}
-					*/
-
 					if(wordIter->find(*keyIter, 0) == 0){
 						break;
 					}
