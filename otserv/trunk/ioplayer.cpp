@@ -427,7 +427,7 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 	return true;
 }
 
-bool IOPlayer::savePlayer(Player* player)
+bool IOPlayer::savePlayer(Player* player, bool shallow)
 {
 	player->preSave();
 
@@ -526,6 +526,9 @@ bool IOPlayer::savePlayer(Player* player)
 		}
 		query.str("");
 	}
+
+	if(shallow)
+		return transaction.commit();
 
 	// deletes all player-related stuff
 

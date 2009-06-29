@@ -61,7 +61,7 @@ public:
 	  * \param player the player to save
 	  * \return true if the player was successfully saved
 	  */
-	bool savePlayer(Player* player);
+	bool savePlayer(Player* player, bool shallow = false);
 
 	bool addPlayerDeath(Player* dying_player, const DeathList& dl);
 

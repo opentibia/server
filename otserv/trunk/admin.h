@@ -120,6 +120,7 @@ enum{
 	//CMD_GETHOUSE = 12,
 	CMD_SAVE_SERVER = 13,
 	CMD_SEND_MAIL = 14
+	CMD_SHALLOW_SAVE_SERVER = 15,
 };
 
 
@@ -197,7 +198,7 @@ protected:
 	virtual void deleteProtocolTask();
 
 	void adminCommandOpenServer();
-	void adminCommandSaveServer();
+	void adminCommandSaveServer(bool shallow);
 	void adminCommandCloseServer();
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();

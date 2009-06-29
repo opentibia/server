@@ -190,7 +190,7 @@ void Game::saveGameState()
 	ScriptEnviroment::saveGameState();
 }
 
-bool Game::saveServer(bool payHouses)
+bool Game::saveServer(bool payHouses, bool shallowSave)
 {
 	saveGameState();
 
@@ -199,8 +199,11 @@ bool Game::saveServer(bool payHouses)
 		++it)
 	{
 		it->second->loginPosition = it->second->getPosition();
-		IOPlayer::instance()->savePlayer(it->second);
+		IOPlayer::instance()->savePlayer(it->second, shallowSave);
 	}
+
+	if(shallowSave)
+		return true;
 
 	if(payHouses){
 		Houses::getInstance().payHouses();

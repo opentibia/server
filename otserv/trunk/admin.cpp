@@ -362,10 +362,11 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 					createTask(boost::bind(&ProtocolAdmin::adminCommandKickPlayer, this, name)));
 				break;
 			}
+			case CMD_SHALLOW_SAVE_SERVER:
 			case CMD_SAVE_SERVER:
 			{
 				g_dispatcher.addTask(
-					createTask(boost::bind(&ProtocolAdmin::adminCommandSaveServer, this)));
+					createTask(boost::bind(&ProtocolAdmin::adminCommandSaveServer, this, command == CMD_SHALLOW_SAVE_SERVER)));
 
 				break;
 			}
@@ -579,9 +580,9 @@ void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 	}
 }
 
-void ProtocolAdmin::adminCommandSaveServer()
+void ProtocolAdmin::adminCommandSaveServer(bool shallow)
 {
-	g_game.saveServer(false);
+	g_game.saveServer(false, shallow);
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){

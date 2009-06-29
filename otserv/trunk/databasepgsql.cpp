@@ -134,14 +134,14 @@ uint64_t DatabasePgSQL::getLastInsertedRowID()
 	ExecStatusType stat = PQresultStatus(res);
 
 	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK){
-		std::cout << "PQexec(): " << query << ": " << PQresultErrorMessage(res) << std::endl;
+		std::cout << "PQexec(): failed to fetch last row: " << PQresultErrorMessage(res) << std::endl;
 		PQclear(res);
 		return 0;
 	}
 
 	// everything went fine
 	uint64_t id = ATOI64( PQgetvalue(res, 0, PQfnumber(res, "last" )));
-	PGClear(res);
+	PQclear(res);
 	return id;
 }
 
