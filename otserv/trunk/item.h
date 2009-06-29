@@ -385,7 +385,7 @@ public:
 
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
-	virtual void onRemoved() {};
+	virtual void onRemoved();
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
 	virtual void __startDecaying();

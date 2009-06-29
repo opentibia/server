@@ -230,10 +230,6 @@ void Item::copyAttributes(Item* item)
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
-
-	if(getUniqueId() != 0){
-		ScriptEnviroment::removeUniqueThing(this);
-	}
 }
 
 void Item::setDefaultSubtype()
@@ -243,6 +239,13 @@ void Item::setDefaultSubtype()
 	count = 1;
 	if(it.charges != 0){
 		setCharges(it.charges);
+	}
+}
+
+void Item::onRemoved()
+{
+	if(getUniqueId() != 0){
+		ScriptEnviroment::removeUniqueThing(this);
 	}
 }
 
