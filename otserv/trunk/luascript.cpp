@@ -3652,8 +3652,13 @@ int LuaScriptInterface::luaDoCreateTeleport(lua_State *L)
 	}
 
 	Item* newItem = Item::CreateItem(itemId);
-	Teleport* newTp = newItem->getTeleport();
+	if(!newItem){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
+	Teleport* newTp = newItem->getTeleport();
 	if(!newTp){
 		delete newItem;
 		reportErrorFunc("Wrong teleport id");
