@@ -155,7 +155,7 @@ bool Event::checkScript(const std::string& datadir, const std::string& scriptsNa
 	
 	if(testInterface.loadFile(datadir + scriptsName + scriptFile) == -1){
 		std::cout << "Warning: [Event::checkScript] Can not load script. " << scriptFile << std::endl;
-		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
+		std::cout << testInterface.getLastLuaError() << std::endl;
 		return false;
 	}
 
