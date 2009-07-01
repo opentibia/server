@@ -410,6 +410,12 @@ uint32_t Npc::loadParams(xmlNodePtr node)
 			else if(asLowerCaseString(*it) == "sorcerer"){
 				params |= RESPOND_SORCERER;
 			}
+			else if(asLowerCaseString(*it) == "lowlevel"){
+				 params |= RESPOND_LOWLEVEL;
+			} 	 
+			else if(asLowerCaseString(*it) == "highlevel"){
+				 params |= RESPOND_HIGHLEVEL;
+			}
 			else if(asLowerCaseString(*it) == "knowspell"){
 				params |= RESPOND_KNOWSPELL;
 			}
@@ -2360,13 +2366,27 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 
 			if(hasBitSet(RESPOND_LOWLEVEL, params)){
-				if((int32_t)player->getLevel() >= iresponse->getLevel())
-					continue;
+				if(iresponse->getLevel() > 0){
+					if((int32_t)player->getLevel() >= iresponse->getLevel())
+						continue;
+				}
+				else{
+					if((int32_t)player->getLevel() >= npcState->level){
+						continue;
+					}
+				}
 			}
 
 			if(hasBitSet(RESPOND_HIGHLEVEL, params)){
-				if((int32_t)player->getLevel() < iresponse->getLevel())
-					continue;
+				if(iresponse->getLevel() > 0){
+					if((int32_t)player->getLevel() < iresponse->getLevel())
+						continue;
+				}
+				else{
+					if((int32_t)player->getLevel() < npcState->level){
+						continue;
+					}
+				}
 			}
 
 			if(hasBitSet(RESPOND_KNOWSPELL, params)){
