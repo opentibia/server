@@ -192,6 +192,8 @@ void Game::saveGameState()
 
 bool Game::saveServer(bool payHouses, bool shallowSave)
 {
+	uint64_t start = OTSYS_TIME();
+
 	saveGameState();
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
@@ -209,7 +211,12 @@ bool Game::saveServer(bool payHouses, bool shallowSave)
 		Houses::getInstance().payHouses();
 	}
 
-	return map->saveMap();
+	bool ret = map->saveMap();
+
+	std::cout << "Notice: Server saved. Process took " <<
+		(OTSYS_TIME() - start)/(1000.) << "s." << std::endl;
+
+	return ret;
 }
 
 void Game::loadGameState()
