@@ -93,7 +93,7 @@ public:
 	virtual void changeHealth(int32_t healthChange);
 
 	virtual void onWalk();
-	virtual bool getNextStep(Direction& dir);
+	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 	virtual void onFollowCreatureComplete(const Creature* creature);
 
 	virtual void onThink(uint32_t interval);
@@ -134,7 +134,7 @@ private:
 	uint32_t yellTicks;
 	int32_t targetChangeCooldown;
 	bool resetTicks;
-	bool isActivated;
+	bool isIdle;
 	bool extraMeleeAttack;
 
 	Spawn* spawn;
@@ -157,8 +157,9 @@ private:
 	bool despawn();
 	bool inDespawnRange(const Position& pos);
 
-	bool activate(bool forced = false);
-	bool deactivate(bool forced = false);
+	void setIdle(bool _idle);
+	void updateIdleStatus();
+	bool getIdleStatus() const { return isIdle;}
 
 	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
 	virtual void onEndCondition(ConditionType_t type, bool lastCondition);

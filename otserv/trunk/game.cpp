@@ -369,6 +369,10 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 						//then last we check items with topOrder 3 (doors etc)
 						thing = tile->getTopTopItem();
 					}
+
+					if(thing == NULL){
+						thing = tile->ground;
+					}
 				}
 			}
 			else{
@@ -3836,13 +3840,15 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 
 void Game::addCreatureCheck(Creature* creature)
 {
+	creature->creatureCheck = true;
+
 	if(creature->checkCreatureVectorIndex >= 0){
-		// Already in a vector, or about to be added
+		// Already in a vector
 		return;
 	}
 
 	toAddCheckCreatureVector.push_back(creature);
-	creature->checkCreatureVectorIndex = 1;
+	creature->checkCreatureVectorIndex = random_range(0, EVENT_CREATURECOUNT - 1);
 	creature->useThing2();
 }
 
@@ -3853,7 +3859,7 @@ void Game::removeCreatureCheck(Creature* creature)
 		return;
 	}
 
-	creature->checkCreatureVectorIndex = 0;
+	creature->creatureCheck = false;
 }
 
 void Game::checkCreatures()
@@ -3867,10 +3873,9 @@ void Game::checkCreatures()
 	//add any new creatures
 	for(it = toAddCheckCreatureVector.begin(); it != toAddCheckCreatureVector.end();){
 		creature = (*it);
-		if(creature->checkCreatureVectorIndex == 1){
-			int next_vector = (checkCreatureLastIndex + 1) % EVENT_CREATURECOUNT;
-			checkCreatureVectors[next_vector].push_back(creature);
-			creature->checkCreatureVectorIndex = next_vector + 2;
+
+		if(creature->creatureCheck){
+			checkCreatureVectors[creature->checkCreatureVectorIndex].push_back(creature);
 			++it;
 		}
 		else{
@@ -3890,7 +3895,7 @@ void Game::checkCreatures()
 
 	for(it = checkCreatureVector.begin(); it != checkCreatureVector.end();){
 		creature = (*it);
-		if(creature->checkCreatureVectorIndex != 0){
+		if(creature->creatureCheck){
 			if(creature->getHealth() > 0){
 				creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
 			}

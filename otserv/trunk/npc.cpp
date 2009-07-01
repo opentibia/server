@@ -2093,9 +2093,9 @@ void Npc::onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCall
 	}
 }
 
-bool Npc::getNextStep(Direction& dir)
+bool Npc::getNextStep(Direction& dir, uint32_t& flags)
 {
-	if(Creature::getNextStep(dir)){
+	if(Creature::getNextStep(dir, flags)){
 		return true;
 	}
 
@@ -2446,7 +2446,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 			}
 
 			bool storageMatch = false;
-			for(StorageConditions::const_iterator iter = iresponse->prop.storageConditions.begin(); iter != iresponse->prop.storageConditions.begin(); ++iter){
+			for(StorageConditions::const_iterator iter = iresponse->prop.storageConditions.begin(); iter != iresponse->prop.storageConditions.end(); ++iter){
 				const StorageCondition& cs = *iter;
 
 				int32_t playerStorageValue = -1;
@@ -2601,7 +2601,7 @@ const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* play
 					bestMatch = iresponse;
 			}
 			else{
-				// First match is always the bestmi
+				// First match is always the best
 				return iresponse;
 			}
 		}

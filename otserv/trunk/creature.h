@@ -306,7 +306,6 @@ public:
 	virtual uint32_t getConditionImmunities() const { return 0; }
 	virtual uint32_t getConditionSuppressions() const { return 0; }
 	virtual bool isAttackable() const { return true;}
-	bool isIdle() const { return checkCreatureVectorIndex == 0;}
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 
@@ -351,7 +350,7 @@ public:
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t interval);
 	virtual void onWalk();
-	virtual bool getNextStep(Direction& dir);
+	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos,
@@ -413,9 +412,8 @@ protected:
 	bool isUpdatingPath;
 	// The creature onThink event vector this creature belongs to
 	// -1 represents that the creature isn't in any vector
-	//  0 represents it's going to be removed in the next checkCreatures
-	//  1 represents it's going to be added in the next checkCreatures
 	int32_t checkCreatureVectorIndex;
+	bool creatureCheck;
 
 	int32_t health, healthMax;
 	int32_t mana, manaMax;

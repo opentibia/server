@@ -90,6 +90,7 @@ Creature::Creature() :
 	blockTicks = 0;
 	walkUpdateTicks = 0;
 	checkCreatureVectorIndex = -1;
+	creatureCheck = false;
 	scriptEventsBitField = 0;
 	onIdleStatus();
 }
@@ -252,8 +253,9 @@ void Creature::onWalk()
 {
 	if(getWalkDelay() <= 0){
 		Direction dir;
-		if(getNextStep(dir)){
-			if(g_game.internalMoveCreature(this, dir, FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
+		uint32_t flags = FLAG_IGNOREFIELDDAMAGE;
+		if(getNextStep(dir, flags)){
+			if(g_game.internalMoveCreature(this, dir, flags) != RET_NOERROR){
 				forceUpdateFollowPath = true;
 			}
 		}
@@ -290,7 +292,7 @@ void Creature::onWalk(Direction& dir)
 	}
 }
 
-bool Creature::getNextStep(Direction& dir)
+bool Creature::getNextStep(Direction& dir, uint32_t& flags)
 {
 	if(!listWalkDir.empty()){
 		dir = listWalkDir.front();

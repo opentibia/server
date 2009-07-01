@@ -64,7 +64,7 @@ Monster* Monster::createMonster(const std::string& name)
 Monster::Monster(MonsterType* _mtype) :
 Creature()
 {
-	isActivated = false;
+	isIdle = true;
 	isMasterInRange = false;
 	mType = _mtype;
 	spawn = NULL;
@@ -142,7 +142,7 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 			isMasterInRange = canSee(getMaster()->getPosition());
 		}
 		updateTargetList();
-		activate();
+		updateIdleStatus();
 	}
 	else{
 		onCreatureEnter(const_cast<Creature*>(creature));
@@ -158,7 +158,7 @@ void Monster::onCreatureDisappear(const Creature* creature, bool isLogout)
 			spawn->startSpawnCheck();
 		}
 
-		deactivate(true);
+		setIdle(true);
 	}
 	else{
 		onCreatureLeave(const_cast<Creature*>(creature));
@@ -176,7 +176,7 @@ void Monster::onCreatureMove(const Creature* creature, const Tile* newTile, cons
 		}
 
 		updateTargetList();
-		activate();
+		updateIdleStatus();
 
 		/*
 		TODO: Optimizations here
@@ -203,7 +203,7 @@ void Monster::onCreatureMove(const Creature* creature, const Tile* newTile, cons
 			if(canSeeNewPos){
 				//Turn the summon on again
 				isMasterInRange = true;
-				activate();
+				updateIdleStatus();
 			}
 		}
 
@@ -282,7 +282,7 @@ void Monster::onCreatureFound(Creature* creature, bool pushFront /*= false*/)
 				targetList.push_back(creature);
 			}
 
-			activate();
+			updateIdleStatus();
 		}
 	}
 }
@@ -294,7 +294,7 @@ void Monster::onCreatureEnter(Creature* creature)
 	if(getMaster() == creature){
 		//Turn the summon on again
 		isMasterInRange = true;
-		activate();
+		updateIdleStatus();
 	}
 
 	onCreatureFound(creature, true);
@@ -350,7 +350,7 @@ void Monster::onCreatureLeave(Creature* creature)
 	if(getMaster() == creature){
 		//Turn the monster off until its master comes back
 		isMasterInRange = false;
-		deactivate();
+		updateIdleStatus();
 	}
 
 	//update friendList
@@ -374,7 +374,7 @@ void Monster::onCreatureLeave(Creature* creature)
 			(*it)->releaseThing2();
 			targetList.erase(it);
 			if(targetList.empty()){
-				deactivate();
+				updateIdleStatus();
 			}
 		}
 #ifdef __DEBUG__
@@ -521,45 +521,40 @@ bool Monster::selectTarget(Creature* creature)
 	return setFollowCreature(creature, true);
 }
 
-bool Monster::activate(bool forced /*= false*/)
+void Monster::setIdle(bool _idle)
 {
-	if(isSummon()){
-		if(isMasterInRange || forced){
-			isActivated = true;
-		}
-	}
-	else{
-		if(!targetList.empty() || forced){
-			isActivated = true;
-		}
-	}
+	isIdle = _idle;
 
-	if(isActivated || !conditions.empty()){
+	if(!isIdle){
 		g_game.addCreatureCheck(this);
 	}
-
-	return isActivated;
-}
-
-bool Monster::deactivate(bool forced /*= false*/)
-{
-	if(isSummon()){
-		if(!isMasterInRange || getMaster()->isIdle() || forced){
-			isActivated = false;
-		}
-	}
 	else{
-		if(targetList.empty() || forced){
-			isActivated = false;
-		}
-	}
-
-	if( (!isActivated && conditions.empty()) || forced){
 		onIdleStatus();
 		g_game.removeCreatureCheck(this);
 	}
+}
 
-	return !isActivated;
+void Monster::updateIdleStatus()
+{
+	bool idle = false;
+
+	if(conditions.empty()){
+		if(isSummon()){
+			if(!isMasterInRange){
+				idle = true;
+			}
+			else if(getMaster()->getMonster() && getMaster()->getMonster()->getIdleStatus()){
+				idle = true;
+			}
+		}
+		else{
+			if(targetList.empty()){
+				idle = true;
+			}
+		}
+	}
+
+	setIdle(idle);
 }
 
 void Monster::onAddCondition(ConditionType_t type, bool hadCondition)
@@ -571,7 +566,7 @@ void Monster::onAddCondition(ConditionType_t type, bool hadCondition)
 		updateMapCache();
 	}
 
-	activate();
+	updateIdleStatus();
 }
 
 void Monster::onEndCondition(ConditionType_t type, bool lastCondition)
@@ -583,7 +578,7 @@ void Monster::onEndCondition(ConditionType_t type, bool lastCondition)
 		updateMapCache();
 	}
 
-	deactivate();
+	updateIdleStatus();
 }
 
 void Monster::onThink(uint32_t interval)
@@ -592,44 +587,47 @@ void Monster::onThink(uint32_t interval)
 
 	if(despawn()){
 		g_game.removeCreature(this, true);
-		deactivate(true);
+		setIdle(true);
 	}
-	else if(!deactivate()){
-		addEventWalk();
+	else{
+		updateIdleStatus();
+		if(!isIdle){
+			addEventWalk();
 
-		if(isSummon()){
-			if(!attackedCreature){
-				if(getMaster() && getMaster()->getAttackedCreature()){
-					///This happens if the monster is summoned during combat
-					selectTarget(getMaster()->getAttackedCreature());
+			if(isSummon()){
+				if(!attackedCreature){
+					if(getMaster() && getMaster()->getAttackedCreature()){
+						///This happens if the monster is summoned during combat
+						selectTarget(getMaster()->getAttackedCreature());
+					}
+					else if(getMaster() != followCreature){
+						//Our master has not ordered us to attack anything, lets follow him around instead.
+						setFollowCreature(getMaster());
+					}
 				}
-				else if(getMaster() != followCreature){
-					//Our master has not ordered us to attack anything, lets follow him around instead.
-					setFollowCreature(getMaster());
+				else if(attackedCreature == this){
+					setFollowCreature(NULL);
 				}
-			}
-			else if(attackedCreature == this){
-				setFollowCreature(NULL);
-			}
-			else if(followCreature != attackedCreature){
-				//This happens just after a master orders an attack, so lets follow it aswell.
-				setFollowCreature(attackedCreature);
-			}
-		}
-		else if(!targetList.empty()){
-			if(!followCreature || !hasFollowPath){
-				searchTarget();
-			}
-			else if(isFleeing()){
-				if(attackedCreature && !canUseAttack(getPosition(), attackedCreature)){
-					searchTarget(TARGETSEARCH_ATTACKRANGE);
+				else if(followCreature != attackedCreature){
+					//This happens just after a master orders an attack, so lets follow it aswell.
+					setFollowCreature(attackedCreature);
 				}
 			}
-		}
+			else if(!targetList.empty()){
+				if(!followCreature || !hasFollowPath){
+					searchTarget();
+				}
+				else if(isFleeing()){
+					if(attackedCreature && !canUseAttack(getPosition(), attackedCreature)){
+						searchTarget(TARGETSEARCH_ATTACKRANGE);
+					}
+				}
+			}
 
-		onThinkTarget(interval);
-		onThinkYell(interval);
-		onThinkDefense(interval);
+			onThinkTarget(interval);
+			onThinkYell(interval);
+			onThinkDefense(interval);
+		}
 	}
 }
 
@@ -979,9 +977,9 @@ void Monster::pushCreatures(Tile* tile)
 	}
 }
 
-bool Monster::getNextStep(Direction& dir)
+bool Monster::getNextStep(Direction& dir, uint32_t& flags)
 {
-	if(!isActivated || getHealth() <= 0){
+	if(isIdle || getHealth() <= 0){
 		//we dont have anyone watching might aswell stop walking
 		eventWalk = 0;
 		return false;
@@ -999,9 +997,11 @@ bool Monster::getNextStep(Direction& dir)
 		}
 	}
 	else if(isSummon() || followCreature){
-		result = Creature::getNextStep(dir);
-
-		if(!result){
+		result = Creature::getNextStep(dir, flags);
+		if(result){
+			flags |= FLAG_PATHFINDING;
+		}
+		else{
 			//target dancing
 			if(attackedCreature && attackedCreature == followCreature){
 				if(isFleeing()){
@@ -1177,7 +1177,7 @@ void Monster::die()
 
 	clearTargetList();
 	clearFriendList();
-	deactivate(true);
+	setIdle(true);
 }
 
 Item* Monster::createCorpse()
@@ -1355,7 +1355,7 @@ void Monster::changeHealth(int32_t healthChange)
 {
 	Creature::changeHealth(healthChange);
 	//In case a player with ignore flag set attacks the monster
-	activate(true);
+	setIdle(false);
 }
 
 bool Monster::challengeCreature(Creature* creature)
@@ -1407,7 +1407,7 @@ bool Monster::convinceCreature(Creature* creature)
 
 			isMasterInRange = true;
 			updateTargetList();
-			activate();
+			updateIdleStatus();
 
 			//Notify surrounding about the change
 			SpectatorVec list;
@@ -1441,7 +1441,7 @@ bool Monster::convinceCreature(Creature* creature)
 
 		isMasterInRange = true;
 		updateTargetList();
-		activate();
+		updateIdleStatus();
 
 		//Notify surrounding about the change
 		SpectatorVec list;
@@ -1468,7 +1468,7 @@ void Monster::onCreatureConvinced(const Creature* convincer, const Creature* cre
 {
 	if(convincer != this && (isFriend(creature) || isOpponent(creature))){
 		updateTargetList();
-		activate();
+		updateIdleStatus();
 	}
 }
 
