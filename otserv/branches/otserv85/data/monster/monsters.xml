@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<monsters>
+	<monster name="Demon" file="demon.xml"/>
+	<monster name="Fire Elemental" file="fire_elemental.xml"/>
+	<monster name="Fire Devil" file="fire_elemental.xml"/>
+	<monster name="Ghoul" file="ghoul.xml"/>
+	<monster name="Cyclops" file="cyclops.xml"/>
+	<monster name="Minotaur" file="minotaur_archer.xml"/>
+	<monster name="Minotaur Archer" file="minotaur_archer.xml"/>
+	<monster name="Minotaur Guard" file="minotaur_guard.xml"/>
+	<monster name="Minotaur Mage" file="minotaur_mage.xml"/>
+	<monster name="Spider" file="spider.xml"/>
+	<monster name="Giant Spider" file="giant_spider.xml"/>
+	<monster name="Poison Spider" file="poison_spider.xml"/>
+	<monster name="Scorpion" file="scorpion.xml"/>
+	<monster name="Stalker" file="stalker.xml"/>
+	<monster name="Magicthrower" file="magicthrower.xml"/>
+	<monster name="Troll" file="troll.xml"/>
+	<monster name="Swamp Troll" file="swamp_troll.xml"/>
+	<monster name="Orc" file="orc.xml"/>
+	<monster name="Orc Berserker" file="orc_berserker.xml"/>
+	<monster name="Orc Leader" file="orc_leader.xml"/>
+	<monster name="Orc Rider" file="orc_rider.xml"/>
+	<monster name="Orc Shaman" file="orc_shaman.xml"/>
+	<monster name="Orc Spearman" file="orc_spearman.xml"/>
+	<monster name="Orc Warrior" file="orc_warrior.xml"/>
+	<monster name="Orc Warlord" file="orc_warlord.xml"/>
+	<monster name="Skeleton" file="skeleton.xml"/>
+	<monster name="Demon Skeleton" file="demon_skeleton.xml"/>
+	<monster name="Slime" file="slime.xml"/>
+	<monster name="Slime Summon" file="slime_summon.xml"/>
+	<monster name="Rotworm" file="rotworm.xml"/>
+	<monster name="Carrion Worm" file="carrion_worm.xml"/>
+	<monster name="Dragon" file="dragon.xml"/>
+	<monster name="Dragon Lord" file="dragon_lord.xml"/>
+	<monster name="Bear" file="bear.xml"/>
+	<monster name="Lion" file="lion.xml"/>
+	<monster name="Deer" file="deer.xml"/>
+	<monster name="Snake" file="snake.xml"/>
+	<monster name="Hyaena" file="hyaena.xml"/>
+	<monster name="Sheep" file="sheep.xml"/>
+	<monster name="Pig" file="pig.xml"/>
+	<monster name="Rabbit" file="rabbit.xml"/>
+	<monster name="Chicken" file="chicken.xml"/>
+	<monster name="Stone Golem" file="stone_golem.xml"/>
+	<monster name="Warlock" file="warlock.xml"/>
+	<monster name="Witch" file="witch.xml"/>
+	<monster name="Bandit" file="bandit.xml"/>
+	<monster name="Hunter" file="hunter.xml"/>
+	<monster name="Smuggler" file="smuggler.xml"/>
+	<monster name="Wild Warrior" file="wild_warrior.xml"/>
+	<monster name="Wasp" file="wasp.xml"/>
+	<monster name="Bug" file="bug.xml"/>
+	<monster name="Amazon" file="amazon.xml"/>
+	<monster name="Valkyrie" file="valkyrie.xml"/>
+	<monster name="Dog" file="dog.xml"/>
+	<monster name="Wolf" file="wolf.xml"/>
+</monsters>
+
