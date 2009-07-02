@@ -326,7 +326,9 @@ enum Skulls_t{
 	SKULL_YELLOW    = 1,
 	SKULL_GREEN     = 2,
 	SKULL_WHITE     = 3,
-	SKULL_RED       = 4
+	SKULL_RED       = 4,
+	SKULL_BLACK     = 5,
+	SKULL_LAST
 };
 
 enum PartyShields_t{

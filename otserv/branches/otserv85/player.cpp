@@ -176,8 +176,8 @@ Creature()
 	setParty(NULL);
 
 #ifdef __SKULLSYSTEM__
-	redSkullTicks = 0;
-	skull = SKULL_NONE;
+	skullTicks = 0;
+	skullType = SKULL_NONE;
 #endif
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -902,7 +902,7 @@ void Player::dropLoot(Container* corpse)
 	uint32_t itemLoss = lossPercent[LOSS_ITEMS];
 	uint32_t backpackLoss = lossPercent[LOSS_CONTAINERS];
 #ifdef __SKULLSYSTEM__
-	if(getSkull() == SKULL_RED){
+	if(getSkull() == SKULL_RED || getSkull() == SKULL_BLACK){
 		itemLoss = 100;
 		backpackLoss = 100;
 	}
@@ -1911,7 +1911,7 @@ void Player::onThink(uint32_t interval)
 
 	checkIdleTime(interval);
 #ifdef __SKULLSYSTEM__
-	checkRedSkullTicks(interval);
+	checkSkullTicks(interval);
 #endif
 }
 
@@ -3576,7 +3576,7 @@ void Player::onEndCondition(ConditionType_t type, bool lastCondition)
 		pzLocked = false;
 
 #ifdef __SKULLSYSTEM__
-		if(getSkull() != SKULL_RED){
+		if(getSkull() != SKULL_RED && getSkull() != SKULL_BLACK){
 			clearAttacked();
 			setSkull(SKULL_NONE);
 			g_game.updateCreatureSkull(this);
@@ -3997,7 +3997,7 @@ Skulls_t Player::getSkull() const
 		return SKULL_NONE;
 	}
 
-	return skull;
+	return skullType;
 }
 
 Skulls_t Player::getSkullClient(const Player* player) const
@@ -4063,11 +4063,11 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
-	redSkullTicks += g_config.getNumber(ConfigManager::FRAG_TIME);
+	skullTicks += g_config.getNumber(ConfigManager::FRAG_TIME);
 	// We subtract one from kills as if you kill three people, you'll gain 3*time ticks,
 	// however some will probably decay in that time so we only check if the ticks are
 	// greater than 2*time (must be >= N kills then)
-	if(redSkullTicks >
+	if(skullTicks >
 			(g_config.getNumber(ConfigManager::KILLS_FOR_RED_SKULL) - 1) *
 			 g_config.getNumber(ConfigManager::FRAG_TIME))
 	{
@@ -4076,12 +4076,13 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 }
 
-void Player::checkRedSkullTicks(int32_t ticks)
+void Player::checkSkullTicks(int32_t ticks)
 {
-	if(redSkullTicks - ticks > 0)
-		redSkullTicks = redSkullTicks - ticks;
+	if(skullTicks - ticks > 0)
+		skullTicks = skullTicks - ticks;
 
-	if(redSkullTicks < 1000 && !hasCondition(CONDITION_INFIGHT) && skull != SKULL_NONE){
+	if(skullTicks < 1000 && !hasCondition(CONDITION_INFIGHT) && getSkull() != SKULL_NONE){
+		skullTicks = 0;
 		setSkull(SKULL_NONE);
 		g_game.updateCreatureSkull(this);
 	}
@@ -4342,10 +4343,10 @@ void Player::checkIdleTime(uint32_t ticks)
 uint32_t Player::getFrags()
 {
 	uint32_t frags;
-	if(redSkullTicks <= 0)
+	if(skullTicks <= 0)
 		frags = 0;
 	else
-		frags = (uint32_t)std::ceil(((double)redSkullTicks / g_config.getNumber(ConfigManager::FRAG_TIME)));
+		frags = (uint32_t)std::ceil(((double)skullTicks / g_config.getNumber(ConfigManager::FRAG_TIME)));
 
 	return frags;
 }
