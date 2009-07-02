@@ -585,7 +585,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 	}
 
 	if(healthChange < 0){
-		if(caster && caster->getPlayer() && target->getPlayer()){
+		if(caster && caster->getPlayer() && target->getPlayer() && target->getPlayer()->getSkull() != SKULL_BLACK){
 			healthChange = healthChange/2;
 		}
 	}
