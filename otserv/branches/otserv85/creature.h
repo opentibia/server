@@ -114,14 +114,6 @@ struct DeathLessThan{
 
 typedef std::vector<DeathEntry> DeathList;
 
-enum ZoneType_t{
-	ZONE_PROTECTION,
-	ZONE_NOPVP,
-	ZONE_PVP,
-	ZONE_NOLOGOUT,
-	ZONE_NORMAL
-};
-
 class Map;
 class Thing;
 class Container;
@@ -235,21 +227,7 @@ public:
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
-	ZoneType_t getZone() const {
-		const Tile* tile = getTile();
-		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
-			return ZONE_PROTECTION;
-		}
-		else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
-			return ZONE_NOPVP;
-		}
-		else if(tile->hasFlag(TILESTATE_PVPZONE)){
-			return ZONE_PVP;
-		}
-		else{
-			return ZONE_NORMAL;
-		}
-	}
+	ZoneType_t getZone() const {return getTile()->getZone();}
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);

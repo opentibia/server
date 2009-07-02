@@ -279,7 +279,9 @@ enum Icons_t{
 	ICON_FREEZING   = 512,
 	ICON_DAZZLED    = 1024,
 	ICON_CURSED     = 2048,
-	ICON_PARTY_BUFF = 4096
+	ICON_PARTY_BUFF = 4096,
+	ICON_PZBLOCK    = 8192,
+	ICON_PZ         = 16384
 };
 
 enum WeaponType_t {

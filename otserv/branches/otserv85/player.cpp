@@ -588,6 +588,15 @@ void Player::sendIcons() const
 				icons |= (*it)->getIcons();
 			}
 		}
+
+		if(isPzLocked()){
+			icons |= ICON_PZBLOCK;
+		}
+
+		if(getTile()->getZone() == ZONE_PROTECTION){
+			icons |= ICON_PZ;
+		}
+
 		client->sendIcons(icons);
 	}
 }
