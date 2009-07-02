@@ -507,9 +507,9 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 		unjustKillTicks = player->unjustKillTicks;
 	}
 
-	query << ", `skulltype` = " << skullType;
-	query << ", `skullendtime` = " << player->skullEndTime;
-	query << ", `unjustkilltime` = " << unjustKillTicks;
+	query << ", `skull_type` = " << skullType;
+	query << ", `skull_endtime` = " << player->skullEndTime;
+	query << ", `unjust_kill_time` = " << unjustKillTicks;
 #endif
 
 	query << " WHERE `id` = " << player->getGUID();

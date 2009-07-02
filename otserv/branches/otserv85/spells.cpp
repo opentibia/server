@@ -712,6 +712,14 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 		return false;
 	}
 
+#ifdef __SKULLSYSTEM__
+	if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
+		//player->sendCancelMessage(RET_);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+#endif
+
 	if(toPos.x != 0xFFFF){
 		const Position& playerPos = player->getPosition();
 		if(playerPos.z > toPos.z){
@@ -817,7 +825,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 
 #ifdef __SKULLSYSTEM__
 			if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
-				//player->sendCancelMessage(RET_TODO);
+				//player->sendCancelMessage(RET_);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
