@@ -231,10 +231,10 @@ int Game::loadMap(std::string filename, std::string filekind)
 	}
 
 	maxPlayers = g_config.getNumber(ConfigManager::MAX_PLAYERS);
-	inFightTicks = g_config.getNumber(ConfigManager::PZ_LOCKED);
+	inFightTicks = g_config.getNumber(ConfigManager::IN_FIGHT_DURATION);
 	exhaustionTicks = g_config.getNumber(ConfigManager::EXHAUSTED);
-	fightExhaustionTicks = g_config.getNumber(ConfigManager::FIGHTEXHAUSTED);
-	healExhaustionTicks = g_config.getNumber(ConfigManager::HEALEXHAUSTED);
+	fightExhaustionTicks = g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED);
+	healExhaustionTicks = g_config.getNumber(ConfigManager::HEAL_EXHAUSTED);
 	Player::maxMessageBuffer = g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER);
 	Monster::despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
 	Monster::despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
