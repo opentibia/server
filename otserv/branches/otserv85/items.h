@@ -166,6 +166,7 @@ public:
 	bool           isHangable;
 	bool           allowDistRead;
 	bool           clientCharges;
+	bool           lookThrough;
 	uint16_t       speed;
 	int32_t        decayTo;
 	uint32_t       decayTime;
