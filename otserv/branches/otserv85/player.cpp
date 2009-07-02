@@ -3640,7 +3640,9 @@ void Player::onAttackedCreature(Creature* target)
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
-				pzLocked = true;
+				if(!targetPlayer->hasAttacked(this)){
+					pzLocked = true;
+				}
 
 #ifdef __SKULLSYSTEM__
 				if( !isPartner(targetPlayer) &&
