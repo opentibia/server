@@ -3,7 +3,7 @@ local TILE_FOOTPRINT_I = 6594
 local TILE_FOOTPRINT_II = 6598
 
 function onStepIn(cid, item, pos)
-	if (isPlayer(cid) and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN)) then
+	if (isPlayer(cid) == TRUE and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == TRUE) then
 		return TRUE
 	end
 
