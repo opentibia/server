@@ -2414,8 +2414,14 @@ void Player::preSave()
 			capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
 		}
 
-		health = healthMax;
-		mana = manaMax;
+		if(getSkull() != SKULL_BLACK){
+			health = healthMax;
+			mana = manaMax;
+		}
+		else{
+			health = 40;
+			mana = 0;
+		}
 	}
 }
 

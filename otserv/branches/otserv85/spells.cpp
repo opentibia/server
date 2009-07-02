@@ -816,6 +816,12 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 			}
 
 #ifdef __SKULLSYSTEM__
+			if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
+				//player->sendCancelMessage(RET_TODO);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+
 			if(isAggressive && needTarget && player->hasSafeMode() && tile->getTopVisibleCreature(player)){
 				Player* targetPlayer = tile->getTopVisibleCreature(player)->getPlayer();
 				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE){
