@@ -561,12 +561,6 @@ float Player::getDefenseFactor() const
 
 		case FIGHTMODE_DEFENSE:
 		{
-			/*
-			if((OTSYS_TIME() - lastAttack) < getAttackSpeed()){
-				//Attacking will cause us to get into normal defense
-				return 1.2f;
-			}
-*/
 			return 2.0f;
 			break;
 		}
@@ -1593,6 +1587,8 @@ void Player::onChangeZone(ZoneType_t zone)
 			}
 		}
 	}
+
+	sendIcons();
 }
 
 void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
@@ -2442,10 +2438,11 @@ void Player::addHealExhaust(uint32_t ticks)
 void Player::addInFightTicks(uint32_t ticks, bool pzlock /*= false*/)
 {
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
+		if(pzlock){
+			pzLocked = true;
+		}
 		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, ticks, 0);
 		addCondition(condition);
-		if(pzlock)
-			pzLocked = true;
 	}
 }
 
@@ -3573,7 +3570,6 @@ void Player::onAddCombatCondition(ConditionType_t type, bool hadCondition)
 void Player::onEndCondition(ConditionType_t type, bool lastCondition)
 {
 	Creature::onEndCondition(type, lastCondition);
-	sendIcons();
 
 	if(type == CONDITION_INFIGHT){
 		onIdleStatus();
@@ -3587,6 +3583,8 @@ void Player::onEndCondition(ConditionType_t type, bool lastCondition)
 		}
 #endif
 	}
+
+	sendIcons();
 }
 
 void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condition)
