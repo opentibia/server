@@ -2243,7 +2243,7 @@ void Player::onDie()
 			}
 		}
 
-		if(isLootPrevented && getSkull() != SKULL_RED){
+		if(isLootPrevented && getSkull() != SKULL_RED && getSkull() != SKULL_BLACK){
 			setDropLoot(false);
 		}
 		if(isSkillPrevented){
@@ -4006,7 +4006,7 @@ Skulls_t Player::getSkullClient(const Player* player) const
 		return SKULL_NONE;
 	}
 
-	if(getSkull() != SKULL_NONE && player->getSkull() != SKULL_RED){
+	if(getSkull() != SKULL_NONE && player->getSkull() != SKULL_RED && player->getSkull() != SKULL_BLACK){
 		if(player->hasAttacked(this) ){
 			return SKULL_YELLOW;
 		}
@@ -4064,13 +4064,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
 	skullTicks += g_config.getNumber(ConfigManager::FRAG_TIME);
-	// We subtract one from kills as if you kill three people, you'll gain 3*time ticks,
-	// however some will probably decay in that time so we only check if the ticks are
-	// greater than 2*time (must be >= N kills then)
-	if(skullTicks >
-			(g_config.getNumber(ConfigManager::KILLS_FOR_RED_SKULL) - 1) *
-			 g_config.getNumber(ConfigManager::FRAG_TIME))
-	{
+	if(skullTicks > (g_config.getNumber(ConfigManager::KILLS_FOR_RED_SKULL)) * g_config.getNumber(ConfigManager::FRAG_TIME)){
+		skullTicks = (int64_t)30*24*60*60*1000;
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
 	}

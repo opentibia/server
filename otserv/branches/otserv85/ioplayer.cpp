@@ -129,7 +129,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->currentOutfit = player->defaultOutfit;
 
 #ifdef __SKULLSYSTEM__
-	int32_t skullTicks = result->getDataInt("skullduration") - std::time(NULL);
+	int32_t skullTicks = result->getDataInt("skullendtime") - std::time(NULL);
 	if(skullTicks > 0){
 		int32_t skullType = result->getDataInt("skulltype");
 		if(skullType >= 0 || skullType < SKULL_LAST){
