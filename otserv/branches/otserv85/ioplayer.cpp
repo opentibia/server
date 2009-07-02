@@ -49,7 +49,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skullendtime`, \
-		`skulltype`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
+		`skulltype`, `unjustkilltime`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
 		`loss_items`, `loss_containers`, `rank_id`, `town_id`, `balance`, `stamina` \
 		FROM `players` LEFT JOIN `accounts` ON `account_id` = `accounts`.`id` \
 		WHERE `players`.`name` = " + db->escapeString(name);
@@ -129,14 +129,14 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->currentOutfit = player->defaultOutfit;
 
 #ifdef __SKULLSYSTEM__
-	int32_t skullTicks = result->getDataInt("skullendtime") - std::time(NULL);
-	if(skullTicks > 0){
-		int32_t skullType = result->getDataInt("skulltype");
-		if(skullType >= 0 || skullType < SKULL_LAST){
-			//ensure that we round up the number of ticks
-			player->skullTicks = (skullTicks + 2) * 1000;
-			player->setSkull((Skulls_t)skullType);
-		}
+	int32_t skullEndTime = result->getDataInt("skullendtime");
+	int32_t skullType = result->getDataInt("skulltype");
+	int32_t unjustKillTicks = result->getDataInt("unjustkilltime");
+
+	if(skullEndTime < std::time(NULL) && skullType >= 0 || skullType < SKULL_LAST){
+		player->skullEndTime = skullEndTime;
+		player->unjustKillTicks = unjustKillTicks;
+		player->skullType =(Skulls_t)skullType;
 	}
 #endif
 
@@ -497,19 +497,19 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	<< ", `stamina` = " << player->stamina;
 
 #ifdef __SKULLSYSTEM__
-	int32_t skullEndTime = 0;
 	Skulls_t skullType = SKULL_NONE;
+	int64_t unjustKillTicks = 0;
+	int64_t skullEndTime = 0;
 
 	if(player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK){
-		if(player->skullTicks > 0){
-			skullEndTime = std::time(NULL) + player->skullTicks / 1000;
-		}
-		
 		skullType = player->getSkull();
+		skullEndTime = player->skullEndTime;
+		unjustKillTicks = player->unjustKillTicks;
 	}
 
-	query << ", `skullendtime` = " << skullEndTime;
 	query << ", `skulltype` = " << skullType;
+	query << ", `skullendtime` = " << player->skullEndTime;
+	query << ", `unjustkilltime` = " << unjustKillTicks;
 #endif
 
 	query << " WHERE `id` = " << player->getGUID();

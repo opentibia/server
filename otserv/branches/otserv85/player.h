@@ -409,7 +409,7 @@ public:
 		{if(client) client->sendCreatureSkull(creature);}
 	void checkSkullTicks(int32_t ticks);
 	uint32_t getFrags();
-	int64_t getSkullTicks() const {return skullTicks;}
+	int64_t getUnjustKillTicks() const {return unjustKillTicks;}
 #endif
 
 	void checkRecentlyGainedExperience(uint32_t interval);
@@ -828,8 +828,9 @@ protected:
 	uint32_t editListId;
 
 #ifdef __SKULLSYSTEM__
-	int64_t skullTicks;
 	Skulls_t skullType;
+	int64_t skullEndTime;
+	int64_t unjustKillTicks;
 	typedef std::set<uint32_t> AttackedSet;
 	AttackedSet attackedSet;
 #endif

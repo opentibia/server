@@ -176,7 +176,8 @@ Creature()
 	setParty(NULL);
 
 #ifdef __SKULLSYSTEM__
-	skullTicks = 0;
+	unjustKillTicks = 0;
+	skullEndTime = 0;
 	skullType = SKULL_NONE;
 #endif
 
@@ -4063,35 +4064,35 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
-	skullTicks += g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION);
+	unjustKillTicks += g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION);
 
-	if(skullTicks > (g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
-		skullTicks = g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
+	if(unjustKillTicks > (g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
+		skullEndTime = g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
 		setSkull(SKULL_BLACK);
 		g_game.updateCreatureSkull(this);
 	}
-	else if(skullTicks > (g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
-		skullTicks = g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
+	else if(unjustKillTicks > (g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
+		skullEndTime = g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
 		setSkull(SKULL_BLACK);
 		g_game.updateCreatureSkull(this);
 	}
-	else if(skullTicks > (g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
-		skullTicks = g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
+	else if(unjustKillTicks > (g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
+		skullEndTime = g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
 		setSkull(SKULL_BLACK);
 		g_game.updateCreatureSkull(this);
 	}
-	else if(skullTicks > (g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
-		skullTicks = g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
+	else if(unjustKillTicks > (g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
+		skullEndTime = g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
 	}
-	else if(skullTicks > (g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
-		skullTicks = g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
+	else if(unjustKillTicks > (g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
+		skullEndTime = g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
 	}
-	else if(skullTicks > (g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
-		skullTicks = g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
+	else if(unjustKillTicks > (g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL)) * g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)){
+		skullEndTime = g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
 	}
@@ -4099,11 +4100,16 @@ void Player::addUnjustifiedDead(const Player* attacked)
 
 void Player::checkSkullTicks(int32_t ticks)
 {
-	if(skullTicks - ticks > 0)
-		skullTicks = skullTicks - ticks;
-
-	if(skullTicks < 1000 && !hasCondition(CONDITION_INFIGHT) && getSkull() != SKULL_NONE){
-		skullTicks = 0;
+	if(unjustKillTicks - ticks > 0){
+		unjustKillTicks = unjustKillTicks - ticks;
+	}
+	else{
+		unjustKillTicks = 0;
+	}
+	
+	if(skullEndTime > std::time(NULL) && !hasCondition(CONDITION_INFIGHT) && getSkull() != SKULL_NONE){
+		skullEndTime = 0;
+		unjustKillTicks = 0;
 		setSkull(SKULL_NONE);
 		g_game.updateCreatureSkull(this);
 	}
@@ -4364,10 +4370,10 @@ void Player::checkIdleTime(uint32_t ticks)
 uint32_t Player::getFrags()
 {
 	uint32_t frags;
-	if(skullTicks <= 0)
+	if(unjustKillTicks <= 0)
 		frags = 0;
 	else
-		frags = (uint32_t)std::ceil(((double)skullTicks / g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)));
+		frags = (uint32_t)std::ceil(((double)unjustKillTicks / g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION)));
 
 	return frags;
 }

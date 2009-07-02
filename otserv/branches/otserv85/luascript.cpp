@@ -1881,7 +1881,7 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			break;
 		case PlayerInfoSkullTicks:
 			#ifdef __SKULLSYSTEM__
-			value = player->getSkullTicks();
+			value = player->getUnjustKillTicks();
 			#else
 			value = 0;
 			#endif
