@@ -1566,7 +1566,7 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, const std::string& param)
 {
 	Player* player = creature->getPlayer();
-	if(!player){
+	if(!player || player->getSkull() == SKULL_BLACK){
 		return false;
 	}
 
@@ -2078,7 +2078,7 @@ bool RuneSpell::Illusion(const RuneSpell* spell, Creature* creature, Item* item,
 bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo)
 {
 	Player* player = creature->getPlayer();
-	if(!player){
+	if(!player || player->getSkull() == SKULL_BLACK){
 		return false;
 	}
 

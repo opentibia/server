@@ -4017,7 +4017,7 @@ Skulls_t Player::getSkullClient(const Player* player) const
 	}
 
 	if(getSkull() != SKULL_NONE && player->getSkull() != SKULL_RED && player->getSkull() != SKULL_BLACK){
-		if(player->hasAttacked(this) ){
+		if(player->hasAttacked(this)){
 			return SKULL_YELLOW;
 		}
 	}

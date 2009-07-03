@@ -372,7 +372,8 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 
 			if(const Player* attackerPlayer = attacker->getPlayer()){
 				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer) ||
-					attackerPlayer->isLoginAttackLocked(targetPlayer->getID())){
+					attackerPlayer->isLoginAttackLocked(targetPlayer->getID()) ||
+						(attackerPlayer->getSkull() == SKULL_BLACK && targetPlayer->getSkull() == SKULL_NONE)){
 					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
 			}
