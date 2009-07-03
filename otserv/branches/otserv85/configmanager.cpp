@@ -150,9 +150,9 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confFloat[STAMINA_EXTRA_EXPERIENCE_RATE] = getGlobalFloat(L, "stamina_extra_experience_rate", 0.5);
 	m_confInteger[HOTKEYS] = getGlobalBoolean(L, "enablehotkeys", false);
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);
-	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalBoolean(L, "saveclientdebug", false);
-	m_confInteger[CHECK_ACCOUNTS] = getGlobalBoolean(L, "checkaccounts", false);
-	m_confInteger[USE_ACCBALANCE] = getGlobalBoolean(L, "useaccbalance", false);
+	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalBoolean(L, "saveclientdebug", true);
+	m_confInteger[CHECK_ACCOUNTS] = getGlobalBoolean(L, "checkaccounts", true);
+	m_confInteger[USE_ACCBALANCE] = getGlobalBoolean(L, "useaccbalance", true);
 	m_confInteger[PREMIUM_ONLY_BEDS] = getGlobalBoolean(L, "premonlybeds", true);
 	m_confInteger[UNJUST_SKULL_DURATION] = getGlobalNumber(L, "unjust_skull_duration", 15*60*1000);
 	m_confInteger[UNJUST_KILL_DURATION] = getGlobalNumber(L, "unjust_kill_duration", 12*60*60*1000);

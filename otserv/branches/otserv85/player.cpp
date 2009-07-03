@@ -2419,7 +2419,10 @@ void Player::preSave()
 			mana = manaMax;
 		}
 		else{
-			health = 40;
+			if(healthMax >= 40)
+				health = 40;
+			else
+				health = healthMax;
 			mana = 0;
 		}
 	}

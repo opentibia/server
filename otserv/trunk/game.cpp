@@ -190,7 +190,7 @@ void Game::saveGameState()
 	ScriptEnviroment::saveGameState();
 }
 
-bool Game::saveServer(bool payHouses, bool shallowSave)
+bool Game::saveServer(bool payHouses, bool shallowSave /*=false*/)
 {
 	uint64_t start = OTSYS_TIME();
 

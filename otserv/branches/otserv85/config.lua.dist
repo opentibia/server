@@ -99,7 +99,7 @@ houserentperiod = "monthly"
 premonlybeds = false
 
 -- Should the server use account balance system or depot system for paying houses?
-useaccbalance = false
+useaccbalance = true
 
 -- How long time the red skull will last
 red_skull_duration = 30*24*60*60*1000
@@ -119,15 +119,9 @@ kills_per_week_red_skull = 5
 kills_per_month_red_skull = 10
 
 -- How many players you need to kill to gain a black skull per day/week/month
-kills_per_day_red_skull = 6
-kills_per_week_red_skull = 10
-kills_per_month_red_skull = 20
-
--- How many players you need to kill to get banished
-frags_to_banishment = 6
-
--- Time in seconds a player will be banished for excessive killing
-kill_ban_time = 24*60*60*30
+kills_per_day_black_skull = 6
+kills_per_week_black_skull = 10
+kills_per_month_black_skull = 20
 
 -- Broadcast violation window banishments
 broadcast_banishments = "no"
@@ -201,7 +195,6 @@ allow_gamemaster_multiclient = false
 -- despawn configs
 -- how many floors can a monster go from his spawn before despawning
 despawnrange = 2
-
 -- how many square metters can a monster be far from his spawn before despawning
 despawnradius = 50
 
@@ -216,7 +209,7 @@ motd = "Welcome to OTServ 0.6.3!"
 motdnum = "1"
 
 -- login message
-loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otserv.org"
+loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otserv.org."
 
 -- how many logins attempts until ip is temporary disabled 
 -- set to 0 to disable
@@ -232,13 +225,13 @@ logintimeout = 60 * 1000
 allowclones = false
 
 -- only one player online per account
-checkaccounts = false
+checkaccounts = true
 
 -- max number of players allowed
 maxplayers = "900"
 
 -- save client debug assertion reports
-saveclientdebug = false
+saveclientdebug = true
 
 -- Set the max query interval for retrieving status information
 -- default: 5 minutes / IP
