@@ -417,6 +417,7 @@ public:
 	bool addOutfit(uint32_t outfitId, uint32_t addons);
 	bool removeOutfit(uint32_t outfitId, uint32_t addons);
 	bool canLogout();
+	void broadcastLoot(Creature* creature, Container* corpse);
 
 	//tile
 	//send methods

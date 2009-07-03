@@ -4386,3 +4386,14 @@ uint32_t Player::getFrags()
 
 	return frags;
 }
+
+void Player::broadcastLoot(Creature* creature, Container* corpse)
+{
+	std::ostringstream os;
+	os << "Loot of " << creature->getNameDescription() << ": " << corpse->getContentDescription();
+	sendTextMessage(MSG_INFO_DESCR, os.str());
+	
+	//send message to party channel
+	if(getParty())
+		getParty()->broadcastLoot(creature, corpse)
+}

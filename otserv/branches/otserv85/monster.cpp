@@ -1318,9 +1318,8 @@ void Monster::dropLoot(Container* corpse)
 	if(corpse && lootDrop){
 		mType->createLoot(corpse);
 		Player* killer = g_game.getPlayerByID(corpse->getCorpseOwner());
-		if(killer && killer->getParty()){
-			killer->getParty()->broadcastLoot(this, corpse->getContainer());
-		}
+		if(killer)
+			killer->broadcastLoot(this, corpse->getContainer());
 	}
 }
 

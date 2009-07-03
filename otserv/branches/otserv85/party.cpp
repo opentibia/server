@@ -340,9 +340,8 @@ void Party::broadcastPartyMessage(MessageClasses msgClass, const std::string& ms
 void Party::broadcastLoot(Creature* creature, Container* corpse)
 {
 	std::ostringstream os;
-
-	os << "Loot of " << creature->getName() << ": " << corpse->getContentDescription();
-
+	os << "Loot of " << creature->getNameDescription() << ": " << corpse->getContentDescription();
+	
 	ChatChannel* channel = g_chat.getChannel(this);
 	if(channel)
 		channel->sendInfo(SPEAK_CHANNEL_W, os.str(), std::time(NULL));
