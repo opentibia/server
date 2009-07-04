@@ -46,7 +46,7 @@ status_port = "7171"
 admin_port = "7171"
 
 -- server url
-url = "http://otserv.org"
+url = "http://otfans.net"
 
 -- server owner name
 ownername = "Tliff"
@@ -209,7 +209,7 @@ motd = "Welcome to OTServ 0.6.3!"
 motdnum = "1"
 
 -- login message
-loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otserv.org."
+loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otfans.net."
 
 -- how many logins attempts until ip is temporary disabled 
 -- set to 0 to disable

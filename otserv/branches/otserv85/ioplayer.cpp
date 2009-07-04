@@ -136,7 +136,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	if(skullEndTime < std::time(NULL) && skullType >= 0 || skullType < SKULL_LAST){
 		player->skullEndTime = skullEndTime;
 		player->unjustKillTicks = unjustKillTicks;
-		player->skullType =(Skulls_t)skullType;
+		player->skullType = (Skulls_t)skullType;
 	}
 #endif
 

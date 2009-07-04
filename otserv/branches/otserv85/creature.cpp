@@ -983,15 +983,16 @@ void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t 
 {
 	lastDamageSource = combatType;
 	changeHealth(-damage);
-	if(attacker){
+	if(attacker)
 		attacker->onAttackedCreatureDrainHealth(this, damage);
-	}
 }
 
 void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 {
 	onAttacked();
 	changeMana(-manaLoss);
+	if(attacker)
+		attacker->onAttackedCreatureDrainMana(this, manaLoss);
 }
 
 BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
@@ -1289,6 +1290,22 @@ void Creature::onIdleStatus()
 void Creature::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	target->addDamagePoints(this, points);
+	onAttackedCreatureDrain(target, points);
+}
+
+void Creature::onAttackedCreatureDrainMana(Creature* target, int32_t manaLoss)
+{
+	onAttackedCreatureDrain(target, manaLoss);
+}
+
+void Creature::onAttackedCreatureDrain(Creature* target, int32_t points)
+{
+	if(isPlayerSummon()){
+		Player* player = getMaster()->getPlayer();
+		std::stringstream ss;
+		ss << "Your " << getName() << " deals " << points << " damage to " << target->getNameDescription() << ".";
+		player->sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+	}
 }
 
 void Creature::onTargetCreatureGainHealth(Creature* target, int32_t points)

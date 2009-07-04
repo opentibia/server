@@ -3717,13 +3717,25 @@ void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	Creature::onAttackedCreatureDrainHealth(target, points);
 
-	if(target && getParty() && !Combat::isPlayerCombat(target) ){
+	if(target && getParty() && !Combat::isPlayerCombat(target)){
 		Monster* tmpMonster = target->getMonster();
-		if( tmpMonster && tmpMonster->isHostile()){
+		if(tmpMonster && tmpMonster->isHostile()){
 			//We have fulfilled a requirement for shared experience
 			getParty()->addPlayerDamageMonster(this, points);
 		}
 	}
+}
+
+void Player::onAttackedCreatureDrainMana(Creature* target, int32_t manaLoss)
+{
+	Creature::onAttackedCreatureDrainMana(target, manaLoss);
+}
+
+void Player::onAttackedCreatureDrain(Creature* target, int32_t points)
+{
+	std::stringstream ss;
+	ss << "You deal " << points << " damage to " << target->getNameDescription() << ".";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
 void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
@@ -3738,7 +3750,7 @@ void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
 			tmpPlayer = target->getMaster()->getPlayer();
 		}
 
-		if( isPartner(tmpPlayer) ){
+		if(isPartner(tmpPlayer)){
 			//We have fulfilled a requirement for shared experience
 			getParty()->addPlayerHealedMember(this, points);
 		}
@@ -4395,5 +4407,5 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 	
 	//send message to party channel
 	if(getParty())
-		getParty()->broadcastLoot(creature, corpse)
+		getParty()->broadcastLoot(creature, corpse);
 }

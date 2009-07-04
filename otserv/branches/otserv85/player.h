@@ -374,6 +374,8 @@ public:
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t manaLoss);
+	virtual void onAttackedCreatureDrain(Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target, bool lastHit);
 	virtual void onGainExperience(uint64_t gainExp);
