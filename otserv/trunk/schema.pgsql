@@ -258,7 +258,7 @@ CREATE TABLE "schema_info" (
 	PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 16);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 17);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER

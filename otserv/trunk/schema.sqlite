@@ -246,7 +246,7 @@ CREATE TABLE "schema_info" (
 	UNIQUE ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 16);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 17);
 
 CREATE TRIGGER "oncreate_guilds"
 AFTER INSERT ON "guilds"
