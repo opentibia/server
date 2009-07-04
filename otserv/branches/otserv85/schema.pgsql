@@ -55,7 +55,6 @@ CREATE TABLE "players" (
 	"conditions" BYTEA NOT NULL,
 	"skull_type" SMALLINT NOT NULL DEFAULT 0,
 	"skull_endtime" BIGINT NOT NULL DEFAULT 0,
-	"unjust_kill_time" BIGINT NOT NULL DEFAULT 0,
 	"guildnick" VARCHAR(255) NOT NULL DEFAULT '',
 	"loss_experience" INT NOT NULL DEFAULT 100,
 	"loss_mana" INT NOT NULL DEFAULT 100,

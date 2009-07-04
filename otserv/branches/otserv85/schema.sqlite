@@ -53,7 +53,6 @@ CREATE TABLE "players" (
 	"conditions" BLOB NOT NULL,
 	"skull_type" BOOLEAN NOT NULL DEFAULT 0,
 	"skull_endtime" INTEGER NOT NULL DEFAULT 0,
-	"unjust_kill_time" INTEGER NOT NULL DEFAULT 0,
 	"guildnick" VARCHAR(255) NOT NULL DEFAULT '',
 	"loss_experience" INTEGER NOT NULL DEFAULT 100,
 	"loss_mana" INTEGER NOT NULL DEFAULT 100,
