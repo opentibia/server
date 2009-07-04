@@ -2115,8 +2115,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 				if(violationReasons[violation] > 0)
 				{
 					msg->AddByte(0x0B);
-					for(int32_t i = 0; i <= 22; i++)
-					{
+					for(int32_t i = 0; i <= violationReasons[4]; i++){
 						if(i <= violationReasons[1])
 							msg->AddByte(violationNames[violation]);
 						else if(i <= violationReasons[violation])

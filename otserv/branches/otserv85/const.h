@@ -440,15 +440,15 @@ enum PlayerFlags{
 
 enum ViolationActions_t
 {
-	Action_None			= 0,
-	Action_Notation			= 1 << 0,
-	Action_Namelock			= 1 << 1,
-	Action_Banishment		= 1 << 2,
-	Action_NamelockBan		= 1 << 3,
-	Action_BanFinalWarning		= 1 << 4,
-	Action_NamelockBanFinalWarning	= 1 << 5,
-	Action_StatementReport		= 1 << 6,
-	Action_IpBan			= 1 << 7
+	Action_None                     = 0,
+	Action_Notation                 = 1 << 0,
+	Action_Namelock                 = 1 << 1,
+	Action_Banishment               = 1 << 2,
+	Action_NamelockBan              = 1 << 3,
+	Action_BanFinalWarning          = 1 << 4,
+	Action_NamelockBanFinalWarning  = 1 << 5,
+	Action_StatementReport          = 1 << 6,
+	Action_IpBan                    = 1 << 7
 };
 
 const int32_t violationReasons[5] =
@@ -457,7 +457,7 @@ const int32_t violationReasons[5] =
 	3,	//all name reasons
 	9,	//all name & statement reasons
 	18,	//all name, statement & cheating reasons
-	22	//all reasons
+	19	//all name, statement & cheating reasons & ip-banishment
 };
 
 const int32_t violationNames[5] =
