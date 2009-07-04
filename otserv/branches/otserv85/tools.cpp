@@ -672,12 +672,6 @@ std::string getViolationReasonString(int32_t reasonId)
 			return "False Report to Gamemaster";
 		case 19:
 			return "Destructive Behaviour";
-		case 20:
-			return "Excessive Unjustified Player Killing";
-		case 21:
-			return "Invalid Payment";
-		case 22:
-			return "Spoiling Auction";
 	}
 
 	return "Unknown Reason";
