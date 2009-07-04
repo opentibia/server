@@ -1880,11 +1880,7 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			#endif
 			break;
 		case PlayerInfoSkullTicks:
-			#ifdef __SKULLSYSTEM__
-			value = player->getUnjustKillTicks();
-			#else
 			value = 0;
-			#endif
 			break;
 		case PlayerInfoBalance:
 		{
@@ -7226,7 +7222,7 @@ int LuaScriptInterface::luaGetPlayerFrags(lua_State *L)
 
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		lua_pushnumber(L, player->getFrags());
+		lua_pushnumber(L, 0);
 	}
 	else
 	{

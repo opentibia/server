@@ -131,11 +131,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 #ifdef __SKULLSYSTEM__
 	int32_t skullType = result->getDataInt("skull_type");
 	int32_t skullEndTime = result->getDataInt("skull_endtime");
-	int32_t unjustKillTicks = result->getDataInt("unjust_kill_time");
 
 	if(skullEndTime < std::time(NULL) && skullType >= 0 || skullType < SKULL_LAST){
 		player->skullEndTime = skullEndTime;
-		player->unjustKillTicks = unjustKillTicks;
 		player->skullType = (Skulls_t)skullType;
 	}
 #endif
@@ -498,18 +496,15 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 
 #ifdef __SKULLSYSTEM__
 	Skulls_t skullType = SKULL_NONE;
-	int64_t unjustKillTicks = 0;
 	int64_t skullEndTime = 0;
 
 	if(player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK){
 		skullType = player->getSkull();
 		skullEndTime = player->skullEndTime;
-		unjustKillTicks = player->unjustKillTicks;
 	}
 
 	query << ", `skull_type` = " << skullType;
 	query << ", `skull_endtime` = " << player->skullEndTime;
-	query << ", `unjust_kill_time` = " << unjustKillTicks;
 #endif
 
 	query << " WHERE `id` = " << player->getGUID();
@@ -669,6 +664,36 @@ bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
 	db.freeResult(result);
 	return true;
 }
+
+/*
+bool IOPlayer::getPlayerUnjustKillCount(Player* player, uin64_t date)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "";
+	query << "SELECT COUNT(*)";
+	query << "FROM";
+	query << "player_killers";
+	query << "LEFT JOIN";
+	query << "killers ON killers.id = player_killers.kill_id";
+	query << "LEFT JOIN";
+	query << "player_deaths on player_deaths.id = killers.death_id";
+	query << "LEFT JOIN";
+	query << "players on players.id = player_deaths.player_id";
+	query << "WHERE";
+	query << "player_killers.player_id = " << player->getGUID() << " AND " << date  << "> player_deaths.date";
+
+	if(!(result = db->storeQuery(query.str())))
+		return false;
+
+	name = result->getDataString("name");
+	nameCacheMap[guid] = name;
+	db->freeResult(result);
+	return true;
+}
+*/
 
 bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 {

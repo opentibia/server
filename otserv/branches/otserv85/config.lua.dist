@@ -107,9 +107,6 @@ red_skull_duration = 30*24*60*60*1000
 -- How long time the black skull will last
 black_skull_duration = 45*24*60*60*1000
 
--- How long one kill adds to your red skull time
-unjust_kill_duration = 12*60*60*1000
-	
 -- White skull duration, how long a player will get pz locked/white skull
 unjust_skull_duration = 15*60*1000
 

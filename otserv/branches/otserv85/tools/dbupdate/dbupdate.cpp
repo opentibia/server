@@ -657,12 +657,7 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 18,
 		{ // PgSql
-			"ALTER TABLE `players` ADD COLUMN `unjust_kill_time_tmp` BIGINT;",
-			"UPDATE      `players` SET `unjust_kill_time_tmp` = `redskulltime`;",
 			"ALTER TABLE `players` DROP COLUMN `redskulltime`;",
-			"ALTER TABLE `players` ALTER COLUMN `unjust_kill_time_tmp` SET NOT NULL;", 
-			"ALTER TABLE `players` ALTER COLUMN `unjust_kill_time_tmp` SET DEFAULT 0;",
-			"ALTER TABLE `players` RENAME COLUMN `unjust_kill_time_tmp` TO `unjust_kill_time`;",
 
 			"ALTER TABLE `players` ADD COLUMN `skull_type_tmp` SMALLINT;",
 			"UPDATE      `players` SET `skull_type_tmp` = 4 WHERE `redskull` = 1;",
@@ -677,7 +672,7 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		},
 		{ // MySql
-			"ALTER TABLE `players` CHANGE `redskulltime` `unjust_kill_time` INT UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `players` DROP COLUMN `redskulltime`;",
 			"ALTER TABLE `players` CHANGE `redskull` `skull_type` INT NOT NULL DEFAULT 0;",
 			"UPDATE      `players` SET `skull_type` = 4 WHERE `skull_type` = 1;",
 			"ALTER TABLE `players` ADD `skull_endtime` INT UNSIGNED NOT NULL DEFAULT 0;",
