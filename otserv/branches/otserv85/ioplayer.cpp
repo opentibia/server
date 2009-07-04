@@ -49,7 +49,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_endtime`, \
-		`skull_type`, `unjust_kill_time`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
+		`skull_type`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
 		`loss_items`, `loss_containers`, `rank_id`, `town_id`, `balance`, `stamina` \
 		FROM `players` LEFT JOIN `accounts` ON `account_id` = `accounts`.`id` \
 		WHERE `players`.`name` = " + db->escapeString(name);
