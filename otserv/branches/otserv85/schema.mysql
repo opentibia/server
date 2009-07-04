@@ -264,7 +264,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 16);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 18);
 
 DELIMITER |
 
