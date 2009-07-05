@@ -256,7 +256,8 @@ public:
 	void setMaster(Creature* creature) {master = creature;}
 	Creature* getMaster() {return master;}
 	bool isSummon() const {return master != NULL;}
-	bool isPlayerSummon() const {return master != NULL && master->getPlayer();}
+	bool isPlayerSummon() const {return master != NULL && master->getPlayer() != NULL;}
+	Player* getPlayerMaster() const {return (isPlayerSummon() ? master->getPlayer() : NULL);}
 	const Creature* getMaster() const {return master;}
 
 	virtual void addSummon(Creature* creature);
@@ -289,7 +290,7 @@ public:
 
 	virtual void gainHealth(Creature* caster, int32_t healthGain);
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void drainMana(Creature* attacker, int32_t points);
 
 	virtual bool challengeCreature(Creature* creature) {return false;};
 	virtual bool convinceCreature(Creature* creature) {return false;};
@@ -310,8 +311,9 @@ public:
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
-	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t manaLoss);
-	virtual void onAttackedCreatureDrain(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points) {};
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points) {};
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target, bool lastHit);

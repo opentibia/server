@@ -1580,7 +1580,7 @@ void Player::onChangeZone(ZoneType_t zone)
 		}
 		else if(zone == ZONE_NOPVP){
 			if( (attackedCreature->getPlayer() ||
-					(attackedCreature->getMaster() && attackedCreature->getMaster()->getPlayer()) ) &&
+					(attackedCreature->isPlayerSummon()) ) &&
 					!hasFlag(PlayerFlag_IgnoreProtectionZone)){
 				setAttackedCreature(NULL);
 				onAttackedCreatureDissapear(false);
@@ -1985,18 +1985,18 @@ void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t da
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
-void Player::drainMana(Creature* attacker, int32_t manaLoss)
+void Player::drainMana(Creature* attacker, int32_t points)
 {
-	Creature::drainMana(attacker, manaLoss);
+	Creature::drainMana(attacker, points);
 
 	sendStats();
 
 	std::stringstream ss;
 	if(attacker){
-		ss << "You lose " << manaLoss << " mana blocking an attack by " << attacker->getNameDescription() << ".";
+		ss << "You lose " << points << " mana blocking an attack by " << attacker->getNameDescription() << ".";
 	}
 	else{
-		ss << "You lose " << manaLoss << " mana.";
+		ss << "You lose " << points << " mana.";
 	}
 
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
@@ -3723,17 +3723,32 @@ void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 			getParty()->addPlayerDamageMonster(this, points);
 		}
 	}
-}
 
-void Player::onAttackedCreatureDrainMana(Creature* target, int32_t manaLoss)
-{
-	Creature::onAttackedCreatureDrainMana(target, manaLoss);
-}
-
-void Player::onAttackedCreatureDrain(Creature* target, int32_t points)
-{
 	std::stringstream ss;
 	ss << "You deal " << points << " damage to " << target->getNameDescription() << ".";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+}
+
+void Player::onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points)
+{
+	std::stringstream ss;
+	ss << "Your " << summon->getName() << " deals " << points << " damage to " << target->getNameDescription() << ".";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+}
+
+void Player::onAttackedCreatureDrainMana(Creature* target, int32_t points)
+{
+	Creature::onAttackedCreatureDrainMana(target, points);
+
+	std::stringstream ss;
+	ss << "You drain " << points << " mana from " << target->getNameDescription() << ".";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+}
+
+void Player::onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points)
+{
+	std::stringstream ss;
+	ss << "Your " << summon->getName() << " drain " << points << " mana from " << target->getNameDescription() << ".";
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
@@ -3745,8 +3760,8 @@ void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
 		if(target->getPlayer()){
 			tmpPlayer = target->getPlayer();
 		}
-		else if(target->getMaster() && target->getMaster()->getPlayer()){
-			tmpPlayer = target->getMaster()->getPlayer();
+		else if(target->isPlayerSummon()){
+			tmpPlayer = target->getPlayerMaster();
 		}
 
 		if(isPartner(tmpPlayer)){
@@ -4087,7 +4102,10 @@ void Player::addUnjustifiedDead(const Player* attacked)
 
 	/*
 	//day
-	uint32_t unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 24 * 60 * 60);
+	//The overlap buffer is using this formula: (2 * hours / (max_kills + 1))
+	//12 hour overlap for 24 hours, 42 hours for 7 days and 80 hours for a month.
+	uint32_t overlap_time = 12 * 60 * 60
+	uint32_t unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 24 * 60 * 60 + overlap_time);
 	if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) ){
 		skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
 		setSkull(SKULL_BLACK);
@@ -4100,7 +4118,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 	else{
 		//week
-		unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 7 * 24 * 60 * 60);
+		overlap_time = 42 * 60 * 60
+		unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 7 * 24 * 60 * 60 + overlap_time);
 		if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) ){
 			skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
 			setSkull(SKULL_BLACK);
@@ -4113,7 +4132,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 		}
 		else{
 			//month
-			int32_t unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 30 * 24 * 60 * 60);
+			overlap_time = 80 * 60 * 60
+			unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 30 * 24 * 60 * 60 + overlap_time);
 			if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) ){
 				skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
 				setSkull(SKULL_BLACK);

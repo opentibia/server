@@ -349,7 +349,7 @@ public:
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void drainMana(Creature* attacker, int32_t points);
 	void addManaSpent(uint32_t amount, bool useMultiplier = true);
 	void addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier = true);
 
@@ -374,8 +374,9 @@ public:
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
-	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t manaLoss);
-	virtual void onAttackedCreatureDrain(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target, bool lastHit);
 	virtual void onGainExperience(uint64_t gainExp);

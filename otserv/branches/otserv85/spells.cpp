@@ -714,7 +714,7 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 
 #ifdef __SKULLSYSTEM__
 	if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
-		//player->sendCancelMessage(RET_);
+		player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
@@ -825,7 +825,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 
 #ifdef __SKULLSYSTEM__
 			if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
-				//player->sendCancelMessage(RET_);
+				player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
@@ -1081,13 +1081,13 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 		bool useDirection = false;
 
 		if(hasParam){
-			Player* playerTarget = NULL;
-			ReturnValue ret = g_game.getPlayerByNameWildcard(param, playerTarget);
-			target = playerTarget;
+			Player* targetPlayer = NULL;
+			ReturnValue ret = g_game.getPlayerByNameWildcard(param, targetPlayer);
+			target = targetPlayer;
 
 			if(!target || target->getHealth() <= 0){
 				if(!casterTargetOrDirection){
-					player->sendCancelMessage(ret);//RET_PLAYERWITHTHISNAMEISNOTONLINE);
+					player->sendCancelMessage(ret);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
@@ -1566,7 +1566,12 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, const std::string& param)
 {
 	Player* player = creature->getPlayer();
-	if(!player || player->getSkull() == SKULL_BLACK){
+	if(!player){
+		return false;
+	}
+
+	if(player->getSkull() == SKULL_BLACK){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
@@ -2078,11 +2083,16 @@ bool RuneSpell::Illusion(const RuneSpell* spell, Creature* creature, Item* item,
 bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo)
 {
 	Player* player = creature->getPlayer();
-	if(!player || player->getSkull() == SKULL_BLACK){
+	if(!player){
 		return false;
 	}
 
 	if(!player->hasFlag(PlayerFlag_CanConvinceAll)){
+		if(player->getSkull() == SKULL_BLACK){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			return false;
+		}
+
 		if(player->getSummonCount() >= 2){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);

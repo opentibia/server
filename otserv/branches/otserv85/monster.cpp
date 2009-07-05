@@ -309,8 +309,8 @@ bool Monster::isFriend(const Creature* creature)
 		if(creature->getPlayer()){
 			tmpPlayer = creature->getPlayer();
 		}
-		else if(creature->getMaster() && creature->getMaster()->getPlayer()){
-			tmpPlayer = creature->getMaster()->getPlayer();
+		else if(creature->isPlayerSummon()){
+			tmpPlayer = creature->getPlayerMaster();
 		}
 
 		if(tmpPlayer && (tmpPlayer == getMaster() || masterPlayer->isPartner(tmpPlayer)) ){
@@ -335,7 +335,7 @@ bool Monster::isOpponent(const Creature* creature)
 	}
 	else{
 		if( (creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
-			(creature->getMaster() && creature->getMaster()->getPlayer()) ) {
+			(creature->isPlayerSummon()) ) {
 			return true;
 		}
 	}
@@ -1192,8 +1192,8 @@ Item* Monster::createCorpse()
 			if(mostDamageCreature->getPlayer()){
 				corpseOwner = mostDamageCreature->getPlayer();
 			}
-			else if(mostDamageCreature->getMaster() && mostDamageCreature->getMaster()->getPlayer()){
-				corpseOwner = mostDamageCreature->getMaster()->getPlayer();
+			else if(mostDamageCreature->isPlayerSummon()){
+				corpseOwner = mostDamageCreature->getPlayerMaster();
 			}
 
 			if(corpseOwner != NULL){

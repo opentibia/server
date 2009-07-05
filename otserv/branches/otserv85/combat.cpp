@@ -290,15 +290,22 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 	}
 
 #ifdef __SKULLSYSTEM__
-	if(player->hasSafeMode() && target->getPlayer()) {
-		if(player->getParty()) {
-			if(player->getParty()->isPlayerMember(target->getPlayer()) || player->getParty()->getLeader() == target) {
-				return Combat::canDoCombat(player, target);
+	if(const Player* targetPlayer = target->getPlayer()){
+		if(player->hasSafeMode()){
+			if(player->getParty()){
+				if(player->getParty()->isPlayerMember(targetPlayer) || player->getParty()->getLeader() == targetPlayer){
+					return Combat::canDoCombat(player, targetPlayer);
+				}
+			}
+			if(targetPlayer->getSkull() == SKULL_NONE) {
+				if(!Combat::isInPvpZone(player, targetPlayer)){
+					return RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
+				}
 			}
 		}
-		if(target->getPlayer()->getSkull() == SKULL_NONE) {
-			if(!Combat::isInPvpZone(player, target)) {
-				return RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
+		else if(player->getSkull() == SKULL_BLACK){
+			if(targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(player)){
+				return RET_YOUMAYNOTATTACKTHISPERSON;
 			}
 		}
 	}
@@ -372,8 +379,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 
 			if(const Player* attackerPlayer = attacker->getPlayer()){
 				if(attackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer) ||
-					attackerPlayer->isLoginAttackLocked(targetPlayer->getID()) ||
-						(attackerPlayer->getSkull() == SKULL_BLACK && targetPlayer->getSkull() == SKULL_NONE)){
+					attackerPlayer->isLoginAttackLocked(targetPlayer->getID())){
 					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
 			}
@@ -385,6 +391,16 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					}
 				}
 			}
+
+#ifdef __SKULLSYSTEM__
+			if(const Player* attackerPlayer = attacker->getPlayer()){
+				if(targetPlayer->getSkull() == SKULL_BLACK){
+					if(targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(attackerPlayer)){
+						return RET_YOUMAYNOTATTACKTHISPERSON;
+					}
+				}
+			}
+#endif
 		}
 		else if(target->getMonster()){
 			if(const Player* attackerPlayer = attacker->getPlayer()){
