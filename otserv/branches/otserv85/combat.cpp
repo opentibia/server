@@ -681,7 +681,7 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 		if(caster){
 			if(caster->getPlayer()){
 				p_caster = caster->getPlayer();
-			}else if(caster->isSummon()){
+			}else if(caster->isPlayerSummon()){
 				p_caster = caster->getPlayerMaster();
 			}
 		}
