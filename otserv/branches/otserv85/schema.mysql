@@ -54,7 +54,7 @@ CREATE TABLE `players` (
 	`save` TINYINT(1) NOT NULL DEFAULT TRUE,
 	`conditions` BLOB NOT NULL COMMENT 'drunk, poisoned etc',
 	`skull_type` INT NOT NULL DEFAULT 0,
-	`skull_endtime` INT UNSIGNED NOT NULL DEFAULT 0,
+	`skull_time` INT UNSIGNED NOT NULL DEFAULT 0,
 	`guildnick` VARCHAR(255) NOT NULL DEFAULT '',
 	`loss_experience` INT NOT NULL DEFAULT 100,
 	`loss_mana` INT NOT NULL DEFAULT 100,

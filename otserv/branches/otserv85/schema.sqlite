@@ -52,7 +52,7 @@ CREATE TABLE "players" (
 	"save" INTEGER NOT NULL DEFAULT 1,
 	"conditions" BLOB NOT NULL,
 	"skull_type" INTEGER NOT NULL DEFAULT 0,
-	"skull_endtime" INTEGER NOT NULL DEFAULT 0,
+	"skull_time" INTEGER NOT NULL DEFAULT 0,
 	"guildnick" VARCHAR(255) NOT NULL DEFAULT '',
 	"loss_experience" INTEGER NOT NULL DEFAULT 100,
 	"loss_mana" INTEGER NOT NULL DEFAULT 100,

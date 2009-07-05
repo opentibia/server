@@ -831,7 +831,7 @@ protected:
 
 #ifdef __SKULLSYSTEM__
 	Skulls_t skullType;
-	int64_t skullEndTime;
+	int64_t lastSkullTime;
 	typedef std::set<uint32_t> AttackedSet;
 	AttackedSet attackedSet;
 #endif

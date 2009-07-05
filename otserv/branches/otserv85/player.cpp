@@ -176,7 +176,7 @@ Creature()
 	setParty(NULL);
 
 #ifdef __SKULLSYSTEM__
-	skullEndTime = 0;
+	lastSkullTime = 0;
 	skullType = SKULL_NONE;
 #endif
 
@@ -4102,59 +4102,61 @@ void Player::addUnjustifiedDead(const Player* attacked)
 
 	/*
 	//day
-	//The overlap buffer is using this formula: (2 * hours / (max_kills + 1))
-	//12 hour overlap for 24 hours, 42 hours for 7 days and 80 hours for a month.
-	uint32_t overlap_time = 12 * 60 * 60
-	uint32_t unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 24 * 60 * 60 + overlap_time);
+	uint32_t time = std::max(std::time(NULL) - 24 * 60 * 60, lastSkullTime);
+	uint32_t unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - time);
+
 	if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) ){
-		skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
+		lastSkullTime = std::time(NULL);
 		setSkull(SKULL_BLACK);
 		g_game.updateCreatureSkull(this);
 	}
 	else if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL) ){
-		skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
+		lastSkullTime = std::time(NULL);
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
 	}
-	else{
-		//week
-		overlap_time = 42 * 60 * 60
-		unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 7 * 24 * 60 * 60 + overlap_time);
-		if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) ){
-			skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
-			setSkull(SKULL_BLACK);
-			g_game.updateCreatureSkull(this);
-		}
-		else if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL) ){
-			skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
-			setSkull(SKULL_RED);
-			g_game.updateCreatureSkull(this);
-		}
-		else{
-			//month
-			overlap_time = 80 * 60 * 60
-			unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - 30 * 24 * 60 * 60 + overlap_time);
-			if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) ){
-				skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
-				setSkull(SKULL_BLACK);
-				g_game.updateCreatureSkull(this);
-			}
-			else if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) ){
-				skullEndTime = std::time(NULL) + g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
-				setSkull(SKULL_RED);
-				g_game.updateCreatureSkull(this);
-			}
-		}
+
+	//week
+	time = std::max(std::time(NULL) - 7 * 24 * 60 * 60, lastSkullTime);
+	unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - time);
+
+	if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_BLACK);
+		g_game.updateCreatureSkull(this);
+	}
+	else if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL) ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_RED);
+		g_game.updateCreatureSkull(this);
+	}
+
+	//month
+	time = std::max(std::time(NULL) - 30 * 24 * 60 * 60, lastSkullTime);
+	unjustKills = IOPlayer::getPlayerUnjustKillCount(this, std::time(NULL) - time);
+
+	if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_BLACK);
+		g_game.updateCreatureSkull(this);
+	}
+	else if(unjustKills > g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_RED);
+		g_game.updateCreatureSkull(this);
 	}
 	*/
 }
 
 void Player::checkSkullTicks(int32_t ticks)
 {
-	if(skullEndTime > std::time(NULL) && !hasCondition(CONDITION_INFIGHT) && getSkull() != SKULL_NONE){
-		skullEndTime = 0;
-		setSkull(SKULL_NONE);
-		g_game.updateCreatureSkull(this);
+	if(!hasCondition(CONDITION_INFIGHT) && getSkull() != SKULL_NONE){
+		if( (skullType == SKULL_RED && lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION) >= std::time(NULL)) ||
+			(skullType == SKULL_BLACK && lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) >= std::time(NULL)) ){
+			lastSkullTime = 0;
+			setSkull(SKULL_NONE);
+			g_game.updateCreatureSkull(this);
+		}
 	}
 }
 #endif

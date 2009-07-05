@@ -48,7 +48,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`account_id`, `players`.`group_id` as `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
-		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_endtime`, \
+		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
 		`skull_type`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
 		`loss_items`, `loss_containers`, `rank_id`, `town_id`, `balance`, `stamina` \
 		FROM `players` LEFT JOIN `accounts` ON `account_id` = `accounts`.`id` \
@@ -130,10 +130,11 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 #ifdef __SKULLSYSTEM__
 	int32_t skullType = result->getDataInt("skull_type");
-	int32_t skullEndTime = result->getDataInt("skull_endtime");
+	int32_t lastSkullTime = result->getDataInt("skull_time");
 
-	if(skullEndTime < std::time(NULL) && skullType >= 0 || skullType < SKULL_LAST){
-		player->skullEndTime = skullEndTime;
+	if( (skullType == SKULL_RED && lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION) < std::time(NULL)) ||
+		(skullType == SKULL_BLACK && lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) < std::time(NULL)) ){
+		player->lastSkullTime = lastSkullTime;
 		player->skullType = (Skulls_t)skullType;
 	}
 #endif
@@ -495,16 +496,8 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	<< ", `stamina` = " << player->stamina;
 
 #ifdef __SKULLSYSTEM__
-	Skulls_t skullType = SKULL_NONE;
-	int64_t skullEndTime = 0;
-
-	if(player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK){
-		skullType = player->getSkull();
-		skullEndTime = player->skullEndTime;
-	}
-
-	query << ", `skull_type` = " << skullType;
-	query << ", `skull_endtime` = " << player->skullEndTime;
+	query << ", `skull_type` = " << (player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK ? player->getSkull() : 0);
+	query << ", `skull_time` = " << player->lastSkullTime;
 #endif
 
 	query << " WHERE `id` = " << player->getGUID();

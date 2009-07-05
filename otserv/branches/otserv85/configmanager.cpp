@@ -161,8 +161,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[KILLS_PER_DAY_BLACK_SKULL] = getGlobalNumber(L, "kills_per_day_black_skull", 6);
 	m_confInteger[KILLS_PER_WEEK_BLACK_SKULL] = getGlobalNumber(L, "kills_per_week_black_skull", 10);
 	m_confInteger[KILLS_PER_MONTH_BLACK_SKULL] = getGlobalNumber(L, "kills_per_month_black_skull", 20);
-	m_confInteger[RED_SKULL_DURATION] = getGlobalNumber(L, "red_skull_duration", 30*24*60*60*1000);
-	m_confInteger[BLACK_SKULL_DURATION] = getGlobalNumber(L, "red_skull_duration", 45*24*60*60*1000);
+	m_confInteger[RED_SKULL_DURATION] = getGlobalNumber(L, "red_skull_duration", 30*24*60*60*1000ULL);
+	m_confInteger[BLACK_SKULL_DURATION] = getGlobalNumber(L, "red_skull_duration", 45*24*60*60*1000ULL);
 	m_confInteger[REMOVE_AMMUNITION] = getGlobalBoolean(L, "remove_ammunition", true);
 	m_confInteger[REMOVE_RUNE_CHARGES] = getGlobalBoolean(L, "remove_rune_charges", true);
 	m_confInteger[REMOVE_WEAPON_CHARGES] = getGlobalBoolean(L, "remove_weapon_charges", true);
@@ -211,7 +211,7 @@ const std::string& ConfigManager::getString(uint32_t _what) const
 	}
 }
 
-int ConfigManager::getNumber(uint32_t _what) const
+int64_t ConfigManager::getNumber(uint32_t _what) const
 {
 	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
 		return m_confInteger[_what];
@@ -233,7 +233,7 @@ double ConfigManager::getFloat(uint32_t _what) const
 	}
 }
 
-bool ConfigManager::setNumber(uint32_t _what, int _value)
+bool ConfigManager::setNumber(uint32_t _what, int64_t _value)
 {
 	if(_what < LAST_INTEGER_CONFIG)
 	{
@@ -277,7 +277,7 @@ std::string ConfigManager::getGlobalString(lua_State* _L, const std::string& _id
 	return ret;
 }
 
-int ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier, int _default)
+int64_t ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default)
 {
 	lua_getglobal(_L, _identifier.c_str());
 
@@ -286,7 +286,7 @@ int ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier
 		return _default;
 	}
 
-	int val = (int)lua_tonumber(_L, -1);
+	int64_t val = (int64_t)lua_tonumber(_L, -1);
 	lua_pop(_L,1);
 
 	return val;

@@ -666,16 +666,16 @@ SimpleUpdateQuery updateQueries[] = {
 			"ALTER TABLE `players` ALTER COLUMN `skull_type_tmp` SET DEFAULT 0;",
 			"ALTER TABLE `players` RENAME COLUMN `skull_type_tmp` TO `skull_type`;",
 
-			"ALTER TABLE `players` ADD `skull_endtime` BIGINT;",
-			"ALTER TABLE `players` ALTER COLUMN `skull_endtime` SET NOT NULL;", 
-			"ALTER TABLE `players` ALTER COLUMN `skull_endtime` SET DEFAULT 0;",			
+			"ALTER TABLE `players` ADD `skull_time` BIGINT;",
+			"ALTER TABLE `players` ALTER COLUMN `skull_time` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `skull_time` SET DEFAULT 0;",
 			NULL
 		},
 		{ // MySql
 			"ALTER TABLE `players` DROP COLUMN `redskulltime`;",
 			"ALTER TABLE `players` CHANGE `redskull` `skull_type` INT NOT NULL DEFAULT 0;",
 			"UPDATE      `players` SET `skull_type` = 4 WHERE `skull_type` = 1;",
-			"ALTER TABLE `players` ADD `skull_endtime` INT UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `players` ADD `skull_time` INT UNSIGNED NOT NULL DEFAULT 0;",
 			NULL
 		},
 		{ // Sqlite

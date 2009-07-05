@@ -155,14 +155,14 @@ public:
 	void getConfigValue(const std::string& key, lua_State* _L);
 	const std::string& getString(uint32_t _what) const;
 	double getFloat(uint32_t _what) const;
-	int getNumber(uint32_t _what) const;
-	bool setNumber(uint32_t _what, int _value);
+	int64_t getNumber(uint32_t _what) const;
+	bool setNumber(uint32_t _what, int64_t _value);
 	bool setString(uint32_t _what, const std::string& _value);
 
 private:
 	static void moveValue(lua_State* fromL, lua_State* toL);
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
-	int getGlobalNumber(lua_State* _L, const std::string& _identifier, int _default=0);
+	int64_t getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default=0);
 	double getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default=0.0);
 	bool getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default=false);
 
