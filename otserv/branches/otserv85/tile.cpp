@@ -569,7 +569,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 						if( !creature->getMonster() ||
 							!creature->isPushable() ||
-							(creature->getMonster()->isSummon() && creature->getMonster()->getMaster()->getPlayer()))
+							(creature->getMonster()->isPlayerSummon()))
 						{
 							return RET_NOTPOSSIBLE;
 						}

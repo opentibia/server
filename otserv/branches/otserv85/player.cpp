@@ -3748,7 +3748,7 @@ void Player::onAttackedCreatureDrainMana(Creature* target, int32_t points)
 void Player::onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points)
 {
 	std::stringstream ss;
-	ss << "Your " << summon->getName() << " drain " << points << " mana from " << target->getNameDescription() << ".";
+	ss << "Your " << summon->getName() << " drains " << points << " mana from " << target->getNameDescription() << ".";
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 

@@ -303,8 +303,8 @@ void Monster::onCreatureEnter(Creature* creature)
 
 bool Monster::isFriend(const Creature* creature)
 {
-	if(isSummon() && getMaster()->getPlayer()){
-		const Player* masterPlayer = getMaster()->getPlayer();
+	if(isPlayerSummon()){
+		const Player* masterPlayer = getPlayerMaster();
 		const Player* tmpPlayer = NULL;
 		if(creature->getPlayer()){
 			tmpPlayer = creature->getPlayer();
@@ -328,7 +328,7 @@ bool Monster::isFriend(const Creature* creature)
 
 bool Monster::isOpponent(const Creature* creature)
 {
-	if(isSummon() && getMaster()->getPlayer()){
+	if(isPlayerSummon()){
 		if(creature != getMaster()){
 			return true;
 		}
@@ -1383,12 +1383,12 @@ bool Monster::convinceCreature(Creature* creature)
 			return false;
 		}
 	}
-
-	if(isSummon()){
-		if(getMaster()->getPlayer()){
-			return false;
-		}
-		else if(getMaster() != creature){
+	
+	if(isPlayerSummon()){
+		return false;
+	}
+	else if(isSummon()){
+		if(getMaster() != creature){
 			Creature* oldMaster = getMaster();
 			oldMaster->removeSummon(this);
 			creature->addSummon(this);

@@ -247,7 +247,7 @@ bool Combat::isPlayerCombat(const Creature* target)
 		return true;
 	}
 
-	if(target->isSummon() && target->getMaster()->getPlayer()){
+	if(target->isPlayerSummon()){
 		return true;
 	}
 
@@ -382,25 +382,20 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					attackerPlayer->isLoginAttackLocked(targetPlayer->getID())){
 					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
-			}
-
-			if(attacker->isSummon()){
-				if(const Player* masterAttackerPlayer = attacker->getMaster()->getPlayer()){
-					if(masterAttackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
-						return RET_YOUMAYNOTATTACKTHISPERSON;
-					}
-				}
-			}
-
 #ifdef __SKULLSYSTEM__
-			if(const Player* attackerPlayer = attacker->getPlayer()){
-				if(targetPlayer->getSkull() == SKULL_BLACK){
+				if(attackerPlayer->getSkull() == SKULL_BLACK){
 					if(targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(attackerPlayer)){
 						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
+				}	
+#endif
+			}
+
+			if(const Player* masterAttackerPlayer = attacker->getPlayerMaster()){
+				if(masterAttackerPlayer->hasFlag(PlayerFlag_CannotAttackPlayer)){
+					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
 			}
-#endif
 		}
 		else if(target->getMonster()){
 			if(const Player* attackerPlayer = attacker->getPlayer()){
@@ -410,7 +405,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 			}
 		}
 
-		if(attacker->getPlayer() || (attacker->isSummon() && attacker->getMaster()->getPlayer()) ){
+		if(attacker->getPlayer() || attacker->isPlayerSummon()){
 			//nopvp-zone
 			if(target->getPlayer() && target->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
 				return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
@@ -423,7 +418,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					}
 				}
 
-				if(target->isSummon() && target->getMaster()->getPlayer()){
+				if(target->isPlayerSummon()){
 					if(!isInPvpZone(attacker, target)){
 						return RET_YOUMAYNOTATTACKTHISCREATURE;
 					}
@@ -686,8 +681,8 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 		if(caster){
 			if(caster->getPlayer()){
 				p_caster = caster->getPlayer();
-			} else if(caster->isSummon()){
-				p_caster = caster->getMaster()->getPlayer();
+			} else {
+				p_caster = caster->getPlayerMaster();
 			}
 		}
 		if(p_caster){
@@ -1524,7 +1519,7 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 				if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE) ){
 					Creature* creature = g_game.getCreatureByID(owner);
 					if(creature){
-						if(creature->getPlayer() || (creature->isSummon() && creature->getMaster()->getPlayer())){
+						if(creature->getPlayer() || creature->isPlayerSummon()){
 							harmfulField = false;
 						}
 					}

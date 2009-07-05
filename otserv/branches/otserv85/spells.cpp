@@ -1570,11 +1570,6 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 		return false;
 	}
 
-	if(player->getSkull() == SKULL_BLACK){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		return false;
-	}
-
 	MonsterType* mType = g_monsters.getMonsterType(param);
 	if(!mType){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -1584,6 +1579,10 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 
 	int32_t manaCost = mType->manaCost;
 	if(!player->hasFlag(PlayerFlag_CanSummonAll)){
+		if(player->getSkull() == SKULL_BLACK){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			return false;
+		}
 		if(!mType->isSummonable){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);

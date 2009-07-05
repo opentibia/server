@@ -740,9 +740,9 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 			Creature* c = de.getKillerCreature();
 			Player* player = c->getPlayer();
 
-			if(c->isSummon() && c->getMaster()->getPlayer()){
+			if(c->isPlayerSummon()){
 				// Set player, next if will insert GUID
-				player = c->getMaster()->getPlayer();
+				player = c->getPlayerMaster();
 				// Set name, so the enviroment insert happenends
 				name = c->getNameDescription();
 			}
