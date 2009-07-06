@@ -2449,6 +2449,7 @@ void Player::addInFightTicks(uint32_t ticks, bool pzlock /*= false*/)
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(pzlock){
 			pzLocked = true;
+			sendIcons();
 		}
 		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, ticks, 0);
 		addCondition(condition);
@@ -3678,6 +3679,13 @@ void Player::onAttackedCreature(Creature* target)
 
 		addInFightTicks(g_game.getInFightTicks());
 	}
+}
+
+void Player::onSummonAttackedCreature(Creature* summon, Creature* target)
+{
+	Creature::onSummonAttackedCreature(summon, target);
+
+	onAttackedCreature(target);
 }
 
 void Player::onAttacked()

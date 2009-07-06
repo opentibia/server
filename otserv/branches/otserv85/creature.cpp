@@ -1273,16 +1273,6 @@ void Creature::onCombatRemoveCondition(const Creature* attacker, Condition* cond
 	removeCondition(condition);
 }
 
-void Creature::onAttackedCreature(Creature* target)
-{
-	//
-}
-
-void Creature::onAttacked()
-{
-	//
-}
-
 void Creature::onIdleStatus()
 {
 	if(getHealth() > 0){
@@ -1294,17 +1284,6 @@ void Creature::onIdleStatus()
 void Creature::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	target->addDamagePoints(this, points);
-	
-	if(isSummon()){
-		getMaster()->onSummonAttackedCreatureDrainHealth(this, target, points);
-	}
-}
-
-void Creature::onAttackedCreatureDrainMana(Creature* target, int32_t points)
-{
-	if(isSummon()){
-		getMaster()->onSummonAttackedCreatureDrainMana(this, target, points);
-	}
 }
 
 void Creature::onTargetCreatureGainHealth(Creature* target, int32_t points)

@@ -2112,8 +2112,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 				msg->AddByte(player->hasFlag(PlayerFlag_CanReportBugs));
 
 				uint16_t violation = player->getViolationLevel();
-				if(violationReasons[violation] > 0)
-				{
+				if(violationReasons[violation] > 0){
 					msg->AddByte(0x0B);
 					for(int32_t i = 0; i <= violationReasons[4]; i++){
 						if(i <= violationReasons[1])

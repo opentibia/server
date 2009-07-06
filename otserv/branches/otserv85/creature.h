@@ -308,11 +308,12 @@ public:
 	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
 	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
-	virtual void onAttackedCreature(Creature* target);
-	virtual void onAttacked();
+	virtual void onAttackedCreature(Creature* target) {};
+	virtual void onSummonAttackedCreature(Creature* summon, Creature* target) {};
+	virtual void onAttacked() {};
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points) {};
-	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points) {};
 	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points) {};
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);

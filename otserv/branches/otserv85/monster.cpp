@@ -132,6 +132,33 @@ void Monster::onFollowCreatureDissapear(bool isLogout)
 #endif
 }
 
+void Monster::onAttackedCreature(Creature* target)
+{
+	Creature::onAttackedCreature(target);
+
+	if(isSummon()){
+		getMaster()->onSummonAttackedCreature(this, target);
+	}
+}
+
+void Monster::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
+{
+	Creature::onAttackedCreatureDrainHealth(target, points);
+	
+	if(isSummon()){
+		getMaster()->onSummonAttackedCreatureDrainHealth(this, target, points);
+	}
+}
+
+void Monster::onAttackedCreatureDrainMana(Creature* target, int32_t points)
+{
+	Creature::onAttackedCreatureDrainMana(target, points);
+
+	if(isSummon()){
+		getMaster()->onSummonAttackedCreatureDrainMana(this, target, points);
+	}
+}
+
 void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	Creature::onCreatureAppear(creature, isLogin);
