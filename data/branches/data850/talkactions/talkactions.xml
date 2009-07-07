@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<talkactions>
+	<talkaction words="!buyhouse" script="buyhouse.lua"/>
+	<talkaction words="!leavehouse" script="leavehouse.lua"/>
+	<talkaction words="!houseinfo" script="houseinfo.lua"/>
+	<talkaction words="!online" script="onlinelist.lua"/>
+	<talkaction words="!frags" script="frags.lua"/>
+	<talkaction words="/cleanhouses" filter="first word" script="housecleaning.lua"/>
+	<talkaction words="/checkconfig" filter="first word" script="configval.lua"/>
+	<talkaction words="/up" filter="first word" script="floorchange.lua"/>
+	<talkaction words="/down" filter="first word" script="floorchange.lua"/>
+	<talkaction words="/t" script="teleportmasterpos.lua"/>
+	<talkaction words="/town" filter="first word" script="teleporttotown.lua"/>
+	<talkaction words="/save" script="saveserver.lua"/>
+	<talkaction words="/kick" filter="first word" script="kickplayer.lua"/>
+	<talkaction words="/c" filter="first word" script="teleporthere.lua"/>
+	<talkaction words="/serverinfo" script="serverinfo.lua"/>
+	<talkaction words="/a" filter="first word" script="teleportntiles.lua"/>
+	<talkaction words="/goto" filter="first word" script="teleportto.lua"/>
+	<talkaction words="/r" filter="first word" script="removething.lua"/>
+	<talkaction words="/bc" filter="first word" script="broadcastclass.lua"/>
+</talkactions>

@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="sibang" nameDescription="a sibang" race="blood" experience="105" speed="220" manacost="0">
+  <health now="225" max="225"/>
+  <look type="118" head="20" body="30" legs="40" feet="50" corpse="6045"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="4"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" min="-20" max="-50"/>
+    <attack name="physical" interval="1000" chance="25" range="7" min="-35" max="-55">
+      <attribute key="shootEffect" value="smallstone"/>
+    </attack>
+  </attacks>
+  <defenses armor="15" defense="12">
+    <defense name="speed" interval="1000" chance="12" speedchange="240" duration="3000">
+      <attribute key="areaEffect" value="redshimmer"/>
+    </defense>
+  </defenses>
+  <elements>
+	<element firePercent="25"/>
+	<element holyPercent="3"/>
+	<element icePercent="-15"/>
+	<element deathPercent="-5"/>
+  </elements>
+  <immunities>
+    <immunity lifedrain="0"/>
+    <immunity paralyze="0"/>
+    <immunity outfit="1"/>
+    <immunity drunk="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Eeeeek! Eeeeek"/>
+    <voice sentence="Huh! Huh! Huh!"/>
+    <voice sentence="Ahhuuaaa!"/>
+  </voices>
+  <loot>
+	<item id="3976" chance="20000" countmax="10"/>
+	<item id="2678" chance="5000" countmax="5"/>
+	<item id="2148" chance="100000" countmax="65"/>
+	<item id="2675" chance="6667" countmax="5"/>
+	<item id="2682" chance="2857"/>
+	<item id="2458" chance="3333"/>
+	<item id="1294" chance="2500" countmax="3"/>
+	<item id="5883" chance="1000" countmax="2"/>
+ </loot>
+</monster>

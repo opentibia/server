@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="dark torturer" nameDescription="a dark torturer" race="blood" experience="3500" speed="250" manacost="0">
+  <health now="7350" max="7350"/>
+  <look type="234" corpse="6328"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="1"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+	<attack name="melee" interval="2000" min="-0" max="-600"/>
+      <attack name="physical" interval="3000" chance="17" range="7" min="-60" max="-600">
+		<attribute key="shootEffect" value="throwingknife"/>
+      </attack>
+	<attack name="physical" interval="3000" chance="17" length="4" spread="3" min="-0" max="-0">
+		<attribute key="areaEffect" value="purplenote"/>
+	</attack>
+  </attacks>
+  <defenses armor="25" defense="35">
+    <defense name="healing" interval="1000" chance="50" min="75" max="125">
+      <attribute key="areaEffect" value="blueshimmer"/>
+    </defense>
+  </defenses>
+  <elements>
+	<element firePercent="100"/>
+	<element earthPercent="50"/>
+	<element energyPercent="40"/>
+	<element deathPercent="35"/>
+	<element icePercent="-20"/>
+	<element holyPercent="-17"/>
+  </elements>
+  <immunities>
+	<immunity invisible="1"/>
+  </immunities>
+  <voices interval="3000" chance="30">
+    <voice sentence="You like it, don't you?"/>
+    <voice sentence="IahaEhheAie!"/>
+  </voices>
+  <loot>
+	<item id="2148" countmax="76" chance1="100000" chancemax="0"/>
+	<item id="2671" countmax="5" chance1="33333" chancemax="0"/>
+	<item id="2470" chance="2000"/>
+	<item id="6300" chance="2066"/>
+	<item id="1987" chance="100000">
+		<inside>
+			<item id="2513" chance="9999"/>
+			<item id="6500" countmax="3" chance1="4555" chancemax="0"/>
+			<item id="2557" chance="12000"/>
+			<item id="2558" chance="11000"/>
+			<item id="5944" chance="5555"/>
+			<item id="5801" chance="1800"/>
+			<item id="5480" chance="1666"/>
+		</inside>
+	</item>
+  </loot>
+</monster>

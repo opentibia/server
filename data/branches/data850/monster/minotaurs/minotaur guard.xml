@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="minotaur guard" nameDescription="a minotaur guard" race="blood" experience="160" speed="190" manacost="550">
+  <health now="185" max="185"/>
+  <look type="29" head="20" body="30" legs="40" feet="50" corpse="5983"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="1"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="1"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="1"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="50" attack="35"/>
+  </attacks>
+  <defenses armor="15" defense="25"/>
+  <elements>
+	<element firePercent="20"/>
+	<element holyPercent="10"/>
+	<element icePercent="-10"/>
+	<element deathPercent="-5"/>
+  </elements>
+  <voices interval="5000" chance="10">
+    <voice sentence="Kirll Karrrl!"/>
+    <voice sentence="Kaplar!"/>
+  </voices>
+  <loot>
+    <item id="3976" countmax="10" chance1="50000" chancemax="0"/>
+    <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+    <item id="2666" countmax="3" chance1="70000" chancemax="0"/>
+    <item id="2387" chance="5000"/>
+    <item id="2649" chance="10000"/>
+    <item id="5878" countmax="1" chance1="5000" chancemax="0"/>
+    <item id="1987" chance="100000">
+      <inside>
+        <item id="2386" chance="6666"/>
+        <item id="2580" chance="5000"/>
+        <item id="2648" chance="5000"/>
+        <item id="2458" chance="10000"/>
+        <item id="2465" chance="2500"/>
+        <item id="2513" chance="10000"/>
+      </inside>
+    </item>
+  </loot>
+</monster>

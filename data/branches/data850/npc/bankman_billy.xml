@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<npc name="Bankman Billy" floorchange="0" walkinterval="4000" walkradius="10">
+	<health now="150" max="150"/>
+	<look type="133" head="10" body="122" legs="19" feet="10"/>
+
+  <interaction range="3" idletimeout="30" defaultpublic="0">
+    <!--This will include the bankman interaction, in this way several npc can use the same interaction-->
+    <include file="bankman.xml"/>
+    
+    <interact keywords="hi" focus="1">
+      <!--These are the alternative keywords-->
+      <keywords>hello</keywords>
+      
+      <response text="Hello. How may I help you |NAME|?"/>
+    </interact>
+
+    <interact keywords="bye" focus="0">
+      <!--These are the alternative keywords-->
+      <keywords>farewell</keywords>
+      
+      <response text="It was a pleasure to help you."/>
+    </interact>
+
+    <!--
+    <interact event="onBusy">
+      <response text="One moment please, |NAME|.">
+        <action name="addqueue" value="|PLAYER|"/>
+      </response>
+    </interact>
+    -->
+
+    <!-- A global idle which is called once every 120 seconds if no interaction is going on-->
+    <interact event="onIdle" time="120" singleevent="1">
+      <response text="Beatiful day is it not |NAME|?" public="1"/>
+    </interact>
+
+    <!-- Example of a story telling response with a timer defined for onidle event -->
+    <interact focus="1" keywords="story">
+      <response text="Once upon a time...">
+        <interact event="onidle" time="4">
+          <response text="there was a king named named Tibianus">
+          </response>
+        </interact>
+      </response>
+    </interact>
+
+    <interact event="onPlayerLeave" focus="0">
+      <response text="It was a pleasure to help you |NAME|."/>
+    </interact>
+    
+    <interact keywords="name">
+      <response text="My name is |NPCNAME|."/>
+    </interact>
+
+    <interact keywords="job">
+      <response text="I am a banker, my job is to exchange coins."/>
+    </interact>
+   
+  </interaction>
+  
+</npc>

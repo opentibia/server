@@ -83,6 +83,17 @@ enum MagicEffectClasses {
 	NM_ME_PLANTATTACK      = 0x36, //54
 	NM_ME_TUTORIALARROW    = 0x37, //55
 	NM_ME_TUTORIALSQUARE   = 0x38, //56
+	NM_ME_MIRRORHORIZONTAL = 0x39, //57
+	NM_ME_MIRRORVERTICAL   = 0x3A, //58
+	NM_ME_SKULLHORIZONTAL  = 0x3B, //59
+	NM_ME_SKULLVERTICAL    = 0x3C, //60
+	NM_ME_ASSASSIN         = 0x3D, //61
+	NM_ME_STEPSHORIZONTAL  = 0x3E, //62
+	NM_ME_BLOODYSTEPS      = 0x3F, //63
+	NM_ME_STEPSVERTICAL    = 0x40, //64
+	NM_ME_YALAHARIGHOST    = 0x41, //65
+	NM_ME_BATS             = 0x42, //66
+	NM_ME_SMOKE            = 0x43, //67
 	//for internal use, dont send to client
 	NM_ME_NONE             = 0xFF,
 	NM_ME_UNK              = 0xFFFF

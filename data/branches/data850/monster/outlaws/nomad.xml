@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="nomad" nameDescription="a nomad" race="blood" experience="60" speed="215" manacost="420">
+<health now="160" max="160"/>
+<look type="146" head="114" body="20" legs="22" feet="2" corpse="6080"/>
+<targetchange interval="5000" chance="8"/>
+<strategy attack="100" defense="0"/>
+<flags>
+<flag summonable="1"/>
+<flag attackable="1"/>
+<flag hostile="1"/>
+<flag illusionable="1"/>
+<flag convinceable="1"/>
+<flag pushable="0"/>
+<flag canpushitems="1"/>
+<flag canpushcreatures="0"/>
+<flag targetdistance="1"/>
+<flag staticattack="90"/>
+<flag runonhealth="18"/>
+</flags>
+<attacks>
+<attack name="melee" interval="2000" min="-30" max="-80"/>
+</attacks>
+<defenses armor="10" defense="13"/>
+<elements>
+	<element firePercent="20"/>
+	<element holyPercent="10"/>
+	<element physicalPercent="-12"/>
+	<element icePercent="-10"/>
+	<element deathPercent="-5"/>
+  </elements>
+<voices interval="5000" chance="10">
+<voice sentence="We are the true sons of the desert!"/>
+<voice sentence="I will leave your remains to the vultures!"/>
+<voice sentence="We are swift as the wind of the desert!"/>
+</voices>
+<loot>
+<item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+<item id="2465" chance="10000"/>
+<item id="2461" chance="10000"/>
+<item id="2649" chance="10000"/>
+<item id="2671" countmax="2" chance1="20000" chancemax="0"/>
+<item id="3976" countmax="10" chance1="50000" chancemax="0"/>
+<item id="1987" chance="100000">
+<inside>
+<item id="2456" chance="6666"/>
+<item id="2544" countmax="15" chance1="10000" chancemax="0"/>
+<item id="2546" countmax="5" chance1="10000" chancemax="0"/>
+<item id="2147" countmax="2" chance1="3333" chancemax="0"/>
+<item id="2675" countmax="4" chance1="6666" chancemax="0"/>
+<item id="2690" countmax="4" chance1="6666" chancemax="0"/>
+<item id="2050" chance="20000"/>
+<item id="2478" chance="3333"/>
+<item id="2652" chance="2222"/>
+<item id="2201" chance="2500"/>
+</inside>
+</item>
+</loot>
+</monster>

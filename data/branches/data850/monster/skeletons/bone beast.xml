@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="bone beast" nameDescription="a bone beast" race="UNDEAD" experience="580" speed="210" manacost="0">
+  <health now="515" max="515"/>
+  <look type="101" head="20" body="30" legs="40" feet="50" corpse="6030"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="1"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="75" attack="47" poison="110"/>
+    <attack name="poison" interval="1000" chance="10" range="7" min="-25" max="-65">
+      <attribute key="shootEffect" value="poison"/>
+      <attribute key="areaEffect" value="poison"/>
+    </attack>
+    <attack name="lifedrain" interval="1000" chance="15" radius="3" target="0" min="-30" max="-50">
+      <attribute key="areaEffect" value="redshimmer"/>
+    </attack>
+    <attack name="poisoncondition" interval="1000" chance="13" radius="3" target="0" min="-60" max="-80">
+      <attribute key="areaEffect" value="poison"/>
+    </attack>
+  </attacks>
+  <defenses armor="20" defense="35">
+    <defense name="healing" interval="1000" chance="12" min="30" max="60">
+      <attribute key="areaEffect" value="greenspark"/>
+    </defense>
+  </defenses>
+  <elements>
+	<element deathPercent="100"/>
+	<element earthPercent="100"/>
+	<element firePercent="-10"/>
+	<element holyPercent="-20"/>
+  </elements>
+  <immunities>
+    <immunity lifedrain="1"/>
+    <immunity paralyze="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <voices interval="5000" chance="10">
+    <voice sentence="Cccchhhhhhhhh!"/>
+    <voice sentence="Knooorrrrr!"/>
+  </voices>
+  <loot>
+    <item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+    <item id="2229" countmax="2" chance1="20000" chancemax="0"/>
+    <item id="2231" chance="33333"/>
+    <item id="2463" chance="2500"/>
+    <item id="5925" countmax="1" chance1="5000" chancemax="0"/>
+    <item id="1987" chance="100000">
+      <inside>
+        <item id="2541" chance="2000"/>
+        <item id="2148" countmax="10" chance1="50000" chancemax="0"/>
+        <item id="2450" chance="1666"/>
+        <item id="2449" chance="10000"/>
+      </inside>
+    </item>
+  </loot>
+</monster>
