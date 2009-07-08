@@ -186,6 +186,10 @@ remove_rune_charges = true
 -- Set to false to disable charges disappearing from weapons on use
 remove_weapon_charges = true
 
+-- Distance weapon configuration
+-- Should exhaustion and action time be checked for using a distance weapon?
+distance_weapon_interrupt_swing = true
+
 -- Allow gamemaster multiclient login to everybody?
 allow_gamemaster_multiclient = false
 
