@@ -8,7 +8,7 @@ function onTargetCorpse(cid, pos)
 	local getPos = pos
 	getPos.stackpos = 255
 	corpse = getThingfromPos(getPos)
-	if(corpse.uid > 0 and isCorpse(corpse.uid) == TRUE and isMoveable(corpse.uid) == TRUE) then
+	if(corpse.uid > 0 and isCorpse(corpse.uid) == TRUE and isMoveable(corpse.uid) == TRUE and getPlayerSkullType(cid) ~= 5) then
 		doRemoveItem(corpse.uid)
 		doPlayerSummonCreature(cid, "Skeleton", pos)
 	end
