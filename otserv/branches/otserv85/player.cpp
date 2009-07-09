@@ -588,7 +588,7 @@ void Player::sendIcons() const
 		}
 
 		if(getTile()->getZone() == ZONE_PROTECTION){
-			icons = ICON_PZ;
+			icons |= ICON_PZ;
 		}
 
 		client->sendIcons(icons);
