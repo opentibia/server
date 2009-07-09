@@ -320,6 +320,7 @@ public:
 	void setFightMode(fightMode_t mode);
 	void setSafeMode(bool _safeMode) {safeMode = _safeMode;}
 	bool hasSafeMode() const {return safeMode;}
+	uint16_t getIcons() const;
 
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);

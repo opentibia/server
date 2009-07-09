@@ -1211,10 +1211,10 @@ Item* Monster::createCorpse()
 {
 	Item* corpse = Creature::createCorpse();
 	if(corpse){
-		Creature* lastHitCreature = NULL;
-		Creature* mostDamageCreature = NULL;
+		DeathList killers = getKillers(1);
+		if(!killers.empty() && (*killers.rbegin()).isCreatureKill() ){
+			Creature* mostDamageCreature = (*killers.rbegin()).getKillerCreature();
 
-		if(getKillers(&lastHitCreature, &mostDamageCreature) && mostDamageCreature){
 			Player* corpseOwner = NULL;
 			if(mostDamageCreature->getPlayer()){
 				corpseOwner = mostDamageCreature->getPlayer();

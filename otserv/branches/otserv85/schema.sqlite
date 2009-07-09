@@ -144,6 +144,7 @@ CREATE TABLE `environment_killers` (
 CREATE TABLE "player_killers" (
 	"kill_id" INTEGER NOT NULL,
 	"player_id" INTEGER NOT NULL,
+	"unjustified" SMALLINT NOT NULL DEFAULT 0,
 	FOREIGN KEY ("kill_id") REFERENCES "killers" ("id"),
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
 );

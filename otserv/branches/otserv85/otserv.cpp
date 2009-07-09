@@ -376,6 +376,8 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 
 void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_manager)
 {
+	std::cout << std::numeric_limits<float>::max() << std::endl;
+
 	//dispatcher thread
 	g_game.setGameState(GAME_STATE_STARTUP);
 

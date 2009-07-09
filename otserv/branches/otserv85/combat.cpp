@@ -369,6 +369,32 @@ bool Combat::isInPvpZone(const Creature* attacker, const Creature* target)
 	return true;
 }
 
+bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
+{
+#ifdef __SKULLSYSTEM__
+	const Player* attackerPlayer = attacker->getPlayer();
+	const Player* targetPlayer = target->getPlayer();
+
+	if(attacker->isPlayerSummon()){
+		attackerPlayer = attacker->getPlayerMaster();
+	}
+
+	if(	attackerPlayer == NULL || 
+		targetPlayer == NULL ||
+		attackerPlayer->isPartner(targetPlayer) ||
+		Combat::isInPvpZone(attackerPlayer, targetPlayer) || 
+		targetPlayer->hasAttacked(attackerPlayer) ||
+		targetPlayer->getSkull() != SKULL_NONE){
+		return false;
+	}
+
+	return true;
+
+#else
+	return false;
+#endif
+}
+
 ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target)
 {
 	if(attacker){

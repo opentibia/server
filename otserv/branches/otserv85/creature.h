@@ -89,18 +89,20 @@ struct DeathLessThan;
 struct DeathEntry{
 	// Death can be either a name (for fields) or a creature (for anything substantial)
 	// Fields are only counted if they are the final hit killer
-	DeathEntry(std::string name, int dmg) : data(name), damage(dmg) {}
-	DeathEntry(Creature* killer, int dmg) : data(killer), damage(dmg) {}
+	DeathEntry(std::string name, int32_t dmg) : data(name), damage(dmg), isUnjust(false) {}
+	DeathEntry(Creature* killer, int32_t dmg, bool unjust) : data(killer), damage(dmg), isUnjust(unjust) {}
 
 	bool isCreatureKill() const {return data.type() == typeid(Creature*);}
 	bool isNameKill() const {return !isCreatureKill();}
+	bool isUnjustKill() const {return isUnjust;}
 
 	Creature* getKillerCreature() const {return boost::any_cast<Creature*>(data);}
 	std::string getKillerName() const {return boost::any_cast<std::string>(data);}
 
 protected:
 	boost::any data;
-	int damage;
+	int32_t damage;
+	bool isUnjust;
 
 	friend struct DeathLessThan;
 };
@@ -467,8 +469,7 @@ protected:
 
 	virtual uint64_t getLostExperience() const { return 0; };
 	virtual double getDamageRatio(Creature* attacker) const;
-	bool getKillers(Creature** lastHitCreature, Creature** mostDamageCreature);
-	DeathList getKillers(int assist_count = 1);
+	DeathList getKillers(int32_t assist_count = 1);
 	virtual void dropLoot(Container* corpse) {};
 	virtual uint16_t getLookCorpse() const { return 0; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;

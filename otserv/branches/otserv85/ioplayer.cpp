@@ -132,8 +132,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	int32_t skullType = result->getDataInt("skull_type");
 	int32_t lastSkullTime = result->getDataInt("skull_time");
 
-	if( (skullType == SKULL_RED && lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION) < std::time(NULL)) ||
-		(skullType == SKULL_BLACK && lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) < std::time(NULL)) ){
+	if( (skullType == SKULL_RED && lastSkullTime < std::time(NULL) + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
+		(skullType == SKULL_BLACK && lastSkullTime < std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION)) ){
 		player->lastSkullTime = lastSkullTime;
 		player->skullType = (Skulls_t)skullType;
 	}
@@ -658,36 +658,6 @@ bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
 	return true;
 }
 
-/*
-bool IOPlayer::getPlayerUnjustKillCount(Player* player, uin64_t date)
-{
-	Database* db = Database::instance();
-	DBQuery query;
-	DBResult* result;
-
-	query << "";
-	query << "SELECT COUNT(*)";
-	query << "FROM";
-	query << "player_killers";
-	query << "LEFT JOIN";
-	query << "killers ON killers.id = player_killers.kill_id";
-	query << "LEFT JOIN";
-	query << "player_deaths on player_deaths.id = killers.death_id";
-	query << "LEFT JOIN";
-	query << "players on players.id = player_deaths.player_id";
-	query << "WHERE";
-	query << "player_killers.player_id = " << player->getGUID() << " AND " << date  << "> player_deaths.date";
-
-	if(!(result = db->storeQuery(query.str())))
-		return false;
-
-	name = result->getDataString("name");
-	nameCacheMap[guid] = name;
-	db->freeResult(result);
-	return true;
-}
-*/
-
 bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 {
 	Database* db = Database::instance();
@@ -742,10 +712,10 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 
 			if(player){
 				DBInsert player_killers_stmt(db);
-				player_killers_stmt.setQuery("INSERT INTO `player_killers` (`kill_id`, `player_id`) VALUES ");
+				player_killers_stmt.setQuery("INSERT INTO `player_killers` (`kill_id`, `player_id`, `unjustified`) VALUES ");
 
 				query.str("");
-				query << kill_id << ", " << player->getGUID();
+				query << kill_id << ", " << player->getGUID() << ", " << (de.isUnjustKill() ? 1 : 0);
 				if(!player_killers_stmt.addRow(query.str()))
 					return false;
 				if(!player_killers_stmt.execute())
@@ -773,6 +743,35 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 	}
 
 	return transaction.commit();
+}
+
+uint64_t IOPlayer::getPlayerUnjustKillCount(Player* player, uint64_t date)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "";
+	query << "SELECT COUNT(*) as `unjustified_count` ";
+	query << "FROM ";
+	query << "`player_killers` ";
+	query << "LEFT JOIN ";
+	query << "`killers` ON `killers`.`id` = `player_killers`.`kill_id` ";
+	query << "LEFT JOIN ";
+	query << "`player_deaths` on `player_deaths`.`id` = `killers`.`death_id` ";
+	query << "LEFT JOIN ";
+	query << "`players` on `players`.`id` = `player_deaths`.`player_id` ";
+	query << "WHERE ";
+	query << "`player_killers`.`player_id` = " << player->getGUID() << " "
+		<< "AND " << "`player_killers`.`unjustified` = " << " 1 "
+		<< "AND " << date  << " < `player_deaths`.`date`";
+
+	if(!(result = db->storeQuery(query.str())))
+		return false;
+
+	uint64_t count = result->getDataLong("unjustified_count");
+	db->freeResult(result);
+	return count;
 }
 
 bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)

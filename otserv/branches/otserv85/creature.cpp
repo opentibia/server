@@ -729,26 +729,13 @@ void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 
 void Creature::onDie()
 {
-	Creature* lastHitCreature = NULL;
-	Creature* mostDamageCreature = NULL;
-	Creature* mostDamageCreatureMaster = NULL;
-	Creature* lastHitCreatureMaster = NULL;
+	DeathList killers = getKillers(g_config.getNumber(ConfigManager::DEATH_ASSIST_COUNT));
 
-	if(getKillers(&lastHitCreature, &mostDamageCreature)){
-		if(lastHitCreature){
-			lastHitCreature->onKilledCreature(this, true);
-			lastHitCreatureMaster = lastHitCreature->getMaster();
-		}
-
-		if(mostDamageCreature){
-			mostDamageCreatureMaster = mostDamageCreature->getMaster();
-			bool isNotLastHitMaster = (mostDamageCreature != lastHitCreatureMaster);
-			bool isNotMostDamageMaster = (lastHitCreature != mostDamageCreatureMaster);
-			bool isNotSameMaster = lastHitCreatureMaster == NULL || (mostDamageCreatureMaster != lastHitCreatureMaster);
-
-			if(mostDamageCreature != lastHitCreature && isNotLastHitMaster &&
-				isNotMostDamageMaster && isNotSameMaster){
-				mostDamageCreature->onKilledCreature(this, false);
+	for(DeathList::const_iterator it = killers.begin(); it != killers.end(); ++it){
+		if(it->isCreatureKill()){
+			Creature* attacker = it->getKillerCreature();
+			if(attacker){
+				attacker->onKilledCreature(this, (it == killers.begin()));
 			}
 		}
 	}
@@ -808,30 +795,13 @@ Item* Creature::dropCorpse()
 	return corpse;
 }
 
-bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCreature)
-{
-	*_lastHitCreature = g_game.getCreatureByID(lastHitCreature);
-
-	int32_t mostDamage = 0;
-	for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		const CountBlock_t& cb = it->second;
-
-		if((cb.total > mostDamage && (OTSYS_TIME() - cb.ticks <= g_game.getInFightTicks()))){
-			if((*_mostDamageCreature = g_game.getCreatureByID(it->first))){
-				mostDamage = cb.total;
-			}
-		}
-	}
-
-	return (*_lastHitCreature || *_mostDamageCreature);
-}
-
-DeathList Creature::getKillers(int assist_count)
+DeathList Creature::getKillers(int32_t assist_count)
 {
 	DeathList list;
 	Creature* lhc = g_game.getCreatureByID(lastHitCreature);
-	if(lhc)
-		list.push_back(DeathEntry(lhc, 0)); // Final Hit killer
+	if(lhc){
+		list.push_back(DeathEntry(lhc, 0, Combat::isUnjustKill(lhc, this) )); // Final Hit killer
+	}
 	else
 		list.push_back(DeathEntry(CombatTypeName(lastDamageSource), 0));
 
@@ -863,7 +833,7 @@ DeathList Creature::getKillers(int assist_count)
 		}
 
 		if(mdc)
-			list.push_back(DeathEntry(mdc, mostDamage));
+			list.push_back(DeathEntry(mdc, mostDamage, Combat::isUnjustKill(mdc, this)));
 	}
 	else{
 		int64_t now = OTSYS_TIME();
@@ -909,7 +879,7 @@ DeathList Creature::getKillers(int assist_count)
 							continue;
 					}
 
-					list.push_back(DeathEntry(mdc, cb.total));
+					list.push_back(DeathEntry(mdc, cb.total, Combat::isUnjustKill(mdc, this)));
 				}
 			}
 		}

@@ -2155,7 +2155,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 						sendVIP((*it), vip_name, online);
 					}
 				}
-				player->sendIcons();
+				sendIcons(player->getIcons());
 			}
 			else{
 				AddTileCreature(msg, pos, stackpos, creature);
