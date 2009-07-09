@@ -278,6 +278,7 @@ enum TextColor_t {
 };
 
 enum Icons_t{
+	ICON_NONE       = 0,
 	ICON_POISON     = 1,
 	ICON_BURN       = 2,
 	ICON_ENERGY     = 4,

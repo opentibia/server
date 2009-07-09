@@ -154,7 +154,7 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 			return false;
 		}
 
-		if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin) && 
+		if(isSetGM && !player->hasFlag(PlayerFlag_CanAlwaysLogin) &&
 			!g_config.getNumber(ConfigManager::ALLOW_GAMEMASTER_MULTICLIENT))
 		{
 			disconnectClient(0x14, "You may only login with a Gamemaster account.");
@@ -260,11 +260,10 @@ bool ProtocolGame::connect(uint32_t playerId)
 	player->client = this;
 	player->client->sendAddCreature(player, player->getPosition(),
 		player->getTile()->__getIndexOfThing(player));
-	player->sendIcons();
 	player->lastip = player->getIP();
 	IOPlayer::instance()->updateLoginInfo(player);
 	m_acceptPackets = true;
-	
+
 	return true;
 }
 
@@ -382,7 +381,7 @@ void ProtocolGame::onConnect()
 
 	// Packet length
 	//output->AddU16(0x06); //length (6)
-	
+
 	// Packet type
 	output->AddByte(0x1F);
 
@@ -1172,7 +1171,7 @@ void ProtocolGame::parseThrow(NetworkMessage& msg)
 	*/
 
 	if(toPos != fromPos){
-		addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, 
+		addGameTaskTimed(DISPATCHER_TASK_EXPIRATION,
 			&Game::playerMoveThing, player->getID(), fromPos, spriteId,
 			fromStackpos, toPos, count);
 	}
@@ -1458,8 +1457,8 @@ void ProtocolGame::parseDebugAssert(NetworkMessage& msg)
 	if(of){
 		char today[32];
 		formatDate(time(NULL), today);
-		
-		of << 
+
+		of <<
 			"-----" << today << " - " << player->getName() << " (" << convertIPToString(player->getIP()) <<
 			assertLine << std::endl <<
 			report_date << std::endl <<
@@ -1673,7 +1672,7 @@ void ProtocolGame::sendLockRuleViolation()
 	}
 }
 
-void ProtocolGame::sendIcons(int icons)
+void ProtocolGame::sendIcons(uint16_t icons)
 {
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
@@ -1758,7 +1757,7 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 		}
 		else{
 			// Large shop, it's better to get a cached map of all item counts and use it
-			// We need a temporary map since the finished map should only contain items 
+			// We need a temporary map since the finished map should only contain items
 			// available in the shop
 			std::map<uint32_t, uint32_t> tempSaleMap;
 			player->__getAllItemTypeCount(tempSaleMap);
@@ -2156,6 +2155,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 						sendVIP((*it), vip_name, online);
 					}
 				}
+				player->sendIcons();
 			}
 			else{
 				AddTileCreature(msg, pos, stackpos, creature);
@@ -2395,20 +2395,20 @@ void ProtocolGame::sendOutfitWindow()
  {
  	#define MAX_NUMBER_OF_OUTFITS 25
  	//client 8.0 outfits limit is 25
- 
+
  	NetworkMessage_ptr msg = getOutputBuffer();
  	if(msg){
  		TRACK_MESSAGE(msg);
  		msg->AddByte(0xC8);
  		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
- 
+
 		std::list<Outfit> outfitList;
 		for(OutfitMap::iterator it = player->outfits.begin(); it != player->outfits.end(); ++it){
 			if(player->canWearOutfit(it->first, it->second.addons)){
 				outfitList.push_back(it->second);
 			}
 		}
- 
+
  		if(outfitList.size() > 0){
 			if(outfitList.size() > MAX_NUMBER_OF_OUTFITS){
  				msg->AddByte(MAX_NUMBER_OF_OUTFITS);

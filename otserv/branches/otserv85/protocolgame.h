@@ -176,7 +176,7 @@ private:
 	void sendRemoveReport(const std::string& name);
 	void sendLockRuleViolation();
 	void sendRuleViolationCancel(const std::string& name);
-	void sendIcons(int icons);
+	void sendIcons(uint16_t icons);
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
 	void sendMagicEffect(const Position& pos, unsigned char type);

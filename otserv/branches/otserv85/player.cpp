@@ -574,7 +574,7 @@ float Player::getDefenseFactor() const
 void Player::sendIcons() const
 {
 	if(client){
-		int icons = 0;
+		uint16_t icons = ICON_NONE;
 
 		ConditionList::const_iterator it;
 		for(it = conditions.begin(); it != conditions.end(); ++it){
@@ -588,7 +588,7 @@ void Player::sendIcons() const
 		}
 
 		if(getTile()->getZone() == ZONE_PROTECTION){
-			icons |= ICON_PZ;
+			icons = ICON_PZ;
 		}
 
 		client->sendIcons(icons);
@@ -4425,7 +4425,7 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 	std::ostringstream os;
 	os << "Loot of " << creature->getNameDescription() << ": " << corpse->getContentDescription();
 	sendTextMessage(MSG_INFO_DESCR, os.str());
-	
+
 	//send message to party channel
 	if(getParty())
 		getParty()->broadcastLoot(creature, corpse);

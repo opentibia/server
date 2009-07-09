@@ -344,9 +344,9 @@ bool Condition::isPersistent() const
 	return true;
 }
 
-uint32_t Condition::getIcons() const
+uint16_t Condition::getIcons() const
 {
-	return isBuff? ICON_PARTY_BUFF : 0;
+	return (isBuff ? ICON_PARTY_BUFF : ICON_NONE);
 }
 
 bool Condition::updateCondition(const Condition* addCondition)
@@ -398,9 +398,9 @@ void ConditionGeneric::addCondition(Creature* creature, const Condition* addCond
 	}
 }
 
-uint32_t ConditionGeneric::getIcons() const
+uint16_t ConditionGeneric::getIcons() const
 {
-	uint32_t icons = Condition::getIcons();
+	uint16_t icons = Condition::getIcons();
 
 	switch(conditionType){
 		case CONDITION_MANASHIELD:
@@ -1471,9 +1471,9 @@ int32_t ConditionDamage::getTotalDamage() const
 	return std::abs(result);
 }
 
-uint32_t ConditionDamage::getIcons() const
+uint16_t ConditionDamage::getIcons() const
 {
-	uint32_t icons = Condition::getIcons();
+	uint16_t icons = Condition::getIcons();
 
 	switch(conditionType){
 		case CONDITION_FIRE:
@@ -1712,9 +1712,9 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 	}
 }
 
-uint32_t ConditionSpeed::getIcons() const
+uint16_t ConditionSpeed::getIcons() const
 {
-	uint32_t icons = Condition::getIcons();
+	uint16_t icons = Condition::getIcons();
 
 	switch(conditionType){
 		case CONDITION_HASTE:
