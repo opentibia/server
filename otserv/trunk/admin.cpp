@@ -370,6 +370,13 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 
 				break;
 			}
+			case CMD_RELATIONAL_SAVE_SERVER:
+			{
+				g_dispatcher.addTask(
+					createTask(boost::bind(&ProtocolAdmin::adminCommandRelationalSaveServer, this)));
+
+				break;
+			}
 			default:
 			{
 				output->AddByte(AP_MSG_COMMAND_FAILED);
@@ -589,6 +596,24 @@ void ProtocolAdmin::adminCommandSaveServer(bool shallow)
 		TRACK_MESSAGE(output);
 
 		addLogLine(this, LOGTYPE_EVENT, 1, "save server ok");
+
+		output->AddByte(AP_MSG_COMMAND_OK);
+		OutputMessagePool::getInstance()->send(output);
+	}
+}
+
+void ProtocolAdmin::adminCommandRelationalSaveServer()
+{
+	std::string old_type = g_config.getString(ConfigManager::MAP_STORAGE_TYPE);
+	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, "relational");
+	g_game.saveServer(false);
+	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, old_type);
+
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+
+		addLogLine(this, LOGTYPE_EVENT, 1, "relational save server ok");
 
 		output->AddByte(AP_MSG_COMMAND_OK);
 		OutputMessagePool::getInstance()->send(output);

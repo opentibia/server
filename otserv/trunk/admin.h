@@ -121,6 +121,7 @@ enum{
 	CMD_SAVE_SERVER = 13,
 	CMD_SEND_MAIL = 14,
 	CMD_SHALLOW_SAVE_SERVER = 15,
+	CMD_RELATIONAL_SAVE_SERVER = 16,
 };
 
 
@@ -199,6 +200,7 @@ protected:
 
 	void adminCommandOpenServer();
 	void adminCommandSaveServer(bool shallow);
+	void adminCommandRelationalSaveServer();
 	void adminCommandCloseServer();
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();
