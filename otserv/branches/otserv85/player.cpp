@@ -4118,8 +4118,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
 
 	//day
-	uint64_t time = std::max((uint64_t)(std::time(NULL) - 24 * 60 * 60), (uint64_t)lastSkullTime);
-	uint32_t unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, time);
+	int64_t time = std::max((int64_t)(std::time(NULL) - 24 * 60 * 60), lastSkullTime);
+	int32_t unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, time);
 
 	if(		g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) > 0 &&
 			g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) > 0 &&
@@ -4137,7 +4137,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 
 	//week
-	time = std::max((uint64_t)(std::time(NULL) - 7 * 24 * 60 * 60), (uint64_t)lastSkullTime);
+	time = std::max((int64_t)(std::time(NULL) - 7 * 24 * 60 * 60), lastSkullTime);
 	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, time);
 
 	if(		g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) > 0 &&
@@ -4156,7 +4156,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 
 	//month
-	time = std::max((uint64_t)(std::time(NULL) - 30 * 24 * 60 * 60), (uint64_t)lastSkullTime);
+	time = std::max((int64_t)(std::time(NULL) - 30 * 24 * 60 * 60), lastSkullTime);
 	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, time);
 
 	if(		g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) > 0 &&

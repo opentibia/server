@@ -130,7 +130,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 #ifdef __SKULLSYSTEM__
 	int32_t skullType = result->getDataInt("skull_type");
-	int32_t lastSkullTime = result->getDataInt("skull_time");
+	int64_t lastSkullTime = result->getDataLong("skull_time");
 
 	if( (skullType == SKULL_RED && lastSkullTime < std::time(NULL) + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
 		(skullType == SKULL_BLACK && lastSkullTime < std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION)) ){
@@ -745,7 +745,7 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 	return transaction.commit();
 }
 
-uint64_t IOPlayer::getPlayerUnjustKillCount(Player* player, uint64_t date)
+int32_t IOPlayer::getPlayerUnjustKillCount(Player* player, int64_t date)
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -767,9 +767,9 @@ uint64_t IOPlayer::getPlayerUnjustKillCount(Player* player, uint64_t date)
 		<< "AND " << date  << " < `player_deaths`.`date`";
 
 	if(!(result = db->storeQuery(query.str())))
-		return false;
+		return 0;
 
-	uint64_t count = result->getDataLong("unjustified_count");
+	int32_t count = result->getDataInt("unjustified_count");
 	db->freeResult(result);
 	return count;
 }
