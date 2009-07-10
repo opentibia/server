@@ -2668,11 +2668,20 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 				}
 			}
 			else{
+				bool fullMatch = false;
+				if(!keyIter->empty()) {
+					if((*keyIter)[keyIter->size() - 1] == '$')
+						fullMatch = true;
+				}
+
 				std::vector<std::string>::iterator wordIter = wordList.end();
 				for(wordIter = lastWordMatchIter; wordIter != wordList.end(); ++wordIter){
-					if(wordIter->find(*keyIter, 0) == 0){
-						break;
+					if(fullMatch) {
+						if(keyIter->find(*wordIter) == 0)
+							break;
 					}
+					else if(wordIter->find(*keyIter, 0) == 0)
+						break;
 				}
 
 				if(wordIter == wordList.end()){
