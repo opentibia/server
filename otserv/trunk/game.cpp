@@ -577,9 +577,9 @@ Player* Game::getPlayerByGuid(uint32_t guid)
 	}
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		if(!(*it).second->isRemoved()){
-			if((*it).second->getGUID() == guid){
-				(*it).second;
+		if(!it->second->isRemoved()){
+			if(it->second->getGUID() == guid){
+				return it->second;
 			}
 		}
 	}
