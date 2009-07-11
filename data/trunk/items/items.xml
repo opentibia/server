@@ -1811,7 +1811,9 @@
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south"/>
 		<attribute key="maleSleeper" value="1766" />
-		<attribute key="femaleSleeper" value="7781" />	</item>
+		<attribute key="femaleSleeper" value="7781" />
+
+	</item>
 	<item id="1759" article="a" name="cot">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
