@@ -20,9 +20,8 @@
 
 #ifndef __OTSERV_POS_H
 #define __OTSERV_POS_H
-//////////////////////////////////////////////////
-// represents a map position
-// for now just a 3d point
+
+#include "definitions.h"
 #include <stdlib.h>
 #include <cmath>
 #include <iostream>
@@ -42,35 +41,34 @@ enum Direction {
 class Position{
 public:
 
-	// for now we just initialise the position to a startpoint
   	Position() : x(0), y(0), z(0) { };
 	~Position() {};
 
-	template<int deltax, int deltay, int deltaz>
+	template<int32_t deltax, int32_t deltay, int32_t deltaz>
 	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(float(p1.x - p2.x)) > deltax ||
-			std::abs(float(p1.y - p2.y)) > deltay ||
-			std::abs(float(p1.z - p2.z)) > deltaz){
+		if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
+			std::abs(int32_t(p1.y - p2.y)) > deltay ||
+			std::abs(int32_t(p1.z - p2.z)) > deltaz){
 			return false;
 		}
 		return true;
 	}
 
-	template<int deltax, int deltay>
+	template<int32_t deltax, int32_t deltay>
 	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(float(p1.x - p2.x)) > deltax ||
-			std::abs(float(p1.y - p2.y)) > deltay){
+		if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
+			std::abs(int32_t(p1.y - p2.y)) > deltay){
 			return false;
 		}
 		return true;
 	}
 
-	Position(uint16_t _x, uint16_t _y, uint16_t _z)
+	Position(int32_t _x, int32_t _y, int32_t _z)
 	: x(_x), y(_y), z(_z) {};
 
-	uint16_t x;
-	uint16_t y;
-	uint16_t z;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	bool operator<(const Position& p) const {
 		if(z < p.z)
@@ -123,10 +121,10 @@ public:
 	PositionEx(){ };
 	~PositionEx(){};
 
-	PositionEx(uint16_t _x, uint16_t _y, uint16_t _z, int32_t _stackpos)
+	PositionEx(int32_t _x, int32_t _y, int32_t _z, int32_t _stackpos)
 	: Position(_x,_y,_z), stackpos(_stackpos) {};
 
-	PositionEx(uint16_t _x, uint16_t _y, uint16_t _z)
+	PositionEx(int32_t _x, int32_t _y, int32_t _z)
 	: Position(_x,_y,_z), stackpos(0) {};
 
 	PositionEx(const Position& p)
