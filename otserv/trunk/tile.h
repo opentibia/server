@@ -44,7 +44,7 @@ typedef std::vector<Item*> ItemVector;
 enum tileflags_t{
 	TILESTATE_NONE						= 0,
 	TILESTATE_PROTECTIONZONE			= 1 << 0,
-	TILESTATE_DEPRICATED_HOUSE			= 1 << 1,
+	TILESTATE_DEPRECATED_HOUSE			= 1 << 1,
 	TILESTATE_NOPVPZONE					= 1 << 2,
 	TILESTATE_NOLOGOUT					= 1 << 3,
 	TILESTATE_PVPZONE					= 1 << 4,
@@ -70,6 +70,14 @@ enum tileflags_t{
 	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 1 << 22,
 	TILESTATE_NOFIELDBLOCKPATH			= 1 << 23,
 	TILESTATE_DYNAMIC_TILE				= 1 << 24
+};
+
+enum ZoneType_t{
+	ZONE_PROTECTION,
+	ZONE_NOPVP,
+	ZONE_PVP,
+	ZONE_NOLOGOUT,
+	ZONE_NORMAL
 };
 
 class HouseTile;
@@ -193,6 +201,22 @@ public:
 			return false;
 		}
 	}
+
+	ZoneType_t getZone() const {
+		if(hasFlag(TILESTATE_PROTECTIONZONE)){
+			return ZONE_PROTECTION;
+		}
+		else if(hasFlag(TILESTATE_NOPVPZONE)){
+			return ZONE_NOPVP;
+		}
+		else if(hasFlag(TILESTATE_PVPZONE)){
+			return ZONE_PVP;
+		}
+		else{
+			return ZONE_NORMAL;
+		}
+	}
+
 	bool hasHeight(uint32_t n) const;
 	virtual std::string getDescription(int32_t lookDistance) const;
 

@@ -83,6 +83,9 @@ public:
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
+	virtual void onAttackedCreature(Creature* target);
+	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
@@ -116,7 +119,7 @@ public:
 	bool isTarget(Creature* creature);
 	bool isFleeing() const {return getHealth() <= mType->runAwayHealth;}
 
-	BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
+	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 
 private:

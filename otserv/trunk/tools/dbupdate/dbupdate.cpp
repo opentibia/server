@@ -592,8 +592,8 @@ SimpleUpdateQuery updateQueries[] = {
 			"ALTER TABLE `houses` ADD COLUMN `name` VARCHAR(100) NOT NULL;",
 			"ALTER TABLE `houses` ADD COLUMN `townid` INTEGER UNSIGNED NOT NULL DEFAULT 0;",
 			"ALTER TABLE `houses` ADD COLUMN `rent` INTEGER UNSIGNED NOT NULL DEFAULT 0;",
-			"ALTER TABLE `houses` ADD COLUMN `guildhall` TINYINT UNSIGNED NOT NULL DEFAULT 0;",
-			"ALTER TABLE `houses` ADD COLUMN `clear` TINYINT UNSIGNED NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD COLUMN `guildhall` TINYINT(1) NOT NULL DEFAULT 0;",
+			"ALTER TABLE `houses` ADD COLUMN `clear` TINYINT(1) NOT NULL DEFAULT 0;",
 			"ALTER TABLE `houses` MODIFY COLUMN `owner` INTEGER NOT NULL DEFAULT 0;",
 
 			"ALTER TABLE `tiles` ADD COLUMN `house_id` INTEGER UNSIGNED NOT NULL DEFAULT 0;",
@@ -654,7 +654,41 @@ SimpleUpdateQuery updateQueries[] = {
 		{ // Sqlite
 			NULL
 		}
-	}
+	},
+	{ 18,
+		{ // PgSql
+			"ALTER TABLE `players` DROP COLUMN `redskulltime`;",
+
+			"ALTER TABLE `players` ADD COLUMN `skull_type_tmp` SMALLINT;",
+			"UPDATE      `players` SET `skull_type_tmp` = 4 WHERE `redskull` = 1;",
+			"ALTER TABLE `players` DROP COLUMN `redskull`;",
+			"ALTER TABLE `players` ALTER COLUMN `skull_type_tmp` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `skull_type_tmp` SET DEFAULT 0;",
+			"ALTER TABLE `players` RENAME COLUMN `skull_type_tmp` TO `skull_type`;",
+
+			"ALTER TABLE `players` ADD `skull_time` BIGINT;",
+			"ALTER TABLE `players` ALTER COLUMN `skull_time` SET NOT NULL;", 
+			"ALTER TABLE `players` ALTER COLUMN `skull_time` SET DEFAULT 0;",
+
+			"ALTER TABLE `player_killers` ADD `unjustified` SMALLINT;",
+			"ALTER TABLE `player_killers` ALTER COLUMN `unjustified` SET NOT NULL;", 
+			"ALTER TABLE `player_killers` ALTER COLUMN `unjustified` SET DEFAULT 0;",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `players` DROP COLUMN `redskulltime`;",
+			"ALTER TABLE `players` CHANGE `redskull` `skull_type` INT NOT NULL DEFAULT 0;",
+			"UPDATE      `players` SET `skull_type` = 4 WHERE `skull_type` = 1;",
+			"ALTER TABLE `players` ADD `skull_time` INT UNSIGNED NOT NULL DEFAULT 0;",
+
+			"ALTER TABLE `player_killers` ADD COLUMN `unjustified` TINYINT(1) NOT NULL DEFAULT 0;",
+
+			NULL
+		},
+		{ // Sqlite
+			NULL
+		}
+	},
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)

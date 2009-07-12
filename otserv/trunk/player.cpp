@@ -176,8 +176,8 @@ Creature()
 	setParty(NULL);
 
 #ifdef __SKULLSYSTEM__
-	redSkullTicks = 0;
-	skull = SKULL_NONE;
+	lastSkullTime = 0;
+	skullType = SKULL_NONE;
 #endif
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -561,12 +561,6 @@ float Player::getDefenseFactor() const
 
 		case FIGHTMODE_DEFENSE:
 		{
-			/*
-			if((OTSYS_TIME() - lastAttack) < getAttackSpeed()){
-				//Attacking will cause us to get into normal defense
-				return 1.2f;
-			}
-*/
 			return 2.0f;
 			break;
 		}
@@ -577,18 +571,32 @@ float Player::getDefenseFactor() const
 	}
 }
 
+uint16_t Player::getIcons() const
+{
+	uint16_t icons = ICON_NONE;
+
+	ConditionList::const_iterator it;
+	for(it = conditions.begin(); it != conditions.end(); ++it){
+		if(!isSuppress((*it)->getType())){
+			icons |= (*it)->getIcons();
+		}
+	}
+
+	if(isPzLocked()){
+		icons |= ICON_PZBLOCK;
+	}
+
+	if(getTile()->getZone() == ZONE_PROTECTION){
+		icons |= ICON_PZ;
+	}
+
+	return icons;
+}
+
 void Player::sendIcons() const
 {
 	if(client){
-		int icons = 0;
-
-		ConditionList::const_iterator it;
-		for(it = conditions.begin(); it != conditions.end(); ++it){
-			if(!isSuppress((*it)->getType())){
-				icons |= (*it)->getIcons();
-			}
-		}
-		client->sendIcons(icons);
+		client->sendIcons(getIcons());
 	}
 }
 
@@ -899,7 +907,7 @@ void Player::dropLoot(Container* corpse)
 	uint32_t itemLoss = lossPercent[LOSS_ITEMS];
 	uint32_t backpackLoss = lossPercent[LOSS_CONTAINERS];
 #ifdef __SKULLSYSTEM__
-	if(getSkull() == SKULL_RED){
+	if(getSkull() == SKULL_RED || getSkull() == SKULL_BLACK){
 		itemLoss = 100;
 		backpackLoss = 100;
 	}
@@ -1577,13 +1585,15 @@ void Player::onChangeZone(ZoneType_t zone)
 		}
 		else if(zone == ZONE_NOPVP){
 			if( (attackedCreature->getPlayer() ||
-					(attackedCreature->getMaster() && attackedCreature->getMaster()->getPlayer()) ) &&
+					(attackedCreature->isPlayerSummon()) ) &&
 					!hasFlag(PlayerFlag_IgnoreProtectionZone)){
 				setAttackedCreature(NULL);
 				onAttackedCreatureDissapear(false);
 			}
 		}
 	}
+
+	sendIcons();
 }
 
 void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
@@ -1906,7 +1916,7 @@ void Player::onThink(uint32_t interval)
 
 	checkIdleTime(interval);
 #ifdef __SKULLSYSTEM__
-	checkRedSkullTicks(interval);
+	checkSkullTicks(interval);
 #endif
 }
 
@@ -1980,18 +1990,18 @@ void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t da
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
-void Player::drainMana(Creature* attacker, int32_t manaLoss)
+void Player::drainMana(Creature* attacker, int32_t points)
 {
-	Creature::drainMana(attacker, manaLoss);
+	Creature::drainMana(attacker, points);
 
 	sendStats();
 
 	std::stringstream ss;
 	if(attacker){
-		ss << "You lose " << manaLoss << " mana blocking an attack by " << attacker->getNameDescription() << ".";
+		ss << "You lose " << points << " mana blocking an attack by " << attacker->getNameDescription() << ".";
 	}
 	else{
-		ss << "You lose " << manaLoss << " mana.";
+		ss << "You lose " << points << " mana.";
 	}
 
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
@@ -2238,7 +2248,7 @@ void Player::onDie()
 			}
 		}
 
-		if(isLootPrevented && getSkull() != SKULL_RED){
+		if(isLootPrevented && getSkull() != SKULL_RED && getSkull() != SKULL_BLACK){
 			setDropLoot(false);
 		}
 		if(isSkillPrevented){
@@ -2247,6 +2257,21 @@ void Player::onDie()
 
 		DeathList killers = getKillers(g_config.getNumber(ConfigManager::DEATH_ASSIST_COUNT));
 		IOPlayer::instance()->addPlayerDeath(this, killers);
+
+		for(DeathList::const_iterator it = killers.begin(); it != killers.end(); ++it){
+			if(it->isCreatureKill() && it->isUnjustKill()){
+				Creature* attacker = it->getKillerCreature();
+				Player* attackerPlayer = attacker->getPlayer();
+
+				if(attacker->isPlayerSummon()){
+					attackerPlayer = attacker->getPlayerMaster();
+				}
+
+				if(attackerPlayer){
+					attackerPlayer->addUnjustifiedDead(this);
+				}
+			}
+		}
 	}
 
 	Creature::onDie();
@@ -2382,12 +2407,10 @@ Item* Player::createCorpse()
 
 		ss << "You recognize " << getNameDescription() << ".";
 
-		Creature* lastHitCreature = NULL;
-		Creature* mostDamageCreature = NULL;
-
-		if(getKillers(&lastHitCreature, &mostDamageCreature) && lastHitCreature){
+		DeathList killers = getKillers(0);
+		if(!killers.empty() && (*killers.begin()).isCreatureKill() ){
 			ss << " " << playerSexSubjectString(getSex()) << " was killed by "
-				<< lastHitCreature->getNameDescription() << ".";
+				<< ((*killers.begin()).getKillerCreature())->getNameDescription() << ".";
 		}
 
 		corpse->setSpecialDescription(ss.str());
@@ -2408,8 +2431,17 @@ void Player::preSave()
 			capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
 		}
 
-		health = healthMax;
-		mana = manaMax;
+		if(getSkull() != SKULL_BLACK){
+			health = healthMax;
+			mana = manaMax;
+		}
+		else{
+			if(healthMax >= 40)
+				health = 40;
+			else
+				health = healthMax;
+			mana = 0;
+		}
 	}
 }
 
@@ -2433,10 +2465,12 @@ void Player::addHealExhaust(uint32_t ticks)
 void Player::addInFightTicks(uint32_t ticks, bool pzlock /*= false*/)
 {
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
+		if(pzlock){
+			pzLocked = true;
+			sendIcons();
+		}
 		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, ticks, 0);
 		addCondition(condition);
-		if(pzlock)
-			pzLocked = true;
 	}
 }
 
@@ -3564,20 +3598,21 @@ void Player::onAddCombatCondition(ConditionType_t type, bool hadCondition)
 void Player::onEndCondition(ConditionType_t type, bool lastCondition)
 {
 	Creature::onEndCondition(type, lastCondition);
-	sendIcons();
 
 	if(type == CONDITION_INFIGHT){
 		onIdleStatus();
 		pzLocked = false;
 
 #ifdef __SKULLSYSTEM__
-		if(getSkull() != SKULL_RED){
+		if(getSkull() != SKULL_RED && getSkull() != SKULL_BLACK){
 			clearAttacked();
 			setSkull(SKULL_NONE);
 			g_game.updateCreatureSkull(this);
 		}
 #endif
 	}
+
+	sendIcons();
 }
 
 void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condition)
@@ -3633,7 +3668,9 @@ void Player::onAttackedCreature(Creature* target)
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
-				pzLocked = true;
+				if(!targetPlayer->hasAttacked(this)){
+					pzLocked = true;
+				}
 
 #ifdef __SKULLSYSTEM__
 				if( !isPartner(targetPlayer) &&
@@ -3660,6 +3697,13 @@ void Player::onAttackedCreature(Creature* target)
 
 		addInFightTicks(g_game.getInFightTicks());
 	}
+}
+
+void Player::onSummonAttackedCreature(Creature* summon, Creature* target)
+{
+	Creature::onSummonAttackedCreature(summon, target);
+
+	onAttackedCreature(target);
 }
 
 void Player::onAttacked()
@@ -3698,13 +3742,40 @@ void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	Creature::onAttackedCreatureDrainHealth(target, points);
 
-	if(target && getParty() && !Combat::isPlayerCombat(target) ){
+	if(target && getParty() && !Combat::isPlayerCombat(target)){
 		Monster* tmpMonster = target->getMonster();
-		if( tmpMonster && tmpMonster->isHostile()){
+		if(tmpMonster && tmpMonster->isHostile()){
 			//We have fulfilled a requirement for shared experience
 			getParty()->addPlayerDamageMonster(this, points);
 		}
 	}
+
+	std::stringstream ss;
+	ss << "You deal " << points << " damage to " << target->getNameDescription() << ".";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+}
+
+void Player::onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points)
+{
+	std::stringstream ss;
+	ss << "Your " << summon->getName() << " deals " << points << " damage to " << target->getNameDescription() << ".";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+}
+
+void Player::onAttackedCreatureDrainMana(Creature* target, int32_t points)
+{
+	Creature::onAttackedCreatureDrainMana(target, points);
+
+	std::stringstream ss;
+	ss << "You drain " << points << " mana from " << target->getNameDescription() << ".";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
+}
+
+void Player::onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points)
+{
+	std::stringstream ss;
+	ss << "Your " << summon->getName() << " drains " << points << " mana from " << target->getNameDescription() << ".";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
 void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
@@ -3715,11 +3786,11 @@ void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
 		if(target->getPlayer()){
 			tmpPlayer = target->getPlayer();
 		}
-		else if(target->getMaster() && target->getMaster()->getPlayer()){
-			tmpPlayer = target->getMaster()->getPlayer();
+		else if(target->isPlayerSummon()){
+			tmpPlayer = target->getPlayerMaster();
 		}
 
-		if( isPartner(tmpPlayer) ){
+		if(isPartner(tmpPlayer)){
 			//We have fulfilled a requirement for shared experience
 			getParty()->addPlayerHealedMember(this, points);
 		}
@@ -3738,17 +3809,8 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 			targetPlayer->setLossSkill(false);
 		}
 		else if(!hasFlag(PlayerFlag_NotGainInFight)){
-#ifdef __SKULLSYSTEM__
-			if( !isPartner(targetPlayer) &&
-					!Combat::isInPvpZone(this, targetPlayer) &&
-					!targetPlayer->hasAttacked(this) &&
-					targetPlayer->getSkull() == SKULL_NONE){
-				addUnjustifiedDead(targetPlayer);
-			}
-#endif
-
 			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT) && lastHit){
-				addInFightTicks(g_config.getNumber(ConfigManager::SKULL_TIME), true);
+				addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION), true);
 			}
 		}
 	}
@@ -3988,7 +4050,7 @@ Skulls_t Player::getSkull() const
 		return SKULL_NONE;
 	}
 
-	return skull;
+	return skullType;
 }
 
 Skulls_t Player::getSkullClient(const Player* player) const
@@ -3997,8 +4059,8 @@ Skulls_t Player::getSkullClient(const Player* player) const
 		return SKULL_NONE;
 	}
 
-	if(getSkull() != SKULL_NONE && player->getSkull() != SKULL_RED){
-		if(player->hasAttacked(this) ){
+	if(getSkull() != SKULL_NONE && player->getSkull() != SKULL_RED && player->getSkull() != SKULL_BLACK){
+		if(player->hasAttacked(this)){
 			return SKULL_YELLOW;
 		}
 	}
@@ -4054,27 +4116,74 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
-	redSkullTicks += g_config.getNumber(ConfigManager::FRAG_TIME);
-	// We subtract one from kills as if you kill three people, you'll gain 3*time ticks,
-	// however some will probably decay in that time so we only check if the ticks are
-	// greater than 2*time (must be >= N kills then)
-	if(redSkullTicks >
-			(g_config.getNumber(ConfigManager::KILLS_FOR_RED_SKULL) - 1) *
-			 g_config.getNumber(ConfigManager::FRAG_TIME))
-	{
+
+	//day
+	int64_t time = std::max((int64_t)(std::time(NULL) - 24 * 60 * 60), lastSkullTime);
+	int32_t unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, time);
+
+	if(		g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) <= unjustKills ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_BLACK);
+		g_game.updateCreatureSkull(this);
+	}
+	else if(g_config.getNumber(ConfigManager::RED_SKULL_DURATION) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL) <= unjustKills ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_RED);
+		g_game.updateCreatureSkull(this);
+	}
+
+	//week
+	time = std::max((int64_t)(std::time(NULL) - 7 * 24 * 60 * 60), lastSkullTime);
+	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, time);
+
+	if(		g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) <= unjustKills ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_BLACK);
+		g_game.updateCreatureSkull(this);
+	}
+	else if(g_config.getNumber(ConfigManager::RED_SKULL_DURATION) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL) <= unjustKills ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_RED);
+		g_game.updateCreatureSkull(this);
+	}
+
+	//month
+	time = std::max((int64_t)(std::time(NULL) - 30 * 24 * 60 * 60), lastSkullTime);
+	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, time);
+
+	if(		g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) <= unjustKills ){
+		lastSkullTime = std::time(NULL);
+		setSkull(SKULL_BLACK);
+		g_game.updateCreatureSkull(this);
+	}
+	else if(g_config.getNumber(ConfigManager::RED_SKULL_DURATION) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) > 0 &&
+			g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) <= unjustKills ){
+		lastSkullTime = std::time(NULL);
 		setSkull(SKULL_RED);
 		g_game.updateCreatureSkull(this);
 	}
 }
 
-void Player::checkRedSkullTicks(int32_t ticks)
+void Player::checkSkullTicks(int32_t ticks)
 {
-	if(redSkullTicks - ticks > 0)
-		redSkullTicks = redSkullTicks - ticks;
-
-	if(redSkullTicks < 1000 && !hasCondition(CONDITION_INFIGHT) && skull != SKULL_NONE){
-		setSkull(SKULL_NONE);
-		g_game.updateCreatureSkull(this);
+	if(!hasCondition(CONDITION_INFIGHT) && getSkull() != SKULL_NONE){
+		if( (skullType == SKULL_RED && lastSkullTime >= std::time(NULL) + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
+			(skullType == SKULL_BLACK && lastSkullTime >= std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION)) ){
+			lastSkullTime = 0;
+			setSkull(SKULL_NONE);
+			g_game.updateCreatureSkull(this);
+		}
 	}
 }
 #endif
@@ -4330,13 +4439,13 @@ void Player::checkIdleTime(uint32_t ticks)
 	}
 }
 
-uint32_t Player::getFrags()
+void Player::broadcastLoot(Creature* creature, Container* corpse)
 {
-	uint32_t frags;
-	if(redSkullTicks <= 0)
-		frags = 0;
-	else
-		frags = (uint32_t)std::ceil(((double)redSkullTicks / g_config.getNumber(ConfigManager::FRAG_TIME)));
+	std::ostringstream os;
+	os << "Loot of " << creature->getNameDescription() << ": " << corpse->getContentDescription();
+	sendTextMessage(MSG_INFO_DESCR, os.str());
 
-	return frags;
+	//send message to party channel
+	if(getParty())
+		getParty()->broadcastLoot(creature, corpse);
 }

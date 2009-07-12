@@ -89,18 +89,20 @@ struct DeathLessThan;
 struct DeathEntry{
 	// Death can be either a name (for fields) or a creature (for anything substantial)
 	// Fields are only counted if they are the final hit killer
-	DeathEntry(std::string name, int dmg) : data(name), damage(dmg) {}
-	DeathEntry(Creature* killer, int dmg) : data(killer), damage(dmg) {}
+	DeathEntry(std::string name, int32_t dmg) : data(name), damage(dmg), isUnjust(false) {}
+	DeathEntry(Creature* killer, int32_t dmg, bool unjust) : data(killer), damage(dmg), isUnjust(unjust) {}
 
 	bool isCreatureKill() const {return data.type() == typeid(Creature*);}
 	bool isNameKill() const {return !isCreatureKill();}
+	bool isUnjustKill() const {return isUnjust;}
 
 	Creature* getKillerCreature() const {return boost::any_cast<Creature*>(data);}
 	std::string getKillerName() const {return boost::any_cast<std::string>(data);}
 
 protected:
 	boost::any data;
-	int damage;
+	int32_t damage;
+	bool isUnjust;
 
 	friend struct DeathLessThan;
 };
@@ -113,14 +115,6 @@ struct DeathLessThan{
 };
 
 typedef std::vector<DeathEntry> DeathList;
-
-enum ZoneType_t{
-	ZONE_PROTECTION,
-	ZONE_NOPVP,
-	ZONE_PVP,
-	ZONE_NOLOGOUT,
-	ZONE_NORMAL
-};
 
 class Map;
 class Thing;
@@ -235,21 +229,7 @@ public:
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
-	ZoneType_t getZone() const {
-		const Tile* tile = getTile();
-		if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
-			return ZONE_PROTECTION;
-		}
-		else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
-			return ZONE_NOPVP;
-		}
-		else if(tile->hasFlag(TILESTATE_PVPZONE)){
-			return ZONE_PVP;
-		}
-		else{
-			return ZONE_NORMAL;
-		}
-	}
+	ZoneType_t getZone() const {return getTile()->getZone();}
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -278,7 +258,8 @@ public:
 	void setMaster(Creature* creature) {master = creature;}
 	Creature* getMaster() {return master;}
 	bool isSummon() const {return master != NULL;}
-	bool isPlayerSummon() const {return master != NULL && master->getPlayer();}
+	bool isPlayerSummon() const {return master != NULL && master->getPlayer() != NULL;}
+	Player* getPlayerMaster() const {return (isPlayerSummon() ? master->getPlayer() : NULL);}
 	const Creature* getMaster() const {return master;}
 
 	virtual void addSummon(Creature* creature);
@@ -311,7 +292,7 @@ public:
 
 	virtual void gainHealth(Creature* caster, int32_t healthGain);
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void drainMana(Creature* attacker, int32_t points);
 
 	virtual bool challengeCreature(Creature* creature) {return false;};
 	virtual bool convinceCreature(Creature* creature) {return false;};
@@ -329,9 +310,13 @@ public:
 	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
 	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
-	virtual void onAttackedCreature(Creature* target);
-	virtual void onAttacked();
+	virtual void onAttackedCreature(Creature* target) {};
+	virtual void onSummonAttackedCreature(Creature* summon, Creature* target) {};
+	virtual void onAttacked() {};
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points) {};
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points) {};
+	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points) {};
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target, bool lastHit);
@@ -484,8 +469,7 @@ protected:
 
 	virtual uint64_t getLostExperience() const { return 0; };
 	virtual double getDamageRatio(Creature* attacker) const;
-	bool getKillers(Creature** lastHitCreature, Creature** mostDamageCreature);
-	DeathList getKillers(int assist_count = 1);
+	DeathList getKillers(int32_t assist_count = 1);
 	virtual void dropLoot(Container* corpse) {};
 	virtual uint16_t getLookCorpse() const { return 0; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;

@@ -83,6 +83,17 @@ enum MagicEffectClasses {
 	NM_ME_PLANTATTACK      = 0x36, //54
 	NM_ME_TUTORIALARROW    = 0x37, //55
 	NM_ME_TUTORIALSQUARE   = 0x38, //56
+	NM_ME_MIRRORHORIZONTAL = 0x39, //57
+	NM_ME_MIRRORVERTICAL   = 0x3A, //58
+	NM_ME_SKULLHORIZONTAL  = 0x3B, //59
+	NM_ME_SKULLVERTICAL    = 0x3C, //60
+	NM_ME_ASSASSIN         = 0x3D, //61
+	NM_ME_STEPSHORIZONTAL  = 0x3E, //62
+	NM_ME_BLOODYSTEPS      = 0x3F, //63
+	NM_ME_STEPSVERTICAL    = 0x40, //64
+	NM_ME_YALAHARIGHOST    = 0x41, //65
+	NM_ME_BATS             = 0x42, //66
+	NM_ME_SMOKE            = 0x43, //67
 	//for internal use, dont send to client
 	NM_ME_NONE             = 0xFF,
 	NM_ME_UNK              = 0xFFFF
@@ -267,6 +278,7 @@ enum TextColor_t {
 };
 
 enum Icons_t{
+	ICON_NONE       = 0,
 	ICON_POISON     = 1,
 	ICON_BURN       = 2,
 	ICON_ENERGY     = 4,
@@ -279,7 +291,9 @@ enum Icons_t{
 	ICON_FREEZING   = 512,
 	ICON_DAZZLED    = 1024,
 	ICON_CURSED     = 2048,
-	ICON_PARTY_BUFF = 4096
+	ICON_PARTY_BUFF = 4096,
+	ICON_PZBLOCK    = 8192,
+	ICON_PZ         = 16384
 };
 
 enum WeaponType_t {
@@ -324,7 +338,9 @@ enum Skulls_t{
 	SKULL_YELLOW    = 1,
 	SKULL_GREEN     = 2,
 	SKULL_WHITE     = 3,
-	SKULL_RED       = 4
+	SKULL_RED       = 4,
+	SKULL_BLACK     = 5,
+	SKULL_LAST
 };
 
 enum PartyShields_t{
@@ -436,15 +452,15 @@ enum PlayerFlags{
 
 enum ViolationActions_t
 {
-	Action_None			= 0,
-	Action_Notation			= 1 << 0,
-	Action_Namelock			= 1 << 1,
-	Action_Banishment		= 1 << 2,
-	Action_NamelockBan		= 1 << 3,
-	Action_BanFinalWarning		= 1 << 4,
-	Action_NamelockBanFinalWarning	= 1 << 5,
-	Action_StatementReport		= 1 << 6,
-	Action_IpBan			= 1 << 7
+	Action_None                     = 0,
+	Action_Notation                 = 1 << 0,
+	Action_Namelock                 = 1 << 1,
+	Action_Banishment               = 1 << 2,
+	Action_NamelockBan              = 1 << 3,
+	Action_BanFinalWarning          = 1 << 4,
+	Action_NamelockBanFinalWarning  = 1 << 5,
+	Action_StatementReport          = 1 << 6,
+	Action_IpBan                    = 1 << 7
 };
 
 const int32_t violationReasons[5] =
@@ -453,7 +469,7 @@ const int32_t violationReasons[5] =
 	3,	//all name reasons
 	9,	//all name & statement reasons
 	18,	//all name, statement & cheating reasons
-	22	//all reasons
+	19	//all name, statement & cheating reasons & ip-banishment
 };
 
 const int32_t violationNames[5] =

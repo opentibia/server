@@ -324,14 +324,24 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 		}
 	}
 
-	Item* item = NULL;
-	item = getTopDownItem();
-	if(item != NULL)
-		return item;
+	TileItemVector* items = getItemList();
 
-	item = getTopTopItem();
-	if(item != NULL)
-		return item;
+	if(items){
+		for(ItemVector::iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
+			const ItemType& iit = Item::items[(*it)->getID()];
+			if(!iit.lookThrough){
+				return (*it);
+			}
+		}
+
+		ItemVector::reverse_iterator itEnd = ItemVector::reverse_iterator(items->getBeginTopItem());
+		for(ItemVector::reverse_iterator it = ItemVector::reverse_iterator(items->getEndTopItem()); it != itEnd; ++it){
+			const ItemType& iit = Item::items[(*it)->getID()];
+			if(!iit.lookThrough){
+				return (*it);
+			}
+		}
+	}
 
 	if(ground)
 		return ground;
@@ -559,7 +569,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 						if( !creature->getMonster() ||
 							!creature->isPushable() ||
-							(creature->getMonster()->isSummon() && creature->getMonster()->getMaster()->getPlayer()))
+							(creature->getMonster()->isPlayerSummon()))
 						{
 							return RET_NOTPOSSIBLE;
 						}

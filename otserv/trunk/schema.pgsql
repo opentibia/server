@@ -53,8 +53,8 @@ CREATE TABLE "players" (
 	"lastip" BIGINT NOT NULL DEFAULT 0,
 	"save" SMALLINT NOT NULL DEFAULT 1,
 	"conditions" BYTEA NOT NULL,
-	"redskulltime" BIGINT NOT NULL DEFAULT 0,
-	"redskull" SMALLINT NOT NULL DEFAULT 0,
+	"skull_type" SMALLINT NOT NULL DEFAULT 0,
+	"skull_time" BIGINT NOT NULL DEFAULT 0,
 	"guildnick" VARCHAR(255) NOT NULL DEFAULT '',
 	"loss_experience" INT NOT NULL DEFAULT 100,
 	"loss_mana" INT NOT NULL DEFAULT 100,
@@ -230,6 +230,7 @@ CREATE TABLE "environment_killers" (
 CREATE TABLE "player_killers" (
 	"kill_id" INT NOT NULL,
 	"player_id" INT NOT NULL,
+	"unjustified" SMALLINT NOT NULL DEFAULT 0,
 	PRIMARY KEY ("kill_id", "player_id"),
 	FOREIGN KEY ("kill_id") REFERENCES "killers" ("id") ON DELETE CASCADE,
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
@@ -258,7 +259,7 @@ CREATE TABLE "schema_info" (
 	PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 17);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 18);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER

@@ -712,6 +712,14 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 		return false;
 	}
 
+#ifdef __SKULLSYSTEM__
+	if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
+		player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+#endif
+
 	if(toPos.x != 0xFFFF){
 		const Position& playerPos = player->getPosition();
 		if(playerPos.z > toPos.z){
@@ -816,6 +824,12 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 			}
 
 #ifdef __SKULLSYSTEM__
+			if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
+				player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
+			}
+
 			if(isAggressive && needTarget && player->hasSafeMode() && tile->getTopVisibleCreature(player)){
 				Player* targetPlayer = tile->getTopVisibleCreature(player)->getPlayer();
 				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE){
@@ -1067,13 +1081,13 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 		bool useDirection = false;
 
 		if(hasParam){
-			Player* playerTarget = NULL;
-			ReturnValue ret = g_game.getPlayerByNameWildcard(param, playerTarget);
-			target = playerTarget;
+			Player* targetPlayer = NULL;
+			ReturnValue ret = g_game.getPlayerByNameWildcard(param, targetPlayer);
+			target = targetPlayer;
 
 			if(!target || target->getHealth() <= 0){
 				if(!casterTargetOrDirection){
-					player->sendCancelMessage(ret);//RET_PLAYERWITHTHISNAMEISNOTONLINE);
+					player->sendCancelMessage(ret);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
@@ -1565,6 +1579,10 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 
 	int32_t manaCost = mType->manaCost;
 	if(!player->hasFlag(PlayerFlag_CanSummonAll)){
+		if(player->getSkull() == SKULL_BLACK){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			return false;
+		}
 		if(!mType->isSummonable){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
@@ -2069,6 +2087,11 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 	}
 
 	if(!player->hasFlag(PlayerFlag_CanConvinceAll)){
+		if(player->getSkull() == SKULL_BLACK){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			return false;
+		}
+
 		if(player->getSummonCount() >= 2){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);

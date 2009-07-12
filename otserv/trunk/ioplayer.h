@@ -64,6 +64,7 @@ public:
 	bool savePlayer(Player* player, bool shallow = false);
 
 	bool addPlayerDeath(Player* dying_player, const DeathList& dl);
+	int32_t getPlayerUnjustKillCount(Player* player, int64_t date);
 
 	bool getGuidByName(uint32_t& guid, std::string& name);
 	bool getAccountByName(uint32_t& acc, std::string& name);

@@ -51,8 +51,8 @@ CREATE TABLE "players" (
 	"lastip" INTEGER NOT NULL DEFAULT 0,
 	"save" INTEGER NOT NULL DEFAULT 1,
 	"conditions" BLOB NOT NULL,
-	"redskulltime" INTEGER NOT NULL DEFAULT 0,
-	"redskull" BOOLEAN NOT NULL DEFAULT 0,
+	"skull_type" INTEGER NOT NULL DEFAULT 0,
+	"skull_time" INTEGER NOT NULL DEFAULT 0,
 	"guildnick" VARCHAR(255) NOT NULL DEFAULT '',
 	"loss_experience" INTEGER NOT NULL DEFAULT 100,
 	"loss_mana" INTEGER NOT NULL DEFAULT 100,
@@ -144,6 +144,7 @@ CREATE TABLE `environment_killers` (
 CREATE TABLE "player_killers" (
 	"kill_id" INTEGER NOT NULL,
 	"player_id" INTEGER NOT NULL,
+	"unjustified" SMALLINT NOT NULL DEFAULT 0,
 	FOREIGN KEY ("kill_id") REFERENCES "killers" ("id"),
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
 );
@@ -246,7 +247,7 @@ CREATE TABLE "schema_info" (
 	UNIQUE ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 17);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 18);
 
 CREATE TRIGGER "oncreate_guilds"
 AFTER INSERT ON "guilds"

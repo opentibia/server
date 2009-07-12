@@ -46,7 +46,7 @@ status_port = "7171"
 admin_port = "7171"
 
 -- server url
-url = "http://otserv.org"
+url = "http://otfans.net"
 
 -- server owner name
 ownername = "Tliff"
@@ -74,13 +74,13 @@ attackspeed = 2000
 exhaustedadd = 200
 
 -- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1 second)
-pzlocked = 60000
+in_fight_duration = 60000
 
 -- how long a field belongs to a player before it no longer causes PZ lock for the owner
 field_ownership_duration = 5000
 
 -- When a player dies, how many of the assisting players (ie. how many of those who made damage) should be stored in database?
-death_assist_count = 1
+death_assist_count = 19
 
 -- enable (advanced, item based) hotkeys?
 enablehotkeys = true
@@ -99,22 +99,26 @@ houserentperiod = "monthly"
 premonlybeds = false
 
 -- Should the server use account balance system or depot system for paying houses?
-useaccbalance = false
+useaccbalance = true
 
--- Frag duration, how long one kill adds to your red skull time
-fragduration = 12*60*60*1000
+-- How long time the red skull will last
+red_skull_duration = 30*24*60*60*1000
+
+-- How long time the black skull will last
+black_skull_duration = 45*24*60*60*1000
 
 -- White skull duration, how long a player will get pz locked/white skull
-skullduration = 15*60*1000
+unjust_skull_duration = 15*60*1000
 
--- How many players you need to kill to gain a red skull
-killsforredskull = 3
+-- How many players you need to kill to gain a red skull per day/week/month
+kills_per_day_red_skull = 3
+kills_per_week_red_skull = 5
+kills_per_month_red_skull = 10
 
--- How many players you need to kill to get banished
-frags_to_banishment = 6
-
--- Time in seconds a player will be banished for excessive killing
-kill_ban_time = 24*60*60*30
+-- How many players you need to kill to gain a black skull per day/week/month
+kills_per_day_black_skull = 6
+kills_per_week_black_skull = 10
+kills_per_month_black_skull = 20
 
 -- Broadcast violation window banishments
 broadcast_banishments = "no"
@@ -182,13 +186,16 @@ remove_rune_charges = true
 -- Set to false to disable charges disappearing from weapons on use
 remove_weapon_charges = true
 
+-- Distance weapon configuration
+-- Should exhaustion and action time be checked for using a distance weapon?
+distance_weapon_interrupt_swing = true
+
 -- Allow gamemaster multiclient login to everybody?
 allow_gamemaster_multiclient = false
 
 -- despawn configs
 -- how many floors can a monster go from his spawn before despawning
 despawnrange = 2
-
 -- how many square metters can a monster be far from his spawn before despawning
 despawnradius = 50
 
@@ -203,7 +210,7 @@ motd = "Welcome to OTServ 0.6.3!"
 motdnum = "1"
 
 -- login message
-loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otserv.org"
+loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otfans.net."
 
 -- how many logins attempts until ip is temporary disabled 
 -- set to 0 to disable
@@ -219,13 +226,13 @@ logintimeout = 60 * 1000
 allowclones = false
 
 -- only one player online per account
-checkaccounts = false
+checkaccounts = true
 
 -- max number of players allowed
 maxplayers = "900"
 
 -- save client debug assertion reports
-saveclientdebug = false
+saveclientdebug = true
 
 -- Set the max query interval for retrieving status information
 -- default: 5 minutes / IP

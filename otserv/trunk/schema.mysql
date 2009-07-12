@@ -52,10 +52,10 @@ CREATE TABLE `players` (
 	`lastlogout` INT UNSIGNED NOT NULL DEFAULT 0,
 	`lastip` INT UNSIGNED NOT NULL DEFAULT 0,
 	`save` TINYINT(1) NOT NULL DEFAULT TRUE,
-	`conditions` BLOB NOT NULL COMMENT 'drunk, poisoned etc (maybe also food and redskull)',
-	`redskulltime` INT UNSIGNED NOT NULL DEFAULT 0,
-	`redskull` TINYINT(1) NOT NULL DEFAULT FALSE,
-	`guildnick` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'additional nick in guild - mostly for web interfaces i think',
+	`conditions` BLOB NOT NULL COMMENT 'drunk, poisoned etc',
+	`skull_type` INT NOT NULL DEFAULT 0,
+	`skull_time` INT UNSIGNED NOT NULL DEFAULT 0,
+	`guildnick` VARCHAR(255) NOT NULL DEFAULT '',
 	`loss_experience` INT NOT NULL DEFAULT 100,
 	`loss_mana` INT NOT NULL DEFAULT 100,
 	`loss_skills` INT NOT NULL DEFAULT 100,
@@ -236,6 +236,7 @@ CREATE TABLE `environment_killers` (
 CREATE TABLE `player_killers` (
 	`kill_id` INT UNSIGNED NOT NULL,
 	`player_id` INT UNSIGNED NOT NULL,
+	`unjustified` TINYINT(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`kill_id`, `player_id`),
 	FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
@@ -264,7 +265,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 17);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 18);
 
 DELIMITER |
 

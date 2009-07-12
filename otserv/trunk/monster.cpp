@@ -132,6 +132,33 @@ void Monster::onFollowCreatureDissapear(bool isLogout)
 #endif
 }
 
+void Monster::onAttackedCreature(Creature* target)
+{
+	Creature::onAttackedCreature(target);
+
+	if(isSummon()){
+		getMaster()->onSummonAttackedCreature(this, target);
+	}
+}
+
+void Monster::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
+{
+	Creature::onAttackedCreatureDrainHealth(target, points);
+	
+	if(isSummon()){
+		getMaster()->onSummonAttackedCreatureDrainHealth(this, target, points);
+	}
+}
+
+void Monster::onAttackedCreatureDrainMana(Creature* target, int32_t points)
+{
+	Creature::onAttackedCreatureDrainMana(target, points);
+
+	if(isSummon()){
+		getMaster()->onSummonAttackedCreatureDrainMana(this, target, points);
+	}
+}
+
 void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	Creature::onCreatureAppear(creature, isLogin);
@@ -303,14 +330,14 @@ void Monster::onCreatureEnter(Creature* creature)
 
 bool Monster::isFriend(const Creature* creature)
 {
-	if(isSummon() && getMaster()->getPlayer()){
-		const Player* masterPlayer = getMaster()->getPlayer();
+	if(isPlayerSummon()){
+		const Player* masterPlayer = getPlayerMaster();
 		const Player* tmpPlayer = NULL;
 		if(creature->getPlayer()){
 			tmpPlayer = creature->getPlayer();
 		}
-		else if(creature->getMaster() && creature->getMaster()->getPlayer()){
-			tmpPlayer = creature->getMaster()->getPlayer();
+		else if(creature->isPlayerSummon()){
+			tmpPlayer = creature->getPlayerMaster();
 		}
 
 		if(tmpPlayer && (tmpPlayer == getMaster() || masterPlayer->isPartner(tmpPlayer)) ){
@@ -328,14 +355,14 @@ bool Monster::isFriend(const Creature* creature)
 
 bool Monster::isOpponent(const Creature* creature)
 {
-	if(isSummon() && getMaster()->getPlayer()){
+	if(isPlayerSummon()){
 		if(creature != getMaster()){
 			return true;
 		}
 	}
 	else{
 		if( (creature->getPlayer() && !creature->getPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
-			(creature->getMaster() && creature->getMaster()->getPlayer()) ) {
+			(creature->isPlayerSummon()) ) {
 			return true;
 		}
 	}
@@ -1184,16 +1211,16 @@ Item* Monster::createCorpse()
 {
 	Item* corpse = Creature::createCorpse();
 	if(corpse){
-		Creature* lastHitCreature = NULL;
-		Creature* mostDamageCreature = NULL;
+		DeathList killers = getKillers(1);
+		if(!killers.empty() && (*killers.rbegin()).isCreatureKill() ){
+			Creature* mostDamageCreature = (*killers.rbegin()).getKillerCreature();
 
-		if(getKillers(&lastHitCreature, &mostDamageCreature) && mostDamageCreature){
 			Player* corpseOwner = NULL;
 			if(mostDamageCreature->getPlayer()){
 				corpseOwner = mostDamageCreature->getPlayer();
 			}
-			else if(mostDamageCreature->getMaster() && mostDamageCreature->getMaster()->getPlayer()){
-				corpseOwner = mostDamageCreature->getMaster()->getPlayer();
+			else if(mostDamageCreature->isPlayerSummon()){
+				corpseOwner = mostDamageCreature->getPlayerMaster();
 			}
 
 			if(corpseOwner != NULL){
@@ -1318,9 +1345,8 @@ void Monster::dropLoot(Container* corpse)
 	if(corpse && lootDrop){
 		mType->createLoot(corpse);
 		Player* killer = g_game.getPlayerByID(corpse->getCorpseOwner());
-		if(killer && killer->getParty()){
-			killer->getParty()->broadcastLoot(this, corpse->getContainer());
-		}
+		if(killer)
+			killer->broadcastLoot(this, corpse->getContainer());
 	}
 }
 
@@ -1384,12 +1410,12 @@ bool Monster::convinceCreature(Creature* creature)
 			return false;
 		}
 	}
-
-	if(isSummon()){
-		if(getMaster()->getPlayer()){
-			return false;
-		}
-		else if(getMaster() != creature){
+	
+	if(isPlayerSummon()){
+		return false;
+	}
+	else if(isSummon()){
+		if(getMaster() != creature){
 			Creature* oldMaster = getMaster();
 			oldMaster->removeSummon(this);
 			creature->addSummon(this);

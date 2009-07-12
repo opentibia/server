@@ -48,8 +48,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`account_id`, `players`.`group_id` as `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
-		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `redskulltime`, \
-		`redskull`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
+		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
+		`skull_type`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
 		`loss_items`, `loss_containers`, `rank_id`, `town_id`, `balance`, `stamina` \
 		FROM `players` LEFT JOIN `accounts` ON `account_id` = `accounts`.`id` \
 		WHERE `players`.`name` = " + db->escapeString(name);
@@ -129,14 +129,13 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->currentOutfit = player->defaultOutfit;
 
 #ifdef __SKULLSYSTEM__
-	int32_t redSkullSeconds = result->getDataInt("redskulltime") - std::time(NULL);
-	if(redSkullSeconds > 0){
-		//ensure that we round up the number of ticks
-		player->redSkullTicks = (redSkullSeconds + 2)*1000;
+	int32_t skullType = result->getDataInt("skull_type");
+	int64_t lastSkullTime = result->getDataLong("skull_time");
 
-		if(result->getDataInt("redskull") == 1){
-			player->skull = SKULL_RED;
-		}
+	if( (skullType == SKULL_RED && lastSkullTime < std::time(NULL) + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
+		(skullType == SKULL_BLACK && lastSkullTime < std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION)) ){
+		player->lastSkullTime = lastSkullTime;
+		player->skullType = (Skulls_t)skullType;
 	}
 #endif
 
@@ -465,17 +464,17 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	//First, an UPDATE query to write the player itself
 	query.str("");
 	query << "UPDATE `players` SET `level` = " << player->level
-	<< ", `vocation` = " << (int)player->getVocationId()
+	<< ", `vocation` = " << (int32_t)player->getVocationId()
 	<< ", `health` = " << player->health
 	<< ", `healthmax` = " << player->healthMax
-	<< ", `direction` = " << (int)player->getDirection()
+	<< ", `direction` = " << (int32_t)player->getDirection()
 	<< ", `experience` = " << player->experience
-	<< ", `lookbody` = " << (int)player->defaultOutfit.lookBody
-	<< ", `lookfeet` = " << (int)player->defaultOutfit.lookFeet
-	<< ", `lookhead` = " << (int)player->defaultOutfit.lookHead
-	<< ", `looklegs` = " << (int)player->defaultOutfit.lookLegs
-	<< ", `looktype` = " << (int)player->defaultOutfit.lookType
-	<< ", `lookaddons` = " << (int)player->defaultOutfit.lookAddons
+	<< ", `lookbody` = " << (int32_t)player->defaultOutfit.lookBody
+	<< ", `lookfeet` = " << (int32_t)player->defaultOutfit.lookFeet
+	<< ", `lookhead` = " << (int32_t)player->defaultOutfit.lookHead
+	<< ", `looklegs` = " << (int32_t)player->defaultOutfit.lookLegs
+	<< ", `looktype` = " << (int32_t)player->defaultOutfit.lookType
+	<< ", `lookaddons` = " << (int32_t)player->defaultOutfit.lookAddons
 	<< ", `maglevel` = " << player->magLevel
 	<< ", `mana` = " << player->mana
 	<< ", `manamax` = " << player->manaMax
@@ -488,22 +487,17 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	<< ", `cap` = " << player->getCapacity()
 	<< ", `sex` = " << player->sex
 	<< ", `conditions` = " << db->escapeBlob(conditions, conditionsSize)
-	<< ", `loss_experience` = " << (int)player->getLossPercent(LOSS_EXPERIENCE)
-	<< ", `loss_mana` = " << (int)player->getLossPercent(LOSS_MANASPENT)
-	<< ", `loss_skills` = " << (int)player->getLossPercent(LOSS_SKILLTRIES)
-	<< ", `loss_items` = " << (int)player->getLossPercent(LOSS_ITEMS)
-	<< ", `loss_containers` = " << (int)player->getLossPercent(LOSS_CONTAINERS)
+	<< ", `loss_experience` = " << (int32_t)player->getLossPercent(LOSS_EXPERIENCE)
+	<< ", `loss_mana` = " << (int32_t)player->getLossPercent(LOSS_MANASPENT)
+	<< ", `loss_skills` = " << (int32_t)player->getLossPercent(LOSS_SKILLTRIES)
+	<< ", `loss_items` = " << (int32_t)player->getLossPercent(LOSS_ITEMS)
+	<< ", `loss_containers` = " << (int32_t)player->getLossPercent(LOSS_CONTAINERS)
 	<< ", `balance` = " << player->balance
 	<< ", `stamina` = " << player->stamina;
 
 #ifdef __SKULLSYSTEM__
-	int32_t redSkullTime = 0;
-	if(player->redSkullTicks > 0){
-		redSkullTime = std::time(NULL) + player->redSkullTicks/1000;
-	}
-
-	query << ", `redskulltime` = " << redSkullTime;
-	query << ", `redskull` = " << (player->skull == SKULL_RED ? 1 : 0);
+	query << ", `skull_type` = " << (player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK ? player->getSkull() : 0);
+	query << ", `skull_time` = " << player->lastSkullTime;
 #endif
 
 	query << " WHERE `id` = " << player->getGUID();
@@ -518,7 +512,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	query.str("");
 
 	//skills
-	for(int i = 0; i <= 6; i++){
+	for(int32_t i = 0; i <= 6; i++){
 		query << "UPDATE `player_skills` SET `value` = " << player->skills[i][SKILL_LEVEL] << ", `count` = " << player->skills[i][SKILL_TRIES] << " WHERE `player_id` = " << player->getGUID() << " AND `skillid` = " << i;
 
 		if(!db->executeQuery(query.str())){
@@ -709,19 +703,19 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 			Creature* c = de.getKillerCreature();
 			Player* player = c->getPlayer();
 
-			if(c->isSummon() && c->getMaster()->getPlayer()){
+			if(c->isPlayerSummon()){
 				// Set player, next if will insert GUID
-				player = c->getMaster()->getPlayer();
+				player = c->getPlayerMaster();
 				// Set name, so the enviroment insert happenends
 				name = c->getNameDescription();
 			}
 
 			if(player){
 				DBInsert player_killers_stmt(db);
-				player_killers_stmt.setQuery("INSERT INTO `player_killers` (`kill_id`, `player_id`) VALUES ");
+				player_killers_stmt.setQuery("INSERT INTO `player_killers` (`kill_id`, `player_id`, `unjustified`) VALUES ");
 
 				query.str("");
-				query << kill_id << ", " << player->getGUID();
+				query << kill_id << ", " << player->getGUID() << ", " << (de.isUnjustKill() ? 1 : 0);
 				if(!player_killers_stmt.addRow(query.str()))
 					return false;
 				if(!player_killers_stmt.execute())
@@ -749,6 +743,35 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 	}
 
 	return transaction.commit();
+}
+
+int32_t IOPlayer::getPlayerUnjustKillCount(Player* player, int64_t date)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "";
+	query << "SELECT COUNT(*) as `unjustified_count` ";
+	query << "FROM ";
+	query << "`player_killers` ";
+	query << "LEFT JOIN ";
+	query << "`killers` ON `killers`.`id` = `player_killers`.`kill_id` ";
+	query << "LEFT JOIN ";
+	query << "`player_deaths` on `player_deaths`.`id` = `killers`.`death_id` ";
+	query << "LEFT JOIN ";
+	query << "`players` on `players`.`id` = `player_deaths`.`player_id` ";
+	query << "WHERE ";
+	query << "`player_killers`.`player_id` = " << player->getGUID() << " "
+		<< "AND " << "`player_killers`.`unjustified` = " << " 1 "
+		<< "AND " << date  << " < `player_deaths`.`date`";
+
+	if(!(result = db->storeQuery(query.str())))
+		return 0;
+
+	int32_t count = result->getDataInt("unjustified_count");
+	db->freeResult(result);
+	return count;
 }
 
 bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)

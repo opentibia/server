@@ -77,10 +77,10 @@ public:
 		MAX_PLAYERS,
 		EXHAUSTED,
 		EXHAUSTED_ADD,
-		FIGHTEXHAUSTED,
-		HEALEXHAUSTED,
+		COMBAT_EXHAUSTED,
+		HEAL_EXHAUSTED,
 		HUNTING_KILL_DURATION,
-		PZ_LOCKED,
+		IN_FIGHT_DURATION,
 		FIELD_OWNERSHIP_DURATION,
 		MIN_ACTIONTIME,
 		MIN_ACTIONEXTIME,
@@ -104,9 +104,16 @@ public:
 		SQL_PORT,
 		STATUSQUERY_TIMEOUT,
 		PREMIUM_ONLY_BEDS,
-		SKULL_TIME,
-		FRAG_TIME,
-		KILLS_FOR_RED_SKULL,
+		UNJUST_SKULL_DURATION,
+		UNJUST_KILL_DURATION,
+		KILLS_PER_DAY_RED_SKULL,
+		KILLS_PER_WEEK_RED_SKULL,
+		KILLS_PER_MONTH_RED_SKULL,
+		KILLS_PER_DAY_BLACK_SKULL,
+		KILLS_PER_WEEK_BLACK_SKULL,
+		KILLS_PER_MONTH_BLACK_SKULL,
+		RED_SKULL_DURATION,
+		BLACK_SKULL_DURATION,
 		REMOVE_AMMUNITION,
 		REMOVE_RUNE_CHARGES,
 		REMOVE_WEAPON_CHARGES,
@@ -131,6 +138,7 @@ public:
 		IPBANISHMENT_LENGTH,
 		BROADCAST_BANISHMENTS,
 		ALLOW_GAMEMASTER_MULTICLIENT,
+		DISTANCE_WEAPON_INTERRUPT_SWING,
 		DEATH_ASSIST_COUNT,
 		NPC_MAX_NONESTACKABLE_SELL_AMOUNT,
 		LAST_INTEGER_CONFIG /* this must be the last one */
@@ -148,21 +156,21 @@ public:
 	void getConfigValue(const std::string& key, lua_State* _L);
 	const std::string& getString(uint32_t _what) const;
 	double getFloat(uint32_t _what) const;
-	int getNumber(uint32_t _what) const;
-	bool setNumber(uint32_t _what, int _value);
+	int64_t getNumber(uint32_t _what) const;
+	bool setNumber(uint32_t _what, int64_t _value);
 	bool setString(uint32_t _what, const std::string& _value);
 
 private:
 	static void moveValue(lua_State* fromL, lua_State* toL);
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
-	int getGlobalNumber(lua_State* _L, const std::string& _identifier, int _default=0);
+	int64_t getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default=0);
 	double getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default=0.0);
 	bool getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default=false);
 
 	lua_State* L;
 	bool m_isLoaded;
 	std::string m_confString[LAST_STRING_CONFIG];
-	int m_confInteger[LAST_INTEGER_CONFIG];
+	int64_t m_confInteger[LAST_INTEGER_CONFIG];
 	double m_confFloat[LAST_FLOAT_CONFIG];
 };
 

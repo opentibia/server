@@ -1126,7 +1126,9 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
 
 	//getPlayerRedSkullTicks(cid)
-	lua_register(m_luaState, "getPlayerRedSkullTicks", LuaScriptInterface::luaGetPlayerRedSkullTicks);
+	//getPlayerSkullTicks(cid)
+	lua_register(m_luaState, "getPlayerRedSkullTicks", LuaScriptInterface::luaGetPlayerSkullTicks);
+	lua_register(m_luaState, "getPlayerSkullTicks", LuaScriptInterface::luaGetPlayerSkullTicks);
 
 	//getPlayerAccountBalance(cid)
 	lua_register(m_luaState, "getPlayerBalance", LuaScriptInterface::luaGetPlayerBalance);
@@ -1877,12 +1879,8 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			value = 0;
 			#endif
 			break;
-		case PlayerInfoRedSkullTicks:
-			#ifdef __SKULLSYSTEM__
-			value = player->getRedSkullTicks();
-			#else
+		case PlayerInfoSkullTicks:
 			value = 0;
-			#endif
 			break;
 		case PlayerInfoBalance:
 		{
@@ -1981,8 +1979,8 @@ int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L){
 int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoSkullType);}
 
-int LuaScriptInterface::luaGetPlayerRedSkullTicks(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoRedSkullTicks);}
+int LuaScriptInterface::luaGetPlayerSkullTicks(lua_State *L){
+	return internalGetPlayerInfo(L, PlayerInfoSkullTicks);}
 
 int LuaScriptInterface::luaGetPlayerBalance(lua_State *L){
 	return internalGetPlayerInfo(L, PlayerInfoBalance);}
@@ -7224,7 +7222,7 @@ int LuaScriptInterface::luaGetPlayerFrags(lua_State *L)
 
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		lua_pushnumber(L, player->getFrags());
+		lua_pushnumber(L, 0);
 	}
 	else
 	{

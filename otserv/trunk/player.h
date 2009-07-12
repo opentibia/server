@@ -320,6 +320,7 @@ public:
 	void setFightMode(fightMode_t mode);
 	void setSafeMode(bool _safeMode) {safeMode = _safeMode;}
 	bool hasSafeMode() const {return safeMode;}
+	uint16_t getIcons() const;
 
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);
@@ -349,7 +350,7 @@ public:
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void drainMana(Creature* attacker, int32_t points);
 	void addManaSpent(uint32_t amount, bool useMultiplier = true);
 	void addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier = true);
 
@@ -372,8 +373,12 @@ public:
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
 	virtual void onAttackedCreature(Creature* target);
+	virtual void onSummonAttackedCreature(Creature* summon, Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target, bool lastHit);
 	virtual void onGainExperience(uint64_t gainExp);
@@ -404,12 +409,10 @@ public:
 	void addAttacked(const Player* attacked);
 	void clearAttacked();
 	void addUnjustifiedDead(const Player* attacked);
-	void setSkull(Skulls_t newSkull) {skull = newSkull;}
+	void setSkull(Skulls_t newSkull) {skullType = newSkull;}
 	void sendCreatureSkull(const Creature* creature) const
 		{if(client) client->sendCreatureSkull(creature);}
-	void checkRedSkullTicks(int32_t ticks);
-	uint32_t getFrags();
-	int64_t getRedSkullTicks() const {return redSkullTicks;}
+	void checkSkullTicks(int32_t ticks);
 #endif
 
 	void checkRecentlyGainedExperience(uint32_t interval);
@@ -417,6 +420,7 @@ public:
 	bool addOutfit(uint32_t outfitId, uint32_t addons);
 	bool removeOutfit(uint32_t outfitId, uint32_t addons);
 	bool canLogout();
+	void broadcastLoot(Creature* creature, Container* corpse);
 
 	//tile
 	//send methods
@@ -828,8 +832,8 @@ protected:
 	uint32_t editListId;
 
 #ifdef __SKULLSYSTEM__
-	int64_t redSkullTicks;
-	Skulls_t skull;
+	Skulls_t skullType;
+	int64_t lastSkullTime;
 	typedef std::set<uint32_t> AttackedSet;
 	AttackedSet attackedSet;
 #endif
