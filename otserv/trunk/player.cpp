@@ -3668,7 +3668,7 @@ void Player::onAttackedCreature(Creature* target)
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
-				if(!targetPlayer->hasAttacked(this)){
+				if(g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK) || !targetPlayer->hasAttacked(this) ){
 					pzLocked = true;
 				}
 

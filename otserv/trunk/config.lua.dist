@@ -110,6 +110,9 @@ black_skull_duration = 45*24*60*60*1000
 -- White skull duration, how long a player will get pz locked/white skull
 unjust_skull_duration = 15*60*1000
 
+-- Enable this and players will get pzlocked regardless of being the aggressor or not (<8.5 this was set to true)
+defensive_pz_lock = false
+
 -- How many players you need to kill to gain a red skull per day/week/month
 kills_per_day_red_skull = 3
 kills_per_week_red_skull = 5
