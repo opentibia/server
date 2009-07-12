@@ -1811,8 +1811,6 @@
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south"/>
 		<attribute key="maleSleeper" value="1766" />
-		<attribute key="femaleSleeper" value="7781" />
-
 	</item>
 	<item id="1759" article="a" name="cot">
 		<attribute key="type" value="bed"/>
@@ -3043,21 +3041,14 @@
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="5"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentPhysical" value="80"/>
-		<attribute key="absorbPercentDeath" value="80"/>
+		<attribute key="absorbPercentPhysical" value="80"/>		<attribute key="absorbPercentDeath" value="80"/>
 	</item>
 	<item id="2198" article="an" name="elven amulet">
 		<attribute key="weight" value="270"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="50"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentPhysical" value="5"/>
-		<attribute key="absorbPercentFire" value="5"/>
-		<attribute key="absorbPercentDeath" value="5"/>
-		<attribute key="absorbPercentIce" value="5"/>
-		<attribute key="absorbPercentEnergy" value="5"/>
-		<attribute key="absorbPercentHoly" value="5"/>
-		<attribute key="absorbPercentEarth" value="5"/>
+		<attribute key="absorbPercentAll" value="5"/>
 	</item>
 	<item id="2199" article="a" name="garlic necklace">
 		<attribute key="weight" value="380"/>
@@ -14230,7 +14221,7 @@
 		<attribute key="weight" value="1000"/>
 	</item>
 	<item id="6500" article="a" name="demonic essence" plural="demonic essences">
-		<attribue key="description" value="Someone might be interested in trading this."/>
+		<attribute key="description" value="Someone might be interested in trading this."/>
 		<attribute key="weight" value="100"/>
 	</item>
 	<item id="6501" article="a" name="gingerbread man">
@@ -20693,6 +20684,15 @@
 		<attribute key="armor" value="1"/>
 		<attribute key="slotType" value="legs"/>
 	</item>
+	<item id="9814" article="a" name="rusty shield" />
+	<item id="9815" article="a" name="rusty shield" />
+	<item id="9816" article="a" name="rusty shield" />
+	<item id="9817" article="a" name="rusty boots" />
+	<item id="9818" article="a" name="rusty boots" />
+	<item id="9819" article="a" name="rusty boots" />
+	<item id="9820" article="a" name="rusty helmet" />
+	<item id="9821" article="a" name="rusty helmet" />
+	<item id="9822" article="a" name="rusty helmet" />
 	<item id="9823" article="a" name="slain undead gladiatort">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="9824"/>
@@ -20899,8 +20899,28 @@
 		<attribute key="duration" value="600"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
+	<item id="9927" article="a" name="flower wreath">
+		<attribute key="weight" value="500"/>
+		<attribute key="slottype" value="head"/>
+		<attribute key="armor" value="0"/>
+	</item>
+	<item id="9928" article="a" name="leaf legs">
+		<attribute key="weight" value="1200"/>
+		<attribute key="slottype" value="legs"/>
+		<attribute key="armor" value="0"/>
+	</item>
+	<item id="9929" article="a" name="flower dress">
+		<attribute key="weight" value="1900"/>
+		<attribute key="slottype" value="body"/>
+		<attribute key="armor" value="0"/>
+	</item>
 	<item id="9930" article="a" name="rust remover">
 		<attribute key="weight" value="250"/>
+	</item>
+	<item id="9931" article="a" name="coconut shoes">
+		<attribute key="weight" value="600"/>
+		<attribute key="slottype" value="feet"/>
+		<attribute key="armor" value="0"/>
 	</item>
 	<item id="9932" article="a" name="firewalker boots">
 		<attribute key="description" value="Wearing these boots reduces the damage gotten from fiery ground."/>
@@ -20976,6 +20996,21 @@
 		<attribute key="description" value="This crest seems important. You shouldn't lose it."/>
 		<attribute key="weight" value="500"/>
 	</item>
+	<item id="9956" article="a" name="magical torch">
+		<attribute key="description" value="You have a day to light all important locations before the torch stops burning."/>
+		<attribute key="slottype" value="hand"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="defense" value="25"/>
+		<attribute key="speed" value="25" />
+		<attribute key="weight" value="1500"/>
+	</item>
+	<item id="9958" article="a" name="royal tapestry">
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="9959" article="a" name="silky tapestry">
+		<attribute key="weight" value="1000"/>
+	</item>
 	<item id="9960" article="a" name="slain death blob">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="9963"/>
@@ -21030,9 +21065,72 @@
 	<item id="9971" article="a" name="gold ingot">
 		<attribute key="weight" value="1800"/>
 	</item>
+	<item id="9975" article="a" name="crystal table">
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="9976" article="a" name="crystal pedestal">
+		<attribute key="weight" value="4000"/>
+		<attribute key="decayTo" value="9977"/>
+		<attribute key="duration" value="15"/>
+	</item>
+	<item id="9977" article="a" name="crystal pedestal">
+		<attribute key="weight" value="4000"/>
+		<attribute key="decayTo" value="9978"/>
+		<attribute key="duration" value="10"/>
+	</item>
+	<item id="9978" article="a" name="crystal pedestal">
+		<attribute key="weight" value="4000"/>
+		<attribute key="decayTo" value="9979"/>
+		<attribute key="duration" value="11"/>
+	</item>
+	<item id="9979" article="a" name="crystal pedestal">
+		<attribute key="weight" value="4000"/>
+		<attribute key="decayTo" value="9976"/>
+		<attribute key="duration" value="8"/>
+	</item>
 	<item id="9980" article="a" name="crystal of power">
 		<attribute key="description" value="It is said to make you more resistant to weaknesses and to supply you with energy."/>
 		<attribute key="weight" value="850"/>
+	</item>
+	<item id="9992" article="a" name="rotworm stew">
+		<attribute key="description" value="It's hot, beefy and delicious. The perfect food for knights."/>
+		<attribute key="weight" value="1200"/>
+	</item>
+	<item id="9993" article="a" name="hydra tongue salad">
+		<attribute key="description" value="Though the hydra tongue is commonly considered a pest plant it tastes surprisingly aromatic."/>
+		<attribute key="weight" value="550"/>
+	</item>
+	<item id="9994" article="a" name="roasted dragon wings">
+		<attribute key="description" value="You know why it's called 'dragon' when you feel the fire in your throat."/>
+		<attribute key="weight" value="850"/>
+	</item>
+	<item id="9995" article="a" name="fried tropical terrorbird">
+		<attribute key="description" value="It's the ideal snack for a beach barbecue."/>
+		<attribute key="weight" value="780"/>
+	</item>
+	<item id="9996" article="a" name="banana chocolate shake">
+		<attribute key="description" value="Sweetness."/>
+		<attribute key="weight" value="300"/>
+	</item>
+	<item id="9997" article="a" name="veggie casserole">
+		<attribute key="description" value="This one would be quite healthy if it wasn't for all the melted cheese on top."/>
+		<attribute key="weight" value="1100"/>
+	</item>
+	<item id="9998" article="a" name="filled jalapeño peppers">
+		<attribute key="description" value="The creamy cheese makes a great combination with spicy peppers."/>
+		<attribute key="weight" value="650"/>
+	</item>
+	<item id="9999" article="a" name="blessed steak">
+		<attribute key="description" value="It's nicely decorated with plums and pumpkin."/>
+		<attribute key="weight" value="950"/>
+	</item>
+	<item id="10000" article="a" name="carrot cake">
+		<attribute key="description" value="This spicy-sweet cake will probably put you into a sugar rush."/>
+		<attribute key="weight" value="680"/>
+	</item>
+	<item id="10001" article="a" name="northern fishburger">
+		<attribute key="description" value="It's only suited for those who like maritime food."/>
+		<attribute key="weight" value="480"/>
 	</item>
 	<item id="10002" article="a" name="dead war golem">
 		<attribute key="containerSize" value="10"/>
@@ -21058,6 +21156,10 @@
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="venom"/>
 		<attribute key="fluidSource" value="slime"/>
+	</item>
+	<item id="10006" article="a" name="cookbook">
+		<attribute key="description" value="It contains several exotic recipes."/>
+		<attribute key="weight" value="1500"/>
 	</item>
 	<item id="10007" article="a" name="dead mutated human">
 		<attribute key="containerSize" value="10"/>
@@ -21086,6 +21188,160 @@
 		<attribute key="magicpoints" value="1"/>
 	</item>
 	<item id="10017" article="a" name="football"/>
+	<item id="10018" article="a" name="voodoo doll">
+		<attribute key="weight" value="650"/>
+	</item>
+	<item id="10020" article="a" name="dragon claw">
+		<attribute key="weight" value="1250"/>
+	</item>
+	<item id="10021" article="a" name="worn soft boots">
+		<attribute key="description" value="Someone specialised in shoes might be able to repair them for you."/>
+		<attribute key="weight" value="800"/>
+	</item>
+	<item id="10022" article="a" name="worn firewalker boots">
+		<attribute key="description" value="They can be recharged with an enchanted ruby."/>
+		<attribute key="weight" value="800"/>
+	</item>
+	<item id="10024" article="a" name="mago mechanic core">
+		<attribute key="weight" value="135"/>
+	</item>
+	<item id="10062" article="a" name="red square book">
+		<attribute key="writeable" value="1"/>
+		<attribute key="weight" value="1300"/>
+	</item>
+	<item id="10063" article="an" name="epaminondas doll">
+		<attribute key="description" value="He talks, moves and burps just like a real person."/>
+		<attribute key="weight" value="777"/>
+	</item>
+	<item id="10064" article="an" name="epaminondas doll">
+		<attribute key="description" value="He talks, moves and burps just like a real person."/>
+		<attribute key="decayTo" value="10063"/>
+		<attribute key="duration" value="2"/>
+		<attribute key="weight" value="777"/>
+	</item>
+	<item id="10072" article="a" name="gear wheel">
+		<attribute key="weight" value="5"/>
+	</item>
+	<item id="10096" article="a" name="voodoo doll">
+		<attribute key="weight" value="650"/>
+	</item>
+	<item id="10097" article="a" name="voodoo doll">
+		<attribute key="weight" value="650"/>
+	</item>
+	<item id="10105" article="a" name="wand of vortex">
+		<attribute key="description" value="Surges of energy rush through the tip of this wand."/>
+		<attribute key="weight" value="1900"/>
+		<attribute key="weaponType" value="wand"/>
+		<attribute key="shootType" value="energy"/>
+		<attribute key="range" value="3"/>
+	</item>
+	<item id="10111" article="a" name="black book">
+		<attribute key="weight" value="1300"/>
+		<attribute key="writeable" value="1"/>
+	</item>
+	<item id="10150" article="a" name="cocktail glass">
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="10151" article="a" name="golem part">
+		<attribute key="weight" value="35"/>
+	</item>
+	<item id="10153" article="a" name="golem disassembler">
+		<attribute key="description" value="It looks suspiciously similar to a crowbar."/>
+		<attribute key="weight" value="15000"/>
+	</item>
+	<item id="10173" article="a" name="golem head">
+		<attribute key="weight" value="4000"/>
+	</item>
+	<item id="10218" article="a" name="unknow amulet">
+		<attribute key="slottype" value="necklace"/>
+		<attribute key="absorbPercentPhysical" value="60"/>
+		<attribute key="absorbPercentFire" value="40"/>
+		<attribute key="charges" value="5"/>
+		<attribute key="weight" value="700"/>
+	</item>
+	<item id="10219" article="a" name="sacred tree amulet">
+		<attribute key="description" value="Its leaves stretch out to cover your whole body if you receive earth damage."/>
+		<attribute key="slottype" value="necklace"/>
+		<attribute key="absorbPercentPhysical" value="60"/>
+		<attribute key="absorbPercentEarth" value="40"/>
+		<attribute key="charges" value="5"/>
+		<attribute key="weight" value="700"/>
+	</item>
+	<item id="10220" article="a" name="leviathan's amulet">
+		<attribute key="slottype" value="necklace"/>
+		<attribute key="absorbPercentPhysical" value="60"/>
+		<attribute key="absorbPercentIce" value="40"/>
+		<attribute key="charges" value="5"/>
+		<attribute key="weight" value="700"/>
+	</item>
+	<item id="10221" article="a" name="shockwave amulet">
+		<attribute key="description" value="It tickles your neck in a rather pleasant way and absorbs loads of damage."/>
+		<attribute key="slottype" value="necklace"/>
+		<attribute key="absorbPercentPhysical" value="60"/>
+		<attribute key="absorbPercentEnergy" value="40"/>
+		<attribute key="charges" value="5"/>
+		<attribute key="weight" value="700"/>
+	</item>
+	<item id="10291" article="an" name="odd hat">
+		<attribute key="description" value="It has to be one of the fabled helmets of light."/>
+		<attribute key="slottype" value="head"/>
+		<attribute key="armor" value="5"/>
+		<attribute key="weight" value="700"/>
+	</item>
+	<item id="10298" article="a" name="helmet of ultimate terror">
+		<attribute key="description" value="There is evil inside."/>
+		<attribute key="slottype" value="head"/>
+		<attribute key="armor" value="3"/>
+		<attribute key="weight" value="1250"/>
+	</item>
+	<item id="10306" article="a" name="fan doll of King Tibianus">
+		<attribute key="description" value="The small label reads: For my greatest admirer."/>
+		<attribute key="weight" value="650"/>
+	</item>
+	<item id="10309" article="a" name="claw of 'The Noxious Spawn'">
+		<attribute key="description" value="It's like a glove and you can't wear a ring on it. You are not sure if you should really put it on."/>
+		<attribute key="slottype" value="hand"/>
+		<attribute key="suppresspoison" value="1"/>
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="10310" article="a" name="claw of 'The Noxious Spawn'">
+		<attribute key="description" value="It's like a glove and you can't wear a ring on it. You are not sure if you should really put it on."/>
+		<attribute key="slottype" value="hand"/>
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="10311" article="a" name="claw of 'The Noxious Spawn'">
+		<attribute key="description" value="It's like a glove and you can't wear a ring on it. You are not sure if you should really put it on."/>
+		<attribute key="slottype" value="hand"/>
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="10312" article="a" name="claw of 'The Noxious Spawn'">
+		<attribute key="description" value="It's like a glove and you can't wear a ring on it. You are not sure if you should really put it on."/>
+		<attribute key="slottype" value="hand"/>
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="10314" article="a" name="claw of 'The Noxious Spawn'">
+		<attribute key="description" value="It's like a glove and you can't wear a ring on it. You are not sure if you should really put it on."/>
+		<attribute key="slottype" value="hand"/>
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="10315" article="a" name="claw of 'The Noxious Spawn'">
+		<attribute key="description" value="It's like a glove and you can't wear a ring on it. You are not sure if you should really put it on."/>
+		<attribute key="slottype" value="hand"/>
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="10316" article="a" name="mighty helm of green sparks">
+		<attribute key="description" value="This helmet spawns green stars. Awesome."/>
+		<attribute key="slottype" value="head"/>
+		<attribute key="armor" value="6"/>
+		<attribute key="weight" value="4600"/>
+	</item>
+	<item id="10454" article="a" name="headache pill" plural="headache pills">
+		<attribute key="weight" value="20"/>
+	</item>
+	<item id="10455" article="a" name="pigeon trophy">
+		<attribute key="description" value="It's a symbol of peace handed out by Tibia ML."/>
+		<attribute key="weight" value="400"/>
+	</item>
 	<item id="20001" name="water"/>
 	<item id="20002" name="blood"/>
 	<item id="20003" name="beer"/>
