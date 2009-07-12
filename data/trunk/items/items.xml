@@ -1154,6 +1154,7 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
+			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1186,6 +1187,7 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="energy">
+			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1195,6 +1197,7 @@
 		<attribute key="decayTo" value="1493"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="field" value="fire">
+			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1221,6 +1224,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="field" value="energy">
+			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1253,6 +1257,7 @@
 		<attribute key="decayTo" value="1501"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="field" value="fire">
+			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1289,6 +1294,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="field" value="energy">
+			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
