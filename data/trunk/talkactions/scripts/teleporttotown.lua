@@ -5,7 +5,7 @@ function onSay(cid, words, param)
 	end
 
 	local townid = getTownIdByName(param)
-	if(townid ~= LUA_NULL) then
+	if(townid ~= 0) then
 		local new_pos = getTownTemplePosition(townid)
 		local old_pos = getPlayerPosition(cid)
 		if(doTeleportThing(cid, new_pos) ~= LUA_ERROR) then
