@@ -1154,6 +1154,7 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
+			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1186,6 +1187,7 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="energy">
+			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1195,6 +1197,7 @@
 		<attribute key="decayTo" value="1493"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="field" value="fire">
+			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1221,6 +1224,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="120"/>
 		<attribute key="field" value="energy">
+			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1253,6 +1257,7 @@
 		<attribute key="decayTo" value="1501"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="field" value="fire">
+			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
 			<attribute key="damage" value="10"/>
@@ -1289,6 +1294,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="field" value="energy">
+			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
 			<attribute key="damage" value="25"/>
 		</attribute>
@@ -1811,6 +1817,8 @@
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south"/>
 		<attribute key="maleSleeper" value="1766" />
+		<attribute key="femaleSleeper" value="7781" />
+
 	</item>
 	<item id="1759" article="a" name="cot">
 		<attribute key="type" value="bed"/>
@@ -3041,14 +3049,21 @@
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="5"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentPhysical" value="80"/>		<attribute key="absorbPercentDeath" value="80"/>
+		<attribute key="absorbPercentPhysical" value="80"/>
+		<attribute key="absorbPercentDeath" value="80"/>
 	</item>
 	<item id="2198" article="an" name="elven amulet">
 		<attribute key="weight" value="270"/>
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="50"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentAll" value="5"/>
+		<attribute key="absorbPercentPhysical" value="5"/>
+		<attribute key="absorbPercentFire" value="5"/>
+		<attribute key="absorbPercentDeath" value="5"/>
+		<attribute key="absorbPercentIce" value="5"/>
+		<attribute key="absorbPercentEnergy" value="5"/>
+		<attribute key="absorbPercentHoly" value="5"/>
+		<attribute key="absorbPercentEarth" value="5"/>
 	</item>
 	<item id="2199" article="a" name="garlic necklace">
 		<attribute key="weight" value="380"/>
@@ -14221,7 +14236,7 @@
 		<attribute key="weight" value="1000"/>
 	</item>
 	<item id="6500" article="a" name="demonic essence" plural="demonic essences">
-		<attribue key="description" value="Someone might be interested in trading this."/>
+		<attribute key="description" value="Someone might be interested in trading this."/>
 		<attribute key="weight" value="100"/>
 	</item>
 	<item id="6501" article="a" name="gingerbread man">
