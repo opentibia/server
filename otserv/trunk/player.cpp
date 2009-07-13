@@ -2258,6 +2258,7 @@ void Player::onDie()
 		DeathList killers = getKillers(g_config.getNumber(ConfigManager::DEATH_ASSIST_COUNT));
 		IOPlayer::instance()->addPlayerDeath(this, killers);
 
+#ifdef __SKULLSYSTEM__
 		for(DeathList::const_iterator it = killers.begin(); it != killers.end(); ++it){
 			if(it->isCreatureKill() && it->isUnjustKill()){
 				Creature* attacker = it->getKillerCreature();
@@ -2273,6 +2274,7 @@ void Player::onDie()
 			}
 		}
 	}
+#endif
 
 	Creature::onDie();
 }
