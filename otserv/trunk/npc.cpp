@@ -2677,7 +2677,7 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 				std::vector<std::string>::iterator wordIter = wordList.end();
 				for(wordIter = lastWordMatchIter; wordIter != wordList.end(); ++wordIter){
 					if(fullMatch) {
-						if(keyIter->find(*wordIter) == 0)
+						if(*wordIter == keyIter->substr(0, keyIter->size() - 1))
 							break;
 					}
 					else if(wordIter->find(*keyIter, 0) == 0)
