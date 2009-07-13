@@ -105,6 +105,11 @@
 		<list type="male" looktype="325" name="Yalaharian"/>
 	</outfit>
 
+	<outfit id="25" default="0">
+		<list type="female" looktype="329" name="Wedding"/>
+		<list type="male" looktype="328" name="Wedding"/>
+	</outfit>
+
 	<outfit id="22">
 		<list type="femalegod" looktype="75" name="Gamemaster"/>
 		<list type="malegod" looktype="75" name="Gamemaster"/>

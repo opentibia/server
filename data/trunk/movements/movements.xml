@@ -325,6 +325,10 @@
 	<moveevent event="StepIn" itemid="8072" script="yellow_pillow.lua" />
 
 	<!-- Items -->
+	<!-- Torches -->
+	<moveevent event="Equip" itemid="9956" slot="hand" function="onEquipItem"/>
+	<moveevent event="DeEquip" itemid="9956" slot="hand" function="onDeEquipItem"/>
+
 	<!-- Boots -->
 	<moveevent event="Equip" itemid="2195" slot="feet" function="onEquipItem"/>
 	<moveevent event="DeEquip" itemid="2195" slot="feet" function="onDeEquipItem"/>
