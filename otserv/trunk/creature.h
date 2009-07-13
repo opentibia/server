@@ -264,6 +264,7 @@ public:
 
 	virtual void addSummon(Creature* creature);
 	virtual void removeSummon(const Creature* creature);
+	void destroySummons();
 	const std::list<Creature*>& getSummons() {return summons;}
 
 	virtual int32_t getArmor() const {return 0;}

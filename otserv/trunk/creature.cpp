@@ -1339,6 +1339,17 @@ void Creature::removeSummon(const Creature* creature)
 	}
 }
 
+void Creature::destroySummons()
+{
+	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
+		(*cit)->setAttackedCreature(NULL);
+		(*cit)->changeHealth(-(*cit)->getHealth());
+		(*cit)->setMaster(NULL);
+		(*cit)->releaseThing2();
+	}
+	summons.clear();
+}
+
 bool Creature::addCondition(Condition* condition)
 {
 	if(condition == NULL){

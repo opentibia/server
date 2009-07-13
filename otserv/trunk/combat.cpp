@@ -320,10 +320,6 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 		return RET_NOTENOUGHROOM;
 	}
 
-	//if(!tile->ground){
-	//	return RET_NOTPOSSIBLE;
-	//}
-
 	if(tile->floorChange()){
 		return RET_NOTENOUGHROOM;
 	}
@@ -1250,7 +1246,7 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 
 			if(area->getValue(y, x) != 0){
 				if(tmpPosX >= 0 && tmpPosY >= 0 && tmpPosZ >= 0 &&
-					tmpPosX <= 0xFFFF && tmpPosY <= 0xFFFF && tmpPosZ < MAP_MAX_LAYERS)
+					tmpPosX < 0xFFFF && tmpPosY < 0xFFFF && tmpPosZ < MAP_MAX_LAYERS)
 				{
 					if(g_game.isSightClear(targetPos, Position(tmpPosX, tmpPosY, tmpPosZ), true)){
 						tile = g_game.getTile(tmpPosX, tmpPosY, tmpPosZ);

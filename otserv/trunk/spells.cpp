@@ -706,19 +706,58 @@ bool Spell::playerSpellCheck(Player* player) const
 	return true;
 }
 
-bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
+bool Spell::playerInstantSpellCheck(Player* player, const Creature* target)
 {
 	if(!playerSpellCheck(player)){
 		return false;
 	}
 
-#ifdef __SKULLSYSTEM__
-	if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
-		player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
+	const Position& toPos = target->getPosition();
+	const Position& playerPos = player->getPosition();
+	if(playerPos.z > toPos.z){
+		player->sendCancelMessage(RET_FIRSTGOUPSTAIRS);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
+	else if(playerPos.z < toPos.z){
+		player->sendCancelMessage(RET_FIRSTGODOWNSTAIRS);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+	else{
+		Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
+		if(!tile){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+
+#ifdef __SKULLSYSTEM__
+		if(player->getSkull() == SKULL_BLACK && isAggressive){
+			if(needTarget){
+				if(const Player* targetPlayer = target->getPlayer()){
+					if(targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(player) ){
+						player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
+						return false;
+					}
+				}
+			}
+			else{
+				player->sendCancelMessage(RET_NOTPOSSIBLE);
+				return false;
+			}
+		}
 #endif
+	}
+
+	return true;
+}
+
+bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
+{
+	if(!playerSpellCheck(player)){
+		return false;
+	}
 
 	if(toPos.x != 0xFFFF){
 		const Position& playerPos = player->getPosition();
@@ -734,12 +773,30 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 		}
 		else{
 			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
-
 			if(!tile){
-				tile = new StaticTile(toPos.x, toPos.y, toPos.z);
-				g_game.setTile(tile);
+				player->sendCancelMessage(RET_NOTPOSSIBLE);
+				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				return false;
 			}
 
+#ifdef __SKULLSYSTEM__
+			if(player->getSkull() == SKULL_BLACK && isAggressive){
+				if(needTarget){
+					Creature* targetCreature = tile->getTopVisibleCreature(player);
+					if(targetCreature && targetCreature->getPlayer()){
+						Player* targetPlayer = targetCreature->getPlayer();
+						if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(player) ){
+							player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
+							return false;
+						}
+					}
+				}
+				else{
+					player->sendCancelMessage(RET_NOTPOSSIBLE);
+					return false;
+				}
+			}
+#endif
 			ReturnValue ret;
 			if((ret = Combat::canDoCombat(player, tile, isAggressive)) != RET_NOERROR){
 				player->sendCancelMessage(ret);
@@ -784,7 +841,6 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 		}
 		else{
 			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
-
 			if(!tile){
 				player->sendCancelMessage(RET_NOTPOSSIBLE);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
@@ -824,15 +880,26 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 			}
 
 #ifdef __SKULLSYSTEM__
-			if(isAggressive && !needTarget && player->getSkull() == SKULL_BLACK){
-				player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
-				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-				return false;
+			if(player->getSkull() == SKULL_BLACK && isAggressive){
+				if(needTarget){
+					Creature* targetCreature = tile->getTopVisibleCreature(player);
+					if(targetCreature && targetCreature->getPlayer()){
+						Player* targetPlayer = targetCreature->getPlayer();
+						if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(player) ){
+							player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
+							return false;
+						}
+					}
+				}
+				else{
+					player->sendCancelMessage(RET_NOTPOSSIBLE);
+					return false;
+				}
 			}
 
-			if(isAggressive && needTarget && player->hasSafeMode() && tile->getTopVisibleCreature(player)){
+			if(player->hasSafeMode() && isAggressive && needTarget && tile->getTopVisibleCreature(player)){
 				Player* targetPlayer = tile->getTopVisibleCreature(player)->getPlayer();
-				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE){
+				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(player) ){
 					player->sendCancelMessage(RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
@@ -1075,6 +1142,10 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 	if(selfTarget){
 		var.type = VARIANT_NUMBER;
 		var.number = player->getID();
+
+		if(!playerInstantSpellCheck(player, player)){
+			return false;
+		}
 	}
 	else if(needTarget || casterTargetOrDirection){
 		Creature* target = NULL;
@@ -1116,6 +1187,10 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 
 			var.type = VARIANT_NUMBER;
 			var.number = target->getID();
+			
+			if(!playerInstantSpellCheck(player, target)){
+				return false;
+			}
 		}
 		else{
 			var.type = VARIANT_POSITION;

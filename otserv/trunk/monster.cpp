@@ -1195,13 +1195,7 @@ bool Monster::canWalkTo(Position pos, Direction dir)
 void Monster::die()
 {
 	setAttackedCreature(NULL);
-	for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
-		(*cit)->changeHealth(-(*cit)->getHealth());
-		(*cit)->setMaster(NULL);
-		(*cit)->releaseThing2();
-	}
-	summons.clear();
-
+	destroySummons();
 	clearTargetList();
 	clearFriendList();
 	setIdle(true);
@@ -1422,14 +1416,7 @@ bool Monster::convinceCreature(Creature* creature)
 
 			setFollowCreature(NULL);
 			setAttackedCreature(NULL);
-
-			//destroy summons
-			for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
-				(*cit)->changeHealth(-(*cit)->getHealth());
-				(*cit)->setMaster(NULL);
-				(*cit)->releaseThing2();
-			}
-			summons.clear();
+			destroySummons();
 
 			isMasterInRange = true;
 			updateTargetList();
@@ -1457,13 +1444,7 @@ bool Monster::convinceCreature(Creature* creature)
 		creature->addSummon(this);
 		setFollowCreature(NULL);
 		setAttackedCreature(NULL);
-
-		for(std::list<Creature*>::iterator cit = summons.begin(); cit != summons.end(); ++cit){
-			(*cit)->changeHealth(-(*cit)->getHealth());
-			(*cit)->setMaster(NULL);
-			(*cit)->releaseThing2();
-		}
-		summons.clear();
+		destroySummons();
 
 		isMasterInRange = true;
 		updateTargetList();
