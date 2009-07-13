@@ -51,7 +51,6 @@
 		F69A431D0C1EAC8300798B45 /* iomapserialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41040C1E943500798B45 /* iomapserialize.cpp */; };
 		F69A431F0C1EAC8300798B45 /* iomapserializesql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41020C1E943500798B45 /* iomapserializesql.cpp */; };
 		F69A43210C1EAC8300798B45 /* iomapserializexml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41000C1E943500798B45 /* iomapserializexml.cpp */; };
-		F69A43230C1EAC8300798B45 /* iomapxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FE0C1E943500798B45 /* iomapxml.cpp */; };
 		F69A43250C1EAC8300798B45 /* ioplayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FC0C1E943500798B45 /* ioplayer.cpp */; };
 		F69A43270C1EAC8300798B45 /* ioplayersql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FA0C1E943500798B45 /* ioplayersql.cpp */; };
 		F69A43290C1EAC8300798B45 /* ioplayerxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F90C1E943500798B45 /* ioplayerxml.cpp */; };
@@ -114,7 +113,6 @@
 		F69A43CF0C1EAED100798B45 /* iomapserialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41040C1E943500798B45 /* iomapserialize.cpp */; };
 		F69A43D10C1EAED100798B45 /* iomapserializesql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41020C1E943500798B45 /* iomapserializesql.cpp */; };
 		F69A43D30C1EAED100798B45 /* iomapserializexml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41000C1E943500798B45 /* iomapserializexml.cpp */; };
-		F69A43D50C1EAED100798B45 /* iomapxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FE0C1E943500798B45 /* iomapxml.cpp */; };
 		F69A43D70C1EAED100798B45 /* ioplayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FC0C1E943500798B45 /* ioplayer.cpp */; };
 		F69A43D90C1EAED100798B45 /* ioplayersql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FA0C1E943500798B45 /* ioplayersql.cpp */; };
 		F69A43DB0C1EAED100798B45 /* ioplayerxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F90C1E943500798B45 /* ioplayerxml.cpp */; };
@@ -229,8 +227,6 @@
 		F69A40FA0C1E943500798B45 /* ioplayersql.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ioplayersql.cpp; path = ../ioplayersql.cpp; sourceTree = SOURCE_ROOT; };
 		F69A40FB0C1E943500798B45 /* ioplayer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ioplayer.h; path = ../ioplayer.h; sourceTree = SOURCE_ROOT; };
 		F69A40FC0C1E943500798B45 /* ioplayer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ioplayer.cpp; path = ../ioplayer.cpp; sourceTree = SOURCE_ROOT; };
-		F69A40FD0C1E943500798B45 /* iomapxml.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = iomapxml.h; path = ../iomapxml.h; sourceTree = SOURCE_ROOT; };
-		F69A40FE0C1E943500798B45 /* iomapxml.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = iomapxml.cpp; path = ../iomapxml.cpp; sourceTree = SOURCE_ROOT; };
 		F69A40FF0C1E943500798B45 /* iomapserializexml.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = iomapserializexml.h; path = ../iomapserializexml.h; sourceTree = SOURCE_ROOT; };
 		F69A41000C1E943500798B45 /* iomapserializexml.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = iomapserializexml.cpp; path = ../iomapserializexml.cpp; sourceTree = SOURCE_ROOT; };
 		F69A41010C1E943500798B45 /* iomapserializesql.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = iomapserializesql.h; path = ../iomapserializesql.h; sourceTree = SOURCE_ROOT; };
@@ -429,8 +425,6 @@
 				F69A40FA0C1E943500798B45 /* ioplayersql.cpp */,
 				F69A40FB0C1E943500798B45 /* ioplayer.h */,
 				F69A40FC0C1E943500798B45 /* ioplayer.cpp */,
-				F69A40FD0C1E943500798B45 /* iomapxml.h */,
-				F69A40FE0C1E943500798B45 /* iomapxml.cpp */,
 				F69A40FF0C1E943500798B45 /* iomapserializexml.h */,
 				F69A41000C1E943500798B45 /* iomapserializexml.cpp */,
 				F69A41010C1E943500798B45 /* iomapserializesql.h */,
@@ -606,7 +600,6 @@
 				F69A431D0C1EAC8300798B45 /* iomapserialize.cpp in Sources */,
 				F69A431F0C1EAC8300798B45 /* iomapserializesql.cpp in Sources */,
 				F69A43210C1EAC8300798B45 /* iomapserializexml.cpp in Sources */,
-				F69A43230C1EAC8300798B45 /* iomapxml.cpp in Sources */,
 				F69A43250C1EAC8300798B45 /* ioplayer.cpp in Sources */,
 				F69A43270C1EAC8300798B45 /* ioplayersql.cpp in Sources */,
 				F69A43290C1EAC8300798B45 /* ioplayerxml.cpp in Sources */,
@@ -685,7 +678,6 @@
 				F69A43CF0C1EAED100798B45 /* iomapserialize.cpp in Sources */,
 				F69A43D10C1EAED100798B45 /* iomapserializesql.cpp in Sources */,
 				F69A43D30C1EAED100798B45 /* iomapserializexml.cpp in Sources */,
-				F69A43D50C1EAED100798B45 /* iomapxml.cpp in Sources */,
 				F69A43D70C1EAED100798B45 /* ioplayer.cpp in Sources */,
 				F69A43D90C1EAED100798B45 /* ioplayersql.cpp in Sources */,
 				F69A43DB0C1EAED100798B45 /* ioplayerxml.cpp in Sources */,

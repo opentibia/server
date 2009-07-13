@@ -134,6 +134,7 @@ public:
 
 protected:
 	bool playerSpellCheck(Player* player) const;
+	bool playerInstantSpellCheck(Player* player, const Creature* target);
 	bool playerInstantSpellCheck(Player* player, const Position& toPos);
 	bool playerRuneSpellCheck(Player* player, const Position& toPos);
 

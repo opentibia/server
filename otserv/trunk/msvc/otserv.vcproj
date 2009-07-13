@@ -299,10 +299,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\iomapxml.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\ioplayer.cpp"
 				>
 			</File>
@@ -598,10 +594,6 @@
 			</File>
 			<File
 				RelativePath="..\iomapserialize.h"
-				>
-			</File>
-			<File
-				RelativePath="..\iomapxml.h"
 				>
 			</File>
 			<File
