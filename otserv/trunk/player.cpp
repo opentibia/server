@@ -4471,9 +4471,10 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 {
 	std::ostringstream os;
 	os << "Loot of " << creature->getNameDescription() << ": " << corpse->getContentDescription();
-	sendTextMessage(MSG_INFO_DESCR, os.str());
 
 	//send message to party channel
 	if(getParty())
 		getParty()->broadcastPartyMessage(MSG_INFO_DESCR, os.str());
+	else
+		sendTextMessage(MSG_INFO_DESCR, os.str());
 }
