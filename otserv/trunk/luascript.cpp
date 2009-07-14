@@ -1780,9 +1780,6 @@ void LuaScriptInterface::registerFunctions()
 	//doSaveServer(payHouses)
 	lua_register(m_luaState, "doSaveServer", LuaScriptInterface::luaDoSaveServer);
 
-	//getPlayerFrags(cid)
-	lua_register(m_luaState, "getPlayerFrags", LuaScriptInterface::luaGetPlayerFrags);
-
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 
@@ -7210,26 +7207,6 @@ int LuaScriptInterface::luaDoSaveServer(lua_State *L)
 	}
 
 	lua_pushnumber(L, LUA_NO_ERROR);
-	return 1;
-}
-
-int LuaScriptInterface::luaGetPlayerFrags(lua_State *L)
-{
-	//getPlayerFrags(cid)
-	uint32_t cid = popNumber(L);
-
-	ScriptEnviroment* env = getScriptEnv();
-
-	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		lua_pushnumber(L, 0);
-	}
-	else
-	{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-	}
-
 	return 1;
 }
 
