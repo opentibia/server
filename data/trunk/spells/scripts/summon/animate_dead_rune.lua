@@ -21,7 +21,7 @@ function onCastSpell(cid, var)
 		pos = getThingPos(cid)
 	end
 
-	if(pos.x ~= 0 and pos.y ~= 0 and pos.z ~= 0) then
+	if(pos.x ~= 0 and pos.y ~= 0 and pos.z ~= 0 and getPlayerSkullType(cid) ~= 5) then
 		return doTargetCorpse(cid, pos)
 	end
 

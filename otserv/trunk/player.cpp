@@ -3670,15 +3670,8 @@ void Player::onAttackedCreature(Creature* target)
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
-				if(g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK) || !targetPlayer->hasAttacked(this)){
-					if(player->getParty()){
-						if(!player->getParty()->isPlayerMember(targetPlayer) && player->getParty()->getLeader() != targetPlayer){
-							pzLocked = true;
-						}
-					}
-					else{
-						pzLocked = true;
-					}
+				if(checkPzBlockOnCombat(targetPlayer)){
+					pzLocked = true;
 				}
 
 #ifdef __SKULLSYSTEM__
@@ -3819,7 +3812,9 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 		}
 		else if(!hasFlag(PlayerFlag_NotGainInFight)){
 			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT) && lastHit){
-				addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION), true);
+				if(checkPzBlockOnCombat(targetPlayer)){
+					addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION), true);
+				}
 			}
 		}
 	}
@@ -4477,4 +4472,19 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 		getParty()->broadcastPartyMessage(MSG_INFO_DESCR, os.str());
 	else
 		sendTextMessage(MSG_INFO_DESCR, os.str());
+}
+
+bool Player::checkPzBlockOnCombat(Player* targetPlayer)
+{
+	if(targetPlayer->hasAttacked(this) && !g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK)){
+		return false;
+	}
+
+	if(getParty()){
+		if(getParty()->isPlayerMember(targetPlayer) || getParty()->getLeader() == targetPlayer){
+			return false;
+		}
+	}
+
+	return true;
 }
