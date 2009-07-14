@@ -23,6 +23,7 @@
 
 #include "definitions.h"
 #include <stdlib.h>
+#include <cstdlib>
 #include <cmath>
 #include <iostream>
 
