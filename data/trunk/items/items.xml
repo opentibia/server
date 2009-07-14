@@ -5217,8 +5217,9 @@
 	<item id="2680" article="a" name="strawberry" plural="strawberries">
 		<attribute key="weight" value="20"/>
 	</item>
-	<item id="2681" name="grapes">
+	<item id="2681" name="grapes" plural="grapes">
 		<attribute key="weight" value="250"/>
+		<attribute key="showcount" value="0"/>
 	</item>
 	<item id="2682" article="a" name="melon">
 		<attribute key="weight" value="950"/>
