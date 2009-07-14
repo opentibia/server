@@ -57,7 +57,6 @@ public:
 	void updateAllPartyIcons();
 	void updatePartyIcons(Player* player);
 	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
-	void broadcastLoot(Creature* creature, Container* corpse);
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 	bool canOpenCorpse(uint32_t ownerId);
 

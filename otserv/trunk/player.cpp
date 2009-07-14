@@ -3670,8 +3670,15 @@ void Player::onAttackedCreature(Creature* target)
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
-				if(g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK) || !targetPlayer->hasAttacked(this) ){
-					pzLocked = true;
+				if(g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK) || !targetPlayer->hasAttacked(this)){
+					if(player->getParty()){
+						if(!player->getParty()->isPlayerMember(targetPlayer) && player->getParty()->getLeader() != targetPlayer){
+							pzLocked = true;
+						}
+					}
+					else{
+						pzLocked = true;
+					}
 				}
 
 #ifdef __SKULLSYSTEM__
@@ -4468,5 +4475,5 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 
 	//send message to party channel
 	if(getParty())
-		getParty()->broadcastLoot(creature, corpse);
+		getParty()->broadcastPartyMessage(MSG_INFO_DESCR, os.str());
 }
