@@ -773,16 +773,16 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		else if(it.weaponType != WEAPON_AMMO && it.weaponType != WEAPON_WAND){ // Arrows and Bolts doesn't show atk
 			s << " (";
 			if(it.attack != 0){
-				s << "Atk:" << (int)it.attack;
+				s << "Atk:" << (int32_t)it.attack;
 			}
 
 			if(it.defence != 0 || it.extraDef != 0){
 				if(it.attack != 0)
 					s << " ";
 
-				s << "Def:" << (int)it.defence;
+				s << "Def:" << (int32_t)it.defence;
 				if(it.extraDef != 0){
-					s << " " << std::showpos << (int)it.extraDef << std::noshowpos;
+					s << " " << std::showpos << (int32_t)it.extraDef << std::noshowpos;
 				}
 			}
 
@@ -790,7 +790,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 				if(it.attack != 0 || it.defence != 0 || it.extraDef != 0)
 					s << ", ";
 
-				s << "magic level " << std::showpos << (int)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+				s << "magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
 			}
 			s << ")";
 		}
@@ -842,11 +842,11 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 	}
 	else if(it.isContainer()){
-		s << " (Vol:" << (int)it.maxItems << ").";
+		s << " (Vol:" << (int32_t)it.maxItems << ").";
 	}
 	else if(it.isKey()){
 		if(item){
-			s << " (Key:" << (int)item->getActionId() << ").";
+			s << " (Key:" << (int32_t)item->getActionId() << ").";
 		}
 		else{
 			s << " (Key:0).";
@@ -902,7 +902,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 				s << "1 minute left.";
 			}
 			else{
-				s << " less than a minute left.";
+				s << "less than a minute left.";
 			}
 		}
 		else{
@@ -927,7 +927,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 
 		if(it.wieldInfo & WIELDINFO_LEVEL){
-			s << " of level " << (int)it.minReqLevel << " or higher";
+			s << " of level " << (int32_t)it.minReqLevel << " or higher";
 		}
 
 		if(it.wieldInfo & WIELDINFO_MAGLV){
@@ -937,7 +937,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			else{
 				s << " of";
 			}
-			s << " magic level " << (int)it.minReqMagicLevel << " or higher";
+			s << " magic level " << (int32_t)it.minReqMagicLevel << " or higher";
 		}
 
 		s << ".";
