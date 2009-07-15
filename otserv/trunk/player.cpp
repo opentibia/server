@@ -3813,7 +3813,7 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 		else if(!hasFlag(PlayerFlag_NotGainInFight)){
 			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT) && lastHit){
 				if(checkPzBlockOnCombat(targetPlayer)){
-					addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_KILL_DURATION), true);
+					addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_SKULL_DURATION), true);
 				}
 			}
 		}
