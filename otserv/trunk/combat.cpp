@@ -292,12 +292,10 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 #ifdef __SKULLSYSTEM__
 	if(const Player* targetPlayer = target->getPlayer()){
 		if(player->hasSafeMode()){
-			if(player->getParty()){
-				if(player->getParty()->isPlayerMember(targetPlayer) || player->getParty()->getLeader() == targetPlayer){
-					return Combat::canDoCombat(player, targetPlayer);
-				}
+			if(player->isPartner(targetPlayer)){
+				return Combat::canDoCombat(player, targetPlayer);
 			}
-			if(targetPlayer->getSkull() == SKULL_NONE) {
+			if(targetPlayer->getSkull() == SKULL_NONE){
 				if(!Combat::isInPvpZone(player, targetPlayer)){
 					return RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS;
 				}

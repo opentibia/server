@@ -4480,10 +4480,8 @@ bool Player::checkPzBlockOnCombat(Player* targetPlayer)
 		return false;
 	}
 
-	if(getParty()){
-		if(getParty()->isPlayerMember(targetPlayer) || getParty()->getLeader() == targetPlayer){
-			return false;
-		}
+	if(isPartner(targetPlayer)){
+		return false;
 	}
 
 	return true;
