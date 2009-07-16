@@ -66,14 +66,15 @@ bool Raids::loadFromXml(const std::string& _filename)
 			return false;
 		}
 
-		int intValue;
+		int32_t intValue;
 		std::string strValue;
 
 		raidNode = root->children;
 		while(raidNode){
 			if(xmlStrcmp(raidNode->name, (const xmlChar*)"raid") == 0){
 				std::string name, file;
-				uint32_t interval, margin;
+				int32_t interval = 0;
+				int32_t margin = 0;
 
 				if(readXMLString(raidNode, "name", strValue)){
 					name = strValue;
@@ -94,23 +95,22 @@ bool Raids::loadFromXml(const std::string& _filename)
 					std::cout << "[Warning] Raids: file tag missing for raid " << name << ". Using default: " << file << std::endl;
 				}
 
-				//interval2 is the average interval between
-				// 2 executions of the raid in minutes
-				if(readXMLInteger(raidNode, "interval2", intValue)){
-					interval = intValue * 60; //transform  to seconds
+				//interval is the average interval between 2 executions of the raid in minutes
+				if((readXMLInteger(raidNode, "interval", intValue) ||
+					readXMLInteger(raidNode, "interval2", intValue)) && intValue > 0 ){
+					interval = intValue * 60;
 				}
 				else{
-					std::cout << "[Error] Raids: interval2 tag missing for raid " << name << std::endl;
+					std::cout << "[Error] Raids: interval tag missing for raid " << name << std::endl;
 					raidNode = raidNode->next;
 					continue;
 				}
 
-				if(readXMLInteger(raidNode, "margin", intValue)){
-					margin = intValue * 60 * 1000; //transform to milliseconds
+				if(readXMLInteger(raidNode, "margin", intValue) && intValue >= 0){
+					margin = intValue * 60;
 				}
 				else{
 					std::cout << "[Warning] Raids: margin tag missing for raid " << name << std::endl;
-					margin = 0;
 				}
 
 				Raid* newRaid = new Raid(name, interval, margin);
@@ -164,7 +164,7 @@ void Raids::checkRaids()
 	if(!getRunning()){
 		uint64_t now = OTSYS_TIME();
 		for(RaidList::iterator it = raidList.begin(); it != raidList.end(); ++it){
-			if(now >= (getLastRaidEnd() + (*it)->getMargin())){
+			if(now >= (getLastRaidEnd() + ((*it)->getMargin() * 1000) )){
 				if(MAX_RAND_RANGE*CHECK_RAIDS_INTERVAL/(*it)->getInterval() >= (uint32_t)random_range(0, MAX_RAND_RANGE)){
 #ifdef __DEBUG_RAID__
 					char buffer[32];
