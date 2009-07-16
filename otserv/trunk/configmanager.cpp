@@ -58,9 +58,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		return false;
 	}
 
-	// output which file we're actually loading
-	std::cout << _filename << std::flush;
-
 	// parse config
 	if(!m_isLoaded) // info that must be loaded one time (unless we reset the modules involved)
 	{
