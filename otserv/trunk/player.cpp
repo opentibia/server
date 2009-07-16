@@ -1266,8 +1266,8 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You can not enter a pvp zone after attacking another player.");
 		break;
 
-	case RET_ACTIONNOTPERMITTEDINANOPVPZONE:
-		sendCancel("This action is not permitted in a none pvp zone.");
+	case RET_ACTIONNOTPERMITTEDINANONPVPZONE:
+		sendCancel("This action is not permitted in a non-pvp zone.");
 		break;
 
 	case RET_YOUCANNOTLOGOUTHERE:

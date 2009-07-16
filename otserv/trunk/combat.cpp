@@ -272,7 +272,7 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 		//nopvp-zone
 		if(isPlayerCombat(target)){
 			if(player->getZone() == ZONE_NOPVP){
-				return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
+				return RET_ACTIONNOTPERMITTEDINANONPVPZONE;
 			}
 			if(target->getZone() == ZONE_NOPVP){
 				return RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
@@ -428,7 +428,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 		if(attacker->getPlayer() || attacker->isPlayerSummon()){
 			//nopvp-zone
 			if(target->getPlayer() && target->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
-				return RET_ACTIONNOTPERMITTEDINANOPVPZONE;
+				return RET_ACTIONNOTPERMITTEDINANONPVPZONE;
 			}
 
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
