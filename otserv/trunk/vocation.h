@@ -32,8 +32,8 @@ public:
 	~Vocation();
 	const std::string& getVocName() const {return name;}
 	const std::string& getVocDescription() const {return description;}
-	uint32_t getReqSkillTries(int skill, int level);
-	uint32_t getReqMana(int magLevel);
+	uint32_t getReqSkillTries(int32_t skill, int32_t level);
+	uint32_t getReqMana(int32_t magLevel);
 
 	uint32_t getHPGain() const {return gainHP;};
 	uint32_t getManaGain() const {return gainMana;};
