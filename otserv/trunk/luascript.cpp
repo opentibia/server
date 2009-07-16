@@ -4423,13 +4423,10 @@ int LuaScriptInterface::luaGetHouseList(lua_State *L)
 		townid = popNumber(L);
 
 	lua_newtable(L);
-	int n = 1;
-	for(HouseMap::iterator iter = Houses::getInstance().getHouseBegin();
-		iter != Houses::getInstance().getHouseEnd();
-		++n, ++iter)
-	{
-		House* house = iter->second;
-
+	uint32_t n = 1;
+	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++n, ++it){
+		House* house = it->second;
+		
 		if(townid != 0 && house->getTownId() != townid)
 			continue;
 		lua_pushnumber(L, n);
@@ -4446,11 +4443,11 @@ int LuaScriptInterface::luaCleanHouse(lua_State *L)
 	uint32_t houseid = popNumber(L);
 
 	House* house = Houses::getInstance().getHouse(houseid);
-
-	if(house) {
+	if(house){
 		house->cleanHouse();
 		lua_pushnumber(L, LUA_TRUE);
-	} else {
+	} 
+	else{
 		lua_pushnumber(L, LUA_FALSE);
 	}
 

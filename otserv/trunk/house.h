@@ -274,10 +274,10 @@ public:
 	House* getHouse(uint32_t houseid, bool add = false)
 	{
 		HouseMap::iterator it = houseMap.find(houseid);
-
 		if(it != houseMap.end()){
 			return it->second;
 		}
+		
 		if(add){
 			House* house = new House(houseid);
 			houseMap[houseid] = house;
@@ -286,7 +286,6 @@ public:
 		else{
 			return NULL;
 		}
-
 	}
 
 	House* getHouseByPlayerId(uint32_t playerId);
