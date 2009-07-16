@@ -855,10 +855,12 @@ DeathList Creature::getKillers(int32_t assist_count)
 					if(mdc->getMaster()){
 						bool cont = false;
 						for(DeathList::iterator finder = list.begin(); finder != list.end(); ++finder){
-							Creature* c = finder->getKillerCreature();
-							if(mdc->getMaster() == c || mdc->getMaster() == c->getMaster()){
-								cont = true;
-								break;
+							if(finder->isCreatureKill()){
+								Creature* c = finder->getKillerCreature();
+								if(mdc->getMaster() == c || mdc->getMaster() == c->getMaster()){
+									cont = true;
+									break;
+								}
 							}
 						}
 						if(cont)
@@ -869,10 +871,12 @@ DeathList Creature::getKillers(int32_t assist_count)
 					if(mdc->getSummonCount() > 0){
 						bool cont = false;
 						for(DeathList::iterator finder = list.begin(); finder != list.end(); ++finder){
-							Creature* c = finder->getKillerCreature();
-							if(c->getMaster() == mdc){
-								cont = true;
-								break;
+							if(finder->isCreatureKill()){
+								Creature* c = finder->getKillerCreature();
+								if(c->getMaster() == mdc){
+									cont = true;
+									break;
+								}
 							}
 						}
 						if(cont)
