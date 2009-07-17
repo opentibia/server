@@ -5,7 +5,7 @@
 	<monster name="Fire Devil" file="fire_elemental.xml"/>
 	<monster name="Ghoul" file="ghoul.xml"/>
 	<monster name="Cyclops" file="cyclops.xml"/>
-	<monster name="Minotaur" file="minotaur_archer.xml"/>
+	<monster name="Minotaur" file="minotaur.xml"/>
 	<monster name="Minotaur Archer" file="minotaur_archer.xml"/>
 	<monster name="Minotaur Guard" file="minotaur_guard.xml"/>
 	<monster name="Minotaur Mage" file="minotaur_mage.xml"/>

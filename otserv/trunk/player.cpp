@@ -3799,7 +3799,7 @@ void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
 	}
 }
 
-void Player::onKilledCreature(Creature* target, bool lastHit)
+void Player::onKilledCreature(Creature* target)
 {
 	if(hasFlag(PlayerFlag_NotGenerateLoot)){
 		target->setDropLoot(false);
@@ -3811,7 +3811,7 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 			targetPlayer->setLossSkill(false);
 		}
 		else if(!hasFlag(PlayerFlag_NotGainInFight)){
-			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT) && lastHit){
+			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
 				if(checkPzBlockOnCombat(targetPlayer)){
 					addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_SKULL_DURATION), true);
 				}
@@ -3824,7 +3824,7 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 		addCondition(condition);
 	}
 
-	Creature::onKilledCreature(target, lastHit);
+	Creature::onKilledCreature(target);
 }
 
 void Player::gainExperience(uint64_t& gainExp)

@@ -735,7 +735,7 @@ void Creature::onDie()
 		if(it->isCreatureKill()){
 			Creature* attacker = it->getKillerCreature();
 			if(attacker){
-				attacker->onKilledCreature(this, (it == killers.begin()));
+				attacker->onKilledCreature(this);
 			}
 		}
 	}
@@ -1273,10 +1273,10 @@ void Creature::onAttackedCreatureKilled(Creature* target)
 	}
 }
 
-void Creature::onKilledCreature(Creature* target, bool lastHit)
+void Creature::onKilledCreature(Creature* target)
 {
 	if(getMaster()){
-		getMaster()->onKilledCreature(target, lastHit);
+		getMaster()->onKilledCreature(target);
 	}
 
 	//scripting event - onKill
