@@ -4199,8 +4199,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 void Player::checkSkullTicks(int32_t ticks)
 {
 	if(!hasCondition(CONDITION_INFIGHT) && getSkull() != SKULL_NONE){
-		if( (skullType == SKULL_RED && lastSkullTime >= lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
-			(skullType == SKULL_BLACK && lastSkullTime >= lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION)) ){
+		if( (skullType == SKULL_RED && std::time(NULL) >= lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
+			(skullType == SKULL_BLACK && std::time(NULL) >= lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION)) ){
 			lastSkullTime = 0;
 			setSkull(SKULL_NONE);
 			g_game.updateCreatureSkull(this);
