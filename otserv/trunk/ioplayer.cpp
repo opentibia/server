@@ -132,8 +132,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	int32_t skullType = result->getDataInt("skull_type");
 	int64_t lastSkullTime = result->getDataLong("skull_time");
 
-	if((skullType == SKULL_RED && lastSkullTime < std::time(NULL) + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
-		(skullType == SKULL_BLACK && lastSkullTime < std::time(NULL) + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION))){
+	if((skullType == SKULL_RED && lastSkullTime < lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
+		(skullType == SKULL_BLACK && lastSkullTime < lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION))){
 		player->lastSkullTime = lastSkullTime;
 		player->skullType = (Skulls_t)skullType;
 	}
