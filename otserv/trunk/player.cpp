@@ -4117,9 +4117,9 @@ void Player::addUnjustifiedDead(const Player* attacked)
 		return;
 	}
 
-	std::stringstream Msg;
-	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
-	sendTextMessage(MSG_STATUS_WARNING, Msg.str());
+	std::stringstream msg;
+	msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
+	sendTextMessage(MSG_STATUS_WARNING, msg.str());
 
 	Skulls_t oldSkull = getSkull();
 	if(oldSkull == SKULL_RED || oldSkull == SKULL_BLACK){
@@ -4128,11 +4128,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 
 	//day
 	int32_t unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, std::time(NULL) - 24 * 60 * 60 );
-
-	if(		g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) > 0 &&
-			g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) <= unjustKills){
-		setAttackedCreature(NULL);
-		destroySummons();
+	if(g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) > 0 &&
+		g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);
 	}
 	else if(getSkull() != SKULL_BLACK && 
@@ -4143,11 +4140,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 
 	//week
 	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, std::time(NULL) - 7 * 24 * 60 * 60 );
-
-	if(		g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) > 0 &&
-			g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) <= unjustKills){
-		setAttackedCreature(NULL);
-		destroySummons();
+	if(g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) > 0 &&
+		g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);
 	}
 	else if(getSkull() != SKULL_BLACK && 
@@ -4158,11 +4152,8 @@ void Player::addUnjustifiedDead(const Player* attacked)
 
 	//month
 	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, std::time(NULL) - 30 * 24 * 60 * 60 );
-
-	if(		g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) > 0 &&
-			g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) <= unjustKills){
-		setAttackedCreature(NULL);
-		destroySummons();
+	if(g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) > 0 &&
+		g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);
 	}
 	else if(getSkull() != SKULL_BLACK && 
@@ -4174,6 +4165,10 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	if(oldSkull != getSkull()){
 		lastSkullTime = std::time(NULL);
 		g_game.updateCreatureSkull(this);
+		if(getSkull() == SKULL_BLACK){
+			setAttackedCreature(NULL);
+			destroySummons();
+		}
 	}
 }
 
