@@ -951,7 +951,7 @@ uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& 
 
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
-		desc << creature->getName() << " itemid: " << item->getID() << " - " << topos;
+		desc << creature->getName() << " itemid: " << item->getID() << " - " << toPos;
 		env->setEventDesc(desc.str());
 		#endif
 
