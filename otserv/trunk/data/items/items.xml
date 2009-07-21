@@ -21073,6 +21073,13 @@
 	</item>
 	<item id="10017" article="a" name="football"/>
 
+	<item id="10355" article="a" name="statue of Fafnar">
+		<attribute key="rotateTo" value="10356"/>
+	</item>
+	<item id="10356" article="a" name="statue of Fafnar">
+		<attribute key="rotateTo" value="10355"/>
+	</item>
+
 
 	<item id="20001" name="water"/>
 	<item id="20002" name="blood"/>
