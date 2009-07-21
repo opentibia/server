@@ -81,6 +81,7 @@ protected:
 
 	void XTEA_encrypt(OutputMessage& msg);
 	bool XTEA_decrypt(NetworkMessage& msg);
+	bool RSA_decrypt(NetworkMessage& msg);
 	bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
 
 	void setRawMessages(bool value) { m_rawMessages = value; }

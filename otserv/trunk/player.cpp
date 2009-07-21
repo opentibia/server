@@ -52,7 +52,9 @@ extern CreatureEvents* g_creatureEvents;
 
 AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
-int32_t Player::maxMessageBuffer;
+int32_t Player::maxMessageBuffer = 0;
+ChannelStatementMap Player::channelStatementMap;
+uint32_t Player::channelStatementGuid = 0;
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 uint32_t Player::playerCount = 0;

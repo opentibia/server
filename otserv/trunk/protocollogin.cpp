@@ -31,7 +31,6 @@
 #include <iomanip>
 #include "game.h"
 
-extern RSA* g_otservRSA;
 extern ConfigManager g_config;
 extern IPList serverIPs;
 extern BanManager g_bans;
@@ -78,7 +77,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
 	}
 
-	if(!RSA_decrypt(g_otservRSA, msg)){
+	if(!RSA_decrypt(msg)){
 		getConnection()->closeConnection();
 		return false;
 	}

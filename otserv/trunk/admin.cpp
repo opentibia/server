@@ -39,7 +39,6 @@ static void addLogLine(ProtocolAdmin* conn, eLogType type, int level, std::strin
 extern Game g_game;
 extern ConfigManager g_config;
 extern BanManager g_bans;
-extern RSA* g_otservRSA;
 
 AdminProtocolConfig* g_adminConfig = NULL;
 
@@ -116,6 +115,11 @@ void ProtocolAdmin::deleteProtocolTask()
 
 void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 {
+	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+		getConnection()->closeConnection();
+		return;
+	}
+
 	uint8_t recvbyte = msg.GetByte();
 
 	OutputMessagePool* outputPool = OutputMessagePool::getInstance();

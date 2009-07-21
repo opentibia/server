@@ -54,11 +54,6 @@
 #include "spawn.h"
 #include "quests.h"
 
-#if defined __EXCEPTION_TRACER__
-#include "exception.h"
-extern boost::recursive_mutex maploadlock;
-#endif
-
 extern ConfigManager g_config;
 extern Actions* g_actions;
 extern Commands commands;
@@ -4731,7 +4726,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 		case ACTION_NAMEREPORT:
 		{
-			g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
+			g_bans.addPlayerBan(guid, 0, player->getGUID(), comment, statement, reasonId, actionType);
 			removeNotations = 1;
 			break;
 		}
@@ -4756,7 +4751,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 						account.warnings--;
 				}
 
-				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
+				g_bans.addPlayerBan(guid, 0, player->getGUID(), comment, statement, reasonId, actionType);
 			}
 
 			break;
@@ -4779,7 +4774,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 		case ACTION_BANREPORTFINAL:{
 			if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
 				actionType = ACTION_DELETION;
-				if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType))
+				if(!g_bans.addAccountBan(account.number, 0, player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings--;
 			}
 			else{
@@ -4787,15 +4782,27 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings = g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION);
 
-				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
+				g_bans.addPlayerBan(guid, 0, player->getGUID(), comment, statement, reasonId, actionType);
 			}
 
 			break;
 		}
 
 		case ACTION_STATEMENT:
-			// this is not banishment, and shouldn't perform default action
+		{
+			ChannelStatementMap::iterator it = Player::channelStatementMap.find(channelId);
+			if(it != Player::channelStatementMap.end()){
+				g_bans.addPlayerStatement(guid, player->getGUID(), comment, it->second, reasonId, actionType);
+				Player::channelStatementMap.erase(it);
+			}
+			else{
+				player->sendCancel("Statement has already been reported.");
+				return false;
+			}
+
+			removeNotations = 0;
 			break;
+		}
 
 		case ACTION_BANISHMENT:
 		default:

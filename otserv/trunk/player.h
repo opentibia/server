@@ -91,6 +91,7 @@ typedef std::map<uint32_t, Depot*> DepotMap;
 typedef std::map<uint32_t, int32_t> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
+typedef std::map<uint32_t, std::string> ChannelStatementMap;
 typedef std::list<std::string> LearnedInstantSpellList;
 typedef std::list<Party*> PartyList;
 
@@ -117,6 +118,8 @@ public:
 
 	static MuteCountMap muteCountMap;
 	static int32_t maxMessageBuffer;
+	static ChannelStatementMap channelStatementMap;
+	static uint32_t channelStatementGuid;
 
 	virtual const std::string& getName() const {return name;}
 	virtual const std::string& getNameDescription() const {return name;}

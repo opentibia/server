@@ -31,6 +31,8 @@
 #include "outputmessage.h"
 #include "rsa.h"
 
+extern RSA g_RSA;
+
 void Protocol::onSendMessage(OutputMessage_ptr msg)
 {
 	#ifdef __DEBUG_NET_DETAIL__
@@ -182,6 +184,11 @@ bool Protocol::XTEA_decrypt(NetworkMessage& msg)
 
 	msg.setMessageLength(tmp);
 	return true;
+}
+
+bool Protocol::RSA_decrypt(NetworkMessage& msg)
+{
+	return RSA_decrypt(&g_RSA, msg);
 }
 
 bool Protocol::RSA_decrypt(RSA* rsa, NetworkMessage& msg)

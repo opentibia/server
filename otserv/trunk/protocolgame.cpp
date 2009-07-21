@@ -51,7 +51,6 @@
 extern Game g_game;
 extern ConfigManager g_config;
 extern Actions actions;
-extern RSA* g_otservRSA;
 extern BanManager g_bans;
 extern CreatureEvents* g_creatureEvents;
 Chat g_chat;
@@ -315,7 +314,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	/*uint16_t clientos =*/ msg.GetU16();
 	uint16_t version  = msg.GetU16();
 
-	if(!RSA_decrypt(g_otservRSA, msg)){
+	if(!RSA_decrypt(msg)){
 		getConnection()->closeConnection();
 		return false;
 	}
@@ -421,7 +420,7 @@ void ProtocolGame::disconnect()
 
 void ProtocolGame::parsePacket(NetworkMessage &msg)
 {
-	if(!m_acceptPackets || msg.getMessageLength() <= 0 || !player)
+	if(!player || !m_acceptPackets || g_game.getGameState() == GAME_STATE_SHUTDOWN || msg.getMessageLength() <= 0)
 		return;
 
 	uint8_t recvbyte = msg.GetByte();
@@ -1424,7 +1423,7 @@ void ProtocolGame::parseViolationWindow(NetworkMessage& msg)
 	uint8_t reason = msg.GetByte();
 	violationAction_t action = (violationAction_t)msg.GetByte();
 	std::string comment = msg.GetString();
-	std::string statement = msg.GetString();
+	std::string statement = (action == ACTION_STATEMENT ? "" : msg.GetString());
 	uint16_t channelId = msg.GetU16();
 	bool ipBanishment = msg.GetByte() != 0;
 	addGameTask(&Game::playerViolationWindow, player->getID(), target, reason, action, comment, statement, channelId, ipBanishment);
@@ -2621,36 +2620,36 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage_ptr msg, const Creature* crea
 	SpeakClasses type, std::string text, uint16_t channelId, uint32_t time /*= 0*/)
 {
 	msg->AddByte(0xAA);
-	msg->AddU32(0x00000000);
 
-	//Do not add name for anonymous channel talk
-	if(creature == NULL)
-	{
-		msg->AddString("");
-	}
-	else if(type != SPEAK_CHANNEL_R2){
-		if(type != SPEAK_RVR_ANSWER){
+	if(creature){
+		if(const Player* speaker = creature->getPlayer()){
+			msg->AddU32(++Player::channelStatementGuid);
+			Player::channelStatementMap[Player::channelStatementGuid] = text;
+
+			if(type == SPEAK_RVR_ANSWER){
+				msg->AddString("Gamemaster");
+				msg->AddU16(0x0000);
+			}
+			else{
+				if(type == SPEAK_CHANNEL_R2){
+					msg->AddString("");
+				}
+				else{
+					msg->AddString(speaker->getName());
+				}
+
+				msg->AddU16(speaker->getPlayerInfo(PLAYERINFO_LEVEL));
+			}
+		}
+		else{
+			msg->AddU32(0x00000000);
 			msg->AddString(creature->getName());
-		}
-		else{
-			msg->AddString("Gamemaster");
-		}
-	}
-	else{
-		msg->AddString("");
-	}
-
-	//Add level only for players
-	const Player* speaker = creature? creature->getPlayer() : NULL;
-	if(speaker){
-		if(type != SPEAK_RVR_ANSWER){
-			msg->AddU16(speaker->getPlayerInfo(PLAYERINFO_LEVEL));
-		}
-		else{
 			msg->AddU16(0x0000);
 		}
 	}
 	else{
+		msg->AddU32(0x00000000);
+		msg->AddString("");
 		msg->AddU16(0x0000);
 	}
 
