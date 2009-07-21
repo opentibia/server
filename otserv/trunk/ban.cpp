@@ -42,8 +42,7 @@ bool BanManager::acceptConnection(uint32_t clientip)
 
 	uint64_t currentTime = OTSYS_TIME();
 	IpConnectMap::iterator it = ipConnectMap.find(clientip);
-	if(it == ipConnectMap.end())
-	{
+	if(it == ipConnectMap.end()){
 		ConnectBlock cb;
 		cb.startTime = currentTime;
 		cb.blockTime = 0;
@@ -55,21 +54,18 @@ bool BanManager::acceptConnection(uint32_t clientip)
 	}
 
 	it->second.count++;
-	if(it->second.blockTime > currentTime)
-	{
+	if(it->second.blockTime > currentTime){
 		banLock.unlock();
 		return false;
 	}
 
-	if(currentTime - it->second.startTime > 1000)
-	{
+	if(currentTime - it->second.startTime > 1000){
 		uint32_t connectionPerSec = it->second.count;
 		it->second.startTime = currentTime;
 		it->second.count = 0;
 		it->second.blockTime = 0;
 
-		if(connectionPerSec > 10)
-		{
+		if(connectionPerSec > 10){
 			it->second.blockTime = currentTime + 10000;
 			banLock.unlock();
 			return false;
@@ -87,8 +83,7 @@ bool BanManager::isIpDisabled(uint32_t clientip)
 
 	time_t currentTime = std::time(NULL);
 	IpLoginMap::iterator it = ipLoginMap.find(clientip);
-	if(it != ipLoginMap.end())
-	{
+	if(it != ipLoginMap.end()){
 		uint32_t loginTimeout = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TIMEOUT) / 1000;
 		if( (it->second.numberOfLogins >= (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TRIES)) &&
 			((uint32_t)currentTime < (uint32_t)it->second.lastLoginTime + loginTimeout) )
@@ -269,7 +264,7 @@ bool BanManager::addPlayerStatement(uint32_t playerId, uint32_t adminid, std::st
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
 
 	DBQuery query;
-	query << BAN_STATEMENT << ", " << playerId << ", " << 0 << ", " << std::time(NULL) << ", " << adminid << ", ";
+	query << BAN_STATEMENT << ", " << playerId << ", " << -1 << ", " << std::time(NULL) << ", " << adminid << ", ";
 	query << db->escapeString(comment) << ", " << db->escapeString(statement) << ", " << reason << ", " << action;
 
 	if(!stmt.addRow(query.str())) return false;
@@ -303,7 +298,7 @@ bool BanManager::addAccountNotation(uint32_t account, uint32_t adminid, std::str
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
 
 	DBQuery query;
-	query << BAN_NOTATION << ", " << account << ",  " << 0 << ", " << std::time(NULL) << ", " << adminid << ", ";
+	query << BAN_NOTATION << ", " << account << ",  " << -1 << ", " << std::time(NULL) << ", " << adminid << ", ";
 	query << db->escapeString(comment) << ", " << db->escapeString(statement) << ", " << reason << ", " << action;
 
 	if(!stmt.addRow(query.str())) return false;
@@ -407,7 +402,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 		ban.id = result->getDataInt("id");
 		ban.value = result->getDataString("value");
 		ban.param = result->getDataString("param");
-		ban.expires = (uint32_t)result->getDataLong("expires");
+		ban.expires = result->getDataLong("expires");
 		ban.added = (uint32_t)result->getDataLong("id");
 		ban.adminId = result->getDataInt("admin_id");
 		ban.reason = result->getDataInt("reason");

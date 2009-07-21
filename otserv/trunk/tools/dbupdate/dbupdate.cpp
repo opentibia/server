@@ -689,6 +689,19 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		}
 	},
+	{ 19,
+		{ // PgSql
+			"",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `bans` CHANGE `expires` `expires` INT NOT NULL;",
+			NULL
+		},
+		{ // Sqlite
+			NULL
+		}
+	},
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)

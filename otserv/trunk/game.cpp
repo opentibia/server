@@ -4726,7 +4726,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 		case ACTION_NAMEREPORT:
 		{
-			g_bans.addPlayerBan(guid, 0, player->getGUID(), comment, statement, reasonId, actionType);
+			g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
 			removeNotations = 1;
 			break;
 		}
@@ -4751,7 +4751,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 						account.warnings--;
 				}
 
-				g_bans.addPlayerBan(guid, 0, player->getGUID(), comment, statement, reasonId, actionType);
+				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
 			}
 
 			break;
@@ -4774,7 +4774,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 		case ACTION_BANREPORTFINAL:{
 			if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
 				actionType = ACTION_DELETION;
-				if(!g_bans.addAccountBan(account.number, 0, player->getGUID(), comment, statement, reasonId, actionType))
+				if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings--;
 			}
 			else{
@@ -4782,7 +4782,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings = g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION);
 
-				g_bans.addPlayerBan(guid, 0, player->getGUID(), comment, statement, reasonId, actionType);
+				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
 			}
 
 			break;
@@ -4826,7 +4826,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	}
 
 	if(ipBanishment && ip > 0)
-		g_bans.addIpBan(ip, 0xFFFFFFFF, (time(NULL) + g_config.getNumber(ConfigManager::IPBANISHMENT_LENGTH)),
+		g_bans.addIpBan(ip, -1, (time(NULL) + g_config.getNumber(ConfigManager::IPBANISHMENT_LENGTH)),
 			player->getGUID(), comment);
 
 	if(removeNotations > 1)

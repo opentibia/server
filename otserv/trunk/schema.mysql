@@ -169,7 +169,7 @@ CREATE TABLE `bans` (
 	`value` INT UNSIGNED NOT NULL COMMENT 'ip, player guid, account number',
 	`param` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'mask',
 	`active` TINYINT(1) NOT NULL DEFAULT TRUE,
-	`expires` INT UNSIGNED NOT NULL,
+	`expires` INT NOT NULL,
 	`added` INT UNSIGNED NOT NULL,
 	`admin_id` INT UNSIGNED NOT NULL DEFAULT 0,
 	`comment` VARCHAR(1024) NOT NULL DEFAULT '',
@@ -265,7 +265,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 18);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 19);
 
 DELIMITER |
 

@@ -37,7 +37,7 @@ struct Ban {
 	BanType_t type;
 	uint32_t id;
 	uint32_t added;
-	uint32_t expires;
+	int32_t expires;
 	uint32_t adminId;
 	uint32_t reason;
 	violationAction_t action;
