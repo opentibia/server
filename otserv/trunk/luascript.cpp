@@ -2686,7 +2686,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 		--itemCount;
 		if(itemCount == 0){
 			if(newItem->getParent()){
-				uint32_t uid = env->addThing((Thing*)newItem);
+				uint32_t uid = env->addThing(newItem);
 				lua_pushnumber(L, uid);
 				return 1;
 			}
@@ -3860,7 +3860,7 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 		return 1;
 	}
 
-	uint32_t cid = env->addThing((Thing*)monster);
+	uint32_t cid = env->addThing(monster);
 
 	lua_pushnumber(L, cid);
 	return 1;
@@ -6608,7 +6608,7 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 		--itemCount;
 		if(itemCount == 0){
 			if(newItem->getParent()){
-				uint32_t uid = env->addThing((Thing*)newItem);
+				uint32_t uid = env->addThing(newItem);
 				lua_pushnumber(L, uid);
 				return 1;
 			}
