@@ -2649,44 +2649,22 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 	}
 
 	const ItemType& it = Item::items[itemId];
-	if(it.stackable && count > 100){
-		int32_t subCount = count;
-		while(subCount > 0){
-			int32_t stackCount = std::min((int32_t)100, (int32_t)subCount);
-			Item* newItem = Item::CreateItem(itemId, stackCount);
 
-			if(!newItem){
-				reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
-				lua_pushnumber(L, LUA_ERROR);
-				return 1;
-			}
+	int32_t itemCount;
+	int32_t subType;
 
-			ReturnValue ret = g_game.internalPlayerAddItem(player, newItem, canDropOnMap);
-
-			if(ret != RET_NOERROR){
-				delete newItem;
-				lua_pushnumber(L, LUA_ERROR);
-				return 1;
-			}
-
-			subCount = subCount - stackCount;
-
-			if(subCount == 0){
-				if(newItem->getParent()){
-					uint32_t uid = env->addThing((Thing*)newItem);
-					lua_pushnumber(L, uid);
-					return 1;
-				}
-				else{
-					//stackable item stacked with existing object, newItem will be released
-					lua_pushnumber(L, LUA_NULL);
-					return 1;
-				}
-			}
-		}
+	if(it.stackable){
+		itemCount = (int32_t)std::ceil((float)count / 100);
+		subType = count;
 	}
 	else{
-		Item* newItem = Item::CreateItem(itemId, count);
+		itemCount = count;
+		subType = 1;
+	}
+
+	while(itemCount > 0){
+		int32_t stackCount = std::min((int32_t)100, (int32_t)subType);
+		Item* newItem = Item::CreateItem(itemId, stackCount);
 
 		if(!newItem){
 			reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
@@ -2694,6 +2672,9 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 			return 1;
 		}
 
+		if(it.stackable){
+			subType -= stackCount;
+		}
 		ReturnValue ret = g_game.internalPlayerAddItem(player, newItem, canDropOnMap);
 
 		if(ret != RET_NOERROR){
@@ -2702,19 +2683,23 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 			return 1;
 		}
 
-		if(newItem->getParent()){
-			uint32_t uid = env->addThing((Thing*)newItem);
-			lua_pushnumber(L, uid);
-			return 1;
-		}
-		else{
-			//stackable item stacked with existing object, newItem will be released
-			lua_pushnumber(L, LUA_NULL);
-			return 1;
+		--itemCount;
+		if(itemCount == 0){
+			if(newItem->getParent()){
+				uint32_t uid = env->addThing((Thing*)newItem);
+				lua_pushnumber(L, uid);
+				return 1;
+			}
+			else{
+				//stackable item stacked with existing object, newItem will be released
+				lua_pushnumber(L, LUA_NULL);
+				return 1;
+			}
 		}
 	}
 
-	return 0;
+	lua_pushnumber(L, LUA_NULL);
+	return 1;
 }
 
 int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
@@ -3524,69 +3509,57 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 	}
 
 	const ItemType& it = Item::items[itemId];
-	if(it.stackable && count > 100){
-		/*
-		reportErrorFunc("Stack count cannot be higher than 100.");
-		count = 100;
-		*/
-		int32_t subCount = count;
-		while(subCount > 0){
-			int32_t stackCount = std::min((int32_t)100, (int32_t)subCount);
-			Item* newItem = Item::CreateItem(itemId, stackCount);
 
-			if(!newItem){
-				reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
-				lua_pushnumber(L, LUA_ERROR);
-				return 1;
-			}
+	int32_t itemCount;
+	int32_t subType;
 
-			ReturnValue ret = g_game.internalAddItem(tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
-
-			if(ret != RET_NOERROR){
-				delete newItem;
-				lua_pushnumber(L, LUA_ERROR);
-				return 1;
-			}
-
-			subCount = subCount - stackCount;
-
-			if(subCount == 0){
-				if(newItem->getParent()){
-					uint32_t uid = env->addThing((Thing*)newItem);
-					lua_pushnumber(L, uid);
-					return 1;
-				}
-				else{
-					//stackable item stacked with existing object, newItem will be released
-					lua_pushnumber(L, LUA_NULL);
-					return 1;
-				}
-			}
-		}
+	if(it.stackable){
+		itemCount = (int32_t)std::ceil((float)count / 100);
+		subType = count;
 	}
 	else{
-		Item* newItem = Item::CreateItem(itemId, count);
+		itemCount = count;
+		subType = 1;
+	}
 
+	while(itemCount > 0){
+		int32_t stackCount = std::min((int32_t)100, (int32_t)subType);
+		Item* newItem = Item::CreateItem(itemId, stackCount);
+
+		if(!newItem){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+
+		if(it.stackable){
+			subType -= stackCount;
+		}
 		ReturnValue ret = g_game.internalAddItem(tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+
 		if(ret != RET_NOERROR){
 			delete newItem;
 			lua_pushnumber(L, LUA_ERROR);
 			return 1;
 		}
 
-		if(newItem->getParent()){
-			uint32_t uid = env->addThing(newItem);
-			lua_pushnumber(L, uid);
-			return 1;
-		}
-		else{
-			//stackable item stacked with existing object, newItem will be released
-			lua_pushnumber(L, LUA_NULL);
-			return 1;
+		--itemCount;
+		if(itemCount == 0){
+			if(newItem->getParent()){
+				uint32_t uid = env->addThing(newItem);
+				lua_pushnumber(L, uid);
+				return 1;
+			}
+			else{
+				//stackable item stacked with existing object, newItem will be released
+				lua_pushnumber(L, LUA_NULL);
+				return 1;
+			}
 		}
 	}
 
-	return 0;
+	lua_pushnumber(L, LUA_NULL);
+	return 1;
 }
 
 int LuaScriptInterface::luaDoCreateItemEx(lua_State *L)
@@ -6592,62 +6565,51 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 	Container* container = env->getContainerByUID(uid);
-	if(container){
-		const ItemType& it = Item::items[itemId];
-		if(it.stackable && count > 100){
-			/*
-			reportErrorFunc("Stack count cannot be higher than 100.");
-			count = 100;
-			*/
+	if(!container){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
-			int32_t subCount = count;
-			while(subCount > 0){
-				int32_t stackCount = std::min((int32_t)100, (int32_t)subCount);
-				Item* newItem = Item::CreateItem(itemId, stackCount);
+	const ItemType& it = Item::items[itemId];
+	int32_t itemCount;
+	int32_t subType;
 
-				if(!newItem){
-					reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
-					lua_pushnumber(L, LUA_ERROR);
-					return 1;
-				}
+	if(it.stackable){
+		itemCount = (int32_t)std::ceil((float)count / 100);
+		subType = count;
+	}
+	else{
+		itemCount = count;
+		subType = 1;
+	}
 
-				ReturnValue ret = g_game.internalAddItem(container, newItem);
+	while(itemCount > 0){
+		int32_t stackCount = std::min((int32_t)100, (int32_t)subType);
+		Item* newItem = Item::CreateItem(itemId, stackCount);
 
-				if(ret != RET_NOERROR){
-					delete newItem;
-					lua_pushnumber(L, LUA_ERROR);
-					return 1;
-				}
-
-				subCount = subCount - stackCount;
-
-				if(subCount == 0){
-					if(newItem->getParent()){
-						uint32_t uid = env->addThing((Thing*)newItem);
-						lua_pushnumber(L, uid);
-						return 1;
-					}
-					else{
-						//stackable item stacked with existing object, newItem will be released
-						lua_pushnumber(L, LUA_NULL);
-						return 1;
-					}
-				}
-			}
+		if(!newItem){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
 		}
-		else{
-			Item* newItem = Item::CreateItem(itemId, count);
 
-			ReturnValue ret = g_game.internalAddItem(container, newItem);
-			if(ret != RET_NOERROR){
-				delete newItem;
-				lua_pushnumber(L, LUA_ERROR);
-				return 1;
-			}
+		if(it.stackable){
+			subType -= stackCount;
+		}
+		ReturnValue ret = g_game.internalAddItem(container, newItem);
 
+		if(ret != RET_NOERROR){
+			delete newItem;
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+
+		--itemCount;
+		if(itemCount == 0){
 			if(newItem->getParent()){
-				uint32_t new_uid = env->addThing((Thing*)newItem);
-				lua_pushnumber(L, new_uid);
+				uint32_t uid = env->addThing((Thing*)newItem);
+				lua_pushnumber(L, uid);
 				return 1;
 			}
 			else{
@@ -6657,13 +6619,9 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 			}
 		}
 	}
-	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
 
-	return 0;
+	lua_pushnumber(L, LUA_NULL);
+	return 1;
 }
 
 int LuaScriptInterface::luaGetDepotId(lua_State *L)
