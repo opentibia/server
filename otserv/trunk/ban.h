@@ -29,7 +29,8 @@ enum BanType_t {
 	BAN_IPADDRESS = 1,
 	BAN_PLAYER = 2,
 	BAN_ACCOUNT = 3,
-	BAN_NOTATION = 4
+	BAN_NOTATION = 4,
+	BAN_STATEMENT = 5
 };
 
 struct Ban {
@@ -79,6 +80,8 @@ public:
 	bool addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid, std::string comment,
 		std::string statement, uint32_t reason, violationAction_t action) const;
 	bool addPlayerBan(const std::string& name, int32_t time, uint32_t adminid, std::string comment,
+		std::string statement, uint32_t reason, violationAction_t action) const;
+	bool addPlayerStatement(uint32_t playerId, uint32_t adminid, std::string comment,
 		std::string statement, uint32_t reason, violationAction_t action) const;
 	bool addAccountBan(uint32_t account, int32_t time, uint32_t adminid, std::string comment,
 		std::string statement, uint32_t reason, violationAction_t action) const;

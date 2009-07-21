@@ -259,6 +259,23 @@ bool BanManager::addPlayerBan(const std::string& name, int32_t time, uint32_t ad
 		addPlayerBan(guid, time, adminid, comment, statement, reason, action);
 }
 
+bool BanManager::addPlayerStatement(uint32_t playerId, uint32_t adminid, std::string comment,
+	std::string statement, uint32_t reason, violationAction_t action) const
+{
+	if(playerId == 0) return false;
+	Database* db = Database::instance();
+
+	DBInsert stmt(db);
+	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
+
+	DBQuery query;
+	query << BAN_STATEMENT << ", " << playerId << ", " << 0 << ", " << std::time(NULL) << ", " << adminid << ", ";
+	query << db->escapeString(comment) << ", " << db->escapeString(statement) << ", " << reason << ", " << action;
+
+	if(!stmt.addRow(query.str())) return false;
+	return stmt.execute();
+}
+
 bool BanManager::addAccountBan(uint32_t account, int32_t time, uint32_t adminid,
 	std::string comment, std::string statement, uint32_t reason, violationAction_t action) const
 {
@@ -286,7 +303,7 @@ bool BanManager::addAccountNotation(uint32_t account, uint32_t adminid, std::str
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
 
 	DBQuery query;
-	query << BAN_NOTATION << ", " << account << ", -1, " << std::time(NULL) << ", " << adminid << ", ";
+	query << BAN_NOTATION << ", " << account << ",  " << 0 << ", " << std::time(NULL) << ", " << adminid << ", ";
 	query << db->escapeString(comment) << ", " << db->escapeString(statement) << ", " << reason << ", " << action;
 
 	if(!stmt.addRow(query.str())) return false;
