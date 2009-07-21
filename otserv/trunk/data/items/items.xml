@@ -21073,14 +21073,25 @@
 	</item>
 	<item id="10017" article="a" name="football"/>
 
+	
 	<item id="10355" article="a" name="statue of Fafnar">
 		<attribute key="rotateTo" value="10356"/>
 	</item>
 	<item id="10356" article="a" name="statue of Fafnar">
 		<attribute key="rotateTo" value="10355"/>
 	</item>
-
-
+	<item id="10541" article="a" name="statue of Fafnar"/>
+	<item id="10542" article="a" name="golden lightbearer's trophy">
+		<!-- fixme! player name should be a player name, and year should be year -->
+		<attribute key="description" value="You read: &quot;<Player name>&quote; helped to keep the fire basins burning and is one of the lightbearers of <year>">
+		<attribute key="weight" value="900"/>
+	</item>
+	<item id="10543" article="a" name="silver lightbearer's trophy">
+		<!-- fixme! player name should be a player name, and year should be year -->
+		<attribute key="description" value="You read: &quot;<Player name>&quote; helped to keep the fire basins burning and is one of the lightbearers of <year>">
+		<attribute key="weight" value="900"/>
+	</item>
+	
 	<item id="20001" name="water"/>
 	<item id="20002" name="blood"/>
 	<item id="20003" name="beer"/>
