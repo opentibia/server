@@ -408,7 +408,6 @@ protected:
 	Outfit_t defaultOutfit;
 
 	Position masterPos;
-	Position lastPos;
 	int32_t masterRadius;
 	uint64_t lastStep;
 	uint32_t lastStepCost;

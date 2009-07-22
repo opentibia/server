@@ -3840,19 +3840,18 @@ void Player::gainExperience(uint64_t& gainExp, bool fromMonster)
 				addCondition(condition);
 			}
 
-			gainExp = (uint64_t)std::floor(gainExp * player->getRateValue(LEVEL_EXPERIENCE));
-
+			gainExp = (uint64_t)std::floor(gainExp * getRateValue(LEVEL_EXPERIENCE));
 			if(fromMonster){
 				if((isPremium() || !g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM)) &&
 					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION)){
 					gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
 				}
 
-				if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
-					if(player->getStaminaMinutes() <= 0){
+				if(!hasFlag(PlayerFlag_HasInfiniteStamina)){
+					if(getStaminaMinutes() <= 0){
 						gainExp = 0;
 					}
-					else if(player->getStaminaMinutes() <= 840){
+					else if(getStaminaMinutes() <= 840){
 						gainExp = gainExp / 2;
 					}
 				}
