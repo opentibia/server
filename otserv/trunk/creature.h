@@ -300,7 +300,7 @@ public:
 
 	virtual void onDie();
 
-	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
+	virtual uint64_t getGainedExperience(Creature* attacker) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
 	void addHealPoints(Creature* caster, int32_t healthPoints);
 	bool hasBeenAttacked(uint32_t attackerId) const;
@@ -321,8 +321,8 @@ public:
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target);
-	virtual void onGainExperience(uint64_t gainExp);
-	virtual void onGainSharedExperience(uint64_t gainExp);
+	virtual void onGainExperience(uint64_t gainExp, bool fromMonster);
+	virtual void onGainSharedExperience(uint64_t gainExp, bool fromMonster);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);

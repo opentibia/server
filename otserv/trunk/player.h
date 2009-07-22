@@ -367,7 +367,7 @@ public:
 	void addInFightTicks(uint32_t ticks, bool pzlock = false);
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual uint64_t getGainedExperience(Creature* attacker, bool useMultiplier = true) const;
+	virtual uint64_t getGainedExperience(Creature* attacker) const;
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
@@ -384,8 +384,8 @@ public:
 	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target);
-	virtual void onGainExperience(uint64_t gainExp);
-	virtual void onGainSharedExperience(uint64_t gainExp);
+	virtual void onGainExperience(uint64_t gainExp, bool fromMonster);
+	virtual void onGainSharedExperience(uint64_t gainExp, bool fromMonster);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
@@ -668,7 +668,7 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	std::string getSkillName(int skillid);
-	void gainExperience(uint64_t& exp);
+	void gainExperience(uint64_t& exp, bool fromMonster);
 	void addExperience(uint64_t exp);
 
 	void updateInventoryWeight();

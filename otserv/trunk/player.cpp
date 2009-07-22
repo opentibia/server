@@ -3466,7 +3466,7 @@ void Player::doAttacking(uint32_t interval)
 	}
 }
 
-uint64_t Player::getGainedExperience(Creature* attacker, bool useMultiplier /*= true*/) const
+uint64_t Player::getGainedExperience(Creature* attacker) const
 {
 	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
 		Player* attackerPlayer = attacker->getPlayer();
@@ -3484,10 +3484,7 @@ uint64_t Player::getGainedExperience(Creature* attacker, bool useMultiplier /*= 
 				uint64_t c = getExperience();
 
 				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor( getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ) );
-				if(!useMultiplier)
-					return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
-				else
-					return uint64_t((result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE)) * attackerPlayer->getRateValue(LEVEL_EXPERIENCE));
+				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
 		}
 	}
 
@@ -3829,7 +3826,7 @@ void Player::onKilledCreature(Creature* target)
 	Creature::onKilledCreature(target);
 }
 
-void Player::gainExperience(uint64_t& gainExp)
+void Player::gainExperience(uint64_t& gainExp, bool fromMonster)
 {
 	if(!hasFlag(PlayerFlag_NotGainExperience)){
 		if(gainExp > 0){
@@ -3843,16 +3840,30 @@ void Player::gainExperience(uint64_t& gainExp)
 				addCondition(condition);
 			}
 
-			if((isPremium() || !g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM)) &&
-					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION))
-				gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
+			gainExp = (uint64_t)std::floor(gainExp * player->getRateValue(LEVEL_EXPERIENCE));
+
+			if(fromMonster){
+				if((isPremium() || !g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM)) &&
+					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION)){
+					gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
+				}
+
+				if(!player->hasFlag(PlayerFlag_HasInfiniteStamina)){
+					if(player->getStaminaMinutes() <= 0){
+						gainExp = 0;
+					}
+					else if(player->getStaminaMinutes() <= 840){
+						gainExp = gainExp / 2;
+					}
+				}
+			}
 
 			addExperience(gainExp);
 		}
 	}
 }
 
-void Player::onGainExperience(uint64_t gainExp)
+void Player::onGainExperience(uint64_t gainExp, bool fromMonster)
 {
 	if(hasFlag(PlayerFlag_NotGainExperience)){
 		gainExp = 0;
@@ -3860,19 +3871,19 @@ void Player::onGainExperience(uint64_t gainExp)
 
 	Party* party = getParty();
 	if(party && party->isSharedExperienceActive() && party->isSharedExperienceEnabled()){
-		party->shareExperience(gainExp);
+		party->shareExperience(gainExp, fromMonster);
 		//We will get a share of the experience through the sharing mechanism
 		gainExp = 0;
 	}
 
-	gainExperience(gainExp);
-	Creature::onGainExperience(gainExp);
+	gainExperience(gainExp, fromMonster);
+	Creature::onGainExperience(gainExp, fromMonster);
 }
 
-void Player::onGainSharedExperience(uint64_t gainExp)
+void Player::onGainSharedExperience(uint64_t gainExp, bool fromMonster)
 {
-	gainExperience(gainExp);
-	Creature::onGainSharedExperience(gainExp);
+	gainExperience(gainExp, fromMonster);
+	Creature::onGainSharedExperience(gainExp, fromMonster);
 }
 
 bool Player::isImmune(CombatType_t type) const
