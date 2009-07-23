@@ -3484,7 +3484,11 @@ uint64_t Player::getGainedExperience(Creature* attacker) const
 				uint64_t c = getExperience();
 
 				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor( getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ) );
-				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
+				if(g_config.getNumber(ConfigManager::RATES_FOR_PLAYER_KILLING)){
+					result = result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
+				}
+
+				return result;
 		}
 	}
 
@@ -3839,25 +3843,35 @@ void Player::gainExperience(uint64_t& gainExp, bool fromMonster)
 				condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
 				addCondition(condition);
 			}
+			
+			//check stamina, player rate and other values
+			getGainExperience(gainExp, fromMonster);
 
-			gainExp = (uint64_t)std::floor(gainExp * getRateValue(LEVEL_EXPERIENCE));
-			if(fromMonster){
-				if((isPremium() || !g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM)) &&
-					stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION)){
-					gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
-				}
-
-				if(!hasFlag(PlayerFlag_HasInfiniteStamina)){
-					if(getStaminaMinutes() <= 0){
-						gainExp = 0;
-					}
-					else if(getStaminaMinutes() <= 840){
-						gainExp = gainExp / 2;
-					}
-				}
-			}
-
+			//add experience
 			addExperience(gainExp);
+		}
+	}
+}
+
+void Player::getGainExperience(uint64_t& gainExp, bool fromMonster)
+{
+	if(fromMonster || g_config.getNumber(ConfigManager::RATES_FOR_PLAYER_KILLING)){
+		gainExp = (uint64_t)std::floor(gainExp * getRateValue(LEVEL_EXPERIENCE));
+	}
+
+	if(fromMonster){
+		if((isPremium() || !g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM)) &&
+			stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION)){
+			gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
+		}
+
+		if(!hasFlag(PlayerFlag_HasInfiniteStamina)){
+			if(getStaminaMinutes() <= 0){
+				gainExp = 0;
+			}
+			else if(getStaminaMinutes() <= 840){
+				gainExp = gainExp / 2;
+			}
 		}
 	}
 }

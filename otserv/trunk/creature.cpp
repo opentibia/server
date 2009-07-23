@@ -1140,8 +1140,7 @@ double Creature::getDamageRatio(Creature* attacker) const
 
 uint64_t Creature::getGainedExperience(Creature* attacker) const
 {
-	uint64_t retValue = (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
-	return retValue;
+	return (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 }
 
 void Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
@@ -1282,6 +1281,10 @@ void Creature::onGainExperience(uint64_t gainExp, bool fromMonster)
 		if(getMaster()){
 			gainExp = gainExp / 2;
 			getMaster()->onGainExperience(gainExp, fromMonster);
+			//get the real experience gained to show on screen, since player rate counts for their summons
+			if(getMaster()->getPlayer()){
+				getMaster()->getPlayer()->getGainExperience(gainExp, fromMonster);
+			}
 		}
 
 		std::stringstream strExp;

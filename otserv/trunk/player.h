@@ -368,6 +368,7 @@ public:
 	void addDefaultRegeneration(uint32_t addTicks);
 
 	virtual uint64_t getGainedExperience(Creature* attacker) const;
+	void getGainExperience(uint64_t& gainExp, bool fromMonster);
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
@@ -668,7 +669,7 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	std::string getSkillName(int skillid);
-	void gainExperience(uint64_t& exp, bool fromMonster);
+	void gainExperience(uint64_t& gainExp, bool fromMonster);
 	void addExperience(uint64_t exp);
 
 	void updateInventoryWeight();
