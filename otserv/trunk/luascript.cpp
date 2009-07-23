@@ -4545,7 +4545,7 @@ int LuaScriptInterface::luaGetPlayersOnlineList(lua_State *L)
 int LuaScriptInterface::luaBroadcastMessage(lua_State *L)
 {
 	//broadcastMessage(message, <optional> messageClass)
-	uint32_t type = MSG_STATUS_CONSOLE_RED;
+	uint32_t type = MSG_STATUS_WARNING;
 	if(lua_gettop(L) >= 2)
 		type = popNumber(L);
 	std::string message = popString(L);

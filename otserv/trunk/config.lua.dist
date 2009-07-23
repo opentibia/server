@@ -61,7 +61,7 @@ worldname = "OpenTibia"
 -- options: pvp, no-pvp, pvp-enforced
 worldtype = "pvp"
 
--- do experience rate and player rate count on experience gained from killings players on pvp-e worlds?
+-- does player rate (from lua functions) count on experience gained from killings players on pvp-e worlds?
 rates_for_player_killing = false
 
 -- exhausted time in ms (1000 = 1 second) for none-aggressive spells
@@ -156,6 +156,7 @@ max_idle_time_warning = 15*60*1000
 
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
+rate_exp_pvp = 1
 rate_skill = 1
 rate_mag = 1
 rate_loot = 1
