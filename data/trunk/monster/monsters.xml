@@ -101,13 +101,13 @@
 	<monster name="Foreman Kneebiter" file="bosses/foreman kneebiter.xml"/>
 	<monster name="General Murius" file="bosses/general murius.xml"/>
 	<monster name="Ghazbaran" file="bosses/ghazbaran.xml"/>
-	<monster name="Golgordan" file="Bosses/golgordan.xml"/>
+	<monster name="Golgordan" file="bosses/golgordan.xml"/>
 	<monster name="Grorlam" file="bosses/grorlam.xml"/>
 	<monster name="Grynch Clan Goblin" file="bosses/grynch clan goblin.xml"/>
 	<monster name="Hellgorak" file="bosses/hellgorak.xml"/>
 	<monster name="Latrivan" file="bosses/latrivan.xml"/>
 	<monster name="Lethal Lissy" file="bosses/lethal lissy.xml"/>
-	<monster name="Lord of the Elements" file="Bosses/lord of the elements.xml"/>
+	<monster name="Lord of the Elements" file="bosses/lord of the elements.xml"/>
 	<monster name="Mad Technomancer" file="bosses/mad technomancer.xml"/>
 	<monster name="Madareth" file="bosses/madareth.xml"/>
 	<monster name="Man In The Cave" file="bosses/man in the cave.xml"/>
@@ -356,7 +356,7 @@
 	<monster name="Nomad" file="outlaws/nomad.xml"/>
 	<monster name="Primitive" file="outlaws/primitive.xml"/>
 	<monster name="Smuggler" file="outlaws/smuggler.xml"/>
-	<monster name="Stalker" file="Outlaws/stalker.xml"/>
+	<monster name="Stalker" file="outlaws/stalker.xml"/>
 	<monster name="Wild Warrior" file="outlaws/wild warrior.xml"/>
 
 	<!-- Pharaohs -->
