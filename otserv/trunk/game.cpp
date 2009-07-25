@@ -4792,7 +4792,8 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 		{
 			ChannelStatementMap::iterator it = Player::channelStatementMap.find(channelId);
 			if(it != Player::channelStatementMap.end()){
-				g_bans.addPlayerStatement(guid, player->getGUID(), comment, it->second, reasonId, actionType);
+				statement = it->second;
+				g_bans.addPlayerStatement(guid, player->getGUID(), comment, statement, reasonId, actionType);
 				Player::channelStatementMap.erase(it);
 			}
 			else{
