@@ -21083,12 +21083,12 @@
 	<item id="10541" article="a" name="statue of Fafnar"/>
 	<item id="10542" article="a" name="golden lightbearer's trophy">
 		<!-- fixme! player name should be a player name, and year should be year -->
-		<attribute key="description" value="You read: &quot;<Player name>&quote; helped to keep the fire basins burning and is one of the lightbearers of <year>">
+		<attribute key="description" value="You read: &quot;&lt;Player name&gt;&quot; helped to keep the fire basins burning and is one of the lightbearers of &lt;year&gt;"/>
 		<attribute key="weight" value="900"/>
 	</item>
 	<item id="10543" article="a" name="silver lightbearer's trophy">
 		<!-- fixme! player name should be a player name, and year should be year -->
-		<attribute key="description" value="You read: &quot;<Player name>&quote; helped to keep the fire basins burning and is one of the lightbearers of <year>">
+		<attribute key="description" value="You read: &quot;&lt;Player name&gt;&quot; helped to keep the fire basins burning and is one of the lightbearers of &lt;year&gt;"/>
 		<attribute key="weight" value="900"/>
 	</item>
 	

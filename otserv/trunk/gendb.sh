@@ -3,6 +3,34 @@
 #based on 
 # http://otfans.net/wiki/index.php/After_compiling:_Creating_first_accounts
 
+echo ""
+echo "gendb.sh"
+echo ""
+if [ -z `which sqlite3` ] ; then
+	echo "This utility requires sqlite3 to be somewhere in your \$PATH."
+	exit 1
+fi
+echo "WARNING"
+echo "This will reinitialize your db.s3db file from the current directory,"
+echo "using schema.sqlite, and populate it with basic players and accounts."
+echo "This means you LOSE ALL DATA in SQLite database db.s3db."
+echo ""
+echo "If you are upgrading, you should try the database utility!"
+echo "If you don't care about your data, type 'yes, ok' below."
+echo "Pressing enter cancels."
+CONFIRM=""
+while [ "$CONFIRM" != "yes, ok" ] ; do
+	read CONFIRM
+	if [ -z "$CONFIRM" ] ; then 
+		echo "Cancelled. You need to type 'yes, ok' to proceed."
+		exit 
+	fi
+
+	if [ "$CONFIRM" != "yes, ok" ] ; then echo "You must either press enter, or type 'yes, ok'" ; fi
+done
+
+echo "Reinitializing"
+
 rm db.s3db 
 sqlite3 db.s3db < schema.sqlite
 
@@ -45,4 +73,4 @@ VALUES ('5', '101', '4', '2638', '2', '0');
 
 _EOF
 
-
+echo "Done!"
