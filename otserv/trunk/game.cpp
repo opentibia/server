@@ -4827,7 +4827,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	}
 
 	if(ipBanishment && ip > 0)
-		g_bans.addIpBan(ip, -1, (time(NULL) + g_config.getNumber(ConfigManager::IPBANISHMENT_LENGTH)),
+		g_bans.addIpBan(ip, 0xFFFFFFFF, (time(NULL) + g_config.getNumber(ConfigManager::IPBANISHMENT_LENGTH)),
 			player->getGUID(), comment);
 
 	if(removeNotations > 1)
